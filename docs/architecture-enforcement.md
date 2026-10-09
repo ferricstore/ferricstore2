@@ -69,6 +69,20 @@ must name one specific Clippy lint on a test function and provide a meaningful
 `reason`; whole-group, module-wide, unreasoned and production suppressions fail.
 Review still decides whether a syntactically accepted reason is appropriate.
 
+## Source size
+
+[ADR-003](adr/003-source-size-limits.md) limits every production Rust `src`
+file to **400 physical lines**, including conditional source and nested test
+modules. Tooling and integration-test/benchmark files may contain **600**.
+Blank lines, documentation and comments count; LF/CRLF and a final line without
+a newline are handled consistently. Preserved upstream snapshots and explicit
+parser fixture data remain outside the first-party Rust selection.
+
+The architecture checker enforces both boundaries in `cargo arch` and the
+local/CI wrapper. There are no file-specific exemptions. Divide large files by
+responsibility while preserving the module allowlist, pure domain and existing
+public contracts. Clippy's long-function/argument checks remain enforced.
+
 ## Archunit evaluation and compiler evidence
 
 The [official archunit API](https://docs.rs/archunit/latest/archunit/) identifies

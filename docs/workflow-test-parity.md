@@ -9,7 +9,7 @@ The existing Elixir workflow behavior tests must pass against equivalent Rust op
 - `tests/reference/elixir-baseline/`: byte-identical test/support snapshots from `ferricstore/ferricstore` commit `66586c596e271408d9184af32eb31cd7218c126e`.
 - `tests/reference/elixir-working-tree/`: changed local workflow-related test inputs kept separate from the pinned baseline. Review their behavior before accepting a delta.
 
-These files preserve the tests we already use; they are not runnable Rust tests or a self-contained Elixir application. The M0 Rust workspace and test infrastructure now exist; the workflow engine and scenario counterparts do not. Do not claim this suite works against Rust until the actual ports and harness run. The textual declaration index is navigation, not an ExUnit parser or executed-test count. Generated/parameterized tests, macro expansion, module/describe context, setup and tags require actual ExUnit collection in the future test-port phase.
+These files preserve the tests we already use; they are not runnable Rust tests or a self-contained Elixir application. M0 infrastructure, actual ExUnit registration and a partial pure M1 domain core now exist. A checked progress ledger records source-derived Rust assertions and reconciled runtime identities; it does not certify full workflow parity. The textual declaration index is navigation, not an ExUnit parser or executed-test count. Generated cases, macro origins, module/describe context, setup, fixtures and mandatory profiles require the collection and execution evidence described below. See [the handoff](CONTINUE.md) for current results.
 
 ## Non-negotiable port contract
 
@@ -53,4 +53,4 @@ M0 collects runtime ExUnit identities and creates the checked bidirectional mapp
 
 M0 collects runtime ExUnit identities; M1 ports domain scenarios; M2/M3 port persistence/consensus faults; M4 ports worker/API contracts; M5 closes broader workflow scope; M6/M7 port query/retention/recovery cases. Property/model tests, architecture checks and Rust-specific safety tests are additional coverage, not replacements for this suite.
 
-No Elixir or Rust suite was executed for this design change. Snapshot integrity and manifest coverage checks verify preservation only, not test outcomes or behavioral equivalence. [Independent harness review](reviews/workflow-test-parity-review.md) records the bounded source inspection and remaining requirements.
+The original design review executed no suites. Subsequent implementation has executed source-derived Rust tests and selected original Elixir cases, with exact evidence in [the handoff](CONTINUE.md) and implementation review notes. Snapshot integrity, registration and manifest coverage checks verify preservation/accounting only, not test outcomes or behavioral equivalence. [Independent harness review](reviews/workflow-test-parity-review.md) records the original bounded source inspection and requirements that still apply.

@@ -1,8 +1,9 @@
 # Development checks
 
-The M0 workspace contains module scaffolds and real infrastructure tests. It does
-not implement workflow behavior, storage, consensus, caches or live transports.
-Reference integrity and architecture checks do not establish workflow parity.
+The workspace contains M0 infrastructure and a partial pure M1 domain core with
+source-derived tests. Storage, consensus, caches and live transports remain
+unimplemented. Reference integrity, registration and architecture checks do not
+establish full workflow parity or durability. See the handoff for current results.
 
 Use Rust **1.99.0**, edition **2024**, on Linux or macOS. The CI host matrix is
 `ubuntu-24.04` and `macos-15`; local checks use the current native host. Windows
@@ -29,6 +30,12 @@ locked workspace check and Clippy on all targets; workspace tests; doctests;
 documentation with warnings denied; `cargo arch`; `cargo reference`; and all four
 `cargo-deny` checks (advisories, bans, licenses and sources). `CARGO_BUILD_WARNINGS`
 is set to `deny`, and rustdoc receives `-D warnings`. A failure stops the wrapper.
+
+The wrapper also runs `cargo progress`, which validates source/runtime identity
+accounting and actual assertion links without certifying execution or full
+workflow parity. Architecture checks enforce 400 physical lines per production
+Rust `src` file and 600 per tooling/integration-test file, as recorded in
+[ADR-003](adr/003-source-size-limits.md).
 
 The supported feature profile is the default profile: there are currently no
 first-party Cargo features. New feature combinations require an explicit reviewed
@@ -59,6 +66,7 @@ Useful individual commands are:
 ```bash
 cargo arch       # Locked architecture policy tests, including negative fixtures.
 cargo reference  # Preserved input integrity; no workflow implementation claim.
+cargo progress   # Checked identity/assertion accounting; no execution certification.
 cargo parity     # require-parity: must fail while included cases remain unported.
 ```
 
@@ -75,8 +83,10 @@ workspace/runtime dependency. Checkout is pinned to
 `refs/tags/v7.0.1`. CI grants only `contents: read`, does not persist checkout
 credentials and does not publish source or request secrets.
 
-The final wrapper passed locally on native macOS: 53 infrastructure tests,
+The original M0 wrapper passed locally on native macOS: 53 infrastructure tests,
 three compile-fail doctests, documentation/architecture/reference checks and all
 four audits. `cargo parity` separately fails as required. The authored Linux and
-macOS GitHub runner matrix has not yet executed remotely. Actual negative
+macOS GitHub runner matrix subsequently passed for the foundation commit recorded
+in [the handoff](CONTINUE.md). Current continuation changes need their own final
+checks and CI result. Actual negative
 checks and reciprocal acceptance are recorded in [the CI review](reviews/infrastructure-ci-review.md).

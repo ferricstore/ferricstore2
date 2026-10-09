@@ -1,6 +1,8 @@
-//! Pure identity, version and bounded-value foundations.
+//! Pure binary identity, source-compatible partition encoding, and checked values.
 //!
-//! M0 module scaffold; implementations follow the reviewed architecture.
+//! Storage identity bounds and composed API-key admission are distinct checks.
+//! Time and fences are explicit values; this crate has no runtime dependencies
+//! and performs no clock, storage, routing, or workflow effects.
 
 #![forbid(unsafe_code)]
 

@@ -65,8 +65,8 @@ struct SourceFile {
 #[serde(deny_unknown_fields)]
 pub(crate) struct SourceDeclaration {
     pub(crate) id: String,
-    source_path: String,
-    line: usize,
+    pub(crate) source_path: String,
+    pub(crate) line: usize,
     declaration: String,
     name_kind: String,
     port_status: String,

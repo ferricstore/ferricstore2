@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "source_commit": "66586c596e271408d9184af32eb31cd7218c126e",
+  "decisions": [
+    {
+      "source_declaration_id": "0bc90782a5fe1e2c",
+      "source_path": "apps/ferricstore/test/support/isolated_instance.ex",
+      "source_line": 19,
+      "source_sha256": "c2b01b2134edbb4af81ca61bd71541eb147a065c8487e8323b4fe323d94a72d3",
+      "source_text": "test \"isolated test\", %{ctx: ctx} do",
+      "kind": "documentation-example-not-runtime-test",
+      "scope_decision": "reference-only",
+      "reason": "Literal usage example within @moduledoc heredoc at lines2-23; no ExUnit registration. Frozen ID remains accounted/unresolved and is never passing.",
+      "review_note": "docs/reviews/workflow-m1-parity.md"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "source_commit": "66586c596e271408d9184af32eb31cd7218c126e",
+  "roots": [
+    "apps/ferricstore/test/ferricstore/store/blob_side_channel_test.exs"
+  ],
+  "files": [
+    {
+      "source_path": "apps/ferricstore/test/ferricstore/store/blob_side_channel_test.exs",
+      "sha256": "a43d40cd388330a5ea2f2d05cf8d30a9b26af8e8716ba60476d75c9e2da5b5ef"
+    },
+    {
+      "source_path": "apps/ferricstore/test/ferricstore/store/blob_side_channel_test/sections/blob_garbage_sweep_streams_keydir_refs_copying_full_ets_table.exs",
+      "sha256": "8655028e8fd14c86cd9e6a382b5ebdc5b9a81e41ad8d9498dbfb111b2db76e02"
+    }
+  ],
+  "scope_decision": "pending-case-review",
+  "selection_omission_reason": "Frozen selection preserved two required blob section files without their consumer root; register the pinned root to reconcile those identities, preserving new nonfrozen runtime cases as unmatched.",
+  "review_note": "docs/reviews/workflow-m1-parity.md",
+  "registration_is_execution": false
+}

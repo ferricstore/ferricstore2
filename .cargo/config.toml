@@ -1,5 +1,6 @@
 [alias]
 arch = "test -p wf-architecture-tests --locked"
 reference = "run -p wf-parity-tests --locked -- check-reference"
+progress = "run -p wf-parity-tests --locked -- check-progress"
 parity = "run -p wf-parity-tests --locked -- require-parity"
 lint = "clippy --workspace --all-targets --locked -- -D warnings"

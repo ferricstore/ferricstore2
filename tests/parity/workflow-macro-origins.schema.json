@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reviewed pinned source macro origins; no execution or parity proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_commit",
+    "reference_manifest_sha256",
+    "origin_rule",
+    "review",
+    "source_collection",
+    "tools",
+    "required_helper_paths",
+    "helper_profiles",
+    "requirements",
+    "origins"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "source_commit": {
+      "const": "66586c596e271408d9184af32eb31cd7218c126e"
+    },
+    "reference_manifest_sha256": {
+      "const": "7df8c7885a64b6276e84517dffa4f1ead0f592f6d0996b398cdb61551c1bae61"
+    },
+    "origin_rule": {
+      "const": "literal-section-origin-v2"
+    },
+    "review": {
+      "$ref": "#/$defs/artifact"
+    },
+    "source_collection": {
+      "$ref": "#/$defs/artifact"
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "required_helper_paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "helper_profiles": {
+      "type": "object"
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "setup_execution",
+        "fixture_review",
+        "mandatory_profile_execution"
+      ],
+      "properties": {
+        "setup_execution": {
+          "const": "unexecuted"
+        },
+        "fixture_review": {
+          "const": "pending"
+        },
+        "mandatory_profile_execution": {
+          "const": "unexecuted"
+        }
+      }
+    },
+    "origins": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/origin"
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_declaration_id",
+        "source_path",
+        "source_sha256",
+        "source_text",
+        "registration_path",
+        "registration_sha256",
+        "use_text",
+        "macro_module",
+        "consumer_module",
+        "name",
+        "runtime_case_id",
+        "scope_decision",
+        "origin_id",
+        "source_line",
+        "registration_line",
+        "macro_definition_line"
+      ],
+      "properties": {
+        "source_declaration_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        },
+        "source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registration_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registration_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "use_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "macro_module": {
+          "type": "string",
+          "minLength": 1
+        },
+        "consumer_module": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime_case_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "scope_decision": {
+          "enum": [
+            "included-workflow",
+            "pending-case-review"
+          ]
+        },
+        "origin_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "registration_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "macro_definition_line": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

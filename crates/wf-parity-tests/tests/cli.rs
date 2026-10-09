@@ -33,11 +33,9 @@ fn preserved_artifacts_pass_but_full_workflow_parity_fails() -> TestResult {
     let error = require_parity(&workspace_root())
         .err()
         .ok_or("M0 must not pass parity")?;
-    assert!(
-        error
-            .to_string()
-            .contains("ExUnit runtime cases have not been collected")
-    );
+    let message = error.to_string();
+    assert!(message.contains("source and Rust execution remain incomplete"));
+    assert!(!message.contains("ExUnit runtime cases have not been collected"));
     Ok(())
 }
 

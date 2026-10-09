@@ -1,0 +1,1539 @@
+{
+  "schema_version": 1,
+  "source_commit": "66586c596e271408d9184af32eb31cd7218c126e",
+  "origin_rule": "literal-section-origin-v2",
+  "registration_is_execution": false,
+  "review_note": "docs/reviews/workflow-m1-parity.md",
+  "sections": [
+    {
+      "macro_module": "Elixir.Ferricstore.Commands.FlowTest.Sections.DispatchesFlowCreateManyThroughRustAst",
+      "source_path": "apps/ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_create_many_through_rust_ast.exs",
+      "source_sha256": "b58e7333a1cc26cc9b35680a754b4cc83831a5eee7a603db6243ad2cbc2ea6ba",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Commands.FlowTest",
+          "registration_line": 31,
+          "registration_path": "apps/ferricstore/test/ferricstore/commands/flow_test.exs",
+          "registration_sha256": "acde7d9befa04b5d2da9226186e6091f9e6447032713eb20dd600b21c0c7bbbf",
+          "use_text": "use Ferricstore.Commands.FlowTest.Sections.DispatchesFlowCreateManyThroughRustAst"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Commands.FlowTest.Sections.DispatchesFlowRewindThroughRustAst",
+      "source_path": "apps/ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_rewind_through_rust_ast.exs",
+      "source_sha256": "8f8ff896a25490462b9d3cdd7b871adafe305941cab6124d3b6ee765f566439c",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Commands.FlowTest",
+          "registration_line": 32,
+          "registration_path": "apps/ferricstore/test/ferricstore/commands/flow_test.exs",
+          "registration_sha256": "acde7d9befa04b5d2da9226186e6091f9e6447032713eb20dd600b21c0c7bbbf",
+          "use_text": "use Ferricstore.Commands.FlowTest.Sections.DispatchesFlowRewindThroughRustAst"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Commands.FlowTest.Sections.DispatchesFlowStateMetaThroughRustAst",
+      "source_path": "apps/ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_state_meta_through_rust_ast.exs",
+      "source_sha256": "1e74f34c6e7f56ad507b62226384443a8b8993d10c31c075113faf9cc421f7e4",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Commands.FlowTest",
+          "registration_line": 33,
+          "registration_path": "apps/ferricstore/test/ferricstore/commands/flow_test.exs",
+          "registration_sha256": "acde7d9befa04b5d2da9226186e6091f9e6447032713eb20dd600b21c0c7bbbf",
+          "use_text": "use Ferricstore.Commands.FlowTest.Sections.DispatchesFlowStateMetaThroughRustAst"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Commands.FlowTest.Sections.DispatchesFlowValuePutPayloadRefsThroughRustAst",
+      "source_path": "apps/ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_value_put_payload_refs_through_rust_ast.exs",
+      "source_sha256": "5c3c7d7a91fa00115bc7ab91d72301cf2436a5a316e06d01d2b39b1f31c4270c",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Commands.FlowTest",
+          "registration_line": 30,
+          "registration_path": "apps/ferricstore/test/ferricstore/commands/flow_test.exs",
+          "registration_sha256": "acde7d9befa04b5d2da9226186e6091f9e6447032713eb20dd600b21c0c7bbbf",
+          "use_text": "use Ferricstore.Commands.FlowTest.Sections.DispatchesFlowValuePutPayloadRefsThroughRustAst"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.HistoryProjectorTest.Sections.AsyncEnqueueRejectsAboveConfiguredPendingCapSoApplyFallBackSy",
+      "source_path": "apps/ferricstore/test/ferricstore/flow/history_projector_test/sections/async_enqueue_rejects_above_configured_pending_cap_so_apply_fall_back_sy.exs",
+      "source_sha256": "001918f197f576ee1e886f6fb2689ac17d1fabf85075f7f85d69ca27550c6881",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.HistoryProjectorTest",
+          "registration_line": 34,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow/history_projector_test.exs",
+          "registration_sha256": "08f719b45f8ee1e4feaad01c268e879891e66edb7571cf10512c07f8bd27e108",
+          "use_text": "use Ferricstore.Flow.HistoryProjectorTest.Sections.AsyncEnqueueRejectsAboveConfiguredPendingCapSoApplyFallBackSy"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.HistoryProjectorTest.Sections.SyncProjectionHydratesSpilledWaraftApplyProjectionValuesBatch",
+      "source_path": "apps/ferricstore/test/ferricstore/flow/history_projector_test/sections/sync_projection_hydrates_spilled_waraft_apply_projection_values_batch.exs",
+      "source_sha256": "7e11e7e624d6c08abc7768c2b272a19ded0d18a4e260209b9067ca2b42659c81",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.HistoryProjectorTest",
+          "registration_line": 28,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow/history_projector_test.exs",
+          "registration_sha256": "08f719b45f8ee1e4feaad01c268e879891e66edb7571cf10512c07f8bd27e108",
+          "use_text": "use Ferricstore.Flow.HistoryProjectorTest.Sections.SyncProjectionHydratesSpilledWaraftApplyProjectionValuesBatch"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.HistoryProjectorTest.Sections.SyncProjectionWritesDedicatedHistoryLogUpdatesIndexAdvancesWate",
+      "source_path": "apps/ferricstore/test/ferricstore/flow/history_projector_test/sections/sync_projection_writes_dedicated_history_log_updates_index_advances_wate.exs",
+      "source_sha256": "1ae6f9676cb4125669c18f9986afc19e716aa6f2aa279fb0638a65e03c5f27fc",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.HistoryProjectorTest",
+          "registration_line": 26,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow/history_projector_test.exs",
+          "registration_sha256": "08f719b45f8ee1e4feaad01c268e879891e66edb7571cf10512c07f8bd27e108",
+          "use_text": "use Ferricstore.Flow.HistoryProjectorTest.Sections.SyncProjectionWritesDedicatedHistoryLogUpdatesIndexAdvancesWate"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.AsyncTerminalHistoryColdOnlyAfterLmdbProjection",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/async_terminal_history_cold_only_after_lmdb_projection.exs",
+      "source_sha256": "35516cdf38002e66a8805d7ef9811f6f73de3ac291b39191bb7f3ed7567a3429",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 128,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.AsyncTerminalHistoryColdOnlyAfterLmdbProjection"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.DefaultStartupRepairsActiveProjectionClearsStaleLmdbFlushMarker",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/default_startup_repairs_active_projection_clears_stale_lmdb_flush_marker.exs",
+      "source_sha256": "fbdd00b105d3550e9858796ca6472c9565a9fbec4e89f56665983348a8ce1922",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 120,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.DefaultStartupRepairsActiveProjectionClearsStaleLmdbFlushMarker"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.HistoryProjectorFsyncsCopiedGeneratedValuesBeforePublishingLmdb",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/history_projector_fsyncs_copied_generated_values_before_publishing_lmdb.exs",
+      "source_sha256": "d5b556c3652cdd74410f4a1aeaaa97dcdeb8a946f0e65dfea631267205d00ada",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 116,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.HistoryProjectorFsyncsCopiedGeneratedValuesBeforePublishingLmdb"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.LineageIncludeColdReverseReadsNewestLmdbPrefixRows",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/lineage_include_cold_reverse_reads_newest_lmdb_prefix_rows.exs",
+      "source_sha256": "53ee32df6f5a451275a2dcf29cff62deee0816e9e8b52878d8d12686cf1601e1",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 127,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.LineageIncludeColdReverseReadsNewestLmdbPrefixRows"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.MirrorFlowReadsRejectStaleLmdbRecordFallBackBitcaskTruth",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/mirror_flow_reads_reject_stale_lmdb_record_fall_back_bitcask_truth.exs",
+      "source_sha256": "d9b355a798e9f28845e6dfbaf837ea44c910f10f98ef508795ad299aec1446f0",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 126,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.MirrorFlowReadsRejectStaleLmdbRecordFallBackBitcaskTruth"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.MirrorWriterProjectsTerminalHistoryHotFlowIndexDuringFlush",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/mirror_writer_projects_terminal_history_hot_flow_index_during_flush.exs",
+      "source_sha256": "0139095b703cac7d2234a95ee0ab23119a44965fe6975c2764c14b86d62e7db6",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 122,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.MirrorWriterProjectsTerminalHistoryHotFlowIndexDuringFlush"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.PartialRetentionCleanupKeepsValuesStillReferencedTerminalState",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/partial_retention_cleanup_keeps_values_still_referenced_terminal_state.exs",
+      "source_sha256": "6bb6bd4e0c09a84eefd98aa672a041ae59cacf88406af880ebce14335ff84770",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 130,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.PartialRetentionCleanupKeepsValuesStillReferencedTerminalState"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.StartupKeepsTerminalHistoryColdWhileDurableHistoryRemainsQuerya",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/startup_keeps_terminal_history_cold_while_durable_history_remains_querya.exs",
+      "source_sha256": "47a3cdfbeccd4b60dcadf41c99fcd6194fc9c1d5c49145b9bdc19cfcd7842e17",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 132,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.StartupKeepsTerminalHistoryColdWhileDurableHistoryRemainsQuerya"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.StartupRebuildsActiveFlowIndexesDedicatedLmdbActiveIndex",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/startup_rebuilds_active_flow_indexes_dedicated_lmdb_active_index.exs",
+      "source_sha256": "9deac36e35ad0a36d3ea306a6a5eea2eff998ba935e918c6d828d79c4f0cc491",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 118,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.StartupRebuildsActiveFlowIndexesDedicatedLmdbActiveIndex"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.StateMachineStillRequiresLmdbMirrorEnqueueModeConfiguredOff",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/state_machine_still_requires_lmdb_mirror_enqueue_mode_configured_off.exs",
+      "source_sha256": "7351715bc76c88c92b4a98dfe1dc2be53e5ae5ff842f97713c80b4b765ed1a9b",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 124,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.StateMachineStillRequiresLmdbMirrorEnqueueModeConfiguredOff"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Flow.LMDBTest.Sections.WarmOpensEmptyShardEnvBeforeFirstUserRead",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test/sections/warm_opens_empty_shard_env_before_first_user_read.exs",
+      "source_sha256": "61e7bc3c7f240ae443f80f2cd3f40aa46fa7b9a09060123e212d26b6f7e13e40",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Flow.LMDBTest",
+          "registration_line": 114,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_lmdb_test.exs",
+          "registration_sha256": "722bd131261f0ade2a3ef3ce1b217e2317f9677f36955e072e20d22baed41440",
+          "use_text": "use Ferricstore.Flow.LMDBTest.Sections.WarmOpensEmptyShardEnvBeforeFirstUserRead"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.ClaimDueMultiStateClaimsEarliestDueJobInsteadFirstListedState",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/claim_due_multi_state_claims_earliest_due_job_instead_first_listed_state.exs",
+      "source_sha256": "64f38d05ed5421ee2ca7e4da6953283cc7961aa0a66477079a98065055a011ce",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 494,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.ClaimDueMultiStateClaimsEarliestDueJobInsteadFirstListedState"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowClaimDueAutomaticallyReclaimsExpiredLeasesRatio",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_claim_due_automatically_reclaims_expired_leases_ratio.exs",
+      "source_sha256": "f72315904d0a69fb4a2be82371ec31cf25aa374735be8838784c4ceddaf079b0",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 502,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowClaimDueAutomaticallyReclaimsExpiredLeasesRatio"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowClaimDueDrainsHigherPrioritiesBeforeLowerPrioritiesDefault",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_claim_due_drains_higher_priorities_before_lower_priorities_default.exs",
+      "source_sha256": "1bf764c1fcfb54e7d2b7437f00864d19ff44c7fbe7c85d7d99228640d8d4823c",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 500,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowClaimDueDrainsHigherPrioritiesBeforeLowerPrioritiesDefault"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowCreateStoresDebugLineageMetadataIndexesIt",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_create_stores_debug_lineage_metadata_indexes_it.exs",
+      "source_sha256": "d70ccf4b26fb0c2f780356b0076ae01b1c287eb69c22e24f842d453aa1b0cada",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 495,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowCreateStoresDebugLineageMetadataIndexesIt"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowFailManyAtomicallyFailsOnePartitionBatch",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_fail_many_atomically_fails_one_partition_batch.exs",
+      "source_sha256": "3d0c892dd443ec0fa05593c9eef27c8e9bfc8029cd98ce88b3a9aa265b3675ec",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 504,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowFailManyAtomicallyFailsOnePartitionBatch"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowHistoryHotMaxRejectsValuesAboveConfiguredMaximum",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_history_hot_max_rejects_values_above_configured_maximum.exs",
+      "source_sha256": "c2b7ab7ff1927d54548917a59d3cb87542aded83969fa9a28c14d0b21453017f",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 506,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowHistoryHotMaxRejectsValuesAboveConfiguredMaximum"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowHistorySupportsRangeReverseEventWorkerFilters",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_history_supports_range_reverse_event_worker_filters.exs",
+      "source_sha256": "14ff39aeee868789d83f23ea2cd3399a1ea17092c2707c665a2e26732de9b871",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 505,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowHistorySupportsRangeReverseEventWorkerFilters"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowInternalKeysUseCompactPartitionTags",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_internal_keys_use_compact_partition_tags.exs",
+      "source_sha256": "2bdd22f8601a63cb914b70bb0cccbc0ed4d8a11dd145372d4186e9f9ca6bc599",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 493,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowInternalKeysUseCompactPartitionTags"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowListAutoPartitionsMergesHotIdsBeforeHydration",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_list_auto_partitions_merges_hot_ids_before_hydration.exs",
+      "source_sha256": "3a1b85d8743ea96a8c6fde23a12d3d0a66a3c64f695351a5bd993dbf1ecf8018",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 499,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowListAutoPartitionsMergesHotIdsBeforeHydration"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowMaxActiveMsTimesOutFlows",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_max_active_ms_times_out_flows.exs",
+      "source_sha256": "b5fa3c52ce092499102ee750178a3ca6405cfeb769171b1ec14a0d9280b09d52",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 503,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowMaxActiveMsTimesOutFlows"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowNativeDueIndexMirrorsCreateClaimDue",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_native_due_index_mirrors_create_claim_due.exs",
+      "source_sha256": "f48e06ac8d682695c137371c1fe0846b79b49fbb9fbeb719eb03dd632dfdef91",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 498,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowNativeDueIndexMirrorsCreateClaimDue"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowPolicyExposesTypeStateRetryRetentionDefaults",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_policy_exposes_type_state_retry_retention_defaults.exs",
+      "source_sha256": "c59cf5b91b966ef97a9162b70695b36be92283a95f149c2d03617fa134c04d34",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 501,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowPolicyExposesTypeStateRetryRetentionDefaults"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowSpawnChildrenRejectsMissingWaitStateWaitingChildren",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_spawn_children_rejects_missing_wait_state_waiting_children.exs",
+      "source_sha256": "ee762cb29df51509e1fd661a72c0eb6ac44e237210816d9ff4254b6c03a10f9d",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 496,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowSpawnChildrenRejectsMissingWaitStateWaitingChildren"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlowSpawnChildrenWaitAnyResolvesOnFirstSuccessfulChildAcrossS",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flow_spawn_children_wait_any_resolves_on_first_successful_child_across_s.exs",
+      "source_sha256": "22813c98ab90af193476d973a1ecdc17e1c50609ad1c0410802694246267b846",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 497,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlowSpawnChildrenWaitAnyResolvesOnFirstSuccessfulChildAcrossS"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.FlowTest.Sections.FlushdbClearsFlowLmdbTerminalProjections",
+      "source_path": "apps/ferricstore/test/ferricstore/flow_test/sections/flushdb_clears_flow_lmdb_terminal_projections.exs",
+      "source_sha256": "69ff06ee2384959fbf5a8001c1cb5c2ff0f07631c64f4d1ead50b39a4c710ba3",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.FlowTest",
+          "registration_line": 507,
+          "registration_path": "apps/ferricstore/test/ferricstore/flow_test.exs",
+          "registration_sha256": "57cda9afb38740e1104b66002ab5f1d5d03721f32f8698f7c3d6a0692d1a6a16",
+          "use_text": "use Ferricstore.FlowTest.Sections.FlushdbClearsFlowLmdbTerminalProjections"
+        }
+      ],
+      "scope_decision": "included-workflow",
+      "scope_reason": "Flow operation regression remains required; mechanism/compatibility disposition and execution are separate.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.Apply3DeleteKey",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/apply_3_delete_key.exs",
+      "source_sha256": "6d37b783c02a0ff08e888f784d69097198e6276096639ffeb31d3c24b01e18a0",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1699,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.Apply3DeleteKey"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart1",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/apply_3_put_key_value_expire_at_ms_part_1.exs",
+      "source_sha256": "db7ea27b18243dec48fc16a1ba841c6034d6aefc8a85a267d1cfe433cb00124d",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1693,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart1"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart2",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/apply_3_put_key_value_expire_at_ms_part_2.exs",
+      "source_sha256": "5e30b89f4fb159f7f56d88df2860d2c7a18d5b608c8087a4efc5fa900453d781",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1694,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart2"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart3",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/apply_3_put_key_value_expire_at_ms_part_3.exs",
+      "source_sha256": "feceef36437e1141deeca3094aa6358cca7a6c23e3b294e3c4ddb4494b6b2d01",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1695,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart3"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.Apply3SetKeyValueExpireAtMsOpts",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/apply_3_set_key_value_expire_at_ms_opts.exs",
+      "source_sha256": "c70165d40085346329a62aba43a160fd6ac45502735fa71dd898cd745981a15f",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1697,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.Apply3SetKeyValueExpireAtMsOpts"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.BatchValueLimits",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/batch_value_limits.exs",
+      "source_sha256": "720d5591723d4f836c00556c9f7fed84a9e1e6f68f9646645fdee990bf3bda1e",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1404,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.BatchValueLimits"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.CoalescesConsecutiveFlowNativeIndexOpsCrossingOrderingBarriers",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/coalesces_consecutive_flow_native_index_ops_crossing_ordering_barriers.exs",
+      "source_sha256": "ae4af8efd4a57e71fa83a4257f4576697193cfa044c8a387144baeaf8b6ad43e",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1396,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.CoalescesConsecutiveFlowNativeIndexOpsCrossingOrderingBarriers"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.CompoundPrefixDeleteExact",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/compound_prefix_delete_exact.exs",
+      "source_sha256": "3575c7f69f13cea821b4a524d6968b0d24f11786ba9a1706d0a9a4c054ae01fa",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1402,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.CompoundPrefixDeleteExact"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.FlowBlobSideChannelApply",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_blob_side_channel_apply.exs",
+      "source_sha256": "317f5d436b4da2def88579e04e71e085498b8be195af79f69a7c32c9f20f6932",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1683,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.FlowBlobSideChannelApply"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.FlowCommandTime",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_command_time.exs",
+      "source_sha256": "7f9337fe74850842b76834127e2ae453c051bd4e82581c7415ea0f0377bf0039",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1685,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.FlowCommandTime"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.FlowGovernanceLimit",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_governance_limit.exs",
+      "source_sha256": "4ea123062a5b699a7d1895a85ab610abf5bca17da4dec0b28e0d5ef966eed672",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1399,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.FlowGovernanceLimit"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.FlowGovernanceReleaseOutbox",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_governance_release_outbox.exs",
+      "source_sha256": "977da321754ab57efd07bd83b2722f7d71ef6167f321c27c0293c5215816dd87",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1398,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.FlowGovernanceReleaseOutbox"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.FlowIndexRollback",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_index_rollback.exs",
+      "source_sha256": "60337d02af243dd1aa4868d98f48faecc850fe35963cb1ef812d81764d4316aa",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1689,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.FlowIndexRollback"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.FlowSharedValueRefPersistence",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_shared_value_ref_persistence.exs",
+      "source_sha256": "22239df11ad0dc6d5e0e9c9006963a8b830817c0b3fab104463af81ebe01582c",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1687,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.FlowSharedValueRefPersistence"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.HandleAux5",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/handle_aux_5.exs",
+      "source_sha256": "cadfde137db1f2687727c14c0a71e40919e12a5046df406e5a6119f78d26d2b7",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1701,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.HandleAux5"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.PromotedCompoundMemberIndex",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/promoted_compound_member_index.exs",
+      "source_sha256": "13d33873ff33533ce45910d19a36e72d279d71c8b775a29586b26cb44d592f99",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1400,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.PromotedCompoundMemberIndex"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.PromotedSingleMutationDurability",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/promoted_single_mutation_durability.exs",
+      "source_sha256": "fc742f0b4a489b84b77ee930e9f40a1a40dfb642f3cccedc17266d8937ab306b",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1401,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.PromotedSingleMutationDurability"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.ReleaseCursorLogCompaction",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/release_cursor_log_compaction.exs",
+      "source_sha256": "f26af9ce0cae91d6f5986df97c2b0400f43496a2a0bff9c94bda9661de9a672d",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1703,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.ReleaseCursorLogCompaction"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.SpopRemovesTypeMarkerFinalSetMemberPopped",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/spop_removes_type_marker_final_set_member_popped.exs",
+      "source_sha256": "e2eceb46aab862462f958f23906630f50d26fd5482056fad0c5976010449b685",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1795,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.SpopRemovesTypeMarkerFinalSetMemberPopped"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.StateMachineCompoundReads",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/state_machine_compound_reads.exs",
+      "source_sha256": "3d261fdfec9a600aafb9025630440f34edc2a2bf6a0489489a3a2e0aef051753",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1691,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.StateMachineCompoundReads"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.StateMachineTest.Sections.TransactionCompoundReadBudget",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test/sections/transaction_compound_read_budget.exs",
+      "source_sha256": "1640f9589cd89173dfb0243e20d8196a59dc728bc64b6ab1a764a4b45d8e001a",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.StateMachineTest",
+          "registration_line": 1403,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/state_machine_test.exs",
+          "registration_sha256": "8ed6f6de8902fc081d1695ea7bd4191bcdec9b2440dd4badeb22dcc7d58ac56d",
+          "use_text": "use Ferricstore.Raft.StateMachineTest.Sections.TransactionCompoundReadBudget"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.AckedWritesSurviveWaraftServerKillDuringActiveWriteLoad",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/acked_writes_survive_waraft_server_kill_during_active_write_load.exs",
+      "source_sha256": "bcfa190e6d625478152cd7b67ac8f076e5d3c3ebf7d1ab18a963c15523215e6c",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 233,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.AckedWritesSurviveWaraftServerKillDuringActiveWriteLoad"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.AdvancedZsetRangePopMutationsSurviveWaraftRestart",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/advanced_zset_range_pop_mutations_survive_waraft_restart.exs",
+      "source_sha256": "b8414fae9356675a19afecf63a33bca10d66504ff90141e7fb8ad8038bddb995",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 255,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.AdvancedZsetRangePopMutationsSurviveWaraftRestart"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.BackendAddMemberRetriesStagedParticipantAfterFailedTransfer",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/backend_add_member_retries_staged_participant_after_failed_transfer.exs",
+      "source_sha256": "abe47ae71c7b79f95bed3269301f920153d2c4e8c959f30f8878bcd8e0d1a8e0",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 265,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.BackendAddMemberRetriesStagedParticipantAfterFailedTransfer"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.DirectWaraftShardReadsPreserveTypedFailures",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/direct_waraft_shard_reads_preserve_typed_failures.exs",
+      "source_sha256": "f68c7fc1273523dd3dcaa4daa94b43e4e65bda7a05972a079789d44ffa8e84b4",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 259,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.DirectWaraftShardReadsPreserveTypedFailures"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.FlowRetentionCleanupScansAllWaraftShards",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/flow_retention_cleanup_scans_all_waraft_shards.exs",
+      "source_sha256": "f8dec0710d9dd28a6d46c475034f0c4d25b1c138fbdba69ac8de84fb6bc9c9d8",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 253,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.FlowRetentionCleanupScansAllWaraftShards"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.InvalidWaraftInFlightBytesConfigDoesNotPartiallyPublishBackend",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/invalid_waraft_in_flight_bytes_config_does_not_partially_publish_backend.exs",
+      "source_sha256": "2a5cc3e018fbda9b9e663b39e189af201a028766b31b3ccfcce8b9529d1beb87",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 231,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.InvalidWaraftInFlightBytesConfigDoesNotPartiallyPublishBackend"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.NumericAppendExpiringStringCommandsSurviveWaraftRestart",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/numeric_append_expiring_string_commands_survive_waraft_restart.exs",
+      "source_sha256": "988ae414e693b3575e6a81fae52694186896e1c3b998ad839d0cccfbc90c4fbf",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 257,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.NumericAppendExpiringStringCommandsSurviveWaraftRestart"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.RejectsVolatileWaraftEtsLogModule",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/rejects_volatile_waraft_ets_log_module.exs",
+      "source_sha256": "e0661be31f62b543f5e8652375e0541c438f3bca8832158d6c4a3612ffba4679",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 227,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.RejectsVolatileWaraftEtsLogModule"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.RestartRecoversMissingCurrentStorageMetadataUsingPreviousDurable",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/restart_recovers_missing_current_storage_metadata_using_previous_durable.exs",
+      "source_sha256": "67ed559c4f15ac1573065fea774c0a042f16d86eae5eb46a899dc2d911b4dc40",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 243,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.RestartRecoversMissingCurrentStorageMetadataUsingPreviousDurable"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.SegmentLogRejectsRecordsStoredUnderWrongSegmentOrdinal",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/segment_log_rejects_records_stored_under_wrong_segment_ordinal.exs",
+      "source_sha256": "62a3dd611c735db0e3b668820965abd7b1d562d70bf8a5dbd075aa221e5c816c",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 235,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.SegmentLogRejectsRecordsStoredUnderWrongSegmentOrdinal"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.SnapshotTransferWrapsWaraftTransportExits",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/snapshot_transfer_wraps_waraft_transport_exits.exs",
+      "source_sha256": "2a649355ba384e8ed03c3f8be61b836be1ff41c15ade34c81149377d956aff2c",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 249,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.SnapshotTransferWrapsWaraftTransportExits"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.StartupFinalizesInterruptedSnapshotSwapAfterMetadataPersisted",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/startup_finalizes_interrupted_snapshot_swap_after_metadata_persisted.exs",
+      "source_sha256": "fa4b6d774f289e2b5d8ada30daaae6fb8772a2d8ebeaba1594bea492a5069e57",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 247,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.StartupFinalizesInterruptedSnapshotSwapAfterMetadataPersisted"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.StorageMetadataHotWritesFsyncJournalRewritingCurrentMetadata",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/storage_metadata_hot_writes_fsync_journal_rewriting_current_metadata.exs",
+      "source_sha256": "9129618a1266073e03279a4a80d430cd32e4291ddc686ce1397284e9d6cef4e7",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 239,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.StorageMetadataHotWritesFsyncJournalRewritingCurrentMetadata"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.StorageRejectsSnapshotPayloadDirRemovedAfterVerification",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/storage_rejects_snapshot_payload_dir_removed_after_verification.exs",
+      "source_sha256": "567a9fa91e8d6f663827e6bb861722155e3342f7a5569591a3494f91ea7973bb",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 245,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.StorageRejectsSnapshotPayloadDirRemovedAfterVerification"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.ThreePeerBackendClusterRecoversAfterLeaderOsProcessKillDuring",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/three_peer_backend_cluster_recovers_after_leader_os_process_kill_during.exs",
+      "source_sha256": "c788f8809b8e1a34802e4689fbb7f7e76a7656176300834829e377d17861cb1a",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 261,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.ThreePeerBackendClusterRecoversAfterLeaderOsProcessKillDuring"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.ThreePeerBackendClusterRemovesMemberThroughBackendApi",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/three_peer_backend_cluster_removes_member_through_backend_api.exs",
+      "source_sha256": "a2d18a6afbef416c2c739d76a8f5dbbef913f979850e1b5bd5c3f176f97f54d9",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 263,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.ThreePeerBackendClusterRemovesMemberThroughBackendApi"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.UnifiedSegmentTrimPrunesFlowApplyProjectionValueCache",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/unified_segment_trim_prunes_flow_apply_projection_value_cache.exs",
+      "source_sha256": "dd25a366d57b9b1314d71dbe4a72412a65aa9b1e2133ad7e711907b8761ffc54",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 229,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.UnifiedSegmentTrimPrunesFlowApplyProjectionValueCache"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.WaraftGenericBatchesCoalesceBehindInFlightFlushDefault",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/waraft_generic_batches_coalesce_behind_in_flight_flush_default.exs",
+      "source_sha256": "9bec6bbf70b7381382c9bc042e942d1a29ffed570ff65060ac1401575dc225fe",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 237,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.WaraftGenericBatchesCoalesceBehindInFlightFlushDefault"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.WaraftStorageCloseFlushesAsyncFlowHistoryBeforePersistingReplay",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/waraft_storage_close_flushes_async_flow_history_before_persisting_replay.exs",
+      "source_sha256": "45016662b142ee52ed0d6af687e12330f42b32d9c896662d328c851c5a7a6685",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 251,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.WaraftStorageCloseFlushesAsyncFlowHistoryBeforePersistingReplay"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Raft.WARaftBackendTest.Sections.WaraftStorageRecoveryReusesSegmentLocationsFlowReplay",
+      "source_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test/sections/waraft_storage_recovery_reuses_segment_locations_flow_replay.exs",
+      "source_sha256": "1d636a06648697ba193d9fdb403a784e26fc3bff92ea2283a8cf4db3699d18b0",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Raft.WARaftBackendTest",
+          "registration_line": 241,
+          "registration_path": "apps/ferricstore/test/ferricstore/raft/waraft_backend_test.exs",
+          "registration_sha256": "adbf7caf20061f1743071faaf780680b79d5738ba9474febe0415d38acf856e4",
+          "use_text": "use Ferricstore.Raft.WARaftBackendTest.Sections.WaraftStorageRecoveryReusesSegmentLocationsFlowReplay"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest.Sections.ConcurrentWrites",
+      "source_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test/sections/concurrent_writes.exs",
+      "source_sha256": "5f299be91682a0056b5147b00f111f740422716bdbbf9c6ac69f9a58de84e09b",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest",
+          "registration_line": 164,
+          "registration_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test.exs",
+          "registration_sha256": "8306b87d02485c14e6ac486a37cd959d659e429158ef77021d3d6a24c005abf2",
+          "use_text": "use Ferricstore.Store.ShardAsyncIoTest.Sections.ConcurrentWrites"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest.Sections.FileSizeAccounting",
+      "source_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test/sections/file_size_accounting.exs",
+      "source_sha256": "9fe69705acb8712f189958b0629fe94d82d67e8217a1f1f4d5cbae4157a837f9",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest",
+          "registration_line": 166,
+          "registration_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test.exs",
+          "registration_sha256": "8306b87d02485c14e6ac486a37cd959d659e429158ef77021d3d6a24c005abf2",
+          "use_text": "use Ferricstore.Store.ShardAsyncIoTest.Sections.FileSizeAccounting"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest.Sections.SharedLogCompaction",
+      "source_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test/sections/shared_log_compaction.exs",
+      "source_sha256": "0c8a9f93d3a39c8404a21df99607e2771795857463526a24536eb643d22623a8",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest",
+          "registration_line": 165,
+          "registration_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test.exs",
+          "registration_sha256": "8306b87d02485c14e6ac486a37cd959d659e429158ef77021d3d6a24c005abf2",
+          "use_text": "use Ferricstore.Store.ShardAsyncIoTest.Sections.SharedLogCompaction"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest.Sections.V2AppendBatchNosyncNif",
+      "source_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test/sections/v2_append_batch_nosync_nif.exs",
+      "source_sha256": "fb7587c0422266989d78f65233e69a9fb182ff294e502981b067fa0deb4c34c4",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Store.ShardAsyncIoTest",
+          "registration_line": 163,
+          "registration_path": "apps/ferricstore/test/ferricstore/store/shard_async_io_test.exs",
+          "registration_sha256": "8306b87d02485c14e6ac486a37cd959d659e429158ef77021d3d6a24c005abf2",
+          "use_text": "use Ferricstore.Store.ShardAsyncIoTest.Sections.V2AppendBatchNosyncNif"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.AclAccountManagement",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/acl_account_management.exs",
+      "source_sha256": "b5847eb216879974acce85cff5272515f4b9a542fbea2952cf0304ce30c47267",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 495,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.AclAccountManagement"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.AclFilteringAndConfig",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/acl_filtering_and_config.exs",
+      "source_sha256": "2dd1f391b0919d25484241782b3824839d65d696d6dfe4992cd374de7b715e92",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 496,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.AclFilteringAndConfig"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.AclFlowActions",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/acl_flow_actions.exs",
+      "source_sha256": "ba75f14fe5207c77eab9325cf83c9c577b21acf11e2171dfb326e85175fd4f1a",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 494,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.AclFlowActions"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.CollectionAndOverview",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/collection_and_overview.exs",
+      "source_sha256": "e7fcb12633eed4e46fca3d0d9cd943b3f58096aa98815fcc008ed95c8bf449ca",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 493,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.CollectionAndOverview"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.FlowBrowseAndQueries",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/flow_browse_and_queries.exs",
+      "source_sha256": "e99d0cbd96ff9ba4f96befb0b4715343d9441d7248a059e7c82c0ca8295a8799",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 498,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.FlowBrowseAndQueries"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.FlowDetailActions",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/flow_detail_actions.exs",
+      "source_sha256": "bd74a13e6e8b7ba9ea77305d11013ee74f4ebe807b3a2615701643071180d471",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 499,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.FlowDetailActions"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.FlowDetailPoliciesRetention",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/flow_detail_policies_retention.exs",
+      "source_sha256": "148eb9b7c1df1d90e3813895d660de58f90bc45f8aa3bf9c0a3229dee5a83750",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 500,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.FlowDetailPoliciesRetention"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.FlowSchedules",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/flow_schedules.exs",
+      "source_sha256": "8b3b5a720dd3f6c8fac044d20dab46e5edc11ddfbcba53098f6c9930c4ba35b1",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 501,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.FlowSchedules"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.HttpFlowRoutes",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/http_flow_routes.exs",
+      "source_sha256": "23302629e6beefef886ed5414b9ceb4e298322960bccff1d458df131ca4a1de3",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 502,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.HttpFlowRoutes"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.FerricstoreServer.Health.DashboardTest.Sections.OperationalPages",
+      "source_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test/sections/operational_pages.exs",
+      "source_sha256": "c2de4db1eb303723589c214e8cd934ef4fa801596c82dc254c8e5726ea22671e",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.FerricstoreServer.Health.DashboardTest",
+          "registration_line": 497,
+          "registration_path": "apps/ferricstore_server/test/ferricstore_server/health/dashboard_test.exs",
+          "registration_sha256": "4a07968cad4c639fbe8484212d2043231ef1c0e4291c0f33cf5b2a350d241f0c",
+          "use_text": "use FerricstoreServer.Health.DashboardTest.Sections.OperationalPages"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Identity provenance reviewed; mixed workflow/general KV/dashboard semantics require case-level scope review. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Store.BlobSideChannelTest.Sections.BlobGarbageSweepIgnoresExpiredBlobRefsStillPresentInKeydir",
+      "source_path": "apps/ferricstore/test/ferricstore/store/blob_side_channel_test/sections/blob_garbage_sweep_ignores_expired_blob_refs_still_present_in_keydir.exs",
+      "source_sha256": "738ec75f2adb12b5f77cb2e1b8d4196e2d313ad99154b22416807601c44bdbc5",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Store.BlobSideChannelTest",
+          "registration_line": 62,
+          "registration_path": "apps/ferricstore/test/ferricstore/store/blob_side_channel_test.exs",
+          "registration_sha256": "a43d40cd388330a5ea2f2d05cf8d30a9b26af8e8716ba60476d75c9e2da5b5ef",
+          "use_text": "use Ferricstore.Store.BlobSideChannelTest.Sections.BlobGarbageSweepIgnoresExpiredBlobRefsStillPresentInKeydir"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Pinned blob root restores declaration lineage only; mixed workflow durability/value and unrelated KV cases require individual scope and representation decisions. No exclusion approved.",
+      "environment_decision": "unproved"
+    },
+    {
+      "macro_module": "Elixir.Ferricstore.Store.BlobSideChannelTest.Sections.RaGenericBatchAcceptsPreExternalizedBlobRefs",
+      "source_path": "apps/ferricstore/test/ferricstore/store/blob_side_channel_test/sections/ra_generic_batch_accepts_pre_externalized_blob_refs.exs",
+      "source_sha256": "f6703900ae320e15be0d8e8a5d7690e0beb7dbbdb8defd1dd9a5ead99904df0d",
+      "consumer_uses": [
+        {
+          "consumer_module": "Elixir.Ferricstore.Store.BlobSideChannelTest",
+          "registration_line": 60,
+          "registration_path": "apps/ferricstore/test/ferricstore/store/blob_side_channel_test.exs",
+          "registration_sha256": "a43d40cd388330a5ea2f2d05cf8d30a9b26af8e8716ba60476d75c9e2da5b5ef",
+          "use_text": "use Ferricstore.Store.BlobSideChannelTest.Sections.RaGenericBatchAcceptsPreExternalizedBlobRefs"
+        }
+      ],
+      "scope_decision": "pending-case-review",
+      "scope_reason": "Pinned blob root restores declaration lineage only; mixed workflow durability/value and unrelated KV cases require individual scope and representation decisions. No exclusion approved.",
+      "environment_decision": "unproved"
+    }
+  ]
+}

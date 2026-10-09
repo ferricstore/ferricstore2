@@ -1,10 +1,16 @@
-//! M0 artifact preservation checks, distinct from unimplemented runtime parity.
+//! Preserved input and progress checks, distinct from incomplete runtime parity.
 
 #![forbid(unsafe_code)]
 
 mod artifact;
+mod macro_origin;
 mod mapping;
+mod progress;
 mod reference;
+mod registration;
+mod runtime_evidence;
+mod rust_source;
+mod rust_tokens;
 
 use std::{
     error::Error,
@@ -12,6 +18,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+pub use progress::ProgressSummary;
 pub use reference::ReferenceSummary;
 
 /// SHA-256 of the preserved schema-1 manifest at the reviewed design HEAD.
@@ -55,6 +62,19 @@ pub fn check_reference(root: &Path) -> Result<ReferenceSummary, CheckError> {
     reference::load(root).map(|(_, summary)| summary)
 }
 
+/// Validate every source identity, optional runtime registration and assertion links.
+///
+/// A valid ledger can remain incomplete. No registration, source link or editable
+/// status is accepted as behavioral execution proof; [`require_parity`] stays closed.
+///
+/// # Errors
+/// Fails on changed preserved inputs, missing/unknown/duplicate source identities,
+/// malformed registration, fabricated statuses or broken/scoped assertion links.
+pub fn check_progress(root: &Path) -> Result<ProgressSummary, CheckError> {
+    let (manifest, _) = reference::load(root)?;
+    progress::check(root, &manifest)
+}
+
 /// Require actual workflow parity evidence; M0 has no passing path.
 ///
 /// Validates preservation and the honest unported mapping, then returns the
@@ -68,9 +88,10 @@ pub fn require_parity(root: &Path) -> Result<(), CheckError> {
     mapping::check(root, &manifest)?;
     Err(CheckError::new(format!(
         "workflow parity incomplete: {} textual declarations are unported; \
-         ExUnit runtime cases have not been collected from the pinned application; \
-         Rust counterparts, assertion mappings, mandatory profiles and execution proof \
-         are absent. M0 artifact integrity is not behavioral parity",
+         runtime registration and checked assertion links cannot certify behavior; \
+         source and Rust execution remain incomplete for the full required scope, \
+         including mandatory profiles, setup, fixtures and adapters. \
+         M0 artifact integrity is not behavioral parity",
         summary.declarations
     )))
 }

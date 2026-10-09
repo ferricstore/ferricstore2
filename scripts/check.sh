@@ -38,6 +38,7 @@ cargo test --workspace --doc --locked
 cargo doc --workspace --no-deps --locked
 cargo arch
 cargo reference
+cargo progress
 "$deny_bin" --locked --workspace check --deny unmatched-skip advisories bans licenses sources
 
 printf 'Infrastructure checks passed; workflow parity remains incomplete.\n'

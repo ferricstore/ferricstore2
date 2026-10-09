@@ -8,6 +8,7 @@
 mod graph;
 mod manifest;
 mod policy;
+mod size;
 mod source;
 
 use std::{error::Error, fs, path::Path, process::Command};

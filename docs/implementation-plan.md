@@ -1,8 +1,8 @@
 # Implementation plan and acceptance gates
 
-Status: M0 project/test/lint/architecture infrastructure is implemented and its complete local gate passes; runtime ExUnit collection/scope reconciliation and workflow/runtime milestones remain planned. See [the handoff](CONTINUE.md) for results and next steps. This plan authorizes no later implementation by itself. Milestones depend on predecessor evidence, not calendar estimates.
+Status: M0 project/test/lint/architecture infrastructure and a partial pure M1 core are implemented. Runtime ExUnit collection has produced real registration; source ownership/scope reconciliation, complete M1 acceptance and later runtime milestones remain incomplete. See [the handoff](CONTINUE.md) for results and next steps. This plan authorizes no later implementation by itself. Milestones depend on predecessor evidence, not calendar estimates.
 
-The [existing Elixir workflow test parity contract](workflow-test-parity.md) is mandatory. Source tests and helpers are preserved in tests/reference with a manifest and hash inventory; all Rust counterparts are currently unported. New model/property tests supplement these regressions.
+The [existing Elixir workflow test parity contract](workflow-test-parity.md) is mandatory. Source tests and helpers are preserved in tests/reference with a manifest and hash inventory; the separate progress ledger tracks partial source-derived Rust counterparts without certifying full parity. New model/property tests supplement these regressions.
 
 The [dual-transport contract](transport-design.md) adds HTTPS and a dedicated TLS/TCP API over one application authorization/admission service. Both are required for the usable transport milestone, with identical workflow semantics and transport-specific resource/fault tests.
 

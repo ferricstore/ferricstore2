@@ -1,9 +1,10 @@
 # Testing infrastructure
 
-This increment provides real tests of infrastructure and no workflow engine.
-All workflow behavior remains unported. Read the [parity contract](workflow-test-parity.md)
-before any later source port. [Continuation instructions](CONTINUE.md) describe
-the remaining M0 collection work and subsequent milestones.
+M0 provides real infrastructure tests; partial M1 domain behavior now has
+source-derived Rust counterparts, separately accounted for by `cargo progress`.
+The runtime engine and full workflow parity remain incomplete. Read the
+[parity contract](workflow-test-parity.md) before adding source ports.
+[Continuation instructions](CONTINUE.md) record current results and gates.
 
 ## Isolated helpers
 
@@ -87,7 +88,21 @@ request-ID replay; do not fabricate reused request IDs. Preserve exact equality,
 set equality, absent-versus-zero distinctions, public errors/encodings and the
 80-follower deep FIFO lane-head assertions in the same call. Map source-allowed
 fault outcomes rather than inferring stronger guarantees from test titles.
-No reducer, scenario runner or invented passing workflow test is added here.
+The preserved mapping remains an immutable M0 absence record. The separate
+progress ledger tracks source-derived reducer assertions and real registration
+without turning either into full-parity execution proof.
+
+## Progress accounting
+
+Run `cargo progress` or
+`cargo run -p wf-parity-tests --locked -- check-progress [--root PATH]`.
+The local/CI wrapper requires this check alongside reference and architecture
+checks. It verifies equality with the frozen declaration IDs, hash-bound runtime
+registration, exact source/test-function identities and active assertion links.
+No editable passing status is accepted. Missing/unreviewed runtime origins and
+unported assertions remain visible; a valid progress ledger is not an acceptance
+certificate. Runtime collection/reconciliation instructions are in
+[the collection guide](runtime-case-collection.md).
 
 ## Dependency decisions and actual checks
 

@@ -1,0 +1,87 @@
+{
+  "helper_profiles": {
+    "apps/ferricstore/test/test_helper.exs": [
+      [
+        "include",
+        []
+      ],
+      [
+        "exclude",
+        [
+          "bench",
+          "perf_guard",
+          "linux_io_uring",
+          "large_alloc",
+          "cluster",
+          "jepsen",
+          "shard_kill",
+          "partition_test"
+        ]
+      ]
+    ],
+    "apps/ferricstore_http/test/test_helper.exs": [
+      [
+        "include",
+        []
+      ],
+      [
+        "exclude",
+        [
+          "python_sdk_integration",
+          "sdk_integration",
+          "java_sdk_integration"
+        ]
+      ]
+    ],
+    "apps/ferricstore_server/test/test_helper.exs": [
+      [
+        "include",
+        []
+      ],
+      [
+        "exclude",
+        [
+          "bench",
+          "linux_io_uring",
+          "large_alloc",
+          "cluster",
+          "jepsen",
+          "shard_kill"
+        ]
+      ]
+    ]
+  },
+  "origin_rule": "literal-section-origin-v2",
+  "origins": [],
+  "reference_manifest_sha256": "7df8c7885a64b6276e84517dffa4f1ead0f592f6d0996b398cdb61551c1bae61",
+  "required_helper_paths": [
+    "apps/ferricstore/test/test_helper.exs",
+    "apps/ferricstore_http/test/test_helper.exs",
+    "apps/ferricstore_server/test/test_helper.exs"
+  ],
+  "requirements": {
+    "fixture_review": "pending",
+    "mandatory_profile_execution": "unexecuted",
+    "setup_execution": "unexecuted"
+  },
+  "review": {
+    "path": "tests/parity/macro-origin-review.json",
+    "sha256": "235bc3da43362561fd5141dbac20cc9c70c462a999d776f4ee57f639749ee0f4"
+  },
+  "schema_version": 1,
+  "source_collection": {
+    "path": "tests/parity/collection/supplemental/collection-details.json",
+    "sha256": "35176752e518187bc4040ee58d83011c1748b82f032b393c16c7021a2470ebd2"
+  },
+  "source_commit": "66586c596e271408d9184af32eb31cd7218c126e",
+  "tools": [
+    {
+      "path": "scripts/runtime-macro-origins.exs",
+      "sha256": "600f4c516ba3fd0ac9f1b5dd590f51efa980ef1532f4eb1ca630ab36a78e4153"
+    },
+    {
+      "path": "scripts/reconcile-elixir-cases.exs",
+      "sha256": "86833e5a9427d46ce54c8da0eeedf3ea89414022248719126166c3fbae4efc66"
+    }
+  ]
+}

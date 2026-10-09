@@ -1,6 +1,9 @@
-//! Pure deterministic workflow boundaries. Workflow behavior is not implemented yet.
+//! Pure, deterministic single-record workflow transitions.
 //!
-//! M0 module scaffold; implementations follow the reviewed architecture.
+//! [`workflow::reduce`] accepts an authoritative record and explicit committed
+//! inputs. Its write description requires atomic persistence by a future adapter.
+//! [`workflow::reduce_with_policy`] also resolves a borrowed installed retry-only
+//! policy. These plans provide no durability or request-ID outcome replay.
 
 #![forbid(unsafe_code)]
 

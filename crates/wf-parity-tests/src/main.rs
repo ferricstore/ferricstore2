@@ -1,13 +1,15 @@
-//! CLI entrypoint for M0 preservation and the incomplete full-parity gate.
+//! CLI for preservation, progress accounting and the incomplete full-parity gate.
 
 #![forbid(unsafe_code)]
 
 use std::{env, path::PathBuf, process::ExitCode};
 
-use wf_parity_tests::{check_reference, require_parity, workspace_root};
+use wf_parity_tests::{check_progress, check_reference, require_parity, workspace_root};
 
 fn usage(message: &str) -> String {
-    format!("{message}; usage: wf-parity-tests <check-reference|require-parity> [--root PATH]")
+    format!(
+        "{message}; usage: wf-parity-tests <check-reference|check-progress|require-parity> [--root PATH]"
+    )
 }
 
 fn run() -> Result<(), String> {
@@ -34,6 +36,51 @@ fn run() -> Result<(), String> {
             result.declarations,
             result.working_tree_changes,
             result.static_require_edges
+        );
+        Ok(())
+    } else if command == "check-progress" {
+        let result = check_progress(&root).map_err(|error| error.to_string())?;
+        println!(
+            "progress ledger validated: {} frozen declarations; {} source-derived declarations; \
+            {} Rust counterpart mappings; {} assertion links.",
+            result.declarations,
+            result.source_derived_declarations,
+            result.rust_counterparts,
+            result.assertions
+        );
+        if result.collection_present {
+            if result.raw_runtime_accounting {
+                println!(
+                    "{} registered runtime cases; {} linked cases; {} unmatched runtime cases; {} unresolved declarations.",
+                    result.registered_runtime_cases,
+                    result.linked_runtime_cases,
+                    result.unmatched_runtime_cases,
+                    result.unresolved_declarations
+                );
+            } else {
+                println!(
+                    "{} registered runtime case links; {} unresolved declarations. Legacy collection lacks raw runtime complement validation.",
+                    result.linked_runtime_cases, result.unresolved_declarations
+                );
+            }
+            if result.reconciliation_complete {
+                println!(
+                    "runtime registration reconciled; registration did not execute source tests"
+                );
+            } else {
+                println!(
+                    "runtime reconciliation incomplete: partial registration or collection blockers"
+                );
+            }
+        } else {
+            println!(
+                "runtime reconciliation incomplete: collection absent; registered case count unavailable; \
+                {} declarations unresolved",
+                result.unresolved_declarations
+            );
+        }
+        println!(
+            "full parity incomplete; checked assertion links do not certify execution or complete behavioral parity"
         );
         Ok(())
     } else if command == "require-parity" {

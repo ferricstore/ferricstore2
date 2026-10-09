@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Comprehensive progress accounting and source assertion links; never parity execution proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_commit", "reference_manifest_sha256", "declarations"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source_commit": {"const": "66586c596e271408d9184af32eb31cd7218c126e"},
+    "reference_manifest_sha256": {"const": "7df8c7885a64b6276e84517dffa4f1ead0f592f6d0996b398cdb61551c1bae61"},
+    "runtime_collection": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/artifact"}]},
+    "declarations": {"type": "array", "minItems": 5858, "maxItems": 5858, "items": {"$ref": "#/$defs/declaration"}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "artifact": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "declaration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_declaration_id", "runtime_case_ids", "rust_assertions"],
+      "properties": {
+        "source_declaration_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "runtime_case_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}},
+        "rust_assertions": {"type": "array", "items": {"$ref": "#/$defs/counterpart"}}
+      }
+    },
+    "counterpart": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scenario_id", "rust_file", "rust_file_sha256", "rust_module", "rust_function", "assertions", "limitations"],
+      "properties": {
+        "scenario_id": {"type": "string", "minLength": 1},
+        "rust_file": {"type": "string", "minLength": 1},
+        "rust_file_sha256": {"$ref": "#/$defs/sha256"},
+        "rust_module": {"type": "string"},
+        "rust_function": {"type": "string", "minLength": 1},
+        "assertions": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/assertion"}},
+        "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "assertion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_line", "source_text", "rust_line", "rust_text"],
+      "properties": {
+        "source_line": {"type": "integer", "minimum": 1}, "source_text": {"type": "string", "minLength": 1},
+        "rust_line": {"type": "integer", "minimum": 1}, "rust_text": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

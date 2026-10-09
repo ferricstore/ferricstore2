@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pinned registration and bidirectional runtime/declaration accounting; never execution",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/legacy_registration"
+    },
+    {
+      "$ref": "#/$defs/reconciled_registration"
+    }
+  ],
+  "$defs": {
+    "source_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "legacy_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "source_declaration_id",
+        "source_path",
+        "source_line",
+        "module",
+        "name",
+        "tags"
+      ],
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_declaration_id": {
+          "$ref": "#/$defs/source_id"
+        },
+        "source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "module": {
+          "type": "string",
+          "pattern": "^Elixir\\..+"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^test .+"
+        },
+        "tags": {
+          "type": "object"
+        }
+      }
+    },
+    "reconciled_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "source_declaration_id",
+        "source_path",
+        "source_line",
+        "module",
+        "name",
+        "tags",
+        "runtime_case_id",
+        "origin_id",
+        "scope_decision"
+      ],
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_declaration_id": {
+          "$ref": "#/$defs/source_id"
+        },
+        "source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "module": {
+          "type": "string",
+          "pattern": "^Elixir\\..+"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^test .+"
+        },
+        "tags": {
+          "type": "object"
+        },
+        "runtime_case_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "origin_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "scope_decision": {
+          "enum": [
+            "included-workflow",
+            "pending-case-review"
+          ]
+        }
+      }
+    },
+    "legacy_registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "source_commit",
+        "reference_manifest_sha256",
+        "collection_kind",
+        "collection_complete",
+        "blockers",
+        "unresolved_declaration_ids",
+        "cases"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "source_commit": {
+          "const": "66586c596e271408d9184af32eb31cd7218c126e"
+        },
+        "reference_manifest_sha256": {
+          "const": "7df8c7885a64b6276e84517dffa4f1ead0f592f6d0996b398cdb61551c1bae61"
+        },
+        "collection_kind": {
+          "const": "exunit-registration-only"
+        },
+        "collection_complete": {
+          "type": "boolean"
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unresolved_declaration_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/source_id"
+          }
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/legacy_case"
+          }
+        }
+      }
+    },
+    "reconciled_registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "source_commit",
+        "reference_manifest_sha256",
+        "collection_kind",
+        "collection_complete",
+        "blockers",
+        "unresolved_declaration_ids",
+        "cases",
+        "collection_details",
+        "macro_origins",
+        "unmatched_runtime_case_ids"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "source_commit": {
+          "const": "66586c596e271408d9184af32eb31cd7218c126e"
+        },
+        "reference_manifest_sha256": {
+          "const": "7df8c7885a64b6276e84517dffa4f1ead0f592f6d0996b398cdb61551c1bae61"
+        },
+        "collection_kind": {
+          "const": "exunit-registration-only"
+        },
+        "collection_complete": {
+          "type": "boolean"
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unresolved_declaration_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/source_id"
+          }
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reconciled_case"
+          }
+        },
+        "collection_details": {
+          "$ref": "#/$defs/artifact"
+        },
+        "macro_origins": {
+          "$ref": "#/$defs/artifact"
+        },
+        "unmatched_runtime_case_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

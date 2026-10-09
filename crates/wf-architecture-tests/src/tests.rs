@@ -51,6 +51,15 @@ fn package_mut<'a>(metadata: &'a mut Value, name: &str) -> CheckResult<&'a mut V
 }
 
 fn source_check(package: &str, module: &str, source: &str) -> CheckResult<Vec<String>> {
+    source_check_kind(package, module, source, false)
+}
+
+fn source_check_kind(
+    package: &str,
+    module: &str,
+    source: &str,
+    test_file: bool,
+) -> CheckResult<Vec<String>> {
     let policy = policy()?;
     let dependency_names = BTreeMap::new();
     let classification = policy
@@ -63,12 +72,76 @@ fn source_check(package: &str, module: &str, source: &str) -> CheckResult<Vec<St
             package,
             module,
             root_file: false,
-            test_file: false,
+            test_file,
             classification,
             policy: &policy,
             dependency_names: &dependency_names,
         },
     )
+}
+
+#[test]
+fn production_file_size_boundary_counts_comments_and_blank_lines() -> CheckResult<()> {
+    let at_limit = "// A documented production responsibility.\n".repeat(400);
+    assert_eq!(
+        source_check("wf-domain", "workflow", &at_limit)?,
+        Vec::<String>::new()
+    );
+    let oversized = format!("{at_limit}\n");
+    assert!(
+        source_check("wf-domain", "workflow", &oversized)?
+            .iter()
+            .any(|failure| failure.contains("401 physical lines exceeds 400"))
+    );
+    Ok(())
+}
+
+#[test]
+fn tooling_and_integration_tests_have_a_separate_checked_size_limit() -> CheckResult<()> {
+    let at_limit = "// Test and tooling explanation.\n".repeat(600);
+    let oversized = format!("{at_limit}// One line beyond the limit.");
+    for (package, module, test_file) in [
+        ("wf-architecture-tests", "source", false),
+        ("wf-domain", "tests::regression", true),
+    ] {
+        assert_eq!(
+            source_check_kind(package, module, &at_limit, test_file)?,
+            Vec::<String>::new()
+        );
+        assert!(
+            source_check_kind(package, module, &oversized, test_file)?
+                .iter()
+                .any(|failure| failure.contains("601 physical lines exceeds 600"))
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn physical_size_counts_crlf_and_an_unterminated_final_line() -> CheckResult<()> {
+    let at_limit = "// Platform-independent sizing.\r\n".repeat(400);
+    assert_eq!(
+        source_check("wf-types", "bounds", &at_limit)?,
+        Vec::<String>::new()
+    );
+    let oversized = format!("{at_limit}// No final newline");
+    assert!(
+        source_check("wf-types", "bounds", &oversized)?
+            .iter()
+            .any(|failure| failure.contains("401 physical lines exceeds 400"))
+    );
+    Ok(())
+}
+
+#[test]
+fn runtime_source_cannot_get_a_larger_budget_by_naming_it_tests() -> CheckResult<()> {
+    let oversized = "// Runtime source remains in the production budget.\n".repeat(401);
+    assert!(
+        source_check("wf-domain", "workflow::tests", &oversized)?
+            .iter()
+            .any(|failure| failure.contains("401 physical lines exceeds 400"))
+    );
+    Ok(())
 }
 
 #[test]

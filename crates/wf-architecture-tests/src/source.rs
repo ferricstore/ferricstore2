@@ -46,6 +46,11 @@ pub(crate) fn check(source: &str, context: &Context<'_>) -> CheckResult<Vec<Stri
         test: context.test_file,
         in_function: false,
     };
+    if let Some(finding) =
+        crate::size::check(source, context.classification.runtime, context.test_file)
+    {
+        visitor.report(&finding);
+    }
     if context.root_file && !syntax.attrs.iter().any(forbids_unsafe) {
         visitor.report("compiler target must declare #![forbid(unsafe_code)]");
     }

@@ -1,6 +1,6 @@
 # ferricstore2
 
-Rust project foundation for a workflow-only FerricStore runtime. The workspace, test support and quality checks are the first implementation increment; workflow behavior, Raft/storage adapters and HTTP/TCP listeners remain unimplemented. Preserved Elixir tests are acceptance inputs for the future port.
+Rust implementation of the reviewed workflow-only FerricStore design. The workspace, test support and quality checks are implemented, with a partial pure M1 domain core and source-derived tests. Raft/storage adapters and HTTP/TCP listeners remain unimplemented. Preserved Elixir tests are mandatory acceptance inputs.
 
 The design preserves explicit durable workflow transitions, leases, fencing, retries and workflow queries. It does not port the general Redis-compatible database or replay arbitrary user code.
 
@@ -23,6 +23,6 @@ Read [the handoff and next steps](docs/CONTINUE.md) to continue implementation f
 
 ## Status
 
-M0 infrastructure increment, with reviewed architecture and transport contracts. The development guide records executable checks and remaining gaps. Runtime library choices remain evaluation candidates; the scaffold does not establish workflow parity, performance or production readiness.
+M0 infrastructure and partial M1 domain implementation, with reviewed architecture and transport contracts. The development guide records executable checks, source-size limits and remaining gaps. Runtime library choices remain evaluation candidates; domain tests and reference registration do not establish complete workflow parity, durability, performance or production readiness.
 
 Source checkout: ferricstore/ferricstore at `66586c596e271408d9184af32eb31cd7218c126e`, plus explicitly identified working-tree observations. Local original Elixir checkouts are preserved. New repository is private pending an explicit publication decision.

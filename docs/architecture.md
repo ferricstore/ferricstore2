@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: reviewed architecture; the M0 workspace/module scaffold is implemented. Workflow behavior and runtime adapters remain unimplemented. This document owns module boundaries; evidence and deep consensus details live in the companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; M0 infrastructure and a partial pure M1 domain core are implemented. Storage, consensus, application and transport adapters remain scaffolds. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 
@@ -26,7 +26,7 @@ Both HTTPS and a dedicated TLS/TCP workflow API are first-class design targets. 
 
 ## Workspace boundaries
 
-The M0 crate boundaries below are scaffolded; type/operation implementations remain planned. [ADR-002](adr/002-project-foundation.md) adds isolated test-support/parity tooling. Avoid generic `utils`, `common`, `manager` or a catch-all backend crate. Small cohesive modules can share a crate if they have the same allowed dependency set, but enforce every logical boundary. Separate domain and adapter crates are mandatory.
+The M0 crate boundaries below are scaffolded; types and domain operations are implemented incrementally against pinned source assertions. [ADR-002](adr/002-project-foundation.md) adds isolated test-support/parity tooling, and [ADR-003](adr/003-source-size-limits.md) enforces source-size limits. Avoid generic `utils`, `common`, `manager` or a catch-all backend crate. Small cohesive modules can share a crate if they have the same allowed dependency set, but enforce every logical boundary. Separate domain and adapter crates are mandatory.
 
 | Crate | Modules and principal types | Allowed first-party dependencies |
 |---|---|---|
@@ -104,7 +104,9 @@ Small pure value types may use standard collections and selected pure helper dep
 
 ## Functional core
 
-Conceptual signatures, not code to implement in this phase:
+Target contracts; the implemented single-record reducer covers part of `decide`
+and produces bounded proposed writes. Remaining contracts require their milestone
+gates:
 
 - `validate(raw_command, limits) -> Result<ValidatedCommand, ValidationError>`: no I/O.
 - `prepare(validated_command, authoritative_view, explicit_inputs) -> PreparedCommand`: leader-side preparation, never a final commit decision.

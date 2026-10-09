@@ -1,11 +1,11 @@
-# Project foundation
+# Workflow implementation with TDD
 
-The user has authorized the Rust project foundation: workspace/module scaffolding, test support, lint/dependency policy, architecture enforcement and CI. Implement those M0 infrastructure pieces. Workflow business behavior, storage/consensus adapters, live HTTP/TCP listeners and a UI remain outside this increment. Do not add fake service behavior or mark workflow parity passing.
+The user has now authorized implementation based on the reviewed architecture, with TDD and GPT-6.1-sol/max subagents that communicate and review each other. Follow the ordered milestones in docs/implementation-plan.md. Start by collecting actual pinned-source test identities and implementing the pure M1 workflow core against source-derived assertions. Later runtime adapters require their predecessor gates. Do not add fake durability/service behavior or mark full workflow parity passing without executed counterparts for all required cases.
 
 Read README.md and docs/architecture.md before proposing changes. Keep the workflow-only scope. Source observations, proposed decisions and unresolved validation gates must be distinguished. Cite source paths and upstream primary documentation. Record disagreements and resolutions in docs/reviews; do not claim independent review unless it happened.
 
 Implementation must follow the dependency allowlist, functional core and safety rules. Architecture changes require an ADR and updates to architecture checks. Do not suppress checks just to pass CI. Preserve backward compatibility only where explicitly included in the parity matrix. All first-party code inherits workspace lint policy and forbids unsafe. Tooling/test-support crates must never enter production dependencies.
 
-Use subagents for this foundation work, communicate through actual shared-file reads and coordinator relays where direct tools are unavailable, and record reciprocal findings/resolutions in docs/reviews. Disjoint write sets avoid overwriting another agent's work.
+Use the explicitly requested subagents, communicate through actual shared-file reads and coordinator relays where direct tools are unavailable, and record reciprocal findings/resolutions in docs/reviews. Agree on API contracts before dependent changes. Assign disjoint write sets; only the coordinator changes shared root policy/configuration or commits/pushes. Do not overwrite a peer's implementation. Record real failing-test evidence before implementation and real passing evidence after it. Never claim TDD from tests written only after code.
 
 The existing Elixir workflow tests are mandatory acceptance inputs: read docs/workflow-test-parity.md. Preserve source identities, scenarios and assertions in Rust counterparts; do not silently drop cases, weaken assertions or count ignored/deferred tests as parity. tests/reference contains preserved upstream test sources and fixture/manifest data, not a runnable Rust implementation.
