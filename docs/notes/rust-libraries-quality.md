@@ -60,8 +60,10 @@ Production workspace edges below follow the canonical `docs/architecture.md` (di
 | consensus | types, domain, ports |
 | storage | types, domain, ports |
 | projection | types, domain, ports |
-| api | types, domain, ports, application |
-| worker | types, domain, ports |
+| wire | types, domain (approved values only) |
+| api-http | types, domain, wire, application |
+| api-tcp | types, domain, wire, application |
+| worker | types, domain, ports; wire only in private client adapters |
 | node | composition dependencies on adapters and application |
 
 Consensus bridges OpenRaft to domain transitions and durable ports; storage must not depend on consensus. If an OpenRaft storage trait needs implementation over storage, put that bridge in consensus and keep storage's API library-neutral. Projection reads committed facts and exposes views; it cannot be the authority for claims. UI endpoints consume application query contracts; they cannot open storage directly. External workflow execution belongs behind worker/application contracts, outside deterministic apply.
@@ -99,3 +101,7 @@ No peer conclusions, responses, or endorsements have been invented. Main archite
 ### Final review status
 
 The pending statements above describe first-round history, not current status. Completed file-based and parent-relayed quality cross-review, actual peer replies, Parfit attribution, and bounded provenance checks are recorded in [rust-quality-review.md](../reviews/rust-quality-review.md). The parent reports final architecture/plan/decision integration of time, identity and watermark wording; see [decisions.md](../reviews/decisions.md). Quality review is complete with no blocking material contradiction identified. Implementation, library conformance, safety/performance measurements and source-parity validation remain future gates; none is claimed complete by this design review.
+
+### Current dual-transport boundary update
+
+[ADR-001](../adr/001-dual-client-transports.md) supersedes the original single api crate. The canonical architecture now uses pure wf-wire and separate wf-api-http/wf-api-tcp, both delegating to the same application service without raw ports/storage/consensus dependencies. Earlier review replies retain historical API arrows; the current canonical allowlist and negative fixtures govern future implementation. HTTP/TCP worker client modules are transport adapters for WorkflowClientPort, not server or consensus dependencies.

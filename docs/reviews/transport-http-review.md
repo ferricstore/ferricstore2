@@ -1,0 +1,135 @@
+# HTTP transport review and exchange record
+
+Author: HTTP agent `01a12041-6519-7c42-8bb8-462619dea045`. Date: 2026-10-09. Design only. Owned [HTTP design](../transports/http.md). The HTTP-owned three-phase round is complete; earlier pending notes preserve the actual initial exchange history, and final dispositions are below. No tests, implementation, commit or direct messaging are claimed.
+
+## Delivery and communication
+
+Repository baseline read: `209fa8f835df799841e4e2e811c3527bbd40f5f1`; AGENTS, README, architecture, implementation plan and workflow parity were read. Only the HTTP design and this review file are owned. Direct agent-send tools are unavailable in the inspected tool inventory; parent relay/shared-file exchanges are the communication path.
+
+Parent instructions received: pure wf-wire DTOs, sibling HTTP/TCP adapters without raw ports, ONE application/auth/admission service; durable request_id separate from TCP call_id and workflow correlation_id; decoded normalized intent digest, opaque base64 bytes and string u64s; immutable acceptance source tests; legacy no-ID cases remain separate. Initial HTTP draft follows these directions. Shared schema examples remain provisional until alignment with the parent's file.
+
+## Initial questions for parent / peer relay
+
+1. Canonical schema: please freeze exact digest algorithm/normalization version and position recovery namespace. HTTP proposes base64 tagged bytes and decimal-string u64s; transport-specific lexical forms must normalize to identical semantic intent.
+2. Claim waiting: HTTP proposes one final committed claim per request ID. A contention-empty committed result ends that ID; waiting without any proposal can return provably not-submitted. Do TCP/system propose repeated empty proposals under one ID? That would conflict with original-outcome replay unless explicitly separated into a durable poll protocol.
+3. Independent batching: HTTP proposes durable per-item IDs, one whole-intent ID only for atomic_group. Please settle whether the common envelope makes an outer independent-batch ID correlation-only or defines durable orchestration; no implicit whole-batch transaction is assumed.
+4. Outcome lookup: not_observed is not a no-commit certificate. A lost-response original may still commit. Please keep retention expiry and recovery mismatch distinct and require same-ID reconciliation rather than new mutation IDs.
+
+## Phase 2: independent reviews
+
+Actually read BOTH peer designs, parent transport contract, current architecture and ADR-001. Reviewed draft SHA-256 identities (designs can subsequently change): TCP `6bfa856e5e2b08d40231dd81ec6fbdca7415d31ea7fc82f5844ba4687e23044f`; system `0e87db0d4aeb9bb2b513f9ec55e53c1e8365bb18acea8745ba42e637aeb47c7b`; parent `4309da0e78991b0e3002b09ba897c997eeecd0e0bfdba4830589fbe40853b354`; architecture `2a893c9141d9d52515bb514f1fa752ad798bb643a13dd57f099d0dbe7aec23a1`; ADR `0df644b97b65b2ba2e3c8e6e1e39cdfcd2a03a2b89b71b90ad0c663e1ac8d3c3`.
+
+### TCP findings and questions for relay
+
+- H-T1, schema mismatch: initial TCP uses `schema:wf.v1`, `tenant`, `type/state`, `attempt_timeout_ms`, and `recovery_epoch`; initial HTTP uses `schema_version`, command and group/recovery_id. Parent subsequently supplied a concrete common shape: `schema_version:"1"`, `operation`, required `tenant_id`, mutation `request_id`, `args`, `attempt:{timeout_ms}`, `consistency:{mode,after:{group_id,recovery_id,index}}`; create fields workflow_type/initial_state. **HTTP accepts and is updating.** TCP HELLO may negotiate wf.v1 but must explicitly map it to schema_version 1. Please update request/reply samples and prohibit undocumented aliases; this is needed before cross-transport vectors can be meaningful.
+- H-T2, capability overstatement: TCP HELLO says max_active_calls 64 but system allows 16 active/8 queued per connection. Parent proposes 16 active and 24 aggregate pending, including parked waiters. **Accepted**: advertise these separately and bound total pending, body and response bytes simultaneously. TCP 2-second default also differs from system 5 seconds; HTTP accepts 5 seconds common default, 30-second cap. Writer's 30-second absolute allowance must not extend the remaining attempt budget or 5-second stall cap. Please align the table/HELLO.
+- H-T3, ordering: the proposed same-lane one-call-at-a-time submission policy is an explicit ordering mechanism and is compatible with parent caution. It does not establish arrival order across lanes/connections/HTTP or atomicity. Stopping an unknown lane protects causally dependent queued work. Please confirm control CANCEL/PING remain live through bounded capacity and that "same-lane definitive order" is not described as universal TCP ordering. HTTP has no implicit stream/connection causal ordering.
+- H-T4, long-poll identity: please confirm a claim ID gets at most one committed claim result. A committed empty claim cannot be retried under that ID to obtain later work. Waiting while unsubmitted may recheck hints; after a contention-empty committed result, return it and require a fresh independent poll ID. Current TCP says initial long-poll capability can be off; discovery and supported operation/mode parity must match HTTP at each rollout. HTTP will gate the capability rather than imply it is already implemented.
+- H-T5, retained claim replay: a replayed old successful claim must not cause a worker to execute with an expired/superseded lease. TCP correctly reserves capacity for unknown claims; please require a strong ownership/revision/fence check (or equivalent current-authority evidence) before resuming a replayed claim. Lease deadline alone is not authority after cancellation/reclaim/restore. No new completion/failure command may mask uncertain reporting.
+
+### System findings and questions for relay
+
+- H-S1, atomic reservations: the 64 MiB response partition supports fewer than 256 simultaneous 1 MiB responses. This is not a contradiction if all count/byte/work reservations acquire together and advertised counts are upper bounds, not promised parallel capacity. Please make this implication explicit; HTTP accepts effective minimums and will charge encoded/decoded/capacity copies plus response construction before proposal.
+- H-S2, waiter cap missing: active/queued limits alone do not bound parked long-poll waiters. Please select explicit node/tenant/connection waiter and key-footprint bounds, include them in the aggregate 24 pending per connection, and reserve fast/maintenance capacity. Proposed HTTP profile uses 128 parked/node, 32/tenant, 8/connection as provisional maxima, subject to byte/key minima. Reauthenticate/re-authorize on wake immediately before proposal; expiry while parked cannot grant a new claim.
+- H-S3, HTTP buffer/control bounds: the common process pool is not an HTTP/2 connection/stream, header, TLS read-ahead or slow-body bound. HTTP will propose 16 KiB aggregate headers, 64 fields, 8 KiB request-target, 1 MiB encoded JSON and structural/value caps matching TCP, 16 active/24 aggregate pending HTTP requests per connection, and 5-second absolute body assembly bounded by remaining attempt. Please confirm these are narrower policy candidates, not measured defaults. Library integration must validate preallocation/parser buffers rather than infer it from an Axum extractor cap.
+- H-S4, deadline ownership and drain: agree with receipt-to-delivery local monotonic attempt budget and supervised submission. HTTP must not use Tower handler cancellation as a no-commit proof. Both designs say new admission stops at drain but also preserve maintenance; please explicitly classify already-owned lease maintenance/reconciliation as bounded allowed drain work while refusing new create/claim admission. Otherwise the shutdown wording could prevent the stated worker heartbeat/report drain.
+- H-S5, error/retention semantics: support `not_observed` being weaker than a no-commit certificate. Please preserve expired retention vs incompatible recovery vs lookup unavailable. The retained window must cover declared reconciliation/retry duration or the design cannot safely promise automatic retries. HTTP will display exact shared OutcomeKind and SubmissionState in RFC9457 extensions.
+
+### Parent contract, architecture and ADR findings
+
+- H-P1: approved as a design proposal: wf-wire is pure, adapters depend only on types/approved domain values/wire/application, node wires one auth/admission service, worker clients do not import server adapters, and raw ports/storage/consensus are blocked by planned item/dependency checks. No change to Raft boundaries or safe-first policy requested.
+- H-P2: parent schema/outcome proposal received directly as task steering, not peer messaging. HTTP accepts `applied/rejected/not_submitted/unknown/read` plus `durable_outcome/not_submitted/may_have_been_submitted/not_applicable`; durable rejected means a committed deterministic outcome, never workflow success. Error responses must distinguish a pre-submit stale-guard failure from a persisted rejection even if both use HTTP409.
+- H-P3: parent should freeze one algorithm/version for canonical intent and outcome retention before SDK mutation retries. SHA-256 in the HTTP initial shape is an illustrative candidate, not an independently finalized digest. Body tenant required and URL equality is accepted; normalized application identity still comes from authenticated authorization, never equality alone.
+- H-P4: independent batching needs precise public IDs: proposal is per-item durable request IDs, optional outer correlation only, one whole-intent ID for atomic_group. Please settle common batch envelope before advertising. Partial/cross-group calls cannot present an outer ID as a durable aggregate outcome without an orchestration design.
+
+No release validation is claimed. At the time of this review, both peer review files were absent when read; their incoming findings have not yet been received. The files above were actually inspected independently rather than inferred from the roster.
+
+## Phase 3: responses and resolutions
+
+Actually read [TCP review](transport-tcp-review.md) and [system review](transport-system-review.md) after their files arrived. The following replies answer their actual finding IDs; this is shared-file communication, not direct messaging. HTTP design has been revised accordingly. Peer receipt/acceptance of these replies is recorded only when subsequently stated in their own files.
+
+### Replies to TCP's HTTP findings
+
+| Received finding | HTTP answer / owned change | Status |
+|---|---|---|
+| TCP-H1 | Accepted parent common schema. All request samples now use schema_version1, tenant_id, args, typed create names and attempt.timeout_ms. URL/body tenant equality is mandatory before proposal. Consistency is structured; TCP wf.v1 negotiation maps to version1 rather than an alias. | Resolved in HTTP; reciprocal peer confirmation awaits final read |
+| TCP-H2 | Accepted. Lookup URL now requires BOTH group_id and recovery_id; workflow.outcome query args use the same identities. Incompatible recovery is explicit, with no current-namespace fallback. | Resolved in HTTP; common restore/replay test gate remains |
+| TCP-H3 | Accepted. Expired is emitted only with retained bounded expiry metadata/frontier proof. Missing rows yield not_observed with retention_guarantee unknown, never historical existence or no-commit proof. Exact bounded tombstone/frontier implementation and duration remain M7 gates. | Design ambiguity resolved; implementation evidence pending |
+| TCP-H4 | Accepted. Common exact outcome/submission pairs and error.code are now in RFC9457 extensions. Every non-submission result is explicitly this-attempt only, including cancellation, overload, drain, denial and redirects; it does not revoke an earlier attempt. | Resolved in HTTP |
+| TCP-H5 | Accepted and parent explicitly confirmed. One actual claim proposal ends the retained ID even when empty. Application checks replay/dedup before parking; parked unsubmitted wait results are attempt-local. Unknown acquisition reserves worker capacity and replays SAME identity. A retained successful claim requires a current-authority ownership check before handling; it is not a new lease. | Resolved in HTTP; TCP application of detail checked at final read |
+
+### Replies to system findings S1-S9
+
+| Received finding | HTTP answer / owned change | Status |
+|---|---|---|
+| S1 | Common fields, strict no-alias schema and required URL/body tenant equality adopted throughout. | Resolved in HTTP |
+| S2 | Exact shared pairs adopted; read lookup nests retained mutation outcome and keeps lookup state separate. HTTP problem wrapper adds standards fields only. Proxy/stream errors cannot prove non-submission. | Resolved in HTTP |
+| S3 | Default5s/cap30s, active16/queued8/unresolved24 including parked, local header-to-delivery deadline and remaining-time write watchdog selected. HTTP parsing/TLS caps supplement one shared application ledger. | Resolved in HTTP; library limits validation remains |
+| S4 | Serialized envelope1MiB, opaque256KiB/value and512KiB/call, structural16/4096 limits;4MiB session ceilings lazy, count+byte minima bind. Complete worst-case output is reserved before proposal under node/per-call/client min. Larger source scenarios keep a reviewed profile/gate rather than truncated assertions. | Resolved in HTTP as proposed policy |
+| S5 | Waiters do not retain execution/worst-case output capacity while parked. Parent selected128/node,64/group,16/tenant,8/connection,<=16scope keys; system owns byte/wake ledger. Wake reauthorizes and reacquires execution/output; no repeated empty committed claims. | Resolved in HTTP; awaiting system finite byte/wake wording |
+| S6 | One final HTTP operation response through supervised submission owner; transport cancel/reset does not cancel workflow. No HTTP1/HTTP2 arrival/commit-order claim. TCP cancel_ack remains separate and lane ordering explicit/local. | Resolved in HTTP; adversarial race tests specified only |
+| S7 | TLS1.3, no early data, h2/http1.1 ALPN separated from wf-tcp/1, no downgrade; separate trust/audiences/resumption stores/client-auth policy. Reauthorize before proposal after queue/wait, including current lookup permissions. | Accepted parent-selected deployment design; integration verification pending |
+| S8 | Per-node shared caps are local resource protection; no cluster-wide tenant quota. Maintenance is inside totals. Successful p99 is not an availability promise; offered/rejected/unknown/client-lag measurements required. | Resolved in HTTP |
+| S9 | Immutable source cases, separate legacy no-ID lease/fence rules, no assumed obsolete endpoint compatibility. Bounded pinned route observations now linked; broad source operation families and float/partition semantics remain explicit M0/M5 gates. | Acceptance requirement preserved; no cases executed/ported |
+
+### Actual parent resolutions received
+
+Parent steering supplied the common schema and exact outcome/submission pairs; HTTP accepted. Parent then explicitly resolved poll finality and independent batching: individual/atomic_group has a durable outer ID; independent has no durable outer ID, each item has one, order is preserved and there is no implicit durable orchestrator. HTTP is updated. These are received parent answers, not an inferred peer consensus.
+
+Parent subsequently selected finite waiter counts128/node64/group16/tenant8/connection<=16scope keys, TLS1.3/no earlydata/separate ALPN and resumption/auth policies, min serialized response capacity before proposal, lazy session ceilings, and shared drain phases. HTTP's earlier H-S2 suggestion32/tenant is superseded by16/tenant. HTTP accepts the selected choices and updated the resource table. Parked-waiter bytes and finite wake work remain system-owned and must be verified in its final file; initial numeric caps remain unvalidated assumptions.
+
+Drain answer: ordinary/create/claim admission stops and unsubmitted waiters leave; bounded current-ownership maintenance/reconciliation can use the reserve until full stop. HTTP has removed the ambiguous all-admission-stops wording. Submission work outliving the socket keeps its owner and permits. A known outcome can still be lost during delivery; timeout never means rollback.
+
+### Central digest review
+
+Actually read [intent-digest.md](../transports/intent-digest.md) in full after parent delivered it. Accepted as a selected design proposal:13-byte WF-INTENT/NUL/V1/NUL prefix, typed length-delimited tags, UTF8-byte sorted unique map keys, ordered lists, raw decoded bytes, lossless integer categories, schema-declared defaults only and current-policy-independent retry meaning. Application pure bounded intent module owns hashing; adapters supply no identity proof; group/recovery/request key is distinct from mutable route hints.
+
+H-D1: HTTP example previously used digest.version; corrected to normalization_version1, algorithmsha256 and64-character lowercase hex placeholder to match the central grammar. Link added; no independent raw-JSON hash policy remains.
+
+H-D2: tag09 finite binary64 is acceptable only behind the document's explicit field-schema/lossless-wire gate. It does not authorize changing preserved scalar partition or source numeric equality rules. HTTP's unsigned decimal fields remain declared u64 types, not blanket coercion. Negativezero/optional null/default/policy semantics need real cross-language vectors before SDK rollout.
+
+H-D3: no design blocker found in this bounded grammar review. Exact per-operation registry, normalization-version rollout/retention, length/overflow bounded encoding and golden hashes remain future implementation gates, not verified encoders. Pure helper placement complies with existing functional-core boundaries; sha2 remains a candidate requiring pin/audit.
+
+H-D4: final parent correction received: v1 does NOT accept client-supplied intent_digest. HTTP removed its earlier "recompute any supplied digest" wording, explicitly rejects that unknown field, and exposes normalization_version/algorithm/value only in responses. Server computes/compares retained identity. Shared retention field is outcome_retained_until_ms. Parent also added wire imports only to private worker client-adapter modules; final architecture/quality rows were actually re-read and comply with functional worker-core isolation.
+
+### Final read and remaining status
+
+Actually re-read the full revised TCP and system design files after their edits, the final parent transport contract, architecture/quality worker-wire allowlist and ADR. Final peer review files still displayed their first-phase reciprocal-response pending paragraphs at that read; no later peer receipt is assumed. Incoming parent answers and concrete revised peer text now resolve the following HTTP questions as design selections:
+
+| HTTP finding | Final observed resolution |
+|---|---|
+| H-T1/H-T2 | TCP REQUEST samples now use common names, wf.v1 mapping, active16/pending24/queued8 and5s default with remaining-time writer bound. Accepted. |
+| H-T3 | TCP explicit serial lane rule, no cross-lane/connection/global order; bounded control two calls/8KiB bodies/16KiB allowance and one writer. Accepted as a selected proposed policy; no claim that control bypasses a partial body or stalled socket. |
+| H-T4/H-T5 | TCP now spells out one final claim outcome, replay-before-park, stale retained-claim current strong ownership check, unknown capacity and no fresh-ID ambiguity masking. Accepted. |
+| H-S1/H-S3 | System now states atomic count+byte minima, lazy connection ceilings, preproposal complete serialized receive cap and bounded control/TLS overhead. HTTP narrower parser/structural watchdog caps remain unvalidated integration policy. Accepted. |
+| H-S2 | System now has finite waiter ledger128/node64/group16/tenant8/worker8/connection<=16keys,8MiB inside request-state pool,<=8KiB/waiter,<=256B/key,8wake tasks and32ready/batch, one coalesced token. HTTP incorporated these. Accepted proposed policy; measured accounting and missed-wake/fairness tests remain gates. |
+| H-S4/H-S5 | System now defines maintenance-only drain and full-stop phases, this-attempt non-submission, expiry proof/unknown-retention and no missing-row no-commit certificate. Accepted. |
+| H-P1/H-P2/H-P3/H-P4 | Parent final shared schema/pairs/typed digest/no-client-digest/per-item independent IDs, TLS/waiters/receive limits/drain selections and worker private wire modules were read and accepted. Exact registry/vectors/retention are future gates. |
+
+Final small normalization follow-up for TCP/parent relay (H-T6): TCP's revised outcome-lookup paragraph uses `recovery_mismatch` as an error whereas parent/system/HTTP freeze `data.state: "incompatible_recovery"`. Please use common read/not_applicable + that state (an error.code may additionally describe it), so this is not a competing lookup-state spelling. HTTP also aligned its unknown error.code to system/TCP's outcome_unknown and reconciliation fields to operation/request_id/group_id/recovery_id. This is a schema-text alignment request, not a new semantics or implementation demand.
+
+No implementation blocker should be inferred from the enumerated future gates; those are required evidence before implementation/release. No peer endorsement of final replies is claimed unless subsequently present in a peer file.
+
+### Final coordinator namespace finding (H-N1)
+
+Received actual parent steering identifies a material gap: mutation envelopes named ID/intent but could resolve the latest recovery on retry, changing the retained key after disaster restore. **Accepted the REQUIRED request_scope:{group_id,recovery_id} contract** for each individual mutation, outer atomic_group batch and each independent item (no outer independent ID/scope). HTTP schema and mutation/applied/unknown samples now bind it; error replies echo it when known. Scope is identity KEY context, excluded from canonical intent; semantic partition/workflow args remain hashed.
+
+Critique/clarification: check asserted scope against authoritative tenant placement immediately before handoff, after queue, long-poll wake and trusted forwarding. Initial admission alone cannot protect work parked while the recovery namespace changes. A submitted owner may finish/reconcile under its original namespace but cannot be reassigned to a newly restored group. No automatically supplied latest scope, fresh scope/ID retry, or treating a membership/routing hint as authority. Strong lookup needs the original namespace; denial in a changed recovery is attempt-local and does not prove the old request failed. Stable scope is obtained through authenticated M4 single-group discovery; future resolver is an authorized read, not membership administration.
+
+This is the smallest sufficient change I found for the selected per-group/recovery identity scheme. A global durable request registry surviving every disaster restore could also prevent duplication, but would introduce another durability/availability authority beyond the current design and is not justified here. Caller-initiated new intent after reconciliation/operator decision is explicit; no forever/exactly-once effect promise is inferred. Missing/old scope, same-ID cross-transport preserved scope, atomic multi-placement rejection, changed recovery during queue/wait, and retained old outcome after restore are added future conformance gates. Original no-ID acceptance cases remain separate.
+
+Parent/common/digest and final peer application of this late scope correction must be re-read before final completion. No namespace gap is marked resolved merely because this owned file changed.
+
+Actual reciprocal responses have now been read: TCP explicitly answered H-T1..H-T5, and system explicitly answered H-S1..H-S5 (as well as TCP's shared findings). HTTP accepts those answers; revised peer text implements the selected schema/resource/finality/ownership choices as documented above. System's final phase-ownership clarification was also read: ordinary queue owns only bounded input/state/queue, dispatch acquires active/cost/output atomically, parked ledger separate, transferred buffers charged once and copies charged separately. HTTP added this exact phase distinction. These statements attribute actual file-based answers, not direct messages or performance validation.
+
+## Final HTTP-owned completion and dispositions
+
+Final full revised TCP and system designs were actually re-read after the late scope change, followed by current parent common scope/lifecycle text and the full revised intent-digest document. HTTP's H-N1 / TCP-D1 / system S-D4 namespace finding is resolved in all three design texts: required original request_scope before first send, SDK journaling, no silent scope/ID replacement, placement/current recovery verification before proposal, per-item independent scope and whole atomic-group scope. Scope remains key context rather than canonical digest input; this does not claim restore fencing is implemented or proven. HTTP accepts the coordinator resolution and peer revisions.
+
+H-T6 is resolved in final TCP text: lookup is read/not_applicable and data.state includes incompatible_recovery, with nested retained outcomes and retention_guarantee unknown when expiry proof is missing. TCP/HTTP unknown examples now share outcome_unknown, flat reconciliation identity fields and original request_scope. Parent's final no-client-digest, outcome_retained_until_ms and private worker-client wire-module decisions were read and applied.
+
+All received TCP-H1..H5 and system S1..S9 findings have individual HTTP answers above; all HTTP questions H-T1..H-T6, H-S1..H-S5, H-P1..H-P4 and H-N1 have concrete accepted design resolutions. Actual peer responses were read; no undocumented direct exchange is claimed. The final peer review files still retained their final-reread-in-progress notices when inspected, so HTTP does not assert that either peer has endorsed this final completion paragraph or subsequently performed another read.
+
+No unresolved HTTP design blocker remains in this round. Before implementation/SDK release, required gates remain exact per-operation/source assertion mapping, finite policy/registry/default/float semantics, golden bytes/hashes, retained-version/expiry horizon, authoritative recovery fencing, bounded safe HTTP/TLS parsing and resource supervision, selected library/provider/MSRV audit, real failover/fault/parity execution and measured workload/SLO evidence. These are design limitations and planned work, not reasons to label incomplete parity passing.
+
+Only docs/transports/http.md and this owned review file were written by the HTTP agent. Current-library/standards sources are cited in the design; selected pinned source observations remain bounded and preserved tests unchanged. git diff --check passed for the shared tracked diff; no workflow or Rust suite was run, and no Rust/Cargo/executable CI/test implementation or commit was made.
