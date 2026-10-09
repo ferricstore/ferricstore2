@@ -2,9 +2,11 @@
 
 Status: planned work only. This plan authorizes no implementation by itself. Milestones depend on predecessor evidence, not calendar estimates.
 
+The [existing Elixir workflow test parity contract](workflow-test-parity.md) is mandatory. Source tests and helpers are preserved in tests/reference with a manifest and hash inventory; all Rust counterparts are currently unported. New model/property tests supplement these regressions.
+
 ## Before implementation
 
-1. Finalize the workflow parity matrix against source tests, distinguishing baseline from dirty checkout. Record supported, deferred and deliberately dropped commands, explicitly including governance, approvals, budgets, durable effects and durable steps. Decide compatibility target: behavioral parity is proposed; wire/SDK and on-disk compatibility are separate decisions.
+1. Finalize the workflow parity matrix and one-to-one scenario/assertion mapping against the preserved Elixir source tests, distinguishing baseline from dirty checkout. Record supported, deferred and deliberately dropped commands, explicitly including governance, approvals, budgets, durable effects and durable steps. Decide compatibility target: behavioral parity is proposed; wire/SDK and on-disk compatibility are separate decisions.
 2. Validate the module allowlist and settle Raft-specific storage trait ownership without a dependency cycle. Pick the smallest crate set that still enforces domain isolation.
 3. Confirm initial durability engine and Raft release together through a future focused spike. Require atomically persisted applied state, command outcome and indexes, crash-safe snapshots, durable log semantics, a proven strong-read barrier and license/security review. No production recommendation based only on README claims.
 4. Freeze deterministic claim/FIFO/retry semantics, time behavior and parent/child group placement and atomicity restrictions. Specify behavior after clock jumps and leader changes, trust of leader versus client timestamps, and time advancement on accepted/rejected/duplicate/tick/membership entries. Never promise exactly-once external effects.
@@ -26,7 +28,11 @@ Status: planned work only. This plan authorizes no implementation by itself. Mil
 | M7: retention and operations | Bounded cleanup, backups/restores, auth/configuration, metrics/tracing, quotas, rolling upgrades | Restore and upgrade rehearsals; GC cannot remove reachable blobs; idempotency expiry semantics and storage capacity limits documented |
 | M8: performance and cache | Baseline measurements; optional PackedGen cache adapter after approval | Same semantic results with cache absent, cold, evicted and rebuilt; memory, tail latency and concurrency/safety evidence justify reuse |
 
-M4 is a narrow vertical slice, not complete legacy parity. Declare missing operations until later milestones pass. Expand the MVP only where a real workflow requires a dependency such as child coordination.
+M4 is a narrow vertical slice, not complete legacy parity. Declare missing operations until later milestones pass. Expand the MVP only where a real workflow requires a dependency such as child coordination. Before M1/M4 test ports, freeze legacy lease/fence retry compatibility separately from explicit request-ID replay, exact externally observed partition/schedule/error fields, and deep FIFO lane-head lookup guarantees.
+
+## Existing test acceptance
+
+M0 must collect runtime ExUnit cases (including generated cases and section files), preserve tags/setup, and map every included workflow case to a Rust owner and counterpart. Each later milestone ports the corresponding original scenarios and assertions. CI must fail for missing included-case mappings, unported cases in claimed parity scope, ignored counterparts or weakened assertions. Deferred scope and explicit unrelated/UI exclusions remain visible; full workflow parity cannot be claimed while included cases are incomplete. See [inventory](workflow-test-inventory.md) and [port contract](workflow-test-parity.md).
 
 ## Test design
 

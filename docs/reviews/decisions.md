@@ -37,3 +37,9 @@ See [workflow final replies](workflow-review.md), [quality final replies](rust-q
 Final integration adds authorizing cache reads before lookup, worker capability restrictions, stable client watermarks distinct from projection generations, leader-admitted time inputs, and required time-entry advancement fixtures. The pinned-source coordinator read identifies existing WARaft/HLC/wall semantics; OpenRaft/monotonic time are proposed Rust migration choices. Noether produced no source findings, and none is attributed to it.
 
 Exact parity classification, releases, storage conformance, clock bounds, schema vectors, unsafe dependency audit and workload measurements remain future implementation gates. No implementation was written.
+
+## Existing workflow-test baseline follow-up
+
+The user requires the existing Elixir workflow tests to work against Rust. Their pinned sources/support/fixtures and separate local deltas are preserved with a hash manifest and a mandatory port contract. Turing independently read five key suites and reviewed the harness plan. Its review identified a significant distinction: legacy retries without request IDs cannot be replaced by artificial request-ID replay, especially after an intervening transition. The coordinator added separate legacy/new retry contracts, deep-FIFO lane-head guarantees, exact public field/encoding assertions, matched durability-state fault barriers and bidirectional runtime/source mapping.
+
+[Review](workflow-test-parity-review.md) is a bounded design audit; no suite was executed and no executable Rust counterparts exist yet. Snapshot/hash checks verify preservation only. Passing parity requires actual included-case execution and unchanged or explicitly mapped assertions.

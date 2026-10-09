@@ -1,0 +1,1795 @@
+defmodule Ferricstore.FlowWriteContractTest do
+  use ExUnit.Case, async: false
+  @moduletag :flow
+  @moduletag :global_state
+
+  alias Ferricstore.Test.ShardHelpers
+
+  setup_all do
+    ShardHelpers.wait_shards_alive()
+    :ok
+  end
+
+  setup do
+    ShardHelpers.flush_all_keys()
+    :ok
+  end
+
+  test "flow create has a no-values fast path for named value refs" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_attrs_named_value_refs_empty?(attrs)"
+    assert source =~ "defp flow_empty_named_ref_input?(nil), do: true"
+  end
+
+  test "flow create rejects metadata that cannot fit its QueryRow before routing" do
+    id = "query-row-create-#{System.unique_integer([:positive])}"
+    max_metadata_bytes = Ferricstore.Flow.Query.QueryRowCodec.max_metadata_bytes()
+    expected_error = "ERR flow query metadata exceeds #{max_metadata_bytes} bytes"
+    type = :binary.copy("t", max_metadata_bytes)
+    opts = [type: type, state: "queued", partition_key: "query-row-contract", now_ms: 1_000]
+
+    assert {:error, ^expected_error} =
+             Ferricstore.Flow.MutationAttrs.create_attrs(id, opts)
+
+    assert {:error, ^expected_error} = FerricStore.flow_create(id, opts)
+
+    assert {:ok, nil} = FerricStore.flow_get(id, partition_key: "query-row-contract")
+  end
+
+  test "flow transition rejects an unencodable QueryRow atomically" do
+    id = "query-row-transition-#{System.unique_integer([:positive])}"
+    partition = "query-row-contract"
+    max_metadata_bytes = Ferricstore.Flow.Query.QueryRowCodec.max_metadata_bytes()
+    expected_error = "ERR flow query metadata exceeds #{max_metadata_bytes} bytes"
+    oversized_state = :binary.copy("s", max_metadata_bytes)
+
+    assert :ok =
+             FerricStore.flow_create(id,
+               type: "query-row-contract",
+               state: "queued",
+               partition_key: partition,
+               run_at_ms: 1_000,
+               now_ms: 1_000
+             )
+
+    assert {:error, ^expected_error} =
+             FerricStore.flow_transition(id, "queued", oversized_state,
+               fencing_token: 0,
+               partition_key: partition,
+               run_at_ms: 1_001,
+               now_ms: 1_001
+             )
+
+    assert {:ok, record} = FerricStore.flow_get(id, partition_key: partition)
+    assert record.state == "queued"
+    assert record.version == 1
+  end
+
+  test "create admission reserves internal and policy projection bytes" do
+    id = "query-row-reservation-#{System.unique_integer([:positive])}"
+    max_metadata_bytes = Ferricstore.Flow.Query.QueryRowCodec.max_metadata_bytes()
+    expected_error = "ERR flow query metadata exceeds #{max_metadata_bytes} bytes"
+
+    assert {:error, ^expected_error} =
+             Ferricstore.Flow.MutationAttrs.create_attrs(id,
+               type: :binary.copy("t", max_metadata_bytes),
+               state: "queued",
+               partition_key: "query-row-contract",
+               attributes: %{"kind" => "invoice"},
+               state_meta: %{"owner" => "worker-1"},
+               now_ms: 1_000
+             )
+  end
+
+  test "flow named value refs do not scan whole flow records on the no-value hot path" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_named_value_refs_empty_fast_path"
+
+    refute source =~ "Map.get(:value_refs, record_or_refs)",
+           "records without :value_refs must not be treated as a value-ref map; that scans every record field"
+  end
+
+  test "flow no-value transition fast path avoids value_ref map lookup for normal records" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert [_, fast_path_source] =
+             String.split(source, "  defp flow_named_value_refs_empty_fast_path", parts: 2)
+
+    assert [fast_path_source, _] =
+             String.split(fast_path_source, "  defp flow_put_record_value_refs", parts: 2)
+
+    refute fast_path_source =~ "Map.get",
+           "normal Flow transitions do not carry named values; the no-value path must avoid a per-record Map.get/3"
+  end
+
+  test "router flow many batches use fixed shard buckets" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    assert source =~ "flow_fixed_shard_buckets(ctx.shard_count)"
+    assert source =~ "put_elem(buckets, shard_idx"
+  end
+
+  test "router flow pipeline results use ordered tuples instead of index maps" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    result_tuple_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(source, "flow_result_tuple")
+
+    expansion_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "expand_flow_pipeline_results"
+      )
+
+    assert result_tuple_source =~ ":erlang.make_tuple(count"
+    assert expansion_source =~ "flow_result_tuple(count, rejected)"
+    assert expansion_source =~ "put_elem(results, index, result)"
+  end
+
+  test "flow create fast apply inserts due lifecycle indexes once" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    refute source =~ "flow_create_put_fast_due(state, plans)",
+           "fast create already includes due/due-any rows in flow_create_put_fast_indexes/2; a separate due pass duplicates lifecycle index work"
+  end
+
+  test "flow claim partition-key aggregation is not quadratic" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    refute source =~ "acc ++ records",
+           "multi-shard claim_due must append records with reverse accumulation, not repeated list concatenation"
+  end
+
+  test "flow pipeline write result assembly is tuple based" do
+    source = Ferricstore.Test.SourceFiles.flow_source()
+
+    assert source =~ "def ordered_results([], _ctx, _callbacks, results_rev)"
+    assert source =~ "Enum.reverse(results_rev)"
+
+    refute source =~ "pipeline_write_indexed_results(ctx, %{})",
+           "pipeline writes are ordered; result assembly should not hash every command index through a map"
+  end
+
+  test "flow pipeline transitions avoid oversized transition batch apply" do
+    source = Ferricstore.Test.SourceFiles.flow_source()
+    router_source = Ferricstore.Test.SourceFiles.router_source()
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    [function_source] =
+      Regex.run(
+        ~r/defp state_run_results\(ctx, keyed_commands, callbacks\).*?^  end/ms,
+        source
+      )
+
+    assert function_source =~ "start_and_claim_run_results(ctx, keyed_commands, callbacks)"
+    assert source =~ "named_value_put_run_results(ctx, keyed_commands, callbacks)"
+    assert source =~ "transition_run_results(ctx, keyed_commands, callbacks)"
+    assert source =~ "defp transition_run_results(ctx, keyed_commands, callbacks)"
+    assert source =~ "Router.flow_transition_batch(attrs_list)"
+
+    [router_function_source] =
+      Regex.run(~r/def flow_transition_batch\(ctx, attrs_list\).*?^  end/ms, router_source)
+
+    assert router_function_source =~ "flow_transition_batch_valid_results(ctx, valid)"
+
+    refute router_source =~ "flow_transition_pipeline_batch",
+           "coalescing many transitions into one apply batch serializes large blob writes and explodes p99"
+
+    refute state_machine_source =~ "flow_transition_pipeline_batch",
+           "transition batching needs a blob-safe design before reintroducing a specialized apply command"
+  end
+
+  test "flow claim_due adjacent pipeline prepends run results without list concatenation" do
+    source = Ferricstore.Test.SourceFiles.flow_source()
+
+    [function_source] =
+      Regex.run(~r/defp adjacent_results\(\[{:ok, claim}.*?^  end/ms, source)
+
+    assert function_source =~ "prepend_results(results, acc)"
+
+    refute function_source =~ "++ acc",
+           "claim_due pipeline result assembly should not copy each coalesced run with list concatenation"
+  end
+
+  test "flow claim_due state normalization avoids generic Enum.uniq hot path" do
+    source = Ferricstore.Test.SourceFiles.flow_source()
+
+    [function_source] =
+      Regex.run(
+        ~r/defp normalize_claim_state_values\(values\) when is_list\(values\).*?^  end/ms,
+        source
+      )
+
+    refute function_source =~ "Enum.uniq",
+           "large multi-state claim_due should dedupe while validating instead of allocating through Enum.uniq"
+
+    assert source =~ "dedupe_claim_states_keep_last"
+  end
+
+  test "Flow LMDB async enqueue guard avoids Process.info on apply hot path" do
+    source = File.read!("lib/ferricstore/flow/lmdb_writer.ex")
+
+    assert [_, async_source] =
+             String.split(
+               source,
+               "\n  def enqueue_async(instance_name, shard_index, ops, after_flush)",
+               parts: 2
+             )
+
+    assert [async_source, _] = String.split(async_source, "\n  def durable?", parts: 2)
+
+    refute async_source =~ "enqueue_guard(pid, op_count)",
+           "async apply projection enqueue should use per-writer atomics, not Process.info/2"
+
+    refute async_source =~ "Process.info",
+           "Process.info/2 showed up in the Flow apply hot-path profile"
+
+    assert async_source =~ "enqueue_async_guard(instance_name, shard_index, op_count)"
+  end
+
+  test "flow soak latency metrics are sampled without extra hot event counters" do
+    source = Ferricstore.Test.SourceFiles.flow_state_lmdb_soak_source()
+
+    assert source =~ "int_env(\"FLOW_LATENCY_SAMPLE_RATE\", 10)"
+
+    assert source =~
+             "record_flow_latency(table, key, duration_us, item_count, event_count, latency_sample_rate)"
+
+    assert source =~ "rem(event_count, latency_sample_rate) == 0"
+    assert source =~ "flow_event_key?(key)"
+    assert source =~ "unless flow_event_key?(key), do: update_max"
+  end
+
+  test "flow query aggregators accumulate chunks without repeated list concatenation" do
+    source = Ferricstore.Test.SourceFiles.flow_source()
+
+    refute source =~ "records ++ acc"
+    refute source =~ "ids ++ acc"
+    refute source =~ "flow_decode_terminal_index_entries(entries, path, now_ms) ++ acc"
+    refute source =~ "flow_decode_query_index_entries(entries, path, now_ms) ++ acc"
+  end
+
+  test "flow history projection avoids grouping when pending entries stay on the apply shard" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_history_projection_same_shard?"
+
+    assert source =~
+             "publish_pending_flow_history_projection_entries(state, ctx, entries, ra_index)"
+  end
+
+  test "flow LMDB mirror enqueue stays async on the state-machine hot path" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    [function_source] =
+      Regex.run(~r/defp enqueue_lmdb_mirror_group\(state, shard_index.*?^  end/ms, source)
+
+    assert function_source =~ "LMDBWriter.enqueue_async("
+
+    refute function_source =~ "LMDBWriter.enqueue(",
+           "Flow apply must not block on LMDB projection enqueue; flush/request are the sync boundary"
+  end
+
+  test "flow history projection never sync-writes from state-machine apply" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    refute source =~ "HistoryProjector.write_entries_sync",
+           "Flow apply must enqueue history projection asynchronously and gate replay/release instead of sync-writing history"
+
+    refute source =~ "with_sync_flow_history",
+           "WARaft Flow apply must not force sync history projection"
+
+    refute source =~ "raw_put_cold(state, entry.key, flow_history_entry_value",
+           "Flow history writes must not have an inline cold-write branch controlled by config"
+  end
+
+  test "flow history projection entries stay lazy on the state-machine hot path" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    [projection_entry_source] =
+      Regex.run(~r/defp flow_history_projection_entry\(.*?^      end/ms, source)
+
+    refute projection_entry_source =~ "Flow.encode_history_fields",
+           "Flow apply should not encode history values; HistoryProjector encodes lazy descriptors async"
+
+    assert projection_entry_source =~ "value: {:flow_history_fields, record, event, now_ms, meta}"
+
+    refute projection_entry_source =~ "record: record",
+           "hot-path projection entries should use one compact value descriptor instead of extra map fields"
+
+    refute projection_entry_source =~ "event: event",
+           "hot-path projection entries should use one compact value descriptor instead of extra map fields"
+
+    refute projection_entry_source =~ "now_ms: now_ms",
+           "hot-path projection entries should use one compact value descriptor instead of extra map fields"
+
+    refute source =~
+             "Flow.encode_history_fields(record, event, now_ms, Map.get(entry, :meta, %{}))",
+           "single-command history planning must also enqueue lazy descriptors"
+
+    assert source =~ "value: {:flow_history_fields, record, event, now_ms, meta}"
+  end
+
+  test "flow history projector pressure path stores overflow instead of sync-failing apply" do
+    source = File.read!("lib/ferricstore/flow/history_projector.ex")
+
+    assert [_, async_source] =
+             String.split(
+               source,
+               "\n  def enqueue_async(instance_ctx, shard_index, entries, ra_index)",
+               parts: 2
+             )
+
+    assert [async_source, _] = String.split(async_source, "\n  @spec flush", parts: 2)
+
+    assert async_source =~ "Pending.append_overflow(projector, entries)"
+
+    refute async_source =~ "GenServer.cast(pid, :drain_overflow)",
+           "queue-full overflow must not cast one drain message per apply batch; flush/retry drains it coalesced"
+
+    refute async_source =~ "{:error, :queue_full}",
+           "queue-full history projection must move to retry overflow, not fail the Ra apply path"
+  end
+
+  test "flow claim_due native planner owns history-ready planning without LMDB sync" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "NativeFlowIndex.plan_claims_with_history(",
+           "claim_due should use the native planner for state/index/history-ready mutation plans"
+
+    [function_source] =
+      Regex.run(~r/defp flow_plan_claim_candidates_native\(.*?^  end/ms, source)
+
+    refute function_source =~ "HistoryProjector.write_entries_sync",
+           "claim_due native planning must not move LMDB/history projection into the apply hot path"
+
+    refute function_source =~ "LMDBWriter.enqueue(",
+           "claim_due native planning must leave LMDB as async cold projection"
+  end
+
+  test "flow history hot path skips after-history pass when records need no trim or terminal mirror" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_after_history_put_records_batch(state, records)"
+    assert source =~ "defp flow_after_history_fast_record?"
+    assert source =~ "flow_many_projection_entries_and_records("
+  end
+
+  test "flow transition due-index moves cache repeated batch keys" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_transition_move_due_indexes_nonempty",
+        "from_due_cache"
+      )
+
+    assert function_source =~ "from_due_cache"
+    assert function_source =~ "flow_claim_cached_due_index_key(from_due_cache, record)"
+
+    refute function_source =~ "flow_due_state_index_plan(record, next",
+           "transition batches usually share type/state/priority/partition; rebuilding due keys per item is visible in the profile"
+  end
+
+  test "flow claim_due native multi-key path does not sort due keys before the NIF scan" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_scan_keys_native_multi_loop",
+        "NativeFlowIndex.claim_due_candidates"
+      )
+
+    refute function_source =~ "Enum.sort",
+           "native Flow claim_due scans keys in caller order; sorting every partition batch was visible in the profile and does not improve correctness"
+  end
+
+  test "flow apply key-size validation does not call Router on the hot path" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "@flow_max_key_size 65_535"
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(source, "flow_validate_key_size")
+
+    assert function_source =~ "@flow_max_key_size"
+
+    refute function_source =~ "Router.max_key_size()",
+           "Flow claim/create validation runs in replicated apply; max key size is a constant and should not call Router per key"
+  end
+
+  test "flow small values skip blob externalization dispatch on apply hot path" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "maybe_externalize_apply_value"
+      )
+
+    assert function_source =~ "flow_inline_blob_value?(threshold, value)"
+
+    assert source =~ "BlobRef.encoded_size?(size)",
+           "ref-sized user bytes must still go through BlobValue so they are not confused with internal refs"
+
+    assert function_source =~ "BlobValue.maybe_externalize",
+           "large values and ref-shaped values still need the blob externalization path"
+  end
+
+  test "flow many router stamps per-shard batches so apply does not rehash each item" do
+    router_source = Ferricstore.Test.SourceFiles.router_source()
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert router_source =~ "@flow_shard_marker :__flow_shard_index__"
+    assert router_source =~ "flow_stamp_shard(command_attrs, shard_idx)"
+    assert router_source =~ "flow_stamp_shard(%{records: attrs}, shard_idx)"
+
+    assert state_machine_source =~ "@flow_shard_marker :__flow_shard_index__"
+    assert state_machine_source =~ "flow_attrs_same_stamped_shard?"
+    assert state_machine_source =~ "flow_key_infos_same_stamped_shard?"
+
+    attrs_check_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_many_same_state_machine_shard?",
+        "Router.shard_for(ctx, key)"
+      )
+
+    assert attrs_check_source =~ "flow_attrs_same_stamped_shard?"
+    assert attrs_check_source =~ "Router.shard_for(ctx, key)"
+
+    key_info_check_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_many_same_state_machine_shard_by_keys?",
+        "Router.shard_for(ctx, key)"
+      )
+
+    assert key_info_check_source =~ "flow_key_infos_same_stamped_shard?"
+    assert key_info_check_source =~ "Router.shard_for(ctx, key)"
+  end
+
+  test "flow many apply uses the command-level shard stamp before per-record rehash fallback" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~
+             "flow_many_partitions_valid?(state, attrs_list, Map.get(attrs, @flow_shard_marker))"
+
+    valid_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_many_partitions_valid?",
+        "flow_many_same_state_machine_shard?"
+      )
+
+    assert valid_source =~ "flow_many_same_state_machine_shard?(state, attrs_list, stamped_shard)"
+
+    same_shard_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_many_same_state_machine_shard?",
+        "stamped_shard == shard_index"
+      )
+
+    assert same_shard_source =~ "stamped_shard == shard_index"
+    assert same_shard_source =~ "flow_attrs_same_stamped_shard?"
+    assert same_shard_source =~ "Router.shard_for(ctx, key)"
+  end
+
+  test "flow claim_due validates due-index key size without building every due key" do
+    source = Ferricstore.Test.SourceFiles.flow_source()
+
+    [function_source] =
+      Regex.run(
+        ~r/defp validate_claim_due_keys\(type, state, nil, partition_key\).*?^  end/ms,
+        source
+      )
+
+    assert function_source =~ "validate_claim_due_key_lengths"
+
+    refute function_source =~ "__MODULE__.Keys.due_key",
+           "claim_due can probe many partitions per poll; validation must use length math instead of allocating every generated due-index key"
+  end
+
+  test "flow claim_due AUTO skips empty shards before Raft writes" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_auto_partition",
+        "flow_claim_due_auto_empty_precheck"
+      )
+
+    assert function_source =~ "flow_claim_due_auto_empty_precheck(ctx, idx, attrs)"
+
+    precheck_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_auto_empty_precheck",
+        "NativeFlowIndex.due_keys_present"
+      )
+
+    assert precheck_source =~ "NativeFlowIndex.due_keys_present"
+    assert precheck_source =~ "flow_claim_due_auto_precheck_keys"
+    assert source =~ "flow_auto_partition_keys_for_shard"
+    assert source =~ "{__MODULE__, :flow_auto_partition_keys_for_shard, ctx.name, ctx.slot_map}"
+  end
+
+  test "flow claim_due AUTO encodes invariant due-key components once per precheck" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_auto_precheck_keys",
+        "{:ok, keys}"
+      )
+
+    assert function_source =~ "Keys.index_component(type)"
+    assert function_source =~ "Keys.index_component(state)"
+    assert function_source =~ "Keys.tag(partition_key)"
+    assert function_source =~ "Keys.due_key_from_tag_and_index_components"
+
+    refute function_source =~ "Keys.due_key(type, state",
+           "type and state are invariant across priority and partition loops and must not be encoded for every generated key"
+
+    refute function_source =~ "Keys.due_key_from_index_components",
+           "automatic partition tags are invariant across states and priorities and must not be parsed for every generated key"
+  end
+
+  test "flow claim_due reclaim precheck does not scan cold due rows for running leases" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_cold_precheck_present?",
+        ~s("running")
+      )
+
+    assert function_source =~ ~s("running")
+    assert function_source =~ "do: false"
+  end
+
+  test "flow claim_due AUTO cold precheck uses broad shard prefix instead of per bucket partition scans" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_cold_precheck_partition_present?",
+        ":auto"
+      )
+
+    assert function_source =~ "cold_due_state_bucket_prefix"
+    refute function_source =~ "flow_auto_partition_keys_for_shard"
+  end
+
+  test "flow claim_due AUTO cold precheck does not repeat the same LMDB probe per priority" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    dispatch_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_cold_precheck_present_by_partition?",
+        ":auto"
+      )
+
+    assert dispatch_source =~ "flow_claim_due_auto_cold_precheck_present?"
+
+    auto_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_due_auto_cold_precheck_present?",
+        "Enum.any?(buckets"
+      )
+
+    assert auto_source =~ "Enum.any?(states"
+    assert auto_source =~ "Enum.any?(buckets"
+
+    refute auto_source =~ "priorities",
+           "the AUTO cold prefix is priority-independent; probing it once per priority repeats identical LMDB reads"
+  end
+
+  test "flow claim_due cold precheck avoids repeated directory syscalls for initialized shards" do
+    source = Ferricstore.Test.SourceFiles.router_source()
+
+    [function_source] =
+      Regex.run(
+        ~r/defp flow_claim_due_cold_precheck_partition_present\?\(.*?defp flow_claim_due_empty_precheck_allowed\?/ms,
+        source
+      )
+
+    assert function_source =~ "LMDB.prefix_entries_initialized"
+
+    refute function_source =~ "LMDB.prefix_entries(path",
+           "Flow shard startup initializes every LMDB directory; checking it again for every empty claim adds one filesystem syscall per cold-prefix probe"
+  end
+
+  test "flow claim_due fast index path avoids generic per-plan tuple dispatch" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_claim_fast_index_entries",
+        "flow_claim_fast_index_entries_loop(plans,"
+      )
+
+    assert function_source =~ "flow_claim_fast_index_entries_loop(plans,"
+
+    refute function_source =~ "flow_claim_plan_pair(plan)",
+           "claim_due fast index apply is on the WARaft apply hot path; it should dispatch plan tuple shapes directly instead of calling the generic plan-pair helper for every item"
+  end
+
+  test "flow terminal transition skips empty due and metadata index passes" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_transition_plans_due_index_empty?(plans)"
+    assert source =~ "flow_transition_move_due_indexes_nonempty(state, plans)"
+    assert source =~ "flow_transition_plans_metadata_index_empty?(plans)"
+    assert source =~ "flow_transition_move_metadata_indexes_nonempty(state, plans)"
+  end
+
+  test "flow terminal transition caches repeated lifecycle index keys" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    state_index_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_transition_move_state_indexes",
+        "flow_claim_cached_state_index_key"
+      )
+
+    assert state_index_source =~ "flow_claim_cached_state_index_key"
+
+    delete_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_transition_delete_old_secondary_indexes",
+        "flow_claim_cached_worker_index_key"
+      )
+
+    assert delete_source =~ "flow_claim_cached_inflight_index_key"
+    assert delete_source =~ "flow_claim_cached_worker_index_key"
+  end
+
+  test "flow non-idempotent create fast path does not synchronously query LMDB for existence" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    [function_source] =
+      Regex.run(
+        ~r/defp flow_create_non_idempotent_many_prepare\(state, attrs_list, key_infos\).*?^  end/ms,
+        source
+      )
+
+    assert function_source =~ "flow_registry_keys_present_hot_only"
+    assert function_source =~ "flow_state_keys_present_hot_only"
+
+    refute function_source =~ "flow_state_keys_present(state, keys)",
+           "current Flow state is the hot authoritative row; LMDB is an async cold projection and must not be a create hot-path dependency"
+
+    [hot_only_source] =
+      Regex.run(
+        ~r/defp flow_state_keys_present_hot_only\(state, keys\).*?^  end/ms,
+        source
+      )
+
+    assert hot_only_source =~ "flow_state_key_present_hot?"
+
+    refute hot_only_source =~ "flow_state_keys_present(state, keys)",
+           "hot-only helper must not delegate to the lagged LMDB presence path"
+  end
+
+  test "flow registry markers use segment-keydir storage instead of apply projection" do
+    storage_source = Ferricstore.Test.SourceFiles.waraft_storage_source()
+
+    [storage_function_source] =
+      Regex.run(
+        ~r/defp segment_project_cold_flow_key\?\(key\).*?^  end/ms,
+        storage_source
+      )
+
+    assert storage_function_source =~ "FlowKeys.value_key?(key)"
+    assert storage_function_source =~ "FlowKeys.history_key?(key)"
+    assert storage_function_source =~ "FlowKeys.registry_key?(key)"
+
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    [registry_marker_source] =
+      Regex.run(
+        ~r/defp flow_put_registry_marker\(state, key, record\).*?^  end/ms,
+        state_machine_source
+      )
+
+    assert registry_marker_source =~ "flow_put_hot(state, key"
+    refute registry_marker_source =~ "raw_put_cold"
+  end
+
+  test "flow retry many history builds entries and next records in one traversal" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_retry_projection_entries_and_records(state, plans, [], [])"
+    assert source =~ "defp flow_retry_projection_entries_and_records("
+  end
+
+  test "flow multi-row history queues async projection once per apply batch" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_many_projection_entries_and_records("
+    assert source =~ "flow_create_projection_entries_and_records("
+    assert source =~ "queue_pending_flow_history_projections_batch(projection_entries)"
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(source, "flow_many_put_history")
+
+    refute function_source =~ "flow_history_put_ready_entry(",
+           "transition/complete/fail/cancel batches should not Process.get/put the pending history queue once per event"
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(source, "flow_create_put_history")
+
+    assert [async_create_source, _sync_fallback_source] =
+             Regex.split(~r/\n\s+else\n/, function_source, parts: 2)
+
+    refute async_create_source =~ "flow_history_put_ready_entry(",
+           "create_many should queue async history projections in one batch instead of one Process.get/put per event"
+  end
+
+  test "flow fast create history builds entries and records in one traversal" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_create_fast_projection_entries_and_records(state, plans, [], [])"
+    assert source =~ "defp flow_create_fast_projection_entries_and_records("
+    assert source =~ "defp flow_create_fast_history_entries_and_records("
+  end
+
+  test "flow secondary indexes are native-only on the replicated apply hot path" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    refute source =~ ~r/(?<!Native)FlowIndex\.put_/
+    refute source =~ ~r/(?<!Native)FlowIndex\.move_/
+    refute source =~ ~r/(?<!Native)FlowIndex\.delete_/
+    refute source =~ ~r/(?<!Native)FlowIndex\.score_of\(/
+    refute source =~ ~r/(?<!Native)FlowIndex\.count_all\(/
+    refute source =~ ":ets.insert(state.flow_index_name"
+    refute source =~ ":ets.insert(state.flow_lookup_name"
+    refute source =~ ":ets.delete(state.flow_index_name"
+    refute source =~ ":ets.delete(state.flow_lookup_name"
+  end
+
+  test "fifo lane maintenance bypasses unrelated due-catalog bookkeeping" do
+    source =
+      File.read!("lib/ferricstore/raft/state_machine/sections/flow_fifo_lane.ex")
+
+    assert source =~ "flow_native_put_new_entries"
+    assert source =~ "flow_native_delete_entries"
+    refute source =~ "flow_index_put_new_entries"
+    refute source =~ "flow_index_delete_members"
+
+    ordering_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_filter_fifo_candidate_pairs"
+      )
+
+    refute ordering_source =~ "Enum.sort_by"
+  end
+
+  test "flow secondary indexes are not backed by ETS tables at boot or rebuild" do
+    sources =
+      [
+        {"lib/ferricstore/store/shard*", Ferricstore.Test.SourceFiles.shard_source()},
+        {"lib/ferricstore/raft/waraft_storage.ex",
+         Ferricstore.Test.SourceFiles.waraft_storage_source()},
+        {"lib/ferricstore/flow/lmdb_rebuilder.ex",
+         File.read!("lib/ferricstore/flow/lmdb_rebuilder.ex")},
+        {"lib/ferricstore/flow/lmdb_writer.ex",
+         File.read!("lib/ferricstore/flow/lmdb_writer.ex")},
+        {"lib/ferricstore/flow/history_projector.ex",
+         File.read!("lib/ferricstore/flow/history_projector.ex")},
+        {"lib/ferricstore/store/router*", Ferricstore.Test.SourceFiles.router_source()}
+      ]
+
+    Enum.each(sources, fn {path, source} ->
+      refute source =~ ~r/(?<!Native)FlowIndex\./,
+             "#{path} must not call the ETS Flow index; native index is the primary Flow index"
+
+      refute source =~ "Ferricstore.Flow.OrderedIndex",
+             "#{path} must not depend on the ETS Flow index module"
+
+      refute source =~ "Ferricstore.Flow.Index",
+             "#{path} must not depend on the ETS Flow index module"
+
+      refute source =~ "merge_from_ets",
+             "#{path} must not rebuild native Flow indexes from ETS"
+
+      refute source =~ "rebuild_from_ets",
+             "#{path} must not rebuild native Flow indexes from ETS"
+    end)
+  end
+
+  test "native Flow index apply_batch does not flatten grouped ops on the hot path" do
+    source = File.read!("lib/ferricstore/flow/native_ordered_index.ex")
+
+    [function_source] =
+      Regex.run(~r/def apply_batch\(resource, ops\).*?^  end/ms, source)
+
+    refute function_source =~ "List.flatten",
+           "Flow native index apply_batch receives grouped op batches; flattening copies the whole batch before the NIF"
+
+    refute function_source =~ "reverse_flatten",
+           "Flow native index apply_batch should parse grouped batches directly"
+  end
+
+  test "native Flow claim planning passes float candidates directly to the NIF" do
+    source = File.read!("lib/ferricstore/flow/native_ordered_index.ex")
+
+    for function_name <- ["plan_claims", "plan_claims_with_history"] do
+      [function_source] =
+        Regex.run(~r/def #{function_name}\(.*?^  end/ms, source)
+
+      refute function_source =~ "parse_claim_candidates",
+             "#{function_name}/... is fed by native claim_due candidates; reparsing and reversing the list copies every candidate before the planner NIF"
+
+      assert function_source =~ "NIF.flow_record_"
+    end
+  end
+
+  test "flow native claim key construction validates generated keys in one fast path" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(source, "flow_native_claim_keys")
+
+    assert function_source =~ "flow_validate_native_claim_key_sizes("
+
+    refute function_source =~ "flow_validate_key_size(",
+           "claim_due builds six generated keys per native claim batch; repeated generic validator calls show up in the apply profile"
+  end
+
+  test "flow native claim hydration reuses precomputed state-key prefix" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        source,
+        "flow_plan_claim_candidates_native",
+        "state_key_prefix"
+      )
+
+    assert function_source =~ "flow_read_claim_candidate_hot_values("
+    assert function_source =~ "state_key_prefix"
+
+    refute function_source =~ "flow_read_claim_candidate_values(",
+           "native claim planning already parsed the due key and built state_key_prefix; parsing the same due key again during hydration is wasted apply CPU"
+  end
+
+  test "flow history projector computes initial LFU once per published batch" do
+    source = File.read!("lib/ferricstore/flow/history_projector/storage.ex")
+
+    [function_source] =
+      Regex.run(~r/def publish_keydir_entries\(instance_ctx.*?^  end/ms, source)
+
+    assert function_source =~ "initial_lfu = LFU.initial()"
+
+    refute function_source =~ "LFU.initial(),",
+           "history projection publishes many rows; LFU.initial/0 reads atomics and should not run per entry"
+  end
+
+  test "flow blob-ref writes compute initial LFU once per value" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    function_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(source, "raw_put_flow_blob_ref")
+
+    assert function_source =~ "lfu = LFU.initial()"
+
+    assert length(Regex.scan(~r/LFU\.initial\(\)/, function_source)) == 1,
+           "large Flow payloads store blob refs; the apply path must not reread LFU atomics per ETS/write operation"
+  end
+
+  test "flow state-record blob staging reuses LFU for the ETS row and cold write" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    [function_source] =
+      Regex.run(~r/defp flow_stage_state_record_batch_entry\(.*?^  end/ms, source)
+
+    refute function_source =~
+             "{nil, LFU.initial(), {:put_cold, key, disk_val, expire_at_ms, LFU.initial()}}",
+           "large Flow transition records should compute LFU once and reuse it for both the keydir row and pending cold write"
+  end
+
+  test "flow fast create state records use known-new pending originals without ETS lookups" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert source =~ "flow_put_new_state_records_batch(state, key_records)"
+    assert source =~ "track_keydir_binary_delta_from_missing("
+  end
+
+  test "singular write commands return success only while claim/get return flow data" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    type_for = fn name -> "contract-#{name}-#{suffix}" end
+
+    queued_id = "contract-queued-#{suffix}"
+    cancel_id = "contract-cancel-#{suffix}"
+    complete_id = "contract-complete-#{suffix}"
+    fail_id = "contract-fail-#{suffix}"
+    retry_id = "contract-retry-#{suffix}"
+    transition_id = "contract-transition-#{suffix}"
+    rewind_id = "contract-rewind-#{suffix}"
+
+    assert :ok =
+             FerricStore.flow_create(queued_id,
+               type: type_for.("queued"),
+               payload: %{step: "queued"},
+               run_at_ms: now_ms + 60_000
+             )
+
+    assert {:ok, queued} = FerricStore.flow_get(queued_id)
+    assert queued.id == queued_id
+    assert queued.payload_ref
+
+    assert :ok =
+             FerricStore.flow_create(cancel_id,
+               type: type_for.("cancel"),
+               payload: %{step: "cancel"},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, [cancel_claim]} =
+             FerricStore.flow_claim_due(type_for.("cancel"),
+               limit: 1,
+               now_ms: now_ms,
+               worker: "contract"
+             )
+
+    assert cancel_claim.id == cancel_id
+
+    assert :ok =
+             FerricStore.flow_cancel(cancel_claim.id,
+               lease_token: cancel_claim.lease_token,
+               fencing_token: cancel_claim.fencing_token,
+               reason: "contract"
+             )
+
+    assert {:ok, cancelled} = FerricStore.flow_get(cancel_id)
+    assert cancelled.state == "cancelled"
+
+    assert :ok =
+             FerricStore.flow_create(complete_id,
+               type: type_for.("complete"),
+               payload: %{step: "complete"},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, [complete_claim]} =
+             FerricStore.flow_claim_due(type_for.("complete"),
+               limit: 1,
+               now_ms: now_ms,
+               worker: "contract"
+             )
+
+    assert complete_claim.id == complete_id
+    assert complete_claim.lease_token
+
+    assert :ok =
+             FerricStore.flow_complete(complete_claim.id, complete_claim.lease_token,
+               fencing_token: complete_claim.fencing_token,
+               result: %{ok: true}
+             )
+
+    assert {:ok, completed} = FerricStore.flow_get(complete_id)
+    assert completed.state == "completed"
+
+    assert :ok =
+             FerricStore.flow_create(fail_id,
+               type: type_for.("fail"),
+               payload: %{step: "fail"},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, [fail_claim]} =
+             FerricStore.flow_claim_due(type_for.("fail"),
+               limit: 1,
+               now_ms: now_ms,
+               worker: "contract"
+             )
+
+    assert fail_claim.id == fail_id
+
+    assert :ok =
+             FerricStore.flow_fail(fail_claim.id, fail_claim.lease_token,
+               fencing_token: fail_claim.fencing_token,
+               error: %{reason: "contract"}
+             )
+
+    assert {:ok, failed} = FerricStore.flow_get(fail_id)
+    assert failed.state == "failed"
+
+    assert :ok =
+             FerricStore.flow_create(retry_id,
+               type: type_for.("retry"),
+               payload: %{step: "retry"},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, [retry_claim]} =
+             FerricStore.flow_claim_due(type_for.("retry"),
+               limit: 1,
+               now_ms: now_ms,
+               worker: "contract"
+             )
+
+    assert retry_claim.id == retry_id
+
+    assert :ok =
+             FerricStore.flow_retry(retry_claim.id, retry_claim.lease_token,
+               fencing_token: retry_claim.fencing_token,
+               run_at_ms: now_ms + 1_000
+             )
+
+    assert {:ok, retried} = FerricStore.flow_get(retry_id)
+    assert retried.state == "queued"
+
+    assert :ok =
+             FerricStore.flow_create(transition_id,
+               type: type_for.("transition"),
+               payload: %{step: "transition"},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, [transition_claim]} =
+             FerricStore.flow_claim_due(type_for.("transition"),
+               limit: 1,
+               now_ms: now_ms,
+               worker: "contract"
+             )
+
+    assert transition_claim.id == transition_id
+
+    assert :ok =
+             FerricStore.flow_transition(transition_claim.id, "running", "waiting",
+               lease_token: transition_claim.lease_token,
+               fencing_token: transition_claim.fencing_token,
+               run_at_ms: now_ms + 2_000
+             )
+
+    assert {:ok, transitioned} = FerricStore.flow_get(transition_id)
+    assert transitioned.state == "waiting"
+
+    assert :ok =
+             FerricStore.flow_create(rewind_id,
+               type: type_for.("rewind"),
+               payload: %{step: "rewind"},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, [{created_event_id, _fields}]} = FerricStore.flow_history(rewind_id, count: 10)
+
+    assert {:ok, [rewind_claim]} =
+             FerricStore.flow_claim_due(type_for.("rewind"),
+               limit: 1,
+               now_ms: now_ms,
+               worker: "contract"
+             )
+
+    assert rewind_claim.id == rewind_id
+
+    assert :ok =
+             FerricStore.flow_complete(rewind_claim.id, rewind_claim.lease_token,
+               fencing_token: rewind_claim.fencing_token,
+               result: %{ok: true}
+             )
+
+    assert :ok = FerricStore.flow_rewind(rewind_id, to_event: created_event_id)
+    assert {:ok, rewound} = FerricStore.flow_get(rewind_id)
+    assert rewound.state == "queued"
+  end
+
+  test "batch write commands return success only while claim/get return flow data" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-many-partition-#{suffix}"
+    type_for = fn name -> "contract-many-#{name}-#{suffix}" end
+
+    create_ids = ["many-create-a-#{suffix}", "many-create-b-#{suffix}"]
+
+    assert :ok =
+             FerricStore.flow_create_many(partition, create_ids,
+               type: type_for.("create"),
+               payload: %{step: "create"},
+               run_at_ms: now_ms + 60_000
+             )
+
+    Enum.each(create_ids, fn id ->
+      assert {:ok, created} = FerricStore.flow_get(id, partition_key: partition)
+      assert created.id == id
+      assert created.state == "queued"
+    end)
+
+    complete_ids = ["many-complete-a-#{suffix}", "many-complete-b-#{suffix}"]
+
+    complete_claims =
+      create_many_and_claim(partition, complete_ids, type_for.("complete"), now_ms)
+
+    assert :ok =
+             FerricStore.flow_complete_many(
+               partition,
+               claim_items(complete_claims),
+               result: %{ok: true}
+             )
+
+    assert_all_states(complete_ids, partition, "completed")
+
+    retry_ids = ["many-retry-a-#{suffix}", "many-retry-b-#{suffix}"]
+    retry_claims = create_many_and_claim(partition, retry_ids, type_for.("retry"), now_ms)
+
+    assert :ok =
+             FerricStore.flow_retry_many(
+               partition,
+               claim_items(retry_claims),
+               run_at_ms: now_ms + 1_000
+             )
+
+    assert_all_states(retry_ids, partition, "queued")
+
+    fail_ids = ["many-fail-a-#{suffix}", "many-fail-b-#{suffix}"]
+    fail_claims = create_many_and_claim(partition, fail_ids, type_for.("fail"), now_ms)
+
+    assert :ok =
+             FerricStore.flow_fail_many(
+               partition,
+               claim_items(fail_claims),
+               error: %{reason: "contract"}
+             )
+
+    assert_all_states(fail_ids, partition, "failed")
+
+    transition_ids = ["many-transition-a-#{suffix}", "many-transition-b-#{suffix}"]
+
+    transition_claims =
+      create_many_and_claim(partition, transition_ids, type_for.("transition"), now_ms)
+
+    assert :ok =
+             FerricStore.flow_transition_many(
+               partition,
+               "running",
+               "waiting",
+               claim_items(transition_claims),
+               run_at_ms: now_ms + 2_000
+             )
+
+    assert_all_states(transition_ids, partition, "waiting")
+
+    cancel_ids = ["many-cancel-a-#{suffix}", "many-cancel-b-#{suffix}"]
+    cancel_claims = create_many_and_claim(partition, cancel_ids, type_for.("cancel"), now_ms)
+
+    assert :ok =
+             FerricStore.flow_cancel_many(
+               partition,
+               claim_items(cancel_claims),
+               reason: "contract"
+             )
+
+    assert_all_states(cancel_ids, partition, "cancelled")
+  end
+
+  test "independent complete_many returns per-item success and completes valid jobs" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-independent-complete-#{suffix}"
+    type = "contract-independent-complete-type-#{suffix}"
+    ids = ["independent-complete-a-#{suffix}", "independent-complete-b-#{suffix}"]
+    claims = create_many_and_claim(partition, ids, type, now_ms)
+
+    assert {:ok, [:ok, :ok]} =
+             FerricStore.flow_complete_many(
+               partition,
+               claim_items(claims),
+               result: %{ok: true},
+               independent: true
+             )
+
+    assert_all_states(ids, partition, "completed")
+  end
+
+  test "independent complete_many can return single ok on full success" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-independent-complete-ok-#{suffix}"
+    type = "contract-independent-complete-ok-type-#{suffix}"
+    ids = ["independent-complete-ok-a-#{suffix}", "independent-complete-ok-b-#{suffix}"]
+    claims = create_many_and_claim(partition, ids, type, now_ms)
+
+    assert :ok =
+             FerricStore.flow_complete_many(
+               partition,
+               claim_items(claims),
+               independent: true,
+               return: :ok_on_success
+             )
+
+    assert_all_states(ids, partition, "completed")
+  end
+
+  test "independent complete_many ok-on-success preserves per-item failures" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-independent-complete-ok-error-#{suffix}"
+    type = "contract-independent-complete-ok-error-type-#{suffix}"
+
+    ids = [
+      "independent-complete-ok-error-a-#{suffix}",
+      "independent-complete-ok-error-b-#{suffix}"
+    ]
+
+    [bad_claim, good_claim] = create_many_and_claim(partition, ids, type, now_ms)
+
+    items = [
+      %{
+        id: bad_claim.id,
+        lease_token: bad_claim.lease_token,
+        fencing_token: bad_claim.fencing_token + 1
+      },
+      %{
+        id: good_claim.id,
+        lease_token: good_claim.lease_token,
+        fencing_token: good_claim.fencing_token
+      }
+    ]
+
+    assert {:ok, [{:error, "ERR stale flow lease"}, :ok]} =
+             FerricStore.flow_complete_many(
+               partition,
+               items,
+               independent: true,
+               return: :ok_on_success
+             )
+  end
+
+  test "flow step_continue atomically advances logical state and keeps a fresh running lease" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-step-continue-#{suffix}"
+    type = "contract-step-continue-type-#{suffix}"
+    id = "contract-step-continue-id-#{suffix}"
+
+    assert :ok =
+             FerricStore.flow_create(id,
+               type: type,
+               partition_key: partition,
+               payload: %{step: "queued"},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, [claimed]} =
+             FerricStore.flow_claim_due(type,
+               limit: 1,
+               now_ms: now_ms,
+               worker: "contract-step-worker",
+               partition_key: partition
+             )
+
+    assert claimed.state == "running"
+    assert claimed.run_state == "queued"
+
+    assert {:ok, continued} =
+             FerricStore.flow_step_continue(id, claimed.lease_token, "queued", "charge_card",
+               partition_key: partition,
+               fencing_token: claimed.fencing_token,
+               lease_ms: 5_000,
+               now_ms: now_ms + 1,
+               payload: %{step: "charge_card"}
+             )
+
+    assert continued.id == id
+    assert continued.state == "running"
+    assert continued.run_state == "charge_card"
+    assert continued.lease_token != claimed.lease_token
+    assert continued.fencing_token == claimed.fencing_token + 1
+    assert continued.lease_deadline_ms == now_ms + 5_001
+
+    assert {:error, "ERR stale flow lease"} =
+             FerricStore.flow_complete(id, claimed.lease_token,
+               partition_key: partition,
+               fencing_token: claimed.fencing_token
+             )
+
+    assert :ok =
+             FerricStore.flow_retry(id, continued.lease_token,
+               partition_key: partition,
+               fencing_token: continued.fencing_token,
+               run_at_ms: now_ms + 3_000,
+               error: %{reason: "try-again"}
+             )
+
+    assert {:ok, retried} = FerricStore.flow_get(id, partition_key: partition)
+    assert retried.state == "charge_card"
+    assert retried.run_state == nil
+    assert retried.next_run_at_ms == now_ms + 3_000
+  end
+
+  test "flow start_and_claim creates the first logical step with a running lease" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-start-and-claim-#{suffix}"
+    type = "contract-start-and-claim-type-#{suffix}"
+    id = "contract-start-and-claim-id-#{suffix}"
+
+    assert {:ok, started} =
+             FerricStore.flow_start_and_claim(id, type, "reserve_inventory",
+               partition_key: partition,
+               worker: "contract-start-worker",
+               lease_ms: 7_000,
+               now_ms: now_ms,
+               payload: %{order_id: suffix}
+             )
+
+    assert started.id == id
+    assert started.type == type
+    assert started.state == "running"
+    assert started.run_state == "reserve_inventory"
+    assert started.attempts == 1
+    assert started.fencing_token == 1
+    assert started.lease_owner == "contract-start-worker"
+    assert is_binary(started.lease_token)
+    assert started.lease_deadline_ms == now_ms + 7_000
+    assert started.next_run_at_ms == now_ms + 7_000
+
+    assert {:error, "ERR flow already exists"} =
+             FerricStore.flow_start_and_claim(id, type, "reserve_inventory",
+               partition_key: partition,
+               worker: "contract-start-worker",
+               now_ms: now_ms
+             )
+
+    assert :ok =
+             FerricStore.flow_retry(id, started.lease_token,
+               partition_key: partition,
+               fencing_token: started.fencing_token,
+               run_at_ms: now_ms + 1_000,
+               error: %{reason: "try-again"}
+             )
+
+    assert {:ok, retried} = FerricStore.flow_get(id, partition_key: partition)
+    assert retried.state == "reserve_inventory"
+    assert retried.run_state == nil
+    assert retried.next_run_at_ms == now_ms + 1_000
+  end
+
+  test "flow run_steps_many defaults persisted timestamps to the cluster clock" do
+    ref = :persistent_term.get(:ferricstore_hlc_ref)
+    previous = :atomics.get(ref, 1)
+
+    on_exit(fn ->
+      :atomics.put(:persistent_term.get(:ferricstore_hlc_ref), 1, previous)
+    end)
+
+    future_ms = System.system_time(:millisecond) + 60_000
+    :atomics.put(ref, 1, Bitwise.bsl(future_ms, 16))
+    suffix = System.unique_integer([:positive, :monotonic])
+    id = "contract-run-steps-hlc-#{suffix}"
+    partition = "contract-run-steps-hlc-partition-#{suffix}"
+
+    assert :ok =
+             FerricStore.flow_run_steps_many(
+               [%{id: id, partition_key: partition}],
+               type: "contract-run-steps-hlc-type-#{suffix}",
+               states: ["completed"],
+               worker: "contract-run-steps-hlc-worker"
+             )
+
+    assert {:ok, record} = FerricStore.flow_get(id, partition_key: partition)
+    assert record.updated_at_ms >= future_ms + 1
+  end
+
+  test "flow run_steps_many runs deterministic step chains in one public command" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-run-steps-#{suffix}"
+    type = "contract-run-steps-type-#{suffix}"
+    ids = ["contract-run-steps-a-#{suffix}", "contract-run-steps-b-#{suffix}"]
+
+    assert :ok =
+             FerricStore.flow_run_steps_many(
+               Enum.map(ids, &%{id: &1, partition_key: partition}),
+               type: type,
+               states: ["reserve_inventory", "charge_card", "send_email"],
+               worker: "contract-run-steps-worker",
+               lease_ms: 7_000,
+               now_ms: now_ms,
+               result: %{ok: true}
+             )
+
+    Enum.each(ids, fn id ->
+      assert {:ok, record} = FerricStore.flow_get(id, partition_key: partition)
+      assert record.state == "completed"
+      assert record.run_state == "send_email"
+      assert record.fencing_token == 3
+      assert record.lease_token == nil
+
+      assert {:ok, history} = FerricStore.flow_history(id, partition_key: partition, count: 10)
+      events = Enum.map(history, fn {_event_id, fields} -> fields["event"] end)
+
+      assert events == ["created", "step_continued", "step_continued", "completed"]
+    end)
+  end
+
+  test "flow run_steps_many rejects duplicate ids without partial creation" do
+    now_ms = System.system_time(:millisecond)
+    suffix = System.unique_integer([:positive, :monotonic])
+    partition = "contract-run-steps-dup-#{suffix}"
+    type = "contract-run-steps-dup-type-#{suffix}"
+    duplicate_id = "contract-run-steps-dup-a-#{suffix}"
+    other_id = "contract-run-steps-dup-b-#{suffix}"
+
+    assert {:ok,
+            [
+              error: "ERR flow duplicate id in batch",
+              error: "ERR flow duplicate id in batch",
+              error: "ERR flow duplicate id in batch"
+            ]} =
+             FerricStore.flow_run_steps_many(
+               [
+                 %{id: duplicate_id, partition_key: partition},
+                 %{id: duplicate_id, partition_key: partition},
+                 %{id: other_id, partition_key: partition}
+               ],
+               type: type,
+               steps: 3,
+               worker: "contract-run-steps-worker",
+               now_ms: now_ms
+             )
+
+    assert {:ok, nil} = FerricStore.flow_get(other_id, partition_key: partition)
+  end
+
+  test "retention apply consumes explicit versioned candidates without lagged projection reads" do
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+    router_source = Ferricstore.Test.SourceFiles.router_source()
+
+    cleanup_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "do_flow_retention_cleanup",
+        "terminal_candidates"
+      )
+
+    cross_cleanup_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "do_flow_cross_retention_cleanup"
+      )
+
+    router_cleanup_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        router_source,
+        "flow_retention_plan_shards"
+      )
+
+    candidate_validation_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        router_source,
+        "flow_retention_valid_candidates?"
+      )
+
+    terminal_planner_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_plan_terminal_candidate"
+      )
+
+    terminal_apply_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_apply_terminal_candidate"
+      )
+
+    assert cleanup_source =~ "terminal_candidates"
+    assert cross_cleanup_source =~ "active_candidates"
+    assert router_cleanup_source =~ "flow_retention_valid_candidates?"
+    assert candidate_validation_source =~ "expected_version"
+    assert terminal_planner_source =~ "cleanup_plan"
+    assert terminal_apply_source =~ "cleanup_plan"
+
+    refute cleanup_source =~ "flow_retention_expired_state_entries"
+    refute cleanup_source =~ "flow_retention_expired_lmdb_state_keys"
+    refute cleanup_source =~ "flow_retention_history_projection_pending?"
+    refute cleanup_source =~ "flow_retention_lmdb_projection_pending?"
+    refute cross_cleanup_source =~ "flow_active_timeout_expired_state_entries"
+  end
+
+  test "retention planning is bounded and executes shard-local commands" do
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+    router_source = Ferricstore.Test.SourceFiles.router_source()
+
+    cleanup_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        router_source,
+        "flow_retention_cleanup_planned"
+      )
+
+    active_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        router_source,
+        "flow_retention_cleanup_active"
+      )
+
+    terminal_planner_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_plan_terminal_candidates"
+      )
+
+    assert cleanup_source =~ "flow_retention_plan_shards"
+    assert cleanup_source =~ "flow_retention_cleanup_active"
+    refute cleanup_source =~ "flow_retention_cleanup_shard"
+
+    assert active_source =~ "flow_retention_shard_commands"
+    assert active_source =~ "flow_retention_execute_shard_commands"
+    refute active_source =~ "flow_cross_shard_tx"
+    assert terminal_planner_source =~ "expired_terminal_state_keys"
+    refute terminal_planner_source =~ "flow_retention_expired_state_entries"
+    refute terminal_planner_source =~ "safe_ets_select"
+  end
+
+  test "retention uses durable shared ref counts without global reference scans" do
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+    router_source = Ferricstore.Test.SourceFiles.router_source()
+
+    tracker_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_track_shared_value_refs"
+      )
+
+    cleanup_executor_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_cleanup_record"
+      )
+
+    terminal_cleanup_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        router_source,
+        "flow_retention_cleanup_terminal_shards"
+      )
+
+    assert tracker_source =~ "shared_value_ref_registry_key"
+    assert tracker_source =~ "flow_increment_shared_value_ref_counts"
+    assert cleanup_executor_source =~ "flow_retention_enqueue_shared_value_orphans"
+    assert terminal_cleanup_source =~ "flow_retention_shard_commands"
+    assert terminal_cleanup_source =~ "flow_retention_execute_shard_commands"
+
+    refute state_machine_source =~ "flow_retention_value_refs_used_by_other_states"
+    refute state_machine_source =~ "flow_retention_reference_scan_states"
+    refute state_machine_source =~ "flow_retention_reference_scan_hook"
+  end
+
+  test "replicated flow apply does not invoke node-local application callbacks" do
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    refute state_machine_source =~ ":flow_shared_value_ref_acquisition_hook"
+    refute state_machine_source =~ ":flow_retention_owned_write_hook"
+  end
+
+  test "cold Flow state reads use QueryRows and authoritative hydration only" do
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+    flow_source = Ferricstore.Test.SourceFiles.flow_source()
+
+    assert state_machine_source =~ "QueryRecordStore.read_many"
+    assert state_machine_source =~ "flow_read_lmdb_records_including_expired"
+    assert flow_source =~ "QueryRowStore.read_many"
+    assert flow_source =~ "QueryRowStore.read_references_many"
+
+    refute state_machine_source =~ ":sm_pending_lmdb_values"
+    refute state_machine_source =~ "flow_decode_lmdb_blob"
+    refute state_machine_source =~ "flow_lmdb_blob_present?"
+    refute state_machine_source =~ "Map.get(park, :state_value)"
+    refute state_machine_source =~ "Ferricstore.Flow.LMDB.decode_value(blob, apply_now_ms())"
+  end
+
+  test "retention cleanup ownership planning uses the bounded durable member index" do
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    cleanup_planner_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_build_cleanup_plan"
+      )
+
+    assert cleanup_planner_source =~ "flow_retention_cleanup_member_entries"
+
+    refute state_machine_source =~ "defp flow_retention_shared_value_links("
+    refute state_machine_source =~ "defp flow_retention_owned_value_keys_page("
+    refute state_machine_source =~ "defp flow_retention_governance_keys("
+    refute state_machine_source =~ "defp flow_retention_keys_with_prefix("
+  end
+
+  test "retention apply requires the durable flow identity guard" do
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    active_planner_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_plan_active_candidate"
+      )
+
+    terminal_planner_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_plan_terminal_candidate"
+      )
+
+    apply_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_retention_apply_candidate_record"
+      )
+
+    assert active_planner_source =~ "expected_guard"
+    assert terminal_planner_source =~ "expected_guard"
+    assert apply_source =~ "flow_retention_current_guard"
+
+    {guard_pos, _length} = :binary.match(apply_source, "flow_retention_current_guard")
+    {fallback_pos, _length} = :binary.match(apply_source, ":miss -> planned_record")
+    assert guard_pos < fallback_pos
+  end
+
+  test "Flow mutations acquire shared refs in their owning shard apply" do
+    router_source = Ferricstore.Test.SourceFiles.router_source()
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    tracker_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        state_machine_source,
+        "flow_track_shared_value_refs"
+      )
+
+    assert tracker_source =~ "flow_increment_shared_value_ref_counts"
+    refute router_source =~ "flow_shared_ref_write"
+  end
+
+  test "startup refreshes active file size after retention metadata backfill writes" do
+    startup_source =
+      __DIR__
+      |> Path.join("../../lib/ferricstore/store/shard/startup.ex")
+      |> Path.expand()
+      |> File.read!()
+
+    recovery_source =
+      __DIR__
+      |> Path.join("../../lib/ferricstore/raft/waraft_storage/sections/recovery.ex")
+      |> Path.expand()
+      |> File.read!()
+
+    assert Regex.match?(
+             ~r/reconcile_startup_shard\(.*?active_file_size = startup_file_size\(active_file_path\)/s,
+             startup_source
+           )
+
+    assert Regex.match?(
+             ~r/reconcile_startup_shard\(.*?active_file_size = recovery_file_size\(active_file_path\)/s,
+             recovery_source
+           )
+
+    assert Regex.match?(
+             ~r/:ok\s*=\s*Ferricstore\.Flow\.LMDBRebuilder\.reconcile_startup_shard\(/,
+             startup_source
+           )
+
+    assert length(
+             Regex.scan(
+               ~r/:ok\s*=\s*Ferricstore\.Flow\.LMDBRebuilder\.reconcile_startup_shard\(/,
+               recovery_source
+             )
+           ) == 2
+
+    rebuild_source =
+      Ferricstore.Test.SourceFiles.private_function_source!(
+        recovery_source,
+        "rebuild_indexes_from_segment_keydir"
+      )
+
+    assert rebuild_source =~ "force_full_reconcile?: true"
+
+    assert rebuild_source =~
+             "Map.put(:active_file_size, recovery_file_size(sm_state.active_file_path))"
+
+    {reconcile_pos, _length} = :binary.match(rebuild_source, "reconcile_startup_shard")
+    {size_refresh_pos, _length} = :binary.match(rebuild_source, "Map.put(:active_file_size")
+    assert reconcile_pos < size_refresh_pos
+  end
+
+  test "state_meta policy reindex enqueues durable bounded migration work" do
+    source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    migration_source =
+      __DIR__
+      |> Path.join("../../lib/ferricstore/raft/state_machine/sections/flow_policy_migration.ex")
+      |> Path.expand()
+      |> File.read!()
+
+    planner_source =
+      __DIR__
+      |> Path.join("../../lib/ferricstore/flow/policy_migration.ex")
+      |> Path.expand()
+      |> File.read!()
+
+    refute source =~ "flow_state_keys_for_policy_reindex"
+    refute source =~ "@flow_policy_reindex_max_keydir_entries"
+    assert source =~ "flow_enqueue_policy_migration"
+    assert planner_source =~ "limit + 1"
+    assert migration_source =~ "PolicyMigration.encode_catalog"
+    assert migration_source =~ "flow_policy_migration_maybe_finish_job"
+    refute migration_source =~ ":ets.foldl"
+  end
+
+  test "Flow policy updates allocate once and install through each Raft group" do
+    router_source = Ferricstore.Test.SourceFiles.router_source()
+    state_machine_source = Ferricstore.Test.SourceFiles.state_machine_source()
+
+    assert [_, policy_put_source] =
+             String.split(router_source, "      def flow_policy_patch_all", parts: 2)
+
+    assert [policy_put_source, _] =
+             String.split(policy_put_source, "      def flow_get", parts: 2)
+
+    assert policy_put_source =~ "{:flow_policy_patch_allocate,"
+    assert policy_put_source =~ "key, patch, replace?, expected_generation}"
+    assert policy_put_source =~ "flow_policy_install_remaining_shards"
+    assert policy_put_source =~ "versioned_value"
+    assert router_source =~ "Task.async_stream"
+    assert policy_put_source =~ "{:flow_policy_put, key, value, expire_at_ms}"
+    refute router_source =~ "{:cross_shard_tx, shard_batches}"
+
+    assert state_machine_source =~ "apply_flow_policy_fence"
+    assert state_machine_source =~ "do_flow_policy_patch_allocate"
+    assert state_machine_source =~ "validate_flow_policy_fence"
+    assert state_machine_source =~ "install_flow_policy_fence"
+  end
+
+  defp create_many_and_claim(partition, ids, type, now_ms) do
+    assert :ok =
+             FerricStore.flow_create_many(partition, ids,
+               type: type,
+               payload: %{step: type},
+               run_at_ms: now_ms
+             )
+
+    assert {:ok, claims} =
+             FerricStore.flow_claim_due(type,
+               limit: length(ids),
+               now_ms: now_ms,
+               worker: "contract-many",
+               partition_key: partition
+             )
+
+    assert Enum.sort(Enum.map(claims, & &1.id)) == Enum.sort(ids)
+    claims
+  end
+
+  defp claim_items(claims) do
+    Enum.map(claims, fn claim ->
+      %{
+        id: claim.id,
+        lease_token: claim.lease_token,
+        fencing_token: claim.fencing_token
+      }
+    end)
+  end
+
+  defp assert_all_states(ids, partition, state) do
+    Enum.each(ids, fn id ->
+      assert {:ok, record} = FerricStore.flow_get(id, partition_key: partition)
+      assert record.state == state
+    end)
+  end
+end

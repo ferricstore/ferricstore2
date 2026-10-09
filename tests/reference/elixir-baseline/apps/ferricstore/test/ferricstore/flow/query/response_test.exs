@@ -1,0 +1,275 @@
+defmodule Ferricstore.Flow.Query.ResponseTest do
+  use ExUnit.Case, async: true
+
+  alias Ferricstore.{Flow.Query.Limits, NativeValueCodec}
+  alias Ferricstore.Flow.Query.{Budget, PreparedResponse, Response, ResultCodec}
+
+  test "builds one versioned page contract and accounts its complete encoded size" do
+    usage = usage(1)
+    records = [%{id: "run-1", partition_key: "tenant-a", state: "failed"}]
+
+    assert {:ok, response} =
+             Response.build(
+               records,
+               true,
+               "fqc1_cursor-token",
+               quality(),
+               usage,
+               Budget.default()
+             )
+
+    assert response.version == "ferric.flow.query.result/v1"
+    assert response.records == records
+    assert response.page == %{has_more: true, cursor: "fqc1_cursor-token"}
+    assert response.quality == quality()
+    assert response.usage.result_records == 1
+
+    assert response.usage.response_bytes == NativeValueCodec.encoded_size(response)
+  end
+
+  test "builds record responses directly from covering index rows" do
+    covered_usage = %{usage(1) | hydrated_records: 0, residual_checks: 0}
+
+    assert {:ok, response} =
+             Response.build(
+               [%{id: "run-1", state: "failed"}],
+               false,
+               nil,
+               quality(),
+               covered_usage,
+               Budget.default()
+             )
+
+    assert response.usage.result_records == 1
+    assert response.usage.hydrated_records == 0
+  end
+
+  test "response byte accounting is stable after writing any signed response size" do
+    response = %{
+      version: "ferric.flow.query.result/v1",
+      records: [%{id: "run-1"}],
+      page: %{has_more: false, cursor: nil},
+      quality: quality(),
+      usage: usage(1)
+    }
+
+    expected = NativeValueCodec.encoded_size(response)
+
+    for response_bytes <- [0, 1, expected, 0x7FFF_FFFF_FFFF_FFFF] do
+      assert response
+             |> put_in([:usage, :response_bytes], response_bytes)
+             |> NativeValueCodec.encoded_size() == expected
+    end
+  end
+
+  test "rejects the full response instead of returning a partial page" do
+    {:ok, budget} = Budget.lower(Budget.default(), response_bytes: 256)
+    records = [%{id: "run-1", state: :binary.copy("x", 1_024)}]
+
+    assert {:error, :query_response_budget_exceeded} =
+             Response.build(records, false, nil, quality(), usage(1), budget)
+  end
+
+  test "enforces the response budget against the native wire representation" do
+    {:ok, budget} = Budget.lower(Budget.default(), response_bytes: 900)
+
+    state_meta =
+      for state <- 1..2, into: %{} do
+        entries = for entry <- 1..16, into: %{}, do: {"k#{entry}", entry}
+        {"s#{state}", entries}
+      end
+
+    records = [%{id: "run-1", state_meta: state_meta}]
+
+    assert {:error, :query_response_budget_exceeded} =
+             Response.build(records, false, nil, quality(), usage(1), budget)
+  end
+
+  test "settles a negotiated compact response against its exact representation" do
+    records =
+      for index <- 1..20 do
+        %{
+          id: "run-#{index}",
+          type: "invoice",
+          state: "failed",
+          version: index,
+          partition_key: "tenant-a",
+          attributes: %{"customer" => "customer-#{index}"}
+        }
+      end
+
+    raw_response = %{
+      version: Response.contract(),
+      records: records,
+      page: %{has_more: false, cursor: nil},
+      quality: quality(),
+      usage: usage(length(records))
+    }
+
+    compact_bytes = raw_response |> ResultCodec.encode() |> byte_size()
+    generic_bytes = NativeValueCodec.encoded_size(raw_response)
+
+    assert compact_bytes < generic_bytes
+    {:ok, budget} = Budget.lower(Budget.default(), response_bytes: compact_bytes)
+
+    assert {:error, :query_response_budget_exceeded} =
+             Response.build(
+               records,
+               false,
+               nil,
+               quality(),
+               usage(length(records)),
+               budget
+             )
+
+    assert {:ok, %PreparedResponse{value: response, payload: payload}} =
+             Response.build(
+               records,
+               false,
+               nil,
+               quality(),
+               usage(length(records)),
+               budget,
+               :flow_query_result_v1
+             )
+
+    assert response.usage.response_bytes == compact_bytes
+    assert ResultCodec.encoded_size(response) == compact_bytes
+    assert payload == ResultCodec.encode(response)
+  end
+
+  test "rejects inconsistent pagination and usage metadata" do
+    assert {:error, :query_engine_failure} =
+             Response.build([], false, "cursor", quality(), usage(0), Budget.default())
+
+    assert {:error, :query_engine_failure} =
+             Response.build([], true, nil, quality(), usage(0), Budget.default())
+
+    assert {:error, :query_engine_failure} =
+             Response.build([%{id: "run-1"}], false, nil, quality(), usage(0), Budget.default())
+  end
+
+  test "rejects pagination metadata above the public cursor limit" do
+    oversized_cursor = :binary.copy("x", Limits.max_cursor_bytes() + 1)
+
+    assert {:error, :query_engine_failure} =
+             Response.build([], true, oversized_cursor, quality(), usage(0), Budget.default())
+  end
+
+  test "rejects malformed outgoing pagination cursors" do
+    for cursor <- ["fqc1_", "other_cursor_token", <<"fqc1_", 0xFF, 0xFF>>] do
+      assert {:error, :query_engine_failure} =
+               Response.build([], true, cursor, quality(), usage(0), Budget.default())
+    end
+  end
+
+  test "rejects unsupported quality values in every dimension" do
+    for field <- Response.quality_fields() do
+      invalid_quality = Map.put(quality(), field, "future_mode")
+
+      assert {:error, :query_engine_failure} =
+               Response.build([], false, nil, invalid_quality, usage(0), Budget.default())
+    end
+  end
+
+  test "fails closed for usage counters outside the native signed integer contract" do
+    oversized = 0x8000_0000_0000_0000
+
+    for field <- [:range_pages, :residual_checks] do
+      invalid_usage = Map.put(usage(0), field, oversized)
+
+      assert {:error, :query_engine_failure} =
+               Response.build([], false, nil, quality(), invalid_usage, Budget.default())
+    end
+  end
+
+  test "encodes nested unsigned 64-bit record values" do
+    maximum = 0xFFFF_FFFF_FFFF_FFFF
+    records = [%{id: "run-1", attributes: %{"version" => maximum}}]
+
+    assert {:ok, %{records: [%{attributes: %{"version" => ^maximum}}]}} =
+             Response.build(records, false, nil, quality(), usage(1), Budget.default())
+  end
+
+  test "fails closed instead of raising for a nested integer above unsigned 64-bit" do
+    records = [%{id: "run-1", attributes: %{"oversized" => 0x1_0000_0000_0000_0000}}]
+
+    assert {:error, :query_engine_failure} =
+             Response.build(records, false, nil, quality(), usage(1), Budget.default())
+  end
+
+  test "builds a non-paginated scalar count without inventing row hydration" do
+    count_usage = %{usage(0) | result_records: 1, scanned_entries: 7, hydrated_records: 7}
+
+    assert {:ok, response} =
+             Response.build_count(7, quality("none"), count_usage, Budget.default())
+
+    assert response == %{
+             version: "ferric.flow.query.result/v1",
+             result: %{kind: "count", value: 7},
+             quality: quality("none"),
+             usage: response.usage
+           }
+
+    assert response.usage.response_bytes == NativeValueCodec.encoded_size(response)
+
+    zero_usage = %{usage(0) | result_records: 1}
+
+    assert {:ok, %{result: %{value: 0}}} =
+             Response.build_count(0, quality("none"), zero_usage, Budget.default())
+  end
+
+  test "settles a compact scalar count with the compact codec size" do
+    count_usage = %{usage(0) | result_records: 1, scanned_entries: 7, hydrated_records: 7}
+
+    raw_response = %{
+      version: Response.contract(),
+      result: %{kind: "count", value: 7},
+      quality: quality("none"),
+      usage: count_usage
+    }
+
+    compact_bytes = raw_response |> ResultCodec.encode() |> byte_size()
+    generic_bytes = NativeValueCodec.encoded_size(raw_response)
+    assert compact_bytes < generic_bytes
+
+    {:ok, budget} = Budget.lower(Budget.default(), response_bytes: compact_bytes)
+
+    assert {:ok, %PreparedResponse{value: response, payload: payload}} =
+             Response.build_count(
+               7,
+               quality("none"),
+               count_usage,
+               budget,
+               :flow_query_result_v1
+             )
+
+    assert response.usage.response_bytes == compact_bytes
+    assert payload == ResultCodec.encode(response)
+  end
+
+  defp usage(result_records) do
+    %{
+      range_seeks: 1,
+      range_pages: 1,
+      scanned_entries: result_records,
+      scanned_bytes: 0,
+      hydrated_records: result_records,
+      residual_checks: result_records,
+      duplicate_entries: 0,
+      result_records: result_records,
+      response_bytes: 0,
+      memory_high_water_bytes: 0,
+      wall_time_us: 10
+    }
+  end
+
+  defp quality(pagination \\ "live_seek") do
+    %{
+      exactness: "projected_exact",
+      freshness: "projection_watermark",
+      coverage: "complete",
+      pagination: pagination
+    }
+  end
+end

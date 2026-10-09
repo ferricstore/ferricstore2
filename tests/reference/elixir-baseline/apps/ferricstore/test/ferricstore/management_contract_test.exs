@@ -1,0 +1,382 @@
+defmodule FerricStore.ManagementContractTest do
+  use ExUnit.Case, async: false
+
+  alias Ferricstore.Commands.Dispatcher
+  alias Ferricstore.Commands.NativeAstParser
+  alias Ferricstore.Test.MockStore
+
+  defmodule FakeACL do
+    @behaviour FerricStore.Management.ACL
+
+    @impl true
+    def set_user(username, rules, opts),
+      do: {:ok, %{username: username, rules: rules, store?: Keyword.has_key?(opts, :store)}}
+
+    @impl true
+    def del_user(username, _opts), do: {:ok, %{deleted: username}}
+
+    @impl true
+    def del_users(usernames, _opts), do: {:ok, length(usernames)}
+
+    @impl true
+    def get_user(username, _opts), do: {:ok, %{username: username}}
+
+    @impl true
+    def list_users(_opts), do: {:ok, ["user default on ~* &* +@all"]}
+
+    @impl true
+    def save(_opts), do: :ok
+
+    @impl true
+    def load(opts), do: {:ok, %{loaded: true, store?: Keyword.has_key?(opts, :store)}}
+  end
+
+  defmodule FakeCapabilities do
+    @behaviour FerricStore.ManagementCapabilities
+
+    @impl true
+    def capabilities(_opts), do: %{acl_management: true, quota_management: true}
+  end
+
+  defmodule NonMapCapabilities do
+    def capabilities(_opts), do: :enabled
+  end
+
+  defmodule NonBooleanCapabilities do
+    def capabilities(_opts), do: %{sdk: "yes"}
+  end
+
+  defmodule FakeTelemetry do
+    @behaviour FerricStore.Management.Telemetry
+
+    @impl true
+    def cluster_info(_opts), do: {:ok, %{}}
+
+    @impl true
+    def namespace_usage(prefix, _opts), do: {:ok, %{prefix: prefix}}
+
+    @impl true
+    def flow_query(attrs, _opts), do: {:ok, attrs}
+
+    @impl true
+    def flow_history(id, opts), do: {:ok, %{id: id, attrs: Keyword.get(opts, :attrs, %{})}}
+  end
+
+  defmodule FakeResourceLimits do
+    @behaviour FerricStore.ResourceLimits
+
+    @impl true
+    def set_limit(scope, limit_spec, opts),
+      do: {:ok, %{scope: scope, limit: limit_spec, store?: Keyword.has_key?(opts, :store)}}
+
+    @impl true
+    def get_limit(scope, opts),
+      do: {:ok, %{scope: scope, limit: %{"keys" => 10}, store?: Keyword.has_key?(opts, :store)}}
+
+    @impl true
+    def usage(scope, opts),
+      do: {:ok, %{scope: scope, usage: %{"keys" => 0}, store?: Keyword.has_key?(opts, :store)}}
+
+    @impl true
+    def check(_scope, _resource, _amount, _opts), do: :ok
+
+    @impl true
+    def reserve(scope, resource, amount, _opts),
+      do: {:ok, {scope, resource, amount}}
+
+    @impl true
+    def release(_reservation, _opts), do: :ok
+
+    @impl true
+    def record_activity(keys, opts) do
+      send(
+        :persistent_term.get({__MODULE__, :test_pid}),
+        {:activity, keys, Keyword.has_key?(opts, :store)}
+      )
+
+      :ok
+    end
+
+    @impl true
+    def check_command(command, args, keys, opts) do
+      send(
+        :persistent_term.get({__MODULE__, :test_pid}),
+        {:command_check, command, args, keys, Keyword.has_key?(opts, :store)}
+      )
+
+      :ok
+    end
+
+    @impl true
+    def acquire_command(command, args, keys, opts) do
+      with :ok <- check_command(command, args, keys, opts), do: {:ok, nil}
+    end
+
+    @impl true
+    def release_command(_lease, _opts), do: :ok
+  end
+
+  defmodule FakeNamespace do
+    @behaviour FerricStore.Management.Namespace
+
+    @impl true
+    def ensure_namespace(prefix, opts),
+      do: {:ok, %{prefix: prefix, store?: Keyword.has_key?(opts, :store)}}
+
+    @impl true
+    def get_namespace(prefix), do: {:ok, %{prefix: prefix}}
+
+    @impl true
+    def list_namespaces, do: {:ok, [%{prefix: "tenant"}]}
+
+    @impl true
+    def delete_namespace(prefix, opts),
+      do: {:ok, %{deleted: prefix, store?: Keyword.has_key?(opts, :store)}}
+  end
+
+  setup do
+    Application.delete_env(:ferricstore, FerricStore.ManagementCapabilities)
+    Application.delete_env(:ferricstore, FerricStore.Management.Telemetry)
+    Application.delete_env(:ferricstore, FerricStore.Management.ACL)
+    Application.delete_env(:ferricstore, FerricStore.Management.Namespace)
+    Application.delete_env(:ferricstore, FerricStore.ResourceLimits)
+
+    on_exit(fn ->
+      Application.delete_env(:ferricstore, FerricStore.ManagementCapabilities)
+      Application.delete_env(:ferricstore, FerricStore.Management.Telemetry)
+      Application.delete_env(:ferricstore, FerricStore.Management.ACL)
+      Application.delete_env(:ferricstore, FerricStore.Management.Namespace)
+      Application.delete_env(:ferricstore, FerricStore.ResourceLimits)
+    end)
+  end
+
+  test "default management capabilities expose OSS-safe feature flags" do
+    assert FerricStore.ManagementCapabilities.capabilities() == %{
+             sdk: true,
+             health: true,
+             telemetry: true,
+             acl_management: false,
+             namespace_management: false,
+             quota_management: false,
+             flow_observability: true
+           }
+  end
+
+  test "FERRICSTORE.CAPABILITIES returns string-keyed SDK contract" do
+    store = MockStore.make()
+
+    assert Dispatcher.dispatch("FERRICSTORE.CAPABILITIES", [], store) == %{
+             "sdk" => true,
+             "health" => true,
+             "telemetry" => true,
+             "acl_management" => false,
+             "namespace_management" => false,
+             "quota_management" => false,
+             "flow_observability" => true
+           }
+  end
+
+  test "FLOW_QUERY transports opaque cursor IDs without scalar coercion" do
+    Application.put_env(:ferricstore, FerricStore.Management.Telemetry, FakeTelemetry)
+    store = MockStore.make()
+
+    assert Dispatcher.dispatch(
+             "FERRICSTORE.TELEMETRY",
+             ["FLOW_QUERY", "BEFORE_ID", "00123", "COUNT", "10", "REV", "true"],
+             store
+           ) == %{"before_id" => "00123", "count" => 10, "rev" => true}
+
+    assert Dispatcher.dispatch(
+             "FERRICSTORE.TELEMETRY",
+             ["FLOW_QUERY", "BEFORE_ID", "TRUE"],
+             store
+           ) == %{"before_id" => "TRUE"}
+  end
+
+  test "capabilities can be extended by a configured implementation" do
+    Application.put_env(:ferricstore, FerricStore.ManagementCapabilities, FakeCapabilities)
+
+    assert Dispatcher.dispatch("FERRICSTORE.CAPABILITIES", [], MockStore.make()) == %{
+             "sdk" => true,
+             "health" => true,
+             "telemetry" => true,
+             "acl_management" => true,
+             "namespace_management" => false,
+             "quota_management" => true,
+             "flow_observability" => true
+           }
+  end
+
+  test "capability adapters fail clearly when they violate the public contract" do
+    assert_raise ArgumentError, ~r/must return a map/, fn ->
+      FerricStore.ManagementCapabilities.capabilities(impl: NonMapCapabilities)
+    end
+
+    assert_raise ArgumentError, ~r/capability :sdk must be a boolean/, fn ->
+      FerricStore.ManagementCapabilities.capabilities(impl: NonBooleanCapabilities)
+    end
+
+    assert_raise ArgumentError, ~r/must export capabilities\/1/, fn ->
+      FerricStore.ManagementCapabilities.capabilities(impl: String)
+    end
+  end
+
+  test "management mutations fail closed in OSS" do
+    store = MockStore.make()
+
+    assert {:error, "ERR unsupported management command"} =
+             Dispatcher.dispatch("ACL", ["SETUSER", "platform_read_abcd", "on", "+PING"], store)
+
+    assert {:error, "ERR unsupported management command"} =
+             Dispatcher.dispatch("FERRICSTORE.NAMESPACE", ["ENSURE", "tenant:namespace"], store)
+
+    assert {:error, "ERR unsupported management command"} =
+             Dispatcher.dispatch(
+               "FERRICSTORE.QUOTA",
+               ["SET", "tenant:namespace", "KEYS", "10"],
+               store
+             )
+  end
+
+  test "ACL LOAD delegates to the configured durable management adapter" do
+    Application.put_env(:ferricstore, FerricStore.Management.ACL, FakeACL)
+
+    assert %{"loaded" => true, "store?" => true} =
+             Dispatcher.dispatch("ACL", ["LOAD"], MockStore.make())
+  end
+
+  test "resource limit enforcement hooks are neutral no-ops by default" do
+    assert :ok = FerricStore.ResourceLimits.check("tenant:namespace", :keys, 1)
+    assert {:ok, nil} = FerricStore.ResourceLimits.reserve("tenant:namespace", :ops_per_sec, 1)
+    assert :ok = FerricStore.ResourceLimits.release(nil)
+    assert :ok = FerricStore.ResourceLimits.record_activity(["tenant:namespace:key"])
+
+    assert {:ok, nil} =
+             FerricStore.ResourceLimits.acquire_command(
+               "SET",
+               ["tenant:namespace:key", "v"],
+               ["tenant:namespace:key"]
+             )
+
+    assert :ok = FerricStore.ResourceLimits.release_command(nil)
+
+    assert :ok =
+             FerricStore.ResourceLimits.check_command("SET", ["tenant:namespace:key", "v"], [
+               "tenant:namespace:key"
+             ])
+  end
+
+  test "resource limit command hooks delegate to configured implementation" do
+    Application.put_env(:ferricstore, FerricStore.ResourceLimits, FakeResourceLimits)
+    :persistent_term.put({FakeResourceLimits, :test_pid}, self())
+
+    assert :ok =
+             FerricStore.ResourceLimits.record_activity(["tenant:namespace:key"],
+               store: MockStore.make()
+             )
+
+    assert_receive {:activity, ["tenant:namespace:key"], true}
+
+    assert :ok =
+             FerricStore.ResourceLimits.check_command(
+               "SET",
+               ["tenant:namespace:key", "value"],
+               ["tenant:namespace:key"],
+               store: MockStore.make()
+             )
+
+    assert_receive {:command_check, "SET", ["tenant:namespace:key", "value"],
+                    ["tenant:namespace:key"], true}
+
+    assert {:ok, nil} =
+             FerricStore.ResourceLimits.acquire_command(
+               "SET",
+               ["tenant:namespace:key", "leased"],
+               ["tenant:namespace:key"],
+               store: MockStore.make()
+             )
+
+    assert_receive {:command_check, "SET", ["tenant:namespace:key", "leased"],
+                    ["tenant:namespace:key"], true}
+
+    assert :ok = FerricStore.ResourceLimits.release_command(nil, store: MockStore.make())
+  end
+
+  test "FERRICSTORE.QUOTA delegates to configured resource limit implementation" do
+    Application.put_env(:ferricstore, FerricStore.ResourceLimits, FakeResourceLimits)
+
+    assert %{"scope" => "tenant", "limit" => %{"keys" => 10}, "store?" => true} =
+             Dispatcher.dispatch(
+               "FERRICSTORE.QUOTA",
+               ["SET", "tenant", "KEYS", "10"],
+               MockStore.make()
+             )
+
+    assert %{"scope" => "tenant", "limit" => %{"keys" => 10}, "store?" => true} =
+             Dispatcher.dispatch("FERRICSTORE.QUOTA", ["GET", "tenant"], MockStore.make())
+
+    assert %{"scope" => "tenant", "usage" => %{"keys" => 0}, "store?" => true} =
+             Dispatcher.dispatch("FERRICSTORE.QUOTA", ["USAGE", "tenant"], MockStore.make())
+  end
+
+  test "FERRICSTORE.NAMESPACE delegates mutations with caller store opts" do
+    Application.put_env(:ferricstore, FerricStore.Management.Namespace, FakeNamespace)
+
+    assert %{"prefix" => "tenant", "store?" => true} =
+             Dispatcher.dispatch("FERRICSTORE.NAMESPACE", ["ENSURE", "tenant"], MockStore.make())
+
+    assert %{"deleted" => "tenant", "store?" => true} =
+             Dispatcher.dispatch("FERRICSTORE.NAMESPACE", ["DELETE", "tenant"], MockStore.make())
+  end
+
+  test "ACL command delegates to configured implementation" do
+    Application.put_env(:ferricstore, FerricStore.Management.ACL, FakeACL)
+
+    assert %{
+             "username" => "platform_write_abcd",
+             "rules" => ["on", "+@write", "-@dangerous"],
+             "store?" => true
+           } =
+             Dispatcher.dispatch(
+               "ACL",
+               [
+                 "SETUSER",
+                 "platform_write_abcd",
+                 "on",
+                 "+@write",
+                 "-@dangerous"
+               ],
+               MockStore.make()
+             )
+
+    assert :ok = Dispatcher.dispatch("ACL", ["SAVE"], MockStore.make())
+  end
+
+  test "native AST parser recognizes management command names" do
+    assert {:ok, "FERRICSTORE.CAPABILITIES", [], {:ferricstore_capabilities, []}, []} =
+             NativeAstParser.parse("FERRICSTORE.CAPABILITIES", [])
+
+    assert {:ok, "ACL", ["SETUSER", "u", "on"], {:acl, "SETUSER", ["u", "on"]}, []} =
+             NativeAstParser.parse("ACL", ["SETUSER", "u", "on"])
+
+    assert {:ok, "FERRICSTORE.QUOTA", ["GET", "tenant"], {:ferricstore_quota, ["GET", "tenant"]},
+            ["tenant:*"]} =
+             NativeAstParser.parse("FERRICSTORE.QUOTA", ["GET", "tenant"])
+
+    assert {:ok, "FERRICSTORE.NAMESPACE", ["ENSURE", "tenant:a"],
+            {:ferricstore_namespace, ["ENSURE", "tenant:a"]}, ["tenant:a:*"]} =
+             NativeAstParser.parse("FERRICSTORE.NAMESPACE", ["ENSURE", "tenant:a"])
+
+    assert {:ok, "FERRICSTORE.TELEMETRY", ["FLOW_QUERY", "PARTITION", "tenant:a"],
+            {:ferricstore_telemetry, ["FLOW_QUERY", "PARTITION", "tenant:a"]}, ["tenant:a:*"]} =
+             NativeAstParser.parse("FERRICSTORE.TELEMETRY", [
+               "FLOW_QUERY",
+               "PARTITION",
+               "tenant:a"
+             ])
+
+    assert {:ok, "FERRICSTORE.TELEMETRY", ["FLOW_QUERY"],
+            {:ferricstore_telemetry, ["FLOW_QUERY"]}, ["*"]} =
+             NativeAstParser.parse("FERRICSTORE.TELEMETRY", ["FLOW_QUERY"])
+  end
+end

@@ -1,6 +1,6 @@
 # ferricstore2
 
-Design for a Rust, workflow-only FerricStore runtime. This repository contains no implementation.
+Design for a Rust, workflow-only FerricStore runtime. This repository contains no Rust implementation; preserved Elixir tests are reference inputs for the future port.
 
 The design preserves explicit durable workflow transitions, leases, fencing, retries and workflow queries. It does not port the general Redis-compatible database or replay arbitrary user code.
 
@@ -11,7 +11,8 @@ The design preserves explicit durable workflow transitions, leases, fencing, ret
 3. [Raft and storage](docs/notes/raft-storage.md).
 4. [Library decisions](docs/library-decisions.md) and [cache reuse/quality gates](docs/notes/rust-libraries-quality.md).
 5. [Implementation plan](docs/implementation-plan.md).
-6. [Review record](docs/reviews/decisions.md) and [source provenance](docs/source-provenance.md).
+6. [Existing Elixir test parity](docs/workflow-test-parity.md) and [test inventory](docs/workflow-test-inventory.md).
+7. [Review record](docs/reviews/decisions.md) and [source provenance](docs/source-provenance.md).
 
 ## Status
 

@@ -1,0 +1,1504 @@
+defmodule Ferricstore.Raft.WARaftBackendTest.Sections.UnifiedSegmentTrimPrunesFlowApplyProjectionValueCache do
+  @moduledoc false
+
+  defmacro __using__(_opts) do
+    quote do
+      import ExUnit.CaptureLog
+
+      alias Ferricstore.ErrorReasons
+      alias Ferricstore.Raft.Cluster, as: RaftCluster
+      alias Ferricstore.Raft.WARaftBackend
+      alias Ferricstore.Raft.WARaftStorage
+      alias Ferricstore.Store.{BlobRef, BlobStore}
+      alias Ferricstore.Store.CompoundKey
+      alias Ferricstore.Store.Router
+      alias Ferricstore.Raft.WARaftBackendTest.LabelCounter
+      alias Ferricstore.Raft.WARaftBackendTest.OversizedLabel
+
+      test "unified segment trim prunes Flow apply-projection value cache", %{
+        root: root,
+        ctx: ctx
+      } do
+        previous_mode = Application.get_env(:ferricstore, :waraft_storage_apply_mode)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_apply_mode, :segment_keydir)
+          clear_apply_projection_cache!()
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          payload_ref =
+            Ferricstore.Flow.Keys.value_key(
+              "segment-keydir-flow-trim-cache",
+              :payload,
+              1,
+              "segment-keydir-flow-trim-cache"
+            )
+
+          payload = :binary.copy("p", 1_024)
+          encoded_payload = Ferricstore.Flow.encode_value(payload)
+          assert Ferricstore.Flow.Keys.value_key?(payload_ref)
+
+          {_log, value_index} =
+            append_waraft_fence!("segment-keydir:flow-trim-cache-index", "v")
+
+          {_lfu, value_offset, value_size} =
+            insert_apply_projection_ref!(root, ctx, value_index, payload_ref, encoded_payload)
+
+          assert value_offset == 0
+          assert value_size == byte_size(encoded_payload)
+          assert apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+          assert apply_projection_cache_value_bytes(root, 0, value_index) >= value_size
+
+          newer_payload_ref =
+            Ferricstore.Flow.Keys.value_key(
+              "segment-keydir-flow-trim-cache-newer",
+              :payload,
+              1,
+              "segment-keydir-flow-trim-cache"
+            )
+
+          newer_payload = :binary.copy("n", 1_024)
+          newer_encoded_payload = Ferricstore.Flow.encode_value(newer_payload)
+
+          {log, newer_value_index} =
+            append_waraft_fence!("segment-keydir:flow-trim-cache-newer-index", "v")
+
+          {_newer_lfu, _newer_value_offset, newer_value_size} =
+            insert_apply_projection_ref!(
+              root,
+              ctx,
+              newer_value_index,
+              newer_payload_ref,
+              newer_encoded_payload
+            )
+
+          assert newer_value_index > value_index
+          assert newer_value_size == byte_size(newer_encoded_payload)
+          assert apply_projection_cache_contains?(root, 0, newer_value_index, newer_payload_ref)
+
+          assert {:ok, _state} =
+                   :ferricstore_waraft_spike_segment_log.trim(log, value_index + 1, %{})
+
+          refute apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+          assert apply_projection_cache_value_bytes(root, 0, value_index) == 0
+          refute apply_projection_cache_contains?(root, 0, newer_value_index, newer_payload_ref)
+          assert apply_projection_cache_value_bytes(root, 0, newer_value_index) == 0
+
+          assert [
+                   {^payload_ref, nil, 0, _lfu_after, {:waraft_projection, projection_index},
+                    projection_offset, ^value_size}
+                 ] = :ets.lookup(elem(ctx.keydir_refs, 0), payload_ref)
+
+          assert is_integer(projection_index) and projection_index > 0
+          assert is_integer(projection_offset) and projection_offset > 0
+
+          assert [
+                   {^newer_payload_ref, nil, 0, _newer_lfu_after,
+                    {:waraft_projection, newer_projection_index}, newer_projection_offset,
+                    ^newer_value_size}
+                 ] = :ets.lookup(elem(ctx.keydir_refs, 0), newer_payload_ref)
+
+          assert is_integer(newer_projection_index) and newer_projection_index > 0
+          assert is_integer(newer_projection_offset) and newer_projection_offset > 0
+
+          assert {:ok, stored_payload} =
+                   Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                     ctx,
+                     0,
+                     {:waraft_projection, projection_index},
+                     payload_ref
+                   )
+
+          assert Ferricstore.Flow.decode_value(stored_payload) == payload
+
+          assert {:ok, stored_newer_payload} =
+                   Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                     ctx,
+                     0,
+                     {:waraft_projection, newer_projection_index},
+                     newer_payload_ref
+                   )
+
+          assert Ferricstore.Flow.decode_value(stored_newer_payload) == newer_payload
+        after
+          restore_env(:waraft_storage_apply_mode, previous_mode)
+        end
+      end
+
+      test "unified segment trim keeps Flow apply-projection cache while keydir still references it",
+           %{
+             root: root,
+             ctx: ctx
+           } do
+        previous_mode = Application.get_env(:ferricstore, :waraft_storage_apply_mode)
+
+        previous_hook =
+          Application.get_env(:ferricstore, :waraft_segment_projection_before_relocate_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_apply_mode, :segment_keydir)
+          clear_apply_projection_cache!()
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          payload_ref =
+            Ferricstore.Flow.Keys.value_key(
+              "segment-keydir-flow-trim-cache-still-referenced",
+              :payload,
+              1,
+              "segment-keydir-flow-trim-cache"
+            )
+
+          payload = :binary.copy("r", 1_024)
+          encoded_payload = Ferricstore.Flow.encode_value(payload)
+
+          {_log, value_index} =
+            append_waraft_fence!("segment-keydir:flow-trim-cache-still-referenced-index", "v")
+
+          {lfu, value_offset, value_size} =
+            insert_apply_projection_ref!(root, ctx, value_index, payload_ref, encoded_payload)
+
+          assert apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+          test_pid = self()
+
+          Application.put_env(:ferricstore, :waraft_segment_projection_before_relocate_hook, fn
+            0, _projection_root, relocations ->
+              assert Enum.any?(relocations, fn {{relocated_key, _value, _expire_at_ms}, _row} ->
+                       relocated_key == payload_ref
+                     end)
+
+              :ets.insert(
+                elem(ctx.keydir_refs, 0),
+                {payload_ref, nil, 9_999_999_999_999, lfu,
+                 {:waraft_apply_projection, value_index}, value_offset, value_size}
+              )
+
+              send(test_pid, :apply_projection_ref_kept_referenced)
+              :ok
+          end)
+
+          assert :ok =
+                   WARaftBackend.write(
+                     0,
+                     {:put, "segment-keydir:flow-trim-cache-still-referenced-fence", "v", 0}
+                   )
+
+          log = waraft_segment_log_record(0)
+
+          assert {:ok, _state} =
+                   :ferricstore_waraft_spike_segment_log.trim(log, value_index + 1, %{})
+
+          assert_receive :apply_projection_ref_kept_referenced
+
+          assert [
+                   {^payload_ref, nil, 9_999_999_999_999, ^lfu,
+                    {:waraft_apply_projection, ^value_index}, ^value_offset, ^value_size}
+                 ] = :ets.lookup(elem(ctx.keydir_refs, 0), payload_ref)
+
+          assert apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+
+          assert {:ok, stored_payload} =
+                   Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                     ctx,
+                     0,
+                     {:waraft_apply_projection, value_index},
+                     payload_ref
+                   )
+
+          assert Ferricstore.Flow.decode_value(stored_payload) == payload
+        after
+          restore_env(:waraft_segment_projection_before_relocate_hook, previous_hook)
+          restore_env(:waraft_storage_apply_mode, previous_mode)
+        end
+      end
+
+      @tag :apply_projection_pin_retention
+      test "unified segment trim relocates LMDB-pinned Flow value locators", %{
+        root: root,
+        ctx: ctx
+      } do
+        previous_sync_hook = Application.get_env(:ferricstore, :waraft_segment_log_file_sync_hook)
+
+        clear_apply_projection_cache!()
+
+        try do
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          payload_ref =
+            Ferricstore.Flow.Keys.value_key(
+              "segment-keydir-flow-trim-pin-relocated",
+              :payload,
+              1,
+              "segment-keydir-flow-trim-pin"
+            )
+
+          payload = :binary.copy("p", 1_024)
+          encoded_payload = Ferricstore.Flow.encode_value(payload)
+          assert Ferricstore.Flow.Keys.value_key?(payload_ref)
+
+          {log, value_index} =
+            append_waraft_fence!("segment-keydir:flow-trim-pin-relocated-index", "v")
+
+          {_lfu, value_offset, value_size} =
+            insert_apply_projection_ref!(root, ctx, value_index, payload_ref, encoded_payload)
+
+          lmdb_path =
+            ctx.data_dir
+            |> Ferricstore.DataDir.shard_data_path(0)
+            |> Ferricstore.Flow.LMDB.path()
+
+          assert :ok =
+                   Ferricstore.Flow.LMDB.write_batch(
+                     lmdb_path,
+                     Ferricstore.Flow.LMDB.segment_value_pin_batch_put_ops([
+                       {payload_ref, 0, {:waraft_apply_projection, value_index}, value_offset,
+                        value_size}
+                     ])
+                   )
+
+          :ets.delete(elem(ctx.keydir_refs, 0), payload_ref)
+
+          assert apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+
+          assert :ok =
+                   WARaftBackend.write(
+                     0,
+                     {:put, "segment-keydir:flow-trim-pin-relocated-fence", "v", 0}
+                   )
+
+          Application.put_env(
+            :ferricstore,
+            :waraft_segment_log_file_sync_hook,
+            {:notify_with_method, self()}
+          )
+
+          assert {:ok, _state} =
+                   :ferricstore_waraft_spike_segment_log.trim(log, value_index + 1, %{})
+
+          assert_receive_apply_projection_sync()
+
+          assert {:ok, [retained_pin]} =
+                   Ferricstore.Flow.LMDB.segment_value_pin_entries_before(
+                     lmdb_path,
+                     value_index + 1,
+                     100
+                   )
+
+          assert retained_pin.key == payload_ref
+          assert retained_pin.file_id == {:waraft_apply_projection, value_index}
+          assert retained_pin.offset == value_offset
+          assert retained_pin.value_size == value_size
+
+          assert {:ok, lmdb_value} = Ferricstore.Flow.LMDB.get(lmdb_path, payload_ref)
+
+          assert {:ok, {{:waraft_apply_projection, ^value_index}, ^value_offset, ^value_size}} =
+                   Ferricstore.Flow.LMDB.decode_value_locator(lmdb_value, 1_000)
+
+          refute apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+
+          assert {:ok, stored_payload} =
+                   Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                     ctx,
+                     0,
+                     {:waraft_apply_projection, value_index},
+                     payload_ref
+                   )
+
+          assert Ferricstore.Flow.decode_value(stored_payload) == payload
+          assert [] = :ets.lookup(elem(ctx.keydir_refs, 0), payload_ref)
+
+          assert :ok = WARaftBackend.stop()
+          FerricStore.Instance.cleanup(ctx.name)
+
+          restarted_ctx = build_ctx(root)
+
+          assert :ok =
+                   WARaftBackend.start(restarted_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log
+                   )
+
+          assert [] = :ets.lookup(elem(restarted_ctx.keydir_refs, 0), payload_ref)
+          assert {:ok, [^payload]} = Ferricstore.Flow.value_mget(restarted_ctx, [payload_ref])
+        after
+          restore_env(:waraft_segment_log_file_sync_hook, previous_sync_hook)
+        end
+      end
+
+      @tag :apply_projection_log_compaction
+      test "unified segment trim compacts apply-projection disk history without dropping live refs",
+           %{
+             root: root,
+             ctx: ctx
+           } do
+        previous_mode = Application.get_env(:ferricstore, :waraft_storage_apply_mode)
+
+        previous_hook =
+          Application.get_env(:ferricstore, :waraft_segment_projection_before_relocate_hook)
+
+        clear_apply_projection_cache!()
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_apply_mode, :segment_keydir)
+
+          assert :ok =
+                   WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          dead_key = "apply-projection-gc:dead"
+          pinned_key = Ferricstore.Flow.Keys.value_key("gc-pinned", :payload, 1, "gc")
+          keydir_key = "apply-projection-gc:keydir"
+          future_key = "apply-projection-gc:future"
+
+          {_log, dead_index} = append_waraft_fence!("apply-projection-gc:dead-index", "v")
+          {_log, pinned_index} = append_waraft_fence!("apply-projection-gc:pinned-index", "v")
+          {_log, keydir_index} = append_waraft_fence!("apply-projection-gc:keydir-index", "v")
+          {log, future_index} = append_waraft_fence!("apply-projection-gc:future-index", "v")
+
+          dead_value = :binary.copy("d", 128 * 1_024)
+          pinned_value = Ferricstore.Flow.encode_value(:binary.copy("p", 32 * 1_024))
+          keydir_value = :binary.copy("k", 32 * 1_024)
+          future_value = :binary.copy("f", 32 * 1_024)
+
+          assert :ok =
+                   Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(
+                     root,
+                     0,
+                     dead_index,
+                     [{dead_key, dead_value, 0}]
+                   )
+
+          {_pinned_lfu, pinned_offset, pinned_size} =
+            insert_apply_projection_ref!(root, ctx, pinned_index, pinned_key, pinned_value)
+
+          {keydir_lfu, keydir_offset, keydir_size} =
+            insert_apply_projection_ref!(root, ctx, keydir_index, keydir_key, keydir_value)
+
+          assert :ok =
+                   Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(
+                     root,
+                     0,
+                     future_index,
+                     [{future_key, future_value, 0}]
+                   )
+
+          assert {:ok, 4} =
+                   Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+          assert :ok =
+                   Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(
+                     root,
+                     0,
+                     dead_index,
+                     [{dead_key, dead_value, 0}]
+                   )
+
+          assert {:ok, 1} =
+                   Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+          lmdb_path =
+            root
+            |> Ferricstore.DataDir.shard_data_path(0)
+            |> Ferricstore.Flow.LMDB.path()
+
+          assert :ok =
+                   Ferricstore.Flow.LMDB.write_batch(
+                     lmdb_path,
+                     Ferricstore.Flow.LMDB.segment_value_pin_batch_put_ops([
+                       {pinned_key, 0, {:waraft_apply_projection, pinned_index}, pinned_offset,
+                        pinned_size}
+                     ])
+                   )
+
+          :ets.delete(elem(ctx.keydir_refs, 0), pinned_key)
+
+          Application.put_env(:ferricstore, :waraft_segment_projection_before_relocate_hook, fn
+            0, _projection_root, relocations ->
+              assert Enum.any?(relocations, fn {{key, _value, _expire_at_ms}, _row} ->
+                       key == keydir_key
+                     end)
+
+              :ets.insert(
+                elem(ctx.keydir_refs, 0),
+                {keydir_key, nil, 9_999_999_999_999, keydir_lfu,
+                 {:waraft_apply_projection, keydir_index}, keydir_offset, keydir_size}
+              )
+
+              :ok
+          end)
+
+          projection_root = waraft_apply_projection_root(root, 0)
+          bytes_before = apply_projection_segment_bytes(projection_root)
+
+          assert {:ok, _state} =
+                   :ferricstore_waraft_spike_segment_log.trim(log, future_index, %{})
+
+          assert :not_found =
+                   :ferricstore_waraft_spike_segment_log.read_disk(
+                     to_charlist(projection_root),
+                     dead_index
+                   )
+
+          assert {:ok, ^pinned_value} =
+                   Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                     ctx,
+                     0,
+                     {:waraft_apply_projection, pinned_index},
+                     pinned_key
+                   )
+
+          assert {:ok, ^keydir_value} =
+                   Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                     ctx,
+                     0,
+                     {:waraft_apply_projection, keydir_index},
+                     keydir_key
+                   )
+
+          assert {:ok, ^future_value} =
+                   Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                     ctx,
+                     0,
+                     {:waraft_apply_projection, future_index},
+                     future_key
+                   )
+
+          assert apply_projection_disk_record_counts(projection_root) == %{
+                   pinned_index => 1,
+                   keydir_index => 1,
+                   future_index => 1
+                 }
+
+          assert apply_projection_segment_bytes(projection_root) < bytes_before
+
+          assert {:ok, pins} =
+                   Ferricstore.Flow.LMDB.segment_value_pin_entries_before(
+                     lmdb_path,
+                     future_index,
+                     100
+                   )
+
+          assert Enum.any?(pins, fn pin ->
+                   pin.key == pinned_key and
+                     pin.file_id == {:waraft_apply_projection, pinned_index}
+                 end)
+        after
+          restore_env(:waraft_segment_projection_before_relocate_hook, previous_hook)
+          restore_env(:waraft_storage_apply_mode, previous_mode)
+        end
+      end
+
+      @tag :apply_projection_log_compaction
+      test "unified segment trim retains QueryRow records and relocates only their central locator",
+           %{
+             root: root,
+             ctx: ctx
+           } do
+        clear_apply_projection_cache!()
+
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+        {_log, dead_index} = append_waraft_fence!("query-row-compaction:dead-index", "v")
+        {_log, query_index} = append_waraft_fence!("query-row-compaction:record-index", "v")
+        {log, trim_index} = append_waraft_fence!("query-row-compaction:trim-index", "v")
+
+        dead_key = "query-row-compaction:dead"
+
+        record = %{
+          id: "query-row-compaction-run",
+          type: "job",
+          state: "completed",
+          version: 7,
+          priority: 0,
+          partition_key: "tenant-a",
+          created_at_ms: 100,
+          updated_at_ms: 200,
+          next_run_at_ms: 0,
+          lease_deadline_ms: nil,
+          attempts: 1,
+          run_state: "terminal",
+          max_active_ms: 10_000,
+          state_enter_seq: 7,
+          history_max_events: 100,
+          history_hot_max_events: 10,
+          parent_flow_id: nil,
+          root_flow_id: nil,
+          correlation_id: nil,
+          attributes: %{"customer" => "acme"},
+          indexed_attributes: ["customer"],
+          state_meta: %{"completed" => %{"reason" => "ok"}},
+          indexed_state_meta: "reason"
+        }
+
+        state_key = Ferricstore.Flow.Keys.state_key(record.id, record.partition_key)
+        encoded_record = Ferricstore.Flow.encode_record(record)
+
+        assert :ok =
+                 Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(root, 0, dead_index, [
+                   {dead_key, :binary.copy("d", 64 * 1_024), 0}
+                 ])
+
+        assert :ok =
+                 Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(root, 0, query_index, [
+                   {state_key, encoded_record, 0}
+                 ])
+
+        assert {:ok, 2} =
+                 Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+        assert {:ok, {old_ordinal, old_offset, old_frame_size}} =
+                 Ferricstore.Raft.WARaftSegmentReader.physical_location(
+                   ctx,
+                   0,
+                   {:waraft_apply_projection, query_index}
+                 )
+
+        old_locator =
+          Ferricstore.Flow.Locator.new!(
+            flow_id: record.id,
+            kind: :state,
+            version: record.version,
+            raft_index: query_index,
+            file_id: {:waraft_apply_projection, query_index},
+            segment_generation: old_ordinal,
+            offset: old_offset,
+            frame_size: old_frame_size,
+            value_size: byte_size(encoded_record),
+            checksum: :crypto.hash(:sha256, encoded_record)
+          )
+
+        assert {:ok, query_row} =
+                 Ferricstore.Flow.Query.QueryRowCodec.encode(state_key, record, old_locator, 0)
+
+        type_catalog_key =
+          Ferricstore.Flow.Keys.type_catalog_member_key(record.type, state_key)
+
+        assert {:ok, query_source_catalog_op} =
+                 Ferricstore.Flow.Query.SourceCatalog.put_op(type_catalog_key, state_key)
+
+        lmdb_path =
+          root
+          |> Ferricstore.DataDir.shard_data_path(0)
+          |> Ferricstore.Flow.LMDB.path()
+
+        assert :ok =
+                 Ferricstore.Flow.LMDB.write_batch(lmdb_path, [
+                   {:put, state_key, query_row},
+                   query_source_catalog_op
+                 ])
+
+        :ets.delete(elem(ctx.keydir_refs, 0), state_key)
+
+        assert {:ok, _state} =
+                 :ferricstore_waraft_spike_segment_log.trim(log, trim_index, %{})
+
+        assert {:ok, relocated_query_row} = Ferricstore.Flow.LMDB.get(lmdb_path, state_key)
+
+        assert {:ok, %{locator: relocated_locator}} =
+                 Ferricstore.Flow.Query.QueryRowCodec.decode(relocated_query_row, state_key)
+
+        assert Ferricstore.Flow.Locator.same_logical_record?(old_locator, relocated_locator)
+        refute Ferricstore.Flow.Locator.same_physical_record?(old_locator, relocated_locator)
+
+        assert {:ok, [%{id: "query-row-compaction-run", version: 7}]} =
+                 Ferricstore.Flow.RecordHydrator.read_many(
+                   ctx,
+                   0,
+                   [{state_key, relocated_locator}],
+                   max_bytes: 1_000_000
+                 )
+
+        assert :not_found =
+                 :ferricstore_waraft_spike_segment_log.read_disk(
+                   root |> waraft_apply_projection_root(0) |> to_charlist(),
+                   dead_index
+                 )
+      end
+
+      @tag :apply_projection_log_compaction
+      test "unified segment trim serializes disk rewrite with an in-flight cache spill", %{
+        root: root,
+        ctx: ctx
+      } do
+        previous_hook = Application.get_env(:ferricstore, :waraft_apply_projection_spill_hook)
+        clear_apply_projection_cache!()
+
+        try do
+          assert :ok =
+                   WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          {_log, old_index} = append_waraft_fence!("apply-projection-gc:spill-race-old", "v")
+          {log, trim_index} = append_waraft_fence!("apply-projection-gc:spill-race-trim", "v")
+          old_key = "apply-projection-gc:spill-race-dead"
+          parent = self()
+
+          assert :ok =
+                   Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(
+                     root,
+                     0,
+                     old_index,
+                     [{old_key, :binary.copy("s", 64 * 1_024), 0}]
+                   )
+
+          Application.put_env(:ferricstore, :waraft_apply_projection_spill_hook, fn _batches ->
+            send(parent, {:apply_projection_spill_paused, self()})
+
+            receive do
+              :release_apply_projection_spill -> :ok
+            end
+          end)
+
+          spill_task =
+            Task.async(fn ->
+              Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+            end)
+
+          assert_receive {:apply_projection_spill_paused, spill_pid}
+
+          trim_task =
+            Task.async(fn ->
+              :ferricstore_waraft_spike_segment_log.trim(log, trim_index, %{})
+            end)
+
+          assert Task.yield(trim_task, 100) == nil
+          send(spill_pid, :release_apply_projection_spill)
+
+          assert {:ok, 1} = Task.await(spill_task, 10_000)
+          assert {:ok, _state} = Task.await(trim_task, 10_000)
+
+          assert :not_found =
+                   :ferricstore_waraft_spike_segment_log.read_disk(
+                     root
+                     |> waraft_apply_projection_root(0)
+                     |> to_charlist(),
+                     old_index
+                   )
+        after
+          restore_env(:waraft_apply_projection_spill_hook, previous_hook)
+        end
+      end
+
+      @tag :apply_projection_log_compaction
+      test "snapshot creation compacts dead apply-projection disk history before copying", %{
+        root: root,
+        ctx: ctx
+      } do
+        clear_apply_projection_cache!()
+
+        assert :ok =
+                 WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+        {_log, dead_index} = append_waraft_fence!("apply-projection-gc:snapshot-dead", "v")
+        {_log, keydir_index} = append_waraft_fence!("apply-projection-gc:snapshot-keydir", "v")
+        {_log, pinned_index} = append_waraft_fence!("apply-projection-gc:snapshot-pinned", "v")
+        dead_key = "apply-projection-gc:snapshot-dead-value"
+        keydir_key = "apply-projection-gc:snapshot-keydir-value"
+        pinned_key = Ferricstore.Flow.Keys.value_key("snapshot-pinned", :payload, 1, "gc")
+        keydir_value = :binary.copy("k", 32 * 1_024)
+        pinned_value = Ferricstore.Flow.encode_value(:binary.copy("p", 32 * 1_024))
+
+        assert :ok =
+                 Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(
+                   root,
+                   0,
+                   dead_index,
+                   [{dead_key, :binary.copy("x", 128 * 1_024), 0}]
+                 )
+
+        {_keydir_lfu, _keydir_offset, _keydir_size} =
+          insert_apply_projection_ref!(root, ctx, keydir_index, keydir_key, keydir_value)
+
+        {_pinned_lfu, pinned_offset, pinned_size} =
+          insert_apply_projection_ref!(root, ctx, pinned_index, pinned_key, pinned_value)
+
+        lmdb_path =
+          root
+          |> Ferricstore.DataDir.shard_data_path(0)
+          |> Ferricstore.Flow.LMDB.path()
+
+        assert :ok =
+                 Ferricstore.Flow.LMDB.write_batch(
+                   lmdb_path,
+                   Ferricstore.Flow.LMDB.segment_value_pin_batch_put_ops([
+                     {pinned_key, 0, {:waraft_apply_projection, pinned_index}, pinned_offset,
+                      pinned_size}
+                   ])
+                 )
+
+        :ets.delete(elem(ctx.keydir_refs, 0), pinned_key)
+
+        assert {:ok, 3} =
+                 Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+        projection_root = waraft_apply_projection_root(root, 0)
+        bytes_before = apply_projection_segment_bytes(projection_root)
+        assert bytes_before > 0
+        assert {:ok, _position} = WARaftBackend.create_snapshot(0)
+
+        assert :not_found =
+                 :ferricstore_waraft_spike_segment_log.read_disk(
+                   to_charlist(projection_root),
+                   dead_index
+                 )
+
+        assert {:ok, ^keydir_value} =
+                 Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                   ctx,
+                   0,
+                   {:waraft_apply_projection, keydir_index},
+                   keydir_key
+                 )
+
+        assert {:ok, ^pinned_value} =
+                 Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                   ctx,
+                   0,
+                   {:waraft_apply_projection, pinned_index},
+                   pinned_key
+                 )
+
+        assert apply_projection_disk_record_counts(projection_root) == %{
+                 keydir_index => 1,
+                 pinned_index => 1
+               }
+
+        assert apply_projection_segment_bytes(projection_root) < bytes_before
+      end
+
+      @tag :apply_projection_log_compaction
+      test "snapshot retention follows the copied LMDB locator view", %{
+        root: root,
+        ctx: ctx
+      } do
+        previous_hook = Application.get_env(:ferricstore, :waraft_snapshot_create_hook)
+        clear_apply_projection_cache!()
+
+        try do
+          assert :ok =
+                   WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          {_log, pinned_index} =
+            append_waraft_fence!("apply-projection-gc:snapshot-lmdb-view", "v")
+
+          pinned_key =
+            Ferricstore.Flow.Keys.value_key("snapshot-lmdb-view", :payload, 1, "gc")
+
+          pinned_value = Ferricstore.Flow.encode_value(:binary.copy("p", 32 * 1_024))
+
+          {_pinned_lfu, pinned_offset, pinned_size} =
+            insert_apply_projection_ref!(root, ctx, pinned_index, pinned_key, pinned_value)
+
+          lmdb_path =
+            root
+            |> Ferricstore.DataDir.shard_data_path(0)
+            |> Ferricstore.Flow.LMDB.path()
+
+          assert :ok =
+                   Ferricstore.Flow.LMDB.write_batch(
+                     lmdb_path,
+                     Ferricstore.Flow.LMDB.segment_value_pin_batch_put_ops([
+                       {pinned_key, 0, {:waraft_apply_projection, pinned_index}, pinned_offset,
+                        pinned_size}
+                     ])
+                   )
+
+          :ets.delete(elem(ctx.keydir_refs, 0), pinned_key)
+
+          assert {:ok, 1} =
+                   Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+          assert {:ok, [pin]} =
+                   Ferricstore.Flow.LMDB.segment_value_pin_entries_before(
+                     lmdb_path,
+                     pinned_index + 1,
+                     10
+                   )
+
+          test_pid = self()
+
+          Application.put_env(:ferricstore, :waraft_snapshot_create_hook, fn
+            {:copied, :data} ->
+              send(test_pid, {:snapshot_lmdb_view_copied, self()})
+
+              receive do
+                :resume_snapshot_lmdb_view -> :ok
+              after
+                2_000 -> {:error, :snapshot_lmdb_view_hook_timeout}
+              end
+
+            _event ->
+              :ok
+          end)
+
+          snapshot_task = Task.async(fn -> WARaftBackend.create_snapshot(0) end)
+          assert_receive {:snapshot_lmdb_view_copied, storage_pid}, 1_000
+
+          assert :ok =
+                   Ferricstore.Flow.LMDB.write_batch(lmdb_path, [
+                     {:delete, pin.pin_key},
+                     {:delete, pinned_key}
+                   ])
+
+          assert :not_found = Ferricstore.Flow.LMDB.get(lmdb_path, pinned_key)
+
+          assert {:ok, []} =
+                   Ferricstore.Flow.LMDB.segment_value_pin_entries_before(
+                     lmdb_path,
+                     pinned_index + 1,
+                     10
+                   )
+
+          send(storage_pid, :resume_snapshot_lmdb_view)
+
+          assert {:ok, {:raft_log_pos, index, term}} = Task.await(snapshot_task, 10_000)
+          assert index >= pinned_index
+
+          snapshot_path =
+            Path.join([
+              root,
+              "waraft",
+              "ferricstore_waraft_backend.1",
+              "snapshot.#{index}.#{term}"
+            ])
+
+          snapshot_lmdb_path = Path.join([snapshot_path, "data", "flow_lmdb"])
+
+          assert {:ok, snapshot_locator} =
+                   Ferricstore.Flow.LMDB.get(snapshot_lmdb_path, pinned_key)
+
+          assert {:ok, {{:waraft_apply_projection, ^pinned_index}, ^pinned_offset, ^pinned_size}} =
+                   Ferricstore.Flow.LMDB.decode_value_locator(
+                     snapshot_locator,
+                     Ferricstore.HLC.now_ms()
+                   )
+
+          assert {:ok,
+                  {0, {:ferricstore_segment_apply_projection_batch, _position, retained_entries}}} =
+                   :ferricstore_waraft_spike_segment_log.read_disk(
+                     snapshot_path
+                     |> Path.join("apply_projection_log")
+                     |> to_charlist(),
+                     pinned_index
+                   )
+
+          assert {pinned_key, pinned_value, 0} in retained_entries
+        after
+          restore_env(:waraft_snapshot_create_hook, previous_hook)
+        end
+      end
+
+      @tag :apply_projection_pin_retention
+      test "unified segment trim prepares LMDB-pinned Flow values in pages", %{
+        root: root,
+        ctx: ctx
+      } do
+        clear_apply_projection_cache!()
+
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+        lmdb_path =
+          ctx.data_dir
+          |> Ferricstore.DataDir.shard_data_path(0)
+          |> Ferricstore.Flow.LMDB.path()
+
+        {last_index, refs_and_payloads} =
+          Enum.reduce(1..3, {0, []}, fn n, {_last_index, acc} ->
+            payload_ref =
+              Ferricstore.Flow.Keys.value_key(
+                "page-#{n}",
+                :payload,
+                1,
+                "segment-keydir-flow-trim-pin-page"
+              )
+
+            payload = "paged-payload-#{n}"
+            encoded_payload = Ferricstore.Flow.encode_value(payload)
+            assert Ferricstore.Flow.Keys.value_key?(payload_ref)
+
+            {_log, value_index} =
+              append_waraft_fence!("segment-keydir:flow-trim-pin-page-index-#{n}", "v")
+
+            {_lfu, value_offset, value_size} =
+              insert_apply_projection_ref!(root, ctx, value_index, payload_ref, encoded_payload)
+
+            assert :ok =
+                     Ferricstore.Flow.LMDB.write_batch(
+                       lmdb_path,
+                       Ferricstore.Flow.LMDB.segment_value_pin_batch_put_ops([
+                         {payload_ref, 0, {:waraft_apply_projection, value_index}, value_offset,
+                          value_size}
+                       ])
+                     )
+
+            :ets.delete(elem(ctx.keydir_refs, 0), payload_ref)
+
+            {value_index, [{payload_ref, payload} | acc]}
+          end)
+
+        assert {:ok, 3} =
+                 WARaftStorage.__prepare_segment_value_pins_for_trim_for_test__(
+                   root,
+                   ctx,
+                   0,
+                   last_index + 1,
+                   2
+                 )
+
+        assert {:ok, retained_pins} =
+                 Ferricstore.Flow.LMDB.segment_value_pin_entries_before(
+                   lmdb_path,
+                   last_index + 1,
+                   10
+                 )
+
+        assert MapSet.new(Enum.map(retained_pins, & &1.key)) ==
+                 MapSet.new(Enum.map(refs_and_payloads, &elem(&1, 0)))
+
+        assert Enum.all?(retained_pins, fn pin ->
+                 match?({:waraft_apply_projection, _index}, pin.file_id)
+               end)
+
+        refs_and_payloads
+        |> Enum.reverse()
+        |> Enum.each(fn {payload_ref, payload} ->
+          assert {:ok, [^payload]} = Ferricstore.Flow.value_mget(ctx, [payload_ref])
+        end)
+      end
+
+      @tag :apply_projection_pin_retention
+      test "unified segment trim drops expired LMDB-pinned Flow apply-projection locators", %{
+        root: root,
+        ctx: ctx
+      } do
+        clear_apply_projection_cache!()
+
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+        payload_ref =
+          Ferricstore.Flow.Keys.value_key(
+            "expired",
+            :payload,
+            1,
+            "segment-keydir-flow-trim-expired-pin"
+          )
+
+        payload = Ferricstore.Flow.encode_value(:binary.copy("x", 1_024))
+        expired_at_ms = 1
+        assert Ferricstore.Flow.Keys.value_key?(payload_ref)
+
+        {log, value_index} =
+          append_waraft_fence!("segment-keydir:flow-trim-expired-pin-index", "v")
+
+        lfu = Ferricstore.Store.LFU.initial()
+        value_size = byte_size(payload)
+
+        :ets.insert(
+          elem(ctx.keydir_refs, 0),
+          {payload_ref, nil, expired_at_ms, lfu, {:waraft_apply_projection, value_index}, 0,
+           value_size}
+        )
+
+        assert :ok =
+                 Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(root, 0, value_index, [
+                   {payload_ref, payload, expired_at_ms}
+                 ])
+
+        lmdb_path =
+          ctx.data_dir
+          |> Ferricstore.DataDir.shard_data_path(0)
+          |> Ferricstore.Flow.LMDB.path()
+
+        assert :ok =
+                 Ferricstore.Flow.LMDB.write_batch(
+                   lmdb_path,
+                   Ferricstore.Flow.LMDB.segment_value_pin_batch_put_ops([
+                     {payload_ref, expired_at_ms, {:waraft_apply_projection, value_index}, 0,
+                      value_size}
+                   ])
+                 )
+
+        :ets.delete(elem(ctx.keydir_refs, 0), payload_ref)
+
+        assert apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+
+        assert :ok =
+                 WARaftBackend.write(
+                   0,
+                   {:put, "segment-keydir:flow-trim-expired-pin-fence", "v", 0}
+                 )
+
+        assert {:ok, _state} =
+                 :ferricstore_waraft_spike_segment_log.trim(log, value_index + 1, %{})
+
+        assert {:ok, []} =
+                 Ferricstore.Flow.LMDB.segment_value_pin_entries_before(
+                   lmdb_path,
+                   value_index + 1,
+                   100
+                 )
+
+        refute apply_projection_cache_contains?(root, 0, value_index, payload_ref)
+      end
+
+      test "unified segment trim does not relocate a keydir row changed after projection", %{
+        ctx: ctx
+      } do
+        previous_mode = Application.get_env(:ferricstore, :waraft_storage_apply_mode)
+
+        previous_hook =
+          Application.get_env(:ferricstore, :waraft_segment_projection_before_relocate_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_apply_mode, :segment_keydir)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          key = "segment-keydir:trim-race"
+          old_value = :binary.copy("o", ctx.hot_cache_max_value_size + 1)
+
+          assert :ok = WARaftBackend.write(0, {:put, key, old_value, 0})
+
+          assert [
+                   {^key, nil, 0, _lfu, {:waraft_segment, value_index}, _value_offset,
+                    old_value_size}
+                 ] = :ets.lookup(elem(ctx.keydir_refs, 0), key)
+
+          test_pid = self()
+
+          Application.put_env(:ferricstore, :waraft_segment_projection_before_relocate_hook, fn
+            0, _projection_root, relocations ->
+              assert Enum.any?(relocations, fn {{relocated_key, _value, _expire_at_ms}, _row} ->
+                       relocated_key == key
+                     end)
+
+              :ets.insert(elem(ctx.keydir_refs, 0), {key, "new-hot", 0, 0, :pending, nil, 0})
+              send(test_pid, :projection_relocation_hook_ran)
+              :ok
+          end)
+
+          assert :ok = WARaftBackend.write(0, {:put, "segment-keydir:trim-race-fence", "v2", 0})
+
+          log = waraft_segment_log_record(0)
+
+          assert {:ok, _state} =
+                   :ferricstore_waraft_spike_segment_log.trim(log, value_index + 1, %{})
+
+          assert_receive :projection_relocation_hook_ran
+
+          assert [{^key, "new-hot", 0, _lfu_after, :pending, nil, 0}] =
+                   :ets.lookup(elem(ctx.keydir_refs, 0), key)
+
+          assert old_value_size == byte_size(old_value)
+        after
+          restore_env(:waraft_segment_projection_before_relocate_hook, previous_hook)
+          restore_env(:waraft_storage_apply_mode, previous_mode)
+        end
+      end
+
+      test "unified segment storage reads cold values from a batched Raft segment record", %{
+        root: root,
+        ctx: ctx
+      } do
+        previous_mode = Application.get_env(:ferricstore, :waraft_storage_apply_mode)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_apply_mode, :segment_keydir)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          bitcask_file = Path.join([root, "data", "shard_0", "00000.log"])
+          bitcask_size = File.stat!(bitcask_file).size
+          key1 = "segment-keydir:batch-large:1"
+          key2 = "segment-keydir:batch-large:2"
+          value1 = :binary.copy("a", ctx.hot_cache_max_value_size + 1)
+          value2 = :binary.copy("b", ctx.hot_cache_max_value_size + 2)
+
+          assert {:ok, [:ok, :ok]} =
+                   WARaftBackend.write_put_batch(0, [{key1, value1, 0}, {key2, value2, 0}])
+
+          assert [
+                   {^key1, nil, 0, _lfu1, {:waraft_segment, index}, offset, value1_size}
+                 ] = :ets.lookup(elem(ctx.keydir_refs, 0), key1)
+
+          assert [
+                   {^key2, nil, 0, _lfu2, {:waraft_segment, ^index}, ^offset, value2_size}
+                 ] = :ets.lookup(elem(ctx.keydir_refs, 0), key2)
+
+          assert is_integer(offset) and offset >= 0
+          assert value1_size == byte_size(value1)
+          assert value2_size == byte_size(value2)
+          assert value1 == Router.get(ctx, key1)
+          assert value2 == Router.get(ctx, key2)
+          assert File.stat!(bitcask_file).size == bitcask_size
+
+          assert :ok = WARaftBackend.stop()
+          FerricStore.Instance.cleanup(ctx.name)
+
+          restarted_ctx = build_ctx(root)
+
+          assert :ok =
+                   WARaftBackend.start(restarted_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log
+                   )
+
+          assert value1 == Router.get(restarted_ctx, key1)
+          assert value2 == Router.get(restarted_ctx, key2)
+        after
+          restore_env(:waraft_storage_apply_mode, previous_mode)
+        end
+      end
+
+      test "unified segment storage replays batched deletes without Bitcask data writes", %{
+        root: root,
+        ctx: ctx
+      } do
+        previous_mode = Application.get_env(:ferricstore, :waraft_storage_apply_mode)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_apply_mode, :segment_keydir)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          bitcask_file = Path.join([root, "data", "shard_0", "00000.log"])
+          bitcask_size = File.stat!(bitcask_file).size
+          key1 = "segment-keydir:delete-batch:1"
+          key2 = "segment-keydir:delete-batch:2"
+
+          assert {:ok, [:ok, :ok]} =
+                   WARaftBackend.write_put_batch(0, [{key1, "v1", 0}, {key2, "v2", 0}])
+
+          assert {:ok, [:ok, :ok]} = WARaftBackend.write_delete_batch(0, [key1, key2])
+          assert nil == Router.get(ctx, key1)
+          assert nil == Router.get(ctx, key2)
+          assert [] == :ets.lookup(elem(ctx.keydir_refs, 0), key1)
+          assert [] == :ets.lookup(elem(ctx.keydir_refs, 0), key2)
+          assert File.stat!(bitcask_file).size == bitcask_size
+
+          assert :ok = WARaftBackend.stop()
+          FerricStore.Instance.cleanup(ctx.name)
+
+          restarted_ctx = build_ctx(root)
+
+          assert :ok =
+                   WARaftBackend.start(restarted_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log
+                   )
+
+          assert nil == Router.get(restarted_ctx, key1)
+          assert nil == Router.get(restarted_ctx, key2)
+        after
+          restore_env(:waraft_storage_apply_mode, previous_mode)
+        end
+      end
+
+      test "committed SET and DEL use the real FerricStore state machine", %{ctx: ctx} do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+        assert :ok = WARaftBackend.write(0, {:put, "wk1", "wv1", 0})
+        assert "wv1" == Router.get(ctx, "wk1")
+        assert [{_, "wv1", 0, _lfu, _fid, _off, 3}] = :ets.lookup(elem(ctx.keydir_refs, 0), "wk1")
+
+        assert :ok = WARaftBackend.write(0, {:delete, "wk1"})
+        assert nil == Router.get(ctx, "wk1")
+        assert [] == :ets.lookup(elem(ctx.keydir_refs, 0), "wk1")
+      end
+
+      test "single-member writes avoid per-command WARaft status calls", %{ctx: ctx} do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        test_pid = self()
+
+        Process.put(:ferricstore_waraft_backend_status_hook, fn shard_index ->
+          send(test_pid, {:waraft_status_call, shard_index})
+        end)
+
+        try do
+          _ = WARaftBackend.status(0)
+          assert_receive {:waraft_status_call, 0}, 100
+
+          assert :ok = WARaftBackend.write(0, {:put, "status-cache:key", "v", 0})
+
+          refute_receive {:waraft_status_call, 0}, 50
+        after
+          Process.delete(:ferricstore_waraft_backend_status_hook)
+        end
+      end
+
+      test "default namespace window keeps WARaft writes on the direct path", %{ctx: ctx} do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        parent = self()
+        handler_id = {__MODULE__, :default_namespace_direct_path, make_ref()}
+
+        :telemetry.attach(
+          handler_id,
+          [:ferricstore, :waraft, :batcher, :slot_flush],
+          &__MODULE__.handle_namespace_batcher_telemetry/4,
+          parent
+        )
+
+        try do
+          assert :ok = WARaftBackend.write(0, {:put, "defaultwin:key", "v", 0})
+          assert "v" == Router.get(ctx, "defaultwin:key")
+          refute_receive {:waraft_namespace_batcher_flush, _event, _measurements, _metadata}, 50
+        after
+          :telemetry.detach(handler_id)
+        end
+      end
+
+      test "start options configure WARaft throughput batch knobs", %{ctx: ctx} do
+        previous_entries =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_log_entries_per_heartbeat)
+
+        previous_heartbeat =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_heartbeat_size)
+
+        previous_apply =
+          Application.get_env(:ferricstore_waraft_backend, :raft_apply_log_batch_size)
+
+        previous_apply_bytes =
+          Application.get_env(:ferricstore_waraft_backend, :raft_apply_batch_max_bytes)
+
+        previous_rotation_interval =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_log_records_per_file)
+
+        previous_rotation_keep =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_log_records)
+
+        previous_max_retained =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_retained_entries)
+
+        try do
+          assert :ok =
+                   WARaftBackend.start(ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log,
+                     max_log_entries_per_heartbeat: 2048,
+                     max_heartbeat_size: 32 * 1024 * 1024,
+                     apply_log_batch_size: 2048,
+                     apply_batch_max_bytes: 32 * 1024 * 1024,
+                     log_rotation_interval: 64,
+                     log_rotation_keep: 128,
+                     max_retained_entries: 128
+                   )
+
+          assert 2048 ==
+                   Application.get_env(
+                     :ferricstore_waraft_backend,
+                     :raft_max_log_entries_per_heartbeat
+                   )
+
+          assert 32 * 1024 * 1024 ==
+                   Application.get_env(:ferricstore_waraft_backend, :raft_max_heartbeat_size)
+
+          assert 2048 ==
+                   Application.get_env(:ferricstore_waraft_backend, :raft_apply_log_batch_size)
+
+          assert 32 * 1024 * 1024 ==
+                   Application.get_env(:ferricstore_waraft_backend, :raft_apply_batch_max_bytes)
+
+          assert 64 ==
+                   Application.get_env(
+                     :ferricstore_waraft_backend,
+                     :raft_max_log_records_per_file
+                   )
+
+          assert 128 == Application.get_env(:ferricstore_waraft_backend, :raft_max_log_records)
+
+          assert 128 ==
+                   Application.get_env(:ferricstore_waraft_backend, :raft_max_retained_entries)
+        after
+          restore_waraft_app_env(:raft_max_log_entries_per_heartbeat, previous_entries)
+          restore_waraft_app_env(:raft_max_heartbeat_size, previous_heartbeat)
+          restore_waraft_app_env(:raft_apply_log_batch_size, previous_apply)
+          restore_waraft_app_env(:raft_apply_batch_max_bytes, previous_apply_bytes)
+          restore_waraft_app_env(:raft_max_log_records_per_file, previous_rotation_interval)
+          restore_waraft_app_env(:raft_max_log_records, previous_rotation_keep)
+          restore_waraft_app_env(:raft_max_retained_entries, previous_max_retained)
+        end
+      end
+
+      test "FerricStore app env configures WARaft throughput batch knobs", %{ctx: ctx} do
+        previous_public = Application.get_env(:ferricstore, :waraft_max_log_entries_per_heartbeat)
+        previous_rotation_public = Application.get_env(:ferricstore, :waraft_log_rotation_keep)
+
+        previous_waraft =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_log_entries_per_heartbeat)
+
+        previous_rotation_waraft =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_log_records)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_max_log_entries_per_heartbeat, 4096)
+          Application.put_env(:ferricstore, :waraft_log_rotation_keep, 8192)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          assert 4096 ==
+                   Application.get_env(
+                     :ferricstore_waraft_backend,
+                     :raft_max_log_entries_per_heartbeat
+                   )
+
+          assert 8192 == Application.get_env(:ferricstore_waraft_backend, :raft_max_log_records)
+        after
+          restore_env(:waraft_max_log_entries_per_heartbeat, previous_public)
+          restore_env(:waraft_log_rotation_keep, previous_rotation_public)
+          restore_waraft_app_env(:raft_max_log_entries_per_heartbeat, previous_waraft)
+          restore_waraft_app_env(:raft_max_log_records, previous_rotation_waraft)
+        end
+      end
+
+      test "invalid WARaft throughput batch knobs fail closed before partition start", %{ctx: ctx} do
+        previous_heartbeat = Application.get_env(:ferricstore, :waraft_max_heartbeat_size)
+
+        try do
+          assert_raise ArgumentError, ~r/max_log_entries_per_heartbeat/, fn ->
+            WARaftBackend.start(ctx,
+              log_module: :ferricstore_waraft_spike_segment_log,
+              max_log_entries_per_heartbeat: 0
+            )
+          end
+
+          refute Process.whereis(:raft_sup_ferricstore_waraft_backend_1)
+
+          Application.put_env(:ferricstore, :waraft_max_heartbeat_size, "bad")
+
+          assert_raise ArgumentError, ~r/waraft_max_heartbeat_size/, fn ->
+            WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          end
+
+          refute Process.whereis(:raft_sup_ferricstore_waraft_backend_1)
+        after
+          restore_env(:waraft_max_heartbeat_size, previous_heartbeat)
+        end
+      end
+
+      test "invalid WARaft throughput config does not partially publish backend app env", %{
+        ctx: ctx
+      } do
+        previous_public = Application.get_env(:ferricstore, :waraft_max_heartbeat_size)
+        previous_database = Application.get_env(:ferricstore_waraft_backend, :raft_database)
+
+        previous_entries =
+          Application.get_env(:ferricstore_waraft_backend, :raft_max_log_entries_per_heartbeat)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_max_heartbeat_size, 0)
+          Application.put_env(:ferricstore_waraft_backend, :raft_database, ~c"sentinel-waraft-db")
+
+          Application.put_env(
+            :ferricstore_waraft_backend,
+            :raft_max_log_entries_per_heartbeat,
+            777
+          )
+
+          assert_raise ArgumentError, ~r/waraft_max_heartbeat_size/, fn ->
+            WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          end
+
+          assert ~c"sentinel-waraft-db" ==
+                   Application.get_env(:ferricstore_waraft_backend, :raft_database)
+
+          assert 777 ==
+                   Application.get_env(
+                     :ferricstore_waraft_backend,
+                     :raft_max_log_entries_per_heartbeat
+                   )
+        after
+          restore_env(:waraft_max_heartbeat_size, previous_public)
+          restore_waraft_app_env(:raft_database, previous_database)
+          restore_waraft_app_env(:raft_max_log_entries_per_heartbeat, previous_entries)
+        end
+      end
+
+      test "small WARaft log retention trims in-memory segment log without losing reads", %{
+        ctx: ctx
+      } do
+        assert :ok =
+                 WARaftBackend.start(ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log,
+                   log_rotation_interval: 4,
+                   log_rotation_keep: 4,
+                   max_retained_entries: 4,
+                   apply_log_batch_size: 8
+                 )
+
+        for n <- 1..32 do
+          assert :ok = WARaftBackend.write(0, {:put, "trim:key:#{n}", "value:#{n}", 0})
+        end
+
+        log_table = waraft_log_table(0)
+
+        assert_eventually(
+          fn ->
+            case :ets.info(log_table, :size) do
+              size when is_integer(size) and size <= 8 -> :trimmed
+              _ -> :not_trimmed
+            end
+          end,
+          :trimmed,
+          100
+        )
+
+        assert "value:1" == Router.get(ctx, "trim:key:1")
+        assert "value:32" == Router.get(ctx, "trim:key:32")
+      end
+
+      @tag :invalid_election_timeout_isolation
+      test "invalid WARaft election timeout bounds fail closed before partition start", %{
+        ctx: ctx
+      } do
+        previous_min = Application.get_env(:ferricstore, :waraft_election_timeout_ms)
+        previous_max = Application.get_env(:ferricstore, :waraft_election_timeout_ms_max)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_election_timeout_ms, 500)
+          Application.put_env(:ferricstore, :waraft_election_timeout_ms_max, 250)
+
+          assert_raise ArgumentError, ~r/waraft_election_timeout_ms_max.*>=/, fn ->
+            WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          end
+
+          refute Process.whereis(:raft_sup_ferricstore_waraft_backend_1)
+        after
+          restore_env(:waraft_election_timeout_ms, previous_min)
+          restore_env(:waraft_election_timeout_ms_max, previous_max)
+        end
+      end
+
+      test "invalid WARaft queue and commit knobs fail closed before partition start", %{ctx: ctx} do
+        previous_pending = Application.get_env(:ferricstore, :waraft_max_pending_reads)
+        existing_sup = Process.whereis(:raft_sup_ferricstore_waraft_backend_1)
+
+        try do
+          assert_raise ArgumentError, ~r/max_pending_high_priority_commits/, fn ->
+            WARaftBackend.start(ctx,
+              log_module: :ferricstore_waraft_spike_segment_log,
+              max_pending_high_priority_commits: -1
+            )
+          end
+
+          assert Process.whereis(:raft_sup_ferricstore_waraft_backend_1) == existing_sup
+
+          assert_raise ArgumentError, ~r/commit_batch_max/, fn ->
+            WARaftBackend.start(ctx,
+              log_module: :ferricstore_waraft_spike_segment_log,
+              commit_batch_max: 0
+            )
+          end
+
+          assert Process.whereis(:raft_sup_ferricstore_waraft_backend_1) == existing_sup
+
+          Application.put_env(:ferricstore, :waraft_max_pending_reads, "bad")
+
+          assert_raise ArgumentError, ~r/waraft_max_pending_reads/, fn ->
+            WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          end
+
+          assert Process.whereis(:raft_sup_ferricstore_waraft_backend_1) == existing_sup
+
+          Application.delete_env(:ferricstore, :waraft_max_pending_reads)
+        after
+          restore_env(:waraft_max_pending_reads, previous_pending)
+        end
+      end
+    end
+  end
+end

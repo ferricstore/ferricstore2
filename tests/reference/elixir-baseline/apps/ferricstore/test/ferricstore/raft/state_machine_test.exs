@@ -1,0 +1,1800 @@
+Code.require_file(
+  "state_machine_test/sections/coalesces_consecutive_flow_native_index_ops_crossing_ordering_barriers.exs",
+  __DIR__
+)
+
+Code.require_file("state_machine_test/sections/flow_blob_side_channel_apply.exs", __DIR__)
+Code.require_file("state_machine_test/sections/flow_command_time.exs", __DIR__)
+
+Code.require_file(
+  "state_machine_test/sections/flow_shared_value_ref_persistence.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/flow_governance_release_outbox.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/promoted_compound_member_index.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/promoted_single_mutation_durability.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/compound_prefix_delete_exact.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/transaction_compound_read_budget.exs",
+  __DIR__
+)
+
+Code.require_file("state_machine_test/sections/batch_value_limits.exs", __DIR__)
+
+Code.require_file("state_machine_test/sections/flow_governance_limit.exs", __DIR__)
+
+Code.require_file("state_machine_test/sections/flow_index_rollback.exs", __DIR__)
+Code.require_file("state_machine_test/sections/state_machine_compound_reads.exs", __DIR__)
+
+Code.require_file(
+  "state_machine_test/sections/apply_3_put_key_value_expire_at_ms_part_1.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/apply_3_put_key_value_expire_at_ms_part_2.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/apply_3_put_key_value_expire_at_ms_part_3.exs",
+  __DIR__
+)
+
+Code.require_file(
+  "state_machine_test/sections/apply_3_set_key_value_expire_at_ms_opts.exs",
+  __DIR__
+)
+
+Code.require_file("state_machine_test/sections/apply_3_delete_key.exs", __DIR__)
+Code.require_file("state_machine_test/sections/handle_aux_5.exs", __DIR__)
+Code.require_file("state_machine_test/sections/release_cursor_log_compaction.exs", __DIR__)
+
+Code.require_file(
+  "state_machine_test/sections/spop_removes_type_marker_final_set_member_popped.exs",
+  __DIR__
+)
+
+defmodule Ferricstore.Raft.StateMachineTest.CurrentStateMachine do
+  @moduledoc false
+
+  alias Ferricstore.Commands.PreparedCommand
+  alias Ferricstore.Flow.PolicyCommand
+  alias Ferricstore.Raft.StateMachine
+  alias Ferricstore.Transaction.ExecutionEntry
+
+  def apply(meta, command, state), do: StateMachine.apply(meta, canonical(command), state)
+
+  defdelegate init(config), to: StateMachine
+  defdelegate init_aux(config), to: StateMachine
+  defdelegate handle_aux(meta, command, from, state, aux), to: StateMachine
+  defdelegate overview(state), to: StateMachine
+  defdelegate state_enter(role, state), to: StateMachine
+  defdelegate tick(time, state), to: StateMachine
+  defdelegate apply_waraft_segment_command(command, meta, state, writer), to: StateMachine
+
+  defdelegate apply_waraft_segment_recovery_command(command, meta, state, writer),
+    to: StateMachine
+
+  defdelegate apply_standalone_command(command, state), to: StateMachine
+  defdelegate apply_standalone_command(command, meta, state), to: StateMachine
+  defdelegate apply_standalone_cross_shard(execute_fn, state), to: StateMachine
+
+  defdelegate __apply_pending_locations_for_test__(state, file_id, batch, locations),
+    to: StateMachine
+
+  defdelegate __validate_pending_locations__(batch, locations), to: StateMachine
+  defdelegate __coalesce_flow_native_ops_for_test__(ops), to: StateMachine
+
+  defdelegate __flow_history_projection_same_shard_for_test__(ctx, state, ops),
+    to: StateMachine
+
+  defdelegate __flow_history_projection_shards_for_test__(ctx, state, ops), to: StateMachine
+  defdelegate __flow_history_projection_value_refs_for_test__(op), to: StateMachine
+  defdelegate __observe_tagged_lmdb_enqueue_failure_for_test__(state, reason), to: StateMachine
+  defdelegate __safe_ets_select_page_for_test__(table, spec, limit), to: StateMachine
+  defdelegate __append_pending_batch_sync_for_test__(path, batch), to: StateMachine
+
+  defdelegate __prob_create_and_fsync_for_test__(state, create_path, final_path, create_result),
+    to: StateMachine
+
+  defdelegate __prob_lifecycle_replay_type_for_test__(store, command, lifecycle_id),
+    to: StateMachine
+
+  defdelegate __flow_native_apply_or_queue_for_test__(native, op), to: StateMachine
+
+  defdelegate __prepare_pending_flow_native_batches_for_test__(state), to: StateMachine
+
+  defdelegate __transaction_compound_delete_prefix_for_test__(state, redis_key, prefix),
+    to: StateMachine
+
+  defdelegate __transaction_compound_batch_delete_for_test__(state, redis_key, compound_keys),
+    to: StateMachine
+
+  defdelegate __normalize_flow_native_claim_result_for_test__(result), to: StateMachine
+
+  defdelegate __flow_read_claim_hot_values_for_test__(state, keys, priority, partition_key),
+    to: StateMachine
+
+  defdelegate __flow_retention_current_state_record_for_test__(state, state_key),
+    to: StateMachine
+
+  defdelegate __flow_plain_expire_at_ms_for_test__(state, key), to: StateMachine
+
+  defdelegate __flow_read_cold_park_state_value_for_test__(state, key, locator),
+    to: StateMachine
+
+  defdelegate __flow_maybe_queue_hibernated_timeout_cleanup_for_test__(state, state_key, record),
+    to: StateMachine
+
+  defdelegate __flow_hibernation_active_index_reverse_for_test__(state, state_key, record),
+    to: StateMachine
+
+  defdelegate __flow_hibernation_locator_from_hot_for_test__(state, state_key, record, value),
+    to: StateMachine
+
+  defp canonical({:cross_shard_tx, shard_batches}) when is_list(shard_batches),
+    do: {:cross_shard_tx, canonical_batches(shard_batches)}
+
+  defp canonical({:cross_shard_tx, shard_batches, watched_keys}) when is_list(shard_batches),
+    do: {:cross_shard_tx, canonical_batches(shard_batches), watched_keys}
+
+  defp canonical({:batch, commands}) when is_list(commands),
+    do: {:batch, Enum.map(commands, &canonical/1)}
+
+  defp canonical({:tx_execute, queue, namespace}) when is_list(queue),
+    do: {:tx_execute, Enum.map(queue, &canonical_entry/1), namespace}
+
+  defp canonical({:tx_execute, queue, namespace, watched_keys}) when is_list(queue),
+    do: {:tx_execute, Enum.map(queue, &canonical_entry/1), namespace, watched_keys}
+
+  defp canonical({:flow_shared_ref_write, shard_index, command}),
+    do: {:flow_shared_ref_write, shard_index, canonical(command)}
+
+  defp canonical({:flow_policy_fence, installs, command}),
+    do: {:flow_policy_fence, installs, canonical(command)}
+
+  defp canonical({command, metadata}) when is_tuple(command) and is_map(metadata),
+    do: {canonical(command), metadata}
+
+  defp canonical(command) when is_tuple(command) do
+    if PolicyCommand.requires_stamp?(command) do
+      attrs = elem(command, tuple_size(command) - 1)
+
+      if is_map(attrs) do
+        put_elem(
+          command,
+          tuple_size(command) - 1,
+          Map.put_new(attrs, :policy_reference_captured, true)
+        )
+      else
+        command
+      end
+    else
+      command
+    end
+  end
+
+  defp canonical(command), do: command
+
+  defp canonical_batches(shard_batches) do
+    Enum.map(shard_batches, fn
+      {shard_index, queue, namespace} when is_list(queue) ->
+        {shard_index, Enum.map(queue, &canonical_entry/1), namespace}
+
+      other ->
+        other
+    end)
+  end
+
+  defp canonical_entry({index, command}) when is_integer(index) and is_tuple(command),
+    do: {index, canonical(command)}
+
+  defp canonical_entry(%ExecutionEntry{} = entry), do: entry
+
+  defp canonical_entry({command, args, _ast}) when is_binary(command) and is_list(args) do
+    command
+    |> PreparedCommand.prepare(args)
+    |> execution_entry!()
+  end
+
+  defp canonical_entry({command, args}) when is_binary(command) and is_list(args) do
+    command
+    |> PreparedCommand.prepare(args)
+    |> execution_entry!()
+  end
+
+  defp canonical_entry(command) when is_tuple(command), do: canonical(command)
+  defp canonical_entry(other), do: other
+
+  defp execution_entry!({:ok, prepared}) do
+    {:ok, entry} = ExecutionEntry.from_prepared(prepared)
+    entry
+  end
+end
+
+defmodule Ferricstore.Raft.StateMachineTest do
+  @moduledoc """
+  Unit tests for `Ferricstore.Raft.StateMachine`.
+
+  These tests exercise the state machine callbacks directly without running
+  a full WARaft partition. The state machine is deterministic and its callbacks can
+  be tested in isolation by constructing state manually.
+  """
+
+  use ExUnit.Case, async: false
+  @moduletag :raft
+  @moduletag :global_state
+
+  alias Ferricstore.Bitcask.NIF
+  alias Ferricstore.Commands.Stream.Index, as: StreamIndex
+  alias Ferricstore.Raft.BlobCommand
+  alias Ferricstore.Raft.StateMachineTest.CurrentStateMachine, as: StateMachine
+  alias Ferricstore.Store.BitcaskWriter
+  alias Ferricstore.Store.{BlobRef, BlobStore, CompoundKey, LFU, Promotion}
+
+  def handle_flow_append_telemetry(_event, measurements, metadata, {test_pid, shard_index}) do
+    if metadata[:shard_index] == shard_index do
+      send(test_pid, {:flow_bitcask_append, measurements, metadata})
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # Setup: create a temporary Bitcask store and ETS table for each test.
+  # Also starts a BitcaskWriter for shard 0 so that background writes from
+  # StateMachine.apply work in isolation tests.
+  # ---------------------------------------------------------------------------
+
+  setup do
+    shard_index = 9000 + :rand.uniform(999)
+    root = Path.join(System.tmp_dir!(), "sm_test_#{:rand.uniform(9_999_999)}")
+    dir = Ferricstore.DataDir.shard_data_path(root, shard_index)
+    File.mkdir_p!(dir)
+
+    # v2: create a .log file instead of NIF.new
+    active_file_path = Path.join(dir, "00000.log")
+    File.touch!(active_file_path)
+
+    suffix = :rand.uniform(9_999_999)
+    keydir_name = :"sm_test_keydir_#{suffix}"
+    :ets.new(keydir_name, [:set, :public, :named_table])
+
+    state =
+      StateMachine.init(%{
+        shard_index: shard_index,
+        shard_data_path: dir,
+        active_file_id: 0,
+        active_file_path: active_file_path,
+        ets: keydir_name
+      })
+
+    Ferricstore.Store.Shard.CompoundMemberIndex.ensure_table!(state.compound_member_index_name)
+
+    Ferricstore.Store.Shard.CompoundMemberIndex.rebuild(
+      state.compound_member_index_name,
+      keydir_name
+    )
+
+    # Start a BitcaskWriter for this shard so deferred writes are processed.
+    {:ok, writer_pid} = BitcaskWriter.start_link(shard_index: shard_index)
+
+    on_exit(fn ->
+      try do
+        if Process.alive?(writer_pid), do: GenServer.stop(writer_pid, :normal, 5000)
+      rescue
+        _ -> :ok
+      catch
+        :exit, _ -> :ok
+      end
+
+      try do
+        :ets.delete(keydir_name)
+      rescue
+        ArgumentError -> :ok
+      end
+
+      File.rm_rf!(dir)
+      File.rm_rf!(root)
+    end)
+
+    %{
+      state: state,
+      ets: keydir_name,
+      store: nil,
+      dir: dir,
+      active_file_path: active_file_path,
+      shard_index: shard_index,
+      writer_pid: writer_pid
+    }
+  end
+
+  test "two-field async envelopes are rejected without mutation", %{state: state, ets: ets} do
+    command = {:async, {:put, "old-async", "value", 0}}
+
+    assert {^state, {:error, {:unknown_command, ^command}}} =
+             StateMachine.apply(%{}, command, state)
+
+    assert [] = :ets.lookup(ets, "old-async")
+  end
+
+  test "replicated Flow state reads are ordered and do not mutate state", %{
+    state: state,
+    ets: ets
+  } do
+    key = "f:{consistent-state}:s"
+
+    record =
+      Ferricstore.Flow.Codec.encode_record(%{
+        id: "consistent-state",
+        type: "job",
+        state: "running",
+        version: 1,
+        created_at_ms: 1,
+        updated_at_ms: 1
+      })
+
+    {written_state, :ok} = StateMachine.apply(%{}, {:put, key, record, 0}, state)
+
+    assert {^written_state, {:ok, "running"}} =
+             StateMachine.apply(%{}, {:flow_consistent_state, key}, written_state)
+
+    assert {^written_state, {:ok, nil}} =
+             StateMachine.apply(%{}, {:flow_consistent_state, key <> ":missing"}, written_state)
+
+    assert [row] = :ets.lookup(ets, key)
+    assert elem(row, 0) == key
+  end
+
+  test "generic batches expose earlier stream appends to later appends", %{
+    state: state,
+    ets: ets
+  } do
+    key = "batched-stream"
+
+    command =
+      {:batch,
+       [
+         {:stream_append, key, {:partial, 1}, ["field", "one"], nil, false},
+         {:stream_append, key, {:partial, 1}, ["field", "two"], nil, false}
+       ]}
+
+    {_new_state, result} = StateMachine.apply(%{}, command, state)
+    assert result == {:ok, ["1-0", "1-1"]}
+
+    entry_prefix = CompoundKey.stream_prefix(key)
+
+    assert ets
+           |> :ets.tab2list()
+           |> Enum.count(fn {compound_key, _, _, _, _, _, _} ->
+             String.starts_with?(compound_key, entry_prefix)
+           end) == 2
+  end
+
+  test "compact stream commands reject malformed fields without mutation", %{
+    state: state,
+    ets: ets
+  } do
+    key = "invalid-compact-stream"
+    command = {:stream_append_many_auto, key, [["orphan"]]}
+
+    assert {_new_state, {:error, :invalid_stream_append_many_auto}} =
+             StateMachine.apply(%{}, command, state)
+
+    assert [] == :ets.lookup(ets, CompoundKey.type_key(key))
+    assert [] == :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    refute ets
+           |> :ets.tab2list()
+           |> Enum.any?(fn {compound_key, _, _, _, _, _, _} ->
+             String.starts_with?(compound_key, CompoundKey.stream_prefix(key))
+           end)
+
+    direct_key = key <> ":direct"
+
+    assert {_new_state, {:error, "ERR wrong number of arguments for 'xadd' command"}} =
+             StateMachine.apply(
+               %{},
+               {:stream_append, direct_key, {:partial, 1}, ["orphan"], nil, false},
+               state
+             )
+
+    assert [] == :ets.lookup(ets, CompoundKey.type_key(direct_key))
+    assert [] == :ets.lookup(ets, CompoundKey.stream_meta_key(direct_key))
+  end
+
+  test "replicated Stream group creation rejects invalid start IDs atomically", %{
+    state: state,
+    ets: ets
+  } do
+    key = "invalid-replicated-stream-group"
+
+    assert {_new_state, {:error, "ERR Invalid stream ID specified as stream command argument"}} =
+             StateMachine.apply(
+               %{},
+               {:stream_mutate, key, {:create, "workers", "not-an-id", true}},
+               state
+             )
+
+    assert [] == :ets.lookup(ets, CompoundKey.type_key(key))
+    assert [] == :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    refute ets
+           |> :ets.tab2list()
+           |> Enum.any?(fn {compound_key, _, _, _, _, _, _} ->
+             String.starts_with?(compound_key, CompoundKey.stream_group_prefix(key))
+           end)
+  end
+
+  test "replicated Stream appends reject malformed ID and trim terms atomically", %{
+    state: state,
+    ets: ets
+  } do
+    commands = [
+      {{:stream_append, "invalid-id-spec", :invalid, ["field", "value"], nil, false},
+       "ERR Invalid stream ID specified as stream command argument"},
+      {{:stream_append, "invalid-maxlen", :auto, ["field", "value"], {:maxlen, :not_boolean, 1},
+        false}, "ERR syntax error"},
+      {{:stream_append, "invalid-minid", :auto, ["field", "value"], {:minid, :not_boolean, "1-0"},
+        false}, "ERR syntax error"}
+    ]
+
+    Enum.each(commands, fn {command, expected_error} ->
+      key = elem(command, 1)
+
+      assert {_new_state, {:error, ^expected_error}} =
+               StateMachine.apply(%{}, command, state)
+
+      assert [] == :ets.lookup(ets, CompoundKey.type_key(key))
+      assert [] == :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+    end)
+  end
+
+  test "replicated Stream delete and ack commands reject non-binary IDs atomically", %{
+    state: state,
+    ets: ets
+  } do
+    key = "invalid-replicated-stream-member-id"
+
+    {state, "1-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 1}, ["field", "one"], nil, false},
+        state
+      )
+
+    {state, :ok} =
+      StateMachine.apply(
+        %{},
+        {:stream_mutate, key, {:create, "workers", "0-0", false}},
+        state
+      )
+
+    assert [{_, committed_meta, 0, _, _, _, _}] =
+             :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    commands = [
+      {:stream_mutate, key, {:delete, ["1-0", 123]}},
+      {:stream_mutate, key, {:ack, "workers", [123]}}
+    ]
+
+    Enum.each(commands, fn command ->
+      assert {_new_state, {:error, "ERR Invalid stream ID specified as stream command argument"}} =
+               StateMachine.apply(%{}, command, state)
+
+      assert [{_, ^committed_meta, 0, _, _, _, _}] =
+               :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+      assert [_entry] =
+               :ets.lookup(
+                 ets,
+                 Ferricstore.Commands.Stream.Entries.entry_key(key, "1-0")
+               )
+    end)
+  end
+
+  test "generic stream mutations see earlier appends with a warm index", %{
+    state: state,
+    ets: ets
+  } do
+    key = "warm-index-batched-stream"
+    cache_store = %{cache_scope: state.instance_name}
+
+    {state, "1-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 1}, ["field", "one"], nil, false},
+        state
+      )
+
+    {state, "2-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 2}, ["field", "two"], nil, false},
+        state
+      )
+
+    StreamIndex.insert_id(key, "1-0", cache_store)
+    StreamIndex.insert_id(key, "2-0", cache_store)
+    StreamIndex.mark_ready(key, cache_store)
+    on_exit(fn -> StreamIndex.clear(key, cache_store) end)
+
+    command =
+      {:batch,
+       [
+         {:stream_append, key, {:partial, 3}, ["field", "three"], nil, false},
+         {:stream_mutate, key, {:delete, ["1-0"]}}
+       ]}
+
+    assert {_new_state, {:ok, ["3-0", 1]}} = StateMachine.apply(%{}, command, state)
+
+    assert [
+             {_, encoded_meta, 0, _, _, _, _}
+           ] = :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    assert {:stream_meta, 2, 2, "2-0", "3-0", 3, 0} =
+             :erlang.binary_to_term(encoded_meta, [:safe])
+  end
+
+  test "append trimming sees earlier appends with a warm index", %{state: state, ets: ets} do
+    key = "warm-index-batched-append-trim"
+    cache_store = %{cache_scope: state.instance_name}
+
+    {state, "1-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 1}, ["field", "one"], nil, false},
+        state
+      )
+
+    {state, "2-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 2}, ["field", "two"], nil, false},
+        state
+      )
+
+    StreamIndex.insert_id(key, "1-0", cache_store)
+    StreamIndex.insert_id(key, "2-0", cache_store)
+    StreamIndex.mark_ready(key, cache_store)
+    on_exit(fn -> StreamIndex.clear(key, cache_store) end)
+
+    command =
+      {:batch,
+       [
+         {:stream_append, key, {:partial, 3}, ["field", "three"], nil, false},
+         {:stream_append, key, {:partial, 4}, ["field", "four"], {:maxlen, false, 2}, false}
+       ]}
+
+    assert {_new_state, {:ok, ["3-0", "4-0"]}} = StateMachine.apply(%{}, command, state)
+
+    assert [{_, encoded_meta, 0, _, _, _, _}] =
+             :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    assert {:stream_meta, 2, 2, "3-0", "4-0", 4, 0} =
+             :erlang.binary_to_term(encoded_meta, [:safe])
+
+    entry_prefix = CompoundKey.stream_prefix(key)
+
+    assert ["3-0", "4-0"] ==
+             ets
+             |> :ets.tab2list()
+             |> Enum.flat_map(fn
+               {compound_key, _, _, _, _, _, _} ->
+                 if String.starts_with?(compound_key, entry_prefix) do
+                   [
+                     binary_part(
+                       compound_key,
+                       byte_size(entry_prefix),
+                       byte_size(compound_key) - byte_size(entry_prefix)
+                     )
+                   ]
+                 else
+                   []
+                 end
+             end)
+             |> Enum.sort()
+
+    assert ["3-0", "4-0"] == StreamIndex.ids(key, :infinity, cache_store)
+  end
+
+  test "pending Stream index views are isolated per topic", %{state: state, ets: ets} do
+    keys = ["pending-topic:a", "pending-topic:b"]
+    cache_store = %{cache_scope: state.instance_name}
+
+    state =
+      Enum.reduce(keys, state, fn key, state ->
+        {state, "1-0"} =
+          StateMachine.apply(
+            %{},
+            {:stream_append, key, {:partial, 1}, ["field", "one"], nil, false},
+            state
+          )
+
+        {state, "2-0"} =
+          StateMachine.apply(
+            %{},
+            {:stream_append, key, {:partial, 2}, ["field", "two"], nil, false},
+            state
+          )
+
+        StreamIndex.insert_id(key, "1-0", cache_store)
+        StreamIndex.insert_id(key, "2-0", cache_store)
+        StreamIndex.mark_ready(key, cache_store)
+        state
+      end)
+
+    on_exit(fn -> Enum.each(keys, &StreamIndex.clear(&1, cache_store)) end)
+
+    [key_a, key_b] = keys
+
+    command =
+      {:batch,
+       [
+         {:stream_append, key_a, {:partial, 3}, ["field", "a-three"], nil, false},
+         {:stream_append, key_b, {:partial, 3}, ["field", "b-three"], nil, false},
+         {:stream_mutate, key_a, {:trim, {:maxlen, false, 2}}},
+         {:stream_mutate, key_b, {:trim, {:minid, false, "2-0"}}}
+       ]}
+
+    assert {_new_state, {:ok, ["3-0", "3-0", 1, 1]}} =
+             StateMachine.apply(%{}, command, state)
+
+    Enum.each(keys, fn key ->
+      assert [{_, encoded_meta, 0, _, _, _, _}] =
+               :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+      assert {:stream_meta, 2, 2, "2-0", "3-0", 3, 0} =
+               :erlang.binary_to_term(encoded_meta, [:safe])
+
+      assert ["2-0", "3-0"] == StreamIndex.ids(key, :infinity, cache_store)
+    end)
+  end
+
+  test "standalone transaction stores trim against earlier Stream appends", %{
+    state: state,
+    ets: ets
+  } do
+    key = "transaction-pending-stream-index"
+    cache_store = %{cache_scope: state.instance_name}
+
+    {state, "1-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 1}, ["field", "one"], nil, false},
+        state
+      )
+
+    {state, "2-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 2}, ["field", "two"], nil, false},
+        state
+      )
+
+    StreamIndex.insert_id(key, "1-0", cache_store)
+    StreamIndex.insert_id(key, "2-0", cache_store)
+    StreamIndex.mark_ready(key, cache_store)
+    on_exit(fn -> StreamIndex.clear(key, cache_store) end)
+
+    execute = fn store ->
+      appended =
+        Ferricstore.Commands.Stream.AtomicAppend.run(
+          key,
+          {:explicit, 3, 0},
+          ["field", "three"],
+          nil,
+          false,
+          store
+        )
+
+      trimmed =
+        Ferricstore.Commands.Stream.AtomicMutation.run(
+          key,
+          {:trim, {:maxlen, false, 2}},
+          store
+        )
+
+      [appended, trimmed]
+    end
+
+    assert {["3-0", 1], _new_state} =
+             StateMachine.apply_standalone_cross_shard(execute, state)
+
+    assert [{_, encoded_meta, 0, _, _, _, _}] =
+             :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    assert {:stream_meta, 2, 2, "2-0", "3-0", 3, 0} =
+             :erlang.binary_to_term(encoded_meta, [:safe])
+
+    refute StreamIndex.ready?(key, cache_store)
+
+    entry_prefix = CompoundKey.stream_prefix(key)
+
+    assert ["2-0", "3-0"] ==
+             ets
+             |> :ets.tab2list()
+             |> Enum.flat_map(fn
+               {compound_key, _, _, _, _, _, _} ->
+                 if String.starts_with?(compound_key, entry_prefix) do
+                   [
+                     binary_part(
+                       compound_key,
+                       byte_size(entry_prefix),
+                       byte_size(compound_key) - byte_size(entry_prefix)
+                     )
+                   ]
+                 else
+                   []
+                 end
+             end)
+             |> Enum.sort()
+  end
+
+  test "failed mixed Stream batches do not publish pending index state", %{
+    state: state,
+    ets: ets
+  } do
+    key = "failed-pending-stream-index"
+    cache_store = %{cache_scope: state.instance_name}
+
+    {state, "1-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 1}, ["field", "one"], nil, false},
+        state
+      )
+
+    {state, "2-0"} =
+      StateMachine.apply(
+        %{},
+        {:stream_append, key, {:partial, 2}, ["field", "two"], nil, false},
+        state
+      )
+
+    StreamIndex.insert_id(key, "1-0", cache_store)
+    StreamIndex.insert_id(key, "2-0", cache_store)
+    StreamIndex.mark_ready(key, cache_store)
+    on_exit(fn -> StreamIndex.clear(key, cache_store) end)
+
+    assert [{_, committed_meta, 0, _, _, _, _}] =
+             :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    previous_hook = Application.get_env(:ferricstore, :pending_append_hook)
+
+    Application.put_env(:ferricstore, :pending_append_hook, fn _path, _batch ->
+      {:error, :forced_mixed_stream_failure}
+    end)
+
+    try do
+      command =
+        {:batch,
+         [
+           {:stream_append, key, {:partial, 3}, ["field", "three"], nil, false},
+           {:stream_mutate, key, {:delete, ["1-0"]}}
+         ]}
+
+      assert {_new_state, {:error, {:bitcask_append_failed, :forced_mixed_stream_failure}}} =
+               StateMachine.apply(%{}, command, state)
+    after
+      if previous_hook do
+        Application.put_env(:ferricstore, :pending_append_hook, previous_hook)
+      else
+        Application.delete_env(:ferricstore, :pending_append_hook)
+      end
+    end
+
+    assert [{_, ^committed_meta, 0, _, _, _, _}] =
+             :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+    assert [] == :ets.lookup(ets, Ferricstore.Commands.Stream.Entries.entry_key(key, "3-0"))
+    assert ["1-0", "2-0"] == StreamIndex.ids(key, :infinity, cache_store)
+  end
+
+  test "failed WAL append publishes none of a grouped multi-topic Stream batch", %{
+    state: state,
+    ets: ets
+  } do
+    keys = ["multi-publication:a", "multi-publication:b"]
+
+    commands =
+      Enum.map(0..15, fn index ->
+        key = Enum.at(keys, rem(index, length(keys)))
+        {:stream_append, key, :auto, ["value", Integer.to_string(index)], nil, false}
+      end)
+
+    previous_hook = Application.get_env(:ferricstore, :pending_append_hook)
+
+    Application.put_env(:ferricstore, :pending_append_hook, fn _path, _batch ->
+      {:error, :forced_multi_stream_append_failure}
+    end)
+
+    try do
+      assert {_new_state, {:error, {:bitcask_append_failed, :forced_multi_stream_append_failure}}} =
+               StateMachine.apply(%{}, {:batch, commands}, state)
+
+      Enum.each(keys, fn key ->
+        assert [] == :ets.lookup(ets, CompoundKey.type_key(key))
+        assert [] == :ets.lookup(ets, CompoundKey.stream_meta_key(key))
+
+        assert {:ok, []} ==
+                 Ferricstore.Store.Shard.CompoundMemberIndex.keys_for_prefix(
+                   state.compound_member_index_name,
+                   CompoundKey.stream_prefix(key)
+                 )
+      end)
+    after
+      restore_env(:pending_append_hook, previous_hook)
+    end
+  end
+
+  @tag :invalid_batch_shape
+  test "non-list batch envelopes are rejected without crashing apply", %{state: state} do
+    commands = [{:batch, :not_a_list}, {:cross_shard_tx, :not_a_list}]
+
+    Enum.each(commands, fn command ->
+      assert {^state, {:error, {:unknown_command, ^command}}} =
+               StateMachine.apply(%{}, command, state)
+    end)
+  end
+
+  @tag :invalid_flow_plan_list_shape
+  test "malformed Flow migration plan lists return errors instead of crashing apply", %{
+    state: state
+  } do
+    commands = [
+      {:flow_policy_migration_step, %{catalog_entries: :not_a_list}},
+      {:flow_policy_catalog_backfill_step, %{candidates: :not_a_list}}
+    ]
+
+    Enum.each(commands, fn command ->
+      assert {_next_state, {:error, reason}} = StateMachine.apply(%{}, command, state)
+      assert is_binary(reason)
+    end)
+  end
+
+  @tag :atomic_type_claim
+  test "replicated type claims cannot overwrite an earlier incompatible claim", %{
+    state: state,
+    ets: ets
+  } do
+    key = "type-claim-race"
+    type_key = CompoundKey.type_key(key)
+
+    assert {claimed_state, {:applied_at, _claim_time, {:ok, :created}}, _effects} =
+             StateMachine.apply(%{index: 1}, {:compound_type_claim, key, :hash}, state)
+
+    assert {rejected_state, {:applied_at, _reject_time, {:error, wrongtype}}, _effects} =
+             StateMachine.apply(%{index: 2}, {:compound_type_claim, key, :set}, claimed_state)
+
+    assert wrongtype =~ "WRONGTYPE"
+    assert rejected_state.active_file_size == claimed_state.active_file_size
+    assert [{^type_key, "hash", 0, _, _, _, _}] = :ets.lookup(ets, type_key)
+  end
+
+  @tag :cross_raft_isolation
+  test "cross-shard transactions cannot mutate another Raft group", %{
+    state: state,
+    ets: ets,
+    shard_index: shard_index
+  } do
+    remote_shard_index = shard_index + 1
+
+    command =
+      {:cross_shard_tx, [{remote_shard_index, [{0, {:put, "remote-key", "value", 0}}], nil}]}
+
+    assert {_new_state, {:error, "CROSSSLOT cross-shard Raft transactions are not supported"}} =
+             StateMachine.apply(%{}, command, state)
+
+    assert [] = :ets.lookup(ets, "remote-key")
+  end
+
+  @tag :cross_raft_isolation
+  test "the obsolete cross-shard envelope is rejected even when its batch names this group", %{
+    state: state,
+    ets: ets,
+    shard_index: shard_index
+  } do
+    command = {:cross_shard_tx, [{shard_index, [{0, {:put, "local-key", "value", 0}}], nil}]}
+
+    assert {_new_state, {:error, "CROSSSLOT cross-shard Raft transactions are not supported"}} =
+             StateMachine.apply(%{}, command, state)
+
+    assert [] = :ets.lookup(ets, "local-key")
+  end
+
+  @tag :flow_replay_visibility
+  test "WARaft recovery hides same-command Flow state and registry entries", %{
+    state: state,
+    ets: ets
+  } do
+    setup_flow_indexes(state)
+
+    id = "replay-same-index-create"
+    partition_key = "replay-same-index-tenant"
+    state_key = Ferricstore.Flow.Keys.state_key(id, partition_key)
+    registry_key = Ferricstore.Flow.Keys.registry_key(id, partition_key)
+    replay_index = 7
+
+    future_record = %{
+      id: id,
+      type: "replay-ordering",
+      state: "cancelled",
+      partition_key: partition_key,
+      version: 2,
+      attempts: 0,
+      fencing_token: 0,
+      created_at_ms: 900,
+      updated_at_ms: 950,
+      next_run_at_ms: 1_000,
+      priority: 0,
+      incarnation: 1,
+      state_enter_seq: 1,
+      ttl_ms: nil,
+      retention_ttl_ms: 86_400_000,
+      max_active_ms: nil,
+      terminal_retention_until_ms: nil,
+      history_hot_max_events: 100,
+      history_max_events: 1_000,
+      payload_ref: nil,
+      value_refs: %{},
+      parent_flow_id: nil,
+      parent_partition_key: nil,
+      root_flow_id: id,
+      correlation_id: nil,
+      result_ref: nil,
+      error_ref: nil,
+      lease_owner: nil,
+      lease_token: nil,
+      lease_deadline_ms: 0,
+      run_state: nil,
+      child_groups: %{}
+    }
+
+    future_value = Ferricstore.Flow.encode_record(future_record)
+
+    :ets.insert(ets, {
+      state_key,
+      future_value,
+      0,
+      LFU.initial(),
+      {:waraft_apply_projection, replay_index},
+      0,
+      byte_size(future_value)
+    })
+
+    :ets.insert(ets, {
+      registry_key,
+      <<1>>,
+      0,
+      LFU.initial(),
+      {:waraft_apply_projection, replay_index},
+      0,
+      1
+    })
+
+    value_key = Ferricstore.Flow.Keys.value_key(id, :payload, 1, partition_key)
+    value_expire_at_ms = System.system_time(:millisecond) + 60_000
+
+    :ets.insert(ets, {
+      value_key,
+      "future-payload",
+      value_expire_at_ms,
+      LFU.initial(),
+      {:waraft_apply_projection, replay_index},
+      0,
+      byte_size("future-payload")
+    })
+
+    recovery_state = Map.put(state, :waraft_recovery_before_index, replay_index)
+
+    assert :miss =
+             StateMachine.__flow_retention_current_state_record_for_test__(
+               recovery_state,
+               state_key
+             )
+
+    assert StateMachine.__flow_plain_expire_at_ms_for_test__(recovery_state, value_key) == nil
+
+    assert StateMachine.__flow_plain_expire_at_ms_for_test__(state, value_key) ==
+             value_expire_at_ms
+
+    attrs = %{
+      id: id,
+      type: "replay-ordering",
+      state: "queued",
+      partition_key: partition_key,
+      run_at_ms: 1_000,
+      now_ms: 1_000,
+      policy_reference_captured: true
+    }
+
+    parent = self()
+
+    writer = fn batch ->
+      send(parent, {:recovery_projection, batch})
+
+      locations =
+        Enum.map(batch, fn
+          {:put, _key, value, _expire_at_ms} -> {:put, 0, byte_size(value)}
+          {:put_cold, _key, value, _expire_at_ms, _lfu} -> {:put, 0, byte_size(value)}
+          {:delete, key, _prob_path} -> {:delete, 0, byte_size(key)}
+        end)
+
+      {:ok, {:waraft_apply_projection, replay_index}, locations}
+    end
+
+    command =
+      {:flow_create_many, state_key, %{records: [attrs], policy_reference_captured: true}}
+
+    assert {recovered_state, {:applied_at, ^replay_index, :ok}, _effects} =
+             StateMachine.apply_waraft_segment_recovery_command(
+               command,
+               %{index: replay_index, term: 1, system_time: 1_000},
+               state,
+               writer
+             )
+
+    assert_receive {:recovery_projection, _batch}, 500
+    refute Map.has_key?(recovered_state, :waraft_recovery_before_index)
+    assert %{state: "queued", version: 1} = flow_record!(recovered_state, state_key)
+
+    later_recovery_state = Map.put(recovered_state, :waraft_recovery_before_index, 8)
+
+    assert {:ok, %{state: "queued", version: 1}} =
+             StateMachine.__flow_retention_current_state_record_for_test__(
+               later_recovery_state,
+               state_key
+             )
+
+    assert {_state, {:applied_at, 8, {:error, "ERR flow already exists"}}, _effects} =
+             StateMachine.apply_waraft_segment_recovery_command(
+               command,
+               %{index: 8, term: 1, system_time: 1_001},
+               recovered_state,
+               fn _batch -> flunk("an earlier Flow must remain visible during recovery") end
+             )
+
+    assert {_state, {:applied_at, 9, {:error, "ERR flow already exists"}}, _effects} =
+             StateMachine.apply(
+               %{index: 9, system_time: 1_002},
+               command,
+               recovered_state
+             )
+  end
+
+  @tag :flow_replay_visibility
+  test "WARaft recovery rejects future hibernation locators before payload IO", %{
+    state: state,
+    dir: dir
+  } do
+    parent = self()
+    key = "flow:{replay-hibernation}:state:run"
+    data_dir = dir |> Path.dirname() |> Path.dirname()
+    state = Map.put(state, :instance_ctx, %FerricStore.Instance{data_dir: data_dir})
+
+    locator = fn index ->
+      Ferricstore.Flow.Locator.new!(
+        flow_id: "run",
+        kind: :state,
+        version: 1,
+        raft_index: index,
+        file_id: {:waraft_apply_projection, index},
+        offset: 0,
+        value_size: 10,
+        frame_size: 32,
+        segment_generation: 0,
+        checksum: :binary.copy(<<1>>, 32)
+      )
+    end
+
+    Process.put(:ferricstore_waraft_apply_projection_disk_read_hook, fn _root, index, source ->
+      send(parent, {:projection_read, index, source})
+    end)
+
+    recovery_state = Map.put(state, :waraft_recovery_before_index, 7)
+
+    try do
+      assert :miss =
+               StateMachine.__flow_read_cold_park_state_value_for_test__(
+                 recovery_state,
+                 key,
+                 locator.(7)
+               )
+
+      refute_receive {:projection_read, 7, _source}, 50
+
+      assert :miss =
+               StateMachine.__flow_read_cold_park_state_value_for_test__(
+                 recovery_state,
+                 key,
+                 locator.(6)
+               )
+
+      assert_receive {:projection_read, 6, :latest}, 500
+    after
+      Process.delete(:ferricstore_waraft_apply_projection_disk_read_hook)
+    end
+  end
+
+  @tag :flow_replay_visibility
+  test "WARaft recovery hides future native-claim hot values", %{state: state, ets: ets} do
+    id = "replay-native-claim-future"
+    partition_key = "replay-native-claim-tenant"
+    key = Ferricstore.Flow.Keys.state_key(id, partition_key)
+    value = Ferricstore.Flow.encode_record(replay_flow_record(id, partition_key))
+
+    :ets.insert(
+      ets,
+      {key, value, 0, LFU.initial(), {:waraft_apply_projection, 7}, 0, byte_size(value)}
+    )
+
+    recovery_state = Map.put(state, :waraft_recovery_before_index, 7)
+
+    assert [nil] =
+             StateMachine.__flow_read_claim_hot_values_for_test__(
+               recovery_state,
+               [{id, 1.0}],
+               nil,
+               partition_key
+             )
+
+    assert [^value] =
+             StateMachine.__flow_read_claim_hot_values_for_test__(
+               state,
+               [{id, 1.0}],
+               nil,
+               partition_key
+             )
+  end
+
+  @tag :flow_replay_visibility
+  test "WARaft recovery cannot hibernate through an identical future hot locator", %{
+    state: state,
+    ets: ets
+  } do
+    id = "replay-hibernation-future-hot"
+    partition_key = "replay-hibernation-hot-tenant"
+    key = Ferricstore.Flow.Keys.state_key(id, partition_key)
+    record = replay_flow_record(id, partition_key)
+    value = Ferricstore.Flow.encode_record(record)
+
+    :ets.insert(
+      ets,
+      {key, value, 0, LFU.initial(), {:waraft_apply_projection, 7}, 0, byte_size(value)}
+    )
+
+    recovery_state = Map.put(state, :waraft_recovery_before_index, 7)
+
+    assert :skip =
+             StateMachine.__flow_hibernation_locator_from_hot_for_test__(
+               recovery_state,
+               key,
+               record,
+               value
+             )
+
+    assert {:ok, %Ferricstore.Flow.Locator{file_id: {:waraft_apply_projection, 7}}} =
+             StateMachine.__flow_hibernation_locator_from_hot_for_test__(
+               state,
+               key,
+               record,
+               value
+             )
+  end
+
+  @tag :flow_replay_visibility
+  test "WARaft recovery does not clean future hibernation metadata", %{state: state} do
+    id = "replay-future-hibernated-timeout"
+    partition_key = "replay-timeout-tenant"
+    state_key = Ferricstore.Flow.Keys.state_key(id, partition_key)
+    lmdb_path = Ferricstore.Flow.LMDB.path(state.shard_data_path)
+
+    record = %{
+      id: id,
+      type: "replay-timeout",
+      state: "queued",
+      partition_key: partition_key,
+      version: 1,
+      priority: 0,
+      state_enter_seq: 1,
+      created_at_ms: 1_000,
+      updated_at_ms: 1_000,
+      max_active_ms: 100,
+      next_run_at_ms: nil
+    }
+
+    locator =
+      Ferricstore.Flow.Locator.new!(
+        flow_id: id,
+        kind: :state,
+        version: 1,
+        raft_index: 7,
+        file_id: {:waraft_apply_projection, 7},
+        offset: 0,
+        value_size: 10,
+        frame_size: 32,
+        segment_generation: 0,
+        checksum: :binary.copy(<<1>>, 32)
+      )
+
+    park_key = Ferricstore.Flow.LMDB.cold_park_key_for_state_key(state_key)
+
+    park_blob =
+      Ferricstore.Flow.LMDB.encode_cold_park(locator,
+        due_at_ms: nil,
+        type: record.type,
+        state: record.state,
+        partition_key: partition_key,
+        state_key: state_key,
+        priority: 0
+      )
+
+    assert :ok =
+             Ferricstore.Flow.LMDB.write_batch(
+               lmdb_path,
+               [{:put, park_key, park_blob}] ++
+                 Ferricstore.Flow.LMDB.active_timeout_index_put_ops(state_key, record, 0)
+             )
+
+    Process.put(:sm_pending_lmdb_mirror_ops, [])
+    recovery_state = Map.put(state, :waraft_recovery_before_index, 7)
+
+    try do
+      assert :ok =
+               StateMachine.__flow_maybe_queue_hibernated_timeout_cleanup_for_test__(
+                 recovery_state,
+                 state_key,
+                 record
+               )
+
+      assert Process.get(:sm_pending_lmdb_mirror_ops) == []
+    after
+      Process.delete(:sm_pending_lmdb_mirror_ops)
+    end
+  end
+
+  @tag :flow_replay_visibility
+  test "WARaft recovery derives hibernation reverse metadata from the replayed record", %{
+    state: state
+  } do
+    id = "replay-hibernation-reverse"
+    partition_key = "replay-reverse-tenant"
+    state_key = Ferricstore.Flow.Keys.state_key(id, partition_key)
+    lmdb_path = Ferricstore.Flow.LMDB.path(state.shard_data_path)
+
+    current = %{
+      id: id,
+      type: "replay-reverse",
+      state: "queued",
+      partition_key: partition_key,
+      version: 1,
+      priority: 0,
+      state_enter_seq: 1,
+      created_at_ms: 1_000,
+      updated_at_ms: 1_000,
+      max_active_ms: nil,
+      next_run_at_ms: 20_000
+    }
+
+    future = %{current | state: "waiting", version: 2, state_enter_seq: 2, updated_at_ms: 2_000}
+
+    {_current_ops, current_reverse} =
+      Ferricstore.Flow.LMDB.active_index_put_ops_with_reverse(state_key, current, 0)
+
+    {_future_ops, future_reverse} =
+      Ferricstore.Flow.LMDB.active_index_put_ops_with_reverse(state_key, future, 0)
+
+    refute current_reverse == future_reverse
+
+    assert :ok =
+             Ferricstore.Flow.LMDB.write_batch(lmdb_path, [
+               {:put, Ferricstore.Flow.LMDB.active_by_state_key_key(state_key), future_reverse}
+             ])
+
+    assert {:ok, ^future_reverse} =
+             StateMachine.__flow_hibernation_active_index_reverse_for_test__(
+               state,
+               state_key,
+               current
+             )
+
+    recovery_state = Map.put(state, :waraft_recovery_before_index, 7)
+
+    assert {:ok, ^current_reverse} =
+             StateMachine.__flow_hibernation_active_index_reverse_for_test__(
+               recovery_state,
+               state_key,
+               current
+             )
+  end
+
+  @tag :terminal_expire_apply_guard
+  test "signaling a terminal schedule with a missing old retention marker does not crash apply",
+       %{
+         state: state,
+         ets: ets
+       } do
+    setup_flow_indexes(state)
+
+    id = "__ferricstore_schedule__:terminal-expire-guard"
+    type = "__ferricstore_schedule"
+    partition_key = "__ferricstore_schedule__:0"
+    state_key = Ferricstore.Flow.Keys.state_key(id, partition_key)
+
+    definition = %{
+      id: "terminal-expire-guard",
+      kind: :one_shot,
+      target: %{id: "terminal-expire-target", type: "terminal-expire-target"},
+      created_at_ms: 1_000,
+      next_run_at_ms: 2_000,
+      fire_count: 0
+    }
+
+    assert {_created_state, :ok} =
+             StateMachine.apply(
+               %{system_time: 1_000},
+               {:flow_create, state_key,
+                %{
+                  id: id,
+                  type: type,
+                  state: "active",
+                  partition_key: partition_key,
+                  schedule_metadata:
+                    Ferricstore.Flow.Schedule.Metadata.from_definition(definition),
+                  payload: definition,
+                  run_at_ms: definition.next_run_at_ms,
+                  now_ms: 1_000
+                }},
+               state
+             )
+
+    created = flow_record!(state, state_key)
+    malformed = %{created | state: "completed", terminal_retention_until_ms: nil}
+    encoded = Ferricstore.Flow.encode_record(malformed)
+
+    :ets.insert(
+      ets,
+      {state_key, encoded, 0, LFU.initial(), 0, 0, byte_size(encoded)}
+    )
+
+    assert {_signaled_state, :ok} =
+             StateMachine.apply(
+               %{system_time: 1_001},
+               {:flow_signal, state_key,
+                %{
+                  id: id,
+                  signal: "schedule_fired",
+                  partition_key: partition_key,
+                  now_ms: 1_001
+                }},
+               state
+             )
+
+    signaled = flow_record!(state, state_key)
+    assert signaled.version == created.version + 1
+    assert signaled.state == "completed"
+    assert is_integer(signaled.terminal_retention_until_ms)
+  end
+
+  use Ferricstore.Raft.StateMachineTest.Sections.CoalescesConsecutiveFlowNativeIndexOpsCrossingOrderingBarriers
+
+  use Ferricstore.Raft.StateMachineTest.Sections.FlowGovernanceReleaseOutbox
+  use Ferricstore.Raft.StateMachineTest.Sections.FlowGovernanceLimit
+  use Ferricstore.Raft.StateMachineTest.Sections.PromotedCompoundMemberIndex
+  use Ferricstore.Raft.StateMachineTest.Sections.PromotedSingleMutationDurability
+  use Ferricstore.Raft.StateMachineTest.Sections.CompoundPrefixDeleteExact
+  use Ferricstore.Raft.StateMachineTest.Sections.TransactionCompoundReadBudget
+  use Ferricstore.Raft.StateMachineTest.Sections.BatchValueLimits
+
+  defp safe_delete_ets(table) do
+    :ets.delete(table)
+  rescue
+    ArgumentError -> :ok
+  end
+
+  defp write_expired_lmdb_terminal!(state, opts) do
+    now_ms = Keyword.fetch!(opts, :now_ms)
+    id = "flow-lmdb-expired-keydir-gone"
+    type = "lmdb-expired-keydir-gone"
+    terminal_state = "completed"
+    partition_key = "tenant-lmdb-expired-keydir-gone"
+    state_key = Ferricstore.Flow.Keys.state_key(id, partition_key)
+    expire_at_ms = now_ms
+
+    record = %{
+      id: id,
+      type: type,
+      state: terminal_state,
+      partition_key: partition_key,
+      version: 1,
+      run_at_ms: now_ms,
+      due_at_ms: nil,
+      created_at_ms: now_ms,
+      updated_at_ms: now_ms,
+      terminal_retention_until_ms: expire_at_ms
+    }
+
+    state_index_key = Ferricstore.Flow.Keys.state_index_key(type, terminal_state, partition_key)
+    terminal_key = Ferricstore.Flow.LMDB.terminal_index_key(state_index_key, id, now_ms)
+    count_key = Ferricstore.Flow.LMDB.terminal_count_key(state_index_key)
+    expire_key = Ferricstore.Flow.LMDB.terminal_expire_key(expire_at_ms, terminal_key)
+
+    terminal_value =
+      Ferricstore.Flow.LMDB.encode_terminal_index_value(
+        id,
+        now_ms,
+        expire_at_ms,
+        state_key,
+        count_key
+      )
+
+    assert :ok =
+             Ferricstore.Flow.LMDB.write_batch(state.flow_lmdb_path, [
+               {:put, state_key,
+                Ferricstore.Flow.LMDB.encode_value(
+                  Ferricstore.Flow.encode_record(record),
+                  expire_at_ms
+                )},
+               {:put, terminal_key, terminal_value},
+               {:put, expire_key,
+                Ferricstore.Flow.LMDB.encode_terminal_expire_value(
+                  terminal_key,
+                  state_key,
+                  count_key
+                )}
+             ])
+
+    state_key
+  end
+
+  defp setup_flow_indexes(state) do
+    :ets.new(state.zset_score_index_name, [:ordered_set, :public, :named_table])
+    :ets.new(state.zset_score_lookup_name, [:set, :public, :named_table])
+
+    on_exit(fn ->
+      safe_delete_ets(state.zset_score_index_name)
+      safe_delete_ets(state.zset_score_lookup_name)
+    end)
+  end
+
+  defp replay_flow_record(id, partition_key) do
+    %{
+      id: id,
+      type: "replay-ordering",
+      state: "queued",
+      partition_key: partition_key,
+      version: 1,
+      priority: 0,
+      state_enter_seq: 1,
+      created_at_ms: 1_000,
+      updated_at_ms: 1_000,
+      next_run_at_ms: 2_000,
+      max_active_ms: nil
+    }
+  end
+
+  defp flow_record!(state, state_key) do
+    case :ets.lookup(state.ets, state_key) do
+      [{^state_key, value, _expire_at_ms, _lfu, _file_id, _offset, _value_size}]
+      when is_binary(value) ->
+        Ferricstore.Flow.decode_record(value)
+
+      [{^state_key, nil, _expire_at_ms, _lfu, file_id, offset, _value_size}] ->
+        path =
+          Path.join(
+            state.shard_data_path,
+            "#{String.pad_leading(Integer.to_string(file_id), 5, "0")}.log"
+          )
+
+        case NIF.v2_pread_at(path, offset) do
+          {:ok, value} when is_binary(value) -> Ferricstore.Flow.decode_record(value)
+          other -> flunk("expected cold Flow record at #{path}:#{offset}, got: #{inspect(other)}")
+        end
+
+      other ->
+        flunk("expected hot Flow state record for #{inspect(state_key)}, got: #{inspect(other)}")
+    end
+  end
+
+  defp flow_history_fields!(state, id, partition_key, event_id) do
+    history_key = Ferricstore.Flow.Keys.stream_entry_key(id, event_id, partition_key)
+
+    case :ets.lookup(state.ets, history_key) do
+      [
+        {^history_key, nil, _expire_at_ms, _lfu, {:flow_history, file_id}, offset, _value_size}
+      ] ->
+        assert {:ok, value} =
+                 Ferricstore.Flow.HistoryProjector.read_value(
+                   state.shard_data_path,
+                   {:flow_history, file_id},
+                   offset
+                 )
+
+        record = flow_record!(state, Ferricstore.Flow.Keys.state_key(id, partition_key))
+        Ferricstore.Flow.decode_history_fields(value, record)
+
+      [] ->
+        # Default hot-history retention can trim the keydir row immediately;
+        # the durable projection still has to be present in the history log.
+        record = flow_record!(state, Ferricstore.Flow.Keys.state_key(id, partition_key))
+
+        case Ferricstore.Flow.HistoryProjector.scan_event_value(
+               state.shard_data_path,
+               history_key
+             ) do
+          {:ok, value} ->
+            Ferricstore.Flow.decode_history_fields(value, record)
+
+          other ->
+            flunk(
+              "expected projected Flow history for #{inspect(history_key)}, got: #{inspect(other)}"
+            )
+        end
+
+      other ->
+        flunk(
+          "expected projected Flow history for #{inspect(history_key)}, got: #{inspect(other)}"
+        )
+    end
+  end
+
+  defp assert_flow_history_event!(state, id, partition_key, event_id, event) do
+    Ferricstore.Test.Eventually.assert_eventually(fn ->
+      fields = flow_history_fields!(state, id, partition_key, event_id)
+      assert flow_history_field(fields, "event") == event
+      assert flow_history_field(fields, "id") == id
+    end)
+  end
+
+  defp start_flow_history_projector!(state) do
+    {:ok, pid} =
+      Ferricstore.Flow.HistoryProjector.start_link(
+        shard_index: state.shard_index,
+        shard_data_path: state.shard_data_path,
+        instance_ctx: Map.get(state, :instance_ctx)
+      )
+
+    on_exit(fn ->
+      try do
+        if Process.alive?(pid), do: GenServer.stop(pid, :normal, 5_000)
+      rescue
+        _ -> :ok
+      catch
+        :exit, _ -> :ok
+      end
+    end)
+
+    :ok
+  end
+
+  defp flow_history_field([key, value | _rest], key), do: value
+  defp flow_history_field([_key, _value | rest], key), do: flow_history_field(rest, key)
+  defp flow_history_field([], _key), do: nil
+
+  defp flow_value!(state, value_key) do
+    case :ets.lookup(state.ets, value_key) do
+      [{^value_key, nil, _expire_at_ms, _lfu, file_id, offset, _value_size}] ->
+        flow_value_from_location!(state, value_key, file_id, offset)
+
+      other ->
+        flow_value_from_lmdb!(state, value_key, other)
+    end
+  end
+
+  defp flow_value_from_location!(state, _value_key, {:flow_history, _file_id} = file_id, offset) do
+    case Ferricstore.Flow.HistoryProjector.read_value(state.shard_data_path, file_id, offset) do
+      {:ok, value} when is_binary(value) ->
+        value
+
+      other ->
+        flunk(
+          "expected projected Flow value at #{inspect(file_id)}:#{offset}, got: #{inspect(other)}"
+        )
+    end
+  end
+
+  defp flow_value_from_location!(state, _value_key, file_id, offset)
+       when is_integer(file_id) and file_id >= 0 do
+    path =
+      Path.join(
+        state.shard_data_path,
+        "#{String.pad_leading(Integer.to_string(file_id), 5, "0")}.log"
+      )
+
+    case NIF.v2_pread_at(path, offset) do
+      {:ok, value} when is_binary(value) ->
+        value
+
+      other ->
+        flunk("expected cold Flow value at #{path}:#{offset}, got: #{inspect(other)}")
+    end
+  end
+
+  defp flow_value_from_lmdb!(state, value_key, original_lookup) do
+    path = Ferricstore.Flow.LMDB.path(state.shard_data_path)
+
+    case Ferricstore.Flow.LMDB.get(path, value_key) do
+      {:ok, blob} when is_binary(blob) ->
+        now_ms = System.system_time(:millisecond)
+
+        case Ferricstore.Flow.LMDB.decode_value_locator(blob, now_ms) do
+          {:ok, {file_id, offset, _value_size}} ->
+            flow_value_from_location!(state, value_key, file_id, offset)
+
+          :not_locator ->
+            case Ferricstore.Flow.LMDB.decode_value(blob, now_ms) do
+              {:ok, value} when is_binary(value) ->
+                value
+
+              other ->
+                flunk(
+                  "expected LMDB Flow value for #{inspect(value_key)}, got decoded #{inspect(other)}"
+                )
+            end
+
+          other ->
+            flunk(
+              "expected LMDB Flow value locator for #{inspect(value_key)}, got #{inspect(other)}"
+            )
+        end
+
+      other ->
+        flunk(
+          "expected cold or projected Flow value for #{inspect(value_key)}, got ETS #{inspect(original_lookup)} and LMDB #{inspect(other)}"
+        )
+    end
+  end
+
+  defp assert_flow_blob_value!(state, value_key, expected_payload) do
+    disk_value = flow_value!(state, value_key)
+    assert BlobRef.encoded_size?(byte_size(disk_value))
+
+    assert {:ok, materialized} =
+             Ferricstore.Store.BlobValue.maybe_materialize(
+               state.data_dir,
+               state.shard_index,
+               128,
+               disk_value
+             )
+
+    assert Ferricstore.Flow.decode_value(materialized) == expected_payload
+  end
+
+  defp restore_env(key, nil), do: Application.delete_env(:ferricstore, key)
+  defp restore_env(key, value), do: Application.put_env(:ferricstore, key, value)
+
+  use Ferricstore.Raft.StateMachineTest.Sections.FlowBlobSideChannelApply
+
+  use Ferricstore.Raft.StateMachineTest.Sections.FlowCommandTime
+
+  use Ferricstore.Raft.StateMachineTest.Sections.FlowSharedValueRefPersistence
+
+  use Ferricstore.Raft.StateMachineTest.Sections.FlowIndexRollback
+
+  use Ferricstore.Raft.StateMachineTest.Sections.StateMachineCompoundReads
+
+  use Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart1
+  use Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart2
+  use Ferricstore.Raft.StateMachineTest.Sections.Apply3PutKeyValueExpireAtMsPart3
+
+  use Ferricstore.Raft.StateMachineTest.Sections.Apply3SetKeyValueExpireAtMsOpts
+
+  use Ferricstore.Raft.StateMachineTest.Sections.Apply3DeleteKey
+
+  use Ferricstore.Raft.StateMachineTest.Sections.HandleAux5
+
+  use Ferricstore.Raft.StateMachineTest.Sections.ReleaseCursorLogCompaction
+
+  defp state_with_missing_active_file(state, opts \\ []) do
+    file_id = 9_000_000 + :erlang.unique_integer([:positive])
+    shard_index = Keyword.get(opts, :shard_index, 100_000 + :erlang.unique_integer([:positive]))
+
+    %{
+      state
+      | shard_index: shard_index,
+        active_file_id: file_id,
+        active_file_path: Path.join(state.shard_data_path, "#{file_id}.log")
+    }
+  end
+
+  defp init_state_for_release_cursor(ets, opts \\ []) do
+    shard_index = Keyword.get(opts, :shard_index, 0)
+    root = Path.join(System.tmp_dir!(), "sm_rc_#{System.unique_integer([:positive])}")
+    shard_path = Ferricstore.DataDir.shard_data_path(root, shard_index)
+    active_file_path = Path.join(shard_path, "00000.log")
+
+    File.mkdir_p!(shard_path)
+    File.touch!(active_file_path)
+    on_exit({:sm_release_cursor_root, root}, fn -> File.rm_rf!(root) end)
+
+    config =
+      %{
+        shard_index: shard_index,
+        shard_data_path: shard_path,
+        active_file_id: 0,
+        active_file_path: active_file_path,
+        ets: ets,
+        instance_ctx: release_cursor_instance_ctx(shard_index)
+      }
+      |> Map.merge(Map.new(opts))
+
+    StateMachine.init(config)
+  end
+
+  defp release_cursor_instance_ctx(shard_index, durable_index \\ 1_000_000, overrides \\ []) do
+    atomics_size = shard_index + 1
+    replay_safe_index = :atomics.new(atomics_size, signed: false)
+    flow_lmdb_replay_safe_index = :atomics.new(atomics_size, signed: false)
+    flow_history_projected_index = :atomics.new(atomics_size, signed: false)
+
+    :atomics.put(replay_safe_index, shard_index + 1, durable_index)
+    :atomics.put(flow_lmdb_replay_safe_index, shard_index + 1, durable_index)
+    :atomics.put(flow_history_projected_index, shard_index + 1, durable_index)
+
+    [
+      checkpoint_flags: :atomics.new(atomics_size, signed: false),
+      checkpoint_in_flight: :atomics.new(atomics_size, signed: false),
+      disk_pressure: :atomics.new(atomics_size, signed: false),
+      last_applied_index: :atomics.new(atomics_size, signed: false),
+      last_released_cursor_index: :atomics.new(atomics_size, signed: false),
+      replay_safe_index: replay_safe_index,
+      flow_lmdb_replay_safe_index: flow_lmdb_replay_safe_index,
+      flow_history_projected_index: flow_history_projected_index,
+      hot_cache_max_value_size: 65_536
+    ]
+    |> Keyword.merge(overrides)
+    |> Map.new()
+  end
+
+  defp set_opts(overrides) do
+    Map.merge(
+      %{expire_at_ms: 0, nx: false, xx: false, get: false, keepttl: false, has_expiry: false},
+      overrides
+    )
+  end
+
+  defp key_for_shard(ctx, prefix, shard_index) do
+    0..10_000
+    |> Enum.find_value(fn i ->
+      key = "#{prefix}:#{i}"
+      if Ferricstore.Store.Router.shard_for(ctx, key) == shard_index, do: key
+    end)
+  end
+
+  defp prob_test_path(dir, key, ext) do
+    Ferricstore.ProbFile.path(dir, key, ext)
+  end
+
+  defp apply_result_value({_state, {:applied_at, _now_ms, result}, _effects}), do: result
+  defp apply_result_value({_state, result, _effects}), do: result
+  defp apply_result_value({_state, result}), do: result
+
+  defp assert_keydir_unavailable_event(request) do
+    assert_receive {:sm_keydir_unavailable, [:ferricstore, :store, :shard_unavailable],
+                    %{count: 1},
+                    %{request: ^request, reason: :keydir_unavailable, source: :raft_apply}}
+  end
+
+  use Ferricstore.Raft.StateMachineTest.Sections.SpopRemovesTypeMarkerFinalSetMemberPopped
+
+  def relay_compound_put_append_telemetry(_event, measurements, metadata, test_pid) do
+    send(test_pid, {:compound_put_append, measurements, metadata})
+  end
+end

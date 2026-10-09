@@ -1,0 +1,133 @@
+defmodule Ferricstore.Flow.MutationAttrsTest do
+  use ExUnit.Case, async: true
+  @moduletag :flow
+
+  alias Ferricstore.Flow.MutationAttrs
+
+  test "create_attrs preserves default state, auto partition, and named value options" do
+    assert {:ok, attrs} =
+             MutationAttrs.create_attrs("flow-1",
+               type: "email",
+               values: ["order"],
+               value_refs: %{reservation: "ref-1"}
+             )
+
+    assert attrs.id == "flow-1"
+    assert attrs.type == "email"
+    assert attrs.state == "queued"
+    assert attrs.partition_key == Ferricstore.Flow.Keys.auto_partition_key("flow-1")
+    assert attrs.values == ["order"]
+    assert attrs.value_refs == %{reservation: "ref-1"}
+  end
+
+  test "create_attrs accepts infinity while validating compact query metadata" do
+    assert {:ok, attrs} =
+             MutationAttrs.create_attrs("flow-without-active-timeout",
+               type: "email",
+               max_active_ms: :infinity
+             )
+
+    assert attrs.max_active_ms == :infinity
+  end
+
+  test "schedule discovery metadata is accepted only through the internal schedule path" do
+    metadata = %{kind: :interval, target_type: "email"}
+
+    assert {:error, "ERR flow schedule metadata is reserved for internal use"} =
+             MutationAttrs.create_attrs("flow-1",
+               type: "email",
+               schedule_metadata: metadata
+             )
+
+    assert {:ok, attrs} =
+             MutationAttrs.create_attrs(
+               "__ferricstore_schedule__:daily",
+               Ferricstore.Flow.Internal.put(
+                 type: "__ferricstore_schedule",
+                 schedule_metadata: metadata
+               )
+             )
+
+    assert attrs.schedule_metadata == metadata
+
+    assert {:error, "ERR flow schedule metadata is reserved for internal use"} =
+             MutationAttrs.create_attrs(
+               "__ferricstore_schedule__:invalid",
+               Ferricstore.Flow.Internal.put(
+                 type: "__ferricstore_schedule",
+                 schedule_metadata: %{kind: :cron, target_type: "email"}
+               )
+             )
+  end
+
+  test "transition_attrs rejects direct transition into running" do
+    assert {:error, "ERR flow running state is only entered by FLOW.CLAIM_DUE"} =
+             MutationAttrs.transition_attrs("flow-1", "queued", "running",
+               fencing_token: 1,
+               partition_key: "p1"
+             )
+  end
+
+  test "create attrs rejects unleased running state before replicated mutation preparation" do
+    for opts <- [
+          [type: "email", state: "running"],
+          [type: "email", state: "running", worker: "worker", lease_ms: 30_000]
+        ] do
+      assert {:error, "ERR flow running state is only entered by FLOW.CLAIM_DUE"} =
+               MutationAttrs.create_attrs("flow-running", opts)
+    end
+  end
+
+  test "batch and spawned child creation share the unleased running rejection" do
+    error = {:error, "ERR flow running state is only entered by FLOW.CLAIM_DUE"}
+
+    children = [
+      %{id: "queued-child", type: "email", state: "queued"},
+      %{id: "running-child", type: "email", state: "running"}
+    ]
+
+    assert MutationAttrs.create_many_attrs(children, [], "partition") == error
+
+    assert MutationAttrs.spawn_children_attrs("parent", children,
+             partition_key: "partition",
+             group_id: "children",
+             exhaust_to: %{success: "completed", failure: "failed"},
+             fencing_token: 0
+           ) == error
+  end
+
+  test "create_attrs rejects timestamps that cannot be represented exactly by Flow indexes" do
+    above_exact_integer = 9_007_199_254_740_992
+
+    assert {:error, "ERR flow now_ms exceeds maximum 9007199254740991"} =
+             MutationAttrs.create_attrs("flow-1",
+               type: "email",
+               now_ms: above_exact_integer
+             )
+
+    assert {:error, "ERR flow run_at_ms exceeds maximum 9007199254740991"} =
+             MutationAttrs.create_attrs("flow-1",
+               type: "email",
+               now_ms: 1,
+               run_at_ms: above_exact_integer
+             )
+  end
+
+  test "lease mutations reject deadlines outside the exact Flow timestamp range" do
+    max_exact_integer = 9_007_199_254_740_991
+
+    assert {:error, "ERR flow lease_ms exceeds maximum 9007199254740991"} =
+             MutationAttrs.start_and_claim_attrs("flow-1", "email", "queued",
+               worker: "worker",
+               now_ms: 0,
+               lease_ms: max_exact_integer + 1
+             )
+
+    assert {:error, "ERR flow lease_ms deadline exceeds maximum 9007199254740991"} =
+             MutationAttrs.start_and_claim_attrs("flow-1", "email", "queued",
+               worker: "worker",
+               now_ms: max_exact_integer,
+               lease_ms: 1
+             )
+  end
+end

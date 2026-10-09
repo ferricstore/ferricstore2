@@ -1,0 +1,146 @@
+defmodule Ferricstore.IsolatedInstanceTest do
+  @moduledoc """
+  Tests proving that isolated instances provide true test isolation.
+  Each test gets its own FerricStore instance — no shared state.
+  """
+  use ExUnit.Case, async: false
+
+  alias Ferricstore.Test.IsolatedInstance
+
+  test "checkin releases each cached LMDB environment" do
+    assert {:ok, _released} = Ferricstore.Flow.LMDB.release_all()
+
+    unrelated_path =
+      Path.join(
+        System.tmp_dir!(),
+        "ferricstore_unrelated_lmdb_#{System.unique_integer([:positive])}"
+      )
+
+    on_exit(fn ->
+      Ferricstore.Flow.LMDB.release(unrelated_path, 30_000)
+      File.rm_rf!(unrelated_path)
+    end)
+
+    assert :ok = Ferricstore.Flow.LMDB.write_batch(unrelated_path, [{:put, "other", "value"}])
+
+    ctx = IsolatedInstance.checkout(shard_count: 1)
+
+    lmdb_path =
+      ctx.data_dir
+      |> Ferricstore.DataDir.shard_data_path(0)
+      |> Ferricstore.Flow.LMDB.path()
+
+    assert :ok = Ferricstore.Flow.LMDB.write_batch(lmdb_path, [{:put, "key", "value"}])
+    assert {:ok, "value"} = Ferricstore.Flow.LMDB.get(lmdb_path, "key")
+    assert :ok = IsolatedInstance.checkin(ctx)
+
+    File.mkdir_p!(lmdb_path)
+    on_exit(fn -> File.rm_rf!(ctx.data_dir) end)
+
+    assert {:ok, 0} = Ferricstore.Bitcask.NIF.lmdb_release(lmdb_path)
+    assert {:ok, 1} = Ferricstore.Bitcask.NIF.lmdb_release(unrelated_path)
+  end
+
+  test "checkin tolerates an instance data directory removed by a failure test" do
+    ctx = IsolatedInstance.checkout(shard_count: 1)
+    File.rm_rf!(ctx.data_dir)
+
+    assert :ok = IsolatedInstance.checkin(ctx)
+  end
+
+  describe "instance isolation" do
+    test "two instances don't see each other's keys" do
+      ctx_a = IsolatedInstance.checkout()
+      ctx_b = IsolatedInstance.checkout()
+
+      FerricStore.Impl.set(ctx_a, "shared_name", "from_a")
+      FerricStore.Impl.set(ctx_b, "shared_name", "from_b")
+
+      assert {:ok, "from_a"} = FerricStore.Impl.get(ctx_a, "shared_name")
+      assert {:ok, "from_b"} = FerricStore.Impl.get(ctx_b, "shared_name")
+
+      IsolatedInstance.checkin(ctx_a)
+      IsolatedInstance.checkin(ctx_b)
+    end
+
+    test "instance is empty on checkout" do
+      ctx = IsolatedInstance.checkout()
+
+      assert {:ok, nil} = FerricStore.Impl.get(ctx, "any_key")
+      assert {:ok, keys} = FerricStore.Impl.keys(ctx)
+      assert keys == []
+
+      IsolatedInstance.checkin(ctx)
+    end
+
+    test "checkin cleans up everything" do
+      ctx = IsolatedInstance.checkout()
+      name = ctx.name
+      data_dir = ctx.data_dir
+      flush_coordinator = Ferricstore.Flow.LMDBFlushCoordinator.name(name)
+
+      assert is_pid(Process.whereis(flush_coordinator))
+
+      FerricStore.Impl.set(ctx, "cleanup_test", "value")
+      IsolatedInstance.checkin(ctx)
+
+      # Persistent term should be cleaned up
+      assert_raise ArgumentError, fn ->
+        FerricStore.Instance.get(name)
+      end
+
+      # Data dir should be removed
+      refute File.exists?(data_dir)
+      refute Process.whereis(flush_coordinator)
+    end
+
+    test "hash operations in isolated instance" do
+      ctx = IsolatedInstance.checkout()
+
+      FerricStore.Impl.hset(ctx, "my_hash", %{"field1" => "val1", "field2" => "val2"})
+      assert {:ok, "val1"} = FerricStore.Impl.hget(ctx, "my_hash", "field1")
+      assert {:ok, map} = FerricStore.Impl.hgetall(ctx, "my_hash")
+      assert map == %{"field1" => "val1", "field2" => "val2"}
+
+      IsolatedInstance.checkin(ctx)
+    end
+
+    test "bloom filter in isolated instance" do
+      ctx = IsolatedInstance.checkout()
+
+      assert :ok = FerricStore.Impl.bf_reserve(ctx, "iso_bloom", 0.01, 100)
+      assert {:ok, 1} = FerricStore.Impl.bf_add(ctx, "iso_bloom", "hello")
+      assert {:ok, 1} = FerricStore.Impl.bf_exists(ctx, "iso_bloom", "hello")
+      assert {:ok, 0} = FerricStore.Impl.bf_exists(ctx, "iso_bloom", "missing")
+
+      IsolatedInstance.checkin(ctx)
+    end
+
+    @tag timeout: 120_000
+    test "concurrent isolated instances do not interfere" do
+      # Keep the module non-async so CI resource pressure from unrelated test
+      # modules does not starve the isolated instance supervisors. The test
+      # still proves concurrent isolated instances by running multiple
+      # single-shard instances at the same time.
+      tasks =
+        for i <- 1..5 do
+          Task.async(fn ->
+            ctx = IsolatedInstance.checkout(shard_count: 1)
+
+            try do
+              FerricStore.Impl.set(ctx, "key", "value_#{i}")
+              Process.sleep(10)
+              {:ok, val} = FerricStore.Impl.get(ctx, "key")
+              assert val == "value_#{i}"
+              :ok
+            after
+              IsolatedInstance.checkin(ctx)
+            end
+          end)
+        end
+
+      results = Task.await_many(tasks, 120_000)
+      assert Enum.all?(results, &(&1 == :ok))
+    end
+  end
+end

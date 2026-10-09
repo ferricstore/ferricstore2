@@ -1,0 +1,1288 @@
+defmodule Ferricstore.Raft.WARaftBackendTest.Sections.WaraftStorageRecoveryReusesSegmentLocationsFlowReplay do
+  @moduledoc false
+
+  defmacro __using__(_opts) do
+    quote do
+      import ExUnit.CaptureLog
+
+      alias Ferricstore.ErrorReasons
+      alias Ferricstore.Raft.Cluster, as: RaftCluster
+      alias Ferricstore.Raft.WARaftBackend
+      alias Ferricstore.Raft.WARaftStorage
+      alias Ferricstore.Store.{BlobRef, BlobStore}
+      alias Ferricstore.Store.CompoundKey
+      alias Ferricstore.Store.Router
+      alias Ferricstore.Raft.WARaftBackendTest.LabelCounter
+      alias Ferricstore.Raft.WARaftBackendTest.OversizedLabel
+
+      @tag :flow_replay_segment_locations
+      test "WARaft storage recovery rebuilds Flow apply projection locations from WAL", %{
+        root: root,
+        ctx: ctx
+      } do
+        {id, partition_key, key} = flow_key_for_shard(ctx, 0, "storage-flow-fast-forward")
+
+        attrs = %{
+          id: id,
+          type: "storage-flow-fast-forward",
+          state: "queued",
+          partition_key: partition_key,
+          run_at_ms: 1,
+          now_ms: 1,
+          payload: "payload-v1",
+          policy_reference_captured: true
+        }
+
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert :ok = WARaftBackend.write(0, {:flow_create, key, attrs})
+
+        assert {:ok, {:raft_log_pos, applied_index, _term} = applied_position} =
+                 WARaftBackend.storage_position(0)
+
+        assert applied_index > 1
+        assert :ok = WARaftBackend.stop()
+
+        storage_root = waraft_storage_root(root, 0)
+        metadata = waraft_latest_storage_metadata(root, 0)
+        File.rm_rf!(Path.join(storage_root, "segment_projection_log"))
+
+        write_waraft_storage_metadata!(
+          root,
+          0,
+          Map.put(metadata, :position, {:raft_log_pos, 1, 1})
+        )
+
+        FerricStore.Instance.cleanup(ctx.name)
+        restarted_ctx = build_ctx(root)
+        context_key = {{WARaftBackend, :context}, :ferricstore_waraft_backend}
+        :persistent_term.put(context_key, restarted_ctx)
+
+        try do
+          handle =
+            WARaftStorage.open(%{table: :ferricstore_waraft_backend, partition: 1}, storage_root)
+
+          try do
+            assert [
+                     {^key, _value, _expire_at_ms, _lfu,
+                      {:waraft_apply_projection, ^applied_index}, _offset, _value_size}
+                   ] = :ets.lookup(elem(restarted_ctx.keydir_refs, 0), key)
+
+            assert {:ok, {_ordinal, _offset, frame_size}} =
+                     Ferricstore.Raft.WARaftSegmentReader.physical_location(
+                       restarted_ctx,
+                       0,
+                       {:waraft_apply_projection, applied_index}
+                     )
+
+            assert frame_size >= 8
+
+            assert {:ok, recovered_value} =
+                     Ferricstore.Raft.WARaftSegmentReader.read_value_from_location(
+                       restarted_ctx,
+                       0,
+                       {:waraft_apply_projection, applied_index},
+                       key
+                     )
+
+            assert %{id: ^id, partition_key: ^partition_key} =
+                     Ferricstore.Flow.decode_record(recovered_value)
+
+            assert WARaftStorage.position(handle) == applied_position
+          after
+            WARaftStorage.close(handle)
+          end
+        after
+          :persistent_term.erase(context_key)
+          FerricStore.Instance.cleanup(restarted_ctx.name)
+        end
+      end
+
+      @tag :flow_replay_segment_locations
+      test "WARaft recovery rebuilds a stale same-index QueryRow without future-state hydration",
+           %{
+             root: root,
+             ctx: ctx
+           } do
+        {id, partition_key, key} = flow_key_for_shard(ctx, 0, "storage-flow-stale-query-row")
+
+        attrs = %{
+          id: id,
+          type: "storage-flow-stale-query-row",
+          state: "queued",
+          partition_key: partition_key,
+          run_at_ms: 1,
+          now_ms: 1,
+          payload: "payload-v1",
+          policy_reference_captured: true
+        }
+
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert :ok = WARaftBackend.write(0, {:flow_create, key, attrs})
+
+        assert {:ok, {:raft_log_pos, created_index, _term}} =
+                 WARaftBackend.storage_position(0)
+
+        assert :ok =
+                 WARaftBackend.write(
+                   0,
+                   {:flow_transition, key,
+                    %{
+                      id: id,
+                      from_state: "queued",
+                      to_state: "process",
+                      fencing_token: 0,
+                      partition_key: partition_key,
+                      now_ms: 2,
+                      policy_reference_captured: true
+                    }}
+                 )
+
+        assert {:ok, {:raft_log_pos, applied_index, _term} = applied_position} =
+                 WARaftBackend.storage_position(0)
+
+        assert applied_index > created_index
+        assert :ok = WARaftBackend.stop()
+
+        lmdb_path =
+          root
+          |> Ferricstore.DataDir.shard_data_path(0)
+          |> Ferricstore.Flow.LMDB.path()
+
+        assert {:ok, current_encoded} =
+                 Ferricstore.Raft.WARaftSegmentReader.read_value_from_location_including_expired(
+                   ctx,
+                   0,
+                   {:waraft_apply_projection, applied_index},
+                   key
+                 )
+
+        current_record = Ferricstore.Flow.decode_record(current_encoded)
+
+        assert {:ok, {current_ordinal, current_offset, current_frame_size}} =
+                 Ferricstore.Raft.WARaftSegmentReader.physical_location(
+                   ctx,
+                   0,
+                   {:waraft_apply_projection, applied_index}
+                 )
+
+        current_locator =
+          Ferricstore.Flow.Locator.new!(
+            flow_id: id,
+            kind: :state,
+            version: current_record.version,
+            raft_index: applied_index,
+            file_id: {:waraft_apply_projection, applied_index},
+            segment_generation: current_ordinal,
+            offset: current_offset,
+            frame_size: current_frame_size,
+            value_size: byte_size(current_encoded),
+            checksum: :crypto.hash(:sha256, current_encoded),
+            expire_at_ms: Map.get(current_record, :terminal_retention_until_ms)
+          )
+
+        assert {:ok, encoded_query_row} =
+                 Ferricstore.Flow.Query.QueryRowCodec.encode(
+                   key,
+                   current_record,
+                   current_locator,
+                   0
+                 )
+
+        stale_record = %{current_record | state: "waiting"}
+        stale_encoded = Ferricstore.Flow.encode_record(stale_record)
+        assert byte_size(stale_encoded) == byte_size(current_encoded)
+
+        assert :ok =
+                 Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(
+                   root,
+                   0,
+                   applied_index,
+                   [{key, stale_encoded, 0}]
+                 )
+
+        assert {:ok, 1} =
+                 Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+        assert {:ok, {stale_ordinal, stale_offset, stale_frame_size}} =
+                 Ferricstore.Raft.WARaftSegmentReader.physical_location(
+                   ctx,
+                   0,
+                   current_locator.file_id
+                 )
+
+        assert :ok =
+                 Ferricstore.Raft.WARaftSegmentReader.put_apply_projection(
+                   root,
+                   0,
+                   applied_index,
+                   [{key, current_encoded, 0}]
+                 )
+
+        assert {:ok, 1} =
+                 Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+        stale_locator = %{
+          current_locator
+          | segment_generation: stale_ordinal,
+            offset: stale_offset,
+            frame_size: stale_frame_size
+        }
+
+        assert {:ok, stale_query_row} =
+                 Ferricstore.Flow.Query.QueryRowCodec.relocate(
+                   encoded_query_row,
+                   key,
+                   current_locator,
+                   stale_locator
+                 )
+
+        assert :ok = Ferricstore.Flow.LMDB.write_batch(lmdb_path, [{:put, key, stale_query_row}])
+
+        assert {:error, :hydrated_record_identity_mismatch} =
+                 Ferricstore.Flow.RecordHydrator.read_many(
+                   ctx,
+                   0,
+                   [{key, stale_locator}],
+                   include_expired: true,
+                   max_bytes: 1_000_000
+                 )
+
+        storage_root = waraft_storage_root(root, 0)
+        File.rm_rf!(Path.join(storage_root, "segment_projection_log"))
+        metadata = waraft_latest_storage_metadata(root, 0)
+
+        write_waraft_storage_metadata!(
+          root,
+          0,
+          Map.put(metadata, :position, {:raft_log_pos, 1, 1})
+        )
+
+        FerricStore.Instance.cleanup(ctx.name)
+        restarted_ctx = build_ctx(root)
+        context_key = {{WARaftBackend, :context}, :ferricstore_waraft_backend}
+        :persistent_term.put(context_key, restarted_ctx)
+        handler_id = "flow-query-locator-repair-#{System.unique_integer([:positive])}"
+
+        :telemetry.attach(
+          handler_id,
+          [:ferricstore, :flow, :query, :locator_repair],
+          fn event, measurements, metadata, test_pid ->
+            send(test_pid, {:flow_query_locator_repair, event, measurements, metadata})
+          end,
+          self()
+        )
+
+        try do
+          handle =
+            WARaftStorage.open(
+              %{table: :ferricstore_waraft_backend, partition: 1},
+              storage_root
+            )
+
+          try do
+            assert WARaftStorage.position(handle) == applied_position
+
+            refute_receive {:flow_query_locator_repair,
+                            [:ferricstore, :flow, :query, :locator_repair], _measurements,
+                            %{shard_index: 0}},
+                           100
+
+            assert {:ok, repaired_query_row} = Ferricstore.Flow.LMDB.get(lmdb_path, key)
+
+            assert {:ok, %{locator: repaired_locator}} =
+                     Ferricstore.Flow.Query.QueryRowCodec.decode(repaired_query_row, key)
+
+            refute Ferricstore.Flow.Locator.same_physical_record?(
+                     stale_locator,
+                     repaired_locator
+                   )
+
+            assert {:ok, [^current_encoded]} =
+                     Ferricstore.Flow.RecordHydrator.read_encoded_many(
+                       restarted_ctx,
+                       0,
+                       [{key, repaired_locator}],
+                       include_expired: true,
+                       max_bytes: 1_000_000
+                     )
+          after
+            WARaftStorage.close(handle)
+          end
+        after
+          :telemetry.detach(handler_id)
+          :persistent_term.erase(context_key)
+          FerricStore.Instance.cleanup(restarted_ctx.name)
+        end
+      end
+
+      @tag :flow_replay_segment_locations
+      test "WARaft recovery ignores an expired QueryRow written after the replayed command", %{
+        root: root,
+        ctx: ctx
+      } do
+        {id, partition_key, key} = flow_key_for_shard(ctx, 0, "storage-flow-future-query-row")
+        wall_now_ms = System.system_time(:millisecond)
+        created_at_ms = wall_now_ms - 10_000
+        cancelled_at_ms = created_at_ms + 1
+
+        create_attrs = %{
+          id: id,
+          type: "storage-flow-future-query-row",
+          state: "recorded",
+          partition_key: partition_key,
+          idempotent: true,
+          run_at_ms: created_at_ms,
+          now_ms: created_at_ms,
+          policy_reference_captured: true
+        }
+
+        cancel_attrs = %{
+          id: id,
+          partition_key: partition_key,
+          fencing_token: 0,
+          expected_version: nil,
+          expect_state: nil,
+          ttl_ms: 1,
+          now_ms: cancelled_at_ms,
+          policy_reference_captured: true
+        }
+
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+        assert :ok =
+                 WARaftBackend.write(
+                   0,
+                   {{:flow_create, key, create_attrs},
+                    %{hlc_ts: {created_at_ms, 0}, wall_time_ms: created_at_ms}}
+                 )
+
+        assert {:ok, {:raft_log_pos, created_index, _term}} =
+                 WARaftBackend.storage_position(0)
+
+        assert :ok =
+                 WARaftBackend.write(
+                   0,
+                   {{:flow_cancel, key, cancel_attrs},
+                    %{hlc_ts: {cancelled_at_ms, 0}, wall_time_ms: cancelled_at_ms}}
+                 )
+
+        assert {:ok, {:raft_log_pos, cancelled_index, _term} = applied_position} =
+                 WARaftBackend.storage_position(0)
+
+        assert cancelled_index > created_index
+
+        assert {:ok, final_encoded} =
+                 Ferricstore.Raft.WARaftSegmentReader.read_value_from_location_including_expired(
+                   ctx,
+                   0,
+                   {:waraft_apply_projection, cancelled_index},
+                   key
+                 )
+
+        final_record = Ferricstore.Flow.decode_record(final_encoded)
+        expire_at_ms = Map.fetch!(final_record, :terminal_retention_until_ms)
+        assert expire_at_ms < wall_now_ms
+
+        assert {:ok, spilled_count} =
+                 Ferricstore.Raft.WARaftSegmentReader.spill_apply_projection_cache(root, 0)
+
+        assert spilled_count > 0
+
+        assert {:ok, {ordinal, offset, frame_size}} =
+                 Ferricstore.Raft.WARaftSegmentReader.physical_location(
+                   ctx,
+                   0,
+                   {:waraft_apply_projection, cancelled_index}
+                 )
+
+        locator =
+          Ferricstore.Flow.Locator.new!(
+            flow_id: id,
+            kind: :state,
+            version: final_record.version,
+            raft_index: cancelled_index,
+            file_id: {:waraft_apply_projection, cancelled_index},
+            segment_generation: ordinal,
+            offset: offset,
+            frame_size: frame_size,
+            value_size: byte_size(final_encoded),
+            checksum: :crypto.hash(:sha256, final_encoded),
+            expire_at_ms: expire_at_ms
+          )
+
+        assert {:ok, encoded_query_row} =
+                 Ferricstore.Flow.Query.QueryRowCodec.encode(
+                   key,
+                   final_record,
+                   locator,
+                   expire_at_ms
+                 )
+
+        assert :ok = WARaftBackend.stop()
+
+        lmdb_path =
+          root
+          |> Ferricstore.DataDir.shard_data_path(0)
+          |> Ferricstore.Flow.LMDB.path()
+
+        assert :ok =
+                 Ferricstore.Flow.LMDB.write_batch(lmdb_path, [{:put, key, encoded_query_row}])
+
+        storage_root = waraft_storage_root(root, 0)
+        File.rm_rf!(Path.join(storage_root, "segment_projection_log"))
+        File.rm_rf!(Path.join(storage_root, "apply_projection_log"))
+        metadata = waraft_latest_storage_metadata(root, 0)
+
+        write_waraft_storage_metadata!(
+          root,
+          0,
+          Map.put(metadata, :position, {:raft_log_pos, 1, 1})
+        )
+
+        FerricStore.Instance.cleanup(ctx.name)
+        restarted_ctx = build_ctx(root)
+        context_key = {{WARaftBackend, :context}, :ferricstore_waraft_backend}
+        :persistent_term.put(context_key, restarted_ctx)
+
+        try do
+          handle =
+            WARaftStorage.open(
+              %{table: :ferricstore_waraft_backend, partition: 1},
+              storage_root
+            )
+
+          try do
+            assert WARaftStorage.position(handle) == applied_position
+
+            assert [recovered_row] = :ets.lookup(elem(restarted_ctx.keydir_refs, 0), key)
+            assert elem(recovered_row, 0) == key
+            recovered_encoded = elem(recovered_row, 1)
+
+            assert %{state: "cancelled", id: ^id, terminal_retention_until_ms: ^expire_at_ms} =
+                     Ferricstore.Flow.decode_record(recovered_encoded)
+          after
+            WARaftStorage.close(handle)
+          end
+        after
+          :persistent_term.erase(context_key)
+          FerricStore.Instance.cleanup(restarted_ctx.name)
+        end
+      end
+
+      test "WARaft storage emits startup phase telemetry", %{ctx: ctx} do
+        parent = self()
+        handler_id = "waraft-storage-startup-phase-#{System.unique_integer([:positive])}"
+
+        :telemetry.attach(
+          handler_id,
+          [:ferricstore, :waraft, :storage, :startup_phase],
+          &__MODULE__.handle_storage_startup_phase_telemetry/4,
+          parent
+        )
+
+        try do
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+          assert_receive {:waraft_storage_startup_phase,
+                          [:ferricstore, :waraft, :storage, :startup_phase],
+                          %{duration_us: duration_us}, %{phase: :read_metadata, shard_index: 0}},
+                         1_000
+
+          assert is_integer(duration_us)
+          assert duration_us >= 0
+
+          assert_receive {:waraft_storage_startup_phase,
+                          [:ferricstore, :waraft, :storage, :startup_phase],
+                          %{duration_us: build_us}, %{phase: :build_state, shard_index: 0}},
+                         1_000
+
+          assert is_integer(build_us)
+          assert build_us >= 0
+        after
+          :telemetry.detach(handler_id)
+        end
+      end
+
+      test "segment-keydir storage persists replay cursor on hot write interval by default",
+           %{root: root, ctx: ctx} do
+        parent = self()
+        previous_mode = Application.get_env(:ferricstore, :waraft_storage_apply_mode)
+        previous_every = Application.get_env(:ferricstore, :waraft_storage_metadata_persist_every)
+
+        previous_hook =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_apply_mode, :segment_keydir)
+          Application.delete_env(:ferricstore, :waraft_storage_metadata_persist_every)
+
+          Application.put_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook, fn path ->
+            send(parent, {:storage_metadata_fsync, path})
+            :ok
+          end)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          drain_storage_metadata_fsyncs()
+
+          for index <- 1..1_100 do
+            assert :ok =
+                     WARaftBackend.write(0, {:put, "segment-metadata-default:#{index}", "v", 0})
+          end
+
+          assert_receive {:storage_metadata_fsync, path}, 1_000
+          assert String.ends_with?(path, "ferricstore_storage.term.journal")
+
+          assert %{position: {:raft_log_pos, persisted_index, _term}} =
+                   waraft_latest_storage_metadata(root, 0)
+
+          assert persisted_index >= 1_024
+        after
+          restore_env(:waraft_storage_apply_mode, previous_mode)
+          restore_env(:waraft_storage_metadata_persist_every, previous_every)
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_hook)
+        end
+      end
+
+      test "segment-native WARaft apply bypasses standalone Bitcask fsync hook", %{ctx: ctx} do
+        parent = self()
+        previous_hook = Application.get_env(:ferricstore, :standalone_durability_hook)
+
+        previous_metadata_hook =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook)
+
+        try do
+          Application.put_env(:ferricstore, :standalone_durability_hook, fn _file_path, batch ->
+            send(parent, {:unexpected_standalone_sync, batch})
+            {:error, :standalone_sync_used}
+          end)
+
+          Application.put_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook, fn path ->
+            send(parent, {:storage_metadata_fsync, path})
+            :ok
+          end)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          drain_storage_metadata_fsyncs()
+
+          assert :ok = WARaftBackend.write(0, {:put, "nosync-apply:k", "v", 0})
+          assert "v" == Router.get(ctx, "nosync-apply:k")
+          refute_receive {:unexpected_standalone_sync, _batch}, 100
+          refute_receive {:storage_metadata_fsync, _path}, 100
+        after
+          restore_env(:standalone_durability_hook, previous_hook)
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_metadata_hook)
+        end
+      end
+
+      test "segment-native WARaft close preserves values without separate Bitcask payload fsync",
+           %{root: root, ctx: ctx} do
+        parent = self()
+        previous_hook = Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook, fn path ->
+            send(parent, {:waraft_payload_fsync, path})
+            :ok
+          end)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          assert :ok = WARaftBackend.write(0, {:put, "nosync-close:k", "v", 0})
+          assert "v" == Router.get(ctx, "nosync-close:k")
+
+          assert :ok = WARaftBackend.stop()
+          refute_receive {:waraft_payload_fsync, _path}, 100
+
+          FerricStore.Instance.cleanup(ctx.name)
+          restarted_ctx = build_ctx(root)
+
+          assert :ok =
+                   WARaftBackend.start(restarted_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log
+                   )
+
+          assert_eventually(fn -> Router.get(restarted_ctx, "nosync-close:k") end, "v")
+        after
+          restore_env(:waraft_bitcask_payload_fsync_file_hook, previous_hook)
+        end
+      end
+
+      test "segment-native WARaft metadata advances from WAL position without payload fsync frontier",
+           %{root: root, ctx: ctx} do
+        parent = self()
+
+        previous_payload_hook =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook)
+
+        previous_metadata_hook =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook, fn path ->
+            send(parent, {:waraft_payload_fsync, path})
+            :ok
+          end)
+
+          Application.put_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook, fn path ->
+            send(parent, {:storage_metadata_fsync, path})
+            :ok
+          end)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          drain_storage_metadata_fsyncs()
+
+          assert :ok = WARaftBackend.write(0, {:put, "nosync-frontier:k1", "v1", 0})
+          refute_receive {:waraft_payload_fsync, _path}, 100
+          refute_receive {:storage_metadata_fsync, _path}, 100
+
+          assert :ok = WARaftBackend.write(0, {:put, "nosync-frontier:k2", "v2", 0})
+          refute_receive {:waraft_payload_fsync, _path}, 100
+          refute_receive {:storage_metadata_fsync, _path}, 100
+
+          assert :ok = WARaftBackend.stop()
+          assert_receive_storage_metadata_fsync()
+
+          assert %{position: {:raft_log_pos, durable_index, _term}} =
+                   waraft_latest_storage_metadata(root, 0)
+
+          assert durable_index >= 4
+          FerricStore.Instance.cleanup(ctx.name)
+          restarted_ctx = build_ctx(root)
+
+          assert :ok =
+                   WARaftBackend.start(restarted_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log
+                   )
+
+          assert_eventually(fn -> Router.get(restarted_ctx, "nosync-frontier:k1") end, "v1")
+          assert_eventually(fn -> Router.get(restarted_ctx, "nosync-frontier:k2") end, "v2")
+        after
+          restore_env(:waraft_bitcask_payload_fsync_file_hook, previous_payload_hook)
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_metadata_hook)
+        end
+      end
+
+      test "segment-native WARaft status reports WAL-backed durable position", %{ctx: ctx} do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert {:ok, pre_write_position} = WARaftBackend.storage_position(0)
+
+        assert :ok = WARaftBackend.write(0, {:put, "nosync-status:k", "v", 0})
+        assert {:ok, post_write_position} = WARaftBackend.storage_position(0)
+        assert post_write_position != pre_write_position
+
+        status = waraft_storage_status(0)
+
+        assert Keyword.fetch!(status, :applied_position) == post_write_position
+        assert Keyword.fetch!(status, :durable_position) == post_write_position
+        assert Keyword.fetch!(status, :payload_dirty?) == false
+      end
+
+      test "segment-native WARaft config metadata persists without separate Bitcask payload fsync",
+           %{ctx: ctx} do
+        parent = self()
+
+        previous_payload_hook =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook)
+
+        previous_metadata_hook =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook, fn path ->
+            send(parent, {:waraft_payload_fsync, path})
+            :ok
+          end)
+
+          Application.put_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook, fn path ->
+            send(parent, {:storage_metadata_fsync, path})
+            :ok
+          end)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          drain_storage_metadata_fsyncs()
+
+          assert :ok = WARaftBackend.write(0, {:put, "nosync-config:k", "v", 0})
+          refute_receive {:waraft_payload_fsync, _path}, 100
+          refute_receive {:storage_metadata_fsync, _path}, 100
+
+          assert {:ok, {:raft_log_pos, _index, _term}} =
+                   WARaftBackend.adjust_membership(0, :add_participant, :config_payload@node)
+
+          refute_receive {:waraft_payload_fsync, _path}, 100
+          assert_receive {:storage_metadata_fsync, metadata_path}, 1_000
+          assert String.contains?(metadata_path, "ferricstore_storage.term")
+
+          status = waraft_storage_status(0)
+          assert Keyword.fetch!(status, :payload_dirty?) == false
+        after
+          restore_env(:waraft_bitcask_payload_fsync_file_hook, previous_payload_hook)
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_metadata_hook)
+        end
+      end
+
+      test "segment-native WARaft deterministic no-ops do not dirty payload",
+           %{ctx: ctx} do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert :ok = WARaftBackend.write(0, {:put, "nosync-wrongtype:k", "v", 0})
+        assert :ok = WARaftBackend.write(0, {:put, "nosync-wrongtype:flush", "v", 0})
+        assert Keyword.fetch!(waraft_storage_status(0), :payload_dirty?) == false
+
+        assert {:error, wrongtype} =
+                 Ferricstore.Commands.Hash.handle_ast(
+                   {:hset, ["nosync-wrongtype:k", "field", "value"]},
+                   ctx
+                 )
+
+        assert wrongtype =~ "WRONGTYPE"
+        assert Keyword.fetch!(waraft_storage_status(0), :payload_dirty?) == false
+        assert "v" == Router.get(ctx, "nosync-wrongtype:k")
+
+        assert 0 = WARaftBackend.write(0, {:cas, "nosync-wrongtype:k", "not-v", "new", 0})
+        assert Keyword.fetch!(waraft_storage_status(0), :payload_dirty?) == false
+
+        assert is_nil(
+                 WARaftBackend.write(0, {:set, "nosync-wrongtype:k", "nx-skip", 0, %{nx: true}})
+               )
+
+        assert Keyword.fetch!(waraft_storage_status(0), :payload_dirty?) == false
+
+        assert is_nil(
+                 WARaftBackend.write(
+                   0,
+                   {:set, "nosync-wrongtype:missing", "xx-skip", 0,
+                    %{
+                      xx: true
+                    }}
+                 )
+               )
+
+        assert Keyword.fetch!(waraft_storage_status(0), :payload_dirty?) == false
+
+        encoded_ref = BlobRef.encode!(BlobRef.from_segment("blob-ref-skip", 0, 0))
+
+        assert is_nil(
+                 WARaftBackend.write(
+                   0,
+                   {:set_blob_ref, "nosync-wrongtype:blob-missing", encoded_ref, 0, %{xx: true}}
+                 )
+               )
+
+        assert Keyword.fetch!(waraft_storage_status(0), :payload_dirty?) == false
+      end
+
+      test "WARaft snapshot exports segment-projected payload without source Bitcask fsync",
+           %{root: root, ctx: ctx} do
+        parent = self()
+
+        previous_payload_hook =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook)
+
+        previous_snapshot_hook =
+          Application.get_env(:ferricstore, :waraft_snapshot_fsync_file_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_file_hook, fn path ->
+            send(parent, {:source_payload_fsync, path})
+            :ok
+          end)
+
+          Application.put_env(:ferricstore, :waraft_snapshot_fsync_file_hook, fn path ->
+            send(parent, {:snapshot_payload_fsync, path})
+            :ok
+          end)
+
+          assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+          assert :ok = WARaftBackend.write(0, {:put, "nosync-snapshot:k", "v", 0})
+          assert Keyword.fetch!(waraft_storage_status(0), :payload_dirty?) == false
+
+          assert {:ok, {:raft_log_pos, index, term} = position} = WARaftBackend.create_snapshot(0)
+
+          snapshot_path =
+            Path.join([
+              root,
+              "waraft",
+              "ferricstore_waraft_backend.1",
+              "snapshot.#{index}.#{term}"
+            ])
+
+          refute_receive {:source_payload_fsync, _path}, 100
+
+          metadata =
+            Path.join(snapshot_path, "ferricstore_snapshot.term")
+            |> File.read!()
+            |> :erlang.binary_to_term([:safe])
+
+          assert %{segment_projection: %{format: :segment_log, count: count}} = metadata
+          assert count > 0
+
+          assert :ok = WARaftBackend.stop()
+          FerricStore.Instance.cleanup(ctx.name)
+
+          target_root = Path.join(root, "nosync-snapshot-target")
+          File.mkdir_p!(target_root)
+          target_ctx = build_ctx(target_root)
+
+          assert :ok =
+                   WARaftBackend.start(target_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log,
+                     bootstrap: false
+                   )
+
+          assert :ok = WARaftBackend.install_snapshot(0, snapshot_path, position)
+          assert_eventually(fn -> Router.get(target_ctx, "nosync-snapshot:k") end, "v")
+          FerricStore.Instance.cleanup(target_ctx.name)
+        after
+          restore_env(:waraft_bitcask_payload_fsync_file_hook, previous_payload_hook)
+          restore_env(:waraft_snapshot_fsync_file_hook, previous_snapshot_hook)
+        end
+      end
+
+      test "storage metadata fsync failure does not advance replay position", %{
+        root: root,
+        ctx: ctx
+      } do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert {:ok, pre_write_position} = WARaftBackend.storage_position(0)
+
+        previous_hook =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook)
+
+        previous_every = Application.get_env(:ferricstore, :waraft_storage_metadata_persist_every)
+
+        previous_payload_every =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_every)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_metadata_persist_every, 1)
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_every, 1)
+
+          Application.put_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook, fn _path ->
+            {:error, :forced_metadata_fsync_failure}
+          end)
+
+          assert Ferricstore.ErrorReasons.write_timeout_unknown() ==
+                   WARaftBackend.write(0, {:put, "metadata-fsync-fail:k", "v", 0})
+
+          assert {:ok, ^pre_write_position} = WARaftBackend.storage_position(0)
+
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_hook)
+
+          assert Ferricstore.ErrorReasons.write_timeout_unknown() ==
+                   WARaftBackend.write(0, {:put, "metadata-fsync-fail:after", "v2", 0})
+
+          assert {:ok, ^pre_write_position} = WARaftBackend.storage_position(0)
+
+          assert :ok = WARaftBackend.stop()
+          FerricStore.Instance.cleanup(ctx.name)
+
+          restarted_ctx = build_ctx(root)
+
+          assert :ok =
+                   WARaftBackend.start(restarted_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log
+                   )
+
+          assert_eventually(fn -> Router.get(restarted_ctx, "metadata-fsync-fail:k") end, "v")
+        after
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_hook)
+          restore_env(:waraft_storage_metadata_persist_every, previous_every)
+          restore_env(:waraft_bitcask_payload_fsync_every, previous_payload_every)
+        end
+      end
+
+      test "storage metadata directory fsync failure does not advance replay position", %{
+        ctx: ctx
+      } do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert {:ok, pre_write_position} = WARaftBackend.storage_position(0)
+        previous_hook = Application.get_env(:ferricstore, :waraft_storage_fsync_dir_hook)
+        previous_every = Application.get_env(:ferricstore, :waraft_storage_metadata_persist_every)
+
+        previous_payload_every =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_every)
+
+        previous_compact_every =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_compact_every)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_metadata_persist_every, 1)
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_every, 1)
+          Application.put_env(:ferricstore, :waraft_storage_metadata_compact_every, 1)
+
+          Application.put_env(:ferricstore, :waraft_storage_fsync_dir_hook, fn path ->
+            if String.ends_with?(path, "ferricstore_waraft_backend.1") do
+              {:error, :forced_metadata_dir_fsync_failure}
+            else
+              :ok
+            end
+          end)
+
+          assert Ferricstore.ErrorReasons.write_timeout_unknown() ==
+                   WARaftBackend.write(0, {:put, "metadata-dir-fsync-fail:k", "v", 0})
+
+          assert {:ok, ^pre_write_position} = WARaftBackend.storage_position(0)
+        after
+          restore_env(:waraft_storage_fsync_dir_hook, previous_hook)
+          restore_env(:waraft_storage_metadata_persist_every, previous_every)
+          restore_env(:waraft_bitcask_payload_fsync_every, previous_payload_every)
+          restore_env(:waraft_storage_metadata_compact_every, previous_compact_every)
+        end
+      end
+
+      @tag :membership_metadata_recovery
+      test "membership metadata fsync failure returns unknown outcome and replays after restart",
+           %{
+             root: root,
+             ctx: ctx
+           } do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+
+        previous_hook =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook, fn _path ->
+            {:error, :forced_membership_metadata_fsync_failure}
+          end)
+
+          assert Ferricstore.ErrorReasons.write_timeout_unknown() ==
+                   WARaftBackend.adjust_membership(0, :add_participant, :missing@node)
+
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_hook)
+
+          assert Ferricstore.ErrorReasons.write_timeout_unknown() ==
+                   WARaftBackend.write(0, {:put, "membership-block:after", "v", 0})
+
+          assert nil == Router.get(ctx, "membership-block:after")
+
+          assert :ok = WARaftBackend.stop()
+          FerricStore.Instance.cleanup(ctx.name)
+
+          restarted_ctx = build_ctx(root)
+
+          assert :ok =
+                   WARaftBackend.start(restarted_ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log
+                   )
+
+          assert_eventually(fn -> Router.get(restarted_ctx, "membership-block:after") end, "v")
+
+          assert eventually(fn ->
+                   case WARaftBackend.status(0) do
+                     status when is_list(status) ->
+                       config = Keyword.get(status, :config, %{})
+
+                       participants =
+                         Map.get(config, :participants, Map.get(config, :membership, []))
+
+                       {:raft_server_ferricstore_waraft_backend_1, :missing@node} in participants
+
+                     _other ->
+                       false
+                   end
+                 end)
+        after
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_hook)
+        end
+      end
+
+      test "storage label chain advances across restart apply-context rollout", %{
+        root: root,
+        ctx: ctx
+      } do
+        assert :ok =
+                 WARaftBackend.start(ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log,
+                   label_module: LabelCounter
+                 )
+
+        assert :ok = WARaftBackend.write(0, {:put, "label:k1", "v1", 0})
+        assert "v1" == Router.get(ctx, "label:k1")
+        assert {:ok, label_before_stop} = waraft_storage_label(0)
+        assert is_integer(label_before_stop)
+
+        assert :ok = WARaftBackend.stop()
+        FerricStore.Instance.cleanup(ctx.name)
+
+        restarted_ctx = build_ctx(root)
+
+        assert :ok =
+                 WARaftBackend.start(restarted_ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log,
+                   label_module: LabelCounter
+                 )
+
+        assert_eventually(fn -> Router.get(restarted_ctx, "label:k1") end, "v1")
+        assert {:ok, label_after_restart} = waraft_storage_label(0)
+        assert label_after_restart > label_before_stop
+
+        assert :ok = WARaftBackend.write(0, {:put, "label:k2", "v2", 0})
+        assert {:ok, label_after} = waraft_storage_label(0)
+        assert label_after > label_after_restart
+      end
+
+      test "storage label advances when rollout changes the replicated apply context", %{
+        root: root,
+        ctx: ctx
+      } do
+        assert :ok =
+                 WARaftBackend.start(ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log,
+                   label_module: LabelCounter
+                 )
+
+        assert :ok = WARaftBackend.write(0, {:put, "label:context-change", "v", 0})
+        assert {:ok, label_before_restart} = waraft_storage_label(0)
+        assert :ok = WARaftBackend.stop()
+        FerricStore.Instance.cleanup(ctx.name)
+
+        current_max = ctx.apply_context.flow_default_history_max_events
+
+        changed_context =
+          Ferricstore.Raft.ApplyContext.new(
+            flow_default_history_max_events: if(current_max == 7, do: 8, else: 7)
+          )
+
+        restarted_ctx = %{build_ctx(root) | apply_context: changed_context}
+
+        assert :ok =
+                 WARaftBackend.start(restarted_ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log,
+                   label_module: LabelCounter
+                 )
+
+        assert {:ok, label_after_restart} = waraft_storage_label(0)
+        assert label_after_restart > label_before_restart
+        assert :ok = WARaftBackend.stop()
+
+        assert waraft_storage_metadata(root, 0).apply_context ==
+                 Ferricstore.Raft.ApplyContext.encode(changed_context)
+      end
+
+      test "storage label is persisted with the applied position before graceful close", %{
+        root: root,
+        ctx: ctx
+      } do
+        previous_every = Application.get_env(:ferricstore, :waraft_storage_metadata_persist_every)
+
+        previous_payload_every =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_every)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_metadata_persist_every, 1)
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_every, 1)
+
+          assert :ok =
+                   WARaftBackend.start(ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log,
+                     label_module: LabelCounter
+                   )
+
+          assert :ok = WARaftBackend.write(0, {:put, "label:crash", "v1", 0})
+          assert {:ok, label_after_apply} = waraft_storage_label(0)
+          assert is_integer(label_after_apply)
+
+          metadata = waraft_latest_storage_metadata(root, 0)
+          assert %{position: {:raft_log_pos, index, _term}, label: ^label_after_apply} = metadata
+          assert index >= 3
+        after
+          restore_env(:waraft_storage_metadata_persist_every, previous_every)
+          restore_env(:waraft_bitcask_payload_fsync_every, previous_payload_every)
+        end
+      end
+
+      test "oversized storage label fails before persisting metadata", %{root: root, ctx: ctx} do
+        previous_every = Application.get_env(:ferricstore, :waraft_storage_metadata_persist_every)
+
+        previous_payload_every =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_every)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_metadata_persist_every, 1)
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_every, 1)
+
+          assert {:error, {:apply_context_rollout_failed, %{0 => {:error, reason}}}} =
+                   WARaftBackend.start(ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log,
+                     label_module: OversizedLabel
+                   )
+
+          assert inspect(reason) =~ "storage_metadata_term_too_large"
+
+          metadata = waraft_latest_storage_metadata(root, 0)
+          assert Map.get(metadata, :label) == nil
+        after
+          WARaftBackend.stop()
+          restore_env(:waraft_storage_metadata_persist_every, previous_every)
+          restore_env(:waraft_bitcask_payload_fsync_every, previous_payload_every)
+        end
+      end
+
+      test "metadata fsync failure does not advance storage label", %{root: root, ctx: ctx} do
+        previous_every = Application.get_env(:ferricstore, :waraft_storage_metadata_persist_every)
+
+        previous_hook =
+          Application.get_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook)
+
+        previous_payload_every =
+          Application.get_env(:ferricstore, :waraft_bitcask_payload_fsync_every)
+
+        try do
+          Application.put_env(:ferricstore, :waraft_storage_metadata_persist_every, 1)
+          Application.put_env(:ferricstore, :waraft_bitcask_payload_fsync_every, 1)
+
+          assert :ok =
+                   WARaftBackend.start(ctx,
+                     log_module: :ferricstore_waraft_spike_segment_log,
+                     label_module: LabelCounter
+                   )
+
+          assert :ok = WARaftBackend.write(0, {:put, "label:failure:before", "v1", 0})
+          assert {:ok, label_before_failure} = waraft_storage_label(0)
+          assert is_integer(label_before_failure)
+          assert %{label: ^label_before_failure} = waraft_latest_storage_metadata(root, 0)
+
+          Application.put_env(:ferricstore, :waraft_storage_metadata_fsync_file_hook, fn _path ->
+            {:error, :forced_label_fsync_failure}
+          end)
+
+          assert Ferricstore.ErrorReasons.write_timeout_unknown() ==
+                   WARaftBackend.write(0, {:put, "label:failure:after", "v2", 0})
+
+          assert {:ok, ^label_before_failure} = waraft_storage_label(0)
+          assert %{label: ^label_before_failure} = waraft_latest_storage_metadata(root, 0)
+        after
+          restore_env(:waraft_storage_metadata_fsync_file_hook, previous_hook)
+          restore_env(:waraft_storage_metadata_persist_every, previous_every)
+          restore_env(:waraft_bitcask_payload_fsync_every, previous_payload_every)
+        end
+      end
+
+      test "restart fails closed on bad storage metadata", %{root: root, ctx: ctx} do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert :ok = WARaftBackend.write(0, {:put, "metadata:keep", "value", 0})
+        assert "value" == Router.get(ctx, "metadata:keep")
+        assert :ok = WARaftBackend.stop()
+
+        metadata_path =
+          Path.join([
+            root,
+            "waraft",
+            "ferricstore_waraft_backend.1",
+            "ferricstore_storage.term"
+          ])
+
+        File.write!(metadata_path, :erlang.term_to_binary(%{version: 999, position: :bad}))
+        FerricStore.Instance.cleanup(ctx.name)
+        restarted_ctx = build_ctx(root)
+
+        assert {:error, _reason} =
+                 WARaftBackend.start(restarted_ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log
+                 )
+
+        assert shard_payload_present?(restarted_ctx, 0)
+      end
+
+      test "missing metadata failure takes precedence over special payload files", %{
+        root: root,
+        ctx: ctx
+      } do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert :ok = WARaftBackend.stop()
+
+        File.rm(waraft_storage_metadata_path(root, 0))
+        File.rm(waraft_storage_metadata_previous_path(root, 0))
+        File.rm(waraft_storage_metadata_journal_path(root, 0))
+
+        fifo_path = Path.join(Ferricstore.DataDir.shard_data_path(root, 0), "unexpected.fifo")
+        assert {_output, 0} = System.cmd("mkfifo", [fifo_path])
+        assert {:ok, %{type: :other, size: 0}} = File.lstat(fifo_path)
+
+        FerricStore.Instance.cleanup(ctx.name)
+        restarted_ctx = build_ctx(root)
+
+        assert {:error, reason} =
+                 WARaftBackend.start(restarted_ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log
+                 )
+
+        assert inspect(reason) =~ "missing_current_storage_metadata"
+      end
+
+      test "cluster-member start publishes zero storage metadata before payload apply", %{
+        root: root,
+        ctx: ctx
+      } do
+        assert :ok =
+                 WARaftBackend.start(ctx,
+                   bootstrap: false,
+                   log_module: :ferricstore_waraft_spike_segment_log
+                 )
+
+        assert %{
+                 position: {:raft_log_pos, 0, 0},
+                 label: nil,
+                 config: nil
+               } = waraft_storage_metadata(root, 0)
+
+        assert File.exists?(waraft_storage_metadata_path(root, 0))
+      end
+
+      test "fresh start ignores rebuildable LMDB projection files when storage metadata is missing",
+           %{
+             root: root,
+             ctx: ctx
+           } do
+        lmdb_path =
+          root
+          |> Ferricstore.DataDir.shard_data_path(0)
+          |> Ferricstore.Flow.LMDB.path()
+
+        :ok = Ferricstore.FS.mkdir_p(lmdb_path)
+
+        assert :ok =
+                 Ferricstore.Flow.LMDB.write_batch(lmdb_path, [{:put, "projection-only", "v"}])
+
+        assert Ferricstore.Flow.LMDB.env_present?(lmdb_path)
+
+        assert :ok =
+                 WARaftBackend.start(ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log
+                 )
+
+        assert %{version: 1, position: {:raft_log_pos, index, _term}} =
+                 waraft_storage_metadata(root, 0)
+
+        assert is_integer(index) and index >= 0
+      end
+
+      test "restart recovers from torn current storage metadata using previous durable metadata",
+           %{
+             root: root,
+             ctx: ctx
+           } do
+        assert :ok = WARaftBackend.start(ctx, log_module: :ferricstore_waraft_spike_segment_log)
+        assert :ok = WARaftBackend.write(0, {:put, "metadata:torn:before", "v1", 0})
+        assert "v1" == Router.get(ctx, "metadata:torn:before")
+        assert :ok = WARaftBackend.write(0, {:put, "metadata:torn:after", "v2", 0})
+        assert "v2" == Router.get(ctx, "metadata:torn:after")
+        assert :ok = WARaftBackend.stop()
+
+        metadata_path = waraft_storage_metadata_path(root, 0)
+        assert File.exists?(waraft_storage_metadata_previous_path(root, 0))
+        File.write!(metadata_path, <<131, 116, 0, 0, 0, 3, "torn">>)
+
+        FerricStore.Instance.cleanup(ctx.name)
+        restarted_ctx = build_ctx(root)
+
+        assert :ok =
+                 WARaftBackend.start(restarted_ctx,
+                   log_module: :ferricstore_waraft_spike_segment_log
+                 )
+
+        assert_eventually(fn -> Router.get(restarted_ctx, "metadata:torn:before") end, "v1")
+        assert_eventually(fn -> Router.get(restarted_ctx, "metadata:torn:after") end, "v2")
+      end
+    end
+  end
+end

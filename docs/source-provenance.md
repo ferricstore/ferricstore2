@@ -23,3 +23,9 @@ Read with `git show` at the pinned FerricStore commit:
 - `raft/state_machine.ex` documents one independent Raft group per shard, deterministic apply on every replica, Bitcask/ETS state application, replicated clock metadata and checkpoint/release-cursor effects. These module-doc contracts are design intent, not independently measured durability or a complete audit of every apply section.
 
 The Rust proposal migrates semantics to an OpenRaft adapter; it does not claim WARaft wire, membership, log or on-disk compatibility. OpenRaft release/backend/clock/snapshot gates must be validated independently. Replicated logical time in the proposal is a design choice to specify and compare with legacy HLC/wall-time semantics, not a claim that the legacy code already implements that exact policy.
+
+## Existing workflow test baseline follow-up
+
+Preserved 480 committed source/support/golden-fixture files selected by workflow filenames, Flow command/module/tag markers, static section-file closure and shared test support. The navigational manifest indexes 5,858 textual declarations, not a runtime ExUnit count; broad mixed suites require case-level scope review. Nine working-tree test changes are separately captured as uncommitted review inputs.
+
+Checked each baseline snapshot against its exact pinned Git blob identity and SHA-256 manifest hash; checked unique declaration IDs and working-tree snapshot hashes. This verifies source preservation, not tests passing. No Elixir or Rust suite was executed. Runtime generated-case collection and Rust counterpart/assertion mapping remain mandatory before parity can be declared.
