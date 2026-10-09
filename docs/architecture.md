@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: proposed design. No implementation. This document owns module boundaries; evidence and deep consensus details live in the companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; the M0 workspace/module scaffold is implemented. Workflow behavior and runtime adapters remain unimplemented. This document owns module boundaries; evidence and deep consensus details live in the companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 
@@ -26,7 +26,7 @@ Both HTTPS and a dedicated TLS/TCP workflow API are first-class design targets. 
 
 ## Workspace boundaries
 
-Names below are proposed; avoid generic `utils`, `common`, `manager` or a catch-all backend crate. Small cohesive modules can share a crate if they have the same allowed dependency set, but enforce every logical boundary. Separate domain and adapter crates are mandatory.
+The M0 crate boundaries below are scaffolded; type/operation implementations remain planned. [ADR-002](adr/002-project-foundation.md) adds isolated test-support/parity tooling. Avoid generic `utils`, `common`, `manager` or a catch-all backend crate. Small cohesive modules can share a crate if they have the same allowed dependency set, but enforce every logical boundary. Separate domain and adapter crates are mandatory.
 
 | Crate | Modules and principal types | Allowed first-party dependencies |
 |---|---|---|
@@ -42,7 +42,9 @@ Names below are proposed; avoid generic `utils`, `common`, `manager` or a catch-
 | `wf-api-tcp` | safe framing/session/call correlation, TLS/auth credential acquisition, request lifecycle | types, domain, wire, application |
 | `wf-worker` | client contract, claim loop, handler outcomes, heartbeat, shutdown; Worker, HandlerOutcome | types, domain, ports; wire only in private client adapters |
 | `wf-node` | configuration, wiring, supervision, lifecycle and telemetry setup | all above |
-| `wf-architecture-tests` | policy specification and checks; never a runtime dependency | tooling only |
+| `wf-architecture-tests` | executable Cargo/architecture policy and negative fixtures; never a runtime dependency | tooling only |
+| `wf-test-support` | isolated test resources, controlled clocks and acknowledged fault barriers | tooling/test dependencies only; no runtime dependencies on this crate |
+| `wf-parity-tests` | preserved snapshot integrity and fail-closed parity evidence checks | tooling only |
 
 `wf-consensus` accesses storage through ports, not `wf-storage`; `wf-node` wires concrete adapters. Use narrow log/state-machine/snapshot ports in `wf-ports` with consensus-neutral types. A local bridge type owned by `wf-consensus` implements OpenRaft traits and delegates to those ports; `wf-storage` implements the neutral ports, and node wires the instances. This makes trait ownership explicit without a storage-to-consensus edge. Do not expose OpenRaft types in the domain or API. Validate that the selected OpenRaft release can satisfy this layout in the adapter spike; change it only through an ADR if a concrete trait constraint demands it.
 
@@ -70,7 +72,7 @@ flowchart TD
     NODE --> PROJ
 ```
 
-Arrows mean code dependency, not request direction. Crate edges are an allowlist; all features, build dependencies and target-specific dependencies are checked. Within ports, worker may reference only the client-facing module and approved value contracts; its wire dependency is restricted to client-adapter modules; both API adapters receive narrow application services and wire contracts rather than raw consensus/transaction capabilities. They cannot import ports/storage/consensus or bypass application authorization/admission. wf-wire cannot import effect/runtime/server crates. Public API/compile-fail and parsed module rules must check these restrictions, with review for macro/facade blind spots. Tests may import test-support but cannot introduce runtime dependency cycles.
+Arrows mean code dependency, not request direction. Crate edges are an allowlist; all features, build dependencies and target-specific dependencies are checked. Within ports, worker may reference only the client-facing module and approved value contracts; its wire dependency is restricted to client-adapter modules; both API adapters receive narrow application services and wire contracts rather than raw consensus/transaction capabilities. They cannot import ports/storage/consensus or bypass application authorization/admission. wf-wire cannot import effect/runtime/server crates. Public API/compile-fail and parsed module rules must check these restrictions, with review for macro/facade blind spots. Tests may import test-support through dev-dependencies but cannot introduce runtime dependency cycles. Node and other production crates cannot depend on any of the three tooling/test-support crates. Public module scaffolds are reservations, not stable implemented APIs; no stub reports successful workflow behavior.
 
 ## Principal structs and trait contracts
 

@@ -9,7 +9,7 @@ The existing Elixir workflow behavior tests must pass against equivalent Rust op
 - `tests/reference/elixir-baseline/`: byte-identical test/support snapshots from `ferricstore/ferricstore` commit `66586c596e271408d9184af32eb31cd7218c126e`.
 - `tests/reference/elixir-working-tree/`: changed local workflow-related test inputs kept separate from the pinned baseline. Review their behavior before accepting a delta.
 
-These files preserve the tests we already use; they are not runnable Rust tests or a self-contained Elixir application. There is no Rust engine/Cargo workspace yet. Do not claim this suite works against Rust until the actual ports and harness run. The textual declaration index is navigation, not an ExUnit parser or executed-test count. Generated/parameterized tests, macro expansion, module/describe context, setup and tags require actual ExUnit collection in the future test-port phase.
+These files preserve the tests we already use; they are not runnable Rust tests or a self-contained Elixir application. The M0 Rust workspace and test infrastructure now exist; the workflow engine and scenario counterparts do not. Do not claim this suite works against Rust until the actual ports and harness run. The textual declaration index is navigation, not an ExUnit parser or executed-test count. Generated/parameterized tests, macro expansion, module/describe context, setup and tags require actual ExUnit collection in the future test-port phase.
 
 ## Non-negotiable port contract
 
@@ -45,7 +45,7 @@ Build a backend-neutral scenario runner only when implementation starts. Scenari
 
 Use deterministic clocks/fault hooks rather than replacing a timeout test with an unconstrained sleep. Translate eventual assertions into bounded convergence checks that preserve ordering and durable checkpoints. Fresh stores/cluster identities and unique tenant/workflow IDs prevent shared-state interference; explicitly serialize cases whose real global resource needs it. Preserve tags/environment prerequisites and ensure mandatory parity profiles run, rather than silently omitting cluster/crash/cold-projection suites.
 
-## Future parity gate and statuses
+## Parity gate and statuses
 
 The completed Rust suite must track `unported`, `ported-not-run`, `passing`, `failing`, `deferred-scope`, and `excluded-with-reason`. Manifest categories/targets are preliminary routing suggestions; they do not approve exclusions. Missing mappings and unclassified runtime cases fail the parity gate. Included behavior requires passing counterparts and preserved assertions; ignored tests remain incomplete. A reduced milestone may report its own passing subset, but may not claim full workflow parity.
 

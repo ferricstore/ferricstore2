@@ -1,0 +1,72 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/wf-types",
+    "crates/wf-domain",
+    "crates/wf-ports",
+    "crates/wf-application",
+    "crates/wf-storage",
+    "crates/wf-consensus",
+    "crates/wf-projection",
+    "crates/wf-wire",
+    "crates/wf-api-http",
+    "crates/wf-api-tcp",
+    "crates/wf-worker",
+    "crates/wf-node",
+    "crates/wf-architecture-tests",
+    "crates/wf-test-support",
+    "crates/wf-parity-tests",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+repository = "https://github.com/ferricstore/ferricstore2"
+
+[workspace.dependencies]
+wf-types = { path = "crates/wf-types" }
+wf-domain = { path = "crates/wf-domain" }
+wf-ports = { path = "crates/wf-ports" }
+wf-application = { path = "crates/wf-application" }
+wf-storage = { path = "crates/wf-storage" }
+wf-consensus = { path = "crates/wf-consensus" }
+wf-projection = { path = "crates/wf-projection" }
+wf-wire = { path = "crates/wf-wire" }
+wf-api-http = { path = "crates/wf-api-http" }
+wf-api-tcp = { path = "crates/wf-api-tcp" }
+wf-worker = { path = "crates/wf-worker" }
+wf-node = { path = "crates/wf-node" }
+wf-architecture-tests = { path = "crates/wf-architecture-tests" }
+wf-test-support = { path = "crates/wf-test-support" }
+wf-parity-tests = { path = "crates/wf-parity-tests" }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"
+missing_docs = "deny"
+rust_2018_idioms = { level = "deny", priority = -1 }
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "deny"
+bare_urls = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+await_holding_lock = "deny"
+
+[workspace.metadata.ferricstore]
+stage = "m0-infrastructure"
+supported-feature-profiles = ["default"]
+
+[profile.release]
+overflow-checks = true

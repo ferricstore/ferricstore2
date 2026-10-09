@@ -1,0 +1,45 @@
+# Audit the default feature profile, including dev/build and target-specific
+# dependencies. No target filter means inactive host dependencies are audited too.
+[graph]
+all-features = false
+no-default-features = false
+
+[advisories]
+db-urls = ["https://github.com/RustSec/advisory-db"]
+yanked = "deny"
+unmaintained = "all"
+unsound = "all"
+unused-ignored-advisory = "deny"
+
+[licenses]
+include-dev = true
+include-build = true
+confidence-threshold = 0.93
+# Unicode-3.0 is required by unicode-ident's AND expression and the reviewed
+# archunit -> cargo_metadata -> URL/ICU dev-tool chain (see CI review CI-04).
+allow = ["Apache-2.0", "MIT", "Unicode-3.0"]
+unused-allowed-license = "warn"
+
+[licenses.private]
+# Only unpublished workspace members are exempt from license declarations.
+# This does not exclude their third-party dependencies from any audit.
+ignore = true
+
+[bans]
+multiple-versions = "deny"
+multiple-versions-include-dev = true
+wildcards = "deny"
+# Workspace path-only edges are private, fixed by the reviewed Cargo graph.
+allow-wildcard-paths = true
+highlight = "all"
+skip = [
+    { crate = "syn@2.0.119", reason = "M0 tooling: archunit 0.0.2 and thiserror-impl 1.0.69 require syn 2; reviewed current Serde/ICU/thiserror 2 derives require syn 3. Owner CI policy; re-review when any chain or lock version changes." },
+    { crate = "thiserror@1.0.69", reason = "M0 archunit 0.0.2 -> cargo_metadata 0.20.0 -> cargo-util-schemas 0.2.0 requires thiserror ^1.0.56; archunit/cargo_metadata require ^2. Owner CI policy; re-review on tooling dependency updates." },
+    { crate = "thiserror-impl@1.0.69", reason = "Exact derive companion required by thiserror 1.0.69 in the reviewed cargo-util-schemas tool chain; current thiserror 2.0.21 needs its own derive. Owner CI policy; re-review on tooling dependency updates." },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

@@ -1,0 +1,41 @@
+name: Infrastructure checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infrastructure-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Rust 1.99.0 / ${{ matrix.os }} / default features
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      CARGO_TERM_COLOR: always
+      RUSTUP_TOOLCHAIN: 1.99.0
+    steps:
+      - name: Checkout
+        # actions/checkout v7.0.1; verified against upstream refs/tags/v7.0.1.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust components
+        run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
+      - name: Install repository-local audit tool
+        run: cargo +1.99.0 install cargo-deny --version 0.20.2 --locked --root .tools
+      - name: Run local and CI checks
+        run: bash scripts/check.sh

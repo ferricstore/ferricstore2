@@ -1,6 +1,6 @@
 # Implementation plan and acceptance gates
 
-Status: planned work only. This plan authorizes no implementation by itself. Milestones depend on predecessor evidence, not calendar estimates.
+Status: M0 project/test/lint/architecture infrastructure is implemented and its complete local gate passes; runtime ExUnit collection/scope reconciliation and workflow/runtime milestones remain planned. See [the handoff](CONTINUE.md) for results and next steps. This plan authorizes no later implementation by itself. Milestones depend on predecessor evidence, not calendar estimates.
 
 The [existing Elixir workflow test parity contract](workflow-test-parity.md) is mandatory. Source tests and helpers are preserved in tests/reference with a manifest and hash inventory; all Rust counterparts are currently unported. New model/property tests supplement these regressions.
 
@@ -15,7 +15,7 @@ The [dual-transport contract](transport-design.md) adds HTTPS and a dedicated TL
 5. Decide inline payload limits and replicated blob durability; deferred blob storage must cause a clear request-size rejection, not a dangling reference.
 6. Approve schema/version policy, routing key encoding, idempotency retention contract, API consistency modes and projection watermarks, including stable client positions versus local projection generations across restart/snapshot and explicit incompatibility after disaster restore.
 7. Complete exact operation/field/error registries following the reviewed TCP framing/negotiation and HTTP endpoint contract; preserve original group/recovery request_scope binding, produce cross-transport intent/dedup vectors, and validate effective resource limits. Validate auth/deadline lifecycle, response reservations, bounded long-poll waiters, slow-client behavior and trusted leader forwarding.
-8. Record decisions as ADRs. Add library versions and MSRV only after verifying the selected release. The design phase intentionally has no Cargo manifest or executable CI.
+8. Record decisions as ADRs. Add library versions and MSRV only after verifying the selected release. The infrastructure increment creates the Cargo workspace and CI; later runtime milestones still require their evidence gates.
 
 ## Ordered delivery
 
@@ -51,7 +51,7 @@ M0 must collect runtime ExUnit cases (including generated cases and section file
 
 Run Miri/loom only on the primitives and concurrent adapters they can meaningfully exercise. Do not replace end-to-end fault tests with unit tests that mirror code.
 
-## Quality requirements for future CI
+## Quality requirements
 
 Every first-party crate must inherit workspace lint configuration; omissions fail policy checks. Run formatting, Clippy with warnings denied, compiler/documentation warnings checks, architecture tests and relevant tests. Include workspace default configurations and explicitly enumerated supported feature/target combinations; `--all-features` alone is insufficient when features are mutually exclusive. Check transitive dependencies and license/advisory policy with audited exceptions that have an owner and expiry.
 

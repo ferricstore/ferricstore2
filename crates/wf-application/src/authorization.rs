@@ -1,0 +1,1 @@
+//! Private authorization implementation boundary.

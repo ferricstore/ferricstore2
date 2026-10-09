@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ferricstore/ferricstore2/tests/parity/workflow-mapping.schema.json",
+  "title": "M0 unported source lineage; not runtime parity evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "stage", "reference_manifest_sha256", "runtime_collection", "rust_execution", "declarations"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "stage": {"const": "m0-infrastructure"},
+    "reference_manifest_sha256": {"const": "7df8c7885a64b6276e84517dffa4f1ead0f592f6d0996b398cdb61551c1bae61"},
+    "runtime_collection": {
+      "allOf": [
+        {"$ref": "#/$defs/missing_evidence"},
+        {"properties": {"status": {"const": "not-collected"}}}
+      ]
+    },
+    "rust_execution": {
+      "allOf": [
+        {"$ref": "#/$defs/missing_evidence"},
+        {"properties": {"status": {"const": "not-executed"}}}
+      ]
+    },
+    "declarations": {
+      "type": "array",
+      "minItems": 5858,
+      "maxItems": 5858,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/unported_declaration"}
+    }
+  },
+  "$defs": {
+    "missing_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason", "evidence", "cases"],
+      "properties": {
+        "status": {"type": "string"},
+        "reason": {"type": "string", "minLength": 1},
+        "evidence": {"const": null},
+        "cases": {"type": "array", "maxItems": 0}
+      }
+    },
+    "unported_declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_declaration_id", "status", "runtime_case_ids", "rust_counterparts"],
+      "properties": {
+        "source_declaration_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "status": {"const": "unported"},
+        "runtime_case_ids": {"type": "array", "maxItems": 0},
+        "rust_counterparts": {"type": "array", "maxItems": 0}
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+# M0: changes to this reviewed boundary policy require an ADR and negative tests.
+schema = 1
+wire_domain_module = "value"
+worker_port_module = "client"
+worker_wire_modules = ["client::http", "client::tcp"]
+
+[packages.wf-types]
+kind = "runtime"
+normal = []
+dev = ["wf-test-support"]
+modules = { identity = true, version = true, bounds = true, error = true }
+
+[packages.wf-domain]
+kind = "runtime"
+normal = ["wf-types"]
+dev = ["wf-test-support"]
+modules = { value = true, workflow = true, claim = true, lease = true, retry = true, policy = true, signal = true, schedule = true, lineage = true, history = true, retention = true }
+
+[packages.wf-ports]
+kind = "runtime"
+normal = ["wf-types", "wf-domain"]
+dev = ["wf-test-support"]
+modules = { client = true, consensus = true, state = true, projection = true, blob = true, clock = true, id_source = true, notification = true, snapshot = true, log = true }
+
+[packages.wf-application]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-ports"]
+dev = ["wf-test-support"]
+modules = { commands = true, queries = true, error = true, authorization = false, admission = false, intent = false, routing = false, reconciliation = false }
+
+[packages.wf-storage]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-ports"]
+dev = ["wf-test-support"]
+modules = { log = true, state = true, transaction = true, snapshot = true, blob = true }
+
+[packages.wf-consensus]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-ports"]
+dev = ["wf-test-support"]
+modules = { adapter = true, apply = true, membership = true, read = true }
+
+[packages.wf-projection]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-ports"]
+dev = ["wf-test-support"]
+modules = { history = true, list = true, lineage = true, checkpoint = true, rebuild = true, cache = true }
+
+[packages.wf-wire]
+kind = "runtime"
+normal = ["wf-types", "wf-domain"]
+dev = ["wf-test-support"]
+modules = { dto = true, scalar = true, operation = true, error = true, capability = true }
+
+[packages.wf-api-http]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-wire", "wf-application"]
+dev = ["wf-test-support"]
+modules = { request = true, response = true, error = true, middleware = false, listener = false }
+
+[packages.wf-api-tcp]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-wire", "wf-application"]
+dev = ["wf-test-support"]
+modules = { frame = true, request = true, response = true, session = true, codec = false, listener = false }
+
+[packages.wf-worker]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-ports", "wf-wire"]
+dev = ["wf-test-support"]
+modules = { worker = true, handler = true, shutdown = true, client = false }
+
+[packages.wf-node]
+kind = "runtime"
+normal = ["wf-types", "wf-domain", "wf-ports", "wf-application", "wf-storage", "wf-consensus", "wf-projection", "wf-wire", "wf-api-http", "wf-api-tcp", "wf-worker"]
+dev = ["wf-test-support"]
+modules = { configuration = true, composition = true, supervision = true, shutdown = true }
+
+[packages.wf-architecture-tests]
+kind = "tooling"
+normal = []
+dev = []
+external_normal = [
+  { name = "serde_json", version = "=1.0.151", features = [], default_features = true },
+  { name = "syn", version = "=2.0.119", features = ["full", "visit"], default_features = true },
+  { name = "toml", version = "=0.8.23", features = ["parse"], default_features = false },
+]
+external_dev = [
+  { name = "archunit", version = "=0.0.2", features = [], default_features = true },
+  { name = "tempfile", version = "=3.27.0", features = [], default_features = true },
+]
+
+[packages.wf-test-support]
+kind = "tooling"
+normal = []
+dev = []
+external_normal = [
+  { name = "tempfile", version = "=3.27.0", features = [], default_features = true },
+]
+
+[packages.wf-parity-tests]
+kind = "tooling"
+normal = []
+dev = ["wf-test-support"]
+external_normal = [
+  { name = "serde", version = "=1.0.229", features = ["derive"], default_features = true },
+  { name = "serde_json", version = "=1.0.151", features = [], default_features = true },
+  { name = "sha2", version = "=0.11.0", features = [], default_features = true },
+]

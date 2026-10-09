@@ -1,0 +1,1 @@
+//! Private intent implementation boundary.
