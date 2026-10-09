@@ -17,8 +17,11 @@ proof or full behavioral parity is claimed.
   [ferricstore/ferricstore2](https://github.com/ferricstore/ferricstore2).
 - Checkout: `/Users/yoavgea/repos/ferricstore2-rust-design`.
 - Branch: `codex/workflow-tdd-core`.
-- The coordinator is preparing the reviewed continuation commit after the final
-  green local gate. No new Linux/macOS CI result is claimed yet.
+- Reviewed implementation commit `25701439accaeb51d41ffc3fcdcddc5b503f2a8e`
+  is pushed to this branch after reciprocal review and the final green local
+  gate. Its [Linux/macOS CI run](https://github.com/ferricstore/ferricstore2/actions/runs/37973550388)
+  **passed on ubuntu-24.04 and macos-15**. This handoff follow-up changes only
+  documentation; the cited run belongs to the implementation commit.
 - Main's last handoff commit was `b0151c5`. The foundation Linux/macOS CI passed
   `f2ff13b2da4e47e1fd52f74520fb219efe2de613`
   ([run](https://github.com/ferricstore/ferricstore2/actions/runs/37929778754)).
@@ -116,6 +119,8 @@ The final native macOS `bash scripts/check.sh` exited 0:
   audits passed.
 
 Actual post-fix output: `/private/tmp/ferricstore2-m1-v2-final-check.log`.
+The shared wrapper also passed on both GitHub runner platforms for `2570143`;
+the run linked above checks the same implementation and hash-bound artifacts.
 `cargo parity` separately exited 1 with accurate full-scope execution gaps:
 `/private/tmp/ferricstore2-m1-v2-final-parity.log`. Fifteen standalone Elixir AST
 regressions also passed independently (seed 120422); all four unchanged compiled

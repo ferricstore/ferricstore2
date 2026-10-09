@@ -428,3 +428,16 @@ Rust cases plus strict Clippy/docs/fmt, the complete C-P2 semantic audit and
 all current artifact/original-capture digest checks. No code/data/guide changed
 after the stable notification used for root's final wrapper. All reciprocal
 reviews are closed; agents returned normally without interruption.
+
+## Reviewed branch and CI
+
+Root committed the reviewed implementation/configuration/artifacts as
+`25701439accaeb51d41ffc3fcdcddc5b503f2a8e` and pushed
+`codex/workflow-tdd-core` to private `ferricstore/ferricstore2`, without merging
+main. [Infrastructure run 37973550388](https://github.com/ferricstore/ferricstore2/actions/runs/37973550388)
+completed **success** for that exact SHA: both ubuntu-24.04 and macos-15 jobs
+passed the shared locked wrapper. The code/artifact tree is unchanged by the
+documentation-only follow-up recording this result. CI runs no original
+Elixir application suite or standalone AST suite, and does not certify full
+workflow parity. The original dirty checkout remains untouched and the isolated
+pinned baseline remains source-clean.
