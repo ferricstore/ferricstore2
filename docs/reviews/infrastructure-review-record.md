@@ -47,7 +47,7 @@ The coordinator and CI reviewer independently executed the complete `bash script
 
 The lock contains 15 first-party and 92 third-party packages. archunit 0.0.2 is dev-only, supplemented by declared Cargo graph, syntax/module and actual compiler visibility checks. The exact three duplicate exceptions and Unicode-3.0 requirement are documented and exercised by CI policy probes. First-party code remains private/unpublished, inherits the lint policy and forbids unsafe. No lint allowance, advisory ignore or production external library was introduced.
 
-GitHub Actions invokes the identical wrapper on ubuntu-24.04 and macos-15, with pinned checkout and minimum read permissions. Local passing evidence covers native macOS; remote supported-host execution is separate evidence and is not inferred here from configuration.
+GitHub Actions invokes the identical wrapper on ubuntu-24.04 and macos-15, with pinned checkout and minimum read permissions. After the reviewed implementation was pushed, the coordinator verified [run 37929778754](https://github.com/ferricstore/ferricstore2/actions/runs/37929778754) completed successfully on both hosts for commit `f2ff13b2da4e47e1fd52f74520fb219efe2de613`. This is actual remote execution evidence, in addition to the native macOS local run. Historical peer notes correctly reported remote execution as absent before the push; this post-push evidence closes that validation item without changing implementation.
 
 ## Remaining gates and continuation
 
