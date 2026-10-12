@@ -520,3 +520,31 @@ This purpose-specific shape view does not parse arbitrary Elixir terms or whole
 raw policy options. Original public replies, strict ETF/generation-zero readers,
 physical configuration/index/migration/atomic operations, required runtime
 profiles and independent Linux/macOS execution remain acceptance obligations.
+
+## Original stored retry-key inspection
+
+A-NEXT-M1-ORIGINAL-RETRY-KEYS1-CREATE1 selects private complete/original_retry_keys
+and its map child, plus two private children of the existing policy test target.
+The exact two borrowed key/value class enums and one paid boolean function are
+implemented after genuine tests-only missing-API RED. All 64 policy controls and
+strict target lint pass; the full macOS wrapper passes502 Rust tests and four
+compile-fail docs with all source/dependency stages. Written-source architecture
+and performance reviews and their reciprocal review are closed without blockers. The existing architecture
+checker now covers both descendants and rejects client/wire/domain-value
+forwarding. Its focused control, formatting and strict library lint pass.
+
+The operation preflights visible map/key/value descriptors before
+semantic lookup. Top-level atom-key presence shadows binary keys even for a
+nonmap value; state rows use the original guarded atom-map preference and
+binary-map fallback. Old-key membership ignores the associated value, and
+reached root/state results short-circuit. The operation borrows inputs and
+returns no owner or current-policy authority. Other classes hide payload
+identity; descriptor bounds and queried-key duplicate handling do not validate
+arbitrary terms or general map uniqueness. ADR006 records the logical schedule.
+
+The full original raw entry reader remains the immediate M1 successor. It must
+preserve ETF safety/full-consumption/envelope/generation-zero/arbitrary-map/type
+behavior and integrate this predicate through bounded paid backing or shared
+borrowed-span visits. The selected slice view does not make that construction
+allocation-free. Original source603's generationless tuple and all required
+public/setup/profile/physical and both-OS acceptance remain separate obligations.

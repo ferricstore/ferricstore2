@@ -439,3 +439,61 @@ fn complete_policy_indexed_ingress_stays_pure_and_server_side() -> CheckResult<(
     }
     Ok(())
 }
+
+#[test]
+fn complete_policy_original_retry_key_inspection_stays_pure_and_server_side() -> CheckResult<()> {
+    for module in [
+        "policy::complete::original_retry_keys",
+        "policy::complete::original_retry_keys::map",
+    ] {
+        assert_eq!(
+            super::source_check(
+                "wf-domain",
+                module,
+                "use std::str; use crate::policy::complete; use wf_types::identity;",
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "unclassified standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+            (
+                "use wf_parity_tests::progress;",
+                "runtime source references M0-only tooling",
+            ),
+        ] {
+            assert!(
+                super::source_check("wf-domain", module, source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    for name in [
+        "OriginalPolicyMapKey",
+        "OriginalPolicyMapValue",
+        "original_complete_policy_uses_max_attempts",
+    ] {
+        let exported = format!("pub use wf_domain::policy::complete::{name};");
+        assert!(
+            super::source_check("wf-ports", "client", &exported)?
+                .iter()
+                .any(|finding| finding.contains("client port facade"))
+        );
+        assert!(
+            super::source_check("wf-wire", "value", &exported)?
+                .iter()
+                .any(|finding| finding.contains("wire may reference only wf_domain::value"))
+        );
+        assert!(
+            super::source_check(
+                "wf-domain",
+                "value",
+                &format!("pub use crate::policy::complete::{name};"),
+            )?
+            .iter()
+            .any(|finding| finding.contains("approved domain value module"))
+        );
+    }
+    Ok(())
+}

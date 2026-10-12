@@ -4,7 +4,7 @@ Updated: 2026-10-12. A new active full-completion goal now follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS run passes 495 Rust tests and four compile-fail doc tests,
+The latest whole-workspace macOS run passes 502 Rust tests and four compile-fail doc tests,
 strict lint, architecture, documentation, reference/progress and all four
 dependency checks. The default RustSec refresh succeeded on October 12 at the
 same October 9 database revision; earlier DNS failures remain historical evidence.
@@ -117,6 +117,20 @@ work can proceed while current Linux acceptance stays pending.
 Public replies, whole raw options, ETF/generation-zero readers, physical
 installation/index/migration operations, original setup/profiles and current
 independent Linux execution remain required. The full goal stays active.
+
+The original-reader component follows an explicit architecture decision and
+closed reciprocal consultation: a borrowed deprecated-retry-key predicate in
+two production children and two children of the existing policy test target.
+Its six real tests preceded production with clean missing-API RED. The implementation
+preserves root atom-key shadowing, guarded state fallback and value-independent
+old-key membership, with descriptor-only bounds and one continuous work account.
+All 64 policy controls and strict target lint pass. The full macOS wrapper passes
+502 Rust tests, four compile-fail docs and every source/dependency stage.
+The production files have 84/178 lines and tests 236/323; all functions fit100.
+Written-source architecture and performance reviews and their reciprocal
+review are closed without blockers. The original generationless decoder fixture
+remains unlinked, and the ledger stays57/59/227. The full raw ETF/generation-zero reader is the immediate M1
+successor, including meaningful integration with this component.
 
 The exact pinned lease-takeover regression now passes in the existing lease
 test target (10/10): lease 50 at 1000, reclaim 500 at 1050, stale-owner completion

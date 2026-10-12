@@ -36035,3 +36035,194 @@ Actual command CARGO_BUILD_WARNINGS=deny cargo +1.99.0 clippy --locked -p wf-dom
     Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.28s
 ```
+
+## DOC-NEXT-M1-ORIGINAL-RETRY-KEYS1 — smallest original-reader semantic predecessor
+
+This is a read-only SOURCE/CONTRACT proposal after the indexed increment, not new code or raw-reader acceptance. I actually read the complete current architecture and ordered implementation plan, current CONTINUE/ADR006 reader limits, pinned66586c5 RetryPolicy/TermCodec/Policy readers/PolicyCommand reference/strict allocator clauses, the relevant mandatory source cases and current Rust restoration/installation/encoding/Replace-parent paths. In7cadbd I also read ENTIRE indexed A6508+precision580 and P11215, agreeing without discrepancy on final all-binary a9967 fixture, ten component links, honest supplemental metadata observations and ROOT's495Rust+4docs Darwin evidence. The reviewed local checkpoint is33cd85e7; current Linux/full-profile/public/physical acceptance remains open.
+
+**Choose one small real missing behavior.** Implement the original deprecated retry-key predicate over purpose-specific borrowed map classes. Existing CompletePolicyData/RetryOverride/positive V2 constructors cannot carry max_attempts, arbitrary source map values or real legacy generation0 entries. Their old validation and bytes must stay unchanged. This predicate is a necessary semantic component of the original current reader; it is NOT the reader, a generation-zero wrapper, a normalization pass, an accepted-current model or a caller/stored-origin flag. The actual raw original entry inspector remains the immediate next required M1 deliverable after this component; do not displace it with further predicate-only microincrements.
+
+Pinned RetryPolicy386–401 accepts a fully decoded three-tuple {:flow_policy_v1,generation,map} with integer generation0..9007199254740991, then checks only old_max_attempts_policy?. It does NOT run complete normalized business admission. RetryPolicy964–995 gives two distinct source rules: top retry/states use atom-key presence before binary-key fallback, including a present nonmap atom value; each state entry tries atom retry WHEN that value is a map, then binary retry WHEN a map. Therefore a nonmap atom retry shadows the binary retry at top level but permits the binary-map fallback inside a state. A map-valued atom state retry shadows its binary-map counterpart. Presence of atom OR binary max_attempts inside a reached retry map rejects irrespective of its value. Root retry is checked before states with short circuit; source states use Enum.any, stopping on the first true. Nonmap retry/states/state values and unrelated/unnormalized content otherwise do not trigger this predicate.
+
+**Exact proposed named batch, requiring ARCH decision before creation.** TWO private production files: crates/wf-domain/src/policy/complete/original_retry_keys.rs (two borrowed input-class enums, sole public entry, ordered root/state decisions) and original_retry_keys/map.rs (descriptor-only preflight, six queried-key mask and paid borrowed map/key visits). TWO private integration children: crates/wf-domain/tests/complete_policy/original_retry_keys.rs and original_retry_keys/refusals.rs. Existing complete.rs adds only private mod original_retry_keys plus the TWO enums/function exports; existing test main.rs adds only EOF blank+mod original_retry_keys. ROOT owns those seams, shared docs and an existing codec_policy.rs control named complete_policy_original_retry_key_inspection_stays_pure_and_server_side, using its existing inspector/graph rules for both descendants and forbidden client/wire/value-forwarding exposure. No dependency/crate/parser/owner/retained-status/error-registry/schema-limit type or benchmark is added. Ordinary production400/test600/function100 apply. Routine private functions/splits within these responsibilities need no inert full-buffer/helper approval loop after selection.
+
+Proposed public shapes, all borrowed and Clone/Copy/Debug, with NO general Eq/term identity promise:
+~~~rust
+pub enum OriginalPolicyMapKey<'input> {
+    Atom(&'input str),
+    Binary(&'input [u8]),
+    Other,
+}
+pub enum OriginalPolicyMapValue<'input> {
+    Map(&'input [(OriginalPolicyMapKey<'input>, Self)]),
+    Other,
+}
+pub fn original_complete_policy_uses_max_attempts(
+    policy: &[(OriginalPolicyMapKey<'_>, OriginalPolicyMapValue<'_>)],
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, CompletePolicyEncodingError>;
+~~~
+
+This is a purpose-specific input-class view of a supplied policy map, not a generic term owner/parser. Other key occurrences may represent DIFFERENT original opaque term keys; Other values cover nil, scalars, lists and other nonmap classes, but do not preserve their bytes/payload identities. Map means the supplied class/entry view; it is not a decoded-validity assertion or proof of ETF/map uniqueness. The function must physically inspect actual supplied entry keys and reached value classes, accepting no separate presence/validity/account/digest flags. The returned boolean only answers whether a reached deprecated key is present in this view. It certifies neither generation, type, complete content, parsed-source correspondence, atom safety, current authority, Fresh nor payment. Original owners remain borrowed throughout; no output owner/copy/spine/tree/default is constructed.
+
+**Source/map correspondence and operational profile.** Input entry order is the supplied order. Within this admitted profile, complete true/false agrees with the source lookup/short-circuit rules independent of entry permutations; prospective refusal prefixes follow supplied order. This does NOT claim that arbitrary Erlang Enum iteration order equals byte-sorted Rust order or that native source work matches these logical events. The future decoder must supply a faithful source-map class view and enforce general semantic map-key identity. This predicate checks duplicate QUERIED identities only: Atom/Binary retry, states and max_attempts are SIX distinct identities, with atom and binary spellings remaining different keys. A repeated same queried identity returns operational Encoding(Malformed) during preflight. A per-map six-bit mask suffices, with no set or dynamic owner. Unqueried atom/binary duplicates and opaque Other key identity are deliberately NOT certified as valid maps; never interpret false as that proof.
+
+Profile mismatch precedes any debit. Entry G128. Preflight all VISIBLE map/value/key descriptors in supplied order, before semantic lookup: root map depth0; key/value children depth+1; candidate descriptor node128 is paid before depth/count checks and BEFORE descending. Bound descriptor depth64 and total descriptor occurrences4096, counting aliased maps once per occurrence. Each map, each key and each Other value counts once; nested Map counts as its value descriptor, not again as an extra root. Known atom/binary key text contributes to a262144-byte aggregate; checked length/cap precedes the separate actual length debit. Other hides real term nodes/bytes, so these bounds are ONLY the represented descriptors/key text, not whole raw terms/ETF/input-owner memory. Depth/nodes return Encoding(ItemLimit), represented-key bytes Encoding(ByteLimit), arithmetic Schema(LengthOverflow); work/profile retain their existing typed operational errors.
+
+For each reached atom/binary key after its preflight node/text debit, classify the six queried identities by comparing the name against fixed retry(5B), states(6B), max_attempts(12B) IN THAT ORDER, stopping on match. Each reached literal comparison prospectively pays G128+actualNameLen+literalLen before byte equality. Opaque Other keys require no name comparison. Set/check the corresponding atom-versus-binary mask bit before visiting its value; duplicate queried identity returns Malformed without that value visit. This visible-descriptor preflight may refuse before an earlier source deprecated condition outside the selected profile; no full source error-priority claim is made there. Native recursive frames/masks/input graph/Drop are outside logicalP.
+
+After successful preflight, admit ONE distinct prospective scratch G0/P128 event for the two borrowed atom/binary selection slots. It preserves max(previousP,128). Semantic top field selection pays map-lookup root128; each reached entry-key visit128+its represented name length (Other length0); each reached atom/binary comparison128+nameLen+queriedLiteralLen. Matching field value classification pays128 BEFORE selecting Map/Other. A top atom match returns immediately even Other; a binary match is only fallback until an atom is found or the map ends. Retry lookup precedes states lookup. A reached retry-map old-key membership pays its root128 and reached key visit/comparison as above; it returns true on EITHER atom/binary max_attempts without inspecting or charging its value class. This preserves value-irrelevant presence and prevents a nil-value test from becoming a normalizer.
+
+Only if top retry did not find an old key, select states with the same top atom-presence rule. A reached states Map pays iterator root128, then each reached state row128 and value-class128; state-key identity/text is not read by this source branch. Nonmap state values skip. A state Map's retry selector pays the same lookup/key/comparison/value events, but the atom match returns immediately ONLY WHEN MAP; an atom Other permits binary-map fallback. A binary Other is not a usable candidate. A reached retry map then runs old-key membership; first true stops before later state rows. No CONTENT/core/business/type/normalization walk is performed, and no source error body or retained result is constructed. All newly reached events use the SAME actual charge, with no refund/reset/substitute account, paid bridge or public credit.
+
+**Independent small oracles, declared before implementation.** Empty policy map: entry128 +preflightMap128 +scratchP128 +retryLookup128 +statesLookup128 =G512/P128/T640, false. The five event stream is [128,128,(0,P128),128,128]; exact640 succeeds, tight639 refuses final128 retainingG384/P128; scratch383 refuses target384 retainingG256/P0. Same-account repeat while raw owners remain held givesG1024/P128/T1152; tight1151 retainsG896/P128. A held real indexed[x] restoration seed1928G/P64 plus empty predicate becomesG2440/P128/T2568; tight2567 retainsG2312/P128. A real already-held indexed four-name normalization seed4784G/P192 plus empty predicate becomesG5296/P192/T5488; tight5487 retainsG5168/P192, preserving the prior larger peak.
+
+Root atom retry→Map(atom max_attempts→Other) independently gives preflightN5/B17/classification581 plus entry128 =G1366/P0, then scratch128. Semantic events are [128 lookup,133 retryKeyVisit,138 retryCompare,128 valueClass,128 membershipRoot,140 oldKeyVisit,152 oldKeyCompare], givingG2313/P128/T2441, true. Exact2441 MUST return before any states semantic lookup; tight2440 retainsG2161/P128 before final152. The Other deprecated value is NOT semantically visited. Repeated Atom(retry) queried identity with two Other values refuses atG926/P0: entry128 +root128 +firstKey128+5+138 +firstValue128 +secondKey128+5+138; the second value is not reached. These are fixed descriptor/statement equations, not sampled operation counters or native cost. Both profile/bound and every reached work/scratch event need exact/tight tests; no fake allocator or OOM probe belongs here because no dynamic output is allocated.
+
+**SIX named tests-first duties.**
+
+| Test / selected child | Mandatory independent controls |
+|---|---|
+| original_retry_keys_preserves_top_atom_precedence_and_short_circuit / parent | Atom retry Other shadows a binary retry Map containing old key in both input orders; atom states Other shadows binary states Map; root old key exact2441 returns true before states semantic work. |
+| original_retry_keys_preserves_guarded_state_retry_fallback / parent | State atom retry Other falls through to binary retry Map; clean atom retry Map shadows bad binary retry Map; bad atom Map wins; nonmap states/entries skip; first true stops before later rows. |
+| original_retry_keys_detects_both_old_names_without_revalidating_content / parent | Atom/binary old-key presence with Other and Map values; current max_retries accepted false; unrelated root max_attempts, type/unknown fields ignored; no UTF8/trim/business/type re-admission of arbitrary binary keys. Other represents a nonmap class, not a proved particular encoded nil/integer payload. |
+| original_retry_keys_keeps_map_order_and_descriptor_scope_explicit / parent | Permutations preserve boolean; queried atom/binary are distinct keys; repeated same queried identity operational Malformed before semantics; opaque/unqueried identity remains unproved; input slices/pointers unchanged after complete semantic/result observations. |
+| original_retry_keys_refuses_descriptor_bounds_before_predicate_visits / refusals | Depth64/65, descriptor4096 attempted boundary, aliased occurrence counting, represented-key262144/+1, profile0, duplicate-query refusal, operational preflight before semantic condition; explicit no whole-term/captured-atom/ETF-cap claim. |
+| original_retry_keys_preserves_one_account_refusals_and_prior_peak / refusals | Independently frozen empty512/640, rootOld2313/2441, duplicate926, each reached tight prefix, repeated output-free calls and real held1928/P64 plus larger4784/P192 seeds; no learned counter/reset/refund. |
+
+These are meaningful supplemental tests of the pinned production helper's missing source branches, not retroactive execution of an original case. Genuine conventional missing-API RED must precede substantive portable production; then focused/strict/ordinary checks, actual reciprocal source review and ROOT's shared/full checks. No inert full-source/private-helper/S0 milestone is requested. Private helper responsibilities may split normally inside the two named files after exact creation selection. Existing policies/caller/CONTENT26/CorePatch18/standalone guard-first/current-before-CAS contracts, request gates/status/bytes/fees and old test prefixes remain unchanged.
+
+**Preserve the original reader cases; no false linkage.** ACTUAL numbered0ab9dc and independent ARCH32db45/ROOT8e0b09 confirm declaration a16aec6cceb6253a at frozen section592–604 builds GENERATIONLESS TWO-TUPLE {:flow_policy_v1,%{type:"checkout",states:%{"charge_card"=>%{retry:%{max_attempts:2}}},retry:%{max_attempts:5}}}; its public decode :error assertion is603, NOT blank605. Current RetryPolicy386–401 rejects that tuple shape before this predicate. Keep the whole original fixture and603 REQUIRED UNLINKED until the real raw reader; never alter it to three fields or map a boolean predicate to its public error. Adjacent caller normalize case583–590/146040b0... asserts the renamed error body at584; it is a separate raw caller-normalization responsibility, also not supplied by this boolean.
+
+Immediate full-reader acceptance inventory remains: RetryPolicy320–401/TermCodec1–21 actual raw encode/decode; PolicyCommand read_policy_reference nil builds generation0 encoded %{type:type} and SHA of ORIGINAL bytes; Policy.ex55–90 reads allocator shard0 and rejects unavailable/read failures distinctly, nil returns{0,nil}, present requires atom type EXACTLY requested; strict allocator flow_create846–924/1183–1197 does stored envelope/gen→CAS→requested type→context/content→active/done high-water. Do not change closed CorePatch's stronger current-before-CAS or old standalone guard-first to equate these routes. Mandatory policy_command_test365–375 original three-tuple roundtrip and generationless refusal;498–525 exact external_size snapshot boundary/full decoded policy;527–550 encoded-overcap/compressed/trailing refusal;552–564 exact MAX and MAX+1; generation_test87–101 foreign-type corruption and all-shard helpers333–340 remain required original-byte/public/setup/profile evidence. Gen0, negative/bignum representation, arbitrary raw map preservation and deprecated-query precedence need real raw byte vectors in that NEXT batch. No current positive V2 constructor/ETF substitute certifies them.
+
+Official dated primary docs support the unresolved distinction, not a baseline runtime proof: [Erlang binary_to_term safe/used](https://www.erlang.org/doc/apps/erts/erlang.html#binary_to_term/2) describes prevention of new atoms AND external function references and reports consumed bytes; pinned TermCodec itself enforces exact consumption and compressed refusal. [OTP28 ETF source](https://raw.githubusercontent.com/erlang/otp/OTP-28.0/erts/doc/guides/erl_ext_dist.md) specifies semantic duplicate map keys are disallowed, including the need to distinguish alternate encodings of equal terms. Captured known atoms alone cannot certify arbitrary :safe term behavior. The actual raw inspector therefore still needs an explicit supported-term/safe-context/semantic-key identity decision, preserved arbitrary-map behavior and stronger private safety dispositions labelled operational. Current OTP docs/our borrowed descriptor bounds are not evidence for the original VM profile. None of those unresolved raw-reader contracts is silently hidden in this predicate.
+
+This task writes ONLY this existing domain note. No Rust/type/module/model/test/config/generator/native/probe artifact has been created or executed. ARCH/PERF can decide this exact short batch and descriptor tariff once; ROOT then assigns actual tests-first/code ownership. The full M1–M8 goal, original scenario/setup/profile obligations, physical readers/atomic publication and independent current Linux AND macOS remain required.
+
+### DOC-NEXT-M1-ORIGINAL-RETRY-KEYS1-BOUND1 — descriptor node boundary precision
+
+ROOT actually read the whole main contract in81e320 and independently agrees with its512/P128, rootOld1366+947=2313/P128, duplicate926, repeat and real held-seed equations. One required test precision follows from the EXACT selected view: complete map-descriptor graphs have N=1+2*entryOccurrences, counting nested/aliased maps per occurrence, hence totalN is odd. Use4095 accepted descriptors versus4097 attempted descriptors; the4096th candidate is paid before the4097th candidate's ItemLimit, not an invented4096-descriptor successful graph. Depth/byte/preflight/semantic scope and all names/APIs remain unchanged.
+
+A flat root with2047 (Other-key,Other-value) descriptor entries hasN4095/B0/classification0. Its preflight plus entry isG524288; retry and states each pay128 lookup +2047*128 key visits=262144, so complete false isG1048576/P128/T1048704. With2048 entries, attempted4097 is paid before the node refusal, retainingG524544/P0. The Other key occurrences may represent distinct opaque source keys; these figures certify ONLY descriptor occurrence work, never general key uniqueness or the hidden raw terms' byte/node cost. This is a fixed declared event oracle, not operation-sampled counters or executed evidence. No new artifact/type/helper/title/cap is proposed or created.
+## DOC-NEXT-M1-ORIGINAL-RETRY-KEYS1-RED1 — actual tests before production
+
+ROOT's exact author order and A-CREATE1 (`architecture` 1,378,626 + 9,163 bytes / SHA 8d96d925) plus P-CREATE1 (1,116,872 + 8,361 bytes / SHA 481ce627) select only the two production children, two test children and the exact 26-byte EOF test seam. I actually read both complete finite decisions; all other source remains outside my write set. Actual formatting 62068c passed. Initial test parent is 7,807 bytes / 222 LF / SHA be19f1d9152175b2ff19e6ae1af932cc8d1a17abaca13d167cfa3e6eaa6ca5be; refusals is 11,158 bytes / 323 LF / SHA b95e4e84d750cb6e09a89a83198bcd7e555fe80b9e3720bcc4fdb44ba1a2c7ca. Manifest 2c36e0 proves the entire old main 1,895-byte SHA 0983001af1bcc10d320cbf3e1eca256806276524c72d25351ee3aad57a50c1b2 prefix, followed only by `\nmod original_retry_keys;\n`; final main is 1,921 bytes / SHA 957689424bb1aaa7aa1c8bdf44106014e0d928afd15c8e6c32b6b6c4e35b5d25. All six exact test identities are present; no production path existed at this run.
+
+Actual command: `CARGO_BUILD_WARNINGS=deny cargo +1.99.0 test --locked -p wf-domain --test complete_policy`. Tool 8916ee completed exit 101, one E0432 covering the three missing selected exports, no other diagnostic and zero assertions. Complete actual output follows; this is conventional missing-API RED before production, not a refusing implementation or semantic run.
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalPolicyMapKey`, `wf_domain::policy::complete::OriginalPolicyMapValue`, `wf_domain::policy::complete::original_complete_policy_uses_max_attempts`
+ --> crates/wf-domain/tests/complete_policy/original_retry_keys.rs:4:43
+  |
+4 |     CompletePolicyEncodingError as Error, OriginalPolicyMapKey as Key,
+  |                                           --------------------^^^^^^^
+  |                                           |
+  |                                           no `OriginalPolicyMapKey` in `policy::complete`
+5 |     OriginalPolicyMapValue as Value, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
+  |     ----------------------^^^^^^^^^
+  |     |
+  |     no `OriginalPolicyMapValue` in `policy::complete`
+6 |     original_complete_policy_uses_max_attempts,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `original_complete_policy_uses_max_attempts` in `policy::complete`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+Depth-65's expected 16,768/P0 was corrected independently from the declared candidate-node-before-depth tariff before this first actual run: entry128 + 65 reached map nodes*128 + 65 attempted key nodes*128. The new exact first-true state fixture is likewise fixed before production: N17/B49/classification2282 gives preflight4635; reached semantics401+530+128+256+256+527+420=2518 gives G7153/P128/T7281, with no later row semantic visit. ARCH and PERF independently confirmed both. After this clean RED, I add the missing bad atom-retry map / clean binary-retry map mirror in both supplied orders within the existing second test (plus unchanged-input length assertion and comment spacing); this remains pre-production source-duty coverage, not a new artifact or altered oracle. ROOT separately observed clean RED 59aeb1 and has now integrated the exact facade. Two substantive production children are next; no new type/helper/inert/S0 gate applies. Original generationless decoder assertion 603 stays unlinked, and raw ETF/safe/full-consumption/gen0/current-reader remains the immediate M1 successor. This local result is Darwin only, with Linux evidence still required.
+
+## DOC-NEXT-M1-ORIGINAL-RETRY-KEYS1-GREEN1 — substantive source and focused acceptance
+
+After the genuine RED1 above and ROOT's exact facade integration, I wrote only the selected two substantive production children. Original root atom-presence masking, guarded state retry fallback, value-independent old-key membership and reached semantic short circuits are implemented on the one received charge. Preflight visits every visible supplied descriptor in order, freshly charges each attempted node before depth/count checks, counts shared map aliases per occurrence, checks represented key-byte totals before text debit, and uses the per-map six-bit mask only for the six queried atom/binary identities. Nested map values are their already-paid descriptor, not another root. All later semantic key/compare/value-class/row events are distinct and prospective; failed debits preserve prior G/P. No source normalization, business admission, incoming/current policy proof, owned output, runtime effect, allocation or new dependency is added. The private shared selector has the two actual top/state behavior substitutions and exposes no public credit or origin flag.
+
+Stable ordinary-formatted source manifest (9ad520, before the first substantive run): `src/policy/complete/original_retry_keys.rs` 3,671 bytes / 84 LF / SHA 611d7b23df6a521c784d075e6d5717b1cb6bcec2e326c9d238e53671d357d164, maximum function34; `original_retry_keys/map.rs` 5,519 bytes / 178 LF / SHA de5f18544f28003b1d296c9be3ae87105ad41b03587145bf0945937dfc6f569f, maximum39. Test parent is 8,263 bytes / 236 LF / SHA c6f4ea4df2317b0b1fd788f93d48be05781d058a7ccc80b0768f290313b214ca, maximum79; test refusal child remains 11,158 bytes / 323 LF / SHA b95e4e84d750cb6e09a89a83198bcd7e555fe80b9e3720bcc4fdb44ba1a2c7ca, maximum53. The sole test delta after initial RED was the pre-production state mirror recorded above: both supplied orders of bad atom retry Map versus clean binary retry Map, unchanged-input length, and comment spacing. No post-production test, expected value, fee or production correction occurred. Old main's exact 1,895-byte SHA 0983001a prefix plus only the delegated26B EOF suffix is revalidated; final main SHA95768942. Four-file ordinary formatter cdca2b and final rustfmt --check passed; owned whitespace diff check287501 passed. Production400/test600/function100 limits hold.
+
+First actual substantive command: `CARGO_BUILD_WARNINGS=deny cargo +1.99.0 test --locked -p wf-domain --test complete_policy`; f000f2 session82779 -> 8e511e completed exit0, all64 passing, zero failed/ignored/filtered. It preserved the old58 while executing all six new source-duty controls. Fixed empty five and RootOld twenty event boundaries, exact early-true2441 and first-true-state7281, duplicate926, flat/aliased4095 success versus4097 retained524544, depth64/65, key262144/+1, profile0, tight/repeated1152, and real held1928/P64 and4784/P192 all agree with pre-production independent schedule/fixture expectations. Complete actual concatenated output follows.
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.18s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-412f381fdad010ab)
+
+running 64 tests
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+
+test result: ok. 64 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+```
+
+Strict focused command: `CARGO_BUILD_WARNINGS=deny cargo +1.99.0 clippy --locked -p wf-domain --test complete_policy -- -D warnings`; 4e5768 session36814 -> 7ffa2f completed exit0 with no diagnostics, no suppression or test/style repair.
+
+```text
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.28s
+```
+
+Written-source review is requested from dedicated ARCH/PERF on these actual stable four files and ROOT's facade/checker. Source593–603's generationless two-tuple remains a distinct required decoder-shape error and receives no assertion link here; these six controls are honest supplemental predicate branch/resource observations. This descriptor bool proves neither general map identity/uniqueness, hidden raw-term accounting, original ETF/safe/used/full-consumption, generation0/current reader/type, nor storage/public/full-profile acceptance. The actual raw original entry inspector remains the immediate M1 successor. Borrow-only code and absence of an output allocation are source facts, not measured allocation/copy/stack/CPU/RSS/latency gains; P128 excludes original owners and native frames, including real held-owner capacities. This focused execution is macOS only. ROOT owns the full wrapper/shared bookkeeping and independent Linux evidence; all M1–M8/profile/public obligations remain open.
+

@@ -765,3 +765,42 @@ post-implementation tests; they are not attributed to the earlier RED. No native
 capacity or total-live-owner guarantee. Old typed APIs and encoding stay exact.
 Original whole-policy options, ETF/current readers, public/setup/profile/physical
 operations and both-host acceptance remain required.
+
+## Original stored retry-key inspection
+
+A-NEXT-M1-ORIGINAL-RETRY-KEYS1-CREATE1 selects two private production children,
+two integration children, OriginalPolicyMapKey/OriginalPolicyMapValue and the
+sole paid boolean predicate. The implementation follows genuine tests-only
+missing-API RED; all64 policy controls and strict target lint pass. The full
+macOS wrapper passes502 Rust tests and four compile-fail docs with all source
+and dependency checks. Written-source architecture and performance reviews and
+their reciprocal review are closed without blockers. No raw-reader acceptance is claimed. Existing APIs,
+positive normalized constructors, encodings and retained outcomes stay exact.
+
+Profile mismatch precedes entry128. Visible map/key/Other-value occurrences
+pay128 before depth64/node4096 checks; actual represented key bytes are capped
+at262144 before their length debit. Named-key classification compares retry,
+states and max_attempts in that order, paying128+both operand lengths before
+each reached equality. A six-bit per-map mask rejects repeated queried
+atom/binary identities before visiting the duplicate's value. The operation
+then admits one G0/P128 scratch event and executes paid source-ordered root,
+key, comparison, matched-value and state-row visits. Root atom presence differs
+from state guarded-map preference; membership skips its value. No dynamic
+output owner, default, accepted credit or generic term-identity proof is added.
+
+Independent pre-implementation expectations now execute: emptyG512/P128/T640,
+root-old-keyG2313/P128/T2441 and queried duplicateG926/P0. Complete visible
+graphs have odd descriptor count1+2E:4095 succeeds atG1048576/P128, while
+attempted4097 refuses atG524544/P0. The corrected refusal counts the root once.
+Real held1928/P64 and4784/P192 seeds preserve continuous charges and maxP.
+Native stack/masks/input construction/comparisons/Drop/live-owner sums remain
+outside these logical bounds. No measured native gain is inferred.
+
+The full original raw reader is the immediate successor, with explicit ETF
+safe atoms/functions, exact consumption, encoded cap, generation0..MAX,
+arbitrary-map and callsite type/error obligations. Its integration must choose
+bounded paid descriptor backing or shared borrowed-span selectors; recursive
+slice input does not itself prove allocation-free construction. The original
+two-tuple decoder assertion603 and caller-normalization584 remain required
+and unlinked. All original setup/profiles/physical and Linux/macOS evidence
+remain acceptance work.
