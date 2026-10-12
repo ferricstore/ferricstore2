@@ -542,9 +542,49 @@ returns no owner or current-policy authority. Other classes hide payload
 identity; descriptor bounds and queried-key duplicate handling do not validate
 arbitrary terms or general map uniqueness. ADR006 records the logical schedule.
 
-The full original raw entry reader remains the immediate M1 successor. It must
-preserve ETF safety/full-consumption/envelope/generation-zero/arbitrary-map/type
-behavior and integrate this predicate through bounded paid backing or shared
-borrowed-span visits. The selected slice view does not make that construction
-allocation-free. Original source603's generationless tuple and all required
-public/setup/profile/physical and both-OS acceptance remain separate obligations.
+The original raw entry reader below integrates this predicate through bounded
+paid backing and the shared borrowed-span visitor. That construction uses temporary
+owners. Original raw parent integration and all required public/setup/profile/
+physical and both-OS acceptance remain separate obligations.
+
+
+## Implemented original raw entry reader
+
+A-NEXT-M1-ORIGINAL-ENTRY1-CREATE1 selects private complete/original_entry with
+eight responsibility-specific children and the private ports reference child.
+Reciprocal creation consultation and actual written-source architecture/performance
+review are closed. All six test children preceded production with genuine missing-API
+RED; domain72/72 and ports65/65 pass. The existing checker passes its new purity and
+server-facade control, with no inspector, dependency or policy exception.
+
+Domain takes original ETF bytes and borrowed atom/export/local-node/function
+context as mathematical inputs. It checks the encoded cap, complete safe term,
+original three-tuple and generation0..MAX before the shared deprecated-key
+predicate. Arbitrary maps remain distinct from normalized business admission.
+The separate read adapter preserves absence, corruption, unavailable and failed
+read origins, then binds only atom:type with a binary semantic value. No
+constructor or returned entry proves physical reads, current authority or
+runtime-context coherence. Existing parent priorities stay unchanged.
+
+Two freshly charged lexical passes surround three fallible temporary Vec
+reservations. Flat spans, map key order and local-function overlays drop before
+the returned entry borrows original bytes. The shared private map visitor has
+exactly the old descriptor and raw-span adapters; the old result and fee controls
+pass unchanged. The raw ports constructor calls a purpose-specific domain byte-preparation
+function once, then hashes its exact output into one PreparedBytes owner. The
+pure helper copies original present bytes or emits the source generation-zero/
+type-map absence fallback on the same account, prospectively paying SHA and
+reference metadata. It accepts raw read classes and grants no debit or Entry-input
+bridge; metadata refusal may precede actual native hashing.
+It retains only the query borrow; public Policy absence stays0/nil.
+
+The selected portable profile models64-bit OTP28.3.1 with explicit operational
+depth/span/capture limits and distinct unsupported-runtime errors. It does not
+replace the broader required source profiles. Captured and first-created local
+functions, source reference branches, semantic map uniqueness and ignored
+subtrees have executed controls. LOCAL, native atom indexes73/75, empty BIT len0/
+bits0 and zero-word NEW/NEWER references are explicit operational exclusions.
+The zero-word native outcome is unknown; ordinary empty BINARY and valid1..5
+reference branches retain their selected semantics. ADR006 records prospective work and scratch
+scheduling. There is no measured native gain or complete original setup/public/
+physical/profile acceptance; Linux and macOS remain independent requirements.

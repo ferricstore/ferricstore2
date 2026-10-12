@@ -23,6 +23,9 @@ CLAIM = "crates/wf-domain/tests/claim_selection.rs"
 FIFO = "crates/wf-domain/tests/claim_selection_fifo.rs"
 LANE = "crates/wf-domain/tests/claim_selection_lane.rs"
 LINKS = [
+    ("a16aec6cceb6253a", "crates/wf-domain/tests/complete_policy/original_entry.rs",
+     "original_entry_preserves_original_shape_generation_and_consumption_errors", 7,
+     [(603, 2)]),
     ("bd8fd99c0d608b90", "crates/wf-domain/tests/complete_policy/indexed_input.rs",
      "indexed_input_normalizes_frozen_original_policy_names_and_presence", 12,
      [(750, 4), (753, 4)]),
@@ -135,6 +138,7 @@ LINKS = [
 # These limits describe this counterpart's represented observations, rather
 # than the complete implementation status of another owner or milestone.
 LIMITS = {
+    "a16aec6cceb6253a": "The frozen original generationless two-tuple retains checkout, the root max_attempts=5 and charge_card state max_attempts=2. The direct Rust None assertion represents source603 :error after complete safe ETF parsing and strict three-tuple shape refusal; it does not claim a deprecated-key predicate result. The original fixture is retained alongside its existing helper control. This direct ledger anchor was added after implementation and supplies supplemental executed coverage, not new tests-first RED. Pure supplied atom/runtime catalogs replace the live VM context; original FlowTest setup, public policy reads, physical storage, broader runtime profiles and independent Linux execution remain required. This single error component does not close the entire source case or full workflow parity.",
     "bd8fd99c0d608b90": "Executed normalization and All/State presentation preserve tenant/atom-region/campaign/tenant first-occurrence names; exact all-binary a/b/c/d input preserves the three-key rejection kind and body. Source750/753 link field components only; public set/get replies745/752, atomic installation, original FlowTest setup and required profiles remain unlinked. This normalizer follows genuine missing-API RED; the links do not establish whole original-case or Linux acceptance.",
     "9d3afdde6564e562": "The actually executed bare Binary version input preserves the normalized indexed_state_meta field at125. This is a post-implementation supplemental observation; public get replies, flow/migration-worker setup, record updates, query/count/index/LMDB behavior, cleanup and required profiles remain unlinked. A typed field observation does not certify complete runtime or independent Linux acceptance.",
     "c8b5602be989ea05": "The actually executed bare Binary version input preserves the normalized indexed_state_meta field at254. This post-implementation supplement does not execute public get replies, worker/migration configuration, claim/signal/query/index/LMDB operations, original setup/cleanup or required profiles. Complete source-case and independent Linux acceptance remain required.",

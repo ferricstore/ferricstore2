@@ -497,3 +497,101 @@ fn complete_policy_original_retry_key_inspection_stays_pure_and_server_side() ->
     }
     Ok(())
 }
+
+#[test]
+fn original_policy_entry_reader_stays_pure_and_server_side() -> CheckResult<()> {
+    for module in [
+        "policy::complete::original_entry",
+        "policy::complete::original_entry::scan",
+        "policy::complete::original_entry::scalar",
+        "policy::complete::original_entry::compound",
+        "policy::complete::original_entry::runtime",
+        "policy::complete::original_entry::identity",
+        "policy::complete::original_entry::visit",
+        "policy::complete::original_entry::safety",
+        "policy::complete::original_entry::callsite",
+    ] {
+        assert_eq!(
+            super::source_check(
+                "wf-domain",
+                module,
+                "use std::str; use crate::policy::complete; use wf_types::identity;",
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "unclassified standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+            (
+                "use wf_parity_tests::progress;",
+                "runtime source references M0-only tooling",
+            ),
+        ] {
+            assert!(
+                super::source_check("wf-domain", module, source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    for name in [
+        "OriginalEtfLocalFun",
+        "OriginalEtfSafety",
+        "OriginalPolicyEntry",
+        "OriginalPolicyReadValue",
+        "OriginalPolicyReadError",
+        "decode_original_complete_policy_entry",
+        "read_original_complete_policy_entry",
+        "prepare_original_complete_policy_reference_bytes",
+    ] {
+        for (package, module, source, diagnosis) in [
+            (
+                "wf-ports",
+                "client",
+                format!("pub use wf_domain::policy::complete::{name};"),
+                "client port facade",
+            ),
+            (
+                "wf-wire",
+                "value",
+                format!("pub use wf_domain::policy::complete::{name};"),
+                "wire may reference only wf_domain::value",
+            ),
+            (
+                "wf-domain",
+                "value",
+                format!("pub use crate::policy::complete::{name};"),
+                "approved domain value module",
+            ),
+        ] {
+            assert!(
+                super::source_check(package, module, &source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    assert_eq!(
+        super::source_check(
+            "wf-ports",
+            "log::complete_policy::original_entry",
+            "use sha2::{Digest, Sha256}; use wf_domain::policy::complete; use wf_types::version;",
+        )?,
+        Vec::<String>::new()
+    );
+    for name in [
+        "OriginalPolicyReference",
+        "prepare_original_complete_policy_reference",
+    ] {
+        assert!(
+            super::source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::log::{name};"),
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
+        );
+    }
+    Ok(())
+}

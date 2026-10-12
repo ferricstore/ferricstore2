@@ -6,6 +6,8 @@ use super::{CompletePolicyEncodingError as Error, PolicySchemaCharge, PolicySche
 
 mod map;
 
+pub(in crate::policy::complete) use map::{OriginalMapVisit, run};
+
 /// Borrowed key classes used by the original stored-policy map predicate.
 ///
 /// These descriptors supply no ETF decoding, atom-safety or source-map identity
@@ -53,32 +55,5 @@ pub fn original_complete_policy_uses_max_attempts(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<bool, Error> {
-    if charge.profile() != limits {
-        return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
-    }
-    charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    map::preflight(policy, charge)?;
-    charge_schema(charge, 0, 128).map_err(Error::Schema)?;
-    if let Some(OriginalPolicyMapValue::Map(retry)) =
-        map::select_top_field(policy, b"retry", charge)?
-        && map::contains_old_key(retry, charge)?
-    {
-        return Ok(true);
-    }
-    if let Some(OriginalPolicyMapValue::Map(states)) =
-        map::select_top_field(policy, b"states", charge)?
-    {
-        charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-        for &(_, value) in states {
-            charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-            charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-            if let OriginalPolicyMapValue::Map(state) = value
-                && let Some(retry) = map::select_state_retry_map(state, charge)?
-                && map::contains_old_key(retry, charge)?
-            {
-                return Ok(true);
-            }
-        }
-    }
-    Ok(false)
+    map::run(policy, limits, 262_144, charge)
 }

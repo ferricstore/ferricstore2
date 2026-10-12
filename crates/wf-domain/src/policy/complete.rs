@@ -17,6 +17,7 @@ mod error;
 mod indexed_input;
 mod installation;
 mod model;
+mod original_entry;
 mod original_retry_keys;
 mod outer;
 mod patch;
@@ -45,6 +46,11 @@ pub use installation::{
 pub use model::{
     ApprovalsData, AuditData, BudgetData, CircuitData, CompleteStatePolicyData, DenialAuditMode,
     EffectsData, GovernanceData, GovernanceMode, LimitData,
+};
+pub use original_entry::{
+    OriginalEtfLocalFun, OriginalEtfSafety, OriginalPolicyEntry, OriginalPolicyReadError,
+    OriginalPolicyReadValue, decode_original_complete_policy_entry,
+    prepare_original_complete_policy_reference_bytes, read_original_complete_policy_entry,
 };
 pub use original_retry_keys::{
     OriginalPolicyMapKey, OriginalPolicyMapValue, original_complete_policy_uses_max_attempts,

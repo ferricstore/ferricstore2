@@ -36226,3 +36226,519 @@ Strict focused command: `CARGO_BUILD_WARNINGS=deny cargo +1.99.0 clippy --locked
 
 Written-source review is requested from dedicated ARCH/PERF on these actual stable four files and ROOT's facade/checker. Source593–603's generationless two-tuple remains a distinct required decoder-shape error and receives no assertion link here; these six controls are honest supplemental predicate branch/resource observations. This descriptor bool proves neither general map identity/uniqueness, hidden raw-term accounting, original ETF/safe/used/full-consumption, generation0/current reader/type, nor storage/public/full-profile acceptance. The actual raw original entry inspector remains the immediate M1 successor. Borrow-only code and absence of an output allocation are source facts, not measured allocation/copy/stack/CPU/RSS/latency gains; P128 excludes original owners and native frames, including real held-owner capacities. This focused execution is macOS only. ROOT owns the full wrapper/shared bookkeeping and independent Linux evidence; all M1–M8/profile/public obligations remain open.
 
+
+## DOC-NEXT-M1-ORIGINAL-ENTRY1 — complete raw reader and distinct source callsites (proposal only)
+
+This is the next substantive M1 operation, not another predicate increment. Recommend one cohesive raw ETF reader, the public Policy raw-read adapter, and the PolicyCommand reference byte constructor. Only this existing note is written. No path/type/module/model, implementation, probe, test or dependency below exists by virtue of this proposal; ARCH must explicitly select the named batch and ROOT must assign authoring. Routine private helpers within the selected responsibilities need no later inert-buffer/S0 gate. The completed predicate stays unchanged until a selected sharing edit preserves every existing API/result/event. I actually read the entire current A-WRITTEN1 (1,388,947+7,793/073158f4,3bfe25) and P-WRITTEN1 (1,126,434+8,746/0c86f18d,4f264d); their actual-source findings agree, with no requested code repair. ROOT's 502+4 macOS wrapper and checkpoint6fccd21/8fdddf5 are coordinator evidence. Current Linux and full source/profile acceptance remain open.
+
+**Actual causal contract.** Pinned66586c5 `apps/ferricstore/lib/ferricstore/term_codec.ex:9–20` rejects compressed131/80 and requires safe decoding plus exact used==input length. `flow/retry_policy.ex:386–401` first bounds the encoded owner to263168, then accepts only the decoded three-tuple flow_policy_v1 / integer generation0..9_007_199_254_740_991 / Map, then invokes the deprecated-key predicate976–995. It does not apply snapshot external_size262144, requested type or normalized business admission. Arbitrary map content and real encoded generation0 must survive; positive normalized Candidate/Value constructors cannot represent this scope. `flow/policy.ex:55–90` independently maps nil to0/nil, nonbinary/type mismatch/corruption to corrupt, unavailable to shard-unavailable and error/invalid reads to read-failed. Its pattern requires atom:type, with no binary-key fallback. raw_entry accepts every binary requested type, including empty; front get/set options/nonempty/key-size admission is a different owner. `flow/policy_command.ex:349–390` instead synthesizes actual original ETF %{type: requested_type} at generation0 on nil and hashes the exact original bytes outside domain. Present values retain their original encoding. Allocator `flow_create.ex:846–924/1183–1197` must still be able to inspect strict generation before CAS and perform atom-type binding only after CAS. Existing CorePatch full-current-before-CAS and standalone guard-first APIs/fees remain exact.
+
+The encoded-only distinction has an independent required control: a three-tuple generation0/1 containing only %{version: binary} has40+payload bytes. Payload263128 produces exactly263168 bytes, while standalone map external_size is263148 (>262144); the decoder accepts it, while the public type-bound read rejects missing atom:type separately. Payload263129 produces263169 and is source corruption before ETF parsing. Do not call old complete_metrics/admit_complete or use the old schema leaf262144 cap in this reader.
+
+**Named production inventory for one creation decision.** New private domain feature `crates/wf-domain/src/policy/complete/original_entry.rs`, with these exact private children in `original_entry/`: `scan.rs` (two complete priced lexical passes and flat index), `scalar.rs` (integer/atom/float/binary/bitstring decoding), `compound.rs` (tuple/list/string/map traversal and transparent zero-length-list aliases), `runtime.rs` (PID/port/ref/export/local-function syntax and branch-specific captured state), `identity.rs` (fallible exact key comparison and bottom-up map uniqueness), `visit.rs` (raw-span adapter to the shared predicate), `safety.rs` (fresh catalog admission/lookups), `callsite.rs` (Policy raw-read classes/error/type adapter). Each owns a source responsibility that can ordinarily fit400/100; no implementation or actual formatter fit is claimed now. One new ports child `crates/wf-ports/src/log/complete_policy/original_entry.rs` owns actual reference fallback emission, paid original-byte copy and SHA using the existing PreparedBytes/PreparedDigest and pinned sha2; domain remains std/wf-types only. No general-purpose public term parser/tree or new dependency.
+
+Exactly these public domain models are proposed, server-side only:
+- `OriginalEtfLocalFun<'context>`: five private mathematical fields module:&str, index:u32, arity:u8, uniq:[u8;16], old_uniq:u64, with exact five-operand `new` returning Self. It describes the canonical already-resolved function entry selected by the captured source code-table state, not proof that the entry exists.
+- `OriginalEtfSafety<'context>`: private borrowed fields atoms:&[&str], active_exports:&[(&str,&str,u32)], local_node:Option<(&str,u32)>, local_funs:&[OriginalEtfLocalFun], pid_references:&[&[u32]], and exact five-operand `new` returning Self. It carries snapshot data, no charge, validity, origin, epoch or permission flag. The reader freshly admits it and performs every reached lookup. A missing local_node means runtime-local checks are unavailable, not that every encoded node is remote. Real capture/coherence and updates after VM table effects remain external obligations.
+- `OriginalPolicyEntry<'encoded>`: four private fields encoded:&[u8], policy_range:(usize,usize), generation:u64, workflow_type:Option<&[u8]>. Getters `encoded`, `policy_bytes`, `generation`, `workflow_type` expose immutable mathematical bytes/scalars only. policy_bytes is the exact encoded policy subterm, including any legal transparent wrapper; workflow_type is only an atom:type field whose semantic value is a binary, including a full-byte BIT_BINARY form. There is no public constructor/decomposition/accepted-entry encoder or payment/current-authority bridge.
+- `OriginalPolicyReadValue<'encoded>` has exactly Absent, Binary(&[u8]), Other, Unavailable, ReadFailed. These are supplied read-result classes, not performed I/O; Other is a rejected nonbinary class and grants no hidden-payload accounting.
+- `OriginalPolicyReadError` has exactly Corrupt, ShardUnavailable, ReadFailed, Encoding(CompletePolicyEncodingError). The first three Display bodies are precisely ERR flow policy is corrupt / ERR flow policy shard not available / ERR flow policy read failed. All are operational read/current errors and may not become caller business rejection/retained status. No RetainedStatus/PolicyRejection or fixed content registry changes.
+
+Propose exactly these raw-only domain entry APIs:
+```rust
+pub fn decode_original_complete_policy_entry<'encoded>(encoded: &'encoded [u8],
+    safety: &OriginalEtfSafety<'_>, limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge)
+    -> Result<Option<OriginalPolicyEntry<'encoded>>, CompletePolicyEncodingError>;
+pub fn read_original_complete_policy_entry<'encoded>(value: OriginalPolicyReadValue<'encoded>,
+    requested_type: &[u8], safety: &OriginalEtfSafety<'_>, limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge)
+    -> Result<Option<OriginalPolicyEntry<'encoded>>, OriginalPolicyReadError>;
+```
+The result lifetime is tied only to the encoded owner, separate from requested-type and safety lifetimes. Decoder Ok(None) means an actual source invalid/unsafe/envelope/generation/deprecated result, not absent storage. Err is operational admission/profile/allocation/unsupported-profile failure. The read adapter returns Ok(None) only for supplied Absent; binary decoder None becomes Corrupt, and valid binary entries require freshly paid atom-type equality. It starts raw on each call, never accepts Entry as an input. Nonbinary/unavailable/read-failed branches and absent do not inspect poisoned safety or reconstruct policy. No source type/nonempty admission is added. A future source allocator can call the unbound decoder, CAS its real generation, then do the private freshly paid type comparison; this proposal does not change the closed parents or create that physical authority.
+
+Ports adds `OriginalPolicyReference<'query>` with three private fields requested_type:&[u8], generation:u64, prepared:existing PreparedBytes, and only workflow_type/generation/encoded/digest getters plus consuming into_parts()->(&[u8],u64,PreparedBytes). Its sole public API is `prepare_original_complete_policy_reference(value, requested_type, safety, limits, &mut charge)->Result<OriginalPolicyReference,OriginalPolicyReadError>`. It starts from the supplied raw read value, uses the raw read adapter for present entries, and owns only one exact encoded-byte Vec/fixed digest. Absent performs the source-specific original ETF generation0/type-map construction, not the Policy0/nil presentation path. There is no public accepted-Entry overload. Original source policy_ref does not use the FWCP namespace/hash; SHA covers exactly the stored/default encoded bytes.
+
+Private nominal inventory is limited to `TermSpan` (six u32 fields start/end/next/canonical/symbol/keys), `VirtualLocalFun` (same five lookup/normalization fields as LocalFun, using a captured atom index for module), `TermPosition` (Encoded(u32), StringCell{span:u32,offset:u32}, Byte(u8), Nil), `EtfMap<'raw,'index,'context>` (borrowed encoded/index/safety plus root:u32), and the trait `OriginalMapVisit` in the EXISTING original_retry_keys/map.rs. No owned node links, leaf copies, recursive Vec graph or self-reference. Temporary Vec<TermSpan>, Vec<u32> canonical key order and Vec<VirtualLocalFun> drop before Entry escapes; input/safety remain borrowed. TermPosition is a comparison cursor for alternate list/string forms, not a retained/general AST.
+
+**Precise sharing seam.** OriginalMapVisit is private `pub(in crate::policy::complete)`, Copy, one associated Copy Key, and seven methods len/key/value_map/name_len/is_named/is_atom/equals_ascii. Exactly two implementations: the existing borrowed slice of public Key/Value descriptors and EtfMap. Move/generalize the current private preflight, mask, top/state selectors and old-key member algorithm behind that trait. All charges precede substantive visits/comparisons; no external callback/dyn box/free credited metadata. Existing public predicate profile/entry128, every5/20 event and all64 current tests retain their exact stream. Raw calls pay a fresh predicate entry128 and its full visible-map preflight/semantics on the received charge. The raw name-byte bound is2*263168, derived from possible Latin1-to-UTF8 width; it is not the old262144 source-business limit. The descriptor API keeps its exact old262144 operational bound. Both retain the64/4096 visible operational profile. Other classes in the raw adapter may be projected only AFTER their complete raw term was lexically/safely/semantically validated, never as a skip or certificate for unsupported terms. A separate freshly paid private atom-only selector obtains type; root binary:type is deliberately ignored.
+
+**Supported profile and material unresolved edge.** Select the explicitly bounded64-bit OTP28.3.1 deterministic external-policy profile: encoded cap263168; encoded term spans4096 and depth64 (root0), checked before descent, with each attempted span128 before cap checks. These latter private bounds are operational exclusions, not the source byte cap or corruption; complete source/profile acceptance outside them remains REQUIRED. Full portable scalar/tuple/list/string/map/bitstring/PID/port/reference/EXPORT_EXT/NEW_FUN_EXT classes are in the proposed responsibility. Known-atom lookup is required even in ignored fields and runtime structures. Active export membership applies only to EXPORT_EXT. Local functions normalize through the captured canonical table or a bounded within-decode first-insert overlay: lookup uses module/index/arity/uniq, while exact equality uses the resolved source entry identity/fallback fields, num_free and environment. Captured entries may supersede wire old_uniq; later identical lookup keys reuse the first virtual entry. Do not compare whole wire headers or apply the active-export catalog to every function. Size and creator identity are ignored for NEW_FUN identity after creator PID validation; obsolete FUN_EXT is source invalid. No VM resource is created by this pure simulation, and a reused/stale snapshot cannot certify source native table state across calls.
+
+This follows the exact [OTP28.3.1 decoder](https://raw.githubusercontent.com/erlang/otp/OTP-28.3.1/erts/emulator/beam/external.c): it skips the compatibility Size field, validates safe export availability separately, and fixes nested maps before duplicate checks. The [OTP27 release rule](https://www.erlang.org/patches/otp-27.0) distinguishes signed float zero for exact term identity. Current OTP29 documentation was read only as current documentation, never attributed to baseline28.3.1. PERF's tagged-source identity audit further finds local reference padding/trailing-zero identity and function-entry reuse; the ordinary runtime/identity implementation must follow those branches, not a syntactic substitute. LOCAL_EXT and internal runtime-affine encodings requiring local_node_hash are explicitly Err(UnsupportedTag) in this first portable profile; likewise a valid runtime form whose required captured tables are unavailable is operationally unsupported. Neither may become None/Corrupt or whole-case parity. Required full source/runtime profiles remain open. The precise capture source/availability and special-reference classification must be confirmed by ARCH/PERF; they are the remaining material contract issue, not an inert-body gate.
+
+**General key identity.** Validate every map bottom-up, including maps/unknown terms in ignored fields. Exact equality coalesces alternate integer/bignum spellings (zero/sign/leading zeros), Latin1/UTF8 atom encodings, string/list/Nil forms, full-byte bitstring/binary encodings and order-independent nested maps. Integer1 differs from float1.0, and +0.0 differs from-0.0; non-finite floats are invalid. Zero-length LIST wrappers resolve to their semantic tail before envelope/map/type decisions. Legacy FLOAT_EXT requires the actual source grammar including comma radix, terminator and accepted completed underflow; trailing bytes after its first NUL are still consumed but not reinterpreted. A bounded local decimal buffer can normalize comma without a String/Vec. References normalize according to the captured node/creation branch and compare padded/trailing-zero number identity. Functions use canonical table/virtual overlay state. No raw-byte equality substitute.
+
+Use one bounded flat key-index Vec and explicit FALLIBLE in-place heapsort/comparison per map; no BTreeSet/Ord closure hiding Result/work and no canonical re-emission/copy of raw leaves. Sorting changes only auxiliary indices. The source Enum iteration order is not promised: supplied ETF encounter order is used for paid raw selectors, whose final Boolean is order-invariant within admitted operation bounds. All source preference, membership and short-circuit decisions still share one implementation.
+
+**Prospective schedule (not sampled counters).** Profile mismatch first/G0. Decoder entry128, source encoded cap check, then two paid prefix bytes; compressed/invalid headers reject before safety/index work. Safety root128; each atom row128+UTF8 bytes, export row128+module/function bytes+4 arity bytes, local-function row128+module bytes+29 fixed bytes, local-node row when present128+name bytes+4, each pid-reference row128+4*wordcount. Row/count/aggregate/canonical-context failure is operational; fresh equality/membership pays128+both actual compared operand widths before each reached comparison. No automatic Context validity/payment token. Cap relevant catalog rows4096 and text262144, with atom255-code-point source bounds; duplicate queried table identities refuse operationally. Context constructors do not charge or attest any of this.
+
+Pass1 reads every encoded byte once and pays128 for each attempted encoded span, before depth/count checks; every atom/fun/ref lookup additionally pays its reached branch-specific catalog work. It measures mathematical N total spans, K total map pairs and F local-function occurrences, with no output owner. Admit one scratch P64*(N+K+F), preserving max priorP, because index/order/virtual-entry stages coexist. Separately pay index reserve128+32N, key-order reserve128+4K and virtual-entry reserve128+64F before their fallible reservations (even zero counts retain the fixed owner event). Pass2 freshly pays the entire byte/node/catalog stream again and builds only offsets/scalars; no prepaid public bridge. Each new virtual fun normalization root/row comparison and insertion128 is separately charged, including reuse; captured/virtual lookup compares the complete branch-specific tuple with both widths. No skipped work on a successful first pass is credited to the second.
+
+Then each map pays root128 and each placed key index128; explicit sort/equality pays128+the compared canonical scalar/compound-cell widths before every reached normalized cell pair, recursively/iteratively paying descendants and rereads. String virtual cells and runtime-normalized fields are charged too. Bottom-up uniqueness precedes envelope shape. Shape pays root128, tag comparison128+both14-byte names, generation classification/range128 and Map classification128; wrong arity stops at its root before the later shape checks. The shared raw predicate pays its full fresh entry/preflight/P128/semantic stream; deprecated true returns None. Atom-only type extraction pays the normal lookup/key/comparison/matched-value events. Last Entry metadata128 occurs after all checks. Fixed parent fields/Getter lengths are mathematical data, no account identity or free source authority. All debit failures preserve priorG/P and return no Entry.
+
+Independent minimum26-byte Map0 with safety atoms=[flow_policy_v1], other catalogs empty/local_node=None has: entry/prefix130; catalog270; each lexical pass (4*128+26)+(128+14+14)=694; scratch256; reserves256+128+128=512; map uniqueness128; shape540; full empty predicate512; empty atom-type lookup128; Entry128. Therefore G3736/P256/T3992. Tight3991 retains3608/P256; repeatG7472/P256/T7728 with tight7727 retaining7344/P256; real held1928/P64 seed givesG5664/P256/T5920, tight5919 retains5536/P256. These are proposed source/statement tariffs fixed before any new-reader execution, subject to concrete peer arithmetic review; no oracle may be learned from the tested result. Nonzero maps/F must test SUM scratch, not max of separately live stages.
+
+Read adapter adds root128 before its supplied-result branch and, only for present decoded entries, a fresh128+requested type bytes+actual binary type bytes comparison; missing/nonbinary type uses zero actual width and rejects. It does not read poisoned safety on absent/unavailable/read-failed/nonbinary branches. Ports present reference freshly pays copy128+B before one fallible Vec reserve/extend, SHA128+B, then reference metadata128. Absent source-reference path freshly measures and emits a fixed six-node ETF form: B=37+type length, M=768+B; raw read root128 then M, exact source cap, reserve128+B, emissionM, SHA128+B, reference128. Hence one-byte type t gives actual38-byte fallback and G2200/P0; checkout gives45 bytes and G2228/P0. An exact/tight same-account and held-output fixture must independently pin these events. No Box conversion, isolated copied generic tree, unpriced insertion, new account or refund. Vec reserve may exceed the request; logical slots/P do not prove physical capacity, peak live owners, allocation, stack, Copy/Drop, CPU/RSS/latency gains.
+
+**Independent raw oracles already assembled in memory (086939, stdlib bytes/hash only; no source candidate/native VM).**
+- MIN26: `836803770e666c6f775f706f6c6963795f763161007400000000`, SHA3074109594dff320c502e1f4664d6f5ec087ecf523162b6dded86d7718677956.
+- TWO-MIN24: `836802770e666c6f775f706f6c6963795f76317400000000`, SHA37444933840a94520fd9808252570c2c5a22b7bf40d98966839e3a917919a508.
+- Actual source603 fields, still TWO-arity,133B: `836802770e666c6f775f706f6c6963795f76317400000003770572657472797400000001770c6d61785f617474656d7074736105770673746174657374000000016d0000000b6368617267655f636172647400000001770572657472797400000001770c6d61785f617474656d70747361027704747970656d00000008636865636b6f7574`, SHA1d0f1f9ecd3adfde1691fb6e221518eecb1b82f7762ad8b6b12f6784e31ec8fb. This represents the exact original term/values; byte assembly is not an original VM dump.
+- Source generation-boundary/public-v1 MAX87B: `836803770e666c6f775f706f6c6963795f76316e0700ffffffffffff1f74000000027704747970656d0000001367656e65726174696f6e2d626f756e64617279770776657273696f6e6d000000097075626c69632d7631`, SHAa58e405da3872edcefc54b4aefa173d2974f19f6f6d0c4eb477a27bcff950228. Replace the seven magnitude bytes by00000000000020 for MAX+1; same87B/SHAd0496491cc029361d630327688dd2c66e0dd9b6f26f1b719def39de156d36a19.
+- Source absence checkout45B: `836803770e666c6f775f706f6c6963795f7631610074000000017704747970656d00000008636865636b6f7574`, SHA4b2a4354b30b9b8ef3b7aa0c35f074bf353113b4a492173067e2528b8f2431e4.
+- Encoded-only exact263168 is fixed40-byte prefix `836803770e666c6f775f706f6c6963795f763161007400000001770776657273696f6e6d000403d8` plus263128 x bytes, SHA5956f6c6daef1dff32920eebc3be9edd05e16a980955b55c7e5c89d6b7884d25; +1 uses length000403d9 and263129 x, SHAe01f2f70d31ad91312f53d7e2ee60e243e05ea781121d942fbfa722c75c28918.
+- Source sized_policy type snapshot-boundary/version x*262096 has standalone external_size262144 and generation1 envelope262164, SHAc2adde0c63beafc062b34fff3bcda0a59bab3ad6b0c2b1ff210909f85b89f3f6. Reader accepts it; incoming snapshot validation/normalization+1 responses remain their distinct owner, not this raw decoder.
+
+**Named tests-first batch.** Five new private children of the existing domain complete_policy target: `original_entry.rs`, `original_entry/cases.rs`, `original_entry/identity.rs`, `original_entry/runtime.rs`, `original_entry/refusals.rs`; one new private ports existing-target child `tests/complete_policy_request/original_reference.rs`. Exact eight domain identities: original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission; original_entry_preserves_original_shape_generation_and_consumption_errors; original_entry_applies_branch_specific_safety_and_runtime_normalization; original_entry_checks_semantic_duplicate_keys_across_etf_encodings; original_entry_integrates_old_key_short_circuit_and_atom_map_preference; original_entry_binds_type_and_preserves_read_result_origin; original_entry_preserves_each_reached_admission_and_owned_index_refusal; original_entry_keeps_original_bytes_after_index_cleanup. Exact three ports identities: original_reference_distinguishes_public_absence_from_stamping_fallback; original_reference_hashes_exact_present_encoding_without_default_expansion; original_reference_preserves_raw_failure_and_continuous_copy_hash_refusals. Routine private fixture/parser-of-fixed-hex helpers within these responsibilities may be split without another inert approval gate; no additional type/path/model. All production400/test600/fn100 ordinary formatting is required at authoring, not achieved by compression/dropped assertions.
+
+Controls must include the complete independent raw bytes/generation/map range/type/reference body+SHA before pointers, input/safety unchanged, held original owners and accepted references on repeated/tight real accounts. Both catalog/virtual F and K/N stages must remain live for combined scratch controls. Cover every truncation/trailing marker, genuine valid compressed input, source exact encoded cap independent of snapshot cap, source two-tuple603 with old predicate NOT reached, proper three-tuple deprecated controls separately, MAX/MAX+1/negative/float generation, old/UTF8 atom and alternate integer encodings, zero-list aliases, all general key equalities above, exact float comma/NUL/underflow/zero cases, ignored unsafe payloads, active-export present/absent, local-fun stale wire-olduniq versus captured canonical entry and first-created overlays, creator validation versus identity, bad Size accepted, FUN_EXT invalid, special refs/padding and LOCAL unsupported distinct from corruption. Mathematically mismatched/public type/read-error controls must start from genuine raw bytes/read classes, not normalized constructors or accepted Entry arguments. Stored decoder accepts empty/foreign/no-type arbitrary maps; public adapter distinguishes them. Empty requested type passes lower adapter where source permits it.
+
+**Frozen source-case duties and honest limits.** Manifest IDs: a15fa47aedeea599(policy_command364) retains371–375 canonical full map and generationless error;2357f49ff9da17a5(line499) retains506–522 deterministic snapshot/reader/normalization observations, but only the real encoded accepted-map portion is this reader's prospective counterpart; ea31ba166b75c838(line526) retains535–546 oversized/compressed/trailing;2302fd8c2cfa076d(line549) retains554/558 MAX decode plus existing560–564 allocator assertions separately;3fb6f6aed5d5d455(generation86) retains foreign-policy-type/max_active9000 and exact corruption response, with actual shard0 write/public get still REQUIRED; a16aec6cceb6253a(section592) retains the generationless checkout/charge_card/max_attempts2/5 recipe and exact603 decode:error, WITHOUT relabeling it a three-tuple old-key test. Separate incoming caller146040b0/584 renamed diagnostic remains untouched and unlinked until its own normalization path executes. TermCodec's actual compressed/trailing tests are causal references; they are not silently added to the frozen workflow manifest. Original all-shard/runtime setup/helper/profile/public observations remain mandatory and cannot be closed by these pure functions or source-assembled bytes.
+
+ROOT shared changes after selection: complete.rs private module and exact domain exports; ports complete_policy/log forwarding for the model/API only; both target EOF mod seams, preserving every old byte; architecture positive descendant/std-wf-types/domain-effect and ports hash/dependency checks plus forbidden client/wire/domain-value forwarding of the new public names. No weakening of checker or dependency policy. Genuine missing-API tests-only RED before substantive source; then preserve all old64 domain and62 ports controls, meaningful new behavioral negatives and full strict/fmt/docs/architecture/reference checks. No required rejecting S0 or full inert-body approval loop. Mapping follows real execution/direct assertions with honest source-component limits. Independent Linux AND macOS, actual safe/runtime captures and full source profiles remain required.
+
+Remaining decisions for the single concrete ARCH/PERF consultation: approve these exact ten production/six test paths/models/APIs/sharing seams; confirm the runtime capture/virtual overlay normalization versus valid-but-unavailable operational exclusions and the strong64/4096 profile; independently review the stated tariff/minimum3992/reference2200/2228 before authoring. Full raw/source profile acceptance—including LOCAL/native tables—cannot be certified by this initial portable profile. Physical allocator-shard reads, actual error provenance/coherent configuration, source default stamping integration, CAS/type/current parent replacement, policy presentation/raw-content resolution, atomic storage/index/migration publication and all M2–M8 remain later required work. The proposal is finite and reviewable now; it imposes no future receipt/body/native wait before an actual named decision and genuine tests-first implementation.
+
+Ports exact lifetime seam is `pub fn prepare_original_complete_policy_reference<'query>(value: OriginalPolicyReadValue<'_>, requested_type: &'query [u8], safety: &OriginalEtfSafety<'_>, limits: PolicySchemaLimits, charge: &mut PolicySchemaCharge) -> Result<OriginalPolicyReference<'query>, OriginalPolicyReadError>`. The owned PreparedBytes makes its encoded lifetime independent of the raw read owner; only the query type remains borrowed. The six proposed models above and private cursor/index/trait inventory are the complete nominal inventory; helpers/transparent spelling aliases within those responsibilities cannot add ownership, an attestation or an unlisted public model.
+
+I ACTUALLY read entire P-SOURCE1 (1,137,068+9,094 / SHA0e6d83b5, c94282) and A-SOURCE1 (1,397,900+3,798 / SHAb8a7502b,539f5c), including the pinned local-function/runtime-reference distinctions and fallible comparison/index ownership, after publishing this concrete contract. Their preparation agrees with its separate source/operational/supported-profile boundaries. Those readings select no artifact or implementation. ROOT's newly located existing clean baseline beams make direct pure original-helper validation possible without a new harness file; ROOT owns that actual VM validation and its version/source evidence, separate from these source-assembled vectors and from full ExUnit/store/setup/profile/Linux acceptance.
+
+## DOC-NEXT-M1-ORIGINAL-ENTRY1-PASSES1 — measurement versus reserved normalization
+
+The intended contract is TWO passes with no virtual Vec or other unreserved dynamic owner in pass1. Pass1 keeps only checked fixed N/K/F counters, Reader/scalar temporaries and depth-limited native parser frames. It validates complete syntax and freshly priced captured safety: atom membership, active-export availability and the reached PID/reference runtime branches, including all ignored children. For NEW_FUN it validates header/field classes, creator PID and environment, ignores the compatible Size field, and measures F; it does not build/search a first-insert overlay or resolve canonical local-fun identity. Catalog admission before pass1 freshly checks the supplied local-function rows as borrowed input, but that is not overlay construction or semantic normalization. Native frames remain outside logical scratch and are explicitly bounded by the selected operational depth64.
+
+After pass1 succeeds, the existing proposal admits the SUM scratch and THREE distinct prospective index/key-order/virtual-entry reserves. Only reserved pass2 builds offsets and virtual first-insert state. Each reached local-function normalization pays its own root/borrowed captured-row/earlier-virtual-row comparisons before lookup; each ACTUAL new insertion pays its distinct128 before pushing into the already reserved Vec. Reuse pays all reached lookup work, with no fabricated insertion or credit. Captured canonical entries take precedence; otherwise the first virtual entry for the source lookup tuple determines later reuse. Pass2 completes this state and the complete fresh byte/node/safety stream before bottom-up semantic map identity/uniqueness. Neither identity nor the deprecated predicate runs during pass1. The minimum F0 arithmetic3736/P256/T3992 and source reference2200/2228 remain unchanged; nonzero-F controls must independently freeze the pass2 visits/insertions from fixed catalogs and term order before production.
+
+This clarifies the intended ownership/event split in the unchanged ORIGINAL-ENTRY1 proposal; it creates no artifact, implementation or new model and adds no private-helper/body gate. ROOT separately reports13 direct pure pinned-helper checks PASS on Elixir1.19.5/OTP28.3.1 (8e8b38), including the actual source603133-byte two-tuple and encoded263168/no-snapshot-cap distinction. Those are ROOT's actual reference-helper evidence, not my execution or full ExUnit/project/setup/profile/Rust/Linux acceptance.
+
+## DOC-NEXT-M1-ORIGINAL-ENTRY1-RUNTIME-CORR1 — precreation correction
+
+The prior pid_references catalog/whitelist proposal is RETRACTED. PERF's newly read exact OTP28.3.1 erl_bif_unique.h259–276 reconstructs the64-bit PID-reference form from the encoded words and checks its internal-PID representation; it does not consult a liveness/permission table. An absent magic lookup falls back to an ordinary reference. Local ordinary/magic branches retain three number words, potentially dropping additional nonzero words, whereas remote references retain their declared words and exact identity ignores trailing zeros. runtime.rs must follow these actual structural/captured-node branches; no invented PID-reference whitelist may reject a source-admitted form.
+
+Recommend the same named batch with OriginalEtfSafety containing FOUR fields/constructor operands only: atoms, active_exports, local_node, local_funs. Remove pid_references and its catalog-row tariff. No replacement model/path/flag is proposed. This supersedes the five-field Safety inventory above, pending the single concrete ARCH/ROOT decision. PASSES1 remains exact: there is no virtual owner in pass1, and reserved pass2 precedes local normalization/identity.
+
+The exact erl_fun.h fields index/old_uniq are C signed32. Recommend i32 for BOTH fields in OriginalEtfLocalFun and VirtualLocalFun, keeping the same five-operand LocalFun constructor and lookup tuple. Incoming old integer fields must first satisfy the source is_small restriction, then reproduce unsigned extraction/C-int low32 conversion; source exact ordering uses the resulting signed32 value. Captured canonical entry/first-created overlay precedence stays unchanged. Catalog fixed-width debit is25 (index4+arity1+uniq16+old_uniq4), superseding29. Lookup tuple width remains21 per operand; logical virtual reserve64F/scratch64F remains conservative and unchanged. These are source-derived corrections before any artifact/implementation/test creation, not counters fitted to a run. F0 minimum3736/P256/T3992 and absence2200/2228 are unchanged. Full special-reference/classifier and local-function runtime source tests remain mandatory in the already named runtime/identity responsibilities.
+
+## DOC-NEXT-M1-ORIGINAL-ENTRY1-RED1 — actual tests-only authoring
+
+AUTHOR ORDER is ROOT-ORIGINAL-ENTRY1-SELECT1 after the single exact A-CREATE1 (1,401,698+16,492/eae64822) and P-CREATE1 (1,147,997+15,552/e7ef053e) consultation normally closed. I actually read both entire decisions before creating these six approved test children. No production, facade, original predicate, configuration, source ledger or other review file was edited by me. Only the six children, delegated exact EOF module suffixes and this existing owned note changed. This is genuine missing-API compiler RED, with zero assertions; it does not establish semantic failure, allocation failure, public/physical/source-profile parity or Linux results.
+
+Six ordinary rustfmt1.99.0/edition2024 actual files, as read at the RED epoch:
+
+| File under crates/ | LF | Maximum function LF | SHA256 |
+| --- | ---: | ---: | --- |
+| wf-domain/tests/complete_policy/original_entry.rs | 363 | 83 | 3b0a3e4a9fd66539dc09e389df065992fac5d1efcfe3109fdccde70757bada5d |
+| wf-domain/tests/complete_policy/original_entry/cases.rs | 222 | 23 | 3aa35e9b0b2f86e054e57e5a4c834715ebd5fca0a1a514dc44eb1ac9ac572b09 |
+| wf-domain/tests/complete_policy/original_entry/identity.rs | 195 | 59 | 112f43b140b1bb053ff5b5a09e472352b1b46407a1dbbc453870ddf4976b9d38 |
+| wf-domain/tests/complete_policy/original_entry/runtime.rs | 241 | 66 | b491f98778945519160f67718e0db220a708b7ae2596b84de80478f1b6875beb |
+| wf-domain/tests/complete_policy/original_entry/refusals.rs | 341 | 52 | 845fe0c4088c370d21aaaa1e8b346024334dd7bece06b1be6297e19607c4d8fa |
+| wf-ports/tests/complete_policy_request/original_reference.rs | 413 | 76 | 2e264e21d778fcb7b0469f21e5fae9312ab2f8f671577e4f234148ae3f3f8f12 |
+
+Function figures count the complete fn declaration/body; each test attribute adds one line and all remain below100. Formatter8c154b/41208a passed. Physical manifest de988e independently checks every file600/function100 and both EOF inverses. Domain main old1,921B/SHA957689424bb1aaa7aa1c8bdf44106014e0d928afd15c8e6c32b6b6c4e35b5d25 + exact21-byte `\nmod original_entry;\n` gives1,942B/SHAc8777046404ff07a2ad308880347744f5790e0ed98fe542498bdae7197793d41. Ports main old8,906B/SHA53de156694f766996685571d3977fd24c7af17307eb25947ba09e7fbf8f29d9b + exact25-byte `\nmod original_reference;\n` gives8,931B/SHAaf2f3ede3cf6c10f3cc2b5f4872f34f0cd1ce0c8ad1e0888a31cb391d0072902. Removing only those suffixes recovers every old byte and line offset; current64/62 existing controls were not edited.
+
+The exact eleven selected test names are present. Fixed raw recipes come from literal ETF fields and independent stdlib byte/SHA arithmetic, never a candidate decoder/encoder/counter. MIN26, TYPE_T38, source603 TWO-tuple133, MAX87, real zlib compressed48, encoded263168/+1 and snapshot262144/encoded262164 are distinguished. Source603 is the actual generationless checkout/charge_card/max_attempts2/5 term, and its byte encounter order is a hand assembly rather than a native term_to_binary dump. The original incoming caller584 diagnostic remains separate. Arbitrary/gen0 maps, whole MAX bytes/policy slice, unknown fields, supported alternate tags, exact semantic identity and branch-specific runtime safety are tested; each operand of a paired identity test first succeeds alone. Runtime controls include source-small60-bit thresholds, EXPORT low32, captured versus first-created local entries, Size/creator/old-index versus canonical identity, insertion before nested environment, five-word local PID-reference positive/invalid-tag/distinct identity and no fake whitelist. Read result classes, atom-only type/empty type, safe ignored single-cause rejection and complete old FUN syntax are represented.
+
+Fixed prospective streams were frozen before production. MIN lex per pass is [1,128,1,1,128,1,1,14,156,128,1,1,128,1,4]=694, with version before root span, all other attempted spans before their fields and distinct initial prefix2. Full positive loop ends3736G/P256/T3992; inherited scratch without a new total increase is not manufactured as a separately refusing event. K1 is6778G/P448/T7226, with P SUM ofN6/K1/F0; read7036/reference7496/T7944. F1 fixedB85/N11/K1/F1/catalog661/lex2463/reserve804/first-insert256 gives9664/P832/T10496, with scratch4086, reserves4566/4698/4890, normalizer7481/insertion7609 and final10496 prospective refusals. One captured row154 changes first insertion128 to lookup172:9862/P832/T10694, with captured lookup7807. Two same-lookup values have B144/N18/K2/F2/catalog661/lex4232/reserve1096/P1408; first-root10118/insert10246/second-root12143/virtual-reuse12315 refusals freeze actual reached work before map sorting. These statements were independently traced by PERF and ROOT, not sampled from a candidate. The extra literal comparison-stage refusal is being assessed from this same declared tariff, separately from the genuine compiler RED.
+
+Absence Policy0/nil differs from exact ETF fallback (t2200, checkout2228). Original present bytes and SHA survive raw/catalog owner cleanup with only query borrowed; Entry similarly escapes after actual owned catalog Strings drop. Same-account exact/tight/repeat loops hold previous original owners/entries/references, real1928G/P64 Candidate and4784G/P192 indexed owners; input and semantic/SHA/account checks precede pointer observations. No account reset/grant/refund, public accepted-entry bridge, Box conversion or measured allocation/copy/CPU/Drop gain is inferred. Both hosts and all required original runtime/profile/public/physical obligations remain open.
+
+Actual commands were started independently; Cargo serialized their build-directory lock. Domain `env CARGO_BUILD_WARNINGS=deny cargo +1.99.0 test --locked -p wf-domain --test complete_policy` returned0c2dd1/EXIT101, one E0432 site listing the six absent domain names and zero assertions. Ports `env CARGO_BUILD_WARNINGS=deny cargo +1.99.0 test --locked -p wf-ports --test complete_policy_request` returned03b61f/session81278 then6d17f5/EXIT101, two E0432 sites listing domain and ports names and zero assertions. There were no other diagnostics. Post-run04a2f3 independently checked all ten selected production paths ABSENT. Full concatenated stdout/stderr below is retained once; no duplicate multi-MB archive or fake refusing S0 exists.
+
+Domain complete output:
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalEtfLocalFun`, `wf_domain::policy::complete::OriginalEtfSafety`, `wf_domain::policy::complete::OriginalPolicyReadError`, `wf_domain::policy::complete::OriginalPolicyReadValue`, `wf_domain::policy::complete::decode_original_complete_policy_entry`, `wf_domain::policy::complete::read_original_complete_policy_entry`
+ --> crates/wf-domain/tests/complete_policy/original_entry.rs:4:43
+  |
+4 |     CompletePolicyEncodingError as Error, OriginalEtfLocalFun, OriginalEtfSafety,
+  |                                           ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^ no `OriginalEtfSafety` in `policy::complete`
+  |                                           |
+  |                                           no `OriginalEtfLocalFun` in `policy::complete`
+5 |     OriginalPolicyReadError as ReadError, OriginalPolicyReadValue as ReadValue, PolicySchemaCharge,
+  |     -----------------------^^^^^^^^^^^^^  -----------------------^^^^^^^^^^^^^
+  |     |                                     |
+  |     |                                     no `OriginalPolicyReadValue` in `policy::complete`
+  |     no `OriginalPolicyReadError` in `policy::complete`
+6 |     PolicySchemaError, decode_original_complete_policy_entry as decode,
+  |                        -------------------------------------^^^^^^^^^^
+  |                        |
+  |                        no `decode_original_complete_policy_entry` in `policy::complete`
+7 |     read_original_complete_policy_entry as read,
+  |     -----------------------------------^^^^^^^^
+  |     |
+  |     no `read_original_complete_policy_entry` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+5 -     OriginalPolicyReadError as ReadError, OriginalPolicyReadValue as ReadValue, PolicySchemaCharge,
+5 +     OriginalPolicyReadError as ReadError, OriginalPolicyMapValue as ReadValue, PolicySchemaCharge,
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+Ports complete output (initial lock/prelude plus terminal):
+```text
+    Blocking waiting for file lock on build directory
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalEtfSafety`, `wf_domain::policy::complete::OriginalPolicyReadError`, `wf_domain::policy::complete::OriginalPolicyReadValue`, `wf_domain::policy::complete::read_original_complete_policy_entry`
+ --> crates/wf-ports/tests/complete_policy_request/original_reference.rs:7:43
+  |
+7 |     CompletePolicyEncodingError as Error, OriginalEtfSafety, OriginalPolicyReadError as ReadError,
+  |                                           ^^^^^^^^^^^^^^^^^  -----------------------^^^^^^^^^^^^^
+  |                                           |                  |
+  |                                           |                  no `OriginalPolicyReadError` in `policy::complete`
+  |                                           no `OriginalEtfSafety` in `policy::complete`
+8 |     OriginalPolicyReadValue as ReadValue, PolicySchemaCharge, PolicySchemaError,
+  |     -----------------------^^^^^^^^^^^^^
+  |     |
+  |     no `OriginalPolicyReadValue` in `policy::complete`
+9 |     read_original_complete_policy_entry as read, restore_complete_policy,
+  |     -----------------------------------^^^^^^^^
+  |     |
+  |     no `read_original_complete_policy_entry` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+8 -     OriginalPolicyReadValue as ReadValue, PolicySchemaCharge, PolicySchemaError,
+8 +     OriginalPolicyMapValue as ReadValue, PolicySchemaCharge, PolicySchemaError,
+  |
+
+error[E0432]: unresolved imports `wf_ports::log::OriginalPolicyReference`, `wf_ports::log::prepare_original_complete_policy_reference`
+  --> crates/wf-ports/tests/complete_policy_request/original_reference.rs:13:5
+   |
+13 |     OriginalPolicyReference, prepare_original_complete_policy_reference as prepare,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^  ------------------------------------------^^^^^^^^^^^
+   |     |                        |
+   |     |                        no `prepare_original_complete_policy_reference` in `log`
+   |     no `OriginalPolicyReference` in `log`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-ports` (test "complete_policy_request") due to 2 previous errors
+```
+
+## DOC-NEXT-M1-ORIGINAL-ENTRY1-GREEN1 (2026-10-12; actual implementation and review repairs)
+
+The batch follows A-CREATE1 eae64822/P-CREATE1 e7ef053e and ROOT's explicit post-RED body order. The complete genuine missing-API outputs remain saved once in RED1 at 2432143 + 10927 B / SHA 2889e5a0. Domain 0c2dd1 and ports 03b61f → 6d17f5 returned EXIT101 with only absent imports and zero assertions; all ten production files were absent then. ROOT independently reproduced both before implementation. This is the subsequent actual-source/GREEN receipt, not another initial RED. My writes are the nine selected domain production children, the two existing predicate files, six selected tests, the exact two EOF seams and this owned note. ROOT authored ports production and all shared facades/checker/docs.
+
+The reader freshly admits the captured tables, runs owner-free syntax/safety pass1, pays simultaneous N/K/F logical scratch and three fallible reservations, constructs the reserved pass2 index and canonical runtime normalization, checks bottom-up semantic key identity, then source envelope/generation, the shared original deprecated-key algorithm, atom-only type and original-byte metadata. Arbitrary maps/gen0 bypass complete-content admission. All temporary Vec owners drop before Entry escapes borrowing raw bytes only. The raw reference-bytes helper reads once, builds one final fallibly reserved Vec and prepays SHA/metadata on the same account; ports performs actual SHA afterward. No accepted-entry/payment/current/Fresh bridge, Box conversion, new dependency or refund was added.
+
+The shared runner preserves old public descriptor APIs and their original event streams; its descriptor name cap remains262144 and the explicitly selected raw adapter cap526336. Top-level atom presence masks binary even for nonmaps; per-state guarded atom maps precede binary-map fallback. Retry precedes states and old-name membership ignores its value. All64 prior domain and62 prior ports tests still pass, unchanged except the exact21/25-byte EOF module suffixes. Output/State aliases were individually accepted after creation with honest timing; IdentityInput was individually accepted before creation. None adds an owner/export or payment token.
+
+After the first substantive72/65 runs, source-driven post-implementation controls exposed real bugs. ROOT's pinned VM empty BIT0 experiment failed; I never replayed that dangerous header. The exact ARCH amendment excludes len0/bits0 operationally after the paid header; len0/nonzero including8 is source invalid, while ordinary empty BINARY remains supported. The revised control genuinely failed71/1 before repair; the old positive BIT0 suggestion is retracted with no source-parity credit. ENV255/256 then failed71/1 before the missing MAX_ARG guard was repaired. These are subsequent source controls rather than claims of pre-production coverage.
+
+I actually read the whole ARCH SOURCE-FINDINGS1 at1438501+3085/SHA0b1ce077 in250050. The new container boundary control failed71/1 on a valid remote OLD_PID before repair (d4fe46/session50859→5f2425). OLD/NEW_PID now read fullu32 id/serial and restrict only matching local node+creation id28; serial staysu32. Local V4_PORT id60 is bounded, remote fullu64 accepted. OLD/NEW_REF firstword18 is checked before node classification; NEWER_REF allows remote fullu32 and local18. Invalid marked PID-ref reconstruction stays source invalid without a fake liveness whitelist. New direct/ignored atom-index controls independently failed71/1 before scan73/75 became operational UnsupportedTag (1ad238/session21734→93430c). A captured text catalog does not prove VM atom-index identity. Plain distribution-cache82/internal-heap74/76/78 remain source invalid. The official pinned external.c/header clauses were checked; no new runtime replay occurred.
+
+The safety accounting defect is repaired: each atom/export/fun row computes a bounded32-bit fingerprint once after its prospective row payment. Only cached prior fingerprints filter later lookups; any collision pays full exact text/fixed-field equality width before equality checks. admit_atoms ends its16KiB cache before export/fun cache calls. This removes unpriced prior-text rehashes without changing frozen MIN/K/F tariffs. Native stack/layout, allocator capacity excess and Drop/RSS remain outside logical scratch certification. No measured native gain is claimed. Runtime three added helpers/calls/separator inverse9065c2 restores exact255LF/9550B/SHA929e82f3, conserving all earlier runtime tests.
+
+Independent frozen oracles remain MIN3736G/P256/T3992; K1 decode6778/P448/T7226 and present reference7496/T7944; F1 B85/N11/K1/F1 gives9664/P832/T10496 and captured9862/T10694. SUM reservations, every reached lexical/normalization/insertion/comparison refusal, repeated retained outputs and real1928/P64 plus4784/P192 predecessors pass without counter learning. Absent t phases[128,806,166,806,166,128] end2200/P0; checkout2228. Exact/tight/repeat/held work and byte/SHA/range/type observations precede pointers. Encoded263168 versus standalone external_size262144 remains explicit. Source603 retains the133-byte generationless two-tuple hand recipe; it is not relabelled as a native dump or a caller584 error.
+
+Final commands: domain warnings-denied locked target6c9b93/session88617→48346d EXIT0/72PASS; ports82f55e/session80205→33caae EXIT0/65PASS. Combined target strictClippy ef0e1f/session25612→6626ed EXIT0. Selected rustfmt --check40a48d and git diff --check e03373 EXIT0. The final manifest57cd35 verifies production400/test600/function100 and both original EOF prefix hashes. The three revised production preimages were runtime9207B/6c8a9425, safety6257B/9bdb4757 and scan3642B/21d37ab1; changes are the described runtime/classification/cache repairs. All other selected production/shared predicate bodies remain at their prior implementation hashes.
+
+These are my Darwin focused executions only. ROOT owns the required full wrapper/shared ledger. Linux, actual captured VM/runtime tables, all public/original setup/profile obligations, physical read/atomic storage and later original raw parent integration remain required. Operationally excluded valid source forms do not establish complete profile acceptance. Getter facts supply no prior paid/current/Fresh authority. No test, fixture, fixed counter or required assertion was ignored or weakened; no suppression was added.
+
+Earlier acquired result provenance (complete output hashes; subsequent supplements are distinct from initialRED):
+
+| Actual epoch | Tools/session | Exit/result | Output bytes/SHA256 |
+|---|---|---|---|
+| First substantive domain run | 458e8f/session → d1963a | 0 / 72 PASS | 6762 / 75b77449534948987ce41b57953f3a9f7dac7db0f22e773b4d1f9b37e5e41f1a |
+| First substantive ports run | e54466/session 7872 → 012279 | 0 / 65 PASS | 6650 / f822e8de7a980c06459ab5c4eb5cab18e9c1442eb75b42eccd89e337383e61f2 |
+| Selected BIT profile correction before scalar repair | b819f2/session 27253 → 9b0bb7 | 101 / 71 PASS / 1 FAIL | 7187 / 8a25429d6af23d59ce023ee771fd213e126d076169b9c716e1772e4771243681 |
+| First production strict lint | 9baee6 | 101 / 3 production style errors | 2483 / 1dc0e37f9685bae78828e3984ed57c1c5d0e85e0aeae0fe2f638acdb2263c219 |
+| ENV255/256 supplement before MAX_ARG repair | 038fff/session 94963 → 79064f | 101 / 71 PASS / 1 FAIL | 8789 / 4286d726f8c5892df3f0798c7203fe677c0c78fddc468ce706a7f2a1cf59fb7c |
+| Domain test strict style check | ea0442 | 101 / 4 test style errors | 2876 / aa05be421e033120f2197772aaeca28e9c60fdb33a6b5f7a4edd5e89df954abe |
+| Ports test strict style check | 25162a/session 95949 → f23592 | 101 / 1 test doc style error | 802 / fa74be318c486d0080f45bf6932b56ba3a8182de66b3e51a485bc8ab216f2f9b |
+| Container boundary supplement before runtime repair | d4fe46/session 50859 → 5f2425 | 101 / 71 PASS / 1 FAIL | 7605 / 8b309c688f661e263d2bdfcedbeb98913d86056941636a3427acc86d3bfbb128 |
+| Atom-index exclusion supplement before scan repair | 1ad238/session 21734 → 93430c | 101 / 71 PASS / 1 FAIL | 7268 / e125e52b2c6b79b3e595dbc99b3416b4954674e1725accaf71ed5510623a08e7 |
+
+The first strict diagnostics were ordinary doc backticks, identical width arms and the oversizedu64 array; later ordinary test diagnostics were as_chunks/is_empty/owned-parameter/doc style. These were corrected without suppressions or semantic changes. The two concrete latest failing assertions before source repair were:
+
+```text
+
+failures:
+
+---- original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization stdout ----
+
+thread 'original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization' (20562737) panicked at crates/wf-domain/tests/complete_policy/original_entry/cases.rs:187:5:
+assertion `left == right` failed: raw [83, 68, 03, 77, 0e, 66, 6c, 6f, 77, 5f, 70, 6f, 6c, 69, 63, 79, 5f, 76, 31, 61, 00, 74, 00, 00, 00, 01, 6d, 00, 00, 00, 01, 78, 67, 77, 01, 6e, 0f, ff, ff, ff, ff, ff, ff, ff, 00]
+  left: false
+ right: true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization
+
+test result: FAILED. 71 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p wf-domain --test complete_policy`
+```
+
+```text
+
+failures:
+
+---- original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization stdout ----
+
+thread 'original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization' (20583704) panicked at crates/wf-domain/tests/complete_policy/original_entry/runtime.rs:349:13:
+assertion `left == right` failed
+  left: None
+ right: Some(UnsupportedTag)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization
+
+test result: FAILED. 71 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p wf-domain --test complete_policy`
+```
+
+Final owned-source manifest (max fn includes complete declaration/body; the single-line test attribute still fits):
+
+| Actual path | LF | Bytes | Max fn | SHA256 |
+|---|---:|---:|---:|---|
+| crates/wf-domain/src/policy/complete/original_entry.rs | 291 | 8177 | 90 | 8e6f9971aabf514703164f6c0c6813d6bbd09b0c2d6de2bc74e26dda2d8dec5f |
+| crates/wf-domain/src/policy/complete/original_retry_keys.rs | 59 | 2676 | 7 | 7fd6a176db7cf6ccbb443e4216d763b747b8b3b61ff339fe803934466d1f7175 |
+| crates/wf-domain/src/policy/complete/original_retry_keys/map.rs | 239 | 7883 | 41 | ae7dbddb7f21d175c8a2f5f40eeb7358207c380e4c5e52da72175b4051017775 |
+| crates/wf-domain/tests/complete_policy/original_entry.rs | 388 | 14855 | 87 | 34a4fa0aeffbff88e6ccb24a082eee3b93c56a69367982031ad35d2852e7cfc8 |
+| crates/wf-ports/tests/complete_policy_request/original_reference.rs | 432 | 15329 | 76 | cb2f27b91c746cb580f6068d9b24e777d9be72fb2429f255499369cd4250980c |
+| crates/wf-domain/src/policy/complete/original_entry/callsite.rs | 170 | 6463 | 39 | 4e987cd27d65e262191990403adead82672a435691e1039d872936069e6d457a |
+| crates/wf-domain/src/policy/complete/original_entry/compound.rs | 114 | 3841 | 58 | ba62810ab1d10408b7c8e4cf97126b1da4cff94c8ce807aa81099f1a05bc9fd7 |
+| crates/wf-domain/src/policy/complete/original_entry/identity.rs | 382 | 12133 | 55 | 497dcb199469e0322e19b8f4b356b6fe6f0df52d786bd7054446496f4fe7e64d |
+| crates/wf-domain/src/policy/complete/original_entry/runtime.rs | 294 | 9571 | 79 | b060c232b6dc88d23a332090fdc9be5a1e1d01d3a3b3ce664f4f0fd04da0b019 |
+| crates/wf-domain/src/policy/complete/original_entry/safety.rs | 218 | 6904 | 37 | 521ec59e80f97293d472bb71e87fb36ea1b9c212c763f23cc8b4e4b21e2cb931 |
+| crates/wf-domain/src/policy/complete/original_entry/scalar.rs | 299 | 10011 | 79 | 85e48b12ac2025f71f6b2dcf7ee49c49f15adbfb78045f72a9b348d2b593d38a |
+| crates/wf-domain/src/policy/complete/original_entry/scan.rs | 120 | 3652 | 46 | 032c0fd59b6109cb0e18e2b1d0509201bde91b051ca546dc70463b6309dc3f20 |
+| crates/wf-domain/src/policy/complete/original_entry/visit.rs | 105 | 3461 | 32 | a01657a1deb38b0abfd3825b3c82e58a851e6f172e4c0cabedd29b8e21e961cb |
+| crates/wf-domain/tests/complete_policy/original_entry/cases.rs | 224 | 7219 | 23 | bdad5ae929f1b1cd287c4fa03a9a968d3c34791692bc5a8091f58e44c3cf7949 |
+| crates/wf-domain/tests/complete_policy/original_entry/identity.rs | 195 | 6321 | 59 | 112f43b140b1bb053ff5b5a09e472352b1b46407a1dbbc453870ddf4976b9d38 |
+| crates/wf-domain/tests/complete_policy/original_entry/refusals.rs | 360 | 13842 | 52 | f487f24485c84c77e6ebfac58cbc03ec95eb886dc27275fc346a12b68c1732ee |
+| crates/wf-domain/tests/complete_policy/original_entry/runtime.rs | 376 | 14006 | 66 | 5c7109cff28a5034af4651023ca2f82d1d35dcc1cbb02818692c8ad7269c5e28 |
+
+Exact EOF inverses independently rechecked in57cd35:
+
+crates/wf-domain/tests/complete_policy/main.rs: current1942B/SHAc8777046404ff07a2ad308880347744f5790e0ed98fe542498bdae7197793d41; remove only21B to recover old1921B/SHA957689424bb1aaa7aa1c8bdf44106014e0d928afd15c8e6c32b6b6c4e35b5d25.
+
+crates/wf-ports/tests/complete_policy_request/main.rs: current8931B/SHAaf2f3ede3cf6c10f3cc2b5f4872f34f0cd1ce0c8ad1e0888a31cb391d0072902; remove only25B to recover old8906B/SHA53de156694f766996685571d3977fd24c7af17307eb25947ba09e7fbf8f29d9b.
+
+DOMAIN final72: 6857B/SHA2823b0fc7c404cec574de59c6fa4b47d23f2894e68b81a20d46826275451f1a6
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.03s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-412f381fdad010ab)
+
+running 72 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+
+test result: ok. 72 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+```
+
+PORTS final65: 6797B/SHA8522de4b02765f770fc446657f7d391812bf33ebfdebd1ce9724b2c0600e4a90
+
+```text
+    Blocking waiting for file lock on build directory
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.08s
+     Running tests/complete_policy_request/main.rs (target/debug/deps/complete_policy_request-07e54ca164b05d41)
+
+running 65 tests
+test accounting::complete_replace_caller_freezes_independent_intent_fees ... ok
+test core_patch::decode::core_patch_decode_keeps_original_identity_distinct_from_equal_merged_values ... ok
+test core_patch::core_patch_intent_preserves_unchanged_clear_and_empty_set ... ok
+test core_patch::core_patch_intent_uses_one_nonrollback_schema_account ... ok
+test accounting::complete_replace_caller_refuses_without_resetting_prior_work ... ok
+test core_patch::core_patch_intent_retains_original_owners_and_caps ... ok
+test core_patch::core_patch_intent_matches_independent_partial_command_literals ... ok
+test core_patch::core_patch_intent_keeps_partial_backoff_and_state_actions ... ok
+test core_patch::apply::core_patch_parent_replays_before_reconstruction_current_and_context ... ok
+test core_patch::core_patch_intent_excludes_preparation_and_current_policy ... ok
+test core_patch::decode::core_patch_decode_preserves_every_header_and_moves_domain_owners ... ok
+test core_patch::frame::core_patch_frame_keeps_original_bytes_borrowed_without_patch_materialization ... ok
+test core_patch::frame::core_patch_frame_binds_header_scope_request_stamp_and_log_identity ... ok
+test core_patch::apply::core_patch_parent_preserves_stored_cas_context_and_high_water_order ... ok
+test core_patch::decode::core_patch_decode_preserves_each_restoration_debit_repeat_and_prior_peak ... ok
+test core_patch::decode::core_patch_decode_matches_frozen_original_commands_and_paid_reproduction ... ok
+test core_patch::gate::core_patch_gate_outlives_temporary_verified_header ... ok
+test core_patch::frame::core_patch_frame_verifies_independent_tag_five_header_and_original_intent ... ok
+test core_patch::gate::core_patch_gate_charges_each_reached_event_before_refusal ... ok
+test core_patch::frame::core_patch_frame_freezes_same_account_refusal_and_repeat_fees ... ok
+test core_patch::frame::core_patch_frame_rejects_noncanonical_partial_and_late_structure ... ok
+test core_patch::frame::core_patch_frame_rederives_intent_before_scope_and_frame_hash ... ok
+test core_patch::prepare::core_patch_prepare_keeps_partial_identity_distinct_from_equal_merged_values ... ok
+test core_patch::prepare::core_patch_prepare_binds_every_header_operand_to_frozen_bytes ... ok
+test core_patch::prepare::core_patch_prepare_preserves_each_same_account_refusal_and_prior_peak ... ok
+test intent::complete_replace_intent_binds_tenant_guard_and_excludes_preparation_fields ... ok
+test core_patch::gate::core_patch_gate_keeps_one_account_repeated_outputs_and_prior_peak ... ok
+test intent::complete_replace_intent_has_fixed_minimal_bytes_and_digest ... ok
+test intent::complete_replace_intent_keeps_legacy_version_one_construction ... ok
+test core_patch::decode::core_patch_decode_preserves_presence_and_each_partial_backoff_kind ... ok
+test intent::complete_replace_intent_preserves_every_field_presence_and_order ... ok
+test original_reference::original_reference_distinguishes_public_absence_from_stamping_fallback ... ok
+test original_reference::original_reference_hashes_exact_present_encoding_without_default_expansion ... ok
+test core_patch::gate::core_patch_gate_preserves_all_decisions_and_validation_priority ... ok
+test core_patch::prepare::core_patch_prepare_preserves_partial_presence_and_each_backoff_kind ... ok
+test core_patch::prepare::core_patch_prepare_matches_frozen_whole_frames_and_prepared_hashes ... ok
+test replace::apply::cases::complete_replace_parent_preserves_envelope_cas_type_and_old_api_priorities ... ok
+test replace::apply::complete_replace_parent_installs_frozen_original_bundle_and_resets_omissions ... ok
+test replace::apply::complete_replace_parent_replays_real_accepted_and_content_rejected_outcomes_before_fresh_work ... ok
+test replace::apply::complete_replace_parent_keeps_nonfresh_gate_priority_and_binding ... ok
+test intent::variants::complete_replace_intent_encodes_scalar_variants_and_widths ... ok
+test replace::complete_replace_frame_binds_header_operands_without_binding_assigned_generation ... ok
+test replace::apply::controls::complete_replace_parent_reads_context_active_and_done_before_generation ... ok
+test replace::complete_replace_frame_preserves_frozen_minimal_and_complete_original_intents ... ok
+test core_patch::apply::core_patch_parent_threads_one_account_through_every_reached_phase ... ok
+test replace::apply::complete_replace_parent_sequential_replacements_preserve_generations_and_stale_results ... ok
+test core_patch::apply::core_patch_parent_fresh_uses_original_partial_and_complete_atomic_bundle ... ok
+test intent::variants::complete_replace_intent_preserves_local_empty_presence ... ok
+test replace::complete_replace_frame_keeps_business_invalid_original_fields_available_for_fresh_successor ... ok
+test replace::decode::complete_replace_decode_reconstructs_frozen_original_owners ... ok
+test replace::decode::complete_replace_decode_moves_header_and_original_input_owners ... ok
+test replace::complete_replace_frame_retains_each_same_account_phase_and_prior_scratch ... ok
+test replace::decode::complete_replace_decode_preserves_business_invalid_fields_without_fresh_authority ... ok
+test replace::decode::complete_replace_decode_retains_same_account_work_and_prior_peak ... ok
+test core_patch::apply::core_patch_parent_serializes_independent_writers_without_renewing_outcomes ... ok
+test original_reference::original_reference_preserves_raw_failure_and_continuous_copy_hash_refusals ... ok
+test replace::decode::complete_replace_decode_preserves_verification_and_reconstruction_refusal_priority ... ok
+test replace::complete_replace_frame_preserves_empty_groups_and_full_governance_widths ... ok
+test replace::decode::complete_replace_decode_preserves_presence_and_governance_fields ... ok
+test replace::apply::cases::complete_replace_parent_retains_only_source_business_origins_and_original_history_limit ... ok
+test replace::apply::controls::complete_replace_parent_keeps_one_account_through_all_refusals_and_late_caps ... ok
+test core_patch::apply::core_patch_parent_classifies_business_and_operational_failures ... ok
+test core_patch::prepare::core_patch_prepare_freezes_profile_scope_raw_and_complete_frame_priority ... ok
+test core_patch::decode::core_patch_decode_refuses_wire_before_original_materialization ... ok
+test replace::complete_replace_frame_enforces_whole_scope_raw_count_and_list_canonicality_priority ... ok
+
+test result: ok. 65 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+```
+
+STRICT final: 260B/SHA7b33668fcba5c5d21e49ff4205e4d0a83453aab4d76bd51bd607fa5d8a0f7b34
+
+```text
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Checking wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.09s
+```
+
+
+## DOC-NEXT-M1-ORIGINAL-ENTRY1-ZERO-REF1 (2026-10-12; selected profile repair)
+
+I actually read the complete ARCH ZERO-REF1 at1456339+1538/SHAcd746875 in620dd5. Pinned OTP-28.3.1 external.c5993–6017 checks only count>5 in size preflight;4703–4731 then reads an undeclared first word for count0. No deterministic source accepted/invalid/fatal outcome is established here. The selected portable profile therefore refuses count0 operationally immediately after its paid two-byte count, before node parsing. I executed no original VM replay and introduced no model/path/alias/API/event. Only the existing domain runtime source and runtime test changed, plus this owned receipt.
+
+The same existing runtime test identity now executes complete direct and ignored-nested zero-count NEW_REFERENCE and NEWER_REFERENCE headers. Decode returns UnsupportedTag; the raw read adapter preserves Encoding(UnsupportedTag). These independently frozen classifications first failed on current production in4b063d/session65072→b1cfc8 EXIT101/71PASS+1FAIL before the narrow branch change. This is an honest post-implementation source-profile supplement, not the original missing-API RED.
+
+The exact production delta replaces the combined count1..5 refusal with count0 UnsupportedTag and count>5 Malformed. Nonreference count remains fixed1; valid1..5 parsing, source boundaries, runtime identity and all frozen work expectations are unchanged. Test delta is one private helper/call within the same selected identity. Inverse99a9ec exactly recovers prior source9571B/b060c232 and test14006B/5c7109cf, including removal of the added EOF separator. Initial observer23c203 retained an extra blank in its inverse and failed; corrected52f79f/99a9ec removed only that observer separator, with no source or oracle rewrite.
+
+crates/wf-domain/src/policy/complete/original_entry/runtime.rs: 9597 B/297 LF/SHAf2cc159ab14248e389e656b3c33aa57d71128858d29c918ebcfce23b97df3b48.
+
+crates/wf-domain/tests/complete_policy/original_entry/runtime.rs: 15243 B/409 LF/SHA4f9e199129d1c2e57ed26e1d80e92a9c82f3eda3f754ab417946a45611f3f110.
+
+Ordinary geometry99a9ec: production297 LF/maxfn82, test409 LF/maxfn66, within400/600/100. Formattingf4de25 and diffcheck2d118d EXIT0. Exact prior manifests and EOF-prefix inverses inGREEN1 otherwise remain current.
+
+Actual failing target4b063d→b1cfc8 EXIT101: complete acquired output7532B/SHA8e5768dcf58e63646912cecfd5cf385088eb0716fa6526724c87d10a40f33c1f.
+
+Domain b5b51d/session85272→7dc536 EXIT0/72PASS: complete acquired output6857B/SHA2813c2a4b6eb12007b808843400eda145c39c6219591763b277f849f8c5d45a8.
+
+Ports ca16ce/session10572→4f2d2f EXIT0/65PASS: complete acquired output6797B/SHA01b9a9f47c1dbaa7580b1f4cd254415cfc9b9cc66a0c5ae6ca652957b938ca8b.
+
+Combined strict a46e96/session73300→c414c0 EXIT0: complete acquired output260B/SHA8b5d9c0b98a84e6f6f83616f87ed7e8b8ffd9dd6f3680333c28d6adb95ab50de.
+
+Commands were the same locked warnings-denied focused domain/ports targets and combined target Clippy -D warnings recorded inGREEN1. All eleven new and prior64/62 controls pass; no whole wrapper was repeated. Source/native/captured-table/full-profile/Linux obligations remain separate. Complete failure excerpt before repair:
+
+```text
+
+failures:
+
+---- original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization stdout ----
+
+thread 'original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization' (20656510) panicked at crates/wf-domain/tests/complete_policy/original_entry/runtime.rs:391:13:
+assertion `left == right` failed
+  left: None
+ right: Some(UnsupportedTag)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization
+
+test result: FAILED. 71 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p wf-domain --test complete_policy`
+```

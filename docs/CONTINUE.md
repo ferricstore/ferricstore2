@@ -4,10 +4,11 @@ Updated: 2026-10-12. A new active full-completion goal now follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS run passes 502 Rust tests and four compile-fail doc tests,
-strict lint, architecture, documentation, reference/progress and all four
-dependency checks. The default RustSec refresh succeeded on October 12 at the
-same October 9 database revision; earlier DNS failures remain historical evidence.
+The latest whole-workspace macOS recount passes 514 Rust tests and four compile-fail
+doc tests. Strict lint, architecture, documentation and reference/progress checks
+pass. The full wrapper stops at its default RustSec refresh because GitHub cannot
+resolve. A separate offline audit passes all four dependency categories against
+the October 9 database revision; it does not turn that wrapper failure into PASS.
 Detailed local results are below;
 saved CI belongs to its earlier commit. M1,
 later runtime milestones and full workflow parity remain incomplete.
@@ -129,8 +130,40 @@ All 64 policy controls and strict target lint pass. The full macOS wrapper passe
 The production files have 84/178 lines and tests 236/323; all functions fit100.
 Written-source architecture and performance reviews and their reciprocal
 review are closed without blockers. The original generationless decoder fixture
-remains unlinked, and the ledger stays57/59/227. The full raw ETF/generation-zero reader is the immediate M1
-successor, including meaningful integration with this component.
+remained unlinked at that checkpoint, and the ledger stayed57/59/227. The full raw
+ETF/generation-zero reader is now implemented under
+A-NEXT-M1-ORIGINAL-ENTRY1-CREATE1, with closed reciprocal consultation.
+All six approved test files preceded production with genuine missing-API RED,
+independently reproduced by the coordinator. The domain target passes72/72 and
+ports65/65, including eight new reader and three reference controls. Actual source
+architecture/performance reviews and reciprocal reads are closed without blockers.
+The raw helper reads once; ports hashes once and moves its output Vec into the
+existing prepared owner. Temporary reader indexes drop before borrowed bytes escape.
+Strict target lint and the extended architecture control pass. Runtime repairs
+preserve local/remote distinctions and captured/first-created function identity.
+LOCAL, native atom indexes, dangerous empty-bitstring headers and zero-word
+references are explicit operational profile exclusions, not invented native replies.
+The existing source603 fixture has a supplemental direct assertion for its original
+generationless shape refusal; both reviewers accept this post-implementation ledger
+anchor. The checked ledger now has58 declarations,60 counterparts and228 assertion
+links, with full runtime reconciliation and parity still incomplete.
+Original raw parent integration, public/setup/profile/physical and independent
+Linux acceptance remain required, with no measured native performance gain.
+
+The next selected M1 responsibility is original stored-policy Replace composition:
+strict envelope/generation read, then CAS, then atom:type, reusing incoming content
+validation and late encoding. Exact artifact consultation precedes implementation.
+Existing V2, CorePatch and standalone contracts remain acceptance controls; original
+incoming retry normalization follows this integration.
+
+The separate Elixir bugfix worktree now has reviewed checkpoint106993c6 for the
+existing TermCodec helper and its tests. A header walk rejects the reproduced
+OTP28.3.1 empty-bitstring underflow before native decoding, and protectively
+excludes zero-word references whose native outcome is unknown. Opaque matching
+bytes and valid reference neighbors stay covered. All73 codec/governance tests,
+selected formatting and strict compilation pass on macOS. Broader project,
+physical-store and independent Linux validation remain open; the four unrelated
+dirty files were preserved.
 
 The exact pinned lease-takeover regression now passes in the existing lease
 test target (10/10): lease 50 at 1000, reclaim 500 at 1050, stale-owner completion
@@ -1021,8 +1054,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **38 reviewed
-source declarations, 39 counterpart records and 128 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **57 reviewed
+source declarations, 59 counterpart records and 227 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

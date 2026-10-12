@@ -796,11 +796,61 @@ Real held1928/P64 and4784/P192 seeds preserve continuous charges and maxP.
 Native stack/masks/input construction/comparisons/Drop/live-owner sums remain
 outside these logical bounds. No measured native gain is inferred.
 
-The full original raw reader is the immediate successor, with explicit ETF
-safe atoms/functions, exact consumption, encoded cap, generation0..MAX,
-arbitrary-map and callsite type/error obligations. Its integration must choose
-bounded paid descriptor backing or shared borrowed-span selectors; recursive
-slice input does not itself prove allocation-free construction. The original
-two-tuple decoder assertion603 and caller-normalization584 remain required
-and unlinked. All original setup/profiles/physical and Linux/macOS evidence
+The original raw reader below uses bounded paid backing and the shared
+borrowed-span selector for ETF safe atoms/functions, exact consumption, encoded
+cap, generation0..MAX, arbitrary maps and callsite type/error distinctions.
+Recursive slice input does not itself prove allocation-free construction.
+Original assertion603 now has an executed generationless shape control and reviewed
+direct supplemental ledger anchor. Caller-normalization584 stays
+distinct and unlinked. All original setup/profiles/physical and Linux/macOS evidence
 remain acceptance work.
+
+
+## Implemented original raw entry reader
+
+A-NEXT-M1-ORIGINAL-ENTRY1-CREATE1 selects the raw-entry feature, eight private
+domain children, one private ports child and six test children. Reciprocal
+consultation and actual written-source reciprocal review are closed. All six test
+children preceded production with genuine missing-API RED. Domain72/72 and ports65/65
+pass, with strict target lint and the extended architecture control. No public general term tree, accepted-entry
+encoder, authority/payment flag, dependency or rule exception is selected.
+A-NEXT-M1-ORIGINAL-ENTRY1-REFERENCE-BYTES1 adds one purpose-specific domain
+raw-read byte-preparation API because the work account has no ports debit API.
+It freshly reads once, copies or emits the exact source bytes, and prepays SHA
+and reference metadata before returning only generation/Vec. Ports hashes its
+output; metadata refusal may precede native SHA execution. This conservative
+schedule preserves all selected logical fees and introduces no payment bridge.
+
+An owner-free syntax/safety pass counts N spans, K map keys and F local functions.
+After its success the received account admits scratch64*(N+K+F) as a SUM, then
+prospectively pays the three separate reservations128+32N,128+4K and128+64F,
+including the fixed zero-count events. Reserved pass2 repeats full byte/node/
+safety work and charges actual captured/virtual lookups and insertions.
+Bottom-up map uniqueness, strict original envelope/generation, fresh shared
+retry-key traversal, atom-only type selection and entry metadata follow in order.
+All temporary owners drop before original bytes escape as borrowed entry fields.
+Every failure preserves successful G and maxP, with no partial entry or refund.
+
+The independently fixed minimum is G3736/P256/T3992; type-t K1 is G6778/P448.
+Raw read adds258, then present reference copy/hash/metadata adds460 for
+G7496/P448/T7944. Absent reference has B=37+query bytes and G2048+4B/P0;
+type-t costs2200 and checkout2228. These independently fixed expectations execute
+against the reader. F1 costs G9664/P832/T10496; captured F1 costs9862/P832/T10694.
+Every positive minimum event, separate K/F reserves, actual insertion/reuse,
+comparison/copy/hash/metadata, repeated accounts and retained scratch peaks have
+fixed source-derived refusal controls, without learning fees from returned totals.
+
+Semantic comparison charges both normalized cell widths and freshly reached
+subtree/rescan work. The selected runtime context distinguishes active exports,
+captured local functions, first virtual entries and static reference branches;
+it grants no runtime presence, liveness or cross-call coherence. Original
+source603 remains a two-tuple shape rejection, separate from incoming584.
+LOCAL, atom-index tags73/75, empty BIT len0/bits0 and zero-word NEW/NEWER
+references return operational UnsupportedTag in the selected portable profile.
+The zero-word native result is unknown; no VM replay or source-invalidity claim
+supports that exclusion. Nonzero empty BIT is source-invalid; ordinary empty BINARY
+and valid1..5 references retain their selected semantics and fees.
+Original public physical/profile/both-host acceptance remains required.
+Vec capacities, stack, caller context, original bytes, Drop, simultaneous native
+owners and latency are outside logical scratch; retaining Vec adds no native
+performance or recoverable-OOM guarantee.

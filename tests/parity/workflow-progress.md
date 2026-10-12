@@ -35,8 +35,11 @@ declaration region. Human review still checks fixtures and semantic equivalence;
 anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
-and authoritative claim-view observations: 37 source declarations, 38
-counterpart records and 124 assertion links. Two separately scoped counterparts
+and authoritative claim-view observations, plus subsequent reviewed domain
+increments: 58 source declarations, 60 counterpart records and 228 assertion links.
+Both reviewers accept the supplemental source603 shape-error anchor; it supplies
+one error component with its remaining setup/profile/physical obligations explicit.
+Two separately scoped counterparts
 belong to one FIFO lifecycle declaration; a single state/partition test retains
 selected observations from two declarations. It preserves every other
 declaration with empty assertion mappings.

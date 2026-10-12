@@ -21971,7 +21971,27 @@
     {
       "source_declaration_id": "a16aec6cceb6253a",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-a16aec6cceb6253a",
+          "rust_file": "crates/wf-domain/tests/complete_policy/original_entry.rs",
+          "rust_file_sha256": "8f24097220d961b1361988cfe43f6d47089d72d49259395d5d1dc214aec295d6",
+          "rust_module": "",
+          "rust_function": "original_entry_preserves_original_shape_generation_and_consumption_errors",
+          "assertions": [
+            {
+              "source_line": 603,
+              "source_text": "assert :error = Ferricstore.Flow.RetryPolicy.decode_flow_policy(blob)",
+              "rust_line": 152,
+              "rust_text": "assert!(decode(&source, &safety, source_limits, &mut source_charge)?.is_none());"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "The frozen original generationless two-tuple retains checkout, the root max_attempts=5 and charge_card state max_attempts=2. The direct Rust None assertion represents source603 :error after complete safe ETF parsing and strict three-tuple shape refusal; it does not claim a deprecated-key predicate result. The original fixture is retained alongside its existing helper control. This direct ledger anchor was added after implementation and supplies supplemental executed coverage, not new tests-first RED. Pure supplied atom/runtime catalogs replace the live VM context; original FlowTest setup, public policy reads, physical storage, broader runtime profiles and independent Linux execution remain required. This single error component does not close the entire source case or full workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a7055349acfdcd64",

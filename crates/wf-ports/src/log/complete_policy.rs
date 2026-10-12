@@ -10,7 +10,10 @@ use wf_domain::workflow::admission::AdmissionLimits;
 
 mod core_patch;
 mod intent;
+mod original_entry;
 mod replace;
+
+pub use original_entry::{OriginalPolicyReference, prepare_original_complete_policy_reference};
 
 pub use replace::{CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame};
 pub use replace::{

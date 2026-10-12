@@ -33,6 +33,7 @@ pub use complete_policy::{
     CompleteCorePolicyPatchRequestPlan, decide_complete_core_policy_patch_frame,
 };
 pub use complete_policy::{CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame};
+pub use complete_policy::{OriginalPolicyReference, prepare_original_complete_policy_reference};
 
 pub use complete_policy::{
     DecodedCompletePolicyReplaceFrame, VerifiedCompletePolicyReplaceFrame,
@@ -83,7 +84,7 @@ pub struct PreparedBytes {
 }
 
 impl PreparedBytes {
-    /// Borrows immutable canonical bytes, excluding separately assigned log ID.
+    /// Borrows exact prepared bytes, excluding separately assigned log ID.
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
         &self.bytes
