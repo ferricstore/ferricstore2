@@ -858,10 +858,15 @@ proof or full behavioral parity is claimed.
   **passed on ubuntu-24.04 and macos-15**. That run certifies the saved commit.
   The later documentation checkpoint `85f82b616521283078d5093726292dfd99d1173f`
   also [passed both runners](https://github.com/ferricstore/ferricstore2/actions/runs/37974338754),
-  verified through GitHub CLI on October 12. CLI access is available for fresh
-  CI on a reviewed checkpoint of the current work.
-  Current uncommitted Rust changes and follow-up documentation have separate
-  local evidence and still require current Linux/macOS CI.
+  verified through GitHub CLI on October 12. These saved runs remain distinct
+  from the current implementation.
+- Current reviewed local implementation checkpoint:
+  `33cd85e7b50f5a4ceceed591895e1285b9b80601`, with 495 passing macOS Rust tests,
+  four compile-fail docs and all strict source/dependency checks. It is saved
+  locally with reciprocal review closed. SSH/HTTPS host resolution and generic
+  GitHub API connection currently fail; no push or fresh CI run happened.
+  Current Linux/macOS CI remains required, and subsequent reader work has its
+  own architecture consultation and evidence.
 - Main's last handoff commit was `b0151c5`. The foundation Linux/macOS CI passed
   `f2ff13b2da4e47e1fd52f74520fb219efe2de613`
   ([run](https://github.com/ferricstore/ferricstore2/actions/runs/37929778754)).
