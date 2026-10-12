@@ -875,7 +875,7 @@ proof or full behavioral parity is claimed.
   verified through GitHub CLI on October 12. These saved runs remain distinct
   from the current implementation.
 - Current reviewed local implementation checkpoint:
-  `33cd85e7b50f5a4ceceed591895e1285b9b80601`, with 495 passing macOS Rust tests,
+  `6fccd21f7b5e90e8cd32dd6f655be1615a8a1e08`, with 502 passing macOS Rust tests,
   four compile-fail docs and all strict source/dependency checks. It is saved
   locally with reciprocal review closed. SSH/HTTPS host resolution and generic
   GitHub API connection currently fail; no push or fresh CI run happened.
