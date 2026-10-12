@@ -5,7 +5,8 @@ increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 The latest whole-workspace macOS recount passes 514 Rust tests and four compile-fail
-doc tests. Strict lint, architecture, documentation and reference/progress checks
+doc tests. The reviewed reader/source603 checkpoint is `bbeba0d`.
+Strict lint, architecture, documentation and reference/progress checks
 pass. The full wrapper stops at its default RustSec refresh because GitHub cannot
 resolve. A separate offline audit passes all four dependency categories against
 the October 9 database revision; it does not turn that wrapper failure into PASS.
