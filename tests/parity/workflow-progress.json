@@ -2326,7 +2326,7 @@
         {
           "scenario_id": "m1-8ad5a4d7b9e59aa1",
           "rust_file": "crates/wf-domain/tests/fencing_retry.rs",
-          "rust_file_sha256": "93713e3401a0443a0521defa400a0ee146ce3627363b4e2c4b7000aee3eab53b",
+          "rust_file_sha256": "591f29a76fca1a0af7b7ab9ae4f0a3927d93810b01d823b18426a43aa6df0e0c",
           "rust_module": "",
           "rust_function": "complete_retry_after_committed_response_loss_is_noop_success",
           "assertions": [
@@ -2365,7 +2365,7 @@
         {
           "scenario_id": "m1-7dee0331572ef4c4",
           "rust_file": "crates/wf-domain/tests/fencing_retry.rs",
-          "rust_file_sha256": "93713e3401a0443a0521defa400a0ee146ce3627363b4e2c4b7000aee3eab53b",
+          "rust_file_sha256": "591f29a76fca1a0af7b7ab9ae4f0a3927d93810b01d823b18426a43aa6df0e0c",
           "rust_module": "",
           "rust_function": "fail_retry_after_committed_response_loss_is_noop_success",
           "assertions": [
@@ -2404,7 +2404,7 @@
         {
           "scenario_id": "m1-57bb245681edfa80",
           "rust_file": "crates/wf-domain/tests/fencing_retry.rs",
-          "rust_file_sha256": "93713e3401a0443a0521defa400a0ee146ce3627363b4e2c4b7000aee3eab53b",
+          "rust_file_sha256": "591f29a76fca1a0af7b7ab9ae4f0a3927d93810b01d823b18426a43aa6df0e0c",
           "rust_module": "",
           "rust_function": "transition_retry_after_committed_response_loss_is_noop_success",
           "assertions": [
@@ -2443,7 +2443,7 @@
         {
           "scenario_id": "m1-093dafce3f08d6c3",
           "rust_file": "crates/wf-domain/tests/fencing_retry.rs",
-          "rust_file_sha256": "93713e3401a0443a0521defa400a0ee146ce3627363b4e2c4b7000aee3eab53b",
+          "rust_file_sha256": "591f29a76fca1a0af7b7ab9ae4f0a3927d93810b01d823b18426a43aa6df0e0c",
           "rust_module": "",
           "rust_function": "retry_retry_is_guarded_by_latest_history_event",
           "assertions": [
@@ -2494,7 +2494,7 @@
         {
           "scenario_id": "m1-21028e29c3421d3a",
           "rust_file": "crates/wf-domain/tests/fencing_retry.rs",
-          "rust_file_sha256": "93713e3401a0443a0521defa400a0ee146ce3627363b4e2c4b7000aee3eab53b",
+          "rust_file_sha256": "591f29a76fca1a0af7b7ab9ae4f0a3927d93810b01d823b18426a43aa6df0e0c",
           "rust_module": "",
           "rust_function": "retry_retry_without_explicit_run_at_preserves_original_policy_schedule",
           "assertions": [
@@ -2534,7 +2534,7 @@
         {
           "scenario_id": "m1-eea318ca431453d0",
           "rust_file": "crates/wf-domain/tests/fencing_retry.rs",
-          "rust_file_sha256": "93713e3401a0443a0521defa400a0ee146ce3627363b4e2c4b7000aee3eab53b",
+          "rust_file_sha256": "591f29a76fca1a0af7b7ab9ae4f0a3927d93810b01d823b18426a43aa6df0e0c",
           "rust_module": "",
           "rust_function": "same_fence_does_not_allow_different_terminal_effect",
           "assertions": [
@@ -4307,7 +4307,39 @@
       "runtime_case_ids": [
         "e4cbc0068e8ab4578c80d3b13b92ade183fe08592b84d45cfb5fb16c6b1abe16"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-62328c799831fd82",
+          "rust_file": "crates/wf-domain/tests/claim_apply/replay_models.rs",
+          "rust_file_sha256": "8c54fb27dee88c328066b7796aec2feefbb4cf350c5dc24da19458cf23f20893",
+          "rust_module": "",
+          "rust_function": "source_default_parallel_claim_returns_both_same_lane_records",
+          "assertions": [
+            {
+              "source_line": 13,
+              "source_text": "assert :ok =",
+              "rust_line": 440,
+              "rust_text": "assert_eq!(actual, (kind, b\"queued\".as_slice(), Some(id)));"
+            },
+            {
+              "source_line": 25,
+              "source_text": "assert {:ok, claimed} =",
+              "rust_line": 485,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 35,
+              "source_text": "assert MapSet.new(Enum.map(claimed, & &1.id)) == MapSet.new([first_id, second_id])",
+              "rust_line": 506,
+              "rust_text": "assert_eq!(actual, BTreeSet::from(ids));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Typed successful reduce(Create) fixtures and a fresh accepted apply-selected plan preserve the original first/second creation times 1000/1001, queued state, explicit partition, priority 1 in record metadata and query, payload=id, common due 2000, no policy, claim time 2000, limit 10, parallel-worker and exact order-insensitive two-ID set. Source line 13 links typed successful creation and retained type/state/payload only; line 25 links the actual fresh accepted claim decision only. Actual selected writes and next control are carried to the owning fixture; exact cardinality/complete stop and final running/lease/control checks are supplemental. Fixed original ID/type/partition prefixes replace only positive unique suffixes, and explicit lease_ms 30000 preserves the pinned default. Explicit monotone fixture sequences 1/2 retain creation order without certifying original Raft allocation. Public :ok/{:ok, ...} replies and record projections, routing/placement authority, public parent reclaim/governance/timeout orchestration, real committed encoding/hash verification, atomic durable record/index/history/outcome/control writes, persisted retained replay, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup/cleanup and every required original profile remain omitted. Rebuilt in-memory views and carried proposed records are not persistence evidence. This inert proposal supplies no assertion execution or passing status. A first passing run covers existing behavior without retroactive tests-first RED or complete original/public/durable/profile parity; independent Linux and macOS execution remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "3c9f0622ef767c44",
@@ -4703,14 +4735,84 @@
       "runtime_case_ids": [
         "94d7db09e58f1617ee0d86135b05ef0aee8398a35acd6ba38b2bc272cbbe1e77"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-587581adc9eb0ceb",
+          "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
+          "rust_file_sha256": "316a820b0f0251cd108bb3ff91d3c0ec9699c8848d5fcc8cfab034bab372fa2e",
+          "rust_module": "",
+          "rust_function": "source_fifo_activation_preserves_populated_state_entry_order",
+          "assertions": [
+            {
+              "source_line": 783,
+              "source_text": "assert {:ok, [%{id: ^first_id}]} =",
+              "rust_line": 529,
+              "rust_text": "assert_eq!(selected, (1, ids[0]));"
+            },
+            {
+              "source_line": 792,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 533,
+              "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Typed successful Create fixtures retain the original first/second creation times 1000/1001, queued state, explicit partition, payload=id and common due 2000; the original queued FIFO patch is prepared only after both creations and its actual resulting policy drives the claim fixture's index mode. Fresh apply-selected claims retain times 2000/2001, limit 10, fifo-worker, explicit original partition/state, exact first-ID singleton and later accepted empty selection. The actual first selected write and next control are carried into the second coherent view; complete-selection stop is supplemental. Fixed original ID/type/partition prefixes replace only positive unique suffixes, priority 0 represents omitted creation priority, explicit monotone fixture sequences 1/2 retain creation order without certifying source Raft allocation, and explicit lease_ms 30000 preserves the pinned default. Invoked original helper assertions at 1384 and 1379 remain public setup obligations and are not counted as direct case assertions. Successful policy preparation and test-side full-index reconstruction do not execute committed policy installation, durable activation/backfill, native rank maintenance or a migration transaction. Public :ok/{:ok, ...} replies and record projections, routing/placement authority, public parent reclaim/governance/timeout orchestration, real committed encoding/hash verification, atomic durable record/index/history/outcome/control writes, persisted retained replay, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup/cleanup and every required original profile remain omitted. This inert proposal supplies no assertion execution or passing status. A first passing run covers existing behavior without retroactive tests-first RED or complete original/public/durable/profile parity; independent Linux and macOS execution remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "be9fd6690bf99980",
       "runtime_case_ids": [
         "de8afef86b96196b57e6ea467addc40e3d26675c0d572c5b32a1e7bc457944bd"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-be9fd6690bf99980",
+          "rust_file": "crates/wf-domain/tests/claim_apply/policy_activation.rs",
+          "rust_file_sha256": "ea4a8d2df5e9f40dc38a2366b1a56103e01205d6180325d0e51bc37e4badbdcd",
+          "rust_module": "",
+          "rust_function": "source_fifo_activation_waits_for_already_leased_lane_to_drain",
+          "assertions": [
+            {
+              "source_line": 812,
+              "source_text": "assert {:ok, [running]} =",
+              "rust_line": 26,
+              "rust_text": "assert_eq!(selected.len(), 1);"
+            },
+            {
+              "source_line": 821,
+              "source_text": "assert running.id == second_id",
+              "rust_line": 30,
+              "rust_text": "assert_eq!(running.id().as_bytes(), ids[1]);"
+            },
+            {
+              "source_line": 824,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 54,
+              "rust_text": "assert_eq!((blocked.len(), stop), (0, SelectionStop::Complete));"
+            },
+            {
+              "source_line": 833,
+              "source_text": "assert :ok =",
+              "rust_line": 77,
+              "rust_text": "assert_eq!(outcome, Outcome::Changed);"
+            },
+            {
+              "source_line": 840,
+              "source_text": "assert {:ok, [%{id: ^first_id}]} =",
+              "rust_line": 91,
+              "rust_text": "assert_eq!((selected.len(), first.id().as_bytes()), (1, ids[0]));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Typed successful Create fixtures preserve creation times 1000/1001, queued state, payload=id, explicit partition, due times 5000/2000, default priority 0 and state-entry sequences 1/2. The actual apply-selected parallel claim at2000 carries its second-record write and next control; only then is the queued FIFO patch prepared and its actual policy used to rebuild the next view. The FIFO claim at5000 is accepted empty while that observed lease remains live; completion at5100 uses its actual token/fence and carries the actual Changed record/control before the FIFO claim at5101 selects the exact first-record singleton. All three queries retain queued state, original partition, limit1, parallel-worker/fifo-worker and pinned default lease30000. Fixed original ID/type/partition prefixes replace only unique suffixes. Source812 links exact singleton cardinality,821 actual selected ID,824 accepted no-write complete selection,833 actual guarded Changed completion,840 final exact singleton/ID; helper return patterns enforce fresh acceptance but public tuple replies are not implemented. Stop/completed-state assertions are supplemental. Original helper assertions1384/1379 remain public setup obligations. Policy preparation and test-side reconstructed indexes do not execute committed installation, durable activation/backfill or atomic migration. Public replies/projections, routing/placement authority, public parent reclaim/governance/timeout orchestration, real committed encoding/hash verification, atomic durable record/index/history/outcome/control writes, persisted retained replay, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup/cleanup and every original execution profile remain omitted. First passing execution is existing-behavior coverage without retroactive TDD RED or full public/durable/profile parity; independent Linux and macOS execution remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f2f7a6b246087607",
@@ -4801,14 +4903,96 @@
       "runtime_case_ids": [
         "d2f379f302dce112576c6b6f516437a00294186e77fbc178f8693e4082becf16"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-0bf563deac76e307",
+          "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
+          "rust_file_sha256": "316a820b0f0251cd108bb3ff91d3c0ec9699c8848d5fcc8cfab034bab372fa2e",
+          "rust_module": "",
+          "rust_function": "source_leased_and_terminal_records_are_absent_from_later_claims",
+          "assertions": [
+            {
+              "source_line": 1250,
+              "source_text": "assert :ok =",
+              "rust_line": 355,
+              "rust_text": "assert_eq!((record.state(), record.payload()), created);"
+            },
+            {
+              "source_line": 1259,
+              "source_text": "assert {:ok, [claimed]} =",
+              "rust_line": 431,
+              "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
+            },
+            {
+              "source_line": 1267,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 435,
+              "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
+            },
+            {
+              "source_line": 1275,
+              "source_text": "assert :ok =",
+              "rust_line": 380,
+              "rust_text": "assert_eq!(outcome, Outcome::Changed);"
+            },
+            {
+              "source_line": 1282,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 435,
+              "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Typed successful reduce(Create) fixture and fresh apply-selected plans retain the original type/state/payload, times, first limit 1 and later limits 10, worker and create\u2192claim\u2192leased-empty\u2192guarded-complete\u2192terminal-empty order. Source line 1250 links typed successful creation and retained state/payload only; line 1275 links Changed completion with the actual selected lease token/fence only. Public :ok/{:ok, ...} projections, automatic default partition placement/routing, public claim parent reclaim/governance/timeout orchestration, durable record/index/history/outcome/control writes, persisted retained replay, real encoded-entry/hash verification, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and required original profiles remain omitted. Each view is rebuilt in memory from the current proposed record, rather than validating a persisted index mutation. Fixed ID/type prefixes replace unique suffixes; explicit lease_ms 30000 preserves the pinned default. Typed complete result/state and complete-selection stop checks are supplemental. The inert proposal supplies no assertion execution or passing status. A first passing run covers existing behavior and supplies no tests-first RED or full original/public/durable/profile parity. Independent Linux and macOS execution remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "4bda857b47effb76",
       "runtime_case_ids": [
         "01f40369e9f542c10695735b35bb7e296e00e09045a4fe2bef045fbe8bdd866f"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-4bda857b47effb76",
+          "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
+          "rust_file_sha256": "316a820b0f0251cd108bb3ff91d3c0ec9699c8848d5fcc8cfab034bab372fa2e",
+          "rust_module": "",
+          "rust_function": "source_future_due_boundary_preserves_empty_and_singleton_claims",
+          "assertions": [
+            {
+              "source_line": 1295,
+              "source_text": "assert :ok =",
+              "rust_line": 266,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 1304,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 331,
+              "rust_text": "assert!(claim.batch().is_none());"
+            },
+            {
+              "source_line": 1312,
+              "source_text": "assert {:ok, [claimed]} =",
+              "rust_line": 334,
+              "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
+            },
+            {
+              "source_line": 1320,
+              "source_text": "assert claimed.id == id",
+              "rust_line": 339,
+              "rust_text": "assert_eq!(write.record.id(), record.id());"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Typed successful reduce(Create) fixture and fresh apply-selected plans preserve source input values, query ordering and empty/singleton/ID observations. Source line 1295 is linked only for typed successful creation and retained inputs, not its public :ok reply. Public :ok/{:ok, ...} projections, automatic default partition placement, durable state/index/outcome writes, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and required original execution profiles are omitted. Fixed ID/type prefixes replace unique suffixes; explicit lease_ms 30000 preserves the pinned default. This test is existing-behavior coverage; first passing execution is neither preimplementation TDD nor full public/profile parity. Linux and macOS execution remain separately required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "3a80ce5957c2a50d",
@@ -7702,7 +7886,57 @@
       "runtime_case_ids": [
         "6910edeba432a3146be387f31c48287064b5b3195fdacf2c6456688efadd5840"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-2302fd8c2cfa076d",
+          "rust_file": "crates/wf-domain/tests/complete_policy/encoding_vectors.rs",
+          "rust_file_sha256": "6ab84d8f75c2a20f225fa35f396fd9f045fb6f8270931caff8bc113e7a05141b",
+          "rust_module": "",
+          "rust_function": "source_policy_generation_stops_at_exact_migration_score_boundary",
+          "assertions": [
+            {
+              "source_line": 554,
+              "source_text": "assert {:ok, {^max_generation, ^policy}} =",
+              "rust_line": 465,
+              "rust_text": "assert_eq!(decoded.generation(), MAX_POLICY_GENERATION);"
+            },
+            {
+              "source_line": 554,
+              "source_text": "assert {:ok, {^max_generation, ^policy}} =",
+              "rust_line": 466,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 558,
+              "source_text": "assert :error = Ferricstore.Flow.RetryPolicy.decode_flow_policy_entry(invalid)",
+              "rust_line": 476,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 560,
+              "source_text": "assert {:ok, ^max_generation} =",
+              "rust_line": 494,
+              "rust_text": "assert_eq!(maximum.value().generation(), MAX_POLICY_GENERATION);"
+            },
+            {
+              "source_line": 563,
+              "source_text": "assert {:error, \"ERR flow policy generation exhausted\"} =",
+              "rust_line": 510,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 563,
+              "source_text": "assert {:error, \"ERR flow policy generation exhausted\"} =",
+              "rust_line": 518,
+              "rust_text": "assert_eq!(refusal.to_string(), \"ERR flow policy generation exhausted\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure normalized-policy observations preserve the pinned generation-boundary/public-v1 content, exact 9007199254740991 generation ceiling, above-ceiling decode refusal, MAX-1 migration allocation and exact exhaustion error. FWPV/FWPS V2 is an explicit semantic encoding replacement for the original ETF tuple; this does not prove legacy ETF decoding, arbitrary stored maps, generation0, public policy installation or physical reads. Supplemental full-byte and unchanged-owner assertions are separate. Source ExUnit async:true setup, original runtime and required profiles remain unexecuted by this Rust test; macOS passing evidence does not replace independent Linux execution. This is coverage of existing code after implementation, not tests-first RED or full workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f37c7746e2ef38f7",
@@ -15906,7 +16140,58 @@
       "runtime_case_ids": [
         "027e7a9f00975e11061f096dcec094ff8efdbfd53d36f2498048ea460bccc099"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-bd8fd99c0d608b90",
+          "rust_file": "crates/wf-domain/tests/complete_policy/indexed_input.rs",
+          "rust_file_sha256": "a9967b55a84474834ce35a253cfd5ccbed3a5866a344e20aebb47a8e21ea3675",
+          "rust_module": "",
+          "rust_function": "indexed_input_normalizes_frozen_original_policy_names_and_presence",
+          "assertions": [
+            {
+              "source_line": 750,
+              "source_text": "assert policy.indexed_attributes == [\"tenant\", \"region\", \"campaign\"]",
+              "rust_line": 79,
+              "rust_text": "assert_eq!(indexed_attributes, expected);"
+            },
+            {
+              "source_line": 753,
+              "source_text": "assert state_policy.indexed_attributes == [\"tenant\", \"region\", \"campaign\"]",
+              "rust_line": 79,
+              "rust_text": "assert_eq!(indexed_attributes, expected);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed normalization and All/State presentation preserve tenant/atom-region/campaign/tenant first-occurrence names; exact all-binary a/b/c/d input preserves the three-key rejection kind and body. Source750/753 link field components only; public set/get replies745/752, atomic installation, original FlowTest setup and required profiles remain unlinked. This normalizer follows genuine missing-API RED; the links do not establish whole original-case or Linux acceptance."
+          ]
+        },
+        {
+          "scenario_id": "m1-bd8fd99c0d608b90-indexed_input_preserves_all_source_diagnostics_and_untouched_inputs",
+          "rust_file": "crates/wf-domain/tests/complete_policy/indexed_input.rs",
+          "rust_file_sha256": "a9967b55a84474834ce35a253cfd5ccbed3a5866a344e20aebb47a8e21ea3675",
+          "rust_module": "",
+          "rust_function": "indexed_input_preserves_all_source_diagnostics_and_untouched_inputs",
+          "assertions": [
+            {
+              "source_line": 755,
+              "source_text": "assert {:error, \"ERR flow indexed_attributes supports at most 3 keys\"} =",
+              "rust_line": 341,
+              "rust_text": "assert_eq!(actual, Reason::AttributesCount);"
+            },
+            {
+              "source_line": 755,
+              "source_text": "assert {:error, \"ERR flow indexed_attributes supports at most 3 keys\"} =",
+              "rust_line": 342,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed normalization and All/State presentation preserve tenant/atom-region/campaign/tenant first-occurrence names; exact all-binary a/b/c/d input preserves the three-key rejection kind and body. Source750/753 link field components only; public set/get replies745/752, atomic installation, original FlowTest setup and required profiles remain unlinked. This normalizer follows genuine missing-API RED; the links do not establish whole original-case or Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a5e5c93e0dd0c9b3",
@@ -19677,7 +19962,27 @@
       "runtime_case_ids": [
         "db684146dc34a62d14b7931d5c36426d2511cb91aa283c831a00cf48053ec9fe"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-9d3afdde6564e562",
+          "rust_file": "crates/wf-domain/tests/complete_policy/indexed_input.rs",
+          "rust_file_sha256": "a9967b55a84474834ce35a253cfd5ccbed3a5866a344e20aebb47a8e21ea3675",
+          "rust_module": "",
+          "rust_function": "indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics",
+          "assertions": [
+            {
+              "source_line": 125,
+              "source_text": "assert policy.indexed_state_meta == \"version\"",
+              "rust_line": 232,
+              "rust_text": "assert_eq!(result, (None, expected));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "The actually executed bare Binary version input preserves the normalized indexed_state_meta field at125. This is a post-implementation supplemental observation; public get replies, flow/migration-worker setup, record updates, query/count/index/LMDB behavior, cleanup and required profiles remain unlinked. A typed field observation does not certify complete runtime or independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "cefe871d2cd02b73",
@@ -19691,14 +19996,60 @@
       "runtime_case_ids": [
         "0369049ad4a79f21862b380bc34789b45c6361f4ce5e1b05b9071f584e4c56c9"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-c8b5602be989ea05",
+          "rust_file": "crates/wf-domain/tests/complete_policy/indexed_input.rs",
+          "rust_file_sha256": "a9967b55a84474834ce35a253cfd5ccbed3a5866a344e20aebb47a8e21ea3675",
+          "rust_module": "",
+          "rust_function": "indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics",
+          "assertions": [
+            {
+              "source_line": 254,
+              "source_text": "assert policy.indexed_state_meta == \"version\"",
+              "rust_line": 232,
+              "rust_text": "assert_eq!(result, (None, expected));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "The actually executed bare Binary version input preserves the normalized indexed_state_meta field at254. This post-implementation supplement does not execute public get replies, worker/migration configuration, claim/signal/query/index/LMDB operations, original setup/cleanup or required profiles. Complete source-case and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "bfba0cb7df3bc2ee",
       "runtime_case_ids": [
         "33a115efc1c54fcbc4d8930b6017f55262344e5326ad3d888f35197eb5319686"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-bfba0cb7df3bc2ee",
+          "rust_file": "crates/wf-domain/tests/complete_policy/indexed_input.rs",
+          "rust_file_sha256": "a9967b55a84474834ce35a253cfd5ccbed3a5866a344e20aebb47a8e21ea3675",
+          "rust_module": "",
+          "rust_function": "indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics",
+          "assertions": [
+            {
+              "source_line": 295,
+              "source_text": "assert policy.indexed_state_meta == \"owner\"",
+              "rust_line": 232,
+              "rust_text": "assert_eq!(result, (None, expected));"
+            },
+            {
+              "source_line": 304,
+              "source_text": "assert policy.indexed_state_meta == nil",
+              "rust_line": 232,
+              "rust_text": "assert_eq!(result, (None, expected));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Separate actually executed bare Binary owner and Nil fixtures preserve the normalized field components at295/304. These post-implementation supplements do not execute public replies, policy reconfiguration, create/claim/signal/index/query operations, original setup/cleanup or required profiles. Complete source-case and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a0dbf8456bd6f3a4",
@@ -19719,7 +20070,33 @@
       "runtime_case_ids": [
         "d0ceab5ef480fe66a5df57524555fc7d48c0a951d9f92551bf32206d2e5ca90e"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-af1eb34f22715541",
+          "rust_file": "crates/wf-domain/tests/complete_policy/indexed_input.rs",
+          "rust_file_sha256": "a9967b55a84474834ce35a253cfd5ccbed3a5866a344e20aebb47a8e21ea3675",
+          "rust_module": "",
+          "rust_function": "indexed_input_preserves_all_source_diagnostics_and_untouched_inputs",
+          "assertions": [
+            {
+              "source_line": 451,
+              "source_text": "assert {:error, \"ERR flow indexed_state_meta supports at most 1 key\"} =",
+              "rust_line": 377,
+              "rust_text": "assert_eq!(actual, Reason::StateMetaCount);"
+            },
+            {
+              "source_line": 451,
+              "source_text": "assert {:error, \"ERR flow indexed_state_meta supports at most 1 key\"} =",
+              "rust_line": 378,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "The actually executed two-binary version/owner list preserves the one-key rejection kind and exact body at451. The source17-entry record metadata error441 is a separate REQUIRED UNLINKED observation, as are public policy/error tuples, original setup/cleanup and all required profiles. Genuine normalizer RED and macOS source tests do not establish full source-case or independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "eeb0dbe5c37e35c5",
@@ -20078,7 +20455,52 @@
     {
       "source_declaration_id": "2f84fe8c1b8f4eb7",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-2f84fe8c1b8f4eb7",
+          "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
+          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_module": "",
+          "rust_function": "source_completed_record_preserves_transition_cancel_and_extension_errors",
+          "assertions": [
+            {
+              "source_line": 143,
+              "source_text": "assert {:ok, completed} =",
+              "rust_line": 209,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 149,
+              "source_text": "assert completed.state == \"completed\"",
+              "rust_line": 223,
+              "rust_text": "assert_eq!(record.state(), b\"completed\");"
+            },
+            {
+              "source_line": 151,
+              "source_text": "assert {:error, \"ERR flow is terminal; use FLOW.REWIND\"} =",
+              "rust_line": 261,
+              "rust_text": "assert_eq!(error.to_string(), expected);"
+            },
+            {
+              "source_line": 156,
+              "source_text": "assert {:error, \"ERR flow is terminal; use FLOW.REWIND\"} =",
+              "rust_line": 261,
+              "rust_text": "assert_eq!(error.to_string(), expected);"
+            },
+            {
+              "source_line": 160,
+              "source_text": "assert still_completed.state == \"completed\"",
+              "rust_line": 265,
+              "rust_text": "assert_eq!(record.state(), b\"completed\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.",
+            "Separate image/flow-terminal-guard fixture Claim30000@1000 and Complete result:ID uses explicit1010 since source clock was omitted. Completed Transition and Cancel use actual completed fence without token and preserve exact terminal/use-FLOW.REWIND errors and completed state. Source151/156 share reached error assertion for separate operations;131/134 helper/public setup and159 public get stay unlinked. Original guard Extend is supplemental."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "948dc4e9a9789330",
@@ -20515,7 +20937,94 @@
     {
       "source_declaration_id": "a765ee1199887142",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-a765ee1199887142",
+          "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
+          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_module": "",
+          "rust_function": "source_fail_and_unleased_cancel_remove_due_work_and_reject_stale_fail",
+          "assertions": [
+            {
+              "source_line": 747,
+              "source_text": "assert {:ok, [claimed]} =",
+              "rust_line": 296,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 756,
+              "source_text": "assert claimed.id == fail_id",
+              "rust_line": 308,
+              "rust_text": "assert_eq!(failed.record.id(), &RecordId::new(fail_id.to_vec())?);"
+            },
+            {
+              "source_line": 758,
+              "source_text": "assert {:error, \"ERR stale flow lease\"} =",
+              "rust_line": 323,
+              "rust_text": "assert_eq!(error.to_string(), \"ERR stale flow lease\");"
+            },
+            {
+              "source_line": 765,
+              "source_text": "assert {:ok, failed} =",
+              "rust_line": 359,
+              "rust_text": "assert_eq!(scenario.apply(1_500, operation)?, Outcome::Changed);"
+            },
+            {
+              "source_line": 772,
+              "source_text": "assert failed.state == \"failed\"",
+              "rust_line": 361,
+              "rust_text": "assert_eq!((record.state(), record.error()), (state, Some(body)));"
+            },
+            {
+              "source_line": 775,
+              "source_text": "assert failed.lease_token == nil",
+              "rust_line": 363,
+              "rust_text": "assert_eq!((record.lease(), record.next_run_at()), (None, None));"
+            },
+            {
+              "source_line": 776,
+              "source_text": "assert failed.next_run_at_ms == nil",
+              "rust_line": 363,
+              "rust_text": "assert_eq!((record.lease(), record.next_run_at()), (None, None));"
+            },
+            {
+              "source_line": 778,
+              "source_text": "assert {:ok, cancelled} =",
+              "rust_line": 359,
+              "rust_text": "assert_eq!(scenario.apply(1_500, operation)?, Outcome::Changed);"
+            },
+            {
+              "source_line": 785,
+              "source_text": "assert cancelled.state == \"cancelled\"",
+              "rust_line": 361,
+              "rust_text": "assert_eq!((record.state(), record.error()), (state, Some(body)));"
+            },
+            {
+              "source_line": 788,
+              "source_text": "assert cancelled.next_run_at_ms == nil",
+              "rust_line": 363,
+              "rust_text": "assert_eq!((record.lease(), record.next_run_at()), (None, None));"
+            },
+            {
+              "source_line": 790,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 381,
+              "rust_text": "assert_eq!(plan.outcome(), Outcome::NotEligible);"
+            },
+            {
+              "source_line": 799,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 381,
+              "rust_text": "assert_eq!(plan.outcome(), Outcome::NotEligible);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.",
+            "Both jobs-fail/jobs-cancel Creates precede sole fail Claim worker-a30000@1000. Wrong-fence+1 Fail error:ID@1500 is rejected before accepted Fail; Cancel affects the original UNLEASED queued record with fence0/no token/reason:ID@1500. Both terminal records have no lease/due work; Fail version3 and Cancel version2 plus inline bodies/history are supplemental. Shared direct macros execute for each distinct effect. Source744/745 setup and external error_ref773/774/786/787 stay REQUIRED UNLINKED; inline error bytes are not external references. Source790/799 NotEligible components do not certify public limit10 empty full-index selection."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "0105c807bf7b6e4c",
@@ -21085,7 +21594,111 @@
     {
       "source_declaration_id": "4b70723c9149fbe8",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-4b70723c9149fbe8",
+          "rust_file": "crates/wf-domain/tests/complete_policy/presentation.rs",
+          "rust_file_sha256": "b8c09211fafa7879472fe28a904581c8d645e2a1e90b1976790934ec3347f332",
+          "rust_module": "",
+          "rust_function": "presentation_preserves_pinned_type_and_state_response_defaults",
+          "assertions": [
+            {
+              "source_line": 34,
+              "source_text": "assert policy.retry.max_retries == 5",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 35,
+              "source_text": "assert policy.max_active_ms == 120_000",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 36,
+              "source_text": "assert policy.retention.ttl_ms == 60_000",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 38,
+              "source_text": "assert policy.retention.history_max_events == 512",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 39,
+              "source_text": "assert policy.states[\"charge_card\"].retry.max_retries == 2",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 40,
+              "source_text": "assert policy.states[\"charge_card\"].retry.backoff.kind == :fixed",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 41,
+              "source_text": "assert policy.states[\"charge_card\"].retry.exhausted_to == \"payment_failed\"",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 42,
+              "source_text": "assert policy.states[\"charge_card\"].retention.ttl_ms == 30_000",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 44,
+              "source_text": "assert policy.states[\"charge_card\"].retention.history_max_events == 256",
+              "rust_line": 94,
+              "rust_text": "assert!(all == expected_all);"
+            },
+            {
+              "source_line": 47,
+              "source_text": "assert state_policy.max_active_ms == 120_000",
+              "rust_line": 97,
+              "rust_text": "assert!(selected == expected_selected);"
+            },
+            {
+              "source_line": 48,
+              "source_text": "assert state_policy.retry.max_retries == 2",
+              "rust_line": 97,
+              "rust_text": "assert!(selected == expected_selected);"
+            },
+            {
+              "source_line": 49,
+              "source_text": "assert state_policy.retry.backoff.base_ms == 10_000",
+              "rust_line": 97,
+              "rust_text": "assert!(selected == expected_selected);"
+            },
+            {
+              "source_line": 50,
+              "source_text": "assert state_policy.retry.exhausted_to == \"payment_failed\"",
+              "rust_line": 97,
+              "rust_text": "assert!(selected == expected_selected);"
+            },
+            {
+              "source_line": 51,
+              "source_text": "assert state_policy.retention.ttl_ms == 30_000",
+              "rust_line": 97,
+              "rust_text": "assert!(selected == expected_selected);"
+            },
+            {
+              "source_line": 53,
+              "source_text": "assert state_policy.retention.history_max_events == 256",
+              "rust_line": 97,
+              "rust_text": "assert!(selected == expected_selected);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "The executed pure normalized presentation preserves every fifteen scalar response assertion at source34-36/38-42/44/47-51/53. Whole independently specified All and State equality checks retain max-active120000, type retry5/fixed10000/30000/jitter0/failed, type TTL60000/history512, charge_card retry2/payment_failed with inherited fixed backoff and TTL30000/history256. Fixed flow-policy replaces only the generated unique suffix. Real normalized restoration and V2 preparation supply current content with explicit generation1; they do not execute public installation or generation allocation. Original public set/get success replies11/46 and hot-field map-key refutes37/43/52 remain UNLINKED acceptance obligations; the Rust public retention type has only TTL/history fields, which is compile/type-shape evidence rather than executed map serialization. Public options/raw-schema/state validation, configuration capture, authoritative physical reads, source ETF/hash/namespace authority, public maps/wire, atomic durable installation, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup/cleanup and every original execution profile remain omitted. Supplemental absence/unknown state/raw governance/version/indexed borrows, captured defaults and logical resource controls do not close those obligations. Actual tests-first missing-API RED precedes this new presentation implementation; independent Linux and macOS execution and full original workflow parity remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e955db97c8344956",
@@ -21378,32 +21991,337 @@
     {
       "source_declaration_id": "d9078b362e9f0d80",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-d9078b362e9f0d80",
+          "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
+          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_module": "",
+          "rust_function": "source_reclaim_boundary_preserves_claim_and_explicit_reclaim_scenarios",
+          "assertions": [
+            {
+              "source_line": 772,
+              "source_text": "assert first.lease_deadline_ms == 1_050",
+              "rust_line": 30,
+              "rust_text": "assert_eq!(scenario.record.lease_deadline().get(), 1_050);"
+            },
+            {
+              "source_line": 774,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 42,
+              "rust_text": "assert_eq!(early.outcome(), Outcome::NotEligible);"
+            },
+            {
+              "source_line": 783,
+              "source_text": "assert {:ok, [second]} =",
+              "rust_line": 46,
+              "rust_text": "assert_eq!(scenario.apply(1_050, reclaim)?, Outcome::Changed);"
+            },
+            {
+              "source_line": 792,
+              "source_text": "assert second.id == id",
+              "rust_line": 47,
+              "rust_text": "assert_eq!(scenario.record.id(), &expected_id);"
+            },
+            {
+              "source_line": 793,
+              "source_text": "assert second.lease_owner == \"worker-b\"",
+              "rust_line": 50,
+              "rust_text": "assert_eq!(lease.worker, b\"worker-b\");"
+            },
+            {
+              "source_line": 794,
+              "source_text": "assert second.version == 3",
+              "rust_line": 51,
+              "rust_text": "assert_eq!(scenario.record.version(), 3);"
+            },
+            {
+              "source_line": 795,
+              "source_text": "assert second.lease_token != first.lease_token",
+              "rust_line": 52,
+              "rust_text": "assert_ne!(lease.token, first.token);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.",
+            "Original lease/flow-reclaim fixture preserves Claim50@1000 deadline1050, running Reclaim50@1049 NotEligible and @1050 Changed ID/worker-b/version3/new token. Source760/763 helper/public setup remains unlinked;774/783 links cover one-record eligibility/effects only, not public empty/singleton query selection."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "284e6d5206fd4919",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-284e6d5206fd4919",
+          "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
+          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_module": "",
+          "rust_function": "source_reclaim_boundary_preserves_claim_and_explicit_reclaim_scenarios",
+          "assertions": [
+            {
+              "source_line": 812,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 42,
+              "rust_text": "assert_eq!(early.outcome(), Outcome::NotEligible);"
+            },
+            {
+              "source_line": 820,
+              "source_text": "assert {:ok, [second]} =",
+              "rust_line": 46,
+              "rust_text": "assert_eq!(scenario.apply(1_050, reclaim)?, Outcome::Changed);"
+            },
+            {
+              "source_line": 828,
+              "source_text": "assert second.id == id",
+              "rust_line": 47,
+              "rust_text": "assert_eq!(scenario.record.id(), &expected_id);"
+            },
+            {
+              "source_line": 829,
+              "source_text": "assert second.lease_owner == \"worker-b\"",
+              "rust_line": 50,
+              "rust_text": "assert_eq!(lease.worker, b\"worker-b\");"
+            },
+            {
+              "source_line": 830,
+              "source_text": "assert second.lease_token != first.lease_token",
+              "rust_line": 52,
+              "rust_text": "assert_ne!(lease.token, first.token);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.",
+            "Separate lease-api/flow-reclaim-api fixture preserves early1049 and boundary1050 observations, exact ID/worker-b/new token. Source801/804 helper/public setup and source public flow_reclaim alias/default-state dispatch remain unlinked;812/820 component links do not certify public empty/singleton cardinality."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "16b7387e060b86f8",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-16b7387e060b86f8",
+          "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
+          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_module": "",
+          "rust_function": "source_extension_preserves_ownership_deadline_and_reclaim_ineligibility",
+          "assertions": [
+            {
+              "source_line": 847,
+              "source_text": "assert {:ok, extended} =",
+              "rust_line": 109,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 854,
+              "source_text": "assert extended.state == \"running\"",
+              "rust_line": 122,
+              "rust_text": "assert_eq!(record.state(), b\"running\");"
+            },
+            {
+              "source_line": 855,
+              "source_text": "assert extended.version == claimed.version + 1",
+              "rust_line": 123,
+              "rust_text": "assert_eq!(record.version(), 3);"
+            },
+            {
+              "source_line": 856,
+              "source_text": "assert extended.lease_token == claimed.lease_token",
+              "rust_line": 125,
+              "rust_text": "assert_eq!(lease.token, claimed.token);"
+            },
+            {
+              "source_line": 857,
+              "source_text": "assert extended.fencing_token == claimed.fencing_token",
+              "rust_line": 126,
+              "rust_text": "assert_eq!(record.fence(), claimed.fence);"
+            },
+            {
+              "source_line": 858,
+              "source_text": "assert extended.lease_deadline_ms == 1_520",
+              "rust_line": 127,
+              "rust_text": "assert_eq!(record.lease_deadline().get(), 1_520);"
+            },
+            {
+              "source_line": 860,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 152,
+              "rust_text": "assert_eq!(early.outcome(), Outcome::NotEligible);"
+            },
+            {
+              "source_line": 868,
+              "source_text": "assert {:error, \"ERR stale flow lease\"} =",
+              "rust_line": 168,
+              "rust_text": "assert_eq!(error.to_string(), \"ERR stale flow lease\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.",
+            "Separate lease-extend fixture carries actual Claim50@1000 guard into Extend500@1020; state running, version3, identical token/fence and deadline1520. Reclaim1100 is NotEligible; wrong fence+1 Extend1030 returns exact stale lease. Source837/839 helper/public setup remains unlinked;847 typed effect and860 one-record eligibility do not certify public replies/selection."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "becdbf189214b351",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-becdbf189214b351",
+          "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
+          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_module": "",
+          "rust_function": "source_extension_preserves_ownership_deadline_and_reclaim_ineligibility",
+          "assertions": [
+            {
+              "source_line": 900,
+              "source_text": "assert extended.version == claimed.version + 1",
+              "rust_line": 123,
+              "rust_text": "assert_eq!(record.version(), 3);"
+            },
+            {
+              "source_line": 901,
+              "source_text": "assert extended.lease_deadline_ms == 1_520",
+              "rust_line": 127,
+              "rust_text": "assert_eq!(record.lease_deadline().get(), 1_520);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.",
+            "Separate lease-extend-ok fixture retains only source900 version3 and901 deadline1520 links. Source881/883 setup,891 public :ok return:ok_on_success/no-materialization and899 public get success remain REQUIRED UNLINKED; typed record effects do not cover the return-OK allocation contract or lease_return_ok profile."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "4b2f9d1ceaa255e1",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-4b2f9d1ceaa255e1",
+          "rust_file": "crates/wf-domain/tests/lease_and_guards.rs",
+          "rust_file_sha256": "2438c3971cd187cd21f922a06c013047e46c7b2d6649d58557121f682d8141c9",
+          "rust_module": "",
+          "rust_function": "source_reclaim_takeover_fences_old_worker_and_preserves_three_history_rows",
+          "assertions": [
+            {
+              "source_line": 908,
+              "source_text": "assert {:ok, _} = flow_create_and_get(id, type: type, run_at_ms: 1_000)",
+              "rust_line": 502,
+              "rust_text": "assert_eq!(outcome, Outcome::Changed);"
+            },
+            {
+              "source_line": 910,
+              "source_text": "assert {:ok, [first]} =",
+              "rust_line": 507,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 918,
+              "source_text": "assert {:ok, [second]} =",
+              "rust_line": 521,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 926,
+              "source_text": "assert second.id == id",
+              "rust_line": 533,
+              "rust_text": "assert_eq!(scenario.record.id(), &id);"
+            },
+            {
+              "source_line": 927,
+              "source_text": "assert second.lease_owner == \"worker-b\"",
+              "rust_line": 538,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 928,
+              "source_text": "assert second.fencing_token == first.fencing_token + 1",
+              "rust_line": 546,
+              "rust_text": "assert_eq!(scenario.record.fence().get(), first.fence.get() + 1);"
+            },
+            {
+              "source_line": 929,
+              "source_text": "assert second.lease_token != first.lease_token",
+              "rust_line": 547,
+              "rust_text": "assert_ne!(scenario.guard()?.token, first.token);"
+            },
+            {
+              "source_line": 931,
+              "source_text": "assert {:error, \"ERR stale flow lease\"} =",
+              "rust_line": 562,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 937,
+              "source_text": "assert {:error, \"ERR stale flow lease\"} =",
+              "rust_line": 562,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 946,
+              "source_text": "assert history",
+              "rust_line": 573,
+              "rust_text": "assert_eq!(scenario.count(EventKind::Created), 1);"
+            },
+            {
+              "source_line": 946,
+              "source_text": "assert history",
+              "rust_line": 574,
+              "rust_text": "assert_eq!(scenario.count(EventKind::Claimed), 2);"
+            },
+            {
+              "source_line": 950,
+              "source_text": "assert Enum.any?(history, fn {_event_id, fields} ->",
+              "rust_line": 575,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record Create/Claim/Reclaim plans preserve leases 50 at 1000 and 500 at 1050, first-owner completion and extension rejections at 1060, exact ID/worker/fence/token observations, and all three proposed history kind/worker entries with created=1/claimed=2. Source 908/910/918 links represent typed successful plans only; public success replies and claim/reclaim selection/cardinality remain required. Source 931/937 share a reached assertion that runs once for each old-owner operation. Source 946 maps both event counts; supplemental exact length and full sequence prevent other events. Source 944 public history query success remains UNLINKED. Supplied record/history snapshot equality is a pure input/fixture control, not persisted atomic rollback. Fixed positive ID/type suffixes and distinct committed token bytes normalize nondeterministic identities only; explicit pure creation time 1000 does not certify the omitted source creation clock. Public projections, automatic partition placement, routing/selection, physical history query/count/order/hydration, durable record/index/history/outcome writes, original async:false flow/global_state shard/FLUSHDB setup and cleanup, required source profiles and independent Linux/macOS execution remain open. First PASS is existing-behavior regression coverage, not preimplementation TDD or complete original-case parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "9466123fbaacecff",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-9466123fbaacecff",
+          "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
+          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_module": "",
+          "rust_function": "source_completed_record_preserves_transition_cancel_and_extension_errors",
+          "assertions": [
+            {
+              "source_line": 969,
+              "source_text": "assert {:ok, _completed} =",
+              "rust_line": 209,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 975,
+              "source_text": "assert {:error, \"ERR stale flow lease\"} =",
+              "rust_line": 261,
+              "rust_text": "assert_eq!(error.to_string(), expected);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.",
+            "Separate lease-extend-terminal fixture Claim50@1000, Complete original owner guard@1010 and Extend original guard500@1020 yields stale lease. Source959/961 helper/public setup unlinked;969 represents typed Changed completion only. Other terminal refusals in this fixture are supplemental."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "8be7d0d8d6ed762a",

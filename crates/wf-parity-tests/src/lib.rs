@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod artifact;
+mod compiler_lineage;
 mod macro_origin;
 mod mapping;
 mod progress;
@@ -18,6 +19,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+pub use compiler_lineage::CompilerLineageSummary;
 pub use progress::ProgressSummary;
 pub use reference::ReferenceSummary;
 
@@ -60,6 +62,18 @@ pub fn workspace_root() -> PathBuf {
 /// Fails on changed/missing/extra artifacts, unsafe paths or inconsistent IDs.
 pub fn check_reference(root: &Path) -> Result<ReferenceSummary, CheckError> {
     reference::load(root).map(|(_, summary)| summary)
+}
+
+/// Check a separate compiler-origin proposal using current trusted pure tooling.
+///
+/// Copied source and BEAM remain data; no source test/setup or Rust counterpart
+/// is executed. Successful proposals leave historical progress/parity unchanged.
+///
+/// # Errors
+/// Fails on missing/drifted tools, frozen/input/proof/complement disagreement,
+/// resource excess, invalid versions or failed bounded pure verification.
+pub fn check_compiler_lineage(root: &Path) -> Result<CompilerLineageSummary, CheckError> {
+    compiler_lineage::check(root)
 }
 
 /// Validate every source identity, optional runtime registration and assertion links.

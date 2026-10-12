@@ -21,12 +21,18 @@ kind = "runtime"
 normal = ["wf-types", "wf-domain"]
 dev = ["wf-test-support"]
 modules = { client = true, consensus = true, state = true, projection = true, blob = true, clock = true, id_source = true, notification = true, snapshot = true, log = true }
+external_normal = [
+  { name = "sha2", version = "=0.11.0", features = [], default_features = false },
+]
 
 [packages.wf-application]
 kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-ports"]
 dev = ["wf-test-support"]
 modules = { commands = true, queries = true, error = true, authorization = false, admission = false, intent = false, routing = false, reconciliation = false }
+external_normal = [
+  { name = "sha2", version = "=0.11.0", features = [], default_features = false },
+]
 
 [packages.wf-storage]
 kind = "runtime"

@@ -3,7 +3,8 @@
 //! [`workflow::reduce`] accepts an authoritative record and explicit committed
 //! inputs. Its write description requires atomic persistence by a future adapter.
 //! [`workflow::reduce_with_policy`] also resolves a borrowed installed retry-only
-//! policy. These plans provide no durability or request-ID outcome replay.
+//! policy. Bounded batch, committed-control and scoped retained-request plans
+//! live under [`workflow`]; an outer adapter must persist their effects atomically.
 
 #![forbid(unsafe_code)]
 

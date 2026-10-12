@@ -1,0 +1,767 @@
+# ADR-006: shared private prepared-command codec
+
+Status: selected for pure M1 implementation after architecture review A-PC1.
+The initial represented batch implementation has exact-byte/boundary controls.
+The represented policy format also has initial exact-byte/boundary controls;
+the bounded physical-claim format now has initial exact-byte/boundary controls.
+Independent final review, complete operation coverage and persistence/runtime
+validation remain required.
+
+## Ownership
+
+Neutral owned preparation values belong to `wf-ports::consensus`. One private
+codec implementation lives below `wf-ports::log`, with narrow typed encode/decode
+functions. Application, storage and consensus already depend on ports. This
+preserves the reviewed first-party arrows and avoids an unavailable application
+decoder or independent copies of the same format. Worker remains restricted to
+ports::client; public wire and transport adapters cannot import this codec.
+The format is a private Rust log contract, independent of public JSON/TCP and
+legacy on-disk encoding. No successful submission, durability or authorization
+is supplied by these pure functions.
+
+Extend the existing exact `sha2 = 0.11.0`, default-features=false, no optional
+features approval to ports alone. ADR-005's source/security/license and unsafe
+dependency observations still apply. Types/domain and wire gain no hash edge.
+Negative architecture controls must reject feature/version/source drift and
+attempted leakage. All first-party codec code is safe and synchronous.
+
+## Bytes and identity
+
+Prepared bytes start with ASCII `FWCP`, big-endian u16 format version1 and an
+operation discriminator. Request headers encode tenant/group/recovery/request
+as distinct u32-length-prefixed opaque byte fields, followed by u16 client-intent
+version and 32 digest bytes, then physical u64/logical u16/wall u64 trusted time.
+This format carries no native Rust layout, platform-sized integers or Unicode
+normalization. Every scalar uses explicit big-endian width. Every optional value
+has exactly tag0 absent or tag1 present; a present empty byte field differs from
+absence. Collections carry u32 counts and meaningful batch order. Policy maps
+use strictly increasing raw byte keys and reject duplicates.
+
+The SHA256 prepared digest covers exactly these bytes. Neither that digest nor
+the separately assigned Raft term/node/index is encoded in its own payload.
+The apply adapter joins the independently assigned lossless LogIdentity to the
+recomputed PreparedDigest. Client intent excludes leader-generated inputs and
+remains distinct. Installed current retry/mode policies come from coherent
+authoritative apply state; they are never caller-supplied payload authority.
+
+Initial request discriminator1 is a bounded batch. Each item contains opaque
+partition and record IDs, u8 creation priority, u64 explicit execution time,
+then its typed operation. Tags1..10 identify create, claim, reclaim, transition,
+complete, fail, retry, retry-with-policy, extend-lease and cancel. Their fields
+follow the actual typed domain structs in declaration order. Retry-time tag0
+means explicit and tag1 means policy-resolved. Backoff kinds0..3 mean none,
+fixed, linear and exponential. The policy installation format below has its
+own exact vectors. Further request-control additions require their own vectors
+before support; unknown versions/tags reject rather than dropping fields.
+
+Actual isolation and state keys are derived from decoded typed fields, with
+their own versioned length prefixes, and checked against the complete 8,192-byte
+scope and 65,535-byte key bounds. Payload/result/error slices derive directly
+from the decoded command fields, with at most two represented occurrences.
+No claimed size, caller-provided key, digest or verified flag is accepted as
+field-binding proof. The encoder and decoder enforce immutable aggregate,
+count and individual byte bounds before allocating/copying variable input.
+The initial format has no recursive values; policy extensions need explicit
+finite shape/work limits. Operational allocation/corruption failures never
+become retained deterministic business rejections.
+
+Isolation bytes are `FWSC`, u16 version1, then the three u32-length-prefixed
+tenant/group/recovery fields. A state key is `FWSK`, u16 version1, then the
+u32-length-prefixed complete isolation bytes, partition and record ID. The sum
+of the isolation bytes and every derived key must also fit the immutable
+decision-byte limit. This bounds repeated namespace-prefix amplification even
+when the original prepared input is small. Request ID belongs to the request
+header, independently of a record's authoritative state key.
+
+The encoder measures the complete grammar before reserving its exact output
+buffer. The decoder completes a borrowed structural/count/length/key pass
+before materializing request fields, items or keys. DecodedRequest borrows the
+original complete input, owns one decoded typed request and derived keys, and
+exposes value fields by borrowing that request. Input bytes, decoded values and
+key bytes have separate logical caps; their simultaneous ownership is not one
+global allocation or native-memory bound. Safe fallible Vec reservations do
+not imply that every standard-library allocation is fallible.
+
+## Policy installation format
+
+Request discriminator2 carries the normalized InstallCommand, followed by one
+u32-length-prefixed private policy value. The command preserves workflow type,
+optional expected generation, mode0Patch/1Replace, then the patch fields in
+declaration order. FieldPatch tags0/1/2 mean unchanged/set/clear. Customer
+version kind0 is opaque bytes and kind1 is u64. RetryPatch carries optional
+max-u16, optional partial backoff (optional kind/base-u64/max-u64/jitter-u8),
+and optional opaque target. Retention carries optional ttl-u64/history-u32.
+State changes are byte-sorted, u32-counted names with tag0Remove/1Patch,
+followed by mode/retry/retention patch fields. Mode0 is parallel and mode1 FIFO.
+
+FWPV is magic/version1/generation-u64/snapshot-length-u32/FWPS, with an 18-byte
+prefix. FWPS is magic/version1/type/version/max-active/normalized retry/
+retention/states. Each snapshot state preserves optional mode, normalized
+retry and retention, including absent versus explicit zero/parallel values.
+Installed generation is 1..MAX_POLICY_GENERATION, independent of customer
+version. Private snapshot bytes are at most 256KiB and the envelope at most
+263168 bytes. Those caps include actual encoded prefixes. Policy work/raw
+limits are separate from the inline workflow payload cap; complete FWCP and
+isolation caps still apply. The private immutable default policy selector
+resolves to 16,384 states; replica-profile checks must compare resolved values.
+
+The codec verifies arbitrary legacy PolicyValue byte bindings by walking the
+canonical semantic envelope against borrowed expected bytes before output
+reservation. Decoding scans complete patch and snapshot shape, semantics,
+sorted uniqueness, lengths/counts and boundaries before owning any fields.
+PolicyValue owns one normalized snapshot and one actual encoded envelope;
+DecodedRequest borrows the complete original frame and adds no second candidate.
+Fresh installation still recomputes against coherent stored generation and
+migration high-water. After retained inspection, fresh dispatch first checks
+stored generation, expected type, actual envelope size and selected snapshot
+limits using borrowed fields. Corrupt stored authority returns no control or
+operation plan; coherent stale CAS remains a retained business rejection.
+The standalone installation API preserves its source CAS-before-stored-value
+validation order. The header gate precedes changed guards on retained replay.
+Source business errors remain preparation/fresh-decision errors;
+malformed private normalized bytes are operational failures.
+
+Present state mode Clear remains representable in private command bytes, while
+source-compatible A-N21 admission rejects it as InvalidStateMode. Valid normalized
+snapshot mode=None remains distinct from this invalid caller field. The unchanged
+policy_clear byte fixture explicitly restores its expected normalized generation2
+value; it does not claim that the invalid command can install that value.
+An actual decoded coherent-view control verifies the fresh business rejection,
+required outcome write and stamped advancement while preserving installed policy.
+Replacement state Remove is also mathematically representable, while reviewed
+A-N24 admission rejects Replace+Remove as InvalidStatePolicy. Its supplemental
+actual decoded fresh-view control verifies the required outcome and stamped
+advancement with unchanged empty authority; valid Patch deletion remains distinct.
+Architecture and performance independently passed the current22 codec controls
+with unchanged relevant inputs. Those runs establish this represented pure
+boundary, with complete operation/profile and persistence/runtime gates open.
+
+Private policy encoding does not promise source ETF/on-disk or source-facing
+wire/hash compatibility. Those observations and complete operation/error
+registries remain separate acceptance work.
+
+## Physical claim phase format
+
+Request discriminator3 represents one physical-state claim leaf, selected in
+A-N42/A-N43. Owned PreparedClaimQuery/PreparedClaimPhase live in the private
+consensus/claim child and are reexported by consensus. The log/claim child owns
+the grammar; no current policy, index, selected record, state key or generated
+lease token is serialized. The domain selects from coherent authoritative
+indexes at ordered apply. Automatic parent reclaim quotas and timeout/governance
+orchestration remain separate implementation contracts.
+
+After the unchanged header, fields are workflow type; optional physical-state
+list; excluded-state list; optional partition-component list; optional u8
+priority; worker bytes; u64 lease duration; u32 selected/scan/head limits; u16
+token version; and u32 first ordinal. Lists use u32 counts and raw byte fields.
+Optional lists preserve Any versus Only(empty), order and duplicates. Every
+usize/u32 conversion is checked. Structurally representable empty/zero/max or
+business-invalid fields remain for fresh domain admission after original replay.
+The private decoder does not impose the fresh64 filter-footprint rule.
+
+Each of the three lists has an explicit100,000-element structural ceiling,
+independent of touched-record limits. Count<=remaining/4, actual field bounds,
+checked scalar widths, complete input/scope limits and final end-of-input are
+checked in the borrowed pass before any scope/query/reference reservation.
+Encoder measurement checks counts/fields/widths before output reservation.
+Decoder materialization uses fallible reservations and one owned leaf copy.
+DecodedRequest also owns three bounded reference spines into the immutable
+external encoded input. Its short-borrow claim_envelope(log) joins the verified
+header/digest, borrows those spines without cloning, and sets resume=None.
+Current authority and both trusted apply profiles remain outer inputs.
+
+Input, caller preparation, decoded leaves, references and isolation can coexist.
+At three100k empty lists,1.2MB of wire length words accompanies300k owned Vec
+descriptors and300k slice references. A conditional, unmeasured64-bit model
+gives12MB decoded descriptor/reference bytes and another7.2MB if original
+descriptors coexist. These figures are not portable layout promises, replicated
+charges, measured RSS or a whole-process allocation/work guarantee. The three
+count limits bound empty-field amplification separately from encoded byte caps.
+
+Twenty-one independent Python vectors cover binary values, list order/presence,
+priority, empty type/worker and zero/max scalar inputs. Existing15 batch/7 policy
+vector bytes remain identical. Six controls cover those bytes/SHA/typed values,
+every truncation/trailing byte, malformed tags/counts, exact entry/inline bounds,
+each list100k/+1 on both paths, simultaneous maxima, malformed final input after
+two complete maximum lists and actual envelope/filter pointer binding. Real
+missing-API and six-control unsupported-stub failures preceded implementation.
+Five supplemental controls now run actual decoded envelopes against coherent
+parallel authority: accepted mutation with complete lease/history/index assertions,
+complete empty claim, fresh invalid-priority rejection, unsupported-token failure
+without an exposed control/outcome plan, and retained accepted/rejected replay
+before changed server phase hints. They derive original retained status from
+actual first processing, preserve the caller query/intent, and check the original
+borrowed response, time/log/expiry and no second outcome write. Local authority
+owners remain alive through a bounded HRTB callback; borrowed plans never escape.
+These are postimplementation integration checks, not retrospective behavior RED.
+
+Current owner and independent architecture/performance executions each pass11
+claim+10 batch+12 policy controls and the exact workspace policy target. Their
+separate280/276 before/after input bindings remain unchanged. The full owner
+wrapper passed322 all-target tests plus four doctests and strict/architecture/
+reference checks, then failed normal RustSec GitHub fetching on DNS resolution.
+That saved-tree evidence does not establish a completed audit, current CI or
+public parent orchestration. Exact phase/hash provenance is in the coordination
+and reviewer records; every full workflow/source/profile/adapter gate remains.
+
+## Acceptance
+
+Independent Python struct/hashlib byte and digest vectors precede implementation.
+Actual compile and behavior REDs precede represented codec GREEN. Test every
+typed operation, arbitrary binary values, absent/present-empty/zero/max scalars,
+meaningful batch order, full truncation, trailing bytes, unsupported version/tag,
+malformed optionality, excessive count/length and exact complete limits. Hash
+and field binding must agree with those vectors, not only a Rust round trip.
+Architecture/performance reviewers independently read and execute the controls.
+Strict checks and all dependency audits remain required. This codec does not
+certify atomic state/index/history/outcome/checkpoint persistence, membership,
+snapshots or recovery; those remain the ordered M2/M3 gates.
+
+## Complete normalized policy VALUE codec (A-V2VAL1)
+
+The canonical FWPS/FWPV version-2 policy VALUE grammar belongs to the pure private implementation in wf-domain::policy::complete. The three complete-policy prepare, verify and decode operations use actual typed content or borrowed bytes and the same caller-owned PolicySchemaCharge. They do not install a policy, allocate its generation or compute an intent or digest. Existing version-1 policy bytes and FWCP framing, dispatch, namespace binding and hashing remain owned by wf-ports.
+
+This exception changes responsibility for normalized VALUE bytes only; it adds no crate dependency, runtime, I/O, clock, hash or OS API to domain. Private measurement stays within one operation's immutable content borrow. Preparation moves the candidate, verification streams against existing bytes, and decoding completes borrowed structural preflight before materializing variable data or envelope owners. Options retain supplied empty groups, false and zero; maps use raw-byte order and lists retain their normalized order. New complete values accept generations 1 through the existing maximum, without converting legacy generation0 or arbitrary source ETF/bignum values.
+
+Each operation checks equality with the account’s immutable profile first and prospectively pays its selected structural, byte, comparison and copy visits before the corresponding work. Matching profiles do not establish accounting identity; the enclosing parent must own and thread the same charge through all of its operations. Failed debit commits neither failing work nor scratch and preserves previous successful work. Existing G1 peak P still describes canonical scratch, not the sum of live Data, VALUE, request, FWCP or parent owners. Native capacity, allocator failure behavior, CPU, RSS, caller construction and rejected-owner destruction require separate evidence. This codec supplies no whole-request, live-owner, source parity, storage or performance certificate.
+
+Creation follows independent literal byte and error oracles, actual API compile-RED, implementation, and reciprocal architecture/performance review. Production files/functions stay within400/100 physical lines, tests within600; dependency and purity checks remain unchanged. Linux and macOS require independent executions. Compound framing/hash/accounting, authoritative install/Patch/intent, original Elixir scenarios and later ordered runtime milestones remain separate acceptance gates.
+
+## Complete replacement caller and intent scheduling (A-M1-OUTER2-I1)
+
+Status: exact Stage I names and responsibility have complete reciprocal approval;
+creation follows six independent test bodies, a real missing-API RED, separately
+selected rejecting-scaffold behavior RED, implementation and actual peer review.
+The selected contract alone is no authored-body, native or product acceptance.
+
+The private `wf-domain::policy::complete::outer` implementation may check the
+actual typed caller header and measure the generation-free normalized intent
+grammar. It remains pure, synchronous, std/types-only and has no SHA, effect,
+clock, OS or backwards dependency. Ports owns the actual private field-to-SHA
+stream. CompletePolicyReplaceInput moves scope/request/time/guard/Data owners;
+Caller retains that input and immutable copies of the supplied schema and
+AdmissionLimits. These copies are mathematical content caps, not AdmissionCharge,
+account identity, digest verification or install/parent authority.
+
+Each closed entry checks equality with the actual schema account's immutable
+profile first at zero logical debit, then pays root128 before finite header,
+stamp and scope inspections. The inclusive FWSC aggregate is18+tenant+group+
+recovery<=8192. The actual measured intent is at most1MiB. Typed counts check
+their cap/u32 representation before container128 and width4; RAW pays128 before
+actual cap/u32 and4+length; an option pays its flag1, then Some128 and the
+distinct represented payload group/container when present. Existing structural
+field/list/map caps and all Option/enum widths remain exact; this is not full
+installed-policy semantic admission or raw Elixir compatibility.
+
+The operation-local measured view borrows actual tenant/Data and copies the
+guard before that same paid field walk. Consuming IntentMeasure::finish releases
+its mutable charge borrow and fills only private checked bytes/nodes. Two
+distinct prospective work events then prepay the actual stream and SHA. The view
+drops before Input moves into Caller. No extra sizing walk, unused operand,
+public counter, paid-result encoder, callback, allowance, reset or second
+account is introduced. Only the raw owned-input ports entry closes the actual
+preparation/hash schedule on its one received mutable charge; mathematical
+domain calls and public immutable getters cannot prove composition identity.
+
+Independent minimal B52/N5 costs692 measurement+692 stream+180 SHA=1564/P0;
+Some(0) costs1844 and attrs[a]2615. Maximum1563 refuses the last180 while
+retaining1384; two minimal calls on the same object cost3128, and maximum3127
+retains2948 after the final refusal. A failing prospective debit commits neither
+failing scalar and preserves prior successful work and positive scratch. The
+caller constructs no uniqueness/sorting scratch. P remains max canonical
+scratch, excluding simultaneous Data/VALUE/frame/parent owners, native capacity,
+tree comparisons, caller construction, rejected-owner Drop, CPU and RSS.
+Represented-length work coefficients do not certify physical byte reads.
+
+Existing V1 branches and VALUE responsibility are preserved. Stage F request
+models, frame/restore APIs, private ClientIntent2 constructor, Reader seams,
+tag4 framing, FWSC emission and their tests/constants remain separately held.
+Two encoded owners during future VALUE-plus-frame preparation need explicit
+ownership accounting; no free in-place, Box or Arc conversion is selected.
+Operational schema/work/length/cap errors stay structured and never become a
+retained business rejection. ONE charged retained gate, Fresh-only current
+authority, coherent atomic namespace/high-water/outcome/checkpoint installation,
+raw Patch/ETF/reference/source parity and later M2-M8 remain required.
+Linux and macOS require independent current execution and matched compiler,
+release/overflow/features/allocator/workload resource and timing measurements.
+
+## Original core-Patch caller and intent scheduling (A-NEXT1-CONSULT)
+
+The selected branch preserves the original normalized CompleteCorePolicyPatchInput;
+it does not encode a merged CompletePolicyValue as Patch identity. Private domain
+outer/caller/core_patch measures the owned caller command; private ports
+log/complete_policy/core_patch streams the same borrowed fields through the
+existing IntentHasher. Existing Complete-Replace/IntentMeasure/Hasher bodies and
+VALUE/FWCP/V1 responsibilities remain exact, apart from the reviewed header
+operand factor and private hasher visibility seams. Public getters expose
+immutable content/caps, with no account identity or install/replay authority.
+
+The exact registry is WF-INTENT\0COMPLETE-CORE-PATCH\0V2\0 (33 bytes), followed
+by tenant RAW, guard OPTION-u64, workflow-type RAW, version FieldPatch,
+max-active FieldPatch, retry FieldPatch, retention FieldPatch and states MAP.
+RAW is big-endian u32 length plus opaque bytes; MAP is big-endian u32 count and
+existing raw-byte BTreeMap order. OPTION is 0 absent / 1 present. FieldPatch is
+0 Unchanged / 1 Set / 2 Clear, with payload only for Set. Version is 0 Bytes+RAW
+or 1 Number-u64. Maximum Set writes u64. Retry Set writes max OPTION-u16,
+backoff OPTION-partialBackoff and target OPTION-RAW. Partial Backoff writes
+kind OPTION-u8 (0 None / 1 Fixed / 2 Linear / 3 Exponential), base OPTION-u64,
+max OPTION-u64 and jitter OPTION-u8. Retention Set writes TTL OPTION-u64 and
+history OPTION-u32. Each state writes key RAW then 0 Remove / 1 Patch; Patch
+writes mode FieldPatch (Set 0 Parallel / 1 Fifo), retry and retention FieldPatch.
+No padding, default expansion, empty collapse or invented governance/indexed
+Patch field is selected. Full u64 guards and business-invalid typed values retain
+identity until later Fresh semantic validation.
+
+The closed entry first checks equality with the actual account's immutable
+profile at zero debit, then pays request-root128 before checked FWSC aggregate
+18+tenant+group+recovery<=8192. One paid borrowed measure walk uses the unchanged
+IntentMeasure. It pays partial-root128 before workflow RAW; RAW descriptor128
+before cap/u32/4+length; count cap/u32 before container128/width4; each state
+row128 before key RAW and action tag1; only Patch adds payload128 before its
+three fields. Every FieldPatch pays tag1 and only Set pays payload128. Retry,
+Backoff and Retention add distinct group128; scalar/version visitors add no
+group. Every Option pays flag1 and Some payload128. Incoming state count uses
+usize::MAX followed by checked u32 representation, never final max_states.
+Type/version/target/key RAW cap is262144; scope is8192 and complete intent1MiB.
+No BTree sorting, reference spine or native comparison fee is invented.
+
+WR1 checks represented byte addition, then global byte cap, then conversion and
+prospective same-account byte debit, and commits the byte count only on success.
+LengthOverflow and structured Encoding(ByteLimit)/schema/work errors retain
+existing mappings. Consuming measure.finish releases its mutable charge borrow;
+private checked B/N metadata prepays stream128*N+B and SHA128+B as TWO separate
+prospective events on that same object. The view ends before original input
+moves into Caller. Ports then performs one actual immutable SHA traversal.
+There is no second account, reset, refund, callback or reusable paid recipe.
+Failed debit commits neither g nor p and preserves earlier work/maximum scratch.
+
+Independent grammar/event rows are (B,N,G): minimal(52,5,1564), guards0/MAX
+(60,6,1844), emptyRetrySet(55,7,2085), Some-emptyBackoff(59,9,2609), state-a
+Remove(58,7,2094), state-a defaultPatch(61,8,2359), SOURCE8 original partial
+(92,16,4500). G=256*N+3*B+128 and new scratch is0. Eight full independent
+literal/digest rows freeze this core; all remaining branch/cap/exclusion controls
+and all six complete readable test bodies must freeze BEFORE test writes.
+Maximum1563 refuses final180 and retains1384; two minimal operations under3127
+retain2948 at the second final180 refusal. Guarded1843 retains1656. Legitimate
+held indexed1928/P64 plus minimal1564 gives3492G/P64,total3556; maximum3555
+refuses180 and retains3312G/P64,total3376. Profiles are immutable from each
+scenario's start; all real setup/operations remain on the same received account.
+
+P remains maximum canonical scratch, excluding simultaneous input/current/
+Data/VALUE/intent/parent owners, native capacity/tree/SHA/allocator/Drop/stack/
+CPU/RSS/latency. Pointer/source moves do not prove allocation or lifetime gains.
+Public current-policy comparisons in tests must call the real paid pure Patch
+preparation on legitimate independent values, not unused variables or producer-
+derived expected data. That model supplies no Fresh/storage authority.
+
+Original partial-command Stage F, exact full headers, ONE charged retained gate
+before consuming Fresh materialization/current/CAS/context/high-water/remerge,
+coherent durable atomic parent and source-public/raw/ETF parity are separate
+successors. ClientIntent::new stays V1-only here. Missing-API RED, separately
+selected S0/behavior RED, substantive source/GREEN, strict/fmt/docs/architecture
+checks and independent Linux AND macOS/full profiles remain actual later gates.
+
+## Borrowed original core-Patch frame verifier (A-NEXT-F1-CREATE1)
+
+The verifier-only branch uses FWCP format 1, outer tag 5 and intent version 2.
+Its length-prefixed payload is the complete original COMPLETE-CORE-PATCH V2
+intent region. Header tenant and region tenant must match; state keys are
+strictly increasing unsigned bytes. Original partial presence, empty leaves,
+zero/MAX scalars and business-invalid values remain data until Fresh remerge.
+Legacy tags 1–3, public V1 ClientIntent construction and held Replace tag 4 stay
+within their existing contracts.
+
+One paid domain structural scan returns ScannedCorePatchFrame with private
+same-frame borrows and fixed parsed scalars. It exposes only original_intent,
+with no constructor, derives, account, paid count, token, callback or credit.
+Restoration consumes that mathematical view; no unrelated frame/header/region
+can be supplied. Only the raw ports verifier recomputes SHA and privately mints
+VerifiedCompleteCorePolicyPatchFrame on its continuous received charge. Domain
+view/header data cannot attest actual SHA, account continuity or install rights.
+
+Profile equality and actual frame cap precede the structural scan. Header RAW
+caps are tenant 8192 and group/recovery/request 256, followed immediately by
+nonempty checks. The checked isolation bound follows the third ID before the
+request and intent fields. Complete outer bounds precede nested inspection.
+Intent SHA is prepaid after structural validation; digest comparison is paid
+before all header copies and later scope planner/measure/reserve/emission and
+frame SHA. An early structural ScopeLimit therefore precedes IntentMismatch.
+Every reached read, comparison operand, copy and tail event remains separately
+paid; refusal preserves prior work and scratch without refund. No second
+structural scan, original Patch/Data materialization or default expansion occurs.
+
+The existing fallible FWSC codec and exact private ports SHA dependency are
+reused. Canonical scratch P excludes borrowed input, owned header/isolation and
+held simultaneous owners; source moves and fewer parses prove no native gain.
+Full independent literals, six readable tests and actual physical fit precede
+creation. Missing-API RED, separately selected rejecting S0, behavior RED,
+substantive SOURCE/GREEN and independent Linux AND macOS remain required.
+Frame preparation, consuming decoder, ONE retained gate, Fresh-only original
+partial remerge and coherent atomic parent remain separately selected successors.
+
+## Original core-Patch frame producer (A-NEXT-F2-CREATE1)
+
+The selected producer extends existing caller/core_patch and ports core_patch/
+frame modules. It introduces no production file, dependency, retained model or
+account capability. Public ports preparation accepts raw owned request input,
+schema/admission limits and its actual mutable PolicySchemaCharge, and returns
+only existing PreparedBytes. Domain returns the unchanged original Caller and
+mathematical intent/frame lengths; its tuple grants no reusable paid credit.
+
+Private CompletePolicyIntentSink has exactly two implementations for existing IntentHasher
+and Writer. One canonical original-field visitor serves hashing and emission;
+all six previous field-visitor bodies retain their grammar. The immutable Caller
+supplies header tenant, original tenant, metadata and original partial command.
+No isolated intent Vec, merged VALUE substitution or public accepted-Caller
+encoder is added. Existing verifier, public V1, legacy tags1–3 and Replace tag4
+remain within their current contracts.
+
+Let A be the four ID byte lengths, B the original intent bytes, N its measured
+nodes, H=79+A the full header including payload-u32, F=H+B, M=128*N+B and
+MH=768+H. Profile equality precedes payment. Paid request/scope and original
+measurement precede header measurement and the checked full F cap. The same
+account then admits distinct stream M, original SHA128+B, reserve128+F, header
+emission MH, original emission M and full-frame SHA128+F events. Every admission
+finishes before actual ports hashing/allocation/emission. Refusal retains prior
+work and maximum scratch; fallible output failure retains admitted work.
+G=384*N+6*B+4*H+1920, new scratch0. Minimal B52/N5/H83/F135 costs4484;
+F134 refuses at1543 before stream. Global +1 fills exactly1MiB before its
+Remove tag refuses, retaining1050240 rather than the different payload refusal.
+
+Prepared output uses the existing fallible Vec writer with complete-frame caps
+and exact final-length comparison before finish. Vec reserve can exceed F;
+boxing may relocate/shrink unless length equals capacity. Original boxed IDs,
+command Vec/tree storage, output capacity and SHA/stack/held owners coexist
+outside canonical scratch. Source structure proves no native performance gain.
+
+Three approved private test children freeze sixteen original frames and six
+header variants, full SHA/bytes, partial presence, scalar/RAW/global/scope caps,
+independent generation1/2 VALUEs and same-account refusals/held outputs/priorP.
+Actual missing-API RED precedes separate rejecting S0 and substantive body
+orders. Current Linux/macOS execution, matched performance, consuming decoder,
+ONE retained gate, Fresh-only remerge, atomic parent and full parity remain gates.
+
+## Consuming original core-Patch decoder (A-NEXT-F3-CREATE1)
+
+The domain's private decoder consumes the sole immutable, bound frame header.
+It reparses its original intent through the existing Reader, preserves all
+Unchanged/Clear/Set and optional distinctions, and constructs the original raw
+partial command. Header scope/request/stamp owners move into that input; no
+second ID copy or default/business admission occurs. Input::into_parts moves
+these owners back out without granting payment or apply authority.
+
+The raw ports decoder runs the complete unchanged verifier on its received
+schema account before its private consume_verified_frame reconstructs input on
+that same account. DecodedCompleteCorePolicyPatchFrame keeps private fields,
+immutable getters and a consuming input accessor. Frame and original-region
+bytes remain borrowed; verified digest and isolation move. No public accepted-
+Verified bridge, constructor, account token or reusable credit is introduced.
+The domain header binds immutable mathematical bytes, not actual SHA, Fresh or
+storage authority. Existing producer, verifier and legacy/Replace contracts
+retain their bodies. Reader optional and copy_leaf visibility widens only
+within policy::complete, with existing copy behavior and other Reader contracts.
+
+For original bytes B, reached structural nodes N, adjacent-key comparison cost K,
+owning objects O and copied-leaf cost C, fresh reconstruction pays
+D=128*N+B+K+128*O+C. Each copy pays128+length before its fallible reserve/copy;
+each adjacent comparison pays128+previous_length+current_length. Refusal retains
+prior work and peak scratch. No refund, replacement account or second hash is
+used. Minimal B52/N5/O2/C129 costs1077 after verifier4423, total5500 and new
+scratch0. Tight total5499 retains5372. Incoming original state-change count
+remains wire/work-bounded rather than limited by the merged final-state cap.
+
+Canonical scratch0 excludes native Vec/tree capacity, moved IDs/isolation,
+hash/stack state and simultaneous retained owners. Exact Vec reserve can exceed
+the requested size; boxing can move or shrink spare capacity. BTreeMap insertion
+has no recoverable allocation Result. These source/accounting facts establish
+no measured allocation, RSS, throughput or latency gain.
+
+Six tests preserve independent frozen frames/header variants, original partial
+presence, business-invalid values, same-account fees/refusals/prior peaks,
+ownership moves and equal-merged-value/distinct-original identity. Real missing-
+API RED and separately selected uniform-refusal behavior RED precede the body.
+The raw codec is independent of the ordered apply successor: verification then
+exactly ONE retained gate must precede Fresh-only reconstruction, coherent
+current/CAS/context/highwater, paid remerge and atomic proposed writes. Full
+public/original profiles, both-host execution and durable adapters remain gates.
+
+
+## Charged header-only original core-Patch gate
+
+A/P-NEXT-F4-GATE1 and the separate TEST1/S01 decisions preserve one shared
+legacy/charged gate. Header and view lifetimes are independent; the only returned
+reference borrows retained authority from the view. Legacy None performs no
+debit and no checked fee arithmetic. It may still evaluate length getters and
+helper branches; source factoring certifies no native cost equivalence.
+
+The charged wrapper first checks the same account's immutable profile at0.
+Reached events then charge root128; scope128 plus both scope-ID lengths;
+control128; one retained get128 plus request length; retained scope128 plus both
+scope lengths; retained request128 plus both lengths; metadata128; intent196;
+expiry128. Each event admits atomically before its comparison or lookup, with
+scratch0 preserving any prior peak. Exact LogReplay stops before lookup, and
+intent conflict precedes expiry. Work refusal preserves the preceding scalars.
+
+One-byte IDs give Fresh519, LogReplay390, Conflict1107, Replay/Expired1235.
+After the independent raw verifier4423, the nine prefixes are4551/4685/4813/
+4942/5076/5206/5334/5530/5658. Two Fresh raw calls total9884. Real held indexed[a]
+restore1928/P64 plus one Fresh totals6934; two total11876. Wider2/3/4/5-byte IDs
+independently verify actual operands with V4476/Fresh535/Replay1271. The tests
+freeze exact and tight fees and hold/reobserve the original owners throughout.
+
+These are logical events, not native tree-comparison/CPU/allocation bounds.
+Native equality may short-circuit; BTreeMap lookup compares internal keys.
+Frame/SHA/ID/FWSC/retained/policy owners, capacities, stack/ABI/error formatting,
+Drop and simultaneous live-owner sums remain outside scratchP. No automatic
+Vec-to-Box conversion, constant-time or measured resource gain is certified.
+
+The gate itself verifies no tag5/V2/SHA binding and reconstructs no Patch. Only
+the separately selected raw parent may freshly verify, gate exactly once and
+consume that owner/reconstruct/current/remerge on Fresh. Existing opaque retained
+fixtures are admitted mathematical results, not installed policy or durable
+replies. Current/CAS/context/highwater/retention/response/atomic parent contracts,
+full public/original profiles and independent Linux and macOS remain successors.
+
+## Fresh-only original core-Patch request parent
+
+A/P-NEXT-F4-PARENT2-BODY1 selects domain complete/request and ports
+core_patch/frame/apply. The raw entry threads one mutable PolicySchemaCharge
+through one verifier, exactly one retained gate and Fresh-only consumption.
+Non-Fresh returns before original reconstruction, current/context/migration/
+window reads, response copying or renewal; replay borrows only external retained
+authority. The Plan's private fields preserve required revision, base control,
+proposed control and the complete decision, without a public constructor.
+
+Fresh pays current lookup and validates the present selected-profile/content/
+type/V2 authority before guard/CAS. Restoration precedes captured positive
+history context and merge; active high-water is checked before completed
+high-water and exhaustion. The old standalone guard-first algorithm remains
+unchanged through three private paid stages. Only the eighteen selected incoming
+guard/absent-type/merge/generation business origins become retained rejections;
+current/read/restoration/context/schema/work/output failures remain operational.
+
+Eligible results check the original positive window and expiry, then represented
+R=scope/request bytes+installed envelope+private response before fallible response
+copy and retained-owner construction. Accepted response version1 is the whole
+assigned canonical FWPV2 envelope, preserving governance/indexed content. Accepted
+Fresh proposes policy/predecessor+outcome+control; rejection outcome+control;
+Replay/Conflict/Expired control only; exact LogReplay no publication. The minimal
+parent costs11178 after verifier4423, gate519 and reconstruction1077 on one
+account. Ninety-four fixed prospective boundaries, current restoration, repeated
+and held-owner peaks, and late cap767 refusal/cap768 acceptance are executed controls.
+
+This pure View/Plan supplies no physical reader/configuration, strict stored
+codec acquisition or atomic namespace/revision/base-control/current-predecessor
+compare-and-publish adapter. Sequential supplied-view writers are not runtime
+concurrency evidence. Public optional-state/default presentation and all original
+source/setup/profile scenarios remain distinct requirements on Linux AND macOS.
+G/P/R excludes coexisting frame/ID/FWSC/partial/current/Data/VALUE/reply owners,
+native capacities/tree/ABI/Drop/live sums; retain Vec and claim no allocation,
+copy, CPU, RSS or latency gain without matched native measurements on both hosts.
+
+## Original Complete Replace frame contract
+
+A-NEXT-M1-COMPLETE-REPLACE-FRAME1-CREATE1 selects the producer and borrowed
+verifier contract. The codec now follows genuine missing-API RED and passes six
+new controls within the 48-test target. macOS workspace source checks pass;
+online RustSec refresh and independent Linux execution remain open.
+
+Private domain outer/replace_frame and its scan child own mathematical frame
+structure, paid header restoration and borrowed list uniqueness. Private ports
+log/complete_policy/replace owns actual hashing, FWSC and fallible frame output.
+FWCP format1/tag6/intent2 carries the original header and generation-free full
+Replace intent. Its exact registry is WF-INTENT\0COMPLETE-REPLACE\0V2\0.
+Original field presence, list order and business-invalid scalars survive;
+assigned generation, current policy and defaults are outside original identity.
+
+The shared private CompletePolicyIntentSink moves the existing CorePatchSink
+grammar into intent.rs with its two existing sinks and error adapter. Replace
+hashing and frame emission use one visitor. Seven redundant inherent Hasher
+convenience methods are removed; new/write/finish, existing Core Patch visitors
+and all old caller payments retain their contracts. The V2 scanner exposes only
+its unchanged complete-private Data field tail, after its existing VALUE prefix.
+
+New producer list checks follow original/header measurement and the complete
+frame cap, before all stream/hash/output prepayments. Each reached container
+and list pays its specified occurrence; each leaf pays128+length before borrowed
+set insertion, after admitting scratch64*count. Duplicates within a list refuse
+as operational Malformed; distinct unsorted lists and equal names across lists
+remain valid. This performs no normalization or business admission. Minimal
+production costs4612; minimal verification remains4423. The same caller account
+retains previous work and maximum scratch after every refusal.
+
+Verification checks original grammar, tenant and intent digest before copying
+header identities, then pays FWSC and whole-frame hashing. Scanned/Header/
+Verified values provide immutable mathematical content rather than reusable
+payment, Fresh authority or installation rights. No Data reconstruction or gate
+occurs in this codec. Independent bytes, same-account boundaries, real prior
+scratch and malformed-input tests precede implementation. Consuming decoding,
+one retained gate, captured-history/source-exact Fresh rejection, coherent
+physical reads and atomic publication require subsequent contracts. Full
+original profiles/parity and independent Linux/macOS execution remain required;
+the source ownership choices establish no measured allocation or speed gain.
+
+## Consuming original Complete Replace decoding
+
+A-NEXT-M1-COMPLETE-REPLACE-DECODE-CREATE1 selects the two private decode children
+within domain outer/replace_frame and ports complete_policy/replace. Raw ports
+decoding verifies once, then privately consumes that result on the same actual
+schema account. Domain consumes the header, freshly reconstructs the original
+guard and complete Data, and moves scope/request/stamp into the original input.
+The private-field decoded model moves FWSC and borrows exact original/frame
+bytes; its consuming input/decomposition methods move existing owners.
+
+The shared owning Data tail is unchanged. Existing V2 snapshot decoding still
+pays its structural and owning roots before FWPS/version. Original Replace
+reconstruction pays its root, registry, tenant, optional guard, Data structural
+and owning roots, and every reached shared field/read/copy. There is no Input
+wrapper fee, synthetic snapshot, assigned generation, second hash/verification,
+normalization, business admission, current/context lookup or request gate.
+
+Source-derived reconstruction is 1077 for minimal original content and 20635 for
+the full fixture. Combined raw decode targets are 5500G/P0 and 43062G/P128.
+Every admitted debit and earlier scratch peak persists through refusal and
+repetition. Six tests now execute these source-derived expectations after
+genuine tests-only missing-API RED; the target passes 54/54. All macOS workspace
+source checks pass, with 472 Rust tests and four compile-fail doc tests. The full
+wrapper fails only its final online advisory refresh; the separate cached
+four-category dependency audit passes against the October 9 database. Actual
+source reciprocal review is closed without blockers. Canonical G/P
+does not bound allocator capacity, live owner totals, tree allocation/comparison,
+Drop, CPU, RSS or latency. Existing
+Vec/Box representation stays intact. Independent Linux execution and original
+public/setup/profile parity remain required. Fresh rejection/history
+and the ordered atomic parent are separate successors.
+
+
+## Source-ordered normalized Complete Replace content
+
+A-NEXT-M1-COMPLETE-REPLACE-CONTENT1-CREATE1 and the reciprocal performance
+creation decision select private domain replace_content with core, governance,
+indexed and rejection children. Its mathematical checker borrows Data, checks
+the immutable account profile and captured history context, runs unchanged
+operational complete_metrics, pays semantic stream and peak scratch, then
+visits representable business fields once in pinned Elixir source order.
+Operational caps, correspondence and noncanonical duplicates return outer
+errors; no schema-error conversion can manufacture the private rejection.
+
+The immutable rejection contains only its restricted reason and, for history,
+the admitted original limit. Exact source response construction freshly pays
+the actual received account and uses static literals or a seven-byte local
+decimal buffer, then one fallibly reserved output Vec. No Data cloning, default
+expansion, VALUE installation, generation, retained status or Fresh authority
+is selected here. Multiple invalid typed map entries follow raw-byte BTreeMap
+order; general Elixir map first-error equivalence remains unproved. Existing
+standalone/core-Patch business order and payments remain unchanged.
+
+Six controls now execute after genuine tests-only missing-API RED; the policy
+target passes 51/51. Independent supplemental response-fee assertions were
+added after implementation and pass in the same 51-test target. The macOS
+workspace passes 478 Rust tests and four compile-fail docs, strict source lint,
+architecture, documentation and reference checks. Its wrapper stops only at
+online RustSec DNS; a separate configured October 9 cached audit passes all
+four categories. Final actual-source reciprocal review is closed without blockers.
+Logical scratch does not bound allocator/tree/live-owner/Drop/CPU/RSS costs;
+there is no measured resource gain. Original raw/public/ETF/setup/profile
+parity, physical atomic publication and independent Linux validation remain
+required alongside macOS.
+
+## Fresh-only original Complete Replace request parent
+
+A-NEXT-M1-COMPLETE-REPLACE-PARENT1-CREATE1 selects domain
+complete/replace_request and its retention child, ports complete_policy/replace/apply,
+four private tests under the existing Replace target, and narrow existing
+encoding, response-length, retained-status, export and architecture-test seams.
+The parent is implemented after genuine missing-API RED; all eight new and
+54 existing controls pass within the 62-test target. Strict library and target
+Clippy pass. Actual written-source reciprocal review is closed without blockers.
+ROOT-PARENT1-CHECK1 records the complete macOS wrapper PASS with 487 Rust tests,
+four compile-fail docs and all source/dependency stages; focused counts overlap.
+Independent Linux acceptance remains pending. No dependency or source-rule
+waiver is added.
+
+Raw verification and the existing charged header gate each run once on the same
+account. Non-Fresh returns before original reconstruction and current, context,
+migration or window reads. Fresh checks same-current V2 bytes before CAS and
+requested-type equality, then captured context, one source-ordered incoming
+content check, active-before-done migration high-water and assigned generation.
+Current correspondence omits old business admission; the accepted Data is
+measured and emitted privately after the actual successful content walk. It is
+then moved into the existing VALUE owner without a second business pass.
+
+PRIVATE-RESULT1 refines the prepared representation to a private Result alias:
+accepted predecessor/VALUE or a bounded two-arm generation/content rejection.
+The outer operational Result remains separate. This preserves the three
+original branches without an additional heap owner or resource event; it
+supplies no measured native size or speed improvement. The added
+retained content status holds the immutable original descriptor/history limit.
+Eligible results pay window128, aggregate128 and metadata128 before response
+construction, then retained-owner128. Aggregate R counts four identity lengths,
+installed envelope and exact response. Accepted retains the entire private
+VALUE through one paid copy; content responses use the existing freshly paid
+encoder and move its one Vec into retention. Body length is determined by a
+restricted fixed-prefix/decimal helper after aggregate payment, before output
+allocation. No operational error produces a retained business result.
+
+Independent source/contract event oracles give minimal verifier4423, Fresh
+gate519 and reconstruction1077, reaching6019. The selected missing-current
+parent reaches9640; present current adds1144 correspondence and130 for both
+type operands, reaching10914. A supplied guard adds288. Tight9639 retains9512;
+two same-view mathematical Fresh calls reach19280, with tight19279 retaining19152.
+A real held1928G/P64 predecessor reaches11568G/P64, total11632; tight11631
+retains11440G/P64. Non-Fresh minimum totals are4813 LogReplay,5530 conflict and
+5658 replay/expiry. Full382 VALUE plus its382 response and four IDs yields R768,
+while its477-byte raw frame fits cap767. The focused tests now execute these
+independent event oracles. Original history18/C17 uses verifier4825 and
+reconstruction1595, then Fresh6939 and retained9182; its replay/expiry6060
+differs from the minimum frame because its original input is wider. One late
+measurement expectation was corrected from unchanged Writer source:
+Sink::Measure overflow yields Schema(SnapshotBytes). The preceding failure is
+retained; no production behavior or fixed counter was changed. These logical
+results do not establish native performance measurements.
+
+The supplied View/private Plan are mathematical compare inputs and owners.
+Original generation0/raw/ETF/public setup and normalization, indexed counts,
+migration queues, physical coherence, whole-bundle atomic publication and all
+required profiles remain successors. Native capacities, tree comparisons,
+stack/ABI/Drop and simultaneous frame/ID/FWSC/current/Data/VALUE/reply owner
+sums stay outside logical G/P/R. Preserve Vec and fallible reserves; independent
+Linux AND macOS results are required before full acceptance.
+
+## Original indexed-policy input normalization
+
+A-NEXT-M1-POLICY-INDEXED-INGRESS1-CREATE1 selects two private domain production
+children and two children of the existing policy integration target. The
+implementation follows genuine tests-only missing-API RED; its six new controls
+pass within the 58-test policy target with strict lint. The full macOS wrapper
+passes 495 Rust tests and four compile-fail docs. Written-source architecture
+and performance review and their reciprocal review are closed without blockers.
+Borrowed RawPolicyIndexedValue preserves
+Nil/Binary/Atom/List/Other classes; Atom("nil") follows the source Nil branch in
+each context. PolicyIndexedInputRejection keeps thirteen exact static source
+messages. The entry returns outer operational errors or inner source rejection
+versus the existing optional Vec fields. An optional private IndexedOwners alias
+changes only spelling; there is no accepted/paid result or retained-status bridge.
+
+After profile admission and entry128, both-tree preflight pays each attempted
+node128 before depth/occurrence checks, then its actual canonical text length
+after the raw byte cap. Root depth0 is limited to64, total occurrences to4096
+and total raw text to262144 bytes. These operational limits are distinct from
+source semantic limits. Scratch is one prospective A+64D event, with A192 for a
+nonempty attribute root list and D the maximum nonempty metadata-list ancestry;
+prior peak survives. Source semantics then pay reached roots, borrowed key
+UTF-8/trim/bounds visits and equality operands in order. Stable unique3/1 checks
+retain all later key and local nested-list error priorities.
+
+Only after both fields succeed does present attribute output pay owner128 and
+reserve128+128N, then each final key copy128+length. Present metadata pays its
+single copy128+length. Fixed source-derived expectations are absent384/P0,
+present attribute nil/empty768/P0 and the original four-name example4784/P192;
+repeat totals9568/P192. A real prior1928G/P64 seed plus absence gives2312G/P64.
+These independent oracles were fixed before implementation and now execute,
+alongside depth/node/raw-byte, nested-priority and held-owner refusal controls.
+Bare Binary version/owner and Nil source-field observations were supplemental
+post-implementation tests; they are not attributed to the earlier RED. No native gain,
+capacity or total-live-owner guarantee. Old typed APIs and encoding stay exact.
+Original whole-policy options, ETF/current readers, public/setup/profile/physical
+operations and both-host acceptance remain required.

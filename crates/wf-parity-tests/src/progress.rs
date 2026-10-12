@@ -54,7 +54,7 @@ struct Ledger {
     declarations: Vec<Entry>,
 }
 
-#[derive(Clone, Deserialize, Eq, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ArtifactRef {
     pub(crate) path: String,

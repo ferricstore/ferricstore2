@@ -484,3 +484,107 @@ fn create_and_transition_revalidate_source_errors_and_binary_fields() -> TestRes
     );
     Ok(())
 }
+
+#[test]
+fn source_reclaim_takeover_fences_old_worker_and_preserves_three_history_rows() -> TestResult {
+    let id = RecordId::new(b"flow-reclaim-fence:1".to_vec())?;
+    let create = CommittedCommand {
+        id: id.clone(),
+        now: TimestampMillis::new(1_000),
+        operation: Operation::Create(Create {
+            workflow_type: b"lease-reclaim-fence:1".to_vec(),
+            state: b"queued".to_vec(),
+            run_at: Some(TimestampMillis::new(1_000)),
+            payload: None,
+        }),
+    };
+    let (outcome, write, event) = reduce(None, &create)?.into_parts();
+    assert_eq!(outcome, Outcome::Changed);
+    let mut scenario = Scenario {
+        record: write.ok_or("source create record absent")?.record,
+        history: vec![event.ok_or("source create history absent")?],
+    };
+    assert_eq!(
+        scenario.apply(
+            1_000,
+            Operation::Claim(Claim {
+                expected_state: b"queued".to_vec(),
+                worker: b"worker-a".to_vec(),
+                token: LeaseToken::new(b"first-committed-token".to_vec())?,
+                lease_ms: 50,
+            })
+        )?,
+        Outcome::Changed
+    );
+    let first = scenario.guard()?;
+    assert_eq!(scenario.record.fence().get(), 1);
+    assert_eq!(
+        scenario.apply(
+            1_050,
+            Operation::Reclaim(Claim {
+                expected_state: b"running".to_vec(),
+                worker: b"worker-b".to_vec(),
+                token: LeaseToken::new(b"second-committed-token".to_vec())?,
+                lease_ms: 500,
+            })
+        )?,
+        Outcome::Changed
+    );
+    assert_eq!(scenario.record.id(), &id);
+    assert_eq!(scenario.record.version(), 3);
+    assert_eq!(scenario.record.lease_deadline().get(), 1_550);
+    assert_eq!(scenario.record.updated_at().get(), 1_050);
+    assert_eq!(scenario.record.attempts(), 0);
+    assert_eq!(
+        scenario
+            .record
+            .lease()
+            .ok_or("takeover lease absent")?
+            .worker,
+        b"worker-b"
+    );
+    assert_eq!(scenario.record.fence().get(), first.fence.get() + 1);
+    assert_ne!(scenario.guard()?.token, first.token);
+    let before = scenario.record.clone();
+    let history_before = scenario.history.clone();
+    for operation in [
+        Operation::Complete(Terminal {
+            guard: first.clone(),
+            payload: None,
+            value: None,
+        }),
+        Operation::ExtendLease(ExtendLease {
+            guard: first,
+            lease_ms: 500,
+        }),
+    ] {
+        let command = scenario.command(1_060, operation);
+        assert_eq!(
+            reduce(Some(&scenario.record), &command)
+                .err()
+                .ok_or("old worker accepted")?
+                .to_string(),
+            "ERR stale flow lease"
+        );
+        assert_eq!(scenario.record, before);
+        assert_eq!(scenario.history, history_before);
+    }
+    assert_eq!(scenario.history.len(), 3);
+    assert_eq!(scenario.count(EventKind::Created), 1);
+    assert_eq!(scenario.count(EventKind::Claimed), 2);
+    assert_eq!(
+        scenario
+            .history
+            .iter()
+            .map(|entry| (entry.kind, entry.worker.as_deref()))
+            .collect::<Vec<_>>(),
+        [
+            (EventKind::Created, None),
+            (EventKind::Claimed, Some(b"worker-a".as_slice())),
+            (EventKind::Claimed, Some(b"worker-b".as_slice())),
+        ]
+    );
+    Ok(())
+}
+
+mod claimed_support;

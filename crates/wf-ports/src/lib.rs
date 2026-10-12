@@ -1,6 +1,8 @@
-//! Neutral effect and client contract boundaries. No backend types are exposed.
+//! Neutral effect/client contracts and private prepared-command codecs.
 //!
-//! M0 module scaffold; implementations follow the reviewed architecture.
+//! Versioned encoders and decoders use immutable byte and work profiles.
+//! Durable storage, consensus and live client adapters retain their reviewed
+//! implementation gates.
 
 #![forbid(unsafe_code)]
 

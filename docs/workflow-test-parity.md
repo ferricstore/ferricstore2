@@ -54,3 +54,14 @@ M0 collects runtime ExUnit identities and creates the checked bidirectional mapp
 M0 collects runtime ExUnit identities; M1 ports domain scenarios; M2/M3 port persistence/consensus faults; M4 ports worker/API contracts; M5 closes broader workflow scope; M6/M7 port query/retention/recovery cases. Property/model tests, architecture checks and Rust-specific safety tests are additional coverage, not replacements for this suite.
 
 The original design review executed no suites. Subsequent implementation has executed source-derived Rust tests and selected original Elixir cases, with exact evidence in [the handoff](CONTINUE.md) and implementation review notes. Snapshot integrity, registration and manifest coverage checks verify preservation/accounting only, not test outcomes or behavioral equivalence. [Independent harness review](reviews/workflow-test-parity-review.md) records the original bounded source inspection and requirements that still apply.
+
+The [selected public claim migration](adr/004-committed-time-and-apply-admission.md#selected-public-claim-parent-migration)
+records four explicit safety dispositions for the pinned source: one atomic
+local-group parent, one monotone reservation cursor per original batch, complete
+current governance through pipelines, and original-ID inquiry/identified
+compensation before fresh spend after unknown. Preserve every original source
+identity, assertion and setup body; each affected assertion needs its explicit
+migration disposition and executed Rust counterpart. Keep intentional safety
+differences and additional fault controls distinct from source equivalence.
+Neither this decision nor pure planner checks advances passing parity. Full
+required case/profile execution on BOTH Linux AND macOS remains mandatory.

@@ -2,6 +2,9 @@
 
 use crate::{bounds::MAX_RECORD_ID_BYTES, error::ValueError};
 
+mod scope;
+pub use scope::{GroupId, PartitionId, RecoveryId, RequestId, TenantId};
+
 /// A nonempty binary identifier within the source storage identity bound.
 ///
 /// Bytes are opaque: invalid UTF-8, nulls, and delimiters are permitted.

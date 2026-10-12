@@ -152,3 +152,17 @@ Cross-transport additions must retry one request across TCP and HTTP under its o
 Before implementation: settle transport/common size caps; freeze normalized intent/digest vectors and retention; verify library cancellation/TLS/server limits against selected releases; realize bounded admission and buffer accounting under hostile input; map every preserved source assertion/runtime case; implement actual process/cluster barriers later; and measure the claimed load/SLO envelope before advertising it. Architecture changes belong to the parent ADR and architecture allowlist.
 
 Actual reviews of TCP, HTTP, parent common design, architecture and ADR have been performed, and both peer review files were read. [System review](../reviews/transport-system-review.md) records specific received IDs, answers, owned revisions and final reread status without inventing peer endorsement. Direct agent messaging is unavailable in this session; shared files plus parent relay are the communication path. No implementation or conformance/performance execution follows from textual review completion.
+
+HTTP, TCP and embedded callers share the
+[selected public claim parent migration](../adr/004-committed-time-and-apply-admission.md#selected-public-claim-parent-migration):
+one replay gate and final atomic local-group plan, one monotone verified credit
+cursor per original batch, complete current governance through pipelines and
+original-ID inquiry/identified compensation before fresh spend after unknown.
+Keep independent coalesced caller identities, current authorization and original
+request scope/intent on retry. Local atomic no-commit does not establish external spend
+or compensation state; absent lookup, cancellation and lost delivery do not
+settle earlier submission. No new credit or fabricated release flow ID follows
+from equivalent retry or a pure planner classification. Public integration
+requires the complete authoritative governance/identified-owner/outbox protocol
+and executed source/safety/persistence controls on BOTH Linux AND macOS and all
+required profiles. This selection implements no service or conformance test.

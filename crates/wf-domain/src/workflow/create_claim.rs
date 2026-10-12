@@ -82,22 +82,31 @@ pub(super) fn claim_record(
         .fence
         .checked_next()
         .ok_or(DomainError::CounterOverflow(Counter::Fence))?;
-    let mut next = record.clone();
-    next.state = b"running".to_vec();
-    next.run_state = Some(if reclaim {
-        retry_run_state(record).to_vec()
-    } else {
-        record.state.clone()
-    });
-    next.version = version;
-    next.fence = fence;
-    next.updated_at = command.now;
-    next.next_run_at = Some(deadline);
-    next.lease = Some(Lease {
-        worker: claim.worker.clone(),
-        token: claim.token.clone(),
-        deadline,
-    });
+    let next = WorkflowRecord {
+        id: record.id.clone(),
+        workflow_type: record.workflow_type.clone(),
+        state: b"running".to_vec(),
+        version,
+        fence,
+        attempts: record.attempts,
+        created_at: record.created_at,
+        updated_at: command.now,
+        next_run_at: Some(deadline),
+        run_state: Some(if reclaim {
+            retry_run_state(record).to_vec()
+        } else {
+            record.state.clone()
+        }),
+        lease: Some(Lease {
+            worker: claim.worker.clone(),
+            token: claim.token.clone(),
+            deadline,
+        }),
+        payload: record.payload.clone(),
+        result: record.result.clone(),
+        error: record.error.clone(),
+        latest_event: record.latest_event,
+    };
     Ok(changed_plan(
         Some(record),
         next,

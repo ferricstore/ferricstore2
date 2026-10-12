@@ -136,11 +136,11 @@ Deduplication is checked before evaluating changed lease/revision preconditions 
 
 Correctness-critical due/FIFO/ownership indexes are authoritative transactional structures, even when derivable from records. Restore must load or rebuild them before enabling claims. Disposable cache/projection indexes remain outside this authority. Claim requests have a maximum scan/work budget and explicit partial/continuation semantics; a budget cannot permit skipping a FIFO head. A partial result must distinguish budget exhaustion with continuation from no eligible work. It may claim eligible heads of other lanes but never skip a live head within one FIFO lane. These limits and exact tie-breaks must be frozen with M1 fixtures.
 
-Client scheduling timestamps are requested deadlines, not authority to advance group time; only admitted leader-prepared time inputs participate in the proposed clock policy. The time ADR must define advancement for accepted, rejected, duplicate, tick and membership entries consistently, with replay preserving the original dedup outcome.
+Client scheduling timestamps are requested deadlines, not authority to advance group time; only admitted leader-prepared time inputs participate. [ADR-004](adr/004-committed-time-and-apply-admission.md) selects consistent advancement for accepted, rejected, duplicate, tick and stamped membership entries, with unchanged clocks for unstamped consensus entries and original dedup outcomes preserved. Live skew/forward-jump/new-leader safety still requires adapter evidence.
 
 Initial payload design is bounded inline bytes/results in replicated commands and snapshots; reject oversized references until a replicated blob availability protocol is validated.
 
-Proposed group time is nondecreasing committed logical time, with bounded committed ticks for idle expiration progress. This is deterministic but needs an explicit clock-skew/forward-jump/new-leader policy before deployment; it does not by itself prove physical-time lease safety. Snapshot and restore preserve logical time and fence identity. Disaster restore requires a new recovery identity or externally safe fence namespace to reject stale members/workers. See the Raft note for snapshot staging, vote/log completion, read barriers and membership gates.
+Selected group time is nondecreasing committed logical time, with bounded committed ticks for idle expiration progress under ADR-004. This is deterministic but needs an explicit clock-skew/forward-jump/new-leader policy before deployment; it does not by itself prove physical-time lease safety. Snapshot and restore preserve logical time and fence identity. Disaster restore requires a new recovery identity or externally safe fence namespace to reject stale members/workers. See the Raft note for snapshot staging, vote/log completion, read barriers and membership gates.
 
 No user handler executes inside Raft apply. Slow I/O and blob hydration do not block the domain reducer; the adapter must bound queues and document ordering/backpressure. Persist payload bytes before accepting a reference, and prove they remain available to every possible apply/snapshot path; local preupload alone is insufficient. A simpler bounded inline payload design is acceptable initially.
 
@@ -169,3 +169,354 @@ Prefer ownership and bounded message passing over shared locks. Do not hold lock
 Schema, command and snapshot versions are independent. Rollout must reject unsupported commands before proposing them; every voting replica must understand committed commands. Retention cannot delete live blob references, idempotency guarantees, pending child accounting or snapshot recovery data. Policy upgrades require explicit semantics for existing leased jobs.
 
 Architecture changes require a short ADR with motivation, changed allowlist, failure cases, migration and tests. Dependency inversion and invariants are enforced in CI as specified in the Rust quality note. Reviewers must distinguish mechanical checks from properties that require fault testing or human review.
+
+## Complete normalized policy VALUE bytes
+
+The reviewed A-V2VAL1 exception assigns the canonical FWPS/FWPV version-2 complete policy VALUE grammar and pure prepare/decode/stream verification to the private domain implementation. Existing V1 and FWCP framing, dispatch, namespace binding and actual hashing stay in ports. This adds no domain dependency or effect/OS access. One shared logical schema account pays every selected visit; its existing peak scratch metric does not certify total live owners or native resource use. See [ADR006](adr/006-private-prepared-command-codec.md) for the responsibility, version and validation limits. Independent Linux and macOS execution remains required.
+
+The private `policy/complete/presentation.rs` owns pure All/State response values
+with independent query and policy lifetimes. It verifies present V2 content once
+on the received schema account, then borrows original version, indexed, retry
+target and raw governance leaves. All owns a bounded, fallibly reserved vector
+of borrowed state descriptors; State has no all-state collection. Some state
+governance selects the whole present group, including empty groups, before type
+fallback; All rows expose only their own group. Captured public retention
+defaults resolve without an apply-context history clamp. Only an explicitly
+supplied absent observation becomes generation zero. These mathematical values
+leave configuration capture, authoritative reads, public maps/transports and
+durable installation to their existing owners; logical fees and borrowed
+addresses do not certify native resource gains on either supported host.
+
+## Complete replacement caller and generation-free intent
+
+A-M1-OUTER2-I1 selects the typed normalized caller/intent predecessor. Its
+creation contract is reviewed; body/TDD/native acceptance is recorded separately.
+The private domain outer feature owns actual caller header checks, immutable
+content/cap ownership, intent measurement and closed prospective logical
+stream/hash scheduling on the caller's same mutable PolicySchemaCharge. Ports
+owns the private one-stream actual SHA branch and uses its existing exact hash
+dependency. Types/domain gain no hash, effect, OS or backwards dependency.
+
+Caller getters and immutable cap copies are mathematical content, not charge
+identity, verification, authorization, storage or parent authority. The ports
+entry accepts raw owned Input, prepares it on its actual received account and
+hashes its real fields. No accepted-Caller reencoder/public debit/credit/flag or
+intent-output Vec/reference spine is introduced. The temporary measured view
+reads actual borrowed operands in its one paid walk and drops before Input moves.
+Separate stream/SHA fees are conservative logical work; actual ports performs
+one interleaved traversal and claims no three-payload-scan native cost.
+
+The new normalized intent2 grammar preserves every complete field, Option,
+enum, raw-byte map order and normalized list order, with fixed big-endian widths.
+Tenant and explicit guard are included; assigned generation, wrappers, group,
+recovery, request and committed time are excluded. Existing app V1 comparison
+and ClientIntent::new stay exact. P retains max canonical scratch rather than
+total live-owner or native memory semantics. See
+[ADR005](adr/005-application-intent-hash-helper.md) and
+[ADR006](adr/006-private-prepared-command-codec.md) for the selected limits.
+
+Stage F framing/restoration/models/ClientIntent2, ONE retained gate and coherent
+atomic authoritative parent remain separate required steps. Raw Patch/aliases/
+nil/ETF/reference hashing/customer versions, all original public scenarios and
+profiles, and later runtime milestones remain acceptance work. Linux and macOS
+require independent current checks and matched native resource/performance
+evidence; local Darwin tests and old CI do not certify current Linux changes.
+
+## Original core-Patch caller and intent
+
+A-NEXT1-CONSULT selects the Stage I owner and identity of the original normalized
+partial core Patch. Private domain outer/caller/core_patch owns pure header
+checks, bounded borrowed measurement and prospective stream/hash scheduling on
+the actual received PolicySchemaCharge. Private ports log/complete_policy/
+core_patch owns the real immutable field-to-SHA traversal using the existing
+exact hash dependency. Domain remains std/wf-types-only, with no effects, SHA,
+OS access or backwards dependency. The two caller owners and ports Intent have
+private fields, immutable getters and no derives or paid-credit API.
+
+The 33-byte COMPLETE-CORE-PATCH V2 registry includes tenant, type, original guard
+and every original partial field. Unchanged/Clear/Set-empty, optional Backoff
+components and state Remove/Patch remain distinct, without default expansion.
+Current policy, migration high-water, captured context and resulting VALUE/
+generation are excluded together with group/recovery/request/stamp/log. Original
+partial identity must survive retry/replay and later remerge against ordered
+coherent current state; a leader-prepared VALUE cannot replace it.
+
+The closed ports entry admits raw owned input on its same passed account, hashes
+that immutable owner once and moves it into Intent. Private measured metadata
+and immutable cap copies convey no account identity or install authority. Actual
+RAW/count/Option/FieldPatch visits and separate stream/SHA prospective payments
+remain bounded and nonrollback. P is canonical scratch maximum, not owner SUM
+or native allocation/Drop/CPU/RSS/latency. Existing Complete-Replace methods,
+measure/hasher bodies, goldens and V1/VALUE/FWCP boundaries remain exact.
+
+ADR005 and ADR006 record the full registry, fees and tests-first hold. The
+existing codec architecture test adds the exact new domain-path positive and
+effect-negative controls plus forbidden client-facade intent leakage; dependency
+policy and source-checker rules remain unchanged. Full literals and six readable
+tests precede creation/RED; S0 is separately selected. Stage F, ONE retained gate,
+Fresh remerge, atomic parent, raw/public parity, all profiles and independent
+Linux AND macOS source/native/performance acceptance remain separate successors.
+
+## Borrowed original core-Patch frame verification
+
+A-NEXT-F1-CREATE1 selects private domain outer/core_patch_frame with its scan
+child, private ports log/complete_policy/core_patch/frame and one test child.
+Domain remains synchronous std/wf-types-only and hash-free. Existing Reader
+module/type/thirteen methods widen only within policy::complete; every body,
+field and optional callback keeps its contract. Ports reuses the exact existing
+SHA dependency and fallible FWSC codec, with no client-facade exposure.
+
+A private-field mathematical ScannedCorePatchFrame exposes only its original
+intent borrow and is consumed for header restoration. It carries no account,
+paid count, token or credit. The sole raw ports verifier freshly admits on one
+actual charge, hashes the bound region, compares its digest before header copies
+and late scope/frame tails, then privately constructs Verified. Early structural
+scope admission remains before intent comparison. No accepted-view/header hash,
+public wrapper constructor, Patch materialization, current-policy access or gate
+is selected. Legacy tags 1–3/public V1 and held Replace tag 4 remain unchanged.
+
+ADR006 records registry, phase and resource limits. Existing architecture checks
+cover both new domain descendants and forbid Verified leakage through client.
+No dependency or source-rule exception is added. Full six-test source/ordinary
+fit, TDD, strict checks and both hosts remain gates. Original partial Stage F,
+Fresh-only ONE retained gate, coherent remerge/atomic parent, raw/public profiles
+and native allocation/performance/live-owner measurements remain successors.
+
+## Original core-Patch frame production
+
+A-NEXT-F2-CREATE1 extends the existing private caller/core_patch and ports
+core_patch/frame responsibilities. Domain pays bounded original/header
+measurement and each prospective hash/reserve/emission event on the actual
+received account. Ports freshly accepts raw owned input and returns only
+existing PreparedBytes after fallible full-frame output and exact length/SHA.
+The unchanged original Caller remains the source for header and payload.
+
+One private CompletePolicyIntentSink grammar serves exactly existing IntentHasher and
+Writer; no new production module, model, hash dependency or domain effect is
+introduced. Existing verifier and V1/legacy/Replace boundaries remain exact.
+Three private test children under the existing core_patch integration module
+keep ordinary physical file/function limits and fixed independent byte oracles.
+ADR006 records separate phase payments and ownership limits. Source reuse does
+not establish native performance or Linux acceptance; consuming decoder,
+retained gate, Fresh remerge, atomic parent and full test parity remain required.
+
+The selected original Complete Replace frame contract adds private domain
+outer/replace_frame with its scan child and private ports complete_policy/replace.
+Domain owns mathematical grammar, paid header restoration and structural list
+uniqueness; ports owns actual hashing and fallible FWCP/FWSC output. Format1/tag6
+preserves the original full generation-free intent, independent of assigned
+generation, current policy and defaults. The shared intent visitor serves both
+hashing and frame emission. Existing caller/Core Patch behavior and the V2
+field scan remain intact through the narrowly reviewed sink/tail extractions.
+
+The new producer admits borrowed list uniqueness after measurement/frame caps
+and before output prepayments, rejecting duplicates as operational Malformed.
+This adds no semantic normalization, current reads, gate or retained authority.
+Verification compares the original intent before header copies and owns no Data.
+The codec is implemented after tests-only RED; its six controls pass within the
+48-test target, and macOS workspace source checks pass. Consuming decoding has a
+separately selected contract below; Fresh retained-request application remains
+subsequent work. ADR006 records accounting/ownership limits. Dependency and purity rules
+stay unchanged; full original parity and independent Linux/macOS execution remain
+required.
+
+The consuming Replace decoder adds only private decode children to
+domain outer/replace_frame and ports complete_policy/replace. Ports verifies raw
+bytes once on the same schema account, then privately consumes the verified
+result. Domain freshly reconstructs the original guard and Data, moving existing
+header identities into the input. The immutable decoded model owns that input
+and the moved FWSC vector while borrowing original frame/intent bytes. It has no
+public constructor, Clone or accepted-Verified entry point.
+
+The existing V2 owning decoder shares its exact Data field tail. Both original
+snapshot roots still precede FWPS/version reads. Replace reconstruction pays
+every reached read and owner occurrence, preserves field presence and original
+list order, and adds no defaults, business admission, current lookup or gate.
+Input decomposition moves all five existing fields. This codec gives no Fresh,
+retained-request, installation or physical publication authority. Its six tests
+follow genuine missing-API RED and pass within the 54-test target. All macOS
+workspace source checks pass; actual source reciprocal review is closed.
+Online advisory refresh, Linux execution and original public/setup/profile
+parity remain open.
+
+## Consuming original core-Patch frame decoding
+
+A-NEXT-F3-CREATE1 selects private decode children within the existing domain
+outer/core_patch_frame and ports core_patch/frame responsibilities. Domain
+consumes the immutable scanned header and reconstructs the exact original
+partial command; boxed header IDs move into its raw request input. Ports
+verifies raw bytes first on the same schema account, privately consumes the
+verified result, and retains borrowed frame/intent bytes with moved isolation.
+DecodedCompleteCorePolicyPatchFrame has private fields and no public constructor.
+
+Reconstruction freshly pays every reached read, comparison and owned leaf copy.
+Original presence and business-invalid values survive without normalization or
+current-policy access. Reader optional/copy visibility widens only inside
+policy::complete; domain remains synchronous, hash-free and std/wf-types-only.
+The existing architecture checks cover the decoder and forbid its client-facade
+exposure. No dependency, source-size or allocation-accounting exception is added.
+
+The raw codec grants no retained-request, Fresh or installation authority. An
+ordered apply parent must verify, run exactly one retained gate, and only on
+Fresh reconstruct the original command before coherent current-policy/CAS,
+context, highwater, paid remerge and atomic write decisions. That parent is a
+separate successor. ADR006 records fresh fees and live-owner limits. Native
+Linux/macOS execution, complete original scenarios and measured performance
+remain independently required.
+
+
+## Charged original core-Patch request replay gate
+
+A/P-NEXT-F4-GATE1 selects the existing workflow/request/gate.rs responsibility.
+The charged entry and legacy inspect_request share one algorithm, one control
+plan and one retained-map lookup. A private optional account preserves the old
+legacy decisions and validation order; the charged entry checks its immutable
+profile and prospectively charges each reached event on the received account.
+Only complete's profile getter/debit helper and restricted reexport widen to
+crate visibility. No dependency, module rule or source-size waiver is added.
+
+The returned RequestGate borrows only the coherent view's retained outcomes.
+Its header lifetime is independent, allowing the result to survive a temporary
+verified-header owner. Fresh, Replay, IntentConflict, Expired and LogReplay,
+original retained response/status/identity/time/expiry and proposed control
+remain mathematical data. The gate reads no Patch, current policy, context,
+CAS, highwater or transaction, and grants no byte-binding/install authority.
+
+Four tests cover lifetime, old/charged decisions and validation priority, every
+prospective refusal, wider identity lengths, repeated same-account owners and
+real prior scratch peaks. Genuine missing-API and rejecting-body failures
+precede the shared implementation; native evidence remains host-specific.
+The separate raw parent must freshly verify, invoke this gate once and only
+for Fresh reconstruct/remerge before coherent atomic proposed writes. Full
+original profiles, Linux/macOS acceptance and durable adapters remain required.
+
+## Fresh-only original core-Patch request parent
+
+A/P-NEXT-F4-PARENT2-BODY1 selects private domain complete/request and ports
+core_patch/frame/apply children. The raw ports entry verifies once, gates once,
+returns non-Fresh decisions directly and reconstructs only Fresh on the same
+schema charge. Domain validates present current authority before CAS, then
+restores/merges with captured context, checks active before completed migration
+high-water and constructs the assigned full VALUE and original retained outcome.
+The unchanged standalone Patch entry retains its original guard-first priority.
+
+The required-revision View contains borrowed maps and Result-valued authority,
+context and retention inputs. The private-field Plan owns proposed Fresh values
+or borrows original replay solely from the external view. Accepted Fresh proposes
+policy/predecessor, outcome and control together; business rejection proposes
+outcome/control. Operational failures expose no partial Plan. Private accepted
+response version1 contains the entire original canonical FWPV2 envelope; public
+presentation remains a separate contract. ADR006 records fees and ownership.
+
+Six tests execute independent full-byte/metadata, error-origin/order, continuous
+account/refusal, replay and sequential-writer controls. These pure supplied views
+implement neither physical ordered reads nor atomic namespace/revision/control/
+predecessor comparison and publication. Strict reader/configuration adapters,
+public/original profiles, full Elixir parity, durability and separate Linux AND
+macOS acceptance remain required. Architecture checks cover both private children
+and forbid server/parent capability leakage through client and wire facades.
+
+## Source-ordered normalized Complete Replace content
+
+A-NEXT-M1-COMPLETE-REPLACE-CONTENT1-CREATE1 and the reciprocal performance
+creation decision select private domain replace_content with core, governance,
+indexed and rejection children. Its mathematical checker borrows Data, checks
+the immutable account profile and captured history context, runs unchanged
+operational complete_metrics, pays semantic stream and peak scratch, then
+visits representable business fields once in pinned Elixir source order.
+Operational caps, correspondence and noncanonical duplicates return outer
+errors; no schema-error conversion can manufacture the private rejection.
+
+The immutable rejection contains only its restricted reason and, for history,
+the admitted original limit. Exact source response construction freshly pays
+the actual received account and uses static literals or a seven-byte local
+decimal buffer, then one fallibly reserved output Vec. No Data cloning, default
+expansion, VALUE installation, generation, retained status or Fresh authority
+is selected here. Multiple invalid typed map entries follow raw-byte BTreeMap
+order; general Elixir map first-error equivalence remains unproved. Existing
+standalone/core-Patch business order and payments remain unchanged.
+
+Six controls now execute after genuine tests-only missing-API RED; the policy
+target passes 51/51. Independent supplemental response-fee assertions were
+added after implementation and pass in the same 51-test target. The macOS
+workspace passes 478 Rust tests and four compile-fail docs, strict source lint,
+architecture, documentation and reference checks. Its wrapper stops only at
+online RustSec DNS; a separate configured October 9 cached audit passes all
+four categories. Final actual-source reciprocal review is closed without blockers.
+Logical scratch does not bound allocator/tree/live-owner/Drop/CPU/RSS costs;
+there is no measured resource gain. Original raw/public/ETF/setup/profile
+parity, physical atomic publication and independent Linux validation remain
+required alongside macOS.
+
+## Fresh-only original Complete Replace request parent
+
+A-NEXT-M1-COMPLETE-REPLACE-PARENT1-CREATE1 selects private domain
+complete/replace_request with its retention child and private ports
+complete_policy/replace/apply. The parent is implemented after genuine
+missing-API RED. All eight new controls and 54 existing controls pass within
+the 62-test target; strict library and target Clippy pass. Actual source review
+and reciprocal architecture/performance review are closed without blockers.
+The complete macOS workspace wrapper passes 487 Rust tests, four compile-fail
+docs and every source/dependency stage; the 62-test target overlaps that total.
+The existing codec architecture
+test checks both domain
+descendants, the ports module, forbidden dependency back-edges and client/wire
+capability leakage. Its one focused macOS control passes.
+
+The raw ports entry verifies once, runs the existing charged header gate once
+and returns non-Fresh decisions before reconstruction or fresh authority reads.
+Fresh consumes the same verified frame and checks present V2 correspondence,
+then CAS, then requested type. Captured context precedes one incoming content
+walk, active and completed migration reads, and assigned generation. Only the
+three generation business reasons or the actual content descriptor reach
+retention. A private Result alias owns accepted predecessor/value or a bounded
+two-arm business rejection; outer operational errors remain separate.
+Operational failures return no partial plan. Old CorePatch and
+standalone priorities retain their existing contracts.
+
+The seven-field supplied View preserves revision, control, Result-valued reads
+and captured configuration. The private-field Plan owns the complete proposed
+policy/predecessor, original outcome and control bundle, or borrows the original
+replay outcome from the external view. Accepted response version1 retains the
+entire original private VALUE with one paid copy; a content-error encoder's
+Vec moves into retention without a second copy. The retained content status
+preserves its original history limit. The original window and aggregate cap
+precede metadata and response allocation.
+
+This typed contract accepts positive normalized V2 current values and original
+normalized replacement Data. Existing public snapshot binding can construct
+mathematical byte-mismatch fixtures without an unchecked API; it supplies no
+physical reader proof. Original generation0/raw/ETF/public normalization,
+indexed catalog and migration-queue writes, coherent physical reads, full
+compare/atomic publication, all original profiles and independent Linux AND
+macOS validation remain required. ADR006 records logical fees and native
+ownership limits; no measured performance gain is claimed.
+
+## Original indexed-policy input normalization
+
+A-NEXT-M1-POLICY-INDEXED-INGRESS1-CREATE1 selects private complete/indexed_input
+and its key child, with two private children in the existing policy test target.
+The implementation follows genuine tests-only missing-API RED; all six new
+controls and existing tests pass in the 58-test policy target with strict lint.
+The full macOS wrapper passes 495 Rust tests and four compile-fail docs.
+Written-source architecture/performance review and their reciprocal review
+are closed without blockers. The exact three exports are a
+borrowed Nil/Binary/Atom/List/Other input view, thirteen fixed source rejection
+reasons, and one normalization function returning the existing optional owned
+indexed fields. No dependency, wire format, retained status or authority model
+is added. The existing architecture checker covers both descendants and rejects
+client/wire/domain-value forwarding; its focused control and strict lint pass.
+
+The operation preflights both raw trees with explicit depth, occurrence and byte
+bounds on the received schema account. Then attributes precede metadata: UTF-8,
+source whitespace trimming, empty/trimmed-byte/reserved checks, stable first
+occurrence, and source unique limits of three attribute names and one key per
+metadata list. Each nested list completes its local check before the next outer
+sibling. Missing attributes differ from present nil/empty lists; nil metadata
+disappears. Only after both fields succeed are final unique leaves copied into
+their existing owners. ADR006 records the fixed logical schedule and limits.
+
+This purpose-specific shape view does not parse arbitrary Elixir terms or whole
+raw policy options. Original public replies, strict ETF/generation-zero readers,
+physical configuration/index/migration/atomic operations, required runtime
+profiles and independent Linux/macOS execution remain acceptance obligations.

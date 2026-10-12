@@ -26,15 +26,44 @@ pub fn select<'a>(
     request: SelectionRequest<'a>,
     continuation: Option<&SelectionContinuation<'a>>,
 ) -> Result<ClaimSelection<'a>, SelectionError> {
-    request.validate()?;
+    select_checked(
+        view,
+        request,
+        continuation,
+        |_, _, _| Ok::<_, SelectionError>(()),
+        |_| true,
+    )
+    .map_err(|error| match error {
+        SelectionFailure::Selection(error) | SelectionFailure::Guard(error) => error,
+    })
+}
+
+pub(super) enum SelectionFailure<E> {
+    Selection(SelectionError),
+    Guard(E),
+}
+
+pub(super) fn select_checked<'a, E>(
+    view: &AuthoritativeClaimView<'a>,
+    request: SelectionRequest<'a>,
+    continuation: Option<&SelectionContinuation<'a>>,
+    mut guard: impl FnMut(
+        Option<ClaimRecord<'a>>,
+        Option<LaneKey<'a>>,
+        Option<DueOrder<'a>>,
+    ) -> Result<(), E>,
+    physical: impl Fn(ClaimRecord<'a>) -> bool,
+) -> Result<ClaimSelection<'a>, SelectionFailure<E>> {
+    request.validate().map_err(SelectionFailure::Selection)?;
     if view.group != request.group {
-        return Err(SelectionError::GroupMismatch);
+        return Err(SelectionFailure::Selection(SelectionError::GroupMismatch));
     }
     if view.fifo.len() > request.head_budget {
-        return Err(SelectionError::HeadBudget);
+        return Err(SelectionFailure::Selection(SelectionError::HeadBudget));
     }
-    let mut cursor = cursor_for(view, request, continuation)?;
-    let heads = read_heads(view)?;
+    let mut cursor =
+        cursor_for(view, request, continuation).map_err(SelectionFailure::Selection)?;
+    let heads = read_heads(view, &mut guard)?;
     let fifo_after = cursor.fifo_after;
     let mut fifo = heads
         .into_iter()
@@ -45,10 +74,17 @@ pub fn select<'a>(
     let mut records = Vec::new();
     records
         .try_reserve_exact(request.limit)
-        .map_err(|_| SelectionError::AllocationFailed)?;
+        .map_err(|_| SelectionFailure::Selection(SelectionError::AllocationFailed))?;
     let mut identities = BTreeSet::new();
     let mut scanned = 0;
     while scanned < request.scan_budget && records.len() < request.limit {
+        if parallel.peek().is_none() && fifo.peek().is_none() {
+            break;
+        }
+        guard(None, None, None).map_err(SelectionFailure::Guard)?;
+        if let Some((order, _)) = parallel.peek() {
+            guard(None, None, Some(**order)).map_err(SelectionFailure::Guard)?;
+        }
         let parallel_first = match (parallel.peek(), fifo.peek()) {
             (Some((order, _)), Some(head)) => **order <= head.order,
             (Some(_), None) => true,
@@ -59,7 +95,8 @@ pub fn select<'a>(
             let Some((order, entry)) = parallel.next() else {
                 break;
             };
-            validate_parallel(view, *order, *entry)?;
+            guard(Some(*entry), None, None).map_err(SelectionFailure::Guard)?;
+            validate_parallel(view, *order, *entry).map_err(SelectionFailure::Selection)?;
             cursor.parallel_after = Some(*order);
             *entry
         } else {
@@ -69,9 +106,13 @@ pub fn select<'a>(
         };
         scanned += 1;
         if !identities.insert((entry.partition_key, entry.record.id().as_bytes())) {
-            return Err(SelectionError::DuplicateIdentity);
+            return Err(SelectionFailure::Selection(
+                SelectionError::DuplicateIdentity,
+            ));
         }
-        if let Some(action) = action_for(request, entry) {
+        if physical(entry)
+            && let Some(action) = action_for(request, entry)
+        {
             records.push(SelectedClaim {
                 record: entry.record,
                 partition_key: entry.partition_key,
@@ -101,33 +142,44 @@ struct Head<'a> {
     entry: ClaimRecord<'a>,
 }
 
-fn read_heads<'a>(view: &AuthoritativeClaimView<'a>) -> Result<Vec<Head<'a>>, SelectionError> {
+fn read_heads<'a, E>(
+    view: &AuthoritativeClaimView<'a>,
+    guard: &mut impl FnMut(
+        Option<ClaimRecord<'a>>,
+        Option<LaneKey<'a>>,
+        Option<DueOrder<'a>>,
+    ) -> Result<(), E>,
+) -> Result<Vec<Head<'a>>, SelectionFailure<E>> {
     let mut heads = Vec::new();
     heads
         .try_reserve_exact(view.fifo.len())
-        .map_err(|_| SelectionError::AllocationFailed)?;
+        .map_err(|_| SelectionFailure::Selection(SelectionError::AllocationFailed))?;
     let mut identities = BTreeSet::new();
     for (lane_key, lane) in view.fifo {
+        guard(None, Some(*lane_key), None).map_err(SelectionFailure::Guard)?;
         if !valid_component(lane_key.workflow_type)
             || !valid_component(lane_key.state)
             || !valid_component(lane_key.partition_key)
         {
-            return Err(SelectionError::InvalidIndex);
+            return Err(SelectionFailure::Selection(SelectionError::InvalidIndex));
         }
         let Some((lane_order, entry)) = lane.first_key_value() else {
             continue;
         };
-        validate_record(view, *entry)?;
+        guard(Some(*entry), None, None).map_err(SelectionFailure::Guard)?;
+        validate_record(view, *entry).map_err(SelectionFailure::Selection)?;
         if entry.priority != 0 {
-            return Err(SelectionError::InvalidFifo);
+            return Err(SelectionFailure::Selection(SelectionError::InvalidFifo));
         }
         if LaneKey::for_record(entry) != Some(*lane_key)
             || LaneOrder::for_record(entry) != *lane_order
         {
-            return Err(SelectionError::InvalidIndex);
+            return Err(SelectionFailure::Selection(SelectionError::InvalidIndex));
         }
         if !identities.insert((entry.partition_key, entry.record.id().as_bytes())) {
-            return Err(SelectionError::DuplicateIdentity);
+            return Err(SelectionFailure::Selection(
+                SelectionError::DuplicateIdentity,
+            ));
         }
         if let Some(order) = DueOrder::for_record(entry) {
             heads.push(Head {

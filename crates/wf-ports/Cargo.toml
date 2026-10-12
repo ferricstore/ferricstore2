@@ -12,3 +12,8 @@ workspace = true
 [dependencies]
 wf-types.workspace = true
 wf-domain.workspace = true
+sha2.workspace = true
+
+[[test]]
+name = "complete_policy_request"
+path = "tests/complete_policy_request/main.rs"

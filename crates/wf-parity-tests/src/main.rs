@@ -4,11 +4,13 @@
 
 use std::{env, path::PathBuf, process::ExitCode};
 
-use wf_parity_tests::{check_progress, check_reference, require_parity, workspace_root};
+use wf_parity_tests::{
+    check_compiler_lineage, check_progress, check_reference, require_parity, workspace_root,
+};
 
 fn usage(message: &str) -> String {
     format!(
-        "{message}; usage: wf-parity-tests <check-reference|check-progress|require-parity> [--root PATH]"
+        "{message}; usage: wf-parity-tests <check-reference|check-progress|check-compiler-lineage|require-parity> [--root PATH]"
     )
 }
 
@@ -81,6 +83,18 @@ fn run() -> Result<(), String> {
         }
         println!(
             "full parity incomplete; checked assertion links do not certify execution or complete behavioral parity"
+        );
+        Ok(())
+    } else if command == "check-compiler-lineage" {
+        let result = check_compiler_lineage(&root).map_err(|error| error.to_string())?;
+        println!(
+            "compiler proposals verified separately: {} raw cases; {} candidates; {} unmatched cases; {} unresolved declarations; {} module versions; {} trace events. Registration and compiler lineage do not certify execution or full parity.",
+            result.registered_cases,
+            result.candidate_origins,
+            result.unresolved_runtime_cases,
+            result.unresolved_declarations,
+            result.module_versions,
+            result.macro_events
         );
         Ok(())
     } else if command == "require-parity" {

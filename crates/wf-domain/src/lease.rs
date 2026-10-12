@@ -4,7 +4,8 @@ use wf_types::version::{Fence, TimestampMillis};
 
 use crate::value::{DomainError, InputField};
 
-/// Caller-generated opaque bytes; this crate never generates or interprets them.
+/// Opaque bytes supplied by named claims or derived by the apply-selected phase.
+/// Named Claim/Reclaim inputs remain explicitly supplied; tokens are never parsed.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LeaseToken(Box<[u8]>);
 
@@ -42,7 +43,7 @@ pub struct LeaseGuard {
 pub struct Lease {
     /// Worker that owns this lease.
     pub worker: Vec<u8>,
-    /// Caller-generated opaque token.
+    /// Opaque supplied or apply-derived token, never interpreted as authority alone.
     pub token: LeaseToken,
     /// Durable expiration deadline, used to enable explicit reclaim.
     pub deadline: TimestampMillis,

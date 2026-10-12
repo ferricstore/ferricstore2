@@ -179,3 +179,5 @@ fn retry_returns_to_claimed_logical_state_and_keeps_zero_deadline() -> TestResul
     assert_eq!(scenario.record.attempts(), 1);
     Ok(())
 }
+
+mod claimed_support;

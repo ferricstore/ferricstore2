@@ -9,6 +9,14 @@ Use Rust **1.99.0**, edition **2024**, on Linux or macOS. The CI host matrix is
 `ubuntu-24.04` and `macos-15`; local checks use the current native host. Windows
 and cross compilation are not part of the supported M0 matrix.
 
+Compiler-lineage process controls also require installed **Elixir 1.19.5** and
+**Erlang/OTP release 28** on PATH. CI pins OTP **28.3.1**; the local wrapper checks
+the release major, while source-capture verification binds the actual build
+separately. Install these versions using the
+[official Elixir installation guidance](https://elixir-lang.org/install/)
+before running the wrapper. This tooling runs synthetic controls; it does not
+load or execute the original FerricStore tests during infrastructure checks.
+
 Install the pinned compiler components and audit tool from the repository root:
 
 ```bash
@@ -18,8 +26,15 @@ bash scripts/check.sh
 ```
 
 The audit tool belongs in `.tools`, never a global installation for these checks.
+The advisory database and its lock also live under the ignored repository-local
+`.tools/advisory-dbs`, as configured by `deny.toml`; run individual audits from
+the repository root. Normal RustSec fetching remains enabled. This location
+keeps audit writes within the workspace and changes no audit threshold.
 The wrapper requires exactly `cargo-deny 0.20.2`; missing or different versions
 fail with a setup message. It does not install tools or silently skip audits.
+The wrapper queries installed Elixir/OTP versions with the same removed
+startup/code-path environment variables as the trusted verifier. Missing or
+different versions fail before Rust checks; no original collector runs here.
 Dependency downloads and the live RustSec advisory database need network access;
 an unavailable prerequisite is a failed check. Keep `Cargo.lock` in version
 control with the workspace; checks use `--locked` and cannot resolve a new
@@ -36,6 +51,16 @@ accounting and actual assertion links without certifying execution or full
 workflow parity. Architecture checks enforce 400 physical lines per production
 Rust `src` file and 600 per tooling/integration-test file, as recorded in
 [ADR-003](adr/003-source-size-limits.md).
+
+Group related code by responsibility. A module with private children uses
+`feature.rs` and `feature/child.rs`; a multi-file Cargo integration target uses
+`tests/<target>/main.rs` with child modules beside it. Small cohesive modules
+can stay in one file; Rust does not require one file per type. This follows the
+[Rust Book's module layout](https://doc.rust-lang.org/book/ch07-05-separating-modules-into-different-files.html).
+Size limits include comments and blank lines. Before creating or moving files,
+types or modules, record the concrete architecture review and implementation
+assignment required by [AGENTS.md](../AGENTS.md); review the resulting code and
+ownership after implementation as well.
 
 The supported feature profile is the default profile: there are currently no
 first-party Cargo features. New feature combinations require an explicit reviewed
@@ -82,6 +107,15 @@ workspace/runtime dependency. Checkout is pinned to
 `3d3c42e5aac5ba805825da76410c181273ba90b1`, verified with upstream
 `refs/tags/v7.0.1`. CI grants only `contents: read`, does not persist checkout
 credentials and does not publish source or request secrets.
+
+CI installs compiler-control tooling with
+[erlef/setup-beam v1.24.0](https://github.com/erlef/setup-beam/releases/tag/v1.24.0)
+at verified release commit `fc68ffb90438ef2936bbb3251622353b3dcb2f93`.
+Its [pinned action inputs](https://raw.githubusercontent.com/erlef/setup-beam/fc68ffb90438ef2936bbb3251622353b3dcb2f93/action.yml)
+select strict quoted Elixir1.19.5/OTP28.3.1 with Hex/Rebar installation disabled.
+The [upstream compatibility guide](https://github.com/erlef/setup-beam/blob/fc68ffb90438ef2936bbb3251622353b3dcb2f93/README.md)
+supports the existing Linux/macOS runner matrix. Authoring this prerequisite
+does not establish successful installation or checks on either CI runner.
 
 The original M0 wrapper passed locally on native macOS: 53 infrastructure tests,
 three compile-fail doctests, documentation/architecture/reference checks and all

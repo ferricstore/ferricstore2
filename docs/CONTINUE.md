@@ -1,9 +1,844 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-09. The user resumed the saved increment with explicit
-subagents, reciprocal review, shared-file communication and preservation of the
-reviewed product architecture. This continuation is verified locally; M1 and
-full workflow parity remain incomplete.
+Updated: 2026-10-12. A new active full-completion goal now follows the saved
+increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
+test lineage, with dedicated architecture/performance review and disjoint
+writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
+The latest whole-workspace macOS run passes 495 Rust tests and four compile-fail doc tests,
+strict lint, architecture, documentation, reference/progress and all four
+dependency checks. The default RustSec refresh succeeded on October 12 at the
+same October 9 database revision; earlier DNS failures remain historical evidence.
+Detailed local results are below;
+saved CI belongs to its earlier commit. M1,
+later runtime milestones and full workflow parity remain incomplete.
+
+Claim/reclaim now constructs the replacement record directly, avoiding copies of
+old state, saved run state and lease owners that would immediately be replaced.
+The 24-scenario ownership matrix and six existing unit controls pass against both
+the original constructor and the candidate. The test helper now accepts borrowed
+slices; strict Clippy remains enabled. This is a source-level copy reduction,
+with no measured speedup or allocation claim.
+
+The new lease lifecycle target executes seven pinned source scenarios in four
+tests, covering reclaim boundaries, extension ownership, completed-record
+rejections, stale failure guards and unleased cancellation. The existing default
+claimed fixture moves unchanged into `tests/claimed_support/mod.rs`, loaded only
+by its three existing consumers. Every old test byte and assertion offset is
+preserved before their new module declaration. The new file has 426 lines;
+the largest affected file has 590, and all functions fit 100. The ledger now has
+51 reviewed source declarations, 52 counterparts and 211 assertion links.
+Public return-OK/no-materialization, error references, queries/selection,
+original runtime setup/profiles, durable storage and Linux validation remain
+required acceptance work. ROOT-NEXT-M1-LEASE-LIFECYCLE1-GREEN1 retains the passing
+full wrapper and the preceding lint failures. Written-source architecture and
+performance review is mutually closed without blockers.
+
+The original Complete Replace frame producer/verifier is now implemented after
+genuine tests-only missing-API RED. Six new tests in four approved private files
+preserve frozen bytes, headers, field presence, caps, canonical lists and continuous
+work accounts. The target passes 48/48. The producer checks uniqueness after
+frame measurement and its byte cap, before hashing/output prepayments. Existing
+caller and V2 behavior remain covered. A missing import and ordinary test lint
+issues were corrected; source arithmetic also corrected a scratch-refusal
+expectation to retain the already-paid list root. CHECK1/CHECK2 preserve all
+failed and passing evidence. Actual source architecture/performance reciprocal
+review is closed without blockers.
+
+The consuming decoder is now implemented after genuine tests-only missing-API
+RED. Its six new controls pass within the 54-test target, preserving original
+fields, header owners, business-invalid values and continuous reconstruction
+work. The two private production children and two test children fit the ordinary
+file/function limits. CHECK1 passes all macOS source checks and retains the
+separate final online dependency-refresh failure. Actual decoder source review
+and reciprocal architecture/performance review are closed without blockers.
+The downstream audit records
+captured history limits, source error order and exact governance/indexed responses.
+The Fresh retained-request parent is implemented below; physical publication
+and the full original runtime contract remain required.
+
+The normalized Replace content checker and exact response encoder are now
+implemented after genuine tests-only missing-API RED. Six new controls pass in
+the 51-test complete-policy target. Operational metrics precede one borrowed
+business walk in source field order; indexed correspondence stays operational.
+Immutable history diagnoses keep the original admitted limit, and responses
+use static literals or seven local decimal bytes with one reserved output Vec.
+Supplemental post-implementation assertions independently verify fresh fees for
+every response fixture, including history limits 1, 17 and 1,000,000; the updated
+51-test target and strict target Clippy pass. These reruns overlap the 478 total.
+CHECK1 preserves seven test-style failures and CHECK2 one ordinary formatting
+wrap; CHECK3 passes every macOS source stage and stops only at online RustSec
+DNS. The current offline four-category audit passes against the configured
+October 9 database. Final actual-source reciprocal review is closed without blockers.
+The five production files fit 400 lines and the three test files fit 600;
+all functions fit 100. This supplies no measured native gain or full original
+public/raw/ETF/setup/profile parity. Independent Linux and the closed Fresh
+physical/atomic publication remain required.
+
+The original Replace request parent is implemented after genuine missing-API
+RED. Its eight new tests pass with all 54 existing controls in the 62-test target;
+strict library and target Clippy pass. One expected late-measurement diagnosis
+was corrected from unchanged Writer source; every prior failure is preserved.
+The three production files contain 244/161/131 lines, and all four test children
+fit 600 lines and 100 per function. All old source bodies and the existing test
+prefix are preserved. Actual written-source reciprocal review is closed without
+blockers. ROOT-PARENT1-CHECK1 records the complete macOS workspace wrapper PASS:
+487 Rust tests, four compile-fail docs and all source/dependency stages. The
+62-test target overlaps that total. Physical atomic publication, original
+public/raw/ETF/setup/profiles and independent Linux acceptance remain required;
+the full-completion goal remains active.
+
+The exact pinned policy-generation boundary now has a passing supplemental
+regression with the original `generation-boundary` type and `public-v1` version.
+It preserves maximum-generation decode, above-maximum refusal, migration
+maximum-minus-one allocation and the exact exhaustion error, using an explicit
+normalized FWPV/FWPS replacement for ETF. All 52 complete-policy controls and
+strict target Clippy pass. Reciprocal review is closed; the full macOS wrapper
+passes 488 Rust tests and four compile-fail docs with all source/dependency stages.
+The ledger records 52 reviewed declarations, 53 counterparts and 217 assertion
+links. This tests existing code and supplies no tests-first RED, legacy ETF,
+original runtime/profile or independent Linux acceptance.
+
+The original indexed-policy input normalizer is implemented after genuine
+missing-API RED. Its six new controls pass with all existing tests in the
+58-test policy target, including exact source whitespace, nested-list error
+order, all thirteen rejection bodies and continuous bounded work accounts.
+Both raw trees are checked before final owners are allocated; only accepted
+unique keys are copied. A review caught and corrected one binary/atom fixture
+mismatch. Three bare metadata observations were added after implementation
+and are recorded as supplemental coverage. Strict target lint and the full
+macOS wrapper pass: 495 Rust tests, four compile-fail docs and every source and
+dependency stage. The ledger has 57 reviewed source declarations, 59
+counterparts and 227 assertion links. Written-source architecture review
+and performance review and their reciprocal review are closed without blockers.
+The saved private-branch CI remains readable, but current SSH/HTTPS Git access
+fails host resolution and generic GitHub API access fails to connect. A fresh
+both-OS run has not started; the reviewed local checkpoint and implementation
+work can proceed while current Linux acceptance stays pending.
+Public replies, whole raw options, ETF/generation-zero readers, physical
+installation/index/migration operations, original setup/profiles and current
+independent Linux execution remain required. The full goal stays active.
+
+The exact pinned lease-takeover regression now passes in the existing lease
+test target (10/10): lease 50 at 1000, reclaim 500 at 1050, stale-owner completion
+and extension at 1060, and all three history kind/worker observations. This is
+coverage of existing behavior, with no production change. Its original 588-line
+file and 100-line test met the size limits. That increment recorded 44 reviewed source
+declarations, 45 counterparts and 170 assertion links; public history-query
+success, claim/reclaim selection, original setup/profiles and Linux execution
+remain open. ROOT-NEXT-M1-LEASE-TAKEOVER-GREEN1 records the passing full script.
+Written-source architecture/performance reciprocal review is closed without blockers.
+
+The pure complete policy presentation now preserves type/state defaults, whole
+raw governance presence, customer versions, indexed borrows and captured public
+retention without a context history clamp. It verifies present V2 content once
+and charges reserve/each state before producing borrowed descriptors. Seven new
+controls follow actual missing-API RED; that increment's whole script passed 45 policy
+tests and 454 total Rust tests after restoring the original All opaque-version
+assertion and replacing nine forbidden fixture panics with same-message test
+errors. Production and grouped integration files contain 296 and 532/185 lines,
+within the 400/600 file and 100 function limits. That ledger had 43 reviewed
+declarations, 44 counterparts and 158 assertion
+links. The fifteen new scalar links preserve the pinned response case;
+public set/get replies and hot-map refutes remain explicitly unlinked required
+acceptance. Actual final receipts are in ROOT-NEXT-M1-PRESENTATION-GREEN1 in the
+coordination note. Full public/setup/durable/profile parity and Linux execution
+remain open; full written-source architecture/performance reciprocal review is
+closed without blockers.
+
+Earlier, the reviewed FIFO activation-drain counterpart was written and
+passes with all19 tests in its claim target. Focused strict lint, formatting,
+architecture27 and progress validation pass. The ledger has42 reviewed source
+declarations,43 counterparts and143 assertion links; original setup/public/
+durable profiles and Linux execution remain open. The charged replay gate's
+shared implementation now passes all36 tests in its target after genuine
+missing-API and old32PASS/new4FAIL stages. The full check script also passes on
+this tree after a single semicolon correction required by strict Clippy.
+Independent written-source architecture/performance review and mutual review
+are closed without blockers. The next Fresh-only parent direction has separate
+architecture/performance acceptance and completed mutual review. Complete code
+now has exact architecture/performance contract selection and closed full
+reciprocal proposal review. Its six controls and grouped private implementation
+are now written after real missing-API RED and compiled old36PASS/new6FAIL S0.
+The focused target passes42/42. That increment's full script passed447 Rust tests,
+four compile-fail doctests, strict lint, architecture28, reference/progress and
+all four dependency checks. Actual written-source architecture/performance and
+full reciprocal review are closed without blockers, including reconciled design
+notes and all narrowly recorded test/lint corrections.
+Pure supplied views leave physical readers, atomic publication, public/original
+profiles, full Elixir parity and Linux execution open.
+
+The user explicitly reconfirmed Linux AND macOS support. Production changes
+and acceptance must cover both. The authored CI matrix is ubuntu-24.04 and
+macos-15; saved CI belongs to its older commit, and current Linux execution
+remains open. Local Darwin/arm64 runtime, layout and timing evidence is scoped
+to that host and cannot replace Linux tests or performance validation.
+
+The user also requested a dedicated Elixir bug-fix owner. GPT-6.1-sol/max
+`elixir_bugfix` completed the selected pure guard correction in the separately reviewed,
+initially clean `/Users/yoavgea/repos/ferricstore2-elixir-bugfix` worktree at
+the pinned66586c5 commit, on `codex/workflow-elixir-bugfixes`. Its findings and
+future reproduction/fix review live in [the owned bug-fix note](reviews/workflow-completion-elixir-bugs.md).
+The dirty original and frozen Rust reference baseline remain unchanged; no bug
+is claimed reproduced or fixed by checkout preparation.
+
+The Elixir owner constructed the reviewed EB2 fifteen-comparison probe and
+four regression declarations in its isolated checkout. Independent inverse
+checks recover every prior test byte. The first supervisor candidate refused
+before a VM because Homebrew's reported Python alias differed from its pinned
+literal identity; that historical refusal remains retained. A separately
+reviewed origin correction, fresh preparation, syntax/archive and single
+candidate order subsequently produced a real pure-projection RED: thirteen
+of fifteen comparisons fail, while the two owned-running controls pass.
+Root read the complete stdout/stderr and validated both complete records,
+all1856 unchanged inputs and the gone process group. This does not execute
+Mix, native storage, project setup or the four ExUnit declarations. Root has
+separately assigned the reviewed LMDB-only nonempty-binary owner guard. The
+owner wrote it; root's whole-source inverse recovers every original byte.
+The reviewed GREEN validation source is now written in its existing carrier;
+root read all540 actual lines and independently reversed all eight hunks to
+every old source and carrier byte. Six current pins match; GREEN was absent
+at preparation.
+Its four-stage execution consultation and reciprocal source review are now
+complete. Root separately recorded/read and executed the four distinct stages.
+The sole GREEN candidate passes15/15 pure comparisons with outer/child exit0,
+all1856 input rows unchanged and its process group gone. Root read all stdout
+and788 stderr lines, both complete canonical records and freshly rehashed all
+inputs. The thirteen original failures are corrected; all preservation controls
+pass. This accepts only the pure guard on Darwin/arm64: the four ExUnit tests,
+native/public execution, legacy rows and both-platform full profiles remain open.
+
+The separately consulted EB-GOV-R1 mixed-reclaim regression is now authored
+in that isolated checkout's existing governance correctness target at line409.
+ARCH and PERF accepted the exact 69-line construction after complete actual
+reciprocal review; ROOT separately issued the source-owner order before writing.
+The owner and ROOT independently verified the entire 55516-byte resulting file
+and the exact inverse restoring every prior 52959 byte. The test is constructed,
+not executed. ARCH and PERF subsequently reviewed the entire actual authored
+source, independently restored every old byte, read each other's complete
+findings and closed reciprocal source acceptance without discrepancies.
+Reservation-ID reuse across reclaim/normal/fill remains a source prediction. No production
+repair or native startup follows from construction. Genuine unchanged-source
+RED and later separately selected GREEN, with accepted real public/native
+profiles, remain required independently on Linux and macOS.
+The independent Elixir readiness review is saved in the owned bug-fix note at
+line2281. ROOT read it completely and verified unchanged causal sources and the
+test insertion inverse. Native isolated project startup remains required; the
+completion/replay tail has a composed-assertion limit, while uniqueness455 is
+independently sensitive. No native run or source amendment followed this review.
+The captured-lifecycle/timeout-closure Rust batch has explicit architecture
+creation decisions and separately actual-read coordinator assignments. Its
+twelve controls produced real missing-interface compile RED before the new
+APIs. The grouped modules, approved test extractions and A-ACT12 guards are now
+implemented; root, architecture and performance completed the stable source
+and reciprocal reviews. Performance independently passed200 Rust tests and
+one doc test on its853 unchanged pre-rename inputs. A subsequent two-file
+local-binding rename repairs the purity checker's collision with local `core`;
+exact whole-file inverses preserve every expression and real `.core()` call.
+Current formatting, workspace policy and strict domain Clippy pass.
+The unchanged restored-FIFO control then produced an actual 0/1 behavior RED
+before the optional-due guard correction; the first twelve-control run passed
+12/12 with all22 scoped inputs unchanged during each run. Root read both complete
+frames. Those local results belong to the recorded draft: FIFO authority/order
+and full work/copy accounting still need correction and stable peer acceptance.
+Shared-file communication and reciprocal review continue through the owned notes.
+The independent unresolved-running-parent control subsequently produced a real
+0/1 ordinal RED, then the same oracle passed1/1 after the logical-state comparison
+fix; root independently verified all821 bindings, with only parent.rs changing
+across that pair. A later body passed178 domain Rust tests and one compile-fail
+doc with821 unchanged inputs during the run. Parent-cycle and oversized consumed
+history-key controls subsequently produced an actual10/12 behavior RED before
+the two guards. First GREEN passed12/12; the final expanded batch passes200
+domain/types Rust tests and one compile-fail doctest, with821 unchanged input
+bindings during each run. Owner strict Clippy, documentation and formatting
+pass. Exact visit/link/step/history-delete, deep cancellation, FIFO refetch and
+sequence/ordinal controls are implemented. The stable accounting/body handoff
+has independent acceptance. Four approved test files also
+changed between that RED and first GREEN; root and performance independently
+verified exact inverses preserving the approved alias/unit/lint assertions.
+The exact five-path generic indexed None-due FIFO batch has architecture
+selection, performance consultation and root's separate owner assignment.
+All five controls preceded API changes: actual compilation reports only two
+missing Option-method errors; after the Option-only seam, the twelve-title
+target passes11 and fails1 because Cancel omits its real FIFO before row.
+Later controls are not reached by that failure. Root read both full frames
+and both854-row unchanged maps. First GREEN passes12/12 and the affected
+four-target regression run passes20/20. Three oversized control functions led
+to two reviewed private helper extractions with an exact515-line donor inverse;
+a separately reviewed scalar assertion refinement preserves every expectation.
+Actual formatted functions now fit100 lines and the child fits515/600 lines.
+The final owner run passes200 Rust tests plus one doc test, with strict Clippy,
+documentation, formatting and workspace policy checks all passing on the same
+854 unchanged inputs. Architecture and performance completed actual reciprocal
+body/inverse/resource reviews. Performance separately passed200 Rust tests and
+one compile-fail doctest on the same current bindings; root read all444 non-map
+raw lines, both complete maps and freshly rehashed every bound input. These are
+local Darwin/arm64 results. FullM1, Linux execution and complete acceptance on
+each platform remain open. The implementation owner has published the concrete
+scheduler/running-credit planning predecessor proposal. Complete architecture
+creation selection, performance source review and actual reciprocal reads now
+precede a separately recorded ROOT tests-first creation/check order for the
+exact grouped ten-path batch. All twelve controls preceded production APIs;
+the retained tests-only RED contains four missing-import errors. A provisional
+12/12 GREEN and a real singleton-coalesced block11/1 behavior RED are published.
+The reviewed resolver split meets file limits. ROOT read the final212 domain/
+types tests plus one compile-fail doctest, strict checks and both complete864-row
+unchanged maps, and freshly rehashed every bound input. The final stable handoff
+and complete inverse/environment receipts are published. Independent source/
+resource reviews are complete. Architecture separately passes12 coordination
+controls and one workspace check; performance passes212 domain/types Rust
+tests plus one compile-fail doctest on the same unchanged864 inputs. These
+overlap the owner checks and add no original-case coverage or measured gains.
+The first architecture receipt-wrapper failure is retained; its reviewed
+readback correction permits only the separately successful second command.
+Unavailable historical initial-child header bytes remain explicitly unresolved,
+separate from acceptance of the fully reviewed current body. ROOT's current
+whole-workspace check passed360 Rust tests and four compile-fail doctests,
+then stopped at the normal RustSec audit because github.com cannot resolve.
+These local Darwin results grant no Linux acceptance.
+Full authoritative governance
+decoding, identified credit owner protocol and the atomic public claim parent
+remain required downstream.
+
+
+The current whole local ordinary wrapper, after Complete Replace and its
+equivalent test assertion correction, passed **392 all-target Rust tests and
+four compile-fail doctests**, zero failed/ignored/filtered, plus formatting,
+locked compilation, strict workspace Clippy, warnings-denied documentation,
+architecture, reference integrity and progress. The additional 26 architecture
+executions overlap and are not added to 392. The real wrapper exit remains 1:
+normal RustSec fetching cannot resolve github.com. No audit skip was added.
+ROOT read all 987 raw output lines and independently reacquired the five
+affected whole source/test bindings unchanged across the run. This ordinary
+check provides no whole-workspace unchanged-input map or bounded resource
+certificate. Native evidence is Darwin/arm64, Rust 1.99.0/default features;
+Elixir 1.19.5/OTP 28 is the tooling profile. Current Linux execution, full original
+Elixir 1.20/NIF/public/profile acceptance and complete dependency audits remain
+open. The preceding 386+4 run belongs to the pre-Replace source tree.
+
+The latest whole local ordinary wrapper, after the reviewed normalized V2
+codec and class-limit correction and before the Complete Replace increment, passed **386 all-target Rust tests and four
+compile-fail doctests**, zero failed/ignored/filtered, plus formatting, locked
+compilation, strict workspace Clippy, warnings-denied documentation,
+architecture, reference integrity and progress. The extra26 architecture
+executions overlap and are not added to386. The real
+wrapper exit remains 1: normal RustSec fetching failed because github.com could
+not resolve. No audit skip was added. ROOT retained the entire native output,
+command, clock observations and real exit in the coordination record; this
+ordinary check has no877-input unchanged-map or bounded resource certificate.
+Its Elixir 1.19.5/OTP 28 tooling profile does not execute the required original
+Elixir1.20/native cases. Fresh GitHub connector discovery returned repository
+not found for the private Rust branch; no current Linux CI job was executed.
+Linux and full product/original/public/profile acceptance remain open.
+
+The preceding saved whole local run, after the coordination batch, passed **360 all-target Rust tests and
+four compile-fail doctests**, plus formatting, locked compilation, strict
+Clippy, warnings-denied documentation, architecture, reference and progress.
+All864 scoped input hashes, including frozen references and policy/ADR inputs,
+stayed unchanged. Its retained complete977-line non-map frame exits1. It stopped
+at normal RustSec fetching because this environment cannot resolve github.com.
+The reviewed cache repair uses ignored `.tools/advisory-dbs` and preserves the
+audit policy. No audit skip was added; the full wrapper remains incomplete.
+The preceding whole-wrapper purity failure remains retained; the reviewed
+two-file local rename resolved it. The earlier348+4/853-input run and
+336/820,322/808,296+4 and242+4 passes
+and saved CI below belong to their recorded trees. This current local run is
+Darwin/arm64 evidence; Linux current execution and both complete audits remain open.
+
+Architecture/performance selected A-OPT1's two existing refund regions. ROOT
+separately assigned the existing R3/R1000 value/order/borrowed-pointer controls
+on unchanged production, then one fallible upfront reservation and focused
+before/after plus strict checks. The two existing regions are implemented;
+the strengthened unchanged-production baseline and final focused26 tests pass,
+with strict Clippy, documentation, formatting and workspace policy. ROOT read
+the complete current/original bodies, raw receipts, four864-row maps, full
+inverses and fresh current inputs. Architecture's complete reciprocal source/
+receipt review accepts both existing regions; ROOT actually read its closure.
+The preceding360+4 whole-tree result does not certify the changed refund tree.
+One source reservation invocation instead of R is not a measured allocation,
+capacity or latency gain. Both platform results remain independently required.
+
+The stable claim/domain regression set passes83 controls, and the current private
+codec set passes33, including five decoded coherent-claim controls; the existing
+application set now passes20 (old14 plus six caller-identity controls); domain/types
+pass188 plus one compile-fail doctest, including eight new caller-normalization
+controls. That V1 caller/intent batch passed strict Clippy, documentation and formatting.
+Their independent source/resource acceptance is complete: architecture and
+performance each passed8 caller+20 application+1 workspace checks, with828 and826
+unchanged input bindings respectively and actual reciprocal publication reads.
+Original caller arrays may coexist with the normalized spines because their
+array/leaf lifetime is shared; no native allocation or speed claim follows.
+Architecture and performance each independently reran
+all33 codec controls and the exact workspace policy target, with280 and276
+unchanged input bindings respectively. Earlier independent56 parity-tooling,
+12 installation and22 codec runs retain their original narrower scopes. The grouped installation target
+preserves all ten original bodies; mode-null and replacement-null source
+corrections are reviewed. Static compiler controls preserve original capture/
+accounting and do not execute original scenarios. Existing-final publication
+refusal previously passed12 artifact controls in owner and independent runs.
+The current static wrapper's shared-budget JSON intake and private final
+publication observer pass syntax checks. The current artifact target passes21
+synthetic controls in owner and independent domain runs, including exact diagnostic
+byte limits and cleanup-result source corrections, with unchanged14 scoped inputs
+and independent architecture/performance source review. These controls do not
+execute the collector or original setup/tests. Successful original run/observer coverage
+remains open. The isolated
+reference-valid missing-capture correction passes56 parity controls in owner and
+independent runs, with a separate performance source review. Architecture's
+earlier directory/visibility audit found229 unique Rust files within400/600-line limits;
+the current new caller feature modules and grouped integration targets also pass
+the enforced limits.
+The separately supervised direct cached-runtime preflight now passes after
+source-reviewed API and package-metadata corrections:39 specifications,40 code
+paths, six fresh reviewed modules and the exact test/host configuration are
+bound to one accepted observation. Its generated data path stayed absent,
+no ExUnit modules or product applications started, and all1912 input/provenance
+rows stayed unchanged. Its process group is gone. Earlier failed attempts are
+retained, including the normal Mix.PubSub loopback-socket denial. This is a
+cached-load/config preflight under Elixir 1.19.5/OTP 28, below the required1.20
+source profile; it executes no original tests/helpers/setup/collector or
+publication and does not advance workflow coverage.
+Fresh read-only discovery also found concrete installed Elixir1.20.4/OTP29.0.5
+roots and bound selected arm64 native/module bytes. The exact A-SUP2 core-only attempt passed Python syntax,
+then failed because its initially-unloaded-crypto assertion found the installed
+crypto module already loaded. Its process group is gone; all1848 bound inputs
+stayed unchanged, and no validation frame or core acceptance was produced.
+The retained failure remains distinct. After the reviewed one-line amendment,
+exact fixed-launcher syntax/archive and a separately assigned single A-SUP5
+attempt, the installed Elixir1.20.4/OTP29 core observation now passes: one valid
+frame, exact four module disk/loaded proofs, crypto/JSON controls, unchanged1848
+inputs and owned process group gone. The complete retained raw result was
+actually read by root. This certifies installed core only; no project/source/
+config/NIF/helper/setup/original scenario or source profile is accepted by it.
+Public claim
+caller normalization and typed intent comparison are implemented and pass the
+owner checks and independent acceptance above. Private claim-phase
+apply and public comparison do not establish public parent orchestration.
+The parity owner has published the complete R-MIX1 supported-project readiness
+proposal; architecture/performance completed reciprocal SOURCE review and
+ROOT separately assigned only the complete inert existing-note source draft.
+After the concrete three-part fit consultation, A-MIX1c/P-MIX5 and a separate
+actual-read ROOT order select complete Inputs/Execution/Entry inert note drafts
+sharing one namespace and budget, replacing the uncreated two-part shape.
+Each must fit32768 bytes/600 physical lines, aggregate98304/1800; complete
+publication is now bound: Inputs22491/375, Execution32757/579 and Entry31973/552,
+sum87221/1506. ROOT actually read all three complete bodies and verified exact
+carrier/prefix/object/V2 custody as DATA. Architecture/performance completed
+the actual-body review and actually read each other's complete findings.
+The three selected amendments cover prepaid source ownership once, the
+complete protected0700 directory chain, and separate frame graph, encoding-owner
+and actual wire limits. ROOT read PARITY's complete response and the architecture/
+performance selection of its exact changes and two existing responsibility moves.
+The complete amended inert bodies are published: Inputs29321/489,
+Execution27864/498 and Entry31937/552, sum89122/1539. ROOT and both peers actually
+read all three complete R1 bodies. Their reciprocal review found five error
+sentinels initialized after descriptor acquisition. A-R-MIX1-R1-SENT1 explicitly
+approved moving those existing initializations before acquisition in place.
+ROOT applied only those five adjacent line reversals, four current SHA fields
+and one3086-byte amendment; every359345-byte predecessor byte and all source
+lengths/LFs remain unchanged. Whole-note forward/inverse and protected full
+readback pass, and ROOT actually read every corrected body. The carrier462653
+bytes and all source caps fit. Architecture and performance independently read
+the complete corrected sources and accepted the full reciprocal SOURCE review.
+Loader, seed and runtime remain unassigned. This inert
+Darwin/arm64 readiness draft supplies no Linux acceptance. Separate Linux
+origins and independent execution on both platforms remain required.
+The G1a normalized complete-policy contract has final reciprocal source approval
+and a separate tests-first assignment: all twelve test bodies exist before the
+production APIs. Architecture/performance approved nine private test-helper
+extractions, preserving the complete original donor before the separate22-slot
+and full-value strengthening. ROOT independently read all final source bodies
+and verified both complete donor inverses, final files within600 lines and
+all25 functions within100. Complete reciprocal source/inverse reviews now
+accept the final test bodies and both preservation stages as SOURCE. Read-only
+implementation preparation subsequently found five same-value assertions whose
+assert_eq! macro requires Debug on existing LimitEnforcement. Their narrow
+equality-assertion correction is implemented and formatted in the two existing
+test children. ROOT and both reciprocal reviewers accept the complete actual
+source and whole-file inverses. Existing production traits remain unchanged.
+The old check wrapper's complete bounded source was
+not retained, so its receipts cannot authorize reuse. ROOT has now published
+the complete inert replacement24958/478. Complete reciprocal actual-body review
+found two allocations outside descriptor protection. The separately selected
+correction is now published as24964/478 in a unique V1-R1 fence; its full inverse
+recovers every original byte. Complete corrected-body reciprocal review accepts
+the source. After the corrected tests and actual-source reviews completed,
+ROOT invoked the exact retained body through the separately approved isolated
+heredoc. The focused Cargo command returned the expected four E0432 imports of
+the missing complete-policy module. Complete raw diagnostics, source owners,
+868 frozen before/after rows and append/close/readback establish genuine
+pre-interface RED on Darwin. This is no executed assertion or passing test.
+The finite validation account remains monotone: actual failed reads and every
+later assigned component remain paid without reset. The reviewed nine-file
+complete-policy implementation and sole module seam are implemented; production
+files fit400 lines and functions100. Original donor inverses, four reviewed
+private helper extractions, metadata scratch and retry descriptor corrections
+preserve the design. Owner, ROOT, architecture and performance completed their
+actual source and reciprocal reviews. No extra production path was created.
+The bounded R1 receipt remains FAILED on missing test-crate documentation.
+Separate DOC1/CLIP1 corrections and fifteen test-only lint corrections retain
+their complete source proofs and historical failed ordinary attempts. Three
+E0282 diagnostics then led to eight explicitly typed borrowed-empty expectations;
+EMPTYTYPE1 completed owner/ROOT whole-source inverses and reciprocal approval.
+The fourth ordinary Darwin attempt passed12 complete-policy controls and224
+unique domain/types Rust tests plus one compile-fail doctest, strict Clippy and
+warnings-denied documentation, on resolution17736/e71de238. Its formatting
+failure and architecture NOT_ATTEMPTED remain retained. The reviewed FMT1
+correction changes only one assertion's whitespace; ROOT proved the complete
+inverse and token identity. Fresh formatting and workspace architecture checks
+then passed on resolution17758/509/4d7db848. Current test children fit539/509/537
+lines and functions91/94/87. This accepts a source-preserving staged local
+validation; the six families did not all execute in one attempt or on one hash.
+No R1 retry, new grant/reset, bounded resource certificate, measured gain,
+Linux execution or full Elixir/native/public/profile parity is claimed.
+A-V2VAL1 now approves the standalone normalized VALUE codec in the pure
+complete-policy domain implementation: three move/borrow APIs, nine named
+private source files and three private test children with twelve independent
+controls. The exact API/grammar/ownership contract preserves current G1 and V1;
+compound request framing, intent, hash and install authority remain separate.
+The reviewed narrow responsibility amendment is saved in ADR006 and architecture.
+DOMAIN authored all twelve independent literal/malformed/accounting controls.
+ROOT recorded actual API compile-RED (three missing-import errors), then the
+approved guard-only scaffold produced genuine behavior RED: twelve existing
+policy tests pass and twelve new codec tests fail, with no ignored cases.
+The nine approved codec bodies are now authored and independently reviewed.
+Architecture, performance and ROOT found three reversed circuit error-class
+limits. ROOT's independently specified count257/1000 and byte256/257 regressions
+produced genuine behavior RED:24 tests pass and the two regressions fail.
+DOMAIN corrected only the three reviewed argument pairs to count1000/name256;
+the unchanged focused target then passed26/26, including the2006/P0 pre-payload
+refusal. ROOT and architecture verified complete source inverses. Performance's
+maximum-size late-refusal and ordered-key supplements preserve earlier oracles;
+these post-authoring regressions do not retroactively add preimplementation TDD.
+A one-expression test byte-literal spelling correction then passed strict
+Clippy without changing either tested byte. The whole current local wrapper
+passes386 Rust tests and four doctests with strict checks, but still exits1 at
+normal RustSec fetching because github.com cannot resolve. Linux execution,
+full original Elixir profiles and compound/public authority remain open.
+
+
+A-M1-CREPLACE1 adds normalized complete replacement preparation and a borrowed
+installation decision. Architecture/performance selected the exact APIs and
+two private helpers before authoring; the six independent controls preceded
+production behavior. The grouped test extraction preserves the entire donor
+and all assertions within600/100 lines. The initial missing-import compile RED
+is separate from the scaffold's real26-pass/six-fail behavior RED.
+The unchanged focused target now passes32/32 on Darwin/arm64, including all six
+replacement controls. Stored/CAS/current/new/late-high-water priority, omission
+reset and present-empty values, generation correspondence and the same
+nonrollback schema account are exercised. ROOT read the entire190-line final
+source, proved the complete scaffold inverse and exact1139-byte unchanged
+wrapper/getter region; every function fits49 lines or fewer. The owner's focused run used the unchanged facade and three test inputs.
+ROOT's first broader check then found one manual_assert_eq diagnostic; an
+equivalent assertion macro correction preserves both operands and all expected
+values. The corrected child fits 258 lines; its whole inverse recovers every
+prior byte. The replacement-wrapper run passed 392 Rust tests and four doctests
+with strict checks, then stopped at normal RustSec DNS fetching. A-M1-FINAL1 and
+P-M1-FINAL1 independently accepted all five current source bodies, complete
+inverses, resource fees and physical limits, and read each other's full results.
+They reviewed the focused raw receipts; the broader current wrapper result is
+attributed to ROOT's complete capture. This pure replacement plan supplies no
+atomic storage/public authority or measured native gain.
+A-M1-OUTER2-I1 and complete PERF reciprocity approve the exact caller/intent
+Stage I batch. Eight tests occupy four grouped integration files; all eighteen
+functions fit 100 physical lines and all files fit 600 (largest 435).
+ROOT and both reviewers read every final source, checked five fixed golden
+fixtures and complete helper/donor/call/format inverses, and preserved the six
+baseline controls plus 21 scalar cases and 40 local presence outcomes.
+Selected FIT2 extractions closed FMT1's four function-size failures; FMT2
+changed no bytes. Native ownership, Drop and allocation gains are unmeasured.
+
+The fresh eight-test missing-API compile RED ran on Darwin at 01:55:37–38 UTC,
+with six E0432 errors (exit 101) and zero executed test bodies. The separately
+selected A-M1-OUTER2-I1-S0 scaffold is now written: three new source files and
+two facade seams, with both preparation functions rejecting InvalidAuthority.
+ROOT independently read all five production sources and verified whole facade
+inverses and unchanged test sources. Fifty production functions fit 100 lines
+(largest 38), and all five files fit 400 (largest 308).
+At 02:06:39–49 UTC the scaffold compiled and all eight focused tests executed
+and failed (exit 101). This is behavioral RED; later successful scalar/presence
+outcomes were not reached. A/P scaffold review and complete reciprocal closure
+are now finished. The separately selected I-M1-OUTER2-I1 owner order assigns
+five domain paths to DOMAIN and three ports paths to ROOT. All eight sources
+are implemented and frozen. The eight focused tests passed on Darwin; the private
+infallible SHA finalizer was explicitly selected in FIN2 after a real Clippy
+failure. Four later test style corrections preserve all scenarios and values.
+Before the core Patch increment, format, strict Clippy, all 27 architecture tests,
+401 workspace Rust tests, four doctests and strict docs passed on the accepted
+Stage I body. Those results predate the current Patch work. Architecture tests
+overlap the workspace count. ARCH and PERF accepted the complete 14-file final review and the
+accounting dependency; their full direct reciprocal review closed normally.
+PRIVATE1 explicitly accepts the actual private visitor refinements after body
+review. The current native receipts are Darwin only.
+On that accepted Stage I body, all 112 production functions fit 100 lines
+(largest 43); files fit 400 (largest 308), and tests fit 600 (largest 435).
+Linux native acceptance, full public
+workflow parity and measured performance remain open.
+
+ROOT's additive notes and dependency test have complete reciprocal source
+acceptance and two focused Darwin passes. Stage F FWCP/frame/restore/models remain
+held. Raw Patch/ETF/full-source identity, coherent parent installation, all original
+profiles, current Linux and macOS execution and later ordered milestones remain open.
+
+The pinned generation-test review retains all 14 source cases as broader
+acceptance work. The normalized core Patch increment has a fully reciprocal
+architecture/performance contract and six tests in grouped private children.
+ROOT read all six actual authored sources; the largest test file is 585 lines
+and the largest test function is 99. The actual Darwin missing-API compile
+RED had four E0432 errors (exit 101). After the exact rejecting scaffold and
+facade seams, the focused target compiled: 32 existing tests passed and all
+six new tests failed (exit 101). These tests-first failures preceded BODY1.
+
+DOMAIN implemented and froze patch.rs, its private patch/merge.rs child and
+the candidate-only decoder factor after the named CPATCH1/FIT1 decisions.
+ROOT's separately recorded RET1 ownership transfer applied only four borrowed
+retention-selector ampersands. Two later existing-test style corrections
+rename a local variable and make a Vec clone explicit; all scenarios,
+assertions, expected values and prior whole-body inverses remain intact.
+The earlier strict Clippy production and test failures remain recorded as
+failed; no lint was suppressed. The public decoder's charged encoded-copy
+suffix is unchanged, proved against every byte of the original decoder.
+
+On 2026-10-11 the corrected current body passed Darwin formatting, strict
+workspace/all-target Clippy, all 27 architecture tests, all 407 workspace
+tests across 67 target summaries, four doctests and strict documentation.
+The workspace count includes the 38 focused policy tests (32 original plus
+six new) and architecture tests; overlapping runs are not added. No test was
+failed, ignored, measured or filtered. Reference integrity passed for 480
+pinned files and 5858 textual declarations. The validated progress ledger
+remains INCOMPLETE: 5903 registered runtime cases, 4222 linked, 1681 unmatched
+and 1655 unresolved declarations. These checks do not certify execution of
+the original cases or full behavior. The full check.sh wrapper, exact Elixir
+tooling profile and RustSec/network acceptance remain open.
+
+ARCH and PERF completed full independent corrected-source review and actual
+reciprocal review of their complete findings, then returned normally. Both
+accepted the typed CPATCH1 production and six-test batch; no source blocker
+remains within that scope. ARCH and PERF completed full actual reciprocal
+review of DOMAIN's next original partial-Patch caller/intent contract and returned
+normally. A-NEXT1-CONSULT selects its exact three paths, immutable owners,
+helpers, registry, same-account schedule and eight independent byte/hash oracles,
+plus exact additive ADR005/006/architecture text and an existing checker block.
+One documentation phrase was corrected because the typed core has no Boolean
+payload. ROOT retained every selected addition and verified exact existing-byte
+inverses. The following tests-first batch preceded the now-written reviewed production
+artifacts and exact selected documentation/checker additions.
+DOMAIN's complete original six-test draft has 763 physical lines and functions
+of 90/66/146/119/169/120 lines; its unchanged original source remains retained.
+ROOT, ARCH and PERF read all six bodies. A-NEXT1-TEST-LAYOUT selects exactly two
+new test files, ten private helpers and the existing main's 16-byte module seam.
+Both reviewers completed actual full reciprocal review without discrepancy.
+All 53 independent literal/hash records, full immutable caller observations,
+eight same-account rows and original duties are preserved. The authored paid
+models explicitly vary the captured history limit and compare distinct partials
+with independently checked equal complete VALUE results; stamp observations
+are explicit. Original 101-line function and 608-line file/106-line helper
+formatter failures remain recorded. Meaningful checked-byte and readonly locals
+resolve them: actual ordinary parent/child formatting gives 583/594 physical
+lines, maximum function 99, with no limit waiver or additional helper.
+I-NEXT1-TESTS1 released the exact tests-only owner order. DOMAIN wrote the two
+files and main seam; ROOT's full authored readback matches every reviewed raw
+byte and its owned ordinary formatter output. The genuine locked/offline target
+compile on Darwin failed with four E0432 missing-API errors (exit 101), before
+any production implementation. Zero test bodies/assertions executed. Post-run
+source bindings and git diff --check passed. Complete A/P-NEXT1-S0-CANDIDATE1
+reciprocity then selected the exact five-file rejecting scaffold; ROOT's
+I-NEXT1-S0-1 owner order preceded its writing. Whole authored-source inverses,
+actual owned formatting and all six frozen test files were independently checked.
+The next unfiltered locked/offline Darwin run compiled and executed all 14 tests:
+**eight existing controls PASS, six new controls FAIL** with InvalidAuthority,
+exit 101 and zero ignored/measured/filtered. All eleven source/test bindings
+remained unchanged across that run; git diff --check passed. These six failures
+stop at initial positive preparation; no full 53-oracle/model/account reach or
+GREEN is inferred. I-NEXT1-BODY1 then wrote only the already consulted two production children,
+private measured view, nine domain/seven ports helpers, header factor,
+visibility-only hasher sharing and real entry bodies. ROOT independently read
+all seven full bodies, checked ordinary formatting and ran genuine Darwin GREEN:
+all 14 controls PASS. The selected three additive documents and existing checker
+block are written with whole prior-byte inverses. Strict Clippy found 13 style
+sites only in the two new test modules; exact fixes preserve all original
+literals, assertion operands, controls and complete pre-fix body inverses.
+Their ordinary formatted sizes remain 583/594 lines, with no lint allowance.
+Clippy, workspace formatting, check, strict docs and four compile-fail doctests
+pass. The BODY1 corrected-source workspace run passes 413 named tests across
+67 targets, including 27 architecture controls; the separate architecture run
+also passes 27, which overlap rather than add to the workspace count.
+All 19 scoped source/test/doc/checker bindings remain unchanged after execution.
+ARCH and PERF completed independent body/test/document reviews and actual
+reciprocal review, including the exact 13 test style edits; no blocker remains
+within that scope. Full original raw/public/profile parity and current Linux
+execution remain open.
+The existing CI matrix covers Ubuntu24.04 and macOS15; its configuration does
+not demonstrate a current Linux run. Linux executor access remains unresolved.
+Progress reconciliation remains explicitly incomplete: 5903 runtime cases,
+4222 linked, 1681 unmatched and 1655 unresolved declarations. These typed core
+controls do not certify full Elixir behavior or complete M1/product parity.
+Separately selected Stage F binding and the ONE retained gate/Fresh-only remerge
+remain mandatory successors.
+Raw empty-list resets, aliases, ETF, generation zero/bignums, full source
+identity, public replies, routing, concurrent atomic installation and every
+required profile remain separate. No complete original source case or Linux
+acceptance is closed by these typed-core tests.
+
+This ordinary implementation scope neither retries or repairs the permanently
+failed bounded R1 nor resets or extends its finite G1 validation account. Each
+admitted complete-policy operation requires the caller's same mutable schema
+charge, whose P continues to describe canonical scratch. Full simultaneous Data/value/frame/
+scratch/parent accounting needs a separately approved resource boundary; ports'
+FWCP/header/copy/hash work is not paid or certified by standalone VALUE acceptance.
+Unknown ETF/hash, legacy generation, customer version and original source parity
+remain gates. No public debit/count/attestation, free copy, hidden owner field,
+second account or backward dependency is authorized.
+Linux and macOS are both supported targets and independently require execution.
+Portable core behavior, dependencies and optimizations must preserve both;
+platform-specific work belongs at the existing adapter boundary. Linux execution
+and full macOS product/native/original/public/profile acceptance remain open.
+Original project callback origins, configuration, live PubSub, ordinary locks,
+shared bounded ownership and failure/cleanup bodies require complete actual
+draft review before any separately assigned stage or execution.
+No project callback/build/collector ran in this proposal phase. Fresh native
+builds, original setup/tests and Linux AND macOS acceptance remain required.
+CI tooling setup is authored; current Linux/macOS execution, successful original
+publication, bounded original collection/setup, supported source runtime/profile
+execution, complete M1 and later milestones remain open. Exact scopes, real RED/GREEN,
+precreation decisions and source/profile gaps are in the active coordination
+record. These results do not replace the saved commit/CI provenance below.
+
+The separately reviewed A/P-PARITY-DUE1 increment adds the original future-due
+boundary case (invariant_test.exs:1291–1321) to the existing claim_apply target.
+Actual written-source review confirms all four mappings and their explicit
+public/durable/profile limitations. All 15 claim_apply tests pass on Darwin.
+The preceding workspace run passed 414 named tests across 67 targets, with zero
+failed or ignored; strict Clippy, formatting, 27 architecture controls and the
+progress validator also pass. Only the selected progress declaration changed;
+all other 5,857 declarations and registration/manifest metadata are preserved.
+This covers existing typed behavior and supplies neither a TDD RED nor complete
+original-case/public/profile parity. A-NEXT-F1-CREATE1 now approves the four
+named frame-verifier paths and one-scan contract after full ARCH/PERF reciprocity.
+The exact additive ADR006/architecture sections and existing checker amendment
+are written; all 27 architecture controls, strict Clippy and formatting pass.
+A/P-NEXT-F1-TESTLAYOUT1 and separate TAG1 now close the full six-test layout,
+one additional private test child and six named helpers after actual reciprocal
+review. ROOT wrote only the two tests and their private parent module seam;
+ordinary sizes are 488/324 lines with all functions at most 95. The first real
+compile failed with three missing-API and ten test hash-rendering errors. A
+byte-equivalent fixed-digest comparison correction preserves every expected
+value and observation. The corrected target failed solely with three E0432
+missing-API errors, before production implementation; zero assertions executed.
+Separate A/P-NEXT-F1-S0-1 reciprocal approval and I-NEXT-F1-S0-1 owner order
+then selected the two rejecting sources and five exact facade seams. ROOT wrote
+them and ran the unfiltered target: all 20 tests executed, old14 PASS/new6 FAIL
+(074caa, exit101); ordinary formatting passes. No later assertions after each
+test's failure are credited. The earlier 414-test passing workspace precedes
+these new tests and is not a current workspace GREEN result. Full FIT1 source
+reciprocity and I-NEXT-F1-BODY1 preceded the substantive sources: DOMAIN wrote
+D1/D2 and the three Reader/module/constructor seams; ROOT wrote P1. The same
+unfiltered focused target now passes20/20 on Darwin (d9a807, exit0). Ordinary
+formatting wraps only three Reader signatures; final format/diff checks pass.
+The private scanner's unchanged tenant comparison is in public scan before
+SHA admission; the domain pair fits245/245 lines with largest functions37/94.
+Strict Clippy first failed on private restore_header's by-value argument
+(f276c2, exit101). Reviewed CONSUME1 moves that same private helper into the
+existing Scanned impl as consuming self; every paid event remains unchanged.
+A second strict attempt found four test-fixture implicit-clone expressions;
+the exact explicit-clone corrections preserve every input and assertion.
+Final strict Clippy passes (54e2be, exit0). At the completed frame increment,
+the macOS workspace passed420 tests across67 targets (88917d, exit0), including all20 focused tests
+and27 architecture controls; four compile-fail doc tests, warnings-denied docs,
+formatting, diff, reference integrity and progress checks pass. No tests are
+ignored. ARCH and PERF accepted all final written production/test sources and
+actually read each other's complete findings; full reciprocal source review is
+closed without discrepancies. At that checkpoint the progress ledger had
+38 reviewed declarations/39 counterparts/128 links, with1681 unmatched runtime
+cases and1655 unresolved declarations.
+
+The subsequent A/P-PARITY-LEASED1 counterpart covers the original leased/terminal
+claim case (invariant_test.exs:1246–1289) in the existing claim_apply target.
+ARCH/PERF actually read each other's complete findings and closed reciprocal
+review without discrepancy; ROOT verified written bytes match their exact
+accepted candidate. The test preserves real creation, the selected claim write,
+leased-empty selection, completion with the observed token/fence, and terminal-
+empty selection at the original times/limits. Actual unfiltered claim_apply
+passes16/16 on macOS (141527, exit0). At that checkpoint the full workspace passed421 tests
+across67 targets (0b491e, exit0), with zero failures, ignored or filtered tests;
+strict Clippy (8ab4b6), formatting (936a23), diff (174acd), reference (6267d3) and
+progress (0a80ea) checks pass. The ledger now has39 reviewed declarations,
+40 counterparts and133 links. The other5856 declaration rows and all registration/
+manifest metadata are preserved; the prior future-due counterpart changes only
+its shared-file digest and four Rust assertion line offsets by2. Runtime gaps
+remain1681 unmatched cases/1655 unresolved declarations. This is executed typed
+existing-behavior coverage, without a retroactive TDD RED or full original/public/
+durable/profile acceptance. The complete LIMITS entry preserves those gaps.
+The subsequent original core-Patch frame producer has explicit A-NEXT-F2-CREATE1
+selection and complete reciprocal proposal review. Three private test children
+precede production: actual missing-API RED reports three E0432 import sites for
+two absent APIs (a740e9, exit101, zero assertions). Separately selected rejecting
+S0 then passes the existing20 and fails the new6 solely with UnsupportedTag
+(da8411, exit101). I-NEXT-F2-BODY1 writes the exact eight approved existing
+production candidates; no new production file/model/dependency is introduced.
+One private CorePatchSink visits the same original Caller for intent SHA and
+frame emission, preserving partial identity without an isolated intent buffer.
+Each prospective payment stays distinct on the actual received schema account.
+The unchanged unfiltered focused target passes26/26 (134658, exit0).
+
+Strict Clippy first reports three test-style diagnostics only. An inclusive
+single-element range and two semicolons fix them; the exact inverse preserves
+every prior test byte and all fixed expectations. Final cases.rs remains595
+physical lines/max function91, SHAadceec30531b084fcf92767613384e10b5d33db9cb2fe4b38f021675888d898c.
+Final strict Clippy passes (fd7f83, exit0). At that producer checkpoint the macOS workspace
+passes427 tests across67 targets (275d50, exit0), zero failed/ignored/filtered,
+including the final26 focused and27 architecture controls without adding them
+again. Four compile-fail doctests (3faf94), warnings-denied docs (fca084),
+formatting (569353), diff (4eab2f), reference (a759d5) and progress (e6f9bf)
+pass. The ledger remains39/40/133 with1681 unmatched cases/1655 unresolved
+declarations; these six internal producer tests add no original-case mapping.
+ARCH and PERF accepted all eight complete written production sources, all three
+complete current test children, the three final style expressions and both
+documentation additions. Each actually read the other's entire findings;
+written-source reciprocal review is closed without discrepancy. Their source
+review and ROOT native evidence remain distinct; neither claims a native gain.
+
+The consuming original-command decoder now has explicit A-NEXT-F3-CREATE1 and
+complete A/P proposal reciprocity. Seven test-only paths precede production:
+missing-API RED (6d2d98, exit101) executes no assertions; separately approved
+uniform-refusal S0 passes old26 and fails new6 (43f7fa, exit101). The substantive
+decoder preserves original partial presence and moves immutable header owners
+while freshly paying reads/comparisons/copies on the received schema account.
+First compilation catches private combinator lifetime inference; a closure
+passes32 tests but strict Clippy rejects it. A-NEXT-F3-LIFETIME1 explicitly binds
+the callback to the received Reader's byte/charge lifetimes and restores the
+method item without suppression or changed expectations. Final strict9c4ada
+passes. ARCH and PERF read every selected written source/test and both final
+documentation sections, accepted the exact batch, and actually read both entire
+parts of each other's findings. Written-source reciprocity is closed without a
+discrepancy; native evidence and unmeasured resource limits remain separate.
+
+The two separately accepted PARITY-PARALLEL-ACTIVATE2 counterparts preserve
+default-parallel two-ID selection and FIFO activation after real fixture
+creation, with actual writes/control carried into later views. The unfiltered
+claim_apply target passes18/18 (bd92e8). Normal generation707c42 adds exactly
+two mappings and refreshes only two existing shared-file digests; all other
+declarations and registration metadata remain unchanged. The ledger now has
+41 reviewed declarations,42 counterparts and138 assertion links. Complete
+LIMITS retain public/durable/setup/profile gaps; these are existing-behavior
+tests with no retroactive TDD RED or full original-scenario acceptance.
+
+The full macOS bash scripts/check.sh exits0 (9f3920):435 tests across67 targets,
+zero failed/ignored/filtered, including final decoder32/32 and architecture27
+without counting repeated checks twice. Four compile-fail docs, formatting,
+warnings-denied compile/Clippy/docs, reference/progress and advisories/bans/
+licenses/sources checks all pass. Diff316320 passes. Runtime accounting remains
+5903/4222/1681/1655; current Linux execution remains open.
+The explicit full-parity command exits1 (8282de): all5858 frozen declarations
+still lack full required behavioral execution, including setup/fixtures,
+mandatory profiles and adapters. Checked partial links do not certify parity.
+
+The next GPT-6.1-sol/max writer proposes the smallest charged retained-gate
+predecessor and ordered apply parent in the existing domain review note.
+Every new artifact/API requires explicit ARCH consultation before creation.
+Exactly ONE retained gate must precede Fresh-only original reconstruction,
+coherent current/CAS/context/highwater, paid remerge and atomic proposed writes.
+Full original/public/profile acceptance and M1–M8 remain open. These macOS
+results and older saved CI do not certify Linux. The full goal stays active.
 
 Final peer findings C-P1/C-P2 are closed for this conservative increment:
 unknown macro environments remain unresolved, and the retry assertion pairing
@@ -20,8 +855,13 @@ proof or full behavioral parity is claimed.
 - Reviewed implementation commit `25701439accaeb51d41ffc3fcdcddc5b503f2a8e`
   is pushed to this branch after reciprocal review and the final green local
   gate. Its [Linux/macOS CI run](https://github.com/ferricstore/ferricstore2/actions/runs/37973550388)
-  **passed on ubuntu-24.04 and macos-15**. This handoff follow-up changes only
-  documentation; the cited run belongs to the implementation commit.
+  **passed on ubuntu-24.04 and macos-15**. That run certifies the saved commit.
+  The later documentation checkpoint `85f82b616521283078d5093726292dfd99d1173f`
+  also [passed both runners](https://github.com/ferricstore/ferricstore2/actions/runs/37974338754),
+  verified through GitHub CLI on October 12. CLI access is available for fresh
+  CI on a reviewed checkpoint of the current work.
+  Current uncommitted Rust changes and follow-up documentation have separate
+  local evidence and still require current Linux/macOS CI.
 - Main's last handoff commit was `b0151c5`. The foundation Linux/macOS CI passed
   `f2ff13b2da4e47e1fd52f74520fb219efe2de613`
   ([run](https://github.com/ferricstore/ferricstore2/actions/runs/37929778754)).
@@ -162,8 +1002,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **37 reviewed
-source declarations, 38 counterpart records and 124 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **38 reviewed
+source declarations, 39 counterpart records and 128 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

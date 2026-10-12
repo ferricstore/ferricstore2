@@ -15,6 +15,14 @@ mod plan;
 mod retry_transition;
 mod validation;
 
+pub mod active;
+pub mod admission;
+pub mod batch;
+pub mod control;
+pub mod indexed;
+pub mod request;
+pub mod restoration;
+
 pub use command::{Cancel, CommittedCommand, Create, Operation, Terminal, Transition};
 pub use plan::{Outcome, RecordWrite, TransitionPlan};
 
@@ -34,7 +42,9 @@ pub const MAX_EXACT_MILLIS: u64 = 9_007_199_254_740_991;
 pub enum WorkflowStatus {
     /// Unleased logical state with a scheduled deadline.
     Scheduled,
-    /// Leased execution, whose logical state is exposed separately.
+    /// Unleased nonterminal state without a scheduled deadline.
+    Unscheduled,
+    /// Physical running label; restoration may preserve absent ownership.
     Running,
     /// Successful terminal state.
     Completed,
@@ -150,7 +160,8 @@ impl WorkflowRecord {
             b"completed" => WorkflowStatus::Completed,
             b"failed" => WorkflowStatus::Failed,
             b"cancelled" => WorkflowStatus::Cancelled,
-            _ => WorkflowStatus::Scheduled,
+            _ if self.next_run_at.is_some() => WorkflowStatus::Scheduled,
+            _ => WorkflowStatus::Unscheduled,
         }
     }
 }

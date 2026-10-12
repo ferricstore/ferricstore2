@@ -37,6 +37,16 @@ pub enum EventKind {
     LeaseExtended,
     /// Explicit cancellation.
     Cancelled,
+    /// A completed child updated its parent accounting.
+    ChildCompleted,
+    /// A failed child updated its parent accounting.
+    ChildFailed,
+    /// A cancelled child updated its parent accounting.
+    ChildCancelled,
+    /// The parent recorded closure of its remaining children.
+    ChildrenCancelled,
+    /// Explicit restored witness of successful child creation.
+    ChildrenSpawned,
 }
 
 impl EventKind {
@@ -52,6 +62,11 @@ impl EventKind {
             Self::Retry => "retry",
             Self::LeaseExtended => "lease_extended",
             Self::Cancelled => "cancelled",
+            Self::ChildCompleted => "child_completed",
+            Self::ChildFailed => "child_failed",
+            Self::ChildCancelled => "child_cancelled",
+            Self::ChildrenCancelled => "children_cancelled",
+            Self::ChildrenSpawned => "children_spawned",
         }
     }
 }

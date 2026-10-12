@@ -12,6 +12,8 @@ use crate::{
     source::{self, Context},
 };
 
+mod codec_policy;
+
 fn root() -> CheckResult<PathBuf> {
     Ok(Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
@@ -235,6 +237,59 @@ fn coverage_features_and_dependency_feature_drift_fail() -> CheckResult<()> {
         graph::check(&changed, &policy, &root()?)?
             .iter()
             .any(|failure| failure.contains("unreviewed external version/source/features"))
+    );
+    Ok(())
+}
+
+#[test]
+fn application_hash_policy_is_pinned_and_cannot_leak_into_domain() -> CheckResult<()> {
+    let original = metadata()?;
+    let policy = policy()?;
+    let edge = json!({
+        "name":"sha2", "kind":null, "optional":false, "target":null,
+        "source":"registry+https://github.com/rust-lang/crates.io-index", "path":null,
+        "features":[], "req":"=0.11.0", "uses_default_features":false,
+    });
+    let mut accepted = original.clone();
+    let dependencies = package_mut(&mut accepted, "wf-application")?["dependencies"]
+        .as_array_mut()
+        .ok_or("missing dependencies")?;
+    dependencies.retain(|dependency| dependency["name"] != "sha2");
+    dependencies.push(edge.clone());
+    assert_eq!(
+        graph::check(&accepted, &policy, &root()?)?,
+        Vec::<String>::new()
+    );
+    for (field, value) in [
+        ("req", json!("^0.11")),
+        ("features", json!(["zeroize"])),
+        ("uses_default_features", json!(true)),
+        ("source", json!("git+https://example.invalid/hash")),
+    ] {
+        let mut changed = accepted.clone();
+        let dependencies = package_mut(&mut changed, "wf-application")?["dependencies"]
+            .as_array_mut()
+            .ok_or("missing dependencies")?;
+        let hash = dependencies
+            .iter_mut()
+            .find(|dependency| dependency["name"] == "sha2")
+            .ok_or("missing hash edge")?;
+        hash[field] = value;
+        assert!(
+            graph::check(&changed, &policy, &root()?)?
+                .iter()
+                .any(|failure| failure.contains("wf-application -> sha2: unreviewed"))
+        );
+    }
+    let mut changed = original;
+    package_mut(&mut changed, "wf-domain")?["dependencies"]
+        .as_array_mut()
+        .ok_or("missing dependencies")?
+        .push(edge);
+    assert!(
+        graph::check(&changed, &policy, &root()?)?
+            .iter()
+            .any(|failure| failure.contains("unclassified external edge wf-domain -> sha2"))
     );
     Ok(())
 }

@@ -2,6 +2,9 @@
 
 use crate::lease::LeaseToken;
 
+pub mod apply;
+pub mod caller;
+pub mod coordination;
 mod error;
 mod index;
 mod request;

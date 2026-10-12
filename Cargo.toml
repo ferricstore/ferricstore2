@@ -41,6 +41,7 @@ wf-node = { path = "crates/wf-node" }
 wf-architecture-tests = { path = "crates/wf-architecture-tests" }
 wf-test-support = { path = "crates/wf-test-support" }
 wf-parity-tests = { path = "crates/wf-parity-tests" }
+sha2 = { version = "=0.11.0", default-features = false }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

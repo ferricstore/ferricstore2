@@ -7,6 +7,14 @@ use wf_types::version::TimestampMillis;
 use crate::retry::JitterSample;
 use crate::value::{DomainError, InputField, RetryPolicyField};
 
+pub mod complete;
+pub mod definition;
+mod install_validation;
+pub mod installation;
+mod patch;
+mod preview;
+pub mod restoration;
+
 const MAX_DELAY_MILLIS: u64 = 2_592_000_000;
 
 /// Supported source backoff kinds.
@@ -244,6 +252,18 @@ impl InstalledRetryPolicy {
     #[must_use]
     pub fn workflow_type(&self) -> &[u8] {
         &self.workflow_type
+    }
+
+    /// Borrows the installed type override without cloning unrelated state policies.
+    #[must_use]
+    pub const fn type_retry(&self) -> &RetryOverride {
+        &self.retry
+    }
+
+    /// Borrows only the relevant logical-state override for bounded admission.
+    #[must_use]
+    pub fn state_retry(&self, state: &[u8]) -> Option<&RetryOverride> {
+        self.states.get(state)
     }
 }
 

@@ -1,14 +1,50 @@
 # Version 1 normalized mutation intent
 
-Status: selected comparison grammar after three-agent review; no encoder or vectors implemented. This is an internal comparison grammar for retained request identity, not another network or persistence format. HTTP and TCP use the [same request contract](../transport-design.md).
+Status: selected comparison grammar after three-agent review. The bounded pure application encoder and policy-set/claim-due entries pass twenty scoped tests against eighteen generic, seven policy-set and twelve claim-due independent byte/hash vectors under [ADR-005](../adr/005-application-intent-hash-helper.md), with independent code/resource acceptance for those represented mappings. Full operation/client/transport gates remain. This is an internal comparison grammar for retained request identity, not another network or persistence format. HTTP and TCP use the [same request contract](../transport-design.md).
 
 ## Authority and input
 
 The application owns a pure, bounded `intent` module. It constructs a typed client intent from validated command values and authorized tenant scope, before leader preparation injects time, randomness or generated IDs. V1 requests do not accept a client-supplied digest. Adapters cannot establish authoritative identity by supplying one. The application recomputes it, compares version and digest with the retained request record, and rejects reuse with different intent. The wire crate carries version/digest values and DTO normalization rules; it does not access the outcome store. SDKs need not compute a digest to retry a request correctly.
 
-Version 1 uses SHA-256 over the exact prefix bytes below followed by one canonical typed value. The proposed implementation helper is RustCrypto `sha2`, using its incremental safe API ([primary documentation](https://docs.rs/sha2/latest/sha2/)). Pin and audit its release/features and transitive unsafe before implementation. A digest is neither an authorization credential nor proof that an outcome was committed; authorization and durable scope checks still apply.
+Version 1 uses SHA-256 over the exact prefix bytes below followed by one canonical typed value. The implementation uses checksum-pinned RustCrypto `sha2` 0.11.0 through its incremental safe API ([primary documentation](https://docs.rs/sha2/0.11.0/sha2/)); its selected features and transitive unsafe review are recorded in ADR-005. A digest is neither an authorization credential nor proof that an outcome was committed; authorization and durable scope checks still apply.
 
-The root is a map with exactly `normalization_version` = string `"1"`, `schema_version` = string `"1"`, `tenant_id`, `operation`, and typed `args`. Each operation's registry defines its complete argument mapping, types, optionality and semantic defaults. Do not derive this mapping automatically from Rust struct names or serialize a generic domain object. A registry version change that affects meaning requires a new normalization version and retained-version retry support.
+The root is a map with exactly `normalization_version` = string `"1"`, `schema_version` = string `"1"`, `tenant_id` = opaque bytes, `operation` = string, and typed `args`. Each operation's registry defines its complete argument mapping, types, optionality and semantic defaults. Do not derive this mapping automatically from Rust struct names or serialize a generic domain object. A registry version change that affects meaning requires a new normalization version and retained-version retry support.
+
+The first implemented entry is `workflow.policy_set`, with its exact typed
+InstallCommand mapping in ADR-005. It preserves business-invalid caller values
+for comparison; source admission runs separately. In particular, mode Clear
+hashes as present null while source-compatible state-policy admission rejects
+that null. Replace+Remove also retains its supplied identity while source
+admission rejects it; Patch deletion remains valid. This entry does not establish raw HTTP/TCP normalization or permit
+dropping unsupported governance/indexed fields from a supplied command.
+
+A-N46 selects the implemented internal comparison entry, `workflow.claim_due`,
+with the exact mapping in ADR-005. A-N49 architecture and performance acceptance
+each passed8 caller,20 application and1 workspace control on unchanged inputs. Its
+eleven mandatory args are workflow_type/worker Bytes, states{any:Bool,
+names:List<Bytes>}, partitions{mode:String,keys:List<Bytes>}, lease_ms/limit/
+reclaim_ratio Unsigned, reclaim_expired Bool, reply_mode String, payload Bool
+and values{mode:String,names:List<Bytes>}. Optional priority/payload_max_bytes/
+governance_shard_id/now_ms are Unsigned; governance_limit_scope is Bytes.
+Absence remains omitted and present zero distinct. Partition modes are
+auto/any/global/only, values modes omitted/all/only, and replies records/jobs/
+jobs_compact/jobs_compact_attrs/jobs_compact_state/jobs_compact_state_attrs.
+
+Fixed claim defaults are lease30000, limit1, reclaim=true, ratio25, absent
+priority and records reply. Payload override wins over full, whose default is
+reply==records. State names keep last occurrence/order; partition/value names
+keep first. Scalar ASCII partition aliases normalize; list aliases remain
+literal bytes. Mixed ANY+names and empty/zero/MAX business-invalid inputs remain
+comparable; source key/footprint/scope/admission runs separately. Both Any and
+Global require the source shared-tenant rejection, never authority from a hash.
+
+Optional source requested_now_ms is caller now_ms identity only and never
+committed-clock authority; future wire permission remains a review gate.
+Policy-dependent payload cap absence differs from every explicit cap. Block
+wait and all server stamp/log/budget/token/selection preparation remain excluded.
+No current policy, clock or generated routing/selection result changes identity.
+The borrowed normalizer and bounded flat encoder confer no public parent,
+transport, source-profile or durable execution guarantee.
 
 Include workflow identity, exact semantic partition values, explicit expected revisions/fences/lease guards, caller-supplied schedule times, policy/definition versions, opaque payload/result bytes and meaningful item order. For an atomic-group batch, the root covers the entire ordered set of item operations/arguments. An independent batch hashes each item separately; it has no durable aggregate identity.
 
@@ -55,4 +91,4 @@ Expose digest as lowercase 64-character hexadecimal with `algorithm:"sha256"` an
 
 Before SDK mutations, produce independently reviewed byte and hash vectors across the Rust application and browser/worker clients. Required equivalent cases: reordered JSON keys, allowed whitespace/escape differences, HTTP versus TCP attempts, changed timeout/call IDs, identical decoded payloads and versioned equivalent defaults. Required different cases: changed tenant/operation/partition, payload bit, fence/revision, absent/null/zero, list order, policy version and requested schedule time. Maximum u64, non-ASCII identifiers, negative zero where supported, atomic/independent batch boundaries and invalid duplicate/ambiguous numbers need explicit fixtures.
 
-Fault/replay cases verify that injected leader time/IDs never replace client-intent identity, concurrent same-ID attempts produce one retained outcome, current authorization applies to lookup/replay, old-version retries retain their original meaning after upgrade, and a retained client journal from before disaster restore cannot mutate a new recovery namespace through either transport. Vectors, safe bounded encoding and retention support are implementation gates, not tests executed in this design phase.
+Fault/replay cases verify that injected leader time/IDs never replace client-intent identity, concurrent same-ID attempts produce one retained outcome, current authorization applies to lookup/replay, old-version retries retain their original meaning after upgrade, and a retained client journal from before disaster restore cannot mutate a new recovery namespace through either transport. The scoped pure encoder checks above do not establish client/transport equivalence, retained-version service behavior or durable retention; those implementation gates remain.

@@ -197,3 +197,5 @@ fn same_fence_does_not_allow_different_terminal_effect() -> TestResult {
     assert_eq!(scenario.count(EventKind::Completed), 0);
     Ok(())
 }
+
+mod claimed_support;

@@ -1,6 +1,8 @@
-//! Application command/query facades over explicit effect ports.
+//! Application boundaries and pure canonical caller-intent preparation.
 //!
-//! M0 module scaffold; implementations follow the reviewed architecture.
+//! The commands facade prepares bounded identities from explicit typed inputs.
+//! Service authorization, operation registries and durable submission retain
+//! their reviewed implementation gates.
 
 #![forbid(unsafe_code)]
 

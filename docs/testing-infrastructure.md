@@ -6,6 +6,19 @@ The runtime engine and full workflow parity remain incomplete. Read the
 [parity contract](workflow-test-parity.md) before adding source ports.
 [Continuation instructions](CONTINUE.md) record current results and gates.
 
+The synthetic compiler-lineage child controls now require Elixir1.19.5 and
+Erlang/OTP release28 even during Cargo's tooling-crate tests. The local wrapper
+checks these prerequisites; CI installs its pinned Elixir/OTP profile as
+documented in [development](development.md). These finite process controls do
+not execute original workflow tests, helpers, setup or the original collector.
+Compiler registration, pure artifact verification and required original
+scenario execution remain separately accounted acceptance steps.
+
+Dependency auditing uses the pinned repository-local cargo-deny binary and
+ignored `.tools/advisory-dbs` database/lock directory. Run from the repository
+root; normal fetching and all four required checks remain enabled. A cached
+database or repaired location alone does not establish a passing audit.
+
 ## Isolated helpers
 
 `wf-test-support` has no runtime first-party dependency. It is a tooling boundary

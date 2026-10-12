@@ -135,6 +135,12 @@ impl<'a> LaneOrder<'a> {
         }
     }
 
+    /// Borrows the actual member-key identity for pre-comparison admission.
+    #[must_use]
+    pub(crate) fn id(self) -> &'a [u8] {
+        self.id
+    }
+
     /// Returns the source running (-1) or queued (0) lane score.
     #[must_use]
     pub const fn score(self) -> i8 {

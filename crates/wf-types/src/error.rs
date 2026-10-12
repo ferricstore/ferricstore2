@@ -28,6 +28,19 @@ pub enum ValueError {
     LengthOverflow,
     /// The partition-key buffer could not reserve its checked length.
     AllocationFailed,
+    /// A tenant/group/recovery/request/partition identity was empty.
+    EmptyScopeId,
+    /// A scoped identity exceeded its declared byte bound.
+    ScopeIdTooLong {
+        /// Actual opaque identity length.
+        bytes: usize,
+        /// Maximum admitted length for this identity kind.
+        limit: usize,
+    },
+    /// Committed physical time exceeded the source 48-bit clock bound.
+    PhysicalTimeTooLarge,
+    /// Committed wall time exceeded its paired physical clock.
+    WallTimeAfterPhysical,
 }
 
 impl fmt::Display for ValueError {
@@ -45,6 +58,16 @@ impl fmt::Display for ValueError {
             }
             Self::LengthOverflow => formatter.write_str("encoded byte length overflow"),
             Self::AllocationFailed => formatter.write_str("partition key allocation failed"),
+            Self::EmptyScopeId => formatter.write_str("scope identity must be nonempty"),
+            Self::ScopeIdTooLong { limit, .. } => {
+                formatter.write_str(&format!("scope identity exceeds {limit} bytes"))
+            }
+            Self::PhysicalTimeTooLarge => {
+                formatter.write_str("physical clock exceeds 48-bit bound")
+            }
+            Self::WallTimeAfterPhysical => {
+                formatter.write_str("wall clock exceeds committed physical time")
+            }
         }
     }
 }
