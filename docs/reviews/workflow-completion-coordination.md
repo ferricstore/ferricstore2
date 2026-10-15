@@ -43539,3 +43539,253 @@ The first cached audit invocation4b4a81 used an invalid --disable-fetch option a
 Root whole-read/hash-verified ARCH TESTS3655/1d8045b6 +PERF TESTS2811/73aa9823 (44bf19), PERF SOURCE3954/418102a4 (7ba30e) and Writer TESTS-AND-WRITTEN6881/3e99df1d (0d6331). All four actual source bodies, selected existing seams and seven behavior identities received reciprocal review without a remaining component finding. Source/expectation inverses preserve prior encoders/validators/tags and every frozen operand. No extra reader/run gate remains.
 
 After the unchanged-input comparison, Root updates only the existing CONTINUE status prose to the actual final totals/limits. No production, test, policy, ledger, frozen reference or Cargo input changes. Ledger remains77/87/326, runtime accounting5903/4222/1681/1655. No engine, atomic publication, crash/power-loss, original source/profile completion, native Linux or full M1–M8 success is claimed. Original dirty Elixir checkout remains untouched. ARCH has found a concrete primary Git blob acquisition route and is preparing a named temporary snapshot/spike proposal; no upstream snapshot, probe/model, dependency or production adapter is created by this reviewed batch.
+
+## M2 exact redb Git-source acquisition and isolated spike release
+
+Root actually whole-read/hash-verified ARCH-NEXT-M2-REDB44-GIT-SPIKE1-CREATE1 at architecture offset2,001,016/21,595 bytes/SHA63a3dc9ad4f09e4b05a28b2148f87fa0cbfebedc9af3be7a137b9675e9111000 (3a99b1). The exact131-path/mode/size/blob inventory is10,814 bytes/SHA25318e9c5ff82391f83cce7088cc9ff243fd3c19fc0adb399526a035e2184905; Root independently fetched the primary ref/commit/tree and reconstructed all34 Git tree objects (cd4954). Both selected source/spike roots are absent before creation.
+
+RELEASE the exact finite temporary batch: Root acquires and verifies every pristine upstream blob under /private/tmp/ferricstore2-redb-4.4.0-7061f7e-source; Writer independently reads the exact inventory/manifest and, only after full acquisition verification, authors the two selected Cargo.toml/src/main.rs files under /private/tmp/ferricstore2-redb-4.4.0-7061f7e-spike. Root owns actual commands/logs. Generated lock/target/database/diagnostics are confined to that selected spike root. No normalization, upstream code change, repository dependency/adapter/probe, extra model/alias or benchmark is selected.
+
+The exact external profile is std-only redb4.4 Git commit7061f7e60d4573311c0636e161d417b93e9fd2b1/tree77441c23f8807fc79b313375656c4db5b8ed5b82. Keep upstream pristine, run the selected locked offline upstream diagnostic first, then the isolated path consumer. Use16MiB cache on both create/reopen, fixed bounded keys/copies, actual one-writer guards/ranges/table-open refusal, same-write reseek, two-table explicit abort/Immediate commit, writer lock lifetime and clean reopen. Review every failure honestly; no TDD claim for the already implemented dependency. This remains a Git-source experiment, not a registry archive/signature, adoption, power-loss/uncertainty proof, native Linux result or M2/full-goal completion. No additional ACK gate remains.
+
+Root completed the selected primary Git acquisition using bounded parallel GET batches followed by sequential, quoted data-only writes. All131 returned UTF-8 blobs were length/Git-SHA checked before materialization; actual reread14b341 verifies2,444,474 bytes, exact executable modes, zero extra paths and all34 tree objects. Root did not execute any upstream script. ARCH independently verified the complete materialized tree99f31d with identical root/inventory. The spike root was created empty only after complete verification, then Writer received the two-file authorship handoff.
+
+Actual upstream diagnostic29cf20 EXIT101: `cargo +1.99.0 check --offline --locked --manifest-path /private/tmp/ferricstore2-redb-4.4.0-7061f7e-source/Cargo.toml -p redb --lib --target-dir /private/tmp/ferricstore2-redb-4.4.0-7061f7e-spike/target/upstream` from the external spike directory refuses missing registry redb required by upstream's redb2_6 dev dependency. This precedes engine compilation and is profile evidence, not a failing engine test. Upstream source/manifest remains unchanged; no fallback, normalization, registry acquisition or production adoption. The selected external path profile follows once Writer's two files are substantive. All formatting is consumer-only/direct main.rs; never mutate path dependencies with fmt --all.
+
+## M2 real redb Git-source spike: actual terminal evidence
+
+The standalone profile resolves offline c551f9 EXIT0. Generated Cargo.lock461B/SHA80746ddf6abb6e5f2367dc79537fff06a20e43ab0de8566277977c3f7b04eb41 contains only the consumer, pristine path redb4.4.0 and registry libc0.2.190/checksumce5d3ddc6d3fa000eb1536d85e147bfe31aacaba692ed6a876f95cb7c855be78 (3ade4d). Actual feature tree ee6475 selects redb/std and libc/default+std only. No upstream normalization or repository dependency change occurred.
+
+Root whole-read both handwritten files75a77d. Before first compilation, a finite Root review finding added observed 65-byte/count-eight refusal controls inside the existing seek function, preserving all four real engine seeks and old position/count/seen on refusal. Frozen pre-build main5,827B/160LF/4fbc0a561a7b79cb2281a141d7c7dc81390efd608a39da0d9db2f785cfaeec51 plus manifest/lock were captured c2dacd. First consumer check0cc5f1/session26317→d0ae7b EXIT101 actually compiles libc/redb successfully, then fails only two E0599 missing the existing ReadableDatabase import. Writer adds that import only; actual check2ed760 EXIT0. This is an actual consumer compile correction, not TDD for the existing dependency or an engine failure.
+
+First native executable9724e2/session13281→ca1703 EXIT0 passes every selected guard/range/TableAlreadyOpen, same-write reopen/reseek/end, copy refusal, two-table explicit abort/Immediate commit, live-writer DatabaseAlreadyOpen and clean reopen assertion. Strict standalone lint53f9be EXIT101 then reports four first-party style issues: two elided TableDefinition lifetimes, one similar local name and missing crate documentation. Writer repairs only those annotations/names/docs; final main5,936B/165LF/SHAbfde65ba31ef26a0f2dfa402d89d88bf13de3b4c3c5f288fe124383b8a70f2b3. All observations are unchanged.
+
+Final actual strict lintc43c84 EXIT0 uses `CARGO_BUILD_WARNINGS=deny cargo +1.99.0 clippy --offline --locked --all-targets --manifest-path /private/tmp/ferricstore2-redb-4.4.0-7061f7e-spike/Cargo.toml -- -D warnings -D unsafe_code -D unsafe_op_in_unsafe_fn -D unused_must_use -D missing_docs -D rust_2018_idioms -D clippy::all -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::panic -D clippy::todo -D clippy::unimplemented -D clippy::dbg_macro -D clippy::await_holding_lock`. Consumer-only `rustfmt +1.99.0 --edition 2024 --check <spike>/src/main.rs` da1536 EXIT0. Final `CARGO_BUILD_WARNINGS=deny cargo +1.99.0 run --offline --locked --manifest-path <spike>/Cargo.toml`79528b EXIT0 repeats every native observation successfully. Prior errors remain appended in check/lint logs; old log text is not a current failure.
+
+After all commands, Root075234 rereads all131 pristine files/modes/2,444,474 bytes, verifies all34 actual trees and zero extra source paths. ARCH99f31d and later b3f05f plus Writer47b7d0/e0a82b independently agree. Root's whole import/style inverse exactly recovers pre-build4fbc0a56; the first inverse SCRIPT omitted .as_slice from a local-name replacement and was corrected without source edits. PERF/ARCH also recover the whole first-runtime5bc5f7ba. No runtime or resource operand was adjusted to the engine output.
+
+Current diagnostic hashes under the selected spike root: upstream-check.log336B/c80e86ec75cbb9d74a5eae2f6582643dcaa443e68a74561c10c3b646cb731da1; check.log1824B/a857efa736e949c85385abf29cd1ef81bd37dc0ec91c6414be91b72b172d62c4; run.log776B/7d7502ef9b9891b191e1497a76b83fb36e4694114a174efb936a0a425d3f29bd; lint.log2503B/cd8819e0ae6fd6ad08fcb8f283331eace46f4918031ced206b131bc47868776d; format.log0B/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855. Real state.redb is65,536 bytes. Manifest remains271B/9d8db8569d823d5d05058a799a23b56d1f79b7895b4f8d81500212f8c02a1b61. Actual host is macOS26.6.2 arm64; no Linux execution occurred.
+
+This closes only the finite primary Git-source experiment. Its16MiB Builder cache and eight bounded position copies grant no total engine/MVCC/RSS or performance bound. Clean reopen is not power-loss/uncertainty proof, nor a GroupApplyStore/driver/workflow adapter. Registry archive/source/advisory/license/MSRV adoption, exact borrowed pre-copy owner charging/point identities, one-gate Fresh loading/complete lanes, atomic workflow integration, failure reconciliation/snapshot/membership and native Linux remain required. Product source/test/config/Cargo/ledger inputs are unchanged from b14a45a; no full workspace rerun or new parity credit follows from temporary files/review notes.
+
+A final existing-manifest quality clarification closes the plan's literal workspace-lint inheritance requirement for this first-party temporary consumer. ARCH selected copying the product's exact Rust/rustdoc/Clippy workspace tables and package inheritance into its already selected Cargo.toml; no new artifact/model/dependency. Writer updates only that file to806B/SHA6d5c7451b4c17340ec7ac0cf3fcc3a59000ce03407d6931e92d3e5e65eba8c52; the whole prior271B manifest is an unchanged prefix and all three tables match the product text/semantics. Root independently checks the semantic tables, exact std-only dependency profile, unchanged lock80746ddf and mainbfde65ba.
+
+Actual ordinary inherited-policy `CARGO_BUILD_WARNINGS=deny cargo +1.99.0 clippy --offline --locked --all-targets --manifest-path <spike>/Cargo.toml -- -D warnings`2c3bae EXIT0; its policy now comes from the manifest rather than needing duplicate CLI lint flags. Root's following a6065f again verifies every upstream byte/mode and all34 tree objects, with no extra source file. The main's final native execution79528b remains on that exact unchanged bfde65ba; no additional runtime rerun is needed for lint metadata alone. The earlier manifest/diagnostic hashes above describe their saved pre-metadata epoch; current manifest is6d5c7451.
+
+Separate read-only PATH availability probe91cdfd finds no podman, limactl, colima, qemu-system-aarch64 or multipass command. This is PATH inventory only, not proof those applications or external Linux runners do not exist. Earlier Docker socket permission denial and private GitHub repository connector404 remain separate facts. No Linux result is inferred. Current component is complete; the overall goal stays active for the concrete adoption, joint Raft/engine ownership, bounded physical read/driver and full source/profile work.
+
+### Reproducible temporary consumer inputs
+
+These are the exact final handwritten inputs of the selected temporary experiment, preserved here because /private/tmp is ephemeral. This documentation snapshot adds no repository runtime/probe module or dependency. Recreate only within the separately named temporary profile; the upstream source remains bound to the complete Git inventory above.
+
+Cargo.toml: 806 bytes, SHA256 6d5c7451b4c17340ec7ac0cf3fcc3a59000ce03407d6931e92d3e5e65eba8c52.
+
+```toml
+[package]
+name = "ferricstore2-redb-44-spike"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[dependencies]
+redb = { path = "../ferricstore2-redb-4.4.0-7061f7e-source", default-features = false, features = ["std"] }
+
+[lints]
+workspace = true
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"
+missing_docs = "deny"
+rust_2018_idioms = { level = "deny", priority = -1 }
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "deny"
+bare_urls = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+await_holding_lock = "deny"
+```
+
+src/main.rs: 5936 bytes, SHA256 bfde65ba31ef26a0f2dfa402d89d88bf13de3b4c3c5f288fe124383b8a70f2b3.
+
+```rust
+//! Isolated redb guard, transaction, and clean reopen checks.
+
+#![forbid(unsafe_code)]
+
+use redb::{
+    Builder, Database, DatabaseError, Durability, ReadableDatabase, ReadableTable, TableDefinition,
+    TableError,
+};
+use std::error::Error;
+use std::ops::Bound::{Excluded, Unbounded};
+use std::path::Path;
+
+const DATA: TableDefinition<'static, &[u8], &[u8]> = TableDefinition::new("data");
+const CONTROL: TableDefinition<'static, &[u8], &[u8]> = TableDefinition::new("control");
+const KEYS: [&[u8]; 4] = [b"a", b"a\0", b"a\xff", b"b"];
+const APPLIED: &[u8] = b"applied";
+const CACHE_BYTES: usize = 16 * 1024 * 1024;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let path = Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/state.redb"));
+    let db = Builder::new().set_cache_size(CACHE_BYTES).create(path)?;
+    check_atomic_tables(&db)?;
+    check_write_guard_and_seek(&db)?;
+    check_abort_and_reopen(db, path)?;
+    println!(
+        "redb 4.4.0: same-write guards/reseek, two-table abort/Immediate commit, \
+         writer lock and clean reopen passed"
+    );
+    Ok(())
+}
+
+fn check_atomic_tables(db: &Database) -> Result<(), Box<dyn Error>> {
+    for marker in [0_u8, 7, 8] {
+        let mut write = db.begin_write()?;
+        write.set_durability(Durability::Immediate)?;
+        {
+            let mut data = write.open_table(DATA)?;
+            let mut control = write.open_table(CONTROL)?;
+            let value = [marker];
+            for key in KEYS {
+                if key.len() > 64 || value.len() > 64 {
+                    return Err("fixture key/value cap exceeded".into());
+                }
+                data.insert(key, value.as_slice())?;
+            }
+            if APPLIED.len() > 64 {
+                return Err("applied key cap exceeded".into());
+            }
+            control.insert(APPLIED, value.as_slice())?;
+        }
+        if marker == 7 {
+            write.abort()?;
+        } else {
+            write.commit()?;
+        }
+        let expected = [if marker == 7 { 0 } else { marker }];
+        let read = db.begin_read()?;
+        let data = read.open_table(DATA)?;
+        let control = read.open_table(CONTROL)?;
+        for key in KEYS {
+            let value = data.get(key)?.ok_or("committed data key missing")?;
+            assert_eq!(value.value(), expected.as_slice());
+        }
+        let applied = control.get(APPLIED)?.ok_or("applied marker missing")?;
+        assert_eq!(applied.value(), expected.as_slice());
+    }
+    Ok(())
+}
+
+fn check_write_guard_and_seek(db: &Database) -> Result<(), Box<dyn Error>> {
+    let write = db.begin_write()?;
+    {
+        let table = write.open_table(DATA)?;
+        let point = table.get(KEYS[1])?.ok_or("point key missing")?;
+        let mut range = table.range::<&[u8]>(..)?;
+        assert!(matches!(
+            write.open_table(DATA),
+            Err(TableError::TableAlreadyOpen(_, _))
+        ));
+        for expected in KEYS {
+            let (key, value) = range.next().transpose()?.ok_or("range ended early")?;
+            assert_eq!(key.value(), expected);
+            assert_eq!(value.value(), &[8]);
+        }
+        assert!(range.next().transpose()?.is_none());
+        assert_eq!(point.value(), &[8]);
+    }
+
+    let mut position: Option<Vec<u8>> = None;
+    let mut copies = 0;
+    let mut seen = 0;
+    loop {
+        let next = {
+            let table = write.open_table(DATA)?;
+            let lower = position.as_deref().map_or(Unbounded, Excluded);
+            let mut range = table.range::<&[u8]>((lower, Unbounded))?;
+            match range.next().transpose()? {
+                Some((key, value)) => {
+                    let expected = KEYS.get(seen).ok_or("unexpected extra key")?;
+                    assert_eq!(key.value(), *expected);
+                    assert_eq!(value.value(), &[8]);
+                    Some(copy_position(key.value(), &mut copies)?)
+                }
+                None => None,
+            }
+        };
+        let Some(next) = next else {
+            break;
+        };
+        // The old bound remains owned until the replacement copy has succeeded.
+        position = Some(next);
+        seen += 1;
+    }
+    assert_eq!(seen, KEYS.len());
+    assert_eq!(copies, KEYS.len());
+    assert_eq!(position.as_deref(), KEYS.last().copied());
+    assert!(copy_position(&[0; 65], &mut copies).is_err());
+    assert_eq!(copies, KEYS.len());
+    assert_eq!(position.as_deref(), KEYS.last().copied());
+    assert_eq!(seen, KEYS.len());
+    for _ in KEYS.len()..8 {
+        let owned = copy_position(b"x", &mut copies)?;
+        assert_eq!(owned.as_slice(), b"x");
+    }
+    assert_eq!(copies, 8);
+    assert!(copy_position(b"x", &mut copies).is_err());
+    assert_eq!(copies, 8);
+    assert_eq!(position.as_deref(), KEYS.last().copied());
+    assert_eq!(seen, KEYS.len());
+    write.abort()?;
+    Ok(())
+}
+
+fn copy_position(key: &[u8], copies: &mut usize) -> Result<Vec<u8>, Box<dyn Error>> {
+    if key.len() > 64 || *copies >= 8 {
+        return Err("owned position cap exceeded".into());
+    }
+    let mut next = Vec::new();
+    next.try_reserve_exact(key.len())?;
+    next.extend_from_slice(key);
+    *copies += 1;
+    Ok(next)
+}
+
+fn check_abort_and_reopen(db: Database, path: &Path) -> Result<(), Box<dyn Error>> {
+    let write = db.begin_write()?;
+    drop(db);
+    assert!(matches!(
+        Builder::new().set_cache_size(CACHE_BYTES).open(path),
+        Err(DatabaseError::DatabaseAlreadyOpen)
+    ));
+    write.abort()?;
+
+    let reopened = Builder::new().set_cache_size(CACHE_BYTES).open(path)?;
+    let read = reopened.begin_read()?;
+    let data = read.open_table(DATA)?;
+    let control = read.open_table(CONTROL)?;
+    for key in KEYS {
+        let value = data.get(key)?.ok_or("reopened data key missing")?;
+        assert_eq!(value.value(), &[8]);
+    }
+    let applied = control.get(APPLIED)?.ok_or("reopened marker missing")?;
+    assert_eq!(applied.value(), &[8]);
+    Ok(())
+}
+```

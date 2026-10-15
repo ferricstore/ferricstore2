@@ -17802,3 +17802,205 @@ I actually whole-read/hash-verified PERF's entire3,954-byte WRITTEN1 at1,693,334
 Root's terminal27e9df/session36521→591f52 is EXIT1 solely at default RustSec GitHub DNS refresh. Actual637 Rust tests/73 targets plus6 compile-fail docs pass, zero warnings/failures/ignored; formatting, compilation, strict Clippy, rustdoc, architecture42, reference and progress checks pass. All1,152 executed inputs remain unchanged at1b2fdc51569dd9e2cf3647d7bd4e481e595451cfe726de4bdd9607f375081783. Separate corrected cached --offline audit0878a9 passes four categories on October14 edb58f5974b83eb8302332821cb6d389777aa351. The initial --disable-fetch invocation was an invalid CLI EXIT2, corrected using help; it was not an audit result or wrapper bypass. These are Root-attributed terminal results, not my own execution or a successful fresh refresh.
 
 This closes only the physical-format review. Real same-write-transaction authority, one-gate Fresh loading, complete lanes, atomic record/index/history/outcome/control persistence, uncertainty/reopen/crash, snapshots/membership and both native OS remain required. I recommend the next concrete prerequisite be acquisition of the exact primary redb4.4 Git-source snapshot followed by an isolated real-engine ownership/transaction spike, with no production dependency adoption. Public GitHub tag/commit/tree/blob GETs now actually succeed despite shell DNS; their complete named artifact/verification/profile selection follows separately. No new acquisition file or probe has been authored by this review.
+
+## ARCH-NEXT-M2-REDB44-GIT-SPIKE1-CREATE1
+
+SELECT this finite temporary acquisition/runtime spike. It creates no repository production source, dependency, adapter, model or M2 exit. Root has committed the reviewed physical/history prerequisite as b14a45a. Public connector reads now demonstrate an executable acquisition route beyond shell DNS: tag v4.4.0 resolves to commit7061f7e60d4573311c0636e161d417b93e9fd2b1 and tree77441c23f8807fc79b313375656c4db5b8ed5b82. The complete recursive response is not truncated:131 blobs/2,444,474 bytes,33 child directories,48 src files/1,521,195 bytes, largest blob171,330 bytes. No symlink/submodule exists. Commit verification is unsigned; this is primary-host/content-hash integrity, never a publisher signature or the crates.io archive checksum.
+
+Exact NEW imported tree root: /private/tmp/ferricstore2-redb-4.4.0-7061f7e-source. Every relative path/mode/size/Git SHA is enumerated below; preserve all131 upstream files unchanged, including AGENTS/build.rs and both licenses. Importing unchanged third-party types/unsafe implementation is not a first-party model/size/check exemption or production dependency adoption. Do not execute upstream shell/container/publish scripts, change its manifest/workspace/feature definitions, or run a normalization/build-copy fallback. Root read upstream AGENTS: the required upstream code-change test process is not being invoked by pristine acquisition/external consumer authorship. No source file or artifact has been created during this read-only selection.
+
+Exact NEW isolated consumer root: /private/tmp/ferricstore2-redb-4.4.0-7061f7e-spike. Writer may author only Cargo.toml and src/main.rs there. Select generated Cargo.lock, target/ (including an upstream subdirectory), state.redb, and upstream-check.log/check.log/run.log/lint.log/format.log as temporary diagnostics/build/engine artifacts under that root. There is no new fixture/model/alias, shell helper, dependency package, library wrapper or repository probe file. Root captures both roots absent before release; never overwrite an existing foreign directory. Imported files remain separate from every generated output. Any failed partial acquisition is labelled incomplete and may be removed only within these newly owned roots.
+
+ACQUISITION API, GET-only: tools.mcp__codex_apps__github_fetch({url:string}) using exactly these public endpoints under https://api.github.com/repos/cberner/redb:
+- /git/ref/tags/v4.4.0
+- /git/commits/7061f7e60d4573311c0636e161d417b93e9fd2b1
+- /git/trees/77441c23f8807fc79b313375656c4db5b8ed5b82?recursive=1
+- /git/blobs/<one enumerated blob SHA>.
+The callable schema takes one url:string. Actual responses expose structuredContent.content; the tree/ref/commit body is JSON text, while blob2193e571f16eab718fa18e5b3765d833a35013a2 was returned as decoded UTF-8 build.rs text. Read that structured payload, not the content block's generic "Action completed". Never reconstruct source from screenshots/quotes, normalize newlines, truncate content, or interpolate unquoted shell code. A different returned shape, non-UTF8/truncated response, missing blob or byte/hash mismatch fails acquisition; no alternate mirror/tree/engine is implicitly authorized. Independent fetches may be bounded in parallel; mutations/verification commits remain sequential. Root performs acquisition, Writer independently reads the exact inventory/manifest, and PERF reviews source/resource facts; no additional acknowledgement gate.
+
+VERIFY before trusting the acquired tree: reject absolute/traversal/NUL paths and modes other than the enumerated100644/100755 files and040000 directories. Encode returned source as exact UTF-8 bytes; require each declared byte length and SHA1("blob "+decimal_length+NUL+bytes). Preserve the two executable file modes, without executing those scripts. Rebuild each Git tree from its direct children in Git name ordering (a directory compares with trailing slash), entries mode-without-leading-zero + space + name + NUL + raw20-byte object SHA; verify SHA1("tree "+body_length+NUL+body) for all34 tree objects including root. I already verified all34 filelessly in e8b48a and verified build.rs968 bytes against2193e571. Root independently reports the same34-tree proof cd4954. After materialization, reread all131 files/modes, recheck every object and root, and require no extra snapshot files. The exact inventory serialization is one LF-terminated ASCII line per file, bytewise path sort, "mode size sha path"; its10,814 bytes have SHA25625318e9c5ff82391f83cce7088cc9ff243fd3c19fc0adb399526a035e2184905. That inventory, not the registry archive39178e0a..., binds this source profile.
+
+The consumer manifest is one package ferricstore2-redb-44-spike/version0.0.0/edition2024/rust-version1.99/publish=false, its own [workspace] with resolver3, and ONLY redb={path="../ferricstore2-redb-4.4.0-7061f7e-source",default-features=false,features=["std"]}. No benchmark/derive/Python member, Tokio/OpenRaft, optional logging/chrono/UUID, test framework or workspace dependency edit is selected. Exact upstream Cargo.toml blobd7b4d2e6ffc09db6d2859a59d040d543264d1f4e requires MSRV1.90 and Darwin/Linux libc^0.2.174; build.rs has no dependency or command execution. Repository toolchain1.99.0 is installed. Read-only cache checks find compatible libc source/archives plus optional index/cache metadata; Writer verified cached0.2.190 against its registry checksum. Actual offline resolution and generated lock graph, not that observation, determine what can build. Record the exact resulting Cargo.lock/checksums/features; do not fetch or silently substitute a missing dependency.
+
+Preserve the pristine tree. First exact upstream-manifest diagnostic may run cargo +1.99.0 check --offline --locked --manifest-path <source>/Cargo.toml -p redb --lib --target-dir <spike>/target/upstream from the external consumer directory. There is no upstream Cargo.lock, so an absent-lock/workspace dev-dependency resolution refusal is only profile evidence, not an engine compilation/test failure or a reason to rewrite source. --locked prevents generating an unlisted snapshot lock. The separately selected external path consumer is then compiled/run offline against that same unchanged package. Its initial own lock generation is allowed; subsequent checks use --locked. No normalization is selected, even if the full upstream workspace cannot resolve.
+
+src/main.rs forbids unsafe and contains ordinary main/check_write_guard_and_seek/check_atomic_tables/check_abort_and_reopen plus a local copy_position helper if useful, each<=100LF and file<=400LF. No public API or new nominal type/alias. Use existing redb Database/Builder/TableDefinition/transaction/guard/error types, two byte-slice tables (data/control), four fixed binary data keys61,6100,61FF,62 and one applied marker. Static keys/bounds remain borrowed. Values/keys are at most64 bytes; an owned seek copy checks length and cumulative<=8 copies BEFORE fallible reserve/copy, retains the old position until a replacement succeeds, and does not advance on failure. Bound slices may borrow that position; they are not a second caller-owned Vec. Engine bound copies and simultaneously live guards remain real additional owners. These fixed<=512 key-payload bytes exclude Vec metadata, allocator rounding, engine pages and process RSS.
+
+Select exactly these finite runtime observations using real redb:
+1. From ONE Table under ONE WriteTransaction, retain an actual point guard and range iterator concurrently and verify expected bytes/order. Opening the same table again while that handle lives must yield the specific TableAlreadyOpen error. Drop point/range/table through lexical scopes.
+2. Reopen the table and repeatedly seek from the last copied key in that SAME WriteTransaction, observing all four expected keys and true range end. Do not substitute a separate read snapshot or fabricate a self-contained Table+Range owner. No same-thread second begin_write while a writer lives: it blocks.
+3. Stage changes to BOTH data and control tables, explicitly abort, then use a fresh read transaction to verify both committed predecessors remain. Commit a second two-table change with explicit Durability::Immediate and verify both results under one read revision.
+4. Drop Database while a live WriteTransaction still holds ownership; reopening the same file must yield the specific DatabaseAlreadyOpen error. Complete/abort and drop that writer and all guards, then open the real file and verify the committed two-table result. Label this clean reopen/lock-lifetime evidence only.
+
+Use an explicit Builder cache size16MiB on BOTH create and every reopen; Database::open's default1GiB builder is outside this selected profile. The setting controls cache policy, not all engine/MVCC/native memory. The fixed tiny dataset has no scaling/load/throughput comparison, fault injector or mock transaction. The artifact's healthy commit/abort/clean-reopen facts are not crash/power-loss/uncertain-commit fencing, full coherent GroupApplyStore, public workflow or physical rollback parity. Root owns command execution and diagnostic logs; Writer owns the two handwritten consumer files; PERF/ARCH actual review proceeds normally. Ordinary function edits within the selected main need no helper-name consultation.
+
+Release only after Root records absence/inventory and the exact source profile; acquire/verify first, then author/run the consumer using the real engine. No missing-API TDD RED can honestly be claimed for an already implemented external library; record first build/runtime failures and their origins as they occur. Run offline compilation/execution, formatting and strict Clippy appropriate to this standalone package; retain exact commands/output and pristine before/after hashes. No additional full-workspace rerun is required when only temporary files/review notes change. Unexpected runtime/library error remains evidence, not authority to patch upstream or add a layer. This is native Darwin evidence only until separately executed elsewhere.
+
+Registry archive verification/adoption/security/source policy, complete driver one-gate/Fresh authority loading and true FIFO completeness, atomic workflow integration, uncertainty/fail-stop/reopen reconciliation, real kill/crash/disk/corruption tests, snapshots/membership and Linux remain mandatory later gates. Docker socket access/private-CI connector access are still unavailable. Direct archive web open failed and Chrome tooling attachment was profile-busy; neither is evidence that every acquisition route is impossible. The demonstrated primary Git route authorizes only this precisely named temporary batch.
+
+Exact imported relative inventory (common root above; mode bytes Git-SHA path):
+```
+100644 198 bba398c38775246326985db009e1245f19614679 .cargo/config.toml
+100644 240 02d3b4df8fe56d1ac6927a35ddac56b3f4308e51 .containerignore
+100644 106 a7a9f0ea9d35975c1395076a3f8953e84dc2dd91 .dockerignore
+100644 169 5e8de00847eb0ae33acb0b17f16b4fec33cf9c6e .editorconfig
+100644 8110 2a1263e94cf5d32942ea3b1d235cb9bbd630de6d .github/workflows/ci.yml
+100644 498 36a3a5a2bba900dc55023bb84c669982a544114a .gitignore
+100644 4620 bde88c438843da3b6b58127f77f34ee985be9412 AGENTS.md
+100644 50793 fcffd688b200b2cf47a986f47eff85f19a7a2b6a CHANGELOG.md
+100644 61 0b3c692c5f1185482c549960c108613e23c1024f CLAUDE.md
+100644 2982 d7b4d2e6ffc09db6d2859a59d040d543264d1f4e Cargo.toml
+100644 1141 9f19ec5d406fff9957c578f82aa08934fdd4939d Containerfile.sandbox
+100644 433 c7745832c580e9295b57cbf3c165be99f59b118e Dockerfile.bench
+100644 11357 261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64 LICENSE-APACHE
+100644 1061 8a77f0eb8a37871705073f3da916585001bda6c6 LICENSE-MIT
+100644 4849 4a1205295f2537a0342c8a1c56ba0756812980e3 README.md
+100644 968 2193e571f16eab718fa18e5b3765d833a35013a2 build.rs
+100644 51 1e7e4127a79604b0a9756193942d01b56beec01d clippy.toml
+100644 1127 577e9975544c6c5b84865ab44397d0e9d79b50e9 crates/redb-bench-compare/Cargo.toml
+100644 35985 1f684c8aaa5a4a7dfd6e189154091dfa15559ad4 crates/redb-bench-compare/benches/common/mod.rs
+100644 3067 0eec9be4da3415bd7ac97f1ec5bcd09a01bcfc6e crates/redb-bench-compare/benches/int_benchmark.rs
+100644 3687 42cd44dbe783e5d324558e33e27f3aa74fd45187 crates/redb-bench-compare/benches/large_values_benchmark.rs
+100644 3261 44e779599d7b4a5e8dde7fceac3f21c22e811c41 crates/redb-bench-compare/benches/lmdb_benchmark.rs
+100644 16167 c2d31784c5be7f2a7c58fd9dac49cda2f0852b51 crates/redb-bench-compare/benches/syscall_benchmark.rs
+100644 1 8b137891791fe96927ad78e64b0aad7bded08bdc crates/redb-bench-compare/src/lib.rs
+100644 1004 adaf3edb54790e5299b776ad2bd40cbef69c3af0 crates/redb-bench/Cargo.toml
+100644 3626 f72e3892cc753c2ecb4673044b8b4367d335dc4c crates/redb-bench/benches/atomics_benchmark.rs
+100644 2602 7d97e60fdcbf2bafbb3b794b161c3a12f22e3a88 crates/redb-bench/benches/multithreaded_insert_benchmark.rs
+100644 807 25b6d3fed99b178853a3da38662b95f979762a3b crates/redb-bench/benches/redb_benchmark.rs
+100644 3831 b3105b4d66e89e9bb2fb10cb58f2835f20d07575 crates/redb-bench/benches/savepoint_benchmark.rs
+100644 22996 eed6790687ba90edd15286fbba7a8d844e3ac9ab crates/redb-bench/benches/userspace_cache_benchmark.rs
+100644 40357 d5affde159fb678961b459d7b26951bf25454009 crates/redb-bench/src/lib.rs
+100644 431 2e4fc292fdd81c9d1b162cad86d070d777423367 crates/redb-derive-rename-test/Cargo.toml
+100644 163 f8e96a8690bd617a43092dd571d2ffd585eb91f3 crates/redb-derive-rename-test/src/lib.rs
+100644 1196 06b78a1a5ac02bb01d532452e959cd2ffeade01b crates/redb-derive-rename-test/tests/rename_test.rs
+100644 781 2f300dab99bf819032b28abe357e35445b083ee9 crates/redb-derive/Cargo.toml
+100644 21970 43451d5c8443fb07d00de92d1758df520ef0cd8f crates/redb-derive/src/lib.rs
+100644 4799 5a6afd1f81718c9b074bab4f4dc358266280ad09 crates/redb-derive/tests/crate_attr_tests.rs
+100644 22837 9e1752fb21a164bfaeed98e8cc7a0fd7ba527cfd crates/redb-derive/tests/derive_tests.rs
+100644 9 b83d22266ac8aa2f8df2edef68082c789727841d crates/redb-no-std-test/.gitignore
+100644 322 0fcfa405f5c1263cdededaaf8640b91936cb1b6a crates/redb-no-std-test/Cargo.toml
+100644 902 8227f7846e93cb48c8209e243f93eeb6e1deea65 crates/redb-no-std-test/src/main.rs
+100644 528 38a8eef9e32e1b7a3426b2d117b955b21ff854a0 crates/redb-python/Cargo.toml
+100644 71 dace4a9ba9f8307ce41f599c8ed41059896ec705 crates/redb-python/build.rs
+100755 396 5f505bbe31e3e96aed5d001a060e68ea8567add3 crates/redb-python/py_publish.sh
+100644 649 c02a375674b302f080dd045f2deff52475239ee9 crates/redb-python/pyproject.toml
+100644 1120 4cacecfe114276557cbff9c5553021550bc3fb76 crates/redb-python/src/database.rs
+100644 4558 d9544715a21c5e5b1bbae5ed1bdd81432afff551 crates/redb-python/src/error.rs
+100644 712 1e0c3414c2107f30568d68854a225c3f16c6bf21 crates/redb-python/src/lib.rs
+100644 3495 b4dbb76835b707ed2034dd7435daa972822e59f8 crates/redb-python/src/transaction.rs
+100644 169 910335d8f1810bd17ebf0466b85dff05b481a4d6 crates/redb-python/test/conftest.py
+100644 2137 a0bc035c065ad5c30c5c22ee781bbb44604579da crates/redb-python/test/test_database_create.py
+100644 1671 9fe191be306860bc3c78fdade4e10808fcc9cf72 crates/redb-python/test/test_multiprocess.py
+100644 818 be2cf047ce2b24c784446b06da2f3c8e068d423d crates/redb-python/test/test_properties.py
+100644 57 5c308e7de293fff09ced5d0dffcca1fd389d44fd crates/redb-python/test/test_smoke.py
+100644 3767 47bf94c1d54c3cd029bffd218c2808724ef24cde crates/redb-python/test/test_transactions.py
+100644 6346 3b5da4284311b7507b9a5295f6041cd0ce208dfb deny.toml
+100644 39892 7bd3c54993e80376152c611b5116dea9392f0cc7 docs/design.md
+100644 791 28a287bbea9b13f5d85a084f0b6a3bfe14fb06f9 examples/derive_value_impl.rs
+100644 570 a4bdf621da539632d47d8c2532c44df3e4287afc examples/int_keys.rs
+100644 3085 062c1591684138e482301768f1d58ddfe1af72b8 examples/multithread.rs
+100644 3846 6b1b27205514eb956e6816033132544fb801566a examples/special_values.rs
+100644 34 020fcd6f37880084f5c21463d0a5a38f30d7de75 fuzz/.gitignore
+100644 552 5ffe59a2616bb6e2ea3e645eaf94db67cac8cd1b fuzz/Cargo.toml
+100644 6178 7c8aecac0c7302dd8d474cae754853ad7fb360da fuzz/fuzz_targets/common.rs
+100644 48093 765eddab464c65d9996e090025ea319e8436efeb fuzz/fuzz_targets/fuzz_redb.rs
+100644 4905 ae38ff7cce7c1a7d346614107f95d1827d09cd5f justfile
+100644 5 e87fb34ea9fee973619b09182cc7c87ecee9e521 rust-toolchain
+100644 16 758d4179d759bdff87d4fe714d55b588f71583e8 rustfmt.toml
+100755 1282 1d4d05919a03c86bf1567e53fa97135ff0f0bee1 scripts/podman-sandbox.sh
+100644 123 34639a6c5444648780ec87491159f1602d9a3897 src/backends.rs
+100644 2879 50441289a0e0fa2e159c2d90b7c4428ec82c8183 src/complex_types.rs
+100644 171330 a6a38767ca5cd18da82c98239561efe93bdf0467 src/db.rs
+100644 30260 dd8234a18e93fdcbff3638155ca3a5c0764299d0 src/error.rs
+100644 3333 6229e5fff668796b01e7f046963e8a9c7f168c9d src/io.rs
+100644 2091 e55f45f125b0ec5111fc887fa3e1fe25a51fb94d src/key_range.rs
+100644 3995 9f39f5ec220e23d7f6836dce76f7a132cc54d52c src/legacy_types.rs
+100644 5649 8101a9b881eb2484739e7509ed843652f9bf1b09 src/lib.rs
+100644 50028 3cdaf524a2ea3de78115c92706845b3fe2df7ea0 src/multimap_table.rs
+100644 540 7dcbf17a29b6078d2e25ceea6eb992cf9794a00d src/sealed.rs
+100644 14558 8e83e4796dc4984f415ec3c5384c05d9e4e0e037 src/sync.rs
+100644 69512 8cb910f0d5b9fb01347e2d5c7978d82aa54dd9ef src/table.rs
+100644 27292 c247bdc9afaba2f1f0419f7eacd4ec90aa11fb37 src/transaction_tracker.rs
+100644 130291 3b9056a0b164484b515685ebed5f33f155d08633 src/transactions.rs
+100644 50928 318adebaa4b313efe3e1fff594ed5a9de0c98b4d src/tree_store/btree.rs
+100644 89836 8c91938a9a9366a5d0ca755562b8abaad214e858 src/tree_store/btree_base.rs
+100644 116997 1e5d81fc9074c74da748b49dc57ded79f5709779 src/tree_store/btree_cursor.rs
+100644 8439 c4973a6dfe7a64e410b8531b092e5fc7196fc78a src/tree_store/btree_cursor_range.rs
+100644 3793 bd6d9956c10332ab7ae5958219b212ba2d7cbd9b src/tree_store/btree_iters.rs
+100644 84833 5544c18c03edc7d809e306f237f199c1607c8cad src/tree_store/btree_mutator.rs
+100644 6799 cf0272cb1a185ed8e8d346ecdb75044b99937a62 src/tree_store/extract_if.rs
+100644 1533 013e1a993a85661430c44725b624984a1abb3b3f src/tree_store/mod.rs
+100644 21333 f7732ac14f6899e59f571ff01284aeb0f7ce91cc src/tree_store/multimap_btree.rs
+100644 4394 223523c57f95fbef146afd04379a1abda521f025 src/tree_store/page_store/active_transactions.rs
+100644 6640 68cc5cc9932497ac0367cd1994aa0c3487da99b3 src/tree_store/page_store/backends.rs
+100644 14695 671c1ce52e7cd2b4fee24288e8f73a386341f36b src/tree_store/page_store/base.rs
+100644 17248 1ced65d983707abb43d9b1e646748c1ff3f918ad src/tree_store/page_store/bitmap.rs
+100644 20555 f41540046356e4557cc54ac8a2933950b884e088 src/tree_store/page_store/buddy_allocator.rs
+100644 55293 e24a44f9dbe55fbf5d65aed5bc2d7bf8bdd5e37d src/tree_store/page_store/cached_file.rs
+100644 2869 70cf6de9d8dfe1cc94ce930a261612ad17fa7e47 src/tree_store/page_store/fast_hash.rs
+100644 3866 8b3175692a6f4eb1a33a3f342f626b70460ab0c3 src/tree_store/page_store/file_backend/fallback.rs
+100644 449 081c66d5848adc829e45f29be4b3c85b9d90e4d7 src/tree_store/page_store/file_backend/mod.rs
+100644 38792 1030fa138ed7daf8628facdd1cd23477a536017b src/tree_store/page_store/file_backend/optimized.rs
+100644 16347 b3d90ede75c0f9d4ed9cd9b81556ce3c116dac36 src/tree_store/page_store/file_backend/range_lock.rs
+100644 68749 5a45cb6a9023a69406a01f1e597ff14b4d351891 src/tree_store/page_store/header.rs
+100644 8105 aa23bb7cc31924ef472a2b727f32cc003f0e5fb8 src/tree_store/page_store/layout.rs
+100644 7339 3531d27b66cc3150925ef21b0cbd7d3c18eda3e4 src/tree_store/page_store/lru_cache.rs
+100644 1100 8af5705c45a75a3e55a7af6a4d363827e8c33980 src/tree_store/page_store/mod.rs
+100644 141483 4a5e30d44595eeec71e1c4f69a7e530c013d0135 src/tree_store/page_store/page_manager.rs
+100644 7613 e75c4296e2eba81c1060094d5527c3c866f74bec src/tree_store/page_store/region.rs
+100644 8635 750c2206aa1e1068f53cda7c93025a3de6801386 src/tree_store/page_store/savepoint.rs
+100644 27630 5fa1a0b553d4a923b01d24152d5d73310d3d9402 src/tree_store/page_store/xxh3.rs
+100644 30014 4eff5182b11e6e52f7ca0725b2832cbe302edbc6 src/tree_store/table_tree.rs
+100644 16948 74543c47d0c39cdec14c0ce1e7432d891a03ef44 src/tree_store/table_tree_base.rs
+100644 28733 b798fece98c7361a2cf213d8a69389490241ff0e src/tuple_types.rs
+100644 76055 47dcd877e428e47fea44cc95b23da5c78dc3b8ae src/types.rs
+100644 19224 76c12fb6d9f95a523bdc8365136d4c714c89ad6c src/types/chrono_v0_4.rs
+100644 2047 661593cd6e14ca79bad2a653b813477fc6cd5fbc src/types/uuid.rs
+100644 8185 690db550af3e582bcfad803ec84ba746d71cb342 tests/abort_tests.rs
+100644 18216 ebd5d1eccb9edce858770c4558bce279cfb2fc13 tests/backward_compatibility.rs
+100644 151145 74adfe31d2b79cc46efa6ee301ae03ced2b8fee5 tests/basic_tests.rs
+100644 2936 ac6b317728af8140aa4a69d2c4c2b885ba631bdb tests/borrow_markers.rs
+100644 4400 4b7d5fa2d697c2635efa1c70b7ba6ea1d87ddb7e tests/check_integrity_failure.rs
+100644 11332 782c37607c90e981e562bab865f73f5a3f34e71d tests/check_integrity_nondurable.rs
+100644 11695 ef27dae339db2f6041dd66c63aa36186bbcb0165 tests/corrupted_btree_descent.rs
+100644 6106 a828626db564b264d5a59cba75a2afb07a82f9e1 tests/crash_consistency.rs
+100644 44449 d8fce4e337c60ba6b3e8c27db9cd57ebabeaf49a tests/cursor_tests.rs
+100644 169403 e054f311ade174d4973498d87743e551ef9560bb tests/integration_tests.rs
+100644 26737 814ab06a73df02c0a0845f008d1ed081c7ba7ad2 tests/multimap_tests.rs
+100644 38449 41d2d5b93c3443f02e6cd9207cca2d947dc02584 tests/multiprocess_tests.rs
+100644 7009 573ac4cf2de50aa9421d2c7196dbfea27d556df1 tests/multithreading_tests.rs
+100644 7909 2d4ed5302e46b8a454576a5e701ab4db03d5ff4c tests/niche_tests.rs
+```
+
+## ARCH-NEXT-M2-REDB44-GIT-SPIKE1-READINESS-REVIEW1
+
+I actually whole-read/hash-verified Writer's entire5,273-byte readiness at3,348,616/6b29c9ae26bee9f7750b32deae46366487b6d6d05c21d381ffc4ec36308eff81 and PERF's entire3,583-byte readiness at1,698,834/431126e9f699c1780e7d9cd21a872d766f53753d9ea6d44973c81f3c42ea83a3 in4db412. Both agree with the final16MiB create/reopen profile, isolated default-std consumer, real same-table/same-write ownership and bounded position overlap. No timing/crash/adoption claim is selected. Root whole-read CREATE3a99b1, independently matched inventory/absence57d80e and released5b72be. Snapshot acquisition/verification precedes the Writer handoff; ordinary reciprocal review adds no further authoring/run gate.
+
+## ARCH-NEXT-M2-REDB44-GIT-SPIKE1-LINT-INHERITANCE1
+
+SELECT Root's narrow clarification within the already selected temporary Cargo.toml: add package [lints] workspace=true and copy the product's exact [workspace.lints.rust], [workspace.lints.rustdoc] and [workspace.lints.clippy] tables into that isolated workspace. The implementation-plan requires first-party inheritance metadata; passing equivalent CLI lint flags did not create an exemption. Dependency/features/lock, source bodies, cases and profile bounds remain unchanged. Writer remains manifest owner unless explicitly handed off. Appropriate standalone checks follow; no new artifact/model, missing-API RED claim or extra acknowledgement gate. Production adoption remains separate.
+
+## ARCH-NEXT-M2-REDB44-GIT-SPIKE1-WRITTEN1
+
+The selected temporary experiment is complete, with no remaining source/resource defect. I actually whole-read the manifest/main in885c04, the13-line copy supplement and the trait/style deltas, and independently verified the acquired source in99f31d: all131 actual files/2,444,474 bytes/modes, no extras/symlinks and all34 reconstructed Git trees match77441c23f8807fc79b313375656c4db5b8ed5b82/inventory25318e9c. My post-command b3f05f again rereads every blob/mode unchanged; Root's terminal075234/a6065f verifies every tree/no extra path after commands. This is primary Git-content integrity, not an unsigned-commit signature or the registry archive.
+
+Final consumer bindings are Cargo.toml806B/37LF/6d5c7451b4c17340ec7ac0cf3fcc3a59000ce03407d6931e92d3e5e65eba8c52, main5936B/165LF/bfde65ba31ef26a0f2dfa402d89d88bf13de3b4c3c5f288fe124383b8a70f2b3 and lock461B/80746ddf6abb6e5f2367dc79537fff06a20e43ab0de8566277977c3f7b04eb41. The actual isolated graph is only consumer→path redb4.4.0→registry libc0.2.190/checksum ce5d3ddc6d3fa000eb1536d85e147bfe31aacaba692ed6a876f95cb7c855be78. No upstream normalization, optional framework feature or product dependency was introduced. Package lint inheritance now matches the product's exact three tables; 806941 checks parsed equality and232b78 exact table text/initial-manifest prefix. Main/lock stayed unchanged through that clarification.
+
+The real code keeps point/range guards on the SAME Table/WriteTransaction, observes specific TableAlreadyOpen, drops handles lexically, and reopens/reseeks inside that same writer. A copied lower bound remains owned through checked/fallible replacement, then changes after engine handles drop. All four expected binary keys and true end are observed. Copy65 refuses before reserve/count progress; four extra1B successes reach8; the next refusal preserves count/position/seen. Both tables progress0→abort7→Immediate8 with coherent read checks. A writer survives Database drop and keeps the real file lock; specific DatabaseAlreadyOpen is observed before writer abort/release and16MiB Builder reopen checks both committed results. All Builder paths use16MiB. These are bounded helper/healthy-engine facts, not a production cursor tariff, native RSS/latency result or fault injection.
+
+Chronology remains honest: Root's pristine upstream29cf20 fails before compilation on unavailable redb2_6 development resolution. The isolated first check compiles libc/redb then finds only two consumer E0599 for omitted ReadableDatabase; the import-only fix passes2ed760. First runtimeca1703 passes every assertion. Strict53f9be then finds only two lifetime annotations, a local name and crate docs. Independent b3f05f/232b78 recover the entire first-runtime163/5bc5f7ba, then pre-build160/4fbc0a56; e1106d removes only the earlier13-line supplement to recover initial147/1dc68749. No engine operand/assertion changed. Final strictc43c84, direct-main formatda1536 and runtime79528b all EXIT0; the later metadata-only inherited-policy check2c3bae also EXIT0 with pristinea6065f. These are Root executions on macOS26.6.2 arm64, not mine; no missing-API TDD, Linux or crash/power-loss/uncertainty proof is claimed.
+
+I actually whole-read/hash-verified PERF's entire3,899-byte finding at1,703,562/d11a11d0d42fa7fb95e853c5135534a5fbdf1dd5726f6ef32127dcd29bfe9b24 in7a047a and Writer's entire3,918-byte receipt at3,353,889/ecf9fc5c1c332ca11d12d014aa11adc11cf51ab4cf940b533333014682d3db9e in5d19a8. Both agree, with their earlier pending/final-metadata epochs distinguished. Root owns all commands/logs; I authored no consumer/upstream source or Cargo execution. Ordinary reciprocal review adds no further gate. The current product remains b14a45a with review/status prose changes only.
+
+## ARCH-NEXT-M2-REDB44-ADOPTION-READINESS2
+
+READ-ONLY successor recommendation; no new artifact/API/dependency is selected here. The Git experiment removes the acquisition-only feasibility limit for that exact local profile. It does not satisfy production source policy: current deny.toml denies unknown Git, allows no Git URL and permits the crates.io registry. Prefer an explicitly pinned registry redb4.4.0/std-only candidate for the storage-owned experimental adapter once the official crate bytes/checksum39178e0a867f9e3eaa6292a4ab1dd3613f2519c5b564341e1e7b29b270736cc4 are acquired/verified and its actual normalized manifest/closure reviewed. The Git snapshot/path lock is not that archive or source audit. A Git/vendor production alternative would require an explicit ADR/source-policy/ownership selection, not reuse of this temporary path or a wildcard exemption.
+
+The new graph must receive its own license/advisory/bans/source review; the product's earlier cached audit did not include this engine. MIT/Apache candidate metadata fits the current allowlist, but all actual default/dev/build/target dependencies still require checking with the chosen profile. State the advisory DB date/revision and fresh-versus-cached outcome honestly; shell DNS remains a fresh-refresh limitation. Declared redb MSRV1.90 fits installed/product1.99 and this actual build; it is no native Linux or lowest-MSRV test. The implementation-plan's joint engine/Raft, crash/snapshot/license/security gates precede a production recommendation. Assess the existing exact OpenRaft0.9.25/storage-v2 candidate and complete cached profile with consensus-owned wrappers; no automatic upgrade or direct Raft dependency in storage/domain follows.
+
+The smallest substantive adapter proposal must include the two actual prerequisite seams alongside the real transaction implementation. I reread GroupApplyTransaction inbf76d8 and record::validate/decode_record in6723f0: record()/outcome() owe prospective512+ALL returned variable bytes before copying; record decoding currently binds group/recovery but returns tenant/partition/id. Reuse/refactor the existing borrowed scanner to check the COMPLETE expected point identity and exact owner sum before ownership, without duplicate grammar or clone-then-charge. Wrong stored identities are Corrupt, never absent/business rejections. Include engine bound copies, old/new positions and pages separately from the completed logical tariff.
+
+Also factor the existing record-batch verify/gate/Fresh join so the real driver opens one authoritative writer, reads control/retained outcome, invokes ONE gate, and only Fresh loads bounded current records/policies and authentic lane ranges under that SAME guard. Replay must bypass those guards; do not gate twice, clone a whole group or present a partial IndexedGroupView as complete lanes. Compare the exact durable predecessor/affected versions and publish accepted/rejected/replay effects atomically, with group/recovery-global control and tenant-bound rows. These seams belong in ONE concrete real-adapter proposal, not another independent pure layer or fake-store guarantee.
+
+Real uncertain-error fencing/reopen reconciliation, same-index recovery visibility, crash/disk/corruption boundaries, snapshot/membership and both native OS remain required. The selected healthy engine experiment cannot close M2. A proposed matched cursor comparison may inform the physical seek strategy after its own finite selection; no benchmark is selected or measured by this readiness finding. Root's inaccessible Docker/private-CI paths remain external Linux limitations.

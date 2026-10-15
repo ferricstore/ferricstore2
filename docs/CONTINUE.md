@@ -18,9 +18,14 @@ repairs preserve all frozen operands. The wrapper exits 1 solely because DNS
 blocks the default advisory refresh; a separate cached October 14 audit passes
 all four categories. Ledger counts remain 77/87/326, with no new parity credit.
 Engine adoption, actual atomicity/recovery, native Linux and full M1–M8 completion
-remain open. The next read-only proposal evaluates acquiring the exact redb 4.4
-Git snapshot through the public connector for an isolated real-engine spike;
-this is not the registry archive/checksum or a production dependency selection.
+remain open. The exact redb 4.4 Git-source experiment now passes offline compilation,
+strict lint and real guard/range/reseek, two-table abort/Immediate commit,
+writer-lock and clean reopen assertions on macOS 26.6.2 arm64. All 131 upstream
+files and 34 Git tree objects remain pristine. The first consumer import and
+four lint failures are recorded with unchanged operands. This temporary profile
+is not a registry archive/checksum, dependency adoption, GroupApplyStore adapter,
+crash/uncertainty, performance or native Linux result. Next: review the adoption
+profile and bounded driver/reader requirements before a concrete adapter proposal.
 
 The preceding reviewed M2 prerequisite implements neutral group transaction traits,
 validated change projections and versioned control/record/outcome codecs in five
