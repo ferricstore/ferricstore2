@@ -301,6 +301,34 @@ Encode validates and measures before one fallible output reservation. Existing
 typed identity conversions retain their allocation behavior. Independent
 literal vectors and contract doubles establish only these represented duties.
 Engine adoption, real coherent transactions, uncertain-commit fencing/reopen
-reconciliation, physical history/index formats, snapshots and native crash
+reconciliation, physical history/index integration, snapshots and native crash
 testing on Linux and macOS remain required. KnownAborted requires proof of an
 unchanged durable predecessor; Uncertain never authorizes blind retry.
+
+## Physical keys and full history values
+
+ARCH-NEXT-M2-PHYSICAL-FORMATS1-CREATE1 selects pure codecs under storage state,
+without selecting an engine. FWPK/version1 separates control, records, outcomes,
+due, FIFO and history families. Each opaque component escapes NUL as 00FF and
+ends with 0000, preserving binary order and component boundaries. Control binds
+group/recovery; other families also bind tenant. Due suffixes preserve inverse
+priority, u64 time, ID, partition, state and type. FIFO suffixes preserve lane,
+running/queued score, full u128 sequence and ID. History suffixes preserve numeric
+event milliseconds followed by the original event ID: equal-time 100-10 precedes
+100-2. Canonical unsigned-u64 event IDs are distinct from public cursor limits;
+their version must match the value, while occurred_at remains independent.
+
+Decoded ordered keys validate complete framing and expected namespace/selector,
+then admit 128 plus raw owned component bytes before one fallible raw-buffer
+reservation. The fixed 128 is a logical tariff, not native layout or spare buffer
+capacity. Prefixes do not certify complete lanes or authentic range ends. Later
+adapters must separately admit encoded seeks, engine bound copies, retained old
+positions and old/new overlap within the same authoritative write transaction.
+
+FWSH/version1 preserves full HistoryEntry and optional retry audit, including
+absent versus present-empty bytes, both decisions and four backoff kinds. Its
+wire cap is explicit and positive. Full borrowed framing/EOF, namespace,
+canonical event ID/version and existing retry-policy validation precede copies.
+The record codec remains the single event-tag authority. These formats supply no
+legacy disk compatibility, public history query, source scenario completion,
+physical atomicity or Linux/macOS crash evidence.

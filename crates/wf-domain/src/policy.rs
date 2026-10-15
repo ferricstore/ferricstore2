@@ -133,7 +133,11 @@ impl RetryOverride {
     }
 }
 
-fn validate_retry(
+/// Validates borrowed retry fields without constructing or copying an override.
+///
+/// # Errors
+/// Rejects the same out-of-range fields and invalid exhaustion targets as input.
+pub fn validate_retry(
     max_retries: Option<u16>,
     backoff: Option<Backoff>,
     exhausted_to: Option<&[u8]>,

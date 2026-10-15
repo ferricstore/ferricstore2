@@ -1,14 +1,16 @@
-//! Closed core/checkpoint/batch5 values; no engine or durability is implemented.
+//! Versioned core/checkpoint/history/batch5 values; no engine or durability.
 
 use std::fmt;
 
 use wf_ports::log::CodecError;
 
 mod control;
+mod history;
 mod outcome;
 mod record;
 
 pub use control::{decode_control, encode_control};
+pub use history::{decode_history, encode_history};
 pub use outcome::{decode_outcome, encode_outcome};
 pub use record::{decode_record, encode_record};
 
@@ -23,11 +25,11 @@ pub enum StateValueError {
     Malformed,
     /// Checked sizes cannot fit the host or explicit wire width.
     LengthOverflow,
-    /// The actual complete wire value exceeds its explicit caller cap.
+    /// Encoded bytes or decoded logical bytes exceed their explicit caller cap.
     Limit {
-        /// Actual measured wire bytes.
+        /// Actual bytes in the unit of the exceeded encoded or logical cap.
         bytes: usize,
-        /// Explicit maximum wire bytes.
+        /// Explicit maximum in the same unit as `bytes`.
         maximum: usize,
     },
     /// A newly introduced fallible variable reservation failed.
@@ -212,4 +214,30 @@ pub(super) fn put_raw(output: &mut Vec<u8>, bytes: &[u8]) -> Result<(), StateVal
     );
     output.extend_from_slice(bytes);
     Ok(())
+}
+
+pub(super) fn canonical_history_position(bytes: &[u8]) -> Result<(u64, u64), StateValueError> {
+    let separator = bytes
+        .iter()
+        .position(|byte| *byte == b'-')
+        .ok_or(StateValueError::InvalidValue)?;
+    Ok((
+        canonical_integer(&bytes[..separator])?,
+        canonical_integer(&bytes[separator + 1..])?,
+    ))
+}
+
+fn canonical_integer(bytes: &[u8]) -> Result<u64, StateValueError> {
+    if bytes.is_empty() || (bytes.len() > 1 && bytes[0] == b'0') {
+        return Err(StateValueError::InvalidValue);
+    }
+    bytes.iter().try_fold(0_u64, |value, byte| {
+        if !byte.is_ascii_digit() {
+            return Err(StateValueError::InvalidValue);
+        }
+        value
+            .checked_mul(10)
+            .and_then(|value| value.checked_add(u64::from(byte - b'0')))
+            .ok_or(StateValueError::InvalidValue)
+    })
 }

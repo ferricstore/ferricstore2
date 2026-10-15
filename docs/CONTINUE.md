@@ -5,7 +5,24 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest reviewed M2 prerequisite implements neutral group transaction traits,
+The current M2 increment adds pure physical point/ordered keys and full history
+values under the named architecture selection. All seven new behavior tests and
+six older value tests pass their first assertion execution after independently
+reproduced missing-API RED. Independent byte vectors preserve full FIFO u128,
+binary component order, original history IDs and distinct committed event time.
+The final macOS wrapper passes 637 Rust tests across 73 targets plus six
+compile-fail docs, with zero warnings/failures/ignored tests. Formatting,
+compilation, strict Clippy, rustdoc, architecture and reference/progress checks
+pass on 1,152 unchanged inputs. Four earlier lint findings remain recorded; their
+repairs preserve all frozen operands. The wrapper exits 1 solely because DNS
+blocks the default advisory refresh; a separate cached October 14 audit passes
+all four categories. Ledger counts remain 77/87/326, with no new parity credit.
+Engine adoption, actual atomicity/recovery, native Linux and full M1–M8 completion
+remain open. The next read-only proposal evaluates acquiring the exact redb 4.4
+Git snapshot through the public connector for an isolated real-engine spike;
+this is not the registry archive/checksum or a production dependency selection.
+
+The preceding reviewed M2 prerequisite implements neutral group transaction traits,
 validated change projections and versioned control/record/outcome codecs in five
 production files. Nine frozen behavior tests pass on their first assertion run
 after missing-API RED independently reproduced by Root. Independent literal

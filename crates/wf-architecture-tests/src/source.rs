@@ -117,7 +117,9 @@ impl Inspector<'_, '_> {
             && (matches!(self.context.package, "wf-types" | "wf-domain" | "wf-wire")
                 || (self.context.package == "wf-storage"
                     && (self.module == "state::value"
-                        || self.module.starts_with("state::value::")))
+                        || self.module.starts_with("state::value::")
+                        || self.module == "state::key"
+                        || self.module.starts_with("state::key::")))
                 || (self.context.package == "wf-ports"
                     && self.module == "log::record_batch::response"))
     }

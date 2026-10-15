@@ -157,3 +157,9 @@ mutations reject wire-to-ports/storage and storage-to-consensus edges; client
 facade fixtures reject the new server capability and response helper exports.
 These checks add no dependency or size exemptions and supply no indirect-call
 effect proof. Borrow safety additionally requires compiler-backed trait docs.
+
+ARCH-NEXT-M2-PHYSICAL-FORMATS1-CREATE1 extends the same pure rule to exact
+`wf-storage::state::key` and its descendants. Existing tests cover point/ordered
+paths, nested descendants, filesystem reexports and neighboring effectful key
+modules. The new history child inherits the existing value rule. No broader
+storage purity rule, file/function limit exemption or dependency edge is added.

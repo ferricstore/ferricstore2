@@ -1,5 +1,6 @@
 //! State boundary for `wf-storage`.
 //!
-//! Pure persisted values; physical transactions remain an adapter obligation.
+//! Pure persisted keys and values; physical transactions remain an adapter duty.
 
+pub mod key;
 pub mod value;

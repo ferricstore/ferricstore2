@@ -7,6 +7,11 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::value::control"),
         ("wf-storage", "state::value::record"),
         ("wf-storage", "state::value::outcome"),
+        ("wf-storage", "state::value::history"),
+        ("wf-storage", "state::key"),
+        ("wf-storage", "state::key::point"),
+        ("wf-storage", "state::key::ordered"),
+        ("wf-storage", "state::key::ordered::nested"),
         ("wf-ports", "log::record_batch::response"),
     ] {
         assert_eq!(
@@ -19,6 +24,7 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         );
         for (source, diagnosis) in [
             ("use std::fs;", "standard-library module"),
+            ("pub use std::fs as exported;", "standard-library module"),
             (
                 "use std as hidden; use hidden::env;",
                 "standard-library module",
@@ -51,6 +57,8 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         ("wf-ports", "state::transaction"),
         ("wf-storage", "transaction"),
         ("wf-storage", "state::value_backend"),
+        ("wf-storage", "state::key_backend"),
+        ("wf-storage", "state::keyed"),
         ("wf-ports", "log::record_batch::response_backend"),
     ] {
         assert_eq!(

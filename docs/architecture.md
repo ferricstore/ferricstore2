@@ -876,3 +876,28 @@ for cumulative admission, ownership and remaining durability requirements.
 This selects no storage engine, dependency, runtime driver, policy/membership
 persistence or snapshot implementation. Contract doubles and codec vectors do
 not establish real transaction completeness, durability or native OS acceptance.
+
+## Physical keys and history encoding
+
+The next reviewed M2 prerequisite groups pure physical key codecs under
+`wf-storage::state::key`, with private point and ordered children, and full
+history values under the private `state::value::history` child. The fourteen
+functions use existing typed scopes, IDs, DueOrder, LaneKey/LaneOrder and
+HistoryEntry. One private-field DecodedOrderedKey owns a packed component buffer;
+its getters borrow that owner after the encoded input is released. It carries no
+authority flag, backend guard or public constructor.
+
+FWPK/version1 binds group/recovery and, for tenant families, tenant. Escaped
+components preserve binary boundaries; due and FIFO bytes preserve domain order,
+including the full u128 FIFO sequence. History compares numeric event-ID time
+then original binary event ID, independently of occurred_at. FWSH/version1 stores
+the complete history snapshot and retry audit using the existing event-tag and
+retry-validation authorities. Borrowed validation precedes owned copies.
+
+Encoded caps and decoded logical caps remain distinct. The decoded key tariff is
+128 plus actual owned component bytes, with only the raw sum reserved in its
+buffer. Engine range-bound copies, retained encoded seeks and overlapping old/new
+positions require separate admission later. Canonical prefixes grant no lane
+completeness proof. See [ADR004](adr/004-committed-time-and-apply-admission.md#physical-keys-and-full-history-values).
+The engine, atomic publication/recovery, public query composition, complete source
+and profile coverage, and native Linux/macOS acceptance remain separate work.

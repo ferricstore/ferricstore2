@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod control;
+mod history;
 mod outcome;
 mod record;
 

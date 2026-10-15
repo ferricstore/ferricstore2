@@ -137,8 +137,14 @@ impl<'a> LaneOrder<'a> {
 
     /// Borrows the actual member-key identity for pre-comparison admission.
     #[must_use]
-    pub(crate) fn id(self) -> &'a [u8] {
+    pub fn id(self) -> &'a [u8] {
         self.id
+    }
+
+    /// Returns the exact committed logical-state entry sequence.
+    #[must_use]
+    pub const fn sequence(self) -> u128 {
+        self.sequence
     }
 
     /// Returns the source running (-1) or queued (0) lane score.

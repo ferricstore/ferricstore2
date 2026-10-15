@@ -127,14 +127,18 @@ fn put_record(output: &mut Vec<u8>, record: &WorkflowRecord) -> Result<(), State
         put_optional(output, value)?;
     }
     let (kind, version, fence) = record.latest_event_witness();
+    output.push(event_tag(kind)?);
+    output.extend_from_slice(&version.to_be_bytes());
+    output.extend_from_slice(&fence.get().to_be_bytes());
+    Ok(())
+}
+
+pub(super) fn event_tag(kind: EventKind) -> Result<u8, StateValueError> {
     let tag = EVENTS
         .iter()
         .position(|event| *event == kind)
         .ok_or(StateValueError::InvalidValue)?;
-    output.push(u8::try_from(tag).map_err(|_| StateValueError::LengthOverflow)?);
-    output.extend_from_slice(&version.to_be_bytes());
-    output.extend_from_slice(&fence.get().to_be_bytes());
-    Ok(())
+    u8::try_from(tag).map_err(|_| StateValueError::LengthOverflow)
 }
 
 fn put_optional(output: &mut Vec<u8>, bytes: Option<&[u8]>) -> Result<(), StateValueError> {
@@ -164,7 +168,7 @@ fn optional_time(bytes: &[u8], offset: &mut usize) -> Result<Option<u64>, StateV
     }
 }
 
-fn event(tag: u8) -> Result<EventKind, StateValueError> {
+pub(super) fn event(tag: u8) -> Result<EventKind, StateValueError> {
     EVENTS
         .get(usize::from(tag))
         .copied()
