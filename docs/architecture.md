@@ -655,3 +655,26 @@ The private checker child is approved to move from `original_current.rs` to
 checks. The parent changes only its module name and stays within 600 lines.
 Original full-flow/state option order, public/physical operations, complete
 runtime profiles and independent Linux/macOS acceptance remain required.
+
+
+## Selected original retention input normalization
+
+A-NEXT-M1-POLICY-RETENTION-INGRESS1-CREATE1 selects one private
+`complete/retention_input.rs` and two children of the existing policy test target.
+The optional normalizer reuses the existing borrowed retry-value vocabulary and
+Copy retention override, with one four-variant caller diagnosis and a separate
+exact-body encoder. Tests-first authoring is selected; implementation and actual
+source review remain pending. No dependency or module-rule exception is added.
+
+The existing private selector widens only to `policy::complete` and is reexported
+only to its parent; its body and old retry fees remain unchanged. Retention owns
+its three-name preflight and preserves TTL, internal hot-key membership, then
+history validation against the original captured limit. Missing fields stay
+missing. The scalar result needs no output allocation; only the separate body
+encoder reserves one Vec. Captured limits are immutable mathematical inputs,
+with no environment read, full-default merge, Fresh or installation authority.
+
+Visible descriptor bounds and prospective work preserve one received account;
+logical scratch does not measure native allocation, stack, memory or speed.
+Whole-flow raw order, ETF sizing/emission, public/atomic physical publication,
+complete runtime profiles and independent Linux/macOS execution remain required.

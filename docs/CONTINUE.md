@@ -5,8 +5,8 @@ increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 The latest whole-workspace macOS run passes 532 Rust tests and four compile-fail
-doc tests. The reviewed original-current Replace checkpoint is `2759262`, following
-the reader/source603 checkpoint `bbeba0d` and MAX-generation supplement `7f3e21a`.
+doc tests. The reviewed retry checkpoint is `a969309`, following original-current Replace
+`2759262`, reader/source603 `bbeba0d` and MAX-generation supplement `7f3e21a`.
 Strict lint, architecture, documentation and reference/progress checks
 pass. The full wrapper stops at its default RustSec refresh because GitHub cannot
 resolve. A separate offline audit passes all four dependency categories against
@@ -184,7 +184,10 @@ The latest full wrapper passes all source stages and stops only at the default
 RustSec GitHub DNS refresh. Reciprocal source and mapping review is closed
 without blockers.
 Remaining raw ingress groups, ETF output, public/physical/profile and both-host
-obligations remain required.
+obligations remain required. The next selected component is original retention
+override normalization and captured-limit diagnostics. Exact architecture
+creation consultation is recorded; meaningful tests precede implementation.
+No new full-default resolver or generic raw-term parser is selected.
 
 The separate Elixir bugfix worktree now has reviewed checkpoint106993c6 for the
 existing TermCodec helper and its tests. A header walk rejects the reproduced

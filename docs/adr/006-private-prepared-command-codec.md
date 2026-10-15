@@ -936,3 +936,35 @@ logical expectations, without measured native gains.
 
 Original whole-flow ingress order, other raw groups, ETF output/sizing, public
 and atomic physical publication, complete profiles and both OS remain required.
+
+
+## Selected original retention input normalization
+
+A-NEXT-M1-POLICY-RETENTION-INGRESS1-CREATE1 selects one private production child,
+two existing-target test children, one caller diagnostic and two APIs. It reuses
+`RawPolicyRetryValue`, `OriginalPolicyMapKey` and Copy `RetentionOverride`; the
+retry-oriented descriptor name is retained without claiming a generic term
+parser. Only existing selector visibility/reexport widens within complete; the
+actual body, retry classifier and all old public fees remain exact.
+
+Nil returns no override; empty collections preserve a supplied empty override.
+Atom presence masks binary keys and keywords select their last duplicate.
+Source order is positive TTL up to31536000000, forbidden hot-key presence, then
+positive history up to original captured C. Missing fields are not defaulted.
+The diagnostic owns C; the encoder validates1..1000000 operationally, uses static
+bodies or seven local decimal bytes, then one fallibly reserved final Vec.
+
+Matching profile precedes entry128 and captured-C admission. Visible input
+preflight pays descriptors before depth64/count4096 refusal and applies the
+represented-text262144 cap before text debit. Queried map-key duplicates reject
+before their value; shadowed/unknown values and alias occurrences remain bounded.
+Collections declare logical P64, freshly pay each reached selector and present
+numeric validator, then successful metadata. Nil is512/P0, empty896/P64,
+TTL1 single row2404/P64 and history50 with C100 gives2832/P64; C10 rejects at2704.
+Fixed diagnostic fees are311/315/309; C1/17/1000000 history bodies cost318/320/330.
+These expectations were frozen before production and are not native measurements.
+
+Meaningful tests precede missing-API RED and substantive implementation. Actual
+execution/source review remain pending. No retained status, authority token,
+full-default/resolved API or dependency is selected. Original whole-flow/public/
+ETF/physical/setup/profile and independent both-OS acceptance remain required.
