@@ -6,6 +6,14 @@ use super::{CompletePolicyEncodingError as Error, PolicySchemaCharge, PolicySche
 
 mod key;
 
+use super::flow_input::value::{PolicyInputCursor as Cursor, PolicyInputKind as Kind};
+
+pub(in crate::policy::complete) struct BorrowedPolicyIndexed<'input> {
+    pub(in crate::policy::complete) count: Option<usize>,
+    pub(in crate::policy::complete) names: [Option<&'input [u8]>; 3],
+    pub(in crate::policy::complete) state_meta: Option<&'input [u8]>,
+}
+
 type IndexedOwners = (Option<Vec<Vec<u8>>>, Option<Vec<u8>>);
 
 /// Borrowed input classes for the two original indexed-policy fields.
@@ -95,12 +103,33 @@ pub fn normalize_complete_policy_indexed_input(
         .and_then(|n| n.checked_add(attribute_scratch))
         .ok_or(Error::Schema(PolicySchemaError::LengthOverflow))?;
     charge_schema(charge, 0, scratch).map_err(Error::Schema)?;
+    let fields = match borrow_indexed(
+        attributes.map(Cursor::Indexed),
+        state_meta.map(Cursor::Indexed),
+        charge,
+    )? {
+        Ok(fields) => fields,
+        Err(reason) => return Ok(Err(reason)),
+    };
+    let attributes = own_attributes(fields.count, &fields.names, charge)?;
+    let metadata = fields
+        .state_meta
+        .map(|name| copy_key(name, charge))
+        .transpose()?;
+    Ok(Ok((attributes, metadata)))
+}
+
+pub(in crate::policy::complete) fn borrow_indexed<'input>(
+    attributes: Option<Cursor<'input>>,
+    state_meta: Option<Cursor<'input>>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<BorrowedPolicyIndexed<'input>, PolicyIndexedInputRejection>, Error> {
     let mut names = [None; 3];
     let count = match borrow_attributes(attributes, &mut names, charge)? {
         Ok(count) => count,
         Err(reason) => return Ok(Err(reason)),
     };
-    let metadata = if let Some(value) = state_meta {
+    let state_meta = if let Some(value) = state_meta {
         match borrow_metadata(value, 0, charge)? {
             Ok(name) => name,
             Err(reason) => return Ok(Err(reason)),
@@ -109,9 +138,11 @@ pub fn normalize_complete_policy_indexed_input(
         charge_schema(charge, 128, 0).map_err(Error::Schema)?;
         None
     };
-    let attributes = own_attributes(count, &names, charge)?;
-    let metadata = metadata.map(|name| copy_key(name, charge)).transpose()?;
-    Ok(Ok((attributes, metadata)))
+    Ok(Ok(BorrowedPolicyIndexed {
+        count,
+        names,
+        state_meta,
+    }))
 }
 
 fn preflight_node<'input>(
@@ -171,23 +202,23 @@ fn preflight_list(
     Ok(())
 }
 
-fn borrow_attributes<'input>(
-    value: Option<RawPolicyIndexedValue<'input>>,
+pub(in crate::policy::complete) fn borrow_attributes<'input>(
+    value: Option<Cursor<'input>>,
     names: &mut [Option<&'input [u8]>; 3],
     charge: &mut PolicySchemaCharge,
 ) -> Result<Result<Option<usize>, PolicyIndexedInputRejection>, Error> {
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
     let list = match value {
         None => return Ok(Ok(None)),
-        Some(RawPolicyIndexedValue::Nil | RawPolicyIndexedValue::Atom("nil")) => {
-            return Ok(Ok(Some(0)));
-        }
-        Some(RawPolicyIndexedValue::List(list)) => list,
+        Some(value) if value.is_nil() => return Ok(Ok(Some(0))),
+        Some(value) if matches!(value.kind(), Kind::List | Kind::ImproperList) => value,
         _ => return Ok(Err(PolicyIndexedInputRejection::AttributesList)),
     };
     let mut count = 0;
     let mut overflow = false;
-    for &value in list {
+    let mut index = 0;
+    while let Some(value) = list.list_item(index, charge)? {
+        index += 1;
         let name = match key::normalize_key(value, true, charge)? {
             Ok(name) => name,
             Err(reason) => return Ok(Err(reason)),
@@ -218,21 +249,22 @@ fn borrow_attributes<'input>(
     })
 }
 
-fn borrow_metadata<'input>(
-    value: RawPolicyIndexedValue<'input>,
+pub(in crate::policy::complete) fn borrow_metadata<'input>(
+    value: Cursor<'input>,
     depth: usize,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Result<Option<&'input [u8]>, PolicyIndexedInputRejection>, Error> {
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    match value {
-        RawPolicyIndexedValue::Nil
-        | RawPolicyIndexedValue::Atom("nil" | "")
-        | RawPolicyIndexedValue::Binary([]) => Ok(Ok(None)),
-        RawPolicyIndexedValue::Other => Ok(Err(PolicyIndexedInputRejection::StateMetaShape)),
-        RawPolicyIndexedValue::List(list) => {
+    if value.is_nil() || value.atom_bytes() == Some(b"") || value.binary_bytes() == Some(b"") {
+        return Ok(Ok(None));
+    }
+    match value.kind() {
+        Kind::List | Kind::ImproperList => {
             let mut first = None;
             let mut overflow = false;
-            for &child in list {
+            let mut index = 0;
+            while let Some(child) = value.list_item(index, charge)? {
+                index += 1;
                 if depth >= 64 {
                     return Err(Error::ItemLimit);
                 }
@@ -259,7 +291,8 @@ fn borrow_metadata<'input>(
                 Ok(first)
             })
         }
-        value => Ok(key::normalize_key(value, false, charge)?.map(Some)),
+        Kind::Atom | Kind::Binary => Ok(key::normalize_key(value, false, charge)?.map(Some)),
+        _ => Ok(Err(PolicyIndexedInputRejection::StateMetaShape)),
     }
 }
 

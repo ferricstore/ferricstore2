@@ -3,7 +3,7 @@
 use crate::retention::{MAX_HISTORY_EVENTS, MAX_RETENTION_MILLIS, RetentionOverride};
 
 use super::admission::charge_schema;
-use super::retry_input::select;
+use super::flow_input::value::{PolicyInputCursor as Cursor, classify_map, select, unsigned};
 use super::{
     CompletePolicyEncodingError as Error, OriginalPolicyMapKey as Key, PolicySchemaCharge,
     PolicySchemaError, PolicySchemaLimits, RawPolicyRetryValue as Raw,
@@ -48,30 +48,38 @@ pub fn normalize_complete_policy_retention_override_input(
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
     valid_limit(history_max_events_limit)?;
     preflight(*input, 0, &mut (0, 0), charge)?;
+    borrow_retention(Cursor::Retry(*input), history_max_events_limit, charge)
+}
+
+pub(in crate::policy::complete) fn borrow_retention(
+    input: Cursor<'_>,
+    history_max_events_limit: u32,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<Option<RetentionOverride>, PolicyRetentionInputRejection>, Error> {
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    if matches!(input, Raw::Nil | Raw::Atom("nil")) {
+    if input.is_nil() {
         charge_schema(charge, 128, 0).map_err(Error::Schema)?;
         return Ok(Ok(None));
     }
-    if !matches!(input, Raw::Map(_) | Raw::Keyword(_)) {
+    let Some(input) = classify_map(input, charge)? else {
         return Ok(Err(PolicyRetentionInputRejection::Shape));
-    }
+    };
     charge_schema(charge, 0, 64).map_err(Error::Schema)?;
-    let ttl_ms = if let Some(value) = select(*input, b"ttl_ms", charge)? {
+    let ttl_ms = if let Some(value) = select(input, b"ttl_ms", charge)? {
         charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-        let Some(value) = positive(value, MAX_RETENTION_MILLIS) else {
+        let Some(value) = positive(value, MAX_RETENTION_MILLIS, charge)? else {
             return Ok(Err(PolicyRetentionInputRejection::Ttl));
         };
         Some(value)
     } else {
         None
     };
-    if select(*input, b"history_hot_max_events", charge)?.is_some() {
+    if select(input, b"history_hot_max_events", charge)?.is_some() {
         return Ok(Err(PolicyRetentionInputRejection::HistoryHot));
     }
-    let history_max_events = if let Some(value) = select(*input, b"history_max_events", charge)? {
+    let history_max_events = if let Some(value) = select(input, b"history_max_events", charge)? {
         charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-        let Some(value) = positive(value, u64::from(history_max_events_limit)) else {
+        let Some(value) = positive(value, u64::from(history_max_events_limit), charge)? else {
             return Ok(Err(PolicyRetentionInputRejection::History {
                 maximum: history_max_events_limit,
             }));
@@ -104,27 +112,7 @@ pub fn encode_complete_policy_retention_input_rejection_body(
         return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
     }
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    let (prefix, maximum) = match rejection {
-        PolicyRetentionInputRejection::Shape => (
-            b"ERR flow retention policy must be a map or keyword list".as_slice(),
-            None,
-        ),
-        PolicyRetentionInputRejection::Ttl => (
-            b"ERR flow retention ttl_ms must be between 1 and 31536000000".as_slice(),
-            None,
-        ),
-        PolicyRetentionInputRejection::HistoryHot => (
-            b"ERR flow retention history_hot_max_events is internal".as_slice(),
-            None,
-        ),
-        PolicyRetentionInputRejection::History { maximum } => {
-            valid_limit(maximum)?;
-            (
-                b"ERR flow retention history_max_events must be between 1 and ".as_slice(),
-                Some(maximum),
-            )
-        }
-    };
+    let (prefix, maximum) = rejection_parts(rejection)?;
     let digits = maximum.map_or(0, decimal_length);
     let length = prefix
         .len()
@@ -151,20 +139,45 @@ pub fn encode_complete_policy_retention_input_rejection_body(
     Ok(owned)
 }
 
-fn valid_limit(maximum: u32) -> Result<(), Error> {
+pub(in crate::policy::complete) fn rejection_parts(
+    rejection: PolicyRetentionInputRejection,
+) -> Result<(&'static [u8], Option<u32>), Error> {
+    Ok(match rejection {
+        PolicyRetentionInputRejection::Shape => (
+            b"ERR flow retention policy must be a map or keyword list".as_slice(),
+            None,
+        ),
+        PolicyRetentionInputRejection::Ttl => (
+            b"ERR flow retention ttl_ms must be between 1 and 31536000000".as_slice(),
+            None,
+        ),
+        PolicyRetentionInputRejection::HistoryHot => (
+            b"ERR flow retention history_hot_max_events is internal".as_slice(),
+            None,
+        ),
+        PolicyRetentionInputRejection::History { maximum } => {
+            valid_limit(maximum)?;
+            (
+                b"ERR flow retention history_max_events must be between 1 and ".as_slice(),
+                Some(maximum),
+            )
+        }
+    })
+}
+
+pub(in crate::policy::complete) fn valid_limit(maximum: u32) -> Result<(), Error> {
     if maximum == 0 || maximum > MAX_HISTORY_EVENTS {
         return Err(Error::Schema(PolicySchemaError::InvalidAuthority));
     }
     Ok(())
 }
 
-fn positive(value: Raw<'_>, maximum: u64) -> Option<u64> {
-    let Raw::Integer(value) = value else {
-        return None;
-    };
-    u64::try_from(value)
-        .ok()
-        .filter(|&value| value != 0 && value <= maximum)
+fn positive(
+    value: Cursor<'_>,
+    maximum: u64,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<u64>, Error> {
+    Ok(unsigned(value, maximum, charge)?.filter(|&n| n != 0))
 }
 
 fn preflight(
@@ -290,7 +303,7 @@ fn charge_visit(length: usize, charge: &mut PolicySchemaCharge) -> Result<(), Er
     charge_schema(charge, work, 0).map_err(Error::Schema)
 }
 
-fn decimal_length(mut value: u32) -> usize {
+pub(in crate::policy::complete) fn decimal_length(mut value: u32) -> usize {
     let mut digits = 1;
     while value >= 10 {
         value /= 10;
@@ -299,7 +312,10 @@ fn decimal_length(mut value: u32) -> usize {
     digits
 }
 
-fn write_decimal(mut value: u32, scratch: &mut [u8; 7]) -> Result<&[u8], Error> {
+pub(in crate::policy::complete) fn write_decimal(
+    mut value: u32,
+    scratch: &mut [u8; 7],
+) -> Result<&[u8], Error> {
     let mut start = scratch.len();
     while value != 0 {
         start = start

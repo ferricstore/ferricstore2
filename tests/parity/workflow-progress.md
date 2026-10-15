@@ -36,7 +36,7 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 60 source declarations, 67 counterpart records and 258 assertion links.
+increments: 64 source declarations, 71 counterpart records and 279 assertion links.
 Both reviewers accept the supplemental source603 shape-error anchor; it supplies
 one error component with its remaining setup/profile/physical obligations explicit.
 The separate original ETF generation-boundary counterpart retains MAX, the returned
@@ -51,6 +51,15 @@ the actual TTL5000/hot3 rejection cause and body after all86 policy controls pas
 Captured-limit and creation-neighbor controls add no StateMachine, generation,
 ETS or inheritance assertion credit. Public/setup/profile/physical and independent
 Linux acceptance remain required; every older counterpart stays unchanged.
+Four whole-flow counterparts link the exact complete governance model,
+first-seen string-list order, the600-leaf governance size rejection and queued
+keyword max_active_ms1000 rejection. Their direct whole-ETF or reason/body
+assertions execute in the100-test policy target; the full macOS workspace passes
+554 Rust tests and four compile-fail docs. All67 previous records are preserved.
+Helper-only enum/bounds controls and the original allowed snapshot map without
+states remain unlinked. Original setup/profiles, public/physical operations and
+independent Linux validation remain required. The default wrapper still fails
+its final RustSec refresh because GitHub DNS resolution is unavailable.
 Two separately scoped counterparts
 belong to one FIFO lifecycle declaration; a single state/partition test retains
 selected observations from two declarations. It preserves every other

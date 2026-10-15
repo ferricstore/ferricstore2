@@ -2,8 +2,9 @@
 
 use std::fmt;
 
+use super::super::flow_input::value::PolicyInputCursor as Cursor;
+use super::charge_schema;
 use super::{Error, PolicyIndexedInputRejection as Reason, PolicySchemaCharge, PolicySchemaError};
-use super::{RawPolicyIndexedValue, charge_schema};
 
 impl Reason {
     /// Reads the exact fixed source response body without allocating.
@@ -40,22 +41,17 @@ impl fmt::Display for Reason {
 impl std::error::Error for Reason {}
 
 pub(super) fn normalize_key<'input>(
-    value: RawPolicyIndexedValue<'input>,
+    value: Cursor<'input>,
     attributes: bool,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Result<&'input [u8], Reason>, Error> {
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    let bytes = match value {
-        RawPolicyIndexedValue::Nil => b"nil".as_slice(),
-        RawPolicyIndexedValue::Binary(bytes) => bytes,
-        RawPolicyIndexedValue::Atom(text) => text.as_bytes(),
-        _ => {
-            return Ok(Err(if attributes {
-                Reason::AttributeString
-            } else {
-                Reason::StateMetaShape
-            }));
-        }
+    let Some(bytes) = value.key_bytes() else {
+        return Ok(Err(if attributes {
+            Reason::AttributeString
+        } else {
+            Reason::StateMetaShape
+        }));
     };
     charge_visit(charge, bytes.len())?;
     let Ok(text) = std::str::from_utf8(bytes) else {

@@ -14,6 +14,7 @@ mod admission;
 pub(crate) use admission::charge_schema;
 mod encoding;
 mod error;
+mod flow_input;
 mod indexed_input;
 mod installation;
 mod model;
@@ -38,6 +39,10 @@ pub use encoding::{
     verify_complete_policy_value_v2,
 };
 pub use error::{CircuitTrackingFailure, GovernanceField, GovernanceRuleKind, PolicySchemaError};
+pub use flow_input::{
+    FlowPolicyInputRejection, GovernancePolicyInputRejection, RawFlowPolicyValue,
+    encode_original_complete_policy_input_rejection_body, normalize_original_complete_policy_input,
+};
 pub use indexed_input::{
     PolicyIndexedInputRejection, RawPolicyIndexedValue, normalize_complete_policy_indexed_input,
 };

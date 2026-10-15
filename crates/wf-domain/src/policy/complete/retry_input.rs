@@ -10,7 +10,7 @@ use super::{
 
 mod value;
 
-pub(super) use value::select;
+use super::flow_input::value::{PolicyInputCursor as Cursor, classify_map, select};
 
 /// Borrowed original retry input classes, without raw-parser authority.
 ///
@@ -142,50 +142,71 @@ fn normalize_fields(
     }
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
     preflight(*input, 0, &mut (0, 0), charge)?;
-    charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    let input = value::nil_alias(*input);
-    if matches!(input, RawPolicyRetryValue::Nil) {
-        charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-        return Ok(Ok(if fill_defaults {
-            Some(RetryOverride {
-                max_retries: Some(3),
-                backoff: Some(Backoff::default()),
-                exhausted_to: Some(copy_target(b"failed", charge)?),
+    let fields = match borrow_retry(Cursor::Retry(*input), fill_defaults, charge)? {
+        Ok(fields) => fields,
+        Err(reason) => return Ok(Err(reason)),
+    };
+    Ok(Ok(fields
+        .map(|fields| {
+            Ok(RetryOverride {
+                max_retries: fields.max_retries,
+                backoff: fields.backoff,
+                exhausted_to: fields
+                    .exhausted_to
+                    .map(|bytes| copy_target(bytes, charge))
+                    .transpose()?,
             })
-        } else {
-            None
-        }));
+        })
+        .transpose()?))
+}
+
+pub(in crate::policy::complete) struct BorrowedPolicyRetry<'input> {
+    pub(in crate::policy::complete) max_retries: Option<u16>,
+    pub(in crate::policy::complete) backoff: Option<Backoff>,
+    pub(in crate::policy::complete) exhausted_to: Option<&'input [u8]>,
+}
+
+pub(in crate::policy::complete) fn borrow_retry<'input>(
+    input: Cursor<'input>,
+    fill_defaults: bool,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<Option<BorrowedPolicyRetry<'input>>, PolicyRetryInputRejection>, Error> {
+    charge_schema(charge, 128, 0).map_err(Error::Schema)?;
+    if input.is_nil() {
+        charge_schema(charge, 128, 0).map_err(Error::Schema)?;
+        return Ok(Ok(fill_defaults.then_some(BorrowedPolicyRetry {
+            max_retries: Some(3),
+            backoff: Some(Backoff::default()),
+            exhausted_to: Some(b"failed"),
+        })));
     }
-    if !matches!(
-        input,
-        RawPolicyRetryValue::Map(_) | RawPolicyRetryValue::Keyword(_)
-    ) {
+    let Some(input) = classify_map(input, charge)? else {
         return Ok(Err(PolicyRetryInputRejection::Shape));
-    }
+    };
     charge_schema(charge, 0, 128).map_err(Error::Schema)?;
-    if value::select(input, b"max_attempts", charge)?.is_some() {
+    if select(input, b"max_attempts", charge)?.is_some() {
         return Ok(Err(PolicyRetryInputRejection::DeprecatedMaxAttempts));
     }
-    let selected = value::select(input, b"max_retries", charge)?;
+    let selected = select(input, b"max_retries", charge)?;
     let max_retries = match value::retry_limit(selected, fill_defaults, charge)? {
         Ok(maximum) => maximum,
         Err(reason) => return Ok(Err(reason)),
     };
-    let selected = value::select(input, b"backoff", charge)?;
+    let selected = select(input, b"backoff", charge)?;
     let backoff = match value::backoff(selected, fill_defaults, charge)? {
         Ok(backoff) => backoff,
         Err(reason) => return Ok(Err(reason)),
     };
-    let selected = value::select(input, b"exhausted_to", charge)?;
+    let selected = select(input, b"exhausted_to", charge)?;
     let target = match value::target(selected, fill_defaults, charge)? {
         Ok(target) => target,
         Err(reason) => return Ok(Err(reason)),
     };
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    Ok(Ok(Some(RetryOverride {
+    Ok(Ok(Some(BorrowedPolicyRetry {
         max_retries,
         backoff,
-        exhausted_to: target.map(|bytes| copy_target(bytes, charge)).transpose()?,
+        exhausted_to: target,
     })))
 }
 

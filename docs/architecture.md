@@ -668,8 +668,10 @@ missing-API RED independently reproduced by Root. All86 policy controls and
 strict target lint pass; actual source/mapping review is mutually closed without
 blockers. No dependency or module-rule exception is added.
 
-The existing private selector widens only to `policy::complete` and is reexported
-only to its parent; its body and old retry fees remain unchanged. Retention owns
+At the retention checkpoint the private selector widened only to
+`policy::complete`, with its body and old retry fees preserved. The subsequent
+whole-flow batch replaces that seam with a shared paid cursor selector while
+preserving the existing public event streams. Retention owns
 its three-name preflight and preserves TTL, internal hot-key membership, then
 history validation against the original captured limit. Missing fields stay
 missing. The scalar result needs no output allocation; only the separate body
@@ -680,3 +682,37 @@ Visible descriptor bounds and prospective work preserve one received account;
 logical scratch does not measure native allocation, stack, memory or speed.
 Whole-flow raw order, ETF sizing/emission, public/atomic physical publication,
 complete runtime profiles and independent Linux/macOS execution remain required.
+
+
+## Implemented original whole-flow normalization
+
+A-NEXT-M1-ORIGINAL-FLOW-INGRESS1-CREATE1 approves a borrowed whole-flow input
+view, source-ordered normalization and deterministic original ETF snapshot output.
+Fourteen private production children group cursor/preflight/layout, core/states,
+governance, binary map ordering and ETF responsibilities under complete/flow_input.
+The selected cursor has actual substitutions in the old retry/indexed wrappers;
+sharing borrowed semantic staging must preserve every old public event stream.
+Seven existing-target test children preceded production with independently
+reproduced missing-API RED; subsequent source-based test corrections are recorded.
+All100 policy controls and strict workspace lint pass. The macOS wrapper passes
+554 Rust tests, four compile-fail doc tests and every source check, then fails
+at its default RustSec refresh because GitHub DNS resolution is unavailable.
+The first failed real-workspace architecture epoch and its local self::core
+qualification correction remain recorded; no checker exception was added.
+Actual source/mapping review and reciprocal architecture/performance review are
+closed without blockers for this component.
+
+Arbitrary nonnegative customer integers remain exact; existing u64-only V2 models
+are not silently widened or used to narrow this input. Nil atoms remain distinct
+from proper empty lists. Binary state-pair maps collapse their last duplicates
+before the release-profile32-key ordering threshold. Portable fixed-width binary
+ordering/fingerprint arithmetic reproduces the pinned64LE OTP profile; request
+identity SHA remains in ports. This is no permission for random or runtime hashing.
+
+One bounded raw preflight and incoming business walk stage borrowed cells. The
+late governance1MiB and whole-snapshot262144 limits use the original normalized
+ETF subset; the final output has one fallible Vec reservation. The full source
+public/frame/retained/Fresh/atomic successor is required separately. This snapshot
+owner carries no installation, origin or payment authority. Logical work/peak
+accounting does not establish native allocation or speed. Complete runtime profiles
+and independent Linux/macOS execution remain mandatory.

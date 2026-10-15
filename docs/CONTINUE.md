@@ -4,16 +4,38 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS run passes 539 Rust tests and four compile-fail
-doc tests. The reviewed retry checkpoint is `a969309`, following original-current Replace
-`2759262`, reader/source603 `bbeba0d` and MAX-generation supplement `7f3e21a`.
+The latest whole-workspace macOS run passes 554 Rust tests and four compile-fail
+doc tests. The preceding retention checkpoint is `a0a8858`, following retry `a969309`,
+original-current Replace `2759262`, reader/source603 `bbeba0d` and MAX-generation
+supplement `7f3e21a`.
 Strict lint, architecture, documentation and reference/progress checks
 pass. The full wrapper stops at its default RustSec refresh because GitHub cannot
 resolve. A separate offline audit passes all four dependency categories against
 the October 9 database revision; it does not turn that wrapper failure into PASS.
+The whole-flow normalization/original ETF batch is implemented after explicit
+architecture/performance approval and independently reproduced tests-only
+missing-API RED. All100 policy controls pass, including the old86; source-based
+post-RED corrections, supplemental refusal tests and the first failed workspace
+architecture epoch are recorded without rewriting their provenance.
+Actual source and mapping reviews, including reciprocal reads, are closed
+without blockers for this snapshot component.
 Detailed local results are below;
 saved CI belongs to its earlier commit. M1,
 later runtime milestones and full workflow parity remain incomplete.
+
+Original whole-flow input now preserves top/state/governance error order,
+arbitrary nonnegative customer versions, exact caller bodies and deterministic
+original ETF snapshots. Borrowed retry/indexed/retention walkers share semantics
+while retaining their old public fees. One bounded incoming walk stages cells;
+late governance and complete-snapshot size gates precede one fallible final Vec.
+Synthesized state maps preserve the source32/33-key ordering transition using
+explicit fixed-width hash arithmetic. This snapshot grants no frame, Fresh,
+current-policy, installation or payment authority. All fourteen new production
+files fit400 lines and seven test files fit600; functions fit100. The checked
+ledger has64 reviewed declarations,71 counterparts and279 assertion links,
+preserving every older record. Full public/physical/runtime/profile acceptance
+and independent Linux execution remain required, with no measured native
+allocation or speed claim.
 
 Claim/reclaim now constructs the replacement record directly, avoiding copies of
 old state, saved run state and lease owners that would immediately be replaced.
@@ -192,7 +214,7 @@ returns existing Copy fields without allocation, while the separate encoder
 owns one fallibly reserved final Vec. Two narrow counterpart records validate
 60 source declarations/67 counterparts/258 assertion links and preserve all65
 older records. Captured-limit StateMachine/ETS and creation/inheritance source
-assertions remain unlinked. The complete macOS wrapper passes539 Rust tests,
+assertions remain unlinked. That retention checkpoint's macOS wrapper passes539 Rust tests,
 four compile-fail docs and all source stages, then stops at the default RustSec
 GitHub DNS refresh. Actual source/mapping review is mutually closed without
 blockers; no full-default resolver or generic term parser is added.

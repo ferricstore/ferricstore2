@@ -38364,3 +38364,857 @@ Actual command `env CARGO_BUILD_WARNINGS=deny cargo +1.99.0 clippy --locked -p w
 ```
 
 Actual rustfmt1.99 --edition2024 --check on the named three owned production paths and two tests, followed by git diff --check, exited0 with empty output. Focused86 and strict results are macOS owner evidence, not independent Linux/native-original/runtime/profile/physical acceptance. All required remaining milestones/OS/source cases remain active; this finite implementation is ready for normal full actual-source reciprocal review without another run/body/ack gate.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1 (proposal only; 2026-10-15)
+
+Recommendation: select ONE cohesive incoming normalizer covering the complete original top-level policy, states, retry/retention/indexed fields and all seven governance groups, ending in original deterministic ETF snapshot bytes. This is the next substantial pure M1 component, rather than another handful of representable normalized fields. No implementation/test/artifact/model/probe is created by this note. The reviewed retention checkpoint a0a8858 and every closed old API, fee, input and source assertion remain frozen. I actually read the current plan, architecture/ADR006/CONTINUE, the pinned normalizers and the source cases below. I also actually read the entire closed retention A7917/ab7a3e10 and P11953/b816e12e findings; exact ranges/hashes were reverified in cd6fe3 and there is no discrepancy.
+
+Scope and real handoff. The existing CompletePolicyData/PolicyVersion::Number(u64), normalized Replace frame and Plan cannot represent all original nonnegative customer integers or the raw list/pair classifications. Do not widen that old enum, silently reject integers above u64, normalize into V2 and then run CONTENT1 again, or call private V2 output an original installed policy. This batch produces an owned original normalized SNAPSHOT, not a generation envelope, request frame, retained outcome, public reply or proof of payment/origin. A concrete REQUIRED successor is original caller input framing in outer/flow_frame.rs plus ports complete_policy/flow.rs, followed by a closed Fresh parent in replace_request/flow.rs with an OriginalFlowPolicyReplacePlan: verify original input once, one retained gate, nonFresh bypass, reconstruct original raw input, strict original current decode/CAS/type, captured context, this ONE incoming walk, active/done generation, original ETF envelope, source response/outcome. Those successor names explain the handoff and are explicitly NOT requested for creation in this batch. That parent must invoke a private raw-to-layout walk on its received account and consume the SAME immutable layout for late generation-envelope emission; it must not accept this public Vec as a paid/accepted token or repeat CONTENT1. Public Policy.set type/options/key-size validation, PolicyCommand absence/reference synthesis, atomic physical installation and HTTP/TCP remain distinct required owners.
+
+Actual pinned source contract. All paths here refer to ferricstore2-elixir-baseline commit66586c5, under apps/ferricstore/lib/ferricstore. flow/retry_policy.ex62-130 accepts binary type (INCLUDING empty binary) plus map/proper keyword options; Map.new keyword duplicates are last-write. Binary type plus non-keyword list gives the opts-keyword diagnosis; other root/type shapes give the policy-map diagnosis. It visits reject top-level mode PRESENCE, version, max_active_ms, retry override, retention override under captured C, indexed attributes, indexed state-meta, governance, states, drop nil fields, then source snapshot external_size<=262144. States is ALWAYS present, including empty default Map. Unknown options disappear. Top mode presence rejects even nil; atom key presence masks binary key even if invalid/nil. Version250-278 accepts nonempty opaque binary OR ANY nonnegative integer; generation's 2^53-1 limit does not constrain that customer version. Max active accepts absent/nil and the exact infinity spellings already in source; otherwise positive<=31536000000. No extra UTF8/type-nonempty/base<=max/normalized-count admission belongs here.
+
+States617-719 must retain all source classes and priorities. Direct Map visits the source Enum.reduce_while order. A list first undergoes full Keyword.keyword? classification; if false, every element must be a two-tuple {binary state, map OR list policy} before Map.new. Last duplicate state-pair wins BEFORE any state business walk, including overwriting an earlier invalid policy. Keyword atom state names then fail the state-name check; do not mistake them for binary pair names. A non-map/non-list root and an invalid list have DISTINCT diagnoses. Each surviving state checks nonempty binary name, exact running exclusion, policy map/proper keyword shape, forbidden max_active_ms PRESENCE, present mode, retry, retention, governance, then drops nil fields. Present mode nil fails; exact atoms parallel/fifo and source-downcased binary spellings succeed. Stored-current maps are never normalized by this incoming path.
+
+Governance flow/governance/policy.ex1-585: nil disappears, empty map/proper keyword remains present-empty, no resolved defaults are filled. Group order is mode, effects(allowed/denied/require_idempotency_key), audit(effect_events/denials), limits, budgets, circuits, approvals(effects/states/assignees/timeout_ms), THEN governance external_size<=1048576. Rule-map Map.new deduplication precedes map_size<=1000, which precedes every name/rule check. Rule names are nonempty binaries<=65535; source map iteration chooses the first rule error. Limit fields are required nonnegative limit, enforcement, lease_size; budget adds required window before enforcement/lease/unit. Circuit order is threshold, open, window, min_calls, rate, latency, error_classes, probe count, success threshold, then the three ordered tracking guards (min_calls>64 first). All integer bounds are the source exact2^53-1 except the explicit percent1..100. Optional nil governance numeric/boolean/enum/string fields disappear; present nil retry numeric/kind and state mode still reject.
+
+A governance string list counts RAW occurrences, including duplicates, up to1000; it validates/copies no1001st leaf before returning the count error. Valid duplicates deduplicate by exact bytes preserving first occurrence. The source list-wide nonempty-string reason differs from field-specific list-shape/width reasons. General bytes cap65535, error classes256. Opaque string/unit/name bytes are not UTF8-normalized. Atom true/false are the actual boolean classes; binary words are not booleans. Source String.downcase is distinct from UTF8 admission: PERF's primary Elixir1.19.5 unicode.ex271-279 read and ROOT native FF+FIFO control show invalid bytes are preserved, not rejected by a new UTF8 guard. A finite proof is required before reducing the accepted ASCII enum spellings to ASCII-only comparison; all other bytes still get the exact enum diagnosis.
+
+Exact creation inventory requested (no files created). FOURTEEN new domain production files:
+1. crates/wf-domain/src/policy/complete/flow_input.rs -- raw model, public result registry/API and orchestration.
+2. flow_input/value.rs -- three real borrowed cursor adapters and fresh selectors/classification.
+3. flow_input/preflight.rs -- visible-tree occurrence/depth/text bounds and correspondence checks.
+4. flow_input/layout.rs -- bounded borrowed normalized cells/edges/work slots, checked pushes.
+5. flow_input/core.rs -- type/root/version/max-active and ordered top-field composition.
+6. flow_input/states.rs -- list/keyword/pair conversion and state field walk.
+7. flow_input/governance.rs -- seven-group order and late governance measurement.
+8. flow_input/governance/groups.rs -- effects/audit/approvals scalar/list composition.
+9. flow_input/governance/rules.rs -- rule-map and ordered limit/budget/circuit walkers.
+10. flow_input/governance/lists.rs -- raw-count/stable dedup with paid cached fingerprints.
+11. flow_input/etf.rs -- source external-size counter and deterministic normalized ETF writer.
+12. flow_input/rejection.rs -- exact finite reason/body registry, immutable captured history limit.
+13. flow_input/order.rs -- surviving Map.new indices, source reduce_while order and deterministic output order.
+14. flow_input/order/hash.rs -- exact pinned binary-key hash/swizzle for synthesized large state maps and paid list fingerprints.
+
+Only existing domain files additionally eligible for narrow sharing are complete.rs (ROOT module/exports), retry_input.rs and retry_input/value.rs, retention_input.rs, indexed_input.rs and indexed_input/key.rs. Their public models/APIs and all existing preflight/semantic/copy debit streams remain exact. Extract/reuse actual borrowed semantic functions, rather than build adapter trees, rerun their old public preflights with inappropriate262144 caps, or use a public paid flag. ROOT owns an appended boundary test in existing crates/wf-architecture-tests/src/tests/codec_policy/original_policy.rs named original_flow_policy_input_stays_pure_and_server_side, plus all shared docs/ADR/ledger/config/Git. It checks every new descendant, existing pure allowlist and forbidden client/wire/domain-value forwarding of the exact five exports; no inspector exception or dependency change.
+
+SIX new private test children in existing wf-domain complete_policy target: tests/complete_policy/flow_input.rs plus flow_input/{cases,governance,states,etf,refusals}.rs, and ONLY EOF blank+mod flow_input in existing main.rs. No new Cargo target/dependency, test model or separate fixture artifact. All new production<=400 physical lines, tests/tooling<=600, functions<=100. Routine private function splitting within these named responsibilities requires no future inert-body/helper review. If this concrete grouping cannot fit, consult an exact cohesive child before creating it.
+
+New public models, exactly THREE, exported only through complete:
+* RawFlowPolicyValue<'input>, Copy: Nil; Integer(i128); BigInteger{negative:bool,little_endian:&'input[u8]}; Atom(&'input str); Binary(&'input[u8]); Map(&'input[(Self,Self)]); List(&'input[Self]); Tuple(&'input[Self]); ImproperList{prefix:&'input[Self],tail:&'input Self}; Other. No raw owner tree is allocated. Big magnitudes may include leading zeroes; mathematical negative-zero is zero, not an invented negative source integer. Other is an unsupported opaque source class, not proof of hidden bytes/nodes/semantic map identity. A future raw decoder must supply real complete views; this typed view does not certify parsing. Improper-list prefix must be nonempty or be an operational malformed view; classify/visit its real tail rather than silently treating it as proper.
+* FlowPolicyInputRejection, Copy/Eq, exactly17 variants: RootShape, RootKeyword, TopStateMode, Version, MaxActive, StatesShape, StatesList, StateName, RunningState, StatePolicyShape, StateMaxActive, StateMode, Retry(PolicyRetryInputRejection), Retention(PolicyRetentionInputRejection), Indexed(PolicyIndexedInputRejection), Governance(GovernancePolicyInputRejection), SnapshotBytes.
+* GovernancePolicyInputRejection, Copy/Eq, exactly24 variants: Shape, Mode, EffectsShape, AuditShape, ApprovalsShape, RuleMapShape(GovernanceRuleKind), RuleShape(GovernanceRuleKind), Denials, Enforcement, RequireIdempotencyBoolean, EffectEventsBoolean, StringList(GovernanceField), ListCount, ListValue, ListBytes(GovernanceField), RuleCount(GovernanceRuleKind), RuleName(GovernanceRuleKind), RuleNameBytes(GovernanceRuleKind), Limit, Positive(GovernanceField), Unit, Percent, Tracking(CircuitTrackingFailure), PolicyBytes. Reuse the existing finite GovernanceField/RuleKind/Tracking enums. Parameterized reasons admit only their actual source field subsets; forged combinations return operational InvalidAuthority in the encoder rather than inventing new response strings. The existing10 retry/4 retention/13 indexed registries remain unchanged.
+
+Exactly TWO new public functions:
+normalize_original_complete_policy_input(workflow_type:&RawFlowPolicyValue<'_>,attrs:&RawFlowPolicyValue<'_>,history_max_events_limit:u32,limits:PolicySchemaLimits,charge:&mut PolicySchemaCharge) -> Result<Result<Vec<u8>,FlowPolicyInputRejection>,CompletePolicyEncodingError>.
+encode_original_complete_policy_input_rejection_body(reason:FlowPolicyInputRejection,limits:PolicySchemaLimits,charge:&mut PolicySchemaCharge) -> Result<Vec<u8>,CompletePolicyEncodingError>.
+The success Vec owns a VERSION-prefixed original normalized snapshot. All input/context lifetimes end before it escapes. No Entry argument, public layout/getter/credit/paid/origin/status or accepted-data constructor exists. History embeds the original admitted C exactly as existing retention reasons do, independent of later configuration. No public standalone governance function is needed to reuse the same private governance walk from top and states.
+
+Exactly EIGHT new private models, no trait or aliases:
+PolicyInputCursor<'input> enum Flow(RawFlowPolicyValue), Retry(RawPolicyRetryValue), Indexed(RawPolicyIndexedValue), with real substitutions in both old wrappers and new whole walk.
+PolicyInputKind enum Nil,Integer,Atom,Binary,Map,Keyword,List,Tuple,ImproperList,Other; BigInteger has Integer class, while a separate accessor borrows its magnitude.
+PolicyInputMap<'input> enum Direct(PolicyInputCursor), Keyword(PolicyInputCursor), StatePairs(PolicyInputCursor), Empty.
+BorrowedPolicyRetry<'input> struct { max_retries:Option<u16>, backoff:Option<Backoff>, exhausted_to:Option<&'input[u8]> }.
+BorrowedPolicyIndexed<'input> struct { count:Option<usize>, names:[Option<&'input[u8]>;3], state_meta:Option<&'input[u8]> }.
+FlowPolicyLayout<'input> struct { cells:Vec<FlowPolicyCell<'input>>, edges:Vec<usize>, work:Vec<FlowPolicyWorkSlot>, root:Option<usize> }.
+FlowPolicyCell<'input> enum Atom(&'static str), Binary(&'input[u8]), Integer(u128), BigInteger(&'input[u8]), List{start:usize,len:usize}, Map{start:usize,len:usize}; ranges index the separate edge Vec, avoiding self-reference.
+FlowPolicyWorkSlot struct { hash:u64,index:usize,cell:usize,order:u64 }, one reusable scratch owner for map/list indices/fingerprint filters. Fields carry no account or admission origin. All cursor/kind/map and borrowed semantic visibility is restricted to crate::policy::complete. Nil has atom identity for keyword-key classification and indexed leaf conversion even while is_nil also recognizes Atom("nil"); do not erase this contextual distinction. Atom true/false likewise retain atom keyword-key identity.
+
+Prospective reuse contract: existing old wrappers keep their actual raw preflight and logical scratch/copy phases; shared semantic functions operate on Cursor::Retry or Cursor::Indexed and return the new BORROWED scalar/leaf staging. Retention returns its existing Copy override. Whole normalization uses Cursor::Flow, one global bounded preflight, then the same source semantic functions without the old entry/preflight/copy phases. It stages retry targets and trimmed indexed leaves in cells and emits only after BOTH all fields and both source size gates succeed. Old full retry defaults still fill exactly as before; whole flow invokes override semantics, not full retry defaults. The new cursor is not a hypothetical abstraction and creates no recursive backing Vec or temporary tree.
+
+Map-order/correspondence disposition. Direct Map rows explicitly supply the original Enum.reduce_while visitation sequence; they are a mathematical source-map view, not raw parser proof. Duplicate queried Atom/Binary identities and duplicate binary state/rule keys are operational correspondence failures; don't give first/last precedence to an invalid map view. Arbitrary Other key identity/general map uniqueness remains an explicit future decoder obligation. Keyword and binary state-pair lists require genuine Map.new last-duplicate conversion. Pure selectors preserve atom presence over binary and fresh last keyword selection. Synthesized binary maps with<=32 UNIQUE keys use pinned flatmap binary term order; larger maps use descending swizzled pinned OTP28.3.1 release64LE binary-key hash and descending exact binary key order on full-hash collision, after last-duplicate selection. This is Enumerable.Map.reduce/Enum.reduce_while via maps.to_list; native iterator/Enum.map runs the reverse order. This algorithm is portable Rust with explicit little-endian scalar operations, not a host-native hash. DEBUG threshold3, collision-bonanza and other source VM profiles remain explicit incomplete profile obligations. No >32 exclusion is proposed as a convenient replacement for this source behavior. ORDER1 below records the now-source-resolved direction and independent controls.
+
+ETF counter/emission. Normalized cells contain only maps, proper lists of binary leaves, nonnegative integers, binaries and finite static atoms (including booleans/enums). Source external_size counter M and deterministic emitted length E are distinct functions/contracts; prove their equality on this CLOSED normalized subset from exact pinned size/encoder branches, never assume general external_size equals encoded length. Measure each governance subtree AFTER seven groups and before proceeding to later top/state work; reject M>1048576 with the exact governance durable body. Measure the whole root ONLY after all states; reject M>262144 with the snapshot body. These are caller-business errors, unlike raw/profile/work/allocation failures. The final writer uses TermCodec's actual deterministic term-key order, UTF8 small atom tags, canonical integer widths and map/list headers, never private FWPS/FWPV. Integers0..255 use small integer; through signed32 maximum use INTEGER_EXT; larger magnitudes use SMALL_BIG (<256 digits) or LARGE_BIG, positive sign, leading zeroes removed. A customer version>u64 is retained as exact significant little-endian magnitude, not narrowed. Empty source strings fail their reached field; opaque nonempty bytes are unchanged.
+
+Bounded operational/resource proposal (all NEW whole-walk fees; all OLD fees unchanged). Profile equality precedes any debit. Entry128 precedes C1..1000000 admission. Preflight both type/attrs descriptor trees before business: attempted node128, then depth<=64, total occurrences<=65536, total VISIBLE atom/binary/magnitude bytes<=64MiB before the respective byte-length debit. Count aliased descendants and shadowed/ignored visible values per occurrence, key before value. This intentionally admits the mandatory~1.2MiB governance input; the old primitive262144 preflight is not reused here. Other cannot hide accounted payload or certify an actual raw parser. Larger/deeper/unrepresented source inputs remain operational exclusions and required profile obligations, never retained caller errors. This profile is a bound, not permission to change caller limits or source state count; old PolicyLimits.max_states is NOT a new source business restriction.
+
+Let N include both actual root descriptors and D the maximum visited descriptor depth. After preflight reserve capacities L=8*N+32 cells,2*L edges,N work slots (checked). This covers synthesized type/states plus every present-backoff:nil four-default expansion, keys and edges; before authoring, prove the count bound on all production constructors. Scratch is the SUM of all concurrently live metadata owners plus bounded indexed staging: Pnew=64*L+8*(2*L)+32*N+64*D+192. Prospectively admit this peak before any Vec reserve. Fresh reservation events are128+64L,128+16L,128+32N, in that order; each calls fallible try_reserve_exact. Every cell append, edge append and work-slot placement separately pays128 before mutation. Reserved capacity is not prepaid semantic work. Metadata owners drop on all errors and before the final Vec escapes; allocator capacity/growth/OOM/Drop/RSS are not certified by the logical schedule. PriorP is always max(priorP,Pnew), never reset or refunded.
+
+Fresh selector fee is128 root, then per represented row128+key bytes and, only for Atom/Binary keys,128+both key/query lengths before exact equality. Every reached field validator/container/classification pays128; absent top version/max-active validators also pay128. Old borrowed primitive semantic fees are preserved when invoked (including nil/default/presence rules); no CONTENT1 pass follows. Source list fingerprints use pinned binary hashing,128+payload length before fresh hash,16 per cached fingerprint comparison, then128+both lengths before equality on every hash hit. Hash inequality filters equality only; it is not map order or semantic uniqueness proof. Stable first occurrence is retained. This makes600 unique~2k leaves practical under the existing128MiB work profile, subject to the actual fixed fixture's preproduction hash/collision trace. A fallible paid index sort pays128+both compared key widths (or16 for cached hash/order words) before each comparison/placement; no Ord comparator hides operational Result/debits. Every uncached reread/normalization/hash is freshly paid.
+
+Each normalized-size and writer visit pays128+the exact header/scalar/payload bytes it measures or emits, including VERSION and list tail blocks, with independent fresh work on later whole-root measurement and emission. Measuring an oversize governance value does not copy its leaves. After final measurement and both caps, final output reservation is128+E, then the SAME immutable layout is emitted with fresh visit fees, followed by metadata128. No default Vec, String, Box, BTreeMap insertion or infallible payload owner exists during business checking. Rejection encoder uses entry128, bounded original-C digit work when relevant,128+whole literal body length, one fallible final Vec; no input/context formatter or source interpolation exists beyond finite field names and captured C.
+
+Representative independent literals/equations to freeze before code. For binary type r + empty Map: normalized term is #{states=>#{},type=><<r>>}; deterministic VERSION-prefixed hex is 837400000002770673746174657374000000007704747970656d0000000172,31B, five cells/four edges. N2/D0 gives preflightG385, L48, reservationG4288 and SUM-P4096. Every array/slot/header event must be included in the final exact success/refusal stream; the draft's naive aggregate MUST NOT omit append or sort events. I intentionally do not invent a final total before that closed stream is independently derived in tests-first authoring. Source top/version order and synthesized state map are observable in the full literal, not expected bytes generated by production.
+
+For normalized r plus binary version payload, M=E=45+payload on the specified subset; payload262099 is exact262144,262100 must reach SnapshotBytes after all states, and type-empty normalizer succeeds as binary type (public facade is another owner). Customer integers0/255,256, signed32Max,+1,u64Max,+1 and a>255-digit magnitude must produce their exact original integer tags/magnitude and retain the version above u64. Negative values reject Version; negative zero/leading-zero descriptors normalize mathematically without changing raw inputs.
+
+Mandatory governance600 recipe has600 UNIQUE String.duplicate(e,2000)<>decimal(i), i1..600, total visible leaf bytes1201692. Its normalized governance metric on this subset is35+5*600+1201692=1204727, so it reaches EXACT Governance(PolicyBytes) before full snapshot/state errors. Source1001-list count,1001-rule count, rule-name65536 and error-class257 must reach their OWN caller reasons. Freeze cached hash/order/collision counts of these literal fixtures from the declared pinned algorithms before production, rather than take them from returned counters. Real prior1928/P64 and indexed4784/P192 owners remain held; also normalize a richer first flow to establish a larger real P, keep its Vec alive through a successful second normalization and a later final-copy refusal, and compare exact original bytes/pointers after both. Repeat calls reuse the SAME immutable profile/account and pay every phase again.
+
+FOURTEEN named tests/duties proposed:
+original_flow_input_preserves_all_top_level_classes_and_presence -- all roots/types, mode presence, unknown dropping, empty type, full atom/binary shadow matrix, original type/state retry/retention inputs.
+original_flow_input_preserves_arbitrary_customer_versions -- opaque bytes and every integer width/negative/zero alias, whole expected bytes, no u64 narrowing.
+original_flow_input_stages_once_without_mutating_inputs -- deep originals/reordered lists, actual owned leaf lifetimes dropped after result, all fields/history immutable; no repeat CONTENT1.
+original_flow_input_preserves_complete_governance_model -- exact c718 source all fields and arrays, approvals effects/states/assignees and circuit fields, empty/nil distinctions.
+original_flow_input_preserves_governance_scalar_and_group_errors -- every24-reason family/valid neighbor, f01 four enforcements,3c5 every original malformed enum, field order and late tracking priority.
+original_flow_input_preserves_governance_lists_and_rule_bounds --663 dedup original sequence;0321001 leaves;999257 error class;be091001 rules;6ad65536 name, duplicates still raw-count and Map.new-before-rule-count.
+original_flow_input_preserves_governance_late_size_priority --34c600 unique exact recipe and metric; valid later groups/invalid later field before size; governance1MiB exact/+1 and full262144 distinct.
+original_flow_input_preserves_state_map_keyword_and_pair_semantics -- both list classifications, malformed tuple arity/shape, last duplicate wins, original6ad2 queued max-active1000 exact body.
+original_flow_input_preserves_source_state_iteration_and_field_order --32/33 surviving keys, pinned reduce_while order, competing errors, forbidden state active before present mode/retry/retention/governance.
+original_flow_input_emits_original_deterministic_etf -- minimal31/full all-field frozen literals, lengths/ranges/bytes and independent reader wrapping; literal expected recipes do not call candidate measure/emit.
+original_flow_input_preserves_both_source_size_gates -- normalized exact/+1 snapshot and original2357 oversized-policy/version x262144 normalizer error; late states error before snapshot cap, no old raw262144 early refusal.
+original_flow_input_preserves_profile_and_visible_bounds -- both roots, ignored/shadowed aliases, depth/node/text exact/+1, queried duplicate before value, no invented general Other/raw uniqueness.
+original_flow_input_preserves_every_prospective_phase_refusal -- fixed source-derived primitive streams including preflight, all concurrent reserves, cached/exact comparison, sort, governance/root measure, output reserve and emission; each max(target-1) preserves exact priorG/P.
+original_flow_input_preserves_continuous_work_and_held_owners -- exact/repeat/realP64/P192/larger prior peak/first+second owned Vec success and third refusal; capturedC1/17/1M exact body fees and poisoned future context.
+
+Mandatory source identity limits. Actual source declarations read: c718031a8b58adbb (all governance model fields and assertions); f01fdd7b5d20366f,3c5b3e727281fd1c,aa2c928919859979,663a4d706bc368f4,0321009a7cfb8f48,99967df82d50befd,be09c1f1eabce8da,6adf1e41e1f6bd48,34c1385be24604d9,d0333aa7c3e21f97,4b70723c9149fbe8,6ad2cd82f0217fe3,2357f49ff9da17a5. Only exact input/assertion components may later be linked after execution. The2357 allowed sized_policy map has NO states; the new full normalizer always adds states. Preserve its original allowed-map external_size/read roundtrip as REQUIRED UNLINKED general snapshot/reader work, not retrofit states or count the supplemental normalized45+payload boundary as that original. Public FlowTest defaults/resolution, all-shard generation, current/atomic/public setup and every source runtime profile remain required; no new component turns those whole cases into passing parity.
+
+Finite consultation decisions, not an inert-body gate. ORDER1: orientation is now resolved by actual pinned enum.ex5039-5046, maps.erl525-542 and erl_map.c3731-3745/3857-3916: flatmaps ascend, synthesized binary HAMTs reduce in descending swizzled-hash/collision-key order. Capture the exact binary hash/read/comparison fees in preproduction tests; Root native ea572a gives33-key reduce_while order [1,3,22,19,6,23,16,27,5,21,7,33,32,28,24,11,10,20,31,15,18,2,14,30,9,25,4,26,12,8,17,13,29], and the raw iterator/Enum.map order is its REVERSE. Never use that reverse proxy. ETF1: actually read/prove the external-size versus deterministic-length branches on the closed normalized subset and finite Unicode-output equivalence before using simplified comparisons. None authorizes accepting a fabricated VM context. Complete original raw/parser correspondence, successor Fresh/original-envelope parent, public options/resolution/service, physical/atomic storage, actual runtime tables, all profiles, Linux AND macOS and M1-M8 remain open. No native performance gain or Box change is claimed.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-STREAM1 (same proposal clarification)
+
+The main proposal at2661124+28433/8b8b9e54 remains inert and creation is not yet approved. This addendum closes its source-proof/order questions and freezes a concrete minimal fee stream before any candidate exists. It adds no artifact/model/API. I actually read ROOT's entire3719-byte NATIVE1 (ee8af2) and ARCH's entire10789-byte SOURCE1 (233b58); both retain their exact warning/runtime/profile limits. I independently fetched/read the relevant exact tagged primary clauses through github_fetch_file in memory: external.c blob ea04f5afc597498961eeced5b394bc4650620575, dist.h766d2f94877440ca90c88ab8525e5ed2ea1a1911, erl_map.c30a8b33a443554093748abb52a70162f15ce6f07, erl_term_hashing.c5b8f23bd34a37d4f95fe1f895ee7e8ee6662fb39 and Elixir enum.ex08a85a07db27ff94c4bff5035c319986d60ab153. No fetched source was written to a new local file.
+
+Closed normalized ETF proof: external.c739-750 supplies VERSION and default flags to the size counter;1493 onward initializes term_to_binary with those SAME defaults, adding only deterministic sorting for this option. dist.h136-137 defines UTF8 atoms/new floats; this output has no floats. Atom-size5306-5336 and emit2880 onward use identical tag/length on the static ASCII atom vocabulary. Small/big integer sizes5369-5387/5450 onward agree with emit3530 onward at255/256,signed32, significant magnitudes and255/256 digit thresholds. Binary-size5610 onward and emit corresponding bitstring branch use5+byte length on byte-aligned normalized binaries. Empty list is NIL_EXT1; every NONEMPTY normalized list contains binary leaves, so neither size nor emit can take the integer-byte STRING_EXT optimization. Both instead use LIST_EXT5 + children + NIL_EXT1. Map size is5+all pairs, independent of iteration; deterministic encoding sorts even flat maps but adds no bytes. These finite cases cover EVERY reachable normalized cell. Therefore M=E for this subset by structural induction, while remaining separate source metric/output purposes. No general external_size-equality theorem, opaque-term encoding, ETF decoder or physical installation is claimed. Keep whole-policy/governance VERSION bytes distinct from the later generation-envelope subterm, which must omit a second131.
+
+ORDER1 is resolved: Enumerable.Map.reduce calls maps.to_list; tagged list construction reverses the ascending HAMT slot/collision traversal. Synthesized binary state maps select last duplicate first, then use final UNIQUE count. <=32 ascends exact binary order; >32 descends fully nibble-swizzled pinned internal hash, with descending exact binary order on full-hash collisions. Native iterator/Enum.map is the reverse and must not be used as the reference. Pinned source hash is binary type11, bit length, fixed alpha/beta mixer, 16-byte blocks, tail and finalization; use explicit little-endian reads/wrapping64 arithmetic. The same binary hash may FILTER governance-list exact byte equality; its source-map ordering meaning applies only to that pinned synthesized binary map path. Captured direct Map rows retain their explicitly supplied source reduce order, not sorted output order.
+
+Unicode proof scope: I actually read unicode.ex8aa9ef02a3ed256ab111b060fce7d742d3c159af's table construction, conditional I/sigma paths and byte fallback. PERF independently parsed the complete tagged UnicodeData fca68e3e and SpecialCasing1013344a with that exact construction (40575 rows/103 unconditional overrides), finding only U+212A→ASCII k among nonASCII-to-allASCII default lowercase mappings. None of parallel/fifo/minimal/ledger/full/off/sampled/all/strict_global/approximate_global contains k. Thus allocation-free ASCII case-insensitive matching is equivalent for ONLY these finite accepted words. It must reject Kelvin/k-containing neighbors and preserve the source rejection of malformed/nonASCII bytes, without an invented UTF8-validation body. Backoff kind remains its own CASE-SENSITIVE old rule. This is attributed independent primary-source analysis; I do not claim my initial large UnicodeData fetch's empty-content response was a full own data read.
+
+Improper-list classification is explicit. Keyword.keyword? returns false for an improper tail, so top/options, governance collection and state-policy keyword contexts retain their exact shape diagnoses. A states pair-list with an earlier invalid prefix pair short-circuits to StatesList; a wholly valid binary-pair prefix that reaches a scalar tail enters source Enum.predicate_list with no matching clause and raises. Select existing operational UnsupportedTag at that reached exception-profile boundary, not a caller error or retained diagnosis. Governance string-list code has its own fallback: an improper tail after valid leaves is ListValue; if a further cons is reached after1000, ListCount precedes validating that leaf. Indexed nested list exception/invalid-tail paths must likewise follow their actual source clauses; where an original exception is reached, use explicit operational UnsupportedTag and preserve that incomplete exception-profile obligation. A tail equivalent to nil is mathematically proper; a zero-length prefix is an operational malformed view. No unsafe/runtime replay or new public exception model is requested.
+
+Exact MIN construction/visit clarification. An empty Map has no duplicate/cached-hash/order placements. Fixed-schema root fields are assembled in known deterministic atom order, so MIN needs no dynamic sort. At the end of its source business walk append, in order: empty states Map cell, states Atom cell, type Binary(r) cell, type Atom cell, root Map cell; then its four edges in deterministic key/value order. Each append/edge pays128 BEFORE mutation; these nine events sum1152. Reserve slots/capacity confer no credit. The independently fixed min31-byte output remains 837400000002770673746174657374000000007704747970656d0000000172.
+
+MIN fee phases on the same profile/account:
+- entry128; type descriptor+raw byte129; attrs empty-Map descriptor128: G385/N2/D0.
+- prospective scratch4096, then the three fallible reserves3200/896/192: G4673/P4096.
+- semantic root128; nine reached selectors128 each in source order (mode/version/maxactive/retry/retention/attributes/meta/governance/states); absent version/maxactive validator128 each; shared indexed absent roots128 each; default state-Map container128. These15 primitive events sum1920 and reachG6593.
+- the five cell/four edge append events128 each reachG7745.
+- measure VERSION block1 without a node fee, then ordered root Map133, states Atom136, empty Map133, type Atom134, type Binary134:671, reachesG8416.
+- final output reserve159 reaches8575; fresh identical writer stream671 reaches9246; success metadata128 reachesG9374/P4096/T13470.
+Both source metric and output writer pay VERSION exactly ONCE per traversal as a1-byte block; it is not a sixth cell/node. Empty-list and nonempty-list tail bytes likewise add their byte block without a fabricated extra cell. Scratch target4481 retainsG385/P0 when refused. Final tight13469 retains9246/P4096; repeated MIN isG18748/P4096/T22844. These are declared preproduction events, not observed counters. All later nonempty/default/sort/hash/size/error streams must derive from the same rules before production; the initial main note intentionally did not certify a naive append-omitting aggregate.
+
+Rejection resolution calls no old owner-returning encoder. Retry.as_bytes and indexed.message already expose static borrowed bodies. Extract a restricted uncharged retention-parts resolver for the SAME literal prefix/original C (old encoder preserves its current entry/digits/reserve stream); this new encoder resolves the wrapped reason first on its own single entry. Governance parameter validation admits only the six real string-list fields, the three RuleKind values and nine positive-field uses. It assembles at most four borrowed static segments and optional C digits in the existing seven-byte stack buffer, then pays digits and128+entire body before ONE fallible output Vec. Fixed fee is256+literal length; captured-C history remains318/320/330 atC1/17/1M. No intermediate Vec, duplicate encoder entry, dynamic String formatter, origin proof or new alias is introduced.
+
+Before creation, the final decision should bind the exact cursor method surface and remaining map-correspondence/placement order consistently: borrowed kind/is_nil/is_atom/atom_bytes/binary_bytes/integer magnitude; borrowed child/row/length access; source map classification; fresh selection; source hash/order access. Nil counts as an atom for keyword-key tests while is_nil controls omission. Whole preflight owns no adapter/tree; fixed queried-key masks can reject duplicate known atom/binary identities key-before-value. Dynamic native state/rule binary-key duplicates must refuse operationally before their first business child, using reserved work slots. Unknown/Other general semantic key identity is not certified. No additional global business normalization or source CONTENT1 pass is inserted by correspondence checking.
+
+Mandatory input resource practicality: the600 unique source recipe's raw leaf bytes1201692 and179700 prior candidates give fresh hash+cached-filter fee4153692 BEFORE any true/collision exact hits and other work, rather than naive full-pair fee742815108. Freeze actual hashes/collision visits from the declared pinned binary algorithm in the preproduction test epoch; do not obtain them from the normalizer's returned G. Root separately reports native9b56a7 type boundary/version262092 exact262144 and+1 rejection, plus exact type wide-version/2^64 output hex; these are finite owner source observations, not new whole-profile/Linux/metric proof. They supplement, rather than change, the main proposed r-type inclusive boundary and arbitrary-version duties.
+
+The source input/ETF snapshot component plus these clarifications is the requested exact creation consultation. It remains proposal-only until ARCH records the named batch and ROOT assigns disjoint tests-first ownership. Ordinary implementation helper splits need no separate inert full-body milestone. The authoritative original caller/frame/Fresh/layout/envelope Plan, public presentation, every original source assertion/setup/runtime profile, physical/atomic/storage and Linux/macOS M1-M8 work all remain explicitly required.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-CORR2 (finite same-inventory resolution)
+
+STREAM1's reached-exception spelling UnsupportedTag is superseded by ARCH's precise existing OUTER CompletePolicyEncodingError::Schema(PolicySchemaError::InvalidAuthority). CompletePolicyEncodingError itself has no direct InvalidAuthority variant; c97998 actually reads encoding.rs32-53. Use that existing wrapper ONLY when the source actually reaches an improper-tail traversal exception, after earlier leaf/pair validation and short-circuits. No global improper-list preflight refusal, new error variant, caller diagnosis or retained origin is selected. Root's301429/9fad7f controls distinguish valid-pair/nil-key prefixes reaching exceptions from earlier bad-pair/empty-key/wrong-class errors; governance's explicit scalar-tail fallback remains ListValue, including exactly1000 valid prefix leaves and a scalar tail.1001 proper duplicates instead reaches ListCount before that leaf. These source vectors belong in the existing named duties.
+
+The declared MIN9374 explicitly SKIPS absent OR contextual-nil optional top retry/retention/governance BEFORE invoking their borrowed semantic routines. No old public API has been called or paid, no credit is claimed, and the new whole optional composition has no validation/owner work at those source nil clauses. Existing standalone primitive Nil calls still execute ALL their old semantic-root/metadata/default/copy events unchanged; new present NONNIL retry/retention enters those real shared walkers including their roots. Present-empty governance enters its group/container walk, while nested governance nil groups skip their optional walkers. Indexed absent inputs deliberately invoke its two shared absent roots because its presence/nil rules differ. Version/max-active absent validators retain their explicitly declared128 events. These choices are part of the new tariff, not inferred refunds; they explain exactly the15 MIN semantic events without omitting a reached helper. Root's reservation wording is likewise precise:4288 is the SUM OF THREE DEBITS, not cumulativeG;385+4288=4673.
+
+Source counterpart precision remains unchanged. The new full normalizer adds empty states, so it cannot claim all2357's original arbitrary sized_policy map observations, which omit states. The actual normalizer oversized-policy/version x262144 error is a legitimate causal component; normalized r payload262099/262100 and Root boundary262092/262093 are additional inclusive controls, not substituted original allowed-map fixtures. Exact canonical manifest c718031a8b58adbb was read/verified in4b8ebd. Every original field/assertion/setup/profile still requires its actual counterpart.
+
+The named state/list duties also include>old PolicyLimits.max_states with a small source-valid snapshot (no source state-count admission),1000 duplicate governance strings versus1001 duplicates, bad1001st leaf/count precedence,1001 duplicate keyword rule names deduplicated BEFORE rule count versus1001 distinct names, and33 raw state pairs demoting to32 UNIQUE keys. This adds no test title/path/model or assertion removal. Main28433 and STREAM10407 remain whole-readable historical proposal epochs; this concise clarification supplies their final exception/tariff wording for the single exact decision.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-LIST-TAIL1
+
+ARCH correctly identified an ambiguity in STREAM1: Erlang empty-list/NIL_EXT is NOT Elixir nil atom. RawFlowPolicyValue::Nil and Atom("nil") represent the atom nil throughout these adapters and NEVER close a proper list. Only Raw::List(&[]) (or recursively proper List/concatenated list tail) terminates one. Thus [valid state pair | Raw::Nil] remains improper and reaches Schema(InvalidAuthority) after valid prefix traversal, while the ordinary proper List neighbor succeeds. Governance [valid binary | Raw::Nil] reaches ListValue; it is not silently accepted. Keyword classification treats a tail Raw::Nil as nonempty nonlist/false, while a Raw::Nil used as a PAIR KEY still is an atom. The normalized empty-list encoder's NIL_EXT1 remains correct and differs from an atom nil encoding, which this normal form omits at optional fields. Preserve all these paired controls within existing named tests. No new artifact/model/API/fee is added; this correction supersedes only STREAM's phrase 'tail equivalent to nil is mathematically proper'.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-INTERFACES1
+
+Same selected paths/models, no extra artifact or helper-body gate. ROOT owns domain flow_input/etf.rs, order.rs and order/hash.rs plus shared complete facade/checker/docs/ledger/Git; writer owns the other11 domain children and approved existing primitive seams after genuine RED/release. ROOT's test ownership is ONLY flow_input/etf.rs with the three arbitrary-version/deterministic-ETF/both-size duties; writer owns other five test children and main EOF. ROOT tests may import Raw/Reason/API directly and existing complete-policy TestResult/limits, with no new helper type or dependency on unfinished fixture bodies.
+
+Private layout semantics: Map.start is an index into paired key/value edges and Map.len is PAIR count; List.start is edge index and List.len is edge count. BigInteger cells borrow CANONICAL significant positive little-endian magnitude; zero/small aliases use Integer and canonical ETF tags. Cells/edges/work/root and their enum/struct visibility is pub(super) only inside flow_input. The cursor/kind/map and shared borrowed semantic types are restricted to crate::policy::complete. No getter/Entry/payment/accepted model is public.
+
+ROOT's exact private functions:
+etf::measure_snapshot(layout:&FlowPolicyLayout<'_>,root:usize,charge:&mutPolicySchemaCharge)->Result<usize,CompletePolicyEncodingError>.
+etf::emit_snapshot(layout:&FlowPolicyLayout<'_>,root:usize,length:usize,charge:&mutPolicySchemaCharge)->Result<Vec<u8>,CompletePolicyEncodingError>.
+order::prepare_map_order<'input>(map:PolicyInputMap<'input>,layout:&mutFlowPolicyLayout<'input>,charge:&mutPolicySchemaCharge)->Result<(usize,usize),CompletePolicyEncodingError>.
+order::sort_output_map(layout:&mutFlowPolicyLayout<'_>,edge_start:usize,pair_len:usize,charge:&mutPolicySchemaCharge)->Result<(),CompletePolicyEncodingError>.
+order::hash::binary_hash(bytes:&[u8],charge:&mutPolicySchemaCharge)->Result<u64,CompletePolicyEncodingError>.
+The last returns the UNSWIZZLED pinned hash and prepays128+len; order derives the swizzled key. prepare_map_order returns a (work_start,work_len) region in the ONE existing work Vec. Direct maps preserve supplied reduce order; StatePairs retain highest duplicate input ordinal before their32 threshold/order; Keyword counts unique atoms without claiming a native atom HAMT order where every rule/state atom name yields the same reached name diagnosis. Fixed-schema maps need no dynamic ordering slots. The caller saves the checkpoint, appends nested work AFTER live outer slots, copies needed scalar slot fields before mutating children, and truncates ONLY its completed region. No clear(), hidden second Vec or clobbering live outer indices. Successful33-state input with nested governance lists/rules explicitly tests this region discipline.
+
+Emit owns output reserve128+length plus fresh VERSION/cell/header/tail/payload writer fees and exact final length check; the OUTER normalizer owns final metadata128. It does not remeasure or repeat business. measure returns the proven closed-subset M=E on a bare VERSION-prefixed subtree; governance calls it at its source point, while top calls it after states. A future envelope emitter must borrow this SAME layout and omit nested VERSION, not parse or recopy the public snapshot Vec.
+
+Named cursor accessors, all constant-time on the LOCAL represented descriptor: kind(), is_nil(), is_atom(), atom_bytes(), binary_bytes(), integer(), big_integer(), len(), child(index), row(index), tail(). Nil/Atomnil is_nil; BOTH also have source atom identity/atom_bytes nil. len() is local map/keyword row count or list/tuple/prefix item count; it is NOT a hidden flattened-list walk. child is a local list/tuple/prefix child; row is a native represented Map or already classified Retry::Keyword row, returning two Copy cursors; tail returns only an explicit improper/concatenated tail, never invents RawNil as empty-list. Flow List-to-Keyword classification is a SEPARATE paid full traversal before constructing PolicyInputMap::Keyword; source pair classification likewise stays in states. Old Retry::Keyword is already classified and incurs no extra old pass.
+
+Restricted map accessors len(charge) and row_at(index,charge) may cross concatenated proper-tail chunks only by paying128 BEFORE every actual tail follow; dense ordinary List/Map rows remain constant-time. No flattened backing is allocated. A reached source-invalid shape or exception is returned at the previously frozen point; these accessors do not globally reject improper source values. Row/tuple/key rereads during classification, fresh selectors, last-duplicate conversion and hashing obey their declared visit/comparison/placement fees; kind() does not hide an O(n) classification. Both source List[] and RawNil-tail neighbors remain explicit.
+
+Use deterministic fallible heapsort for dynamic order/output comparisons, with Result threaded through every paid comparison. Cached hash/order-word comparison is16; uncached exact byte-key comparison is128+both lengths. Work-slot initial append/update costs128; a swap of two complete slots admits256 atomically BEFORE either mutation. A paired-edge swap admits512 atomically BEFORE four index placements; edge appends remain128 each. This is a conservative new tariff grouping, not four separately refusing writes. Hash hits always pay fresh full equality; cached hashes only filter. These choices preserve MIN's no-sort/no-slot-placement stream9374/P4096, while nonempty heapsort/hash/collision streams must be independently frozen during substantive tests-first authoring before production, never learned from a returned account.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-MASK1 (preproduction tariff clarification)
+
+Freeze the exact new46-name queried-key union in source first-appearance order: mode,version,max_active_ms,retry,retention,indexed_attributes,indexed_state_meta,governance,states,max_attempts,max_retries,backoff,exhausted_to,kind,base_ms,max_ms,jitter_pct,ttl_ms,history_hot_max_events,history_max_events,effects,audit,limits,budgets,circuits,approvals,allowed,denied,require_idempotency_key,effect_events,denials,limit,enforcement,lease_size,window_ms,unit,failure_threshold,open_ms,min_calls,failure_rate_pct,latency_threshold_ms,error_classes,half_open_max_probes,half_open_success_threshold,assignees,timeout_ms. This is ONE private literal array QUERY_NAMES in the already selected preflight.rs, not a model/path/API. Class-first: only source atom/binary keys enter comparisons; Nil has atom identity/name nil. Each attempted key first pays descriptor128 and its actually represented text bytes; then, for each visited literal until the first exact hit,128+key-name byte length+literal byte length; a hit separately pays membership128 BEFORE visiting the value. DirectMap repeats of the same queried atom/binary identity return existing Error::Malformed after membership, before duplicate value. A local u128 mask separates atom bit i and binary bit46+i; maximum91. Keyword duplicates remain valid/last-write but pay their same classification/membership events. Nonqueried keys have no membership event. Full old retry8/retention3 tables/order/body/fees remain unchanged. Scalar/default/root MIN has no map keys and remains9374/P4096.
+
+Dynamic binary state/rule Map duplicates are checked with the existing reserved work owner when that container is reached and before its first business child. Source Map.new duplicates remain legal and are compacted before final unique count/ordering. Opaque general map identity is still not proved by Other. This fixes the previously underspecified NEW preflight stream before any production exists; nonempty independent fee tables use this46-name order, never a candidate counter.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-MASK-SCOPE1
+
+MASK1's Keyword preflight wording is superseded: the NEW46-table mask applies ONLY actual RawFlow::Map row keys during global descriptor preflight. Generic List/Tuple recurse normally without classifying every list or applying a mask to tuple heads. Keyword classification is the separate paid source semantic traversal; selectors then pay fresh normal row/literal work, with NO46-table pass and legal last duplicates. Old RawRetry::Keyword is already classified and retains its entire old8-table preflight/fees. ARCH recorded exact acceptance at1587357+3366/bdb7ab7e; MIN unchanged. Independent DirectMap version-v preflight1058 and duplicate mode membership1305 (tight1304 retains1177/P0 before duplicate huge value) are fixed preproduction test anchors.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-CONS-STATE1
+
+Same selected new tariff, frozen before production: governance string-list traversal pays ONE128 reached-cons event before count/class inspection; it includes the leaf class test and has no second validator128. At raw count1000, the1001st CONS returns ListCount before reading its leaf class/payload; a scalar improper tail instead reaches the source ListValue fallback. Only valid reached leaves then pay fresh hash128+length, prior cached comparisons16, exact-on-hit128+both lengths, and unique work-slot placement128. Thus the [a,b,a] one-byte-list subtree pays root128 plus1189 reached-row/hash/cache/hit/placement work=1317. Default empty states pays its ONE128 container in order::prepare_map_order; states orchestration adds no duplicate container event. MIN9374/P4096 remains exact. ARCH explicitly agrees by direct message; PERF has the same precise stream for independent nonempty derivation. No old primitive body/event, public model, artifact or source priority changes.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-STATE-LIST-TARIFF1
+
+Before any production, freeze the substantive nonempty streams as independently checked by PERF. First-list recipe type r/attrs governance.effects.allowed [a,b,a]: preflight10082, N11/D4/L120/P10400, reserves10336→G20418. Child-first construction appends no Gov/effects/list cell placeholders before this first list. Top through Gov selector3956→24374; Gov root128/mode402/effects405→25309; effects root128/allowed405→25842. Listroot128; rows [128,129,128], [128,129,16,128], [128,129,16,130] reach27159. First cached comparison target37028 retains26612/P10400 at max37027; exact-hit target37559 retains27029/P10400 at max37558. Full13cells/12edges, GovM47, wholeE89 totals G38541/P10400/T48941. The600 unique original hashes were independently computed from the pinned algorithm before production: no hits among600, leaf bytes1201692, fresh hashes1278492,179700 cached comparisons2875200, total hash/filter4153692; this is not a native gain claim.
+
+StatePairs [s01=>{},s02=>{}] with type r: N10/D3, pre2845/P9664, reserves9664→12509. Top root/selectors/absent validators/indexed roots4294→16803. Separately paid Keyword classifier128+first row128 returnsfalse, then pair classifier128+two rows128 each;640→17443. No hidden tuple-child visit/classifier debit or later work-region iteration debit. prepareMap [128,128,131,128,128,131,16,128,134,256,256]=1564→19007. Each surviving empty state pays name/class128, exact running compare138, policyMap128, five absent selectors128 each=1034, then four128 child-first appends (policyMap/nameBinary/twoedges). Enclosing statesMap128 precedes paired-edge sort, reaching22227. Sort [134,512,512]→23385; remaining root8appends1024→24409; nine-cell E57 measure1209, reserve185, emit1209, metadata128→G27140/P9664/T36804. Both full-slot256 and paired-edge512 swaps are atomic prospective events. These new stream choices leave every old primitive event and MIN9374 exact; fixed arrays are frozen before the implementation, not extracted from a returned counter.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-TESTS-RED1 (actual tests-only completion)
+
+The selected finite TESTS-FIRST phase is complete. Root's CREATE1/SELECT1 delegated the original five test paths plus exact17B main EOF; ARCH TEST-GROUP1 explicitly selected the additional private governance/cases.rs and mod cases BEFORE its creation (architecture1590723+2153/dab514c89991adbe3fd72572030ec979fd0964c6faa907b47c6ef6de67e190d4, e8d55c). No new nominal type, alias/model, dependency, target, production path, unchecked factory, suppression or probe was created. ROOT owns the seventh actual test file flow_input/etf.rs; I did not edit it. The fourteen named test identities remain exactly the selected duties. The corrected fixture statement uses a supplied PolicyLimits::new(1) profile and TWO states; the earlier comment65>default was wrong (actual old default16384) and is honestly corrected before production.
+
+Actual chronology: rustfmt a82e02 first exposed753 physical lines in governance.rs. Existing helpers were split/moved to the explicitly approved child and existing cases.rs without removing a test/assertion/source input. A first patch application failed with a context mismatch and changed no file; the subsequent exact-context patch succeeded. Final ordinary rustfmt passed (cb95a2 and8ab111). Source/control refinements from ARCH/PERF were completed before any production existed: all bounded BigInteger aliases/negative-zero and invalid neighbors; inverse and contextual-nil atom/binary precedence; nil ATOM keyword keys; proper NONEMPTY concatenated list tails/last duplicate; reached improper-tail exceptions after earlier errors; 32/33 and mixed33 long-hash adjacent/swap errors; supplied-state-budget independence; source governance lists/count/dedup/rule count/name/group/numeric/tracking/opaque-byte priorities.
+
+First REAL command was `env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`, in ferricstore2-rust-design. Initial8a998d/session87532 -> terminal8f1b49 EXIT101 found TWO E0432 missing-export diagnostics PLUS an extra super in the restore fixture and an unused atom import after moving the positive enum helper. ZERO assertions ran. I corrected only super::super::super::data -> super::super::data and removed that unused import, preserving every fixture/body/work oracle. This first failure is not relabeled a clean missing-API RED or a production defect. Full concatenated output, copied from the actual retained receipts:
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::FlowPolicyInputRejection`, `wf_domain::policy::complete::GovernancePolicyInputRejection`, `wf_domain::policy::complete::RawFlowPolicyValue`, `wf_domain::policy::complete::encode_original_complete_policy_input_rejection_body`, `wf_domain::policy::complete::normalize_original_complete_policy_input`
+  --> crates/wf-domain/tests/complete_policy/flow_input.rs:5:43
+   |
+ 5 |     CompletePolicyEncodingError as Error, FlowPolicyInputRejection as Reason,
+   |                                           ------------------------^^^^^^^^^^
+   |                                           |
+   |                                           no `FlowPolicyInputRejection` in `policy::complete`
+ 6 |     GovernancePolicyInputRejection as Gov, PolicyIndexedInputRejection as Indexed,
+   |     ------------------------------^^^^^^^
+   |     |
+   |     no `GovernancePolicyInputRejection` in `policy::complete`
+ 7 |     PolicyRetentionInputRejection as Retention, PolicyRetryInputRejection as Retry,
+ 8 |     PolicySchemaError, RawFlowPolicyValue as Raw,
+   |                        ------------------^^^^^^^
+   |                        |
+   |                        no `RawFlowPolicyValue` in `policy::complete`
+ 9 |     encode_original_complete_policy_input_rejection_body as encode,
+   |     ----------------------------------------------------^^^^^^^^^^
+   |     |
+   |     no `encode_original_complete_policy_input_rejection_body` in `policy::complete`
+10 |     normalize_original_complete_policy_input as normalize,
+   |     ----------------------------------------^^^^^^^^^^^^^
+   |     |
+   |     no `normalize_original_complete_policy_input` in `policy::complete`
+   |
+help: a similar name exists in the module
+   |
+ 9 -     encode_original_complete_policy_input_rejection_body as encode,
+ 9 +     encode_complete_policy_replace_rejection_body as encode,
+   |
+help: a similar name exists in the module
+   |
+10 -     normalize_original_complete_policy_input as normalize,
+10 +     read_original_complete_policy_entry as normalize,
+   |
+
+error[E0432]: unresolved imports `wf_domain::policy::complete::FlowPolicyInputRejection`, `wf_domain::policy::complete::GovernancePolicyInputRejection`, `wf_domain::policy::complete::RawFlowPolicyValue`, `wf_domain::policy::complete::normalize_original_complete_policy_input`
+ --> crates/wf-domain/tests/complete_policy/flow_input/etf.rs:4:5
+  |
+4 |     FlowPolicyInputRejection as Reason, GovernancePolicyInputRejection as Gov, OriginalEtfSafety,
+  |     ------------------------^^^^^^^^^^  ------------------------------^^^^^^^
+  |     |                                   |
+  |     |                                   no `GovernancePolicyInputRejection` in `policy::complete`
+  |     no `FlowPolicyInputRejection` in `policy::complete`
+5 |     PolicySchemaCharge, PolicySchemaLimits, RawFlowPolicyValue as Raw,
+  |                                             ------------------^^^^^^^
+  |                                             |
+  |                                             no `RawFlowPolicyValue` in `policy::complete`
+6 |     decode_original_complete_policy_entry as decode,
+7 |     normalize_original_complete_policy_input as normalize,
+  |     ----------------------------------------^^^^^^^^^^^^^
+  |     |
+  |     no `normalize_original_complete_policy_input` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+7 -     normalize_original_complete_policy_input as normalize,
+7 +     read_original_complete_policy_entry as normalize,
+  |
+
+error[E0433]: too many leading `super` keywords within `crate::flow_input::refusals`
+   --> crates/wf-domain/tests/complete_policy/flow_input/refusals.rs:421:43
+    |
+421 |             let mut value = super::super::super::data(b"r".to_vec(), None, BTreeMap::new());
+    |                                           ^^^^^ this `super` would go above the crate root
+
+error: unused import: `atom`
+ --> crates/wf-domain/tests/complete_policy/flow_input/governance/cases.rs:4:42
+  |
+4 | use super::super::{Gov, Raw, TestResult, atom, map, named_map};
+  |                                          ^^^^
+  |
+  = note: `-D unused-imports` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+Some errors have detailed explanations: E0432, E0433.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 4 previous errors
+```
+
+Second REAL identical locked warnings-denied command: e6cb9a/session37408 -> fd5344 EXIT101. Exactly TWO E0432 diagnostics cover the five still-absent exports (three models/two functions), with no other diagnostic and ZERO assertions. Full concatenated output:
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::FlowPolicyInputRejection`, `wf_domain::policy::complete::GovernancePolicyInputRejection`, `wf_domain::policy::complete::RawFlowPolicyValue`, `wf_domain::policy::complete::encode_original_complete_policy_input_rejection_body`, `wf_domain::policy::complete::normalize_original_complete_policy_input`
+  --> crates/wf-domain/tests/complete_policy/flow_input.rs:5:43
+   |
+ 5 |     CompletePolicyEncodingError as Error, FlowPolicyInputRejection as Reason,
+   |                                           ------------------------^^^^^^^^^^
+   |                                           |
+   |                                           no `FlowPolicyInputRejection` in `policy::complete`
+ 6 |     GovernancePolicyInputRejection as Gov, PolicyIndexedInputRejection as Indexed,
+   |     ------------------------------^^^^^^^
+   |     |
+   |     no `GovernancePolicyInputRejection` in `policy::complete`
+ 7 |     PolicyRetentionInputRejection as Retention, PolicyRetryInputRejection as Retry,
+ 8 |     PolicySchemaError, RawFlowPolicyValue as Raw,
+   |                        ------------------^^^^^^^
+   |                        |
+   |                        no `RawFlowPolicyValue` in `policy::complete`
+ 9 |     encode_original_complete_policy_input_rejection_body as encode,
+   |     ----------------------------------------------------^^^^^^^^^^
+   |     |
+   |     no `encode_original_complete_policy_input_rejection_body` in `policy::complete`
+10 |     normalize_original_complete_policy_input as normalize,
+   |     ----------------------------------------^^^^^^^^^^^^^
+   |     |
+   |     no `normalize_original_complete_policy_input` in `policy::complete`
+   |
+help: a similar name exists in the module
+   |
+ 9 -     encode_original_complete_policy_input_rejection_body as encode,
+ 9 +     encode_complete_policy_replace_rejection_body as encode,
+   |
+help: a similar name exists in the module
+   |
+10 -     normalize_original_complete_policy_input as normalize,
+10 +     read_original_complete_policy_entry as normalize,
+   |
+
+error[E0432]: unresolved imports `wf_domain::policy::complete::FlowPolicyInputRejection`, `wf_domain::policy::complete::GovernancePolicyInputRejection`, `wf_domain::policy::complete::RawFlowPolicyValue`, `wf_domain::policy::complete::normalize_original_complete_policy_input`
+ --> crates/wf-domain/tests/complete_policy/flow_input/etf.rs:4:5
+  |
+4 |     FlowPolicyInputRejection as Reason, GovernancePolicyInputRejection as Gov, OriginalEtfSafety,
+  |     ------------------------^^^^^^^^^^  ------------------------------^^^^^^^
+  |     |                                   |
+  |     |                                   no `GovernancePolicyInputRejection` in `policy::complete`
+  |     no `FlowPolicyInputRejection` in `policy::complete`
+5 |     PolicySchemaCharge, PolicySchemaLimits, RawFlowPolicyValue as Raw,
+  |                                             ------------------^^^^^^^
+  |                                             |
+  |                                             no `RawFlowPolicyValue` in `policy::complete`
+6 |     decode_original_complete_policy_entry as decode,
+7 |     normalize_original_complete_policy_input as normalize,
+  |     ----------------------------------------^^^^^^^^^^^^^
+  |     |
+  |     no `normalize_original_complete_policy_input` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+7 -     normalize_original_complete_policy_input as normalize,
+7 +     read_original_complete_policy_entry as normalize,
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 2 previous errors
+```
+
+Actual before/after source proof185fe7/ddcb38: ALL FOURTEEN production paths remain absent (no flow_input.rs and no flow_input directory). Existing complete.rs plus retry_input.rs/value.rs, retention_input.rs, indexed_input.rs/key.rs are byte-for-byte HEADa0a8858. Existing test main's entire1982B prefix is unchanged, SHA256949017b4ef2622cc6473e101194d0f9fd8f04312dfa1adce69c7d7a9d67d22b6; ONLY suffix `\nmod flow_input;\n` (17B) was appended. Current1999B main SHA b3143eb0aa25455aa50f4608fb8dad44656fe1c0c838889ec30d16f198c4a0ef.
+
+Final actual manifest from ddcb38, ordinary formatted geometry <=600, functions <=100:
+- flow_input.rs:19190B/584LF/maxfn69/SHAa393e5a4249d4012f446e870e4665170c3f8496e0bf55dbe2603a60705ba63e5.
+- flow_input/cases.rs:19914B/582LF/maxfn68/SHA64f01d998a4dcb8c81ab039136e3eebfc7e6d7497f78a0cff1f69d841c38638a.
+- flow_input/governance.rs:18755B/578LF/maxfn86/SHA6f112913ebea60ff67a1df6aacd6e75e456667d7330ab7f80f0bad3c60986199.
+- flow_input/governance/cases.rs:18206B/574LF/maxfn74/SHA655b9c58d89fba299a4549c63d38e116d0e29f809d45ccc37122aae0c08f7522.
+- flow_input/states.rs:19146B/596LF/maxfn68/SHA149ec521cb7f165ec72efc0b7ae4bacb4ea0710c2aede28042f7aac386554e8e.
+- flow_input/refusals.rs:18626B/532LF/maxfn61/SHAc07d3b5c3f251721e20218af4f029e2354a86d5a8589d1c2c5a02307861051bc.
+- ROOT-owned flow_input/etf.rs, untouched by me:14469B/431LF/maxfn68/SHAbc18274b4d93f6ccffd12357cb843af4e94f4e29763994b98284143813441366.
+
+Independent provenance and prospective controls. Expected ETF helpers assemble only explicitly supplied expected normalized atoms/integers/binary/list/map grammar; no candidate encoder/decoder/counter defines an expected value. MIN is the fixed31B/SHA3b0dc61aa522d906982f8ba00cc6ba7dbf314ab722142d297726deb761bc1dcd. All MIN9374/P4096 primitive debits, scratch/reserves, append/measure/reserve/emit/metadata are individually refused at target-1. Gov[a,b,a] pre10082/P10400/reserves→20418, cached/exact leaf events, full child-first cells, Gov measure943, states, whole measure1753/reserve217/fresh writer/metadata all feed the SAME per-event refusal helper; total38541/P10400. StatePairs s01/s02 freezes every descriptor/classification/prepare/empty-state/append/sort/measure/emit event, including atomic256 slot swaps and512 paired-edge swaps:27140/P9664. The new46 queried mask is actual-Map-only; version-v pre1058 and duplicate-mode membership1305/tight1304 retain1177/P0 BEFORE its oversized duplicate value. Scalar no-Keyword preclassification, cached filters and proper-tail work are not hidden.
+
+Real predecessor owners remain held: restore1928/P64 plus MIN11302/P4096, indexed4784/P192 plus MIN14158/P4096. Rich first input Map[(Other,List[Nil,Nil])] establishes13726/P6912; a second MIN succeeds to23100 and a third output-reserve refusal38587 at max38586 retains31516/P6912, while both first/second exact bytes/pointers remain observable. Captured history bodies C1/17/1M retain original literals/fees318/320/330. Profile mismatch has no debit; invalid C precedes nil/shape; depth64/65, N65536/attempted65537 and64MiB raw limits count ignored/shadowed/aliased visible occurrences, without claiming Other proves hidden raw identity/payload. Old standalone retry646/512, retention512 and indexed384 streams remain directly asserted.
+
+I ACTUALLY read the entire independent PERF NONEMPTY-FREEZE1 at1332114+6622/SHA895457d605ce85741a0a6f167a3981beb6cd802d085b47e809e584a64c595cbd and HASH-NATIVE1 at1321782+10332/SHA27ddbb1603046fbd757e6932916228864fae7e1d9e7068e5c4fe238df233347e in0416d6. They agree on all frozen stream arithmetic/hash/order and the600-unique filter phases. No new VM/probe or candidate run supplied an oracle. Root's native observations are attributed to that exact pinned opt64LE Darwin profile, not to my Rust execution or other profiles.
+
+Root reports its own independent final missing-API reproduction c94b51/session75335->96c30b EXIT101 and production-absence/old-byte proofb5c665, then explicit later production release. Those are Root's evidence, not an owner assertion run. This finite phase claims only substantive authored controls and genuine preproduction RED; first GREEN/strict lint/source review belong to the subsequent implementation phase. Public/options/frame/Fresh/original-envelope integration, arbitrary raw/parser correspondence, every original setup/assertion/profile, physical atomic storage, all M1-M8 work and BOTH Linux/macOS remain open. No native speed/allocation/Box or whole-case parity claim.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-TYPE-TEST-CORR1
+
+PERF independently found a genuine source-oracle contradiction AFTER the clean RED and BEFORE any implementation result: assert_root_classes reused Raw::Binary(empty) from invalid ATTRS as an invalid workflow TYPE with proper List(empty), while source accepts every binary TYPE and the same test already accepts empty TYPE+Map(empty). ROOT explicitly authorized the narrow repair. The invalid-attrs RootShape assertion remains; that one type subcase now asserts the whole independently assembled empty-type snapshot, other type classes still assert RootShape. No counters/source contract/API changed; this is an honest post-RED source-only test correction, not preproduction evidence for these final bytes. Original parent a393e5a4 is preserved in TESTS-RED1; actual current hash/geometry follows.
+Current parent 19347B/589LF/SHA25622396d6c18246f2ef36c0c84756c61c97a0b5755a1383a8eefe899786f2f59b9. Root authorization and ARCH/PERF source confirmation preceded this correction; no other test changed.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-CONTIGUOUS1
+
+Source construction finding before any implementation compiler/account result: parent Map paired edges must be contiguous after all nested child edges exist. The old frozen per-state parent-edge append order could interleave later child edges. ARCH1606134+3107/6d943d7b and Root explicitly selected the SAME model fix: consume raw row, normalize child, append name cell, debit128 before ONE whole-slot update cell=childRoot/order=checked u64(nameCellID), keeping raw index/hash. Only after every child completes append all staged name/child pairs; then enclosing Map and output sort. No adjacency assumption, dead-edge copy, extra owner/path/model. This necessarily adds128 per child and moves edge events. Exact n2 stream now pre/prepare19007→child1418→20425→child1418→21843→four edges512→22355→Map128→22483→sort1158→23641→root1024→24665→M1209/res185/emit1209/meta128→G27396/P9664/T37060. Root delegated this exact test correction to me. Original27140 in the genuine RED remains historical; this is an honest post-RED construction/tariff correction made before implementation results, not counter fitting. MIN9374, Gov38541 and every old primitive fee remain exact.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-SELECTOR-TEST-CORR1
+
+First implementation compile a41e31/session32215→254374 EXIT101 compiled production but exposed two latent test E0369 comparisons: RawFlowPolicyValue has no selected PartialEq. Exact unchanged [(Other,Nil)]/[Nil,Nil] expectations are retained as structural matches! assertions; no public trait was added. First actual100-test execution 7eaf86/session39846→284067 EXIT101 had99PASS/1FAIL. Only the every-prospective-phase test failed at the first nonempty selector: expected prior20546 versus actual20812, bothP10400. The test incorrectly treated independently summed selector408 as ONE atomic event. Root/PERF had actually read select() before this result, and the preproduction declared/old tariff always specified separate root128, row128+K, compare128+K+Q. Root explicitly authorized the source-granularity repair AFTER this result, not a production change or fitted total. For K10/Q4,408 expands[128,138,142]; K7/Q4,402 expands[128,135,139]; K6/Q4,400 expands[128,134,138]. All Gov/effects/later/n2 selectors now use these three independent width events. Hash/node/header/actual-comparison fees retain their selected atomic grouping. Full38541/P10400 and27396/P9664, all scenarios/bytes/bodies and old fees are unchanged. This honest post-implementation-result oracle-granularity epoch supersedes only composite selector test events; original RED and99/1 output remain required evidence.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-GREEN1 (actual substantive implementation; 2026-10-15)
+
+The selected whole incoming normalizer is substantively implemented. Actual owner focused complete_policy target is100PASS/0FAIL/0ignored, including every old86 control and14 new identities; warnings-denied library+target Clippy PASS. This is the finite snapshot-normalizer component, not the required caller/frame/Fresh/original-generation-envelope/public/physical integration or full M1–M8 acceptance. ROOT owns the three ETF/order/hash bodies, facade/checker and independent full-wrapper validation. My11 new children and5 old semantic-sharing seams are the only production paths I edited. No additional file/type/alias/model/dependency/probe or suppression was introduced. The7 test paths remain the selected batch including the separately preapproved governance/cases child; ROOT's ETF child is untouched.
+
+Actual environment c520c1: {"host": "macOS-26.6.2-arm64-arm-64bit-Mach-O", "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: aarch64-apple-darwin\nrelease: 1.99.0\nLLVM version: 23.1.1\n", "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)\n", "head": "a0a88588ba6af316d0fd64d1c5b6a09a73cf2812"}. HEAD during these owner runs is a0a88588ba6af316d0fd64d1c5b6a09a73cf2812; tests execute the pending worktree on macOS/aarch64. This provides no Linux execution or other source VM/profile evidence.
+
+Chronology is preserved, not rewritten as a single clean TDD epoch. The initial absent-API TESTS-RED1 at2716069+15690/c777dc28 is unchanged: substantive tests preceded all14 production files. Its parent a393e5a4 and original n2 27140/composite-selector oracle are historical. TYPE-TEST-CORR1 is the independent source-only empty-binary TYPE correction found after RED but before any implementation result. CONTIGUOUS1 was the pre-result same-model edge-staging correction, independently selected by ARCH/ROOT: children finish before parent paired edges, and a fresh whole-slot128 stores cell=childRoot/order=checked nameCellID while preserving raw index/hash. N2 therefore27396/P9664; MIN9374 and Gov38541 unchanged. The first compiler E0369 and first executed99PASS/1FAIL remain below. SELECTOR-TEST-CORR1 is honestly AFTER that99/1 result: each declared selector is [128,128+keyLen,128+keyLen+queryLen], not one indivisible total. The actual production select body had already been read by ROOT/PERF before that result; no production event, whole total/input/body was changed to fit a counter.
+
+Actual source corrections after first100. PERF/ARCH independently found present-nonnil wrong-class governance lists returned StringList before their already-declared root128. I moved that existing128 before kind rejection; optional nil still skips the walker and all valid streams stay exact. Root authorized the supplemental independent target31887/max31886 retention23439/P8320; exact31887 reaches StringList(Allowed) at23567/P8320. I separately found the analogous rule-map None branch, confirmed by ARCH/PERF/ROOT: classify_map keeps its current paid order; None ONLY now pays128 before RuleMapShape; valid maps receive their sole root128 in prepare_map_order. Independent literal type-r/governance/limits/Other gives N6/D2/raw17, entry-inclusive pre5662, reservations6976/P6912, top3956+Govroot128+selectors400/403/401/402, priorG18328; tight25367 refuses25368 retaining18328/P6912. This supplemental row passes. These are postimplementation source/tariff repairs and new regression observations, not initial RED assertions. Frozen valid totals9374/38541/27396 and all old primitive results/events remain unchanged.
+
+Strict chronology is separate. First Clippy stopped on4 ROOT-owned hash/order style diagnostics; ROOT repaired code ticks/as_chunks/guard/lifetime with unchanged tariff. Second Clippy reached a test-only non-NFC Kelvin literal in cases.rs; replacing it by the SAME U+212A escape preserves exact UTF-8 bytes and negative oracle. No lint was suppressed. The final owner100/strict after those fixes includes both wrong-class refusal regressions. After these PASS runs, ROOT's first independent fullwrapper77d1e8/session15032→b56811→121166 EXIT101 found exactly one architecture source-classifier ambiguity: bare local core::normalize was read by source.rs146 as external core. Actual checker read418676 confirmed the cause. I changed ONLY that path to self::core::normalize (6 added bytes), rustfmt185b3f PASS, parent199LF/SHA8a66cda0. No checker waiver/event/API/behavior change. ROOT owns the appropriate focused architecture and complete-wrapper rerun; its failure and later outcomes must be attributed to ROOT, not silently called owner100 evidence for the final qualified spelling.
+
+Owner execution ledger (all commands use locked Rust1.99.0, RUSTFLAGS=-Dwarnings; command/result chunks and session IDs are actual):
+- Epoch1: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`; a41e31/session32215→254374; EXIT101. Production compiles; two latent test E0369 structural comparisons fail; exact expected shapes converted to matches! without adding PartialEq.
+- Epoch2: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`; 7eaf86/session39846→284067; EXIT101. First100 execution99PASS/1FAIL at nonempty-selector prospective retention; source-granularity correction above.
+- Epoch3: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`; 35c693/session30846→0d3bc3; EXIT0. First100/100 PASS before wrong-class list/rule review fixes.
+- Epoch4: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`; 6d27de/session1335→54f568; EXIT101. Exactly4 ROOT-owned strict style diagnostics.
+- Epoch5: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`; 57b520/session23031→8c0136; EXIT0. 100/100 PASS with list root correction and independent tight/exact list regression.
+- Epoch6: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`; a91498/session26823→9e82f8; EXIT101. Exactly1 test unicode_not_nfc diagnostic.
+- Epoch7: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`; 824b76/session74530→b6b09c; EXIT0. Strict lib+target PASS after exact-byte Unicode escape and rule None-only source fix, before final added rule regression row.
+- Epoch8: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`; e39df5/session66841→c22f63; EXIT0. Final owner100/100 PASS with both new wrong-class regression rows.
+- Epoch9: `env RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`; 31ed81; EXIT0. Final owner strict library+target PASS on those same test/source bytes (before the subsequent local self:: qualification).
+
+Complete actual failed command outputs are retained here; no assertion run occurred in the E0369 compile failure. Successful repeated output lists are not duplicated: the final actual100 output and strict result are retained below, while earlier successful epochs are separately identified above.
+
+Epoch1 literal output (`env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`):
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0369]: binary operation `==` cannot be applied to type `[(RawFlowPolicyValue<'_>, RawFlowPolicyValue<'_>); 1]`
+  --> crates/wf-domain/tests/complete_policy/flow_input/refusals.rs:95:9
+   |
+95 |         assert_eq!(shared, [(Raw::Other, Raw::Nil)]);
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |         |
+   |         [(RawFlowPolicyValue<'_>, RawFlowPolicyValue<'_>); 1]
+   |         [(RawFlowPolicyValue<'_>, RawFlowPolicyValue<'_>); 1]
+   |
+note: `RawFlowPolicyValue<'_>` does not implement `PartialEq`
+  --> crates/wf-domain/src/policy/complete/flow_input.rs:22:1
+   |
+22 | pub enum RawFlowPolicyValue<'input> {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `RawFlowPolicyValue<'_>` is defined in another crate
+note: `RawFlowPolicyValue<'_>` does not implement `PartialEq`
+  --> crates/wf-domain/src/policy/complete/flow_input.rs:22:1
+   |
+22 | pub enum RawFlowPolicyValue<'input> {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `RawFlowPolicyValue<'_>` is defined in another crate
+
+error[E0369]: binary operation `==` cannot be applied to type `[RawFlowPolicyValue<'_>; 2]`
+   --> crates/wf-domain/tests/complete_policy/flow_input/refusals.rs:530:5
+    |
+530 |     assert_eq!(leaves, [Raw::Nil, Raw::Nil]);
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     |
+    |     [RawFlowPolicyValue<'_>; 2]
+    |     [RawFlowPolicyValue<'_>; 2]
+    |
+note: `RawFlowPolicyValue<'_>` does not implement `PartialEq<RawFlowPolicyValue<'_>>`
+   --> crates/wf-domain/src/policy/complete/flow_input.rs:22:1
+    |
+ 22 | pub enum RawFlowPolicyValue<'input> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `RawFlowPolicyValue<'_>` is defined in another crate
+
+For more information about this error, try `rustc --explain E0369`.
+error: could not compile `wf-domain` (test "complete_policy") due to 2 previous errors
+```
+
+Epoch2 literal output (`env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`):
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.06s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 100 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... FAILED
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+failures:
+
+---- flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal stdout ----
+
+thread 'flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal' (27897821) panicked at crates/wf-domain/tests/complete_policy/flow_input/refusals.rs:262:13:
+assertion `left == right` failed
+  left: (20812, 10400)
+ right: (20546, 10400)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal
+
+test result: FAILED. 99 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+error: test failed, to rerun pass `-p wf-domain --test complete_policy`
+```
+
+Epoch4 literal output (`env RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`):
+
+```text
+    Checking wf-types v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-types)
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error: item in documentation is missing backticks
+ --> crates/wf-domain/src/policy/complete/flow_input/order/hash.rs:3:39
+  |
+3 | //! Adapted from the binary branch of erl_term_hashing.c, type11. Arithmetic and
+  |                                       ^^^^^^^^^^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#doc_markdown
+  = note: `-D clippy::doc-markdown` implied by `-D clippy::pedantic`
+  = help: to override `-D clippy::pedantic` add `#[allow(clippy::doc_markdown)]`
+help: try
+  |
+3 - //! Adapted from the binary branch of erl_term_hashing.c, type11. Arithmetic and
+3 + //! Adapted from the binary branch of `erl_term_hashing.c`, type11. Arithmetic and
+  |
+
+error: using `chunks_exact` with a constant chunk size
+  --> crates/wf-domain/src/policy/complete/flow_input/order/hash.rs:29:28
+   |
+29 |     let mut chunks = bytes.chunks_exact(16);
+   |                            ^^^^^^^^^^^^^^^^
+   |
+help: consider using `as_chunks::<16>()` instead
+  --> crates/wf-domain/src/policy/complete/flow_input/order/hash.rs:29:28
+   |
+29 |     let mut chunks = bytes.chunks_exact(16);
+   |                            ^^^^^^^^^^^^^^^^
+   = note: you can access the chunks using `chunks.0.iter()`, and the remainder using `chunks.1`
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D clippy::all`
+   = help: to override `-D clippy::all` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: this `if` statement can be collapsed
+  --> crates/wf-domain/src/policy/complete/flow_input/order.rs:73:9
+   |
+73 | /         if let Some((prior_kind, prior_bytes)) = key_bytes(prior) {
+74 | |             if kind == prior_kind {
+75 | |                 pay_compare(bytes, prior_bytes, charge)?;
+76 | |                 if bytes == prior_bytes {
+...  |
+80 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+   = note: `-D clippy::collapsible-if` implied by `-D clippy::all`
+   = help: to override `-D clippy::all` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+   |
+73 ~         if let Some((prior_kind, prior_bytes)) = key_bytes(prior)
+74 ~             && kind == prior_kind {
+75 |                 pay_compare(bytes, prior_bytes, charge)?;
+...
+78 |                 }
+79 ~             }
+   |
+
+error: the following explicit lifetimes could be elided: 'input
+  --> crates/wf-domain/src/policy/complete/flow_input/order.rs:85:14
+   |
+85 | fn key_bytes<'input>(key: PolicyInputCursor<'input>) -> Option<(bool, &'input [u8])> {
+   |              ^^^^^^                         ^^^^^^                     ^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#elidable_lifetime_names
+   = note: `-D clippy::elidable-lifetime-names` implied by `-D clippy::pedantic`
+   = help: to override `-D clippy::pedantic` add `#[allow(clippy::elidable_lifetime_names)]`
+help: elide the lifetimes
+   |
+85 - fn key_bytes<'input>(key: PolicyInputCursor<'input>) -> Option<(bool, &'input [u8])> {
+85 + fn key_bytes(key: PolicyInputCursor<'_>) -> Option<(bool, &[u8])> {
+   |
+
+error: could not compile `wf-domain` (lib) due to 4 previous errors
+```
+
+Epoch6 literal output (`env RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`):
+
+```text
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error: non-NFC Unicode sequence detected
+   --> crates/wf-domain/tests/complete_policy/flow_input/cases.rs:440:9
+    |
+440 |         "Kfull".as_bytes(),
+    |         ^^^^^^^ help: consider replacing the string with: `"Kfull"`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unicode_not_nfc
+    = note: `-D clippy::unicode-not-nfc` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::unicode_not_nfc)]`
+
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+Epoch8 literal output (`env RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy`):
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.25s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 100 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+test result: ok. 100 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+```
+
+Epoch9 literal output (`env RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`):
+
+```text
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.41s
+```
+
+Final format/geometry checks:02d448 EXIT0 enumerated every new/old-sharing production plus all7 tests, each production<=400 physical lines, tests<=600, every function<=100 (largest new source function83; largest new test86). Own22-leaf rustfmt +1.99.0 --check --edition2024 --config skip_children=true returned6bd246 EXIT0; git diff --check c09ccd EXIT0. The later local path qualification independently passed185b3f rustfmt. Exact main EOF inversefa25ba: actual1999B equals whole old1982B donor a0a8858 PLUS ONLY17B '\nmod flow_input;\n', SHA b3143eb0aa25455aa50f4608fb8dad44656fe1c0c838889ec30d16f198c4a0ef. These are read-only checks, not a new architecture exception.
+
+Final actual source/test manifest (parent bytes include self:: qualification; ROOT-owned files are listed for epoch identification only):
+
+```jsonl
+{"path":"crates/wf-domain/src/policy/complete/flow_input.rs","bytes":7112,"lines":199,"max_function_lines":33,"max_function":"normalize_original_complete_policy_input","sha256":"8a66cda0d73673ade0c9226eac14fa0c47e397264216d4766d8b5ec9d0d526dc"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/core.rs","bytes":9227,"lines":274,"max_function_lines":72,"max_function":"normalize","sha256":"5668542bf415832e35b5402201d4c3aabcc0c75a817ff303b23d16a6ff860d50"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/etf.rs","bytes":6109,"lines":186,"max_function_lines":35,"max_function":"visit","sha256":"84b5c1d598069e59932e85074955a28883f5f9869cf1c736c287bad9fb26d222"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/governance/groups.rs","bytes":4130,"lines":143,"max_function_lines":40,"max_function":"approvals","sha256":"37b3030ff568464e60a7ab93b6f89f18527162a6d43c22ef02cd31c4556e384b"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/governance/lists.rs","bytes":3750,"lines":119,"max_function_lines":83,"max_function":"optional","sha256":"419cbf362bf21ebfca939a4db7886b6e906ac97ba5be76d69e612ca6284a62cf"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/governance/rules.rs","bytes":8365,"lines":268,"max_function_lines":73,"max_function":"circuit","sha256":"aa05a676f0ef2e17fa5ac0058e62d40f9bb500c8ceb2a23528fd7a958d3784e2"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/governance.rs","bytes":4776,"lines":173,"max_function_lines":81,"max_function":"optional","sha256":"9cc283079eef1592fe77cfa0b10e65b83940916e9ff5c411f06b5309eba4531c"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/layout.rs","bytes":4758,"lines":150,"max_function_lines":43,"max_function":"new","sha256":"d981de8ac0599d97791cc8e1cbbe9c01076861499c9a99f15b8aaeab80849456"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/order/hash.rs","bytes":2985,"lines":89,"max_function_lines":43,"max_function":"binary_hash","sha256":"ca4a7644793297adbb58ba44ad37175307d7e5d03d664b81eb00297c7595fb0f"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/order.rs","bytes":8736,"lines":281,"max_function_lines":42,"max_function":"prepare_map_order","sha256":"c2a805eaa5ff194b13b50afcbb10a6e56b6cc1edeccb0e586dd85a3c3ca168bd"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/preflight.rs","bytes":4087,"lines":151,"max_function_lines":45,"max_function":"node","sha256":"a050f4ca741e4107ed534a3830577ba69c4127b2e9977c1f16bf0daf364ee3f6"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/rejection.rs","bytes":8706,"lines":218,"max_function_lines":77,"max_function":"governance","sha256":"376a9f6d24f35e4d92852aeddc266b4d31c1bddb749bd348f4fb4b5f08126eab"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/states.rs","bytes":5483,"lines":159,"max_function_lines":49,"max_function":"normalize","sha256":"f81df25c430c1e94be689feb6ede68c9bd3013ce5f3bd78a4e56c48f825d9bf1"}
+{"path":"crates/wf-domain/src/policy/complete/flow_input/value.rs","bytes":11684,"lines":338,"max_function_lines":32,"max_function":"kind","sha256":"7bb1687738c9394098278852cbca06095a8729db07ebe55a9d10868f9782082b"}
+{"path":"crates/wf-domain/src/policy/complete/retry_input.rs","bytes":11514,"lines":312,"max_function_lines":43,"max_function":"borrow_retry","sha256":"a1e3abda91560dc7a4f2e691e627be55c0665724ae5b9bec9ce37c9e931af576"}
+{"path":"crates/wf-domain/src/policy/complete/retry_input/value.rs","bytes":6365,"lines":202,"max_function_lines":46,"max_function":"backoff","sha256":"315e1ae6a3b9cb6bca82473ca224134c5a50dba2465aff51ab9a666aefe44f0c"}
+{"path":"crates/wf-domain/src/policy/complete/retention_input.rs","bytes":11493,"lines":330,"max_function_lines":43,"max_function":"borrow_retention","sha256":"97a86a7b295e0e10dac0e3149fe9fbe51785445568b48c78d55b9184019dd92e"}
+{"path":"crates/wf-domain/src/policy/complete/indexed_input.rs","bytes":12124,"lines":332,"max_function_lines":46,"max_function":"borrow_metadata","sha256":"9e040924e6ecbebc89c8c918255455181204ab0670f90dcae07dda58ea751f4c"}
+{"path":"crates/wf-domain/src/policy/complete/indexed_input/key.rs","bytes":4104,"lines":117,"max_function_lines":47,"max_function":"normalize_key","sha256":"6dcbff77195ebf2755f9e7ab00416e9aecf7f820d609991b5b3348853a3c6afd"}
+{"path":"crates/wf-domain/tests/complete_policy/flow_input.rs","bytes":19347,"lines":589,"max_function_lines":69,"max_function":"assert_big_integer_errors","sha256":"22396d6c18246f2ef36c0c84756c61c97a0b5755a1383a8eefe899786f2f59b9"}
+{"path":"crates/wf-domain/tests/complete_policy/flow_input/cases.rs","bytes":20426,"lines":599,"max_function_lines":68,"max_function":"assert_governance_enum_neighbors","sha256":"a3279ce151fde202d22f72b3d337e68d74edc5d061baaef6b8f6c3ce7070af4b"}
+{"path":"crates/wf-domain/tests/complete_policy/flow_input/etf.rs","bytes":14469,"lines":431,"max_function_lines":68,"max_function":"assert_full_golden","sha256":"bc18274b4d93f6ccffd12357cb843af4e94f4e29763994b98284143813441366"}
+{"path":"crates/wf-domain/tests/complete_policy/flow_input/governance/cases.rs","bytes":18206,"lines":574,"max_function_lines":74,"max_function":"assert_shapes_and_enums","sha256":"655b9c58d89fba299a4549c63d38e116d0e29f809d45ccc37122aae0c08f7522"}
+{"path":"crates/wf-domain/tests/complete_policy/flow_input/governance.rs","bytes":18755,"lines":578,"max_function_lines":86,"max_function":"assert_list_neighbors","sha256":"6f112913ebea60ff67a1df6aacd6e75e456667d7330ab7f80f0bad3c60986199"}
+{"path":"crates/wf-domain/tests/complete_policy/flow_input/refusals.rs","bytes":20623,"lines":599,"max_function_lines":63,"max_function":"assert_nonempty_phases","sha256":"552f5e1169348cdcc9e601d86e90c546f91ad7a57a687123e9cc791b05262dcf"}
+{"path":"crates/wf-domain/tests/complete_policy/flow_input/states.rs","bytes":19146,"lines":596,"max_function_lines":68,"max_function":"assert_nested_workspace","sha256":"149ec521cb7f165ec72efc0b7ae4bacb4ea0710c2aede28042f7aac386554e8e"}
+```
+
+Source/resources/ownership review summary. Three real Cursor adapters Flow/Retry/Indexed share the borrowed scalar/leaf semantics without owner-adapter trees or old wrapper reentry. Old public wrappers retain their own preflight/semantic/copy phases, all old86 controls pass; whole flow performs one global visible-descriptor preflight and one source business walk, retaining arbitrary nonnegative significant BigInteger version magnitudes. Top/state/source group order, atom presence over binary, keyword last-write, Nil atom versus proper List tail, reached improper source exceptions as operational InvalidAuthority, all seven governance groups and their late1MiB cap before states, final262144 cap, source deterministic ETF tags/key order are represented. This is no raw parser/general Other-key equality/runtime-map authority proof.
+
+L=8N+32 cells,2L edges,N work capacity reserves cover synthesized fixed defaults and every constructor before checked push. Fixed schema arrays use compact usize IDs; no9-element Option array or temporary adapter owner. Logical SUM-P includes all3 simultaneously live Vec metadata owners,64D and192 fixed staging. Each dynamic state/rule work region appends after live ancestors, stages complete child/name IDs with paid128 whole-slot mutation and truncates only its own completed region. All nested children finish before contiguous parent edges. No Byte/String/Box payload owner appears during semantics. One final fallibly reserved Vec receives deterministic ETF after every source check/cap; metadata owners drop before it escapes. Actual allocator capacity/stack/Drop/RSS, physical atomicity and native allocation/time are not certified by this logical estimate. No speed/Box gain is claimed.
+
+Independently frozen positive/refusal work remains concrete. MIN31B SHA3b0dc61a→G9374/P4096/T13470; Gov[a,b,a]→G38541/P10400/T48941 with cached16 comparisons, exact130 hit, Gov measurement943 and root measure/emit1753 each; n2 nowG27396/P9664/T37060 including perchild1418, deferred4edges512 and outputsort[134,512,512]. Every reached primitive is individually refused at target-1 using literal events, not returned totals. Real restore1928/P64 and indexed4784/P192 seeds retain their first owners. Rich firstflow13726/P6912, successful secondMIN23100, third output-reserve target38587/max38586 retains31516/P6912 while both prior bytes/pointers stay observed. C1/17/1M bodies318/320/330 retain captured immutable C. 600 unique e*2000+decimal leaves (1201692payload) reach exact GovernancePolicyBytes under admitted profile; cached comparison filter source arithmetic4153692 avoids a full pairwise-payload tariff while making no worst-case collision/native speed claim. Root's hash/order knownanswers remain source-profile observations; release64LE32 threshold versus DEBUG/other VM profiles remain explicit required work.
+
+Concrete DIRECT assertion suggestions for ROOT's sole generator/ledger ownership. These were read from the exact frozen manifest identities and numbered source, not ID prefixes; macro indices below are zero-based within the real #[test] function. The final file hashes above bind each suggestion. A whole expected-ETF equality is the represented normalized-field counterpart, not public installation/resolution/physical proof:
+- c718031a8b58adbb, flow_governance_models_test.exs declaration11: source normalization success12 plus scalar/list assertions41–54 ↔ flow_input/governance.rs original_flow_input_preserves_complete_governance_model DIRECT macro0 at19 (total3 direct macros). Exact original full-mode/running100/strict_global/lease20, llm:gpt10000/window60000/tokens, all9 effect:email.send circuit fields and stripe.refund/payment_review/finance approvals are retained inside the whole-flow wrapper.
+- 34c1385be24604d9, flow_governance_exhaustive_review_test.exs declaration222: source225 ↔ governance.rs original_flow_input_preserves_governance_late_size_priority DIRECT macro1 at562 reason and macro2 at563 body (total3). Extra poisoned later states proves priority; source225's input600 distinct leaves is unchanged.
+- 6ad2cd82f0217fe3, flow_test/sections/flow_policy_exposes_type_state_retry_retention_defaults.exs declaration146: source149 ↔ states.rs original_flow_input_preserves_state_map_keyword_and_pair_semantics DIRECT macros0/1 at27/28 (total2). Original queued:[max_active_ms:1000] cause/body is retained; public set and generated type/setup are not executed.
+- Optional additional candidate663a4d706bc368f4, flow_governance_exhaustive_review_test.exs declaration163: source164/169 ↔ governance.rs original_flow_input_preserves_governance_lists_and_rule_bounds DIRECT macro0 at287 (total1). This EXACT identity is the email/webhook/email/sms/webhook first-seen result, not unrelated6630 query-planner identity. The whole expected bytes retain[email,webhook,sms]; ROOT may choose a later finite mapping, no ledger was edited by me.
+
+No direct links are proposed merely from helper assertions for f01fdd7b5d20366f,3c5b3e727281fd1c,aa2c928919859979,0321009a7cfb8f48,99967df82d50befd,be09c1f1eabce8da,6adf1e41e1f6bd48,d0333aa7c3e21f97. Those exact source recipes/field priority controls actually run through selected helpers, but a helper is not the required direct macro in a real testfn. Original4b70723c9149fbe8's input field components run here while public resolved defaults/hot-key absence/public install remain required and its earlier links remain untouched. Original2357f49ff9da17a5 allowed sized stored map omits states: this normalizer ALWAYS adds states, so its original allowed-map external_size/read-roundtrip remains REQUIRED UNLINKED. Supplemental normalized exact262144 and +1/versionx262144 are not retrofitted into that original allowed fixture.
+
+Every suggestion remains component-limited: original async/setup/runtime/context capture, public type/options/admission, caller raw/frame+retained gate+strict current/CAS/type+one incoming walk+generation ETF envelope/response, all-shard/atomic physical publication, actual VM local/runtime capture and complete parser correspondence, all original observations/profiles, independent Linux ANDmacOS and M1–M8 remain active acceptance obligations. Owner first100/strict and ROOT's separate full wrapper are not a declaration of whole source-case parity. Actual source peer findings and reciprocal read/closure follow normal review; no future helper/body/native/acknowledgment gate is requested.
+
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-INGRESS1-RECIPROCAL1
+
+I ACTUALLY whole-read complete PERF SOURCE finding1354062+14959/SHA34330d0787ae7b9f607f650f89a553af6841550a2dbe900181adf35dc1801d60 in080afe and ARCH SOURCE finding1613714+15578/SHAc42e6d08d0975bf7a6142266e4e02b2010d092e058a00ce473e4152ef8ee7aee ind01f6b; hashes verified. Both actually read the entire47386B owner GREEN1, all26 actual bindings and full current source/test/shared seams. Source/ownership/order/fees, honest RED and failed/repair epochs, four component mappings and remaining source/profile/OS scope agree with no discrepancy. Their normal mutual read closes separately without an extra source/body/native/acknowledgment gate.
+
+I also ACTUALLY read final CONTINUE/architecture/ADR006 complete diffs62bd69, full generator delta11ca11 and ALL FOUR complete generated progress declaration records219cbb, after Root's optional663a selection. Exact manifest663a4d706bc368f4 source164/169 list recipe, c718 source12/41–54,34c source225 and6ad2 source149 anchors/hashes/limitations agree with actual executed tests. There is no prefix inference, helper-only credit or retrofit of2357's no-states allowed fixture. Root reports validator4ec85a PASS64declarations/71counterparts/279links, all67 old records conserved; I did not edit generator/ledger.
+
+Root separately reports actual post-qualification workspace architecture e08742/session36498→6d84f7 EXIT0 and fullwrapperaa70eb/session5221→df4f1c EXIT1 ONLY default RustSec github.com DNS at07:35:50. Its554 primary Rust tests plus4 compile-fail docs and all source stages passed; the100 policy target was independently observed e40478/b47984. I attribute these to Root's commands, not my owner runs or own full stdout read; EXIT1 is not wrapperPASS/fresh online audit/Linux evidence. Current Rust sources/tests remain frozen after self:: qualification. The required same-layout originalframe/Fresh/generation-envelope successor is now separately read-only proposal work in this existing note; it does not reopen the completed finite normalizer or approve any new artifact/model/API.

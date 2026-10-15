@@ -17012,7 +17012,33 @@
       "runtime_case_ids": [
         "fa6fd3fb4c9fb4d5094f46db89bd9d4a2d9c4e5039c36f3708b75cb429b78933"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-663a4d706bc368f4",
+          "rust_file": "crates/wf-domain/tests/complete_policy/flow_input/governance.rs",
+          "rust_file_sha256": "6f112913ebea60ff67a1df6aacd6e75e456667d7330ab7f80f0bad3c60986199",
+          "rust_module": "",
+          "rust_function": "original_flow_input_preserves_governance_lists_and_rule_bounds",
+          "assertions": [
+            {
+              "source_line": 164,
+              "source_text": "assert {:ok, policy} =",
+              "rust_line": 287,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 169,
+              "source_text": "assert policy.effects.allowed == [\"email\", \"webhook\", \"sms\"]",
+              "rust_line": 287,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed input retains original email/webhook/email/sms/webhook occurrences and compares the entire independently assembled normalized snapshot, including allowed email/webhook/sms in first-seen order. The sole direct test macro represents source normalization success164 and exact list order169. Extra binary type r and empty states are whole-flow context; the governance map itself preserves the original source recipe. Other list/rule-bound assertions in called helpers remain unlinked here. Original async:true ExUnit/runtime/setup and mandatory profiles plus independent Linux execution remain required. Borrowed input, deterministic ETF and logical work controls imply no public installation, origin/payment authority, physical publication or measured native allocation/speed. Initial missing-API RED and subsequent recorded test corrections remain separate; these component links do not certify full source-case or workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e9bd43efdac3c8ef",
@@ -17054,7 +17080,33 @@
       "runtime_case_ids": [
         "f51d15f4205e6a3e1469fba479d4e89ed04f27c3cbff1deea25e07f0456a1ee5"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-34c1385be24604d9",
+          "rust_file": "crates/wf-domain/tests/complete_policy/flow_input/governance.rs",
+          "rust_file_sha256": "6f112913ebea60ff67a1df6aacd6e75e456667d7330ab7f80f0bad3c60986199",
+          "rust_module": "",
+          "rust_function": "original_flow_input_preserves_governance_late_size_priority",
+          "assertions": [
+            {
+              "source_line": 225,
+              "source_text": "assert {:error, \"ERR flow governance policy exceeds 1048576-byte durable limit\"} =",
+              "rust_line": 562,
+              "rust_text": "assert_eq!(actual, Err(Reason::Governance(Gov::PolicyBytes)));"
+            },
+            {
+              "source_line": 225,
+              "source_text": "assert {:error, \"ERR flow governance policy exceeds 1048576-byte durable limit\"} =",
+              "rust_line": 563,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed input preserves all600 distinct original e*2000+decimal1..600 leaves, totaling1201692 payload bytes. It reaches the governance1048576-byte diagnosis and exact response body; extra invalid states proves this governance gate precedes later state validation. Original source-derived normalized governance size1204727 was independently captured before production. Whole-flow borrowed normalization is an explicit wrapper around the source Policy.normalize recipe; source ExUnit/runtime/setup/profiles, physical publication and independent Linux execution remain required. The direct reason/body assertions link only source225. Separate exact-cap neighbors and arbitrary customer-version/snapshot ETF controls are supplemental and do not link original2357's allowed stored-map fixture that omits states. The real missing-API RED, post-RED corrections, first99/1 accounting-test failure and subsequent primitive-event repair remain distinct evidence; this component mapping is neither whole source-case parity nor a native performance measurement."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "d0333aa7c3e21f97",
@@ -18027,7 +18079,111 @@
       "runtime_case_ids": [
         "512f28bcde21f4405f9577ed9f6c33146f3fe24da8ace0f0c1f19735122a8e54"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-c718031a8b58adbb",
+          "rust_file": "crates/wf-domain/tests/complete_policy/flow_input/governance.rs",
+          "rust_file_sha256": "6f112913ebea60ff67a1df6aacd6e75e456667d7330ab7f80f0bad3c60986199",
+          "rust_module": "",
+          "rust_function": "original_flow_input_preserves_complete_governance_model",
+          "assertions": [
+            {
+              "source_line": 12,
+              "source_text": "assert {:ok, policy} =",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 41,
+              "source_text": "assert policy.mode == :full",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 42,
+              "source_text": "assert policy.limits[\"running\"].enforcement == :strict_global",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 43,
+              "source_text": "assert policy.limits[\"running\"].lease_size == 20",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 44,
+              "source_text": "assert policy.budgets[\"llm:gpt\"].window_ms == 60_000",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 45,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].failure_threshold == 5",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 46,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].window_ms == 60_000",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 47,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].min_calls == 10",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 48,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].failure_rate_pct == 50",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 49,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].latency_threshold_ms == 2_000",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 50,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].error_classes == [\"TimeoutError\"]",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 51,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].half_open_max_probes == 3",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 52,
+              "source_text": "assert policy.circuits[\"effect:email.send\"].half_open_success_threshold == 2",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 53,
+              "source_text": "assert policy.approvals.effects == [\"stripe.refund\"]",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            },
+            {
+              "source_line": 54,
+              "source_text": "assert policy.approvals.states == [\"payment_review\"]",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(success(&Raw::Map(&rows))?, expected);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed whole-flow normalization contains the exact original governance input: full mode, running limit100/strict_global/lease20, llm:gpt budget10000/window60000/tokens, all nine effect:email.send circuit fields and stripe.refund/payment_review/finance approvals. One complete deterministic ETF equality, independently assembled from explicit expected fields, represents source normalization success12 and all fourteen scalar/list observations41-54. The extra outer type r and empty states map are whole-flow context, not part of the source governance map. Borrowed descriptors replace original terms; no public installation, current-policy/frame/origin authority or physical publication is inferred. Source async:true ExUnit execution, original runtime/setup and all mandatory profiles plus independent Linux acceptance remain required. Genuine missing-API RED preceded implementation; recorded source-based post-RED test corrections and postimplementation supplements are distinct from that original buffer. These links record represented components, not complete source-case or workflow parity, and imply no measured native speed or allocation gain."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f01fdd7b5d20366f",
@@ -21813,7 +21969,33 @@
     {
       "source_declaration_id": "6ad2cd82f0217fe3",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-6ad2cd82f0217fe3",
+          "rust_file": "crates/wf-domain/tests/complete_policy/flow_input/states.rs",
+          "rust_file_sha256": "149ec521cb7f165ec72efc0b7ae4bacb4ea0710c2aede28042f7aac386554e8e",
+          "rust_module": "",
+          "rust_function": "original_flow_input_preserves_state_map_keyword_and_pair_semantics",
+          "assertions": [
+            {
+              "source_line": 149,
+              "source_text": "assert {:error, \"ERR flow max_active_ms is type-level only\"} =",
+              "rust_line": 27,
+              "rust_text": "assert_eq!(actual, Err(Reason::StateMaxActive));"
+            },
+            {
+              "source_line": 149,
+              "source_text": "assert {:error, \"ERR flow max_active_ms is type-level only\"} =",
+              "rust_line": 28,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed raw whole-flow input preserves queued keyword max_active_ms1000 and returns StateMaxActive plus the exact ERR flow max_active_ms is type-level only body. Fixed binary type r replaces only the source generated type suffix. The direct macros represent the error component at149, not the source public FerricStore.flow_policy_set error tuple, caller/options/frame/Fresh/current ordering, authoritative reads or atomic installation. Original FlowTest async:false tags/timeout/shards/FLUSHDB/cleanup, required runtime profiles and independent Linux execution remain required. State-class/order/hash/nested-workspace controls are supplemental; macOS source execution and genuine initial missing-API RED do not establish whole public/source-case or workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "cdc424a6df64c8b9",

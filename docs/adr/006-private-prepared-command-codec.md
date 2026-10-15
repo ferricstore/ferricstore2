@@ -970,3 +970,46 @@ lint pass without postproduction oracle changes. Actual source/mapping review
 is mutually closed without blockers. No retained status, authority token,
 full-default/resolved API or dependency is selected. Original whole-flow/public/ETF/physical/setup/profile
 and independent both-OS acceptance remain required.
+
+
+## Implemented original whole-flow snapshot producer
+
+The explicit whole-ingress creation decision approves three borrowed/public
+diagnostic models, two snapshot/body APIs and eight private cursor/staging models
+in fourteen cohesive children, with seven existing-target test children. Root owns
+ETF/map ordering and shared boundaries; Writer owns the source semantic walkers.
+Both authored substantive tests first; independently reproduced missing-API RED
+preceded production. All100 policy controls and strict workspace lint pass.
+Source-derived post-RED corrections and supplemental wrong-class refusal checks
+remain distinct from that original RED buffer. The full macOS run passes554 Rust
+tests and four compile-fail docs, then stops at the default RustSec DNS failure.
+
+The complete original order and nil/presence/error behavior apply to every top,
+state and governance group. Customer version magnitudes may exceed u64; output
+is deterministic original ETF, not normalized V2. Exactly the reachable finite
+normalized subset has a source-proven equal external-size/emitted-length metric.
+Governance size is checked after its seven groups and before states; whole size
+follows states. Synthesized binary maps use final unique key count, ascending
+binary order through32 keys and descending swizzled pinned binary hash above32.
+
+MASK1 freezes the46-name preflight registry for actual represented Map keys only;
+it must not classify generic List/Tuple descriptors as keywords. Old primitive
+preflight tables/fees remain unchanged. New visible bounds are65536 occurrences,
+depth64 and64MiB represented text; the mandatory600 unique~2k governance leaves
+must reach their exact caller size error. Concurrent cells/edges/work and bounded
+staging contribute summed logical scratch before all three fallible reservations.
+Every later selector, comparison, placement, size visit and writer visit pays
+freshly. The independently fixed empty-map stream is G9374/P4096/T13470.
+
+The returned snapshot Vec has no generation, origin, paid or retained authority.
+Original frame/ports/Fresh replacement integration must consume the same private
+layout, preserving one admission/gate and source ordering; those successor artifacts
+are not approved in this batch. Physical/public behavior, all pinned source test
+assertions/setup/profiles and both native OS remain required in ordered M1–M8.
+
+The source-only CONTIGUOUS-EDGES1 correction stages each completed dynamic-map
+child/name in the existing work slot with one paid128 update, then appends all
+enclosing edges after every child. Nested child ranges remain contiguous. The
+two-state stream is27396/P9664/T37060; its older frozen RED vector remains
+historical. This adds no owner/model or source business pass, and changes no old
+primitive, MIN or Gov-list stream. No implementation result supplied the revision.
