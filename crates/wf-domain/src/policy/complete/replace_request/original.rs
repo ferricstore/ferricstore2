@@ -141,6 +141,22 @@ fn read_original_current<'raw>(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<OriginalPolicyEntry<'raw>>, OriginalCompletePolicyReplaceApplyError> {
+    use OriginalCompletePolicyReplaceApplyError::Current;
+
+    let Some(raw) = read_original_current_bytes(view, requested, charge)? else {
+        return Ok(None);
+    };
+    decode_original_complete_policy_entry(raw, &view.safety, limits, charge)
+        .map_err(|error| Current(OriginalPolicyReadError::Encoding(error)))?
+        .map(Some)
+        .ok_or(Current(OriginalPolicyReadError::Corrupt))
+}
+
+pub(super) fn read_original_current_bytes<'raw>(
+    view: &OriginalCompletePolicyReplaceApplyView<'_, 'raw, '_>,
+    requested: &[u8],
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<&'raw [u8]>, OriginalCompletePolicyReplaceApplyError> {
     use OriginalCompletePolicyReplaceApplyError::{Current, Replace};
 
     let work = u64::try_from(requested.len())
@@ -164,13 +180,10 @@ fn read_original_current<'raw>(
         }
         Some(OriginalPolicyReadValue::Binary(raw)) => *raw,
     };
-    decode_original_complete_policy_entry(raw, &view.safety, limits, charge)
-        .map_err(|error| Current(OriginalPolicyReadError::Encoding(error)))?
-        .map(Some)
-        .ok_or(Current(OriginalPolicyReadError::Corrupt))
+    Ok(Some(raw))
 }
 
-fn bind_original_current_type(
+pub(super) fn bind_original_current_type(
     current: &OriginalPolicyEntry<'_>,
     requested: &[u8],
     charge: &mut PolicySchemaCharge,

@@ -20,7 +20,7 @@ pub(super) struct FlowPolicyWorkSlot {
     pub(super) order: u64,
 }
 
-pub(super) struct FlowPolicyLayout<'input> {
+pub(in crate::policy::complete) struct FlowPolicyLayout<'input> {
     pub(super) cells: Vec<FlowPolicyCell<'input>>,
     pub(super) edges: Vec<usize>,
     pub(super) work: Vec<FlowPolicyWorkSlot>,

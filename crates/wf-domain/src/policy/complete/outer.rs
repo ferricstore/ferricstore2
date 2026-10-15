@@ -10,8 +10,15 @@ use super::{
 
 mod caller;
 mod core_patch_frame;
+pub(in crate::policy::complete) mod flow_frame;
 mod model;
 mod replace_frame;
+
+pub use flow_frame::{
+    OriginalFlowPolicyReplaceFrameHeader, OriginalFlowPolicyReplaceInput,
+    ScannedOriginalFlowPolicyReplaceFrame, prepare_original_flow_policy_replace_frame_bytes,
+    restore_original_flow_policy_replace_frame_header, scan_original_flow_policy_replace_frame,
+};
 
 pub use replace_frame::{
     CompletePolicyReplaceFrameHeader, ScannedCompletePolicyReplaceFrame,

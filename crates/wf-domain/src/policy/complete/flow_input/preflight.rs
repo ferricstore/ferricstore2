@@ -1,9 +1,7 @@
 //! Visible occurrence accounting and queried direct-map correspondence checks.
 
-use super::value::{PolicyInputCursor, visit};
-use super::{
-    Error, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue as Raw, charge_schema,
-};
+use super::value::{PolicyInputCursor as Cursor, PolicyInputKind as Kind, visit};
+use super::{Error, PolicySchemaCharge, PolicySchemaError, charge_schema};
 
 const QUERY_NAMES: [&[u8]; 46] = [
     b"mode",
@@ -55,8 +53,8 @@ const QUERY_NAMES: [&[u8]; 46] = [
 ];
 
 pub(super) fn measure(
-    workflow_type: Raw<'_>,
-    attrs: Raw<'_>,
+    workflow_type: Cursor<'_>,
+    attrs: Cursor<'_>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(usize, usize), Error> {
     let mut measured = (0_usize, 0_usize, 0_usize);
@@ -66,7 +64,7 @@ pub(super) fn measure(
 }
 
 fn node(
-    value: Raw<'_>,
+    value: Cursor<'_>,
     depth: usize,
     measured: &mut (usize, usize, usize),
     charge: &mut PolicySchemaCharge,
@@ -77,42 +75,66 @@ fn node(
         return Err(Error::ItemLimit);
     }
     measured.2 = measured.2.max(depth);
-    match value {
-        Raw::Atom(s) => text(s.len(), measured, charge),
-        Raw::Binary(b)
-        | Raw::BigInteger {
-            little_endian: b, ..
-        } => text(b.len(), measured, charge),
-        Raw::Map(rows) => {
+    match value.kind() {
+        Kind::Atom => text(
+            value.atom_bytes().ok_or(Error::Malformed)?.len(),
+            measured,
+            charge,
+        ),
+        Kind::Binary => text(
+            value.binary_bytes().ok_or(Error::Malformed)?.len(),
+            measured,
+            charge,
+        ),
+        Kind::Integer => match value.big_integer() {
+            Some((_, bytes)) => text(bytes.len(), measured, charge),
+            None => Ok(()),
+        },
+        Kind::Map => {
             let mut mask = 0_u128;
-            for &(key, child) in rows {
+            for index in 0..value.len() {
+                let (key, child) = value.row(index).ok_or(Error::Malformed)?;
                 node(key, depth + 1, measured, charge)?;
                 queried(key, &mut mask, charge)?;
                 node(child, depth + 1, measured, charge)?;
             }
             Ok(())
         }
-        Raw::List(rows) | Raw::Tuple(rows) => {
-            for &child in rows {
+        Kind::Keyword => {
+            for index in 0..value.len() {
+                let (key, child) = value.row(index).ok_or(Error::Malformed)?;
+                node(key, depth + 1, measured, charge)?;
                 node(child, depth + 1, measured, charge)?;
             }
             Ok(())
         }
-        Raw::ImproperList { prefix, tail } => {
-            if prefix.is_empty() {
-                return Err(Error::Malformed);
-            }
-            for &child in prefix {
+        Kind::List | Kind::Tuple => {
+            for index in 0..value.len() {
+                let child = value.child(index).ok_or(Error::Malformed)?;
                 node(child, depth + 1, measured, charge)?;
             }
-            node(*tail, depth + 1, measured, charge)
+            Ok(())
+        }
+        Kind::ImproperList => {
+            if value.len() == 0 {
+                return Err(Error::Malformed);
+            }
+            for index in 0..value.len() {
+                let child = value.child(index).ok_or(Error::Malformed)?;
+                node(child, depth + 1, measured, charge)?;
+            }
+            node(
+                value.tail().ok_or(Error::Malformed)?,
+                depth + 1,
+                measured,
+                charge,
+            )
         }
         _ => Ok(()),
     }
 }
 
-fn queried(key: Raw<'_>, mask: &mut u128, charge: &mut PolicySchemaCharge) -> Result<(), Error> {
-    let key = PolicyInputCursor::Flow(key);
+fn queried(key: Cursor<'_>, mask: &mut u128, charge: &mut PolicySchemaCharge) -> Result<(), Error> {
     let Some(bytes) = key.key_bytes() else {
         return Ok(());
     };

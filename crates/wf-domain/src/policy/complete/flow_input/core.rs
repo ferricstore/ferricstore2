@@ -4,7 +4,7 @@ use super::layout::{FlowPolicyCell as Cell, FlowPolicyLayout as Layout};
 use super::value::{
     PolicyInputCursor as Cursor, PolicyInputMap as Map, classify_map, select, unsigned, visit,
 };
-use super::{Error, FlowPolicyInputRejection as Reason, PolicySchemaCharge, RawFlowPolicyValue};
+use super::{Error, FlowPolicyInputRejection as Reason, PolicySchemaCharge};
 use crate::policy::complete::{indexed_input, retention_input, retry_input};
 use crate::policy::{Backoff, BackoffKind};
 
@@ -21,17 +21,16 @@ const TOP_NAMES: [&str; 9] = [
 ];
 
 pub(super) fn normalize<'input>(
-    workflow_type: RawFlowPolicyValue<'input>,
-    attrs: RawFlowPolicyValue<'input>,
+    workflow_type: Cursor<'input>,
+    attrs: Cursor<'input>,
     maximum: u32,
     layout: &mut Layout<'input>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Result<usize, Reason>, Error> {
     visit(charge, 0)?;
-    let Some(workflow_type) = Cursor::Flow(workflow_type).binary_bytes() else {
+    let Some(workflow_type) = workflow_type.binary_bytes() else {
         return Ok(Err(Reason::RootShape));
     };
-    let attrs = Cursor::Flow(attrs);
     let Some(attrs_map) = classify_map(attrs, charge)? else {
         return Ok(Err(
             if matches!(

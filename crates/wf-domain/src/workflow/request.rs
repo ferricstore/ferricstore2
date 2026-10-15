@@ -94,6 +94,12 @@ impl ClientIntent {
         Self { version: 2, digest }
     }
 
+    /// Selects the original whole-flow registry after same-frame digest comparison.
+    #[must_use]
+    pub(crate) const fn original_flow_policy_replace(digest: [u8; 32]) -> Self {
+        Self { version: 3, digest }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

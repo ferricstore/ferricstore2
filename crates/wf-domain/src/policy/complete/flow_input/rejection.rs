@@ -41,7 +41,18 @@ pub(super) fn encode(
     Ok(owned)
 }
 
-fn parts(reason: Reason) -> Result<([&'static [u8]; 4], Option<u32>), Error> {
+pub(in crate::policy::complete) fn body_len(reason: Reason) -> Result<usize, Error> {
+    let (parts, maximum) = parts(reason)?;
+    let digits = maximum.map_or(0, retention_input::decimal_length);
+    parts
+        .iter()
+        .try_fold(digits, |sum, part| sum.checked_add(part.len()))
+        .ok_or_else(overflow)
+}
+
+pub(in crate::policy::complete) fn parts(
+    reason: Reason,
+) -> Result<([&'static [u8]; 4], Option<u32>), Error> {
     let bytes = match reason {
         Reason::RootShape => b"ERR flow policy must be a map or keyword list".as_slice(),
         Reason::RootKeyword => b"ERR flow opts must be a keyword list",

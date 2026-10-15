@@ -716,3 +716,33 @@ public/frame/retained/Fresh/atomic successor is required separately. This snapsh
 owner carries no installation, origin or payment authority. Logical work/peak
 accounting does not establish native allocation or speed. Complete runtime profiles
 and independent Linux/macOS execution remain mandatory.
+
+## Implemented original whole-flow replacement parent
+
+A-NEXT-M1-ORIGINAL-FLOW-PARENT1-CREATE1 adds eleven privately grouped production
+files under the existing domain complete-policy and ports log boundaries. The
+lower replace=true command has registry-three mathematical intent and a captured
+source-order sidecar; domain remains synchronous and hash-free, with actual SHA
+in ports. One bounded borrowed verifier and one existing retained-request gate
+precede Fresh. Non-Fresh bypasses all changed current/context/migration/window
+reads. Fresh returns owned proposed key/value/response data and coherent compare
+inputs, with no physical publication or service authority.
+
+Current decoding and raw CAS precede atom:type binding, captured limits and one
+incoming source-ordered normalization. The same private layout and checked bare
+snapshot length survive migration high-water allocation and direct original ETF
+envelope emission. There is no intermediate snapshot Vec or second admission
+pass. Current decoder indexes drop before incoming layout allocation; only this
+parent widens encoded spans to263168 so it can read its valid output. Existing
+public4096-span readers and standalone normalization retain their old behavior.
+The installation bytes and retained response remain separately paid owners.
+
+The source-order sidecar proves relative correspondence conditional on faithful
+capture; it does not attest VM origin. Raw Other's operational UnsupportedTag is
+a temporary required opaque-identity gap, not an approved product exclusion.
+Public Policy.set preprocessing/replies, complete source/setup/runtime profiles,
+physical atomic/all-shard publication and independent Linux execution remain
+required. The final macOS wrapper passes567 Rust tests, four compile-fail docs
+and every infrastructure stage; direct source-ledger anchors remain separate.
+Compact ordinal staging, linear inverse validation and direct same-layout
+emission are source-level improvements, with no measured native gain claimed.

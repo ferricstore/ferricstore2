@@ -9,9 +9,16 @@ use wf_domain::policy::complete::{
 use wf_domain::workflow::admission::AdmissionLimits;
 
 mod core_patch;
+mod flow;
 mod intent;
 mod original_entry;
 mod replace;
+
+pub use flow::{
+    OriginalFlowPolicyReplaceRequestPlan, VerifiedOriginalFlowPolicyReplaceFrame,
+    decide_original_flow_policy_replace_frame, prepare_original_flow_policy_replace_frame,
+    verify_original_flow_policy_replace_frame,
+};
 
 pub use original_entry::{OriginalPolicyReference, prepare_original_complete_policy_reference};
 

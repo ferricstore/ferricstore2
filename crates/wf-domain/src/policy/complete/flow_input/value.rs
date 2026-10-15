@@ -4,6 +4,7 @@ use super::{
     Error, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue as Raw, charge_schema,
 };
 use crate::policy::complete::RawPolicyRetryValue as Retry;
+use crate::policy::complete::outer::flow_frame::FlowPolicyFrameCursor;
 use crate::policy::complete::{OriginalPolicyMapKey as Key, RawPolicyIndexedValue as Indexed};
 
 #[derive(Clone, Copy, Debug)]
@@ -11,6 +12,7 @@ pub(in crate::policy::complete) enum PolicyInputCursor<'input> {
     Flow(Raw<'input>),
     Retry(Retry<'input>),
     Indexed(Indexed<'input>),
+    Frame(FlowPolicyFrameCursor<'input>),
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -39,6 +41,7 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn kind(self) -> PolicyInputKind {
         use PolicyInputKind as K;
         match self {
+            Self::Frame(value) => value.kind(),
             Self::Flow(value) => match value {
                 Raw::Nil => K::Nil,
                 Raw::Integer(_) | Raw::BigInteger { .. } => K::Integer,
@@ -76,6 +79,7 @@ impl<'input> PolicyInputCursor<'input> {
     }
     pub(in crate::policy::complete) fn atom_bytes(self) -> Option<&'input [u8]> {
         match self {
+            Self::Frame(value) => value.atom_bytes(),
             Self::Flow(Raw::Nil) | Self::Retry(Retry::Nil) | Self::Indexed(Indexed::Nil) => {
                 Some(b"nil")
             }
@@ -87,6 +91,7 @@ impl<'input> PolicyInputCursor<'input> {
     }
     pub(in crate::policy::complete) fn binary_bytes(self) -> Option<&'input [u8]> {
         match self {
+            Self::Frame(value) => value.binary_bytes(),
             Self::Flow(Raw::Binary(b))
             | Self::Retry(Retry::Binary(b))
             | Self::Indexed(Indexed::Binary(b)) => Some(b),
@@ -98,12 +103,14 @@ impl<'input> PolicyInputCursor<'input> {
     }
     pub(in crate::policy::complete) fn integer(self) -> Option<i128> {
         match self {
+            Self::Frame(value) => value.integer(),
             Self::Flow(Raw::Integer(n)) | Self::Retry(Retry::Integer(n)) => Some(n),
             _ => None,
         }
     }
     pub(in crate::policy::complete) fn big_integer(self) -> Option<(bool, &'input [u8])> {
         match self {
+            Self::Frame(value) => value.big_integer(),
             Self::Flow(Raw::BigInteger {
                 negative,
                 little_endian,
@@ -113,6 +120,7 @@ impl<'input> PolicyInputCursor<'input> {
     }
     pub(in crate::policy::complete) fn len(self) -> usize {
         match self {
+            Self::Frame(value) => value.len(),
             Self::Flow(Raw::Map(rows)) => rows.len(),
             Self::Flow(
                 Raw::List(rows) | Raw::Tuple(rows) | Raw::ImproperList { prefix: rows, .. },
@@ -125,6 +133,7 @@ impl<'input> PolicyInputCursor<'input> {
     }
     pub(in crate::policy::complete) fn child(self, index: usize) -> Option<Self> {
         match self {
+            Self::Frame(value) => value.child(index).map(Self::Frame),
             Self::Flow(
                 Raw::List(rows) | Raw::Tuple(rows) | Raw::ImproperList { prefix: rows, .. },
             ) => rows.get(index).copied().map(Self::Flow),
@@ -134,6 +143,9 @@ impl<'input> PolicyInputCursor<'input> {
     }
     pub(in crate::policy::complete) fn row(self, index: usize) -> Option<(Self, Self)> {
         match self {
+            Self::Frame(value) => value
+                .row(index)
+                .map(|(key, child)| (Self::Frame(key), Self::Frame(child))),
             Self::Flow(Raw::Map(rows)) => rows
                 .get(index)
                 .map(|&(k, v)| (Self::Flow(k), Self::Flow(v))),
@@ -153,6 +165,7 @@ impl<'input> PolicyInputCursor<'input> {
     }
     pub(in crate::policy::complete) fn tail(self) -> Option<Self> {
         match self {
+            Self::Frame(value) => value.tail().map(Self::Frame),
             Self::Flow(Raw::ImproperList { tail, .. }) => Some(Self::Flow(*tail)),
             _ => None,
         }

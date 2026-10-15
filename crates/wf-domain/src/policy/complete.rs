@@ -75,6 +75,11 @@ pub use outer::{
     decode_complete_policy_replace_frame_input, prepare_complete_policy_replace_frame_caller,
     restore_complete_policy_replace_frame_header, scan_complete_policy_replace_frame,
 };
+pub use outer::{
+    OriginalFlowPolicyReplaceFrameHeader, OriginalFlowPolicyReplaceInput,
+    ScannedOriginalFlowPolicyReplaceFrame, prepare_original_flow_policy_replace_frame_bytes,
+    restore_original_flow_policy_replace_frame_header, scan_original_flow_policy_replace_frame,
+};
 pub use patch::{CompleteCorePolicyPatchInput, prepare_complete_core_policy_patch};
 pub use presentation::{
     CompletePolicyPresentation, PresentedPolicyState, PresentedRetry, present_complete_policy,
@@ -87,6 +92,10 @@ pub use replace_request::{
     CompletePolicyReplaceApplyError, CompletePolicyReplaceApplyView, CompletePolicyReplaceFresh,
     OriginalCompletePolicyReplaceApplyError, OriginalCompletePolicyReplaceApplyView,
     prepare_complete_policy_replace_fresh, prepare_original_complete_policy_replace_fresh,
+};
+pub use replace_request::{
+    OriginalFlowPolicyInstall, OriginalFlowPolicyReplaceFresh, OriginalFlowPolicyReplaceRejection,
+    prepare_original_flow_policy_replace_fresh,
 };
 pub use request::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,

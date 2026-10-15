@@ -13,9 +13,12 @@ mod governance;
 mod layout;
 mod order;
 mod preflight;
-mod rejection;
+pub(in crate::policy::complete) mod rejection;
 mod states;
 pub(in crate::policy::complete) mod value;
+
+pub(in crate::policy::complete) type NormalizedFlowPolicyLayout<'input> =
+    (layout::FlowPolicyLayout<'input>, usize);
 
 /// Borrowed visible original input; this is no decoder or current-policy proof.
 #[derive(Clone, Copy, Debug)]
@@ -159,16 +162,39 @@ pub fn normalize_original_complete_policy_input(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Result<Vec<u8>, FlowPolicyInputRejection>, Error> {
+    let (layout, length) = match prepare_original_flow_policy_layout(
+        value::PolicyInputCursor::Flow(*workflow_type),
+        value::PolicyInputCursor::Flow(*attrs),
+        history_max_events_limit,
+        limits,
+        charge,
+    )? {
+        Ok(prepared) => prepared,
+        Err(reason) => return Ok(Err(reason)),
+    };
+    let root = layout.root.ok_or(Error::Malformed)?;
+    let bytes = etf::emit_snapshot(&layout, root, length, charge)?;
+    charge_schema(charge, 128, 0).map_err(Error::Schema)?;
+    Ok(Ok(bytes))
+}
+
+pub(in crate::policy::complete) fn prepare_original_flow_policy_layout<'input>(
+    workflow_type: value::PolicyInputCursor<'input>,
+    attrs: value::PolicyInputCursor<'input>,
+    history_max_events_limit: u32,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<NormalizedFlowPolicyLayout<'input>, FlowPolicyInputRejection>, Error> {
     if charge.profile() != limits {
         return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
     }
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
     super::retention_input::valid_limit(history_max_events_limit)?;
-    let (count, depth) = preflight::measure(*workflow_type, *attrs, charge)?;
+    let (count, depth) = preflight::measure(workflow_type, attrs, charge)?;
     let mut layout = layout::FlowPolicyLayout::new(count, depth, charge)?;
     let root = match self::core::normalize(
-        *workflow_type,
-        *attrs,
+        workflow_type,
+        attrs,
         history_max_events_limit,
         &mut layout,
         charge,
@@ -181,9 +207,17 @@ pub fn normalize_original_complete_policy_input(
     if length > 262_144 {
         return Ok(Err(FlowPolicyInputRejection::SnapshotBytes));
     }
-    let bytes = etf::emit_snapshot(&layout, root, length, charge)?;
-    charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-    Ok(Ok(bytes))
+    Ok(Ok((layout, length)))
+}
+
+pub(in crate::policy::complete) fn emit_original_flow_policy_envelope(
+    normalized: &NormalizedFlowPolicyLayout<'_>,
+    generation: u64,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Vec<u8>, Error> {
+    let (layout, length) = normalized;
+    let root = layout.root.ok_or(Error::Malformed)?;
+    etf::emit_envelope(layout, root, *length, generation, charge)
 }
 
 /// Encodes one exact caller diagnosis into a freshly paid final owner.

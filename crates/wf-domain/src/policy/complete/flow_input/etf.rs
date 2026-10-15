@@ -1,13 +1,16 @@
 //! Original deterministic ETF for the closed normalized policy-cell subset.
 //!
 //! Pinned OTP28.3.1 external.c size/emit branches agree on this subset only.
-//! No generation, stored-entry admission or payment authority is constructed.
+//! Stored-entry admission and payment authority remain outside this writer.
 
 use crate::policy::complete::{
     CompletePolicyEncodingError as Error, PolicySchemaCharge, PolicySchemaError, charge_schema,
 };
 
 use super::layout::{FlowPolicyCell, FlowPolicyLayout};
+
+mod envelope;
+pub(super) use envelope::emit_envelope;
 
 pub(super) fn measure_snapshot(
     layout: &FlowPolicyLayout<'_>,

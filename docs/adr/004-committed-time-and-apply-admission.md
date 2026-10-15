@@ -232,3 +232,33 @@ local writes. Original setup/assertions stay immutable and additional safety
 controls remain distinct. Execute the required counterparts and profiles on
 BOTH Linux AND macOS; documented requirements and planner GREEN confer no
 5858-case coverage or service acceptance.
+
+## Original whole-flow replacement identity and admission
+
+The reviewed A-NEXT-M1-ORIGINAL-FLOW-PARENT1-CREATE1 increment implements the
+represented lower replace=true allocator command under existing domain/ports
+boundaries. Private FWCP format1/tag8 selects intent registry3. Intent binds the
+tenant, exact binary policy key, raw mathematical expected generation and patch;
+scope group/recovery, request identity, stamp and current/context/history values
+remain separately verified operands. Integer aliases and map permutations have
+the same mathematical identity, while list order and field presence remain
+distinct. The authenticated sidecar carries captured source row order separately.
+Its consistency assumes faithful source capture and supplies no VM-origin proof.
+
+The new frame/intent hard ceiling is96MiB and also obeys supplied decision-byte
+admission, whose default is16MiB. Earlier frame/intent registries retain their
+existing1MiB limits. Prospective logical work bounds raw occurrences, depth,
+visible bytes, compact canonical scratch, every reached read/compare/write and
+the actual ports hashes. No caller size, verified mathematical header or prior
+payment token bypasses the received account. A single verifier and request gate
+precede Fresh; non-Fresh never reads changed policy/context/history inputs.
+
+Fresh reuses one private normalized layout through generation allocation and
+direct original-envelope emission. Current indexes are dropped first; the new
+parent's263168-span profile reads its own source-valid output without changing
+the public4096-span reader. Key, installed bytes and response are real independent
+owned data subject to aggregate admission. Physical policy/outcome/control writes
+still require the later atomic adapter. Public Policy.set preprocessing/replies,
+opaque Other identity, source capture/setup/profile acceptance and independent
+Linux execution remain required. Passing567 Rust tests/four compile-fail docs on
+macOS establishes this represented component, not full M1 or workflow parity.

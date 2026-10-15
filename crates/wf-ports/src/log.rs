@@ -36,6 +36,11 @@ pub use complete_policy::{
     CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,
     decide_original_complete_policy_replace_frame,
 };
+pub use complete_policy::{
+    OriginalFlowPolicyReplaceRequestPlan, VerifiedOriginalFlowPolicyReplaceFrame,
+    decide_original_flow_policy_replace_frame, prepare_original_flow_policy_replace_frame,
+    verify_original_flow_policy_replace_frame,
+};
 pub use complete_policy::{OriginalPolicyReference, prepare_original_complete_policy_reference};
 
 pub use complete_policy::{

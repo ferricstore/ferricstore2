@@ -39425,3 +39425,1283 @@ Big alias guard Raw::BigInteger{negative:false,little_endian:[1,0]} with empty p
 Continuous larger prior peak control remains actual old snapshot API, not transported Other: use the existing ignored Other-key/List[Nil,Nil] fixture G13726/P6912 and hold its bytes. New MIN decide-only adds17002=>G30728/P6912/T37640, final-outcome tight37639 retains30600/P6912. If frame producer is on that SAME account add6473=>G37201/T44113, tight44112 retains37073/P6912. The old Other input is NEVER claimed to traverse this new frame. First and second successful output owners plus later refusal must be reobserved with pointers/bytes after real frame/catalog drops. Existing independent1928/P64 control can use an already-approved primitive fixture. Source old APIs/events remain unchanged.
 
 All nonempty arrays are independently derived BEFORE test RED/production; Root/PERF review may catch actual arithmetic mistakes, but no future candidate output may set these expectations. This note creates no artifact/model/type or source change. Public/capture/opaque/physical/OS/full-goal obligations remain as selected.
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-PARENT1-PORTS-TESTS-RED1 (actual tests-only handoff; 2026-10-15)
+
+Finite selected TEST phase, not production/behavioral GREEN. Exact A-CREATE1 architecture1642896+15150/57fa8821b9b7983e255bfdf6bf7462d4c4ac87f3ab3e7a53c79a4134b7b8a31e was ACTUALLY whole-read5ddcc4. Root recorded disjoint authoring; ARCH wrote domain flow_frame+cases+refusals+17B EOF, Writer wrote ports flow+cases+refusals+11B EOF, Root wrote the separately preapproved source.rs child under TEST-GROUP1 architecture1660460+1824/ecbeb6888170ec2105c4432a350bdefe8fbae8dcfe37938346df18c1f775eb9f. No new model/API/fee/identity/dependency was created. All12 selected test identities remain:4 domain and8 ports. Existing assertions/inputs and target prefixes are preserved; only additional modules/tests/helpers were added. No implementation/stub/helper body or production facade was authored.
+
+Meaningful actual ports sources cover: direct original generation ETF/response/key owners; strict current->rawCAS->type->C->incoming->H order; fixed-true patch Map/key guards; source-invalid raw negative/noninteger/>MAX guards; arbitrary safe invalid-business current map, gen0, exact encoded263168 versus263169 before catalog/CAS with no snapshot cap; original-source d419 no-guard AND dea49 CAS1000->2000->stale3000 with ACTUAL prior original output as current;17d valid1000/queuedFIFO reset plus separate unknown-field supplement;470ba normalized current-cross-policy-wire1000->3000 at1000/3000 and exact beta2000 generationless ETF BINARY under valid beta key/nil at2000;006b full target-high-water-policygen3/max1000->max2000/gen4;889 exact validkey/type/normalized1000/MAX+1;capturedC100/C10+history50 original types/times/bodies;arbitrary2^64/255/256-digit versions and padding through real output->next-current;opaque FF/NUL binary key/type with owned output->current;five1000-name45173B actual output->next-current and old public4096 ItemLimit;real retained accepted/rejected origins with replay pointer/immutable metadata and changed poisonous current/catalog/C/H/window;600 exact unique~1.2MiB governance original recipe PLUS later-states poison;inclusive snapshot262144 and late source-priority failures;window/aggregate416/417;one-account primitive work/current wrappers, real64/272/6912 prior peaks, first and second owned successes reobserved through later refusal and frame/catalog/key drops. These remain mathematical component fixtures; public preprocessing/capture, ETS/setup/all-shard/physical publication/projection and all remaining source/profile/OS obligations stay REQUIRED.
+
+All oracles were source-derived before production: MECHANICS1/VECTORS2 I80/S20/F187 and6473/4683/17002/23910, full nonempty n2/n3/Big arrays and sourceETF lengths/digests; no result counter was sampled to set an expectation. Parent every-positive-phase controls currently assert EVERY prospective TIGHT target-minus-one plus FULL exact success (domain producer/verifier additionally test exact at every step); do not overstate that as every intermediate parent exact-prefix execution. Current-specific reader/type work wraps Current(Encoding); common verifier/gate/Fresh/retention work wraps Replace. Source-only pre-RED body fixture was independently matched by ARCH/PERF: guardNil/patchNil=>I68/S8/F163,L1571,verifier4495+gate519+Freshroot128+patchclass128=>5270, then window128/aggregate128/status128/encoder-entry128/copy157/outcome128=>6067/P0. Input Flow reasons resolve borrowed parts directly with one final owner, never old owner-returning encoder/double entry. Exact current-cap refusal before catalogs is verifier4683+gate519+Fresh128+patch128+key142+lookup129+decoder-entry128=5857/P0.
+
+Actual chronological failures, with no suppression/assertion dropping:
+A. Before any production, own proofd750ba showed all11 selected production paths ABSENT, ports main exactly old8931B SHAaf2f3ede3cf6c10f3cc2b5f4872f34f0cd1ce0c8ad1e0888a31cb391d0072902 +11B newline/mod flow/newline, initial source529 predecessor463/fe8b47f. First command8aefb5/session71182->44370c EXIT101:4 E0432 groups and9 absent selected-status E0599, PLUS actual unused parent corrupt import after helper relocation and replay pointer *out E0308. Those two ordinary test import/type-expression defects were fixed: remove unused import; bind replayed:&RetainedOutcome then std::ptr::eq(replayed,original). No fixture/assertion/fee/production change. The initial failed output is retained below, not mislabeled clean RED.
+B. Root's already-selected original captured-limit source addition and proper captured small-map order/opaque-key refinements were saved BEFORE final ports RED; no implementation result existed. Final command704845/session16516->644425 EXIT101: EXACTLY4 E0432 groups for selected missing exports and10 E0599 for selected missing RetainedStatus::OriginalFlowPolicyReplaceRejected. No unused/type/other diagnostics; ZERO assertions executed. The E0599 are genuine missing selected API/variant, not an unrelated syntax failure. Final proofe9c2da confirms parent583/6e268768, cases564/1b8766c9, refusals566/29fd2dad, Root source529/7424f138; old ports main prefix8931B exact+11B, new8942B/SHAf70698caed456ef6c40723624ffe16ed0efcefe1ab39fc98aaf8b6add2e7cf03. Both production roots remained absent after completion. Root independently reproduced final ports c79c5a/session27829->2892e7 with the same4E0432+10E0599/nootherdiagnostic/zeroassertions; that is ROOT evidence, not my own second execution.
+
+Actual formatting/fit: own leaf rustfmt22ed0e/d4898b EXIT0; full cargo fmt --all -- --check5339ae EXIT0. Read-only physical geometry682bb8 verifies all7 test files<=600 and every detected function<=100; final source line counts/max functions below. No lint suppression/ignore/dependency/extra target was added. Main EOF registration preserves every previous byte. No behavioral target GREEN, strict production lint acceptance, native runtime gain or Linux result is claimed by missing-API RED.
+
+Actual current7-file manifest/geometry (682bb8; domain316 includes ARCH's final preproduction fresh Big-comparator supplement, whose final domain RED is separately owned):
+{"path": "crates/wf-domain/tests/complete_policy/flow_frame.rs", "bytes": 11580, "lines": 316, "sha256": "5b99c4531ab6f1e6d2810684d8f72d94c414de07e17d5646b3f1016de015d7b2", "max_function": [50, "assert_big_comparator_events"]}
+{"path": "crates/wf-domain/tests/complete_policy/flow_frame/cases.rs", "bytes": 18415, "lines": 556, "sha256": "303fe68009ba414e639fb36ab29d8e099c8e19acd2efd4325905a3644306a5b6", "max_function": [96, "assert_outer_and_node_tampering"]}
+{"path": "crates/wf-domain/tests/complete_policy/flow_frame/refusals.rs", "bytes": 19656, "lines": 543, "sha256": "3b71a304cd378879351fec42268425753f7891d5286f6abc7736a0d5851ee4f2", "max_function": [80, "assert_profiles_and_visible_caps"]}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow.rs", "bytes": 19636, "lines": 583, "sha256": "6e26876872ec015b06b1ca70de5e80d9a008bdacf97cdf4c94f932343dcc3eda", "max_function": [81, "original_flow_parent_keeps_context_content_and_highwater_order"]}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow/cases.rs", "bytes": 18304, "lines": 564, "sha256": "1b8766c9aa10ce9af42a14b202e425bdadcacb9e7b5fac2d36d6cef537fe55cc", "max_function": [60, "assert_type_binding"]}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow/refusals.rs", "bytes": 18698, "lines": 566, "sha256": "29fd2dad0450b0922ad74dfa04d60bb10291d3ce3672d5df8d7e0299d2612054", "max_function": [85, "assert_held"]}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow/source.rs", "bytes": 17858, "lines": 529, "sha256": "7424f13806add3c4d0ada243500fa94f7f0a5c943202482b13ad08f9d4b4f303", "max_function": [83, "assert_own_output"]}
+
+
+Peer ACTUAL reads: I whole-read Root source432 in9b5626 and complete final529/7424f138 in8834a7 (including C100/C10). I whole-read domain264 initial parent +all556/543 children in9b5626/9ebad4/72ed92; then ENTIRE added52-line Big-comparator parent delta e76e80, current316/5b99c453. No test/oracle blocker found. Independently confirmed mixedInteger2/RawBig[1,0] key recipe: samepre1040/P432, each heap/adjacent raw Big trim130 increases eachpass by260, canonical raw Big child adds130, two integer wire bytes add2, so M4869/W7105 and producer14615/P432; canonical scan2589/restore3072=>5661. Trim tight4236->4237 retains3675/P432 and5136->5137 retains4575/P432. Domains use mathematical scaffold/digest restoration honestly, never claim domain SHA or ports verification authority. Canonical ID independence/nested-map duplicate controls, source/intent ordering distinction, three-cycle p/q orientation, primitive arrays, integer/atom/list aliases, occurrence/depth/text caps and held real old-Other donors all agree. Root source controls preserve exact numeric/source recipes while physical observations remain unlinked. Existing Other snapshot acceptance is NOT claimed transported by the temporary frame UnsupportedTag profile.
+
+Raw initial command/output:
+$ env RUSTFLAGS=-Dwarnings cargo test --locked -p wf-ports --test complete_policy_request
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+   Compiling digest v0.11.3
+   Compiling sha2 v0.11.0
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalFlowPolicyReplaceFresh`, `wf_domain::policy::complete::OriginalFlowPolicyReplaceInput`, `wf_domain::policy::complete::OriginalFlowPolicyReplaceRejection`
+  --> crates/wf-ports/tests/complete_policy_request/flow.rs:9:5
+   |
+ 9 |     OriginalFlowPolicyReplaceFresh as FlowFresh, OriginalFlowPolicyReplaceInput as Input,
+   |     ------------------------------^^^^^^^^^^^^^  ------------------------------^^^^^^^^^
+   |     |                                            |
+   |     |                                            no `OriginalFlowPolicyReplaceInput` in `policy::complete`
+   |     no `OriginalFlowPolicyReplaceFresh` in `policy::complete`
+10 |     OriginalFlowPolicyReplaceRejection as Rejection, OriginalPolicyReadError as ReadError,
+   |     ----------------------------------^^^^^^^^^^^^^
+   |     |
+   |     no `OriginalFlowPolicyReplaceRejection` in `policy::complete`
+   |
+help: a similar name exists in the module
+   |
+10 -     OriginalFlowPolicyReplaceRejection as Rejection, OriginalPolicyReadError as ReadError,
+10 +     CompletePolicyReplaceRejection as Rejection, OriginalPolicyReadError as ReadError,
+   |
+
+error[E0432]: unresolved imports `wf_ports::log::OriginalFlowPolicyReplaceRequestPlan`, `wf_ports::log::decide_original_flow_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/flow.rs:22:5
+   |
+22 |     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+   |     ------------------------------------^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `decide_original_flow_policy_replace_frame` in `log`
+   |     |
+   |     no `OriginalFlowPolicyReplaceRequestPlan` in `log`
+   |
+help: a similar name exists in the module
+   |
+22 -     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+22 +     CompletePolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+   |
+help: a similar name exists in the module
+   |
+22 -     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+22 +     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_complete_policy_replace_frame,
+   |
+
+error[E0432]: unresolved import `wf_ports::log::prepare_original_flow_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/flow/cases.rs:13:5
+   |
+13 | use wf_ports::log::prepare_original_flow_policy_replace_frame;
+   |     ^^^^^^^^^^^^^^^------------------------------------------
+   |                    |
+   |                    no `prepare_original_flow_policy_replace_frame` in `log`
+   |
+help: a similar name exists in the module
+   |
+13 - use wf_ports::log::prepare_original_flow_policy_replace_frame;
+13 + use wf_ports::log::decide_original_complete_policy_replace_frame;
+   |
+
+error[E0432]: unresolved import `wf_ports::log::prepare_original_flow_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:14:5
+   |
+14 | use wf_ports::log::prepare_original_flow_policy_replace_frame;
+   |     ^^^^^^^^^^^^^^^------------------------------------------
+   |                    |
+   |                    no `prepare_original_flow_policy_replace_frame` in `log`
+   |
+help: a similar name exists in the module
+   |
+14 - use wf_ports::log::prepare_original_flow_policy_replace_frame;
+14 + use wf_ports::log::decide_original_complete_policy_replace_frame;
+   |
+
+error: unused import: `corrupt`
+  --> crates/wf-ports/tests/complete_policy_request/flow.rs:32:43
+   |
+32 |     KEY, accepted, atom, binary, control, corrupt, current, expected, frame, frame_with, k1_safety,
+   |                                           ^^^^^^^
+   |
+   = note: `-D unused-imports` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:483:29
+    |
+483 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+483 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+483 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:527:29
+    |
+527 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+527 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+527 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(reason)),
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:557:33
+    |
+557 |                 RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+557 -                 RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+557 +                 RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/source.rs:243:25
+    |
+243 |         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape)
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+243 -         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape)
+243 +         RetainedStatus::CompletePolicyReplaceRejected(Rejection::PatchShape)
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:129:29
+    |
+129 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+129 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+129 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::PatchShape),
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:147:29
+    |
+147 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PolicyKey),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+147 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PolicyKey),
+147 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::PolicyKey),
+    |
+
+error[E0308]: mismatched types
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:201:42
+    |
+201 |                     assert!(std::ptr::eq(*out, &outcomes[&request_id]));
+    |                             ------------ ^^^^ expected `*const RetainedOutcome`, found `RetainedOutcome`
+    |                             |
+    |                             arguments to this function are incorrect
+    |
+    = note: expected raw pointer `*const wf_domain::workflow::request::RetainedOutcome`
+                    found struct `wf_domain::workflow::request::RetainedOutcome`
+note: function defined here
+   --> /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/ptr/mod.rs:2507:7
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:281:29
+    |
+281 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(Reason::Retention(
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+281 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(Reason::Retention(
+281 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(Reason::Retention(
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:328:29
+    |
+328 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+328 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+328 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(reason)),
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:542:25
+    |
+542 |         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+542 -         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+542 +         RetainedStatus::CompletePolicyReplaceRejected(Rejection::PatchShape),
+    |
+
+Some errors have detailed explanations: E0308, E0432, E0599.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `wf-ports` (test "complete_policy_request") due to 15 previous errors
+
+
+Raw final command/output:
+$ env RUSTFLAGS=-Dwarnings cargo test --locked -p wf-ports --test complete_policy_request
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalFlowPolicyReplaceFresh`, `wf_domain::policy::complete::OriginalFlowPolicyReplaceInput`, `wf_domain::policy::complete::OriginalFlowPolicyReplaceRejection`
+  --> crates/wf-ports/tests/complete_policy_request/flow.rs:9:5
+   |
+ 9 |     OriginalFlowPolicyReplaceFresh as FlowFresh, OriginalFlowPolicyReplaceInput as Input,
+   |     ------------------------------^^^^^^^^^^^^^  ------------------------------^^^^^^^^^
+   |     |                                            |
+   |     |                                            no `OriginalFlowPolicyReplaceInput` in `policy::complete`
+   |     no `OriginalFlowPolicyReplaceFresh` in `policy::complete`
+10 |     OriginalFlowPolicyReplaceRejection as Rejection, OriginalPolicyReadError as ReadError,
+   |     ----------------------------------^^^^^^^^^^^^^
+   |     |
+   |     no `OriginalFlowPolicyReplaceRejection` in `policy::complete`
+   |
+help: a similar name exists in the module
+   |
+10 -     OriginalFlowPolicyReplaceRejection as Rejection, OriginalPolicyReadError as ReadError,
+10 +     CompletePolicyReplaceRejection as Rejection, OriginalPolicyReadError as ReadError,
+   |
+
+error[E0432]: unresolved imports `wf_ports::log::OriginalFlowPolicyReplaceRequestPlan`, `wf_ports::log::decide_original_flow_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/flow.rs:22:5
+   |
+22 |     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+   |     ------------------------------------^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `decide_original_flow_policy_replace_frame` in `log`
+   |     |
+   |     no `OriginalFlowPolicyReplaceRequestPlan` in `log`
+   |
+help: a similar name exists in the module
+   |
+22 -     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+22 +     CompletePolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+   |
+help: a similar name exists in the module
+   |
+22 -     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_flow_policy_replace_frame,
+22 +     OriginalFlowPolicyReplaceRequestPlan as Plan, decide_original_complete_policy_replace_frame,
+   |
+
+error[E0432]: unresolved import `wf_ports::log::prepare_original_flow_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/flow/cases.rs:13:5
+   |
+13 | use wf_ports::log::prepare_original_flow_policy_replace_frame;
+   |     ^^^^^^^^^^^^^^^------------------------------------------
+   |                    |
+   |                    no `prepare_original_flow_policy_replace_frame` in `log`
+   |
+help: a similar name exists in the module
+   |
+13 - use wf_ports::log::prepare_original_flow_policy_replace_frame;
+13 + use wf_ports::log::decide_original_complete_policy_replace_frame;
+   |
+
+error[E0432]: unresolved import `wf_ports::log::prepare_original_flow_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:14:5
+   |
+14 | use wf_ports::log::prepare_original_flow_policy_replace_frame;
+   |     ^^^^^^^^^^^^^^^------------------------------------------
+   |                    |
+   |                    no `prepare_original_flow_policy_replace_frame` in `log`
+   |
+help: a similar name exists in the module
+   |
+14 - use wf_ports::log::prepare_original_flow_policy_replace_frame;
+14 + use wf_ports::log::decide_original_complete_policy_replace_frame;
+   |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:483:29
+    |
+483 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+483 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+483 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:527:29
+    |
+527 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+527 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+527 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(reason)),
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:557:33
+    |
+557 |                 RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+557 -                 RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(
+557 +                 RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/source.rs:227:25
+    |
+227 |         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(Reason::Retention(
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+227 -         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(Reason::Retention(
+227 +         RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(Reason::Retention(
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow/source.rs:309:25
+    |
+309 |         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape)
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+309 -         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape)
+309 +         RetainedStatus::CompletePolicyReplaceRejected(Rejection::PatchShape)
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:129:29
+    |
+129 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+129 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+129 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::PatchShape),
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:147:29
+    |
+147 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PolicyKey),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+147 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PolicyKey),
+147 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::PolicyKey),
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:282:29
+    |
+282 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(Reason::Retention(
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+282 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(Reason::Retention(
+282 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(Reason::Retention(
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:329:29
+    |
+329 |             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+329 -             RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::Input(reason)),
+329 +             RetainedStatus::CompletePolicyReplaceRejected(Rejection::Input(reason)),
+    |
+
+error[E0599]: no variant, associated function, or constant named `OriginalFlowPolicyReplaceRejected` found for enum `wf_domain::workflow::request::RetainedStatus` in the current scope
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:543:25
+    |
+543 |         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `wf_domain::workflow::request::RetainedStatus`
+    |
+help: there is a variant with a similar name
+    |
+543 -         RetainedStatus::OriginalFlowPolicyReplaceRejected(Rejection::PatchShape),
+543 +         RetainedStatus::CompletePolicyReplaceRejected(Rejection::PatchShape),
+    |
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `wf-ports` (test "complete_policy_request") due to 14 previous errors
+
+
+Current ports buffers/EOF are frozen for Root's normal independent final RED and explicit substantive implementation assignment. No additional artifact/body/ACK/native stage is requested. Full original cases/setup/profiles, mandatory Linux ANDmacOS and complete ordered M1–M8 goal remain active.
+
+## DOC-NEXT-M1-ORIGINAL-FLOW-PARENT1-WRITTEN-GREEN1 (2026-10-15)
+
+The selected lower replace=true original-flow parent is substantively implemented after the separately preserved meaningful missing-API RED. This is a finite M1 component checkpoint, not full M1–M8 completion. Exact creation decision is ARCH1642896+15150/SHA57fa8821b9b7983e255bfdf6bf7462d4c4ac87f3ab3e7a53c79a4134b7b8a31e, with the later approved source.rs grouping. Root independently reproduced final domain80eb9d and ports c79c5a→2892e7 (4E0432+10 selected-variant E0599, no other diagnostics/assertions), bound all7 final tests/EOFs and all11 absent production paths in bdaac2, and explicitly released production before any source creation. The complete tests-first ports evidence remains heading39429/byte2848036+32934/db06c12a; its original failed import/pointer epoch is not collapsed into the clean RED.
+
+Ownership: Writer authored the EIGHT new domain frame/model/raw/canonical/codec/scan/Fresh/retention paths. Root accepted a clean handoff of both still-ABSENT/unstarted ports production paths before writing them, and authored the new ETF envelope child plus all17 existing shared/facade seams. Writer did not write Root's paths or shared sources. ARCH owns the three domain test paths; Writer owns ports parent/cases/refusals; Root owns ports source.rs. Root owns checker/config/docs/ledger/Git. No additional artifact/model/alias/dependency/fee was invented to resolve implementation or lint findings.
+
+Result and conservation: registry3 has mathematical Integer/Big/negative-zero/padding aliases and map-permutation identity, while exact transport binds captured source-order sidecar. One compact occurrence-bounded ordinal Vec is reserved; each actual raw row/compare/swap/normalization/read/write/backpatch is prospectively charged. The verifier owns no index/tree and validates canonical children before adjacent map comparisons. One verifier and existing gate precede Fresh; non-Fresh returns before changed current/catalog/C/H/window reads. Fresh is patchMap→exact nonempty f:{f}:policy: suffix→strict expanded current→raw CAS→type binding→captured C→one same-layout incoming source walk and bare-size gate→active H→done H→allocation→original ETF envelope→owned key/success→expiry/aggregate/status→distinct response copy/final metadata. Stored arbitrary safe maps are not business re-admitted. Current backing drops before Layout; plan retains only independent key/value/response/header owners and gate replay authority. Original envelope reuses only the closed private layout's checked bare length: Eenv=E+18+g; writer overhead402+g. No snapshot Vec, old CONTENT1 pass, V2 installation claim, second business walk, public paid token or fake publication was introduced.
+
+Frozen independent MIN producer6473/P272, verifier4683/P0 and closed parent17002/P4096; n2 producer13823/P432/verifier5655; n3 producer19810/P448/verifier6270; Big guard6771/4701; Big comparator14615/5661; present parent23910/P4096; PatchShape6067/P0; long aggregate R416/417; 5x1000-name45173 output→next-current all execute in the unchanged tests. Old public4096 reader controls, old standalone Other13726/P6912 and all100 old domain+73 old ports controls remain executed. Canonical frame alias fees do not retroactively change old raw adapters.
+
+Actual source corrections and failures, in reached order:
+1. Before the first compile, PERF actually read compound() and found a provisional tag5 write followed by unpaid output[tag]=7. ARCH selected shape-before-final-tag; codec now reuses the single paid shape walk and writes5/7 once. No new event/owner; MIN/n2/n3 untouched. Root also read the exact body.
+2. First warnings-denied domain compile e0a833/session33701→87ad1f EXIT101: unused Raw import and unread FrameCursor.intent field. Removed the import. row() now performs a constant map-record offset/pointer correspondence check against the borrowed intent, without payload reread, making its selected origin field substantive. Header writer moved from codec to the already selected parent file to keep physical geometry; same calls/events/bytes.
+3. First assertion epoch c4d3d0/session73279→d01cab EXIT101:103PASS/1FAIL. Altered I/S declared region returned TrailingBytes before validating its claimed structure. Moved trailing decision after successful exact intent/sidecar validation. Second epoch4e0352/session31832→e63c9b EXIT101:103PASS/1FAIL, same test now saw ItemLimit when shifted sidecar M became huge. Sidecar metadata count>65536 is Malformed; attempted physical node/depth bounds remain ItemLimit. Focused77e3b2/session80411→8a785f then1PASS. Neither failed assertion was removed or reclassified as initial RED.
+4. Strict library3a966c/session16637→cafafd EXIT101 had seven real Clippy findings: Root envelope checked-conversion/manual-bit-width; Writer private codec byvalue, complex private scanner tuple, public consuming scanned value, Big branch semicolon, and private264B view byvalue. Root fixed its two within envelope. Writer changed only private borrows, moved consuming restoration onto the selected Scanned model, filled selected Scanned fields instead of returning a complex tuple (NO new alias), and added the semicolon. Public API remains selected. Full domain6c5c01/session15911→9b5e11 first104PASS.
+5. All-target strict e80ec1/session38077→bb2a22 EXIT101: six ordinary TEST lint diagnostics below. ARCH applied only its two exact syntax styles. Writer fixed four ports helper styles; Root changed only five first-operand borrows in source.rs. These are honest POST-implementation style epochs; they were not present in the genuine final missing-API RED bytes. Every frozen expected byte/event/assertion is conserved by the exact inverse proofs below. All-target992a2f/session56824→1f1713 and fmtc95083 EXIT0.
+6. Two final prospective-read source findings were corrected without new fees or models. Writer found sidecar count compared against input.len before its explicit count4 read; ARCH/PERF/Root agreed comparison now uses the paid local count. Root then found intent's expected-length word peek before child128/length4. Existing node() now accepts remaining bytes, pays128→length4, narrows its existing Cursor to that checked extent and returns it; intent advances from returned expected extent, requires exact final patch end, and every recursive child checks bounded extent equals the already-paid offset-table range. No boolean/credit/new alias/index was added. Valid event streams remain exact. Count-only f7c8ec/session18795→fa65a1 passed104+strict; ports f027a9/session28801→d36c9a passed81. Final source386/0aeb3608 below includes BOTH read-order fixes.
+
+Final stable execution on Darwin25.6.0 arm64, rustc1.99.0(b940084d7 2026-09-28): joined6d7a73/session1703→1ce074 EXIT0 ran the following exact sequential commands: `env RUSTFLAGS=-Dwarnings cargo test --locked -p wf-domain --test complete_policy` (104/104); `env RUSTFLAGS=-Dwarnings cargo test --locked -p wf-ports --test complete_policy_request` (81/81); `env RUSTFLAGS=-Dwarnings cargo clippy --locked -p wf-domain -p wf-ports --all-targets -- -D warnings` (PASS); `cargo fmt --all -- --check` (PASS). git diff --checkd95a51 PASS. No subsequent source/test edits are planned. Root's first ports ab6a5a→5a5c31 81PASS and independent domain dad09a→7506f4 104PASS are owner reports, separate from my raw executions. Root reports the first full wrapper8ce78a/session20563 EXIT0 INCLUDING default RustSec, but conservatively treats it as mixed-source because the paid-read correction was announced while live; it is NOT my final-byte wrapper claim. Root owns the independently bound final same-source wrapper, source maps and full-goal checkpoint.
+
+Exact SIX ordinary test lint repairs/inverse recipe: (a) domain parent `assert!(remainder.is_empty())`→`assert_eq!(remainder, [])`; (b) domain cases identical0/4 match arms→0|4. (c) ports hex constant chunks_exact(2)→as_chunks::<2>().0.iter(), with the same fixed-input recipe; (d) constant aggregate equality113+150+150+4→actual key.len()+2*final_bytes.len()+4, still asserting417; (e) PRIVATE apply helper takes &RawView, dereferences at the unchanged public API, and every caller adds ONLY a leading & to view()/supplied operands (including Root's five source.rs calls); (f) replay pointer uses &raw const outcomes[...] with the same typed borrowed outcome. Inverting (c)–(f), then ordinary rustfmt stdin, independently recovers all four exact frozen ports hashes:6e26876872ec015b06b1ca70de5e80d9a008bdacf97cdf4c94f932343dcc3eda;1b8766c9aa10ce9af42a14b202e425bdadcacb9e7b5fac2d36d6cef537fe55cc;29fd2dad0450b0922ad74dfa04d60bb10291d3ce3672d5df8d7e0299d2612054;7424f13806add3c4d0ada243500fa94f7f0a5c943202482b13ad08f9d4b4f303 (actual424fc3). Domain exact inverses and both original main prefixes:
+```text
+domain-parent-inverse 5b99c4531ab6f1e6d2810684d8f72d94c414de07e17d5646b3f1016de015d7b2
+domain-cases-inverse 303fe68009ba414e639fb36ab29d8e099c8e19acd2efd4325905a3644306a5b6
+main-exact-prefix crates/wf-domain/tests/complete_policy/main.rs 1999 b3143eb0aa25455aa50f4608fb8dad44656fe1c0c838889ec30d16f198c4a0ef suffix b'\nmod flow_frame;\n'
+main-exact-prefix crates/wf-ports/tests/complete_policy_request/main.rs 8931 af2f3ede3cf6c10f3cc2b5f4872f34f0cd1ce0c8ad1e0888a31cb391d0072902 suffix b'\nmod flow;\n'
+```
+
+Final11 production+7 test manifests (actual092052; main EOFs proved above). All production≤400LF/functions≤100 (largest codec392, scanner386, Fresh95LF function); all tests≤600LF/functions≤100 (largest ports parent583, cases fn96). Exact main suffixes remain17B domain and11B ports, no old prefix/assertion edits.
+```jsonl
+{"path": "crates/wf-domain/src/policy/complete/outer/flow_frame.rs", "B": 8363, "LF": 246, "SHA256": "dddf1b99bcc914bca8a5540400ec3bdc809d666d4be914af7d6f4909016a98e1"}
+{"path": "crates/wf-domain/src/policy/complete/outer/flow_frame/canonical.rs", "B": 10087, "LF": 354, "SHA256": "c9bdfca822669f6afd3a9a24b6511afb1544e819f7bd7c19216e6159a16319fb"}
+{"path": "crates/wf-domain/src/policy/complete/outer/flow_frame/codec.rs", "B": 12339, "LF": 392, "SHA256": "428bebdd2fa7f50682a6b30da8b46d195a2146465e3a64a6b87e5c31cef47ff3"}
+{"path": "crates/wf-domain/src/policy/complete/outer/flow_frame/model.rs", "B": 5480, "LF": 160, "SHA256": "347bf784cc4d308a7ce5293d10a9cd20056bef329c46a0597b70b59952f45729"}
+{"path": "crates/wf-domain/src/policy/complete/outer/flow_frame/raw.rs", "B": 4237, "LF": 125, "SHA256": "8e0e85cf63dc2e2d2739bf44c40c7a7d6d51ec70a9cc649125fbd07536b8fd8f"}
+{"path": "crates/wf-domain/src/policy/complete/outer/flow_frame/scan.rs", "B": 12530, "LF": 386, "SHA256": "0aeb3608b333eee6d2a4b27ad5d33ede0f131c3d578577c60b22fc106c748c12"}
+{"path": "crates/wf-domain/src/policy/complete/replace_request/flow.rs", "B": 9251, "LF": 263, "SHA256": "f500417056474089cc10ae1eb6352fe46c9c91ab0cd8a6239e4d0761ed09625d"}
+{"path": "crates/wf-domain/src/policy/complete/replace_request/flow/retention.rs", "B": 5572, "LF": 152, "SHA256": "fbf24630ae5c416b231f4a4c19db69cb60bc8e72ce7b68d8737ec204a941600a"}
+{"path": "crates/wf-ports/src/log/complete_policy/flow.rs", "B": 5189, "LF": 132, "SHA256": "e74f9374f250124a4c4fc9651e8cf08c0c17d328de753bf7d24711d916e9263f"}
+{"path": "crates/wf-ports/src/log/complete_policy/flow/apply.rs", "B": 5106, "LF": 133, "SHA256": "84e0252f28fefcb04d771f0027e625cdeefe96dc67b7041f77191a52c1c9eb3d"}
+{"path": "crates/wf-domain/src/policy/complete/flow_input/etf/envelope.rs", "B": 1900, "LF": 60, "SHA256": "4006787f4a9ead619b6903df18099aa9c7d86d4ef61d3c3716714bfc83802dbd"}
+{"path": "crates/wf-domain/tests/complete_policy/flow_frame.rs", "B": 11576, "LF": 316, "SHA256": "37c4e916a7eec630025d4ff7a714330db608d7efa658168241aa172d2721243b"}
+{"path": "crates/wf-domain/tests/complete_policy/flow_frame/cases.rs", "B": 18376, "LF": 555, "SHA256": "8ed5d59cc3584dd761de1a6f70ac5ff90678ed4dff4cc6f03ba58046b26926ca"}
+{"path": "crates/wf-domain/tests/complete_policy/flow_frame/refusals.rs", "B": 19656, "LF": 543, "SHA256": "3b71a304cd378879351fec42268425753f7891d5286f6abc7736a0d5851ee4f2"}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow.rs", "B": 19664, "LF": 583, "SHA256": "dc50d5f4d3757885fa41337a054f087494c5380648712652fc551c0d948f8326"}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow/cases.rs", "B": 18313, "LF": 564, "SHA256": "156c761bcf2802b7dd20ec42a87794d24ce1b688c6f30143e584bcf6c2ae4df3"}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow/refusals.rs", "B": 18756, "LF": 568, "SHA256": "cd7a736e6f0ad1fcb23e023e22a49c1b668a419ef944a621ccf509ad7fd83062"}
+{"path": "crates/wf-ports/tests/complete_policy_request/flow/source.rs", "B": 17863, "LF": 529, "SHA256": "0f1cfe8ae62bbc935e1184434fa22e9451ed6797acfe206b7a2ec714c76fd361"}
+```
+
+Writer's actual reciprocal source review: full new Root ports2 bodies67288b, new envelope567a6d/current4006787f, and ENTIRE17 shared/facade seam diffs6f6f4d were displayed/read; actual Frame substitution retains old Flow/Retry/Indexed branches, old standalone wrapper reuses same business body, private snapshot length stays private, current4096/263168 choice is fixed by caller, old reader attempted-span debit order unchanged, raw-origin lookup extracted without changed classes/events, new internal registry3 ctor doesn't widen public ctor, precise retained status doesn't turn operational failures into business reasons. No material issue found in those Root-owned bodies. ARCH/PERF independently actual-read Writer sources and concrete corrections; final written findings/whole reciprocity are separate evidence, not invented by this note.
+
+Remaining required scope: Raw::Other cannot certify missing payload identity and the NEW frame returns operational UnsupportedTag; old snapshot Other cases remain exact and are not transported/substituted. Full opaque-term identity/capture, public Policy.set FIRST-control versus PolicyPatch LAST recursive preprocessing, arbitrary-map captured-order origin proof, public response-state/all-shard behavior, physical atomic installation/durability, every required original declaration/assertion/setup/profile, Linux execution and the remaining M1–M8 tasks remain REQUIRED. This macOS logical G/P/source subset is not native allocation/RSS/time/speed gain, general VM external_size theorem or full workflow parity. No permanent product exclusion or source authority is inferred.
+
+Raw failed/pass outputs below are the actual captured owner command output (no synthetic failure reconstruction). The first compiler's initial unused-import diagnostic remains directly at toole0a833; its terminal output87ad1f is retained here. All subsequent failed epochs and the final joined pass are included completely.
+
+### First domain compile terminal e0a833→87ad1f, EXIT101
+
+```text
+error: field `intent` is never read
+ --> crates/wf-domain/src/policy/complete/outer/flow_frame/raw.rs:8:16
+  |
+6 | pub(in crate::policy::complete) struct FlowPolicyFrameCursor<'frame> {
+  |                                        --------------------- field in this struct
+7 |     pub(super) node: &'frame [u8],
+8 |     pub(super) intent: &'frame [u8],
+  |                ^^^^^^
+  |
+  = note: `FlowPolicyFrameCursor` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+  = note: `-D dead-code` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: could not compile `wf-domain` (lib) due to 2 previous errors
+```
+
+### First executed domain target c4d3d0→d01cab, EXIT101 (103/1)
+
+```text
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.36s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 104 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test flow_frame::original_flow_frame_rejects_all_structural_tampering ... FAILED
+test flow_frame::original_flow_frame_preserves_raw_presence_and_source_order ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test flow_frame::original_flow_frame_canonicalizes_mathematical_terms ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test flow_frame::original_flow_frame_preserves_each_account_event ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+failures:
+
+---- flow_frame::original_flow_frame_rejects_all_structural_tampering stdout ----
+
+thread 'flow_frame::original_flow_frame_rejects_all_structural_tampering' (28197167) panicked at crates/wf-domain/tests/complete_policy/flow_frame.rs:250:5:
+assertion `left == right` failed
+  left: Some(Encoding(TrailingBytes))
+ right: Some(Encoding(Malformed))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    flow_frame::original_flow_frame_rejects_all_structural_tampering
+
+test result: FAILED. 103 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `-p wf-domain --test complete_policy`
+```
+
+### Second executed domain target4e0352→e63c9b, EXIT101 (103/1)
+
+```text
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.13s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 104 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test flow_frame::original_flow_frame_preserves_raw_presence_and_source_order ... ok
+test flow_frame::original_flow_frame_rejects_all_structural_tampering ... FAILED
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test flow_frame::original_flow_frame_canonicalizes_mathematical_terms ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test flow_frame::original_flow_frame_preserves_each_account_event ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+failures:
+
+---- flow_frame::original_flow_frame_rejects_all_structural_tampering stdout ----
+
+thread 'flow_frame::original_flow_frame_rejects_all_structural_tampering' (28199008) panicked at crates/wf-domain/tests/complete_policy/flow_frame.rs:250:5:
+assertion `left == right` failed
+  left: Some(Encoding(ItemLimit))
+ right: Some(Encoding(Malformed))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    flow_frame::original_flow_frame_rejects_all_structural_tampering
+
+test result: FAILED. 103 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `-p wf-domain --test complete_policy`
+```
+
+### First strict library3a966c→cafafd, EXIT101
+
+```text
+error: checked cast can be simplified
+  --> crates/wf-domain/src/policy/complete/flow_input/etf/envelope.rs:19:31
+   |
+19 |     let generation_width = if generation <= u64::from(u8::MAX) {
+   |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `u8::try_from(generation).is_ok()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#checked_conversions
+   = note: `-D clippy::checked-conversions` implied by `-D clippy::pedantic`
+   = help: to override `-D clippy::pedantic` add `#[allow(clippy::checked_conversions)]`
+
+error: manual implementation of `bit_width`
+  --> crates/wf-domain/src/policy/complete/flow_input/etf/envelope.rs:24:22
+   |
+24 |         let digits = (u64::BITS - generation.leading_zeros()).div_ceil(8);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_bit_width
+   = note: `-D clippy::manual-bit-width` implied by `-D clippy::pedantic`
+   = help: to override `-D clippy::pedantic` add `#[allow(clippy::manual_bit_width)]`
+help: try
+   |
+24 -         let digits = (u64::BITS - generation.leading_zeros()).div_ceil(8);
+24 +         let digits = generation.bit_width().div_ceil(8);
+   |
+
+error: this argument is passed by value, but not consumed in the function body
+   --> crates/wf-domain/src/policy/complete/outer/flow_frame/codec.rs:200:12
+    |
+200 |     input: OriginalFlowPolicyReplaceInput<'_>,
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_pass_by_value
+    = note: `-D clippy::needless-pass-by-value` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::needless_pass_by_value)]`
+help: consider taking a reference instead
+    |
+200 |     input: &OriginalFlowPolicyReplaceInput<'_>,
+    |            +
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> crates/wf-domain/src/policy/complete/outer/flow_frame/scan.rs:136:6
+    |
+136 |   ) -> Result<
+    |  ______^
+137 | |     (
+138 | |         &'frame [u8],
+139 | |         &'frame [u8],
+...   |
+143 | |     Error,
+144 | | > {
+    | |_^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::type_complexity)]`
+
+error: this argument is passed by value, but not consumed in the function body
+  --> crates/wf-domain/src/policy/complete/outer/flow_frame.rs:96:14
+   |
+96 |     scanned: ScannedOriginalFlowPolicyReplaceFrame<'frame>,
+   |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: or consider marking this type as `Copy`
+  --> crates/wf-domain/src/policy/complete/outer/flow_frame/model.rs:43:1
+   |
+43 | pub struct ScannedOriginalFlowPolicyReplaceFrame<'frame> {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_pass_by_value
+help: consider taking a reference instead
+   |
+96 |     scanned: &ScannedOriginalFlowPolicyReplaceFrame<'frame>,
+   |              +
+
+error: consider adding a `;` to the last statement for consistent formatting
+   --> crates/wf-domain/src/policy/complete/outer/flow_frame.rs:197:13
+    |
+197 |             visible(little_endian.len(), &mut metrics.2, charge)?
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: add a `;` here: `visible(little_endian.len(), &mut metrics.2, charge)?;`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#semicolon_if_nothing_returned
+    = note: `-D clippy::semicolon-if-nothing-returned` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::semicolon_if_nothing_returned)]`
+
+error: this argument (264 byte) is passed by value, but might be more efficient if passed by reference (limit: 256 byte)
+   --> crates/wf-domain/src/policy/complete/replace_request/flow.rs:119:11
+    |
+119 |     view: OriginalCompletePolicyReplaceApplyView<'_, '_, '_>,
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider passing by reference instead: `&OriginalCompletePolicyReplaceApplyView<'_, '_, '_>`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_types_passed_by_value
+    = note: `-D clippy::large-types-passed-by-value` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::large_types_passed_by_value)]`
+
+error: could not compile `wf-domain` (lib) due to 7 previous errors
+```
+
+### First all-target strict e80ec1→bb2a22, EXIT101
+
+```text
+    Checking digest v0.11.3
+    Checking sha2 v0.11.0
+    Checking wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error: these match arms have identical bodies
+   --> crates/wf-domain/tests/complete_policy/flow_frame/cases.rs:265:13
+    |
+265 |             0 => [b"a", b"b", b"c", b"q"],
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+269 |             4 => [b"a", b"b", b"c", b"q"],
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: if this is unintentional make the arms return different values
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#match_same_arms
+    = note: `-D clippy::match-same-arms` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::match_same_arms)]`
+help: otherwise merge the patterns into a single arm
+    |
+265 ~             1 => [b"a", b"B", b"c", b"q"],
+266 |             2 => [b"a", b"b", b"C", b"q"],
+267 |             3 => [b"a", b"b", b"c", b"Q"],
+268 ~             0 | 4 => [b"a", b"b", b"c", b"q"],
+    |
+
+error: used `assert!` to check that a value is empty
+   --> crates/wf-domain/tests/complete_policy/flow_frame.rs:162:5
+    |
+162 |     assert!(remainder.is_empty());
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#assert_is_empty
+    = note: `-D clippy::assert-is-empty` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::assert_is_empty)]`
+help: use `assert_eq!` to show the value on failure
+    |
+162 -     assert!(remainder.is_empty());
+162 +     assert_eq!(remainder, []);
+    |
+
+error: could not compile `wf-domain` (test "complete_policy") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: using `chunks_exact` with a constant chunk size
+  --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:20:10
+   |
+20 |         .chunks_exact(2)
+   |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D clippy::all`
+   = help: to override `-D clippy::all` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: identical args used in this `assert_eq!` macro call
+   --> crates/wf-ports/tests/complete_policy_request/flow/refusals.rs:225:16
+    |
+225 |     assert_eq!(113 + 150 + 150 + 4, 417);
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#eq_op
+    = note: `-D clippy::eq-op` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::eq_op)]`
+
+error: this argument (264 byte) is passed by value, but might be more efficient if passed by reference (limit: 256 byte)
+  --> crates/wf-ports/tests/complete_policy_request/flow.rs:37:15
+   |
+37 |     supplied: RawView<'v, '_, '_>,
+   |               ^^^^^^^^^^^^^^^^^^^ help: consider passing by reference instead: `&RawView<'v, '_, '_>`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_types_passed_by_value
+   = note: `-D clippy::large-types-passed-by-value` implied by `-D clippy::pedantic`
+   = help: to override `-D clippy::pedantic` add `#[allow(clippy::large_types_passed_by_value)]`
+
+error: implicit borrow as raw pointer
+   --> crates/wf-ports/tests/complete_policy_request/flow.rs:202:52
+    |
+202 |                     assert!(std::ptr::eq(replayed, &outcomes[&request_id]));
+    |                                                    ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#borrow_as_ptr
+    = note: `-D clippy::borrow-as-ptr` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::borrow_as_ptr)]`
+help: use a raw pointer instead
+    |
+202 |                     assert!(std::ptr::eq(replayed, &raw const outcomes[&request_id]));
+    |                                                     +++++++++
+
+error: could not compile `wf-ports` (test "complete_policy_request") due to 4 previous errors
+```
+
+### First full domainGREEN6c5c01→9b5e11, EXIT0
+
+```text
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.36s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 104 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test flow_frame::original_flow_frame_preserves_raw_presence_and_source_order ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test flow_frame::original_flow_frame_canonicalizes_mathematical_terms ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test flow_frame::original_flow_frame_preserves_each_account_event ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test flow_frame::original_flow_frame_rejects_all_structural_tampering ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+test result: ok. 104 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+```
+
+### Final same-source joined6d7a73→1ce074, EXIT0
+
+```text
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.32s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 104 tests
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test flow_frame::original_flow_frame_preserves_raw_presence_and_source_order ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test flow_frame::original_flow_frame_canonicalizes_mathematical_terms ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test flow_frame::original_flow_frame_preserves_each_account_event ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test flow_frame::original_flow_frame_rejects_all_structural_tampering ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+test result: ok. 104 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.29s
+     Running tests/complete_policy_request/main.rs (target/debug/deps/complete_policy_request-91ebe03204cf4dae)
+
+running 81 tests
+test accounting::complete_replace_caller_freezes_independent_intent_fees ... ok
+test core_patch::core_patch_intent_preserves_unchanged_clear_and_empty_set ... ok
+test accounting::complete_replace_caller_refuses_without_resetting_prior_work ... ok
+test core_patch::core_patch_intent_keeps_partial_backoff_and_state_actions ... ok
+test core_patch::core_patch_intent_excludes_preparation_and_current_policy ... ok
+test core_patch::core_patch_intent_uses_one_nonrollback_schema_account ... ok
+test core_patch::core_patch_intent_retains_original_owners_and_caps ... ok
+test core_patch::core_patch_intent_matches_independent_partial_command_literals ... ok
+test core_patch::decode::core_patch_decode_keeps_original_identity_distinct_from_equal_merged_values ... ok
+test core_patch::decode::core_patch_decode_preserves_every_header_and_moves_domain_owners ... ok
+test core_patch::apply::core_patch_parent_replays_before_reconstruction_current_and_context ... ok
+test core_patch::decode::core_patch_decode_preserves_each_restoration_debit_repeat_and_prior_peak ... ok
+test core_patch::frame::core_patch_frame_binds_header_scope_request_stamp_and_log_identity ... ok
+test core_patch::apply::core_patch_parent_preserves_stored_cas_context_and_high_water_order ... ok
+test core_patch::frame::core_patch_frame_keeps_original_bytes_borrowed_without_patch_materialization ... ok
+test core_patch::frame::core_patch_frame_rejects_noncanonical_partial_and_late_structure ... ok
+test core_patch::frame::core_patch_frame_freezes_same_account_refusal_and_repeat_fees ... ok
+test core_patch::decode::core_patch_decode_matches_frozen_original_commands_and_paid_reproduction ... ok
+test core_patch::gate::core_patch_gate_outlives_temporary_verified_header ... ok
+test core_patch::frame::core_patch_frame_verifies_independent_tag_five_header_and_original_intent ... ok
+test core_patch::gate::core_patch_gate_charges_each_reached_event_before_refusal ... ok
+test core_patch::frame::core_patch_frame_rederives_intent_before_scope_and_frame_hash ... ok
+test core_patch::prepare::core_patch_prepare_binds_every_header_operand_to_frozen_bytes ... ok
+test core_patch::prepare::core_patch_prepare_keeps_partial_identity_distinct_from_equal_merged_values ... ok
+test core_patch::gate::core_patch_gate_keeps_one_account_repeated_outputs_and_prior_peak ... ok
+test core_patch::prepare::core_patch_prepare_preserves_each_same_account_refusal_and_prior_peak ... ok
+test core_patch::decode::core_patch_decode_preserves_presence_and_each_partial_backoff_kind ... ok
+test flow::original_flow_parent_owns_key_value_and_response_after_frame_drop ... ok
+test core_patch::gate::core_patch_gate_preserves_all_decisions_and_validation_priority ... ok
+test core_patch::prepare::core_patch_prepare_preserves_partial_presence_and_each_backoff_kind ... ok
+test flow::original_flow_parent_keeps_continuous_held_owners ... ok
+test flow::original_flow_parent_keeps_context_content_and_highwater_order ... ok
+test core_patch::prepare::core_patch_prepare_matches_frozen_whole_frames_and_prepared_hashes ... ok
+test intent::complete_replace_intent_binds_tenant_guard_and_excludes_preparation_fields ... ok
+test intent::complete_replace_intent_has_fixed_minimal_bytes_and_digest ... ok
+test intent::complete_replace_intent_keeps_legacy_version_one_construction ... ok
+test flow::original_flow_parent_preserves_nonfresh_before_all_changed_reads ... ok
+test intent::complete_replace_intent_preserves_every_field_presence_and_order ... ok
+test original_reference::original_reference_hashes_exact_present_encoding_without_default_expansion ... ok
+test original_reference::original_reference_distinguishes_public_absence_from_stamping_fallback ... ok
+test intent::variants::complete_replace_intent_encodes_scalar_variants_and_widths ... ok
+test core_patch::apply::core_patch_parent_threads_one_account_through_every_reached_phase ... ok
+test replace::apply::cases::complete_replace_parent_preserves_envelope_cas_type_and_old_api_priorities ... ok
+test flow::original_flow_parent_keeps_allocator_guard_and_current_priority ... ok
+test core_patch::apply::core_patch_parent_fresh_uses_original_partial_and_complete_atomic_bundle ... ok
+test replace::apply::complete_replace_parent_replays_real_accepted_and_content_rejected_outcomes_before_fresh_work ... ok
+test replace::apply::complete_replace_parent_installs_frozen_original_bundle_and_resets_omissions ... ok
+test replace::apply::complete_replace_parent_keeps_nonfresh_gate_priority_and_binding ... ok
+test replace::apply::controls::complete_replace_parent_reads_context_active_and_done_before_generation ... ok
+test replace::apply::complete_replace_parent_sequential_replacements_preserve_generations_and_stale_results ... ok
+test replace::complete_replace_frame_binds_header_operands_without_binding_assigned_generation ... ok
+test replace::complete_replace_frame_preserves_frozen_minimal_and_complete_original_intents ... ok
+test intent::variants::complete_replace_intent_preserves_local_empty_presence ... ok
+test replace::complete_replace_frame_keeps_business_invalid_original_fields_available_for_fresh_successor ... ok
+test replace::decode::complete_replace_decode_moves_header_and_original_input_owners ... ok
+test core_patch::apply::core_patch_parent_serializes_independent_writers_without_renewing_outcomes ... ok
+test replace::decode::complete_replace_decode_reconstructs_frozen_original_owners ... ok
+test replace::complete_replace_frame_retains_each_same_account_phase_and_prior_scratch ... ok
+test replace::decode::complete_replace_decode_preserves_business_invalid_fields_without_fresh_authority ... ok
+test replace::original_apply::original_current_replace_accepts_zero_and_discards_stored_business_fields ... ok
+test original_reference::original_reference_preserves_raw_failure_and_continuous_copy_hash_refusals ... ok
+test replace::decode::complete_replace_decode_retains_same_account_work_and_prior_peak ... ok
+test replace::original_apply::original_current_replace_checks_context_and_both_migration_reads_before_exhaustion ... ok
+test replace::original_apply::cases::original_current_replace_preserves_reader_origins_and_profile_refusals ... ok
+test replace::original_apply::original_current_replace_preserves_nonfresh_and_real_retained_replays ... ok
+test replace::original_apply::refusals::original_current_replace_keeps_existing_typed_and_standalone_contracts ... ok
+test flow::original_flow_parent_preserves_every_prospective_phase ... ok
+test replace::original_apply::original_current_replace_keeps_decode_cas_and_type_priority ... ok
+test replace::complete_replace_frame_preserves_empty_groups_and_full_governance_widths ... ok
+test replace::decode::complete_replace_decode_preserves_presence_and_governance_fields ... ok
+test replace::decode::complete_replace_decode_preserves_verification_and_reconstruction_refusal_priority ... ok
+test replace::apply::cases::complete_replace_parent_retains_only_source_business_origins_and_original_history_limit ... ok
+test replace::original_apply::refusals::original_current_replace_keeps_one_account_and_owned_results_through_refusals ... ok
+test replace::original_apply::original_current_replace_retains_only_incoming_content_and_generation_errors ... ok
+test replace::apply::controls::complete_replace_parent_keeps_one_account_through_all_refusals_and_late_caps ... ok
+test core_patch::apply::core_patch_parent_classifies_business_and_operational_failures ... ok
+test core_patch::prepare::core_patch_prepare_freezes_profile_scope_raw_and_complete_frame_priority ... ok
+test core_patch::decode::core_patch_decode_refuses_wire_before_original_materialization ... ok
+test flow::original_flow_parent_retains_only_reached_business_rejections ... ok
+test flow::original_flow_parent_emits_exact_original_envelopes ... ok
+test replace::complete_replace_frame_enforces_whole_scope_raw_count_and_list_canonicality_priority ... ok
+
+test result: ok. 81 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Checking wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.92s
+```

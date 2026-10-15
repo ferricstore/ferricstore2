@@ -6,16 +6,17 @@ use super::{
 };
 
 pub(super) type Output<'a> = Option<(&'a mut Vec<TermSpan>, &'a mut Vec<VirtualLocalFun>)>;
-pub(super) type State = (usize, usize, usize, usize);
+pub(super) type State = (usize, usize, usize, usize, usize);
 
 pub(super) fn run(
     raw: &[u8],
     safety: &OriginalEtfSafety<'_>,
+    span_limit: usize,
     measured: &mut (usize, usize, usize),
     output: &mut Output<'_>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
-    let mut state = (0, 0, 0, 0);
+    let mut state = (0, 0, 0, 0, span_limit);
     if byte(raw, &mut state.0, charge)? != 131 {
         return Err(Error::Malformed);
     }
@@ -38,7 +39,7 @@ pub(super) fn term(
     pay(charge, 128)?;
     let index = u32::try_from(state.1).map_err(|_| overflow())?;
     state.1 = state.1.checked_add(1).ok_or_else(overflow)?;
-    if depth > 64 || state.1 > 4_096 {
+    if depth > 64 || state.1 > state.4 {
         return Err(Error::ItemLimit);
     }
     let start = u32::try_from(state.0).map_err(|_| overflow())?;

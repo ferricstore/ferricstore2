@@ -180,6 +180,26 @@ pub fn decode_original_complete_policy_entry<'encoded>(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<OriginalPolicyEntry<'encoded>>, Error> {
+    decode_with_span_limit(raw, safety, 4_096, limits, charge)
+}
+
+/// Reads original current bytes under the whole-flow parent's encoded-span profile.
+pub(super) fn decode_original_flow_policy_current_entry<'encoded>(
+    raw: &'encoded [u8],
+    safety: &OriginalEtfSafety<'_>,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<OriginalPolicyEntry<'encoded>>, Error> {
+    decode_with_span_limit(raw, safety, 263_168, limits, charge)
+}
+
+fn decode_with_span_limit<'encoded>(
+    raw: &'encoded [u8],
+    safety: &OriginalEtfSafety<'_>,
+    span_limit: usize,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<OriginalPolicyEntry<'encoded>>, Error> {
     if charge.profile() != limits {
         return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
     }
@@ -197,7 +217,7 @@ pub fn decode_original_complete_policy_entry<'encoded>(
     }
     safety::admit(safety, charge)?;
     let mut measured = (0_usize, 0_usize, 0_usize);
-    let first = scan::run(raw, safety, &mut measured, &mut None, charge);
+    let first = scan::run(raw, safety, span_limit, &mut measured, &mut None, charge);
     if source_result(first)?.is_none() {
         return Ok(None);
     }
@@ -223,7 +243,7 @@ pub fn decode_original_complete_policy_entry<'encoded>(
     reserve(&mut virtual_funs, f, 64, charge)?;
     let mut output = Some((&mut spans, &mut virtual_funs));
     measured = (0, 0, 0);
-    let second = scan::run(raw, safety, &mut measured, &mut output, charge);
+    let second = scan::run(raw, safety, span_limit, &mut measured, &mut output, charge);
     if source_result(second)?.is_none() {
         return Ok(None);
     }

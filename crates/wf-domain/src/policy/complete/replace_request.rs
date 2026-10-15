@@ -23,8 +23,14 @@ use super::{
     PolicySchemaLimits, check_complete_policy_replace_content,
 };
 
+mod flow;
 mod original;
 mod retention;
+
+pub use flow::{
+    OriginalFlowPolicyInstall, OriginalFlowPolicyReplaceFresh, OriginalFlowPolicyReplaceRejection,
+    prepare_original_flow_policy_replace_fresh,
+};
 
 pub use original::{
     OriginalCompletePolicyReplaceApplyError, OriginalCompletePolicyReplaceApplyView,
