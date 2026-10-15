@@ -279,3 +279,115 @@ fn original_flow_policy_input_stays_pure_and_server_side() -> CheckResult<()> {
     }
     Ok(())
 }
+
+#[test]
+fn original_flow_policy_parent_stays_pure_and_server_side() -> CheckResult<()> {
+    for module in [
+        "policy::complete::outer::flow_frame",
+        "policy::complete::outer::flow_frame::model",
+        "policy::complete::outer::flow_frame::raw",
+        "policy::complete::outer::flow_frame::canonical",
+        "policy::complete::outer::flow_frame::codec",
+        "policy::complete::outer::flow_frame::scan",
+        "policy::complete::replace_request::flow",
+        "policy::complete::replace_request::flow::retention",
+        "policy::complete::flow_input::etf::envelope",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-domain",
+                module,
+                "use crate::policy::complete; use std::ops::Range; use wf_types::version;",
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "unclassified standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+            (
+                "use wf_parity_tests::progress;",
+                "runtime source references M0-only tooling",
+            ),
+        ] {
+            assert!(
+                source_check("wf-domain", module, source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    for name in [
+        "OriginalFlowPolicyReplaceInput",
+        "ScannedOriginalFlowPolicyReplaceFrame",
+        "OriginalFlowPolicyReplaceFrameHeader",
+        "OriginalFlowPolicyInstall",
+        "OriginalFlowPolicyReplaceFresh",
+        "OriginalFlowPolicyReplaceRejection",
+        "prepare_original_flow_policy_replace_frame_bytes",
+        "scan_original_flow_policy_replace_frame",
+        "restore_original_flow_policy_replace_frame_header",
+        "prepare_original_flow_policy_replace_fresh",
+    ] {
+        original_flow_export_is_server_only(name)?;
+    }
+    for module in [
+        "log::complete_policy::flow",
+        "log::complete_policy::flow::apply",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                module,
+                "use wf_domain::policy::complete; use wf_types::version;",
+            )?,
+            Vec::<String>::new()
+        );
+    }
+    for name in [
+        "VerifiedOriginalFlowPolicyReplaceFrame",
+        "OriginalFlowPolicyReplaceRequestPlan",
+        "prepare_original_flow_policy_replace_frame",
+        "verify_original_flow_policy_replace_frame",
+        "decide_original_flow_policy_replace_frame",
+    ] {
+        assert!(
+            source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::log::{name};")
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
+        );
+    }
+    Ok(())
+}
+
+fn original_flow_export_is_server_only(name: &str) -> CheckResult<()> {
+    for (package, module, prefix, diagnosis) in [
+        ("wf-ports", "client", "wf_domain", "client port facade"),
+        (
+            "wf-wire",
+            "value",
+            "wf_domain",
+            "wire may reference only wf_domain::value",
+        ),
+        (
+            "wf-domain",
+            "value",
+            "crate",
+            "approved domain value module",
+        ),
+    ] {
+        assert!(
+            source_check(
+                package,
+                module,
+                &format!("pub use {prefix}::policy::complete::{name};"),
+            )?
+            .iter()
+            .any(|finding| finding.contains(diagnosis))
+        );
+    }
+    Ok(())
+}
