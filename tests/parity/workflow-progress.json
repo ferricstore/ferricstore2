@@ -19802,7 +19802,33 @@
       "runtime_case_ids": [
         "0c5fc85018101f1d785f8dc3a59052228d35245b0c29bd3a220d5aff833276cc"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-49bda0ec2fab73ce",
+          "rust_file": "crates/wf-domain/tests/complete_policy/public_set.rs",
+          "rust_file_sha256": "39d266b86e9889ab7ad3ce9172b5ce28d500bac43381be09acd2cd9cd265200d",
+          "rust_module": "",
+          "rust_function": "original_public_set_preserves_root_and_first_control_priority",
+          "assertions": [
+            {
+              "source_line": 242,
+              "source_text": "assert {:error, \"ERR flow state must be a string\"} =",
+              "rust_line": 103,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 242,
+              "source_text": "assert {:error, \"ERR flow state must be a string\"} =",
+              "rust_line": 112,
+              "rust_text": "assert_eq!(body, b\"ERR flow state must be a string\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure public-input preparation preserves generation-state-validation-1 and state:1 from source239-244. Two direct test-body macros represent only source242's invalid-state diagnosis and exact ERR flow state must be a string body; encoding uses the same continuously charged account. Fixed positive suffix1 replaces the generated identity. Function-head, FIRST controls, LAST patch values, raw sizing and ownership receive additional controls, but this counterpart links none of their helper assertions to unrelated source assertions. Genuine missing-API RED was independently reproduced before production; the later predicate-order and improper-terminal supplements and ordinary compiler/lint repairs retain separate provenance. Public dispatch and returned error tuple, arbitrary-current default-false merge, committed identity/replies, physical atomic/all-shard publication, original async:false/global_state setup/flush and every mandatory runtime profile remain required. Borrowed represented maps assume mathematical key uniqueness and captured reduce order; opaque identity and struct Enumerable support remain temporary required gaps, not exclusions. Passing macOS component tests and logical bounded-work improvement establish neither full source-case/workflow parity, measured native performance nor independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "c0feb9ef8a2818ed",

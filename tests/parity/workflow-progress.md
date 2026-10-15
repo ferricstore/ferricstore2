@@ -36,7 +36,7 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 70 source declarations, 77 counterpart records and 301 assertion links.
+increments: 71 source declarations, 78 counterpart records and 303 assertion links.
 Both reviewers accept the supplemental source603 shape-error anchor; it supplies
 one error component with its remaining setup/profile/physical obligations explicit.
 The separate original ETF generation-boundary counterpart retains MAX, the returned
@@ -75,10 +75,25 @@ max_active_ms:nil projection remains unlinked. Public get/all-shard/physical ETS
 assertions, source889 and error pattern assignments remain unlinked. All original
 setup/runtime profiles and independent Linux acceptance remain required. Six
 narrow component counterparts cannot certify six complete original cases.
-The complete current macOS wrapper passes573 Rust tests and four compile-fail
+The preceding source-anchor macOS wrapper passes573 Rust tests and four compile-fail
 documentation tests, including formatting, strict lint, architecture/reference/
 progress validation and all four default dependency-audit categories. The same
 1027 check inputs remain unchanged throughout that run; Linux remains pending.
+
+Public Policy.set preparation adds one counterpart with two direct links for
+the pinned invalid response-state recipe: the invalid-state diagnosis and exact
+caller body. All77 older counterparts, their limitations and every runtime ID
+remain unchanged. The eight new tests also cover controls, conversion, sizing,
+default-budget4096-key behavior and held owners, without mapping helper-only
+observations to other source assertions. Independently reproduced missing-API
+RED precedes production; the predicate-order and improper-terminal supplements
+and ordinary compiler/lint repairs keep their actual timing. The current complete
+macOS wrapper passes582 Rust tests/four compile-fail documentation tests and all
+source/dependency stages on unchanged1036 implementation/tooling inputs. Public
+dispatch/error tuples, default-false arbitrary-current merge, identity/capture/
+Enumerable, physical/all-shard installation, original setup/runtime profiles,
+all remaining scenarios/assertions and independent Linux remain required.
+
 Two separately scoped counterparts
 belong to one FIFO lifecycle declaration; a single state/partition test retains
 selected observations from two declarations. It preserves every other

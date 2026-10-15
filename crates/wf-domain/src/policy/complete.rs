@@ -23,6 +23,7 @@ mod original_retry_keys;
 mod outer;
 mod patch;
 mod presentation;
+mod public_set;
 mod replace_content;
 mod replace_request;
 mod request;
@@ -83,6 +84,10 @@ pub use outer::{
 pub use patch::{CompleteCorePolicyPatchInput, prepare_complete_core_policy_patch};
 pub use presentation::{
     CompletePolicyPresentation, PresentedPolicyState, PresentedRetry, present_complete_policy,
+};
+pub use public_set::{
+    OriginalPolicySetInputRejection, OriginalPolicySetPatchView, OriginalPolicySetRequest,
+    encode_original_policy_set_input_rejection_body, prepare_original_policy_set_request,
 };
 pub use replace_content::{
     CompletePolicyReplaceRejection, CompletePolicyReplaceRejectionKind,

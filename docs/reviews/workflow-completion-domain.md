@@ -41253,3 +41253,1511 @@ PERF whole-read the31772B main and1408B fixture appendix and independently match
 MIN2661/P464/T3125, true-row4496/P1032/T5528, seven bodies/encoder totals and the
 held6912/third-MIN refusal equations. Final nonempty primitive arrays remain
 ordinary tests-first derivation before final RED/production, as already stated.
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-SET1-TESTS-VECTORS1
+
+Tests-only author epoch after Root release and ARCH exact CREATE1/GROUP-AND-
+COMPACT1. All five production paths are ABSENT in ec581f; git diff of existing
+domain/ports production is EMPTY46588f. No production/stub/API implementation
+has been written, and no compiler or candidate counter has supplied a number.
+
+The full9080B ARCH decision72a5a537 was actually read b3dd23. Its exact5413B
+group/compact amendment79c64bab was actually read c4cc92. PERF's whole8754B plus
+938 closure was read bd01d0, and entire5276B independent NONEMPTY1 was read0922a5.
+These are actual reads, not inferred approvals. Root released the exact fourth
+test child and same-Slot amendment before metric.rs was created0c0654.
+
+Four actual authored files in final pre-RED ec581f:
+public_set.rs596LF/20297B/SHA1b11e9e358b1782e487ff9f6cf8947c425109bbf82b467464646575430856a93;
+public_set/cases.rs580LF/18390B/SHAcbae177e06db6fe98497a995db057771d022df5bd7eb72c9a8a0876521b6f3be;
+public_set/metric.rs216LF/7804B/SHA996bfb591eb4d80d86d74d733e5a4c4403ba431d8f0b122856a1b5a6bb60948e;
+public_set/refusals.rs551LF/19870B/SHA02e73de39430d0ebb69d5f77148e5358d32d4d48c7919a96bc6472919f0e56f4.
+Eight selected test identities are unchanged. Ordinary helpers fit100LF; final
+files fit600. Source-root/main prefix remains actual2016B/8ab9308ca9c681680805f55d0809662fb7d3dbb8943b1e50133e20e0f2a59971
+plus EXACT17B newline/mod public_set;/newline, final2033B/
+bfff76b8993e73b90d9ad84cf1234aba2ce6ff381d0911e95518e27664c35af0.
+Inverse proof f17955 precedes any target execution. Own diff-check passescddda7.
+
+Semantic source refinements are pre-RED/source-derived: exact positive numeric
+generation-state-validation-1 for49bda with state1 and direct31B body; original
+generation-merge-1 and MAP queued/review state inputs from pinned158–190, with
+pair-list conversion retained as supplemental; full FIRST nil/false duplicate
+controls; nil/bool keyword KEY positives; opaque tuple and STRUCT MAP-KEY barriers;
+empty statesMap versus generic[]; ordinary LAST winner before recursion versus
+all duplicate state callbacks first. No physical/get/generation-merge success
+or all-shard assertion is claimed by preparing those two request components.
+
+Exact same-Slot algorithm amendment replaces the original all-prior scan BEFORE
+production: stage every surviving key with paid hash+slot; fallible maxheapsort
+by exact key then source ordinal; equal-key scalar ordinal16; adjacent cached16,
+and on hash HIT TWO fresh source-row128 reads before exact byte comparison;
+compact LAST group slot with128 only on a real move (skip self-position).
+Generic lists/DirectMap callbacks/old API tariffs are unchanged. State-pair
+callbacks ALL finish source order BEFORE sort/compact; keyword winners collapse
+BEFORE recursive values. Initial626LF/6c699d0f retained old8592 and pre-amendment
+N2 prefix as a historical authoring epoch, not executed RED or candidate data.
+The provisional9634 omitted two fresh hit-row fetches and is NOT selected.
+
+NEW RawNil is an implicit variant with zero supplied preflight text bytes;
+explicit Atom(nil) prepays3, while both metric terms have width5. Old API/cursor
+preflights remain unchanged. Nested generic root128 covers Keyword.keyword?
+entry (no extra classifier root); then128 per reached predicate row. List
+children each finish under one paid128 completed-slot append, no empty-slot+
+update pair. Only after all children, list edges read staged cell metadata and
+pay128 each. On failed STRING probe, implicit proper terminator is width1 ONLY,
+not a synthetic Cell/node128; an actual improper tail is a real recursive term.
+
+Literal primitive equations, independently joined with PERF before any code:
+MIN: pre385/public896/res592/construct384/metric134/key142/meta128
+=>G2661/P464/T3125.
+CONTROL replace:true: pre780/public1460/res904/builder692/construct256/
+metric134/key142/meta128=>G4496/P1032/T5528.
+X=(x,Binary(v)): pre771/public1442/res904=>3117;
+builder[128,128,134,148,136,129,128]=931=>4048;
+policy/struct/callback/value/stage/assembly/Map:
+[128,128,139,128,135,128,128,128,128,128,128,128,128]=1682=>5730;
+metric[1,128,5,128,3,128,6]=399;key142/meta128
+=>G6399/P1032/T7431.
+
+N2=(a,Nil),(b,Nil):
+pre1155/public1988/res1216=>4359;
+NEW stage[128,128,134,148,136,129,128,128,134,148,136,129,128]=1734=>6093;
+sort[128,128,130,256,256]=898=>6991;
+adjacent MISS16=>7007; policy+struct[128,128,139,128,139]=662;
+each callback[128,135,128,128,128]=647; assembly NINE128 events;
+metric[1,128,5,128,3,128,5,128,3,128,5]=662;key142/meta128
+=>G11047/P1344/T12391. Cached16 moved AFTER sort; old refusal prefixes are
+superseded, full total unchanged. Heap content target7823; swaps8079/8335;
+new cached target8351 retainingG6991/P1344 at8350.
+
+DUPLICATE=(x,Binary(v)) twice, actual aliased input pair:
+pre1157/public1988/res1216=>4361; stage1734=>6095;
+sort[128,128,130,16,256,256]=914=>7009;
+adjacent HIT/real move[16,128,128,130,128]=530=>7539;
+normalization1682=>9221;metric399=>9620;key142/meta128
+=>G9890/P1344/T11234. Same input pointers still count every occurrence.
+These arrays prove exact equality work as well as cached/hash filtering.
+
+LIST x=[Integer1,Integer2]:
+pre1026/public1442/res1112=>3580;builder931=>4511;
+policy/struct/callback[128,128,139,128,135]=658=>5169;
+generic-root/classifier-row[128,128]; each child[128,128,128,128];
+two edges/List cell[128,128,128]; top slot/assembly/key/twoedges/Map SIX128;
+construction reaches7601. Metric[1,128,5,128,3,128,128,128,5]=654;
+key142/meta128=>G8525/P1368/T9893.
+Failed-probe neighbor[1,256]: same through probe at8250, then
+[5,128,2,128,5,1,142,128] (LIST header/fresh heads/implicit NIL/key/meta)
+=>G8789/P1368/T10157. No invented NIL node128.
+
+All six arrays are literal test constants. Fileless arithmetic a87c99/ec581f
+checked their elements/sums; the final NEW duplicate is9890, not8592.
+fees() tries EVERY positive primitive (and SUM scratch) at target-1, asserts
+exact WorkBytes target and retained G/P, then full exact total succeeds.
+No result counter becomes an expected fee. Pre-execution ordinary authoring
+names were corrected to existing charge.g()/p() and WorkBytes{bytes,maximum};
+no new accessor/error API was introduced.
+
+Observable DirectMap callback order from earlier pinned/native binary-key
+capture is frozen (no new VM/probe): for33 keys use reduce order
+[1,3,22,19,6,23,16,27,5,21,7,33,32,28,24,11,10,20,31,15,18,2,14,30,9,25,4,26,12,8,17,13,29].
+All values are Nil except s29=>Map{Atom(__struct__):Atom(Example)}. Correct
+>32 callback reversal reaches that first. N73/D4/raw118/pre9590;public1442;
+P8360/res7976;builder931;top policy/struct/callback658;genericMap root128;
+33 binary-key struct rows4224;firstcallback128;childMap128;structrow128;
+struct exact148 =>G25481/P8360/T33841. Tight33840 retains25333/P8360.
+Flat32 captured ascending s01..s32 with s01 struct:
+N71/D4/raw115/pre9331;P8152/res7768;32-row scan4096 =>G24886/T33038,
+tight33037 retains24738/P8152. Root and PERF independently decomposed these
+same equations before production. They detect opposite callback direction.
+
+Raw metric width controls now have REAL cap observations, not just comments:
+converted %{x:term,z:Binary(B)} has pinned metric17+T(term)+B. Each literal
+T is tested at B=262144-17-T and B+1, full preparation success then exact
+SnapshotBytes. ByteList65535 T65538 therefore B196589; byteList65536 T131078
+therefore B131049, publicly reachable under N131072. Other fixed T cases:
+nilATOM5/[]1; tuple containing [1,2|nilATOM]16; integer2552,256/−1/signed32
+neighbors5, out-of-signed32± neighbors7,i128MAX19; negative-zero Big2,
+2^64 paddedBig12,255/256 significant digits258/262; atom UTF8-byte255/256
+257/259; tuple arity255/256 of Integer0 512/517; opaque FFNUL Binary7.
+Request raw views still preserve input integer descriptor bytes, not u64
+narrowing. Every width equation is pinned supported-subset source arithmetic.
+
+Default-work causal regression is actual PolicySchemaLimits::default()
+128MiB,4096 DISTINCT five-byte atom names k0000..k4095 with Nil values.
+N12290/D2 gives P1278672; converted raw patch49158B. Assert success plus all4096
+full key/value views, owned key and admitted default-budget bound. It never
+raises to the1GiB convenience fixture. Old all-prior cached scan alone would
+cost134184960 before other work; this is logical source-complexity evidence,
+not a native speed/allocation measurement. Both-OS performance remains open.
+
+Owner/refusal equations frozen independently: three MIN final tight8446 retains
+7855/P464 at8447 with first two owned keys live. Opaque FFNUL x payload adds two
+source bytes instead of v's one: firstG6401/P1032, second MIN=>9062, third MIN
+final target12755/tight12754 retains11595/P1032; first key and borrowed payload
+pointers reobserved through both success and refusal. Wrapper object can drop,
+actual underlying rows/payload remain live. OLD restore seed1928/P64 +MIN
+=>4589/P464/T5053, tight5052 retains4461/P464 with old owner held. OLD standalone
+Other seed13726/P6912 +MIN=>16387/P6912/T23299, tight23298 retains16259/P6912
+and original31B snapshot pointer/bytes. No Other was transported by NEW public
+metric; its full opaque identity/capture gap remains REQUIRED.
+
+Every exact caller body is an INDEPENDENT fixed test literal, with entry128/
+reserve-copy128+B exact/tight controls:36/40/35/31/59/32/45 bytes correspond to
+292/296/291/287/315/288/301. Prep AND encoder mismatch are no-debit. Bounds count
+all visible dead/opaque/aliased nodes: N131072 exact shape reachesOptions at
+G16777729/P0, next attempted node ItemLimit16777473/P0; D64 root-class failure
+and D65 attempted leaf bound each8705/P0; raw bytes67108864 exact root-class
+failure67109504/P0, +1 refuses before leaf-byte debit at513/P0. Empty improper
+prefix failsMalformed385/P0 before tail. Impossible atom spelling and reached
+struct exceptions remain Schema(InvalidAuthority); surviving Other metric
+UnsupportedTag, never a fake hidden size. Full source/runtime/setup/profiles/
+identity/capture/merge/public reply/physical/both-OS/M1–M8 remain REQUIRED.
+
+Next action is genuine locked warnings-denied complete_policy test compilation
+while all five implementation paths/exports remain absent. Preserve every raw
+compiler failure; only a clean missing-export terminal epoch with zero assertions
+is the selected real RED. Root independently reproduces before production.
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-SET1-TESTS-RED1
+
+Finite tests-first phase complete; production is NOT implemented/released by this
+receipt. Root's exact CREATE1 and fourth-child/sort amendment authorizations
+precede every new path. All eight meaningful test declarations and the exact
+main suffix are saved. Actual pre-RED production-absence/old-source conservation
+is ec581f/46588f; Root independently bound264 original production inputs earlier.
+No production/stub was created. Full source/setup/profile/identity/capture/
+Enumerable/merge/reply/physical/both-OS and M1–M8 requirements remain active.
+
+Final unchanged manifests are the four test hashes recorded in TESTS-VECTORS1
+and main2033B/bfff76b8 (literal raw2016B prefix8ab9308c plus17B suffixf17955).
+Files are596/580/216/551LF, maximum ordinary function79LF by source spans a94465.
+Own rustfmt96c83e and final diff-check8a1328 EXIT0. Source-derived refinements,
+old8592/intermediate9634 and selected9890 histories are kept in the preceding
+vectors; NONE is a sampled candidate counter or postproduction adjustment.
+First unsuccessful compiler invocation occurred only after the vectors note
+2989965+10428/SHA0789aaeb1d09e390fcb2f9e8d9d58ead9fe3fb6514fdbbc3efc5e44520d29767
+was saved. That note was not an implementation.
+
+Actual first command:
+RUSTFLAGS=-Dwarnings cargo test --locked -p wf-domain --test complete_policy
+tool c4684c/session4970 yielded the five absent exports in ONE E0432. Terminal
+poll8d6996 EXIT101 said exactly one previous error. There were zero assertions,
+zero warnings and no unrelated diagnostic. A full-capture repeat292c36 EXIT101
+returned the same complete missing-export error, preserved verbatim below.
+The repeat exists to keep one unbroken raw output receipt, not to conceal the
+first split-output epoch or create an assertion RED. Root was notified of the
+first terminal result immediately and owns independent reproduction/release.
+
+Full repeat raw result: exit_code=101; wall=1.283834958;
+actual output length=2064 characters. Command output:
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalPolicySetInputRejection`, `wf_domain::policy::complete::OriginalPolicySetPatchView`, `wf_domain::policy::complete::OriginalPolicySetRequest`, `wf_domain::policy::complete::encode_original_policy_set_input_rejection_body`, `wf_domain::policy::complete::prepare_original_policy_set_request`
+ --> crates/wf-domain/tests/complete_policy/public_set.rs:5:34
+  |
+5 |     CompletePolicyEncodingError, OriginalPolicySetInputRejection, OriginalPolicySetPatchView,
+  |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^ no `OriginalPolicySetPatchView` in `policy::complete`
+  |                                  |
+  |                                  no `OriginalPolicySetInputRejection` in `policy::complete`
+6 |     OriginalPolicySetRequest, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^ no `OriginalPolicySetRequest` in `policy::complete`
+7 |     encode_original_policy_set_input_rejection_body, prepare_original_policy_set_request,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `prepare_original_policy_set_request` in `policy::complete`
+  |     |
+  |     no `encode_original_policy_set_input_rejection_body` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+6 -     OriginalPolicySetRequest, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue,
+6 +     OriginalPolicyReadValue, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue,
+  |
+help: a similar name exists in the module
+  |
+7 -     encode_original_policy_set_input_rejection_body, prepare_original_policy_set_request,
+7 +     encode_original_complete_policy_input_rejection_body, prepare_original_policy_set_request,
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+Interpretation: a genuine missing-API tests-first RED while all five selected
+implementation files and facade exports are absent. It does not certify that
+all eventual source type/lifetime/lint checks will pass; ordinary later failures
+must be retained honestly. It is not a source-business assertion failure and
+does not claim any new public scenario passed. Root's independent reproduction
+and explicit production ownership release are next. ARCH/PERF are reviewing the
+actual four buffers and literal vectors normally without an extra body gate.
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-SET1-PREDICATE-SUPPLEMENT1
+
+Honest timing: AFTER the writer's clean first RED c4684c/8d6996/full292c36 and
+Root's independent5216cd/session61195→532b54 clean RED, but BEFORE ANY SUT file
+or export. Root explicitly assigned this concrete ARCH source finding. No fee,
+old assertion/input, API/model/path or test identity changes.
+
+Pinned PolicyPatch's states-list path completes Enum.all? pair/config admission
+before invoking ANY Map.new/2 callback. Add the combined existing-duty neighbor:
+FIRST binary queued pair has the existing improper-list config (which throws if
+converted); LATER queued pair has Nil config (fails map-or-list predicate).
+Whole predicate therefore returns false and generic list mapping preserves BOTH
+tuple interiors unchanged. Raw metric can size those actual improper terms.
+This must successfully prepare the exact fallback List, rather than partially
+running the earlier callback. Existing bad-first+valid-last exception and
+Nil-alone fallback controls remain intact.
+
+Only cases.rs changed: old580LF/18390B/cbae177e06db6fe98497a995db057771d022df5bd7eb72c9a8a0876521b6f3be
+to596LF/18897B/ea1e9272babd7b0a76b24932eba3908dcd3dbab08d4dc744c1ba88d838e4fda9.
+Exactly507B/16LF insertion. Fileless whole inverse f13edd removes that one
+insertion and recovers the entire frozen cbae177e hash. No other byte differs.
+Callback helper span93LF, all4files<=600 and functions<=100. Other3test hashes,
+17B main registration, all literal fees and initial receipts remain unchanged.
+Own rustfmta9b1c3 and diff-check593f73 EXIT0. f13edd confirms all5production
+paths ABSENT; existing domain/ports production diff69bb6c is EMPTY.
+
+New final target command is the same warnings-denied locked complete_policy:
+43e02b EXIT101, oneE0432 for five absent exports, zero other diagnostic/warning,
+zero assertions. Its full raw output is below. Root received the new case hash
+and terminal RED immediately, to reproduce before explicit production release.
+
+Scope precision from actual reviewer read: DUPLICATE v/v is a fee/equality/alias
+occurrence fixture; LAST-value semantics are separately checked by version and
+nil-alias key tests and state pairs, not an invented a/b fee input. Old6912 seed
+currently executes the tight-refusal branch only; the16387 exact-success total
+is a preproduction equation, not an executed successful invocation. Old64 seed
+covers both exact and tight. No behavioral test has run past missing exports.
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalPolicySetInputRejection`, `wf_domain::policy::complete::OriginalPolicySetPatchView`, `wf_domain::policy::complete::OriginalPolicySetRequest`, `wf_domain::policy::complete::encode_original_policy_set_input_rejection_body`, `wf_domain::policy::complete::prepare_original_policy_set_request`
+ --> crates/wf-domain/tests/complete_policy/public_set.rs:5:34
+  |
+5 |     CompletePolicyEncodingError, OriginalPolicySetInputRejection, OriginalPolicySetPatchView,
+  |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^ no `OriginalPolicySetPatchView` in `policy::complete`
+  |                                  |
+  |                                  no `OriginalPolicySetInputRejection` in `policy::complete`
+6 |     OriginalPolicySetRequest, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^ no `OriginalPolicySetRequest` in `policy::complete`
+7 |     encode_original_policy_set_input_rejection_body, prepare_original_policy_set_request,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `prepare_original_policy_set_request` in `policy::complete`
+  |     |
+  |     no `encode_original_policy_set_input_rejection_body` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+6 -     OriginalPolicySetRequest, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue,
+6 +     OriginalPolicyReadValue, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue,
+  |
+help: a similar name exists in the module
+  |
+7 -     encode_original_policy_set_input_rejection_body, prepare_original_policy_set_request,
+7 +     encode_original_complete_policy_input_rejection_body, prepare_original_policy_set_request,
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-SET1-GREEN1
+
+Finite five-file public preparation implementation is written and stable. This is the selected pure predecessor only: controls and recursive raw conversion plus Router raw-patch size. It carries BOTH replace modes and borrowed response-state without dispatching, admitting a policy, merging current, projecting public replies, certifying VM capture/identity, or installing/retaining anything. Root owns the facade/checker/shared docs/ledger/Git; Writer wrote only the selected five production children, the already approved four tests/main suffix and this existing note. Existing old production APIs/events were not rewritten.
+
+Actual whole source responsibilities: parent controls/head/order and new bounded preflight; immutable owned routing key and borrowed cell/edge view in model; PolicyPatch recursion/barriers/state special handling in patch; one active-slot owner with fallible heapsort plus exact adjacent LAST compaction in rows; independent pinned raw external_size metric in metric. FIRST Nil is retained as an occurrence, not a missing control. State callbacks all finish in source order before LAST collapse, unlike ordinary keyword winners. Each raw Map is explicitly an input-condition ordinary map with mathematical unique keys and supplied reduce order, including nil/integer/proper-list aliases; this preparer does not prove that condition. Reached struct Enumerable and surviving Other remain temporary required unsupported profiles. Source type/state bytes stay opaque. Arbitrary mathematical BigInteger patch values are preserved and their metric is canonical; only expected-generation control narrows to the source bound.
+
+All three concurrent invocation owners are covered by prospective SUM104N+128D+256, followed by independent fallible reservations. Work slots drop before metric/key. Parent edges append after every child, so nested ranges stay contiguous. Key allocation is one final paid copy after full converted metric and cap. Metric visits root128 before kind/payload and pays exact widths; a raw-map key's term128 precedes its row fetch and is that visit, not an extra row fee. Big padding is scanned only after128+FULL magnitude. Nonempty list packing probes each actual head before classification; failed probes take a fresh LIST walk, implicit proper NIL is only width1, and real improper tails recurse. Tuple interiors/Map keys are transformation barriers but are fully measured. Full metric precedes the final262144 comparison; it does not short-circuit over-cap before a later Other/work refusal. The supported-subset OTP28.3.1 relation is not a universal external_size theorem.
+
+One genuine source review correction was applied AFTER implementation started and BEFORE the first implementation compiler/assertion result: state_pairs(None,improper) now raises the selected outer Schema(InvalidAuthority) immediately, while a prior actual nonpair/config predicate failure remains false and takes generic tuple-preserving fallback. ARCH found this from Enum.all? source; PERF and Root independently agreed. The prior branch would start an extra generic walk before the same eventual exception, altering work/refusal priority. No fixed valid array/total changed. Root explicitly authorized an existing-duty supplement: type r; states=ImproperList([Tuple(Binary queued,List[])],NilATOM). N9/D4/raw13; pre1293+public1457+res1320+builder951+policy/struct400+callback268+state128+predicate128+tail128=G6073/P1704/T7777. Exact7777 returns authority; max7776 attempts7777 and retains5945/P1704. The helper/call was added honestly postimplementation/pre-first-result, not retroactive missing-API RED. Its original551LF predecessor remains in the earlier frozen manifest and inverse below. Existing eight identities and six arrays are unchanged.
+
+Execution chronology is complete and retained. Genuine missing-export RED and Root final reproduction preceded every SUT file/export as recorded in RED-AND-PRODUCTION1; the earlier507B combined-predicate supplement has its own separately reproduced pre-SUT RED. First implementation target413d26/session25301→fa09da EXIT101 had TWO E0716 temporary one-element arrays, no assertions. Local bindings repair only lifetimes: one frozen parent expression and the new improper-prefix helper. Second target7521f4/session15461→18342d EXIT0 is the FIRST assertion epoch, all112 tests PASS, with no source/oracle adjustment from results. First strict882680/session80954→feb11b EXIT101 had five library style findings, repaired only with doc ticks, direct empty-list pattern, readonly iterators preserving debit-before-payload, and collapsed control-if. Second strict842e3e/session58785→6d96b9 EXIT101 had25 test findings: two doc ticks,21 expect/panic diagnostics, one elidable lifetime and one unnecessary Result wrapper. Existing TestResult propagation replaces failing unwraps/panic; scalar/length/recursive/byte/pointer comparisons remain. The ordinary assert_raw helper moved to the roomy already-approved metric test child, parent imports it. All four pre-style whole buffers were retained; ARCH reviewed the concrete actual move and Root confirmed no new-artifact/approval gate. Third stricta9f5a7/session31699→9fb73a EXIT0 passed all wf-domain targets with warnings denied. Final a383b3/session76851→12a644 EXIT0 passes112/112 on those final bytes. Format658aa0 and diff-check726730 EXIT0. No behavioral assertion ever failed, and no expected fee/body/metric/oracle was fitted to a candidate output.
+
+Actual runtime environment5803a8: Darwin25.6.0 arm64, rustc1.99.0 (b940084d7 2026-09-28), default supported profile. This is macOS evidence only. All112 complete-policy controls include the old104 and eight new tests; it is not a count of complete source cases, physical/public workflows, Linux or full M1-M8. Root independently reported112 and existing87 ports PASS, attributed to Root's receipts, not Writer execution. Root owns the final full wrapper and mapping credit.
+
+All five source files fit400LF; max source function73LF. Four tests548/596/277/597 fit600; max helper92LF. The4096 distinct-key default128MiB regression executes full cardinality/key/value checks and succeeds with the selected same-Slot sort/adjacent algorithm, unlike the proposed all-prior cached loop whose visits alone exceed the budget. This is logical bounded-work evidence, not measured native latency/allocation gain; small duplicate cases may do more sorting. All independent MIN/control/X/N2/DUP/LIST exact totals and every positive tight prefix passed, as did failed STRING probe8789, seven fixed body literal encoders, direct32/33 callback endpoints, raw descriptor limits, long metric cap observations and held64/6912/returned owners. DUP is actual v/v, LAST is separately proved;6912 fixture remains tight-only, not an executed ample success.
+
+Normal actual reciprocal/test and mapping reads: ENTIRE ARCH6928+b1768 at1736526/1743454 and PERF7945+2815 at1476589/1484534 were freshly displayed/hash-verified in965488/587080, agree without discrepancy. Root's full current ADR006/CONTINUE/generator/JSON delta was read in a6de2f. Exact49bda source242 maps only parent direct macro indices0/1 (current103/112), preserving generation-state-validation-1/state1 and31B body; no setup/dispatch/reply tuple or helper assertion is linked. Root was informed that the preliminary prose still said behavior unpassed at this read; final execution wording is Root-owned. Full defaultfalse arbitrary-current merge, opaque/Enumerable identity and real capture, public committed identity/projection/dispatch, physical atomic/all-shard installation, original setup/assertion/runtime profiles, full M1-M8 and independent Linux AND macOS validation remain REQUIRED. This finite implementation adds no exclusion, silent route-to-replace-true or final-goal completion claim.
+
+Final actual complete file manifest (32c0e2)
+```text
+crates/wf-domain/src/policy/complete/public_set.rs: 340LF/10937B/SHA1c3f7a1c8ccba8f232d1085081ddebbfe4c29a8a36dd6a4b594f396ae3f80980
+crates/wf-domain/src/policy/complete/public_set/model.rs: 247LF/7893B/SHA462c1cee1b60cef6968ec52f1df906c22baa31427442504c89df277974f41b17
+crates/wf-domain/src/policy/complete/public_set/patch.rs: 286LF/8355B/SHA61c47ae807bbc8ca7be59572ab035a96c1f1f7e8df5eff116ea4230a0cb1c2fb
+crates/wf-domain/src/policy/complete/public_set/patch/rows.rs: 177LF/4842B/SHAbda29604ee713db27ed2fc39264955134cf2a8588c3c9da3f38671f6fc6e7464
+crates/wf-domain/src/policy/complete/public_set/metric.rs: 218LF/6678B/SHAc5c44f78bbacf00fd03eb244e6ef39705e450ed476da22938649d911e4fa785b
+crates/wf-domain/tests/complete_policy/public_set.rs: 548LF/18458B/SHA39d266b86e9889ab7ad3ce9172b5ce28d500bac43381be09acd2cd9cd265200d
+crates/wf-domain/tests/complete_policy/public_set/cases.rs: 596LF/18912B/SHA3494a8a036ad40e519a2beb2f76f7914b227653569ebcb96535bbef838ba42fd
+crates/wf-domain/tests/complete_policy/public_set/metric.rs: 277LF/9877B/SHAb79bb797cfbe878027bb3cb3af6be5b678f8224b860f6419b89d3bb306011b74
+crates/wf-domain/tests/complete_policy/public_set/refusals.rs: 597LF/21407B/SHA1141a0ac9d3997acee889def761a9ab9f4f8cc630c4da0fa73a52a6f93fe238e
+crates/wf-domain/tests/complete_policy/main.rs: 86LF/2033B/SHAbfff76b8993e73b90d9ad84cf1234aba2ce6ff381d0911e95518e27664c35af0
+crates/wf-domain/src/policy/complete.rs: 280LF/9984B/SHA2b491e571a9edd220ab2391d979cbf9525af28ff91947e37aee49baca5671104
+Main WHOLE prefix +17B inverse PASS 2016 8ab9308ca9c681680805f55d0809662fb7d3dbb8943b1e50133e20e0f2a59971
+```
+
+Whole frozen-test inverse chain proof (1da598)
+```text
+Parent pre-style minus exact E0716 local-array repair WHOLE frozen RED restored 1b11e9e358b1782e487ff9f6cf8947c425109bbf82b467464646575430856a93
+Refusals pre-style minus exact source-prefix supplement WHOLE frozen RED restored 02e73de39430d0ebb69d5f77148e5358d32d4d48c7919a96bc6472919f0e56f4
+Cases pre-style minus507B predicate supplement WHOLE initial RED restored cbae177e06db6fe98497a995db057771d022df5bd7eb72c9a8a0876521b6f3be
+Metric pre-style WHOLE frozen RED exact 996bfb591eb4d80d86d74d733e5a4c4403ba431d8f0b122856a1b5a6bb60948e
+PRE-STYLE crates/wf-domain/tests/complete_policy/public_set.rs 597 20318 ee0e83e82ccb59155e57c4d4825c42c17e2e266eca2bc5bf36b9e5ce1a37eec2
+PRE-STYLE crates/wf-domain/tests/complete_policy/public_set/cases.rs 596 18897 ea1e9272babd7b0a76b24932eba3908dcd3dbab08d4dc744c1ba88d838e4fda9
+PRE-STYLE crates/wf-domain/tests/complete_policy/public_set/metric.rs 216 7804 996bfb591eb4d80d86d74d733e5a4c4403ba431d8f0b122856a1b5a6bb60948e
+PRE-STYLE crates/wf-domain/tests/complete_policy/public_set/refusals.rs 600 21432 176f5e2b1d00e29f84dc743fc843ace0204075adbfcf00a8b67808b4cc07164f
+```
+
+The following COMPLETE inverse diff restores all four PRE-test-Clippy buffers exactly; it preserves the honest E0716 and source-prefix supplement epochs. The next chain above restores frozen pre-SUT hashes after removing ONLY their separately identified additions. Every changed failure still fails its enclosing TestResult, and every comparison/expected operand remains.
+
+Complete style/layout inverse, current → pre-test-Clippy (c80693)
+```text
+--- crates/wf-domain/tests/complete_policy/public_set.rs (current)
++++ crates/wf-domain/tests/complete_policy/public_set.rs (pre-test-Clippy)
+@@ -1,7 +1,6 @@
+-//! Original public controls and `PolicyPatch` preparation, without dispatch.
++//! Original public controls and PolicyPatch preparation, without dispatch.
+
+ use super::{TestResult, limits};
+-use metric::assert_raw;
+ use wf_domain::policy::complete::{
+     CompletePolicyEncodingError, OriginalPolicySetInputRejection, OriginalPolicySetPatchView,
+     OriginalPolicySetRequest, PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue,
+@@ -38,18 +37,15 @@
+     Ok(())
+ }
+
+-fn assert_view(
+-    actual: OriginalPolicySetPatchView<'_>,
+-    expected: &RawFlowPolicyValue<'_>,
+-) -> TestResult {
++fn assert_view(actual: OriginalPolicySetPatchView<'_>, expected: &RawFlowPolicyValue<'_>) {
+     match expected {
+         RawFlowPolicyValue::Map(rows) => {
+             assert_eq!(actual.map_len(), Some(rows.len()));
+             assert!(actual.raw().is_none());
+             for (index, (key, value)) in rows.iter().enumerate() {
+-                let (actual_key, actual_value) = actual.map_entry(index).ok_or("map pair")?;
+-                assert_raw(actual_key.raw().ok_or("opaque map key")?, *key)?;
+-                assert_view(actual_value, value)?;
++                let (actual_key, actual_value) = actual.map_entry(index).expect("map pair");
++                assert_raw(actual_key.raw().expect("opaque map key"), *key);
++                assert_view(actual_value, value);
+             }
+             assert!(actual.map_entry(rows.len()).is_none());
+         }
+@@ -57,13 +53,66 @@
+             assert_eq!(actual.list_len(), Some(values.len()));
+             assert!(actual.raw().is_none());
+             for (index, value) in values.iter().enumerate() {
+-                assert_view(actual.list_item(index).ok_or("list item")?, value)?;
++                assert_view(actual.list_item(index).expect("list item"), value);
+             }
+             assert!(actual.list_item(values.len()).is_none());
+         }
+-        _ => assert_raw(actual.raw().ok_or("raw leaf")?, *expected)?,
+-    }
+-    Ok(())
++        _ => assert_raw(actual.raw().expect("raw leaf"), *expected),
++    }
++}
++
++fn assert_raw(actual: RawFlowPolicyValue<'_>, expected: RawFlowPolicyValue<'_>) {
++    match (actual, expected) {
++        (RawFlowPolicyValue::Nil, RawFlowPolicyValue::Nil)
++        | (RawFlowPolicyValue::Other, RawFlowPolicyValue::Other) => {}
++        (RawFlowPolicyValue::Integer(a), RawFlowPolicyValue::Integer(b)) => assert_eq!(a, b),
++        (RawFlowPolicyValue::Atom(a), RawFlowPolicyValue::Atom(b)) => assert_eq!(a, b),
++        (RawFlowPolicyValue::Binary(a), RawFlowPolicyValue::Binary(b)) => assert_eq!(a, b),
++        (
++            RawFlowPolicyValue::BigInteger {
++                negative: a,
++                little_endian: aa,
++            },
++            RawFlowPolicyValue::BigInteger {
++                negative: b,
++                little_endian: bb,
++            },
++        ) => {
++            assert_eq!(a, b);
++            assert_eq!(aa, bb);
++        }
++        (RawFlowPolicyValue::Map(a), RawFlowPolicyValue::Map(b)) => {
++            assert_eq!(a.len(), b.len());
++            for ((ak, av), (bk, bv)) in a.iter().zip(b) {
++                assert_raw(*ak, *bk);
++                assert_raw(*av, *bv);
++            }
++        }
++        (RawFlowPolicyValue::List(a), RawFlowPolicyValue::List(b))
++        | (RawFlowPolicyValue::Tuple(a), RawFlowPolicyValue::Tuple(b)) => {
++            assert_eq!(a.len(), b.len());
++            for (a, b) in a.iter().zip(b) {
++                assert_raw(*a, *b);
++            }
++        }
++        (
++            RawFlowPolicyValue::ImproperList {
++                prefix: a,
++                tail: aa,
++            },
++            RawFlowPolicyValue::ImproperList {
++                prefix: b,
++                tail: bb,
++            },
++        ) => {
++            assert_eq!(a.len(), b.len());
++            for (a, b) in a.iter().zip(b) {
++                assert_raw(*a, *b);
++            }
++            assert_raw(*aa, *bb);
++        }
++        other => panic!("different original terms: {other:?}"),
++    }
+ }
+
+ fn one<'input>(
+@@ -363,7 +412,7 @@
+     let large = vec![0xff; 262_145];
+     for bytes in [b"".as_slice(), b"\xff\0".as_slice(), large.as_slice()] {
+         one("state", RawFlowPolicyValue::Binary(bytes), |request| {
+-            let state = request.response_state().ok_or("present query")?;
++            let state = request.response_state().expect("present query");
+             assert_eq!(state, bytes);
+             assert_eq!(state.as_ptr(), bytes.as_ptr());
+             assert_eq!(request.patch().map_len(), Some(0));
+@@ -456,7 +505,7 @@
+         &RawFlowPolicyValue::Binary(b"r"),
+         &RawFlowPolicyValue::List(&rows),
+     )?;
+-    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+     assert_empty_states()?;
+     cases::assert_original_queued_patch()?;
+     Ok(())
+@@ -483,7 +532,7 @@
+         &RawFlowPolicyValue::Binary(b"r"),
+         &RawFlowPolicyValue::List(&rows),
+     )?;
+-    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+     let nil_pair = [
+         RawFlowPolicyValue::Binary(b"queued"),
+         RawFlowPolicyValue::Nil,
+@@ -502,7 +551,7 @@
+         &RawFlowPolicyValue::Binary(b"r"),
+         &RawFlowPolicyValue::List(&rows),
+     )?;
+-    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+     Ok(())
+ }
+
+--- crates/wf-domain/tests/complete_policy/public_set/cases.rs (current)
++++ crates/wf-domain/tests/complete_policy/public_set/cases.rs (pre-test-Clippy)
+@@ -44,7 +44,7 @@
+         &RawFlowPolicyValue::Binary(b"r"),
+         &RawFlowPolicyValue::List(&rows),
+     )?;
+-    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+     for invalid in [
+         RawFlowPolicyValue::Atom("done"),
+         RawFlowPolicyValue::List(&[]),
+@@ -126,7 +126,7 @@
+         &RawFlowPolicyValue::List(&opts),
+     )?;
+     assert!(!request.replace());
+-    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+     assert_second_patch()?;
+     Ok(())
+ }
+@@ -193,7 +193,7 @@
+         &RawFlowPolicyValue::List(&opts),
+     )?;
+     assert!(!request.replace());
+-    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+     Ok(())
+ }
+
+@@ -246,7 +246,7 @@
+         RawFlowPolicyValue::Map(&expected_map),
+     )];
+     one("x", RawFlowPolicyValue::Map(&source), |request| {
+-        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+         Ok(())
+     })?;
+     let list = [
+@@ -262,7 +262,7 @@
+         RawFlowPolicyValue::List(&expected_list),
+     )];
+     one("x", RawFlowPolicyValue::List(&list), |request| {
+-        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+         Ok(())
+     })
+ }
+@@ -282,7 +282,7 @@
+         RawFlowPolicyValue::Map(&nested),
+     )];
+     one("x", RawFlowPolicyValue::Map(&nested), |request| {
+-        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+         Ok(())
+     })?;
+     let deletion = [(
+@@ -294,7 +294,7 @@
+         RawFlowPolicyValue::Map(&deletion),
+     )];
+     one("states", RawFlowPolicyValue::Map(&deletion), |request| {
+-        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+         Ok(())
+     })
+ }
+@@ -333,7 +333,7 @@
+         ),
+     ];
+     let request = prepare(&RawFlowPolicyValue::Binary(b"r"), &opts)?;
+-    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++    assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+     let prefix = [
+         RawFlowPolicyValue::Integer(1),
+         RawFlowPolicyValue::Integer(2),
+@@ -354,7 +354,7 @@
+         RawFlowPolicyValue::Tuple(&tuple),
+     )];
+     one("x", RawFlowPolicyValue::Tuple(&tuple), |request| {
+-        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+         Ok(())
+     })
+ }
+@@ -384,7 +384,7 @@
+         RawFlowPolicyValue::Map(&child),
+     )];
+     one("x", RawFlowPolicyValue::List(&rows), |request| {
+-        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+         Ok(())
+     })?;
+     let first = [RawFlowPolicyValue::Binary(b"queued"), bad];
+@@ -414,7 +414,7 @@
+         assert_view(
+             request.patch(),
+             &RawFlowPolicyValue::Map(&expected_fallback),
+-        )?;
++        );
+         Ok(())
+     })?;
+     let good = [
+@@ -447,7 +447,7 @@
+         RawFlowPolicyValue::Map(&states),
+     )];
+     one("states", RawFlowPolicyValue::List(&pairs), |request| {
+-        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++        assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+         Ok(())
+     })
+ }
+@@ -477,7 +477,7 @@
+             RawFlowPolicyValue::Tuple(&tuple),
+         )];
+         one("x", RawFlowPolicyValue::Tuple(&tuple), |request| {
+-            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+             Ok(())
+         })?;
+         let key = [(
+@@ -486,7 +486,7 @@
+         )];
+         let expected_key = [(RawFlowPolicyValue::Atom("x"), RawFlowPolicyValue::Map(&key))];
+         one("x", RawFlowPolicyValue::Map(&key), |request| {
+-            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected_key))?;
++            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected_key));
+             Ok(())
+         })?;
+     }
+@@ -507,7 +507,7 @@
+         let map = [(key, value)];
+         let expected = [(RawFlowPolicyValue::Atom("x"), RawFlowPolicyValue::Map(&map))];
+         one("x", RawFlowPolicyValue::Map(&map), |request| {
+-            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+             Ok(())
+         })?;
+     }
+--- crates/wf-domain/tests/complete_policy/public_set/metric.rs (current)
++++ crates/wf-domain/tests/complete_policy/public_set/metric.rs (pre-test-Clippy)
+@@ -1,8 +1,8 @@
+-//! Pinned raw `external_size` controls for converted public patches.
++//! Pinned raw external_size controls for converted public patches.
+
+ use super::{
+-    OriginalPolicySetInputRejection, RawFlowPolicyValue, TestResult, assert_view, one, prepare,
+-    rejected,
++    OriginalPolicySetInputRejection, RawFlowPolicyValue, TestResult, assert_raw, assert_view, one,
++    prepare, rejected,
+ };
+
+ #[test]
+@@ -10,11 +10,11 @@
+     let exact = vec![b'v'; 262_130];
+     let above = vec![b'v'; 262_131];
+     one("x", RawFlowPolicyValue::Binary(&exact), |request| {
+-        let (_, leaf) = request.patch().map_entry(0).ok_or("x")?;
++        let (_, leaf) = request.patch().map_entry(0).expect("x");
+         assert_raw(
+-            leaf.raw().ok_or("binary")?,
++            leaf.raw().expect("binary"),
+             RawFlowPolicyValue::Binary(&exact),
+-        )?;
++        );
+         Ok(())
+     })?;
+     let pair = [
+@@ -36,16 +36,13 @@
+     for (count, width) in [(65_535, 65_538), (65_536, 131_078)] {
+         let bytes = vec![RawFlowPolicyValue::Integer(255); count];
+         one("x", RawFlowPolicyValue::List(&bytes), |request| {
+-            let (_, list) = request.patch().map_entry(0).ok_or("x")?;
++            let (_, list) = request.patch().map_entry(0).expect("x");
+             assert_eq!(list.list_len(), Some(count));
+             for index in 0..count {
+                 assert_raw(
+-                    list.list_item(index)
+-                        .ok_or("byte")?
+-                        .raw()
+-                        .ok_or("integer")?,
++                    list.list_item(index).expect("byte").raw().expect("integer"),
+                     RawFlowPolicyValue::Integer(255),
+-                )?;
++                );
+             }
+             Ok(())
+         })?;
+@@ -119,7 +116,7 @@
+     ] {
+         let expected = [(RawFlowPolicyValue::Atom("version"), value)];
+         one("version", value, |request| {
+-            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected))?;
++            assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+             Ok(())
+         })?;
+         assert_metric_boundary(value, width)?;
+@@ -161,8 +158,8 @@
+     let atom256 = "é".repeat(128);
+     for (atom, width) in [(&atom255, 257), (&atom256, 259)] {
+         one("x", RawFlowPolicyValue::Atom(atom), |request| {
+-            let (_, leaf) = request.patch().map_entry(0).ok_or("x")?;
+-            assert_raw(leaf.raw().ok_or("atom")?, RawFlowPolicyValue::Atom(atom))?;
++            let (_, leaf) = request.patch().map_entry(0).expect("x");
++            assert_raw(leaf.raw().expect("atom"), RawFlowPolicyValue::Atom(atom));
+             Ok(())
+         })?;
+         assert_metric_boundary(RawFlowPolicyValue::Atom(atom), width)?;
+@@ -170,11 +167,11 @@
+     for (arity, width) in [(255, 512), (256, 517)] {
+         let tuple = vec![RawFlowPolicyValue::Integer(0); arity];
+         one("x", RawFlowPolicyValue::Tuple(&tuple), |request| {
+-            let (_, leaf) = request.patch().map_entry(0).ok_or("x")?;
++            let (_, leaf) = request.patch().map_entry(0).expect("x");
+             assert_raw(
+-                leaf.raw().ok_or("tuple")?,
++                leaf.raw().expect("tuple"),
+                 RawFlowPolicyValue::Tuple(&tuple),
+-            )?;
++            );
+             Ok(())
+         })?;
+         assert_metric_boundary(RawFlowPolicyValue::Tuple(&tuple), width)?;
+@@ -206,72 +203,14 @@
+     assert_eq!(request.policy_key(), b"f:{f}:policy:r");
+     assert_eq!(request.patch().map_len(), Some(4096));
+     for (index, expected) in names.iter().enumerate() {
+-        let (key, value) = request.patch().map_entry(index).ok_or("surviving pair")?;
++        let (key, value) = request.patch().map_entry(index).expect("surviving pair");
+         assert_raw(
+-            key.raw().ok_or("atom key")?,
++            key.raw().expect("atom key"),
+             RawFlowPolicyValue::Atom(expected),
+-        )?;
+-        assert_raw(value.raw().ok_or("nil value")?, RawFlowPolicyValue::Nil)?;
++        );
++        assert_raw(value.raw().expect("nil value"), RawFlowPolicyValue::Nil);
+     }
+     assert_eq!(charge.p(), 1_278_672);
+     assert!(charge.total() <= profile.max_work_bytes());
+     Ok(())
+ }
+-
+-pub(super) fn assert_raw(
+-    actual: RawFlowPolicyValue<'_>,
+-    expected: RawFlowPolicyValue<'_>,
+-) -> TestResult {
+-    match (actual, expected) {
+-        (RawFlowPolicyValue::Nil, RawFlowPolicyValue::Nil)
+-        | (RawFlowPolicyValue::Other, RawFlowPolicyValue::Other) => {}
+-        (RawFlowPolicyValue::Integer(a), RawFlowPolicyValue::Integer(b)) => assert_eq!(a, b),
+-        (RawFlowPolicyValue::Atom(a), RawFlowPolicyValue::Atom(b)) => assert_eq!(a, b),
+-        (RawFlowPolicyValue::Binary(a), RawFlowPolicyValue::Binary(b)) => assert_eq!(a, b),
+-        (
+-            RawFlowPolicyValue::BigInteger {
+-                negative: a,
+-                little_endian: aa,
+-            },
+-            RawFlowPolicyValue::BigInteger {
+-                negative: b,
+-                little_endian: bb,
+-            },
+-        ) => {
+-            assert_eq!(a, b);
+-            assert_eq!(aa, bb);
+-        }
+-        (RawFlowPolicyValue::Map(a), RawFlowPolicyValue::Map(b)) => {
+-            assert_eq!(a.len(), b.len());
+-            for ((ak, av), (bk, bv)) in a.iter().zip(b) {
+-                assert_raw(*ak, *bk)?;
+-                assert_raw(*av, *bv)?;
+-            }
+-        }
+-        (RawFlowPolicyValue::List(a), RawFlowPolicyValue::List(b))
+-        | (RawFlowPolicyValue::Tuple(a), RawFlowPolicyValue::Tuple(b)) => {
+-            assert_eq!(a.len(), b.len());
+-            for (a, b) in a.iter().zip(b) {
+-                assert_raw(*a, *b)?;
+-            }
+-        }
+-        (
+-            RawFlowPolicyValue::ImproperList {
+-                prefix: a,
+-                tail: aa,
+-            },
+-            RawFlowPolicyValue::ImproperList {
+-                prefix: b,
+-                tail: bb,
+-            },
+-        ) => {
+-            assert_eq!(a.len(), b.len());
+-            for (a, b) in a.iter().zip(b) {
+-                assert_raw(*a, *b)?;
+-            }
+-            assert_raw(*aa, *bb)?;
+-        }
+-        other => return Err(format!("different original terms: {other:?}").into()),
+-    }
+-    Ok(())
+-}
+--- crates/wf-domain/tests/complete_policy/public_set/refusals.rs (current)
++++ crates/wf-domain/tests/complete_policy/public_set/refusals.rs (pre-test-Clippy)
+@@ -335,13 +335,13 @@
+         })?;
+     }
+     assert_byte_bound(profile)?;
+-    assert_profile_exclusions(profile);
+-    Ok(())
+-}
+-
+-fn depth_fixture(
++    assert_profile_exclusions(profile)?;
++    Ok(())
++}
++
++fn depth_fixture<'input>(
+     depth: usize,
+-    value: RawFlowPolicyValue<'_>,
++    value: RawFlowPolicyValue<'input>,
+     check: &mut dyn for<'view> FnMut(RawFlowPolicyValue<'view>) -> TestResult,
+ ) -> TestResult {
+     if depth == 0 {
+@@ -378,7 +378,9 @@
+     Ok(())
+ }
+
+-fn assert_profile_exclusions(profile: wf_domain::policy::complete::PolicySchemaLimits) {
++fn assert_profile_exclusions(
++    profile: wf_domain::policy::complete::PolicySchemaLimits,
++) -> TestResult {
+     let tail = RawFlowPolicyValue::Binary(b"unreached");
+     let empty = RawFlowPolicyValue::ImproperList {
+         prefix: &[],
+@@ -428,6 +430,7 @@
+         ),
+         Err(CompletePolicyEncodingError::UnsupportedTag)
+     ));
++    Ok(())
+ }
+
+ #[test]
+@@ -517,13 +520,13 @@
+     assert_eq!((charge.g(), charge.p()), (11595, 1032));
+     assert_eq!(request.policy_key().as_ptr(), key_pointer);
+     assert_eq!(second.policy_key(), request.policy_key());
+-    let (_, leaf) = request.patch().map_entry(0).ok_or("x")?;
+-    match leaf.raw().ok_or("binary")? {
++    let (_, leaf) = request.patch().map_entry(0).expect("x");
++    match leaf.raw().expect("binary") {
+         RawFlowPolicyValue::Binary(value) => {
+             assert_eq!(value.as_ptr(), bytes.as_ptr());
+             assert_eq!(value, bytes);
+         }
+-        other => return Err(format!("different leaf {other:?}").into()),
++        other => panic!("different leaf {other:?}"),
+     }
+     assert_eq!(request.policy_key(), b"f:{f}:policy:r");
+     Ok(())
+```
+
+First implementation compiler result: EXIT101, zero assertions (fa09da)
+```text
+error[E0716]: temporary value dropped while borrowed
+   --> crates/wf-domain/tests/complete_policy/public_set/refusals.rs:175:40
+    |
+175 |             &RawFlowPolicyValue::List(&[RawFlowPolicyValue::Tuple(&pair)]),
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ creates a temporary value which is freed while still in use
+...
+178 |         );
+    |          - temporary value is freed at the end of this statement
+...
+189 |                 result,
+    |                 ------ borrow later used here
+    |
+    = note: consider using a `let` binding to create a longer lived value
+
+error[E0716]: temporary value dropped while borrowed
+   --> crates/wf-domain/tests/complete_policy/public_set.rs:551:36
+    |
+551 |         &RawFlowPolicyValue::List(&[RawFlowPolicyValue::Tuple(&opts)]),
+    |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ creates a temporary value which is freed while still in use
+552 |     )?;
+    |       - temporary value is freed at the end of this statement
+553 |     assert_view(request.patch(), &RawFlowPolicyValue::Map(&expected));
+    |                 ------- borrow later used here
+    |
+help: consider using a `let` binding to create a longer lived value
+    |
+549 ~     let binding = [RawFlowPolicyValue::Tuple(&opts)];
+550 ~     let request = prepare(
+551 |         &RawFlowPolicyValue::Binary(b"r"),
+552 ~         &RawFlowPolicyValue::List(&binding),
+    |
+
+For more information about this error, try `rustc --explain E0716`.
+error: could not compile `wf-domain` (test "complete_policy") due to 2 previous errors
+```
+
+First actual assertion epoch: EXIT0/112 PASS (18342d)
+```text
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.57s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 112 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test flow_frame::original_flow_frame_preserves_raw_presence_and_source_order ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test flow_frame::original_flow_frame_canonicalizes_mathematical_terms ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test public_set::original_public_set_converts_last_policy_values_and_state_pairs ... ok
+test public_set::original_public_set_keeps_both_modes_and_unbounded_reply_state ... ok
+test public_set::cases::original_public_set_preserves_recursive_barriers_and_callback_reachability ... ok
+test public_set::original_public_set_preserves_root_and_first_control_priority ... ok
+test public_set::refusals::original_public_set_keeps_one_account_and_borrowed_owners ... ok
+test public_set::metric::original_public_set_preserves_arbitrary_integer_and_byte_terms ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test flow_frame::original_flow_frame_preserves_each_account_event ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test public_set::refusals::original_public_set_prepays_each_reached_operation ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test public_set::metric::original_public_set_measures_converted_patch_before_lower_business ... ok
+test flow_frame::original_flow_frame_rejects_all_structural_tampering ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+test result: ok. 112 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+```
+
+First strict library epoch: EXIT101/five findings (feb11b)
+```text
+error: the loop variable `index` is only used to index `rows`
+  --> crates/wf-domain/src/policy/complete/public_set/metric.rs:71:26
+   |
+71 |             for index in 0..rows.len() {
+   |                          ^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+   = note: `-D clippy::needless-range-loop` implied by `-D clippy::all`
+   = help: to override `-D clippy::all` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+   |
+71 -             for index in 0..rows.len() {
+71 +             for <item> in &rows {
+   |
+
+error: item in documentation is missing backticks
+ --> crates/wf-domain/src/policy/complete/public_set/patch.rs:1:12
+  |
+1 | //! Source PolicyPatch conversion without business normalization or tuple walks.
+  |            ^^^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#doc_markdown
+  = note: `-D clippy::doc-markdown` implied by `-D clippy::pedantic`
+  = help: to override `-D clippy::pedantic` add `#[allow(clippy::doc_markdown)]`
+help: try
+  |
+1 - //! Source PolicyPatch conversion without business normalization or tuple walks.
+1 + //! Source `PolicyPatch` conversion without business normalization or tuple walks.
+  |
+
+error: redundant guard
+  --> crates/wf-domain/src/policy/complete/public_set/patch.rs:30:29
+   |
+30 |         Raw::List(items) if items.is_empty() => arena.cell(
+   |                             ^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#redundant_guards
+   = note: `-D clippy::redundant-guards` implied by `-D clippy::all`
+   = help: to override `-D clippy::all` add `#[allow(clippy::redundant_guards)]`
+help: try
+   |
+30 -         Raw::List(items) if items.is_empty() => arena.cell(
+30 +         Raw::List([]) => arena.cell(
+   |
+
+error: the loop variable `index` is only used to index `work`
+   --> crates/wf-domain/src/policy/complete/public_set/patch.rs:139:18
+    |
+139 |     for index in start..start + len {
+    |                  ^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+help: consider using an iterator
+    |
+139 -     for index in start..start + len {
+139 +     for <item> in work.iter().skip(start).take(len) {
+    |
+
+error: this `if` statement can be collapsed
+   --> crates/wf-domain/src/policy/complete/public_set.rs:215:9
+    |
+215 | /         if let Some(field) = control_name(key, charge)? {
+216 | |             if found[field].is_none() {
+217 | |                 found[field] = Some(pair[1]);
+218 | |             }
+219 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+215 ~         if let Some(field) = control_name(key, charge)?
+216 ~             && found[field].is_none() {
+217 |                 found[field] = Some(pair[1]);
+218 ~             }
+    |
+
+error: could not compile `wf-domain` (lib) due to 5 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `wf-domain` (lib test) due to 5 previous errors
+```
+
+Second strict test epoch: EXIT101/25 findings (6d96b9)
+```text
+error: item in documentation is missing backticks
+ --> crates/wf-domain/tests/complete_policy/public_set.rs:1:34
+  |
+1 | //! Original public controls and PolicyPatch preparation, without dispatch.
+  |                                  ^^^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#doc_markdown
+  = note: `-D clippy::doc-markdown` implied by `-D clippy::pedantic`
+  = help: to override `-D clippy::pedantic` add `#[allow(clippy::doc_markdown)]`
+help: try
+  |
+1 - //! Original public controls and PolicyPatch preparation, without dispatch.
+1 + //! Original public controls and `PolicyPatch` preparation, without dispatch.
+  |
+
+error: item in documentation is missing backticks
+ --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:1:16
+  |
+1 | //! Pinned raw external_size controls for converted public patches.
+  |                ^^^^^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#doc_markdown
+help: try
+  |
+1 - //! Pinned raw external_size controls for converted public patches.
+1 + //! Pinned raw `external_size` controls for converted public patches.
+  |
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:13:25
+   |
+13 |         let (_, leaf) = request.patch().map_entry(0).expect("x");
+   |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+   = note: requested on the command line with `-D clippy::expect-used`
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:15:13
+   |
+15 |             leaf.raw().expect("binary"),
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:39:29
+   |
+39 |             let (_, list) = request.patch().map_entry(0).expect("x");
+   |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:43:21
+   |
+43 |                     list.list_item(index).expect("byte").raw().expect("integer"),
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:43:21
+   |
+43 |                     list.list_item(index).expect("byte").raw().expect("integer"),
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:161:29
+    |
+161 |             let (_, leaf) = request.patch().map_entry(0).expect("x");
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:162:24
+    |
+162 |             assert_raw(leaf.raw().expect("atom"), RawFlowPolicyValue::Atom(atom));
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:170:29
+    |
+170 |             let (_, leaf) = request.patch().map_entry(0).expect("x");
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:172:17
+    |
+172 |                 leaf.raw().expect("tuple"),
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:206:28
+    |
+206 |         let (key, value) = request.patch().map_entry(index).expect("surviving pair");
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:208:13
+    |
+208 |             key.raw().expect("atom key"),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/metric.rs:211:20
+    |
+211 |         assert_raw(value.raw().expect("nil value"), RawFlowPolicyValue::Nil);
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: the following explicit lifetimes could be elided: 'input
+   --> crates/wf-domain/tests/complete_policy/public_set/refusals.rs:342:18
+    |
+342 | fn depth_fixture<'input>(
+    |                  ^^^^^^
+343 |     depth: usize,
+344 |     value: RawFlowPolicyValue<'input>,
+    |                               ^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#elidable_lifetime_names
+    = note: `-D clippy::elidable-lifetime-names` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::elidable_lifetime_names)]`
+help: elide the lifetimes
+    |
+342 ~ fn depth_fixture(
+343 |     depth: usize,
+344 ~     value: RawFlowPolicyValue<'_>,
+    |
+
+error: this function's return value is unnecessary
+   --> crates/wf-domain/tests/complete_policy/public_set/refusals.rs:381:1
+    |
+381 | / fn assert_profile_exclusions(
+382 | |     profile: wf_domain::policy::complete::PolicySchemaLimits,
+383 | | ) -> TestResult {
+    | |_______________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_wraps
+    = note: `-D clippy::unnecessary-wraps` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::unnecessary_wraps)]`
+help: remove the return type...
+    |
+383 - ) -> TestResult {
+383 + ) -> () {
+    |
+help: ...and then remove returned values
+    |
+433 -     Ok(())
+    |
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/refusals.rs:523:21
+    |
+523 |     let (_, leaf) = request.patch().map_entry(0).expect("x");
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set/refusals.rs:524:11
+    |
+524 |     match leaf.raw().expect("binary") {
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: `panic` should not be present in production code
+   --> crates/wf-domain/tests/complete_policy/public_set/refusals.rs:529:18
+    |
+529 |         other => panic!("different leaf {other:?}"),
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#panic
+    = note: requested on the command line with `-D clippy::panic`
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set.rs:46:50
+   |
+46 |                 let (actual_key, actual_value) = actual.map_entry(index).expect("map pair");
+   |                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set.rs:47:28
+   |
+47 |                 assert_raw(actual_key.raw().expect("opaque map key"), *key);
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set.rs:56:29
+   |
+56 |                 assert_view(actual.list_item(index).expect("list item"), value);
+   |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: used `expect()` on an `Option` value
+  --> crates/wf-domain/tests/complete_policy/public_set.rs:60:25
+   |
+60 |         _ => assert_raw(actual.raw().expect("raw leaf"), *expected),
+   |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: if this value is `None`, it will panic
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: `panic` should not be present in production code
+   --> crates/wf-domain/tests/complete_policy/public_set.rs:114:18
+    |
+114 |         other => panic!("different original terms: {other:?}"),
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#panic
+
+error: used `expect()` on an `Option` value
+   --> crates/wf-domain/tests/complete_policy/public_set.rs:415:25
+    |
+415 |             let state = request.response_state().expect("present query");
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: if this value is `None`, it will panic
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#expect_used
+
+error: could not compile `wf-domain` (test "complete_policy") due to 25 previous errors
+```
+
+Final strict all-target domain epoch: EXIT0 (9fb73a)
+```text
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.59s
+```
+
+Final complete-policy target: EXIT0/112 PASS (12a644)
+```text
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.01s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-34b63828666c91e5)
+
+running 112 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test flow_input::etf::original_flow_input_preserves_arbitrary_customer_versions ... ok
+test flow_input::etf::original_flow_input_emits_original_deterministic_etf ... ok
+test flow_input::governance::original_flow_input_preserves_complete_governance_model ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test flow_frame::original_flow_frame_preserves_raw_presence_and_source_order ... ok
+test flow_input::original_flow_input_stages_once_without_mutating_inputs ... ok
+test flow_input::refusals::original_flow_input_preserves_continuous_work_and_held_owners ... ok
+test flow_input::original_flow_input_preserves_all_top_level_classes_and_presence ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test flow_input::states::original_flow_input_preserves_state_map_keyword_and_pair_semantics ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test flow_frame::original_flow_frame_canonicalizes_mathematical_terms ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test flow_input::governance::original_flow_input_preserves_governance_scalar_and_group_errors ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test flow_input::refusals::original_flow_input_preserves_every_prospective_phase_refusal ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test flow_input::states::original_flow_input_preserves_source_state_iteration_and_field_order ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test public_set::cases::original_public_set_preserves_recursive_barriers_and_callback_reachability ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test public_set::original_public_set_converts_last_policy_values_and_state_pairs ... ok
+test public_set::original_public_set_keeps_both_modes_and_unbounded_reply_state ... ok
+test public_set::refusals::original_public_set_keeps_one_account_and_borrowed_owners ... ok
+test public_set::original_public_set_preserves_root_and_first_control_priority ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test public_set::metric::original_public_set_preserves_arbitrary_integer_and_byte_terms ... ok
+test flow_frame::original_flow_frame_preserves_each_account_event ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test flow_input::etf::original_flow_input_preserves_both_source_size_gates ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test flow_input::governance::original_flow_input_preserves_governance_late_size_priority ... ok
+test flow_input::governance::original_flow_input_preserves_governance_lists_and_rule_bounds ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test public_set::refusals::original_public_set_prepays_each_reached_operation ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+test public_set::metric::original_public_set_measures_converted_patch_before_lower_business ... ok
+test flow_frame::original_flow_frame_rejects_all_structural_tampering ... ok
+test flow_input::refusals::original_flow_input_preserves_profile_and_visible_bounds ... ok
+
+test result: ok. 112 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+```
+
+Final formatting and git diff --check returned EXIT0 with empty output (658aa0/726730). No source/test mutation followed those final checks before this receipt was appended.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-SET1-WRITTEN1 — exact receipt and counterpart scope
+
+Root preserved the ENTIRE pristine69012B GREEN1 as Git blob9a0fbfe1b6067194f4d3fedb88873ccfbd6b36fe, SHA4cb4559e1626866028829b952e92304557ff7f0dacee66d44379c71acdc3958e. At Root's request Writer removed ONLY nine ASCII spaces on otherwise blank unified-diff context lines in that newly appended suffix; the historical3009613-byte prefix and every source/test byte stayed exact. Current GREEN1 is3009613+69003/SHA201d1a223d73d097a42359894bbee4dd7202bbc21d5f0a4349ca382a30bf37f7. Literal blank context markers in its DISPLAY are normalized to blank lines for diff-check; use the pristine blob for a strict unified-patch parser, or restore one ASCII context space to those blank lines inside the inverse diff. This is documentation whitespace normalization, not silent failure/oracle rewriting. Independent95c51f actually reads the whole Git blob, checks both length/SHA and proves the entire current receipt equals that blob minus precisely those nine spaces. Subsequent git diff --check d9c768 passes. Earlier GREEN1 text 'ARCH6928+b1768' is a typographic separator only: the actual whole reads were6928+1768, with both exact hashes verified in965488.
+
+Independent3dce86 actually applies the full serialized19242B inverse to every CURRENT test file in memory, with strict context equality and no fuzz or filesystem write, and recovers ALL pre-style bytes/hashes. Independent1da598 then restores frozen pre-SUT parent1b11e9e3 by undoing its ONE local-array E0716 repair; restores refusals02e73de3 by removing ONLY the new improper-prefix helper/call; confirms metric996bfb59 exactly; and removes the separate507B callback-predicate supplement from cases to recover initialcbae177e, while the post-supplement frozenea1 hash remains separately preserved. No assertion operand, expected metric/body/fee, test identity or old primitive changed through these mechanical repairs.
+
+Writer ACTUALLY whole-reads PERF WRITTEN1 at1488076+12339/SHA8deb786793659f52de57db1092962cac593d0a1e6001d8dd2bffd9b5f902f639 in e49c92 and agrees without source/resource/mapping discrepancy. All five code responsibilities, one-owner slot sort/adjacent complexity, exact metric/Big/list semantics, 7777 source-only fix, real retained/borrowed owners, actual tuple/key barriers and conditional RawMap/Other/Enumerable profile agree. Logical peak/work and successful4096 default-budget control imply no native allocation/speed or OS equivalence claim. Normal ARCH written-source counterpart is read separately when saved; this adds no implementation/body/result gate.
+
+Writer also ACTUALLY reads Root's final CONTINUE/ADR006 delta11b82b and the ENTIRE compact coordination GREEN1 in f9b141. Root's attributed final246096/session92906→d006b9 EXIT0 passes582 Rust tests/four compile-fail docs and every source/default audit stage on unchanged1036 inputs/SHAfa81fdfa1caff99bd8999feb045c499a84f60ebf0ce5932a96526d6b708c938a; Writer does not claim to have read the separate duplicated75482B full output or executed that wrapper. Independent ledger67567c restores the ENTIRE previous JSON semantically after removing ONLY49bda's one new counterpart/two direct source242 links, conserving all prior records/runtime IDs/metadata. Final71/78/303 counts and original5858/5903/4222/1681/1655 scope stay precise. Full public default-false/current-view merge, coherent one-pass downstream handoff, public identity/projection/dispatch, opaque identity and VM capture/Enumerable, physical atomic/all-shard behavior, original setup/profile/assertions and independent Linux AND macOS/full M1-M8 remain required. No source/test edit or extra implementation rerun follows this note-only closure.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-SET1-CACHE-BOUND-PRECISION1
+
+PERF caught a factual inequality wording error in GREEN1, independently confirmed by Root: at4096 distinct rows the proposed cached prior-slot visits total16*4096*4095/2=134184960, which is32768 BELOW the default134217728, not above it. Required logical SUM scratch1278672 makes visits+P=135463632, already1245904 ABOVE default before any other G. This supersedes GREEN1's phrase 'visits alone exceed the budget' and any equivalent historical shorthand; the correct causal statement is that the visits PLUS required scratch already exceed the budget. The existing staged heapsort/default4096 success, all source semantics/resources, prewritten expected literals and native-gain limits are unchanged. Pristine/normalized prior receipts remain exact; this is a prose arithmetic correction without code/test edit, candidate fitting or rerun.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-SET1-CLOSE1
+
+Writer ACTUALLY whole-read/hash-verified ARCH WRITTEN1 at1746066+12848/SHAb43bde5d157a21eb15a301e15d0bd7f761580b93f8c8eba6a4c1735ab2e0217f in6c6213. Agree without source, ownership, fee, test-origin or narrow49bda mapping discrepancy. PERF's entire12339B finding was already actually read in e49c92 and both reviewers have actually reviewed each other's complete findings. Exact final ADR arithmetic diff0a9d8e now says cached visits PLUS required scratch and supplies the correct integers; the901B owner precision preserves earlier receipts. Root's reported final same1036-input macOS582+4/all-stage PASS and Writer112/strict/fmt PASS are accurately scoped. The five-file/four-test finite public-preparation responsibility is COMPLETE and normal source reciprocity is CLOSED without blocker; source/test bytes remain frozen. Root owns reviewed checkpoint/Git. Full default-false arbitrary-current integration, public identity/replies/dispatch/projection, complete opaque/Enumerable/capture semantics, physical/setup/profile/source-assertion duties, independent Linux AND macOS and full M1-M8 remain active required work under their next concrete consultation.

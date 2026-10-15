@@ -1013,3 +1013,62 @@ enclosing edges after every child. Nested child ranges remain contiguous. The
 two-state stream is27396/P9664/T37060; its older frozen RED vector remains
 historical. This adds no owner/model or source business pass, and changes no old
 primitive, MIN or Gov-list stream. No implementation result supplied the revision.
+
+## Selected original public Policy.set preparation
+
+ARCH-NEXT-M1-ORIGINAL-PUBLIC-SET1-CREATE1 and its
+GROUP-AND-COMPACT1 amendment select a pure domain predecessor to public dispatch.
+The five private children below `policy/complete/public_set` own controls,
+immutable patch views, conversion, synthesized-row compaction and raw-size
+measurement. Three public models and two functions are reexported through the
+existing facade; no wire, client, runtime or authority contract is added.
+The existing architecture test checks all five descendants and the five exports.
+
+The request owns one prefixed policy key, borrows response-state and raw payload
+bytes, and retains a bounded cell/edge arena. FIRST control occurrences determine
+state, expected generation and replace; both replace modes survive. Ordinary
+keyword values collapse LAST before recursive conversion. State-pair callbacks
+all run in source order before duplicate compaction. Tuple interiors and map keys
+remain conversion barriers; the reached struct predicate is checked at the
+Map.new/2 boundary, before value callbacks. Converted raw size precedes
+current-policy/CAS/business
+validation. The seven fixed caller diagnoses remain distinct from operational
+profile, work, shape, allocation and unsupported-term errors.
+
+This new represented-input profile admits131072 occurrences, depth64 and64MiB
+of visible bytes; every old profile and fee remains unchanged. One continuous
+account pays entry, preflight, logical SUM scratch104N+128D+256, three fallible
+reservations, reached selectors/conversion, measurement and late routing-key
+ownership. Alias occurrences are charged separately. Temporary slots drop before
+return; the retained view supplies no captured-order, origin or payment authority.
+
+The same temporary slot Vec stages eligible rows, performs a paid heapsort by
+exact key bytes and source ordinal, then compacts adjacent groups to their LAST
+entry. This replaces the initially proposed all-prior hash scan: cached reads
+plus required scratch already exceed the default128MiB work allowance at4096
+distinct keys despite a49158-byte valid patch. Cached work134184960 plus
+scratch1278672 is135463632, above134217728 before other reached work.
+Fresh operand reads, comparisons, swaps and real compact
+moves remain individually charged. Hash equality never substitutes for exact
+key equality. This is a bounded-work improvement, without native latency or
+allocation measurements and without a claim that every small input is faster.
+
+Four reviewed test children contain eight substantive tests with independently
+derived fee streams, seven literal caller bodies, raw-size boundaries, held
+owners and an actual default-budget4096-key control. Root independently reproduced
+the final missing-API RED before releasing the five production files. All112
+policy tests and strict lint now pass, and Root independently reproduces the
+complete macOS582-test/four-doc-test wrapper with all source/dependency stages.
+The pre-SUT predicate-order supplement, the source-review improper-terminal
+correction/regression, both RED epochs and ordinary compiler/lint failures remain
+separately recorded.
+
+Default-false arbitrary-current merge, coherent source/VM order and opaque-term
+identity, public replies and committed identity, physical atomic/all-shard
+installation, every required original setup/runtime/assertion profile and native
+Linux and macOS execution remain required successors. Preparation does not grant
+those capabilities or full original public-call parity.
+
+Surviving Raw Other terms currently produce operational UnsupportedTag during
+measurement; reached struct Enumerable dispatch is likewise an explicit
+temporary unsupported profile. Neither gap is a product exclusion.
