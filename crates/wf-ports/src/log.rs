@@ -27,7 +27,8 @@ mod writer;
 pub use record_batch::{
     FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan,
     RecordBatchInspection, decide_fresh_record_batch, decide_record_batch, encode_record_batch,
-    inspect_record_batch, prepare_record_batch, record_batch_retained_status,
+    inspect_record_batch, inspect_record_batch_point, prepare_record_batch,
+    record_batch_retained_status,
 };
 
 pub use complete_policy::{

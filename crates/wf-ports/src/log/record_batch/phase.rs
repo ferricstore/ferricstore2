@@ -6,7 +6,9 @@ use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::control::ControlPlan;
 use wf_domain::workflow::indexed::{EntryOrder, IndexedGroupView};
-use wf_domain::workflow::request::gate::{GateDecision, GateView, inspect_request};
+use wf_domain::workflow::request::gate::{
+    GateDecision, GateView, PointGateView, RequestGate, inspect_point_request, inspect_request,
+};
 use wf_domain::workflow::request::{RequestValueError, RetainedMetadata, RetainedOutcome};
 use wf_types::version::LogIdentity;
 
@@ -66,15 +68,44 @@ pub fn inspect_record_batch<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace_limit)?;
     let gate = inspect_request(view, decoded.header(log), limits.admission)?;
+    Ok(finish_inspection(decoded, log, gate, workspace_limit))
+}
+
+/// Checks actual decoded data and inspects one original outcome and scoped cohort.
+///
+/// The observations must share one coherent transaction revision. A complete
+/// retained map and current indexed authority are not arguments. Generic decoded
+/// inputs remain caller-owned before this method's prospective checks.
+///
+/// # Errors
+/// Rejects unsupported roots/profiles, intent, workspace or retained authority.
+pub fn inspect_record_batch_point<'input, 'retained>(
+    decoded: DecodedRequest<'input>,
+    log: LogIdentity,
+    view: PointGateView<'_, 'retained>,
+    limits: CodecLimits,
+    workspace_limit: usize,
+) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
+    check_decoded(&decoded, limits, workspace_limit)?;
+    let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
+    Ok(finish_inspection(decoded, log, gate, workspace_limit))
+}
+
+fn finish_inspection<'input, 'retained>(
+    decoded: DecodedRequest<'input>,
+    log: LogIdentity,
+    gate: RequestGate<'retained>,
+    workspace_limit: usize,
+) -> RecordBatchInspection<'input, 'retained> {
     let control = gate.control();
     let decision = match gate.decision() {
         GateDecision::Fresh => {
-            return Ok(RecordBatchInspection::Fresh(FreshRecordBatch {
+            return RecordBatchInspection::Fresh(FreshRecordBatch {
                 decoded: Box::new(decoded),
                 log,
                 control,
                 workspace_limit,
-            }));
+            });
         }
         GateDecision::Replay(original) => RecordBatchApplyDecision::Replay(original),
         GateDecision::IntentConflict => RecordBatchApplyDecision::IntentConflict,
@@ -82,10 +113,7 @@ pub fn inspect_record_batch<'input, 'retained>(
         GateDecision::LogReplay => RecordBatchApplyDecision::LogReplay,
     };
     drop(decoded);
-    Ok(RecordBatchInspection::Complete(RecordBatchApplyPlan {
-        control,
-        decision,
-    }))
+    RecordBatchInspection::Complete(RecordBatchApplyPlan { control, decision })
 }
 
 /// Consumes fresh inputs with complete current indexed authority, without gating again.

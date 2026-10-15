@@ -58,6 +58,22 @@ pub struct GateView<'a> {
     pub outcomes: &'a BTreeMap<RequestId, RetainedOutcome>,
 }
 
+/// Exact requested outcome and scoped cohort observation from one revision.
+///
+/// The retained owner has an independent lifetime from the expected query scope.
+/// These mathematical inputs do not prove their storage origin or authority.
+#[derive(Clone, Copy, Debug)]
+pub struct PointGateView<'scope, 'retained> {
+    /// Current server-bound tenant/group/recovery namespace.
+    pub scope: &'scope RequestScope,
+    /// Persisted group/recovery time, identity and checkpoint.
+    pub control: ControlState,
+    /// Whether any retained key exists in this exact tenant/group/recovery scope.
+    pub retained_nonempty: bool,
+    /// Exact requested original outcome, or its authoritative absence.
+    pub outcome: Option<&'retained RetainedOutcome>,
+}
+
 /// Replay inspection result; fresh operation dispatch has not executed yet.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GateDecision<'a> {
@@ -105,10 +121,47 @@ pub fn inspect_request<'view>(
     header: CommittedHeader<'_>,
     limits: AdmissionLimits,
 ) -> Result<RequestGate<'view>, ApplyError> {
-    inspect_request_impl(view, header, limits, None).map_err(|error| match error {
-        ChargedRequestGateError::Apply(error) => error,
-        ChargedRequestGateError::Schema(_) => ApplyError::InvalidAuthority,
-    })
+    inspect_request_impl(view, header, limits, None).map_err(apply_error)
+}
+
+/// Inspects one requested outcome and its exact scoped cohort before fresh guards.
+///
+/// The caller supplies coherent same-revision observations. A missing requested
+/// outcome does not establish an empty cohort. Exact log replay skips retained
+/// metadata only after header and cohort integrity have passed.
+///
+/// # Errors
+/// Rejects foreign/corrupt authority, incoherent cohort or conflicting log identity.
+pub fn inspect_point_request<'retained>(
+    view: PointGateView<'_, 'retained>,
+    header: CommittedHeader<'_>,
+    limits: AdmissionLimits,
+) -> Result<RequestGate<'retained>, ApplyError> {
+    let mut charge = None;
+    validate_header(view.scope, header, limits, &mut charge).map_err(apply_error)?;
+    if (view.outcome.is_some() && !view.retained_nonempty)
+        || (view.control.last_entry().is_none() && view.retained_nonempty)
+    {
+        return Err(ApplyError::InvalidAuthority);
+    }
+    let control = prepare_control(view.control, header, &mut charge).map_err(apply_error)?;
+    let decision = if control.is_log_replay() {
+        GateDecision::LogReplay
+    } else if let Some(retained) = view.outcome {
+        classify_retained(
+            view.scope,
+            view.control,
+            header,
+            control,
+            retained,
+            limits,
+            &mut charge,
+        )
+        .map_err(apply_error)?
+    } else {
+        GateDecision::Fresh
+    };
+    Ok(RequestGate { control, decision })
 }
 
 /// Operational charged inspection refusal; it grants no execution authority.
@@ -158,35 +211,11 @@ fn inspect_request_impl<'view>(
     limits: AdmissionLimits,
     mut charge: Option<&mut PolicySchemaCharge>,
 ) -> Result<RequestGate<'view>, ChargedRequestGateError> {
-    charge_gate(&mut charge, 128)?;
-    if header.format_version != 1 {
+    validate_header(view.scope, header, limits, &mut charge)?;
+    if view.control.last_entry().is_none() && !view.outcomes.is_empty() {
         return Err(ChargedRequestGateError::Apply(ApplyError::InvalidAuthority));
     }
-    charge_gate_operands(
-        &mut charge,
-        &[
-            view.scope.tenant().as_bytes().len(),
-            view.scope.group().as_bytes().len(),
-            view.scope.recovery().as_bytes().len(),
-            header.scope.tenant().as_bytes().len(),
-            header.scope.group().as_bytes().len(),
-            header.scope.recovery().as_bytes().len(),
-        ],
-    )?;
-    if view.scope != header.scope
-        || header.encoded_entry.len() > limits.decision_bytes()
-        || header.encoded_isolation_scope.len() > MAX_ENCODED_ISOLATION_SCOPE_BYTES
-        || (view.control.last_entry().is_none() && !view.outcomes.is_empty())
-    {
-        return Err(ChargedRequestGateError::Apply(ApplyError::InvalidAuthority));
-    }
-    charge_gate(&mut charge, 128)?;
-    let control = plan_control(
-        view.control,
-        header.identity,
-        EntryStamp::Stamped(header.stamp),
-    )
-    .map_err(ChargedRequestGateError::Apply)?;
+    let control = prepare_control(view.control, header, &mut charge)?;
     if control.is_log_replay() {
         return Ok(RequestGate {
             control,
@@ -195,15 +224,64 @@ fn inspect_request_impl<'view>(
     }
     charge_gate_operands(&mut charge, &[header.request.as_bytes().len()])?;
     let decision = if let Some(retained) = view.outcomes.get(header.request) {
-        classify_retained(view, header, control, retained, limits, &mut charge)?
+        classify_retained(
+            view.scope,
+            view.control,
+            header,
+            control,
+            retained,
+            limits,
+            &mut charge,
+        )?
     } else {
         GateDecision::Fresh
     };
     Ok(RequestGate { control, decision })
 }
 
+fn validate_header(
+    scope: &RequestScope,
+    header: CommittedHeader<'_>,
+    limits: AdmissionLimits,
+    charge: &mut Option<&mut PolicySchemaCharge>,
+) -> Result<(), ChargedRequestGateError> {
+    charge_gate(charge, 128)?;
+    if header.format_version != 1 {
+        return Err(ChargedRequestGateError::Apply(ApplyError::InvalidAuthority));
+    }
+    charge_gate_operands(
+        charge,
+        &[
+            scope.tenant().as_bytes().len(),
+            scope.group().as_bytes().len(),
+            scope.recovery().as_bytes().len(),
+            header.scope.tenant().as_bytes().len(),
+            header.scope.group().as_bytes().len(),
+            header.scope.recovery().as_bytes().len(),
+        ],
+    )?;
+    if scope != header.scope
+        || header.encoded_entry.len() > limits.decision_bytes()
+        || header.encoded_isolation_scope.len() > MAX_ENCODED_ISOLATION_SCOPE_BYTES
+    {
+        return Err(ChargedRequestGateError::Apply(ApplyError::InvalidAuthority));
+    }
+    Ok(())
+}
+
+fn prepare_control(
+    current: ControlState,
+    header: CommittedHeader<'_>,
+    charge: &mut Option<&mut PolicySchemaCharge>,
+) -> Result<ControlPlan, ChargedRequestGateError> {
+    charge_gate(charge, 128)?;
+    plan_control(current, header.identity, EntryStamp::Stamped(header.stamp))
+        .map_err(ChargedRequestGateError::Apply)
+}
+
 fn classify_retained<'view>(
-    view: GateView<'view>,
+    scope: &RequestScope,
+    previous: ControlState,
     header: CommittedHeader<'_>,
     control: ControlPlan,
     retained: &'view RetainedOutcome,
@@ -216,12 +294,12 @@ fn classify_retained<'view>(
             retained.scope.tenant().as_bytes().len(),
             retained.scope.group().as_bytes().len(),
             retained.scope.recovery().as_bytes().len(),
-            view.scope.tenant().as_bytes().len(),
-            view.scope.group().as_bytes().len(),
-            view.scope.recovery().as_bytes().len(),
+            scope.tenant().as_bytes().len(),
+            scope.group().as_bytes().len(),
+            scope.recovery().as_bytes().len(),
         ],
     )?;
-    if &retained.scope != view.scope {
+    if &retained.scope != scope {
         return Err(ChargedRequestGateError::Apply(ApplyError::InvalidAuthority));
     }
     charge_gate_operands(
@@ -235,8 +313,8 @@ fn classify_retained<'view>(
         return Err(ChargedRequestGateError::Apply(ApplyError::InvalidAuthority));
     }
     charge_gate(charge, 128)?;
-    if retained.original_position.index() > view.control.position()
-        || retained.original_time > view.control.time().hlc().physical()
+    if retained.original_position.index() > previous.position()
+        || retained.original_time > previous.time().hlc().physical()
         || retained.response.len() > limits.decision_bytes()
     {
         return Err(ChargedRequestGateError::Apply(ApplyError::InvalidAuthority));
@@ -251,6 +329,13 @@ fn classify_retained<'view>(
     } else {
         GateDecision::Replay(retained)
     })
+}
+
+fn apply_error(error: ChargedRequestGateError) -> ApplyError {
+    match error {
+        ChargedRequestGateError::Apply(error) => error,
+        ChargedRequestGateError::Schema(_) => ApplyError::InvalidAuthority,
+    }
 }
 
 fn charge_gate(

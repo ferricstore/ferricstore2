@@ -178,3 +178,10 @@ filesystem/alias/async/global/unsafe/macro refusals need no new exception.
 Behavioral tests separately cover complete point binding, distinct ownership
 caps and query/donor lifetimes. Source review verifies pre-copy admission and
 shared parsing; the purity matrix alone does not establish those properties.
+
+ARCH-M2-POINT-RETAINED-GATE1-CREATE1 uses existing pure domain/phase/key paths,
+without a new policy exemption. Existing client-facade and wire/domain-value
+fixtures now reject the point view/inspection exports at their actual paths.
+The transaction remains an effect boundary. Compiler-backed behavior tests
+separately exercise independent query/outcome lifetimes; direct source checks
+do not establish same-revision physical observations or backend durability.

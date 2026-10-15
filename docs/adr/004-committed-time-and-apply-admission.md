@@ -351,3 +351,25 @@ canonical event ID/version and existing retry-policy validation precede copies.
 The record codec remains the single event-tag authority. These formats supply no
 legacy disk compatibility, public history query, source scenario completion,
 physical atomicity or Linux/macOS crash evidence.
+
+## Point-retained input before current workflow loading
+
+ARCH-M2-POINT-RETAINED-GATE1-CREATE1 adds a point/cohort view with independent
+query and original-outcome lifetimes. The cohort is exactly tenant+group+recovery;
+control remains global to group+recovery. A requested miss does not prove the
+cohort empty. Some outcome with an empty observation, or any nonempty cohort
+with unapplied control, refuses before control planning and exact log replay.
+Otherwise exact log replay precedes retained metadata checks; normal requests
+share the original scope/request/position/time/response/intent/expiry classifier.
+The complete-map and charged APIs retain their lazy check/debit/lookup order.
+
+The required transaction observation retained_nonempty has no default false.
+Opening/seeking and observing its first candidate/end each require a prospective
+cumulative step. A refused second step leaves the first spent and returns Limit,
+never absence. No value owner or512-byte owner charge is needed for existence;
+encoded bounds and engine bound copies require separate adapter admission.
+The view's boolean is observed mathematical data, not transaction provenance.
+The unchanged decoded/Fresh/late bounds cover their existing owners only. A
+future joined driver must also account for loaded owners and use stable expected
+namespace storage independent of the DecodedRequest it consumes. Real storage,
+uncertain commit recovery, native performance and Linux acceptance remain open.

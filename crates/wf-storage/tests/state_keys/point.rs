@@ -1,6 +1,8 @@
 use super::{TestResult, hex, scope, standard_scope};
 use std::collections::BTreeSet;
-use wf_storage::state::key::{encode_control_key, encode_outcome_key, encode_record_key};
+use wf_storage::state::key::{
+    encode_control_key, encode_outcome_key, encode_outcome_prefix, encode_record_key,
+};
 use wf_storage::state::value::StateValueError;
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId};
 
@@ -150,5 +152,59 @@ fn point_key_collisions_and_byte_limits_fail_closed() -> TestResult {
     let group = GroupId::new(b"g".to_vec())?;
     let recovery = RecoveryId::new(b"z".to_vec())?;
     assert_eq!(encode_control_key(&group, &recovery, 13)?, hex(CONTROL)?);
+    Ok(())
+}
+
+#[test]
+fn outcome_prefix_binds_exact_tenant_cohort() -> TestResult {
+    let original = standard_scope()?;
+    let prefix = encode_outcome_prefix(&original, 16)?;
+    assert_eq!(prefix, hex("4657504b0001026700007a0000740000")?);
+    assert_eq!(
+        encode_outcome_prefix(&original, 0),
+        Err(StateValueError::InvalidValue)
+    );
+    assert_eq!(
+        encode_outcome_prefix(&original, 15),
+        Err(StateValueError::Limit {
+            bytes: 16,
+            maximum: 15
+        })
+    );
+    let binary = scope(b"g\0", b"z\xff", b"t\0")?;
+    assert_eq!(
+        encode_outcome_prefix(&binary, 21)?,
+        hex("4657504b0001026700ff00007aff00007400ff0000")?
+    );
+    for request in [b"a".as_slice(), b"a\0", b"a\xff", b"\0"] {
+        let request = RequestId::new(request.to_vec())?;
+        assert!(encode_outcome_key(&original, &request, 100)?.starts_with(&prefix));
+    }
+    let request = RequestId::new(b"q".to_vec())?;
+    for foreign in [
+        scope(b"gg", b"z", b"t")?,
+        scope(b"g", b"zz", b"t")?,
+        scope(b"g", b"z", b"tt")?,
+        scope(b"g", b"z", b"t\0")?,
+    ] {
+        assert!(!encode_outcome_key(&foreign, &request, 100)?.starts_with(&prefix));
+    }
+    let maximum = scope(&[0; 256], &[0; 256], &[0; 8_192])?;
+    let mut expected = vec![0x46, 0x57, 0x50, 0x4b, 0, 1, 2];
+    for count in [256, 256, 8_192] {
+        for _ in 0..count {
+            expected.extend_from_slice(&[0, 255]);
+        }
+        expected.extend_from_slice(&[0, 0]);
+    }
+    assert_eq!(expected.len(), 17_421);
+    assert_eq!(encode_outcome_prefix(&maximum, 17_421)?, expected);
+    assert_eq!(
+        encode_outcome_prefix(&maximum, 17_420),
+        Err(StateValueError::Limit {
+            bytes: 17_421,
+            maximum: 17_420
+        })
+    );
     Ok(())
 }

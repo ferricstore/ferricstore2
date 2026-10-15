@@ -922,3 +922,22 @@ positions require separate admission later. Canonical prefixes grant no lane
 completeness proof. See [ADR004](adr/004-committed-time-and-apply-admission.md#physical-keys-and-full-history-values).
 The engine, atomic publication/recovery, public query composition, complete source
 and profile coverage, and native Linux/macOS acceptance remain separate work.
+
+## Bounded retained point and cohort input
+
+The point gate consumes ordinary same-revision scope/control, requested outcome
+and exact tenant/group/recovery nonempty observations. Its query scope and
+original outcome have independent lifetimes. The complete-map and charged APIs
+share header/control/classification stages while preserving their existing lazy
+order. The ports phase shares the same decoded checks and Complete/Fresh owners;
+it constructs no temporary map or current workflow view. Missing requested data
+never supplies an empty-cohort observation.
+
+GroupApplyTransaction requires retained_nonempty for the authentic scoped
+prefix, counting open and first candidate/end before progress. Refusal cannot
+become absence. Storage's pure encode_outcome_prefix supplies the existing key
+family and escaping with one bounded reserve. Contract-double observations do
+not provide physical storage evidence. The real driver must retain stable
+expected namespace owners, account for all loaded owners and bound copies, and
+supply actual touched indexes and installed policies under one guard before
+atomic publication. Independent Linux and macOS runtime proof remains required.

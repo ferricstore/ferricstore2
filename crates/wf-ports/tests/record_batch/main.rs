@@ -30,6 +30,7 @@ use wf_types::version::{
 };
 
 mod phases;
+mod point;
 mod replay;
 mod source;
 

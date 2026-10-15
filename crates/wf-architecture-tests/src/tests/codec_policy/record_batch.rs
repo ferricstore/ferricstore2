@@ -32,6 +32,7 @@ fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
         "decide_record_batch",
         "prepare_record_batch",
         "inspect_record_batch",
+        "inspect_record_batch_point",
         "decide_fresh_record_batch",
         "record_batch_retained_status",
     ] {

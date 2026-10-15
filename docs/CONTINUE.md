@@ -5,7 +5,27 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The current M2 increment separates bounded raw batch preparation, one retained
+The current M2 increment adds a bounded retained point/cohort gate. A missing
+requested outcome cannot hide other outcomes in its tenant/group/recovery scope.
+The same classifier preserves full-map and charged API order; independent query
+and outcome lifetimes let replay borrow its original owner. The ports phase
+shares existing decoded checks and Complete/Fresh handling without a temporary
+map. A required transaction prefix probe and bounded physical outcome-prefix
+encoder support the future adapter; no engine is implemented by this contract.
+
+The final macOS wrapper passes 653 Rust tests across 73 targets plus six
+compile-fail docs, with zero warnings/failures/ignored tests. Formatting,
+compilation, strict Clippy, rustdoc, architecture and reference/progress checks
+pass on 1,157 unchanged non-review inputs. One pointer-style lint was repaired
+without changing its compared addresses; all six new behavior tests passed on
+their first assertion run. The wrapper exits 1 solely because DNS blocks the
+default advisory refresh; a separate cached October 14 audit passes all four
+categories. Ledger counts remain 77/87/326 with no new Elixir parity credit.
+Next: explicit bounded touched-record/index and current policy observations,
+then the real atomic storage adapter. Dependency adoption, original runtime/setup
+profiles, native Linux and full M1–M8 completion remain open.
+
+The preceding M2 increment separates bounded raw batch preparation, one retained
 inspection and Fresh-only indexed decision. Preparation admits decoded owners
 before allocation and captures the actual profile and derived intent result.
 Complete drops decoded scratch and borrows the original retained result;
@@ -20,8 +40,9 @@ pass on 1,156 unchanged non-review inputs. One initial test-only Clippy finding
 was repaired without changing operands. The wrapper exits 1 solely because
 DNS blocks the default advisory refresh; a separate cached October 14 audit
 passes all four categories. Ledger counts remain 77/87/326 with no additional
-Elixir parity credit. Next: honest point-retained/cohort and touched-authority
-inputs, then the real atomic storage adapter. Dependency adoption, original
+Elixir parity credit. Its point-retained successor is described above;
+touched-authority inputs and the real atomic storage adapter still follow.
+Dependency adoption, original
 runtime/setup profiles, native Linux and full M1–M8 completion remain open.
 
 The preceding M2 increment implements borrowed record/outcome scans with complete

@@ -11,7 +11,7 @@ use wf_domain::workflow::control::{
     ControlState, EntryIdentity, EntryStamp, PreparedDigest, plan_control,
 };
 use wf_domain::workflow::request::gate::{
-    CommittedHeader, GateDecision, GateView, inspect_request,
+    CommittedHeader, GateDecision, GateView, PointGateView, inspect_point_request, inspect_request,
 };
 use wf_domain::workflow::request::{
     ClientIntent, PolicyRejection, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
@@ -169,4 +169,218 @@ fn initialized(time: CommittedTime) -> Result<ControlState, Box<dyn std::error::
         EntryStamp::Unstamped,
     )?
     .next())
+}
+
+fn point_outcome(
+    scope: RequestScope,
+    request: RequestId,
+    index: u64,
+    original_time: u64,
+) -> Result<RetainedOutcome, TestError> {
+    Ok(RetainedOutcome::new(
+        RetainedMetadata {
+            scope,
+            request,
+            intent: ClientIntent::new(1, [1; 32])?,
+            original_position: identity(index).log(),
+            original_time: TimestampMillis::new(original_time),
+            expires_at: TimestampMillis::new(100),
+            status: RetainedStatus::Accepted,
+        },
+        1,
+        vec![0],
+        AdmissionLimits::default(),
+    )?)
+}
+
+fn point_header<'a>(
+    scope: &'a RequestScope,
+    request: &'a RequestId,
+    index: u64,
+    now: u64,
+) -> Result<CommittedHeader<'a>, TestError> {
+    Ok(CommittedHeader {
+        format_version: 1,
+        scope,
+        request,
+        intent: ClientIntent::new(1, [1; 32])?,
+        identity: identity(index),
+        stamp: time(now, now)?,
+        encoded_entry: b"entry",
+        encoded_isolation_scope: b"scope",
+    })
+}
+
+#[test]
+fn point_gate_matches_complete_view_classifications() -> TestResult {
+    let original_scope = scope(b"tenant")?;
+    let request = RequestId::new(b"request".to_vec())?;
+    let original = point_outcome(original_scope.clone(), request.clone(), 1, 10)?;
+    let control = plan_control(
+        initialized(time(0, 0)?)?,
+        identity(1),
+        EntryStamp::Stamped(time(10, 10)?),
+    )?
+    .next();
+    for class in 0..6 {
+        let query = original_scope.clone();
+        let mut header = point_header(
+            &original_scope,
+            &request,
+            if class == 4 { 1 } else { 2 },
+            match class {
+                3 => 100,
+                4 => 10,
+                _ => 20,
+            },
+        )?;
+        if class == 2 {
+            header.intent = ClientIntent::new(1, [2; 32])?;
+        }
+        let retained = (class != 0 && class != 5).then_some(&original);
+        let outcomes = if class == 0 {
+            BTreeMap::new()
+        } else if class == 5 {
+            let other = RequestId::new(b"other".to_vec())?;
+            BTreeMap::from([(other.clone(), point_outcome(query.clone(), other, 1, 10)?)])
+        } else {
+            BTreeMap::from([(request.clone(), original.clone())])
+        };
+        let point = inspect_point_request(
+            PointGateView {
+                scope: &query,
+                control,
+                retained_nonempty: class != 0,
+                outcome: retained,
+            },
+            header,
+            AdmissionLimits::default(),
+        )?;
+        let complete = inspect_request(
+            GateView {
+                scope: &original_scope,
+                control,
+                outcomes: &outcomes,
+            },
+            header,
+            AdmissionLimits::default(),
+        )?;
+        drop(query);
+        assert_eq!(point.control(), complete.control());
+        assert_eq!(point.decision(), complete.decision());
+        match class {
+            0 | 5 => assert_eq!(point.decision(), GateDecision::Fresh),
+            1 => {
+                let GateDecision::Replay(replayed) = point.decision() else {
+                    return Err("expected original replay".into());
+                };
+                assert_eq!(std::ptr::from_ref(replayed), std::ptr::from_ref(&original));
+                assert_eq!(replayed.response(), [0]);
+                assert_eq!(replayed.original_position(), identity(1).log());
+                assert_eq!(replayed.original_time().get(), 10);
+                assert_eq!(replayed.expires_at().get(), 100);
+            }
+            2 => assert_eq!(point.decision(), GateDecision::IntentConflict),
+            3 => assert_eq!(point.decision(), GateDecision::Expired),
+            4 => assert_eq!(point.decision(), GateDecision::LogReplay),
+            _ => return Err("unexpected class".into()),
+        }
+        assert_eq!(
+            point.control().next().position().get(),
+            if class == 4 { 1 } else { 2 }
+        );
+        assert_eq!(point.control().is_log_replay(), class == 4);
+    }
+    Ok(())
+}
+
+#[test]
+fn point_gate_rejects_incoherent_cohort_and_foreign_retained() -> TestResult {
+    let query = scope(b"tenant")?;
+    let request = RequestId::new(b"request".to_vec())?;
+    let original = point_outcome(query.clone(), request.clone(), 1, 10)?;
+    let control = plan_control(
+        initialized(time(0, 0)?)?,
+        identity(1),
+        EntryStamp::Stamped(time(10, 10)?),
+    )?
+    .next();
+    let header = point_header(&query, &request, 2, 20)?;
+    let view = PointGateView {
+        scope: &query,
+        control,
+        retained_nonempty: true,
+        outcome: None,
+    };
+    let invalid = Err(ApplyError::InvalidAuthority);
+    assert_eq!(
+        inspect_point_request(
+            PointGateView {
+                control: ControlState::initial(time(0, 0)?),
+                ..view
+            },
+            header,
+            AdmissionLimits::default(),
+        ),
+        invalid
+    );
+    for (index, now) in [(0, 20), (1, 10)] {
+        assert_eq!(
+            inspect_point_request(
+                PointGateView {
+                    retained_nonempty: false,
+                    outcome: Some(&original),
+                    ..view
+                },
+                point_header(&query, &request, index, now)?,
+                AdmissionLimits::default(),
+            ),
+            invalid
+        );
+    }
+    let fresh = inspect_point_request(
+        PointGateView {
+            control: ControlState::initial(time(0, 0)?),
+            retained_nonempty: false,
+            ..view
+        },
+        point_header(&query, &request, 0, 1)?,
+        AdmissionLimits::default(),
+    )?;
+    assert_eq!(fresh.decision(), GateDecision::Fresh);
+    for bad in [
+        point_outcome(scope(b"foreign")?, request.clone(), 1, 10)?,
+        point_outcome(query.clone(), RequestId::new(b"other".to_vec())?, 1, 10)?,
+        point_outcome(query.clone(), request.clone(), 2, 10)?,
+        point_outcome(query.clone(), request.clone(), 1, 11)?,
+    ] {
+        let bad_view = PointGateView {
+            outcome: Some(&bad),
+            ..view
+        };
+        assert_eq!(
+            inspect_point_request(bad_view, header, AdmissionLimits::default()),
+            invalid
+        );
+        let replay = inspect_point_request(
+            bad_view,
+            point_header(&query, &request, 1, 10)?,
+            AdmissionLimits::default(),
+        )?;
+        assert_eq!(replay.decision(), GateDecision::LogReplay);
+        assert_eq!(replay.control().next(), control);
+    }
+    let foreign = scope(b"foreign")?;
+    assert_eq!(
+        inspect_point_request(
+            view,
+            CommittedHeader {
+                scope: &foreign,
+                ..point_header(&query, &request, 0, 20)?
+            },
+            AdmissionLimits::default(),
+        ),
+        invalid
+    );
+    Ok(())
 }

@@ -1285,3 +1285,23 @@ do not sum previously held returned owners or establish native latency/RSS.
 Five new tests pass after real missing-API RED; actual source reviews preserve
 the unchanged reducer, encoder and wire grammar. Physical loading, atomic
 publication, point-cohort proof and independent Linux execution remain open.
+
+## Point-only retained inspection
+
+ARCH-M2-POINT-RETAINED-GATE1-CREATE1 adds inspect_record_batch_point using the
+same decoded profile/D/actual intent checks and the same Complete/Fresh mapping.
+It invokes one shared point gate without building an outcome map or loading
+current records. PointGateView separates the expected-query and retained owner
+lifetimes. Its requested outcome and exact tenant/group/recovery nonempty
+observation must come from the same transaction revision; neither field certifies
+that provenance. Some outcome implies nonempty; nonempty with unapplied control
+refuses before exact log replay. Existing full-map/charged callers retain their
+check/debit/lookup order and normal retained classification algorithm.
+
+The physical existence bound is the existing FWPK1 family2 prefix over group,
+recovery and tenant, without a request component. It reuses existing escaping,
+checked measurement and one admitted output reserve; min16/binary21/all-NUL
+maximum17421 remain separate from the prepared isolation cap. Transaction
+retained_nonempty is required and accounts for open plus first candidate/end,
+with no copied outcome. These inputs enable point-retained inspection;
+coherent touched-index/policy loading and the real atomic adapter still follow.

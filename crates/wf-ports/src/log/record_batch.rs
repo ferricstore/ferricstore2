@@ -28,6 +28,7 @@ mod response;
 
 pub use phase::{
     FreshRecordBatch, RecordBatchInspection, decide_fresh_record_batch, inspect_record_batch,
+    inspect_record_batch_point,
 };
 pub use response::record_batch_retained_status;
 

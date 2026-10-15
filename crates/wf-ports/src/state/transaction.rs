@@ -120,6 +120,18 @@ pub trait GroupApplyTransaction: Sized {
         tenant: &TenantId,
         request: &RequestId,
     ) -> Result<Option<RetainedOutcome>, StateTransactionError>;
+    /// Observes any retained key in this tenant and transaction group/recovery.
+    ///
+    /// Under this same exclusive revision, charge one cumulative step BEFORE
+    /// opening/seeking its exact physical prefix and another BEFORE observing
+    /// the first candidate or actual end. Both true and false need both steps;
+    /// refusal retains earlier debits and never establishes absence. A first
+    /// key outside the prefix proves emptiness without reading/copying a value.
+    /// No outcome owner or 512-byte charge is needed for this observation; owned
+    /// seek bounds and backend copies require separate adapter admission.
+    /// # Errors
+    /// Operational backend, corruption or cumulative admission failure.
+    fn retained_nonempty(&self, tenant: &TenantId) -> Result<bool, StateTransactionError>;
     /// Reads one exact authoritative core record, never a whole-group snapshot.
     /// # Errors
     /// Operational backend, corruption or cumulative admission failure.

@@ -18,6 +18,7 @@ struct RecordingGroupStore<'input> {
     scope: &'input RequestScope,
     control: ControlState,
     records: &'input [StoredWorkflowRecord],
+    outcomes: &'input [RetainedOutcome],
     rows: &'input [DueOrder<'input>],
     calls: RefCell<Vec<&'static str>>,
     committed: Cell<bool>,
@@ -128,11 +129,40 @@ impl<'store, 'input> GroupApplyTransaction for RecordingGroupTransaction<'store,
 
     fn outcome(
         &self,
-        _tenant: &TenantId,
-        _request: &RequestId,
+        tenant: &TenantId,
+        request: &RequestId,
     ) -> Result<Option<RetainedOutcome>, StateTransactionError> {
         self.step("outcome-miss")?;
-        Ok(None)
+        self.store
+            .outcomes
+            .iter()
+            .find(|outcome| {
+                outcome.scope().tenant() == tenant
+                    && outcome.scope().group() == self.group
+                    && outcome.scope().recovery() == self.recovery
+                    && outcome.request() == request
+            })
+            .map(|outcome| {
+                self.admit(
+                    512 + outcome.scope().tenant().as_bytes().len()
+                        + outcome.scope().group().as_bytes().len()
+                        + outcome.scope().recovery().as_bytes().len()
+                        + outcome.request().as_bytes().len()
+                        + outcome.response().len(),
+                )?;
+                Ok(outcome.clone())
+            })
+            .transpose()
+    }
+
+    fn retained_nonempty(&self, tenant: &TenantId) -> Result<bool, StateTransactionError> {
+        self.step("retained-open")?;
+        self.step("retained-first")?;
+        Ok(self.store.outcomes.iter().any(|outcome| {
+            outcome.scope().tenant() == tenant
+                && outcome.scope().group() == self.group
+                && outcome.scope().recovery() == self.recovery
+        }))
     }
 
     fn record(
@@ -354,6 +384,7 @@ pub(super) fn commit_after_observations(changes: &GroupApplyChanges<'_, '_>) -> 
         scope: changes.scope(),
         control: changes.expected(),
         records: &owners,
+        outcomes: &[],
         rows: &rows,
         calls: RefCell::new(Vec::new()),
         committed: Cell::new(false),
@@ -375,6 +406,7 @@ pub(super) fn commit_after_observations(changes: &GroupApplyChanges<'_, '_>) -> 
         *store.calls.borrow(),
         ["begin", "open", "next", "control", "commit"]
     );
+    assert_retained_probe(changes)?;
     Ok(())
 }
 
@@ -394,6 +426,7 @@ fn same_transaction_binds_points_heads_and_range_budget() -> TestResult {
         scope: &scope,
         control: ControlState::initial(clock(0)?),
         records: &owners,
+        outcomes: &[],
         rows: &rows,
         calls: RefCell::new(Vec::new()),
         committed: Cell::new(false),
@@ -470,6 +503,11 @@ fn assert_filtered_continuation(
     rows: &[DueOrder<'_>],
 ) -> TestResult {
     {
+        let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 1)?;
+        assert!(!tx.retained_nonempty(scope.tenant())?);
+        assert_eq!((tx.steps.get(), tx.bytes.get()), (2, 0));
+    }
+    {
         let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 10_000)?;
         let mut cursor = tx.due_cursor(scope.tenant(), query(), None, 5, 1_000)?;
         assert!(matches!(cursor.next()?, DueCursorStep::BudgetEnd));
@@ -488,5 +526,43 @@ fn assert_filtered_continuation(
     assert_eq!(cursor.position(), Some(rows[0]));
     assert_eq!(tx.bytes.get(), 135);
     assert_eq!(tx.steps.get(), 3);
+    Ok(())
+}
+
+fn assert_retained_probe(changes: &GroupApplyChanges<'_, '_>) -> TestResult {
+    let outcome = changes.outcome().ok_or("fresh outcome absent")?;
+    let mut store = RecordingGroupStore {
+        scope: changes.scope(),
+        control: changes.plan().control().next(),
+        records: &[],
+        outcomes: std::slice::from_ref(outcome),
+        rows: &[],
+        calls: RefCell::new(Vec::new()),
+        committed: Cell::new(false),
+    };
+    {
+        let tx = store.begin_apply(changes.scope().group(), changes.scope().recovery(), 1, 1)?;
+        assert_eq!(
+            tx.retained_nonempty(changes.scope().tenant()),
+            Err(StateTransactionError::Limit)
+        );
+        assert_eq!((tx.steps.get(), tx.bytes.get()), (1, 0));
+        assert_eq!(&*tx.store.calls.borrow(), &["begin", "retained-open"]);
+    }
+    {
+        let tx = store.begin_apply(
+            changes.scope().group(),
+            changes.scope().recovery(),
+            4,
+            1_035,
+        )?;
+        assert_eq!(tx.control()?, changes.plan().control().next());
+        assert!(tx.retained_nonempty(changes.scope().tenant())?);
+        assert_eq!(
+            tx.outcome(changes.scope().tenant(), outcome.request())?,
+            Some(outcome.clone())
+        );
+        assert_eq!((tx.steps.get(), tx.bytes.get()), (4, 1_035));
+    }
     Ok(())
 }

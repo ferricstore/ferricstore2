@@ -61,3 +61,23 @@ pub fn encode_outcome_key(
         maximum_bytes,
     )
 }
+
+/// Encodes the exact retained cohort prefix for tenant, group and recovery.
+///
+/// The request component is absent; complete outcome keys extend this prefix.
+/// # Errors
+/// Rejects a zero cap, checked size overflow, excess bytes or allocation failure.
+pub fn encode_outcome_prefix(
+    scope: &RequestScope,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    encode_components(
+        2,
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+        ],
+        maximum_bytes,
+    )
+}
