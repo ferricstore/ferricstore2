@@ -19681,6 +19681,31 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "Postimplementation lower-parent coverage preserves generation-always-on-1, max_active_ms1000 then2000, no expected-generation guard and the ACTUAL first original ETF output as next current. Direct generation/full-value macros represent only the returned generation/value components of source18/21. The positive generated type suffix is fixed to1; explicit private request IDs/stamps supply additional Rust metadata. Public flow_policy_set preprocessing and reply maps, source24 public get, all-shard helper calls19/22, original async:false/global_state setup/flush and required runtime profiles remain unexecuted. Each result is a proposed owned installation, not a physical write/read, transaction or durable outcome. These direct tests were added after e4859af and pass existing behavior without new or retroactive tests-first RED. Independent Linux acceptance and full source-case/workflow parity remain required; logical work/ownership implies no measured native gain."
           ]
+        },
+        {
+          "scenario_id": "m1-d4199dfa1b750255-original_policy_get_preserves_pinned_allocator_and_type_binding",
+          "rust_file": "crates/wf-ports/tests/original_policy_get.rs",
+          "rust_file_sha256": "5c8c209073eb95ef21db966d8803bb5349cf5b9b6cddc6f1de674f7844f87c7c",
+          "rust_module": "",
+          "rust_function": "original_policy_get_preserves_pinned_allocator_and_type_binding",
+          "assertions": [
+            {
+              "source_line": 24,
+              "source_text": "assert {:ok, %{generation: 2, max_active_ms: 2_000}} =",
+              "rust_line": 106,
+              "rust_text": "assert_eq!(reply.generation(), u64::from(generation));"
+            },
+            {
+              "source_line": 24,
+              "source_text": "assert {:ok, %{generation: 2, max_active_ms: 2_000}} =",
+              "rust_line": 111,
+              "rust_text": "assert_eq!(maximum.integer(), Some(i128::from(active)));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure original GET composition validates raw opts=[], invokes the recording policy reader once with allocator zero and the exact derived key, then uses the existing borrowed projector. Hand-encoded stored-value recipes retain generation-always-on-1 and generation-cas-1 with generation2/max_active2000, generation-canonical-get-1-0 with generation1/max_active1000, and foreign-policy-type with generation1/max_active9000 under generation-mismatched-read-1. Each record links only its declaration's direct generation/max-active components at source24/46/82 or exact Corrupt/body components at source101. The canonical type is a possible source template spelling; native routed-away hashing is unproved. The original SET/CAS sequences, normalization/encoder, stale replica deletion, all-shard setup, physical writes/reads, cache suppression, consistency barriers, authorization and original async:false/global_state/flush/runtime profiles remain required. Recording-call macros and selected charge_card helper assertions add no ledger credit. Seven new behavior tests pass on macOS after genuine independently reproduced missing-API RED; pre-SUT fixture refinements and later source/lint repairs retain their actual timing. Stage-specific work/key reservations do not prove summed external owners, measured native resources, full source-case/workflow parity or independent Linux acceptance. Every older counterpart and runtime binding is preserved."
+          ]
         }
       ]
     },
@@ -19738,6 +19763,31 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "Postimplementation lower-parent coverage preserves generation-cas-1, initial max_active_ms1000, CAS1 update2000 using ACTUAL first original ETF as current, then stale CAS1/update3000 using ACTUAL second output. Direct generation/full-value macros represent source31/34 components; exact retained StaleGeneration and caller body represent source40 error components. Fresh(None) and reobserved immutable second output are supplemental and do not prove source46 public get or physical nonoverwrite. Fixed positive suffix1 and explicit private request/stamp fixtures do not implement public preprocessing/replies, all-shard publication, original async:false/global_state flush/setup or required runtime profiles. Proposed installation/outcome owners are not a durable transaction. Tests were added after e4859af with first-PASS existing behavior, not tests-first RED. Independent Linux acceptance and complete source-case/workflow parity remain required; no measured allocation/speed claim follows."
           ]
+        },
+        {
+          "scenario_id": "m1-dea49ead483519f8-original_policy_get_preserves_pinned_allocator_and_type_binding",
+          "rust_file": "crates/wf-ports/tests/original_policy_get.rs",
+          "rust_file_sha256": "5c8c209073eb95ef21db966d8803bb5349cf5b9b6cddc6f1de674f7844f87c7c",
+          "rust_module": "",
+          "rust_function": "original_policy_get_preserves_pinned_allocator_and_type_binding",
+          "assertions": [
+            {
+              "source_line": 46,
+              "source_text": "assert {:ok, %{generation: 2, max_active_ms: 2_000}} =",
+              "rust_line": 106,
+              "rust_text": "assert_eq!(reply.generation(), u64::from(generation));"
+            },
+            {
+              "source_line": 46,
+              "source_text": "assert {:ok, %{generation: 2, max_active_ms: 2_000}} =",
+              "rust_line": 111,
+              "rust_text": "assert_eq!(maximum.integer(), Some(i128::from(active)));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure original GET composition validates raw opts=[], invokes the recording policy reader once with allocator zero and the exact derived key, then uses the existing borrowed projector. Hand-encoded stored-value recipes retain generation-always-on-1 and generation-cas-1 with generation2/max_active2000, generation-canonical-get-1-0 with generation1/max_active1000, and foreign-policy-type with generation1/max_active9000 under generation-mismatched-read-1. Each record links only its declaration's direct generation/max-active components at source24/46/82 or exact Corrupt/body components at source101. The canonical type is a possible source template spelling; native routed-away hashing is unproved. The original SET/CAS sequences, normalization/encoder, stale replica deletion, all-shard setup, physical writes/reads, cache suppression, consistency barriers, authorization and original async:false/global_state/flush/runtime profiles remain required. Recording-call macros and selected charge_card helper assertions add no ledger credit. Seven new behavior tests pass on macOS after genuine independently reproduced missing-API RED; pre-SUT fixture refinements and later source/lint repairs retain their actual timing. Stage-specific work/key reservations do not prove summed external owners, measured native resources, full source-case/workflow parity or independent Linux acceptance. Every older counterpart and runtime binding is preserved."
+          ]
         }
       ]
     },
@@ -19753,14 +19803,66 @@
       "runtime_case_ids": [
         "21fcb8475ba4abc381c955a788a3fae67d1bdf6a1929dada75907604f6516796"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-b48dac33c99e2b07",
+          "rust_file": "crates/wf-ports/tests/original_policy_get.rs",
+          "rust_file_sha256": "5c8c209073eb95ef21db966d8803bb5349cf5b9b6cddc6f1de674f7844f87c7c",
+          "rust_module": "",
+          "rust_function": "original_policy_get_preserves_pinned_allocator_and_type_binding",
+          "assertions": [
+            {
+              "source_line": 82,
+              "source_text": "assert {:ok, %{generation: 1, max_active_ms: 1_000}} =",
+              "rust_line": 106,
+              "rust_text": "assert_eq!(reply.generation(), u64::from(generation));"
+            },
+            {
+              "source_line": 82,
+              "source_text": "assert {:ok, %{generation: 1, max_active_ms: 1_000}} =",
+              "rust_line": 111,
+              "rust_text": "assert_eq!(maximum.integer(), Some(i128::from(active)));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure original GET composition validates raw opts=[], invokes the recording policy reader once with allocator zero and the exact derived key, then uses the existing borrowed projector. Hand-encoded stored-value recipes retain generation-always-on-1 and generation-cas-1 with generation2/max_active2000, generation-canonical-get-1-0 with generation1/max_active1000, and foreign-policy-type with generation1/max_active9000 under generation-mismatched-read-1. Each record links only its declaration's direct generation/max-active components at source24/46/82 or exact Corrupt/body components at source101. The canonical type is a possible source template spelling; native routed-away hashing is unproved. The original SET/CAS sequences, normalization/encoder, stale replica deletion, all-shard setup, physical writes/reads, cache suppression, consistency barriers, authorization and original async:false/global_state/flush/runtime profiles remain required. Recording-call macros and selected charge_card helper assertions add no ledger credit. Seven new behavior tests pass on macOS after genuine independently reproduced missing-API RED; pre-SUT fixture refinements and later source/lint repairs retain their actual timing. Stage-specific work/key reservations do not prove summed external owners, measured native resources, full source-case/workflow parity or independent Linux acceptance. Every older counterpart and runtime binding is preserved."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "3fb6f6aed5d5d455",
       "runtime_case_ids": [
         "dad5350b42d026deb15f6a4dab3f82ad156b288018f94d3da5b200961604136c"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-3fb6f6aed5d5d455",
+          "rust_file": "crates/wf-ports/tests/original_policy_get.rs",
+          "rust_file_sha256": "5c8c209073eb95ef21db966d8803bb5349cf5b9b6cddc6f1de674f7844f87c7c",
+          "rust_module": "",
+          "rust_function": "original_policy_get_preserves_pinned_allocator_and_type_binding",
+          "assertions": [
+            {
+              "source_line": 101,
+              "source_text": "assert {:error, \"ERR flow policy is corrupt\"} = FerricStore.flow_policy_get(type)",
+              "rust_line": 132,
+              "rust_text": "assert_eq!(reason, Rejection::Corrupt);"
+            },
+            {
+              "source_line": 101,
+              "source_text": "assert {:error, \"ERR flow policy is corrupt\"} = FerricStore.flow_policy_get(type)",
+              "rust_line": 133,
+              "rust_text": "assert_eq!(reason.as_bytes(), b\"ERR flow policy is corrupt\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure original GET composition validates raw opts=[], invokes the recording policy reader once with allocator zero and the exact derived key, then uses the existing borrowed projector. Hand-encoded stored-value recipes retain generation-always-on-1 and generation-cas-1 with generation2/max_active2000, generation-canonical-get-1-0 with generation1/max_active1000, and foreign-policy-type with generation1/max_active9000 under generation-mismatched-read-1. Each record links only its declaration's direct generation/max-active components at source24/46/82 or exact Corrupt/body components at source101. The canonical type is a possible source template spelling; native routed-away hashing is unproved. The original SET/CAS sequences, normalization/encoder, stale replica deletion, all-shard setup, physical writes/reads, cache suppression, consistency barriers, authorization and original async:false/global_state/flush/runtime profiles remain required. Recording-call macros and selected charge_card helper assertions add no ledger credit. Seven new behavior tests pass on macOS after genuine independently reproduced missing-API RED; pre-SUT fixture refinements and later source/lint repairs retain their actual timing. Stage-specific work/key reservations do not prove summed external owners, measured native resources, full source-case/workflow parity or independent Linux acceptance. Every older counterpart and runtime binding is preserved."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "358b86de3fd9c9b9",

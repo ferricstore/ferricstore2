@@ -24,6 +24,7 @@ mod original_retry_keys;
 mod outer;
 mod patch;
 mod presentation;
+mod public_get;
 mod public_set;
 mod replace_content;
 mod replace_request;
@@ -95,6 +96,9 @@ pub use outer::{
 pub use patch::{CompleteCorePolicyPatchInput, prepare_complete_core_policy_patch};
 pub use presentation::{
     CompletePolicyPresentation, PresentedPolicyState, PresentedRetry, present_complete_policy,
+};
+pub use public_get::{
+    OriginalPolicyGetRejection, OriginalPolicyGetRequest, prepare_original_policy_get_request,
 };
 pub use public_set::{
     OriginalPolicySetInputRejection, OriginalPolicySetMapOrders, OriginalPolicySetPatchView,

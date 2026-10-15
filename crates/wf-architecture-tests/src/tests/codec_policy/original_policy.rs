@@ -400,6 +400,8 @@ fn original_public_policy_set_preparation_stays_pure_and_server_side() -> CheckR
         "policy::complete::public_set::patch",
         "policy::complete::public_set::patch::rows",
         "policy::complete::public_set::metric",
+        "policy::complete::public_get",
+        "policy::complete::public_get::model",
         "policy::complete::original_reply",
         "policy::complete::original_reply::model",
         "policy::complete::original_reply::value",
@@ -447,8 +449,30 @@ fn original_public_policy_set_preparation_stays_pure_and_server_side() -> CheckR
         "OriginalPolicyReplyError",
         "present_original_policy_set_reply",
         "present_original_policy_get_reply",
+        "OriginalPolicyGetRequest",
+        "OriginalPolicyGetRejection",
+        "prepare_original_policy_get_request",
     ] {
         original_flow_export_is_server_only(name)?;
+    }
+    assert_eq!(
+        source_check(
+            "wf-ports",
+            "state::policy",
+            "use wf_domain::policy::complete;"
+        )?,
+        Vec::<String>::new()
+    );
+    for name in ["OriginalPolicyGetReader", "read_original_policy_get_reply"] {
+        assert!(
+            source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::state::{name};")
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
+        );
     }
     Ok(())
 }

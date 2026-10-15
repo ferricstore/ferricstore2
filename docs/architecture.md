@@ -804,3 +804,20 @@ existing immutable plans; physical publication remains an adapter obligation.
 See [ADR006](adr/006-private-prepared-command-codec.md) for the selected contract
 and remaining opaque ingress identity, custom Enumerable support and runtime
 acceptance requirements.
+
+## Original public policy GET boundary
+
+Pure domain GET preparation preserves complete keyword validation followed by
+type, FIRST state and key-size checks. It owns only the temporary routing key;
+ignored option values receive no patch conversion or hidden-payload authority.
+The original policy reader capability and caller are grouped under
+`wf-ports::state::policy`. One allocator-zero read follows fresh preparation,
+then the key owner drops before the existing borrowed reply projection.
+
+This narrow source compatibility interface exposes no backend or cache handle
+to domain code. Its receiver owns the read-result lifetime; the key has an
+independent short borrow. Physical consistency, asynchronous read barriers,
+authorization and cache tracking remain adapter obligations. Stage-specific
+logical reservations and source-derived tests do not establish native resource
+measurements or complete original runtime parity. See
+[ADR006](adr/006-private-prepared-command-codec.md) for the selected contract.

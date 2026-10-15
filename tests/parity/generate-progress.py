@@ -191,6 +191,18 @@ LINKS = [
     ("4b70723c9149fbe8", "crates/wf-domain/tests/complete_policy/original_reply/source.rs",
      "original_reply_preserves_pinned_type_and_state_retry_retention_maps", 21,
      [(37, 5), (43, 14), (52, 18)]),
+    ("d4199dfa1b750255", "crates/wf-ports/tests/original_policy_get.rs",
+     "original_policy_get_preserves_pinned_allocator_and_type_binding", 6,
+     [(24, 0), (24, 1)]),
+    ("dea49ead483519f8", "crates/wf-ports/tests/original_policy_get.rs",
+     "original_policy_get_preserves_pinned_allocator_and_type_binding", 6,
+     [(46, 0), (46, 1)]),
+    ("b48dac33c99e2b07", "crates/wf-ports/tests/original_policy_get.rs",
+     "original_policy_get_preserves_pinned_allocator_and_type_binding", 6,
+     [(82, 0), (82, 1)]),
+    ("3fb6f6aed5d5d455", "crates/wf-ports/tests/original_policy_get.rs",
+     "original_policy_get_preserves_pinned_allocator_and_type_binding", 6,
+     [(101, 3), (101, 4)]),
 ]
 
 # These limits describe this counterpart's represented observations, rather
@@ -291,6 +303,8 @@ def counterparts(manifest):
             limitations.append("Executed original ETF reply views preserve the pinned flow-policy type/default retry and retention recipe, charge_card overrides and inherited defaults. Three direct test-body atom-field absence assertions link only source37/43/52: the type, all-states charge_card and selected charge_card retention maps omit history_hot_max_events. The manually encoded stored-policy recipe preserves source values but does not execute public keyword preprocessing, physical set/get calls or the original encoder. Source11/46 public success replies, authoritative/atomic/all-shard publication, coherent VM capture, opaque identity/Enumerable support, original setup/cleanup and every required runtime profile remain acceptance obligations. Other scalar observations and helper assertions add no new ledger links. Tests-only missing-API RED preceded production; the separate empty/atom-state lookup supplements were added after production and retain their actual provenance. Seven new domain tests and the real Fresh/Replay caller test pass on macOS; logical resource controls do not establish measured native allocation/speed, full source-case/workflow parity or independent Linux acceptance. Every older counterpart, limitation and runtime identity is preserved.")
         elif source_id == "2302fd8c2cfa076d" and rust_file == "crates/wf-domain/tests/complete_policy/original_entry.rs":
             limitations.append("Executed original ETF observations retain the exact generation-boundary/public-v1 term, generation 9007199254740991, and the above-maximum sibling. Source554 links generation, atom:type and the complete returned policy-map bytes; source558 links strict None refusal for MAX+1. The fixed hand recipe preserves the source term and values, not the native encoder's default map order. This counterpart does not execute the original encoder or migration allocator/exhaustion; those remain separately mapped normalized observations. The direct above-maximum ledger anchor is a post-implementation supplement with no new tests-first RED. Borrowed mathematical atom/runtime catalogs replace live VM context. Original ExUnit setup/runtime/profiles, public installation/physical reads, full case parity and independent Linux acceptance remain required.")
+        elif rust_file == "crates/wf-ports/tests/original_policy_get.rs":
+            limitations.append("Executed pure original GET composition validates raw opts=[], invokes the recording policy reader once with allocator zero and the exact derived key, then uses the existing borrowed projector. Hand-encoded stored-value recipes retain generation-always-on-1 and generation-cas-1 with generation2/max_active2000, generation-canonical-get-1-0 with generation1/max_active1000, and foreign-policy-type with generation1/max_active9000 under generation-mismatched-read-1. Each record links only its declaration's direct generation/max-active components at source24/46/82 or exact Corrupt/body components at source101. The canonical type is a possible source template spelling; native routed-away hashing is unproved. The original SET/CAS sequences, normalization/encoder, stale replica deletion, all-shard setup, physical writes/reads, cache suppression, consistency barriers, authorization and original async:false/global_state/flush/runtime profiles remain required. Recording-call macros and selected charge_card helper assertions add no ledger credit. Seven new behavior tests pass on macOS after genuine independently reproduced missing-API RED; pre-SUT fixture refinements and later source/lint repairs retain their actual timing. Stage-specific work/key reservations do not prove summed external owners, measured native resources, full source-case/workflow parity or independent Linux acceptance. Every older counterpart and runtime binding is preserved.")
         elif source_id in LIMITS:
             limitations.append(LIMITS[source_id])
         existing = result.setdefault(source_id, [])

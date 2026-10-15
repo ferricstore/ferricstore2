@@ -36,7 +36,7 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 71 source declarations, 79 counterpart records and 306 assertion links.
+increments: 73 source declarations, 83 counterpart records and 314 assertion links.
 Both reviewers accept the supplemental source603 shape-error anchor; it supplies
 one error component with its remaining setup/profile/physical obligations explicit.
 The separate original ETF generation-boundary counterpart retains MAX, the returned
@@ -102,6 +102,15 @@ recipe does not execute public installation or physical reads. The seven new
 domain tests and the real Fresh/Replay caller test pass on macOS; full public
 replies, original setup/runtime profiles, physical publication and independent
 Linux acceptance remain required.
+
+Original GET composition adds four narrow counterparts and eight direct links:
+generation/max-active values for source lines 24, 46 and 82, and the foreign-type
+corrupt diagnosis/body at line 101. The reader method is actually invoked once
+with allocator zero and the derived key. Stored values are manual source-value
+recipes; original SET/CAS sequences, routed-away hashing, replica deletion,
+physical/cache behavior and original setup/runtime profiles remain required.
+All 79 older records and every runtime binding are unchanged. Selected charge_card
+observations execute in a helper and receive no new direct-assertion links.
 
 Two separately scoped counterparts
 belong to one FIFO lifecycle declaration; a single state/partition test retains

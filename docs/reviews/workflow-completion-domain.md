@@ -43814,3 +43814,159 @@ Final actual manifest47a1dd before Root's wrapper (bytes/LF/SHA256):
 | ports/public_set/reply.rs | 6352/190 | 070018aa8c0a46547453502ab6070c2b39ffa986aecc49f99528ab9074cbb2e2 |
 
 Actual reciprocal source reads29e6a9/bd624a cover all Root new source/value and existing index/current/facade seams. Independent old Map enum and entire implementation relocation are BOTH byte-exact; no old event body changed. Whole ARCH TESTS4537/dcd57039 and WRITTEN5625/337ad5e0 were actually read/SHA-verified (latter7fcbcd), and whole PERF TESTS4294/e4f1e56b was read likewise; I agree without discrepancy. Root/performance final lint/wrapper and ordinary finite peer closure remain separately attributed. Full frontend, opaque/runtime/custom Enumerable/capture origin, eventual wire output, physical/setup, both OS and M1–M8 remain required.
+
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-GET1-PROPOSE1
+
+Proposal only; no successor file, type, test or implementation exists. This is the next bounded M1 join after reviewed reply checkpoint9234891. Root/ARCH/PERF agree on pure domain ingress, one narrow ports read and direct reuse of the existing generic GET projector; this note requests the named creation decision, not a new acknowledgment gate.
+
+Exact THREE production paths: Writer crates/wf-domain/src/policy/complete/public_get.rs and public_get/model.rs; Root crates/wf-ports/src/state/policy.rs, registered/reexported by EXISTING state.rs. No log module or committed identity change. Exact THREE tests: Writer crates/wf-domain/tests/complete_policy/public_get.rs and public_get/refusals.rs, plus domain main's exact17B LF+mod public_get;+LF; Root standalone crates/wf-ports/tests/original_policy_get.rs (automatic Cargo integration target original_policy_get). Root alone owns complete.rs facade, state.rs registration, architecture/checker/docs/ledger/Git. Production400/test600/function100 limits apply.
+
+THREE public production models, NO new private production model:
+1. OriginalPolicyGetRequest<'input>: private owned key Vec, original borrowed workflow_type/state, immutable PolicySchemaLimits. Getters policy_key()->&[u8], workflow_type()->&'input[u8], response_state()->Option<&'input[u8]>, schema_limits()->PolicySchemaLimits. Original payload refs never borrow the key owner. No Clone, public constructor, origin or paid flag.
+2. OriginalPolicyGetRejection: Options,Type,State,KeyBytes,Corrupt,ShardUnavailable,ReadFailed. Its static body/as_bytes and Display preserve the exact four input bodies already used by SET and three GET read bodies from ReplyRejection. No AllocationFailed variant is reachable for GET.
+3. Ports OriginalPolicyGetReader, a policy-only semantic capability:
+```rust
+fn read_policy_value_without_cache_tracking<'read>(
+    &'read mut self, shard: u32, key: &[u8]
+) -> OriginalPolicyReadValue<'read>;
+```
+The result borrows the reader alone, independently of the short key parameter. This is not a generic Router/backend/storage handle. Real cache-tracking suppression, physical consistency and reader-buffer ownership remain REQUIRED adapter work. The fixture proves actual method invocation only.
+
+Exactly TWO free APIs:
+```rust
+prepare_original_policy_get_request<'input>(
+    workflow_type: &RawFlowPolicyValue<'input>,
+    opts: &RawFlowPolicyValue<'input>,
+    limits: PolicySchemaLimits, charge: &mut PolicySchemaCharge,
+) -> Result<Result<OriginalPolicyGetRequest<'input>,
+                   OriginalPolicyGetRejection>, CompletePolicyEncodingError>;
+
+read_original_policy_get_reply<'input, R: OriginalPolicyGetReader>(
+    reader: &'input mut R,
+    workflow_type: &RawFlowPolicyValue<'input>,
+    opts: &RawFlowPolicyValue<'input>,
+    context: OriginalPolicyReplyContext<'input>,
+    limits: PolicySchemaLimits, charge: &mut PolicySchemaCharge,
+) -> Result<Result<OriginalPolicyReply<'input>,
+                   OriginalPolicyGetRejection>, OriginalPolicyReplyError>;
+```
+Ports ALWAYS calls the preparer fresh from Raw, caches original type/state refs, invokes the capability exactly once with shard0/exact f:{f}:policy: key, explicitly drops request/key, then calls present_original_policy_get_reply once. Existing inner Corrupt/Unavailable/ReadFailed maps directly to the new same-body variants; operational/raised errors remain existing ReplyError. No prepared-request consumer, new debit API, domain I/O closure, decode duplication, old4096 wrapper or encode/parse bridge exists.
+
+Source: actual whole pinned Policy.ex af6485 confirms28–38 head class → FULL Keyword.keyword? → nonempty type → FIRST state → key cap → read_entry; SET places key before state and validates/converts additional fields. read_entry55–82 invokes allocator shard0 with tracking disabled, preserves absent/read/error/type origins. GET never calls PolicyPatch and never inspects unrelated values. A single advancing list-prefix/tail cursor validates every tuple/key without rescanning prior siblings. First nil stays present, so a later state cannot replace it. Proper segmented lists ending List[] are accepted; nonlist terminal makes Options after the completed prefix, before type/state diagnoses. Raw::ImproperList retains its represented nonempty-prefix contract: a reached empty prefix is operational Malformed before following tail. Nonbinary workflow type or nonlist opts returns Options at head. RawNil/Atomnil and boolean atom KEY aliases are admitted; only exact atom state selects the control.
+
+Every reached atom KEY is freshly paid128+UTF8len before validating at most255 Unicode chars (ByteLimit for impossible RawAtom spellings); then, only until FIRSTstate is found, freshly pay128+UTF8len+5 before exact comparison. Unknown/expected/replace VALUE payloads, including Other/struct/improper/huge RawAtom, are never recursively inspected or converted. This grants no hidden-payload/native atom/whole-ingress validity authority; full opaque/runtime/capture frontend scope stays REQUIRED. State class accepts nil or ANY binary including empty/invalid UTF8. New ingress adds no semantic query-length cap; the existing projector's selected64MiB operational query profile stays exact and late, after supplied read/decode origins. Key type65522 is inclusive;65523 rejects because prefix13/max65535.
+
+NEW logical schedule (old APIs/fees unchanged): matching-profile check before work; entry128, head128, keyword-container128; each actual row128 before tuple/key class/FIRST local-ref update; atom-key observation and optional comparison as above; each actual improper tail-follow128 before advancing. Complete shape precedes type128, state128, keybound128, in that order. Iterative constant-space traversal plus positive work debits bounds reached processing; no arena, work Vec or new whole-Raw occurrence/depth walk. Admit P=128+keylen before one128+keylen key reserve/prefix+type materialization, then request metadata128. FINAL128+keylen prospectively prepays ONE read invocation, following the existing ports hash-prepayment pattern. A failure here returns before the ports reader is invoked. Request stores facts only; standalone preparation does not perform or prove a read.
+
+MIN r/[] ingress primitives[128,128,128,128,128,128,142,128,142] sum1180/P142/T1322; zero-G key admission at G768 precedes materialization. state:nil adds[128row,133atom,138compare], giving1579/P142. These are prospective source/operation arithmetic, no candidate exists. Ports has no extra entry beyond its actual fresh preparer. Unchanged minimal GET is18785, so joined MIN is19965/P2492/T22457. Exact/tight controls freeze before RED, including one readable nonempty stream and zero-G owner admission. Tight1321 refuses the final read debit with zero calls; exact1322 reaches the read then projector entry128 refuses at1450 with one call. No historical max P is used as live backing.
+
+Lifetimes/resources: ingress/read phase owns only keylen+128 algorithm scratch; Raw descriptors/payloads and reader-internal storage are external capability/input scope. The result cannot retain the short key. Drop the key before the unchanged projector's V/index/catalog/State admission; its same supplied context.additional_live is untouched, so unused overflow cannot outrank malformed decode-None/read errors. This is stage-specific logical admission, not all-live/RSS/adapter buffer accounting. Reader/raw type/query/safety/capture donors remain borrowed for the returned reply's input lifetime. Existing native-order binding still validates the supplied correspondence only when reached; no runtime capture authority is manufactured.
+
+Seven substantive test duties in three files: domain2 front shape/priority and FIRST/ignored-payload/key neighbors; domain refusals2 every ingress debit/peak and continuous/held-request accounts; ports3 actual invocation/error/read-key lifetimes, pinned generation/type/selected source recipes, and continuous ingress-read-projector exact/tight budget. Domain tests reuse existing main TestResult/limits, no new fixture type. Root standalone test explicitly selects test-only TestResult<T=()> alias and RecordingPolicyReader<'input>{value:OriginalPolicyReadValue<'input>,calls:Vec<(u32,Vec<u8>)>} fixture; inspect calls after dropping any borrowed reply. No unselected nominal test model.
+
+Meaningful pinned anchors actually read: flow_policy_generation_test.exs25/47 (generation2/max_active2000),70–84 (allocator0 despite routed stale replica; physical deletion/routing setup remains uncredited),86–101 (foreign-policy-type/gen1/max_active9000 → exact Corrupt); flow_policy_exposes_type_state_retry_retention_defaults.exs46–53 selected charge_card fields/defaults. Root can observe these through the real capability boundary without claiming source setup/physical read parity. Supplemental controls include zero reads for late malformed keyword after a valid FIRST state, State before overlong key, nil FIRST versus invalid duplicate, ignored malformed expected/replace/Other, max key/opaque state, unavailable/readfailed before poisoned context and malformed ETF before overflowing additional_live. Source callback/native gaps, eventual wire emission, original setup/profiles and BOTH native OS remain required.
+
+After named selection Root releases ONLY these tests; meaningful frozen literals and genuine missing-API RED plus Root reproduction precede production. Peers review actual written code normally without another read/decimal/body acknowledgment gate.
+
+
+GET1 resource-test precision after PERF's actual whole proposal read: held standalone requests test only input/output preservation, cumulative nonrollback G and historical P; this API has no additional-live argument and does NOT certify the SUM of externally held requests. The coherent ports parent owns exactly one key and drops it before the existing projector's stage. No historical max is reused as a live base. This narrows the test claim, not source behavior, inventory, tariff or API; MIN/read/combined literals above remain1180/1579/19965 withP142/2492. All six successor paths remain absent.
+
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-GET1-TESTS-RED1
+
+ARCH CREATE8267/29bc390c was actually whole-read2beb3f; Root tests-only release6bbe1f preceded these files. Three test files contain SEVEN identities (Writer2+2,Root3). Meaningful source/shape/FIRST/ignored-value, Unicode atom/key/query, actual reader-call, selected/pinned values and prospective account observations are written; no stub/production was used.
+
+First warnings-denied locked/offline domain command b42dad/session39849→3c09dd EXIT101 had ONLY one E0432/three selected missing exports, no other diagnostic/warning/assertion. AFTER this first RED and BEFORE SUT, ARCH strengthened the existing no-ingress-query-cap fixture from262145 to67108865, with explicit drop of the previously observed request. This is not retroactive RED: whole preimage eabd82cc was retained, and reversing only that drop/two numeric replacements recovers it exactly. No identity or fee array changed. Final domain299e93/session29483→73c46a EXIT101 again ONLY E0432/three exports. My independent final ports2b422f EXIT101 has ONLY two E0432/three exports, zero other diagnostics/assertions. Both commands were env RUSTFLAGS='-D warnings' cargo test -p <crate> --test <target> --locked --offline.
+
+Literal event parsing independently matches MIN1180/P142/T1322 and segmented-FIRSTnil1968/P142/T2110 element for element. Both streams test EVERY positive event and G0 peak admission exact/tight; improper prefix911/783, mismatch0 and held-preservation1306→2486/P205/T2691 also have independent source arithmetic. Held requests claim preservation/cumulative work/historical peak only, not their external SUM. Source callback prepayment and complete GET join19965/P2492 are Root's actual written zero/one-call controls, before any implementation.
+
+My ENTIRE final Root ports514 body read01109a has no remaining concrete oracle issue. Root corrected the provisional four-atom MIN context to its exact three-atom reader schedule before RED, without changing any literal fees. Its promised stored charge_card source recipe is present; canonical-get spelling now includes both deterministic numeric suffixes. Physical routed-away/setup/cache tracking/native runtime effects remain uncredited.
+
+Final all-test/main manifest87eea2 (bytes/LF/SHA):
+- domain public_get.rs:9866/303/6096ffdcde690010e73e81067dd11a9dd6bbc027fb784ef06921a7d555137e54;
+- domain public_get/refusals.rs:5639/172/bd46ff55c3df7f934360ea3f1cde040294a80b3ffcbe68959104e46fb99cf110;
+- ports tests/original_policy_get.rs:16336/514/c458f58e4b63a0df31790b4eedaaf8c86c3deac99d79c97d52ffad0a21db5fca;
+- domain main.rs:2090/92/5ea5411401769b1ffa5e0e834ddfdebc65eff98c8608d374319471012da69554.
+Full frozen preimages are retained. Removing exact17B suffix restores WHOLE2073B main/e89d1cda570e99e3061b330c124b6b3932f6b68ea5820feba1f98864e632fc71. At actual87eea2 all THREE selected production files were ABSENT. Root independently reproduces final RED before releasing production; ordinary counterpart read is no extra approval gate.
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-GET1-WRITTEN1
+
+Root independently reproduced final missing-export RED and released production in9e0591; these three bodies were absent before that release. My two domain bodies plus Root's narrow state/policy capability now implement the selected join. One advancing keyword cursor preserves full shape before empty type/FIRST state/key diagnoses; FIRST nil stays present. Unknown/control values remain opaque. The sole key reserve/copy, metadata and immediately following read are prospective. The ports receiver-only result lifetime permits exactly one shard0/key read, then explicit request/key drop before the existing GET projector. No second decode, SET conversion, new payment authority or historical-P live base was added.
+
+Current actual whole-read production (bytes/LF/SHA):
+- domain public_get.rs5147/144/a6f58b0f8c377cd7bd6d77fb754b55621853f71442eb2409c3399038d3e970d7;
+- domain public_get/model.rs3030/89/5bb7a936684e3ab46d8511ce1bcec9faebf98e1c029de5a73f61bf990be51eb1;
+- Root state/policy.rs3189/66/b91ca608e5ee24afc6aa0dc611b7b446cd066e85bdb17de5200c867205d8058c.
+All fit400/100. ARCH4251/395ae1d1 was ENTIRE actually read/hash-verified9bb1c8 and agreed; its independent facade/source inverses are accepted.
+
+First real focused runs, before the lexical row repair, were Root domainf61b93→a836d7 fourPASS and ports85e590→b6b484 threePASS, no compile/assertion failure. ARCH/PERF then found the row descriptor Copy lexically before its128: borrowed iteration now pays before dereference, with identical events. My subsequent strict locked/offline whole complete_policy runf0e6b7/session77402→0f8221 EXIT0 passed129/129 (125 old+4 new), zero failed/ignored. The command was env RUSTFLAGS='-D warnings' cargo test -p wf-domain --test complete_policy --locked --offline.
+
+PERF owns workspace strict Clippy, without duplicate runs. Its firstf3a29d→fa3491 EXIT101 had only option_option: the ordinary private helper now uses existing Rejection::Options as inner Result failure, preserving missing versus FIRST nil without another model. Seconde65968→7e8c8d had libraries clean and only three Writer test-helper styles: unnecessary Result wrappers for assert_bodies/assert_work and unused by-value consumption. Unit returns, caller ? removal and explicit drop(result) preserve every assertion. Third09e7a6→3e57dc has domain/libraries clean and only five Root ports-test styles, being fixed by that owner at this save. Full workspace/wrapper terminal will be attributed separately.
+
+Current Writer tests: parent9840/302/e817680951d5f2f9e26532981d9722ff1f4765b7d0f3f6e3e03a17f481bb3edd; refusals5628/172/905a2896a6466fa10e10d96898437c05615d2776ff3fb3b6124888e2012d6cf5. Main's exact17B registration is unchanged. No test identity, fixture, assertion operand or literal MIN/segmented/continuous fee vector changed after final RED. The following fileless inverse recipes were actually executed: source7cd142 and tests e2cdbc, all whole-file hashes TRUE; PERF independently recovered both tests c3bcdf.
+
+```python
+from pathlib import Path
+from hashlib import sha256
+
+def once(s, a, b):
+    assert s.count(a) == 1
+    return s.replace(a, b, 1)
+
+p = Path("crates/wf-domain/src/policy/complete/public_get.rs")
+s = p.read_text()
+s = once(s, """    let first = match first_state(*opts, charge)? {
+        Ok(first) => first,
+        Err(reason) => return Ok(Err(reason)),
+    };""", """    let Some(first) = first_state(*opts, charge)? else {
+        return Ok(Err(Rejection::Options));
+    };""")
+s = once(s, """) -> Result<Result<Option<Raw<'input>>, OriginalPolicyGetRejection>, Error> {
+    use OriginalPolicyGetRejection as Rejection;
+
+""", """) -> Result<Option<Option<Raw<'input>>>, Error> {
+""")
+s = once(s, "            return Ok(Ok(first));", "            return Ok(Some(first));")
+i = s.index("fn first_state")
+head, helper = s[:i], s[i:]
+assert helper.count("Ok(Err(Rejection::Options))") == 4
+s = head + helper.replace("Ok(Err(Rejection::Options))", "Ok(None)")
+assert sha256(s.encode()).hexdigest() == "a2e707f9333d80a111520954fdd372bade6e93e7b7acda5fe5709de3a542ef8a"
+s = once(s, """        for row in rows {
+            pay(charge, 128)?;
+            let Raw::Tuple(pair) = *row else {""", """        for &row in rows {
+            pay(charge, 128)?;
+            let Raw::Tuple(pair) = row else {""")
+assert sha256(s.encode()).hexdigest() == "427a9cdbcf9bbfef8d7b3607891a934ca13778dc96cc0a142c9347edf9522a56"
+
+p = Path("crates/wf-domain/tests/complete_policy/public_get.rs")
+s = once(p.read_text(), "    assert_bodies();", "    assert_bodies()?;")
+s = once(s, "fn assert_bodies() {", "fn assert_bodies() -> TestResult {")
+s = once(s, "        assert_eq!(reason.to_string().as_bytes(), bytes);\n    }\n}",
+         "        assert_eq!(reason.to_string().as_bytes(), bytes);\n    }\n    Ok(())\n}")
+assert sha256(s.encode()).hexdigest() == "6096ffdcde690010e73e81067dd11a9dd6bbc027fb784ef06921a7d555137e54"
+
+p = Path("crates/wf-domain/tests/complete_policy/public_get/refusals.rs")
+s = p.read_text()
+for a, b in [
+    ("            target - 1,\n        );", "            target - 1,\n        )?;"),
+    ("            assert_work(result, next_g + next_fee + next_p.max(next_peak), target);",
+     "            assert_work(result, next_g + next_fee + next_p.max(next_peak), target)?;"),
+    ("        910,\n    );", "        910,\n    )?;"),
+    ("        assert_work(result, 2_691, maximum);", "        assert_work(result, 2_691, maximum)?;"),
+    ("fn assert_work<T>(result: Result<T, EncodingError>, bytes: u64, maximum: u64) {",
+     "fn assert_work<T>(result: Result<T, EncodingError>, bytes: u64, maximum: u64) -> TestResult {"),
+    ("    drop(result);", "    Ok(())"),
+]:
+    s = once(s, a, b)
+assert sha256(s.encode()).hexdigest() == "bd46ff55c3df7f934360ea3f1cde040294a80b3ffcbe68959104e46fb99cf110"
+```
+
+One timing precision supersedes prior TESTS-RED1 wording: Root's four-atom context/source-recipe repairs preceded its FINAL RED59ad21 and SUT, while an initial ports RED had already started; they are not claimed before that initial epoch. The separate query-cap refinement remains honestly post-first-domain-RED/pre-SUT, with exact original preimage retained. This source component does not establish physical/cache/barrier/authorization adapters, opaque/runtime capture, source setup/profiles or both native OS. Full M1–M8 remains active; Root owns wrapper/docs/ledger/Git.
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-GET1-CLOSED1
+
+Normal reciprocal SOURCE review is closed: ENTIRE ARCH4251/395ae1d1 read9bb1c8 and PERF5145/9d9d3e2b at1622427 read a17f08, both agreed; both peers actually whole-read my6449/03c6557c receipt and independently recovered the source/test preimages. PERF's final204bec strict all-target/all-feature locked/offline Clippy EXIT0 has zero diagnostics. Root's final wrapper989986/session98114→c20c8b EXIT1 is qualified precisely: all source stages PASS610 Rust/69targets+4docs, zero ignored/failures/warnings/errors; ONLY default RustSec DNS refresh failed. All1122 bound inputs stayed SHA4129a149096ab490362ab4b4f5d942de6a712bb4cfa5dcb2dce37ae42f2df699. Separate cached audit a83ee4 passed all four categories; this is not a fresh-audit or Linux claim.
+
+No additional code, fee or oracle change followed. Source/ownership/inverse review for this finite GET join is complete, with Root retaining Git/docs/ledger responsibility and full M1–M8 active. The next authorized action is a finite read-only workflow/replay/command gap survey; no next artifact/type/test is selected or created by this closure.

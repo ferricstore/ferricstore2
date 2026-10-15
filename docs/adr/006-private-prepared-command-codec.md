@@ -1161,3 +1161,33 @@ stored intent/value immutable while applying current caller defaults. It does
 not publish a physical result. Full wire output, coherent ingress capture,
 physical atomic/all-shard publication, original setup/runtime profiles and
 independent Linux execution remain required.
+
+## Original public Policy.get ingress and reader composition
+
+ARCH-NEXT-M1-ORIGINAL-PUBLIC-GET1-CREATE1 selects two private domain files and
+one private ports file, with seven behavior tests in three files. Domain
+preparation validates the complete keyword shape, then nonempty type, FIRST
+state and key size in source order. One advancing list cursor preserves FIRST
+nil and ignores unrelated values without SET patch conversion or recursive
+payload traversal. Reached atom keys retain their source character bound.
+
+The policy-specific reader and caller live under `wf-ports::state`, separate
+from prepared log commands. The caller always prepares fresh raw input and
+invokes one read using allocator shard zero and the derived policy key. The
+returned bytes borrow the reader independently of that temporary key. An
+explicit key-owner drop precedes the unchanged generic GET projector, which
+retains read/decode/type origins and the supplied caller context.
+
+Preparation prospectively pays the immediately following read invocation.
+Its local peak covers this request's key and scratch only; raw inputs, reader
+storage and earlier standalone requests remain external to that stage. Held
+request tests verify preservation and cumulative work, without claiming their
+summed live memory. The caller passes additive context owners unchanged and
+does not infer ownership credit from the account's historical peak.
+
+This source compatibility capability does not select blocking production I/O,
+strong-read barriers, tenant authorization, cache suppression or a concrete
+storage adapter. Tests record actual capability invocation and exact replies;
+they do not execute physical reads or original setup/runtime profiles. Native
+allocation/latency, opaque ingress provenance, full wire output, all required
+source scenarios and independent Linux/macOS acceptance remain required.

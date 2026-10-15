@@ -4,7 +4,24 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The current batch implements original public policy reply views in eight
+The working tree implements original public Policy.get validation and reader
+composition in three production files. Domain preparation preserves complete
+keyword validation, FIRST state and source error order; the ports state boundary
+performs one allocator-zero capability call and releases its temporary key before
+reply projection. All seven new behavior tests pass, and the full policy target
+passes 129 tests. The final native macOS workspace run passes 610 Rust tests
+across 69 targets and four compile-fail docs, with zero warnings, failures or
+ignored tests. Formatting, compilation, strict lint, rustdoc, architecture and
+reference/progress checks pass on 1,122 unchanged inputs. The wrapper exits 1
+only at its default RustSec refresh because GitHub DNS is unavailable; the
+separate cached October 14 audit passes all four categories. Strict all-feature
+Clippy also passes. Source and reciprocal reviews found no component blocker.
+The ledger has 73 declarations, 83 counterparts and 314 assertion links, adding
+only direct GET generation/max-active and corrupt-type/body observations while
+preserving all older records. Full M1–M8, physical/cache/barrier adapters, original
+setup/runtime profiles and independent Linux validation remain incomplete.
+
+The preceding committed checkpoint implements original public policy reply views in eight
 private production files. Root independently reproduced missing-API RED before
 production; the seven new domain tests and the real Fresh/Replay caller test
 pass. The final native macOS workspace run passes 603 Rust tests across 68 targets
@@ -15,7 +32,7 @@ DNS blocks its default RustSec refresh; the separate cached audit passes all fou
 categories against the October 14 database. Strict all-feature Clippy also passes.
 Two library and three test lint repairs preserve expectations and paid order;
 their failed epochs and the post-SUT States lookup regressions remain recorded.
-The ledger now has 71 declarations, 79 counterparts and 306 assertion links,
+At that checkpoint the ledger has 71 declarations, 79 counterparts and 306 assertion links,
 adding only the three executed hot-history-key absence observations. Full M1–M8,
 public/physical operations, original runtime profiles and native Linux remain
 incomplete. Written-source and reciprocal reviews are closed without a component
@@ -1215,8 +1232,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **71 reviewed
-source declarations, 79 counterpart records and 306 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **73 reviewed
+source declarations, 83 counterpart records and 314 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

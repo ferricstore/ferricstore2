@@ -1,3 +1,7 @@
 //! State boundary for `wf-ports`.
 //!
-//! Reserved for the reviewed contract; no workflow behavior is implemented here.
+//! Source compatibility policy queries use an explicit policy read capability.
+
+mod policy;
+
+pub use policy::{OriginalPolicyGetReader, read_original_policy_get_reply};
