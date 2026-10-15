@@ -5,6 +5,7 @@
 mod control;
 mod history;
 mod outcome;
+mod ownership;
 mod record;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

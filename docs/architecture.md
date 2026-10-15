@@ -873,6 +873,15 @@ scope, request, intent, log/time/expiry and response. See
 [ADR004](adr/004-committed-time-and-apply-admission.md#group-transaction-and-persisted-core-values)
 for cumulative admission, ownership and remaining durability requirements.
 
+The selected point-scan successor adds private-field borrowed
+`ScannedWorkflowRecord` and `ScannedRetainedOutcome` values, with record parsing
+grouped under the private `value/record/scan.rs` child. Full expected point
+identity is checked before a view is returned. Each view reports 512 plus all
+variable bytes in the eventual owner and consumes itself to materialize within
+an explicit ownership cap. The existing decoders share this single parsing path
+while retaining their wire-only public cap. The views borrow only encoded input,
+retain no query owners and grant no transaction custody or payment credit.
+
 This selects no storage engine, dependency, runtime driver, policy/membership
 persistence or snapshot implementation. Contract doubles and codec vectors do
 not establish real transaction completeness, durability or native OS acceptance.

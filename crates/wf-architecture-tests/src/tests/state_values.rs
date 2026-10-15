@@ -6,6 +6,7 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::value"),
         ("wf-storage", "state::value::control"),
         ("wf-storage", "state::value::record"),
+        ("wf-storage", "state::value::record::scan"),
         ("wf-storage", "state::value::outcome"),
         ("wf-storage", "state::value::history"),
         ("wf-storage", "state::key"),

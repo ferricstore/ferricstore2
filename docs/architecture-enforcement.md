@@ -163,3 +163,10 @@ ARCH-NEXT-M2-PHYSICAL-FORMATS1-CREATE1 extends the same pure rule to exact
 paths, nested descendants, filesystem reexports and neighboring effectful key
 modules. The new history child inherits the existing value rule. No broader
 storage purity rule, file/function limit exemption or dependency edge is added.
+
+ARCH-M2-STATE-POINT-SCANS1-CREATE1 adds the actual record scan child to the
+existing value-module test matrix. The descendant rule already applies; its
+filesystem/alias/async/global/unsafe/macro refusals need no new exception.
+Behavioral tests separately cover complete point binding, distinct ownership
+caps and query/donor lifetimes. Source review verifies pre-copy admission and
+shared parsing; the purity matrix alone does not establish those properties.

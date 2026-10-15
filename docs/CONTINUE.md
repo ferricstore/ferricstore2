@@ -5,7 +5,26 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The current M2 increment adds pure physical point/ordered keys and full history
+The current M2 increment implements borrowed record/outcome scans with complete
+expected point binding and prospective ownership admission. One shared parser
+feeds the new consuming views and the existing owning decoder APIs. Exact
+logical tariffs include 512 plus every returned variable field; wire/domain
+caps remain separate. Five new behavior tests pass their first assertion run
+after twice-reproduced missing-API RED. Two additive peer-review controls are
+explicitly post-RED refinements; no original operand was weakened.
+
+The final macOS wrapper passes 642 Rust tests across 73 targets plus six
+compile-fail docs, with zero warnings/failures/ignored tests. Formatting,
+compilation, strict Clippy, rustdoc, architecture and reference/progress checks
+pass on 1,154 unchanged non-review inputs. The wrapper exits 1 solely because
+DNS blocks the default advisory refresh; a separate cached October 14 audit
+passes all four categories. Ledger counts remain 77/87/326 with no additional
+Elixir parity credit. Next: factor the raw batch's single retained gate before
+Fresh authority loading, preserving complete indexed authority, then implement
+the real atomic storage adapter. Dependency adoption, original runtime/setup
+profiles, native Linux and full M1–M8 completion remain open.
+
+The preceding M2 increment adds pure physical point/ordered keys and full history
 values under the named architecture selection. All seven new behavior tests and
 six older value tests pass their first assertion execution after independently
 reproduced missing-API RED. Independent byte vectors preserve full FIFO u128,
@@ -37,10 +56,10 @@ four acknowledged process-kill recovery cases. Its three bounded snapshot tests,
 strict Clippy and formatting pass; earlier compile/lint/format failures remain
 recorded. These are temporary native macOS proof results, not additional product
 tests or workflow parity. Its full-graph audit stops before checks on uncached
-Windows/Android crates, and registry adoption remains open. Next: implement the
-reviewed product prerequisites for bounded record/outcome decoding, exact point
-binding and one retained request gate before Fresh authority reads, then the
-real atomic storage adapter. Full runtime, native Linux and M1–M8 remain open.
+Windows/Android crates, and registry adoption remains open. The product scanner
+successor is described above; a single retained gate before Fresh authority
+reads and the real atomic storage adapter still follow. Full runtime, native
+Linux and M1–M8 remain open.
 
 The preceding reviewed M2 prerequisite implements neutral group transaction traits,
 validated change projections and versioned control/record/outcome codecs in five

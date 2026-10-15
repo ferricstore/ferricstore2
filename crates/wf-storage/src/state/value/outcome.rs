@@ -1,7 +1,9 @@
 //! One retained batch5 response grammar, owned by the ports response parser.
 
 use wf_domain::workflow::admission::AdmissionLimits;
-use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome};
+use wf_domain::workflow::request::{
+    ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
+};
 use wf_ports::log::record_batch_retained_status;
 use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, LogIdentity, TimestampMillis};
@@ -10,6 +12,74 @@ use super::{
     StateValueError, add, allocate, copy, finish, put_raw, raw, raw_size, read_u16, read_u64,
     start, take,
 };
+
+/// Validated borrowed metadata and response, without transaction authority.
+///
+/// The view borrows only its encoded donor. Materialization freshly admits its
+/// complete logical owner size; scanning does not debit a transaction budget.
+pub struct ScannedRetainedOutcome<'input> {
+    tenant: &'input [u8],
+    group: &'input [u8],
+    recovery: &'input [u8],
+    request: &'input [u8],
+    response: &'input [u8],
+    intent: ClientIntent,
+    original_position: LogIdentity,
+    original_time: TimestampMillis,
+    expires_at: TimestampMillis,
+    response_version: u16,
+    status: RetainedStatus,
+    limits: AdmissionLimits,
+    owned_bytes: usize,
+}
+
+impl ScannedRetainedOutcome<'_> {
+    /// Reads 512 plus every variable byte returned by materialization.
+    #[must_use]
+    pub const fn owned_bytes(&self) -> usize {
+        self.owned_bytes
+    }
+
+    /// Consumes parsed fields after admitting their complete logical owner size.
+    ///
+    /// # Errors
+    /// Rejects a zero/short owner cap, failed field allocation or typed restoration.
+    pub fn into_owned(
+        self,
+        maximum_owned_bytes: usize,
+    ) -> Result<RetainedOutcome, StateValueError> {
+        if maximum_owned_bytes == 0 {
+            return Err(StateValueError::InvalidValue);
+        }
+        if self.owned_bytes > maximum_owned_bytes {
+            return Err(StateValueError::Limit {
+                bytes: self.owned_bytes,
+                maximum: maximum_owned_bytes,
+            });
+        }
+        let scope = RequestScope::new(
+            TenantId::new(copy(self.tenant)?).map_err(|_| StateValueError::InvalidValue)?,
+            GroupId::new(copy(self.group)?).map_err(|_| StateValueError::InvalidValue)?,
+            RecoveryId::new(copy(self.recovery)?).map_err(|_| StateValueError::InvalidValue)?,
+        );
+        RetainedOutcome::new(
+            RetainedMetadata {
+                scope,
+                request: RequestId::new(copy(self.request)?)
+                    .map_err(|_| StateValueError::InvalidValue)?,
+                intent: self.intent,
+                original_position: self.original_position,
+                original_time: self.original_time,
+                expires_at: self.expires_at,
+                status: self.status,
+            },
+            self.response_version,
+            copy(self.response)?,
+            self.limits,
+        )
+        .map_err(|_| StateValueError::InvalidValue)
+    }
+}
 
 /// Encodes original metadata and a single canonical batch5/response1 body.
 ///
@@ -58,20 +128,20 @@ pub fn encode_outcome(
     Ok(output)
 }
 
-/// Binds a complete FWSO1 frame to an expected original scope and request.
+/// Scans a complete FWSO1 frame bound to an expected original scope and request.
 ///
-/// All frame, scope, profile, response and expiry checks precede field copies.
+/// All frame, scope, profile, response and expiry checks precede materialization.
 ///
 /// # Errors
-/// Rejects unsupported/malformed responses, foreign scope, limits and allocation failure.
-pub fn decode_outcome(
-    bytes: &[u8],
+/// Rejects unsupported/malformed responses, foreign scope, wire caps or invalid values.
+pub fn scan_outcome<'input>(
+    bytes: &'input [u8],
     expected_scope: &RequestScope,
     expected_request: &RequestId,
     limits: AdmissionLimits,
-    maximum_bytes: usize,
-) -> Result<RetainedOutcome, StateValueError> {
-    let mut offset = start(bytes, *b"FWSO", maximum_bytes)?;
+    maximum_wire_bytes: usize,
+) -> Result<ScannedRetainedOutcome<'input>, StateValueError> {
+    let mut offset = start(bytes, *b"FWSO", maximum_wire_bytes)?;
     let tenant = raw(bytes, &mut offset)?;
     let group = raw(bytes, &mut offset)?;
     let recovery = raw(bytes, &mut offset)?;
@@ -102,24 +172,45 @@ pub fn decode_outcome(
     }
     let intent = ClientIntent::record_batch(digest);
     let status = record_batch_retained_status(intent, response_version, response)?;
-    let scope = RequestScope::new(
-        TenantId::new(copy(tenant)?).map_err(|_| StateValueError::InvalidValue)?,
-        GroupId::new(copy(group)?).map_err(|_| StateValueError::InvalidValue)?,
-        RecoveryId::new(copy(recovery)?).map_err(|_| StateValueError::InvalidValue)?,
-    );
-    RetainedOutcome::new(
-        RetainedMetadata {
-            scope,
-            request: RequestId::new(copy(request)?).map_err(|_| StateValueError::InvalidValue)?,
-            intent,
-            original_position: LogIdentity::new(term, node, AppliedPosition::new(index)),
-            original_time: TimestampMillis::new(original_time),
-            expires_at: TimestampMillis::new(expires_at),
-            status,
-        },
+    let mut owned_bytes = 512;
+    for field in [tenant, group, recovery, request, response] {
+        add(&mut owned_bytes, field.len())?;
+    }
+    Ok(ScannedRetainedOutcome {
+        tenant,
+        group,
+        recovery,
+        request,
+        response,
+        intent,
+        original_position: LogIdentity::new(term, node, AppliedPosition::new(index)),
+        original_time: TimestampMillis::new(original_time),
+        expires_at: TimestampMillis::new(expires_at),
         response_version,
-        copy(response)?,
+        status,
         limits,
-    )
-    .map_err(|_| StateValueError::InvalidValue)
+        owned_bytes,
+    })
+}
+
+/// Validates a complete frame, then consumes the same scan into an owned outcome.
+///
+/// This legacy entry preserves its wire-only cap contract.
+/// # Errors
+/// Rejects unsupported/corrupt values, explicit caps, admission or allocation.
+pub fn decode_outcome(
+    bytes: &[u8],
+    expected_scope: &RequestScope,
+    expected_request: &RequestId,
+    limits: AdmissionLimits,
+    maximum_bytes: usize,
+) -> Result<RetainedOutcome, StateValueError> {
+    scan_outcome(
+        bytes,
+        expected_scope,
+        expected_request,
+        limits,
+        maximum_bytes,
+    )?
+    .into_owned(usize::MAX)
 }

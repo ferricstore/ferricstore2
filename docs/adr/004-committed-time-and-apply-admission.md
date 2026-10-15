@@ -295,6 +295,25 @@ times above the caller timestamp ceiling. FWSO retains the response once and
 derives status through the single ports batch5/response1 parser. Other outcome
 families fail closed until separately selected.
 
+ARCH-M2-STATE-POINT-SCANS1-CREATE1 selects immutable borrowed record/outcome
+scans before ownership. Record point scans bind the complete expected
+group/recovery/tenant/partition/ID; outcomes bind the complete scope/request.
+One parsed view feeds both the consuming materializer and the existing owning
+decoder, preserving the old wire-only decoder contract without a second wire
+parse. Expected query owners are compared and released independently of the
+encoded donor. The views carry no payment, storage-origin or authority token.
+
+Each view computes the checked logical charge once: 512 plus every variable
+field returned in its owned result. Record group/recovery are excluded because
+the returned record does not own them; tenant/partition and every core field
+are included. Outcome scope, request and response are all included. Consuming
+materialization rejects zero or insufficient ownership caps before its first
+field copy. Wire, domain and decoded ownership caps remain distinct. A future
+transaction must prospectively charge its cumulative account before invoking
+materialization; the borrowed view itself does not mutate that account. Fixed
+tariffs and existing identity Vec-to-Box conversion do not certify native layout,
+capacity or recoverable allocation behavior.
+
 Each codec takes a positive explicit byte cap. Decode checks actual bounds,
 complete framing/EOF, namespace and semantics before constructing owners.
 Encode validates and measures before one fallible output reservation. Existing
