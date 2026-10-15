@@ -391,3 +391,47 @@ fn original_flow_export_is_server_only(name: &str) -> CheckResult<()> {
     }
     Ok(())
 }
+
+#[test]
+fn original_public_policy_set_preparation_stays_pure_and_server_side() -> CheckResult<()> {
+    for module in [
+        "policy::complete::public_set",
+        "policy::complete::public_set::model",
+        "policy::complete::public_set::patch",
+        "policy::complete::public_set::patch::rows",
+        "policy::complete::public_set::metric",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-domain",
+                module,
+                "use crate::policy::complete; use wf_types::version;",
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "unclassified standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+            (
+                "use wf_parity_tests::progress;",
+                "runtime source references M0-only tooling",
+            ),
+        ] {
+            assert!(
+                source_check("wf-domain", module, source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    for name in [
+        "OriginalPolicySetRequest",
+        "OriginalPolicySetPatchView",
+        "OriginalPolicySetInputRejection",
+        "prepare_original_policy_set_request",
+        "encode_original_policy_set_input_rejection_body",
+    ] {
+        original_flow_export_is_server_only(name)?;
+    }
+    Ok(())
+}

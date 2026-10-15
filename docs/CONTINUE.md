@@ -57,6 +57,20 @@ unlinked; source error pattern assignments are not direct assertion anchors.
 The complete macOS wrapper passes573 Rust tests/four compile-fail docs and every
 source/dependency stage with the same1027 check inputs before and after execution.
 
+The next selected batch prepares public Policy.set inputs through converted-raw
+patch sizing, preserving both replace modes, FIRST controls and LAST policy
+values. Architecture and performance consultation are closed for five privately
+grouped production files, three test files, three public/three private models
+and two APIs. Writer has tests-only ownership of the new public_set test children
+and the existing target's17-byte registration suffix. Eight substantive duties,
+including the pinned invalid response-state recipe, precede genuine missing-API
+RED and Root reproduction; production is not released yet. The selected appended
+architecture control passes one real focused test, formatting and strict lint.
+The prior zero-selection exact-name invocation has no test credit. Full merge,
+opaque identity/capture, public replies, physical publication and both-OS/profile
+acceptance remain required. See ROOT-NEXT-M1-ORIGINAL-PUBLIC-SET1-CREATE1 in the
+[coordination record](reviews/workflow-completion-coordination.md).
+
 Original whole-flow input now preserves top/state/governance error order,
 arbitrary nonnegative customer versions, exact caller bodies and deterministic
 original ETF snapshots. Borrowed retry/indexed/retention walkers share semantics

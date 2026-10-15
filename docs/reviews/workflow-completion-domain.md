@@ -40705,3 +40705,551 @@ test result: ok. 81 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
     Checking wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.92s
 ```
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-SET1-PROPOSAL1
+
+Status: PROPOSAL ONLY after committed e4859af. No production/test/stub/type or
+new path is created by this note. Root owns selection, shared seams, ledger and
+Git; this existing note is the writer's only write set. The proposed increment
+prepares a public Policy.set command through the Router's converted-patch size
+guard. It performs no current read, merge, incoming business normalization,
+generation allocation, retained gate, publication or public reply construction.
+
+Source and causal boundary
+--------------------------
+
+Actual pinned reads use ferricstore/ferricstore
+66586c596e271408d9184af32eb31cd7218c126e, especially
+apps/ferricstore/lib/ferricstore/flow/policy.ex (whole, da196a/d0b604),
+flow/policy_patch.ex (whole, b6af4e/29c025), RetryPolicy325–365,
+and store/router/part_06.ex162–208 (cf8efb/current exact excerpt). Existing
+README, implementation plan, parity requirements, architecture and current
+presentation/patch/parent were read; current code is not changed.
+
+Policy.set11–23 first requires binary TYPE and list OPTS. A nonbinary type
+therefore returns the options error even with a valid keyword list. Within that
+guard the exact order is complete Keyword.keyword? shape, nonempty binary type,
+derived-key length, FIRST atom-key state, FIRST expected_generation, FIRST
+replace (default false), PolicyPatch.from_opts, then Router. Empty binary type
+with bad keyword shape still gets Options. A valid type is arbitrary nonempty
+binary, including invalid UTF-8/NUL. Prefix f:{f}:policy: has13 bytes; max key65535
+means type65522 inclusive, type65523 refused before any control value check.
+State is nil or ANY binary, including empty and arbitrarily long represented
+bytes; there is no source state-query length or UTF-8 guard here. Expected is
+nil or a mathematical integer0..9007199254740991; this PUBLIC expected-generation
+diagnosis differs from the lower allocator diagnosis. Replace is precisely
+true/false atom, absent false, present nil invalid. Keyword controls use FIRST.
+
+PolicyPatch.from_opts drops ALL atom-key state/expected_generation/replace rows,
+then Map.new collapses LAST data keys BEFORE recursion. The root-only states
+special case recognizes exact atom states or binary states keys (the latter can
+arise in raw nested/direct map sources, not a valid top keyword key). It is not
+a recursive special treatment for arbitrary nested maps named states.
+Generic conversion: [] stays []; a nonempty proper keyword list first collapses
+LAST, then recursively transforms surviving map VALUES; other lists transform
+each element; maps transform VALUES; map KEYS and ALL tuple interiors are opaque
+barriers. Tuples remain tuples even if an interior list looks like a keyword.
+Raw Nil and Atom(nil) are Elixir nil ATOM, not the empty proper list.
+
+Root states([]) is different: Enum.all? is vacuously true, so it becomes Map{}.
+A state pair is tuple2 of binary name and map-or-list CONFIG; states[(name,nil)]
+does not qualify as the special pair list and follows generic list/tuple rules.
+Map.new(states, callback) transforms EVERY admitted pair config BEFORE duplicate
+LAST collapse. A dead ordinary keyword value can contain an improper list or
+struct and be discarded without reaching it; an earlier duplicate state-pair
+config must still be transformed and may reach an exception before a valid last
+config. These are distinct required tests. A reached improper generic list tail
+corresponding to Enum's original exception returns outer Schema(InvalidAuthority),
+not an invented caller diagnosis. Root improper keyword options normally fail
+Keyword.keyword? and return Options; proper fragmented list tails concatenate.
+Only a real empty List tail closes a list; nilATOM does not.
+
+Primary Elixir v1.19.5 Map source was actually fetched:
+https://github.com/elixir-lang/elixir/blob/v1.19.5/lib/elixir/lib/map.ex#L247
+blob2ad4a8edbca4d0b70b9555bdeba408a1a161edcc.
+Map.new(list, transform) runs Enum.map before maps.from_list. Ordinary Map.new/2
+uses maps.iterator. For captured >32 unique-map rows, callback order is the
+REVERSE of our RawFlowPolicyValue::Map Enum.reduce/maps.to_list order; <=32 is the
+same flatmap order. This is distinct from deterministic ETF order. Newly built
+keyword/pair maps may use an explicitly NEW logical key order in this pure
+preparation stage, since no field/business diagnosis is emitted and all reached
+preprocessing exceptions have the same outer disposition. Their row order is
+NOT a VM capture or valid lower business-order sidecar.
+
+The struct branch is material: Map.new(%_{}=value, transform) precedes ordinary
+map handling. Primary compiler elixir_erl_pass.erl470–473/712–720
+(blob44974a7699b73444640e7d6b051c9f4328dd2b8e) proves its predicate is exact
+atom-key __struct__ with an ATOM VALUE (including nil), not mere key presence:
+https://github.com/elixir-lang/elixir/blob/v1.19.5/lib/elixir/src/elixir_erl_pass.erl#L712
+A reached Map.new/2 with that predicate returns outer Schema(InvalidAuthority)
+in this temporary ordinary-map profile; it does not execute Enumerable/user
+code or claim all struct protocols reject upstream. Integer/binary values under
+atom __struct__, or binary __struct__ keys, remain ordinary maps. This check is
+at actual reached conversion only, including newly built keyword maps, never
+global preflight or inside tuple/key barriers. Exact stdlib/custom Enumerable
+support and source capture remain REQUIRED later work, not approved product
+exclusions. Raw external_size itself does not dispatch Enumerable.
+
+Router part_06.ex182 checks external_size of the CONVERTED RAW PATCH <=262144
+BEFORE keydir/Raft/lower current/CAS/business. This increment includes that
+guard. A surviving unknown1.2MiB payload is therefore SnapshotBytes here, rather
+than the direct lower normalizer's Governance1MiB diagnosis. It must not call
+CONTENT1 or the whole-flow normalizer to obtain this result. Public preparation
+does not require current/C/history/default retry/retention context.
+
+Exact proposed artifact and ownership inventory
+-----------------------------------------------
+
+Five NEW domain production paths, all writer-owned after Root's tests-first RED
+release, private below existing policy::complete:
+1. crates/wf-domain/src/policy/complete/public_set.rs:
+   public validation/FIRST controls, bounded descriptor walk, late final key
+   ownership, orchestration and two public functions.
+2. crates/wf-domain/src/policy/complete/public_set/model.rs:
+   the six named models below, immutable view access and capacity-checked arena
+   appends. No constructor is public.
+3. crates/wf-domain/src/policy/complete/public_set/patch.rs:
+   PolicyPatch's root states/generic value walks and sequential callback order,
+   tuple/key barriers, reached exception/struct disposition.
+4. crates/wf-domain/src/policy/complete/public_set/patch/rows.rs:
+   LAST compaction, exact-on-hash-hit equality, bounded active slot regions and
+   fallible key ordering for newly built keyword/binary-pair maps.
+5. crates/wf-domain/src/policy/complete/public_set/metric.rs:
+   pinned default external_size for the represented converted-term subset,
+   including byte-list packing; no ETF byte owner or business pass.
+
+Three NEW integration test paths, writer-owned FIRST:
+- crates/wf-domain/tests/complete_policy/public_set.rs
+- crates/wf-domain/tests/complete_policy/public_set/cases.rs
+- crates/wf-domain/tests/complete_policy/public_set/refusals.rs
+The ONLY existing test seam is exact17-byte EOF "\nmod public_set;\n" on
+crates/wf-domain/tests/complete_policy/main.rs, preserving every prior byte,
+assertion and module. Existing main is currently2016B from the prior checkpoint.
+No ports test/production path is selected for this preparation-only component.
+
+Root-owned existing seams, after the appropriate test/source order:
+- crates/wf-domain/src/policy/complete.rs: private mod public_set plus five exact
+  reexports (three public models/two functions). No old body change.
+- crates/wf-architecture-tests/src/tests/codec_policy/original_policy.rs:
+  append one original_public_policy_set_preparation_stays_pure_and_server_side
+  test using existing source_check. Current393LF leaves room for this cohesive
+  boundary control under600; no new checker child/config/inspector/dependency.
+  Check the five descendants for purity and forbid the five exact exports from
+  client/wire/domain-value forwards. No checker allowance is proposed.
+- normal implementation/docs/ADR006/progress conservation updates and Git are
+  Root's responsibility. No generator credit is inferred from this proposal.
+
+Three NEW public models:
+OriginalPolicySetRequest<'input>, private fields and no public constructor/Clone:
+owned policy_key:Vec<u8>, expected_generation:Option<u64>, replace:bool,
+response_state:Option<&'input[u8]>, and owned converted patch arena. Methods are
+policy_key()->&[u8], workflow_type()->&[u8] (derive suffix of the same owned key),
+expected_generation()->Option<u64>, replace()->bool,
+response_state()->Option<&[u8]>, patch()->OriginalPolicySetPatchView<'_>.
+It is a mathematical prepared request, with NO caller/frame/gate/origin/payment/
+installed/public-reply authority. Both false and true are preserved; false is
+never routed through the existing true-only lower parent.
+
+OriginalPolicySetPatchView<'view>, Copy with private borrowed cell/edge slices and
+cell ID. Methods raw()->Option<RawFlowPolicyValue<'view>>,
+map_len()->Option<usize>,
+map_entry(index)->Option<(Self,Self)>,
+list_len()->Option<usize>, list_item(index)->Option<Self>.
+Raw leaves include unchanged tuple/key terms and scalar bytes; transformed maps
+and lists use the other accessors. Out-of-range/mismatched kind returns None.
+These are constant accessors over internally checked represented cells/edges,
+not new reader authority. No public kind enum, accepted token or size field.
+
+OriginalPolicySetInputRejection, Copy/Eq/Debug:
+Options, Type, KeyBytes, State, ExpectedGeneration, Replace, SnapshotBytes.
+as_bytes()->&'static[u8] is nonallocating. Exact strings/byte lengths:
+Options36: ERR flow opts must be a keyword list
+Type40: ERR flow type must be a non-empty string
+KeyBytes35: ERR key too large (max 65535 bytes)
+State31: ERR flow state must be a string
+ExpectedGeneration59: ERR flow expected_generation must be a non-negative integer
+Replace32: ERR flow replace must be boolean
+SnapshotBytes45: ERR flow policy snapshot exceeds 262144 bytes
+No std::error::Error implementation is required by the selected contract.
+
+Three NEW private models, all in model.rs:
+PolicySetPatchCell<'input> = Raw(RawFlowPolicyValue<'input>) |
+Map{start:usize,pairs:usize} | List{start:usize,len:usize}.
+PolicySetPatchArena<'input> owns cells:Vec<Cell>, edges:Vec<usize>, root:usize.
+PolicySetPatchSlot holds source:usize, cell:usize, hash:u64, Copy.
+Use these exact private names; no aliases/traits/extra context/owner types.
+Map edges are a CONTIGUOUS paired range; list edges a contiguous single range.
+Every nested child completes before parent edges append. Slots stage child IDs;
+ancestor regions remain live while children append temporary regions. A source
+ordinal identifies the original row (no retained wide borrowed cursor per slot).
+
+One TEMPORARY Vec<PolicySetPatchSlot> is passed to conversion, truncated by
+checkpoint on return, then dropped before the success request is returned.
+Request moves ONLY cells+edges arena and the key Vec. No work Vec capacity is
+hidden in the returned request and no intermediate adapter tree is allocated.
+
+Two NEW public APIs:
+prepare_original_policy_set_request<'input>(
+    workflow_type:&RawFlowPolicyValue<'input>,
+    opts:&RawFlowPolicyValue<'input>,
+    limits:PolicySchemaLimits,
+    charge:&mut PolicySchemaCharge,
+) -> Result<Result<OriginalPolicySetRequest<'input>,
+                   OriginalPolicySetInputRejection>,CompletePolicyEncodingError>;
+
+encode_original_policy_set_input_rejection_body(
+    reason:OriginalPolicySetInputRejection,
+    limits:PolicySchemaLimits,
+    charge:&mut PolicySchemaCharge,
+) -> Result<Vec<u8>,CompletePolicyEncodingError>;
+
+The descriptor wrapper objects may drop if their underlying borrowed arrays/
+payloads live; returned payload/state references require their actual source
+lifetime. The request owns its routing key independently, with no redundant
+type Vec. This deliberately differs from the closed install Plan's owner-drop
+contract. A view cannot be converted into a Raw map, Verified frame or authority
+by a public constructor. No existing API accepts this prepared owner as proof.
+
+Resource profile and prospective primitive rules
+------------------------------------------------
+
+This is a NEW public preparation tariff, not an edit to any old wrapper, lower
+frame, raw normalization, current reader or retained outcome stream. All use
+the caller's one PolicySchemaCharge. Profile mismatch is no-debit outer
+Schema(ProfileMismatch). No counter reset/refund/clone credit.
+
+Visible input bounds cover BOTH supplied descriptor trees (type and opts), not
+two copies: N<=131072 occurrences, max depth64 (each root depth0), total visible
+atom/binary/magnitude bytes<=67108864. Shared input pointers count per occurrence.
+This NEW N explicitly admits65535 AND65536 byte-list elements plus public
+type/options/tuple/key wrappers; old lower65536/old raw reader caps stay exact.
+The byte profile admits the original600 unique~2000-byte governance values to
+the reached RAW PATCH SnapshotBytes guard. No262144 type/preflight cap is added.
+
+Entry128; each attempted descriptor occurrence128 BEFORE N/depth checks; visible
+payload length is checked against total-byte bound then paid at its length BEFORE
+a content scan. Recursion visits tuple fields/map keys/map values/list elements/
+improper prefix and tail even where conversion later treats a subtree as opaque
+or a dead duplicate; it bounds VISIBLE descriptors, not hidden Other payload.
+An Atom is already-captured UTF-8 spelling, no interning; after the prepaid
+byte scan, >255 Unicode scalar spellings are outer InvalidAuthority (not a
+possible captured OTP atom). This adds no restriction to actual existing atoms.
+Integer/Big padding is not normalized during descriptor traversal.
+
+After descriptor bounds: public root guard128; top keyword-shape root128 and
+one128 per reached logical cons before tuple2/atom-key tests. The pass collects
+FIRST state/expected_generation/replace borrowed values without examining their
+value classes; compare each eligible atom key in fixed order
+[state,expected_generation,replace], stopping at first equality, with
+128+keyByteLen+queryByteLen BEFORE each exact text comparison. A shape-invalid
+row/tail returns Options. Nil/Atom(nil) is an atom key; binary keys fail keyword.
+Explicit improper-fragment tail transitions pay128 before following; root[] has
+no separate tail event. Proper tails concatenate; nilATOM stays improper.
+Type128, derived key-bound128, state128, expected128, replace128 are separate
+source-order validators. Bounded Integer access is under that validator; any
+Big value needing sign/magnitude normalization pays128+FULL represented magnitude
+before scanning high padding. Zero is zero under either sign. Invalid controls
+return inner diagnosis without patch allocation or metric. No key copy yet.
+
+Let actual admitted N,D be descriptor counts. Three invocation Vecs reserve N
+each: cell budget64N, edges8N, slot budget32N; fixed bounded staging256+128D.
+Logical scratch P_new=104N+128D+256 is admitted BEFORE any of these allocations,
+then reservations are individually prospective128+64N,128+8N,128+32N and each
+uses try_reserve_exact. Native size_of/allocator rounding/stack/RSS are not
+claimed by these logical budgets. They include the SUM of all three concurrent
+invocation owners, not max of their sizes. Prior returned request/snapshot owners
+remain paid held outputs; historical P is not a total-native-live-memory meter.
+
+Output cells/edges/active slots each fit N. Conversion replaces source containers
+and pair wrappers rather than expanding business defaults; state[]→Map{} replaces
+one node. Unreachable state-pair callback output is still occurrence-bounded and
+charged; no discarded output/callback work disappears. Nested active parent/child
+row occurrences are disjoint, so SUM active slots<=N even with aliased pointers.
+A bounded stack stores root/source/checkpoints, not adapter trees or extra Vecs.
+
+Conversion visit128 precedes each reached normalize_policy_patch/state_patch/
+normalize_keyword_maps root class. The top LAST Map.new builder has its own128
+root. Each actual fresh row/cons read128, including repeated classifier/build/
+callback/edge-assembly reads; no full list traversal is hidden in a kind accessor.
+Generic[] takes its empty fast path; nonempty generic lists classify keyword
+with128 per reached row, stopping at the first invalid row exactly as source;
+a false classifier then freshly maps EVERY element. Struct predicate lookup is
+inside the reached Map.new/2 container visit plus paid fresh row reads and
+128+keyLen+10 comparisons on eligible atom keys; atom value is classified under
+that paid row. It is not an extra empty-map root or a global exclusion.
+
+LAST keyword compaction rereads each row128; top reserved filtering uses the
+same fixed [state,expected_generation,replace] exact comparison rule BEFORE
+hashing. Reserved rows drop, all remaining keys are atoms. State-pair conversion
+runs every source-list callback128+recursive conversion BEFORE duplicate lookup,
+unlike ordinary keyword compaction. For either new atom-key keyword or binary
+state-pair keys: fresh FNV-1a64 (offset14695981039346656037,
+prime1099511628211, wrapping arithmetic) pays128+keyLen before the byte hash;
+each prior cached fingerprint visit16; a matching fingerprint then pays
+128+both exact byte widths before equality. Hash inequality only filters;
+no hash-only equality or VM iteration/order claim. Each slot append/whole update
+pays128. For state-pair duplicate callbacks, earlier transformed cells remain
+charged even if unreachable after the last update.
+
+Surviving new keyword/pair slots use one fallible heapsort in their active region
+with exact key text/binary order; each raw row fetch128 and comparison128+both
+widths before content, every actual atomic slot swap256 before mutation.
+This NEW logical map order is not a captured map order. Direct map rows instead
+retain the supplied actual-map reduce order in the result, while Map.new/2
+callbacks use forward<=32/reverse>32. Direct-map key uniqueness and faithful VM
+order are SOURCE INPUT CONDITIONS, not proven by RawFlowPolicyValue::Map nor by
+the prepared result; full identity/capture remains REQUIRED. This component does
+not pretend to validate arbitrary mathematical-map identity with a unit key tag.
+
+Each cell/edge append128 BEFORE capacity-checked push, whole staged child-ID
+update128, and paired parent edges append only after all children. Parent keys
+are Raw cells preserving arbitrary key subterms. Public getters never mutate.
+After successful full raw metric/cap, key ownership pays128+13+typeLen, performs
+one fallible exact allocation and prefix+type copy. Final success metadata128.
+The temporary slot Vec drops; cells/edges/key move without recopy.
+
+Raw patch metric: exact supported-subset relation, not normalized M=E reuse
+-------------------------------------------------------------------------
+
+Actual tagged OTP-28.3.1 external.c blobea04f5afc597498961eeced5b394bc4650620575
+was fetched, with exact reads739–750,4215–4235,5306–5336,5369–5385,
+5450–5457,5507–5570. MAX_STRING_LEN at59 is65535. Sources:
+https://github.com/erlang/otp/blob/OTP-28.3.1/erts/emulator/beam/external.c#L739
+https://github.com/erlang/otp/blob/OTP-28.3.1/erts/emulator/beam/external.c#L4215
+https://github.com/erlang/otp/blob/OTP-28.3.1/erts/emulator/beam/external.c#L5507
+Default flags use UTF8_ATOMS|NEW_FLOATS. For THIS represented subset (no runtime
+opaque/float/bitstring/reference/function payload), source default external_size
+is exactly1 VERSION byte plus the following term lengths:
+- Atom UTF-8 b bytes:2+b if b<=255, otherwise3+b; Nil/Atom(nil) is5.
+- Binary b:5+b. No UTF-8 check/trim.
+- Mathematical integer0..255:2; other signed32:5; otherwise3+d for significant
+  magnitude d<256,6+d for d>=256. Negative zero/high-zero Big padding is
+  canonicalized mathematically, not counted as output digits. Integer128 and
+  Big aliases have identical metric.
+- Tuple arity<=255:2+sum(children), otherwise5+sum(children).
+- Map:5+sum(key and value terms), irrespective of iteration/order/struct shape.
+- Empty proper list:1 (NIL_EXT, distinct from nilATOM).
+- Proper nonempty ALL-byte integer list length1..65535:3+length (STRING_EXT).
+- Other proper list:5+sum(head terms)+1. An actual improper nonlist tail uses its
+  full term metric in place of the final1; mathematically proper fragmented list
+  tails concatenate before this choice. No-head fragment delegates to its tail.
+
+Metric traversal is independent of business validation: VERSION1 first, each
+reached term/root128 before class, then one exact header/leaf width debit before
+reading its payload or accumulating that branch. Scalar fixed headers are
+metadata; binary/atom content is scanned only after its full width admission.
+Big normalization pays128+FULL original magnitude before trimming; its exact
+canonical branch-width debit is separate. For a nonempty list, the STRING probe
+pays128 per reached head BEFORE byte-class/range check, stops on first nonbyte,
+improper terminal, or65536th candidate. A Big candidate pays its normalization
+before byte classification. If the probe fails, LIST header5 and a FRESH ordinary
+term walk of all heads/tail are paid; if it succeeds, pay3+length once, with no
+second head scan. Empty list skips that probe. Raw tuple/key barriers are traversed
+here to size them, although their contents were not recursively converted.
+All represented branches are fully measured before the final262144 comparison;
+no prefix-over-cap shortcut hides a later UnsupportedTag/work refusal.
+
+Reached Raw::Other in metric (even inside a tuple or map key) returns outer
+UnsupportedTag. Its missing payload cannot be assigned a fake external_size or
+identity. A dropped reserved/dead keyword value may contain Other because no
+surviving patch metric reaches it. This preserves the old snapshot API's Other
+cases/events and makes the NEW public descriptor limitation explicit.
+Full opaque source terms, real VM-order capture, struct Enumerable behavior,
+public committed identity and generic current/merge are REQUIRED later work.
+
+Independent metric controls BEFORE production (PERF also rederived, no probe):
+for converted %{x_atom=>binary(n)}, M=14+n, so n262130 is inclusive262144 and
+n262131 gives SnapshotBytes262145. For %{x_atom=>proper byte list(n)},
+n65535 gives65547, n65536 gives131087; both are publicly reachable under NEW N.
+Same map with [] gives10; with nilATOM gives14; states:[] becomes Map{} and gives19.
+Standalone proper[1,2] metric6 versus actual [1,2|nilATOM]15.
+Integer2^64 standalone13 / map-x21; significant digit lengths255/256 standalone
+259/263 (map-x adds8). Include signed32 neighbors,255/256, negative and padded
+aliases, Unicode atom UTF8-byte255/256 boundary, tuples255/256 and binary FF/NUL.
+The standalone numbers are equations for nested test expectations, not a new
+public metric helper or native-general external_size theorem.
+
+Frozen initial representative NEW work streams
+----------------------------------------------
+
+MIN: type Binary(r), opts List([]), N2/D0/raw1, patch emptyMap metric6,
+owned key14. No current/history/default state normalization is performed.
+Primitive deltas in exact order:
+preflight [128,128,1,128] =>G385;
+public [128(root),128(keyword),128(type),128(key),128(state),128(expected),
+128(replace)] =>G1281;
+scratch peak464;
+reservations [256,144,192] =>G1873;
+empty top builder/normalize-policy/Map-cell [128,128,128] =>G2257;
+raw metric [1,128,5] =>G2391;
+final key [142] =>G2533; final success[128] =>G2661/P464/T3125.
+Exact work3125 succeeds; tight3124 refuses target3125 retainingG2533/P464.
+The first scratch target is1745 (G1281+P464); tight1744 retainsG1281/P0.
+All positive primitive refusals, not just phase totals, will be direct assertions.
+
+One reserved-control row type r / opts[(replace,true)]:
+N5/D2/raw12; preflight780; public root/keyword/row plus fixed key comparisons
+[140,154,142] and five validators yields2240.
+P1032; reservations[448,168,288] yield3144; topbuilder128,row128,reserved-key
+comparisons[140,154,142] yield3836; normalize-policy128/emptyMapcell128,
+metric[1,128,5],key142,success128 =>G4496/P1032/T5528.
+This row preserves true while dropping replace from the patch; default MIN is
+false. These are NEW source-derived logical tariffs, no candidate exists.
+
+Rejection encoder profile mismatch has no debit; otherwise [128(entry),128+B
+fallible reserve+copy] gives Options292,Type296,KeyBytes291,State287,
+ExpectedGeneration315,Replace288,SnapshotBytes301; P0 unless inherited.
+No old owner encoder, intermediate Vec, retained status or double entry.
+
+Continuous examples: three successful MIN calls on one account give
+G2661/5322/7983,P464; third final tight8446 refuses target8447 atG7855/P464,
+with the first two key owners and all source payload pointers reobserved.
+A real OLD standalone Other seed G13726/P6912 held through NEW MIN gives
+G16387/P6912/T23299; tight23298 at new final metadata retainsG16259/P6912.
+This is an old-source seed, NOT Other transported by the new prepared profile.
+Returned arena owners are never dropped/replaced in a helper before reobserving
+the first held result. No returned counter is used to build expected fees.
+
+Further nonempty conversion/STRING-probe/hash-hit/swap/callback/metric primitive
+arrays are ordinary tests-first derivation and must be frozen BEFORE final
+missing-API RED/production. Exact inventory approval may release meaningful
+semantic test authoring before every full decimal is finished, as Root's
+previous cadence explicitly allowed; no inert body or native probe gate.
+
+Eight meaningful selected test duties
+------------------------------------
+
+public_set.rs (three identities):
+1. original_public_set_preserves_root_and_first_control_priority:
+   nonbinary TYPE vs opts shape; empty type after shape; key65522/65523; bad state
+   before expected before replace; first invalid/good and good/invalid duplicate
+   controls in both orders; atom nil/bool key/value distinctions; arbitrary
+   binary type/state bytes and no invented response-state length bound.
+2. original_public_set_keeps_both_modes_and_unbounded_reply_state:
+   absent false, true/false exact, nil/nonboolean rejects; preserve original
+   state selector, expected guards including MAX and mathematical Big aliases;
+   carry defaultfalse distinctly without attempting current merge or claiming
+   existing registry3 binds response/default context.
+3. original_public_set_converts_last_policy_values_and_state_pairs:
+   full view comparisons built before prepare for ordinary last keyword,
+   original queued-FIFO/retry data, states[] vs generic[], binary state pairs,
+   duplicate configs EACH normalized, duplicate ordinary keyword losers skipped.
+
+cases.rs (three identities):
+4. original_public_set_preserves_recursive_barriers_and_callback_reachability:
+   nested keyword/map/list conversion, tuple interior/map-key barriers,
+   root-only states special handling, improper proper-tail concatenation versus
+   reached exception, dead winner vs state callback reachability, ordinary
+   __struct__ integer/binary and exact reached atom-value struct profile,
+   struct inside tuple/key barrier remains metric-only. Newly built output
+   order is mathematical/logical; DirectMap callback profile distinct.
+5. original_public_set_measures_converted_patch_before_lower_business:
+   public unknown262130/262131 exact raw size, original600~2000-byte unique Gov
+   recipe reaches raw SnapshotBytes before lower invalid fields/current/Gov,
+   STRING65535/65536 both success, list/proper/improper/nil distinctions,
+   no old normalized-size/private V2 handoff; exact rejection bytes.
+6. original_public_set_preserves_arbitrary_integer_and_byte_terms:
+   versions aboveu64 and255/256 significant bytes remain mathematically intact
+   in patch view; bounded expected rejects huge/negative; small/signed32/Big
+   metric branch neighbors, UTF8 atom-byte/tuple arity boundaries, opaque FF/NUL,
+   all field-agnostic unknown data preserved until future business walk.
+
+refusals.rs (two identities):
+7. original_public_set_prepays_each_reached_operation:
+   exact/tight literal MIN/control/nonempty conversion/hash/collision-filter/
+   compaction/swap/list probe/metric/key/body/final events and source failures;
+   N/D/B exact/+1 including ignored/dead subtrees, attempted nodes before cap,
+   matching profile and no-debit mismatch, preflight actual alias occurrences,
+   struct/Other operational priority without invented caller diagnosis.
+8. original_public_set_keeps_one_account_and_borrowed_owners:
+   actual repeated calls, old prior64/6912 peaks, first held through second
+   success and third refusal, owned key pointer/bytes versus borrowed input
+   payload/state/view pointers; dropped local Raw wrappers with live underlying
+   storage; every output and failed epoch retained. Existing old API controls
+   continue through full target, no assertions/inputs removed or substituted.
+
+All expected structural values, exact caller strings and independent fee arrays
+are authored before production. Genuine final complete_policy missing-API RED
+must show the selected exports absent with no unrelated diagnostics/zero
+assertions, then Root independently reproduces and releases disjoint production.
+Preserve every failed compiler/style epoch rather than relabeling it clean RED.
+If five production/three test files cannot fit400/600 and function100 limits
+without losing duties, consult an exact cohesive additional artifact BEFORE
+creation; do not compress away scenarios.
+
+Required successor handoff and limits
+------------------------------------
+
+This is a necessary public preprocessing predecessor, not completion of public
+Policy.set. Defaultfalse merge must later preserve arbitrary source-safe current
+maps/keys/ignored terms and atom/binary equivalent-key rules, with exact special
+state deletion only when RESOLVED key is atom states. Existing deterministicETF
+row order alone is not general mixed-key Enum order. Current index+merge backing+
+new normalized Layout must be SUM-paid while live; no current-drop proof reused.
+
+A future public committed parent must bind BOTH operation semantics AND original
+response_state/default context, not just registry3's lower key/expected/patch.
+Prepared output is not fed into the lower captured-source-order frame as proof.
+It must eventually be consumed by a real shared private business walk once,
+without public view→snapshot Vec→parse→CONTENT1 readmission or u64 narrowing.
+Public reply All/State projection must preserve arbitrary source versions,
+state retry/retention defaults and whole-state governance fallback; current V2
+presentation values do not prove that bridge. No response DTO model is selected
+in this batch. Full opaque identity/capture/Enumerable profiles remain REQUIRED.
+
+Physical Router keydir/Raft/all-shard installation, ETS overwrite/setup/runtime,
+all mandatory original assertions/scenarios, full M1–M8 and independent Linux AND
+macOS validation remain active. This proposal claims no native performance
+measurement; it removes repeated NEW control scans and avoids payload copies by
+source-level reasoning, while old fees/APIs remain exact.
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-SET1-SOURCE-FIXTURE1
+
+Finite same-proposal precision; no new artifact/API/model/tariff is selected.
+Root's actual pinned source identity49bda0ec2fab73ce,
+apps/ferricstore/test/ferricstore/flow_policy_generation_test.exs239–244,
+uses workflow type generation-state-validation-<generated>, state:1 and direct
+assert242 of exact ERR flow state must be a string. Duty1 must preserve that
+source recipe with a deterministic supplied suffix and a DIRECT test-body body
+assertion after real execution. FerricStore setup, routing and installation are
+still outside this pure validation observation; Root owns any later narrow
+ledger mapping. This supplements the generic bad-state/control priority matrix.
+
+The source normalize_policy_patch branch also mentions a binary states key,
+but valid public top options are atom-key keyword rows, so this API's newly
+built top patch has atom keys only. A binary states key in a nested raw map is
+preserved as an ordinary generic-map key and DOES NOT trigger root-state
+conversion. Do not invent a public binary-top-key positive by weakening the
+Keyword.keyword? requirement. That raw lower/source branch remains separately
+meaningful for a future generic patch/merge consumer.
+
+Proposal31772B/50445c0e was actually read back in complete15500/16272B displays
+25eb5b/6c5fb0 after writing. No source/test creation has occurred in this task.
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-SET1-PROFILE-PRECISION1
+
+Same exact5+3/models/APIs proposal; no implementation or new artifact.
+ARCH's finite whole review found no inventory/resource blocker and selected the
+following existing Raw descriptor rule before its recorded creation decision:
+RawFlowPolicyValue::ImproperList has a NONEMPTY prefix. In this NEW public
+preflight an empty prefix returns existing EncodingError::Malformed AFTER that
+node's ordinary attempted128/count/depth check, BEFORE following its tail.
+This applies inside tuple/key barriers too, as visible input validity. A
+nonempty prefix ending in a real proper List tail remains admitted; nilATOM
+never closes it. The earlier mathematical metric no-head delegation is not
+admission of an empty-prefix Raw descriptor, and no old API is altered.
+
+Exact existing outer variants for the NEW bound/check paths are ItemLimit for
+N/depth, ByteLimit for total visible raw bytes, Schema(LengthOverflow) for checked
+arithmetic, AllocationFailure for actual fallible reservation failure, and
+Malformed for impossible internal cell/edge/slot correspondence. Work/profile
+errors remain existing Schema variants; reached source traversal exceptions,
+invalid impossible atom spelling and struct profile use Schema(InvalidAuthority).
+Other's reached metric exclusion is UnsupportedTag. No new error variant.
+
+Actual reciprocal source-preparation reads: ARCH's entire8821B/ebf56038 was read
+in819f66, PERF's entire8178+970+3716B including struct predicate/raw-metric proofs
+was read in0bc3fb. They agree on public priority, exact FIRST/LAST and raw metric.
+PERF whole-read the31772B main and1408B fixture appendix and independently matched
+MIN2661/P464/T3125, true-row4496/P1032/T5528, seven bodies/encoder totals and the
+held6912/third-MIN refusal equations. Final nonempty primitive arrays remain
+ordinary tests-first derivation before final RED/production, as already stated.
