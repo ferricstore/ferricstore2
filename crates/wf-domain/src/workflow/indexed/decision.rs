@@ -14,13 +14,13 @@ use super::{
     IndexedGroupView, OrderingChange, OrderingMetadata, rows,
 };
 
-pub(super) fn decide<'a>(
-    view: IndexedGroupView<'a>,
-    items: &[IndexedBatchItem<'a>],
+pub(super) fn decide<'view>(
+    view: IndexedGroupView<'view>,
+    items: &[IndexedBatchItem<'_>],
     order: EntryOrder,
     encoded_entry: &[u8],
     limits: AdmissionLimits,
-) -> Result<IndexedDecision<'a>, ApplyError> {
+) -> Result<IndexedDecision<'view>, ApplyError> {
     decide_with(view, items, order, encoded_entry, limits, admitted_bytes)
 }
 

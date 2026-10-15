@@ -19,8 +19,14 @@ mod encode;
 mod keys;
 mod policy;
 mod reader;
+mod record_batch;
 mod scan;
 mod writer;
+
+pub use record_batch::{
+    RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, decide_record_batch,
+    encode_record_batch,
+};
 
 pub use complete_policy::{
     CompleteCorePolicyPatchIntent, CompletePolicyReplaceIntent,

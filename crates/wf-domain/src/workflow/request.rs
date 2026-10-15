@@ -106,6 +106,12 @@ impl ClientIntent {
         Self { version: 4, digest }
     }
 
+    /// Selects the prepared mutation-batch grammar; grants no apply authority.
+    #[must_use]
+    pub const fn record_batch(digest: [u8; 32]) -> Self {
+        Self { version: 5, digest }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

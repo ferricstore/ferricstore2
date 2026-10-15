@@ -453,7 +453,7 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
             && !self.test
             && name
                 .as_deref()
-                .is_none_or(|name| !["vec", "format", "matches"].contains(&name))
+                .is_none_or(|name| !["vec", "format", "write", "matches"].contains(&name))
         {
             self.report("unreviewed runtime macro/generated code requires an audit gate");
         }
@@ -467,10 +467,16 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
 impl Inspector<'_, '_> {
     fn inspect_expression_macro(&mut self, mac: &syn::Macro, name: Option<&str>) {
         match name {
-            Some("format" | "vec") => {
+            Some("format" | "vec" | "write") => {
                 if let Ok(arguments) =
                     Punctuated::<Expr, Token![,]>::parse_terminated.parse2(mac.tokens.clone())
                 {
+                    if name == Some("write")
+                        && !matches!(arguments.iter().nth(1), Some(Expr::Lit(literal))
+                            if matches!(&literal.lit, Lit::Str(_)))
+                    {
+                        self.report("uninspectable approved expression macro");
+                    }
                     for expression in &arguments {
                         self.visit_expr(expression);
                     }

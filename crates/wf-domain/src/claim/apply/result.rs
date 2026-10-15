@@ -186,21 +186,29 @@ pub enum ClaimRejection {
 impl fmt::Display for ClaimRejection {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ValueTooLarge { bytes, maximum } => formatter.write_str(&format!(
-                "ERR value too large ({bytes} bytes, max {maximum} bytes)")),
-            Self::WorkBytes { bytes, maximum } => formatter.write_str(&format!(
-                "claim represented work exceeds immutable budget ({bytes} bytes, max {maximum} bytes)")),
+            Self::ValueTooLarge { bytes, maximum } => write!(
+                formatter,
+                "ERR value too large ({bytes} bytes, max {maximum} bytes)"
+            ),
+            Self::WorkBytes { bytes, maximum } => write!(
+                formatter,
+                "claim represented work exceeds immutable budget ({bytes} bytes, max {maximum} bytes)"
+            ),
             _ => formatter.write_str(match self {
                 Self::InvalidScope => "invalid claim selection scope",
                 Self::InvalidPriority => "claim priority must be between 0 and 2",
                 Self::InvalidBudget => "claim selection budget exceeds supported bounds",
                 Self::HeadBudget => "claim selection requires more authoritative lane heads",
-                Self::StaleContinuation => "claim selection continuation does not match this snapshot/request",
+                Self::StaleContinuation => {
+                    "claim selection continuation does not match this snapshot/request"
+                }
                 Self::EmptyType => "ERR flow type must be a non-empty string",
                 Self::EmptyWorker => "ERR flow worker must be a non-empty string",
                 Self::ZeroLease => "ERR flow lease_ms must be a positive integer",
                 Self::LeaseTooLarge => "ERR flow lease_ms exceeds maximum 9007199254740991",
-                Self::LeaseDeadlineTooLarge => "ERR flow lease_ms deadline exceeds maximum 9007199254740991",
+                Self::LeaseDeadlineTooLarge => {
+                    "ERR flow lease_ms deadline exceeds maximum 9007199254740991"
+                }
                 Self::VersionOverflow => "ERR flow version overflow",
                 Self::FenceOverflow => "ERR flow fencing token overflow",
                 Self::DecisionBytes => "workflow decision byte budget exceeded",

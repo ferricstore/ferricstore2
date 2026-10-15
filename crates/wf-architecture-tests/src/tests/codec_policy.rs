@@ -597,3 +597,4 @@ fn original_policy_entry_reader_stays_pure_and_server_side() -> CheckResult<()> 
 }
 
 mod original_policy;
+mod record_batch;

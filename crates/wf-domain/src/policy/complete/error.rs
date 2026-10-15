@@ -150,33 +150,42 @@ impl fmt::Display for PolicySchemaError {
         };
         match self {
             Self::Policy(error) => fmt::Display::fmt(error, formatter),
-            Self::WorkBytes { bytes, maximum } => formatter.write_str(&format!(
+            Self::WorkBytes { bytes, maximum } => write!(
+                formatter,
                 "complete policy work budget exceeded ({bytes}, maximum {maximum})"
-            )),
-            Self::RuleCount(kind) => formatter.write_str(&format!(
+            ),
+            Self::RuleCount(kind) => write!(
+                formatter,
                 "ERR flow governance {kind:?} rule count exceeds 1000"
-            )),
-            Self::InvalidName(kind) => formatter.write_str(&format!(
+            ),
+            Self::InvalidName(kind) => write!(
+                formatter,
                 "ERR flow governance {kind:?} rule name must be nonempty"
-            )),
-            Self::NameBytes(kind) => formatter.write_str(&format!(
+            ),
+            Self::NameBytes(kind) => write!(
+                formatter,
                 "ERR flow governance {kind:?} rule name exceeds 65535 bytes"
-            )),
-            Self::ListCount(_) => formatter.write_str(&format!(
+            ),
+            Self::ListCount(_) => write!(
+                formatter,
                 "ERR flow governance {field} list count exceeds 1000"
-            )),
-            Self::InvalidListValue(_) => formatter.write_str(&format!(
+            ),
+            Self::InvalidListValue(_) => write!(
+                formatter,
                 "ERR flow governance {field} must contain nonempty names"
-            )),
-            Self::ListBytes(_) => formatter.write_str(&format!(
+            ),
+            Self::ListBytes(_) => write!(
+                formatter,
                 "ERR flow governance {field} name exceeds its byte maximum"
-            )),
-            Self::NonCanonicalList(_) => formatter.write_str(&format!(
+            ),
+            Self::NonCanonicalList(_) => write!(
+                formatter,
                 "ERR normalized flow governance {field} names must be unique"
-            )),
-            Self::InvalidInteger(_) => formatter.write_str(&format!(
+            ),
+            Self::InvalidInteger(_) => write!(
+                formatter,
                 "ERR flow governance {field} is outside its integer bounds"
-            )),
+            ),
             Self::CircuitTracking(failure) => formatter.write_str(match failure {
                 CircuitTrackingFailure::MinCallsAbove64 => "ERR circuit min_calls exceeds 64",
                 CircuitTrackingFailure::ThresholdAbove64WithoutRate => {

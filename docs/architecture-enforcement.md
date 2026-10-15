@@ -56,9 +56,13 @@ non-value domain modules. Worker wire paths are restricted to the private
 and public re-exports through `client` fail. Import groups, aliases, Cargo
 renames, glob imports/re-exports and qualified references are inspected.
 
-`vec!`, `format!` and `matches!` are the only currently approved production
+`vec!`, `format!`, `write!` and `matches!` are the currently approved production
 expression macros. Their supported argument grammars are parsed and recursively
 visited, including vector repeats and match guards; unparseable arguments fail.
+The supported `write!` form requires a destination and a string literal followed
+by comma-separated expressions or named assignment arguments. The destination
+and every argument receive the same effect, unsafe and dependency checks as
+ordinary expressions. Missing or nonliteral format arguments fail closed.
 Other runtime macros, code includes, module path redirection and archunit ignore
 directives require a new audit gate. The `archunit: ignore` directive is rejected
 independently because the evaluated upstream release deliberately omits that

@@ -20812,12 +20812,76 @@
     {
       "source_declaration_id": "88c6507d3eccfe8c",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-88c6507d3eccfe8c",
+          "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
+          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_module": "",
+          "rust_function": "pinned_complete_many_preserves_order_and_atomic_guard_rollback",
+          "assertions": [
+            {
+              "source_line": 795,
+              "source_text": "assert Enum.map(completed, & &1.id) == Enum.map(items, & &1.id)",
+              "rust_line": 363,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 796,
+              "source_text": "assert Enum.all?(completed, &(&1.state == \"completed\"))",
+              "rust_line": 370,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed private mutation-byte composition preserves the pinned fail/complete bulk type/partition/worker/ID prefixes, sorted input order, run/claim1000 and terminal2000 recipes. Fixed suffixes and explicit create900 normalize generated identities and unspecified source clocks; complete success retains its explicit source900. Links cover only ordered IDs and terminal states, or BOTH original running/version2 observations after bad-first guard refusal. An additional reversed input exercises late refusal without relabeling the source order. Coherent borrowed views replace physical reads; source compound public error/success replies, error/result references, info counts, fetched histories, public normalization/routing and original setup/runtime profiles remain UNLINKED. Inline payload/result/error, proposed index/history changes, retained scalar acknowledgements and priority/FIFO controls supply additional component checks only. Genuine independently reproduced missing-API RED preceded production; finite test/layout repairs before SUT retain their actual timing. All six new tests pass on macOS, with no complete source-case/workflow parity, physical atomic durability, measured native resource gain or independent Linux result implied. Every older counterpart and runtime binding is preserved."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "6286a35397e402f7",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-6286a35397e402f7",
+          "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
+          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_module": "",
+          "rust_function": "pinned_complete_many_preserves_order_and_atomic_guard_rollback",
+          "assertions": [
+            {
+              "source_line": 845,
+              "source_text": "assert fetched_a.state == \"running\"",
+              "rust_line": 411,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 846,
+              "source_text": "assert fetched_b.state == \"running\"",
+              "rust_line": 411,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 847,
+              "source_text": "assert fetched_a.version == 2",
+              "rust_line": 418,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 848,
+              "source_text": "assert fetched_b.version == 2",
+              "rust_line": 418,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed private mutation-byte composition preserves the pinned fail/complete bulk type/partition/worker/ID prefixes, sorted input order, run/claim1000 and terminal2000 recipes. Fixed suffixes and explicit create900 normalize generated identities and unspecified source clocks; complete success retains its explicit source900. Links cover only ordered IDs and terminal states, or BOTH original running/version2 observations after bad-first guard refusal. An additional reversed input exercises late refusal without relabeling the source order. Coherent borrowed views replace physical reads; source compound public error/success replies, error/result references, info counts, fetched histories, public normalization/routing and original setup/runtime profiles remain UNLINKED. Inline payload/result/error, proposed index/history changes, retained scalar acknowledgements and priority/FIFO controls supply additional component checks only. Genuine independently reproduced missing-API RED preceded production; finite test/layout repairs before SUT retain their actual timing. All six new tests pass on macOS, with no complete source-case/workflow parity, physical atomic durability, measured native resource gain or independent Linux result implied. Every older counterpart and runtime binding is preserved."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "07c3865bfa1c7839",
@@ -20976,7 +21040,7 @@
         {
           "scenario_id": "m1-e1a8cf7f619f136a",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "c62016b54f33498553ce99b76373a6997dcd02c776f59d4d69893a2328cf5b89",
+          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
           "rust_module": "",
           "rust_function": "flow_retry_returns_to_claimed_run_state_with_computed_backoff",
           "assertions": [
@@ -21109,7 +21173,7 @@
         {
           "scenario_id": "m1-78839ca2df54b42f",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "c62016b54f33498553ce99b76373a6997dcd02c776f59d4d69893a2328cf5b89",
+          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
           "rust_module": "",
           "rust_function": "flow_retry_exhausts_to_configured_active_state",
           "assertions": [
@@ -21164,7 +21228,7 @@
         {
           "scenario_id": "m1-537f7338ecf1c648",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "c62016b54f33498553ce99b76373a6997dcd02c776f59d4d69893a2328cf5b89",
+          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
           "rust_module": "",
           "rust_function": "flow_retry_terminal_exhaustion_keeps_stable_audit_metadata",
           "assertions": [
@@ -21314,12 +21378,76 @@
     {
       "source_declaration_id": "1222bd491908472b",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-1222bd491908472b",
+          "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
+          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_module": "",
+          "rust_function": "pinned_fail_many_preserves_order_and_atomic_guard_rollback",
+          "assertions": [
+            {
+              "source_line": 44,
+              "source_text": "assert Enum.map(failed, & &1.id) == Enum.map(items, & &1.id)",
+              "rust_line": 278,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 45,
+              "source_text": "assert Enum.all?(failed, &(&1.state == \"failed\"))",
+              "rust_line": 285,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed private mutation-byte composition preserves the pinned fail/complete bulk type/partition/worker/ID prefixes, sorted input order, run/claim1000 and terminal2000 recipes. Fixed suffixes and explicit create900 normalize generated identities and unspecified source clocks; complete success retains its explicit source900. Links cover only ordered IDs and terminal states, or BOTH original running/version2 observations after bad-first guard refusal. An additional reversed input exercises late refusal without relabeling the source order. Coherent borrowed views replace physical reads; source compound public error/success replies, error/result references, info counts, fetched histories, public normalization/routing and original setup/runtime profiles remain UNLINKED. Inline payload/result/error, proposed index/history changes, retained scalar acknowledgements and priority/FIFO controls supply additional component checks only. Genuine independently reproduced missing-API RED preceded production; finite test/layout repairs before SUT retain their actual timing. All six new tests pass on macOS, with no complete source-case/workflow parity, physical atomic durability, measured native resource gain or independent Linux result implied. Every older counterpart and runtime binding is preserved."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "dab579f2989c77fd",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-dab579f2989c77fd",
+          "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
+          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_module": "",
+          "rust_function": "pinned_fail_many_preserves_order_and_atomic_guard_rollback",
+          "assertions": [
+            {
+              "source_line": 90,
+              "source_text": "assert fetched_a.state == \"running\"",
+              "rust_line": 327,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 91,
+              "source_text": "assert fetched_b.state == \"running\"",
+              "rust_line": 327,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 92,
+              "source_text": "assert fetched_a.version == 2",
+              "rust_line": 334,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 93,
+              "source_text": "assert fetched_b.version == 2",
+              "rust_line": 334,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed private mutation-byte composition preserves the pinned fail/complete bulk type/partition/worker/ID prefixes, sorted input order, run/claim1000 and terminal2000 recipes. Fixed suffixes and explicit create900 normalize generated identities and unspecified source clocks; complete success retains its explicit source900. Links cover only ordered IDs and terminal states, or BOTH original running/version2 observations after bad-first guard refusal. An additional reversed input exercises late refusal without relabeling the source order. Coherent borrowed views replace physical reads; source compound public error/success replies, error/result references, info counts, fetched histories, public normalization/routing and original setup/runtime profiles remain UNLINKED. Inline payload/result/error, proposed index/history changes, retained scalar acknowledgements and priority/FIFO controls supply additional component checks only. Genuine independently reproduced missing-API RED preceded production; finite test/layout repairs before SUT retain their actual timing. All six new tests pass on macOS, with no complete source-case/workflow parity, physical atomic durability, measured native resource gain or independent Linux result implied. Every older counterpart and runtime binding is preserved."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a0e3d21740e13f1a",
@@ -22309,7 +22437,7 @@
         {
           "scenario_id": "m1-ab0be7e9b8c01099",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "c62016b54f33498553ce99b76373a6997dcd02c776f59d4d69893a2328cf5b89",
+          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
           "rust_module": "",
           "rust_function": "stored_state_retry_policy_drives_retry_exhaustion_without_command_override",
           "assertions": [
@@ -22340,7 +22468,7 @@
         {
           "scenario_id": "m1-579ae5ad18ea20b4",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "c62016b54f33498553ce99b76373a6997dcd02c776f59d4d69893a2328cf5b89",
+          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
           "rust_module": "",
           "rust_function": "command_retry_policy_overrides_stored_state_policy",
           "assertions": [

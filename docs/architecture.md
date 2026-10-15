@@ -821,3 +821,31 @@ authorization and cache tracking remain adapter obligations. Stage-specific
 logical reservations and source-derived tests do not establish native resource
 measurements or complete original runtime parity. See
 [ADR006](adr/006-private-prepared-command-codec.md) for the selected contract.
+
+## Selected indexed mutation batch bridge
+
+The pure M1 join lives in private `wf-ports::log::record_batch`, with intent
+and response children. A consuming producer binds eight prepared mutation
+variants to a distinct intent registry5 and the existing FWCP1 format. The raw
+consumer verifies actual bytes and intent before exactly one retained-request
+gate. Fresh alone binds current retry authority and calls the existing indexed
+batch reducer, preserving records, history, priority, sequence and correctness
+index deltas. Named Claim/Reclaim keep their existing separate behavior.
+
+The result borrows only the coherent authoritative view. Decoded
+commands, keys and temporary reference buffers drop before namespace/request
+owners move into a compact retained acknowledgement. Acceptance is one private
+byte; exhaustive business rejections use at most nineteen. Physical atomic
+publication of the complete indexed plan, retained outcome and control remains
+the persistence adapter's duty. Fresh boxes the fixed retained metadata after
+workspace admission and value validation, keeping the enum compact without
+cloning response or namespace owners.
+
+Separate prospective workspace checks bound simultaneous logical owners using
+the existing immutable admission profile. They establish no native allocation,
+latency or process memory measurement. Six batch tests pass after genuine
+missing-API RED, and all macOS workspace source checks pass. A fresh advisory
+refresh and native Linux validation remain open. This establishes no public normalization,
+wire response, durability, full source parity or native Linux acceptance. See
+[ADR006](adr/006-private-prepared-command-codec.md) and the
+[named architecture decision](reviews/workflow-completion-architecture.md#arch-next-m1-record-batch1-create1).

@@ -16,6 +16,12 @@ pub(super) fn write(
     writer: &mut Writer<'_>,
     limits: CodecLimits,
 ) -> Result<(), CodecError> {
+    if request.intent.version() != 1
+        && !(request.intent.version() == 5
+            && matches!(request.operation, PreparedOperation::Batch(_)))
+    {
+        return Err(CodecError::UnsupportedVersion);
+    }
     let scope = [
         request.scope.tenant().as_bytes(),
         request.scope.group().as_bytes(),

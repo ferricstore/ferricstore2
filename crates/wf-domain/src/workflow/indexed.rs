@@ -203,13 +203,13 @@ pub enum IndexRejection {
 ///
 /// # Errors
 /// Rejects corrupt consumed authority, ordinal overflow or host allocation failure.
-pub fn decide_indexed_batch<'a>(
-    view: IndexedGroupView<'a>,
-    items: &[IndexedBatchItem<'a>],
+pub fn decide_indexed_batch<'view>(
+    view: IndexedGroupView<'view>,
+    items: &[IndexedBatchItem<'_>],
     order: EntryOrder,
     encoded_entry: &[u8],
     limits: AdmissionLimits,
-) -> Result<IndexedDecision<'a>, ApplyError> {
+) -> Result<IndexedDecision<'view>, ApplyError> {
     decision::decide(view, items, order, encoded_entry, limits)
 }
 

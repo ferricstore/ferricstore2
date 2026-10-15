@@ -36,7 +36,11 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 73 source declarations, 83 counterpart records and 314 assertion links.
+increments: 77 source declarations, 87 counterpart records and 326 assertion links.
+The four bulk fail/complete counterparts add only ordered IDs, terminal states,
+and both original running/version2 observations after guard refusal. Real private
+bytes reach the indexed decision and retained response; physical references,
+info counts, fetched histories, public setup and runtime profiles remain open.
 Both reviewers accept the supplemental source603 shape-error anchor; it supplies
 one error component with its remaining setup/profile/physical obligations explicit.
 The separate original ETF generation-boundary counterpart retains MAX, the returned

@@ -489,7 +489,7 @@ fn approved_expression_macros_cannot_hide_effects_or_layer_access() -> CheckResu
             .iter()
             .filter(|failure| failure.contains("standard-library module"))
             .count()
-            >= 4,
+            >= 6,
         "{effects:?}"
     );
     let hidden = source_check(
@@ -502,11 +502,39 @@ fn approved_expression_macros_cannot_hide_effects_or_layer_access() -> CheckResu
             .iter()
             .any(|failure| failure.contains("private client transport module"))
     );
+    for (source, diagnosis) in [
+        (
+            "fn forbidden() { let _ = write!(formatter, \"{:?}\", wf_wire::dto::Record); }",
+            "private client transport module",
+        ),
+        (
+            "fn forbidden() { let _ = write!(formatter, \"{}\", unsafe { 1 }); }",
+            "first-party unsafe block",
+        ),
+        (
+            "fn malformed() { let _ = write!(formatter; \"{}\", 1); }",
+            "uninspectable approved expression macro",
+        ),
+        (
+            "fn malformed() { let _ = write!(formatter); }",
+            "uninspectable approved expression macro",
+        ),
+        (
+            "fn malformed() { let _ = write!(formatter, format_string, 1); }",
+            "uninspectable approved expression macro",
+        ),
+    ] {
+        assert!(
+            source_check("wf-worker", "worker", source)?
+                .iter()
+                .any(|failure| failure.contains(diagnosis))
+        );
+    }
     assert_eq!(
         source_check(
             "wf-domain",
             "workflow",
-            "fn pure() { let _ = vec![1; 3]; let _ = format!(\"{}\", 1); let _ = matches!(1, 1 | 2 if true); }"
+            "fn pure() { let _ = vec![1; 3]; let _ = format!(\"{}\", 1); let _ = matches!(1, 1 | 2 if true); let _ = write!(formatter, \"{n:?}\", n = 1); }"
         )?,
         Vec::<String>::new()
     );

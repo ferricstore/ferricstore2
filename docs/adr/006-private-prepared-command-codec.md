@@ -1191,3 +1191,74 @@ storage adapter. Tests record actual capability invocation and exact replies;
 they do not execute physical reads or original setup/runtime profiles. Native
 allocation/latency, opaque ingress provenance, full wire output, all required
 source scenarios and independent Linux/macOS acceptance remain required.
+
+## Selected original indexed mutation batch composition
+
+ARCH-NEXT-M1-RECORD-BATCH1-CREATE1 selects three private production files under
+`wf-ports::log::record_batch`, three behavior test files and one architecture
+test child. The six semantic tests pass after independently reproduced
+missing-API RED and implementation. The exact
+field/code tables and named shared seams are bound in the
+[architecture decision](../reviews/workflow-completion-architecture.md#arch-next-m1-record-batch1-create1).
+
+The producer consumes a PreparedRequest, independently computes its operation
+intent and replaces the supplied digest without cloning the command tree. The
+consumer structurally scans once, prospectively admits decoder ownership, then
+decodes actual FWCP bytes. Both header directions accept intent1 for every
+existing root, or intent5 only for Batch; other combinations reject. ClientIntent's new
+record_batch constructor is mathematical and grants no validation authority.
+Existing registry1 construction and the other dedicated registries stay intact.
+
+Registry5 streams `WF-RECORD-BATCH`, NUL, `V5`, NUL, tenant and the meaningful
+ordered mutation list through SHA256. Fixed-width big-endian fields, explicit
+operation/backoff tags and absent/present byte fields define identity. Caller
+partitions, IDs, guards, values, create priority and explicit deadlines remain.
+Committed clocks, request/group/recovery identities, generated policy jitter,
+policy-resolved retry time and unused non-create priority are excluded. A
+RetryWithPolicy override retains one optional complete Backoff tuple. This is
+a prepared-value contract; earlier caller/default provenance remains separate.
+The eight supported mutations are Create, Transition, Complete, Fail, Retry,
+RetryWithPolicy, ExtendLease and Cancel. Named Claim/Reclaim remain available
+through the old codec and their appropriate data-reply paths.
+
+One existing request inspection precedes all Fresh current-record, retry-policy
+and index work. Fresh checks effective committed time, binds exact derived keys
+and each present payload/result/error occurrence, then calls the existing
+indexed reducer with first ordinal0 for this single batch frame. Two stable
+reference/item buffers avoid per-item value vectors. The two existing indexed
+signature lifetime splits keep returned predecessor references tied solely to
+the authoritative view. Scratch, decoded operation, keys and isolation drop
+before namespace/request owners move into retention.
+
+The private retained response version1 is acceptance `[0]` or an exhaustive
+business-rejection code and scalar payload of at most19 bytes. Explicit matches
+preserve every selected Domain/Admission/Batch/Index code; Rust enum layouts are
+not serialized. Typed status and immutable original time/position/expiry remain
+bound to the response. Operational decode, resource, authority, allocation and
+expiry errors are never retained as business outcomes. Replay borrows its exact
+original owner and bypasses current guards and new TTL configuration.
+
+Fresh stores its retained metadata in `Box<RetainedOutcome>` after the late
+workspace check and retained-value validation. This avoids the large inline
+enum variant while moving response/namespace ownership. The fixed512 metadata
+term covers the object and pointer. It adds one fixed allocation and indirection;
+it supplies no measured native gain. Stable `Box::new` follows existing fixed
+metadata precedents; [fallible Box allocation remains nightly](https://doc.rust-lang.org/std/boxed/struct.Box.html#method.try_new).
+Variable Vec builders remain fallible. Host allocation failure for this fixed
+box is fail-stop before durable publication, without a recoverable-OOM promise.
+
+For frame bytes E, immutable decision cap B and verified item count n, decoder
+ownership admits D=4E+B+1024n+2048; Fresh admits D+192n+256+B before either new
+buffer reservation. After transients drop, retention admits E+B+H+531, where H
+is moved namespace/request payload. Producer output admits the owned-input sum
+plus1024n+512 and measured frame bytes. Arithmetic is checked. These are
+operational logical coexistence bounds, separate from replicated business
+admission and native allocator capacity. The corrected fixed-wire proof
+E<=V+335+80n gives a default Fresh bound50,847,292 for core-admitted V under a
+64MiB workspace allowance. It makes no universal all-input or native RSS claim.
+
+The source write-contract suite observes scalar bulk acknowledgement and
+separate record fetches. Original sorted bad-first rollback and supplemental
+reversed late refusal remain distinct. Public raw/schema conversion, independent
+bulk modes, physical value references, queries, original setup/profiles, atomic
+durability and complete Linux/macOS acceptance remain required successors.

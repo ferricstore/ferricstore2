@@ -4,7 +4,35 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The working tree implements original public Policy.get validation and reader
+
+The latest reviewed increment implements private indexed mutation-batch
+encoding/apply and retained replay. Six new tests pass after independently
+reproduced missing-API RED; source review's non-batch error correction has its
+own regression RED/GREEN. Fresh bounds temporary owners, uses one request gate
+and preserves actual retry authority, input order, priority/FIFO and rollback.
+Fixed retained metadata is boxed after admission and validation, without a
+measured native performance claim. An independent exhaustion model adds64
+retry attempts across16 limit/target combinations to the existing target.
+Sixteen existing error displays also avoid temporary formatting Strings; the
+same352 Rust tests and one doc test pass before and after. The parsed `write!`
+audit has genuine tests-first RED/GREEN and preserves nested effect inspection.
+
+The final native macOS joint run passes618 Rust tests across70 targets and four
+compile-fail docs, with zero warnings, failures or ignored tests. Formatting,
+all-target compilation, strict Clippy, rustdoc, all40 architecture tests,
+reference integrity and progress checks pass on1132 unchanged inputs. The wrapper
+exits1 only because GitHub DNS blocks its default RustSec refresh; the separate
+cached October14 audit passes all four categories. Earlier full-wrapper macro
+and missing-target-safety-attribute failures remain recorded. The ledger now has
+77 declarations,87 counterparts and326 links, adding only twelve direct bulk
+ID/state/version observations. Physical refs/info/fetched histories, original
+setup/runtime profiles, independent Linux and full M1–M8 completion remain open.
+The architecture exit table now identifies concrete evidence for all five
+literal pure M1 model subjects. It selects no further pure policy/model layer.
+The next phase is read-only M2 atomic publication/recovery readiness and an
+exact artifact proposal; no backend or persistence implementation is approved.
+
+The preceding local commit `dbfdf0b` implements original public Policy.get validation and reader
 composition in three production files. Domain preparation preserves complete
 keyword validation, FIRST state and source error order; the ports state boundary
 performs one allocator-zero capability call and releases its temporary key before
@@ -1085,13 +1113,16 @@ proof or full behavioral parity is claimed.
   also [passed both runners](https://github.com/ferricstore/ferricstore2/actions/runs/37974338754),
   verified through GitHub CLI on October 12. These saved runs remain distinct
   from the current implementation.
-- Current reviewed local implementation checkpoint:
-  `6fccd21f7b5e90e8cd32dd6f655be1615a8a1e08`, with 502 passing macOS Rust tests,
-  four compile-fail docs and all strict source/dependency checks. It is saved
-  locally with reciprocal review closed. SSH/HTTPS host resolution and generic
-  GitHub API connection currently fail; no push or fresh CI run happened.
-  Current Linux/macOS CI remains required, and subsequent reader work has its
-  own architecture consultation and evidence.
+- Latest reviewed local increment: indexed mutation-batch composition and the
+  formatter/macro/model changes described above, with618 passing macOS Rust
+  tests, four compile-fail docs and all strict source checks. Its predecessor
+  is `dbfdf0b`. The
+  default dependency refresh fails on DNS; the separate October 14 cached audit
+  passes all four categories. It is saved locally with reciprocal review closed.
+  SSH/HTTPS host resolution and generic GitHub API connection currently fail;
+  no push or fresh CI run happened.
+  Current Linux/macOS CI remains required, and subsequent persistence work needs
+  its own concrete architecture consultation and predecessor evidence.
 - Main's last handoff commit was `b0151c5`. The foundation Linux/macOS CI passed
   `f2ff13b2da4e47e1fd52f74520fb219efe2de613`
   ([run](https://github.com/ferricstore/ferricstore2/actions/runs/37929778754)).
@@ -1261,10 +1292,12 @@ Continue in this order:
    documentation non-case, mixed workflow scope, setup/fixtures and mandatory
    profiles without editing frozen inputs or treating registration as execution.
    Port remaining original observations.
-3. Finish M1: broader scope/value admission, policy installation decisions,
-   partition/batch invariants, request-ID replay/model tests, committed encoding
-   and deterministic time/hash preparation. The represented pure subset is not
-   a completed workflow engine.
+3. Use the bounded five-subject pure M1 exit assessment in the architecture
+   review. Address concrete remaining source obligations without inventing
+   another policy/model layer. Review M2 neutral publication/recovery contracts,
+   selected dependency versions and real adapter proof requirements, then obtain
+   concrete architecture selection before any new artifact. The represented
+   pure subset is not a completed workflow engine.
 4. Pass M2 persistence/recovery gates before M3 consensus and M4 application,
    shared wire, HTTPS/TLS-TCP and worker work. Preserve atomic record/index/
    history/outcome/applied-position writes and uncertainty semantics.

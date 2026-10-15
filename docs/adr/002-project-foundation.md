@@ -21,3 +21,16 @@ Add wf-test-support for isolated test resources, controlled clocks and acknowled
 CI and local checks must run the same formatting, compiler/Clippy/doc warnings, architecture rules and negative fixtures, scaffold/helper tests, reference-integrity checks and dependency audit. The full parity gate fails until original runtime cases, assertion mappings and executed Rust counterparts exist. No ignored/deferred case can count as passing parity.
 
 The complete local check wrapper passes: 53 infrastructure tests, three compiler-failure doctests, formatting/compiler/Clippy/rustdoc checks, complete-workspace architecture/reference checks and all four pinned dependency audits. See [the infrastructure review record](../reviews/infrastructure-review-record.md) for peer findings, versions, dispositions and limits. M0's later runtime ExUnit collection/scope decisions remain unfinished; this increment is the infrastructure foundation, not all M0 exit evidence or any workflow runtime milestone. The supported Linux/macOS remote host matrix is configured separately from local execution evidence.
+
+## Parsed standard formatting audit
+
+The October 15 architecture review extends the existing parsed expression-macro
+policy to standard `write!` for direct formatter output. This removes explicit
+temporary strings in existing error formatting. The checker requires a
+destination, literal format string and parseable comma-separated arguments,
+then recursively inspects the destination and all arguments. Tests first expose
+the missing allowance and inspection; positive formatting, hidden I/O, forbidden
+layer access, unsafe expressions and malformed syntax remain executable controls.
+Other macro and generated-code audit requirements remain in force. This changes
+neither crate dependencies nor domain capabilities and establishes no measured
+native performance gain.

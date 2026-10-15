@@ -150,12 +150,14 @@ pub enum AdmissionError {
 impl fmt::Display for AdmissionError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ValueTooLarge { bytes, maximum } => formatter.write_str(&format!(
+            Self::ValueTooLarge { bytes, maximum } => write!(
+                formatter,
                 "ERR value too large ({bytes} bytes, max {maximum} bytes)"
-            )),
-            Self::KeyTooLarge => formatter.write_str(&format!(
+            ),
+            Self::KeyTooLarge => write!(
+                formatter,
                 "ERR key too large (max {MAX_API_KEY_BYTES} bytes)"
-            )),
+            ),
             Self::InvalidLimits => {
                 formatter.write_str("invalid immutable workflow admission limits")
             }

@@ -47,12 +47,14 @@ impl fmt::Display for ValueError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::EmptyRecordId => formatter.write_str("ERR flow id must be a non-empty string"),
-            Self::RecordIdTooLong { .. } => formatter.write_str(&format!(
+            Self::RecordIdTooLong { .. } => write!(
+                formatter,
                 "record id exceeds storage identity limit (max {MAX_RECORD_ID_BYTES} bytes)"
-            )),
-            Self::ApiKeyTooLong { .. } => formatter.write_str(&format!(
+            ),
+            Self::ApiKeyTooLong { .. } => write!(
+                formatter,
                 "ERR key too large (max {MAX_API_KEY_BYTES} bytes)"
-            )),
+            ),
             Self::EmptyPartitionComponents => {
                 formatter.write_str("partition key requires at least one binary component")
             }
@@ -60,7 +62,7 @@ impl fmt::Display for ValueError {
             Self::AllocationFailed => formatter.write_str("partition key allocation failed"),
             Self::EmptyScopeId => formatter.write_str("scope identity must be nonempty"),
             Self::ScopeIdTooLong { limit, .. } => {
-                formatter.write_str(&format!("scope identity exceeds {limit} bytes"))
+                write!(formatter, "scope identity exceeds {limit} bytes")
             }
             Self::PhysicalTimeTooLarge => {
                 formatter.write_str("physical clock exceeds 48-bit bound")
