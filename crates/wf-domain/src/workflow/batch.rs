@@ -13,6 +13,9 @@ use super::{
     CommittedCommand, DomainError, Operation, TransitionPlan, WorkflowRecord, reduce_with_policy,
 };
 
+mod authority;
+pub(super) use authority::{BatchAuthority, observed_current};
+
 /// Borrowed group-local authoritative placement/current-record view.
 ///
 /// The apply owner must supply complete canonical relevant records and placement,
@@ -179,13 +182,21 @@ pub(super) fn build_plan(
     view: GroupView<'_>,
     items: &[BatchItem<'_>],
 ) -> Result<BatchDecision, ApplyError> {
+    build_plan_with(BatchAuthority::Full(view), items)
+}
+
+pub(super) fn build_plan_with(
+    view: BatchAuthority<'_, '_>,
+    items: &[BatchItem<'_>],
+) -> Result<BatchDecision, ApplyError> {
     let mut plans = Vec::new();
     plans
         .try_reserve_exact(items.len())
         .map_err(|_| ApplyError::AllocationFailed)?;
     for item in items {
-        let record = view.records.get(&identity(*item)).copied();
-        let plan = match reduce_with_policy(record, item.command, item.retry_policy) {
+        let record = view.record(identity(*item))?;
+        let retry_policy = view.retry_policy(*item, record)?;
+        let plan = match reduce_with_policy(record, item.command, retry_policy) {
             Ok(plan) => plan,
             Err(error) => return Ok(BatchDecision::Rejected(BatchRejection::Domain(error))),
         };
@@ -203,13 +214,22 @@ pub(super) fn admitted_bytes(
     encoded_entry: &[u8],
     limits: AdmissionLimits,
 ) -> Result<Result<usize, BatchRejection>, ApplyError> {
+    admitted_with(BatchAuthority::Full(view), items, encoded_entry, limits)
+}
+
+pub(super) fn admitted_with(
+    view: BatchAuthority<'_, '_>,
+    items: &[BatchItem<'_>],
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+) -> Result<Result<usize, BatchRejection>, ApplyError> {
     admitted_with_identity(view, items, encoded_entry, limits, |item| {
         Ok(&item.command.id)
     })
 }
 
 fn admitted_with_identity<'input, K: Ord>(
-    view: GroupView<'_>,
+    view: BatchAuthority<'_, '_>,
     items: &[BatchItem<'input>],
     encoded_entry: &[u8],
     limits: AdmissionLimits,
@@ -224,10 +244,10 @@ fn admitted_with_identity<'input, K: Ord>(
     let mut ids = BTreeSet::new();
     let mut total = 0;
     for item in items {
-        let Some(group) = view.placements.get(item.partition) else {
+        let Some(group) = view.placement(item.partition) else {
             return Err(ApplyError::InvalidAuthority);
         };
-        if group != view.group {
+        if group != view.group() {
             return Ok(Err(BatchRejection::CrossGroup));
         }
         if !ids.insert(project(*item)?) {
@@ -244,14 +264,14 @@ fn admitted_with_identity<'input, K: Ord>(
         {
             return Ok(Err(BatchRejection::Admission(error)));
         }
-        if let Some(record) = view.records.get(&identity(*item)) {
+        if let Some(record) = view.record(identity(*item))? {
             if record.id() != &item.command.id {
                 return Err(ApplyError::InvalidAuthority);
             }
             let bytes = record_bytes(record, limits).map_err(|_| ApplyError::InvalidAuthority)?;
             add(&mut total, bytes).map_err(|_| ApplyError::InvalidAuthority)?;
             if matches!(item.command.operation, Operation::RetryWithPolicy(_))
-                && let Some(policy) = item.retry_policy
+                && let Some(policy) = view.retry_policy(*item, Some(record))?
             {
                 if policy.workflow_type() != record.workflow_type() {
                     return Err(ApplyError::InvalidAuthority);
@@ -279,6 +299,15 @@ fn admitted_with_identity<'input, K: Ord>(
 
 pub(super) fn admitted_claim_bytes(
     view: GroupView<'_>,
+    items: &[BatchItem<'_>],
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+) -> Result<Result<usize, BatchRejection>, ApplyError> {
+    admitted_claim_with(BatchAuthority::Full(view), items, encoded_entry, limits)
+}
+
+pub(super) fn admitted_claim_with(
+    view: BatchAuthority<'_, '_>,
     items: &[BatchItem<'_>],
     encoded_entry: &[u8],
     limits: AdmissionLimits,

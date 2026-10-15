@@ -2,16 +2,20 @@
 
 use std::collections::BTreeMap;
 
+use wf_types::identity::{GroupId, PartitionId};
 use wf_types::version::LogIdentity;
 
 use crate::claim::{
     ClaimRecord, DueOrder, FifoIndex, LaneKey, LaneOrder, ParallelIndex, RecordIndex,
+    ScopedRecordId,
 };
+use crate::policy::InstalledRetryPolicy;
 use crate::policy::definition::{PolicySnapshot, StateMode};
 
 use super::admission::AdmissionLimits;
 use super::batch::{ApplyError, BatchItem, BatchPlan, BatchRejection, GroupView};
 
+mod authority;
 mod decision;
 pub(crate) use decision::decide_selected_claims;
 
@@ -32,6 +36,34 @@ pub struct IndexedGroupView<'a> {
     pub fifo: &'a FifoIndex<'a>,
     /// Coherent installed policies keyed by exact workflow type; absent is default.
     pub policies: &'a BTreeMap<&'a [u8], &'a PolicySnapshot>,
+}
+
+/// Explicit observed points, without claiming complete index or record maps.
+///
+/// A missing reached map key is unobserved and refuses; present `None`/`false`
+/// represents actual absence. Query descriptors and policy views may drop after
+/// reduction; only canonical current-record borrows can enter the returned plan.
+/// These ordinary mathematical facts convey no transaction provenance.
+#[derive(Clone, Copy, Debug)]
+pub struct TouchedIndexedGroupView<'query, 'current> {
+    /// Expected coherent group for authoritative partition placement.
+    pub group: &'query GroupId,
+    /// Observed partition placement; missing placement remains invalid authority.
+    pub placements: &'query BTreeMap<PartitionId, GroupId>,
+    /// Observed exact canonical point, including explicit record absence.
+    pub current: &'query BTreeMap<ScopedRecordId<'query>, Option<ClaimRecord<'current>>>,
+    /// Observed exact parallel due membership, including explicit false.
+    pub parallel: &'query BTreeMap<DueOrder<'query>, bool>,
+    /// Observed exact FIFO member; a present member proves its lane is nonempty.
+    pub fifo_members:
+        &'query BTreeMap<(LaneKey<'query>, LaneOrder<'query>), Option<ClaimRecord<'current>>>,
+    /// Observed first FIFO member or actual empty prefix, never a projection.
+    pub fifo_heads:
+        &'query BTreeMap<LaneKey<'query>, Option<(LaneOrder<'current>, ClaimRecord<'current>)>>,
+    /// Observed installed mode policy; present `None` supplies source defaults.
+    pub policies: &'query BTreeMap<&'query [u8], Option<&'query PolicySnapshot>>,
+    /// Observed retry policy, overriding item policy even for present `None`.
+    pub retry_policies: &'query BTreeMap<&'query [u8], Option<&'query InstalledRetryPolicy>>,
 }
 
 /// One bounded item with creation priority; existing priority remains canonical.
@@ -210,7 +242,37 @@ pub fn decide_indexed_batch<'view>(
     encoded_entry: &[u8],
     limits: AdmissionLimits,
 ) -> Result<IndexedDecision<'view>, ApplyError> {
-    decision::decide(view, items, order, encoded_entry, limits)
+    decision::decide(
+        authority::IndexedAuthority::Full(view),
+        items,
+        order,
+        encoded_entry,
+        limits,
+    )
+}
+
+/// Decides from explicit reached observations without constructing complete views.
+///
+/// Current point owners and all observations must share one coherent revision.
+/// Absent observations refuse; observed policy/retry absence supplies defaults.
+/// Query maps and installed policies are not retained by the returned plan.
+///
+/// # Errors
+/// Rejects unobserved/corrupt authority, ordinal overflow or host allocation failure.
+pub fn decide_touched_indexed_batch<'current>(
+    view: TouchedIndexedGroupView<'_, 'current>,
+    items: &[IndexedBatchItem<'_>],
+    order: EntryOrder,
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+) -> Result<IndexedDecision<'current>, ApplyError> {
+    decision::decide(
+        authority::IndexedAuthority::Touched(view),
+        items,
+        order,
+        encoded_entry,
+        limits,
+    )
 }
 
 fn rows(entry: ClaimRecord<'_>, mode: StateMode) -> Option<IndexRows<'_>> {

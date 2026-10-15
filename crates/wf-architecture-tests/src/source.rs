@@ -127,7 +127,9 @@ impl Inspector<'_, '_> {
                             | "log::record_batch::intent"
                             | "log::record_batch::response"
                             | "log::record_batch::phase"
-                    ) || self.module.starts_with("log::record_batch::phase::"))))
+                            | "log::record_batch::fresh"
+                    ) || self.module.starts_with("log::record_batch::phase::")
+                        || self.module.starts_with("log::record_batch::fresh::"))))
     }
 
     fn path(&mut self, written: &[String]) {

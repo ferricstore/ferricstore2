@@ -3,17 +3,13 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
-use wf_domain::claim::ScopedRecordId;
 use wf_domain::policy::InstalledRetryPolicy;
-use wf_domain::workflow::Operation;
-use wf_domain::workflow::batch::{ApplyError, BatchItem};
+use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::control::ControlPlan;
-use wf_domain::workflow::indexed::{
-    EntryOrder, IndexedBatchItem, IndexedDecision, IndexedGroupView, decide_indexed_batch,
-};
+use wf_domain::workflow::indexed::IndexedDecision;
 use wf_domain::workflow::request::indexed::IndexedRequestView;
 use wf_domain::workflow::request::{ClientIntent, RequestValueError, RetainedOutcome};
-use wf_types::version::{LogIdentity, TimestampMillis};
+use wf_types::version::LogIdentity;
 
 use crate::consensus::{PreparedOperation, PreparedRequest};
 
@@ -22,13 +18,14 @@ use super::{
     reader::Reader, scan, writer::Writer,
 };
 
+mod fresh;
 mod intent;
 mod phase;
 mod response;
 
 pub use phase::{
-    FreshRecordBatch, RecordBatchInspection, decide_fresh_record_batch, inspect_record_batch,
-    inspect_record_batch_point,
+    FreshRecordBatch, RecordBatchInspection, decide_fresh_record_batch,
+    decide_fresh_record_batch_touched, inspect_record_batch, inspect_record_batch_point,
 };
 pub use response::record_batch_retained_status;
 
@@ -127,8 +124,6 @@ impl From<RequestValueError> for RecordBatchApplyError {
         Self::Retained(value)
     }
 }
-
-type ValueRow<'a> = ([&'a [u8]; 2], usize);
 
 /// Consumes typed private mutation inputs and recomputes their V5 caller intent.
 ///
@@ -251,78 +246,6 @@ pub fn decide_record_batch<'view>(
             decide_fresh_record_batch(fresh, view.group, retry_policies, outcome_ttl_ms)
         }
     }
-}
-
-fn fresh<'view>(
-    decoded: &DecodedRequest<'_>,
-    view: IndexedGroupView<'view>,
-    retry_policies: &BTreeMap<&[u8], &InstalledRetryPolicy>,
-    order: EntryOrder,
-    now: TimestampMillis,
-    limits: CodecLimits,
-    workspace: usize,
-) -> Result<IndexedDecision<'view>, RecordBatchApplyError> {
-    let PreparedOperation::Batch(prepared) = &decoded.request.operation else {
-        return Err(CodecError::UnsupportedTag.into());
-    };
-    if prepared.iter().any(|item| item.command.now != now) {
-        return Err(ApplyError::InvalidAuthority.into());
-    }
-    let count = prepared.len();
-    let bound = sum(&[
-        decoder_bound(decoded.encoded.len(), count, limits)?,
-        product(count, 192)?,
-        256,
-        limits.admission.decision_bytes(),
-    ])?;
-    admit(bound, workspace)?;
-    let mut values: Vec<ValueRow<'_>> = reserve(count)?;
-    for index in 0..count {
-        let mut row: ValueRow<'_> = ([&[]; 2], 0);
-        for value in decoded
-            .value_bytes(index)
-            .ok_or(CodecError::Malformed)?
-            .into_iter()
-            .flatten()
-        {
-            row.0[row.1] = value;
-            row.1 += 1;
-        }
-        values.push(row);
-    }
-    let mut items = reserve(count)?;
-    for (index, (prepared, row)) in prepared.iter().zip(&values).enumerate() {
-        let policy = if matches!(prepared.command.operation, Operation::RetryWithPolicy(_)) {
-            let key = ScopedRecordId {
-                partition_key: prepared.partition.as_bytes(),
-                id: prepared.command.id.as_bytes(),
-            };
-            view.batch
-                .records
-                .get(&key)
-                .and_then(|record| retry_policies.get(record.workflow_type()))
-                .copied()
-        } else {
-            None
-        };
-        items.push(IndexedBatchItem {
-            item: BatchItem {
-                partition: &prepared.partition,
-                command: &prepared.command,
-                state_key: decoded.state_key(index).ok_or(CodecError::Malformed)?,
-                encoded_values: &row.0[..row.1],
-                retry_policy: policy,
-            },
-            create_priority: prepared.create_priority,
-        });
-    }
-    Ok(decide_indexed_batch(
-        view,
-        &items,
-        order,
-        decoded.encoded,
-        limits.admission,
-    )?)
 }
 
 fn decoder_bound(encoded: usize, count: usize, limits: CodecLimits) -> Result<usize, CodecError> {

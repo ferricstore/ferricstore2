@@ -34,6 +34,7 @@ fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
         "inspect_record_batch",
         "inspect_record_batch_point",
         "decide_fresh_record_batch",
+        "decide_fresh_record_batch_touched",
         "record_batch_retained_status",
     ] {
         assert!(
@@ -50,6 +51,8 @@ fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
         "workflow::request",
         "workflow::indexed",
         "workflow::indexed::decision",
+        "workflow::batch::authority",
+        "workflow::indexed::authority",
     ] {
         assert_eq!(
             source_check(
@@ -97,6 +100,8 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::record_batch::intent",
         "log::record_batch::phase",
         "log::record_batch::phase::nested",
+        "log::record_batch::fresh",
+        "log::record_batch::fresh::nested",
     ] {
         assert_eq!(
             source_check("wf-ports", module, "use std::collections::BTreeMap;")?,
@@ -127,6 +132,7 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
     for neighbor in [
         "log::record_batch::response_backend",
         "log::record_batch::phase_backend",
+        "log::record_batch::fresh_backend",
     ] {
         assert_eq!(
             source_check(

@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::control::ControlPlan;
-use wf_domain::workflow::indexed::{EntryOrder, IndexedGroupView};
+use wf_domain::workflow::indexed::{EntryOrder, IndexedGroupView, TouchedIndexedGroupView};
 use wf_domain::workflow::request::gate::{
     GateDecision, GateView, PointGateView, RequestGate, inspect_point_request, inspect_request,
 };
@@ -13,6 +13,7 @@ use wf_domain::workflow::request::{RequestValueError, RetainedMetadata, Retained
 use wf_types::version::LogIdentity;
 
 use super::super::{CodecLimits, DecodedRequest};
+use super::fresh::FreshAuthority;
 use super::{
     RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, admit, check_decoded,
     response, sum,
@@ -130,6 +131,46 @@ pub fn decide_fresh_record_batch<'current>(
     retry_policies: &BTreeMap<&[u8], &InstalledRetryPolicy>,
     outcome_ttl_ms: u64,
 ) -> Result<RecordBatchApplyPlan<'current>, RecordBatchApplyError> {
+    finish_fresh(
+        fresh,
+        FreshAuthority::Full {
+            view,
+            retry_policies,
+        },
+        0,
+        outcome_ttl_ms,
+    )
+}
+
+/// Consumes Fresh with explicit reached observations and declared additional residency.
+///
+/// Missing observations refuse instead of supplying defaults. Query descriptors
+/// and policies need not outlive the returned current-predecessor plan. The
+/// caller must separately admit fact-map construction and loaded owners; this
+/// scalar adds their declared logical residency, not native allocation proof.
+///
+/// # Errors
+/// Rejects unobserved/corrupt authority, time, apply, retention or workspace failures.
+pub fn decide_fresh_record_batch_touched<'current>(
+    fresh: FreshRecordBatch<'_>,
+    view: TouchedIndexedGroupView<'_, 'current>,
+    additional_live_bytes: usize,
+    outcome_ttl_ms: u64,
+) -> Result<RecordBatchApplyPlan<'current>, RecordBatchApplyError> {
+    finish_fresh(
+        fresh,
+        FreshAuthority::Touched(view),
+        additional_live_bytes,
+        outcome_ttl_ms,
+    )
+}
+
+fn finish_fresh<'current>(
+    fresh: FreshRecordBatch<'_>,
+    authority: FreshAuthority<'_, 'current>,
+    additional_live_bytes: usize,
+    outcome_ttl_ms: u64,
+) -> Result<RecordBatchApplyPlan<'current>, RecordBatchApplyError> {
     let FreshRecordBatch {
         decoded,
         log,
@@ -141,13 +182,12 @@ pub fn decide_fresh_record_batch<'current>(
         *boxed
     };
     let limits = decoded.limits;
-    if view.batch.group != decoded.request.scope.group() {
+    if authority.group() != decoded.request.scope.group() {
         return Err(ApplyError::InvalidAuthority.into());
     }
-    let operation = super::fresh(
+    let operation = super::fresh::decide(
         &decoded,
-        view,
-        retry_policies,
+        authority,
         EntryOrder {
             identity: log,
             first_ordinal: 0,
@@ -155,6 +195,7 @@ pub fn decide_fresh_record_batch<'current>(
         control.execution_time(),
         limits,
         workspace_limit,
+        additional_live_bytes,
     )?;
     let encoded_len = decoded.encoded.len();
     let DecodedRequest {
@@ -174,15 +215,13 @@ pub fn decide_fresh_record_batch<'current>(
         request.scope.recovery().as_bytes().len(),
         request.request.as_bytes().len(),
     ])?;
-    admit(
-        sum(&[
-            encoded_len,
-            limits.admission.decision_bytes(),
-            header_bytes,
-            531,
-        ])?,
-        workspace_limit,
-    )?;
+    let late = sum(&[
+        encoded_len,
+        limits.admission.decision_bytes(),
+        header_bytes,
+        531,
+    ])?;
+    admit(sum(&[late, additional_live_bytes])?, workspace_limit)?;
     let (response, status) = response::encode(&operation)?;
     let expires_at = control
         .execution_time()

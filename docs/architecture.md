@@ -941,3 +941,21 @@ not provide physical storage evidence. The real driver must retain stable
 expected namespace owners, account for all loaded owners and bound copies, and
 supply actual touched indexes and installed policies under one guard before
 atomic publication. Independent Linux and macOS runtime proof remains required.
+
+## Selected bounded touched-record inputs
+
+The touched indexed view supplies explicit observed current points, parallel
+membership, FIFO members/heads and installed mode/retry policies. A missing
+reached slot is an operational authority failure; present None/false is an
+observed absence. One canonical ClaimRecord carries both core and ordering.
+The shared Full/Touched algorithms retain lazy validation and old complete-map
+behavior, with no synthetic complete view. Returned plans
+borrow only current predecessors, allowing query maps and policy views to drop.
+
+The consuming Fresh bridge reuses the same decoded owner and retained gate. A
+caller-live byte input augments the existing prospective metadata and late
+response bounds; it grants no implicit credit for loaded records or map staging.
+The real driver still owns coherent physical loading, admission for every live
+owner and bound copy, and atomic publication/recovery. See
+[ADR006](adr/006-private-prepared-command-codec.md#selected-touched-record-indexed-input)
+for the selected contract and its remaining runtime gates.

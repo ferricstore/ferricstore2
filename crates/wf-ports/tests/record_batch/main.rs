@@ -33,6 +33,7 @@ mod phases;
 mod point;
 mod replay;
 mod source;
+mod touched;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 

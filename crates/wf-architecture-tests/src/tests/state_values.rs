@@ -87,34 +87,8 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
             .any(|finding| finding.contains("client port facade"))
         );
     }
+    assert_domain_values_stay_server_only()?;
     let original = metadata()?;
-    for name in ["PointGateView", "inspect_point_request"] {
-        for (package, module, domain, diagnosis) in [
-            ("wf-ports", "client", "wf_domain", "client port facade"),
-            (
-                "wf-wire",
-                "value",
-                "wf_domain",
-                "wire may reference only wf_domain::value",
-            ),
-            (
-                "wf-domain",
-                "value",
-                "crate",
-                "approved domain value module",
-            ),
-        ] {
-            assert!(
-                source_check(
-                    package,
-                    module,
-                    &format!("pub use {domain}::workflow::request::gate::{name};")
-                )?
-                .iter()
-                .any(|finding| finding.contains(diagnosis))
-            );
-        }
-    }
     for (from, to) in [
         ("wf-wire", "wf-ports"),
         ("wf-wire", "wf-storage"),
@@ -134,6 +108,42 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         assert!(findings.iter().any(|finding| finding.contains(
             &format!("forbidden declared edge {from} -> {to}")
         )), "{findings:?}");
+    }
+    Ok(())
+}
+
+fn assert_domain_values_stay_server_only() -> CheckResult<()> {
+    for path in [
+        "request::gate::PointGateView",
+        "request::gate::inspect_point_request",
+        "indexed::TouchedIndexedGroupView",
+        "indexed::decide_touched_indexed_batch",
+    ] {
+        for (package, module, domain, diagnosis) in [
+            ("wf-ports", "client", "wf_domain", "client port facade"),
+            (
+                "wf-wire",
+                "value",
+                "wf_domain",
+                "wire may reference only wf_domain::value",
+            ),
+            (
+                "wf-domain",
+                "value",
+                "crate",
+                "approved domain value module",
+            ),
+        ] {
+            assert!(
+                source_check(
+                    package,
+                    module,
+                    &format!("pub use {domain}::workflow::{path};")
+                )?
+                .iter()
+                .any(|finding| finding.contains(diagnosis))
+            );
+        }
     }
     Ok(())
 }

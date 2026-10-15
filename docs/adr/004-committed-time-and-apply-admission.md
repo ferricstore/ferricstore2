@@ -373,3 +373,21 @@ The unchanged decoded/Fresh/late bounds cover their existing owners only. A
 future joined driver must also account for loaded owners and use stable expected
 namespace storage independent of the DecodedRequest it consumes. Real storage,
 uncertain commit recovery, native performance and Linux acceptance remain open.
+
+The selected touched-indexed input keeps each required current/index/policy
+observation explicit. Missing a reached slot is InvalidAuthority; an observed
+None/false establishes absence only as supplied mathematical data. Reusing one
+canonical current ClaimRecord avoids a second projected core-record map.
+Ordinary FIFO member mutations need no unrelated head owner; named claims still
+require the actual first member. All physical observations must eventually come
+from the same exclusive guard.
+
+The touched Fresh bridge accepts additional_live_bytes and checked-adds it to
+both existing Fresh and late response bounds, before the corresponding new
+owners are allocated. It neither measures nor constructs the caller's facts.
+The real driver must admit decoder D, cumulative read-owner R and descriptor/
+copied-bound staging S together during loading, then pass every still-live
+external owner in L. Exhaustion and overflow stay operational failures, without
+retained business rejection or applied-position progress. The ordinary complete
+view path retains its existing bounds and validation order. Atomic publication,
+uncertainty fencing/reopen and native Linux/macOS validation remain required.

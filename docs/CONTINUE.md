@@ -5,7 +5,30 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The current M2 increment adds a bounded retained point/cohort gate. A missing
+The current M2 increment implements bounded touched-record/indexed inputs.
+Explicit observations distinguish unknown authority from actual absence, with
+shared batch/index algorithms preserving the complete-view path. Ordinary FIFO
+followers need their exact member without an unrelated head lookup; named
+claims retain true-head checks. Reached retry observations override item hints,
+including observed default policy. The consuming Fresh bridge reuses decoded
+owners and adds caller-live logical bytes before metadata and late response
+allocation. These supplied facts establish no physical read provenance.
+
+The final macOS wrapper passes 659 Rust tests across 74 targets plus six
+compile-fail docs, with zero warnings/failures/ignored tests. Formatting,
+compilation, strict Clippy, rustdoc, architecture and reference/progress checks
+pass on 1,164 unchanged non-review inputs. All six new behavior tests passed on
+their first assertion run. Later lifetime-name and test-helper lint repairs
+preserve every assertion operand. The wrapper exits 1 solely because GitHub DNS
+blocks its default advisory refresh; a separate cached October 14 audit passes
+all four categories. Ledger counts remain 77/87/326, with no new Elixir parity
+credit. Next: coherent bounded placement/policy/current/index loading and the
+real atomic adapter, preserving complete policy backing and accounting for
+temporary read-owner overlap. Engine adoption, crash/uncertainty recovery,
+original assertion/setup/runtime profiles, native Linux and full M1–M8
+completion remain open.
+
+The preceding M2 increment adds a bounded retained point/cohort gate. A missing
 requested outcome cannot hide other outcomes in its tenant/group/recovery scope.
 The same classifier preserves full-map and charged API order; independent query
 and outcome lifetimes let replay borrow its original owner. The ports phase
@@ -1390,8 +1413,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **73 reviewed
-source declarations, 83 counterpart records and 314 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **77 reviewed
+source declarations, 87 counterpart records and 326 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

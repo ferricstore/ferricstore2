@@ -185,3 +185,12 @@ fixtures now reject the point view/inspection exports at their actual paths.
 The transaction remains an effect boundary. Compiler-backed behavior tests
 separately exercise independent query/outcome lifetimes; direct source checks
 do not establish same-revision physical observations or backend durability.
+
+ARCH-M2-TOUCHED-INDEXED-INPUT1-CREATE1 adds exact
+`wf-ports::log::record_batch::fresh` and its descendants to the same pure rule.
+Its compiled missing-diagnosis test failed twice before repair; the focused
+test then passed. The neighboring fresh_backend remains an effectful positive
+control. Domain batch/indexed children already inherit domain purity. Existing
+client, wire and domain-value checks reject the new server-only exports.
+No dependency or source-size exemption is introduced. Borrowed touched facts
+remain ordinary supplied values; these checks prove no physical provenance.

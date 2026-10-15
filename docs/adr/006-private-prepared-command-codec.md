@@ -1305,3 +1305,39 @@ maximum17421 remain separate from the prepared isolation cap. Transaction
 retained_nonempty is required and accounts for open plus first candidate/end,
 with no copied outcome. These inputs enable point-retained inspection;
 coherent touched-index/policy loading and the real atomic adapter still follow.
+
+## Selected touched-record indexed input
+
+ARCH-M2-TOUCHED-INDEXED-INPUT1-CREATE1 selects an ordinary borrowed
+TouchedIndexedGroupView and consuming decide_fresh_record_batch_touched entry.
+Its query maps distinguish an unobserved key from observed None/false. Reached
+unobserved authority is an operational failure; unused facts are not eagerly
+validated. One canonical ClaimRecord supplies the core record and ordering.
+Only current-record borrows survive the result; query keys, map descriptors,
+placement and policy references may be released. The view certifies no physical
+read or transaction provenance.
+
+Closed private Full/Touched branches share the existing batch and index
+algorithms. Full-map defaults and dual-map consistency checks retain their old
+behavior. Touched retry observations override item retry hints at the existing
+reached retry-policy admission/build point, including observed None for source
+defaults. Parallel predecessors require exact due membership and an observed
+empty FIFO prefix. Ordinary FIFO mutations require their exact member without
+requiring a head lookup; named Claim/Reclaim still require the true head.
+Unscheduled followers retain canonical record/order and no-parallel checks.
+
+The consuming Fresh entry unboxes the same decoded owner, with no new decode,
+hash, retained gate or projected map. Authority construction adds no core-record
+clone. It retains the two
+fallibly reserved value/item buffers. For caller-live logical bytes L, touched
+admission checked-adds L to the old Fresh bound before either reserve and to the
+old late bound after transient owners drop. Full callers pass zero and retain
+their existing error order. L is a caller-supplied mathematical input, with no
+refund or implicit credit for fact maps. The real driver must separately admit
+D+R+S during loading and include all remaining read owners, staging and copied
+bounds in L. These formulas establish neither native allocation sizes nor RSS.
+
+Implementation and executed acceptance are tracked in the continuation and
+review records. Real coherent loading, atomic publication/recovery, original
+assertion/setup/profile coverage and native Linux/macOS acceptance remain
+required.
