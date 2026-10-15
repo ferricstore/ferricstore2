@@ -10,6 +10,7 @@ use retry_policy_support::{Scenario, TestResult, claim, configured};
 use wf_domain::history::EventKind;
 use wf_domain::policy::{Backoff, BackoffKind, InstalledRetryPolicy, RetryOverride};
 use wf_domain::retry::RetryDecision;
+use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_domain::workflow::{
     CommittedCommand, DomainError, MAX_EXACT_MILLIS, Operation, Outcome, Transition,
     reduce_with_policy,
@@ -441,5 +442,42 @@ fn generated_policy_retry_exhaustion_matches_independent_attempt_model() -> Test
             }
         }
     }
+    Ok(())
+}
+
+#[test]
+fn generated_retry_deadline_survives_core_record_restoration() -> TestResult {
+    let mut scenario = Scenario::claimed(b"restored-payment", b"queued")?;
+    let retry = scenario.retry(configured(3, BackoffKind::Fixed, 100, b"failed"))?;
+    scenario.apply(MAX_EXACT_MILLIS, Operation::RetryWithPolicy(retry), None)?;
+    let record = &scenario.record;
+    assert_eq!(
+        record.next_run_at(),
+        Some(TimestampMillis::new(MAX_EXACT_MILLIS + 100))
+    );
+    let event = scenario.history.last().ok_or("retry witness absent")?;
+    let restored = restore_record(
+        WorkflowRecordData {
+            id: record.id().clone(),
+            workflow_type: record.workflow_type().to_vec(),
+            state: record.state().to_vec(),
+            version: record.version(),
+            fence: record.fence(),
+            attempts: record.attempts(),
+            created_at: record.created_at(),
+            updated_at: record.updated_at(),
+            next_run_at: record.next_run_at(),
+            run_state: record.run_state().map(<[u8]>::to_vec),
+            lease: record.lease().cloned(),
+            payload: record.payload().map(<[u8]>::to_vec),
+            result: record.result().map(<[u8]>::to_vec),
+            error: record.error().map(<[u8]>::to_vec),
+            latest_kind: event.kind,
+            latest_version: event.version,
+            latest_fence: event.fence,
+        },
+        wf_domain::workflow::admission::AdmissionLimits::default(),
+    )?;
+    assert_eq!(restored, scenario.record);
     Ok(())
 }

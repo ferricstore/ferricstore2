@@ -21040,122 +21040,122 @@
         {
           "scenario_id": "m1-e1a8cf7f619f136a",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
+          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
           "rust_module": "",
           "rust_function": "flow_retry_returns_to_claimed_run_state_with_computed_backoff",
           "assertions": [
             {
               "source_line": 607,
               "source_text": "assert claimed.state == \"running\"",
-              "rust_line": 81,
+              "rust_line": 82,
               "rust_text": "assert_eq!(scenario.record.state(), b\"running\");"
             },
             {
               "source_line": 608,
               "source_text": "assert claimed.run_state == \"charge_card\"",
-              "rust_line": 82,
+              "rust_line": 83,
               "rust_text": "assert_eq!(scenario.record.run_state(), Some(b\"charge_card\".as_slice()));"
             },
             {
               "source_line": 621,
               "source_text": "assert retried.state == \"charge_card\"",
-              "rust_line": 94,
+              "rust_line": 95,
               "rust_text": "assert_eq!(scenario.record.state(), b\"charge_card\");"
             },
             {
               "source_line": 622,
               "source_text": "assert retried.attempts == 1",
-              "rust_line": 95,
+              "rust_line": 96,
               "rust_text": "assert_eq!(scenario.record.attempts(), 1);"
             },
             {
               "source_line": 623,
               "source_text": "assert retried.next_run_at_ms == 3_000",
-              "rust_line": 96,
+              "rust_line": 97,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 624,
               "source_text": "assert retried.lease_token == nil",
-              "rust_line": 100,
+              "rust_line": 101,
               "rust_text": "assert_eq!(scenario.record.lease(), None);"
             },
             {
               "source_line": 631,
               "source_text": "assert retry_fields[\"retry_decision\"] == \"scheduled\"",
-              "rust_line": 104,
+              "rust_line": 105,
               "rust_text": "assert_eq!(meta.decision.as_str(), \"scheduled\");"
             },
             {
               "source_line": 632,
               "source_text": "assert retry_fields[\"retry_run_state\"] == \"charge_card\"",
-              "rust_line": 105,
+              "rust_line": 106,
               "rust_text": "assert_eq!(meta.run_state, b\"charge_card\");"
             },
             {
               "source_line": 633,
               "source_text": "assert retry_fields[\"retry_next_run_at_ms\"] == \"3000\"",
-              "rust_line": 106,
+              "rust_line": 107,
               "rust_text": "assert_eq!(meta.next_run_at, Some(TimestampMillis::new(3_000)));"
             },
             {
               "source_line": 634,
               "source_text": "assert retry_fields[\"retry_max_retries\"] == \"3\"",
-              "rust_line": 107,
+              "rust_line": 108,
               "rust_text": "assert_eq!(meta.policy.max_retries, 3);"
             },
             {
               "source_line": 635,
               "source_text": "assert retry_fields[\"retry_backoff_kind\"] == \"exponential\"",
-              "rust_line": 108,
+              "rust_line": 109,
               "rust_text": "assert_eq!(meta.policy.backoff.kind.as_str(), \"exponential\");"
             },
             {
               "source_line": 636,
               "source_text": "assert retry_fields[\"retry_backoff_base_ms\"] == \"1000\"",
-              "rust_line": 109,
+              "rust_line": 110,
               "rust_text": "assert_eq!(meta.policy.backoff.base_ms, 1_000);"
             },
             {
               "source_line": 637,
               "source_text": "assert retry_fields[\"retry_backoff_max_ms\"] == \"30000\"",
-              "rust_line": 110,
+              "rust_line": 111,
               "rust_text": "assert_eq!(meta.policy.backoff.max_ms, 30_000);"
             },
             {
               "source_line": 638,
               "source_text": "assert retry_fields[\"retry_jitter_pct\"] == \"0\"",
-              "rust_line": 111,
+              "rust_line": 112,
               "rust_text": "assert_eq!(meta.policy.backoff.jitter_pct, 0);"
             },
             {
               "source_line": 639,
               "source_text": "assert retry_fields[\"retry_exhausted_to\"] == \"payment_failed\"",
-              "rust_line": 112,
+              "rust_line": 113,
               "rust_text": "assert_eq!(meta.policy.exhausted_to, b\"payment_failed\");"
             },
             {
               "source_line": 641,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 113,
+              "rust_line": 114,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 649,
               "source_text": "assert {:ok, [reclaimed]} =",
-              "rust_line": 119,
+              "rust_line": 120,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 657,
               "source_text": "assert reclaimed.id == id",
-              "rust_line": 123,
+              "rust_line": 124,
               "rust_text": "assert_eq!(scenario.record.id().as_bytes(), b\"policy-fixture\");"
             },
             {
               "source_line": 658,
               "source_text": "assert reclaimed.run_state == \"charge_card\"",
-              "rust_line": 124,
+              "rust_line": 125,
               "rust_text": "assert_eq!(scenario.record.run_state(), Some(b\"charge_card\".as_slice()));"
             }
           ],
@@ -21173,44 +21173,44 @@
         {
           "scenario_id": "m1-78839ca2df54b42f",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
+          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
           "rust_module": "",
           "rust_function": "flow_retry_exhausts_to_configured_active_state",
           "assertions": [
             {
               "source_line": 690,
               "source_text": "assert exhausted.state == \"payment_failed\"",
-              "rust_line": 134,
+              "rust_line": 135,
               "rust_text": "assert_eq!(scenario.record.state(), b\"payment_failed\");"
             },
             {
               "source_line": 691,
               "source_text": "assert exhausted.attempts == 1",
-              "rust_line": 135,
+              "rust_line": 136,
               "rust_text": "assert_eq!(scenario.record.attempts(), 1);"
             },
             {
               "source_line": 692,
               "source_text": "assert exhausted.next_run_at_ms == 2_000",
-              "rust_line": 136,
+              "rust_line": 137,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 693,
               "source_text": "assert exhausted.lease_token == nil",
-              "rust_line": 140,
+              "rust_line": 141,
               "rust_text": "assert_eq!(scenario.record.lease(), None);"
             },
             {
               "source_line": 695,
               "source_text": "assert {:ok, [manual]} =",
-              "rust_line": 143,
+              "rust_line": 144,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 703,
               "source_text": "assert manual.id == id",
-              "rust_line": 147,
+              "rust_line": 148,
               "rust_text": "assert_eq!(scenario.record.id().as_bytes(), b\"policy-fixture\");"
             }
           ],
@@ -21228,38 +21228,38 @@
         {
           "scenario_id": "m1-537f7338ecf1c648",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
+          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
           "rust_module": "",
           "rust_function": "flow_retry_terminal_exhaustion_keeps_stable_audit_metadata",
           "assertions": [
             {
               "source_line": 735,
               "source_text": "assert exhausted.state == \"failed\"",
-              "rust_line": 170,
+              "rust_line": 171,
               "rust_text": "assert_eq!(scenario.record.state(), b\"failed\");"
             },
             {
               "source_line": 736,
               "source_text": "assert exhausted.next_run_at_ms == nil",
-              "rust_line": 171,
+              "rust_line": 172,
               "rust_text": "assert_eq!(scenario.record.next_run_at(), None);"
             },
             {
               "source_line": 743,
               "source_text": "assert retry_fields[\"retry_decision\"] == \"exhausted\"",
-              "rust_line": 174,
+              "rust_line": 175,
               "rust_text": "assert_eq!(meta.decision.as_str(), \"exhausted\");"
             },
             {
               "source_line": 744,
               "source_text": "assert retry_fields[\"retry_next_run_at_ms\"] == \"\"",
-              "rust_line": 175,
+              "rust_line": 176,
               "rust_text": "assert_eq!(meta.next_run_at, None);"
             },
             {
               "source_line": 745,
               "source_text": "assert retry_fields[\"retry_exhausted_to\"] == \"failed\"",
-              "rust_line": 176,
+              "rust_line": 177,
               "rust_text": "assert_eq!(meta.policy.exhausted_to, b\"failed\");"
             }
           ],
@@ -22437,20 +22437,20 @@
         {
           "scenario_id": "m1-ab0be7e9b8c01099",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
+          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
           "rust_module": "",
           "rust_function": "stored_state_retry_policy_drives_retry_exhaustion_without_command_override",
           "assertions": [
             {
               "source_line": 425,
               "source_text": "assert exhausted.state == \"payment_failed\"",
-              "rust_line": 40,
+              "rust_line": 41,
               "rust_text": "assert_eq!(scenario.record.state(), b\"payment_failed\");"
             },
             {
               "source_line": 426,
               "source_text": "assert exhausted.next_run_at_ms == 2_000",
-              "rust_line": 41,
+              "rust_line": 42,
               "rust_text": "assert_eq!("
             }
           ],
@@ -22468,20 +22468,20 @@
         {
           "scenario_id": "m1-579ae5ad18ea20b4",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "0940acdbd96efa35b5ff8115adda57d83c876f6aa03123a335b702e48ac3b912",
+          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
           "rust_module": "",
           "rust_function": "command_retry_policy_overrides_stored_state_policy",
           "assertions": [
             {
               "source_line": 462,
               "source_text": "assert retried.state == \"charge_card\"",
-              "rust_line": 69,
+              "rust_line": 70,
               "rust_text": "assert_eq!(scenario.record.state(), b\"charge_card\");"
             },
             {
               "source_line": 463,
               "source_text": "assert retried.next_run_at_ms == 7_000",
-              "rust_line": 70,
+              "rust_line": 71,
               "rust_text": "assert_eq!("
             }
           ],

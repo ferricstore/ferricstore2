@@ -93,9 +93,6 @@ fn validate_record_data(data: &WorkflowRecordData) -> Result<(), ActiveValueErro
     if data.created_at.get() > MAX_EXACT_MILLIS || data.updated_at.get() > MAX_EXACT_MILLIS {
         return Err(ActiveValueError::Domain(DomainError::NowTooLarge));
     }
-    if let Some(time) = data.next_run_at {
-        validate_run_at(time).map_err(ActiveValueError::Domain)?;
-    }
     if let Some(lease) = &data.lease {
         require_nonempty(&lease.worker, InputField::Worker).map_err(ActiveValueError::Domain)?;
         validate_run_at(lease.deadline).map_err(ActiveValueError::Domain)?;

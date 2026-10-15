@@ -5,7 +5,20 @@ increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest reviewed increment implements private indexed mutation-batch
+The latest restoration repair preserves valid generated retry deadlines
+above the caller timestamp ceiling. Its whole-record regression first failed
+with RunAtTooLarge against unchanged production; removing only that incorrect
+stored due-time check then passes13 retry and12 active-timeout tests. Lease,
+terminal, clock and witness checks remain intact. Ordinary source review is
+closed without a blocker. The final macOS run passes619 Rust tests across70
+targets plus four compile-fail docs, with no warnings/failures/ignored tests.
+Formatting, strict lint, documentation, architecture and reference/progress
+checks pass on1132 unchanged inputs. The wrapper exits1 solely at the default
+RustSec DNS failure; all four cached audit categories pass separately.
+Ledger counts stay
+77/87/326 with only the existing test fingerprints/line anchors refreshed.
+
+The latest reviewed commit `b530513` implements private indexed mutation-batch
 encoding/apply and retained replay. Six new tests pass after independently
 reproduced missing-API RED; source review's non-batch error correction has its
 own regression RED/GREEN. Fresh bounds temporary owners, uses one request gate
