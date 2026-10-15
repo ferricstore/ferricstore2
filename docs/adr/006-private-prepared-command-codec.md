@@ -899,3 +899,37 @@ be refused by the original ETF input path. Original ETF emission/sizing,
 raw option/retry/governance normalization, migration codecs, public responses,
 physical policy/outcome/control publication, complete runtime profiles and
 independent Linux/macOS execution remain required in the full ordered plan.
+
+## Selected original retry input normalization
+
+The mutually reviewed A/P-NEXT-M1-POLICY-RETRY-INGRESS1-CREATE1 contract selects
+borrowed raw retry descriptors and caller diagnoses, returning existing full
+or optional override models. Two private production children and two test
+children preserve source nil/presence/defaults, atom masking, last keyword
+duplicate and ten exact field errors. This is selected input behavior;
+implementation and executed acceptance are pending meaningful tests-first RED.
+Existing normalized, stored-reader and retained-status contracts stay unchanged.
+
+The one visible tree is preflighted before semantics: depth64, count4096 and
+represented text262144. Every attempted descriptor pays128 before its count/depth
+refusal; text caps precede text debits. A key's classification and queried-key
+duplicate check precede its value. Other hides unrepresented term identity/bytes;
+no arbitrary map uniqueness, raw ETF or native memory proof is inferred.
+
+Semantic root work precedes nil/shape/collection; collections declare logical
+P128. Each reached field lookup scans and pays independently, then validators
+run in original order. Atom nil is canonicalized after its visible three-byte
+preflight and before kind spelling. Final metadata precedes the single fallible
+target reservation/copy after every validation. No allocating default, temporary
+Map.new owner, normalization credit or blanket Vec-to-Box conversion is selected.
+
+Independent targets include nil override512/full646 atP0, atom-nil515/649,
+empty override1024/P128 and empty full2566/P128. Actual one-row backoff-nil
+input is4124/P128/T4252; the proposal's2176 subtotal was corrected before any
+test/source creation. A nonempty target `done` gives3459/P128/T3587, with
+tight3586 retaining3327/P128 before allocation. Existing held-owner seeds and
+all1800 original generated normalizations remain required tests. These are
+source/input-derived logical expectations, without measured native gains.
+
+Original whole-flow ingress order, other raw groups, ETF output/sizing, public
+and atomic physical publication, complete profiles and both OS remain required.

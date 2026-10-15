@@ -621,3 +621,34 @@ raw migration/option/retry normalization, public projections, physical coherent
 reads and atomic publication remain required work. Logical source-derived fees
 do not certify native allocation, stack, latency or gain. Full required source
 profiles and independent Linux/macOS execution remain mandatory.
+
+## Selected original retry input normalization
+
+A-NEXT-M1-POLICY-RETRY-INGRESS1-CREATE1 selects private `retry_input.rs` and
+`retry_input/value.rs`, two children of the existing complete-policy test target,
+and the existing normalized `RetryPolicy`/`RetryOverride` output models. Two new
+enums represent borrowed raw value classes and ten fixed source diagnoses;
+`OriginalPolicyMapKey` is reused. Creation consultation and reciprocal resource
+review are closed. Meaningful tests-first authoring precedes implementation.
+
+The two three-operand APIs take a borrowed value, schema limits and the received
+continuous account. They distinguish full nil defaults from absent overrides,
+empty supplied overrides and present backoff groups with all scalar defaults.
+Atom presence shadows binary keys; keywords select the last duplicate. Source
+validation order and exact error bodies remain separate from operational limits.
+Exhausted targets are nonempty opaque bytes except exact `running`. A base delay
+greater than its maximum remains a valid input.
+
+Preflight bounds the entire visible descriptor tree, including ignored/shadowed
+values and repeated aliases. Descriptor depth/count/text limits do not certify
+hidden payload size, arbitrary source-map identity, raw parsing or ETF safety.
+Fresh field scans reuse no payment credit and materialize no temporary map.
+After every semantic check, output metadata and one fallible target reservation
+precede the final copy into the existing model. Target-free overrides allocate
+no target Vec. Logical scratch remains independent of native memory or speed.
+
+The private checker child is approved to move from `original_current.rs` to
+`original_policy.rs`, preserving its existing body before adding retry boundary
+checks. The parent changes only its module name and stays within 600 lines.
+Original full-flow/state option order, public/physical operations, complete
+runtime profiles and independent Linux/macOS acceptance remain required.
