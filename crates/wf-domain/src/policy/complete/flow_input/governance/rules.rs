@@ -18,7 +18,18 @@ pub(super) fn optional<'input>(
         visit(charge, 0)?;
         return Ok(Err(Gov::RuleMapShape(kind)));
     };
-    let (start, len) = order::prepare_map_order(map, layout, charge)?;
+    let (start, len) = if matches!(
+        map,
+        super::Map::Direct(Cursor::Frame4(_) | Cursor::Merge(_))
+    ) {
+        visit(charge, 0)?;
+        if map.len(charge)? > 1_000 {
+            return Ok(Err(Gov::RuleCount(kind)));
+        }
+        order::prepare_map_order_rows(map, layout, charge)?
+    } else {
+        order::prepare_map_order(map, layout, charge)?
+    };
     if len > 1_000 {
         return Ok(Err(Gov::RuleCount(kind)));
     }

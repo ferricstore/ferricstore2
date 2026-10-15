@@ -12,7 +12,13 @@ mod core_patch;
 mod flow;
 mod intent;
 mod original_entry;
+mod public_set;
 mod replace;
+
+pub use public_set::{
+    OriginalPolicySetRequestPlan, VerifiedOriginalPolicySetFrame, decide_original_policy_set_frame,
+    prepare_original_policy_set_frame, verify_original_policy_set_frame,
+};
 
 pub use flow::{
     OriginalFlowPolicyReplaceRequestPlan, VerifiedOriginalFlowPolicyReplaceFrame,

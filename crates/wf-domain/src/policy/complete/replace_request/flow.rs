@@ -34,6 +34,20 @@ pub struct OriginalFlowPolicyInstall {
 }
 
 impl OriginalFlowPolicyInstall {
+    pub(in crate::policy::complete) const fn new_proposed(
+        policy_key: Vec<u8>,
+        stored_generation: u64,
+        generation: u64,
+        encoded: Vec<u8>,
+    ) -> Self {
+        Self {
+            policy_key,
+            stored_generation,
+            generation,
+            encoded,
+        }
+    }
+
     /// Borrows the independently owned exact destination key.
     #[must_use]
     pub fn policy_key(&self) -> &[u8] {

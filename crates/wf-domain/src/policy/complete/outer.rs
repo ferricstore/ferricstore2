@@ -12,7 +12,14 @@ mod caller;
 mod core_patch_frame;
 pub(in crate::policy::complete) mod flow_frame;
 mod model;
+pub(in crate::policy::complete) mod public_set_frame;
 mod replace_frame;
+
+pub use public_set_frame::{
+    OriginalPolicySetFrameBytes, OriginalPolicySetFrameHeader, OriginalPolicySetFrameInput,
+    ScannedOriginalPolicySetFrame, prepare_original_policy_set_frame_bytes,
+    restore_original_policy_set_frame_header, scan_original_policy_set_frame,
+};
 
 pub use flow_frame::{
     OriginalFlowPolicyReplaceFrameHeader, OriginalFlowPolicyReplaceInput,

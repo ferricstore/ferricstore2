@@ -9,9 +9,18 @@ pub struct OriginalPolicySetRequest<'input> {
     pub(super) replace: bool,
     pub(super) response_state: Option<&'input [u8]>,
     pub(super) patch: PolicySetPatchArena<'input>,
+    pub(super) reservation: (usize, usize),
 }
 
 impl OriginalPolicySetRequest<'_> {
+    pub(in crate::policy::complete) const fn reservation_count(&self) -> usize {
+        self.reservation.0
+    }
+
+    pub(in crate::policy::complete) const fn reservation_depth(&self) -> usize {
+        self.reservation.1
+    }
+
     /// Borrows the independently owned prefixed routing key.
     #[must_use]
     pub fn policy_key(&self) -> &[u8] {

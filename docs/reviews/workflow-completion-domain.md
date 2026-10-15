@@ -42761,3 +42761,791 @@ PERF caught a factual inequality wording error in GREEN1, independently confirme
 ## CORE-NEXT-M1-ORIGINAL-PUBLIC-SET1-CLOSE1
 
 Writer ACTUALLY whole-read/hash-verified ARCH WRITTEN1 at1746066+12848/SHAb43bde5d157a21eb15a301e15d0bd7f761580b93f8c8eba6a4c1735ab2e0217f in6c6213. Agree without source, ownership, fee, test-origin or narrow49bda mapping discrepancy. PERF's entire12339B finding was already actually read in e49c92 and both reviewers have actually reviewed each other's complete findings. Exact final ADR arithmetic diff0a9d8e now says cached visits PLUS required scratch and supplies the correct integers; the901B owner precision preserves earlier receipts. Root's reported final same1036-input macOS582+4/all-stage PASS and Writer112/strict/fmt PASS are accurately scoped. The five-file/four-test finite public-preparation responsibility is COMPLETE and normal source reciprocity is CLOSED without blocker; source/test bytes remain frozen. Root owns reviewed checkpoint/Git. Full default-false arbitrary-current integration, public identity/replies/dispatch/projection, complete opaque/Enumerable/capture semantics, physical/setup/profile/source-assertion duties, independent Linux AND macOS and full M1-M8 remain active required work under their next concrete consultation.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1 — concrete proposed batch, NOT creation authority
+
+Proposal after a1cfe42, existing-note ONLY. Recommend one coherent PURE public-prepared → new both-mode frame → one gate → retained current → merged overlay → ONE existing Layout business walk → late original envelope/owned install+retained outcome path. This is the next pure integration, not public transport/projection/physical publication. Actual reads: pinned PolicyPatch full59e9b8, allocator846–924 in27d11b, mandatory generation158–330 in740cf1/27d11b; current reader/Fresh/cursors/Layout/preflight/frame/ports in0ab11b/1fd45c/a24d1d/811a11/331773, README+architecture71c68b. Initial aggregate acquisitions clipped; material current/value/identity/Layout/frame bodies were independently redisplayed before this proposal. Whole ARCH3936+2535 and PERF7760 were actually read/hash-verified58ef1d/a5a8c8. No future path, stub, type, test or probe exists from Writer.
+
+The proposed batch is 18 NEW production files and 12 NEW tests, with explicit existing seams below. Root may select/amend this finite inventory; it is not a request for body/helper approvals. Some resource primitive ordering is deliberately identified for final tests-first freezing, rather than fabricated decimal totals. Every named artifact still needs ARCH's one recorded decision and Root tests-only author order.
+
+A. NEW production inventory and disjoint owners
+---------------------------------------------
+Writer owns these TEN:
+1. crates/wf-domain/src/policy/complete/original_entry/indexed.rs — retained ONE-decode owner and restricted construction/access.
+2. crates/wf-domain/src/policy/complete/original_entry/indexed/value.rs — actual borrowed ETF/virtual STRING cursor, no Raw adapter tree.
+3. crates/wf-domain/src/policy/complete/public_set/order.rs — server-supplied map-order context and prospective correspondence checks.
+4. crates/wf-domain/src/policy/complete/public_set/merge.rs — bounded mutable merge arena/models, frozen before business use.
+5. crates/wf-domain/src/policy/complete/public_set/merge/apply.rs — exact-key/equivalent resolution and atom:states special merge.
+6. crates/wf-domain/src/policy/complete/public_set/merge/equality.rs — cross-current/frame exact mathematical equality and coarse hash filter.
+7. crates/wf-domain/src/policy/complete/public_set/merge/rows.rs — paid lookup/index growth/final row ordering.
+8. crates/wf-domain/src/policy/complete/public_set/merge/value.rs — immutable merged cursor over real current/frame references.
+9. crates/wf-domain/src/policy/complete/replace_request/public_set.rs — both-mode Fresh source ordering and one shared normalization.
+10. crates/wf-domain/src/policy/complete/replace_request/public_set/retention.rs — precise reached rejection/status and two final byte owners.
+
+Root owns these EIGHT:
+11. crates/wf-domain/src/policy/complete/outer/public_set_frame.rs — discriminator/profile/three domain frame APIs.
+12. crates/wf-domain/src/policy/complete/outer/public_set_frame/model.rs — concrete public inputs/scanned/header ownership.
+13. crates/wf-domain/src/policy/complete/outer/public_set_frame/codec.rs — one measured final Vec, real patches, source-order sidecar.
+14. crates/wf-domain/src/policy/complete/outer/public_set_frame/canonical.rs — actual Prepared/Wire/Raw adapters and mathematical canonical comparison.
+15. crates/wf-domain/src/policy/complete/outer/public_set_frame/scan.rs — owner-free structural/canonical/permutation scan.
+16. crates/wf-domain/src/policy/complete/outer/public_set_frame/value.rs — borrowed validated Frame4 cursor.
+17. crates/wf-ports/src/log/complete_policy/public_set.rs — three real SHA operations/verification and verified owner.
+18. crates/wf-ports/src/log/complete_policy/public_set/apply.rs — exactly one existing request gate and owned plan.
+
+No generic trait, second AST, source callback execution, unsafe, new dependency, or hidden context/credit model. New types are exhaustively named below; ordinary helpers may split inside these files. Each source400LF/function100; consult a cohesive extra child ONLY if actual duties cannot fit.
+
+B. Exact model/API proposal
+---------------------------
+Eight public models:
+- OriginalPolicySetMapOrders<'capture>: immutable supplied SERVER/coherent-view facts, NOT authority. Private fields patch_identity:[u8;32], current_encoded:Option<&'capture[u8]>, and THREE borrowed slices patch/current/merged. Each slice element is the ordinary tuple (u32 map_id, &'capture[u32] forward, &'capture[u32] inverse). Constructor new takes exactly those five inputs. It does not certify VM capture.
+- OriginalPolicySetFrameInput<'request,'input,'capture>: owned scope/request/stamp, borrowed &OriginalPolicySetRequest<'input> and &OriginalPolicySetMapOrders. new(scope,request,stamp,prepared,orders). No caller can substitute a raw unprepared patch.
+- ScannedOriginalPolicySetFrame<'frame>: borrowed structural result plus exact intent/patch ranges, not paid/origin authority.
+- OriginalPolicySetFrameHeader<'frame>: four owned namespace identities; borrowed key/patch/reply-state, Option<u64> expected and bool replace; immutable registry-four ClientIntent. No public constructor.
+- OriginalPolicySetApplyView<'view,'raw,'context,'capture>: wraps the existing OriginalCompletePolicyReplaceApplyView plus &OriginalPolicySetMapOrders. Supplied coherent mathematical reads only; no I/O.
+- OriginalPolicySetFresh = (Option<OriginalFlowPolicyInstall>, RetainedOutcome), reusing the REAL old owned original-ETF installation type.
+- VerifiedOriginalPolicySetFrame<'frame> in ports: private header+whole PreparedDigest+owned isolation, no constructor/installation authority.
+- OriginalPolicySetRequestPlan<'view> in ports: same concrete revision/base_control/control/DispatchDecision ownership shape, borrowing only replay outcome and outliving frame/current/catalog/overlay.
+
+Eleven PRIVATE models:
+- OriginalPolicyCurrentIndex<'raw,'context> retains OriginalPolicyEntry + the SAME span/key/virtual-fun Vecs and safety borrow from one strict decode.
+- OriginalPolicyCurrentCursor<'view> borrows that index and existing TermPosition (including virtual StringCell/Byte/Nil); payload identity is never converted to unit Raw::Other.
+- PolicyMergeArena<'view> holds current/frame/capture borrows and FOUR Vecs: maps, rows, lookup words, final-order row IDs.
+- PolicyMergeMap: mutable/final logical map metadata, base origin and lookup/order ranges.
+- PolicyMergeRow: key/value PolicyMergeRef, coarse hash, live/link metadata.
+- PolicyMergeRef: Current(actual cursor), Frame(actual cursor), or Map(usize overlay ID). No self-referential Rust owner.
+- PolicyMergeCursor<'view>: immutable arena borrow+PolicyMergeRef, created only after merge freeze.
+- PolicySetFrameValue<'view>: Copy Prepared(PatchView), Wire(Frame4 cursor), Raw(existing RawFlowPolicyValue) — three ACTUAL adapters.
+- PolicySetFrameSink<'out>: Measure or Emit, no fake measure writes.
+- PolicySetFrameCursor<'frame>: Copy bounded byte/span cursor, source-order row access.
+- PolicySetRejected: Policy(PolicyRejection) or Input(FlowPolicyInputRejection), never an operational error.
+
+SEVEN free APIs:
+Domain prepare_original_policy_set_frame_bytes(input,limits,admission,charge) -> Result<(Vec<u8>,usize,std::ops::Range<usize>,std::ops::Range<usize>),CompletePolicyRequestError>; tuple is final frame, intent-digest offset, EXACT intent range, EXACT canonical-patch range.
+Domain scan_original_policy_set_frame(encoded,limits,admission,charge) -> ScannedOriginalPolicySetFrame.
+Domain restore_original_policy_set_frame_header(scanned,recomputed_intent:[u8;32],recomputed_patch:[u8;32],orders,limits,admission,charge) -> FrameHeader.
+Domain prepare_original_policy_set_fresh(view,header,(ClientIntent,LogIdentity,TimestampMillis),limits,admission,charge) -> OriginalPolicySetFresh with existing OriginalCompletePolicyReplaceApplyError outer type.
+Ports prepare_original_policy_set_frame(input,limits,admission,charge) -> PreparedBytes.
+Ports verify_original_policy_set_frame(encoded,orders,limits,admission,charge) -> VerifiedOriginalPolicySetFrame.
+Ports decide_original_policy_set_frame(view,encoded,log,limits,admission,charge) -> OriginalPolicySetRequestPlan.
+
+Getters mirror actual existing header/verified/plan contracts. Header exposes replace/response_state as borrowed facts while live; the escaped plan retains the bound intent but does NOT pretend the original ETF response is the required public projected reply. Real public projection/arbitrary-version defaults remain a successor, not V2/u64 conversion.
+
+C. Existing seams and compatibility
+-----------------------------------
+Writer-only existing seams proposed: original_entry.rs factors its build into a restricted retained-result helper; old decode APIs consume it then immediately drop indexes exactly as now, preserving all old bytes/fees/caps. New retained path admits live-base SUM BEFORE the existing three reserves, not after. Existing identity.rs compare visibility widens only inside original_entry for Current/Current exact equality; body/order/old events unchanged. public_set.rs registers order/merge. public_set/model.rs stores original private reservation_count/depth in Arena (constructor's existing metadata), so producer accounts actual logical cell/edge owners including dead callback cells WITHOUT Vec.capacity() or charge.p() guesses; old public methods/fees unchanged. Shared flow_input/value.rs gains ONLY actual Current/Frame4/Merge cursor variants/accessors. Shared flow_input.rs/preflight.rs/layout.rs gain restricted joined entry/profile/live-base reservation helpers, while every old wrapper uses old limits/base0 and exact streams.
+
+Root-only existing seams: complete.rs, outer.rs, replace_request.rs, ports log/complete_policy.rs facade registrations; workflow/request.rs internal ClientIntent::original_policy_set selects registry4, public new/version1 and old2/3 unchanged; workflow/request/outcome.rs adds RetainedStatus::OriginalPolicySetRejected(FlowPolicyInputRejection), no arbitrary operational retention; existing OriginalFlowPolicyInstall receives restricted new_proposed(key,stored,generation,encoded) to move already admitted owners without recopy. Root owns checker/ADR/shared docs/generator/ledger/Git. No unrelated retained-status consumer edit is assumed.
+
+D. Source order and the actual merged representation
+----------------------------------------------------
+Successful new public preparation must occur FIRST, once, using existing API/controls/Router metric. Producer reads that prepared view directly; no snapshot/ETF or Raw tree adapter. Its arena/key may DROP after one final frame is built. Fresh borrows verified frame data, not the dead public arena's historical P.
+
+After one verifier and one gate, NonFresh returns before current/captured-current/merged-orders/C/migration/window work. Fresh: key/patch/mode structural guard → ONE strict original-current read/decode → CAS → atom:type binding → merge or true-replacement → captured C → ONE existing core::normalize/Layout business walk over resulting cursor → late active/done migration H → next generation → SAME immutable Layout direct original envelope → late owned key → retained window/aggregate/status/response/outcome. Old raw invalid-CAS tests remain old allocator controls; new public framing has already normalized/validated Option<u64> guards.
+
+Merge EXACT mathematical key first; only if missing, atom→exact binary spelling or binary→the unique equivalent atom. If both exist, exact class wins and hidden other key remains. Generic maps merge recursively. Only RESOLVED atom :states with two map values invokes merge_states; source state keys use exact identity, Nil/Atomnil deletes, and map-valued state patches recurse through deep_merge_policy. Binary states never receives atom-only deletion. Scalars/lists replace. Right traversal comes from the captured VM context; synthesized logical sort is NEVER substituted.
+
+Arena uses append-only paid row metadata, mutable value updates and tombstones during merge, with O(1) owner-free final row access after freeze. Each source occurrence/path has its own map node; an existing overlay map on that path is updated in place rather than cloning its whole subtree on another alias update. Current maps/keys/runtime terms remain real retained positions and cannot be normalized/rejected before rescue by an overwrite. Coarse hash filters only accelerate exact lookup: full FNV for atom/binary bytes and canonical integer magnitude; complex/runtime keys use only a class hash and ALWAYS fresh recursive exact equality on a hit. Hash never proves equality or VM ordering. Current/Current equality reuses the genuine existing span comparator; cross-frame maps compare mathematical key/value sets, not positions in differing auxiliary orders. Adversarial compound-key collisions stay paid/bounded, with no universal speed claim.
+
+E. Native order: explicit conditional captured profile
+------------------------------------------------------
+Choose SERVER-SUPPLIED coherent map traversal, not an invented portable spelling sort. OTP28.3.1 atom flatmaps compare native Eterm indexes and atom HAMT hashes use those indexes; OriginalEtfSafety lookup ordinals are NOT native IDs. Current identity ordering is equality-only.
+
+Orders identifies PATCH maps by canonical-preorder Frame4 map ID, CURRENT maps by validated original encoded span ordinal under EXACT current_encoded bytes, MERGED maps by overlay creation ID after final logical rows exist. A record forward[sourceVMordinal]=logicalRow; inverse[logicalRow]=sourceVMordinal must range/bijection-check with safe [read4,prepay16,range decision,read4,equality decision]. IDs/counts/map origin and entire current byte correspondence are freshly checked; patch_identity is independently SHA256 over canonical patch bytes, compared against server-supplied capture facts. Final merged logical row list preserves current rows' exact key identities plus new insertions; records address those actual rows, not a separate unvalidated key payload. Missing/reused/mismatched reached records return outer InvalidAuthority; never invented caller errors. No Map key class is silently narrowed.
+
+Patch order context is read during verification; current/merged context ONLY Fresh after strict current/CAS/type. An arbitrary client sidecar is not native authority: scanner validates transport, and restored sidecar is matched against the coherent SERVER order facts. Context constructors grant no origin/payment credit. Runtime producer/capture coherence across replicas is STILL REQUIRED before real deployment; this pure represented-view path is deterministic for the FULL supplied coherent view, not a claim that Rust derives/attests actual VM order. It adds no user-visible CAS against a leader's old snapshot. Actual authoritative view/capture must refer to the current used by this apply, so the12-writer pure fixture refreshes coherent facts for each returned-current handoff. Complete runtime capture/atom-index protocol and all accepted Enumerable behavior remain required.
+
+Reached current/merged struct Enumerable boundary is handled only at an actual source map-reduce callback point, after preceding source checks; unknown/overwritten structs stay intact. Existing operational InvalidAuthority represents the temporary unsupported callback profile. It is not a global __struct__ filter, unit Other conversion, source caller diagnosis or product exclusion.
+
+F. New wire identity/profile (old8/registry3 exact)
+-------------------------------------------------
+Propose FWCP version1 discriminator9 (actual scan331773 finds1..3/5/6/8, no9), ClientIntent registry4 and prefix WF-INTENT\0ORIGINAL-POLICY-SET\0V1\0. Intent: length-prefixed tenant,key; replace byte0/1; optional response-state0 or1+raw bytes; expected0 or1+u64BE; canonical prepared patch. Absent/false identical; Nil/Atomnil optional controls identical; None response distinct from Binary(empty); math integer/padding/proper-fragment/map permutations canonical. Ordered lists remain ordered. Map IDs/offsets/permutations are not mathematical-key comparison data. Root4-identity header/stamp format stays separate from original intent as existing design.
+
+Use existing closed mathematical node grammar mechanics (node length/tag/u32 child counts+relative offsets), canonical-preorder map IDs and dual source→canonical/inverse sidecar, but a NEW separate implementation/profile. Prepared/captured logical row→canonical rank is composed with server forward/inverse directly while writing final sidecar; no unreserved mapping Vec. Measure never invents patches. Emit uses ONE measured final Vec, prospective zero fill, every actual length/offset/side-table mutation132. Three actual ports SHA operations are patch canonical bytes, full intent and whole frame; domain prepays each128+length, digest overwrite160, compare192. Public preparation is not repeated.
+
+NEW frame/intent cap128MiB, patch semantic nodes131072/root depth64, represented total payload cap64MiB plus derived key/header limits; full reply-state bytes admitted by preparation are supported. Existing frame3 actually uses64MiB visible/96MiB frame, not the older typed1MiB cap, but its N65536 still fails required prepared profiles. The public pipeline fixture opts[x:List(131067 empty Lists)] has originalN131072/D3, patch metric131082 and converted patch131070 nodes; canonical patch2228187B under existing node recipe. Also preserve65535/65536 byte-list neighbors, wrapper/control counts and response-state262145/opaque/empty. Old8/3 goldens, scope caps and fees stay unchanged.
+
+G. Prospective owner/resources and the STRING issue
+---------------------------------------------------
+Never infer live bounds from allocator capacity, historical charge.p(), or a public paid flag. Deterministic private counts are mathematical bounds ONLY.
+
+Producer live stage: retained public key+cell/edge capacities (72*Npub+keyLen+256, original reserved counts now privately retained), one canonical ordinal Vec (8*Npatch+128D+256), then ONE final F-byte frame. Admit their simultaneous logical SUM before each reserve; reserve costs128+chosen byte budget and actual writes/zero-fill/hash events precede operations. Temporary builder/public owners can drop before apply.
+
+Fresh retains EXACT three current indexes from ONE strict scan. Let Nc,Kc,Fc be physical span/key/fun counts; reader local R=64*(Nc+Kc+Fc), reserves128+32Nc /128+4Kc /128+64Fc retain old bodies. New path admits live base+R BEFORE these allocations. Treat immutable frame F and current raw V as explicitly bounded live backing in the NEW joined logical profile, rather than claiming native RSS; external source/catalog ownership is not copied or certified. Current orders are borrowed bounded input, not a new Vec.
+
+Overlay bound T=Nc+Npatch+32 (physical current, canonical prepared patch), four fallible owner budgets:128T maps,160T rows,8*(8T) lookup words INCLUDING geometric retired segments,8T final-order row IDs. O=360T+512+128D. Every real map/row/slot append/update/tombstone128, scalar cached/hash16, exact byte compare128+both widths, each actual bulk slot swap256; lookup growth clears/pays each actually initialized word. All owner reserves admit F+V+R+O before allocation. Exact lookup primitive order and representative nonempty arrays freeze during meaningful test authoring BEFORE final RED/production, not candidate-derived.
+
+Do NOT equate physical spans to semantic STRING cells. NEW joined structural preflight counts virtual heads prospectively and admits semantic occurrences524288/depth64/visible64MiB; old wrappers remain65536. Layout reservation bound B=Nc+Npatch+32, not expanded ignored STRING count: every virtual STRING head is an Integer; the existing list-producing business branches require binary/atom names or tuples/maps and reject an integer before materializing it. Such STRING heads cannot produce accepted output cells. Unknown STRING fields are structurally paid but ignored by the ONE business walk. This source-class capacity proof is an explicit review item, not a paid-skip adapter. Physical/tag count plus STRING payload lengths stays bounded by263168 original bytes; combined expanded current+patch is below524288. All reached virtual reads still pay, and accepted ordinary lists retain full per-leaf work.
+
+Existing Layout local S(B,D)=672B+64D+2752, including synthetic defaults. New joined helper admits F+V+R+O+S BEFORE any Layout reserve. It calls the SAME core::normalize ONCE. No old CONTENT1/normalized Data pass. Current/overlay metadata conservatively stays live through envelope in this proposed first batch because the shared cursor currently has one lifetime; we do not pretend the payload/index lifetime is already split. Direct envelope uses the already measured immutable snapshot length E: Eenv=E+18+g and fresh writer Msnapshot+402+g. Before final output/key reserve admit actual live stage plus new owner lengths; G pays both installed bytes/key and separate retained-response copy. After prepare returns indexes/overlay/Layout drop; retainer stage sums only actual install/key/namespace/new response owners. Output aggregate still includes BOTH Eenv owners. Independent owned plan outlives frame/current/context/catalogs.
+
+Mandatory capacity witness BEFORE SUT: current gen0/type:r/states:{} plus TWO ignored atom keys a,b each STRING65535 is131133B, physicalN12/K4/F0/R1024 but expanded131080>131072. False empty patch must produce frozen minimal gen1 original51B envelope under default work, without allocating131080 Layout cells. Earlier one-STRING65598B/N10/R832 neighbor also remains useful. Source math, not native/SUT observation. Exact producer/verifier/Fresh/nonempty vectors and every positive prospective boundary freeze before final missing-API RED.
+
+H. TWELVE substantive test identities / exact new test paths
+-----------------------------------------------------------
+Writer SIX domain test files:
+crates/wf-domain/tests/complete_policy/public_merge.rs
+crates/wf-domain/tests/complete_policy/public_merge/cases.rs
+crates/wf-domain/tests/complete_policy/public_merge/current.rs
+crates/wf-domain/tests/complete_policy/public_merge/order.rs
+crates/wf-domain/tests/complete_policy/public_merge/refusals.rs
+crates/wf-domain/tests/complete_policy/public_merge/owners.rs
+Writer owns exact newline+mod public_merge;+newline EOF only on existing domain main.
+Root SIX ports test files:
+crates/wf-ports/tests/complete_policy_request/public_set.rs
+crates/wf-ports/tests/complete_policy_request/public_set/frame.rs
+crates/wf-ports/tests/complete_policy_request/public_set/source.rs
+crates/wf-ports/tests/complete_policy_request/public_set/gate.rs
+crates/wf-ports/tests/complete_policy_request/public_set/refusals.rs
+crates/wf-ports/tests/complete_policy_request/public_set/owners.rs
+Root owns exact newline+mod public_set;+newline EOF only on existing ports main.
+
+Twelve duties/identities: (1) exact-key and fallback-class matrix incl both classes/nil/Big/proper-list aliases; (2) resolved atom:states deletion versus binary states generic nil; (3) full real source merge/string/native-state sequences; (4) true reset/no-readmission-invalid-current rescue; (5) current STRING physical/semantic/resource bounds; (6) contextual capture correspondence/order competing errors; (7) canonical new frame+math/query/mode identity and strict malformed wires; (8) one gate/nonFresh poison bypass and changed-mode/query conflicts; (9) source strictread→CAS→type→merge→C→business→lateH error priority; (10) literal prospective producer/verifier/merge/Layout/emission/body/aggregate exact and tight streams with inherited64/large peaks; (11) frame/current/arena/catalog drop, all final two byte owners+key reobserved through success/refusal; (12) sequential coherent two-writer BOTH orders and twelve-writer original recipe component with actual prior output as next current.
+
+Original exact IDs/source: 76ce05532a4084fb generation158–189 preserves generation-merge-1, maxactive1000, queued FIFO/retry7 then dead plus review FIFO, source161/169/177 content; e782ea691ad8e998191–215 uses generation-string-patch-1 and actual binary mode parallel/retry9; 0f523e8d4fd45612217–237 uses generation-native-state-patch-1 and actual review pair list;17d8471407b0c04a320–330 resets max1000/queuedFIFO using replace true. c0feb9ef8a2818ed246–278 and9f774decb7904a65280–317 use exact queued/review and state-1..12 parity modes, then compare source generation/state content. Pure serialized orders/rotations/reverse are component coverage, NOT original Task concurrency/readiness/all-shard/global setup. Physical concurrent writers/setup/get/projection stay required and unlinked. All expected original ETF/body/semantic values are built from pinned source before candidate calls, never copied from first output. Returned bytes alone are used only as the genuine next current.
+
+Both OS/default profile/old112 domain+87 ports/genuine original references stay explicit. Tests-only creation follows recorded selection, meaningful complete tests and literal streams precede final real missing-export/status RED, Root independently reproduces then releases SUT. No production/stubs/probe/new artifact before that decision. This is a proposed coherent captured-view pure integration; full Other/Enumerable/VM capture/public reply/physical/setup/runtime/assertions/Linux and all M1-M8 remain REQUIRED.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-MECHANICS1 — finite inventory amendment and joint seams
+
+This amends the actual 25,587-byte proposal at3084462/SHA283718a63b2611bf8dec932d925127ae2687ff67f8e3b2734532ff210f284590. The eighteen production/twelve test paths and eight public/eleven private models remain proposed as one batch. No implementation, test or stub was created by Writer. Root has separately received ARCH's limited six-ports-test selection; that does not release Writer's domain tests or production. This addendum resolves the published resource/interface questions so the full named decision can be finite. Final representative primitive arrays are ordinary tests-first work and must precede final missing-API RED and production; they are not inferred from SUT counters.
+
+1. Exact existing seams and methods
+----------------------------------
+Add ROOT-owned existing crates/wf-ports/src/log.rs for reexports, and ROOT-owned existing crates/wf-domain/src/policy/complete/flow_input/order.rs for the source-row protocol below. These are existing files, not extra artifacts. All eighteen new paths retain their prior disjoint owners.
+
+OriginalPolicySetApplyView::new(base:OriginalCompletePolicyReplaceApplyView<'view,'raw,'context>,orders:OriginalPolicySetMapOrders<'capture>) stores exactly those two immutable supplied inputs. Its gate/current/C/migration/window meanings remain the existing base meanings. Constructor grants no view/capture authority.
+
+ScannedOriginalPolicySetFrame::canonical_patch(&self)->&'frame[u8] returns the EXACT checked canonical-patch region, alongside original_intent()->&'frame[u8]. Ports freshly hashes each region before restoration. Header into_parts, restricted pub(in crate::policy::complete), returns exactly:
+(RequestScope,RequestId,&'frame[u8],PolicySetFrameCursor<'frame>,Option<u64>,bool,Option<&'frame[u8]>)
+in scope,request,key,patch,expected,replace,response_state order. Scope/request move; other byte operands borrow frame. Header public encoded/original_intent/scope/request/stamp/intent/replace/response_state getters mirror the already real lower header contract. The closed plan retains registry4 intent, not a fabricated public query response.
+
+Writer's public_set::order module is visible only within complete. OriginalPolicySetMapOrders remains public through the facade; its members remain private. Restricted ordinary methods, not new free public APIs/models:
+- patch_identity(&self)->[u8;32].
+- admit_patch(&self,node_bound:usize,charge:&mut PolicySchemaCharge)->Result<usize,CompletePolicyEncodingError>: checks reached patch-record metadata/caps and returns its deterministic borrowed-backing length Cpatch. The result is a length, not paid/origin credit.
+- bind_patch(&self,recomputed:[u8;32],charge)->Result<(),CompletePolicyEncodingError>: fresh192 comparison against the supplied patch_identity.
+- patch_record(&self,map_id:u32,pairs:usize,charge)->Result<(&'capture[u32],&'capture[u32]),CompletePolicyEncodingError>: direct canonical-ID lookup, fresh record128 and scalar16 count/ID checks, with reached permutation checks as below.
+- bind_current_bytes(&self,actual:Option<&[u8]>,charge)->Result<(),CompletePolicyEncodingError>: false/Fresh after CAS/type only; option-class128, then fresh128+both byte lengths before an actual Some/Some byte comparison. None/Some mismatch is operational InvalidAuthority.
+- admit_current(&self,node_bound,charge) and admit_merged(&self,node_bound,charge) have the same Result<usize,Error> shape as admit_patch and inspect ONLY their reached slice's count/ID/length metadata, not every p/q payload.
+- current_record(&self,map_id:u32,pairs:usize,charge) and merged_record(...) return the same borrowed two-slice tuple as patch_record, using paid sorted-ID search. Repeated reads of the SAME consistent map record are valid. 'Reused' in the initial proposal meant conflicting identity/correspondence, never one-use-only records.
+
+The ordinary helper names above are fixed joint seams; error conversion at the existing CompletePolicyRequestError/ApplyError boundaries remains Root/Writer's existing conversion. No new alias/error/context/model is introduced.
+
+2. Fourth current owner: one catalog, no old TermSpan layout change
+------------------------------------------------------------------
+Choose one FOURTH Vec<u32> in the proposed OriginalPolicyCurrentIndex. Do NOT add child_start or any field to the old TermSpan. Its old native24-byte layout, old32 logical reservation, all old indexes/decoder streams remain unchanged. The fourth catalog is built only for reached false-mode current traversal, AFTER strict current decode -> CAS -> atom-type binding, before merge. True replacement and stale/type refusal never allocate/build it. The old public and old lower read APIs return/drop the same three owners and do not build/pay this catalog.
+
+For Nc physical spans reserve at most2Nc u32 entries. First initialize exactly Nc header words; the disjoint appended range [Nc,2Nc) stores immediate Tuple/LIST head span IDs, at most Nc in total. Tuple/LIST head occurrences are disjoint physical source occurrences; actual LIST tails remain the existing paid/validated span.keys positions. Maps use the existing canonical key Vec (key at keys[span.keys+logical], value at spans[key].next). STRING has arithmetic Byte children and no catalog expansion.
+
+Header meaning is tag-dependent private metadata: Tuple/nonempty LIST stores the appended child-range start; zero-head LIST alias stores its terminal resolved physical ID; all other kinds, INCLUDING MAP, keep the impossible-index sentinel. Current-order records are NEVER eagerly bound/cached in this catalog. A checked cursor resolves a zero-head-list alias by this single precomputed ID; it does not hide an uncharged chain walk. Empty Erlang list is a List cursor, never the Elixir nil atom.
+
+Prospective schedule: admit liveBase+R3+R4 before fourth reserve, R3=64(Nc+Kc+Fc), R4=8Nc+128. ReserveG=128+8Nc, then header initializationG=4Nc BEFORE initializing those words. Process physical spans in REVERSE ordinal order: one128 before reading each already validated span's tag/metadata; a real header update128 before writing it; each immediate child-ID append128 before fetching its validated next metadata and writing. Flattening a zero-head alias uses its already processed later target and one actual128 header update, not a second ETF parse or uncharged traversal. Nonempty compounds append only heads in source/physical order, then write their header. No actual p/q read occurs here. Eheads<=Nc proves total len<=2Nc and the declared R4. All index access is checked; Integer/Binary/Big/atom payload borrows still refer to actual original bytes/safety tables.
+
+This selects constant-time current row/child/alias access over adding paid child_at rescans to every old retry/indexed walker. It avoids quadratic hidden ordinal scans and avoids changing old native span width. This is a source-cost argument, not measured native performance.
+
+3. Reached native-order binding, including untouched current maps
+-----------------------------------------------------------------
+Every current map stays wrapped in PolicyMergeCursor. Shared PolicyInputCursor therefore needs the ACTUAL Frame4 and Merge variants; remove the redundant proposed shared Current variant. OriginalPolicyCurrentCursor remains an actual private model used by merge/equality and MergeRef::Current; it is not a standalone business map adapter.
+
+Default Current/Overlay map row access is its O(1) LOGICAL row catalog for order-insensitive Map.get/has_key selection. A Current logical row means existing AUXILIARY canonical-key Vec order, not ETF encounter order and not Erlang term/native order. Frame4 has separate canonical-row access for identity and bound source-row access for business. Exact equality never zips incompatible map orders.
+
+At an ACTUAL source Enum boundary, the map obtains one paid source-order binding for that walk. This returns a Copy PolicyMergeCursor carrying the found record ordinal/mapping in its already proposed fields. No interior mutation, extra Vec, token or paid flag. Each subsequent native row access uses that already validated mapping in O(1), covered by the walk's fresh row128; it does not redo .find/binary search or validate a whole permutation for every row. Repeated source walks bind freshly. Missing/invalid UNUSED current/merged p/q records remain unread; overwritten current fields and true replacement do not acquire such a failure.
+
+Existing flow_input/order.rs prepare_map_order keeps its old signature. For Direct maps it binds native order only when this new adapter requires it, and reads a source-row triple (ORIGINAL logical index,key,value). WorkSlot.index stores that original logical index. Later states/rules code's unchanged original input.row_at(slot.index) consequently revisits the exact same logical row. Old Flow/Retry/Indexed/Frame3 behavior and fees remain exact. New Frame4's bound sidecar is already source ordered, so original index is its source ordinal. Synthesized old Keyword/StatePairs keep their existing exact source hash/order path.
+
+Untouched CURRENT nested map: MergeCursor(Current(pos)).logical_row uses original keys Vec; its source-walk binding looks up current_record(physicalMapSpan,count), then source row s reads logical rank p[s] and returns the corresponding original key/value as MergeCursor wrappers. A nested current map never escapes as an unbound shared Current cursor. OVERLAY map uses final logical-live row-ID catalog and its reached merged record. FRAME map uses validated frame sidecar. Leaves borrow actual payload; tuples/lists keep current/frame identity barriers and their children remain wrapped.
+
+Only actual source Enum dispatch gets the temporary struct/Enumerable operational disposition. Copying/indexing LEFT rows is not such dispatch. Binary incoming-key exact miss DOES reach PolicyPatch.equivalent_policy_key's Enum.reduce_while(left) before atom fallback; preserve the reached struct guard there even if ordinary-map exact hash lookup safely replaces order-insensitive atom-name scanning. Exact hit bypasses that guard. Right-map deep_merge/merge_states reduces and source states/rule-map business walks are actual Enum boundaries. No global current-struct rejection; overwritten/ignored struct and exact-hit rescue fixtures are mandatory. Full Enumerable/custom callback scope remains REQUIRED.
+
+4. Bounded context storage, validation, and lookup
+-------------------------------------------------
+Patch IDs are dense canonical-preorder IDs, so patch_record uses checked direct indexing. Current IDs are physical MAP span ordinals; merged IDs are overlay creation IDs, which may be sparse after overwritten intermediates. Their tables must have strictly increasing unique IDs. Metadata admission pays root128 before slice inspection, each actual record128 before ID/count access, and scalar16 before each ID/order/length comparison. Cap records and sum rank counts separately: patch records<=Npatch and sum forward lengths<=Npatch; current records<=Nc and ranks<=Nc; merged records<=T and ranks<=T. Forward and inverse lengths must match. Checked arithmetic precedes length products.
+
+For a reached current/merged map, pay record128 before search; each actual binary-search midpoint/ID comparison16 before that read/decision; on match check actual ID/count16 and validate p/q. Valid per-rank permutation primitive sequence is [read4,prepay16,range decision,read4,equality decision]; out-of-range stops after [4,16]. Each found rank must satisfy q[p[s]]==s. This proves bijection in O(k) without scratch. Duplicate IDs fail metadata admission; unknown/missing reached IDs and count/content correspondence fail InvalidAuthority. A found record can be revisited consistently. Unused p/q contents are not inspected merely because a table exists.
+
+Borrowed context backing is EXPLICIT in the new logical profile because F does not contain these separate server arrays. For a reached admitted slice C=64*recordCount+8*sumForwardLengths, including its two u32 arrays and bounded record metadata. Cpatch joins producer/verify and remains live while their references do; false Fresh additionally admits Ccurrent/Cmerged from reached metadata after CAS/type. Their unselected payload values are unread. This is a bounded admitted-input accounting profile, not native RSS or origin proof. The lifetime of the supplied arrays is external; constructors grant no resource credit. Reached source-walk binding checks correspondence against the actual map/count, not a mere record ID.
+
+Overlay final logical order catalog appends each live row ID ONCE per surviving map in that map's insertion/link order. A source order is read as catalog[start+p[source]], so no hidden in-place reorder, unreserved rank map, tombstone ordinal scan or second metadata owner is needed. After merge, a bounded depth-first walk of actual surviving overlay map references freezes each once; source occurrences are never shared/cloned into two live paths. Unused/overwritten overlay intermediates need no capture record. Reached business binding caches its record in the Copy cursor; no mutation after freeze.
+
+5. Overlay lookup/owner proof and equality invariants
+-----------------------------------------------------
+Freeze one lazy open-addressed lookup schedule within the same four owners. Each map starts capacity0; first row requires2 words. Grow by doubling BEFORE its cumulative staged/ever-inserted row count would exceed half capacity; deleted rows/tombstones count toward this number. Old segments stay retired within the same reserved lookup Vec. For r>0 final capacity<4r and sum of geometric segments<2*capacity<8r. Sum r<=total staged source-occurrence rows<=T proves lookup words<8T. Empty maps allocate no segment.
+
+Initialize each new lookup word only after128; use checked reserved-capacity append. A probe pays16 BEFORE reading its bucket/cached hash. On an occupied equal coarse hash, freshly compare exact key (recursive pair128 and payload128+widths where applicable) before equality can decide a match. Differing hashes only filter. Linear probe stops at empty; tombstones are skipped/remembered under paid16 probes. New row128, actual bucket write128 and map-descriptor update128 precede mutation; replacing a whole row128; actual deletion separately prepays row/bucket changes. Growth re-inserts only live row IDs with the same paid probe/write rules, never clones payload/row subtrees. Exact-key lookup completes FIRST; only a miss reaches atom/binary equivalence lookup and the source conditional left-Enum guard. No extra same-key table scan is implicit.
+
+Hash equality invariants: Integer/trimmed Big aliases incl negative zero share one canonical sign/magnitude hash; RawNil/Atomnil share atom-nil identity; Erlang [] and STRING/proper byte-list mathematical aliases share the same coarse LIST class; tuples/maps use class-only filter so map permutations cannot disagree; current aligned BIT_BINARY and Binary share byte identity, partial bitstrings do not. Runtime/current opaque compound classes stay real terms and every hit reaches exact comparison. Current TermPosition::Nil is Erlang [] and MUST NOT trigger state deletion. Current/Current comparator remains the genuine original comparator with old body/events unchanged.
+
+6. Live-stage H/I and corrected simultaneous sums
+------------------------------------------------
+Let h=t+g+r+requestLen, H=512+h (four independent128 logical owner allowances). Source identity bounds imply h<=8430 and H<=8942. Let I=18+t+g+r<=8192 be the actual isolation owner; it lives only during verify/gate and is dropped BEFORE Fresh. F is borrowed whole-frame backing, V borrowed exact current bytes. Neither includes H, I or external capture arrays.
+
+Producer peak before reserves includes H+Cpatch+publicArena+ordinalWork+finalFrame, where publicArena=72*Npub+keyLen+256 uses the actually retained private original reservation counts, and work=8*Npatch+128D+256. The copied frame namespace and still-owned Input namespace coexist. After frame completion preparation arena/key/work/Input can drop, before apply.
+
+Owner-free scan only borrows F. Restore admits F+Cpatch+growingH BEFORE each namespace copy; after copies, verifier admits F+Cpatch+H+I before isolation allocation. Header moves H into Fresh. NonFresh gate result bypasses all current/Ccurrent/Cmerged/catalog/overlay/C/migration/window.
+
+Strict current read on Fresh has base F+Cpatch+H+V, and must admit base+R3 BEFORE the SAME existing three reserves; no fourth catalog exists yet. CAS and type then run. TRUE drops current indexes and V borrow before incoming business; it bypasses all current/merged capture/catalog/overlay. Its Layout reserve admits F+Cpatch+H+S, using the new incoming profile without routing through false semantics.
+
+FALSE after CAS/type admits R4 before the one child catalog reserve. It then includes reached Ccurrent/Cmerged metadata backing and overlay O=360T+512+128D, with T=Nc+Npatch+32. Before each reserve, sum F+V+H+Cpatch+Ccurrent+Cmerged+R3+R4+O plus the local owner being added exactly once. Before Layout owners add S=672B+64D+2752, B=Nc+Npatch+32. Current/overlay/index owners conservatively stay live through direct envelope, as the actual cursor currently has one lifetime. Envelope/key reserves add their real final byte owners to that live sum; G includes original writer/keycopy. After preparation returns all transient cursor/index/overlay/Layout owners drop; retainer stage includes moved H+installed key+installed ETF+the separately allocated response. Installed bytes and retained response are two actual owners and both count in aggregate. Past charge.p() remains a monotonic historical maximum, never a substitute for live additive bounds.
+
+Physical-vs-semantic B proof is conditional on NO concurrent duplication of one source occurrence/path: each current encoded occurrence and serialized patch occurrence has at most one live overlay node; updates on a path mutate its existing overlay map, never clone it. Current envelope adds one depth level: policy root starts one level lower in the new business cursor; virtual STRING heads add back at most that removed level, so semantic policy depth stays<=64. Current physical tags plus STRING payload lengths are bounded by263168 encoded bytes. Adding patch131072 plus small synthetics remains below semantic524288. Each successful list-producing business branch rejects Integer STRING heads before creating output cells (names/rules require binary/atom/tuple); ignored STRING fields remain borrowed/pay structural visits. Thus B is physical-based without hidden accepted list-cell expansion.
+
+The two-STRING witness131133B/Nc12/Kc4/Fc0 now has R3=1024 and new R4=224, not the old three-owner total alone. It still must produce gen1 minimal51B under default matching work, with exact native context ONLY for reached Enum maps, no eagerly demanded order for ignored maps. No131080-cell Layout reservation.
+
+The public x=>131067 emptyLists fixture needs an AMPLE matching schema profile for complete-pipeline success: Npatch131070/T131102 makes O+S>=135300528 before F/H/G, already above default134217728. Default must prospectively refuse; explicit larger matching profile must succeed. Admission default decision16MiB also stays unchanged. Select explicit AdmissionLimits::new(1_048_576,134_217_728,1000) for the new128MiB frame/profile and wide response-state controls, plus ordinary default tests; no claim all large new profiles pass old defaults. Existing typed1MiB/old frame8 profiles/goldens/fees stay exact.
+
+7. Exact test registration names and original source IDs
+--------------------------------------------------------
+Writer's SIX domain identities in the six already named files:
+original_public_merge_preserves_exact_and_equivalent_key_semantics
+original_public_merge_preserves_resolved_states_and_source_fields
+original_public_merge_retains_original_terms_without_string_expansion
+original_public_merge_uses_server_bound_source_traversal
+original_public_merge_prepays_each_joined_operation
+original_public_merge_keeps_simultaneous_and_returned_owners
+
+Root's SIX ports identities in its already selected six paths:
+original_public_set_frames_bind_both_mode_and_reply_context
+original_public_set_frames_preserve_canonical_math_and_new_profile
+original_public_set_frames_reconstruct_original_merge_sequences
+original_public_set_frames_gate_once_before_all_fresh_reads
+original_public_set_frames_keep_exact_prospective_boundaries
+original_public_set_frames_outlive_all_input_and_current_owners
+
+Exact EOF suffixes are domain "\nmod public_merge;\n" (19 bytes) and ports "\nmod public_set;\n" (17 bytes); preserve each complete preimage/assertion. The six source IDs, separated from source lines to remove prior typographic ambiguity, are:
+76ce05532a4084fb — generation test158–189;
+e782ea691ad8e998 —191–215;
+0f523e8d4fd45612 —217–237;
+c0feb9ef8a2818ed —246–278;
+9f774decb7904a65 —280–317;
+17d8471407b0c04a —320–330.
+Keep the actual prior original ETF output as next current, independent expected content built BEFORE apply, both serialized two-writer orders and twelve-writer content/generation. Component limitations/public projection/physical readiness/setup/concurrency remain explicit and REQUIRED.
+
+Add substantive reached context tests: overwritten current Map with missing/poisoned order succeeds; true mode ignores current/merged record payload; surviving untouched Current states/rule map competing errors follows supplied coherent native order; same logical result under a different actual server order can change source first diagnosis but never pretends arbitrary client permutation is VM truth. Binary exact miss on a current struct reaches unsupported Enum, exact hit or overwrite can rescue it; both class keys and resolved atom/binary states keep their actual source semantics. No changed old scenario is credited as full public/capture behavior.
+
+8. Decision scope and independent wire literals
+-----------------------------------------------
+Root and PERF independently packed empty final wire BEFORE SUT: patch17/intent76/side20/frame183, patch SHA93708c027d7fd5f6c27b3f29c9229795b0d0d27efd342e78cda87768017b3de2; intent SHAa58aa50ce9877a9b71cdcb801d1e50508236cf78c2a2a4427d4844cd13304216; frame SHA19e5b4f614e197d8be6a776f037d5d73954bdbb32d0f98e383e3b8fe36e65e1f. These are attributed independent source packing, not Writer execution/VM observations. Nonempty Root patch46/intent119/side28/frame234 control binds true/stateFF00/expected7/x7. Full primitive G/P/event arrays still freeze in ordinary actual tests before final RED, including fourth catalog, context binding, exact/equivalence hit/miss, growth/tombstone, virtual STRING and fresh envelope/body/aggregate. No decimal completion becomes an extra semantic-creation gate.
+
+This resolves the actual initial inventory omissions/owner and access issues without adding new models/paths. It is a finite proposed amendment for ARCH's named full decision and Root's tests-only order, not production authority. Full opaque incoming identity, runtime VM capture/coherence, supported Enumerable behavior, original public query projection/replies/dispatch, physical atomic/current comparison, all original setup/assertions/runtime profiles, Linux AND macOS and M1–M8 remain REQUIRED successors. No false route-to-true, snapshot encode/parse bridge, repeated business normalization or native-gain claim.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-INTERFACES1 — exact borrowed seam and source boundary
+
+This short clarification supersedes MECHANICS1's mistaken BY-VALUE ApplyView constructor spelling. Both constructors borrow the context, as the initial contract/Root's actual selected test buffers do:
+OriginalPolicySetApplyView::new(base:OriginalCompletePolicyReplaceApplyView<'view,'raw,'context>,orders:&'capture OriginalPolicySetMapOrders<'capture>)->Self;
+OriginalPolicySetFrameInput::new(scope:RequestScope,request:RequestId,stamp:CommittedTime,prepared:&'request OriginalPolicySetRequest<'input>,orders:&'capture OriginalPolicySetMapOrders<'capture>)->Self.
+No context is copied/owned; appropriate covariance may shorten the supplied capture-data borrow. The proposed four ApplyView/three Input lifetimes and model counts are unchanged.
+
+Exact ROOT order.rs / WRITER value.rs joint methods, all pub(in crate::policy::complete):
+PolicyInputMap<'input>::bind_source_order(self,charge:&mut PolicySchemaCharge)->Result<Self,CompletePolicyEncodingError>;
+PolicyInputMap<'input>::source_row_at(&self,index:usize,charge:&mut PolicySchemaCharge)->Result<(usize,PolicyInputCursor<'input>,PolicyInputCursor<'input>),CompletePolicyEncodingError>.
+
+bind_source_order is a no-op with NO new event on every old adapter. New Direct Merge/Frame4 maps reach their actual source Enum guard and, where needed, record binding. The returned Copy map/cursor caches that walk's already validated record. source_row_at's first result is the ORIGINAL input's logical row index. In prepare_map_order, Root keeps the original map for duplicate_slot and downstream logical revisits, binds a local source-map copy once, then the EXISTING paid row128 precedes source_row_at. WorkSlot.index stores the returned original logical ordinal. Later input.row_at(slot.index) remains correct; the prepare_map_order signature and every old stream are unchanged. No mutable cache or per-row search occurs.
+
+One precise SOURCE PRIORITY amendment requires the EXISTING Writer-owned crates/wf-domain/src/policy/complete/flow_input/governance/rules.rs seam in this batch: actual pinned Governance.Policy259–289 checks map_size<=1000 BEFORE Enum.reduce_while (whole actual branch b6ae61). Therefore a NEW-adapter Direct rule map above1000 must return the existing RuleCount after its reached container128 BEFORE binding native order/struct Enumerable. Missing/poisoned unused record must not replace that caller error. This new-only direct-map precheck leaves old wrappers/fees unchanged; keyword/state-pair compaction still runs before its final count. At<=1000 the shared prepare_map_order source binding is used normally. No new path/type/API/test identity; include exact/tight priority control in the already named source/order/refusal duties.
+
+Other reached Enum precision: pinned PolicyPatch91–103 source binary-key exact miss invokes Enum.reduce_while(LEFT map) before atom fallback. Thus left STRUCT callback disposition is reached there even though ordinary-map unique atom-name equivalence can safely use indexed lookup independent of native order. Exact-class hit performs no such dispatch. Left indexing/copying alone still never rejects a struct. Atom-key fallback uses exact binary Map.has_key without this Enum branch. This was actually reread in97146a, not derived from SUT.
+
+Add one meaningful existing-duty C fixture from ARCH's actual pinned source reread: current normalized retention.history_max_events50, captured previously under C100; false empty/unrelated patch under C10 must reject the SURVIVING merged History{maximum:10}; incoming history overwrite10 rescues it, while true reset discards it. This proves current is neither independently re-admitted before merge nor skipped after merge. Existing late-C/business/highwater ordering remains. No new identity/path/model.
+
+Source order/capture is still conditional on genuine server origin, and the two final byte owners remain actual separate copies. The new existing rules.rs seam and these signatures await the SAME full named decision; the limited Root six-test release is unchanged. Decimal vectors still freeze before final RED; no source/test implementation was created by Writer for this proposal.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-ORDER-ROOT1 — one container debit
+
+Choose ARCH's concrete flag-free shared helper for the preceding RuleCount priority. ROOT-owned flow_input/order.rs keeps prepare_map_order(map,layout,charge)->Result<(usize,usize),Error> as its OLD wrapper: admit the SOLE container128, then call pub(super) prepare_map_order_rows(map:PolicyInputMap<'input>,layout:&mut FlowPolicyLayout<'input>,charge:&mut PolicySchemaCharge)->Result<(usize,usize),CompletePolicyEncodingError>. That private rows helper has NO container debit and performs the source binder/actual rows exactly as described above. Ordinary function extraction changes no old event/body behavior.
+
+Writer's new-adapter Direct branch in governance/rules.rs admits container128 BEFORE count inspection; above1000 returns RuleCount; otherwise calls prepare_map_order_rows directly. All old adapters still call prepare_map_order. Thus valid new maps and early count refusals each pay exactly one root128, no paid flag/token or double debit. States and all old callers/signatures retain their wrapper. Root owns the helper extraction; Writer owns only the new rules branch. This fixes the precise dependent helper spelling before tests/SUT, within the already proposed files/models.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-HASH-AND-IDENTITIES1 — final joint facts
+
+Root selects public immutable OriginalPolicySetFrameInput::patch_identity(&self)->[u8;32]. Ports caches this expected supplied fact BEFORE consuming Input. It grants no origin/payment authority and adds no free API/model/tuple field. Exact producer actual order and domain prospective fee order: PATCH SHA128+patchLen -> INTENT SHA128+intentLen -> digest overwrite160 -> WHOLE FRAME SHA128+frameLen -> expected-patch comparison192. All three hashes/overwrite occur even on bad supplied patch identity, then comparison rejects; no fictitious later work after an early mismatch. Verification compares actual recomputed patch through the existing restore API. Domain semantic tests with explicitly supplied digest values remain mathematical tests, not actual SHA/origin proof; ports tests perform real SHA. This is a concrete joint-method closure, not a new artifact.
+
+The six ports macro names in MECHANICS1 section7 were proposed spellings. Root's already selected/actually written six identities supersede those spellings without changing duties/count:
+public_set_frame_binds_mode_query_guard_and_canonical_patch;
+public_set_frame_preserves_the_full_public_preparation_profile;
+public_set_parent_preserves_strict_current_cas_type_and_late_read_order;
+public_set_parent_keeps_replay_expiry_and_intent_conflicts_before_fresh_reads;
+public_set_frame_preserves_profiles_caps_and_capture_correspondence;
+public_set_parent_owns_installation_and_retained_response_after_donors_drop.
+Writer's six proposed domain names remain as recorded. All six Root current buffers were actually whole-read by Writer in b05e13/8848f9/cb8e04/8f0815 (header254/frame151/gate133/owners109/refusals86/source219 at76f0cc). They are evolving tests before full fee/source additions, not final RED or complete-duty acceptance. No wrong expected current oracle found in this available scope. Final source recipes and arrays still need actual whole/delta review before final RED.
+
+No source/test edit was performed by Writer. Existing-note-only contract phase continues until the single named full decision and Root's tests-only order.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-ORDER-FEES1 — frozen helper primitives before SUT
+
+Fixed now from the selected contract, independent of SUT/counters. Root/PERF requested exact helper branches to compose producer/verifier arrays; this is ordinary tests-first tariff completion.
+
+admit_patch: [root128,recordCountCap16], then EACH record in slice order [record128,denseIDequalsIndex16,pLenEqualsQLen16,cumulativeForwardRanksCap16]. Every decision occurs after its specified debit and short-circuits immediately on failure. Checked arithmetic failure uses the existing LengthOverflow. Dense IDs imply range after count cap; no redundant ID-range debit. Single empty record and single one-pair record BOTH have [128,16,128,16,16,16], G320; backing C is64/72 respectively. It never reads p/q values. A second record adds exactly176. Empty table has [128,16] and G144; absence of a required actual map is diagnosed later by patch_record, not fabricated here.
+
+admit_current/admit_merged: [root128,recordCountCap16], then EACH record [record128,IDrange16], then strict-IDincrease16 ONLY after first, then [pLenEqualsQLen16,cumulativeForwardRanksCap16]. Current range is ID<Nc, merged ID<T; table count/rank caps are the same bound. One record G320, each later record192. Missing UNUSED records/payloads remain uninspected; only metadata profile/unique ordering is admitted. No global actual-map correspondence or permutation check occurs in these helpers.
+
+patch_record: [record128] BEFORE checked direct indexing; missing index refuses there. On found record [IDequalsRequested16,pLenEqualsActualPairs16], then for EACH actual source rank [forwardRead4,combinedRangeEquality16,rangeDecision,inverseRead4,equalityDecision]. Metadata admission already checked p/q length equality; this is a lexical reached call protocol, not a public credit flag. Empty record array [128,16,16] G160; one-pair [128,16,16,4,16,4] G184. Wrong ID stopsG144; wrong actual pair count stopsG160; out-of-range first rank stopsG180 without inverse access; wrong inverse stopsG184. Caller array caps are admitted before payload lookup.
+
+current_record/merged_record: record128, then standard half-open binary search, midpoint lo+(hi-lo)/2, each actual ID comparison16 BEFORE that read/cmp. Less sets lo=mid+1; Greater hi=mid; Equal found. Empty/missing table returns InvalidAuthority after the128 plus actual midpoint comparisons. On found record pay pair-count-equality16; ID was already compared by the midpoint event and is not compared twice. Then the SAME safe per-rank [4,16,4] sequence. Single empty record found G160; single one-pair found G184; a missing ID in one record G144. A bound Copy cursor may read the already validated arrays in O(1) during that walk under each existing paid row128; another source walk binds freshly. No uncharged per-row table search.
+
+bind_patch is exactly [192], no invented entry128. bind_current_bytes is [optionClass128], then only Some/Some adds [128+lenActual+lenCaptured] before exact bytes; None/None succeeds at128, mixed option class refuses at128. Tuple/canonical key contents are not certified by these lengths/digests.
+
+For restore's actual FRAME-to-SERVER p/q correspondence, Context p/q was freshly validated by patch_record and frame p/q by scan. Compare EACH forward entry16, then EACH inverse entry16 (in that order); these read already validated bounded metadata. No additional wire-read4 is invented; context payload validation still pays its own [4,16,4]. Counts/IDs are the existing patch_record checks. Extra/missing canonical map records are checked by final actual visited-map-count equality16 after the last map. Producer likewise checks that final dense visited-map count16. These primitives join Root's complete producer/scan/restore vectors BEFORE final RED.
+
+Catalog-only independent vectors received from PERF and independently recomputed: normalized current Nc8 G1760/R4192, oneSTRING Nc10 G2040/R4208, twoSTRING Nc12 G2320/R4224. They are reserve128+8Nc, initialization4Nc, reverse physical visits128, three envelope-head appends128 and one envelope header update128; no other compound head/alias in those three recipes. Actual literal interleaving follows reverse spans, with envelope index0 last. Physical-bound test also needs literal P or32MiB success, since wrong eager88MiB Layout can still fit the default128MiB account with approximately17MiB structural work. No native allocation observation or code change is claimed.
+
+These ordered primitives are frozen before candidate source. Any genuine source/resource correction requires honest provenance; they are not to be learned from returned counters. Full Fresh merge/layout/retention arrays remain Writer's test authoring; full producer/verifier/gate arrays Root's. No production/stub created.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-FRESH-VECTORS1 — pre-SUT empty false stream
+
+This is a prospective source-operation freeze while all eighteen SUT paths remain absent. It adds no artifact/model/API. Six substantive domain tests exist; their resource authoring and the final missing-API RED are still pending. No candidate counter, compiler or VM probe supplied these literals. PERF independently reconstructed the full sum before this save.
+
+For namespace t/g/z/request q, type r, absent current, empty prepared patch and false mode: F183, H516, Cpatch64. Current table is empty; merged table contains the zero-pair map0 record, Cmerged64. Npatch1, Nc0, T=B33,D0. R3/R4/Ccurrent are zero. O12392, S24928. The first Fresh entry128 admits live base763. Prefix literal G=[128,128,142,129,128,128,128,16,128,16,128,16,16,16], sum1247: entry, patch class, key, current lookup, CAS, bind-current None, admit-current [128,16], admit-merged [128,16,128,16,16,16]. After metadata admit the enlarged borrowed base827. Admit base+O13219 BEFORE the four reserves [4352,5408,2240,392]. Then [128 sole right Enum/container guard,128 actual overlay map append,128 actual map freeze/update(order_start,len),128 captured C]. These are four real roots/mutations, not a second native-order entry or a payment flag.
+
+The sole Enum/container128 is the existing reached visit: it admits kind/struct checks. Each actually inspected logical row then128; an atom-key __struct__ comparison is128+keyLen+10. A hit's value atom class is read under that row visit. The same lexical root covers validation and the len<=1 native-order identity shortcut. Current/Merged >1 bind their fresh record afterward. Frame4 uses its already validated source sidecar. Root order.rs already owns the container128 before bind_source_order, so that method adds ONLY its reached guard rows/comparisons/record events, never a duplicate root. Merge's direct source Enum pays that same one root itself. Exact binary miss's LEFT Enum is a separately reached root; copying left rows alone is not Enum.
+
+Shared layout preparation is [128 entry,128 workflow-type node,1 text,128 empty attrs node], sum385. Admit13219+S=38147 BEFORE reserves [19072,4864,1184], sum25120. Retain 24 separately paid128 old semantic/cell/edge events, then snapshot measure [1,133,136,133,134,134] (671). This whole layout component is29248. The synthetic physical capacity B33 is NOT the actual structural occurrence count2 and is NOT an extra business pass.
+
+Late literal G=[129,129,128,179,1,130,144,130,133,136,133,134,134,142,128,128,128,128,179,128], sum2601: active/done H, allocate, envelope reserve, writer, key, success, window, aggregate, status, separate response copy, final RetainedOutcome metadata. Admit38147+51=38198 immediately BEFORE envelope reserve179; admit38198+14=38212 immediately BEFORE key copy142. Metadata/cursor/Layout owners stay live through this emission/key stage under the selected conservative lifetime. They drop before retainer; its actual live H+key+two51B owners632 stays below historical P38212 and is not added to that historical maximum. Aggregate R120 counts key14+two51B+namespace/request4.
+
+Full isolated Fresh G46000/P38212/T84212. Verify5376+FreshGate519 gives parent G51895/P38212/T90107. Same-account public2661+producer6918+verify5376+gate519+Fresh46000 gives G61474/P38212/T99686. Each first-scratch/output peak admission is a separate G0 prospective event before its corresponding reserve; all other events above are atomic as listed. Final metadata128 is the last event: full exact84212 succeeds; tight84211 retains G45872/P38212 and refuses attempted84212. Root owns the full producer/verifier/gate join; Writer's tests isolate the declared Fresh component using separately paid mathematical header fixtures, and do not describe those fixtures as real SHA/VM capture.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-PREFIX-VECTORS1 — real catalog, growth and exact-hit prefixes
+
+All primitives here are frozen before SUT/first compiler result. Current physical reader fees reuse the unchanged independently frozen TYPE_R38 grammar, not returned counters: exact safety [flow_policy_v1,type], current38B/Nc6/Kc1/Fc0, readerG6778, localR3448. The actual tests use invoke_checked with precisely that narrow safety; the broad source-fixture safety is NOT used for these literals. The shared old lexical/identity array remains byte-for-byte the earlier source stream; current errors retain Current(Encoding(...)). Fourth catalog errors also retain that current encoding origin. The final type/CAS/merge/arena operations keep the existing Replace(Request(Encoding(...))) origin.
+
+The first Fresh event is ATOMIC (G128,P763) for empty false; it is not separate G0+128. All later new peak-only admissions are G0 at the listed positions. The current38 fixture first pays entry128/patch128/key142/lookup129, then admits actual borrowed V38: P801. Reader's local448 admission becomes1249; its old temporary128 admission becomes929 and stays below the same historical1249. Then [CAS128,typebind130,current-option128,current-bytes204,admit-current128/16,admit-merged128/16/128/16/16/16] gives prefixG8359. Cmerged64 admission raises P1313; catalogR4176 admission raises P1489 before reserve176, init24, reverse six node128, envelope three head-append128 and one header-update128. Catalog-complete G9839/P1489. Every positive target in this selected prefix has a literal last-minus-one refusal test; all source ordering/whole successful current behavior is separately asserted. No last total for the untested remainder is inferred.
+
+Define D for the new joined staging from the maximum admitted POLICY/PATCH cursor depth, with the current outer envelope level removed; the separate envelope/catalog scanner already charges its own encoded depth. Thus x:7 has D1 and the empty-current/empty-patch case D0. New frame false x:7 has canonicalpatch46/side28/F220,Npatch3,Cpatch72, supplied merged single one-pair recordC72. Fresh entryP808; after context metadata base880; T35/O13240 givesP14120. Four reserveG [4608,5728,2368,408] sum13112. Starting G1247, actual right Frame Enum [128 root,128 row,139 atom x vs __struct__] givesG14754; actual map append128, reduction row128, fresh fingerprint129, two separate word initialization128/128, rowappend128, empty-bucket probe16, bucketwrite128,mapdescriptorupdate128 giveG15795/P14120/T29915. Exact/fallback cap0 performs no invented bucket read; first cap2 table is initialized before its actual writes.
+
+Lookup fingerprint is CLASS-NEUTRAL FNV over atom/binary bytes, prospectively128+length once for the current operand and reused across exact and equivalence lookup. Exact mathematical class comparison ALWAYS distinguishes classes; coarse same-hash only filters, never proves equality. This choice closes the potential hidden fallback rehash. Mathematical integer/list/bitstring alias hash invariants remain the selected ones. Every actual bucket read16, every real initialized word128, real row/bucket/map write128 stays separate. No subtotal256 initialization replaces the two actual operations.
+
+Exact-hit fixture uses the same current38 reader and incoming public type:r: F223/Cpatch72/Cmerged72,Nc6/Npatch3/T41/D1. InitialP811, currentP849, R3peak1297 (old temp977), metadata1369,catalog1545. Same catalog-completeG9839. Full overlay admittedP16945; reserves[5376,6688,2752,456] giveG25111. Right Enum[128,128,142] then actual map128, leftrow128/hash132, two word128s,row128,probe16,bucket128,mapupdate128 giveG26553. Actual incoming row128/hash132/probe16, exact recursivePAIR128 then atom payload128+4+4=136, and one actual whole-row replacement128 giveG27221/P16945/T44166. The exact key hit has NO fallback lookup/hash and no map-size write. The tests assert all positive last-minus-one boundaries across this real prefix. The whole mathematical alias/deletion/source fixtures remain substantive successful/error controls; this prefix is specifically an exact-hit payment control.
+
+Source-derived fee/origin/first-peak decisions precede code. No source scenario, old API stream, VM/capture authority, native CPU/RSS or full Linux/public/setup completion is inferred. Root independently owns the full producer/verifier/gate join; the isolated Fresh helper's setup account is explicit.
+
+## CORE-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-TESTS-RED1 — final six tests before SUT
+
+Status: finite tests-only handoff, NOT implementation or full-goal completion. Exact ARCH18-production/12-test decision f4e7fc3a and Root tests-only author release preceded creation. Writer created ONLY the named six domain test files and exact19B main EOF; no production/stub/model/extra artifact was written. Root's six disjoint ports tests and their17B main suffix remain Root-owned. Root must independently reproduce final genuine missing-API RED and explicitly release SUT. No body/reader acknowledgment or performance probe is an extra gate.
+
+The six macro identities preserve exact/fallback mathematical aliases; resolved atom:states deletion and binary states generic merge; actual original generation-merge/string/native-state/reset recipes; current arbitrary terms/retained versions, safe invalid-current rescue, C100/history50 success versus C10 rejection/overwrite/true reset; CURRENT/FRAME/MERGED33 competing source-order paths; real simultaneous bounds/current STRING versus span count; exact/tight fee streams and returned independent key/install/response owners. Existing source IDs76ce05532a4084fb/e782ea691ad8e998/0f523e8d4fd45612/17d8471407b0c04a retain their concrete source recipes, with generated numeric suffix1. Root owns coherent serialized two/twelve-writer source components. None credits original Tasks, physical all-shard state, setup/get/public projection or native concurrency.
+
+Current source witnesses include two STRING65535 fields131133B but physicalNc12, accepted under32MiB/default and P<1MiB; actual five1000-name output45173B used as next current; padded/nonnegative customer versions2^64 and2^64+1 preserved/replaced by ONE Layout walk; genuine float/partial bitstring ignored current terms; aligned BIT_BINARY key equality versus partial bits; zero-head CURRENT LIST_EXT(0,Binary v) resolving to Binary versionv without admitting invalid incoming Raw empty-prefix descriptors. Default helper safety includes actual assignees atom for the large next-current fixture. No RawOther unit claims opaque incoming identity; Other appears only in its unchanged old standalone seed boundary.
+
+All six files are substantive and<=600LF, every actual helper<=100LF. Main2033B/SHA bfff76b8993e73b90d9ad84cf1234aba2ce6ff381d0911e95518e27664c35af0 gains ONLY the19 bytes newline+mod public_merge;+newline. New main2052B/SHA3c32b5892dadb0c4441f38adad5b20c2ec3af466c8a1f7d16f4a4220c29ecb2a. Original112 tests/bodies/registration prefix were preserved.
+
+Resource scope: full empty-false G46000/P38212/T84212 and the source-frozen first peak(128,763) are unchanged. Every positive event has a last-minus-one refusal and, for the COMPLETE empty stream, exact-at-that-event next-refusal/full-success checks. Catalog/growth/hit/delete arrays are explicitly finite selected prefixes: they assert every positive tight boundary, not uncomputed complete scenario totals. Root owns complete same-account public+producer+verify+gate+Fresh G61474/P38212/T99686. Isolated domain Fresh uses separately paid mathematical header setup, explicitly not SHA/VM capture proof. Accepted installation and retained response are distinct actual owners; current/frame/prepared/context donors can drop. Continuous old seed1928/P64 -> fullFresh47928/P38212 exact86140, tight86139 retains47800/P38212. Old seed13726/P6912 -> fullFresh59726/P38212 exact97938, tight97937 retains59598/P38212; tight20765 at new entry attempts20766 preserving13726/P6912 and held bytes/pointer. Old Other seed does not traverse new frame9.
+
+HONEST pre-SUT source/arithmetic refinements superseding PREFIX-VECTORS1 where specified: Root independently packed hit atomtype13+binaryr10+map25 =patch48/I107/side28/F222 (NOT provisionalF223); all corresponding hit P values are one lower, final G27221/P16944/T44165. PERF/Writer independently packed deletion NilATOM node5 (NOT twelve-byte Atom spelling and NOT empty-list node13): innerMap25+queuedBinary15+Nil5=45; rootMap25+statesAtom15+45=patch85/I144/side48/F279. Thus deletion backing peaks are entry939,current1006,R3peak1838,catalog2046,final19734. Source primitive addition caught provisional copy subtotals before SUT: current states first copy918, type grow4 copy1444, nested queued copy918; actual written final block23100 plus pre-overlay16667 =G39767/P19734/T59501 (NOT provisional39939). The type-binding130 event in catalog/hit/delete retains the existing Current(ReadError::Encoding(...)) origin, while CAS and new context/merge retain Replace. These are grammar/source/addition corrections, never fitted to a test counter. Initial RED ran zero assertions.
+
+Deletion source stream: gen1/type:r/states:{queued:nilATOM} actual67B, exact safety[flow_policy_v1,states,type,nil], Nc10/K3/R3832. PERF independently reconstructed readerG13164: safety797 +lex2762 twice +reserves716 +identity916 +envelope540 +deprecated3747 +type796 +metadata128. Fourth catalogR4208/G2040: reserve208/init40, reverse ten visit128, three envelope-head append128, header update128. After source/CAS/type/context metadata and catalog G16667, admit O17688 (T47,D2) with live P19734, reserves[6144,7648,3136,504]. Real right guard[128,128,144], root mapappend128, two left copies including cap2->4 growth with four separately paid word initializations and cached reinsert, exact states match, nested right guard/map/one-row copy, queued exact match then three real128 row/bucket/length deletes reachG39767. Class-neutral byte-FNV is reused across exact/fallback with mandatory exact-class comparison. Fresh hash128+width, probe16, each real initialization/write128 remain atomic; no subtotal256 replaces separate writes. The written array is the authority for primitive interleaving, not the provisional prose subtotal.
+
+Actual command epochs, all macOS and BEFORE SUT: rustfmt251e26/474fa2/a178c1 PASS. An ordinary apply_patch attempt for an unformatted one-line assertion failed its expected-text match without mutating files; it was reapplied against the actual formatted lines. First compiler b32f58/session93905 ->8b3947 EXIT101 was already clean missing surface (oneE0432/eight exports, oneE0599/selected status). While SUT remained absent, source review supplied the type-origin correction, exact hit/deletion backing arithmetic, real deletion prefix and selected zero-head Current alias. Final split epoch06cef1/session6052 ->858938 EXIT101 has the same selected missing diagnostics. Final complete-output collection6bb9c0 EXIT101 repeats that exact frozen source, oneE0432/eight absent exports +oneE0599/selected status; zero other diagnostics/warnings/assertions. Repetition collects one full terminal archive, not an additional semantic execution or evidence of implementation correctness.
+
+Final command: CARGO_BUILD_WARNINGS=deny RUSTFLAGS=-Dwarnings cargo +1.99.0 test --locked -p wf-domain --test complete_policy
+
+Final whole terminal output6bb9c0:
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalPolicySetApplyView`, `wf_domain::policy::complete::OriginalPolicySetFrameInput`, `wf_domain::policy::complete::OriginalPolicySetFresh`, `wf_domain::policy::complete::OriginalPolicySetMapOrders`, `wf_domain::policy::complete::prepare_original_policy_set_frame_bytes`, `wf_domain::policy::complete::prepare_original_policy_set_fresh`, `wf_domain::policy::complete::restore_original_policy_set_frame_header`, `wf_domain::policy::complete::scan_original_policy_set_frame`
+  --> crates/wf-domain/tests/complete_policy/public_merge.rs:10:43
+   |
+10 |     OriginalPolicyReadValue as ReadValue, OriginalPolicySetApplyView, OriginalPolicySetFrameInput,
+   |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `OriginalPolicySetFrameInput` in `policy::complete`
+   |                                           |
+   |                                           no `OriginalPolicySetApplyView` in `policy::complete`
+11 |     OriginalPolicySetFresh, OriginalPolicySetMapOrders, OriginalPolicySetPatchView,
+   |     ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^ no `OriginalPolicySetMapOrders` in `policy::complete`
+   |     |
+   |     no `OriginalPolicySetFresh` in `policy::complete`
+12 |     PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits, RawFlowPolicyValue as Raw,
+13 |     prepare_original_policy_set_frame_bytes, prepare_original_policy_set_fresh,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `prepare_original_policy_set_fresh` in `policy::complete`
+   |     |
+   |     no `prepare_original_policy_set_frame_bytes` in `policy::complete`
+14 |     prepare_original_policy_set_request, restore_original_policy_set_frame_header,
+   |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `restore_original_policy_set_frame_header` in `policy::complete`
+15 |     scan_original_policy_set_frame,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `scan_original_policy_set_frame` in `policy::complete`
+   |
+help: a similar name exists in the module
+   |
+10 -     OriginalPolicyReadValue as ReadValue, OriginalPolicySetApplyView, OriginalPolicySetFrameInput,
+10 +     OriginalPolicyReadValue as ReadValue, OriginalPolicySetPatchView, OriginalPolicySetFrameInput,
+   |
+help: a similar name exists in the module
+   |
+10 -     OriginalPolicyReadValue as ReadValue, OriginalPolicySetApplyView, OriginalPolicySetFrameInput,
+10 +     OriginalPolicyReadValue as ReadValue, OriginalPolicySetApplyView, OriginalPolicySetRequest,
+   |
+help: a similar name exists in the module
+   |
+11 -     OriginalPolicySetFresh, OriginalPolicySetMapOrders, OriginalPolicySetPatchView,
+11 +     OriginalPolicySetRequest, OriginalPolicySetMapOrders, OriginalPolicySetPatchView,
+   |
+help: a similar name exists in the module
+   |
+11 -     OriginalPolicySetFresh, OriginalPolicySetMapOrders, OriginalPolicySetPatchView,
+11 +     OriginalPolicySetFresh, OriginalPolicyReadError, OriginalPolicySetPatchView,
+   |
+help: a similar name exists in the module
+   |
+13 -     prepare_original_policy_set_frame_bytes, prepare_original_policy_set_fresh,
+13 +     prepare_original_policy_set_request, prepare_original_policy_set_fresh,
+   |
+help: a similar name exists in the module
+   |
+13 -     prepare_original_policy_set_frame_bytes, prepare_original_policy_set_fresh,
+13 +     prepare_original_policy_set_frame_bytes, prepare_original_policy_set_request,
+   |
+help: a similar name exists in the module
+   |
+14 -     prepare_original_policy_set_request, restore_original_policy_set_frame_header,
+14 +     prepare_original_policy_set_request, restore_original_flow_policy_replace_frame_header,
+   |
+
+error[E0599]: no variant, associated function, or constant named `OriginalPolicySetRejected` found for enum `RetainedStatus` in the current scope
+   --> crates/wf-domain/tests/complete_policy/public_merge.rs:386:25
+    |
+386 |         RetainedStatus::OriginalPolicySetRejected(reason)
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^ variant, associated function, or constant not found in `RetainedStatus`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 2 previous errors
+```
+
+Actual final manifest/geometry and absence/prefix checks:
+```json
+{
+  "crates/wf-domain/tests/complete_policy/main.rs": {
+    "bytes": 2052,
+    "lines": 88,
+    "sha256": "3c32b5892dadb0c4441f38adad5b20c2ec3af466c8a1f7d16f4a4220c29ecb2a",
+    "maxfn": [
+      17,
+      28,
+      "fn data("
+    ]
+  },
+  "crates/wf-domain/tests/complete_policy/public_merge.rs": {
+    "bytes": 12429,
+    "lines": 390,
+    "sha256": "555fb94ac708902e8aa30b848180645d1de251f05cf43e532afb3de6036ab34a",
+    "maxfn": [
+      69,
+      294,
+      "fn invoke_checked("
+    ]
+  },
+  "crates/wf-domain/tests/complete_policy/public_merge/cases.rs": {
+    "bytes": 15328,
+    "lines": 417,
+    "sha256": "0c10ecdf2730828edff42150d32ca0e964b5f5b4c69b1b791db8b7a81aad67cb",
+    "maxfn": [
+      51,
+      62,
+      "fn assert_resolved_states() -> TestResult {"
+    ]
+  },
+  "crates/wf-domain/tests/complete_policy/public_merge/current.rs": {
+    "bytes": 13305,
+    "lines": 395,
+    "sha256": "3809b9f58f6453947828954c6e267d7537e746724b4484b72e19ed3c11440f4e",
+    "maxfn": [
+      58,
+      280,
+      "pub(super) fn term(value: Raw<'_>, out: &mut Vec<u8>) -> TestResult {"
+    ]
+  },
+  "crates/wf-domain/tests/complete_policy/public_merge/order.rs": {
+    "bytes": 11959,
+    "lines": 351,
+    "sha256": "273abcc08b07333a129a3c9189b86110bcda1ebde69f205224db30ffb247b807",
+    "maxfn": [
+      62,
+      107,
+      "fn assert_trivial_and_missing() -> TestResult {"
+    ]
+  },
+  "crates/wf-domain/tests/complete_policy/public_merge/owners.rs": {
+    "bytes": 7206,
+    "lines": 198,
+    "sha256": "7c133da491234fa77df65265225da28047a982338b3db30ab5d37b1eeb9fde6f",
+    "maxfn": [
+      46,
+      47,
+      "fn assert_larger_seed() -> TestResult {"
+    ]
+  },
+  "crates/wf-domain/tests/complete_policy/public_merge/refusals.rs": {
+    "bytes": 17396,
+    "lines": 474,
+    "sha256": "c693c1a672c19c40377044ac78824995291e691c2df0270c3a1d1b3fe78aac34",
+    "maxfn": [
+      66,
+      277,
+      "fn assert_delete_prefix() -> TestResult {"
+    ]
+  }
+}
+all18 selected production paths ABSENT; full main prefix2033 exact, suffix19 exact; six macro identities= 6
+```
+
+The new Raw/capture profile remains conditional on faithful server order/identity context. Full opaque incoming term identity/capture and custom Enumerable, final public response-state projection/retained public identity authority, physical/setup/assertions/profiles, Linux independently from macOS, and M1–M8 stay REQUIRED. Writer makes no Git action, native CPU/memory/performance gain, complete public parity, or full-goal claim. Root and ARCH/PERF receive final hashes/actual source for normal review; genuine Root reproduction and explicit SUT release remain the next concrete steps.
+
+## DOMAIN-NEXT-M1-ORIGINAL-PUBLIC-MERGE1-GREEN1 — finite written source, failed stages and conservation
+
+The selected conditional server-capture parent is implemented. The new frame binds both replacement modes and the optional reply selector in registry4; one verifier and one request gate precede strict current read -> CAS -> atom:type binding -> real merge or replacement -> captured C -> ONE existing Layout business walk -> late migration/generation -> original ETF from that same Layout -> independently owned installation/key and retained response. This finite finding claims the represented pure component and its executed checks. It does not claim final public reply projection, actual server capture/origin, full opaque or Enumerable ingress, physical atomic/all-shard publication, native Linux, all original setup/profiles/assertions, or the full M1-M8 objective. Those remain REQUIRED.
+
+Production creation was authorized only after Root's independently reproduced final domain and ports missing-API RED, recorded a92310. The complete prior TESTS-RED1 at3154421+14161/SHA228a2aa18df526e7aa95f605340d97a43d50fb2b004430b99ef7968b5dc4d336 remains an exact historical prefix. The initial eighteen-SUT absence and the initial twelve frozen test buffers are not relabeled by later source/profile/style repairs. Root owns eight new production bodies, facades/registry/checker/docs/ledger/Git and six ports tests; Writer owns ten new production bodies, the thirteen existing seams below and six domain tests. No new Writer artifact/type/alias was created to address lint.
+
+The retained reader moves the SAME three original indexes into a private owner. False Fresh creates one additional2*Nc u32 catalog only after strict current/CAS/type; old TermSpan is unchanged. Reverse construction pays each node/head/header update and resolves zero-head aliases without repeated linked sibling scans. STRING stays a borrowed virtual integer list; ignored strings do not become expanded adapter or Layout cells. Joined preflight has its selected524288 semantic-occurrence profile, while physical Layout staging uses B=Nc+Npatch+32 with the selected depth bound. Existing wrappers retain their old65536/4096 profiles and streams. The depth scalar is a safe whole-entry-derived upper bound, not exact policy-subtree depth.
+
+The overlay uses four bounded fallibly reserved owners; exact class keys precede source equivalence. Atom/Binary reuse a class-neutral byte hash, but exact equality always retains class. Integer/Big, nil atom, proper-list/STRING and aligned-bit aliases remain mathematical. Row chains preserve insertion order until paid final contiguous placement; actual reads/appends/swaps and mutations are prospective. The eight-word-per-staged-row geometric lookup bound counts tombstones and retired tables. This is a bounded logical algorithm, not a universal O(n log n), native latency or allocator/RSS gain claim. Compound collisions and exact recursive comparison remain paid work.
+
+Source-significant CURRENT/MERGED traversal uses reached server-supplied correspondence; untouched nested current maps stay wrapped by the merged cursor. Ordinary0/1 maps skip permutation lookup only AFTER the reached Enumerable/struct guard. Frame rows use the checked sidecar. Canonical identity/ETF order, auxiliary equality indexes and captured native order are deliberately distinct. Capture facts are represented conditional inputs, not certified by atom spelling, safety-table ordinals or a client permutation.
+
+Each actual live-stage SUM is admitted before its corresponding allocation: public preparation/header/capture/sort/frame at producer; frame/header/isolation at restoration; then frame/header/current bytes/indexes/reached capture/catalog/overlay/Layout/ETF/key in false Fresh. Ports drops isolation before Fresh and serialization permits public preparation to drop. Bounded original Raw descriptors/payloads are external inputs to the selected logical-owner profile; the account is not total process memory. Transients drop before retention, which separately admits512+aggregateTotal before status/response allocation. Distinct installation and response Vec owners are paid; no snapshot Vec, cloned AST, public payment token, repeated business walk or encode-then-parse bridge exists.
+
+Two actual source-review repairs were completed before the first successful assertion epoch. First, the strict retained reader's deprecated-map visitor still inherited4096 descriptors; ARCH CURRENT-MAP-BOUND1/CURRENT-MAP-EXPORT1 select only the new retained path's min(measuredNc,configuredLimit) helper while old wrappers remain4096. A1000-rule normalized current, independently51081 bytes/Nc6012/deprecated6009, is strictly read then true-reset to precomputed minimal generation2. This same-duty regression and two required safety atoms were added AFTER initial RED and SUT creation, BEFORE the first SUT assertion result; it is not initial RED evidence or counter-fitted data. Second, PERF/ARCH found the missing late retained-owner peak: the code checked aggregate length but had not separately admitted H+key+install+response. The repair is a zero-work prospective admission after aggregate refusal and before allocation; frozen G46000/P38212 is unchanged.
+
+The architecture check's concrete unclassified std::ptr use was removed by documenting the actual private invariant: two Current operands in one arena originate the SAME retained index. The unchanged original identity comparator is called directly; no checker waiver, alias workaround or uncharged byte comparison was introduced. A different suggested padded-Big defect was disproved and withdrawn: the original scalar decoder already pays the full encoded magnitude and caches significant width/canonical zero sign. No redundant trim fee, source fix or new claim follows from that false alarm.
+
+Actual execution chronology, with failures retained:
+
+| Epoch | Result and scope |
+| --- | --- |
+| Root partial libcheck6c1334->eed078 | Failed while Writer paths/interfaces were unfinished, plus Root's three moved-import issues; Root corrected its imports. This is not a complete implementation result. |
+| Root architecture1b3a34/session86777->80eb28 | EXIT101, sole unclassified std::ptr::eq in indexed/value; repaired as above. |
+| Writer complete libcheck5f7c03/session47699->a901cd | EXIT101, sole unused optional Root FrameCursor.map_id getter. |
+| Writer focused attempt3bef39/session38933->2be4c4 | EXIT101 on that same getter; zero assertions executed. Root removed it. |
+| Writer first assertion96fdce/session84708->23c417 | EXIT0, ALL118/118 domain tests (old112+six new), zero failed/ignored. No assertion/fee/byte oracle was changed after this result. |
+| Root first ports39f3df/session70140->a021e6 | Owner-attributed EXIT0, ALL93/93 (old87+six new), including every frame/gate/refusal/source/continuity duty. |
+| Strict fa366e/session59322->e4feba | EXIT101, fifteen library diagnostics: Writer one tuple return, three truncating casts, six sole-Map wildcard arms; Root three tuple-complexity sites, one owned-input style, one sole-Raw arm. |
+| Strict2ecd4d/session95036->adf3bc | Library clean; EXIT101 on six Writer test diagnostics and ten Root test diagnostics. |
+| Domain strict4665dd/session4603->7292dc | EXIT0 after Writer's ordinary six test fixes. |
+| Final strict9cf6e2/session65476->0c1755 | EXIT0 for locked domain+ports ALL targets with warnings denied. |
+| Final domain7597fb/session4082->90ba89 | EXIT0,118 passed/0 failed/0 ignored, after final styles. |
+| Root workspace831786/session41807->6b187d | Owner-attributed all source checks PASS:595 Rust tests across68 targets plus4 compile-fail docs,0 warnings/failures/ignored. Full wrapper EXIT1 only at default GitHub/RustSec DNS refresh. |
+| Root cached audita3e28b | Separate --offline four-category PASS against October14 DBedb58f5974b83eb8302332821cb6d389777aa351. This is not a fresh default-refresh success. |
+
+The strict command was `CARGO_BUILD_WARNINGS=deny RUSTFLAGS=-Dwarnings cargo +1.99.0 clippy --locked -p wf-domain -p wf-ports --all-targets -- -D warnings`; focused domain used the same environment and `cargo +1.99.0 test --locked -p wf-domain --test complete_policy`. Full raw outputs remain in the named actual tool epochs; this finite receipt summarizes diagnostics rather than duplicating prior logs. Root reports the full workspace before/after1102-input binding9b86c16074ed944d5b7feab0cf655e6b277d5253c97d89188f6d4b23d92794bc unchanged. This note's later prose writes are excluded from that source binding.
+
+Writer's library lint repairs preserve logical events: the original reader reservation helper was split into a unit peak/reserve admission and a generic single-Vec reserve helper; hash slot masking now checks u64 low bits before checked usize conversion; sole Map arms are explicit. Root's two transparent tuple aliases were separately recorded by ARCH-TUPLE-ALIASES1, with no representation or fee change. Root's test aliases were separately selected by ARCH-TEST-TUPLES1. Writer's tests use NO new alias: output-parameter patch_records, explicit account destructure, three needless-borrow removals, and a unit rejected helper/caller syntax. Every assertion macro remains byte-for-byte identical across this style stage (per-file counts9/0/7/3/18/30, total67), as actually checked while deriving the inverse below.
+
+Representative streams were frozen before production, not learned from these results: empty FreshG46000/P38212/T84212; same-account public2661+producer6918+verify5376+gate519+Fresh46000=61474/P38212; catalog prefix9839/P1489; first-growth15795/P14120; exact-hit27221/P16944; deletion39767/P19734. Initial wire/prefix arithmetic corrections and Current-origin type130 were already recorded BEFORE SUT in TESTS-RED1. Catalog/growth/hit/deletion are finite representative prefixes, not invented full-case G totals. The source fixtures preserve both returned-current writer orders/twelve writers, original queued/retry/string/native/reset recipes, C100/history50 positive then C10 rejection/rescue/reset, arbitrary customer versions and current aliases. Source helpers do not receive direct original assertion/setup credit merely because they pass; Root owns any direct-anchor ledger changes.
+
+Current eighteen selected source bindings (full path, byte length, physical LF and SHA256; all lines terminate with LF):
+
+| Path | Bytes | LF | SHA256 |
+| --- | ---: | ---: | --- |
+| `crates/wf-domain/src/policy/complete/original_entry/indexed.rs` | 4908 | 137 | `423f78ccd659defe70d3c5c98ca1e4b3943565edcd03bedd39d7b1d1a966c81d` |
+| `crates/wf-domain/src/policy/complete/original_entry/indexed/value.rs` | 7838 | 227 | `2a09228beac99bf6b13f0904f18796eef603d361a4275ae0afcb495e285e11fe` |
+| `crates/wf-domain/src/policy/complete/public_set/order.rs` | 8296 | 265 | `dc2743c7030b73bc4cee90145ce7ee5a75325df9c108b7d5404b25ce71ee4a8d` |
+| `crates/wf-domain/src/policy/complete/public_set/merge.rs` | 4763 | 166 | `6eb1d5be19979819323aa240abca2dfaa6e69192d1da4868dcfd9485aada8c65` |
+| `crates/wf-domain/src/policy/complete/public_set/merge/apply.rs` | 5240 | 172 | `687cbb99c570f9fd7d08938534ea0b218739c0b047d1bd6609eb4ac789c1ea74` |
+| `crates/wf-domain/src/policy/complete/public_set/merge/equality.rs` | 6440 | 213 | `ffb7cb0df3147543fac038c1ba876d0c2866d3e3ce9e76fc7ab627ad0035b61e` |
+| `crates/wf-domain/src/policy/complete/public_set/merge/rows.rs` | 9140 | 296 | `70adce8294ec27cdde1ae5b9c0cbf0f2f4a8f34232decfb946f1938bdf09fe69` |
+| `crates/wf-domain/src/policy/complete/public_set/merge/value.rs` | 6100 | 187 | `e9e07ae69b9c621a6a0e46544a659ebdc81ebf11151c413ae873120e6190be32` |
+| `crates/wf-domain/src/policy/complete/replace_request/public_set.rs` | 12813 | 374 | `5c3aa771d22ed9418353c2ac236e93cc15b8c139d8b45af3be153f25e37501dc` |
+| `crates/wf-domain/src/policy/complete/replace_request/public_set/retention.rs` | 4679 | 122 | `6778a9b1e7b07e78fb38d27de0bf6b53e4e4df7020c29380c24c6eb62e8701b1` |
+| `crates/wf-domain/src/policy/complete/outer/public_set_frame.rs` | 11135 | 326 | `65e97a9baf82e21116868dcd2eb8b2b145ae98cfd9de9fd81162b76370584da9` |
+| `crates/wf-domain/src/policy/complete/outer/public_set_frame/model.rs` | 8337 | 235 | `8274bbe28c783ea4f9a17ba83e05cd83eb5653980abdc29ed646abd3832a1038` |
+| `crates/wf-domain/src/policy/complete/outer/public_set_frame/codec.rs` | 11418 | 366 | `fff85f68a54aa0ab2076104c85c6fcfbb2c8e320bd69f696b63062bc7217ea9f` |
+| `crates/wf-domain/src/policy/complete/outer/public_set_frame/canonical.rs` | 10269 | 354 | `6645b2d330d933e9e2f0db3cbad2fc11fe07aab7cbb3c9e4beeb64367fd5afd6` |
+| `crates/wf-domain/src/policy/complete/outer/public_set_frame/scan.rs` | 12994 | 397 | `62714a06cb526c64aa5aa2103cb8ab6c4a63617c40c5b6c7a5864f8d9a0b8622` |
+| `crates/wf-domain/src/policy/complete/outer/public_set_frame/value.rs` | 10334 | 298 | `ac05e3f5373f4c50207d58e61b3096088868621619f1a52a3982476faa987fcc` |
+| `crates/wf-ports/src/log/complete_policy/public_set.rs` | 5553 | 142 | `b31fb93c100366a4cd9ce467dcdd1e197fa8e8944a11974585f8dfeb4b457e77` |
+| `crates/wf-ports/src/log/complete_policy/public_set/apply.rs` | 5016 | 135 | `4687945966677d80c922a21a17acdbb7995d6cd9b1e6ee521c0ebcb475801e59` |
+
+Writer existing-seam bindings read at HEAD`ab847e770fc9b6f199c69591fed74ef7ffa357cc`; the final column is the exact unchanged Git baseline preimage hash for ordinary inverse review, not a claim that these files are byte-unchanged:
+
+| Path | Bytes | LF | Current SHA256 | Baseline SHA256 |
+| --- | ---: | ---: | --- | --- |
+| `crates/wf-domain/src/policy/complete/flow_input.rs` | 9729 | 270 | `39b8a4fd701a7f82b1ba0ce3e070eba39f9717bd0c15d375a70146baa2be7963` | `cf73570cc9560fc2c937994c2db2f258432b7800f7965b68750a12cc1a623a7d` |
+| `crates/wf-domain/src/policy/complete/flow_input/governance/rules.rs` | 8676 | 279 | `118b4495dc481e619569526fe70a3ef672a05cdbc25e9acd892e367bd6f56589` | `aa05a676f0ef2e17fa5ac0058e62d40f9bb500c8ceb2a23528fd7a958d3784e2` |
+| `crates/wf-domain/src/policy/complete/flow_input/layout.rs` | 5056 | 160 | `c4526f7b547f82e1789415f30f07a9f0d866bcee0c553d4b039e16b6cc18aa04` | `feed23a287b4cdb6a308a650214524ca48d4bbd6eef8d344c56b9912a8f1d2d4` |
+| `crates/wf-domain/src/policy/complete/flow_input/preflight.rs` | 6268 | 219 | `a7a357b4a5682d0587ac6115081b9a71c851850c6828c1a394273e8da9e2de83` | `51d3f34a17ee0551376948c39fc978fca6a37c16195193e146a33240ac2f3069` |
+| `crates/wf-domain/src/policy/complete/flow_input/value.rs` | 14758 | 392 | `0be4143013b2a87525d2da15db6b3bbc470b95d76d57ebf1dfa1bd221f972cf8` | `f6faa0165395f50fb279b0bfc74713fe703967321f332e1195e71af12660306d` |
+| `crates/wf-domain/src/policy/complete/original_entry.rs` | 10672 | 369 | `5330707e5d8709f4cf9c7c395744d70de7287b8ec8aeb13613836e5610cd4008` | `1509308227258404aefa746b863a8d585e43b06cbad7fdb02f8784ef814459fc` |
+| `crates/wf-domain/src/policy/complete/original_entry/identity.rs` | 12155 | 382 | `081a2a72ff11151ba17f60648e2c7153ce99cad4b1055ab07bf821ee723cfbbb` | `497dcb199469e0322e19b8f4b356b6fe6f0df52d786bd7054446496f4fe7e64d` |
+| `crates/wf-domain/src/policy/complete/original_entry/scan.rs` | 4242 | 141 | `fbadfe04b690cea9030ccc75a0a485050f257bdc7a2af9ae4e14c76e200ba685` | `07ce40c2bd6f8c92df26208cff198158e35434039048ac766be8e02cc5a32f40` |
+| `crates/wf-domain/src/policy/complete/original_entry/visit.rs` | 3820 | 120 | `e5fa3334256e5f07eeb15d8ada780a5a359599191adca3980e3cbb2a4e364f7b` | `a01657a1deb38b0abfd3825b3c82e58a851e6f172e4c0cabedd29b8e21e961cb` |
+| `crates/wf-domain/src/policy/complete/original_retry_keys.rs` | 2697 | 59 | `14643b77a6e97617169d229feb9715a41f804128d76d74a65929f5e99422943a` | `7fd6a176db7cf6ccbb443e4216d763b747b8b3b61ff339fe803934466d1f7175` |
+| `crates/wf-domain/src/policy/complete/original_retry_keys/map.rs` | 8286 | 251 | `3958fe593381af35e994a43626c701d39a405069dd1c935aa2e3e9b75bd453da` | `ae7dbddb7f21d175c8a2f5f40eeb7358207c380e4c5e52da72175b4051017775` |
+| `crates/wf-domain/src/policy/complete/public_set.rs` | 11109 | 344 | `7dda39ed9a4b09ab3213a15d097cd02e71c3bf9c860458b76cc0e3239793aedd` | `1c3f7a1c8ccba8f232d1085081ddebbfe4c29a8a36dd6a4b594f396ae3f80980` |
+| `crates/wf-domain/src/policy/complete/public_set/model.rs` | 8167 | 256 | `e15e6176035422f1d2183b10aff30b5d66edc32b8046542b99936b73d9fa56de` | `462c1cee1b60cef6968ec52f1df906c22baa31427442504c89df277974f41b17` |
+
+Final six domain test bindings:
+
+| Path | Bytes | LF | SHA256 |
+| --- | ---: | ---: | --- |
+| `crates/wf-domain/tests/complete_policy/public_merge.rs` | 12534 | 394 | `52ec4a005aeaabdade89a176414fc7374499cbf47cd44db79bab40c38af43921` |
+| `crates/wf-domain/tests/complete_policy/public_merge/cases.rs` | 15322 | 417 | `1c4caabc20ef8abb8e9be349fb75920806063fef1f9d87d6a53513ffdb3a7d0d` |
+| `crates/wf-domain/tests/complete_policy/public_merge/current.rs` | 14460 | 426 | `8e0ae3e91a6c049669928f03658ed8e67f60878b364fff98d5025fbbcdaa6ab0` |
+| `crates/wf-domain/tests/complete_policy/public_merge/order.rs` | 11930 | 352 | `295605b64e969a46fc76dbc3451aff08e27c8f30437d2b04f6559e8cb118142c` |
+| `crates/wf-domain/tests/complete_policy/public_merge/refusals.rs` | 17407 | 475 | `c2b00098a3befc452237ea3a0b7796d55fc63582e47803f1a898711931090e01` |
+| `crates/wf-domain/tests/complete_policy/public_merge/owners.rs` | 7206 | 198 | `7c133da491234fa77df65265225da28047a982338b3db30ab5d37b1eeb9fde6f` |
+
+Domain main is EXACT prior2033B/SHAbfff76b8993e73b90d9ad84cf1234aba2ce6ff381d0911e95518e27664c35af0 plus19B `\\nmod public_merge;\\n`, now2052B/SHA3c32b5892dadb0c4441f38adad5b20c2ec3af466c8a1f7d16f4a4220c29ecb2a; actual byte equality was asserted. Existing tests/assertions are not reordered or replaced.
+
+Whole pre-style domain buffers, including the honestly later1000-rule supplement:
+
+| Path | Bytes | LF | SHA256 |
+| --- | ---: | ---: | --- |
+| `crates/wf-domain/tests/complete_policy/public_merge.rs` | 12485 | 392 | `31b884c4d7abad29dd8f3f4214273f2bf66eb2f034a765c6078e78c3dd5bbf25` |
+| `crates/wf-domain/tests/complete_policy/public_merge/cases.rs` | 15328 | 417 | `0c10ecdf2730828edff42150d32ca0e964b5f5b4c69b1b791db8b7a81aad67cb` |
+| `crates/wf-domain/tests/complete_policy/public_merge/current.rs` | 14462 | 426 | `a055be6337d610386dee674b5e20304030f45743d6b6356d34af203816ff437f` |
+| `crates/wf-domain/tests/complete_policy/public_merge/order.rs` | 11959 | 351 | `273abcc08b07333a129a3c9189b86110bcda1ebde69f205224db30ffb247b807` |
+| `crates/wf-domain/tests/complete_policy/public_merge/refusals.rs` | 17396 | 474 | `c693c1a672c19c40377044ac78824995291e691c2df0270c3a1d1b3fe78aac34` |
+| `crates/wf-domain/tests/complete_policy/public_merge/owners.rs` | 7206 | 198 | `7c133da491234fa77df65265225da28047a982338b3db30ab5d37b1eeb9fde6f` |
+
+The following inverse is zero-based FINAL line offsets, applied in reverse order PER FILE. Each `after` slice is asserted before replacement with `before`, and the whole reconstructed SHA256 is checked against `prestyle_sha256`. This was actually executed successfully; line-based offsets avoid ambiguous repeated helper text. Before that successful proof, two read-only context-string inverse attempts correctly refused ambiguous repeated call context; they changed no files or evidence. All numbers/bytes/caller assertions remain intact.
+
+```json
+[
+  {
+    "path": "crates/wf-domain/tests/complete_policy/public_merge.rs",
+    "prestyle_sha256": "31b884c4d7abad29dd8f3f4214273f2bf66eb2f034a765c6078e78c3dd5bbf25",
+    "inverse": [
+      {
+        "line": 151,
+        "after": "    );\n    Ok(())\n",
+        "before": "    )\n"
+      },
+      {
+        "line": 265,
+        "after": "    let mut patch = Vec::new();\n    order::patch_records(prepared.patch(), &mut patch)?;\n",
+        "before": "    let patch = order::patch_records(prepared.patch())?;\n"
+      },
+      {
+        "line": 304,
+        "after": "    let (limits, charge) = account;\n",
+        "before": ""
+      },
+      {
+        "line": 362,
+        "after": "        limits,\n",
+        "before": "        account.0,\n"
+      },
+      {
+        "line": 364,
+        "after": "        charge,\n",
+        "before": "        account.1,\n"
+      },
+      {
+        "line": 386,
+        "after": "fn rejected(result: &OriginalPolicySetFresh, reason: Reason, body: &[u8]) {\n",
+        "before": "fn rejected(result: &OriginalPolicySetFresh, reason: Reason, body: &[u8]) -> TestResult {\n"
+      },
+      {
+        "line": 393,
+        "after": "",
+        "before": "    Ok(())\n"
+      }
+    ]
+  },
+  {
+    "path": "crates/wf-domain/tests/complete_policy/public_merge/cases.rs",
+    "prestyle_sha256": "0c10ecdf2730828edff42150d32ca0e964b5f5b4c69b1b791db8b7a81aad67cb",
+    "inverse": [
+      {
+        "line": 94,
+        "after": "            );\n",
+        "before": "            )?;\n"
+      },
+      {
+        "line": 250,
+        "after": "            Some(actual),\n",
+        "before": "            Some(&actual),\n"
+      },
+      {
+        "line": 287,
+        "after": "            (kind, Some(actual), 1_000_000),\n",
+        "before": "            (kind, Some(&actual), 1_000_000),\n"
+      },
+      {
+        "line": 317,
+        "after": "            Some(actual),\n",
+        "before": "            Some(&actual),\n"
+      },
+      {
+        "line": 349,
+        "after": "    );\n",
+        "before": "    )?;\n"
+      },
+      {
+        "line": 355,
+        "after": "    );\n",
+        "before": "    )?;\n"
+      }
+    ]
+  },
+  {
+    "path": "crates/wf-domain/tests/complete_policy/public_merge/current.rs",
+    "prestyle_sha256": "a055be6337d610386dee674b5e20304030f45743d6b6356d34af203816ff437f",
+    "inverse": [
+      {
+        "line": 146,
+        "after": "            );\n",
+        "before": "            )?;\n"
+      },
+      {
+        "line": 246,
+        "after": "    );\n",
+        "before": "    )?;\n"
+      }
+    ]
+  },
+  {
+    "path": "crates/wf-domain/tests/complete_policy/public_merge/order.rs",
+    "prestyle_sha256": "273abcc08b07333a129a3c9189b86110bcda1ebde69f205224db30ffb247b807",
+    "inverse": [
+      {
+        "line": 101,
+        "after": "        rejected(&result, reason, body);\n",
+        "before": "        rejected(&result, reason, body)?;\n"
+      },
+      {
+        "line": 263,
+        "after": "pub(super) fn patch_records(\n    value: View<'_>,\n    out: &mut Vec<(u32, Vec<u32>, Vec<u32>)>,\n) -> TestResult {\n    view_maps(value, out)\n",
+        "before": "pub(super) fn patch_records(value: View<'_>) -> TestResult<Vec<(u32, Vec<u32>, Vec<u32>)>> {\n    let mut out = Vec::new();\n    view_maps(value, &mut out)?;\n    Ok(out)\n"
+      }
+    ]
+  },
+  {
+    "path": "crates/wf-domain/tests/complete_policy/public_merge/refusals.rs",
+    "prestyle_sha256": "c693c1a672c19c40377044ac78824995291e691c2df0270c3a1d1b3fe78aac34",
+    "inverse": [
+      {
+        "line": 408,
+        "after": "    );\n",
+        "before": "    )?;\n"
+      },
+      {
+        "line": 432,
+        "after": "    );\n    Ok(())\n",
+        "before": "    )\n"
+      }
+    ]
+  },
+  {
+    "path": "crates/wf-domain/tests/complete_policy/public_merge/owners.rs",
+    "prestyle_sha256": "7c133da491234fa77df65265225da28047a982338b3db30ab5d37b1eeb9fde6f",
+    "inverse": []
+  }
+]
+```
+
+For reproducibility, the executed inverse loop is:
+
+```python
+lines = Path(record["path"]).read_text().splitlines(True)
+for edit in reversed(record["inverse"]):
+    after = edit["after"].splitlines(True)
+    start = edit["line"]
+    assert lines[start:start + len(after)] == after
+    lines[start:start + len(after)] = edit["before"].splitlines(True)
+restored = "".join(lines).encode()
+assert sha256(restored).hexdigest() == record["prestyle_sha256"]
+```
+
+A second ACTUAL whole inverse (be2bd4 EXIT0) then removes only `assert_many_normalized_rules()?;`, its complete helper before `assert_zero_head_current`, and the two safety strings enforcement/strict_global from the pre-style buffers. Parent restores EXACT frozen12429B/390LF/SHA555fb94ac708902e8aa30b848180645d1de251f05cf43e532afb3de6036ab34a; current restores EXACT13305B/395LF/SHA3809b9f58f6453947828954c6e267d7537e746724b4484b72e19ed3c11440f4e. The other four pre-style hashes already equal the final RED hashes. Thus the chain separates original RED bytes, the source-only profile supplement and ordinary styles rather than silently rewriting provenance.
+
+I actually read all eight Root production bodies, including current complete root/codec/scan/model/value/ports and canonical source; the final Root alias/drop/sole-Raw deltas were separately read. No remaining concrete source/ownership/fee issue was found. I also whole-read the latest Root CONTINUE/architecture/ADR006 diff d2fd95; it correctly distinguishes source-check PASS, default-refresh DNS failure, cached audit, conditional native capture and still-required public projection/Linux/full scope. This is normal reciprocal review, not an extra compiler/body/ACK gate.
+
+I actually whole-read and SHA-verified PERF SOURCE1554964+13598/af7c44d1963728e6ce9961344b69131b936656c06777ffb8fa6f3aaaa04ef2b8 and ARCH TEST1805443+7604/07fd997dc925f8da4c162b9c717e0e17034355b236aaa34b18051c24dac2bd0a in7c41eb. I then ACTUALLY whole-read final ARCH SOURCE1824299+11121/2975cf1f8c0cfdbf37a0be0defacede2d064e675ae732ec2a00d2205b7878858 in042a38. Both finite SOURCE findings accept all eighteen bodies and shared seams, and agree on owner/equality/native-order/resource limits and honest failed-stage chronology. Writer's reciprocal source read is closed without discrepancy; their later actual inverse review is ordinary closure, not another code/result/ACK gate. No source/test mutation is planned.

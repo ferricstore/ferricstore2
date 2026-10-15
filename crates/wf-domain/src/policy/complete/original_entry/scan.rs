@@ -6,7 +6,7 @@ use super::{
 };
 
 pub(super) type Output<'a> = Option<(&'a mut Vec<TermSpan>, &'a mut Vec<VirtualLocalFun>)>;
-pub(super) type State = (usize, usize, usize, usize, usize);
+pub(super) type State = (usize, usize, usize, usize, usize, usize);
 
 pub(super) fn run(
     raw: &[u8],
@@ -16,7 +16,22 @@ pub(super) fn run(
     output: &mut Output<'_>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
-    let mut state = (0, 0, 0, 0, span_limit);
+    let mut depth = 0;
+    run_with_depth(
+        raw, safety, span_limit, measured, &mut depth, output, charge,
+    )
+}
+
+pub(super) fn run_with_depth(
+    raw: &[u8],
+    safety: &OriginalEtfSafety<'_>,
+    span_limit: usize,
+    measured: &mut (usize, usize, usize),
+    depth: &mut usize,
+    output: &mut Output<'_>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(), Error> {
+    let mut state = (0, 0, 0, 0, span_limit, 0);
     if byte(raw, &mut state.0, charge)? != 131 {
         return Err(Error::Malformed);
     }
@@ -25,6 +40,7 @@ pub(super) fn run(
         return Err(Error::TrailingBytes);
     }
     *measured = (state.1, state.2, state.3);
+    *depth = state.5;
     Ok(())
 }
 
@@ -42,6 +58,7 @@ pub(super) fn term(
     if depth > 64 || state.1 > state.4 {
         return Err(Error::ItemLimit);
     }
+    state.5 = state.5.max(depth);
     let start = u32::try_from(state.0).map_err(|_| overflow())?;
     let tag = byte(raw, &mut state.0, charge)?;
     let mut span = TermSpan {
@@ -67,6 +84,9 @@ pub(super) fn term(
         73 | 75 | 121 => return Err(Error::UnsupportedTag),
         _ => return Err(Error::Malformed),
     };
+    if span.tag() == 107 && span.datum() != 0 {
+        state.5 = state.5.max(depth + 1);
+    }
     span.end = u32::try_from(state.0).map_err(|_| overflow())?;
     span.next = u32::try_from(state.1).map_err(|_| overflow())?;
     if let Some((spans, _)) = output {

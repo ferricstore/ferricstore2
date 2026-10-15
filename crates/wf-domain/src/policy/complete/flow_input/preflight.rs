@@ -57,9 +57,26 @@ pub(super) fn measure(
     attrs: Cursor<'_>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(usize, usize), Error> {
+    measure_with_limit(workflow_type, attrs, 65_536, charge)
+}
+
+pub(super) fn measure_joined(
+    workflow_type: Cursor<'_>,
+    attrs: Cursor<'_>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(usize, usize), Error> {
+    measure_with_limit(workflow_type, attrs, 524_288, charge)
+}
+
+fn measure_with_limit(
+    workflow_type: Cursor<'_>,
+    attrs: Cursor<'_>,
+    limit: usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(usize, usize), Error> {
     let mut measured = (0_usize, 0_usize, 0_usize);
-    node(workflow_type, 0, &mut measured, charge)?;
-    node(attrs, 0, &mut measured, charge)?;
+    node(workflow_type, 0, &mut measured, limit, charge)?;
+    node(attrs, 0, &mut measured, limit, charge)?;
     Ok((measured.0, measured.2))
 }
 
@@ -67,11 +84,12 @@ fn node(
     value: Cursor<'_>,
     depth: usize,
     measured: &mut (usize, usize, usize),
+    limit: usize,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
     visit(charge, 0)?;
     measured.0 = measured.0.checked_add(1).ok_or_else(overflow)?;
-    if depth > 64 || measured.0 > 65_536 {
+    if depth > 64 || measured.0 > limit {
         return Err(Error::ItemLimit);
     }
     measured.2 = measured.2.max(depth);
@@ -94,24 +112,24 @@ fn node(
             let mut mask = 0_u128;
             for index in 0..value.len() {
                 let (key, child) = value.row(index).ok_or(Error::Malformed)?;
-                node(key, depth + 1, measured, charge)?;
+                node(key, depth + 1, measured, limit, charge)?;
                 queried(key, &mut mask, charge)?;
-                node(child, depth + 1, measured, charge)?;
+                node(child, depth + 1, measured, limit, charge)?;
             }
             Ok(())
         }
         Kind::Keyword => {
             for index in 0..value.len() {
                 let (key, child) = value.row(index).ok_or(Error::Malformed)?;
-                node(key, depth + 1, measured, charge)?;
-                node(child, depth + 1, measured, charge)?;
+                node(key, depth + 1, measured, limit, charge)?;
+                node(child, depth + 1, measured, limit, charge)?;
             }
             Ok(())
         }
         Kind::List | Kind::Tuple => {
             for index in 0..value.len() {
                 let child = value.child(index).ok_or(Error::Malformed)?;
-                node(child, depth + 1, measured, charge)?;
+                node(child, depth + 1, measured, limit, charge)?;
             }
             Ok(())
         }
@@ -121,12 +139,13 @@ fn node(
             }
             for index in 0..value.len() {
                 let child = value.child(index).ok_or(Error::Malformed)?;
-                node(child, depth + 1, measured, charge)?;
+                node(child, depth + 1, measured, limit, charge)?;
             }
             node(
                 value.tail().ok_or(Error::Malformed)?,
                 depth + 1,
                 measured,
+                limit,
                 charge,
             )
         }
@@ -170,4 +189,31 @@ fn text(
 
 fn overflow() -> Error {
     Error::Schema(PolicySchemaError::LengthOverflow)
+}
+
+pub(super) fn keyword(
+    mut input: Cursor<'_>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, Error> {
+    visit(charge, 0)?;
+    loop {
+        if !matches!(input.kind(), Kind::List | Kind::ImproperList) {
+            return Ok(false);
+        }
+        for index in 0..input.len() {
+            visit(charge, 0)?;
+            let tuple = input.child(index).ok_or(Error::Malformed)?;
+            if tuple.kind() != Kind::Tuple
+                || tuple.len() != 2
+                || !tuple.child(0).ok_or(Error::Malformed)?.is_atom()
+            {
+                return Ok(false);
+            }
+        }
+        let Some(tail) = input.tail() else {
+            return Ok(true);
+        };
+        visit(charge, 0)?;
+        input = tail;
+    }
 }

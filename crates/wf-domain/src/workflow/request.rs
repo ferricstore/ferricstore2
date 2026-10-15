@@ -100,6 +100,12 @@ impl ClientIntent {
         Self { version: 3, digest }
     }
 
+    /// Selects both public set modes after same-frame intent comparison.
+    #[must_use]
+    pub(crate) const fn original_policy_set(digest: [u8; 32]) -> Self {
+        Self { version: 4, digest }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

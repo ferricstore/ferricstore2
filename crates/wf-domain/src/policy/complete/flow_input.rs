@@ -191,7 +191,44 @@ pub(in crate::policy::complete) fn prepare_original_flow_policy_layout<'input>(
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
     super::retention_input::valid_limit(history_max_events_limit)?;
     let (count, depth) = preflight::measure(workflow_type, attrs, charge)?;
-    let mut layout = layout::FlowPolicyLayout::new(count, depth, charge)?;
+    let layout = layout::FlowPolicyLayout::new(count, depth, charge)?;
+    finish_layout(
+        workflow_type,
+        attrs,
+        history_max_events_limit,
+        layout,
+        charge,
+    )
+}
+
+pub(in crate::policy::complete) fn prepare_joined_flow_policy_layout<'input>(
+    input: (
+        value::PolicyInputCursor<'input>,
+        value::PolicyInputCursor<'input>,
+        u32,
+    ),
+    bounds: (usize, usize),
+    live: usize,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<NormalizedFlowPolicyLayout<'input>, FlowPolicyInputRejection>, Error> {
+    if charge.profile() != limits {
+        return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
+    }
+    charge_schema(charge, 128, 0).map_err(Error::Schema)?;
+    super::retention_input::valid_limit(input.2)?;
+    preflight::measure_joined(input.0, input.1, charge)?;
+    let layout = layout::FlowPolicyLayout::new_with_base(bounds.0, bounds.1, live, charge)?;
+    finish_layout(input.0, input.1, input.2, layout, charge)
+}
+
+fn finish_layout<'input>(
+    workflow_type: value::PolicyInputCursor<'input>,
+    attrs: value::PolicyInputCursor<'input>,
+    history_max_events_limit: u32,
+    mut layout: layout::FlowPolicyLayout<'input>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<NormalizedFlowPolicyLayout<'input>, FlowPolicyInputRejection>, Error> {
     let root = match self::core::normalize(
         workflow_type,
         attrs,

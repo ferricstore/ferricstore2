@@ -42,6 +42,10 @@ pub use complete_policy::{
     verify_original_flow_policy_replace_frame,
 };
 pub use complete_policy::{OriginalPolicyReference, prepare_original_complete_policy_reference};
+pub use complete_policy::{
+    OriginalPolicySetRequestPlan, VerifiedOriginalPolicySetFrame, decide_original_policy_set_frame,
+    prepare_original_policy_set_frame, verify_original_policy_set_frame,
+};
 
 pub use complete_policy::{
     DecodedCompletePolicyReplaceFrame, VerifiedCompletePolicyReplaceFrame,

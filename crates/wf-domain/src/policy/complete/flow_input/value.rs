@@ -5,6 +5,8 @@ use super::{
 };
 use crate::policy::complete::RawPolicyRetryValue as Retry;
 use crate::policy::complete::outer::flow_frame::FlowPolicyFrameCursor;
+use crate::policy::complete::outer::public_set_frame::PolicySetFrameCursor;
+use crate::policy::complete::public_set::merge::PolicyMergeCursor;
 use crate::policy::complete::{OriginalPolicyMapKey as Key, RawPolicyIndexedValue as Indexed};
 
 #[derive(Clone, Copy, Debug)]
@@ -13,6 +15,8 @@ pub(in crate::policy::complete) enum PolicyInputCursor<'input> {
     Retry(Retry<'input>),
     Indexed(Indexed<'input>),
     Frame(FlowPolicyFrameCursor<'input>),
+    Frame4(PolicySetFrameCursor<'input>),
+    Merge(PolicyMergeCursor<'input>),
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -42,6 +46,8 @@ impl<'input> PolicyInputCursor<'input> {
         use PolicyInputKind as K;
         match self {
             Self::Frame(value) => value.kind(),
+            Self::Frame4(value) => value.kind(),
+            Self::Merge(value) => value.kind(),
             Self::Flow(value) => match value {
                 Raw::Nil => K::Nil,
                 Raw::Integer(_) | Raw::BigInteger { .. } => K::Integer,
@@ -80,6 +86,8 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn atom_bytes(self) -> Option<&'input [u8]> {
         match self {
             Self::Frame(value) => value.atom_bytes(),
+            Self::Frame4(value) => value.atom_bytes(),
+            Self::Merge(value) => value.atom_bytes(),
             Self::Flow(Raw::Nil) | Self::Retry(Retry::Nil) | Self::Indexed(Indexed::Nil) => {
                 Some(b"nil")
             }
@@ -92,6 +100,8 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn binary_bytes(self) -> Option<&'input [u8]> {
         match self {
             Self::Frame(value) => value.binary_bytes(),
+            Self::Frame4(value) => value.binary_bytes(),
+            Self::Merge(value) => value.binary_bytes(),
             Self::Flow(Raw::Binary(b))
             | Self::Retry(Retry::Binary(b))
             | Self::Indexed(Indexed::Binary(b)) => Some(b),
@@ -104,6 +114,8 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn integer(self) -> Option<i128> {
         match self {
             Self::Frame(value) => value.integer(),
+            Self::Frame4(value) => value.integer(),
+            Self::Merge(value) => value.integer(),
             Self::Flow(Raw::Integer(n)) | Self::Retry(Retry::Integer(n)) => Some(n),
             _ => None,
         }
@@ -111,6 +123,8 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn big_integer(self) -> Option<(bool, &'input [u8])> {
         match self {
             Self::Frame(value) => value.big_integer(),
+            Self::Frame4(value) => value.big_integer(),
+            Self::Merge(value) => value.big_integer(),
             Self::Flow(Raw::BigInteger {
                 negative,
                 little_endian,
@@ -121,6 +135,8 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn len(self) -> usize {
         match self {
             Self::Frame(value) => value.len(),
+            Self::Frame4(value) => value.len(),
+            Self::Merge(value) => value.len(),
             Self::Flow(Raw::Map(rows)) => rows.len(),
             Self::Flow(
                 Raw::List(rows) | Raw::Tuple(rows) | Raw::ImproperList { prefix: rows, .. },
@@ -134,6 +150,8 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn child(self, index: usize) -> Option<Self> {
         match self {
             Self::Frame(value) => value.child(index).map(Self::Frame),
+            Self::Frame4(value) => value.child(index).map(Self::Frame4),
+            Self::Merge(value) => value.child(index).map(Self::Merge),
             Self::Flow(
                 Raw::List(rows) | Raw::Tuple(rows) | Raw::ImproperList { prefix: rows, .. },
             ) => rows.get(index).copied().map(Self::Flow),
@@ -146,6 +164,12 @@ impl<'input> PolicyInputCursor<'input> {
             Self::Frame(value) => value
                 .row(index)
                 .map(|(key, child)| (Self::Frame(key), Self::Frame(child))),
+            Self::Frame4(value) => value
+                .row(index)
+                .map(|(k, v)| (Self::Frame4(k), Self::Frame4(v))),
+            Self::Merge(value) => value
+                .row(index)
+                .map(|(k, v)| (Self::Merge(k), Self::Merge(v))),
             Self::Flow(Raw::Map(rows)) => rows
                 .get(index)
                 .map(|&(k, v)| (Self::Flow(k), Self::Flow(v))),
@@ -166,6 +190,8 @@ impl<'input> PolicyInputCursor<'input> {
     pub(in crate::policy::complete) fn tail(self) -> Option<Self> {
         match self {
             Self::Frame(value) => value.tail().map(Self::Frame),
+            Self::Frame4(value) => value.tail().map(Self::Frame4),
+            Self::Merge(value) => value.tail().map(Self::Merge),
             Self::Flow(Raw::ImproperList { tail, .. }) => Some(Self::Flow(*tail)),
             _ => None,
         }
@@ -196,6 +222,49 @@ impl<'input> PolicyInputCursor<'input> {
 }
 
 impl<'input> PolicyInputMap<'input> {
+    pub(in crate::policy::complete) fn bind_source_order(
+        self,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Self, Error> {
+        match self {
+            Self::Direct(PolicyInputCursor::Merge(value)) => Ok(Self::Direct(
+                PolicyInputCursor::Merge(value.bind_source_order(charge)?),
+            )),
+            Self::Direct(PolicyInputCursor::Frame4(value)) => {
+                // This new adapter's sidecar is already source ordered.
+                for index in 0..value.len() {
+                    visit(charge, 0)?;
+                    let (key, child) = value.row(index).ok_or(Error::Malformed)?;
+                    if let Some(bytes) = key.atom_bytes() {
+                        visit(charge, bytes.len().checked_add(10).ok_or_else(overflow)?)?;
+                        if bytes == b"__struct__" && child.atom_bytes().is_some() {
+                            return Err(Error::Schema(PolicySchemaError::InvalidAuthority));
+                        }
+                    }
+                }
+                Ok(self)
+            }
+            _ => Ok(self),
+        }
+    }
+
+    pub(in crate::policy::complete) fn source_row_at(
+        &self,
+        index: usize,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<(usize, PolicyInputCursor<'input>, PolicyInputCursor<'input>), Error> {
+        if let Self::Direct(PolicyInputCursor::Merge(value)) = *self {
+            let (logical, key, child) = value.source_row(index).ok_or(Error::Malformed)?;
+            return Ok((
+                logical,
+                PolicyInputCursor::Merge(key),
+                PolicyInputCursor::Merge(child),
+            ));
+        }
+        let (key, child) = self.row_at(index, charge)?;
+        Ok((index, key, child))
+    }
+
     pub(in crate::policy::complete) fn len(
         &self,
         charge: &mut PolicySchemaCharge,
@@ -250,41 +319,13 @@ pub(in crate::policy::complete) fn classify_map<'input>(
     Ok(match input.kind() {
         PolicyInputKind::Map => Some(PolicyInputMap::Direct(input)),
         PolicyInputKind::Keyword => Some(PolicyInputMap::Keyword(input)),
-        PolicyInputKind::List | PolicyInputKind::ImproperList if keyword(input, charge)? => {
+        PolicyInputKind::List | PolicyInputKind::ImproperList
+            if super::preflight::keyword(input, charge)? =>
+        {
             Some(PolicyInputMap::Keyword(input))
         }
         _ => None,
     })
-}
-
-fn keyword(
-    mut input: PolicyInputCursor<'_>,
-    charge: &mut PolicySchemaCharge,
-) -> Result<bool, Error> {
-    visit(charge, 0)?;
-    loop {
-        if !matches!(
-            input.kind(),
-            PolicyInputKind::List | PolicyInputKind::ImproperList
-        ) {
-            return Ok(false);
-        }
-        for index in 0..input.len() {
-            visit(charge, 0)?;
-            let tuple = input.child(index).ok_or(Error::Malformed)?;
-            if tuple.kind() != PolicyInputKind::Tuple
-                || tuple.len() != 2
-                || !tuple.child(0).ok_or(Error::Malformed)?.is_atom()
-            {
-                return Ok(false);
-            }
-        }
-        let Some(tail) = input.tail() else {
-            return Ok(true);
-        };
-        visit(charge, 0)?;
-        input = tail;
-    }
 }
 
 pub(in crate::policy::complete) fn select<'input>(

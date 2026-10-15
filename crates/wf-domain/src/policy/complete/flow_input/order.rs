@@ -17,10 +17,19 @@ pub(super) fn prepare_map_order<'input>(
     charge: &mut PolicySchemaCharge,
 ) -> Result<(usize, usize), Error> {
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
+    prepare_map_order_rows(map, layout, charge)
+}
+
+pub(super) fn prepare_map_order_rows<'input>(
+    map: PolicyInputMap<'input>,
+    layout: &mut FlowPolicyLayout<'input>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(usize, usize), Error> {
+    let source = map.bind_source_order(charge)?;
     let start = layout.work.len();
-    for index in 0..map.len(charge)? {
+    for source_index in 0..source.len(charge)? {
         charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-        let (key, _) = map.row_at(index, charge)?;
+        let (index, key, _) = source.source_row_at(source_index, charge)?;
         let bytes =
             key_bytes(key).filter(|(atom, _)| !*atom || matches!(&map, PolicyInputMap::Keyword(_)));
         let fingerprint = bytes.map_or(Ok(0), |(_, bytes)| hash::binary_hash(bytes, charge))?;

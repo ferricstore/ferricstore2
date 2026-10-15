@@ -50,13 +50,23 @@ pub(in crate::policy::complete) fn run<M: OriginalMapVisit>(
     name_cap: u64,
     charge: &mut PolicySchemaCharge,
 ) -> Result<bool, Error> {
+    run_with_node_limit(policy, limits, name_cap, 4_096, charge)
+}
+
+pub(in crate::policy::complete) fn run_with_node_limit<M: OriginalMapVisit>(
+    policy: M,
+    limits: PolicySchemaLimits,
+    name_cap: u64,
+    node_limit: u64,
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, Error> {
     if charge.profile() != limits {
         return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
     }
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
     let mut measured = (0_u64, 0_u64);
-    visit_descriptor(0, &mut measured.0, charge)?;
-    preflight_entries(policy, 0, &mut measured, name_cap, charge)?;
+    visit_descriptor(0, &mut measured.0, node_limit, charge)?;
+    preflight_entries(policy, 0, &mut measured, name_cap, node_limit, charge)?;
     charge_schema(charge, 0, 128).map_err(Error::Schema)?;
     if let Some(retry) = select_field(policy, b"retry", false, charge)?
         && let Some(map) = policy.value_map(retry)
@@ -91,6 +101,7 @@ fn preflight_entries<M: OriginalMapVisit>(
     depth: usize,
     measured: &mut (u64, u64),
     name_cap: u64,
+    node_limit: u64,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
     let child_depth = depth
@@ -99,7 +110,7 @@ fn preflight_entries<M: OriginalMapVisit>(
     let mut queried = 0_u8;
     let mut previous = None;
     for _ in 0..entries.len() {
-        visit_descriptor(child_depth, &mut measured.0, charge)?;
+        visit_descriptor(child_depth, &mut measured.0, node_limit, charge)?;
         let key = entries.key(previous);
         previous = Some(key);
         if let Some(length) = entries.name_len(key) {
@@ -120,9 +131,9 @@ fn preflight_entries<M: OriginalMapVisit>(
                 queried |= bit;
             }
         }
-        visit_descriptor(child_depth, &mut measured.0, charge)?;
+        visit_descriptor(child_depth, &mut measured.0, node_limit, charge)?;
         if let Some(child) = entries.value_map(key) {
-            preflight_entries(child, child_depth, measured, name_cap, charge)?;
+            preflight_entries(child, child_depth, measured, name_cap, node_limit, charge)?;
         }
     }
     Ok(())
@@ -131,13 +142,14 @@ fn preflight_entries<M: OriginalMapVisit>(
 fn visit_descriptor(
     depth: usize,
     nodes: &mut u64,
+    node_limit: u64,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
     charge_schema(charge, 128, 0).map_err(Error::Schema)?;
     *nodes = nodes
         .checked_add(1)
         .ok_or(Error::Schema(PolicySchemaError::LengthOverflow))?;
-    if depth > 64 || *nodes > 4_096 {
+    if depth > 64 || *nodes > node_limit {
         return Err(Error::ItemLimit);
     }
     Ok(())

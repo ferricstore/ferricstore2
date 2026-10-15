@@ -1,6 +1,6 @@
 //! Encounter-order raw adapter sharing the original paid deprecated selectors.
 
-use super::super::original_retry_keys::{OriginalMapVisit, run};
+use super::super::original_retry_keys::{OriginalMapVisit, run, run_with_node_limit};
 use super::{Error, EtfMap, PolicySchemaCharge, PolicySchemaLimits, compound, overflow, pay};
 
 impl OriginalMapVisit for EtfMap<'_, '_, '_> {
@@ -69,6 +69,21 @@ pub(super) fn old_keys(
     charge: &mut PolicySchemaCharge,
 ) -> Result<bool, Error> {
     run(map, limits, 2 * 263_168, charge)
+}
+
+pub(super) fn old_keys_with_node_limit(
+    map: EtfMap<'_, '_, '_>,
+    limits: PolicySchemaLimits,
+    nodes: usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, Error> {
+    run_with_node_limit(
+        map,
+        limits,
+        2 * 263_168,
+        u64::try_from(nodes).map_err(|_| overflow())?,
+        charge,
+    )
 }
 
 pub(super) fn workflow_type<'raw>(

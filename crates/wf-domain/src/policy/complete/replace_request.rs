@@ -25,7 +25,12 @@ use super::{
 
 mod flow;
 mod original;
+mod public_set;
 mod retention;
+
+pub use public_set::{
+    OriginalPolicySetApplyView, OriginalPolicySetFresh, prepare_original_policy_set_fresh,
+};
 
 pub use flow::{
     OriginalFlowPolicyInstall, OriginalFlowPolicyReplaceFresh, OriginalFlowPolicyReplaceRejection,

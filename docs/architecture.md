@@ -746,3 +746,48 @@ required. The final macOS wrapper passes567 Rust tests, four compile-fail docs
 and every infrastructure stage; direct source-ledger anchors remain separate.
 Compact ordinal staging, linear inverse validation and direct same-layout
 emission are source-level improvements, with no measured native gain claimed.
+
+## Selected original public Policy.set frame and merge
+
+ARCH-NEXT-M1-ORIGINAL-PUBLIC-MERGE-CREATE1 selects eighteen private production
+files under the existing complete-policy and ports log boundaries. Twelve new
+test identities preceded production with independently reproduced missing-API
+RED. All selected bodies now exist. Integrated verification has595 passing
+Rust tests and four compile-fail docs,
+with strict workspace lint and all source checks passing. The wrapper then
+fails at the default RustSec GitHub DNS refresh; a separate cached October14
+audit passes all four categories. Neither that audit nor the preceding complete
+582-test checkpoint certifies a fresh dependency refresh or native Linux run.
+Written-source architecture/performance and reciprocal reviews are closed
+without a remaining component blocker.
+
+Registry four binds the public prepared patch, both replace modes, optional raw
+reply selector and generation guard. The whole-frame digest additionally covers
+the captured patch-order sidecar, which is excluded from canonical intent.
+Domain measures and
+encodes deterministically without hashing. Ports owns the actual patch, intent
+and whole-frame hashes, one structural verifier and one retained-request gate.
+Non-Fresh decisions bypass current policy, limits, migration and retention reads.
+Borrowed capture correspondence is conditional on faithful ingress; it does not
+attest native VM enumeration order or origin.
+
+Fresh strictly decodes current bytes before CAS and atom-type binding. True
+replacement drops the current index before normalization. False replacement uses
+a bounded retained-current index and a four-owner merge arena, preserving exact
+keys, source aliases, reached Enumerable guards and resolved-state nil deletion.
+Current data is not independently business-readmitted before an overwriting
+patch can rescue it. One joined layout validates surviving values, then retains
+that same layout through late migration generation and original ETF emission.
+The separately owned installation and retained response outlive all borrowed
+frame, current, capture and layout owners.
+
+New-only current decoding admits 263168 encoded spans and uses the same measured
+span bound for the deprecated-map visitor. Old public 4096 profiles and event
+streams remain unchanged. Logical peak accounting sums live current indexes,
+capture backing, arena and layout reservations, final ETF and key owners before
+allocation; it separately admits retained metadata plus the installation and
+response after transient owners drop. This is bounded resource accounting, with
+no native allocation or latency measurement. The core adds no OS-specific API.
+Public reply projection, opaque ingress identity and coherent VM capture,
+physical atomic/all-shard publication, all original assertion/setup/runtime
+profiles and independent Linux/macOS validation remain required.

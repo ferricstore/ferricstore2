@@ -81,13 +81,19 @@ pub use outer::{
     ScannedOriginalFlowPolicyReplaceFrame, prepare_original_flow_policy_replace_frame_bytes,
     restore_original_flow_policy_replace_frame_header, scan_original_flow_policy_replace_frame,
 };
+pub use outer::{
+    OriginalPolicySetFrameBytes, OriginalPolicySetFrameHeader, OriginalPolicySetFrameInput,
+    ScannedOriginalPolicySetFrame, prepare_original_policy_set_frame_bytes,
+    restore_original_policy_set_frame_header, scan_original_policy_set_frame,
+};
 pub use patch::{CompleteCorePolicyPatchInput, prepare_complete_core_policy_patch};
 pub use presentation::{
     CompletePolicyPresentation, PresentedPolicyState, PresentedRetry, present_complete_policy,
 };
 pub use public_set::{
-    OriginalPolicySetInputRejection, OriginalPolicySetPatchView, OriginalPolicySetRequest,
-    encode_original_policy_set_input_rejection_body, prepare_original_policy_set_request,
+    OriginalPolicySetInputRejection, OriginalPolicySetMapOrders, OriginalPolicySetPatchView,
+    OriginalPolicySetRequest, encode_original_policy_set_input_rejection_body,
+    prepare_original_policy_set_request,
 };
 pub use replace_content::{
     CompletePolicyReplaceRejection, CompletePolicyReplaceRejectionKind,
@@ -101,6 +107,9 @@ pub use replace_request::{
 pub use replace_request::{
     OriginalFlowPolicyInstall, OriginalFlowPolicyReplaceFresh, OriginalFlowPolicyReplaceRejection,
     prepare_original_flow_policy_replace_fresh,
+};
+pub use replace_request::{
+    OriginalPolicySetApplyView, OriginalPolicySetFresh, prepare_original_policy_set_fresh,
 };
 pub use request::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,

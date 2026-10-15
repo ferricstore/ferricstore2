@@ -4,14 +4,32 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS run passes 582 Rust tests and four compile-fail
-doc tests. The preceding retention checkpoint is `a0a8858`, following retry `a969309`,
+The working tree now contains the selected original public Policy.set frame and
+both-mode Fresh merge successor. Its twelve new test identities have genuine
+tests-only missing-API RED independently reproduced by Root before production.
+All eighteen selected production files have substantive bodies. The native macOS
+workspace run passes595 Rust tests across68 targets and four compile-fail docs;
+formatting, all-target compilation, strict Clippy, rustdoc, architecture and
+reference/progress checks pass with zero warnings, failures or ignored tests.
+The full wrapper exits1 only at its default RustSec refresh because GitHub DNS
+resolution is unavailable. A separate cached audit passes all four categories
+against the October14 database; it does not certify a fresh advisory refresh.
+The same1102 bound source/tooling/fixture/documentation inputs remain unchanged
+through the complete run. Written-source architecture/performance and reciprocal
+reviews are closed without a remaining component blocker.
+The new source-backed 1,000-rule retained-current regression is explicitly a
+post-initial-RED refinement. No new parity credit or native Linux result is
+claimed. See ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-RED1-RELEASE1 in the coordination
+record and the selected contract in ADR006.
+The last complete wrapper success belongs to the preceding582-test preparation
+checkpoint. Earlier retention is `a0a8858`, following retry `a969309`,
 original-current Replace `2759262`, reader/source603 `bbeba0d` and MAX-generation
 supplement `7f3e21a`.
-Strict lint, architecture, documentation, reference/progress and all four default
-dependency-audit categories pass. The final wrapper exits0 on unchanged1036
-check inputs; its source binding and prior failed epochs are in the coordination
-record. The configured RustSec database is at `edb58f5974b83eb8302332821cb6d389777aa351`
+That earlier wrapper passes strict lint, architecture, documentation,
+reference/progress and all four default dependency-audit categories, exiting0
+on unchanged1036 check inputs. Its source binding and prior failed epochs are
+in the coordination record. The configured RustSec database is at
+`edb58f5974b83eb8302332821cb6d389777aa351`
 (October14). Earlier DNS-failed wrappers remain historical failures. Current
 Git SSH/HTTPS still fail host resolution, so no fresh Linux CI run is claimed.
 The whole-flow normalization/original ETF batch is implemented after explicit

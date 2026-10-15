@@ -42985,3 +42985,241 @@ Root actual79a1d1 reads the old full frame constructor/scanner: existing discrim
 PERF independently supplies a meaningful original-public expansion recipe, before SUT: type r; opts x=List of131067 empty Lists has rawN131072/D3 and public external metric131082, below262144. Converted patch has131070 nodes. Root independently checks current canonical grammar: emptyList13, parentList13+17*n=2228152, one-pairMap overhead25+atomx10 yields patch2228187 before canonical intent/header/sidecar. This fixture fits current16MiB decision framing but exceeds a wrongly inherited1MiB path and the old65536 node profile. Whole-pipeline/default-work acceptance is NOT inferred from standalone large-profile preparation. New format/cursor must keep actual boundaries and continuous charges explicit; no candidate counter, native measurement or new artifact supplies these expectations.
 
 Actual098e26 also confirms Layout cells retain only static atoms, scalar integers/child IDs and borrowed raw Binary/Big slices. A new two-lifetime/internal cursor contract may therefore allow transient current/merge indexes to drop after the single business walk, before late envelope ownership, while actual current/frame byte donors remain live. This is an opportunity requiring an actual Rust lifetime proof; the current one-lifetime cursor does not prove it. Root ACTUALLY whole-reads ARCH2535/7c3efabf and PERF7760/eb3a9cd8 in58cb59 and accepts their exact source/resource/readiness findings without approving any new artifact/model/API. Writer's concrete named proposal remains live and prerequisite to next tests-first creation.
+
+### ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-PROPOSAL1
+
+Root actually reads Writer's full initial25587-byte inventory at domain3084462,
+SHA283718a63b2611bf8dec932d925127ae2687ff67f8e3b2734532ff210f284590
+(b95fea/2bb981), then reactivates the existing ARCH/PERF owners for concrete
+independent selection/resource review and actual reciprocal reads. Proposed
+ownership is Writer10/Root8 new production files and six test files each; no
+new artifact is created or selected by this review. Root source reads cover
+the old full frame/model/canonical/codec/scan, ports flow/apply, shared
+preflight/core/Layout/cursor, preparation arena and retained outcome. The Root
+facade seam also needs existing crates/wf-ports/src/log.rs, whose explicit
+reexports would otherwise hide the new ports APIs. This amendment is sent to
+ARCH before creation.
+
+Root identifies a substantive live-owner omission: copied header tenant,
+group, recovery and request owners remain live through Fresh until retention.
+The proposed F+V+R+O(+S/output/key) must include their deterministic H bound;
+borrowed frame backing F cannot also count those separate allocations. Ports
+isolation actually drops before Fresh and is counted only while live. All
+peers receive this issue before test-oracle freezing. Writer separately flags
+ordinal current-list/tuple child access: span-next rescans cannot hide inside
+the shared uncharged child getter. Its paid traversal or prospectively reserved
+index and any additional affected seams must be selected explicitly. Neither
+issue requires a user decision or an extra approval gate beyond the requested
+architecture consultation.
+
+Independent read-only grammar arithmetic efe737 produces a PROVISIONAL empty
+frame witness before SUT: identities t/g/z/q, zero stamp, type r, false mode,
+absent reply/expected and empty prepared patch. Under the proposed registry4,
+tag9 and 33-byte prefix, patch/intent/sidecar/frame lengths are17/76/20/183;
+patch SHA93708c027d7fd5f6c27b3f29c9229795b0d0d27efd342e78cda87768017b3de2,
+intent SHAa58aa50ce9877a9b71cdcb801d1e50508236cf78c2a2a4427d4844cd13304216,
+frame SHA19e5b4f614e197d8be6a776f037d5d73954bdbb32d0f98e383e3b8fe36e65e1f.
+This script creates no artifact/test/probe and calls no candidate. The actual
+selected wire/primitive contract and meaningful complete tests must precede
+genuine missing-API RED and independent Root reproduction. No implementation,
+native gain, original-case mapping, Linux result or full-goal completion follows.
+
+Root independently checks a nonempty PROVISIONAL wire witness in07268d using
+only Python struct/hashlib and the proposed grammar: same identities/stamp,
+replace true, reply bytes FF00, expected7 and patch atom x=>integer7. Canonical
+patch/intent/sidecar/frame lengths are46/119/28/234; map child offsets25/35/46,
+sidecar node offset73. Their patch/intent/frame SHA256 values are respectively
+0f52a4ebacdb2994a5fa034dca7603ea1ebe6364d1c2ce8afea917238e278f8d,
+3e4f759a7af9f457f562ed26122221cd722b237f5a0d3e65f6dbf9aaeca33474 and
+d69f9d7063d1becdf6b26ab9249f60422cd5bf14365960fb2e9702048d2a774e.
+No file or candidate call is created. PERF independently derives that the
+131070-node prepared expansion cannot imply default joined admission:
+T131102 gives O+S at least135300528 before F/H/G, already1082800 above
+134217728. The eventual test must select an explicit larger matching profile
+or freeze a genuine default refusal; no cap or accepted oracle is inferred.
+
+### ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-TESTS1-CREATE1
+
+Root ACTUALLY whole-reads ARCH's explicit limited TESTS-FIRST1 decision in
+badf2b: heading1766799+2883/SHA56e6c3cd7e77f17c29e1440d13df3ba7c883b2a1243f0092c4ec4f11270f196f
+(the reviewer's2884-byte slice includes its preceding LF). ACCEPT the SIX
+Root-owned ports public_set test paths and only17B EOF main registration;
+their named public constructors/API/getters are fixed by that decision. Actual
+95163f independently confirms all proposed30 paths still absent and old ports
+main8942B/SHAf70698caed456ef6c40723624ffe16ed0efcefe1ab39fc98aaf8b6add2e7cf03.
+Root now authors substantive semantic tests in that disjoint selected set.
+No production, stub or Writer test is released. Final private mechanics and
+all nonempty prospective streams must freeze before genuine missing-API RED,
+independent reproduction and later SUT release; no RED or PASS is claimed yet.
+
+### ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-CREATE1
+
+Root ACTUALLY whole-reads the complete full ARCH decision in ad2c3b:
+ARCH-NEXT-M1-ORIGINAL-PUBLIC-MERGE-CREATE1 at1769683+16851,
+SHAba7317f0734b0ca17a7752dc5126cedf618b40a6d99e2dad19217f750390d9f5.
+ACCEPT its exact named18 production/12 tests/eight public/eleven private
+models/seven APIs and existing seams, with disjoint Writer10/Root8 ownership.
+The complete artifact inventory is recorded in that exact linked decision in
+[the architecture review](workflow-completion-architecture.md#arch-next-m1-original-public-merge-create1).
+Root also ACTUALLY whole-reads all23559 mechanics bytes in9ee182/b4a039,
+interfaces4243+order1273 inbac9d7, final hash/getter/identity2187 and entire
+PERF12315/a7f783e5 in a3c084. Borrowed constructors, reached-only map order,
+H/I/C sums, fourth2Nc catalog, source-row ordinals and one-container rules
+priority are selected; no remaining creation choice is unresolved.
+
+RELEASE Writer TESTS ONLY now: crates/wf-domain/tests/complete_policy/public_merge.rs,
+public_merge/cases.rs, current.rs, order.rs, refusals.rs and owners.rs, plus
+ONLY19B EOF registration in that target's existing main.rs. Root retains its
+already selected six ports tests and17B main suffix. Immediately before this
+release, the actual independent manifest confirms all298 existing src Rust
+paths byte-identical to the pre-test snapshot, all18 proposed production paths
+ABSENT and all six Writer tests ABSENT. Production/stubs remain held until
+the full meaningful12-duty tests and independent literal fee streams freeze,
+genuine missing-API RED and Root's independent reproduction. No compiler or
+candidate call has happened in this batch yet.
+
+Root's initial six semantic files now include the original two-writer BOTH
+orders and twelve-writer forward/reverse recipes at the actual closed parent,
+using genuine prior output only as next current and carrying control/outcomes.
+Expected ETF/map IDs are independently built from the source values before
+each call. Both Writer and PERF catch a real PRE-RED context-fixture issue:
+merged logical rows are prior sorted names PLUS the inserted key; binary
+small-map source order is sorted final names, so identity p/q is wrong for
+reverse writers and state-10. Root derives p by exact expected-name lookup and
+q as its inverse, before SUT; all expected content/bytes remain unchanged.
+These are serialized pure components, with original Task/readiness/public get,
+all-shard/setup/runtime/capture/physical assertions still REQUIRED. No PASS,
+full source mapping, native gain or Linux result follows.
+
+
+## ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-TESTS2
+
+User input is not pending. The full M1–M8, complete pinned Elixir assertion/profile parity and independent Linux/macOS goal stays active and incomplete. Root, Writer, ARCH and PERF continue disjoint work; ordinary source review creates no extra helper/read-ACK gate. No successor production or stub has been written or released.
+
+ARCH's selected eighteen-production/twelve-test CREATE1 was actually whole-read by Root (ad2c3b; later exact re-read101c90), reciprocal proposal review closed (f0aca2). Root also whole-read QUALITY1, SCALARS and TRIVIAL-ORDER1 in101c90. TRIVIAL-ORDER1 explicitly selects reached struct/Enumerable guard FIRST, then zero-/one-row CURRENT/MERGED identity without record/search/rank fees; PATCH remains strict. PROFILE1 (whole908b3b) separates response/query64MiB, canonical/scanned patch scalar262144 and key65535 from the unchanged original public combined-raw64MiB profile. Represented Raw Big padding remains charged under its original physical source bound; new262145-byte padded-seven fixture must retain the independent234-byte golden.
+
+The sole existing architecture-control append passed one actual selected test (cf4a26/session37797→7bd830 exit0) and strict package all-target Clippy (ecc7f0 exit0). Entire old14213B source prefix is unchanged; approved3181B suffix SHA d41ca29cd2d2517d3f10c8492ce7809fc69aaf0c7f1072f10b3b378608ef511a,527LF/new function88. ARCH independently verified actual source (QUALITY1). This is synthetic quality coverage, not execution of absent product APIs.
+
+Root's six substantive ports files are saved/formatted, current manifest5aae9f: parent271/43112501, frame211/ff8ffc41, source507/2116e3b2, gate202/c9e5e9a3, refusals488/8dc82a13, owners109/445d4501. Entire old main prefix plus only selected17-byte module suffix remains required. Independent canonical bytes, sidecars, both-mode/query/guard identity, source writer order/control/outcome chains, real owned donors, strict current/CAS/type/late reads and capture refusals precede SUT.
+
+Producer primitive vectors are prospectively source-derived: empty G6918/P1441; x7 G9422/P1846. The earlier provisional9430 total was an eight-unit arithmetic mistake (3*132+4+4+132=536), independently caught and corrected before any candidate/compiler execution; array operands were unchanged. Actual producer hash order is Patch→Intent→overwrite→wholeFrame→last192 context comparison. Verifier vectors are empty G5376/P784, x7 G5836/P829, actual hash order Intent→Patch→restore→wholeFrame. ARCH/PERF independently compared the full element streams; exact/tight tests cover each positive event and each live-P jump.
+
+Same-account seeds are actual old constructors, not injected counters: seed0 G0/P0, old restore seed1 G1928/P64 and old normalized seed2 G13726/P6912; real seed owners drop. Public MIN2661→producer6918→drop public owner→verifier5376 gives final G/P14955/1441,16883/1441,28681/6912, with exact success and tight final311 refusal. PERF whole-read actual helpers21ad1c/09b62a and independently agreed; this preserves historical peak without adding it as new live scratch. Gate uses the same verifier events, then unchanged[128,134,128], and only nonLog[129,134,130,128,196,128]; totals5766/P784 LogReplay or6611/P784 retained Replay/Expired. Root's actual new202LF helper tests each positive/P-jump refusal and exact full total; ordinary peer review continues.
+
+Writer's six domain test duties are substantive WIP. Actual source review by Root (40f476/d58b69/0410fa/15bc8a) and peers identified same-duty additions: C100/history50 acceptance, false exact-hit versus reached LEFT-struct Enum miss, arbitrary retained customer versions, and native33 competing errors through PATCH/MERGED as well as CURRENT. Writer is adding these and freezing full Fresh/overlay/catalog/Layout/retention literal events BEFORE registration, missing-API RED and independent reproduction. Root ports/domain product targets have NOT been compiled in this batch, and no successor RED or GREEN is claimed. No ledger/parity counts advance from authoring. Previous complete macOS582+four-doc checkpoint and pending native Linux remain unchanged.
+
+Root additionally whole-read the exact3857B FRESH-VECTORS1/SHA72c35778 (35b310), independently joined the frozen source-only Fresh46000/P38212 with public2661+producer6918+verifier5376+gate519, and saved full continuous Fresh exact/tight in existing refusals.rs561LF (52895d). Final G61474/63402/75200, P38212, T99686/101614/113412; last128 refusal retains G61346/63274/75072. Real prepared owner drops before apply and frame drops before escaped51B acceptance checks. PERF actually whole-read53df7c and independently agreed. Rechecked all298 existing src files: no added/removed production, and only the approved architecture-test suffix differs from pretests; successor SUT remains absent. ARCH's finite frame/continuity actual-source review closed at1800505+2721/SHA365ff564. Final domain arrays/source additions and genuine RED remain pending.
+
+Root initial ports compilation2a7c00/session62142→6bf628 exited101 with the selected missing exports/status PLUS one fixture E0308 from generic ptr::eq(*replayed,...). Root corrected only explicit borrowed coercion (`let replayed: &RetainedOutcome = replayed` before the same pointer-identity assertion); no expected response/capture/fee changed. Actual rerun aafd3c/session22638→806cce exits101 with exactly twoE0432 groups (three domain/four ports exports) and oneE0599 selected status, no other warning/diagnosis/assertion execution. Entire current production still absent. This initial clean missing-API RED is separate from the final twelve-test source freeze/reproduction; Writer is adding the selected deletion-prefix vectors and correcting source-derived type130 error origin before final release. Root's current actual-workspace architecture check5cdecc/session54124→a93e90 passes ONE selected test, including source geometry, but provides no feature execution credit.
+
+
+## ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-RED1-RELEASE1
+
+RELEASE the exact eighteen-production batch and existing seams selected by ARCH-NEXT-M1-ORIGINAL-PUBLIC-MERGE-CREATE1, plus its PROFILE1/TRIVIAL-ORDER1 amendments. Writer now owns the exact selected TEN new domain files and named existing Writer seams; Root owns the exact EIGHT new frame/ports files and shared existing Root seams. Neither owner edits the other's files. This is the already selected conditional server-captured-view implementation, not a new model/API/authority decision. No extra reader/helper ACK gate or stub is introduced.
+
+All twelve substantive tests and literal prospective vectors precede production. Writer final domain6bb9c0 exits101 with only oneE0432 group/eight selected exports and oneE0599/new retained status. Root INDEPENDENTLY reproduced final domain4d50a3/session72912→fde6e3 EXIT101 with exactly those diagnoses, and final ports1997bd/session38921→22be69 EXIT101 with exactly twoE0432 groups/three domain+four ports exports and oneE0599/new status. Commands use CARGO_BUILD_WARNINGS=deny, RUSTFLAGS=-Dwarnings, cargo+1.99.0 test --locked --offline with each actual complete-policy integration target; no assertion executed, no other diagnostic or warning. Earlier initial epochs remain above/Writer record.
+
+Frozen domain files: parent390/555fb94a, cases417/0c10ecdf, current395/3809b9f5, order351/273abcc0, owners198/7c133da4, refusals474/c693c1a6. Their complete bytes are preserved in Root session store; old2033B main is exact plus selected19B suffix. Root ports files are parent271/43112501, frame211/ff8ffc41, source507/2116e3b2, owners109/445d4501, refusals561/53394a47 and gate203/9161f018 after the explicit borrowed-coercion fixture correction. Complete bytes are preserved; old8942B main is exact plus selected17B suffix. No source oracle changed from candidate execution.
+
+Source-only preproduction corrections are explicit: old type-binding130 failures retain Current origin (PERF); Root independently packed type:r patch48/I107/S28/F222, correcting all corresponding P literals by−1 without changing G27221; true Nil deletion is node5/patch85/I144/S48/F279, correcting earlier P by−7 (PERF). DELETE's final53-element block23100 plus reader/catalog prefix16667 gives G39767/P19734/T59501, independently checked by PERF6d1432. Catalog prefix9839/P1489, growth15795 and complete emptyFresh46000/P38212 remain independent pre-SUT streams. Root whole-read actual corrected vectors84738f/5274c2 and final zero-head alias/decode fixture de37c1, preserving genuine old binary customer-version acceptance. Root found/fed Writer the earlier exact StateName response/safety-catalog fixture fixes before SUT; no production behavior was fitted to an erroneous test.
+
+At the release boundary Root rehashed ALL298 existing crates/*/src/**/*.rs: no added/removed source and only the approved existing architecture-test suffix differs from the pretests map. Thus all18 successor SUT files are still absent before release. Final actual workspace-policy test107b76/session14688→f860fc passes ONE selected test with current test source geometry/dependencies; this is quality evidence only. All old APIs/bytes/events and actual new source checks/reciprocal review, full macOS wrapper, truthful narrow ledger mappings, independent Linux, full Elixir assertions/profiles and M1–M8 remain required. Goal stays active/incomplete; no new feature GREEN/parity/native-gain credit.
+
+
+## ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-IMPLEMENTATION1
+
+After the recorded independent final RED/release, Root created all eight selected frame/ports bodies. Current formatted geometry333/354/366/235/397/303 plus142/135 stays within400; one bounded u32 canonical ordinal Vec, actual Prepared/Wire/Raw adapters and owner-free scan/correspondence replace no existing old codec body. The orchestration helper lives in existing selected root, structural preflight in selected value child, and header writer in selected model child; no extra artifact/model/AST is created. Root existing facades, registry4/status, move-only installation constructor and flag-free source-row extraction are implemented. Writer owns its ten files and current/merge/Layout integration; no cross-owner edits.
+
+First partial libcheck6c1334/session42521→eed078 exits101 with unfinished Writer modules/reexport/source-order seam and Root's moved Kind/unused-import issues; Root corrected only its import placements. This is an intermediate implementation failure, not GREEN. First actual production policy check1b3a34/session86777→80eb28 exits101 with ONLY unclassified std::ptr in Writer indexed/value.rs, no size/function violation. ARCH's actual call-site proof4e4e5f shows one retained current per arena and descendants preserve its index; Writer removes the unnecessary address guard, documenting the private same-owner invariant. No checker alias/waiver or new fee is introduced. Full library/product checks await completed peer bodies.
+
+Named same-scan extension ARCH DEPTH-FACTS1 (1803226+2217/58473fab, Root actual whole0b2563) selects existing Writer original_entry/scan.rs numeric scalar depth and restricted Header::patch_bounds. Current D is a safe whole-entry/virtual-STRING upper bound minus one, not exact policy-subtree depth. New Scanned/Header cache only exact PATCH root node count/maxdepth, under existing paid visits, without putting root facts on child cursors. Header::patch_backing caches the actually admitted capture backing length for conservative Fresh reservation sums, as Writer explicitly confirmed; no duplicate admission/paid credit/origin token. Existing into_parts tuple stays exact. Ordinary MapOrders::patch_count constant lookup supports the already-frozen final16 comparison.
+
+ARCH CURRENT-MAP-BOUND1 (1814502+3485/d5ac87a9) selects existing map/visit numeric bound plumbing, preserving old4096 public helper caps/events while the new retained path uses min(measured physical Nc,new span limit). ARCH/PERF independently found the old descriptor cap still rejected valid own output despite263168 encoded spans. Same current test duty adds the exact normalized1000-rule input before its true reset: bare51061/envelope51081/Nc6012/Kc3004; deprecated6009 exceeds4096 but fits Nc. This is a source-found postinitial-RED refinement, with no invented native map capture or old API widening. ROW-FREEZE1 (1817987+1615/680790c2) clarifies paid nonempty previous-row-chain freeze append/reversal using the same selected four owners, leaving frozen empty/source prefixes unchanged. Actual written source and any added source-refinement assertions must be reviewed truthfully; no candidate counter supplies an oracle. The known padded-current integer >16-byte hash alias defect was also found by ARCH before the first complete implementation result and sent Writer for a paid canonical trim and same-duty edge assertion.
+
+All original test preimages, final RED epochs and later source refinements remain distinct. No successor feature pass, measured native gain, complete parity or Linux result has been claimed. The full goal remains active/incomplete.
+
+CORRECTION to IMPLEMENTATION1's last review hypothesis: ARCH withdrew the alleged >16-byte padded-current Big hash defect after Writer identified existing scalar::big normalization. ARCH whole8bb2c3 and PERF independent484c01 confirm span.keys is significant magnitude length and negative zero is cleared under already-paid lexical reads; CurrentCursor exposes that canonical slice and Frame4 rejects padded wire digits. No reachable raw-magnitude mismatch was found. No fee, source or extra regression was changed, and this is NOT an implementation repair. Root corrected the user-facing progress statement. The independently proven4096 descriptor-cap defect and its selected CURRENT-MAP-BOUND1 fix remain real.
+
+
+## ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-FOCUSED-GREEN1
+
+All eighteen selected production files are substantive. The first complete Writer library check5f7c03/session47699→a901cd and focused attempt3bef39/session38933→2be4c4 fail before assertions with the same sole unused optional Root PolicySetFrameCursor::map_id getter under warnings denial. Root removes that unnecessary getter without a suppression, fee change or test change. Writer reports physical400/100 source geometry passing; final full quality checks still follow.
+
+Writer focused domain96fdce/session84708→23c417 exits0 with118/118 policy tests, all112 old and six new, zero ignored. This includes all frozen exact/tight empty/catalog/growth/hit/delete fees, all three native33-order adapters, retained STRING inputs and the explicitly post-initial-RED source-backed1000-rule true-reset regression. Root independently runs cargo+1.99.0 test --locked --offline -p wf-ports --test complete_policy_request,39f3df/session70140→a021e6 EXIT0:93/93, all87 old plus six new, zero ignored. This is the first actual assertion run for the ports successor; frozen canonical bytes/hashes, whole public profiles, source writer chains, continuous accounts/refusals, NonFresh ordering and escaped owners pass unchanged.
+
+PERF finds a concrete active SUM ownership omission in retention: aggregate decision length was checked, but separately owned response allocation needed its own admission after transient owners drop. Writer implements zero-work peak_at(512 + aggregateTotal) after aggregate cap and before status/copy. ARCH and PERF independently read the actual fix and confirm its position. Frozen empty G46000/P38212 remains unchanged because its earlier live layout dominates; this is an actual accounting repair, not a measured allocation claim. Both reviewers independently verify final current-map wrappers and the1000-rule source refinement; old4096 APIs stay exact.
+
+Root updates existing CONTINUE, architecture and ADR006 with the selected registry4/frame/both-mode Fresh ownership and resource contract, explicitly marking full verification pending. Strict all-target Clippy is underway, followed by Root's unchanged-input full macOS wrapper and final source review. No ledger count, complete source scenario, native Linux result or M1–M8 completion follows from these focused passes. The full goal remains active/incomplete, with no pending user question or approval.
+
+
+StrictClippy's first actual combined library epochfa366e/session59322→e4feba exits101 with15 ordinary findings: tuple complexity, intentionally consumed input borrowing, single-variant wildcards and three hash-to-usize casts. No assertion failure supplied an expected value. ARCH records exact TUPLE-ALIASES1 at1821580+1778/SHA3702776d5ad918e8a6f828ebb4b7d3ff6be27505a97b8d19e416c7705f96665e, actually whole-read by Root8d16f3 before creation. Root adds exactly the public transparent FrameBytes alias and private HeaderParts alias in existing selected files; the former has both facade reexports and the existing server-only check. Named counts are now9 public/12 private models-or-aliases, with the same seven free APIs and eighteen production paths. The consuming producer saves its Result, drops the consumed input namespace owners and returns that same Result; bytes, owner liveness through emission, signatures and fees stay exact. Writer fixes its findings in its own files; no warning waiver or checker exception is added. Root also corrects performance review's architecture wording: registry4 intent excludes captured sidecar order; the whole-frame digest covers it.
+
+Root's focused-GREEN snapshot independently compares all twelve actual test buffers against the frozen pre-SUT bytes. Ten are byte-identical. Only Writer parent+current differ by the explicitly disclosed source-backed1000-rule regression/safety atoms: parent392LF/31b884c4, current426LF/a055be63. No ports test or original prospective fee/response assertion changed. Subsequent lint-only syntax changes, if any, require a separately recorded inverse; this snapshot is not relabeled as the initial RED manifest. ARCH recommends preserving71 declarations/78 counterparts/303 links: original source observations execute in ordinary helpers, while the unchanged ledger rule requires direct live macro anchors. New frame/gate controls do not manufacture original scenario/setup or VM capture lineage.
+
+
+## ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-PORTS-STYLE-INVERSE1
+
+Root independently restores all SIX final ports tests to the exact frozen pre-SUT hashes with ONLY the ordinary selected alias/borrow/pointer/lifetime/as_chunks syntax changes below. Actual Python execution exits0 with six TRUE; source expectations, literal fee/byte operands and assertions are untouched. The copied code is a reproducible read-only review recipe in this existing note, not a new product/test artifact or candidate oracle.
+
+```python
+from pathlib import Path
+import re,hashlib,json
+base=Path('crates/wf-ports/tests/complete_policy_request')
+expected={
+'public_set.rs':'43112501cf8f4438cfe063cab7028068fd19f716df775c1c450bbc6366163215',
+'public_set/frame.rs':'ff8ffc41c6d8e5faeb610e2a9f5e762be07429bf396e4f611f95fe7ef134936d',
+'public_set/gate.rs':'9161f018c839d8f5ad8a8dad1b09fa29a2cd396470a46d4e1c9c13d80ff079d5',
+'public_set/owners.rs':'445d45010bfeb923c0a25987d4eeff98f684976f090ea5b3a18d82b16f6e1831',
+'public_set/refusals.rs':'53394a4730db2ee051268c8f43ba47fb5b63a18dfb27f90e80fee18480214453',
+'public_set/source.rs':'2116e3b2e57c6cace83c2fe0757a871fb8bf84eef2ab2fe51b7df61bbf57009d'}
+results={}
+for path,sha in expected.items():
+    s=(base/path).read_text()
+    s=re.sub(r'((?:super::)?apply\(\n\s+)&(supplied,|view\()',r'\1\2',s)
+    if path=='public_set.rs':
+        s=s.replace("fn prepared(opts: Raw<'_>) -> TestResult<OriginalPolicySetRequest<'_>> {","fn prepared<'input>(opts: Raw<'input>) -> TestResult<OriginalPolicySetRequest<'input>> {")
+        s=s.replace("supplied: &RawView<'view, '_, '_>","supplied: RawView<'view, '_, '_>")
+        s=s.replace("OriginalPolicySetApplyView::new(*supplied, orders)","OriginalPolicySetApplyView::new(supplied, orders)")
+        s=s.replace(".as_chunks::<2>()\n        .0\n        .iter()",".chunks_exact(2)")
+    if path=='public_set/gate.rs':
+        s=s.replace("assert!(std::ptr::eq(\n                    std::ptr::from_ref(replayed),\n                    std::ptr::from_ref(&outcomes[&request]),\n                ));","assert!(std::ptr::eq(replayed, &outcomes[&request]));")
+        s=s.replace("assert_gate_boundaries(&supplied,","assert_gate_boundaries(supplied,")
+        s=s.replace("assert_conflicts(&supplied,","assert_conflicts(supplied,")
+        s=s.replace("supplied: &super::RawView<'_, '_, '_>","supplied: super::RawView<'_, '_, '_>")
+    if path=='public_set/source.rs':
+        s=s.replace("type SourceState<'a> = (&'a [u8], &'a str);\ntype SourceMapOrders = Vec<(u32, Vec<u32>)>;\n\n","")
+        s=s.replace("states: (&[SourceState<'_>], &[SourceState<'_>]),","states: (&[(&[u8], &str)], &[(&[u8], &str)]),")
+        s=s.replace("TestResult<(Vec<u8>, SourceMapOrders)>","TestResult<(Vec<u8>, Vec<(u32, Vec<u32>)>)>")
+        s=s.replace("maps: &mut SourceMapOrders","maps: &mut Vec<(u32, Vec<u32>)>")
+        s=s.replace("&canonical_text(","canonical_text(")
+        s=s.replace("canonical_text(3, state)?, &config","canonical_text(3, state)?, config")
+        s=s.replace('canonical_text(2, b"states")?, &states','canonical_text(2, b"states")?, states')
+        s=s.replace("fn canonical_pair(id: u32, key: &[u8], value: &[u8])","fn canonical_pair(id: u32, key: Vec<u8>, value: Vec<u8>)")
+        s=s.replace("out.extend_from_slice(key);","out.extend_from_slice(&key);")
+        s=s.replace("out.extend_from_slice(value);\n    Ok(out)\n}","out.extend_from_slice(&value);\n    Ok(out)\n}")
+    results[path]=hashlib.sha256(s.encode()).hexdigest()==sha
+print(json.dumps(results,sort_keys=True))
+assert all(results.values())
+```
+
+
+## ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-CHECK1
+
+The actual unchanged full macOS wrapper831786/session41807→6b187d exits1. All preceding stages pass: formatting, locked workspace/all-target compilation, strict all-target Clippy,595 Rust tests across68 targets, four compile-fail doctests, warnings-denied rustdoc, architecture, frozen reference and unchanged progress ledger. Zero tests fail or are ignored and no compiler warning is emitted. The later cargo arch repeats39 architecture tests; those are not added a second time to595. Exact complete log is/private/tmp/ferricstore2-public-merge-check.log,77353B/SHA85081a5b97ca744e874ae74f6a9fc40235d74ec5c841c27bb385ae6a21de63be.
+
+The ONLY terminal failure is the DEFAULT cargo-deny RustSec advisory-db refresh: Git cannot resolve github.com. This is a real external refresh failure, not a green full wrapper. Root separately runs the documented --offline --locked --workspace all-four-category check(a3e28b EXIT0):advisories/bans/licenses/sources all pass against actual cached DBedb58f5974b83eb8302332821cb6d389777aa351,2026-10-14T22:18:32+02:00(46019a). That diagnostic preserves audit configuration and adds no exception, but does NOT prove a fresh refresh. No repeated DNS/default-wrapper retry is scheduled absent a changed condition. Independent native Linux remains required and unavailable.
+
+Before and after the complete wrapper, all1102 bound inputs are identical with compact sorted path→SHA JSON digest9b86c16074ed944d5b7feab0cf655e6b277d5253c97d89188f6d4b23d92794bc. The explicit inventory recursively includes regular files undercrates/tests/scripts/.cargo/.github/docs EXCEPT active docs/reviews, plus existing rootCargo.toml/Cargo.lock/rust-toolchain.toml/rustfmt.toml/clippy.toml/deny.toml/AGENTS.md/README.md. This is a deliberately broader documentation-inclusive inventory than the preceding1036-file checkpoint; counts are not silently compared as identical inventories. Root's later status-only changes in CONTINUE/architecture/ADR006 occur AFTER this bound run, not during it. No product or test source changes afterward are claimed.
+
+Root actually whole-reads/hash-verifies the finite PERF13598B SOURCE finding at1554964/SHAaf7c44d1963728e6ce9961344b69131b936656c06777ffb8fa6f3aaaa04ef2b8. Its earlier saved validation paragraph is honestly separate from the later all-target/whole-wrapper facts. Root also independently reviews the entire Writer test-style diff against the focused-GREEN prestyle snapshot: caller-owned patch_records Vec, account destructuring, needless borrows and unit-return assertion helper preserve every assertion, response literal and prospective debit. Root's six ports tests separately reverse exactly to frozen initialRED SHA using the published read-only inverse. The1000-rule source-refinement delta remains separately disclosed, not removed or relabeled as initialRED.
+
+Full parity accounting remains71 declarations/78 counterparts/303 links,5858 frozen/5903 registered/4222 linked/1681 unmatched/1655 unresolved. No helper-contained source component receives invented direct-macro ledger credit. Full source scenario/assertion/setup/profile acceptance, coherent opaque/VM ingress, final public reply-state projection, physical atomic/all-shard publication, later milestones, a fresh dependency refresh and both native OS remain required. The full completion goal stays active/incomplete; no user answer or approval is pending.
+
+
+## ROOT-NEXT-M1-ORIGINAL-PUBLIC-MERGE-SOURCE-CLOSED1
+
+Written-source architecture/performance and normal reciprocal review are CLOSED without a concrete remaining component blocker. Root actually whole-reads and hash-verifies ARCH11121/2975cf1f(2e5111), PERF13598/af7c44d1, PERF2918/8e808b15(78f7f9) and Writer25600/fdfb5177(325b12). ARCH independently whole-reads PERF4df5fb; PERF independently whole-reads ARCH2342ef; Writer independently whole-reads both7c41eb/042a38 and all eight Root bodies. All eighteen current source hashes agree. No extra ACK/body/execution gate or successor scope is inferred.
+
+Root independently executes Writer's published six-file line-offset syntax inverse258763: all six exact prestyle SHA recover. Root then independently removes ONLY the disclosed in-memory1000-rule source supplement and its two safety atoms29d0f5: all six hashes recover the actual initial frozenRED bytes, parent555fb94a/current3809b9f included. This is preservation evidence, not deletion of the actual regression or retroactive tests-first credit. Root's ports six-file read-only inverse7a672f recovers all six initial hashes; ARCH909d14 and PERF86e912 independently execute that same proof. Actual expected values/assertions/prospective fee vectors remain unchanged through lint fixes.
+
+Root rechecks all1102 bound files after terminal validation: ONLY the three expected status documents differ from the before/after wrapper inventory, with no path additions/removals or product/test/tooling/fixture mutation. Source checks595+4 PASS, default wrapper DNS-only EXIT1, separate cached audit all4 PASS, unchanged71/78/303 ledger and still-required nativeLinux/fullscope remain precisely as CHECK1. The reviewed source checkpoint is ready for Root's local commit. Fresh dependency refresh and independently executed Linux are explicitly pending; unchanged dependencies or offline results do not discharge them. Next public reply behavior is separately planned, without holding this finite reviewed component or interrupting peers. Full goal stays active/incomplete.

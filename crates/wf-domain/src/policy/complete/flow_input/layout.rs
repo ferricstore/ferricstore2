@@ -33,6 +33,15 @@ impl<'input> FlowPolicyLayout<'input> {
         depth: usize,
         charge: &mut PolicySchemaCharge,
     ) -> Result<Self, Error> {
+        Self::new_with_base(count, depth, 0, charge)
+    }
+
+    pub(super) fn new_with_base(
+        count: usize,
+        depth: usize,
+        live: usize,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Self, Error> {
         let length = count
             .checked_mul(8)
             .and_then(|n| n.checked_add(32))
@@ -45,6 +54,7 @@ impl<'input> FlowPolicyLayout<'input> {
             .and_then(|n| n.checked_add(work))
             .and_then(|n| n.checked_add(depth.checked_mul(64)?))
             .and_then(|n| n.checked_add(192))
+            .and_then(|n| n.checked_add(live))
             .ok_or_else(overflow)?;
         charge_schema(charge, 0, u64::try_from(peak).map_err(|_| overflow())?)
             .map_err(Error::Schema)?;

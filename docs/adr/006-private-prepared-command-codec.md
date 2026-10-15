@@ -1072,3 +1072,64 @@ those capabilities or full original public-call parity.
 Surviving Raw Other terms currently produce operational UnsupportedTag during
 measurement; reached struct Enumerable dispatch is likewise an explicit
 temporary unsupported profile. Neither gap is a product exclusion.
+
+## Selected original public Policy.set frame and both-mode Fresh
+
+ARCH-NEXT-M1-ORIGINAL-PUBLIC-MERGE-CREATE1 selects eighteen privately grouped
+production files and twelve test children within the existing targets. Root
+independently reproduced both final tests-only missing-API RED results before
+releasing production. All eighteen bodies now exist. Integrated tests, strict
+lint and every source-check stage pass in the595-test/four-doc native macOS run.
+The wrapper subsequently exits1 at its default RustSec refresh because GitHub
+DNS resolution fails. A separate cached October14 audit passes all four
+categories; that is not a default-refresh success. Written-source architecture,
+performance and reciprocal reviews are closed without a component blocker.
+Earlier complete582-test wrapper results belong to
+the preceding preparation checkpoint, and native Linux remains pending.
+
+The new frame has discriminator9 and request registry4. Mathematical intent
+begins with `WF-INTENT\0ORIGINAL-POLICY-SET\0V1\0`, then binds raw tenant/key,
+replace, optional reply-state bytes, optional expected generation and canonical
+patch. The whole frame also carries scope/request/stamp and the captured patch
+source-order sidecar. Producer hashing is patch, intent, digest overwrite and
+whole frame, followed by the final supplied-context comparison. Verification
+hashes intent and patch, restores and binds represented capture correspondence,
+then hashes the whole frame. Hashing remains exclusively in ports.
+
+Canonical patch bounds are131072 nodes, depth64 and262144 scalar payload bytes;
+the independent reply selector admits64MiB and the key admits65535 bytes.
+Received raw public values keep their64MiB physical payload admission, including
+large padded integer encodings; canonical measurement and emission freshly trim
+integer padding. One bounded ordinal Vec supplies canonical staging. The producer
+returns exact intent/patch ranges for the ports hashes, without a domain digest
+or runtime authority.
+
+One structural verifier and one existing request gate precede Fresh. Fresh reads
+strict current bytes, checks the raw expected generation and binds atom:type.
+True replacement drops current decoding owners; false replacement binds the
+captured exact current bytes, builds its child catalog from retained spans of
+that same decode and uses
+four bounded merge owners. Exact keys take precedence over source aliases;
+resolved atom-state nil values delete, while proper empty lists remain distinct.
+Struct Enumerable guards run only when the corresponding source operation is
+actually reached. Surviving known values enter one source-ordered business
+layout; overwritten current values cannot fail an earlier independent business
+admission. Late migration high-water checks and generation allocation precede
+direct original ETF emission from that same layout.
+
+The new-only current scanner admits263168 encoded spans and threads a measured
+span bound into deprecated-map traversal. Old public wrappers retain4096 limits
+and exact work streams. The explicit source-backed1,000-rule current/true-reset
+regression is a post-initial-RED refinement, not part of the frozen RED manifest.
+No source fixture, initial expected fee or previous failure is rewritten.
+
+Logical resource accounting reserves every simultaneously live index, capture,
+merge arena, joined layout, installation ETF and key before allocation. After
+transient owners drop, a separate zero-work peak admission covers retained
+metadata, final key, installation and distinct response. Historical peak values
+cannot substitute for this active-owner sum. Native allocation or speed is not
+inferred from these logical reservations. The proposed installation has no
+physical publication authority, and its original-envelope retained response is
+not yet the final public reply-state projection. Coherent VM capture, opaque
+ingress identity, complete original scenarios/setup/profiles, physical atomic
+all-shard publication and independent Linux/macOS acceptance remain required.

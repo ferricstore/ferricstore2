@@ -7,13 +7,16 @@ use super::{
 };
 use model::{PolicySetPatchArena, PolicySetPatchCell, PolicySetPatchSlot};
 
+pub(in crate::policy::complete) mod merge;
 mod metric;
 mod model;
+pub(in crate::policy::complete) mod order;
 mod patch;
 
 pub use model::{
     OriginalPolicySetInputRejection, OriginalPolicySetPatchView, OriginalPolicySetRequest,
 };
+pub use order::OriginalPolicySetMapOrders;
 
 /// Prepares original public controls and converted raw patch without admission.
 ///
@@ -99,6 +102,7 @@ pub fn prepare_original_policy_set_request<'input>(
         replace,
         response_state,
         patch: arena,
+        reservation: (bounds.0, bounds.2),
     }))
 }
 

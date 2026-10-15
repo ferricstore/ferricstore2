@@ -435,3 +435,94 @@ fn original_public_policy_set_preparation_stays_pure_and_server_side() -> CheckR
     }
     Ok(())
 }
+
+#[test]
+fn original_public_policy_set_merge_stays_pure_and_server_side() -> CheckResult<()> {
+    for module in [
+        "policy::complete::original_entry::indexed",
+        "policy::complete::original_entry::indexed::value",
+        "policy::complete::public_set::order",
+        "policy::complete::public_set::merge",
+        "policy::complete::public_set::merge::apply",
+        "policy::complete::public_set::merge::equality",
+        "policy::complete::public_set::merge::rows",
+        "policy::complete::public_set::merge::value",
+        "policy::complete::replace_request::public_set",
+        "policy::complete::replace_request::public_set::retention",
+        "policy::complete::outer::public_set_frame",
+        "policy::complete::outer::public_set_frame::model",
+        "policy::complete::outer::public_set_frame::codec",
+        "policy::complete::outer::public_set_frame::canonical",
+        "policy::complete::outer::public_set_frame::scan",
+        "policy::complete::outer::public_set_frame::value",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-domain",
+                module,
+                "use crate::policy::complete; use wf_types::version;"
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "unclassified standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+            (
+                "use wf_parity_tests::progress;",
+                "runtime source references M0-only tooling",
+            ),
+        ] {
+            assert!(
+                source_check("wf-domain", module, source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    for name in [
+        "OriginalPolicySetMapOrders",
+        "OriginalPolicySetFrameBytes",
+        "OriginalPolicySetFrameInput",
+        "ScannedOriginalPolicySetFrame",
+        "OriginalPolicySetFrameHeader",
+        "OriginalPolicySetApplyView",
+        "OriginalPolicySetFresh",
+        "prepare_original_policy_set_frame_bytes",
+        "scan_original_policy_set_frame",
+        "restore_original_policy_set_frame_header",
+        "prepare_original_policy_set_fresh",
+    ] {
+        original_flow_export_is_server_only(name)?;
+    }
+    for module in [
+        "log::complete_policy::public_set",
+        "log::complete_policy::public_set::apply",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                module,
+                "use wf_domain::policy::complete; use wf_types::version;"
+            )?,
+            Vec::<String>::new()
+        );
+    }
+    for name in [
+        "VerifiedOriginalPolicySetFrame",
+        "OriginalPolicySetRequestPlan",
+        "prepare_original_policy_set_frame",
+        "verify_original_policy_set_frame",
+        "decide_original_policy_set_frame",
+    ] {
+        assert!(
+            source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::log::{name};")
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
+        );
+    }
+    Ok(())
+}

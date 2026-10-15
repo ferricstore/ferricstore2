@@ -7,7 +7,9 @@ use wf_types::version::{LogIdentity, TimestampMillis};
 
 use super::{ClientIntent, RequestScope};
 use crate::claim::apply::ClaimRejection;
-use crate::policy::complete::{CompletePolicyReplaceRejection, OriginalFlowPolicyReplaceRejection};
+use crate::policy::complete::{
+    CompletePolicyReplaceRejection, FlowPolicyInputRejection, OriginalFlowPolicyReplaceRejection,
+};
 use crate::policy::installation::PolicyError;
 use crate::workflow::admission::AdmissionLimits;
 use crate::workflow::batch::BatchRejection;
@@ -26,6 +28,8 @@ pub enum RetainedStatus {
     CompletePolicyReplaceRejected(CompletePolicyReplaceRejection),
     /// Original reached whole-flow replacement diagnosis, without operational failures.
     OriginalFlowPolicyReplaceRejected(OriginalFlowPolicyReplaceRejection),
+    /// Original reached public set diagnosis, with its captured business context.
+    OriginalPolicySetRejected(FlowPolicyInputRejection),
     /// Original canonical index guard rejection.
     IndexedRejected(IndexRejection),
     /// Original business-only claim rejection, without operational authority errors.

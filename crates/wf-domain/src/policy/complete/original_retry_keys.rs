@@ -6,7 +6,7 @@ use super::{CompletePolicyEncodingError as Error, PolicySchemaCharge, PolicySche
 
 mod map;
 
-pub(in crate::policy::complete) use map::{OriginalMapVisit, run};
+pub(in crate::policy::complete) use map::{OriginalMapVisit, run, run_with_node_limit};
 
 /// Borrowed key classes used by the original stored-policy map predicate.
 ///

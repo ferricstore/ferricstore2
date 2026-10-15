@@ -7,7 +7,7 @@ use super::{
     VirtualLocalFun, compound, overflow, pay, runtime, scalar,
 };
 
-type IdentityInput<'raw, 'index, 'context> = (
+pub(super) type IdentityInput<'raw, 'index, 'context> = (
     &'raw [u8],
     &'index [TermSpan],
     &'index [u32],
@@ -156,7 +156,7 @@ fn width(input: IdentityInput<'_, '_, '_>, position: Position) -> usize {
     }
 }
 
-fn compare(
+pub(super) fn compare(
     input: IdentityInput<'_, '_, '_>,
     mut left: Position,
     mut right: Position,
