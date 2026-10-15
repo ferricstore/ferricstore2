@@ -2,7 +2,9 @@
 
 use wf_domain::policy::complete::{
     CompletePolicyReplaceApplyError, CompletePolicyReplaceApplyView, CompletePolicyReplaceFresh,
+    OriginalCompletePolicyReplaceApplyError, OriginalCompletePolicyReplaceApplyView,
     PolicySchemaCharge, PolicySchemaLimits, prepare_complete_policy_replace_fresh,
+    prepare_original_complete_policy_replace_fresh,
 };
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlPlan, ControlState};
@@ -109,6 +111,67 @@ pub fn decide_complete_policy_replace_frame<'view>(
                 .map_err(Request)?
                 .into_input();
             DispatchDecision::Fresh(prepare_complete_policy_replace_fresh(
+                view,
+                input,
+                (intent, log, control.execution_time()),
+                limits,
+                admission,
+                charge,
+            )?)
+        }
+        GateDecision::Replay(original) => DispatchDecision::Replay(original),
+        GateDecision::IntentConflict => DispatchDecision::IntentConflict,
+        GateDecision::Expired => DispatchDecision::Expired,
+        GateDecision::LogReplay => DispatchDecision::LogReplay,
+    };
+    Ok(CompletePolicyReplaceRequestPlan {
+        expected_revision: view.revision,
+        base_control: view.gate.control,
+        control,
+        decision,
+    })
+}
+
+/// Prepares an original-current replacement with one verifier and request gate.
+///
+/// Non-Fresh preserves the original decision before raw policy, catalog, context
+/// or migration reads. Fresh consumes the verified input and returns the same
+/// owned private V2 bundle. Only gate replay authority can remain borrowed.
+///
+/// # Errors
+/// Preserves common parent failures and distinct original-current read failures;
+/// operational errors return no partial plan or retained business outcome.
+pub fn decide_original_complete_policy_replace_frame<'view>(
+    view: OriginalCompletePolicyReplaceApplyView<'view, '_, '_>,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: PolicySchemaLimits,
+    admission: AdmissionLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<CompletePolicyReplaceRequestPlan<'view>, OriginalCompletePolicyReplaceApplyError> {
+    use CompletePolicyReplaceApplyError::{Apply, Request};
+    use OriginalCompletePolicyReplaceApplyError::Replace;
+
+    let verified = verify_complete_policy_replace_frame(encoded, limits, admission, charge)
+        .map_err(|error| Replace(Request(error)))?;
+    let (gate, intent) = {
+        let header = verified.header(log);
+        let intent = header.intent;
+        let gate =
+            inspect_complete_core_policy_patch_gate(view.gate, header, limits, admission, charge)
+                .map_err(|error| match error {
+                ChargedRequestGateError::Apply(error) => Replace(Apply(error)),
+                ChargedRequestGateError::Schema(error) => Replace(Request(error.into())),
+            })?;
+        (gate, intent)
+    };
+    let control = gate.control();
+    let decision = match gate.decision() {
+        GateDecision::Fresh => {
+            let input = consume_verified_frame(verified, limits, admission, charge)
+                .map_err(|error| Replace(Request(error)))?
+                .into_input();
+            DispatchDecision::Fresh(prepare_original_complete_policy_replace_fresh(
                 view,
                 input,
                 (intent, log, control.execution_time()),

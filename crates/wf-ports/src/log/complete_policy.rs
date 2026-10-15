@@ -15,7 +15,10 @@ mod replace;
 
 pub use original_entry::{OriginalPolicyReference, prepare_original_complete_policy_reference};
 
-pub use replace::{CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame};
+pub use replace::{
+    CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,
+    decide_original_complete_policy_replace_frame,
+};
 pub use replace::{
     DecodedCompletePolicyReplaceFrame, VerifiedCompletePolicyReplaceFrame,
     decode_complete_policy_replace_frame, prepare_complete_policy_replace_frame,

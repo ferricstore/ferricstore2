@@ -78,7 +78,8 @@ pub use replace_content::{
 };
 pub use replace_request::{
     CompletePolicyReplaceApplyError, CompletePolicyReplaceApplyView, CompletePolicyReplaceFresh,
-    prepare_complete_policy_replace_fresh,
+    OriginalCompletePolicyReplaceApplyError, OriginalCompletePolicyReplaceApplyView,
+    prepare_complete_policy_replace_fresh, prepare_original_complete_policy_replace_fresh,
 };
 pub use request::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,

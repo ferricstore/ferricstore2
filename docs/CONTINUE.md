@@ -4,8 +4,9 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS recount passes 514 Rust tests and four compile-fail
-doc tests. The reviewed reader/source603 checkpoint is `bbeba0d`.
+The latest whole-workspace macOS recount passes 523 Rust tests and four compile-fail
+doc tests. The reviewed reader/source603 checkpoint is `bbeba0d`; `7f3e21a` adds
+the original MAX-generation assertion/ledger supplement.
 Strict lint, architecture, documentation and reference/progress checks
 pass. The full wrapper stops at its default RustSec refresh because GitHub cannot
 resolve. A separate offline audit passes all four dependency categories against
@@ -154,17 +155,23 @@ refusal. The two-line direct refusal anchor supplements existing behavior;
 all72 policy controls, strict lint and progress validation pass. Existing normalized
 counterpart IDs and limitations stay unchanged. No original encoder, migration
 allocator, public/setup/profile/physical or Linux result is inferred from this link.
-Original raw parent integration, public/setup/profile/physical and independent
-Linux acceptance remain required, with no measured native performance gain.
+Original ETF output, complete raw ingress, public/setup/profile/physical and
+independent Linux acceptance remain required, with no measured native performance gain.
 
-The next selected M1 responsibility is original stored-policy Replace composition:
-strict envelope/generation read, then CAS, then atom:type, reusing incoming content
-validation and late encoding. Exact architecture/performance consultation is closed:
-one domain child, two models, the existing ports parent, three test children and
-the private architecture control are selected. The writer is authoring all eight
-required scenarios before genuine missing-API RED and substantive implementation.
-Existing V2, CorePatch and standalone contracts remain acceptance controls; original
-incoming retry normalization follows this integration.
+Original stored-policy Replace composition is implemented after genuine missing-API
+RED independently reproduced by the coordinator. Eight new controls cover strict
+envelope/generation read, CAS, then atom:type, reusing incoming-only validation,
+migration allocation, late encoding and retention. The 73-test target, strict
+domain/ports lint and private architecture control pass. Reciprocal architecture
+and performance source review is closed without blockers. Existing V2, CorePatch
+and standalone priorities and fee streams remain covered. The source-backed
+first-install fixture now supplies an actual missing map entry; its independent
+expected value is built before apply. This final test-only refinement passes
+73/73, lint and formatting after the 523-test whole-workspace epoch.
+The private V2 output remains an explicit semantic encoding, with original ETF
+output, physical/public/runtime profiles and both-OS acceptance still required.
+The next substantive M1 responsibility is original incoming retry/override
+normalization; exact artifact/API consultation is being prepared before creation.
 
 The separate Elixir bugfix worktree now has reviewed checkpoint106993c6 for the
 existing TermCodec helper and its tests. A header walk rejects the reproduced
@@ -1064,8 +1071,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **57 reviewed
-source declarations, 59 counterpart records and 227 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **58 reviewed
+source declarations, 61 counterpart records and 232 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

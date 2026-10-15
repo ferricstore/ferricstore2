@@ -588,3 +588,36 @@ The zero-word native outcome is unknown; ordinary empty BINARY and valid1..5
 reference branches retain their selected semantics. ADR006 records prospective work and scratch
 scheduling. There is no measured native gain or complete original setup/public/
 physical/profile acceptance; Linux and macOS remain independent requirements.
+
+## Implemented original-current replacement composition
+
+A-NEXT-M1-ORIGINAL-CURRENT-REPLACE1-CREATE1 selects one private
+`replace_request/original.rs` child with the original-current View and error models.
+The existing ports parent gains its original-current entry, and existing Plan,
+Fresh and retained-status models are reused. All eight new tests preceded
+production with genuine missing-API RED independently reproduced by the coordinator.
+All 73 controls and strict domain/ports lint pass. The three test children and
+private architecture control follow the reciprocal creation decision.
+Actual source architecture/performance review is mutually closed without blockers.
+
+Gate replay lifetime is separate from raw current maps/bytes and captured runtime
+catalogs. Supplied read classes distinguish a confirmed miss from a nonbinary HIT.
+Fresh performs strict envelope/generation decoding before CAS, then atom:type
+binding, followed by the shared incoming-only content/migration/allocation/encoding
+tail and retention. The source's two immutable decodes are represented by one full
+fresh decode plus the reached post-CAS comparison. Stored arbitrary map content
+is discarded for replacement without business re-admission or cloning.
+
+Common parent failures wrap the existing replacement error. Reached decoder and
+type-comparison work errors retain the original reader encoding origin; strict
+current/type corruption uses the allocator's exact high-water message. Only incoming
+content descriptors and allowed generation decisions enter retained outcomes.
+The existing normalized V2, CorePatch, standalone and public Policy priorities,
+interfaces and fee streams remain acceptance controls. No dependency or inspector
+exception is selected; domain remains synchronous and pure.
+
+The output remains the selected private V2 semantic encoding. Original ETF output,
+raw migration/option/retry normalization, public projections, physical coherent
+reads and atomic publication remain required work. Logical source-derived fees
+do not certify native allocation, stack, latency or gain. Full required source
+profiles and independent Linux/macOS execution remain mandatory.

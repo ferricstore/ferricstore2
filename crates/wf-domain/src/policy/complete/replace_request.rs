@@ -23,7 +23,13 @@ use super::{
     PolicySchemaLimits, check_complete_policy_replace_content,
 };
 
+mod original;
 mod retention;
+
+pub use original::{
+    OriginalCompletePolicyReplaceApplyError, OriginalCompletePolicyReplaceApplyView,
+    prepare_original_complete_policy_replace_fresh,
+};
 
 /// Results supplied from one coherent revision; no physical reader is implemented.
 #[derive(Clone, Copy)]
@@ -70,6 +76,10 @@ impl fmt::Display for CompletePolicyReplaceApplyError {
 impl std::error::Error for CompletePolicyReplaceApplyError {}
 
 type ReplacePrepared = Result<(u64, CompletePolicyValue), ReplaceRejected>;
+type ReplaceMigrations<'view> = (
+    &'view BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
+    &'view BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
+);
 
 enum ReplaceRejected {
     Policy(PolicyRejection),
@@ -120,7 +130,7 @@ fn prepare_replace_result(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<ReplacePrepared, CompletePolicyReplaceApplyError> {
-    use CompletePolicyReplaceApplyError::{Apply, Request};
+    use CompletePolicyReplaceApplyError::Request;
 
     let current = read_replace_current(view, &data.workflow_type, limits, charge)?;
     let stored = current.map_or(0, CompletePolicyValue::generation);
@@ -131,8 +141,28 @@ fn prepare_replace_result(
     if let Some(current) = current {
         bind_replace_current_type(current, &data.workflow_type, charge)?;
     }
+    prepare_replace_content_result(
+        data,
+        stored,
+        (view.active_migrations, view.completed_migrations),
+        view.history_max_events_limit,
+        limits,
+        charge,
+    )
+}
+
+fn prepare_replace_content_result(
+    data: CompletePolicyData,
+    stored: u64,
+    migrations: ReplaceMigrations<'_>,
+    history_limit: Result<u32, ApplyError>,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<ReplacePrepared, CompletePolicyReplaceApplyError> {
+    use CompletePolicyReplaceApplyError::{Apply, Request};
+
     charge_schema(charge, 128, 0).map_err(|error| Request(error.into()))?;
-    let history_limit = view.history_max_events_limit.map_err(Apply)?;
+    let history_limit = history_limit.map_err(Apply)?;
     if history_limit == 0 || history_limit > MAX_HISTORY_EVENTS {
         return Err(Apply(ApplyError::InvalidAuthority));
     }
@@ -142,7 +172,7 @@ fn prepare_replace_result(
     {
         return Ok(Err(ReplaceRejected::Content(rejection)));
     }
-    let migration = read_replace_high_water(view, &data.workflow_type, charge)?;
+    let migration = read_replace_high_water(migrations, &data.workflow_type, charge)?;
     charge_schema(charge, 128, 0).map_err(|error| Request(error.into()))?;
     let generation = stored.max(migration).checked_add(1);
     let Some(generation) = generation.filter(|value| *value <= MAX_POLICY_GENERATION) else {
@@ -218,7 +248,7 @@ fn bind_replace_current_type(
 }
 
 fn read_replace_high_water(
-    view: CompletePolicyReplaceApplyView<'_>,
+    migrations: ReplaceMigrations<'_>,
     workflow_type: &[u8],
     charge: &mut PolicySchemaCharge,
 ) -> Result<u64, CompletePolicyReplaceApplyError> {
@@ -229,7 +259,7 @@ fn read_replace_high_water(
         .and_then(|length| length.checked_add(128))
         .ok_or(Request(PolicySchemaError::LengthOverflow.into()))?;
     let mut high_water = 0;
-    for migrations in [view.active_migrations, view.completed_migrations] {
+    for migrations in [migrations.0, migrations.1] {
         charge_schema(charge, work, 0).map_err(|error| Request(error.into()))?;
         let generation = match migrations.get(workflow_type) {
             Some(value) => (*value).map_err(Apply)?,

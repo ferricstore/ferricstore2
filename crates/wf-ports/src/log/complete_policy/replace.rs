@@ -18,7 +18,10 @@ use super::intent::{hash_intent, map_codec_error, write_replace_intent};
 mod apply;
 mod decode;
 
-pub use apply::{CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame};
+pub use apply::{
+    CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,
+    decide_original_complete_policy_replace_frame,
+};
 
 pub use decode::{DecodedCompletePolicyReplaceFrame, decode_complete_policy_replace_frame};
 

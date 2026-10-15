@@ -525,3 +525,5 @@ fn complete_replace_frame_keeps_business_invalid_original_fields_available_for_f
 mod decode;
 
 mod apply;
+
+mod original_apply;

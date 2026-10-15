@@ -854,3 +854,48 @@ Original public physical/profile/both-host acceptance remains required.
 Vec capacities, stack, caller context, original bytes, Drop, simultaneous native
 owners and latency are outside logical scratch; retaining Vec adds no native
 performance or recoverable-OOM guarantee.
+
+## Implemented original-current replacement composition
+
+The reciprocal A/P-NEXT-M1-ORIGINAL-CURRENT-REPLACE1-CREATE1 decision selects
+one private domain child, two borrowed-input/error models and two six-operand
+APIs, using the existing ports parent and Plan/Fresh/retained-status registry.
+The View separates gate, raw-map and runtime-context lifetimes. Confirmed miss
+alone is Absent; a nil/nonbinary HIT is corrupt. These are mathematical inputs,
+with later coherent-read and atomic-compare duties unchanged. Eight new tests
+preceded production with independently reproduced missing-API RED; all 73
+controls and strict domain/ports lint now pass.
+
+The existing verifier and request gate each execute once. Every non-Fresh
+decision bypasses reconstruction and current/context/migration/window reads.
+Fresh pays the common root and current lookup, including class inspection,
+then performs one complete unbound original decode before CAS. Its existing
+type projection/metadata fees stay before CAS; semantic atom:type binding and
+its both-operand comparison follow CAS. Malformed current beats stale CAS,
+while a valid foreign type with stale CAS retains the stale result first.
+No stored-map content admission, Data reconstruction or second parse is added.
+
+Both typed and original-current paths share only the private post-type tail:
+captured history context, one incoming content walk, active and completed
+migration reads, allocation, and same-Data late encoding. Existing outcome
+retention is reused. Common parent/gate/tail errors wrap the existing error;
+reached reader/type-debit failures preserve Current(Encoding), and current
+corruption displays `ERR corrupt flow policy high-water`. Public Policy
+corruption spelling and all existing API/event priorities stay unchanged.
+
+Independent fixed inputs select absent G9640 and TYPE_R38 present
+G16548/P448/T16996. Final tight16995 retains G16420/P448; two calls reach
+G33096/P448/T33544, with tight33543 retaining32968/P448. A real held1928/P64
+prefix gives G18476/P448/T18924. Reader scratch/reserve and every reached
+phase remain prospectively paid; Drop does not refund or reset the account.
+These independently fixed source-derived expectations now pass in the executed
+tests, with no native resource or speed claim. The exact private architecture
+control also passes. The private two-map ReplaceMigrations alias was explicitly
+approved before creation after strict lint diagnosed tuple type complexity;
+private view helpers borrow without changing the public API or fee stream.
+
+Private V2 proposed values/replies are an explicit semantic encoding and must
+be refused by the original ETF input path. Original ETF emission/sizing,
+raw option/retry/governance normalization, migration codecs, public responses,
+physical policy/outcome/control publication, complete runtime profiles and
+independent Linux/macOS execution remain required in the full ordered plan.

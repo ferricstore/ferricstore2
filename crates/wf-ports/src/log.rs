@@ -32,7 +32,10 @@ pub use complete_policy::{
 pub use complete_policy::{
     CompleteCorePolicyPatchRequestPlan, decide_complete_core_policy_patch_frame,
 };
-pub use complete_policy::{CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame};
+pub use complete_policy::{
+    CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,
+    decide_original_complete_policy_replace_frame,
+};
 pub use complete_policy::{OriginalPolicyReference, prepare_original_complete_policy_reference};
 
 pub use complete_policy::{

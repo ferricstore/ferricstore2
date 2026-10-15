@@ -36813,3 +36813,654 @@ The proposed policies map stores captured read-result classes, not literal ETS v
 The original source invokes strict decoding twice across CAS/type helpers; this proposal parses immutable current bytes once, retaining the entire existing unbound decoder tariff including pre-CAS paid type projection/metadata, then pays the reached binding afterCAS. It claims result/order correspondence in the supported portable profile, not equal source/native call counts. Incoming guard remains the existing normalized Option<u64>; original negative/noninteger raw options and front key/type/state admission remain required raw-ingress obligations. No public normalization case is silently credited.
 
 I actually read all available PERF READY1 at1207535+7866/SHA224e5ba2 in243c72 and agree with its source/owner/resource qualification. The concrete no-extra-read-class event and TYPE_R38 fixture are frozen by the main proposal, so its previously conditional16548/P448/T16996 is now a proposed oracle, still not a native result or creation decision. Only this existing owned note changed.
+
+## DOC-NEXT-M1-ORIGINAL-CURRENT-REPLACE1-TESTS-RED1 (2026-10-15; actual tests-only author epoch)
+
+ROOT assigned exactly the three original_apply test children plus the EOF-only existing replace.rs seam under A-CREATE1 architecture1475319+9757/SHAf9d7be0d and P1216183+9996/SHA7fda82e9, whose entire finite decisions I actually read. The source snapshot remains the reviewed 7f3e21a predecessor; I did not edit ROOT's supplemented original_entry.rs or any production/shared facade/checker/config/ledger. All eight selected named tests are now substantive actual Rust source. Ordinary private helper splitting remains inside the selected paths; no additional artifact/model/type/alias was introduced.
+
+Actual test manifest and after-clean-RED absence check (b37f36 EXIT0):
+```text
+[
+  {
+    "path": "crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs",
+    "bytes": 18350,
+    "lines": 496,
+    "sha256": "0f468edac9991356dcee2546f1ef6845578195654e2175fdb4a1bd22a684f41c",
+    "max_function_lines": 78,
+    "tests": [
+      "original_current_replace_accepts_zero_and_discards_stored_business_fields",
+      "original_current_replace_keeps_decode_cas_and_type_priority",
+      "original_current_replace_preserves_nonfresh_and_real_retained_replays",
+      "original_current_replace_checks_context_and_both_migration_reads_before_exhaustion",
+      "original_current_replace_retains_only_incoming_content_and_generation_errors"
+    ]
+  },
+  {
+    "path": "crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs",
+    "bytes": 18158,
+    "lines": 553,
+    "sha256": "c165b00235a7b24749d1bcfc53ddacf32ae3adccdc80993c374f1dab79af32dc",
+    "max_function_lines": 97,
+    "tests": [
+      "original_current_replace_preserves_reader_origins_and_profile_refusals"
+    ]
+  },
+  {
+    "path": "crates/wf-ports/tests/complete_policy_request/replace/original_apply/refusals.rs",
+    "bytes": 17491,
+    "lines": 530,
+    "sha256": "e3f183dbcf5c98fb95a1bc3b5d3a54356360a1e30c10f3570650436e809e1b1d",
+    "max_function_lines": 92,
+    "tests": [
+      "original_current_replace_keeps_one_account_and_owned_results_through_refusals",
+      "original_current_replace_keeps_existing_typed_and_standalone_contracts"
+    ]
+  },
+  {
+    "path": "crates/wf-ports/tests/complete_policy_request/replace.rs",
+    "bytes": 19749,
+    "lines": 529,
+    "sha256": "60b2e3a1520de00751a3c4f7d5364e708f742d3b330d3fad51d01d2ccfe60ea3",
+    "suffix_bytes": 21,
+    "old_prefix_bytes": 19728,
+    "inverse_sha256": "b5f5b7fc320fa105846100e779a4a3bf13bba9a4aa34725f3c74ffc79bd2ee19"
+  }
+]
+Production child and both raw-current APIs remain absent after clean RED.
+```
+
+The initial compile was `env CARGO_BUILD_WARNINGS=deny cargo +1.99.0 test --locked -p wf-ports --test complete_policy_request`, tool2c5c7b, EXIT101. It found the missing new API imports plus an ordinary test pointer dereference and unused imports; zero assertions ran. I replaced the pointer expression with an explicitly borrowed RetainedOutcome local and removed only the unused imports. No fixture, expected error/body/status/bytes, fee stream or assertion duty changed. This first real failed epoch is retained rather than described as clean API-only evidence:
+```text
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalCompletePolicyReplaceApplyError`, `wf_domain::policy::complete::OriginalCompletePolicyReplaceApplyView`
+  --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:10:5
+   |
+10 |     OriginalCompletePolicyReplaceApplyError as RawError,
+   |     ---------------------------------------^^^^^^^^^^^^
+   |     |
+   |     no `OriginalCompletePolicyReplaceApplyError` in `policy::complete`
+11 |     OriginalCompletePolicyReplaceApplyView as RawView, OriginalEtfSafety,
+   |     --------------------------------------^^^^^^^^^^^
+   |     |
+   |     no `OriginalCompletePolicyReplaceApplyView` in `policy::complete`
+   |
+help: a similar name exists in the module
+   |
+10 -     OriginalCompletePolicyReplaceApplyError as RawError,
+10 +     CompletePolicyReplaceApplyError as RawError,
+   |
+help: a similar name exists in the module
+   |
+11 -     OriginalCompletePolicyReplaceApplyView as RawView, OriginalEtfSafety,
+11 +     CompletePolicyReplaceApplyView as RawView, OriginalEtfSafety,
+   |
+
+error[E0432]: unresolved import `wf_ports::log::decide_original_complete_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:25:39
+   |
+25 |     CompletePolicyReplaceRequestPlan, decide_original_complete_policy_replace_frame,
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `decide_original_complete_policy_replace_frame` in `log`
+   |
+help: a similar name exists in the module
+   |
+25 -     CompletePolicyReplaceRequestPlan, decide_original_complete_policy_replace_frame,
+25 +     CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,
+   |
+
+warning: unused import: `RequestId`
+ --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:6:80
+  |
+6 |     PolicySchemaLimits, RawError, RawView, ReadError, ReadValue, RequestError, RequestId,
+  |                                                                                ^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `DispatchDecision`, `PolicySchemaLimits`, and `RetainedStatus`
+ --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/refusals.rs:4:58
+  |
+4 |     AdmissionLimits, ApplyError, BTreeMap, ControlState, DispatchDecision, EncodingError,
+  |                                                          ^^^^^^^^^^^^^^^^
+5 |     ExistingError, OriginalEtfSafety, PolicyError, PolicySchemaCharge, PolicySchemaError,
+6 |     PolicySchemaLimits, RawError, ReadError, ReadValue, RequestError, RequestId, RetainedStatus,
+  |     ^^^^^^^^^^^^^^^^^^                                                           ^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:352:61
+    |
+352 |                     assert!(std::ptr::eq::<RetainedOutcome>(*out, &outcomes[&request]));
+    |                             ------------------------------- ^^^^ expected `*const RetainedOutcome`, found `RetainedOutcome`
+    |                             |
+    |                             arguments to this function are incorrect
+    |
+    = note: expected raw pointer `*const wf_domain::workflow::request::RetainedOutcome`
+                    found struct `wf_domain::workflow::request::RetainedOutcome`
+note: function defined here
+   --> /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/ptr/mod.rs:2507:7
+
+Some errors have detailed explanations: E0308, E0432.
+For more information about an error, try `rustc --explain E0308`.
+error: `wf-ports` (test "complete_policy_request") generated 2 warnings
+error: warnings are denied by `build.warnings` configuration
+```
+
+Ordinary rustfmt1.99.0 completed successfully on all three actual test files (4491b6 EXIT0). The exact same command then produced clean conventional missing-API RED tool978e08, EXIT101 in0.2704s, exactly two E0432 diagnostics for the two absent domain models and new ports function, no warnings/other diagnostics, zero assertions. The domain child and both new API spellings remained absent in the actual post-command b37f36 check. This is genuine pre-production missing-API evidence, not a stub/S0, semantic failure or passing counterpart:
+```text
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error[E0432]: unresolved imports `wf_domain::policy::complete::OriginalCompletePolicyReplaceApplyError`, `wf_domain::policy::complete::OriginalCompletePolicyReplaceApplyView`
+  --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:10:5
+   |
+10 |     OriginalCompletePolicyReplaceApplyError as RawError,
+   |     ---------------------------------------^^^^^^^^^^^^
+   |     |
+   |     no `OriginalCompletePolicyReplaceApplyError` in `policy::complete`
+11 |     OriginalCompletePolicyReplaceApplyView as RawView, OriginalEtfSafety,
+   |     --------------------------------------^^^^^^^^^^^
+   |     |
+   |     no `OriginalCompletePolicyReplaceApplyView` in `policy::complete`
+   |
+help: a similar name exists in the module
+   |
+10 -     OriginalCompletePolicyReplaceApplyError as RawError,
+10 +     CompletePolicyReplaceApplyError as RawError,
+   |
+help: a similar name exists in the module
+   |
+11 -     OriginalCompletePolicyReplaceApplyView as RawView, OriginalEtfSafety,
+11 +     CompletePolicyReplaceApplyView as RawView, OriginalEtfSafety,
+   |
+
+error[E0432]: unresolved import `wf_ports::log::decide_original_complete_policy_replace_frame`
+  --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:25:39
+   |
+25 |     CompletePolicyReplaceRequestPlan, decide_original_complete_policy_replace_frame,
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `decide_original_complete_policy_replace_frame` in `log`
+   |
+help: a similar name exists in the module
+   |
+25 -     CompletePolicyReplaceRequestPlan, decide_original_complete_policy_replace_frame,
+25 +     CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,
+   |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-ports` (test "complete_policy_request") due to 2 previous errors
+```
+
+Independent prospective oracles are frozen before substantive production: incoming minimal135 and full477 frames use the existing fixed original intent literals, not a new parent; raw TYPE_R38 is separately fixed hex/SHA6e997863 and binds the SAME one-byte r as the incoming frame. Full E382/private VALUE and E40 bytes are assembled from the existing fixed original DATA offset36 with explicit FWPS/FWPV headers/generation; gen1 SHA0f611667/cce55bbc are asserted. Raw SOURCE603 remains the exact133-byte GENERATIONLESS two-tuple recipe, with no invented third component. Raw exact cap uses the bound type:r plus version payload263116 (total263168; map external_size263148), and payload263117 is the rejected263169 neighbor. The span cap fixture uses TAG-only Safety (same independent545458 reader-prefix source trace plus6276 parent-prefix =551734); it does not silently use the more expensive two-atom catalog. The generation-boundary/public-v1 oracle independently constructs nextMAX DATA and its full72-byte private VALUE. Existing private V2 output is intentionally rejected as raw ETF on a subsequent raw-current call.
+
+All positive K1 reader debit events are the independently frozen two lexical passes1244 each, same-account scratch448 and the declared index/key/fun reserves, map/shape/predicate/type/metadata events summing6778. Each positive prospective target is asserted against its literal priorG/P and Current(Encoding(WorkBytes)); zero-increment inherited scratch is not manufactured as a refusal. Fixed full-parent phases finish16548/P448/total16996, exact/tight/repeat33096 and real held1928/P64 controls never learn an expected amount from returned counters. Nonzero-F recipe is independently assembled B85/N11/K1/F1, same-source virtual insertion before environment, with scratch target10362/prior9530P0, normalization13757/prior12797P832, actual insertion13885/prior12925P832; missing atom:type subsequently corrupts at16197/P832. A real C17/history18 rejected owner is held and reobserved while a later accepted raw-current call accumulates32638/P448. Actual accepted/fixed-content/dynamic-content parent-derived replay controls preserve original outcome pointer/body/kind/C/time/deadline/digest/ID and every gate branch while poisoning current/catalog/context/H/window.
+
+Current-specific errors are kept distinct: raw corrupt/unsupported/deprecated/overcap and post-CAS type failures do not become retained caller errors; common profile/root/lookup/CAS/tail errors remain Replace(existing). Actual Other/Unavailable/ReadFailed/Absent classes, absent bypass of invalid Safety, reader depth/span/catalog refusal, stale-before-type, aligned versus partial BIT_BINARY, context before content/H, active before done, validMAX reading failed done before exhaustion, original window validation for business failures, and late R767 refusal/R768 success are represented. Old typed fees9640/10914, malformed-current-beforeCAS CorePatch/typed parent, guard-first standalone128, and public absence/reference/corruption spellings are explicit neighbors. Their assertions have not executed yet because imports are absent; later source/compile/assertion failures must be recorded honestly.
+
+No source mapping/public case credit is added in this tests-only epoch. Source603's original shape, the generation-boundary/public-v1 fields and foreign-policy-type9000 are preserved where represented; full original d419/dea49/17d847 public replies/1000-2000-3000 replacement scenarios, all-shard installation, physical coherent reads/atomic publication, raw migration codecs, supported runtime contexts, complete ingress normalization, original ETF output, Linux and full profiles remain required separately. This three-file target is portable pure control coverage and private semantic encoding, not physical/current authority or full original/native acceptance.
+
+ROOT and ARCH/PERF were notified promptly of clean RED978e08 and actual source readiness. ROOT owns independent RED reproduction and the subsequent implementation order; no production has been authored by me in this assignment. The next source review may identify ordinary fixture/style issues hidden until APIs resolve; this note does not predeclare GREEN.
+
+## DOC-NEXT-M1-ORIGINAL-CURRENT-REPLACE1-GREEN1 (2026-10-15; actual authored source and focused validation)
+
+ROOT independently reproduced tests-only RED0d1a55 (exactly absent new APIs/zero assertions), verified absent original.rs and the whole old replace.rs prefix, then explicitly assigned substantive domain original.rs and existing replace_request.rs to me. ROOT authored all ports/facade/checker/shared changes concurrently. I wrote no ROOT-owned file. The original earlier TESTS-RED1 section remains unchanged and preserves clean978e08 versus the initial pointer/import failure. This final receipt adds actual implementation/validation and does not relabel later coverage or style repairs as first RED.
+
+Final owned-source/test manifest36fec2 EXIT0 (ordinary rustfmt1.99.0; production<=400/test<=600 and every function<=100; targeted diff-check1f8890 EXIT0):
+```text
+{"path": "crates/wf-domain/src/policy/complete/replace_request.rs", "bytes": 10867, "lines": 274, "max_fn_lf": 33, "sha256": "fa9003b43204cec188e96df9fc577bbd86959b6fecb2467258107752d73b6018"}
+{"path": "crates/wf-domain/src/policy/complete/replace_request/original.rs", "bytes": 8411, "lines": 197, "max_fn_lf": 34, "sha256": "a1ba09b4d8ca3e876bf9ea6fca3f6c02e81c3982f088ebe37c6985289a304085"}
+{"path": "crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs", "bytes": 21170, "lines": 572, "max_fn_lf": 92, "sha256": "d41467b55193a28b970a2d51791dc0e4063711467b5d29c997c9ad88de62c752"}
+{"path": "crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs", "bytes": 19729, "lines": 588, "max_fn_lf": 97, "sha256": "ae88f8f997ea5285acb638823ce2c60ee184192be799ced9ea0c9a26d5c92121"}
+{"path": "crates/wf-ports/tests/complete_policy_request/replace/original_apply/refusals.rs", "bytes": 19201, "lines": 584, "max_fn_lf": 92, "sha256": "bc9cf1fff01be592e467b7cfe5e78fd7a6ea9b88f3c3db4a22772324f4401398"}
+replace.rs whole prefix inverse 19728 b5f5b7fc320fa105846100e779a4a3bf13bba9a4aa34725f3c74ffc79bd2ee19 suffix21B
+ROOT source603/MAX supplement remains exact HEAD 393 e37d789ba600cc15f21b5998610673c561158be7e0d1ce16ed99912f5eebd2de
+```
+
+The new raw-domain child has only the selected borrowed8-field/three-lifetime View and two-arm error. It pays profile/root/lookup-class before one exact existing unbound reader; absence skips Safety; original generation0/arbitrary safe maps are not normalized/admitted as CompleteData. Strict decode completes before CAS; only the reached both-length type equality binds afterCAS. Reader/type-specific errors remain Current while common root/CAS/context/tail/retention errors remain Replace(existing). CurrentCorrupt Display is allocator-specific high-water wording; public Policy error is unchanged. No source-valid unsupported profile is called corruption. No extra read-class128, hash, stored Data clone, accepted-entry/credit bridge, old incoming business rewalk, new dependency or physical authority was added. Raw/catalog owners do not escape owned Fresh output.
+
+Existing typed current verification, type binding and three-reason policy-registry helper strings were source-compared byte-for-byte against HEAD donor10029/SHAe0c0ac31. The shared context/one-CONTENT/active-then-done/generation/late-V2 tail matches exactly after the two view-input substitutions; high-water body matches after replacing view fields with tuple fields (cc71e9 EXIT0). An initial source-audit matcher88fe72 failed on generic function spelling, then the corrected generic-aware matcher completed these exact checks; that tool issue was not a Rust behavior failure. The existing typed parent full-current-beforeCAS, CorePatch and guard-first standalone paths remain distinct and their old tests pass in the73 target.
+
+Strict607eda diagnosed type_complexity on the approved two-map tuple, so I explicitly consulted ARCH BEFORE creating the one PRIVATE transparent ReplaceMigrations<'view> alias. ARCH accepted exact spelling/only two private uses at1489642+1681/SHA5236224a; I actually read the complete decision762f7d before applying it. It creates no owner/event/public model/export. Two private264-byte View helpers now borrow, while the selected public by-value API remains exact. No lint was suppressed.
+
+Normal actual peer review found useful source/control gaps after initial RED. All were fixed within the SAME eight identities/three files and independently traced before their first assertion execution: valid stored max_active1000/queuedFIFO and unknown-safe-field reset; literal max1000→2000 and stale3000 leaving the supplied current2000; generation0/1 plus full E382; H7/3 and3/9 dominating stored1 with fixed expected gen8/10 bytes; different simultaneous active PositionConflict versus done AllocationFailed; good-window InvalidGeneration descriptor/body; poisoned context after foreign/missing/nonbinary type; every positive CONTENT delta[128,128,128,1,257,128] and late writer552/reserve168/emit552; first accepted Plan held across successful second call; larger inherited peak832 after F1 failure and next minimal accepted call. The expected-generation helper accepts an explicit independent scalar for high-water cases instead of assuming stored+1. Exact source603 TWO-tuple and ROOT's393LF source603/MAX supplement remain unchanged.
+
+PERF independently identified the initial oversized-version fixture did not isolate late output: type1+version262144 exceeds the operational raw sum cap. The actual retained test uses type1+version262143=B262144, independent frame262283/intent262200 within incoming1MiB. Existing encode source sets maximum18+262144=262162; cursor35 plus version262143 attempts262178, giving the SAME expected Schema(SnapshotBytes) at late measurement before leaf/output/window. This is a source-backed fixture reachability correction, not an observed-counter/error rewrite. All numeric raw-reader/parent/copy/retention oracles remain the pre-production frozen values.
+
+The first integrated compile needed the PolicySchemaLimits import after moving its cap helper. The first actual assertion epoch ran72 PASS/1 FAIL only because the compatibility fixture invoked public ClientIntent::new(2) before the intended old CorePatch check; actual request.rs73–85 only admits public version1. Correcting that constructor to version1 reaches the intended operational current failure; no production/body/work expected value changed. The next target9d712a/session36602→4a1edb was73/73 EXIT0. Its unchanged successful target list is not duplicated here; final post-style run below independently repeats73/73.
+
+Strict repairs were ordinary and preserve all asserted source inputs/results/oracles: domain private View references and approved tuple alias; test apply-helper borrowed View, void-only outcome helper made unit with call-site propagation removed, pointer comparison now uses two typed borrowed locals. A mechanical propagation edit accidentally removed one unrelated profile(...)?; its actual compile failurefb4272 is preserved and the operator was restored. The final strict and focused commands both pass; neither uses an allow/ignore/suppression, stub, fake refusal, new model or sampled expectation.
+
+Complete failed epochs and final outputs are retained once below. ROOT separately reported its earlier integration lintae13d1 unused Apply import; I narrowed that existing local import during extraction. That ROOT-owned report is distinguished from the following actual owner commands.
+
+First integrated compile f6052c/session47952 ->97a758 EXIT101; production compiled, zero assertions; moved test helper import absent.
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error[E0425]: cannot find type `PolicySchemaLimits` in this scope
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/refusals.rs:556:13
+    |
+556 |     limits: PolicySchemaLimits,
+    |             ^^^^^^^^^^^^^^^^^^
+    |
+   ::: crates/wf-domain/src/policy/complete/admission.rs:59:1
+    |
+ 59 | pub struct PolicySchemaCharge {
+    | ----------------------------- similarly named struct `PolicySchemaCharge` defined here
+    |
+help: a struct with a similar name exists
+    |
+556 -     limits: PolicySchemaLimits,
+556 +     limits: PolicySchemaCharge,
+    |
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `wf-ports` (test "complete_policy_request") due to 1 previous error
+```
+
+Second integrated run189a73/session22262 ->f92f2f EXIT101; actual72 PASS/1 fixture failure.
+```text
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.92s
+     Running tests/complete_policy_request/main.rs (target/debug/deps/complete_policy_request-07e54ca164b05d41)
+
+running 73 tests
+test accounting::complete_replace_caller_freezes_independent_intent_fees ... ok
+test core_patch::core_patch_intent_preserves_unchanged_clear_and_empty_set ... ok
+test core_patch::core_patch_intent_matches_independent_partial_command_literals ... ok
+test core_patch::core_patch_intent_excludes_preparation_and_current_policy ... ok
+test core_patch::core_patch_intent_uses_one_nonrollback_schema_account ... ok
+test accounting::complete_replace_caller_refuses_without_resetting_prior_work ... ok
+test core_patch::core_patch_intent_keeps_partial_backoff_and_state_actions ... ok
+test core_patch::decode::core_patch_decode_keeps_original_identity_distinct_from_equal_merged_values ... ok
+test core_patch::core_patch_intent_retains_original_owners_and_caps ... ok
+test core_patch::frame::core_patch_frame_keeps_original_bytes_borrowed_without_patch_materialization ... ok
+test core_patch::apply::core_patch_parent_replays_before_reconstruction_current_and_context ... ok
+test core_patch::decode::core_patch_decode_matches_frozen_original_commands_and_paid_reproduction ... ok
+test core_patch::frame::core_patch_frame_freezes_same_account_refusal_and_repeat_fees ... ok
+test core_patch::apply::core_patch_parent_preserves_stored_cas_context_and_high_water_order ... ok
+test core_patch::decode::core_patch_decode_preserves_every_header_and_moves_domain_owners ... ok
+test core_patch::frame::core_patch_frame_rejects_noncanonical_partial_and_late_structure ... ok
+test core_patch::frame::core_patch_frame_rederives_intent_before_scope_and_frame_hash ... ok
+test core_patch::decode::core_patch_decode_preserves_each_restoration_debit_repeat_and_prior_peak ... ok
+test core_patch::frame::core_patch_frame_binds_header_scope_request_stamp_and_log_identity ... ok
+test core_patch::gate::core_patch_gate_charges_each_reached_event_before_refusal ... ok
+test core_patch::frame::core_patch_frame_verifies_independent_tag_five_header_and_original_intent ... ok
+test intent::complete_replace_intent_binds_tenant_guard_and_excludes_preparation_fields ... ok
+test core_patch::gate::core_patch_gate_outlives_temporary_verified_header ... ok
+test core_patch::gate::core_patch_gate_keeps_one_account_repeated_outputs_and_prior_peak ... ok
+test intent::complete_replace_intent_has_fixed_minimal_bytes_and_digest ... ok
+test core_patch::decode::core_patch_decode_preserves_presence_and_each_partial_backoff_kind ... ok
+test core_patch::prepare::core_patch_prepare_keeps_partial_identity_distinct_from_equal_merged_values ... ok
+test core_patch::prepare::core_patch_prepare_binds_every_header_operand_to_frozen_bytes ... ok
+test core_patch::prepare::core_patch_prepare_matches_frozen_whole_frames_and_prepared_hashes ... ok
+test intent::complete_replace_intent_keeps_legacy_version_one_construction ... ok
+test core_patch::gate::core_patch_gate_preserves_all_decisions_and_validation_priority ... ok
+test original_reference::original_reference_distinguishes_public_absence_from_stamping_fallback ... ok
+test intent::complete_replace_intent_preserves_every_field_presence_and_order ... ok
+test original_reference::original_reference_hashes_exact_present_encoding_without_default_expansion ... ok
+test core_patch::prepare::core_patch_prepare_preserves_each_same_account_refusal_and_prior_peak ... ok
+test core_patch::apply::core_patch_parent_threads_one_account_through_every_reached_phase ... ok
+test replace::apply::cases::complete_replace_parent_preserves_envelope_cas_type_and_old_api_priorities ... ok
+test core_patch::apply::core_patch_parent_fresh_uses_original_partial_and_complete_atomic_bundle ... ok
+test intent::variants::complete_replace_intent_encodes_scalar_variants_and_widths ... ok
+test replace::apply::complete_replace_parent_installs_frozen_original_bundle_and_resets_omissions ... ok
+test replace::apply::complete_replace_parent_replays_real_accepted_and_content_rejected_outcomes_before_fresh_work ... ok
+test core_patch::prepare::core_patch_prepare_preserves_partial_presence_and_each_backoff_kind ... ok
+test replace::apply::controls::complete_replace_parent_reads_context_active_and_done_before_generation ... ok
+test replace::apply::complete_replace_parent_sequential_replacements_preserve_generations_and_stale_results ... ok
+test intent::variants::complete_replace_intent_preserves_local_empty_presence ... ok
+test core_patch::apply::core_patch_parent_serializes_independent_writers_without_renewing_outcomes ... ok
+test replace::apply::complete_replace_parent_keeps_nonfresh_gate_priority_and_binding ... ok
+test replace::complete_replace_frame_preserves_frozen_minimal_and_complete_original_intents ... ok
+test replace::complete_replace_frame_binds_header_operands_without_binding_assigned_generation ... ok
+test replace::decode::complete_replace_decode_moves_header_and_original_input_owners ... ok
+test replace::complete_replace_frame_keeps_business_invalid_original_fields_available_for_fresh_successor ... ok
+test replace::decode::complete_replace_decode_preserves_business_invalid_fields_without_fresh_authority ... ok
+test replace::decode::complete_replace_decode_reconstructs_frozen_original_owners ... ok
+test replace::complete_replace_frame_retains_each_same_account_phase_and_prior_scratch ... ok
+test replace::decode::complete_replace_decode_retains_same_account_work_and_prior_peak ... ok
+test original_reference::original_reference_preserves_raw_failure_and_continuous_copy_hash_refusals ... ok
+test replace::original_apply::original_current_replace_accepts_zero_and_discards_stored_business_fields ... ok
+test replace::original_apply::original_current_replace_checks_context_and_both_migration_reads_before_exhaustion ... ok
+test replace::original_apply::refusals::original_current_replace_keeps_existing_typed_and_standalone_contracts ... FAILED
+test replace::original_apply::cases::original_current_replace_preserves_reader_origins_and_profile_refusals ... ok
+test replace::original_apply::original_current_replace_preserves_nonfresh_and_real_retained_replays ... ok
+test replace::decode::complete_replace_decode_preserves_presence_and_governance_fields ... ok
+test replace::apply::cases::complete_replace_parent_retains_only_source_business_origins_and_original_history_limit ... ok
+test replace::original_apply::original_current_replace_keeps_decode_cas_and_type_priority ... ok
+test replace::complete_replace_frame_preserves_empty_groups_and_full_governance_widths ... ok
+test replace::decode::complete_replace_decode_preserves_verification_and_reconstruction_refusal_priority ... ok
+test replace::original_apply::refusals::original_current_replace_keeps_one_account_and_owned_results_through_refusals ... ok
+test replace::apply::controls::complete_replace_parent_keeps_one_account_through_all_refusals_and_late_caps ... ok
+test replace::original_apply::original_current_replace_retains_only_incoming_content_and_generation_errors ... ok
+test core_patch::apply::core_patch_parent_classifies_business_and_operational_failures ... ok
+test core_patch::prepare::core_patch_prepare_freezes_profile_scope_raw_and_complete_frame_priority ... ok
+test core_patch::decode::core_patch_decode_refuses_wire_before_original_materialization ... ok
+test replace::complete_replace_frame_enforces_whole_scope_raw_count_and_list_canonicality_priority ... ok
+
+failures:
+
+---- replace::original_apply::refusals::original_current_replace_keeps_existing_typed_and_standalone_contracts stdout ----
+Error: UnsupportedVersion
+
+
+failures:
+    replace::original_apply::refusals::original_current_replace_keeps_existing_typed_and_standalone_contracts
+
+test result: FAILED. 72 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p wf-ports --test complete_policy_request`
+```
+
+First strict target750c6c/session71418 ->607eda EXIT101; four ordinary production lint diagnostics.
+```text
+    Blocking waiting for file lock on build directory
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error: this argument (264 byte) is passed by value, but might be more efficient if passed by reference (limit: 256 byte)
+   --> crates/wf-domain/src/policy/complete/replace_request/original.rs:109:11
+    |
+109 |     view: OriginalCompletePolicyReplaceApplyView<'_, '_, '_>,
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider passing by reference instead: `&OriginalCompletePolicyReplaceApplyView<'_, '_, '_>`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_types_passed_by_value
+    = note: `-D clippy::large-types-passed-by-value` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::large_types_passed_by_value)]`
+
+error: this argument (264 byte) is passed by value, but might be more efficient if passed by reference (limit: 256 byte)
+   --> crates/wf-domain/src/policy/complete/replace_request/original.rs:139:11
+    |
+139 |     view: OriginalCompletePolicyReplaceApplyView<'_, 'raw, '_>,
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider passing by reference instead: `&OriginalCompletePolicyReplaceApplyView<'_, 'raw, '_>`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_types_passed_by_value
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> crates/wf-domain/src/policy/complete/replace_request.rs:153:17
+    |
+153 |       migrations: (
+    |  _________________^
+154 | |         &BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
+155 | |         &BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
+156 | |     ),
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::type_complexity)]`
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> crates/wf-domain/src/policy/complete/replace_request.rs:250:17
+    |
+250 |       migrations: (
+    |  _________________^
+251 | |         &BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
+252 | |         &BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
+253 | |     ),
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+
+error: could not compile `wf-domain` (lib) due to 4 previous errors
+```
+
+Second strict targete064b5/session7953 ->5bdd00 EXIT101; production clean, three ordinary test lint diagnostics.
+```text
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Checking wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error: this function's return value is unnecessary
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:203:1
+    |
+203 | / pub(super) fn outcome(
+204 | |     out: &RetainedOutcome,
+205 | |     frame: &[u8],
+206 | |     body: &[u8],
+207 | |     time: u64,
+208 | |     index: u64,
+209 | | ) -> TestResult {
+    | |_______________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_wraps
+    = note: `-D clippy::unnecessary-wraps` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::unnecessary_wraps)]`
+help: remove the return type...
+    |
+209 - ) -> TestResult {
+209 + ) -> () {
+    |
+help: ...and then remove returned values
+    |
+224 -     Ok(())
+    |
+
+error: this argument (264 byte) is passed by value, but might be more efficient if passed by reference (limit: 256 byte)
+  --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:38:11
+   |
+38 |     view: RawView<'v, '_, '_>,
+   |           ^^^^^^^^^^^^^^^^^^^ help: consider passing by reference instead: `&RawView<'v, '_, '_>`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_types_passed_by_value
+   = note: `-D clippy::large-types-passed-by-value` implied by `-D clippy::pedantic`
+   = help: to override `-D clippy::pedantic` add `#[allow(clippy::large_types_passed_by_value)]`
+
+error: implicit borrow as raw pointer
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:414:52
+    |
+414 |                     assert!(std::ptr::eq(replayed, &outcomes[&request]));
+    |                                                    ^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#borrow_as_ptr
+    = note: `-D clippy::borrow-as-ptr` implied by `-D clippy::pedantic`
+    = help: to override `-D clippy::pedantic` add `#[allow(clippy::borrow_as_ptr)]`
+help: use a raw pointer instead
+    |
+414 |                     assert!(std::ptr::eq(replayed, &raw const outcomes[&request]));
+    |                                                     +++++++++
+
+error: could not compile `wf-ports` (test "complete_policy_request") due to 3 previous errors
+```
+
+Third strict targetfb4272 EXIT101; test-only editing mistake removed one profile-result propagation operator.
+```text
+    Checking wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+error[E0308]: mismatched types
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:342:50
+    |
+342 |         let mut charge = PolicySchemaCharge::new(limits);
+    |                          ----------------------- ^^^^^^ expected `PolicySchemaLimits`, found `Result<PolicySchemaLimits, Box<_>>`
+    |                          |
+    |                          arguments to this function are incorrect
+    |
+    = note: expected struct `PolicySchemaLimits`
+                 found enum `std::result::Result<PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>`
+note: associated function defined here
+   --> crates/wf-domain/src/policy/complete/admission.rs:68:18
+    |
+ 68 |     pub const fn new(limits: PolicySchemaLimits) -> Self {
+    |                  ^^^
+help: use the `?` operator to extract the `std::result::Result<wf_domain::policy::complete::PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>` value, propagating a `Result::Err` value to the caller
+    |
+342 |         let mut charge = PolicySchemaCharge::new(limits?);
+    |                                                        +
+
+error[E0308]: mismatched types
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:347:13
+    |
+343 |         let result = apply(
+    |                      ----- arguments to this function are incorrect
+...
+347 |             limits,
+    |             ^^^^^^ expected `PolicySchemaLimits`, found `Result<PolicySchemaLimits, Box<_>>`
+    |
+    = note: expected struct `PolicySchemaLimits`
+                 found enum `std::result::Result<PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>`
+note: function defined here
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply.rs:37:4
+    |
+ 37 | fn apply<'v>(
+    |    ^^^^^
+...
+ 41 |     limits: PolicySchemaLimits,
+    |     --------------------------
+help: use the `?` operator to extract the `std::result::Result<wf_domain::policy::complete::PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>` value, propagating a `Result::Err` value to the caller
+    |
+347 |             limits?,
+    |                   +
+
+error[E0308]: mismatched types
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:369:46
+    |
+369 |     let mut charge = PolicySchemaCharge::new(limits);
+    |                      ----------------------- ^^^^^^ expected `PolicySchemaLimits`, found `Result<PolicySchemaLimits, Box<_>>`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+    = note: expected struct `PolicySchemaLimits`
+                 found enum `std::result::Result<PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>`
+note: associated function defined here
+   --> crates/wf-domain/src/policy/complete/admission.rs:68:18
+    |
+ 68 |     pub const fn new(limits: PolicySchemaLimits) -> Self {
+    |                  ^^^
+help: use the `?` operator to extract the `std::result::Result<wf_domain::policy::complete::PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>` value, propagating a `Result::Err` value to the caller
+    |
+369 |     let mut charge = PolicySchemaCharge::new(limits?);
+    |                                                    +
+
+error[E0308]: mismatched types
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:375:49
+    |
+375 |     assert_current_bounds(gate, &marks, &frame, limits)?;
+    |     ---------------------                       ^^^^^^ expected `PolicySchemaLimits`, found `Result<PolicySchemaLimits, Box<_>>`
+    |     |
+    |     arguments to this function are incorrect
+    |
+    = note: expected struct `PolicySchemaLimits`
+                 found enum `std::result::Result<PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>`
+note: function defined here
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:492:4
+    |
+492 | fn assert_current_bounds(
+    |    ^^^^^^^^^^^^^^^^^^^^^
+...
+496 |     limits: PolicySchemaLimits,
+    |     --------------------------
+help: use the `?` operator to extract the `std::result::Result<wf_domain::policy::complete::PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>` value, propagating a `Result::Err` value to the caller
+    |
+375 |     assert_current_bounds(gate, &marks, &frame, limits?)?;
+    |                                                       +
+
+error[E0308]: mismatched types
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/cases.rs:376:65
+    |
+376 |     super::refusals::assert_current_nodes(gate, &marks, &frame, limits)?;
+    |     -------------------------------------                       ^^^^^^ expected `PolicySchemaLimits`, found `Result<PolicySchemaLimits, Box<_>>`
+    |     |
+    |     arguments to this function are incorrect
+    |
+    = note: expected struct `PolicySchemaLimits`
+                 found enum `std::result::Result<PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>`
+note: function defined here
+   --> crates/wf-ports/tests/complete_policy_request/replace/original_apply/refusals.rs:552:15
+    |
+552 | pub(super) fn assert_current_nodes(
+    |               ^^^^^^^^^^^^^^^^^^^^
+...
+556 |     limits: PolicySchemaLimits,
+    |     --------------------------
+help: use the `?` operator to extract the `std::result::Result<wf_domain::policy::complete::PolicySchemaLimits, std::boxed::Box<dyn std::error::Error>>` value, propagating a `Result::Err` value to the caller
+    |
+376 |     super::refusals::assert_current_nodes(gate, &marks, &frame, limits?)?;
+    |                                                                       +
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `wf-ports` (test "complete_policy_request") due to 5 previous errors
+```
+
+Final strict targetd262ff/session76792 ->598447 EXIT0.
+```text
+    Checking wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.12s
+```
+
+Final focused target18afcd/session37016 ->c4141a EXIT0;73 actual PASS.
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+   Compiling wf-ports v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-ports)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.71s
+     Running tests/complete_policy_request/main.rs (target/debug/deps/complete_policy_request-07e54ca164b05d41)
+
+running 73 tests
+test accounting::complete_replace_caller_freezes_independent_intent_fees ... ok
+test core_patch::core_patch_intent_preserves_unchanged_clear_and_empty_set ... ok
+test accounting::complete_replace_caller_refuses_without_resetting_prior_work ... ok
+test core_patch::decode::core_patch_decode_keeps_original_identity_distinct_from_equal_merged_values ... ok
+test core_patch::core_patch_intent_matches_independent_partial_command_literals ... ok
+test core_patch::core_patch_intent_retains_original_owners_and_caps ... ok
+test core_patch::core_patch_intent_uses_one_nonrollback_schema_account ... ok
+test core_patch::core_patch_intent_keeps_partial_backoff_and_state_actions ... ok
+test core_patch::core_patch_intent_excludes_preparation_and_current_policy ... ok
+test core_patch::apply::core_patch_parent_replays_before_reconstruction_current_and_context ... ok
+test core_patch::frame::core_patch_frame_keeps_original_bytes_borrowed_without_patch_materialization ... ok
+test core_patch::frame::core_patch_frame_binds_header_scope_request_stamp_and_log_identity ... ok
+test core_patch::decode::core_patch_decode_preserves_every_header_and_moves_domain_owners ... ok
+test core_patch::frame::core_patch_frame_freezes_same_account_refusal_and_repeat_fees ... ok
+test core_patch::apply::core_patch_parent_preserves_stored_cas_context_and_high_water_order ... ok
+test core_patch::decode::core_patch_decode_matches_frozen_original_commands_and_paid_reproduction ... ok
+test core_patch::decode::core_patch_decode_preserves_each_restoration_debit_repeat_and_prior_peak ... ok
+test core_patch::gate::core_patch_gate_outlives_temporary_verified_header ... ok
+test core_patch::frame::core_patch_frame_verifies_independent_tag_five_header_and_original_intent ... ok
+test core_patch::frame::core_patch_frame_rejects_noncanonical_partial_and_late_structure ... ok
+test core_patch::frame::core_patch_frame_rederives_intent_before_scope_and_frame_hash ... ok
+test core_patch::prepare::core_patch_prepare_binds_every_header_operand_to_frozen_bytes ... ok
+test core_patch::gate::core_patch_gate_keeps_one_account_repeated_outputs_and_prior_peak ... ok
+test core_patch::decode::core_patch_decode_preserves_presence_and_each_partial_backoff_kind ... ok
+test core_patch::prepare::core_patch_prepare_keeps_partial_identity_distinct_from_equal_merged_values ... ok
+test core_patch::gate::core_patch_gate_charges_each_reached_event_before_refusal ... ok
+test intent::complete_replace_intent_has_fixed_minimal_bytes_and_digest ... ok
+test intent::complete_replace_intent_binds_tenant_guard_and_excludes_preparation_fields ... ok
+test core_patch::prepare::core_patch_prepare_preserves_each_same_account_refusal_and_prior_peak ... ok
+test intent::complete_replace_intent_keeps_legacy_version_one_construction ... ok
+test core_patch::gate::core_patch_gate_preserves_all_decisions_and_validation_priority ... ok
+test intent::complete_replace_intent_preserves_every_field_presence_and_order ... ok
+test original_reference::original_reference_distinguishes_public_absence_from_stamping_fallback ... ok
+test core_patch::prepare::core_patch_prepare_matches_frozen_whole_frames_and_prepared_hashes ... ok
+test original_reference::original_reference_hashes_exact_present_encoding_without_default_expansion ... ok
+test replace::apply::cases::complete_replace_parent_preserves_envelope_cas_type_and_old_api_priorities ... ok
+test replace::apply::complete_replace_parent_installs_frozen_original_bundle_and_resets_omissions ... ok
+test intent::variants::complete_replace_intent_encodes_scalar_variants_and_widths ... ok
+test core_patch::prepare::core_patch_prepare_preserves_partial_presence_and_each_backoff_kind ... ok
+test replace::apply::complete_replace_parent_keeps_nonfresh_gate_priority_and_binding ... ok
+test replace::apply::complete_replace_parent_replays_real_accepted_and_content_rejected_outcomes_before_fresh_work ... ok
+test core_patch::apply::core_patch_parent_fresh_uses_original_partial_and_complete_atomic_bundle ... ok
+test core_patch::apply::core_patch_parent_threads_one_account_through_every_reached_phase ... ok
+test replace::apply::controls::complete_replace_parent_reads_context_active_and_done_before_generation ... ok
+test intent::variants::complete_replace_intent_preserves_local_empty_presence ... ok
+test replace::complete_replace_frame_binds_header_operands_without_binding_assigned_generation ... ok
+test replace::apply::complete_replace_parent_sequential_replacements_preserve_generations_and_stale_results ... ok
+test replace::complete_replace_frame_preserves_frozen_minimal_and_complete_original_intents ... ok
+test core_patch::apply::core_patch_parent_serializes_independent_writers_without_renewing_outcomes ... ok
+test replace::complete_replace_frame_keeps_business_invalid_original_fields_available_for_fresh_successor ... ok
+test replace::decode::complete_replace_decode_reconstructs_frozen_original_owners ... ok
+test replace::complete_replace_frame_retains_each_same_account_phase_and_prior_scratch ... ok
+test replace::decode::complete_replace_decode_moves_header_and_original_input_owners ... ok
+test replace::decode::complete_replace_decode_preserves_business_invalid_fields_without_fresh_authority ... ok
+test original_reference::original_reference_preserves_raw_failure_and_continuous_copy_hash_refusals ... ok
+test replace::decode::complete_replace_decode_preserves_verification_and_reconstruction_refusal_priority ... ok
+test replace::original_apply::original_current_replace_accepts_zero_and_discards_stored_business_fields ... ok
+test replace::decode::complete_replace_decode_retains_same_account_work_and_prior_peak ... ok
+test replace::original_apply::cases::original_current_replace_preserves_reader_origins_and_profile_refusals ... ok
+test replace::original_apply::original_current_replace_checks_context_and_both_migration_reads_before_exhaustion ... ok
+test replace::original_apply::original_current_replace_preserves_nonfresh_and_real_retained_replays ... ok
+test replace::original_apply::original_current_replace_keeps_decode_cas_and_type_priority ... ok
+test replace::original_apply::refusals::original_current_replace_keeps_existing_typed_and_standalone_contracts ... ok
+test replace::complete_replace_frame_preserves_empty_groups_and_full_governance_widths ... ok
+test replace::apply::cases::complete_replace_parent_retains_only_source_business_origins_and_original_history_limit ... ok
+test replace::decode::complete_replace_decode_preserves_presence_and_governance_fields ... ok
+test replace::original_apply::refusals::original_current_replace_keeps_one_account_and_owned_results_through_refusals ... ok
+test replace::apply::controls::complete_replace_parent_keeps_one_account_through_all_refusals_and_late_caps ... ok
+test core_patch::apply::core_patch_parent_classifies_business_and_operational_failures ... ok
+test replace::original_apply::original_current_replace_retains_only_incoming_content_and_generation_errors ... ok
+test core_patch::prepare::core_patch_prepare_freezes_profile_scope_raw_and_complete_frame_priority ... ok
+test core_patch::decode::core_patch_decode_refuses_wire_before_original_materialization ... ok
+test replace::complete_replace_frame_enforces_whole_scope_raw_count_and_list_canonicality_priority ... ok
+
+test result: ok. 73 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+```
+
+
+Outcome: current source has genuine pre-production absent-API RED, substantive implementation and actual final73 focused tests plus strict target Clippy on macOS. All source/header/body/metadata/value/generation/control/revision/owner and fixed G/P assertions pass at their selected boundaries; initial compile/assertion/lint failures remain explicit. ROOT owns the full workspace checks, shared documentation/ledger/commits and actual peer closure. Linux, full original profiles, public/all-shard/physical reader/atomic storage, original ETF output installation and remaining raw ingress/normalization are still required. Private V2 output is semantic encoding and is deliberately not fed back as source ETF. No native allocation/time/representation gain or full-goal completion is claimed.
