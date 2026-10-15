@@ -158,6 +158,14 @@ facade fixtures reject the new server capability and response helper exports.
 These checks add no dependency or size exemptions and supply no indirect-call
 effect proof. Borrow safety additionally requires compiler-backed trait docs.
 
+ARCH-M2-RECORD-BATCH-PHASES1-CREATE1 additionally applies direct purity checks to
+exact `wf-ports::log::record_batch`, its exact intent child and its phase child
+and phase descendants. The existing test now exercises filesystem/environment
+aliases, async/await, globals, unsafe and macro-hidden effects at those paths;
+neighboring response_backend/phase_backend remain effectful positive controls.
+The added rule has an executed missing-diagnosis RED before repair and focused
+GREEN afterward. The five new exports are also refused by client-facade checks.
+
 ARCH-NEXT-M2-PHYSICAL-FORMATS1-CREATE1 extends the same pure rule to exact
 `wf-storage::state::key` and its descendants. Existing tests cover point/ordered
 paths, nested descendants, filesystem reexports and neighboring effectful key

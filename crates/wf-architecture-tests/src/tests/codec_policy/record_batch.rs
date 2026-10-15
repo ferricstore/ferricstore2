@@ -2,6 +2,7 @@ use super::super::{CheckResult, source_check};
 
 #[test]
 fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
+    assert_record_batch_effect_boundary()?;
     for module in [
         "log::record_batch",
         "log::record_batch::intent",
@@ -25,8 +26,13 @@ fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
         "RecordBatchApplyPlan",
         "RecordBatchApplyDecision",
         "RecordBatchApplyError",
+        "RecordBatchInspection",
+        "FreshRecordBatch",
         "encode_record_batch",
         "decide_record_batch",
+        "prepare_record_batch",
+        "inspect_record_batch",
+        "decide_fresh_record_batch",
         "record_batch_retained_status",
     ] {
         assert!(
@@ -81,5 +87,54 @@ fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
         .iter()
         .any(|finding| finding.contains("approved domain value module"))
     );
+    Ok(())
+}
+
+fn assert_record_batch_effect_boundary() -> CheckResult<()> {
+    for module in [
+        "log::record_batch",
+        "log::record_batch::intent",
+        "log::record_batch::phase",
+        "log::record_batch::phase::nested",
+    ] {
+        assert_eq!(
+            source_check("wf-ports", module, "use std::collections::BTreeMap;")?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::fs;", "standard-library module"),
+            (
+                "use std as hidden; pub use hidden::env;",
+                "standard-library module",
+            ),
+            ("pub async fn effect() {}", "declares async behavior"),
+            ("fn hidden() { future.await; }", "awaits effects"),
+            ("static GLOBAL: u64 = 0;", "declares global state"),
+            ("fn hidden() { unsafe {} }", "unsafe block"),
+            (
+                "fn hidden() { let _ = format!(\"{}\", std::env::var(\"X\")); }",
+                "standard-library module",
+            ),
+        ] {
+            let findings = source_check("wf-ports", module, source)?;
+            assert!(
+                findings.iter().any(|finding| finding.contains(diagnosis)),
+                "{module}: missing {diagnosis}: {findings:?}"
+            );
+        }
+    }
+    for neighbor in [
+        "log::record_batch::response_backend",
+        "log::record_batch::phase_backend",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                neighbor,
+                "use std::fs; pub async fn effect() {} static GLOBAL: u64 = 0;"
+            )?,
+            Vec::<String>::new()
+        );
+    }
     Ok(())
 }

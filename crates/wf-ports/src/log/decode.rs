@@ -14,6 +14,7 @@ use crate::consensus::{PreparedBatchItem, PreparedOperation, PreparedRequest};
 use super::{
     CodecError, CodecLimits, DecodedRequest, claim, common, digest, keys, policy,
     reader::{self, Reader},
+    record_batch,
 };
 
 pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest<'_>, CodecError> {
@@ -65,19 +66,27 @@ pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest
         PreparedOperation::Batch(items)
     };
     reader.finish()?;
+    let request = PreparedRequest {
+        scope,
+        request,
+        intent: header.intent,
+        stamp: header.stamp,
+        operation,
+    };
+    let record_batch_intent = if header.operation_tag == 1 && header.intent.version() == 5 {
+        record_batch::decoded_intent(&request)
+    } else {
+        Err(CodecError::UnsupportedVersion)
+    };
     Ok(DecodedRequest {
-        request: PreparedRequest {
-            scope,
-            request,
-            intent: header.intent,
-            stamp: header.stamp,
-            operation,
-        },
+        request,
         encoded,
         digest: digest(encoded),
         isolation,
         state_keys,
         claim_filters,
+        limits,
+        record_batch_intent,
     })
 }
 

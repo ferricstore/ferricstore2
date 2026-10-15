@@ -11,9 +11,8 @@ use wf_domain::workflow::control::ControlPlan;
 use wf_domain::workflow::indexed::{
     EntryOrder, IndexedBatchItem, IndexedDecision, IndexedGroupView, decide_indexed_batch,
 };
-use wf_domain::workflow::request::gate::{GateDecision, inspect_request};
 use wf_domain::workflow::request::indexed::IndexedRequestView;
-use wf_domain::workflow::request::{RequestValueError, RetainedMetadata, RetainedOutcome};
+use wf_domain::workflow::request::{ClientIntent, RequestValueError, RetainedOutcome};
 use wf_types::version::{LogIdentity, TimestampMillis};
 
 use crate::consensus::{PreparedOperation, PreparedRequest};
@@ -24,8 +23,12 @@ use super::{
 };
 
 mod intent;
+mod phase;
 mod response;
 
+pub use phase::{
+    FreshRecordBatch, RecordBatchInspection, decide_fresh_record_batch, inspect_record_batch,
+};
 pub use response::record_batch_retained_status;
 
 /// Proposed control and indexed operation, without durable-apply authority.
@@ -161,6 +164,65 @@ pub fn encode_record_batch(
     })
 }
 
+/// Prospectively bounds decoded owners before preparing one private mutation batch.
+///
+/// The result provides actual scope/request lookup operands before inspection.
+/// This per-call bound does not include previously returned owners held by callers.
+///
+/// # Errors
+/// Rejects framing, unsupported roots/profiles, intent or prospective workspace.
+pub fn prepare_record_batch(
+    encoded: &[u8],
+    limits: CodecLimits,
+    workspace_limit: usize,
+) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
+    scan::preflight(encoded, limits)?;
+    let mut reader = Reader::new(encoded, limits);
+    let header = common::header(&mut reader)?;
+    if header.operation_tag != 1 {
+        return Err(CodecError::UnsupportedTag.into());
+    }
+    if header.intent.version() != 5 {
+        return Err(CodecError::UnsupportedVersion.into());
+    }
+    let count = common::count(&mut reader)?;
+    admit(
+        decoder_bound(encoded.len(), count, limits)?,
+        workspace_limit,
+    )?;
+    let decoded = decode::read(encoded, limits)?;
+    check_decoded(&decoded, limits, workspace_limit)?;
+    Ok(decoded)
+}
+
+pub(super) fn decoded_intent(request: &PreparedRequest) -> Result<ClientIntent, CodecError> {
+    intent::derive(request).map(|(intent, _)| intent)
+}
+
+fn check_decoded(
+    decoded: &DecodedRequest<'_>,
+    limits: CodecLimits,
+    workspace: usize,
+) -> Result<(), RecordBatchApplyError> {
+    let PreparedOperation::Batch(items) = &decoded.request.operation else {
+        return Err(CodecError::UnsupportedTag.into());
+    };
+    if decoded.request.intent.version() != 5 {
+        return Err(CodecError::UnsupportedVersion.into());
+    }
+    if decoded.limits != limits {
+        return Err(ApplyError::InvalidAuthority.into());
+    }
+    admit(
+        decoder_bound(decoded.encoded.len(), items.len(), limits)?,
+        workspace,
+    )?;
+    if decoded.record_batch_intent? != decoded.request.intent {
+        return Err(RecordBatchApplyError::IntentMismatch);
+    }
+    Ok(())
+}
+
 /// Verifies actual private bytes and invokes exactly one scoped replay gate.
 ///
 /// Only Fresh consults current records/retry/index authority. The returned plan
@@ -178,93 +240,16 @@ pub fn decide_record_batch<'view>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchApplyPlan<'view>, RecordBatchApplyError> {
-    scan::preflight(encoded, limits)?;
-    let mut reader = Reader::new(encoded, limits);
-    let header = common::header(&mut reader)?;
-    if header.operation_tag != 1 {
-        return Err(CodecError::UnsupportedTag.into());
-    }
-    if header.intent.version() != 5 {
-        return Err(CodecError::UnsupportedVersion.into());
-    }
-    let count = common::count(&mut reader)?;
-    admit(
-        decoder_bound(encoded.len(), count, limits)?,
-        workspace_limit,
-    )?;
-    let decoded = decode::read(encoded, limits)?;
-    if intent::derive(&decoded.request)?.0 != decoded.request.intent {
-        return Err(RecordBatchApplyError::IntentMismatch);
-    }
+    let decoded = prepare_record_batch(encoded, limits, workspace_limit)?;
     if view.group.batch.group != view.gate.scope.group() {
         return Err(ApplyError::InvalidAuthority.into());
     }
-    let gate = inspect_request(view.gate, decoded.header(log), limits.admission)?;
-    let control = gate.control();
-    let decision = match gate.decision() {
-        GateDecision::Replay(original) => RecordBatchApplyDecision::Replay(original),
-        GateDecision::IntentConflict => RecordBatchApplyDecision::IntentConflict,
-        GateDecision::Expired => RecordBatchApplyDecision::Expired,
-        GateDecision::LogReplay => RecordBatchApplyDecision::LogReplay,
-        GateDecision::Fresh => {
-            let operation = fresh(
-                &decoded,
-                view.group,
-                retry_policies,
-                EntryOrder {
-                    identity: log,
-                    first_ordinal: 0,
-                },
-                control.execution_time(),
-                limits,
-                workspace_limit,
-            )?;
-            let request = decoded.request;
-            drop(request.operation);
-            drop(decoded.isolation);
-            drop(decoded.state_keys);
-            drop(decoded.claim_filters);
-            let header_bytes = sum(&[
-                request.scope.tenant().as_bytes().len(),
-                request.scope.group().as_bytes().len(),
-                request.scope.recovery().as_bytes().len(),
-                request.request.as_bytes().len(),
-            ])?;
-            admit(
-                sum(&[
-                    encoded.len(),
-                    limits.admission.decision_bytes(),
-                    header_bytes,
-                    531,
-                ])?,
-                workspace_limit,
-            )?;
-            let (response, status) = response::encode(&operation)?;
-            let expires_at = control
-                .execution_time()
-                .checked_add(outcome_ttl_ms)
-                .ok_or(RequestValueError::InvalidExpiry)?;
-            let outcome = RetainedOutcome::new(
-                RetainedMetadata {
-                    scope: request.scope,
-                    request: request.request,
-                    intent: request.intent,
-                    original_position: log,
-                    original_time: control.execution_time(),
-                    expires_at,
-                    status,
-                },
-                1,
-                response,
-                limits.admission,
-            )?;
-            RecordBatchApplyDecision::Fresh {
-                operation,
-                outcome: Box::new(outcome),
-            }
+    match inspect_record_batch(decoded, log, view.gate, limits, workspace_limit)? {
+        RecordBatchInspection::Complete(plan) => Ok(plan),
+        RecordBatchInspection::Fresh(fresh) => {
+            decide_fresh_record_batch(fresh, view.group, retry_policies, outcome_ttl_ms)
         }
-    };
-    Ok(RecordBatchApplyPlan { control, decision })
+    }
 }
 
 fn fresh<'view>(

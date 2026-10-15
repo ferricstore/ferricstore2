@@ -29,6 +29,7 @@ use wf_types::version::{
     AppliedPosition, CommittedTime, Fence, HlcTimestamp, LogIdentity, TimestampMillis,
 };
 
+mod phases;
 mod replay;
 mod source;
 

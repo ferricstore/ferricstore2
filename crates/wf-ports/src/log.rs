@@ -6,6 +6,7 @@ use sha2::{Digest, Sha256};
 use wf_domain::policy::installation::{PolicyCandidate, PolicyLimits, PolicyValue};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::PreparedDigest;
+use wf_domain::workflow::request::ClientIntent;
 use wf_domain::workflow::request::gate::CommittedHeader;
 use wf_types::version::LogIdentity;
 
@@ -24,8 +25,9 @@ mod scan;
 mod writer;
 
 pub use record_batch::{
-    RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, decide_record_batch,
-    encode_record_batch, record_batch_retained_status,
+    FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan,
+    RecordBatchInspection, decide_fresh_record_batch, decide_record_batch, encode_record_batch,
+    inspect_record_batch, prepare_record_batch, record_batch_retained_status,
 };
 
 pub use complete_policy::{
@@ -122,6 +124,8 @@ pub struct DecodedRequest<'a> {
     isolation: Vec<u8>,
     state_keys: Vec<Vec<u8>>,
     claim_filters: Option<claim::ClaimFilterRefs<'a>>,
+    limits: CodecLimits,
+    record_batch_intent: Result<ClientIntent, CodecError>,
 }
 
 impl DecodedRequest<'_> {

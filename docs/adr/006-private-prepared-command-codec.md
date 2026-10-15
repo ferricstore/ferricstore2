@@ -1262,3 +1262,26 @@ separate record fetches. Original sorted bad-first rollback and supplemental
 reversed late refusal remain distinct. Public raw/schema conversion, independent
 bulk modes, physical value references, queries, original setup/profiles, atomic
 durability and complete Linux/macOS acceptance remain required successors.
+
+## Mutation batch preparation and retained inspection phases
+
+ARCH-M2-RECORD-BATCH-PHASES1-CREATE1 factors the existing raw consumer into
+`prepare_record_batch`, `inspect_record_batch` and `decide_fresh_record_batch`.
+The sole decoder captures immutable CodecLimits and the actual V5 derivation
+Result. Generic decoding still succeeds when only that private derivation is
+unsupported; phase inspection preserves the original mathematical error.
+Preparation admits D before materialization; inspection checks actual profile,
+D and intent before the single existing retained gate. Complete drops decoded
+owners and returns the inline plan/original borrow. Fresh alone boxes the same
+owner and retains no query/outcome-map lifetime. Consuming Fresh releases the
+box before indexed work and command/key scratch before the unchanged late bound.
+The old raw API preserves its signature and intent/group/gate error order.
+
+D=4E+B+1024n+2048, Fresh=D+192n+256+B and late=E+B+header_bytes+531 remain
+unchanged. The existing full GateView and complete IndexedGroupView still apply;
+no requested-only map, projection or candidate window becomes authority. Fixed
+Box allocation uses existing allocator semantics. These logical per-call bounds
+do not sum previously held returned owners or establish native latency/RSS.
+Five new tests pass after real missing-API RED; actual source reviews preserve
+the unchanged reducer, encoder and wire grammar. Physical loading, atomic
+publication, point-cohort proof and independent Linux execution remain open.

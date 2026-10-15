@@ -121,7 +121,13 @@ impl Inspector<'_, '_> {
                         || self.module == "state::key"
                         || self.module.starts_with("state::key::")))
                 || (self.context.package == "wf-ports"
-                    && self.module == "log::record_batch::response"))
+                    && (matches!(
+                        self.module.as_str(),
+                        "log::record_batch"
+                            | "log::record_batch::intent"
+                            | "log::record_batch::response"
+                            | "log::record_batch::phase"
+                    ) || self.module.starts_with("log::record_batch::phase::"))))
     }
 
     fn path(&mut self, written: &[String]) {

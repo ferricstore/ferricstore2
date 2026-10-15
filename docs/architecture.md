@@ -850,6 +850,18 @@ wire response, durability, full source parity or native Linux acceptance. See
 [ADR006](adr/006-private-prepared-command-codec.md) and the
 [named architecture decision](reviews/workflow-completion-architecture.md#arch-next-m1-record-batch1-create1).
 
+The selected M2 phase child now exposes bounded raw preparation, one retained
+inspection and consuming Fresh decision separately. The sole decoder captures
+its actual limits and actual V5 intent result; generic decoding preserves its
+existing error contract. Complete releases decoded owners and returns the
+original outcome without a new box. Fresh alone boxes the same decoded owner,
+retains no query/outcome-map borrow, and releases that box before the unchanged
+indexed reducer and late response admission. The legacy raw API delegates while
+preserving intent-before-group-before-gate error order. Both existing complete
+authority views remain required; this supplies no point-only cohort or partial
+index authority. See the
+[phase decision](reviews/workflow-completion-architecture.md#arch-m2-record-batch-phases1-create1).
+
 ## Group apply capability and persisted values
 
 The selected M2 prerequisite groups the neutral transaction capability under
