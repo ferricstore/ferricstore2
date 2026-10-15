@@ -47,7 +47,7 @@ pub(super) fn queried_key(
     Ok(None)
 }
 
-pub(super) fn select<'input>(
+pub(in crate::policy::complete) fn select<'input>(
     input: Raw<'input>,
     name: &[u8],
     charge: &mut PolicySchemaCharge,

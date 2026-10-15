@@ -141,3 +141,63 @@ fn original_retry_input_stays_pure_and_server_side() -> CheckResult<()> {
     }
     Ok(())
 }
+
+#[test]
+fn original_retention_input_stays_pure_and_server_side() -> CheckResult<()> {
+    let module = "policy::complete::retention_input";
+    assert_eq!(
+        source_check(
+            "wf-domain",
+            module,
+            "use crate::policy::complete; use wf_types::version;",
+        )?,
+        Vec::<String>::new()
+    );
+    for (source, diagnosis) in [
+        ("use std::env;", "unclassified standard-library module"),
+        ("pub async fn effect() {}", "declares async behavior"),
+        (
+            "use wf_parity_tests::progress;",
+            "runtime source references M0-only tooling",
+        ),
+    ] {
+        assert!(
+            source_check("wf-domain", module, source)?
+                .iter()
+                .any(|finding| finding.contains(diagnosis))
+        );
+    }
+    for name in [
+        "PolicyRetentionInputRejection",
+        "encode_complete_policy_retention_input_rejection_body",
+        "normalize_complete_policy_retention_override_input",
+    ] {
+        for (package, module, source, diagnosis) in [
+            (
+                "wf-ports",
+                "client",
+                format!("pub use wf_domain::policy::complete::{name};"),
+                "client port facade",
+            ),
+            (
+                "wf-wire",
+                "value",
+                format!("pub use wf_domain::policy::complete::{name};"),
+                "wire may reference only wf_domain::value",
+            ),
+            (
+                "wf-domain",
+                "value",
+                format!("pub use crate::policy::complete::{name};"),
+                "approved domain value module",
+            ),
+        ] {
+            assert!(
+                source_check(package, module, &source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    Ok(())
+}

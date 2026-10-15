@@ -21734,6 +21734,43 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "The executed pure normalized presentation preserves every fifteen scalar response assertion at source34-36/38-42/44/47-51/53. Whole independently specified All and State equality checks retain max-active120000, type retry5/fixed10000/30000/jitter0/failed, type TTL60000/history512, charge_card retry2/payment_failed with inherited fixed backoff and TTL30000/history256. Fixed flow-policy replaces only the generated unique suffix. Real normalized restoration and V2 preparation supply current content with explicit generation1; they do not execute public installation or generation allocation. Original public set/get success replies11/46 and hot-field map-key refutes37/43/52 remain UNLINKED acceptance obligations; the Rust public retention type has only TTL/history fields, which is compile/type-shape evidence rather than executed map serialization. Public options/raw-schema/state validation, configuration capture, authoritative physical reads, source ETF/hash/namespace authority, public maps/wire, atomic durable installation, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup/cleanup and every original execution profile remain omitted. Supplemental absence/unknown state/raw governance/version/indexed borrows, captured defaults and logical resource controls do not close those obligations. Actual tests-first missing-API RED precedes this new presentation implementation; independent Linux and macOS execution and full original workflow parity remain required."
           ]
+        },
+        {
+          "scenario_id": "m1-4b70723c9149fbe8-retention_input_preserves_optional_presence_and_original_type_state_values",
+          "rust_file": "crates/wf-domain/tests/complete_policy/retention_input.rs",
+          "rust_file_sha256": "c75a6b5bed402342e028079e9dc78425a51525982ea852baf3afb5f9a873eda2",
+          "rust_module": "",
+          "rust_function": "retention_input_preserves_optional_presence_and_original_type_state_values",
+          "assertions": [
+            {
+              "source_line": 36,
+              "source_text": "assert policy.retention.ttl_ms == 60_000",
+              "rust_line": 45,
+              "rust_text": "assert_eq!(actual.ttl_ms, Some(u64::try_from(ttl)?));"
+            },
+            {
+              "source_line": 38,
+              "source_text": "assert policy.retention.history_max_events == 512",
+              "rust_line": 46,
+              "rust_text": "assert_eq!(actual.history_max_events, Some(u32::try_from(history)?));"
+            },
+            {
+              "source_line": 42,
+              "source_text": "assert policy.states[\"charge_card\"].retention.ttl_ms == 30_000",
+              "rust_line": 45,
+              "rust_text": "assert_eq!(actual.ttl_ms, Some(u64::try_from(ttl)?));"
+            },
+            {
+              "source_line": 44,
+              "source_text": "assert policy.states[\"charge_card\"].retention.history_max_events == 256",
+              "rust_line": 46,
+              "rust_text": "assert_eq!(actual.history_max_events, Some(u32::try_from(history)?));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed borrowed optional retention normalization preserves original type TTL60000/history512 and charge_card TTL30000/history256 inputs; the two direct scalar macros execute for both rows and link only source36/38/42/44. A separate original TTL5000/history_hot_max_events3 recipe links source140 to its real caller reason and exact body. Existing Copy RetentionOverride replaces scalar maps, without proving public map serialization or hot-field absence. Public set/get/default projection, authoritative installation, source error tuple, whole raw flow/state ingress, ETF sizing/emission, physical atomic publication and original FlowTest async:false, flow/global_state tags, 120000 timeout, shards/FLUSHDB/cleanup and all runtime profiles remain required. Captured C100/C10 with history50 and exact body10, changed later capture and dropped donors execute as additional pure controls, but source b0c4 line684 is a pattern assignment and its generation1/decoded-value assertion668 and ETS assertion692 remain UNLINKED. Neighbor TTL5000/history9 does not link source3e46 creation/inheritance/store assertions. Visible descriptor bounds do not prove hidden term bytes, arbitrary map identity or parser correspondence. Real tests-only missing-API RED preceded production; all86 policy controls and strict target lint actually pass on macOS. These post-GREEN ledger anchors preserve every older record and limitation, certify only the represented field/error components and establish neither whole source-case/full workflow parity nor independent Linux acceptance."
+          ]
         }
       ]
     },
@@ -21745,7 +21782,33 @@
     {
       "source_declaration_id": "bb1cff7dbab51d19",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-bb1cff7dbab51d19",
+          "rust_file": "crates/wf-domain/tests/complete_policy/retention_input.rs",
+          "rust_file_sha256": "c75a6b5bed402342e028079e9dc78425a51525982ea852baf3afb5f9a873eda2",
+          "rust_module": "",
+          "rust_function": "retention_input_preserves_ttl_internal_history_and_captured_error_order",
+          "assertions": [
+            {
+              "source_line": 140,
+              "source_text": "assert {:error, \"ERR flow retention history_hot_max_events is internal\"} =",
+              "rust_line": 216,
+              "rust_text": "assert_eq!(result, Err(Reason::HistoryHot));"
+            },
+            {
+              "source_line": 140,
+              "source_text": "assert {:error, \"ERR flow retention history_hot_max_events is internal\"} =",
+              "rust_line": 217,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed borrowed optional retention normalization preserves original type TTL60000/history512 and charge_card TTL30000/history256 inputs; the two direct scalar macros execute for both rows and link only source36/38/42/44. A separate original TTL5000/history_hot_max_events3 recipe links source140 to its real caller reason and exact body. Existing Copy RetentionOverride replaces scalar maps, without proving public map serialization or hot-field absence. Public set/get/default projection, authoritative installation, source error tuple, whole raw flow/state ingress, ETF sizing/emission, physical atomic publication and original FlowTest async:false, flow/global_state tags, 120000 timeout, shards/FLUSHDB/cleanup and all runtime profiles remain required. Captured C100/C10 with history50 and exact body10, changed later capture and dropped donors execute as additional pure controls, but source b0c4 line684 is a pattern assignment and its generation1/decoded-value assertion668 and ETS assertion692 remain UNLINKED. Neighbor TTL5000/history9 does not link source3e46 creation/inheritance/store assertions. Visible descriptor bounds do not prove hidden term bytes, arbitrary map identity or parser correspondence. Real tests-only missing-API RED preceded production; all86 policy controls and strict target lint actually pass on macOS. These post-GREEN ledger anchors preserve every older record and limitation, certify only the represented field/error components and establish neither whole source-case/full workflow parity nor independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "6ad2cd82f0217fe3",

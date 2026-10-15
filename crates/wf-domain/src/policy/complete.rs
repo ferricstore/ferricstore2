@@ -27,6 +27,7 @@ mod replace_request;
 mod request;
 mod resolution;
 mod restoration;
+mod retention_input;
 mod retry_input;
 mod rules;
 mod validation;
@@ -88,6 +89,10 @@ pub use request::{
 };
 pub use resolution::{ResolvedGovernance, resolve_governance};
 pub use restoration::{restore_complete_policy, validate_stored_complete_policy};
+pub use retention_input::{
+    PolicyRetentionInputRejection, encode_complete_policy_retention_input_rejection_body,
+    normalize_complete_policy_retention_override_input,
+};
 pub use retry_input::{
     PolicyRetryInputRejection, RawPolicyRetryValue, normalize_complete_policy_retry_input,
     normalize_complete_policy_retry_override_input,

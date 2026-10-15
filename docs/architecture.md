@@ -657,14 +657,16 @@ Original full-flow/state option order, public/physical operations, complete
 runtime profiles and independent Linux/macOS acceptance remain required.
 
 
-## Selected original retention input normalization
+## Implemented original retention input normalization
 
 A-NEXT-M1-POLICY-RETENTION-INGRESS1-CREATE1 selects one private
 `complete/retention_input.rs` and two children of the existing policy test target.
 The optional normalizer reuses the existing borrowed retry-value vocabulary and
 Copy retention override, with one four-variant caller diagnosis and a separate
-exact-body encoder. Tests-first authoring is selected; implementation and actual
-source review remain pending. No dependency or module-rule exception is added.
+exact-body encoder. Six meaningful tests preceded production with genuine
+missing-API RED independently reproduced by Root. All86 policy controls and
+strict target lint pass; actual source/mapping review is mutually closed without
+blockers. No dependency or module-rule exception is added.
 
 The existing private selector widens only to `policy::complete` and is reexported
 only to its parent; its body and old retry fees remain unchanged. Retention owns

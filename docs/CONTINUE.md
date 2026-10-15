@@ -4,7 +4,7 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS run passes 532 Rust tests and four compile-fail
+The latest whole-workspace macOS run passes 539 Rust tests and four compile-fail
 doc tests. The reviewed retry checkpoint is `a969309`, following original-current Replace
 `2759262`, reader/source603 `bbeba0d` and MAX-generation supplement `7f3e21a`.
 Strict lint, architecture, documentation and reference/progress checks
@@ -184,10 +184,18 @@ The latest full wrapper passes all source stages and stops only at the default
 RustSec GitHub DNS refresh. Reciprocal source and mapping review is closed
 without blockers.
 Remaining raw ingress groups, ETF output, public/physical/profile and both-host
-obligations remain required. The next selected component is original retention
-override normalization and captured-limit diagnostics. Exact architecture
-creation consultation is recorded; meaningful tests precede implementation.
-No new full-default resolver or generic raw-term parser is selected.
+obligations remain required. Original retention override normalization and
+captured-limit diagnostics are now implemented after independently reproduced
+missing-API RED. Six new tests pass with all80 previous policy controls; strict
+target lint passes with no postproduction oracle changes. The pure normalizer
+returns existing Copy fields without allocation, while the separate encoder
+owns one fallibly reserved final Vec. Two narrow counterpart records validate
+60 source declarations/67 counterparts/258 assertion links and preserve all65
+older records. Captured-limit StateMachine/ETS and creation/inheritance source
+assertions remain unlinked. The complete macOS wrapper passes539 Rust tests,
+four compile-fail docs and all source stages, then stops at the default RustSec
+GitHub DNS refresh. Actual source/mapping review is mutually closed without
+blockers; no full-default resolver or generic term parser is added.
 
 The separate Elixir bugfix worktree now has reviewed checkpoint106993c6 for the
 existing TermCodec helper and its tests. A header walk rejects the reproduced

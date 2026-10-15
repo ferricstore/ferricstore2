@@ -10,6 +10,8 @@ use super::{
 
 mod value;
 
+pub(super) use value::select;
+
 /// Borrowed original retry input classes, without raw-parser authority.
 ///
 /// `Keyword` supplies an already-classified proper atom-key pair list. `Other`

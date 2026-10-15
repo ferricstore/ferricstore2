@@ -938,7 +938,7 @@ Original whole-flow ingress order, other raw groups, ETF output/sizing, public
 and atomic physical publication, complete profiles and both OS remain required.
 
 
-## Selected original retention input normalization
+## Implemented original retention input normalization
 
 A-NEXT-M1-POLICY-RETENTION-INGRESS1-CREATE1 selects one private production child,
 two existing-target test children, one caller diagnostic and two APIs. It reuses
@@ -964,7 +964,9 @@ TTL1 single row2404/P64 and history50 with C100 gives2832/P64; C10 rejects at270
 Fixed diagnostic fees are311/315/309; C1/17/1000000 history bodies cost318/320/330.
 These expectations were frozen before production and are not native measurements.
 
-Meaningful tests precede missing-API RED and substantive implementation. Actual
-execution/source review remain pending. No retained status, authority token,
-full-default/resolved API or dependency is selected. Original whole-flow/public/
-ETF/physical/setup/profile and independent both-OS acceptance remain required.
+Six meaningful tests preceded substantive implementation with genuine missing-API
+RED independently reproduced by Root. All86 policy controls and strict target
+lint pass without postproduction oracle changes. Actual source/mapping review
+is mutually closed without blockers. No retained status, authority token,
+full-default/resolved API or dependency is selected. Original whole-flow/public/ETF/physical/setup/profile
+and independent both-OS acceptance remain required.

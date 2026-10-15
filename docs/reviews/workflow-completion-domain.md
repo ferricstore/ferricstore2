@@ -38051,3 +38051,316 @@ Nil=[128,128,128,128], P0, sum512; Atomnil=[128,128,3,128,128], P0, sum515. Empt
 One hotNil row: preflight+root=[128,128,128,22,156,172,128,128,128] ends1118; P64; TTL scan=[128,150,156] ends1552; hot scan=[128,150,172] ends2002 then returnsHistoryHot, no history or final metadata. One history50 row: preflight+root=[128,128,128,18,152,168,164,128,128,128] ends1270; P64; TTL=[128,146,152] ends1696; hot=[128,146,168] ends2138; history+validator=[128,146,164,128] ends2704. C10 returns History{maximum:10}; C100 then pays metadata128 and succeeds2832. Both raw input rows and C captures are literal, not a result-derived oracle.
 
 Original type/state two-row TTL/history: preflight+root=[128,128,128,6,140,128,128,128,18,152,168,164,128,128,128] ends1800; P64; TTL+validator=[128,134,140,146,152,128] ends2628; hot=[128,134,156,146,168] ends3360; history+validator=[128,134,152,146,164,128] ends4212; metadata128 ends4340. Original TTL5000/hot3: preflight+root=[128,128,128,6,140,128,128,128,22,156,172,128,128,128] ends1648; P64; TTL+validator=[128,134,140,150,156,128] ends2484; hot=[128,134,156,150,172] ends3224 and rejects before history. Fixed literal body lengths55/59/53 give independent encoder streams[128,183]/[128,187]/[128,181], totals311/315/309. History C1/17/1000000 streams[128,1,189]/[128,2,190]/[128,7,195] give318/320/330; the digit event is a fresh prospective debit before writing decimal bytes. Every body encoder preserves the original normalizer's or prior operation's peak.
+
+
+### DOC-NEXT-M1-POLICY-RETENTION-INGRESS1-TESTS-RED1 — actual meaningful tests before production
+
+I ACTUALLY read the complete9967B A-CREATE1 at architecture1529514/SHA dcc8dd9df442d1f7973adc414c81ed64020c9fd1125e271edbff01fe3fbdf39c before creating these artifacts. ROOT explicitly assigned only the selected two test children+22B main EOF, after proving all selected paths absent against831e3c3/a969309. I authored all six substantive selected tests BEFORE any retention production/seam/facade/checker change. No production stub or source gate was manufactured. ROOT owns the independent RED reproduction and later release.
+
+Final actual manifest: crates/wf-domain/tests/complete_policy/retention_input.rs13484B/394LF/SHA c75a6b5bed402342e028079e9dc78425a51525982ea852baf3afb5f9a873eda2; child retention_input/refusals.rs16451B/489LF/SHA7a237dc98c31533c471fba2689cfa179c9080e40a68737450fc79d77821d8c84. Functions stay≤100 (initial maxima74/70 before later short neighbor helper); both files≤600. Existing main preserves every old1960B/SHA147dcd9c05948fb429b841b988af0885dfb341c71169ce93ccce3282e3dc8477 byte plus ONLY22B literal "\nmod retention_input;\n", new1982B/SHA949017b4ef2622cc6473e101194d0f9fd8f04312dfa1adce69c7d7a9d67d22b6. The sole selected production retention_input.rs remains ABSENT after final RED. Both old retry source files remain byte-exact HEAD, no selector visibility/reexport has been edited. No extra model/alias/helper file/dependency exists.
+
+All six identities and source duties are meaningful: optional presence/type-state outputs; atom priority/keyword-last; TTL→hot→history error order; captured limits/body ownership; visible bounds/every reached debit; one continuous account/old contracts. They use real original TTL60000/history512, state30000/256, neighbor5000/9 and forbiddenTTL5000/hot3; C100 accepts50, C10 rejects50 and its diagnostic still encodes10 after later local capture100 and dropped owned raw-key storage. Fixed/dynamic bodies are literal source strings. TTL/history every invalid scalar class includes Nil/Atomnil/negative/zero/out-of-range/i128 edges/binary/atom/emptyMap/emptyKeyword/Other and valid exact neighbors. Both key classes/orders, valid atom over Nil/out-of-range binary and invalid nonnil atom over valid binary are exact whole-output assertions. Both API mismatched profiles are no-debit. Captured C0/1000001/u32MAX fails atG128/P0 for Nil/Atomnil/Other and forged history body maxima, BEFORE any semantic nil success.
+
+Every positive event of the independently frozen Nil/Atomnil/empty/TTL/hot/history/original-two-row/body streams is refused at prospective-total-minus-one with exact priorG/P. Arithmetic is from RETENTION1/VECTORS1 and agreed A/P source traces, not candidate counters. Bounds include exact/+1 depth/node/text, flat and NONEMPTY shared aliases counted per occurrence, duplicate queried TTL before oversized duplicate value and visible oversized shadowed input. Real restore1928/P64 and indexed4784/P192 owners remain held; empty results preserve peaks/repeats. Two C17 body Vecs remain live through third final reserve refusal at960/max959 retainingG770/P0. Existing raw retry nil512/full646 remain controls for the upcoming visibility-only selector seam. No normalization/body error is converted to retained status/public authority.
+
+Truthful preproduction tooling chronology: an initial rustfmt invocation after only the parent existed could not resolve the not-yet-created refusals child; after that selected child was created, rustfmt succeeded normally. First actual cargo target had the required absent exports AND an ordinary warning for two unused child imports (PolicySchemaLimits/normalized), so it is NOT the clean RED receipt. Removing ONLY those unused imports yielded clean6e43d0. Same-duty preproduction coverage improvements then added invalid C on Nil/Atomnil (deab35) and exact positive/mirrored shadow outputs plus map/keyword invalid numeric classes (8455ef). No expected input/body/fee was rewritten. Early parent346/be0eb217, child487/ee8ace3d then unused-import487/1be49170 and added capture489/7a237dc9 remain distinct source epochs. All code is still absent; these are authored-source refinements before implementation, not retrospective RED.
+
+The command in EVERY actual target run was `env CARGO_BUILD_WARNINGS=deny cargo +1.99.0 test --locked -p wf-domain --test complete_policy`. Complete returned output follows; each session's chunks are concatenated exactly:
+
+**Initial target c5ac91/session42484 →c410cd EXIT101 (one E0432 plus two unused imports warning)**
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::PolicyRetentionInputRejection`, `wf_domain::policy::complete::encode_complete_policy_retention_input_rejection_body`, `wf_domain::policy::complete::normalize_complete_policy_retention_override_input`
+ --> crates/wf-domain/tests/complete_policy/retention_input.rs:6:5
+  |
+6 |     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |     -----------------------------^^^^^^^^^^
+  |     |
+  |     no `PolicyRetentionInputRejection` in `policy::complete`
+7 |     encode_complete_policy_retention_input_rejection_body as encode,
+  |     -----------------------------------------------------^^^^^^^^^^
+  |     |
+  |     no `encode_complete_policy_retention_input_rejection_body` in `policy::complete`
+8 |     normalize_complete_policy_retention_override_input as normalize,
+  |     --------------------------------------------------^^^^^^^^^^^^^
+  |     |
+  |     no `normalize_complete_policy_retention_override_input` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+6 -     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+6 +     PolicyRetryInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |
+help: a similar name exists in the module
+  |
+7 -     encode_complete_policy_retention_input_rejection_body as encode,
+7 +     encode_complete_policy_replace_rejection_body as encode,
+  |
+help: a similar name exists in the module
+  |
+8 -     normalize_complete_policy_retention_override_input as normalize,
+8 +     normalize_complete_policy_retry_override_input as normalize,
+  |
+
+warning: unused imports: `PolicySchemaLimits` and `normalized`
+ --> crates/wf-domain/tests/complete_policy/retention_input/refusals.rs:4:56
+  |
+4 |     Error, Key, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits, Raw, Reason,
+  |                                                        ^^^^^^^^^^^^^^^^^^
+5 |     RetentionOverride, TestResult, encode, limits, normalize, normalized,
+  |                                                               ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+For more information about this error, try `rustc --explain E0432`.
+error: `wf-domain` (test "complete_policy") generated 1 warning
+error: warnings are denied by `build.warnings` configuration
+```
+
+**After unused-import-only removal, 6e43d0 EXIT101 (clean one E0432)**
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::PolicyRetentionInputRejection`, `wf_domain::policy::complete::encode_complete_policy_retention_input_rejection_body`, `wf_domain::policy::complete::normalize_complete_policy_retention_override_input`
+ --> crates/wf-domain/tests/complete_policy/retention_input.rs:6:5
+  |
+6 |     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |     -----------------------------^^^^^^^^^^
+  |     |
+  |     no `PolicyRetentionInputRejection` in `policy::complete`
+7 |     encode_complete_policy_retention_input_rejection_body as encode,
+  |     -----------------------------------------------------^^^^^^^^^^
+  |     |
+  |     no `encode_complete_policy_retention_input_rejection_body` in `policy::complete`
+8 |     normalize_complete_policy_retention_override_input as normalize,
+  |     --------------------------------------------------^^^^^^^^^^^^^
+  |     |
+  |     no `normalize_complete_policy_retention_override_input` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+6 -     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+6 +     PolicyRetryInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |
+help: a similar name exists in the module
+  |
+7 -     encode_complete_policy_retention_input_rejection_body as encode,
+7 +     encode_complete_policy_replace_rejection_body as encode,
+  |
+help: a similar name exists in the module
+  |
+8 -     normalize_complete_policy_retention_override_input as normalize,
+8 +     normalize_complete_policy_retry_override_input as normalize,
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+**After preproduction Nil/Atomnil invalid-capture controls, deab35 EXIT101 (clean one E0432)**
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::PolicyRetentionInputRejection`, `wf_domain::policy::complete::encode_complete_policy_retention_input_rejection_body`, `wf_domain::policy::complete::normalize_complete_policy_retention_override_input`
+ --> crates/wf-domain/tests/complete_policy/retention_input.rs:6:5
+  |
+6 |     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |     -----------------------------^^^^^^^^^^
+  |     |
+  |     no `PolicyRetentionInputRejection` in `policy::complete`
+7 |     encode_complete_policy_retention_input_rejection_body as encode,
+  |     -----------------------------------------------------^^^^^^^^^^
+  |     |
+  |     no `encode_complete_policy_retention_input_rejection_body` in `policy::complete`
+8 |     normalize_complete_policy_retention_override_input as normalize,
+  |     --------------------------------------------------^^^^^^^^^^^^^
+  |     |
+  |     no `normalize_complete_policy_retention_override_input` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+6 -     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+6 +     PolicyRetryInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |
+help: a similar name exists in the module
+  |
+7 -     encode_complete_policy_retention_input_rejection_body as encode,
+7 +     encode_complete_policy_replace_rejection_body as encode,
+  |
+help: a similar name exists in the module
+  |
+8 -     normalize_complete_policy_retention_override_input as normalize,
+8 +     normalize_complete_policy_retry_override_input as normalize,
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+**Final complete source epoch, 8455ef EXIT101 (clean one E0432)**
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+error[E0432]: unresolved imports `wf_domain::policy::complete::PolicyRetentionInputRejection`, `wf_domain::policy::complete::encode_complete_policy_retention_input_rejection_body`, `wf_domain::policy::complete::normalize_complete_policy_retention_override_input`
+ --> crates/wf-domain/tests/complete_policy/retention_input.rs:6:5
+  |
+6 |     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |     -----------------------------^^^^^^^^^^
+  |     |
+  |     no `PolicyRetentionInputRejection` in `policy::complete`
+7 |     encode_complete_policy_retention_input_rejection_body as encode,
+  |     -----------------------------------------------------^^^^^^^^^^
+  |     |
+  |     no `encode_complete_policy_retention_input_rejection_body` in `policy::complete`
+8 |     normalize_complete_policy_retention_override_input as normalize,
+  |     --------------------------------------------------^^^^^^^^^^^^^
+  |     |
+  |     no `normalize_complete_policy_retention_override_input` in `policy::complete`
+  |
+help: a similar name exists in the module
+  |
+6 -     PolicyRetentionInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+6 +     PolicyRetryInputRejection as Reason, PolicySchemaError, RawPolicyRetryValue as Raw,
+  |
+help: a similar name exists in the module
+  |
+7 -     encode_complete_policy_retention_input_rejection_body as encode,
+7 +     encode_complete_policy_replace_rejection_body as encode,
+  |
+help: a similar name exists in the module
+  |
+8 -     normalize_complete_policy_retention_override_input as normalize,
+8 +     normalize_complete_policy_retry_override_input as normalize,
+  |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `wf-domain` (test "complete_policy") due to 1 previous error
+```
+
+Disposition: final8455ef EXIT101 is conventional genuine tests-only missing-API RED, exactly one E0432 naming the three selected absent exports, zero assertions and zero other diagnostics. Production was checked absent after final command. ROOT may independently reproduce these exact bytes before substantive production release; no new body/helper/approval gate is added. This macOS compile evidence is not runtime assertions/Linux/original public/ETF/store/profile or full-goal acceptance.
+
+
+### DOC-NEXT-M1-POLICY-RETENTION-INGRESS1-GREEN1 — first substantive implementation passes
+
+ROOT independently reproduced clean final-byte tests-only RED67b6a2, exactly oneE0432/three absent exports/zero assertions, and preimage75d2d5 bound final394/c75a6b5b +489/7a237dc9, absent production and exact old facade/retry/checker/main prefix. ROOT then explicitly released ONLY this writer's new retention_input.rs plus the already-selected visibility/reexport seam. I substantively authored that one production file and changed exactly the private selector visibility/reexport; ROOT integrated facade/checker separately. First actual compile/assertion run PASSED86/86 (all80 old+six new). First strict library+target Clippy PASSED. There was NO postproduction failed compilation, assertion, lint or expected-input/output/work correction in this epoch.
+
+Frozen manifest: crates/wf-domain/src/policy/complete/retention_input.rs10873B/314LF/SHAae24c7e834a92cb1e2524001b424918855ea137e6469c7270cf137792e1dc24a; existing retry_input.rs10687B/291LF/SHAf726f19f9c300dd8713c25ba95a783ce7c74925b3cf87a39824e89df101f740f; existing value.rs7507B/240LF/SHA4fc0a9457ee3443141a46fb4a74be9aa70b455df918fd6167e08f1be2f16113c. Exact whole inverses: remove only newline+pub(super) use value::select+newline from the parent, or reverse pub(in crate::policy::complete) fn select→pub(super) fn select in the child, and both ENTIRE old files recover HEAD byte-exact. The actual select signature/body, all eight-name retry preflight and old public API results/fees remain unchanged. No new alias/type/model/path beyond the selected enum/module is added.
+
+Tests remain EXACT to genuine RED: parent13484B/394LF/SHA c75a6b5bed402342e028079e9dc78425a51525982ea852baf3afb5f9a873eda2; child16451B/489LF/SHA7a237dc98c31533c471fba2689cfa179c9080e40a68737450fc79d77821d8c84. Existing main still preserves old1960B plus only selected22B EOF. All production≤400, tests≤600, function spans≤100 (new production50/55 maximum public bodies); rustfmt check on the three owned production paths and both tests exits0, and git diff --check exits0. No additional tests/source/probe/benchmark or shared-file edits were made by this writer.
+
+Actual implementation owns one bounded optional-source walk. Profile match precedes entry128 and capturedC1..1M validation, even Nil. Whole represented key/value tree preflight pays before bounds, counts every alias, checks text before text debit and per-Map queried duplicate before that value; only retention's own three-name mask is new. Semantic root handles Nil/shape before P64; the actual shared selector pays fresh full scans for TTL, forbidden hot PRESENCE and history in exact reached order. Numeric positivity/range precedes conversion; absent fields stayNone, empty collectionSome(empty), atom invalid/nil shadows binary and Keyword last wins. Normalization has no allocation, default merge, environment/current/retained authority, old business admission or second pass. It returns existing Copy RetentionOverride; captured history reasons own only the original u32 maximum and no input/config lifetime. Both input and diagnostic invalid maxima remain operational atG128, not caller errors.
+
+Only the independent diagnostic encoder constructs a Vec: static source prefixes or the fixed60-byte history prefix, validatedC, prospective digit work then128+whole length, bounded[0;7] decimal writes, one fallible final reservation and direct prefix/digit copy. No intermediate String/tree/Vec/Box/default target exists. Earlier G/P persist on all work failures; normalizer P64 is max with prior peak, encoder P0 never refunds it. Held first+second Vecs are reobserved after third final reserve refusal. Logical counters/one reservation are not native capacity/allocation-call/stack/latency/RSS/OOM/Drop guarantees or cross-host gains.
+
+Independent preproduction RETENTION1/VECTORS1 literals execute unchanged: Nil512/Atomnil515, empty896/P64, TTL2404, hotNil2002, history50 success2832 or C10 rejection2704, exact type/state pair4340, original5000/hot3 reason3224. Every declared positive prefix, including encoded fixed311/315/309 and history318/320/330, is refused prospectively before the corresponding work with exact retained G/P. Descriptor depth/node/byte/duplicate and nonempty alias streams, real1928/P64 and4784/P192 owners/repeats, immutable capture and two body successes before third refusal all pass without SUT-derived oracle changes. Original raw inputs/error causes remain components only; no public/set/get/StateMachine/ETS/ETF/source setup/physical/profile/Linux or full-case proof follows.
+
+I also ACTUALLY read every paragraph of the full PERF retention CREATE1 (displayed1267899+11769 B, excluding only its leading newline) and full A9967 before implementation; source, bounds, body, lifetime and tariff findings agree. Actual final TEST acceptance from ARCH/PERF is separate normal review, not an inert/body or extra native gate. ROOT owns broader workspace runs, shared docs/mapping/checkpoint and the remaining full M1–M8 goal.
+
+Actual command `env CARGO_BUILD_WARNINGS=deny cargo +1.99.0 test --locked -p wf-domain --test complete_policy`, aefa2e/session11392→b99c8f EXIT0. Complete output:
+
+```text
+   Compiling wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.18s
+     Running tests/complete_policy/main.rs (target/debug/deps/complete_policy-412f381fdad010ab)
+
+running 86 tests
+test encoding_malformed::v2_rejects_every_truncation_and_trailing_byte ... ok
+test encoding_accounting::v2_admits_each_copy_and_streams_verify_without_second_output ... ok
+test encoding_vectors::source_policy_generation_stops_at_exact_migration_score_boundary ... ok
+test encoding_malformed::v2_rejects_unknown_versions_tags_and_option_bytes ... ok
+test encoding_vectors::v2_all_fields_round_trip_without_losing_presence ... ok
+test encoding_vectors::v2_minimal_literal_bytes_preserve_the_v1_format ... ok
+test encoding_accounting::v2_prepare_verify_decode_share_one_nonrollback_charge ... ok
+test indexed_input::indexed_input_normalizes_frozen_original_policy_names_and_presence ... ok
+test admission::normalized_schema_covers_source_scalar_and_circuit_extremes ... ok
+test encoding_vectors::v2_lists_retain_order_and_maps_retain_byte_order ... ok
+test encoding_accounting::v2_round_trip_compares_values_before_original_owner_descriptors ... ok
+test indexed_input::indexed_input_preserves_all_source_diagnostics_and_untouched_inputs ... ok
+test indexed_input::indexed_input_preserves_nested_meta_local_priority_and_nil_atom_semantics ... ok
+test indexed_input::refusals::indexed_input_keeps_repeated_outputs_and_prior_peak_on_one_account ... ok
+test indexed_input::indexed_input_trims_only_source_whitespace_before_bounds_and_deduplication ... ok
+test install::complete_replace_keeps_one_nonrollback_schema_account ... ok
+test install::complete_replace_allocates_stored_or_migration_generation ... ok
+test admission::opaque_names_and_canonical_metadata_keep_separate_rules ... ok
+test install::complete_replace_cas_preserves_existing_policy ... ok
+test install::complete_replace_resets_omissions_and_retains_present_empty ... ok
+test encoding_accounting::v2_current_profiles_and_resource_errors_remain_distinct ... ok
+test install::complete_replace_preserves_standalone_cas_before_current_validation ... ok
+test admission::shared_schema_work_exact_boundary_and_second_call_do_not_reset ... ok
+test original_entry::original_entry_keeps_original_bytes_after_index_cleanup ... ok
+test encoding_vectors::v2_versions_and_generations_keep_distinct_integer_domains ... ok
+test encoding_malformed::v2_late_structural_refusal_precedes_materialization ... ok
+test install::complete_replace_rechecks_current_type_bytes_and_generation ... ok
+test encoding_malformed::v2_rejects_overlong_counts_lengths_and_disordered_keys ... ok
+test encoding_vectors::v2_error_class_bytes_refuse_before_semantic_materialization ... ok
+test original_entry::original_entry_binds_type_and_preserves_read_result_origin ... ok
+test original_entry::original_entry_integrates_old_key_short_circuit_and_atom_map_preference ... ok
+test original_retry_keys::refusals::original_retry_keys_preserves_one_account_refusals_and_prior_peak ... ok
+test original_retry_keys::original_retry_keys_detects_both_old_names_without_revalidating_content ... ok
+test original_entry::original_entry_preserves_original_shape_generation_and_consumption_errors ... ok
+test original_retry_keys::original_retry_keys_keeps_map_order_and_descriptor_scope_explicit ... ok
+test admission::all_count_and_byte_occurrences_precede_duplicate_work ... ok
+test original_retry_keys::original_retry_keys_preserves_guarded_state_retry_fallback ... ok
+test patch::core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account ... ok
+test original_retry_keys::original_retry_keys_preserves_top_atom_precedence_and_short_circuit ... ok
+test patch::core_patch_preserves_source_guard_and_late_high_water_priorities ... ok
+test patch::core_patch_uses_contextual_history_limits_in_source_order ... ok
+test patch::core_patch_retains_independent_type_and_state_fields ... ok
+test presentation::presentation_distinguishes_absent_all_and_requested_state_shapes ... ok
+test presentation::presentation_preserves_pinned_type_and_state_response_defaults ... ok
+test original_entry::original_entry_accepts_generation_zero_and_arbitrary_maps_without_admission ... ok
+test presentation::presentation_borrows_indexed_version_and_each_backoff_kind ... ok
+test presentation::presentation_preserves_whole_raw_governance_presence_and_fallback ... ok
+test patch::core_patch_clears_optional_groups_and_deletes_states ... ok
+test presentation::presentation_uses_captured_public_defaults_without_history_clamp ... ok
+test presentation::refusals::presentation_preserves_profile_authority_and_continuous_account_refusals ... ok
+test presentation::refusals::presentation_charges_each_declared_state_before_reserve_and_emission ... ok
+test replace_content::refusals::replace_content_charges_response_construction_and_keeps_old_contracts ... ok
+test resolution::default_type_state_merges_all_known_fields ... ok
+test resolution::running_resolution_comes_only_from_complete_bound_content ... ok
+test retention_input::refusals::retention_input_keeps_one_account_prior_peak_and_old_contracts ... ok
+test patch::core_patch_merges_backoff_without_expanding_omitted_overrides ... ok
+test retention_input::retention_input_keeps_captured_limits_and_body_owners ... ok
+test original_entry::runtime::original_entry_applies_branch_specific_safety_and_runtime_normalization ... ok
+test replace_content::governance::replace_content_returns_exact_reachable_governance_and_indexed_bodies ... ok
+test retention_input::retention_input_preserves_optional_presence_and_original_type_state_values ... ok
+test replace_content::replace_content_captures_history_limit_without_expanding_defaults ... ok
+test replace_content::replace_content_keeps_source_field_and_circuit_error_priority ... ok
+test retention_input::retention_input_preserves_atom_priority_and_keyword_last_values ... ok
+test replace_content::replace_content_preserves_normalized_presence_and_numeric_boundaries ... ok
+test resolution::current_profile_readmission_precedes_name_lookup ... ok
+test retry_input::refusals::retry_input_keeps_existing_contracts_and_caller_errors_separate ... ok
+test resolution::rule_maps_inherit_per_field_and_empty_maps_do_not_erase ... ok
+test retry_input::retry_input_preserves_source_diagnostics_and_field_order ... ok
+test retention_input::retention_input_preserves_ttl_internal_history_and_captured_error_order ... ok
+test original_retry_keys::refusals::original_retry_keys_refuses_descriptor_bounds_before_predicate_visits ... ok
+test replace_content::refusals::replace_content_preserves_operational_preflight_and_schema_accounts ... ok
+test retry_input::retry_input_keeps_override_layering_defaults_and_opaque_targets ... ok
+test retry_input::retry_input_preserves_full_defaults_and_override_presence ... ok
+test retry_input::refusals::retry_input_preserves_each_prospective_debit_and_continuous_owner ... ok
+test values::actual_snapshot_envelope_ranges_have_independent_boundaries ... ok
+test values::complete_omission_empty_zero_and_customer_version_are_distinct ... ok
+test values::complete_state_maps_keep_presence_and_state_governance_bound ... ok
+test values::complete_snapshot_moves_every_core_and_governance_owner ... ok
+test retry_input::retry_input_preserves_atom_precedence_and_keyword_last_values ... ok
+test encoding_vectors::v2_error_class_count_accepts_the_full_governance_list_limit ... ok
+test retention_input::refusals::retention_input_preserves_descriptor_bounds_and_each_reached_work_refusal ... ok
+test retry_input::refusals::retry_input_preserves_descriptor_bounds_and_ignored_subtrees ... ok
+test indexed_input::refusals::indexed_input_refuses_raw_caps_and_work_before_owner_construction ... ok
+test original_entry::refusals::original_entry_preserves_each_reached_admission_and_owned_index_refusal ... ok
+test retry_input::retry_input_reconstructs_original_normalize_cases_before_timing ... ok
+test original_entry::identity::original_entry_checks_semantic_duplicate_keys_across_etf_encodings ... ok
+
+test result: ok. 86 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+```
+
+Actual command `env CARGO_BUILD_WARNINGS=deny cargo +1.99.0 clippy --locked -p wf-domain --lib --test complete_policy -- -D warnings`, ddd88a/session5488→04d6d1 EXIT0. Complete output:
+
+```text
+    Checking wf-domain v0.1.0 (/Users/yoavgea/repos/ferricstore2-rust-design/crates/wf-domain)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.95s
+```
+
+Actual rustfmt1.99 --edition2024 --check on the named three owned production paths and two tests, followed by git diff --check, exited0 with empty output. Focused86 and strict results are macOS owner evidence, not independent Linux/native-original/runtime/profile/physical acceptance. All required remaining milestones/OS/source cases remain active; this finite implementation is ready for normal full actual-source reciprocal review without another run/body/ack gate.
