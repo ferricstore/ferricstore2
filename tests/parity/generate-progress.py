@@ -95,6 +95,19 @@ LINKS = [
      [(491, 0), (492, 1), (501, 2), (502, 3), (503, 4), (512, 5), (515, 6), (518, 7), (529, 8), (530, 9)]),
     ("ecaed3fd34f388ec", POLICY, "flow_retry_policy_keeps_generated_backoff_values_bounded_and_deterministic", 6,
      [(562, 0), (563, 1), (564, 2), (567, 3), (572, 4), (580, 5)]),
+    ("999b558a2dc276d2", "crates/wf-domain/tests/complete_policy/retry_input.rs",
+     "retry_input_reconstructs_original_normalize_cases_before_timing", 11,
+     [(479, 0), (480, 1)]),
+    ("bd7d579285676091", "crates/wf-domain/tests/complete_policy/retry_input.rs",
+     "retry_input_reconstructs_original_normalize_cases_before_timing", 11,
+     [(491, 2), (492, 2), (501, 2), (502, 2), (503, 2), (512, 2), (515, 2), (518, 2),
+      (529, 3), (530, 3)]),
+    ("ecaed3fd34f388ec", "crates/wf-domain/tests/complete_policy/retry_input.rs",
+     "retry_input_reconstructs_original_normalize_cases_before_timing", 11,
+     [(562, 4), (563, 5), (564, 6), (567, 8), (572, 9), (580, 10)]),
+    ("146040b0f178fda6", "crates/wf-domain/tests/complete_policy/retry_input.rs",
+     "retry_input_preserves_source_diagnostics_and_field_order", 4,
+     [(584, 0), (584, 1)]),
     ("e1a8cf7f619f136a", RETRY, "flow_retry_returns_to_claimed_run_state_with_computed_backoff", 20,
      [(607, 0), (608, 1), (621, 2), (622, 3), (623, 4), (624, 5), (631, 7), (632, 8),
       (633, 9), (634, 10), (635, 11), (636, 12), (637, 13), (638, 14), (639, 15),
@@ -217,7 +230,9 @@ def counterparts(manifest):
             limitations.append("Borrowed retry policy/reducer observations only; policy installation/readback, partition-wide claim cardinality, durable history/query and public wire projections are omitted. Typed Some/None and numeric metadata represent observations, not string serialization.")
         if rust_file in (CLAIM, FIFO, LANE):
             limitations.append("Pure borrowed authoritative-view observations only; snapshot completeness/revision identity, FIFO policy installation, native/durable index maintenance, automatic reclaim and public claim projections remain adapter obligations. Fixed fixture IDs/times preserve source order rather than original generated namespaces.")
-        if source_id == "2302fd8c2cfa076d" and rust_file == "crates/wf-domain/tests/complete_policy/original_entry.rs":
+        if rust_file == "crates/wf-domain/tests/complete_policy/retry_input.rs":
+            limitations.append("Executed borrowed original retry descriptors preserve the original thirty-day keyword recipe, fixed/linear/exponential timing rows, jitter bounds, all 1800 per-attempt raw normalizations and default/zero-retry observations. Source584 additionally preserves its original max_attempts=3, fixed100/1000, jitter0, failed recipe and exact caller rejection kind/body; it is distinct from stored source603 decoding. Repeated timing rows map to the one direct assertion executed for every corresponding table row, and the inclusive range assertion preserves both jitter bounds. Normalization success patterns enforced by the helper are not separately linked as direct macros. Explicit committed JitterSample replaces source phash2 preparation and supplies no hash/runtime identity proof; typed owners replace Elixir maps/error tuples. Visible descriptor limits do not prove raw parser correspondence, hidden term bytes or arbitrary map uniqueness. The source FlowTest async:false setup/tags/timeout, live shards/FLUSHDB/cleanup, public policy/lease/store operations, every mandatory runtime profile and independent Linux execution remain required. Original normalized counterpart IDs and limitations are preserved. The new tests preceded production with genuine missing-API RED and actually passed on macOS, while ledger anchors were added afterward; these component links do not certify whole source cases or full workflow parity.")
+        elif source_id == "2302fd8c2cfa076d" and rust_file == "crates/wf-domain/tests/complete_policy/original_entry.rs":
             limitations.append("Executed original ETF observations retain the exact generation-boundary/public-v1 term, generation 9007199254740991, and the above-maximum sibling. Source554 links generation, atom:type and the complete returned policy-map bytes; source558 links strict None refusal for MAX+1. The fixed hand recipe preserves the source term and values, not the native encoder's default map order. This counterpart does not execute the original encoder or migration allocator/exhaustion; those remain separately mapped normalized observations. The direct above-maximum ledger anchor is a post-implementation supplement with no new tests-first RED. Borrowed mathematical atom/runtime catalogs replace live VM context. Original ExUnit setup/runtime/profiles, public installation/physical reads, full case parity and independent Linux acceptance remain required.")
         elif source_id in LIMITS:
             limitations.append(LIMITS[source_id])

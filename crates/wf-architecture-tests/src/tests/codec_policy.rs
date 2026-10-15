@@ -596,4 +596,4 @@ fn original_policy_entry_reader_stays_pure_and_server_side() -> CheckResult<()> 
     Ok(())
 }
 
-mod original_current;
+mod original_policy;

@@ -27,6 +27,7 @@ mod replace_request;
 mod request;
 mod resolution;
 mod restoration;
+mod retry_input;
 mod rules;
 mod validation;
 
@@ -87,6 +88,10 @@ pub use request::{
 };
 pub use resolution::{ResolvedGovernance, resolve_governance};
 pub use restoration::{restore_complete_policy, validate_stored_complete_policy};
+pub use retry_input::{
+    PolicyRetryInputRejection, RawPolicyRetryValue, normalize_complete_policy_retry_input,
+    normalize_complete_policy_retry_override_input,
+};
 pub use rules::{ResolvedBudget, ResolvedCircuit};
 
 /// Owned complete normalized content; supplied empty groups remain present.

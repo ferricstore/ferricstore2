@@ -622,14 +622,17 @@ reads and atomic publication remain required work. Logical source-derived fees
 do not certify native allocation, stack, latency or gain. Full required source
 profiles and independent Linux/macOS execution remain mandatory.
 
-## Selected original retry input normalization
+## Implemented original retry input normalization
 
 A-NEXT-M1-POLICY-RETRY-INGRESS1-CREATE1 selects private `retry_input.rs` and
 `retry_input/value.rs`, two children of the existing complete-policy test target,
 and the existing normalized `RetryPolicy`/`RetryOverride` output models. Two new
 enums represent borrowed raw value classes and ten fixed source diagnoses;
 `OriginalPolicyMapKey` is reused. Creation consultation and reciprocal resource
-review are closed. Meaningful tests-first authoring precedes implementation.
+review are closed. Eight meaningful tests preceded production with genuine
+missing-API RED independently reproduced by the coordinator; all 80 policy
+controls and strict target lint pass. Actual architecture/performance source and
+mapping review is mutually closed without blockers.
 
 The two three-operand APIs take a borrowed value, schema limits and the received
 continuous account. They distinguish full nil defaults from absent overrides,

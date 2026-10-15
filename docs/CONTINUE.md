@@ -4,7 +4,7 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS recount passes 523 Rust tests and four compile-fail
+The latest whole-workspace macOS run passes 532 Rust tests and four compile-fail
 doc tests. The reviewed original-current Replace checkpoint is `2759262`, following
 the reader/source603 checkpoint `bbeba0d` and MAX-generation supplement `7f3e21a`.
 Strict lint, architecture, documentation and reference/progress checks
@@ -170,10 +170,21 @@ expected value is built before apply. This final test-only refinement passes
 73/73, lint and formatting after the 523-test whole-workspace epoch.
 The private V2 output remains an explicit semantic encoding, with original ETF
 output, physical/public/runtime profiles and both-OS acceptance still required.
-Original incoming retry/override normalization is now selected after closed
-reciprocal consultation: two production and two test children, two new enums,
-existing normalized outputs and the approved checker regrouping. Meaningful
-tests-first authoring is underway; production implementation remains pending.
+Original incoming retry/override normalization is implemented after independently
+reproduced missing-API RED. Two production and two test children preserve full
+defaults versus absent overrides, atom masking, keyword last values, source error
+order and one fallible final target copy. All 80 policy controls, including eight
+new tests and 1800 per-attempt normalizations, and strict target lint pass. Two
+test-helper borrowing lint failures were corrected without changing any oracle.
+The regrouped private checker preserves its old body and the 599-line parent;
+the new purity/server-boundary control and strict tooling lint pass. Four new
+counterpart records validate 59 source declarations/65 counterparts/252
+assertion links, preserving every old record and leaving full parity incomplete.
+The latest full wrapper passes all source stages and stops only at the default
+RustSec GitHub DNS refresh. Reciprocal source and mapping review is closed
+without blockers.
+Remaining raw ingress groups, ETF output, public/physical/profile and both-host
+obligations remain required.
 
 The separate Elixir bugfix worktree now has reviewed checkpoint106993c6 for the
 existing TermCodec helper and its tests. A header walk rejects the reproduced
@@ -1073,8 +1084,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **58 reviewed
-source declarations, 61 counterpart records and 232 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **59 reviewed
+source declarations, 65 counterpart records and 252 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

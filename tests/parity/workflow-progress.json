@@ -21862,6 +21862,31 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "Borrowed retry policy/reducer observations only; policy installation/readback, partition-wide claim cardinality, durable history/query and public wire projections are omitted. Typed Some/None and numeric metadata represent observations, not string serialization."
           ]
+        },
+        {
+          "scenario_id": "m1-999b558a2dc276d2-retry_input_reconstructs_original_normalize_cases_before_timing",
+          "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
+          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_module": "",
+          "rust_function": "retry_input_reconstructs_original_normalize_cases_before_timing",
+          "assertions": [
+            {
+              "source_line": 479,
+              "source_text": "assert policy.backoff.base_ms == 2_592_000_000",
+              "rust_line": 395,
+              "rust_text": "assert_eq!(policy.backoff.base_ms, 2_592_000_000);"
+            },
+            {
+              "source_line": 480,
+              "source_text": "assert policy.backoff.max_ms == 2_592_000_000",
+              "rust_line": 396,
+              "rust_text": "assert_eq!(policy.backoff.max_ms, 2_592_000_000);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed borrowed original retry descriptors preserve the original thirty-day keyword recipe, fixed/linear/exponential timing rows, jitter bounds, all 1800 per-attempt raw normalizations and default/zero-retry observations. Source584 additionally preserves its original max_attempts=3, fixed100/1000, jitter0, failed recipe and exact caller rejection kind/body; it is distinct from stored source603 decoding. Repeated timing rows map to the one direct assertion executed for every corresponding table row, and the inclusive range assertion preserves both jitter bounds. Normalization success patterns enforced by the helper are not separately linked as direct macros. Explicit committed JitterSample replaces source phash2 preparation and supplies no hash/runtime identity proof; typed owners replace Elixir maps/error tuples. Visible descriptor limits do not prove raw parser correspondence, hidden term bytes or arbitrary map uniqueness. The source FlowTest async:false setup/tags/timeout, live shards/FLUSHDB/cleanup, public policy/lease/store operations, every mandatory runtime profile and independent Linux execution remain required. Original normalized counterpart IDs and limitations are preserved. The new tests preceded production with genuine missing-API RED and actually passed on macOS, while ledger anchors were added afterward; these component links do not certify whole source cases or full workflow parity."
+          ]
         }
       ]
     },
@@ -21941,6 +21966,79 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "Borrowed retry policy/reducer observations only; policy installation/readback, partition-wide claim cardinality, durable history/query and public wire projections are omitted. Typed Some/None and numeric metadata represent observations, not string serialization."
           ]
+        },
+        {
+          "scenario_id": "m1-bd7d579285676091-retry_input_reconstructs_original_normalize_cases_before_timing",
+          "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
+          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_module": "",
+          "rust_function": "retry_input_reconstructs_original_normalize_cases_before_timing",
+          "assertions": [
+            {
+              "source_line": 491,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(fixed, \"flow-a\", 1, 1_000) == 1_100",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 492,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(fixed, \"flow-a\", 3, 1_000) == 1_100",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 501,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(linear, \"flow-a\", 1, 1_000) == 1_100",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 502,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(linear, \"flow-a\", 2, 1_000) == 1_200",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 503,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(linear, \"flow-a\", 3, 1_000) == 1_300",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 512,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(exponential, \"flow-a\", 1, 1_000) ==",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 515,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(exponential, \"flow-a\", 2, 1_000) ==",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 518,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.next_run_at_ms(exponential, \"flow-a\", 3, 1_000) ==",
+              "rust_line": 414,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 529,
+              "source_text": "assert next_run >= 1_000",
+              "rust_line": 431,
+              "rust_text": "assert!((1_000..=1_250).contains(&time));"
+            },
+            {
+              "source_line": 530,
+              "source_text": "assert next_run <= 1_250",
+              "rust_line": 431,
+              "rust_text": "assert!((1_000..=1_250).contains(&time));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed borrowed original retry descriptors preserve the original thirty-day keyword recipe, fixed/linear/exponential timing rows, jitter bounds, all 1800 per-attempt raw normalizations and default/zero-retry observations. Source584 additionally preserves its original max_attempts=3, fixed100/1000, jitter0, failed recipe and exact caller rejection kind/body; it is distinct from stored source603 decoding. Repeated timing rows map to the one direct assertion executed for every corresponding table row, and the inclusive range assertion preserves both jitter bounds. Normalization success patterns enforced by the helper are not separately linked as direct macros. Explicit committed JitterSample replaces source phash2 preparation and supplies no hash/runtime identity proof; typed owners replace Elixir maps/error tuples. Visible descriptor limits do not prove raw parser correspondence, hidden term bytes or arbitrary map uniqueness. The source FlowTest async:false setup/tags/timeout, live shards/FLUSHDB/cleanup, public policy/lease/store operations, every mandatory runtime profile and independent Linux execution remain required. Original normalized counterpart IDs and limitations are preserved. The new tests preceded production with genuine missing-API RED and actually passed on macOS, while ledger anchors were added afterward; these component links do not certify whole source cases or full workflow parity."
+          ]
         }
       ]
     },
@@ -21997,13 +22095,88 @@
             "Borrowed retry policy/reducer observations only; policy installation/readback, partition-wide claim cardinality, durable history/query and public wire projections are omitted. Typed Some/None and numeric metadata represent observations, not string serialization.",
             "All 1,800 source input combinations are retained, but source phash2 jitter preparation is replaced by an explicit committed sample; source hash bytes are not certified."
           ]
+        },
+        {
+          "scenario_id": "m1-ecaed3fd34f388ec-retry_input_reconstructs_original_normalize_cases_before_timing",
+          "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
+          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_module": "",
+          "rust_function": "retry_input_reconstructs_original_normalize_cases_before_timing",
+          "assertions": [
+            {
+              "source_line": 562,
+              "source_text": "assert first == second",
+              "rust_line": 448,
+              "rust_text": "assert_eq!(first, second);"
+            },
+            {
+              "source_line": 563,
+              "source_text": "assert first >= now_ms",
+              "rust_line": 449,
+              "rust_text": "assert!(first >= now);"
+            },
+            {
+              "source_line": 564,
+              "source_text": "assert first <= now_ms + max_ms",
+              "rust_line": 450,
+              "rust_text": "assert!(first.get() <= 123_456 + u64::try_from(maximum)?);"
+            },
+            {
+              "source_line": 567,
+              "source_text": "assert Ferricstore.Flow.RetryPolicy.attempt_allowed?(",
+              "rust_line": 459,
+              "rust_text": "assert!(policy.attempt_allowed(3));"
+            },
+            {
+              "source_line": 572,
+              "source_text": "refute Ferricstore.Flow.RetryPolicy.attempt_allowed?(",
+              "rust_line": 460,
+              "rust_text": "assert!(!policy.attempt_allowed(4));"
+            },
+            {
+              "source_line": 580,
+              "source_text": "refute Ferricstore.Flow.RetryPolicy.attempt_allowed?(no_retries, 1)",
+              "rust_line": 465,
+              "rust_text": "assert!(!full(&Raw::Keyword(&zero), profile, &mut charge)?.attempt_allowed(1));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed borrowed original retry descriptors preserve the original thirty-day keyword recipe, fixed/linear/exponential timing rows, jitter bounds, all 1800 per-attempt raw normalizations and default/zero-retry observations. Source584 additionally preserves its original max_attempts=3, fixed100/1000, jitter0, failed recipe and exact caller rejection kind/body; it is distinct from stored source603 decoding. Repeated timing rows map to the one direct assertion executed for every corresponding table row, and the inclusive range assertion preserves both jitter bounds. Normalization success patterns enforced by the helper are not separately linked as direct macros. Explicit committed JitterSample replaces source phash2 preparation and supplies no hash/runtime identity proof; typed owners replace Elixir maps/error tuples. Visible descriptor limits do not prove raw parser correspondence, hidden term bytes or arbitrary map uniqueness. The source FlowTest async:false setup/tags/timeout, live shards/FLUSHDB/cleanup, public policy/lease/store operations, every mandatory runtime profile and independent Linux execution remain required. Original normalized counterpart IDs and limitations are preserved. The new tests preceded production with genuine missing-API RED and actually passed on macOS, while ledger anchors were added afterward; these component links do not certify whole source cases or full workflow parity."
+          ]
         }
       ]
     },
     {
       "source_declaration_id": "146040b0f178fda6",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-146040b0f178fda6",
+          "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
+          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_module": "",
+          "rust_function": "retry_input_preserves_source_diagnostics_and_field_order",
+          "assertions": [
+            {
+              "source_line": 584,
+              "source_text": "assert {:error, \"ERR flow retry max_attempts was renamed to max_retries\"} =",
+              "rust_line": 244,
+              "rust_text": "assert_eq!(result, Err(Reason::DeprecatedMaxAttempts));"
+            },
+            {
+              "source_line": 584,
+              "source_text": "assert {:error, \"ERR flow retry max_attempts was renamed to max_retries\"} =",
+              "rust_line": 245,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed borrowed original retry descriptors preserve the original thirty-day keyword recipe, fixed/linear/exponential timing rows, jitter bounds, all 1800 per-attempt raw normalizations and default/zero-retry observations. Source584 additionally preserves its original max_attempts=3, fixed100/1000, jitter0, failed recipe and exact caller rejection kind/body; it is distinct from stored source603 decoding. Repeated timing rows map to the one direct assertion executed for every corresponding table row, and the inclusive range assertion preserves both jitter bounds. Normalization success patterns enforced by the helper are not separately linked as direct macros. Explicit committed JitterSample replaces source phash2 preparation and supplies no hash/runtime identity proof; typed owners replace Elixir maps/error tuples. Visible descriptor limits do not prove raw parser correspondence, hidden term bytes or arbitrary map uniqueness. The source FlowTest async:false setup/tags/timeout, live shards/FLUSHDB/cleanup, public policy/lease/store operations, every mandatory runtime profile and independent Linux execution remain required. Original normalized counterpart IDs and limitations are preserved. The new tests preceded production with genuine missing-API RED and actually passed on macOS, while ledger anchors were added afterward; these component links do not certify whole source cases or full workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a16aec6cceb6253a",

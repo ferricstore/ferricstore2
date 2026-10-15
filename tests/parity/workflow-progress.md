@@ -36,12 +36,16 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 58 source declarations, 61 counterpart records and 232 assertion links.
+increments: 59 source declarations, 65 counterpart records and 252 assertion links.
 Both reviewers accept the supplemental source603 shape-error anchor; it supplies
 one error component with its remaining setup/profile/physical obligations explicit.
 The separate original ETF generation-boundary counterpart retains MAX, the returned
 policy-map bytes and MAX+1 refusal. It preserves every old scenario ID and limitation;
 original encoder, migration and full setup/profile/physical acceptance remain separate.
+Four new raw-retry counterparts retain the original cap/timing/generated inputs
+and caller old-name rejection, including all 1800 per-attempt normalizations.
+Their direct assertion links preserve every older counterpart and explicitly
+retain jitter, descriptor, setup, profile, public/physical and Linux limitations.
 Two separately scoped counterparts
 belong to one FIFO lifecycle declaration; a single state/partition test retains
 selected observations from two declarations. It preserves every other
