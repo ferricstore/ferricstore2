@@ -1,6 +1,6 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-15. The active full-completion goal follows the saved
+Updated: 2026-10-16. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
@@ -24,8 +24,23 @@ writer-lock and clean reopen assertions on macOS 26.6.2 arm64. All 131 upstream
 files and 34 Git tree objects remain pristine. The first consumer import and
 four lint failures are recorded with unchanged operands. This temporary profile
 is not a registry archive/checksum, dependency adoption, GroupApplyStore adapter,
-crash/uncertainty, performance or native Linux result. Next: review the adoption
-profile and bounded driver/reader requirements before a concrete adapter proposal.
+crash/uncertainty or native Linux result. A separate reviewed warm-cache cursor
+experiment now passes its complete untimed oracles and all 48 paired samples:
+same-writer reseek medians are 2.05–2.14 times the local retained-range baseline
+across four fixtures. Twelve Immediate commits are measured separately. This is
+native macOS fixture evidence, not a deployable retained cursor, product p99 or
+Linux result. The isolated redb graph also has zero cached-audit errors, with
+four unused product-policy warnings recorded. The separate joint redb/OpenRaft
+proof now passes the real storage-v2 Suite, singleton write/read-barrier/snapshot
+transfer/reopen, cancellation drain, delegated-sync fencing/reconciliation and
+four acknowledged process-kill recovery cases. Its three bounded snapshot tests,
+strict Clippy and formatting pass; earlier compile/lint/format failures remain
+recorded. These are temporary native macOS proof results, not additional product
+tests or workflow parity. Its full-graph audit stops before checks on uncached
+Windows/Android crates, and registry adoption remains open. Next: implement the
+reviewed product prerequisites for bounded record/outcome decoding, exact point
+binding and one retained request gate before Fresh authority reads, then the
+real atomic storage adapter. Full runtime, native Linux and M1–M8 remain open.
 
 The preceding reviewed M2 prerequisite implements neutral group transaction traits,
 validated change projections and versioned control/record/outcome codecs in five

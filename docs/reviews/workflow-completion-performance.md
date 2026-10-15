@@ -13286,3 +13286,236 @@ Root/ARCH report independently verified on-disk131 blobs/2,444,474 bytes/modes, 
 Root check retry2ed760 and first runtime9724e2/session13281→ca1703 pass. I actually read the441-byte runtime log cf290877 in6d3f5c: the selected assertions complete on the native Darwin host. Its reported build duration is not a throughput/latency measurement. Root's later strict53f9be found only two elided TableDefinition lifetimes, a similar local name and missing crate docs. My independent whole-file inverse37cc13 restores EXACT first-run5bc5f7ba from current bfde65ba by reversing only those four style items; all operands/assertions/copy branches remain unchanged. Final strict/format/pristine comparison is pending at this save, and no duplicate command was started here.
 
 The code/caps/cases were reviewed directly with both peers. Actual graph/build/runtime evidence now supersedes the earlier acquisition-only feasibility limit for THIS Git-source profile, not the unverified registry archive, production adoption, native Linux or all-dependency audit. No timing loop was selected or run. Matched range-versus-reseek measurement, atomic workflow integration, uncertain reconciliation, real crash/reopen, snapshots/membership and both required OS acceptance remain later work.
+## PERF-M2-REDB-SPIKE1-CLOSED1
+
+No remaining source/resource defect. I actually whole-read and hash-verified ARCH's entire 7,424-byte source/readiness finding at 2,024,102/a2343c07 in 1bb127 and Writer's entire 3,918-byte receipt at 3,353,889/ecf9fc5c in 3495ed; both actually read my whole 3,899-byte source finding and agree. Normal reciprocal review is closed.
+
+Root's final strict c43c84, direct-main format da1536 and native run 79528b EXIT0 bind main bfde65ba and lock 80746ddf. The later manifest-only inheritance clarification is 806 B/6d5c7451b4c17340ec7ac0cf3fcc3a59000ce03407d6931e92d3e5e65eba8c52: my whole 828188 read and parsed 180343 comparison match all three product lint tables, and whole inverse 744c11 recovers the initial 271-byte manifest 9d8db856. The first read-only inverse kept one separator LF; correcting only that proof cut changed no file. Main/lock/dependency operands are unchanged. Root's inherited-policy strict 2c3bae EXIT0 and full pristine reread a6065f supersede the earlier pending metadata epoch.
+
+I actually read the accumulated final check/lint/run/format logs and final bindings in f4ff65. The initial two consumer trait-import errors and four style diagnostics remain before successful retries; no behavioral or operand repair is hidden. Root's 075234/a6065f, with ARCH's independent snapshot reads, verifies all 131 source blobs/modes and 34 trees remain pristine. I ran no Cargo build/test/lint or engine command.
+
+The evidence is healthy native macOS 26.6.2 arm64 behavior for the exact isolated Git-source/std/libc profile. The eight-copy/64-byte helper and 16 MiB cache setting do not certify total engine allocation/RSS. Registry provenance/adoption, production transaction and one-gate integration, uncertain reconciliation, crash/power-loss, Linux and full M2 remain open. A matched cursor benchmark is a separate read-only proposal; no timing result or additional artifact is authorized by this closure.
+
+## PERF-M2-CURSOR-MATCHED-BENCH-PROPOSAL1
+
+READ-ONLY proposal for ARCH consultation, requested by Root after the actual engine invariants passed. No benchmark artifact, new model, source edit or measurement is created here. This would measure one pending M2 cursor strategy decision, not product p99, production GroupApplyTransaction conformance or M8 completion.
+
+Proposed temporary root: /private/tmp/ferricstore2-redb-4.4.0-cursor-7061f7e. Exactly three handwritten files: Cargo.toml, src/main.rs and src/scan.rs. Reuse the pristine 7061f7e Git snapshot by path with ONLY redb default-features=false/features=[std]; retain Rust 1.99.0, exact inherited product lint tables and release overflow-checks=true. No product crate, Criterion, allocator instrumentation or dependency upgrade. Cargo.lock/target/bench.redb/check.log/lint.log/format.log/results.log are the only further proposed artifacts. PERF would own these three source files and the selected execution after ARCH selection/Root release; no parallel Cargo runner is needed. The actual new lock must again prove the selected std/libc closure; direct-file formatting must preserve the upstream tree.
+
+Function inventory, with no own nominal types/aliases: main.rs contains main, seed, fixture_key, verify, measure_pairs and measure_commits; scan.rs contains retained, reseek, consume, decode and copy_position. Both Rust files stay within 400 LF and every function within 100 LF. The two scan entry points are module-private; ordinary arrays/tuples carry bounded counters. These names and responsibilities are prospective, not a source release.
+
+Seed one database and two byte-slice tables: DUE has empty values; RECORD maps the identical key to its ordinal as 8-byte BE. Seed ordinals 0..16,384 and two outside-tenant sentinel rows without an owned dataset vector. The exact fixture uses FWPK/u16BE1/family3, escaped namespace g/z/t, priority 2 (rank 0), due=i:u64BE, then escaped id=i:u64BE, partition=[p,0,i%256], state=q, type=r. NUL escaping/terminators match the reviewed physical grammar; this is a byte fixture, not a replacement codec implementation. Tenant s/u sentinels must stay outside t's range. Bounds are the 25-byte namespace+rank+due prefixes for 0 and N, inclusive lower/exclusive upper. This excludes equal-due N rows without inventing a business selector.
+
+Exactly four workloads: N=1,024 or 16,384, each with accept-all or accept iff ordinal%4==0. Every candidate in BOTH modes performs the same fresh RECORD open/get/drop, full borrowed fixture/namespace/value validation, encoded-key copy, 13 decoded raw component-byte copies and 8 value-byte copies, including filtered-out candidates. Advance the consumed position only after all checks/copies; filtered rows still advance. There is no output vector. Untimed verify checks EVERY decoded field/value/order against independent ordinal formulas and the full accepted sequence, then true end and final consumed position; counts/checksums alone are insufficient.
+
+Frozen arithmetic from fileless grammar packing 38bb81: key lengths<=56 under an explicit 64-byte cap; raw due components total 13. For N 1,024, encoded bytes 54,536 and total copied bytes 76,040; for N 16,384, encoded bytes 868,736 and copied bytes 1,212,800. Both filter modes copy these same totals. Accept-all counts/sums are 1,024/523,776 and 16,384/134,209,536. Filtered counts/sums are 256/130,560 and 4,096/33,546,240; the last accepted ordinals are 1,020/16,380 while consumed positions are 1,023/16,383. Expected candidates=N and end probes=1 in every case. Literal boundary keys 0/1/255/256/16,383 must be checked independently during test authoring before timing; production output must never supply their oracle.
+
+The deliberate difference is due-table ownership. retained opens one Table and Range and keeps them locally alive through traversal/end. reseek lexically drops row/range/table after each candidate, then opens the SAME WriteTransaction's table/range from Excluded(last consumed key), including a real final empty seek. Both reopen RECORD once per candidate; neither keeps a cheaper point-table handle. Therefore due opens/range creations are 1 versus N+1, RECORD opens/gets=N, and next calls=N+1 in both. The source copies each finite range bound into an owned Vec ([exact redb iterator source](https://github.com/cberner/redb/blob/7061f7e60d4573311c0636e161d417b93e9fd2b1/src/tree_store/btree_iters.rs#L103)); repeated seek/table/bound work is part of B's measured cost, not hidden setup. These are operation counts/source mechanisms, not measured malloc counts or a CPU decomposition.
+
+Keep identical caller copies using double fixed arrays: 2*64 encoded bytes,2*13 decoded bytes,8 copied value bytes and2*25 bound bytes =212 payload bytes. Retaining an encoded position in A is an explicit matching cost, not a requirement inferred for a production retained cursor. Include 384 bytes for 12 pairs of u128 sample values, 512 logical bytes for fixed scalars/headers, and worst finite redb bound owners 2*128+64+25=345. The declared simultaneous sum is 1,453 under a positive 2,048-byte cap, checked before copies/range creation; no old position is overwritten before complete admission. Bound copies are admitted before range(), and a previous ephemeral Range drops before its replacement. Positive per-pass caps are N+1 inspections and 2 MiB cumulative copied bytes, with no reset during that pass. These are explicit benchmark bounds, not a silent revision of the completed transaction tariff. Engine pages/cache, internal iterator structures, allocator capacity and output formatting are outside this declared-owner sum; no total-RSS/all-engine-allocation theorem follows.
+
+Build release once, record toolchain/target/OS/CPU/profile and exact source/manifest/lock bindings. Use 16 MiB Builder cache on every create/open. Seed and commit outside scan timing; untimed full verification precedes every timed workload. Then two untimed warm-up pairs and 12 measured pairs, alternating AB/BA evenly. Each pair uses one unchanged WriteTransaction acquired before either timer and aborted after both; include each strategy's due-table open/range creation/traversal/end/drop inside its timed call. No writes, commit, printing or output materialization occur inside a scan timer. Print every raw paired duration, counters and copy totals, plus min/median/max without a winner threshold or p99 claim. Label this warm-cache single-process fixture; no purge/cold-cache, concurrency or disk-throughput inference.
+
+Separately measure 12 Immediate commits: begin writer, dirty reserved out-of-prefix markers in BOTH tables and set durability before the timer; time ONLY consumed commit(), then verify coherent markers in a new read outside the timer. Propagate any error; do not label it known-aborted or simulate uncertainty. This is a separate healthy commit-return/sync series, never folded into scan rates or crash/power-loss proof.
+
+Use Instant::checked_duration_since and reject a missing/nonpositive sample rather than silently reporting a saturated zero. The [primary Instant contract](https://doc.rust-lang.org/std/time/struct.Instant.html) warns that monotonic clocks are not guaranteed steady and behavior differs by platform. Apply black_box to runtime inputs and final computed counters; its [primary contract](https://doc.rust-lang.org/std/hint/fn.black_box.html) is best-effort optimization resistance, not a correctness guarantee. Those current docs are 1.99.1; the installed selected compiler remains 1.99.0. The independent untimed oracle establishes correctness.
+
+A retained Range is a legal local baseline but does not prove that an owned GroupDueCursor can store its Table+Range without self-reference under the present transaction shape. A faster baseline would motivate a separately selected safe visitor/API discussion, never unsafe/self-referential ownership or a ReadOnly snapshot substitute. These measurements could quantify this fixture's strategy cost only. Native macOS and Linux runs must be reported separately; the current Linux runner remains inaccessible. Registry adoption, authentic due/complete-FIFO authority, one-gate Fresh loading, commit reconciliation and crash/snapshot/membership duties remain mandatory independent work. ARCH's 7,424-byte readiness was actually read in 1bb127 and agrees with that separation; its review is not benchmark creation authority.
+
+## PERF-M2-CURSOR-MATCHED-BENCH1-WRITTEN1
+
+The selected experiment is complete; no further timing is needed. ARCH's entire 7,131-byte CREATE at 2,031,526/c1772335 was actually read/hash-verified in 795b5e, and Root released 24aaa0 after absence capture. I authored ONLY the three selected temporary files and serially ran the selected profile/commands. All 11 functions are <=66 LF; main 266 LF/scan 253 LF. No product/dependency/adapter/model/alias or upstream source changed.
+
+First source was manifest 2016d716, main 38d45eb7 and scan b583d314. Initial check d16f2c→0e6051 EXIT101 found two unhandled set_durability Results and one unused import. I propagated both existing API errors with ?,  removed the import, and separately applied Root's matched-work finding: observe completed encoded/raw/value copies through black_box EVERY candidate in shared consume before progress. Otherwise A's intermediate copies could be dead stores while B consumed its positions. This material measurement repair preceded every run/timing and changed no fixture/oracle. Retry accdf0 passed. First strict 10e003 then found only two equivalent inspection predicates, byte-char slice spelling and an empty assertion; narrow repairs gave strict 8e4b9a EXIT0 and direct-file format 2479b3 EXIT0, without suppression. Release 83fe80/session98737→e1eede EXIT0 compiled once. This is existing-engine evaluation, not missing-API TDD.
+
+Metadata phase bd1d69 failed BEFORE running the executable because CPU-model sysctl was permission-denied; actual output 73b6e8 is retained, no retry/elevation. CPU model/count remain unavailable. Rust 1.99.0/b940084d7, LLVM 23.1.1, aarch64-apple-darwin and macOS 26.6.2/25G83 arm64 are recorded. No affinity/frequency/thermal/global-idle control is claimed. Root held joint Cargo activity during the sample window. Own full pre-run 826f5d integrity proof matched 131 exact upstream blobs/modes/34 trees/no extras; Root's independent terminal 3ae8df repeats that proof after commands. Package lint inheritance/release overflow policy match the product, independently confirmed in e09624.
+
+Untimed release 826f5d EXIT0 checks all five literal boundary keys, EVERY canonical field/point value/accepted ordinal, consumed positions including filtered rows, exact frozen counters/copy totals and true end. Root whole-read both final files 729018/3a8937 and ARCH reviewed the per-row observability delta 06390f before measurement. No candidate output defined an oracle.
+
+The ONLY selected timing 22f7ca/session9048→ef7e0f EXIT0 contains 48 raw paired rows (12 per workload, 6/6 AB/BA), after two warm-up pairs per workload, plus 12 separate Immediate commits. Own parser/inverse analysis bc1b12 and Root's independent a8e46c verify every raw counter array, ordering/sample identity and positive duration. Copies remain 76,040/1,212,800 bytes per pass under BOTH filters, with same point probes and candidate count. Printed summary medians floor the average of two center integer-ns samples; the raw pairs retain exact inputs to that average.
+
+| Candidate rows | Filter | Retained median ms | Reseek median ms | Median paired B/A |
+|---:|---|---:|---:|---:|
+|1,024|all|0.587|1.256|2.143|
+|1,024|every fourth|0.595|1.264|2.090|
+|16,384|all|10.269|21.416|2.096|
+|16,384|every fourth|10.220|20.989|2.076|
+
+Separate Immediate commit-return min/median/max is 3.920/4.233/6.618 ms (12 samples; both markers verified coherently outside timers). That series excludes transaction construction/inserts and does not establish crash/power-loss durability. Scan times include each strategy's due-table open/range/end/drop plus identical full validation/point/copy work. B opens/seeks N+1 times versus A once; this measures their combined cost on these rows, not an instrumented malloc/CPU breakdown. The 16 MiB warm-cache fixture has 8-byte records, one process and no concurrency/cold-cache/disk-throughput or product p99/M8 inference.
+
+The declared owner/copy caps remained checked inside every scan: 1,453 logical bytes under 2,048, N+1 inspections and 2 MiB cumulative copies. Both keep old encoded/raw arrays until complete replacement; B admits engine-bound copies before range(). Engine pages/cache/native capacities/internal iterator structures remain outside that declared sum. A is a safe LOCAL Table+Range baseline; these results do not make Table+Range self-storage feasible under the owned GroupDueCursor shape. The measured roughly 2.1x fixture cost motivates evaluating a separately selected safe visitor/ownership seam, not unsafe/self-reference, a ReadOnly snapshot substitute or automatic production adoption. Authentic bounded due/FIFO authority, one gate, unknown-commit reconciliation, crash/snapshot/membership and native Linux remain required. No Linux run occurred.
+
+Final immutable inputs/log inventory (SHA256):
+
+|File|Bytes|SHA256|
+|---|---:|---|
+|Cargo.toml|849|2016d7166f301ca8f25fbf360d4d45263348d73945415de757bb58eeb2428455|
+|Cargo.lock|462|835f40322990f31d680e470f08ca23343f24339dd03a0e6b596d37bedb845f99|
+|src/main.rs|9827|6c62479e6ad234818f6eb63310f0ca6def69a91f2d15af8da1020186c9ae6685|
+|src/scan.rs|8478|db90dde323f6a96420f72e72f3aa4655fd28a759804c11529b4b11a2a4d189c4|
+|check.log|2152|a829f23c1e140922d60a6e85683c0664f43e6c99e881bca7041ec91aff8d3d48|
+|lint.log|2437|a04e5109922fd5ee7829ea528c3dd434e9b73c58b7215a22c7e3b178af8a939a|
+|format.log|0|e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855|
+|results.log|13551|3800d34a47b062b372fdaf1f47d12a995a2bb89eef48888b92ce808f64e6cd14|
+
+The release binary is 1,613,104 B/e90dc1baccfa863460994b36b7e4e94f3e3c1689c58336862d249c71b03ab7ed. The owned database is 8,425,472 B/a88416dfc477c34cdd275d6a3af34b98f008df98b9f2f29389ee26fb23258aca; it is regenerated by seed, not an archived engine/durability certificate. Only the selected root/generated paths were created.
+
+Own whole in-memory inverses bc1b12 recover BOTH complete first-published Rust files: reverse main's two Result propagations/import removal and two lint spellings to 38d45eb7; reverse scan's two predicate spellings and per-row black_box tuple to b583d314. The latter inverse explicitly withdraws the measurement-observability repair; it is provenance, not the measured implementation. All literal fixture bytes and numeric expected arrays are unchanged.
+
+To survive temporary-root lifetime, the following ONE zlib/base64 block preserves the exact UTF-8 contents of the three handwritten inputs, lock and complete four logs above as a sorted JSON object keyed by their selected relative paths. This is data inside this existing note, not another artifact/dependency. In-memory round-trip already matches every byte/hash. It excludes the regenerable database, target and pristine third-party source; the latter is pinned by the existing complete 131-blob inventory/tree proof. Decode with base64.b64decode, zlib.decompress and json.loads; encode each resulting string as UTF-8 and compare the inventory hashes before optional reconstruction. No code/run is needed to trust a performance threshold; none is set.
+
+Packed JSON bytes=38896, SHA256=190824338ef0021a125b5c9ec9852aad0b09db4f47e8b265f59e8193b496b737; decoded file count=8.
+
+```base64
+eNrtXQlz20aW/ittpcYmY5LCfVCmvYnt7GYnGaeczMxWUVoKBJoS1iTAAKCOKNrfvu/1ATRAgJTkxJa3hi6LJNDHu/q9r183
+mjcHr4PsLB0t0/DDwfjgK/LLeZyTRbykBN6DTZGugiIOg+XymvzbGU1oFhQ0IvNrwusdJ1+R7wssm6TwlhQ0ieD+Is3IKkg2
+wZLQKC7i5AxKXtAsj9OETIh1nBwn0+k6CD8EZ/Tk5DhJghWFG8cHC5plcZgXaUaNYUaj+dCyhuEmy9Ps+EBt4/hAG8E/vBjR
+NXabhDHN4c70OIG7WPf4YHCcnHR3tozn4Xarxkj3Wbt5uslCXjKjZ3FeZNfPz4tinY8PD8/i4nwzH4Xp6jDb5MVwGSRnhyFK
+Jx/F6TAGeq6wjfCchh/yzYq1ElI7MqModCJzEWiaRue6bTqRZ1PdcucLaupBEAbzwPENGjmB5zoL3w7nbujZ9py6HjbYxQvn
+t86LNbJ2SIhzzyV0MBCGAApfgiGUXXykapj2xUVDMyy8xuSlltZHvo831pv5Ms7P4doiWOaU8XqZZh9yIAYpyWieLqEiq2QK
+YaissTLRHO7fkHVQnLOCo9FhC+UomaGrOfrCpUOuaJAFiegi2CyL4YIGxSZjwmK0DIhyZXp8kBfR8cEJuWUkLMHuse+SVihT
+ZJsGAyNWbITcQ9lNkgcLOgvTSAg3zeZxhDyJO+l6Ficz8WXBBQVsXvMim5xGsxU0NYNPtXurOM9hvM2iNMxrN7DjmaHp3iyO
+4nSVMykt6QVdKsUGZJ3FaRYX13BxqAsG23iA9oGNeZZ+oAlQWmQBdjmDAh/q/c6DjM422bJ+taXVcBmv19fQKHibuxK3plGQ
+gIO6a/lNcpkFaxRaVCOHXq1pWGxfXwcJa7y6UqRR2lBGvFov6YomRaNyND+brYIwq5cPLoO4mJ2nywjVhI63KZh1lqIHHmV0
+SYMcLT8Fq18s08shdyelfcGwZVfAf5/BqCX4+gFahJaJQcQYzkmRkvP47JzmBXkPqiM44Ai4Lhgj8RxcvRiMObgFQl7D9XiJ
+LaCDIBfSIdbvsXF2wYYR6R2CnC/A9R0Wq/UdB1uftUdeI/XY3g7ngiRod+6G15G9QTeXQZZAD2PCRw0BbaVZMSan72kQBcD+
+L/jnFOgZDl+SPAsPV0GcjLJ87I0dHcn8/TjxyO8ERxp2NB7ffLuJlxHNBuRNUIC/Rv/wZpMFc5BNcT0gsuXqbq2vAWFvb+gi
+Tph7vD1i3ZCPef23+hJUEzAUiMsUmP1qinLoCc/BZZD3T05Jbx1kBUkXjSJwq0/AP0OkFz4RTRNknmalJEGCOdw4JcV5UBD0
+RmROUUwRdt2UpmWNbaZ0IMyyBLeXMDrpKKfFLCrl16tEOR5/v1pBDAGl94945W1md79kl6QSRoEYpyR+FVwj2UFCTt9m2Sm5
+CLIYfMqAXJ7H4TnJz9PNMsIS50ESLTlvZVMZ/XUDwwqEAbIqzimOKgA+EYydhJJLAAnkdPhGCGyIIhrCJzC2c7pcj5lJnS5p
+QWbQ4mg0OsWhGp8lYNSstYzRiOPjIljigG+IT1Z9oBif89d9NbulWsPQxj4f0EAdfFNs+d6kKXXvq2ah5z9M0Q9X0rYcHqwq
+pQ1FX6VXO93hOWF0z+NkH3TrkwrY60Q0XFpEyKSC6D5kzp/+IT1GG4pShBiV0Ys43eSEdZcfVRQQuoqLQljcpwgU2M134JHz
+cxwBEb04JSISk+kmSddFvIp/g1vPwSPON2dxskhPSAGomRa9vA+THwKdu58+iFbtfSrZCGCiyKeUTkMi9khzcoZTAODCVFIA
+FfiOmE+BLZ9Av6WLS2hI8zzIrsnpywm5BoXqpwSaP70iQ7C/l5NTNX7lYcDjlzHWndIDG41wHS+A3RxBJAIpaAMUD/aLbZMb
+xeV2RWzlRbjbCcENncE0vICBAsO81jpv/LQW23gtnHkvNhn4pYyghaLQcZ51EefQkpy9llPWkZjHxim/xjE4/4wocaQdsqns
+6LxYLb8Clc3Wy00+SxNaC4MY43jV8RgKDbHQEAqdItpaxjxjoBYCiH9aoxucAYLcLIb5ULMgCaII4Ql8Ti97Sj8lMYBWakHs
+YRr2vbFuSJn6nqKxe2r3S9ds5fwhWEJAXGGoyzdhGCdhsbxmMaygCQlyEoBmC7hZZG2YzzbHhil5sU1FSsgNNAHxF93EdP4s
+fzYg82ebZyddw6VFttJ2smsQ49dzmJZvjg8+uexQADPQaTbLlzHYXefIwIJDLDjkBf/M0dEkqjFCGMgL8pxmxROGZ9g0ksO9
+gOMYTOrR1bq4boV8umEqkA++KQoT7fYyiqVhnjSK8xlrqte/J8hrwLpPoE1O/ExSXAeUNdmzgsM4H7KCncqUKYrTOhNdKi2L
+t+u1QR5TqwJTxW36K9cqYNpLhlG5RkFGiyBebjJa09zwzprD0s8bpbGzqsKATE9KHaue5M+EkVYTRir4eI5TdcY2jQDqBywb
+zUwoZQb0P+mcJUgWDN0AvP9TSQaflxe76P6SsK7HkR2f/+QCzK3PARlOVrQIoqAIhnMKoqbDDZj0CrG8mB9Pps9w/IXg9J89
+54MQPw7/cfHshKcqQ8Ivg1h9S9M8K3KJoRnOUPOHhgcsgLQDdPysMG84LobQ+zkoXVahcycwfJ/OrfmCzj1qWr6mz0PN1qkb
+hFZZDWiF4V21D4MqzYsxCYIsPHesYbBeLymUyi7jBJPMDP+OBYnHyQ8//ONHmUWDZsyRPtJVXvPLGd5F3n7K0mgTFn8LVnR8
+XBwXqyB893N5+R+iDbxjOCNnBHiEJZtqN+x/90y1+Q3m6Jn8AuziDSOT/BiE36bphyE0DQFneJ0GF7jOEyyJYUPLGhHl/kqz
+hC6J6EHcHJPvspj852ZJTJ3o/lh3x4ZDfnrzCxPSEcnStBhfJZshuATXHekOcGz9r334/u0Pb7/5+e3sm/c/OtbsF0ezdBJk
+K8eqieM6BxzBCE7wL8jgPKLrUbjejOYZlJkBnoABgMzwsmPC38liVWAqV9cMi+hj8m6NE1ckG8cpfJFzRmmAM+HwJvNIjxyf
+cHsk9IqGmwKzcEfk9U9/B4QT0eUhjHjAIyDNC6iEN+Ez+DSSA0nz9OoIOoE5G8CN4wRGXQ6ehM54gzNh4BMdxDVfgk85NCx4
+uRbDR/khdpAfmhaAFUphuF8FYcHao1dFFrDVipzZNGaFJ9VaDK8+8SwfnHlg2M7E0HQncnXHWZiaHgbewrAX84XpaJEVWbbh
+mKblRa7pW7al2xF1bXc+tz1K54ZleJZtN3thGWjei+UYshfPtBeWZhoweLSFCaLzNGq52kLzwsCALsyFYZmmH0WaGWjUmdu+
+E5nuHFwO9LHw/aoXBTWIbnzPcGU/TugYlutTJ4gMIFz3Fg6MWdPUoaswcCK6cPzA1xdGpNvBwosC0Lyme07oB9RxPLvej0Dy
+pdBcT/YTzX0tiqhpmAsn8B3L0BauQV1jYQaB5dj2IjK8wLV9T7NCXbcNHzyGrgdGYEW656OnkP1wL3gofMDhLh/NyYCxAexY
+khIKhIT6PAjDReA5puVovm/NTWfuUov61sKkZqg70KftmabjOUZkWH7o6nOQNJQB2+YuVlgcrqTFizhkowDtknnxiSBv2Fw5
+QG85EZ41zScw8lIA8eDkJsLVAeaHojNJuuu6hu5AFAiXAXA3Sy8hPMq7FkD6MFiDSVoeWwAEQiBoJBM2PIGOgkKdCVtBgyC6
+hpsTF1yCRoB7ui5wvGDJfLOa2OhHHLIM8mIWwlRos+J3zR0N4yJIR7sgadasbmq2o+1t1jG9LoJ1Qzc8TSWZFeaNgx35trlF
+NpTY2YFK+Fb7luZz2k3ThhFpae2t4yqZsAEyB8cFwel6QCh0ej2EXpfRoWxxmGOWOgkp3E4igulp5unAswmrWCOUi3Ati7U3
+o1dxMdGkpeVgSyG2g6gAYEkOQ6CYbYpwwgKmrg11+xdDG5vm2NZGnmf6jvZc08aaxsPoDHxdfBEX15P3EDUILn3lgLtgzsl3
+Ecikec4c4hl4z2A5jKMlDK6MU359iFhtBaHrbBNAgCjobr/9/3McrIM462g0D3ANcqLB9QwY0zBMgc8FQpN8Yru+reGlnNIP
+eEE3DN0Ge5SFJlNsc0D4X07BgDAK2UUT/sq7+olo6C6VNMOu6t2FAV0woNcZ8HTHsGsM2OCi9UfIgNGuAR9sxK8xYNqPUwNm
+uwZ8y28w4LiGrT1CBqxWDTi6a7p1E/JszTIeIQN2uwZc29C8ugY0TXuMGnDaNWDonmnVB7H7OAex2zEGdF93awz4BtfJY2PA
+6xgDnlcfA4DgffsxMuC3a8Bxml4I5g7syqMLZF2h2HG1Oge6b2iPkoOOWAwMMLepgAlAsPYn5wCQ0QpXeNqZQGAIsge8qhgO
+W1jnFzzHBi5WwVXlmu7UpC6blIqr2gQhOOjPRKNicP1p05dWDbImd4NBh+VkFP3pHkzozS39AQkgaNb/ndW3o85d7E+lvsP6
+XJOHDMX6IK5rj436Dhho640YrsNU7vHJvgMDwryzHj7ActoQyGem3uqA4FpzEmQ58Hps1HegP78Zug3bsFvg62emvh362Z7r
+OHXkBN14j87u23GfY2l6ffZpagLKPirqO0AfhDpm5RX1MBVtAX2fmfp2xOc4dmPaBsiAj4THFa3agy3ADo+595J8yzK8Rxhs
+9Q7LF9FJmTQbn952umAZ46AB9HiEVYCebzmeWwI9po+7tFjhPBGiVZznWKZegkeh0k+QT5ZqbGt8J+bTNc/V6+PI0G1LTGdL
+VWK7IHHxJmmBj5xifkvoVBRSlHrn2vBmKy3cia92+9Q1vYkHDR0Myq6HlkfMl9GhLwMGRg2tGGhjDaj4iPlqR5C+bzr1RC7w
+6dmNPOIjZqsdWvq+p5m11BZ0apluPTX0iNmyO0aXp+Eick1dMN4a4fcR8+V0jC4bgo1n1vTlmKb2xXgNt0NfpmHrjeGFeMk3
+vhC+vK7o5RsNt2F4/hfEl9+hLw3zRW49ejnClXwRUbkLbmimZvhGjTHLghnfF8NYF96wfI3j38oSAcc20p+fizEF1bbxVkfK
+MhYruFYzHB9MsgS2YtzdreESMJe+tGoZtK/bmAEQLcvh+2dvkWjX9P4cqe95fhMua77fqmYkZUAkHfdT8t66d7Td/XlT9Cta
+gyVAlI7bBr0eG0tdINnU7XpKD0wPDK0tjD82lsyuCO55jUinebr5RRie1aEl37WshssEq2vkjR8nS124WDP9puG5nmd8CWPJ
+6ZjBGH59XdIwcA+mZTx+jtyOqaZvNGbQuu0LVPLIOeqCwTBr0WtpdHAOrm/pzuNnqQsBs2WMupYA7dhfgnPoBL+e4zVnlzCR
+/jLAQxd6wKjU9Him+wh46oSmLclhCetqkNdgsKiEvDxa3aldFfFy2KEgXs0H8OxqCuJlYEs+cFLhz1g+7s/z0zqwu1VKb5TS
+TZOh53opo17KsnWfsVIvZTZKaYbualulrGYpVzO2qbcbpWAu5Nt+s5TTpMuybWuLeneLLrdFXl6jlK4jKm+W8pt0mb7jOFtS
+bQgfd+K3Cb8hfRMDi1c+OjSTliKMQdxWbAG6N7xqvaDUMd9NLfZa487sji3VxgjcpGk5ckv1weBAeabiYHxwePiE/BgUIT7L
+xR7wGWbsAWPc6A1M0CE7cyITg43gWUdZjOcVsf3Wa/7kET5DE0QBTK8yPNXtyZSfSNVTDqrqs6PU8DnDvIjGY/6Y3Pgtvh0p
+18/jpBiP58sg/DDDp2aUW7i7fDz+PsmLAHqXrT30UJ2WU3SOExiaBB8DYV9wQliQN39/O24WfvEMaCjicECeTjfeiXh7SSbN
+guNxQi97xwfRhh4f4JONvM33b1+/e//m45vNaJhmkdryu3/+7e372etvfsJHOuPf8HQvY6ZZHmNokRDUe69Phi8JP9jkRa8/
+IN+mVy+i64QwZbx8KZ6hZoeOrDYFfwiSHZwmhMy7lw9qitvsVBK+7R077gGw+Jo/acXfZHFslZ2yJuuFGYXBAdzMaRKej/hR
+dP1XojgYXdR7Gs3LC+sMLGSZPOnxr/g6Prjnhv2bW75bH94fulEfj76T/XODTi7GY6aEfDx+9/PO29+8f/0f/L6USrxQigXZ
+Wd7rj4Lkuvc7fN7gaPudyE9kgid+DYcr4BQfxj3oS4XhS1ydYbjOa4JT73LvU79/SyjmY5S28DlXflQBPmWvz/iaqjODkHai
+lpNlZZhjxcXJdxjxtgrjiyVvrpGCAe9kUNavkcxIq74qH1ssgVvDn/Bwy0HVh1SZoOTdh16v3z9ObsUIYwYLLok8lb7mnsON
++VsYH9F8NKdnEBfYhV4plHucASSrKOKXveBDxPI8oXRNkxl7nrEH3q4mfVmce5q8rQp3ZrVa7AHpLIqTYMmf9h1xq2naAbbe
++0BBOUuanBXnfTwxMb7CoxJncLkn2sCzHYpnW1YBLIziBJ8i7z2F0tPRiLcCjhMPszwYBTk/vwD006wr+OmqLzoeFelsLrwD
+Dsj29m7rjFcHU8hDJe7LNkBW3sinZFmbbRzrXgzfqvbIPUplpc1h0aJWCFGOJVmFL15toEDoOyKOBZSxQLZ73IhjRqe8rRMl
+1MR4qmKrOpVCeIqdPGp0On+2fgbigH49wBzZ9WyRpStJM/kLbj3pv1K7YC4lH5MpC9dHxD1hzRwfnOEpkvD+G74/RRrhLY7g
+T9khu/+rKJcdH6jt4rhLN8Ua3qA9jUlD3OaXQX3uCUh+zWkUuoKGvvvnT389PtaOj680Hf+YHCKoDXO9Q8OuuIGm22NHWQw4
+R+xBfc7bCBEg2ANNIALhWV+9WsxhB9xARYxMZtPYBanCzqBD7WhHATwURxolfPa32QMB9o+a44kXnxC/e1iyk2ZwUDKWmlQC
+C2WnBnkpiEJC6qxWgwmsmZkiABdh2wRsGwECDEMITGl1XEkLRa2S+Rpp7ORNP9oimVVAqWttNG61b9j20Xax7h7aw+59RNUq
+pgIftE+CApTSJS2luxoXimkYLaYxhVGrnfRr8UsyZ2yHbd506YUVbyXASS2MC5givJbEKmNAGOnyHiFeAJLqLGXxaqAYbdBE
+NZZjw5zWmsP0T9dMx8UsuBuwv5bW8Vosdv+Hulrtm87+YvJTq0Hc/qCTUv3jKdV3UqkrdOoPpRJs/6Pp3C1NVZ4PlyZubPxI
+OvUdtOp/oN4R0pkfSay56Bao+RCRnqjhrMSPSwxgwZKFNGUANnBxLwiLDSt+TzTKKrMZ14CUhxlhddEvAikFU4Xnm+QDTANf
+GC97qrPadySSGr/5mdPszOg6NGjGciSL8c3o2xPJ8SVbnrIGMG4gEOJutshmWRDFVz02WYWv4samWHhMAP1XOEPsgscKg1zE
+A0EVCx4donjKtaJi1acljaOR0sBJY2rG1MJ3AQwITAox21Z5bvyGOlph8kvMcxVRsOkumbwkPdeZsf3FtmHO2JNluqnNbEdT
+x4aY32BxfWboxownnk1rZmj+jG3BMM2ZbTkzw6pVnGGdWpjcJPLIBIKHnC/TIKpipKh5q6A5OZcFViA0l3PwG8HSIbHKqb24
+pNbmvy5Qr6hKqKorBFirvW+uyulD9UEhTKyNxzLl33vKym5N/gdVDqtsRrEGxUT4YK0uTEVLUiADwvQtDYDzPmRLCGWvuAqg
+TupbCcbE5+cktzwuspNsPgcL5mmmTMFaM2XKnpkb1thttTpxIz/dyr0zN/z9tto8cyM/3bItNDfw57axf+bmtuaZS0bqJDcn
+iPXE1UMSKHdNV90rVVUiwf1ZKumaeeqfwbspzKp1AyayugETQ+PkaDtplmE4klkSqw3H32WgtdEhMlklIY51RLw2MsrMBToh
+TonRRkjZOP/diR4n/Tmr18eZ8VF3HUZ1VeklAPL+qDgHty0S+uNxkl72d7TAT4rjzopT0DHvKfOu7f6mXFvoMYX21SulbmvD
+ur2L7XxpFwE1//GHdb9DVJjLfKiopdVMUcYY/SvyuAa6KrJ5IQTcn9MV7TF1AxvsC5DTx0jLr7JUa3+X3NgSwUYczTbB4t1l
+8TViuVqIV7LSLI+TUBKxp276YZZi2A3ZUWaA8SgeDvlqTy1AcUmQpHmvSxpCIhUbe4x1a7b8G83Sqjr3KZ2ZhR1ZhppBcs/E
+VTvl5jEEf4CORfTU0XBLoy2XWsNQQyKVUXaJoyOvX59miO0Iu2KYWIK9uRXbEuCDui+BfZU7EpR7k5vxK3mLfa5Fsy2dSSHu
+LfOXnWWkajRVL3cor9+xfDmstTuVkgCj+WozvNudWS42F0GDG/BzZPkBoIJ8Nh2ZQbDaPSVhgZhVHuUpnh6GfgzXHvpd4Y+t
+n4NZ81pTu4Od0nMEUdQTZZ2TDpdRuopyVMplxm6HcdgaFPdYOK4ayA0kuwycbSS5wb+3cgMB2HG1d+CGf7yVmwduuk1Z8A7G
+IT/qbSbQ35shvN2N7uTC48cskCn4SoVXyryflxiUTu2eJsc6CrIPbM0bYJOyDMAbQSzef9W6nHCflbwHruY1VvQesKr38JW9
+xiLUHOImPwOXy6u2AjUQQrzHotRHtXdb14BEnCro2VIT743PnusLWY2CHFJ1tlW2oxL09S4Qcx/QUoEUvrloJ1Zpxya4WrAT
+jGyDj9pOpn1peo7Qg0g1d/ze20qUcRvFe/sWnivTbJZusczWSbc0Vzx5eqdttflvxd9TIuu0FmQus9dv+NYta93eQ7CTcMF+
+S38fxw5v90/kqApvB/XdcDf8/ba+J+5G2uVttUwpLEv67PaoX4v0EhCpob4W3mWBWnxvjqw9ob0K563JlfZNffeJyRUMHFQQ
+r5ntUYKr2M4nji4W2/ne/or5K1BhHDFmDnGhjCUTScDBYnEJc4t4sQAckRT1bX5s819eYFQ8i0H0H7trL13n4/G32Ot4fPP2
+KlxuIkxvfZ/wT7fNjXyNH7v7J5L1C1CVB2G1T4+1vlnjVrQb8BwDsaPuVtm399P7t999/19jtocOAILDprItS+Nn7Jv2G38r
++NvxAWvp8JC8Foh4LH/DheWSy5RdmXxVcnf85OYBy4oRmRUbsNbAkwyZDRN0ZvkhkzZbNGBDkl+E0Q2XcC8S2y6MkWedpXOm
+i/Vm3mOM9wmgqjK3oWQBgeOmzIR9KcuXAivV1jDFRb7lLQzWYgchXFbx2VSkkTpRGgSaJyylTvMnPZmuZLn030Uyrk9+/73q
+hryA27i1TolHtVgkjsMWW/y24tBtY19DeslgGy6KGHa5nQKvTnEb0vaqMTeU5v6IzXrN2mE1xT12baq7o1HL2jNjtQ4Jm22u
+07zcZVJbs5EFEnpVzPaWiijup5UrP7rZ2sq+QixlW24C0Rp31dShxrKG9fvqrw5VtRUNgq1/EwlkxRbcuMJhGBlfA2J/btjP
+8ZgWaAd/wgR/ZEQfoBGAk8JBA5OCUR0L8FFznx1rzJFN6gGMVRmxW+PxC769tteTvqjHlK2G0QGRHqvHlK/eq4PPcuZso6NR
+d1Is03Tdst2k5Yeb9m40qercZ5+J2lPLLg8UWGkIHelnlsbjW9YYMmDpPCbGEVobTKUKdDdguji92ZkYLQXlNgWlvuaA+D60
+5Rrak0pPGFUStSi/O9NFRU2siO/4Bib+G4y7smwtWS/h4jsm8zzt234PBNqBtOTr6ZZb2FtQjPxd5aQOOsqUa1stCYC2rJ7C
+Bl+IbZhjowqDBSu6Go/zy2Dde6q6xkELx/071JdMb8tha7NYzfHxD517Gxvj9In6020QxJSkWnUProuuIeB47EavXAPr1yPE
+lt+s2aUM7/jzQgDopDwOcS7ZEQarZH3vqSyPK+cV07h8LkWjAErJiszZNIEGW8P4F8z4F8z4/DCjGVDvFkzvG0jVHY/dAXRX
+8AQM9G4ZVepgiP6cT3SGaJgRV/shNwIGk3KQCb2K82K0vT9VEeVL0Beat6Eb4Itw58lzYrPPePbvc7XsCCaaPcPus3u4XbMc
+EfvQhnjiC2fCSyh+D8RxL8BW7kTBHwbhy7s1q+lYOOsGbQ3SOtFICe26POWeONZAmh3gkrF1dxzZxJIdgO0PAmT7wVgbELvd
+3ol8LwD2IPB125RRF+jqAly7wdadgNZdQNY+gNUBrraMYAeoUuX/MWDq4UBqB4h6JMiJua7PgJsALNVNcw9aAjWPxeOe/AJN
+WB9jroDyKRh+Mwsu1RsQb8WNsExTibsCPnUgsPuuuK2DRGwjYtuHSA0syEdjJkJ73C09LSuWpg02IcuCalUT6ARlEDMxiUn5
+YsfhYrNcVltf5cN7u8Da3Ze3sDT/pdNJuSyFiXbgpv+qzBOv2S9PyRR6nOf4c/cHKot1T8gfiwB2PTRvtpjI4FxpyfXiuNDI
+eXnFakl5dQmoRk67A1WEwX99jiiyN7uy5fVlT3RGfI/uK8QRensGfX1dS5tXIhH9viRG/ZngHWB8tVkGRXzBTvFqf6rmVlo+
+IGQ5ZIXpMbMbyKE0wGFTUzN30ZirnUmN1/Cnem8LgtcUVj4ErfgP0S24j1Js6Dy+BirgTW27rK6OBSXiK2pi+AKl2LxlnVQP
+uDXvObXWMEyX+x5xblQ+0mZtoSy25FltMVf2hYDq6ruFle3Fei001Yd72drOR4RwfFc59a7x3cADKnUNvFTeYpuclG81Yxdk
+9ktbxn3OLabcsbmhcnvSlXPHJ53xlM1wpedUfS97lKh7hlvaTwn4qysvEM7DFfEcJy5wgJT5LFOUnIqLWuc4m6fQ5yWIGh9d
+O6cB+lgYa4f4rCKwsNu1Vn6/xa2x7mEKC5PjmlP7vI9mssEyve8zmItFzrymYX/8s5LqTIc33Hhuoxwnu55VRDPA2MRbYJGC
+77QUlffD7lLzbMjxftIsCJd3RuBCLB1PJlbOo2P+toOLp4Zt3y1zW3JBczBbuo+DjgRuNyftT0CywV09HjMVUzzezEndA9Z5
+HI1kX8RQ+BXPLe50jZXCmK6qhyj3PkBZcmdsQXRxDwipHMudfMXbd991uQbwjtKfqphYjdId0Fc6zYbDfDAwviPKbTha0c8e
+aZRZna6HfhsJQyBQyYPNOIOVN5E2BFOUE7ZZjSHulnMbSmf0Nauh7iQ7xx9gF/dfwAhMtmOtSkT1pRYL9SoKQgkOv3gxJRBu
+2xYX4lSMATHqAe91YIOtNLtC2hNG2x75y8TjPnjYBsa2IB1C/KPtUzgKmihpx0+qpqnoH/2LIteG+CWRLZ7rD9KMutXk9v8A
++qLakg==
+```
+
+## PERF-M2-CURSOR-MATCHED-BENCH1-CLOSED1
+
+I actually whole-read/hash-verified ARCH's entire 4,673-byte source/result finding at 2,068,437/2a236543 in e43f8e and agree. ARCH independently decoded all eight preserved inputs/logs and verified every raw sample/counter, source inverse and paired-ratio figure; Root independently did the same. Normal reciprocal review is closed, with no further timing or source change. One metadata precision: the CPU-brand command was denied, and the initial script stopped before querying CPU count; both remain unavailable. The measured evidence/limitations are unchanged. Dedicated review now proceeds on the separately selected joint proof.
+
+
+## PERF-M2-JOINT-RAFT-REDB1-WRITTEN1
+
+I actually whole-read the selected joint source in `/private/tmp/ferricstore2-openraft-0.9.25-redb-4.4.0-spike`, including all twelve source bodies, the exact inherited manifest and the three original cap tests. Final CREATE+precision+admission were read in 27c949; rolling full source reads include 345f9e, 521dc7, ce6953, 1f1916, df267b, 07faa2 and fc3b33. No extra artifact or execution was introduced by this review. The latest fully read main is 8,346 bytes/41d292db, engine is 8,000/f2a5ac27, fault is 10,383/717db55a; these are pre-format, pending-runtime bindings rather than a final manifest.
+
+The resource correction selected before creation is present: one shared preparation semaphore is cloned across LogBridge, its readers, StateBridge and SnapshotBuilder, and is acquired before their new owned row/member/snapshot construction. Capture releases it; building reacquires it without nesting. The independent engine permit moves into Job and survives cancellation of its reply waiter. Consequently the selected two concurrent serialized batches remain at most two 1 MiB payload owners plus their bounded row metadata. Current codec a9cb5447 first serializes into fixed 64 KiB scratch, then checks the aggregate including each log's 24-byte identity prefix before fallible output reservation/copy. Engine validation repeats positive profiles and aggregate/count bounds before work. The worker's additional per-log wire Vec is at most 16 KiB; returned/partially decoded entries, membership images, captured builders and the two 64 KiB snapshot frames during save remain separately bounded owners, not free peak credit. Library serialization allocations, completed externally held results, upstream queues and redb pages/cache are outside that narrow concurrency theorem. The 16 MiB cache policy is no RSS cap.
+
+CappedSnapshot 107e8b13 has no clone/mutable escape: from/into consume existing ownership, writes check position+length and fallibly reserve before Cursor growth, rejected writes/seeks preserve state, seeks alone do not expand the payload, and default vectored routing still reaches the capped write. The exact three tests were read before source. Current state image reading fails on partial persisted value/member presence; only wholly absent initial state defaults. Full term/node/index identities, durable committed position, ordered additive responses, membership and snapshot metadata remain explicit. Snapshot capture is coherent, metadata disagreement rejects before target writes, and installation publishes value+last-applied+membership+current snapshot in one Immediate transaction. No full workflow adapter, hidden second business admission or invented complete FIFO view is supplied by this isolated proof.
+
+I found a real cancellation-fixture completion race during source review: the read reply can wake its waiter before that read Job drops its permit. Writer corrected it before joint runtime by acquiring and dropping the SAME engine gate after the value 5 read, then asserting one available permit. Actual f2a5ac27 contains this barrier; no sleep, weakened assertion, new model or changed job contract is involved. The worker itself already retained the permit correctly. Main 41d292db separately reserves 128 JoinHandles fallibly, runs the genuine upstream Suite outside its own Runtime, releases framework senders before worker joins, and checks delta 7/read barrier/completed snapshot/target install/full drain/reopen/delta 3=>10 with zero RPCs.
+
+Root's actual fault 317/717db55a delegates real FileBackend sync before its one injected error. Commit then probes a real begin_write PreviousIo refusal and fences the proof handle; reopening reconciles an ENTIRE old or new state cohort and resumes from its recovered position. Four actual child boundaries park after staged writes/before commit or after successful Immediate; the parent length-bounds acknowledgement reading, kills/reaps, joins the reader, and only then reopens and compares full state, membership and current snapshot. This is a meaningful process-kill design, not power-loss or Linux evidence. The selected 20s bounds apply to asynchronous leader/client/barrier/snapshot waits; the child handshake is 10s. Native filesystem/cache behavior remains separately qualified.
+
+At this save, I actually read Root's check.log 3,283 B/6559829b and unit-green.log 640 B/94297f59: the offline 122-package resolution/check reached EXIT0 with a sole deprecated fetch_update warning; current main replaces it with try_update. The three frozen CappedSnapshot tests pass without operand changes. No joint Suite/singleton/fault/crash runtime or strict-clean result is claimed yet. Root owns every execution; final runtime/style deltas will be reviewed ordinarily, without another approval or acknowledgment gate. I found no remaining concrete source/resource blocker in these actual bodies.
+
+
+## PERF-M2-JOINT-RAFT-REDB1-STRICT-DELTA1
+
+I actually whole-read the complete accumulated lint.log in 191272: 10,154 bytes/SHA95546ec74940820b8cc8b3890afd2fe313cd0184830c1b04da1abb9624ac4942, preserving the first11 diagnostics and the second strict EXIT0. In faadb5 I whole-read the changed codec108/bbe635e3, bridge82/508ce67d, log115/d5c74a89, state84/2ca18784 and main190/45650b7c. The ARCH-selected heap scratch validates positive maximum<=64KiB before try_reserve_exact+zero-fill; Cursor still borrows a fixed slice and cannot grow. Scratch and the later output Vec overlap explicitly. It replaces the original stack-array representation, so I make no byte-only inverse or fewer-allocation claim. Ready futures, borrowed row decoding, collapsed guard, documentation and config-error conversion retain fixture operands and real completion rules. No suppression, dependency, artifact or oracle change was added. At this read there was no run.log or format.log; joint runtime and final formatting remain Root-owned later evidence, not an extra approval gate.
+
+
+## PERF-M2-JOINT-RAFT-REDB1-CLOSED1
+
+I actually whole-read/hash-verified ARCH's entire 6,802-byte WRITTEN1 at 2,076,324/e4ff367e in b9ccbb and agree. All fifteen actual formatted manifest/lock/source/test hashes independently match its table. My source conclusions and separately recorded heap-scratch qualification stand; no remaining selected blocker. In read-only 34748e, reversing only three assert reflows and EOF normalization reconstructs the ENTIRE frozen 5,093-byte cap test/SHA8487cbd584b04ea8a2467e2c37f9d26197ea568884c1c94702a3dc5cf8a69dec. No file or assertion was edited by this proof.
+
+Later executed evidence supersedes the earlier pending-at-save paragraphs. I actually read the entire completed run.log in b9bd56: 888 bytes/SHA6344a7662bdd0c6bd9f8e5985a8ed3ac69d70a113f7a95e8a8649846ecdde1fe, EXIT0 for genuine upstream Suite, singleton delta 7/barrier/snapshot transfer/drain/reopen/delta 3=>10, cancellation reservation drain, delegated-sync refusal/reconciliation/resumption and all four acknowledged process-kill recovery boundaries. Root independently confirms 07f9eb/session29506→79931f. I ran no duplicate engine or Cargo command. Actual test.log 846 B/2a2fd9a3 in 30a764 confirms all-target EXIT0: zero binary unit tests plus the THREE genuine cap tests, not an invented fourth test. The separate runtime main supplies Suite/integration assertions. First format-check EXIT1 then format/check EXIT0 and the first eleven strict diagnostics remain honest earlier stages.
+
+Actual full audit.log 747 B/48684990 was also read in 30a764: offline metadata failed before category checks because windows-core0.62.2 and android_system_properties0.1.6 archives are absent. This is NO joint advisory/license/bans/sources pass; neither an earlier smaller graph nor a product cached audit substitutes. Native evidence is the selected macOS arm64 experiment, with no timing/RSS/power-loss/Linux/production-adoption or full-workflow-parity claim. Physical workflow authority, one retained gate before Fresh reads and complete FIFO lane obligations remain necessary future integration work. Normal reciprocal source review closes finitely; no additional acknowledgment or run is required. The next product decode/gate review proceeds separately.

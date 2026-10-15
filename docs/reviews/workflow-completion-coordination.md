@@ -43789,3 +43789,72 @@ fn check_abort_and_reopen(db: Database, path: &Path) -> Result<(), Box<dyn Error
     Ok(())
 }
 ```
+
+## ROOT-M2-REDB44-CACHED-GRAPH-AUDIT1
+
+Read-only diagnostic `17a574` exits 0 using the unchanged product policy:
+
+```text
+.tools/bin/cargo-deny --offline --locked --workspace --manifest-path /private/tmp/ferricstore2-redb-4.4.0-7061f7e-spike/Cargo.toml --config /Users/yoavgea/repos/ferricstore2-rust-design/deny.toml check --show-stats advisories bans licenses sources
+```
+
+Advisories and sources each report zero errors/warnings. Bans reports three unmatched product-only skip warnings (syn/thiserror/thiserror-impl); licenses reports one unused Unicode-3.0 allowance warning. No policy edit or warning suppression was made. This diagnostic is not a clean strict product gate. It covers the actual isolated consumer/path-redb4.4.0/registry-libc0.2.190 graph only, not the registry redb archive, a future OpenRaft closure or production adoption. Independent `fdb6af` binds the cached advisory DB to `edb58f5974b83eb8302332821cb6d389777aa351`, dated 2026-10-14T22:18:32+02:00; no fresh fetch occurred. `e52e4b` rechecks unchanged consumer manifest `6d5c7451`, main `bfde65ba` and lock `80746ddf`.
+
+## ROOT-M2-CURSOR-MATCHED-BENCH1-RELEASE1
+
+Root actually read ARCH's entire 7,131-byte `ARCH-M2-CURSOR-MATCHED-BENCH1-CREATE1` at architecture offset 2,031,526 / SHA256 `c1772335a1a30860d273c7d374c2668e8636df987b54d63d58f4a78746287d5e` in `a74ed2`, and PERF's full proposal in `00aa9c`. `a56959` confirms the selected temporary root is absent and not a symlink. Release PERF to author and serially execute ONLY the three selected files and exact generated outputs/profile/workloads. Root/ARCH/Writer review actual source; no additional acknowledgement gate precedes work. Writer's joint proof remains disjoint.
+
+Root's independent fileless oracle `8e76ef` precedes authored code/timing and agrees with both candidate/copy/count/sum totals, max key56, namespace16 and bounds25. Ordered key-stream SHA256 is `39dc2436d90e5c85883449531b796ea653589e70aa4bc5dcb1c0447b45d1117d` for N1024 and `bf7f0a0884003080451be27b7606dd4167f383d441b33d3543687eb005aee1f1` for N16384. These are independent diagnostics, not a new hashing dependency or replacement for every-field/accepted-sequence checks. Literal boundary bytes printed by that independent calculation are frozen below:
+
+```text
+0: 4657504b0001036700007a000074000000000000000000000000ff00ff00ff00ff00ff00ff00ff00ff00007000ff00ff0000710000720000
+1: 4657504b0001036700007a000074000000000000000000000100ff00ff00ff00ff00ff00ff00ff0100007000ff010000710000720000
+255: 4657504b0001036700007a00007400000000000000000000ff00ff00ff00ff00ff00ff00ff00ffff00007000ffff0000710000720000
+256: 4657504b0001036700007a000074000000000000000000010000ff00ff00ff00ff00ff00ff0100ff00007000ff00ff0000710000720000
+16383: 4657504b0001036700007a0000740000000000000000003fff00ff00ff00ff00ff00ff00ff3fff00007000ffff0000710000720000
+```
+
+## ROOT-M2-CURSOR-MATCHED-BENCH1-REVIEW1
+
+Root whole-read first manifest/main/scan in `1b8c1b`/`833452`/`fe2b73`. Review caught unequal optimizer observability: retained's intermediate encoded/raw copies could be dead stores while reseek consumes every encoded position. Shared per-candidate `black_box` now observes encoded/raw/value copies before progress. ARCH independently agreed. Root whole-read final main/scan/lock in `729018`/`3a8937`/`d7010a`: fixed literals, every-field and accepted-sequence checks, exact copy/counter/end oracles, same-writer guards and separate Immediate timer are preserved. No source defect remains. Initial unused import, two unhandled durability Results and four strict style findings remain failed epochs; no engine TDD claim is made.
+
+PERF's selected execution `22f7ca`/session9048→`ef7e0f` exits 0 after strict lint, direct format, release build and complete untimed checks. Root held all joint Cargo work through the measurement window. Independent `a8e46c` parses ALL raw results: 48 pairs, twelve unique samples per workload, balanced six AB/six BA, exact full eight-counter arrays for each strategy, and twelve positive separate commit samples. `results.log` is 13,551 bytes / SHA256 `3800d34a47b062b372fdaf1f47d12a995a2bb89eef48888b92ce808f64e6cd14`.
+
+| Rows/filter | Retained median ms | Reseek median ms | Ratio of medians |
+|---|---:|---:|---:|
+| 1024/all | 0.586542 | 1.256291 | 2.142 |
+| 1024/quarter | 0.5946875 | 1.2643125 | 2.126 |
+| 16384/all | 10.2690625 | 21.415667 | 2.085 |
+| 16384/quarter | 10.220375 | 20.9892705 | 2.054 |
+
+Separate healthy Immediate commit median is 4.2328125 ms, min3.920084/max6.618 ms. These are one warm-cache, single-process, native macOS26.6.2/arm64 fixture under Rust1.99.0/release with overflow checks. CPU model/count collection was permission-denied and remains unavailable; no elevation or inferred CPU identity. A local retained Table+Range is a legal baseline, not an implementation of the owning product cursor. No total allocation/RSS, cold-cache/concurrency, product p99, native Linux, power-loss, registry adoption or M2/M8 completion follows. No further timing is needed; joint proof work may proceed.
+
+## ROOT-M2-JOINT-REDB44-OPENRAFT0925-PROOF1-TEST-RELEASE1
+
+Root actually read the full ARCH CREATE+PRECISION in `ba1792`, verified exact 21,097/6,488-byte bindings in `a64c54` (`a2395240`/`653f382d`), and whole-read final 2,195-byte ADMISSION `c8f3580e` in `f2914d`. That call proves `/private/tmp/ferricstore2-openraft-0.9.25-redb-4.4.0-spike` absent and not a symlink. The three records form the single selected fourteen-file/fifteen-model contract. No generic readiness or acknowledgement remains.
+
+Release phase ONE now: Writer creates ONLY the selected Cargo.toml and required root directory, exact profile/lint inheritance, no explicit absent bin target. Root authors ONLY tests/capped_snapshot.rs with the three selected identities. ALL twelve src files remain absent. Root owns offline resolution and independent precise missing-data.rs RED, then freezes tests and separately releases the actual selected source batch. No implementation before that release. The finished PERF measurement window has ended; joint Cargo may run without contaminating it. No product dependency/lock/source or pristine upstream edit is selected.
+
+## ROOT-M2-JOINT-REDB44-OPENRAFT0925-PROOF1-RED1-SOURCE-RELEASE1
+
+Root authored only the selected three-identity `tests/capped_snapshot.rs`: 5,093 bytes/126 LF/SHA256 `8487cbd584b04ea8a2467e2c37f9d26197ea568884c1c94702a3dc5cf8a69dec` (`ab856f`). Writer's sole manifest is 1,295 bytes/42 LF/`2ff50365a646850feb20036e1addae20e53f2c42ae3533db8ed52769006c9436`; Root whole-read `bc17d5` and semantic lint equality `4617ec`. ALL src remained absent. Writer independently whole-read the actual tests and found no contract defect.
+
+Actual offline lock generation `076324` exits0. Lock is 28,742 bytes/1,127 LF/SHA256 `6542b594e36bdddc1d5f642f2f55089d4c8d29abea3887565ef64fc0ecff6d7d`, 123 packages including the consumer. Direct OpenRaft/macros0.9.25, redb4.4.0, Tokio1.53.2, Serde1.0.229, JSON1.0.151 and wf-types0.1.0 match the selected profile. This is actual resolution, not the packaged upstream dev lock.
+
+Root's first `cargo +1.99.0 test --offline --locked --test capped_snapshot` (`f70cdb`/session12573→`9ea1f3`) compiles the actual host dependencies then exits101 solely because selected `tests/../src/snapshot/data.rs` does not exist. Independent repeat `cc5faf` exits101 at the same precise missing-file error. `033a6d` confirms ALL src still absent and frozen tests unchanged; accumulated `unit-red.log` is3,441 bytes/SHA256 `e8ffe37e25f04abc42b755dce7e470375a80ff63e15fec0ba79e3cd8e619a3d8`, with exactly two expected missing-file failures. No assertions have executed and no engine-wide TDD claim is made. Full pre-body test/manifest/lock buffers are frozen in Root's session record.
+
+Release phase TWO now: Writer may author the twelve exact selected src files and fifteen own models under the combined ARCH CREATE+PRECISION+ADMISSION contract. Frozen tests/manifest/lock and product/upstream files remain Root-owned or immutable. Root remains the sole joint Cargo/log runner. Publish the cap body first for focused GREEN/source review, then the complete substantive runtime/fault source. Ordinary reciprocal review proceeds without an extra acknowledgement gate; concrete defects are resolved normally.
+
+## ROOT-M2-JOINT-REDB44-OPENRAFT0925-PROOF1-TERMINAL1
+
+Root directly collected the first real whole runtime invocation: 07f9eb/session29506→79931f, cargo +1.99.0 run --offline --locked, EXIT0. The real OpenRaft storage-v2 Suite passes with durable committed-position support. A genuine singleton applies delta7, crosses its linearizable read barrier, completes/captures a snapshot, installs it into a separate target, drains/shuts down/reopens, then applies delta3 and verifies10 with zero peer RPCs. The real cancelled-waiter case retains the worker permit through completion/drain. A post-delegated-sync error returns the original error, observes actual engine refusal, fences, closes/reopens, accepts only a complete old/new cohort, and resumes from that recovered position. Four separately acknowledged apply/install before-commit/after-Immediate process kills are reaped before reopen and recover the exact expected full value/applied/membership/current-snapshot cohort. This is macOS26.6.2 arm64 process-crash evidence; it is not power/device-loss, multi-node quorum, production workflow or Linux evidence.
+
+run.log is888B/SHA2566344a7662bdd0c6bd9f8e5985a8ed3ac69d70a113f7a95e8a8649846ecdde1fe. Root's post-format all-target tests6811c2/session11044→997fdb exit0: binary harness0, snapshot integration3 passed/0 failed/0 ignored/0 warnings. test.log846B/2a2fd9a371cdce0a65aa3f686f55d3df1c89b45eb5d815c133209040c0f29e62. Original cap assertions first passed e55e5b after actual twice-reproduced missing-data.rs RED. Later formatting reflows only; no whole-store tests-first claim is made for this external dependency/runtime proof. Product count stays637 and ledger stays77/87/326.
+
+First full compile4256eb/session48469→70813f exits0 with one actual deprecated fetch_update warning, subsequently repaired. First strict644954 exits101 with eleven real findings; second strict3fb7f8 exits0 without suppressions. Heap scratch, Ready futures, borrowed row decode and ConfigError mapping are real code adaptations, not merely lexical changes. First format99f36a exits1; Root's explicit package-only mechanical handoff runs fmt e65c8d and fmt --check5873a1, both exit0, without --all or upstream mutation. Accumulated logs preserve failed epochs before success: check3283B/6559829b, lint10154B/95546ec7, format81651B/3d166649.
+
+The actual joint cached audit2988c0 exits1 BEFORE any advisory/bans/license/source categories because all-target Cargo metadata needs uncached windows-core0.62.2 and android_system_properties0.1.6. Root whole-read audit.log in ca49e6;747B/48684990. No policy/pin/target-filter/suppression change or clean-audit credit. The tool also creates an incidental empty .tools/advisory-dbs/db.lock in this temporary root; it is not authored source or a successful advisory refresh. The earlier tiny redb graph diagnostic does not substitute for this full graph. No repeated unchanged acquisition attempt is required.
+
+Root independently verifies ALL fifteen manifest/lock/test/source files remain byte-identical to the frozen post-format epoch833eba. Manifest2ff50365 and lock6542b594 retain the exact123-package selected profile; testb7d5695d retains all original operands. All twelve production source files stay below400 physical LF and test138LF below600; ARCH reviewed each actual ordinary function below100. Whole source/resource review is reciprocal: ARCH's complete6802B/e4ff367e and PERF's4923B/4292a7c5 plus1063B/2a4195fc were actually whole-read in fafe4c, and their real partial-image and cancellation completion-race corrections are in the executed source. Writer independently whole-read Root-owned fault/tests. Root's final78b152 verifies all131 pristine upstream blobs,2,444,474B/all34Git trees/root77441c23/inventory25318e9c/no extras after every joint command.
+
+The isolated proof is closed without another acknowledgment or run gate. It adopts no production dependency, GroupApplyStore implementation or parity/profile claim. Full source/registry acquisition policy, joint graph audit, real bounded product atomicity/recovery/snapshot completeness, native Linux, multi-node consensus and all remaining M1–M8/source setup profiles remain active work. ARCH/Writer/PERF now read the exact product scanner/point-binding/one-request-gate seams for the next concrete named implementation batch; no new artifact is selected by this terminal record.
