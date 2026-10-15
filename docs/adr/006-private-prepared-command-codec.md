@@ -1133,3 +1133,31 @@ physical publication authority, and its original-envelope retained response is
 not yet the final public reply-state projection. Coherent VM capture, opaque
 ingress identity, complete original scenarios/setup/profiles, physical atomic
 all-shard publication and independent Linux/macOS acceptance remain required.
+
+## Selected original public policy reply views
+
+ARCH-NEXT-M1-ORIGINAL-PUBLIC-REPLY1-CREATE1 selects eight private production
+files and six test files. The pure domain projects original SET and GET replies
+from borrowed ETF donors and explicit caller defaults. SET decodes its returned
+value without a type-binding check; GET binds the stored type. Missing GET uses
+generation zero and caller defaults. Read failures precede unused context.
+
+One retained structural index supports generic values and exact-key backoff
+overlays. A cached type-default record is shared across state records. Four
+bounded indexed names use fixed inline storage; records and their ordering keep
+fallibly reserved Vec capacity after LAST compaction. Public map iteration and
+atom lookup pay before observation and preserve iterator state on refusal.
+Resident reservations include explicit additional caller owners; historical
+peak charge is never an ownership credit. These are logical work and ownership
+bounds, without a measured native speed or allocation claim.
+
+Source Enumerable dispatch, eager callbacks, false/nil fallback and independent
+indexed-helper failures retain source order. Captured native state-map order is
+an explicit correspondence input; synthetic reply maps use specified logical
+order. Complete opaque ingress identity and custom Enumerable runtime support
+remain required; reached unsupported profiles return operational `UnsupportedTag`.
+The Fresh/Replay caller test consumes real existing plans and keeps
+stored intent/value immutable while applying current caller defaults. It does
+not publish a physical result. Full wire output, coherent ingress capture,
+physical atomic/all-shard publication, original setup/runtime profiles and
+independent Linux execution remain required.

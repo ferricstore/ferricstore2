@@ -791,3 +791,16 @@ no native allocation or latency measurement. The core adds no OS-specific API.
 Public reply projection, opaque ingress identity and coherent VM capture,
 physical atomic/all-shard publication, all original assertion/setup/runtime
 profiles and independent Linux/macOS validation remain required.
+
+## Original public policy reply views
+
+The selected private domain reply implementation borrows original ETF donors
+and explicit caller defaults, sharing the structural index and type defaults
+across state views. Generic values preserve exact map-key classes and source
+fallback/error order. Public observations use the same logical resource account
+with explicit simultaneously live caller owners. No storage, clock, hash or
+transport dependency enters the domain. The real Fresh/Replay caller test uses
+existing immutable plans; physical publication remains an adapter obligation.
+See [ADR006](adr/006-private-prepared-command-codec.md) for the selected contract
+and remaining opaque ingress identity, custom Enumerable support and runtime
+acceptance requirements.

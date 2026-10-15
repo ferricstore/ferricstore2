@@ -143,7 +143,7 @@ struct VirtualLocalFun {
 }
 
 #[derive(Clone, Copy)]
-enum TermPosition {
+pub(in crate::policy::complete) enum TermPosition {
     Encoded(u32),
     StringCell { span: u32, offset: u32 },
     Byte(u8),

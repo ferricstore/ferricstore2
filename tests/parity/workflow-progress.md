@@ -36,7 +36,7 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 71 source declarations, 78 counterpart records and 303 assertion links.
+increments: 71 source declarations, 79 counterpart records and 306 assertion links.
 Both reviewers accept the supplemental source603 shape-error anchor; it supplies
 one error component with its remaining setup/profile/physical obligations explicit.
 The separate original ETF generation-boundary counterpart retains MAX, the returned
@@ -93,6 +93,15 @@ source/dependency stages on unchanged1036 implementation/tooling inputs. Public
 dispatch/error tuples, default-false arbitrary-current merge, identity/capture/
 Enumerable, physical/all-shard installation, original setup/runtime profiles,
 all remaining scenarios/assertions and independent Linux remain required.
+
+Original policy reply views add one counterpart with three direct observations
+for source lines 37, 43 and 52: the type, all-states charge_card and selected
+charge_card retention maps omit the internal hot-history key. All 78 older counterparts and
+every runtime identity remain unchanged. The manually encoded source-value
+recipe does not execute public installation or physical reads. The seven new
+domain tests and the real Fresh/Replay caller test pass on macOS; full public
+replies, original setup/runtime profiles, physical publication and independent
+Linux acceptance remain required.
 
 Two separately scoped counterparts
 belong to one FIFO lifecycle declaration; a single state/partition test retains

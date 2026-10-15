@@ -18,6 +18,38 @@ impl std::fmt::Debug for OriginalPolicyCurrentCursor<'_, '_, '_> {
 }
 
 impl<'index, 'raw, 'context> OriginalPolicyCurrentCursor<'index, 'raw, 'context> {
+    pub(in crate::policy::complete) const fn position(self) -> Position {
+        self.position
+    }
+
+    pub(in crate::policy::complete) fn original_encoding(self) -> Option<&'raw [u8]> {
+        let Position::Encoded(_) = self.position else {
+            return None;
+        };
+        let span = self.span()?;
+        self.index.raw.get(span.start as usize..span.end as usize)
+    }
+
+    pub(in crate::policy::complete) fn float(self) -> Option<f64> {
+        let span = self.span()?;
+        matches!(span.tag(), 70 | 99)
+            .then(|| f64::from_bits((u64::from(span.canonical) << 32) | u64::from(span.keys)))
+    }
+
+    pub(in crate::policy::complete) fn bitstring(self) -> Option<(&'raw [u8], usize)> {
+        let span = self.span()?;
+        if !matches!(span.tag(), 109 | 77) {
+            return None;
+        }
+        let bits = usize::try_from(span.keys).ok()?;
+        let start = usize::try_from(span.canonical).ok()?;
+        let bytes = self
+            .index
+            .raw
+            .get(start..start.checked_add(bits.div_ceil(8))?)?;
+        Some((bytes, bits))
+    }
+
     pub(in crate::policy::complete) fn equal(
         self,
         other: Self,

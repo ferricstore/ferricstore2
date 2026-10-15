@@ -55,6 +55,33 @@ impl<'raw, 'context> OriginalPolicyCurrentIndex<'raw, 'context> {
         OriginalPolicyCurrentCursor::new(self, TermPosition::Encoded(self.policy))
     }
 
+    pub(in crate::policy::complete) fn at(
+        &self,
+        position: TermPosition,
+    ) -> OriginalPolicyCurrentCursor<'_, 'raw, 'context> {
+        OriginalPolicyCurrentCursor::new(self, position)
+    }
+
+    pub(in crate::policy::complete) fn compare_positions(
+        &self,
+        left: TermPosition,
+        right: TermPosition,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<std::cmp::Ordering, Error> {
+        super::identity::compare(
+            (
+                self.raw,
+                &self.spans,
+                &self.keys,
+                &self.safety,
+                &self.virtual_funs,
+            ),
+            left,
+            right,
+            charge,
+        )
+    }
+
     pub(in crate::policy::complete) fn build_catalog(
         &mut self,
         live: usize,

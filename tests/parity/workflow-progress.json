@@ -22079,6 +22079,37 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "Executed borrowed optional retention normalization preserves original type TTL60000/history512 and charge_card TTL30000/history256 inputs; the two direct scalar macros execute for both rows and link only source36/38/42/44. A separate original TTL5000/history_hot_max_events3 recipe links source140 to its real caller reason and exact body. Existing Copy RetentionOverride replaces scalar maps, without proving public map serialization or hot-field absence. Public set/get/default projection, authoritative installation, source error tuple, whole raw flow/state ingress, ETF sizing/emission, physical atomic publication and original FlowTest async:false, flow/global_state tags, 120000 timeout, shards/FLUSHDB/cleanup and all runtime profiles remain required. Captured C100/C10 with history50 and exact body10, changed later capture and dropped donors execute as additional pure controls, but source b0c4 line684 is a pattern assignment and its generation1/decoded-value assertion668 and ETS assertion692 remain UNLINKED. Neighbor TTL5000/history9 does not link source3e46 creation/inheritance/store assertions. Visible descriptor bounds do not prove hidden term bytes, arbitrary map identity or parser correspondence. Real tests-only missing-API RED preceded production; all86 policy controls and strict target lint actually pass on macOS. These post-GREEN ledger anchors preserve every older record and limitation, certify only the represented field/error components and establish neither whole source-case/full workflow parity nor independent Linux acceptance."
           ]
+        },
+        {
+          "scenario_id": "m1-4b70723c9149fbe8-original_reply_preserves_pinned_type_and_state_retry_retention_maps",
+          "rust_file": "crates/wf-domain/tests/complete_policy/original_reply/source.rs",
+          "rust_file_sha256": "956d493483dcae6fc28085a47446c2c1a6d3435a7057ca74edcfc6e2f8718b26",
+          "rust_module": "",
+          "rust_function": "original_reply_preserves_pinned_type_and_state_retry_retention_maps",
+          "assertions": [
+            {
+              "source_line": 37,
+              "source_text": "refute Map.has_key?(policy.retention, :history_hot_max_events)",
+              "rust_line": 36,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 43,
+              "source_text": "refute Map.has_key?(policy.states[\"charge_card\"].retention, :history_hot_max_events)",
+              "rust_line": 70,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 52,
+              "source_text": "refute Map.has_key?(state_policy.retention, :history_hot_max_events)",
+              "rust_line": 94,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed original ETF reply views preserve the pinned flow-policy type/default retry and retention recipe, charge_card overrides and inherited defaults. Three direct test-body atom-field absence assertions link only source37/43/52: the type, all-states charge_card and selected charge_card retention maps omit history_hot_max_events. The manually encoded stored-policy recipe preserves source values but does not execute public keyword preprocessing, physical set/get calls or the original encoder. Source11/46 public success replies, authoritative/atomic/all-shard publication, coherent VM capture, opaque identity/Enumerable support, original setup/cleanup and every required runtime profile remain acceptance obligations. Other scalar observations and helper assertions add no new ledger links. Tests-only missing-API RED preceded production; the separate empty/atom-state lookup supplements were added after production and retain their actual provenance. Seven new domain tests and the real Fresh/Replay caller test pass on macOS; logical resource controls do not establish measured native allocation/speed, full source-case/workflow parity or independent Linux acceptance. Every older counterpart, limitation and runtime identity is preserved."
+          ]
         }
       ]
     },

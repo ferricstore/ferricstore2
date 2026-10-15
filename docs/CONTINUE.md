@@ -4,7 +4,24 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The working tree now contains the selected original public Policy.set frame and
+The current batch implements original public policy reply views in eight
+private production files. Root independently reproduced missing-API RED before
+production; the seven new domain tests and the real Fresh/Replay caller test
+pass. The final native macOS workspace run passes 603 Rust tests across 68 targets
+and four compile-fail docs, with zero warnings, failures or ignored tests.
+Formatting, strict all-target lint, rustdoc, architecture and reference/progress
+checks pass on 1,116 unchanged bound inputs. The wrapper exits 1 only because GitHub
+DNS blocks its default RustSec refresh; the separate cached audit passes all four
+categories against the October 14 database. Strict all-feature Clippy also passes.
+Two library and three test lint repairs preserve expectations and paid order;
+their failed epochs and the post-SUT States lookup regressions remain recorded.
+The ledger now has 71 declarations, 79 counterparts and 306 assertion links,
+adding only the three executed hot-history-key absence observations. Full M1–M8,
+public/physical operations, original runtime profiles and native Linux remain
+incomplete. Written-source and reciprocal reviews are closed without a component
+blocker. See the selected reply contract in ADR006 and the coordination note.
+
+The preceding checkpoint contains the selected original public Policy.set frame and
 both-mode Fresh merge successor. Its twelve new test identities have genuine
 tests-only missing-API RED independently reproduced by Root before production.
 All eighteen selected production files have substantive bodies. The native macOS
@@ -1199,7 +1216,7 @@ remain historical evidence; they are not the current verification totals.
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
 [progress ledger](../tests/parity/workflow-progress.json) now has **71 reviewed
-source declarations, 78 counterpart records and 303 assertion links**. Links
+source declarations, 79 counterpart records and 306 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

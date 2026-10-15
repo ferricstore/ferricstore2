@@ -400,6 +400,14 @@ fn original_public_policy_set_preparation_stays_pure_and_server_side() -> CheckR
         "policy::complete::public_set::patch",
         "policy::complete::public_set::patch::rows",
         "policy::complete::public_set::metric",
+        "policy::complete::original_reply",
+        "policy::complete::original_reply::model",
+        "policy::complete::original_reply::value",
+        "policy::complete::original_reply::source",
+        "policy::complete::original_reply::resolve",
+        "policy::complete::original_reply::states",
+        "policy::complete::original_reply::maps",
+        "policy::complete::flow_input::value::map",
     ] {
         assert_eq!(
             source_check(
@@ -430,6 +438,15 @@ fn original_public_policy_set_preparation_stays_pure_and_server_side() -> CheckR
         "OriginalPolicySetInputRejection",
         "prepare_original_policy_set_request",
         "encode_original_policy_set_input_rejection_body",
+        "OriginalPolicyReply",
+        "OriginalPolicyReplyValue",
+        "OriginalPolicyReplyMapIter",
+        "OriginalPolicyReplyMapEntry",
+        "OriginalPolicyReplyContext",
+        "OriginalPolicyReplyRejection",
+        "OriginalPolicyReplyError",
+        "present_original_policy_set_reply",
+        "present_original_policy_get_reply",
     ] {
         original_flow_export_is_server_only(name)?;
     }

@@ -19,6 +19,7 @@ mod indexed_input;
 mod installation;
 mod model;
 mod original_entry;
+mod original_reply;
 mod original_retry_keys;
 mod outer;
 mod patch;
@@ -59,6 +60,11 @@ pub use original_entry::{
     OriginalEtfLocalFun, OriginalEtfSafety, OriginalPolicyEntry, OriginalPolicyReadError,
     OriginalPolicyReadValue, decode_original_complete_policy_entry,
     prepare_original_complete_policy_reference_bytes, read_original_complete_policy_entry,
+};
+pub use original_reply::{
+    OriginalPolicyReply, OriginalPolicyReplyContext, OriginalPolicyReplyError,
+    OriginalPolicyReplyMapEntry, OriginalPolicyReplyMapIter, OriginalPolicyReplyRejection,
+    OriginalPolicyReplyValue, present_original_policy_get_reply, present_original_policy_set_reply,
 };
 pub use original_retry_keys::{
     OriginalPolicyMapKey, OriginalPolicyMapValue, original_complete_policy_uses_max_attempts,
