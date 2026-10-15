@@ -24,7 +24,7 @@ FIFO = "crates/wf-domain/tests/claim_selection_fifo.rs"
 LANE = "crates/wf-domain/tests/claim_selection_lane.rs"
 LINKS = [
     ("a16aec6cceb6253a", "crates/wf-domain/tests/complete_policy/original_entry.rs",
-     "original_entry_preserves_original_shape_generation_and_consumption_errors", 7,
+     "original_entry_preserves_original_shape_generation_and_consumption_errors", 8,
      [(603, 2)]),
     ("bd8fd99c0d608b90", "crates/wf-domain/tests/complete_policy/indexed_input.rs",
      "indexed_input_normalizes_frozen_original_policy_names_and_presence", 12,
@@ -47,6 +47,9 @@ LINKS = [
     ("2302fd8c2cfa076d", "crates/wf-domain/tests/complete_policy/encoding_vectors.rs",
      "source_policy_generation_stops_at_exact_migration_score_boundary", 11,
      [(554, 2), (554, 3), (558, 4), (560, 5), (563, 7), (563, 8)]),
+    ("2302fd8c2cfa076d", "crates/wf-domain/tests/complete_policy/original_entry.rs",
+     "original_entry_preserves_original_shape_generation_and_consumption_errors", 8,
+     [(554, 3), (554, 4), (554, 6), (558, 7)]),
     ("d9078b362e9f0d80", "crates/wf-domain/tests/lease_lifecycle.rs",
      "source_reclaim_boundary_preserves_claim_and_explicit_reclaim_scenarios", 24,
      [(772, 0), (774, 1), (783, 5), (792, 6), (793, 8), (794, 9), (795, 10)]),
@@ -214,7 +217,9 @@ def counterparts(manifest):
             limitations.append("Borrowed retry policy/reducer observations only; policy installation/readback, partition-wide claim cardinality, durable history/query and public wire projections are omitted. Typed Some/None and numeric metadata represent observations, not string serialization.")
         if rust_file in (CLAIM, FIFO, LANE):
             limitations.append("Pure borrowed authoritative-view observations only; snapshot completeness/revision identity, FIFO policy installation, native/durable index maintenance, automatic reclaim and public claim projections remain adapter obligations. Fixed fixture IDs/times preserve source order rather than original generated namespaces.")
-        if source_id in LIMITS:
+        if source_id == "2302fd8c2cfa076d" and rust_file == "crates/wf-domain/tests/complete_policy/original_entry.rs":
+            limitations.append("Executed original ETF observations retain the exact generation-boundary/public-v1 term, generation 9007199254740991, and the above-maximum sibling. Source554 links generation, atom:type and the complete returned policy-map bytes; source558 links strict None refusal for MAX+1. The fixed hand recipe preserves the source term and values, not the native encoder's default map order. This counterpart does not execute the original encoder or migration allocator/exhaustion; those remain separately mapped normalized observations. The direct above-maximum ledger anchor is a post-implementation supplement with no new tests-first RED. Borrowed mathematical atom/runtime catalogs replace live VM context. Original ExUnit setup/runtime/profiles, public installation/physical reads, full case parity and independent Linux acceptance remain required.")
+        elif source_id in LIMITS:
             limitations.append(LIMITS[source_id])
         existing = result.setdefault(source_id, [])
         scenario_id = f"m1-{source_id}" if not existing else f"m1-{source_id}-{function}"

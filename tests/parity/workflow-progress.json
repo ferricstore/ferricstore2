@@ -7935,6 +7935,43 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "Executed pure normalized-policy observations preserve the pinned generation-boundary/public-v1 content, exact 9007199254740991 generation ceiling, above-ceiling decode refusal, MAX-1 migration allocation and exact exhaustion error. FWPV/FWPS V2 is an explicit semantic encoding replacement for the original ETF tuple; this does not prove legacy ETF decoding, arbitrary stored maps, generation0, public policy installation or physical reads. Supplemental full-byte and unchanged-owner assertions are separate. Source ExUnit async:true setup, original runtime and required profiles remain unexecuted by this Rust test; macOS passing evidence does not replace independent Linux execution. This is coverage of existing code after implementation, not tests-first RED or full workflow parity."
           ]
+        },
+        {
+          "scenario_id": "m1-2302fd8c2cfa076d-original_entry_preserves_original_shape_generation_and_consumption_errors",
+          "rust_file": "crates/wf-domain/tests/complete_policy/original_entry.rs",
+          "rust_file_sha256": "e37d789ba600cc15f21b5998610673c561158be7e0d1ce16ed99912f5eebd2de",
+          "rust_module": "",
+          "rust_function": "original_entry_preserves_original_shape_generation_and_consumption_errors",
+          "assertions": [
+            {
+              "source_line": 554,
+              "source_text": "assert {:ok, {^max_generation, ^policy}} =",
+              "rust_line": 168,
+              "rust_text": "assert_eq!(entry.generation(), 9_007_199_254_740_991);"
+            },
+            {
+              "source_line": 554,
+              "source_text": "assert {:ok, {^max_generation, ^policy}} =",
+              "rust_line": 169,
+              "rust_text": "assert_eq!(entry.workflow_type(), Some(&b\"generation-boundary\"[..]));"
+            },
+            {
+              "source_line": 554,
+              "source_text": "assert {:ok, {^max_generation, ^policy}} =",
+              "rust_line": 171,
+              "rust_text": "assert_eq!(entry.policy_bytes(), &maximum[29..]);"
+            },
+            {
+              "source_line": 558,
+              "source_text": "assert :error = Ferricstore.Flow.RetryPolicy.decode_flow_policy_entry(invalid)",
+              "rust_line": 176,
+              "rust_text": "assert!(decode(&excessive, &safety, profile, &mut excessive_charge)?.is_none());"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed original ETF observations retain the exact generation-boundary/public-v1 term, generation 9007199254740991, and the above-maximum sibling. Source554 links generation, atom:type and the complete returned policy-map bytes; source558 links strict None refusal for MAX+1. The fixed hand recipe preserves the source term and values, not the native encoder's default map order. This counterpart does not execute the original encoder or migration allocator/exhaustion; those remain separately mapped normalized observations. The direct above-maximum ledger anchor is a post-implementation supplement with no new tests-first RED. Borrowed mathematical atom/runtime catalogs replace live VM context. Original ExUnit setup/runtime/profiles, public installation/physical reads, full case parity and independent Linux acceptance remain required."
+          ]
         }
       ]
     },
@@ -21975,7 +22012,7 @@
         {
           "scenario_id": "m1-a16aec6cceb6253a",
           "rust_file": "crates/wf-domain/tests/complete_policy/original_entry.rs",
-          "rust_file_sha256": "8f24097220d961b1361988cfe43f6d47089d72d49259395d5d1dc214aec295d6",
+          "rust_file_sha256": "e37d789ba600cc15f21b5998610673c561158be7e0d1ce16ed99912f5eebd2de",
           "rust_module": "",
           "rust_function": "original_entry_preserves_original_shape_generation_and_consumption_errors",
           "assertions": [

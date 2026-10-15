@@ -172,6 +172,8 @@ fn original_entry_preserves_original_shape_generation_and_consumption_errors() -
     let mut excessive = maximum.clone();
     excessive[22..29].copy_from_slice(&[0, 0, 0, 0, 0, 0, 32]);
     check(&excessive, &safety, false)?;
+    let mut excessive_charge = PolicySchemaCharge::new(profile);
+    assert!(decode(&excessive, &safety, profile, &mut excessive_charge)?.is_none());
     let mut wrong = vec![131];
     wrong.extend_from_slice(&tuple(&[atom("wrong")?, integer(0)?, map(&[])?])?);
     check(&wrong, &safety, false)?;

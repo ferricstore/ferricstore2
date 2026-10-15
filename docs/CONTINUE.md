@@ -1,6 +1,6 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-12. A new active full-completion goal now follows the saved
+Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
@@ -146,14 +146,23 @@ LOCAL, native atom indexes, dangerous empty-bitstring headers and zero-word
 references are explicit operational profile exclusions, not invented native replies.
 The existing source603 fixture has a supplemental direct assertion for its original
 generationless shape refusal; both reviewers accept this post-implementation ledger
-anchor. The checked ledger now has58 declarations,60 counterparts and228 assertion
+anchor. The checked ledger now has58 declarations,61 counterparts and232 assertion
 links, with full runtime reconciliation and parity still incomplete.
+The original ETF generation-boundary fixture now has a separately reviewed
+counterpart for MAX generation, the complete returned policy bytes and MAX+1
+refusal. The two-line direct refusal anchor supplements existing behavior;
+all72 policy controls, strict lint and progress validation pass. Existing normalized
+counterpart IDs and limitations stay unchanged. No original encoder, migration
+allocator, public/setup/profile/physical or Linux result is inferred from this link.
 Original raw parent integration, public/setup/profile/physical and independent
 Linux acceptance remain required, with no measured native performance gain.
 
 The next selected M1 responsibility is original stored-policy Replace composition:
 strict envelope/generation read, then CAS, then atom:type, reusing incoming content
-validation and late encoding. Exact artifact consultation precedes implementation.
+validation and late encoding. Exact architecture/performance consultation is closed:
+one domain child, two models, the existing ports parent, three test children and
+the private architecture control are selected. The writer is authoring all eight
+required scenarios before genuine missing-API RED and substantive implementation.
 Existing V2, CorePatch and standalone contracts remain acceptance controls; original
 incoming retry normalization follows this integration.
 
