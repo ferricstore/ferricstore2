@@ -118,6 +118,14 @@ impl ControlState {
             None => None,
         }
     }
+    /// Reads the original stamp, preserving unapplied and unstamped distinctions.
+    #[must_use]
+    pub const fn last_entry_stamp(self) -> Option<EntryStamp> {
+        match self.last_entry {
+            Some((_, stamp)) => Some(stamp),
+            None => None,
+        }
+    }
 }
 
 /// A proposed control update; it provides no persistence guarantee.

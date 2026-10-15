@@ -849,3 +849,30 @@ refresh and native Linux validation remain open. This establishes no public norm
 wire response, durability, full source parity or native Linux acceptance. See
 [ADR006](adr/006-private-prepared-command-codec.md) and the
 [named architecture decision](reviews/workflow-completion-architecture.md#arch-next-m1-record-batch1-create1).
+
+## Group apply capability and persisted values
+
+The selected M2 prerequisite groups the neutral transaction capability under
+private `wf-ports::state::transaction` and pure versioned value codecs under
+`wf-storage::state::value`, with private control, record and outcome children.
+The capability exposes exclusive group/recovery transactions, shared bounded
+observations, cursor-borrowed rows and consumed commit. A live cursor prevents
+commit; a live row prevents advancing its cursor. Backend guards and physical
+page types stay private. Whole-group materialization cannot replace authentic
+point, lane-head and ordered-range authority.
+
+`GroupApplyChanges` owns the existing indexed batch plan and borrows its request
+scope. Its validated projections separate accepted business changes, fresh
+retained outcomes and processing control. Replay preserves the original outcome;
+exact log replay proposes no writes. Actual atomic publication and predecessor
+comparison remain backend responsibilities. The single allocation-free ports
+response parser owns batch5 status decoding; storage stores no duplicate status
+table. FWSC preserves exact last stamps independently of clamped control time;
+FWSR preserves complete core records and event witnesses; FWSO preserves original
+scope, request, intent, log/time/expiry and response. See
+[ADR004](adr/004-committed-time-and-apply-admission.md#group-transaction-and-persisted-core-values)
+for cumulative admission, ownership and remaining durability requirements.
+
+This selects no storage engine, dependency, runtime driver, policy/membership
+persistence or snapshot implementation. Contract doubles and codec vectors do
+not establish real transaction completeness, durability or native OS acceptance.

@@ -270,7 +270,12 @@ fn command_bytes(
     Ok(total)
 }
 
-pub(crate) fn record_bytes(
+/// Admits actual immutable record fields without cloning or encoding them.
+///
+/// The result is the existing logical field sum, not origin or payment credit.
+/// # Errors
+/// Rejects per-field/aggregate excess or checked length overflow.
+pub fn record_bytes(
     record: &WorkflowRecord,
     limits: AdmissionLimits,
 ) -> Result<usize, AdmissionError> {

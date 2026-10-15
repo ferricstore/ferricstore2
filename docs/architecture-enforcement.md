@@ -144,3 +144,16 @@ are not passing runtime parity evidence.
 See [the architecture review](reviews/infrastructure-architecture-review.md)
 for actual checks, reciprocal findings and dispositions, and
 [CONTINUE.md](CONTINUE.md) for the next authorized work.
+
+## Pure storage value boundary
+
+ARCH-NEXT-M2-STATE-CONTRACT1-CREATE1 applies the existing pure-source rules to
+exact `wf-storage::state::value` and its descendants, plus exact
+`wf-ports::log::record_batch::response`. Transaction and backend responsibilities
+remain effectful. Tests exercise approved pure imports and refusal of filesystem,
+environment aliases, async behavior, global state, unsafe and hidden macro
+effects. Neighboring effectful modules remain positive controls. Declared graph
+mutations reject wire-to-ports/storage and storage-to-consensus edges; client
+facade fixtures reject the new server capability and response helper exports.
+These checks add no dependency or size exemptions and supply no indirect-call
+effect proof. Borrow safety additionally requires compiler-backed trait docs.

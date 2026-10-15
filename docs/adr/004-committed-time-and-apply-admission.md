@@ -262,3 +262,45 @@ still require the later atomic adapter. Public Policy.set preprocessing/replies,
 opaque Other identity, source capture/setup/profile acceptance and independent
 Linux execution remain required. Passing567 Rust tests/four compile-fail docs on
 macOS establishes this represented component, not full M1 or workflow parity.
+
+## Group transaction and persisted core values
+
+ARCH-NEXT-M2-STATE-CONTRACT1-CREATE1 selects the engine-independent successor.
+An exclusive group/recovery transaction supplies shared point reads, true FIFO
+heads and an authentic ordered due cursor before consumed commit. Group control
+is shared across tenants; records and outcomes additionally bind tenant. The
+backend must compare the actual predecessor and affected versions under the same
+transaction guard before publishing records, ordering/index/history changes,
+new outcomes and control atomically. The immutable changes container validates
+mathematical plan consistency; it grants no provenance or durability authority.
+
+Every read/open attempt, including misses, consumes the transaction's cumulative
+step allowance. Each inspected candidate is charged before filtering, and the
+actual empty end probe consumes a step. Logical byte charges are 512 for control,
+512 plus every owned variable byte for materialized records/outcomes, and 128
+plus the four binary key components for inspected due keys. Materialized filter
+records are charged too. Admission precedes ownership and visible progress;
+page reopening refunds nothing. Cursor position includes fully consumed filtered
+candidates. BudgetEnd preserves this position and differs from actual RangeEnd.
+These limits exclude backend caches/pages, queued jobs and arbitrary caller
+clones; they establish no native process memory or CPU guarantee.
+
+Separate BE version1 FWSC/FWSR/FWSO grammars preserve opaque identity bytes,
+Option presence and complete original values. FWSC retains both nondecreasing
+control time and the exact original last-entry stamp, including backward stamps,
+and distinguishes unapplied control from applied index zero. FWSR retains all
+core record fields, exact ordering metadata and the explicit latest-event
+witness; restoration reuses domain validation, including generated retry due
+times above the caller timestamp ceiling. FWSO retains the response once and
+derives status through the single ports batch5/response1 parser. Other outcome
+families fail closed until separately selected.
+
+Each codec takes a positive explicit byte cap. Decode checks actual bounds,
+complete framing/EOF, namespace and semantics before constructing owners.
+Encode validates and measures before one fallible output reservation. Existing
+typed identity conversions retain their allocation behavior. Independent
+literal vectors and contract doubles establish only these represented duties.
+Engine adoption, real coherent transactions, uncertain-commit fencing/reopen
+reconciliation, physical history/index formats, snapshots and native crash
+testing on Linux and macOS remain required. KnownAborted requires proof of an
+unchanged durable predecessor; Uncertain never authorizes blind retry.

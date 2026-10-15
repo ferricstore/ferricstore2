@@ -26,6 +26,8 @@ use super::{
 mod intent;
 mod response;
 
+pub use response::record_batch_retained_status;
+
 /// Proposed control and indexed operation, without durable-apply authority.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RecordBatchApplyPlan<'view> {

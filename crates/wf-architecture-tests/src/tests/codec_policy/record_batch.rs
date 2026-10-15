@@ -27,6 +27,7 @@ fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
         "RecordBatchApplyError",
         "encode_record_batch",
         "decide_record_batch",
+        "record_batch_retained_status",
     ] {
         assert!(
             source_check(

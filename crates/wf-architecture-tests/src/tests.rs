@@ -13,6 +13,7 @@ use crate::{
 };
 
 mod codec_policy;
+mod state_values;
 
 fn root() -> CheckResult<PathBuf> {
     Ok(Path::new(env!("CARGO_MANIFEST_DIR"))

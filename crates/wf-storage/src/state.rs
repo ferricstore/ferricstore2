@@ -1,3 +1,5 @@
 //! State boundary for `wf-storage`.
 //!
-//! Reserved for the reviewed contract; no workflow behavior is implemented here.
+//! Pure persisted values; physical transactions remain an adapter obligation.
+
+pub mod value;

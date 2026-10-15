@@ -152,6 +152,15 @@ impl WorkflowRecord {
     pub fn error(&self) -> Option<&[u8]> {
         self.error.as_deref()
     }
+    /// Reads the exact latest event witness without inferring it from state.
+    #[must_use]
+    pub const fn latest_event_witness(&self) -> (EventKind, u64, Fence) {
+        (
+            self.latest_event.kind,
+            self.latest_event.version,
+            self.latest_event.fence,
+        )
+    }
     /// Derives lifecycle category without consulting time.
     #[must_use]
     pub fn status(&self) -> WorkflowStatus {

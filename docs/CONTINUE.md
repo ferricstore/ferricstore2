@@ -1,9 +1,28 @@
 # ferricstore2: implementation handoff
 
 Updated: 2026-10-15. The active full-completion goal follows the saved
-increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
-test lineage, with dedicated architecture/performance review and disjoint
+increment below. GPT-6.1-sol/max owners are completing the remaining milestones
+and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
+
+The latest reviewed M2 prerequisite implements neutral group transaction traits,
+validated change projections and versioned control/record/outcome codecs in five
+production files. Nine frozen behavior tests pass on their first assertion run
+after missing-API RED independently reproduced by Root. Independent literal
+vectors preserve exact original stamps, record witnesses and retained responses;
+two new architecture tests have their own RED/GREEN. Reciprocal source review
+is closed without a component blocker. Strict lint repairs preserve every
+assertion, byte grammar and existing admission/response encoding body.
+
+The final macOS wrapper passes 630 Rust tests across 72 targets plus six
+compile-fail docs, with zero warnings/failures/ignored tests. Formatting,
+compilation, strict Clippy, rustdoc, architecture and reference/progress checks
+pass on 1,144 unchanged inputs. The wrapper exits 1 solely because DNS blocks the
+default advisory refresh; a separate cached October 14 audit passes all four
+categories. Earlier lint/format failures remain recorded. Ledger counts remain
+77/87/326 with no new parity credit. Engine adoption, physical atomicity/crash
+recovery, snapshots, native Linux execution and full M1–M8/source/profile
+completion remain open. The next M2 recommendation is read-only readiness work.
 
 The latest restoration repair preserves valid generated retry deadlines
 above the caller timestamp ceiling. Its whole-record regression first failed

@@ -25,7 +25,7 @@ mod writer;
 
 pub use record_batch::{
     RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, decide_record_batch,
-    encode_record_batch,
+    encode_record_batch, record_batch_retained_status,
 };
 
 pub use complete_policy::{

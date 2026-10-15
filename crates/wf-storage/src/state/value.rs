@@ -1,0 +1,215 @@
+//! Closed core/checkpoint/batch5 values; no engine or durability is implemented.
+
+use std::fmt;
+
+use wf_ports::log::CodecError;
+
+mod control;
+mod outcome;
+mod record;
+
+pub use control::{decode_control, encode_control};
+pub use outcome::{decode_outcome, encode_outcome};
+pub use record::{decode_record, encode_record};
+
+/// Operational persisted-value failure, never a retained business rejection.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum StateValueError {
+    /// The represented value or response version is unsupported.
+    UnsupportedVersion,
+    /// A magic, event, response or presence discriminator is unknown.
+    UnsupportedTag,
+    /// Complete framing is truncated or contains trailing bytes.
+    Malformed,
+    /// Checked sizes cannot fit the host or explicit wire width.
+    LengthOverflow,
+    /// The actual complete wire value exceeds its explicit caller cap.
+    Limit {
+        /// Actual measured wire bytes.
+        bytes: usize,
+        /// Explicit maximum wire bytes.
+        maximum: usize,
+    },
+    /// A newly introduced fallible variable reservation failed.
+    Allocation,
+    /// Namespace, typed value, status or positive profile is invalid.
+    InvalidValue,
+}
+
+impl fmt::Display for StateValueError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Limit { bytes, maximum } => {
+                write!(formatter, "state value {bytes} exceeds {maximum}")
+            }
+            Self::UnsupportedVersion => formatter.write_str("unsupported state value version"),
+            Self::UnsupportedTag => formatter.write_str("unsupported state value tag"),
+            Self::Malformed => formatter.write_str("malformed state value"),
+            Self::LengthOverflow => formatter.write_str("state value length overflow"),
+            Self::Allocation => formatter.write_str("state value allocation failed"),
+            Self::InvalidValue => formatter.write_str("invalid state value"),
+        }
+    }
+}
+impl std::error::Error for StateValueError {}
+
+impl From<CodecError> for StateValueError {
+    fn from(error: CodecError) -> Self {
+        match error {
+            CodecError::UnsupportedVersion => Self::UnsupportedVersion,
+            CodecError::UnsupportedTag | CodecError::InvalidOptionality => Self::UnsupportedTag,
+            CodecError::Malformed | CodecError::TrailingBytes => Self::Malformed,
+            CodecError::LengthOverflow => Self::LengthOverflow,
+            CodecError::Allocation => Self::Allocation,
+            _ => Self::InvalidValue,
+        }
+    }
+}
+
+pub(super) fn start(
+    bytes: &[u8],
+    magic: [u8; 4],
+    maximum: usize,
+) -> Result<usize, StateValueError> {
+    if maximum == 0 {
+        return Err(StateValueError::InvalidValue);
+    }
+    if bytes.len() > maximum {
+        return Err(StateValueError::Limit {
+            bytes: bytes.len(),
+            maximum,
+        });
+    }
+    let mut offset = 0;
+    if take(bytes, &mut offset, 4)? != magic.as_slice() {
+        return Err(StateValueError::UnsupportedTag);
+    }
+    if read_u16(bytes, &mut offset)? != 1 {
+        return Err(StateValueError::UnsupportedVersion);
+    }
+    Ok(offset)
+}
+
+pub(super) fn take<'a>(
+    bytes: &'a [u8],
+    offset: &mut usize,
+    length: usize,
+) -> Result<&'a [u8], StateValueError> {
+    let end = offset
+        .checked_add(length)
+        .ok_or(StateValueError::LengthOverflow)?;
+    let value = bytes.get(*offset..end).ok_or(StateValueError::Malformed)?;
+    *offset = end;
+    Ok(value)
+}
+
+pub(super) fn raw<'a>(bytes: &'a [u8], offset: &mut usize) -> Result<&'a [u8], StateValueError> {
+    let length =
+        usize::try_from(read_u32(bytes, offset)?).map_err(|_| StateValueError::LengthOverflow)?;
+    take(bytes, offset, length)
+}
+
+pub(super) fn read_u8(bytes: &[u8], offset: &mut usize) -> Result<u8, StateValueError> {
+    Ok(take(bytes, offset, 1)?[0])
+}
+pub(super) fn read_u16(bytes: &[u8], offset: &mut usize) -> Result<u16, StateValueError> {
+    Ok(u16::from_be_bytes(
+        take(bytes, offset, 2)?
+            .try_into()
+            .map_err(|_| StateValueError::Malformed)?,
+    ))
+}
+fn read_u32(bytes: &[u8], offset: &mut usize) -> Result<u32, StateValueError> {
+    Ok(u32::from_be_bytes(
+        take(bytes, offset, 4)?
+            .try_into()
+            .map_err(|_| StateValueError::Malformed)?,
+    ))
+}
+pub(super) fn read_u64(bytes: &[u8], offset: &mut usize) -> Result<u64, StateValueError> {
+    Ok(u64::from_be_bytes(
+        take(bytes, offset, 8)?
+            .try_into()
+            .map_err(|_| StateValueError::Malformed)?,
+    ))
+}
+pub(super) fn read_u128(bytes: &[u8], offset: &mut usize) -> Result<u128, StateValueError> {
+    Ok(u128::from_be_bytes(
+        take(bytes, offset, 16)?
+            .try_into()
+            .map_err(|_| StateValueError::Malformed)?,
+    ))
+}
+
+pub(super) fn flag(bytes: &[u8], offset: &mut usize) -> Result<bool, StateValueError> {
+    match read_u8(bytes, offset)? {
+        0 => Ok(false),
+        1 => Ok(true),
+        _ => Err(StateValueError::UnsupportedTag),
+    }
+}
+
+pub(super) fn finish(bytes: &[u8], offset: usize) -> Result<(), StateValueError> {
+    if offset == bytes.len() {
+        Ok(())
+    } else {
+        Err(StateValueError::Malformed)
+    }
+}
+
+pub(super) fn copy(bytes: &[u8]) -> Result<Vec<u8>, StateValueError> {
+    let mut result = Vec::new();
+    result
+        .try_reserve_exact(bytes.len())
+        .map_err(|_| StateValueError::Allocation)?;
+    result.extend_from_slice(bytes);
+    Ok(result)
+}
+
+pub(super) fn raw_size(bytes: &[u8]) -> Result<usize, StateValueError> {
+    u32::try_from(bytes.len()).map_err(|_| StateValueError::LengthOverflow)?;
+    bytes
+        .len()
+        .checked_add(4)
+        .ok_or(StateValueError::LengthOverflow)
+}
+
+pub(super) fn add(total: &mut usize, length: usize) -> Result<(), StateValueError> {
+    *total = total
+        .checked_add(length)
+        .ok_or(StateValueError::LengthOverflow)?;
+    Ok(())
+}
+
+pub(super) fn allocate(
+    size: usize,
+    maximum: usize,
+    magic: [u8; 4],
+) -> Result<Vec<u8>, StateValueError> {
+    if maximum == 0 || size < 6 {
+        return Err(StateValueError::InvalidValue);
+    }
+    if size > maximum {
+        return Err(StateValueError::Limit {
+            bytes: size,
+            maximum,
+        });
+    }
+    let mut result = Vec::new();
+    result
+        .try_reserve_exact(size)
+        .map_err(|_| StateValueError::Allocation)?;
+    result.extend_from_slice(&magic);
+    result.extend_from_slice(&1_u16.to_be_bytes());
+    Ok(result)
+}
+
+pub(super) fn put_raw(output: &mut Vec<u8>, bytes: &[u8]) -> Result<(), StateValueError> {
+    output.extend_from_slice(
+        &u32::try_from(bytes.len())
+            .map_err(|_| StateValueError::LengthOverflow)?
+            .to_be_bytes(),
+    );
+    output.extend_from_slice(bytes);
+    Ok(())
+}

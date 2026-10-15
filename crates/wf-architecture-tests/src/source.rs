@@ -113,7 +113,13 @@ impl Inspector<'_, '_> {
     }
 
     fn pure(&self) -> bool {
-        !self.test && matches!(self.context.package, "wf-types" | "wf-domain" | "wf-wire")
+        !self.test
+            && (matches!(self.context.package, "wf-types" | "wf-domain" | "wf-wire")
+                || (self.context.package == "wf-storage"
+                    && (self.module == "state::value"
+                        || self.module.starts_with("state::value::")))
+                || (self.context.package == "wf-ports"
+                    && self.module == "log::record_batch::response"))
     }
 
     fn path(&mut self, written: &[String]) {
