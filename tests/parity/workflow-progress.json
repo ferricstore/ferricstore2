@@ -19644,14 +19644,102 @@
       "runtime_case_ids": [
         "49485fab36666543f64c02893e24046c9da43224172de3b25dab81c8fcc4ee85"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-d4199dfa1b750255",
+          "rust_file": "crates/wf-ports/tests/complete_policy_request/flow/source/anchors.rs",
+          "rust_file_sha256": "8e303fa33435a0ffaaf45afe67ed4cf17ea1dc86f63b9ffe036ba1de290ca79f",
+          "rust_module": "",
+          "rust_function": "original_flow_source_monotonic_generation_values",
+          "assertions": [
+            {
+              "source_line": 18,
+              "source_text": "assert {:ok, %{generation: 1}} = FerricStore.flow_policy_set(type, max_active_ms: 1_000)",
+              "rust_line": 30,
+              "rust_text": "assert_eq!(first.generation(), 1);"
+            },
+            {
+              "source_line": 18,
+              "source_text": "assert {:ok, %{generation: 1}} = FerricStore.flow_policy_set(type, max_active_ms: 1_000)",
+              "rust_line": 31,
+              "rust_text": "assert_eq!(first.encoded(), first_bytes);"
+            },
+            {
+              "source_line": 21,
+              "source_text": "assert {:ok, %{generation: 2}} = FerricStore.flow_policy_set(type, max_active_ms: 2_000)",
+              "rust_line": 41,
+              "rust_text": "assert_eq!(second.generation(), 2);"
+            },
+            {
+              "source_line": 21,
+              "source_text": "assert {:ok, %{generation: 2}} = FerricStore.flow_policy_set(type, max_active_ms: 2_000)",
+              "rust_line": 42,
+              "rust_text": "assert_eq!(second.encoded(), second_bytes);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Postimplementation lower-parent coverage preserves generation-always-on-1, max_active_ms1000 then2000, no expected-generation guard and the ACTUAL first original ETF output as next current. Direct generation/full-value macros represent only the returned generation/value components of source18/21. The positive generated type suffix is fixed to1; explicit private request IDs/stamps supply additional Rust metadata. Public flow_policy_set preprocessing and reply maps, source24 public get, all-shard helper calls19/22, original async:false/global_state setup/flush and required runtime profiles remain unexecuted. Each result is a proposed owned installation, not a physical write/read, transaction or durable outcome. These direct tests were added after e4859af and pass existing behavior without new or retroactive tests-first RED. Independent Linux acceptance and full source-case/workflow parity remain required; logical work/ownership implies no measured native gain."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "dea49ead483519f8",
       "runtime_case_ids": [
         "4ed060f36ba9dacff5706d75aac201e80a8f4b71329b116f8fa3c7b287e36f40"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-dea49ead483519f8",
+          "rust_file": "crates/wf-ports/tests/complete_policy_request/flow/source/anchors.rs",
+          "rust_file_sha256": "8e303fa33435a0ffaaf45afe67ed4cf17ea1dc86f63b9ffe036ba1de290ca79f",
+          "rust_module": "",
+          "rust_function": "original_flow_source_stale_generation_values",
+          "assertions": [
+            {
+              "source_line": 31,
+              "source_text": "assert {:ok, %{generation: 1}} =",
+              "rust_line": 67,
+              "rust_text": "assert_eq!(first.generation(), 1);"
+            },
+            {
+              "source_line": 31,
+              "source_text": "assert {:ok, %{generation: 1}} =",
+              "rust_line": 68,
+              "rust_text": "assert_eq!(first.encoded(), first_bytes);"
+            },
+            {
+              "source_line": 34,
+              "source_text": "assert {:ok, %{generation: 2}} =",
+              "rust_line": 78,
+              "rust_text": "assert_eq!(second.generation(), 2);"
+            },
+            {
+              "source_line": 34,
+              "source_text": "assert {:ok, %{generation: 2}} =",
+              "rust_line": 79,
+              "rust_text": "assert_eq!(second.encoded(), second_bytes);"
+            },
+            {
+              "source_line": 40,
+              "source_text": "assert {:error, \"ERR stale flow policy generation\"} =",
+              "rust_line": 89,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 40,
+              "source_text": "assert {:error, \"ERR stale flow policy generation\"} =",
+              "rust_line": 93,
+              "rust_text": "assert_eq!(out.response(), b\"ERR stale flow policy generation\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Postimplementation lower-parent coverage preserves generation-cas-1, initial max_active_ms1000, CAS1 update2000 using ACTUAL first original ETF as current, then stale CAS1/update3000 using ACTUAL second output. Direct generation/full-value macros represent source31/34 components; exact retained StaleGeneration and caller body represent source40 error components. Fresh(None) and reobserved immutable second output are supplemental and do not prove source46 public get or physical nonoverwrite. Fixed positive suffix1 and explicit private request/stamp fixtures do not implement public preprocessing/replies, all-shard publication, original async:false/global_state flush/setup or required runtime profiles. Proposed installation/outcome owners are not a durable transaction. Tests were added after e4859af with first-PASS existing behavior, not tests-first RED. Independent Linux acceptance and complete source-case/workflow parity remain required; no measured allocation/speed claim follows."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "eab35c58f06f284a",
@@ -19735,7 +19823,45 @@
       "runtime_case_ids": [
         "fcba6c44a35e0876aca22475170d53949939e6238664a88fdbc6393c81f6f976"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-17d8471407b0c04a",
+          "rust_file": "crates/wf-ports/tests/complete_policy_request/flow/source/anchors.rs",
+          "rust_file_sha256": "8e303fa33435a0ffaaf45afe67ed4cf17ea1dc86f63b9ffe036ba1de290ca79f",
+          "rust_module": "",
+          "rust_function": "original_flow_source_replacement_omission_values",
+          "assertions": [
+            {
+              "source_line": 323,
+              "source_text": "assert {:ok, %{generation: 1}} =",
+              "rust_line": 138,
+              "rust_text": "assert_eq!(first.generation(), 1);"
+            },
+            {
+              "source_line": 323,
+              "source_text": "assert {:ok, %{generation: 1}} =",
+              "rust_line": 139,
+              "rust_text": "assert_eq!(first.encoded(), first_bytes);"
+            },
+            {
+              "source_line": 329,
+              "source_text": "assert {:ok, %{generation: 2, max_active_ms: nil, states: %{}}} =",
+              "rust_line": 149,
+              "rust_text": "assert_eq!(second.generation(), 2);"
+            },
+            {
+              "source_line": 329,
+              "source_text": "assert {:ok, %{generation: 2, max_active_ms: nil, states: %{}}} =",
+              "rust_line": 150,
+              "rust_text": "assert_eq!(second.encoded(), second_bytes);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Postimplementation lower-parent coverage preserves generation-replace-1, initial max_active_ms1000 and queued FIFO, executes the first installation, then supplies its ACTUAL original ETF output as current for an empty replacement. Direct generation/full-value observations represent source323 generation1/content and source329 generation2/empty-states components only. Stored active-duration omission is supplemental; the public max_active_ms:nil projection remains UNLINKED and required. Raw already-converted maps substitute for public keyword/PolicyPatch preprocessing; public replies, physical atomic/all-shard installation, original async:false/global_state flush/setup and mandatory runtime profiles remain required. Generated suffix1 and private metadata are fixed fixtures. Tests supplement existing e4859af behavior without retroactive RED or complete source-case parity; independent Linux execution and full workflow acceptance remain open, with no native gain claim."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f8e12ab7700ee300",
@@ -26642,7 +26768,33 @@
     {
       "source_declaration_id": "006b42c44fb9d2e5",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-006b42c44fb9d2e5",
+          "rust_file": "crates/wf-ports/tests/complete_policy_request/flow/source/anchors.rs",
+          "rust_file_sha256": "8e303fa33435a0ffaaf45afe67ed4cf17ea1dc86f63b9ffe036ba1de290ca79f",
+          "rust_module": "",
+          "rust_function": "original_flow_source_target_highwater_value",
+          "assertions": [
+            {
+              "source_line": 624,
+              "source_text": "assert {:ok, {4, ^new_policy}} =",
+              "rust_line": 239,
+              "rust_text": "assert_eq!(installed.generation(), 4);"
+            },
+            {
+              "source_line": 624,
+              "source_text": "assert {:ok, {4, ^new_policy}} =",
+              "rust_line": 240,
+              "rust_text": "assert_eq!(installed.encoded(), final_bytes);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Postimplementation lower-parent coverage retains target-high-water-policy, independently encoded full original stored generation3/max_active_ms1000, normalized replacement2000 at time2000 and exact generation4/full original ETF output. The two direct macros represent only source624 decoded allocation components. The original initial physical put is replaced by an explicitly supplied coherent current view; later stale generation2 put and source636 ETS nonoverwrite assertion remain UNLINKED. Reobserving immutable stored fixture bytes proves no physical mutation. Original StateMachine/store setup, atomic/all-shard publication, required runtime profiles and independent Linux acceptance remain required. Tests were added after e4859af and pass existing behavior without retroactive tests-first RED, full source-case/workflow parity or measured native allocation/speed claims."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "1d763110d8379ac9",
@@ -27567,7 +27719,45 @@
     {
       "source_declaration_id": "470baaca150ba604",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-470baaca150ba604",
+          "rust_file": "crates/wf-ports/tests/complete_policy_request/flow/source/anchors.rs",
+          "rust_file_sha256": "8e303fa33435a0ffaaf45afe67ed4cf17ea1dc86f63b9ffe036ba1de290ca79f",
+          "rust_module": "",
+          "rust_function": "original_flow_source_cross_policy_generation_values",
+          "assertions": [
+            {
+              "source_line": 572,
+              "source_text": "assert {:ok, {1, ^current_policy}} =",
+              "rust_line": 186,
+              "rust_text": "assert_eq!(first.generation(), 1);"
+            },
+            {
+              "source_line": 572,
+              "source_text": "assert {:ok, {1, ^current_policy}} =",
+              "rust_line": 187,
+              "rust_text": "assert_eq!(first.encoded(), first_bytes);"
+            },
+            {
+              "source_line": 609,
+              "source_text": "assert {:ok, {2, ^updated_policy}} =",
+              "rust_line": 211,
+              "rust_text": "assert_eq!(second.generation(), 2);"
+            },
+            {
+              "source_line": 609,
+              "source_text": "assert {:ok, {2, ^updated_policy}} =",
+              "rust_line": 212,
+              "rust_text": "assert_eq!(second.encoded(), second_bytes);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Postimplementation lower-parent coverage retains current-cross-policy-wire normalized max_active_ms1000 at time1000, ACTUAL original ETF output as next current, and normalized3000 at time3000. Direct generation/full-byte observations represent only source572/609 decoded-value components. The intervening beta-cross-policy-wire normalized2000 at time2000 is the actual generationless TWO-TUPLE BINARY patch and reaches the exact PatchShape/body controls; source585 is a pattern assignment, while physical ETS assertions569/592/606 remain UNLINKED. Supplied coherent views and private log/request metadata do not execute StateMachine persistence, ETS publication, all-shard behavior or original setup/context/runtime profiles. Tests were added after e4859af as existing-behavior direct anchors without new RED. Independent Linux execution and complete source-case/workflow parity remain required; source-level ownership is not measured native performance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "889763e6c2411af9",
@@ -27577,7 +27767,33 @@
     {
       "source_declaration_id": "b0c4b373d72b2a6c",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-b0c4b373d72b2a6c",
+          "rust_file": "crates/wf-ports/tests/complete_policy_request/flow/source/anchors.rs",
+          "rust_file_sha256": "8e303fa33435a0ffaaf45afe67ed4cf17ea1dc86f63b9ffe036ba1de290ca79f",
+          "rust_module": "",
+          "rust_function": "original_flow_source_captured_history_limit_value",
+          "assertions": [
+            {
+              "source_line": 668,
+              "source_text": "assert {:ok, {1, %{retention: %{history_max_events: 50}}}} =",
+              "rust_line": 274,
+              "rust_text": "assert_eq!(accepted.generation(), 1);"
+            },
+            {
+              "source_line": 668,
+              "source_text": "assert {:ok, {1, %{retention: %{history_max_events: 50}}}} =",
+              "rust_line": 275,
+              "rust_text": "assert_eq!(accepted.encoded(), expected_bytes);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Postimplementation lower-parent coverage preserves replicated-policy-limit-accepted at time1000 and replicated-policy-limit-rejected at time2000, with the SAME retention.history_max_events50 under supplied immutable C100 and C10. Direct generation1/full original ETF equality represents only source668 accepted decoded-value components; derived type/empty states are additional normalized fields permitted by that source partial-map pattern. C10 reaches exact History{maximum:10} and the original62-byte body, but source684 is a pattern assignment and source692 physical ETS absence remains UNLINKED. This pure input does not execute conflicting global application environment changes, ApplyContext encoding, StateMachine/ETS publication, all-shard setup or original runtime profiles. Tests were added after e4859af as first-PASS existing-behavior anchors without new RED. Independent Linux execution and complete source-case/workflow parity remain required, with no measured native gain."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "1d902a7c5ac879a3",

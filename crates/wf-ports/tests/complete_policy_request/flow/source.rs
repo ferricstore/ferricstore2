@@ -527,3 +527,5 @@ pub(super) fn assert_own_output(gate: GateView<'_>, limits: PolicySchemaLimits) 
     assert!(charge.p() >= 322_496);
     Ok(())
 }
+
+mod anchors;

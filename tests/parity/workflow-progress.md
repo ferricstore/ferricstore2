@@ -36,7 +36,7 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 64 source declarations, 71 counterpart records and 279 assertion links.
+increments: 70 source declarations, 77 counterpart records and 301 assertion links.
 Both reviewers accept the supplemental source603 shape-error anchor; it supplies
 one error component with its remaining setup/profile/physical obligations explicit.
 The separate original ETF generation-boundary counterpart retains MAX, the returned
@@ -48,18 +48,37 @@ Their direct assertion links preserve every older counterpart and explicitly
 retain jitter, descriptor, setup, profile, public/physical and Linux limitations.
 Two new retention counterparts link the original type/state scalar fields and
 the actual TTL5000/hot3 rejection cause and body after all86 policy controls pass.
-Captured-limit and creation-neighbor controls add no StateMachine, generation,
+At that retention checkpoint, captured-limit and creation-neighbor controls added no StateMachine, generation,
 ETS or inheritance assertion credit. Public/setup/profile/physical and independent
 Linux acceptance remain required; every older counterpart stays unchanged.
 Four whole-flow counterparts link the exact complete governance model,
 first-seen string-list order, the600-leaf governance size rejection and queued
 keyword max_active_ms1000 rejection. Their direct whole-ETF or reason/body
-assertions execute in the100-test policy target; the full macOS workspace passes
+assertions executed in the100-test policy target; its macOS workspace epoch passed
 554 Rust tests and four compile-fail docs. All67 previous records are preserved.
 Helper-only enum/bounds controls and the original allowed snapshot map without
 states remain unlinked. Original setup/profiles, public/physical operations and
-independent Linux validation remain required. The default wrapper still fails
-its final RustSec refresh because GitHub DNS resolution is unavailable.
+independent Linux validation remain required. That snapshot epoch failed its
+final RustSec refresh because GitHub DNS resolution was unavailable. The subsequent
+original whole-flow parent checkpoint passed567 Rust tests/four compile-fail docs
+and every default wrapper stage, including all four dependency categories.
+
+Six postimplementation tests now expose direct lower-parent generation/value/error
+observations for the pinned monotonic, stale-CAS, omission-reset, cross-policy,
+target-high-water and captured-limit recipes. All87 policy-request tests and strict
+target lint pass. The22 new links preserve every one of the71 earlier counterpart
+records and every registration/runtime ID. Actual prior original ETF output feeds
+the next current read; expected bytes precede each operation. These are existing
+behavior supplements, with no retroactive tests-first RED. Stored omission is
+supplemental to source329's linked generation2/empty-states components; public
+max_active_ms:nil projection remains unlinked. Public get/all-shard/physical ETS
+assertions, source889 and error pattern assignments remain unlinked. All original
+setup/runtime profiles and independent Linux acceptance remain required. Six
+narrow component counterparts cannot certify six complete original cases.
+The complete current macOS wrapper passes573 Rust tests and four compile-fail
+documentation tests, including formatting, strict lint, architecture/reference/
+progress validation and all four default dependency-audit categories. The same
+1027 check inputs remain unchanged throughout that run; Linux remains pending.
 Two separately scoped counterparts
 belong to one FIFO lifecycle declaration; a single state/partition test retains
 selected observations from two declarations. It preserves every other

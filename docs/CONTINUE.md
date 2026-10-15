@@ -4,12 +4,12 @@ Updated: 2026-10-15. The active full-completion goal follows the saved
 increment below. GPT-6.1-sol/max owners are completing M1 and compiler-backed
 test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
-The latest whole-workspace macOS run passes 567 Rust tests and four compile-fail
+The latest whole-workspace macOS run passes 573 Rust tests and four compile-fail
 doc tests. The preceding retention checkpoint is `a0a8858`, following retry `a969309`,
 original-current Replace `2759262`, reader/source603 `bbeba0d` and MAX-generation
 supplement `7f3e21a`.
 Strict lint, architecture, documentation, reference/progress and all four default
-dependency-audit categories pass. The final wrapper exits0 on unchanged1026
+dependency-audit categories pass. The final wrapper exits0 on unchanged1027
 check inputs; its source binding and prior failed epochs are in the coordination
 record. The configured RustSec database is at `edb58f5974b83eb8302332821cb6d389777aa351`
 (October14). Earlier DNS-failed wrappers remain historical failures. Current
@@ -26,8 +26,8 @@ saved CI belongs to its earlier commit. M1,
 later runtime milestones and full workflow parity remain incomplete.
 
 The original whole-flow lower replacement parent is now implemented after
-independently reproduced tests-only RED. All104 domain policy tests and81 policy
-request tests pass, including twelve new tests. One borrowed structural verifier
+independently reproduced tests-only RED. Its104 domain policy tests and81 policy
+request tests passed, including twelve new tests. One borrowed structural verifier
 and one retained-request gate precede Fresh. Fresh preserves current/CAS/type/
 captured-limit/history order and emits an original ETF envelope directly from
 the same normalized layout. Its owned key, installation and distinct response
@@ -40,11 +40,22 @@ lint-only test edits invert exactly to the frozen preproduction buffers.
 This component implements the lower replace=true command. Faithful VM/source
 order capture is still an ingress obligation; the sidecar proves relative
 correspondence only. Raw Other remains a temporary REQUIRED opaque-term identity
-gap, not a product exclusion. Public Policy.set preprocessing/replies, direct
-source ledger anchors, physical atomic/all-shard installation, original setup/
-runtime profiles and independent Linux execution remain required. The checked
-ledger remains64/71/279 because helper assertions are not direct test anchors.
+gap, not a product exclusion. Public Policy.set preprocessing/replies,
+physical atomic/all-shard installation, original setup/runtime profiles and
+independent Linux execution remain required. The checked ledger now has70
+source declarations,77 counterparts and301 assertion links.
 Logical ownership improvements supply no measured allocation or speed claim.
+
+Six supplemental direct source tests now pass within the87-test policy-request
+target, with strict lint. Their315-line private child preserves generation1→2,
+stale CAS, FIFO omission reset, cross-policy encoded-patch rejection, generation3→4
+and captured C100/C10 history50 recipes. Twenty-two new links cover value/error
+components only; all71 older counterpart records and every runtime ID are exact.
+These tests were added after implementation and supply no new tests-first RED.
+Public get/all-shard/ETS observations and the public nil projection remain
+unlinked; source error pattern assignments are not direct assertion anchors.
+The complete macOS wrapper passes573 Rust tests/four compile-fail docs and every
+source/dependency stage with the same1027 check inputs before and after execution.
 
 Original whole-flow input now preserves top/state/governance error order,
 arbitrary nonnegative customer versions, exact caller bodies and deterministic
@@ -55,7 +66,7 @@ Synthesized state maps preserve the source32/33-key ordering transition using
 explicit fixed-width hash arithmetic. The standalone snapshot API grants no frame, Fresh,
 current-policy, installation or payment authority. All fourteen new production
 files fit400 lines and seven test files fit600; functions fit100. The checked
-ledger has64 reviewed declarations,71 counterparts and279 assertion links,
+ledger has70 reviewed declarations,77 counterparts and301 assertion links,
 preserving every older record. Full public/physical/runtime/profile acceptance
 and independent Linux execution remain required, with no measured native
 allocation or speed claim.
@@ -1140,8 +1151,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **64 reviewed
-source declarations, 71 counterpart records and 279 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **70 reviewed
+source declarations, 77 counterpart records and 301 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 
