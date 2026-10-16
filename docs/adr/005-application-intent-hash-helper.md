@@ -276,3 +276,34 @@ Stage F, ONE retained gate or install authority. Original partial-command replay
 and Fresh-only coherent remerge, atomic namespace/policy/catalogue/high-water/
 outcome/checkpoint publication, raw/ETF/source-public parity, full profiles and
 independent Linux AND macOS execution/performance remain required.
+
+## Selected public mutation V1 registry delegation
+
+ARCH-PUBLIC-MUTATION-INGRESS1-CREATE1 selects one bounded static V1 mutation
+registry beneath the server feature `wf-ports::log::public_mutation::intent`.
+It covers the seven represented core kinds: Create, Transition, Complete, Fail,
+source-policy Retry, ExtendLease and Cancel. Application preparation and raw
+committed verification share that registry so the verifier recomputes caller
+identity from actual fields without an application dependency or trusted digest.
+The existing generic application V1 comparison helper and its defaults remain
+unchanged. Its independent vectors execute in the application test target,
+which already depends on both crates; ports tests use independently packed
+literal bytes and hashes. No reverse test dependency is introduced.
+
+This is an explicit, limited delegation of the grammar ownership above. The
+registry streams the same V1 root, tags, sorted UTF-8 keys and optionality from
+the normalized borrowed caller. Semantic auto partition differs from a literal
+partition spelling; tenant, workflow ID, caller requested time and guards enter
+identity, while the generated preparation stamp and request/log identities do
+not. The selected compatible canonical
+bound is the captured decision budget plus8192, checked with arithmetic and
+actual measurement. It accommodates the supported1MiB inline payload without
+changing the generic helper's1MiB default or asserting a native memory limit.
+
+The feature reuses the existing ports hash dependency and stays synchronous
+and pure. It exports no worker-client capability and grants no authorization,
+placement, proposal or durability authority. The first application service
+supports only the four terminal kinds; the other core profiles are reusable
+prerequisites for the still-required rich public routes. Source implementation,
+passing counterparts, real retained submission and both OS results remain
+separate evidence; recording this selection does not establish those results.

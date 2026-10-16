@@ -7,6 +7,7 @@ mod history;
 mod independent;
 mod outcome;
 mod ownership;
+mod public_mutation;
 mod record;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

@@ -28,6 +28,7 @@ use wf_types::version::{
 
 mod independent;
 mod protocol;
+mod public_mutation;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 

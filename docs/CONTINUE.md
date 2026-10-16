@@ -13,13 +13,15 @@ reviewed style repairs. Nineteen independent tuple samples were executed on
 OTP 28 and 29 before implementation. Review found reserved-type and unsupported
 field diagnoses; added controls reproduced each finding before its repair.
 The shared reducer preserves the private explicit-sample path and skips source
-hash work when the resolved policy cannot use jitter.
+hash work for None backoff or a zero jitter percentage.
 
-Application and public-frame/gate tests are frozen and have genuine missing-API
-RED results. Remaining Changes, physical outcome, driver and native-ingress
-oracles precede release of those implementation layers. The last complete
-workspace result is the V6 result below; the current domain result does not
-replace it. Public submission/retention, original setup/runtime profiles,
+Application, public-frame/gate, Changes, physical outcome, driver and native
+ingress tests are frozen with genuine missing-API RED results before their
+implementations. The exact reviewed batch is released to disjoint application
+and lower-layer owners, with reciprocal architecture/performance review. These
+higher-layer assertions have not executed yet. The last complete workspace
+result is the V6 result below; the current domain result does not replace it.
+Public submission/retention, original setup/runtime profiles,
 production backend/consensus integration, Linux execution and full M1–M8 parity
 remain required. See ARCH-PUBLIC-MUTATION-INGRESS1-CREATE1 and its review records.
 

@@ -207,3 +207,14 @@ fixtures pass independently before source implementation; behavioral RED remains
 separate. The native main/cases/fixtures are test tooling within600 physical lines;
 five adapter/fault implementation files remain within400, all functions within100.
 The same strict workspace lint tables apply to the isolated native manifest.
+
+ARCH-PUBLIC-MUTATION-INGRESS1-CREATE1 applies the same direct purity rules to
+exact `wf-ports::log::public_mutation` and its descendants. Negative controls
+for the root and response child failed twice before the narrow classifier
+repair; all42 architecture tests then passed. The named neighboring
+`public_mutation_backend` stays effectful. `consensus::mutation` remains an
+effect contract, and the worker client facade remains value-only. This adds
+no dependency, source-size or lint exemption. The shared pure V1 registry is
+the limited delegation recorded in ADR-005; actual authorization, same-writer
+observations, retained publication and Linux/macOS durability need separate
+executed evidence.
