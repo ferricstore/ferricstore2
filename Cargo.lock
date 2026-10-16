@@ -865,6 +865,7 @@ name = "wf-storage"
 version = "0.1.0"
 dependencies = [
  "redb",
+ "sha2",
  "wf-domain",
  "wf-ports",
  "wf-types",

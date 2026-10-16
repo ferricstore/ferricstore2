@@ -19435,3 +19435,78 @@ Actual source_pins.rs whole-read c3eddb accepted:117LF, two identities, canonica
 ### ARCH-M2-REDB-GIT-SOURCE1-NATIVE1
 
 APPROVE ONLY the two EXISTING current native paths /private/tmp/ferricstore2-record-batch-redb-4.4.0-7061f7e-driver/Cargo.toml and Cargo.lock: replace its temporary redb path with the identical canonical Git repository/full revision/version="=4.4.0"/no-default/std declaration, then regenerate the lock. This prevents duplicate engine identities after the product dependency adoption. ALL native src remains byte-exact; no other spike/file/model/API/behavior or dependency upgrade is selected. Root owns mutation, unchanged-oracle execution/strict/format and proof save. This is dependency-source alignment, not new behavioral TDD or a new adoption/platform claim.
+
+
+### ARCH-M2-DURABLE-LOG1-CREATE1
+
+SELECT the complete finite PERF proposal at1,924,382+14,747/SHA5e1c09228335e283a51ce0484eafea6767f774a9923292be5ffe8e50cc70b1c8, actually WHOLE-read/hash-verified d2d168. Its exact field/getter/signature, framing, error and fault contracts are binding. Existing source-pin predecessor is separate; this is actual product persistence work, not another scalar engine proof or a complete M2/M3 claim.
+
+Approve SIX NEW production paths: crates/wf-ports/src/log/storage.rs and crates/wf-storage/src/log/{format,store,read,write,recovery}.rs. EXISTING product seams: ports/src/log.rs private child/reexports plus consuming PreparedBytes::into_bytes(self)->Vec<u8>; storage/src/log.rs facade; storage/Cargo.toml plus architecture/policy.toml for exact existing workspace sha2=0.11.0/no-default/features[] helper edge. Use the already selected canonical redb Git default profile. No feature, Tokio/OpenRaft product dependency, extra module/file/model/alias or storage-to-consensus edge.
+
+Exactly SIX production models: RaftVote; non-Clone/no raw-body-Debug RaftLogEntry; RaftLogState; RaftLogLimits with the proposal's E/N/A/P/R/recovery-count/recovery-wire/W private fields and five-argument paired constructor; RaftLogError with InvalidLimits,InvalidRange,Limit,Allocation,Corrupt,Conflict,Unavailable,Uncertain,Fenced; and non-Clone RedbLogStore with private Database/group/recovery/limits/fenced. One neutral RaftLogStore trait, synchronous &mut state/save_vote/save_committed/append/read_page/truncate_from, borrowed scope getters. Exact constructors, getters and owned Entry transfers are those in the whole-read proposal; immutable State construction grants no authority. Database-consuming constructors run the SAME private create/open/recovery implementation and expose no database extraction/admin API. Path builders configure16MiB cache; external Database cache remains caller-owned. Purge is ABSENT until a real snapshot boundary is proved.
+
+Approve FOUR NEW test paths crates/wf-storage/tests/durable_log/{main,limits,recovery,faults}.rs. Only extra nominal model is DiskFaultBackend{inner:FileBackend,fault:Arc<AtomicU8>} in faults.rs, forwarding the actual backend; ONE parent TestResult alias. Six identities exactly log_cross_call_and_reopen, log_vote_and_committed_prefix, log_profiles_and_owned_pages, log_recovery_rejects_invalid_cohorts, log_sync_failure_fences, log_kill_ack_boundaries. Use independently packed frames/full raw cohorts, scope/ambiguity/max/binary and exact/tight refusal, prefix overlap/commit/truncate/reopen/corruption, 16MiB positive plus supported command/policy, and real delegated-sync uncertainty/WAIT-kill assertions. PreparedBytes transfer pins pointer/length; capacity transfer is observable across Vec→Entry→into_parts, not an unselected PreparedBytes capacity getter.
+
+Retain both exact tables/meta rows and70-byte entry framing/scope-bound SHA. Recovery validates the full bounded consecutive0-based cohort/last/exact committed ID; it never fabricates an empty old store. All cross-call overlaps compare ID AND body; save_vote matches pinned default term/node/flag ordering, save_committed never regresses/clears, truncation cannot cross committed. Read caps return only a nonempty consecutive prefix or true exhaustion, never false empty on first-row Limit; bounds must not wrap. Profile exhaustion is Limit, stored inconsistency Corrupt. Non-clean commit is Uncertain and fences every operation until fresh open; no success or metadata publication before Immediate completion. Before-sync kill permits complete old OR new without ACK; after-return ACK requires new. These are process/storage results, not power-loss or Linux proofs.
+
+Selected owner accounting is exact logical G=512+g+r (<=1024), fixed2048, A=512n+sum bodies and R=512p+sum returned bodies; append holds original A plus ONE70+largest-body wire, read charges before every copy/reserve. Group/recovery actual256-byte caps independently checked e72619. Proposal's positive/default/counted recovery rules and checked sums stand. Its sufficient W formula is NOT a constructor minimum: valid smaller W may operationally refuse. Engine caches/pages/repair and externally held pages/capacity remain outside these logical claims.
+
+Root owns Cargo/policy/ADR/Git, freezing/all commands and any test corrections. After saving the green source predecessor and recording this CREATE, Root may release PERF ONLY the four disk-test files. Freeze meaningful missing-API/models assertions and reproduce genuine RED before releasing Writer the six new product files/two existing facades; Root alone changes dependency/policy files. Existing caps remain400 production/600 tooling/100 function lines; no waiver or unlisted artifact. ARCH/Writer/PERF review actual buffers normally, with no additional readiness gate. Applied/membership state join, complete snapshots/snapshot-safe purge, supervised async/callback adapter, real Raft/service, both supported OS profiles and full original M1–M8/parity remain REQUIRED successors.
+
+
+### ARCH-M2-DURABLE-LOG1-PRECISION1
+
+SELECT the explicit adjacent-leader invariant for the pinned default OpenRaft0.9.25 profile: alongside index+1, require nondecreasing lexicographic(term,leader_node) within supplied batches, at durable-tail/new-suffix boundaries and during full recovery. Equal leader remains valid; higher term may carry a smaller node; same-term smaller node is a regression. Supplied regression is Conflict with no publication; stored regression is Corrupt. Tests cover both negative dimensions and the higher-term/lower-node positive inside existing identities/files.
+
+Actual pinned primary read ac9d2d: src/log_id/mod.rs orders LogId leader-first; src/engine/log_id_list.rs load_log_ids relies on ordered leader runs for its binary search and append debug-asserts increasing LogId. This validates the selected invariant rather than inferring identity from indexes. Check uses only previous/current scalars; no new model/path/owner/fee or broader optional single-term-leader support. Other test authoring proceeds normally; source stays held until Root's genuine frozen RED/release.
+
+
+### ARCH-M2-DURABLE-LOG1-PRECISION2
+
+Bind read_page bounds by checked u128 half-open [lo,hi): start Included(x)=x, Excluded(x)=x+1, Unbounded=0; end Included(x)=x+1, Excluded(x)=x, Unbounded=2^64. lo>hi is InvalidRange, equality is true empty, otherwise scan. Never wrap MAX or cast the 2^64 sentinel to u64. Thus Excluded(k)/Excluded(k) is InvalidRange; Excluded(MAX)/Included(MAX) and Included(MAX)/Excluded(MAX) are empty. This explicitly supersedes the draft's ambiguous equal-open wording. Root and PERF agree before test freeze.
+
+Metadata keys are literally b"manifest" and b"state". Recovery/truncate census uses configured recovery rows/full70+body wire bytes, counted once per logical affected row before mutation; a deletion pass does not double that unit. Append overlap uses incoming n/body bounds with borrowed comparisons, without a copied old-entry owner or recovery credit. No new model/path/fee.
+
+Actual source-pin helper540aa2 preserves every approved non-redb external edge, including selected storage sha2, while replacing only redb. Own executed ENTIRE helper inverse to HEAD is TRUE; all assertions/drift operands remain exact. Current123LF/4,764B/SHA 6fe855a871b5b2b70039cdaf2779d505785a57b5a9e18696ef73c9499a0da117 (the current compact retain layout). Root owns execution; no additional gate.
+
+
+### ARCH-M2-DURABLE-LOG1-PRECISION3
+
+APPROVE directory-entry durability in the already selected log/store.rs. Actual pinned redb db.rs2104-2120 read4f915c shows Builder::create opens/creates the file then calls Database::new, without parent-directory sync. Path create must finish the initial Immediate commit, then open and sync the parent directory before returning Success on Linux/macOS. A bare relative filename uses "."; no implicit mkdir. Directory-open/sync failure after committed initialization is Uncertain; drop the unreturned store rather than claim no initialization. Path open of a preexisting entry needs no create-directory step.
+
+Database-consuming constructors run the same initialization/recovery but explicitly require caller-owned durable file/directory setup because the private Database supplies no path. Same files/models/owners/tariffs; no power-loss or unsupported-platform proof is inferred. PERF may author the existing tests normally; Writer source remains held for Root's frozen genuine RED/release.
+
+
+### ARCH-M2-DURABLE-LOG1-TESTS1
+
+Accepted actual final four test bodies b36ed6/04344a/ee2cfc/2bd0b4; df629f completes the omitted middle of the fourth output. Independently rehashed: main359LF/6a8fe11e442a7fbadfd315ca2f2493fde022dbc9d657872ebe42cbc15b5ab896; limits269/efdbdef6af290e3e6521fdfbeb7e2d263ec4d9508e23533352ff08c85e650237; recovery372/1c6a7082dc2b9afcf2671893edf36fa321aa6eb497ad0a71fc09d6a4bc816ba3; faults397/d6c5b0f72f5d8410336aced5592902a0faf88d19d000ad3dd1cde7af68160c58. Exactly six selected identities, one DiskFaultBackend and parent TestResult; no added model/path. Root reports real geometry check passed.
+
+Own candidate-free struct/hash pack8faf81 matches all THREE ENTIRE literal frames (manifest44/state39/entry73). Independent raw full cohorts, binary/max/ambiguous scopes, cross-call ID/body/leader conflicts, monotonic vote/exact committed identity and protected truncate controls are meaningful. New checksummed term regression, foreign ordinary/multimap inventories and existing-namespace bootstrap refusals preserve the selected full-recovery duty.
+
+Source-only arithmetic agrees: G514+2048+A515+wire73=3150; two-row peak3665; first read owner peak3077; recovery146/145 counts full wires. Range/MAX behavior matches PRECISION2. PreparedBytes pointer/length and Vec-to-Entry capacity transfer avoid an unselected getter; retained page survives store drop. Large16MiB/command/policy fixtures test compatibility without converting body copies in the external oracle into a production-memory claim.
+
+Actual FileBackend delegation is preserved. Four post-delegated-sync errors demand Uncertain, every state/read/mutation then Fenced, and reopen plus resumed append is compared to complete independent old/new cohorts. Eight READY/parent-A/WAIT cases distinguish before-sync old-or-new (no ACK) from after-success-return required-new. Bounded signal reads/timeouts always terminate/wait/join the child path; no timing sleep supplies durability evidence. Process-kill claims remain distinct from power-loss/Linux proof. Root alone owns frozen RED/execution/release; no assertions have executed or source readiness been inferred from this review.
+
+
+### ARCH-M2-DURABLE-LOG1-PRECISION4
+
+SELECT exact redb backend profile compatibility: every RedbLogStore constructor rejects maximum_entry_bytes > 3*1024^3-70 (3,221,225,402) as InvalidLimits before its own I/O/table work. Neutral RaftLogLimits remains generic. Actual pinned base.rs17-18 read f673f8 fixes the3GiB value ceiling; table.rs326-334 read0a407f enforces it before insertion. The70-byte frame and8-byte key fit the independent3.75GiB pair bound. This is an actual engine ceiling, not an arbitrary product body cap. ValueTooLarge fallback is operational Limit, without an I/O-fence inference.
+
+Root may add exact/+1 no-large-allocation profiles to the EXISTING limits.rs identity, including invalid-path noncreation; no new artifact/model/alias/API/fee. Small positive workspace remains valid for empty setup. Writer holds ONLY this newly selected guard for Root's genuine behavioral RED/release while all unrelated approved source proceeds. The default16MiB and existing large-command/policy controls remain compatible.
+
+
+### ARCH-M2-DURABLE-LOG1-TESTS2
+
+Actual backend_entry_caps helper64601d accepted: neutral-valid exact/+1 E profiles, small W, all four backend constructors, absent path remains absent and supplied engine remains table-empty. No giant body or new identity/model. Current limits333LF/12,061B/SHAe6b9cbbf6908b37ced6126b9e427fee55f3f036b196d325da0aa87f4618e1fe0. Own a97a61 ENTIRE helper/call/added ReadableDatabase import inverse restores frozen efdbdef6 TRUE. Initial partial inverse omitted that import and failed; correcting the proof changed no file. Old oracles remain exact. This is an honest post-original-RED supplement; actual behavioral RED and narrow guard release remain Root-owned.
+
+
+### ARCH-M2-DURABLE-LOG1-PRECISION5
+
+Initial actual store.rs b5ffd7 erases explicit DatabaseError::Storage(Corrupted) into Unavailable. SELECT narrow constructor delegation of DatabaseError::Storage through existing format::storage_error, retaining other DatabaseError diagnoses as Unavailable. Same existing store/format files, no model/API. Writer holds ONLY this mapping for Root's behavioral RED/release; the backend-cap guard remains separately held. Initial transaction-begin closures erase the same nested Storage cause; this related finding was sent Root without claiming the constructor test executes those branches.
+
+Root's existing recovery identity gained physical_header_corruption. Actual helper41d479 and pinned header122349/d88b44 agree: zeroing the immutable u32 at offset20 yields explicit Corrupted, independently asserted through raw Builder before product open/create. Own28c9de ENTIRE helper/call/std::io inverse restores1c6a7082 TRUE; current397LF/SHA91724285d10c39c9cd4b3a6277642e2adfb36da781e22ad8f9adf19d34108a7a. Old controls remain exact, no new artifact/model. The first product-open assertion precedes create; genuine RED reach remains Root-owned.
+
+
+### ARCH-M2-DURABLE-LOG1-PRECISION6
+
+SELECT Corrupt alongside Unavailable/Uncertain in existing store.failure() fatal classification. Actual canonical raft-storage.md23 read d2c30a requires a corrupt/unreconciled replica to stop serving/applying. First detection returns Corrupt; later state/read/mutations return Fenced. Borrowed scope getters remain available; profile/caller/allocation refusals do not fence. Same match operand, no new file/model/API or contrived mirror test. This classification may proceed in the active source batch. Existing real fault tests reach shared fencing after Uncertain; the constructor-header fixture returns no handle and supplies no live-Corrupt trigger credit. Both separately held behavioral guards retain their Root-owned sequencing.

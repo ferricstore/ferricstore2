@@ -12,13 +12,16 @@ fn configured(source: &str) -> CheckResult<Policy> {
         "external_normal = [{{ name = 'redb', version = '=4.4.0', features = ['std'], default_features = false, source = '{source}' }}]"
     )
     .parse()?;
-    document["packages"]["wf-storage"]
+    let dependencies = document["packages"]["wf-storage"]
         .as_table_mut()
         .ok_or("missing storage policy")?
-        .insert(
-            "external_normal".into(),
-            external["external_normal"].clone(),
-        );
+        .entry("external_normal")
+        .or_insert_with(|| toml::Value::Array(Vec::new()))
+        .as_array_mut()
+        .ok_or("external policy must be an array")?;
+    dependencies
+        .retain(|dependency| dependency.get("name").and_then(toml::Value::as_str) != Some("redb"));
+    dependencies.push(external["external_normal"][0].clone());
     let mut text = String::new();
     for (name, value) in document.as_table().ok_or("missing policy root")? {
         writeln!(&mut text, "{name} = {value}")?;

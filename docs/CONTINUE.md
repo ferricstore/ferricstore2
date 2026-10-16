@@ -5,30 +5,47 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The M2 backend dependency is now an exact canonical redb 4.4.0 Git pin, with
-default features disabled and only std enabled. Source-policy regression tests
-failed before the exact-source checker repair and now reject moving refs and
-source/version/feature/path/layer drift. The workspace passes 702 tests across
-83 targets, six compile-fail docs across 15 targets, formatting, compilation,
-strict Clippy, warnings-denied rustdoc and reference/progress checks. All four
-full-workspace dependency audit categories pass using the cached advisory database;
-no target/dev/build exclusion or source-policy waiver was added.
+The scoped synchronous durable Raft log now has its first complete implementation
+and passing disk tests. It preserves opaque entry ownership, checks full overlap
+identity/body, protects the committed prefix and validates strict bounded recovery.
+Actual delegated-sync faults and eight acknowledged process-kill stages exercise
+the same production path. Two added regressions failed before their narrow repairs:
+backend-incompatible entry limits and physical engine corruption diagnosis.
+Architecture and performance independently reviewed the implementation and repairs.
 
-The existing native acceptance executable also passes compilation, formatting,
-strict Clippy and its complete persistence/reopen/process-kill cases on the same
-canonical dependency. Its 15 Rust source files are unchanged; only its manifest
-and lock changed. The exact 17-file proof is saved at 627fb772 on
-codex/workflow-record-batch-native-proof. Local offline validation uses
-`CARGO_HOME=/private/tmp/ferricstore2-m2-durable-log-cargo-home`, seeded from the
-verified upstream commit and tree. The manifest and lock retain the canonical
-upstream URL/revision. See [ADR-007](adr/007-durable-log-storage.md) and
-ARCH-M2-REDB-GIT-SOURCE1-CREATE1.
+The final macOS snapshot passes all 708 Rust tests across 84 workspace targets and
+six compile-fail examples across 15 documentation targets, with zero failures or
+ignored tests. Formatting, all-target compilation, strict Clippy, warnings-denied
+rustdoc and reference/progress checks pass. The full-workspace cached dependency
+audit passes advisories, bans, licenses and sources without exclusions or waivers;
+this is not a fresh online advisory refresh. All 660 selected source, manifest and
+policy inputs remain unchanged during validation. See
+[ADR-007](adr/007-durable-log-storage.md) and the coordination record for actual
+RED/GREEN evidence, source qualification and remaining gates.
 
-The next product slice is a scoped synchronous durable log with real disk,
-recovery, corruption and commit-failure tests. The exact proposal is in the
-performance review; backend code is not implemented by the dependency selection.
-Applied-state/membership recovery, snapshots and safe purge, consensus/service
-wiring, original Elixir runtime parity and native Linux remain required.
+The existing native acceptance executable also passes pinned formatting,
+compilation, strict Clippy and its complete persistence/reopen/process-kill cases.
+All 677 combined product/native inputs remain unchanged. Its 15 Rust files are
+identical to the prior proof; only the storage sha2 lock edge changed. The exact
+17-file proof is saved at 55bcbd85 on codex/workflow-record-batch-native-proof.
+Both use canonical redb 4.4.0 commit
+7061f7e60d4573311c0636e161d417b93e9fd2b1, no-default/std only. Local offline
+validation uses CARGO_HOME=/private/tmp/ferricstore2-m2-durable-log-cargo-home,
+seeded from verified upstream objects; product manifests retain the upstream pin.
+
+The next real M2 predecessor is product authoritative state-store adoption through
+the existing GroupApplyStore and ControlState, with explicit bounded genesis and
+strict open. Its concrete contract is under read-only peer consultation; no
+successor artifact or implementation has been released. Applied-state/membership
+recovery, exact cross-database log joins, snapshots and safe purge precede full
+consensus/service wiring. Complete M1–M8, original Elixir setup/runtime parity and
+native Linux remain required; this checkpoint establishes no milestone exit.
+Ledger counts remain 82 source-derived declarations, 92 counterpart mappings and
+365 assertion links, with 1,681 unmatched runtime cases and 1,655 unresolved
+declarations. Component tests confer no new full-source parity credit.
+
+The entries below record earlier increments; their counts and next-step statements
+belong to those historical checkpoints.
 
 The public-ingress continuation now has its domain predecessor: bounded borrowed
 scalar caller normalization and source-compatible retry jitter derived inside

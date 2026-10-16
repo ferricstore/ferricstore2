@@ -1,4 +1,4 @@
-//! Narrow private-format preparation functions; no durable log is implemented.
+//! Prepared command codecs and consensus-neutral durable log capabilities.
 
 use std::fmt;
 
@@ -23,7 +23,12 @@ mod public_mutation;
 mod reader;
 mod record_batch;
 mod scan;
+mod storage;
 mod writer;
+
+pub use storage::{
+    RaftLogEntry, RaftLogError, RaftLogLimits, RaftLogState, RaftLogStore, RaftVote,
+};
 
 pub use public_mutation::{
     decide_fresh_public_mutation_touched, encode_public_mutation, inspect_public_mutation_point,
@@ -115,6 +120,11 @@ pub struct PreparedBytes {
 }
 
 impl PreparedBytes {
+    /// Transfers the original wire owner without copying or changing capacity.
+    #[must_use]
+    pub fn into_bytes(self) -> Vec<u8> {
+        self.bytes
+    }
     /// Borrows exact prepared bytes, excluding separately assigned log ID.
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] {

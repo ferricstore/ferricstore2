@@ -1,3 +1,11 @@
 //! Log boundary for `wf-storage`.
 //!
-//! Reserved for the reviewed contract; no workflow behavior is implemented here.
+//! Scoped synchronous durability, without consensus or state-machine apply.
+
+mod format;
+mod read;
+mod recovery;
+mod store;
+mod write;
+
+pub use store::RedbLogStore;

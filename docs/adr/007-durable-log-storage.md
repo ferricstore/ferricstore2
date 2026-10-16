@@ -1,7 +1,8 @@
 # ADR-007: pinned durable-log storage source
 
-Status: source selection accepted; synchronous log implementation and its
-recovery tests are in progress. This decision does not establish a milestone exit.
+Status: source selection accepted; scoped synchronous log implementation and
+its disk/recovery/fault tests pass on macOS. This decision does not establish a
+milestone exit or Linux validation.
 
 The first product storage adapter uses redb 4.4.0 from the canonical upstream
 repository at commit `7061f7e60d4573311c0636e161d417b93e9fd2b1`, with default
@@ -33,3 +34,73 @@ Primary sources: [pinned upstream commit](https://github.com/cberner/redb/commit
 and [pinned manifest](https://github.com/cberner/redb/blob/7061f7e60d4573311c0636e161d417b93e9fd2b1/Cargo.toml).
 See ARCH-M2-REDB-GIT-SOURCE1-CREATE1 in the architecture review and the
 coordination record for executed checks and remaining gates.
+
+## Scoped synchronous log contract
+
+ARCH-M2-DURABLE-LOG1-CREATE1 selects consensus-neutral vote, entry, state, limits
+and error values plus a synchronous mutable log port. `RedbLogStore` owns its
+database and namespace and cannot be cloned. Path constructors configure a 16 MiB
+engine cache; constructors consuming an existing Database use that caller's engine
+configuration and the same production initialization/recovery path. Async
+scheduling and cancellation ownership belong to the later consensus bridge.
+After its initial Immediate commit, path creation synchronizes the parent
+directory before returning success on Linux/macOS. A bare relative filename uses
+parent `.`. Failure at that point is an uncertain initialization. Database-consuming
+constructors require caller-owned durable file and directory setup; opening an
+existing path does not create or resynchronize its directory entry.
+
+Creation requires an empty database and atomically installs the group/recovery
+manifest, scalar state and empty log. Recovery opens existing tables without
+creating missing data. It validates the complete bounded log from index zero,
+exact tail and committed identities, checksums and table/metadata inventory.
+Opaque entry bodies retain their original owners; consuming prepared bytes and
+entry parts does not clone their payloads. Public diagnostics expose fixed error
+classifications. Explicit engine corruption retains Corrupt through nested
+database and transaction errors; unrelated engine failures remain Unavailable.
+
+Append validates the complete batch and its durable overlaps before publication.
+Every overlap must match full identity and body; extension follows the exact tail.
+Consecutive indices have nondecreasing `(term, leader_node)` under the selected
+OpenRaft default leader profile. Higher term with smaller node is valid. Supplied
+order conflicts refuse without publication; stored order regression is corruption.
+Votes advance lexicographically by `(term, node, committed)`. The committed prefix
+can advance only to an exact stored identity, and truncation may remove only its
+uncommitted suffix. Rows and scalar state commit together with Immediate
+durability. Corrupt, unavailable or uncertain results fence further reads and
+writes until a new handle completes recovery; admission, allocation and caller
+conflict refusals do not fence the handle.
+
+Two tables use version-1 frames: `wf_raft_meta_v1` contains only `manifest` and
+`state`, while `wf_raft_log_v1` maps u64 indices to entries. Manifest framing is
+`FWRM`, u16 version, u16-length group and recovery, and SHA-256. State framing is
+`FWLS`, u16 version, option flags, optional vote/committed/tail and SHA-256. Entry
+framing is `FWRL`, u16 version, full 24-byte identity, u64 body length, body and
+SHA-256: 70 bytes plus body. State and entry checksums also bind the length-prefixed
+group/recovery namespace with the `wf-raft-log-v1` prefix. Integer fields are big
+endian. Parsers reject invalid flags, lengths, identity/key mismatch and trailing
+bytes. No OpenRaft or serde types enter the neutral persistence contract.
+
+Limits separately bound entry bytes, append rows/owners, returned page
+rows/owners, recovery rows/wire bytes and logical workspace. Defaults admit a
+16 MiB entry, 1,000-row/64 MiB append and read page, one-million-row/1 GiB recovery
+scan and 256 MiB logical workspace. Limits remain configurable for the complete
+encoded application profile. The neutral limits remain backend-independent.
+Every redb constructor rejects an entry maximum above 3,221,225,402 bytes before
+its own file/table work: the pinned engine permits a 3 GiB value and the entry
+frame adds 70 bytes. An unexpected engine ValueTooLarge is an operational Limit.
+The exact-boundary tests allocate no large payload. Input/output ownership
+charges are 512 bytes per
+row plus body lengths; namespace ownership is 512 plus group/recovery lengths,
+with a separate 2,048-byte operation allowance. Append additionally charges one
+largest encoded entry. These logical fees exclude engine internals and existing
+caller allocations; they are not process RSS or latency guarantees.
+
+Read pages return a bounded prefix and independently owned bodies. Admission
+failure on the first row is an error, never an empty result. Range handling must
+cover excluded/included endpoints and u64 exhaustion without wrapping. Normalize
+to u128 half-open bounds: included/excluded starts become x/x+1, included/excluded
+ends become x+1/x, and unbounded endpoints become 0/2^64. A lower bound above the
+upper is InvalidRange; equal normalized bounds are empty. Purge is
+absent until recovery can prove an applied/snapshot boundary. This log slice
+does not supply workflow-state publication, membership recovery, snapshots,
+consensus or service wiring; those M2/M3 successors remain mandatory.
