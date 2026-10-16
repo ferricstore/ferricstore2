@@ -35,6 +35,7 @@ use wf_types::version::{
 
 mod admission;
 mod gate;
+mod independent;
 mod load;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
@@ -61,6 +62,7 @@ struct ObservedStore {
     written_outcome: Option<RetainedOutcome>,
     writes: Vec<RecordWrite>,
     histories: Vec<HistoryEntry>,
+    captured_admission: Option<AdmissionLimits>,
 }
 
 struct ObservedTransaction<'store> {
@@ -128,6 +130,7 @@ fn observed_store() -> TestResult<ObservedStore> {
         written_outcome: None,
         writes: Vec::new(),
         histories: Vec::new(),
+        captured_admission: None,
     })
 }
 
@@ -219,6 +222,7 @@ impl GroupApplyStore for ObservedStore {
         &'s mut self,
         group: &'s GroupId,
         recovery: &'s RecoveryId,
+        admission: AdmissionLimits,
         maximum_read_steps: usize,
         maximum_read_bytes: usize,
         maximum_temporary_bytes: usize,
@@ -230,6 +234,7 @@ impl GroupApplyStore for ObservedStore {
         if maximum_read_steps == 0 || maximum_read_bytes == 0 || maximum_temporary_bytes == 0 {
             return Err(StateTransactionError::Limit);
         }
+        self.captured_admission = Some(admission);
         Ok(ObservedTransaction {
             store: self,
             group,

@@ -7,10 +7,8 @@ use syn::{
     visit::Visit,
 };
 
-use crate::{
-    CheckResult,
-    policy::{Package, Policy},
-};
+use crate::CheckResult;
+use crate::policy::{Package, Policy};
 
 pub(crate) struct Context<'a> {
     pub(crate) package: &'a str,
@@ -113,23 +111,28 @@ impl Inspector<'_, '_> {
     }
 
     fn pure(&self) -> bool {
+        let under = |prefix: &str| {
+            self.module
+                .strip_prefix(prefix)
+                .is_some_and(|suffix| suffix.is_empty() || suffix.starts_with("::"))
+        };
+        let ports_module = matches!(
+            self.module.as_str(),
+            "log::record_batch" | "log::record_batch::intent" | "log::record_batch::response"
+        ) || [
+            "log::record_batch::phase",
+            "log::record_batch::fresh",
+            "log::record_batch::independent",
+            "log::record_batch::response::independent",
+            "state::transaction::independent",
+        ]
+        .into_iter()
+        .any(under);
         !self.test
             && (matches!(self.context.package, "wf-types" | "wf-domain" | "wf-wire")
                 || (self.context.package == "wf-storage"
-                    && (self.module == "state::value"
-                        || self.module.starts_with("state::value::")
-                        || self.module == "state::key"
-                        || self.module.starts_with("state::key::")))
-                || (self.context.package == "wf-ports"
-                    && (matches!(
-                        self.module.as_str(),
-                        "log::record_batch"
-                            | "log::record_batch::intent"
-                            | "log::record_batch::response"
-                            | "log::record_batch::phase"
-                            | "log::record_batch::fresh"
-                    ) || self.module.starts_with("log::record_batch::phase::")
-                        || self.module.starts_with("log::record_batch::fresh::"))))
+                    && (under("state::value") || under("state::key")))
+                || (self.context.package == "wf-ports" && ports_module))
     }
 
     fn path(&mut self, written: &[String]) {

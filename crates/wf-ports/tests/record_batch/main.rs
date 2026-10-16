@@ -383,7 +383,7 @@ fn record_batch_intent_and_frame_bind_all_mutation_fields() -> TestResult {
         ));
     }
     let mut unsupported = frame.as_bytes().to_vec();
-    unsupported[27..29].copy_from_slice(&6_u16.to_be_bytes());
+    unsupported[27..29].copy_from_slice(&7_u16.to_be_bytes());
     assert!(matches!(
         decode_prepared(&unsupported, limits()),
         Err(CodecError::UnsupportedVersion)

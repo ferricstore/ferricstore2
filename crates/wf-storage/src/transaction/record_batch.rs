@@ -6,7 +6,8 @@ use wf_domain::workflow::request::RequestScope;
 use wf_domain::workflow::request::gate::PointGateView;
 use wf_ports::log::{
     RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, RecordBatchInspection,
-    inspect_record_batch_point, prepare_record_batch,
+    inspect_independent_record_batch_point, inspect_record_batch_point,
+    prepare_independent_record_batch, prepare_record_batch,
 };
 use wf_ports::state::{
     GroupApplyChanges, GroupApplyStore, GroupApplyTransaction, StateTransactionError,
@@ -34,6 +35,31 @@ pub fn apply_record_batch_transaction<S: GroupApplyStore>(
     log: LogIdentity,
     limits: RecordBatchTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
+    apply(store, expected_scope, encoded, log, limits, false)
+}
+
+/// Applies one verified V6 vector with final-once records and every history.
+/// The same exclusive guard and point gate precede all bounded Fresh reads.
+/// # Errors
+/// Operational preparation, authority, budget or commit refusal publishes no reply.
+pub fn apply_independent_record_batch_transaction<S: GroupApplyStore>(
+    store: &mut S,
+    expected_scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: RecordBatchTransactionLimits,
+) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
+    apply(store, expected_scope, encoded, log, limits, true)
+}
+
+fn apply<S: GroupApplyStore>(
+    store: &mut S,
+    expected_scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: RecordBatchTransactionLimits,
+    independent: bool,
+) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
     let live = live_bytes(limits)?;
     let available =
         limits
@@ -43,13 +69,18 @@ pub fn apply_record_batch_transaction<S: GroupApplyStore>(
                 attempted: live,
                 maximum: limits.workspace_bytes,
             })?;
-    let decoded = prepare_record_batch(encoded, limits.codec, available)?;
+    let decoded = if independent {
+        prepare_independent_record_batch(encoded, limits.codec, available)?
+    } else {
+        prepare_record_batch(encoded, limits.codec, available)?
+    };
     if &decoded.request().scope != expected_scope {
         return Err(RecordBatchApplyError::Apply(ApplyError::InvalidAuthority).into());
     }
     let tx = store.begin_apply(
         expected_scope.group(),
         expected_scope.recovery(),
+        limits.codec.admission(),
         limits.maximum_read_steps,
         limits.maximum_read_bytes,
         limits.maximum_adapter_bytes,
@@ -57,18 +88,23 @@ pub fn apply_record_batch_transaction<S: GroupApplyStore>(
     let predecessor = tx.control()?;
     let retained_nonempty = tx.retained_nonempty(expected_scope.tenant())?;
     let original = tx.outcome(expected_scope.tenant(), &decoded.request().request)?;
-    let inspection = inspect_record_batch_point(
-        decoded,
-        log,
-        PointGateView {
-            scope: expected_scope,
-            control: predecessor,
-            outcome: original.as_ref(),
-            retained_nonempty,
-        },
-        limits.codec,
-        limits.workspace_bytes,
-    )?;
+    let view = PointGateView {
+        scope: expected_scope,
+        control: predecessor,
+        outcome: original.as_ref(),
+        retained_nonempty,
+    };
+    let inspection = if independent {
+        inspect_independent_record_batch_point(
+            decoded,
+            log,
+            view,
+            limits.codec,
+            limits.workspace_bytes,
+        )?
+    } else {
+        inspect_record_batch_point(decoded, log, view, limits.codec, limits.workspace_bytes)?
+    };
     match inspection {
         RecordBatchInspection::Complete(plan) => {
             let changes = GroupApplyChanges::new(expected_scope, predecessor, plan)?;
@@ -121,7 +157,10 @@ fn complete_kind(
         RecordBatchApplyDecision::IntentConflict => 1,
         RecordBatchApplyDecision::Expired => 2,
         RecordBatchApplyDecision::LogReplay => 3,
-        RecordBatchApplyDecision::Fresh { .. } => return Err(StateTransactionError::Corrupt.into()),
+        RecordBatchApplyDecision::Fresh { .. }
+        | RecordBatchApplyDecision::IndependentFresh { .. } => {
+            return Err(StateTransactionError::Corrupt.into());
+        }
     };
     Ok((control.next(), kind))
 }
@@ -130,10 +169,17 @@ fn fresh_reply(
     plan: RecordBatchApplyPlan<'_>,
 ) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
     let (control, decision) = plan.into_parts();
-    let RecordBatchApplyDecision::Fresh { operation, outcome } = decision else {
-        return Err(StateTransactionError::Corrupt.into());
+    let outcome = match decision {
+        RecordBatchApplyDecision::Fresh { operation, outcome } => {
+            drop(operation);
+            outcome
+        }
+        RecordBatchApplyDecision::IndependentFresh { operation, outcome } => {
+            drop(operation);
+            outcome
+        }
+        _ => return Err(StateTransactionError::Corrupt.into()),
     };
-    drop(operation);
     Ok(RecordBatchTransactionOutcome::Retained {
         control: control.next(),
         outcome,

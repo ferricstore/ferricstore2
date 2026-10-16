@@ -16,6 +16,8 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-domain", "policy::complete::record_projection"),
         ("wf-domain", "policy::complete::record_projection::nested"),
         ("wf-ports", "log::record_batch::response"),
+        ("wf-ports", "state::transaction::independent"),
+        ("wf-ports", "state::transaction::independent::nested"),
     ] {
         assert_eq!(
             source_check(
@@ -66,6 +68,7 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         ("wf-storage", "state::key_backend"),
         ("wf-storage", "state::keyed"),
         ("wf-ports", "log::record_batch::response_backend"),
+        ("wf-ports", "state::transaction::independent_backend"),
     ] {
         assert_eq!(
             source_check(

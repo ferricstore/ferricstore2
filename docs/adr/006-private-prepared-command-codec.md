@@ -1384,3 +1384,34 @@ uses one table/real write transaction and full record/index/history/outcome/cont
 oracles; it introduces no product dependency or engine-adoption claim. Native
 Linux, runtime consensus wiring and full original scenario/profile parity remain
 required.
+
+## Independent V6 private batch profile
+
+ARCH-M2-INDEPENDENT-V6-PUBLICATION1-CREATE1 adds intent6 to the existing FWCP1
+nonempty batch root1. Its eight caller-operation field streams use separator
+WF-RECORD-BATCH\0V6\0; V5 bytes/digests remain exact. Generic decoding caches the
+actual derived Result without newly propagating it. Public preparation,
+inspection and Fresh entry points reject cross-use of verified5/6 profiles.
+Claim/Reclaim remain outside this mutation profile; public empty-batch handling
+remains a required pre-submission behavior.
+
+Response version remains1. V6 evaluated responses are root2, a positive u32
+count<=100000 and exactly that many scalar rows: success0 or a closed existing
+domain/priority error. Whole-call refusal retains root1 and its existing table.
+V5 success remains scalar root0. Per-item admission/duplicate/cross-group/claim
+head errors are forbidden; incomplete/trailing bytes reject. Parsing and exact
+plan comparison stream rows without a per-row owner. Changes validates status,
+count and every row against the actual independent decision.
+
+Only after the one retained gate returns Replay does the pure wrapper check
+grammar/status agreement and compare Some(count) with incoming item count.
+Whole-call rejection has None and remains replayable. Exact-log replay, conflict
+and expiry bypass that response metadata check. Physical outcome scan retains
+its explicit pre-gate fail-closed precedence. Its borrowed descriptor adds only
+the parsed optional count; configured transaction admission remains separate.
+
+The same consumed Changes/commit path publishes original-once/final-once/all
+histories with outcome/control. Retained replies move their original owned
+buffers only after commit. This private profile and the isolated native proof
+do not implement public normalization/submission hooks, SDK/wire compatibility,
+production dependency adoption or full original setup/runtime/Linux acceptance.

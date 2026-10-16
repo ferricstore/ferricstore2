@@ -12,7 +12,9 @@ mod load;
 mod observations;
 mod record_batch;
 
-pub use record_batch::apply_record_batch_transaction;
+pub use record_batch::{
+    apply_independent_record_batch_transaction, apply_record_batch_transaction,
+};
 
 /// Explicit per-call logical profile, separate from native cache/pages and RSS.
 ///

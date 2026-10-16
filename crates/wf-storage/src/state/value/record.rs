@@ -11,7 +11,7 @@ use wf_types::identity::{GroupId, PartitionId, RecoveryId};
 use super::{StateValueError, add, allocate, put_raw, raw_size};
 
 mod scan;
-pub use scan::{ScannedWorkflowRecord, scan_record_point};
+pub use scan::{ScannedWorkflowRecord, scan_record_point, scan_record_point_profiled};
 
 const EVENTS: [EventKind; 13] = [
     EventKind::Created,

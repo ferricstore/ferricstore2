@@ -4,7 +4,7 @@ use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{
     ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
 };
-use wf_ports::log::record_batch_retained_status;
+use wf_ports::log::{record_batch_retained_status, record_batch_retained_summary};
 use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, LogIdentity, TimestampMillis};
 
@@ -31,6 +31,7 @@ pub struct ScannedRetainedOutcome<'input> {
     status: RetainedStatus,
     limits: AdmissionLimits,
     owned_bytes: usize,
+    response_count: Option<usize>,
 }
 
 impl ScannedRetainedOutcome<'_> {
@@ -38,6 +39,12 @@ impl ScannedRetainedOutcome<'_> {
     #[must_use]
     pub const fn owned_bytes(&self) -> usize {
         self.owned_bytes
+    }
+
+    /// Reads the structural vector count, independent of configured transaction caps.
+    #[must_use]
+    pub const fn response_count(&self) -> Option<usize> {
+        self.response_count
     }
 
     /// Consumes parsed fields after admitting their complete logical owner size.
@@ -167,11 +174,13 @@ pub fn scan_outcome<'input>(
     {
         return Err(StateValueError::InvalidValue);
     }
-    if intent_version != 5 {
-        return Err(StateValueError::UnsupportedVersion);
-    }
-    let intent = ClientIntent::record_batch(digest);
-    let status = record_batch_retained_status(intent, response_version, response)?;
+    let intent = match intent_version {
+        5 => ClientIntent::record_batch(digest),
+        6 => ClientIntent::independent_record_batch(digest),
+        _ => return Err(StateValueError::UnsupportedVersion),
+    };
+    let (status, response_count) =
+        record_batch_retained_summary(intent, response_version, response)?;
     let mut owned_bytes = 512;
     for field in [tenant, group, recovery, request, response] {
         add(&mut owned_bytes, field.len())?;
@@ -190,6 +199,7 @@ pub fn scan_outcome<'input>(
         status,
         limits,
         owned_bytes,
+        response_count,
     })
 }
 

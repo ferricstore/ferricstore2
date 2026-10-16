@@ -4,6 +4,7 @@
 
 mod control;
 mod history;
+mod independent;
 mod outcome;
 mod ownership;
 mod record;

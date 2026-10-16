@@ -32,10 +32,10 @@ pub enum RecordBatchInspection<'input, 'retained> {
 /// The fixed box moves existing buffers; it does not copy commands or keys.
 /// Its allocation follows the existing fixed-owner allocator behavior.
 pub struct FreshRecordBatch<'input> {
-    decoded: Box<DecodedRequest<'input>>,
-    log: LogIdentity,
-    control: ControlPlan,
-    workspace_limit: usize,
+    pub(super) decoded: Box<DecodedRequest<'input>>,
+    pub(super) log: LogIdentity,
+    pub(super) control: ControlPlan,
+    pub(super) workspace_limit: usize,
 }
 
 impl<'input> FreshRecordBatch<'input> {
@@ -67,7 +67,7 @@ pub fn inspect_record_batch<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    check_decoded(&decoded, limits, workspace_limit)?;
+    check_decoded(&decoded, limits, workspace_limit, 5)?;
     let gate = inspect_request(view, decoded.header(log), limits.admission)?;
     Ok(finish_inspection(decoded, log, gate, workspace_limit))
 }
@@ -87,12 +87,12 @@ pub fn inspect_record_batch_point<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    check_decoded(&decoded, limits, workspace_limit)?;
+    check_decoded(&decoded, limits, workspace_limit, 5)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
     Ok(finish_inspection(decoded, log, gate, workspace_limit))
 }
 
-fn finish_inspection<'input, 'retained>(
+pub(super) fn finish_inspection<'input, 'retained>(
     decoded: DecodedRequest<'input>,
     log: LogIdentity,
     gate: RequestGate<'retained>,
@@ -171,6 +171,9 @@ fn finish_fresh<'current>(
     additional_live_bytes: usize,
     outcome_ttl_ms: u64,
 ) -> Result<RecordBatchApplyPlan<'current>, RecordBatchApplyError> {
+    if fresh.decoded.request.intent.version() != 5 {
+        return Err(super::super::CodecError::UnsupportedVersion.into());
+    }
     let FreshRecordBatch {
         decoded,
         log,

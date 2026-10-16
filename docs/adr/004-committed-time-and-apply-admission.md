@@ -503,3 +503,35 @@ Results and borrows finalization state. This adds no per-item Box or allocation;
 it asserts no smaller native layout. External query/current/policy/fact owners
 and future driver staging still need their separate bounds. Logical admission
 establishes no RSS, latency, universal allocator or durable-publication guarantee.
+
+## Independent V6 driver admission
+
+ARCH-M2-INDEPENDENT-V6-PUBLICATION1-CREATE1 keeps the independent core tariff
+inside the configured decision allowance B. With actual encoded length E and
+item count n, decoded admission remains D=4E+B+1024n+2048 before decoding.
+Fresh reference staging admits F=D+192n+256+B before either existing reference
+Vec or the domain copies. The driver reserves its separate cumulative
+L=R+S+C before preparation, prepares with W-L and adds the same L to later
+bounds; dropping temporary owners creates no refund.
+
+After decoded operation/key/isolation/filter scratch is released, measure exact
+response length U and require U<=B and E+B+H+512+U+L<=W before its fallible
+response reservation. H is the actual tenant/group/recovery/request byte sum.
+V5 retains its existing late scalar bound. No per-row status owner, converted
+core/history Vec or copied predecessor plan is introduced.
+
+The transaction captures the same AdmissionLimits. Borrowed FWSO scanning uses
+wire cap102+H+B and computes returned owner512+H+U; configured vector count is
+checked before R admission/materialization. Structural grammar retains its
+separate hard100000 limit. Record scans use the same parser, with only configured
+inline/core exhaustion selecting Limit; legacy codec errors remain unchanged.
+Output record_bytes admission precedes encoding, so generated cancelled9 under
+inline1 is operational Limit with no published cohort or acknowledgement.
+
+Native publication charges C before affected-lane storage, every encoded
+key/value and copied bound. Its lane descriptors sort/deduplicate in place;
+original versions, final records/indexes and all histories use borrowed direct
+iterators. Actual head owners remain R-paid. First/final native runs and strict
+checks are recorded separately from product tests. These logical limits and
+isolated macOS executions certify no RSS/latency bound, production adoption,
+power-loss behavior, Linux result or complete workflow parity.

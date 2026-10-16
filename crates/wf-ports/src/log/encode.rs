@@ -17,7 +17,7 @@ pub(super) fn write(
     limits: CodecLimits,
 ) -> Result<(), CodecError> {
     if request.intent.version() != 1
-        && !(request.intent.version() == 5
+        && !(matches!(request.intent.version(), 5 | 6)
             && matches!(request.operation, PreparedOperation::Batch(_)))
     {
         return Err(CodecError::UnsupportedVersion);

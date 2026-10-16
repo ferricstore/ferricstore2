@@ -1030,8 +1030,41 @@ borrowed only while evaluating the next step. Intermediate plans are not cloned.
 See [ADR004](adr/004-committed-time-and-apply-admission.md#independent-indexed-batch-admission)
 for admission and the private result representation refinement.
 
-This representation does not publish physical writes. The required successor
-compares each original once, writes each final core/index once and persists all
-histories with outcome/control under one coherent transaction. General V6
-intent/response framing, real public hooks, backend adoption, original profiles
-and Linux/macOS acceptance remain required; atomic V5 behavior stays unchanged.
+This pure representation alone does not publish physical writes. Its V6
+transaction successor is described below. Real public hooks, backend adoption,
+original profiles and Linux/macOS acceptance remain required; atomic V5 behavior
+stays unchanged.
+
+## Independent V6 transaction publication
+
+ARCH-M2-INDEPENDENT-V6-PUBLICATION1-CREATE1 reuses the existing private batch
+frame, decoded owner, retained inspection, Fresh owner and consumed commit.
+Verified intent6 selects independent semantics; V5 entry points remain strict5.
+IndependentFresh extends the existing apply decision with the existing domain
+plan and one boxed retained outcome. The experimental apply plan, decision and
+changes owners no longer provide Clone; no generic operation layer or second
+commit protocol is introduced.
+
+The retained response contains one bounded scalar row per ordered item. Changes
+validation checks every row against the actual plan. After one Replay gate,
+grammar, retained status and a present vector count must agree; whole-call
+rejections have no vector count. Exact-log replay, intent conflict and expiry
+retain their earlier precedence. Physical pre-gate corruption and operational
+limits remain separate from these pure classifications.
+
+One exclusive transaction compares each original version once, writes each final
+record/ordering/index once, emits all successful histories and repairs affected
+FIFO heads. Outcome/control and Immediate commit share that writer. Failed or
+uncertain commit releases no acknowledgement; uncertainty fences the backend
+until reopen/reconciliation. Publication uses borrowed records and iterators,
+without cloning cores/history or constructing a conversion result Vec.
+
+The guard captures the same immutable admission profile used in preparation.
+Profiled record scans distinguish configured inline/core limits from corrupt
+content; output record admission precedes the unchanged encoder. Counted outcome
+scans admit configured count and complete returned owners before materializing.
+See [ADR004](adr/004-committed-time-and-apply-admission.md#independent-v6-driver-admission)
+and [ADR006](adr/006-private-prepared-command-codec.md#independent-v6-private-batch-profile).
+The redb consumer remains an isolated acceptance experiment; public producer
+hooks, production backend wiring, original profiles, Linux and milestone exits
+require their own evidence. Logical tariffs establish no measured native gain.

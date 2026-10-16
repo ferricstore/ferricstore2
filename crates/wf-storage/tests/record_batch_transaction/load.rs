@@ -180,6 +180,7 @@ impl GroupApplyTransaction for ObservedTransaction<'_> {
                 self.store.histories.extend(item.plan().history().cloned());
             }
         }
+        independent::record_publication(self.store, changes)?;
         self.store.committed = true;
         Ok(())
     }

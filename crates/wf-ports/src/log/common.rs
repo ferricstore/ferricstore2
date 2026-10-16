@@ -49,6 +49,7 @@ pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, Codec
     let intent = match (version, operation_tag) {
         (1, _) => ClientIntent::new(1, digest).map_err(|_| CodecError::UnsupportedVersion)?,
         (5, 1) => ClientIntent::record_batch(digest),
+        (6, 1) => ClientIntent::independent_record_batch(digest),
         _ => return Err(CodecError::UnsupportedVersion),
     };
     let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;

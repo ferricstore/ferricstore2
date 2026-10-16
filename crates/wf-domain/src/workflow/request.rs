@@ -112,6 +112,12 @@ impl ClientIntent {
         Self { version: 5, digest }
     }
 
+    /// Selects ordered independent mutations; grants no apply authority.
+    #[must_use]
+    pub const fn independent_record_batch(digest: [u8; 32]) -> Self {
+        Self { version: 6, digest }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

@@ -6,7 +6,7 @@ use std::fmt;
 use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::control::ControlPlan;
-use wf_domain::workflow::indexed::IndexedDecision;
+use wf_domain::workflow::indexed::{IndependentIndexedDecision, IndexedDecision};
 use wf_domain::workflow::request::indexed::IndexedRequestView;
 use wf_domain::workflow::request::{ClientIntent, RequestValueError, RetainedOutcome};
 use wf_types::version::LogIdentity;
@@ -19,18 +19,26 @@ use super::{
 };
 
 mod fresh;
+mod independent;
 mod intent;
 mod phase;
 mod response;
 
+pub use independent::{
+    decide_fresh_independent_record_batch_touched, encode_independent_record_batch,
+    inspect_independent_record_batch_point, prepare_independent_record_batch,
+};
 pub use phase::{
     FreshRecordBatch, RecordBatchInspection, decide_fresh_record_batch,
     decide_fresh_record_batch_touched, inspect_record_batch, inspect_record_batch_point,
 };
-pub use response::record_batch_retained_status;
+pub use response::{
+    independent_record_batch_response_matches, record_batch_retained_status,
+    record_batch_retained_summary,
+};
 
 /// Proposed control and indexed operation, without durable-apply authority.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct RecordBatchApplyPlan<'view> {
     control: ControlPlan,
     decision: RecordBatchApplyDecision<'view>,
@@ -55,13 +63,20 @@ impl<'view> RecordBatchApplyPlan<'view> {
 }
 
 /// Fresh indexed values or one original scoped replay classification.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum RecordBatchApplyDecision<'view> {
     /// Persist these bounded plans and original acknowledgement atomically.
     Fresh {
         /// Complete accepted plan or deterministic rejection without partial writes.
         operation: IndexedDecision<'view>,
         /// Immutable private scalar acknowledgement/rejection bytes.
+        outcome: Box<RetainedOutcome>,
+    },
+    /// Persist final records once and every successful independent history.
+    IndependentFresh {
+        /// Ordered item results or a whole-profile refusal.
+        operation: IndependentIndexedDecision<'view>,
+        /// Counted private response, bound to every ordered result.
         outcome: Box<RetainedOutcome>,
     },
     /// Borrow the original owner before changed current guards/indexes.
@@ -133,11 +148,20 @@ impl From<RequestValueError> for RecordBatchApplyError {
 /// # Errors
 /// Refuses unsupported operations, actual framing limits and prospective bounds.
 pub fn encode_record_batch(
-    mut request: PreparedRequest,
+    request: PreparedRequest,
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<PreparedBytes, RecordBatchApplyError> {
-    let (intent, input_bytes) = intent::derive(&request)?;
+    encode_profile(request, limits, workspace_limit, 5)
+}
+
+fn encode_profile(
+    mut request: PreparedRequest,
+    limits: CodecLimits,
+    workspace_limit: usize,
+    version: u16,
+) -> Result<PreparedBytes, RecordBatchApplyError> {
+    let (intent, input_bytes) = intent::derive(&request, version)?;
     request.intent = intent;
     let PreparedOperation::Batch(items) = &request.operation else {
         return Err(CodecError::UnsupportedTag.into());
@@ -172,13 +196,22 @@ pub fn prepare_record_batch(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
+    prepare_profile(encoded, limits, workspace_limit, 5)
+}
+
+fn prepare_profile(
+    encoded: &[u8],
+    limits: CodecLimits,
+    workspace_limit: usize,
+    version: u16,
+) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
     scan::preflight(encoded, limits)?;
     let mut reader = Reader::new(encoded, limits);
     let header = common::header(&mut reader)?;
     if header.operation_tag != 1 {
         return Err(CodecError::UnsupportedTag.into());
     }
-    if header.intent.version() != 5 {
+    if header.intent.version() != version {
         return Err(CodecError::UnsupportedVersion.into());
     }
     let count = common::count(&mut reader)?;
@@ -187,23 +220,24 @@ pub fn prepare_record_batch(
         workspace_limit,
     )?;
     let decoded = decode::read(encoded, limits)?;
-    check_decoded(&decoded, limits, workspace_limit)?;
+    check_decoded(&decoded, limits, workspace_limit, version)?;
     Ok(decoded)
 }
 
 pub(super) fn decoded_intent(request: &PreparedRequest) -> Result<ClientIntent, CodecError> {
-    intent::derive(request).map(|(intent, _)| intent)
+    intent::derive(request, request.intent.version()).map(|(intent, _)| intent)
 }
 
 fn check_decoded(
     decoded: &DecodedRequest<'_>,
     limits: CodecLimits,
     workspace: usize,
+    version: u16,
 ) -> Result<(), RecordBatchApplyError> {
     let PreparedOperation::Batch(items) = &decoded.request.operation else {
         return Err(CodecError::UnsupportedTag.into());
     };
-    if decoded.request.intent.version() != 5 {
+    if decoded.request.intent.version() != version {
         return Err(CodecError::UnsupportedVersion.into());
     }
     if decoded.limits != limits {

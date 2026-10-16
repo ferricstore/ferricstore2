@@ -73,11 +73,12 @@ pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest
         stamp: header.stamp,
         operation,
     };
-    let record_batch_intent = if header.operation_tag == 1 && header.intent.version() == 5 {
-        record_batch::decoded_intent(&request)
-    } else {
-        Err(CodecError::UnsupportedVersion)
-    };
+    let record_batch_intent =
+        if header.operation_tag == 1 && matches!(header.intent.version(), 5 | 6) {
+            record_batch::decoded_intent(&request)
+        } else {
+            Err(CodecError::UnsupportedVersion)
+        };
     Ok(DecodedRequest {
         request,
         encoded,

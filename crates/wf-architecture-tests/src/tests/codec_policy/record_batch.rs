@@ -22,31 +22,7 @@ fn record_batch_parent_stays_pure_and_server_side() -> CheckResult<()> {
                 .any(|finding| finding.contains("runtime source references M0-only tooling"))
         );
     }
-    for name in [
-        "RecordBatchApplyPlan",
-        "RecordBatchApplyDecision",
-        "RecordBatchApplyError",
-        "RecordBatchInspection",
-        "FreshRecordBatch",
-        "encode_record_batch",
-        "decide_record_batch",
-        "prepare_record_batch",
-        "inspect_record_batch",
-        "inspect_record_batch_point",
-        "decide_fresh_record_batch",
-        "decide_fresh_record_batch_touched",
-        "record_batch_retained_status",
-    ] {
-        assert!(
-            source_check(
-                "wf-ports",
-                "client",
-                &format!("pub use crate::log::{name};")
-            )?
-            .iter()
-            .any(|finding| finding.contains("client port facade"))
-        );
-    }
+    assert_record_batch_exports()?;
     for module in [
         "workflow::request",
         "workflow::indexed",
@@ -102,6 +78,10 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::record_batch::phase::nested",
         "log::record_batch::fresh",
         "log::record_batch::fresh::nested",
+        "log::record_batch::independent",
+        "log::record_batch::independent::nested",
+        "log::record_batch::response::independent",
+        "log::record_batch::response::independent::nested",
     ] {
         assert_eq!(
             source_check("wf-ports", module, "use std::collections::BTreeMap;")?,
@@ -133,6 +113,8 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::record_batch::response_backend",
         "log::record_batch::phase_backend",
         "log::record_batch::fresh_backend",
+        "log::record_batch::independent_backend",
+        "log::record_batch::response::independent_backend",
     ] {
         assert_eq!(
             source_check(
@@ -141,6 +123,41 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
                 "use std::fs; pub async fn effect() {} static GLOBAL: u64 = 0;"
             )?,
             Vec::<String>::new()
+        );
+    }
+    Ok(())
+}
+
+fn assert_record_batch_exports() -> CheckResult<()> {
+    for name in [
+        "RecordBatchApplyPlan",
+        "RecordBatchApplyDecision",
+        "RecordBatchApplyError",
+        "RecordBatchInspection",
+        "FreshRecordBatch",
+        "encode_record_batch",
+        "decide_record_batch",
+        "prepare_record_batch",
+        "inspect_record_batch",
+        "inspect_record_batch_point",
+        "decide_fresh_record_batch",
+        "decide_fresh_record_batch_touched",
+        "record_batch_retained_status",
+        "encode_independent_record_batch",
+        "prepare_independent_record_batch",
+        "inspect_independent_record_batch_point",
+        "decide_fresh_independent_record_batch_touched",
+        "record_batch_retained_summary",
+        "independent_record_batch_response_matches",
+    ] {
+        assert!(
+            source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::log::{name};")
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
         );
     }
     Ok(())

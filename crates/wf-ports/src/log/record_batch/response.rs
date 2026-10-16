@@ -1,4 +1,4 @@
-//! Private scalar acknowledgement and exhaustive deterministic rejection grammar.
+//! Scalar and counted acknowledgements sharing one closed rejection grammar.
 
 use wf_domain::value::{Counter, DomainError, InputField, RetryPolicyField};
 use wf_domain::workflow::admission::AdmissionError;
@@ -7,6 +7,9 @@ use wf_domain::workflow::indexed::{IndexRejection, IndexedDecision};
 use wf_domain::workflow::request::{ClientIntent, RetainedStatus};
 
 use super::super::CodecError;
+
+pub(super) mod independent;
+pub use independent::independent_record_batch_response_matches;
 
 pub(super) fn encode(
     decision: &IndexedDecision<'_>,
@@ -19,8 +22,13 @@ pub(super) fn encode(
         bytes.push(0);
         return Ok((bytes, RetainedStatus::Accepted));
     };
+    push_rejection(&mut bytes, *reason)?;
+    Ok((bytes, RetainedStatus::IndexedRejected(*reason)))
+}
+
+fn push_rejection(bytes: &mut Vec<u8>, reason: IndexRejection) -> Result<(), CodecError> {
     bytes.push(1);
-    match *reason {
+    match reason {
         IndexRejection::InvalidPriority => bytes.extend_from_slice(&[4, 0]),
         IndexRejection::FifoPriority => bytes.extend_from_slice(&[5, 0]),
         IndexRejection::NotFifoHead => bytes.extend_from_slice(&[6, 0]),
@@ -66,7 +74,7 @@ pub(super) fn encode(
             }
         },
     }
-    Ok((bytes, RetainedStatus::IndexedRejected(*reason)))
+    Ok(())
 }
 
 fn domain(reason: DomainError) -> (u8, Option<u8>) {
@@ -125,30 +133,50 @@ fn domain(reason: DomainError) -> (u8, Option<u8>) {
     (code, detail)
 }
 
-/// Derives the exact private batch5 response status without allocating.
-///
-/// This validates a closed byte grammar, not outcome origin or persistence.
+/// Derives a closed scalar or counted response status without allocating.
 /// # Errors
-/// Rejects unsupported profiles/tags, incomplete/trailing bytes and integer overflow.
+/// Rejects unsupported profiles, incomplete/trailing bytes and invalid tags.
 pub fn record_batch_retained_status(
     intent: ClientIntent,
     response_version: u16,
     response: &[u8],
 ) -> Result<RetainedStatus, CodecError> {
-    if intent.version() != 5 || response_version != 1 {
+    record_batch_retained_summary(intent, response_version, response).map(|(status, _)| status)
+}
+
+/// Validates the complete response and reads its optional independent row count.
+/// This grammar check grants no origin, configured-count or persistence authority.
+/// # Errors
+/// Rejects unsupported profiles, invalid rows/counts and incomplete/trailing bytes.
+pub fn record_batch_retained_summary(
+    intent: ClientIntent,
+    response_version: u16,
+    response: &[u8],
+) -> Result<(RetainedStatus, Option<usize>), CodecError> {
+    if !matches!(intent.version(), 5 | 6) || response_version != 1 {
         return Err(CodecError::UnsupportedVersion);
     }
-    let Some(&root) = response.first() else {
-        return Err(CodecError::Malformed);
-    };
-    if root == 0 {
-        return if response.len() == 1 {
-            Ok(RetainedStatus::Accepted)
-        } else {
-            Err(CodecError::Malformed)
-        };
+    match response.first().copied().ok_or(CodecError::Malformed)? {
+        0 if intent.version() == 5 => {
+            if response.len() != 1 {
+                return Err(CodecError::Malformed);
+            }
+            Ok((RetainedStatus::Accepted, None))
+        }
+        1 => {
+            let (reason, size) = rejection(response)?;
+            if response.len() != size {
+                return Err(CodecError::Malformed);
+            }
+            Ok((RetainedStatus::IndexedRejected(reason), None))
+        }
+        2 if intent.version() == 6 => independent::summary(response),
+        _ => Err(CodecError::UnsupportedTag),
     }
-    if root != 1 {
+}
+
+fn rejection(response: &[u8]) -> Result<(IndexRejection, usize), CodecError> {
+    if response.first() != Some(&1) {
         return Err(CodecError::UnsupportedTag);
     }
     let (&kind, &code) = response
@@ -194,10 +222,7 @@ pub fn record_batch_retained_status(
         },
         _ => return Err(CodecError::UnsupportedTag),
     };
-    if response.len() != size {
-        return Err(CodecError::Malformed);
-    }
-    Ok(RetainedStatus::IndexedRejected(rejection))
+    Ok((rejection, size))
 }
 
 fn decoded_size(bytes: &[u8]) -> Result<usize, CodecError> {

@@ -26,9 +26,12 @@ mod writer;
 
 pub use record_batch::{
     FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan,
-    RecordBatchInspection, decide_fresh_record_batch, decide_fresh_record_batch_touched,
-    decide_record_batch, encode_record_batch, inspect_record_batch, inspect_record_batch_point,
-    prepare_record_batch, record_batch_retained_status,
+    RecordBatchInspection, decide_fresh_independent_record_batch_touched,
+    decide_fresh_record_batch, decide_fresh_record_batch_touched, decide_record_batch,
+    encode_independent_record_batch, encode_record_batch,
+    independent_record_batch_response_matches, inspect_independent_record_batch_point,
+    inspect_record_batch, inspect_record_batch_point, prepare_independent_record_batch,
+    prepare_record_batch, record_batch_retained_status, record_batch_retained_summary,
 };
 
 pub use complete_policy::{

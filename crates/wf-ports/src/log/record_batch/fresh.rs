@@ -6,8 +6,9 @@ use wf_domain::claim::ScopedRecordId;
 use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::workflow::batch::{ApplyError, BatchItem};
 use wf_domain::workflow::indexed::{
-    EntryOrder, IndexedBatchItem, IndexedDecision, IndexedGroupView, TouchedIndexedGroupView,
-    decide_indexed_batch, decide_touched_indexed_batch,
+    EntryOrder, IndependentIndexedDecision, IndexedBatchItem, IndexedDecision, IndexedGroupView,
+    TouchedIndexedGroupView, decide_indexed_batch, decide_touched_independent_indexed_batch,
+    decide_touched_indexed_batch,
 };
 use wf_types::identity::GroupId;
 use wf_types::version::TimestampMillis;
@@ -87,21 +88,69 @@ pub(super) fn decide<'current>(
     workspace: usize,
     additional_live_bytes: usize,
 ) -> Result<IndexedDecision<'current>, RecordBatchApplyError> {
+    let prepared = inputs(decoded, now, limits, workspace, additional_live_bytes)?;
+    let values = stage_values(decoded, prepared.len())?;
+    let mut items = stage_items(decoded, prepared, &values)?;
+    for (item, prepared) in items.iter_mut().zip(prepared) {
+        item.item.retry_policy = authority.retry_policy(prepared);
+    }
+    Ok(authority.decide(&items, order, decoded.encoded, limits)?)
+}
+
+pub(super) fn decide_independent<'current>(
+    decoded: &DecodedRequest<'_>,
+    view: TouchedIndexedGroupView<'_, 'current>,
+    order: EntryOrder,
+    now: TimestampMillis,
+    workspace: usize,
+    additional_live_bytes: usize,
+) -> Result<IndependentIndexedDecision<'current>, RecordBatchApplyError> {
+    let prepared = inputs(
+        decoded,
+        now,
+        decoded.limits,
+        workspace,
+        additional_live_bytes,
+    )?;
+    let values = stage_values(decoded, prepared.len())?;
+    let items = stage_items(decoded, prepared, &values)?;
+    Ok(decide_touched_independent_indexed_batch(
+        view,
+        &items,
+        order,
+        decoded.encoded,
+        decoded.limits.admission,
+    )?)
+}
+
+fn inputs<'a>(
+    decoded: &'a DecodedRequest<'_>,
+    now: TimestampMillis,
+    limits: CodecLimits,
+    workspace: usize,
+    additional_live_bytes: usize,
+) -> Result<&'a [PreparedBatchItem], RecordBatchApplyError> {
     let PreparedOperation::Batch(prepared) = &decoded.request.operation else {
         return Err(CodecError::UnsupportedTag.into());
     };
     if prepared.iter().any(|item| item.command.now != now) {
         return Err(ApplyError::InvalidAuthority.into());
     }
-    let count = prepared.len();
     let bound = sum(&[
-        decoder_bound(decoded.encoded.len(), count, limits)?,
-        product(count, 192)?,
+        decoder_bound(decoded.encoded.len(), prepared.len(), limits)?,
+        product(prepared.len(), 192)?,
         256,
         limits.admission.decision_bytes(),
     ])?;
     admit(sum(&[bound, additional_live_bytes])?, workspace)?;
-    let mut values: Vec<ValueRow<'_>> = reserve(count)?;
+    Ok(prepared)
+}
+
+fn stage_values<'a>(
+    decoded: &'a DecodedRequest<'_>,
+    count: usize,
+) -> Result<Vec<ValueRow<'a>>, CodecError> {
+    let mut values = reserve(count)?;
     for index in 0..count {
         let mut row: ValueRow<'_> = ([&[]; 2], 0);
         for value in decoded
@@ -115,18 +164,26 @@ pub(super) fn decide<'current>(
         }
         values.push(row);
     }
-    let mut items = reserve(count)?;
-    for (index, (prepared, row)) in prepared.iter().zip(&values).enumerate() {
+    Ok(values)
+}
+
+fn stage_items<'a>(
+    decoded: &'a DecodedRequest<'_>,
+    prepared: &'a [PreparedBatchItem],
+    values: &'a [ValueRow<'a>],
+) -> Result<Vec<IndexedBatchItem<'a>>, CodecError> {
+    let mut items = reserve(prepared.len())?;
+    for (index, (prepared, row)) in prepared.iter().zip(values).enumerate() {
         items.push(IndexedBatchItem {
             item: BatchItem {
                 partition: &prepared.partition,
                 command: &prepared.command,
                 state_key: decoded.state_key(index).ok_or(CodecError::Malformed)?,
                 encoded_values: &row.0[..row.1],
-                retry_policy: authority.retry_policy(prepared),
+                retry_policy: None,
             },
             create_priority: prepared.create_priority,
         });
     }
-    Ok(authority.decide(&items, order, decoded.encoded, limits)?)
+    Ok(items)
 }

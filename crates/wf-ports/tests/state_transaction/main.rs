@@ -26,6 +26,7 @@ use wf_types::version::{
     AppliedPosition, CommittedTime, Fence, HlcTimestamp, LogIdentity, TimestampMillis,
 };
 
+mod independent;
 mod protocol;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

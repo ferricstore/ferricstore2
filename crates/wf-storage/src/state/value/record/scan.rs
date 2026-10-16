@@ -119,7 +119,7 @@ impl ScannedWorkflowRecord<'_> {
         })
     }
 
-    fn validate(&self) -> Result<usize, StateValueError> {
+    fn validate(&self, profiled: bool) -> Result<usize, StateValueError> {
         if !nonempty(self.tenant, 8_192)
             || !nonempty(self.partition, 65_535)
             || !nonempty(self.id, 65_535)
@@ -159,12 +159,20 @@ impl ScannedWorkflowRecord<'_> {
         .flatten()
         {
             if field.len() > self.limits.inline_bytes() {
-                return Err(StateValueError::InvalidValue);
+                return Err(profile_error(
+                    profiled,
+                    field.len(),
+                    self.limits.inline_bytes(),
+                ));
             }
             add(&mut core_bytes, field.len())?;
         }
         if core_bytes > self.limits.decision_bytes() {
-            return Err(StateValueError::InvalidValue);
+            return Err(profile_error(
+                profiled,
+                core_bytes,
+                self.limits.decision_bytes(),
+            ));
         }
         Ok(core_bytes)
     }
@@ -189,6 +197,30 @@ pub fn scan_record_point<'input>(
         Some((expected_scope.tenant(), expected_partition, expected_id)),
         limits,
         maximum_wire_bytes,
+        false,
+    )
+}
+
+/// Scans the same complete point while reporting caller-profile budgets as limits.
+/// Content, namespace and framing failures retain their legacy error origins.
+/// # Errors
+/// Rejects corrupt values, wire caps or precise inline/core profile exhaustion.
+pub fn scan_record_point_profiled<'input>(
+    bytes: &'input [u8],
+    expected_scope: &RequestScope,
+    expected_partition: &PartitionId,
+    expected_id: &RecordId,
+    limits: AdmissionLimits,
+    maximum_wire_bytes: usize,
+) -> Result<ScannedWorkflowRecord<'input>, StateValueError> {
+    scan(
+        bytes,
+        expected_scope.group(),
+        expected_scope.recovery(),
+        Some((expected_scope.tenant(), expected_partition, expected_id)),
+        limits,
+        maximum_wire_bytes,
+        true,
     )
 }
 
@@ -199,7 +231,15 @@ pub(super) fn scan_legacy<'input>(
     limits: AdmissionLimits,
     maximum_wire_bytes: usize,
 ) -> Result<ScannedWorkflowRecord<'input>, StateValueError> {
-    scan(bytes, group, recovery, None, limits, maximum_wire_bytes)
+    scan(
+        bytes,
+        group,
+        recovery,
+        None,
+        limits,
+        maximum_wire_bytes,
+        false,
+    )
 }
 
 fn scan<'input>(
@@ -209,6 +249,7 @@ fn scan<'input>(
     point: Option<(&TenantId, &PartitionId, &RecordId)>,
     limits: AdmissionLimits,
     maximum: usize,
+    profiled: bool,
 ) -> Result<ScannedWorkflowRecord<'input>, StateValueError> {
     let mut offset = start(bytes, *b"FWSR", maximum)?;
     let actual_group = raw(bytes, &mut offset)?;
@@ -278,7 +319,7 @@ fn scan<'input>(
         limits,
         owned_bytes: 512,
     };
-    let core_bytes = scanned.validate()?;
+    let core_bytes = scanned.validate(profiled)?;
     for length in [tenant.len(), partition.len(), core_bytes] {
         add(&mut scanned.owned_bytes, length)?;
     }
@@ -305,5 +346,13 @@ fn optional_time(bytes: &[u8], offset: &mut usize) -> Result<Option<u64>, StateV
         Ok(Some(read_u64(bytes, offset)?))
     } else {
         Ok(None)
+    }
+}
+
+fn profile_error(profiled: bool, bytes: usize, maximum: usize) -> StateValueError {
+    if profiled {
+        StateValueError::Limit { bytes, maximum }
+    } else {
+        StateValueError::InvalidValue
     }
 }

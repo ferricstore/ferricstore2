@@ -1,4 +1,4 @@
-//! Closed V5 caller field stream, independent of generated preparation values.
+//! Closed caller field streams, independent of generated preparation values.
 
 use sha2::{Digest, Sha256};
 use wf_domain::lease::LeaseGuard;
@@ -12,13 +12,20 @@ use crate::consensus::{PreparedOperation, PreparedRequest};
 
 use super::super::CodecError;
 
-pub(super) fn derive(request: &PreparedRequest) -> Result<(ClientIntent, usize), CodecError> {
+pub(super) fn derive(
+    request: &PreparedRequest,
+    version: u16,
+) -> Result<(ClientIntent, usize), CodecError> {
     let PreparedOperation::Batch(items) = &request.operation else {
         return Err(CodecError::UnsupportedTag);
     };
     let mut hash = Sha256::new();
     let mut bytes = 0;
-    hash.update(b"WF-RECORD-BATCH\0V5\0");
+    hash.update(match version {
+        5 => b"WF-RECORD-BATCH\0V5\0",
+        6 => b"WF-RECORD-BATCH\0V6\0",
+        _ => return Err(CodecError::UnsupportedVersion),
+    });
     raw(&mut hash, &mut bytes, request.scope.tenant().as_bytes())?;
     hash.update(
         u32::try_from(items.len())
@@ -44,7 +51,13 @@ pub(super) fn derive(request: &PreparedRequest) -> Result<(ClientIntent, usize),
             .checked_add(field.len())
             .ok_or(CodecError::LengthOverflow)?;
     }
-    Ok((ClientIntent::record_batch(hash.finalize().into()), bytes))
+    let digest = hash.finalize().into();
+    let intent = if version == 6 {
+        ClientIntent::independent_record_batch(digest)
+    } else {
+        ClientIntent::record_batch(digest)
+    };
+    Ok((intent, bytes))
 }
 
 fn raw(hash: &mut Sha256, bytes: &mut usize, value: &[u8]) -> Result<(), CodecError> {

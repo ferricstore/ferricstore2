@@ -5,7 +5,36 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest increment adds a touched independent indexed plan for all eight
+The current increment implements the private V6 independent batch bridge through
+the same preparation, one retained gate, Fresh decision and consumed transaction
+commit. Counted scalar responses bind every ordered result; exact V5 bytes and
+strict profile boundaries remain. Publication compares original versions once,
+writes final records/indexes once and preserves every intermediate history.
+Captured admission limits govern input, output and retained ownership.
+
+The full macOS wrapper passes 687 Rust tests across 80 targets plus six
+compile-fail examples across 15 documentation targets, with zero warnings,
+failures or ignored tests. Formatting, compilation, strict Clippy, rustdoc,
+architecture and reference/progress checks pass on 1,190 unchanged non-review
+inputs. Its sole failure is GitHub DNS during the default advisory refresh;
+the separate cached October 14 audit passes all four categories. The isolated
+native redb executable also passes formatting, strict Clippy and every old/new
+case, including six actual process-kill boundaries and sync uncertainty.
+
+All nine new product identities pass their first assertion execution after
+missing-contract RED twice. Review additionally finds a typed Replay status/body
+mismatch; its added control fails twice before the narrow fix, then passes with
+exact-log/conflict/expiry bypass controls. Later lint repairs preserve complete
+frozen oracles by whole-file inverses. Ledger counts remain 82/92/365, with no new
+full source-case parity credit. See ARCH-M2-INDEPENDENT-V6-PUBLICATION1-CREATE1.
+
+Next are actual public normalization/submission and no-pre-read hook behavior,
+backend adoption and remaining ordered persistence/recovery gates. The native
+consumer is an isolated acceptance experiment. Original setup/runtime profiles,
+Linux execution, complete pure-domain acceptance and full M1–M8/workflow parity
+remain required; this increment establishes no milestone exit.
+
+The preceding increment adds a touched independent indexed plan for all eight
 mutation operations. Later commands for the same scoped ID use the latest
 successful write; item errors and no-ops preserve that predecessor and ordering
 cursor. Results retain every successful history event. Separate descriptors
@@ -26,14 +55,11 @@ Four new tests passed on their first assertion run after missing-API RED twice;
 subsequent lint repairs preserve the complete test oracle by whole-file inverse.
 Ledger counts remain 82/92/365, with no new source-case parity credit.
 
-Next is the actual general V6 intent, ordered retained response and atomic
-publication bridge: compare originals once, persist final records/indexes once,
-and preserve every intermediate history alongside outcome/control. Keep exact
-V5 compatibility, measured response admission and consistent native limits.
-Public hook/no-pre-read behavior, engine adoption, original setup/runtime
-profiles, native Linux and full M1–M8/workflow parity remain required. See
-ARCH-M2-INDEPENDENT-INDEXED1-CREATE1 and its step-representation refinement;
-this increment establishes no milestone exit.
+That indexed prerequisite supplies the original/final/history representation
+used by the V6 bridge above. Public hook/no-pre-read behavior, engine adoption,
+original setup/runtime profiles, native Linux and full M1–M8/workflow parity
+remain required. See ARCH-M2-INDEPENDENT-INDEXED1-CREATE1 and its
+step-representation refinement; it establishes no milestone exit.
 
 Pure independent terminal batches now use the same ordered planner for Complete,
 Fail, caller-resolved Retry and Cancel. Per-item errors preserve other successes;

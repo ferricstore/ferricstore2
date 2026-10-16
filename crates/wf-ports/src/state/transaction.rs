@@ -7,12 +7,17 @@ use wf_domain::claim::apply::ClaimQuery;
 use wf_domain::claim::{DueOrder, LaneKey, LaneOrder};
 use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits};
 use wf_domain::workflow::WorkflowRecord;
+use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlState, plan_control};
-use wf_domain::workflow::indexed::{IndexedBatchPlan, IndexedDecision, OrderingMetadata};
+use wf_domain::workflow::indexed::{
+    IndependentIndexedPlan, IndexedBatchPlan, IndexedDecision, OrderingMetadata,
+};
 use wf_domain::workflow::request::{RequestScope, RetainedOutcome, RetainedStatus};
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId, TenantId};
 
 use crate::log::{RecordBatchApplyDecision, RecordBatchApplyPlan, record_batch_retained_status};
+
+mod independent;
 
 /// Typed core record with its tenant, placement and canonical ordering metadata.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -78,6 +83,7 @@ pub trait GroupApplyStore {
         &'s mut self,
         group: &'s GroupId,
         recovery: &'s RecoveryId,
+        admission: AdmissionLimits,
         maximum_read_steps: usize,
         maximum_read_bytes: usize,
         maximum_temporary_bytes: usize,
@@ -245,7 +251,7 @@ pub trait GroupDueCursor {
 }
 
 /// Validated mathematical changes, with no origin or persistence certificate.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct GroupApplyChanges<'scope, 'view> {
     scope: &'scope RequestScope,
     expected: ControlState,
@@ -283,7 +289,8 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
                     IndexedDecision::Accepted(_) => RetainedStatus::Accepted,
                     IndexedDecision::Rejected(reason) => RetainedStatus::IndexedRejected(*reason),
                 };
-                if outcome.scope() != scope
+                if outcome.intent().version() != 5
+                    || outcome.scope() != scope
                     || outcome.status() != status
                     || record_batch_retained_status(
                         outcome.intent(),
@@ -295,6 +302,9 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
                 {
                     return Err(StateTransactionError::InvalidChanges);
                 }
+            }
+            RecordBatchApplyDecision::IndependentFresh { operation, outcome } => {
+                independent::validate(scope, operation, outcome)?;
             }
             RecordBatchApplyDecision::Replay(outcome) if outcome.scope() != scope => {
                 return Err(StateTransactionError::InvalidChanges);
@@ -339,11 +349,17 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
             _ => None,
         }
     }
+    /// Accepted independent results, unique finals and every real history.
+    #[must_use]
+    pub fn independent_business(&self) -> Option<&IndependentIndexedPlan<'view>> {
+        independent::business(self.plan.decision())
+    }
     /// New outcome only for Fresh; original replay/conflict owners stay unchanged.
     #[must_use]
     pub fn outcome(&self) -> Option<&RetainedOutcome> {
         match self.plan.decision() {
-            RecordBatchApplyDecision::Fresh { outcome, .. } => Some(outcome),
+            RecordBatchApplyDecision::Fresh { outcome, .. }
+            | RecordBatchApplyDecision::IndependentFresh { outcome, .. } => Some(outcome),
             _ => None,
         }
     }

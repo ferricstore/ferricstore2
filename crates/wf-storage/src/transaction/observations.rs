@@ -7,7 +7,10 @@ use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::policy::definition::{PolicySnapshot, StateMode};
 use wf_domain::workflow::indexed::TouchedIndexedGroupView;
 use wf_domain::workflow::request::RequestScope;
-use wf_ports::log::{FreshRecordBatch, RecordBatchApplyPlan, decide_fresh_record_batch_touched};
+use wf_ports::log::{
+    FreshRecordBatch, RecordBatchApplyPlan, decide_fresh_independent_record_batch_touched,
+    decide_fresh_record_batch_touched,
+};
 use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId};
 
@@ -49,21 +52,26 @@ pub(super) fn decide<'current>(
         debit(staging_used, 256, cap)?;
         retries.insert(kind, projection.as_ref().map(|(_, retry)| retry));
     }
-    Ok(decide_fresh_record_batch_touched(
-        fresh,
-        TouchedIndexedGroupView {
-            group: scope.group(),
-            placements,
-            current: &current,
-            parallel: &parallel,
-            fifo_members: &members,
-            fifo_heads: &heads,
-            policies: &modes,
-            retry_policies: &retries,
-        },
-        live_bytes,
-        limits.outcome_ttl_ms,
-    )?)
+    let view = TouchedIndexedGroupView {
+        group: scope.group(),
+        placements,
+        current: &current,
+        parallel: &parallel,
+        fifo_members: &members,
+        fifo_heads: &heads,
+        policies: &modes,
+        retry_policies: &retries,
+    };
+    Ok(if fresh.decoded().request().intent.version() == 6 {
+        decide_fresh_independent_record_batch_touched(
+            fresh,
+            view,
+            live_bytes,
+            limits.outcome_ttl_ms,
+        )
+    } else {
+        decide_fresh_record_batch_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
+    }?)
 }
 
 fn current_facts<'query, 'current>(
