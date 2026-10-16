@@ -27,6 +27,14 @@ publication, original setup/runtime profiles, native Linux and full M1–M8/work
 parity remain open. See ARCH-M1-INDEPENDENT-TRANSITIONS1-CREATE1 and the active
 review records; this component does not establish a milestone exit.
 
+The separate Elixir bugfix checkout now has commit 7c351783, fixing the Elixir 1.20
+TermCodec pin warning after a genuine fresh-target diagnostic failure. Strict
+target checks and the same 89 existing test cases pass on both 1.19.5/OTP 28.3.1
+and 1.20.4/OTP 29.0.5 (178 executions). Cached support-module scope is explicit;
+native/service/full-source profiles, public worker/governance and Linux remain
+unexecuted. Earlier dirty changes are preserved. This adds no Rust parity credit;
+see [the Elixir review](reviews/workflow-completion-elixir-bugs.md).
+
 The preceding joined record-batch driver preserves complete policy backing,
 independent query owners, cumulative R/S/C accounting, actual operational prefetch
 precedence and owned responses after consumed commit. Frozen product/native

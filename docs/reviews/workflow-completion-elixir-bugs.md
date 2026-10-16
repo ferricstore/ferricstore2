@@ -2396,3 +2396,225 @@ run, output artifact, source/test patch, new artifact, commit/push or agent
 spawn/interruption occurred here. ONLY this append changes the owned note; all130679 predecessor
 bytes/SHA df34b8a99fd6d3ace8b28bdfae93f37d1f9415b478b01c086aeea1e2935ecdd6
 and all frozen/original inputs are preserved. This opens no consumed allowance.
+
+## EB-CLAIM-UNITS1 finite existing regression follow-up — 2026-10-16
+
+ROOT assigned this finite readiness/existing-regression task and expressly
+allowed read-only baseline cached beams. The isolated bugfix HEAD remains
+`106993c6`; its four modified tracked paths and existing untracked
+`tools/flow-worker-index-regression.exs` are preserved. No original/baseline
+source, store, dependency or build output is changed. This append preserves
+all 139024 predecessor bytes, SHA256
+`f33ddbcd4c6cf41471133a6cf19f3684293b966ce07bbb812baf2534d5d7d31b`.
+
+Fresh read-only readiness confirms Darwin/arm64 and no isolated `deps/`,
+`_build/` or `test-results/`. All 39 locked Hex archives exist in the local
+Hex cache; this is availability, not checksum/SCM/native acceptance. The
+local precompiled-NIF cache has older v0.11.6/v0.3.x artifacts, none for the
+project's required v0.11.18, and `cowlib` remains a pinned Git dependency.
+Installed mise Elixir1.20.4/OTP29.0.5 paths exist, but were not executed here.
+Previously observed physical locked-LMDB EPERM remains the separate native
+gate (ROOT-ELIXIR-NATIVE-UNITS1, coordination42435–42488); no unchanged native,
+Mix, DNS, Docker or Linux blocker was rerun and no source repair is inferred.
+
+Actual tool receipt `a72b04` exits0, child PID74287. It executes the complete
+EXISTING `Ferricstore.Flow.ClaimDueAPITest` (9 declarations) and
+`Ferricstore.Flow.PipelineClaimDueCommandTest` (7), both unchanged in
+`apps/ferricstore/test/ferricstore/flow/`. ExUnit reports exactly
+`%{total: 16, skipped: 0, excluded: 0, failures: 0}`. Real assertions cover
+claim-filter footprint/key bytes, timestamp and blocking limits, compact job
+results, payload ceiling, pipeline normalization and unsupported blocking.
+No declaration/assertion/exclusion was authored, weakened or ignored.
+
+Runtime is absolute
+`/Users/yoavgea/.asdf/installs/elixir/1.19.5-otp-28/bin/elixir`, with PATH
+beginning `/Users/yoavgea/.asdf/installs/erlang/28.3.1/bin`.
+The VM asserts Elixir1.19.5, exact OTP_VERSION28.3.1 and the expected Erlang
+root; reported architecture is `aarch64-apple-darwin24.5.0`.
+Exact BEAM options are `+S 2:2 +SDcpu 1 +SDio 1 +A 2 -noinput`;
+effective schedulers/async threads are2/2. This is the Rust repository's
+pinned compiler-control toolchain and auxiliary Elixir unit evidence; it
+does not satisfy the original project's declared Elixir~>1.20 profile.
+
+Fourteen complete CURRENT bugfix production modules are compiled in memory,
+in this order: TermCodec, then Flow Options, Internal, InternalLimits, Keys,
+SystemMetadata, StorageScope, ClaimFilter, ClaimWaiters, RecordProjection,
+PayloadReturn, Telemetry, ClaimDueAPI and PipelineClaimDueCommand. Each actual
+Code.compile_file return must contain ONLY its expected module; each loaded
+module MD5 must equal its returned BEAM MD5 and compile source path must equal
+the current isolated source path. Module-redefinition warnings remain visible.
+No BEAM/cache/module source is emitted. Current source evidence does not turn
+the cached support below into current-source coverage.
+
+The read-only baseline is HEAD66586c596e271408d9184af32eb31cd7218c126e with
+clean tracked status. Six loaded cached support beams TOTAL are reported:
+one Ferricstore.Store.Router and FIVE telemetry beams (`telemetry_app`,
+`telemetry_ets`, `telemetry_sup`, `telemetry`, `telemetry_handler_table`).
+Router SHA256 is
+`09199ee3fbe4a217645376b159a98f7d151120bdc92fe48103a361f72a4e027b`;
+its real `max_key_size/0` is asserted65535. Telemetry's main beam SHA256 is
+`af41b2b619d014ab07bc797d5e33cd75f4ac2b700dd132e0055a282a7dca8455`.
+All six actual loaded origin/hash rows remain in the tool receipt. Their
+availability/source lineage is disclosed; recompilation/review of those cached
+beams is not claimed. Current ClaimDueAPI SHA256 is945fcecb5218961b8a3186e1ed2eb1e85f585a228f6203215b8245772f1139fa;
+PipelineClaimDueCommand is68cbb30b92f587e8057f2b2cfcbd55fb2f95d9488fbee7d9e92b6f95274e9984.
+The two unchanged test SHA256s are respectively
+`e481ae8feb0492e699a0ad1b4b22406a66c92a074c5ac9a758dd61465bbcf9f5`
+and `690033929b5462a26eb007cb531858aa936af1db3e0c780a6eb515cbe42ce885`.
+
+The procedural inline no-file wrapper uses clean explicit env, stdinDEVNULL,
+core limit0, owned session/process group, measured20s child deadline,
+TERM2s/KILL2s/reap and64KiB per stream. Actual elapsed0.998s,
+stdout6798/stderr6561 bytes, child0, no cause, groupgone=true. The outer
+before/after hashes agree for all159891 current source/test bytes, each
+file<=64KiB and combined<=256KiB. These source intake/pipe/deadline caps are
+not a native RSS/CPU bound. Isolated deps/_build/test-results remain absent.
+No output artifact, helper file, new type/module/model, service, store,
+dependency/native build, source/test patch, commit or push is created.
+
+The VM asserts Ferricstore.Bitcask.NIF is NOT loaded. Started applications are
+only compiler, crypto, elixir, ex_unit, kernel, logger, stdlib and telemetry;
+the Ferricstore application SPEC is loaded without starting its service.
+CLI-only ExUnit keeps the eight normal project exclude tags; none excludes a
+selected case. AuditFormatter and JUnit are not selected, so no shared audit
+log is truncated or test-results output written.
+
+This finite PASS supplies no public worker-index/mixed-reclaim execution,
+governance reservation repair, native-write/full-source acceptance, new TDD,
+Linux result, original profile or Rust parity credit. Both Linux AND macOS
+native/public/full profiles and the previously documented Elixir bugs/gates
+remain open. ROOT will actual-read and route ordinary reciprocal review.
+
+## EB-CLAIM-UNITS2 declared toolchain and concrete warning — 2026-10-16
+
+ROOT separately assigned the SAME existing16 tests/current14 modules on the
+installed declared toolchain, with no source/build writes or new artifact.
+Actual receipt `e5647f`, PID88690, outer0/child0: Elixir1.20.4 and exact
+OTP_VERSION29.0.5/root are asserted inside the VM; architecture reports
+`aarch64-apple-darwin`. Absolute Elixir launcher is
+`/Users/yoavgea/.local/share/mise/installs/elixir/1.20.4-otp-29/bin/elixir`;
+PATH begins `/Users/yoavgea/.local/share/mise/installs/erlang/29.0.5/bin`.
+Launcher SHA256s are respectively
+`5cb23d89a78f75589b06fade3097e217b77e63416d61c1800f674579748c4307`
+and `885a3918bff96c5af168365c4becbf838601f329afc2bac0fb5c3a1e66d4f6cd`.
+Elixir VERSION/OTP_VERSION file SHA256s are
+`2c695e095cd2f2b53fc4c472996a88157a3bd9c7f4df3aebc2dd45aeb179d836`
+and `61e2dccfe26dc8d2f506bb25763451c45d059547777f115dd41d1f8a96c9e89f`.
+
+Complete existing ClaimDueAPITest9 + PipelineClaimDueCommandTest7 again report
+`%{total: 16, skipped: 0, excluded: 0, failures: 0}`. Same unchanged tests,
+seed0/max_cases1/timeout10000, eight normal excludes and CLI-only formatter;
+no declaration, assertion or tag is changed. All14 current module returns,
+loaded-BEAM MD5 and compile-source paths are checked exactly as UNITS1.
+Their full source/test identities remain those recorded above/in the receipts.
+
+Exactly the SAME six cached support beams load from the pinned baseline:
+Router + FIVE telemetry beams. Their complete SHA256s match UNITS1; this run
+additionally asserts each loaded MD5 equals its actual disk-BEAM MD5 and the
+exact six-module set. All expose stored compile version9.0.6. Actual calls
+and16 passing tests demonstrate this narrow runtime compatibility, not fresh
+compilation/current-source coverage of the cached support. Router's real
+max_key_size remains65535. The four runtime/version files and six support
+beams are hashed unchanged before/after in addition to all159891 unchanged
+current source/test bytes. No deps/_build/test-results output is created.
+
+Same clean-env/core0/stdinDEVNULL/owned-group/20s/64KiB-per-stream approach,
+exact `+S 2:2 +SDcpu 1 +SDio 1 +A 2 -noinput`, effective2schedulers/2async.
+Actual0.987s, stdout6912/stderr7000 bytes, no cause, child reaped/groupgone.
+Bitcask.NIF is asserted NOT loaded. Started applications are compiler, crypto,
+elixir, ex_unit, kernel, logger, sasl, stdlib and telemetry; Ferricstore's
+SPEC is loaded without service startup. No native/service/full-source,
+Linux, public worker-index/mixed-reclaim, TDD or Rust parity credit follows.
+
+NEW observed diagnostic, preserved verbatim in the receipt: under1.20 the
+CURRENT `apps/ferricstore/lib/ferricstore/term_codec.ex:112` match
+`<<_opaque::binary-size(size), rest::binary>> = binary` warns that externally
+bound size must be preceded by the pin operator. This is a real new compiler
+warning beyond the visible expected module-redefinition warnings. A prospective
+existing-line `binary-size(^size)` repair is NOT made by this source-frozen
+validation task. Thus16 behavioral assertions pass on the declared version,
+but warnings-as-errors/full-source acceptance remains open. ROOT/ARCH received
+the exact finding for a separately selected repair/validation scope.
+
+This append preserves every144626 predecessor byte/SHA256
+`e7063f4081b1baa2ab8e6ece391772f9196e3688bc651f86cec59edb35e29072`,
+including the actual1.19.5/OTP28 result. All prior source/native/Linux holds
+remain; no unchanged physical LMDB/Mix/DNS/Docker/Linux blocker was rerun.
+
+## EB-TERM-PIN1 diagnostic RED, one-token repair and two-toolchain GREEN
+
+ROOT separately authorized this existing-line repair after the actual UNITS2
+diagnostic. No new file/type/module/model/test source was selected or created.
+This is compiler compatibility, not a reproduced runtime-behavior defect.
+
+First invocation `0e3598`/PID91367 exits1 on the INLINE control's keyword
+argument syntax before target compilation; source remains5668B/fcd44c7d and
+groupgone. This is an infrastructure epoch, NOT target RED. Bracketing its
+existing `[log: true]` option corrects that procedural invocation.
+Actual corrected `e76594`/PID91502, fresh Elixir1.20.4/OTP29.0.5 VM, asserts
+TermCodec not preloaded and has NO baseline code paths. It compiles ONLY the
+whole current5668B source with `Code.with_diagnostics([log: true], ...)`.
+Exactly one captured warning is at term_codec.ex112:28, externally-bound size
+requiring a pin; no module-redefinition warning occurs. The strict
+`diagnostics == []` control is false and child exits1. Source hash is unchanged
+`fcd44c7d6344d78c25f84985b543eb8ccf1e8981da48ed820e71a3e4b5087297`;
+native module is not loaded,0.302s,stdout829/stderr417,groupgone.
+
+ONLY production edit: existing isolated
+`apps/ferricstore/lib/ferricstore/term_codec.ex:112` changes
+`binary-size(size)` to `binary-size(^size)` in the existing match.
+One ASCII94 caret is inserted at zero-based byte4730. Complete new file is
+5669B/136LF/SHA256
+`7f3fc227ea8c6d994547e48ebeb52eba34419009f040c87d510a5aafaa312d4c`.
+Actual whole inverse check `dc86a9` removes ONLY that token and recovers ALL
+5668 predecessor bytes/hash above. Header traversal, native decode, guards,
+test bodies and other dirty paths are unchanged; `git diff --check` passes.
+
+Both subsequent fresh VMs compile this exact target BEFORE adding baseline
+paths, assert no preloaded target, bind returned module/loaded MD5/source path,
+and capture EMPTY diagnostics. Thus the same strict target control genuinely
+changes RED to GREEN without redefinition-noise filtering or suppression.
+The remaining13 current source modules are then compiled/MD5/source-path
+checked as in UNITS1/2, with expected redefinition warnings visible.
+
+| Exact asserted runtime | Actual receipt / PID | Strict target | Existing test cases | Seconds / stdout / stderr |
+|---|---|---|---|---|
+| asdf Elixir1.19.5 / OTP_VERSION28.3.1 | dd3120/session11881 then f071e1 /92670 | diagnostics[] | 89 total,0 failed/skipped/excluded | 1.405 /13012 /6136 bytes |
+| mise Elixir1.20.4 / OTP_VERSION29.0.5 | cb9bbf/session57614 then bd3496 /92803 | diagnostics[] | 89 total,0 failed/skipped/excluded | 1.439 /13023 /6136 bytes |
+
+Absolute launcher/root/version assertions and clean runtime environment are
+the same separately recorded profiles above; each uses2schedulers/1dirtyCPU/
+1dirtyIO/2async,20s child deadline,64KiB per stream,stdinDEVNULL/core0 and
+owned-group TERM2s/KILL2s/reap. Both exit0, report no cause and groupgone.
+Source/test inputs are19files/211581B, each<=64KiB/combined<=256KiB, unchanged
+before/after EACH run. Launcher/version bindings and39 selected cached support
+beams (1520756B) are unchanged too. Loaded cached support is33beams, including
+governance dependencies, Router, CommandTime/HLC and five telemetry beams.
+Every actual loaded support origin/SHA256/stored compile version9.0.6 is
+printed and its loaded MD5 is checked against its disk BEAM. CommandTime/HLC
+are reported loaded bindings outside the39-beam pre/post custody selection.
+These cached modules are not presented as freshly compiled current coverage.
+
+The unchanged five test files run as one serial CLI-only ExUnit group, seed0,
+max_cases1/timeout10000/eight normal excludes. The prior73 regression group is
+8 TermCodecTest +22 FlowGovernanceModelsTest +43 FlowGovernanceExhaustiveReviewTest;
+the claim group is9 ClaimDueAPITest +7 PipelineClaimDueCommandTest.
+That is89 DISTINCT TEST CASES and178 executions across two runtimes, not178
+distinct cases or a count of assertion statements. UNITS2's earlier shorthand
+“16 behavioral assertions” means16 test cases; its frozen bytes stay preserved.
+Additional unchanged test SHA256s are TermCodecTest
+`9725626e4c0086eeaf17963ba3c875eea2f0ffca006170aabd4d30a2a80579f5`,
+ModelsTest `bc8e9b72b79cef8ca19c8313422dbfde2bf5df0159bbfa73b7a8a074f25a8a4e`,
+ExhaustiveReviewTest `2161580bbff53c9a27c26d8e2aa5900a642d9c6fcd6af60fbcd004bc5472e7a0`.
+
+Both VMs assert Bitcask.NIF NOT loaded, report only core/crypto/ExUnit/telemetry
+applications (plus sasl underOTP29), and load Ferricstore's SPEC without service
+startup. AuditFormatter/JUnit are not selected. No store/native/build/deps/
+test-results output is created, no unchanged native/Mix/DNS/Linux blocker is
+rerun, and no test/assertion/tag is authored, weakened or ignored. All original
+public worker-index/governance, full source/native/service, Linux AND macOS
+production-profile and Rust parity gates remain separate. No commit/push here;
+ROOT owns review/commit of ONLY this token repair.
+
+This append preserves every148182 predecessor byte/SHA256
+`d1521e6b1dd51198f206e3f8b893adae5ea2dd8c6798a7131ac39e50ee8a062b`.
