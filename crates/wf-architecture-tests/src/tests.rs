@@ -13,6 +13,7 @@ use crate::{
 };
 
 mod codec_policy;
+mod source_pins;
 mod state_values;
 
 fn root() -> CheckResult<PathBuf> {

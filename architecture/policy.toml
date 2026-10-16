@@ -39,6 +39,9 @@ kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-ports"]
 dev = ["wf-test-support"]
 modules = { log = true, state = true, transaction = true, snapshot = true, blob = true }
+external_normal = [
+  { name = "redb", version = "=4.4.0", features = ["std"], default_features = false, source = "git+https://github.com/cberner/redb?rev=7061f7e60d4573311c0636e161d417b93e9fd2b1" },
+]
 
 [packages.wf-consensus]
 kind = "runtime"

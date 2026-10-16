@@ -13,3 +13,4 @@ workspace = true
 wf-types.workspace = true
 wf-domain.workspace = true
 wf-ports.workspace = true
+redb.workspace = true

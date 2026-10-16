@@ -177,7 +177,7 @@ fn check_edge(
         if dependency["req"] != approved.version
             || actual_features != expected_features
             || dependency["uses_default_features"].as_bool() != Some(approved.default_features)
-            || dependency["source"] != "registry+https://github.com/rust-lang/crates.io-index"
+            || dependency["source"] != approved.source
             || !dependency["path"].is_null()
         {
             violations.push(format!(

@@ -5,6 +5,31 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The M2 backend dependency is now an exact canonical redb 4.4.0 Git pin, with
+default features disabled and only std enabled. Source-policy regression tests
+failed before the exact-source checker repair and now reject moving refs and
+source/version/feature/path/layer drift. The workspace passes 702 tests across
+83 targets, six compile-fail docs across 15 targets, formatting, compilation,
+strict Clippy, warnings-denied rustdoc and reference/progress checks. All four
+full-workspace dependency audit categories pass using the cached advisory database;
+no target/dev/build exclusion or source-policy waiver was added.
+
+The existing native acceptance executable also passes compilation, formatting,
+strict Clippy and its complete persistence/reopen/process-kill cases on the same
+canonical dependency. Its 15 Rust source files are unchanged; only its manifest
+and lock changed. The exact 17-file proof is saved at 627fb772 on
+codex/workflow-record-batch-native-proof. Local offline validation uses
+`CARGO_HOME=/private/tmp/ferricstore2-m2-durable-log-cargo-home`, seeded from the
+verified upstream commit and tree. The manifest and lock retain the canonical
+upstream URL/revision. See [ADR-007](adr/007-durable-log-storage.md) and
+ARCH-M2-REDB-GIT-SOURCE1-CREATE1.
+
+The next product slice is a scoped synchronous durable log with real disk,
+recovery, corruption and commit-failure tests. The exact proposal is in the
+performance review; backend code is not implemented by the dependency selection.
+Applied-state/membership recovery, snapshots and safe purge, consensus/service
+wiring, original Elixir runtime parity and native Linux remain required.
+
 The public-ingress continuation now has its domain predecessor: bounded borrowed
 scalar caller normalization and source-compatible retry jitter derived inside
 authoritative apply. All 354 domain tests across 40 targets pass. The final
@@ -47,9 +72,9 @@ Ledger counts remain 82 source-derived declarations, 92 counterpart mappings and
 1,655 unresolved declarations; these component checks confer no new full-source
 parity credit. Original setup/runtime profiles, production backend/consensus
 integration, Linux execution and full M1–M8 parity remain required. Architecture
-and performance are assessing the earliest real M2 log/snapshot/recovery
-prerequisite against the existing OpenRaft/redb spike. That successor remains
-read-only and unselected. Rich individual Create/Transition/Extend replies,
+and performance selected the scoped durable-log predecessor described above,
+using the existing OpenRaft/redb spike as evidence. Its backend tests and source
+remain the next implementation work. Rich individual Create/Transition/Extend replies,
 current authorization and supervised runtime integration also remain required;
 this increment establishes no milestone exit or full-source parity.
 

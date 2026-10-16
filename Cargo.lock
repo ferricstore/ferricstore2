@@ -423,6 +423,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
+name = "redb"
+version = "4.4.0"
+source = "git+https://github.com/cberner/redb?rev=7061f7e60d4573311c0636e161d417b93e9fd2b1#7061f7e60d4573311c0636e161d417b93e9fd2b1"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "regex"
 version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -856,6 +864,7 @@ dependencies = [
 name = "wf-storage"
 version = "0.1.0"
 dependencies = [
+ "redb",
  "wf-domain",
  "wf-ports",
  "wf-types",
