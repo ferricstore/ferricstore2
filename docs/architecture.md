@@ -998,3 +998,14 @@ This pure component does not connect the physical Batch5 transaction driver or
 implement indexed effects, wire/retained replies, independent durable publication
 or original service/setup/runtime profiles. Those remain required successors;
 component assertion links establish no full source-case parity or milestone exit.
+
+ARCH-M1-INDEPENDENT-TERMINALS1-CREATE1 extends this same private child with a
+terminal entry point for Complete, Fail, caller-resolved Retry and Cancel. One
+shared loop and preflight select the closed operation family; the old transition
+entry point remains restricted to Transition. Neutral IndependentBatchDecision
+and IndependentBatchPlan reuse the two existing owners, with public reexport
+aliases preserving the old names and enum namespace. No second planner, policy
+owner or projection is introduced. RetryWithPolicy remains outside this profile.
+An eventual legacy no-op still admits its actual command and latest predecessor
+before reduction. Original public hook/no-I/O behavior, physical history/index
+publication and durable application remain required successors.

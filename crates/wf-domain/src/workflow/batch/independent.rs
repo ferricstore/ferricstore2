@@ -1,4 +1,4 @@
-//! Ordered independent transitions over borrowed current and earlier owned writes.
+//! Ordered independent mutations over borrowed current and earlier owned writes.
 
 use std::collections::BTreeMap;
 
@@ -12,11 +12,11 @@ use super::{ApplyError, BatchItem, BatchRejection, GroupView, ScopedPlan};
 
 /// Owned ordered successes/errors; later successes see preceding successful writes.
 #[derive(Debug, Eq, PartialEq)]
-pub struct IndependentTransitionPlan {
+pub struct IndependentBatchPlan {
     results: Vec<Result<ScopedPlan, DomainError>>,
 }
 
-impl IndependentTransitionPlan {
+impl IndependentBatchPlan {
     /// Borrows one result per input in its original order.
     #[must_use]
     pub fn results(&self) -> &[Result<ScopedPlan, DomainError>] {
@@ -32,12 +32,17 @@ impl IndependentTransitionPlan {
 
 /// Independent business outcomes or a whole input/profile refusal with no plan.
 #[derive(Debug, Eq, PartialEq)]
-pub enum IndependentTransitionDecision {
+pub enum IndependentBatchDecision {
     /// Complete ordered independent results, including individual domain errors.
-    Accepted(IndependentTransitionPlan),
+    Accepted(IndependentBatchPlan),
     /// No provisional result or write is exposed.
     Rejected(BatchRejection),
 }
+
+/// Compatibility name for the transition entry point's shared decision.
+pub use IndependentBatchDecision as IndependentTransitionDecision;
+/// Compatibility name for the transition entry point's shared owned plan.
+pub use IndependentBatchPlan as IndependentTransitionPlan;
 
 /// Decides same-group transitions in input order, retaining independent failures.
 ///
@@ -52,8 +57,35 @@ pub fn decide_independent_transition_batch(
     encoded_entry: &[u8],
     limits: AdmissionLimits,
 ) -> Result<IndependentTransitionDecision, ApplyError> {
-    if let Some(error) = preflight(view, items, encoded_entry, limits)? {
-        return Ok(IndependentTransitionDecision::Rejected(error));
+    decide(view, items, encoded_entry, limits, false)
+}
+
+/// Decides same-group complete, fail, caller-resolved retry and cancel commands.
+///
+/// Results retain input order and earlier successful writes. Policy retries are
+/// outside this profile; plain retries retain their supplied committed deadline.
+/// This owns core/history plans without performing indexed or durable apply.
+/// The decoder remains responsible for actual key/value correspondence.
+/// # Errors
+/// Rejects corrupt/missing authority or a fallible result allocation operationally.
+pub fn decide_independent_terminal_batch(
+    view: GroupView<'_>,
+    items: &[BatchItem<'_>],
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+) -> Result<IndependentBatchDecision, ApplyError> {
+    decide(view, items, encoded_entry, limits, true)
+}
+
+fn decide(
+    view: GroupView<'_>,
+    items: &[BatchItem<'_>],
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+    terminal: bool,
+) -> Result<IndependentBatchDecision, ApplyError> {
+    if let Some(error) = preflight(view, items, encoded_entry, limits, terminal)? {
+        return Ok(IndependentBatchDecision::Rejected(error));
     }
     let mut results = Vec::new();
     results
@@ -71,7 +103,7 @@ pub fn decide_independent_transition_batch(
             return Err(ApplyError::InvalidAuthority);
         }
         if let Some(error) = admit_step(*item, current, &mut variable_bytes, items.len(), limits)? {
-            return Ok(IndependentTransitionDecision::Rejected(
+            return Ok(IndependentBatchDecision::Rejected(
                 BatchRejection::Admission(error),
             ));
         }
@@ -88,9 +120,9 @@ pub fn decide_independent_transition_batch(
         }
     }
     drop(latest);
-    Ok(IndependentTransitionDecision::Accepted(
-        IndependentTransitionPlan { results },
-    ))
+    Ok(IndependentBatchDecision::Accepted(IndependentBatchPlan {
+        results,
+    }))
 }
 
 fn preflight(
@@ -98,6 +130,7 @@ fn preflight(
     items: &[BatchItem<'_>],
     encoded_entry: &[u8],
     limits: AdmissionLimits,
+    terminal: bool,
 ) -> Result<Option<BatchRejection>, ApplyError> {
     if items.len() > limits.batch_items() {
         return Ok(Some(BatchRejection::Admission(AdmissionError::BatchItems)));
@@ -116,7 +149,7 @@ fn preflight(
     }
     if items
         .iter()
-        .any(|item| !matches!(item.command.operation, Operation::Transition(_)))
+        .any(|item| !allowed_operation(&item.command.operation, terminal))
     {
         return Ok(Some(BatchRejection::Domain(
             DomainError::UnsupportedOperation,
@@ -125,6 +158,20 @@ fn preflight(
     Ok(charge(0, items.len(), limits)
         .err()
         .map(BatchRejection::Admission))
+}
+
+fn allowed_operation(operation: &Operation, terminal: bool) -> bool {
+    if terminal {
+        matches!(
+            operation,
+            Operation::Complete(_)
+                | Operation::Fail(_)
+                | Operation::Retry(_)
+                | Operation::Cancel(_)
+        )
+    } else {
+        matches!(operation, Operation::Transition(_))
+    }
 }
 
 fn current_record<'row>(

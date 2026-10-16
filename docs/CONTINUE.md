@@ -5,6 +5,29 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
+Pure independent terminal batches now use the same ordered planner for Complete,
+Fail, caller-resolved Retry and Cancel. Per-item errors preserve other successes;
+an identical Complete pair emits one write/event followed by a legacy no-op.
+The old transition entry point retains its operation restriction through public
+compatibility aliases. Cumulative admission charges the actual evolving record
+before every reducer call, including an eventual no-op; results own their bytes.
+
+The latest macOS wrapper passes 674 Rust tests across 78 targets plus six
+compile-fail examples across 15 documentation targets, with zero warnings,
+failures or ignored tests. Formatting, compilation, strict Clippy, rustdoc,
+architecture and reference/progress checks pass on 1,176 unchanged non-review
+inputs. The wrapper exits 1 solely because GitHub DNS blocks its default advisory
+refresh; the separate cached October 14 audit passes all four categories.
+Architecture and performance reviews accept the actual source and 30 new direct
+component assertion links across three source declarations. Ledger counts are
+82/92/365; all 5,855 other declarations and every runtime identity are unchanged.
+Four new tests passed on first assertion execution after missing-API RED twice;
+a later test-only Clippy style repair preserves the complete frozen oracle by
+whole-file inverse. Public/durable independent publication, hook/no-I/O cases,
+physical history/index effects, original setup/runtime profiles, native Linux
+and full M1–M8/workflow parity remain required. This increment establishes no
+milestone exit; see ARCH-M1-INDEPENDENT-TERMINALS1-CREATE1 and the review records.
+
 Pure independent transitions now preserve ordered per-item failures and successes,
 including repeated IDs consuming the latest successful proposed record. Errors and
 legacy no-ops retain that predecessor; the existing atomic batch stays unchanged.

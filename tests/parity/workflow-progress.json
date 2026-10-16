@@ -21559,7 +21559,141 @@
     {
       "source_declaration_id": "4963f0d0a4e54c1e",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-4963f0d0a4e54c1e",
+          "rust_file": "crates/wf-domain/tests/independent_terminals.rs",
+          "rust_file_sha256": "18aaf12796c34175a424d14cf119a472e2989535ae89595f4641aeaf913e0463",
+          "rust_module": "",
+          "rust_function": "independent_terminal_many_preserves_per_item_success",
+          "assertions": [
+            {
+              "source_line": 329,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 227,
+              "rust_text": "assert_eq!(plan.results().len(), 2);"
+            },
+            {
+              "source_line": 329,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 228,
+              "rust_text": "assert_eq!(plan.results()[0], Err(DomainError::StaleLease));"
+            },
+            {
+              "source_line": 329,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 229,
+              "rust_text": "assert_eq!(DomainError::StaleLease.to_string(), \"ERR stale flow lease\");"
+            },
+            {
+              "source_line": 348,
+              "source_text": "assert {:ok, %{state: \"running\"}} =",
+              "rust_line": 230,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 351,
+              "source_text": "assert {:ok, %{state: \"completed\"}} =",
+              "rust_line": 246,
+              "rust_text": "assert_eq!(changed.record.state(), state);"
+            },
+            {
+              "source_line": 370,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 227,
+              "rust_text": "assert_eq!(plan.results().len(), 2);"
+            },
+            {
+              "source_line": 370,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 228,
+              "rust_text": "assert_eq!(plan.results()[0], Err(DomainError::StaleLease));"
+            },
+            {
+              "source_line": 370,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 229,
+              "rust_text": "assert_eq!(DomainError::StaleLease.to_string(), \"ERR stale flow lease\");"
+            },
+            {
+              "source_line": 390,
+              "source_text": "assert {:ok, %{state: \"running\"}} =",
+              "rust_line": 230,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 393,
+              "source_text": "assert {:ok, %{state: \"queued\"}} =",
+              "rust_line": 246,
+              "rust_text": "assert_eq!(changed.record.state(), state);"
+            },
+            {
+              "source_line": 412,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 227,
+              "rust_text": "assert_eq!(plan.results().len(), 2);"
+            },
+            {
+              "source_line": 412,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 228,
+              "rust_text": "assert_eq!(plan.results()[0], Err(DomainError::StaleLease));"
+            },
+            {
+              "source_line": 412,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 229,
+              "rust_text": "assert_eq!(DomainError::StaleLease.to_string(), \"ERR stale flow lease\");"
+            },
+            {
+              "source_line": 431,
+              "source_text": "assert {:ok, %{state: \"running\"}} =",
+              "rust_line": 230,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 434,
+              "source_text": "assert {:ok, %{state: \"failed\"}} =",
+              "rust_line": 246,
+              "rust_text": "assert_eq!(changed.record.state(), state);"
+            },
+            {
+              "source_line": 450,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 227,
+              "rust_text": "assert_eq!(plan.results().len(), 2);"
+            },
+            {
+              "source_line": 450,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 228,
+              "rust_text": "assert_eq!(plan.results()[0], Err(DomainError::StaleLease));"
+            },
+            {
+              "source_line": 450,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 229,
+              "rust_text": "assert_eq!(DomainError::StaleLease.to_string(), \"ERR stale flow lease\");"
+            },
+            {
+              "source_line": 461,
+              "source_text": "assert {:ok, %{state: \"queued\"}} =",
+              "rust_line": 230,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 464,
+              "source_text": "assert {:ok, %{state: \"cancelled\"}} =",
+              "rust_line": 246,
+              "rust_text": "assert_eq!(changed.record.state(), state);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure independent terminal components preserve all four original Complete/explicit Retry/Fail/Cancel groups, bad-first stale guard and good-second success, original colon-UID prefixes and distinct repeated type calls versus Cancel's shared type. Real Create and named Claim reducers supply current versions/guards; only unspecified creation clocks and opaque tokens are fixed. Shared direct macros execute for each effect: source329/370/412/450 link cardinality, StaleLease and exact ERR stale flow lease body, while source348/390/431/461 and351/393/434/464 link unchanged borrowed bad state and successful proposed good state. Bad fences are actual+1, good fences exact; Cancel is unleased1/0. Terminal time2000 and Retry explicit3000 remain intact. No physical nonoverwrite/get, compound public replies, claim_due selection or default/installed policy resolution/exhaustion/audit is certified. Source441's creation prerequisite, public preprocessing, retention/values/governance/children, authoritative index/history/durable independent publication, FlowTest async:false/flow/global_state/120000/live-shard/FLUSHDB setup/cleanup and every required original profile remain open. Required hook/no-I/O successors5020f3d94d04459d/4367a8c983c1da95 are not excluded. Runtime identity stays unresolved. Genuine missing-API RED twice precedes production; first assertion execution passes all four new tests on macOS. A later empty-result assertion style repair preserves the complete frozen oracle by whole-file inverse. Logical ownership/admission proves no measured performance, independent Linux result or full source-case/workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "5020f3d94d04459d",
@@ -21976,7 +22110,51 @@
     {
       "source_declaration_id": "538a6ff12c1e8b33",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-538a6ff12c1e8b33",
+          "rust_file": "crates/wf-domain/tests/independent_terminals.rs",
+          "rust_file_sha256": "18aaf12796c34175a424d14cf119a472e2989535ae89595f4641aeaf913e0463",
+          "rust_module": "",
+          "rust_function": "independent_terminal_pipeline_preserves_success_error_success",
+          "assertions": [
+            {
+              "source_line": 609,
+              "source_text": "assert [:ok, {:error, _reason}, :ok] =",
+              "rust_line": 285,
+              "rust_text": "assert_eq!(plan.results().len(), 3);"
+            },
+            {
+              "source_line": 609,
+              "source_text": "assert [:ok, {:error, _reason}, :ok] =",
+              "rust_line": 286,
+              "rust_text": "assert_eq!(plan.results()[1], Err(DomainError::StaleLease));"
+            },
+            {
+              "source_line": 631,
+              "source_text": "assert {:ok, %{state: \"completed\"}} =",
+              "rust_line": 293,
+              "rust_text": "assert_eq!(changed.record.state(), b\"completed\");"
+            },
+            {
+              "source_line": 634,
+              "source_text": "assert {:ok, %{state: \"running\"}} =",
+              "rust_line": 287,
+              "rust_text": "assert_eq!(records[1].state(), b\"running\");"
+            },
+            {
+              "source_line": 637,
+              "source_text": "assert {:ok, %{state: \"completed\"}} =",
+              "rust_line": 293,
+              "rust_text": "assert_eq!(changed.record.state(), b\"completed\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure terminal pipeline components preserve the original shared type/partition and three ID prefixes, actual Create plus named Claim at1000 with worker pipeline-terminal/lease30000, Complete at1001 and exact wrong-token middle guard. Direct source609 links cardinality/error,631/637 share the completed-state macro reached for first and third success,634 links unchanged borrowed middle running state. Both successful write helpers and supplemental IDs/predecessor2/version3/history checks execute, but helper assertions receive no invented direct anchors. These are owned proposed plans, not public :ok replies, physical reads/nonoverwrite, claim_due/index selection, Instance/Router preprocessing, indexed/history/durable publication, retention/governance or original FlowTest setup/runtime profiles. Required hook/no-I/O successors remain unported. Runtime identity stays empty; generated positive suffixes and opaque current tokens alone are fixed. Twice-reproduced missing-API RED precedes production and all four new tests pass first execution on macOS; lint-only empty assertion repair has a whole-file inverse. Independent Linux, full source-case/workflow parity and measured native performance remain unproved."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "4367a8c983c1da95",
@@ -21986,7 +22164,51 @@
     {
       "source_declaration_id": "e0a28881c94ae756",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-e0a28881c94ae756",
+          "rust_file": "crates/wf-domain/tests/independent_terminals.rs",
+          "rust_file_sha256": "18aaf12796c34175a424d14cf119a472e2989535ae89595f4641aeaf913e0463",
+          "rust_module": "",
+          "rust_function": "independent_terminal_duplicate_complete_is_one_write",
+          "assertions": [
+            {
+              "source_line": 721,
+              "source_text": "assert [:ok, :ok] =",
+              "rust_line": 322,
+              "rust_text": "assert_eq!(plan.results().len(), 2);"
+            },
+            {
+              "source_line": 721,
+              "source_text": "assert [:ok, :ok] =",
+              "rust_line": 324,
+              "rust_text": "assert_eq!(first.plan().outcome(), Outcome::Changed);"
+            },
+            {
+              "source_line": 721,
+              "source_text": "assert [:ok, :ok] =",
+              "rust_line": 330,
+              "rust_text": "assert_eq!(second.plan().outcome(), Outcome::LegacyNoop);"
+            },
+            {
+              "source_line": 724,
+              "source_text": "assert {:ok, %{state: \"completed\"}} =",
+              "rust_line": 328,
+              "rust_text": "assert_eq!(changed.record.state(), b\"completed\");"
+            },
+            {
+              "source_line": 729,
+              "source_text": "assert Enum.count(history, fn {_event_id, fields} ->",
+              "rust_line": 334,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure duplicate terminal components retain separate type/ID uid calls, source prefixes, actual Create/Claim at1000 with pipeline-terminal-dup/lease30000, and the identical Complete pair at1001. Source721 links exact cardinality plus Changed/LegacyNoop outcomes,724 links the completed proposed state,729 links exactly one newly emitted Completed event. The second result owns neither write nor history; expected predecessor2/version3 and unchanged old Transition-only refusal are supplemental. Source727 physical history-query success remains REQUIRED UNLINKED: counting reducer-emitted events is not a persisted history query or public compound/get reply. No retained request ID simulates legacy duplicate semantics. Original claim_due selection, physical/index/history/durable publication, retention/values/governance/children, FlowTest async:false/flow/global_state/120000/live-shard/FLUSHDB setup/cleanup and every required profile remain open. Runtime identity is unresolved. Genuine missing-API RED twice precedes production; all four selected tests pass first execution on macOS, with a later lint-only empty assertion repair proven by entire-file inverse. Neither full source-case/workflow parity, measured native resource gains nor independent Linux acceptance follows."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e844ef97afc44dc9",

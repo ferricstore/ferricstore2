@@ -463,3 +463,15 @@ before the fully owned Vec returns. Existing reducer/identity/map allocation
 semantics remain unchanged. This logical tariff certifies no native layout, RSS,
 CPU/latency or durable independent publication; those need their own adapters and
 executed original profiles on Linux and macOS.
+
+ARCH-M1-INDEPENDENT-TERMINALS1-CREATE1 applies the same admission and ownership
+contract to Complete, Fail, caller-resolved Retry and Cancel through one shared
+loop. Neutral names and old-name public reexport aliases add no variable owner;
+the old transition entry point keeps its operation restriction. Both existing
+RetryTime variants remain caller-resolved; installed-policy retries are refused.
+Two identical Complete commands with one-byte i/r/p/k and actual Claim worker w
+and token k use predecessor sizes 17 then 17, V42 and exact 2472/tight 2471.
+Both commands with result256 use predecessor sizes 17 then 273, V810 and exact
+5544/tight 5543. The second eventual no-op pays its full admission before reduce;
+neither tight refusal exposes the first provisional plan. These are logical
+per-call bounds, with unchanged allocator behavior and no measured native claim.

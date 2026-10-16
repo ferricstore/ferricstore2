@@ -36,7 +36,18 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 79 source declarations, 89 counterpart records and 335 assertion links.
+increments: 82 source declarations, 92 counterpart records and 365 assertion links.
+Three independent-terminal counterparts add 30 direct component links for the
+four Complete/Retry/Fail/Cancel groups, the success/error/success pipeline and
+duplicate Complete with one newly emitted completion event. Shared macros run
+for every represented effect or successful index. Real Create and named Claim
+reducers supply guards; public claim selection, compound/get replies, physical
+history query and durable/index publication remain required. All 5,855 other
+declaration records and every runtime identity are unchanged; the three new
+source runtime IDs remain unresolved. Four new tests pass on first assertion
+execution after missing-API RED twice. A later Clippy empty-assertion style
+repair preserves the complete frozen oracle by whole-file inverse. These links
+grant no full source-case/profile parity or independent Linux acceptance.
 Two independent-transition counterparts add nine direct component links: ordered
 stale-lease/cardinality/body and unchanged/successful state, then initial queued
 state, duplicate-pipeline cardinality and final processing/version3. Both success

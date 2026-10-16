@@ -17,7 +17,9 @@ mod authority;
 mod independent;
 pub(super) use authority::{BatchAuthority, observed_current};
 pub use independent::{
-    IndependentTransitionDecision, IndependentTransitionPlan, decide_independent_transition_batch,
+    IndependentBatchDecision, IndependentBatchPlan, IndependentTransitionDecision,
+    IndependentTransitionPlan, decide_independent_terminal_batch,
+    decide_independent_transition_batch,
 };
 
 /// Borrowed group-local authoritative placement/current-record view.
