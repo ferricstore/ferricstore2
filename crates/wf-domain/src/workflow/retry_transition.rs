@@ -3,8 +3,8 @@
 use wf_types::version::{Fence, TimestampMillis};
 
 use crate::history::{EventKind, RetryHistory};
-use crate::policy::{InstalledRetryPolicy, resolve};
-use crate::retry::{PolicyRetry, Retry, RetryDecision, RetryTime};
+use crate::policy::{BackoffKind, InstalledRetryPolicy, resolve};
+use crate::retry::{PolicyRetry, Retry, RetryDecision, RetryTime, source_retry_jitter};
 use crate::value::Counter;
 
 use super::plan::{changed_plan, changed_retry_plan, noop_plan};
@@ -79,6 +79,7 @@ pub(super) fn policy_retry_record(
     command: &CommittedCommand,
     retry: &PolicyRetry,
     installed_policy: Option<&InstalledRetryPolicy>,
+    source_jitter: bool,
 ) -> Result<TransitionPlan, DomainError> {
     if duplicate_retry(record, retry.guard.fence, retry.run_at) {
         return Ok(noop_plan(Outcome::LegacyNoop));
@@ -96,9 +97,18 @@ pub(super) fn policy_retry_record(
         .checked_add(1)
         .ok_or(DomainError::CounterOverflow(Counter::Attempts))?;
     let (state, next_run_at, decision) = if policy.attempt_allowed(attempts) {
-        let run_at = match retry.run_at {
-            Some(time) => time,
-            None => policy.next_run_at(command.now, attempts, retry.jitter)?,
+        let run_at = if let Some(time) = retry.run_at {
+            time
+        } else {
+            let jitter = if source_jitter
+                && policy.backoff.jitter_pct != 0
+                && !matches!(policy.backoff.kind, BackoffKind::None)
+            {
+                source_retry_jitter(record.id().as_bytes(), attempts, command.now.get())
+            } else {
+                retry.jitter
+            };
+            policy.next_run_at(command.now, attempts, jitter)?
         };
         (run_state.to_vec(), Some(run_at), RetryDecision::Scheduled)
     } else {

@@ -5,6 +5,24 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The public-ingress continuation now has its domain predecessor: bounded borrowed
+scalar caller normalization and source-compatible retry jitter derived inside
+authoritative apply. All 354 domain tests across 40 targets pass. The final
+focused controls and strict Clippy across all domain targets also pass after
+reviewed style repairs. Nineteen independent tuple samples were executed on
+OTP 28 and 29 before implementation. Review found reserved-type and unsupported
+field diagnoses; added controls reproduced each finding before its repair.
+The shared reducer preserves the private explicit-sample path and skips source
+hash work when the resolved policy cannot use jitter.
+
+Application and public-frame/gate tests are frozen and have genuine missing-API
+RED results. Remaining Changes, physical outcome, driver and native-ingress
+oracles precede release of those implementation layers. The last complete
+workspace result is the V6 result below; the current domain result does not
+replace it. Public submission/retention, original setup/runtime profiles,
+production backend/consensus integration, Linux execution and full M1–M8 parity
+remain required. See ARCH-PUBLIC-MUTATION-INGRESS1-CREATE1 and its review records.
+
 The current increment implements the private V6 independent batch bridge through
 the same preparation, one retained gate, Fresh decision and consumed transaction
 commit. Counted scalar responses bind every ordered result; exact V5 bytes and

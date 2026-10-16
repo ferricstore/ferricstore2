@@ -119,6 +119,17 @@ No async, Tokio, threads, wall clocks, randomness, environment, networking, file
 
 Application code performs effects through ports. The same domain validation and state rules serve HTTP, dedicated TCP, embedded access and workers. The UI receives stable enums, structured field errors and allowed actions computed by domain rules. Allowed actions are advisory: committed state must revalidate every mutation.
 
+The implemented `workflow::caller` capture normalizes bounded borrowed scalar
+mutation fields without reading records, policy or time. Its shared raw metric
+counts every occurrence, including shadowed common options, after bounding each
+field slice to eight entries. The individual public-mutation domain entry
+requires one item and reuses the independent planner and its original/final/
+history ownership. Source retry jitter is a portable deterministic derivation of
+the binary ID, authoritative next attempt and command time, reached only inside
+guarded policy timing. The private explicit-sample path stays separate. These
+mathematical values do not establish authorization or durable submission; the
+public prepared/retained and application boundaries remain implementation work.
+
 ## Command execution and durability
 
 1. Authenticate and enforce tenant, request and payload bounds at the edge. Construct typed command and idempotency key.

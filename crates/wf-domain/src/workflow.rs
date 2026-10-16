@@ -18,6 +18,7 @@ mod validation;
 pub mod active;
 pub mod admission;
 pub mod batch;
+pub mod caller;
 pub mod control;
 pub mod indexed;
 pub mod request;
@@ -205,6 +206,15 @@ pub fn reduce_with_policy(
     command: &CommittedCommand,
     installed_policy: Option<&InstalledRetryPolicy>,
 ) -> Result<TransitionPlan, DomainError> {
+    reduce_profile(record, command, installed_policy, false)
+}
+
+fn reduce_profile(
+    record: Option<&WorkflowRecord>,
+    command: &CommittedCommand,
+    installed_policy: Option<&InstalledRetryPolicy>,
+    source_jitter: bool,
+) -> Result<TransitionPlan, DomainError> {
     if command
         .id
         .as_bytes()
@@ -256,9 +266,13 @@ pub fn reduce_with_policy(
             EventKind::Failed,
         ),
         Operation::Retry(retry) => retry_record(require_record(record)?, command, retry),
-        Operation::RetryWithPolicy(retry) => {
-            policy_retry_record(require_record(record)?, command, retry, installed_policy)
-        }
+        Operation::RetryWithPolicy(retry) => policy_retry_record(
+            require_record(record)?,
+            command,
+            retry,
+            installed_policy,
+            source_jitter,
+        ),
         Operation::ExtendLease(extend) => extend_record(require_record(record)?, command, extend),
         Operation::Cancel(cancel) => cancel_record(require_record(record)?, command, cancel),
     }

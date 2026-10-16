@@ -5,6 +5,9 @@ use wf_types::version::TimestampMillis;
 use crate::lease::LeaseGuard;
 use crate::policy::RetryOverride;
 
+mod source;
+pub use source::source_retry_jitter;
+
 /// Source retry audit decision.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum RetryDecision {
@@ -27,8 +30,8 @@ impl RetryDecision {
 
 /// Explicit committed hash sample used by source-compatible retry jitter.
 ///
-/// Preparation supplies the pinned source `phash2({id, next_attempt, now})`
-/// result when exact compatibility is required. The domain never generates it.
+/// Explicit-sample callers supply the pinned source tuple hash when needed.
+/// The public mutation reducer separately derives it after authoritative guards.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct JitterSample(u32);
 

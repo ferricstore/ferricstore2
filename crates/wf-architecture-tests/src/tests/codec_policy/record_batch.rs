@@ -82,6 +82,12 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::record_batch::independent::nested",
         "log::record_batch::response::independent",
         "log::record_batch::response::independent::nested",
+        "log::public_mutation",
+        "log::public_mutation::intent",
+        "log::public_mutation::codec",
+        "log::public_mutation::apply",
+        "log::public_mutation::response",
+        "log::public_mutation::response::nested",
     ] {
         assert_eq!(
             source_check("wf-ports", module, "use std::collections::BTreeMap;")?,
@@ -115,6 +121,7 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::record_batch::fresh_backend",
         "log::record_batch::independent_backend",
         "log::record_batch::response::independent_backend",
+        "log::public_mutation_backend",
     ] {
         assert_eq!(
             source_check(
@@ -149,6 +156,14 @@ fn assert_record_batch_exports() -> CheckResult<()> {
         "decide_fresh_independent_record_batch_touched",
         "record_batch_retained_summary",
         "independent_record_batch_response_matches",
+        "prepare_public_mutation_intent",
+        "measure_public_mutation",
+        "encode_public_mutation",
+        "prepare_public_mutation",
+        "inspect_public_mutation_point",
+        "decide_fresh_public_mutation_touched",
+        "public_mutation_retained_status",
+        "public_mutation_response_matches",
     ] {
         assert!(
             source_check(

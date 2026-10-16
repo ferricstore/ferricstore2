@@ -20,7 +20,8 @@ mod decision;
 mod independent;
 pub(crate) use decision::decide_selected_claims;
 pub use independent::{
-    IndependentIndexedDecision, IndependentIndexedPlan, decide_touched_independent_indexed_batch,
+    IndependentIndexedDecision, IndependentIndexedPlan,
+    decide_public_mutation_touched_indexed_batch, decide_touched_independent_indexed_batch,
 };
 
 /// Current canonical records, modes and complete correctness indexes.

@@ -15,6 +15,7 @@ pub(in crate::workflow) enum IndependentProfile {
     Transition,
     Terminal,
     Indexed,
+    Public,
 }
 
 pub(in crate::workflow) type IndependentStep<E> = Result<Result<TransitionPlan, E>, BatchRejection>;
@@ -240,6 +241,16 @@ fn allowed_operation(operation: &Operation, profile: IndependentProfile) -> bool
                 | Operation::ExtendLease(_)
                 | Operation::Cancel(_)
         ),
+        IndependentProfile::Public => matches!(
+            operation,
+            Operation::Create(_)
+                | Operation::Transition(_)
+                | Operation::Complete(_)
+                | Operation::Fail(_)
+                | Operation::RetryWithPolicy(_)
+                | Operation::ExtendLease(_)
+                | Operation::Cancel(_)
+        ),
     }
 }
 
@@ -296,11 +307,16 @@ pub(in crate::workflow) fn charge(
     add(
         &mut bytes,
         count
-            .checked_mul(if matches!(profile, IndependentProfile::Indexed) {
-                1_664
-            } else {
-                128
-            })
+            .checked_mul(
+                if matches!(
+                    profile,
+                    IndependentProfile::Indexed | IndependentProfile::Public
+                ) {
+                    1_664
+                } else {
+                    128
+                },
+            )
             .ok_or(AdmissionError::LengthOverflow)?,
     )?;
     limits.check_total(bytes)

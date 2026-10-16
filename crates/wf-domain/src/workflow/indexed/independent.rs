@@ -23,6 +23,7 @@ struct IndependentIndexState<'query, 'current> {
     count: usize,
     ordering: Vec<Option<(OrderingMetadata, StateMode)>>,
     consumed: u32,
+    profile: IndependentProfile,
 }
 
 /// Owned independent results and original-to-final publication descriptors.
@@ -154,13 +155,58 @@ pub fn decide_touched_independent_indexed_batch<'current>(
     encoded_entry: &[u8],
     limits: AdmissionLimits,
 ) -> Result<IndependentIndexedDecision<'current>, ApplyError> {
+    decide_profile(
+        view,
+        items,
+        order,
+        encoded_entry,
+        limits,
+        IndependentProfile::Indexed,
+    )
+}
+
+/// Decides exactly one verified public mutation with source-derived retry timing.
+///
+/// Only the seven public core operations are admitted. Actual prepared evidence
+/// and caller identity must be verified before this Fresh entry; this value is
+/// not authorization or publication authority. Old explicit-sample APIs differ.
+/// # Errors
+/// Refuses count other than one, invalid authority, allocation or ordinal overflow.
+pub fn decide_public_mutation_touched_indexed_batch<'current>(
+    view: TouchedIndexedGroupView<'_, 'current>,
+    items: &[IndexedBatchItem<'_>],
+    order: EntryOrder,
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+) -> Result<IndependentIndexedDecision<'current>, ApplyError> {
+    if items.len() != 1 {
+        return Err(ApplyError::InvalidAuthority);
+    }
+    decide_profile(
+        view,
+        items,
+        order,
+        encoded_entry,
+        limits,
+        IndependentProfile::Public,
+    )
+}
+
+fn decide_profile<'current>(
+    view: TouchedIndexedGroupView<'_, 'current>,
+    items: &[IndexedBatchItem<'_>],
+    order: EntryOrder,
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+    profile: IndependentProfile,
+) -> Result<IndependentIndexedDecision<'current>, ApplyError> {
     let authority = IndexedAuthority::Touched(view);
     if let Some(error) = independent_preflight(
         authority.batch(),
         items.iter().map(|item| item.item),
         encoded_entry,
         limits,
-        IndependentProfile::Indexed,
+        profile,
     )? {
         return Ok(IndependentIndexedDecision::Rejected(IndexRejection::Batch(
             error,
@@ -178,6 +224,7 @@ pub fn decide_touched_independent_indexed_batch<'current>(
         count: items.len(),
         ordering: Vec::new(),
         consumed: 0,
+        profile,
     };
     state
         .ordering
@@ -191,7 +238,7 @@ pub fn decide_touched_independent_indexed_batch<'current>(
         authority.batch(),
         &commands,
         limits,
-        IndependentProfile::Indexed,
+        profile,
         |index, _, current, previous, bytes| {
             let item = *items.get(index).ok_or(ApplyError::InvalidAuthority)?;
             state.evaluate(item, current, previous, bytes)

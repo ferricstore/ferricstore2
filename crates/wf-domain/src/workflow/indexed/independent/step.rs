@@ -6,7 +6,7 @@ use crate::workflow::batch::{
     ApplyError, BatchRejection, IndependentProfile, IndependentStep, admit_retry_policy,
     charge_independent,
 };
-use crate::workflow::{Operation, WorkflowRecord, reduce_with_policy};
+use crate::workflow::{Operation, WorkflowRecord, reduce_profile};
 
 use super::super::decision::{next_ordering, validate};
 use super::super::{IndexRejection, IndexedBatchItem};
@@ -32,13 +32,16 @@ impl<'current> IndependentIndexState<'_, 'current> {
         {
             return Ok(self.refusal(error));
         }
-        if let Err(error) =
-            charge_independent(*bytes, self.count, self.limits, IndependentProfile::Indexed)
-        {
+        if let Err(error) = charge_independent(*bytes, self.count, self.limits, self.profile) {
             return Ok(Err(BatchRejection::Admission(error)));
         }
         let (before, before_mode) = self.before(item, current, previous)?;
-        let plan = match reduce_with_policy(current, item.item.command, retry_policy) {
+        let plan = match reduce_profile(
+            current,
+            item.item.command,
+            retry_policy,
+            matches!(self.profile, IndependentProfile::Public),
+        ) {
             Ok(plan) => plan,
             Err(error) => {
                 return Ok(self.refusal(IndexRejection::Batch(BatchRejection::Domain(error))));
