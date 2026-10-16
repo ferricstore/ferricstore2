@@ -81,3 +81,43 @@ pub fn encode_outcome_prefix(
         maximum_bytes,
     )
 }
+
+/// Encodes an exact normalized-policy query, including an empty raw type.
+///
+/// Stored values still require nonempty schema-valid types. Query bytes have no
+/// record-ID ceiling; the explicit encoded cap bounds their escaped expansion.
+/// # Errors
+/// Rejects a zero cap, checked size overflow, excess bytes or allocation failure.
+pub fn encode_policy_key(
+    scope: &RequestScope,
+    workflow_type: &[u8],
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    encode_components(
+        6,
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            workflow_type,
+        ],
+        maximum_bytes,
+    )
+}
+
+/// Encodes recovery-wide authoritative placement, independent of tenant/group.
+///
+/// The entire value is a nonempty typed group ID under this key version/family.
+/// # Errors
+/// Rejects a zero cap, checked size overflow, excess bytes or allocation failure.
+pub fn encode_placement_key(
+    recovery: &RecoveryId,
+    partition: &PartitionId,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    encode_components(
+        7,
+        &[recovery.as_bytes(), partition.as_bytes()],
+        maximum_bytes,
+    )
+}

@@ -44,6 +44,12 @@ pub struct ScannedWorkflowRecord<'input> {
 }
 
 impl ScannedWorkflowRecord<'_> {
+    /// Reads the validated predecessor version without materializing an owner.
+    #[must_use]
+    pub const fn version(&self) -> u64 {
+        self.version
+    }
+
     /// Reads 512 plus every variable byte returned by materialization.
     #[must_use]
     pub const fn owned_bytes(&self) -> usize {

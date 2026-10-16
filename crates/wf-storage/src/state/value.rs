@@ -12,7 +12,9 @@ mod record;
 pub use control::{decode_control, encode_control};
 pub use history::{decode_history, encode_history};
 pub use outcome::{ScannedRetainedOutcome, decode_outcome, encode_outcome, scan_outcome};
-pub use record::{ScannedWorkflowRecord, decode_record, encode_record, scan_record_point};
+pub use record::{
+    ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields, scan_record_point,
+};
 
 /// Operational persisted-value failure, never a retained business rejection.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

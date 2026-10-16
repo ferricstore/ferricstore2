@@ -1,7 +1,8 @@
 use super::{TestResult, hex, scope, standard_scope};
 use std::collections::BTreeSet;
 use wf_storage::state::key::{
-    encode_control_key, encode_outcome_key, encode_outcome_prefix, encode_record_key,
+    encode_control_key, encode_outcome_key, encode_outcome_prefix, encode_placement_key,
+    encode_policy_key, encode_record_key,
 };
 use wf_storage::state::value::StateValueError;
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId};
@@ -10,6 +11,90 @@ use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId};
 const CONTROL: &str = "4657504b0001006700007a0000";
 const RECORD: &str = "4657504b0001016700007a0000740000700000690000";
 const OUTCOME: &str = "4657504b0001026700007a0000740000710000";
+
+#[test]
+fn installed_policy_and_placement_keys_are_scoped() -> TestResult {
+    let original = standard_scope()?;
+    let partition = PartitionId::new(b"p".to_vec())?;
+    let policy = hex("4657504b0001066700007a0000740000720000")?;
+    let placement = hex("4657504b0001077a0000700000")?;
+    assert_eq!(encode_policy_key(&original, b"r", 19)?, policy);
+    assert_eq!(
+        encode_placement_key(original.recovery(), &partition, 13)?,
+        placement
+    );
+    assert_eq!(
+        encode_policy_key(&original, b"", 18)?,
+        hex("4657504b0001066700007a00007400000000")?
+    );
+    let binary = scope(b"g\0", b"\xff", b"t\0")?;
+    assert_eq!(
+        encode_policy_key(&binary, b"r\0\xff", 26)?,
+        hex("4657504b0001066700ff0000ff00007400ff00007200ffff0000")?
+    );
+    for foreign in [
+        scope(b"h", b"z", b"t")?,
+        scope(b"g", b"y", b"t")?,
+        scope(b"g", b"z", b"other")?,
+    ] {
+        assert_ne!(encode_policy_key(&foreign, b"r", 100)?, policy);
+    }
+    assert_ne!(encode_policy_key(&original, b"r\0", 100)?, policy);
+    assert_ne!(
+        encode_placement_key(&RecoveryId::new(b"y".to_vec())?, &partition, 100)?,
+        placement
+    );
+    assert_ne!(
+        encode_placement_key(original.recovery(), &PartitionId::new(b"pp".to_vec())?, 100)?,
+        placement
+    );
+    assert_ne!(policy[6], placement[6]);
+    assert_eq!(
+        encode_policy_key(&original, b"r", 0),
+        Err(StateValueError::InvalidValue)
+    );
+    assert_eq!(
+        encode_placement_key(original.recovery(), &partition, 0),
+        Err(StateValueError::InvalidValue)
+    );
+    assert_eq!(
+        encode_policy_key(&original, b"r", 18),
+        Err(StateValueError::Limit {
+            bytes: 19,
+            maximum: 18
+        })
+    );
+    assert_eq!(
+        encode_placement_key(original.recovery(), &partition, 12),
+        Err(StateValueError::Limit {
+            bytes: 13,
+            maximum: 12
+        })
+    );
+    // Raw queries admit empty and >RecordId-sized policy types truthfully.
+    let large = vec![b'r'; 65_536];
+    let encoded = encode_policy_key(&original, &large, 65_554)?;
+    assert_eq!(encoded.len(), 65_554);
+    assert_eq!(&encoded[16..encoded.len() - 2], large);
+    assert_eq!(
+        encode_policy_key(&original, &large, 65_553),
+        Err(StateValueError::Limit {
+            bytes: 65_554,
+            maximum: 65_553
+        })
+    );
+    let maximum = scope(&[0; 256], &[0; 256], &[0; 8_192])?;
+    assert_eq!(
+        encode_policy_key(&maximum, &vec![0; 262_117], 541_657)?.len(),
+        541_657
+    );
+    let partition = PartitionId::new(vec![0; 65_535])?;
+    assert_eq!(
+        encode_placement_key(maximum.recovery(), &partition, 131_593)?.len(),
+        131_593
+    );
+    Ok(())
+}
 
 #[test]
 fn point_key_vectors_bind_global_and_tenant_identity() -> TestResult {

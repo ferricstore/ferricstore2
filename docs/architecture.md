@@ -959,3 +959,25 @@ The real driver still owns coherent physical loading, admission for every live
 owner and bound copy, and atomic publication/recovery. See
 [ADR006](adr/006-private-prepared-command-codec.md#selected-touched-record-indexed-input)
 for the selected contract and its remaining runtime gates.
+
+
+## Selected joined transaction orchestration
+
+The next reviewed M2 batch joins one preparation and retained point gate with
+one exclusive neutral storage transaction. The domain owns complete-policy
+mode/retry projection; storage owns bounded coherent loading and publication.
+Complete performs no Fresh lookup, and returned replies own their original
+metadata/bytes after consumed commit. No local record or query borrow escapes.
+Physical prefetch failures are explicit operational aborts even when a later
+pure classification would be an earlier business rejection or exact LogReplay;
+the old pure algorithms and their validation order remain shared and unchanged.
+
+Placement uses recovery/partition authority; policies remain tenant/group/
+recovery/type scoped and preserve exact normalized complete backing. The loader
+and adapter prospectively admit separate cumulative R/S/C owners in addition to
+the existing decoded/Fresh/late bounds. See [ADR004](adr/004-committed-time-and-apply-admission.md#selected-driver-read-staging-and-adapter-accounts)
+and [ADR006](adr/006-private-prepared-command-codec.md#selected-joined-record-batch-transaction).
+The concrete redb implementation remains an isolated real-backend acceptance
+experiment until dependency adoption and both-host/runtime gates pass. Its
+whole-cohort and process-kill oracles establish no production deployment,
+consensus integration, source/setup/profile parity or M2 exit before execution.

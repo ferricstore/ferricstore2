@@ -3,8 +3,10 @@
 use wf_domain::history::EventKind;
 use wf_domain::workflow::WorkflowRecord;
 use wf_domain::workflow::admission::{AdmissionLimits, record_bytes};
+use wf_domain::workflow::indexed::OrderingMetadata;
+use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::StoredWorkflowRecord;
-use wf_types::identity::{GroupId, RecoveryId};
+use wf_types::identity::{GroupId, PartitionId, RecoveryId};
 
 use super::{StateValueError, add, allocate, put_raw, raw_size};
 
@@ -38,17 +40,62 @@ pub fn encode_record(
     limits: AdmissionLimits,
     maximum_bytes: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if maximum_bytes == 0 || owner.ordering.priority > 2 {
+    encode_fields(
+        [
+            group.as_bytes(),
+            recovery.as_bytes(),
+            owner.tenant.as_bytes(),
+            owner.partition.as_bytes(),
+        ],
+        &owner.record,
+        owner.ordering,
+        limits,
+        maximum_bytes,
+    )
+}
+
+/// Encodes borrowed proposed fields without constructing a second record owner.
+/// # Errors
+/// Preserves the legacy ordering, admission, wire-cap and allocation refusals.
+pub fn encode_record_fields(
+    scope: &RequestScope,
+    partition: &PartitionId,
+    record: &WorkflowRecord,
+    ordering: OrderingMetadata,
+    limits: AdmissionLimits,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    encode_fields(
+        [
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            partition.as_bytes(),
+        ],
+        record,
+        ordering,
+        limits,
+        maximum_bytes,
+    )
+}
+
+fn encode_fields(
+    namespace: [&[u8]; 4],
+    record: &WorkflowRecord,
+    ordering: OrderingMetadata,
+    limits: AdmissionLimits,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    if maximum_bytes == 0 || ordering.priority > 2 {
         return Err(StateValueError::InvalidValue);
     }
-    record_bytes(&owner.record, limits).map_err(|_| StateValueError::InvalidValue)?;
-    let record = &owner.record;
+    record_bytes(record, limits).map_err(|_| StateValueError::InvalidValue)?;
     let mut size = 80;
     for field in [
-        group.as_bytes(),
-        recovery.as_bytes(),
-        owner.tenant.as_bytes(),
-        owner.partition.as_bytes(),
+        namespace[0],
+        namespace[1],
+        namespace[2],
+        namespace[3],
         record.id().as_bytes(),
         record.workflow_type(),
         record.state(),
@@ -77,16 +124,11 @@ pub fn encode_record(
         add(&mut size, 8)?;
     }
     let mut output = allocate(size, maximum_bytes, *b"FWSR")?;
-    for field in [
-        group.as_bytes(),
-        recovery.as_bytes(),
-        owner.tenant.as_bytes(),
-        owner.partition.as_bytes(),
-    ] {
+    for field in namespace {
         put_raw(&mut output, field)?;
     }
-    output.push(owner.ordering.priority);
-    output.extend_from_slice(&owner.ordering.state_enter_seq.to_be_bytes());
+    output.push(ordering.priority);
+    output.extend_from_slice(&ordering.state_enter_seq.to_be_bytes());
     put_record(&mut output, record)?;
     Ok(output)
 }

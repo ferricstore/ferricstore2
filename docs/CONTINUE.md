@@ -5,7 +5,33 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The current M2 increment implements bounded touched-record/indexed inputs.
+The joined record-batch transaction driver now preserves complete policy backing,
+independent query owners, cumulative R/S/C accounting, actual operational prefetch
+precedence and owned responses after consumed commit. Frozen product/native
+oracles failed twice for the precise missing APIs/files before source release.
+All seven new product behaviors passed on first execution within 29 focused
+tests. The complete isolated redb executable passes, including real delegated
+sync-error recovery and four accepted/rejected process-kill boundaries. A further
+healthy-policy work-limit control first failed with Corrupt, then passed after
+its narrow mapper repair. Borrowed local indexes remove repeated linear outer
+lookups with separately charged descriptors; no measured native speedup is claimed.
+
+The final macOS wrapper passes 666 Rust tests across 76 targets plus six
+compile-fail docs, with zero warnings/failures/ignored tests. Formatting,
+compilation, strict Clippy, rustdoc, architecture and reference/progress checks
+pass on 1,173 unchanged non-review inputs. Lint-only repairs preserve the complete
+frozen oracle files by whole-file inverses. The wrapper exits 1 solely because
+GitHub DNS blocks its default advisory refresh; the separate cached October 14
+product audit passes all four categories. Native formatting, strict Clippy and
+the complete executable separately exit 0. Architecture and performance reviewed
+actual source; product and backend owners reviewed each other. See
+ARCH-M2-RECORD-BATCH-TRANSACTION1-CREATE1 and its borrowed-encoder/lookup precisions
+in the coordination/review records. Ledger counts remain 77/87/326 with no new
+Elixir parity credit. Engine adoption and production backend wiring, original
+assertion/setup/runtime profiles, native Linux and full M1–M8 completion remain
+open. This increment does not establish M2 exit.
+
+The preceding M2 increment implements bounded touched-record/indexed inputs.
 Explicit observations distinguish unknown authority from actual absence, with
 shared batch/index algorithms preserving the complete-view path. Ordinary FIFO
 followers need their exact member without an unrelated head lookup; named

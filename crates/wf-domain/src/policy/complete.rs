@@ -26,6 +26,7 @@ mod patch;
 mod presentation;
 mod public_get;
 mod public_set;
+mod record_projection;
 mod replace_content;
 mod replace_request;
 mod request;
@@ -105,6 +106,7 @@ pub use public_set::{
     OriginalPolicySetRequest, encode_original_policy_set_input_rejection_body,
     prepare_original_policy_set_request,
 };
+pub use record_projection::{project_record_batch_policy, record_batch_policy_projection_bytes};
 pub use replace_content::{
     CompletePolicyReplaceRejection, CompletePolicyReplaceRejectionKind,
     check_complete_policy_replace_content, encode_complete_policy_replace_rejection_body,

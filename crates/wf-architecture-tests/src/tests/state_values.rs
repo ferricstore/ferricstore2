@@ -13,6 +13,8 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::key::point"),
         ("wf-storage", "state::key::ordered"),
         ("wf-storage", "state::key::ordered::nested"),
+        ("wf-domain", "policy::complete::record_projection"),
+        ("wf-domain", "policy::complete::record_projection::nested"),
         ("wf-ports", "log::record_batch::response"),
     ] {
         assert_eq!(
@@ -57,6 +59,9 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
     for (package, module) in [
         ("wf-ports", "state::transaction"),
         ("wf-storage", "transaction"),
+        ("wf-storage", "transaction::record_batch"),
+        ("wf-storage", "transaction::load"),
+        ("wf-storage", "transaction::observations"),
         ("wf-storage", "state::value_backend"),
         ("wf-storage", "state::key_backend"),
         ("wf-storage", "state::keyed"),
@@ -114,10 +119,12 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
 
 fn assert_domain_values_stay_server_only() -> CheckResult<()> {
     for path in [
-        "request::gate::PointGateView",
-        "request::gate::inspect_point_request",
-        "indexed::TouchedIndexedGroupView",
-        "indexed::decide_touched_indexed_batch",
+        "workflow::request::gate::PointGateView",
+        "workflow::request::gate::inspect_point_request",
+        "workflow::indexed::TouchedIndexedGroupView",
+        "workflow::indexed::decide_touched_indexed_batch",
+        "policy::complete::project_record_batch_policy",
+        "policy::complete::record_batch_policy_projection_bytes",
     ] {
         for (package, module, domain, diagnosis) in [
             ("wf-ports", "client", "wf_domain", "client port facade"),
@@ -135,13 +142,9 @@ fn assert_domain_values_stay_server_only() -> CheckResult<()> {
             ),
         ] {
             assert!(
-                source_check(
-                    package,
-                    module,
-                    &format!("pub use {domain}::workflow::{path};")
-                )?
-                .iter()
-                .any(|finding| finding.contains(diagnosis))
+                source_check(package, module, &format!("pub use {domain}::{path};"))?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
             );
         }
     }

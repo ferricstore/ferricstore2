@@ -12,7 +12,10 @@ pub use ordered::{
     decode_due_key, decode_fifo_key, decode_history_key, encode_due_key, encode_due_prefix,
     encode_fifo_key, encode_fifo_prefix, encode_history_key, encode_history_prefix,
 };
-pub use point::{encode_control_key, encode_outcome_key, encode_outcome_prefix, encode_record_key};
+pub use point::{
+    encode_control_key, encode_outcome_key, encode_outcome_prefix, encode_placement_key,
+    encode_policy_key, encode_record_key,
+};
 
 /// One independently owned decoded key; namespace checks convey no authority.
 ///
@@ -109,7 +112,7 @@ pub(super) fn key_start(
     length: usize,
     maximum: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if family > 5 {
+    if family > 7 {
         return Err(StateValueError::UnsupportedTag);
     }
     if length < 7 {

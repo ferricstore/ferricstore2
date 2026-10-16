@@ -5,6 +5,7 @@ use std::fmt;
 
 use wf_domain::claim::apply::ClaimQuery;
 use wf_domain::claim::{DueOrder, LaneKey, LaneOrder};
+use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits};
 use wf_domain::workflow::WorkflowRecord;
 use wf_domain::workflow::control::{ControlState, plan_control};
 use wf_domain::workflow::indexed::{IndexedBatchPlan, IndexedDecision, OrderingMetadata};
@@ -67,7 +68,9 @@ pub trait GroupApplyStore {
     where
         Self: 's;
 
-    /// Acquires one revision with positive cumulative step/owned-byte caps.
+    /// Acquires one revision with positive cumulative step/owned-byte/scratch caps.
+    /// Temporary scope/key/value/seek owners and backend finite-bound copies
+    /// debit C prospectively without refunds, separately from returned-owner R.
     ///
     /// # Errors
     /// Operational acquisition, namespace or profile failure.
@@ -77,6 +80,7 @@ pub trait GroupApplyStore {
         recovery: &'s RecoveryId,
         maximum_read_steps: usize,
         maximum_read_bytes: usize,
+        maximum_temporary_bytes: usize,
     ) -> Result<Self::Transaction<'s>, StateTransactionError>;
 }
 
@@ -108,6 +112,24 @@ pub trait GroupApplyTransaction: Sized {
     type DueCursor<'tx>: GroupDueCursor
     where
         Self: 'tx;
+    /// Reads recovery-wide exact partition placement; missing is observed absence.
+    /// One probe and512+copied group bytes are charged before ownership.
+    /// # Errors
+    /// Operational backend, corruption or cumulative admission failure.
+    fn placement(&self, partition: &PartitionId) -> Result<Option<GroupId>, StateTransactionError>;
+    /// Reads complete normalized V2 backing, never a retry-only persisted shadow.
+    /// Pre-admit checked2048+216*wire bytes against R before complete decoding,
+    /// including typed metadata and uniqueness scratch. Use this SAME schema
+    /// account; validate exact type. Original ETF/foreign/corrupt rows refuse.
+    /// # Errors
+    /// Operational backend, corruption, schema work or cumulative admission failure.
+    fn installed_policy(
+        &self,
+        tenant: &TenantId,
+        workflow_type: &[u8],
+        limits: PolicySchemaLimits,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Option<CompletePolicyValue>, StateTransactionError>;
     /// Reads global group control; unapplied differs from applied index0.
     /// # Errors
     /// Operational backend, corruption or cumulative admission failure.
@@ -299,6 +321,12 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
     #[must_use]
     pub const fn plan(&self) -> &RecordBatchApplyPlan<'view> {
         &self.plan
+    }
+    /// Moves the existing plan after the caller has completed consumed commit.
+    /// This mathematical extraction grants no durability or origin certificate.
+    #[must_use]
+    pub fn into_plan(self) -> RecordBatchApplyPlan<'view> {
+        self.plan
     }
     /// Accepted touched-only business/index/history plan; absent for rejection.
     #[must_use]

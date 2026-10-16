@@ -194,3 +194,16 @@ control. Domain batch/indexed children already inherit domain purity. Existing
 client, wire and domain-value checks reject the new server-only exports.
 No dependency or source-size exemption is introduced. Borrowed touched facts
 remain ordinary supplied values; these checks prove no physical provenance.
+
+
+ARCH-M2-RECORD-BATCH-TRANSACTION1-CREATE1 keeps the domain policy projection
+under existing domain purity and the new storage transaction children effectful.
+The state-value test matrix exercises the actual new projection child and nested
+path, while client/wire/domain-value fixtures reject its actual server-only
+exports. The key encoders, shared borrowed record encoder and scalar scanner
+getter inherit existing pure key/value rules. No source policy expansion or
+missing-rule RED is attributed to these already-covered descendants. Focused
+fixtures pass independently before source implementation; behavioral RED remains
+separate. The native main/cases/fixtures are test tooling within600 physical lines;
+five adapter/fault implementation files remain within400, all functions within100.
+The same strict workspace lint tables apply to the isolated native manifest.

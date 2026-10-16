@@ -6,7 +6,8 @@ use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedStatus};
 use wf_ports::state::StoredWorkflowRecord;
 use wf_storage::state::value::{
-    StateValueError, decode_outcome, decode_record, scan_outcome, scan_record_point,
+    StateValueError, decode_outcome, decode_record, encode_record_fields, scan_outcome,
+    scan_record_point,
 };
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, Fence, LogIdentity, TimestampMillis};
@@ -104,6 +105,7 @@ fn record_point_scan_binds_every_expected_component() -> TestResult {
     drop(partition);
     drop(id);
     assert_eq!(scanned.owned_bytes(), 625);
+    assert_eq!(scanned.version(), 7);
     assert_running(&scanned.into_owned(625)?)?;
     for field in 0..5 {
         let expected = scope(
@@ -157,6 +159,42 @@ fn record_scan_admits_all_owned_fields_before_copy() -> TestResult {
     }
     let owner =
         scan_record_point(&bytes, &expected, &partition, &id, limits, 269)?.into_owned(625)?;
+    assert_eq!(
+        encode_record_fields(
+            &expected,
+            &partition,
+            &owner.record,
+            owner.ordering,
+            AdmissionLimits::default(),
+            269
+        )?,
+        bytes
+    );
+    assert_eq!(
+        encode_record_fields(
+            &expected,
+            &partition,
+            &owner.record,
+            owner.ordering,
+            AdmissionLimits::default(),
+            268
+        ),
+        Err(StateValueError::Limit {
+            bytes: 269,
+            maximum: 268
+        })
+    );
+    assert_eq!(
+        encode_record_fields(
+            &expected,
+            &partition,
+            &owner.record,
+            owner.ordering,
+            AdmissionLimits::default(),
+            0
+        ),
+        Err(StateValueError::InvalidValue)
+    );
     drop(bytes);
     assert_running(&owner)?;
     let bytes = hex(RUNNING)?;

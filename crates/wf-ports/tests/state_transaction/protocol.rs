@@ -6,6 +6,7 @@ use std::cell::{Cell, RefCell};
 use super::{TestResult, clock, sample_record, scope};
 use wf_domain::claim::apply::{ClaimQuery, ClaimStates};
 use wf_domain::claim::{ClaimRecord, DueOrder, LaneKey, LaneOrder, PartitionFilter};
+use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits};
 use wf_domain::workflow::control::ControlState;
 use wf_domain::workflow::request::{RequestScope, RetainedOutcome};
 use wf_ports::state::{
@@ -58,8 +59,9 @@ impl<'input> GroupApplyStore for RecordingGroupStore<'input> {
         recovery: &'s RecoveryId,
         maximum_read_steps: usize,
         maximum_read_bytes: usize,
+        maximum_temporary_bytes: usize,
     ) -> Result<RecordingGroupTransaction<'s, 'input>, StateTransactionError> {
-        if maximum_read_steps == 0 || maximum_read_bytes == 0 {
+        if maximum_read_steps == 0 || maximum_read_bytes == 0 || maximum_temporary_bytes == 0 {
             return Err(StateTransactionError::Limit);
         }
         if self.scope.group() != group || self.scope.recovery() != recovery {
@@ -120,6 +122,23 @@ impl<'store, 'input> GroupApplyTransaction for RecordingGroupTransaction<'store,
         = RecordingDueCursor<'tx, 'store, 'input>
     where
         Self: 'tx;
+
+    fn placement(
+        &self,
+        _partition: &PartitionId,
+    ) -> Result<Option<GroupId>, StateTransactionError> {
+        Err(StateTransactionError::Unavailable)
+    }
+
+    fn installed_policy(
+        &self,
+        _tenant: &TenantId,
+        _workflow_type: &[u8],
+        _limits: PolicySchemaLimits,
+        _charge: &mut PolicySchemaCharge,
+    ) -> Result<Option<CompletePolicyValue>, StateTransactionError> {
+        Err(StateTransactionError::Unavailable)
+    }
 
     fn control(&self) -> Result<ControlState, StateTransactionError> {
         self.step("control")?;
@@ -394,6 +413,7 @@ pub(super) fn commit_after_observations(changes: &GroupApplyChanges<'_, '_>) -> 
         changes.scope().recovery(),
         10,
         10_000,
+        10_000,
     )?;
     {
         let mut cursor = tx.due_cursor(changes.scope().tenant(), query(), None, 1, 1_000)?;
@@ -432,7 +452,7 @@ fn same_transaction_binds_points_heads_and_range_budget() -> TestResult {
         committed: Cell::new(false),
     };
     {
-        let tx = store.begin_apply(scope.group(), scope.recovery(), 20, 10_000)?;
+        let tx = store.begin_apply(scope.group(), scope.recovery(), 20, 10_000, 10_000)?;
         assert_eq!(tx.control()?, ControlState::initial(clock(0)?));
         {
             let mut cursor = tx.due_cursor(scope.tenant(), query(), None, 1, 1_000)?;
@@ -485,7 +505,7 @@ fn same_transaction_binds_points_heads_and_range_budget() -> TestResult {
     }
     assert_filtered_continuation(&mut store, &scope, &rows)?;
     {
-        let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 516)?;
+        let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 516, 10_000)?;
         assert_eq!(
             tx.record(scope.tenant(), &owners[1].partition, owners[1].record.id()),
             Err(StateTransactionError::Limit)
@@ -503,12 +523,12 @@ fn assert_filtered_continuation(
     rows: &[DueOrder<'_>],
 ) -> TestResult {
     {
-        let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 1)?;
+        let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 1, 10_000)?;
         assert!(!tx.retained_nonempty(scope.tenant())?);
         assert_eq!((tx.steps.get(), tx.bytes.get()), (2, 0));
     }
     {
-        let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 10_000)?;
+        let tx = store.begin_apply(scope.group(), scope.recovery(), 2, 10_000, 10_000)?;
         let mut cursor = tx.due_cursor(scope.tenant(), query(), None, 5, 1_000)?;
         assert!(matches!(cursor.next()?, DueCursorStep::BudgetEnd));
         assert_eq!(cursor.position(), Some(rows[0]));
@@ -516,11 +536,11 @@ fn assert_filtered_continuation(
         assert_eq!(tx.bytes.get(), 135);
     }
     {
-        let tx = store.begin_apply(scope.group(), scope.recovery(), 3, 10_000)?;
+        let tx = store.begin_apply(scope.group(), scope.recovery(), 3, 10_000, 10_000)?;
         let mut resumed = tx.due_cursor(scope.tenant(), query(), Some(rows[0]), 5, 1_000)?;
         assert!(matches!(resumed.next()?, DueCursorStep::Row(row) if row.id == b"b"));
     }
-    let tx = store.begin_apply(scope.group(), scope.recovery(), 10, 10_000)?;
+    let tx = store.begin_apply(scope.group(), scope.recovery(), 10, 10_000, 10_000)?;
     let mut cursor = tx.due_cursor(scope.tenant(), query(), None, 5, 266)?;
     assert!(matches!(cursor.next()?, DueCursorStep::BudgetEnd));
     assert_eq!(cursor.position(), Some(rows[0]));
@@ -541,7 +561,13 @@ fn assert_retained_probe(changes: &GroupApplyChanges<'_, '_>) -> TestResult {
         committed: Cell::new(false),
     };
     {
-        let tx = store.begin_apply(changes.scope().group(), changes.scope().recovery(), 1, 1)?;
+        let tx = store.begin_apply(
+            changes.scope().group(),
+            changes.scope().recovery(),
+            1,
+            1,
+            10_000,
+        )?;
         assert_eq!(
             tx.retained_nonempty(changes.scope().tenant()),
             Err(StateTransactionError::Limit)
@@ -555,6 +581,7 @@ fn assert_retained_probe(changes: &GroupApplyChanges<'_, '_>) -> TestResult {
             changes.scope().recovery(),
             4,
             1_035,
+            10_000,
         )?;
         assert_eq!(tx.control()?, changes.plan().control().next());
         assert!(tx.retained_nonempty(changes.scope().tenant())?);

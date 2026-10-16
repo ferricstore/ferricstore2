@@ -1,0 +1,227 @@
+//! Separately admitted descriptors borrowing stable query and current owners.
+
+use std::collections::BTreeMap;
+
+use wf_domain::claim::{ClaimRecord, DueOrder, LaneKey, LaneOrder, ScopedRecordId};
+use wf_domain::policy::InstalledRetryPolicy;
+use wf_domain::policy::definition::{PolicySnapshot, StateMode};
+use wf_domain::workflow::indexed::TouchedIndexedGroupView;
+use wf_domain::workflow::request::RequestScope;
+use wf_ports::log::{FreshRecordBatch, RecordBatchApplyPlan, decide_fresh_record_batch_touched};
+use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
+use wf_types::identity::{PartitionId, RecordId};
+
+use super::load::{LoadedRecordBatch, debit, entry, reserve_slots};
+use super::{RecordBatchTransactionError, RecordBatchTransactionLimits};
+
+pub(super) fn decide<'current>(
+    fresh: FreshRecordBatch<'_>,
+    scope: &RequestScope,
+    loaded: &'current mut LoadedRecordBatch,
+    limits: RecordBatchTransactionLimits,
+    live_bytes: usize,
+) -> Result<RecordBatchApplyPlan<'current>, RecordBatchTransactionError> {
+    let LoadedRecordBatch {
+        queries,
+        records,
+        placements,
+        policy_types,
+        projections,
+        parallel,
+        members,
+        heads,
+        staging_used,
+        ..
+    } = loaded;
+    let cap = limits.maximum_staging_bytes;
+    let current = current_facts(queries, records, staging_used, cap)?;
+    let parallel = parallel_facts(parallel, records, staging_used, cap)?;
+    let members = member_facts(members, records, staging_used, cap)?;
+    let heads = head_facts(heads, records, staging_used, cap)?;
+    let mut modes = BTreeMap::<&[u8], Option<&PolicySnapshot>>::new();
+    let mut retries = BTreeMap::<&[u8], Option<&InstalledRetryPolicy>>::new();
+    for (index, kind) in policy_types.iter().enumerate() {
+        let projection = projections
+            .get(index)
+            .ok_or(StateTransactionError::Corrupt)?;
+        debit(staging_used, 256, cap)?;
+        modes.insert(kind, projection.as_ref().map(|(mode, _)| mode.policy()));
+        debit(staging_used, 256, cap)?;
+        retries.insert(kind, projection.as_ref().map(|(_, retry)| retry));
+    }
+    Ok(decide_fresh_record_batch_touched(
+        fresh,
+        TouchedIndexedGroupView {
+            group: scope.group(),
+            placements,
+            current: &current,
+            parallel: &parallel,
+            fifo_members: &members,
+            fifo_heads: &heads,
+            policies: &modes,
+            retry_policies: &retries,
+        },
+        live_bytes,
+        limits.outcome_ttl_ms,
+    )?)
+}
+
+fn current_facts<'query, 'current>(
+    queries: &'query [(PartitionId, RecordId)],
+    records: &'current [Option<StoredWorkflowRecord>],
+    used: &mut usize,
+    cap: usize,
+) -> Result<
+    BTreeMap<ScopedRecordId<'query>, Option<ClaimRecord<'current>>>,
+    RecordBatchTransactionError,
+> {
+    if queries.len() != records.len() {
+        return Err(StateTransactionError::Corrupt.into());
+    }
+    let mut facts = BTreeMap::new();
+    for ((partition, id), record) in queries.iter().zip(records) {
+        debit(used, 128, cap)?;
+        facts.insert(
+            ScopedRecordId {
+                partition_key: partition.as_bytes(),
+                id: id.as_bytes(),
+            },
+            record.as_ref().map(entry),
+        );
+    }
+    Ok(facts)
+}
+
+fn parallel_facts<'current>(
+    observations: &[(usize, bool)],
+    records: &'current [Option<StoredWorkflowRecord>],
+    used: &mut usize,
+    cap: usize,
+) -> Result<BTreeMap<DueOrder<'current>, bool>, RecordBatchTransactionError> {
+    let mut facts = BTreeMap::new();
+    for (index, present) in observations {
+        let record = current_row(records, *index)?;
+        let due = DueOrder::for_record(&record).ok_or(StateTransactionError::Corrupt)?;
+        debit(used, 128, cap)?;
+        facts.insert(due, *present);
+    }
+    Ok(facts)
+}
+
+fn member_facts<'current>(
+    observations: &[(usize, bool)],
+    records: &'current [Option<StoredWorkflowRecord>],
+    used: &mut usize,
+    cap: usize,
+) -> Result<
+    BTreeMap<(LaneKey<'current>, LaneOrder<'current>), Option<ClaimRecord<'current>>>,
+    RecordBatchTransactionError,
+> {
+    let mut facts = BTreeMap::new();
+    for (index, present) in observations {
+        let record = current_row(records, *index)?;
+        let lane = LaneKey::for_record(&record).ok_or(StateTransactionError::Corrupt)?;
+        debit(used, 256, cap)?;
+        facts.insert(
+            (lane, LaneOrder::for_record(&record)),
+            present.then_some(record),
+        );
+    }
+    Ok(facts)
+}
+
+fn head_facts<'current>(
+    observations: &'current [(usize, Option<StoredWorkflowRecord>)],
+    records: &'current [Option<StoredWorkflowRecord>],
+    used: &mut usize,
+    cap: usize,
+) -> Result<
+    BTreeMap<LaneKey<'current>, Option<(LaneOrder<'current>, ClaimRecord<'current>)>>,
+    RecordBatchTransactionError,
+> {
+    let mut facts = BTreeMap::new();
+    for (index, head) in observations {
+        let record = current_row(records, *index)?;
+        let lane = LaneKey::for_record(&record).ok_or(StateTransactionError::Corrupt)?;
+        let head = head.as_ref().map(|head| {
+            let row = entry(head);
+            (LaneOrder::for_record(&row), row)
+        });
+        debit(used, 256, cap)?;
+        facts.insert(lane, head);
+    }
+    Ok(facts)
+}
+
+fn current_row(
+    records: &[Option<StoredWorkflowRecord>],
+    index: usize,
+) -> Result<ClaimRecord<'_>, StateTransactionError> {
+    records
+        .get(index)
+        .and_then(Option::as_ref)
+        .map(entry)
+        .ok_or(StateTransactionError::Corrupt)
+}
+
+pub(super) fn load_indexes<T: GroupApplyTransaction>(
+    loaded: &mut LoadedRecordBatch,
+    tx: &T,
+    scope: &RequestScope,
+    cap: usize,
+) -> Result<(), RecordBatchTransactionError> {
+    let count = loaded.records.len();
+    reserve_slots(&mut loaded.parallel, count, &mut loaded.staging_used, cap)?;
+    reserve_slots(&mut loaded.members, count, &mut loaded.staging_used, cap)?;
+    reserve_slots(&mut loaded.heads, count, &mut loaded.staging_used, cap)?;
+    let mut type_positions = BTreeMap::<&[u8], usize>::new();
+    for (index, kind) in loaded.policy_types.iter().enumerate() {
+        debit(&mut loaded.staging_used, 128, cap)?;
+        type_positions.insert(kind, index);
+    }
+    for (index, owner) in loaded.records.iter().enumerate() {
+        let Some(owner) = owner else {
+            continue;
+        };
+        let row = entry(owner);
+        let Some(lane) = LaneKey::for_record(&row) else {
+            continue;
+        };
+        let mode = type_positions
+            .get(row.record.workflow_type())
+            .and_then(|at| loaded.projections.get(*at))
+            .ok_or(StateTransactionError::Corrupt)?
+            .as_ref()
+            .map_or(StateMode::Parallel, |(mode, _)| {
+                mode.policy().state_mode(row.logical_state())
+            });
+        let due = DueOrder::for_record(&row);
+        if let Some(due) = due {
+            loaded
+                .parallel
+                .push((index, tx.parallel_member(scope.tenant(), due)?));
+        }
+        match mode {
+            StateMode::Fifo => {
+                let member = tx.fifo_member(scope.tenant(), lane, LaneOrder::for_record(&row))?;
+                if member.as_ref().is_some_and(|member| member != owner) {
+                    return Err(StateTransactionError::Corrupt.into());
+                }
+                loaded.members.push((index, member.is_some()));
+                drop(member);
+            }
+            StateMode::Parallel if due.is_some() => {
+                let head = tx.fifo_head(scope.tenant(), lane)?;
+                if head.as_ref().is_some_and(|head| {
+                    head.tenant != *scope.tenant()
+                        || LaneKey::for_record(&entry(head)) != Some(lane)
+                }) {
+                    return Err(StateTransactionError::Corrupt.into());
+                }
+                loaded.heads.push((index, head));
+            }
+            StateMode::Parallel => {}
+        }
+    }
+    Ok(())
+}

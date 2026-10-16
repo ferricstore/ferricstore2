@@ -391,3 +391,50 @@ external owner in L. Exhaustion and overflow stay operational failures, without
 retained business rejection or applied-position progress. The ordinary complete
 view path retains its existing bounds and validation order. Atomic publication,
 uncertainty fencing/reopen and native Linux/macOS validation remain required.
+
+
+## Selected driver read, staging and adapter accounts
+
+The joined transaction selection reserves L=checked(R+S+C) from workspace W
+before raw preparation. Passing W-L to the existing decoder admits D+L before
+its owned buffers. One retained inspection then uses W; touched Fresh adds the
+same L to both its existing Fresh and late bounds. R, S and C are distinct
+cumulative logical accounts without refunds. Reserving configured R covers
+canonical, outcome, head and transient member copies, including spent debits
+after a temporary drops. External requests/scopes, previous replies and native
+engine cache/pages/MVCC remain separate owners.
+
+S separately charges root1024, each intermediate vector slot512, copied query
+bytes, each placement row256 plus copied partition/group, each independent type
+query128 plus bytes and each policy projection P. Final borrowed fact entries
+are additional: current/parallel128 each, member/head256 each and policy/retry
+descriptors256 each per type. Intermediate storage and simultaneously live
+fact maps never share one fee. P=1024+2*type bytes+sum(256+2*state-name bytes)
+plus all copied retry exhausted-target bytes. Each reserve/insert/copy is admitted
+prospectively; this is not a native collection-capacity estimate.
+
+Local borrowed query/type seen sets and the finalized type-position map remove
+repeated linear membership scans while preserving first-occurrence vectors and
+physical read order. Each distinct lookup descriptor separately costs S128,
+with an additional upper640n across n query and two sets of at most2n type
+entries. These fees never reuse the intermediate-slot or final fact-map fees.
+All indexes drop before their borrowed backing moves; no native speed or RSS
+result is inferred from their comparison-count improvement.
+
+C separately admits each encoded key/value/seek payload ceiling, engine bound
+copy, position component and affected-lane descriptor before creation. Each
+position/lane descriptor adds128; temporary scope construction adds512 plus all
+copied namespace bytes. Dropping an owner does not restore C. Complete policy
+decoding prospectively charges Q(E)=2048+216E against R, including complete raw/
+envelope backing, typed state/rule/list metadata and existing uniqueness scratch.
+The continuous PolicySchemaCharge remains separate from all three accounts.
+
+The explicit acceptance fixture profile is W256MiB/R64MiB/S64MiB/C32MiB,
+L167772160. The reviewed maximum core Fresh bound50847292 plus L218619452 leaves
+49816004 below W268435456. The old64MiB all-core-batches bound does not carry over.
+This arithmetic admits no universal all-input/profile or native-RSS claim.
+Exact/tight budgets, complete policy262162 bytes, actual false-head/cursor
+refusals and four real process-kill cut points require executed backend evidence.
+Initial control is atomically seeded with fixture policy/placement; later missing
+control is Corrupt, including for a new tenant. No in-memory fallback, reset
+counter or business retention of an operational refusal is selected.

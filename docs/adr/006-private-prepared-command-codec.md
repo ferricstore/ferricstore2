@@ -1341,3 +1341,46 @@ Implementation and executed acceptance are tracked in the continuation and
 review records. Real coherent loading, atomic publication/recovery, original
 assertion/setup/profile coverage and native Linux/macOS acceptance remain
 required.
+
+
+## Selected joined record-batch transaction
+
+ARCH-M2-RECORD-BATCH-TRANSACTION1-CREATE1 selects synchronous neutral
+orchestration under wf-storage::transaction. Implementation and executed
+acceptance remain tracked in the continuation and review records. The driver
+uses an externally stable expected scope, prepares once, then holds one
+exclusive group/recovery guard through control, exact retained cohort/outcome,
+Fresh placement/current/policy/index observations and consumed commit. Complete
+performs no Fresh reads. Reply values own their complete retained metadata and
+bytes and escape only after successful commit; no local loaded-record borrow
+escapes. Uncertain commit returns an operational failure and requires fencing
+and durable reopen/reconciliation.
+
+Actual pre-gate I/O can fail before an otherwise exact LogReplay. Bounded eager
+Fresh prefetch can likewise fail on an unused later corrupt policy before an
+earlier pure business rejection. These are explicit physical-driver operational
+precedence rules; existing pure gates/reducers retain their old ordering. A
+healthy empty-type Create performs its actual empty policy-key lookup and reaches
+its existing deterministic EmptyValue rejection. No fabricated absence, second
+gate or copied business reducer is selected.
+
+The pure domain projection preserves the complete policy owner unchanged. Its
+mode view carries the same generation and every state mode; its retry view
+carries all type/state overrides. These temporary views are never persisted as a
+replacement complete policy. Installed storage values use exact normalized
+FWPV2; original public ETF policy installation/read parity remains separate.
+FWPK1 family6 encodes group/recovery/tenant/type policy points. Family7 encodes
+recovery/partition placement with the raw nonempty GroupId value, independent of
+tenant and group. Query types admit empty and greater-than-65535 byte components
+under the positive encoded bound. Stored policy content still requires its full
+existing validation and exact expected type.
+
+The borrowed record encoder accepts existing scope, partition, core and ordering
+values directly. It shares the legacy encoder's single measured grammar without
+cloning the scope or core through a StoredWorkflowRecord container. The borrowed
+record scanner exposes its already validated version for consumed commit checks.
+Neither API changes bytes or creates a custody token. The isolated redb backend
+uses one table/real write transaction and full record/index/history/outcome/control
+oracles; it introduces no product dependency or engine-adoption claim. Native
+Linux, runtime consensus wiring and full original scenario/profile parity remain
+required.
