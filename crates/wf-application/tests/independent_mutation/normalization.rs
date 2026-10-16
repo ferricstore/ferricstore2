@@ -352,5 +352,30 @@ fn repeated_common_and_maximum_inline() -> TestResult {
 #[test]
 fn ingress_whole_call_limits_precede_clock_and_submit() -> TestResult {
     limits_precede_effects()?;
+    oversized_raw_options_refuse_before_effects()?;
     repeated_common_and_maximum_inline()
+}
+
+fn oversized_raw_options_refuse_before_effects() -> TestResult {
+    let scope = scope()?;
+    let x = RequestId::new(b"x".to_vec())?;
+    let y = RequestId::new(b"y".to_vec())?;
+    let fields = fields();
+    let over = [("unknown", MutationFieldValue::Unsupported); 9];
+    let items = [
+        item(&scope, &x, b"i", &fields),
+        item(&scope, &y, b"j", &over),
+    ];
+    let mut port = probe();
+    assert!(matches!(
+        submit_independent_mutations(
+            IndependentMutationCall::TerminalPipeline { items: &items },
+            &mut port,
+            MutationCallLimits::default()
+        ),
+        Err(MutationCallerError::InvalidOptions)
+    ));
+    assert!(port.events.is_empty());
+    assert!(port.frames.is_empty());
+    Ok(())
 }
