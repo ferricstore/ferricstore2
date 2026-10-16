@@ -2,12 +2,12 @@
 
 use crate::claim::{ClaimRecord, LaneKey, LaneOrder, ScopedRecordId};
 use crate::policy::definition::StateMode;
-use crate::workflow::Operation;
 use crate::workflow::admission::{AdmissionLimits, add, record_bytes};
 use crate::workflow::batch::{
     ApplyError, BatchAuthority, BatchDecision, BatchItem, BatchRejection, admitted_claim_bytes,
     admitted_with, build_plan_with,
 };
+use crate::workflow::{Operation, TransitionPlan};
 
 use super::authority::{IndexedAuthority, active, logical_state};
 
@@ -95,45 +95,19 @@ fn build_ordering<'current>(
         let before = view.current(item.item)?;
         let before_mode =
             before.map_or(Ok(StateMode::Parallel), |entry| view.mode(entry.record))?;
-        let priority = before.map_or(item.create_priority, |entry| entry.priority);
-        let (after, after_mode) = if let Some(write) = plan.plan().write() {
-            let record = &write.record;
-            let after_mode = view.mode(record)?;
-            if after_mode == StateMode::Fifo && priority != 0 && active(record) {
-                return Ok(Some(IndexRejection::FifoPriority));
-            }
-            let allocate = before.is_none_or(|entry| {
-                entry.logical_state() != logical_state(record) && active(record)
-            });
-            let sequence = if allocate {
-                let ordinal = order
-                    .first_ordinal
-                    .checked_add(*consumed)
-                    .ok_or(ApplyError::InvalidAuthority)?;
-                *consumed = consumed
-                    .checked_add(1)
-                    .ok_or(ApplyError::InvalidAuthority)?;
-                (u128::from(order.identity.index().get()) << 32) + u128::from(ordinal)
-            } else {
-                before.ok_or(ApplyError::InvalidAuthority)?.state_enter_seq
-            };
-            (
-                OrderingMetadata {
-                    priority,
-                    state_enter_seq: sequence,
-                },
-                after_mode,
-            )
-        } else {
-            let entry = before.ok_or(ApplyError::InvalidAuthority)?;
-            (
-                OrderingMetadata {
-                    priority,
-                    state_enter_seq: entry.state_enter_seq,
-                },
-                before_mode,
-            )
+        let (after, after_mode, next) = match next_ordering(
+            view,
+            *item,
+            before,
+            before_mode,
+            plan.plan(),
+            order,
+            *consumed,
+        )? {
+            Ok(values) => values,
+            Err(error) => return Ok(Some(error)),
         };
+        *consumed = next;
         ordering.push(OrderingChange {
             before,
             before_mode,
@@ -142,6 +116,62 @@ fn build_ordering<'current>(
         });
     }
     Ok(None)
+}
+
+pub(super) fn next_ordering(
+    view: IndexedAuthority<'_, '_>,
+    item: IndexedBatchItem<'_>,
+    before: Option<ClaimRecord<'_>>,
+    before_mode: StateMode,
+    plan: &TransitionPlan,
+    order: EntryOrder,
+    consumed: u32,
+) -> Result<Result<(OrderingMetadata, StateMode, u32), IndexRejection>, ApplyError> {
+    let priority = before.map_or(item.create_priority, |entry| entry.priority);
+    let Some(write) = plan.write() else {
+        let entry = before.ok_or(ApplyError::InvalidAuthority)?;
+        return Ok(Ok((
+            OrderingMetadata {
+                priority,
+                state_enter_seq: entry.state_enter_seq,
+            },
+            before_mode,
+            consumed,
+        )));
+    };
+    let record = &write.record;
+    let after_mode = view.mode(record)?;
+    if after_mode == StateMode::Fifo && priority != 0 && active(record) {
+        return Ok(Err(IndexRejection::FifoPriority));
+    }
+    let allocate =
+        before.is_none_or(|entry| entry.logical_state() != logical_state(record) && active(record));
+    let (sequence, next) = if allocate {
+        let ordinal = order
+            .first_ordinal
+            .checked_add(consumed)
+            .ok_or(ApplyError::InvalidAuthority)?;
+        let next = consumed
+            .checked_add(1)
+            .ok_or(ApplyError::InvalidAuthority)?;
+        (
+            (u128::from(order.identity.index().get()) << 32) + u128::from(ordinal),
+            next,
+        )
+    } else {
+        (
+            before.ok_or(ApplyError::InvalidAuthority)?.state_enter_seq,
+            consumed,
+        )
+    };
+    Ok(Ok((
+        OrderingMetadata {
+            priority,
+            state_enter_seq: sequence,
+        },
+        after_mode,
+        next,
+    )))
 }
 
 pub(crate) fn decide_selected_claims<'view>(
@@ -168,7 +198,7 @@ fn rejected(error: IndexRejection) -> IndexedDecision<'static> {
     IndexedDecision::Rejected(error)
 }
 
-fn validate(
+pub(super) fn validate(
     view: IndexedAuthority<'_, '_>,
     item: IndexedBatchItem<'_>,
     limits: AdmissionLimits,

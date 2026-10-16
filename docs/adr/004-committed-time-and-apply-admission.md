@@ -475,3 +475,31 @@ Both commands with result256 use predecessor sizes 17 then 273, V810 and exact
 5544/tight 5543. The second eventual no-op pays its full admission before reduce;
 neither tight refusal exposes the first provisional plan. These are logical
 per-call bounds, with unchanged allocator behavior and no measured native claim.
+
+## Independent indexed batch admission
+
+ARCH-M2-INDEPENDENT-INDEXED1-CREATE1 admits the closed eight-mutation indexed
+profile through the same ordered fold. Count, actual wire, all placements,
+operation profile and the full fixed tariff precede every new reservation.
+Require `4V + 2688n`: existing `1024n` result work and `128n` borrowed latest-write
+descriptors, plus three separate `512n` allowances for command references,
+scalar ordering scratch and final publication descriptors. Both older pure
+profiles retain `4V + 1152n` exactly.
+
+Each reached item cumulatively pays its actual command/key/value/partition and
+evolving predecessor before reducer copies. Installed retry targets and original
+head/canonical terms reuse the existing validation and charging rules. Errors,
+no-ops and dropping temporary owners provide no refund. The literal Retry/Cancel
+fixture admits exactly 5504 bytes, or 7552 with a first-only 256-byte payload;
+one byte less refuses the whole plan. Rejected FIFO Create followed by valid
+Create, Transition and Cancel admits 10848 and refuses at 10847.
+
+All successful history owners remain live, while final descriptors borrow only
+external original records and hold scalar indices into the owned results.
+Admission overflow is a whole-profile refusal; reducer counter/retry overflow
+is an item error; ordinal/authority arithmetic is operational. The approved
+STEP-REFINEMENT1 uses the same private IndependentStep name for nested standard
+Results and borrows finalization state. This adds no per-item Box or allocation;
+it asserts no smaller native layout. External query/current/policy/fact owners
+and future driver staging still need their separate bounds. Logical admission
+establishes no RSS, latency, universal allocator or durable-publication guarantee.

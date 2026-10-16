@@ -5,6 +5,36 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The latest increment adds a touched independent indexed plan for all eight
+mutation operations. Later commands for the same scoped ID use the latest
+successful write; item errors and no-ops preserve that predecessor and ordering
+cursor. Results retain every successful history event. Separate descriptors
+borrow original canonical records and select final records/indexes once per ID,
+without changing the intermediate expected versions or cloning earlier plans.
+This is the required domain representation for durable publication, not the
+publisher itself. Both original pure entry points retain their old restrictions
+and admission bounds.
+
+The latest macOS wrapper passes 678 Rust tests across 79 targets plus six
+compile-fail examples across 15 documentation targets, with zero warnings,
+failures or ignored tests. Formatting, compilation, strict Clippy, rustdoc,
+architecture and reference/progress checks pass on 1,181 unchanged non-review
+inputs. The wrapper exits 1 solely because GitHub DNS blocks its default advisory
+refresh; the separate cached October 14 audit passes all four categories.
+Architecture and performance accept the actual source and reciprocal reviews.
+Four new tests passed on their first assertion run after missing-API RED twice;
+subsequent lint repairs preserve the complete test oracle by whole-file inverse.
+Ledger counts remain 82/92/365, with no new source-case parity credit.
+
+Next is the actual general V6 intent, ordered retained response and atomic
+publication bridge: compare originals once, persist final records/indexes once,
+and preserve every intermediate history alongside outcome/control. Keep exact
+V5 compatibility, measured response admission and consistent native limits.
+Public hook/no-pre-read behavior, engine adoption, original setup/runtime
+profiles, native Linux and full M1–M8/workflow parity remain required. See
+ARCH-M2-INDEPENDENT-INDEXED1-CREATE1 and its step-representation refinement;
+this increment establishes no milestone exit.
+
 Pure independent terminal batches now use the same ordered planner for Complete,
 Fail, caller-resolved Retry and Cancel. Per-item errors preserve other successes;
 an identical Complete pair emits one write/event followed by a legacy no-op.
@@ -12,7 +42,7 @@ The old transition entry point retains its operation restriction through public
 compatibility aliases. Cumulative admission charges the actual evolving record
 before every reducer call, including an eventual no-op; results own their bytes.
 
-The latest macOS wrapper passes 674 Rust tests across 78 targets plus six
+That macOS wrapper passes 674 Rust tests across 78 targets plus six
 compile-fail examples across 15 documentation targets, with zero warnings,
 failures or ignored tests. Formatting, compilation, strict Clippy, rustdoc,
 architecture and reference/progress checks pass on 1,176 unchanged non-review

@@ -17,7 +17,11 @@ use super::batch::{ApplyError, BatchItem, BatchPlan, BatchRejection, GroupView};
 
 mod authority;
 mod decision;
+mod independent;
 pub(crate) use decision::decide_selected_claims;
+pub use independent::{
+    IndependentIndexedDecision, IndependentIndexedPlan, decide_touched_independent_indexed_batch,
+};
 
 /// Current canonical records, modes and complete correctness indexes.
 ///

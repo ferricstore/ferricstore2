@@ -1009,3 +1009,29 @@ owner or projection is introduced. RetryWithPolicy remains outside this profile.
 An eventual legacy no-op still admits its actual command and latest predecessor
 before reduction. Original public hook/no-I/O behavior, physical history/index
 publication and durable application remain required successors.
+
+## Independent indexed publication plan
+
+ARCH-M2-INDEPENDENT-INDEXED1-CREATE1 selects the touched domain prerequisite for
+Create, Transition, Complete, Fail, Retry, RetryWithPolicy, ExtendLease and Cancel.
+One shared ordered fold serves the existing pure profiles and the new indexed
+profile. Original index validation, retry-target admission and candidate ordering
+reuse the existing rules. Item business errors complete before the latest-write
+index or ordinal cursor advances; whole admission or operational failure exposes
+no provisional plan.
+
+The non-Clone public plan owns all ordered results and histories. Sorted final
+descriptors contain only original canonical borrows and scalar result indices;
+deltas borrow the final owned record from the plan. A Retry from version 2 to 3
+followed by Cancel to 4 retains expected versions 2/3 and both histories, while
+the final descriptor separately identifies original version 2 and final 4.
+Final descriptors store no references into the result Vec; earlier results are
+borrowed only while evaluating the next step. Intermediate plans are not cloned.
+See [ADR004](adr/004-committed-time-and-apply-admission.md#independent-indexed-batch-admission)
+for admission and the private result representation refinement.
+
+This representation does not publish physical writes. The required successor
+compares each original once, writes each final core/index once and persists all
+histories with outcome/control under one coherent transaction. General V6
+intent/response framing, real public hooks, backend adoption, original profiles
+and Linux/macOS acceptance remain required; atomic V5 behavior stays unchanged.

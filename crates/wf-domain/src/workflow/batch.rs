@@ -21,6 +21,10 @@ pub use independent::{
     IndependentTransitionPlan, decide_independent_terminal_batch,
     decide_independent_transition_batch,
 };
+pub(super) use independent::{
+    IndependentProfile, IndependentResults, IndependentStep, charge as charge_independent,
+    preflight as independent_preflight, run as run_independent,
+};
 
 /// Borrowed group-local authoritative placement/current-record view.
 ///
@@ -279,21 +283,7 @@ fn admitted_with_identity<'input, K: Ord>(
             if matches!(item.command.operation, Operation::RetryWithPolicy(_))
                 && let Some(policy) = view.retry_policy(*item, Some(record))?
             {
-                if policy.workflow_type() != record.workflow_type() {
-                    return Err(ApplyError::InvalidAuthority);
-                }
-                let state = super::validation::retry_run_state(record);
-                for layer in [Some(policy.type_retry()), policy.state_retry(state)]
-                    .into_iter()
-                    .flatten()
-                {
-                    if let Some(target) = &layer.exhausted_to {
-                        limits
-                            .check_value(target)
-                            .map_err(|_| ApplyError::InvalidAuthority)?;
-                        add(&mut total, target.len()).map_err(|_| ApplyError::InvalidAuthority)?;
-                    }
-                }
+                admit_retry_policy(record, policy, limits, &mut total)?;
             }
             if let Err(error) = limits.check_total(total) {
                 return Ok(Err(BatchRejection::Admission(error)));
@@ -301,6 +291,30 @@ fn admitted_with_identity<'input, K: Ord>(
         }
     }
     Ok(Ok(total))
+}
+
+pub(super) fn admit_retry_policy(
+    record: &WorkflowRecord,
+    policy: &InstalledRetryPolicy,
+    limits: AdmissionLimits,
+    total: &mut usize,
+) -> Result<(), ApplyError> {
+    if policy.workflow_type() != record.workflow_type() {
+        return Err(ApplyError::InvalidAuthority);
+    }
+    let state = super::validation::retry_run_state(record);
+    for layer in [Some(policy.type_retry()), policy.state_retry(state)]
+        .into_iter()
+        .flatten()
+    {
+        if let Some(target) = &layer.exhausted_to {
+            limits
+                .check_value(target)
+                .map_err(|_| ApplyError::InvalidAuthority)?;
+            add(total, target.len()).map_err(|_| ApplyError::InvalidAuthority)?;
+        }
+    }
+    Ok(())
 }
 
 pub(super) fn admitted_claim_bytes(
