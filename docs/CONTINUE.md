@@ -12,8 +12,10 @@ oracles failed twice for the precise missing APIs/files before source release.
 All seven new product behaviors passed on first execution within 29 focused
 tests. The complete isolated redb executable passes, including real delegated
 sync-error recovery and four accepted/rejected process-kill boundaries. A further
-healthy-policy work-limit control first failed with Corrupt, then passed after
-its narrow mapper repair. Borrowed local indexes remove repeated linear outer
+healthy-policy work-limit control and a smaller-state-profile control each first
+failed with Corrupt, then passed after narrow mapper repairs. Count refusal can
+precede deeper content validation; it does not certify stored bytes as healthy.
+Borrowed local indexes remove repeated linear outer
 lookups with separately charged descriptors; no measured native speedup is claimed.
 
 The final macOS wrapper passes 666 Rust tests across 76 targets plus six

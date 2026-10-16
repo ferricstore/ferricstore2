@@ -44033,3 +44033,30 @@ This is a concrete product neutral transaction increment and isolated Darwin nat
 ### Final reciprocal architecture receipt
 
 Product checkpoint 4a8f9f4 contains the selected driver and qualified terminal results. Root subsequently whole-read ARCH WRITTEN1 at 2,191,352 +10,086 bytes, SHA76ee0928fa16e1562759b1e4cfa032f04c0ee3c3b27d8aaa38467c6972c1d217 (2511a4), accepting all twelve product/five native bodies and full frozen-oracle inverses. Root also whole-read PERF terminal1,955/1196c298 (021283), including its actual reciprocal Writer reads. This closes the finite source reviews without another execution/ACK gate. The separate smaller-schema ItemLimit candidate remains under read-only assessment and changes no tested source or parity count. Writer is now selecting the next bounded pure source-derived scenario gap in its existing note; creation still requires the concrete architecture decision and tests-first release.
+
+## Native caller state-count refusal regression
+
+Previous goal turn made concrete progress: product4a8f9f4 and final architecture reviewe2f135f were committed, and the unmodified macOS wrapper executed666+6 passing assertions with only the recorded online advisory DNS failure. The full goal remains ACTIVE. Current turn revalidated the clean product tree, then repaired a separate native diagnosis defect rather than relabelling default-profile evidence.
+
+Root whole-read ARCH count selection2,201,438+2,684/aef0f67b (47060b). Valid PolicyLimits::new(1) can reject healthy default-admitted multi-state bytes with top-level ItemLimit. The selected native mapper now treats this as operational Limit. Fixed hard collection-count caps can also refuse before deeper content validation; this fail-closed result does not prove healthy versus corrupt content. No second parser/decode or product codec error contract was added.
+
+Root independently packed a42-byte snapshot/60-byte generation7 envelope with q FIFO/z Parallel states, SHA7c0dec94f3531dac43d2fe85d825b14c7a94cc3557c54b9a7bf4f23144d08ba7 (518839). Existing cases::schema_limits was extended ONLY with default-decode/generation7/states2/exactencoded checks, direct matching states1 profile/account ItemLimit, and actual driver Limit/full unchanged cohort. Native R64/S64/C32/W256 MiB and default128MiB schema work are ample; Q(60)=15,008. No new identity/file/model/helper/API/Cargo dependency. Cases522LF and function83LF remain within limits.
+
+The formatted additive whole-file inverse1785d9 restores ENTIRE preceding cases475/7b1693a8, Gitblob1048983fcf1e57adb8e0cb973b6b29c7fad43dec. In47060b the printed test_before_blob0951bce3 actually named the raw AFTER input; this label is corrected by1785d9. The first read-only inverse attemptca06f2 failed only its whitespace boundary precondition; no source change or native command ran there. The corrected whole inverse and actual RED are the evidence.
+
+Actual940601 compiled cleanly then FAILED at cases.rs320: healthy complete policy state-count refusal expectedLimit but Err(Transaction(Corrupt)), commandEXIT101. Both test248d3b5f and mapperffbb52aa remained exact. Default fixture validation and direct limited decoder checks executed before this failure; the later whole-cohort assertion earned no pass until the repaired run. PERF was released only after this genuine RED to add ItemLimit=>Limit. Its first repair0581ccaa passed complete native execution4a0611 (all original and new duties), but strictClippy rejected match_same_arms. Equivalent OR-pattern43cb4446 removes only that lint; Root965716 whole inverse removing the added OR operand restores ENTIRE originalffbb52aa exactly. All other branches, tariffs and inputs remain unchanged.
+
+Final965716→7a7e54: native fmt check0, strictClippy all targets/all features/warnings denied0, complete native executable0. This executes the new full unchanged-cohort refusal as well as ALL prior cases and four real process-kill boundaries. All ten Cargo/source inputs are identical before/after63186d3ded6c6c02ed8168d707740379841fb77af20189f29803e80d1e300d09. Existing native-first-assertion.log and native-strict.log preserve RED, intermediate lint-only failure and final GREEN. Product source/Cargo/tests are unchanged, so666+6 remains the previous same-source result; no unnecessary product rerun or new parity credit.
+
+Final overridden native local Git content bindings (the other eight inputs retain the previous receipt; these unreferenced local objects can be pruned and are not a shipped target):
+
+| Native input | Git blob | SHA256 |
+|---|---|---|
+| src/cases.rs | 9b346be9c89e3b1c7c37540888f1dd3e78af9503 | 248d3b5f2d97fa1cfbca07af79f557bdc4d5eadace8a2e37d6b8a41bda032493 |
+| src/read.rs | 5014392a237cceb646b11dcf13c01cb4c7bd9b25 | 43cb4446bd8c3a52c70058fa1942fabcea37fbc10ff6014ba32763ede33a0e28 |
+
+ARCH and PERF independently reconstructed the60 bytes and executed complete inverse comparisons; their finite reviews are recorded in their owned notes. Original product/API behavior, production dependency adoption, full Elixir assertion/setup/profile parity, Linux, power-loss and full M2/M1–M8 completion remain separate and unproven. Writer continues the next bounded pure M1 pinned-source gap proposal under the architecture-before-creation and tests-first gates.
+
+### Anchored native evidence snapshot
+
+ARCH17575e1d selects the exact existing ten native inputs as a local parentless Git evidence branch. Root created refs/heads/codex/workflow-record-batch-native-proof at 1a3e09af56d67eae12e74dd1c604f7849dfcb38d; root tree01ee2350a281f280510a63396cb1494f64f0c87e, src tree229e2f32d11a150863224d9c28842e7dd37272bf. Every mode100644 tree blob was compared byte-for-byte with the current native input, count10/manifest63186d3ded6c6c02ed8168d707740379841fb77af20189f29803e80d1e300d09. Current product branch and index tree were unchanged. This local ref anchors the formerly unreferenced content; it adds no production file/dependency/adoption/checkout/network change. Absolute source/path prerequisites remain; it is not a portable package or Linux execution result.
