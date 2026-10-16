@@ -255,6 +255,7 @@ fn public_core_caller_defaults_guards_and_feature_refusals() -> TestResult {
     partition_and_overrides()?;
     input_limits()?;
     schema_errors();
+    diagnostic_tokens_are_redacted()?;
     Ok(())
 }
 
@@ -307,4 +308,35 @@ fn reserved_types() {
         (reserved, lookalike, rich, ttl),
         (true, true, [true; 6], true)
     );
+}
+
+fn diagnostic_tokens_are_redacted() -> TestResult {
+    let secret = b"ferric-token-sentinel".as_slice();
+    let fields = [
+        ("lease_token", Bytes(secret)),
+        ("fencing_token", Integer(1)),
+    ];
+    let input = MutationInput {
+        operation: "complete",
+        id: b"i",
+        fields: &fields,
+    };
+    let normalized = normalize(input.operation, input.id, input.fields)?;
+    let guard = LeaseGuard {
+        token: LeaseToken::new(secret.to_vec())?,
+        fence: Fence::new(1),
+    };
+    let rendered = [
+        format!("{:?}", fields[0].1),
+        format!("{input:?}"),
+        format!("{:?}", normalized.operation()),
+        format!("{normalized:?}"),
+        format!("{:?}", guard.token),
+        format!("{guard:?}"),
+    ];
+    let ascii = std::str::from_utf8(secret)?;
+    let decimal = format!("{secret:?}");
+    let exposed = rendered.map(|value| value.contains(ascii) || value.contains(&decimal));
+    assert_eq!(exposed, [false; 6]);
+    Ok(())
 }

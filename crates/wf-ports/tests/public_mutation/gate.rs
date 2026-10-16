@@ -37,6 +37,7 @@ fn scalar_grammar(intent: ClientIntent) -> TestResult {
 
 #[test]
 fn public_item_profile_binds_evidence_effects_and_gate() -> TestResult {
+    admitted_stamp_effect_is_independent_of_control_time()?;
     let (bytes, intent) = encoded(2_000, &fields())?;
     scalar_grammar(intent)?;
     let plan = decide_missing(bytes.as_bytes(), WORKSPACE)?;
@@ -83,6 +84,25 @@ fn public_item_profile_binds_evidence_effects_and_gate() -> TestResult {
     let malformed = altered(original, original.status(), vec![2, 0, 0, 0])?;
     assert!(inspect(retry.as_bytes(), control, Some(&malformed), 1).is_err());
     assert_bypasses(bytes.as_bytes(), control, &malformed)?;
+    Ok(())
+}
+
+fn admitted_stamp_effect_is_independent_of_control_time() -> TestResult {
+    let (default, _) = encoded(1_000, &fields())?;
+    let mut requested = fields().to_vec();
+    requested.push(("now_ms", MutationFieldValue::Integer(0)));
+    let (requested, _) = encoded(1_000, &requested)?;
+    let control = ControlState::initial(clock(2_000)?);
+    let default = decide_missing_at(default.as_bytes(), WORKSPACE, control);
+    let requested = decide_missing_at(requested.as_bytes(), WORKSPACE, control);
+    assert_eq!((default.is_ok(), requested.is_ok()), (true, true));
+    for plan in [default?, requested?] {
+        assert_eq!(plan.control().execution_time(), TimestampMillis::new(2_000));
+        let outcome = retained(&plan)?;
+        assert_eq!(outcome.original_time(), TimestampMillis::new(2_000));
+        assert_eq!(outcome.expires_at(), TimestampMillis::new(3_000));
+        assert_eq!(outcome.response(), [2, 0, 0]);
+    }
     Ok(())
 }
 

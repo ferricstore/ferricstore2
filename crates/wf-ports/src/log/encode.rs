@@ -16,6 +16,9 @@ pub(super) fn write(
     writer: &mut Writer<'_>,
     limits: CodecLimits,
 ) -> Result<(), CodecError> {
+    if matches!(request.operation, PreparedOperation::PublicMutation { .. }) {
+        return super::public_mutation::write_owned(request, writer, limits);
+    }
     if request.intent.version() != 1
         && !(matches!(request.intent.version(), 5 | 6)
             && matches!(request.operation, PreparedOperation::Batch(_)))
@@ -35,6 +38,7 @@ pub(super) fn write(
         PreparedOperation::Batch(_) => 1,
         PreparedOperation::InstallPolicy { .. } => 2,
         PreparedOperation::ClaimPhase(_) => 3,
+        PreparedOperation::PublicMutation { .. } => return Err(CodecError::UnsupportedTag),
     })?;
     for value in scope {
         writer.raw(value, 8_192)?;
@@ -51,6 +55,7 @@ pub(super) fn write(
             return policy::write(command, value, writer, limits);
         }
         PreparedOperation::ClaimPhase(phase) => return claim::write(phase, writer, limits),
+        PreparedOperation::PublicMutation { .. } => return Err(CodecError::UnsupportedTag),
     };
     if items.is_empty() || items.len() > limits.admission.batch_items() {
         return Err(CodecError::ItemLimit);

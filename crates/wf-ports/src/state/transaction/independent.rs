@@ -6,6 +6,7 @@ use wf_domain::workflow::request::{RequestScope, RetainedOutcome, RetainedStatus
 use super::StateTransactionError;
 use crate::log::{
     RecordBatchApplyDecision, independent_record_batch_response_matches,
+    public_mutation_response_matches, public_mutation_retained_status,
     record_batch_retained_summary,
 };
 
@@ -14,6 +15,22 @@ pub(super) fn validate(
     operation: &IndependentIndexedDecision<'_>,
     outcome: &RetainedOutcome,
 ) -> Result<(), StateTransactionError> {
+    if outcome.intent().version() == 1 {
+        if outcome.scope() != scope
+            || public_mutation_retained_status(
+                outcome.intent(),
+                outcome.response_version(),
+                outcome.response(),
+            )
+            .map_err(|_| StateTransactionError::InvalidChanges)?
+                != outcome.status()
+            || !public_mutation_response_matches(operation, outcome.response())
+                .map_err(|_| StateTransactionError::InvalidChanges)?
+        {
+            return Err(StateTransactionError::InvalidChanges);
+        }
+        return Ok(());
+    }
     let status = match operation {
         IndependentIndexedDecision::Accepted(_) => RetainedStatus::Accepted,
         IndependentIndexedDecision::Rejected(reason) => RetainedStatus::IndexedRejected(*reason),

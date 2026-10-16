@@ -24,6 +24,10 @@ mod intent;
 mod phase;
 mod response;
 
+pub(super) use fresh::decide_independent;
+pub(super) use phase::finish_inspection;
+pub(super) use response::{push_rejection, rejection};
+
 pub use independent::{
     decide_fresh_independent_record_batch_touched, encode_independent_record_batch,
     inspect_independent_record_batch_point, prepare_independent_record_batch,
@@ -40,8 +44,8 @@ pub use response::{
 /// Proposed control and indexed operation, without durable-apply authority.
 #[derive(Debug, Eq, PartialEq)]
 pub struct RecordBatchApplyPlan<'view> {
-    control: ControlPlan,
-    decision: RecordBatchApplyDecision<'view>,
+    pub(super) control: ControlPlan,
+    pub(super) decision: RecordBatchApplyDecision<'view>,
 }
 
 impl<'view> RecordBatchApplyPlan<'view> {
@@ -76,7 +80,7 @@ pub enum RecordBatchApplyDecision<'view> {
     IndependentFresh {
         /// Ordered item results or a whole-profile refusal.
         operation: IndependentIndexedDecision<'view>,
-        /// Counted private response, bound to every ordered result.
+        /// Counted V6 or scalar public response, bound to the represented results.
         outcome: Box<RetainedOutcome>,
     },
     /// Borrow the original owner before changed current guards/indexes.
@@ -228,15 +232,25 @@ pub(super) fn decoded_intent(request: &PreparedRequest) -> Result<ClientIntent, 
     intent::derive(request, request.intent.version()).map(|(intent, _)| intent)
 }
 
-fn check_decoded(
+pub(super) fn check_decoded(
     decoded: &DecodedRequest<'_>,
     limits: CodecLimits,
     workspace: usize,
     version: u16,
 ) -> Result<(), RecordBatchApplyError> {
-    let PreparedOperation::Batch(items) = &decoded.request.operation else {
-        return Err(CodecError::UnsupportedTag.into());
-    };
+    let items = decoded
+        .request
+        .operation
+        .mutation_items()
+        .ok_or(CodecError::UnsupportedTag)?;
+    if (version == 1)
+        != matches!(
+            decoded.request.operation,
+            PreparedOperation::PublicMutation { .. }
+        )
+    {
+        return Err(CodecError::UnsupportedVersion.into());
+    }
     if decoded.request.intent.version() != version {
         return Err(CodecError::UnsupportedVersion.into());
     }
@@ -282,7 +296,11 @@ pub fn decide_record_batch<'view>(
     }
 }
 
-fn decoder_bound(encoded: usize, count: usize, limits: CodecLimits) -> Result<usize, CodecError> {
+pub(super) fn decoder_bound(
+    encoded: usize,
+    count: usize,
+    limits: CodecLimits,
+) -> Result<usize, CodecError> {
     sum(&[
         product(encoded, 4)?,
         limits.admission.decision_bytes(),
@@ -297,13 +315,13 @@ fn product(value: usize, multiplier: usize) -> Result<usize, CodecError> {
         .ok_or(CodecError::LengthOverflow)
 }
 
-fn sum(values: &[usize]) -> Result<usize, CodecError> {
+pub(super) fn sum(values: &[usize]) -> Result<usize, CodecError> {
     values.iter().try_fold(0_usize, |sum, value| {
         sum.checked_add(*value).ok_or(CodecError::LengthOverflow)
     })
 }
 
-fn admit(attempted: usize, maximum: usize) -> Result<(), RecordBatchApplyError> {
+pub(super) fn admit(attempted: usize, maximum: usize) -> Result<(), RecordBatchApplyError> {
     if attempted > maximum {
         Err(RecordBatchApplyError::Workspace { attempted, maximum })
     } else {

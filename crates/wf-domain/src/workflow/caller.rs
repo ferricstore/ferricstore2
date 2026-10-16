@@ -11,7 +11,7 @@ pub use input::measure_core_mutation_input;
 pub use normalize::normalize_core_mutation;
 
 /// One value in the explicitly supported transport-neutral capture vocabulary.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Eq, PartialEq)]
 pub enum MutationFieldValue<'a> {
     /// An explicitly supplied nil, distinct from an omitted field.
     Nil,
@@ -27,6 +27,19 @@ pub enum MutationFieldValue<'a> {
     Unsupported,
 }
 
+impl fmt::Debug for MutationFieldValue<'_> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Nil => formatter.write_str("Nil"),
+            Self::Bool(value) => formatter.debug_tuple("Bool").field(value).finish(),
+            Self::Integer(value) => formatter.debug_tuple("Integer").field(value).finish(),
+            Self::Bytes(_) => formatter.write_str("Bytes(<redacted>)"),
+            Self::Retry(_) => formatter.write_str("Retry(<redacted>)"),
+            Self::Unsupported => formatter.write_str("Unsupported"),
+        }
+    }
+}
+
 /// One caller item, without generated time, scope or authorization evidence.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct MutationInput<'a> {
@@ -39,7 +52,7 @@ pub struct MutationInput<'a> {
 }
 
 /// Normalized borrowed core effect; richer source effects remain unsupported.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Eq, PartialEq)]
 pub enum CoreMutation<'a> {
     /// Create an unleased record.
     Create {
@@ -128,6 +141,20 @@ pub enum CoreMutation<'a> {
         /// Present cancellation reason bytes.
         reason: Option<&'a [u8]>,
     },
+}
+
+impl fmt::Debug for CoreMutation<'_> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(match self {
+            Self::Create { .. } => "Create",
+            Self::Transition { .. } => "Transition",
+            Self::Complete { .. } => "Complete",
+            Self::Fail { .. } => "Fail",
+            Self::Retry { .. } => "Retry",
+            Self::ExtendLease { .. } => "ExtendLease",
+            Self::Cancel { .. } => "Cancel",
+        })
+    }
 }
 
 /// A mathematical normalized caller; it is not origin or admission authority.

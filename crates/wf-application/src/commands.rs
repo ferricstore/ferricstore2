@@ -7,6 +7,8 @@ use wf_types::identity::TenantId;
 
 use crate::error::PreparationError;
 
+pub mod independent;
+
 /// Explicit typed comparison value chosen by a versioned operation schema.
 ///
 /// This is neither a network DTO nor a generic domain/persistence serializer.

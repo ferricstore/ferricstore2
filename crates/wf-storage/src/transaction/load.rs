@@ -11,7 +11,7 @@ use wf_domain::policy::complete::{
 use wf_domain::policy::installation::PolicyCandidate;
 use wf_domain::workflow::Operation;
 use wf_domain::workflow::request::RequestScope;
-use wf_ports::consensus::{PreparedBatchItem, PreparedOperation};
+use wf_ports::consensus::PreparedBatchItem;
 use wf_ports::log::{CodecError, DecodedRequest, RecordBatchApplyError};
 use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
 use wf_types::identity::{GroupId, PartitionId, RecordId};
@@ -38,9 +38,11 @@ impl LoadedRecordBatch {
         decoded: &DecodedRequest<'_>,
         limits: RecordBatchTransactionLimits,
     ) -> Result<Self, RecordBatchTransactionError> {
-        let PreparedOperation::Batch(items) = &decoded.request().operation else {
-            return Err(RecordBatchApplyError::Encoding(CodecError::UnsupportedTag).into());
-        };
+        let items = decoded
+            .request()
+            .operation
+            .mutation_items()
+            .ok_or(RecordBatchApplyError::Encoding(CodecError::UnsupportedTag))?;
         let mut loaded = Self::new(items.len(), limits.maximum_staging_bytes)?;
         let mut seen_types = BTreeSet::new();
         loaded.copy_queries(items, &mut seen_types, limits.maximum_staging_bytes)?;

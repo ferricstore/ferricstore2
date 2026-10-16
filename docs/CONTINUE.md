@@ -16,14 +16,29 @@ The shared reducer preserves the private explicit-sample path and skips source
 hash work for None backoff or a zero jitter percentage.
 
 Application, public-frame/gate, Changes, physical outcome, driver and native
-ingress tests are frozen with genuine missing-API RED results before their
-implementations. The exact reviewed batch is released to disjoint application
-and lower-layer owners, with reciprocal architecture/performance review. These
-higher-layer assertions have not executed yet. The last complete workspace
-result is the V6 result below; the current domain result does not replace it.
+ingress tests were frozen with genuine missing-API RED results before their
+implementations. The reviewed scalar terminal ingress now passes all 698 tests
+across 83 workspace targets and six compile-fail examples across 15 documentation
+targets. Formatting, compilation, strict Clippy, rustdoc, architecture, reference
+and progress checks pass. The complete isolated native executable also passes
+formatting, strict Clippy and all eight real process-kill boundaries. Behavioral
+review reproduced dry-measure error origin, public default time, native read-stage
+diagnosis and diagnostic token exposure before their narrow repairs. Final tests
+preserve all 646 combined Rust/manifest inputs; ordinary style repairs preserve
+the complete frozen oracles. Native proof is saved separately at 6a807a68 on
+codex/workflow-record-batch-native-proof. Registry dependencies are unchanged;
+the earlier online advisory-refresh DNS failure is not a successful fresh audit.
 Public submission/retention, original setup/runtime profiles,
 production backend/consensus integration, Linux execution and full M1–M8 parity
 remain required. See ARCH-PUBLIC-MUTATION-INGRESS1-CREATE1 and its review records.
+
+This application family supports independent Complete, Fail, source-policy Retry
+and Cancel with per-slot original request scope, retained outcomes and a stopped
+suffix after uncertainty. Whole-call raw/profile/frame preflight precedes every
+effect. Rich individual Create/Transition/Extend replies, independent create-many,
+current authorization and supervised runtime integration remain successors. The
+next source-derived create-many candidate is under architecture/performance
+review; this increment establishes no milestone exit or full-source parity.
 
 The current increment implements the private V6 independent batch bridge through
 the same preparation, one retained gate, Fresh decision and consumed transaction

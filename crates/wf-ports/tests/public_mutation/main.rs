@@ -128,6 +128,14 @@ fn inspect<'input, 'retained>(
 }
 
 fn decide_missing(bytes: &[u8], workspace: usize) -> TestResult<RecordBatchApplyPlan<'static>> {
+    decide_missing_at(bytes, workspace, ControlState::initial(clock(0)?))
+}
+
+fn decide_missing_at(
+    bytes: &[u8],
+    workspace: usize,
+    control: ControlState,
+) -> TestResult<RecordBatchApplyPlan<'static>> {
     let scope = scope()?;
     let decoded = prepare_public_mutation(bytes, limits(), workspace)?;
     let inspection = inspect_public_mutation_point(
@@ -135,7 +143,7 @@ fn decide_missing(bytes: &[u8], workspace: usize) -> TestResult<RecordBatchApply
         log(0),
         PointGateView {
             scope: &scope,
-            control: ControlState::initial(clock(0)?),
+            control,
             outcome: None,
             retained_nonempty: false,
         },

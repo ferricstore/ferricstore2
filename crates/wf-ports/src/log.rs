@@ -19,10 +19,17 @@ mod decode;
 mod encode;
 mod keys;
 mod policy;
+mod public_mutation;
 mod reader;
 mod record_batch;
 mod scan;
 mod writer;
+
+pub use public_mutation::{
+    decide_fresh_public_mutation_touched, encode_public_mutation, inspect_public_mutation_point,
+    measure_public_mutation, prepare_public_mutation, prepare_public_mutation_intent,
+    public_mutation_response_matches, public_mutation_retained_status,
+};
 
 pub use record_batch::{
     FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan,
@@ -163,9 +170,7 @@ impl DecodedRequest<'_> {
     pub fn value_bytes(&self, index: usize) -> Option<[Option<&[u8]>; 2]> {
         use wf_domain::workflow::Operation;
 
-        let PreparedOperation::Batch(items) = &self.request.operation else {
-            return None;
-        };
+        let items = self.request.operation.mutation_items()?;
         let operation = &items.get(index)?.command.operation;
         Some(match operation {
             Operation::Create(value) => [value.payload.as_deref(), None],

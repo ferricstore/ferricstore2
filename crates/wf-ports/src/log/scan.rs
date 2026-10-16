@@ -10,6 +10,10 @@ pub(super) fn preflight(encoded: &[u8], limits: CodecLimits) -> Result<(), Codec
     let header = common::header(&mut reader)?;
     let scope = keys::scope_length(header.scope())?;
     let mut derived = scope;
+    if header.operation_tag == 4 {
+        super::public_mutation::preflight(&mut reader, &header)?;
+        return reader.finish();
+    }
     if header.operation_tag == 2 {
         policy::preflight(&mut reader)?;
         return reader.finish();
@@ -26,7 +30,7 @@ pub(super) fn preflight(encoded: &[u8], limits: CodecLimits) -> Result<(), Codec
             keys::state_length(scope, item.partition.len(), item.id.len())?,
             limits.admission.decision_bytes(),
         )?;
-        operation(&mut reader, item.tag)?;
+        operation(&mut reader, item.tag, false)?;
     }
     reader.finish()
 }
@@ -73,7 +77,7 @@ fn retry_override(reader: &mut Reader<'_>) -> Result<(), CodecError> {
     optional_field(reader)
 }
 
-fn operation(reader: &mut Reader<'_>, tag: u8) -> Result<(), CodecError> {
+pub(super) fn operation(reader: &mut Reader<'_>, tag: u8, public: bool) -> Result<(), CodecError> {
     match tag {
         1 => {
             field(reader)?;
@@ -104,7 +108,9 @@ fn operation(reader: &mut Reader<'_>, tag: u8) -> Result<(), CodecError> {
             guard(reader)?;
             optional_time(reader)?;
             retry_override(reader)?;
-            reader.u32()?;
+            if !public {
+                reader.u32()?;
+            }
             optional_field(reader)?;
             optional_field(reader)
         }

@@ -6,8 +6,14 @@ use crate::value::{DomainError, InputField};
 
 /// Opaque bytes supplied by named claims or derived by the apply-selected phase.
 /// Named Claim/Reclaim inputs remain explicitly supplied; tokens are never parsed.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub struct LeaseToken(Box<[u8]>);
+
+impl std::fmt::Debug for LeaseToken {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("LeaseToken(<redacted>)")
+    }
+}
 
 impl LeaseToken {
     /// Checks a nonempty binary token, including non-UTF-8 bytes.

@@ -37,7 +37,7 @@ pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, Codec
         return Err(CodecError::UnsupportedVersion);
     }
     let operation_tag = reader.byte()?;
-    if !matches!(operation_tag, 1..=3) {
+    if !matches!(operation_tag, 1..=4) {
         return Err(CodecError::UnsupportedTag);
     }
     let tenant = reader.nonempty(8_192)?;

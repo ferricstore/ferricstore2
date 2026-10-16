@@ -32,10 +32,10 @@ pub enum RecordBatchInspection<'input, 'retained> {
 /// The fixed box moves existing buffers; it does not copy commands or keys.
 /// Its allocation follows the existing fixed-owner allocator behavior.
 pub struct FreshRecordBatch<'input> {
-    pub(super) decoded: Box<DecodedRequest<'input>>,
-    pub(super) log: LogIdentity,
-    pub(super) control: ControlPlan,
-    pub(super) workspace_limit: usize,
+    pub(in crate::log) decoded: Box<DecodedRequest<'input>>,
+    pub(in crate::log) log: LogIdentity,
+    pub(in crate::log) control: ControlPlan,
+    pub(in crate::log) workspace_limit: usize,
 }
 
 impl<'input> FreshRecordBatch<'input> {
@@ -92,7 +92,7 @@ pub fn inspect_record_batch_point<'input, 'retained>(
     Ok(finish_inspection(decoded, log, gate, workspace_limit))
 }
 
-pub(super) fn finish_inspection<'input, 'retained>(
+pub(in crate::log) fn finish_inspection<'input, 'retained>(
     decoded: DecodedRequest<'input>,
     log: LogIdentity,
     gate: RequestGate<'retained>,

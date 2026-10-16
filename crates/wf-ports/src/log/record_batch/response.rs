@@ -26,7 +26,10 @@ pub(super) fn encode(
     Ok((bytes, RetainedStatus::IndexedRejected(*reason)))
 }
 
-fn push_rejection(bytes: &mut Vec<u8>, reason: IndexRejection) -> Result<(), CodecError> {
+pub(in crate::log) fn push_rejection(
+    bytes: &mut Vec<u8>,
+    reason: IndexRejection,
+) -> Result<(), CodecError> {
     bytes.push(1);
     match reason {
         IndexRejection::InvalidPriority => bytes.extend_from_slice(&[4, 0]),
@@ -175,7 +178,7 @@ pub fn record_batch_retained_summary(
     }
 }
 
-fn rejection(response: &[u8]) -> Result<(IndexRejection, usize), CodecError> {
+pub(in crate::log) fn rejection(response: &[u8]) -> Result<(IndexRejection, usize), CodecError> {
     if response.first() != Some(&1) {
         return Err(CodecError::UnsupportedTag);
     }

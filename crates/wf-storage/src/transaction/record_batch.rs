@@ -6,8 +6,9 @@ use wf_domain::workflow::request::RequestScope;
 use wf_domain::workflow::request::gate::PointGateView;
 use wf_ports::log::{
     RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, RecordBatchInspection,
-    inspect_independent_record_batch_point, inspect_record_batch_point,
-    prepare_independent_record_batch, prepare_record_batch,
+    inspect_independent_record_batch_point, inspect_public_mutation_point,
+    inspect_record_batch_point, prepare_independent_record_batch, prepare_public_mutation,
+    prepare_record_batch,
 };
 use wf_ports::state::{
     GroupApplyChanges, GroupApplyStore, GroupApplyTransaction, StateTransactionError,
@@ -19,6 +20,13 @@ use super::observations;
 use super::{
     RecordBatchTransactionError, RecordBatchTransactionLimits, RecordBatchTransactionOutcome,
 };
+
+#[derive(Clone, Copy)]
+enum RecordBatchProfile {
+    Atomic,
+    Independent,
+    Public,
+}
 
 /// Applies one private batch under one coherent transaction and retained gate.
 ///
@@ -35,7 +43,14 @@ pub fn apply_record_batch_transaction<S: GroupApplyStore>(
     log: LogIdentity,
     limits: RecordBatchTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
-    apply(store, expected_scope, encoded, log, limits, false)
+    apply(
+        store,
+        expected_scope,
+        encoded,
+        log,
+        limits,
+        RecordBatchProfile::Atomic,
+    )
 }
 
 /// Applies one verified V6 vector with final-once records and every history.
@@ -49,7 +64,34 @@ pub fn apply_independent_record_batch_transaction<S: GroupApplyStore>(
     log: LogIdentity,
     limits: RecordBatchTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
-    apply(store, expected_scope, encoded, log, limits, true)
+    apply(
+        store,
+        expected_scope,
+        encoded,
+        log,
+        limits,
+        RecordBatchProfile::Independent,
+    )
+}
+
+/// Applies one public-V1 item under the same exclusive gate and consumed commit.
+/// # Errors
+/// Profile, caller evidence, authority, budgets or unproved commit return no reply.
+pub fn apply_public_mutation_transaction<S: GroupApplyStore>(
+    store: &mut S,
+    expected_scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: RecordBatchTransactionLimits,
+) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
+    apply(
+        store,
+        expected_scope,
+        encoded,
+        log,
+        limits,
+        RecordBatchProfile::Public,
+    )
 }
 
 fn apply<S: GroupApplyStore>(
@@ -58,7 +100,7 @@ fn apply<S: GroupApplyStore>(
     encoded: &[u8],
     log: LogIdentity,
     limits: RecordBatchTransactionLimits,
-    independent: bool,
+    profile: RecordBatchProfile,
 ) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
     let live = live_bytes(limits)?;
     let available =
@@ -69,10 +111,12 @@ fn apply<S: GroupApplyStore>(
                 attempted: live,
                 maximum: limits.workspace_bytes,
             })?;
-    let decoded = if independent {
-        prepare_independent_record_batch(encoded, limits.codec, available)?
-    } else {
-        prepare_record_batch(encoded, limits.codec, available)?
+    let decoded = match profile {
+        RecordBatchProfile::Independent => {
+            prepare_independent_record_batch(encoded, limits.codec, available)?
+        }
+        RecordBatchProfile::Atomic => prepare_record_batch(encoded, limits.codec, available)?,
+        RecordBatchProfile::Public => prepare_public_mutation(encoded, limits.codec, available)?,
     };
     if &decoded.request().scope != expected_scope {
         return Err(RecordBatchApplyError::Apply(ApplyError::InvalidAuthority).into());
@@ -94,16 +138,20 @@ fn apply<S: GroupApplyStore>(
         outcome: original.as_ref(),
         retained_nonempty,
     };
-    let inspection = if independent {
-        inspect_independent_record_batch_point(
+    let inspection = match profile {
+        RecordBatchProfile::Independent => inspect_independent_record_batch_point(
             decoded,
             log,
             view,
             limits.codec,
             limits.workspace_bytes,
-        )?
-    } else {
-        inspect_record_batch_point(decoded, log, view, limits.codec, limits.workspace_bytes)?
+        )?,
+        RecordBatchProfile::Atomic => {
+            inspect_record_batch_point(decoded, log, view, limits.codec, limits.workspace_bytes)?
+        }
+        RecordBatchProfile::Public => {
+            inspect_public_mutation_point(decoded, log, view, limits.codec, limits.workspace_bytes)?
+        }
     };
     match inspection {
         RecordBatchInspection::Complete(plan) => {

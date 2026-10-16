@@ -50,7 +50,7 @@ pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest
             command: CommittedCommand {
                 id: RecordId::new(reader::copy(item.id)?).map_err(|_| CodecError::Malformed)?,
                 now: item.now,
-                operation: operation(&mut reader, item.tag)?,
+                operation: operation(&mut reader, item.tag, false)?,
             },
             create_priority: item.priority,
         });
@@ -62,6 +62,8 @@ pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest
         let (phase, filters) = claim::read(&mut reader)?;
         claim_filters = Some(filters);
         PreparedOperation::ClaimPhase(phase)
+    } else if header.operation_tag == 4 {
+        super::public_mutation::read(&mut reader, &isolation, &mut state_keys)?
     } else {
         PreparedOperation::Batch(items)
     };
@@ -76,6 +78,8 @@ pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest
     let record_batch_intent =
         if header.operation_tag == 1 && matches!(header.intent.version(), 5 | 6) {
             record_batch::decoded_intent(&request)
+        } else if header.operation_tag == 4 {
+            super::public_mutation::decoded_intent(&request, encoded, limits)
         } else {
             Err(CodecError::UnsupportedVersion)
         };
@@ -159,12 +163,12 @@ fn retry(reader: &mut Reader<'_>) -> Result<Retry, CodecError> {
         error: bytes(reader)?,
     })
 }
-fn policy_retry(reader: &mut Reader<'_>) -> Result<PolicyRetry, CodecError> {
+fn policy_retry(reader: &mut Reader<'_>, public: bool) -> Result<PolicyRetry, CodecError> {
     Ok(PolicyRetry {
         guard: guard(reader)?,
         run_at: time(reader)?,
         policy_override: retry_override(reader)?,
-        jitter: JitterSample::new(reader.u32()?),
+        jitter: JitterSample::new(if public { 0 } else { reader.u32()? }),
         payload: bytes(reader)?,
         error: bytes(reader)?,
     })
@@ -188,7 +192,11 @@ fn cancel(reader: &mut Reader<'_>) -> Result<Cancel, CodecError> {
         error: bytes(reader)?,
     })
 }
-fn operation(reader: &mut Reader<'_>, tag: u8) -> Result<Operation, CodecError> {
+pub(super) fn operation(
+    reader: &mut Reader<'_>,
+    tag: u8,
+    public: bool,
+) -> Result<Operation, CodecError> {
     Ok(match tag {
         1 => Operation::Create(Create {
             workflow_type: reader.owned()?,
@@ -202,7 +210,7 @@ fn operation(reader: &mut Reader<'_>, tag: u8) -> Result<Operation, CodecError> 
         5 => Operation::Complete(terminal(reader)?),
         6 => Operation::Fail(terminal(reader)?),
         7 => Operation::Retry(retry(reader)?),
-        8 => Operation::RetryWithPolicy(policy_retry(reader)?),
+        8 => Operation::RetryWithPolicy(policy_retry(reader, public)?),
         9 => Operation::ExtendLease(ExtendLease {
             guard: guard(reader)?,
             lease_ms: reader.u64()?,

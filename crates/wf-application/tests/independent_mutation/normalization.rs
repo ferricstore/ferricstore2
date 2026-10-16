@@ -131,8 +131,8 @@ fn terminal_many_normalizes_all_before_effects() -> TestResult {
         )
         .is_err()
     );
-    assert!(port.events.is_empty());
-    assert!(port.frames.is_empty());
+    assert_eq!(port.events, [] as [&str; 0]);
+    assert_eq!(port.frames, [] as [Vec<u8>; 0]);
     assert!(matches!(
         submit_independent_mutations(
             many(&[], MutationReplyMode::Items),
@@ -141,7 +141,7 @@ fn terminal_many_normalizes_all_before_effects() -> TestResult {
         ),
         Err(MutationCallerError::EmptyMany)
     ));
-    assert!(port.events.is_empty());
+    assert_eq!(port.events, [] as [&str; 0]);
     unsupported_routes(&scope, &x)?;
     let rich = [
         ("lease_token", MutationFieldValue::Bytes(b"l")),
@@ -160,7 +160,7 @@ fn terminal_many_normalizes_all_before_effects() -> TestResult {
         )
         .is_err()
     );
-    assert!(port.events.is_empty());
+    assert_eq!(port.events, [] as [&str; 0]);
     assert_eq!(port.frames.len(), 0);
     Ok(())
 }
@@ -188,7 +188,7 @@ fn unsupported_routes(scope: &RequestScope, request: &RequestId) -> TestResult {
             reply.items()[0].status(),
             MutationItemStatus::LocalError(MutationCallerError::UnsupportedFeature(_))
         ));
-        assert!(port.events.is_empty());
+        assert_eq!(port.events, [] as [&str; 0]);
         let call = IndependentMutationCall::TerminalMany {
             operation,
             base_partition: Some(b"p"),
@@ -199,7 +199,7 @@ fn unsupported_routes(scope: &RequestScope, request: &RequestId) -> TestResult {
         assert!(
             submit_independent_mutations(call, &mut port, MutationCallLimits::default()).is_err()
         );
-        assert!(port.events.is_empty());
+        assert_eq!(port.events, [] as [&str; 0]);
     }
     let fields = fields();
     let items = [MutationItemInput {
@@ -220,7 +220,7 @@ fn unsupported_routes(scope: &RequestScope, request: &RequestId) -> TestResult {
         )
         .is_err()
     );
-    assert!(port.events.is_empty());
+    assert_eq!(port.events, [] as [&str; 0]);
     Ok(())
 }
 
@@ -260,8 +260,8 @@ fn limits_precede_effects() -> TestResult {
             submit_independent_mutations(many(&items, MutationReplyMode::Items), &mut port, limits)
                 .is_err()
         );
-        assert!(port.events.is_empty());
-        assert!(port.frames.is_empty());
+        assert_eq!(port.events, [] as [&str; 0]);
+        assert_eq!(port.frames, [] as [Vec<u8>; 0]);
     }
     let mut port = probe();
     let limits = MutationCallLimits {
@@ -310,7 +310,7 @@ fn repeated_common_and_maximum_inline() -> TestResult {
         assert_eq!(result.is_ok(), succeeds);
         assert_eq!(port.frames.len(), if succeeds { 2 } else { 0 });
         if !succeeds {
-            assert!(port.events.is_empty());
+            assert_eq!(port.events, [] as [&str; 0]);
         }
     }
     let payload = vec![b'v'; MIB];
@@ -353,6 +353,7 @@ fn repeated_common_and_maximum_inline() -> TestResult {
 fn ingress_whole_call_limits_precede_clock_and_submit() -> TestResult {
     limits_precede_effects()?;
     oversized_raw_options_refuse_before_effects()?;
+    late_measured_profile_refuses_before_effects()?;
     repeated_common_and_maximum_inline()
 }
 
@@ -375,7 +376,41 @@ fn oversized_raw_options_refuse_before_effects() -> TestResult {
         ),
         Err(MutationCallerError::InvalidOptions)
     ));
-    assert!(port.events.is_empty());
-    assert!(port.frames.is_empty());
+    assert_eq!(port.events, [] as [&str; 0]);
+    assert_eq!(port.frames, [] as [Vec<u8>; 0]);
+    Ok(())
+}
+
+fn late_measured_profile_refuses_before_effects() -> TestResult {
+    let scope = scope()?;
+    let x = RequestId::new(b"x".to_vec())?;
+    let y = RequestId::new(b"y".to_vec())?;
+    let mut fields = fields().to_vec();
+    fields.push(("partition_key", MutationFieldValue::Bytes(b"p")));
+    let payload = [b'v'; 64];
+    let mut larger = fields.clone();
+    larger.push(("payload", MutationFieldValue::Bytes(&payload)));
+    let items = [
+        item(&scope, &x, b"i", &fields),
+        item(&scope, &y, b"j", &larger),
+    ];
+    let mut port = probe();
+    let limits = MutationCallLimits {
+        codec: wf_ports::log::CodecLimits::new(AdmissionLimits::new(MIB, 150, 1_000)?),
+        ..MutationCallLimits::default()
+    };
+    // Independent widths: first E117 fits; payload option adds4+64, so E185 refuses.
+    let refused = matches!(
+        submit_independent_mutations(
+            IndependentMutationCall::TerminalPipeline { items: &items },
+            &mut port,
+            limits
+        ),
+        Err(MutationCallerError::RawBytes)
+    );
+    assert_eq!(
+        (refused, port.events.len(), port.frames.len()),
+        (true, 0, 0)
+    );
     Ok(())
 }

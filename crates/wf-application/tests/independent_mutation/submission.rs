@@ -56,9 +56,9 @@ fn terminal_pipeline_keeps_slots_and_stops_after_unknown() -> TestResult {
         &mut port,
         MutationCallLimits::default(),
     )?;
-    assert!(empty.items().is_empty());
+    assert_eq!(empty.items(), []);
     assert!(!empty.is_scalar_ok());
-    assert!(port.events.is_empty());
+    assert_eq!(port.events, [] as [&str; 0]);
     Ok(())
 }
 
@@ -193,7 +193,7 @@ fn corrupt_and_denied_replies() -> TestResult {
         MutationItemStatus::NotSubmitted(MutationNotSubmitted::InvalidScope)
     ));
     assert_eq!(port.events, ["prepare", "submit"]);
-    assert!(port.frames.is_empty());
+    assert_eq!(port.frames, [] as [Vec<u8>; 0]);
     let mut port = probe();
     port.prepare_failure_at = Some(1);
     let reply = submit_independent_mutations(

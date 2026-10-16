@@ -7,8 +7,8 @@ use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::workflow::batch::{ApplyError, BatchItem};
 use wf_domain::workflow::indexed::{
     EntryOrder, IndependentIndexedDecision, IndexedBatchItem, IndexedDecision, IndexedGroupView,
-    TouchedIndexedGroupView, decide_indexed_batch, decide_touched_independent_indexed_batch,
-    decide_touched_indexed_batch,
+    TouchedIndexedGroupView, decide_indexed_batch, decide_public_mutation_touched_indexed_batch,
+    decide_touched_independent_indexed_batch, decide_touched_indexed_batch,
 };
 use wf_types::identity::GroupId;
 use wf_types::version::TimestampMillis;
@@ -97,7 +97,7 @@ pub(super) fn decide<'current>(
     Ok(authority.decide(&items, order, decoded.encoded, limits)?)
 }
 
-pub(super) fn decide_independent<'current>(
+pub(in crate::log) fn decide_independent<'current>(
     decoded: &DecodedRequest<'_>,
     view: TouchedIndexedGroupView<'_, 'current>,
     order: EntryOrder,
@@ -114,7 +114,15 @@ pub(super) fn decide_independent<'current>(
     )?;
     let values = stage_values(decoded, prepared.len())?;
     let items = stage_items(decoded, prepared, &values)?;
-    Ok(decide_touched_independent_indexed_batch(
+    let decide = if matches!(
+        decoded.request.operation,
+        PreparedOperation::PublicMutation { .. }
+    ) {
+        decide_public_mutation_touched_indexed_batch
+    } else {
+        decide_touched_independent_indexed_batch
+    };
+    Ok(decide(
         view,
         &items,
         order,
@@ -130,8 +138,18 @@ fn inputs<'a>(
     workspace: usize,
     additional_live_bytes: usize,
 ) -> Result<&'a [PreparedBatchItem], RecordBatchApplyError> {
-    let PreparedOperation::Batch(prepared) = &decoded.request.operation else {
-        return Err(CodecError::UnsupportedTag.into());
+    let prepared = decoded
+        .request
+        .operation
+        .mutation_items()
+        .ok_or(CodecError::UnsupportedTag)?;
+    let now = if let PreparedOperation::PublicMutation { evidence, .. } = &decoded.request.operation
+    {
+        evidence
+            .requested_now_ms
+            .map_or(decoded.request.stamp.hlc().physical(), TimestampMillis::new)
+    } else {
+        now
     };
     if prepared.iter().any(|item| item.command.now != now) {
         return Err(ApplyError::InvalidAuthority.into());

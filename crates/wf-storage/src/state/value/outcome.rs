@@ -4,7 +4,9 @@ use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{
     ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
 };
-use wf_ports::log::{record_batch_retained_status, record_batch_retained_summary};
+use wf_ports::log::{
+    public_mutation_retained_status, record_batch_retained_status, record_batch_retained_summary,
+};
 use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, LogIdentity, TimestampMillis};
 
@@ -99,7 +101,12 @@ pub fn encode_outcome(
     if maximum_bytes == 0 {
         return Err(StateValueError::InvalidValue);
     }
-    let status = record_batch_retained_status(
+    let parse = if outcome.intent().version() == 1 {
+        public_mutation_retained_status
+    } else {
+        record_batch_retained_status
+    };
+    let status = parse(
         outcome.intent(),
         outcome.response_version(),
         outcome.response(),
@@ -175,12 +182,19 @@ pub fn scan_outcome<'input>(
         return Err(StateValueError::InvalidValue);
     }
     let intent = match intent_version {
+        1 => ClientIntent::new(1, digest).map_err(|_| StateValueError::UnsupportedVersion)?,
         5 => ClientIntent::record_batch(digest),
         6 => ClientIntent::independent_record_batch(digest),
         _ => return Err(StateValueError::UnsupportedVersion),
     };
-    let (status, response_count) =
-        record_batch_retained_summary(intent, response_version, response)?;
+    let (status, response_count) = if intent_version == 1 {
+        (
+            public_mutation_retained_status(intent, response_version, response)?,
+            None,
+        )
+    } else {
+        record_batch_retained_summary(intent, response_version, response)?
+    };
     let mut owned_bytes = 512;
     for field in [tenant, group, recovery, request, response] {
         add(&mut owned_bytes, field.len())?;
