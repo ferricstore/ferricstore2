@@ -36,14 +36,33 @@ pub(super) fn prepare<'a>(
                 items,
                 common,
                 base_partition,
-                Some(operation),
+                (Some(operation), false),
+                limits,
+                callers,
+                results,
+            )
+        }
+        IndependentMutationCall::CreateMany {
+            base_partition,
+            common,
+            items,
+            ..
+        } => {
+            if items.is_empty() {
+                return Err(MutationCallerError::EmptyMany);
+            }
+            prepare_items(
+                items,
+                common,
+                base_partition,
+                (Some("create"), true),
                 limits,
                 callers,
                 results,
             )
         }
         IndependentMutationCall::TerminalPipeline { items } => {
-            prepare_items(items, &[], None, None, limits, callers, results)
+            prepare_items(items, &[], None, (None, false), limits, callers, results)
         }
     }
 }
@@ -65,11 +84,12 @@ fn prepare_items<'a>(
     items: &'a [MutationItemInput<'a>],
     common: &'a [(&'a str, MutationFieldValue<'a>)],
     base: Option<&'a [u8]>,
-    operation: Option<&str>,
+    family: (Option<&str>, bool),
     limits: MutationCallLimits,
     callers: &mut Vec<Result<NormalizedMutation<'a>, MutationCallerError>>,
     results: &mut Vec<MutationItemResult>,
 ) -> Result<usize, MutationCallerError> {
+    let (operation, _) = family;
     let global = preflight(items, common, base, operation, limits)?;
     callers
         .try_reserve_exact(items.len())
@@ -78,7 +98,7 @@ fn prepare_items<'a>(
         .try_reserve_exact(items.len())
         .map_err(|_| MutationCallerError::Allocation)?;
     for item in items {
-        let caller = match normalize_item(item, common, base, operation, limits) {
+        let caller = match normalize_item(item, common, base, family, limits) {
             Ok(caller) => {
                 match measure_public_mutation(item.scope, item.request, &caller, limits.codec) {
                     Ok(encoded) => {
@@ -115,16 +135,17 @@ fn normalize_item<'a>(
     item: &MutationItemInput<'a>,
     common: &'a [(&'a str, MutationFieldValue<'a>)],
     base: Option<&'a [u8]>,
-    operation: Option<&str>,
+    family: (Option<&str>, bool),
     limits: MutationCallLimits,
 ) -> Result<NormalizedMutation<'a>, MutationCallerError> {
+    let (operation, create) = family;
     if let Some(operation) = operation {
-        terminal(operation)?;
+        allowed_operation(operation, create)?;
         if item.input.operation != operation {
             return Err(MutationCallerError::InvalidField("operation"));
         }
     }
-    terminal(item.input.operation)?;
+    allowed_operation(item.input.operation, create)?;
     normalize_core_mutation(
         item.input,
         common,
@@ -134,7 +155,10 @@ fn normalize_item<'a>(
     )
 }
 
-fn terminal(operation: &str) -> Result<(), MutationCallerError> {
+fn allowed_operation(operation: &str, create: bool) -> Result<(), MutationCallerError> {
+    if create && operation == "create" {
+        return Ok(());
+    }
     match operation {
         "complete" | "fail" | "retry" | "cancel" => Ok(()),
         "create" => Err(MutationCallerError::UnsupportedFeature("create")),

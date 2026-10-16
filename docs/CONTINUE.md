@@ -15,30 +15,43 @@ field diagnoses; added controls reproduced each finding before its repair.
 The shared reducer preserves the private explicit-sample path and skips source
 hash work for None backoff or a zero jitter percentage.
 
-Application, public-frame/gate, Changes, physical outcome, driver and native
-ingress tests were frozen with genuine missing-API RED results before their
-implementations. The reviewed scalar terminal ingress now passes all 698 tests
-across 83 workspace targets and six compile-fail examples across 15 documentation
-targets. Formatting, compilation, strict Clippy, rustdoc, architecture, reference
-and progress checks pass. The complete isolated native executable also passes
-formatting, strict Clippy and all eight real process-kill boundaries. Behavioral
-review reproduced dry-measure error origin, public default time, native read-stage
-diagnosis and diagnostic token exposure before their narrow repairs. Final tests
-preserve all 646 combined Rust/manifest inputs; ordinary style repairs preserve
-the complete frozen oracles. Native proof is saved separately at 6a807a68 on
+The reviewed public ingress now also supports independent CreateMany through the
+existing normalization, retained outcome and consumed-transaction path. Every
+item is normalized and measured before effects; duplicates retain ordered,
+independent results. The native fixture exercises the original explicit-partition
+mixed result and automatic-partition 34-slot/33-created scenarios, physical
+history/index/outcome cohorts, original-request replay and database reopen.
+Existing terminal families retain their operation restrictions. See
+ARCH-PUBLIC-CREATE-MANY1-CREATE1 and the reciprocal review records.
+
+Review also reproduced a pre-existing restoration bug: Create accepts terminal
+state names with a due time, but domain restoration and stored-record scanning
+rejected the resulting valid records after acknowledgment. Two narrow validation
+changes admit that combination only with an explicit Created witness. Regression
+tests failed twice before the repair and now cover all three terminal names with
+default and explicit-zero due times, non-Created rejection and native reopen.
+See ARCH-TERMINAL-CREATE-ROUNDTRIP1-CREATE1 and its precision.
+
+The final macOS run passes all 700 Rust tests across 83 workspace targets and six
+compile-fail examples across 15 documentation targets, with no failures or ignored
+tests. Formatting, compilation, strict Clippy, warnings-denied rustdoc and
+reference/progress checks pass. The complete isolated native executable also
+passes formatting, strict Clippy and all eight real process-kill boundaries.
+All 648 combined source/manifest inputs remained unchanged during verification.
+The exact 17-file native proof is saved at f8ec8443 on
 codex/workflow-record-batch-native-proof. Registry dependencies are unchanged;
 the earlier online advisory-refresh DNS failure is not a successful fresh audit.
-Public submission/retention, original setup/runtime profiles,
-production backend/consensus integration, Linux execution and full M1–M8 parity
-remain required. See ARCH-PUBLIC-MUTATION-INGRESS1-CREATE1 and its review records.
 
-This application family supports independent Complete, Fail, source-policy Retry
-and Cancel with per-slot original request scope, retained outcomes and a stopped
-suffix after uncertainty. Whole-call raw/profile/frame preflight precedes every
-effect. Rich individual Create/Transition/Extend replies, independent create-many,
-current authorization and supervised runtime integration remain successors. The
-next source-derived create-many candidate is under architecture/performance
-review; this increment establishes no milestone exit or full-source parity.
+Ledger counts remain 82 source-derived declarations, 92 counterpart mappings and
+365 assertion links. Runtime reconciliation still has 1,681 unmatched cases and
+1,655 unresolved declarations; these component checks confer no new full-source
+parity credit. Original setup/runtime profiles, production backend/consensus
+integration, Linux execution and full M1–M8 parity remain required. Architecture
+and performance are assessing the earliest real M2 log/snapshot/recovery
+prerequisite against the existing OpenRaft/redb spike. That successor remains
+read-only and unselected. Rich individual Create/Transition/Extend replies,
+current authorization and supervised runtime integration also remain required;
+this increment establishes no milestone exit or full-source parity.
 
 The current increment implements the private V6 independent batch bridge through
 the same preparation, one retained gate, Fresh decision and consumed transaction

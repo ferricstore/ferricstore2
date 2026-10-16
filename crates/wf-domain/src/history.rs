@@ -88,7 +88,7 @@ pub struct HistoryEntry {
     pub attempts: u64,
     /// Lifecycle state after this event.
     pub state: Vec<u8>,
-    /// Due or lease deadline after this event; absent for terminal states.
+    /// Stored due or lease deadline; dedicated terminal effects clear it.
     pub next_run_at: Option<TimestampMillis>,
     /// Source-compatible zero when no lease exists.
     pub lease_deadline: TimestampMillis,

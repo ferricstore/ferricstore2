@@ -1,4 +1,4 @@
-//! Bounded terminal callers, prepared and submitted independently in source order.
+//! Bounded callers, prepared and submitted independently in source order.
 //!
 //! Authorization and supervised completion belong to the supplied submission
 //! capability. These values do not establish a production runtime or durability.
@@ -25,7 +25,7 @@ pub struct MutationItemInput<'a> {
     pub input: MutationInput<'a>,
 }
 
-/// Source-natural terminal families, without an aggregate durable identity.
+/// Source-natural independent families, without an aggregate durable identity.
 #[derive(Clone, Copy, Debug)]
 pub enum IndependentMutationCall<'a> {
     /// Normalize every item before any effect; an invalid item refuses the call.
@@ -37,6 +37,17 @@ pub enum IndependentMutationCall<'a> {
         /// Common options, charged once for each original item before overrides.
         common: &'a [(&'a str, MutationFieldValue<'a>)],
         /// Original ordered caller slots.
+        items: &'a [MutationItemInput<'a>],
+        /// Presentation choice, excluded from each mutation's intent.
+        reply: MutationReplyMode,
+    },
+    /// Normalize every create before any effect, retaining independent results.
+    CreateMany {
+        /// Explicit inherited partition, or semantic automatic partitioning.
+        base_partition: Option<&'a [u8]>,
+        /// Common options, charged once for each original item before overrides.
+        common: &'a [(&'a str, MutationFieldValue<'a>)],
+        /// Original ordered create slots, including repeated workflow IDs.
         items: &'a [MutationItemInput<'a>],
         /// Presentation choice, excluded from each mutation's intent.
         reply: MutationReplyMode,
@@ -193,6 +204,9 @@ pub fn submit_independent_mutations<P: MutationSubmitPort>(
     let scalar_requested = matches!(
         call,
         IndependentMutationCall::TerminalMany {
+            reply: MutationReplyMode::OkOnSuccess,
+            ..
+        } | IndependentMutationCall::CreateMany {
             reply: MutationReplyMode::OkOnSuccess,
             ..
         }

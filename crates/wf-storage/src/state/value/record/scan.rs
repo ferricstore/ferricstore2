@@ -133,7 +133,8 @@ impl ScannedWorkflowRecord<'_> {
             || self.updated > MAX_EXACT_MILLIS
             || self.run_state.is_some_and(<[u8]>::is_empty)
             || (matches!(self.state, b"completed" | b"failed" | b"cancelled")
-                && self.next.is_some())
+                && self.next.is_some()
+                && self.latest.0 != EventKind::Created)
             || self.lease.is_some_and(|(worker, token, deadline)| {
                 worker.is_empty()
                     || token.is_empty()

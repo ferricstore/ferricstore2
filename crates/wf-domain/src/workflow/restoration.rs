@@ -102,7 +102,9 @@ fn validate_record_data(data: &WorkflowRecordData) -> Result<(), ActiveValueErro
         || data.latest_fence != data.fence
         || data.run_state.as_ref().is_some_and(Vec::is_empty)
         || (data.state != b"running" && data.lease.is_some())
-        || (terminal_state(&data.state) && data.next_run_at.is_some())
+        || (terminal_state(&data.state)
+            && data.next_run_at.is_some()
+            && data.latest_kind != EventKind::Created)
         || data
             .lease
             .as_ref()

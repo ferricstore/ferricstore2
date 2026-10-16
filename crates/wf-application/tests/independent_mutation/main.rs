@@ -29,6 +29,7 @@ use wf_types::version::{
     AppliedPosition, CommittedTime, HlcTimestamp, LogIdentity, TimestampMillis,
 };
 
+mod create_many;
 mod normalization;
 mod submission;
 

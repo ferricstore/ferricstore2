@@ -256,7 +256,7 @@ fn public_core_caller_defaults_guards_and_feature_refusals() -> TestResult {
     input_limits()?;
     schema_errors();
     diagnostic_tokens_are_redacted()?;
-    Ok(())
+    terminal_creates_restore()
 }
 
 fn reserved_types() {
@@ -338,5 +338,73 @@ fn diagnostic_tokens_are_redacted() -> TestResult {
     let decimal = format!("{secret:?}");
     let exposed = rendered.map(|value| value.contains(ascii) || value.contains(&decimal));
     assert_eq!(exposed, [false; 6]);
+    Ok(())
+}
+
+fn restore_with_kind(
+    record: &WorkflowRecord,
+    kind: wf_domain::history::EventKind,
+) -> Result<WorkflowRecord, wf_domain::workflow::active::ActiveValueError> {
+    restore_record(
+        WorkflowRecordData {
+            id: record.id().clone(),
+            workflow_type: record.workflow_type().to_vec(),
+            state: record.state().to_vec(),
+            version: record.version(),
+            fence: record.fence(),
+            attempts: record.attempts(),
+            created_at: record.created_at(),
+            updated_at: record.updated_at(),
+            next_run_at: record.next_run_at(),
+            run_state: record.run_state().map(<[u8]>::to_vec),
+            lease: record.lease().cloned(),
+            payload: record.payload().map(<[u8]>::to_vec),
+            result: record.result().map(<[u8]>::to_vec),
+            error: record.error().map(<[u8]>::to_vec),
+            latest_kind: kind,
+            latest_version: record.version(),
+            latest_fence: record.fence(),
+        },
+        AdmissionLimits::default(),
+    )
+}
+
+fn terminal_creates_restore() -> TestResult {
+    use wf_domain::history::EventKind;
+    for state in [b"completed".as_slice(), b"failed", b"cancelled"] {
+        for run_at in [None, Some(TimestampMillis::new(0))] {
+            let record = reduce(
+                None,
+                &CommittedCommand {
+                    id: RecordId::new(b"i".to_vec())?,
+                    now: TimestampMillis::new(1_000),
+                    operation: Operation::Create(Create {
+                        workflow_type: b"r".to_vec(),
+                        state: state.to_vec(),
+                        run_at,
+                        payload: None,
+                    }),
+                },
+            )?
+            .into_parts()
+            .1
+            .ok_or("terminal create absent")?
+            .record;
+            assert_eq!(
+                record.next_run_at(),
+                Some(run_at.unwrap_or(TimestampMillis::new(1_000)))
+            );
+            assert_eq!(with_attempts(&record, 0)?, record);
+            assert_eq!(restore_with_kind(&record, EventKind::Created)?, record);
+            for kind in [
+                EventKind::Completed,
+                EventKind::Failed,
+                EventKind::Cancelled,
+                EventKind::Retry,
+            ] {
+                assert!(restore_with_kind(&record, kind).is_err());
+            }
+        }
+    }
     Ok(())
 }

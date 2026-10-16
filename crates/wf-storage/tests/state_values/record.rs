@@ -188,7 +188,84 @@ fn core_record_vectors_roundtrip_reducer_and_latest_witness() -> TestResult {
     );
     assert_eq!(retried.attempts(), 1);
     assert_eq!(retried.error(), Some(b"".as_slice()));
-    roundtrip(retried, 5)
+    roundtrip(retried, 5)?;
+    terminal_creates_roundtrip()
+}
+
+fn terminal_creates_roundtrip() -> TestResult {
+    use wf_domain::workflow::request::RequestScope;
+    use wf_storage::state::value::{scan_record_point, scan_record_point_profiled};
+    let group = GroupId::new(b"g\0\xff".to_vec())?;
+    let recovery = RecoveryId::new(b"z\0\xff".to_vec())?;
+    let limits = AdmissionLimits::default();
+    for state in [b"completed".as_slice(), b"failed", b"cancelled"] {
+        for run_at in [None, Some(TimestampMillis::new(0))] {
+            let record = changed(
+                None,
+                1_000,
+                Operation::Create(Create {
+                    workflow_type: b"r".to_vec(),
+                    state: state.to_vec(),
+                    run_at,
+                    payload: None,
+                }),
+            )?;
+            assert_eq!(
+                record.next_run_at(),
+                Some(run_at.unwrap_or(TimestampMillis::new(1_000)))
+            );
+            roundtrip(record.clone(), 0)?;
+            let owner = stored(record)?;
+            let scope = RequestScope::new(owner.tenant.clone(), group.clone(), recovery.clone());
+            let bytes = encode_record(&group, &recovery, &owner, limits, 1_024 * 1_024)?;
+            assert_eq!(
+                scan_record_point(
+                    &bytes,
+                    &scope,
+                    &owner.partition,
+                    owner.record.id(),
+                    limits,
+                    1_024 * 1_024
+                )?
+                .into_owned(1_024 * 1_024)?,
+                owner
+            );
+            assert_eq!(
+                scan_record_point_profiled(
+                    &bytes,
+                    &scope,
+                    &owner.partition,
+                    owner.record.id(),
+                    limits,
+                    1_024 * 1_024
+                )?
+                .into_owned(1_024 * 1_024)?,
+                owner
+            );
+            // Only the exact final event tag changes: Completed, Failed, Retry, Cancelled.
+            for kind in [3, 4, 5, 7] {
+                let mut bad = bytes.clone();
+                let at = bad.len() - 17;
+                bad[at] = kind;
+                assert_eq!(
+                    decode_record(&bad, &group, &recovery, limits, 1_024 * 1_024),
+                    Err(StateValueError::InvalidValue)
+                );
+                assert!(matches!(
+                    scan_record_point_profiled(
+                        &bad,
+                        &scope,
+                        &owner.partition,
+                        owner.record.id(),
+                        limits,
+                        1_024 * 1_024
+                    ),
+                    Err(StateValueError::InvalidValue)
+                ));
+            }
+        }
+    }
+    Ok(())
 }
 
 #[test]
