@@ -36,7 +36,18 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 77 source declarations, 87 counterpart records and 326 assertion links.
+increments: 79 source declarations, 89 counterpart records and 335 assertion links.
+Two independent-transition counterparts add nine direct component links: ordered
+stale-lease/cardinality/body and unchanged/successful state, then initial queued
+state, duplicate-pipeline cardinality and final processing/version3. Both success
+helpers execute; the direct cardinality anchor does not alone prove their results.
+The complete fixtures retain original positive-colon namespaces, guards and run
+times. They expose owned proposed writes, without executing public get replies,
+independent durable publication, indexed effects or original setup/runtime profiles.
+All 5,856 other declaration records and every runtime identity are preserved;
+the two new source runtime IDs remain unresolved. Four tests pass on first
+execution after twice-reproduced missing-API RED. This is component progress;
+full original scenarios, independent Linux and full workflow parity remain open.
 The four bulk fail/complete counterparts add only ordered IDs, terminal states,
 and both original running/version2 observations after guard refusal. Real private
 bytes reach the indexed decision and retained response; physical references,

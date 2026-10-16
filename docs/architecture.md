@@ -981,3 +981,20 @@ The concrete redb implementation remains an isolated real-backend acceptance
 experiment until dependency adoption and both-host/runtime gates pass. Its
 whole-cohort and process-kill oracles establish no production deployment,
 consensus integration, source/setup/profile parity or M2 exit before execution.
+
+## Pure independent transition component
+
+The domain's batch/independent child reuses the existing single-record reducer
+for ordered same-group transitions. Each success sees the preceding successful
+write for its partition/ID; errors and legacy no-ops preserve that predecessor.
+The result owns its ordered proposals/errors, while a whole resource refusal
+exposes none. The original atomic batch and its duplicate-ID rule stay unchanged.
+
+A borrowed latest-write index avoids whole-group or prior-plan cloning and drops
+before output ownership transfers. Cumulative admission accounts for every
+evolving predecessor before copies; see
+[ADR004](adr/004-committed-time-and-apply-admission.md#independent-transition-plan-admission).
+This pure component does not connect the physical Batch5 transaction driver or
+implement indexed effects, wire/retained replies, independent durable publication
+or original service/setup/runtime profiles. Those remain required successors;
+component assertion links establish no full source-case parity or milestone exit.

@@ -438,3 +438,28 @@ refusals and four real process-kill cut points require executed backend evidence
 Initial control is atomically seeded with fixture policy/placement; later missing
 control is Corrupt, including for a new tenant. No in-memory fallback, reset
 counter or business retention of an operational refusal is selected.
+
+## Independent transition plan admission
+
+ARCH-M1-INDEPENDENT-TRANSITIONS1-CREATE1 selects a pure ordered transition
+component distinct from atomic batches. Individual reducer errors remain ordered
+results; a later profile refusal exposes no provisional plan. Count, actual wire,
+all placements and the transition-only operation profile are checked before
+record copies. Empty input under the wire cap returns an empty accepted result.
+
+Before output reserve or lookup insertion, admit checked1152n: existing1024n
+plan/result work plus separate128n borrowed latest-write descriptors. Each reached
+item adds actual admitted command/key/value bytes, copied partition bytes and the
+ACTUAL evolving predecessor to cumulative V. Require4V+1152n under the same
+decision cap BEFORE reduce/history/partition copies. Earlier successful owners
+stay live; inherited payload is charged again when copied into a later record.
+The one-byte i/r/p/k queued-to-ready-to-processing fixture gives V47 and exact2492,
+tight2491. First-only payload256 gives V559 and exact4540, tight4539.
+
+The local lookup borrows original item keys and stores indices only for real
+successful writes. Errors/no-ops retain the previous index; execution follows
+input order. Predecessor borrows end before result insertion and the lookup drops
+before the fully owned Vec returns. Existing reducer/identity/map allocation
+semantics remain unchanged. This logical tariff certifies no native layout, RSS,
+CPU/latency or durable independent publication; those need their own adapters and
+executed original profiles on Linux and macOS.

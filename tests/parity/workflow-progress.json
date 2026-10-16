@@ -20792,12 +20792,94 @@
     {
       "source_declaration_id": "67e5682f41dbbb5b",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-67e5682f41dbbb5b",
+          "rust_file": "crates/wf-domain/tests/independent_transitions.rs",
+          "rust_file_sha256": "952827f26aa356314566f23ed78d2f40898ea9507327379e4c266893902e764c",
+          "rust_module": "",
+          "rust_function": "independent_transition_many_keeps_success_after_stale_guard",
+          "assertions": [
+            {
+              "source_line": 560,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 138,
+              "rust_text": "assert_eq!(plan.results().len(), 2);"
+            },
+            {
+              "source_line": 560,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 139,
+              "rust_text": "assert_eq!(plan.results()[0], Err(DomainError::StaleLease));"
+            },
+            {
+              "source_line": 560,
+              "source_text": "assert {:ok, [{:error, \"ERR stale flow lease\"}, :ok]} =",
+              "rust_line": 140,
+              "rust_text": "assert_eq!(DomainError::StaleLease.to_string(), \"ERR stale flow lease\");"
+            },
+            {
+              "source_line": 573,
+              "source_text": "assert {:ok, %{state: \"queued\"}} = FerricStore.flow_get(id_a, partition_key: partition)",
+              "rust_line": 141,
+              "rust_text": "assert_eq!(bad.state(), b\"queued\");"
+            },
+            {
+              "source_line": 574,
+              "source_text": "assert {:ok, %{state: \"ready\"}} = FerricStore.flow_get(id_b, partition_key: partition)",
+              "rust_line": 148,
+              "rust_text": "assert_eq!(written.record.state(), b\"ready\");"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure independent-transition components preserve original positive-colon partition/type/ID prefixes, queued creation/run1000, bad-first fencing1 and good-second fencing0, ready run2000, ordered StaleLease/Ok outcomes and exact ERR stale flow lease body. Five direct macros link only source560 cardinality/error/body and source573/574 state components. No successful plan exists for bad; its borrowed original stays queued, while the good proposed write is ready. This is not a physical flow_get/nonoverwrite or public compound reply assertion. Typed successful Create fixtures replace original create_many/hydrate setup; source551 public creation, routing/placement provenance, indexed FIFO/priority effects, independent durable publication/history, wire/response encoding, FlowTest async:false/flow/global_state/120000/live-shard/FLUSHDB cleanup and every required original runtime profile remain open. Runtime case identity remains unresolved. Supplemental admission, no-op, partition, ownership and cumulative payload controls add no source links. Genuine precise missing-API RED twice preceded production; all four selected tests passed first execution on macOS. These component links do not establish full source-case/workflow parity, measured native performance or independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "5c2bdf9abea86479",
       "runtime_case_ids": [],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-5c2bdf9abea86479",
+          "rust_file": "crates/wf-domain/tests/independent_transitions.rs",
+          "rust_file_sha256": "952827f26aa356314566f23ed78d2f40898ea9507327379e4c266893902e764c",
+          "rust_module": "",
+          "rust_function": "independent_transition_pipeline_preserves_duplicate_order",
+          "assertions": [
+            {
+              "source_line": 583,
+              "source_text": "assert {:ok, %{state: \"queued\"}} =",
+              "rust_line": 162,
+              "rust_text": "assert_eq!(record.state(), b\"queued\");"
+            },
+            {
+              "source_line": 591,
+              "source_text": "assert [:ok, :ok] =",
+              "rust_line": 180,
+              "rust_text": "assert_eq!(plan.results().len(), 2);"
+            },
+            {
+              "source_line": 597,
+              "source_text": "assert {:ok, %{state: \"processing\", version: 3}} =",
+              "rust_line": 187,
+              "rust_text": "assert_eq!(last.record.state(), b\"processing\");"
+            },
+            {
+              "source_line": 597,
+              "source_text": "assert {:ok, %{state: \"processing\", version: 3}} =",
+              "rust_line": 188,
+              "rust_text": "assert_eq!(last.record.version(), 3);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure independent pipeline preserves original positive-colon partition/type/ID prefixes and actual queued creation, then ordered queued-to-ready and ready-to-processing with fencing0 and both successful results. Four direct macros link only source583 initial-state component, source591 exact result cardinality (both success helpers additionally execute), and source597 final processing/version3 components. Proposed predecessor versions1/2 and intermediate ready/version2 are supplemental. Fixed explicit2000/3000 replace only unasserted clocks; original run1000 is retained. Owned plans and an in-memory initial GroupView replace source Instance/Router/state-machine/public create/get calls; aliases/default input normalization, physical/index/history changes, distributed grouping, durable independent publication, FlowTest async:false/flow/global_state/120000/live-shard/FLUSHDB setup/cleanup and every required original runtime profile remain open. Runtime case identity remains unresolved and no IDs are invented. The atomic duplicate-ID refusal stays separate. Genuine precise missing-API RED twice preceded production; all four selected tests passed first execution on macOS. This partial component mapping does not certify the complete source case, full workflow parity, native resource gains or independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "d97fb8ac7d732cb2",

@@ -14,7 +14,11 @@ use super::{
 };
 
 mod authority;
+mod independent;
 pub(super) use authority::{BatchAuthority, observed_current};
+pub use independent::{
+    IndependentTransitionDecision, IndependentTransitionPlan, decide_independent_transition_batch,
+};
 
 /// Borrowed group-local authoritative placement/current-record view.
 ///

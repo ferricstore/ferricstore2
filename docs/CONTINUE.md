@@ -5,7 +5,29 @@ increment below. GPT-6.1-sol/max owners are completing the remaining milestones
 and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
 writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The joined record-batch transaction driver now preserves complete policy backing,
+Pure independent transitions now preserve ordered per-item failures and successes,
+including repeated IDs consuming the latest successful proposed record. Errors and
+legacy no-ops retain that predecessor; the existing atomic batch stays unchanged.
+Outputs own every proposed partition/core/history value after input donors drop.
+Cumulative evolving-owner admission precedes each copy, with a separate borrowed
+lookup descriptor allowance and no whole-group clone. The four selected tests
+passed on their first assertion execution after precise missing-API RED twice.
+
+The final macOS wrapper passes 670 Rust tests across 77 targets plus six
+compile-fail docs, with zero warnings/failures/ignored tests. Formatting,
+compilation, strict Clippy, rustdoc, architecture and reference/progress checks
+pass on 1,175 unchanged non-review inputs. The wrapper exits 1 solely because
+GitHub DNS blocks its default advisory refresh; the separate cached October 14
+audit passes all four categories. Actual source and reciprocal architecture/
+performance reviews accept this increment. Nine direct component assertion links
+add two previously unmapped source declarations: ledger counts are 79/89/335.
+All 5,856 other declaration records and every runtime identity remain unchanged;
+the two new runtime IDs remain unresolved. Public/indexed/durable independent
+publication, original setup/runtime profiles, native Linux and full M1–M8/workflow
+parity remain open. See ARCH-M1-INDEPENDENT-TRANSITIONS1-CREATE1 and the active
+review records; this component does not establish a milestone exit.
+
+The preceding joined record-batch driver preserves complete policy backing,
 independent query owners, cumulative R/S/C accounting, actual operational prefetch
 precedence and owned responses after consumed commit. Frozen product/native
 oracles failed twice for the precise missing APIs/files before source release.
