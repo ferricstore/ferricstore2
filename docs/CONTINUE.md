@@ -1,48 +1,66 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-16. The active full-completion goal follows the saved
-increment below. GPT-6.1-sol/max owners are completing the remaining milestones
-and compiler-backed test lineage, with dedicated architecture/performance review and disjoint
-writes. See [the active coordination record](reviews/workflow-completion-coordination.md).
+Updated: 2026-10-19. The active full-completion goal continues beyond this reviewed
+increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
+performance review and disjoint writes. See
+[the active coordination record](reviews/workflow-completion-coordination.md).
 
-The scoped synchronous durable Raft log now has its first complete implementation
-and passing disk tests. It preserves opaque entry ownership, checks full overlap
-identity/body, protects the committed prefix and validates strict bounded recovery.
-Actual delegated-sync faults and eight acknowledged process-kill stages exercise
-the same production path. Two added regressions failed before their narrow repairs:
-backend-incompatible entry limits and physical engine corruption diagnosis.
-Architecture and performance independently reviewed the implementation and repairs.
+The scoped synchronous durable log now has a product state-store counterpart.
+RedbStateStore implements the existing GroupApplyStore through explicit bounded
+genesis, strict noncreating recovery and one exclusive consumed Immediate writer.
+It binds namespace/bootstrap data, validates local placement and complete
+bidirectional due/FIFO authority, and atomically publishes records, indexes,
+history, retained outcomes and control for the existing V5/V6/public1 drivers.
+Genesis donor admission and recovery/read/output accounts are prospective and
+cumulative. Fatal uncertainty/corruption/unavailability fences the same store.
+See [architecture](architecture.md#scoped-synchronous-state-authority),
+[ADR-004](adr/004-committed-time-and-apply-admission.md#scoped-state-store-admission)
+and [ADR-007](adr/007-durable-log-storage.md).
 
-The final macOS snapshot passes all 708 Rust tests across 84 workspace targets and
-six compile-fail examples across 15 documentation targets, with zero failures or
-ignored tests. Formatting, all-target compilation, strict Clippy, warnings-denied
-rustdoc and reference/progress checks pass. The full-workspace cached dependency
-audit passes advisories, bans, licenses and sources without exclusions or waivers;
-this is not a fresh online advisory refresh. All 660 selected source, manifest and
-policy inputs remain unchanged during validation. See
-[ADR-007](adr/007-durable-log-storage.md) and the coordination record for actual
-RED/GREEN evidence, source qualification and remaining gates.
+All six substantive state-store test identities pass, including full independent
+physical cohorts, maximum binary/value profiles, strict indexes, delegated-sync
+failure/reconciliation and eight real boundary kills. Four kills occur before
+sync with no business acknowledgment; four occur after successful return/ACK.
+These are process-termination checks, not power-loss or Linux evidence. Three
+separate regression controls failed before narrow repairs: applied clocks below
+immutable genesis, a valid policy exceeding a smaller state-count profile, and
+count2 retained output reaching a real batch1 guard. Preimplementation missing-API
+RED and pre-freeze fixture corrections are recorded separately. Architecture and
+performance reviewed the actual source and each other's findings; style repairs
+preserve complete frozen oracles through executed whole-file inverses.
 
-The existing native acceptance executable also passes pinned formatting,
+The final macOS snapshot passes **714 Rust tests across 85 workspace targets**
+and six compile-fail examples across 15 documentation targets, with zero failures
+or ignored tests. Formatting, all-target compilation, strict Clippy,
+warnings-denied rustdoc and reference/progress checks pass. The full-workspace
+cached dependency audit passes advisories, bans, licenses and sources without
+exclusions or waivers; this is not a fresh online advisory refresh. All 685 selected
+Rust/manifest/policy/style inputs remain unchanged throughout validation.
+
+The existing isolated native acceptance executable also passes pinned formatting,
 compilation, strict Clippy and its complete persistence/reopen/process-kill cases.
-All 677 combined product/native inputs remain unchanged. Its 15 Rust files are
-identical to the prior proof; only the storage sha2 lock edge changed. The exact
-17-file proof is saved at 55bcbd85 on codex/workflow-record-batch-native-proof.
-Both use canonical redb 4.4.0 commit
-7061f7e60d4573311c0636e161d417b93e9fd2b1, no-default/std only. Local offline
-validation uses CARGO_HOME=/private/tmp/ferricstore2-m2-durable-log-cargo-home,
-seeded from verified upstream objects; product manifests retain the upstream pin.
+All 702 combined product/native inputs remain unchanged. Its exact 17 files,
+including all 15 Rust sources, are identical to proof 55bcbd85 on
+codex/workflow-record-batch-native-proof; no new native proof source was needed.
+Both use canonical redb 4.4.0 commit 7061f7e60d4573311c0636e161d417b93e9fd2b1,
+no-default/std only. Offline validation uses
+CARGO_HOME=/private/tmp/ferricstore2-m2-durable-log-cargo-home, seeded from verified
+upstream objects; product manifests retain the upstream pin.
 
-The next real M2 predecessor is product authoritative state-store adoption through
-the existing GroupApplyStore and ControlState, with explicit bounded genesis and
-strict open. Its concrete contract is under read-only peer consultation; no
-successor artifact or implementation has been released. Applied-state/membership
-recovery, exact cross-database log joins, snapshots and safe purge precede full
-consensus/service wiring. Complete M1–M8, original Elixir setup/runtime parity and
-native Linux remain required; this checkpoint establishes no milestone exit.
+The full workflow-parity gate was executed and still fails as required: original
+scenarios, mandatory profiles, setup, fixtures and adapters are incomplete.
 Ledger counts remain 82 source-derived declarations, 92 counterpart mappings and
 365 assertion links, with 1,681 unmatched runtime cases and 1,655 unresolved
-declarations. Component tests confer no new full-source parity credit.
+declarations. Component/disk tests confer no new full-source parity credit.
+
+Continue with the earliest actual M2 predecessor: neutral Blank/Membership and
+applied-state recovery, exact full log-ID AND actual-body-digest joins between
+separate database owners, then snapshot installation and safe purge before full
+consensus/service wiring. Committed Claim/policy routes, complete M1–M8, original
+Elixir setup/runtime parity and native Linux remain required. No successor
+artifact/model or implementation is released merely by this next-step statement;
+use the concrete architecture consultation and tests-first boundary in AGENTS.md.
+This checkpoint establishes no milestone exit or completed product.
 
 The entries below record earlier increments; their counts and next-step statements
 belong to those historical checkpoints.

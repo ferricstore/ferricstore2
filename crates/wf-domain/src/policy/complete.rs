@@ -37,7 +37,7 @@ mod retry_input;
 mod rules;
 mod validation;
 
-pub use admission::{PolicySchemaCharge, PolicySchemaLimits};
+pub use admission::{PolicySchemaCharge, PolicySchemaLimits, complete_policy_value_owned_bytes};
 pub use encoding::{
     CompletePolicyEncodingError, decode_complete_policy_value_v2, prepare_complete_policy_value_v2,
     verify_complete_policy_value_v2,

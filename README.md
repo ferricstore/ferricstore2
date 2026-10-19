@@ -1,6 +1,6 @@
 # ferricstore2
 
-Rust implementation of the reviewed workflow-only FerricStore design. The workspace, test support and quality checks are implemented, with a partial pure M1 domain core, source-derived tests and a scoped synchronous durable log. Product authoritative state storage, Raft integration and HTTP/TCP listeners remain incomplete. Preserved Elixir tests are mandatory acceptance inputs.
+Rust implementation of the reviewed workflow-only FerricStore design. The workspace, test support and quality checks are implemented, with a partial pure M1 domain core, source-derived tests, a synchronous durable log and a scoped transactional state backend. Snapshots, Raft integration and HTTP/TCP listeners remain incomplete. Preserved Elixir tests are mandatory acceptance inputs.
 
 The design preserves explicit durable workflow transitions, leases, fencing, retries and workflow queries. It does not port the general Redis-compatible database or replay arbitrary user code.
 
@@ -23,6 +23,6 @@ Read [the handoff and next steps](docs/CONTINUE.md) to continue implementation f
 
 ## Status
 
-M0 infrastructure and partial M1 domain implementation, with reviewed architecture and transport contracts. The development guide records executable checks, source-size limits and remaining gaps. Runtime library choices remain evaluation candidates; domain tests and reference registration do not establish complete workflow parity, durability, performance or production readiness.
+M0 infrastructure, partial M1 domain implementation and scoped M2 persistence, with reviewed architecture and transport contracts. The development guide records executable checks, source-size limits and remaining gaps. Further runtime library choices remain evaluation candidates; component tests and reference registration do not establish complete workflow parity, milestone completion, performance or production readiness.
 
 Source checkout: ferricstore/ferricstore at `66586c596e271408d9184af32eb31cd7218c126e`, plus explicitly identified working-tree observations. Local original Elixir checkouts are preserved. New repository is private pending an explicit publication decision.

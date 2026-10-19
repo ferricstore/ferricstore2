@@ -1,9 +1,10 @@
 # Development checks
 
-The workspace contains M0 infrastructure and a partial pure M1 domain core with
-source-derived tests. Storage, consensus, caches and live transports remain
-unimplemented. Reference integrity, registration and architecture checks do not
-establish full workflow parity or durability. See the handoff for current results.
+The workspace contains M0 infrastructure, a partial pure M1 domain core and
+scoped synchronous durable-log/state adapters with source-derived tests.
+Snapshots, consensus, caches and live transports remain incomplete. Reference
+integrity, registration and architecture checks do not establish full workflow
+parity or milestone completion. See the handoff for current results.
 
 Use Rust **1.99.0**, edition **2024**, on Linux or macOS. The CI host matrix is
 `ubuntu-24.04` and `macos-15`; local checks use the current native host. Windows
@@ -75,7 +76,7 @@ the reason, and undergo review; broad allowances are rejected by architecture
 checks. There is no first-party open-source license grant.
 
 `deny.toml` permits MIT, Apache-2.0 and verified Unicode-3.0 third-party licenses, rejects unknown
-registries and git sources, duplicate versions and wildcard requirements, and
+registries and unapproved Git sources, duplicate versions and wildcard requirements, and
 denies yanked, unmaintained and unsound dependencies. Unpublished workspace
 packages are exempt only from license declarations. Third-party dev/build
 dependencies remain audited. There are no advisory ignores. Three exact
@@ -83,7 +84,9 @@ duplicate-version exceptions cover `syn@2.0.119`, `thiserror@1.0.69` and
 `thiserror-impl@1.0.69`: the reviewed architecture/Serde tooling requires
 incompatible upstream majors. Every exception has its chain and review owner in
 the policy; it must be re-reviewed on dependency updates. An unused exception
-fails through `--deny unmatched-skip`. See [the evidence](reviews/infrastructure-ci-review.md).
+fails through `--deny unmatched-skip`. The exact reviewed redb Git source is
+selected in [ADR-007](adr/007-durable-log-storage.md); other Git sources remain
+closed. See [the evidence](reviews/infrastructure-ci-review.md).
 New license requirements or exceptions need evidence and review.
 
 Useful individual commands are:

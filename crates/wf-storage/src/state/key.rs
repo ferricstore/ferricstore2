@@ -6,7 +6,10 @@ use wf_types::version::TimestampMillis;
 use super::value::{StateValueError, add, allocate, read_u8, start};
 
 mod ordered;
+mod physical;
 mod point;
+
+pub(crate) use physical::{DecodedStateKey, decode_state_key};
 
 pub use ordered::{
     decode_due_key, decode_fifo_key, decode_history_key, encode_due_key, encode_due_prefix,
@@ -248,11 +251,30 @@ pub(super) fn own(
             maximum,
         });
     }
+    let mut ranges = [(0, 0); 4];
+    let output = copy_components::<4>(bytes, parts, length, &mut ranges)?;
+    Ok(DecodedOrderedKey {
+        family,
+        rank,
+        number,
+        bytes: output,
+        ranges,
+    })
+}
+
+fn copy_components<const N: usize>(
+    bytes: &[u8],
+    parts: &[(usize, usize)],
+    length: usize,
+    ranges: &mut [(usize, usize); N],
+) -> Result<Vec<u8>, StateValueError> {
+    if parts.len() > N {
+        return Err(StateValueError::InvalidValue);
+    }
     let mut output = Vec::new();
     output
         .try_reserve_exact(length)
         .map_err(|_| StateValueError::Allocation)?;
-    let mut ranges = [(0, 0); 4];
     for (index, part) in parts.iter().enumerate() {
         let start = output.len();
         let mut encoded = bytes[part.0..part.1].iter();
@@ -267,11 +289,5 @@ pub(super) fn own(
     if output.len() != length {
         return Err(StateValueError::Malformed);
     }
-    Ok(DecodedOrderedKey {
-        family,
-        rank,
-        number,
-        bytes: output,
-        ranges,
-    })
+    Ok(output)
 }

@@ -35,6 +35,10 @@ pub struct StoredWorkflowRecord {
 /// Operational transaction failure, never retained as a business rejection.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum StateTransactionError {
+    /// A constructor profile is zero, overflowing or internally incompatible.
+    InvalidLimits,
+    /// A healthy existing inventory or manifest belongs to another namespace.
+    NamespaceConflict,
     /// The adapter proves the durable predecessor is unchanged.
     KnownAborted,
     /// Commit may be durable; fence service and reconcile after reopen.
@@ -54,6 +58,8 @@ pub enum StateTransactionError {
 impl fmt::Display for StateTransactionError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(match self {
+            Self::InvalidLimits => "invalid state store limits",
+            Self::NamespaceConflict => "state store namespace conflict",
             Self::KnownAborted => "state transaction known aborted",
             Self::Uncertain => "state transaction commit uncertain",
             Self::Corrupt => "corrupt state authority",

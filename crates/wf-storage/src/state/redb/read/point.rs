@@ -1,0 +1,208 @@
+//! One borrowed point guard, admission, then one independently owned result.
+
+use super::super::{
+    ROWS,
+    admission::{
+        copy_bytes, policy_error, storage_error, table_error, total, value_error, wire_record_limit,
+    },
+    store::RedbStateTransaction,
+};
+use crate::state::{key, value};
+use redb::ReadableTable;
+use wf_domain::policy::complete::{
+    CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits, decode_complete_policy_value_v2,
+};
+use wf_domain::workflow::control::ControlState;
+use wf_domain::workflow::request::RetainedOutcome;
+use wf_ports::state::{StateTransactionError, StoredWorkflowRecord};
+use wf_types::identity::{GroupId, PartitionId, RecordId, RequestId, TenantId};
+
+impl RedbStateTransaction<'_> {
+    pub(in super::super) fn read_control(&self) -> Result<ControlState, StateTransactionError> {
+        self.step()?;
+        let key = self.key(
+            &[self.group.as_bytes(), self.recovery.as_bytes()],
+            0,
+            |cap| key::encode_control_key(self.group, self.recovery, cap),
+        )?;
+        self.opened()?;
+        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let guard = table
+            .get(key.as_slice())
+            .map_err(|e| storage_error(&e))?
+            .ok_or(StateTransactionError::Corrupt)?;
+        self.recovery_row(&key, guard.value())?;
+        self.admit_read(512)?;
+        value::decode_control(guard.value(), self.group, self.recovery, 1_024).map_err(value_error)
+    }
+    pub(in super::super) fn read_nonempty(
+        &self,
+        tenant: &TenantId,
+    ) -> Result<bool, StateTransactionError> {
+        self.step()?;
+        let scope = self.scope(tenant)?;
+        let prefix = self.key(
+            &[
+                self.group.as_bytes(),
+                self.recovery.as_bytes(),
+                tenant.as_bytes(),
+            ],
+            0,
+            |cap| key::encode_outcome_prefix(&scope, cap),
+        )?;
+        self.temporary(prefix.len())?;
+        self.opened()?;
+        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let mut rows = table
+            .range(prefix.as_slice()..)
+            .map_err(|e| storage_error(&e))?;
+        self.step()?;
+        let row = rows.next().transpose().map_err(|e| storage_error(&e))?;
+        if let Some((key, value)) = row {
+            self.recovery_row(key.value(), value.value())?;
+            Ok(key.value().starts_with(&prefix))
+        } else {
+            Ok(false)
+        }
+    }
+    pub(in super::super) fn read_outcome(
+        &self,
+        tenant: &TenantId,
+        request: &RequestId,
+    ) -> Result<Option<RetainedOutcome>, StateTransactionError> {
+        self.step()?;
+        let scope = self.scope(tenant)?;
+        let key = self.key(
+            &[
+                self.group.as_bytes(),
+                self.recovery.as_bytes(),
+                tenant.as_bytes(),
+                request.as_bytes(),
+            ],
+            0,
+            |cap| key::encode_outcome_key(&scope, request, cap),
+        )?;
+        self.opened()?;
+        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
+        let Some(guard) = guard else {
+            return Ok(None);
+        };
+        self.recovery_row(&key, guard.value())?;
+        let scanned = value::scan_outcome(
+            guard.value(),
+            &scope,
+            request,
+            self.admission,
+            self.outcome_wire_limit(tenant, request)?,
+        )
+        .map_err(value_error)?;
+        if scanned
+            .response_count()
+            .is_some_and(|n| n > self.admission.batch_items())
+        {
+            return Err(StateTransactionError::Limit);
+        }
+        let bytes = scanned.owned_bytes();
+        self.admit_read(bytes)?;
+        scanned.into_owned(bytes).map(Some).map_err(value_error)
+    }
+    pub(in super::super) fn read_placement(
+        &self,
+        partition: &PartitionId,
+    ) -> Result<Option<GroupId>, StateTransactionError> {
+        self.step()?;
+        let key = self.key(
+            &[self.recovery.as_bytes(), partition.as_bytes()],
+            0,
+            |cap| key::encode_placement_key(self.recovery, partition, cap),
+        )?;
+        self.opened()?;
+        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
+        let Some(guard) = guard else {
+            return Ok(None);
+        };
+        self.recovery_row(&key, guard.value())?;
+        let bytes = guard.value();
+        if bytes.is_empty() || bytes.len() > 256 {
+            return Err(StateTransactionError::Corrupt);
+        }
+        self.admit_read(total(512, [bytes.len()])?)?;
+        GroupId::new(copy_bytes(bytes)?)
+            .map(Some)
+            .map_err(|_| StateTransactionError::Corrupt)
+    }
+    pub(in super::super) fn read_policy(
+        &self,
+        tenant: &TenantId,
+        workflow_type: &[u8],
+        limits: PolicySchemaLimits,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Option<CompletePolicyValue>, StateTransactionError> {
+        if limits.policy_limits().max_states() > self.limits.schema().policy_limits().max_states() {
+            return Err(StateTransactionError::InvalidChanges);
+        }
+        self.step()?;
+        let scope = self.scope(tenant)?;
+        let key = self.key(
+            &[
+                self.group.as_bytes(),
+                self.recovery.as_bytes(),
+                tenant.as_bytes(),
+                workflow_type,
+            ],
+            0,
+            |cap| key::encode_policy_key(&scope, workflow_type, cap),
+        )?;
+        self.opened()?;
+        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
+        let Some(guard) = guard else {
+            return Ok(None);
+        };
+        self.recovery_row(&key, guard.value())?;
+        let bytes = guard
+            .value()
+            .len()
+            .checked_mul(216)
+            .and_then(|n| n.checked_add(2_048))
+            .ok_or(StateTransactionError::Limit)?;
+        self.admit_read(bytes)?;
+        let value =
+            decode_complete_policy_value_v2(guard.value(), limits, charge).map_err(policy_error)?;
+        if value.data().workflow_type != workflow_type {
+            return Err(StateTransactionError::Corrupt);
+        }
+        Ok(Some(value))
+    }
+    pub(in super::super) fn read_record(
+        &self,
+        tenant: &TenantId,
+        partition: &PartitionId,
+        id: &RecordId,
+    ) -> Result<Option<StoredWorkflowRecord>, StateTransactionError> {
+        self.step()?;
+        let scope = self.scope(tenant)?;
+        let key = self.record_key(&scope, partition, id)?;
+        self.opened()?;
+        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
+        let Some(guard) = guard else {
+            return Ok(None);
+        };
+        self.recovery_row(&key, guard.value())?;
+        let scanned = value::scan_record_point_profiled(
+            guard.value(),
+            &scope,
+            partition,
+            id,
+            self.admission,
+            wire_record_limit(self.admission)?,
+        )
+        .map_err(value_error)?;
+        let bytes = scanned.owned_bytes();
+        self.admit_read(bytes)?;
+        scanned.into_owned(bytes).map(Some).map_err(value_error)
+    }
+}

@@ -9,6 +9,9 @@ use super::{
     CompletePolicyData, GovernanceData, GovernanceField, GovernanceRuleKind, PolicySchemaError,
 };
 
+mod owner;
+pub use owner::complete_policy_value_owned_bytes;
+
 /// Immutable normalized-content and represented-work admission profile.
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub struct PolicySchemaLimits {

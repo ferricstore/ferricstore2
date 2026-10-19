@@ -535,3 +535,52 @@ iterators. Actual head owners remain R-paid. First/final native runs and strict
 checks are recorded separately from product tests. These logical limits and
 isolated macOS executions certify no RSS/latency bound, production adoption,
 power-loss behavior, Linux result or complete workflow parity.
+
+
+## Scoped state-store admission
+
+ARCH-M2-STATE-STORE1-CREATE1 implements explicit bounded genesis and strict recovery
+using the existing neutral transaction ports and physical value/key grammars.
+StateStoreLimits captures supported AdmissionLimits and complete-policy shape,
+independent genesis row/input-owner caps, recovery inspected-row/full-wire/step
+caps, cumulative temporary C and constructor workspace W. All caps are positive;
+a positive small W may refuse an operation. A larger actual admission component
+refuses before acquiring the writer; a smaller supported profile may report Limit
+for healthy persisted data. The actual guard also bounds final record fields,
+retained response bytes and V6 item count before output encoding/publication.
+
+Genesis first bounds row counts, encoded lengths and fixed G+2048 without scratch.
+One continuous schema account measures every complete donor using the existing
+borrowed complete_metrics. Its scalar allowance is
+U=2048+512*represented_rows+typed_variable_bytes+actual_encoded_bytes; it proves no
+content correspondence. Input I sums placement(512+partition+group) and
+policy(512+tenant+U). Admit G+2048+I+C_config <= W before full streamed verification,
+key copies or database work. The same account continues through verification;
+there is no second policy owner or encoded output. Copying the borrowed genesis
+descriptor does not refund or duplicate admission credit.
+
+Strict open reserves G+2048+C_config. Reached rows, including repeated cross-check
+reads, debit row count and full actual key+value bytes before parse/hash/copy;
+opens/probes/range advances/misses/end probes debit steps. Every temporary decoded
+key, scope, seek bound, record, policy and overlapping neighbor owner is admitted
+prospectively to the same cumulative C without refunds. Existing decoded policy
+P(E)=2048+216E remains distinct from the unverified donor allowance U. Explicit
+larger C/W can be required for repeated maximum-policy recovery. These logical
+accounts do not bound all engine pages/cache, donor construction/destruction,
+actual RSS or latency, and do not promise indefinite growth under fixed limits.
+
+The private complete physical decoder owns one packed byte buffer and seven fixed
+ranges at 256+unescaped bytes. It shares the existing unescape-copy implementation
+with the unchanged four-component ordered decoder and its 128-byte metadata fee;
+caller-owned fixed range arrays add no alias or heap owner. Runtime returned-owner
+R remains separate from temporary C. Limit/Allocation/InvalidChanges do not fence;
+Corrupt/Unavailable/Uncertain stop that store and its existing guards until reopen.
+
+The immutable FWSS1 manifest contains namespace lengths/bytes, original 18-byte
+genesis time, placement/policy counts, a streamed bootstrap-row SHA and frame SHA
+(108+group+recovery bytes). Future committed bootstrap-data changes must update
+this manifest atomically. Recovery rechecks its complete counts/digest and exact
+initial-control rules, plus applied control's independent HLC/wall lower bounds.
+Full membership/log-state recovery joins, snapshot installation/purge, live
+consensus/transport integration, original source/profile parity and Linux/macOS
+acceptance remain separate required gates.

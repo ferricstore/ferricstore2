@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: reviewed architecture; M0 infrastructure and a partial pure M1 domain core are implemented. Storage, consensus, application and transport adapters remain scaffolds. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core and scoped synchronous durable-log/state adapters are implemented. Snapshot, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 
@@ -1042,9 +1042,9 @@ See [ADR004](adr/004-committed-time-and-apply-admission.md#independent-indexed-b
 for admission and the private result representation refinement.
 
 This pure representation alone does not publish physical writes. Its V6
-transaction successor is described below. Real public hooks, backend adoption,
-original profiles and Linux/macOS acceptance remain required; atomic V5 behavior
-stays unchanged.
+transaction successor and later scoped backend adoption are described below.
+Real public hooks, node wiring, original profiles and Linux/macOS acceptance
+remain required; atomic V5 behavior stays unchanged.
 
 ## Independent V6 transaction publication
 
@@ -1076,6 +1076,47 @@ content; output record admission precedes the unchanged encoder. Counted outcome
 scans admit configured count and complete returned owners before materializing.
 See [ADR004](adr/004-committed-time-and-apply-admission.md#independent-v6-driver-admission)
 and [ADR006](adr/006-private-prepared-command-codec.md#independent-v6-private-batch-profile).
-The redb consumer remains an isolated acceptance experiment; public producer
-hooks, production backend wiring, original profiles, Linux and milestone exits
-require their own evidence. Logical tariffs establish no measured native gain.
+This V6 stage initially used an isolated redb acceptance consumer. The scoped
+state-store adoption below supplies the product backend; public producer hooks,
+node/consensus wiring, original profiles, Linux and milestone exits still require
+their own evidence. Logical tariffs establish no measured native gain.
+
+
+## Scoped synchronous state authority
+
+ARCH-M2-STATE-STORE1-CREATE1 adopts the existing GroupApplyStore transaction
+contract through private state/redb children in wf-storage. One non-Clone
+RedbStateStore owns its database and fixed group/recovery namespace; its
+transaction and borrowed due cursor retain the same exclusive writer revision.
+Node wiring and consensus continue to depend on the neutral ports. No raw
+Database extraction or whole-group snapshot substitutes for point/index reads.
+
+Explicit create admits borrowed sorted genesis placements and complete policies,
+then publishes only initial control and immutable bootstrap data in one Immediate
+transaction. The Copy genesis descriptor carries shared slices and time, without
+copying donors or granting accounting credit. Path creation also syncs the parent
+directory; consumed-Database construction documents caller-owned setup. Open
+never manufactures a missing table/control. A versioned checksummed manifest
+binds namespace, initial time and complete policy/placement counts and digest.
+
+Recovery validates every physical key/value identity, local canonical placement
+and both directions of policy-resolved due/FIFO authority before serving. Real
+running or unscheduled FIFO heads remain blockers. Retained history may outlive a
+core, and terminal-named Created records with due times remain valid without an
+active lane. Control clocks cannot fall below immutable genesis; older original
+stamps remain valid when resulting control time has been clamped. The supported
+profile governs persisted and returned owners, including independent response
+count. Healthy smaller profiles may refuse with Limit; malformed authority is
+Corrupt. Fatal errors latch the same store and live guards until reopen.
+
+Atomic and independent plans share consumed publication of records, authoritative
+indexes, every successful history, retained outcome and control. Independent
+original versions are checked once and final cores written once. Immediate commit
+must complete before acknowledgment; an unproved consumed failure is Uncertain.
+See [ADR-004](adr/004-committed-time-and-apply-admission.md#scoped-state-store-admission)
+for prospective accounts and the separate durability/deployment gates.
+
+This adapter and its process-kill tests do not complete committed Claim/policy
+routes, Blank/Membership persistence, exact full-ID/body-digest log/state recovery
+joining, snapshots/purge, Raft/services, original setup/runtime parity or both-OS
+acceptance. Those remain required ordered successors.
