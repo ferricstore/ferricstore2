@@ -25,6 +25,7 @@ use wf_types::identity::{RecordId, RequestId};
 use wf_types::version::{Fence, TimestampMillis};
 
 mod bootstrap;
+mod control;
 mod cursor;
 mod faults;
 mod fixtures;

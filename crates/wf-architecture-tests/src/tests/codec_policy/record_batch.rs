@@ -88,6 +88,15 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::public_mutation::apply",
         "log::public_mutation::response",
         "log::public_mutation::response::nested",
+        "consensus::membership",
+        "consensus::membership::value",
+        "consensus::membership::nested",
+        "log::control",
+        "log::control::scan",
+        "log::control::codec",
+        "log::control::nested",
+        "state::control",
+        "state::control::nested",
     ] {
         assert_eq!(
             source_check("wf-ports", module, "use std::collections::BTreeMap;")?,
@@ -122,6 +131,9 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::record_batch::independent_backend",
         "log::record_batch::response::independent_backend",
         "log::public_mutation_backend",
+        "consensus::membership_backend",
+        "log::control_backend",
+        "state::control_backend",
     ] {
         assert_eq!(
             source_check(

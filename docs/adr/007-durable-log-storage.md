@@ -150,3 +150,97 @@ ordinary apply and acknowledge only after durable state application. Atomic
 effective-membership/control persistence, suffix replay, snapshot installation,
 safe purge, real Raft wiring and both native operating-system gates remain required.
 Implementation and execution evidence belong to the handoff and review records.
+
+## Applied membership and neutral control entries
+
+ARCH-M2-RAFT-CONTROL1-CREATE1 selects the following bounded synchronous successor.
+Its tests produced missing-contract RED before implementation and now pass with
+the complete macOS workspace/native checks recorded in the handoff. Last-applied
+membership is distinct from a Raft owner's effective, possibly uncommitted
+configuration. Linux and the full product acceptance gates remain open.
+
+Pure ports own `RaftMembership`, `AppliedRaftMembership`, their limits/error and
+the borrowed `GroupControlChanges`. Configurations preserve outer order,
+duplicates and more than two joint sets. Each nonempty inner voter set and the
+node directory are strictly sorted and unique; every voter has a node, and extra
+nodes are learners. Zero/MAX node IDs and empty, shared, NUL or multibyte UTF-8
+addresses are valid. Validated construction moves input owners without cloning.
+Only initial applied state has empty membership; it cannot encode as a command.
+
+`FWBL` and `FWMB` bodies contain magic, u16 version1, u16-length group/recovery
+and an explicit stamp flag. A stamped body adds physical u64, logical u16 and
+wall u64; no receiver clock supplies this metadata. Blank ends there. Membership
+adds u32 configuration count, each u32 voter count and u64 voters, u32 node count,
+all sorted u64 node IDs, then parallel u32-length UTF-8 addresses. Integers are big
+endian and trailing bytes are invalid. Existing Normal `FWCP` bodies stay exact.
+Prepared identity is SHA-256 of the entire actual entry body.
+
+Borrowed validation completes scope, shape, sorting, voter lookup and EOF before
+any reserve or typed decode. Voter lookup uses binary search over contiguous
+fixed-size node IDs. Apply and strict recovery need no typed membership owner or
+lookup map. Let k be configuration count, v total voter occurrences, n node count,
+a UTF-8 address bytes and s the stamp flag. Logical ownership and wire sizes are:
+
+```text
+U        = 1024 + 512*k + 8*v + 512*n + a
+E_blank  = 11 + group_bytes + recovery_bytes + 18*s
+E_member = 19 + group_bytes + recovery_bytes + 18*s + 4*k + 8*v + 12*n + a
+J        = 512 + E
+```
+
+Initial membership has U1024. Producers reserve workspace2048+E for Blank and
+2048+U+E for Membership; typed body decoding reserves2048+J+U. Default limits are
+64 configurations, 1,000,000 voter occurrences, 65,536 nodes, 1,048,576 bytes per
+address, 16,777,216 body bytes and 67,108,864 owned bytes. Every cap is positive;
+small positive caps remain valid profiles that can refuse a particular operation.
+
+`GroupControlTransaction` extends the existing actual apply guard. Its immutable
+`owner_limits()` returns configured cumulative R/C even when fenced; data reads
+and consumed `commit_control` retain normal fatal-error fencing. Same-guard
+`applied_membership` returns initial None or the applied full identity, original
+stamp and owned membership. Query limits cannot exceed the captured profile;
+healthy data above a valid smaller profile produces Limit. Commit revalidates
+against its captured profile even when changes were built under a larger one.
+
+`wf-consensus::apply::apply_control_entry` reads these actual budgets before
+reads/hash, borrows the body, computes the unchanged control plan from its explicit
+stamp and consumes one Immediate commit. Its checked workspace is3072+J+R+C;
+the namespace allowance conservatively supports both maximum256-byte IDs.
+`read_applied_state` reads control and membership through that same guard with
+workspace3072+R+C. Returned control512 and membershipU share R. Encoded output
+is charged once inside C; neither function adds an imaginary typed apply owner.
+Zero workspace is InvalidLimits; arithmetic overflow or insufficient workspace
+is Limit. No supplied argument certifies consensus commitment: the later Raft
+owner must persist committed before ordinary application.
+
+The state layout advances to `FWSS2`, preserving its two table names, ordinary
+ROWS0..7/key formats and `FWSC1` values. META requires exactly `manifest` and
+`membership`. The manifest retains its108+group+recovery shape and hash recipe,
+with version2 and a new frame checksum. Atomic genesis installs explicit None
+membership with the original cohort. An intact legacy `FWSS1` returns
+UnsupportedLayout without migration or mutation.
+
+Required `FWMV1` membership values bind u16-length group/recovery and flag0/1.
+None adds only a SHA-256 checksum. Some adds the full24-byte log identity, u64
+body length, original `FWMB` body and checksum over the complete preceding frame.
+Thus O_none=43+group+recovery and O_some=75+group+recovery+E. The inner body's SHA
+is the applied prepared digest, separately from wrapper and log-frame checksums.
+The wire cap applies to the inner command; None carries no command body. Before
+file/table creation, the captured profile must admit initial U1024 and actual
+O_none in C and the engine output limit.
+
+Backend publication compares actual namespace and predecessor before mutation,
+fully validates the old borrowed membership, and preserves all other rows.
+Replay aborts without changes; Blank publishes only control; Membership publishes
+control and the exact original membership body in one Immediate writer. A failed
+commit is Uncertain and fences the store; a fatal data read fences its live guard.
+Strict open counts the required metadata in recovery rows/bytes/steps. Unapplied
+control requires None. Applied membership cannot be ahead of control; equal index
+requires full identity, actual body SHA and original stamp equality. Current HLC
+and wall must both cover a known membership stamp even when membership is older.
+
+Historical membership/log joining, ordered suffix replay, snapshots/install/purge,
+real Raft integration, full source parity and native Linux/macOS acceptance remain
+required. The earlier checkpoint verifier is not silently expanded to perform
+those successors. Logical ownership formulas do not establish native RSS or
+latency improvements.

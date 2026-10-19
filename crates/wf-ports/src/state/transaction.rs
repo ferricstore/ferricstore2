@@ -39,6 +39,8 @@ pub enum StateTransactionError {
     InvalidLimits,
     /// A healthy existing inventory or manifest belongs to another namespace.
     NamespaceConflict,
+    /// A healthy private backend layout requires an explicitly selected migration.
+    UnsupportedLayout,
     /// The adapter proves the durable predecessor is unchanged.
     KnownAborted,
     /// Commit may be durable; fence service and reconcile after reopen.
@@ -60,6 +62,7 @@ impl fmt::Display for StateTransactionError {
         formatter.write_str(match self {
             Self::InvalidLimits => "invalid state store limits",
             Self::NamespaceConflict => "state store namespace conflict",
+            Self::UnsupportedLayout => "unsupported state store layout",
             Self::KnownAborted => "state transaction known aborted",
             Self::Uncertain => "state transaction commit uncertain",
             Self::Corrupt => "corrupt state authority",

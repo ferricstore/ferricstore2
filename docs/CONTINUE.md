@@ -5,7 +5,76 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest increment adds bounded startup verification between the separate durable
+The latest increment implements bounded neutral Blank/Membership bodies and
+atomic last-applied membership with the SAME workflow ControlState. Pure ports
+preserve complete ordered joint configurations, learners, original owners and
+explicit stamped/unstamped metadata. The actual state guard supplies its captured
+R/C limits, typed membership reads and consumed Immediate control publication.
+Apply/recovery stay borrowed; original Normal FWCP bytes and workflow publication
+remain unchanged. Persisted applied membership remains distinct from Raft's
+possibly uncommitted effective configuration. See
+[ADR-007](adr/007-durable-log-storage.md#applied-membership-and-neutral-control-entries).
+
+FWSS2 atomically initializes required None membership with manifest/control.
+Strict noncreating recovery binds the exact metadata inventory, original body SHA,
+full identity/stamp and HLC/wall lower bounds. Intact legacy FWSS1 is explicitly
+UnsupportedLayout; there is no silent upgrade. A genuine behavioral RED exposed
+an impossible FWMV declared length reported as Limit; constant-work actual framing
+validation now returns corruption while healthy smaller-profile refusal stays Limit.
+
+All twelve new test identities pass after preimplementation missing-contract RED:
+three pure-port, seven storage and two real consensus-function tests. They cover
+independent complete wire/value goldens, stamped/unstamped/replay/clamped behavior,
+exact/tight actual guard budgets, complete ROWS+META cohorts, corruption, actual
+uncached read failure and same-live-guard fencing, delegated sync uncertainty,
+reconciliation and four new process kills. The before-sync cases target the first
+non-growth commit-path sync, which may precede a later flush; after-return cases
+require the complete new cohort. A real stack showed the initial fixture instead
+hit a growth sync, correctly Unavailable; that setup correction is not a product
+bug. Existing fault modes and every old test identity/oracle remain covered.
+These are process-boundary tests, not power-loss, network ACK or Linux evidence.
+
+Architecture and performance reviewed actual tests/source and each other's work.
+The initial donor count check now precedes linear scans. A local buffer rename,
+a concretely approved borrowed-tuple alias and typed empty-slice assertions resolve
+strict diagnostics without waivers or changed owner/parser/oracle behavior; peers
+executed complete-file inverses for the style changes. Related modules remain in
+private feature directories and all source-size policies pass.
+
+The final native macOS snapshot passes **732 Rust tests across 87 workspace
+targets**, plus six compile-fail examples across 15 documentation targets, with
+zero failures or ignored tests. Formatting, all-target compilation, strict Clippy,
+warnings-denied rustdoc, architecture and reference/progress checks pass. The full
+cached dependency audit passes advisories, bans, licenses and sources without
+waivers/exclusions; no fresh online advisory refresh is claimed. All 708 selected
+source/manifest/policy/style inputs stayed unchanged throughout final verification.
+
+The separate pinned native acceptance executable passes formatting, compilation,
+strict Clippy and its complete persistence/fault/process-kill run. All 725 combined
+inputs stayed unchanged. Its 17 files, including 15 Rust sources, remain exactly
+proof 55bcbd85; no native source changed. Canonical redb 4.4.0/no-default/std-only
+and all dependency manifests/lockfiles remain unchanged. No runtime framework,
+concrete backend edge in consensus or registry package is introduced.
+
+The executed full parity gate still fails. Ledger counts remain 82 source-derived
+declarations, 92 mappings and 365 assertion links; 1,681 runtime cases remain
+unmatched and 1,655 declarations unresolved. These component tests add no full
+source-case parity credit. Complete pinned Elixir setup, fixtures, mandatory
+profiles and runtime scenarios remain required, as does native Linux validation.
+
+Next: verify historical applied membership against the actual durable log and
+replay only the ordered committed suffix through real Blank/Membership/Normal
+apply paths before returning usable owners. Preserve the existing checkpoint
+verifier's separate contract and no-snapshot qualification; it does not silently
+perform this successor. Architecture/performance are reviewing a finite proposal
+in the existing notes; no next source is released. Then finish snapshot/install/
+purge, consensus/read barriers, remaining domain and Claim/policy routes, services
+and full M1–M8 acceptance. The full goal remains active; new artifacts still require
+concrete architecture consultation and substantive tests before implementation.
+
+Earlier startup checkpoint (`0e80526`):
+
+That checkpoint adds bounded startup verification between the separate durable
 log and workflow state stores. The required log point read admits the caller's
 actual body owner before copying, preserving old page/wire behavior. The consuming
 verifier returns both owners only after full term/node/index and SHA-256 of the

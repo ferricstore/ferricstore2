@@ -37,21 +37,44 @@ impl StorageBackend for DiskFaultBackend {
         self.inner.len()
     }
     fn read(&self, offset: u64, output: &mut [u8]) -> io::Result<()> {
+        if self
+            .fault
+            .compare_exchange(3, 0, Ordering::SeqCst, Ordering::SeqCst)
+            .is_ok()
+        {
+            return Err(io::Error::other("injected control getter read failure"));
+        }
         self.inner.read(offset, output)
     }
     fn write(&self, offset: u64, input: &[u8]) -> io::Result<()> {
         self.inner.write(offset, input)
     }
     fn set_len(&self, length: u64) -> io::Result<()> {
-        self.inner.set_len(length)
+        let mode = self.fault.load(Ordering::SeqCst);
+        let before = if matches!(mode, 4 | 6) {
+            Some(self.inner.len()?)
+        } else {
+            None
+        };
+        self.inner.set_len(length)?;
+        if before.is_some_and(|before| length > before) {
+            let _ = self
+                .fault
+                .compare_exchange(mode, mode + 1, Ordering::SeqCst, Ordering::SeqCst);
+        }
+        Ok(())
     }
     fn sync_data(&self) -> io::Result<()> {
         let mode = self.fault.swap(0, Ordering::SeqCst);
-        if mode == 2 {
+        if matches!(mode, 2 | 6) {
             parked("before-sync")?;
         }
         self.inner.sync_data()?;
-        if mode == 1 {
+        // The pinned engine syncs each successful growth before publication.
+        if matches!(mode, 5 | 7) {
+            self.fault.store(mode - 1, Ordering::SeqCst);
+        }
+        if matches!(mode, 1 | 4) {
             return Err(io::Error::other(
                 "injected failure AFTER delegated file sync",
             ));
@@ -85,14 +108,22 @@ impl StorageBackend for DiskFaultBackend {
     }
 }
 
-fn wrapped(path: &Path, fault: Arc<AtomicU8>) -> TestResult<RedbStateStore> {
+pub(super) fn wrapped(path: &Path, fault: Arc<AtomicU8>) -> TestResult<RedbStateStore> {
+    wrapped_with_cache(path, fault, 16 * fixtures::MIB)
+}
+
+pub(super) fn wrapped_with_cache(
+    path: &Path,
+    fault: Arc<AtomicU8>,
+    cache_size: usize,
+) -> TestResult<RedbStateStore> {
     let file = OpenOptions::new().read(true).write(true).open(path)?;
     let backend = DiskFaultBackend {
         inner: FileBackend::new(file)?,
         fault,
     };
     let database = redb::Builder::new()
-        .set_cache_size(16 * fixtures::MIB)
+        .set_cache_size(cache_size)
         .create_with_backend(backend)?;
     let scope = fixtures::scope()?;
     Ok(RedbStateStore::open_database(
@@ -243,7 +274,7 @@ fn immediate_failure_fences_and_reconciles() -> TestResult {
     Ok(())
 }
 
-fn parked(stage: &str) -> io::Result<()> {
+pub(super) fn parked(stage: &str) -> io::Result<()> {
     println!("WFSTATE READY {stage}");
     io::stdout().flush()?;
     let mut acknowledgement = [0; 1];

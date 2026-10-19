@@ -2,6 +2,7 @@
 
 use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaLimits};
 use wf_domain::workflow::admission::AdmissionLimits;
+use wf_ports::consensus::RaftMembershipLimits;
 use wf_ports::state::StateTransactionError;
 use wf_types::identity::{GroupId, PartitionId, TenantId};
 use wf_types::version::CommittedTime;
@@ -10,6 +11,7 @@ mod admission;
 mod bootstrap;
 mod commit;
 mod cursor;
+mod membership;
 mod publication;
 mod read;
 mod recovery;
@@ -43,6 +45,7 @@ pub struct StateStoreLimits {
     recovery: (usize, usize, usize),
     temporary: usize,
     workspace: usize,
+    membership: RaftMembershipLimits,
 }
 
 impl StateStoreLimits {
@@ -80,6 +83,7 @@ impl StateStoreLimits {
             recovery,
             temporary: temporary_bytes,
             workspace: workspace_bytes,
+            membership: RaftMembershipLimits::default(),
         })
     }
     /// Supported persisted field and decision profile.
@@ -127,6 +131,17 @@ impl StateStoreLimits {
     pub const fn workspace_bytes(self) -> usize {
         self.workspace
     }
+    /// Supported complete applied-membership data and ownership profile.
+    #[must_use]
+    pub const fn membership_limits(self) -> RaftMembershipLimits {
+        self.membership
+    }
+    /// Selects the actual persisted membership profile without changing other caps.
+    #[must_use]
+    pub const fn with_membership_limits(mut self, limits: RaftMembershipLimits) -> Self {
+        self.membership = limits;
+        self
+    }
 }
 
 impl Default for StateStoreLimits {
@@ -138,6 +153,7 @@ impl Default for StateStoreLimits {
             recovery: (1_000_000, 1_024 * 1_048_576, 10_000_000),
             temporary: 128 * 1_048_576,
             workspace: 256 * 1_048_576,
+            membership: RaftMembershipLimits::default(),
         }
     }
 }

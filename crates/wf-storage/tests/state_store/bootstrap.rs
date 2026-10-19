@@ -70,7 +70,7 @@ pub(super) fn manifest(
             hash.update(value);
         }
     }
-    let mut wire = b"FWSS\0\x01".to_vec();
+    let mut wire = b"FWSS\0\x02".to_vec();
     wire.extend_from_slice(&u16::try_from(group.len())?.to_be_bytes());
     wire.extend_from_slice(group);
     wire.extend_from_slice(&u16::try_from(recovery.len())?.to_be_bytes());
@@ -236,7 +236,7 @@ fn exact_genesis() -> TestResult {
     assert_eq!(
         packed,
         hex(
-            "46575353000100016700017a00000000000000110000000000000000001100000000000000020000000000000001e0f976e00789b0cd089958944f473308862f10357046f939ababbfe6c5c81e8dac89a094cb5580339bc637b3339631dda60a4e4fb787fce63decd6663e8a670a"
+            "46575353000200016700017a00000000000000110000000000000000001100000000000000020000000000000001e0f976e00789b0cd089958944f473308862f10357046f939ababbfe6c5c81e8d246756048fdeb32b8ac45d52d0e78bd657cc70c30d9ddce6ecbbda807e7923ab"
         )?
     );
     let database = redb::Builder::new().open(&path)?;

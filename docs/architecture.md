@@ -1141,3 +1141,26 @@ edge is the existing exact no-default sha2 pin. See
 limits, custody, wire preservation and the no-snapshot qualification. This check
 does not supply effective membership, suffix application, snapshot/purge recovery
 or a Raft runtime.
+
+### Selected applied-membership successor
+
+ARCH-M2-RAFT-CONTROL1-CREATE1 adds pure membership/control values in
+`wf-ports::consensus::membership`, `log::control` and `state::control`, with private
+children grouped by responsibility. Effect checks cover each complete subtree
+and distinguish similarly named effectful neighbors. The extension transaction
+belongs to the existing real state guard; no second store/guard or wrapper
+certificate supplies membership authority. `wf-consensus::apply` consumes only
+neutral ports and receives actual captured R/C before data work. Concrete redb
+publication remains in `wf-storage::state::redb`.
+
+Blank advances only the existing control; Membership atomically advances control
+and the original membership body. The stored applied configuration preserves
+joint-set order, voter/node identity and original time, separately from any future
+effective Raft configuration. FWSS2 requires explicit initial None membership;
+strict open refuses intact FWSS1 without silently upgrading it. See
+[ADR-007](adr/007-durable-log-storage.md#applied-membership-and-neutral-control-entries)
+for selected formats, ownership accounts and recovery invariants. Implementation
+and the twelve new test identities pass after missing-contract RED, with complete
+macOS workspace/native validation recorded in the handoff. Historical membership
+joins, ordered replay, snapshots, the real consensus/service owner, full source
+parity and Linux validation remain separate required work.

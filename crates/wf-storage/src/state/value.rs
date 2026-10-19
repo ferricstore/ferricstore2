@@ -6,11 +6,16 @@ use wf_ports::log::CodecError;
 
 mod control;
 mod history;
+mod membership;
 mod outcome;
 mod record;
 
 pub use control::{decode_control, encode_control};
 pub use history::{decode_history, encode_history};
+pub(crate) use membership::inspect_membership;
+pub use membership::{
+    decode_applied_membership, encode_applied_membership, measure_applied_membership,
+};
 pub use outcome::{ScannedRetainedOutcome, decode_outcome, encode_outcome, scan_outcome};
 pub use record::{
     ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields, scan_record_point,
@@ -37,6 +42,8 @@ pub enum StateValueError {
     },
     /// A newly introduced fallible variable reservation failed.
     Allocation,
+    /// A complete membership count/address/owner profile was exhausted.
+    MembershipLimit,
     /// Namespace, typed value, status or positive profile is invalid.
     InvalidValue,
 }
@@ -52,6 +59,7 @@ impl fmt::Display for StateValueError {
             Self::Malformed => formatter.write_str("malformed state value"),
             Self::LengthOverflow => formatter.write_str("state value length overflow"),
             Self::Allocation => formatter.write_str("state value allocation failed"),
+            Self::MembershipLimit => formatter.write_str("state membership profile limit"),
             Self::InvalidValue => formatter.write_str("invalid state value"),
         }
     }

@@ -15,6 +15,7 @@ use crate::consensus::{PreparedOperation, PreparedRequest};
 mod claim;
 mod common;
 mod complete_policy;
+mod control;
 mod decode;
 mod encode;
 mod keys;
@@ -24,6 +25,9 @@ mod reader;
 mod record_batch;
 mod scan;
 mod storage;
+pub use control::{
+    decode_raft_membership_body, encode_raft_blank, encode_raft_membership, measure_control_entry,
+};
 mod writer;
 
 pub use storage::{

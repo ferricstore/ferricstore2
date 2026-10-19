@@ -23,6 +23,7 @@ pub(super) fn admit(
     limits: StateStoreLimits,
 ) -> Result<usize, StateTransactionError> {
     admission::workspace(group, recovery, limits, 0)?;
+    super::membership::initial(group, recovery, limits)?;
     let count = total(genesis.placements.len(), [genesis.policies.len()])?;
     if count > limits.maximum_genesis_rows() {
         return Err(StateTransactionError::Limit);
@@ -166,6 +167,7 @@ pub(super) fn initialize(
     meta.insert(b"manifest".as_slice(), manifest.as_slice())
         .map_err(|e| storage_error(&e))?;
     drop(meta);
+    super::membership::write(&tx, None, None)?;
     tx.write
         .set_durability(Durability::Immediate)
         .map_err(|_| StateTransactionError::Unavailable)?;
@@ -200,7 +202,7 @@ fn manifest(
     let mut out = Vec::new();
     out.try_reserve_exact(bytes)
         .map_err(|_| StateTransactionError::Allocation)?;
-    out.extend_from_slice(b"FWSS\0\x01");
+    out.extend_from_slice(b"FWSS\0\x02");
     for field in [store.group.as_bytes(), store.recovery.as_bytes()] {
         out.extend_from_slice(
             &u16::try_from(field.len())

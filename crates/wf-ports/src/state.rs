@@ -2,9 +2,11 @@
 //!
 //! Source compatibility policy queries use an explicit policy read capability.
 
+mod control;
 mod policy;
 mod transaction;
 
+pub use control::{GroupControlChanges, GroupControlTransaction};
 pub use policy::{OriginalPolicyGetReader, read_original_policy_get_reply};
 pub use transaction::{
     DueCursorStep, GroupApplyChanges, GroupApplyStore, GroupApplyTransaction, GroupDueCursor,

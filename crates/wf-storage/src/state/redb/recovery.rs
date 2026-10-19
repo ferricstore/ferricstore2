@@ -39,13 +39,30 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionErr
     if meta_key.value() != b"manifest" {
         return Err(StateTransactionError::Corrupt);
     }
+    let mut layout = 0;
+    let (initial, placements, policies, expected) =
+        check_manifest(manifest.value(), &tx, &mut layout)?;
+    let member = if layout == 2 {
+        tx.step()?;
+        let (key, bytes) = meta_rows
+            .next()
+            .transpose()
+            .map_err(|e| storage_error(&e))?
+            .ok_or(StateTransactionError::Corrupt)?;
+        tx.recovery_row(key.value(), bytes.value())?;
+        if key.value() != super::membership::KEY {
+            return Err(StateTransactionError::Corrupt);
+        }
+        Some(bytes)
+    } else {
+        None
+    };
     tx.step()?;
     if let Some(row) = meta_rows.next() {
         let (key, value) = row.map_err(|e| storage_error(&e))?;
         tx.recovery_row(key.value(), value.value())?;
         return Err(StateTransactionError::Corrupt);
     }
-    let (initial, placements, policies, expected) = check_manifest(manifest.value(), &tx)?;
     let control = tx.control()?;
     if control.last_entry().is_none() && control.time() != initial {
         return Err(StateTransactionError::Corrupt);
@@ -53,10 +70,16 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionErr
     if control.time().hlc() < initial.hlc() || control.time().wall() < initial.wall() {
         return Err(StateTransactionError::Corrupt);
     }
+    if let Some(bytes) = member {
+        super::membership::validate_value(&tx, bytes.value(), control)?;
+    }
     let (actual_placements, actual_policies, hash) =
         validate_rows(&tx, control.last_entry().is_some())?;
     if placements != actual_placements || policies != actual_policies || expected != hash {
         return Err(StateTransactionError::Corrupt);
+    }
+    if layout == 1 {
+        return Err(StateTransactionError::UnsupportedLayout);
     }
     Ok(())
 }
@@ -90,8 +113,16 @@ fn inventory(tx: &RedbStateTransaction<'_>) -> Result<(), StateTransactionError>
 fn check_manifest(
     bytes: &[u8],
     tx: &RedbStateTransaction<'_>,
+    layout: &mut u16,
 ) -> Result<(CommittedTime, u64, u64, [u8; 32]), StateTransactionError> {
-    let mut at = value::start(bytes, *b"FWSS", bytes.len()).map_err(value_error)?;
+    let mut at = 0;
+    if value::take(bytes, &mut at, 4).map_err(value_error)? != b"FWSS" {
+        return Err(StateTransactionError::Corrupt);
+    }
+    *layout = value::read_u16(bytes, &mut at).map_err(value_error)?;
+    if !matches!(*layout, 1 | 2) {
+        return Err(StateTransactionError::Corrupt);
+    }
     let n = usize::from(value::read_u16(bytes, &mut at).map_err(value_error)?);
     let group = value::take(bytes, &mut at, n).map_err(value_error)?;
     let n = usize::from(value::read_u16(bytes, &mut at).map_err(value_error)?);

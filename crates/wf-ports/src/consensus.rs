@@ -10,7 +10,12 @@ use wf_types::identity::{PartitionId, RequestId};
 use wf_types::version::CommittedTime;
 
 mod claim;
+mod membership;
 mod mutation;
+pub use membership::{
+    AppliedRaftMembership, RaftMembership, RaftMembershipError, RaftMembershipLimits,
+    raft_membership_owned_bytes,
+};
 
 pub use claim::{PreparedClaimPhase, PreparedClaimQuery};
 pub use mutation::{MutationNotSubmitted, MutationSubmission, MutationSubmitPort, MutationUnknown};

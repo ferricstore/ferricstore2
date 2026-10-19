@@ -13,6 +13,7 @@ use wf_domain::workflow::request::{RequestScope, RetainedOutcome};
 use wf_ports::log::record_batch_retained_summary;
 use wf_ports::state::{GroupApplyChanges, GroupApplyTransaction, StateTransactionError};
 
+pub(super) mod control;
 mod independent;
 
 pub(super) fn apply(

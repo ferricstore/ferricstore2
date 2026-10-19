@@ -584,3 +584,23 @@ initial-control rules, plus applied control's independent HLC/wall lower bounds.
 Full membership/log-state recovery joins, snapshot installation/purge, live
 consensus/transport integration, original source/profile parity and Linux/macOS
 acceptance remain separate required gates.
+
+## Applied-membership control admission
+
+The selected successor in
+[ADR-007](007-durable-log-storage.md#applied-membership-and-neutral-control-entries)
+extends the same actual transaction with a separate membership getter and
+consumed control commit. Original stamped Blank/Membership metadata goes through
+the existing control planner: unstamped entries advance position with unchanged
+time, and older stamps preserve nondecreasing HLC and wall while retaining their
+original stamp. Membership, control and their identity/body digest publish in one
+Immediate writer; ordinary record/index/history/outcome rows remain exact.
+
+Typed membership charges U=1024+512*k+8*v+512*n+a before allocation. Borrowed apply
+and recovery do not allocate U. Returned control512 and membershipU share actual
+cumulative R; encoded membership output is charged once inside actual C. Apply
+workspace is3072+J+R+C and same-guard read workspace3072+R+C, with checked
+arithmetic and actual configured budgets, including unused capacity. The initial
+U1024 is supported-readability admission before file creation, with only the real
+None output charged to C. Tests-first implementation/execution status is tracked
+in the handoff; these accounts add no Raft acknowledgment, RSS or Linux evidence.

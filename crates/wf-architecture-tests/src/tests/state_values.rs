@@ -9,6 +9,8 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::value::record::scan"),
         ("wf-storage", "state::value::outcome"),
         ("wf-storage", "state::value::history"),
+        ("wf-storage", "state::value::membership"),
+        ("wf-storage", "state::value::membership::nested"),
         ("wf-storage", "state::key"),
         ("wf-storage", "state::key::point"),
         ("wf-storage", "state::key::ordered"),
@@ -88,6 +90,8 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         "GroupApplyTransaction",
         "GroupDueCursor",
         "GroupApplyChanges",
+        "GroupControlChanges",
+        "GroupControlTransaction",
     ] {
         assert!(
             source_check(

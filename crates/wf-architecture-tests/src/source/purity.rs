@@ -19,6 +19,9 @@ impl Inspector<'_, '_> {
             "log::record_batch::response::independent",
             "state::transaction::independent",
             "log::public_mutation",
+            "consensus::membership",
+            "log::control",
+            "state::control",
         ]
         .into_iter()
         .any(under);
