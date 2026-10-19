@@ -36,7 +36,18 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 82 source declarations, 92 counterpart records and 365 assertion links.
+increments: 84 source declarations, 94 counterpart records and 373 assertion links.
+
+The latest two counterparts preserve the direct pure RetryPolicyTest malformed
+state recipes and compact-policy canonical snapshot, including all six source
+assertions through eight exact kind/body/full-reply links. Both pass in the
+ten-test Rust retry-policy target, with strict Clippy. The original Mix command
+stopped before tests at a local TCP socket `:eperm`; it is retained as setup
+failure, with source runtime/helper profiles and independent Linux validation
+still required. The third state-mode/FIFO helper case remains unlinked. These
+are tests of existing behavior, without a new tests-first RED or full-parity
+claim. Previous counterpart anchors and all runtime bindings remain unchanged;
+only three older whole-file hashes change for the append-only Rust test file.
 Three independent-terminal counterparts add 30 direct component links for the
 four Complete/Retry/Fail/Cancel groups, the success/error/success pipeline and
 duplicate Complete with one newly emitted completion event. Shared macros run

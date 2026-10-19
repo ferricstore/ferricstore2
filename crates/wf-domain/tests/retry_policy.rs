@@ -333,3 +333,84 @@ fn installed_view_rejects_invalid_logical_states_and_preserves_opaque_binary_nam
     );
     Ok(())
 }
+
+// Frozen declaration deb8dc5136bd2e4e, direct RetryPolicyTest lines 6-16.
+#[test]
+fn original_flow_policy_rejects_both_malformed_state_policy_recipes() -> TestResult {
+    use wf_domain::policy::complete::{
+        FlowPolicyInputRejection, PolicySchemaCharge, PolicySchemaLimits, RawFlowPolicyValue,
+        encode_original_complete_policy_input_rejection_body,
+        normalize_original_complete_policy_input,
+    };
+
+    let limits = PolicySchemaLimits::default();
+    for (workflow_type, value) in [
+        (
+            b"invalid-state-policy".as_slice(),
+            RawFlowPolicyValue::Integer(42),
+        ),
+        (
+            b"invalid-state-policy-list".as_slice(),
+            RawFlowPolicyValue::List(&[RawFlowPolicyValue::Atom("not_a_keyword_pair")]),
+        ),
+    ] {
+        let states = [(RawFlowPolicyValue::Binary(b"queued"), value)];
+        let option = [
+            RawFlowPolicyValue::Atom("states"),
+            RawFlowPolicyValue::Map(&states),
+        ];
+        let opts = [RawFlowPolicyValue::Tuple(&option)];
+        let mut charge = PolicySchemaCharge::new(limits);
+        assert_eq!(
+            normalize_original_complete_policy_input(
+                &RawFlowPolicyValue::Binary(workflow_type),
+                &RawFlowPolicyValue::List(&opts),
+                1_000_000,
+                limits,
+                &mut charge,
+            )?,
+            Err(FlowPolicyInputRejection::StatePolicyShape)
+        );
+        assert_eq!(
+            encode_original_complete_policy_input_rejection_body(
+                FlowPolicyInputRejection::StatePolicyShape,
+                limits,
+                &mut charge,
+            )?,
+            b"ERR flow state policy must be a map or keyword list"
+        );
+    }
+    Ok(())
+}
+
+// Frozen declaration 9e5df11d9c3d3842, direct RetryPolicyTest lines 18-25.
+#[test]
+fn original_flow_policy_omits_absent_fields_and_preserves_the_exact_empty_state() -> TestResult {
+    use wf_domain::policy::complete::{
+        PolicySchemaCharge, PolicySchemaLimits, RawFlowPolicyValue,
+        normalize_original_complete_policy_input,
+    };
+
+    let limits = PolicySchemaLimits::default();
+    let states = [(
+        RawFlowPolicyValue::Binary(b"queued"),
+        RawFlowPolicyValue::Map(&[]),
+    )];
+    let option = [
+        RawFlowPolicyValue::Atom("states"),
+        RawFlowPolicyValue::Map(&states),
+    ];
+    let opts = [RawFlowPolicyValue::Tuple(&option)];
+    let mut charge = PolicySchemaCharge::new(limits);
+    let actual = normalize_original_complete_policy_input(
+        &RawFlowPolicyValue::Binary(b"compact-policy"),
+        &RawFlowPolicyValue::List(&opts),
+        1_000_000,
+        limits,
+        &mut charge,
+    )?;
+    // Complete canonical ETF: only states={queued=>{}} and type are present.
+    let expected = b"\x83t\0\0\0\x02w\x06statest\0\0\0\x01m\0\0\0\x06queuedt\0\0\0\0w\x04typem\0\0\0\x0ecompact-policy";
+    assert_eq!(actual, Ok(expected.to_vec()));
+    Ok(())
+}

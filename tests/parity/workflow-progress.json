@@ -14595,14 +14595,90 @@
       "runtime_case_ids": [
         "58474d885a2d9b39b015fd9ca96a3242fd0728964ce136224ed0142f659ac00f"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-deb8dc5136bd2e4e",
+          "rust_file": "crates/wf-domain/tests/retry_policy.rs",
+          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
+          "rust_module": "",
+          "rust_function": "original_flow_policy_rejects_both_malformed_state_policy_recipes",
+          "assertions": [
+            {
+              "source_line": 9,
+              "source_text": "assert ^error =",
+              "rust_line": 364,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 9,
+              "source_text": "assert ^error =",
+              "rust_line": 374,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 12,
+              "source_text": "assert ^error =",
+              "rust_line": 364,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 12,
+              "source_text": "assert ^error =",
+              "rust_line": 374,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed original-input normalization preserves both exact workflow type names, keyword states opts, queued state, integer42 and the one-element non-keyword atom list. The shared direct rejection-kind/body macros execute for BOTH original recipes; each source error tuple maps to both observations. This covers the complete pure rejection observations using existing Rust descriptors, without a runtime term decoder or transport claim. The source ExUnit.Case async:true file has no case setup or special tags; its original umbrella helper/profile still requires execution. The actual normal mix test attempt stopped before tests at Mix.PubSub TCP socket :eperm, retained as setup failure. First Rust PASS and strict checks are macOS acceptance of existing implemented behavior, not tests-first RED, original source execution, independent Linux validation or full workflow parity. The separate FIFO helper case remains open."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "9e5df11d9c3d3842",
       "runtime_case_ids": [
         "924f1cb6c0ffb5ecade79dabb297f731a023984fb918a0f5250ad330d3c7ecfa"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-9e5df11d9c3d3842",
+          "rust_file": "crates/wf-domain/tests/retry_policy.rs",
+          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
+          "rust_module": "",
+          "rust_function": "original_flow_policy_omits_absent_fields_and_preserves_the_exact_empty_state",
+          "assertions": [
+            {
+              "source_line": 19,
+              "source_text": "assert {:ok, policy} =",
+              "rust_line": 414,
+              "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
+            },
+            {
+              "source_line": 22,
+              "source_text": "refute Map.has_key?(policy, :version)",
+              "rust_line": 414,
+              "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
+            },
+            {
+              "source_line": 23,
+              "source_text": "refute Map.has_key?(policy, :max_active_ms)",
+              "rust_line": 414,
+              "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
+            },
+            {
+              "source_line": 24,
+              "source_text": "assert policy.states == %{\"queued\" => %{}}",
+              "rust_line": 414,
+              "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed original-input normalization preserves compact-policy, original keyword states opts and queued empty state policy. One direct full Result/canonical ETF equality proves normalization success, exactly the states/type fields, absent version/max_active_ms and exactly queued=>empty map; all four original assertions are linked to that complete literal equality. Independent grammar packing proves all60 expected bytes; it is not an externally promised legacy wire format. The source ExUnit.Case async:true file has no case setup or special tags; original umbrella helper/profile execution still requires a usable Mix environment. Actual mix test stopped before tests at Mix.PubSub TCP socket :eperm. Existing-behavior Rust/macOS PASS adds neither retroactive TDD, independent Linux acceptance, source runtime/profile execution nor full workflow parity. The third execution-mode/FIFO helper case remains unlinked."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "3cc1821bd694c95e",
@@ -22803,7 +22879,7 @@
         {
           "scenario_id": "m1-999b558a2dc276d2",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "0b25b35b51087b2d25530120278232bc40ff7bba47cf44e70318953bd03a7a1d",
+          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
           "rust_module": "",
           "rust_function": "flow_retry_policy_accepts_thirty_day_backoff_cap",
           "assertions": [
@@ -22859,7 +22935,7 @@
         {
           "scenario_id": "m1-bd7d579285676091",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "0b25b35b51087b2d25530120278232bc40ff7bba47cf44e70318953bd03a7a1d",
+          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
           "rust_module": "",
           "rust_function": "flow_retry_policy_computes_standard_backoff_timing",
           "assertions": [
@@ -23011,7 +23087,7 @@
         {
           "scenario_id": "m1-ecaed3fd34f388ec",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "0b25b35b51087b2d25530120278232bc40ff7bba47cf44e70318953bd03a7a1d",
+          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
           "rust_module": "",
           "rust_function": "flow_retry_policy_keeps_generated_backoff_values_bounded_and_deterministic",
           "assertions": [
