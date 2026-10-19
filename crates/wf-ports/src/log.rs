@@ -14,6 +14,7 @@ use crate::consensus::{PreparedOperation, PreparedRequest};
 
 mod claim;
 mod common;
+pub use common::normal_recovery_header;
 mod complete_policy;
 mod control;
 mod decode;

@@ -5,7 +5,71 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest increment implements bounded neutral Blank/Membership bodies and
+The latest increment implements concrete consuming startup recovery in
+`wf-node::recovery`. One actual guard captures control and applied membership,
+then drops typed membership and the guard before reading the separate durable
+log. A bounded audit of the complete retained applied prefix verifies the full
+checkpoint identity, actual body SHA, original stamp, every historical HLC/wall
+floor and the LAST membership, including valid None. All audit precedes replay.
+Only the fixed committed suffix reaches existing real Blank/Membership/V5/V6/
+public1 drivers; uncommitted bodies remain untouched. Final coherent control/M
+and unchanged committed boundary must match before both owners return. Any error
+drops both owners; an already committed replay prefix remains durable for reopen.
+See [ADR-007](adr/007-durable-log-storage.md#selected-committed-startup-recovery).
+
+Twelve new test identities pass after genuine missing-contract RED. They isolate
+stale M, false None and independent historical clock floors using separately valid
+histories with the SAME matching A; verify exact ID/body/stamp/scope and complete
+Normal intent/EOF; compare all physical state/log cohorts through mixed replay,
+original replies, business refusals and expiry; preserve an opaque uncommitted
+tail; and exercise prospective exact/tight point/body/guard/decoder/membership/
+scope accounts, binary tenants, repeated recovery and two real completed-call
+process kills with durable-prefix reopen/resume. These are composition tests
+against existing drivers, not a second independent proof of the reducer/backend,
+inside-engine faults, power loss, service readiness or Linux evidence.
+
+Architecture and performance actually reviewed all tests/source and each other's
+findings. Three preimplementation fixture corrections fixed an invented FIFO
+head row, a Fresh command time below effective control time and an unencodable
+full isolation scope; none is product-bug RED. Exact index literals were packed
+independently. A private unused receiver and three equivalent test spellings
+resolve strict diagnostics, with executed complete-file inverses and no changed
+oracle, fee or waiver. Related implementations stay in private join/replay
+children; source-size and dependency/module policies pass. Node adds only the
+existing exact no-default SHA pin and a canonical redb DEV-only test edge.
+Consensus/storage/old drivers and original FWCP/storage bytes remain unchanged.
+
+The final native macOS snapshot passes **745 Rust tests across 89 workspace
+targets**, plus six compile-fail examples across 15 documentation targets, with
+zero failures or ignored tests. Formatting, all-target compilation, strict Clippy,
+warnings-denied rustdoc, architecture and reference/progress checks pass. The full
+cached dependency audit passes advisories, bans, licenses and sources without
+waivers/exclusions; no fresh online advisory refresh is claimed. All 718 selected
+source/manifest/policy/style inputs stayed unchanged throughout final validation.
+
+The separate pinned native acceptance executable passes formatting, compilation,
+strict Clippy and its complete persistence/fault/process-kill run. All 735 combined
+inputs stayed unchanged. Its 17 files, including 15 Rust sources, remain exactly
+proof 55bcbd85; no native source changed. Both backends retain canonical redb
+4.4.0/no-default/std-only. Actual execution is Darwin arm64; native Linux remains
+required. No runtime framework or consensus-to-storage dependency was introduced.
+
+The executed full parity gate still fails. Ledger counts remain 82 source-derived
+declarations, 92 mappings and 365 assertion links; 1,681 runtime cases remain
+unmatched and 1,655 declarations unresolved. These component tests add no complete
+source-case parity credit. Every pinned Elixir setup, fixture, mandatory profile
+and runtime scenario remains required. The full goal stays active.
+
+Next: complete snapshots/install/purge and snapshot-aware startup, preserving
+durable publication before any log purge. Then finish consensus/read barriers,
+remaining domain and Claim/policy routes, services and full M1–M8 acceptance.
+Peers are assessing snapshot responsibilities/resources in existing notes only;
+no next artifact/model/source is selected. Every new artifact still requires
+concrete architecture consultation and substantive tests before implementation.
+
+Earlier applied-membership checkpoint (`b5ce61a`):
+
+That checkpoint implements bounded neutral Blank/Membership bodies and
 atomic last-applied membership with the SAME workflow ControlState. Pure ports
 preserve complete ordered joint configurations, learners, original owners and
 explicit stamped/unstamped metadata. The actual state guard supplies its captured
@@ -61,16 +125,6 @@ declarations, 92 mappings and 365 assertion links; 1,681 runtime cases remain
 unmatched and 1,655 declarations unresolved. These component tests add no full
 source-case parity credit. Complete pinned Elixir setup, fixtures, mandatory
 profiles and runtime scenarios remain required, as does native Linux validation.
-
-Next: verify historical applied membership against the actual durable log and
-replay only the ordered committed suffix through real Blank/Membership/Normal
-apply paths before returning usable owners. Preserve the existing checkpoint
-verifier's separate contract and no-snapshot qualification; it does not silently
-perform this successor. Architecture/performance are reviewing a finite proposal
-in the existing notes; no next source is released. Then finish snapshot/install/
-purge, consensus/read barriers, remaining domain and Claim/policy routes, services
-and full M1–M8 acceptance. The full goal remains active; new artifacts still require
-concrete architecture consultation and substantive tests before implementation.
 
 Earlier startup checkpoint (`0e80526`):
 

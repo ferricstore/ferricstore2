@@ -10,6 +10,7 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+sha2.workspace = true
 wf-types.workspace = true
 wf-domain.workspace = true
 wf-ports.workspace = true
@@ -21,3 +22,6 @@ wf-wire.workspace = true
 wf-api-http.workspace = true
 wf-api-tcp.workspace = true
 wf-worker.workspace = true
+
+[dev-dependencies]
+redb.workspace = true

@@ -121,3 +121,58 @@ fn git_source_policy_rejects_unpinned_or_unsupported_sources() -> CheckResult<()
     }
     Ok(())
 }
+
+#[test]
+fn committed_recovery_dependency_profiles_are_exact_and_layered() -> CheckResult<()> {
+    let mut accepted = metadata()?;
+    let dependencies = package_mut(&mut accepted, "wf-node")?["dependencies"]
+        .as_array_mut()
+        .ok_or("missing node dependencies")?;
+    dependencies.retain(|edge| edge["name"] != "sha2");
+    dependencies.push(json!({
+        "name": "sha2", "kind": null, "optional": false, "target": null,
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "path": null, "features": [], "req": "=0.11.0", "uses_default_features": false,
+    }));
+    assert_eq!(
+        graph::check(&accepted, &super::policy()?, &root()?)?,
+        Vec::<String>::new()
+    );
+    for (name, field, value) in [
+        ("sha2", "req", json!("^0.11.0")),
+        ("sha2", "features", json!(["std"])),
+        ("sha2", "uses_default_features", json!(true)),
+        (
+            "sha2",
+            "source",
+            json!("registry+https://example.invalid/index"),
+        ),
+        ("redb", "req", json!("^4.4.0")),
+        ("redb", "features", json!(["std", "logging"])),
+        ("redb", "uses_default_features", json!(true)),
+        ("redb", "kind", json!(null)),
+        (
+            "redb",
+            "source",
+            json!("registry+https://github.com/rust-lang/crates.io-index"),
+        ),
+        ("redb", "path", json!(root()?.join("vendor/redb"))),
+    ] {
+        let mut changed = accepted.clone();
+        let edge = package_mut(&mut changed, "wf-node")?["dependencies"]
+            .as_array_mut()
+            .ok_or("missing node dependencies")?
+            .iter_mut()
+            .find(|edge| edge["name"] == name)
+            .ok_or("missing selected edge")?;
+        edge[field] = value;
+        let findings = graph::check(&changed, &super::policy()?, &root()?)?;
+        assert!(
+            findings
+                .iter()
+                .any(|finding| finding.contains(&format!("wf-node -> {name}"))),
+            "missed {name} drift in {field}: {findings:?}"
+        );
+    }
+    Ok(())
+}

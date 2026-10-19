@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters and bounded checkpoint verification are implemented. Snapshot, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters and bounded committed startup recovery are implemented. Snapshot, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 
@@ -1116,10 +1116,10 @@ must complete before acknowledgment; an unproved consumed failure is Uncertain.
 See [ADR-004](adr/004-committed-time-and-apply-admission.md#scoped-state-store-admission)
 for prospective accounts and the separate durability/deployment gates.
 
-This adapter and its process-kill tests do not complete committed Claim/policy
-routes, Blank/Membership persistence, exact full-ID/body-digest log/state recovery
-joining, snapshots/purge, Raft/services, original setup/runtime parity or both-OS
-acceptance. Those remain required ordered successors.
+This adapter alone does not complete committed Claim/policy routes, snapshots/
+purge, Raft/services, original setup/runtime parity or both-OS acceptance. The
+following successors add applied membership and concrete log/state startup
+composition; their component evidence does not complete these remaining gates.
 
 ### Separate log/state checkpoint verification
 
@@ -1164,3 +1164,34 @@ and the twelve new test identities pass after missing-contract RED, with complet
 macOS workspace/native validation recorded in the handoff. Historical membership
 joins, ordered replay, snapshots, the real consensus/service owner, full source
 parity and Linux validation remain separate required work.
+
+### Selected committed startup recovery
+
+ARCH-M2-COMMITTED-RECOVERY1-CREATE1 assigns concrete synchronous startup
+orchestration to `wf-node::recovery`, with private join/replay children. It consumes
+the actual separate log/state owners and uses existing consensus control functions
+and storage Normal drivers. Consensus stays storage-neutral; no recovery trait,
+second state owner, readiness certificate or driver relocation is introduced.
+The only new models are explicit limits and fixed errors. Node uses the existing
+exact no-default SHA dependency; canonical redb is a dev-only node edge for
+independent complete physical test observations.
+
+One actual guard supplies control and applied membership. Their scalar metadata
+survive after the typed membership and guard drop. A bounded full retained-prefix
+audit proves the latest membership, including valid None, the actual checkpoint
+identity/body SHA/original stamp and every historical HLC/wall lower bound. All
+audit precedes ordered committed replay through the existing real apply paths.
+Unknown or currently unsupported Normal profiles refuse; their eventual durable
+drivers remain required. Uncommitted suffixes stay untouched.
+
+Every error drops both stores, while already committed replay prefixes remain
+durable for explicit reopen. There is no cross-entry rollback or service admission
+claim. The header helper reuses the pure `log::common` grammar and proves only
+borrowed dispatch/scope/stamp facts; full Normal verification stays with existing
+preparers/drivers. Exact phase/aggregate resource accounts are in
+[ADR-007](adr/007-durable-log-storage.md#selected-committed-startup-recovery).
+Twelve tests pass after actual preimplementation missing-contract RED. Final macOS
+acceptance passes 745 Rust tests/89 targets, six compile-fail examples/15 doc
+targets, strict quality checks and the separate unchanged native executable.
+Full required parity still fails; Linux, snapshots and runtime milestone gates
+remain open. The handoff binds exact current validation and remaining work.

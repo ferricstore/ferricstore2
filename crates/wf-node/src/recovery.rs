@@ -1,0 +1,299 @@
+//! Bounded startup audit/replay on separately owned product databases.
+//!
+//! This no-snapshot/no-purge composition neither starts a service nor supplies
+//! consensus commitment. It processes only the already durable committed prefix.
+
+use std::fmt;
+use wf_ports::consensus::{RaftMembershipError, RaftMembershipLimits};
+use wf_ports::log::{CodecError, RaftLogError, RaftLogStore};
+use wf_ports::state::StateTransactionError;
+use wf_storage::log::RedbLogStore;
+use wf_storage::state::RedbStateStore;
+use wf_storage::transaction::{RecordBatchTransactionError, RecordBatchTransactionLimits};
+use wf_types::identity::{GroupId, RecoveryId};
+
+mod join;
+mod replay;
+
+/// Explicit per-guard profiles and whole-call startup work/owner ceilings.
+/// No default semantic TTL or cluster apply profile is manufactured.
+#[derive(Clone, Copy)]
+pub struct CommittedRecoveryLimits {
+    membership: RaftMembershipLimits,
+    state: (usize, usize, usize, usize),
+    normal: RecordBatchTransactionLimits,
+    work: (usize, usize),
+    entry: usize,
+    workspace: usize,
+}
+
+impl CommittedRecoveryLimits {
+    /// Sets membership, state(steps,observationR,controlR,C), Normal, work(points,
+    /// copied body bytes), point-owner J and total W profiles.
+    /// # Errors
+    /// Refuses zero required fields or a point cap below its fixed512 fee.
+    pub fn new(
+        membership: RaftMembershipLimits,
+        state: (usize, usize, usize, usize),
+        normal: RecordBatchTransactionLimits,
+        work: (usize, usize),
+        maximum_owned_entry_bytes: usize,
+        workspace_bytes: usize,
+    ) -> Result<Self, CommittedRecoveryError> {
+        if [
+            state.0,
+            state.1,
+            state.2,
+            state.3,
+            work.0,
+            work.1,
+            workspace_bytes,
+            normal.maximum_read_steps,
+            normal.maximum_read_bytes,
+            normal.maximum_staging_bytes,
+            normal.maximum_adapter_bytes,
+            normal.workspace_bytes,
+        ]
+        .contains(&0)
+            || maximum_owned_entry_bytes < 512
+            || normal.outcome_ttl_ms == 0
+        {
+            return Err(CommittedRecoveryError::InvalidLimits);
+        }
+        Ok(Self {
+            membership,
+            state,
+            normal,
+            work,
+            entry: maximum_owned_entry_bytes,
+            workspace: workspace_bytes,
+        })
+    }
+    /// Supported membership validation profile.
+    #[must_use]
+    pub const fn membership_limits(self) -> RaftMembershipLimits {
+        self.membership
+    }
+    /// Cumulative steps within each observation/control guard.
+    #[must_use]
+    pub const fn maximum_state_read_steps(self) -> usize {
+        self.state.0
+    }
+    /// Cumulative R within each initial/final coherent observation.
+    #[must_use]
+    pub const fn maximum_applied_state_bytes(self) -> usize {
+        self.state.1
+    }
+    /// Cumulative R within each consumed control-entry application.
+    #[must_use]
+    pub const fn maximum_control_apply_bytes(self) -> usize {
+        self.state.2
+    }
+    /// Cumulative C within each observation/control guard.
+    #[must_use]
+    pub const fn maximum_temporary_bytes(self) -> usize {
+        self.state.3
+    }
+    /// Exact existing Normal driver profile, including its explicit semantic TTL.
+    #[must_use]
+    pub const fn normal_limits(self) -> RecordBatchTransactionLimits {
+        self.normal
+    }
+    /// Whole-call point allowance across audit AND replay.
+    #[must_use]
+    pub const fn maximum_log_points(self) -> usize {
+        self.work.0
+    }
+    /// Whole-call copied BODY bytes, excluding fixed log-wire headers.
+    #[must_use]
+    pub const fn maximum_log_body_bytes(self) -> usize {
+        self.work.1
+    }
+    /// Maximum copied point owner512+E.
+    #[must_use]
+    pub const fn maximum_owned_entry_bytes(self) -> usize {
+        self.entry
+    }
+    /// Simultaneous logical owner ceiling, separate from engine pages/cache.
+    #[must_use]
+    pub const fn workspace_bytes(self) -> usize {
+        self.workspace
+    }
+
+    fn base(group: &GroupId, recovery: &RecoveryId) -> Result<usize, CommittedRecoveryError> {
+        total(&[
+            512,
+            group.as_bytes().len(),
+            recovery.as_bytes().len(),
+            512,
+            group.as_bytes().len(),
+            recovery.as_bytes().len(),
+            2048,
+            512,
+        ])
+    }
+    fn admit(self, parts: &[usize]) -> Result<(), CommittedRecoveryError> {
+        if total(parts)? > self.workspace {
+            return Err(CommittedRecoveryError::Limit);
+        }
+        Ok(())
+    }
+}
+
+fn total(parts: &[usize]) -> Result<usize, CommittedRecoveryError> {
+    parts
+        .iter()
+        .copied()
+        .try_fold(0_usize, usize::checked_add)
+        .ok_or(CommittedRecoveryError::Limit)
+}
+
+/// Fixed startup failures; every recovery error drops both database handles.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CommittedRecoveryError {
+    /// A required positive profile or point-owner minimum is invalid.
+    InvalidLimits,
+    /// A whole-call work/owner allowance or checked arithmetic was exceeded.
+    Limit,
+    /// The independently supplied namespace differs from actual store/header scope.
+    NamespaceMismatch,
+    /// Applied/committed state violates the no-snapshot rule or committed changed.
+    IncompatibleCheckpoint,
+    /// An expected committed point is genuinely absent.
+    MissingEntry,
+    /// The complete term/node/index identity differs.
+    IdentityMismatch,
+    /// SHA256 of the actual applied body differs from the saved checkpoint.
+    BodyMismatch,
+    /// The actual applied body's original stamp differs from saved control.
+    StampMismatch,
+    /// Applied clocks are below a known historical stamped entry.
+    ClockMismatch,
+    /// Saved/final membership is not the exact last committed membership.
+    MembershipMismatch,
+    /// No real supported driver exists for this closed body/profile.
+    UnsupportedEntry,
+    /// An actual driver/final observation disagrees with the expected control.
+    ProgressMismatch,
+    /// Existing durable log operational diagnosis.
+    Log(RaftLogError),
+    /// Existing same-guard state operational diagnosis.
+    State(StateTransactionError),
+    /// Existing complete Normal preparation/transaction diagnosis.
+    Normal(RecordBatchTransactionError),
+    /// Header-only parsing failure.
+    Codec(CodecError),
+    /// Closed Blank/Membership parsing failure.
+    Membership(RaftMembershipError),
+}
+impl fmt::Display for CommittedRecoveryError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Self::InvalidLimits => "invalid committed recovery limits",
+            Self::Limit => "committed recovery limit",
+            Self::NamespaceMismatch => "committed recovery namespace mismatch",
+            Self::IncompatibleCheckpoint => "incompatible committed recovery checkpoint",
+            Self::MissingEntry => "committed recovery point missing",
+            Self::IdentityMismatch => "committed recovery log identity mismatch",
+            Self::BodyMismatch => "committed recovery body digest mismatch",
+            Self::StampMismatch => "committed recovery original stamp mismatch",
+            Self::ClockMismatch => "committed recovery historical clock mismatch",
+            Self::MembershipMismatch => "committed recovery membership mismatch",
+            Self::UnsupportedEntry => "unsupported committed recovery entry",
+            Self::ProgressMismatch => "committed recovery progress mismatch",
+            Self::Log(error) => return fmt::Display::fmt(error, f),
+            Self::State(error) => return fmt::Display::fmt(error, f),
+            Self::Normal(error) => return fmt::Display::fmt(error, f),
+            Self::Codec(error) => return fmt::Display::fmt(error, f),
+            Self::Membership(error) => return fmt::Display::fmt(error, f),
+        })
+    }
+}
+impl std::error::Error for CommittedRecoveryError {}
+
+/// Audits the full retained history, then applies only the fixed committed suffix.
+/// All errors consume both owners; any already committed replay prefix remains
+/// durable for explicit reopen. Success is startup consistency, not a Raft service.
+/// # Errors
+/// Refuses profiles, unsupported/inconsistent bodies, operational errors or budgets.
+pub fn recover_committed(
+    mut log: RedbLogStore,
+    mut state: RedbStateStore,
+    group: &GroupId,
+    recovery: &RecoveryId,
+    limits: CommittedRecoveryLimits,
+) -> Result<(RedbLogStore, RedbStateStore), CommittedRecoveryError> {
+    use CommittedRecoveryError as Error;
+    if log.group() != group
+        || log.recovery() != recovery
+        || state.group() != group
+        || state.recovery() != recovery
+    {
+        return Err(Error::NamespaceMismatch);
+    }
+    let base = CommittedRecoveryLimits::base(group, recovery)?;
+    let mut saved = None;
+    let initial = join::observe(&mut state, (group, recovery), limits, base, &mut saved)?;
+    let metadata = log.state().map_err(Error::Log)?;
+    let stop = join::boundary(initial, metadata.committed(), limits)?;
+    let audit_end = initial
+        .last_entry()
+        .map_or(0, |entry| u128::from(entry.log().index().get()) + 1);
+    let mut work = [0, limits.maximum_log_body_bytes()];
+    let mut latest = None;
+    for position in 0..audit_end {
+        let index = u64::try_from(position).map_err(|_| Error::Limit)?;
+        let entry = join::point(&mut log, index, limits, base, &mut work)?;
+        join::audit(
+            &entry,
+            (group, recovery),
+            limits,
+            base,
+            initial,
+            &mut latest,
+        )?;
+    }
+    if latest != saved {
+        return Err(Error::MembershipMismatch);
+    }
+    let mut progress = initial;
+    for position in audit_end..stop {
+        let index = u64::try_from(position).map_err(|_| Error::Limit)?;
+        let entry = join::point(&mut log, index, limits, base, &mut work)?;
+        if position + 1 == stop && Some(entry.id()) != metadata.committed() {
+            return Err(Error::IdentityMismatch);
+        }
+        progress = replay::apply(
+            &mut state,
+            &entry,
+            (group, recovery),
+            limits,
+            base,
+            progress,
+        )?;
+        if entry.body().starts_with(b"FWMB") {
+            latest = Some((
+                progress.last_entry().ok_or(Error::ProgressMismatch)?,
+                progress.last_entry_stamp().ok_or(Error::ProgressMismatch)?,
+            ));
+        }
+    }
+    let mut final_membership = None;
+    let observed = join::observe(
+        &mut state,
+        (group, recovery),
+        limits,
+        base,
+        &mut final_membership,
+    )?;
+    if observed != progress {
+        return Err(Error::ProgressMismatch);
+    }
+    if final_membership != latest {
+        return Err(Error::MembershipMismatch);
+    }
+    if log.state().map_err(Error::Log)?.committed() != metadata.committed() {
+        return Err(Error::IncompatibleCheckpoint);
+    }
+    Ok((log, state))
+}

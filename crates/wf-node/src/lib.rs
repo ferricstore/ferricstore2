@@ -11,5 +11,6 @@
 
 pub mod composition;
 pub mod configuration;
+pub mod recovery;
 pub mod shutdown;
 pub mod supervision;

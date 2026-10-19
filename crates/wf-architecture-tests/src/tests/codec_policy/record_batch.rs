@@ -95,6 +95,8 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::control::scan",
         "log::control::codec",
         "log::control::nested",
+        "log::common",
+        "log::common::nested",
         "state::control",
         "state::control::nested",
     ] {
@@ -133,6 +135,7 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
         "log::public_mutation_backend",
         "consensus::membership_backend",
         "log::control_backend",
+        "log::common_backend",
         "state::control_backend",
     ] {
         assert_eq!(

@@ -239,8 +239,81 @@ control requires None. Applied membership cannot be ahead of control; equal inde
 requires full identity, actual body SHA and original stamp equality. Current HLC
 and wall must both cover a known membership stamp even when membership is older.
 
-Historical membership/log joining, ordered suffix replay, snapshots/install/purge,
-real Raft integration, full source parity and native Linux/macOS acceptance remain
-required. The earlier checkpoint verifier is not silently expanded to perform
-those successors. Logical ownership formulas do not establish native RSS or
-latency improvements.
+At the applied-membership checkpoint, historical joining and ordered suffix replay
+remained successors; the section below records their concrete implementation.
+Snapshots/install/purge, real Raft integration, full source parity and native
+Linux/macOS acceptance remain required. The earlier checkpoint verifier is not
+silently expanded. Logical ownership formulas establish no native RSS or latency
+improvement.
+
+## Selected committed startup recovery
+
+ARCH-M2-COMMITTED-RECOVERY1-CREATE1 selects `wf-node::recovery::recover_committed`
+over the actual consumed RedbLogStore/RedbStateStore. Private join/replay children
+own orchestration only; the existing control and V5/V6/public1 transaction drivers
+retain validation, domain decisions and atomic publication. The earlier neutral
+checkpoint verifier stays unchanged. Twelve test identities pass after actual
+preimplementation missing-contract RED. Final macOS validation passes 745 Rust
+tests/89 targets plus six compile-fail examples/15 doc targets, strict quality
+checks and the separate unchanged native executable; exact evidence is in the
+handoff. Full source parity, Linux and later milestone gates remain open.
+
+`CommittedRecoveryLimits` requires an explicit existing Normal profile, including
+its deterministic original outcome TTL, and has no Default. It captures membership
+ceilings, per-guard steps/observation-R/control-R/C, cumulative reached-point/body
+bytes, per-entry owner J and global workspace W. Positive small profiles may refuse
+operations; construction rejects zero fields or J<512. Existing errors retain
+their categories through the fixed `CommittedRecoveryError` variants.
+
+Observe A/control and last-applied M under the SAME actual state guard. Extract
+only Copy metadata, then drop typed membership and guard before log access. Freeze
+the real durable committed C. With no snapshot/purge, A requires C and A<=C, with
+full identity equality when their indexes match. Audit every actual point0..A
+before any replay write. Fully parse control bodies; supported historical Normal
+bodies also use their existing complete prepare/intent/EOF verification. The new
+borrowed header helper supplies only profile, scope and original stamp facts.
+
+At A require complete log identity, SHA-256(actual body) and original stamp. A.time
+must dominate EVERY historical stamped HLC and wall. Derive the LAST actual FWMB
+and compare complete identity/digest/stamp to saved M, including None. Checking
+only the saved M point cannot prove this last-membership invariant.
+
+Replay only consecutive points(A,C] through actual existing drivers. Retained
+business rejection/replay, request conflict and expiry are successful processing;
+their returned control must match the existing plan_control result. Drop the
+complete reply, expected scope and point before the next read. Final SAME-guard
+control/M observation and unchanged durable C must match progress. Unsupported
+policy/Claim/other Normal profiles refuse instead of being skipped; their joined
+durable routes remain required. Never inspect, apply or truncate uncommitted rows.
+
+All errors drop BOTH owners, including budget refusal. A replay prefix may already
+be durable: explicit strict reopen resumes from actual control, with no invented
+cross-entry rollback. Return establishes this bounded startup contract, not Raft
+commit provenance, effective/uncommitted membership or service readiness.
+
+Let g/r/t be actual namespace/tenant byte lengths, E body bytes, J=512+E,
+G=512+g+r and B=2*G+2048+512. The last512 pays retained scalar metadata. Before
+observation require B+configured observationR+C<=W. Before a point copy require
+B+actual bounded point cap<=W. Full-prefix and suffix share one point/body account;
+preflight stop=u128(C.index)+1 against the point cap. Before each point pass
+512+min(configuredJ-512,remaining_body_bytes) to the existing bounded read, then
+debit actual E after success. There is no wrapping u64 MAX+1 or suffix refund.
+
+Historical Normal uses B+512+D, where its unchanged decoder's
+D=4*E+codecB+1024*n+2048 already pays E and decoded scope. Normal replay pays
+Q=512+t+g+r BEFORE fallible expected-scope copies, requiring
+B+max(actualJ+Q,512+Q+normalW)<=W. Both terms matter when a valid tiny Normal W
+is below E. Existing driver W already pays encoded E and reserves cumulative
+R+stagingS+C. Control replay instead admits B+actualJ+configured controlR+C;
+its existing applier independently checks actual guard budgets. Output O stays
+inside C once. All arithmetic is checked; engine pages/cache and native allocator
+capacity remain outside these logical fees.
+
+The exact existing no-default SHA pin is a node normal edge. The canonical pinned
+redb no-default/std edge is node DEV-only for test observations/corruption, with
+negative checks against source/feature/version drift and production leakage.
+Narrow purity checks cover `log::common` and descendants while similarly named
+effectful neighbors stay distinct. No new engine, registry package or consensus
+storage edge is introduced. Snapshots/install/purge, full original setup/profile
+parity, runtime integration and independent native Linux/macOS acceptance remain
+required; these equations establish no measured latency/RSS gain.

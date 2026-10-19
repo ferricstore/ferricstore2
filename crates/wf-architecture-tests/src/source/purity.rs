@@ -21,6 +21,7 @@ impl Inspector<'_, '_> {
             "log::public_mutation",
             "consensus::membership",
             "log::control",
+            "log::common",
             "state::control",
         ]
         .into_iter()

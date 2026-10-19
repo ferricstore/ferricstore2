@@ -3,7 +3,33 @@
 use wf_domain::workflow::request::ClientIntent;
 use wf_types::version::{CommittedTime, HlcTimestamp, TimestampMillis};
 
-use super::{CodecError, reader::Reader};
+use super::{CodecError, CodecLimits, reader::Reader};
+
+/// Borrows supported Normal profile/scope/stamp facts without validating its body.
+/// Complete intent, operations, derived keys and EOF remain the driver's duty.
+/// # Errors
+/// Refuses a header/profile/framing error or the explicit encoded byte cap.
+pub fn normal_recovery_header(
+    encoded: &[u8],
+    limits: CodecLimits,
+) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(CodecError::ByteLimit);
+    }
+    let mut reader = Reader::new(encoded, limits);
+    let header = header(&mut reader)?;
+    let profile = match (header.operation_tag, header.intent.version()) {
+        (1, 5) => 5,
+        (1, 6) => 6,
+        (4, 1) => 1,
+        _ => return Err(CodecError::UnsupportedTag),
+    };
+    Ok((
+        profile,
+        [header.tenant, header.group, header.recovery],
+        header.stamp,
+    ))
+}
 
 pub(super) struct RawHeader<'a> {
     pub(super) operation_tag: u8,

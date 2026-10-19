@@ -87,7 +87,13 @@ modules = { worker = true, handler = true, shutdown = true, client = false }
 kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-ports", "wf-application", "wf-storage", "wf-consensus", "wf-projection", "wf-wire", "wf-api-http", "wf-api-tcp", "wf-worker"]
 dev = ["wf-test-support"]
-modules = { configuration = true, composition = true, supervision = true, shutdown = true }
+modules = { configuration = true, composition = true, supervision = true, shutdown = true, recovery = true }
+external_normal = [
+  { name = "sha2", version = "=0.11.0", features = [], default_features = false },
+]
+external_dev = [
+  { name = "redb", version = "=4.4.0", features = ["std"], default_features = false, source = "git+https://github.com/cberner/redb?rev=7061f7e60d4573311c0636e161d417b93e9fd2b1" },
+]
 
 [packages.wf-architecture-tests]
 kind = "tooling"

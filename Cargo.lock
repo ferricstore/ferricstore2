@@ -820,6 +820,8 @@ dependencies = [
 name = "wf-node"
 version = "0.1.0"
 dependencies = [
+ "redb",
+ "sha2",
  "wf-api-http",
  "wf-api-tcp",
  "wf-application",
