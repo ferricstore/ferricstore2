@@ -5,7 +5,18 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest completed increment implements protected local log purge and startup
+The latest completed increment adds the trusted received-log boundary. Matching
+full local identities require the actual body digest and retain their suffix;
+conflicting or beyond-tail received boundaries replace the covered physical
+branch atomically with C/P/artifact metadata. Complete expected metadata CAS,
+commitment/leader protection and exact retry preserve the existing durable owner.
+Eleven new substantive tests pass after missing-contract RED, including exact/tight
+census, actual disk faults and six acknowledged process kills. The implementation
+uses one new private source file, three existing seams and three new test files.
+This is the log capability beneath the required state catalog and accepted Raft callback. See
+[ADR-007](adr/007-durable-log-storage.md#selected-trusted-received-log-boundary).
+
+The protected local purge component implements startup
 recovery from a pinned snapshot. Node proves the immutable snapshot against the
 actual committed history before pinning state and purging the separate log.
 The durable log binds the full purged identity and original artifact ID; every
@@ -25,8 +36,8 @@ proven final flush. These are component/process-boundary checks, not power-loss,
 queued runtime, offline rollback or complete original-source/profile parity.
 
 Architecture and performance reviewed the actual source/tests and each other's
-findings. The increment stays in four named new production files, the selected
-existing seams and thirteen approved test/helper files; its sole new production
+findings. The protected-purge predecessor stays in four named new production
+files, the selected existing seams and thirteen approved test/helper files; its sole new production
 model is SnapshotRecoveryError. Concrete helper moves preserve old oracles.
 A test trait import was corrected before final node RED. Equivalent strict
 spellings have executed complete-file inverses; no assertion, fee, lint, size or
@@ -35,14 +46,14 @@ audited checker rule, with behavioral regression RED/GREEN and all 39 checker
 unit tests passing. See ARCH-M2-PROTECTED-PURGE1-CREATE1 and its precision decisions
 in the active record.
 
-The current macOS checkpoint passes **791 Rust tests across 90 targets** and
+The current macOS checkpoint passes **802 Rust tests across 90 targets** and
 **six compile-fail examples across 15 documentation targets**, with zero failures
 or ignored tests. Formatting, all-target compilation, strict Clippy,
 warnings-denied rustdoc, architecture and reference/progress checks pass. The
 complete cached dependency audit passes advisories, bans, licenses and sources
 without new exclusions or waivers; no fresh online advisory refresh is claimed.
-All 1,303 selected Rust/manifest/lock/policy/style/script/CI/reference and native
-inputs stayed unchanged throughout final validation.
+All 1,311 selected runtime/policy/script/CI/reference and native inputs stayed
+unchanged throughout final validation.
 
 The separate pinned native acceptance executable also passes formatting,
 compilation, strict Clippy and its complete persistence/fault/process-kill run.
@@ -58,16 +69,29 @@ unmatched and 1,655 declarations unresolved. These component tests add no comple
 source-case parity credit. Every pinned Elixir setup, fixture, mandatory profile
 and runtime scenario remains required. The full goal stays active.
 
-Next: safe anchor advancement, repeated capture/install/purge and trusted
+Next: safe state/log anchor advancement, repeated capture/install/purge and trusted
 received-snapshot provenance beyond the local log tail. The current fixed pin
-refuses replacement and cannot be treated as product completion. Agents are
-consulting on the next concrete inventory; proposals remain unselected until
-architecture records the exact files, types, custody and resource contract.
+refuses replacement and cannot be treated as product completion. Architecture
+has selected the exact next files, types, custody and resource contract; the state/node bodies remain held for their substantive tests and RED.
 Consult architecture before any additional file, type or module, then establish
 real failing tests before implementation. Queued runtime capture and offline
 restore/lineage remain mandatory. Finish consensus/read barriers, remaining domain
 and committed Claim/policy routes, services and complete M1–M8 acceptance,
 including both supported hosts.
+
+The first native recheck selected system Rust 1.98 outside the repository. Only
+the remaining native checks were rerun with pinned Rust 1.99; all passed without
+product/oracle repair or repeated workspace execution.
+
+ARCH-M2-SNAPSHOT-ADVANCE1-CREATE1 separately selects the remaining seven production
+files, two models, extension capability and nine test/helper files for the state
+catalog and node composition. Default FWSS3 stays exact; consuming explicit
+upgrade enables six-table FWSS4 while canonical FWSP1 bytes/IDs remain unchanged.
+Old and new artifacts coexist through durable intent, log acknowledgement and
+retirement. The ready-first scalar capability preserves old exact budgets before
+admitting the new path. The frozen regression is complete; substantive catalog/
+node tests come next. This remaining production is held until its own tests, RED
+and explicit release.
 
 Earlier indexed-snapshot checkpoint (`9245995`):
 

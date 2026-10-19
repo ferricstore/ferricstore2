@@ -3,6 +3,7 @@
 //! Scoped synchronous durability, without consensus or state-machine apply.
 
 mod format;
+mod install;
 mod purge;
 mod read;
 mod recovery;

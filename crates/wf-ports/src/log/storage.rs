@@ -347,4 +347,21 @@ pub trait RaftLogStore {
         position: LogIdentity,
         snapshot_id: [u8; 32],
     ) -> Result<(), RaftLogError>;
+    /// Publishes an explicitly trusted received snapshot boundary atomically.
+    /// The server first establishes accepted snapshot authority and durably
+    /// retains its state artifact. This opaque primitive certifies neither.
+    /// Exact saved P/id retry precedes the prior-metadata comparison. Otherwise
+    /// the full expected metadata must match and the boundary must exceed C.
+    /// Matching full identity requires the actual body digest and keeps its
+    /// suffix; conflict or beyond-tail installation removes the old branch.
+    /// # Errors
+    /// Refuses protected boundaries, stale metadata, body or census conflicts,
+    /// and preserves the ordinary fatal or uncertain engine diagnosis.
+    fn install_snapshot_boundary(
+        &mut self,
+        expected: RaftLogState,
+        position: LogIdentity,
+        prepared: [u8; 32],
+        snapshot_id: [u8; 32],
+    ) -> Result<(), RaftLogError>;
 }

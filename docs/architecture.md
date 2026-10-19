@@ -1221,3 +1221,19 @@ tests across 90 targets, six compile-fail examples across 15 documentation targe
 strict quality checks and the unchanged separate native executable.
 Safe repeated advancement, received/beyond-tail snapshots, full source parity,
 runtime services and both-platform validation remain required successors.
+
+### Selected trusted received log boundary
+
+The neutral log port now has an explicit trusted received-boundary capability.
+The concrete redb owner handles full metadata CAS, actual same-ID body SHA,
+protected commitment, vote preservation and atomic C/P/ID/deletion. Its one
+borrowed scan charges prefix-plus-neighbor for a matching boundary and the whole
+discarded branch for conflict/beyond-tail. See
+[ADR-007](adr/007-durable-log-storage.md#selected-trusted-received-log-boundary).
+Eleven new tests plus seventeen existing log tests and strict storage checks pass
+after preimplementation missing-contract RED. Wider regression passes 802 Rust
+tests across 90 targets, six documentation examples across 15 targets, strict
+quality checks and the separate native Darwin executable.
+The state catalog/received coordinator and actual accepted Raft callback remain
+separate required work. The low-level capability requires their durable authority
+and custody; it supplies no service-readiness claim.

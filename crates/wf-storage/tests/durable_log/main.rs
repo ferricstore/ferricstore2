@@ -19,6 +19,7 @@ mod faults;
 mod limits;
 mod point;
 mod purge;
+mod received;
 mod recovery;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

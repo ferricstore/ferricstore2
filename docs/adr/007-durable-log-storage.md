@@ -470,3 +470,41 @@ Queued runtime capture, offline recovery/lineage, all original source/setup/prof
 cases, real consensus/services and separate native Linux/macOS evidence remain
 mandatory. No new dependency, storage-to-consensus edge, second authority owner
 or service readiness certificate is selected.
+
+## Selected trusted received log boundary
+
+ARCH-M2-SNAPSHOT-ADVANCE1-LOG-CREATE1 adds the neutral
+`RaftLogStore::install_snapshot_boundary(expected, position, prepared, snapshot_id)`
+and its concrete redb implementation. The server must first establish accepted
+received-snapshot authority and durable state-artifact custody. The two-store
+catalog/coordinator and actual accepted Raft callback remain required successors.
+This opaque log primitive carries those caller preconditions.
+
+One writer loads actual metadata. Exact saved full P/artifact-ID retry succeeds
+before comparing the old expected state. Otherwise the complete expected vote,
+C, tail and P/ID must match; S must exceed protected C/P and preserve their leader
+order. Matching full local S requires SHA-256 of its actual body to equal the
+supplied prepared digest. Its later suffix remains intact. A differing full S or
+S beyond the tail discards the covered old physical branch. Every successful
+publication preserves vote and atomically stores C=P=S, artifact ID, logical tail
+and the appropriate deletion in the same Immediate transaction. A logical
+boundary has no fabricated physical row, including at MAX.
+
+One borrowed forward scan charges each reached full stored wire before shared
+decode/checksum/body hashing. Matching S reaches the inclusive prefix plus one
+retained neighbor; conflict/beyond-tail reaches all old rows. Continuity and the
+actual committed witness are checked before mutation. Guards end before ranged
+deletion. No application key/entry vector or unrelated matching-branch suffix
+scan is introduced. Healthy Conflict/Limit leaves the owner usable; actual fatal
+or uncertain engine failures retain the existing fence/reopen rules. Native
+engine COW/cache/reclamation stays outside logical owner bounds.
+
+Eleven new identities pass after actual preimplementation missing-method RED,
+alongside seventeen existing log identities. They cover exact metadata/body
+refusals, independent full cohorts, exact/tight prefix-versus-full census, real
+read/sync faults and six acknowledged process kills. Strict storage checks pass.
+Full regression passes 802 Rust tests across 90 targets and six compile-fail
+examples across 15 documentation targets, with workspace strict checks,
+warnings-denied rustdoc and native Darwin acceptance. These component results
+establish no received state authority, callback readiness, Linux or source-case
+parity. Safe repeated state/log advancement remains required.

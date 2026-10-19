@@ -194,6 +194,17 @@ impl RaftLogStore for RedbLogStore {
         self.ready()?;
         super::purge::through(self, position, snapshot_id).map_err(|error| self.failure(error))
     }
+    fn install_snapshot_boundary(
+        &mut self,
+        expected: RaftLogState,
+        position: LogIdentity,
+        prepared: [u8; 32],
+        snapshot_id: [u8; 32],
+    ) -> Result<(), RaftLogError> {
+        self.ready()?;
+        super::install::boundary(self, expected, position, prepared, snapshot_id)
+            .map_err(|error| self.failure(error))
+    }
 }
 
 fn base(group: &GroupId, recovery: &RecoveryId, limits: RaftLogLimits) -> Result<(), RaftLogError> {
