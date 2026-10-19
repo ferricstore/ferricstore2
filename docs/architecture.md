@@ -1161,9 +1161,10 @@ strict open refuses intact FWSS1 without silently upgrading it. See
 [ADR-007](adr/007-durable-log-storage.md#applied-membership-and-neutral-control-entries)
 for selected formats, ownership accounts and recovery invariants. Implementation
 and the twelve new test identities pass after missing-contract RED, with complete
-macOS workspace/native validation recorded in the handoff. Historical membership
-joins, ordered replay, snapshots, the real consensus/service owner, full source
-parity and Linux validation remain separate required work.
+macOS workspace/native validation recorded in the handoff. At that checkpoint,
+historical joining and ordered replay were successors; the composition below now
+provides them. Snapshots, the real consensus/service owner, full source parity and
+Linux validation remain required.
 
 ### Selected committed startup recovery
 
