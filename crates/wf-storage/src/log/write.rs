@@ -67,7 +67,7 @@ fn identity(
         index,
         &store.group,
         &store.recovery,
-        store.limits,
+        store.limits.maximum_entry_bytes(),
     )?
     .0)
 }
@@ -152,7 +152,7 @@ fn validate_batch(
                 index,
                 &store.group,
                 &store.recovery,
-                store.limits,
+                store.limits.maximum_entry_bytes(),
             )?;
             if id != entry.id() || body != entry.body() {
                 return Err(RaftLogError::Conflict);
@@ -226,7 +226,7 @@ fn suffix(
             key.value(),
             &store.group,
             &store.recovery,
-            store.limits,
+            store.limits.maximum_entry_bytes(),
         )?;
         if previous.map_or(id.index().get() != 0, |before| !format::follows(before, id)) {
             return Err(RaftLogError::Corrupt);

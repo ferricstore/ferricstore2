@@ -1,6 +1,7 @@
-//! Consensus adapter boundaries. No Raft implementation is included yet.
+//! Storage-neutral checkpoint verification and consensus adapter boundaries.
 //!
-//! M0 module scaffold; implementations follow the reviewed architecture.
+//! Bounded startup verification is implemented; the Raft runtime, membership
+//! recovery, snapshots and committed-suffix replay remain incomplete.
 
 #![forbid(unsafe_code)]
 
@@ -8,3 +9,4 @@ pub mod adapter;
 pub mod apply;
 pub mod membership;
 pub mod read;
+pub mod recovery;

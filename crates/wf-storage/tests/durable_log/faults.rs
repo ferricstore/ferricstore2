@@ -145,6 +145,7 @@ fn expected(kind: u8, changed: bool) -> TestResult<Vec<(Vec<u8>, Vec<u8>)>> {
 
 fn assert_fenced(store: &mut RedbLogStore) {
     assert!(matches!(store.state(), Err(RaftLogError::Fenced)));
+    assert!(matches!(store.read_entry(0, 0), Err(RaftLogError::Fenced)));
     assert!(matches!(
         store.read_page(Bound::Unbounded, Bound::Unbounded),
         Err(RaftLogError::Fenced)

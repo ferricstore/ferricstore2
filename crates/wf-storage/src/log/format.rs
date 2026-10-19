@@ -2,7 +2,7 @@
 
 use redb::TableDefinition;
 use sha2::{Digest, Sha256};
-use wf_ports::log::{RaftLogError, RaftLogLimits, RaftLogState, RaftVote};
+use wf_ports::log::{RaftLogError, RaftLogState, RaftVote};
 use wf_types::identity::{GroupId, RecoveryId};
 use wf_types::version::{AppliedPosition, LogIdentity};
 
@@ -228,7 +228,7 @@ pub(super) fn decode_entry<'a>(
     index: u64,
     group: &GroupId,
     recovery: &RecoveryId,
-    limits: RaftLogLimits,
+    maximum_body_bytes: usize,
 ) -> Result<(LogIdentity, &'a [u8]), RaftLogError> {
     let payload = prefix(wire, *b"FWRL")?;
     let mut offset = 6;
@@ -239,7 +239,7 @@ pub(super) fn decode_entry<'a>(
     if id.index().get() != index || body.len() != length {
         return Err(RaftLogError::Corrupt);
     }
-    if length > limits.maximum_entry_bytes() {
+    if length > maximum_body_bytes {
         return Err(RaftLogError::Limit);
     }
     verify(wire, Some((group, recovery)))?;

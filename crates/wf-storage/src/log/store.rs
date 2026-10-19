@@ -166,6 +166,14 @@ impl RaftLogStore for RedbLogStore {
         self.ready()?;
         write::append(self, &entries).map_err(|error| self.failure(error))
     }
+    fn read_entry(
+        &mut self,
+        index: u64,
+        maximum_owned_bytes: usize,
+    ) -> Result<Option<RaftLogEntry>, RaftLogError> {
+        self.ready()?;
+        read::point(self, index, maximum_owned_bytes).map_err(|error| self.failure(error))
+    }
     fn read_page(
         &mut self,
         start: Bound<u64>,

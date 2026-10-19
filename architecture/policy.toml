@@ -48,7 +48,10 @@ external_normal = [
 kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-ports"]
 dev = ["wf-test-support"]
-modules = { adapter = true, apply = true, membership = true, read = true }
+modules = { adapter = true, apply = true, membership = true, read = true, recovery = true }
+external_normal = [
+  { name = "sha2", version = "=0.11.0", features = [], default_features = false },
+]
 
 [packages.wf-projection]
 kind = "runtime"

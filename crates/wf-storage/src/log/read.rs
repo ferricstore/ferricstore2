@@ -27,6 +27,43 @@ pub(super) fn state(store: &RedbLogStore) -> Result<RaftLogState, RaftLogError> 
     metadata(&table, store)
 }
 
+pub(super) fn point(
+    store: &RedbLogStore,
+    index: u64,
+    maximum_owned_bytes: usize,
+) -> Result<Option<RaftLogEntry>, RaftLogError> {
+    let body_cap = maximum_owned_bytes
+        .checked_sub(512)
+        .ok_or(RaftLogError::Limit)?
+        .min(store.limits.maximum_entry_bytes());
+    let tx = store
+        .database
+        .begin_read()
+        .map_err(format::transaction_error)?;
+    let table = tx.open_table(format::LOGS).map_err(format::table_error)?;
+    let guard = table
+        .get(index)
+        .map_err(|error| format::storage_error(&error))?;
+    let Some(guard) = guard else {
+        return Ok(None);
+    };
+    let (id, body) = format::decode_entry(
+        guard.value(),
+        index,
+        &store.group,
+        &store.recovery,
+        body_cap,
+    )?;
+    let bytes = format::sum(&[512, body.len()])?;
+    if bytes > maximum_owned_bytes || bytes > store.limits.maximum_read_bytes() {
+        return Err(RaftLogError::Limit);
+    }
+    store.workspace(bytes)?;
+    let mut owned = format::allocate(body.len())?;
+    owned.extend_from_slice(body);
+    Ok(Some(RaftLogEntry::new(id, owned)))
+}
+
 fn interval(start: Bound<u64>, end: Bound<u64>) -> Result<(u128, u128), RaftLogError> {
     let lower = match start {
         Bound::Included(value) => u128::from(value),
@@ -79,7 +116,7 @@ pub(super) fn page(
             key.value(),
             &store.group,
             &store.recovery,
-            store.limits,
+            store.limits.maximum_entry_bytes(),
         )?;
         if previous.is_some_and(|before| !format::follows(before, id)) {
             return Err(RaftLogError::Corrupt);

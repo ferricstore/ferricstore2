@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core and scoped synchronous durable-log/state adapters are implemented. Snapshot, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters and bounded checkpoint verification are implemented. Snapshot, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 
@@ -1120,3 +1120,24 @@ This adapter and its process-kill tests do not complete committed Claim/policy
 routes, Blank/Membership persistence, exact full-ID/body-digest log/state recovery
 joining, snapshots/purge, Raft/services, original setup/runtime parity or both-OS
 acceptance. Those remain required ordered successors.
+
+### Separate log/state checkpoint verification
+
+The synchronous `wf-consensus::recovery` verifier consumes the two independently
+owned stores through neutral ports. It returns them only after checking their
+startup checkpoint; every failure drops both. The one exclusive state guard ends
+without commit before log metadata and a bounded exact point read. Applied state
+binds the full term/node/index and SHA-256 of the actual stored body, separately
+from the scoped storage-frame checksum. Unapplied state and verified state behind
+committed remain valid but require later ordered replay before service.
+
+The mandatory log point port admits 512 plus actual body bytes before copying,
+with caller and captured backend limits. It returns no singleton page. Checked
+combined workspace reserves both store namespaces, fixed operation/control and
+the maximum of sequential control scratch and entry ownership. There is no
+second checkpoint model or backend dependency in consensus; its only new external
+edge is the existing exact no-default sha2 pin. See
+[ADR-007](adr/007-durable-log-storage.md#bounded-checkpoint-startup-join) for exact
+limits, custody, wire preservation and the no-snapshot qualification. This check
+does not supply effective membership, suffix application, snapshot/purge recovery
+or a Raft runtime.

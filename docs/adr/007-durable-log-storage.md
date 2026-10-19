@@ -104,3 +104,49 @@ upper is InvalidRange; equal normalized bounds are empty. Purge is
 absent until recovery can prove an applied/snapshot boundary. This log slice
 does not supply workflow-state publication, membership recovery, snapshots,
 consensus or service wiring; those M2/M3 successors remain mandatory.
+
+## Bounded checkpoint startup join
+
+ARCH-M2-CHECKPOINT-JOIN1-CREATE1 selects a read-only startup predecessor for the
+current unpurged, no-snapshot stores. `wf-consensus::recovery` depends only on
+the existing neutral ports, domain/types and the already pinned sha2 0.11.0
+without default features. Exact dependency and module checks remain enforced;
+consensus cannot import the concrete storage crate. Node supplies two separate
+database owners. This check does not make their transactions atomic together.
+
+The required `RaftLogStore::read_entry(index, maximum_owned_bytes)` returns at
+most one existing entry owner. Readiness/fencing precedes caller-cap validation.
+Caps below 512 refuse even an absent index; 512 admits an empty body. Borrowed
+framing, key identity and declared length precede profile checks. The smaller
+of the actual body limit and caller cap minus 512 bounds checksum work and body
+copying. Existing adapter read/workspace caps still apply before ownership.
+No allocating page fallback, body clone or index increment is required; the
+existing page and wire contracts remain unchanged.
+
+`verify_checkpoint` consumes both owners and returns only their pair on success.
+Every failure drops both, requiring reopen before reuse. Borrowed expected scope
+is checked first. A single state control read uses minimal valid admission,
+returned budget 512 and explicit step/temporary caps. Its uncommitted guard ends
+before log metadata or point reading. Applied control requires a durable committed
+boundary at or above it, complete identity equality at equal index, and the exact
+point's full log identity plus SHA-256 of its actual body matching the saved
+prepared digest. The FWRL checksum is a different digest. Unapplied state and
+verified applied state behind committed are valid and still require ordered
+replay; successful verification neither performs replay nor admits service.
+
+Explicit limits separate control steps, temporary C, entry owner J and workspace
+W. J is at least 512; defaults are 1/2048/16,777,728/268,435,456 respectively.
+Before store acquisition, checked F + max(C,J) must fit W, where
+F = 2*(512 + group length + recovery length) + 2048 + 512. The two phases share
+no live temporary/entry pool. Each adapter also enforces its actual captured
+profile. These are logical first-party ownership/work accounts, excluding engine
+pages/cache, allocator overhead and caller owners; no speed or RSS claim follows.
+
+This applied/committed relation is scoped to startup without snapshots or purge.
+Pinned OpenRaft 0.9.25 permits applied ahead of its persisted committed observation
+during snapshot installation, and its default save_committed is optional/no-op.
+The future bridge must explicitly await Immediate committed persistence before
+ordinary apply and acknowledge only after durable state application. Atomic
+effective-membership/control persistence, suffix replay, snapshot installation,
+safe purge, real Raft wiring and both native operating-system gates remain required.
+Implementation and execution evidence belong to the handoff and review records.

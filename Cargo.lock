@@ -803,6 +803,7 @@ dependencies = [
 name = "wf-consensus"
 version = "0.1.0"
 dependencies = [
+ "sha2",
  "wf-domain",
  "wf-ports",
  "wf-types",

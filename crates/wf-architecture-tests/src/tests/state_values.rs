@@ -121,6 +121,7 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         ("wf-wire", "wf-ports"),
         ("wf-wire", "wf-storage"),
         ("wf-storage", "wf-consensus"),
+        ("wf-consensus", "wf-storage"),
     ] {
         let mut changed = original.clone();
         package_mut(&mut changed, from)?["dependencies"]
@@ -136,6 +137,50 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         assert!(findings.iter().any(|finding| finding.contains(
             &format!("forbidden declared edge {from} -> {to}")
         )), "{findings:?}");
+    }
+    Ok(())
+}
+
+#[test]
+fn checkpoint_join_dependency_is_exact_and_layered() -> CheckResult<()> {
+    let mut accepted = metadata()?;
+    let dependencies = package_mut(&mut accepted, "wf-consensus")?["dependencies"]
+        .as_array_mut()
+        .ok_or("missing dependencies")?;
+    dependencies.retain(|edge| edge["name"] != "sha2");
+    dependencies.push(json!({
+        "name": "sha2", "kind": null, "optional": false, "target": null,
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "path": null, "features": [], "req": "=0.11.0", "uses_default_features": false,
+    }));
+    assert_eq!(
+        graph::check(&accepted, &policy()?, &root()?)?,
+        Vec::<String>::new()
+    );
+    assert_eq!(
+        source_check("wf-consensus", "recovery", "use std::fmt;")?,
+        Vec::<String>::new()
+    );
+    for (field, value) in [
+        ("req", json!("^0.11.0")),
+        ("features", json!(["std"])),
+        ("uses_default_features", json!(true)),
+        ("source", json!("registry+https://example.invalid/index")),
+    ] {
+        let mut changed = accepted.clone();
+        let edge = package_mut(&mut changed, "wf-consensus")?["dependencies"]
+            .as_array_mut()
+            .ok_or("missing dependencies")?
+            .iter_mut()
+            .find(|edge| edge["name"] == "sha2")
+            .ok_or("missing SHA edge")?;
+        edge[field] = value;
+        assert!(
+            graph::check(&changed, &policy()?, &root()?)?
+                .iter()
+                .any(|finding| finding.contains("wf-consensus -> sha2: unreviewed")),
+            "missed drift in {field}"
+        );
     }
     Ok(())
 }

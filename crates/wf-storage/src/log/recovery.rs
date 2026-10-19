@@ -98,7 +98,7 @@ fn validate_entries(
             key.value(),
             &store.group,
             &store.recovery,
-            store.limits,
+            store.limits.maximum_entry_bytes(),
         )?;
         if previous.map_or(id.index().get() != 0, |before| !format::follows(before, id)) {
             return Err(RaftLogError::Corrupt);

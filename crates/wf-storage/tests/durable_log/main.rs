@@ -15,6 +15,7 @@ use wf_types::version::{AppliedPosition, LogIdentity};
 
 mod faults;
 mod limits;
+mod point;
 mod recovery;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

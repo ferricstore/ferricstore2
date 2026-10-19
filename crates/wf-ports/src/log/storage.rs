@@ -281,6 +281,16 @@ pub trait RaftLogStore {
     /// # Errors
     /// Refuses limits, gaps, identity/body/leader conflict or operational failure.
     fn append(&mut self, entries: Vec<RaftLogEntry>) -> Result<(), RaftLogError>;
+    /// Reads one exact point after admitting 512 plus its actual body bytes.
+    /// Ready/fence precedes cap checks; caps below 512 refuse before any probe.
+    /// A 512-byte cap admits an empty body; None means genuine point absence.
+    /// # Errors
+    /// Refuses caller/backend owner limits before copying, or operational failure.
+    fn read_entry(
+        &mut self,
+        index: u64,
+        maximum_owned_bytes: usize,
+    ) -> Result<Option<RaftLogEntry>, RaftLogError>;
     /// Returns a bounded consecutive prefix; empty proves interval exhaustion.
     /// # Errors
     /// Refuses inverted ranges, first-row limits, corruption or engine failure.

@@ -5,6 +5,61 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The latest increment adds bounded startup verification between the separate durable
+log and workflow state stores. The required log point read admits the caller's
+actual body owner before copying, preserving old page/wire behavior. The consuming
+verifier returns both owners only after full term/node/index and SHA-256 of the
+actual body match the saved applied checkpoint. Every failure drops both handles.
+Its read-only state guard ends before log activity; checked workspace reserves the
+maximum of those sequential phases. See
+[ADR-007](adr/007-durable-log-storage.md#bounded-checkpoint-startup-join).
+
+All five new product test identities pass after genuine missing-contract RED,
+including real separate-file reopen, identity/body/scope mismatch, exact/tight
+ownership caps, unchanged observable authority and three actual process kills:
+after durable append, after durable committed persistence before state apply, and
+after successful state-driver return. These are call-boundary process tests, not
+power-loss, network acknowledgment or Linux evidence. The applied-ahead rejection
+checks its exact control/log; its two-record business cohort is not independently
+reasserted. Architecture and performance reviewed the actual tests/source and
+each other's findings. Two lint-only repairs preserve the complete frozen oracles
+and checked arithmetic; the new exact dependency/module guard failed before the
+selected policy change and now passes.
+
+The final native macOS snapshot passes **720 Rust tests across 86 workspace
+targets**, plus six compile-fail examples across 15 documentation targets, with
+zero failures or ignored tests. Formatting, all-target compilation, strict Clippy,
+warnings-denied rustdoc, architecture and reference/progress checks pass. The full
+cached dependency audit passes advisories, bans, licenses and sources without
+waivers or exclusions; no fresh online advisory refresh is claimed. All 691 selected
+source/manifest/policy/style inputs stayed unchanged throughout final verification.
+
+The separate pinned native acceptance executable passes formatting, compilation,
+strict Clippy and its full persistence/fault/process-kill cases. All 708 combined
+inputs stayed unchanged. Its 17 files, including 15 Rust sources, remain exactly
+proof 55bcbd85; no native source changed. Both stores retain the canonical redb
+4.4.0 pin and no-default/std-only profile. The consensus verifier adds only the
+existing exact no-default sha2 dependency and uses neutral ports; no concrete
+storage edge, runtime framework or new registry package is introduced.
+
+The executed full parity gate still fails. Ledger counts remain 82 source-derived
+declarations, 92 mappings and 365 assertion links; 1,681 runtime cases remain
+unmatched and 1,655 declarations unresolved. These component checks add no full
+source-case parity credit. Complete pinned Elixir setup, fixtures, mandatory
+profiles and runtime scenarios remain required, as does native Linux validation.
+
+Next: bounded neutral Blank/Membership bodies, atomic last-applied membership with
+the SAME ControlState, and ordered recovery/apply through the actual ports. Persisted
+last-applied membership must remain distinct from Raft's possibly uncommitted
+effective configuration. Preserve existing Normal FWCP bytes and SHA-256(body).
+Then finish snapshot/install/purge, consensus/read barriers, remaining domain and
+Claim/policy routes, services and full M1–M8 acceptance. Startup verification alone
+performs no suffix replay, membership recovery or service admission. The full goal
+remains active; next artifacts still require concrete architecture consultation
+and substantive tests before implementation.
+
+Earlier state-store checkpoint (d664574):
+
 The scoped synchronous durable log now has a product state-store counterpart.
 RedbStateStore implements the existing GroupApplyStore through explicit bounded
 genesis, strict noncreating recovery and one exclusive consumed Immediate writer.
