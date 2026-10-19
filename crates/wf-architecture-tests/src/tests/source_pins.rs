@@ -1,9 +1,66 @@
 use std::fmt::Write as _;
 
-use super::{CheckResult, Policy, graph, json, metadata, package_mut, root};
+use super::{CheckResult, Policy, graph, json, metadata, package_mut, root, source_check_kind};
 
 const SOURCE: &str =
     "git+https://github.com/cberner/redb?rev=7061f7e60d4573311c0636e161d417b93e9fd2b1";
+
+#[test]
+fn shared_test_helpers_require_exact_literal_owner_and_module_paths() -> CheckResult<()> {
+    for (package, module, name, path) in [
+        (
+            "wf-storage",
+            "tests::durable_log::main",
+            "disk_backend",
+            "../state_store/faults/backend.rs",
+        ),
+        (
+            "wf-node",
+            "tests::snapshot_recovery::main",
+            "fixture_data",
+            "../recovery/fixtures/shared.rs",
+        ),
+        (
+            "wf-node",
+            "tests::snapshot_recovery::main",
+            "disk_backend",
+            "../../../wf-storage/tests/state_store/faults/backend.rs",
+        ),
+    ] {
+        let source = format!("#[path = {path:?}] mod {name};");
+        assert_eq!(
+            source_check_kind(package, module, &source, true)?,
+            Vec::<String>::new()
+        );
+        let wrong_path = format!("#[path = \"{path}.unreviewed\"] mod {name};");
+        let wrong_name = format!("#[path = {path:?}] mod unreviewed;");
+        let nested = format!("mod nested {{ {source} }}");
+        let production = format!("#[cfg(test)] {source}");
+        let nonliteral = format!("#[path = 1] mod {name};");
+        let bare = format!("#[path] mod {name};");
+        let list = format!("#[path({path:?})] mod {name};");
+        for (owner, scope, text, test_file) in [
+            (package, module, wrong_path.as_str(), true),
+            ("wf-domain", module, source.as_str(), true),
+            (package, "tests::unreviewed::main", source.as_str(), true),
+            (package, module, wrong_name.as_str(), true),
+            (package, module, nested.as_str(), true),
+            (package, module, production.as_str(), false),
+            (package, module, nonliteral.as_str(), true),
+            (package, module, bare.as_str(), true),
+            (package, module, list.as_str(), true),
+        ] {
+            let violations = source_check_kind(owner, scope, text, test_file)?;
+            assert!(
+                violations
+                    .iter()
+                    .any(|item| item == "module path redirection requires an audit gate"),
+                "unreviewed path escaped its exact test owner: {owner}/{scope}: {text}"
+            );
+        }
+    }
+    Ok(())
+}
 
 fn configured(source: &str) -> CheckResult<Policy> {
     let mut document: toml::Value =

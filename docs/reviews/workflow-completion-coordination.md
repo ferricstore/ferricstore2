@@ -44803,3 +44803,142 @@ Final documentation phase corrects ONLY two crate opening comments after runtime
 ARCH actually reviewed all final README/CONTINUE/architecture/ADR007 diffs and additional development/two-header changes, independently proving whole non-doc equality to HEAD for both headers. Root whole-read its terminal2450/4da579ec and finalheader1293/3df9cc43 receipts through2,599,092. PERF actually reviewed the closing changed sections and both headers, accepted resource/scope wording via direct message; no measured gains or complete source/Linux acceptance is implied. Current save prefixes are ARCH2,599,092/PERF2,055,440/DOMAIN3,810,255, each actually read; all later successor proposals stay in the worktree unstaged. Root will save only this reviewed current increment and existing Root coordination note.
 
 This continuation is PROGRESS: completed snapshot source/runtime/strict/full/native acceptance, corrected one approved old format fixture without weakening its original comparisons, executed all760/6 checks, honestly executed the failing full parity gate, reconciled reciprocal review and final documentation, and preserved the concrete unselected safe-purge/startup proposal. The full original goal remains ACTIVE: repeated safe snapshot/purge/install, full original runtime/setup/profile coverage, remaining domain/Claim/policy/application/consensus/services and native Linux are still required. No goal completion, pause or impasse is asserted.
+
+
+Continuation audit: the preceding goal turn was PROGRESS, completing snapshot checkpoint9245995 with760/6 actual macOS acceptance and honest failing full parity. This continuation authoritatively revalidated ahead58, only unselected DOMAIN/PERF review suffixes dirty and all three assigned sol6.1/max peers running. All prior command handles are terminal, so no run is restarted. Root read current handoff/AGENTS and actual old node producers, generic fault backend/database/ACK helpers and log/recovery boundaries.
+
+Root sent ARCH exact proposed13 new test/helper paths (four durable_log/purge children, state snapshot pin, six node snapshot_recovery target files, two helper-only moves), exactly TestResult/Cohort new test aliases, existing mod/shim/reexport seams and real coordinator pin/logsync/afterreturn/prefix kill reach. Source inventory remains four proposed files/one SnapshotRecoveryError model and exact existing seams from frozen15515+594+752. No new file/type/helper model/source is created until the named decision. Both operating systems, full source/runtime/profile parity, safe repeated advancement and beyond-tail received-snapshot provenance remain required. Full goal remains active.
+
+
+Root actually whole-read/hash-verified ARCH-M2-PROTECTED-PURGE1-CREATE1 at2,604,442+7,506/SHA92a7c3579cb8311d727706669a5294336c559e0346ba63f16d45fa54fb7aa1a4 BEFORE creating the two selected helper files. The exact frozen15515+594+752 contract and10678 helper roster are selected together with13 test/helper paths, four production paths and one production error model. Root withdrew Cohort; ONLY new node TestResult alias is selected. Root owns all helper/test/command changes; ALL new production bodies/model remain held until complete frozen substantive RED and explicit release.
+
+Root moved the exact25 node helper functions/Rows/MIB to recovery/fixtures/shared.rs with selected visibility, retained the entire old None-only state_meta body in its shim, and moved the exact existing state backend/factory/ACK functions to faults/backend.rs without changing modes/locks/error strings/tokens. Before formatting, executed ENTIRE inverse of both existing parents restores original nodee4d5df32 and statefault0553ee8e TRUE; every moved body is byte-exact after visibility inversion. No old test identity/assertion or product source changed. This is setup/refactoring, not product RED. Root now formats and executes original node10/storage28 before substantive new tests.
+
+
+PROTECTED-PURGE1 substantive preimplementation freeze: all13 concretely approved new test/helper paths and4 existing registration/helper parents are now saved and formatted; only the selected node TestResult alias is new. Thirty new substantive test identities cover scalar durable pin, complete log cohorts/strict wire and every mutator, exact prefix+neighbor census, S-specific original provenance, full real mixed replay/replies, MAX trusted-boundary zero points, prospective snapshot/J/Q accounts, consuming failures and real STATE4/LOG4/LOG6/after-return process boundaries. The newly added low-level log process-kill identity uses the same shared real ACK helpers and adds no artifact/model. Independent ENTIRE FWSD2 87B and FWLS2 143/160B packings were reexecuted from struct/hashlib and match every current literal, TRUE. Before RED, implementation remains HELD and no runtime behavior is passing.
+
+Frozen17 test/helper input bindings (path, bytes, LF, SHA256):
+["crates/wf-storage/tests/durable_log/main.rs", 11340, 363, "4e8e5316af3a3367fc5c1f42b53eab48f59579d83df8a6de2a5b3b1e911f841b"]
+["crates/wf-storage/tests/durable_log/purge.rs", 7621, 215, "480bc0a79c6eaee4b98ae9a0795f0310cde0b18a26914a9892a1e525cb08e5eb"]
+["crates/wf-storage/tests/durable_log/purge/corruption.rs", 4531, 130, "d5543b4f1f4d48b93ed9fa957a4d41d025c0f703ddf1283159c7f34a72a821da"]
+["crates/wf-storage/tests/durable_log/purge/faults.rs", 7141, 199, "480d24e0d3b40ceff9c3ce2cd42daf97c03716e7a5ca51f946dd2f3bf21030ae"]
+["crates/wf-storage/tests/durable_log/purge/limits.rs", 3414, 92, "ce6c8849b49621861e1ceed0e8ae2bd79d190125a212536d2a00ba6854ae19ab"]
+["crates/wf-storage/tests/state_store/faults.rs", 9326, 280, "aef7e152589160549365592b0b210e4b916f4041140dfa5cd3d67563c022e734"]
+["crates/wf-storage/tests/state_store/faults/backend.rs", 5950, 187, "2d7ae30c2cd8c611add1cb17bf5310f01faf2a335dad6f4a27e456920a1da0f7"]
+["crates/wf-storage/tests/state_store/snapshot.rs", 440, 16, "24cb7357eb81853a3f90d487b95ec509eea4430b10c4a32316f391c51819315c"]
+["crates/wf-storage/tests/state_store/snapshot/pin.rs", 9414, 264, "deab866b1c5e83faebeb6ea72e2f84b193c6d96832227030528e14fbeb74cba0"]
+["crates/wf-node/tests/recovery/fixtures.rs", 1107, 28, "0e0d294e98bd47989073f85832da1af7b21ed26d52e84bbc702c613d543b9bfb"]
+["crates/wf-node/tests/recovery/fixtures/shared.rs", 12251, 401, "aec11de84a3cd3524457f67959768a9d43d9abecbe4ed8c949f18aa1b86b027e"]
+["crates/wf-node/tests/snapshot_recovery/faults.rs", 9595, 297, "9597e35e0fd5ca197c7b09aa79f6b2acc82b9f8c711353ce8ae2d953e04a5350"]
+["crates/wf-node/tests/snapshot_recovery/fixtures.rs", 4325, 119, "4b6abf8cfe38b4e06c4af0a22b0f425cae88068fe4e87999c2c4c22e5dd462a5"]
+["crates/wf-node/tests/snapshot_recovery/limits.rs", 9246, 285, "e9b10a7aab086fa806972a57cd4643262a206f3321e66552170d1a8442e62b8c"]
+["crates/wf-node/tests/snapshot_recovery/main.rs", 990, 34, "79df3ad0049363d50414fd8aaaba7c31f84a8f0c2cccb7cb1993615dd5c94649"]
+["crates/wf-node/tests/snapshot_recovery/provenance.rs", 8805, 247, "ba2dd38d32ee1ecbf1863196812b62b33ae356d6a8ea161c2be6ee43048a2996"]
+["crates/wf-node/tests/snapshot_recovery/replay.rs", 13205, 386, "fb97ed61d0b4814a7adc9719a1922202a2e276644cfa8ee58db469fdd5872b82"]
+
+
+First protected-purge frozen commands are terminal: fmt0 at1,135,773+0; log no-run RED101 at1,135,804+7,579/SHAcc422ae5739025a91184fe8183e054634616cff35dbe7f45a390a1486037746a has exactly23 errors ONLY selected missing purge/anchor APIs; state no-run RED101 at1,143,414+8,410/SHA6120e61224ee335d0e2d2aefb9668609ba34b828be1f9ef341280c9191aa6b40 has exactly21 errors ONLY selected missing scalar pin and SnapshotPinned APIs. Root independently enumerated every structured error. Node no-run101 at1,151,856+4,455/SHA28327a3ce49c405eeaa3024a31388edbcda1080c60b00f27e5f50f06ca7c495f includes ONE setup missing ReadableTableMetadata trait import along with the expected missing new APIs; this is NOT qualifying complete-batch RED. Root added only that existing redb trait import, with no oracle change.
+
+Actual workspace-policy101 at1,156,351+916/SHA453092abdb1f106cadcf7af7ff96c9c62014f41b95bd194686839cab67fd0aa3 reports ONLY two root test module-path audit violations. The selected helper-sharing design needs a concrete narrow checker audit, not a bypass. Root requested ARCH exact-three package/module/literal test-only paths, with wrong-owner/path/module/production/nested controls in existing source_pins tests, existing source.rs gate and enforcement prose. No generic test allowance, model or new path is proposed. All next production remains HELD; Root must finalize corrected input bindings and execute qualified node RED/checker TDD/GREEN before release. Parent command exits0 merely records these real expected/technical failures, not test success.
+
+
+Root whole-read/hash-verified ARCH PRECISION2 2,623,749+3,165/SHA20c4fa0b870c5c50b02401917d463d4882a487cb07038402344c427f22a79142 before checker repair. Actual exact-path regression RED1fail101 at1,160,980+1,144/SHA387d48535314ed5334227db60e104fdc780ae7fa07eec67c55d795649bddb46f preceded implementation. Actual GREEN1/0 at1,162,196+495/SHA43d2122b1eb93510ea02bfdedc027978559abb6d8af61f1524b8f67ed3d4b1f4 exercises all3 positive triples/27 negative controls; full workspace policy0 at1,162,737+427/SHA4b8f944d5db333bf1ed1ef07368fdcf9ae89af1d109a5bcfffb218b19180c30a; checker all-target strict0 at1,163,202+333/SHA8a45dab038b0b42c1490bc3d15abf76003493d9f33d0e23573ecc7d259507567. Source592LF and testchild235LF stay under600; no general path/test exception or lint/size/dependency waiver.
+
+Corrected FINAL node no-run RED101 at1,157,338+3,604/SHAa1159cc5e7417228037e0658e58ec5c4973f5042f2c5bbc8752d98895d81ad89 contains exactly4 errors ONLY selected absent error/functions/pin/purge APIs, no fixture len error. Four unused-trait warnings are caused by unresolved API/type checking and remain subject to final strict acceptance, not suppressed. Root enumerated all4 errors. Complete fixture import-only inverse restores pre-correction4b6abf8c TRUE; other16 original frozen inputs remain exact. All new production is still absent immediately before explicit release.
+
+FINAL19 frozen test/helper/checker bindings (path, bytes, LF, SHA256):
+["crates/wf-storage/tests/durable_log/main.rs", 11340, 363, "4e8e5316af3a3367fc5c1f42b53eab48f59579d83df8a6de2a5b3b1e911f841b"]
+["crates/wf-storage/tests/durable_log/purge.rs", 7621, 215, "480bc0a79c6eaee4b98ae9a0795f0310cde0b18a26914a9892a1e525cb08e5eb"]
+["crates/wf-storage/tests/durable_log/purge/corruption.rs", 4531, 130, "d5543b4f1f4d48b93ed9fa957a4d41d025c0f703ddf1283159c7f34a72a821da"]
+["crates/wf-storage/tests/durable_log/purge/faults.rs", 7141, 199, "480d24e0d3b40ceff9c3ce2cd42daf97c03716e7a5ca51f946dd2f3bf21030ae"]
+["crates/wf-storage/tests/durable_log/purge/limits.rs", 3414, 92, "ce6c8849b49621861e1ceed0e8ae2bd79d190125a212536d2a00ba6854ae19ab"]
+["crates/wf-storage/tests/state_store/faults.rs", 9326, 280, "aef7e152589160549365592b0b210e4b916f4041140dfa5cd3d67563c022e734"]
+["crates/wf-storage/tests/state_store/faults/backend.rs", 5950, 187, "2d7ae30c2cd8c611add1cb17bf5310f01faf2a335dad6f4a27e456920a1da0f7"]
+["crates/wf-storage/tests/state_store/snapshot.rs", 440, 16, "24cb7357eb81853a3f90d487b95ec509eea4430b10c4a32316f391c51819315c"]
+["crates/wf-storage/tests/state_store/snapshot/pin.rs", 9414, 264, "deab866b1c5e83faebeb6ea72e2f84b193c6d96832227030528e14fbeb74cba0"]
+["crates/wf-node/tests/recovery/fixtures.rs", 1107, 28, "0e0d294e98bd47989073f85832da1af7b21ed26d52e84bbc702c613d543b9bfb"]
+["crates/wf-node/tests/recovery/fixtures/shared.rs", 12251, 401, "aec11de84a3cd3524457f67959768a9d43d9abecbe4ed8c949f18aa1b86b027e"]
+["crates/wf-node/tests/snapshot_recovery/faults.rs", 9595, 297, "9597e35e0fd5ca197c7b09aa79f6b2acc82b9f8c711353ce8ae2d953e04a5350"]
+["crates/wf-node/tests/snapshot_recovery/fixtures.rs", 4348, 119, "a3831eb5c615457b23ef9b5da243d70db32b1fdad0c8ed1834334408ab05e54c"]
+["crates/wf-node/tests/snapshot_recovery/limits.rs", 9246, 285, "e9b10a7aab086fa806972a57cd4643262a206f3321e66552170d1a8442e62b8c"]
+["crates/wf-node/tests/snapshot_recovery/main.rs", 990, 34, "79df3ad0049363d50414fd8aaaba7c31f84a8f0c2cccb7cb1993615dd5c94649"]
+["crates/wf-node/tests/snapshot_recovery/provenance.rs", 8805, 247, "ba2dd38d32ee1ecbf1863196812b62b33ae356d6a8ea161c2be6ee43048a2996"]
+["crates/wf-node/tests/snapshot_recovery/replay.rs", 13205, 386, "fb97ed61d0b4814a7adc9719a1922202a2e276644cfa8ee58db469fdd5872b82"]
+["crates/wf-architecture-tests/src/source.rs", 21252, 592, "cb5e96c3e5bee98ccf8e933f163598a0502bb49e073fadfed2d6468a6d17824a"]
+["crates/wf-architecture-tests/src/tests/source_pins.rs", 9129, 235, "b3009ddfa3485e530b095a70f02584e518424baac5e01b6b6e190976fff0e538"]
+
+
+Root final checker library run0 at1,163,575+3,734/SHAfb2bd799a333f49a6680934375c4f4a8026129c6dc7ea3cb2075e8f923076c9b executes39/39 with0fail/ignored; final diff-check0. ARCH actually reviewed exact gate/prose, independently inverted entire source method and test additions to HEAD TRUE; PERF reciprocal review is requested and ongoing. Corrected fixture and frozen19 inputs remain exact.
+
+EXPLICIT RELEASE to Writer under ARCH-M2-PROTECTED-PURGE1-CREATE1 plus PRECISION1: implement exactly the selected four new production files (storage log/purge; node recovery/snapshot and its provenance/replay children), the selected existing ports/storage/consensus/node seams and ONE SnapshotRecoveryError model. Preserve original wire/driver behavior and frozen Root tests/checker inputs. Real complete missing-contract RED is recorded for storage log, pin and corrected node before source implementation, with independent full goldens. Root alone owns Cargo/formatter/Git/tests/shared docs; peers independently review actual source and each other. Thirty new behavior identities are NOT passing yet; full source/setup/profile parity, both-host validation, future safe pin advancement and beyond-tail provenance remain required. Full original goal remains ACTIVE.
+
+
+This continuation is concrete PROGRESS: Root authored30 substantive preimplementation identities across the selected13 new test/helper paths, preserved old node10/state28 and all original helper bodies through full inverses, independently reexecuted3 full golden packs, corrected one test oracle before execution and one trait-import setup before final RED, executed qualified missing-contract-only storage/node RED, and used genuine checker behavioral RED then regression/all39/full-policy/strict GREEN for exact helper audit. Root whole-read/hash-verified final ARCH TESTS1 2,626,914+8,862/SHAfe70f6542b0690295b59b04f7e86c52ef407000d67bb213594c6220c1aabf0c4 and all PERF receipts through2,074,139. CONTINUE now identifies current work and was actually reviewed by ARCH. All Root command handles are terminal; Writer acknowledged explicit release and is implementing the selected source layers, with dedicated ARCH/PERF reciprocal review active and no interrupts. No new-product GREEN, Linux, full parity or completion is asserted. The original all-M1–M8/source/setup/profile/both-host goal remains ACTIVE; next Root work is actual complete stable source review and frozen-test execution.
+
+
+Continuation audit: previous goal turn was PROGRESS, with30 frozen substantive tests, qualified missing-contract RED, exact helper audit behavioral RED/GREEN plus39 checker tests/whole policy/strict, and explicit selected production release. Current active goal and ahead58 worktree were revalidated; Writer is authoritatively running and has now delivered stable log and snapshot layers. All19 frozen test/helper/checker inputs rehashed unchanged in this continuation. Root runs no formatter/build against the still-incomplete node layer.
+
+Root actually read the new complete log/purge body and all selected log/ports diffs with save_committed and full strict-recovery context, then snapshot API/facade/format/read/capture/install/validation diffs and underlying validation/owner paths. Prefix+retained-neighbor census precedes hash; bounded range deletion and atomic anchor publication preserve all original state reconstructions, C=P idempotence and physical read absence. Both dedicated peers independently accepted actual stable log/snapshot layers; there is no runtime GREEN yet.
+
+One Root candidate concern was explicitly WITHDRAWN after tracing the complete debit route: recovery cohort/retained calls tx.control→read_control→admit_read(512), but snapshot::transaction passes recovering=true, so admission::admit_read debits cumulative temporary C512 and NOT returned-owner R. Only normal guards use R512. Writer, PERF and ARCH independently verified the same real branch. Thus scalarR1 remains valid without Metadata/U, and NO extra seam, account reset, waived fee, test change or source correction is authorized or needed. This is resolved source-review reasoning, not product behavioral RED or a new gate.
+
+Root whole-read the actual ordered implementation plan again: M1 model/property/source acceptance, M2 every persistence/replay boundary, M3 real3-node consensus, M4 both real transports/worker, M5 breadth/races, M6 queries/rebuild, M7 operations/restore and M8 measured performance/cache equivalence remain the full requested scope. The present fixed-pin component does not replace safe repeated advancement/received-beyond-tail provenance, full Elixir setups/runtime/profiles or native Linux/macOS acceptance. Full goal remains ACTIVE.
+
+
+Protected-purge implementation first real assertions all GREEN without behavior/oracle repair: log17/17 at1,168,997+1,527/SHA8cedc1c991082dea9ccf2d1db543556231ebd14d5a79c7412012d534cf5458a2; state33/33 at1,170,559+2,965/SHA7d2612d50efcdd336077fe3b37d8cba22bb5e71a1e9608a2a57ac4ff96bf142e; new node15/15 at1,173,558+1,714/SHA1cdb843fe18067e3ee4740f934edb8e95719d42d65b67dac9b7802494568d835; original node10/10 at1,175,315+1,246/SHAb30509c6b3c0becf67d32f3e4c9b03e65b1b34cf2ac2840925445367be5568ec. Thus all30 selected new identities execute successfully, including actual injected disk faults and acknowledged process kills. No power-loss, final-flush, Linux or complete source-profile parity is inferred.
+
+Alltargetcheck0 at1,176,601+1,073/SHA6a16050dcf3cdf35b97a8e9c12760fec0b190f42e18cc176192e64feff1b335c. Strict found only equivalent styles: nested version pattern, two method pointers, binary14 literal, pure test helper Result wrapper and import placement. All received executed ENTIRE-file inverses by Root/ARCH/PERF; exact original bodies, assertions, fees and accepted grammar conserve. One node module opening doc correction removes its now-stale no-snapshot claim. No suppressions, exceptions or new artifacts/models were introduced. Strict is now actually GREEN0 at1,183,842+163/SHAbfc866e7b9b2b6dbb6f5c8add561646eca46a1da49dcb89a34cb797ba0cee583, final fmtcheck0 at1,183,801+0, and complete workspace source policy0 at1,184,042+308/SHAd62a3ea4c8d1735f4c163014453d7c20654364db2b78ec711d8fab2fd2b90f6d.
+
+FINAL19 STYLE epoch bindings: only3 Root test-helper spellings differ from originalfreeze, all complete inverses proved; other16 exact. Production still stable before broad workspace/native/source-profile acceptance.
+["crates/wf-storage/tests/durable_log/main.rs", 11340, 363, "4e8e5316af3a3367fc5c1f42b53eab48f59579d83df8a6de2a5b3b1e911f841b"]
+["crates/wf-storage/tests/durable_log/purge.rs", 7625, 215, "fdfc7a0e4ce2a61eba8dcf049fb6cad4f74218e0885440369e4717bacf02cc79"]
+["crates/wf-storage/tests/durable_log/purge/corruption.rs", 4531, 130, "d5543b4f1f4d48b93ed9fa957a4d41d025c0f703ddf1283159c7f34a72a821da"]
+["crates/wf-storage/tests/durable_log/purge/faults.rs", 7141, 199, "480d24e0d3b40ceff9c3ce2cd42daf97c03716e7a5ca51f946dd2f3bf21030ae"]
+["crates/wf-storage/tests/durable_log/purge/limits.rs", 3414, 92, "ce6c8849b49621861e1ceed0e8ae2bd79d190125a212536d2a00ba6854ae19ab"]
+["crates/wf-storage/tests/state_store/faults.rs", 9326, 280, "aef7e152589160549365592b0b210e4b916f4041140dfa5cd3d67563c022e734"]
+["crates/wf-storage/tests/state_store/faults/backend.rs", 5950, 187, "2d7ae30c2cd8c611add1cb17bf5310f01faf2a335dad6f4a27e456920a1da0f7"]
+["crates/wf-storage/tests/state_store/snapshot.rs", 440, 16, "24cb7357eb81853a3f90d487b95ec509eea4430b10c4a32316f391c51819315c"]
+["crates/wf-storage/tests/state_store/snapshot/pin.rs", 9414, 264, "deab866b1c5e83faebeb6ea72e2f84b193c6d96832227030528e14fbeb74cba0"]
+["crates/wf-node/tests/recovery/fixtures.rs", 1107, 28, "0e0d294e98bd47989073f85832da1af7b21ed26d52e84bbc702c613d543b9bfb"]
+["crates/wf-node/tests/recovery/fixtures/shared.rs", 12251, 401, "aec11de84a3cd3524457f67959768a9d43d9abecbe4ed8c949f18aa1b86b027e"]
+["crates/wf-node/tests/snapshot_recovery/faults.rs", 9577, 297, "c49b50151b3c268d0c56e38df64b6984d670e85dc36966924f04c660937bd1ac"]
+["crates/wf-node/tests/snapshot_recovery/fixtures.rs", 4348, 119, "a3831eb5c615457b23ef9b5da243d70db32b1fdad0c8ed1834334408ab05e54c"]
+["crates/wf-node/tests/snapshot_recovery/limits.rs", 9246, 285, "e9b10a7aab086fa806972a57cd4643262a206f3321e66552170d1a8442e62b8c"]
+["crates/wf-node/tests/snapshot_recovery/main.rs", 990, 34, "79df3ad0049363d50414fd8aaaba7c31f84a8f0c2cccb7cb1993615dd5c94649"]
+["crates/wf-node/tests/snapshot_recovery/provenance.rs", 8797, 247, "b0fa3433946c37ad0a57df7bb10ac0565772293abc9c9ee8c781e900a5cb3355"]
+["crates/wf-node/tests/snapshot_recovery/replay.rs", 13205, 386, "fb97ed61d0b4814a7adc9719a1922202a2e276644cfa8ee58db469fdd5872b82"]
+["crates/wf-architecture-tests/src/source.rs", 21252, 592, "cb5e96c3e5bee98ccf8e933f163598a0502bb49e073fadfed2d6468a6d17824a"]
+["crates/wf-architecture-tests/src/tests/source_pins.rs", 9129, 235, "b3009ddfa3485e530b095a70f02584e518424baac5e01b6b6e190976fff0e538"]
+
+
+PROTECTED-PURGE1 broad acceptance starts on Darwin/arm64. All 1303 selected Rust/manifests/lock/policy/style/scripts/CI/reference inputs plus native paths are frozen under SHAb3f46fd033733eec188544296931238c4a4350c857343ebdb397dbdceb776e73. Native17 complete-file comparison to proof55bcbd85 is TRUE. Frozen inputs exclude append-only review/documentation prose and generated target artifacts. All source remains Writer-frozen; post-style full acceptance is pending.
+
+
+PROTECTED-PURGE1 broad command receipts (parent process records actual results; required-parity exit1 remains a FAILED product gate, not success):
+{"label": "purge-final-toolchain", "exit": 0, "offset": 1184379, "length": 36, "sha256": "8dc912acd5bfeafc70b01b1d2a2afb0844afa02f5dba2f1ae8d5c212d005afb6"}
+{"label": "purge-final-deny-version", "exit": 0, "offset": 1184447, "length": 18, "sha256": "1758f5ea93d8ad3585079f05c19358b7bb969cce1bf6c7bdab6659a8cd1ef6b8"}
+{"label": "purge-final-workspace-tests", "exit": 0, "offset": 1184500, "length": 84991, "sha256": "73f2d6158f7bf75fbd9866a3a880334c3800820ad46319c62a559140de8b1a1d", "targets": 90, "tests": [791, 0, 0]}
+{"label": "purge-final-doc-tests", "exit": 0, "offset": 1269520, "length": 2707, "sha256": "e84eabc406bea0ef010aab76bde744d3f800c34818ae0f11a56d44770b201f4b", "targets": 15, "tests": [6, 0, 0]}
+{"label": "purge-final-rustdoc", "exit": 0, "offset": 1272254, "length": 1281, "sha256": "43a29e9944b7d4bd10dae2759cfa58d55e8bb219df49dcf30e85441558d4c99f"}
+{"label": "purge-final-reference", "exit": 1, "offset": 1273564, "length": 268, "sha256": "7ebb720c301890743d765c2ac2ee65de6a42ec5275bda5bacf1c33a6bb0887ca"}
+All 1303 selected input hashes remain EXACT to starting SHAb3f46fd033733eec188544296931238c4a4350c857343ebdb397dbdceb776e73 after every completed command. Native17 remain exact to proof55bcbd85.
+
+
+Full post-style workspace actual GREEN791/90 at1,184,500+84,991/SHA73f2d6158f7bf75fbd9866a3a880334c3800820ad46319c62a559140de8b1a1d and doc GREEN6/15 at1,269,520+2,707/SHAe84eabc406bea0ef010aab76bde744d3f800c34818ae0f11a56d44770b201f4b; rustdoc0. All1303 inputs exact. First reference invocation incorrectly forwarded --offline through the Cargo alias to the application, so its usage error1 at1,273,564+268/SHA7ebb720c301890743d765c2ac2ee65de6a42ec5275bda5bacf1c33a6bb0887ca is RUNNER SETUP, not a failed reference-integrity test or behavioral RED. Root resumes ONLY the eight remaining checks using explicit cargo run flags before --; passed workspace/doc/rustdoc are not restarted.
+
+
+PROTECTED-PURGE1 remaining broad command receipts (parent process records results; required-parity exit1 is an actual FAILED product gate):
+{"label": "purge-final-reference-corrected", "exit": 0, "offset": 1273871, "length": 365, "sha256": "50c3d1118d0dd5372e20be1dbba6d0dd8a7a9d8fbffd07bd5fe99717c7a0ddf1"}
+{"label": "purge-final-progress-corrected", "exit": 0, "offset": 1274274, "length": 559, "sha256": "f3c742ee190005f10ab9460e5c6cdce952e509db11f2f2ae119375f01d587e32"}
+{"label": "purge-final-required-parity-corrected", "exit": 1, "offset": 1274878, "length": 453, "sha256": "2fc2435c1f8cf3f23c1922dbd40e61f96ee2d5fe2bd8c4ea08deba99956968d6"}
+{"label": "purge-final-cached-audit", "exit": 0, "offset": 1275363, "length": 48, "sha256": "f1a0fca39d4280363937aabd77783990ea6480bd9ca257816de3b68fc8efa845"}
+{"label": "purge-final-native-fmt", "exit": 0, "offset": 1275441, "length": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+{"label": "purge-final-native-check", "exit": 0, "offset": 1275473, "length": 479, "sha256": "aad9dc10d10a265b39da22cd4d12b9afcab1646b324e1b02c3eeac6b6a1d375e"}
+{"label": "purge-final-native-strict", "exit": 0, "offset": 1275985, "length": 184, "sha256": "6e527fca2244aab42cb84005991950eeffe997bdcd54955f9a27de174d7aa97d"}
+{"label": "purge-final-native-run", "exit": 0, "offset": 1276199, "length": 564, "sha256": "2af6d109014308e2b196d44759cf88aa3d3deb968c4f5a8d48a93f04b8093ec0"}
+All1303 inputs remain EXACT to SHAb3f46fd033733eec188544296931238c4a4350c857343ebdb397dbdceb776e73 after every completed command; cached audit claims no online advisory refresh. Native17 remain exact to proof55bcbd85.
+
+
+PROTECTED-PURGE1 closing status: session62444 terminal0 recorded all eight remaining commands, including actual full-parity failure1. All1303 source/native inputs stayed exact; final workspace791/90 plus6/15, strict/check/policy/rustdoc/reference/progress, cached deny and native Darwin acceptance are GREEN. No source rerun is needed for prose-only closing updates. Root actually whole-read/hash-verified PERF FIRST-RUNTIME-STYLE1 2,083,896+3,217/SHAf1067e10c832248420b7f20683d6ed36210b19735254e6474992df32f93cfbb4 and finalstyle2,087,113+1,764/SHA5eb4c8eb40f5172cbc41d3ab0102a568e9e4584fd9e15b793834c711d12e4e19; together with earlier receipts this completes actual reads through selected PERF2088877. Current reviewed cutoffs remain ARCH2655533/PERF2088877/DOMAIN3853817. Later planning suffixes are UNSELECTED and will remain outside the current indexed checkpoint until actually reviewed. The original all-M1–M8/source/setup/profile/both-host goal stays ACTIVE;1681 unmatched runtime/1655 unresolved declarations, safe repeated advancement/received beyond-tail provenance, real runtime services and native Linux remain open.
+
+Current closing prose reciprocal review: ARCH and PERF actually read README, development, CONTINUE through earlier checkpoints, architecture opening/protected-purge close, and ADR007 transition/full protected-purge section. Both accepted without material finding or requested source change; their message receipts are preserved here rather than appended after UNSELECTED suffixes. All30 selected new identities versus791/90+6/15 full Darwin results, unchanged1303/native17, cached-only audit, actual parity failure and open repeated advancement/received/Linux/runtime duties remain explicit. Root diff-check0. The current indexed checkpoint will contain only reviewed current note prefixes; future planning suffixes remain intact in the working tree. Full goal ACTIVE.

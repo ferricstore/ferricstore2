@@ -11,5 +11,6 @@ mod faults;
 mod fixtures;
 mod lifecycle;
 mod limits;
+mod pin;
 
 type RawCohort = BTreeMap<String, BTreeMap<Vec<u8>, Vec<u8>>>;

@@ -22,6 +22,12 @@ pub(super) fn install(
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     let _ = validate::complete(&mut target, &mut charge, store.limits.snapshot_limits())
         .map_err(SnapshotError::State)?;
+    if validate::pin(&target)
+        .map_err(SnapshotError::State)?
+        .is_some()
+    {
+        return Err(SnapshotError::SnapshotPinned);
+    }
     // Rebind actual incoming content to the TARGET profile, not the old stage cap.
     let mut source =
         super::transaction(&source_store, limits, store.limits).map_err(SnapshotError::Stage)?;

@@ -1,7 +1,7 @@
 //! Bounded startup audit/replay on separately owned product databases.
 //!
-//! This no-snapshot/no-purge composition neither starts a service nor supplies
-//! consensus commitment. It processes only the already durable committed prefix.
+//! These compositions neither start a service nor supply consensus commitment.
+//! They process only the already durable committed prefix.
 
 use std::fmt;
 use wf_ports::consensus::{RaftMembershipError, RaftMembershipLimits};
@@ -14,6 +14,9 @@ use wf_types::identity::{GroupId, RecoveryId};
 
 mod join;
 mod replay;
+mod snapshot;
+
+pub use snapshot::{SnapshotRecoveryError, purge_snapshot, recover_snapshotted};
 
 /// Explicit per-guard profiles and whole-call startup work/owner ceilings.
 /// No default semantic TTL or cluster apply profile is manufactured.
@@ -235,6 +238,9 @@ pub fn recover_committed(
     let mut saved = None;
     let initial = join::observe(&mut state, (group, recovery), limits, base, &mut saved)?;
     let metadata = log.state().map_err(Error::Log)?;
+    if metadata.last_purged().is_some() {
+        return Err(Error::IncompatibleCheckpoint);
+    }
     let stop = join::boundary(initial, metadata.committed(), limits)?;
     let audit_end = initial
         .last_entry()

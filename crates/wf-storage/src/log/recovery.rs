@@ -85,8 +85,11 @@ fn validate_entries(
 ) -> Result<(), RaftLogError> {
     let mut count = 0;
     let mut bytes = 0;
-    let mut previous: Option<LogIdentity> = None;
-    let mut committed = state.committed().is_none();
+    let mut previous: Option<LogIdentity> = state.last_purged();
+    let mut committed = state.committed().is_none()
+        || state
+            .last_purged()
+            .is_some_and(|position| state.committed() == Some(position));
     for row in table
         .iter()
         .map_err(|error| format::storage_error(&error))?

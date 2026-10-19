@@ -75,6 +75,7 @@ pub struct RaftLogState {
     vote: Option<RaftVote>,
     committed: Option<LogIdentity>,
     last_log: Option<LogIdentity>,
+    anchor: Option<(LogIdentity, [u8; 32])>,
 }
 
 impl RaftLogState {
@@ -89,6 +90,23 @@ impl RaftLogState {
             vote,
             committed,
             last_log,
+            anchor: None,
+        }
+    }
+    /// Preserves supplied scalar observations, including a mathematical anchor.
+    /// The caller establishes cross-database provenance separately.
+    #[must_use]
+    pub const fn new_with_anchor(
+        vote: Option<RaftVote>,
+        committed: Option<LogIdentity>,
+        last_log: Option<LogIdentity>,
+        anchor: Option<(LogIdentity, [u8; 32])>,
+    ) -> Self {
+        Self {
+            vote,
+            committed,
+            last_log,
+            anchor,
         }
     }
     /// Reads the persisted vote.
@@ -101,10 +119,26 @@ impl RaftLogState {
     pub const fn committed(self) -> Option<LogIdentity> {
         self.committed
     }
-    /// Reads the last physical log identity.
+    /// Reads the last physical identity, or the purged identity when empty.
     #[must_use]
     pub const fn last_log(self) -> Option<LogIdentity> {
         self.last_log
+    }
+    /// Reads the full inclusive purged boundary.
+    #[must_use]
+    pub const fn last_purged(self) -> Option<LogIdentity> {
+        match self.anchor {
+            Some((position, _)) => Some(position),
+            None => None,
+        }
+    }
+    /// Reads the exact artifact reference, without certifying its provenance.
+    #[must_use]
+    pub const fn purged_snapshot_id(self) -> Option<[u8; 32]> {
+        match self.anchor {
+            Some((_, id)) => Some(id),
+            None => None,
+        }
     }
 }
 
@@ -303,4 +337,14 @@ pub trait RaftLogStore {
     /// # Errors
     /// Refuses a protected boundary, census limits or operational failure.
     fn truncate_from(&mut self, index: u64) -> Result<(), RaftLogError>;
+    /// Atomically deletes an inclusive committed prefix and saves its anchor.
+    /// The server must first prove provenance and durably pin the artifact in
+    /// the separate state store; this primitive cannot certify that database.
+    /// # Errors
+    /// Refuses conflicting boundaries, validation limits or operational failure.
+    fn purge_through(
+        &mut self,
+        position: LogIdentity,
+        snapshot_id: [u8; 32],
+    ) -> Result<(), RaftLogError>;
 }

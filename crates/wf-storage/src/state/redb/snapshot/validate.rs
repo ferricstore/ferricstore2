@@ -25,6 +25,26 @@ pub(super) fn marker(
     format::decode_descriptor(tx, bytes.value())
 }
 
+pub(super) fn pin(tx: &RedbStateTransaction<'_>) -> Result<Option<[u8; 32]>, Error> {
+    tx.step()?;
+    let table = tx
+        .write
+        .open_table(super::super::META)
+        .map_err(admission::table_error)?;
+    tx.step()?;
+    let bytes = table
+        .get(KEY)
+        .map_err(|error| admission::storage_error(&error))?
+        .ok_or(Error::Corrupt)?;
+    tx.recovery_row(KEY, bytes.value())?;
+    let facts = format::decode_descriptor(tx, bytes.value())?;
+    Ok(if bytes.value()[5] == 2 {
+        facts.map(|value| value.0)
+    } else {
+        None
+    })
+}
+
 fn empty(tx: &RedbStateTransaction<'_>) -> Result<(), Error> {
     for definition in [META, ROWS] {
         tx.step()?;

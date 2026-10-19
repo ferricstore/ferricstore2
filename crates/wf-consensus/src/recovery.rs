@@ -175,6 +175,9 @@ pub fn verify_checkpoint<L: RaftLogStore, S: GroupApplyStore>(
         tx.control().map_err(CheckpointJoinError::State)?
     };
     let metadata = log.state().map_err(CheckpointJoinError::Log)?;
+    if metadata.last_purged().is_some() {
+        return Err(CheckpointJoinError::IncompatibleCheckpoint);
+    }
     let Some(applied) = control.last_entry() else {
         return Ok((log, state));
     };

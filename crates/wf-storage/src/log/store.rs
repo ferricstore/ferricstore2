@@ -186,6 +186,14 @@ impl RaftLogStore for RedbLogStore {
         self.ready()?;
         write::truncate(self, index).map_err(|error| self.failure(error))
     }
+    fn purge_through(
+        &mut self,
+        position: wf_types::version::LogIdentity,
+        snapshot_id: [u8; 32],
+    ) -> Result<(), RaftLogError> {
+        self.ready()?;
+        super::purge::through(self, position, snapshot_id).map_err(|error| self.failure(error))
+    }
 }
 
 fn base(group: &GroupId, recovery: &RecoveryId, limits: RaftLogLimits) -> Result<(), RaftLogError> {

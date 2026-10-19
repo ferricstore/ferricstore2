@@ -389,7 +389,84 @@ queued late write; serialized component custody alone does not complete that
 runtime case. Offline interrupted replacement with an older source remains a
 separate recovery/new-lineage obligation, not permission for serving-state rollback.
 An actual coordinator must establish capture/install commitment provenance before
-destructive purge. Durable last-purged identity, anchor crash ordering and
-snapshot-aware startup audit(S,A]/replay(A,C] remain required successors; existing
-no-snapshot verification/recovery stays unchanged. Full original setup/profile
-parity and separate Linux/macOS execution remain required.
+destructive purge. The following successor now provides local snapshot provenance,
+durable last-purged identity, anchor crash ordering and snapshot-aware startup
+audit(S,A]/replay(A,C]. Safe repeated anchor advancement and received snapshots
+beyond the local log tail remain required. Full original setup/profile parity
+and separate Linux/macOS execution remain required.
+
+## Selected protected local purge and snapshot-base recovery
+
+ARCH-M2-PROTECTED-PURGE1-CREATE1 and PRECISION1 implement this successor. Thirty
+substantive test identities pass after independent architecture and performance
+review and actual preimplementation missing-contract RED. The complete macOS
+checkpoint passes 791 Rust tests across 90 targets and six compile-fail examples
+across 15 documentation targets, with strict quality checks and the unchanged
+separate native executable. PRECISION2 separately audits only three exact test
+helper imports, with behavioral checker RED/GREEN and all 39 checker tests passing.
+
+The existing log state gains a paired full purged identity P and artifact ID. Its
+old constructor remains unanchored; the new scalar constructor supplies no storage
+certificate. Logical last-log identity is the physical tail, or P when empty.
+Every mutator preserves this pair, append refuses resurrection at or below P, and
+truncate cannot reach P or committed C. Strict reopen proves P<=C, exact identities
+at equal indexes, first retained P+1, continuity and the exact retained C/tail.
+FWLS1 remains exact when unanchored. FWLS2 requires the anchor plus C and tail,
+flags14/15, P24 and ID32 before the existing namespace-bound checksum. FWRM1,
+FWRL1, the two-table inventory and physical-only reads remain unchanged.
+
+The trusted low-level `purge_through` capability deletes an inclusive prefix in
+one Immediate writer. It requires a nonregressing boundary at or below C and the
+exact local boundary; equal P/ID replay is idempotent. One full-wire census checks
+the affected prefix and the first retained neighbor before decode/hash, then
+guards drop before bounded range deletion and atomic metadata publication. It
+does not inspect the separate state database or establish commitment itself.
+
+The state-local pin validates the complete actual immutable artifact before
+persisting only its descriptor. FWSD2 is pinned-Some only, with the same 87-byte
+layout and checksum domain; all unpinned FWSD1 bytes and FWSP1 DATA remain exact.
+The artifact stream excludes the descriptor, so pinning preserves its ID. Scalar
+pin/probe uses borrowed validation without a returned Metadata/membership owner;
+recovery control-read tariffs remain cumulative C, while typed Metadata still
+requires its complete R. Capture/install refuse a validated pin before replacement
+or output. Ordinary applies and original-artifact export remain available.
+
+Node consumes both real owners in `purge_snapshot` and `recover_snapshotted`.
+Every error drops both; neither a caller-created Metadata value nor a bare pin is
+provenance. A current artifact observation supplies only scalar S control,
+membership identity/stamp and ID after the full Metadata owner drops. Local purge
+requires applied S<=A<=C, exact equal-index identities and independent clock dominance.
+With no P, audit 0..S against S's original identity, actual body SHA, stamp, scope,
+historical clocks and last membership, including None. Audit (S,A] against A and
+its actual membership. Only after this full proof and a fixed-C recheck does the
+coordinator durably pin state, then invoke the real log purge. A pin failure leaves
+logs intact; uncertain log publication leaves the artifact durably pinned and
+only the complete old or complete new log cohort eligible for reconciliation.
+
+With P present, startup requires the exact pinned artifact S=P/ID and seeds the
+historical control/membership from its actual frozen data. It audits only (S,A],
+then replays (A,C] through the unchanged control and Normal V5/V6/public1 drivers.
+Final coherent control/membership and fixed C must agree. Later refusal preserves
+an already durable replay prefix for fresh reopen/resume. Required absent DATA
+is MissingSnapshot, including with P present; a present but unpinned or mismatched
+artifact is AnchorMismatch. Without P or DATA, startup uses the old recovery path.
+An initial unapplied snapshot has empty prehistory and cannot authorize purge.
+Both old no-purge entry points explicitly refuse P even if A remains retained.
+
+Before each of at most three separate snapshot-method phases, outer B=2G+2560
+admits configured snapshot R+C in W as well as the method's own bound. Each phase
+retains its actual cumulative method account, so the aggregate is at most three
+caps. Metadata drops before other owners. One whole-call log point/body pool
+covers audit and replay, with prospective 512+min(J-512,remaining-body) admission.
+Recovery counts are C+1 without P or C-P with P, using u128; P=C=MAX requires zero
+points. Local purge analogously admits its audit only through A.
+Engine range deletion, freed-page vectors/COW/cache, physical RSS and caller
+buffering remain separate; these bounds establish no measured speed improvement.
+
+This local fixed-pin predecessor does not complete repeated capture/install/purge
+or authorize unpinning. Safe anchor advancement and received-snapshot provenance
+past the local log tail remain required before the complete Raft storage contract.
+Queued runtime capture, offline recovery/lineage, all original source/setup/profile
+cases, real consensus/services and separate native Linux/macOS evidence remain
+mandatory. No new dependency, storage-to-consensus edge, second authority owner
+or service readiness certificate is selected.

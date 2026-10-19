@@ -289,7 +289,23 @@ impl Inspector<'_, '_> {
 impl<'ast> Visit<'ast> for Inspector<'_, '_> {
     fn visit_attribute(&mut self, attribute: &'ast Attribute) {
         self.lint(&attribute.meta);
-        if attribute.path().is_ident("path") && self.context.classification.runtime {
+        let approved = match (self.context.package, self.module.as_str()) {
+            ("wf-storage", "tests::durable_log::main::disk_backend") => {
+                Some("../state_store/faults/backend.rs")
+            }
+            ("wf-node", "tests::snapshot_recovery::main::fixture_data") => {
+                Some("../recovery/fixtures/shared.rs")
+            }
+            ("wf-node", "tests::snapshot_recovery::main::disk_backend") => {
+                Some("../../../wf-storage/tests/state_store/faults/backend.rs")
+            }
+            _ => None,
+        };
+        let audited = self.context.test_file
+            && matches!((&attribute.meta, approved),
+            (Meta::NameValue(value), Some(path)) if matches!(&value.value,
+                Expr::Lit(literal) if matches!(&literal.lit, Lit::Str(text) if text.value() == path)));
+        if attribute.path().is_ident("path") && self.context.classification.runtime && !audited {
             self.report("module path redirection requires an audit gate");
         }
         syn::visit::visit_attribute(self, attribute);

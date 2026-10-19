@@ -141,6 +141,8 @@ pub enum SnapshotError {
     GenesisMismatch,
     /// Live installation would regress or conflict with applied control.
     StaleSnapshot,
+    /// The sole artifact is pinned and cannot yet be replaced or cleared.
+    SnapshotPinned,
     /// Live installation would regress or conflict with applied membership.
     MembershipMismatch,
     /// A caller input failed.
@@ -165,6 +167,7 @@ impl std::fmt::Display for SnapshotError {
             Self::ProfileMismatch => "snapshot profile mismatch",
             Self::GenesisMismatch => "snapshot genesis mismatch",
             Self::StaleSnapshot => "stale snapshot",
+            Self::SnapshotPinned => "snapshot pinned",
             Self::MembershipMismatch => "snapshot membership mismatch",
             Self::InputUnavailable => "snapshot input unavailable",
             Self::OutputUnavailable => "snapshot output unavailable",
@@ -205,4 +208,17 @@ pub trait StateSnapshotStore {
         stage: Self::Stage,
         limits: SnapshotLimits,
     ) -> Result<SnapshotMetadata, SnapshotError>;
+    /// Durably retains the exact validated current artifact before log purge.
+    /// This local pin does not establish Raft commitment or lineage.
+    /// # Errors
+    /// Refuses an absent/different artifact, profiles or active storage failure.
+    fn pin_snapshot(
+        &mut self,
+        expected_id: [u8; 32],
+        limits: SnapshotLimits,
+    ) -> Result<(), SnapshotError>;
+    /// Reads the validated local pin without materializing snapshot metadata.
+    /// # Errors
+    /// Refuses profiles, malformed authority or active storage failure.
+    fn snapshot_pin(&mut self, limits: SnapshotLimits) -> Result<Option<[u8; 32]>, SnapshotError>;
 }

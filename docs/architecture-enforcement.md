@@ -68,6 +68,16 @@ directives require a new audit gate. The `archunit: ignore` directive is rejecte
 independently because the evaluated upstream release deliberately omits that
 dependency from its own graph. Tooling can use owned fixture includes and I/O.
 
+ARCH-M2-PROTECTED-PURGE1-PRECISION2 audits three exact test helper imports:
+`wf-storage/tests/durable_log/main.rs` imports `disk_backend` from
+`../state_store/faults/backend.rs`; `wf-node/tests/snapshot_recovery/main.rs`
+imports `fixture_data` from `../recovery/fixtures/shared.rs` and `disk_backend`
+from `../../../wf-storage/tests/state_store/faults/backend.rs`. The checker
+requires actual integration-test origin, the exact package and declared module,
+and a literal matching path. Nested, renamed, malformed and production imports
+remain rejected, including production modules marked `cfg(test)`. All helper
+bodies still receive the ordinary source checks.
+
 No lint allowances are needed by this implementation. A future test exception
 must name one specific Clippy lint on a test function and provide a meaningful
 `reason`; whole-group, module-wide, unreasoned and production suppressions fail.

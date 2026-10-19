@@ -177,9 +177,13 @@ fn descriptor_hash(tx: &RedbStateTransaction<'_>, prefix: &[u8]) -> Result<[u8; 
 pub(super) fn descriptor(
     tx: &RedbStateTransaction<'_>,
     facts: Option<([u8; 32], usize, usize)>,
+    pinned: bool,
     out: &mut [u8; 87],
 ) -> Result<usize, Error> {
-    out[..6].copy_from_slice(b"FWSD\0\x01");
+    if pinned && facts.is_none() {
+        return Err(Error::Corrupt);
+    }
+    out[..6].copy_from_slice(if pinned { b"FWSD\0\x02" } else { b"FWSD\0\x01" });
     out[6] = u8::from(facts.is_some());
     let at = if let Some((id, rows, bytes)) = facts {
         out[7..15].copy_from_slice(&u64::try_from(rows).map_err(|_| Error::Limit)?.to_be_bytes());
@@ -203,11 +207,12 @@ pub(super) fn decode_descriptor(
     bytes: &[u8],
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
     let mut at = 0;
-    if value::take(bytes, &mut at, 6).map_err(admission::value_error)? != b"FWSD\0\x01" {
+    let header = value::take(bytes, &mut at, 6).map_err(admission::value_error)?;
+    if header != b"FWSD\0\x01" && header != b"FWSD\0\x02" {
         return Err(Error::Corrupt);
     }
     let result = match value::read_u8(bytes, &mut at).map_err(admission::value_error)? {
-        0 => None,
+        0 if header == b"FWSD\0\x01" => None,
         1 => {
             let rows =
                 usize::try_from(value::read_u64(bytes, &mut at).map_err(admission::value_error)?)

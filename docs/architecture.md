@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters, bounded committed startup recovery and complete indexed state snapshots are implemented. Snapshot-aware startup/purge, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters, bounded committed startup recovery, complete indexed state snapshots and protected local purge with pinned-snapshot startup are implemented. Safe repeated snapshot advancement, received snapshots beyond the local log tail, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 
@@ -1196,3 +1196,28 @@ acceptance passes 745 Rust tests/89 targets, six compile-fail examples/15 doc
 targets, strict quality checks and the separate unchanged native executable.
 Full required parity still fails; Linux, snapshots and runtime milestone gates
 remain open. The handoff binds exact current validation and remaining work.
+
+### Selected protected local purge and snapshot-base startup
+
+ARCH-M2-PROTECTED-PURGE1-CREATE1 implements the successor to indexed snapshots.
+The neutral log state holds full P plus the immutable artifact ID; storage owns
+inclusive prefix validation/deletion and preserves that pair through every log
+mutation. The existing state owner supplies a durable local descriptor pin, which
+blocks artifact replacement while ordinary workflow application continues. A pin
+alone proves no commitment. No second store, checkpoint model or authority token
+is introduced.
+
+Concrete node orchestration proves the older snapshot S against its actual log
+history before pinning state and then purging the separate log. After purge,
+startup requires the exact pinned S=P artifact, audits retained (S,A] and replays
+committed (A,C] through existing drivers. Both owners drop on any error; already
+durable replay prefixes remain available for explicit reopen. Consensus remains
+storage-neutral and the old no-purge APIs refuse a saved P. Exact wire, resource
+and two-database ordering rules are in
+[ADR-007](adr/007-durable-log-storage.md#selected-protected-local-purge-and-snapshot-base-recovery).
+All thirty new behavior test identities pass after missing-contract RED and
+independent source/test review. The complete macOS checkpoint passes 791 Rust
+tests across 90 targets, six compile-fail examples across 15 documentation targets,
+strict quality checks and the unchanged separate native executable.
+Safe repeated advancement, received/beyond-tail snapshots, full source parity,
+runtime services and both-platform validation remain required successors.

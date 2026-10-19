@@ -11,12 +11,15 @@ use super::{
     store::{self, RedbLogStore},
 };
 
-fn load(tx: &WriteTransaction, store: &RedbLogStore) -> Result<RaftLogState, RaftLogError> {
+pub(super) fn load(
+    tx: &WriteTransaction,
+    store: &RedbLogStore,
+) -> Result<RaftLogState, RaftLogError> {
     let table = tx.open_table(format::META).map_err(format::table_error)?;
     read::metadata(&table, store)
 }
 
-fn replace(
+pub(super) fn replace(
     tx: &WriteTransaction,
     store: &RedbLogStore,
     state: RaftLogState,
@@ -48,7 +51,12 @@ pub(super) fn save_vote(store: &RedbLogStore, vote: RaftVote) -> Result<(), Raft
     replace(
         &tx,
         store,
-        RaftLogState::new(Some(vote), state.committed(), state.last_log()),
+        RaftLogState::new_with_anchor(
+            Some(vote),
+            state.committed(),
+            state.last_log(),
+            state.last_purged().zip(state.purged_snapshot_id()),
+        ),
     )?;
     store::commit(tx)
 }
@@ -98,7 +106,12 @@ pub(super) fn save_committed(store: &RedbLogStore, id: LogIdentity) -> Result<()
     replace(
         &tx,
         store,
-        RaftLogState::new(state.vote(), Some(id), state.last_log()),
+        RaftLogState::new_with_anchor(
+            state.vote(),
+            Some(id),
+            state.last_log(),
+            state.last_purged().zip(state.purged_snapshot_id()),
+        ),
     )?;
     store::commit(tx)
 }
@@ -177,6 +190,13 @@ pub(super) fn append(store: &RedbLogStore, entries: &[RaftLogEntry]) -> Result<(
         .begin_write()
         .map_err(format::transaction_error)?;
     let state = load(&tx, store)?;
+    if state.last_purged().is_some_and(|position| {
+        entries
+            .iter()
+            .any(|entry| entry.id().index() <= position.index())
+    }) {
+        return Err(RaftLogError::Conflict);
+    }
     let last = {
         let mut table = tx.open_table(format::LOGS).map_err(format::table_error)?;
         let last = validate_batch(&table, store, entries, state.last_log())?;
@@ -200,7 +220,12 @@ pub(super) fn append(store: &RedbLogStore, entries: &[RaftLogEntry]) -> Result<(
     replace(
         &tx,
         store,
-        RaftLogState::new(state.vote(), state.committed(), last),
+        RaftLogState::new_with_anchor(
+            state.vote(),
+            state.committed(),
+            last,
+            state.last_purged().zip(state.purged_snapshot_id()),
+        ),
     )?;
     store::commit(tx)
 }
@@ -261,7 +286,10 @@ pub(super) fn truncate(store: &RedbLogStore, index: u64) -> Result<(), RaftLogEr
         let mut table = tx.open_table(format::LOGS).map_err(format::table_error)?;
         let remaining = index
             .checked_sub(1)
-            .map(|before| identity(&table, store, before))
+            .map(|before| match state.last_purged() {
+                Some(position) if position.index().get() == before => Ok(position),
+                _ => identity(&table, store, before),
+            })
             .transpose()?;
         suffix(&table, store, index, remaining, state.last_log())?;
         // The validated affected-row census is paid once; redb deletes by range.
@@ -273,7 +301,12 @@ pub(super) fn truncate(store: &RedbLogStore, index: u64) -> Result<(), RaftLogEr
     replace(
         &tx,
         store,
-        RaftLogState::new(state.vote(), state.committed(), remaining),
+        RaftLogState::new_with_anchor(
+            state.vote(),
+            state.committed(),
+            remaining,
+            state.last_purged().zip(state.purged_snapshot_id()),
+        ),
     )?;
     store::commit(tx)
 }

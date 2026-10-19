@@ -13,9 +13,12 @@ use wf_storage::log::RedbLogStore;
 use wf_types::identity::{GroupId, RecoveryId};
 use wf_types::version::{AppliedPosition, LogIdentity};
 
+#[path = "../state_store/faults/backend.rs"]
+mod disk_backend;
 mod faults;
 mod limits;
 mod point;
+mod purge;
 mod recovery;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

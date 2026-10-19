@@ -36,8 +36,23 @@ pub(super) fn put_descriptor(
     tx: &RedbStateTransaction<'_>,
     facts: Option<([u8; 32], usize, usize)>,
 ) -> Result<(), StateTransactionError> {
+    write_descriptor(tx, facts, false)
+}
+
+pub(super) fn pin_descriptor(
+    tx: &RedbStateTransaction<'_>,
+    facts: ([u8; 32], usize, usize),
+) -> Result<(), StateTransactionError> {
+    write_descriptor(tx, Some(facts), true)
+}
+
+fn write_descriptor(
+    tx: &RedbStateTransaction<'_>,
+    facts: Option<([u8; 32], usize, usize)>,
+    pinned: bool,
+) -> Result<(), StateTransactionError> {
     let mut bytes = [0_u8; 87];
-    let n = format::descriptor(tx, facts, &mut bytes)?;
+    let n = format::descriptor(tx, facts, pinned, &mut bytes)?;
     tx.temporary(n)?;
     tx.step()?;
     let mut table = tx
@@ -264,5 +279,19 @@ impl StateSnapshotStore for RedbStateStore {
         .map_err(|_| SnapshotError::Limit)?;
         admit(&self.group, &self.recovery, self.limits, limits, extra)?;
         active(self, install::install(self, stage, limits))
+    }
+    fn pin_snapshot(
+        &mut self,
+        expected_id: [u8; 32],
+        limits: SnapshotLimits,
+    ) -> Result<(), SnapshotError> {
+        self.ready().map_err(SnapshotError::State)?;
+        admit(&self.group, &self.recovery, self.limits, limits, 0)?;
+        active(self, read::pin(self, Some(expected_id), limits)).map(|_| ())
+    }
+    fn snapshot_pin(&mut self, limits: SnapshotLimits) -> Result<Option<[u8; 32]>, SnapshotError> {
+        self.ready().map_err(SnapshotError::State)?;
+        admit(&self.group, &self.recovery, self.limits, limits, 0)?;
+        active(self, read::pin(self, None, limits))
     }
 }

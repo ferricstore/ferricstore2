@@ -141,13 +141,19 @@ pub(super) fn state(
     let size = 39
         + usize::from(state.vote().is_some()) * 17
         + usize::from(state.committed().is_some()) * 24
-        + usize::from(state.last_log().is_some()) * 24;
+        + usize::from(state.last_log().is_some()) * 24
+        + usize::from(state.last_purged().is_some()) * 56;
     let mut wire = allocate(size)?;
-    wire.extend_from_slice(b"FWLS\0\x01");
+    wire.extend_from_slice(if state.last_purged().is_some() {
+        b"FWLS\0\x02"
+    } else {
+        b"FWLS\0\x01"
+    });
     wire.push(
         u8::from(state.vote().is_some())
             | (u8::from(state.committed().is_some()) << 1)
-            | (u8::from(state.last_log().is_some()) << 2),
+            | (u8::from(state.last_log().is_some()) << 2)
+            | (u8::from(state.last_purged().is_some()) << 3),
     );
     if let Some(vote) = state.vote() {
         wire.extend_from_slice(&vote.term().to_be_bytes());
@@ -156,6 +162,10 @@ pub(super) fn state(
     }
     for id in [state.committed(), state.last_log()].into_iter().flatten() {
         put_id(&mut wire, id);
+    }
+    if let Some((position, id)) = state.last_purged().zip(state.purged_snapshot_id()) {
+        put_id(&mut wire, position);
+        wire.extend_from_slice(&id);
     }
     let hash = digest(&wire, Some((group, recovery)))?;
     wire.extend_from_slice(&hash);
@@ -167,10 +177,14 @@ pub(super) fn decode_state(
     group: &GroupId,
     recovery: &RecoveryId,
 ) -> Result<RaftLogState, RaftLogError> {
-    let body = prefix(wire, *b"FWLS")?;
+    if wire.len() < 39 || wire[..4] != *b"FWLS" || !matches!(&wire[4..6], [0, 1 | 2]) {
+        return Err(RaftLogError::Corrupt);
+    }
+    let anchored = wire[5] == 2;
+    let body = &wire[..wire.len() - 32];
     let mut offset = 6;
     let [flags] = take(body, &mut offset)?;
-    if flags & !7 != 0 {
+    if (anchored && !matches!(flags, 14 | 15)) || (!anchored && flags & !7 != 0) {
         return Err(RaftLogError::Corrupt);
     }
     let vote = if flags & 1 != 0 {
@@ -194,13 +208,27 @@ pub(super) fn decode_state(
     } else {
         None
     };
+    let anchor = if anchored {
+        Some((read_id(body, &mut offset)?, take::<32>(body, &mut offset)?))
+    } else {
+        None
+    };
     if offset != body.len()
-        || committed.is_some_and(|id| last.is_none_or(|tail| id.index() > tail.index()))
+        || committed.is_some_and(|id| {
+            last.is_none_or(|tail| {
+                id.index() > tail.index() || (id.index() == tail.index() && id != tail)
+            })
+        })
+        || anchor.is_some_and(|(position, _)| {
+            committed.is_none_or(|id| {
+                position.index() > id.index() || (position.index() == id.index() && position != id)
+            })
+        })
     {
         return Err(RaftLogError::Corrupt);
     }
     verify(wire, Some((group, recovery)))?;
-    Ok(RaftLogState::new(vote, committed, last))
+    Ok(RaftLogState::new_with_anchor(vote, committed, last, anchor))
 }
 
 pub(super) fn entry(

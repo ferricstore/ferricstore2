@@ -83,3 +83,25 @@ pub(super) fn current<W: std::io::Write>(
     }
     Ok(Some(metadata))
 }
+
+pub(super) fn pin(
+    store: &RedbStateStore,
+    expected: Option<[u8; 32]>,
+    limits: SnapshotLimits,
+) -> Result<Option<[u8; 32]>, SnapshotError> {
+    let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::State)?;
+    let mut charge = PolicySchemaCharge::new(store.limits.schema());
+    let facts = validate::complete(&mut tx, &mut charge, limits).map_err(SnapshotError::State)?;
+    let pinned = validate::pin(&tx).map_err(SnapshotError::State)?;
+    if let Some(id) = expected {
+        let facts = facts
+            .filter(|facts| facts.0 == id)
+            .ok_or(SnapshotError::StaleSnapshot)?;
+        if pinned.is_none() {
+            super::pin_descriptor(&tx, facts).map_err(SnapshotError::State)?;
+            super::commit(tx).map_err(SnapshotError::State)?;
+        }
+        return Ok(Some(id));
+    }
+    Ok(pinned)
+}

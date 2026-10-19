@@ -21,6 +21,9 @@ pub(super) fn capture<W: std::io::Write>(
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     let _ = validate::complete(&mut tx, &mut charge, store.limits.snapshot_limits())
         .map_err(SnapshotError::State)?;
+    if validate::pin(&tx).map_err(SnapshotError::State)?.is_some() {
+        return Err(SnapshotError::SnapshotPinned);
+    }
     // New DATA caps never reinterpret an older, larger artifact's valid profile.
     let expected = format::facts(&tx, limits).map_err(SnapshotError::State)?;
     for table in [super::META, super::ROWS] {
