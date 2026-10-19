@@ -117,6 +117,21 @@ pub(super) fn wrapped_with_cache(
     fault: Arc<AtomicU8>,
     cache_size: usize,
 ) -> TestResult<RedbStateStore> {
+    let database = fault_database(path, fault, cache_size)?;
+    let scope = fixtures::scope()?;
+    Ok(RedbStateStore::open_database(
+        database,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreLimits::default(),
+    )?)
+}
+
+pub(super) fn fault_database(
+    path: &Path,
+    fault: Arc<AtomicU8>,
+    cache_size: usize,
+) -> TestResult<redb::Database> {
     let file = OpenOptions::new().read(true).write(true).open(path)?;
     let backend = DiskFaultBackend {
         inner: FileBackend::new(file)?,
@@ -125,13 +140,7 @@ pub(super) fn wrapped_with_cache(
     let database = redb::Builder::new()
         .set_cache_size(cache_size)
         .create_with_backend(backend)?;
-    let scope = fixtures::scope()?;
-    Ok(RedbStateStore::open_database(
-        database,
-        scope.group().clone(),
-        scope.recovery().clone(),
-        StateStoreLimits::default(),
-    )?)
+    Ok(database)
 }
 
 fn seed_frame() -> TestResult<PreparedBytes> {

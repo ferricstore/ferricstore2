@@ -1,7 +1,6 @@
 //! Borrowed same-writer reseeks and fully admitted continuation positions.
 
 use super::{
-    ROWS,
     admission::{entry, storage_error, table_error, total, value_error},
     store::{RedbStateTransaction, fence},
 };
@@ -53,7 +52,10 @@ pub(super) fn open<'tx, 's>(
     )?;
     transaction.temporary(prefix.len())?;
     {
-        let table = transaction.write.open_table(ROWS).map_err(table_error)?;
+        let table = transaction
+            .write
+            .open_table(transaction.rows_table)
+            .map_err(table_error)?;
         let _range = table
             .range(prefix.as_slice()..)
             .map_err(|e| storage_error(&e))?;
@@ -165,7 +167,7 @@ impl RedbStateDueCursor<'_, '_> {
         let table = self
             .transaction
             .write
-            .open_table(ROWS)
+            .open_table(self.transaction.rows_table)
             .map_err(table_error)?;
         let mut rows = table
             .range::<&[u8]>((bound, Bound::Unbounded))

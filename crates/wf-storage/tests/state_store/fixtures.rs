@@ -73,7 +73,7 @@ pub(super) fn genesis_control_lower_bound(path: &Path) -> TestResult {
     let original_manifest = raw_manifest(path)?;
     let mut manifest = original_manifest.clone();
     assert_eq!(manifest.len(), 110);
-    // FWSS2 with one-byte group/recovery: time starts at12, checksum at78.
+    // FWSS3 with one-byte group/recovery: time starts at12, checksum at78.
     manifest[20..22].copy_from_slice(&1_u16.to_be_bytes());
     let checksum = Sha256::digest(&manifest[..78]);
     manifest[78..].copy_from_slice(&checksum);
@@ -214,8 +214,9 @@ pub(super) fn raw_manifest(path: &Path) -> TestResult<Vec<u8>> {
     let database = redb::Builder::new().open(path)?;
     let read = database.begin_read()?;
     let table = read.open_table(META)?;
-    assert_eq!(table.len()?, 2);
+    assert_eq!(table.len()?, 3);
     assert!(table.get(b"membership".as_slice())?.is_some());
+    assert!(table.get(b"snapshot".as_slice())?.is_some());
     let guard = table
         .get(b"manifest".as_slice())?
         .ok_or("manifest absent")?;
@@ -242,9 +243,15 @@ pub(super) fn replace(
             .ok_or("membership absent")?
             .value()
             .to_vec();
+        let snapshot = metadata
+            .get(b"snapshot".as_slice())?
+            .ok_or("snapshot marker absent")?
+            .value()
+            .to_vec();
         metadata.retain(|_, _| false)?;
         metadata.insert(b"manifest".as_slice(), manifest)?;
         metadata.insert(b"membership".as_slice(), membership.as_slice())?;
+        metadata.insert(b"snapshot".as_slice(), snapshot.as_slice())?;
     }
     write.commit()?;
     Ok(())

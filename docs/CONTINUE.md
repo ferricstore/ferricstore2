@@ -1,11 +1,82 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-19. The active full-completion goal continues beyond this reviewed
+Updated: 2026-10-20. The active full-completion goal continues beyond this reviewed
 increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest increment implements concrete consuming startup recovery in
+The current increment implements complete indexed state snapshots in the neutral
+`StateSnapshotStore` and concrete redb adapter. Capture retains immutable original
+authority; current export reproduces that DATA after later applies; a validated
+private Stage moves into a fresh restore or is consumed by atomic live install.
+Live install checks actual target profiles, exact genesis and nondecreasing
+control, independent HLC/wall floors and complete applied membership. Candidate
+storage failures preserve healthy active authority. Capture finishes caller output
+before its final Immediate commit; sink failure aborts replacement, and commit
+uncertainty fences even after all output bytes were accepted. Caller flush/fsync
+remains explicit. See [ADR-007](adr/007-durable-log-storage.md#selected-complete-state-snapshots).
+
+FWSS3 requires exactly four live/frozen tables and explicit None/Some descriptor.
+FWSP1 and FWSD1 bind complete sorted authority, framing/counts, scope, checksum
+and full-stream ID. Historical semantic checks use their own indexed cohort.
+Healthy legacy FWSS1/2 is fully checked and refused, without silent migration.
+One whole-call work/schema account includes revisits, old retirement and source/
+destination copies. Metadata is admitted before ownership copies; receive uses one
+charged reusable row buffer and export borrows rows. Logical budgets do not cover
+engine caches/COW/reclamation, caller buffering/blocking or native RSS.
+
+Fifteen new snapshot test identities pass after genuine missing-contract RED.
+Independent full-frame/descriptor literals, complete mixed-authority cohorts,
+maximum inline/policy/binary scope, corruption, exact/tight resource profiles,
+actual target revalidation, immutable retrieval and lineage refusals are covered.
+Real cache-zero Stage read failure, active sync uncertainty and four acknowledged
+capture/install process kills execute with whole-cohort reopen/retry. The pre-sync
+kills reach the first non-growth commit-path sync, not a proven final flush.
+These are component/process-boundary checks, not power-loss, queued-runtime
+capture, offline rollback or full original-source/profile parity.
+
+Architecture and performance actually reviewed source/tests and each other's
+findings. Implementation stays in the ten selected new files and twelve existing
+seams. Test helper extractions and layout migrations have concrete approvals.
+Fixture import/visibility/reply/first-log corrections, the health getter's captured
+profile and the old recovery META2-to-META3 migration are setup work, not product
+behavioral RED. Complete-file inverses preserve old oracles through those changes
+and equivalent strict spellings. No lint, size or dependency waiver was added.
+
+The final native macOS workspace passes **760 Rust tests across 89 targets** and
+six compile-fail examples across 15 documentation targets, with zero failures or
+ignored tests. Formatting, all-target compilation, strict Clippy, warnings-denied
+rustdoc, architecture and reference/progress checks pass. The complete cached
+dependency audit passes advisories, bans, licenses and sources without exclusions
+or waivers; no fresh online advisory refresh is claimed. All 735 selected Rust/
+manifest/policy/style inputs stayed unchanged throughout final validation.
+
+The separate pinned native acceptance executable also passes formatting,
+compilation, strict Clippy and its complete persistence/fault/process-kill run.
+Its 17 files, including 15 Rust sources, remain byte-exact to proof 55bcbd85.
+It exercises the existing drivers; snapshot-specific faults run in the workspace
+suite above. Both backends retain canonical redb 4.4.0/no-default/std-only.
+Actual execution is Darwin arm64. Separate native Linux validation remains required.
+No runtime framework, new dependency or consensus-to-storage edge was introduced.
+
+The executed full parity gate still fails. Ledger counts remain 82 source-derived
+declarations, 92 mappings and 365 assertion links; 1,681 runtime cases remain
+unmatched and 1,655 declarations unresolved. These component tests add no complete
+source-case parity credit. Every pinned Elixir setup, fixture, mandatory profile
+and runtime scenario remains required. The full goal stays active.
+
+Next: establish durable snapshot retention and commitment provenance before log
+purge, then snapshot-aware startup audit/replay. Safe anchor advancement, repeated
+capture/install/purge and received-snapshot provenance beyond the local log tail
+remain required; a temporary fixed pin is not product completion. The current
+unselected successor proposal lives after the selected review cutoffs. Root must
+consult architecture on its concrete test/helper inventory before any new artifact.
+Then finish consensus/read barriers, remaining domain and committed Claim/policy
+routes, services and complete M1–M8 acceptance, including both supported hosts.
+
+Earlier committed startup recovery (`bae8d8a`, `85ab0cd`):
+
+That checkpoint implements concrete consuming startup recovery in
 `wf-node::recovery`. One actual guard captures control and applied membership,
 then drops typed membership and the guard before reading the separate durable
 log. A bounded audit of the complete retained applied prefix verifies the full
@@ -39,7 +110,7 @@ children; source-size and dependency/module policies pass. Node adds only the
 existing exact no-default SHA pin and a canonical redb DEV-only test edge.
 Consensus/storage/old drivers and original FWCP/storage bytes remain unchanged.
 
-The final native macOS snapshot passes **745 Rust tests across 89 workspace
+That committed native macOS snapshot passes **745 Rust tests across 89 workspace
 targets**, plus six compile-fail examples across 15 documentation targets, with
 zero failures or ignored tests. Formatting, all-target compilation, strict Clippy,
 warnings-denied rustdoc, architecture and reference/progress checks pass. The full
@@ -59,13 +130,6 @@ declarations, 92 mappings and 365 assertion links; 1,681 runtime cases remain
 unmatched and 1,655 declarations unresolved. These component tests add no complete
 source-case parity credit. Every pinned Elixir setup, fixture, mandatory profile
 and runtime scenario remains required. The full goal stays active.
-
-Next: complete snapshots/install/purge and snapshot-aware startup, preserving
-durable publication before any log purge. Then finish consensus/read barriers,
-remaining domain and Claim/policy routes, services and full M1–M8 acceptance.
-Peers are assessing snapshot responsibilities/resources in existing notes only;
-no next artifact/model/source is selected. Every new artifact still requires
-concrete architecture consultation and substantive tests before implementation.
 
 Earlier applied-membership checkpoint (`b5ce61a`):
 

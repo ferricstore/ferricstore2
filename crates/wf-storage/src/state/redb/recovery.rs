@@ -1,7 +1,6 @@
 //! Exclusive noncreating recovery with a cumulative census and shared grammar.
 
 use super::{
-    META, ROWS,
     admission::{storage_error, table_error, total, value_error},
     bootstrap::hash_row,
     store::{RedbStateStore, RedbStateTransaction},
@@ -17,16 +16,39 @@ mod index;
 mod rows;
 
 pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionError> {
-    let tx = store.transaction(
+    let mut tx = store.transaction(
         true,
         store.limits.admission(),
         store.limits.maximum_recovery_steps(),
         usize::MAX,
         store.limits.maximum_temporary_bytes(),
     )?;
-    inventory(&tx)?;
+    let tables = inventory(&tx)?;
+    let mut charge = PolicySchemaCharge::new(tx.limits.schema());
+    let (layout, _) = cohort(&tx, &mut charge)?;
+    if layout < 3 {
+        if tables != 2 {
+            return Err(StateTransactionError::Corrupt);
+        }
+        return Err(StateTransactionError::UnsupportedLayout);
+    }
+    if tables != 4 {
+        return Err(StateTransactionError::Corrupt);
+    }
+    let _ =
+        super::snapshot::validate::retained(&mut tx, &mut charge, store.limits.snapshot_limits())?;
+    Ok(())
+}
+
+pub(super) fn cohort(
+    tx: &RedbStateTransaction<'_>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(u16, wf_domain::workflow::control::ControlState), StateTransactionError> {
     tx.step()?;
-    let metadata = tx.write.open_table(META).map_err(table_error)?;
+    let metadata = tx
+        .write
+        .open_table(tx.metadata_table)
+        .map_err(table_error)?;
     tx.step()?;
     let mut meta_rows = metadata.iter().map_err(|e| storage_error(&e))?;
     tx.step()?;
@@ -41,8 +63,8 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionErr
     }
     let mut layout = 0;
     let (initial, placements, policies, expected) =
-        check_manifest(manifest.value(), &tx, &mut layout)?;
-    let member = if layout == 2 {
+        check_manifest(manifest.value(), tx, &mut layout)?;
+    let member = if layout >= 2 {
         tx.step()?;
         let (key, bytes) = meta_rows
             .next()
@@ -57,6 +79,19 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionErr
     } else {
         None
     };
+    if layout == 3 && !tx.snapshot_cohort {
+        tx.step()?;
+        let (key, bytes) = meta_rows
+            .next()
+            .transpose()
+            .map_err(|e| storage_error(&e))?
+            .ok_or(StateTransactionError::Corrupt)?;
+        tx.recovery_row(key.value(), bytes.value())?;
+        if key.value() != super::snapshot::KEY {
+            return Err(StateTransactionError::Corrupt);
+        }
+        super::snapshot::check_descriptor(tx, bytes.value())?;
+    }
     tx.step()?;
     if let Some(row) = meta_rows.next() {
         let (key, value) = row.map_err(|e| storage_error(&e))?;
@@ -71,31 +106,33 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionErr
         return Err(StateTransactionError::Corrupt);
     }
     if let Some(bytes) = member {
-        super::membership::validate_value(&tx, bytes.value(), control)?;
+        super::membership::validate_value(tx, bytes.value(), control)?;
     }
     let (actual_placements, actual_policies, hash) =
-        validate_rows(&tx, control.last_entry().is_some())?;
+        validate_rows(tx, control.last_entry().is_some(), charge)?;
     if placements != actual_placements || policies != actual_policies || expected != hash {
         return Err(StateTransactionError::Corrupt);
     }
-    if layout == 1 {
-        return Err(StateTransactionError::UnsupportedLayout);
-    }
-    Ok(())
+    Ok((layout, control))
 }
 
-fn inventory(tx: &RedbStateTransaction<'_>) -> Result<(), StateTransactionError> {
+pub(super) fn inventory(tx: &RedbStateTransaction<'_>) -> Result<usize, StateTransactionError> {
     tx.step()?;
     let mut tables = tx.write.list_tables().map_err(|e| storage_error(&e))?;
     let mut count = 0;
+    let mut mask = 0_u8;
     loop {
         tx.step()?;
         let Some(table) = tables.next() else {
             break;
         };
-        if !matches!(table.name(), "wf_state_meta_v1" | "wf_state_rows_v1") {
-            return Err(StateTransactionError::Corrupt);
-        }
+        mask |= match table.name() {
+            "wf_state_meta_v1" => 1,
+            "wf_state_rows_v1" => 2,
+            "wf_state_snapshot_meta_v1" => 4,
+            "wf_state_snapshot_rows_v1" => 8,
+            _ => return Err(StateTransactionError::Corrupt),
+        };
         count += 1;
     }
     tx.step()?;
@@ -104,10 +141,10 @@ fn inventory(tx: &RedbStateTransaction<'_>) -> Result<(), StateTransactionError>
         .list_multimap_tables()
         .map_err(|e| storage_error(&e))?;
     tx.step()?;
-    if count != 2 || multimaps.next().is_some() {
+    if !matches!((count, mask), (2, 3) | (4, 15)) || multimaps.next().is_some() {
         return Err(StateTransactionError::Corrupt);
     }
-    Ok(())
+    Ok(count)
 }
 
 fn check_manifest(
@@ -120,7 +157,7 @@ fn check_manifest(
         return Err(StateTransactionError::Corrupt);
     }
     *layout = value::read_u16(bytes, &mut at).map_err(value_error)?;
-    if !matches!(*layout, 1 | 2) {
+    if !matches!(*layout, 1..=3) {
         return Err(StateTransactionError::Corrupt);
     }
     let n = usize::from(value::read_u16(bytes, &mut at).map_err(value_error)?);
@@ -158,15 +195,15 @@ fn check_manifest(
 fn validate_rows(
     tx: &RedbStateTransaction<'_>,
     applied: bool,
+    charge: &mut PolicySchemaCharge,
 ) -> Result<(u64, u64, [u8; 32]), StateTransactionError> {
     tx.step()?;
-    let table = tx.write.open_table(ROWS).map_err(table_error)?;
+    let table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
     tx.step()?;
     let mut entries = table.iter().map_err(|e| storage_error(&e))?;
     let mut counts = [0_u64; 2];
     let mut hash = Sha256::new();
     hash.update(b"wf-state-genesis-v1");
-    let mut charge = PolicySchemaCharge::new(tx.limits.schema());
     loop {
         tx.step()?;
         let Some(row) = entries.next() else {
@@ -187,7 +224,7 @@ fn validate_rows(
         if !applied && matches!(decoded.family(), 1 | 2 | 5) {
             return Err(StateTransactionError::Corrupt);
         }
-        rows::validate(tx, &table, &decoded, value.value(), &mut charge)?;
+        rows::validate(tx, &table, &decoded, value.value(), charge)?;
         if matches!(decoded.family(), 6 | 7) {
             counts[usize::from(decoded.family() - 6)] = counts[usize::from(decoded.family() - 6)]
                 .checked_add(1)

@@ -1,6 +1,6 @@
 //! Borrowed membership validation and the same exclusive guard capability.
 
-use super::{META, StateStoreLimits, admission, store::RedbStateTransaction};
+use super::{StateStoreLimits, admission, store::RedbStateTransaction};
 use crate::state::value;
 use redb::ReadableTable;
 use wf_domain::workflow::control::{ControlState, EntryStamp};
@@ -63,7 +63,10 @@ pub(super) fn write(
     tx.temporary(size)?;
     let encoded = value::encode_applied_membership(tx.group, tx.recovery, log, body, profile, size)
         .map_err(admission::value_error)?;
-    let mut table = tx.write.open_table(META).map_err(admission::table_error)?;
+    let mut table = tx
+        .write
+        .open_table(tx.metadata_table)
+        .map_err(admission::table_error)?;
     table
         .insert(KEY, encoded.as_slice())
         .map_err(|error| admission::storage_error(&error))?;
@@ -104,7 +107,10 @@ pub(super) fn validate_value(
 
 pub(super) fn validate(tx: &RedbStateTransaction<'_>, control: ControlState) -> Result<(), Error> {
     tx.step()?;
-    let table = tx.write.open_table(META).map_err(admission::table_error)?;
+    let table = tx
+        .write
+        .open_table(tx.metadata_table)
+        .map_err(admission::table_error)?;
     let bytes = table
         .get(KEY)
         .map_err(|error| admission::storage_error(&error))?
@@ -129,7 +135,7 @@ impl GroupControlTransaction for RedbStateTransaction<'_> {
             self.step()?;
             let table = self
                 .write
-                .open_table(META)
+                .open_table(self.metadata_table)
                 .map_err(admission::table_error)?;
             let bytes = table
                 .get(KEY)

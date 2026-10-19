@@ -1,7 +1,8 @@
 //! Storage-neutral checkpoint verification and consensus adapter boundaries.
 //!
-//! Bounded startup verification is implemented; the Raft runtime, membership
-//! recovery, snapshots and committed-suffix replay remain incomplete.
+//! Bounded checkpoint verification and neutral control-entry apply are implemented.
+//! Node composes membership audit and committed replay through neutral ports.
+//! The Raft runtime, snapshot integration and read barriers remain incomplete.
 
 #![forbid(unsafe_code)]
 

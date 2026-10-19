@@ -1,7 +1,6 @@
 //! One borrowed point guard, admission, then one independently owned result.
 
 use super::super::{
-    ROWS,
     admission::{
         copy_bytes, policy_error, storage_error, table_error, total, value_error, wire_record_limit,
     },
@@ -26,7 +25,10 @@ impl RedbStateTransaction<'_> {
             |cap| key::encode_control_key(self.group, self.recovery, cap),
         )?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let guard = table
             .get(key.as_slice())
             .map_err(|e| storage_error(&e))?
@@ -52,7 +54,10 @@ impl RedbStateTransaction<'_> {
         )?;
         self.temporary(prefix.len())?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let mut rows = table
             .range(prefix.as_slice()..)
             .map_err(|e| storage_error(&e))?;
@@ -83,7 +88,10 @@ impl RedbStateTransaction<'_> {
             |cap| key::encode_outcome_key(&scope, request, cap),
         )?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
         let Some(guard) = guard else {
             return Ok(None);
@@ -118,7 +126,10 @@ impl RedbStateTransaction<'_> {
             |cap| key::encode_placement_key(self.recovery, partition, cap),
         )?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
         let Some(guard) = guard else {
             return Ok(None);
@@ -156,7 +167,10 @@ impl RedbStateTransaction<'_> {
             |cap| key::encode_policy_key(&scope, workflow_type, cap),
         )?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
         let Some(guard) = guard else {
             return Ok(None);
@@ -186,7 +200,10 @@ impl RedbStateTransaction<'_> {
         let scope = self.scope(tenant)?;
         let key = self.record_key(&scope, partition, id)?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
         let Some(guard) = guard else {
             return Ok(None);

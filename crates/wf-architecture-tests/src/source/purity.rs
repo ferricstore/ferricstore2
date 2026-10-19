@@ -23,6 +23,7 @@ impl Inspector<'_, '_> {
             "log::control",
             "log::common",
             "state::control",
+            "snapshot::metadata",
         ]
         .into_iter()
         .any(under);

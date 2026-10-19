@@ -276,11 +276,11 @@ impl RedbStateTransaction<'_> {
         value: &[u8],
     ) -> Result<(), StateTransactionError> {
         if self.recovering {
-            debit(&self.inspected, 1, self.limits.maximum_recovery_rows())?;
+            debit(&self.inspected, 1, self.maximum_inspected)?;
             debit(
                 &self.wire,
                 total(key.len(), [value.len()])?,
-                self.limits.maximum_recovery_bytes(),
+                self.maximum_wire,
             )?;
         }
         Ok(())

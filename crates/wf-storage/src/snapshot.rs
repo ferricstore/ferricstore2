@@ -1,3 +1,3 @@
-//! Snapshot boundary for `wf-storage`.
-//!
-//! Reserved for the reviewed contract; no workflow behavior is implemented here.
+//! Durable immutable snapshot data and privately validated restore custody.
+
+pub use crate::state::snapshot::RedbSnapshotStage;

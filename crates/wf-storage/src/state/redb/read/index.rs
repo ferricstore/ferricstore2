@@ -1,7 +1,6 @@
 //! Real physical membership and the first FIFO row in the same writer revision.
 
 use super::super::{
-    ROWS,
     admission::{copy_bytes, entry, storage_error, table_error, total, value_error},
     store::RedbStateTransaction,
 };
@@ -22,7 +21,10 @@ impl RedbStateTransaction<'_> {
         let scope = self.scope(tenant)?;
         let key = self.due_key(&scope, due)?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
         if let Some(row) = &guard {
             self.recovery_row(&key, row.value())?;
@@ -44,7 +46,10 @@ impl RedbStateTransaction<'_> {
         let key = self.fifo_key(&scope, lane, member)?;
         self.opened()?;
         {
-            let table = self.write.open_table(ROWS).map_err(table_error)?;
+            let table = self
+                .write
+                .open_table(self.rows_table)
+                .map_err(table_error)?;
             let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
             let Some(guard) = guard else {
                 return Ok(None);
@@ -120,7 +125,10 @@ impl RedbStateTransaction<'_> {
     ) -> Result<Option<key::DecodedOrderedKey>, StateTransactionError> {
         self.temporary(prefix.len())?;
         self.opened()?;
-        let table = self.write.open_table(ROWS).map_err(table_error)?;
+        let table = self
+            .write
+            .open_table(self.rows_table)
+            .map_err(table_error)?;
         let mut rows = table.range(prefix..).map_err(|e| storage_error(&e))?;
         self.opened()?;
         self.step()?;

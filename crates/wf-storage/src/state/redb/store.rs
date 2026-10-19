@@ -32,9 +32,40 @@ pub struct RedbStateTransaction<'s> {
     pub(super) recovering: bool,
     pub(super) inspected: Cell<usize>,
     pub(super) wire: Cell<usize>,
+    pub(super) maximum_inspected: usize,
+    pub(super) maximum_wire: usize,
+    pub(super) metadata_table: redb::TableDefinition<'static, &'static [u8], &'static [u8]>,
+    pub(super) rows_table: redb::TableDefinition<'static, &'static [u8], &'static [u8]>,
+    pub(super) io_calls: Cell<usize>,
+    pub(super) snapshot_cohort: bool,
 }
 
 impl RedbStateStore {
+    pub(super) fn unvalidated(
+        database: redb::Database,
+        group: GroupId,
+        recovery: RecoveryId,
+        limits: StateStoreLimits,
+    ) -> Self {
+        Self {
+            database,
+            group,
+            recovery,
+            limits,
+            fenced: Cell::new(false),
+        }
+    }
+    pub(super) fn ready(&self) -> Result<(), StateTransactionError> {
+        if self.fenced.get() {
+            Err(StateTransactionError::Unavailable)
+        } else {
+            Ok(())
+        }
+    }
+    pub(super) fn failed(&self, error: StateTransactionError) -> StateTransactionError {
+        fence(&self.fenced, error);
+        error
+    }
     /// Creates a wholly empty inventory and syncs its new parent directory entry.
     /// A bare relative filename uses the current directory; no directory is made.
     /// # Errors
@@ -175,6 +206,12 @@ impl RedbStateStore {
             recovering,
             inspected: Cell::new(0),
             wire: Cell::new(0),
+            maximum_inspected: self.limits.maximum_recovery_rows(),
+            maximum_wire: self.limits.maximum_recovery_bytes(),
+            metadata_table: super::META,
+            rows_table: super::ROWS,
+            io_calls: Cell::new(0),
+            snapshot_cohort: false,
         })
     }
 }
@@ -207,6 +244,17 @@ impl GroupApplyStore for RedbStateStore {
 }
 
 impl RedbStateTransaction<'_> {
+    pub(super) fn carry_from(&self, previous: &Self) {
+        self.steps.set(self.steps.get().max(previous.steps.get()));
+        self.read.set(self.read.get().max(previous.read.get()));
+        self.temporary
+            .set(self.temporary.get().max(previous.temporary.get()));
+        self.inspected
+            .set(self.inspected.get().max(previous.inspected.get()));
+        self.wire.set(self.wire.get().max(previous.wire.get()));
+        self.io_calls
+            .set(self.io_calls.get().max(previous.io_calls.get()));
+    }
     pub(super) fn ready(&self) -> Result<(), StateTransactionError> {
         if self.fenced.get() {
             Err(StateTransactionError::Unavailable)

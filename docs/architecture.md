@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters and bounded committed startup recovery are implemented. Snapshot, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters, bounded committed startup recovery and complete indexed state snapshots are implemented. Snapshot-aware startup/purge, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 

@@ -1,6 +1,7 @@
-//! Composition and supervision boundary. This scaffold starts no workflow service.
+//! Composition, bounded committed startup recovery and supervision boundaries.
 //!
-//! M0 module scaffold; implementations follow the reviewed architecture.
+//! Startup recovery joins the concrete durable log and state stores. Runtime
+//! wiring and supervision remain incomplete; this crate starts no workflow service.
 //! Worker transport modules are private to the worker crate:
 //! ```compile_fail,E0603
 //! use wf_worker::client;

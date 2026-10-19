@@ -1,6 +1,6 @@
 # ferricstore2
 
-Rust implementation of the reviewed workflow-only FerricStore design. The workspace, test support and quality checks are implemented, with a partial pure M1 domain core, source-derived tests, a synchronous durable log, a scoped transactional state backend, atomic applied-membership/control persistence and bounded historical audit with committed startup replay. Snapshots, Raft integration and HTTP/TCP listeners remain incomplete. Preserved Elixir tests are mandatory acceptance inputs.
+Rust implementation of the reviewed workflow-only FerricStore design. The workspace, test support and quality checks are implemented, with a partial pure M1 domain core, source-derived tests, a synchronous durable log, transactional state, atomic applied membership/control, bounded committed startup replay and complete indexed state snapshot capture/restore/install. Snapshot-aware startup, safe log purge, Raft integration and HTTP/TCP listeners remain incomplete. Preserved Elixir tests are mandatory acceptance inputs.
 
 The design preserves explicit durable workflow transitions, leases, fencing, retries and workflow queries. It does not port the general Redis-compatible database or replay arbitrary user code.
 

@@ -202,19 +202,32 @@ fn clock_and_identity_cases(
 }
 
 fn legacy_layout(dir: &Path) -> TestResult {
-    let path = dir.join("legacy.redb");
-    drop(f::create(&path)?);
-    let rows = f::raw_rows(&path)?;
-    let mut meta = fixtures::raw_meta(&path)?;
-    meta.remove(fixtures::MEMBER_KEY);
-    let manifest = meta.get_mut(b"manifest".as_slice()).ok_or("manifest")?;
-    assert_eq!(&manifest[..6], b"FWSS\0\x02");
-    manifest[5] = 1;
-    rehash(manifest);
-    rejected(
-        &path,
-        &rows,
-        &meta,
-        StateTransactionError::UnsupportedLayout,
-    )
+    for version in [1, 2] {
+        let path = dir.join(format!("legacy-{version}.redb"));
+        drop(f::create(&path)?);
+        let rows = f::raw_rows(&path)?;
+        let mut meta = fixtures::raw_meta(&path)?;
+        if version == 1 {
+            meta.remove(fixtures::MEMBER_KEY);
+        }
+        meta.remove(b"snapshot".as_slice());
+        let manifest = meta.get_mut(b"manifest".as_slice()).ok_or("manifest")?;
+        assert_eq!(&manifest[..6], b"FWSS\0\x03");
+        manifest[5] = version;
+        rehash(manifest);
+        let database = redb::Builder::new().open(&path)?;
+        let write = database.begin_write()?;
+        for name in ["wf_state_snapshot_meta_v1", "wf_state_snapshot_rows_v1"] {
+            assert!(write.delete_table(redb::TableDefinition::<&[u8], &[u8]>::new(name))?);
+        }
+        write.commit()?;
+        drop(database);
+        rejected(
+            &path,
+            &rows,
+            &meta,
+            StateTransactionError::UnsupportedLayout,
+        )?;
+    }
+    Ok(())
 }

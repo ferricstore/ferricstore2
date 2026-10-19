@@ -17,11 +17,11 @@ use super::{TestResult, f};
 
 pub(super) const MEMBER_KEY: &[u8] = b"membership";
 pub(super) const MEMBER: &str = "46574d42000100016700017a000000000300000002000000000000000100000000000000020000000200000000000000020000000000000003000000020000000000000001000000000000000200000004000000000000000100000000000000020000000000000003000000000000000400000001610000000000000002780000000002ceb2";
-pub(super) const NONE: &str =
+pub(crate) const NONE: &str =
     "46574d56000100016700017a00ac790aa1bf45989cda350d1a756194a344fee55f0cf4169b6e72190759ebeecc";
 pub(super) const SOME: &str = "46574d56000100016700017a01000000000000000100000000000000070000000000000000000000000000008646574d42000100016700017a000000000300000002000000000000000100000000000000020000000200000000000000020000000000000003000000020000000000000001000000000000000200000004000000000000000100000000000000020000000000000003000000000000000400000001610000000000000002780000000002ceb27492a63cb751990c91dc46ef3153f12a155c4b4d5490148e6bc916b947cbad10";
 
-pub(super) fn hex(s: &str) -> TestResult<Vec<u8>> {
+pub(crate) fn hex(s: &str) -> TestResult<Vec<u8>> {
     s.as_bytes()
         .as_chunks::<2>()
         .0
@@ -30,14 +30,14 @@ pub(super) fn hex(s: &str) -> TestResult<Vec<u8>> {
         .collect()
 }
 
-pub(super) fn stamp(p: u64, l: u16, w: u64) -> TestResult<EntryStamp> {
+pub(crate) fn stamp(p: u64, l: u16, w: u64) -> TestResult<EntryStamp> {
     Ok(EntryStamp::Stamped(CommittedTime::new(
         HlcTimestamp::new(p, l)?,
         w,
     )?))
 }
 
-pub(super) fn membership() -> TestResult<RaftMembership> {
+pub(crate) fn membership() -> TestResult<RaftMembership> {
     Ok(RaftMembership::new(
         vec![vec![1, 2], vec![2, 3], vec![1, 2]],
         vec![
@@ -50,7 +50,7 @@ pub(super) fn membership() -> TestResult<RaftMembership> {
     )?)
 }
 
-pub(super) fn frame(member: bool, stamp: EntryStamp) -> TestResult<PreparedBytes> {
+pub(crate) fn frame(member: bool, stamp: EntryStamp) -> TestResult<PreparedBytes> {
     let scope = f::scope()?;
     let limits = RaftMembershipLimits::default();
     Ok(if member {
@@ -67,7 +67,7 @@ pub(super) fn frame(member: bool, stamp: EntryStamp) -> TestResult<PreparedBytes
     })
 }
 
-pub(super) fn row(log: Option<LogIdentity>, body: Option<&[u8]>) -> TestResult<Vec<u8>> {
+pub(crate) fn row(log: Option<LogIdentity>, body: Option<&[u8]>) -> TestResult<Vec<u8>> {
     let mut out = b"FWMV\0\x01\0\x01g\0\x01z".to_vec();
     out.push(u8::from(log.is_some()));
     match (log, body) {
@@ -122,7 +122,7 @@ pub(super) fn replace(
     Ok(())
 }
 
-pub(super) fn set_control(
+pub(crate) fn set_control(
     rows: &mut BTreeMap<Vec<u8>, Vec<u8>>,
     control: ControlState,
 ) -> TestResult {
@@ -134,7 +134,7 @@ pub(super) fn set_control(
     Ok(())
 }
 
-pub(super) fn current(state: &mut RedbStateStore) -> TestResult<ControlState> {
+pub(crate) fn current(state: &mut RedbStateStore) -> TestResult<ControlState> {
     let s = f::scope()?;
     let tx = state.begin_apply(
         s.group(),
@@ -156,7 +156,7 @@ pub(super) fn next(
     Ok(plan_control(previous, EntryIdentity::new(log, frame.digest()), stamp)?.next())
 }
 
-pub(super) fn apply(
+pub(crate) fn apply(
     state: &mut RedbStateStore,
     frame: &PreparedBytes,
     log: LogIdentity,

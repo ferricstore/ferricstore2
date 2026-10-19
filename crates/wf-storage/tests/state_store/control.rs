@@ -11,7 +11,7 @@ use wf_ports::state::{
 use wf_storage::state::{key, value};
 
 mod faults;
-mod fixtures;
+pub(super) mod fixtures;
 mod limits;
 mod recovery;
 
@@ -24,14 +24,14 @@ fn consensus_entries_publish_only_same_control_and_membership() -> TestResult {
     drop(store);
     let mut rows = f::raw_rows(&path)?;
     let mut meta = fixtures::raw_meta(&path)?;
-    assert_eq!(meta.len(), 2);
+    assert_eq!(meta.len(), 3);
     assert_eq!(
         meta.get(fixtures::MEMBER_KEY).ok_or("required member")?,
         &fixtures::hex(fixtures::NONE)?
     );
     assert_eq!(
         meta.get(b"manifest".as_slice()).ok_or("manifest")?[4..6],
-        [0, 2]
+        [0, 3]
     );
     let blank = fixtures::frame(false, EntryStamp::Unstamped)?;
     let stamp = fixtures::stamp(20, 3, 19)?;

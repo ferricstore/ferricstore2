@@ -1,6 +1,8 @@
-//! Durable storage adapter boundaries. No engine has been selected by this scaffold.
+//! Scoped synchronous durable log and transactional workflow state adapters.
 //!
-//! M0 module scaffold; implementations follow the reviewed architecture.
+//! The reviewed redb backend persists authority, indexes, retained outcomes and
+//! applied control/membership and indexed state snapshots. Blob adapters and
+//! snapshot-aware runtime integration remain incomplete.
 
 #![forbid(unsafe_code)]
 

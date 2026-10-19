@@ -168,6 +168,7 @@ pub(super) fn initialize(
         .map_err(|e| storage_error(&e))?;
     drop(meta);
     super::membership::write(&tx, None, None)?;
+    super::snapshot::initialize(&tx)?;
     tx.write
         .set_durability(Durability::Immediate)
         .map_err(|_| StateTransactionError::Unavailable)?;
@@ -202,7 +203,7 @@ fn manifest(
     let mut out = Vec::new();
     out.try_reserve_exact(bytes)
         .map_err(|_| StateTransactionError::Allocation)?;
-    out.extend_from_slice(b"FWSS\0\x02");
+    out.extend_from_slice(b"FWSS\0\x03");
     for field in [store.group.as_bytes(), store.recovery.as_bytes()] {
         out.extend_from_slice(
             &u16::try_from(field.len())

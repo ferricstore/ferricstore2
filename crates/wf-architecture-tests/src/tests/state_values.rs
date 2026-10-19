@@ -22,6 +22,8 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-ports", "state::transaction::independent::nested"),
         ("wf-ports", "log::public_mutation::response"),
         ("wf-ports", "log::public_mutation::response::nested"),
+        ("wf-ports", "snapshot::metadata"),
+        ("wf-ports", "snapshot::metadata::nested"),
     ] {
         assert_eq!(
             source_check(
@@ -75,6 +77,8 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         ("wf-ports", "state::transaction::independent_backend"),
         ("wf-ports", "log::public_mutation_backend"),
         ("wf-ports", "consensus::mutation"),
+        ("wf-ports", "snapshot"),
+        ("wf-ports", "snapshot::metadata_backend"),
     ] {
         assert_eq!(
             source_check(
@@ -104,6 +108,22 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         );
     }
     assert_domain_values_stay_server_only()?;
+    for name in [
+        "StateSnapshotStore",
+        "SnapshotMetadata",
+        "SnapshotLimits",
+        "SnapshotError",
+    ] {
+        assert!(
+            source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::snapshot::{name};")
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
+        );
+    }
     for name in [
         "MutationSubmitPort",
         "MutationSubmission",

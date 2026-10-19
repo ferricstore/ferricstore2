@@ -3,6 +3,7 @@
 use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaLimits};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_ports::consensus::RaftMembershipLimits;
+use wf_ports::snapshot::SnapshotLimits;
 use wf_ports::state::StateTransactionError;
 use wf_types::identity::{GroupId, PartitionId, TenantId};
 use wf_types::version::CommittedTime;
@@ -15,6 +16,7 @@ mod membership;
 mod publication;
 mod read;
 mod recovery;
+pub(crate) mod snapshot;
 mod store;
 
 pub use cursor::RedbStateDueCursor;
@@ -46,6 +48,7 @@ pub struct StateStoreLimits {
     temporary: usize,
     workspace: usize,
     membership: RaftMembershipLimits,
+    snapshot: SnapshotLimits,
 }
 
 impl StateStoreLimits {
@@ -84,6 +87,7 @@ impl StateStoreLimits {
             temporary: temporary_bytes,
             workspace: workspace_bytes,
             membership: RaftMembershipLimits::default(),
+            snapshot: SnapshotLimits::default(),
         })
     }
     /// Supported persisted field and decision profile.
@@ -142,6 +146,17 @@ impl StateStoreLimits {
         self.membership = limits;
         self
     }
+    /// Captured immutable snapshot data profile and default operation budgets.
+    #[must_use]
+    pub const fn snapshot_limits(self) -> SnapshotLimits {
+        self.snapshot
+    }
+    /// Selects snapshot ceilings without changing workflow or membership data.
+    #[must_use]
+    pub const fn with_snapshot_limits(mut self, limits: SnapshotLimits) -> Self {
+        self.snapshot = limits;
+        self
+    }
 }
 
 impl Default for StateStoreLimits {
@@ -154,6 +169,7 @@ impl Default for StateStoreLimits {
             temporary: 128 * 1_048_576,
             workspace: 256 * 1_048_576,
             membership: RaftMembershipLimits::default(),
+            snapshot: SnapshotLimits::default(),
         }
     }
 }

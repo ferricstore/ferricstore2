@@ -1,10 +1,9 @@
 //! Independent genesis framing, donor admission and strict constructor controls.
 
+use redb::ReadableDatabase;
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::path::Path;
-
-use redb::{ReadableDatabase, TableHandle};
-use sha2::{Digest, Sha256};
 use wf_domain::policy::complete::{
     CompletePolicyCandidate, CompletePolicyData, CompletePolicyValue, PolicySchemaCharge,
     PolicySchemaError, PolicySchemaLimits, complete_policy_value_owned_bytes,
@@ -18,7 +17,7 @@ use wf_storage::state::{RedbStateStore, StateStoreGenesis, StateStoreLimits, key
 use wf_types::identity::{GroupId, PartitionId, TenantId};
 
 use super::{TestResult, fixtures as f};
-
+mod inventory;
 pub(super) fn candidate(
     name: &[u8],
     version: Option<Vec<u8>>,
@@ -41,7 +40,6 @@ pub(super) fn candidate(
         &mut PolicySchemaCharge::new(schema),
     )?)
 }
-
 pub(super) fn minimal(name: &[u8]) -> TestResult<CompletePolicyValue> {
     let schema = PolicySchemaLimits::default();
     Ok(prepare_complete_policy_value_v2(
@@ -50,7 +48,6 @@ pub(super) fn minimal(name: &[u8]) -> TestResult<CompletePolicyValue> {
         &mut PolicySchemaCharge::new(schema),
     )?)
 }
-
 /// Pack the reviewed version independently of the product manifest parser.
 pub(super) fn manifest(
     group: &[u8],
@@ -70,7 +67,7 @@ pub(super) fn manifest(
             hash.update(value);
         }
     }
-    let mut wire = b"FWSS\0\x02".to_vec();
+    let mut wire = b"FWSS\0\x03".to_vec();
     wire.extend_from_slice(&u16::try_from(group.len())?.to_be_bytes());
     wire.extend_from_slice(group);
     wire.extend_from_slice(&u16::try_from(recovery.len())?.to_be_bytes());
@@ -236,19 +233,10 @@ fn exact_genesis() -> TestResult {
     assert_eq!(
         packed,
         hex(
-            "46575353000200016700017a00000000000000110000000000000000001100000000000000020000000000000001e0f976e00789b0cd089958944f473308862f10357046f939ababbfe6c5c81e8d246756048fdeb32b8ac45d52d0e78bd657cc70c30d9ddce6ecbbda807e7923ab"
+            "46575353000300016700017a00000000000000110000000000000000001100000000000000020000000000000001e0f976e00789b0cd089958944f473308862f10357046f939ababbfe6c5c81e8d909cd168f3d5b3703f1914e40fedaa4646208b33ccc21cdfb0fadb997d2ad5a8"
         )?
     );
-    let database = redb::Builder::new().open(&path)?;
-    let read = database.begin_read()?;
-    let mut names = read
-        .list_tables()?
-        .map(|table| table.name().to_owned())
-        .collect::<Vec<_>>();
-    names.sort();
-    assert_eq!(names, ["wf_state_meta_v1", "wf_state_rows_v1"]);
-    assert_eq!(read.list_multimap_tables()?.count(), 0);
-    drop(read);
+    let database = inventory::check(&path)?;
     let reopened = RedbStateStore::open_database(
         database,
         scope.group().clone(),

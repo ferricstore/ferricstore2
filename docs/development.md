@@ -2,7 +2,7 @@
 
 The workspace contains M0 infrastructure, a partial pure M1 domain core and
 scoped synchronous durable-log/state adapters with source-derived tests.
-Snapshots, consensus, caches and live transports remain incomplete. Reference
+Snapshot-aware startup/purge, consensus, caches and live transports remain incomplete. Reference
 integrity, registration and architecture checks do not establish full workflow
 parity or milestone completion. See the handoff for current results.
 

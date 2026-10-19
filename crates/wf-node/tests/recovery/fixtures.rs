@@ -385,9 +385,17 @@ pub(super) fn state_rows(dir: &Path) -> TestResult<Rows> {
 
 pub(super) fn state_meta(dir: &Path) -> TestResult<Rows> {
     let rows = bytes_table(&dir.join("state.redb"), "wf_state_meta_v1")?;
-    assert_eq!(rows.len(), 2);
+    assert_eq!(rows.len(), 3);
     assert!(rows.contains_key(b"manifest".as_slice()));
     assert!(rows.contains_key(b"membership".as_slice()));
+    let descriptor = rows
+        .get(b"snapshot".as_slice())
+        .ok_or("missing snapshot descriptor")?;
+    assert_eq!(descriptor.len(), 39);
+    assert_eq!(&descriptor[..7], b"FWSD\0\x01\0");
+    for name in ["wf_state_snapshot_meta_v1", "wf_state_snapshot_rows_v1"] {
+        assert_eq!(bytes_table(&dir.join("state.redb"), name)?.len(), 0);
+    }
     Ok(rows)
 }
 

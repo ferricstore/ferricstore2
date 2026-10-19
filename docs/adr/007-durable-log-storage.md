@@ -317,3 +317,79 @@ effectful neighbors stay distinct. No new engine, registry package or consensus
 storage edge is introduced. Snapshots/install/purge, full original setup/profile
 parity, runtime integration and independent native Linux/macOS acceptance remain
 required; these equations establish no measured latency/RSS gain.
+
+## Selected complete state snapshots
+
+ARCH-M2-STATE-SNAPSHOT1-CREATE1 selects the implemented state snapshot predecessor.
+Fifteen substantive identities pass after genuine missing-contract RED, including
+actual storage faults and four capture/install process-kill paths. The final macOS
+workspace passes 760 Rust tests plus six compile-fail examples; exact scope and
+remaining gates are recorded in the handoff. Architecture and performance reviewed
+actual source/tests and each other. Setup/layout fixture corrections and equivalent
+strict spellings preserve old oracles; they are not product behavioral RED.
+Exact artifacts, signatures, defaults, wire and four test-helper precisions are
+recorded in the active completion coordination/domain/architecture reviews.
+
+The neutral `StateSnapshotStore` owns capture, current-artifact export and live
+installation with an associated private Stage. `SnapshotLimits` separates artifact
+rows/encoded bytes/individual row bytes from whole-call visits/bytes/steps, I/O
+attempts/quantum, metadata R, temporary C and workspace W. `SnapshotMetadata` owns
+complete original control and applied membership; it certifies no Raft commitment
+or installation authorization. Storage's non-cloneable `RedbSnapshotStage` consumes
+a genuinely empty database and validates the actual incoming stream before it can
+be installed or moved into a fresh restored store. No raw database/apply handle
+escapes. The path receive form exclusively creates a new file and synchronizes its
+parent; opaque-database callers retain those setup obligations.
+
+Select explicit FWSS3 with the existing live META/ROWS and two queryable immutable
+snapshot META/ROWS tables. Live metadata requires manifest, membership and an
+explicit None/Some snapshot descriptor. None requires empty frozen tables. Some
+contains exact original manifest/membership and all captured authority families
+0..7, including clocks, fences, leases, inline values, outcomes, history, policies,
+placements and indexes. Snapshot-local tables/descriptor are excluded from capture.
+Intact FWSS1/2 is fully checked under its old inventory and refused as
+UnsupportedLayout; there is no implicit migration or silent FWSS2 widening.
+
+FWSP1 has independent group/recovery lengths, metadata count2, row count and total
+encoded length, then sorted metadata and sorted unique authority rows. Each row
+places u32 key length and u64 value length before either payload. A final SHA-256
+covers preceding bytes and genuine EOF is required. The artifact ID hashes the
+complete stream including that footer. FWSD1 binds that ID/count/length with a
+namespace-bound descriptor checksum. Canonical emission from frozen indexed rows
+must reproduce the original DATA after later ordinary applies; it never recaptures
+newer live rows under older metadata. Strict reopen validates both cohorts and the
+complete retained artifact using indexed semantic probes, without a hidden scratch
+path or repeated whole-stream scans for each point.
+
+Capture holds the actual exclusive synchronous state writer through old-artifact
+census, replacement, validation and complete caller output. Output error aborts
+the uncommitted replacement; final Immediate failure is uncertain and fences even
+if all bytes reached the sink. Accepted output is not caller flush/fsync. Live
+install retains exclusive validated staging custody while checking actual target
+profiles, exact immutable genesis, nondecreasing applied index/HLC/wall/membership
+and exact control/membership at equal indexes. One Immediate transaction replaces
+live authority and its recoverable artifact together. Stage-source failures abort
+without fencing healthy active authority; actual active engine failures keep their
+fatal classification. Fresh restore moves the already checked Stage directly.
+
+For every retained namespace G=512+g+r. Before work require
+sum(Gs)+2048+configuredR+configuredC<=W; installation pays both namespaces.
+Metadata R_actual=G+512+U(M), with complete typed membership U under its existing
+metric. Semantic helpers use the actual min(snapshot C,target C), sharing cumulative
+temporary, visit and schema accounts without phase refunds. Old-artifact retirement
+uses whole-call work and its captured data profile, not the smaller new artifact's
+row/length caps. Receive pays the full512+q at each new logical row-buffer high
+water; smaller rows reuse it. Every actual I/O attempt is admitted before invocation,
+including short calls and Interrupted. Quantum1 costs E output and E+1 input
+attempts, including actual EOF. Engine caches/pages/COW/disk, caller buffering and
+blocking, and allocator excess are separate from these logical bounds.
+
+The original Elixir concurrent capture requires an acknowledged barrier and a real
+queued late write; serialized component custody alone does not complete that
+runtime case. Offline interrupted replacement with an older source remains a
+separate recovery/new-lineage obligation, not permission for serving-state rollback.
+An actual coordinator must establish capture/install commitment provenance before
+destructive purge. Durable last-purged identity, anchor crash ordering and
+snapshot-aware startup audit(S,A]/replay(A,C] remain required successors; existing
+no-snapshot verification/recovery stays unchanged. Full original setup/profile
+parity and separate Linux/macOS execution remain required.
