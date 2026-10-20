@@ -8,7 +8,7 @@ use wf_domain::policy::complete::{
     CompleteCorePolicyPatchFresh, CompleteCorePolicyPatchFreshView, CompleteCorePolicyPatchInput,
     CompleteCorePolicyPatchRequestInput, CompletePolicyData, CompletePolicyValue,
     CompleteStatePolicyData, GovernanceData, PolicySchemaCharge, PolicySchemaError,
-    PolicySchemaLimits, prepare_complete_core_policy_patch_fresh,
+    PolicySchemaLimits, StoredPolicyValue, prepare_complete_core_policy_patch_fresh,
     prepare_complete_core_policy_patch_point_fresh, prepare_complete_policy_value_v2,
     restore_complete_core_policy_patch_frame_header, restore_complete_policy,
     scan_complete_core_policy_patch_frame,
@@ -87,15 +87,20 @@ fn input(
     ))
 }
 
-fn stored(value: CompletePolicyData) -> TestResult<CompletePolicyValue> {
+fn stored(value: CompletePolicyData) -> TestResult<StoredPolicyValue> {
     let profile = PolicySchemaLimits::default();
     let mut charge = PolicySchemaCharge::new(profile);
     let candidate = restore_complete_policy(7, value, profile, &mut charge)?;
-    Ok(prepare_complete_policy_value_v2(
-        candidate,
-        profile,
-        &mut charge,
-    )?)
+    Ok(StoredPolicyValue::Complete(Box::new(
+        prepare_complete_policy_value_v2(candidate, profile, &mut charge)?,
+    )))
+}
+
+fn complete(value: &StoredPolicyValue) -> TestResult<&CompletePolicyValue> {
+    match value {
+        StoredPolicyValue::Complete(value) => Ok(value),
+        StoredPolicyValue::Original(_) => Err("expected Complete fixture".into()),
+    }
 }
 
 fn preserved() -> CompletePolicyData {
@@ -152,6 +157,7 @@ fn compare(
     match (&point.0, &full.0) {
         (Some((before, actual)), Some((expected, reference))) => {
             assert_eq!(before, expected);
+            let (actual, reference) = (complete(actual)?, complete(reference)?);
             assert_eq!(actual.generation(), reference.generation());
             assert!(actual.data() == reference.data());
             assert_eq!(actual.encoded(), reference.encoded());
@@ -236,7 +242,7 @@ fn point_fresh_matches_full_complete_fields_and_order() -> TestResult {
         (point_charge.g(), point_charge.p()),
         (full_charge.g(), full_charge.p())
     );
-    let installed = &point.0.as_ref().ok_or("missing candidate")?.1;
+    let installed = complete(&point.0.as_ref().ok_or("missing candidate")?.1)?;
     let mut expected = preserved();
     expected.max_active_ms = Some(2_000);
     expected
@@ -277,7 +283,7 @@ fn assert_wrong_current() -> TestResult {
         &mut PolicySchemaCharge::new(profile),
     );
     assert!(matches!(result, Err(Error::Request(_))));
-    assert_eq!(wrong.data().workflow_type, b"foreign");
+    assert_eq!(complete(&wrong)?.data().workflow_type, b"foreign");
     let unbound = prepare_complete_core_policy_patch_point_fresh(
         CompleteCorePolicyPatchFreshView {
             workflow_type: b"foreign",
@@ -465,7 +471,7 @@ fn assert_precedence_result(case: usize, point: &CompleteCorePolicyPatchFresh) -
     } else {
         assert_eq!(case, 11);
         assert_eq!(
-            point.0.as_ref().ok_or("missing candidate")?.1.generation(),
+            complete(&point.0.as_ref().ok_or("missing candidate")?.1)?.generation(),
             8
         );
     }

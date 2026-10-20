@@ -264,11 +264,20 @@ pub(super) fn assert_core_patch_parent_replay(
         )?;
     }
     assert_eq!(
-        installed.as_ref().map(|(_, value)| value.generation()),
+        installed
+            .as_ref()
+            .map(|(_, value)| match value {
+                StoredPolicyValue::Complete(value) => Ok(value.generation()),
+                StoredPolicyValue::Original(_) => Err("expected Complete fixture"),
+            })
+            .transpose()?,
         (!rejected).then_some(1)
     );
     if let Some((stored, value)) = &installed {
         assert_eq!(*stored, 0);
+        let StoredPolicyValue::Complete(value) = value else {
+            return Err("expected Complete fixture".into());
+        };
         assert!(value.data() == &minimal_data());
         assert_eq!(value.encoded(), expected);
     }
@@ -452,7 +461,7 @@ pub(super) fn assert_core_patch_parent_writers(
 fn assert_core_patch_parent_writer_duplicates(
     context: (&RequestScope, ControlState, u64),
     outcomes: &mut BTreeMap<RequestId, RetainedOutcome>,
-    policies: &BTreeMap<Vec<u8>, Result<CompletePolicyValue, ApplyError>>,
+    policies: &BTreeMap<Vec<u8>, Result<StoredPolicyValue, ApplyError>>,
     migrations: &BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
     expected: (&[u8], &[u8], &CompletePolicyData, &[u8]),
     limits: PolicySchemaLimits,

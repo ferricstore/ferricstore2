@@ -10,7 +10,7 @@ use super::{
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,
     CompleteCorePolicyPatchInput, CompleteCorePolicyPatchRequestInput,
-    CompletePolicyReplaceApplyView, prepare_complete_core_policy_patch_fresh,
+    CompletePolicyReplaceApplyView, StoredPolicyValue, prepare_complete_core_policy_patch_fresh,
     prepare_complete_policy_replace, prepare_complete_policy_value_v2,
     read_original_complete_policy_entry, restore_complete_policy,
 };
@@ -451,7 +451,10 @@ fn assert_unchanged_guard_order() -> TestResult {
     let scope = scope()?;
     let outcomes = BTreeMap::new();
     let marks = BTreeMap::new();
-    let policies = BTreeMap::from([(b"r".to_vec(), Ok(current))]);
+    let mut policies = BTreeMap::from([(
+        b"r".to_vec(),
+        Ok(StoredPolicyValue::Complete(Box::new(current))),
+    )]);
     let gate = GateView {
         scope: &scope,
         control: ControlState::initial(stamp(0)?),
@@ -494,6 +497,12 @@ fn assert_unchanged_guard_order() -> TestResult {
             RequestError::Encoding(EncodingError::EncodingMismatch)
         ))
     );
+    let (kind, current) = policies.pop_first().ok_or("missing Complete fixture")?;
+    assert!(policies.is_empty());
+    let Ok(StoredPolicyValue::Complete(current)) = current else {
+        return Err("expected Complete fixture".into());
+    };
+    let policies = BTreeMap::from([(kind, Ok(*current))]);
     let typed = CompletePolicyReplaceApplyView {
         gate,
         revision: 7,

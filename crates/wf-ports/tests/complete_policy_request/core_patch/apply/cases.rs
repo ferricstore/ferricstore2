@@ -131,7 +131,7 @@ pub(super) fn core_patch_parent_view<'a>(
     scope: &'a RequestScope,
     control: ControlState,
     outcomes: &'a BTreeMap<RequestId, RetainedOutcome>,
-    policies: &'a BTreeMap<Vec<u8>, Result<CompletePolicyValue, ApplyError>>,
+    policies: &'a BTreeMap<Vec<u8>, Result<StoredPolicyValue, ApplyError>>,
     active: &'a BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
     done: &'a BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
 ) -> CompleteCorePolicyPatchApplyView<'a> {
@@ -167,7 +167,7 @@ pub(super) fn core_patch_parent_value(
     case: usize,
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
-) -> TestResult<CompletePolicyValue> {
+) -> TestResult<StoredPolicyValue> {
     let expected = decode_core_patch_literal(CORE_PATCH_PARENT_VALUES[case].0)?;
     let hash = decode_core_patch_literal(CORE_PATCH_PARENT_VALUES[case].1)?;
     assert_eq!(
@@ -189,7 +189,7 @@ pub(super) fn core_patch_parent_value(
     assert_eq!(value.generation(), generation);
     assert!(value.data() == &data);
     assert_eq!(value.encoded(), expected.as_slice());
-    Ok(value)
+    Ok(StoredPolicyValue::Complete(Box::new(value)))
 }
 
 pub(super) fn core_patch_parent_rows(
@@ -277,7 +277,9 @@ pub(super) fn assert_core_patch_parent_accepted(
     frame: &[u8],
     metadata: (&[u8], u64, u64),
 ) -> TestResult {
-    let DispatchDecision::Fresh((Some((observed, value)), outcome)) = plan.decision() else {
+    let DispatchDecision::Fresh((Some((observed, StoredPolicyValue::Complete(value))), outcome)) =
+        plan.decision()
+    else {
         return Err("expected complete accepted Fresh owners".into());
     };
     assert_eq!(*observed, stored);
@@ -447,6 +449,7 @@ pub(super) fn assert_core_patch_parent_current_restoration() -> TestResult {
     let limits = profile(11_793)?;
     let mut charge = PolicySchemaCharge::new(limits);
     let current = decode_complete_policy_value_v2(CORE_PATCH_PARENT_MINIMAL, limits, &mut charge)?;
+    let current = StoredPolicyValue::Complete(Box::new(current));
     assert_eq!((charge.g(), charge.p()), (2_153, 0));
     let scope = core_patch_parent_scope()?;
     let outcomes = BTreeMap::new();
@@ -557,16 +560,6 @@ pub(super) fn core_patch_parent_writer_step(
         return Err("writer expected complete Fresh bundle".into());
     };
     Ok((control.next(), fresh))
-}
-
-pub(super) fn core_patch_parent_stored(
-    policies: &BTreeMap<Vec<u8>, Result<CompletePolicyValue, ApplyError>>,
-) -> TestResult<&CompletePolicyValue> {
-    Ok(policies
-        .get(b"r".as_slice())
-        .ok_or("held mathematical current")?
-        .as_ref()
-        .map_err(|error| *error)?)
 }
 
 pub(super) fn assert_core_patch_parent_full_max(

@@ -3,11 +3,15 @@
 use super::prepare::cases::decode_core_patch_literal;
 use super::prepare::literals::FROZEN_CORE_PATCH_FRAMES;
 use crate::{TestResult, profile};
-use wf_domain::policy::complete::{PolicySchemaCharge, PolicySchemaLimits};
+use std::collections::BTreeMap;
+use wf_domain::policy::complete::{
+    CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits, StoredPolicyValue,
+};
 use wf_domain::policy::installation::{MAX_POLICY_GENERATION, PolicyError, PolicyLimits};
 use wf_domain::retention::RetentionError;
 use wf_domain::value::{DomainError, InputField, RetryPolicyField};
 use wf_domain::workflow::admission::AdmissionLimits;
+use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::request::{ClientIntent, PolicyRejection, RetainedStatus};
 use wf_ports::log::{
     CodecError, complete_core_policy_patch_retained_status, verify_complete_core_policy_patch_frame,
@@ -31,6 +35,24 @@ pub(super) fn intent() -> TestResult<ClientIntent> {
 
 pub(super) fn minimal_value() -> Vec<u8> {
     b"FWPV\0\x02\0\0\0\0\0\0\0\x01\0\0\0\x16FWPS\0\x02\0\0\0\x01r\0\0\0\0\0\0\0\0\0\0\0".to_vec()
+}
+
+pub(super) fn core_patch_parent_owned(value: CompletePolicyValue) -> StoredPolicyValue {
+    StoredPolicyValue::Complete(Box::new(value))
+}
+
+pub(super) fn core_patch_parent_stored(
+    policies: &BTreeMap<Vec<u8>, Result<StoredPolicyValue, ApplyError>>,
+) -> TestResult<&CompletePolicyValue> {
+    let StoredPolicyValue::Complete(value) = policies
+        .get(b"r".as_slice())
+        .ok_or("held mathematical current")?
+        .as_ref()
+        .map_err(|error| *error)?
+    else {
+        return Err("expected Complete fixture".into());
+    };
+    Ok(value)
 }
 
 pub(super) fn full_value() -> TestResult<Vec<u8>> {
@@ -351,7 +373,7 @@ fn intent2_response_profiles_separate_refusal_from_malformed_grammar() -> TestRe
 fn full_core_patch_plan_binds_the_predecessor_used_for_preparation() -> TestResult {
     use std::collections::BTreeMap;
     use wf_domain::policy::complete::{
-        CompleteCorePolicyPatchApplyView, decode_complete_policy_value_v2,
+        CompleteCorePolicyPatchApplyView, StoredPolicyValue, decode_complete_policy_value_v2,
     };
     use wf_domain::workflow::control::ControlState;
     use wf_domain::workflow::request::{RequestScope, gate::GateView};
@@ -369,13 +391,12 @@ fn full_core_patch_plan_binds_the_predecessor_used_for_preparation() -> TestResu
     );
     let control = ControlState::initial(CommittedTime::new(HlcTimestamp::new(0, 0)?, 0)?);
     let actual = decode_complete_policy_value_v2(&full_value()?, schema, &mut charge)?;
+    let actual = StoredPolicyValue::Complete(Box::new(actual));
     let policies = BTreeMap::from([(
         b"r".to_vec(),
-        Ok(decode_complete_policy_value_v2(
-            &minimal_value(),
-            schema,
-            &mut charge,
-        )?),
+        Ok(StoredPolicyValue::Complete(Box::new(
+            decode_complete_policy_value_v2(&minimal_value(), schema, &mut charge)?,
+        ))),
     )]);
     let outcomes = BTreeMap::new();
     let migrations = BTreeMap::new();

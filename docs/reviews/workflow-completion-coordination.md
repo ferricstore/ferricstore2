@@ -47319,3 +47319,222 @@ credit remains exactly the scoped evidence above. ARCH's final13473 block
 reciprocally read PERF10377/previous1420; PERF actually read the exact ARCH4680
 reached-pair selection. The subsequent final-note read is ordinary reciprocal
 recordkeeping, not a further freeze or production readiness dependency.
+
+
+### ROOT-B1-DOMAIN-SOURCE1-RELEASE — after frozen tests8fa7434
+
+The complete selected B1 regression batch is frozen before implementation:
+ports1ffb63a, nodefe8d0b9, domain/ports/N241c1dc8 and final storage8fa7434.
+Supported-format custody repair03ac3d2 remains independent. Root now releases
+Writer's disjoint Domain implementation within the exact already approved
+ARCHCREATE3317960+26186/1f400832 and3344146+2593/aa0eb67f contracts, plus
+ARCH3409777+4680/7587feb9 reached-pair and final union-predicate clarification.
+Writer actually whole/hash-read those decisions and final DOMAIN46718/13d93b70
+before this release; no production was edited during read-only preparation.
+
+Only SIX new private production paths may be created, all under existing
+crates/wf-domain/src/policy/complete/flow_input/:
+interop.rs;interop/v2.rs;interop/v2/governance.rs;interop/patch.rs;
+interop/patch/states.rs;interop/patch/retry.rs. Existing wf-domain complete
+model/export, Core request/point/typed patch and original SET/read/GET/transient
+seams may change within that selected contract. Move the EXISTING unchanged
+StoredPolicyValue variants to existing complete/model.rs; this is the reviewed
+source API break, with Root preserving the old ports reexport. Add only the
+explicit existing-alias/private context reached-pair slot and no new nominal,
+trait, alias, probe, dependency or source path. Any newly discovered artifact
+requires concrete ARCH consultation BEFORE creation.
+
+Writer owns wf-domain production only. Root owns every wf-ports/wf-storage/
+wf-node edit, all tests/metadata/configs, Cargo/formatter/Git and integration.
+No test changes or unapproved source artifacts may overlap. First stable Domain
+carrier/reached-pair subset may hand off early with actual hashes for Root's
+Ports threading; otherwise dependent integration waits for a stable contract.
+Exact standalone typed API/Complete bytes/old g/p/error order remain preserved.
+Same-type public GET/SET/Core ETF interoperability, physical raw span authority,
+MAX generation2^53-1, authentic predecessor/reached metadata, transient-large
+limits and continuous prospective owners remain the selected implementation
+requirements. Original query ownership must move rather than free re-decoding;
+actual native copies/owners require admission. No synthetic policies or format
+refusal scope reduction is permitted. Both reviewers retain actual source and
+reciprocal review duties after handoff; no optimization gain or later feature
+execution is inferred from this release. Full goal stays active.
+
+
+### ROOT-B1-INTEGRATION-SOURCE1 — existing seams and reviewed direct-layout finding
+
+After frozen tests8fa7434, Root authored the approved existing Ports/storage
+integration while Writer exclusively owns Domain production. Root's seventeen
+production files add no path/type/alias/dependency: the existing union reexport,
+Core preparation/Plan/Changes/receipt matcher, actual current-generation read,
+Complete/original publication branches, layout-aware retained point/recovery
+readers, and physical original GET/SET drivers follow the recorded ALIAS1/SEAMS1
+and integration audit. No Node change is required for unchanged committed op2
+grammar; the actual driver must close its own new ownership phases.
+
+ARCH and PERF actually whole-read the held seventeen bodies/diffs. They
+independently found that supplied response2 Replay could bypass the correctly
+guarded retained reader and commit control on an actual old3/5 owner. Root
+whole-read ARCH3433831+13691/b6db555f integration inventory and
+3447522+3597/e1d6bb36 direct-layout finding and same-S3 regression selection.
+The existing backend now has its actual-layout guard before X in both Fresh
+and Replay validate arms. Existing authority.rs holds the selected genuine
+accepted2 donor/public Replay old3/5 refusal and actual6 positive regression.
+These changes are authored only: no compile, runtime RED/GREEN, or complete
+B1 acceptance is inferred. Exact unguarded and guarded execution remains due
+after Writer's coherent Domain handoff; the regression must freeze before
+committing its repair.
+
+Root also owns mechanical legacy-test carrier adaptation. Existing Complete
+fixtures are wrapped once and explicitly discriminated before their same old
+payload/generation assertions; standalone typed APIs and every frozen numeric
+fee/error/bound remain unchanged. No new test path/type/identity is created.
+Source review, geometry, compiler diagnostics and actual execution are still
+required. Writer remains Domain-only; reviewers remain notes-only; Root alone
+runs formatter/Cargo/Git. No peer was interrupted. Full parity/runtime/services
+and both OS acceptance remain open and the full goal stays active.
+
+
+### ROOT-B1-FIRST-COMPILE1 — coherent Domain provider, no assertions executed
+
+Writer handed off all24 Domain production paths and explicitly held source.
+Root formatted those exact paths using toolchain1.99.0/edition2024 with children
+independently selected. Twenty-two satisfy400LF; raw patch.rs499 and retry.rs419
+require approved existing-home factoring, not compressed formatting or a waiver.
+The first scoped complete_policy --no-run used298 captured inputs, fingerprint
+6d056c665db4967d0859369c3276781164fc5186286328b365f9fe26995ab3b3, all unchanged.
+Actual compiler exit101 is raw3217214+965/SHA256
+ecf4379e5772689874bbca5b4b4889b6731bb79ebee8ea3fb3d3381b03be7e62.
+Warnings-denied stopped the library on unused action in retry.rs and unused
+PolicySchemaError in states.rs. No assertion ran; absence of later diagnostics
+is not compile success. Root released Writer's Domain-only fixes and geometry
+consultation, with no Cargo or Domain mutation until another stable handoff.
+
+Root actually whole/hash-read DOMAIN4292777+9368/b550c156 authored provider and
+PERF2704916+11287/ba765dce finite seventeen-source review. The provider explicitly
+flags known keyword retry/retention/config parsing for architecture resolution;
+Root requested source-compatible semantics and discriminating existing-home
+coverage for any actual gap. No profile/scope waiver is selected.
+
+ARCH3451119+1629/df29945e selected the existing Complete fixture accessor's
+relocation into existing core_patch/response.rs. Applied callers remain within
+600LF, with no new file/type/module/alias. Ten legacy adaptations and separate
+same-S3 direct replay extension are stable for actual review, not executed.
+The scalar guard was authored during review BEFORE that S3 addition; a later
+exact unguarded/guarded run can prove the regression and correction, but must
+NOT be described as tests-written-before-code TDD for this newly found guard.
+The original fifteen B1 behavior identities remain frozen before feature
+implementation. Neither this compile attempt nor source-only review replaces
+the last full passing b861d3d checkpoint or credits any Elixir parity case.
+
+
+### ROOT-B1-LEGACY-PROGRESS1 — independent tooling while Domain fixes continue
+
+The previous goal turn made implementation/test/source-review progress and
+produced actual first compiler diagnostics; it was not a status-only turn.
+After handoff, Writer resumed only Domain import/geometry repairs while raw
+keyword behavior remains held for a discriminating same-D3 regression.
+Root's independent tooling CLI has no Domain dependency and did not compile
+changing Domain production. check-progress exits0 with944 captured inputs
+adffcf6509a877438355079520afafa674131c44393de65817795346d67985a5
+unchanged; exact raw3218313+559/ebc8aea7d5a1365b6cd820539407b8211c6f02a9e65479c72f13367150753f50.
+Counts remain5858 frozen declarations/85 source-derived/95 counterparts/384
+links,5903 registered/4222 linked/1681 unmatched/1655 unresolved. No parity
+credit or execution claim is added. All ten mechanical callers satisfy600LF;
+strict compile/lint/execution remains due after stable Domain repair.
+
+Root provided PERF's requested exact immutable ten-file review input in the
+EXISTING validation log:3218935+27700/SHA256
+5902d389620121a528087dabf58a563c9f3e0a4450168bdacb70710ed599739a.
+This is the scoped8fa7434 diff and entire old/current byte/LF/hash roster, not
+a new test, probe, source file or runtime result. Both reviewers can inspect
+the changed seams and independently conserve untouched assertions.
+
+
+### ROOT-B1-DOMAIN-EXECUTION1 — real selected success and keyword regression
+
+Root whole/hash-read ARCH3471438+2659/7de3a34a geometry selection,
+3474097+7408/36787bc8 keyword contract, and3481505+1561/668efe18 exact
+ONE private CorePatchPreparationContext artifact in existing request/point.rs.
+Only query/history/migrations/allNone with unchanged moved owners/public5slot
+contract is approved; no other nominal/alias/path is inferred. Writer's next
+handoff contained import/geometry repairs ONLY, leaving keyword behavior held.
+Root formatted26 changed Domain files, all<=400LF; raw parent386/retry386 and
+facade356 now satisfy the policy without compression or suppressions.
+
+Coherent Domain complete_policy --no-run exits0:298 captured inputs
+321034cf2514f8ef32a926f4bce6d43b3e047d466f0587e830820213f28308b4
+unchanged; raw3246795+264/8ff1dd776021e0b729221cb2eb7e5ef5f0a372e7f70b5f8657346dbc97daade4.
+Frozen D1-D4 then run4pass/0fail/ignored,136filtered on the SAME provider/pin;
+raw3247199+635/c83c23d8cbff1409313ba938e47af3eaf890361d096a77555a41a1e689dfdc4e.
+The full affected target then runs140pass/0fail/ignored/filtered; raw
+3247965+12971/73ef09821abe9bab6f1a91f8c356ca74c4501f1732dacb65b75d6e949e2872ad.
+The output display was truncated, but the exact entire captured result ends
+with those counts and actual exit0. This is one Domain target on macOS, not
+full workspace/backend/Elixir/native/Linux acceptance.
+
+Strict Domain all-target Clippy exits101,369 inputs
+9bd5624432e95a3193002ea5bf67ff8bee6798c7910f92173ce3aa0cf4c24e5c unchanged;
+raw3261076+14494/81d7f03025a06c9cc23245bb238b107867dfaff8ce14ac0db96983e54cd39c65.
+Twenty-two concrete naming/lazy combinator/lifetime/tiny Copy parameter/count/
+boolean/private-context diagnostics remain; no lint was suppressed. Root
+released Writer LINT-ONLY fixes under the selected private context decision.
+Keyword behavior remains held until its genuine regression freezes.
+
+Root authored that selected SAME D3 extension in only existing interop.rs595
+f4fb09887ef08893a408550bd1987b8a7eacae3669d1019b06a73289b7138ac1 and
+interop/fixtures.rs591/da55c904a49c8288069c88d1a50345f459d547774ee7fc537cb887744d4ef175.
+All old assertions/D4 operands remain. Two corresponding all-MAP phases run
+first; then the proper keyword donor portably decodes with exact generation,
+type and encoded bytes. The unrelated keyword edit fails at phase1, explicitly
+localized as keyword patch=true, phase=1: Schema(InvalidAuthority).
+Actual101/0pass1fail139filtered:298inputs
+6f8bdbee416e84cbd270567ed92b6235c6f1428173dd15d8466bf13414e19708 unchanged;
+raw3276537+713/25498a368f80195bb9be5306ce8a41fdd099f74a0631d067c9b1fae4db30c07c.
+The earlier context-free RED3275712+682/3e13f1b3 is not used to localize a stage.
+The reached keyword partial-edit/duplicate LAST/Clear-all assertions remain
+unexecuted after this failure. Expected wire fixtures preserve keyword LISTs,
+known duplicate/displaced pairs, unknown portable-key binary/padded/zero-list
+leaves, and the enclosing MAP's binary retry shadow. No new test identity/file/
+model was made. Both reviewers receive actual source for finite freeze review.
+
+Root actually read ARCH3483066+7784/32df1b47 legacy10/S3 source acceptance,
+PERF2691261+1390/02755b56 reciprocal suffix,2716203+3223/35fc130a S3 and
+2719426+5451/7b33d71c legacy10, plus DOMAIN4302145+4520/30147315 geometry
+receipt. Their finite source results do not imply execution of Ports/storage
+or supplied replay tests. Keyword extension has no behavioral fix release yet;
+full goal and all later runtime/parity/both-OS requirements remain active.
+
+
+### ROOT-B1-KEYWORD-FREEZE1 — reviewed regression before behavioral correction
+
+Both reviewers actually accepted the595/f4fb0988 and591/da55c904 keyword
+regression/independent full-wire fixtures, with their own entire literal
+reversals to511/5d94ebece and533/ba8c8148. Root whole/hash-read
+ARCH3490850+5475/d2e37b9c and PERF2738401+4975/aa47b51a actual source/713RED
+receipts. PERF2724877+13524/205f497c converter/transient/effect review was
+also actually whole/hash-read. No runtime success is inferred from review.
+The current keyword regression is now selected for freeze before repair.
+
+After lint-only Domain handoff, the first Ports no-run reaches five remaining
+legacy fixture type mismatches: exact raw3277389+4716/
+b3c86fc28e30a1ea544e141485bf8e5991b23db14ed2adaa796e20f27263ef5e,360
+inputs09ec412e unchanged,exit101. Root wraps the same three prepared Complete
+values and, after the existing Core refusal assertion, moves the sole same
+fixture back from its Box for the original typed Replace view. Its key is moved,
+remaining map emptiness is asserted, and no decoder/account/old assertion or
+operand changes. The ordinary existing response fixture helper keeps the
+parent at600LF; all affected tests remain<=600. These four small source deltas
+are sent for peer review separately from the prior ten-caller acceptance.
+Ports no-run then exits0:360inputs
+ed391f7d3688d5b5f83cd985d95e22cbf0307df3272e04af6f500a09fdc9ed54 unchanged;
+raw3282248+278/cc8d82885ac3da930ddfc9ad9d73995314378919711a2737611fceecf304df11.
+This compiles the Ports library and target; assertions are a separate run.
+
+ARCH selected exactly one PRIVATE TEST-ONLY interop/compatibility.rs child
+BEFORE creation, in3490850+5475/d2e37b9c. Only the new keyword helpers move
+there, with original511/533 bodies preserved; sameD3 entry and no new type/
+alias/testID/dependency. Independent binary-kind and mixed-case binary-mode
+controls must genuinely fail before the shared behavioral repair. Root will
+perform exact reinlining conservation and freeze those controls separately.
+The existing six production paths and approved private context remain the only
+new production artifacts. All keyword/scalar behavior is still held.

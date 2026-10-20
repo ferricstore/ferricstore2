@@ -13,6 +13,7 @@ fn cross_format_predecessor_history_and_generation_substitution_refuse_atomicall
         StateTransactionError,
     };
     let dir = f::directory("interop-authority")?;
+    assert_supplied_replay_layouts(&dir)?;
     let path = dir.join("state");
     let scope = f::scope()?;
     let actual = w::rich_value()?;
@@ -304,4 +305,189 @@ fn core_substitution(
     );
     drop(store);
     check_disk(path, before)
+}
+
+fn assert_supplied_replay_layouts(dir: &Path) -> TestResult {
+    use wf_domain::workflow::request::RetainedStatus;
+    use wf_storage::transaction::apply_complete_core_policy_patch_transaction;
+
+    let caps = f::limits();
+    let scope = f::scope()?;
+    let donor_path = dir.join("replay-layout6");
+    let value = w::rich_value()?;
+    let mut store = f::create(
+        &donor_path,
+        &[(b"job".to_vec(), value.encoded().to_vec())],
+        64,
+    )?;
+    let set = original_frame(b"layout-set", 0, Raw::Map(&[]), Raw::List(&[]))?;
+    let set_outcome = retained(f::apply(
+        &mut store,
+        &set,
+        0,
+        caps,
+        &mut PolicySchemaCharge::new(caps.schema),
+    )?)?;
+    assert_eq!(set_outcome.response(), w::rich_wire(2, 7, b"parallel")?);
+    let first = w::core_frame(b"layout-replay", 11, Some(2), fifo_patch())?;
+    let donor = retained(apply_complete_core_policy_patch_transaction(
+        &mut store,
+        &scope,
+        &first,
+        f::log(1),
+        caps,
+    )?)?;
+    assert_eq!(
+        (
+            donor.intent().version(),
+            donor.response_version(),
+            donor.status()
+        ),
+        (2, 2, RetainedStatus::Accepted)
+    );
+    assert_eq!(donor.response(), w::rich_wire(3, 7, b"fifo")?);
+    drop(store);
+    let incoming = w::core_frame(b"layout-replay", 12, Some(2), fifo_patch())?;
+    assert_eq!(donor.intent(), w::core_intent(&incoming, 2)?);
+    // The same genuine accepted receipt must work on actual6, while supplied
+    // mathematical metadata cannot grant its representation to an old owner.
+    assert_supplied_replay(&donor_path, 6, &incoming, &donor)?;
+    for layout in [3, 5] {
+        let path = dir.join(format!("replay-layout{layout}"));
+        let mut store = f::create(&path, &[(b"job".to_vec(), value.encoded().to_vec())], 64)?;
+        if layout == 5 {
+            let frame = w::core_frame(b"layout-v2", 0, Some(1), PolicyPatch::default())?;
+            let outcome = retained(apply_complete_core_policy_patch_transaction(
+                &mut store,
+                &scope,
+                &frame,
+                f::log(0),
+                caps,
+            )?)?;
+            assert_eq!(
+                (outcome.response_version(), outcome.status()),
+                (1, RetainedStatus::Accepted)
+            );
+        } else {
+            let owner = f::owner(
+                &scope,
+                b"p",
+                f::data(b"a", b"other", b"q", 0, Some(0))?,
+                0,
+                0,
+            )?;
+            f::seed(&mut store, &scope, &[owner], 0, 0)?;
+        }
+        let owner = f::owner(
+            &scope,
+            b"p",
+            f::data(b"b", b"other", b"q", 11, Some(11))?,
+            0,
+            1_u128 << 32,
+        )?;
+        f::seed(&mut store, &scope, &[owner], 1, 11)?;
+        drop(store);
+        assert_supplied_replay(&path, layout, &incoming, &donor)?;
+    }
+    Ok(())
+}
+
+fn assert_supplied_replay(
+    path: &Path,
+    layout: u16,
+    incoming: &[u8],
+    donor: &wf_domain::workflow::request::RetainedOutcome,
+) -> TestResult {
+    use wf_domain::workflow::request::{DispatchDecision, gate::PointGateView};
+    use wf_ports::log::{
+        CompleteCorePolicyPatchPointInspection, inspect_complete_core_policy_patch_point,
+        prepare_complete_core_policy_patch_point_frame,
+    };
+    use wf_ports::state::{
+        GroupApplyStore, GroupApplyTransaction, GroupCorePolicyChanges, GroupCorePolicyTransaction,
+        StateTransactionError,
+    };
+
+    let caps = f::limits();
+    let scope = f::scope()?;
+    let mut expected = f::cohort(path)?;
+    let mut store = f::open(path, 64)?;
+    let tx = store.begin_apply(
+        scope.group(),
+        scope.recovery(),
+        caps.codec.admission(),
+        caps.maximum_read_steps,
+        caps.maximum_read_bytes,
+        caps.maximum_adapter_bytes,
+    )?;
+    assert_eq!(tx.core_policy_layout()?, layout);
+    let control = tx.control()?;
+    assert_eq!(control.position().get(), 1);
+    assert_eq!(control.time().hlc().physical().get(), 11);
+    drop(tx);
+    let mut charge = PolicySchemaCharge::new(caps.schema);
+    let verified = prepare_complete_core_policy_patch_point_frame(
+        incoming,
+        caps.schema,
+        caps.codec.admission(),
+        &mut charge,
+        caps.workspace_bytes,
+    )?;
+    let CompleteCorePolicyPatchPointInspection::Complete(plan) =
+        inspect_complete_core_policy_patch_point(
+            verified,
+            f::log(2),
+            PointGateView {
+                scope: &scope,
+                control,
+                retained_nonempty: true,
+                outcome: Some(donor),
+            },
+            (caps.schema, caps.codec.admission()),
+            &mut charge,
+            caps.workspace_bytes,
+        )?
+    else {
+        return Err("supplied replay unexpectedly requested Fresh authority".into());
+    };
+    let DispatchDecision::Replay(original) = plan.decision() else {
+        return Err("supplied receipt did not classify Replay".into());
+    };
+    assert!(std::ptr::eq(*original, donor));
+    assert!(plan.workflow_type().is_none());
+    let changes = GroupCorePolicyChanges::new(
+        &scope,
+        control,
+        None,
+        *plan,
+        (caps.schema, caps.codec.admission()),
+        &mut charge,
+        1_000_000,
+    )?;
+    let prior = (charge.g(), charge.p());
+    let tx = store.begin_apply(
+        scope.group(),
+        scope.recovery(),
+        caps.codec.admission(),
+        caps.maximum_read_steps,
+        caps.maximum_read_bytes,
+        caps.maximum_adapter_bytes,
+    )?;
+    let result = tx.commit_core_policy(&changes, &mut charge);
+    if layout == 6 {
+        assert_eq!(result?, 6);
+        f::finish(
+            &mut expected,
+            &scope,
+            incoming,
+            f::log(2),
+            (f::clock(12)?, f::clock(12)?),
+            None,
+        )?;
+    } else {
+        assert_eq!(result, Err(StateTransactionError::InvalidChanges));
+        assert_eq!((charge.g(), charge.p()), prior);
+    }
+    drop(store);
+    check_disk(path, &expected)
 }

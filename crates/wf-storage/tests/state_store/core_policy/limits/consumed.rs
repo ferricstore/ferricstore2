@@ -1,7 +1,7 @@
 //! Exact consumed C/End prefix; no driver counters or physical-call calibration.
 
 use super::*;
-use wf_domain::policy::complete::{CompleteCorePolicyPatchFreshView, CompletePolicyValue};
+use wf_domain::policy::complete::{CompleteCorePolicyPatchFreshView, StoredPolicyValue};
 use wf_domain::workflow::control::ControlState;
 use wf_domain::workflow::request::gate::PointGateView;
 use wf_ports::log::{
@@ -142,7 +142,7 @@ fn prepare_plan<'retained>(
     current: ControlState,
     scope: &RequestScope,
     frame: &[u8],
-    old: &CompletePolicyValue,
+    old: &StoredPolicyValue,
     charge: &mut PolicySchemaCharge,
 ) -> TestResult<CompleteCorePolicyPatchRequestPlan<'retained>> {
     let caps = f::limits();
@@ -208,6 +208,7 @@ fn commit_prefix(
         tx.control()?
     };
     let old = f::policy(b"job", 1, &[(b"q", StateMode::Fifo)], false)?;
+    let old = StoredPolicyValue::Complete(Box::new(old));
     let mut charge = PolicySchemaCharge::new(ample.schema);
     let plan = prepare_plan(current, &s, frame, &old, &mut charge)?;
     let changes = GroupCorePolicyChanges::new(

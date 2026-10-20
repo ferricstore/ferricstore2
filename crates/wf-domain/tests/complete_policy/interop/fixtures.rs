@@ -531,3 +531,61 @@ pub(super) fn partial_wire(generation: u64, after: bool) -> Vec<u8> {
     }
     envelope(generation, &map(&rows))
 }
+
+pub(super) fn group(keywords: bool, rows: &[(&str, Vec<u8>)]) -> Vec<u8> {
+    if keywords {
+        super::keyword(rows)
+    } else {
+        fields(rows)
+    }
+}
+
+pub(super) fn keyword_wire(generation: u64, phase: u8, keywords: bool) -> Vec<u8> {
+    let changed = phase == 2;
+    let mut retry = vec![("max_retries", integer(if changed { 2 } else { 3 }))];
+    if keywords {
+        retry.insert(0, ("max_retries", integer(1)));
+    }
+    let retained = group(
+        keywords,
+        &[("history_max_events", integer(17)), ("ttl_ms", integer(50))],
+    );
+    let mut config = vec![("mode", atom("fifo"))];
+    if !changed {
+        config.push(("retention", retained.clone()));
+    }
+    config.push(("retry", group(keywords, &retry)));
+    if !changed && keywords {
+        config.push(("retention", retained));
+    }
+    config.push(("indexed_state_meta", vec![108, 0, 0, 0, 0, 106]));
+    let mut rows = vec![
+        (atom("retry"), super::keyword_retry(changed, keywords)),
+        (binary(b"retry"), fields(&[("max_retries", integer(999))])),
+        (
+            atom("retention"),
+            group(
+                keywords,
+                &[
+                    ("history_max_events", integer(64)),
+                    ("ttl_ms", integer(if changed { 200 } else { 100 })),
+                ],
+            ),
+        ),
+        (
+            atom("states"),
+            map(&[(binary(b"queued"), group(keywords, &config))]),
+        ),
+        (atom("type"), binary(b"r")),
+    ];
+    if !changed {
+        rows.extend([
+            (atom("version"), integer(7)),
+            (binary(b"version"), integer(8)),
+        ]);
+    }
+    if phase > 0 {
+        rows.push((atom("max_active_ms"), integer(3)));
+    }
+    envelope(generation, &map(&rows))
+}

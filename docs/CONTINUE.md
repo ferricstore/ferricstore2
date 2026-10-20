@@ -43,11 +43,12 @@ ETF/V2 interoperability, followed by actual runtime source profiles/order,
 authoritative indexed record effects and durable migration jobs. The concrete B1
 test batch has fifteen behavior identities across sixteen private test/helper
 paths. All six storage scenarios are authored, covering substitutions, FIFO,
-physical faults, mixed snapshot lineage and large transient conversions. Review
+physical faults, mixed snapshot lineage and large transient conversions; the
+final storage batch is frozen in `8fa7434` before implementation. Review
 strengthened full state-name coverage and the paid lazy-conversion discriminator.
 The first frozen ports regression reproduced UnsupportedVersion before later
-union-carrier tests were added. Final domain, ports and storage tests fail
-compilation at the selected missing interoperability APIs/carrier. Earlier
+union-carrier tests were added. Before implementation, the frozen domain, ports
+and storage targets failed compilation at the missing APIs/carrier. Earlier
 existing-API storage and node cases reproduce UnsupportedPolicyFormat; scoped
 target lint passes. Assertions after those reached failures remain unexecuted.
 The existing mixed-format test now requires acceptance on independent full-store
@@ -55,7 +56,24 @@ forks while preserving its primary record operations. A supported-format S3
 precursor also reproduces a forged Core migration-context commit; architecture
 has selected its fixed reached-context seal before implementation. Exact review,
 input pins, execution limits and test checkpoints are in the coordination record.
-Full interoperability production remains held. Full pinned Elixir scenario/assertion/setup/profile
+The approved Domain implementation is in progress with separate integration
+ownership. The coordinator has authored the existing Ports/storage integration;
+architecture and performance have reviewed its actual source. Their review found
+a missing actual-layout check for supplied Core response2 replay. The guard and a
+direct replay regression are authored but await coherent compilation and actual
+before/after execution. Legacy test callers are being adapted to the shared
+policy carrier with their assertions and resource limits preserved.
+
+The Domain provider now compiles, and the four frozen interoperability tests
+plus all 140 tests in the affected Domain target passed on unchanged inputs.
+Those results precede an additional same-identity keyword-group regression:
+both corresponding map controls and portable keyword decoding succeed, but an
+unrelated patch of that healthy keyword donor returns InvalidAuthority. The
+behavioral correction awaits that regression's review/freeze. All 26 changed
+Domain files satisfy 400 formatted lines; strict Domain Clippy found 22 issues
+being repaired without suppressions. Ports/storage/node execution remains due.
+This working tree has no new full-workspace passing result.
+Full pinned Elixir scenario/assertion/setup/profile
 parity, governing services, accepted consensus/runtime, application/transports
 and both Linux/macOS acceptance remain required. Progress remains 85 source-derived
 declarations, 95 mappings and 384 assertion links; this increment adds no parity
@@ -74,7 +92,7 @@ missing-interoperability regressions; overall N2 still fails later at unsupporte
 Core-over-ETF. Architecture and performance accepted the actual source and each
 other's review. Exact log replay, accepted publication, local purge permission
 and successful-commit cache timing remain preserved. Full interoperability
-production remains held; this is a scoped repair, not a new full-workspace result.
+remains incomplete; this is a scoped repair, not a new full-workspace result.
 
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper

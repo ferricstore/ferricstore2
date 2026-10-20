@@ -6,8 +6,8 @@ use wf_domain::policy::RetryOverride;
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,
     CompleteCorePolicyPatchFresh, CompletePolicyData, CompletePolicyEncodingError,
-    CompletePolicyValue, CompleteStatePolicyData, PolicySchemaCharge, PolicySchemaError,
-    PolicySchemaLimits, decode_complete_policy_value_v2, prepare_complete_core_policy_patch,
+    CompleteStatePolicyData, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
+    StoredPolicyValue, decode_complete_policy_value_v2, prepare_complete_core_policy_patch,
     restore_complete_policy,
 };
 use wf_domain::policy::definition::StateMode;
@@ -31,6 +31,7 @@ use super::prepare::cases::{
     core_patch_prepare_command, core_patch_prepare_literal_frame, decode_core_patch_literal,
 };
 use super::prepare::literals::FROZEN_CORE_PATCH_FRAMES;
+use super::response::{core_patch_parent_owned, core_patch_parent_stored};
 
 mod cases;
 mod controls;
@@ -41,8 +42,8 @@ use cases::{
     assert_core_patch_parent_outcome, assert_core_patch_parent_presence, core_patch_parent_apply,
     core_patch_parent_business_frame, core_patch_parent_frame, core_patch_parent_log,
     core_patch_parent_rows, core_patch_parent_scope, core_patch_parent_source8_data,
-    core_patch_parent_stamp, core_patch_parent_stored, core_patch_parent_value,
-    core_patch_parent_view, core_patch_parent_writer_step,
+    core_patch_parent_stamp, core_patch_parent_value, core_patch_parent_view,
+    core_patch_parent_writer_step,
 };
 use controls::{
     CORE_PATCH_PARENT_PHASES, assert_core_patch_parent_account, assert_core_patch_parent_limits,
@@ -373,14 +374,14 @@ fn assert_core_patch_parent_current_order(
     let mut foreign = CORE_PATCH_PARENT_MINIMAL.to_vec();
     foreign[28] = b'u';
     let value = decode_complete_policy_value_v2(&foreign, limits, charge)?;
-    policies.insert(b"r".to_vec(), Ok(value));
+    policies.insert(b"r".to_vec(), Ok(core_patch_parent_owned(value)));
     for case in 0..2 {
         if case == 1 {
             let candidate = restore_complete_policy(1, minimal_data(), limits, charge)?;
             let mut malformed = CORE_PATCH_PARENT_MINIMAL.to_vec();
             malformed[0] ^= 1;
             let value = candidate.bind_encoded_snapshot(18..40, malformed, limits, charge)?;
-            policies.insert(b"r".to_vec(), Ok(value));
+            policies.insert(b"r".to_vec(), Ok(core_patch_parent_owned(value)));
         }
         let mut view = core_patch_parent_view(
             &scope,

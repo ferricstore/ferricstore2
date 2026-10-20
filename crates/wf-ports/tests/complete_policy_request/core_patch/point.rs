@@ -7,7 +7,7 @@ use crate::{TestResult, minimal_data, profile};
 use sha2::{Digest, Sha256};
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyError as Error, CompleteCorePolicyPatchFreshView,
-    CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits, decode_complete_policy_value_v2,
+    PolicySchemaCharge, PolicySchemaLimits, StoredPolicyValue, decode_complete_policy_value_v2,
     restore_complete_policy,
 };
 use wf_domain::workflow::admission::AdmissionLimits;
@@ -54,7 +54,7 @@ fn whole_workspace(schema: PolicySchemaLimits, bytes: usize, states: usize) -> T
         + 263_168
         + 1024)
 }
-fn authority(current: Option<&CompletePolicyValue>) -> CompleteCorePolicyPatchFreshView<'_> {
+fn authority(current: Option<&StoredPolicyValue>) -> CompleteCorePolicyPatchFreshView<'_> {
     CompleteCorePolicyPatchFreshView {
         workflow_type: b"r",
         current: Ok(current),
@@ -100,7 +100,7 @@ fn fresh<'input>(
 fn plan<'retained>(
     encoded: &[u8],
     scope: &RequestScope,
-    current: Option<&CompletePolicyValue>,
+    current: Option<&StoredPolicyValue>,
     schema: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> TestResult<CompleteCorePolicyPatchRequestPlan<'retained>> {
@@ -131,7 +131,9 @@ fn complete_core_patch_point_gate_runs_once_before_fresh_decode() -> TestResult 
     assert_eq!((charge.g(), charge.p()), (13_031, 0));
     assert_eq!((result.base_control(), result.control()), (base, control));
     assert_eq!(result.expected_revision(), base.position().get());
-    let DispatchDecision::Fresh((Some((expected, value)), outcome)) = result.decision() else {
+    let DispatchDecision::Fresh((Some((expected, StoredPolicyValue::Complete(value))), outcome)) =
+        result.decision()
+    else {
         return Err("missing initial owned policy/outcome".into());
     };
     assert_eq!((*expected, value.generation()), (0, 1));
@@ -245,9 +247,12 @@ fn complete_core_patch_point_receipts_keep_full_fwpv2_and_rejection_literals() -
     let mut charge = PolicySchemaCharge::new(schema);
     let old = decode_complete_policy_value_v2(&full_value()?, schema, &mut charge)?;
     let old_bytes = old.encoded().to_vec();
+    let old = StoredPolicyValue::Complete(Box::new(old));
     let bytes = frame(7)?;
     let result = plan(&bytes, &scope, Some(&old), schema, &mut charge)?;
-    let DispatchDecision::Fresh((Some((expected, value)), outcome)) = result.decision() else {
+    let DispatchDecision::Fresh((Some((expected, StoredPolicyValue::Complete(value))), outcome)) =
+        result.decision()
+    else {
         return Err("missing complete patched value".into());
     };
     assert_eq!((*expected, value.generation()), (1, 2));
@@ -256,6 +261,9 @@ fn complete_core_patch_point_receipts_keep_full_fwpv2_and_rejection_literals() -
     assert_eq!(outcome.status(), RetainedStatus::Accepted);
     assert_eq!(outcome.response_version(), 1);
     assert_eq!(outcome.intent().version(), 2);
+    let StoredPolicyValue::Complete(old) = &old else {
+        return Err("expected Complete fixture".into());
+    };
     assert_eq!(value.data().version, old.data().version);
     assert_eq!(
         value.data().indexed_attributes,
@@ -419,6 +427,7 @@ fn complete_core_patch_changes_bind_current_control_policy_and_response() -> Tes
     let expected = ControlState::initial(stamp(0)?);
     let mut charge = PolicySchemaCharge::new(schema);
     let old = decode_complete_policy_value_v2(&full_value()?, schema, &mut charge)?;
+    let old = StoredPolicyValue::Complete(Box::new(old));
     for case in 0..5 {
         let plan = plan(&bytes, &scope, None, schema, &mut charge)?;
         let foreign = RequestScope::new(
@@ -462,6 +471,7 @@ fn complete_core_patch_changes_bind_current_control_policy_and_response() -> Tes
         }
     }
     let minimal = decode_complete_policy_value_v2(&minimal_value(), schema, &mut charge)?;
+    let minimal = StoredPolicyValue::Complete(Box::new(minimal));
     let accepted = plan(&bytes, &scope, Some(&minimal), schema, &mut charge)?;
     let accepted_substitution = GroupCorePolicyChanges::new(
         &scope,
@@ -516,7 +526,11 @@ fn assert_response_correspondence(schema: PolicySchemaLimits) -> TestResult {
         if case == 4 {
             candidate = Some((
                 0,
-                decode_complete_policy_value_v2(&full_value()?, schema, &mut charge)?,
+                StoredPolicyValue::Complete(Box::new(decode_complete_policy_value_v2(
+                    &full_value()?,
+                    schema,
+                    &mut charge,
+                )?)),
             ));
         }
         let outcome = RetainedOutcome::new(
@@ -561,7 +575,10 @@ fn assert_response_correspondence(schema: PolicySchemaLimits) -> TestResult {
         let value =
             candidate.bind_encoded_snapshot(18..response.len(), response, schema, &mut charge)?;
         mismatches[index] = complete_core_policy_patch_response_matches(
-            &(Some((generation - 1, value)), outcome),
+            &(
+                Some((generation - 1, StoredPolicyValue::Complete(Box::new(value)))),
+                outcome,
+            ),
             (schema, AdmissionLimits::default()),
             &mut charge,
             1_000_000,

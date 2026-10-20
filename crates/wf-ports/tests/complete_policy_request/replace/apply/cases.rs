@@ -10,8 +10,8 @@ use super::{
 };
 use wf_domain::policy::complete::{
     CircuitTrackingFailure as Tracking, CompletePolicyReplaceRejectionKind as Kind,
-    CompleteStatePolicyData, GovernanceField as Field, prepare_complete_policy_replace,
-    prepare_complete_policy_value_v2, restore_complete_policy,
+    CompleteStatePolicyData, GovernanceField as Field, StoredPolicyValue,
+    prepare_complete_policy_replace, prepare_complete_policy_value_v2, restore_complete_policy,
 };
 use wf_domain::policy::definition::{PolicyPatch, PolicyVersion};
 use wf_domain::policy::installation::MAX_POLICY_GENERATION;
@@ -293,7 +293,7 @@ fn complete_replace_parent_preserves_envelope_cas_type_and_old_api_priorities() 
             );
         }
     }
-    assert_old_priorities(&policies, limits, &mut charge)?;
+    assert_old_priorities(policies, limits, &mut charge)?;
     super::controls::assert_current_caps(limits, &mut charge)?;
     let absent = BTreeMap::new();
     for (guard, error) in [
@@ -320,7 +320,7 @@ fn complete_replace_parent_preserves_envelope_cas_type_and_old_api_priorities() 
 }
 
 fn assert_old_priorities(
-    policies: &BTreeMap<Vec<u8>, Result<CompletePolicyValue, ApplyError>>,
+    policies: BTreeMap<Vec<u8>, Result<CompletePolicyValue, ApplyError>>,
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> TestResult {
@@ -334,6 +334,15 @@ fn assert_old_priorities(
         ))
     );
     assert_eq!(charge.g(), before + 128);
+    let policies = policies
+        .into_iter()
+        .map(|(key, value)| {
+            (
+                key,
+                value.map(|value| StoredPolicyValue::Complete(Box::new(value))),
+            )
+        })
+        .collect();
     let scope = scope()?;
     let outcomes = BTreeMap::new();
     let marks = BTreeMap::new();
@@ -344,7 +353,7 @@ fn assert_old_priorities(
             outcomes: &outcomes,
         },
         revision: 7,
-        policies,
+        policies: &policies,
         active_migrations: &marks,
         completed_migrations: &marks,
         history_max_events_limit: Ok(1_000_000),

@@ -1,7 +1,9 @@
 //! Actual policy predecessor and immutable-context authority at consumed commit.
 
 use super::{TestResult, f};
-use wf_domain::policy::complete::{CompleteCorePolicyPatchFreshView, PolicySchemaCharge};
+use wf_domain::policy::complete::{
+    CompleteCorePolicyPatchFreshView, PolicySchemaCharge, StoredPolicyValue,
+};
 use wf_domain::policy::definition::{FieldPatch, PolicyPatch};
 use wf_domain::policy::installation::PolicyError;
 use wf_domain::retention::RetentionOverride;
@@ -161,7 +163,9 @@ fn core_patch_preparation_cannot_raise_the_actual_history_limit() -> TestResult 
         },
         &mut charge,
     )?;
-    let DispatchDecision::Fresh((Some((_, candidate)), outcome)) = plan.decision() else {
+    let DispatchDecision::Fresh((Some((_, StoredPolicyValue::Complete(candidate))), outcome)) =
+        plan.decision()
+    else {
         return Err("mathematical history65 fixture did not accept".into());
     };
     assert_eq!(outcome.status(), RetainedStatus::Accepted);
