@@ -6,7 +6,7 @@ use sha2::{Digest, Sha256};
 use std::{io::Cursor, path::Path};
 use wf_domain::claim::apply::ClaimWorkLimits;
 use wf_domain::workflow::admission::AdmissionLimits;
-use wf_domain::workflow::control::EntryStamp;
+use wf_domain::workflow::control::{EntryIdentity, EntryStamp};
 use wf_domain::workflow::request::RetainedStatus;
 use wf_domain::workflow::{Create, Operation};
 use wf_ports::state::{GroupApplyStore, GroupApplyTransaction, StateTransactionError};
@@ -110,11 +110,11 @@ fn seed(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore, Vec<u8>)> {
     let metadata = state.capture_snapshot(&mut wire, SnapshotLimits::default())?;
     assert_eq!(metadata.id().as_slice(), Sha256::digest(&wire).as_slice());
     assert_eq!(
-        metadata.control().last_entry().map(|entry| entry.log()),
+        metadata.control().last_entry().map(EntryIdentity::log),
         Some(f::at(2))
     );
     assert_eq!(
-        metadata.membership().entry().map(|entry| entry.log()),
+        metadata.membership().entry().map(EntryIdentity::log),
         Some(f::at(0))
     );
     Ok((log, state, wire))

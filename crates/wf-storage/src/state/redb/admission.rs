@@ -48,7 +48,8 @@ pub(super) fn value_error(error: value::StateValueError) -> StateTransactionErro
         value::StateValueError::Allocation => StateTransactionError::Allocation,
         value::StateValueError::Limit { .. }
         | value::StateValueError::LengthOverflow
-        | value::StateValueError::MembershipLimit => StateTransactionError::Limit,
+        | value::StateValueError::MembershipLimit
+        | value::StateValueError::ProfileLimit => StateTransactionError::Limit,
         _ => StateTransactionError::Corrupt,
     }
 }

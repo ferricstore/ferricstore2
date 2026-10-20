@@ -18,7 +18,7 @@ fn deep_seed(path: &Path, s: &RequestScope) -> TestResult<StoredWorkflowRecord> 
         &[b"p"],
         Some(f::policy(b"deep", &[b"queued"], false)?),
     )?;
-    let owners = (0..81)
+    let owners = (0_u32..81)
         .map(|i| {
             let id = if i == 0 {
                 b"fifo-deep-head".to_vec()
@@ -37,7 +37,7 @@ fn deep_seed(path: &Path, s: &RequestScope) -> TestResult<StoredWorkflowRecord> 
                 )?,
                 OrderingMetadata {
                     priority: 0,
-                    state_enter_seq: i as u128,
+                    state_enter_seq: u128::from(i),
                 },
             )
         })
@@ -169,7 +169,7 @@ fn any_seed(path: &Path, s: &RequestScope) -> TestResult<StoredWorkflowRecord> {
         Some(f::policy(b"deep-order", &[b"first", b"second"], false)?),
     )?;
     let mut first = Vec::new();
-    for i in 0..81 {
+    for i in 0_u32..81 {
         first.push(f::owner(
             s,
             b"p",
@@ -182,7 +182,7 @@ fn any_seed(path: &Path, s: &RequestScope) -> TestResult<StoredWorkflowRecord> {
             )?,
             OrderingMetadata {
                 priority: 0,
-                state_enter_seq: i as u128,
+                state_enter_seq: u128::from(i),
             },
         )?);
     }

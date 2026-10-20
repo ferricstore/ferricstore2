@@ -22,14 +22,7 @@ use wf_storage::transaction::{
 use wf_types::identity::{PartitionId, RecordId, RequestId};
 use wf_types::version::{Fence, TimestampMillis};
 
-fn initialized(
-    path: &Path,
-) -> TestResult<(
-    [BTreeMap<Vec<u8>, Vec<u8>>; 4],
-    [BTreeMap<Vec<u8>, Vec<u8>>; 4],
-    Vec<u8>,
-    Vec<u8>,
-)> {
+fn initialized(path: &Path) -> TestResult<(f::Cohort, f::Cohort, Vec<u8>, Vec<u8>)> {
     let s = f::scope()?;
     let mut store = f::create(path, &s, &[b"p"], Some(f::policy(b"job", &[b"q"], false)?))?;
     let mut first = f::data(b"head", b"job", b"q", 0, Some(0))?;

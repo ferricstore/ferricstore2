@@ -65,28 +65,61 @@ pub(super) fn select_checked<'a, E>(
         cursor_for(view, request, continuation).map_err(SelectionFailure::Selection)?;
     let heads = read_heads(view, &mut guard)?;
     let fifo_after = cursor.fifo_after;
-    let mut fifo = heads
+    let fifo = heads
         .into_iter()
-        .filter(|head| fifo_after.is_none_or(|after| head.order > after))
-        .peekable();
+        .filter(|head| fifo_after.is_none_or(|after| head.order > after));
     let start = cursor.parallel_after.map_or(Unbounded, Excluded);
-    let mut parallel = view.parallel.range((start, Unbounded)).peekable();
+    let parallel = view
+        .parallel
+        .range((start, Unbounded))
+        .map(|(order, entry)| (*order, *entry));
+    let (records, scanned, stop) = merge(
+        &mut cursor,
+        parallel,
+        fifo,
+        &mut guard,
+        physical,
+        |order, entry| validate_parallel(view, order, entry),
+    )?;
+    Ok(ClaimSelection {
+        records,
+        scanned,
+        head_reads: view.fifo.len(),
+        stop,
+        continuation: (stop != SelectionStop::Complete).then_some(cursor),
+    })
+}
+
+pub(super) fn merge<'query, 'current: 'query, E>(
+    cursor: &mut SelectionContinuation<'query>,
+    parallel: impl Iterator<Item = (DueOrder<'current>, ClaimRecord<'current>)>,
+    fifo: impl Iterator<Item = Head<'current>>,
+    guard: &mut impl FnMut(
+        Option<ClaimRecord<'current>>,
+        Option<LaneKey<'current>>,
+        Option<DueOrder<'current>>,
+    ) -> Result<(), E>,
+    physical: impl Fn(ClaimRecord<'current>) -> bool,
+    mut validate: impl FnMut(DueOrder<'current>, ClaimRecord<'current>) -> Result<(), SelectionError>,
+) -> Result<(Vec<SelectedClaim<'current>>, usize, SelectionStop), SelectionFailure<E>> {
+    let mut parallel = parallel.peekable();
+    let mut fifo = fifo.peekable();
     let mut records = Vec::new();
     records
-        .try_reserve_exact(request.limit)
+        .try_reserve_exact(cursor.request.limit)
         .map_err(|_| SelectionFailure::Selection(SelectionError::AllocationFailed))?;
     let mut identities = BTreeSet::new();
     let mut scanned = 0;
-    while scanned < request.scan_budget && records.len() < request.limit {
+    while scanned < cursor.request.scan_budget && records.len() < cursor.request.limit {
         if parallel.peek().is_none() && fifo.peek().is_none() {
             break;
         }
         guard(None, None, None).map_err(SelectionFailure::Guard)?;
         if let Some((order, _)) = parallel.peek() {
-            guard(None, None, Some(**order)).map_err(SelectionFailure::Guard)?;
+            guard(None, None, Some(*order)).map_err(SelectionFailure::Guard)?;
         }
         let parallel_first = match (parallel.peek(), fifo.peek()) {
-            (Some((order, _)), Some(head)) => **order <= head.order,
+            (Some((order, _)), Some(head)) => *order <= head.order,
             (Some(_), None) => true,
             (None, Some(_)) => false,
             (None, None) => break,
@@ -95,10 +128,10 @@ pub(super) fn select_checked<'a, E>(
             let Some((order, entry)) = parallel.next() else {
                 break;
             };
-            guard(Some(*entry), None, None).map_err(SelectionFailure::Guard)?;
-            validate_parallel(view, *order, *entry).map_err(SelectionFailure::Selection)?;
-            cursor.parallel_after = Some(*order);
-            *entry
+            guard(Some(entry), None, None).map_err(SelectionFailure::Guard)?;
+            validate(order, entry).map_err(SelectionFailure::Selection)?;
+            cursor.parallel_after = Some(order);
+            entry
         } else {
             let Some(head) = fifo.next() else { break };
             cursor.fifo_after = Some(head.order);
@@ -111,7 +144,7 @@ pub(super) fn select_checked<'a, E>(
             ));
         }
         if physical(entry)
-            && let Some(action) = action_for(request, entry)
+            && let Some(action) = action_for(cursor.request, entry)
         {
             records.push(SelectedClaim {
                 record: entry.record,
@@ -122,24 +155,18 @@ pub(super) fn select_checked<'a, E>(
     }
     let stop = if parallel.peek().is_none() && fifo.peek().is_none() {
         SelectionStop::Complete
-    } else if records.len() == request.limit {
+    } else if records.len() == cursor.request.limit {
         SelectionStop::ClaimLimit
     } else {
         SelectionStop::ScanBudget
     };
-    Ok(ClaimSelection {
-        records,
-        scanned,
-        head_reads: view.fifo.len(),
-        stop,
-        continuation: (stop != SelectionStop::Complete).then_some(cursor),
-    })
+    Ok((records, scanned, stop))
 }
 
 #[derive(Clone, Copy)]
-struct Head<'a> {
-    order: DueOrder<'a>,
-    entry: ClaimRecord<'a>,
+pub(super) struct Head<'a> {
+    pub(super) order: DueOrder<'a>,
+    pub(super) entry: ClaimRecord<'a>,
 }
 
 fn read_heads<'a, E>(

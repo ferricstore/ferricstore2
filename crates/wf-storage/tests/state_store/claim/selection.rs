@@ -386,22 +386,30 @@ fn same_id_binary_partitions_and_tenants_keep_distinct_leases() -> TestResult {
                 f::data(b"same", b"isolated", b"queued", 0, Some(0))?,
                 OrderingMetadata {
                     priority: 0,
-                    state_enter_seq: i as u128,
+                    state_enter_seq: (i as u128) << 32,
                 },
             )
         })
         .collect::<TestResult<Vec<_>>>()?;
-    f::seed(&mut store, &s, &owners, 0, 0)?;
+    for (index, owner) in owners.iter().enumerate() {
+        f::seed(
+            &mut store,
+            &s,
+            std::slice::from_ref(owner),
+            u64::try_from(index)?,
+            0,
+        )?;
+    }
     let foreign = f::owner(
         &other,
         partitions[0],
         f::data(b"same", b"isolated", b"queued", 0, Some(0))?,
         OrderingMetadata {
             priority: 0,
-            state_enter_seq: 1_u128 << 32,
+            state_enter_seq: 2_u128 << 32,
         },
     )?;
-    f::seed(&mut store, &other, std::slice::from_ref(&foreign), 1, 0)?;
+    f::seed(&mut store, &other, std::slice::from_ref(&foreign), 2, 0)?;
     drop(store);
     let mut expected = f::cohort(&path)?;
     let mut after = Vec::new();
@@ -425,12 +433,12 @@ fn same_id_binary_partitions_and_tenants_keep_distinct_leases() -> TestResult {
         [26; 32],
     )?;
     let response = f::receipt(&after, 0, 2, 0)?;
-    let metadata = f::metadata(&s, b"scope", 2, 25, [26; 32], RetainedStatus::Accepted)?;
+    let metadata = f::metadata(&s, b"scope", 3, 25, [26; 32], RetainedStatus::Accepted)?;
     f::finish(
         &mut expected,
         &s,
         &frame,
-        f::log(2),
+        f::log(3),
         (f::clock(25)?, f::clock(25)?),
         Some((&metadata, &response)),
     )?;
@@ -438,7 +446,7 @@ fn same_id_binary_partitions_and_tenants_keep_distinct_leases() -> TestResult {
         &path,
         &s,
         &frame,
-        f::log(2),
+        f::log(3),
         f::limits(),
         &expected,
         &response,

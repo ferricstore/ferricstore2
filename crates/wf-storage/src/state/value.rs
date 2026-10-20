@@ -44,6 +44,8 @@ pub enum StateValueError {
     Allocation,
     /// A complete membership count/address/owner profile was exhausted.
     MembershipLimit,
+    /// A healthy Claim receipt exceeds the actual captured response profile.
+    ProfileLimit,
     /// Namespace, typed value, status or positive profile is invalid.
     InvalidValue,
 }
@@ -60,6 +62,7 @@ impl fmt::Display for StateValueError {
             Self::LengthOverflow => formatter.write_str("state value length overflow"),
             Self::Allocation => formatter.write_str("state value allocation failed"),
             Self::MembershipLimit => formatter.write_str("state membership profile limit"),
+            Self::ProfileLimit => formatter.write_str("state response profile limit"),
             Self::InvalidValue => formatter.write_str("invalid state value"),
         }
     }

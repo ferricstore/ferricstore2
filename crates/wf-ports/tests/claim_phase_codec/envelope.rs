@@ -59,6 +59,15 @@ fn decoded_claim_envelope_binds_header_physical_filters_and_original_bytes() -> 
         );
     }
     assert!(decoded.state_key(0).is_none());
+    assert_eq!(
+        decoded.claim_state_key(
+            &wf_types::identity::PartitionId::new(b"p".to_vec())?,
+            &wf_types::identity::RecordId::new(vec![0, 255])?
+        )?,
+        super::bytes(
+            "4657534b0001000000164657534300010000000200ff0000000147000000015200000001700000000200ff"
+        )?
+    );
     assert!(decoded.value_bytes(0).is_none());
     assert!(decoded.policy_envelope(log).is_none());
     let expected = request("claim_any")?;

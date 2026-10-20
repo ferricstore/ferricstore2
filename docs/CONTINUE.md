@@ -5,6 +5,32 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The latest completed component is the durable physical Claim increment.
+Commit `e080ef4` freezes 31 substantive tests after reviewed missing-API RED.
+The implementation spans thirteen approved private production files and existing
+seams, with separate domain/storage and ports/node ownership. Architecture and
+performance review found three domain authority/order gaps; additional controls
+reproduced them before the fixes. Every production file is within 400 physical
+lines. The complete macOS workspace now passes **873 tests across 90 targets**
+and **six compile-fail examples across 15 documentation targets**, with zero
+failures or ignored tests. Formatting, strict all-target Clippy, warnings-denied
+rustdoc, architecture and frozen-reference checks pass; all 1,336 non-Markdown
+repository inputs stayed unchanged. The actual Claim storage17/recovery4/snapshot3
+cases pass, including real faults and process kills. Source and test-conservation
+reviews are complete. The progress checker now passes after rebasing only three
+existing file hashes and eleven unchanged assertion pointers for the new module
+registration. Source-derived counts remain 85 declarations/95 mappings/384 links;
+the full parity gate still fails. Separate pinned native compatibility passes
+formatting, compilation, strict Clippy and the complete executable. The cached
+dependency audit passes advisories, bans, licenses and sources without new
+waivers; no online advisory refresh is claimed. See SOURCE-PRECISION2 in the active coordination record for
+the exact key API and private lane-loader split. These are component results,
+not full parity, public Claim/governance or Linux acceptance.
+
+The 842-test macOS results below are the preceding checkpoint. Full public
+Claim/governance, all pinned Elixir
+cases/setups/profiles, later milestones and native Linux validation remain open.
+
 The latest reviewed increment (`12cc4ff`) adds repeatable snapshot advancement and trusted
 received-snapshot composition over the durable state catalog. The preceding
 storage increment (`c1073db`) adds the trusted received-log boundary. Matching
@@ -84,7 +110,8 @@ socket (`:eperm`); this is a setup failure. These reviewed assertion mappings
 add no source-runtime, Linux or full-parity acceptance. Original setup and runtime
 profiles remain open.
 
-Next: complete durable Claim/policy routes and their replay/response support,
+Next: complete durable policy publication/activation after the implemented
+physical Claim leaf, then public Claim/governance and their replay/response support,
 then implement actual accepted Raft callbacks, paired-owner runtime and read
 barriers. Legacy
 layout3 keeps its fixed pin; explicitly upgraded layout4 supports repeated
@@ -98,21 +125,23 @@ ARCH-M1M2-DURABLE-CLAIM-LEAF1-CREATE1 selects the exact first durable Claim
 contract after reciprocal architecture/performance review. Root releases only
 its 14 named test/helper children and registrations for tests-first authoring
 (including the precise helper splits in TEST-PRECISION1 through 3);
-all 12 production paths remain held until substantive tests are reviewed,
-frozen and reach genuine RED. The contract preserves
+The original twelve production paths, plus the subsequently approved private
+lane-loader child, have explicit coordinator implementation release
+after reviewed tests were frozen and reached genuine RED (test commit `e080ef4`). The contract preserves
 query-scoped due selection, independent FIFO head discovery, the complete
 original retained lease reply and one consumed atomic publication. Full public
 Claim/governance, complete-policy publication/activation, source setup/profiles
 and both-host execution remain required successors to that physical leaf.
 
-All 31 new Claim test identities are authored across domain, ports, storage and
+Initial tests-only checkpoint: all 31 new Claim test identities were authored across domain, ports, storage and
 node recovery/snapshots. Review corrected incomplete reference fixtures, preserved
 original FIFO budgets alongside separately seeded tight-budget checks, and added
 the actual storage future-priority boundary case. The final formatted batch has
 reciprocal review and genuine preimplementation missing-contract RED in all five
 affected Cargo targets, with all 1,340 selected inputs unchanged. Formatting
-passes. These are missing-API compiler failures; no new Claim assertion has run
-and no Claim implementation acceptance is claimed yet.
+passed. Those were missing-API compiler failures. The current implemented
+increment has since passed all 31 identities as part of the 873-test run above;
+the initial compiler failures are not behavioral product-bug evidence.
 
 The first native recheck selected system Rust 1.98 outside the repository. Only
 the remaining native checks were rerun with pinned Rust 1.99; all passed without

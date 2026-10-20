@@ -6,6 +6,15 @@ use super::{CodecError, CodecLimits, reader::Reader, writer::Writer};
 
 const MAX_FILTER_ITEMS: usize = 100_000;
 
+mod apply;
+mod response;
+
+pub use apply::{
+    ClaimApplyDecision, ClaimApplyPlan, ClaimPhaseInspection, FreshClaimPhase,
+    decide_fresh_claim_phase_observed, inspect_claim_phase_point, prepare_claim_phase,
+};
+pub use response::{claim_response_matches, claim_retained_summary};
+
 pub(super) type ClaimFilterRefs<'a> = [Vec<&'a [u8]>; 3];
 type FilterParts<'a> = (Option<Vec<Vec<u8>>>, Vec<&'a [u8]>);
 type ComponentParts<'a> = (Vec<Vec<u8>>, Vec<&'a [u8]>);
@@ -31,10 +40,14 @@ pub(super) fn write(
 }
 
 pub(super) fn preflight(reader: &mut Reader<'_>) -> Result<(), CodecError> {
+    occurrences(reader).map(|_| ())
+}
+
+pub(super) fn occurrences(reader: &mut Reader<'_>) -> Result<usize, CodecError> {
     reader.field()?;
-    scan_filter(reader)?;
-    scan_components(reader)?;
-    scan_filter(reader)?;
+    let states = scan_filter(reader)?;
+    let exclusions = scan_components(reader)?;
+    let partitions = scan_filter(reader)?;
     reader.optional(Reader::byte)?;
     reader.field()?;
     reader.u64()?;
@@ -42,7 +55,11 @@ pub(super) fn preflight(reader: &mut Reader<'_>) -> Result<(), CodecError> {
         usize::try_from(reader.u32()?).map_err(|_| CodecError::LengthOverflow)?;
     }
     reader.u16()?;
-    reader.u32().map(|_| ())
+    reader.u32()?;
+    states
+        .checked_add(exclusions)
+        .and_then(|count| count.checked_add(partitions))
+        .ok_or(CodecError::LengthOverflow)
 }
 
 pub(super) fn read<'a>(
@@ -106,11 +123,13 @@ fn write_components(
     Ok(())
 }
 
-fn scan_filter(reader: &mut Reader<'_>) -> Result<(), CodecError> {
-    reader.optional(scan_components).map(|_| ())
+fn scan_filter(reader: &mut Reader<'_>) -> Result<usize, CodecError> {
+    reader
+        .optional(scan_components)
+        .map(Option::unwrap_or_default)
 }
 
-fn scan_components(reader: &mut Reader<'_>) -> Result<(), CodecError> {
+fn scan_components(reader: &mut Reader<'_>) -> Result<usize, CodecError> {
     let count = usize::try_from(reader.u32()?).map_err(|_| CodecError::LengthOverflow)?;
     if count > MAX_FILTER_ITEMS {
         return Err(CodecError::ItemLimit);
@@ -121,7 +140,7 @@ fn scan_components(reader: &mut Reader<'_>) -> Result<(), CodecError> {
     for _ in 0..count {
         reader.field()?;
     }
-    Ok(())
+    Ok(count)
 }
 
 fn read_filter<'a>(reader: &mut Reader<'a>) -> Result<FilterParts<'a>, CodecError> {

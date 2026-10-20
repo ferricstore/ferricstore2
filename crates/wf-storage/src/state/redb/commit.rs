@@ -10,9 +10,10 @@ use redb::Durability;
 use wf_domain::workflow::control::{ControlState, EntryStamp};
 use wf_domain::workflow::indexed::IndexedBatchPlan;
 use wf_domain::workflow::request::{RequestScope, RetainedOutcome};
-use wf_ports::log::record_batch_retained_summary;
+use wf_ports::log::{claim_retained_summary, record_batch_retained_summary};
 use wf_ports::state::{GroupApplyChanges, GroupApplyTransaction, StateTransactionError};
 
+pub(super) mod claim;
 pub(super) mod control;
 mod independent;
 
@@ -145,6 +146,24 @@ fn write_outcome(
 ) -> Result<(), StateTransactionError> {
     if outcome.response().len() > tx.admission.decision_bytes() {
         return Err(StateTransactionError::Limit);
+    }
+    if outcome.intent().version() == 1 && outcome.response_version() == 3 {
+        let (status, _) = claim_retained_summary(
+            outcome.intent(),
+            3,
+            outcome.response(),
+            outcome.original_time(),
+            tx.admission,
+        )
+        .map_err(|error| match error {
+            wf_ports::log::CodecError::ByteLimit
+            | wf_ports::log::CodecError::ItemLimit
+            | wf_ports::log::CodecError::ValueLimit => StateTransactionError::Limit,
+            _ => StateTransactionError::InvalidChanges,
+        })?;
+        if status != outcome.status() {
+            return Err(StateTransactionError::InvalidChanges);
+        }
     }
     if outcome.intent().version() == 6
         && record_batch_retained_summary(

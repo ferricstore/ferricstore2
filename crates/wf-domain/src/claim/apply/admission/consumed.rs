@@ -1,11 +1,13 @@
 //! Exact moved consumed-authority guard; optional-due correction follows real RED.
 
-use super::super::{ClaimApplyView, ClaimRejection, ClaimWorkLimits};
+use super::super::{ClaimApplyView, ClaimEncoding, ClaimRejection, ClaimWorkLimits};
 use super::ClaimPreflightError;
 use crate::claim::{ClaimRecord, DueOrder, LaneKey, LaneOrder, ScopedRecordId};
 use crate::policy::definition::StateMode;
 use crate::workflow::admission::{AdmissionLimits, record_bytes};
 use crate::workflow::batch::ApplyError;
+use crate::workflow::indexed::IndexedAuthority;
+use std::collections::BTreeMap;
 use wf_types::bounds::{MAX_API_KEY_BYTES, MAX_RECORD_ID_BYTES};
 
 pub(in super::super) fn guard_consumed(
@@ -15,16 +17,36 @@ pub(in super::super) fn guard_consumed(
     work: ClaimWorkLimits,
     g: &mut u64,
 ) -> Result<(), ClaimPreflightError> {
+    guard_consumed_with(
+        (IndexedAuthority::Full(view.group), view.encodings),
+        entry,
+        limits,
+        work,
+        g,
+    )
+}
+
+pub(in super::super) fn guard_consumed_with(
+    view: (
+        IndexedAuthority<'_, '_>,
+        &BTreeMap<ScopedRecordId<'_>, ClaimEncoding<'_>>,
+    ),
+    entry: ClaimRecord<'_>,
+    limits: AdmissionLimits,
+    work: ClaimWorkLimits,
+    g: &mut u64,
+) -> Result<(), ClaimPreflightError> {
+    let (view, encodings) = view;
     let invalid = ClaimPreflightError::Apply(ApplyError::InvalidAuthority);
     let overflow = ClaimPreflightError::Business(ClaimRejection::LengthOverflow);
     let r = record_bytes(entry.record, limits).map_err(|_| invalid)?;
     let names = admit_authority_components(entry, limits)?;
     let id = ScopedRecordId::for_record(&entry);
-    let index = view.group.records.get(&id).ok_or(invalid)?;
-    let canonical = view.group.batch.records.get(&id).ok_or(invalid)?;
+    let index = view.entry(id).map_err(ClaimPreflightError::Apply)?;
+    let canonical = view.canonical(id).map_err(ClaimPreflightError::Apply)?;
     let ri = record_bytes(index.record, limits).map_err(|_| invalid)?;
     let rg = record_bytes(canonical, limits).map_err(|_| invalid)?;
-    admit_authority_components(*index, limits)?;
+    admit_authority_components(index, limits)?;
     admit_authority_components(
         ClaimRecord {
             record: canonical,
@@ -50,17 +72,24 @@ pub(in super::super) fn guard_consumed(
         }));
     }
     *g = next;
-    let encoding = view.encodings.get(&id).ok_or(invalid)?;
+    let encoding = encodings.get(&id).ok_or(invalid)?;
     if entry.priority > 2
         || encoding.partition.as_bytes() != entry.partition_key
         || encoding.state_key.len() > MAX_API_KEY_BYTES
-        || view.group.batch.placements.get(encoding.partition) != Some(view.group.batch.group)
-        || index != &entry
-        || *canonical != entry.record
+        || !view.placement_matches(encoding.partition)
+        || index != entry
+        || canonical != entry.record
     {
         return Err(invalid);
     }
-    let policy = view.group.policies.get(entry.record.workflow_type());
+    let policy = match view {
+        IndexedAuthority::Full(full) => full.policies.get(entry.record.workflow_type()).copied(),
+        IndexedAuthority::Touched(touched) => touched
+            .policies
+            .get(entry.record.workflow_type())
+            .copied()
+            .ok_or(invalid)?,
+    };
     if policy.is_some_and(|p| {
         p.workflow_type().len() > limits.inline_bytes()
             || p.workflow_type() != entry.record.workflow_type()
@@ -76,18 +105,28 @@ pub(in super::super) fn guard_consumed(
     match mode {
         StateMode::Parallel => {
             let due = due.ok_or(invalid)?;
-            if view.group.fifo.contains_key(&lane) || !view.group.parallel.contains_key(&due) {
+            if view
+                .lane_present(lane)
+                .map_err(ClaimPreflightError::Apply)?
+                || !view
+                    .parallel_contains(due)
+                    .map_err(ClaimPreflightError::Apply)?
+            {
                 return Err(invalid);
             }
         }
         StateMode::Fifo => {
             if entry.priority != 0
-                || due.is_some_and(|due| view.group.parallel.contains_key(&due))
-                || !view
-                    .group
-                    .fifo
-                    .get(&lane)
-                    .is_some_and(|members| members.contains_key(&LaneOrder::for_record(&entry)))
+                || match due {
+                    Some(due) => view
+                        .parallel_contains(due)
+                        .map_err(ClaimPreflightError::Apply)?,
+                    None => false,
+                }
+                || view
+                    .member(lane, LaneOrder::for_record(&entry))
+                    .map_err(ClaimPreflightError::Apply)?
+                    != Some(entry)
             {
                 return Err(invalid);
             }

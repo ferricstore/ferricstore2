@@ -1,5 +1,7 @@
 //! Replay-approved physical selection and short-lived staged command composition.
 
+use crate::claim::ScopedRecordId;
+use std::collections::BTreeMap;
 use wf_types::version::TimestampMillis;
 
 use crate::claim::selection::{SelectionFailure, select_checked};
@@ -11,8 +13,8 @@ use crate::value::Counter;
 use crate::workflow::admission::{AdmissionError, AdmissionLimits};
 use crate::workflow::batch::{ApplyError, BatchItem, BatchRejection};
 use crate::workflow::indexed::{
-    EntryOrder, IndexRejection, IndexedBatchItem, IndexedBatchPlan, IndexedDecision,
-    decide_selected_claims,
+    EntryOrder, IndexRejection, IndexedAuthority, IndexedBatchItem, IndexedBatchPlan,
+    IndexedDecision, decide_selected_claims, decide_selected_claims_touched,
 };
 use crate::workflow::{CommittedCommand, DomainError, Operation, Outcome};
 
@@ -23,8 +25,8 @@ use super::admission::{
 use super::result::ClaimResumeKind;
 use super::token::source_token;
 use super::{
-    ClaimApplyView, ClaimDecision, ClaimEnvelope, ClaimPlan, ClaimRejection, ClaimResume,
-    ClaimStates, ClaimWorkLimits,
+    ClaimApplyView, ClaimDecision, ClaimEncoding, ClaimEnvelope, ClaimPlan, ClaimQuery,
+    ClaimRejection, ClaimResume, ClaimStates, ClaimWorkLimits,
 };
 
 pub(crate) fn decide<'a>(
@@ -121,7 +123,7 @@ fn select_phase<'a>(
     let mut scanned = 0;
     let selection = select_checked(
         &authority,
-        mapped_selection_request(view, envelope, now),
+        mapped_selection_request(view.gate.scope.group().as_bytes(), envelope, now),
         cursor,
         |record, lane, due| match (record, lane, due) {
             (Some(entry), None, None) => guard_consumed(view, entry, limits, work, &mut g),
@@ -130,15 +132,7 @@ fn select_phase<'a>(
             (None, None, None) => guard_scan(&mut scanned, &mut g, work),
             _ => Err(invalid),
         },
-        |entry| {
-            (match envelope.query.states {
-                ClaimStates::Any => true,
-                ClaimStates::Only(states) => states.contains(&entry.record.state()),
-            }) && !envelope
-                .query
-                .exclude_states
-                .contains(&entry.record.state())
-        },
+        |entry| physical_matches(envelope.query, entry),
     )
     .map_err(|error| match error {
         SelectionFailure::Guard(error) => error,
@@ -172,6 +166,26 @@ fn build_selected<'a>(
     now: TimestampMillis,
     limits: AdmissionLimits,
 ) -> Result<IndexedBatchPlan<'a>, ClaimPreflightError> {
+    build_selected_with(
+        (IndexedAuthority::Full(view.group), view.encodings),
+        envelope,
+        selection,
+        now,
+        limits,
+    )
+}
+
+pub(super) fn build_selected_with<'current>(
+    view: (
+        IndexedAuthority<'_, 'current>,
+        &BTreeMap<ScopedRecordId<'_>, ClaimEncoding<'_>>,
+    ),
+    envelope: &ClaimEnvelope<'_>,
+    selection: &ClaimSelection<'current>,
+    now: TimestampMillis,
+    limits: AdmissionLimits,
+) -> Result<IndexedBatchPlan<'current>, ClaimPreflightError> {
+    let (view, encodings) = view;
     let invalid = ClaimPreflightError::Apply(ApplyError::InvalidAuthority);
     let mut commands = Vec::new();
     commands
@@ -203,25 +217,30 @@ fn build_selected<'a>(
             partition_key: selected.partition_key,
             id: selected.record.id().as_bytes(),
         };
-        let encoding = view.encodings.get(&id).ok_or(invalid)?;
+        let encoding = encodings.get(&id).ok_or(invalid)?;
         items.push(IndexedBatchItem::new(BatchItem::new(
             encoding.partition,
             command,
             encoding.state_key,
         )));
     }
-    match decide_selected_claims(
-        view.group,
-        &items,
-        EntryOrder {
-            identity: envelope.header.identity.log(),
-            first_ordinal: envelope.first_ordinal,
-        },
-        envelope.header.encoded_entry,
-        limits,
-    )
-    .map_err(ClaimPreflightError::Apply)?
-    {
+    let order = EntryOrder {
+        identity: envelope.header.identity.log(),
+        first_ordinal: envelope.first_ordinal,
+    };
+    let decided = match view {
+        IndexedAuthority::Full(view) => {
+            decide_selected_claims(view, &items, order, envelope.header.encoded_entry, limits)
+        }
+        IndexedAuthority::Touched(view) => decide_selected_claims_touched(
+            view,
+            &items,
+            order,
+            envelope.header.encoded_entry,
+            limits,
+        ),
+    };
+    match decided.map_err(ClaimPreflightError::Apply)? {
         IndexedDecision::Accepted(batch) => {
             if batch.consumed_ordinals() != 0
                 || batch.batch().items().len() != commands.len()
@@ -274,13 +293,13 @@ fn classify_index_rejection(rejection: IndexRejection) -> ClaimPreflightError {
     }
 }
 
-fn mapped_selection_request<'a>(
-    view: ClaimApplyView<'a>,
+pub(super) fn mapped_selection_request<'a>(
+    group: &'a [u8],
     envelope: &ClaimEnvelope<'a>,
     now: TimestampMillis,
 ) -> SelectionRequest<'a> {
     SelectionRequest {
-        group: view.gate.scope.group().as_bytes(),
+        group,
         workflow_type: envelope.query.workflow_type,
         partitions: envelope.query.partitions,
         states: StateFilter::Any,
@@ -292,4 +311,14 @@ fn mapped_selection_request<'a>(
         head_budget: envelope.head_budget,
         reclaim_expired: true,
     }
+}
+
+pub(super) fn physical_matches(
+    query: ClaimQuery<'_>,
+    entry: crate::claim::ClaimRecord<'_>,
+) -> bool {
+    (match query.states {
+        ClaimStates::Any => true,
+        ClaimStates::Only(states) => states.contains(&entry.record.state()),
+    }) && !query.exclude_states.contains(&entry.record.state())
 }

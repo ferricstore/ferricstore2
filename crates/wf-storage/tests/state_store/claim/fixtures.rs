@@ -35,6 +35,8 @@ mod wire;
 pub(super) use wire::{history_wire, outcome_wire, receipt, record_wire};
 
 pub(super) use old::{clock, directory, log, scope};
+/// Complete raw owners in the fixed four-table order below.
+pub(super) type Cohort = [BTreeMap<Vec<u8>, Vec<u8>>; 4];
 pub(super) const TABLES: [&str; 4] = [
     "wf_state_meta_v1",
     "wf_state_rows_v1",
@@ -294,12 +296,13 @@ pub(super) fn seed(
     let frame = encode_record_batch(request, profile.codec, profile.workspace_bytes)?;
     assert!(matches!(
         apply_record_batch_transaction(store, scope, frame.as_bytes(), log(at), profile)?,
-        RecordBatchTransactionOutcome::Retained { .. }
+        RecordBatchTransactionOutcome::Retained { outcome, .. }
+            if outcome.status() == RetainedStatus::Accepted
     ));
     Ok(())
 }
 
-pub(super) fn cohort(path: &Path) -> TestResult<[BTreeMap<Vec<u8>, Vec<u8>>; 4]> {
+pub(super) fn cohort(path: &Path) -> TestResult<Cohort> {
     let database = redb::Builder::new().open(path)?;
     let read = database.begin_read()?;
     let mut result = std::array::from_fn(|_| BTreeMap::new());

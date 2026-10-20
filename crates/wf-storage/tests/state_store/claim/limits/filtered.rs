@@ -22,7 +22,7 @@ fn filtered_physical_prefix_and_end_are_not_semantic_budget() -> TestResult {
     let path = dir.join("state");
     let s = f::scope()?;
     let mut store = f::create(&path, &s, &[b"p"], None)?;
-    let rows = (0..81)
+    let rows = (0_u32..81)
         .map(|i| {
             f::owner(
                 &s,
@@ -36,7 +36,7 @@ fn filtered_physical_prefix_and_end_are_not_semantic_budget() -> TestResult {
                 )?,
                 OrderingMetadata {
                     priority: 2,
-                    state_enter_seq: i as u128,
+                    state_enter_seq: u128::from(i),
                 },
             )
         })

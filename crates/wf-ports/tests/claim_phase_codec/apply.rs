@@ -395,39 +395,64 @@ fn point_gate_precedes_changed_leaf_query_and_current_authority() -> TestResult 
     assert_eq!(actual.original_position(), at(1));
     assert_eq!(actual.expires_at().get(), 100);
     assert_eq!(plan.control().next().position().get(), 2);
-    let invalid = request("claim_priority_max")?;
-    let bytes = encode_prepared(&invalid, CodecLimits::default())?;
-    let decoded = prepare_claim_phase(bytes.as_bytes(), CodecLimits::default(), WORKSPACE)?;
-    let inspection = inspect_claim_phase_point(
-        decoded,
-        at(1),
-        PointGateView {
-            scope: &invalid.scope,
-            control: initial_control()?,
-            outcome: None,
-            retained_nonempty: false,
-        },
-        CodecLimits::default(),
-        WORKSPACE,
-        ClaimWorkLimits::default(),
-    )?;
-    let ClaimPhaseInspection::Fresh(fresh) = inspection else {
-        return Err("new invalid query did not reach query classification".into());
-    };
-    assert_eq!(
-        fresh.query_preflight(),
-        Err(ClaimRejection::InvalidPriority)
-    );
-    let rejected = decide_fresh_claim_phase_observed(fresh, None, 0, 100)?;
-    let ClaimApplyDecision::Fresh { operation, outcome } = rejected.decision() else {
-        return Err("missing finalized rejection".into());
-    };
-    assert!(matches!(
-        operation,
-        ClaimDecision::Rejected(ClaimRejection::InvalidPriority)
-    ));
-    assert_eq!(outcome.response(), b"FWCR\0\x01\x01\x01");
-    assert_eq!(outcome.original_time().get(), 11);
+    check_fresh_query_errors()?;
+    Ok(())
+}
+
+fn check_fresh_query_errors() -> TestResult {
+    for unsupported_token in [false, true] {
+        let mut invalid = request(if unsupported_token {
+            "claim_any"
+        } else {
+            "claim_priority_max"
+        })?;
+        if unsupported_token {
+            let PreparedOperation::ClaimPhase(phase) = &mut invalid.operation else {
+                return Err("missing fresh invalid token phase".into());
+            };
+            phase.token_version = 2;
+            phase.query.lease_ms = 0;
+        }
+        let bytes = encode_prepared(&invalid, CodecLimits::default())?;
+        let decoded = prepare_claim_phase(bytes.as_bytes(), CodecLimits::default(), WORKSPACE)?;
+        let inspection = inspect_claim_phase_point(
+            decoded,
+            at(1),
+            PointGateView {
+                scope: &invalid.scope,
+                control: initial_control()?,
+                outcome: None,
+                retained_nonempty: false,
+            },
+            CodecLimits::default(),
+            WORKSPACE,
+            ClaimWorkLimits::default(),
+        );
+        if unsupported_token {
+            assert!(matches!(
+                inspection,
+                Err(RecordBatchApplyError::Apply(ApplyError::InvalidAuthority))
+            ));
+            continue;
+        }
+        let ClaimPhaseInspection::Fresh(fresh) = inspection? else {
+            return Err("new invalid query did not reach query classification".into());
+        };
+        assert_eq!(
+            fresh.query_preflight(),
+            Err(ClaimRejection::InvalidPriority)
+        );
+        let rejected = decide_fresh_claim_phase_observed(fresh, None, 0, 100)?;
+        let ClaimApplyDecision::Fresh { operation, outcome } = rejected.decision() else {
+            return Err("missing finalized rejection".into());
+        };
+        assert!(matches!(
+            operation,
+            ClaimDecision::Rejected(ClaimRejection::InvalidPriority)
+        ));
+        assert_eq!(outcome.response(), b"FWCR\0\x01\x01\x01");
+        assert_eq!(outcome.original_time().get(), 11);
+    }
     Ok(())
 }
 

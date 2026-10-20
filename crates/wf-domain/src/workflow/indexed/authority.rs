@@ -8,7 +8,7 @@ use crate::workflow::batch::{ApplyError, BatchAuthority, BatchItem, observed_cur
 use super::{IndexedGroupView, TouchedIndexedGroupView};
 
 #[derive(Clone, Copy)]
-pub(super) enum IndexedAuthority<'query, 'current> {
+pub(crate) enum IndexedAuthority<'query, 'current> {
     Full(IndexedGroupView<'current>),
     Touched(TouchedIndexedGroupView<'query, 'current>),
 }
@@ -43,14 +43,14 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
         }
     }
 
-    pub(super) fn canonical(
+    pub(crate) fn canonical(
         self,
         id: ScopedRecordId<'_>,
     ) -> Result<&'current WorkflowRecord, ApplyError> {
         self.batch().record(id)?.ok_or(ApplyError::InvalidAuthority)
     }
 
-    pub(super) fn canonical_matches(
+    pub(crate) fn canonical_matches(
         self,
         id: ScopedRecordId<'_>,
         head: ClaimRecord<'_>,
@@ -61,7 +61,7 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
         }
     }
 
-    pub(super) fn mode(self, record: &WorkflowRecord) -> Result<StateMode, ApplyError> {
+    pub(crate) fn mode(self, record: &WorkflowRecord) -> Result<StateMode, ApplyError> {
         let policy = match self {
             Self::Full(view) => view.policies.get(record.workflow_type()).copied(),
             Self::Touched(view) => view
@@ -83,7 +83,7 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
             .unwrap_or(StateMode::Parallel))
     }
 
-    pub(super) fn parallel_member(
+    pub(crate) fn parallel_member(
         self,
         due: DueOrder<'_>,
         entry: ClaimRecord<'_>,
@@ -98,7 +98,7 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
         }
     }
 
-    pub(super) fn parallel_contains(self, due: DueOrder<'_>) -> Result<bool, ApplyError> {
+    pub(crate) fn parallel_contains(self, due: DueOrder<'_>) -> Result<bool, ApplyError> {
         match self {
             Self::Full(view) => Ok(view.parallel.contains_key(&due)),
             Self::Touched(view) => view
@@ -109,7 +109,7 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
         }
     }
 
-    pub(super) fn lane_present(self, lane: LaneKey<'_>) -> Result<bool, ApplyError> {
+    pub(crate) fn lane_present(self, lane: LaneKey<'_>) -> Result<bool, ApplyError> {
         match self {
             Self::Full(view) => Ok(view.fifo.contains_key(&lane)),
             Self::Touched(view) => view
@@ -120,7 +120,7 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
         }
     }
 
-    pub(super) fn member(
+    pub(crate) fn member(
         self,
         lane: LaneKey<'_>,
         member: LaneOrder<'_>,
@@ -140,7 +140,7 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
         }
     }
 
-    pub(super) fn head(
+    pub(crate) fn head(
         self,
         lane: LaneKey<'_>,
     ) -> Result<(LaneOrder<'current>, ClaimRecord<'current>), ApplyError> {
@@ -158,6 +158,40 @@ impl<'query, 'current> IndexedAuthority<'query, 'current> {
                 .copied()
                 .flatten()
                 .ok_or(ApplyError::InvalidAuthority),
+        }
+    }
+
+    pub(crate) fn entry(self, id: ScopedRecordId<'_>) -> Result<ClaimRecord<'current>, ApplyError> {
+        match self {
+            Self::Full(view) => view
+                .records
+                .get(&id)
+                .copied()
+                .ok_or(ApplyError::InvalidAuthority),
+            Self::Touched(view) => observed_current(view, id)?.ok_or(ApplyError::InvalidAuthority),
+        }
+    }
+
+    pub(crate) fn placement_matches(self, partition: &wf_types::identity::PartitionId) -> bool {
+        match self {
+            Self::Full(view) => view.batch.placements.get(partition) == Some(view.batch.group),
+            Self::Touched(view) => view.placements.get(partition) == Some(view.group),
+        }
+    }
+
+    pub(crate) fn parallel_entry(
+        self,
+        due: DueOrder<'_>,
+        entry: ClaimRecord<'current>,
+    ) -> Result<ClaimRecord<'current>, ApplyError> {
+        match self {
+            Self::Full(view) => view
+                .parallel
+                .get(&due)
+                .copied()
+                .ok_or(ApplyError::InvalidAuthority),
+            Self::Touched(_) if self.parallel_member(due, entry)? => Ok(entry),
+            Self::Touched(_) => Err(ApplyError::InvalidAuthority),
         }
     }
 }

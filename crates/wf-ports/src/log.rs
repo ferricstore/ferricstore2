@@ -13,6 +13,11 @@ use wf_types::version::LogIdentity;
 use crate::consensus::{PreparedOperation, PreparedRequest};
 
 mod claim;
+pub use claim::{
+    ClaimApplyDecision, ClaimApplyPlan, ClaimPhaseInspection, FreshClaimPhase,
+    claim_response_matches, claim_retained_summary, decide_fresh_claim_phase_observed,
+    inspect_claim_phase_point, prepare_claim_phase,
+};
 mod common;
 pub use common::normal_recovery_header;
 mod complete_policy;
@@ -179,6 +184,20 @@ impl DecodedRequest<'_> {
     #[must_use]
     pub fn state_key(&self, index: usize) -> Option<&[u8]> {
         self.state_keys.get(index).map(Vec::as_slice)
+    }
+    /// Encodes a reached Claim identity using this decoded isolation owner.
+    /// The caller admits the exact key owner before invoking this allocation.
+    /// # Errors
+    /// Rejects another operation, composed-key bounds or allocation failure.
+    pub fn claim_state_key(
+        &self,
+        partition: &wf_types::identity::PartitionId,
+        id: &wf_types::identity::RecordId,
+    ) -> Result<Vec<u8>, CodecError> {
+        if !matches!(self.request.operation, PreparedOperation::ClaimPhase(_)) {
+            return Err(CodecError::UnsupportedTag);
+        }
+        keys::state(&self.isolation, partition.as_bytes(), id.as_bytes())
     }
     /// Borrows the represented payload/result/error fields without another copy.
     #[must_use]

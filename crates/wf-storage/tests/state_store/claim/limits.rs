@@ -34,8 +34,9 @@ fn refusal(
     let before = f::cohort(path)?;
     let s = f::scope()?;
     let mut store = f::open(path, &s)?;
-    let error = apply_claim_transaction(&mut store, &s, frame, f::log(0), caps)
-        .expect_err("resource refusal was accepted");
+    let Err(error) = apply_claim_transaction(&mut store, &s, frame, f::log(0), caps) else {
+        return Err("resource refusal was accepted".into());
+    };
     // Resource refusal must leave this same healthy handle usable.
     drop(store.begin_apply(
         s.group(),
@@ -238,9 +239,9 @@ fn actual_fifo_lane_jump_and_head_budget_include_empty_probes() -> TestResult {
         &path,
         &s,
         &[b"p"],
-        Some(f::policy(b"job", &[b"q", b"empty"], false)?),
+        Some(f::policy(b"job", &[b"empty", b"q"], false)?),
     )?;
-    let owners = (0..81)
+    let owners = (0_u32..81)
         .map(|i| {
             f::owner(
                 &s,
@@ -254,13 +255,13 @@ fn actual_fifo_lane_jump_and_head_budget_include_empty_probes() -> TestResult {
                 )?,
                 OrderingMetadata {
                     priority: 0,
-                    state_enter_seq: i as u128,
+                    state_enter_seq: u128::from(i),
                 },
             )
         })
         .collect::<TestResult<Vec<_>>>()?;
     f::seed(&mut store, &s, &owners, 0, 0)?;
-    check_lane_jump(&mut store, &s)?;
+    check_lane_jump(&mut store, &s, &owners[0])?;
     drop(store);
     let mut expected = f::cohort(&path)?;
     let mut query = f::query(b"job", b"worker", 1);
@@ -388,7 +389,11 @@ fn selected_plan_output_and_complete_policy_overlaps() -> TestResult {
     Ok(())
 }
 
-fn check_lane_jump(store: &mut wf_storage::state::RedbStateStore, s: &RequestScope) -> TestResult {
+fn check_lane_jump(
+    store: &mut wf_storage::state::RedbStateStore,
+    s: &RequestScope,
+    first: &StoredWorkflowRecord,
+) -> TestResult {
     for steps in [4, 5] {
         let tx = store.begin_apply(
             s.group(),
@@ -410,6 +415,30 @@ fn check_lane_jump(store: &mut wf_storage::state::RedbStateStore, s: &RequestSco
             ),
             "whole escaped lane successor must skip all eighty follower keys"
         );
+    }
+    // Independent wire52, prefix21, scope515 and decoded139 tariff:
+    // open557 + first seek557 + candidate inspection52 + decoded buffer139.
+    assert_eq!(f::member(s, first).len(), 52);
+    for adapter_bytes in [1_304, 1_305] {
+        let tx = store.begin_apply(
+            s.group(),
+            s.recovery(),
+            AdmissionLimits::default(),
+            3,
+            139,
+            adapter_bytes,
+        )?;
+        let mut cursor =
+            tx.claim_lane_cursor(s.tenant(), borrowed_query(b"job", ClaimStates::Any))?;
+        assert!(matches!(
+            (adapter_bytes, cursor.next()?),
+            (1_304, ClaimLaneStep::BudgetEnd) | (1_305, ClaimLaneStep::Lane(_))
+        ));
+        assert_eq!(cursor.position().is_some(), adapter_bytes == 1_305);
+        if adapter_bytes == 1_304 {
+            assert!(matches!(cursor.next()?, ClaimLaneStep::BudgetEnd));
+            assert!(cursor.position().is_none());
+        }
     }
     Ok(())
 }

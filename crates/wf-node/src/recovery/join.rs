@@ -7,12 +7,13 @@ use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlState, EntryIdentity, EntryStamp, PreparedDigest};
 use wf_ports::log::{
     CodecError, RaftLogEntry, RaftLogStore, measure_control_entry, normal_recovery_header,
-    prepare_independent_record_batch, prepare_public_mutation, prepare_record_batch,
+    prepare_claim_phase, prepare_independent_record_batch, prepare_public_mutation,
+    prepare_record_batch,
 };
 use wf_ports::state::GroupApplyStore;
 use wf_storage::log::RedbLogStore;
 use wf_storage::state::RedbStateStore;
-use wf_storage::transaction::RecordBatchTransactionError;
+use wf_storage::transaction::{ClaimTransactionError, RecordBatchTransactionError};
 use wf_types::identity::{GroupId, RecoveryId};
 use wf_types::version::{CommittedTime, LogIdentity};
 
@@ -185,13 +186,19 @@ fn audit_normal(
         .checked_sub(total(&[base, 512])?)
         .ok_or(Error::Limit)?;
     let codec = limits.normal_limits().codec;
-    let decoded = match profile {
-        5 => prepare_record_batch(body, codec, available),
-        6 => prepare_independent_record_batch(body, codec, available),
-        1 => prepare_public_mutation(body, codec, available),
-        _ => return Err(Error::UnsupportedEntry),
-    }
-    .map_err(|error| Error::Normal(RecordBatchTransactionError::Apply(error)))?;
+    let decoded = if profile == 3 {
+        limits.claim_work_limits().ok_or(Error::UnsupportedEntry)?;
+        prepare_claim_phase(body, codec, available)
+            .map_err(|error| Error::Claim(ClaimTransactionError::Apply(error)))?
+    } else {
+        match profile {
+            5 => prepare_record_batch(body, codec, available),
+            6 => prepare_independent_record_batch(body, codec, available),
+            1 => prepare_public_mutation(body, codec, available),
+            _ => return Err(Error::UnsupportedEntry),
+        }
+        .map_err(|error| Error::Normal(RecordBatchTransactionError::Apply(error)))?
+    };
     if decoded.request().scope.group() != namespace.0
         || decoded.request().scope.recovery() != namespace.1
     {

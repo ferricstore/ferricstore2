@@ -197,10 +197,9 @@ fn observed_heads_block_and_touched_selected_guards() -> TestResult {
     let policies = BTreeMap::from([(b"job".as_slice(), policy.policy())]);
     let scope = test_scope()?;
     let request = RequestId::new(b"observed-head".to_vec())?;
-    let partitions = [PartitionId::new(b"p".to_vec())?];
     with_claim_view(
         &entries,
-        &partitions,
+        &[PartitionId::new(b"p".to_vec())?],
         GateView {
             scope: &scope,
             control: test_control()?,
@@ -212,6 +211,10 @@ fn observed_heads_block_and_touched_selected_guards() -> TestResult {
             let envelope =
                 test_envelope(test_header(&scope, &request, 1, 25)?, test_query(b"job", 2));
             with_observed(full, &[], ClaimWindowEnd::RangeEnd, true, |window| {
+                assert_eq!(
+                    authority_controls(window, &envelope, entries[1])?,
+                    [true; 3]
+                );
                 let decision = decide_observed_claim(
                     window,
                     &envelope,
@@ -281,6 +284,100 @@ fn observed_heads_block_and_touched_selected_guards() -> TestResult {
                 Ok(())
             })
         },
+    )
+}
+
+fn authority_controls(
+    window: ClaimObservedWindow<'_, '_>,
+    envelope: &ClaimEnvelope<'_>,
+    wrong_member: ClaimRecord<'_>,
+) -> Result<[bool; 3], TestError> {
+    let wrong_members = window
+        .indexed
+        .fifo_members
+        .keys()
+        .map(|key| (*key, Some(wrong_member)))
+        .collect();
+    let wrong = ClaimObservedWindow {
+        indexed: TouchedIndexedGroupView {
+            fifo_members: &wrong_members,
+            ..window.indexed
+        },
+        ..window
+    };
+    let member_refused = authority_refused(wrong, envelope);
+    let heads = window.head_lanes.iter().map(|lane| (*lane, None)).collect();
+    let empty_current = BTreeMap::new();
+    let empty_members = BTreeMap::new();
+    let empty_encodings = BTreeMap::new();
+    let empty = ClaimObservedWindow {
+        indexed: TouchedIndexedGroupView {
+            current: &empty_current,
+            fifo_members: &empty_members,
+            fifo_heads: &heads,
+            ..window.indexed
+        },
+        encodings: &empty_encodings,
+        ..window
+    };
+    let positive = decide_observed_claim(
+        empty,
+        envelope,
+        TimestampMillis::new(25),
+        AdmissionLimits::default(),
+        ClaimWorkLimits::default(),
+        0,
+    )?;
+    assert!(
+        selected_ids(&positive)?.is_empty(),
+        "healthy explicit empty lane"
+    );
+    let missing = BTreeMap::new();
+    let missing_refused = authority_refused(
+        ClaimObservedWindow {
+            indexed: TouchedIndexedGroupView {
+                placements: &missing,
+                ..empty.indexed
+            },
+            ..empty
+        },
+        envelope,
+    );
+    let foreign = window
+        .indexed
+        .placements
+        .keys()
+        .map(|partition| {
+            Ok((
+                partition.clone(),
+                wf_types::identity::GroupId::new(b"foreign".to_vec())?,
+            ))
+        })
+        .collect::<Result<BTreeMap<_, _>, TestError>>()?;
+    let foreign_refused = authority_refused(
+        ClaimObservedWindow {
+            indexed: TouchedIndexedGroupView {
+                placements: &foreign,
+                ..empty.indexed
+            },
+            ..empty
+        },
+        envelope,
+    );
+    Ok([member_refused, missing_refused, foreign_refused])
+}
+
+fn authority_refused(window: ClaimObservedWindow<'_, '_>, envelope: &ClaimEnvelope<'_>) -> bool {
+    matches!(
+        decide_observed_claim(
+            window,
+            envelope,
+            TimestampMillis::new(25),
+            AdmissionLimits::default(),
+            ClaimWorkLimits::default(),
+            0
+        ),
+        Err(ApplyError::InvalidAuthority)
     )
 }
 

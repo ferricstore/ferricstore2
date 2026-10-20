@@ -4,12 +4,15 @@
 //! They process only the already durable committed prefix.
 
 use std::fmt;
+use wf_domain::claim::apply::ClaimWorkLimits;
 use wf_ports::consensus::{RaftMembershipError, RaftMembershipLimits};
 use wf_ports::log::{CodecError, RaftLogError, RaftLogStore};
 use wf_ports::state::StateTransactionError;
 use wf_storage::log::RedbLogStore;
 use wf_storage::state::RedbStateStore;
-use wf_storage::transaction::{RecordBatchTransactionError, RecordBatchTransactionLimits};
+use wf_storage::transaction::{
+    ClaimTransactionError, RecordBatchTransactionError, RecordBatchTransactionLimits,
+};
 use wf_types::identity::{GroupId, RecoveryId};
 
 mod join;
@@ -28,6 +31,7 @@ pub struct CommittedRecoveryLimits {
     membership: RaftMembershipLimits,
     state: (usize, usize, usize, usize),
     normal: RecordBatchTransactionLimits,
+    claim_work: Option<ClaimWorkLimits>,
     work: (usize, usize),
     entry: usize,
     workspace: usize,
@@ -70,10 +74,22 @@ impl CommittedRecoveryLimits {
             membership,
             state,
             normal,
+            claim_work: None,
             work,
             entry: maximum_owned_entry_bytes,
             workspace: workspace_bytes,
         })
+    }
+    /// Explicitly enables physical Claim replay with its immutable work profile.
+    #[must_use]
+    pub const fn with_claim_work_limits(mut self, work: ClaimWorkLimits) -> Self {
+        self.claim_work = Some(work);
+        self
+    }
+    /// Reads the selected Claim profile; legacy construction leaves it absent.
+    #[must_use]
+    pub const fn claim_work_limits(self) -> Option<ClaimWorkLimits> {
+        self.claim_work
     }
     /// Supported membership validation profile.
     #[must_use]
@@ -187,6 +203,8 @@ pub enum CommittedRecoveryError {
     State(StateTransactionError),
     /// Existing complete Normal preparation/transaction diagnosis.
     Normal(RecordBatchTransactionError),
+    /// Existing physical Claim preparation/transaction diagnosis.
+    Claim(ClaimTransactionError),
     /// Header-only parsing failure.
     Codec(CodecError),
     /// Closed Blank/Membership parsing failure.
@@ -210,6 +228,7 @@ impl fmt::Display for CommittedRecoveryError {
             Self::Log(error) => return fmt::Display::fmt(error, f),
             Self::State(error) => return fmt::Display::fmt(error, f),
             Self::Normal(error) => return fmt::Display::fmt(error, f),
+            Self::Claim(error) => return fmt::Display::fmt(error, f),
             Self::Codec(error) => return fmt::Display::fmt(error, f),
             Self::Membership(error) => return fmt::Display::fmt(error, f),
         })

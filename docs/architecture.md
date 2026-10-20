@@ -1269,3 +1269,41 @@ formats, resource ownership and error/recovery order are in
 Focused storage49/node36 and strict checks pass on Darwin; the handoff records
 broader validation separately. These component results certify no full source
 parity, Linux execution or M2/M3 milestone exit.
+
+
+## Selected durable physical Claim leaf
+
+ARCH-M1M2-DURABLE-CLAIM-LEAF1-CREATE1 and its precise key/loader decisions join
+private op3 Claim preparation to one actual exclusive state transaction. The
+neutral ports expose a consuming Claim plan and borrowed due/lane capabilities;
+redb stays inside storage. Thirteen private production children keep the domain
+observed reducer, ports codecs and storage loading/publication grouped by their
+existing feature parents. No dependency, runtime framework or second backend is
+introduced. Every production file remains within 400 physical lines.
+
+One real retained point gate precedes Fresh query validation and current reads.
+A sealed business rejection uses no fabricated window; a valid query pays both
+complete admission walks before real observed selection. The loader reads actual
+complete policy/placement/current authority, discovers true FIFO heads separately
+from query-scoped due rows, and prospectively admits independent owners, slots,
+key bounds and cumulative visits. Running, future and unscheduled FIFO heads keep
+blocking followers. This internal leaf explicitly refuses present governance;
+it is not the public parent/governance transaction.
+
+Consumed commit repeats actual control/profile/plan/predecessor checks and
+publishes core, indexes, histories, original retained response and control in one
+Immediate transaction. Replies escape only after durable completion; uncertainty
+fences. Replay moves the original retained owner without a second response copy.
+FWCR1/response3 retains the complete ordered leased postimages, full u64 counters
+and original metadata-time token binding. Node recovery enables op3 only with an
+explicit Claim work profile, audits the original body and uses the real driver
+for committed suffix replay, including after snapshots and purge.
+
+All 31 selected identities pass in the complete 873-test macOS workspace, with
+strict checks and independent reciprocal source/resource review. Actual faults,
+process kills and exact/tight logical profiles supplement selection/replay tests.
+The separate pinned native compatibility executable also passes. These results
+establish no power-loss theorem, measured CPU/RSS improvement, Linux execution,
+full source/setup/profile parity, public Claim/governance or accepted runtime
+readiness. Durable complete-policy activation is the required next route. See
+[ADR-007](adr/007-durable-log-storage.md#selected-durable-physical-claim-leaf).

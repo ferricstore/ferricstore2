@@ -10,6 +10,7 @@ use wf_types::version::CommittedTime;
 
 mod admission;
 mod bootstrap;
+mod claim;
 mod commit;
 mod cursor;
 mod membership;

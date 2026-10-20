@@ -5,7 +5,7 @@ use super::{fixtures as f, limits, recover_committed};
 use std::path::Path;
 use wf_domain::claim::apply::ClaimWorkLimits;
 use wf_domain::workflow::admission::AdmissionLimits;
-use wf_domain::workflow::control::EntryStamp;
+use wf_domain::workflow::control::{EntryIdentity, EntryStamp};
 use wf_domain::workflow::request::{RequestScope, RetainedStatus};
 use wf_domain::workflow::{Create, Operation};
 use wf_ports::log::{CodecError, CodecLimits, RaftLogError, RaftLogStore, RecordBatchApplyError};
@@ -290,7 +290,7 @@ fn mixed_committed_claim_replay_preserves_original_outcomes() -> TestResult {
             assert_eq!(log.state()?.last_log(), Some(f::at(10)));
             inspect_original(&mut state)?;
             assert_eq!(
-                f::applied(&mut state)?.1.entry().map(|entry| entry.log()),
+                f::applied(&mut state)?.1.entry().map(EntryIdentity::log),
                 Some(f::at(0))
             );
             drop((log, state));

@@ -3,17 +3,42 @@
 use super::ClaimPreflightError;
 use crate::claim::apply::token::source_token_length;
 use crate::claim::apply::{
-    ClaimApplyView, ClaimEnvelope, ClaimQuery, ClaimRejection, ClaimWorkLimits,
+    ClaimApplyView, ClaimEncoding, ClaimEnvelope, ClaimQuery, ClaimRejection, ClaimWorkLimits,
 };
 use crate::claim::{
     ClaimRecord, ClaimSelection, DueOrder, LaneKey, LaneOrder, ScopedRecordId, SelectedClaim,
 };
 use crate::workflow::admission::{AdmissionError, AdmissionLimits, record_bytes};
 use crate::workflow::batch::ApplyError;
+use crate::workflow::indexed::IndexedAuthority;
+use std::collections::BTreeMap;
 use wf_types::version::TimestampMillis;
 
 pub(in super::super) fn preflight_selected(
     view: ClaimApplyView<'_>,
+    envelope: &ClaimEnvelope<'_>,
+    selection: &ClaimSelection<'_>,
+    context: (TimestampMillis, usize),
+    limits: AdmissionLimits,
+    work: ClaimWorkLimits,
+    g: &mut u64,
+) -> Result<(), ClaimPreflightError> {
+    preflight_selected_with(
+        (IndexedAuthority::Full(view.group), view.encodings),
+        envelope,
+        selection,
+        context,
+        limits,
+        work,
+        g,
+    )
+}
+
+pub(in super::super) fn preflight_selected_with(
+    view: (
+        IndexedAuthority<'_, '_>,
+        &BTreeMap<ScopedRecordId<'_>, ClaimEncoding<'_>>,
+    ),
     envelope: &ClaimEnvelope<'_>,
     selection: &ClaimSelection<'_>,
     context: (TimestampMillis, usize),
@@ -61,19 +86,23 @@ pub(in super::super) fn preflight_selected(
 }
 
 fn selected_charge(
-    view: ClaimApplyView<'_>,
+    view: (
+        IndexedAuthority<'_, '_>,
+        &BTreeMap<ScopedRecordId<'_>, ClaimEncoding<'_>>,
+    ),
     selected: SelectedClaim<'_>,
     query: ClaimQuery<'_>,
     now: TimestampMillis,
     limits: AdmissionLimits,
 ) -> Result<(usize, usize), ClaimPreflightError> {
     let invalid = ClaimPreflightError::Apply(ApplyError::InvalidAuthority);
+    let (view, encodings) = view;
     let id = ScopedRecordId {
         partition_key: selected.partition_key,
         id: selected.record.id().as_bytes(),
     };
-    let entry = *view.group.records.get(&id).ok_or(invalid)?;
-    let canonical = *view.group.batch.records.get(&id).ok_or(invalid)?;
+    let entry = view.entry(id).map_err(ClaimPreflightError::Apply)?;
+    let canonical = view.canonical(id).map_err(ClaimPreflightError::Apply)?;
     let r = record_bytes(entry.record, limits).map_err(|_| invalid)?;
     let rg = record_bytes(canonical, limits).map_err(|_| invalid)?;
     entry
@@ -97,7 +126,7 @@ fn selected_charge(
             },
         ));
     }
-    let encoding = view.encodings.get(&id).ok_or(invalid)?;
+    let encoding = encodings.get(&id).ok_or(invalid)?;
     let mut b = rg;
     for bytes in [
         id.id.len(),
@@ -118,9 +147,9 @@ fn selected_charge(
     Ok((b, t))
 }
 
-fn selected_index_charge(
-    view: ClaimApplyView<'_>,
-    entry: ClaimRecord<'_>,
+fn selected_index_charge<'current>(
+    view: IndexedAuthority<'_, 'current>,
+    entry: ClaimRecord<'current>,
     bytes: (usize, usize),
     limits: AdmissionLimits,
 ) -> Result<(usize, usize), ClaimPreflightError> {
@@ -134,12 +163,18 @@ fn selected_index_charge(
             .ok_or(ClaimPreflightError::Business(
                 ClaimRejection::LengthOverflow,
             ))?;
-    let member = if let Some(members) = view.group.fifo.get(&lane) {
-        let member = members.get(&LaneOrder::for_record(&entry)).ok_or(invalid)?;
-        let (_, head) = members.first_key_value().ok_or(invalid)?;
-        let hid = ScopedRecordId::for_record(head);
-        let hi = view.group.records.get(&hid).ok_or(invalid)?;
-        let hg = view.group.batch.records.get(&hid).ok_or(invalid)?;
+    let member = if view
+        .lane_present(lane)
+        .map_err(ClaimPreflightError::Apply)?
+    {
+        let member = view
+            .member(lane, LaneOrder::for_record(&entry))
+            .map_err(ClaimPreflightError::Apply)?
+            .ok_or(invalid)?;
+        let (_, head) = view.head(lane).map_err(ClaimPreflightError::Apply)?;
+        let hid = ScopedRecordId::for_record(&head);
+        let hi = view.entry(hid).map_err(ClaimPreflightError::Apply)?;
+        let hg = view.canonical(hid).map_err(ClaimPreflightError::Apply)?;
         let rh = record_bytes(head.record, limits).map_err(|_| invalid)?;
         let rhi = record_bytes(hi.record, limits).map_err(|_| invalid)?;
         let rhg = record_bytes(hg, limits).map_err(|_| invalid)?;
@@ -156,10 +191,8 @@ fn selected_index_charge(
             ))?;
         member
     } else {
-        view.group
-            .parallel
-            .get(&DueOrder::for_record(&entry).ok_or(invalid)?)
-            .ok_or(invalid)?
+        view.parallel_entry(DueOrder::for_record(&entry).ok_or(invalid)?, entry)
+            .map_err(ClaimPreflightError::Apply)?
     };
     let rm = record_bytes(member.record, limits).map_err(|_| invalid)?;
     t = t

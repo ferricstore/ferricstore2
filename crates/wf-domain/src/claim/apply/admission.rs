@@ -5,15 +5,17 @@ use wf_types::version::TimestampMillis;
 
 use crate::claim::request::{MAX_CLAIMS, MAX_HEADS, MAX_SCANS};
 use crate::claim::{DueOrder, LaneKey, PartitionFilter};
+use crate::policy::definition::StateMode;
 use crate::workflow::MAX_EXACT_MILLIS;
 use crate::workflow::admission::AdmissionLimits;
 use crate::workflow::batch::ApplyError;
+use crate::workflow::indexed::TouchedIndexedGroupView;
 
 mod consumed;
 mod selected;
-use super::{ClaimEnvelope, ClaimRejection, ClaimStates, ClaimWorkLimits};
-pub(super) use consumed::guard_consumed;
-pub(super) use selected::preflight_selected;
+use super::{ClaimEnvelope, ClaimQuery, ClaimRejection, ClaimStates, ClaimWorkLimits};
+pub(super) use consumed::{guard_consumed, guard_consumed_with};
+pub(super) use selected::{preflight_selected, preflight_selected_with};
 
 #[derive(Clone, Copy, Debug)]
 pub(super) enum ClaimPreflightError {
@@ -27,6 +29,16 @@ pub(super) fn admit_query(
     limits: AdmissionLimits,
     work: ClaimWorkLimits,
 ) -> Result<(usize, u64), ClaimPreflightError> {
+    admit_query_with_prior(envelope, now, limits, work, 0)
+}
+
+pub(super) fn admit_query_with_prior(
+    envelope: &ClaimEnvelope<'_>,
+    now: TimestampMillis,
+    limits: AdmissionLimits,
+    work: ClaimWorkLimits,
+    prior_work: u64,
+) -> Result<(usize, u64), ClaimPreflightError> {
     let query = envelope.query;
     let partitions = match query.partitions {
         PartitionFilter::Any => &[][..],
@@ -39,7 +51,10 @@ pub(super) fn admit_query(
     admit_query_counts(envelope, now, limits)?;
     let overflow = ClaimPreflightError::Business(ClaimRejection::LengthOverflow);
     let mut q = 0_usize;
-    let mut g = u64::try_from(envelope.header.encoded_entry.len()).map_err(|_| overflow)?;
+    let mut g = u64::try_from(envelope.header.encoded_entry.len())
+        .map_err(|_| overflow)?
+        .checked_add(prior_work)
+        .ok_or(overflow)?;
     for (components, maximum) in [
         (&[query.workflow_type][..], MAX_RECORD_ID_BYTES),
         (&[query.worker][..], limits.inline_bytes()),
@@ -196,6 +211,48 @@ pub(super) fn guard_lane(
         }));
     }
     *g = next;
+    Ok(())
+}
+
+pub(super) fn guard_observed_lane(
+    view: TouchedIndexedGroupView<'_, '_>,
+    lane: LaneKey<'_>,
+    query: ClaimQuery<'_>,
+    limits: AdmissionLimits,
+) -> Result<(), ClaimPreflightError> {
+    let invalid = ClaimPreflightError::Apply(ApplyError::InvalidAuthority);
+    let partition = match query.partitions {
+        PartitionFilter::Any => true,
+        PartitionFilter::Only(partitions) => partitions.contains(&lane.partition_key),
+    };
+    let state = match query.states {
+        ClaimStates::Any => true,
+        ClaimStates::Only(states) => {
+            states.contains(&lane.state) || states.contains(&b"running".as_slice())
+        }
+    };
+    if lane.workflow_type != query.workflow_type
+        || !partition
+        || !state
+        || query.priority.is_some_and(|priority| priority != 0)
+        || !view.placements.iter().any(|(partition, group)| {
+            partition.as_bytes() == lane.partition_key && group == view.group
+        })
+    {
+        return Err(invalid);
+    }
+    let policy = view
+        .policies
+        .get(lane.workflow_type)
+        .copied()
+        .flatten()
+        .ok_or(invalid)?;
+    if policy.workflow_type() != lane.workflow_type
+        || policy.workflow_type().len() > limits.inline_bytes()
+        || policy.states().get(lane.state).and_then(|state| state.mode) != Some(StateMode::Fifo)
+    {
+        return Err(invalid);
+    }
     Ok(())
 }
 

@@ -16,9 +16,13 @@ use super::{PartitionFilter, ScopedRecordId};
 
 mod admission;
 pub(crate) mod decision;
+mod observed;
 mod result;
 mod token;
 
+pub use observed::{
+    ClaimObservedWindow, ClaimWindowEnd, decide_observed_claim, preflight_observed_claim_query,
+};
 pub use result::{ClaimDecision, ClaimPlan, ClaimRejection, ClaimResume};
 
 /// Physical lifecycle state inclusion; running is independent of its logical lane.

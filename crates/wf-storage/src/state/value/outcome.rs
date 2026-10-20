@@ -5,7 +5,8 @@ use wf_domain::workflow::request::{
     ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
 };
 use wf_ports::log::{
-    public_mutation_retained_status, record_batch_retained_status, record_batch_retained_summary,
+    CodecError, claim_retained_summary, public_mutation_retained_status,
+    record_batch_retained_status, record_batch_retained_summary,
 };
 use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, LogIdentity, TimestampMillis};
@@ -101,16 +102,36 @@ pub fn encode_outcome(
     if maximum_bytes == 0 {
         return Err(StateValueError::InvalidValue);
     }
-    let parse = if outcome.intent().version() == 1 {
-        public_mutation_retained_status
+    let status = if outcome.intent().version() == 1 && outcome.response_version() == 3 {
+        // Wire-only syntax/ceiling admission. The actual guard, point reader and
+        // recovery repeat the narrower captured response profile independently.
+        let ceiling = AdmissionLimits::new(
+            wf_domain::workflow::admission::MAX_INLINE_BYTES,
+            maximum_bytes,
+            1000,
+        )
+        .map_err(|_| StateValueError::InvalidValue)?;
+        claim_retained_summary(
+            outcome.intent(),
+            3,
+            outcome.response(),
+            outcome.original_time(),
+            ceiling,
+        )
+        .map_err(claim_error)?
+        .0
     } else {
-        record_batch_retained_status
+        let parse = if outcome.intent().version() == 1 {
+            public_mutation_retained_status
+        } else {
+            record_batch_retained_status
+        };
+        parse(
+            outcome.intent(),
+            outcome.response_version(),
+            outcome.response(),
+        )?
     };
-    let status = parse(
-        outcome.intent(),
-        outcome.response_version(),
-        outcome.response(),
-    )?;
     if status != outcome.status() {
         return Err(StateValueError::InvalidValue);
     }
@@ -177,7 +198,8 @@ pub fn scan_outcome<'input>(
         || recovery != expected_scope.recovery().as_bytes()
         || request != expected_request.as_bytes()
         || expires_at <= original_time
-        || response.len() > limits.decision_bytes()
+        || (response.len() > limits.decision_bytes()
+            && !(intent_version == 1 && response_version == 3))
     {
         return Err(StateValueError::InvalidValue);
     }
@@ -187,7 +209,16 @@ pub fn scan_outcome<'input>(
         6 => ClientIntent::independent_record_batch(digest),
         _ => return Err(StateValueError::UnsupportedVersion),
     };
-    let (status, response_count) = if intent_version == 1 {
+    let (status, response_count) = if intent_version == 1 && response_version == 3 {
+        claim_retained_summary(
+            intent,
+            response_version,
+            response,
+            TimestampMillis::new(original_time),
+            limits,
+        )
+        .map_err(claim_error)?
+    } else if intent_version == 1 {
         (
             public_mutation_retained_status(intent, response_version, response)?,
             None,
@@ -215,6 +246,15 @@ pub fn scan_outcome<'input>(
         owned_bytes,
         response_count,
     })
+}
+
+fn claim_error(error: CodecError) -> StateValueError {
+    match error {
+        CodecError::ByteLimit | CodecError::ItemLimit | CodecError::ValueLimit => {
+            StateValueError::ProfileLimit
+        }
+        other => other.into(),
+    }
 }
 
 /// Validates a complete frame, then consumes the same scan into an owned outcome.

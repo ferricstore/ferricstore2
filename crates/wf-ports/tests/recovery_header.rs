@@ -24,7 +24,7 @@ fn packed(root: u8, intent: u16, scopes: [&[u8]; 3]) -> Result<Vec<u8>, std::num
 #[test]
 fn normal_recovery_header_borrows_supported_profiles_without_body_authority()
 -> Result<(), Box<dyn std::error::Error>> {
-    for (root, intent, profile) in [(1, 5, 5), (1, 6, 6), (4, 1, 1)] {
+    for (root, intent, profile) in [(1, 5, 5), (1, 6, 6), (4, 1, 1), (3, 1, 3)] {
         let scopes: [&[u8]; 3] = [b"t\0\xff", b"g\0", b"z\xff"];
         let mut bytes = packed(root, intent, scopes)?;
         for suffix in [&[][..], b"not a valid operation body".as_slice()] {
@@ -44,13 +44,22 @@ fn normal_recovery_header_borrows_supported_profiles_without_body_authority()
 #[test]
 fn normal_recovery_header_rejects_wrong_profiles_framing_and_byte_caps()
 -> Result<(), Box<dyn std::error::Error>> {
-    for (root, intent) in [(1, 1), (2, 1), (3, 1)] {
+    for (root, intent) in [(1, 1), (2, 1)] {
         assert_eq!(
             normal_recovery_header(
                 &packed(root, intent, [b"t", b"g", b"z"])?,
                 CodecLimits::default()
             ),
             Err(CodecError::UnsupportedTag)
+        );
+    }
+    for intent in [5, 6] {
+        assert_eq!(
+            normal_recovery_header(
+                &packed(3, intent, [b"t", b"g", b"z"])?,
+                CodecLimits::default()
+            ),
+            Err(CodecError::UnsupportedVersion)
         );
     }
     let bytes = packed(1, 5, [b"t", b"g", b"z"])?;

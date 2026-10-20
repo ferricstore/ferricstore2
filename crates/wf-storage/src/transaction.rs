@@ -8,9 +8,14 @@ use wf_domain::workflow::request::RetainedOutcome;
 use wf_ports::log::{CodecLimits, RecordBatchApplyError};
 use wf_ports::state::StateTransactionError;
 
+mod claim;
 mod load;
 mod observations;
 mod record_batch;
+
+pub use claim::{
+    ClaimTransactionError, ClaimTransactionLimits, ClaimTransactionOutcome, apply_claim_transaction,
+};
 
 pub use record_batch::{
     apply_independent_record_batch_transaction, apply_public_mutation_transaction,

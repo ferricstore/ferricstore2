@@ -9,7 +9,8 @@ use wf_ports::log::{CodecError, RaftLogEntry};
 use wf_ports::state::GroupApplyStore;
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
-    RecordBatchTransactionOutcome, apply_independent_record_batch_transaction,
+    ClaimTransactionLimits, ClaimTransactionOutcome, RecordBatchTransactionOutcome,
+    apply_claim_transaction, apply_independent_record_batch_transaction,
     apply_public_mutation_transaction, apply_record_batch_transaction,
 };
 use wf_types::identity::{GroupId, RecoveryId, TenantId};
@@ -88,6 +89,11 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
+    let claim_work = if profile == 3 {
+        Some(limits.claim_work_limits().ok_or(Error::UnsupportedEntry)?)
+    } else {
+        None
+    };
     let scope_bytes = total(&[512, fields[0].len(), fields[1].len(), fields[2].len()])?;
     let driver = limits.normal_limits();
     let before = total(&[512, entry.body().len(), scope_bytes])?;
@@ -100,6 +106,27 @@ fn normal(
         RecoveryId::new(copy(namespace.1.as_bytes())?)
             .map_err(|_| Error::Codec(CodecError::Malformed))?,
     );
+    if let Some(work) = claim_work {
+        let outcome = apply_claim_transaction(
+            state,
+            &scope,
+            entry.body(),
+            entry.id(),
+            ClaimTransactionLimits { base: driver, work },
+        )
+        .map_err(Error::Claim)?;
+        let control = match outcome {
+            ClaimTransactionOutcome::Retained { control, outcome } => {
+                drop(outcome);
+                control
+            }
+            ClaimTransactionOutcome::IntentConflict(control)
+            | ClaimTransactionOutcome::Expired(control)
+            | ClaimTransactionOutcome::LogReplay(control) => control,
+        };
+        drop(scope);
+        return Ok(control);
+    }
     let outcome = match profile {
         5 => apply_record_batch_transaction(state, &scope, entry.body(), entry.id(), driver),
         6 => apply_independent_record_batch_transaction(

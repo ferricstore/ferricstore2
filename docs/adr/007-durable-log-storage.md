@@ -603,3 +603,75 @@ cleanup witness keep their actual chronology. Focused storage49/node36, strict
 checks and separate native Darwin execution pass. Full workspace, both-host,
 source setup/profile parity, consensus/services and milestone exits require
 separate evidence in the handoff; these facts do not establish full completion.
+
+
+## Selected durable physical Claim leaf
+
+The selected internal op3/intent1 leaf joins the existing trusted original-parent
+digest, private request codec, one retained point gate and an actual exclusive
+redb writer. ARCH-M1M2-DURABLE-CLAIM-LEAF1-CREATE1, SOURCE-PRECISION2 and the
+recorded test-only Cohort alias decision enumerate the exact artifacts; no public
+parent, policy-edit authority, governance fallback, new dependency or layout is
+inferred. The thirteen production children preserve the functional core and
+neutral storage/node boundaries.
+
+Fresh authority is loaded only after the full first query preflight. Its sealed
+rejection pairs only with None; valid preflight pairs only with a real observed
+window. The reducer independently repeats complete query admission, so valid
+work pays g1+g2. Missing observations differ from observed absence. Complete
+reached placement/current/index/head relations must agree, including an
+unselected future head's exact Some member and explicit empty-lane placement.
+Unsupported token/resume is an outer authority failure before Fresh business
+admission and after the retained gate. Present governance, even empty, is an
+explicit unsupported route in this first leaf.
+
+Due selection is query-scoped and due<=now. Physical foreign, future and filtered
+visits pay operational accounts without consuming semantic B/H. Distinct true
+FIFO lanes use complete escaped-prefix successors; running, unscheduled and
+future heads remain blockers, and finite explicit empty probes are deduplicated.
+B+1 frontier ownership and H+1 canonical-head admission remain prospective.
+Observed tag1 members cannot become duplicate parallel candidates.
+
+The decoder admits D=4E+2048+576N after a complete borrowed structural/EOF scan.
+R, S and C are separate monotone accounts for actual loaded owners, staging slots
+and adapter work/ownership. Candidate key length is a logical C inspection tariff
+before parsing, separate from decoded-key R/C; it does not pretend a copied
+engine AccessGuard. W includes configured R/S/C plus the admitted live phase,
+and O<=A precedes the sole reply allocation. Valid query copies drop before late
+response retention admission. These are logical bounds, not engine cache, COW,
+native RSS, disk, CPU or latency guarantees.
+
+Consumed publication repeats the captured actual profile, control and complete
+response/plan validation, checks original versions and shares the existing atomic
+Immediate core/index/history/outcome/control writer. Exact log replay writes
+nothing. Duplicate/conflict/expiry classification precedes changed Fresh query,
+clock or policy. The original outcome owner moves after successful consumed
+commit; uncertain completion fences and returns no reply.
+
+FWCR1/response_version3 retains all six raw row fields, optional payload/result/
+error presence, u64 version/fence/deadline/times/attempts, priority and u128
+sequence. Every updated_at/token binds stored original_time; accepted rows share
+type, worker and deadline. There is no invented created<=updated constraint or
+narrowed attempt counter. Hard grammar is Corrupt; a legitimate narrower Claim
+response profile returns healthy Limit through a Claim-only mapper. Old routes
+keep their error origins. One full scanner pass validates rows, while identity
+uniqueness rescans skip already validated nonidentity bytes without copying; its
+bounded quadratic comparison has no measured speed claim.
+
+Node construction keeps Claim disabled unless an explicit work profile is
+supplied. Applied-history audit prepares the actual original op3 body without
+executing current policy; committed suffix replay calls the actual Claim driver
+under the existing shared point/body and outer workspace accounts. Snapshot,
+strict reopen and protected purge retain the original response metadata.
+
+Tests-first missing-contract RED froze 31 selected identities in e080ef4. Later
+peer-found authority/order gaps received genuine assertion RED and narrow fixes.
+Two storage setup mistakes (old atomicV5 duplicate-ID refusal and unsorted policy
+wire) were corrected transparently before Claim; they are not product-bug RED.
+The complete macOS run passes 873 tests across 90 targets and six compile-fail
+examples across 15 documentation targets, strict checks, reference/progress,
+cached dependency policy and the separate pinned native compatibility executable.
+Actual process kills and pre-sync uncertainty are not power-loss/final-flush
+proof. Every required original setup/profile, complete public parent/governance,
+real policy publication/activation, accepted Raft callbacks/runtime/read barriers,
+both-host validation and full M1–M8 acceptance remain mandatory successors.

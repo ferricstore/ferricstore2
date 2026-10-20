@@ -84,6 +84,34 @@ pub fn encode_fifo_prefix(
         maximum_bytes,
     )
 }
+/// Emits the exact requested type's FIFO prefix for distinct-lane discovery.
+/// # Errors
+/// Rejects byte caps, checked length overflow or allocation failure.
+pub fn encode_fifo_type_prefix(
+    scope: &RequestScope,
+    workflow_type: &[u8],
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    let fields = scope_fields(scope);
+    encode_components(
+        4,
+        &[fields[0], fields[1], fields[2], workflow_type],
+        maximum_bytes,
+    )
+}
+/// Returns the lexical successor of the COMPLETE escaped lane prefix.
+/// # Errors
+/// Rejects caps, framing, arithmetic or allocation failure.
+pub fn encode_fifo_lane_upper_bound(
+    scope: &RequestScope,
+    lane: LaneKey<'_>,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    let mut upper = encode_fifo_prefix(scope, lane, maximum_bytes)?;
+    let last = upper.last_mut().ok_or(StateValueError::Malformed)?;
+    *last = last.checked_add(1).ok_or(StateValueError::LengthOverflow)?;
+    Ok(upper)
+}
 
 /// Emits running score, full u128 sequence and opaque member ID after the lane.
 /// # Errors
@@ -246,6 +274,86 @@ pub fn decode_fifo_key(
         length,
         maximum_decoded_bytes,
     )
+}
+
+/// Validates a complete FIFO member without presupposing its discovered lane.
+/// # Errors
+/// Rejects malformed/foreign keys and admits all four fields before ownership.
+pub fn decode_fifo_observation_key(
+    bytes: &[u8],
+    scope: &RequestScope,
+    maximum_bytes: usize,
+    maximum_decoded_bytes: usize,
+) -> Result<DecodedOrderedKey, StateValueError> {
+    let mut offset = header(bytes, 4, maximum_bytes, maximum_decoded_bytes)?;
+    let (namespace, _) = components::<3>(bytes, &mut offset)?;
+    let (lane, mut length) = components::<3>(bytes, &mut offset)?;
+    let rank = read_u8(bytes, &mut offset)?;
+    let sequence = read_u128(bytes, &mut offset)?;
+    let (id, n) = components::<1>(bytes, &mut offset)?;
+    finish(bytes, offset)?;
+    expected(bytes, &namespace, &scope_fields(scope))?;
+    if rank > 1 {
+        return Err(StateValueError::UnsupportedTag);
+    }
+    add(&mut length, n)?;
+    own(
+        4,
+        rank,
+        sequence,
+        bytes,
+        &[lane[0], lane[1], lane[2], id[0]],
+        length,
+        maximum_decoded_bytes,
+    )
+}
+
+/// Measures the exact decoded due-key owner without allocating any component.
+/// # Errors
+/// Validates full namespace/rank/framing before returning checked128+four leaves.
+pub fn due_key_owned_bytes(
+    bytes: &[u8],
+    scope: &RequestScope,
+    maximum_wire_bytes: usize,
+) -> Result<usize, StateValueError> {
+    let mut offset = header(bytes, 3, maximum_wire_bytes, usize::MAX)?;
+    let (namespace, _) = components::<3>(bytes, &mut offset)?;
+    let rank = read_u8(bytes, &mut offset)?;
+    let _due = read_u64(bytes, &mut offset)?;
+    let (_, length) = components::<4>(bytes, &mut offset)?;
+    finish(bytes, offset)?;
+    expected(bytes, &namespace, &scope_fields(scope))?;
+    if rank > 2 {
+        return Err(StateValueError::InvalidValue);
+    }
+    length
+        .checked_add(128)
+        .ok_or(StateValueError::LengthOverflow)
+}
+
+/// Measures the exact decoded discovery key before copying any lane/member bytes.
+/// # Errors
+/// Validates namespace/rank/scalars/EOF and checked owner arithmetic.
+pub fn fifo_observation_key_owned_bytes(
+    bytes: &[u8],
+    scope: &RequestScope,
+    maximum_wire_bytes: usize,
+) -> Result<usize, StateValueError> {
+    let mut offset = header(bytes, 4, maximum_wire_bytes, usize::MAX)?;
+    let (namespace, _) = components::<3>(bytes, &mut offset)?;
+    let (_, mut length) = components::<3>(bytes, &mut offset)?;
+    let rank = read_u8(bytes, &mut offset)?;
+    let _sequence = read_u128(bytes, &mut offset)?;
+    let (_, id) = components::<1>(bytes, &mut offset)?;
+    finish(bytes, offset)?;
+    expected(bytes, &namespace, &scope_fields(scope))?;
+    if rank > 1 {
+        return Err(StateValueError::UnsupportedTag);
+    }
+    add(&mut length, id)?;
+    length
+        .checked_add(128)
+        .ok_or(StateValueError::LengthOverflow)
 }
 
 /// Validates full history identity/score before copying only the original ID.

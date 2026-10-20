@@ -1,7 +1,6 @@
 //! Original receipts survive changed leaf controls and strict physical reopen.
 
 use super::{TestResult, fixtures as f};
-use std::collections::BTreeMap;
 use std::path::Path;
 use wf_domain::claim::apply::ClaimRejection;
 use wf_domain::history::EventKind;
@@ -242,7 +241,7 @@ fn strict_mutations(
                     wf_types::identity::TenantId::new(b"other".to_vec())?,
                     s.group().clone(),
                     s.recovery().clone(),
-                )
+                );
             }
             _ => bytes.push(0),
         }
@@ -340,10 +339,7 @@ fn claim_rejection_and_empty_acceptance_publish_only_outcome_control() -> TestRe
     Ok(())
 }
 
-fn retained_seed(
-    path: &Path,
-    s: &RequestScope,
-) -> TestResult<([BTreeMap<Vec<u8>, Vec<u8>>; 4], Box<RetainedOutcome>)> {
+fn retained_seed(path: &Path, s: &RequestScope) -> TestResult<(f::Cohort, Box<RetainedOutcome>)> {
     // Current job governance is coherent genesis, not a policy publication.
     drop(f::create(
         path,

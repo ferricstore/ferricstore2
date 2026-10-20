@@ -45259,3 +45259,146 @@ Raw stdout/stderr spans in /private/tmp/ferricstore2-m2-source-pin-validation.lo
 Root inspected all terminal outputs. Diagnostics are E0432 missing selected observed/ports/transaction/cursor contracts and E0599 missing selected actual cursor methods, recovery builder and Claim error variant. No malformed fixture syntax, missing old helper import, bad target name, dependency/network/setup failure or unrelated compiler diagnostic appears. These are genuine preimplementation missing-contract REDs, not behavioral assertion failures; no Claim assertion ran. Subsequent compilation may expose additional fixture issues and must distinguish them from product bugs without weakening the frozen oracles.
 
 Before the final replay/C corrections, all47 architecture checks passed at source1340 pin64f5a66b47e0d0bdad4fbc6999a365eb708426c1248dd37bcc2e017851dfd4f2, raw1758460+5023/SHA85a5d42f7fb29d2498809ef9640d2dd2e41153b13ce211d109834339700378ac. That earlier policy pass is not silently rebound to the later fixture bytes. Final frozen formatting above did rerun successfully. Actual host remains Darwin arm64; no Linux/full-suite/native gain/source parity is claimed.
+
+
+### ROOT-M1M2-DURABLE-CLAIM-LEAF1-SOURCE1 — explicit implementation release after actual RED
+
+The reviewed tests-only increment is committed as e080ef4. Root inspected the five terminal missing-contract Cargo101 outputs in RED1, with frozen1340 inputs unchanged and all12 production paths absent. Root now EXPLICITLY RELEASES implementation of ONLY the12 production paths/16struct-enum+3trait inventory and named existing seams selected by ARCH-M1M2-DURABLE-CLAIM-LEAF1-CREATE1 and the complete corrected DOMAIN contract3933094+51843/SHA804d532fd2467e96d1d0a3a17bac03397dec268ebb771bfa7fa599cc795d780f. No new file/type/module/model/alias/dependency/backend may be inferred; newly necessary artifacts still need a concrete architecture consultation before creation.
+
+Root write set: wf-ports/src/log/claim/{apply.rs,response.rs,response/scan.rs}; wf-ports/src/state/claim.rs; their named existing ports/log/state/consensus/header/facade seams; ONLY the response-version predicate in wf-domain/src/workflow/request/outcome.rs; existing wf-node recovery.rs, recovery/join.rs and recovery/replay.rs profile/error/audit/replay dispatch. Writer write set: wf-domain/src/claim/apply/observed.rs and actual existing domain selection/admission/indexed factoring; wf-storage/src/transaction/claim.rs, claim/load.rs, claim/observations.rs; wf-storage/src/state/redb/claim.rs, claim/due.rs, claim/lanes.rs, commit/claim.rs; named existing storage key/value/transaction/read/commit/strict-recovery/snapshot/facade seams. This is all12 new production paths, split4/8. Both authors explicitly agreed, with no shared-file conflict. Root alone owns Cargo/formatters/shared policy/Git; tests stay frozen absent a concrete diagnosed fixture issue. ARCH/PERF retain dedicated reciprocal source review and may finish finite tasks normally; no interruptions.
+
+The exact contract remains one real point gate before complete Fresh validation/current reads; sealed rejection uses no fake observed window; valid observed apply independently revalidates and pays g1+g2; query-scoped due<=now plus true FIFO heads/complete touched authority; prospective D/R/S/C/W/O and continuous operational steps; one consumed version/control/CAS/core/index/history/outcome/control publication; exact original replay response/time/log/expiry; Uncertain fences with no reply. FWCR1 stores full u64 attempts and binds every updated_at/token to original metadata time, while hard grammar versus legitimate narrower profile limits keep distinct origins. Current complete policy/schema backing stays real, and this first leaf explicitly refuses present governance without claiming public-parent/policy publication. Node audit and replay share the existing actual point/body budget and use an explicit ClaimWork option.
+
+Implementation is newly authorized, not passing or adopted into public runtime. Full public Claim/governance/complete-policy publication, accepted Raft/runtime/read barriers/services/queries/operations, every original setup/profile/assertion counterpart, measured native optimization and Linux AND macOS completion remain active goal requirements.
+
+
+### ROOT durable Claim source review regression controls
+
+First scoped source runs: pinned offline domain claim_apply22/22 and ports claim_phase_codec15/15 passed before peer corrections. This is component evidence only. ARCH/PERF found independently supplied Touched FIFO member could disagree with an unselected future head, and explicit empty lane could bypass reached placement. Root added controls under the existing observed_heads identity: healthy explicit empty positive, wrong Some member, missing placement, foreign placement. Existing frozen oracles remain; no new path/type/model/test identity. New test bytes 17666/LF521/SHA30a06284577a2c04152c29210dd54b6f80ede661e6d8a721161e947f3a67a3c5. Production corrections are held until this genuine behavior RED terminates.
+
+
+### ROOT-M1M2-DURABLE-CLAIM-LEAF1-SOURCE-PRECISION2 — exact key API and loader geometry
+
+Root actually read and hash-verified ARCH 2889633+2334/SHA606f69782fdb10541ea7a652001386702716d4402e4928a7a94254f78274d831 and 2895091+2595/SHAaac2dc2868694d1d9f9a07daebd8cd562cba9afbd78241aff11c1e7fab118205. Release the exact typed DecodedRequest::claim_state_key method in the existing Root log.rs seam, with prospective caller S and the existing FWSK encoder. Root has authored it plus an independent complete-key literal in the existing envelope test; this is supplemental integration coverage, not a separately claimed preimplementation RED.
+
+Release exactly one additional private source child to Writer: crates/wf-storage/src/transaction/claim/load/lanes.rs, registered by private mod lanes in load.rs. Move only existing load_lanes/load_head/verify_fifo method bodies, necessary imports/path spellings and pub(super) method visibility. No model, alias, dependency, wire, algorithm, owner or fee change is selected by this move. The new-production roster is now13 paths, still16 structs/enums plus3 traits. All other SOURCE1 ownership and full completion gates remain.
+
+Peer review produced three domain corrections. Root executed genuine assertion RED under the existing observed-head identity: wrong Some member, missing empty-lane placement and foreign placement all returned false, after a healthy explicit empty positive (1 test, exit101, raw SHA0186682af7d965b447acf933d7a4107a1920c07809f0eff288d4abf26634fa55). An earlier bare exact selector ran0 tests and is not evidence. Root separately executed the existing ports point-gate identity with Fresh token2+ZeroLease after unchanged replay/invalid-priority checks (1 test, exit101, raw SHA9086964f6fbecacdfffe275673c4c5b8bcaac161b1254bb84e30b3b6bfe1f16f). Writer applied exact member equality, borrowed reached placement/group, and early token/resume outer authority guard. One GroupId reference spelling failed compilation and was corrected; that compile failure is not behavioral RED.
+
+The subsequent broad domain/ports run kept all1011 scoped inputs unchanged (SHA6989ff6481b93b75f5a70f2dfab35771ca911cb55f02963fbba4031a753ab943). It passed50 complete targets/519 tests, including all22 domain Claim and15 ports Claim tests, then failed the old recovery_header target (1 pass/1 failure): its old unsupported op3 expectation contradicts the selected profile3 extension. Raw log1784439+55617/SHAce8f1a1dc4404257fd3c049e7d540d1465ef516cb3f235c63ffb24ee021abb11. Root moved that pair into the existing positive borrowed-header/body-independent loop, retained other unsupported roots, and added op3 intent5/6 invalid-version checks. This is an explicit selected-contract expectation update; no full green or parity credit is inferred. Strict Clippy then full scoped tests are currently running at1011-input SHA57cf749e151931ffa8f54c5af9e0dd433dfdb338c74c36d72187a35da2378380.
+
+ARCH/PERF clarified that each reached in-prefix raw candidate's escaped wire length is an additional selected logical C inspection tariff, distinct from its borrowed engine guard and separate owned decoded-buffer C/R. Writer added that debit before borrowed full-key measurement in the existing two cursors. This was a source-review correction; no separate behavioral RED or physical wire allocation is claimed. Root formatted the stable raw layer; ordered.rs was tightened to400 physical lines without changing code. Storage/node integration, full workspace, original source/setup/profile parity, measured performance and native Linux remain pending. The full goal remains active.
+
+
+### ROOT-M1M2-DURABLE-CLAIM-LEAF1-GREEN1 — actual complete macOS component validation
+
+The implemented13-path/16struct-enum+3trait production roster has actual reciprocal
+source/resource review. Root whole-read/hash-verified ARCH fullstorage6536,
+keymethod2719, keyAPI2334, loadergeometry2595 and testalias2185 receipts; PERF full
+17891-byte source/resource receipt; DOMAIN7457-byte implementation review and
+9129-byte final conservation receipt. The latter executes entire-file inverses
+against e080ef4 for six style-only files, and separate inverses of all named
+intentional setup/probe changes for the three other storage tests. No test oracle,
+fee, lint, dependency or source-size waiver was introduced.
+
+Before creation Root whole-read ARCH2923647+2185/SHAa33423755fbdaba2e6b6aba86c03559012e9f16a9a7d079cfac372eaa312d313.
+It approves ONLY the test Cohort alias in existing claim/fixtures.rs and the three
+fixtures/faults/replay return spellings; no production alias/owner/fee changes.
+Root applied this exact alias and removed replay's newly-unused import. Other
+strict fixes are equivalent documentation/Copy-Result/mapping/generator/match/
+semicolon spellings. Node EntryIdentity::log replaces exactly three closures;
+DOMAIN independently restored the complete original files by inverse.
+
+The first real storage run passed15 and failed2: same-ID cross-partition setup
+used the old atomicV5 duplicate-ID rejection, and a policy fixture supplied
+unsorted V2 state wire. Both fail before Claim. Actual singleton accepted seeds
+and canonical policy input order repair those setups, preserving full physical
+postimage/foreign-row/reopen/receipt oracles. Shared seed now requires Accepted,
+strengthening setup. They are not product-bug RED or weakened old semantics.
+The added C1304/1305 actual lane control independently prices557open+557seek+
+52wire inspection+139decodedC, R139 and3steps; the short path latches BudgetEnd
+without position and without further advancement. This is supplemental accounting
+coverage, not a separately claimed pre-fix RED or measured optimization.
+
+Focused actual execution passed storage17, recovery4 and snapshot3 with zero
+ignored tests. Raw spans1845587+1833/cc8ca642f5b2e71f7acf6adcabffeaf5081edab0f8ae5c4164720463e9dc222f,
+1847510+1361/e08a6acf5b3f918adf01973b77612f30ced8ece61254dcb2d32caacd5d89c499,
+1848970+637/f982f58018351feb6b15a66f0cbb671eaf61067b0cdc47821fbf8104f38a518a.
+All1336 repository inputs stayed96f9a7ec98a804c0bc11364cf2257523c42cedce157d7144dfd0b64fce08d901.
+
+After the named strict refinements, all1336 repository non-Markdown runtime,
+test, policy, script, CI and reference inputs stayed unchanged throughout EVERY
+final workspace command: canonical path+NUL+lowerSHAhex+LF fingerprint
+5f422241b6a4ec00e70724da5722e489e69ad344615cd4aaee704b66c69ff647.
+Rust1.99.0, locked/offline, build/rustdoc warnings denied. Exact stdout/stderr
+receipts are in /private/tmp/ferricstore2-m2-source-pin-validation.log:
+
+| Command | Actual exit | Offset+bytes | SHA256 |
+|---|---:|---:|---|
+| workspace fmt check |0|1863009+0|e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855|
+| workspace/all-target strict Clippy |0|1863096+163|3f4bff1487291a4962ba7f1f7bda8a9fcb86e3c42a495880744fe6de0796b2df|
+| workspace/all-target tests |0|1863329+92981|f102d958bf34b5135a9ee9441072ecf16ed1d8ad837913ca5ba71d1bf4f828c7|
+| workspace doc tests |0|1956372+2707|157bc080aa199b76b7d9a1582c295041c0bf60d03810f334d0f47593ee9fbbab|
+| workspace no-deps rustdoc |0|1959144+2161|dda2291fad31e9c6ae8d87ca933db77db482c44418fc5d5c23fe2ca0d9a5cfe2|
+| cargo arch |0|1961330+5023|3f528d7b0e33b7f87fc3e20c5f11139391e047264b3560e1c941b0cc4516c295|
+| cargo reference |0|1966383+365|ca4afb1bd4a5a63e9ccc322316d9c961fac85e506c11bcac9267c890070bef43|
+
+Actual totals are873 passed across90 target results; documentation has6 passed
+compile-fail examples across15 targets. Both have0failed/ignored/measured/filtered.
+Architecture additionally reports39+4+3+1, including exact facade/source/layer/
+size policies. Root independently hash-verified every raw span above. These are
+macOS Darwin arm64 results, not Linux evidence.
+
+The final progress command at1966777+165/SHAf133806b441337397862b7368931a3646d4255871251a1ada522243926389b73
+correctly failed because tests-only commit e080ef4 inserted mod observed; into
+claim_apply/main.rs without rebasing its existing three ledger records. Root and
+DOMAIN independently proved the ENTIRE e080ef4^ file differs only by that one
+line, all eleven mapped literal assertions remain unchanged at +1, and the
+complete ledger inverse restores every original value. Root changed ONLY three
+SHA fields and eleven rust_line values, preserving JSON formatting and all5858
+records/IDs/scenarios/limitations/source text/runtime/setup/count fields. Old
+ledger327b185bef236315a6dcdc45c6679e5044d11a785530ce22986c6add0015c6b2
+becomes2212648dc97863d878877cc9f15ebe6cdee12f9366d38a1ad967865834db8498.
+No new scenario or parity credit is claimed. All1336 repository inputs then stayed
+0584748c00264390a9325b8b99b84d919d38f7c4778833779afadf9948af3ef1
+throughout the separate final metadata/audit/native epoch.
+
+| Final command | Actual exit | Offset+bytes | SHA256 |
+|---|---:|---:|---|
+| cargo progress |0|1967021+559|bdd5a7d18890e513fe64dc5b670778edec70b2f0355fa23a5c1260256ecf303d|
+| require-parity (required incomplete scope) |1|1967710+453|2fc2435c1f8cf3f23c1922dbd40e61f96ee2d5fe2bd8c4ea08deba99956968d6|
+| cargo-deny offline/locked/workspace, deny unmatched-skip, advisories+bans+licenses+sources |0|1968341+48|f1a0fca39d4280363937aabd77783990ea6480bd9ca257816de3b68fc8efa845|
+| separate native fmt check |0|1968493+0|e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855|
+| separate native all-target check |0|1968621+574|75a4233694ef88c34dbbaa843d923a64aa2c09e2e655a5f0bca9556e9dbbcf1b|
+| separate native all-target strict Clippy |0|1969339+184|627349695afe01da7ac8c980eb0851f76be504919190f5e31b8f6e8ffd336b97|
+| separate native complete executable |0|1969635+659|e976f0d0302019facceea8b0d3e2629a19706a1dd9d54453bd5d3c27aeb5baf7|
+
+Native path is /private/tmp/ferricstore2-record-batch-redb-4.4.0-7061f7e-driver.
+All17 Cargo/source inputs are byte-identical to saved proof55bcbd85 and remained
+028ebfdcc7e0ae1fd152ebd657bd88d89ba978c3519454b531337ca7e33b05d5
+after EVERY command, alongside all1336 repository inputs. Native uses the actual
+current path-dependency products, pinned1.99.0, redb4.4.0/7061f7e/no-default/std.
+No native acceptance source was edited or materialized. The audit used installed
+cargo-deny0.20.2 and the cached database only; no refreshed online advisory or
+new exclusion is claimed. Root independently hash-verified all seven final spans.
+
+Progress remains85source-derived/95counterparts/384links,5903registered,
+4222linked,1681unmatched runtime and1655unresolved declarations. The actual full
+parity gate remains1 for incomplete mandatory scope. Every original setup,
+fixture/profile/assertion, real public parent/governance/identified owner, complete
+policy publication/activation, accepted Raft callback/paired-owner runtime/read
+barriers, services/queries/operations, offline recovery and separate Linux plus
+macOS/performance/M1–M8 evidence remain required. No power-loss/final-flush,
+full parity, Linux or measured CPU/RSS/speed claim follows from component GREEN.
+Root continues that full active goal. ARCH/PERF/writer now consult the next real
+policy activation route read-only; no future artifact/source release is inferred.
+
+
+GREEN1 closing prose has actual independent ARCH and PERF review: both whole-read
+the current selected physical Claim architecture/ADR007 sections and CONTINUE
+opening, confirmed gate/response/profile/ownership/logical/native limits and the
+873/90+6/15 macOS/current-native/cached-audit qualifications, and found no material
+accuracy/design issue. No new source artifact or future approval is inferred.
+Root will checkpoint only this reviewed implementation/tests/metadata/docs. The
+next completecorePatch/publication roster is being derived READ-ONLY by Writer
+with dedicated ARCH/PERF consultation; it is not selected or released yet.

@@ -18,7 +18,8 @@ use super::batch::{ApplyError, BatchItem, BatchPlan, BatchRejection, GroupView};
 mod authority;
 mod decision;
 mod independent;
-pub(crate) use decision::decide_selected_claims;
+pub(crate) use authority::IndexedAuthority;
+pub(crate) use decision::{decide_selected_claims, decide_selected_claims_touched};
 pub use independent::{
     IndependentIndexedDecision, IndependentIndexedPlan,
     decide_public_mutation_touched_indexed_batch, decide_touched_independent_indexed_batch,

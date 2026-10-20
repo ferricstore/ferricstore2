@@ -5,7 +5,7 @@ use crate::policy::definition::StateMode;
 use crate::workflow::admission::{AdmissionLimits, add, record_bytes};
 use crate::workflow::batch::{
     ApplyError, BatchAuthority, BatchDecision, BatchItem, BatchRejection, admitted_claim_bytes,
-    admitted_with, build_plan_with,
+    admitted_claim_with, admitted_with, build_plan_with,
 };
 use crate::workflow::{Operation, TransitionPlan};
 
@@ -191,6 +191,23 @@ pub(crate) fn decide_selected_claims<'view>(
             BatchAuthority::Full(view) => admitted_claim_bytes(view, items, encoded, limits),
             BatchAuthority::Touched(_) => Err(ApplyError::InvalidAuthority),
         },
+    )
+}
+
+pub(crate) fn decide_selected_claims_touched<'current>(
+    view: super::TouchedIndexedGroupView<'_, 'current>,
+    items: &[IndexedBatchItem<'_>],
+    order: EntryOrder,
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+) -> Result<IndexedDecision<'current>, ApplyError> {
+    decide_with(
+        IndexedAuthority::Touched(view),
+        items,
+        order,
+        encoded_entry,
+        limits,
+        admitted_claim_with,
     )
 }
 

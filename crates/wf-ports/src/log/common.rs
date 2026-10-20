@@ -22,6 +22,7 @@ pub fn normal_recovery_header(
         (1, 5) => 5,
         (1, 6) => 6,
         (4, 1) => 1,
+        (3, 1) => 3,
         _ => return Err(CodecError::UnsupportedTag),
     };
     Ok((
