@@ -3,12 +3,17 @@
 use super::{CommittedRecoveryError, CommittedRecoveryLimits, join};
 use wf_domain::workflow::control::{ControlState, EntryIdentity};
 use wf_ports::log::{RaftLogState, RaftLogStore};
-use wf_ports::snapshot::{SnapshotError, SnapshotLimits, StateSnapshotStore};
+use wf_ports::snapshot::{
+    SnapshotError, SnapshotLimits, StateSnapshotStore, StateSnapshotTransitionStore,
+};
 use wf_storage::{log::RedbLogStore, state::RedbStateStore};
 use wf_types::identity::{GroupId, RecoveryId};
 
+mod advance;
 mod provenance;
+mod received;
 mod replay;
+pub use received::{install_received_snapshot, restore_received_snapshot};
 
 /// Fixed failures; every error consumes both owners, preserving any durable prefix.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -97,7 +102,7 @@ fn anchor(
 }
 
 /// Proves the local snapshot against committed history, pins it, then purges.
-/// This fixed-pin predecessor cannot advance or replace an existing purge base.
+/// Legacy layout3 keeps its fixed pin; explicitly upgraded layout4 advances it.
 /// # Errors
 /// Consumes both owners on every profile, provenance or operational refusal.
 pub fn purge_snapshot(
@@ -109,6 +114,17 @@ pub fn purge_snapshot(
     snapshot_limits: SnapshotLimits,
 ) -> Result<(RedbLogStore, RedbStateStore), SnapshotRecoveryError> {
     let base = namespace(&log, &state, (group, recovery))?;
+    if state.supports_snapshot_transitions()? {
+        return advance::run(
+            log,
+            state,
+            (group, recovery),
+            limits,
+            snapshot_limits,
+            true,
+            base,
+        );
+    }
     let metadata = log.state().map_err(CommittedRecoveryError::Log)?;
     phase(limits, snapshot_limits, base)?;
     let snapshot = state
@@ -175,6 +191,17 @@ pub fn recover_snapshotted(
     snapshot_limits: SnapshotLimits,
 ) -> Result<(RedbLogStore, RedbStateStore), SnapshotRecoveryError> {
     let base = namespace(&log, &state, (group, recovery))?;
+    if state.supports_snapshot_transitions()? {
+        return advance::run(
+            log,
+            state,
+            (group, recovery),
+            limits,
+            snapshot_limits,
+            false,
+            base,
+        );
+    }
     let metadata = log.state().map_err(CommittedRecoveryError::Log)?;
     phase(limits, snapshot_limits, base)?;
     let Some(snapshot) = state.current_snapshot(&mut std::io::sink(), snapshot_limits)? else {

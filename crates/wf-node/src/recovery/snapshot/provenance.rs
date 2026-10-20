@@ -50,6 +50,54 @@ pub(super) fn boundary(
     Ok(())
 }
 
+pub(super) fn from(
+    log: &mut RedbLogStore,
+    namespace: (&GroupId, &RecoveryId),
+    limits: CommittedRecoveryLimits,
+    controls: [ControlState; 2],
+    memberships: &[Option<(EntryIdentity, EntryStamp)>; 3],
+    work: &mut [usize; 2],
+    context: (usize, Option<wf_types::version::LogIdentity>),
+) -> Result<(), Error> {
+    let [saved, current] = controls;
+    let saved_end = saved
+        .last_entry()
+        .map_or(0, |e| u128::from(e.log().index().get()) + 1);
+    let end = current
+        .last_entry()
+        .map_or(0, |e| u128::from(e.log().index().get()) + 1);
+    let start = context.1.map_or(0, |p| u128::from(p.index().get()) + 1);
+    let [seed, snapshot_member, current_member] = *memberships;
+    let mut latest = if context.1.is_some() { seed } else { None };
+    if start == saved_end && latest != snapshot_member {
+        return Err(Error::MembershipMismatch);
+    }
+    for position in start..end {
+        let entry = join::point(
+            log,
+            u64::try_from(position).map_err(|_| Error::Limit)?,
+            limits,
+            context.0,
+            work,
+        )?;
+        join::audit(
+            &entry,
+            namespace,
+            limits,
+            context.0,
+            if position < saved_end { saved } else { current },
+            &mut latest,
+        )?;
+        if position + 1 == saved_end && latest != snapshot_member {
+            return Err(Error::MembershipMismatch);
+        }
+    }
+    if latest != current_member {
+        return Err(Error::MembershipMismatch);
+    }
+    Ok(())
+}
+
 pub(super) fn audit(
     log: &mut RedbLogStore,
     namespace: (&GroupId, &RecoveryId),

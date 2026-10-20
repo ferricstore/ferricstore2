@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+mod advance;
 #[path = "../../../wf-storage/tests/state_store/faults/backend.rs"]
 mod disk_backend;
 mod faults;

@@ -4,6 +4,8 @@ use crate::state::StateTransactionError;
 
 mod metadata;
 pub use metadata::SnapshotMetadata;
+mod transition;
+pub use transition::{SnapshotTransition, StateSnapshotTransitionStore};
 
 /// Explicit data, cumulative work, caller-I/O and first-party owner ceilings.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -143,6 +145,10 @@ pub enum SnapshotError {
     StaleSnapshot,
     /// The sole artifact is pinned and cannot yet be replaced or cleared.
     SnapshotPinned,
+    /// A durable transition retains custody until its log acknowledgement.
+    TransitionPending,
+    /// A supplied transition or acknowledgement conflicts with durable facts.
+    TransitionConflict,
     /// Live installation would regress or conflict with applied membership.
     MembershipMismatch,
     /// A caller input failed.
@@ -168,6 +174,8 @@ impl std::fmt::Display for SnapshotError {
             Self::GenesisMismatch => "snapshot genesis mismatch",
             Self::StaleSnapshot => "stale snapshot",
             Self::SnapshotPinned => "snapshot pinned",
+            Self::TransitionPending => "snapshot transition pending",
+            Self::TransitionConflict => "snapshot transition conflict",
             Self::MembershipMismatch => "snapshot membership mismatch",
             Self::InputUnavailable => "snapshot input unavailable",
             Self::OutputUnavailable => "snapshot output unavailable",

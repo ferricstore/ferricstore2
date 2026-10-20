@@ -12,6 +12,7 @@ pub struct RedbStateStore {
     pub(super) group: GroupId,
     pub(super) recovery: RecoveryId,
     pub(super) limits: StateStoreLimits,
+    pub(super) layout: u16,
     fenced: Cell<bool>,
 }
 
@@ -52,6 +53,7 @@ impl RedbStateStore {
             group,
             recovery,
             limits,
+            layout: 3,
             fenced: Cell::new(false),
         }
     }
@@ -134,6 +136,7 @@ impl RedbStateStore {
             group,
             recovery,
             limits,
+            layout: 3,
             fenced: Cell::new(false),
         };
         bootstrap::initialize(&store, genesis, scratch)?;
@@ -150,14 +153,15 @@ impl RedbStateStore {
         limits: StateStoreLimits,
     ) -> Result<Self, StateTransactionError> {
         admission::workspace(&group, &recovery, limits, 0)?;
-        let store = Self {
+        let mut store = Self {
             database,
             group,
             recovery,
             limits,
+            layout: 3,
             fenced: Cell::new(false),
         };
-        recovery::validate(&store)?;
+        store.layout = recovery::validate(&store)?;
         Ok(store)
     }
     /// Fixed authoritative group; available even after a fatal error.

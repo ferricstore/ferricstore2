@@ -24,6 +24,16 @@ pub(super) fn source(error: SnapshotError) -> SnapshotError {
 }
 
 impl RedbSnapshotStage {
+    /// Fixed candidate namespace, without database work or authority credit.
+    #[must_use]
+    pub const fn group(&self) -> &GroupId {
+        &self.store.group
+    }
+    /// Fixed candidate recovery identity, without database work.
+    #[must_use]
+    pub const fn recovery(&self) -> &RecoveryId {
+        &self.store.recovery
+    }
     /// Consumes a genuinely empty database. Caller owns file/cache/dir durability.
     /// # Errors
     /// Refuses framing, resources, existing inventory or candidate storage errors.

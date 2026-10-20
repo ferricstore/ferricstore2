@@ -1,6 +1,6 @@
 # Workflow runtime architecture
 
-Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters, bounded committed startup recovery, complete indexed state snapshots and protected local purge with pinned-snapshot startup are implemented. Safe repeated snapshot advancement, received snapshots beyond the local log tail, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
+Status: reviewed architecture; M0 infrastructure, a partial pure M1 domain core, scoped synchronous durable-log/state adapters, bounded committed startup recovery, complete indexed state snapshots and repeatable protected snapshot advancement are implemented. Explicit state upgrade enables trusted received-snapshot composition beyond the local log tail. Accepted Raft callbacks, consensus, application and transport integration remain incomplete. This document owns module boundaries; implementation/review evidence and remaining gates live in the handoff and companion notes. Decisions that remain conditional must pass the implementation-plan gates.
 
 ## Purpose and scope
 
@@ -1237,3 +1237,35 @@ quality checks and the separate native Darwin executable.
 The state catalog/received coordinator and actual accepted Raft callback remain
 separate required work. The low-level capability requires their durable authority
 and custody; it supplies no service-readiness claim.
+
+
+### Repeatable snapshot custody and trusted received composition
+
+ARCH-M2-SNAPSHOT-ADVANCE1-CREATE1 extends the same state owner through a neutral
+transition capability. Create/receive retain the exact legacy four-table FWSS3
+default and fixed-pin behavior; strict open preserves persisted layout3 or4.
+A consuming explicit upgrade enables
+six-table FWSS4 LIVE authority; canonical immutable FWSP1 DATA still contains
+FWSS3 and retains its original bytes and ID. Two indexed slots keep current DATA
+and the actual log-anchored DATA through state intent, separate log publication,
+exact acknowledgement and retirement. A pending intent prevents replacement.
+An unanchored current slot is reused; an anchored replacement uses the other slot.
+
+Concrete node orchestration owns both handles. It validates the exact old P
+artifact and pin, requires current applied S>=P, binds complete control and ID at
+S=P, and preserves independent HLC/wall floors at S>P. One shared point/body pool
+proves S before later LIVE A and committed replay. PNone state-only pins grant
+retention; their proof still starts at index0. No independent checkpoint owner or
+consensus-to-storage dependency is added.
+
+Trusted received composition consumes a private Stage, validates actual available
+boundary provenance and publishes received LIVE/DATA/intent before switching the
+log and retiring old DATA. Fresh restore requires an actually unpurged log and
+moves Stage into the state owner. Mathematical transition inputs do not establish
+accepted consensus authority: the real Raft callback, paired-owner runtime,
+queued capture and offline restore/new-lineage operation remain required. Exact
+formats, resource ownership and error/recovery order are in
+[ADR-007](adr/007-durable-log-storage.md#selected-repeatable-snapshot-custody-and-received-composition).
+Focused storage49/node36 and strict checks pass on Darwin; the handoff records
+broader validation separately. These component results certify no full source
+parity, Linux execution or M2/M3 milestone exit.

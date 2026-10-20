@@ -22,8 +22,7 @@ mod expected;
 use expected::expected;
 
 mod backend;
-pub(super) use backend::{fault_database, parked};
-use backend::{signal_reader, terminate};
+pub(super) use backend::{fault_database, parked, signal_reader, terminate};
 
 pub(super) fn wrapped(path: &Path, fault: Arc<AtomicU8>) -> TestResult<RedbStateStore> {
     wrapped_with_cache(path, fault, 16 * fixtures::MIB)

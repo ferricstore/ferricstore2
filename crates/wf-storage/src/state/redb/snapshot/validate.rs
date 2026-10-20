@@ -1,7 +1,7 @@
 //! One shared semantic validator, explicit lineage and indexed historical data.
 
 use super::super::{membership, recovery, store::RedbStateTransaction};
-use super::{KEY, META, ROWS, SnapshotError, SnapshotLimits, admission, format, select};
+use super::{KEY, META, SnapshotError, SnapshotLimits, admission, format, select};
 use crate::state::value;
 use redb::ReadableTable;
 use wf_domain::policy::complete::PolicySchemaCharge;
@@ -45,8 +45,8 @@ pub(super) fn pin(tx: &RedbStateTransaction<'_>) -> Result<Option<[u8; 32]>, Err
     })
 }
 
-fn empty(tx: &RedbStateTransaction<'_>) -> Result<(), Error> {
-    for definition in [META, ROWS] {
+pub(super) fn empty(tx: &RedbStateTransaction<'_>) -> Result<(), Error> {
+    for definition in [tx.metadata_table, tx.rows_table] {
         tx.step()?;
         let table = tx
             .write
@@ -68,10 +68,18 @@ pub(in crate::state::redb) fn retained(
     tx: &mut RedbStateTransaction<'_>,
     charge: &mut PolicySchemaCharge,
     profile: SnapshotLimits,
+    layout: u16,
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
+    if layout == 4 {
+        let supported = tx.limits.snapshot_limits();
+        return super::catalog::retained(tx, charge, supported);
+    }
     let current = tx.control()?;
     let Some(expected) = marker(tx)? else {
-        empty(tx)?;
+        select(tx, true);
+        let result = empty(tx);
+        select(tx, false);
+        result?;
         return Ok(None);
     };
     select(tx, true);
@@ -111,7 +119,7 @@ fn retained_inner(
     .map_err(|_| Error::Corrupt)
 }
 
-fn get<'a>(
+pub(super) fn get<'a>(
     tx: &RedbStateTransaction<'_>,
     table: &'a impl ReadableTable<&'static [u8], &'static [u8]>,
     key: &[u8],
@@ -131,7 +139,7 @@ pub(super) fn values(
     manifests: (&[u8], &[u8]),
     members: (&[u8], &[u8]),
 ) -> Result<(), SnapshotError> {
-    if manifests.0 != manifests.1 {
+    if !format::same_genesis(manifests.0, manifests.1) {
         return Err(SnapshotError::GenesisMismatch);
     }
     let (old, new) = controls;
@@ -208,11 +216,13 @@ pub(super) fn complete(
     charge: &mut PolicySchemaCharge,
     profile: SnapshotLimits,
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
-    if recovery::inventory(tx)? != 4 {
-        return Err(Error::Corrupt);
-    }
-    if recovery::cohort(tx, charge)?.0 != 3 {
+    let tables = recovery::inventory(tx)?;
+    let layout = recovery::cohort(tx, charge)?.0;
+    if layout < 3 {
         return Err(Error::UnsupportedLayout);
     }
-    retained(tx, charge, profile)
+    if tables != if layout == 4 { 6 } else { 4 } {
+        return Err(Error::Corrupt);
+    }
+    retained(tx, charge, profile, layout)
 }

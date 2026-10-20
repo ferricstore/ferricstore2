@@ -6,6 +6,7 @@ use super::{TestResult, fixtures as f};
 use wf_ports::snapshot::{SnapshotError, SnapshotLimits, SnapshotMetadata, StateSnapshotStore};
 use wf_storage::snapshot::RedbSnapshotStage;
 
+mod advance;
 mod corruption;
 mod faults;
 mod fixtures;

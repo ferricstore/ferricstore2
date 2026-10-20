@@ -127,9 +127,71 @@ fn entries<W: std::io::Write>(
             push(tx, output, limits, hash, &k.to_be_bytes())?;
             push(tx, output, limits, hash, &v.to_be_bytes())?;
             push(tx, output, limits, hash, key.value())?;
-            push(tx, output, limits, hash, value.value())?;
+            let normalized = if !tx.snapshot_cohort
+                && key.value() == b"manifest"
+                && value.value().get(4..6) == Some([0, 4].as_slice())
+            {
+                Some(manifest(tx, value.value(), 3).map_err(SnapshotError::State)?)
+            } else {
+                None
+            };
+            push(
+                tx,
+                output,
+                limits,
+                hash,
+                normalized.as_deref().unwrap_or(value.value()),
+            )?;
         }
     }
+    Ok(())
+}
+
+pub(super) fn same_genesis(old: &[u8], new: &[u8]) -> bool {
+    old.len() == new.len()
+        && old.len() >= 38
+        && old[..4] == *b"FWSS"
+        && new[..4] == *b"FWSS"
+        && old[6..old.len() - 32] == new[6..new.len() - 32]
+}
+
+pub(super) fn manifest(
+    tx: &RedbStateTransaction<'_>,
+    bytes: &[u8],
+    version: u16,
+) -> Result<Vec<u8>, Error> {
+    if bytes.len() < 38 || &bytes[..4] != b"FWSS" {
+        return Err(Error::Corrupt);
+    }
+    tx.temporary(bytes.len())?;
+    let mut result = admission::copy_bytes(bytes)?;
+    result[4..6].copy_from_slice(&version.to_be_bytes());
+    let at = result.len() - 32;
+    let hash = Sha256::digest(&result[..at]);
+    result[at..].copy_from_slice(&hash);
+    Ok(result)
+}
+
+pub(super) fn set_manifest(tx: &RedbStateTransaction<'_>, version: u16) -> Result<(), Error> {
+    tx.step()?;
+    let mut table = tx
+        .write
+        .open_table(super::super::META)
+        .map_err(admission::table_error)?;
+    let bytes = {
+        tx.step()?;
+        let value = table
+            .get(b"manifest".as_slice())
+            .map_err(|e| admission::storage_error(&e))?
+            .ok_or(Error::Corrupt)?;
+        tx.recovery_row(b"manifest", value.value())?;
+        manifest(tx, value.value(), version)?
+    };
+    tx.step()?;
+    tx.recovery_row(b"manifest", &bytes)?;
+    table
+        .insert(b"manifest".as_slice(), bytes.as_slice())
+        .map_err(|e| admission::storage_error(&e))?;
     Ok(())
 }
 

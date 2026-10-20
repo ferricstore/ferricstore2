@@ -508,3 +508,98 @@ examples across 15 documentation targets, with workspace strict checks,
 warnings-denied rustdoc and native Darwin acceptance. These component results
 establish no received state authority, callback readiness, Linux or source-case
 parity. Safe repeated state/log advancement remains required.
+
+
+## Selected repeatable snapshot custody and received composition
+
+ARCH-M2-SNAPSHOT-ADVANCE1-CREATE1 and its recorded precision decisions extend the
+existing snapshot/log contract on the same exclusive owners. The new neutral
+StateSnapshotTransitionStore capability extends StateSnapshotStore and retains
+its Stage type. SnapshotTransition is a Copy mathematical precondition containing
+full prior RaftLogState, target LogIdentity, immutable DATA ID and local/received
+origin. Its checked constructors establish ordering, not consensus authority.
+The only private catalog model contains two optional scalar artifact facts,
+current/anchor selectors and an optional transition. No second backend, authority
+certificate, generic transaction layer or new dependency is introduced.
+
+Create and receive default to FWSS3/four tables with exact legacy DATA, fixed pin
+and budget behavior; strict open preserves the selected persisted layout.
+A consuming explicit upgrade validates that
+owner, creates only the two alternate frozen tables and atomically publishes LIVE
+FWSS4 plus the catalog. Strict open never manufactures or silently upgrades a
+layout. LIVE FWSS4 requires all six exact tables; frozen DATA stays FWSS3 and the
+FWSP1 wire/ID remains byte-identical. Manifest normalization changes only version
+and checksum and admits the actual output length before copying.
+
+The scope-bound FWSD3 catalog is 43..318 bytes with exact EOF. Its prefix is
+`FWSD 00 03`, then current/anchor selectors (0 absent,1 slot0,2 slot1). Each slot
+has tag0/1 and, when present, rows:u64, encoded_bytes:u64 and ID:32. Pending tag1
+adds origin0(local)/1(received), prior-metadata flags vote1/C2/tail4/P8, each
+present original field, target identity:24 and ID:32. Prior vote is17 bytes;
+C/tail/P identities are24 each and present P also carries its original32-byte ID.
+The final SHA-256 covers `wf-state-snapshot-catalog-v1`, u16-length-prefixed group
+and recovery bytes, and the full prefix. Unknown tags/flags/selectors, checksum or
+EOF disagreement, duplicate IDs and populated unreferenced slots are Corrupt.
+Every referenced slot must also pass complete canonical and semantic validation.
+
+Capture/install first reuse an existing identical target; an unrelated old anchor
+stays intact. Without an anchor, replacement reuses current (including slot1);
+with an anchor it uses the other slot. Every requested NEW DATA cap applies even
+to an exact pending retry or reused target. Unrelated OLD DATA and cleanup use
+captured supported bounds. Preparation persists intent while retaining both
+artifacts. Exact prior log metadata permits forward publication; exact acknowledged
+new metadata permits finish. Any other metadata relation refuses. Finish retires
+only non-target DATA and clears intent in one Immediate transaction after actual
+log acknowledgement. Restart handles both old-log and new-log windows; consumed
+failures release neither a service-ready owner nor a provisional acknowledgement.
+
+The local coordinator proves the exact retained original P artifact and actual
+pin. With PSome a present current candidate must be applied with S>=P; older or
+unapplied candidates are AnchorMismatch. Equal S=P requires complete ControlState
+and original artifact ID equality before any clock diagnosis. Higher S must
+preserve old P's independent HLC and wall floors, including when post-P bodies
+are Unstamped. It audits candidate S before later LIVE A using one cumulative
+point/body pool, then performs optional ordered committed replay. With PNone,
+an existing state-only pin grants retention only; the actual audit starts0.
+Absent required DATA remains MissingSnapshot. Unpurged unapplied local purge
+retains its earlier UnappliedSnapshot error.
+
+Trusted received installation checks caller and Stage namespaces, actual old
+metadata and LIVE<=old C, plus matching physical boundary identity/body/stamp when
+available. It atomically publishes received LIVE, canonical DATA and received
+intent, then uses the existing trusted log-boundary primitive and exact finish.
+Fresh restore requires actual PNone, moves Stage into state, explicitly upgrades,
+persists intent and switches the log; it does not heal a missing old P artifact.
+The caller still must bind original DATA to an actual accepted Raft decision.
+The accepted callback/runtime, queued capture barrier, strong reads, real peers
+and separate offline/new-lineage restore remain successors.
+
+The ready-first scalar capability performs no database work or allocation and
+preserves legacy B=3588 and W=1,054,214 for g/z. Mode4 adds fixed512 context,
+Bnext=4100. Typed Metadata reserves G+512+U; G=512+group_len+recovery_len and
+U(None)=1024, so R=2050 for g/z. Scalar upgrade/observe/prepare/finish support R1
+without materializing membership. Storage method W covers G+2048+configured R+
+operation C, plus a held Stage's actual G when applicable. Effective temporary C
+is min(operation C, actual active-target C), never the Stage's historical C.
+Method-local row/full-wire/step/C/schema accounts remain continuous across all
+validation, source/target copies and retirement; carried watermarks precede each
+side's resumed work. A single schema charge spans the method.
+
+Node outer exact W=Bnext+R+C is1,054,726 for g/z,R2050,C1MiB. Live receive owns
+log+state+Stage, adding G514 for exact1,055,240. Fresh restore moves Stage and owns
+two namespaces for exact1,054,726. Metadata drops before log points or another
+Metadata observation. At most six snapshot method phases use their own complete
+method budgets; fresh uses four. Point/body work is shared across all coordinator
+audit/replay substeps, including MAX/equal-boundary and tiny Normal-driver cases.
+These are logical admission bounds, not RSS, engine cache/COW/disk or speed claims.
+Consumed Database cleanup may sync/read after refusal. The resource test calibrates
+an actual Stage.metadata fault and requires the earlier outer Limit; a post-drop
+fault flag cannot prove absence of engine cleanup I/O.
+
+Thirty original selected tests received genuine missing-contract RED before the
+production release. Later real legacy, mirrored-slot and retained-P behavioral
+failures led to narrow repairs; post-fix pending-cap controls and the corrected
+cleanup witness keep their actual chronology. Focused storage49/node36, strict
+checks and separate native Darwin execution pass. Full workspace, both-host,
+source setup/profile parity, consensus/services and milestone exits require
+separate evidence in the handoff; these facts do not establish full completion.

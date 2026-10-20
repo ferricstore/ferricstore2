@@ -15,7 +15,7 @@ use wf_types::version::{CommittedTime, HlcTimestamp};
 mod index;
 mod rows;
 
-pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionError> {
+pub(super) fn validate(store: &RedbStateStore) -> Result<u16, StateTransactionError> {
     let mut tx = store.transaction(
         true,
         store.limits.admission(),
@@ -32,12 +32,16 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<(), StateTransactionErr
         }
         return Err(StateTransactionError::UnsupportedLayout);
     }
-    if tables != 4 {
+    if tables != if layout == 4 { 6 } else { 4 } {
         return Err(StateTransactionError::Corrupt);
     }
-    let _ =
-        super::snapshot::validate::retained(&mut tx, &mut charge, store.limits.snapshot_limits())?;
-    Ok(())
+    let _ = super::snapshot::validate::retained(
+        &mut tx,
+        &mut charge,
+        store.limits.snapshot_limits(),
+        layout,
+    )?;
+    Ok(layout)
 }
 
 pub(super) fn cohort(
@@ -79,7 +83,7 @@ pub(super) fn cohort(
     } else {
         None
     };
-    if layout == 3 && !tx.snapshot_cohort {
+    if layout >= 3 && !tx.snapshot_cohort {
         tx.step()?;
         let (key, bytes) = meta_rows
             .next()
@@ -88,6 +92,9 @@ pub(super) fn cohort(
             .ok_or(StateTransactionError::Corrupt)?;
         tx.recovery_row(key.value(), bytes.value())?;
         if key.value() != super::snapshot::KEY {
+            return Err(StateTransactionError::Corrupt);
+        }
+        if (layout == 4) != bytes.value().starts_with(b"FWSD\0\x03") {
             return Err(StateTransactionError::Corrupt);
         }
         super::snapshot::check_descriptor(tx, bytes.value())?;
@@ -131,6 +138,8 @@ pub(super) fn inventory(tx: &RedbStateTransaction<'_>) -> Result<usize, StateTra
             "wf_state_rows_v1" => 2,
             "wf_state_snapshot_meta_v1" => 4,
             "wf_state_snapshot_rows_v1" => 8,
+            "wf_state_snapshot_alt_meta_v1" => 16,
+            "wf_state_snapshot_alt_rows_v1" => 32,
             _ => return Err(StateTransactionError::Corrupt),
         };
         count += 1;
@@ -141,7 +150,7 @@ pub(super) fn inventory(tx: &RedbStateTransaction<'_>) -> Result<usize, StateTra
         .list_multimap_tables()
         .map_err(|e| storage_error(&e))?;
     tx.step()?;
-    if !matches!((count, mask), (2, 3) | (4, 15)) || multimaps.next().is_some() {
+    if !matches!((count, mask), (2, 3) | (4, 15) | (6, 63)) || multimaps.next().is_some() {
         return Err(StateTransactionError::Corrupt);
     }
     Ok(count)
@@ -157,7 +166,7 @@ fn check_manifest(
         return Err(StateTransactionError::Corrupt);
     }
     *layout = value::read_u16(bytes, &mut at).map_err(value_error)?;
-    if !matches!(*layout, 1..=3) {
+    if !matches!(*layout, 1..=4) {
         return Err(StateTransactionError::Corrupt);
     }
     let n = usize::from(value::read_u16(bytes, &mut at).map_err(value_error)?);

@@ -10,12 +10,15 @@ use wf_ports::state::StateTransactionError;
 use wf_types::identity::{GroupId, RecoveryId};
 
 mod capture;
+mod catalog;
 mod format;
 mod install;
 mod io;
 mod read;
 mod receive;
 mod stage;
+mod transition;
+mod upgrade;
 pub(super) mod validate;
 pub use stage::RedbSnapshotStage;
 
@@ -23,13 +26,21 @@ pub(super) const META: redb::TableDefinition<'static, &[u8], &[u8]> =
     redb::TableDefinition::new("wf_state_snapshot_meta_v1");
 pub(super) const ROWS: redb::TableDefinition<'static, &[u8], &[u8]> =
     redb::TableDefinition::new("wf_state_snapshot_rows_v1");
+pub(super) const ALT_META: redb::TableDefinition<'static, &[u8], &[u8]> =
+    redb::TableDefinition::new("wf_state_snapshot_alt_meta_v1");
+pub(super) const ALT_ROWS: redb::TableDefinition<'static, &[u8], &[u8]> =
+    redb::TableDefinition::new("wf_state_snapshot_alt_rows_v1");
 pub(super) const KEY: &[u8] = b"snapshot";
 
 pub(super) fn check_descriptor(
     tx: &RedbStateTransaction<'_>,
     bytes: &[u8],
 ) -> Result<(), StateTransactionError> {
-    format::decode_descriptor(tx, bytes).map(|_| ())
+    if bytes.starts_with(b"FWSD\0\x03") {
+        catalog::decode(tx, bytes).map(|_| ())
+    } else {
+        format::decode_descriptor(tx, bytes).map(|_| ())
+    }
 }
 
 pub(super) fn put_descriptor(
@@ -216,7 +227,13 @@ pub(super) fn copy(
         source
             .recovery_row(key.value(), value.value())
             .map_err(SnapshotError::Stage)?;
-        if from.name() == super::META.name() && to.name() == META.name() && key.value() == KEY {
+        if from.name() == super::META.name()
+            && matches!(
+                to.name(),
+                "wf_state_snapshot_meta_v1" | "wf_state_snapshot_alt_meta_v1"
+            )
+            && key.value() == KEY
+        {
             continue;
         }
         admission::engine_pair(key.value().len(), value.value().len())
@@ -226,8 +243,17 @@ pub(super) fn copy(
         target
             .recovery_row(key.value(), value.value())
             .map_err(SnapshotError::State)?;
+        let normalized = if key.value() == b"manifest" && to.name() != super::META.name() {
+            if value.value().get(4..6) == Some([0, 3].as_slice()) {
+                None
+            } else {
+                Some(format::manifest(target, value.value(), 3).map_err(SnapshotError::State)?)
+            }
+        } else {
+            None
+        };
         output
-            .insert(key.value(), value.value())
+            .insert(key.value(), normalized.as_deref().unwrap_or(value.value()))
             .map_err(|e| SnapshotError::State(admission::storage_error(&e)))?;
         source.carry_from(target);
     }

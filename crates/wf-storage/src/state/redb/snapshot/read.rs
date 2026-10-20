@@ -76,7 +76,17 @@ pub(super) fn current<W: std::io::Write>(
     else {
         return Ok(None);
     };
-    select(&mut tx, true);
+    if store.layout == 4 {
+        let catalog = super::catalog::load(&tx).map_err(SnapshotError::State)?;
+        super::catalog::select(
+            &mut tx,
+            catalog
+                .current
+                .ok_or(SnapshotError::State(Error::Corrupt))?,
+        );
+    } else {
+        select(&mut tx, true);
+    }
     let metadata = metadata(&tx, facts)?;
     if format::emit(&tx, Some(output), limits)? != facts {
         return Err(SnapshotError::State(Error::Corrupt));
@@ -92,6 +102,32 @@ pub(super) fn pin(
     let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::State)?;
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     let facts = validate::complete(&mut tx, &mut charge, limits).map_err(SnapshotError::State)?;
+    if store.layout == 4 {
+        let mut catalog = super::catalog::load(&tx).map_err(SnapshotError::State)?;
+        let pinned = catalog
+            .anchor
+            .and_then(|s| catalog.slots[usize::from(s)])
+            .map(|f| f.0);
+        if let Some(id) = expected {
+            if catalog.pending.is_some() {
+                return Err(SnapshotError::TransitionPending);
+            }
+            if pinned.is_some_and(|old| old != id) {
+                return Err(SnapshotError::SnapshotPinned);
+            }
+            let slot = catalog
+                .find(id)
+                .filter(|s| catalog.current == Some(*s))
+                .ok_or(SnapshotError::StaleSnapshot)?;
+            if pinned.is_none() {
+                catalog.anchor = Some(slot);
+                super::catalog::put(&tx, &catalog).map_err(SnapshotError::State)?;
+                super::commit(tx).map_err(SnapshotError::State)?;
+            }
+            return Ok(Some(id));
+        }
+        return Ok(pinned);
+    }
     let pinned = validate::pin(&tx).map_err(SnapshotError::State)?;
     if let Some(id) = expected {
         let facts = facts
@@ -104,4 +140,27 @@ pub(super) fn pin(
         return Ok(Some(id));
     }
     Ok(pinned)
+}
+
+pub(super) fn by_id<W: std::io::Write>(
+    store: &RedbStateStore,
+    id: [u8; 32],
+    output: &mut W,
+    limits: SnapshotLimits,
+) -> Result<Option<SnapshotMetadata>, SnapshotError> {
+    let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::State)?;
+    let mut charge = PolicySchemaCharge::new(store.limits.schema());
+    validate::complete(&mut tx, &mut charge, store.limits.snapshot_limits())
+        .map_err(SnapshotError::State)?;
+    let catalog = super::catalog::load(&tx).map_err(SnapshotError::State)?;
+    let Some(slot) = catalog.find(id) else {
+        return Ok(None);
+    };
+    super::catalog::select(&mut tx, slot);
+    let facts = catalog.slots[usize::from(slot)].ok_or(SnapshotError::State(Error::Corrupt))?;
+    let metadata = metadata(&tx, facts)?;
+    if format::emit(&tx, Some(output), limits)? != facts {
+        return Err(SnapshotError::State(Error::Corrupt));
+    }
+    Ok(Some(metadata))
 }

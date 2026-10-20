@@ -2,9 +2,9 @@
 
 The workspace contains M0 infrastructure, a partial pure M1 domain core and
 scoped synchronous durable-log/state adapters with source-derived tests.
-Protected local purge and pinned-snapshot startup are implemented. Safe repeated
-snapshot advancement, received snapshots beyond the local log tail, consensus,
-caches and live transports remain incomplete. Reference
+Repeatable protected snapshot advancement and trusted received-snapshot composition
+beyond the local log tail are implemented. Accepted Raft callbacks, the consensus
+runtime, caches and live transports remain incomplete. Reference
 integrity, registration and architecture checks do not establish full workflow
 parity or milestone completion. See the handoff for current results.
 

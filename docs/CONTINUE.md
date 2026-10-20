@@ -5,7 +5,9 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest completed increment adds the trusted received-log boundary. Matching
+The latest reviewed increment adds repeatable snapshot advancement and trusted
+received-snapshot composition over the durable state catalog. The preceding
+storage increment (`c1073db`) adds the trusted received-log boundary. Matching
 full local identities require the actual body digest and retain their suffix;
 conflicting or beyond-tail received boundaries replace the covered physical
 branch atomically with C/P/artifact metadata. Complete expected metadata CAS,
@@ -46,52 +48,83 @@ audited checker rule, with behavioral regression RED/GREEN and all 39 checker
 unit tests passing. See ARCH-M2-PROTECTED-PURGE1-CREATE1 and its precision decisions
 in the active record.
 
-The current macOS checkpoint passes **802 Rust tests across 90 targets** and
+The latest complete macOS checkpoint passes **842 Rust tests across 90 targets** and
 **six compile-fail examples across 15 documentation targets**, with zero failures
 or ignored tests. Formatting, all-target compilation, strict Clippy,
 warnings-denied rustdoc, architecture and reference/progress checks pass. The
 complete cached dependency audit passes advisories, bans, licenses and sources
 without new exclusions or waivers; no fresh online advisory refresh is claimed.
-All 1,311 selected runtime/policy/script/CI/reference and native inputs stayed
+All 1,326 selected runtime/policy/script/CI/reference and native inputs stayed
 unchanged throughout final validation.
 
 The separate pinned native acceptance executable also passes formatting,
 compilation, strict Clippy and its complete persistence/fault/process-kill run.
-Its 17 files, including 15 Rust sources, remain byte-exact to proof 55bcbd85.
+Its 17 selected inputs, including 15 Rust sources, stayed unchanged throughout
+the separate native run and the complete workspace validation.
 It exercises existing drivers; snapshot/purge-specific faults run in the workspace
 suite above. Both backends retain canonical redb 4.4.0/no-default/std-only.
 Actual execution is Darwin arm64. Separate native Linux validation remains required.
 No runtime framework, new dependency or consensus-to-storage edge was introduced.
 
-The executed full parity gate still fails. Ledger counts remain 82 source-derived
-declarations, 92 mappings and 365 assertion links; 1,681 runtime cases remain
+The executed full parity gate still fails. Current ledger counts are 85 source-derived
+declarations, 95 mappings and 384 assertion links; 1,681 runtime cases remain
 unmatched and 1,655 declarations unresolved. These component tests add no complete
 source-case parity credit. Every pinned Elixir setup, fixture, mandatory profile
 and runtime scenario remains required. The full goal stays active.
 
-Next: safe state/log anchor advancement, repeated capture/install/purge and trusted
-received-snapshot provenance beyond the local log tail. The current fixed pin
-refuses replacement and cannot be treated as product completion. Architecture
-has selected the exact next files, types, custody and resource contract; the state/node bodies remain held for their substantive tests and RED.
-Consult architecture before any additional file, type or module, then establish
-real failing tests before implementation. Queued runtime capture and offline
-restore/lineage remain mandatory. Finish consensus/read barriers, remaining domain
-and committed Claim/policy routes, services and complete M1–M8 acceptance,
-including both supported hosts.
+Three pure original policy cases now execute in the Rust retry-policy target;
+the first two are committed in `adb8d1d` and the third in `5547d0c`.
+All eleven tests and strict Clippy pass.
+They preserve both malformed-state recipes, the complete compact-policy canonical
+reply and independent FIFO/parallel/default modes through actual product views.
+The third uses explicit represented map correspondence and ordinary Rust set/any
+queries over the complete product-resolved map. The original Elixir
+command stopped before assertions because Mix could not open its local TCP
+socket (`:eperm`); this is a setup failure. These reviewed assertion mappings
+add no source-runtime, Linux or full-parity acceptance. Original setup and runtime
+profiles remain open.
+
+Next: complete durable Claim/policy routes and their replay/response support,
+then implement actual accepted Raft callbacks, paired-owner runtime and read
+barriers. Legacy
+layout3 keeps its fixed pin; explicitly upgraded layout4 supports repeated
+capture/install/purge and trusted received composition. Consult architecture
+before any additional file, type or module, then establish real failing tests
+before implementation. Queued runtime capture and offline restore/lineage remain
+mandatory. Finish remaining domain and committed Claim/policy routes, services and
+complete M1–M8 acceptance, including both supported hosts.
 
 The first native recheck selected system Rust 1.98 outside the repository. Only
 the remaining native checks were rerun with pinned Rust 1.99; all passed without
 product/oracle repair or repeated workspace execution.
 
-ARCH-M2-SNAPSHOT-ADVANCE1-CREATE1 separately selects the remaining seven production
+ARCH-M2-SNAPSHOT-ADVANCE1-CREATE1 selects the seven production
 files, two models, extension capability and nine test/helper files for the state
 catalog and node composition. Default FWSS3 stays exact; consuming explicit
 upgrade enables six-table FWSS4 while canonical FWSP1 bytes/IDs remain unchanged.
 Old and new artifacts coexist through durable intent, log acknowledgement and
 retirement. The ready-first scalar capability preserves old exact budgets before
-admitting the new path. The frozen regression is complete; substantive catalog/
-node tests come next. This remaining production is held until its own tests, RED
-and explicit release.
+admitting the new path. The original 30-case batch received reciprocal review and
+qualified missing-contract RED before Root released the seven production paths.
+Source review and execution have since exposed defects; the nine existing
+test/helper files now contain 37 substantive identities: 16 storage and 21 node.
+The added cases cover an unanchored alternate slot and retained old-checkpoint
+clock/control/artifact binding. The slot regression failed after a valid strict
+reopen, then passed after repair. The complete 49-test state-store target and
+strict storage Clippy now pass. The first node build's missing existing trait
+import was fixed before assertions. Six checkpoint regressions then exposed
+incorrect acceptance, received narrow repairs and now pass through both recovery
+and purge. Complete node regression now passes all 36 tests. A drop-only control
+disproved the earlier post-cleanup fault witness; the reviewed metadata-failure
+calibration now passes with the exact admission error and unchanged-state checks.
+Both storage and node pass strict all-target Clippy after equivalent source/test
+refinements. Complete workspace validation now passes 842 tests and six
+documentation examples, plus compilation, formatting, strict Clippy,
+warnings-denied rustdoc, architecture, reference/progress and the cached
+dependency audit. All 1,326 checked inputs remained unchanged. Separate native
+Darwin validation also passes. This accepts the selected component batch on
+macOS; native Linux, complete source parity and queued runtime acceptance remain
+open. The full parity command still exits 1 for the required incomplete scope.
 
 Earlier indexed-snapshot checkpoint (`9245995`):
 

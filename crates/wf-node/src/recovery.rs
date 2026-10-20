@@ -16,7 +16,10 @@ mod join;
 mod replay;
 mod snapshot;
 
-pub use snapshot::{SnapshotRecoveryError, purge_snapshot, recover_snapshotted};
+pub use snapshot::{
+    SnapshotRecoveryError, install_received_snapshot, purge_snapshot, recover_snapshotted,
+    restore_received_snapshot,
+};
 
 /// Explicit per-guard profiles and whole-call startup work/owner ceilings.
 /// No default semantic TTL or cluster apply profile is manufactured.

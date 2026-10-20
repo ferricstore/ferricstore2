@@ -5,6 +5,7 @@ use super::{
     RedbSnapshotStage, SnapshotError, SnapshotLimits, SnapshotMetadata, read, select, validate,
 };
 use wf_domain::policy::complete::PolicySchemaCharge;
+use wf_domain::workflow::control::EntryIdentity;
 use wf_ports::state::StateTransactionError;
 
 pub(super) fn install(
@@ -12,6 +13,10 @@ pub(super) fn install(
     stage: RedbSnapshotStage,
     limits: SnapshotLimits,
 ) -> Result<SnapshotMetadata, SnapshotError> {
+    if store.layout == 4 {
+        return advance(store, stage, limits, None)?
+            .ok_or(SnapshotError::State(StateTransactionError::Corrupt));
+    }
     let source_store = stage.store;
     if store.group != source_store.group || store.recovery != source_store.recovery {
         return Err(SnapshotError::NamespaceMismatch);
@@ -61,6 +66,91 @@ pub(super) fn install(
     }
     select(&mut target, true);
     let metadata = read::metadata(&target, facts)?;
+    super::commit(target).map_err(SnapshotError::State)?;
+    Ok(metadata)
+}
+
+pub(super) fn advance(
+    store: &RedbStateStore,
+    stage: RedbSnapshotStage,
+    limits: SnapshotLimits,
+    transition: Option<wf_ports::snapshot::SnapshotTransition>,
+) -> Result<Option<SnapshotMetadata>, SnapshotError> {
+    let source_store = stage.store;
+    if store.group != source_store.group || store.recovery != source_store.recovery {
+        return Err(SnapshotError::NamespaceMismatch);
+    }
+    source_store.ready().map_err(SnapshotError::Stage)?;
+    let mut target =
+        super::transaction(store, limits, store.limits).map_err(SnapshotError::State)?;
+    let mut charge = PolicySchemaCharge::new(store.limits.schema());
+    validate::complete(&mut target, &mut charge, store.limits.snapshot_limits())
+        .map_err(SnapshotError::State)?;
+    let mut catalog = super::catalog::load(&target).map_err(SnapshotError::State)?;
+    if catalog.pending.is_some() && catalog.pending != transition {
+        return Err(SnapshotError::TransitionPending);
+    }
+    if let Some(t) = transition {
+        if !t.is_received() {
+            return Err(SnapshotError::TransitionConflict);
+        }
+        super::transition::prior(&mut target, &catalog, t)?;
+    }
+    let mut source =
+        super::transaction(&source_store, limits, store.limits).map_err(SnapshotError::Stage)?;
+    source.carry_from(&target);
+    let facts = validate::complete(&mut source, &mut charge, limits)
+        .map_err(SnapshotError::Stage)?
+        .ok_or(SnapshotError::Stage(StateTransactionError::Corrupt))?;
+    if let Some(t) = transition {
+        use wf_ports::state::GroupApplyTransaction;
+        if facts.0 != *t.id()
+            || source
+                .control()
+                .map_err(SnapshotError::Stage)?
+                .last_entry()
+                .map(EntryIdentity::log)
+                != Some(t.position())
+        {
+            return Err(SnapshotError::TransitionConflict);
+        }
+    }
+    if catalog.pending.is_some() {
+        return Ok(None);
+    }
+    target.carry_from(&source);
+    validate::compatible(&source, &target)?;
+    target.carry_from(&source);
+    let existing = catalog.find(facts.0);
+    let slot = existing.unwrap_or_else(|| catalog.destination());
+    for table in [super::super::META, super::super::ROWS] {
+        super::retire(&target, table).map_err(SnapshotError::State)?;
+    }
+    super::copy(&source, &target, super::super::META, super::super::META)?;
+    super::copy(&source, &target, super::super::ROWS, super::super::ROWS)?;
+    super::format::set_manifest(&target, 4).map_err(SnapshotError::State)?;
+    if existing.is_none() {
+        super::catalog::retire(&target, slot).map_err(SnapshotError::State)?;
+        let [meta, rows] = super::catalog::tables(slot);
+        super::copy(&source, &target, super::META, meta)?;
+        super::copy(&source, &target, super::ROWS, rows)?;
+    }
+    catalog.current = Some(slot);
+    catalog.slots[usize::from(slot)] = Some(facts);
+    catalog.pending = transition;
+    super::catalog::put(&target, &catalog).map_err(SnapshotError::State)?;
+    if validate::complete(&mut target, &mut charge, store.limits.snapshot_limits())
+        .map_err(SnapshotError::State)?
+        != Some(facts)
+    {
+        return Err(SnapshotError::State(StateTransactionError::Corrupt));
+    }
+    let metadata = if transition.is_none() {
+        super::catalog::select(&mut target, slot);
+        Some(read::metadata(&target, facts)?)
+    } else {
+        None
+    };
     super::commit(target).map_err(SnapshotError::State)?;
     Ok(metadata)
 }
