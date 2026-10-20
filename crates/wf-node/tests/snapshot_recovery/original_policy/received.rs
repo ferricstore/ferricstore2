@@ -29,7 +29,7 @@ use wf_storage::transaction::{
     OriginalPolicyTransactionError, apply_original_policy_set_transaction,
 };
 
-fn stage(dir: &Path, wire: &[u8]) -> TestResult<RedbSnapshotStage> {
+pub(super) fn stage(dir: &Path, wire: &[u8]) -> TestResult<RedbSnapshotStage> {
     let scope = f::scope()?;
     let path = dir.join("candidate.redb");
     // A failed consuming composition has dropped its private candidate owner.
@@ -46,7 +46,7 @@ fn stage(dir: &Path, wire: &[u8]) -> TestResult<RedbSnapshotStage> {
     )?)
 }
 
-fn target(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore, Vec<u8>, u64)> {
+pub(super) fn target(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore, Vec<u8>, u64)> {
     let (log, state, old, position) = legacy_base(dir, false)?;
     let mut state = state.upgrade_snapshot_layout(SnapshotLimits::default())?;
     // Upgrade the live receiver capability while retaining its exact old DATA.
@@ -58,7 +58,7 @@ fn target(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore, Vec<u8>, u64)
     Ok((log, state, old, position))
 }
 
-fn fault_log(dir: &Path, fault: Arc<AtomicU8>) -> TestResult<RedbLogStore> {
+pub(super) fn fault_log(dir: &Path, fault: Arc<AtomicU8>) -> TestResult<RedbLogStore> {
     let scope = f::scope()?;
     Ok(RedbLogStore::open_database(
         disk_backend::fault_database(&dir.join("log.redb"), fault, 0)?,
@@ -78,7 +78,7 @@ fn identity(out: &mut Vec<u8>, position: wf_types::version::LogIdentity) {
     }
 }
 
-fn descriptor(
+pub(super) fn descriptor(
     slots: [Option<([u8; 32], usize, usize)>; 2],
     current: u8,
     anchor: u8,

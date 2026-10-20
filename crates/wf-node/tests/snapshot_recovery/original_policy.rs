@@ -30,6 +30,7 @@ use wf_storage::transaction::{
 };
 use wf_types::identity::RequestId;
 
+mod interop;
 mod received;
 
 type Cohort = [Option<f::Rows>; 6];

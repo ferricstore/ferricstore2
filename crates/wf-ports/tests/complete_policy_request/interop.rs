@@ -17,6 +17,48 @@ use wf_ports::log::{
 use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, LogIdentity, TimestampMillis};
 
+mod fresh;
+mod retained;
+
+fn stamp(now: u64) -> TestResult<wf_types::version::CommittedTime> {
+    Ok(wf_types::version::CommittedTime::new(
+        wf_types::version::HlcTimestamp::new(now, 0)?,
+        now,
+    )?)
+}
+
+fn log(index: u64) -> LogIdentity {
+    LogIdentity::new(1, 7, AppliedPosition::new(index))
+}
+
+fn frame(
+    now: u64,
+    expected: Option<u64>,
+    patch: wf_domain::policy::definition::PolicyPatch,
+) -> TestResult<Vec<u8>> {
+    use wf_domain::policy::complete::{
+        CompleteCorePolicyPatchInput, CompleteCorePolicyPatchRequestInput,
+    };
+    let schema = profile(100_000_000)?;
+    Ok(wf_ports::log::prepare_complete_core_policy_patch_frame(
+        CompleteCorePolicyPatchRequestInput::new(
+            metadata(RetainedStatus::Accepted)?.scope,
+            RequestId::new(b"q".to_vec())?,
+            stamp(now)?,
+            CompleteCorePolicyPatchInput {
+                workflow_type: b"r".to_vec(),
+                expected_generation: expected,
+                patch,
+            },
+        ),
+        schema,
+        AdmissionLimits::default(),
+        &mut PolicySchemaCharge::new(schema),
+    )?
+    .as_bytes()
+    .to_vec())
+}
+
 // Independent ETF envelope: gen1, type r, customer integer 2^128+1.
 const BIG_VERSION: &[u8] = b"\x83\x68\x03\x77\x0eflow_policy_v1\x61\x01\
     \x74\0\0\0\x02\x77\x04type\x6d\0\0\0\x01r\

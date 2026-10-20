@@ -47001,3 +47001,119 @@ No checks were suppressed. Storage S1/S2 were independently reviewed with their
 coherent corrected RED; Root returned those buffers to Writer for remaining
 cases. Unregistered fault/snapshot work is excluded from scoped executed-input
 pins. Production stays unchanged from b861d3d throughout this tests-first work.
+
+
+### ROOT-B1-TEST-PRECISION2-RELEASE — exact cohesive test children
+
+Root whole/hash-read ARCH3371859+6814/cb55c9c0 (actual P2/P3 and finite raw stages),
+ARCH3378673+3167/391edf33 (creation/visibility decision), and PERF2626105+9495/8a107e33
+(actual S1/S2 closure and independent final raw ledger). Record and release ONLY
+these approved test changes before either new child is created:
+
+- Root creates domain complete_policy/interop/accounting.rs for D4 helpers,
+  moving prime/assert_frontier unchanged and adding exact raw controls. D4's
+  existing named test remains at its same parent identity. No converter oracle
+  is removed; a mechanical whole-source inverse must conserve them.
+- Writer creates storage state_store/original_policy/interop/authority.rs for
+  the already selected S3 and its exclusive helpers. The existing parent adds
+  one private mod and reuses its actual fixtures.
+- Writer may change ONLY existing activation::{blocked_claim,complete_running,
+  claim_first} to pub(super), preserving bodies/signatures/assertions for S4.
+
+Thirteen approved test/helper paths, fifteen IDs and six production paths; no
+new model/type/alias/API/dependency/probe. Production remains held. Exact raw
+sizer93796 returns conservative84/J14368, kernel115053 produces actual76/K588
+with retained Index1024; they are distinct from physical decoder X/R/S/C fees.
+All actual raw cut literals are derived independently before code. The additional
+Core migration-seal question remains an investigated reachable-case duty, with no
+product refinement released until an actual public-builder regression proves it.
+
+
+### ROOT-B1-TEST-PRECISION3-RELEASE — isolated supported custody matrix
+
+Root whole/hash-read ARCH3387221+1748/38a99c7b before creation. Release exactly
+node snapshot_recovery/original_policy/interop/pending.rs for the existing N2
+eight-case matrix, Core/Original times Replay/Conflict/Expired/Fresh-stale, each
+real independent pending receiver. Existing interop.rs removes its single-case
+helper, adds private mod pending and calls the matrix FIRST under the same N2
+identity. All original446LF mixed-receive assertions remain. Fourteen test/helper
+paths, six production paths and fifteen IDs; no new nominal/alias/API/dependency/
+probe. This is tests-only, no source release.
+
+The preceding single supported Core-r response1 helper genuinely reproduced
+durable control3 publication while received transition2 remained pending, with
+original receipt1/time11/expiry1011. Raw3177778+2741/4d63af29 at506 unchanged inputs
+2f1275b7 is an actual existing-product bug RED; strict3180669+163/bfc866e7 passes.
+It does not require missing ETF2/2. The expanded matrix must preserve full pending
+cohorts/logs and aggregate all eight observations before asserting, so a first
+wrong ACK does not hide later branches. A separately frozen/reviewed regression
+precedes the narrowly selected no-business custody repair; full B1 stays held.
+
+
+### ROOT-B1-TEST-PRECISION4-RELEASE — expanded storage helper geometry
+
+Root whole/hash-read ARCH3388969+3937/cfa9d813 before creation. Record/release
+Writer's exact private storage original_policy/interop/wire/expanded.rs, moving
+ONLY existing expanded caps/store_limits/open/expanded/reducing_merge bodies and
+exclusive imports; old wire.rs adds private mod plus same-signature delegate.
+Root's stdin-only rustfmt census at wire461d3bcb yielded660 physical lines, so
+this responsibility split is necessary. Fifteen test/helper paths, fifteen
+IDs, six production paths; no new model/alias/API/dependency/probe or source.
+The detailed raw D4 actual review in the same note is accepted separately: Root
+whole inverse of moved helper/mod/call restores3b70e763, with every old converter
+assertion preserved. All actual raw controls remain compile-RED at missing APIs,
+not executed credit. Full B1 production remains held.
+
+
+### ROOT-B1-REVIEWED-TESTS-FREEZE2 — domain, ports and received custody
+
+Root accepts the reviewed D1–D4 final parent511LF/5d94ebece, accounting163LF/a810a412,
+fixture533LF/ba8c8148 and main1807e16b. Actual final missing-only compile RED is
+raw3175326+2297/24d51ca6 at292 unchanged inputs9949d1bc: five selected missing
+APIs/carrier, zero executed assertions. Root whole/hash-read ARCH3937/cfa9d813
+and PERF4224/883588e7 final reviews. Own entire helper reinline restores3b70e763.
+All old converter and D1–D3 assertions remain, D4 identity stays in its parent.
+
+Root accepts reviewed P2/P3: parent292LF/5c544398, fresh332LF/c5f9152a,
+retained351LF/ddb45d86. Actual final missing-carrier-only RED3162279+8550/283275f0
+at354 unchanged inputsb0326bee is exactly ten selected old Complete/Stored type
+mismatches, no assertions. The temporary Raw-array lifetime setup issue was
+fixed before that run. Root whole/hash-read ARCH6814/cb55c9c0 and PERF4410/9ac56e77;
+both own whole parent inverses restore frozen P1 91dd6b2e byte-exactly.
+
+Root accepts reviewed N2 original mixed scenario plus its supported eight-case
+prelude. Parent449LF/7e579679 and pending187LF/f85f4ea5 preserve all old446LF
+mixed assertions via whole inverse6da5d1c5. The single-helper source review and
+corrected eager-observation delta are independently read by ARCH/PERF. ARCH
+found the first matrix short-circuited log reads after false cohort equality;
+Root now eagerly measures cohort and logs separately and aggregates all eight.
+The final genuine behavioral RED3183978+1405/579ed299 at507 unchanged inputs
+b10111fd shows ALL8 same_cohort=false,same_logs=true,InvalidChanges=false.
+Strict target passes3185530+163/eaad6c35 at the same pin. This is an actual
+existing-format publication defect, distinct from the later missing ETF source.
+The earlier short-circuit matrix claims only eight mutations/refusal failures.
+Root whole/hash-read ARCH5381/3782b82f, source-selection6582/50310c52 and PERF
+4905/acebc909 +3868/cfe9182c; final eager delta review is separately explicit.
+No later mixed snapshot or B1 assertion execution is inferred.
+
+Root's exact-file pinned rustfmt --check and Git whitespace checks pass for
+these held tests. Production is still byte-unchanged from b861d3d before this
+regression checkpoint. Writer's storage files/activation edits remain disjoint
+WIP and are excluded from this commit; no full-suite, parity or Linux claim.
+
+### ROOT-B1-TEST-PRECISION5-RELEASE — consumed prefix responsibility
+
+Root whole/hash-read ARCH3392906+6582/50310c52 before creation. Release Writer's
+exact storage interop/faults/consumed.rs for selected S5's three named consumed
+prefix helpers, parent private mod and same-S5 call. Existing initialized actual
+fixtures stay; no model/alias/API/probe or new identity. Sixteen test/helper
+paths, six B1 production paths and fifteen IDs. Numeric S5 C/R/End/g still awaits
+independent actual-source agreement; geometry approval supplies none. This is
+tests-only; the isolated custody repair is separately selected and releases only
+after this corrected regression commit. Full B1 production remains held.
+
+Final eager-matrix review is now closed: Root whole/hash-read ARCH3399488+1534/
+b2fbfa74 and PERF2653007+3950/7737d1ab. Both independently read final1405/579ed299
+and strict163/eaad6c35, preserve the old mixed source by own entire inverses,
+and confirm all8 actual cohort mutations with eagerly observed unchanged logs.
+The corrected regression may be frozen; no further readiness round is required.

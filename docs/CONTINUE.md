@@ -59,6 +59,14 @@ declarations, 95 mappings and 384 assertion links; this increment adds no parity
 credit, and the full parity gate still fails. The active full-completion goal
 continues beyond this component. The preceding production checkpoint is cb68b87.
 
+An earlier supported-format N2 prelude exposes a separate existing custody bug:
+Core/original replay, conflict, expiry and Fresh stale rejection all publish
+while received DATA still awaits log acknowledgment. All eight actual cases
+change the complete durable state cohort while log rows/metadata stay unchanged.
+The corrected aggregate regression and strict target lint are recorded before
+repair. A narrowly selected fix in three existing storage files will guard
+no-business publication; the full interoperability source batch remains held.
+
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper
 paths; thirteen private production children stay under the existing feature
