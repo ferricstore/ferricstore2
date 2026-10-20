@@ -212,9 +212,6 @@ fn apply_fresh(
         return Err(StateError::UnsupportedPolicyProfile.into());
     }
     let current = tx.original_policy_current(scope.tenant(), &query, limits.schema, charge)?;
-    if current.as_ref().is_some_and(|raw| raw.starts_with(b"FWPV")) {
-        return Err(StateError::UnsupportedPolicyFormat.into());
-    }
     let plan = decide_original_policy_set_point_fresh_bounded(
         fresh,
         OriginalPolicySetFreshView {

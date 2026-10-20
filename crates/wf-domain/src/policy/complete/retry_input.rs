@@ -1,6 +1,9 @@
 //! Bounded original retry input normalization and final target ownership.
 
+use super::original_entry::indexed::OriginalPolicyCurrentIndex as Index;
+use crate::policy::installation::PolicyError;
 use crate::policy::{Backoff, RetryOverride, RetryPolicy};
+use crate::value::{DomainError, RetryPolicyField};
 
 use super::admission::charge_schema;
 use super::{
@@ -309,4 +312,44 @@ fn copy_target(bytes: &[u8], charge: &mut PolicySchemaCharge) -> Result<Vec<u8>,
         .map_err(|_| Error::AllocationFailure)?;
     owned.extend_from_slice(bytes);
     Ok(owned)
+}
+
+pub(in crate::policy::complete) fn number(
+    index: &Index<'_, 'static>,
+    position: u32,
+    maximum: u64,
+    field: RetryPolicyField,
+) -> Result<u64, Error> {
+    index
+        .raw_cursor(position)
+        .integer()
+        .and_then(|n| u64::try_from(n).ok())
+        .filter(|&n| n <= maximum)
+        .ok_or_else(|| invalid(field))
+}
+pub(in crate::policy::complete) fn invalid(field: RetryPolicyField) -> Error {
+    domain(DomainError::InvalidRetryPolicy(field))
+}
+pub(in crate::policy::complete) fn domain(error: DomainError) -> Error {
+    Error::Schema(PolicySchemaError::Policy(PolicyError::Domain(error)))
+}
+
+pub(in crate::policy::complete) fn raw_backoff_kind(
+    index: &Index<'_, 'static>,
+    position: u32,
+    charge: &mut PolicySchemaCharge,
+) -> Result<crate::policy::BackoffKind, Error> {
+    use crate::policy::BackoffKind;
+    let cursor = index.raw_cursor(position);
+    if cursor.binary_bytes().is_some() {
+        return value::kind(Some(Cursor::Current(cursor)), charge)?
+            .map_err(|_| invalid(RetryPolicyField::BaseMillis));
+    }
+    match cursor.atom_bytes() {
+        Some(b"none") => Ok(BackoffKind::None),
+        Some(b"fixed") => Ok(BackoffKind::Fixed),
+        Some(b"linear") => Ok(BackoffKind::Linear),
+        Some(b"exponential") => Ok(BackoffKind::Exponential),
+        _ => Err(invalid(RetryPolicyField::BaseMillis)),
+    }
 }

@@ -109,7 +109,8 @@ impl RedbStateTransaction<'_> {
         self.recovery_row(&key, guard.value())?;
         let maximum = self.outcome_wire_limit(tenant, request)?;
         let validation =
-            value::outcome_policy_validation_bytes(guard.value(), maximum).map_err(value_error)?;
+            value::outcome_policy_validation_bytes_in_layout(guard.value(), maximum, self.layout)
+                .map_err(value_error)?;
         self.admit_read(validation)?;
         let scanned = value::scan_outcome_profiled(
             guard.value(),

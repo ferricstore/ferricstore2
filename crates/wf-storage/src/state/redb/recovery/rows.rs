@@ -27,7 +27,7 @@ pub(super) fn validate(
             let owner = record(tx, key, bytes)?;
             index::canonical(tx, table, &owner, charge, layout)?;
         }
-        2 => outcome(tx, key, bytes, charge)?,
+        2 => outcome(tx, key, bytes, charge, layout)?,
         3 | 4 => index::reverse(tx, table, key, bytes, charge, layout)?,
         5 => history(tx, key, bytes)?,
         6 => {
@@ -77,13 +77,15 @@ fn outcome(
     key: &DecodedStateKey,
     bytes: &[u8],
     charge: &mut PolicySchemaCharge,
+    layout: u16,
 ) -> Result<(), StateTransactionError> {
     let scope = tx.scope_bytes(key.part(2))?;
     tx.temporary(key.part(3).len())?;
     let request =
         RequestId::new(copy_bytes(key.part(3))?).map_err(|_| StateTransactionError::Corrupt)?;
     let maximum = tx.outcome_wire_limit(scope.tenant(), &request)?;
-    let validation = value::outcome_policy_validation_bytes(bytes, maximum).map_err(value_error)?;
+    let validation = value::outcome_policy_validation_bytes_in_layout(bytes, maximum, layout)
+        .map_err(value_error)?;
     tx.temporary(validation)?;
     let scanned = value::scan_outcome_profiled(
         bytes,

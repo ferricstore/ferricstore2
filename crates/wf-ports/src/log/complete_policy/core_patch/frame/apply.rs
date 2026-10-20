@@ -3,8 +3,8 @@
 use sha2::{Digest, Sha256};
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,
-    CompleteCorePolicyPatchFresh, CompletePolicyValue, PolicySchemaCharge, PolicySchemaError,
-    PolicySchemaLimits, prepare_complete_core_policy_patch_fresh_with_query,
+    CompleteCorePolicyPatchFresh, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
+    StoredPolicyValue, prepare_complete_core_policy_patch_fresh_with_query,
 };
 use wf_domain::policy::installation::MAX_ENCODED_POLICY_BYTES;
 use wf_domain::workflow::admission::AdmissionLimits;
@@ -34,9 +34,10 @@ pub struct CompleteCorePolicyPatchRequestPlan<'view> {
     base_control: ControlState,
     control: ControlPlan,
     decision: DispatchDecision<'view, CompleteCorePolicyPatchFresh>,
-    rejected_query: Option<Vec<u8>>,
+    retained_query: Option<Vec<u8>>,
     predecessor_identity: Option<(usize, [u8; 32])>,
     used_history_max_events_limit: Option<u32>,
+    used_migrations: Option<(u64, u64)>,
 }
 
 impl<'view> CompleteCorePolicyPatchRequestPlan<'view> {
@@ -71,13 +72,42 @@ impl<'view> CompleteCorePolicyPatchRequestPlan<'view> {
         self.used_history_max_events_limit
     }
 
+    /// Reads migration context only after both original getters succeeded.
+    #[must_use]
+    pub const fn used_migration_generations(&self) -> Option<(u64, u64)> {
+        self.used_migrations
+    }
+
+    /// Repeats Fresh response correspondence using this plan's sealed query.
+    /// # Errors
+    /// Preserves the same grammar, profile and owner refusals as the matcher.
+    pub fn response_matches(
+        &self,
+        profiles: (PolicySchemaLimits, AdmissionLimits),
+        charge: &mut PolicySchemaCharge,
+        maximum_policy_owner_bytes: usize,
+    ) -> Result<bool, crate::log::CodecError> {
+        let DispatchDecision::Fresh(fresh) = &self.decision else {
+            return Ok(false);
+        };
+        super::super::response::response_matches_for_query(
+            fresh,
+            profiles,
+            charge,
+            maximum_policy_owner_bytes,
+            self.workflow_type(),
+        )
+    }
+
     /// Borrows the original Fresh query; non-Fresh has no current-policy query.
     /// Rejected queries retain their original owner, including an empty type.
     #[must_use]
     pub fn workflow_type(&self) -> Option<&[u8]> {
         match &self.decision {
-            DispatchDecision::Fresh((Some((_, value)), _)) => Some(&value.data().workflow_type),
-            DispatchDecision::Fresh((None, _)) => self.rejected_query.as_deref(),
+            DispatchDecision::Fresh((Some((_, StoredPolicyValue::Complete(value))), _)) => {
+                Some(&value.data().workflow_type)
+            }
+            DispatchDecision::Fresh(_) => self.retained_query.as_deref(),
             _ => None,
         }
     }
@@ -88,7 +118,7 @@ impl<'view> CompleteCorePolicyPatchRequestPlan<'view> {
     /// Each actual hash is bounded native O(P) work, outside the logical g tariff;
     /// equality does not prove stored origin or committed authority.
     #[must_use]
-    pub fn matches_predecessor(&self, predecessor: Option<&CompletePolicyValue>) -> bool {
+    pub fn matches_predecessor(&self, predecessor: Option<&StoredPolicyValue>) -> bool {
         match (self.predecessor_identity, predecessor) {
             (None, None) => true,
             (Some((length, digest)), Some(value))
@@ -154,15 +184,16 @@ pub fn decide_complete_core_policy_patch_frame<'view>(
     let expected_revision = view.revision;
     let base_control = view.gate.control;
     let control = gate.control();
-    let mut rejected_query = None;
+    let mut retained_query = None;
     let mut predecessor_identity = None;
     let mut used_history_max_events_limit = None;
+    let mut used_migrations = None;
     let decision = match gate.decision() {
         GateDecision::Fresh => {
             let input = consume_verified_frame(verified, limits, admission, charge)
                 .map_err(Request)?
                 .into_input();
-            let (prepared, query, current, used_history) =
+            let (prepared, query, current, used_history, migrations) =
                 prepare_complete_core_policy_patch_fresh_with_query(
                     view,
                     input,
@@ -171,9 +202,10 @@ pub fn decide_complete_core_policy_patch_frame<'view>(
                     admission,
                     charge,
                 )?;
-            rejected_query = query;
+            retained_query = query;
             predecessor_identity = capture_predecessor(current)?;
             used_history_max_events_limit = used_history;
+            used_migrations = migrations;
             DispatchDecision::Fresh(prepared)
         }
         GateDecision::Replay(original) => DispatchDecision::Replay(original),
@@ -186,14 +218,15 @@ pub fn decide_complete_core_policy_patch_frame<'view>(
         base_control,
         control,
         decision,
-        rejected_query,
+        retained_query,
         predecessor_identity,
         used_history_max_events_limit,
+        used_migrations,
     })
 }
 
 fn capture_predecessor(
-    current: Option<&CompletePolicyValue>,
+    current: Option<&StoredPolicyValue>,
 ) -> Result<Option<(usize, [u8; 32])>, CompleteCorePolicyPatchApplyError> {
     current
         .map(|value| {

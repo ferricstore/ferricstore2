@@ -11,8 +11,9 @@ use super::{publication, write_control};
 use crate::state::{key, value};
 use wf_domain::policy::complete::{
     CompletePolicyEncodingError, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
-    original_policy_indexed_fields_equal, original_record_batch_policy_projection_bytes,
-    project_original_record_batch_policy,
+    original_record_batch_policy_projection_bytes, project_original_record_batch_policy,
+    project_record_batch_policy, record_batch_policy_projection_bytes,
+    stored_policy_indexed_fields_equal,
 };
 use wf_domain::policy::{InstalledRetryPolicy, definition::PolicySnapshot};
 use wf_domain::workflow::control::plan_control;
@@ -76,12 +77,12 @@ fn publish(
             .plan()
             .workflow_type()
             .ok_or(Error::InvalidChanges)?;
-        let before = actual.as_ref().map(|(raw, _)| raw.as_slice());
-        if let Some(raw) = before {
+        let before = actual.as_ref().map(|(value, _)| value);
+        if let Some(StoredPolicyValue::Original(raw)) = before {
             tx.temporary(original_owner(raw.len())?)?;
         }
         tx.temporary(original_owner(install.encoded().len())?)?;
-        let same = original_policy_indexed_fields_equal(before, install.encoded(), schema, charge)
+        let same = stored_policy_indexed_fields_equal(before, install.encoded(), schema, charge)
             .map_err(|e| match e {
                 CompletePolicyEncodingError::Schema(PolicySchemaError::InvalidAuthority) => {
                     Error::UnsupportedPolicyEffects
@@ -92,7 +93,7 @@ fn publish(
             return Err(Error::UnsupportedPolicyEffects);
         }
         let old_projection = before
-            .map(|raw| projection(&tx, raw, kind, schema, charge))
+            .map(|value| stored_projection(&tx, value, kind, schema, charge))
             .transpose()?;
         let new_projection = projection(&tx, install.encoded(), kind, schema, charge)?;
         let saved = snapshot::policy::publication_catalog(&tx)?;
@@ -158,33 +159,25 @@ fn actual_predecessor(
     changes: &GroupOriginalPolicyChanges<'_>,
     schema: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
-) -> Result<Option<(Vec<u8>, u64)>, Error> {
+) -> Result<Option<(StoredPolicyValue, u64)>, Error> {
     let actual = if matches!(changes.plan().decision(), DispatchDecision::Fresh(_)) {
         let kind = changes
             .plan()
             .workflow_type()
             .ok_or(Error::InvalidChanges)?;
-        let actual =
-            tx.read_stored_with_generation(changes.scope().tenant(), kind, schema, charge)?;
-        match actual {
-            None => None,
-            Some((StoredPolicyValue::Original(raw), generation)) => Some((raw, generation)),
-            Some((StoredPolicyValue::Complete(_), _)) => {
-                return Err(Error::UnsupportedPolicyFormat);
-            }
-        }
+        tx.read_stored_with_generation(changes.scope().tenant(), kind, schema, charge)?
     } else {
         None
     };
     if matches!(changes.plan().decision(), DispatchDecision::Fresh(_)) {
-        let actual_raw = actual.as_ref().map(|(raw, _)| raw.as_slice());
+        let actual_raw = actual.as_ref().map(|(value, _)| value.encoded());
         if actual_raw != changes.predecessor() || !changes.plan().matches_predecessor(actual_raw) {
             return Err(Error::InvalidChanges);
         }
     }
     Ok(actual)
 }
-fn projection(
+pub(super) fn projection(
     tx: &RedbStateTransaction<'_>,
     raw: &[u8],
     kind: &[u8],
@@ -311,5 +304,24 @@ fn codec_error(e: CodecError) -> Error {
         CodecError::ByteLimit | CodecError::ItemLimit | CodecError::ValueLimit => Error::Limit,
         CodecError::UnsupportedPolicyProfile => Error::UnsupportedPolicyProfile,
         _ => Error::InvalidChanges,
+    }
+}
+
+fn stored_projection(
+    tx: &RedbStateTransaction<'_>,
+    value: &StoredPolicyValue,
+    kind: &[u8],
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(PolicySnapshot, InstalledRetryPolicy), Error> {
+    match value {
+        StoredPolicyValue::Original(raw) => projection(tx, raw, kind, schema, charge),
+        StoredPolicyValue::Complete(value) => {
+            let bytes = record_batch_policy_projection_bytes(value).map_err(original_error)?;
+            tx.temporary(bytes)?;
+            project_record_batch_policy(value, schema, charge, bytes)
+                .map(|(policy, retry)| (policy.into_policy(), retry))
+                .map_err(original_error)
+        }
     }
 }

@@ -135,6 +135,19 @@ fn prepare<'raw>(
         .ok_or_else(|| schema(PolicySchemaError::InvalidAuthority))?;
     let bytes = view.current(requested, charge)?;
     *original = bytes;
+    if bounds.2
+        && let Some(bytes) = bytes.filter(|b| b.starts_with(b"FWPV"))
+    {
+        return point::prepare_v2(
+            view,
+            bytes,
+            (key, patch, expected, replace),
+            (bounds.0, bounds.1, base),
+            limits,
+            charge,
+            used,
+        );
+    }
     let current_live = plus(base, bytes.map_or(0, <[u8]>::len))?;
     let current = if let Some(bytes) = bytes {
         peak_at(current_live, charge).map_err(current_error)?;

@@ -12,6 +12,9 @@ use crate::policy::complete::{OriginalPolicyMapKey as Key, RawPolicyIndexedValue
 
 mod map;
 pub(in crate::policy::complete) use map::PolicyInputMap;
+pub(in crate::policy::complete::flow_input) use map::{
+    raw_group_parent, raw_keyword_fields, rewrite_keyword,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub(in crate::policy::complete) enum PolicyInputCursor<'input> {

@@ -10,7 +10,7 @@ use crate::policy::complete::{
 use super::layout::{FlowPolicyCell, FlowPolicyLayout};
 
 mod envelope;
-pub(super) use envelope::emit_envelope;
+pub(super) use envelope::{emit_envelope, emit_envelope_bounded};
 
 pub(super) fn measure_snapshot(
     layout: &FlowPolicyLayout<'_>,
@@ -74,11 +74,15 @@ fn visit(
         }
         FlowPolicyCell::Integer(value) => integer(value, output, limit, charge),
         FlowPolicyCell::BigInteger(magnitude) => big_integer(magnitude, output, limit, charge),
+        FlowPolicyCell::RawTerm(bytes) => block(&[], bytes, true, output, limit, charge),
         FlowPolicyCell::List { start, len } => {
             container(layout, start, len, 108, charge, output, limit)
         }
         FlowPolicyCell::Map { start, len } => {
             container(layout, start, len, 116, charge, output, limit)
+        }
+        FlowPolicyCell::Tuple { start, len } => {
+            container(layout, start, len, 104, charge, output, limit)
         }
     }
 }
@@ -134,9 +138,20 @@ fn container(
         return block(&[106], &[], true, output, limit, charge);
     }
     let count = u32::try_from(len).map_err(|_| overflow())?;
-    let mut header = [tag, 0, 0, 0, 0];
+    let mut header = [if tag == 104 { 105 } else { tag }, 0, 0, 0, 0];
     header[1..].copy_from_slice(&count.to_be_bytes());
-    let mut length = block(&header, &[], true, output, limit, charge)?;
+    let mut length = if tag == 104 && len <= 255 {
+        block(
+            &[104, u8::try_from(len).map_err(|_| overflow())?],
+            &[],
+            true,
+            output,
+            limit,
+            charge,
+        )?
+    } else {
+        block(&header, &[], true, output, limit, charge)?
+    };
     let children = if tag == 116 {
         len.checked_mul(2).ok_or_else(overflow)?
     } else {

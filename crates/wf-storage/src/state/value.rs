@@ -16,6 +16,7 @@ pub(crate) use membership::inspect_membership;
 pub use membership::{
     decode_applied_membership, encode_applied_membership, measure_applied_membership,
 };
+pub(crate) use outcome::outcome_policy_validation_bytes_in_layout;
 pub use outcome::{
     ScannedRetainedOutcome, decode_outcome, encode_outcome, encode_outcome_profiled,
     outcome_policy_validation_bytes, scan_outcome, scan_outcome_profiled,

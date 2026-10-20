@@ -264,3 +264,92 @@ pub(super) fn finish<'raw>(
         key, stored, generation, encoded,
     )))
 }
+
+pub(super) fn prepare_v2<'raw>(
+    view: &impl OriginalPolicySetAuthority<'raw>,
+    bytes: &[u8],
+    input: (
+        &[u8],
+        crate::policy::complete::outer::public_set_frame::PolicySetFrameCursor<'_>,
+        Option<u64>,
+        bool,
+    ),
+    stage: (usize, usize, usize),
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    used: &mut (Option<u32>, Option<(u64, u64)>),
+) -> Result<Result<OriginalFlowPolicyInstall, PolicySetRejected>, RawError> {
+    use crate::policy::complete::{
+        decode_complete_policy_value_v2, encode_original_policy_from_complete,
+    };
+    let (key, patch, expected, replace) = input;
+    let requested = key
+        .get(13..)
+        .ok_or_else(|| schema(PolicySchemaError::InvalidAuthority))?;
+    let owner = bytes
+        .len()
+        .checked_mul(216)
+        .and_then(|n| n.checked_add(2048))
+        .ok_or_else(|| schema(PolicySchemaError::LengthOverflow))?;
+    let current_live = plus(stage.2, bytes.len())?;
+    peak_at(plus(current_live, owner)?, charge).map_err(super::current_error)?;
+    let value =
+        decode_complete_policy_value_v2(bytes, limits, charge).map_err(super::current_error)?;
+    let stored = value.generation();
+    pay(charge, 128)?;
+    if expected.is_some_and(|expected| expected != stored) {
+        return Ok(Err(policy(PolicyError::StaleGeneration)?));
+    }
+    pay(
+        charge,
+        plus(
+            128,
+            plus(requested.len(), value.data().workflow_type.len())?,
+        )?,
+    )?;
+    if value.data().workflow_type != requested {
+        return Err(RawError::Current(OriginalPolicyReadError::Corrupt));
+    }
+    if replace {
+        drop(value);
+        return finish(
+            view,
+            (key, stored),
+            Cursor::Frame4(patch),
+            (plus(stage.0, 32)?, stage.1, stage.2),
+            limits,
+            charge,
+            used,
+        );
+    }
+    let converted = encode_original_policy_from_complete(
+        &value,
+        limits,
+        charge,
+        plus(current_live, owner)?,
+        u32::MAX as usize,
+    )
+    .map_err(encoding)?;
+    drop(value);
+    let base = plus(current_live, 512)?;
+    let current =
+        crate::policy::complete::original_entry::indexed::decode_transient_portable_retained(
+            &converted,
+            converted.len(),
+            converted.len(),
+            plus(base, converted.len())?,
+            limits,
+            charge,
+        )
+        .map_err(super::current_error)?
+        .ok_or(RawError::Current(OriginalPolicyReadError::Corrupt))?;
+    super::merge_current(
+        view,
+        Some(current),
+        (key, stored, patch),
+        (stage.0, stage.1, base, true),
+        limits,
+        charge,
+        used,
+    )
+}

@@ -342,7 +342,7 @@ pub fn original_policy_indexed_fields_equal(
         _ => Ok(false),
     }
 }
-fn metadata<'index>(
+pub(super) fn metadata<'index>(
     index: Option<&'index Index<'_, 'static>>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<&'index [u8]>, Error> {
@@ -360,7 +360,7 @@ fn metadata<'index>(
     };
     Ok(borrow_metadata(Cursor::Current(index.at(p)), 0, charge)?.unwrap_or(None))
 }
-fn attributes<'index>(
+pub(super) fn attributes<'index>(
     index: Option<&'index Index<'_, 'static>>,
     names: &mut [Option<&'index [u8]>; 3],
     charge: &mut PolicySchemaCharge,

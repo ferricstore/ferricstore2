@@ -2,10 +2,13 @@
 
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchFresh, CompletePolicyEncodingError, CompletePolicyValue,
-    PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
-    core_policy_patch_rejection_for_response, decode_complete_policy_value_v2_profiled,
+    OriginalPolicyEntry, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
+    StoredPolicyValue, core_policy_patch_rejection_for_response,
+    decode_complete_policy_value_v2_profiled,
 };
-use wf_domain::policy::installation::{MAX_POLICY_GENERATION, PolicyError};
+use wf_domain::policy::installation::{
+    MAX_ENCODED_POLICY_BYTES, MAX_POLICY_GENERATION, PolicyError,
+};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{ClientIntent, RetainedStatus};
 
@@ -25,6 +28,10 @@ pub fn complete_core_policy_patch_retained_status(
     charge: &mut PolicySchemaCharge,
     maximum_policy_owner_bytes: usize,
 ) -> Result<RetainedStatus, CodecError> {
+    if original_response(intent, response_version, response) {
+        return validated_original(response, profiles, charge, maximum_policy_owner_bytes)
+            .map(|_| RetainedStatus::Accepted);
+    }
     validated_response(
         intent,
         response_version,
@@ -83,7 +90,39 @@ pub fn complete_core_policy_patch_response_matches(
     charge: &mut PolicySchemaCharge,
     maximum_policy_owner_bytes: usize,
 ) -> Result<bool, CodecError> {
+    response_matches_for_query(fresh, profiles, charge, maximum_policy_owner_bytes, None)
+}
+
+pub(super) fn response_matches_for_query(
+    fresh: &CompleteCorePolicyPatchFresh,
+    profiles: (PolicySchemaLimits, AdmissionLimits),
+    charge: &mut PolicySchemaCharge,
+    maximum_policy_owner_bytes: usize,
+    query: Option<&[u8]>,
+) -> Result<bool, CodecError> {
     let (candidate, outcome) = fresh;
+    if original_response(
+        outcome.intent(),
+        outcome.response_version(),
+        outcome.response(),
+    ) {
+        let entry = validated_original(
+            outcome.response(),
+            profiles,
+            charge,
+            maximum_policy_owner_bytes,
+        )?;
+        return Ok(match candidate {
+            Some((expected, StoredPolicyValue::Original(raw))) => {
+                outcome.status() == RetainedStatus::Accepted
+                    && *expected < MAX_POLICY_GENERATION
+                    && entry.generation() > *expected
+                    && raw.as_slice() == outcome.response()
+                    && query.is_none_or(|kind| entry.workflow_type() == Some(kind))
+            }
+            _ => false,
+        });
+    }
     let (status, decoded) = validated_response(
         outcome.intent(),
         outcome.response_version(),
@@ -96,14 +135,46 @@ pub fn complete_core_policy_patch_response_matches(
         return Ok(false);
     }
     Ok(match candidate {
-        Some((expected, value)) => {
+        Some((expected, StoredPolicyValue::Complete(value))) => {
             status == RetainedStatus::Accepted
                 && *expected < MAX_POLICY_GENERATION
                 && value.generation() == expected + 1
-                && decoded.as_ref() == Some(value)
+                && decoded.as_ref() == Some(value.as_ref())
         }
+        Some((_, StoredPolicyValue::Original(_))) => false,
         None => matches!(status, RetainedStatus::PolicyRejected(_)),
     })
+}
+
+fn original_response(intent: ClientIntent, version: u16, response: &[u8]) -> bool {
+    intent.version() == 2 && version == 2 && response.first() == Some(&131)
+}
+
+fn validated_original<'raw>(
+    response: &'raw [u8],
+    profiles: (PolicySchemaLimits, AdmissionLimits),
+    charge: &mut PolicySchemaCharge,
+    maximum_policy_owner_bytes: usize,
+) -> Result<OriginalPolicyEntry<'raw>, CodecError> {
+    if charge.profile() != profiles.0 {
+        return Err(CodecError::Malformed);
+    }
+    if response.len() > MAX_ENCODED_POLICY_BYTES {
+        return Err(CodecError::Malformed);
+    }
+    if response.len() > profiles.1.decision_bytes() {
+        return Err(CodecError::ByteLimit);
+    }
+    // The exact existing ETF validator performs one decoder and no accepted
+    // registry pass. Its returned entry borrows the original response bytes.
+    super::super::public_set::response::validated_response(
+        response,
+        profiles.0,
+        charge,
+        maximum_policy_owner_bytes,
+    )?
+    .1
+    .ok_or(CodecError::Malformed)
 }
 
 fn encoding_error(error: CompletePolicyEncodingError) -> CodecError {

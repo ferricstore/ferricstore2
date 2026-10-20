@@ -8,8 +8,11 @@ pub(super) enum FlowPolicyCell<'input> {
     Binary(&'input [u8]),
     Integer(u128),
     BigInteger(&'input [u8]),
+    // Constructed internally only from a retained, validated original term span.
+    RawTerm(&'input [u8]),
     List { start: usize, len: usize },
     Map { start: usize, len: usize },
+    Tuple { start: usize, len: usize },
 }
 
 #[derive(Clone, Copy, Debug)]

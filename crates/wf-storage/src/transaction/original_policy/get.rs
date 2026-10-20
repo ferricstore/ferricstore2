@@ -4,16 +4,19 @@ use super::{OriginalPolicyTransactionError as Error, RawError, workspace};
 use crate::state::{RedbStateStore, RedbStateTransaction};
 use crate::transaction::RecordBatchTransactionLimits;
 use wf_domain::policy::complete::{
-    CompletePolicyEncodingError, OriginalPolicyGetRejection, OriginalPolicyGetRequest,
-    OriginalPolicyReadValue, OriginalPolicyReply, OriginalPolicyReplyContext,
-    OriginalPolicyReplyError, OriginalPolicyReplyRejection, PolicySchemaCharge, PolicySchemaError,
-    RawFlowPolicyValue, original_policy_get_reply_projection_bytes,
+    CompletePolicyEncodingError, CompletePolicyValue, OriginalPolicyGetRejection,
+    OriginalPolicyGetRequest, OriginalPolicyReadValue, OriginalPolicyReply,
+    OriginalPolicyReplyContext, OriginalPolicyReplyError, OriginalPolicyReplyRejection,
+    PolicySchemaCharge, PolicySchemaError, RawFlowPolicyValue, StoredPolicyValue,
+    encode_original_policy_from_complete, original_policy_from_complete_bytes,
+    original_policy_get_reply_projection_bytes, original_policy_projection_reply_bytes,
     prepare_original_policy_get_request, present_original_policy_get_reply,
+    present_original_policy_projection_get_reply,
 };
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::{
-    GroupApplyStore, GroupCorePolicyTransaction, GroupOriginalPolicyTransaction,
-    StateTransactionError,
+    GroupApplyStore, GroupApplyTransaction, GroupCorePolicyTransaction,
+    GroupOriginalPolicyTransaction, StateTransactionError,
 };
 
 /// Prepares original GET controls before I/O and visits one actual paid reply.
@@ -81,11 +84,14 @@ fn read_reply(
     let kind = request.workflow_type();
     let state = request.response_state();
     drop(request);
-    let raw = tx.original_policy_current(scope.tenant(), kind, limits.schema, charge)?;
-    if raw.as_ref().is_some_and(|value| value.starts_with(b"FWPV")) {
-        return Err(StateTransactionError::UnsupportedPolicyFormat.into());
-    }
-    preflight(&tx, raw.as_deref(), state, limits, charge)?;
+    let raw = match tx.stored_policy_value(scope.tenant(), kind, limits.schema, charge)? {
+        Some(StoredPolicyValue::Complete(value)) => {
+            return projected_reply(&tx, kind, state, value, limits, charge, visit);
+        }
+        Some(StoredPolicyValue::Original(raw)) => Some(raw),
+        None => None,
+    };
+    preflight(&tx, raw.as_deref(), state, None, limits, charge)?;
     let defaults = tx.original_policy_reply_defaults();
     let context =
         OriginalPolicyReplyContext::portable(defaults, if raw.is_some() { 512 } else { 0 });
@@ -93,33 +99,73 @@ fn read_reply(
         OriginalPolicyReadValue::Absent,
         OriginalPolicyReadValue::Binary,
     );
-    let reply = match present_original_policy_get_reply(
+    let reply = public_reply(present_original_policy_get_reply(
         kind,
         value,
         state,
         context,
         limits.schema,
         charge,
-    )? {
-        Ok(reply) => Ok(reply),
-        Err(OriginalPolicyReplyRejection::Corrupt) => Err(OriginalPolicyGetRejection::Corrupt),
+    )?)?;
+    visit(reply, charge).map_err(Error::Reply)
+}
+
+fn projected_reply(
+    tx: &RedbStateTransaction<'_>,
+    kind: &[u8],
+    state: Option<&[u8]>,
+    value: Box<CompletePolicyValue>,
+    limits: RecordBatchTransactionLimits,
+    charge: &mut PolicySchemaCharge,
+    visit: impl for<'reply> FnOnce(
+        Result<OriginalPolicyReply<'reply>, OriginalPolicyGetRejection>,
+        &mut PolicySchemaCharge,
+    ) -> Result<(), OriginalPolicyReplyError>,
+) -> Result<(), Error> {
+    let (length, _) = original_policy_from_complete_bytes(&value, limits.schema, charge, 0)?;
+    let conversion = length
+        .checked_add(512)
+        .ok_or(StateTransactionError::Limit)?;
+    super::admit_staging(conversion, limits)?;
+    let encoded = encode_original_policy_from_complete(&value, limits.schema, charge, 0, length)?;
+    drop(value);
+    preflight(tx, Some(&encoded), state, Some(length), limits, charge)?;
+    let context = OriginalPolicyReplyContext::portable(tx.original_policy_reply_defaults(), 512);
+    let reply = public_reply(present_original_policy_projection_get_reply(
+        kind,
+        &encoded,
+        state,
+        context,
+        limits.schema,
+        charge,
+        length,
+    )?)?;
+    visit(reply, charge).map_err(Error::Reply)
+}
+
+fn public_reply(
+    reply: Result<OriginalPolicyReply<'_>, OriginalPolicyReplyRejection>,
+) -> Result<Result<OriginalPolicyReply<'_>, OriginalPolicyGetRejection>, Error> {
+    match reply {
+        Ok(reply) => Ok(Ok(reply)),
+        Err(OriginalPolicyReplyRejection::Corrupt) => Ok(Err(OriginalPolicyGetRejection::Corrupt)),
         Err(OriginalPolicyReplyRejection::ShardUnavailable) => {
-            Err(OriginalPolicyGetRejection::ShardUnavailable)
+            Ok(Err(OriginalPolicyGetRejection::ShardUnavailable))
         }
         Err(OriginalPolicyReplyRejection::ReadFailed) => {
-            Err(OriginalPolicyGetRejection::ReadFailed)
+            Ok(Err(OriginalPolicyGetRejection::ReadFailed))
         }
         Err(OriginalPolicyReplyRejection::AllocationFailed) => {
-            return Err(CompletePolicyEncodingError::Malformed.into());
+            Err(CompletePolicyEncodingError::Malformed.into())
         }
-    };
-    visit(reply, charge).map_err(Error::Reply)
+    }
 }
 
 fn preflight(
     tx: &RedbStateTransaction<'_>,
     raw: Option<&[u8]>,
     state: Option<&[u8]>,
+    projection_limit: Option<usize>,
     limits: RecordBatchTransactionLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
@@ -127,8 +173,12 @@ fn preflight(
     // This measurement is a real extra decode/catalog pass, admitted in the
     // same cumulative C account before its index allocation.
     tx.original_policy_temporary(validation)?;
-    let reply_bytes =
-        original_policy_get_reply_projection_bytes(raw, state, limits.schema, charge)?;
+    let reply_bytes = match (raw, projection_limit) {
+        (Some(raw), Some(maximum)) => {
+            original_policy_projection_reply_bytes(raw, state, maximum, limits.schema, charge)?
+        }
+        _ => original_policy_get_reply_projection_bytes(raw, state, limits.schema, charge)?,
+    };
     let raw_owner = raw.map_or(Ok(0), |value| {
         value
             .len()

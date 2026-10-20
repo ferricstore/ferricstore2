@@ -4,17 +4,151 @@ use super::super::{TermPosition as Position, TermSpan};
 use super::OriginalPolicyCurrentIndex;
 use crate::policy::complete::flow_input::value::PolicyInputKind as Kind;
 
+impl<'raw, 'context> OriginalPolicyCurrentIndex<'raw, 'context> {
+    pub(in crate::policy::complete) fn raw_policy_position(&self) -> u32 {
+        super::super::compound::resolve(&self.spans, self.policy)
+    }
+    pub(in crate::policy::complete) fn raw_cursor(
+        &self,
+        id: u32,
+    ) -> OriginalPolicyCurrentCursor<'_, 'raw, 'context> {
+        self.at(Position::Encoded(super::super::compound::resolve(
+            &self.spans,
+            id,
+        )))
+    }
+    pub(in crate::policy::complete) fn raw_span(
+        &self,
+        id: u32,
+    ) -> Result<&'raw [u8], super::Error> {
+        let span = self.spans.get(id as usize).ok_or(super::Error::Malformed)?;
+        self.raw
+            .get(span.start as usize..span.end as usize)
+            .ok_or(super::Error::Malformed)
+    }
+    pub(in crate::policy::complete) fn raw_row_positions(
+        &self,
+        parent: u32,
+        next: u32,
+    ) -> Result<Option<(u32, u32, u32)>, super::Error> {
+        let map = self
+            .spans
+            .get(parent as usize)
+            .ok_or(super::Error::Malformed)?;
+        if map.tag() != 116 || next <= parent {
+            return Err(super::Error::Malformed);
+        }
+        if next == map.next {
+            return Ok(None);
+        }
+        if next > map.next {
+            return Err(super::Error::Malformed);
+        }
+        let key = self
+            .spans
+            .get(next as usize)
+            .ok_or(super::Error::Malformed)?;
+        let value = self
+            .spans
+            .get(key.next as usize)
+            .ok_or(super::Error::Malformed)?;
+        if value.next > map.next {
+            return Err(super::Error::Malformed);
+        }
+        Ok(Some((next, key.next, value.next)))
+    }
+    pub(in crate::policy::complete) fn raw_keyword_pair(
+        &self,
+        cursor: &mut (u32, u32),
+        charge: &mut super::PolicySchemaCharge,
+    ) -> Result<Option<(u32, u32, u32)>, super::Error> {
+        loop {
+            let span = *self
+                .spans
+                .get(cursor.0 as usize)
+                .ok_or(super::Error::Malformed)?;
+            if span.tag() == 106 || (span.tag() == 107 && span.datum() == 0) {
+                return Ok(None);
+            }
+            if span.tag() != 108
+                || span.datum() == 0
+                || cursor.1 <= cursor.0
+                || cursor.1 > span.keys
+            {
+                return Err(super::Error::Malformed);
+            }
+            if cursor.1 == span.keys {
+                cursor.0 = self.raw_keyword_start(span.keys, charge)?;
+                cursor.1 = cursor.0.checked_add(1).ok_or_else(super::overflow)?;
+                continue;
+            }
+            super::pay(charge, 128)?;
+            let id = cursor.1;
+            let tuple = *self.spans.get(id as usize).ok_or(super::Error::Malformed)?;
+            if !matches!(tuple.tag(), 104 | 105) || tuple.keys != 2 || tuple.next > span.keys {
+                return Err(super::Error::Schema(
+                    super::super::PolicySchemaError::InvalidAuthority,
+                ));
+            }
+            let key = id.checked_add(1).ok_or_else(super::overflow)?;
+            let value = self
+                .spans
+                .get(key as usize)
+                .ok_or(super::Error::Malformed)?
+                .next;
+            if self
+                .spans
+                .get(value as usize)
+                .is_none_or(|span| span.next != tuple.next)
+                || self.raw_cursor(key).atom_bytes().is_none()
+            {
+                return Err(super::Error::Schema(
+                    super::super::PolicySchemaError::InvalidAuthority,
+                ));
+            }
+            cursor.1 = tuple.next;
+            return Ok(Some((id, key, value)));
+        }
+    }
+
+    pub(in crate::policy::complete) fn raw_depth(
+        &self,
+        id: u32,
+        charge: &mut super::PolicySchemaCharge,
+    ) -> Result<usize, super::Error> {
+        let span = self.spans.get(id as usize).ok_or(super::Error::Malformed)?;
+        let count = match span.tag() {
+            104 | 105 => span.keys as usize,
+            116 => (span.datum() as usize)
+                .checked_mul(2)
+                .ok_or_else(super::overflow)?,
+            108 => (span.datum() as usize)
+                .checked_add(1)
+                .ok_or_else(super::overflow)?,
+            _ => return Ok(0),
+        };
+        let (mut child, mut depth) = (id + 1, 0);
+        for _ in 0..count {
+            super::pay(charge, 128)?;
+            depth = depth.max(
+                self.raw_depth(child, charge)?
+                    .checked_add(1)
+                    .ok_or_else(super::overflow)?,
+            );
+            child = self
+                .spans
+                .get(child as usize)
+                .ok_or(super::Error::Malformed)?
+                .next;
+        }
+        Ok(depth)
+    }
+}
+
 #[derive(Clone, Copy)]
 pub(in crate::policy::complete) struct OriginalPolicyCurrentCursor<'index, 'raw, 'context> {
     pub(super) index: &'index OriginalPolicyCurrentIndex<'raw, 'context>,
     pub(super) position: Position,
-}
-
-impl std::fmt::Debug for OriginalPolicyCurrentCursor<'_, '_, '_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("OriginalPolicyCurrentCursor")
-            .finish_non_exhaustive()
-    }
 }
 
 impl<'index, 'raw, 'context> OriginalPolicyCurrentCursor<'index, 'raw, 'context> {

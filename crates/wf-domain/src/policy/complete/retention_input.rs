@@ -1,6 +1,9 @@
 //! Original optional retention validation and independently paid diagnostics.
 
-use crate::retention::{MAX_HISTORY_EVENTS, MAX_RETENTION_MILLIS, RetentionOverride};
+use crate::policy::installation::PolicyError;
+use crate::retention::{
+    MAX_HISTORY_EVENTS, MAX_RETENTION_MILLIS, RetentionError, RetentionOverride,
+};
 
 use super::admission::charge_schema;
 use super::flow_input::value::{PolicyInputCursor as Cursor, classify_map, select, unsigned};
@@ -327,4 +330,26 @@ pub(in crate::policy::complete) fn write_decimal(
         value /= 10;
     }
     Ok(&scratch[start..])
+}
+
+pub(in crate::policy::complete) fn valid_retention(
+    field: usize,
+    value: i128,
+    maximum: u32,
+) -> Result<(), Error> {
+    let bound = if field == 0 {
+        31_536_000_000
+    } else {
+        i128::from(maximum)
+    };
+    if !(1..=bound).contains(&value) {
+        return Err(Error::Schema(PolicySchemaError::Policy(
+            PolicyError::Retention(if field == 0 {
+                RetentionError::Ttl
+            } else {
+                RetentionError::History
+            }),
+        )));
+    }
+    Ok(())
 }

@@ -3,7 +3,9 @@ use super::{TestResult, check_disk, f, fifo_patch, original_frame, retained, w};
 use std::path::Path;
 use wf_domain::policy::complete::{PolicySchemaCharge, RawFlowPolicyValue as Raw};
 use wf_domain::policy::definition::PolicyPatch;
+use wf_domain::workflow::request::RequestScope;
 use wf_storage::state::RedbStateStore;
+use wf_storage::transaction::RecordBatchTransactionLimits;
 
 #[test]
 fn cross_format_predecessor_history_and_generation_substitution_refuse_atomically() -> TestResult {
@@ -87,16 +89,27 @@ fn cross_format_predecessor_history_and_generation_substitution_refuse_atomicall
     let actual = StoredPolicyValue::Complete(Box::new(actual));
     core_substitution(&path, &before, &actual, 65, 0)?;
     core_substitution(&path, &before, &actual, 64, 1)?;
+    stale_cas(&path, before, &history, &scope, caps)?;
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+fn stale_cas(
+    path: &Path,
+    before: f::Cohort,
+    history: &[(Raw<'_>, Raw<'_>)],
+    scope: &RequestScope,
+    caps: RecordBatchTransactionLimits,
+) -> TestResult {
     // Authentic stale CAS retains a business rejection before the later
     // invalid retention request could mask its generation diagnosis.
     let expected = [Raw::Atom("expected_generation"), Raw::Integer(0)];
     let bytes = original_frame(
         b"stale",
         10,
-        Raw::Map(&[(Raw::Atom("retention"), Raw::Map(&history))]),
+        Raw::Map(&[(Raw::Atom("retention"), Raw::Map(history))]),
         Raw::List(&[Raw::Tuple(&expected)]),
     )?;
-    store = f::open(&path, 64)?;
+    let mut store = f::open(path, 64)?;
     let outcome = retained(f::apply(
         &mut store,
         &bytes,
@@ -108,7 +121,7 @@ fn cross_format_predecessor_history_and_generation_substitution_refuse_atomicall
     drop(store);
     let mut after = before;
     let metadata = f::metadata(
-        &scope,
+        scope,
         b"stale",
         1,
         10,
@@ -117,15 +130,13 @@ fn cross_format_predecessor_history_and_generation_substitution_refuse_atomicall
     )?;
     f::finish(
         &mut after,
-        &scope,
+        scope,
         &bytes,
         f::log(1),
         (f::clock(10)?, f::clock(10)?),
         Some((&metadata, 1, b"ERR stale flow policy generation")),
     )?;
-    check_disk(&path, &after)?;
-    std::fs::remove_dir_all(dir)?;
-    Ok(())
+    check_disk(path, &after)
 }
 fn original_plan(
     store: &mut RedbStateStore,
@@ -222,7 +233,7 @@ fn core_substitution(
     let scope = f::scope()?;
     let caps = f::limits();
     let mut store = f::open(path, 64)?;
-    let patch = if history == 65 {
+    let delta = if history == 65 {
         PolicyPatch {
             retention: FieldPatch::Set(RetentionOverride {
                 ttl_ms: None,
@@ -233,7 +244,7 @@ fn core_substitution(
     } else {
         fifo_patch()
     };
-    let bytes = w::core_frame(b"core-attack", 10, Some(1), patch)?;
+    let bytes = w::core_frame(b"core-attack", 10, Some(1), delta)?;
     let mut charge = PolicySchemaCharge::new(caps.schema);
     let tx = store.begin_apply(
         scope.group(),

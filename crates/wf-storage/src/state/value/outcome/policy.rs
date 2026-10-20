@@ -82,12 +82,32 @@ pub fn outcome_policy_validation_bytes(
     bytes: &[u8],
     maximum_wire_bytes: usize,
 ) -> Result<usize, StateValueError> {
+    validation_bytes(bytes, maximum_wire_bytes, None)
+}
+
+pub(crate) fn outcome_policy_validation_bytes_in_layout(
+    bytes: &[u8],
+    maximum_wire_bytes: usize,
+    layout: u16,
+) -> Result<usize, StateValueError> {
+    validation_bytes(bytes, maximum_wire_bytes, Some(layout))
+}
+
+fn validation_bytes(
+    bytes: &[u8],
+    maximum_wire_bytes: usize,
+    layout: Option<u16>,
+) -> Result<usize, StateValueError> {
     with_frame(
         bytes,
         maximum_wire_bytes,
-        |fields, intent, _, _, _, _, _| {
+        |fields, intent, _, _, _, _, response_version| {
             let response = fields[4];
-            if intent == 4 && response.first() == Some(&131) {
+            let core_original = layout.is_some() && intent == 2 && response_version == 2;
+            if core_original && layout != Some(6) {
+                return Err(StateValueError::Malformed);
+            }
+            if (intent == 4 || core_original) && response.first() == Some(&131) {
                 if response.len() > 263_168 {
                     return Err(StateValueError::Malformed);
                 }
@@ -157,6 +177,7 @@ pub(super) fn retained_status(
         CodecError::ByteLimit | CodecError::ItemLimit | CodecError::ValueLimit => {
             StateValueError::ProfileLimit
         }
+        CodecError::UnsupportedPolicyProfile => StateValueError::UnsupportedPolicyProfile,
         other => other.into(),
     })
 }

@@ -23,7 +23,7 @@ pub fn original_policy_set_response_status(
         .map(|(status, _)| status)
 }
 
-fn validated_response<'raw>(
+pub(in crate::log::complete_policy) fn validated_response<'raw>(
     response: &'raw [u8],
     schema: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,

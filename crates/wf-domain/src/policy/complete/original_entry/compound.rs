@@ -138,3 +138,24 @@ pub(super) fn envelope_facts(
     }
     Ok(Some(generation))
 }
+
+impl super::indexed::OriginalPolicyCurrentIndex<'_, '_> {
+    pub(in crate::policy::complete) fn raw_keyword_start(
+        &self,
+        mut id: u32,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<u32, Error> {
+        loop {
+            pay(charge, 128)?;
+            let span = self.spans.get(id as usize).ok_or(Error::Malformed)?;
+            match span.tag() {
+                108 if span.datum() == 0 => id = span.canonical,
+                106 | 108 => return Ok(id),
+                107 if span.datum() == 0 => return Ok(id),
+                _ => {
+                    return Err(Error::Schema(super::PolicySchemaError::InvalidAuthority));
+                }
+            }
+        }
+    }
+}

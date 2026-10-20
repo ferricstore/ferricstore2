@@ -6,7 +6,7 @@ use super::{
 };
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyError as Error, CompleteCorePolicyPatchFreshView,
-    PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
+    PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits, StoredPolicyValue,
     complete_core_policy_patch_frame_decode_bound,
     prepare_complete_core_policy_patch_point_fresh_with_query,
 };
@@ -149,9 +149,10 @@ pub fn inspect_complete_core_policy_patch_point<'input, 'retained>(
             base_control,
             control,
             decision,
-            rejected_query: None,
+            retained_query: None,
             predecessor_identity: None,
             used_history_max_events_limit: None,
+            used_migrations: None,
         },
     )))
 }
@@ -169,10 +170,15 @@ pub fn decide_complete_core_policy_patch_point_fresh<'retained>(
     charge: &mut PolicySchemaCharge,
 ) -> Result<CompleteCorePolicyPatchRequestPlan<'retained>, Error> {
     profile(fresh.schema, charge)?;
+    let candidate = if matches!(view.current, Ok(Some(StoredPolicyValue::Original(_)))) {
+        512 + MAX_ENCODED_POLICY_BYTES
+    } else {
+        2048 + 216 * MAX_ENCODED_POLICY_BYTES
+    };
     let required = sum(&[
         scratch(fresh.schema)?,
         fresh.decoder_bound,
-        2048 + 216 * MAX_ENCODED_POLICY_BYTES,
+        candidate,
         fresh
             .admission
             .decision_bytes()
@@ -181,7 +187,7 @@ pub fn decide_complete_core_policy_patch_point_fresh<'retained>(
     ])?;
     admit(required, fresh.workspace_limit)?;
     let intent = fresh.decoded.header(fresh.log).intent;
-    let (prepared, rejected_query, current, used_history_max_events_limit) =
+    let (prepared, retained_query, current, used_history_max_events_limit, used_migrations) =
         prepare_complete_core_policy_patch_point_fresh_with_query(
             view,
             fresh.decoded.into_input(),
@@ -196,9 +202,10 @@ pub fn decide_complete_core_policy_patch_point_fresh<'retained>(
         base_control: fresh.base_control,
         control: fresh.control,
         decision: DispatchDecision::Fresh(prepared),
-        rejected_query,
+        retained_query,
         predecessor_identity,
         used_history_max_events_limit,
+        used_migrations,
     })
 }
 

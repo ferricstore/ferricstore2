@@ -30,7 +30,7 @@ use super::patch::{
 };
 use super::{
     CompleteCorePolicyPatchRequestInput, CompletePolicyEncodingError, CompletePolicyRequestError,
-    CompletePolicyValue, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
+    PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits, StoredPolicyValue,
 };
 
 /// Supplied results from one coherent namespace/revision; no reader is implemented.
@@ -41,7 +41,7 @@ pub struct CompleteCorePolicyPatchApplyView<'view> {
     /// Required current snapshot revision, with no missing-value sentinel.
     pub revision: u64,
     /// Present values or operational read refusals; absent keys mean actual absence.
-    pub policies: &'view BTreeMap<Vec<u8>, Result<CompletePolicyValue, ApplyError>>,
+    pub policies: &'view BTreeMap<Vec<u8>, Result<StoredPolicyValue, ApplyError>>,
     /// Same-type active migration generations or operational reader refusals.
     pub active_migrations: &'view BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
     /// Same-type completed migration generations or operational reader refusals.
@@ -53,15 +53,16 @@ pub struct CompleteCorePolicyPatchApplyView<'view> {
 }
 
 /// Proposed optional policy/predecessor and immutable original retained outcome.
-pub type CompleteCorePolicyPatchFresh = (Option<(u64, CompletePolicyValue)>, RetainedOutcome);
+pub type CompleteCorePolicyPatchFresh = (Option<(u64, StoredPolicyValue)>, RetainedOutcome);
 
-/// Mathematical Fresh owners, original rejected query, same validated current,
-/// and the history bound actually reached. This grants no stored authority.
+/// Mathematical Fresh owners, retained query, same validated current, reached
+/// history and reached migration pair. This grants no stored authority.
 pub type CompleteCorePolicyPatchPreparation<'current> = (
     CompleteCorePolicyPatchFresh,
     Option<Vec<u8>>,
-    Option<&'current CompletePolicyValue>,
+    Option<&'current StoredPolicyValue>,
     Option<u32>,
+    Option<(u64, u64)>,
 );
 
 /// Operational composition failure; no partial parent is returned.
@@ -116,9 +117,9 @@ pub fn prepare_complete_core_policy_patch_fresh(
 
 /// Prepares original Fresh owners and returns their captured preparation context.
 ///
-/// The query owner is returned only for business rejection. The current borrow
-/// is the same already validated input, without a second lookup or stored proof.
-/// The final scalar records only a successfully reached contextual history bound.
+/// Rejections and accepted Original results return the original query owner.
+/// Current is the same validated union borrow, without a second lookup. Context
+/// slots record only successfully reached and range-valid getters.
 /// # Errors
 /// Preserves the old preparation order, fees and operational diagnoses.
 pub fn prepare_complete_core_policy_patch_fresh_with_query<'current>(
@@ -185,7 +186,7 @@ fn core_patch_business_message(error: PolicyError) -> Option<&'static [u8]> {
 fn core_patch_parent_bytes(
     scope: &RequestScope,
     request: &RequestId,
-    installed: Option<&CompletePolicyValue>,
+    installed: Option<&StoredPolicyValue>,
     response_len: usize,
     admission: AdmissionLimits,
     charge: &mut PolicySchemaCharge,
@@ -230,7 +231,7 @@ fn retain_core_patch_outcome(
     scope: RequestScope,
     request: RequestId,
     committed: (ClientIntent, LogIdentity, TimestampMillis),
-    prepared: Result<(u64, CompletePolicyValue), CompleteCorePolicyPatchApplyError>,
+    prepared: Result<(u64, StoredPolicyValue), CompleteCorePolicyPatchApplyError>,
     window: Result<u64, ApplyError>,
     admission: AdmissionLimits,
     charge: &mut PolicySchemaCharge,
@@ -282,7 +283,12 @@ fn retain_core_patch_outcome(
         .map_err(|_| Request(CompletePolicyEncodingError::AllocationFailure.into()))?;
     copied.extend_from_slice(response);
     charge_schema(charge, 128, 0).map_err(|error| Request(error.into()))?;
-    let outcome = RetainedOutcome::new(metadata, 1, copied, admission).map_err(Outcome)?;
+    let version = if matches!(&prepared, Ok((_, StoredPolicyValue::Original(_)))) {
+        2
+    } else {
+        1
+    };
+    let outcome = RetainedOutcome::new(metadata, version, copied, admission).map_err(Outcome)?;
     Ok((prepared.ok(), outcome))
 }
 

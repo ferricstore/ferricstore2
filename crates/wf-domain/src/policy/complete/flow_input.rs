@@ -10,6 +10,12 @@ use super::{
 mod core;
 mod etf;
 mod governance;
+mod interop;
+pub(in crate::policy::complete) use interop::{admit_raw, encode_raw, measure_raw, read_raw};
+pub use interop::{
+    encode_original_policy_from_complete, original_core_policy_patch_bytes,
+    original_policy_from_complete_bytes, prepare_stored_core_policy_patch,
+};
 mod layout;
 pub(in crate::policy::complete) mod order;
 mod preflight;

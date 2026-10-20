@@ -29,11 +29,50 @@ pub fn original_policy_get_reply_projection_bytes(
     schema: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<usize, Error> {
+    measure(encoded, state, None, schema, charge)
+}
+
+/// Measures a transient projection under explicit byte/span bounds.
+/// A later presenter repeats its actual retained decode on the same account.
+/// # Errors
+/// Preserves profile, grammar, allocation, work and healthy transient bounds.
+pub fn original_policy_projection_reply_bytes(
+    encoded: &[u8],
+    state: Option<&[u8]>,
+    maximum_projection_bytes: usize,
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<usize, Error> {
+    measure(
+        Some(encoded),
+        state,
+        Some(maximum_projection_bytes),
+        schema,
+        charge,
+    )
+}
+
+fn measure(
+    encoded: Option<&[u8]>,
+    state: Option<&[u8]>,
+    transient: Option<usize>,
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<usize, Error> {
     super::entry(schema, charge)?;
     let mut index = encoded
         .map(|raw| {
-            super::super::original_entry::indexed::decode_portable_retained(raw, 0, schema, charge)?
-                .ok_or(Error::Malformed)
+            match transient {
+                Some(maximum) => {
+                    super::super::original_entry::indexed::decode_transient_portable_retained(
+                        raw, maximum, maximum, 0, schema, charge,
+                    )
+                }
+                None => super::super::original_entry::indexed::decode_portable_retained(
+                    raw, 0, schema, charge,
+                ),
+            }?
+            .ok_or(Error::Malformed)
         })
         .transpose()?;
     let mut bytes = 0_usize;

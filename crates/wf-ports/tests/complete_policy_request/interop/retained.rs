@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyView, OriginalCompletePolicyReplaceApplyView,
     OriginalPolicyReadValue, OriginalPolicySetApplyView, OriginalPolicySetFrameInput,
-    OriginalPolicySetMapOrders, PolicySchemaCharge, RawFlowPolicyValue as Raw,
+    OriginalPolicySetMapOrders, PolicySchemaCharge, PolicySchemaLimits, RawFlowPolicyValue as Raw,
     canonical_original_etf_safety, decode_complete_policy_value_v2,
     prepare_original_policy_set_request,
 };
@@ -81,26 +81,22 @@ fn retained_core(version: u16, encoded: &[u8]) -> TestResult<RetainedOutcome> {
     )?)
 }
 
-fn core(version: u16) -> TestResult {
-    let schema = profile(100_000_000)?;
-    let scope = metadata(RetainedStatus::Accepted)?.scope;
-    let encoded = frame(10, None, PolicyPatch::default())?;
-    let original = retained_core(version, &encoded)?;
+fn core_control(encoded: &[u8], schema: PolicySchemaLimits) -> TestResult<ControlState> {
     let verified = verify_complete_core_policy_patch_frame(
-        &encoded,
+        encoded,
         schema,
         AdmissionLimits::default(),
         &mut PolicySchemaCharge::new(schema),
     )?;
-    let control = ControlState::restored(
+    Ok(ControlState::restored(
         stamp(10)?,
         verified.header(log(0)).identity,
         EntryStamp::Stamped(stamp(10)?),
-    )?;
-    let mut outcomes = BTreeMap::new();
-    outcomes.insert(original.request().clone(), original);
-    let original = outcomes.values().next().ok_or("retained original")?;
-    let current = if version == 1 {
+    )?)
+}
+
+fn core_current(version: u16, schema: PolicySchemaLimits) -> TestResult<StoredPolicyValue> {
+    Ok(if version == 1 {
         StoredPolicyValue::Original(super::original(1)?)
     } else {
         StoredPolicyValue::Complete(Box::new(decode_complete_policy_value_v2(
@@ -108,7 +104,19 @@ fn core(version: u16) -> TestResult {
             schema,
             &mut PolicySchemaCharge::new(schema),
         )?))
-    };
+    })
+}
+
+fn core(version: u16) -> TestResult {
+    let schema = profile(100_000_000)?;
+    let scope = metadata(RetainedStatus::Accepted)?.scope;
+    let encoded = frame(10, None, PolicyPatch::default())?;
+    let original = retained_core(version, &encoded)?;
+    let control = core_control(&encoded, schema)?;
+    let mut outcomes = BTreeMap::new();
+    outcomes.insert(original.request().clone(), original);
+    let original = outcomes.values().next().ok_or("retained original")?;
+    let current = core_current(version, schema)?;
     let policies = BTreeMap::from([(b"r".to_vec(), Ok(current))]);
     let migrations = BTreeMap::from([(b"r".to_vec(), Err(ApplyError::InvalidAuthority))]);
     for class in 0..4 {
@@ -240,12 +248,12 @@ fn original_frame(now: u64, replace: bool) -> TestResult<Vec<u8>> {
     .to_vec())
 }
 
-fn original_retained() -> TestResult {
-    let schema = profile(100_000_000)?;
-    let scope = metadata(RetainedStatus::Accepted)?.scope;
-    let encoded = original_frame(10, false)?;
+fn original_setup(
+    encoded: &[u8],
+    schema: PolicySchemaLimits,
+) -> TestResult<(ControlState, RetainedOutcome)> {
     let verified = prepare_original_policy_set_point_frame_bounded(
-        &encoded,
+        encoded,
         schema,
         AdmissionLimits::default(),
         &mut PolicySchemaCharge::new(schema),
@@ -260,6 +268,14 @@ fn original_retained() -> TestResult {
     wanted.original_time = TimestampMillis::new(10);
     wanted.expires_at = TimestampMillis::new(110);
     let original = RetainedOutcome::new(wanted, 1, original(1)?, AdmissionLimits::default())?;
+    Ok((control, original))
+}
+
+fn original_retained() -> TestResult {
+    let schema = profile(100_000_000)?;
+    let scope = metadata(RetainedStatus::Accepted)?.scope;
+    let encoded = original_frame(10, false)?;
+    let (control, original) = original_setup(&encoded, schema)?;
     let outcomes = BTreeMap::from([(original.request().clone(), original)]);
     let original = outcomes.values().next().ok_or("original intent4 receipt")?;
     let policies = BTreeMap::from([(b"r".to_vec(), OriginalPolicyReadValue::Binary(COMPLETE))]);

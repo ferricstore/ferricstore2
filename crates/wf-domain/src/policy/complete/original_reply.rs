@@ -22,7 +22,9 @@ pub use model::{
     OriginalPolicyReplyMapEntry, OriginalPolicyReplyMapIter, OriginalPolicyReplyRejection,
     OriginalPolicyReplyValue,
 };
-pub use source::original_policy_get_reply_projection_bytes;
+pub use source::{
+    original_policy_get_reply_projection_bytes, original_policy_projection_reply_bytes,
+};
 
 /// Projects a successful original setter envelope without rebinding stored type.
 ///
@@ -82,6 +84,49 @@ pub fn present_original_policy_get_reply<'input>(
     Result<OriginalPolicyReply<'input>, OriginalPolicyReplyRejection>,
     OriginalPolicyReplyError,
 > {
+    get_reply(workflow_type, value, state, context, limits, charge, None)
+}
+
+/// Presents an admitted transient rendering using the fixed portable profile.
+/// The donor remains external and must survive every borrowed observation.
+/// # Errors
+/// Preserves full grammar, profile, work and explicit transient-size refusals.
+pub fn present_original_policy_projection_get_reply<'input>(
+    workflow_type: &'input [u8],
+    encoded: &'input [u8],
+    state: Option<&'input [u8]>,
+    mut context: OriginalPolicyReplyContext<'input>,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    maximum_projection_bytes: usize,
+) -> Result<
+    Result<OriginalPolicyReply<'input>, OriginalPolicyReplyRejection>,
+    OriginalPolicyReplyError,
+> {
+    context.portable = true;
+    get_reply(
+        workflow_type,
+        OriginalPolicyReadValue::Binary(encoded),
+        state,
+        context,
+        limits,
+        charge,
+        Some(maximum_projection_bytes),
+    )
+}
+
+fn get_reply<'input>(
+    workflow_type: &'input [u8],
+    value: OriginalPolicyReadValue<'input>,
+    state: Option<&'input [u8]>,
+    context: OriginalPolicyReplyContext<'input>,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    transient: Option<usize>,
+) -> Result<
+    Result<OriginalPolicyReply<'input>, OriginalPolicyReplyRejection>,
+    OriginalPolicyReplyError,
+> {
     entry(limits, charge)?;
     let raw = match value {
         OriginalPolicyReadValue::Absent => None,
@@ -101,7 +146,13 @@ pub fn present_original_policy_get_reply<'input>(
             workflow_type.len(),
             state,
         );
-        let Some(index) = retained(raw, context, live, limits, charge)? else {
+        let decoded = match transient {
+            Some(maximum) => super::original_entry::indexed::decode_transient_portable_retained(
+                raw, maximum, maximum, live, limits, charge,
+            ),
+            None => retained(raw, context, live, limits, charge),
+        };
+        let Some(index) = decoded? else {
             return Ok(Err(OriginalPolicyReplyRejection::Corrupt));
         };
         let stored = index.entry().workflow_type();

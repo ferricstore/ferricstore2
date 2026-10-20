@@ -22,6 +22,81 @@ pub(in crate::policy::complete) struct OriginalPolicyCurrentIndex<'raw, 'context
 }
 
 impl<'raw, 'context> OriginalPolicyCurrentIndex<'raw, 'context> {
+    // Splice counts are local to one paid census/build; zero LIST aliases stay literal.
+    pub(in crate::policy::complete) fn record_splice_map_len(
+        &mut self,
+        position: TermPosition,
+        length: usize,
+    ) -> Result<(), Error> {
+        self.record_splice_len(position, length, 116)
+    }
+
+    pub(in crate::policy::complete) fn splice_map_len(
+        &self,
+        position: TermPosition,
+    ) -> Result<usize, Error> {
+        self.splice_len(position, 116)
+    }
+
+    pub(in crate::policy::complete) fn record_splice_keyword_len(
+        &mut self,
+        position: TermPosition,
+        length: usize,
+    ) -> Result<(), Error> {
+        self.record_splice_len(position, length, 108)
+    }
+
+    pub(in crate::policy::complete) fn splice_keyword_len(
+        &self,
+        position: TermPosition,
+    ) -> Result<usize, Error> {
+        self.splice_len(position, 108)
+    }
+
+    fn splice_position(&self, position: TermPosition, tag: u8) -> Result<usize, Error> {
+        let TermPosition::Encoded(id) = position else {
+            return Err(Error::Malformed);
+        };
+        let span = self.spans.get(id as usize).ok_or(Error::Malformed)?;
+        if span.tag() != tag || (tag == 108 && span.datum() == 0) {
+            return Err(Error::Malformed);
+        }
+        Ok(id as usize)
+    }
+
+    fn record_splice_len(
+        &mut self,
+        position: TermPosition,
+        length: usize,
+        tag: u8,
+    ) -> Result<(), Error> {
+        if !matches!(position, TermPosition::Encoded(_)) {
+            return Err(Error::Malformed);
+        }
+        let encoded = length
+            .checked_add(1)
+            .and_then(|n| u32::try_from(n).ok())
+            .ok_or_else(overflow)?;
+        let id = self.splice_position(position, tag)?;
+        let span = &mut self.spans[id];
+        if span.canonical != 0 && span.canonical != encoded {
+            return Err(Error::Malformed);
+        }
+        span.canonical = encoded;
+        Ok(())
+    }
+
+    fn splice_len(&self, position: TermPosition, tag: u8) -> Result<usize, Error> {
+        let id = self.splice_position(position, tag)?;
+        usize::try_from(
+            self.spans[id]
+                .canonical
+                .checked_sub(1)
+                .ok_or(Error::Malformed)?,
+        )
+        .map_err(|_| overflow())
+    }
+
     pub(in crate::policy::complete) const fn entry(&self) -> &OriginalPolicyEntry<'raw> {
         &self.entry
     }
@@ -184,7 +259,32 @@ pub(in crate::policy::complete) fn decode_portable_retained<'raw>(
     super::decode_indexed(
         raw,
         &super::canonical_original_etf_safety(),
-        (263_168, 263_168, true),
+        (263_168, 263_168, true, 263_168),
+        live,
+        limits,
+        charge,
+    )
+}
+
+pub(in crate::policy::complete) fn decode_transient_portable_retained<'raw>(
+    raw: &'raw [u8],
+    maximum_encoded_bytes: usize,
+    maximum_spans: usize,
+    live: usize,
+    limits: super::PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<OriginalPolicyCurrentIndex<'raw, 'static>>, Error> {
+    if charge.profile() != limits {
+        return Err(Error::Schema(super::PolicySchemaError::ProfileMismatch));
+    }
+    if raw.len() > maximum_encoded_bytes || u32::try_from(raw.len()).is_err() {
+        return Err(Error::ByteLimit);
+    }
+    let maximum_spans = maximum_spans.min(u32::MAX as usize);
+    super::decode_indexed(
+        raw,
+        &super::canonical_original_etf_safety(),
+        (maximum_spans, maximum_spans, true, maximum_encoded_bytes),
         live,
         limits,
         charge,
@@ -254,23 +354,6 @@ pub(super) fn finish_decoded<'encoded, 'context>(
     }))
 }
 
-pub(super) fn reserve_peak(
-    counts: (usize, usize, usize),
-    live: usize,
-    charge: &mut PolicySchemaCharge,
-) -> Result<(), Error> {
-    let (n, k, f) = counts;
-    let peak = n
-        .checked_add(k)
-        .and_then(|v| v.checked_add(f))
-        .and_then(|v| v.checked_mul(64))
-        .and_then(|v| v.checked_add(live))
-        .ok_or_else(overflow)?;
-    charge_schema(charge, 0, u64::try_from(peak).map_err(|_| overflow())?)
-        .map_err(Error::Schema)?;
-    Ok(())
-}
-
 pub(super) fn reserved<T>(
     count: usize,
     width: u64,
@@ -296,4 +379,11 @@ fn reserve<T>(
     vector
         .try_reserve_exact(count)
         .map_err(|_| Error::AllocationFailure)
+}
+
+impl std::fmt::Debug for OriginalPolicyCurrentCursor<'_, '_, '_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OriginalPolicyCurrentCursor")
+            .finish_non_exhaustive()
+    }
 }

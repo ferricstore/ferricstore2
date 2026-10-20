@@ -38,7 +38,7 @@ fn seeded(path: &Path) -> TestResult<Vec<u8>> {
         0,
         0,
     )?;
-    f::seed(&mut store, &scope, &[row.clone()], 0, 0)?;
+    f::seed(&mut store, &scope, std::slice::from_ref(&row), 0, 0)?;
     drop(store);
     f::batch(
         &scope,
@@ -461,6 +461,8 @@ fn stage(path: &Path, bytes: &[u8]) -> TestResult<RedbSnapshotStage> {
 }
 #[test]
 fn interop_mixed_snapshot_lineage_and_received_install_keep_old_formats() -> TestResult {
+    use redb::ReadableDatabase;
+
     let dir = f::directory("interop-lineage")?;
     let (expected, wire) = lineage(&dir)?;
     assert_eq!(&wire[..6], b"FWSP\0\x03");
@@ -495,7 +497,6 @@ fn interop_mixed_snapshot_lineage_and_received_install_keep_old_formats() -> Tes
         assert!(
             matches!(stage(&path, &wire[..cut]), Err(error) if error.downcast_ref::<SnapshotError>() == Some(&SnapshotError::Malformed))
         );
-        use redb::ReadableDatabase;
         let database = redb::Builder::new().open(&path)?;
         assert_eq!(database.begin_read()?.list_tables()?.count(), 0);
     }

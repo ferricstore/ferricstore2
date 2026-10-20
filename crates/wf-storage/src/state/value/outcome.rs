@@ -18,6 +18,7 @@ use super::{
 };
 
 mod policy;
+pub(crate) use policy::outcome_policy_validation_bytes_in_layout;
 pub use policy::{encode_outcome_profiled, outcome_policy_validation_bytes, scan_outcome_profiled};
 
 /// Validated borrowed metadata and response, without transaction authority.

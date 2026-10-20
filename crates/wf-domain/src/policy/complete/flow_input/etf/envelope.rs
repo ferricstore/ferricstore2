@@ -13,6 +13,17 @@ pub(in crate::policy::complete::flow_input) fn emit_envelope(
     generation: u64,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Vec<u8>, Error> {
+    emit_envelope_bounded(layout, root, snapshot_length, generation, 263_168, charge)
+}
+
+pub(in crate::policy::complete::flow_input) fn emit_envelope_bounded(
+    layout: &FlowPolicyLayout<'_>,
+    root: usize,
+    snapshot_length: usize,
+    generation: u64,
+    maximum_encoded_bytes: usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Vec<u8>, Error> {
     if generation > MAX_POLICY_GENERATION {
         return Err(Error::Malformed);
     }
@@ -28,7 +39,7 @@ pub(in crate::policy::complete::flow_input) fn emit_envelope(
         .checked_add(18)
         .and_then(|bytes| bytes.checked_add(generation_width))
         .ok_or_else(overflow)?;
-    if length > 263_168 {
+    if length > maximum_encoded_bytes || u32::try_from(length).is_err() {
         return Err(Error::ByteLimit);
     }
     let fee = u64::try_from(length)

@@ -16,7 +16,7 @@ use super::super::{PreparedBytes, keys};
 use super::intent::map_codec_error;
 
 mod apply;
-mod response;
+pub(super) mod response;
 
 pub use apply::{
     FreshOriginalPolicySetFrame, OriginalPolicySetPointInspection, OriginalPolicySetRequestPlan,

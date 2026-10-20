@@ -121,7 +121,7 @@ fn number(
     Ok(unsigned(selected, maximum, charge)?.ok_or(reason))
 }
 
-fn kind(
+pub(super) fn kind(
     selected: Option<Cursor<'_>>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Result<BackoffKind, Reason>, Error> {

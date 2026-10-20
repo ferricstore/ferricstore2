@@ -1,14 +1,19 @@
 //! Same-guard policy publication and mathematical change correspondence.
 
-use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits};
+use wf_domain::policy::complete::{
+    CompletePolicyEncodingError, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
+    StoredPolicyValue, decode_original_complete_policy_entry_portable,
+};
+use wf_domain::policy::installation::{MAX_ENCODED_POLICY_BYTES, PolicyError};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlState, plan_control};
-use wf_domain::workflow::request::{DispatchDecision, RequestScope, RetainedOutcome};
+use wf_domain::workflow::request::{
+    DispatchDecision, RequestScope, RetainedOutcome, RetainedStatus,
+};
 use wf_types::identity::{RequestId, TenantId};
 
 use crate::log::{
-    CodecError, CompleteCorePolicyPatchRequestPlan, complete_core_policy_patch_response_matches,
-    complete_core_policy_patch_retained_status,
+    CodecError, CompleteCorePolicyPatchRequestPlan, complete_core_policy_patch_retained_status,
 };
 
 use super::{GroupApplyTransaction, StateTransactionError};
@@ -50,7 +55,7 @@ pub trait GroupCorePolicyTransaction: GroupApplyTransaction {
 pub struct GroupCorePolicyChanges<'scope, 'old, 'retained> {
     scope: &'scope RequestScope,
     expected: ControlState,
-    predecessor: Option<&'old CompletePolicyValue>,
+    predecessor: Option<&'old StoredPolicyValue>,
     plan: CompleteCorePolicyPatchRequestPlan<'retained>,
 }
 
@@ -64,7 +69,7 @@ impl<'scope, 'old, 'retained> GroupCorePolicyChanges<'scope, 'old, 'retained> {
     pub fn new(
         scope: &'scope RequestScope,
         expected: ControlState,
-        predecessor: Option<&'old CompletePolicyValue>,
+        predecessor: Option<&'old StoredPolicyValue>,
         plan: CompleteCorePolicyPatchRequestPlan<'retained>,
         profiles: (PolicySchemaLimits, AdmissionLimits),
         charge: &mut PolicySchemaCharge,
@@ -97,29 +102,28 @@ impl<'scope, 'old, 'retained> GroupCorePolicyChanges<'scope, 'old, 'retained> {
                 let query = plan
                     .workflow_type()
                     .ok_or(StateTransactionError::InvalidChanges)?;
-                if !plan.matches_predecessor(predecessor)
-                    || predecessor.is_some_and(|old| old.data().workflow_type != query)
-                {
+                if !plan.matches_predecessor(predecessor) {
                     return Err(StateTransactionError::InvalidChanges);
                 }
+                let stored_generation = predecessor_generation(
+                    predecessor,
+                    query,
+                    profiles.0,
+                    charge,
+                    maximum_validation_owner_bytes,
+                )?;
                 validate_scope(scope, outcome)?;
                 if outcome.original_position() != identity.log()
                     || outcome.original_time() != control.execution_time()
-                    || !complete_core_policy_patch_response_matches(
-                        fresh,
-                        profiles,
-                        charge,
-                        maximum_validation_owner_bytes,
-                    )
-                    .map_err(codec_error)?
+                    || !plan
+                        .response_matches(profiles, charge, maximum_validation_owner_bytes)
+                        .map_err(codec_error)?
                 {
                     return Err(StateTransactionError::InvalidChanges);
                 }
                 if let Some((generation, value)) = candidate
-                    && (*generation != predecessor.map_or(0, CompletePolicyValue::generation)
-                        || predecessor.is_some_and(|old| {
-                            old.data().workflow_type != value.data().workflow_type
-                        }))
+                    && (*generation != stored_generation
+                        || matches!(value, StoredPolicyValue::Complete(value) if value.data().workflow_type != query))
                 {
                     return Err(StateTransactionError::InvalidChanges);
                 }
@@ -165,7 +169,7 @@ impl<'scope, 'old, 'retained> GroupCorePolicyChanges<'scope, 'old, 'retained> {
     }
     /// Borrows the original full policy for actual backend correspondence.
     #[must_use]
-    pub const fn predecessor(&self) -> Option<&'old CompletePolicyValue> {
+    pub const fn predecessor(&self) -> Option<&'old StoredPolicyValue> {
         self.predecessor
     }
     /// Borrows all original classification and response owners.
@@ -180,7 +184,7 @@ impl<'scope, 'old, 'retained> GroupCorePolicyChanges<'scope, 'old, 'retained> {
     }
     /// Borrows only a Fresh accepted policy and its expected generation.
     #[must_use]
-    pub fn business(&self) -> Option<&(u64, CompletePolicyValue)> {
+    pub fn business(&self) -> Option<&(u64, StoredPolicyValue)> {
         match self.plan.decision() {
             DispatchDecision::Fresh((candidate, _)) => candidate.as_ref(),
             _ => None,
@@ -207,7 +211,8 @@ fn validate_scope(
 ) -> Result<(), StateTransactionError> {
     if outcome.scope() != scope
         || outcome.intent().version() != 2
-        || outcome.response_version() != 1
+        || !(outcome.response_version() == 1
+            || (outcome.response_version() == 2 && outcome.status() == RetainedStatus::Accepted))
     {
         return Err(StateTransactionError::InvalidChanges);
     }
@@ -220,6 +225,59 @@ fn codec_error(error: CodecError) -> StateTransactionError {
             StateTransactionError::Limit
         }
         CodecError::Allocation => StateTransactionError::Allocation,
+        CodecError::UnsupportedPolicyProfile => StateTransactionError::UnsupportedPolicyProfile,
         _ => StateTransactionError::InvalidChanges,
+    }
+}
+
+fn predecessor_generation(
+    predecessor: Option<&StoredPolicyValue>,
+    query: &[u8],
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    maximum_owner: usize,
+) -> Result<u64, StateTransactionError> {
+    match predecessor {
+        None => Ok(0),
+        Some(StoredPolicyValue::Complete(value)) => {
+            if value.data().workflow_type != query {
+                return Err(StateTransactionError::InvalidChanges);
+            }
+            Ok(value.generation())
+        }
+        Some(StoredPolicyValue::Original(raw)) => {
+            if raw.len() > MAX_ENCODED_POLICY_BYTES {
+                return Err(StateTransactionError::InvalidChanges);
+            }
+            let owner = raw
+                .len()
+                .checked_mul(256)
+                .and_then(|n| n.checked_add(65_536))
+                .ok_or(StateTransactionError::Limit)?;
+            if owner > maximum_owner {
+                return Err(StateTransactionError::Limit);
+            }
+            let entry = decode_original_complete_policy_entry_portable(raw, schema, charge)
+                .map_err(|error| match error {
+                    CompletePolicyEncodingError::UnsupportedPolicyProfile => {
+                        StateTransactionError::UnsupportedPolicyProfile
+                    }
+                    CompletePolicyEncodingError::AllocationFailure => {
+                        StateTransactionError::Allocation
+                    }
+                    CompletePolicyEncodingError::ByteLimit
+                    | CompletePolicyEncodingError::ItemLimit
+                    | CompletePolicyEncodingError::Schema(
+                        PolicySchemaError::WorkBytes { .. }
+                        | PolicySchemaError::Policy(PolicyError::StateBudget),
+                    ) => StateTransactionError::Limit,
+                    _ => StateTransactionError::InvalidChanges,
+                })?
+                .ok_or(StateTransactionError::InvalidChanges)?;
+            if entry.workflow_type() != Some(query) {
+                return Err(StateTransactionError::InvalidChanges);
+            }
+            Ok(entry.generation())
+        }
     }
 }

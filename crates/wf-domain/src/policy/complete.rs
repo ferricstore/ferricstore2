@@ -46,7 +46,9 @@ pub use encoding::{
 pub use error::{CircuitTrackingFailure, GovernanceField, GovernanceRuleKind, PolicySchemaError};
 pub use flow_input::{
     FlowPolicyInputRejection, GovernancePolicyInputRejection, RawFlowPolicyValue,
-    encode_original_complete_policy_input_rejection_body, normalize_original_complete_policy_input,
+    encode_original_complete_policy_input_rejection_body, encode_original_policy_from_complete,
+    normalize_original_complete_policy_input, original_core_policy_patch_bytes,
+    original_policy_from_complete_bytes, prepare_stored_core_policy_patch,
 };
 pub use indexed_input::{
     PolicyIndexedInputRejection, RawPolicyIndexedValue, normalize_complete_policy_indexed_input,
@@ -57,7 +59,7 @@ pub use installation::{
 };
 pub use model::{
     ApprovalsData, AuditData, BudgetData, CircuitData, CompleteStatePolicyData, DenialAuditMode,
-    EffectsData, GovernanceData, GovernanceMode, LimitData,
+    EffectsData, GovernanceData, GovernanceMode, LimitData, StoredPolicyValue,
 };
 pub use original_entry::{
     OriginalEtfLocalFun, OriginalEtfSafety, OriginalPolicyEntry, OriginalPolicyReadError,
@@ -69,7 +71,8 @@ pub use original_reply::{
     OriginalPolicyReply, OriginalPolicyReplyContext, OriginalPolicyReplyError,
     OriginalPolicyReplyMapEntry, OriginalPolicyReplyMapIter, OriginalPolicyReplyRejection,
     OriginalPolicyReplyValue, original_policy_get_reply_projection_bytes,
-    present_original_policy_get_reply, present_original_policy_set_reply,
+    original_policy_projection_reply_bytes, present_original_policy_get_reply,
+    present_original_policy_projection_get_reply, present_original_policy_set_reply,
 };
 pub use original_retry_keys::{
     OriginalPolicyMapKey, OriginalPolicyMapValue, original_complete_policy_uses_max_attempts,
@@ -115,6 +118,7 @@ pub use record_projection::{
     original_policy_indexed_fields_equal, original_record_batch_policy_has_governance,
     original_record_batch_policy_projection_bytes, project_original_record_batch_policy,
     project_record_batch_policy, record_batch_policy_projection_bytes,
+    stored_policy_indexed_fields_equal,
 };
 pub use replace_content::{
     CompletePolicyReplaceRejection, CompletePolicyReplaceRejectionKind,

@@ -47681,3 +47681,68 @@ scanning remains a concrete performance candidate for the required later work.
 Physical census: all868 Rust files satisfy production400/tooling-tests600.
 Finalsource/helper reviews have no open finding. Production remains uncommitted
 pending whole-workspace checks; full parity/runtime/both-host/allM1–M8 remain open.
+
+ROOT-B1-WHOLE-FINAL4-ACCEPTED (2026-10-20)
+
+The previous goal turn made concrete progress: the actual whole run exposed an
+unclassified std::array path, and Root corrected only the existing find helper's
+final fixed-array selection. No purity allowlist was widened. ARCH and PERF read
+the source and independently inverted the complete final383LF/478c10d6 file to
+the former380LF/629d7577 file. Atom-first selection, all N including zero, owners,
+input visits and debits are unchanged. ARCH PURE1 ends3566404; PERF PURE1 ends2797222.
+Earlier STYLE1/STYLE2 test factors and the sole public_reply lifetime cleanup also
+have both reviewers' independent whole-file inverses; all assertions are retained.
+
+Actual full nine-command sequence is terminal0. All1483 captured repository
+inputs remained unchanged, fingerprint
+31b12eebd17308d0fa47e8f3b0baf1f4dce104e557624e5cc578ad0b24e65692.
+Only the three appending ARCH/PERF/DOMAIN notes were outside that pin. Raw output
+is retained in /private/tmp/ferricstore2-m2-source-pin-validation.log:
+
+- fmt0:3347576+0/e3b0c442; check0:3347770+1140/61f5f798.
+- strict all-target Clippy0:3349129+1140/780b5302.
+- workspace tests0:3350462+100686/
+  04062c6034de00a7c6d05a330ff0d263ea870b57461ad2b24520254c362bbac2;
+  951PASS across90targets,0failed/ignored/measured/filtered.
+- doc tests0:3451333+2706/9d2353e3a894416bcc4eca2b3b54ad7c195cf6e22e9b7b6e94f342b15c8524c2;
+  6PASS across15targets,0failed/ignored/measured/filtered.
+- warnings-denied doc0:3454227+1252/4706fd12.
+- arch0:3455628+5023/1f5710b0; its47PASS are a repeated subset, not added to951.
+- reference0:3460805+365/ca4afb1b; progress0:3461323+559/bdd5a7d1.
+
+The preceding complete candidate passed fmt/check/strict but stopped in the
+architecture workspace test at the std::array path:3337432+9968/9b6bae2d.
+It was a real failed candidate, superseded by the complete final sequence above;
+its partial72PASS/1FAIL are not a passing-workspace claim. No test suppression,
+policy expansion or new file/type/model was used for the correction.
+
+Separate existing native executable and cached audit are terminal0. The17 native
+first-party inputs (manifest, lock and15src Rust files) join the same1483 repository
+inputs:1500 unchanged, fingerprint
+054ae454d08699fb6c76b4a649caaa41db43cd433fd3ee21192477073f0eae40.
+Generated databases, target output and advisory cache locks are not source inputs.
+Native fmt0:3462168+0/e3b0c442; check0:3462472+574/243248a1;
+strict0:3463375+184/53c0755b; actual run0:3463844+724/02db27e4,
+with actual `native transaction cases passed`. This exercises the existing driver
+against current products, not every original runtime/profile or a new B2 producer.
+Cached cargo-deny advisories/bans/licenses/sources allPASS0 at3464861+48/
+f1a0fca39d4280363937aabd77783990ea6480bd9ca257816de3b68fc8efa845.
+The command explicitly uses --offline --locked --workspace and denies unmatched
+skips; no fresh online advisory result is claimed.
+
+The full required parity gate is actually terminal1 at3465083+453/
+2fc2435c1f8cf3f23c1922dbd40e61f96ee2d5fe2bd8c4ea08deba99956968d6,
+with all1500 inputs unchanged. Ledger remains85source declarations/95mappings/
+384assertion links;5903registered/4222linked/1681unmatched/1655unresolved.
+The original scenario/assertion/setup/profile and adapter gaps remain failures;
+951 component tests and preserved registration do not certify full parity.
+
+Root updates CONTINUE only after all command pins have terminated; no Rust,
+configuration, reference or test input changes follow the passing sequence.
+Reviewed B1 note prefixes for the checkpoint: ARCH3566404, PERF2797222,
+DOMAIN4321656. Later B2 notes remain separate design proposals in the worktree.
+This goal turn is PROGRESS through full quality/native acceptance, accurate
+failing parity, documentation and the reviewed production checkpoint. B2 actual
+runtime profile/order, B3 indexed effects, B4 durable jobs, real governance/
+Claim/consensus/services/transports, full original acceptance and native Linux
+AND macOS/M1–M8 remain required. Full goal stays ACTIVE; no completion or impasse.

@@ -12,7 +12,7 @@ pub(in crate::policy::complete) mod indexed;
 mod runtime;
 mod safety;
 pub use indexed::decode_original_complete_policy_entry_portable;
-use indexed::{reserve_peak, reserved};
+use indexed::reserved;
 pub use safety::canonical_original_etf_safety;
 mod scalar;
 mod scan;
@@ -204,10 +204,15 @@ fn decode_with_span_limit<'encoded>(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<OriginalPolicyEntry<'encoded>>, Error> {
-    Ok(
-        decode_indexed(raw, safety, (span_limit, 4_096, false), 0, limits, charge)?
-            .map(|value| value.entry),
-    )
+    Ok(decode_indexed(
+        raw,
+        safety,
+        (span_limit, 4_096, false, 263_168),
+        0,
+        limits,
+        charge,
+    )?
+    .map(|value| value.entry))
 }
 
 pub(in crate::policy::complete) fn decode_retained<'encoded, 'context>(
@@ -221,7 +226,7 @@ pub(in crate::policy::complete) fn decode_retained<'encoded, 'context>(
     decode_indexed(
         raw,
         safety,
-        (span_limit, span_limit, false),
+        (span_limit, span_limit, false, 263_168),
         live,
         limits,
         charge,
@@ -231,17 +236,17 @@ pub(in crate::policy::complete) fn decode_retained<'encoded, 'context>(
 pub(super) fn decode_indexed<'encoded, 'context>(
     raw: &'encoded [u8],
     safety: &OriginalEtfSafety<'context>,
-    bounds: (usize, usize, bool),
+    bounds: (usize, usize, bool, usize),
     live: usize,
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<indexed::OriginalPolicyCurrentIndex<'encoded, 'context>>, Error> {
-    let (span_limit, map_limit, portable) = bounds;
+    let (span_limit, map_limit, portable, maximum_encoded_bytes) = bounds;
     if charge.profile() != limits {
         return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
     }
     pay(charge, 128)?;
-    if raw.len() > 263_168 || raw.len() < 2 {
+    if raw.len() > maximum_encoded_bytes || raw.len() < 2 {
         return Ok(None);
     }
     pay(charge, 1)?;
@@ -327,4 +332,21 @@ fn source_result<T>(result: Result<T, Error>) -> Result<Option<T>, Error> {
         Err(Error::Malformed | Error::TrailingBytes) => Ok(None),
         Err(error) => Err(error),
     }
+}
+
+pub(super) fn reserve_peak(
+    counts: (usize, usize, usize),
+    live: usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(), Error> {
+    let (n, k, f) = counts;
+    let peak = n
+        .checked_add(k)
+        .and_then(|v| v.checked_add(f))
+        .and_then(|v| v.checked_mul(64))
+        .and_then(|v| v.checked_add(live))
+        .ok_or_else(overflow)?;
+    charge_schema(charge, 0, u64::try_from(peak).map_err(|_| overflow())?)
+        .map_err(Error::Schema)?;
+    Ok(())
 }

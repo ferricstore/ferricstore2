@@ -117,6 +117,9 @@ impl RetainedOutcome {
         } = metadata;
         if response_version != 1
             && !(response_version == 2
+                && intent.version() == 2
+                && status == RetainedStatus::Accepted)
+            && !(response_version == 2
                 && intent.version() == 1
                 && matches!(
                     status,

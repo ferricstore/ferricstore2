@@ -16,7 +16,7 @@ use crate::retention::RetentionOverride;
 
 use super::{
     CompletePolicyEncodingError, CompletePolicyValue, PolicySchemaCharge, PolicySchemaError,
-    PolicySchemaLimits, validate_stored_complete_policy,
+    PolicySchemaLimits, StoredPolicyValue, validate_stored_complete_policy,
 };
 
 /// Detects configured governance maps after one fresh portable raw decode.
@@ -58,6 +58,72 @@ pub fn original_record_batch_policy_has_governance(
         }
     }
     Ok(false)
+}
+
+/// Compares actual stored indexed effects with a proposed original install donor.
+/// Complete backing is verified and borrowed; no synthetic original Vec is made.
+/// # Errors
+/// Preserves actual format/profile/work and reached source-normalizer errors.
+pub fn stored_policy_indexed_fields_equal(
+    before: Option<&StoredPolicyValue>,
+    after: &[u8],
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, CompletePolicyEncodingError> {
+    let Some(StoredPolicyValue::Complete(old)) = before else {
+        return original_policy_indexed_fields_equal(
+            before.map(StoredPolicyValue::encoded),
+            after,
+            schema,
+            charge,
+        );
+    };
+    super::verify_complete_policy_value_v2(old, schema, charge)?;
+    let index = original::read(after, &old.data().workflow_type, schema, charge)?;
+    super::admission::charge_schema(charge, 128, 0).map_err(CompletePolicyEncodingError::Schema)?;
+    let old_meta = old.data().indexed_state_meta.as_deref();
+    let new_meta = original::metadata(Some(&index), charge)?;
+    super::admission::charge_schema(charge, 128, 0).map_err(CompletePolicyEncodingError::Schema)?;
+    let old_names = old.data().indexed_attributes.as_deref().unwrap_or_default();
+    let mut new_names = [None; 3];
+    let new_count = original::attributes(Some(&index), &mut new_names, charge)?;
+    if old_names.len() != new_count {
+        return Ok(false);
+    }
+    for name in old_names {
+        let mut found = false;
+        for other in new_names.into_iter().take(new_count).flatten() {
+            if indexed_bytes_equal(name, other, charge)? {
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            return Ok(false);
+        }
+    }
+    match (old_meta, new_meta) {
+        (None, None) => Ok(true),
+        (Some(a), Some(b)) => indexed_bytes_equal(a, b, charge),
+        _ => Ok(false),
+    }
+}
+
+fn indexed_bytes_equal(
+    a: &[u8],
+    b: &[u8],
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, CompletePolicyEncodingError> {
+    let fee = a
+        .len()
+        .checked_add(b.len())
+        .and_then(|n| n.checked_add(128))
+        .and_then(|n| u64::try_from(n).ok())
+        .ok_or(CompletePolicyEncodingError::Schema(
+            PolicySchemaError::LengthOverflow,
+        ))?;
+    super::admission::charge_schema(charge, fee, 0).map_err(CompletePolicyEncodingError::Schema)?;
+    Ok(a == b)
 }
 
 /// Measures both temporary projections, including every copied state name.

@@ -5,6 +5,7 @@ use crate::state::RedbStateStore;
 use std::fmt;
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchFreshView, PolicySchemaCharge,
+    StoredPolicyValue,
 };
 use wf_domain::workflow::control::ControlState;
 use wf_domain::workflow::request::gate::PointGateView;
@@ -174,7 +175,7 @@ fn apply_fresh(
         .map_err(|_| StateTransactionError::Allocation)?;
     kind.extend_from_slice(requested);
     let _layout = tx.core_policy_layout()?;
-    let old = tx.installed_policy(scope.tenant(), &kind, limits.schema, charge)?;
+    let old = tx.stored_policy_value(scope.tenant(), &kind, limits.schema, charge)?;
     let plan = decide_complete_core_policy_patch_point_fresh(
         fresh,
         CompleteCorePolicyPatchFreshView {
@@ -189,9 +190,15 @@ fn apply_fresh(
     )
     .map_err(|error| apply_error(error, limits))?;
     drop(kind);
-    let validation = validation_bytes(plan.decision())?;
+    let response_validation = validation_bytes(plan.decision())?;
+    let predecessor_validation = match old.as_ref() {
+        Some(StoredPolicyValue::Original(raw)) => original_validation(raw)?,
+        _ => 0,
+    };
+    let validation = response_validation.max(predecessor_validation);
     staging = staging
-        .checked_add(validation)
+        .checked_add(predecessor_validation)
+        .and_then(|n| n.checked_add(response_validation))
         .ok_or(StateTransactionError::Limit)?;
     admit_staging(staging, limits)?;
     let changes = GroupCorePolicyChanges::new(
@@ -270,8 +277,24 @@ fn validation_bytes(
             .checked_mul(216)
             .and_then(|n| n.checked_add(2048))
             .ok_or(StateTransactionError::Limit),
+        Some(o)
+            if o.intent().version() == 2
+                && o.response_version() == 2
+                && o.response().first() == Some(&131) =>
+        {
+            original_validation(o.response())
+        }
         _ => Ok(0),
     }
+}
+fn original_validation(raw: &[u8]) -> Result<usize, StateTransactionError> {
+    if raw.len() > wf_domain::policy::installation::MAX_ENCODED_POLICY_BYTES {
+        return Err(StateTransactionError::InvalidChanges);
+    }
+    raw.len()
+        .checked_mul(256)
+        .and_then(|n| n.checked_add(65_536))
+        .ok_or(StateTransactionError::Limit)
 }
 fn nonfresh(
     plan: CompleteCorePolicyPatchRequestPlan<'_>,

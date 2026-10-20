@@ -7,6 +7,25 @@ use crate::policy::definition::StateMode;
 use crate::retention::RetentionOverride;
 use crate::workflow::active::LimitEnforcement;
 
+/// Full persisted policy backing; projections never replace this authority.
+pub enum StoredPolicyValue {
+    /// Complete normalized backing, moved after its actual owner admission.
+    Complete(Box<super::CompletePolicyValue>),
+    /// Original ETF backing, including arbitrary customer integer magnitudes.
+    Original(Vec<u8>),
+}
+
+impl StoredPolicyValue {
+    /// Borrows actual encoded backing without decoding or certifying its contents.
+    #[must_use]
+    pub fn encoded(&self) -> &[u8] {
+        match self {
+            Self::Complete(value) => value.encoded(),
+            Self::Original(raw) => raw,
+        }
+    }
+}
+
 /// Normalized content attached to one unique logical-state key.
 #[derive(Eq, PartialEq)]
 pub struct CompleteStatePolicyData {

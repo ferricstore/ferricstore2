@@ -5,111 +5,75 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The original-public-policy increment is implemented and validated on macOS. It
-connects the paid point gate to durable original ETF publication, real SET/GET,
-restricted Claim projections, layout6 snapshots and bounded committed recovery.
-Its thirty reviewed tests were frozen before implementation: two receipt cases,
-five domain cases, five ports cases, fourteen storage cases and four node cases.
-Architecture and performance independently reviewed the actual source, exact
-resource accounts, all Fresh predecessor/context authority, FIFO activation,
-physical fault cuts and snapshot custody. Thirteen approved private production
-children preserve the existing crate boundaries and dependency policy.
+The same-type ETF/V2 interoperability batch is implemented and validated on
+macOS. Real SET, GET and Core patches preserve complete values, original unknown
+bytes and actual predecessor/context authority across both formats. Six approved
+private Domain children preserve the existing crate/dependency boundaries. The
+fifteen new behavior identities include substitutions, FIFO, physical fault cuts,
+mixed snapshot lineage, large transient conversions and committed node recovery.
 
-Production checkpoint `b861d3d` passes **936 tests across 90 targets**, with zero
-failures, ignored or filtered tests, plus **six compile-fail examples across
+The reviewed B1 tree passes **951 tests across 90 targets**, with zero failures,
+ignored or filtered tests, plus **six compile-fail examples across
 15 documentation targets**. Formatting, all-target compilation, strict all-target
 Clippy, warnings-denied rustdoc, architecture and reference/progress checks pass.
-All 1,460 captured repository inputs stayed unchanged through that sequence;
+All 1,483 captured repository inputs stayed unchanged through that sequence;
 only the three concurrently appended peer review notes were outside the pin.
 The separate native transaction executable passes formatting, compilation,
-strict Clippy and execution against the same products, with all 1,477 combined
+strict Clippy and execution against the same products, with all 1,500 combined
 repository/native inputs unchanged. All four cached dependency-audit categories
 pass. Production files remain within 400 physical lines and tooling/tests 600,
 with unchanged strict function checks. No fresh online advisory audit, native
-Linux result or measured performance gain is claimed.
+Linux result or measured performance gain is claimed. Earlier checkpoint
+`b861d3d` passed 936 tests before these fifteen new identities.
 
-Additional genuine regressions preceded repairs for unsupported-profile
-allocation, valid-but-unrepresentable ETF states, configured governance,
-hard oversized persisted rows and direct-commit same-owner cache reuse. Their
-tests are frozen in 304754a, bd74056, a18dbde and 9277a71. Cache publication now
-follows known successful commits. Review proved the later test-style cleanup
-conserves every old assertion; b0bbcc1 freezes it. Commit 1dc0723 keeps the future
-snapshot-version refusal at 4 and malformed legacy-body controls for 2/3. The
-earlier whole run's sole stale fixture failure is superseded by the complete
-passing sequence, rather than counted as a production bug.
+The original-public-policy prerequisite connects the paid point gate to durable
+ETF publication, restricted Claim projections, layout6 snapshots and bounded
+committed recovery. Its thirty reviewed tests were frozen before implementation.
+Genuine regressions also preceded repairs for unsupported-profile allocation,
+valid-but-unrepresentable ETF states, configured governance, hard oversized
+persisted rows and direct-commit same-owner cache reuse. Their tests are frozen
+in 304754a, bd74056, a18dbde and 9277a71. Cache publication follows known successful
+commits. Reviewed test-style factors conserve the old assertions and limits.
 
-Full product completion remains open. The next required work is same-type
-ETF/V2 interoperability, followed by actual runtime source profiles/order,
-authoritative indexed record effects and durable migration jobs. The concrete B1
-test batch has fifteen behavior identities across sixteen private test/helper
-paths. All six storage scenarios are authored, covering substitutions, FIFO,
-physical faults, mixed snapshot lineage and large transient conversions; the
-final storage batch is frozen in `8fa7434` before implementation. Review
-strengthened full state-name coverage and the paid lazy-conversion discriminator.
-The first frozen ports regression reproduced UnsupportedVersion before later
-union-carrier tests were added. Before implementation, the frozen domain, ports
-and storage targets failed compilation at the missing APIs/carrier. Earlier
-existing-API storage and node cases reproduce UnsupportedPolicyFormat; scoped
-target lint passes. Assertions after those reached failures remain unexecuted.
-The existing mixed-format test now requires acceptance on independent full-store
-forks while preserving its primary record operations. A supported-format S3
-precursor also reproduces a forged Core migration-context commit; architecture
-has selected its fixed reached-context seal before implementation. Exact review,
-input pins, execution limits and test checkpoints are in the coordination record.
-The approved Domain implementation is in progress with separate integration
-ownership. The coordinator has authored the existing Ports/storage integration;
-architecture and performance have reviewed its actual source. Their review found
-a missing actual-layout check for supplied Core response2 replay. The guard and a
-direct replay regression are authored but await coherent compilation and actual
-before/after execution. Legacy test callers are being adapted to the shared
-policy carrier with their assertions and resource limits preserved.
+B1's frozen tests first reproduced missing APIs/carriers and unsupported formats.
+Subsequent keyword/binary regressions preceded their repairs. Flat/chained proper
+keyword groups preserve zero-LIST aliases, unknown bytes and earlier duplicates;
+changed groups replace the last known entry and clear all targeted entries.
+Three padded-number controls pass both phases; the suspected numeric defect was
+withdrawn after checking paid lexical normalization. No numeric repair or
+fixed63-profile expansion was made. Both reviewers independently reconstructed
+the ten pregeometry files and accepted the helper moves and unchanged accounts.
 
-The keyword/binary correction now passes all 140 affected Domain tests and all
-109 affected Ports tests on unchanged scoped inputs, with zero failures,
-ignored or filtered tests. This includes the new binary labels, flat/chained
-keyword groups, zero-LIST alias preservation and exact original MAP accounting.
-Three padded-number controls pass both phases; their suspected source defect was
-withdrawn after checking the paid lexical normalization. No numeric repair or
-profile-table expansion is selected. All test files remain within 600 lines.
-The reviewed whole-helper moves and count extraction now satisfy the production
-400-line limit; every Rust file satisfies its physical limit. Strict Domain
-all-target Clippy passes. Both reviewers independently reconstructed all ten
-pregeometry files and accepted the unchanged behavior and accounting.
+The large reduction scenario preserves the original oversized-request rejection,
+then applies two legal reductions with independent full ETF/cohort/reopen checks.
+It passes the exact typed 2bn WorkBytes refusal with complete rollback/default
+reopen, then both positives under the reviewed source-derived 8bn work/10bn
+workspace configuration. Only the reduction test's read limit is 256MiB; original
+GET/lazy defaults and production limits stay unchanged. All six new storage and
+both new node scenarios pass in the complete workspace run.
 
-The Storage target compiles. S1's original all-removal request exceeds the fixed
-public patch cap; the reviewed correction preserves its exact rejection and
-uses two legal reductions with independent full ETF/cohort/reopen checks. The
-large expected-wire helper has the explicit expanded schema and still shares one
-account through both validations. S1 now passes the exact typed2bn WorkBytes
-refusal with complete rollback/default reopen, then both legal positives under
-the reviewed source-derived8bn/W10bn configuration. Only reduction R is256MiB;
-original GET/lazy defaults and production limits stay exact. All five other new
-storage scenarios pass, including physical faults and mixed snapshots. Both new
-node recovery/snapshot cases pass. Controlled removal of the replay layout guard
-reproduces invalid acceptance on actual layout3; restoring it passes every S3
-control. This late guard check is not claimed as tests-before-code TDD.
-Remaining storage/node and
-full-workspace execution is still required; no new whole-workspace PASS exists.
-Full pinned Elixir scenario/assertion/setup/profile
-parity, governing services, accepted consensus/runtime, application/transports
-and both Linux/macOS acceptance remain required. Progress remains 85 source-derived
-declarations, 95 mappings and 384 assertion links; this increment adds no parity
-credit, and the full parity gate still fails. The active full-completion goal
-continues beyond this component. The preceding production checkpoint is cb68b87.
+Review found a missing actual-layout check for supplied Core response2 replay.
+Controlled removal of the two guard predicates reproduces invalid acceptance on
+actual layout3; restoration passes every S3 control. This late guard check is
+explicitly not tests-before-code TDD. The supported-format N2 prelude separately
+exposed publication while received DATA awaited log acknowledgment. All eight
+pre-code regressions in `41c1dc8` now pass with complete cohort protection; the
+later mixed-format N2 tail also passes in B1. Exact log replay, accepted
+publication, purge permission and successful-commit cache timing remain preserved.
 
-The supported-format N2 prelude exposed and now repairs a separate custody bug:
-Core/original replay, conflict, expiry and Fresh stale rejection published
-while received DATA still awaited log acknowledgment. Before repair, all eight
-actual cases changed the complete durable state cohort while log rows/metadata
-stayed unchanged. The reviewed regression was committed in `41c1dc8` before
-the three-file storage fix. All eight checks now complete, and the 61 existing
-node recovery/snapshot tests pass with strict target Clippy. The two new feature
-tests were deliberately filtered from that existing-test run and remain separate
-missing-interoperability regressions; overall N2 still fails later at unsupported
-Core-over-ETF. Architecture and performance accepted the actual source and each
-other's review. Exact log replay, accepted publication, local purge permission
-and successful-commit cache timing remain preserved. Full interoperability
-remains incomplete; this is a scoped repair, not a new full-workspace result.
+Full product completion remains open. The next required work is B2 actual
+runtime source profiles/order, B3 authoritative indexed record effects and B4
+durable migration jobs. B2 is a design-only architecture/performance consultation;
+no runtime producer, new profile or artifact roster is selected yet. Pinned OTP
+research identifies runtime identity, future-key closure and durable replay facts
+that require concrete ownership and bounded accounting before implementation.
+
+Full pinned Elixir scenario/assertion/setup/profile parity, governing services,
+accepted consensus/runtime, application/transports and Linux/macOS acceptance
+remain required. Progress remains 85 source-derived declarations, 95 mappings and
+384 assertion links; this increment adds no complete source-case parity credit.
+The full parity gate was executed and still fails. The active full-completion
+goal continues beyond this reviewed component.
 
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper
