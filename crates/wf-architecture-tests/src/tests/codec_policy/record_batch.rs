@@ -179,6 +179,15 @@ fn assert_record_batch_exports() -> CheckResult<()> {
         "decide_fresh_public_mutation_touched",
         "public_mutation_retained_status",
         "public_mutation_response_matches",
+        "prepare_claim_phase",
+        "inspect_claim_phase_point",
+        "decide_fresh_claim_phase_observed",
+        "ClaimPhaseInspection",
+        "FreshClaimPhase",
+        "ClaimApplyPlan",
+        "ClaimApplyDecision",
+        "claim_retained_summary",
+        "claim_response_matches",
     ] {
         assert!(
             source_check(

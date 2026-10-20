@@ -18,6 +18,12 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-domain", "policy::complete::record_projection"),
         ("wf-domain", "policy::complete::record_projection::nested"),
         ("wf-ports", "log::record_batch::response"),
+        ("wf-ports", "log::claim"),
+        ("wf-ports", "log::claim::apply"),
+        ("wf-ports", "log::claim::apply::nested"),
+        ("wf-ports", "log::claim::response"),
+        ("wf-ports", "log::claim::response::scan"),
+        ("wf-ports", "log::claim::response::scan::nested"),
         ("wf-ports", "state::transaction::independent"),
         ("wf-ports", "state::transaction::independent::nested"),
         ("wf-ports", "log::public_mutation::response"),
@@ -62,10 +68,11 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
     Ok(())
 }
 
-#[test]
-fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
+fn assert_effectful_transaction_neighbors() -> CheckResult<()> {
     for (package, module) in [
         ("wf-ports", "state::transaction"),
+        ("wf-ports", "state::claim"),
+        ("wf-ports", "state::claim::nested"),
         ("wf-storage", "transaction"),
         ("wf-storage", "transaction::record_batch"),
         ("wf-storage", "transaction::load"),
@@ -74,6 +81,7 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         ("wf-storage", "state::key_backend"),
         ("wf-storage", "state::keyed"),
         ("wf-ports", "log::record_batch::response_backend"),
+        ("wf-ports", "log::claim_backend"),
         ("wf-ports", "state::transaction::independent_backend"),
         ("wf-ports", "log::public_mutation_backend"),
         ("wf-ports", "consensus::mutation"),
@@ -89,6 +97,12 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
             Vec::<String>::new()
         );
     }
+    Ok(())
+}
+
+#[test]
+fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
+    assert_effectful_transaction_neighbors()?;
     for name in [
         "GroupApplyStore",
         "GroupApplyTransaction",
@@ -96,6 +110,13 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         "GroupApplyChanges",
         "GroupControlChanges",
         "GroupControlTransaction",
+        "GroupClaimChanges",
+        "GroupClaimTransaction",
+        "GroupClaimDueCursor",
+        "GroupClaimLaneCursor",
+        "ClaimDueKind",
+        "ClaimDueStep",
+        "ClaimLaneStep",
     ] {
         assert!(
             source_check(

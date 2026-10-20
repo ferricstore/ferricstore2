@@ -5,7 +5,7 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest reviewed increment adds repeatable snapshot advancement and trusted
+The latest reviewed increment (`12cc4ff`) adds repeatable snapshot advancement and trusted
 received-snapshot composition over the durable state catalog. The preceding
 storage increment (`c1073db`) adds the trusted received-log boundary. Matching
 full local identities require the actual body digest and retain their suffix;
@@ -93,6 +93,16 @@ before any additional file, type or module, then establish real failing tests
 before implementation. Queued runtime capture and offline restore/lineage remain
 mandatory. Finish remaining domain and committed Claim/policy routes, services and
 complete M1–M8 acceptance, including both supported hosts.
+
+ARCH-M1M2-DURABLE-CLAIM-LEAF1-CREATE1 selects the exact first durable Claim
+contract after reciprocal architecture/performance review. Root releases only
+its 10 named test/helper children and registrations for tests-first authoring;
+all 12 production paths remain held until substantive tests are reviewed,
+frozen and reach genuine RED. The contract preserves
+query-scoped due selection, independent FIFO head discovery, the complete
+original retained lease reply and one consumed atomic publication. Full public
+Claim/governance, complete-policy publication/activation, source setup/profiles
+and both-host execution remain required successors to that physical leaf.
 
 The first native recheck selected system Rust 1.98 outside the repository. Only
 the remaining native checks were rerun with pinned Rust 1.99; all passed without

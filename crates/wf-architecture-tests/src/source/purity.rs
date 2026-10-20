@@ -19,6 +19,7 @@ impl Inspector<'_, '_> {
             "log::record_batch::response::independent",
             "state::transaction::independent",
             "log::public_mutation",
+            "log::claim",
             "consensus::membership",
             "log::control",
             "log::common",
