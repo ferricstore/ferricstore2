@@ -36,18 +36,25 @@ anchors alone cannot establish completeness or actual assertion execution.
 
 The offline generator records reviewed partition, fencing, borrowed retry-policy
 and authoritative claim-view observations, plus subsequent reviewed domain
-increments: 84 source declarations, 94 counterpart records and 373 assertion links.
+increments: 85 source declarations, 95 counterpart records and 384 assertion links.
 
-The latest two counterparts preserve the direct pure RetryPolicyTest malformed
-state recipes and compact-policy canonical snapshot, including all six source
-assertions through eight exact kind/body/full-reply links. Both pass in the
-ten-test Rust retry-policy target, with strict Clippy. The original Mix command
-stopped before tests at a local TCP socket `:eperm`; it is retained as setup
-failure, with source runtime/helper profiles and independent Linux validation
-still required. The third state-mode/FIFO helper case remains unlinked. These
-are tests of existing behavior, without a new tests-first RED or full-parity
-claim. Previous counterpart anchors and all runtime bindings remain unchanged;
-only three older whole-file hashes change for the append-only Rust test file.
+Three direct RetryPolicyTest counterparts now preserve the malformed-state
+recipes, compact-policy canonical snapshot and independent execution modes.
+The third retains the exact ordered-policy keyword input and observes the actual
+product reply's queued/review/undeclared modes and complete two-state map before
+ordinary Rust FIFO-set/any/filter predicates. Actual Absent supplies an empty map
+and false for nil. Its nine source assertions receive eleven direct links;
+mechanical fixture/map helpers receive no direct assertion credit. The encoded
+generation1 and identity map-order correspondence are represented fixtures,
+without VM/native-order capture or failure-order parity. A missing fixture
+correspondence caused the first attempt's InvalidAuthority; production stayed
+unchanged. All eleven Rust retry-policy tests and strict Clippy pass. The original
+Mix command stopped before tests at a local TCP socket `:eperm`; original runtime,
+helper profiles and independent Linux validation remain required. These are
+existing-behavior observations with no new tests-first RED or full-parity claim.
+Every runtime binding and old assertion anchor is preserved. Exactly six ledger
+records change: five existing whole-file hashes and the new counterpart; two
+older limitations now acknowledge the separately linked mode observations.
 Three independent-terminal counterparts add 30 direct component links for the
 four Complete/Retry/Fail/Cancel groups, the success/error/success pipeline and
 duplicate Complete with one newly emitted completion event. Shared macros run

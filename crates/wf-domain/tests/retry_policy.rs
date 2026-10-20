@@ -414,3 +414,160 @@ fn original_flow_policy_omits_absent_fields_and_preserves_the_exact_empty_state(
     assert_eq!(actual, Ok(expected.to_vec()));
     Ok(())
 }
+
+use std::collections::BTreeSet;
+use wf_domain::policy::complete::RawFlowPolicyValue::{Atom, Binary, List, Map, Tuple};
+use wf_domain::policy::complete::{
+    CompletePolicyEncodingError, FlowPolicyInputRejection, OriginalEtfSafety,
+    OriginalPolicyReadValue, OriginalPolicyReply, OriginalPolicyReplyContext, PolicySchemaCharge,
+    PolicySchemaLimits, normalize_original_complete_policy_input,
+    present_original_policy_get_reply,
+};
+use wf_domain::retention::ResolvedRetention;
+
+// Frozen declaration 3cc1821bd694c95e, direct RetryPolicyTest lines 27-44.
+#[test]
+fn original_flow_policy_retains_independently_configured_execution_modes() -> TestResult {
+    let limits = PolicySchemaLimits::default();
+    let mut charge = PolicySchemaCharge::new(limits);
+    let snapshot = original_ordered_policy_input(limits, &mut charge)?;
+    assert!(snapshot.is_ok());
+    let snapshot = snapshot.map_err(|_| "original ordered-policy recipe was rejected")?;
+    let mut encoded = b"\x83\x68\x03\x77\x0eflow_policy_v1\x61\x01".to_vec();
+    encoded.extend_from_slice(snapshot.get(1..).ok_or("missing ETF version")?);
+    drop(snapshot);
+    let atoms = [
+        "flow_policy_v1",
+        "states",
+        "type",
+        "mode",
+        "fifo",
+        "parallel",
+    ];
+    let safety = OriginalEtfSafety::new(&atoms, &[], None, &[]);
+    // Represented fixture correspondence, without VM/native order capture credit.
+    let context = OriginalPolicyReplyContext::new(
+        safety,
+        ResolvedRetention::default(),
+        Some(&encoded),
+        Some((5, &[0, 1], &[0, 1])),
+        0,
+    );
+    for (state, expected) in [
+        (b"queued".as_slice(), b"fifo".as_slice()),
+        (b"review".as_slice(), b"parallel".as_slice()),
+        (b"undeclared".as_slice(), b"parallel".as_slice()),
+    ] {
+        let reply = present_original_policy_get_reply(
+            b"ordered-policy",
+            OriginalPolicyReadValue::Binary(&encoded),
+            Some(state),
+            context,
+            limits,
+            &mut charge,
+        )??;
+        let root = reply.root();
+        let mode = root
+            .atom_field("mode", &mut charge)?
+            .ok_or("selected mode absent")?;
+        assert_eq!(mode.atom_bytes(), Some(expected));
+    }
+    {
+        let reply = present_original_policy_get_reply(
+            b"ordered-policy",
+            OriginalPolicyReadValue::Binary(&encoded),
+            None,
+            context,
+            limits,
+            &mut charge,
+        )??;
+        let mut actual = BTreeMap::new();
+        original_reply_state_modes(&reply, &mut actual, &mut charge)?;
+        // Set/any queries observe the complete product-resolved public map.
+        assert_eq!(
+            actual,
+            BTreeMap::from([
+                (b"queued".as_slice(), b"fifo".as_slice()),
+                (b"review".as_slice(), b"parallel".as_slice()),
+            ])
+        );
+        let fifo_states = actual
+            .iter()
+            .filter(|(_, mode)| **mode == b"fifo")
+            .map(|(&name, _)| name)
+            .collect::<BTreeSet<_>>();
+        assert_eq!(fifo_states, BTreeSet::from([b"queued".as_slice()]));
+        assert!(actual.values().any(|&mode| mode == b"fifo"));
+        assert!(
+            actual
+                .iter()
+                .any(|(&name, &mode)| mode == b"fifo" && name == b"queued")
+        );
+        assert!(
+            !actual
+                .iter()
+                .any(|(&name, &mode)| mode == b"fifo" && name == b"review")
+        );
+    }
+    let absent = present_original_policy_get_reply(
+        b"ordered-policy",
+        OriginalPolicyReadValue::Absent,
+        None,
+        context,
+        limits,
+        &mut charge,
+    )??;
+    let mut modes = BTreeMap::new();
+    original_reply_state_modes(&absent, &mut modes, &mut charge)?;
+    assert_eq!(modes.len(), 0);
+    assert!(!modes.values().any(|&mode| mode == b"fifo"));
+    Ok(())
+}
+
+fn original_ordered_policy_input(
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<Vec<u8>, FlowPolicyInputRejection>, CompletePolicyEncodingError> {
+    let queued_mode = [Atom("mode"), Atom("fifo")];
+    let review_mode = [Atom("mode"), Atom("parallel")];
+    let queued = [Tuple(&queued_mode)];
+    let review = [Tuple(&review_mode)];
+    let states = [
+        (Binary(b"queued"), List(&queued)),
+        (Binary(b"review"), List(&review)),
+    ];
+    let option = [Atom("states"), Map(&states)];
+    let opts = [Tuple(&option)];
+    normalize_original_complete_policy_input(
+        &Binary(b"ordered-policy"),
+        &List(&opts),
+        1_000_000,
+        limits,
+        charge,
+    )
+}
+
+fn original_reply_state_modes<'view>(
+    reply: &'view OriginalPolicyReply<'_>,
+    actual: &mut BTreeMap<&'view [u8], &'view [u8]>,
+    charge: &mut PolicySchemaCharge,
+) -> TestResult {
+    let states = reply
+        .root()
+        .atom_field("states", charge)?
+        .ok_or("states absent")?;
+    let mut rows = states.map_iter().ok_or("states were not a map")?;
+    while let Some((name, row)) = rows.next(charge)? {
+        let mode = row.atom_field("mode", charge)?.ok_or("state mode absent")?;
+        assert!(
+            actual
+                .insert(
+                    name.binary_bytes().ok_or("state was not binary")?,
+                    mode.atom_bytes().ok_or("mode was not an atom")?,
+                )
+                .is_none()
+        );
+    }
+    assert_eq!(states.map_len(), Some(actual.len()));
+    Ok(())
+}

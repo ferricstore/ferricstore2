@@ -14599,7 +14599,7 @@
         {
           "scenario_id": "m1-deb8dc5136bd2e4e",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
+          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
           "rust_module": "",
           "rust_function": "original_flow_policy_rejects_both_malformed_state_policy_recipes",
           "assertions": [
@@ -14630,7 +14630,7 @@
           ],
           "limitations": [
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
-            "Executed original-input normalization preserves both exact workflow type names, keyword states opts, queued state, integer42 and the one-element non-keyword atom list. The shared direct rejection-kind/body macros execute for BOTH original recipes; each source error tuple maps to both observations. This covers the complete pure rejection observations using existing Rust descriptors, without a runtime term decoder or transport claim. The source ExUnit.Case async:true file has no case setup or special tags; its original umbrella helper/profile still requires execution. The actual normal mix test attempt stopped before tests at Mix.PubSub TCP socket :eperm, retained as setup failure. First Rust PASS and strict checks are macOS acceptance of existing implemented behavior, not tests-first RED, original source execution, independent Linux validation or full workflow parity. The separate FIFO helper case remains open."
+            "Executed original-input normalization preserves both exact workflow type names, keyword states opts, queued state, integer42 and the one-element non-keyword atom list. The shared direct rejection-kind/body macros execute for BOTH original recipes; each source error tuple maps to both observations. This covers the complete pure rejection observations using existing Rust descriptors, without a runtime term decoder or transport claim. The source ExUnit.Case async:true file has no case setup or special tags; its original umbrella helper/profile still requires execution. The actual normal mix test attempt stopped before tests at Mix.PubSub TCP socket :eperm, retained as setup failure. First Rust PASS and strict checks are macOS acceptance of existing implemented behavior, not tests-first RED, original source execution, independent Linux validation or full workflow parity. The separate FIFO helper observations have their own public-view counterpart; complete original-case/profile acceptance remains open."
           ]
         }
       ]
@@ -14644,7 +14644,7 @@
         {
           "scenario_id": "m1-9e5df11d9c3d3842",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
+          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
           "rust_module": "",
           "rust_function": "original_flow_policy_omits_absent_fields_and_preserves_the_exact_empty_state",
           "assertions": [
@@ -14675,7 +14675,7 @@
           ],
           "limitations": [
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
-            "Executed original-input normalization preserves compact-policy, original keyword states opts and queued empty state policy. One direct full Result/canonical ETF equality proves normalization success, exactly the states/type fields, absent version/max_active_ms and exactly queued=>empty map; all four original assertions are linked to that complete literal equality. Independent grammar packing proves all60 expected bytes; it is not an externally promised legacy wire format. The source ExUnit.Case async:true file has no case setup or special tags; original umbrella helper/profile execution still requires a usable Mix environment. Actual mix test stopped before tests at Mix.PubSub TCP socket :eperm. Existing-behavior Rust/macOS PASS adds neither retroactive TDD, independent Linux acceptance, source runtime/profile execution nor full workflow parity. The third execution-mode/FIFO helper case remains unlinked."
+            "Executed original-input normalization preserves compact-policy, original keyword states opts and queued empty state policy. One direct full Result/canonical ETF equality proves normalization success, exactly the states/type fields, absent version/max_active_ms and exactly queued=>empty map; all four original assertions are linked to that complete literal equality. Independent grammar packing proves all60 expected bytes; it is not an externally promised legacy wire format. The source ExUnit.Case async:true file has no case setup or special tags; original umbrella helper/profile execution still requires a usable Mix environment. Actual mix test stopped before tests at Mix.PubSub TCP socket :eperm. Existing-behavior Rust/macOS PASS adds neither retroactive TDD, independent Linux acceptance, source runtime/profile execution nor full workflow parity. The third execution-mode/FIFO observations now have a separate public-view counterpart; complete original-case/profile acceptance remains required."
           ]
         }
       ]
@@ -14685,7 +14685,87 @@
       "runtime_case_ids": [
         "e5369798e83f4aca07b1d3dd88fdc91f05c0de47ea617eca155def4065d6ddf9"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-3cc1821bd694c95e",
+          "rust_file": "crates/wf-domain/tests/retry_policy.rs",
+          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
+          "rust_module": "",
+          "rust_function": "original_flow_policy_retains_independently_configured_execution_modes",
+          "assertions": [
+            {
+              "source_line": 28,
+              "source_text": "assert {:ok, policy} =",
+              "rust_line": 434,
+              "rust_text": "assert!(snapshot.is_ok());"
+            },
+            {
+              "source_line": 36,
+              "source_text": "assert RetryPolicy.state_mode(policy, \"queued\") == :fifo",
+              "rust_line": 473,
+              "rust_text": "assert_eq!(mode.atom_bytes(), Some(expected));"
+            },
+            {
+              "source_line": 37,
+              "source_text": "assert RetryPolicy.state_mode(policy, \"review\") == :parallel",
+              "rust_line": 473,
+              "rust_text": "assert_eq!(mode.atom_bytes(), Some(expected));"
+            },
+            {
+              "source_line": 38,
+              "source_text": "assert RetryPolicy.state_mode(policy, \"undeclared\") == :parallel",
+              "rust_line": 473,
+              "rust_text": "assert_eq!(mode.atom_bytes(), Some(expected));"
+            },
+            {
+              "source_line": 39,
+              "source_text": "assert RetryPolicy.fifo_states(policy) == MapSet.new([\"queued\"])",
+              "rust_line": 487,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 39,
+              "source_text": "assert RetryPolicy.fifo_states(policy) == MapSet.new([\"queued\"])",
+              "rust_line": 499,
+              "rust_text": "assert_eq!(fifo_states, BTreeSet::from([b\"queued\".as_slice()]));"
+            },
+            {
+              "source_line": 40,
+              "source_text": "assert RetryPolicy.any_fifo_state?(policy)",
+              "rust_line": 500,
+              "rust_text": "assert!(actual.values().any(|&mode| mode == b\"fifo\"));"
+            },
+            {
+              "source_line": 41,
+              "source_text": "assert RetryPolicy.any_fifo_state?(policy, &(&1 == \"queued\"))",
+              "rust_line": 501,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 42,
+              "source_text": "refute RetryPolicy.any_fifo_state?(policy, &(&1 == \"review\"))",
+              "rust_line": 506,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 43,
+              "source_text": "refute RetryPolicy.any_fifo_state?(nil)",
+              "rust_line": 522,
+              "rust_text": "assert_eq!(modes.len(), 0);"
+            },
+            {
+              "source_line": 43,
+              "source_text": "refute RetryPolicy.any_fifo_state?(nil)",
+              "rust_line": 523,
+              "rust_text": "assert!(!modes.values().any(|&mode| mode == b\"fifo\"));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed original ordered-policy normalization preserves the exact keyword states recipe with queued FIFO and review parallel. The actual flow_policy_v1 reader and charged public reply resolver supply queued/review/undeclared modes and the complete two-row map before ordinary Rust set/any/queued/review predicates; actual Absent supplies an empty map and nil false. Nine original assertions map to direct success/mode/full-map/set/predicate macros in the named test, including both empty-map and false observations for nil. The two same-file helpers only construct the original raw recipe or mechanically inspect charged product map rows; they implement no mode fallback or FIFO business logic. This is the reviewed Rust public-view semantic counterpart, with no new named FIFO helper API. The explicit generation1 envelope and same-byte states span5 identity-order correspondence are represented fixtures, not VM/native map-order capture, authoritative storage or failure-order parity. A first attempt lacking required all-state correspondence failed InvalidAuthority; the fixture was corrected without changing production or claiming tests-first RED. All eleven retry-policy tests and strict lint pass on macOS; the mutable-output extractor refinement preserves the complete old13790-byte prefix and original observations. Original ExUnit.Case async:true umbrella setup/helper/profile execution remains required: the real source attempt stopped before assertions at Mix.PubSub TCP socket :eperm. No source runtime, transport, full source-case/workflow parity, independent Linux acceptance or measured performance is certified."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "49c8502d9c270367",
@@ -22879,7 +22959,7 @@
         {
           "scenario_id": "m1-999b558a2dc276d2",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
+          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
           "rust_module": "",
           "rust_function": "flow_retry_policy_accepts_thirty_day_backoff_cap",
           "assertions": [
@@ -22935,7 +23015,7 @@
         {
           "scenario_id": "m1-bd7d579285676091",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
+          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
           "rust_module": "",
           "rust_function": "flow_retry_policy_computes_standard_backoff_timing",
           "assertions": [
@@ -23087,7 +23167,7 @@
         {
           "scenario_id": "m1-ecaed3fd34f388ec",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "3ede5348ab58900dab072a82d083df8aebc4a7b82e47ccf4763073d872d8a229",
+          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
           "rust_module": "",
           "rust_function": "flow_retry_policy_keeps_generated_backoff_values_bounded_and_deterministic",
           "assertions": [
