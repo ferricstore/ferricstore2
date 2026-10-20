@@ -384,3 +384,5 @@ fn point_gate_rejects_incoherent_cohort_and_foreign_retained() -> TestResult {
     );
     Ok(())
 }
+
+mod charged;

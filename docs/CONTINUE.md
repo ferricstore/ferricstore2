@@ -5,7 +5,7 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest completed component is the durable physical Claim increment.
+The latest completed component is the durable physical Claim increment (`a422638`).
 Commit `e080ef4` freezes 31 substantive tests after reviewed missing-API RED.
 The implementation spans thirteen approved private production files and existing
 seams, with separate domain/storage and ports/node ownership. Architecture and

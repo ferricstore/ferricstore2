@@ -45402,3 +45402,102 @@ accuracy/design issue. No new source artifact or future approval is inferred.
 Root will checkpoint only this reviewed implementation/tests/metadata/docs. The
 next completecorePatch/publication roster is being derived READ-ONLY by Writer
 with dedicated ARCH/PERF consultation; it is not selected or released yet.
+
+
+### ROOT next durable policy consultation — actual origin and priority constraints
+
+The previous goal turn was PROGRESS: reviewed implementation checkpoint a422638,
+actual873/90+6/15 full macOS validation, separate pinned native execution, cached
+all-category audit and conservative ledger repair. Fresh current-state reads
+confirm that HEAD and a clean worktree before this continuation's documentation
+update. All three explicitly requested6.1-sol/max peers are actually running and
+communicate directly on the next contract; no successor source is released.
+
+Root independently whole-read state/redb/bootstrap.rs, request/gate.rs,
+complete_policy/core_patch/frame.rs and frame/apply.rs, plus the current physical
+recovery/Claim/index/publication seams. Legacy FWSS3/4 binds complete family6
+policies plus family7 placements to wf-state-genesis-v1. Editing those rows cannot
+silently reinterpret that immutable birth digest. Existing normalized complete
+core-Patch op5/intent2 preserves unchanged full FWPV2 fields, but its parent uses
+a full GateView. Real publication needs one genuinely charged point gate before
+current reads, complete reindexing over actual canonical records (including
+unscheduled/running), explicit origin/current-census layout and snapshot handling,
+consumed atomic publication and real recovery replay. A fake outcome map or a
+second gate is not an approved bridge. The exact successor files/models/APIs/
+formats/resources are still being derived by Writer and reviewed by ARCH/PERF;
+these findings are not creation permission.
+
+Root separately verified the ORIGINAL Elixir checkout
+/Users/yoavgea/repos/ferricstore2-elixir-baseline is clean and HEAD exactly
+66586c596e271408d9184af32eb31cd7218c126e. No original file or Git state was changed.
+Read-only source trace finds FifoLane.identity47–81 derives logical lane, sequence
+and score without a priority test; flow_fifo_candidate_lane464 and injected
+head395–439 classify by current policy and exact lane/state, without priority.
+flow_require_fifo_entry in flow_create345–366 rejects priority!=0 for NEW FIFO
+entry and is invoked by create/transition paths. The present Rust selection,
+observed, consumed and indexed authority guards instead assume every current
+FIFO record already has priority0. A real parallel->FIFO policy edit can reach
+healthy existing priorities1/2, so preserving those rows requires an explicit
+source-backed distinction or revised supported authority contract. Do not reset
+stored priority or invent a source business error merely to avoid the mismatch.
+Root relayed exact current guards and original-source operands to ARCH and Writer;
+no source/test correction has been made or accepted yet. The real original
+parallel lease2000 -> policy publication -> emptyClaim5000 -> complete5100 ->
+first-head5101 chain stays required, alongside supplemental nonzero-priority,
+reopen/snapshot/fault/resource controls and full public policy/governance/runtime/
+source-profile/Linux successors. Goal remains ACTIVE.
+
+
+### ROOT-NEXT-M1M2-POLICY-POINT1-RED1/SOURCE1 — reviewed prerequisite and actual missing-function RED
+
+Root whole-read/hash-verified ARCH2925832+7061/ca598138f5a7e71b2177bcc83056a5c6c682749cef586d10901201106d8dba87
+and exact geometry precision2932893+3048/3dcfc76880a9b4c2c63db47728e7941f4d47ab0429c175683ba332d1a623f4cc,
+plus PERF2288822+6769/1e8b5141350cf6ec55a218f7eb995605962c301c296512389eed01740cbeff0d.
+The two substantive tests were first authored only in the old existing flat file;
+actual rustfmt expanded them to714LF/functions175+141, so Root did NOT execute
+or relax the limit. After exact prior geometry approval, Root moved the ORIGINAL
+386LF request_gate.rs to request_gate/main.rs plus ONLY sole mod charged;
+main388LF/SHAe4c16813b6dbfe0966aa4a31622385a6aaddfef30ddbd5bbf531170c42e0e15a.
+Root and ARCH independently executed ENTIRE remove-registration inverseTRUE to
+actual a422638 original12962B/SHAe940536385f96e3349e3e1eafb1166d19d90b640cf1587b55e27d7f8eb6fa4fc.
+Old flat root is absent, target stays request_gate, and no existing ledger or
+reference/checker pointer to that path was found. Every old function/import/helper
+byte stays unchanged; no old identity was duplicated or removed.
+
+The new private charged.rs is13180B/412LF/SHA697ee5ed64376d69a70c5ba62df739d9e926012687a5309e3ab2e3df892b3971.
+Exactly two selected new identities and four ordinary private assertion helpers
+have physical lengths71/78/83/30/51/74, all<=100. They cover all six classifications
+and accepted/rejected original outcomes, original pointer/metadata/window,
+independent expected-scope lifetime, incoherent cohort/foreign header and all four
+bad-retained scope/request/position/time cases, exact LogReplay bypass and
+unapplied/applied0 distinction. PERF found those four missing charged-retained
+controls in the initial714 draft; Root added them without another identity or
+weakened oracle, and both peers actually read the final412 and main388 before
+freeze. Exact/one-short every reached phase expects the next event at intermediate
+exact caps; full exact1317 replays. Real public complete-policy restoration sets
+g1928/p64; repeated Fresh reaches2549 then3106, while3105 fails the last operand
+and retainsg2907/p64. Profile mismatch debits nothing. These are ordinary coherent
+mathematical gate fixtures, not a physical storage or verified-frame proof.
+
+Root executed locked/offline cargo test -p wf-domain --test request_gate on
+Rust1.99.0 with warnings denied and ALL1337 non-Markdown inputs unchanged,
+canonical fingerprintc654eece655cbff101c4ed9c83929960e30bca92c380a8541b5ef37a4d936dba.
+Actual terminal101 raw1970329+780/SHA4937971fb968b91ea273157c438a3808d7c04b36b378f67367e7e7f232da5ab5
+in the existing source-pin-validation log contains ONLY E0432 missing
+inspect_complete_core_policy_patch_point_gate at the intended import. Parent
+gate.rs remains80887b9a6587b179d13b3c41b0a056117a7357023f605b7c67cfec772d6dc18f;
+new production point.rs was asserted ABSENT. This is genuine preimplementation
+missing-contract RED, not executed assertion/product-bug evidence or a zero-case
+filter. Later compilation still must distinguish fixture issues honestly.
+
+Root now EXPLICITLY RELEASES ONLY the selected private production gate/point.rs
+and existing gate.rs registration/reexports/factor. No type/trait/alias/dependency,
+codec, current-policy loader, writer, snapshot or whole-route artifact is released.
+Root is sole author and owns format/Cargo/Git. Implement exact one shared optional
+charge body, old wrapper signature/docs/none behavior and shared helpers/order;
+new wrapper checks profile first and pays the selected conservative request
+observation only after LogReplay and before Some/None. Both existing old Full
+and old point behavior/fees stay unchanged. ARCH/PERF review actual source normally
+after save. Whole policy publication and full original goal remain mandatory;
+Root whole-read separate16647B/eeebbbd8 UNSELECTED successor audit as evidence,
+not as broad source permission. No native CPU/RSS/speed/Linux/full-parity claim.
