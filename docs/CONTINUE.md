@@ -17,7 +17,17 @@ authoring for28 additional identities. The first ports response case and five
 domain cases are reviewed and frozen after actual missing-API RED. Cross-review
 strengthened the governance, update and list-LAST ordering controls before that
 freeze. Production implementation remains held; the remaining tests are being
-authored with disjoint ownership.
+authored with disjoint ownership. Three point-gate cases and the remaining ports
+response-correspondence case are now authored and formatted, with actual
+missing-API compilation failures; architecture and performance reviews are
+complete. This brings the reviewed regression batch to twelve identities,
+including the two storage receipt cases; production implementation remains held.
+Performance review added both directions of present/absent predecessor
+substitution, including rejected Fresh plans. Storage roundtrip/GET and FIFO
+activation cases are drafted; review added real SET reply projection, GET
+temporary-budget refusal and same-account callback checks. A specifically
+approved private fixture frame child keeps formatted test files within600 lines.
+These drafts do not add passing tests or full-parity credit.
 
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper
@@ -47,7 +57,7 @@ assertions and immutable reference inputs are preserved.
 
 The selected next batch connects the existing original public Policy.set path
 through durable original ETF publication and real SET/GET. Its exact twelve
-production paths and fifteen test/helper paths are recorded under
+production paths and named test/helper roster are recorded under
 ARCH-M1M2-ORIGINAL-PUBLIC-ALLOCATOR1-CREATE1. Test authoring is split between Root
 and the implementation agent with independent architecture/performance review.
 Same-type ETF/FWPV2 interoperability, wider source profiles/order, actual indexed

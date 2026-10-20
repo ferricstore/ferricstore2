@@ -32,6 +32,7 @@ use super::{TestResult, profile};
 mod frame;
 mod gate;
 mod owners;
+mod point;
 mod refusals;
 mod response;
 mod source;
