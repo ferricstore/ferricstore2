@@ -11,6 +11,7 @@ use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{CommittedTime, HlcTimestamp};
 
 mod admission;
+mod apply;
 mod dispatch;
 mod envelope;
 mod vectors;

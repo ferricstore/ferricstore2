@@ -38,6 +38,7 @@ use wf_types::version::{
 };
 
 mod admission;
+mod observed;
 mod replay_models;
 mod source_scenarios;
 

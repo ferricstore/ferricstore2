@@ -45203,3 +45203,59 @@ Root actually whole-read/hash-verified ARCH2794820+15968/SHA7c2766ab69f5959e61f1
 Root now releases TEST AUTHORSHIP ONLY: Root owns crates/wf-ports/tests/claim_phase_codec/apply.rs and its existing main.rs registration, exactly the four selected ports identities. claim_writer_sol61 owns the otherNINE selected paths: domain tests/claim_apply/observed.rs; storage tests/state_store/claim.rs and claim/{fixtures,selection,replay,limits,faults}.rs; node tests/recovery/claim.rs and tests/snapshot_recovery/claim.rs, plus ONLY their four existing main.rs registrations. Paths are fully rooted in their named crates above and in the ARCH decision. Existing helper bodies/visibility, shared backend redirections, aliases, nominal helper models and dependencies are not released. New private functions within these approved test files may mechanically construct original inputs/independent expected bytes and observations; they must not implement product selection, retry, response parsing or index rules. Root retains commands/formatters/shared policy/Git and all production release authority.
 
 The exact31 substantive identities and all original operands, complete independent physical/response oracles, actual faults/kills, high-u64-attempt/profile-healthy-reuse controls and both-host/source-runtime qualifications stay selected. Root and Writer must review each other's actual tests with ARCH/PERF, then freeze and execute qualifying missing-contract RED before Root explicitly releases ANY of the12 production paths or product existing seams. No productsource implementation, green behavior, complete source-case parity, Linux execution, native measured gain or M1–M8 completion follows from tests-only authoring. Complete public parent/governance/identified owner/complete-policy activation/consensus/query/transport/operations/performance acceptance remains the full active goal.
+
+
+### ROOT Claim test precision and actual peer reads
+
+Root whole-read/hash-verified ARCH TEST-PRECISION1 at 2830523+5573/SHA896cce6833a1e5cfb8212d1d5dce20f0c4780b0bf054acc17fbd264c34b1f5c4 and PERF PORTS-DRAFT1 at 2198050+7526/SHA17bae65538f826bbc0061151743f096d0fce85410da93d9bb1ab1b052a5bf997. The recorded architecture decision explicitly selects only new crates/wf-ports/tests/claim_phase_codec/apply/literals.rs for four unchanged mechanical functions, with put_raw private and three pub(super), existing TestResult and ClaimRejection imports. This is eleven test/helper files and unchanged four ports/thirty-one total identities; all production remains held. Root also actually whole-read the preceding 19735-byte unselected governing-owner protocol audit; no new product or governance selection follows.
+
+Before creating the child, Root reconstructed the ENTIRE pre-extraction parent buffer and asserted exact equality/SHA81e646762ed90c764e43f146272d6461143a5df82b6f4bf94fab0f9853e66b9e. The child preserves all four function bodies and raw operands; only the three approved visibility spellings change. The two accepted response-profile/intent refinements remain separate additions before test freeze. No Claim RED or passing assertions have executed.
+
+
+### ROOT-M1M2-DURABLE-CLAIM-LEAF1-TESTS-FREEZE1
+
+Previous goal turn made concrete progress by extracting the approved literal child, preserving an entire-parent inverse and adding reviewed intent/profile controls. This turn adds the seven node tests, completes reciprocal source review of all31 identities, fixes real preimplementation fixture mistakes and executes the missing-contract baseline; it is progress, not a no-progress/blocked turn. The full M1–M8/source-profile/both-host goal remains active.
+
+Root actually read ARCH TEST-PRECISION2/6352/cd4c4979, TEST-PRECISION3/3504/e4b6cd9d and final TESTS1/8882/7735a0db, plus PERF four-drafts6997/eae05aa4 and node8069/8be979b8. The exact test/helper roster is14 paths/31 substantive identities (domain3,ports4,storage17,node7), with approved private literal/wire/FIFO/filtered children and five existing registrations. All files are formatted and within600 physical lines, with all inspected functions within100. Writer reviewed Root ports and both node files; Root and dedicated ARCH/PERF reviewed Writer actual test bodies and corrections.
+
+Final corrections replace incoherent Full/RangeEnd fixtures, preserve default FIFO calls plus separately seeded B1, add actual-store future-high2/due-low0 B1 success, restore EventKind import, use coherent governance genesis/originalother rather than raw policy installation, price complex member observation in the prefix-failure case, and correct C1363 plus the connected100-byte late-W slack. These are fixture corrections before product assertions and receive no behavioral RED credit. Existing original tests/helpers and runtime/dependency policies remain unchanged. No policy-publication/public-parent/native/Linux/parity/performance credit follows.
+
+The frozen selection is1323 tracked/unignored non-Markdown repository inputs plus17 native Cargo/src inputs, total1340. Canonical aggregate sorts names repo/<relative> or native/<relative> and hashes name + NUL + lowercase SHA256hex + LF for every selected file. Frozen SHA256 b726c8a485e062d9b0c561b76264218452c6f72a75d6825f2ef90b3b68e99c08. All twelve approved production files are still absent. Production remains held throughout the following commands and until Root inspects their terminal failures.
+
+Frozen test/helper inventory:
+- crates/wf-domain/tests/claim_apply/observed.rs 14796B/420LF/SHA062198a7e1107a1cdeba12b703d327a5c030b926df977e02239175a33acabe86
+- crates/wf-ports/tests/claim_phase_codec/apply.rs 20870B/557LF/SHA043f0e9170bbee1e9e22b7dc83ae2c2383904830ea5966dbd809c7256ebe7deb
+- crates/wf-ports/tests/claim_phase_codec/apply/literals.rs 2114B/70LF/SHA8df748347d7b34687ff86d4bd9009b424f37125509b112ccf899db0d9544e675
+- crates/wf-storage/tests/state_store/claim.rs 181B/9LF/SHA4358a57f7349836a0fbc2eb40624f22597e7138c58c719df760631e88de6e063
+- crates/wf-storage/tests/state_store/claim/faults.rs 12396B/382LF/SHA5dc27c6947038a2323b55a5ad0af907e79f730b1223b011c1958fbf12aaf2b2c
+- crates/wf-storage/tests/state_store/claim/fixtures/wire.rs 6128B/186LF/SHA1ac924bdc782861e4da70c94f810b07311466b8a315e4b0526aa6f8a4cd8f7ea
+- crates/wf-storage/tests/state_store/claim/fixtures.rs 15778B/501LF/SHAf3eaccab6aa9ce79d0f7482c58e801f02fe87570e0856173aaa3465b8b085d75
+- crates/wf-storage/tests/state_store/claim/limits/filtered.rs 6088B/206LF/SHAb15fee75c9f3e28e9f4132da1885dde06ddf2a40acd934ee35b04f301ad6426c
+- crates/wf-storage/tests/state_store/claim/limits.rs 15867B/506LF/SHA81711f276d4c790397691a5689ac088d8ad25f9961fef93e40ff3af1a602e7d8
+- crates/wf-storage/tests/state_store/claim/replay.rs 12618B/420LF/SHAd0cb1e1e78743e2b54a04865b0d3619c104bda3e96071bf2c8ff45d1946ef15b
+- crates/wf-storage/tests/state_store/claim/selection/fifo.rs 8591B/281LF/SHA50b6d6b4579806616d391b4d8bfc928383a5ee0e59dd700e9ae265a081d1e3b5
+- crates/wf-storage/tests/state_store/claim/selection.rs 18292B/589LF/SHA48bd1063d03ee1e0b44ffbacb91de68f90888b1472dfa24ac218cfeca11cae57
+- crates/wf-node/tests/recovery/claim.rs 18481B/564LF/SHAdb4a5794d7481228d8ad6ce72de0105d79c47a3bde07c0686f79d523bcb4a155
+- crates/wf-node/tests/snapshot_recovery/claim.rs 13769B/383LF/SHA07230efdb2e15ab0b0318ecba8c5a9a8d02b948a2bcb09ccc3f5beaae3ef7fd8
+
+Post-RED agreed source ownership (not yet release): Root owns the four approved ports children, named existing ports/consensus/common facade seams, ONLY workflow/request/outcome.rs response-version predicate and existing node recovery limits/error/join/replay. Writer owns domain observed and actual existing selection/indexed factoring plus all seven approved storage children and named storage key/value/transaction/commit/read/recovery/snapshot seams. Root alone owns commands/formatters/shared policy/Git. No additional artifact/model is inferred.
+
+
+### ROOT-M1M2-DURABLE-CLAIM-LEAF1-RED1 — actual five-target missing-contract failures
+
+Root actually whole-read/hash-verified final PERF14 review2223428+10730/SHA77a7a8e078c130330310c54b36de96fe7b8f044bb3fc72d00fec503f36601ee8, including coherent governance genesis and C1363/configured-live corrections. All14 files/31 identities had substantive mutual source review before commands. The actual frozen1340-input SHA is b726c8a485e062d9b0c561b76264218452c6f72a75d6825f2ef90b3b68e99c08. All12 production paths were asserted absent before the run. Every command retained all1340 hashes with no extra selected input. The wrapper terminated0 only because it required the following actual test-command exits101; it is NOT a passing Claim test run.
+
+Raw stdout/stderr spans in /private/tmp/ferricstore2-m2-source-pin-validation.log:
+
+| Command (locked/offline for tests) | Actual exit | Offset+bytes | SHA256 |
+|---|---:|---:|---|
+| cargo fmt --all -- --check |0|1763593+0|e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855|
+| cargo test -p wf-domain --test claim_apply |101|1763747+1046|4bc0cca105afe2bbb2e6687c5dab9dbd0e040d23d7a15d4e9d1fb10e4fda5c3d|
+| cargo test -p wf-ports --test claim_phase_codec |101|1764954+2067|829e7d04db9a7ea1c6af67e1a69f6e6affa6e6a9cdac0544c76044e12f9ffe51|
+| cargo test -p wf-storage --test state_store |101|1767178+7770|c9375d3f8cd8e6aef561ff0016e641e4ca2873bb7f54aaad4e0124d0f03910f2|
+| cargo test -p wf-node --test recovery |101|1775099+3943|89b26f0eb556e1efd1c9b05438284379096b00d298186a3519334b1465b656a9|
+| cargo test -p wf-node --test snapshot_recovery |101|1779202+1655|1b13d167d6f8c885cf080fb93c34e7de2db5721354054a64ac3b3781e8a8f4aa|
+
+Root inspected all terminal outputs. Diagnostics are E0432 missing selected observed/ports/transaction/cursor contracts and E0599 missing selected actual cursor methods, recovery builder and Claim error variant. No malformed fixture syntax, missing old helper import, bad target name, dependency/network/setup failure or unrelated compiler diagnostic appears. These are genuine preimplementation missing-contract REDs, not behavioral assertion failures; no Claim assertion ran. Subsequent compilation may expose additional fixture issues and must distinguish them from product bugs without weakening the frozen oracles.
+
+Before the final replay/C corrections, all47 architecture checks passed at source1340 pin64f5a66b47e0d0bdad4fbc6999a365eb708426c1248dd37bcc2e017851dfd4f2, raw1758460+5023/SHA85a5d42f7fb29d2498809ef9640d2dd2e41153b13ce211d109834339700378ac. That earlier policy pass is not silently rebound to the later fixture bytes. Final frozen formatting above did rerun successfully. Actual host remains Darwin arm64; no Linux/full-suite/native gain/source parity is claimed.

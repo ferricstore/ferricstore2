@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+mod claim;
 mod faults;
 mod fixtures;
 mod history;

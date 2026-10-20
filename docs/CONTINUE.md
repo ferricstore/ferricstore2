@@ -96,13 +96,23 @@ complete M1–M8 acceptance, including both supported hosts.
 
 ARCH-M1M2-DURABLE-CLAIM-LEAF1-CREATE1 selects the exact first durable Claim
 contract after reciprocal architecture/performance review. Root releases only
-its 10 named test/helper children and registrations for tests-first authoring;
+its 14 named test/helper children and registrations for tests-first authoring
+(including the precise helper splits in TEST-PRECISION1 through 3);
 all 12 production paths remain held until substantive tests are reviewed,
 frozen and reach genuine RED. The contract preserves
 query-scoped due selection, independent FIFO head discovery, the complete
 original retained lease reply and one consumed atomic publication. Full public
 Claim/governance, complete-policy publication/activation, source setup/profiles
 and both-host execution remain required successors to that physical leaf.
+
+All 31 new Claim test identities are authored across domain, ports, storage and
+node recovery/snapshots. Review corrected incomplete reference fixtures, preserved
+original FIFO budgets alongside separately seeded tight-budget checks, and added
+the actual storage future-priority boundary case. The final formatted batch has
+reciprocal review and genuine preimplementation missing-contract RED in all five
+affected Cargo targets, with all 1,340 selected inputs unchanged. Formatting
+passes. These are missing-API compiler failures; no new Claim assertion has run
+and no Claim implementation acceptance is claimed yet.
 
 The first native recheck selected system Rust 1.98 outside the repository. Only
 the remaining native checks were rerun with pinned Rust 1.99; all passed without

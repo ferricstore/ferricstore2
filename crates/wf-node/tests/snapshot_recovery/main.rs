@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod advance;
+mod claim;
 #[path = "../../../wf-storage/tests/state_store/faults/backend.rs"]
 mod disk_backend;
 mod faults;
