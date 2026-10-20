@@ -516,5 +516,30 @@ fn assert_response_correspondence(schema: PolicySchemaLimits) -> TestResult {
             case == 0
         );
     }
+    // Binding admits lengths and DATA independently; it supplies no wire proof.
+    // Exercise both generation and DATA disagreement through public constructors.
+    let mut mismatches = [false; 2];
+    for (index, generation) in [2, 1].into_iter().enumerate() {
+        let mut charge = PolicySchemaCharge::new(schema);
+        let (_, _, _, decision) = plan(&bytes, &scope, None, schema, &mut charge)?.into_parts();
+        let DispatchDecision::Fresh((_, outcome)) = decision else {
+            return Err("missing original correspondence receipt".into());
+        };
+        let mut data = minimal_data();
+        if index == 1 {
+            data.workflow_type = b"different".to_vec();
+        }
+        let candidate = restore_complete_policy(generation, data, schema, &mut charge)?;
+        let response = outcome.response().to_vec();
+        let value =
+            candidate.bind_encoded_snapshot(18..response.len(), response, schema, &mut charge)?;
+        mismatches[index] = complete_core_policy_patch_response_matches(
+            &(Some((generation - 1, value)), outcome),
+            (schema, AdmissionLimits::default()),
+            &mut charge,
+            1_000_000,
+        )?;
+    }
+    assert_eq!(mismatches, [false, false]);
     Ok(())
 }

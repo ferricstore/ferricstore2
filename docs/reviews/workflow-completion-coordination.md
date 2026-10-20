@@ -46074,3 +46074,28 @@ The isolated progress gate now exits0: raw2302842+605/SHA256
 identity, status or parity credit changed. Earlier exact-checkout 878/90 test,
 doc, strict, format, architecture and reference results remain checkpoint-scoped;
 current policy integration is still underway. Full parity and Linux remain open.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-MATCHER-RED1 — public mathematical correspondence
+
+The first actual complete_policy_request source run passes all100 tests, including
+six frozen new cases: raw2315916+10173/SHA256
+09b0dd459706ec4ef3da076e3ee1ee449493eaaaeb001de36aecec6ca6591b76;
+503 scoped domain/types/ports inputs unchanged. Reciprocal PERF review then found
+that the public response matcher accepts ordinary candidates whose admitted DATA
+or generation disagrees with their bound valid encoded response. ARCH confirmed
+that bind_encoded_snapshot deliberately does not prove correspondence.
+
+Root appends two controls inside existing P4, retaining its five original cases
+and complete old body through an executed full inverse. One binds gen2/expected1
+to actual gen1 response; another binds different DATA at gen1/expected0 to the
+same valid gen1 response. Both use public restore/bind and the actual original
+retained outcome, then aggregate the two matcher bools before asserting false.
+The actual regression executes both: [true,true] versus [false,false], one failed
+test/99 filtered, exit101. Raw2326772+1055/SHA256
+3e0669d1c7e44011fffc7c87d77bfbf3f27d18f5e5aecbaa47b749ca1b632712;
+503 inputs unchanged at435d1f08c1104761bd192dcf552b44a1d69f3ce2256d51aee2f7c6b11c0ffc6e.
+An earlier short exact-filter invocation selected zero tests and is no evidence
+of RED or GREEN. This appended control is frozen before correcting the matcher.
+ARCH selected a private ordinary helper reusing the ONE already decoded full
+value for complete equality; no second decoder/U/g/p or new model/path is added.
