@@ -32,6 +32,7 @@ use wf_types::version::{AppliedPosition, Fence, LogIdentity, TimestampMillis};
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
+mod activated_priority;
 mod fold;
 mod publication;
 

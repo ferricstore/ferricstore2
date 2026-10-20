@@ -37,6 +37,7 @@ use wf_types::version::{
     AppliedPosition, CommittedTime, HlcTimestamp, LogIdentity, TimestampMillis,
 };
 
+mod activated_priority;
 mod admission;
 mod observed;
 mod replay_models;

@@ -45588,3 +45588,101 @@ scoped gate-only facts, logical tariff/prior g+p/None bypass/borrow/RED-style
 qualifications and open complete policy/public/runtime/Linux/parity duties, with
 no material finding or added gate. Root proceeds to a reviewed source checkpoint;
 whole-policy proposal remains separately unselected and source-held.
+
+
+### ROOT-M1M2-DURABLE-COMPLETE-CORE-PATCH1-TESTS1 — exact tests-only release
+
+The preceding goal turn made progress by actually reading and resolving the
+finite original-head, workspace, parser, error-origin, registry and consumed-Fresh
+owner corrections. Current continuation independently revalidated HEAD8487ce7,
+three live GPT-6.1-sol/max peers and only the three existing review notes dirty;
+no successor production/test source existed at release.
+
+Root actually whole-read/hash-verified ARCH's exact CREATE1 and precision,
+2962575+21757/SHA2561d23835f0fc1f3ccdbcde70315908840377d18acc1f975eac420ef0c18d9819b,
+and PERF CONTRACT1,2321796+12752/
+92831266a8bab80b05be9f1ad9bed136e7c80b3a5e786ff8617249cb8add3eae.
+Both independently read the complete corrected DOMAIN66202-byte contract ending
+4071611/9f66a5edac72c694ea67d10f43afc0e598d825db1a2fbfa67c9d9c6fdd560e66.
+Root previously read its entire main and all four exact corrections and now
+accepts the precise selected13 production paths/seven structs-enums/two traits,
+15 test-helper paths/28 substantive identities and resource/error/custody terms.
+The estimator is sizing only; Workspace belongs ONLY to the existing
+CompleteCorePolicyPatchApplyError. No further generic approval cycle is required.
+
+Root RELEASES TESTS ONLY under
+ARCH-M1M2-DURABLE-COMPLETE-CORE-PATCH1-CREATE1 and PRECISION1:
+
+- Root: T2 claim_apply/activated_priority.rs; T3
+  independent_indexed/activated_priority.rs; T4/T5
+  complete_policy_request/core_patch/point.rs and response.rs; T14
+  node recovery/core_policy.rs; T15 node snapshot_recovery/core_policy.rs.
+  Root owns ONLY their five existing parent registrations:
+  domain claim_apply/main.rs and independent_indexed/main.rs;
+  ports complete_policy_request/core_patch.rs; node recovery/main.rs and
+  snapshot_recovery/main.rs.
+- Writer: T1 domain complete_policy/point.rs and T6--T13 storage
+  state_store/core_policy.rs and its exact seven named children. Writer owns
+  ONLY domain complete_policy/main.rs and storage state_store/main.rs
+  registrations. The exact path/identity lists are in the selected ARCH note.
+
+Both authors use substantive independent expected bytes/totals, actual accepted
+fixtures and existing visible helpers. No helper visibility/model/alias/path,
+Cargo target, dependency or original oracle is implicitly changed. New concrete
+geometry or contract needs architecture consultation. Root alone runs
+Cargo/formatter/shared policy/Git commands. ARCH and PERF read/review actual tests
+and each other's findings as files become ready; Writer and Root reciprocally
+read the other's authored tests. Freeze the reviewed actual tests, execute real
+selected missing-contract RED, and separately execute the new priority behavioral
+assertions against current APIs before any production release. Existing source
+remains HELD. In particular no policy driver, response codec, layout5/FWSP2,
+reindex implementation or public/runtime source is authorized by this release.
+
+The selected implementation split AFTER a later explicit source release is
+Writer domain/storage (including storage outcome child and existing integration)
+versus Root ports/node. Root will assign exact existing facade seams once at that
+release. Only the coordinator commits. Current875/90 macOS and6/15 documentation
+GREEN belongs to8487ce7; no newly authored test has passed merely from this
+selection. Full original Elixir setup/scenario/profile parity, actual current
+Linux, public parent/governance/runtime and all remaining M1--M8 remain required;
+the full goal remains active.
+
+
+ROOT TESTS1 precise spelling release: Root actually whole-read ARCH TEST-PRECISION1
+2985126+1574/3b2d5b0d278c88232dc7003387cf7356043d464896578d56b60a8cbc2a79ba7c.
+Writer may create ONLY the named private test-only Cohort alias in selectedT7:
+[Option<BTreeMap<Vec<u8>,Vec<u8>>>;6], retaining absent versus present-empty table
+observations. This adds no path/production model/dependency/test identity and
+changes no fee or source release. All other TESTS1 ownership/holds remain exact.
+
+
+### ROOT-M1M2-DURABLE-COMPLETE-CORE-PATCH1-PRIORITY-RED1 — executed behavioral failures
+
+Root actually whole-read/hashverified ARCH priority5085/8cd7c185 and PERF6896/
+5ec0cfca. Revised T2 is14522B/414LF/835a5b62b3143c970c2039ec1cc15bdc370f720be765e967f49ef77f7ba2a48c;
+T3 is5983B/169LF/f7608c42e2fd161e25334ce9463a3459b8ae39a12bc6fcdc4628b2911ced1936.
+Both peers independently read actual complete buffers and each other's findings;
+Root corrected their initially missed same-physical-state LegacyNoop oracle,
+and added their observed/default coverage controls before this freeze.
+Only the two named parent mod registrations differ; old bodies remain exact.
+
+On unchanged475 selected production/manifests/config/target-test inputs,
+fingerprinta2c730c823764247679a894b9413db86579a36b6811038ac923a74a150a17ee3,
+Root ran locked/offline Rust1.99 cargo test -p wf-domain --test claim_apply
+--test independent_indexed --no-fail-fast. Actual compile succeeded, then all29
+tests executed:26 existing pass and allTHREE new controls fail, none ignored or
+filtered. D3 andD5 return existing InvalidAuthority on coherent nonzero FIFO
+predecessors. D4 reaches its assertion and observes(scanned1,Complete) instead of
+independent(scanned0,Complete), exposing the old priority filtering's wasted
+candidate scan. These are genuine behavioral RED, not missing-API compilation
+or a setup failure. Raw output2082110+4359/SHA256
+41732be8086214984bbe9b959025300ed73866af94ed779501c2483f265a83e4 in the existing
+source-pin validation log; Cargo exits101, runner confirms exact unchanged inputs.
+The separately authored target fixtures do not enter these selected Cargo tests.
+
+Root freezes/checkpoints these three reviewed identities and four named files
+before implementation. No production release follows: remaining selected
+policy/domain/ports/storage/node tests still need actual review/freeze and
+selected-contract RED before the exact disjoint source release. Current875GREEN
+belongs to8487ce7; this expected failing-test checkpoint is expressly incomplete.
+Full original/runtime/Linux/M1--M8 objective remains active.
