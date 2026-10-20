@@ -45982,3 +45982,95 @@ final test-body evidence; no missing-API result is relabelled behavioral GREEN.
 Root checkpoints these tests before issuing the exact source release. The
 complete public-policy/Claim/governance/runtime/source-profile/both-host/M1–M8
 objective remains active; this freeze is no milestone completion.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-SOURCE1 — exact reviewed implementation release
+
+Tests are now independently committed in d1d332d, following actual reviewed
+missing-contract RED in all five affected integration targets and the earlier
+priority behavioral RED. Root RELEASES the selected durable-policy contract,
+CREATE1 and its recorded precisions, including exact consumed-prefix order and
+API-PRECISION8. This is implementation permission, not a passing result. The
+seven existing priority source seams are separately committed in af046e8.
+
+The approved thirteen NEW production files remain exactly:
+
+1. crates/wf-domain/src/policy/complete/request/point.rs
+2. crates/wf-ports/src/log/complete_policy/core_patch/frame/apply/point.rs
+3. crates/wf-ports/src/log/complete_policy/core_patch/response.rs
+4. crates/wf-ports/src/state/core_policy.rs
+5. crates/wf-storage/src/transaction/core_policy.rs
+6. crates/wf-storage/src/state/redb/core_policy.rs
+7. crates/wf-storage/src/state/redb/core_policy/reindex.rs
+8. crates/wf-storage/src/state/redb/core_policy/reindex/rows.rs
+9. crates/wf-storage/src/state/redb/core_policy/reindex/heads.rs
+10. crates/wf-storage/src/state/redb/core_policy/catalog.rs
+11. crates/wf-storage/src/state/redb/commit/core_policy.rs
+12. crates/wf-storage/src/state/value/outcome/policy.rs
+13. crates/wf-storage/src/state/redb/snapshot/policy.rs
+
+The same seven structs/enums and two traits remain selected; no additional
+nominal type, alias, dependency, generic backend or public runtime is implied.
+Root assigns disjoint source ownership to use all available implementation work
+while retaining the dedicated architecture/performance roles:
+
+- Writer owns new files 1,5–11,13 and their exact existing domain/storage factors:
+  complete policy/outer/request/charge exports, the shared Full/Fresh authority
+  and business registry, index-delta helper, storage transaction/store/history
+  limits/cache, canonical/catalog keys, read/commit/recovery/snapshot routes.
+  Writer does not edit the outcome codec/facade or Root ports/node seams.
+- Performance owns ONLY new file12 plus existing state/value/outcome.rs and
+  state/value.rs facade for the selected profiled FWSO implementation. It
+  preserves old encode/scan/decode behavior and global Codec conversion, restores
+  the ACTUAL intent2 digest through the named scalar constructor, prospectively
+  admits U and maps only legitimate narrower profile refusals to ProfileLimit.
+  It continues resource/optimization review; Root/Writer/ARCH review its code.
+- Root owns new files2–4, their existing ports/log/state/common exports and
+  header profile, existing node recovery limits/error/join/replay, and ONLY the
+  selected workflow/request.rs named-intent2 visibility/documentation seam.
+  Root alone edits shared policy/config/Cargo/metadata, formats and runs commands.
+- Architecture reviews actual source, cross-owner contracts and new concrete
+  creation requests. It authors no production files in this split.
+
+All sources remain within 400 physical lines, test/tooling within 600 and strict
+function/lint rules unchanged. Additional paths/types/aliases require concrete
+consultation before creation. No owner edits the frozen tests to fit output;
+real new findings retain their original RED and receive reviewed corrections.
+Same selected schema account, prior g/p, real full policy fields, actual global
+head custody, both charged censuses and true canonical End, atomic layout5/origin3
+and mixed FWSP1/FWSP2 custody stay mandatory. Root will integrate focused GREEN,
+strict/full/native checks and reciprocal source review. Public parents/runtime,
+all original Elixir cases/setup/profiles and native Linux remain required beyond
+this component; the full goal stays active.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-SOURCE2 — scoped validation and existing-seam precisions
+
+Root releases ARCH API-PRECISION9: the existing private transaction captures the
+actual strictly opened layout scalar, without eager metadata I/O or a new owner.
+Consumed manifest/origin/census validation remains mandatory. Root also releases
+API-PRECISION10: the new ordinary profiled full-decoder entry shares the actual
+existing decoder, attributing only configured state-count refusal to existing
+Schema(Policy(StateBudget)). Legacy decoder/candidate/raw-scan boundaries preserve
+ItemLimit and all old fees/order. There is no new path, nominal model or alias.
+
+Domain GREEN2 passes all 131 complete_policy tests after a field-documentation-only
+compiler repair. All 353 scoped domain/types inputs stayed unchanged, fingerprint
+d1af8ab4c4be225c92380aa56024c906a7540269570abf27391b6fa79175f5d9.
+The actual raw span is 2303470+12309/SHA256
+344f982b2be80942b69609ec5c411c457baa66db1a3466e3c50c0a3a8aefb5bd.
+The runner's initially printed offset preceded another append; Root searched and
+hash-verified the actual contiguous output span above. This result predates the
+subsequent decoder attribution factor and does not certify it or other crates.
+
+Root independently proved the priority ledger correction and ARCH supplied its
+independent proof: exactly three file hashes and eleven +1 assertion pointers,
+with the full inverse recovering the original JSON and original test parent.
+Both primary and isolated ledgers changed from SHA2212648dc97863d878877cc9f15ebe6cdee12f9366d38a1ad967865834db8498
+to SHA96ab2e7d1cc5b6f614d6e0021de42e99d9f5eb0f7c19c75d653a000191339974.
+The isolated progress gate now exits0: raw2302842+605/SHA256
+913485859c4e0402e843bab872ff6f518015672be3d57cf522dc57eb7d9f391b;
+745 scoped inputs unchanged. No scenario, assertion literal, limitation, runtime
+identity, status or parity credit changed. Earlier exact-checkout 878/90 test,
+doc, strict, format, architecture and reference results remain checkpoint-scoped;
+current policy integration is still underway. Full parity and Linux remain open.

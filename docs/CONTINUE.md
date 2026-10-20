@@ -6,23 +6,27 @@ performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
 Current development is the selected durable complete-policy publication batch.
-Commit `f8139a7` freezes three reviewed priority regression tests before source.
-They reproduced three FIFO priority defects. The separately reviewed scheduling
-decision releases only seven existing priority source seams while storage tests
-finish; the first implementation run passes all 42 focused cases, including the
-three unchanged new regressions. Another 54 Claim/index compatibility cases pass.
-This is a focused result; the complete policy route is still unimplemented.
-The selected test bodies now exist across domain,
-codecs, physical storage and node recovery. Four domain/codec/node targets have
-actual missing-contract compilation RED. Storage's final consumed-prefix and
-snapshot target-C controls are reviewed and frozen. The approved inventory is
-eighteen test/helper paths and 28 substantive identities, all within the 600-line
-test-file limit after mechanical grouping. The final storage target has actual
-missing-contract RED, with only selected missing APIs and no warnings or executed
-assertions. All thirteen new durable-policy production paths remain held until
-Root's explicit source release.
-The latest fully validated implemented checkpoint is `8487ce7`; its results below
-do not describe the intentionally failing development test checkpoint.
+The eighteen reviewed test/helper paths and 28 substantive regression identities
+are frozen in `d1d332d` and its priority-test predecessor. All five affected
+integration targets reached genuine missing-contract compilation RED before
+policy implementation. Root explicitly released the thirteen selected production
+paths in ROOT-COMPLETE-CORE-PATCH1-SOURCE1; domain, ports/node, storage and retained
+codec work now have disjoint owners and reciprocal architecture/performance review.
+The domain complete-policy target passes all 131 tests, including both frozen
+current-only Fresh regressions. Ports validation is in progress; transactional
+storage, snapshots and node integration still require their passing checks.
+
+The priority repairs in `af046e8` passed 878 tests across 90 targets and six
+compile-fail examples across 15 documentation targets in an isolated exact
+checkout. Formatting, strict all-target Clippy, warnings-denied rustdoc,
+architecture and reference checks pass there. A reviewed metadata correction
+changes only three counterpart hashes and eleven unchanged assertion pointers;
+the isolated progress checker now passes with the same 85 declarations,
+95 mappings and 384 assertion links. These results describe the priority
+checkpoint plus that metadata correction, not the active policy worktree.
+Separate pinned native compatibility also passed before policy source changes.
+Full parity, complete public/runtime behavior and native Linux acceptance remain
+open; this component is not full-product completion.
 
 The latest implemented policy prerequisite adds a genuinely charged retained
 point gate. Its two reviewed tests were frozen in `04c7f4d` after genuine

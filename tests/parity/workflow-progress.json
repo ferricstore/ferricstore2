@@ -4739,20 +4739,20 @@
         {
           "scenario_id": "m1-587581adc9eb0ceb",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "f67b9b09c36977638465932f8c876daa7aacdc00000a630f4d9e2a6c4ab77755",
+          "rust_file_sha256": "f38354c660391a4256ef06c5040d695ce56fc47af5db1a6b63aeb35639f045d1",
           "rust_module": "",
           "rust_function": "source_fifo_activation_preserves_populated_state_entry_order",
           "assertions": [
             {
               "source_line": 783,
               "source_text": "assert {:ok, [%{id: ^first_id}]} =",
-              "rust_line": 530,
+              "rust_line": 531,
               "rust_text": "assert_eq!(selected, (1, ids[0]));"
             },
             {
               "source_line": 792,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 534,
+              "rust_line": 535,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             }
           ],
@@ -4907,38 +4907,38 @@
         {
           "scenario_id": "m1-0bf563deac76e307",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "f67b9b09c36977638465932f8c876daa7aacdc00000a630f4d9e2a6c4ab77755",
+          "rust_file_sha256": "f38354c660391a4256ef06c5040d695ce56fc47af5db1a6b63aeb35639f045d1",
           "rust_module": "",
           "rust_function": "source_leased_and_terminal_records_are_absent_from_later_claims",
           "assertions": [
             {
               "source_line": 1250,
               "source_text": "assert :ok =",
-              "rust_line": 356,
+              "rust_line": 357,
               "rust_text": "assert_eq!((record.state(), record.payload()), created);"
             },
             {
               "source_line": 1259,
               "source_text": "assert {:ok, [claimed]} =",
-              "rust_line": 432,
+              "rust_line": 433,
               "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
             },
             {
               "source_line": 1267,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 436,
+              "rust_line": 437,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             },
             {
               "source_line": 1275,
               "source_text": "assert :ok =",
-              "rust_line": 381,
+              "rust_line": 382,
               "rust_text": "assert_eq!(outcome, Outcome::Changed);"
             },
             {
               "source_line": 1282,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 436,
+              "rust_line": 437,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             }
           ],
@@ -4958,32 +4958,32 @@
         {
           "scenario_id": "m1-4bda857b47effb76",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "f67b9b09c36977638465932f8c876daa7aacdc00000a630f4d9e2a6c4ab77755",
+          "rust_file_sha256": "f38354c660391a4256ef06c5040d695ce56fc47af5db1a6b63aeb35639f045d1",
           "rust_module": "",
           "rust_function": "source_future_due_boundary_preserves_empty_and_singleton_claims",
           "assertions": [
             {
               "source_line": 1295,
               "source_text": "assert :ok =",
-              "rust_line": 267,
+              "rust_line": 268,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 1304,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 332,
+              "rust_line": 333,
               "rust_text": "assert!(claim.batch().is_none());"
             },
             {
               "source_line": 1312,
               "source_text": "assert {:ok, [claimed]} =",
-              "rust_line": 335,
+              "rust_line": 336,
               "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
             },
             {
               "source_line": 1320,
               "source_text": "assert claimed.id == id",
-              "rust_line": 340,
+              "rust_line": 341,
               "rust_text": "assert_eq!(write.record.id(), record.id());"
             }
           ],
