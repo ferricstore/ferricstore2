@@ -44,12 +44,14 @@ fn expanded_open(path: &std::path::Path) -> TestResult<RedbStateStore> {
 }
 pub(super) fn run(dir: &std::path::Path) -> TestResult {
     let path = dir.join("expanded-v2");
-    let names = seed(&path)?;
+    let names = seed(&path).map_err(|error| format!("expanded seed: {error}"))?;
     let before = f::cohort(&path)?;
-    check_get(&path, &names)?;
+    check_get(&path, &names).map_err(|error| format!("expanded GET: {error}"))?;
     assert_eq!(f::cohort(&path)?, before);
-    let empty = lazy_updates(&path, &before)?;
+    let empty =
+        lazy_updates(&path, &before).map_err(|error| format!("expanded lazy updates: {error}"))?;
     reducing_merge(dir, &before, &names, &empty)
+        .map_err(|error| format!("expanded reducing merge: {error}").into())
 }
 fn seed(path: &std::path::Path) -> TestResult<Vec<Vec<u8>>> {
     use wf_storage::state::StateStoreGenesis;

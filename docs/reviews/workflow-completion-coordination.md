@@ -47538,3 +47538,33 @@ controls must genuinely fail before the shared behavioral repair. Root will
 perform exact reinlining conservation and freeze those controls separately.
 The existing six production paths and approved private context remain the only
 new production artifacts. All keyword/scalar behavior is still held.
+
+ROOT-B1-COMPATIBILITY-FREEZE2 (2026-10-20)
+
+332af1d froze the prior keyword and supplied replay tests. The ARCH-selected
+private compatibility child relocates only those same-D3 helpers; the old
+fixtures return exactly to533LF/ba8c8148. Both reviewers independently proved
+whole-file reinlining. The child now also has two independent binary kind/mode
+regressions and three positive padded-known-number controls, all eagerly called.
+Actual299 inputs e680a5d9 unchanged: raw3288919+1062/2d87087d reports the two
+binary phase1 errors and all three numeric cases Ok through both phases. The
+preceding wrong-name invocation raw3288369+379/d1f7aaca ran ZERO tests and grants
+no acceptance. ARCH/Writer traced paid lexical significant-length normalization
+and withdrew the numerical source hypothesis. No numeric/profile-table change
+is authorized. Binary/keyword corrections remain selected from genuine REDs.
+
+Corrected P3 preserves every Core assertion and derives existing Original peak
+784 from183+64+516+21; its unsealed predecessor predicate remains false. Both
+reviewers proved whole inverses. Actual three Ports cases PASS at
+raw3284425+684/9544ace4,360 inputs ecdf3a0d unchanged. Storage no-run passed at
+raw3283926+351/a40bc178. Stage-only S1 diagnostics then localized actual failure
+at expanded reducing merge, raw3290136+755/40d0feac,590 inputs70917c3f unchanged;
+all preceding S1/expanded assertions completed. Independent ARCH/PERF arithmetic
+shows patch19+17*16384=278547 exceeds262144. Preserve that front rejection and
+select1024 then15360 removals (17427/261139); exact ETF2 length261173 followed by
+ETF3 empty53, full receipts/cohorts/reopen after each. No production cap change.
+
+This test-only freeze precedes release of the already selected keyword/binary
+behavior repair and remaining redundant-closure lint. Domain source is still
+held at this record. New complete acceptance, parity, Linux, runtime and later
+milestone work remain open. Peer notes remain their independent owned records.

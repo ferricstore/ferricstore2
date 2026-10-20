@@ -292,6 +292,10 @@ fn original_retained() -> TestResult {
             AdmissionLimits::default(),
             &mut charge,
         )?;
+        // Existing Full restoration owns E183 + capture64 + four IDs516 + I21.
+        assert_eq!(body.len(), 183);
+        let full_peak = 183 + 64 + 4 * (128 + 1) + 21;
+        assert_eq!(charge.p(), full_peak);
         let verified = prepare_original_policy_set_point_frame_bounded(
             &body,
             schema,
@@ -317,11 +321,20 @@ fn original_retained() -> TestResult {
         else {
             return Err("intent4 replay reached Fresh current".into());
         };
-        assert_eq!(charge.p(), 0);
+        // Point's independent 720 header bound stays below the prior Full peak.
+        assert_eq!(charge.p(), full_peak);
         for plan in [full, *point] {
             classification(plan.decision(), class, original)?;
             assert_eq!(plan.workflow_type(), None);
-            assert!(plan.matches_predecessor(None));
+            assert!(!plan.matches_predecessor(None));
+            assert_eq!(
+                (
+                    plan.portable_profile_id(),
+                    plan.used_history_max_events_limit(),
+                    plan.used_migration_generations()
+                ),
+                (None, None, None)
+            );
             let changes = GroupOriginalPolicyChanges::new(
                 &scope,
                 control,

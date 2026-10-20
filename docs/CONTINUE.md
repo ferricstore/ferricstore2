@@ -64,15 +64,21 @@ direct replay regression are authored but await coherent compilation and actual
 before/after execution. Legacy test callers are being adapted to the shared
 policy carrier with their assertions and resource limits preserved.
 
-The Domain provider now compiles, and the four frozen interoperability tests
-plus all 140 tests in the affected Domain target passed on unchanged inputs.
-Those results precede an additional same-identity keyword-group regression:
-both corresponding map controls and portable keyword decoding succeed, but an
-unrelated patch of that healthy keyword donor returns InvalidAuthority. The
-behavioral correction awaits that regression's review/freeze. All 26 changed
-Domain files satisfy 400 formatted lines; strict Domain Clippy found 22 issues
-being repaired without suppressions. Ports/storage/node execution remains due.
-This working tree has no new full-workspace passing result.
+The Domain provider compiles; four frozen interoperability tests and all 140
+tests in the affected Domain target passed before additional compatibility
+coverage. The frozen keyword regression reaches InvalidAuthority; two newer
+independent binary kind/mode cases reach existing-policy validation errors.
+Three eager padded-number cases pass both phases and preserve exact raw bytes;
+their suspected source defect was withdrawn after checking the paid lexical
+normalization. No numeric repair is selected. The approved compatibility child
+keeps every test file within 600 lines. All 26 changed Domain production files
+satisfy 400 formatted lines; strict Domain Clippy now has one closure spelling
+issue after the reviewed lint-only repair. All three Ports interop tests pass
+with independently corrected existing Original verifier accounting. The Storage
+target compiles; S1 reaches its final expanded reducing-merge fixture, which
+exceeds the unchanged public patch byte cap. Preserve that oversized rejection
+and use two valid reductions for the positive case. Remaining storage/node and
+full-workspace execution is still required; no new whole-workspace PASS exists.
 Full pinned Elixir scenario/assertion/setup/profile
 parity, governing services, accepted consensus/runtime, application/transports
 and both Linux/macOS acceptance remain required. Progress remains 85 source-derived

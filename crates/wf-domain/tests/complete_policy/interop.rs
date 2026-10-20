@@ -14,6 +14,7 @@ use wf_domain::policy::installation::{MAX_POLICY_GENERATION, PolicyError, Policy
 use wf_domain::policy::{Backoff, BackoffKind, RetryOverride};
 use wf_domain::retention::{RetentionError, RetentionOverride};
 mod accounting;
+mod compatibility;
 mod fixtures;
 use accounting::{assert_frontier, prime};
 use fixtures as f;
@@ -272,7 +273,7 @@ fn assert_policy_error(
 #[test]
 fn stored_patch_preserves_partial_clear_remove_and_reached_error_order() -> TestResult {
     let profile = limits(2_000_000_000)?;
-    assert_keyword_groups(profile)?;
+    compatibility::assert_keyword_groups(profile)?;
     let old = StoredPolicyValue::Original(f::partial_wire(7, false));
     let changed = patch(
         Some(&old),
@@ -508,88 +509,5 @@ fn interop_admits_each_conversion_and_splice_owner_on_one_schema_account() -> Te
     ));
     assert_eq!((repeated.g(), repeated.p()), (21_200, 9_491));
     accounting::assert_raw_accounting()?;
-    Ok(())
-}
-
-fn keyword(rows: &[(&str, Vec<u8>)]) -> Vec<u8> {
-    let mut out = vec![108];
-    let count = u32::try_from(rows.len()).unwrap_or_default();
-    assert_eq!(u64::from(count), rows.len() as u64);
-    out.extend_from_slice(&count.to_be_bytes());
-    for (key, value) in rows {
-        out.extend_from_slice(&[104, 2]);
-        out.extend_from_slice(&f::atom(key));
-        out.extend_from_slice(value);
-    }
-    out.push(106);
-    out
-}
-
-fn keyword_retry(changed: bool, keywords: bool) -> Vec<u8> {
-    let backoff = f::group(
-        keywords,
-        &[
-            ("base_ms", f::integer(if changed { 9 } else { 17 })),
-            ("jitter_pct", f::integer(4)),
-            ("kind", f::atom("fixed")),
-            ("max_ms", f::integer(33)),
-            ("version", vec![110, 3, 0, 1, 0, 0]),
-        ],
-    );
-    let mut rows = vec![
-        ("backoff", backoff),
-        ("exhausted_to", f::binary(b"dead")),
-        ("max_retries", f::integer(if changed { 9 } else { 7 })),
-        ("type", f::binary(b"\0\xffopaque")),
-    ];
-    if keywords {
-        rows.insert(0, ("max_retries", f::integer(1)));
-    }
-    f::group(keywords, &rows)
-}
-
-fn assert_keyword_groups(profile: PolicySchemaLimits) -> TestResult {
-    use wf_domain::policy::complete::decode_original_complete_policy_entry_portable;
-    for keywords in [false, true] {
-        let raw = f::keyword_wire(7, 0, keywords);
-        let mut charge = PolicySchemaCharge::new(profile);
-        let entry = decode_original_complete_policy_entry_portable(&raw, profile, &mut charge)
-            .map_err(|error| format!("keyword donor={keywords}: {error:?}"))?
-            .ok_or("healthy keyword donor did not decode")?;
-        assert_eq!(
-            (entry.generation(), entry.workflow_type()),
-            (7, Some(b"r".as_slice()))
-        );
-        assert_eq!(entry.encoded(), raw);
-        let old = StoredPolicyValue::Original(raw.clone());
-        for phase in [1, 2] {
-            let mut delta = if phase == 1 {
-                PolicyPatch {
-                    max_active_ms: FieldPatch::Set(3),
-                    ..PolicyPatch::default()
-                }
-            } else {
-                partial_change()
-            };
-            if phase == 2 {
-                let FieldPatch::Set(retry) = &mut delta.retry else {
-                    return Err("partial retry fixture".into());
-                };
-                retry.max_retries = Some(9);
-            }
-            let changed = patch(
-                Some(&old),
-                0,
-                input(Some(7), delta),
-                64,
-                profile,
-                &mut charge,
-                0,
-            )
-            .map_err(|error| format!("keyword patch={keywords}, phase={phase}: {error:?}"))?;
-            assert_eq!(original(&changed)?, f::keyword_wire(8, phase, keywords));
-            assert_eq!(original(&old)?, raw);
-        }
-    }
     Ok(())
 }
