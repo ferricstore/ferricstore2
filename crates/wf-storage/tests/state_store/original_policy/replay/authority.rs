@@ -1,9 +1,164 @@
 //! Consumed original publication repeats actual current and used context.
-use super::{TestResult, f, install, public_frame, raw_policy};
+use super::{TestResult, complete_core_frame, f, install, public_frame, raw_policy};
 use std::path::Path;
 use wf_domain::policy::complete::{PolicySchemaCharge, RawFlowPolicyValue as Raw};
 use wf_domain::workflow::request::RetainedStatus;
 use wf_ports::state::StateTransactionError;
+
+pub(super) fn assert_original_over_complete(path: &Path, before: &f::Cohort) -> TestResult {
+    use wf_domain::workflow::request::RetainedOutcome;
+    use wf_ports::state::{GroupApplyStore, GroupOriginalPolicyTransaction};
+    use wf_storage::transaction::RecordBatchTransactionOutcome;
+    let fork = path.with_extension("set-cross");
+    drop(f::create(&fork, &[], 64)?);
+    f::replace(&fork, before)?;
+    assert_eq!(f::cohort(&fork)?, *before);
+    let scope = f::scope()?;
+    let profile = f::limits();
+    let frame = public_frame(
+        b"complete",
+        b"cross-format",
+        11,
+        Raw::Map(&[]),
+        Raw::List(&[]),
+    )?;
+    let raw = raw_policy(2, b"complete")?;
+    let metadata = f::metadata(
+        &scope,
+        b"cross-format",
+        1,
+        11,
+        f::frame_intent(&frame, 1)?,
+        RetainedStatus::Accepted,
+    )?;
+    let mut expected = before.clone();
+    f::rows_mut(&mut expected)?.insert(f::key(6, &[b"g", b"z", b"t", b"complete"]), raw.clone());
+    f::finish(
+        &mut expected,
+        &scope,
+        &frame,
+        f::log(1),
+        (f::clock(11)?, f::clock(11)?),
+        Some((&metadata, 1, &raw)),
+    )?;
+    f::upgrade6(
+        &mut expected,
+        &scope,
+        f::catalog(&scope, [None, None], None, None, None)?,
+    )?;
+    let mut store = f::open(&fork, 64)?;
+    let mut charge = PolicySchemaCharge::new(profile.schema);
+    let RecordBatchTransactionOutcome::Retained { outcome, .. } =
+        f::apply(&mut store, &frame, 1, profile, &mut charge)?
+    else {
+        return Err("original SET over Complete did not retain".into());
+    };
+    assert_eq!(
+        *outcome,
+        RetainedOutcome::new(metadata, 1, raw.clone(), profile.codec.admission())?,
+    );
+    let tx = store.begin_apply(
+        scope.group(),
+        scope.recovery(),
+        profile.codec.admission(),
+        profile.maximum_read_steps,
+        profile.maximum_read_bytes,
+        profile.maximum_adapter_bytes,
+    )?;
+    assert_eq!(
+        tx.original_policy_current(scope.tenant(), b"complete", profile.schema, &mut charge)?,
+        Some(raw),
+    );
+    drop(tx);
+    drop(store);
+    assert_eq!(f::cohort(&fork)?, expected);
+    drop(f::open(&fork, 64)?);
+    assert_eq!(f::cohort(&fork)?, expected);
+    Ok(())
+}
+
+pub(super) fn assert_core_over_original(path: &Path, before: &f::Cohort) -> TestResult {
+    use wf_domain::workflow::request::RetainedOutcome;
+    use wf_ports::log::verify_complete_core_policy_patch_frame;
+    use wf_ports::state::{GroupApplyStore, GroupOriginalPolicyTransaction};
+    use wf_storage::transaction::{
+        RecordBatchTransactionOutcome, apply_complete_core_policy_patch_transaction,
+    };
+    let fork = path.with_extension("core-cross");
+    drop(f::create(&fork, &[], 64)?);
+    f::replace(&fork, before)?;
+    assert_eq!(f::cohort(&fork)?, *before);
+    let scope = f::scope()?;
+    let profile = f::limits();
+    let frame = complete_core_frame(b"job", b"core-cross", 11)?;
+    let raw = raw_policy(2, b"job")?;
+    let mut charge = PolicySchemaCharge::new(profile.schema);
+    let intent = verify_complete_core_policy_patch_frame(
+        frame.as_bytes(),
+        profile.schema,
+        profile.codec.admission(),
+        &mut charge,
+    )?
+    .header(f::log(1))
+    .intent;
+    let metadata = f::metadata(
+        &scope,
+        b"core-cross",
+        1,
+        11,
+        intent,
+        RetainedStatus::Accepted,
+    )?;
+    let mut expected = before.clone();
+    f::rows_mut(&mut expected)?.insert(f::key(6, &[b"g", b"z", b"t", b"job"]), raw.clone());
+    f::finish(
+        &mut expected,
+        &scope,
+        frame.as_bytes(),
+        f::log(1),
+        (f::clock(11)?, f::clock(11)?),
+        Some((&metadata, 2, &raw)),
+    )?;
+    f::upgrade6(
+        &mut expected,
+        &scope,
+        f::catalog(&scope, [None, None], None, None, None)?,
+    )?;
+    let mut store = f::open(&fork, 64)?;
+    let RecordBatchTransactionOutcome::Retained { outcome, .. } =
+        apply_complete_core_policy_patch_transaction(
+            &mut store,
+            &scope,
+            frame.as_bytes(),
+            f::log(1),
+            profile,
+        )?
+    else {
+        return Err("Core over original did not retain".into());
+    };
+    assert_eq!(
+        *outcome,
+        RetainedOutcome::new(metadata, 2, raw.clone(), profile.codec.admission())?,
+    );
+    let tx = store.begin_apply(
+        scope.group(),
+        scope.recovery(),
+        profile.codec.admission(),
+        profile.maximum_read_steps,
+        profile.maximum_read_bytes,
+        profile.maximum_adapter_bytes,
+    )?;
+    assert_eq!(
+        tx.original_policy_current(scope.tenant(), b"job", profile.schema, &mut charge)?,
+        Some(raw),
+    );
+    drop(tx);
+    drop(store);
+    assert_eq!(f::cohort(&fork)?, expected);
+    drop(f::open(&fork, 64)?);
+    assert_eq!(f::cohort(&fork)?, expected);
+    Ok(())
+}
 
 #[test]
 fn consumed_original_changes_repeat_all_fresh_authority() -> TestResult {

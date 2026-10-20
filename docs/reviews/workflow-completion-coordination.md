@@ -47185,3 +47185,137 @@ and coherent missing-contract RED. Its three deferred child registrations are
 still explicit. Only this scoped source repair and read review-note prefixes
 are checkpointed now; those storage drafts and the full B1 production batch
 remain outside the checkpoint. The full-completion goal remains active.
+
+
+### ROOT-B1-STORAGE-FINITE2 — actual full authored batch and authority RED
+
+After scoped repair03ac3d2, Root accepted Writer custody of all S1-S6 storage
+bodies and their approved helpers. Exactly three deferred modules are now
+registered: authority/faults/snapshots. Root formatted/censused all paths;
+all test files fit600 physical LF without waivers. Ordinary later style factors
+stay inside the same existing files and approved responsibilities.
+
+Root's supported OLD typed same-S3 precursor genuinely reproduces the independent
+Core context-authority gap before B1 implementation. Actual rich Completegen1
+and the SAME foreign seed0 permit a Fresh plan with forged activeSome1 and
+completedNone; actual backend migrations remain closed0/0. Candidate2 passes the
+old strict response1 +1 relation and public Changes constructor. Actual commit
+returnsOk5 and the eager full six-table cohort comparison isfalse, versus the
+required InvalidChanges/true. RAW3204970+1117/
+13c8ff78df095212bdd68f205c740a14ef590b1c9dca3ebe5e3623fccb184591,
+584 inputs0cf7befb587f633fa6b7ddda3e30ca76b5911dcbde5646eef973c7cd08a50282
+unchanged,actual101/0pass1fail98filtered. The temporary in-memory-backed source
+168092c8bdf5837993fdfa39587a271a187c45fa288cca2fa85d1b064bcaef28
+uses the same S3 ID/core_substitution helper with only the old Complete carrier,
+direct reached-case call and independent (result,cohort) assertion. All held
+future bytes were restored in finally. Earlier lint and unseeded-context retries
+are NOT source-defect evidence; the unseeded attempt also had a changed input pin.
+
+Root actually whole/hash-read ARCH3409777+4680/
+7587feb98a2b4f645da79a3d84e747cdc4c8942d1b27824079a2c1db87954dec.
+This selects a fixed Copy reached migration pair in the EXISTING Core preparation
+alias/context and Plan, threaded by Full/point preparation and repeated by the
+actual writer beside the history check. It preserves both getter/range/error
+orders, all nonFresh/CAS/merge skips, reached GenerationExhausted context, all
+fees/owners and response1 exact +1. No new nominal/alias/file or B1 source release.
+
+Writer migrated exactly two obsolete cross-format UnsupportedPolicyFormat
+expectations under the existing mixed replay identity, after the recorded
+ARCH3354131 selection. Two ordinary helpers in EXISTING replay/authority.rs copy
+all six actual tables into independent .set-cross/.core-cross stores, construct
+whole accepted policy/receipt/control/manifest expectations, read the raw result
+on the same owner and strict-reopen; primary Claim/Create/Core1/2/3 assertions are
+unchanged. Root formatted parent450LF/adf093e4 and authority537LF/321d81f5.
+Actual existing-API runtime reaches the first new originalSET-overV2 positive
+and refuses UnsupportedPolicyFormat: RAW3210494+704/
+7cfc342d37188b8c059b1c2f9fcd45ca83053a9b62a6f2a60123eb2a029b7fad,
+584 inputs6173d87526b19318bb84fcaf80d2a898522e25a9324c93f3d6703740df9994b9
+unchanged,actual101/0pass1fail97filtered. The later Core fork and primary controls
+remain unexecuted in this RED. Root read the entire Writer4761/77021013 and
+3209/8798adea handoff blocks; ARCH independently whole-inverted both current
+files against immutable03ac3d2 preimages. Writer's own inverse is separate evidence.
+
+Root corrected real test-setup/lint issues before recording final RED: snapshot
+layout upgrade consumes/returns its owner, and two unused imports were removed;
+S4's last block and expanded setup/GET/updates now use ordinary existing-file
+helpers to honor100-line bodies, with no assertion loss or new owner; an
+unnecessary clone and similar name were corrected. Constant-only wide-size
+assertions now derive278581 dynamically from actual names. Review also found two
+real expanded oracle gaps: only counting states did not bind all seven-byte keys,
+and wide-schema success alone did not prove skipped conversion. The actual GET
+now exhausts all16384 distinct names order-independently and verifies effective
+state map5/parallel. The same expanded scenario adds a PURE same-frame100M
+prepare/inspect/Fresh-decision pair before each actual wide durable operation.
+Actual store/current capture is outside that pure account; internal simultaneous
+owners still require their real prospective admission. The selected conservative
+lazy upper97,795,920 fits100M; eager FULL converter alone g88,030,268 plus
+J44,049,120 requires132,079,388, even116,316,184 after granting the entire verifier
+as free. No artificial U fee or physical p<J oracle is inserted. Wide GET,
+stale/replacement, reducing merge and full persisted cohorts stay paired.
+
+The final existing-API subset strict target passes:
+RAW3215287+169/15d2d6062972c588b4f93289567d322ca5b7b0e8c1df5f94765a8ee7620d74d1,
+584 inputsc39814bcd1f272d36320e56203adc2d7c4c2e6dcb0c9766aa561a62338dd4caf
+unchanged,actual0. For this scoped lint run only, three intended new-carrier
+children were temporarily unregistered and restored; no full-future-target lint
+acceptance is inferred. All children are registered for the final coherent
+missing-contract compile: RAW3215614+1460/
+f70231cde90d48763cc813d3a6ca53bdcf994a0ce554315f42cc1f7ff1efbed3,
+584 inputs7b72aaf966fef98a8b124fcf73693b11f43fa0f2822057a864d2a807851e6ab2
+unchanged,actual101. Exactly two E0432 and one E0425 are the selected missing
+StoredPolicyValue domain carrier. No incidental compiler diagnostic remains;
+NO test assertion executed in this full compile attempt. Pure100M success, full
+S1-S6 positives and later fault/snapshot obligations await actual implementation
+and execution. Final ordinary reciprocal test review remains finite; the full
+B1 production batch is still held until its test checkpoint. Full goal remains
+active; no parity/Linux/native optimization credit follows from this test work.
+
+
+### ROOT-B1-STORAGE-TEST-CHECKPOINT — final actual review accepted
+
+Root whole/hash-read final ARCH3414457+13473/
+ba6b092b90148aad5b4e85708bcc224db334a6bf3de177f234c69e76495e212e
+and PERF2672548+10377/d7ba824697c3f0337dc0803f355117aef89a04ed479fa6e08175bfec9ad9b354.
+Both actually reviewed the final388LF/ae072bc1 pure helper and both old-test
+migration paths; the accepted final source messages close their earlier saved
+pending-helper qualifiers. ARCH independently whole-inverted both replay files,
+activation visibility, snapshot setup correction and the pure helper; PERF
+independently whole-inverted the parent style/registration and snapshot setup.
+Each read the other's actual selected resource/source findings. No finite
+source/resource/authority disagreement remains; test freezing needs no new
+general readiness cycle. Pure100M and all later feature positives remain
+unexecuted, as explicitly qualified above.
+
+The final exact test census/rustfmt passes for all eleven storage paths:
+original_policy.rs215B/10LF/f4ccf4ed;activation12635B/406LF/1ba81a0c;
+interop16185B/519LF/eff0dcfa;wire13909B/413LF/a9ad7382;
+expanded13156B/388LF/ae072bc1;authority10340B/307LF/d341f877;
+faults16840B/506LF/506f7de1;consumed6773B/224LF/83a93fb2;
+snapshots20721B/577LF/69c04e3e;replay14202B/450LF/adf093e4;
+replay/authority17398B/537LF/321d81f5. All fall within600 physical LF.
+The complete B1 batch remains fifteen behavior identities and sixteen NEW
+private test/helper paths, with six approved future production children.
+Current Source3 pending-custody fix03ac3d2 is separate; no B1 source edit is
+included in this test checkpoint.
+
+The clarified Core Plan predicate accepts Option<&StoredPolicyValue>, matching
+its validated current and Changes carrier. Internal correspondence hashes the
+ACTUAL encoded predecessor arm, not a transient conversion. Original Plan keeps
+Option<&[u8]>. This exact selected spelling supersedes the earlier proposal's
+Core raw-slice shorthand and introduces no new artifact, model, owner or debit.
+Root has read the concrete model/alias reached-pair approval before any edit.
+Writer may prepare READ-ONLY for the next disjoint Domain implementation task;
+creation/mutation still requires Root's explicit post-checkpoint source release.
+The required B2/B3/B4, full Elixir setup/scenario/assertion/profile coverage,
+runtime/governing services/transports and native Linux/macOS acceptance remain
+open under the active full-completion goal.
+
+Root subsequently whole/hash-read final PERF2682925+8336/
+090294176b9ca6aef72e936f8d2f05d363ce39357aeb3e033e735323ddfbcf1c,
+which binds the actual final pure helper, restored authority, replay forks, own
+entire source inverses and qualified strict/missing-contract results. Both
+expanded coverage findings are closed in actual authored test source; execution
+credit remains exactly the scoped evidence above. ARCH's final13473 block
+reciprocally read PERF10377/previous1420; PERF actually read the exact ARCH4680
+reached-pair selection. The subsequent final-note read is ordinary reciprocal
+recordkeeping, not a further freeze or production readiness dependency.

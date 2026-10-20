@@ -41,18 +41,21 @@ passing sequence, rather than counted as a production bug.
 Full product completion remains open. The next required work is same-type
 ETF/V2 interoperability, followed by actual runtime source profiles/order,
 authoritative indexed record effects and durable migration jobs. The concrete B1
-test batch is selected after architecture/performance review. The first frozen
-ports regression reproduced UnsupportedVersion before the later union-carrier
-tests were added. New domain and ports cases now fail compilation at the selected
-missing interoperability APIs/carriers. Two storage cases and the committed and
-received-snapshot recovery cases compile and reproduce UnsupportedPolicyFormat;
-their respective target Clippy checks pass. Their assertions after those reached
-failures remain unexecuted. Architecture and performance have reviewed the
-domain, request, storage and recovery subsets separately; unfinished cases and
-reviews remain explicit in the coordination record. Storage substitutions,
-FIFO, physical faults, snapshot and expanded transient-size coverage continue,
-alongside the final independently priced raw-splice controls. No successor
-interoperability production source is released. Full pinned Elixir scenario/assertion/setup/profile
+test batch has fifteen behavior identities across sixteen private test/helper
+paths. All six storage scenarios are authored, covering substitutions, FIFO,
+physical faults, mixed snapshot lineage and large transient conversions. Review
+strengthened full state-name coverage and the paid lazy-conversion discriminator.
+The first frozen ports regression reproduced UnsupportedVersion before later
+union-carrier tests were added. Final domain, ports and storage tests fail
+compilation at the selected missing interoperability APIs/carrier. Earlier
+existing-API storage and node cases reproduce UnsupportedPolicyFormat; scoped
+target lint passes. Assertions after those reached failures remain unexecuted.
+The existing mixed-format test now requires acceptance on independent full-store
+forks while preserving its primary record operations. A supported-format S3
+precursor also reproduces a forged Core migration-context commit; architecture
+has selected its fixed reached-context seal before implementation. Exact review,
+input pins, execution limits and test checkpoints are in the coordination record.
+Full interoperability production remains held. Full pinned Elixir scenario/assertion/setup/profile
 parity, governing services, accepted consensus/runtime, application/transports
 and both Linux/macOS acceptance remain required. Progress remains 85 source-derived
 declarations, 95 mappings and 384 assertion links; this increment adds no parity

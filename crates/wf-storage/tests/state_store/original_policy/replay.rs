@@ -4,8 +4,7 @@ use super::{TestResult, fixtures as f};
 use std::path::Path;
 use wf_domain::policy::complete::{PolicySchemaCharge, RawFlowPolicyValue as Raw};
 use wf_domain::workflow::request::{RetainedOutcome, RetainedStatus};
-use wf_ports::state::StateTransactionError;
-use wf_storage::transaction::{OriginalPolicyTransactionError, RecordBatchTransactionOutcome};
+use wf_storage::transaction::RecordBatchTransactionOutcome;
 use wf_types::identity::RequestId;
 
 fn public_frame(
@@ -292,31 +291,7 @@ fn mixed_complete_original_types_keep_layout6_and_exact_identity() -> TestResult
     )?);
     install(&path, b"job", b"original", 0, 10, 64)?;
     let before = f::cohort(&path)?;
-    let profile = f::limits();
-    let mut store = f::open(&path, 64)?;
-    let cross = public_frame(
-        b"complete",
-        b"cross-format",
-        11,
-        Raw::Map(&[]),
-        Raw::List(&[]),
-    )?;
-    let error = f::apply(
-        &mut store,
-        &cross,
-        1,
-        profile,
-        &mut PolicySchemaCharge::new(profile.schema),
-    )
-    .err()
-    .ok_or("cross format accepted")?;
-    assert!(matches!(
-        error.downcast_ref::<OriginalPolicyTransactionError>(),
-        Some(OriginalPolicyTransactionError::Transaction(
-            StateTransactionError::UnsupportedPolicyFormat
-        ))
-    ));
-    drop(store);
+    authority::assert_original_over_complete(&path, &before)?;
     assert_eq!(f::cohort(&path)?, before);
     mixed_mutation_and_core(&path, &complete)?;
     drop(f::open(&path, 64)?);
@@ -326,27 +301,11 @@ fn mixed_complete_original_types_keep_layout6_and_exact_identity() -> TestResult
 
 fn mixed_mutation_and_core(path: &Path, complete: &[u8]) -> TestResult {
     use wf_ports::log::verify_complete_core_policy_patch_frame;
-    use wf_storage::transaction::{
-        CorePolicyTransactionError, apply_complete_core_policy_patch_transaction,
-    };
+    use wf_storage::transaction::apply_complete_core_policy_patch_transaction;
     let s = f::scope()?;
     let profile = f::limits();
     let before = f::cohort(path)?;
-    let mut store = f::open(path, 64)?;
-    let wrong = complete_core_frame(b"job", b"core-cross", 11)?;
-    assert_eq!(
-        apply_complete_core_policy_patch_transaction(
-            &mut store,
-            &s,
-            wrong.as_bytes(),
-            f::log(1),
-            profile
-        ),
-        Err(CorePolicyTransactionError::Transaction(
-            StateTransactionError::UnsupportedPolicyFormat
-        ))
-    );
-    drop(store);
+    authority::assert_core_over_original(path, &before)?;
     assert_eq!(f::cohort(path)?, before);
     let mut expected = complete_record_mutations(path, before)?;
     let bytes = complete_core_frame(b"complete", b"core-v2", 40)?;
@@ -375,7 +334,7 @@ fn mixed_mutation_and_core(path: &Path, complete: &[u8]) -> TestResult {
         &s,
         f::catalog(&s, [None, None], None, None, None)?,
     )?;
-    store = f::open(path, 64)?;
+    let mut store = f::open(path, 64)?;
     assert!(
         matches!(apply_complete_core_policy_patch_transaction(&mut store,&s,bytes.as_bytes(),f::log(3),profile)?,
         RecordBatchTransactionOutcome::Retained{outcome,..}if outcome.response()==new)

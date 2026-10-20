@@ -227,7 +227,7 @@ fn activation(priority: u8) -> TestResult {
     Ok(())
 }
 
-fn blocked_claim(
+pub(super) fn blocked_claim(
     path: &Path,
     s: &RequestScope,
     expected: &mut f::Cohort,
@@ -272,7 +272,7 @@ fn blocked_claim(
     Ok(())
 }
 
-fn complete_running(
+pub(super) fn complete_running(
     path: &Path,
     s: &RequestScope,
     expected: &mut f::Cohort,
@@ -340,7 +340,7 @@ fn complete_running(
     Ok(())
 }
 
-fn claim_first(
+pub(super) fn claim_first(
     path: &Path,
     s: &RequestScope,
     expected: &mut f::Cohort,

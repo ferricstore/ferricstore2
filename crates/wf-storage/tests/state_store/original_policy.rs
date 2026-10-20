@@ -3,6 +3,7 @@ use super::TestResult;
 mod activation;
 mod faults;
 mod fixtures;
+mod interop;
 mod limits;
 mod replay;
 mod roundtrip;
