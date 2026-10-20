@@ -32,7 +32,7 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<u16, StateTransactionEr
         }
         return Err(StateTransactionError::UnsupportedLayout);
     }
-    if tables != if matches!(layout, 4 | 5) { 6 } else { 4 } {
+    if tables != if matches!(layout, 4..=6) { 6 } else { 4 } {
         return Err(StateTransactionError::Corrupt);
     }
     let _ = super::snapshot::validate::retained(
@@ -83,7 +83,7 @@ pub(super) fn cohort(
     } else {
         None
     };
-    if layout == 5 {
+    if matches!(layout, 5 | 6) {
         tx.step()?;
         let (key, origin) = meta_rows
             .next()
@@ -108,7 +108,7 @@ pub(super) fn cohort(
         if key.value() != super::snapshot::KEY {
             return Err(StateTransactionError::Corrupt);
         }
-        if (matches!(layout, 4 | 5)) != bytes.value().starts_with(b"FWSD\0\x03") {
+        if (matches!(layout, 4..=6)) != bytes.value().starts_with(b"FWSD\0\x03") {
             return Err(StateTransactionError::Corrupt);
         }
         super::snapshot::check_descriptor(tx, bytes.value())?;
@@ -120,7 +120,7 @@ pub(super) fn cohort(
         return Err(StateTransactionError::Corrupt);
     }
     let control = tx.control()?;
-    if layout == 5 && control.last_entry().is_none() {
+    if matches!(layout, 5 | 6) && control.last_entry().is_none() {
         return Err(StateTransactionError::Corrupt);
     }
     if control.last_entry().is_none() && control.time() != initial {
@@ -183,7 +183,7 @@ pub(super) fn check_manifest(
         return Err(StateTransactionError::Corrupt);
     }
     *layout = value::read_u16(bytes, &mut at).map_err(value_error)?;
-    if *layout == 5 {
+    if matches!(*layout, 5 | 6) {
         return super::core_policy::catalog::parse5(tx, bytes)
             .map(super::core_policy::catalog::facts);
     }
@@ -234,7 +234,9 @@ fn validate_rows(
     let mut entries = table.iter().map_err(|e| storage_error(&e))?;
     let mut counts = [0_u64; 2];
     let mut hash = Sha256::new();
-    hash.update(if layout == 5 {
+    hash.update(if layout == 6 {
+        super::snapshot::original::CATALOG_DOMAIN
+    } else if layout == 5 {
         super::core_policy::catalog::CURRENT_CATALOG_DOMAIN
     } else {
         b"wf-state-genesis-v1"
@@ -259,7 +261,7 @@ fn validate_rows(
         if !applied && matches!(decoded.family(), 1 | 2 | 5) {
             return Err(StateTransactionError::Corrupt);
         }
-        rows::validate(tx, &table, &decoded, value.value(), charge)?;
+        rows::validate(tx, &table, &decoded, value.value(), charge, layout)?;
         if matches!(decoded.family(), 6 | 7) {
             counts[usize::from(decoded.family() - 6)] = counts[usize::from(decoded.family() - 6)]
                 .checked_add(1)

@@ -5,25 +5,49 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The original-public-policy regression batch now has thirty reviewed tests frozen
-before implementation: two receipt cases, five domain cases, five ports cases,
-fourteen storage cases and four node recovery/snapshot cases. The receipt cases
-compile and fail with UnsupportedVersion on the old codec; the remaining cases
-report selected missing APIs. No new assertions have passed yet. Architecture and
-performance reviewed independent ETF/resource ledgers, all Fresh predecessor and
-used-context authority, real FIFO activation, exhaustive physical fault offsets,
-and old/new snapshot custody. Review corrected fixture API/lifetime errors and
-an explicit receiving-layout upgrade before fault injection.
+The original-public-policy increment is implemented and validated on macOS. It
+connects the paid point gate to durable original ETF publication, real SET/GET,
+restricted Claim projections, layout6 snapshots and bounded committed recovery.
+Its thirty reviewed tests were frozen before implementation: two receipt cases,
+five domain cases, five ports cases, fourteen storage cases and four node cases.
+Architecture and performance independently reviewed the actual source, exact
+resource accounts, all Fresh predecessor/context authority, FIFO activation,
+physical fault cuts and snapshot custody. Thirteen approved private production
+children preserve the existing crate boundaries and dependency policy.
 
-The last production checkpoint remains cb68b87 below. The exact approved next
-source batch connects original public Policy.set through one paid point gate to
-durable ETF publication, SET/GET projection and bounded recovery. Root owns
-ports/node; the implementation agent owns domain/storage. All thirty tests must
-pass alongside the existing suite before this component is accepted. Same-type
-format interoperability, runtime source profiles, real indexed effects and
-migration jobs remain required successors, along with full Elixir parity and
-both Linux/macOS acceptance. These failing tests add no passing-test or parity
-credit.
+The coherent checkpoint passes **936 tests across 90 targets**, with zero
+failures, ignored or filtered tests, plus **six compile-fail examples across
+15 documentation targets**. Formatting, all-target compilation, strict all-target
+Clippy, warnings-denied rustdoc, architecture and reference/progress checks pass.
+All 1,460 captured repository inputs stayed unchanged through that sequence;
+only the three concurrently appended peer review notes were outside the pin.
+The separate native transaction executable passes formatting, compilation,
+strict Clippy and execution against the same products, with all 1,477 combined
+repository/native inputs unchanged. All four cached dependency-audit categories
+pass. Production files remain within 400 physical lines and tooling/tests 600,
+with unchanged strict function checks. No fresh online advisory audit, native
+Linux result or measured performance gain is claimed.
+
+Additional genuine regressions preceded repairs for unsupported-profile
+allocation, valid-but-unrepresentable ETF states, configured governance,
+hard oversized persisted rows and direct-commit same-owner cache reuse. Their
+tests are frozen in 304754a, bd74056, a18dbde and 9277a71. Cache publication now
+follows known successful commits. Review proved the later test-style cleanup
+conserves every old assertion; b0bbcc1 freezes it. Commit 1dc0723 keeps the future
+snapshot-version refusal at 4 and malformed legacy-body controls for 2/3. The
+earlier whole run's sole stale fixture failure is superseded by the complete
+passing sequence, rather than counted as a production bug.
+
+Full product completion remains open. The next required work is same-type
+ETF/V2 interoperability, followed by actual runtime source profiles/order,
+authoritative indexed record effects and durable migration jobs. The concrete B1
+proposal is under architecture/performance review; no successor source release
+is implied by this checkpoint. Full pinned Elixir scenario/assertion/setup/profile
+parity, governing services, accepted consensus/runtime, application/transports
+and both Linux/macOS acceptance remain required. Progress remains 85 source-derived
+declarations, 95 mappings and 384 assertion links; this increment adds no parity
+credit, and the full parity gate still fails. The active full-completion goal
+continues beyond this component. The preceding production checkpoint is cb68b87.
 
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper
@@ -33,8 +57,8 @@ including `d1d332d`, `fc25d7a`, `e537850` and `e937c8c`. Independent architectur
 performance and implementation reviews preserve full values, original replies,
 actual predecessor/context authority and exact logical resource accounts.
 
-The final coherent checkpoint passes **906 tests across 90 targets**, with zero
-failures, ignored or filtered tests, plus **six compile-fail examples across
+That preceding coherent checkpoint passes **906 tests across 90 targets**, with
+zero failures, ignored or filtered tests, plus **six compile-fail examples across
 15 documentation targets**. Formatting, all-target compilation, strict all-target
 Clippy, warnings-denied rustdoc, architecture and reference/progress checks pass.
 All 1,370 captured non-Markdown repository inputs stayed unchanged throughout
@@ -47,22 +71,9 @@ advisory refresh, native Linux result or measured performance gain is claimed.
 
 The original-query/predecessor and used-history authority gaps now have actual
 failing regressions followed by passing fixes. Both node fixture corrections
-pass, and the old unknown-snapshot-version control remains with future version3
-alongside a new malformed legacy-body-as-version2 check. All prior unrelated
+passed. At that checkpoint the unknown-snapshot-version control used future
+version 3 alongside a malformed legacy-body-as-version2 check. All prior unrelated
 assertions and immutable reference inputs are preserved.
-
-The selected next batch connects the existing original public Policy.set path
-through durable original ETF publication and real SET/GET. Its exact twelve
-production paths and named test/helper roster are recorded under
-ARCH-M1M2-ORIGINAL-PUBLIC-ALLOCATOR1-CREATE1. Test authoring is split between Root
-and the implementation agent with independent architecture/performance review.
-Same-type ETF/FWPV2 interoperability, wider source profiles/order, actual indexed
-record/catalog effects and durable migration jobs remain required named
-successors. No successor source is released by this handoff. Full original
-case/setup/profile parity, native Linux acceptance, accepted consensus/runtime,
-public governance and the remaining ordered M1–M8 work remain open; the full
-completion goal stays active. Source-derived progress remains 85 declarations,
-95 mappings and 384 assertion links, with no new parity credit from this batch.
 
 The priority repairs in `af046e8` passed 878 tests across 90 targets and six
 compile-fail examples across 15 documentation targets in an isolated exact

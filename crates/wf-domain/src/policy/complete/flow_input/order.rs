@@ -9,7 +9,7 @@ use crate::policy::complete::{
 use super::layout::{FlowPolicyCell, FlowPolicyLayout, FlowPolicyWorkSlot};
 use super::value::{PolicyInputCursor, PolicyInputMap};
 
-pub(super) mod hash;
+pub(in crate::policy::complete) mod hash;
 
 pub(super) fn prepare_map_order<'input>(
     map: PolicyInputMap<'input>,
@@ -27,9 +27,25 @@ pub(super) fn prepare_map_order_rows<'input>(
 ) -> Result<(usize, usize), Error> {
     let source = map.bind_source_order(charge)?;
     let start = layout.work.len();
+    let native = if source.needs_native_order() {
+        Some(crate::policy::complete::public_set::native_order::ranks(
+            source,
+            usize::try_from(charge.p()).map_err(|_| overflow())?,
+            charge,
+        )?)
+    } else {
+        None
+    };
     for source_index in 0..source.len(charge)? {
         charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-        let (index, key, _) = source.source_row_at(source_index, charge)?;
+        let (index, key, _) = if let Some(ranks) = &native {
+            let index = usize::try_from(*ranks.get(source_index).ok_or(Error::Malformed)?)
+                .map_err(|_| overflow())?;
+            let (key, value) = source.row_at(index, charge)?;
+            (index, key, value)
+        } else {
+            source.source_row_at(source_index, charge)?
+        };
         let bytes =
             key_bytes(key).filter(|(atom, _)| !*atom || matches!(&map, PolicyInputMap::Keyword(_)));
         let fingerprint = bytes.map_or(Ok(0), |(_, bytes)| hash::binary_hash(bytes, charge))?;

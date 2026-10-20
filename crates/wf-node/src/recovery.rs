@@ -11,12 +11,13 @@ use wf_ports::state::StateTransactionError;
 use wf_storage::log::RedbLogStore;
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
-    ClaimTransactionError, CorePolicyTransactionError, RecordBatchTransactionError,
-    RecordBatchTransactionLimits,
+    ClaimTransactionError, CorePolicyTransactionError, OriginalPolicyTransactionError,
+    RecordBatchTransactionError, RecordBatchTransactionLimits,
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
 mod join;
+mod original_policy;
 mod replay;
 mod snapshot;
 
@@ -34,6 +35,7 @@ pub struct CommittedRecoveryLimits {
     normal: RecordBatchTransactionLimits,
     claim_work: Option<ClaimWorkLimits>,
     core_policy: bool,
+    original_policy: bool,
     work: (usize, usize),
     entry: usize,
     workspace: usize,
@@ -78,6 +80,7 @@ impl CommittedRecoveryLimits {
             normal,
             claim_work: None,
             core_policy: false,
+            original_policy: false,
             work,
             entry: maximum_owned_entry_bytes,
             workspace: workspace_bytes,
@@ -221,6 +224,8 @@ pub enum CommittedRecoveryError {
     Claim(ClaimTransactionError),
     /// Existing complete core-policy preparation/transaction diagnosis.
     CorePolicy(CorePolicyTransactionError),
+    /// Original public Policy.set preparation/transaction diagnosis.
+    OriginalPolicy(OriginalPolicyTransactionError),
     /// Header-only parsing failure.
     Codec(CodecError),
     /// Closed Blank/Membership parsing failure.
@@ -246,6 +251,7 @@ impl fmt::Display for CommittedRecoveryError {
             Self::Normal(error) => return fmt::Display::fmt(error, f),
             Self::Claim(error) => return fmt::Display::fmt(error, f),
             Self::CorePolicy(error) => return fmt::Display::fmt(error, f),
+            Self::OriginalPolicy(error) => return fmt::Display::fmt(error, f),
             Self::Codec(error) => return fmt::Display::fmt(error, f),
             Self::Membership(error) => return fmt::Display::fmt(error, f),
         })

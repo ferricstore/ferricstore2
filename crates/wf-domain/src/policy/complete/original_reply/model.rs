@@ -17,6 +17,7 @@ pub struct OriginalPolicyReplyContext<'input> {
     pub(super) encoded_binding: Option<&'input [u8]>,
     pub(super) states_order: Option<(u32, &'input [u32], &'input [u32])>,
     pub(super) additional_live: usize,
+    pub(super) portable: bool,
 }
 
 impl<'input> OriginalPolicyReplyContext<'input> {
@@ -35,6 +36,21 @@ impl<'input> OriginalPolicyReplyContext<'input> {
             encoded_binding,
             states_order,
             additional_live,
+            portable: false,
+        }
+    }
+
+    /// Uses the fixed portable server profile and reached actual binary-map order.
+    /// This mathematical context supplies no storage or runtime-origin proof.
+    #[must_use]
+    pub fn portable(defaults: ResolvedRetention, additional_live: usize) -> Self {
+        Self {
+            safety: super::super::canonical_original_etf_safety(),
+            defaults,
+            encoded_binding: None,
+            states_order: None,
+            additional_live,
+            portable: true,
         }
     }
 }

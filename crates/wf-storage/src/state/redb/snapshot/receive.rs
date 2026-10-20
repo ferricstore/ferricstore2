@@ -35,7 +35,7 @@ fn header(
         return Err(SnapshotError::Malformed);
     }
     let version = u16::from_be_bytes([magic[4], magic[5]]);
-    if !matches!(version, 1 | 2) {
+    if !matches!(version, 1..=3) {
         return Err(SnapshotError::UnsupportedVersion);
     }
     for expected in [tx.group.as_bytes(), tx.recovery.as_bytes()] {
@@ -57,7 +57,7 @@ fn header(
     for (target, bytes) in values.iter_mut().zip(counts.as_chunks::<8>().0) {
         *target = usize::try_from(u64::from_be_bytes(*bytes)).map_err(|_| SnapshotError::Limit)?;
     }
-    let metadata = if version == 2 { 3 } else { 2 };
+    let metadata = if version >= 2 { 3 } else { 2 };
     if values[0] != metadata {
         return Err(SnapshotError::Malformed);
     }
@@ -137,7 +137,11 @@ fn row(
         b"origin"
     };
     if position.0 && position.1 == 0 {
-        let wanted = if position.2 == 2 { [0, 5] } else { [0, 3] };
+        let wanted = match position.2 {
+            3 => [0, 6],
+            2 => [0, 5],
+            _ => [0, 3],
+        };
         if value.get(4..6) != Some(wanted.as_slice()) {
             return Err(SnapshotError::Malformed);
         }
@@ -241,7 +245,7 @@ pub(super) fn receive(
     }
     {
         let mut buffer = (Vec::new(), 0);
-        for (meta, count) in [(true, if version == 2 { 3 } else { 2 }), (false, rows)] {
+        for (meta, count) in [(true, if version >= 2 { 3 } else { 2 }), (false, rows)] {
             for index in 0..count {
                 row(
                     &tx,
@@ -267,10 +271,10 @@ pub(super) fn receive(
     io::eof(&tx, input, limits)?;
     let facts = (
         state.0.finalize().into(),
-        rows + if version == 2 { 3 } else { 2 },
+        rows + if version >= 2 { 3 } else { 2 },
         wire,
     );
-    if version == 2 {
+    if version >= 2 {
         super::policy::upgrade_catalog(
             &tx,
             &super::catalog::SnapshotCatalog {
@@ -291,5 +295,14 @@ pub(super) fn receive(
         return Err(SnapshotError::Stage(Error::Corrupt));
     }
     super::commit(tx).map_err(SnapshotError::Stage)?;
-    Ok((facts.0, facts.1, facts.2, if version == 2 { 5 } else { 3 }))
+    Ok((
+        facts.0,
+        facts.1,
+        facts.2,
+        match version {
+            3 => 6,
+            2 => 5,
+            _ => 3,
+        },
+    ))
 }

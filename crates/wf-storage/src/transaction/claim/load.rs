@@ -7,16 +7,17 @@ use wf_domain::claim::apply::{ClaimQuery, ClaimStates, ClaimWindowEnd};
 use wf_domain::claim::{ClaimRecord, DueOrder, LaneKey};
 use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::policy::complete::{
-    CompletePolicyValue, PolicySchemaCharge, project_record_batch_policy,
-    record_batch_policy_projection_bytes,
+    PolicySchemaCharge, original_record_batch_policy_has_governance,
+    original_record_batch_policy_projection_bytes, project_original_record_batch_policy,
+    project_record_batch_policy, record_batch_policy_projection_bytes,
 };
+use wf_domain::policy::definition::PolicySnapshot;
 use wf_domain::policy::definition::StateMode;
-use wf_domain::policy::installation::PolicyCandidate;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::log::{DecodedRequest, FreshClaimPhase, RecordBatchApplyError};
 use wf_ports::state::{
     ClaimDueKind, ClaimDueStep, GroupClaimDueCursor, GroupClaimTransaction, StateTransactionError,
-    StoredWorkflowRecord,
+    StoredPolicyValue, StoredWorkflowRecord,
 };
 use wf_types::identity::{GroupId, PartitionId, RecordId};
 use wf_types::version::TimestampMillis;
@@ -27,8 +28,8 @@ pub(super) struct LoadedClaim {
     pub(super) queries: Vec<(PartitionId, RecordId)>,
     pub(super) records: Vec<StoredWorkflowRecord>,
     pub(super) placements: BTreeMap<PartitionId, GroupId>,
-    pub(super) policy: Option<CompletePolicyValue>,
-    pub(super) projection: Option<(PolicyCandidate, InstalledRetryPolicy)>,
+    pub(super) policy: Option<StoredPolicyValue>,
+    pub(super) projection: Option<(PolicySnapshot, InstalledRetryPolicy)>,
     pub(super) parallel: Vec<usize>,
     pub(super) heads: Vec<(Vec<u8>, PartitionId, Option<usize>)>,
     pub(super) state_keys: Vec<Vec<u8>>,
@@ -93,32 +94,72 @@ impl LoadedClaim {
         limits: ClaimTransactionLimits,
     ) -> Result<(), ClaimTransactionError> {
         let mut charge = PolicySchemaCharge::new(limits.base.schema);
-        self.policy = tx.installed_policy(scope.tenant(), kind, limits.base.schema, &mut charge)?;
+        self.policy =
+            tx.stored_policy_value(scope.tenant(), kind, limits.base.schema, &mut charge)?;
         if let Some(policy) = &self.policy {
-            if policy.data().workflow_type != kind {
-                return Err(StateTransactionError::Corrupt.into());
-            }
-            if policy.data().governance.is_some()
-                || policy
-                    .data()
-                    .states
-                    .values()
-                    .any(|state| state.governance.is_some())
-            {
-                return Err(ClaimTransactionError::UnsupportedGovernance);
-            }
-            let bytes = record_batch_policy_projection_bytes(policy)?;
-            debit(
-                &mut self.staging_used,
-                bytes,
-                limits.base.maximum_staging_bytes,
-            )?;
-            self.projection = Some(project_record_batch_policy(
-                policy,
-                limits.base.schema,
-                &mut charge,
-                bytes,
-            )?);
+            let cap = limits.base.maximum_staging_bytes;
+            self.projection = Some(match policy {
+                StoredPolicyValue::Complete(policy) => {
+                    if policy.data().workflow_type != kind {
+                        return Err(StateTransactionError::Corrupt.into());
+                    }
+                    if policy.data().governance.is_some()
+                        || policy
+                            .data()
+                            .states
+                            .values()
+                            .any(|s| s.governance.is_some())
+                    {
+                        return Err(ClaimTransactionError::UnsupportedGovernance);
+                    }
+                    let bytes = record_batch_policy_projection_bytes(policy)?;
+                    debit(&mut self.staging_used, bytes, cap)?;
+                    let (mode, retry) = project_record_batch_policy(
+                        policy,
+                        limits.base.schema,
+                        &mut charge,
+                        bytes,
+                    )?;
+                    (mode.into_policy(), retry)
+                }
+                StoredPolicyValue::Original(raw) => {
+                    let owner = raw
+                        .len()
+                        .checked_mul(256)
+                        .and_then(|n| n.checked_add(65_536))
+                        .ok_or(StateTransactionError::Limit)?;
+                    debit(&mut self.staging_used, owner, cap)?;
+                    if original_record_batch_policy_has_governance(
+                        raw,
+                        kind,
+                        limits.base.schema,
+                        &mut charge,
+                    )? {
+                        return Err(ClaimTransactionError::UnsupportedGovernance);
+                    }
+                    debit(&mut self.staging_used, owner, cap)?;
+                    let bytes = original_record_batch_policy_projection_bytes(
+                        raw,
+                        kind,
+                        limits.base.schema,
+                        &mut charge,
+                    )?;
+                    debit(
+                        &mut self.staging_used,
+                        owner
+                            .checked_add(bytes)
+                            .ok_or(StateTransactionError::Limit)?,
+                        cap,
+                    )?;
+                    project_original_record_batch_policy(
+                        raw,
+                        kind,
+                        limits.base.schema,
+                        &mut charge,
+                        bytes,
+                    )?
+                }
+            });
         }
         Ok(())
     }
@@ -194,9 +235,7 @@ impl LoadedClaim {
     pub(super) fn mode(&self, state: &[u8]) -> StateMode {
         self.projection
             .as_ref()
-            .map_or(StateMode::Parallel, |(policy, _)| {
-                policy.policy().state_mode(state)
-            })
+            .map_or(StateMode::Parallel, |(policy, _)| policy.state_mode(state))
     }
 
     fn store_record(

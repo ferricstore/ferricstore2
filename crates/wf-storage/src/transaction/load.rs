@@ -5,15 +5,18 @@ use std::collections::{BTreeMap, BTreeSet};
 use wf_domain::claim::ClaimRecord;
 use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::policy::complete::{
-    CompletePolicyValue, PolicySchemaCharge, project_record_batch_policy,
+    PolicySchemaCharge, original_record_batch_policy_projection_bytes,
+    project_original_record_batch_policy, project_record_batch_policy,
     record_batch_policy_projection_bytes,
 };
-use wf_domain::policy::installation::PolicyCandidate;
+use wf_domain::policy::definition::PolicySnapshot;
 use wf_domain::workflow::Operation;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::consensus::PreparedBatchItem;
 use wf_ports::log::{CodecError, DecodedRequest, RecordBatchApplyError};
-use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
+use wf_ports::state::{
+    GroupApplyTransaction, StateTransactionError, StoredPolicyValue, StoredWorkflowRecord,
+};
 use wf_types::identity::{GroupId, PartitionId, RecordId};
 
 use super::{RecordBatchTransactionError, RecordBatchTransactionLimits};
@@ -23,8 +26,8 @@ pub(super) struct LoadedRecordBatch {
     pub(super) records: Vec<Option<StoredWorkflowRecord>>,
     pub(super) placements: BTreeMap<PartitionId, GroupId>,
     pub(super) policy_types: Vec<Vec<u8>>,
-    pub(super) policies: Vec<Option<CompletePolicyValue>>,
-    pub(super) projections: Vec<Option<(PolicyCandidate, InstalledRetryPolicy)>>,
+    pub(super) policies: Vec<Option<StoredPolicyValue>>,
+    pub(super) projections: Vec<Option<(PolicySnapshot, InstalledRetryPolicy)>>,
     pub(super) parallel: Vec<(usize, bool)>,
     pub(super) members: Vec<(usize, bool)>,
     pub(super) heads: Vec<(usize, Option<StoredWorkflowRecord>)>,
@@ -186,21 +189,46 @@ impl LoadedRecordBatch {
         )?;
         let mut charge = PolicySchemaCharge::new(limits.schema);
         for kind in &self.policy_types {
-            let policy = tx.installed_policy(scope.tenant(), kind, limits.schema, &mut charge)?;
-            let projection = if let Some(policy) = &policy {
-                if policy.data().workflow_type != *kind {
-                    return Err(StateTransactionError::Corrupt.into());
+            let policy =
+                tx.stored_policy_value(scope.tenant(), kind, limits.schema, &mut charge)?;
+            let projection = match &policy {
+                Some(StoredPolicyValue::Complete(policy)) => {
+                    if policy.data().workflow_type != *kind {
+                        return Err(StateTransactionError::Corrupt.into());
+                    }
+                    let bytes = record_batch_policy_projection_bytes(policy)?;
+                    debit(&mut self.staging_used, bytes, cap)?;
+                    let (mode, retry) =
+                        project_record_batch_policy(policy, limits.schema, &mut charge, bytes)?;
+                    Some((mode.into_policy(), retry))
                 }
-                let bytes = record_batch_policy_projection_bytes(policy)?;
-                debit(&mut self.staging_used, bytes, cap)?;
-                Some(project_record_batch_policy(
-                    policy,
-                    limits.schema,
-                    &mut charge,
-                    bytes,
-                )?)
-            } else {
-                None
+                Some(StoredPolicyValue::Original(raw)) => {
+                    let owner = raw
+                        .len()
+                        .checked_mul(256)
+                        .and_then(|n| n.checked_add(65_536))
+                        .ok_or_else(overflow)?;
+                    debit(&mut self.staging_used, owner, cap)?;
+                    let bytes = original_record_batch_policy_projection_bytes(
+                        raw,
+                        kind,
+                        limits.schema,
+                        &mut charge,
+                    )?;
+                    debit(
+                        &mut self.staging_used,
+                        owner.checked_add(bytes).ok_or_else(overflow)?,
+                        cap,
+                    )?;
+                    Some(project_original_record_batch_policy(
+                        raw,
+                        kind,
+                        limits.schema,
+                        &mut charge,
+                        bytes,
+                    )?)
+                }
+                None => None,
             };
             self.policies.push(policy);
             self.projections.push(projection);

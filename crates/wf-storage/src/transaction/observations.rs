@@ -48,7 +48,7 @@ pub(super) fn decide<'current>(
             .get(index)
             .ok_or(StateTransactionError::Corrupt)?;
         debit(staging_used, 256, cap)?;
-        modes.insert(kind, projection.as_ref().map(|(mode, _)| mode.policy()));
+        modes.insert(kind, projection.as_ref().map(|(mode, _)| mode));
         debit(staging_used, 256, cap)?;
         retries.insert(kind, projection.as_ref().map(|(_, retry)| retry));
     }
@@ -206,7 +206,7 @@ pub(super) fn load_indexes<T: GroupApplyTransaction>(
             .ok_or(StateTransactionError::Corrupt)?
             .as_ref()
             .map_or(StateMode::Parallel, |(mode, _)| {
-                mode.policy().state_mode(row.logical_state())
+                mode.state_mode(row.logical_state())
             });
         let due = DueOrder::for_record(&row);
         if let Some(due) = due {

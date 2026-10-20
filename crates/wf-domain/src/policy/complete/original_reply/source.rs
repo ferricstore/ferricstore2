@@ -13,8 +13,65 @@ use crate::policy::complete::original_entry::{
     TermPosition as Position, indexed::OriginalPolicyCurrentIndex as Index,
 };
 use crate::policy::complete::{
-    CompletePolicyEncodingError as Error, PolicySchemaCharge, PolicySchemaError,
+    CompletePolicyEncodingError as Error, PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits,
 };
+
+/// Measures a freshly decoded portable GET reply without building that reply.
+///
+/// The returned index/catalog, reply metadata and reached-map rank peak exclude
+/// caller query backing. A later presenter performs its own separately paid
+/// decode; this arithmetic result grants no retained-index or authority credit.
+/// # Errors
+/// Preserves malformed envelope, portable profile, schema and allocation errors.
+pub fn original_policy_get_reply_projection_bytes(
+    encoded: Option<&[u8]>,
+    state: Option<&[u8]>,
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<usize, Error> {
+    super::entry(schema, charge)?;
+    let mut index = encoded
+        .map(|raw| {
+            super::super::original_entry::indexed::decode_portable_retained(raw, 0, schema, charge)?
+                .ok_or(Error::Malformed)
+        })
+        .transpose()?;
+    let mut bytes = 0_usize;
+    if let Some(index) = &mut index {
+        bytes = index.owner_bound()?;
+        index.build_catalog(bytes, charge)?;
+        bytes = bytes
+            .checked_add(index.catalog_bound()?)
+            .ok_or_else(overflow)?;
+    }
+    let states = index
+        .as_ref()
+        .map(|index| field(index, index.cursor().position(), b"states", charge))
+        .transpose()?
+        .flatten();
+    let capacity = super::capacity(index.as_ref(), state, states)?;
+    let depth = index.as_ref().map_or(0, Index::depth_bound);
+    let metadata = capacity
+        .checked_mul(520)
+        .and_then(|n| n.checked_add(1024))
+        .and_then(|n| depth.checked_mul(64).and_then(|depth| n.checked_add(depth)))
+        .ok_or_else(overflow)?;
+    bytes = bytes.checked_add(metadata).ok_or_else(overflow)?;
+    if state.is_none()
+        && let (Some(index), Some(states)) = (&index, states)
+    {
+        let states = index.at(states);
+        if states.kind() == Kind::Map && states.len() > 1 {
+            bytes = states
+                .len()
+                .checked_mul(72)
+                .and_then(|n| n.checked_add(64))
+                .and_then(|n| bytes.checked_add(n))
+                .ok_or_else(overflow)?;
+        }
+    }
+    Ok(bytes)
+}
 
 pub(super) fn field(
     index: &Index<'_, '_>,

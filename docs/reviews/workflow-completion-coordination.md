@@ -46798,3 +46798,75 @@ Root actually whole-read/hash-verified ARCH API113284260+4039/daa5aaf4de8a60dba6
 The analogous existing Core history identity now proves actual empty3/directcommit5, same-owner layoutOk3 instead ofOk5. Its independent installed policy, full finish/upgrade5 cohort and strict reopen PASS before the final layout assertion. Initial raw2906752+1124/2ac45bb9 is genuine behavioral RED. ARCH's precise GEOMETRY6 same-file five-argument assert_direct_core_cohort factor retains all full metadata/row/receipt/control/catalog/reopen assertions while keeping the caller under100 lines. Final factored behavioral RED remains identical: raw2908029+1124/e26a577bf700b09dd78bb507d52e659911905f6f27f8aee7e35d8a8ec5dbb77a;577inputs unchanged6658d63ba0503aaf803ab25a1d945cfc7327152dc7e5004c287646465d773ca0. Later old history checks do not execute in this RED. No new test identity/file/type/alias/dependency.
 
 Root freezes these two reviewed direct-cache regressions and the separately explained three fixture corrections in a tests-only commit BEFORE API11 source repair. After that commit RELEASE exactly the already selected existing10-source-path Cell/ref fix, both Core/Original set cache only after known-success commit, no added I/O/fee/owner or public setter. Root retains formatter/runner/Git and codec3; Writer owns selected storage source, ARCH/PERF review actual final correction reciprocally. Full suites/strict quality/native/Linux/parity remain required; full M1–M8 goal stays active.
+
+
+ROOT strict test-only precision (2026-10-20)
+
+Current whole-repository strict rerun reaches all production successfully; remaining22storage/6node diagnostics are test style/shape only, raw2916996+15397/be91b13366301ff99ed1ed1053dda4bde349e30d5d41716daa0d1f74342a4183;1460inputs unchanged3dbc02bac8ba5c3e525366edf516def7a6fa0e5eca546f7ff71c75c5377756b4. Actual enforcement.md98 uses Clippy's function-body100 rule; the separate physical400/600 limits apply to files. ARCH's additional conservative physical100 GEOMETRY7A preference is withdrawn/unexecuted because the existing publication factor passes the actual contract. No further production movement is released for that preference.
+
+ARCH explicitly selects minimal test type-complexity repairs in existing artifacts: storage snapshot lineage helpers split the single pair into separate existing facts3/facts5 tuple arguments (six/five total, no new alias); ONE private nonnominal type Cohort=[Option<f::Rows>;6] in EXISTING node snapshot_recovery/original_policy.rs, used by its existing cohort return and imported into existing received child for the pair return. This is the second test alias across the selected batch, no new model/path/owner or production alias. Root owns these and ordinary test-only lint repairs: actual setup scope becomes a borrowed helper argument instead of expect, GET visitor failure propagates and forbidden-visit flag remains asserted, same scalar/method/clone spellings and full oracles preserved. No allowance or dropped scenario is authorized.
+
+
+### ROOT-ORIGINAL-PUBLIC-ALLOCATOR1-FINAL — coherent macOS component checkpoint
+
+The original-public policy batch now has a coherent complete local result. All
+thirty selected identities execute alongside the old suite. The independently
+reviewed additional authority regressions were frozen before their repairs:
+304754a (unsupported first-pass allocation), bd74056 (valid unrepresentable ETF),
+a18dbde (governance and hard oversized persisted row), and 9277a71 (both public
+direct-commit same-owner caches). Only known successful consumed commits publish
+the new cache. Existing raw authority, true canonical End, independent repeated
+decoder owners and supplied/actual context checks remain intact.
+
+Both ARCH and PERF independently reconstructed ALL eight final test-style files
+against 9277a71; b0bbcc1 freezes their ordinary cleanup. Full run 1 actually failed
+only on the old framing test's version 3 UnsupportedVersion expectation after
+explicit FWSP3 support: 882 PASS / 1 FAIL across 80 completed targets, storage 94/95.
+Root kept the future-version refusal at 4 and added legacy-body-as-v3 Malformed
+beside the retained v2 control. Both reviewers' whole-file inverses restore the
+entire prior 448 LF file 4d3e52f1. Focused 1 PASS raw 3029075+455/7b196316 is followed
+by the full sequence below; 1dc0723 freezes this test-only correction. No fixture
+correction is credited as a production behavioral repair.
+
+Final sequence uses Rust 1.99.0, locked/offline and warnings-denied build/rustdoc.
+All 1,460 repository inputs remain 634cc50c90d819afdb5afaf80272d01ca0098eb13488dc2f39e5127632c9a84e
+before/after EVERY command in the combined run. Only the three explicitly active
+peer notes are excluded; Root CONTINUE/coordination, all code/tests/config,
+reference data and parity ledgers are included. Raw main source-pin-validation
+log 3029668+108821/SHA256aaf636df6688d6221652b5da1d771bf82524f1306edb3b595bc04e78c42574e9
+has nine command boundaries, each exit0: fmt; all-target check; strict all-target
+Clippy; all-target workspace tests; doctests; no-deps rustdoc; arch; reference;
+progress. Root independently parses the test section as 936 PASS across 90 targets,
+and docs as 6 PASS across 15 targets, all 0 failed/ignored/measured/filtered. Repeated
+arch 47 is not added to the 936. Source-size policy passes 400 production / 600
+tooling-tests and the unchanged strict function rules. No waiver or dependency
+change was introduced.
+
+Separate existing native transaction proof uses its actual current path products
+and pinned1.99.0. All 1,477 repository+native inputs stay
+7126846ff1e0e2fb3948b3c0c89ef4a882686a4b640d9660255d8f39d4146a97.
+Formatter/check/strict/full executable all exit0, raw3138625+2182/
+9285cce70b9ccf7fd4c67640260f1bfeacb3564c877e2a38cd8b1516f4be2e86.
+Cached cargo-deny 0.20.2 advisories/bans/licenses/sources all pass with deny
+unmatched-skip, raw3140949+48/f1a0fca39d4280363937aabd77783990ea6480bd9ca257816de3b68fc8efa845.
+No fresh online advisory refresh, native performance gain or Linux execution is
+claimed. No unchanged Linux access probe was repeated.
+
+Full require-parity still actually exits 1, raw3141142+453/
+2fc2435c1f8cf3f23c1922dbd40e61f96ee2d5fe2bd8c4ea08deba99956968d6.
+Progress stays 85 source-derived declarations / 95 mappings / 384 links; registration
+5903 / linked 4222 / unmatched 1681 / unresolved 1655 remains incomplete. No ledger or
+reference input changed and no new parity credit is claimed. Full M1–M8, every
+required original scenario/assertion/setup/profile and both OS targets remain
+required; the objective stays ACTIVE.
+
+Root whole/hash-read the cited final source/cache/style/fixture blocks ending
+at ARCH 3317960, PERF 2584941 and DOMAIN 4232368, including reciprocal receipts.
+The required B1 successor proposal DOMAIN 4232368+26947/
+444f543505b3e493ff7ded24086c1b77c84721174a584b313d018ef643891a79 was
+separately whole/hash-read by Root in two contiguous chunks. It is under actual
+ARCH/PERF review; the proposed six pure/nine test paths and moved existing union
+are NOT released by this component result. Concrete closure addresses actual
+existing homes, original encoded raw spans, prospective counting/layout ownership,
+lazy replace and transient-versus-persisted caps. B2 runtime profile/order,
+B3 authoritative indexed effects and B4 durable migration jobs stay required.

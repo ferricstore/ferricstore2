@@ -16,8 +16,16 @@ use super::super::{PreparedBytes, keys};
 use super::intent::map_codec_error;
 
 mod apply;
+mod response;
 
-pub use apply::{OriginalPolicySetRequestPlan, decide_original_policy_set_frame};
+pub use apply::{
+    FreshOriginalPolicySetFrame, OriginalPolicySetPointInspection, OriginalPolicySetRequestPlan,
+    decide_original_policy_set_frame, decide_original_policy_set_frame_bounded,
+    decide_original_policy_set_point_fresh_bounded,
+    inspect_original_policy_set_point_frame_bounded,
+    prepare_original_policy_set_point_frame_bounded,
+};
+pub use response::{original_policy_set_response_matches, original_policy_set_response_status};
 
 /// Verified original bytes and independently restored mathematical header owners.
 ///
@@ -39,6 +47,12 @@ impl<'frame> VerifiedOriginalPolicySetFrame<'frame> {
     #[must_use]
     pub fn original_intent(&self) -> &'frame [u8] {
         self.header.original_intent()
+    }
+
+    /// Borrows the original policy key without copying or granting read authority.
+    #[must_use]
+    pub fn policy_key(&self) -> &[u8] {
+        self.header.policy_key()
     }
 
     /// Reads the independently recomputed identity of the complete frame.

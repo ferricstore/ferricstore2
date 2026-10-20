@@ -7,7 +7,8 @@ use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaCharge, Polic
 use wf_domain::workflow::control::ControlState;
 use wf_domain::workflow::request::RetainedOutcome;
 use wf_ports::state::{
-    GroupApplyChanges, GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord,
+    GroupApplyChanges, GroupApplyTransaction, StateTransactionError, StoredPolicyValue,
+    StoredWorkflowRecord,
 };
 use wf_types::identity::{GroupId, PartitionId, RecordId, RequestId, TenantId};
 
@@ -43,6 +44,15 @@ impl<'s> GroupApplyTransaction for RedbStateTransaction<'s> {
         charge: &mut PolicySchemaCharge,
     ) -> Result<Option<CompletePolicyValue>, StateTransactionError> {
         self.checked(|| self.read_policy(tenant, workflow_type, limits, charge))
+    }
+    fn stored_policy_value(
+        &self,
+        tenant: &TenantId,
+        kind: &[u8],
+        schema: PolicySchemaLimits,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Option<StoredPolicyValue>, StateTransactionError> {
+        self.checked(|| self.read_stored_policy(tenant, kind, schema, charge))
     }
     fn record(
         &self,

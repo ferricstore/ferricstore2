@@ -38,8 +38,12 @@ fn sizes(
             {
                 continue;
             }
-            if key.value() == b"manifest" && value.value().get(4..6) == Some([0, 5].as_slice()) {
-                version = 2;
+            if key.value() == b"manifest" {
+                if value.value().get(4..6) == Some([0, 5].as_slice()) {
+                    version = 2;
+                } else if value.value().get(4..6) == Some([0, 6].as_slice()) {
+                    version = 3;
+                }
             }
             pair(key.value().len(), value.value().len(), limits)?;
             rows = admission::total(rows, [1])?;
@@ -88,10 +92,10 @@ fn header<W: std::io::Write>(
         output,
         limits,
         hash,
-        if counts.2 == 2 {
-            b"FWSP\0\x02"
-        } else {
-            b"FWSP\0\x01"
+        match counts.2 {
+            3 => b"FWSP\0\x03",
+            2 => b"FWSP\0\x02",
+            _ => b"FWSP\0\x01",
         },
     )?;
     for part in [tx.group.as_bytes(), tx.recovery.as_bytes()] {
@@ -99,7 +103,7 @@ fn header<W: std::io::Write>(
         push(tx, output, limits, hash, &n.to_be_bytes())?;
         push(tx, output, limits, hash, part)?;
     }
-    let meta = if counts.2 == 2 { 3 } else { 2 };
+    let meta = if counts.2 >= 2 { 3 } else { 2 };
     let rows = counts.0.checked_sub(meta).ok_or(SnapshotError::Malformed)?;
     for n in [meta, rows, counts.1] {
         let n = u64::try_from(n).map_err(|_| SnapshotError::Limit)?;

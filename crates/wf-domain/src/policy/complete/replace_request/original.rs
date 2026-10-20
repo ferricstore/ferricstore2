@@ -48,6 +48,13 @@ pub struct OriginalCompletePolicyReplaceApplyView<'view, 'raw, 'context> {
 pub enum OriginalCompletePolicyReplaceApplyError {
     /// Existing frame/gate/common preparation and retention refusal.
     Replace(CompletePolicyReplaceApplyError),
+    /// The selected total workspace is too small for the prospective phase.
+    Workspace {
+        /// Logical bytes needed by this bounded phase.
+        bytes: usize,
+        /// Configured workspace ceiling.
+        maximum: usize,
+    },
     /// Original current-reader or reached post-CAS type-binding refusal.
     Current(OriginalPolicyReadError),
 }
@@ -55,6 +62,10 @@ pub enum OriginalCompletePolicyReplaceApplyError {
 impl fmt::Display for OriginalCompletePolicyReplaceApplyError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::Workspace { bytes, maximum } => write!(
+                formatter,
+                "original policy workspace {bytes} exceeds {maximum}"
+            ),
             Self::Replace(error) => fmt::Display::fmt(error, formatter),
             Self::Current(OriginalPolicyReadError::Corrupt) => {
                 formatter.write_str("ERR corrupt flow policy high-water")

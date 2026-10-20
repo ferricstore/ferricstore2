@@ -3,6 +3,7 @@
 use std::cmp::Ordering;
 
 use super::super::flow_input::value::PolicyInputKind as Kind;
+use super::super::flow_input::value::{PolicyInputCursor, PolicyInputMap};
 use super::super::original_entry::{TermPosition, indexed::OriginalPolicyCurrentCursor};
 use super::model::{
     OriginalPolicyReply as Reply, OriginalPolicyReplyContext as Context, PolicyReplyRef as Ref,
@@ -53,8 +54,27 @@ fn map<'input>(
     let index = owner.index.as_ref().ok_or(Error::Malformed)?;
     source::guard_map(index, input, charge)?;
     let count = index.at(input).len();
-    let (forward, extra) =
-        source::native_order(index, input, context, owner.resident_bound, charge)?;
+    let resident = owner.resident_bound;
+    let native = if context.portable && count > 1 {
+        Some(super::super::public_set::native_order::ranks(
+            PolicyInputMap::Direct(PolicyInputCursor::Current(index.at(input))),
+            resident,
+            charge,
+        )?)
+    } else {
+        None
+    };
+    let (forward, extra) = if let Some(native) = &native {
+        (
+            Some(native.as_slice()),
+            count
+                .checked_mul(8)
+                .and_then(|n| n.checked_add(64))
+                .ok_or_else(overflow)?,
+        )
+    } else {
+        source::native_order(index, input, context, resident, charge)?
+    };
     owner.resident_bound = owner
         .resident_bound
         .checked_add(extra)
@@ -77,6 +97,10 @@ fn map<'input>(
             charge,
         )?;
         append(owner, state, charge)?;
+    }
+    if native.is_some() {
+        drop(native);
+        owner.resident_bound = resident;
     }
     Ok(())
 }

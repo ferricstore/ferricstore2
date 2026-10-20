@@ -57,38 +57,29 @@ pub use record_batch::{
 };
 
 pub use complete_policy::{
-    CompleteCorePolicyPatchIntent, CompletePolicyReplaceIntent,
-    DecodedCompleteCorePolicyPatchFrame, VerifiedCompleteCorePolicyPatchFrame,
-    decode_complete_core_policy_patch_frame, prepare_complete_core_policy_patch_frame,
-    prepare_complete_core_policy_patch_intent, prepare_complete_policy_replace_intent,
-    verify_complete_core_policy_patch_frame,
-};
-pub use complete_policy::{
-    CompleteCorePolicyPatchPointInspection, CompleteCorePolicyPatchRequestPlan,
-    FreshCompleteCorePolicyPatchFrame, complete_core_policy_patch_response_matches,
-    complete_core_policy_patch_retained_status, decide_complete_core_policy_patch_frame,
-    decide_complete_core_policy_patch_point_fresh, inspect_complete_core_policy_patch_point,
-    prepare_complete_core_policy_patch_point_frame,
-};
-pub use complete_policy::{
-    CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,
-    decide_original_complete_policy_replace_frame,
-};
-pub use complete_policy::{
-    OriginalFlowPolicyReplaceRequestPlan, VerifiedOriginalFlowPolicyReplaceFrame,
-    decide_original_flow_policy_replace_frame, prepare_original_flow_policy_replace_frame,
-    verify_original_flow_policy_replace_frame,
-};
-pub use complete_policy::{OriginalPolicyReference, prepare_original_complete_policy_reference};
-pub use complete_policy::{
-    OriginalPolicySetRequestPlan, VerifiedOriginalPolicySetFrame, decide_original_policy_set_frame,
-    prepare_original_policy_set_frame, verify_original_policy_set_frame,
-};
-
-pub use complete_policy::{
-    DecodedCompletePolicyReplaceFrame, VerifiedCompletePolicyReplaceFrame,
-    decode_complete_policy_replace_frame, prepare_complete_policy_replace_frame,
-    verify_complete_policy_replace_frame,
+    CompleteCorePolicyPatchIntent, CompleteCorePolicyPatchPointInspection,
+    CompleteCorePolicyPatchRequestPlan, CompletePolicyReplaceIntent,
+    CompletePolicyReplaceRequestPlan, DecodedCompleteCorePolicyPatchFrame,
+    DecodedCompletePolicyReplaceFrame, FreshCompleteCorePolicyPatchFrame,
+    FreshOriginalPolicySetFrame, OriginalFlowPolicyReplaceRequestPlan, OriginalPolicyReference,
+    OriginalPolicySetPointInspection, OriginalPolicySetRequestPlan,
+    VerifiedCompleteCorePolicyPatchFrame, VerifiedCompletePolicyReplaceFrame,
+    VerifiedOriginalFlowPolicyReplaceFrame, VerifiedOriginalPolicySetFrame,
+    complete_core_policy_patch_response_matches, complete_core_policy_patch_retained_status,
+    decide_complete_core_policy_patch_frame, decide_complete_core_policy_patch_point_fresh,
+    decide_complete_policy_replace_frame, decide_original_complete_policy_replace_frame,
+    decide_original_flow_policy_replace_frame, decide_original_policy_set_frame,
+    decide_original_policy_set_frame_bounded, decide_original_policy_set_point_fresh_bounded,
+    decode_complete_core_policy_patch_frame, decode_complete_policy_replace_frame,
+    inspect_complete_core_policy_patch_point, inspect_original_policy_set_point_frame_bounded,
+    original_policy_set_response_matches, original_policy_set_response_status,
+    prepare_complete_core_policy_patch_frame, prepare_complete_core_policy_patch_intent,
+    prepare_complete_core_policy_patch_point_frame, prepare_complete_policy_replace_frame,
+    prepare_complete_policy_replace_intent, prepare_original_complete_policy_reference,
+    prepare_original_flow_policy_replace_frame, prepare_original_policy_set_frame,
+    prepare_original_policy_set_point_frame_bounded, verify_complete_core_policy_patch_frame,
+    verify_complete_policy_replace_frame, verify_original_flow_policy_replace_frame,
+    verify_original_policy_set_frame,
 };
 
 /// Immutable byte/count budgets shared by encoder, decoder and ordered apply.
@@ -302,6 +293,8 @@ pub enum CodecError {
     UnsupportedVersion,
     /// An operation/backoff discriminator is unknown.
     UnsupportedTag,
+    /// Structurally valid original ETF needs another captured atom profile.
+    UnsupportedPolicyProfile,
     /// A present/absent tag is neither zero nor one.
     InvalidOptionality,
     /// Fixed fields, typed identities or input continuity are invalid.
@@ -329,6 +322,7 @@ impl fmt::Display for CodecError {
         formatter.write_str(match self {
             Self::UnsupportedVersion => "unsupported private prepared version",
             Self::UnsupportedTag => "unsupported private prepared tag",
+            Self::UnsupportedPolicyProfile => "unsupported original policy profile",
             Self::InvalidOptionality => "invalid private prepared optionality",
             Self::Malformed => "malformed private prepared command",
             Self::TrailingBytes => "trailing private prepared bytes",

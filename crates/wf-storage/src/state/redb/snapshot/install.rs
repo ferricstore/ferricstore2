@@ -13,12 +13,12 @@ pub(super) fn install(
     stage: RedbSnapshotStage,
     limits: SnapshotLimits,
 ) -> Result<SnapshotMetadata, SnapshotError> {
-    if store.layout == 5 && stage.store.layout != 5 {
+    if store.layout.get() >= 5 && stage.store.layout.get() < store.layout.get() {
         return Err(SnapshotError::State(
             StateTransactionError::UnsupportedLayout,
         ));
     }
-    if matches!(store.layout, 4 | 5) || stage.store.layout == 5 {
+    if matches!(store.layout.get(), 4..=6) || stage.store.layout.get() >= 5 {
         return advance(store, stage, limits, None)?
             .ok_or(SnapshotError::State(StateTransactionError::Corrupt));
     }
@@ -82,7 +82,7 @@ pub(super) fn advance(
     transition: Option<wf_ports::snapshot::SnapshotTransition>,
 ) -> Result<Option<SnapshotMetadata>, SnapshotError> {
     let source_store = stage.store;
-    if store.layout == 5 && source_store.layout != 5 {
+    if store.layout.get() >= 5 && source_store.layout.get() < store.layout.get() {
         return Err(SnapshotError::State(
             StateTransactionError::UnsupportedLayout,
         ));
@@ -96,7 +96,7 @@ pub(super) fn advance(
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     validate::complete(&mut target, &mut charge, store.limits.snapshot_limits())
         .map_err(SnapshotError::State)?;
-    let mut catalog = if store.layout == 3 {
+    let mut catalog = if store.layout.get() == 3 {
         super::policy::publication_catalog(&target)
     } else {
         super::catalog::load(&target)
@@ -136,7 +136,7 @@ pub(super) fn advance(
     target.carry_from(&source);
     validate::compatible(&source, &target)?;
     target.carry_from(&source);
-    if store.layout == 3 {
+    if store.layout.get() == 3 {
         super::policy::upgrade_catalog(&target, &catalog).map_err(SnapshotError::State)?;
     }
     let existing = catalog.find(facts.0);
@@ -146,7 +146,7 @@ pub(super) fn advance(
     }
     super::copy(&source, &target, super::super::META, super::super::META)?;
     super::copy(&source, &target, super::super::ROWS, super::super::ROWS)?;
-    if source_store.layout != 5 {
+    if source_store.layout.get() < 5 {
         super::format::set_manifest(&target, 4).map_err(SnapshotError::State)?;
     }
     if existing.is_none() {

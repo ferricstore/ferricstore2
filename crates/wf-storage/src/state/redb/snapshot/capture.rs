@@ -17,7 +17,7 @@ pub(super) fn capture<W: std::io::Write>(
     output: &mut W,
     limits: SnapshotLimits,
 ) -> Result<SnapshotMetadata, SnapshotError> {
-    if matches!(store.layout, 4 | 5) {
+    if matches!(store.layout.get(), 4..=6) {
         return advance(store, output, limits);
     }
     let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::State)?;

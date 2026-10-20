@@ -41,7 +41,7 @@ pub(in crate::policy::complete) struct PolicyMergeArena<'input> {
     rows: Vec<PolicyMergeRow<'input>>,
     lookup: Vec<u64>,
     order: Vec<usize>,
-    orders: &'input OriginalPolicySetMapOrders<'input>,
+    orders: Option<&'input OriginalPolicySetMapOrders<'input>>,
     root: usize,
 }
 
@@ -58,6 +58,25 @@ impl<'input> PolicyMergeArena<'input> {
         count: usize,
         depth: usize,
         orders: &'input OriginalPolicySetMapOrders<'input>,
+        live: usize,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Self, Error> {
+        Self::allocate(count, depth, Some(orders), live, charge)
+    }
+
+    pub(in crate::policy::complete) fn new_native(
+        count: usize,
+        depth: usize,
+        live: usize,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Self, Error> {
+        Self::allocate(count, depth, None, live, charge)
+    }
+
+    fn allocate(
+        count: usize,
+        depth: usize,
+        orders: Option<&'input OriginalPolicySetMapOrders<'input>>,
         live: usize,
         charge: &mut PolicySchemaCharge,
     ) -> Result<Self, Error> {

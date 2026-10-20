@@ -10,7 +10,7 @@ use crate::policy::complete::{
 const C1: u64 = 0x87c3_7b91_1142_53d5;
 const C2: u64 = 0x4cf5_ad43_2745_937f;
 
-pub(in crate::policy::complete::flow_input) fn binary_hash(
+pub(in crate::policy::complete) fn binary_hash(
     bytes: &[u8],
     charge: &mut PolicySchemaCharge,
 ) -> Result<u64, Error> {

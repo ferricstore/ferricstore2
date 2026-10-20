@@ -61,13 +61,15 @@ pub use model::{
 };
 pub use original_entry::{
     OriginalEtfLocalFun, OriginalEtfSafety, OriginalPolicyEntry, OriginalPolicyReadError,
-    OriginalPolicyReadValue, decode_original_complete_policy_entry,
+    OriginalPolicyReadValue, canonical_original_etf_safety, decode_original_complete_policy_entry,
+    decode_original_complete_policy_entry_portable,
     prepare_original_complete_policy_reference_bytes, read_original_complete_policy_entry,
 };
 pub use original_reply::{
     OriginalPolicyReply, OriginalPolicyReplyContext, OriginalPolicyReplyError,
     OriginalPolicyReplyMapEntry, OriginalPolicyReplyMapIter, OriginalPolicyReplyRejection,
-    OriginalPolicyReplyValue, present_original_policy_get_reply, present_original_policy_set_reply,
+    OriginalPolicyReplyValue, original_policy_get_reply_projection_bytes,
+    present_original_policy_get_reply, present_original_policy_set_reply,
 };
 pub use original_retry_keys::{
     OriginalPolicyMapKey, OriginalPolicyMapValue, original_complete_policy_uses_max_attempts,
@@ -94,7 +96,8 @@ pub use outer::{
 pub use outer::{
     OriginalPolicySetFrameBytes, OriginalPolicySetFrameHeader, OriginalPolicySetFrameInput,
     ScannedOriginalPolicySetFrame, prepare_original_policy_set_frame_bytes,
-    restore_original_policy_set_frame_header, scan_original_policy_set_frame,
+    restore_original_policy_set_frame_header, restore_original_policy_set_point_frame_header,
+    scan_original_policy_set_frame,
 };
 pub use patch::{CompleteCorePolicyPatchInput, prepare_complete_core_policy_patch};
 pub use presentation::{
@@ -106,9 +109,13 @@ pub use public_get::{
 pub use public_set::{
     OriginalPolicySetInputRejection, OriginalPolicySetMapOrders, OriginalPolicySetPatchView,
     OriginalPolicySetRequest, encode_original_policy_set_input_rejection_body,
-    prepare_original_policy_set_request,
+    original_policy_set_rejection_from_body, prepare_original_policy_set_request,
 };
-pub use record_projection::{project_record_batch_policy, record_batch_policy_projection_bytes};
+pub use record_projection::{
+    original_policy_indexed_fields_equal, original_record_batch_policy_has_governance,
+    original_record_batch_policy_projection_bytes, project_original_record_batch_policy,
+    project_record_batch_policy, record_batch_policy_projection_bytes,
+};
 pub use replace_content::{
     CompletePolicyReplaceRejection, CompletePolicyReplaceRejectionKind,
     check_complete_policy_replace_content, encode_complete_policy_replace_rejection_body,
@@ -123,7 +130,9 @@ pub use replace_request::{
     prepare_original_flow_policy_replace_fresh,
 };
 pub use replace_request::{
-    OriginalPolicySetApplyView, OriginalPolicySetFresh, prepare_original_policy_set_fresh,
+    OriginalPolicySetApplyView, OriginalPolicySetFresh, OriginalPolicySetFreshView,
+    OriginalPolicySetPreparation, prepare_original_policy_set_fresh,
+    prepare_original_policy_set_fresh_with_query, prepare_original_policy_set_point_fresh,
 };
 pub use request::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,

@@ -14,6 +14,7 @@ pub(in crate::state::redb) mod catalog;
 mod format;
 mod install;
 mod io;
+pub(super) mod original;
 pub(in crate::state::redb) mod policy;
 mod read;
 mod receive;
@@ -246,7 +247,7 @@ pub(super) fn copy(
             .map_err(SnapshotError::State)?;
         let normalized = if key.value() == b"manifest" && to.name() != super::META.name() {
             if value.value().get(4..6) == Some([0, 3].as_slice())
-                || value.value().get(4..6) == Some([0, 5].as_slice())
+                || matches!(value.value().get(4..6), Some([0, 5 | 6]))
             {
                 None
             } else {
@@ -307,10 +308,10 @@ impl StateSnapshotStore for RedbStateStore {
         )
         .map_err(|_| SnapshotError::Limit)?;
         admit(&self.group, &self.recovery, self.limits, limits, extra)?;
-        let incoming_layout = stage.store.layout;
+        let incoming_layout = stage.store.layout.get();
         let metadata = active(self, install::install(self, stage, limits))?;
-        if incoming_layout == 5 {
-            self.layout = 5;
+        if incoming_layout >= 5 {
+            self.layout.set(incoming_layout);
         }
         Ok(metadata)
     }

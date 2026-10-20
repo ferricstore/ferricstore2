@@ -36,6 +36,10 @@ pub enum CompletePolicyEncodingError {
     UnsupportedVersion,
     /// An enum or boolean tag is unsupported.
     UnsupportedTag,
+    /// A structurally valid original value needs a different portable safety profile.
+    UnsupportedPolicyProfile,
+    /// Reached source map order needs runtime facts outside the portable profile.
+    UnsupportedSourceOrder,
     /// An optional field has an invalid discriminant.
     InvalidOptionality,
     /// The encoded structure is incomplete or noncanonical.
@@ -60,6 +64,12 @@ impl fmt::Display for CompletePolicyEncodingError {
                 formatter.write_str("unsupported complete policy encoding version")
             }
             Self::UnsupportedTag => formatter.write_str("unsupported complete policy encoding tag"),
+            Self::UnsupportedPolicyProfile => {
+                formatter.write_str("unsupported original policy safety profile")
+            }
+            Self::UnsupportedSourceOrder => {
+                formatter.write_str("unsupported original policy source order")
+            }
             Self::InvalidOptionality => formatter.write_str("invalid complete policy optionality"),
             Self::Malformed => formatter.write_str("malformed complete policy encoding"),
             Self::TrailingBytes => formatter.write_str("trailing complete policy bytes"),

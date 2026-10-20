@@ -145,6 +145,25 @@ pub fn restore_original_policy_set_frame_header<'frame>(
     scanned.restore(intent, backing, charge)
 }
 
+/// Restores a scan-validated committed sidecar without external captured map facts.
+/// # Errors
+/// Preserves profile, byte cap, intent mismatch, work and allocation origins.
+pub fn restore_original_policy_set_point_frame_header<'frame>(
+    scanned: ScannedOriginalPolicySetFrame<'frame>,
+    intent: [u8; 32],
+    limits: PolicySchemaLimits,
+    admission: AdmissionLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<OriginalPolicySetFrameHeader<'frame>, CompletePolicyRequestError> {
+    profile(limits, charge)?;
+    cap(scanned.encoded.len(), admission)?;
+    visit(charge, 192)?;
+    if scanned.digest != intent {
+        return Err(CompletePolicyRequestError::IntentMismatch);
+    }
+    scanned.restore(intent, 0, charge)
+}
+
 fn correspondence(
     frame: PolicySetFrameCursor<'_>,
     orders: &OriginalPolicySetMapOrders<'_>,

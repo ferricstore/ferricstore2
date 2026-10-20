@@ -20,6 +20,7 @@ fn mode(
     owner: &StoredWorkflowRecord,
     state: &[u8],
     charge: &mut PolicySchemaCharge,
+    layout: u16,
 ) -> Result<StateMode, StateTransactionError> {
     let scope = tx.scope(&owner.tenant)?;
     let key = tx.key(
@@ -38,13 +39,46 @@ fn mode(
         return Ok(StateMode::Parallel);
     };
     tx.recovery_row(&key, guard.value())?;
-    let policy = decode_policy(tx, guard.value(), owner.record.workflow_type(), charge)?;
-    Ok(policy
-        .data()
-        .states
-        .get(state)
-        .and_then(|p| p.mode)
-        .unwrap_or(StateMode::Parallel))
+    let policy = decode_policy(
+        tx,
+        guard.value(),
+        owner.record.workflow_type(),
+        charge,
+        layout,
+    )?;
+    match policy {
+        wf_ports::state::StoredPolicyValue::Complete(policy) => Ok(policy
+            .data()
+            .states
+            .get(state)
+            .and_then(|p| p.mode)
+            .unwrap_or(StateMode::Parallel)),
+        wf_ports::state::StoredPolicyValue::Original(raw) => {
+            let schema = tx.limits.schema();
+            tx.temporary(super::super::original_policy::original_owner(raw.len())?)?;
+            let bytes = wf_domain::policy::complete::original_record_batch_policy_projection_bytes(
+                &raw,
+                owner.record.workflow_type(),
+                schema,
+                charge,
+            )
+            .map_err(super::super::original_policy::original_error)?;
+            tx.temporary(
+                super::super::original_policy::original_owner(raw.len())?
+                    .checked_add(bytes)
+                    .ok_or(StateTransactionError::Limit)?,
+            )?;
+            let (policy, _) = wf_domain::policy::complete::project_original_record_batch_policy(
+                &raw,
+                owner.record.workflow_type(),
+                schema,
+                charge,
+                bytes,
+            )
+            .map_err(super::super::original_policy::original_error)?;
+            Ok(policy.state_mode(state))
+        }
+    }
 }
 
 pub(super) fn canonical(
@@ -52,6 +86,7 @@ pub(super) fn canonical(
     table: &impl ReadableTable<&'static [u8], &'static [u8]>,
     owner: &StoredWorkflowRecord,
     charge: &mut PolicySchemaCharge,
+    layout: u16,
 ) -> Result<(), StateTransactionError> {
     let placement = tx.key(
         &[tx.recovery.as_bytes(), owner.partition.as_bytes()],
@@ -63,7 +98,7 @@ pub(super) fn canonical(
     let Some(lane) = LaneKey::for_record(&row) else {
         return Ok(());
     };
-    let fifo = mode(tx, table, owner, lane.state, charge)? == StateMode::Fifo;
+    let fifo = mode(tx, table, owner, lane.state, charge, layout)? == StateMode::Fifo;
     let scope = tx.scope(&owner.tenant)?;
     let member = tx.fifo_key(&scope, lane, LaneOrder::for_record(&row))?;
     exact(tx, table, &member, if fifo { Some(&[]) } else { None })?;
@@ -171,6 +206,7 @@ pub(super) fn reverse(
     key: &DecodedStateKey,
     bytes: &[u8],
     charge: &mut PolicySchemaCharge,
+    layout: u16,
 ) -> Result<(), StateTransactionError> {
     let scope = tx.scope_bytes(key.part(2))?;
     let (partition, id) = if key.family() == 3 {
@@ -182,7 +218,7 @@ pub(super) fn reverse(
         .ok_or(StateTransactionError::Corrupt)?;
     let row = entry(&owner);
     let lane = LaneKey::for_record(&row).ok_or(StateTransactionError::Corrupt)?;
-    let fifo = mode(tx, table, &owner, lane.state, charge)? == StateMode::Fifo;
+    let fifo = mode(tx, table, &owner, lane.state, charge, layout)? == StateMode::Fifo;
     if key.family() == 3 {
         let due = DueOrder {
             priority: 2 - key.rank(),

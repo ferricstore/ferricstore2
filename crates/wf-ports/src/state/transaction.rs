@@ -1,8 +1,6 @@
 //! Semantic transaction authority. Implementations must keep one exclusive
 //! revision through all reads and consumed commit; this module supplies no engine.
 
-use std::fmt;
-
 use wf_domain::claim::apply::ClaimQuery;
 use wf_domain::claim::{DueOrder, LaneKey, LaneOrder};
 use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits};
@@ -15,6 +13,7 @@ use wf_domain::workflow::indexed::{
 use wf_domain::workflow::request::{RequestScope, RetainedOutcome, RetainedStatus};
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId, TenantId};
 
+use super::{StateTransactionError, StoredPolicyValue};
 use crate::log::{RecordBatchApplyDecision, RecordBatchApplyPlan, record_batch_retained_status};
 
 mod independent;
@@ -31,49 +30,6 @@ pub struct StoredWorkflowRecord {
     /// Priority0..2 and exact u128 logical-state entry sequence.
     pub ordering: OrderingMetadata,
 }
-
-/// Operational transaction failure, never retained as a business rejection.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum StateTransactionError {
-    /// A constructor profile is zero, overflowing or internally incompatible.
-    InvalidLimits,
-    /// A healthy existing inventory or manifest belongs to another namespace.
-    NamespaceConflict,
-    /// A healthy private backend layout requires an explicitly selected migration.
-    UnsupportedLayout,
-    /// The adapter proves the durable predecessor is unchanged.
-    KnownAborted,
-    /// Commit may be durable; fence service and reconcile after reopen.
-    Uncertain,
-    /// Stored namespace, record or index authority is inconsistent.
-    Corrupt,
-    /// The backend cannot currently provide authority.
-    Unavailable,
-    /// A positive explicit cumulative read or local cursor cap was exhausted.
-    Limit,
-    /// An admitted host reservation failed.
-    Allocation,
-    /// The supplied mathematical change container is incoherent.
-    InvalidChanges,
-}
-
-impl fmt::Display for StateTransactionError {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str(match self {
-            Self::InvalidLimits => "invalid state store limits",
-            Self::NamespaceConflict => "state store namespace conflict",
-            Self::UnsupportedLayout => "unsupported state store layout",
-            Self::KnownAborted => "state transaction known aborted",
-            Self::Uncertain => "state transaction commit uncertain",
-            Self::Corrupt => "corrupt state authority",
-            Self::Unavailable => "state authority unavailable",
-            Self::Limit => "state transaction read limit",
-            Self::Allocation => "state transaction allocation failed",
-            Self::InvalidChanges => "invalid state transaction changes",
-        })
-    }
-}
-impl std::error::Error for StateTransactionError {}
 
 /// Opens one exclusive ordered group/recovery revision without copying namespace.
 pub trait GroupApplyStore {
@@ -145,6 +101,22 @@ pub trait GroupApplyTransaction: Sized {
         limits: PolicySchemaLimits,
         charge: &mut PolicySchemaCharge,
     ) -> Result<Option<CompletePolicyValue>, StateTransactionError>;
+    /// Reads full backing without changing the old complete-only capability.
+    ///
+    /// Existing adapters move their already admitted complete owner into Box;
+    /// concrete mixed-format stores override this to retain original raw bytes.
+    /// # Errors
+    /// Preserves the actual reader's profile, ownership and authority refusals.
+    fn stored_policy_value(
+        &self,
+        tenant: &TenantId,
+        workflow_type: &[u8],
+        limits: PolicySchemaLimits,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Option<StoredPolicyValue>, StateTransactionError> {
+        self.installed_policy(tenant, workflow_type, limits, charge)
+            .map(|value| value.map(|value| StoredPolicyValue::Complete(Box::new(value))))
+    }
     /// Reads global group control; unapplied differs from applied index0.
     /// # Errors
     /// Operational backend, corruption or cumulative admission failure.

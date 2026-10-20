@@ -16,6 +16,9 @@ pub fn normal_recovery_header(
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
     }
+    if encoded.get(6) == Some(&9) {
+        return original_policy_header(encoded, limits);
+    }
     let mut reader = Reader::new(encoded, limits);
     let header = header(&mut reader)?;
     let profile = match (header.operation_tag, header.intent.version()) {
@@ -31,6 +34,33 @@ pub fn normal_recovery_header(
         [header.tenant, header.group, header.recovery],
         header.stamp,
     ))
+}
+
+fn original_policy_header(
+    encoded: &[u8],
+    limits: CodecLimits,
+) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
+    let mut reader = Reader::new(encoded, limits);
+    if reader.take(4)? != b"FWCP" {
+        return Err(CodecError::Malformed);
+    }
+    if reader.u16()? != 1 {
+        return Err(CodecError::UnsupportedVersion);
+    }
+    if reader.byte()? != 9 {
+        return Err(CodecError::UnsupportedTag);
+    }
+    let tenant = reader.nonempty(8192)?;
+    let group = reader.nonempty(256)?;
+    let recovery = reader.nonempty(256)?;
+    let _request = reader.nonempty(256)?;
+    if reader.u16()? != 4 {
+        return Err(CodecError::UnsupportedTag);
+    }
+    let _digest = reader.take(32)?;
+    let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;
+    let stamp = CommittedTime::new(hlc, reader.u64()?).map_err(|_| CodecError::Malformed)?;
+    Ok((4, [tenant, group, recovery], stamp))
 }
 
 pub(super) struct RawHeader<'a> {

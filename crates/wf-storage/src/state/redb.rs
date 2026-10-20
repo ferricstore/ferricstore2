@@ -15,6 +15,7 @@ mod commit;
 pub(crate) mod core_policy;
 mod cursor;
 mod membership;
+pub(crate) mod original_policy;
 mod publication;
 mod read;
 mod recovery;
@@ -52,6 +53,7 @@ pub struct StateStoreLimits {
     membership: RaftMembershipLimits,
     snapshot: SnapshotLimits,
     history_max_events_limit: u32,
+    original_reply_defaults: wf_domain::retention::ResolvedRetention,
 }
 
 impl StateStoreLimits {
@@ -92,6 +94,7 @@ impl StateStoreLimits {
             membership: RaftMembershipLimits::default(),
             snapshot: SnapshotLimits::default(),
             history_max_events_limit: wf_domain::retention::MAX_HISTORY_EVENTS,
+            original_reply_defaults: wf_domain::retention::ResolvedRetention::default(),
         })
     }
     /// Reads the immutable server history admission bound.
@@ -111,6 +114,29 @@ impl StateStoreLimits {
             return Err(StateTransactionError::InvalidLimits);
         }
         self.history_max_events_limit = maximum;
+        Ok(self)
+    }
+
+    /// Reads the immutable defaults used by original public SET/GET replies.
+    #[must_use]
+    pub const fn original_policy_reply_defaults(self) -> wf_domain::retention::ResolvedRetention {
+        self.original_reply_defaults
+    }
+
+    /// Captures validated positive original public reply defaults.
+    /// # Errors
+    /// Refuses a TTL or history default outside the existing retention bounds.
+    pub fn with_original_policy_reply_defaults(
+        mut self,
+        defaults: wf_domain::retention::ResolvedRetention,
+    ) -> Result<Self, StateTransactionError> {
+        wf_domain::retention::RetentionOverride {
+            ttl_ms: Some(defaults.ttl_ms),
+            history_max_events: Some(defaults.history_max_events),
+        }
+        .validate(wf_domain::retention::MAX_HISTORY_EVENTS)
+        .map_err(|_| StateTransactionError::InvalidLimits)?;
+        self.original_reply_defaults = defaults;
         Ok(self)
     }
 
@@ -195,6 +221,7 @@ impl Default for StateStoreLimits {
             membership: RaftMembershipLimits::default(),
             snapshot: SnapshotLimits::default(),
             history_max_events_limit: wf_domain::retention::MAX_HISTORY_EVENTS,
+            original_reply_defaults: wf_domain::retention::ResolvedRetention::default(),
         }
     }
 }

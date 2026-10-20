@@ -17,6 +17,7 @@ pub(super) mod claim;
 pub(super) mod control;
 pub(super) mod core_policy;
 mod independent;
+pub(super) mod original_policy;
 
 pub(super) fn apply(
     tx: RedbStateTransaction<'_>,

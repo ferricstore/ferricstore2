@@ -40,6 +40,10 @@ impl<'input> PolicyInputMap<'input> {
         }
     }
 
+    pub(in crate::policy::complete) fn needs_native_order(self) -> bool {
+        matches!(self, Self::Direct(PolicyInputCursor::Merge(value)) if value.needs_native_order())
+    }
+
     pub(in crate::policy::complete) fn source_row_at(
         &self,
         index: usize,

@@ -93,6 +93,9 @@ fn normal(
     if profile == 2 && !limits.core_policy_patches() {
         return Err(Error::UnsupportedEntry);
     }
+    if profile == 4 && !limits.original_policy_sets() {
+        return Err(Error::UnsupportedEntry);
+    }
     let claim_work = if profile == 3 {
         Some(limits.claim_work_limits().ok_or(Error::UnsupportedEntry)?)
     } else {
@@ -131,7 +134,9 @@ fn normal(
         drop(scope);
         return Ok(control);
     }
-    let outcome = if profile == 2 {
+    let outcome = if profile == 4 {
+        super::original_policy::apply(state, &scope, entry, driver)?
+    } else if profile == 2 {
         apply_complete_core_policy_patch_transaction(
             state,
             &scope,

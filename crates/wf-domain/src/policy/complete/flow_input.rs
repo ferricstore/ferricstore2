@@ -11,7 +11,7 @@ mod core;
 mod etf;
 mod governance;
 mod layout;
-mod order;
+pub(in crate::policy::complete) mod order;
 mod preflight;
 pub(in crate::policy::complete) mod rejection;
 mod states;

@@ -49,6 +49,8 @@ pub enum StateValueError {
     MembershipLimit,
     /// A healthy response exceeds the actual captured response profile.
     ProfileLimit,
+    /// Valid original ETF needs another captured portable atom/profile context.
+    UnsupportedPolicyProfile,
     /// Namespace, typed value, status or positive profile is invalid.
     InvalidValue,
 }
@@ -66,6 +68,9 @@ impl fmt::Display for StateValueError {
             Self::Allocation => formatter.write_str("state value allocation failed"),
             Self::MembershipLimit => formatter.write_str("state membership profile limit"),
             Self::ProfileLimit => formatter.write_str("state response profile limit"),
+            Self::UnsupportedPolicyProfile => {
+                formatter.write_str("unsupported original policy profile")
+            }
             Self::InvalidValue => formatter.write_str("invalid state value"),
         }
     }
@@ -138,7 +143,7 @@ pub(super) fn read_u16(bytes: &[u8], offset: &mut usize) -> Result<u16, StateVal
             .map_err(|_| StateValueError::Malformed)?,
     ))
 }
-fn read_u32(bytes: &[u8], offset: &mut usize) -> Result<u32, StateValueError> {
+pub(super) fn read_u32(bytes: &[u8], offset: &mut usize) -> Result<u32, StateValueError> {
     Ok(u32::from_be_bytes(
         take(bytes, offset, 4)?
             .try_into()

@@ -187,6 +187,9 @@ fn audit_normal(
     if profile == 2 {
         return audit_core_policy(body, limits, base, stamp);
     }
+    if profile == 4 {
+        return super::original_policy::audit(body, limits, base, stamp);
+    }
     let available = limits
         .workspace_bytes()
         .checked_sub(total(&[base, 512])?)

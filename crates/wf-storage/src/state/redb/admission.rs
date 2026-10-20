@@ -45,6 +45,9 @@ pub(super) fn copy_bytes(bytes: &[u8]) -> Result<Vec<u8>, StateTransactionError>
 
 pub(super) fn value_error(error: value::StateValueError) -> StateTransactionError {
     match error {
+        value::StateValueError::UnsupportedPolicyProfile => {
+            StateTransactionError::UnsupportedPolicyProfile
+        }
         value::StateValueError::Allocation => StateTransactionError::Allocation,
         value::StateValueError::Limit { .. }
         | value::StateValueError::LengthOverflow

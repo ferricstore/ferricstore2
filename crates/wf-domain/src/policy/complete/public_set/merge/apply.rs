@@ -128,16 +128,17 @@ pub(super) fn source_order<'input>(
     if count <= 1 {
         return Ok(None);
     }
+    let Some(orders) = arena.orders else {
+        return Ok(None);
+    };
     match value {
         Ref::Current(value) => Ok(Some(
-            arena
-                .orders
+            orders
                 .current_record(value.map_id().ok_or_else(authority)?, count, charge)?
                 .0,
         )),
         Ref::Map(id) => Ok(Some(
-            arena
-                .orders
+            orders
                 .merged_record(u32::try_from(id).map_err(|_| overflow())?, count, charge)?
                 .0,
         )),

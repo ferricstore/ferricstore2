@@ -139,7 +139,7 @@ pub(super) fn retained(
         select(tx, slot);
         if let Some(expected) = catalog.slots[usize::from(slot)] {
             let (layout, saved) = recovery::cohort(tx, charge)?;
-            if !matches!(layout, 3 | 5) || super::format::facts(tx, limits)? != expected {
+            if !matches!(layout, 3 | 5 | 6) || super::format::facts(tx, limits)? != expected {
                 return Err(Error::Corrupt);
             }
             compatible(tx, saved, live)?;

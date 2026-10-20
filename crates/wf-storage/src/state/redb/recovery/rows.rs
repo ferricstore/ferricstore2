@@ -1,15 +1,13 @@
 //! One paid row owner, bound to the independently decoded complete physical key.
 
 use super::super::{
-    admission::{copy_bytes, policy_error, storage_error, total, value_error, wire_record_limit},
+    admission::{copy_bytes, storage_error, total, value_error, wire_record_limit},
     store::RedbStateTransaction,
 };
 use super::index;
 use crate::state::{key::DecodedStateKey, value};
 use redb::ReadableTable;
-use wf_domain::policy::complete::{
-    CompletePolicyValue, PolicySchemaCharge, decode_complete_policy_value_v2,
-};
+use wf_domain::policy::complete::PolicySchemaCharge;
 use wf_ports::state::{StateTransactionError, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId, RequestId};
 
@@ -19,6 +17,7 @@ pub(super) fn validate(
     key: &DecodedStateKey,
     bytes: &[u8],
     charge: &mut PolicySchemaCharge,
+    layout: u16,
 ) -> Result<(), StateTransactionError> {
     match key.family() {
         0 => {
@@ -26,14 +25,14 @@ pub(super) fn validate(
         }
         1 => {
             let owner = record(tx, key, bytes)?;
-            index::canonical(tx, table, &owner, charge)?;
+            index::canonical(tx, table, &owner, charge, layout)?;
         }
         2 => outcome(tx, key, bytes, charge)?,
-        3 | 4 => index::reverse(tx, table, key, bytes, charge)?,
+        3 | 4 => index::reverse(tx, table, key, bytes, charge, layout)?,
         5 => history(tx, key, bytes)?,
         6 => {
             let _scope = tx.scope_bytes(key.part(2))?;
-            decode_policy(tx, bytes, key.part(3), charge)?;
+            decode_policy(tx, bytes, key.part(3), charge, layout)?;
         }
         7 => {
             if key.part(1).is_empty()
@@ -134,19 +133,17 @@ pub(super) fn decode_policy(
     bytes: &[u8],
     workflow_type: &[u8],
     charge: &mut PolicySchemaCharge,
-) -> Result<CompletePolicyValue, StateTransactionError> {
-    let owner = bytes
-        .len()
-        .checked_mul(216)
-        .and_then(|n| n.checked_add(2_048))
-        .ok_or(StateTransactionError::Limit)?;
-    tx.temporary(owner)?;
-    let value =
-        decode_complete_policy_value_v2(bytes, tx.limits.schema(), charge).map_err(policy_error)?;
-    if value.data().workflow_type != workflow_type {
-        return Err(StateTransactionError::Corrupt);
-    }
-    Ok(value)
+    layout: u16,
+) -> Result<wf_ports::state::StoredPolicyValue, StateTransactionError> {
+    super::super::original_policy::decode_stored(
+        tx,
+        bytes,
+        workflow_type,
+        tx.limits.schema(),
+        charge,
+        false,
+        layout,
+    )
 }
 
 pub(super) fn lookup_record(

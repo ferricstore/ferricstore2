@@ -39,7 +39,7 @@ pub(in crate::state::redb) fn read(
         .map_err(|e| storage_error(&e))?
         .ok_or(Error::Corrupt)?;
     let version = version(bytes.value())?;
-    let facts = if version == POLICY_LAYOUT {
+    let facts = if matches!(version, 5 | 6) {
         parse5(tx, bytes.value())?
     } else {
         let mut layout = 0;
@@ -58,7 +58,7 @@ pub(in crate::state::redb) fn read(
     };
     tx.step()?;
     let origin = table.get(ORIGIN_KEY).map_err(|e| storage_error(&e))?;
-    if version == POLICY_LAYOUT {
+    if matches!(version, 5 | 6) {
         bind_origin(tx, facts, origin.ok_or(Error::Corrupt)?.value())?;
     } else if origin.is_some() {
         return Err(Error::Corrupt);
@@ -81,7 +81,8 @@ pub(in crate::state::redb) fn parse5(
     tx: &RedbStateTransaction<'_>,
     bytes: &[u8],
 ) -> Result<CurrentPolicyManifest, Error> {
-    if version(bytes)? != POLICY_LAYOUT {
+    let layout = version(bytes)?;
+    if !matches!(layout, 5 | 6) {
         return Err(Error::Corrupt);
     }
     let mut at = 6;
@@ -109,11 +110,19 @@ pub(in crate::state::redb) fn parse5(
         .map_err(value_error)?
         .try_into()
         .map_err(|_| Error::Corrupt)?;
+    let profile = if layout == 6 {
+        Some(value::read_u32(bytes, &mut at).map_err(value_error)?)
+    } else {
+        None
+    };
     let checksum = Sha256::digest(&bytes[..at]);
     if value::take(bytes, &mut at, 32).map_err(value_error)? != checksum.as_slice() {
         return Err(Error::Corrupt);
     }
     value::finish(bytes, at).map_err(value_error)?;
+    if profile.is_some_and(|id| id != 1) {
+        return Err(Error::UnsupportedPolicyProfile);
+    }
     Ok(CurrentPolicyManifest {
         initial_time,
         placements,
@@ -166,7 +175,9 @@ pub(in crate::state::redb) fn verify(
 }
 fn census(tx: &RedbStateTransaction<'_>, layout: u16) -> Result<(u64, u64, [u8; 32]), Error> {
     let mut hash = Sha256::new();
-    hash.update(if layout == POLICY_LAYOUT {
+    hash.update(if layout == 6 {
+        super::super::snapshot::original::CATALOG_DOMAIN
+    } else if layout == POLICY_LAYOUT {
         CURRENT_CATALOG_DOMAIN
     } else {
         b"wf-state-genesis-v1"
@@ -212,10 +223,35 @@ fn census(tx: &RedbStateTransaction<'_>, layout: u16) -> Result<(u64, u64, [u8; 
 pub(in crate::state::redb) fn publish(
     tx: &RedbStateTransaction<'_>,
     old_layout: u16,
-    mut manifest: CurrentPolicyManifest,
+    manifest: CurrentPolicyManifest,
     catalog: &super::super::snapshot::catalog::SnapshotCatalog,
 ) -> Result<(), Error> {
-    if old_layout != POLICY_LAYOUT {
+    publish_target(
+        tx,
+        old_layout,
+        manifest,
+        catalog,
+        old_layout.max(POLICY_LAYOUT),
+    )
+}
+
+pub(in crate::state::redb) fn publish_original(
+    tx: &RedbStateTransaction<'_>,
+    old_layout: u16,
+    manifest: CurrentPolicyManifest,
+    catalog: &super::super::snapshot::catalog::SnapshotCatalog,
+) -> Result<(), Error> {
+    publish_target(tx, old_layout, manifest, catalog, 6)
+}
+
+fn publish_target(
+    tx: &RedbStateTransaction<'_>,
+    old_layout: u16,
+    mut manifest: CurrentPolicyManifest,
+    catalog: &super::super::snapshot::catalog::SnapshotCatalog,
+    target: u16,
+) -> Result<(), Error> {
+    if old_layout < POLICY_LAYOUT {
         tx.step()?;
         let mut table = tx
             .write
@@ -242,19 +278,20 @@ pub(in crate::state::redb) fn publish(
         drop(table);
         super::super::snapshot::policy::upgrade_catalog(tx, catalog)?;
     }
-    let (placements, policies, hash) = census(tx, POLICY_LAYOUT)?;
+    let (placements, policies, hash) = census(tx, target)?;
     manifest.placements = placements;
     manifest.policies = policies;
     manifest.catalog_hash = hash;
     let n = total(
-        140,
+        if target == 6 { 144 } else { 140 },
         [tx.group.as_bytes().len(), tx.recovery.as_bytes().len()],
     )?;
     tx.temporary(n)?;
     engine_pair(8, n)?;
     let mut output = Vec::new();
     output.try_reserve_exact(n).map_err(|_| Error::Allocation)?;
-    output.extend_from_slice(b"FWSS\0\x05");
+    output.extend_from_slice(b"FWSS");
+    output.extend_from_slice(&target.to_be_bytes());
     for part in [tx.group.as_bytes(), tx.recovery.as_bytes()] {
         output.extend_from_slice(
             &u16::try_from(part.len())
@@ -271,6 +308,9 @@ pub(in crate::state::redb) fn publish(
     }
     output.extend_from_slice(&hash);
     output.extend_from_slice(&manifest.origin_hash);
+    if target == 6 {
+        output.extend_from_slice(&1_u32.to_be_bytes());
+    }
     output.extend_from_slice(&Sha256::digest(&output));
     tx.step()?;
     let mut table = tx

@@ -22,6 +22,7 @@ pub use model::{
     OriginalPolicyReplyMapEntry, OriginalPolicyReplyMapIter, OriginalPolicyReplyRejection,
     OriginalPolicyReplyValue,
 };
+pub use source::original_policy_get_reply_projection_bytes;
 
 /// Projects a successful original setter envelope without rebinding stored type.
 ///
@@ -50,15 +51,7 @@ pub fn present_original_policy_set_reply<'input>(
         workflow_type.len(),
         state,
     );
-    let Some(index) = super::original_entry::decode_retained(
-        encoded,
-        &context.safety,
-        263_168,
-        live,
-        limits,
-        charge,
-    )?
-    else {
+    let Some(index) = retained(encoded, context, live, limits, charge)? else {
         return Ok(Err(OriginalPolicyReplyRejection::AllocationFailed));
     };
     Ok(Ok(prepare(
@@ -108,15 +101,7 @@ pub fn present_original_policy_get_reply<'input>(
             workflow_type.len(),
             state,
         );
-        let Some(index) = super::original_entry::decode_retained(
-            raw,
-            &context.safety,
-            263_168,
-            live,
-            limits,
-            charge,
-        )?
-        else {
+        let Some(index) = retained(raw, context, live, limits, charge)? else {
             return Ok(Err(OriginalPolicyReplyRejection::Corrupt));
         };
         let stored = index.entry().workflow_type();
@@ -180,6 +165,20 @@ fn prepare<'input>(
     }
     pay(charge, 128)?;
     Ok(owner)
+}
+
+fn retained<'input>(
+    raw: &'input [u8],
+    context: OriginalPolicyReplyContext<'input>,
+    live: usize,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<OriginalPolicyCurrentIndex<'input, 'input>>, EncodingError> {
+    if context.portable {
+        super::original_entry::indexed::decode_portable_retained(raw, live, limits, charge)
+    } else {
+        super::original_entry::decode_retained(raw, &context.safety, 263_168, live, limits, charge)
+    }
 }
 
 fn initialize<'input>(

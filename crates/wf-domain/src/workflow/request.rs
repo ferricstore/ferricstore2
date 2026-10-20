@@ -104,9 +104,11 @@ impl ClientIntent {
         Self { version: 3, digest }
     }
 
-    /// Selects both public set modes after same-frame intent comparison.
+    /// Selects the mathematical original public-SET grammar for an explicit digest.
+    /// Constructs the original SET mathematical digest identity only.
+    /// No verification, admission, payment, runtime origin or apply authority is supplied.
     #[must_use]
-    pub(crate) const fn original_policy_set(digest: [u8; 32]) -> Self {
+    pub const fn original_policy_set(digest: [u8; 32]) -> Self {
         Self { version: 4, digest }
     }
 

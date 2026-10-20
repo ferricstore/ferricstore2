@@ -11,6 +11,9 @@ mod identity;
 pub(in crate::policy::complete) mod indexed;
 mod runtime;
 mod safety;
+pub use indexed::decode_original_complete_policy_entry_portable;
+use indexed::{reserve_peak, reserved};
+pub use safety::canonical_original_etf_safety;
 mod scalar;
 mod scan;
 mod visit;
@@ -202,7 +205,7 @@ fn decode_with_span_limit<'encoded>(
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<OriginalPolicyEntry<'encoded>>, Error> {
     Ok(
-        decode_indexed(raw, safety, (span_limit, 4_096), 0, limits, charge)?
+        decode_indexed(raw, safety, (span_limit, 4_096, false), 0, limits, charge)?
             .map(|value| value.entry),
     )
 }
@@ -215,18 +218,25 @@ pub(in crate::policy::complete) fn decode_retained<'encoded, 'context>(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<indexed::OriginalPolicyCurrentIndex<'encoded, 'context>>, Error> {
-    decode_indexed(raw, safety, (span_limit, span_limit), live, limits, charge)
+    decode_indexed(
+        raw,
+        safety,
+        (span_limit, span_limit, false),
+        live,
+        limits,
+        charge,
+    )
 }
 
-fn decode_indexed<'encoded, 'context>(
+pub(super) fn decode_indexed<'encoded, 'context>(
     raw: &'encoded [u8],
     safety: &OriginalEtfSafety<'context>,
-    bounds: (usize, usize),
+    bounds: (usize, usize, bool),
     live: usize,
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<indexed::OriginalPolicyCurrentIndex<'encoded, 'context>>, Error> {
-    let (span_limit, map_limit) = bounds;
+    let (span_limit, map_limit, portable) = bounds;
     if charge.profile() != limits {
         return Err(Error::Schema(PolicySchemaError::ProfileMismatch));
     }
@@ -245,102 +255,70 @@ fn decode_indexed<'encoded, 'context>(
     safety::admit(safety, charge)?;
     let mut measured = (0_usize, 0_usize, 0_usize);
     let mut depth = 0;
-    let first = scan::run(raw, safety, span_limit, &mut measured, &mut None, charge);
-    if source_result(first)?.is_none() {
-        return Ok(None);
-    }
-    reserve_peak(measured, live, charge)?;
-    let mut spans = reserved(measured.0, 32, charge)?;
-    let mut keys = reserved(measured.1, 4, charge)?;
-    let mut virtual_funs = reserved(measured.2, 64, charge)?;
-    let mut output = Some((&mut spans, &mut virtual_funs));
-    measured = (0, 0, 0);
-    let second = scan::run_with_depth(
+    if portable {
+        let first = scan::run_profiled(
+            raw,
+            safety,
+            (span_limit, true),
+            &mut measured,
+            &mut depth,
+            &mut None,
+            charge,
+        );
+        let Some((unsupported, facts)) = source_result(first)? else {
+            return Ok(None);
+        };
+        if unsupported {
+            return match compound::envelope_facts(raw, facts, safety, charge)? {
+                None => Ok(None),
+                Some(_) => Err(Error::UnsupportedPolicyProfile),
+            };
+        }
+    } else if source_result(scan::run(
         raw,
         safety,
         span_limit,
         &mut measured,
-        &mut depth,
-        &mut output,
-        charge,
-    );
-    if source_result(second)?.is_none() {
-        return Ok(None);
-    }
-    if source_result(identity::maps(
-        raw,
-        &mut spans,
-        &mut keys,
-        safety,
-        &virtual_funs,
+        &mut None,
         charge,
     ))?
     .is_none()
     {
         return Ok(None);
     }
-    let Some((generation, policy)) = compound::envelope(raw, &spans, safety, charge)? else {
-        return Ok(None);
-    };
-    let map = EtfMap {
+    reserve_peak(measured, live, charge)?;
+    let mut spans = reserved(measured.0, 32, charge)?;
+    let keys = reserved(measured.1, 4, charge)?;
+    let mut virtual_funs = reserved(measured.2, 64, charge)?;
+    let mut output = Some((&mut spans, &mut virtual_funs));
+    measured = (0, 0, 0);
+    let second = scan::run_profiled(
         raw,
-        spans: &spans,
-        safety: *safety,
-        root: compound::resolve(&spans, policy),
-    };
-    if if map_limit == 4_096 {
-        visit::old_keys(map, limits, charge)?
-    } else {
-        visit::old_keys_with_node_limit(map, limits, spans.len().min(map_limit), charge)?
-    } {
+        safety,
+        (span_limit, portable),
+        &mut measured,
+        &mut depth,
+        &mut output,
+        charge,
+    );
+    let Some((unsupported, _)) = source_result(second)? else {
         return Ok(None);
+    };
+    if unsupported {
+        return match compound::envelope(raw, &spans, safety, charge)? {
+            None => Ok(None),
+            Some(_) => Err(Error::UnsupportedPolicyProfile),
+        };
     }
-    let workflow_type = visit::workflow_type(map, charge)?;
-    pay(charge, 128)?;
-    let policy_span = spans[usize::try_from(policy).map_err(|_| overflow())?];
-    let entry = OriginalPolicyEntry {
-        encoded: raw,
-        policy_range: (
-            usize::try_from(policy_span.start).map_err(|_| overflow())?,
-            usize::try_from(policy_span.end).map_err(|_| overflow())?,
-        ),
-        generation,
-        workflow_type,
-    };
-    Ok(Some(indexed::OriginalPolicyCurrentIndex {
+    indexed::finish_decoded(
         raw,
-        spans,
-        keys,
-        virtual_funs,
-        safety: *safety,
-        entry,
-        catalog: Vec::new(),
-        policy,
-        depth: depth.saturating_sub(1),
-    }))
-}
-
-fn reserve_peak(
-    counts: (usize, usize, usize),
-    live: usize,
-    charge: &mut PolicySchemaCharge,
-) -> Result<(), Error> {
-    let (n, k, f) = counts;
-    let peak = n
-        .checked_add(k)
-        .and_then(|v| v.checked_add(f))
-        .and_then(|v| v.checked_mul(64))
-        .and_then(|v| v.checked_add(live))
-        .ok_or_else(overflow)?;
-    charge_schema(charge, 0, u64::try_from(peak).map_err(|_| overflow())?)
-        .map_err(Error::Schema)?;
-    Ok(())
-}
-
-fn reserved<T>(count: usize, width: u64, charge: &mut PolicySchemaCharge) -> Result<Vec<T>, Error> {
-    let mut owner = Vec::new();
-    reserve(&mut owner, count, width, charge)?;
-    Ok(owner)
+        safety,
+        map_limit,
+        (spans, keys, virtual_funs),
+        depth,
+        limits,
+        charge,
+    )
 }
 
 fn source_result<T>(result: Result<T, Error>) -> Result<Option<T>, Error> {
@@ -349,21 +327,4 @@ fn source_result<T>(result: Result<T, Error>) -> Result<Option<T>, Error> {
         Err(Error::Malformed | Error::TrailingBytes) => Ok(None),
         Err(error) => Err(error),
     }
-}
-
-fn reserve<T>(
-    vector: &mut Vec<T>,
-    count: usize,
-    width: u64,
-    charge: &mut PolicySchemaCharge,
-) -> Result<(), Error> {
-    let fee = u64::try_from(count)
-        .map_err(|_| overflow())?
-        .checked_mul(width)
-        .and_then(|n| n.checked_add(128))
-        .ok_or_else(overflow)?;
-    pay(charge, fee)?;
-    vector
-        .try_reserve_exact(count)
-        .map_err(|_| Error::AllocationFailure)
 }

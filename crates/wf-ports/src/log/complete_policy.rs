@@ -16,8 +16,12 @@ mod public_set;
 mod replace;
 
 pub use public_set::{
-    OriginalPolicySetRequestPlan, VerifiedOriginalPolicySetFrame, decide_original_policy_set_frame,
-    prepare_original_policy_set_frame, verify_original_policy_set_frame,
+    FreshOriginalPolicySetFrame, OriginalPolicySetPointInspection, OriginalPolicySetRequestPlan,
+    VerifiedOriginalPolicySetFrame, decide_original_policy_set_frame,
+    decide_original_policy_set_frame_bounded, decide_original_policy_set_point_fresh_bounded,
+    inspect_original_policy_set_point_frame_bounded, original_policy_set_response_matches,
+    original_policy_set_response_status, prepare_original_policy_set_frame,
+    prepare_original_policy_set_point_frame_bounded, verify_original_policy_set_frame,
 };
 
 pub use flow::{

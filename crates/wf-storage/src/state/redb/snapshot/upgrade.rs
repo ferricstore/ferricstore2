@@ -8,15 +8,12 @@ impl RedbStateStore {
     /// Explicitly enables two-generation snapshot custody on a validated owner.
     /// # Errors
     /// Consumes the owner on profile, active storage or uncertain commit failure.
-    pub fn upgrade_snapshot_layout(
-        mut self,
-        limits: SnapshotLimits,
-    ) -> Result<Self, SnapshotError> {
+    pub fn upgrade_snapshot_layout(self, limits: SnapshotLimits) -> Result<Self, SnapshotError> {
         self.ready().map_err(SnapshotError::State)?;
         admit(&self.group, &self.recovery, self.limits, limits, 0)?;
         active(&self, upgrade(&self, limits))?;
-        if self.layout != 5 {
-            self.layout = 4;
+        if self.layout.get() < 5 {
+            self.layout.set(4);
         }
         Ok(self)
     }
@@ -27,7 +24,7 @@ fn upgrade(store: &RedbStateStore, limits: SnapshotLimits) -> Result<(), Snapsho
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     let facts = validate::complete(&mut tx, &mut charge, store.limits.snapshot_limits())
         .map_err(SnapshotError::State)?;
-    if matches!(store.layout, 4 | 5) {
+    if matches!(store.layout.get(), 4..=6) {
         return Ok(());
     }
     let pin = validate::pin(&tx).map_err(SnapshotError::State)?;

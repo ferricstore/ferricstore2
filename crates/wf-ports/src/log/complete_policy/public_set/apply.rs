@@ -15,6 +15,14 @@ use wf_types::version::LogIdentity;
 
 use super::{VerifiedOriginalPolicySetFrame, verify_original_policy_set_frame};
 
+mod point;
+pub use point::{
+    FreshOriginalPolicySetFrame, OriginalPolicySetPointInspection,
+    decide_original_policy_set_frame_bounded, decide_original_policy_set_point_fresh_bounded,
+    inspect_original_policy_set_point_frame_bounded,
+    prepare_original_policy_set_point_frame_bounded,
+};
+
 /// Complete proposed owners and comparison inputs, borrowing only gate replay.
 ///
 /// No constructor or physical publication is supplied. The frame, current value,
@@ -24,6 +32,11 @@ pub struct OriginalPolicySetRequestPlan<'view> {
     base_control: ControlState,
     control: ControlPlan,
     decision: DispatchDecision<'view, OriginalPolicySetFresh>,
+    workflow_type: Option<Vec<u8>>,
+    predecessor: Option<(usize, [u8; 32])>,
+    used_history: Option<u32>,
+    used_migrations: Option<(u64, u64)>,
+    portable_profile: Option<u32>,
 }
 
 impl<'view> OriginalPolicySetRequestPlan<'view> {
@@ -49,6 +62,46 @@ impl<'view> OriginalPolicySetRequestPlan<'view> {
     #[must_use]
     pub const fn decision(&self) -> &DispatchDecision<'view, OriginalPolicySetFresh> {
         &self.decision
+    }
+
+    /// Borrows the original Fresh query, including a rejected query.
+    #[must_use]
+    pub fn workflow_type(&self) -> Option<&[u8]> {
+        self.workflow_type.as_deref()
+    }
+
+    /// Compares exact predecessor presence and its bounded raw digest.
+    #[must_use]
+    pub fn matches_predecessor(&self, current: Option<&[u8]>) -> bool {
+        use sha2::{Digest, Sha256};
+        if self.portable_profile.is_none() {
+            return false;
+        }
+        match (self.predecessor, current) {
+            (None, None) => true,
+            (Some((length, digest)), Some(raw)) if raw.len() <= 263_168 => {
+                length == raw.len() && digest == <[u8; 32]>::from(Sha256::digest(raw))
+            }
+            _ => false,
+        }
+    }
+
+    /// Reads only successfully reached, range-valid history context.
+    #[must_use]
+    pub const fn used_history_max_events_limit(&self) -> Option<u32> {
+        self.used_history
+    }
+
+    /// Reads only successfully reached active/completed migration context.
+    #[must_use]
+    pub const fn used_migration_generations(&self) -> Option<(u64, u64)> {
+        self.used_migrations
+    }
+
+    /// Reads the fixed portable profile of a new sealed Fresh preparation.
+    #[must_use]
+    pub const fn portable_profile_id(&self) -> Option<u32> {
+        self.portable_profile
     }
 
     /// Moves all proposed owners and comparison inputs without copying them.
@@ -131,5 +184,10 @@ pub fn decide_original_policy_set_frame<'view>(
         base_control: base.gate.control,
         control,
         decision,
+        workflow_type: None,
+        predecessor: None,
+        used_history: None,
+        used_migrations: None,
+        portable_profile: None,
     })
 }

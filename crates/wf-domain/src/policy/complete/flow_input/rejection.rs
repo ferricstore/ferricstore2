@@ -1,5 +1,8 @@
 //! Exact finite borrowed response parts and one final fallible byte owner.
 
+mod retained;
+pub use retained::original_policy_set_rejection_from_body;
+
 use super::{Error, FlowPolicyInputRejection as Reason, GovernancePolicyInputRejection as Gov};
 use super::{PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits, charge_schema};
 use crate::policy::complete::retention_input;

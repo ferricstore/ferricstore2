@@ -18,7 +18,8 @@ mod replace_frame;
 pub use public_set_frame::{
     OriginalPolicySetFrameBytes, OriginalPolicySetFrameHeader, OriginalPolicySetFrameInput,
     ScannedOriginalPolicySetFrame, prepare_original_policy_set_frame_bytes,
-    restore_original_policy_set_frame_header, scan_original_policy_set_frame,
+    restore_original_policy_set_frame_header, restore_original_policy_set_point_frame_header,
+    scan_original_policy_set_frame,
 };
 
 pub use flow_frame::{

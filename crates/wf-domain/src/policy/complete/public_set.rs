@@ -10,6 +10,7 @@ use model::{PolicySetPatchArena, PolicySetPatchCell, PolicySetPatchSlot};
 pub(in crate::policy::complete) mod merge;
 mod metric;
 mod model;
+pub(in crate::policy::complete) mod native_order;
 pub(in crate::policy::complete) mod order;
 mod patch;
 
@@ -342,3 +343,5 @@ pub(super) fn overflow() -> Error {
 pub(super) fn authority() -> Error {
     Error::Schema(PolicySchemaError::InvalidAuthority)
 }
+
+pub use super::flow_input::rejection::original_policy_set_rejection_from_body;

@@ -123,17 +123,17 @@ impl<'input> PolicyMergeCursor<'input> {
         charge: &mut PolicySchemaCharge,
     ) -> Result<Self, Error> {
         self.guard_rows(charge)?;
-        if self.len() > 1 {
+        if self.len() > 1
+            && let Some(orders) = self.arena.orders
+        {
             self.forward = match self.value {
                 Ref::Current(v) => Some(
-                    self.arena
-                        .orders
+                    orders
                         .current_record(v.map_id().ok_or_else(authority)?, self.len(), charge)?
                         .0,
                 ),
                 Ref::Map(id) => Some(
-                    self.arena
-                        .orders
+                    orders
                         .merged_record(
                             u32::try_from(id).map_err(|_| overflow())?,
                             self.len(),
@@ -145,6 +145,10 @@ impl<'input> PolicyMergeCursor<'input> {
             };
         }
         Ok(self)
+    }
+
+    pub(in crate::policy::complete) fn needs_native_order(self) -> bool {
+        self.arena.orders.is_none() && !matches!(self.value, Ref::Frame(_))
     }
 
     pub(in crate::policy::complete) fn source_row(

@@ -5,7 +5,9 @@ use crate::state::value::StateValueError;
 use wf_domain::policy::complete::{PolicySchemaCharge, PolicySchemaLimits};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedOutcome, RetainedStatus};
-use wf_ports::log::{CodecError, complete_core_policy_patch_retained_status};
+use wf_ports::log::{
+    CodecError, complete_core_policy_patch_retained_status, original_policy_set_response_status,
+};
 use wf_types::identity::RequestId;
 
 /// Encodes policy receipts with the actual captured profile and operation account.
@@ -22,7 +24,7 @@ pub fn encode_outcome_profiled(
     charge: &mut PolicySchemaCharge,
     maximum_policy_owner_bytes: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if outcome.intent().version() != 2 {
+    if !matches!(outcome.intent().version(), 2 | 4) {
         return encode_outcome(outcome, maximum_wire_bytes);
     }
     if maximum_wire_bytes == 0 {
@@ -72,6 +74,7 @@ pub fn scan_outcome_profiled<'input>(
 ///
 /// Every intent2 FWPV prefix receives `2048 + 216 * actual_response_bytes`, even
 /// if its version, content or trailing bytes will subsequently be rejected.
+/// Intent4 ETF receives `65536 + 256 * actual_response_bytes` independently.
 /// Zero for other bodies does not recognize a valid business error or old value.
 /// # Errors
 /// Refuses malformed/oversized FWSO framing or checked-size overflow.
@@ -84,6 +87,16 @@ pub fn outcome_policy_validation_bytes(
         maximum_wire_bytes,
         |fields, intent, _, _, _, _, _| {
             let response = fields[4];
+            if intent == 4 && response.first() == Some(&131) {
+                if response.len() > 263_168 {
+                    return Err(StateValueError::Malformed);
+                }
+                return response
+                    .len()
+                    .checked_mul(256)
+                    .and_then(|n| n.checked_add(65_536))
+                    .ok_or(StateValueError::LengthOverflow);
+            }
             if intent != 2 || !response.starts_with(b"FWPV") {
                 return Ok(0);
             }
@@ -105,6 +118,33 @@ pub(super) fn retained_status(
     maximum_policy_owner_bytes: usize,
 ) -> Result<RetainedStatus, StateValueError> {
     let (schema, charge) = profile;
+    if intent.version() == 4 {
+        if response_version != 1 {
+            return Err(StateValueError::UnsupportedVersion);
+        }
+        if charge.profile() != schema {
+            return Err(StateValueError::InvalidValue);
+        }
+        if response.len() > 263_168 {
+            return Err(StateValueError::Malformed);
+        }
+        if response.len() > admission.decision_bytes() {
+            return Err(StateValueError::ProfileLimit);
+        }
+        return original_policy_set_response_status(
+            response,
+            schema,
+            charge,
+            maximum_policy_owner_bytes,
+        )
+        .map_err(|error| match error {
+            CodecError::ByteLimit | CodecError::ItemLimit | CodecError::ValueLimit => {
+                StateValueError::ProfileLimit
+            }
+            CodecError::UnsupportedPolicyProfile => StateValueError::UnsupportedPolicyProfile,
+            other => other.into(),
+        });
+    }
     complete_core_policy_patch_retained_status(
         intent,
         response_version,

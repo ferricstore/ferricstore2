@@ -53,7 +53,7 @@ pub(super) fn decide<'current>(
     } = loaded;
     let current = current_facts(queries, records, staging_used, cap)?;
     let encodings = encodings(queries, state_keys, staging_used, cap)?;
-    let policy = projection.as_ref().map(|(policy, _)| policy.policy());
+    let policy = projection.as_ref().map(|(policy, _)| policy);
     let parallel_facts = parallel_facts(records, policy, staging_used, cap)?;
     let members = member_facts(records, policy, staging_used, cap)?;
     let fifo_heads = head_facts(&kind, heads, records, policy, staging_used, cap)?;

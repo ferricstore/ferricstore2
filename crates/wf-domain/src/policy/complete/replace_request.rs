@@ -29,7 +29,9 @@ mod public_set;
 mod retention;
 
 pub use public_set::{
-    OriginalPolicySetApplyView, OriginalPolicySetFresh, prepare_original_policy_set_fresh,
+    OriginalPolicySetApplyView, OriginalPolicySetFresh, OriginalPolicySetFreshView,
+    OriginalPolicySetPreparation, prepare_original_policy_set_fresh,
+    prepare_original_policy_set_fresh_with_query, prepare_original_policy_set_point_fresh,
 };
 
 pub use flow::{

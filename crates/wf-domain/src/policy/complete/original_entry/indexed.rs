@@ -1,8 +1,9 @@
 //! Same strict reader owners retained for one source merge, with lazy children.
 
 use super::{
-    Error, OriginalEtfSafety, OriginalPolicyEntry, PolicySchemaCharge, TermPosition, TermSpan,
-    VirtualLocalFun, charge_schema, overflow, pay,
+    Error, EtfMap, OriginalEtfSafety, OriginalPolicyEntry, PolicySchemaCharge, TermPosition,
+    TermSpan, VirtualLocalFun, charge_schema, compound, identity, overflow, pay, source_result,
+    visit,
 };
 
 mod value;
@@ -161,4 +162,138 @@ impl<'raw, 'context> OriginalPolicyCurrentIndex<'raw, 'context> {
             Some(index)
         }
     }
+}
+
+/// Decodes the original entry with the immutable portable server profile.
+/// # Errors
+/// Preserves malformed-envelope None, operational bounds and distinct profile refusal.
+pub fn decode_original_complete_policy_entry_portable<'raw>(
+    raw: &'raw [u8],
+    limits: super::PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<OriginalPolicyEntry<'raw>>, Error> {
+    Ok(decode_portable_retained(raw, 0, limits, charge)?.map(|index| index.entry))
+}
+
+pub(in crate::policy::complete) fn decode_portable_retained<'raw>(
+    raw: &'raw [u8],
+    live: usize,
+    limits: super::PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<OriginalPolicyCurrentIndex<'raw, 'static>>, Error> {
+    super::decode_indexed(
+        raw,
+        &super::canonical_original_etf_safety(),
+        (263_168, 263_168, true),
+        live,
+        limits,
+        charge,
+    )
+}
+
+pub(super) fn finish_decoded<'encoded, 'context>(
+    raw: &'encoded [u8],
+    safety: &OriginalEtfSafety<'context>,
+    map_limit: usize,
+    owners: (Vec<TermSpan>, Vec<u32>, Vec<VirtualLocalFun>),
+    depth: usize,
+    limits: super::PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<OriginalPolicyCurrentIndex<'encoded, 'context>>, Error> {
+    let (mut spans, mut keys, virtual_funs) = owners;
+    if source_result(identity::maps(
+        raw,
+        &mut spans,
+        &mut keys,
+        safety,
+        &virtual_funs,
+        charge,
+    ))?
+    .is_none()
+    {
+        return Ok(None);
+    }
+    let Some((generation, policy)) = compound::envelope(raw, &spans, safety, charge)? else {
+        return Ok(None);
+    };
+    let map = EtfMap {
+        raw,
+        spans: &spans,
+        safety: *safety,
+        root: compound::resolve(&spans, policy),
+    };
+    if if map_limit == 4_096 {
+        visit::old_keys(map, limits, charge)?
+    } else {
+        visit::old_keys_with_node_limit(map, limits, spans.len().min(map_limit), charge)?
+    } {
+        return Ok(None);
+    }
+    let workflow_type = visit::workflow_type(map, charge)?;
+    pay(charge, 128)?;
+    let policy_span = spans[usize::try_from(policy).map_err(|_| overflow())?];
+    let entry = OriginalPolicyEntry {
+        encoded: raw,
+        policy_range: (
+            usize::try_from(policy_span.start).map_err(|_| overflow())?,
+            usize::try_from(policy_span.end).map_err(|_| overflow())?,
+        ),
+        generation,
+        workflow_type,
+    };
+    Ok(Some(OriginalPolicyCurrentIndex {
+        raw,
+        spans,
+        keys,
+        virtual_funs,
+        safety: *safety,
+        entry,
+        catalog: Vec::new(),
+        policy,
+        depth: depth.saturating_sub(1),
+    }))
+}
+
+pub(super) fn reserve_peak(
+    counts: (usize, usize, usize),
+    live: usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(), Error> {
+    let (n, k, f) = counts;
+    let peak = n
+        .checked_add(k)
+        .and_then(|v| v.checked_add(f))
+        .and_then(|v| v.checked_mul(64))
+        .and_then(|v| v.checked_add(live))
+        .ok_or_else(overflow)?;
+    charge_schema(charge, 0, u64::try_from(peak).map_err(|_| overflow())?)
+        .map_err(Error::Schema)?;
+    Ok(())
+}
+
+pub(super) fn reserved<T>(
+    count: usize,
+    width: u64,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Vec<T>, Error> {
+    let mut owner = Vec::new();
+    reserve(&mut owner, count, width, charge)?;
+    Ok(owner)
+}
+
+fn reserve<T>(
+    vector: &mut Vec<T>,
+    count: usize,
+    width: u64,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(), Error> {
+    let fee = u64::try_from(count)
+        .map_err(|_| overflow())?
+        .checked_mul(width)
+        .and_then(|n| n.checked_add(128))
+        .ok_or_else(overflow)?;
+    pay(charge, fee)?;
+    vector
+        .try_reserve_exact(count)
+        .map_err(|_| Error::AllocationFailure)
 }

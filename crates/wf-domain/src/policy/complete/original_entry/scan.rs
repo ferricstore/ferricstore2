@@ -6,7 +6,17 @@ use super::{
 };
 
 pub(super) type Output<'a> = Option<(&'a mut Vec<TermSpan>, &'a mut Vec<VirtualLocalFun>)>;
-pub(super) type State = (usize, usize, usize, usize, usize, usize);
+pub(super) type State = (
+    usize,
+    usize,
+    usize,
+    usize,
+    usize,
+    usize,
+    bool,
+    bool,
+    (usize, [TermSpan; 4]),
+);
 
 pub(super) fn run(
     raw: &[u8],
@@ -31,7 +41,38 @@ pub(super) fn run_with_depth(
     output: &mut Output<'_>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
-    let mut state = (0, 0, 0, 0, span_limit, 0);
+    run_profiled(
+        raw,
+        safety,
+        (span_limit, false),
+        measured,
+        depth,
+        output,
+        charge,
+    )
+    .map(|_| ())
+}
+
+pub(super) fn run_profiled(
+    raw: &[u8],
+    safety: &OriginalEtfSafety<'_>,
+    bounds: (usize, bool),
+    measured: &mut (usize, usize, usize),
+    depth: &mut usize,
+    output: &mut Output<'_>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(bool, [TermSpan; 4]), Error> {
+    let mut state = (
+        0,
+        0,
+        0,
+        0,
+        bounds.0,
+        0,
+        bounds.1,
+        false,
+        (1, [TermSpan::default(); 4]),
+    );
     if byte(raw, &mut state.0, charge)? != 131 {
         return Err(Error::Malformed);
     }
@@ -41,7 +82,7 @@ pub(super) fn run_with_depth(
     }
     *measured = (state.1, state.2, state.3);
     *depth = state.5;
-    Ok(())
+    Ok((state.7, state.8.1))
 }
 
 pub(super) fn term(
@@ -71,7 +112,19 @@ pub(super) fn term(
     }
     let alias = match tag {
         97 | 98 | 110 | 111 | 70 | 99 | 100 | 115 | 118 | 119 | 109 | 77 => {
-            scalar::parse(raw, safety, &mut state.0, &mut span, charge)?;
+            if state.6 {
+                scalar::parse_profiled(
+                    raw,
+                    safety,
+                    &mut state.0,
+                    &mut span,
+                    true,
+                    &mut state.7,
+                    charge,
+                )?;
+            } else {
+                scalar::parse(raw, safety, &mut state.0, &mut span, charge)?;
+            }
             None
         }
         104 | 105 | 106 | 107 | 108 | 116 => {
@@ -81,13 +134,22 @@ pub(super) fn term(
             runtime::parse(raw, safety, state, output, (depth, &mut span), charge)?;
             None
         }
-        73 | 75 | 121 => return Err(Error::UnsupportedTag),
+        73 | 75 | 121 => {
+            return Err(if state.6 {
+                Error::UnsupportedPolicyProfile
+            } else {
+                Error::UnsupportedTag
+            });
+        }
         _ => return Err(Error::Malformed),
     };
     if span.tag() == 107 && span.datum() != 0 {
         state.5 = state.5.max(depth + 1);
     }
     span.end = u32::try_from(state.0).map_err(|_| overflow())?;
+    if state.6 && usize::try_from(span.start).ok() == Some(state.8.0) {
+        state.8.1[0] = alias.unwrap_or(span);
+    }
     span.next = u32::try_from(state.1).map_err(|_| overflow())?;
     if let Some((spans, _)) = output {
         spans[usize::try_from(index).map_err(|_| overflow())?] = span;

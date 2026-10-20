@@ -14,6 +14,9 @@ pub(super) fn parse(
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
     let (depth, span) = frame;
+    if state.6 {
+        state.7 = true;
+    }
     match span.tag() {
         113 => exported(raw, context, state, output, (depth, span), charge),
         112 => local_fun(raw, context, state, output, (depth, span), charge),
@@ -50,14 +53,21 @@ fn node_container(
     } else {
         1
     };
-    if count == 0 {
+    if count == 0 && !state.6 {
         return Err(Error::UnsupportedTag);
     }
     if count > 5 {
         return Err(Error::Malformed);
     }
     let (_, node) = scan::term(raw, context, state, output, depth + 1, charge)?;
-    let name = atom_name(node, context)?;
+    let name = if state.6 {
+        if !matches!(node.tag(), 100 | 115 | 118 | 119) {
+            return Err(Error::Malformed);
+        }
+        ""
+    } else {
+        atom_name(node, context)?
+    };
     span.set_datum(node.datum());
     span.canonical = u32::try_from(state.0).map_err(|_| overflow())?;
     let creation = match tag {
@@ -91,7 +101,11 @@ fn node_container(
     if matches!(tag, 101 | 114) && ref_word(raw, *span, 0) >= (1 << 18) {
         return Err(Error::Malformed);
     }
-    let local = safety::node(context, name, creation, charge)?;
+    let local = if state.6 {
+        false
+    } else {
+        safety::node(context, name, creation, charge)?
+    };
     if local {
         validate_local_container(raw, *span)?;
     }
@@ -168,6 +182,14 @@ fn exported(
             .try_into()
             .map_err(|_| Error::Malformed)?,
     );
+    if state.6 {
+        if !matches!(module.tag(), 100 | 115 | 118 | 119)
+            || !matches!(function.tag(), 100 | 115 | 118 | 119)
+        {
+            return Err(Error::Malformed);
+        }
+        return Ok(());
+    }
     safety::exported(
         context,
         atom_name(module, context)?,
@@ -202,7 +224,13 @@ fn local_fun(
         return Err(Error::Malformed);
     }
     let (_, module) = scan::term(raw, context, state, output, depth + 1, charge)?;
-    atom_name(module, context)?;
+    if state.6 {
+        if !matches!(module.tag(), 100 | 115 | 118 | 119) {
+            return Err(Error::Malformed);
+        }
+    } else {
+        atom_name(module, context)?;
+    }
     let (_, old_index) = scan::term(raw, context, state, output, depth + 1, charge)?;
     scalar::small(raw, old_index)?;
     let (_, old_uniq) = scan::term(raw, context, state, output, depth + 1, charge)?;
@@ -216,7 +244,9 @@ fn local_fun(
     if !matches!(creator.tag(), 103 | 88) {
         return Err(Error::Malformed);
     }
-    if let Some((_, virtuals)) = output {
+    if let Some((_, virtuals)) = output
+        && !state.6
+    {
         let value = VirtualLocalFun {
             module: module.datum(),
             index,

@@ -1,8 +1,8 @@
 //! Supplied preparation, borrowed scans and independently owned namespace headers.
 
 use super::{
-    CompletePolicyRequestError, Error, PolicySchemaCharge, PolicySetFrameCursor, add, check_scope,
-    copy, peak, visit,
+    CompletePolicyRequestError, Error, PolicySchemaCharge, PolicySchemaLimits,
+    PolicySetFrameCursor, add, check_scope, copy, peak, visit,
 };
 use crate::policy::complete::{OriginalPolicySetMapOrders, OriginalPolicySetRequest};
 use crate::workflow::request::{ClientIntent, RequestScope};
@@ -188,6 +188,40 @@ impl<'frame> OriginalPolicySetFrameHeader<'frame> {
     pub(in crate::policy::complete) const fn patch_bounds(&self) -> (usize, usize) {
         self.patch_bounds
     }
+    /// Borrows the exact original policy key from the committed frame.
+    #[must_use]
+    pub const fn policy_key(&self) -> &'frame [u8] {
+        self.policy_key
+    }
+
+    /// Copies the original requested type on the same freshly checked account.
+    /// # Errors
+    /// Preserves profile, invalid key authority, work and allocation refusals.
+    pub fn copy_workflow_type(
+        &self,
+        limits: PolicySchemaLimits,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Vec<u8>, CompletePolicyRequestError> {
+        super::profile(limits, charge)?;
+        let requested = self
+            .policy_key
+            .strip_prefix(b"f:{f}:policy:")
+            .filter(|s| !s.is_empty())
+            .filter(|_| self.policy_key.len() <= 65_535)
+            .ok_or_else(super::authority)?;
+        let mut live = add(self.encoded.len(), self.patch_backing)?;
+        for bytes in [
+            self.scope.tenant().as_bytes(),
+            self.scope.group().as_bytes(),
+            self.scope.recovery().as_bytes(),
+            self.request.as_bytes(),
+        ] {
+            live = add(live, add(128, bytes.len())?)?;
+        }
+        peak(charge, add(live, add(128, requested.len())?)?)?;
+        Ok(copy(requested, charge)?)
+    }
+
     pub(in crate::policy::complete) const fn patch_backing(&self) -> usize {
         self.patch_backing
     }

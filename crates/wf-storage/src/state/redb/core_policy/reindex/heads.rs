@@ -10,7 +10,7 @@ use redb::ReadableTable;
 use std::collections::BTreeMap;
 use wf_domain::claim::{DueOrder, LaneKey};
 use wf_domain::policy::complete::CompletePolicyValue;
-use wf_domain::policy::definition::StateMode;
+use wf_domain::policy::definition::{PolicySnapshot, StateMode};
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId};
@@ -112,15 +112,36 @@ impl PolicyReindexHeads {
         scope: &RequestScope,
         policy: &CompletePolicyValue,
     ) -> Result<(), StateTransactionError> {
+        self.finish_for(tx, scope, &policy.data().workflow_type, |state| {
+            mode(Some(policy), state)
+        })
+    }
+    pub(in crate::state::redb) fn finish_modes(
+        &self,
+        tx: &RedbStateTransaction<'_>,
+        scope: &RequestScope,
+        policy: &PolicySnapshot,
+    ) -> Result<(), StateTransactionError> {
+        self.finish_for(tx, scope, policy.workflow_type(), |state| {
+            policy.state_mode(state)
+        })
+    }
+    fn finish_for(
+        &self,
+        tx: &RedbStateTransaction<'_>,
+        scope: &RequestScope,
+        kind: &[u8],
+        mode: impl Fn(&[u8]) -> StateMode,
+    ) -> Result<(), StateTransactionError> {
         for (partition, states) in &self.lanes {
             for state in states.keys() {
                 let lane = LaneKey {
-                    workflow_type: &policy.data().workflow_type,
+                    workflow_type: kind,
                     state,
                     partition_key: partition.as_bytes(),
                 };
                 let head = tx.fifo_head(scope.tenant(), lane)?;
-                if mode(Some(policy), state) == StateMode::Parallel {
+                if mode(state) == StateMode::Parallel {
                     if head.is_some() {
                         return Err(StateTransactionError::Corrupt);
                     }

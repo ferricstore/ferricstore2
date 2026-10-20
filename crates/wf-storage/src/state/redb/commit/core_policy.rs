@@ -104,7 +104,7 @@ fn publish(
         publication::put(&tx, &key, candidate.encoded())?;
         catalog::publish(&tx, old_layout, manifest, &saved)?;
         put_outcome(&tx, scope, outcome, &encoded)?;
-        layout = catalog::POLICY_LAYOUT;
+        layout = old_layout.max(catalog::POLICY_LAYOUT);
     } else if let Some(outcome) = changes.outcome() {
         let encoded = encode_outcome(&tx, outcome, charge)?;
         put_outcome(&tx, scope, outcome, &encoded)?;
@@ -114,6 +114,7 @@ fn publish(
         .set_durability(redb::Durability::Immediate)
         .map_err(|_| Error::Unavailable)?;
     tx.write.commit().map_err(|_| Error::Uncertain)?;
+    tx.committed_layout.set(layout);
     Ok(layout)
 }
 fn validate(
@@ -226,7 +227,7 @@ fn encode_outcome(
         _ => Error::InvalidChanges,
     })
 }
-fn put_outcome(
+pub(super) fn put_outcome(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
     outcome: &RetainedOutcome,

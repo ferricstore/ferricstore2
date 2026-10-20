@@ -223,7 +223,7 @@ fn scan_with_policy<'input>(
                 || expires_at <= original_time
                 || (response.len() > limits.decision_bytes()
                     && !(intent_version == 1 && response_version == 3)
-                    && !(intent_version == 2 && profile.is_some()))
+                    && !(matches!(intent_version, 2 | 4) && profile.is_some()))
             {
                 return Err(StateValueError::InvalidValue);
             }
@@ -232,11 +232,12 @@ fn scan_with_policy<'input>(
                     ClientIntent::new(1, digest).map_err(|_| StateValueError::UnsupportedVersion)?
                 }
                 2 if profile.is_some() => ClientIntent::complete_core_policy_patch(digest),
+                4 if profile.is_some() => ClientIntent::original_policy_set(digest),
                 5 => ClientIntent::record_batch(digest),
                 6 => ClientIntent::independent_record_batch(digest),
                 _ => return Err(StateValueError::UnsupportedVersion),
             };
-            let (status, response_count) = if intent_version == 2 {
+            let (status, response_count) = if matches!(intent_version, 2 | 4) {
                 let (schema, charge, maximum_owner) =
                     profile.ok_or(StateValueError::UnsupportedVersion)?;
                 (

@@ -2,6 +2,12 @@
 
 use std::collections::BTreeMap;
 
+mod original;
+pub use original::{
+    original_policy_indexed_fields_equal, original_record_batch_policy_projection_bytes,
+    project_original_record_batch_policy,
+};
+
 use crate::policy::definition::StatePolicy;
 use crate::policy::installation::{PolicyCandidate, PolicyError};
 use crate::policy::restoration::{PolicySnapshotData, restore_candidate};
@@ -12,6 +18,47 @@ use super::{
     CompletePolicyEncodingError, CompletePolicyValue, PolicySchemaCharge, PolicySchemaError,
     PolicySchemaLimits, validate_stored_complete_policy,
 };
+
+/// Detects configured governance maps after one fresh portable raw decode.
+///
+/// This root/state MAP-presence restriction is not a complete resolver for
+/// arbitrary raw governance. Full original bytes remain the caller's authority.
+/// # Errors
+/// Preserves actual profile, type binding, work, malformed and allocation errors.
+pub fn original_record_batch_policy_has_governance(
+    raw: &[u8],
+    kind: &[u8],
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, CompletePolicyEncodingError> {
+    use super::flow_input::value::PolicyInputKind as Kind;
+    let index = original::read(raw, kind, schema, charge)?;
+    let root = index.cursor().position();
+    if original::field(&index, root, b"governance", charge)?
+        .is_some_and(|position| index.at(position).kind() == Kind::Map)
+    {
+        return Ok(true);
+    }
+    if let Some(states) = original::field(&index, root, b"states", charge)?
+        .filter(|&position| index.at(position).kind() == Kind::Map)
+    {
+        for ordinal in 0..index.at(states).len() {
+            super::admission::charge_schema(charge, 128, 0)
+                .map_err(CompletePolicyEncodingError::Schema)?;
+            let (_, config) = index
+                .at(states)
+                .row(ordinal)
+                .ok_or(CompletePolicyEncodingError::Malformed)?;
+            if config.kind() == Kind::Map
+                && original::field(&index, config.position(), b"governance", charge)?
+                    .is_some_and(|position| index.at(position).kind() == Kind::Map)
+            {
+                return Ok(true);
+            }
+        }
+    }
+    Ok(false)
+}
 
 /// Measures both temporary projections, including every copied state name.
 ///

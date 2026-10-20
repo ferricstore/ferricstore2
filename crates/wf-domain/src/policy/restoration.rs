@@ -45,6 +45,17 @@ pub fn restore_candidate(
     if generation == 0 || generation > MAX_POLICY_GENERATION {
         return Err(PolicyError::InvalidGeneration);
     }
+    let policy = restore_policy_snapshot(data, limits)?;
+    Ok(PolicyCandidate { generation, policy })
+}
+
+/// Restores generation-free mode/content facts without installed authority.
+/// # Errors
+/// Preserves the existing snapshot field and owner budget validation.
+pub fn restore_policy_snapshot(
+    data: PolicySnapshotData,
+    limits: PolicyLimits,
+) -> Result<PolicySnapshot, PolicyError> {
     let PolicySnapshotData {
         workflow_type,
         version,
@@ -62,5 +73,13 @@ pub fn restore_candidate(
         states,
     };
     super::install_validation::validate_snapshot(&policy, limits)?;
-    Ok(PolicyCandidate { generation, policy })
+    Ok(policy)
+}
+
+impl PolicyCandidate {
+    /// Moves mathematical snapshot facts without installing or certifying them.
+    #[must_use]
+    pub fn into_policy(self) -> PolicySnapshot {
+        self.policy
+    }
 }

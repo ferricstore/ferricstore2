@@ -1,11 +1,19 @@
 //! Original public policy query preparation, one read and borrowed projection.
 
 use wf_domain::policy::complete::{
-    CompletePolicyEncodingError, OriginalPolicyGetRejection, OriginalPolicyReadValue,
-    OriginalPolicyReply, OriginalPolicyReplyContext, OriginalPolicyReplyError,
-    OriginalPolicyReplyRejection, PolicySchemaCharge, PolicySchemaLimits, RawFlowPolicyValue,
-    prepare_original_policy_get_request, present_original_policy_get_reply,
+    CompletePolicyEncodingError, CompletePolicyValue, OriginalPolicyGetRejection,
+    OriginalPolicyReadValue, OriginalPolicyReply, OriginalPolicyReplyContext,
+    OriginalPolicyReplyError, OriginalPolicyReplyRejection, PolicySchemaCharge, PolicySchemaLimits,
+    RawFlowPolicyValue, prepare_original_policy_get_request, present_original_policy_get_reply,
 };
+
+/// Full persisted authority; execution projections never replace these bytes.
+pub enum StoredPolicyValue {
+    /// Complete normalized backing, moved after its actual owner admission.
+    Complete(Box<CompletePolicyValue>),
+    /// Original ETF backing, including customer versions outside native integers.
+    Original(Vec<u8>),
+}
 
 /// Policy-specific source compatibility read capability.
 ///

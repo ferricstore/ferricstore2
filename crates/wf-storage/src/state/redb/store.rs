@@ -12,7 +12,7 @@ pub struct RedbStateStore {
     pub(super) group: GroupId,
     pub(super) recovery: RecoveryId,
     pub(super) limits: StateStoreLimits,
-    pub(super) layout: u16,
+    pub(super) layout: Cell<u16>,
     fenced: Cell<bool>,
 }
 
@@ -20,6 +20,7 @@ pub struct RedbStateStore {
 pub struct RedbStateTransaction<'s> {
     pub(super) write: redb::WriteTransaction,
     pub(super) layout: u16,
+    pub(super) committed_layout: &'s Cell<u16>,
     pub(super) group: &'s GroupId,
     pub(super) recovery: &'s RecoveryId,
     pub(super) admission: AdmissionLimits,
@@ -54,7 +55,7 @@ impl RedbStateStore {
             group,
             recovery,
             limits,
-            layout: 3,
+            layout: Cell::new(3),
             fenced: Cell::new(false),
         }
     }
@@ -137,7 +138,7 @@ impl RedbStateStore {
             group,
             recovery,
             limits,
-            layout: 3,
+            layout: Cell::new(3),
             fenced: Cell::new(false),
         };
         bootstrap::initialize(&store, genesis, scratch)?;
@@ -154,15 +155,15 @@ impl RedbStateStore {
         limits: StateStoreLimits,
     ) -> Result<Self, StateTransactionError> {
         admission::workspace(&group, &recovery, limits, 0)?;
-        let mut store = Self {
+        let store = Self {
             database,
             group,
             recovery,
             limits,
-            layout: 3,
+            layout: Cell::new(3),
             fenced: Cell::new(false),
         };
-        store.layout = recovery::validate(&store)?;
+        store.layout.set(recovery::validate(&store)?);
         Ok(store)
     }
     /// Fixed authoritative group; available even after a fatal error.
@@ -177,7 +178,7 @@ impl RedbStateStore {
     }
 
     pub(crate) fn committed_core_policy_layout(&mut self, layout: u16) {
-        self.layout = layout;
+        self.layout.set(layout);
     }
 
     pub(super) fn transaction(
@@ -201,7 +202,8 @@ impl RedbStateStore {
             .inspect_err(|error| fence(&self.fenced, *error))?;
         Ok(RedbStateTransaction {
             write,
-            layout: self.layout,
+            layout: self.layout.get(),
+            committed_layout: &self.layout,
             group: &self.group,
             recovery: &self.recovery,
             admission,

@@ -10,7 +10,12 @@ use wf_ports::state::StateTransactionError;
 
 mod claim;
 mod core_policy;
+mod original_policy;
 pub use core_policy::{CorePolicyTransactionError, apply_complete_core_policy_patch_transaction};
+pub use original_policy::{
+    OriginalPolicyTransactionError, apply_original_policy_set_transaction,
+    with_original_policy_get_reply,
+};
 mod load;
 mod observations;
 mod record_batch;

@@ -14,6 +14,18 @@ pub(super) fn parse(
     span: &mut TermSpan,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(), Error> {
+    parse_profiled(raw, context, cursor, span, false, &mut false, charge)
+}
+
+pub(super) fn parse_profiled(
+    raw: &[u8],
+    context: &OriginalEtfSafety<'_>,
+    cursor: &mut usize,
+    span: &mut TermSpan,
+    portable: bool,
+    unsupported: &mut bool,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(), Error> {
     match span.tag() {
         97 => span.keys = u32::from(scan::byte(raw, cursor, charge)?),
         98 => span.keys = scan::word(raw, cursor, charge)?,
@@ -44,7 +56,19 @@ pub(super) fn parse(
             };
             let latin = matches!(span.tag(), 100 | 115);
             let bytes = scan::take(raw, cursor, length, charge)?;
-            span.set_datum(safety::atom(context, bytes, latin, charge)?);
+            span.set_datum(
+                match if portable {
+                    safety::atom_profiled(context, bytes, latin, true, charge)
+                } else {
+                    safety::atom(context, bytes, latin, charge)
+                } {
+                    Err(Error::UnsupportedPolicyProfile) => {
+                        *unsupported = true;
+                        0x00ff_ffff
+                    }
+                    result => result?,
+                },
+            );
         }
         109 | 77 => {
             let length =

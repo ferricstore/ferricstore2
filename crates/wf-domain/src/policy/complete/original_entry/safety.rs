@@ -160,6 +160,16 @@ pub(super) fn atom(
     latin: bool,
     charge: &mut PolicySchemaCharge,
 ) -> Result<u32, Error> {
+    atom_profiled(context, raw, latin, false, charge)
+}
+
+pub(super) fn atom_profiled(
+    context: &OriginalEtfSafety<'_>,
+    raw: &[u8],
+    latin: bool,
+    portable: bool,
+    charge: &mut PolicySchemaCharge,
+) -> Result<u32, Error> {
     let utf8 = if latin {
         None
     } else {
@@ -183,7 +193,11 @@ pub(super) fn atom(
             return u32::try_from(index).map_err(|_| overflow());
         }
     }
-    Err(Error::Malformed)
+    Err(if portable {
+        Error::UnsupportedPolicyProfile
+    } else {
+        Error::Malformed
+    })
 }
 
 pub(super) fn node(
@@ -216,3 +230,75 @@ pub(super) fn exported(
     }
     Err(Error::Malformed)
 }
+
+/// Returns the immutable emitter profile, including the explicit nil compatibility atom.
+#[must_use]
+pub const fn canonical_original_etf_safety() -> OriginalEtfSafety<'static> {
+    OriginalEtfSafety::new(CANONICAL_ATOMS, &[], None, &[])
+}
+
+const CANONICAL_ATOMS: &[&str] = &[
+    "all",
+    "allowed",
+    "approvals",
+    "approximate_global",
+    "assignees",
+    "audit",
+    "backoff",
+    "base_ms",
+    "budgets",
+    "circuits",
+    "denials",
+    "denied",
+    "effect_events",
+    "effects",
+    "enforcement",
+    "error_classes",
+    "exhausted_to",
+    "exponential",
+    "failure_rate_pct",
+    "failure_threshold",
+    "false",
+    "fifo",
+    "fixed",
+    "flow_policy_v1",
+    "full",
+    "governance",
+    "half_open_max_probes",
+    "half_open_success_threshold",
+    "history_max_events",
+    "indexed_attributes",
+    "indexed_state_meta",
+    "jitter_pct",
+    "kind",
+    "latency_threshold_ms",
+    "lease_size",
+    "ledger",
+    "limit",
+    "limits",
+    "linear",
+    "max_active_ms",
+    "max_ms",
+    "max_retries",
+    "min_calls",
+    "minimal",
+    "mode",
+    "nil",
+    "none",
+    "off",
+    "open_ms",
+    "parallel",
+    "require_idempotency_key",
+    "retention",
+    "retry",
+    "sampled",
+    "states",
+    "strict_global",
+    "timeout_ms",
+    "true",
+    "ttl_ms",
+    "type",
+    "unit",
+    "version",
+    "window_ms",
+];

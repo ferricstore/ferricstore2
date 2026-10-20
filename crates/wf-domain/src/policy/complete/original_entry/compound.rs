@@ -44,10 +44,17 @@ pub(super) fn parse(
             } else {
                 u64::from(count)
             };
-            for _ in 0..terms {
-                scan::term(raw, safety, state, output, depth + 1, charge)?;
+            let root = state.6 && usize::try_from(span.start).ok() == Some(state.8.0);
+            for ordinal in 0..terms {
+                let (_, child) = scan::term(raw, safety, state, output, depth + 1, charge)?;
+                if root && matches!(span.tag(), 104 | 105) && count == 3 {
+                    state.8.1[usize::try_from(ordinal).map_err(|_| overflow())? + 1] = child;
+                }
             }
             if span.tag() == 108 {
+                if root && count == 0 {
+                    state.8.0 = state.0;
+                }
                 let (tail, meaning) = scan::term(raw, safety, state, output, depth + 1, charge)?;
                 span.keys = tail;
                 if count == 0 {
@@ -74,14 +81,36 @@ pub(super) fn envelope(
     safety: &OriginalEtfSafety<'_>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<Option<(u64, u32)>, Error> {
-    pay(charge, 128)?;
     let root = resolve(spans, 0);
     let tuple = spans[root as usize];
+    let mut facts = [
+        tuple,
+        TermSpan::default(),
+        TermSpan::default(),
+        TermSpan::default(),
+    ];
+    let mut policy = 0;
+    if matches!(tuple.tag(), 104 | 105) && tuple.keys == 3 {
+        facts[1] = spans[resolve(spans, root + 1) as usize];
+        let generation = spans[root as usize + 1].next;
+        facts[2] = spans[resolve(spans, generation) as usize];
+        policy = spans[generation as usize].next;
+        facts[3] = spans[resolve(spans, policy) as usize];
+    }
+    Ok(envelope_facts(raw, facts, safety, charge)?.map(|generation| (generation, policy)))
+}
+
+pub(super) fn envelope_facts(
+    raw: &[u8],
+    facts: [TermSpan; 4],
+    safety: &OriginalEtfSafety<'_>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<u64>, Error> {
+    pay(charge, 128)?;
+    let [tuple, name, generation, policy] = facts;
     if !matches!(tuple.tag(), 104 | 105) || tuple.keys != 3 {
         return Ok(None);
     }
-    let tag = resolve(spans, root + 1);
-    let name = spans[tag as usize];
     let actual = if matches!(name.tag(), 100 | 115 | 118 | 119) {
         safety.atoms.get(name.datum() as usize).copied()
     } else {
@@ -94,21 +123,18 @@ pub(super) fn envelope(
     if actual != Some("flow_policy_v1") {
         return Ok(None);
     }
-    let generation = spans[root as usize + 1].next;
-    let generation_span = spans[resolve(spans, generation) as usize];
     pay(charge, 128)?;
     let Some(generation) =
-        super::scalar::signed(raw, generation_span).and_then(|value| u64::try_from(value).ok())
+        super::scalar::signed(raw, generation).and_then(|n| u64::try_from(n).ok())
     else {
         return Ok(None);
     };
     if generation > 9_007_199_254_740_991 {
         return Ok(None);
     }
-    let policy = spans[(spans[root as usize + 1].next) as usize].next;
     pay(charge, 128)?;
-    if spans[resolve(spans, policy) as usize].tag() != 116 {
+    if policy.tag() != 116 {
         return Ok(None);
     }
-    Ok(Some((generation, policy)))
+    Ok(Some(generation))
 }

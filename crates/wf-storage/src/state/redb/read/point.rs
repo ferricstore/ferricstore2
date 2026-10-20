@@ -1,16 +1,12 @@
 //! One borrowed point guard, admission, then one independently owned result.
 
 use super::super::{
-    admission::{
-        copy_bytes, policy_error, storage_error, table_error, total, value_error, wire_record_limit,
-    },
+    admission::{copy_bytes, storage_error, table_error, total, value_error, wire_record_limit},
     store::RedbStateTransaction,
 };
 use crate::state::{key, value};
 use redb::ReadableTable;
-use wf_domain::policy::complete::{
-    CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits, decode_complete_policy_value_v2,
-};
+use wf_domain::policy::complete::{CompletePolicyValue, PolicySchemaCharge, PolicySchemaLimits};
 use wf_domain::workflow::control::ControlState;
 use wf_domain::workflow::request::RetainedOutcome;
 use wf_ports::state::{StateTransactionError, StoredWorkflowRecord};
@@ -171,44 +167,13 @@ impl RedbStateTransaction<'_> {
         limits: PolicySchemaLimits,
         charge: &mut PolicySchemaCharge,
     ) -> Result<Option<CompletePolicyValue>, StateTransactionError> {
-        if limits.policy_limits().max_states() > self.limits.schema().policy_limits().max_states() {
-            return Err(StateTransactionError::InvalidChanges);
+        match self.read_stored_policy(tenant, workflow_type, limits, charge)? {
+            None => Ok(None),
+            Some(wf_ports::state::StoredPolicyValue::Complete(value)) => Ok(Some(*value)),
+            Some(wf_ports::state::StoredPolicyValue::Original(_)) => {
+                Err(StateTransactionError::UnsupportedPolicyFormat)
+            }
         }
-        self.step()?;
-        let scope = self.scope(tenant)?;
-        let key = self.key(
-            &[
-                self.group.as_bytes(),
-                self.recovery.as_bytes(),
-                tenant.as_bytes(),
-                workflow_type,
-            ],
-            0,
-            |cap| key::encode_policy_key(&scope, workflow_type, cap),
-        )?;
-        self.opened()?;
-        let table = self
-            .write
-            .open_table(self.rows_table)
-            .map_err(table_error)?;
-        let guard = table.get(key.as_slice()).map_err(|e| storage_error(&e))?;
-        let Some(guard) = guard else {
-            return Ok(None);
-        };
-        self.recovery_row(&key, guard.value())?;
-        let bytes = guard
-            .value()
-            .len()
-            .checked_mul(216)
-            .and_then(|n| n.checked_add(2_048))
-            .ok_or(StateTransactionError::Limit)?;
-        self.admit_read(bytes)?;
-        let value =
-            decode_complete_policy_value_v2(guard.value(), limits, charge).map_err(policy_error)?;
-        if value.data().workflow_type != workflow_type {
-            return Err(StateTransactionError::Corrupt);
-        }
-        Ok(Some(value))
     }
     pub(in super::super) fn read_record(
         &self,

@@ -70,7 +70,7 @@ pub(in crate::state::redb) fn retained(
     profile: SnapshotLimits,
     layout: u16,
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
-    if matches!(layout, 4 | 5) {
+    if matches!(layout, 4..=6) {
         let supported = tx.limits.snapshot_limits();
         return super::catalog::retained(tx, charge, supported);
     }
@@ -96,7 +96,7 @@ fn retained_inner(
     expected: ([u8; 32], usize, usize),
 ) -> Result<(), Error> {
     let (layout, saved) = recovery::cohort(tx, charge)?;
-    if !matches!(layout, 3 | 5) || format::facts(tx, profile)? != expected {
+    if !matches!(layout, 3 | 5 | 6) || format::facts(tx, profile)? != expected {
         return Err(Error::Corrupt);
     }
     tx.step()?;
@@ -241,7 +241,7 @@ pub(super) fn complete(
     if layout < 3 {
         return Err(Error::UnsupportedLayout);
     }
-    if tables != if matches!(layout, 4 | 5) { 6 } else { 4 } {
+    if tables != if matches!(layout, 4..=6) { 6 } else { 4 } {
         return Err(Error::Corrupt);
     }
     retained(tx, charge, profile, layout)
