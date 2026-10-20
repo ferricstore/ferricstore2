@@ -64,23 +64,30 @@ direct replay regression are authored but await coherent compilation and actual
 before/after execution. Legacy test callers are being adapted to the shared
 policy carrier with their assertions and resource limits preserved.
 
-The Domain provider compiles; four frozen interoperability tests and all 140
-tests in the affected Domain target passed before additional compatibility
-coverage. The frozen keyword regression reaches InvalidAuthority; two newer
-independent binary kind/mode cases reach existing-policy validation errors.
-Three eager padded-number cases pass both phases and preserve exact raw bytes;
-their suspected source defect was withdrawn after checking the paid lexical
-normalization. No numeric repair is selected. The approved compatibility child
-keeps every test file within 600 lines. All 26 changed Domain production files
-satisfy 400 formatted lines; strict Domain Clippy now has one closure spelling
-issue after the reviewed lint-only repair. All three Ports interop tests pass
-with independently corrected existing Original verifier accounting. The Storage
-target compiles; S1 reaches its final expanded reducing-merge fixture, which
-exceeds the unchanged public patch byte cap. The reviewed fixture correction
-retains that exact rejection and uses two valid reductions with independent full
-ETF/cohort/reopen checks. Its large expected-wire validator receives the explicit
-expanded schema; old callers keep their original profile and both validations
-still share one account. This corrected positive fixture is not yet executed.
+The keyword/binary correction now passes all 140 affected Domain tests and all
+109 affected Ports tests on unchanged scoped inputs, with zero failures,
+ignored or filtered tests. This includes the new binary labels, flat/chained
+keyword groups, zero-LIST alias preservation and exact original MAP accounting.
+Three padded-number controls pass both phases; their suspected source defect was
+withdrawn after checking the paid lexical normalization. No numeric repair or
+profile-table expansion is selected. All test files remain within 600 lines.
+The reviewed whole-helper moves and count extraction now satisfy the production
+400-line limit; every Rust file satisfies its physical limit. Strict Domain
+all-target Clippy passes. Both reviewers independently reconstructed all ten
+pregeometry files and accepted the unchanged behavior and accounting.
+
+The Storage target compiles. S1's original all-removal request exceeds the fixed
+public patch cap; the reviewed correction preserves its exact rejection and
+uses two legal reductions with independent full ETF/cohort/reopen checks. The
+large expected-wire helper has the explicit expanded schema and still shares one
+account through both validations. S1 now passes the exact typed2bn WorkBytes
+refusal with complete rollback/default reopen, then both legal positives under
+the reviewed source-derived8bn/W10bn configuration. Only reduction R is256MiB;
+original GET/lazy defaults and production limits stay exact. All five other new
+storage scenarios pass, including physical faults and mixed snapshots. Both new
+node recovery/snapshot cases pass. Controlled removal of the replay layout guard
+reproduces invalid acceptance on actual layout3; restoring it passes every S3
+control. This late guard check is not claimed as tests-before-code TDD.
 Remaining storage/node and
 full-workspace execution is still required; no new whole-workspace PASS exists.
 Full pinned Elixir scenario/assertion/setup/profile

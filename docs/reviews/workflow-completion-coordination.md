@@ -47617,3 +47617,67 @@ depth and verbatim Debug move if needed; PERF9f18efe6 records own final fixture
 inverses and prospective capacity derivation. No new artifact/model/profile is
 introduced. Writer alone continues the explicitly released Domain behavior work;
 Root alone owns formatter/Cargo/Git. Full goal remains active.
+
+ROOT-B1-BEHAVIOR-EXECUTION2 (2026-10-20)
+
+Prior goal turn was PROGRESS: c2614fd plus real binary/numeric execution changed
+next actions. This turn adds2579c74/e3a12f3 and actual corrected-provider results.
+D3 PASS1/139filtered raw3291064+467/bd0cc08c. FULL affected Domain140 PASS,0failed,
+ignored,filtered: raw3291687+12971/fc9c9072,299 inputs8a36fca6 unchanged. All new
+binary/numeric/flat/chained controls and exact MAP D4 completed. FULL affected
+Ports109 PASS with0failed/ignored/filtered: raw3308098+10934/2b9b3c0d,360 inputs
+3b5cc0ae unchanged. These scoped results are not whole-workspace acceptance.
+
+Strict Domain370/bf843161 unchanged fails solely rewrite_keyword104/100,
+raw3306839+1103/6bdbd965. Formatted rawpatch411/d52a1f82, retry402/1323a7ad,
+indexed406/fc053bd1 and indexedvalue414/3a352675 exceed400. After ALL pins ended,
+Root released ARCH's exact existing-home moves: valid_state→rawstates;
+retry map→value/map raw_group_parent with narrow existing reexports;
+reserve_peak→original_entry parent; raw_keyword_start→existing compound child.
+The sole lint extraction moves exact expected-count expression to ordinary
+keyword_expected in existing value/map, with same observations/call position.
+No new file/type/alias/model or behavioral change is released by this window.
+
+Corrected S1 first actual result590/502ff5a3 unchanged fails WorkBudget,
+raw3304821+880/7f5b425a. Stage-only context rerun590/d618c66b unchanged,
+raw3305855+806/436a4c65, localizes FIRST legal reduction0 APPLY; front succeeds,
+expected result/reopen are later unexecuted. Observed2000000014 versus2bn is
+combined represented admission, NOT a sampled standalone g. PERF independently
+finds duplicate_slot's16-per-prior-unique scan:16*15360*15359/2=1887313920g;
+required V2decode24725337+converter88030268 already gives2000069525g before
+other work/p. This legitimate current-profile refusal is not a correctness RED
+or permission to calibrate a new cap. Paired atomic refusal and source-derived
+adequate positive capacity remain under finite review; no source fix authorized.
+Full parity/runtime/Linux/M1–M8 and whole-goal requirements remain open.
+
+ROOT-B1-SCOPED-FINAL3 (2026-10-20)
+
+All fifteen B1 identities have now passed scoped executions; a coherent whole
+workspace sequence remains required. Finalgeometry strictDomain370/5165a5dd
+unchanged PASS at3321319+167/fb371a31. The sole intervening testlint was a needless
+Result in assert_scalar_forms: only caller?, unitreturn and Ok removed; ARCH's
+whole inverse TRUE to469/11196acd. Currentchild468/4c1b4406 preservesallassertions.
+OtherfiveStoragePASS590/22b25e02 unchanged raw3321646+1133/d4be08a6 (96filtered).
+Controlled source-only removal of TWO layout guards yields337/785a1b7e and real
+S3 failure Ok3 versus InvalidChanges,590/fde9b0f2 unchanged raw3322951+1101/eabb4b4f.
+Finally restoration exactly344/73f30 is byteverified; S3PASS590/22b25e02 unchanged
+raw3324209+500/4f2939d7. This late guard test is not pre-code TDD. NodeN1/N2 both
+PASS524/3eda67c3 unchanged raw3324867+1470/1ad94f05 (18/43filtered respectively).
+
+ARCH2a3cc287 selected S1 test-only default-preserving factories, checkedwork/temp/W,
+reduction-onlyR256, typedlow2bn abort/cohort/defaultreopen, SAMEframehigh8bn/W10bn
+retry andbothfullpositivecohorts. PERF91d959f8 sourceupper7136870912<8bn and
+R/Wbounds were actuallywhole/hashread before implementation. Currentexpanded
+509LF/18025B/17ce0c207f64df4c638722872599ca031a71af2bc7a7557100b76e3358f6a031
+passes S1:590/83245d2a unchanged raw3326511+483/59d5e8d0,1PASS/100filtered. All low
+rollback and both positive full oracles/reopens actuallycomplete. Both reviewers
+independently reconstruct full2579c74 preimage432/94c7 with explicitly scoped
+stage/capacity inverses. Root independently reconstructs immediate435/15500B/
+071e9e2aca426288d7a22dd4eb2d8f22703e86396daaea8401a82a5f3356d139
+from that Gitbase plus four stage-only contexts. No production cap/algorithm/
+fee/profile-table change or measured optimization is claimed. Quadratic slot
+scanning remains a concrete performance candidate for the required later work.
+
+Physical census: all868 Rust files satisfy production400/tooling-tests600.
+Finalsource/helper reviews have no open finding. Production remains uncommitted
+pending whole-workspace checks; full parity/runtime/both-host/allM1–M8 remain open.

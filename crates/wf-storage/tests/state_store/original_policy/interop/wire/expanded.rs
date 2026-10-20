@@ -9,37 +9,56 @@ use wf_storage::{state::RedbStateStore, transaction::with_original_policy_get_re
 use wf_types::identity::{PartitionId, RequestId};
 
 fn expanded_caps() -> TestResult<wf_storage::transaction::RecordBatchTransactionLimits> {
+    expanded_caps_with_work(2_000_000_000, 3_500_000_000)
+}
+fn expanded_caps_with_work(
+    work: u64,
+    workspace: usize,
+) -> TestResult<wf_storage::transaction::RecordBatchTransactionLimits> {
     use wf_domain::policy::{complete::PolicySchemaLimits, installation::PolicyLimits};
     let mut caps = f::limits();
-    caps.schema = PolicySchemaLimits::new(PolicyLimits::default(), 2_000_000_000)?;
+    caps.schema = PolicySchemaLimits::new(PolicyLimits::default(), work)?;
     caps.maximum_read_bytes = 128 * 1_048_576;
     caps.maximum_staging_bytes = 256 * 1_048_576;
     caps.maximum_adapter_bytes = 512 * 1_048_576;
     caps.maximum_read_steps = 1_000_000;
-    caps.workspace_bytes = 3_500_000_000;
+    caps.workspace_bytes = workspace;
     Ok(caps)
 }
 fn expanded_store_limits() -> TestResult<wf_storage::state::StateStoreLimits> {
+    expanded_store_limits_with_work(2_000_000_000, 3_500_000_000)
+}
+fn expanded_store_limits_with_work(
+    work: u64,
+    workspace: usize,
+) -> TestResult<wf_storage::state::StateStoreLimits> {
     use wf_storage::state::StateStoreLimits;
-    let caps = expanded_caps()?;
+    let caps = expanded_caps_with_work(work, workspace)?;
     Ok(StateStoreLimits::new(
         caps.codec.admission(),
         caps.schema,
         (1000, 256 * 1_048_576),
         (1_000_000, 1_073_741_824, 10_000_000),
-        2_000_000_000,
-        3_500_000_000,
+        usize::try_from(work)?,
+        workspace,
     )?
     .with_history_max_events_limit(64)?
     .with_original_policy_reply_defaults(f::store_limits(64)?.original_policy_reply_defaults())?)
 }
 fn expanded_open(path: &std::path::Path) -> TestResult<RedbStateStore> {
+    expanded_open_with_work(path, 2_000_000_000, 3_500_000_000)
+}
+fn expanded_open_with_work(
+    path: &std::path::Path,
+    work: u64,
+    workspace: usize,
+) -> TestResult<RedbStateStore> {
     let scope = f::scope()?;
     Ok(RedbStateStore::open(
         path,
         scope.group().clone(),
         scope.recovery().clone(),
-        expanded_store_limits()?,
+        expanded_store_limits_with_work(work, workspace)?,
     )?)
 }
 pub(super) fn run(dir: &std::path::Path) -> TestResult {
@@ -334,7 +353,9 @@ fn pure_lazy(
 fn reducing_merge(dir: &std::path::Path, before: &f::Cohort, names: &[Vec<u8>]) -> TestResult {
     let path = dir.join("expanded-reducing-merge");
     let scope = f::scope()?;
-    let caps = expanded_caps()?;
+    let workspace = usize::try_from(10_000_000_000_u64)?;
+    let mut caps = expanded_caps_with_work(8_000_000_000, workspace)?;
+    caps.maximum_read_bytes = 256 * 1_048_576;
     // Fork the exact actually validated complete predecessor, not an ETF
     // surrogate; the accepted stored output still obeys persisted ETF263168.
     drop(f::create(&path, &[], 64)?);
@@ -364,7 +385,8 @@ fn reducing_merge(dir: &std::path::Path, before: &f::Cohort, names: &[Vec<u8>]) 
             Raw::Map(&attrs),
             Raw::List(&[]),
             &mut PolicySchemaCharge::new(caps.schema),
-        )?;
+        )
+        .map_err(|error| format!("reduction {at} front: {error}"))?;
         let empty_map = f::etf_map(&[])?;
         let rows = names[range.end..]
             .iter()
@@ -373,7 +395,10 @@ fn reducing_merge(dir: &std::path::Path, before: &f::Cohort, names: &[Vec<u8>]) 
         let states = f::etf_map(&rows)?;
         let raw = f::etf_policy(at + 2, b"job", &[(b"states", &states)])?;
         assert_eq!(raw.len(), if at == 0 { 261_173 } else { 53 });
-        let mut store = expanded_open(&path)?;
+        if at == 0 {
+            assert_reduction_budget_abort(&path, before, &bytes)?;
+        }
+        let mut store = expanded_open_with_work(&path, 8_000_000_000, workspace)?;
         let wf_storage::transaction::RecordBatchTransactionOutcome::Retained { outcome, .. } =
             f::apply(
                 &mut store,
@@ -381,7 +406,8 @@ fn reducing_merge(dir: &std::path::Path, before: &f::Cohort, names: &[Vec<u8>]) 
                 at,
                 caps,
                 &mut PolicySchemaCharge::new(caps.schema),
-            )?
+            )
+            .map_err(|error| format!("reduction {at} apply: {error}"))?
         else {
             return Err("reducing merge did not retain".into());
         };
@@ -395,12 +421,63 @@ fn reducing_merge(dir: &std::path::Path, before: &f::Cohort, names: &[Vec<u8>]) 
                 f::frame_intent(&bytes, at)?,
                 (1, &raw),
                 caps.schema,
-            )?
+            )
+            .map_err(|error| format!("reduction {at} expected outcome: {error}"))?
         );
         drop(store);
         assert_eq!(f::cohort(&path)?, expected);
-        drop(expanded_open(&path)?);
+        drop(
+            expanded_open_with_work(&path, 8_000_000_000, workspace)
+                .map_err(|error| format!("reduction {at} reopen: {error}"))?,
+        );
     }
+    Ok(())
+}
+
+fn assert_reduction_budget_abort(
+    path: &std::path::Path,
+    before: &f::Cohort,
+    bytes: &[u8],
+) -> TestResult {
+    use wf_domain::policy::complete::{
+        CompletePolicyReplaceApplyError, CompletePolicyRequestError,
+        OriginalCompletePolicyReplaceApplyError, PolicySchemaError,
+    };
+    use wf_storage::transaction::{
+        OriginalPolicyTransactionError, apply_original_policy_set_transaction,
+    };
+
+    let mut caps = expanded_caps()?;
+    caps.maximum_read_bytes = 256 * 1_048_576;
+    let mut store = expanded_open(path)?;
+    let Err(error) = apply_original_policy_set_transaction(
+        &mut store,
+        &f::scope()?,
+        bytes,
+        f::log(0),
+        caps,
+        &mut PolicySchemaCharge::new(caps.schema),
+    ) else {
+        return Err("small reduction budget unexpectedly accepted".into());
+    };
+    assert!(
+        matches!(
+            error,
+            OriginalPolicyTransactionError::Original(
+                OriginalCompletePolicyReplaceApplyError::Replace(
+                    CompletePolicyReplaceApplyError::Request(
+                        CompletePolicyRequestError::Encoding(EncodingError::Schema(
+                            PolicySchemaError::WorkBytes { bytes, maximum }
+                        ))
+                    )
+                )
+            ) if maximum == 2_000_000_000 && bytes > maximum
+        ),
+        "small reduction budget error: {error:?}"
+    );
+    drop(store);
+    assert_eq!(f::cohort(path)?, *before);
+    drop(expanded_open(path)?);
     Ok(())
 }
 

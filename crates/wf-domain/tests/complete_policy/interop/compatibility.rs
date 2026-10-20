@@ -45,7 +45,7 @@ fn keyword_retry(changed: bool, keywords: bool) -> Vec<u8> {
 
 pub(super) fn assert_keyword_groups(profile: PolicySchemaLimits) -> TestResult {
     use wf_domain::policy::complete::decode_original_complete_policy_entry_portable;
-    assert_scalar_forms(profile)?;
+    assert_scalar_forms(profile);
     for keywords in [false, true] {
         let raw = keyword_wire(7, 0, keywords);
         let mut charge = PolicySchemaCharge::new(profile);
@@ -238,7 +238,7 @@ fn chained_wire(generation: u64, phase: u8) -> Vec<u8> {
     keyword_wire_full(generation, phase, true, retry, true)
 }
 
-fn assert_scalar_forms(profile: PolicySchemaLimits) -> TestResult {
+fn assert_scalar_forms(profile: PolicySchemaLimits) {
     // Both calls execute before either result is asserted.
     let results = [
         scalar_form(profile, false),
@@ -251,7 +251,6 @@ fn assert_scalar_forms(profile: PolicySchemaLimits) -> TestResult {
         results.iter().all(Result::is_ok),
         "binary kind/mode and padded max-active/retry/retention results: {results:?}"
     );
-    Ok(())
 }
 
 fn scalar_form(profile: PolicySchemaLimits, mode_case: bool) -> TestResult {
