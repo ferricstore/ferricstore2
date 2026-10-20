@@ -204,7 +204,7 @@ fn original_receipt_precedes_changed_format_context_and_order() -> TestResult {
         drop(store);
         assert_eq!(f::cohort(&path)?, expected);
         let (advance, _) = install(&path, b"later", b"expiry-clock", next + 2, 1100, 65)?;
-        assert!(!advance.is_empty());
+        assert_ne!(advance, [] as [u8; 0]);
         expected = f::cohort(&path)?;
         let mut store = f::open(&path, 65)?;
         assert!(matches!(

@@ -2,7 +2,8 @@
 use super::{TestResult, fixtures as f};
 use std::path::Path;
 use wf_domain::policy::complete::{
-    CompletePolicyEncodingError as EncodingError, OriginalPolicyGetRejection, PolicySchemaCharge,
+    CompletePolicyEncodingError as EncodingError, OriginalPolicyGetRejection,
+    OriginalPolicyReplyError, OriginalPolicyReplyValue, PolicySchemaCharge,
     RawFlowPolicyValue as Raw,
 };
 use wf_domain::workflow::request::{RetainedOutcome, RetainedStatus};
@@ -115,12 +116,12 @@ fn assert_set_reply(
     assert_eq!(root.map_len(), Some(10));
     assert_eq!(
         root.atom_field("type", charge)?
-            .and_then(|v| v.binary_bytes()),
+            .and_then(OriginalPolicyReplyValue::binary_bytes),
         Some(b"job".as_slice())
     );
     assert_eq!(
         root.atom_field("max_active_ms", charge)?
-            .and_then(|v| v.integer()),
+            .and_then(OriginalPolicyReplyValue::integer),
         maximum
     );
     let states = root
@@ -133,7 +134,7 @@ fn assert_set_reply(
     assert_eq!(
         state
             .atom_field("mode", charge)?
-            .and_then(|v| v.atom_bytes()),
+            .and_then(OriginalPolicyReplyValue::atom_bytes),
         Some(b"parallel".as_slice())
     );
     let policy = state
@@ -142,7 +143,7 @@ fn assert_set_reply(
     assert_eq!(
         policy
             .atom_field("max_retries", charge)?
-            .and_then(|v| v.integer()),
+            .and_then(OriginalPolicyReplyValue::integer),
         Some(retry)
     );
     let retention = state
@@ -151,7 +152,7 @@ fn assert_set_reply(
     assert_eq!(
         retention
             .atom_field("history_max_events", charge)?
-            .and_then(|v| v.integer()),
+            .and_then(OriginalPolicyReplyValue::integer),
         Some(64)
     );
     assert!(iter.next(charge)?.is_none());
@@ -176,20 +177,21 @@ fn get(
         profile,
         &mut charge,
         |reply, charge| {
-            assert!(std::ptr::eq(&*charge, account));
+            assert!(std::ptr::eq(std::ptr::from_ref(&*charge), account));
             visited += 1;
-            let reply = reply.expect("real GET reply");
+            let reply =
+                reply.map_err(|_| OriginalPolicyReplyError::Encoding(EncodingError::Malformed))?;
             assert_eq!(reply.generation(), generation);
             let root = reply.root();
             assert_eq!(root.map_len(), Some(10));
             assert_eq!(
                 root.atom_field("type", charge)?
-                    .and_then(|v| v.binary_bytes()),
+                    .and_then(OriginalPolicyReplyValue::binary_bytes),
                 Some(b"job".as_slice())
             );
             assert_eq!(
                 root.atom_field("max_active_ms", charge)?
-                    .and_then(|v| v.integer()),
+                    .and_then(OriginalPolicyReplyValue::integer),
                 maximum
             );
             let returned = root
@@ -203,7 +205,7 @@ fn get(
                 assert_eq!(
                     value
                         .atom_field("mode", charge)?
-                        .and_then(|v| v.atom_bytes()),
+                        .and_then(OriginalPolicyReplyValue::atom_bytes),
                     Some(*mode)
                 );
             }
@@ -360,7 +362,8 @@ fn present_gen0_big_integer_and_get_error_order() -> TestResult {
         profile,
         &mut charge,
         |reply, charge| {
-            let reply = reply.expect("present zero");
+            let reply =
+                reply.map_err(|_| OriginalPolicyReplyError::Encoding(EncodingError::Malformed))?;
             let value = reply
                 .root()
                 .atom_field("version", charge)?
@@ -378,6 +381,7 @@ fn present_gen0_big_integer_and_get_error_order() -> TestResult {
         } else {
             tight.maximum_read_bytes = 1;
         }
+        let mut visited = false;
         assert!(matches!(
             with_original_policy_get_reply(
                 &mut store,
@@ -386,12 +390,16 @@ fn present_gen0_big_integer_and_get_error_order() -> TestResult {
                 &Raw::List(&[]),
                 tight,
                 &mut PolicySchemaCharge::new(profile.schema),
-                |_, _| panic!("refused read must not visit")
+                |_, _| {
+                    visited = true;
+                    Ok(())
+                }
             ),
             Err(OriginalPolicyTransactionError::Transaction(
                 StateTransactionError::Limit
             ))
         ));
+        assert!(!visited);
         get(&mut store, 0, None, &[])?;
     }
     drop(store);
@@ -461,11 +469,11 @@ fn unchanged_effects_preserve_full_policy_and_changed_effects_refuse_atomically(
     publication(&path, b"empty", 1, 0, &bytes, &mut expected, Some(&raw))?;
     let attrs = [Raw::Binary(b"customer")];
     let governance = [(Raw::Atom("effects"), Raw::Map(&[]))];
-    let patch = [
+    let fields = [
         (Raw::Atom("indexed_attributes"), Raw::List(&attrs)),
         (Raw::Atom("governance"), Raw::Map(&governance)),
     ];
-    let changed = frame(b"index-change", 2, Raw::Map(&patch), Raw::List(&[]))?;
+    let changed = frame(b"index-change", 2, Raw::Map(&fields), Raw::List(&[]))?;
     let mut store = f::open(&path, 64)?;
     let profile = f::limits();
     assert!(
@@ -536,11 +544,11 @@ fn assert_unchanged_rich_and_meta(path: &Path, expected: &mut f::Cohort) -> Test
     )?;
     publication(path, b"unchanged", 3, 1, &bytes, expected, Some(&raw))?;
     f::assert_original_governance_claim_refused(path, 2, expected)?;
-    let patch = [(
+    let attrs = [(
         Raw::Atom("indexed_state_meta"),
         Raw::List(&[Raw::Binary(b"customer")]),
     )];
-    let bytes = frame(b"meta-change", 4, Raw::Map(&patch), Raw::List(&[]))?;
+    let bytes = frame(b"meta-change", 4, Raw::Map(&attrs), Raw::List(&[]))?;
     let mut store = f::open(path, 64)?;
     let profile = f::limits();
     let error = f::apply(

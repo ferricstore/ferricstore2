@@ -4,7 +4,9 @@ use super::super::{
     CommittedRecoveryError, Error, SnapshotLimits, StateSnapshotStore, disk_backend,
     recover_snapshotted,
 };
-use super::{TestResult, artifact, caps, cohort, f, inspect, legacy_base, normal, policy, seed};
+use super::{
+    Cohort, TestResult, artifact, caps, cohort, f, inspect, legacy_base, normal, policy, seed,
+};
 use sha2::{Digest, Sha256};
 use std::{
     io::Cursor,
@@ -138,7 +140,7 @@ fn pending_cohorts(
     old: &[u8],
     wire: &[u8],
     transition: SnapshotTransition,
-) -> TestResult<([Option<f::Rows>; 6], [Option<f::Rows>; 6])> {
+) -> TestResult<(Cohort, Cohort)> {
     let old_facts = (
         Sha256::digest(old).into(),
         before[2].as_ref().ok_or("old meta")?.len() + before[3].as_ref().ok_or("old rows")?.len(),
@@ -150,10 +152,10 @@ fn pending_cohorts(
         wire.len(),
     );
     let mut pending = before.clone();
-    pending[0] = source[0].clone();
-    pending[1] = source[1].clone();
-    pending[4] = source[4].clone();
-    pending[5] = source[5].clone();
+    pending[0].clone_from(&source[0]);
+    pending[1].clone_from(&source[1]);
+    pending[4].clone_from(&source[4]);
+    pending[5].clone_from(&source[5]);
     pending[0].as_mut().ok_or("live meta")?.insert(
         b"snapshot".to_vec(),
         descriptor([Some(old_facts), Some(new_facts)], 1, 0, Some(transition))?,

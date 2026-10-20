@@ -346,12 +346,13 @@ fn mixed_lineage(dir: &Path) -> TestResult {
         &path,
         &mut expected,
         &mut log,
-        (facts3, facts5),
+        facts3,
+        facts5,
         (&old3, &old5),
     )?;
     assert_eq!((expected[2].clone(), expected[3].clone()), frozen3);
     assert_eq!((expected[4].clone(), expected[5].clone()), frozen5);
-    lineage_transitions(&path, &mut expected, &mut log, (facts3, facts5))?;
+    lineage_transitions(&path, &mut expected, &mut log, facts3, facts5)?;
     drop(log);
     Ok(())
 }
@@ -360,7 +361,8 @@ fn lineage_original(
     path: &Path,
     expected: &mut f::Cohort,
     log: &mut RedbLogStore,
-    facts: (([u8; 32], usize, usize), ([u8; 32], usize, usize)),
+    facts3: ([u8; 32], usize, usize),
+    facts5: ([u8; 32], usize, usize),
     old: (&[u8], &[u8]),
 ) -> TestResult {
     let s = f::scope()?;
@@ -395,14 +397,14 @@ fn lineage_original(
     f::upgrade6(
         expected,
         &s,
-        f::catalog(&s, [Some(facts.0), Some(facts.1)], Some(1), Some(0), None)?,
+        f::catalog(&s, [Some(facts3), Some(facts5)], Some(1), Some(0), None)?,
     )?;
     let mut state = f::open(path, 64)?;
     assert!(
         matches!(f::apply(&mut state,&frame,2,caps,&mut PolicySchemaCharge::new(caps.schema))?,
         RecordBatchTransactionOutcome::Retained{outcome,..}if outcome.response()==response)
     );
-    for (id, wanted) in [(facts.0.0, old.0), (facts.1.0, old.1)] {
+    for (id, wanted) in [(facts3.0, old.0), (facts5.0, old.1)] {
         let mut actual = Vec::new();
         assert!(
             state
@@ -422,20 +424,21 @@ fn lineage_transitions(
     path: &Path,
     expected: &mut f::Cohort,
     log: &mut RedbLogStore,
-    facts: (([u8; 32], usize, usize), ([u8; 32], usize, usize)),
+    facts3: ([u8; 32], usize, usize),
+    facts5: ([u8; 32], usize, usize),
 ) -> TestResult {
     let s = f::scope()?;
     let mut state = f::open(path, 64)?;
-    let transition = SnapshotTransition::local(log.state()?, f::log(1), facts.1.0)?;
+    let transition = SnapshotTransition::local(log.state()?, f::log(1), facts5.0)?;
     state.prepare_snapshot_transition(transition, SnapshotLimits::default())?;
-    log.purge_through(f::log(1), facts.1.0)?;
+    log.purge_through(f::log(1), facts5.0)?;
     state.finish_snapshot_transition(log.state()?, SnapshotLimits::default())?;
     drop(state);
     expected[2] = Some(BTreeMap::new());
     expected[3] = Some(BTreeMap::new());
     expected[0].as_mut().ok_or("no metadata")?.insert(
         b"snapshot".to_vec(),
-        f::catalog(&s, [None, Some(facts.1)], Some(1), Some(1), None)?,
+        f::catalog(&s, [None, Some(facts5)], Some(1), Some(1), None)?,
     );
     assert_eq!(f::cohort(path)?, *expected);
     let wire = f::stream3(expected)?;
@@ -456,7 +459,7 @@ fn lineage_transitions(
     frozen(expected, 0)?;
     expected[0].as_mut().ok_or("no metadata")?.insert(
         b"snapshot".to_vec(),
-        f::catalog(&s, [Some(current), Some(facts.1)], Some(0), Some(1), None)?,
+        f::catalog(&s, [Some(current), Some(facts5)], Some(0), Some(1), None)?,
     );
     let transition = SnapshotTransition::local(log.state()?, f::log(2), current.0)?;
     state.prepare_snapshot_transition(transition, SnapshotLimits::default())?;
@@ -464,7 +467,7 @@ fn lineage_transitions(
         b"snapshot".to_vec(),
         f::catalog(
             &s,
-            [Some(current), Some(facts.1)],
+            [Some(current), Some(facts5)],
             Some(0),
             Some(1),
             Some(transition),
@@ -480,7 +483,7 @@ fn lineage_transitions(
         state.snapshot_pin(SnapshotLimits::default())?,
         Some(current.0)
     );
-    for id in [facts.0.0, facts.1.0] {
+    for id in [facts3.0, facts5.0] {
         assert!(
             state
                 .snapshot_by_id(id, &mut Vec::new(), SnapshotLimits::default())?

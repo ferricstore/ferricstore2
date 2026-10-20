@@ -113,14 +113,14 @@ fn wrapped(path: &Path, fault: Arc<AtomicU8>) -> TestResult<RedbStateStore> {
 
 fn perform(
     store: &mut RedbStateStore,
+    scope: &wf_domain::workflow::request::RequestScope,
     frame: &[u8],
     at: u64,
 ) -> Result<RecordBatchTransactionOutcome, OriginalPolicyTransactionError> {
     let caps = f::limits();
-    let s = f::scope().expect("fixed nonempty scope");
     apply_original_policy_set_transaction(
         store,
-        &s,
+        scope,
         frame,
         f::log(at),
         caps,
@@ -143,7 +143,7 @@ fn fenced(store: &mut RedbStateStore, frame: &[u8]) -> TestResult {
         Err(StateTransactionError::Unavailable)
     ));
     assert_eq!(
-        perform(store, frame, 1),
+        perform(store, &f::scope()?, frame, 1),
         Err(OriginalPolicyTransactionError::Transaction(
             StateTransactionError::Unavailable
         ))
@@ -162,7 +162,7 @@ fn read_faults(dir: &Path) -> TestResult {
         } else {
             fault.store(3, Ordering::SeqCst);
             assert_eq!(
-                perform(&mut store, &frame, 1),
+                perform(&mut store, &f::scope()?, &frame, 1),
                 Err(OriginalPolicyTransactionError::Transaction(
                     StateTransactionError::Unavailable
                 ))
@@ -255,7 +255,7 @@ fn real_read_write_and_uncertain_faults_preserve_original_cohorts() -> TestResul
     // syncs. This is neither a final-flush label nor a power-loss simulation.
     fault.store(4, Ordering::SeqCst);
     assert_eq!(
-        perform(&mut store, &frame, 1),
+        perform(&mut store, &f::scope()?, &frame, 1),
         Err(OriginalPolicyTransactionError::Transaction(
             StateTransactionError::Uncertain
         ))
@@ -322,7 +322,7 @@ fn counted_case(path: &Path, failure: Option<(bool, usize)>) -> TestResult<(usiz
             read_left.store(offset, Ordering::SeqCst);
         }
     }
-    let result = perform(&mut store, &frame, 1);
+    let result = perform(&mut store, &f::scope()?, &frame, 1);
     let counts = (reads.load(Ordering::SeqCst), writes.load(Ordering::SeqCst));
     let injected = failure.is_none_or(|(write, _)| {
         if write {
@@ -393,7 +393,8 @@ fn reconcile(
         )?;
     }
     let mut store = f::open(path, 64)?;
-    let RecordBatchTransactionOutcome::Retained { outcome, .. } = perform(&mut store, frame, at)?
+    let RecordBatchTransactionOutcome::Retained { outcome, .. } =
+        perform(&mut store, &f::scope()?, frame, at)?
     else {
         return Err("reconciliation did not retain original reply".into());
     };
@@ -461,7 +462,7 @@ fn child(path: &Path, after: bool) -> TestResult {
         fault.store(6, Ordering::SeqCst);
     }
     assert!(
-        matches!(perform(&mut store,&frame()?,1)?,RecordBatchTransactionOutcome::Retained{outcome,..}
+        matches!(perform(&mut store,&f::scope()?,&frame()?,1)?,RecordBatchTransactionOutcome::Retained{outcome,..}
         if outcome.status()==RetainedStatus::Accepted)
     );
     if after {

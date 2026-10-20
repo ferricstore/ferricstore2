@@ -35,7 +35,7 @@ fn consumed_original_changes_repeat_all_fresh_authority() -> TestResult {
         };
         let generation = [
             Raw::Atom("expected_generation"),
-            Raw::Integer(if case == 4 { 0 } else { 1 }),
+            Raw::Integer(i128::from(case != 4)),
         ];
         let frame = public_frame(
             b"job",
@@ -304,7 +304,7 @@ fn accepted(
     };
     let expected = [
         Raw::Atom("expected_generation"),
-        Raw::Integer(if stale { 0 } else { 1 }),
+        Raw::Integer(i128::from(!stale)),
     ];
     let bytes = public_frame(
         b"job",

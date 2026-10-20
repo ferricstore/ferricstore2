@@ -1,4 +1,4 @@
-//! Exact actual ETF prefix, original head ID/empty capture and true RangeEnd.
+//! Exact actual ETF prefix, original head ID/empty capture and true `RangeEnd`.
 use super::super::{TestResult, fixtures as f};
 use std::path::Path;
 use wf_domain::policy::complete::{
@@ -399,7 +399,7 @@ fn prefix_limits(fifo: bool) -> (usize, usize, u64) {
         if fifo { 3 } else { 2 },
         if fifo { 2 } else { 0 },
         0,
-        if fifo { 1 } else { 0 },
+        usize::from(fifo),
         if fifo { 2 } else { 1 },
         2,
     ];

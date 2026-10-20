@@ -32,6 +32,8 @@ use wf_types::identity::RequestId;
 
 mod received;
 
+type Cohort = [Option<f::Rows>; 6];
+
 fn normal() -> RecordBatchTransactionLimits {
     let mut limits = f::driver_limits();
     limits.workspace_bytes = 512 * f::MIB;
@@ -147,7 +149,7 @@ fn publish(state: &mut RedbStateStore, body: &[u8], position: u64, generation: u
     Ok(())
 }
 
-fn cohort(dir: &Path) -> TestResult<[Option<f::Rows>; 6]> {
+fn cohort(dir: &Path) -> TestResult<Cohort> {
     let names = [
         "wf_state_meta_v1",
         "wf_state_rows_v1",
@@ -205,7 +207,7 @@ fn legacy_base(
     let member = f::member(EntryStamp::Unstamped, 4)?;
     f::append(&mut log, 0, member.as_bytes())?;
     f::apply_control(&mut state, 0, member.as_bytes())?;
-    let position = if complete { 1 } else { 0 };
+    let position = u64::from(complete);
     if complete {
         apply_complete(&mut log, &mut state)?;
     }
