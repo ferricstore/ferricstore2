@@ -15,7 +15,7 @@ resource accounts, all Fresh predecessor/context authority, FIFO activation,
 physical fault cuts and snapshot custody. Thirteen approved private production
 children preserve the existing crate boundaries and dependency policy.
 
-The coherent checkpoint passes **936 tests across 90 targets**, with zero
+Production checkpoint `b861d3d` passes **936 tests across 90 targets**, with zero
 failures, ignored or filtered tests, plus **six compile-fail examples across
 15 documentation targets**. Formatting, all-target compilation, strict all-target
 Clippy, warnings-denied rustdoc, architecture and reference/progress checks pass.
@@ -41,8 +41,11 @@ passing sequence, rather than counted as a production bug.
 Full product completion remains open. The next required work is same-type
 ETF/V2 interoperability, followed by actual runtime source profiles/order,
 authoritative indexed record effects and durable migration jobs. The concrete B1
-proposal is under architecture/performance review; no successor source release
-is implied by this checkpoint. Full pinned Elixir scenario/assertion/setup/profile
+test batch is now selected after architecture/performance review; its regression
+tests are being authored before implementation. Its first ports regression
+compiles and fails with the expected UnsupportedVersion on the existing code;
+strict target Clippy passes. Later assertions in that test have not run yet.
+No successor production source is released. Full pinned Elixir scenario/assertion/setup/profile
 parity, governing services, accepted consensus/runtime, application/transports
 and both Linux/macOS acceptance remain required. Progress remains 85 source-derived
 declarations, 95 mappings and 384 assertion links; this increment adds no parity

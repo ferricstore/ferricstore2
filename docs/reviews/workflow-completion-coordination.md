@@ -46870,3 +46870,77 @@ are NOT released by this component result. Concrete closure addresses actual
 existing homes, original encoded raw spans, prospective counting/layout ownership,
 lazy replace and transient-versus-persisted caps. B2 runtime profile/order,
 B3 authoritative indexed effects and B4 durable migration jobs stay required.
+
+
+### ROOT-B1-INTEROP-TEST-RELEASE1 — exact named tests-only assignment
+
+Previous goal turn was PROGRESS: b861d3d committed the coherent original-public
+component with 936 tests plus six docs and the separately qualified native/cached
+checks. Current source/tests are clean; full goal, Linux and parity stay open.
+Root actually whole/hash-read ARCH-M1M2-ORIGINAL-POLICY-INTEROP-B1-CREATE1 at
+3317960+26186, SHA2561f400832ea9eb72a9a5d804c12706ef8d931ba7fa53ccd11f6816bffee738537,
+in two contiguous chunks, the entire DOMAIN main/P1-P6 chain at4232368+46718/
+13d93b70ac847902ddcf9c79c321a3a97937567d181317ef1903312b22c8ccd2,
+and PERF2584941+13229 through P5/P6. Actual reciprocal review is closed.
+
+RELEASE TESTS ONLY under that exact creation decision: the nine named files,
+five existing target/feature registrations and fifteen named IDs. Writer owns
+crates/wf-domain/tests/complete_policy/interop.rs and interop/fixtures.rs plus
+its existing main registration, and storage tests/state_store/original_policy/
+interop.rs with interop/{wire,faults,snapshots}.rs plus its existing parent.
+Root owns ports tests/complete_policy_request/interop.rs and its main registration,
+node tests/recovery/original_policy/interop.rs and snapshot_recovery/original_policy/
+interop.rs with their existing original_policy parent registrations. Root first
+runs P1 using the EXISTING response validator and literal ETF to establish actual
+behavioral RED; other missing selected APIs may produce genuine compile RED.
+Every control must later execute before acceptance; no skipped assertion credit.
+
+D1-D4, P1-P3, S1-S6 and N1-N2 retain the exact CREATE1 names/oracles. Full FWSO
+is tested in storage, never a ports-to-storage edge. Node children reuse their
+actual parent fixtures, with only the selected received helper visibility if
+needed; no new path import/type/alias/protocol. Independent census/resource
+ledgers are test content before source: minimal policy m9,d1,J8864,E51,K563;
+PERF is deriving the complete event and owner frontiers from actual tariffs.
+ARCH's final message selects fused paid zero-J sizing: 4004 g for the minimal
+sizer and15402 for the encoder, with no redundant postbuild measure. Its narrow
+recorded supplement will bind exact placement. Preserve the old response2/nonETF
+UnsupportedVersion with g=p=0, and the new accepted-only RetainedOutcome version
+gate controls, without fake fields or silently editing old assertions.
+
+The six approved production children, existing union move/API changes and all
+new production bodies REMAIN HELD. No production release follows merely from
+this test assignment. Actual source/fixture reciprocal reviews and frozen real
+RED precede the disjoint implementation assignment. Root alone runs Cargo,
+formatter, Git and changes shared metadata. Further artifacts require concrete
+consultation; no new dependency, lint waiver, profile shrink or parity credit.
+B2 runtime profile/order, B3 indexed record effects and B4 durable jobs, all
+remaining original scenarios/setup/profiles and both OS targets stay required.
+
+
+### ROOT-B1-P1-RED1 — reviewed existing-API regression freeze
+
+Root authored only approved ports interop.rs P1 plus its one main registration.
+Final source is 8,877 bytes / 250 LF / SHA25691dd6b2ee91a9c325d2bac0cb35f0c52b0a4b829222e6f9d596dad432afd4c2f.
+The entire old parent is conserved by removing exactly mod interop; SHA6bd1af4d.
+ARCH and PERF independently packed ETF51/67 and FWPV40, reconstructed that parent,
+and reviewed every actual control. They caught an i32-only test helper before its
+later max-generation assertion; Root added canonical SMALL_BIG_EXT and both own
+whole-file inverses preserve every assertion. This is a setup correction, not a
+production defect or claim that the later assertion ran.
+
+The final corrected command compiles, runs exactly P1, then fails UnsupportedVersion
+at the new intent2/response2 path AFTER the first old-intent4 fixture health check.
+Actual exit101, 0 passed / 1 failed / 106 filtered. Raw main log3142572+697,
+SHA2565d23b2ee4cfc671102421b34a5f095b0b12994e394f079f9545be7cbf5fdfdcd.
+All 352 library/target/config inputs remain925f51a5a11286e0b3ba19f0b71338d24107f6540382b16983bd71f9d9ad910c.
+The later BIG67, metadata, profile/cap/EOF/generation controls are written but
+UNEXECUTED at this RED cutoff; they must all run after implementation. Target
+strict Clippy actually passes, raw3143397+165/a07b223ea20e079118aaba4fb0233497802689cafc6f09232602973c31de8355.
+No production source changed; future Some-install/query/predecessor P2 remains
+required and is not inferred from P1's accepted-with-no-install negative.
+
+Root whole/hash-read final ARCH3346739+5214/b2ff47d2 and PERF2608680+5375/58534cbb
+actual reviews, plus full independent D4 ledger2598170+10510/3b9c9b30. P1 is frozen
+before any new production body. Writer's disjoint domain/storage tests and Root's
+other ports/node identities continue; no production release, parity credit or
+whole-worktree acceptance follows. The last validated production remains b861d3d.

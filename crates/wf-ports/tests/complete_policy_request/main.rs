@@ -21,6 +21,7 @@ use wf_types::version::{CommittedTime, HlcTimestamp};
 mod accounting;
 mod core_patch;
 mod intent;
+mod interop;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
