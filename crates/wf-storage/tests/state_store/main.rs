@@ -27,6 +27,7 @@ use wf_types::version::{Fence, TimestampMillis};
 mod bootstrap;
 mod claim;
 mod control;
+mod core_policy;
 mod cursor;
 mod faults;
 mod fixtures;

@@ -4,6 +4,7 @@
 
 mod advance;
 mod claim;
+mod core_policy;
 #[path = "../../../wf-storage/tests/state_store/faults/backend.rs"]
 mod disk_backend;
 mod faults;

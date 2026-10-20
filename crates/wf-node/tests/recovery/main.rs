@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod claim;
+mod core_policy;
 mod faults;
 mod fixtures;
 mod history;

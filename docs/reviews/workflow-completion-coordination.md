@@ -45686,3 +45686,299 @@ policy/domain/ports/storage/node tests still need actual review/freeze and
 selected-contract RED before the exact disjoint source release. Current875GREEN
 belongs to8487ce7; this expected failing-test checkpoint is expressly incomplete.
 Full original/runtime/Linux/M1--M8 objective remains active.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-TEST-PRECISIONS2-3 — selected observation and real fault probes
+
+Root actually whole-read/hashverified ARCH API-PRECISION2,2991785+2189/
+a29bb8e37b6dd5ea506d1267064051002df31e0277d4d57a6118febb44ac624c,
+and TEST-PRECISION3,2993974+3515/
+6d35376fdfcd9456c90438903ada5ffdd9a9c004cbcc1b95cda21f859be48a42.
+The existing immutable PolicySchemaCharge::profile public-visibility-only change
+is SELECTED for the later source release, still HELD now. P4 adds the selected
+supplied wrong-account InvalidChanges/unchanged-gp control in its same identity.
+No codec variant, model, path, counter reset or fee is added.
+
+Root RELEASES TEST INSTRUMENTATION ONLY in the two existing selected shared
+files state_store/faults/backend.rs and faults.rs facade: exact optional
+read_probe/write_probe Arc<AtomicUsize> attempt/countdown tuples and
+fault_database_counted signature/reexport from ARCH. Root is sole writer;
+Writer may call it from selected S9. It continues delegating real FileBackend,
+counts actual attempted disk calls, preserves old mode3 before optional read
+probe and old4/6 growth/sync/ACK behavior. MAX disables injection, zero atomically
+fires once then MAX. Calibration counts only an armed actual operation; disarm
+before drops/reopen, explicit1..=4096 finite fixture counts, all calibrated read
+offsets and first/last writes, no semantic phase labels or native performance
+claims. This is authored support for the selected fault tests, not their passed
+execution, a new fake engine, product release or new test identity. The13-path
+production implementation remains HELD pending the remaining frozen tests/RED.
+
+
+ROOT TEST-PRECISION4 release: Root actually whole-read ARCH3006155+1399/
+8ade18eed2c2029deb4b7caa92b4d8b8db131ef4f9a2c626a466d161bec4604b.
+Writer may create exactly the private selected test child
+crates/wf-storage/tests/state_store/core_policy/activation/isolation.rs, move
+the complete S3 identity and extract only its final four assertion groups into
+the six-borrowed-argument same-child helper; sole mod isolation registration.
+This resolves actual formatted646LF parent geometry without a waiver. Tests
+become16 named paths with unchanged28 identities; production remains13 paths
+and held. Separately reviewed Create(None) fixture corrections are explicit
+semantic setup corrections, not claimed byte-identical helper moves; preserve
+the full original S1 real API chain and default budgets. Root's proposed
+queued-only S2 filter was withdrawn after actual Reverse(priority) inspection;
+existing Any/H1 selection remains correct.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-TEST-PRECISION5 — finite fixtures and reviewed coordinator tests
+
+Root actually whole-read/hash-verified ARCH final node/backend/P4 receipt
+3007554+4239/9fa11df701cf45e42f399766e42692724b3a5704b1a7d1e82508918e5f18458e,
+TEST-PRECISION5 3011793+2107/
+861a0ea1cca23319fbda91e30e9a9c7b3affd8cffd1a47047889f3f2daf6fbec,
+and PERF node/backend/P4 receipt2352219+11422/
+f3255bcb52d6f3af7c38fffc775cd3e85c87b34bd86a840814b86a97b2bb1099.
+Root releases only the exact existing-file restored S2/raw replace-helper move,
+mandatory-four/paired-ALT cohort inventory and actual scheduled S3 correction
+in TEST-PRECISION5. These are honest component setups, not a source Create
+counterpart. Source Create(None) still means due=now. S1 preserves its real
+source activation chain; ARCH's additional source-fidelity finding is accepted:
+payload=id through actual Create and all expected owners, plus explicit queued
+and original-partition filters on all three source Claims. Writer may add that
+same-file mechanical fixture wrapper without changing S2's Any/H1 output.
+No new path, type, dependency, test identity or production release follows.
+
+Both peers accepted the actual Root domain/ports/node tests, final P4 supplied
+charge-profile negative and existing counted backend. Root added only directory
+cleanup at the end of N2's header-only helper after the node review. The new-Core
+profile support clarification is selected: charge equals the selected immutable
+schema; selected states AND work stay within captured store ceilings; backend
+uses that same account without reset. Old read_policy remains unchanged.
+
+Existing delegated durable_log consumer actually passes28/28, zero ignored or
+filtered, after replacing deprecated fetch_update with compiler-suggested
+try_update in the test hook. Raw2087863+2700/
+d7d170294802f04793bfb800e4ad773311454639ea6a009646f39895a827b206;
+475 compiled inputs stayed exact, fingerprint
+282e27d7805b53436b62e90fdbc3ca76517f3d6ac00f584f9b55c5b9974f61d2.
+The earlier deprecated-spelling attempt failed compilation before tests. These
+results establish preservation of the old consumer only; new counted S9 and
+new policy/node tests have not passed. Root now freezes its selected domain,
+ports and node targets for real missing-contract RED while Writer completes
+the separate mutable storage tests. All production remains held.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-COORDINATOR-RED1 — twelve remaining coordinator identities
+
+Root executed four locked/offline Rust1.99 Cargo test commands before any
+successor production change. The selected592 production/manifests/config and
+actual four-target/helper inputs stayed unchanged throughout every command.
+The separate storage test authoring was excluded because these commands do not
+compile that mutable target. Domain complete_policy and node snapshot_recovery
+report only the selected missing APIs on their first run. Ports and recovery
+first exposed actual test setup mistakes, retained in the raw log: assert_eq
+required Debug on existing equality-only complete fields, the request schema
+error needed its existing Encoding wrapper, and the unresolved point enum
+needed an explicit borrowed replay donor to retain the original pointer check.
+Root corrected only those spellings/types and added no production workaround,
+Debug implementation, source variant or changed semantic expected value.
+
+Final actual missing-contract RED receipts in the existing source-pin log:
+
+- Domain complete_policy:2090737+1437/
+  22325be2c9a86fa17a971a2a46fae00df23751e97da0ae3e16e5ef0731e68abe;
+  initial592-input fingerprint350fc2e402a110d7496bf351134b544fc2823f4c60df7fa2d3eed926b55e711f.
+- Ports complete_policy_request:2118180+5941/
+  16948408e15fa736142a027d09d5e29bd9588f7721d83208b8011a597e27b11c;
+  final592-input fingerprinta72e904d18412d3d43433e37b7e79450977651d4c8432fc834fd353a26f8e19e.
+- Node recovery:2114103+3894/
+  25927992f0c8f3e71df73ef70b5d9324b1c7402c23647054d324dd6baf225733;
+  corrected592-input fingerprint37e67072263dc8ea2f0d1b3e2a0b8b984db560357fbbfd4257a39976be02ddd6.
+- Node snapshot_recovery:2105849+1249/
+  10514ed04d22eaf76acc5da20c77a3486945c8949e1bb7ed352f2f662b00cd60;
+  initial592-input fingerprint350fc2e402a110d7496bf351134b544fc2823f4c60df7fa2d3eed926b55e711f.
+
+Each Cargo command exits101 before executing assertions. This is missing-API
+RED for twelve test identities, distinct from the three already executed
+behavioral priority failures; neither is passed policy/recovery acceptance.
+Current domain point525LF/e74c6bef, ports point520LF/7119093b and response324LF/
+5fec0bf9, recovery463LF/f6961149 and snapshot421LF/bef97b25 preserve the reviewed
+oracles. All four complete parent inverses removing ONLY their selected mod
+lines (and the domain appended blank) actually equal their HEAD originals.
+Production remains held until remaining storage bodies are reviewed/frozen and
+their real selected-contract RED is recorded. Full goal remains active.
+
+
+ROOT TEST-PRECISION6 release: Root whole-read/hash-verified ARCH3017588+1350/
+1ae0936d8df5d3e6c82fcc908c21002aa276477b8079eb973a1bdabf550d61fd.
+Writer may create only the named private storage snapshots/received.rs child,
+move S13 and the four specified helpers unchanged except its two original
+backend qualifications need one more super. Keep shared assert_empty_stage in
+the parent because malformed_streams also calls it. Sole mod received and
+use super::*; no visibility change. This resolves actual formatted728LF
+geometry without waiver. Seventeen paths retain the same28 identities. The
+separate unnecessary-mut and disjoint split_at_mut fixes repair test compilation,
+not semantic expectations or production. Production remains held.
+
+Writer's reciprocal actual reading found that four new ports fixture calls
+incorrectly used ClientIntent::new for versions2/5/6, while the existing public
+constructor intentionally admits only1. Root corrected only the test setup:
+intent2 comes from the existing verifier over the frozen frame0 on a separate
+generous SETUP account, leaving the tested charge/profile unchanged; negative
+version5/6 values use their existing named public constructors. Point uses that
+same frame0 verified donor. No production constructor or authority was widened.
+This pre-runtime finding was missed by the initial static review and is kept
+distinct from missing-API RED and subsequent behavioral execution.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-STORAGE-RED2 — compiled authored storage roster
+
+Root formatted the stable storage handoff and ran the actual state_store target
+twice before any successor production change. The first attempt preserved real
+test setup diagnostics: the independent wire packer needed disjoint metadata/row
+borrows via split_at_mut(1), and one create-result binding did not need mut.
+Writer corrected only those spellings. The approved snapshot grouping then moved
+S13 and four helpers into received.rs while keeping the shared empty-stage helper
+in the parent. Root independently reconstructed and formatted the ENTIRE previous
+24,026-byte/728-line parent in memory; its SHA256 exactly matches
+028b79834c2ed78ab7eff116d0aef7fbe23b21939b6febd10b6426ccdaae4508.
+Only the two moved backend paths need an additional super. Root also proved the
+complete state_store/main.rs inverse equals its HEAD original after removing its
+sole selected mod core_policy line.
+
+The second actual Cargo command exits 101 with only selected missing APIs and
+the selected Workspace variant; no assertions execute and no warnings remain.
+All 507 selected production/config/manifest/storage-target inputs stay exact,
+fingerprint b52a8ff3e0bbb4c6080b97e9a542abe974b013972a2124d1a130a845314f8c29.
+Raw output 2140724+9217/SHA256
+baac94a29233b4e4d8f04b3ffc944d5fb56f18339b4f396b9ad506bb074b499f
+is in the existing source-pin validation log. This is compilation RED, not passed
+physical policy/fault/snapshot acceptance. The first failed-setup epoch remains
+at 2124267+10179/b37f1f79fa77dfdb1a94670d10109f6361366d51f6c0b2cee9bb3262af3e7a74.
+
+Actual inventory confirms 17 selected test/helper paths, 28 #[test] identities
+and every file within 600 physical lines. Root whole-read the actual current
+limits, faults, complete pre-split snapshots and corrected activation bodies.
+The remaining substantive resource review is the independent original-head-ID
+inventory and canonical RangeEnd boundary in S7; ARCH/PERF/Writer are deriving
+its direct consumed-commit fixture and finite helper ledger before source.
+All production remains held. Original Elixir setup/profile/runtime parity,
+both-host validation and all later milestones remain required.
+
+The final ports fixture-donor correction also reaches only selected missing APIs:
+raw 2134629+5949/994b6fb76eb4bfbdf8b13507018568966cde53f3e5cab4f965a3f97e936c585c,
+592 unchanged inputs, fingerprint
+6e572d595dd99e6c9e6ad06a3662b34e5069475f720f9fda614dde68b7b5ee6f.
+Current point520LF/6dd30ed1 and response348LF/8a6a5972 retain the independent
+business, complete-value, comparison-work and decoder-owner oracles. The intent
+donor uses only its separate generous fixture-preparation account.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-PRIORITY-SOURCE1 — independent proven defect first
+
+The previous goal turn made concrete progress: four domain/ports/node and one
+storage target reached actual selected missing-API RED after test setup repairs,
+all 28 test identities were authored, and the approved grouping brought all 17
+selected test/helper files within 600 lines. The remaining direct consumed C/End
+test duty is being closed by Writer with ARCH/PERF; no production policy route
+has been released or created.
+
+To make implementation progress independently, Root actually whole-read and
+hash-verified ARCH PRIORITY-SCHEDULE1 at 3021103+2335/
+77b5d9b0496fd80652e82ef8587822bf762dc15474441d2411e20d67a495f474.
+Root now RELEASES ONLY the seven exact EXISTING priority source seams named
+there. Root is sole writer; Writer does not touch these seams concurrently.
+No new artifact, type, alias, dependency, policy API or publication source is
+released. The full goal and complete selected policy/C/End duties stay intact.
+
+The three new independent behavioral priority tests were already frozen in
+f8139a7 before source. Root also checkpointed the selected old synthetic negative
+adjustment in acce38a: only priority 1 becomes invalid 3 and its expected error
+becomes InvalidPriority; the separate overlap negative remains unchanged.
+Before any production edit, actual PRIORITY-RED2 compiled and executed all 42
+cases across claim_apply, independent_indexed and claim_selection_limits:
+39 existing cases pass, all three new priority controls fail, zero ignored or
+filtered. Raw 2150082+5513/
+e9b6064dc0f980f53ca162b2756f5ccc7ce02931b5819a7edb45118079f09c77;
+476 selected inputs stayed exact, fingerprint
+ff637c04800ba74e9e431a47451c4774265fff00302d31887424b627e44333c5.
+
+The implementation preserves validated priorities 0..2, true global head/H
+accounting before priority candidate filtering, and changed active entry-command
+guards after real LegacyNoop handling. Claim/Reclaim/ExtendLease and terminal
+mutations retain priority and ordering. Root will run the frozen controls and
+appropriate existing regression/strict checks; ARCH/PERF review actual diffs.
+All thirteen new durable-policy production paths remain absent and held.
+
+Priority source first execution is GREEN: all 42 cases across the same three
+targets pass, zero failed/ignored/filtered, on 476 unchanged selected inputs,
+fingerprint 2df0062853105b6c2779f4034bf015f14789421fa915a2acb23045c581a13587.
+Raw 2155738+4187/SHA256
+0acc59586af33ed62be258bb95b6d2cc6a0bfbd4d903340a554a9be6cb923a63
+is preserved in the existing log. The three independent new behavioral controls
+were not edited after their genuine RED. The source changes only the approved
+seven existing files; the thirteen policy paths remain absent. Broader Claim/
+indexed compatibility, strict checks and actual peer source review follow;
+this focused GREEN is not a whole-worktree or complete-policy claim.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-TEST-PRECISION7 — exact consumed-prefix supplement
+
+Root actually whole-read/hash-verified DOMAIN 4071611+8485/
+b4423124e0410edbf112d97540a27192438ed7b3ad5cb45186e24f003f8c1ac4
+and ARCH TEST-PRECISION7 3026386+4177/
+7f81ddf1e6f28f99d07960c5a2b8d194b277feb2e723ee35859a9400b6925f3b.
+PERF independently checked the existing primitive fees and complete numeric
+ledger. Root selects its exact existing-seam order precision and RELEASES ONLY
+the named private limits/consumed.rs test child, its five named ordinary helpers,
+sole mod consumed and assert_prefix call under existing S7. Eighteen selected
+test/helper paths retain the same 28 identities. No new type, alias, dependency,
+policy API or production file is released.
+
+The actual one-record live5 consumed prefix independently costs C19,099,
+35 steps and R16,686 through real canonical RangeEnd, including G's original
+head-ID byte. Keep the pre-mutation matcher; immediately after End prepay the
+required U52=13,280 and FWSO158, encode once and retain/reuse that wire. Exact
+prefix C32,536/32,537 and steps34/35 pairs must both roll back complete old
+cohorts while only the high arm reaches independent decoder g+3,607, p0. The
+generous direct consumed arm must publish the complete independent new cohort.
+These are consumed-prefix controls, not a whole-driver or native performance
+claim. Actual final test review/freeze/RED still precede policy implementation.
+
+Root separately releases the concrete S13 test correction verified by PERF:
+same original stream and same target schema Pg50,000, C50,000 refusal versus
+C2MiB success with complete independent cohort. Four source U52 decodes alone
+cost C53,120; eight source/target decoder calls total g28,856 below that SAME
+schema. This eliminates the old C12k/Pg12k mask. Same-handle uncertainty fencing
+and all original stage/downgrade controls remain. No additional artifact or
+identity is introduced. All thirteen policy production paths remain held.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-FROZEN-TESTS1 — complete selected tests before policy source
+
+Root actually whole-read the final consumed-prefix and same-schema snapshot
+controls and hash-verified PERF 2363641+11631/61e10ef2 and
+2375272+3723/8951b768, DOMAIN 4083545+1249/9afa7374 and ARCH
+API-PRECISION8 3030563+1707/bbe0c1c9. Both reviewers and Writer whole-read the
+final bodies, resolved reciprocal findings and reported no remaining concrete
+setup, lifetime, resource or oracle issue. The existing named mathematical
+intent2 constructor visibility precision is selected for the later Root-owned
+source seam; new(2) still refuses and no fake original frame is permitted.
+
+Root freezes all 18 named test/helper paths and their unchanged 28 identities,
+all at or below 600 physical lines. Sorted path/NUL/SHA256/LF fingerprint:
+b46fc40e401944066e699799ffa0c1e193f33ca313f8ed94f8a5cc640dd544a2.
+The original three priority controls were frozen in f8139a7 before their actual
+behavioral RED and separately reviewed source repair af046e8. Remaining tests
+retain their independent policy/response/wire/cohort/resource expected values.
+
+After final formatting, actual primary state_store RED3 exits101 with only the
+19 selected missing APIs/Workspace variants (E0432/E0599), zero warning lines,
+and no assertions executed. Raw 2288415+13016/SHA256
+511fa43e62e5765b9315c743b979b7bfb296c968483df0c5c5192cf7cad3f95a;
+508 selected inputs stayed exact, fingerprint
+65574825639e0538e3a7b0ee4997496ce105adac6b1cb9386baed534d2e8972c.
+The four domain/ports/node target RED receipts above remain their unchanged
+final test-body evidence; no missing-API result is relabelled behavioral GREEN.
+Root checkpoints these tests before issuing the exact source release. The
+complete public-policy/Claim/governance/runtime/source-profile/both-host/M1–M8
+objective remains active; this freeze is no milestone completion.

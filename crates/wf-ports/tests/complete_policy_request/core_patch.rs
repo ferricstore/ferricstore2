@@ -25,7 +25,9 @@ mod cases;
 mod decode;
 mod frame;
 mod gate;
+mod point;
 mod prepare;
+mod response;
 
 use cases::{
     assert_core_patch_account_case, assert_core_patch_current_models,

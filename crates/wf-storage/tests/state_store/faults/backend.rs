@@ -9,7 +9,7 @@ use std::ops::Bound;
 use std::path::Path;
 use std::process::{Child, ExitStatus};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 use std::sync::mpsc;
 use std::thread;
 
@@ -17,6 +17,8 @@ use std::thread;
 struct DiskFaultBackend {
     inner: FileBackend,
     fault: Arc<AtomicU8>,
+    read_probe: Option<(Arc<AtomicUsize>, Arc<AtomicUsize>)>,
+    write_probe: Option<(Arc<AtomicUsize>, Arc<AtomicUsize>)>,
 }
 
 impl StorageBackend for DiskFaultBackend {
@@ -31,9 +33,11 @@ impl StorageBackend for DiskFaultBackend {
         {
             return Err(io::Error::other("injected control getter read failure"));
         }
+        check_probe(&self.read_probe)?;
         self.inner.read(offset, output)
     }
     fn write(&self, offset: u64, input: &[u8]) -> io::Result<()> {
+        check_probe(&self.write_probe)?;
         self.inner.write(offset, input)
     }
     fn set_len(&self, length: u64) -> io::Result<()> {
@@ -100,10 +104,40 @@ pub(crate) fn fault_database(
     fault: Arc<AtomicU8>,
     cache_size: usize,
 ) -> TestResult<redb::Database> {
+    fault_database_counted(path, fault, cache_size, None, None)
+}
+
+fn check_probe(probe: &Option<(Arc<AtomicUsize>, Arc<AtomicUsize>)>) -> io::Result<()> {
+    let Some((attempts, remaining)) = probe else {
+        return Ok(());
+    };
+    attempts.fetch_add(1, Ordering::SeqCst);
+    let previous = remaining.try_update(Ordering::SeqCst, Ordering::SeqCst, |left| match left {
+        usize::MAX => None,
+        0 => Some(usize::MAX),
+        left => Some(left - 1),
+    });
+    if previous == Ok(0) {
+        Err(io::Error::other("injected counted disk attempt failure"))
+    } else {
+        Ok(())
+    }
+}
+
+/// Counts actual read/write attempts; MAX disables the one-shot failure.
+pub(crate) fn fault_database_counted(
+    path: &Path,
+    fault: Arc<AtomicU8>,
+    cache_size: usize,
+    read_probe: Option<(Arc<AtomicUsize>, Arc<AtomicUsize>)>,
+    write_probe: Option<(Arc<AtomicUsize>, Arc<AtomicUsize>)>,
+) -> TestResult<redb::Database> {
     let file = OpenOptions::new().read(true).write(true).open(path)?;
     let backend = DiskFaultBackend {
         inner: FileBackend::new(file)?,
         fault,
+        read_probe,
+        write_probe,
     };
     let database = redb::Builder::new()
         .set_cache_size(cache_size)

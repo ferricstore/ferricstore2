@@ -5,20 +5,39 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
+Current development is the selected durable complete-policy publication batch.
+Commit `f8139a7` freezes three reviewed priority regression tests before source.
+They reproduced three FIFO priority defects. The separately reviewed scheduling
+decision releases only seven existing priority source seams while storage tests
+finish; the first implementation run passes all 42 focused cases, including the
+three unchanged new regressions. Another 54 Claim/index compatibility cases pass.
+This is a focused result; the complete policy route is still unimplemented.
+The selected test bodies now exist across domain,
+codecs, physical storage and node recovery. Four domain/codec/node targets have
+actual missing-contract compilation RED. Storage's final consumed-prefix and
+snapshot target-C controls are reviewed and frozen. The approved inventory is
+eighteen test/helper paths and 28 substantive identities, all within the 600-line
+test-file limit after mechanical grouping. The final storage target has actual
+missing-contract RED, with only selected missing APIs and no warnings or executed
+assertions. All thirteen new durable-policy production paths remain held until
+Root's explicit source release.
+The latest fully validated implemented checkpoint is `8487ce7`; its results below
+do not describe the intentionally failing development test checkpoint.
+
 The latest implemented policy prerequisite adds a genuinely charged retained
 point gate. Its two reviewed tests were frozen in `04c7f4d` after genuine
 missing-function RED. One approved private production child shares the existing
 validators and preserves the old uncharged path; no new model or dependency was
 added. Architecture and performance reviewed the actual source and each other's
-findings. The complete macOS workspace now passes **875 tests across 90 targets**
+findings. That macOS checkpoint passes **875 tests across 90 targets**
 plus **six compile-fail examples across 15 documentation targets**, with zero
 failures or ignored tests. Formatting, strict all-target Clippy, warnings-denied
 rustdoc, architecture, reference/progress, cached dependency policy and separate
 pinned native compatibility all pass. All 1,338 repository and 17 native inputs
 stayed unchanged through validation. Full parity still fails; no new source-case
 mapping, native Linux result or measured optimization is claimed. The complete
-durable policy publication/reindex/layout/snapshot contract remains under review
-before its concrete artifact selection and tests-first release.
+durable policy publication/reindex/layout/snapshot contract is selected; its
+remaining tests and implementation are still required.
 
 The preceding completed component is the durable physical Claim increment (`a422638`).
 Commit `e080ef4` freezes 31 substantive tests after reviewed missing-API RED.
