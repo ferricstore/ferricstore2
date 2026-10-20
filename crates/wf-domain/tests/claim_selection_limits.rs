@@ -297,14 +297,14 @@ fn insufficient_head_budget_rejects_without_skipping_an_unread_lane() -> TestRes
 fn fifo_priority_and_parallel_lane_overlap_reject_atomically() -> TestResult {
     let record = record(b"a", b"queued", 1_000)?;
     let mut nonzero = entry(&record, b"tenant", 1);
-    nonzero.priority = 1;
+    nonzero.priority = 3;
     let parallel = ParallelIndex::new();
     let mut fifo = FifoIndex::new();
     add_lane(&mut fifo, nonzero)?;
     let records = authority(&parallel, &fifo);
     assert!(matches!(
         select(&view(&parallel, &fifo, &records), request(), None),
-        Err(SelectionError::InvalidFifo)
+        Err(SelectionError::InvalidPriority)
     ));
     let zero = entry(&record, b"tenant", 1);
     let mut fifo = FifoIndex::new();
