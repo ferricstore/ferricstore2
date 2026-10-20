@@ -74,6 +74,19 @@ fn accepted_original_etf_and_dynamic_rejections_restore_exactly() -> TestResult 
         status(&unsupported),
         Err(CodecError::UnsupportedPolicyProfile)
     ));
+    let mut unsupported_charge = PolicySchemaCharge::new(schema);
+    assert!(matches!(
+        original_policy_set_response_status(
+            &unsupported,
+            schema,
+            &mut unsupported_charge,
+            65_536 + 256 * unsupported.len(),
+        ),
+        Err(CodecError::UnsupportedPolicyProfile)
+    ));
+    // Full structural EOF/envelope is checked on the first lexical walk. An
+    // unsupported atom must refuse before any Index/catalog allocation.
+    assert_eq!(unsupported_charge.p(), 0);
     unsupported.push(0);
     assert!(matches!(status(&unsupported), Err(CodecError::Malformed)));
     for end in 0..raw.len() {
@@ -144,9 +157,54 @@ fn response_correspondence_rejects_legal_wrong_install_and_context() -> TestResu
             assert_changes_correspondence(&bytes, original, &other, schema)?;
         }
         assert_changes_arguments(&bytes, original, schema, !rejected)?;
+        if !rejected {
+            assert_late_aggregate(&bytes, original, schema)?;
+        }
     }
     assert_query_correspondence(original, schema)?;
     assert_absence_correspondence(original, schema)?;
+    Ok(())
+}
+
+fn assert_late_aggregate(bytes: &[u8], original: &[u8], schema: PolicySchemaLimits) -> TestResult {
+    use super::{AdmissionLimits, ControlState, ReadValue, scope, stamp};
+    use wf_ports::state::{GroupOriginalPolicyChanges, StateTransactionError};
+    let namespace = scope()?;
+    // Accepted replacement is independent minimal ETF51, key14, four scoped
+    // identity bytes. The actual late producer owns TWO separate ETF copies.
+    let exact = 2 * 51 + b"f:{f}:policy:r".len() + 4;
+    assert_eq!(exact, 120);
+    for maximum in [exact - 1, exact] {
+        let mut charge = PolicySchemaCharge::new(schema);
+        let plan = super::point::point_plan(
+            bytes,
+            &namespace,
+            super::point::authority(ReadValue::Binary(original)),
+            schema,
+            &mut charge,
+        )?;
+        let result = GroupOriginalPolicyChanges::new(
+            &namespace,
+            ControlState::initial(stamp(0)?),
+            Some(original),
+            plan,
+            (AdmissionLimits::new(1_048_576, maximum, 1000)?, schema),
+            &mut charge,
+            1_000_000,
+        );
+        if maximum == exact {
+            let changes = result?;
+            assert_eq!(
+                changes
+                    .outcome()
+                    .ok_or("missing Fresh response")?
+                    .response(),
+                minimal(2)?
+            );
+        } else {
+            assert_eq!(result.err(), Some(StateTransactionError::Limit));
+        }
+    }
     Ok(())
 }
 

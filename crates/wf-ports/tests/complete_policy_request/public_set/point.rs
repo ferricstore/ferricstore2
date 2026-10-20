@@ -261,6 +261,84 @@ fn sealed_full_and_point_bind_original_predecessor_and_used_context() -> TestRes
     for rejected in [false, true] {
         assert_seal(&raw, &other, rejected, schema)?;
     }
+    assert_full_portable_merge(schema)?;
+    Ok(())
+}
+
+fn assert_full_portable_merge(schema: PolicySchemaLimits) -> TestResult {
+    let namespace = scope()?;
+    let raw = minimal(1)?;
+    let encoded = frame(Raw::List(&[]), &empty_orders())?;
+    let policies = BTreeMap::from([(b"r".to_vec(), ReadValue::Binary(&raw))]);
+    let migrations = BTreeMap::new();
+    let outcomes = BTreeMap::new();
+    let ranks = [(0, &[99_u32][..], &[99_u32][..])];
+    let orders = super::OriginalPolicySetMapOrders::new(
+        digest(super::EMPTY_PATCH),
+        Some(&[0]),
+        &[(0, &[], &[])],
+        &ranks,
+        &ranks,
+    );
+    // Only PATCH facts are committed. This new consumable profile1 route must
+    // derive reached current/merged order and fixed safety from actual bytes.
+    let supplied = view(
+        GateView {
+            scope: &namespace,
+            control: ControlState::initial(stamp(0)?),
+            outcomes: &outcomes,
+        },
+        &policies,
+        &migrations,
+        &migrations,
+        OriginalEtfSafety::new(&["x", "x"], &[], None, &[]),
+    );
+    let mut charge = PolicySchemaCharge::new(schema);
+    let point = point_plan(
+        &encoded,
+        &namespace,
+        authority(ReadValue::Binary(&raw)),
+        schema,
+        &mut charge,
+    )?;
+    let full = decide_original_policy_set_frame_bounded(
+        OriginalPolicySetApplyView::new(supplied, &orders),
+        &encoded,
+        log(0),
+        schema,
+        AdmissionLimits::default(),
+        &mut charge,
+        workspace(schema, &encoded)?,
+    )?;
+    accepted(&full, 1, 2, &minimal(2)?)?;
+    assert_eq!(retained(&point)?, retained(&full)?);
+    assert_eq!(full.portable_profile_id(), Some(1));
+    assert!(full.matches_predecessor(Some(&raw)));
+    let mut changed_revision = supplied;
+    changed_revision.revision = 7;
+    let wrong = decide_original_policy_set_frame_bounded(
+        OriginalPolicySetApplyView::new(changed_revision, &orders),
+        &encoded,
+        log(0),
+        schema,
+        AdmissionLimits::default(),
+        &mut charge,
+        workspace(schema, &encoded)?,
+    )?;
+    assert_eq!(wrong.expected_revision(), 7);
+    assert_eq!(
+        wf_ports::state::GroupOriginalPolicyChanges::new(
+            &namespace,
+            supplied.gate.control,
+            Some(&raw),
+            wrong,
+            (AdmissionLimits::default(), schema),
+            &mut charge,
+            1_000_000,
+        )
+        .err(),
+        Some(wf_ports::state::StateTransactionError::InvalidChanges),
+    );
     Ok(())
 }
 
