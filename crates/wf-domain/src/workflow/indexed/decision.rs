@@ -141,7 +141,17 @@ pub(super) fn next_ordering(
     };
     let record = &write.record;
     let after_mode = view.mode(record)?;
-    if after_mode == StateMode::Fifo && priority != 0 && active(record) {
+    if after_mode == StateMode::Fifo
+        && priority != 0
+        && active(record)
+        && matches!(
+            item.item.command.operation,
+            Operation::Create(_)
+                | Operation::Transition(_)
+                | Operation::Retry(_)
+                | Operation::RetryWithPolicy(_)
+        )
+    {
         return Ok(Err(IndexRejection::FifoPriority));
     }
     let allocate =
@@ -246,9 +256,6 @@ pub(super) fn validate(
             member,
             head_candidate,
         }) => {
-            if entry.priority != 0 {
-                return Err(ApplyError::InvalidAuthority);
-            }
             if let Some(head_candidate) = head_candidate {
                 if view.member(lane, member)? != Some(entry)
                     || view.parallel_contains(head_candidate)?
@@ -310,7 +317,7 @@ fn validate_head(
     let canonical_bytes =
         record_bytes(canonical, limits).map_err(|_| ApplyError::InvalidAuthority)?;
     add(&mut head_bytes, canonical_bytes).map_err(|_| ApplyError::InvalidAuthority)?;
-    if head.priority != 0
+    if head.priority > 2
         || LaneKey::for_record(&head) != Some(lane)
         || LaneOrder::for_record(&head) != order
         || !view.canonical_matches(id, head)?

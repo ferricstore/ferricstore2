@@ -63,7 +63,7 @@ pub(super) fn select_checked<'a, E>(
     }
     let mut cursor =
         cursor_for(view, request, continuation).map_err(SelectionFailure::Selection)?;
-    let heads = read_heads(view, &mut guard)?;
+    let heads = read_heads(view, request, &mut guard)?;
     let fifo_after = cursor.fifo_after;
     let fifo = heads
         .into_iter()
@@ -171,6 +171,7 @@ pub(super) struct Head<'a> {
 
 fn read_heads<'a, E>(
     view: &AuthoritativeClaimView<'a>,
+    request: SelectionRequest<'_>,
     guard: &mut impl FnMut(
         Option<ClaimRecord<'a>>,
         Option<LaneKey<'a>>,
@@ -195,9 +196,6 @@ fn read_heads<'a, E>(
         };
         guard(Some(*entry), None, None).map_err(SelectionFailure::Guard)?;
         validate_record(view, *entry).map_err(SelectionFailure::Selection)?;
-        if entry.priority != 0 {
-            return Err(SelectionFailure::Selection(SelectionError::InvalidFifo));
-        }
         if LaneKey::for_record(entry) != Some(*lane_key)
             || LaneOrder::for_record(entry) != *lane_order
         {
@@ -208,7 +206,11 @@ fn read_heads<'a, E>(
                 SelectionError::DuplicateIdentity,
             ));
         }
-        if let Some(order) = DueOrder::for_record(entry) {
+        if request
+            .priority
+            .is_none_or(|priority| priority == entry.priority)
+            && let Some(order) = DueOrder::for_record(entry)
+        {
             heads.push(Head {
                 order,
                 entry: *entry,

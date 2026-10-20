@@ -255,8 +255,7 @@ fn heads<'current>(
             work,
             g,
         )?;
-        if entry.priority != 0
-            || LaneKey::for_record(entry) != Some(*lane)
+        if LaneKey::for_record(entry) != Some(*lane)
             || LaneOrder::for_record(entry) != *order
             || !identities.insert((entry.partition_key, entry.record.id().as_bytes()))
         {

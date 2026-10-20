@@ -116,17 +116,15 @@ pub(in super::super) fn guard_consumed_with(
             }
         }
         StateMode::Fifo => {
-            if entry.priority != 0
-                || match due {
-                    Some(due) => view
-                        .parallel_contains(due)
-                        .map_err(ClaimPreflightError::Apply)?,
-                    None => false,
-                }
-                || view
-                    .member(lane, LaneOrder::for_record(&entry))
-                    .map_err(ClaimPreflightError::Apply)?
-                    != Some(entry)
+            if match due {
+                Some(due) => view
+                    .parallel_contains(due)
+                    .map_err(ClaimPreflightError::Apply)?,
+                None => false,
+            } || view
+                .member(lane, LaneOrder::for_record(&entry))
+                .map_err(ClaimPreflightError::Apply)?
+                != Some(entry)
             {
                 return Err(invalid);
             }

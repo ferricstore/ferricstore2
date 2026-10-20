@@ -37,9 +37,8 @@ impl LoadedClaim {
             }
         }
         drop(cursor);
-        if query.priority.is_none_or(|priority| priority == 0)
-            && let (PartitionFilter::Only(partitions), ClaimStates::Only(states)) =
-                (query.partitions, query.states)
+        if let (PartitionFilter::Only(partitions), ClaimStates::Only(states)) =
+            (query.partitions, query.states)
         {
             for state in states {
                 if *state == b"running" || self.mode(state) != StateMode::Fifo {
@@ -112,7 +111,7 @@ impl LoadedClaim {
     ) -> Result<(), ClaimTransactionError> {
         let row = entry(owner);
         let lane = LaneKey::for_record(&row).ok_or(StateTransactionError::Corrupt)?;
-        if row.priority != 0
+        if row.priority > 2
             || self.mode(row.logical_state()) != StateMode::Fifo
             || tx
                 .fifo_member(scope.tenant(), lane, LaneOrder::for_record(&row))?

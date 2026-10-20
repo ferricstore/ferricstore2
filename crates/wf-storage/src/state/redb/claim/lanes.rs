@@ -88,17 +88,15 @@ impl RedbClaimLaneCursor<'_, '_> {
                 return Ok(ClaimLaneStep::RangeEnd);
             };
             let lane = position.lane().ok_or(StateTransactionError::Corrupt)?;
-            let matched = self.query.priority.is_none_or(|priority| priority == 0)
-                && match self.query.partitions {
-                    PartitionFilter::Any => true,
-                    PartitionFilter::Only(partitions) => partitions.contains(&lane.partition_key),
+            let matched = match self.query.partitions {
+                PartitionFilter::Any => true,
+                PartitionFilter::Only(partitions) => partitions.contains(&lane.partition_key),
+            } && match self.query.states {
+                ClaimStates::Any => true,
+                ClaimStates::Only(states) => {
+                    states.contains(&lane.state) || states.contains(&b"running".as_slice())
                 }
-                && match self.query.states {
-                    ClaimStates::Any => true,
-                    ClaimStates::Only(states) => {
-                        states.contains(&lane.state) || states.contains(&b"running".as_slice())
-                    }
-                };
+            };
             self.position = Some(position);
             if matched {
                 return self

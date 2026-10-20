@@ -234,7 +234,6 @@ pub(super) fn guard_observed_lane(
     if lane.workflow_type != query.workflow_type
         || !partition
         || !state
-        || query.priority.is_some_and(|priority| priority != 0)
         || !view.placements.iter().any(|(partition, group)| {
             partition.as_bytes() == lane.partition_key && group == view.group
         })
