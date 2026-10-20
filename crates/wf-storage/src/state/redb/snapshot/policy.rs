@@ -38,6 +38,17 @@ pub(in crate::state::redb) fn publication_catalog(
         pending: None,
     })
 }
+
+pub(in crate::state::redb) fn require_served(tx: &RedbStateTransaction<'_>) -> Result<(), Error> {
+    if publication_catalog(tx)?
+        .pending
+        .is_some_and(wf_ports::snapshot::SnapshotTransition::is_received)
+    {
+        return Err(Error::InvalidChanges);
+    }
+    Ok(())
+}
+
 pub(in crate::state::redb) fn upgrade_catalog(
     tx: &RedbStateTransaction<'_>,
     saved: &catalog::SnapshotCatalog,

@@ -52,20 +52,26 @@ domain, request, storage and recovery subsets separately; unfinished cases and
 reviews remain explicit in the coordination record. Storage substitutions,
 FIFO, physical faults, snapshot and expanded transient-size coverage continue,
 alongside the final independently priced raw-splice controls. No successor
-production source is released. Full pinned Elixir scenario/assertion/setup/profile
+interoperability production source is released. Full pinned Elixir scenario/assertion/setup/profile
 parity, governing services, accepted consensus/runtime, application/transports
 and both Linux/macOS acceptance remain required. Progress remains 85 source-derived
 declarations, 95 mappings and 384 assertion links; this increment adds no parity
 credit, and the full parity gate still fails. The active full-completion goal
 continues beyond this component. The preceding production checkpoint is cb68b87.
 
-An earlier supported-format N2 prelude exposes a separate existing custody bug:
-Core/original replay, conflict, expiry and Fresh stale rejection all publish
-while received DATA still awaits log acknowledgment. All eight actual cases
-change the complete durable state cohort while log rows/metadata stay unchanged.
-The corrected aggregate regression and strict target lint are recorded before
-repair. A narrowly selected fix in three existing storage files will guard
-no-business publication; the full interoperability source batch remains held.
+The supported-format N2 prelude exposed and now repairs a separate custody bug:
+Core/original replay, conflict, expiry and Fresh stale rejection published
+while received DATA still awaited log acknowledgment. Before repair, all eight
+actual cases changed the complete durable state cohort while log rows/metadata
+stayed unchanged. The reviewed regression was committed in `41c1dc8` before
+the three-file storage fix. All eight checks now complete, and the 61 existing
+node recovery/snapshot tests pass with strict target Clippy. The two new feature
+tests were deliberately filtered from that existing-test run and remain separate
+missing-interoperability regressions; overall N2 still fails later at unsupported
+Core-over-ETF. Architecture and performance accepted the actual source and each
+other's review. Exact log replay, accepted publication, local purge permission
+and successful-commit cache timing remain preserved. Full interoperability
+production remains held; this is a scoped repair, not a new full-workspace result.
 
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper

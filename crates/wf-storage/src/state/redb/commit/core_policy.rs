@@ -105,9 +105,12 @@ fn publish(
         catalog::publish(&tx, old_layout, manifest, &saved)?;
         put_outcome(&tx, scope, outcome, &encoded)?;
         layout = old_layout.max(catalog::POLICY_LAYOUT);
-    } else if let Some(outcome) = changes.outcome() {
-        let encoded = encode_outcome(&tx, outcome, charge)?;
-        put_outcome(&tx, scope, outcome, &encoded)?;
+    } else {
+        snapshot::policy::require_served(&tx)?;
+        if let Some(outcome) = changes.outcome() {
+            let encoded = encode_outcome(&tx, outcome, charge)?;
+            put_outcome(&tx, scope, outcome, &encoded)?;
+        }
     }
     write_control(&tx, control)?;
     tx.write

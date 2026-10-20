@@ -47117,3 +47117,71 @@ b2fbfa74 and PERF2653007+3950/7737d1ab. Both independently read final1405/579ed2
 and strict163/eaad6c35, preserve the old mixed source by own entire inverses,
 and confirm all8 actual cohort mutations with eagerly observed unchanged logs.
 The corrected regression may be frozen; no further readiness round is required.
+
+
+### ROOT-ISOLATED-CUSTODY-SOURCE1-RELEASE — after regression checkpoint
+
+The corrected reviewed tests are committed before implementation. Root now
+releases ONLY the three EXISTING paths selected in ARCH3392906+6582/50310c52:
+wf-storage state/redb/snapshot/policy.rs (ordinary require_served),
+state/redb/commit/core_policy.rs and state/redb/commit/original_policy.rs
+(no-business branch invocation). Reject only actual received pending custody
+before any outcome/control publication; preserve exact LogReplay abort, original
+Fresh predecessor checks, accepted business/catalog/C/End order, local purge
+permission and success-only cache publication. Actual new no-business descriptor
+work uses existing paid/read/step/temporary admission. No new source artifact,
+model/alias/dependency, schema reset, fake service or full B1 release. Root owns
+source edits/validation; ARCH/PERF review the actual small diff reciprocally.
+The whole N2 remains expected to fail later at missing Core-ETF support even when
+all eight prior custody checks actually pass. No whole-test GREEN is inferred.
+
+
+### ROOT-ISOLATED-CUSTODY-SOURCE1-CHECKPOINT — repaired supported matrix
+
+Tests were frozen first in41c1dc8. Only the three released existing source paths
+changed: snapshot/policy.rs2388B/75LF/784de460f4ba1d8a25e69dc465f93f1b9120777b39028772fffe7c63da003bcd,
+commit/core_policy.rs9015B/258LF/38c48c511c2468bee32e46a1c534745cf66f64afae9a88e5b56e98ace329c7d7,
+commit/original_policy.rs12067B/315LF/a1c1880cce79f54b33d80dc6c51ed286a3fbd4d9f56fc1dc12ff3cb5118c2df5.
+The same-writer catalog guard refuses only received pending custody before
+no-business outcome/control publication, after exact LogReplay abort and the
+original Fresh context/predecessor checks. Accepted business/End/catalog/fee
+order, local purge permission and success-only cache updates are unchanged.
+Actual descriptor work costs two normal steps, with bounded borrowed FWSD3
+verification/fixed Copy, no new independent R/C owner and no policy-schema g/p.
+The ordinary Original helper enforces the existing function-body limit; no lint
+waiver, new source artifact/type/alias, dependency or full B1 release occurs.
+
+Root whole/hash-read the actual final reciprocal ARCH3406965+2812/
+5fe732001db2459ee592e025009ebe3d350313ee0b3729a8b67dc890f66811e4
+and PERF2671128+1420/01f26b6f7b1d22309d17f5a43a9febf167856592fbe60906bd243eae9b615d4c,
+in addition to the preceding actual source/inverse/resource blocks. Both
+independently conserved entire old source outside the selected guard and
+accepted the same transaction/account/metadata/custody/cache boundaries.
+
+Final strict Clippy for both node targets and dependencies exits0:
+RAW3195043+260/f9fa7a1d3a18cf94c317d9f742caebed9b0ddf32c8b4957bd5379efe586480be;
+all518 inputsb84ea791ee8334b7fffc28f772d429fb5891b316b61c4ee51e109b81f5511715
+unchanged. Exact three-source rustfmt and Git whitespace pass. Final N2 runtime
+RAW3195456+928/70bd0f154fc24c4e0cf9d085a8c6dc191152c1e8becb13f166968327a07cfe9b
+completes all eight supported custody checks before later UnsupportedPolicyFormat
+at Core-u5. Its507 inputs8d56086941a4eb0577255cb48146f7ca62e0c8da4eb168b6a2e330de3447cbb9
+stay unchanged; overall0pass1fail43filtered/actual101. No later mixed receive
+assertion or whole-N2 GREEN is credited.
+
+Final post-style existing-node run is also complete: cargo test --locked --offline
+-p wf-node --test recovery --test snapshot_recovery -- --skip original_policy::interop::.
+RAW3196541+6297/1f95423a68e8920ca125b4f681d3ae74d37470cdfb7974a0bfa21220dfd05a01,
+actual0;18 existing recovery plus43 existing snapshot tests pass, zero failed or
+ignored, exactly one new feature test filtered per target. The same518/b84ea791
+inputs stay unchanged. Root whole/hash-read the actual output and relayed the
+completed final61 result to both reviewers, whose saved notes correctly scoped
+it as pending at their earlier save. This supersedes the pre-style run, not the
+last whole-workspace acceptance. No native Linux, full B1, parity or performance
+improvement result is inferred.
+
+Writer handed off all authored S1-S6 storage tests and approved children to Root
+custody for formatting/census, actual peer review, old typed-authority staging
+and coherent missing-contract RED. Its three deferred child registrations are
+still explicit. Only this scoped source repair and read review-note prefixes
+are checkpointed now; those storage drafts and the full B1 production batch
+remain outside the checkpoint. The full-completion goal remains active.

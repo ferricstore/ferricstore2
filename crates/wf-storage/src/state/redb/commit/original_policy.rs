@@ -129,9 +129,8 @@ fn publish(
         catalog::publish_original(&tx, old_layout, manifest, &saved)?;
         super::core_policy::put_outcome(&tx, scope, outcome, &encoded)?;
         layout = snapshot::original::LAYOUT;
-    } else if let Some(outcome) = changes.outcome() {
-        let encoded = encode_outcome(&tx, outcome, schema, charge)?;
-        super::core_policy::put_outcome(&tx, scope, outcome, &encoded)?;
+    } else {
+        publish_no_business(&tx, changes, schema, charge)?;
     }
     write_control(&tx, control)?;
     tx.write
@@ -140,6 +139,19 @@ fn publish(
     tx.write.commit().map_err(|_| Error::Uncertain)?;
     tx.committed_layout.set(layout);
     Ok(layout)
+}
+fn publish_no_business(
+    tx: &RedbStateTransaction<'_>,
+    changes: &GroupOriginalPolicyChanges<'_>,
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(), Error> {
+    snapshot::policy::require_served(tx)?;
+    if let Some(outcome) = changes.outcome() {
+        let encoded = encode_outcome(tx, outcome, schema, charge)?;
+        super::core_policy::put_outcome(tx, changes.scope(), outcome, &encoded)?;
+    }
+    Ok(())
 }
 fn actual_predecessor(
     tx: &RedbStateTransaction<'_>,
