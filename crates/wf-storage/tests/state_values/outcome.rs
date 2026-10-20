@@ -1,5 +1,10 @@
 //! Independent FWSO values retain one canonical response, deriving its status.
 
+use wf_domain::policy::complete::{
+    FlowPolicyInputRejection, OriginalEtfSafety, PolicyRetentionInputRejection, PolicySchemaCharge,
+    PolicySchemaLimits, decode_original_complete_policy_entry,
+};
+use wf_domain::policy::installation::PolicyLimits;
 use wf_domain::value::{Counter, DomainError, InputField, RetryPolicyField};
 use wf_domain::workflow::admission::{AdmissionError, AdmissionLimits};
 use wf_domain::workflow::batch::BatchRejection;
@@ -8,7 +13,9 @@ use wf_domain::workflow::request::{
     ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
 };
 use wf_ports::log::{CodecError, record_batch_retained_status};
-use wf_storage::state::value::{StateValueError, decode_outcome, encode_outcome};
+use wf_storage::state::value::{
+    StateValueError, decode_outcome, encode_outcome, encode_outcome_profiled, scan_outcome_profiled,
+};
 use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, LogIdentity, TimestampMillis};
 
@@ -412,5 +419,167 @@ fn outcome_rejects_foreign_profile_scope_and_corrupt_response() -> TestResult {
     ));
     malformed_responses(&expected_scope, &request)?;
     outcome_limits(&expected_scope, &request)?;
+    Ok(())
+}
+
+#[test]
+fn original_policy_set_outcome_vectors_preserve_exact_owned_receipt() -> TestResult {
+    // Independent FWSO1/intent4/response1 with customer version 2^128+1.
+    let literal = "4657534f000100000001740000000167000000017200000001710004111111111111111111111111111111111111111111111111111111111111111100000000000000030000000000000004000000000000000000000000000000050000000000000069000100000043836803770e666c6f775f706f6c6963795f7631610174000000027704747970656d0000000172770776657273696f6e6e11000100000000000000000000000000000001";
+    let raw = hex(
+        "836803770e666c6f775f706f6c6963795f7631610174000000027704747970656d0000000172770776657273696f6e6e11000100000000000000000000000000000001",
+    )?;
+    let bytes = hex(literal)?;
+    assert_eq!(bytes.len(), 173);
+    assert_eq!(raw.len(), 67);
+    let schema = PolicySchemaLimits::default();
+    let admission = AdmissionLimits::default();
+    let mut charge = PolicySchemaCharge::new(schema);
+    let safety = OriginalEtfSafety::new(&["flow_policy_v1", "type", "version"], &[], None, &[]);
+    let entry = decode_original_complete_policy_entry(&raw, &safety, schema, &mut charge)?
+        .ok_or("independent ETF receipt fixture must decode")?;
+    assert_eq!(entry.generation(), 1);
+    assert_eq!(entry.workflow_type(), Some(b"r".as_slice()));
+    let expected_scope = scope(b"t", b"g", b"r")?;
+    let request = RequestId::new(b"q".to_vec())?;
+    let scanned = scan_outcome_profiled(
+        &bytes,
+        &expected_scope,
+        &request,
+        admission,
+        173,
+        (schema, &mut charge),
+        1_048_576,
+    )?;
+    assert_eq!(scanned.owned_bytes(), 583);
+    drop(expected_scope);
+    drop(request);
+    let owner = scanned.into_owned(583)?;
+    drop(bytes);
+    assert_eq!(owner.scope(), &scope(b"t", b"g", b"r")?);
+    assert_eq!(owner.request().as_bytes(), b"q");
+    assert_eq!(owner.intent().version(), 4);
+    assert_eq!(owner.intent().digest(), &[0x11; 32]);
+    assert_eq!(
+        owner.original_position(),
+        LogIdentity::new(3, 4, AppliedPosition::new(0))
+    );
+    assert_eq!(owner.original_time(), TimestampMillis::new(5));
+    assert_eq!(owner.expires_at(), TimestampMillis::new(105));
+    assert_eq!(owner.response_version(), 1);
+    assert_eq!(owner.status(), RetainedStatus::Accepted);
+    assert_eq!(owner.response(), raw);
+    assert_eq!(
+        encode_outcome_profiled(&owner, 173, admission, schema, &mut charge, 1_048_576,)?,
+        hex(literal)?
+    );
+    let mismatch = RetainedOutcome::new(
+        RetainedMetadata {
+            scope: owner.scope().clone(),
+            request: owner.request().clone(),
+            intent: owner.intent(),
+            original_position: owner.original_position(),
+            original_time: owner.original_time(),
+            expires_at: owner.expires_at(),
+            status: RetainedStatus::OriginalPolicySetRejected(FlowPolicyInputRejection::Version),
+        },
+        1,
+        owner.response().to_vec(),
+        admission,
+    )?;
+    assert_eq!(
+        encode_outcome_profiled(&mismatch, 173, admission, schema, &mut charge, 1_048_576,),
+        Err(StateValueError::InvalidValue)
+    );
+    assert!(ClientIntent::new(4, [0x11; 32]).is_err());
+    Ok(())
+}
+
+#[test]
+fn original_policy_set_history_rejection_preserves_original_maximum() -> TestResult {
+    // This codec has no current-store history argument: restore the ORIGINAL
+    // canonical decimal under both actual schema profiles, never today's default.
+    let prefix = b"ERR flow retention history_max_events must be between 1 and ";
+    let expected_scope = scope(b"t", b"g", b"r")?;
+    let request = RequestId::new(b"q".to_vec())?;
+    let admission = AdmissionLimits::default();
+    let profiles = [
+        PolicySchemaLimits::new(PolicyLimits::new(1)?, 8 * 1_048_576)?,
+        PolicySchemaLimits::default(),
+    ];
+    for schema in profiles {
+        for maximum in [1, 17, 999_999, 1_000_000] {
+            let mut body = prefix.to_vec();
+            body.extend_from_slice(maximum.to_string().as_bytes());
+            let mut bytes = frame(&body)?;
+            bytes[27] = 4;
+            let mut charge = PolicySchemaCharge::new(schema);
+            let scanned = scan_outcome_profiled(
+                &bytes,
+                &expected_scope,
+                &request,
+                admission,
+                bytes.len(),
+                (schema, &mut charge),
+                1_048_576,
+            )?;
+            let owner = scanned.into_owned(516 + body.len())?;
+            assert_eq!(
+                owner.status(),
+                RetainedStatus::OriginalPolicySetRejected(FlowPolicyInputRejection::Retention(
+                    PolicyRetentionInputRejection::History { maximum },
+                ),)
+            );
+            assert_eq!(owner.response(), body);
+            assert_eq!(
+                encode_outcome_profiled(
+                    &owner,
+                    bytes.len(),
+                    admission,
+                    schema,
+                    &mut charge,
+                    1_048_576,
+                )?,
+                bytes
+            );
+        }
+        for decimal in ["", "0", "01", "+1", " 1", "1000001", "1x", "17\n"] {
+            let mut body = prefix.to_vec();
+            body.extend_from_slice(decimal.as_bytes());
+            let mut bytes = frame(&body)?;
+            bytes[27] = 4;
+            let mut charge = PolicySchemaCharge::new(schema);
+            assert!(
+                scan_outcome_profiled(
+                    &bytes,
+                    &expected_scope,
+                    &request,
+                    admission,
+                    bytes.len(),
+                    (schema, &mut charge),
+                    1_048_576,
+                )
+                .is_err()
+            );
+        }
+        let mut body = prefix.to_vec();
+        body.extend_from_slice(b"17");
+        let mut bytes = frame(&body)?;
+        bytes[27] = 4;
+        bytes.push(0);
+        let mut charge = PolicySchemaCharge::new(schema);
+        assert!(
+            scan_outcome_profiled(
+                &bytes,
+                &expected_scope,
+                &request,
+                admission,
+                bytes.len(),
+                (schema, &mut charge),
+                1_048_576,
+            )
+            .is_err()
+        );
+    }
     Ok(())
 }

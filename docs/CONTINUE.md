@@ -5,6 +5,15 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The next original-public-policy receipt tests now have genuine RED: both compile
+and fail with `UnsupportedVersion` on the existing profiled storage codec. They
+preserve an independent complete ETF/FWSO literal with customer version2^128+1,
+original receipt ownership/metadata and dynamic history-error maxima. Architecture
+and performance independently verified the literals and conservation of all older
+tests. Production remains at the passing `cb68b87` checkpoint below; these two new
+tests deliberately expose missing support. The cohesive allocator SET/GET proposal
+is saved for concrete architecture/performance review before further creation.
+
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper
 paths; thirteen private production children stay under the existing feature

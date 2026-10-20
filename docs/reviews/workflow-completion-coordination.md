@@ -46409,3 +46409,86 @@ execution for all required cases, mandatory profiles, setup, fixtures and
 adapters. Registration/partial assertion links are not full passing parity.
 This expected global failure remains open and does not erase the executed
 906-test current-component result; Root does not mark the full goal complete.
+
+### ROOT-ORIGINAL-PUBLIC-SET1-DESIGN-STATUS1 — concrete successor consultation
+
+Status checked at HEAD cb68b87 on 2026-10-20: the full goal is active and the
+only successor changes observed are architecture/performance review appends.
+Root whole-read and hash-verified PERF bytes 2,430,501+26,479,
+SHA256 4f6f09bac5537186713dce5b27cb556dfd6542553f6172e6a8b174e4d7aa964f.
+The original ETF decoder/index/merge/reply owners need separate prospective
+accounting; the existing FWPV2 tariff is not an ETF bound. Present generation0,
+arbitrary customer BigInteger versions, separately owned retained replies and
+typed physical GET failures must survive the real adapter composition.
+
+Root independently read the existing map-order contract, merge arena and
+apply/value cursors, binary source-order helper, ports GET wrapper, original
+PUBLIC SET retention and current storage receipt/read/commit seams. Reached
+binary state/governance-name traversal can reuse the pinned binary-order
+direction; arbitrary runtime-affine key ordering still needs actual origin
+facts. The patch sidecar does not attest current or merged map order. These
+findings do not select an implementation or certify native performance.
+
+ARCH and Writer are finishing the exact successor API/artifact/test roster.
+PERF was assigned a finite reciprocal review of that concrete proposal; all
+three GPT-6.1-sol/max peers are active and retain disjoint note ownership.
+No successor file/type/module/alias or test/source creation is released here.
+Restricted internal prerequisites must retain concrete full-contract follow-on
+tests for cross-format policies, runtime-affine map classes and indexed
+catalog/migration effects; they cannot count as completed public SET or parity.
+No validation of unchanged cb68b87 source was rerun for this status check.
+
+### ROOT-ORIGINAL-PUBLIC-SET1-RECEIPT-RED1 — actual original receipt regression gap
+
+The previous goal turn was a status/consultation turn without a new executable
+result. This continuation takes the next safe tests-first action rather than
+repeating the existing checkpoint. Root whole-read/hash-verified ARCH's concrete
+RECEIPT-TESTS1 decision at 3,118,342+2,365,
+e36b34bfb6ded3b93640fcbbec5406fa7a502b04e1e3fee3c1b1541cf27f8eb3.
+Root RELEASED and authored only its two named tests in the existing
+crates/wf-storage/tests/state_values/outcome.rs. No new file/helper/module/type,
+alias, public API or production implementation was created.
+
+Formatted file: 20,168 bytes/585LF,
+93764803cd8bf8b4160689695359974d6ec69b1c4afecaff97e28624c91163c3.
+The accepted test uses an independently packed whole173-byte FWSO1 intent4
+response1 literal, carrying67-byte original ETF with customer version2^128+1.
+The existing pure decoder validates the fixture before the missing receipt scan.
+The583-byte owned result must survive dropping scope/request and wire donors,
+preserve every original metadata field/raw byte and reproduce the entire literal;
+a mismatched retained status must reject. The second test restores original
+history maxima1/17/999999/1000000 under two actual schema profiles, with malformed
+decimal and trailing-frame controls. These codec APIs have no current-store
+history argument; no changed-store replay evidence is claimed by these tests.
+
+Actual command cargo test --locked --offline -p wf-storage --test state_values
+original_policy_set_ -- --nocapture compiled successfully, then BOTH tests failed
+with UnsupportedVersion. Command exit101, zero passed/two failed/16 old filtered.
+Raw main source-pin-validation.log at2,659,100+858,
+b89631d5e3fa218026403a0403022026adf16a2a1fd1e8d659c148ec4eea5882.
+All832 scoped crate/Cargo/toolchain/config inputs stayed unchanged:
+fc739b88596061d62abc33289accbcadb2dbe1fecad6c369a482435e2a79772e.
+Root session3507 is terminal; no validation command remains live.
+
+Root independently reversed only the exact imports and appended tests and
+recovered the ENTIRE previous416LF file, SHA256
+7e27274a622134feb6c8deab2721a7536ca5df5002ca7852f15a539ed61d483c.
+ARCH independently repeated that full inverse and the ETF/FWSO packing, with no
+fixture/oracle/ownership finding. PERF is reviewing the actual tests. The full
+allocator roster/source remains held; RED is genuine missing receipt support,
+not passing parity or permission to implement an unreviewed representation.
+
+Root subsequently whole-read/hash-verified PERF's actual independent receipt-test
+review at2,456,980+3,607,
+44065a5f532c9f80f7a97e1435aaba37957570861b5c1cb8e33469ab10489152.
+Its independent full173B/67B packing,583-byte ownership and ENTIRE-old-file inverse
+agree with ARCH/Root. Both peers actually inspected the terminal two-test RED;
+neither found a setup/oracle defect. Root freezes these two substantive tests
+before implementation. No predecessor assertion was changed or removed.
+
+Writer's complete successor proposal is now saved in DOMAIN at4,125,010+52,159,
+97d78ec03412aca521a287d04fcde60ff9dec0c7f54db1a539925e94d16c6ed3.
+ARCH and PERF were assigned finite review of that actual roster, including its
+proposed ETF-specific owner envelope and required full-contract completion
+batches. This byte receipt identifies an UNSELECTED proposal; Root has not yet
+whole-read the full52,159-byte proposal or released its artifacts/source.
