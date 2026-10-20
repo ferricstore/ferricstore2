@@ -54,6 +54,7 @@ fn stream_framing_counts_order_checksum_and_real_eof() -> TestResult {
         "truncated",
         "trailing",
         "legacy-body-as-v2",
+        "legacy-body-as-v3",
     ]
     .into_iter()
     .enumerate()
@@ -63,10 +64,11 @@ fn stream_framing_counts_order_checksum_and_real_eof() -> TestResult {
         match label {
             "magic" => wire[0] = 0,
             "version" => {
-                wire[5] = 3;
+                wire[5] = 4;
                 expected = SnapshotError::UnsupportedVersion;
             }
             "legacy-body-as-v2" => wire[5] = 2,
+            "legacy-body-as-v3" => wire[5] = 3,
             "group" => {
                 wire[8] = b'f';
                 expected = SnapshotError::NamespaceMismatch;
