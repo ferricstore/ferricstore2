@@ -12,6 +12,7 @@ mod faults;
 mod fixture_data;
 mod fixtures;
 mod limits;
+mod original_policy;
 mod provenance;
 mod replay;
 

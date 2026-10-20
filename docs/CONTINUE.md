@@ -5,29 +5,25 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The next original-public-policy receipt tests now have genuine RED: both compile
-and fail with `UnsupportedVersion` on the existing profiled storage codec. They
-preserve an independent complete ETF/FWSO literal with customer version2^128+1,
-original receipt ownership/metadata and dynamic history-error maxima. Architecture
-and performance independently verified the literals and conservation of all older
-tests. Production remains at the passing `cb68b87` checkpoint below; these two new
-tests deliberately expose missing support. Architecture and performance have
-selected the exact next allocator SET/GET contract and released tests-only
-authoring for28 additional identities. The first ports response case and five
-domain cases are reviewed and frozen after actual missing-API RED. Cross-review
-strengthened the governance, update and list-LAST ordering controls before that
-freeze. Production implementation remains held; the remaining tests are being
-authored with disjoint ownership. Three point-gate cases and the remaining ports
-response-correspondence case are now authored and formatted, with actual
-missing-API compilation failures; architecture and performance reviews are
-complete. This brings the reviewed regression batch to twelve identities,
-including the two storage receipt cases; production implementation remains held.
-Performance review added both directions of present/absent predecessor
-substitution, including rejected Fresh plans. Storage roundtrip/GET and FIFO
-activation cases are drafted; review added real SET reply projection, GET
-temporary-budget refusal and same-account callback checks. A specifically
-approved private fixture frame child keeps formatted test files within600 lines.
-These drafts do not add passing tests or full-parity credit.
+The original-public-policy regression batch now has thirty reviewed tests frozen
+before implementation: two receipt cases, five domain cases, five ports cases,
+fourteen storage cases and four node recovery/snapshot cases. The receipt cases
+compile and fail with UnsupportedVersion on the old codec; the remaining cases
+report selected missing APIs. No new assertions have passed yet. Architecture and
+performance reviewed independent ETF/resource ledgers, all Fresh predecessor and
+used-context authority, real FIFO activation, exhaustive physical fault offsets,
+and old/new snapshot custody. Review corrected fixture API/lifetime errors and
+an explicit receiving-layout upgrade before fault injection.
+
+The last production checkpoint remains cb68b87 below. The exact approved next
+source batch connects original public Policy.set through one paid point gate to
+durable ETF publication, SET/GET projection and bounded recovery. Root owns
+ports/node; the implementation agent owns domain/storage. All thirty tests must
+pass alongside the existing suite before this component is accepted. Same-type
+format interoperability, runtime source profiles, real indexed effects and
+migration jobs remain required successors, along with full Elixir parity and
+both Linux/macOS acceptance. These failing tests add no passing-test or parity
+credit.
 
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper
