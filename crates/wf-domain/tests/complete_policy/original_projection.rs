@@ -168,5 +168,26 @@ fn assert_profile_origin(profile: wf_domain::policy::complete::PolicySchemaLimit
     let mut wrong_envelope = unknown;
     wrong_envelope[2] = 2;
     assert!(decode(&wrong_envelope, profile, &mut charge)?.is_none());
+    let mut errors = [None, None];
+    for (ordinal, name) in [b"".as_slice(), b"running"].into_iter().enumerate() {
+        // Original envelopes admit arbitrary binary state keys. Failure to
+        // represent them in this execution projection is a healthy capability
+        // boundary; it must preserve the valid original raw authority.
+        let raw = envelope(
+            0,
+            &[
+                (atom("type")?, binary(b"job")?),
+                (atom("states")?, map(&[(binary(name)?, map(&[])?)])?),
+            ],
+        )?;
+        let saved = raw.clone();
+        let owner = decode(&raw, profile, &mut charge)?.ok_or("valid arbitrary state map")?;
+        assert_eq!(owner.generation(), 0);
+        let needed = measure(&raw, b"job", profile, &mut charge)?;
+        errors[ordinal] = project(&raw, b"job", profile, &mut charge, needed).err();
+        assert_eq!(owner.encoded(), saved);
+        assert_eq!(raw, saved);
+    }
+    assert_eq!(errors, [Some(Error::UnsupportedPolicyProfile); 2]);
     Ok(())
 }
