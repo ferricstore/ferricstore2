@@ -6,19 +6,25 @@ performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
 Current development is the selected durable complete-policy publication batch.
-The eighteen reviewed test/helper paths and 30 substantive regression identities
-are frozen in `d1d332d` and its priority-test predecessor. All five affected
-integration targets reached genuine missing-contract compilation RED before
-policy implementation. Root explicitly released the thirteen selected production
-paths in ROOT-COMPLETE-CORE-PATCH1-SOURCE1; domain, ports/node, storage and retained
-codec work now have disjoint owners and reciprocal architecture/performance review.
-The domain complete-policy target passes all 131 tests, including both frozen
-current-only Fresh regressions. The broader domain/ports run passes 539 tests across 52 targets. All thirteen
-initial policy storage tests pass, including exact resource, fault and kill
-controls. Independent review then found missing original-query/predecessor
-binding; three added controls have actual behavioral RED and are frozen before
-correction. Two node setup incompatibilities are corrected and await rerun.
-Strict/full/node and native checks remain required before component acceptance.
+The reviewed test/helper paths and original regression identities are frozen in
+`d1d332d`, followed by matcher/predecessor controls in `fc25d7a` and `e537850`.
+All five affected integration targets reached genuine missing-contract RED before
+policy implementation. The thirteen selected production paths and their existing
+seams have disjoint owners and reciprocal architecture/performance review.
+The broader domain/ports run passed 539 tests across 52 targets before the latest
+binding refinement. Its latest targeted reruns pass all101 port tests and all14
+policy storage tests. Node recovery16 plus snapshot41 now pass all57 tests,
+including both corrected fixture setups. These are separate component runs.
+
+Review found a further immutable-history authority gap: an ordinary mathematical
+view can prepare a candidate using65 although the actual store limit is64. The
+new storage regression genuinely fails at consumed commit before correction.
+ARCH API13/TEST8 selects a used-only history scalar seal, checked against the
+actual guard before publication, preserving early stale-CAS bypass. Two new
+storage tests move into the explicitly approved private replay/authority.rs child,
+with the old parent body conserved; the history identity includes a real stale
+positive with false but unused history. Tests must freeze before source release.
+Strict/full and native checks remain required before component acceptance.
 
 The priority repairs in `af046e8` passed 878 tests across 90 targets and six
 compile-fail examples across 15 documentation targets in an isolated exact

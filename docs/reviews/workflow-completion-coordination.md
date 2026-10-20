@@ -46173,3 +46173,61 @@ fixed predecessor length/SHA seal, actual ALL-Fresh current comparison, unchange
 old g/p and independent plan lifetime. Each SHA walk has explicit hard P cap and
 bounded native O(P) cost; no measured speed/CPU claim is made. Source stays held
 until this test checkpoint and Root's following explicit release.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-SOURCE4 — exact original-query/predecessor repair release
+
+Root freezes the additional controls in e537850 after actual behavioral RED in
+both Full/point constructor and consumed storage boundaries. Root RELEASES the
+exact ARCH API-PRECISION12 existing-artifact refinement, with no additional path,
+nominal model, trait, alias or dependency. Writer owns domain retaining wrappers,
+shared reducer/patch/borrowed encoder factoring and actual ALL-Fresh backend
+predecessor comparison. Root owns existing RequestPlan fixed seal/original-query
+fields/getters, Full/point builder wiring and Changes comparison. Performance and
+architecture retain independent source/resource review. Existing frozen fees,
+orphans/original reply metadata, non-Fresh bypass, accepted C/End and native hash
+qualifications are exact; no test rewrite to fit output is authorized. Node setup
+corrections are frozen separately and require actual passing reruns. The complete
+product/source-profile/both-host goal remains active.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-HISTORY-RED1 / TEST8 — exact authority grouping
+
+Actual API12 results: ports101/101 at raw2415511+10271/
+8dc71d1cf940a230d3c49c802f2d18b872796150b9d4f002e0ad9fb5495ae6a9;
+storage14/14 at2425920+1879/
+10821f942a7dfa1d94727c8bb453572eeea09449d4a845382d3eaa3dfe9b68ae;
+node16+snapshot41=57 at2429160+6639/
+fa6469268d77a7e9efdeda752bed4f5823771d432722869fca2ebe3a2983ef3a.
+Scoped503/658/831 inputs stayed unchanged; these are separate component runs.
+
+The new genuine history RED at2427939+1084/
+399bdb3a2bd4bd208ad0ccfff4fe0e11d9da40d3e6cc72bdc0f01234c5e8f22c
+shows correct actual absence and immutable64, but supplied65 prepares a candidate
+with retention65 and consumed commit wrongly returnsOk(5). No history correction
+has been released. Root whole-read/hash-verified ARCH API13/TEST8 at3077676+5662/
+0749e59f0246819a0fb57ede8180c6db8bed583254d7de1abac897d50a722f6a.
+It explicitly approves only replay/authority.rs, moving both new identities with
+exclusive imports; the old345LF parent body stays exact. Two named mechanical
+phase/consumed-refusal helpers are approved, no new type/alias/dependency. Root
+will add the same-ID stale-CAS positive with deliberately unused false history,
+rerun genuine RED, and freeze tests before the exact API13 source release.
+
+ARCH additionally explicitly approves exactly one third same-child ordinary helper
+assert_unused_history_is_stale(path:&Path,scope:&RequestScope,caps:Limits)->TestResult
+so the same-ID positive executes first against its separate real dir/unused store
+without a139LF test function. It preserves observed currentNone/history64,
+supplied65, stale status/body, actual commit3, strict reopen/receipt/control.
+The simultaneous assert_history_decision suggestion was NOT selected.
+No path/type/model/alias/dependency or selected identity was added.
+
+TEST8/8A actual frozen-candidate result: new qualified history RED2 genuinely
+fails Ok(5) versus InvalidChanges, after the stale positive's exact body/status,
+commit3 and strict-reopened receipt/control all pass. Raw2435939+1138/
+b61ba705f8e28b296c452af307a5d0b21fff8aec3b1a3797ddca6bf3dda31b24;
+659 scoped inputs unchanged. The moved predecessor identity separately passes
+1/1,80filtered at2437229+373/
+466edc8e67b5f232f2721d31172c6c3c1a6071da400dbd3a6b78277f748755cb.
+Parent fn accepted onward is byte-identical to d1d332d; child357LF/parent347LF,
+two unique moved identities and no duplication. Source correction is still held
+at this checkpoint. No parity/profile credit is created by a module move.
