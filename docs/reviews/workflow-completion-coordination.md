@@ -46944,3 +46944,60 @@ actual reviews, plus full independent D4 ledger2598170+10510/3b9c9b30. P1 is fro
 before any new production body. Writer's disjoint domain/storage tests and Root's
 other ports/node identities continue; no production release, parity credit or
 whole-worktree acceptance follows. The last validated production remains b861d3d.
+
+
+### ROOT-B1-TEST-PRECISION1 — approved ports split and actual next REDs
+
+Root consulted before creating the additional ports children. ARCH
+B1-CREATE1-TEST-PRECISION1, note3351953+2178/SHA256
+f40d2de2c99414da963370038e6b64d455dfaa6fa0979ce10e3d06c6167ee0c9,
+was read entirely. Select exactly existing interop.rs private children
+interop/fresh.rs(P2) and interop/retained.rs(P3) under the already named
+complete_policy_request integration target. No new type/alias/model/probe,
+dependency or identity; eleven test/helper files, fifteen IDs, six production
+paths. Root owns these children. Production remains held.
+
+The domain handoff is under Root formatting/validation custody; Writer continues
+only storage. After formatting, Root replaced forbidden fixture expect() calls
+with checked bounded conversions and explicit assertions, preserving all test
+assertions. Actual command under291 inputs9d5ddc8e exits101 unchanged: exactly
+four selected missing public imports (StoredPolicyValue, converter, sizer and
+stored Core patch). Raw3143705+1561/SHA256
+785c3bd773bc3c62b4e8b6bd9ae280cda40b579204e224cdc024164414625971.
+No domain test assertion ran, and strict target lint cannot run past missing
+APIs yet. Actual ARCH/PERF review is in progress; raw-splice absolute ledger
+remains pending and is not replaced by the converter ledger.
+
+Root authored approved N1 recovery interop.rs plus one parent registration.
+The existing-API test compiles and fails at the real Core-over-ETF publication
+with Transaction(UnsupportedPolicyFormat), before subsequent recovery controls.
+Actual0pass/1fail/18filtered, raw3145404+804/SHA256
+ecff045e672cbddf142107d966108b2357e01c2bdb6fd48af8fc2c90637c70b5.
+All500 captured library/recovery/config inputs are unchanged d3f78c63. Strict
+recovery-target Clippy passes at the same input pin, raw3146342+953/SHA256
+ce9447223cf69e9f84dc117baa2ab92e793aad5710a689bb661488f1418e83b0.
+N1 exact-cut/body-pool/audit/replay/receipt/cohort checks are written but not
+executed beyond that reached RED. Actual reciprocal source review remains
+required before freezing; no implementation release or parity credit follows.
+
+
+### ROOT-B1-N1-REVIEWED-FREEZE1 — actual compiled suffix regression
+
+Root whole/hash-read ARCH3362077+3646/b5907d8e and PERF2622674+3431/28ea7e9a.
+Both actual N1 reviews independently conserve the entire old parent by removing
+only mod interop and independently pack ETF62/FWPV40. The held source is
+node recovery/original_policy/interop.rs13808B392LF/ca5862ec, parent14979B454LF/005655bb.
+The actual behavior RED804/ecff and strict953/ce94 at unchanged500-inputd3f78c63
+remain the validation epoch. No source changed after them. Root accepts this
+finite reviewed test for tests-only freezing. Real audit/suffix/cut/body-pool,
+receipt and six-table postimages after Core-u8 remain unexecuted; this is no
+implementation GREEN, full B1 release or full-source parity credit.
+
+Root has also authored approved ports fresh/retained children and received N2.
+Their actual compile/runtime failures and review stages are distinct from N1.
+Initial ports helper E0716 was fixed before the final missing-carrier-only compile
+RED; initial N2 Clippy similar_names was repaired before passing target lint.
+No checks were suppressed. Storage S1/S2 were independently reviewed with their
+coherent corrected RED; Root returned those buffers to Writer for remaining
+cases. Unregistered fault/snapshot work is excluded from scoped executed-input
+pins. Production stays unchanged from b861d3d throughout this tests-first work.

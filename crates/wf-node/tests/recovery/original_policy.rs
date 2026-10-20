@@ -32,6 +32,7 @@ use wf_storage::transaction::{
 use wf_types::identity::{PartitionId, RecordId, RequestId};
 
 mod audit;
+mod interop;
 
 fn normal() -> RecordBatchTransactionLimits {
     let mut value = f::driver_limits();

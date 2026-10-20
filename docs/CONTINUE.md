@@ -41,11 +41,18 @@ passing sequence, rather than counted as a production bug.
 Full product completion remains open. The next required work is same-type
 ETF/V2 interoperability, followed by actual runtime source profiles/order,
 authoritative indexed record effects and durable migration jobs. The concrete B1
-test batch is now selected after architecture/performance review; its regression
-tests are being authored before implementation. Its first ports regression
-compiles and fails with the expected UnsupportedVersion on the existing code;
-strict target Clippy passes. Later assertions in that test have not run yet.
-No successor production source is released. Full pinned Elixir scenario/assertion/setup/profile
+test batch is selected after architecture/performance review. The first frozen
+ports regression reproduced UnsupportedVersion before the later union-carrier
+tests were added. New domain and ports cases now fail compilation at the selected
+missing interoperability APIs/carriers. Two storage cases and the committed and
+received-snapshot recovery cases compile and reproduce UnsupportedPolicyFormat;
+their respective target Clippy checks pass. Their assertions after those reached
+failures remain unexecuted. Architecture and performance have reviewed the
+domain, request, storage and recovery subsets separately; unfinished cases and
+reviews remain explicit in the coordination record. Storage substitutions,
+FIFO, physical faults, snapshot and expanded transient-size coverage continue,
+alongside the final independently priced raw-splice controls. No successor
+production source is released. Full pinned Elixir scenario/assertion/setup/profile
 parity, governing services, accepted consensus/runtime, application/transports
 and both Linux/macOS acceptance remain required. Progress remains 85 source-derived
 declarations, 95 mappings and 384 assertion links; this increment adds no parity
