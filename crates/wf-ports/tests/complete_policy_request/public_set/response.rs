@@ -142,13 +142,13 @@ fn response_correspondence_rejects_legal_wrong_install_and_context() -> TestResu
             &mut charge,
             1_000_000
         )?);
-        if !rejected {
-            super::accepted(&plan, 1, 2, &minimal(2)?)?;
-        } else {
+        if rejected {
             assert_eq!(
                 super::retained(&plan)?.response(),
                 b"ERR stale flow policy generation"
             );
+        } else {
+            super::accepted(&plan, 1, 2, &minimal(2)?)?;
         }
         for index in 0..3 {
             let other = changed_field(original, index)?;

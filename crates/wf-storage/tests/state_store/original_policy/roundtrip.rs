@@ -397,6 +397,7 @@ fn present_gen0_big_integer_and_get_error_order() -> TestResult {
     drop(store);
     assert_zero_read_invalid_opts(&path)?;
     assert_eq!(f::cohort(&path)?, expected);
+    super::limits::assert_original_hard_length_corrupt(&path, &expected)?;
     drop(f::open(&path, 64)?);
     Ok(())
 }
@@ -503,6 +504,26 @@ fn assert_unchanged_rich_and_meta(path: &Path, expected: &mut f::Cohort) -> Test
     )?;
     f::replace(path, expected)?;
     drop(f::open(path, 64)?);
+    // Explicit restored component with state-local governance, coherent census
+    // and strict reopen; the original root-governance cohort is restored below.
+    let state_config = f::etf_map(&[(f::atom(b"governance")?, f::etf_map(&[])?)])?;
+    let state_rows = f::etf_map(&[(f::binary(b"queued")?, state_config)])?;
+    let mut state_governance = expected.clone();
+    f::rows_mut(&mut state_governance)?.insert(
+        f::key(6, &[b"g", b"z", b"t", b"job"]),
+        f::etf_policy(1, b"job", &[(b"states", &state_rows)])?,
+    );
+    f::upgrade6(
+        &mut state_governance,
+        &f::scope()?,
+        f::catalog(&f::scope()?, [None, None], None, None, None)?,
+    )?;
+    f::replace(path, &state_governance)?;
+    drop(f::open(path, 64)?);
+    f::assert_original_governance_claim_refused(path, 1, &state_governance)?;
+    f::replace(path, expected)?;
+    drop(f::open(path, 64)?);
+    f::assert_original_governance_claim_refused(path, 1, expected)?;
     let bytes = frame(b"unchanged", 3, Raw::Map(&[]), Raw::List(&[]))?;
     let raw = f::etf_policy(
         2,
@@ -514,6 +535,7 @@ fn assert_unchanged_rich_and_meta(path: &Path, expected: &mut f::Cohort) -> Test
         ],
     )?;
     publication(path, b"unchanged", 3, 1, &bytes, expected, Some(&raw))?;
+    f::assert_original_governance_claim_refused(path, 2, expected)?;
     let patch = [(
         Raw::Atom("indexed_state_meta"),
         Raw::List(&[Raw::Binary(b"customer")]),

@@ -17,6 +17,63 @@ use wf_storage::transaction::{
 };
 use wf_types::identity::RequestId;
 
+pub(super) fn assert_original_hard_length_corrupt(path: &Path, expected: &f::Cohort) -> TestResult {
+    use wf_domain::policy::complete::PolicySchemaLimits;
+    use wf_storage::state::{RedbStateStore, StateStoreLimits};
+
+    let normal = f::store_limits(64)?;
+    let temporary = 32 * 1_048_576;
+    let narrow = StateStoreLimits::new(
+        normal.admission(),
+        PolicySchemaLimits::new(normal.schema().policy_limits(), u64::try_from(temporary)?)?,
+        (
+            normal.maximum_genesis_rows(),
+            normal.maximum_genesis_bytes(),
+        ),
+        (
+            normal.maximum_recovery_rows(),
+            normal.maximum_recovery_bytes(),
+            normal.maximum_recovery_steps(),
+        ),
+        temporary,
+        normal.workspace_bytes(),
+    )?
+    .with_history_max_events_limit(64)?
+    .with_original_policy_reply_defaults(normal.original_policy_reply_defaults())?;
+    let s = f::scope()?;
+    // Healthy raw authority is supported under these SAME schema/C limits.
+    drop(RedbStateStore::open(
+        path,
+        s.group().clone(),
+        s.recovery().clone(),
+        narrow,
+    )?);
+    let mut invalid = expected.clone();
+    let mut oversized = f::etf_policy(0, b"job", &[(b"states", &f::etf_map(&[])?)])?;
+    oversized.resize(263_169, 0);
+    assert_eq!(65_536 + 256 * oversized.len(), 67_436_800);
+    assert!(67_436_800 > temporary);
+    f::rows_mut(&mut invalid)?.insert(f::key(6, &[b"g", b"z", b"t", b"job"]), oversized);
+    f::upgrade6(
+        &mut invalid,
+        &s,
+        f::catalog(&s, [None, None], None, None, None)?,
+    )?;
+    f::replace(path, &invalid)?;
+    let error = RedbStateStore::open(path, s.group().clone(), s.recovery().clone(), narrow).err();
+    assert_eq!(f::cohort(path)?, invalid);
+    f::replace(path, expected)?;
+    drop(RedbStateStore::open(
+        path,
+        s.group().clone(),
+        s.recovery().clone(),
+        narrow,
+    )?);
+    assert_eq!(error, Some(StateTransactionError::Corrupt));
+    assert_eq!(f::cohort(path)?, *expected);
+    Ok(())
+}
+
 fn input() -> TestResult<(Vec<u8>, Vec<u8>)> {
     let caps = f::limits();
     let s = f::scope()?;
@@ -233,7 +290,7 @@ fn get_reply_workspace(path: &Path) -> TestResult {
                         wf_domain::policy::complete::CompletePolicyEncodingError::Malformed,
                     )
                 })?;
-                assert!(reply.atom_field(b"states", account)?.is_some());
+                assert!(reply.root().atom_field("states", account)?.is_some());
                 Ok(())
             },
         );

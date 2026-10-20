@@ -307,6 +307,44 @@ pub(super) fn claim(
     Ok(())
 }
 
+pub(super) fn assert_original_governance_claim_refused(
+    path: &Path,
+    at: u64,
+    expected: &Cohort,
+) -> TestResult {
+    use wf_storage::transaction::ClaimTransactionError;
+
+    let namespace = scope()?;
+    let frame = claim_frame(
+        &namespace,
+        b"guard-original-governance",
+        20,
+        b"job",
+        b"worker",
+        None,
+        None,
+    )?;
+    let mut store = open(path, 64)?;
+    let result = apply_claim_transaction(
+        &mut store,
+        &namespace,
+        &frame,
+        log(at),
+        ClaimTransactionLimits {
+            base: limits(),
+            work: ClaimWorkLimits::default(),
+        },
+    );
+    drop(store);
+    assert!(
+        matches!(result, Err(ClaimTransactionError::UnsupportedGovernance)),
+        "present original governance must stop the restricted Claim: {result:?}"
+    );
+    assert_eq!(cohort(path)?, *expected);
+    drop(open(path, 64)?);
+    Ok(())
+}
+
 pub(super) fn raw(out: &mut Vec<u8>, value: &[u8]) -> TestResult {
     out.extend_from_slice(&u32::try_from(value.len())?.to_be_bytes());
     out.extend_from_slice(value);
@@ -412,21 +450,4 @@ pub(super) fn apply(
         profile,
         charge,
     )?)
-}
-pub(super) fn seed_records(
-    store: &mut RedbStateStore,
-    commands: &[PreparedBatchItem],
-    at: u64,
-) -> TestResult {
-    let frame = batch(
-        &scope()?,
-        format!("seed-{at}").as_bytes(),
-        0,
-        commands.to_vec(),
-    )?;
-    assert!(
-        matches!(apply_record_batch_transaction(store,&scope()?,frame.as_bytes(),log(at),limits())?,
-  RecordBatchTransactionOutcome::Retained{outcome,..}if outcome.status()==RetainedStatus::Accepted)
-    );
-    Ok(())
 }

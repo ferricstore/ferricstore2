@@ -155,7 +155,7 @@ fn invoke(
     Ok(fresh)
 }
 
-fn rejected(result: OriginalPolicySetFresh, reason: Reason, body: &[u8]) {
+fn rejected(result: &OriginalPolicySetFresh, reason: Reason, body: &[u8]) {
     assert!(result.0.is_none());
     assert_eq!(
         result.1.status(),
@@ -181,7 +181,7 @@ fn state_failure(
             b"ERR flow max_active_ms is type-level only".as_slice(),
         )
     };
-    rejected(invoke(current, opts, records, Ok(64))?, reason, body);
+    rejected(&invoke(current, opts, records, Ok(64))?, reason, body);
     Ok(())
 }
 
@@ -350,7 +350,7 @@ fn binary_hash_collisions_and_governance_named_order() -> TestResult {
         };
         let body = format!("ERR flow governance {singular} rule must be a map or keyword list");
         rejected(
-            invoke(
+            &invoke(
                 &rule_policy(kind, 33, (2, 1), false)?,
                 Raw::List(&[]),
                 &empty,
@@ -371,7 +371,7 @@ fn binary_hash_collisions_and_governance_named_order() -> TestResult {
             )
         };
         rejected(
-            invoke(
+            &invoke(
                 &rule_policy(kind, 33, (1, 2), false)?,
                 Raw::List(&[]),
                 &empty,
@@ -475,7 +475,7 @@ fn assert_earlier_and_count(states: &[u8], empty: &[(u32, &[u32], &[u32])]) -> T
         (atom("type")?, binary(b"r")?),
     ];
     rejected(
-        invoke(&policy(&fields)?, Raw::List(&[]), empty, Ok(64))?,
+        &invoke(&policy(&fields)?, Raw::List(&[]), empty, Ok(64))?,
         Reason::MaxActive,
         b"ERR flow max_active_ms must be between 1 and 31536000000 or infinity",
     );
@@ -487,7 +487,7 @@ fn assert_earlier_and_count(states: &[u8], empty: &[(u32, &[u32], &[u32])]) -> T
         let current = rule_policy(kind, 1001, (usize::MAX, usize::MAX), true)?;
         let body = format!("ERR flow governance {plural} policy must contain at most 1000 rules");
         rejected(
-            invoke(&current, Raw::List(&[]), empty, Ok(64))?,
+            &invoke(&current, Raw::List(&[]), empty, Ok(64))?,
             Reason::Governance(Gov::RuleCount(kind)),
             body.as_bytes(),
         );
