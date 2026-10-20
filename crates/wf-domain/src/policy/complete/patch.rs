@@ -7,12 +7,12 @@ use crate::policy::installation::{MAX_POLICY_GENERATION, MAX_POLICY_SNAPSHOT_BYT
 use crate::value::{DomainError, InputField};
 
 use super::admission::charge_schema;
-use super::encoding::decode_complete_policy_candidate_v2;
+use super::encoding::{decode_complete_policy_candidate_v2, encode_complete_policy_candidate_v2};
 use super::validation::admit_complete;
 use super::{
     CompletePolicyCandidate, CompletePolicyData, CompletePolicyEncodingError, CompletePolicyValue,
-    PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits, prepare_complete_policy_value_v2,
-    validate_stored_complete_policy, verify_complete_policy_value_v2,
+    PolicySchemaCharge, PolicySchemaError, PolicySchemaLimits, validate_stored_complete_policy,
+    verify_complete_policy_value_v2,
 };
 
 mod merge;
@@ -61,7 +61,8 @@ pub fn prepare_complete_core_policy_patch(
     if let Some(existing) = existing {
         validate_complete_core_patch_current(existing, &input.workflow_type, limits, charge)?;
     }
-    let data = restore_core_patch_current(existing, input.workflow_type, limits, charge)?;
+    let data = restore_core_patch_current(existing, input.workflow_type, limits, charge)
+        .map_err(|(error, _)| error)?;
     let data = merge_core_patch_content(
         data,
         input.patch,
@@ -69,8 +70,10 @@ pub fn prepare_complete_core_policy_patch(
         history_max_events_limit,
         limits,
         charge,
-    )?;
+    )
+    .map_err(|(error, _)| error)?;
     encode_core_patch_content(stored, migration_high_water, data, limits, charge)
+        .map_err(|(error, _)| error)
 }
 
 pub(super) fn check_complete_core_patch_guard(
@@ -107,27 +110,36 @@ pub(super) fn restore_core_patch_current(
     workflow_type: Vec<u8>,
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
-) -> Result<CompletePolicyData, CompletePolicyEncodingError> {
+) -> Result<CompletePolicyData, (CompletePolicyEncodingError, Vec<u8>)> {
     if let Some(existing) = existing {
-        let candidate = decode_complete_policy_candidate_v2(existing.encoded(), limits, charge)?;
+        let candidate =
+            match decode_complete_policy_candidate_v2(existing.encoded(), limits, charge) {
+                Ok(candidate) => candidate,
+                Err(error) => return Err((error, workflow_type)),
+            };
         let mut data = candidate.data;
         data.workflow_type = workflow_type;
         Ok(data)
     } else {
-        charge_schema(charge, 128, 0).map_err(CompletePolicyEncodingError::Schema)?;
-        if workflow_type.is_empty() {
-            return Err(CompletePolicyEncodingError::Schema(
-                PolicySchemaError::Policy(PolicyError::Domain(DomainError::EmptyValue(
-                    InputField::Type,
-                ))),
-            ));
+        let admitted = (|| {
+            charge_schema(charge, 128, 0).map_err(CompletePolicyEncodingError::Schema)?;
+            if workflow_type.is_empty() {
+                return Err(CompletePolicyEncodingError::Schema(
+                    PolicySchemaError::Policy(PolicyError::Domain(DomainError::EmptyValue(
+                        InputField::Type,
+                    ))),
+                ));
+            }
+            if workflow_type.len() > MAX_POLICY_SNAPSHOT_BYTES {
+                return Err(CompletePolicyEncodingError::Schema(
+                    PolicySchemaError::SnapshotBytes,
+                ));
+            }
+            charge_schema(charge, 128, 0).map_err(CompletePolicyEncodingError::Schema)
+        })();
+        if let Err(error) = admitted {
+            return Err((error, workflow_type));
         }
-        if workflow_type.len() > MAX_POLICY_SNAPSHOT_BYTES {
-            return Err(CompletePolicyEncodingError::Schema(
-                PolicySchemaError::SnapshotBytes,
-            ));
-        }
-        charge_schema(charge, 128, 0).map_err(CompletePolicyEncodingError::Schema)?;
         Ok(CompletePolicyData {
             workflow_type,
             version: None,
@@ -149,8 +161,8 @@ pub(super) fn merge_core_patch_content(
     history_max_events_limit: u32,
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
-) -> Result<CompletePolicyData, CompletePolicyEncodingError> {
-    merge::merge_core_policy(
+) -> Result<CompletePolicyData, (CompletePolicyEncodingError, Vec<u8>)> {
+    let merged = merge::merge_core_policy(
         &mut data,
         patch,
         had_existing,
@@ -158,8 +170,13 @@ pub(super) fn merge_core_patch_content(
         limits,
         charge,
     )
-    .map_err(CompletePolicyEncodingError::Schema)?;
-    admit_complete(&data, limits, charge, true).map_err(CompletePolicyEncodingError::Schema)?;
+    .and_then(|()| admit_complete(&data, limits, charge, true));
+    if let Err(error) = merged {
+        return Err((
+            CompletePolicyEncodingError::Schema(error),
+            data.workflow_type,
+        ));
+    }
     Ok(data)
 }
 
@@ -169,21 +186,26 @@ pub(super) fn encode_core_patch_content(
     data: CompletePolicyData,
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
-) -> Result<CompletePolicyValue, CompletePolicyEncodingError> {
+) -> Result<CompletePolicyValue, (CompletePolicyEncodingError, Vec<u8>)> {
     if migration_high_water > MAX_POLICY_GENERATION {
-        return Err(CompletePolicyEncodingError::Schema(
-            PolicySchemaError::InvalidAuthority,
+        return Err((
+            CompletePolicyEncodingError::Schema(PolicySchemaError::InvalidAuthority),
+            data.workflow_type,
         ));
     }
-    let generation = stored.max(migration_high_water).checked_add(1).ok_or(
-        CompletePolicyEncodingError::Schema(PolicySchemaError::Policy(
-            PolicyError::GenerationExhausted,
-        )),
-    )?;
-    if generation > MAX_POLICY_GENERATION {
-        return Err(CompletePolicyEncodingError::Schema(
-            PolicySchemaError::Policy(PolicyError::GenerationExhausted),
+    let generation = stored.max(migration_high_water).checked_add(1);
+    let Some(generation) = generation.filter(|generation| *generation <= MAX_POLICY_GENERATION)
+    else {
+        return Err((
+            CompletePolicyEncodingError::Schema(PolicySchemaError::Policy(
+                PolicyError::GenerationExhausted,
+            )),
+            data.workflow_type,
         ));
+    };
+    let candidate = CompletePolicyCandidate { generation, data };
+    match encode_complete_policy_candidate_v2(&candidate, limits, charge) {
+        Ok(encoded) => Ok(CompletePolicyValue { candidate, encoded }),
+        Err(error) => Err((error, candidate.data.workflow_type)),
     }
-    prepare_complete_policy_value_v2(CompletePolicyCandidate { generation, data }, limits, charge)
 }

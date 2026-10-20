@@ -15,7 +15,9 @@ impl RedbStateStore {
         self.ready().map_err(SnapshotError::State)?;
         admit(&self.group, &self.recovery, self.limits, limits, 0)?;
         active(&self, upgrade(&self, limits))?;
-        self.layout = 4;
+        if self.layout != 5 {
+            self.layout = 4;
+        }
         Ok(self)
     }
 }
@@ -25,7 +27,7 @@ fn upgrade(store: &RedbStateStore, limits: SnapshotLimits) -> Result<(), Snapsho
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     let facts = validate::complete(&mut tx, &mut charge, store.limits.snapshot_limits())
         .map_err(SnapshotError::State)?;
-    if store.layout == 4 {
+    if matches!(store.layout, 4 | 5) {
         return Ok(());
     }
     let pin = validate::pin(&tx).map_err(SnapshotError::State)?;

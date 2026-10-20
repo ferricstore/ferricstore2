@@ -293,3 +293,23 @@ fn rows(entry: ClaimRecord<'_>, mode: StateMode) -> Option<IndexRows<'_>> {
         }),
     }
 }
+
+/// Derives index-only mode replacement while preserving the complete record.
+/// Equal representations produce no mutation; no installed authority is supplied.
+#[must_use]
+pub fn index_delta_for_policy_modes(
+    entry: ClaimRecord<'_>,
+    before_mode: StateMode,
+    after_mode: StateMode,
+) -> IndexDelta<'_> {
+    let before = rows(entry, before_mode);
+    let after = rows(entry, after_mode);
+    if before == after {
+        IndexDelta {
+            before: None,
+            after: None,
+        }
+    } else {
+        IndexDelta { before, after }
+    }
+}

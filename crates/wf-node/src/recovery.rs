@@ -11,7 +11,8 @@ use wf_ports::state::StateTransactionError;
 use wf_storage::log::RedbLogStore;
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
-    ClaimTransactionError, RecordBatchTransactionError, RecordBatchTransactionLimits,
+    ClaimTransactionError, CorePolicyTransactionError, RecordBatchTransactionError,
+    RecordBatchTransactionLimits,
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
@@ -32,6 +33,7 @@ pub struct CommittedRecoveryLimits {
     state: (usize, usize, usize, usize),
     normal: RecordBatchTransactionLimits,
     claim_work: Option<ClaimWorkLimits>,
+    core_policy: bool,
     work: (usize, usize),
     entry: usize,
     workspace: usize,
@@ -75,6 +77,7 @@ impl CommittedRecoveryLimits {
             state,
             normal,
             claim_work: None,
+            core_policy: false,
             work,
             entry: maximum_owned_entry_bytes,
             workspace: workspace_bytes,
@@ -90,6 +93,17 @@ impl CommittedRecoveryLimits {
     #[must_use]
     pub const fn claim_work_limits(self) -> Option<ClaimWorkLimits> {
         self.claim_work
+    }
+    /// Explicitly enables complete core-policy Patch replay on the normal profile.
+    #[must_use]
+    pub const fn with_core_policy_patches(mut self) -> Self {
+        self.core_policy = true;
+        self
+    }
+    /// Reads the explicit policy opt-in; legacy construction leaves it disabled.
+    #[must_use]
+    pub const fn core_policy_patches(self) -> bool {
+        self.core_policy
     }
     /// Supported membership validation profile.
     #[must_use]
@@ -205,6 +219,8 @@ pub enum CommittedRecoveryError {
     Normal(RecordBatchTransactionError),
     /// Existing physical Claim preparation/transaction diagnosis.
     Claim(ClaimTransactionError),
+    /// Existing complete core-policy preparation/transaction diagnosis.
+    CorePolicy(CorePolicyTransactionError),
     /// Header-only parsing failure.
     Codec(CodecError),
     /// Closed Blank/Membership parsing failure.
@@ -229,6 +245,7 @@ impl fmt::Display for CommittedRecoveryError {
             Self::State(error) => return fmt::Display::fmt(error, f),
             Self::Normal(error) => return fmt::Display::fmt(error, f),
             Self::Claim(error) => return fmt::Display::fmt(error, f),
+            Self::CorePolicy(error) => return fmt::Display::fmt(error, f),
             Self::Codec(error) => return fmt::Display::fmt(error, f),
             Self::Membership(error) => return fmt::Display::fmt(error, f),
         })

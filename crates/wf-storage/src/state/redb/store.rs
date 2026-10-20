@@ -19,6 +19,7 @@ pub struct RedbStateStore {
 /// One writer revision, with cumulative returned and temporary owner accounts.
 pub struct RedbStateTransaction<'s> {
     pub(super) write: redb::WriteTransaction,
+    pub(super) layout: u16,
     pub(super) group: &'s GroupId,
     pub(super) recovery: &'s RecoveryId,
     pub(super) admission: AdmissionLimits,
@@ -175,6 +176,10 @@ impl RedbStateStore {
         &self.recovery
     }
 
+    pub(crate) fn committed_core_policy_layout(&mut self, layout: u16) {
+        self.layout = layout;
+    }
+
     pub(super) fn transaction(
         &self,
         recovering: bool,
@@ -196,6 +201,7 @@ impl RedbStateStore {
             .inspect_err(|error| fence(&self.fenced, *error))?;
         Ok(RedbStateTransaction {
             write,
+            layout: self.layout,
             group: &self.group,
             recovery: &self.recovery,
             admission,

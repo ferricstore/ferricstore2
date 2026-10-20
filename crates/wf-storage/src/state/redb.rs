@@ -12,6 +12,7 @@ mod admission;
 mod bootstrap;
 mod claim;
 mod commit;
+pub(crate) mod core_policy;
 mod cursor;
 mod membership;
 mod publication;
@@ -50,6 +51,7 @@ pub struct StateStoreLimits {
     workspace: usize,
     membership: RaftMembershipLimits,
     snapshot: SnapshotLimits,
+    history_max_events_limit: u32,
 }
 
 impl StateStoreLimits {
@@ -89,8 +91,29 @@ impl StateStoreLimits {
             workspace: workspace_bytes,
             membership: RaftMembershipLimits::default(),
             snapshot: SnapshotLimits::default(),
+            history_max_events_limit: wf_domain::retention::MAX_HISTORY_EVENTS,
         })
     }
+    /// Reads the immutable server history admission bound.
+    #[must_use]
+    pub const fn history_max_events_limit(self) -> u32 {
+        self.history_max_events_limit
+    }
+
+    /// Captures a valid server history bound without changing other profiles.
+    /// # Errors
+    /// Refuses zero or a value beyond the supported source maximum.
+    pub fn with_history_max_events_limit(
+        mut self,
+        maximum: u32,
+    ) -> Result<Self, StateTransactionError> {
+        if maximum == 0 || maximum > wf_domain::retention::MAX_HISTORY_EVENTS {
+            return Err(StateTransactionError::InvalidLimits);
+        }
+        self.history_max_events_limit = maximum;
+        Ok(self)
+    }
+
     /// Supported persisted field and decision profile.
     #[must_use]
     pub const fn admission(self) -> AdmissionLimits {
@@ -171,6 +194,7 @@ impl Default for StateStoreLimits {
             workspace: 256 * 1_048_576,
             membership: RaftMembershipLimits::default(),
             snapshot: SnapshotLimits::default(),
+            history_max_events_limit: wf_domain::retention::MAX_HISTORY_EVENTS,
         }
     }
 }

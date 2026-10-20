@@ -76,7 +76,7 @@ fn published(path: &Path) -> TestResult<f::Cohort> {
     Ok(expected)
 }
 
-fn checksum(bytes: &mut Vec<u8>) -> TestResult {
+fn checksum(bytes: &mut [u8]) -> TestResult {
     let end = bytes
         .len()
         .checked_sub(32)
@@ -248,16 +248,13 @@ fn legacy_descriptor(wire: &[u8], count: usize, pinned: bool) -> TestResult<Vec<
     Ok(out)
 }
 
-#[test]
-fn policy_activation_preserves_frozen3_ids_and_transitions_to_snapshot2() -> TestResult {
-    let dir = f::directory("policy-mixed-snapshots")?;
-    let path = dir.join("state");
-    let s = f::scope()?;
-    let mut state = f::create(&path, &s, &[b"p"], &[])?;
-    let row = f::owner(&s, b"p", f::data(b"seed", b"job", b"q", 0, Some(0))?, 0, 0)?;
-    f::seed(&mut state, &s, std::slice::from_ref(&row), 0, 0)?;
+fn seeded_log(
+    dir: &Path,
+    s: &wf_domain::workflow::request::RequestScope,
+    row: &wf_ports::state::StoredWorkflowRecord,
+) -> TestResult<RedbLogStore> {
     let seed = f::batch(
-        &s,
+        s,
         b"seed-0",
         0,
         vec![PreparedBatchItem {
@@ -283,6 +280,18 @@ fn policy_activation_preserves_frozen3_ids_and_transitions_to_snapshot2() -> Tes
     )?;
     log.append(vec![RaftLogEntry::new(f::log(0), seed.as_bytes().to_vec())])?;
     log.save_committed(f::log(0))?;
+    Ok(log)
+}
+
+#[test]
+fn policy_activation_preserves_frozen3_ids_and_transitions_to_snapshot2() -> TestResult {
+    let dir = f::directory("policy-mixed-snapshots")?;
+    let path = dir.join("state");
+    let s = f::scope()?;
+    let mut state = f::create(&path, &s, &[b"p"], &[])?;
+    let row = f::owner(&s, b"p", f::data(b"seed", b"job", b"q", 0, Some(0))?, 0, 0)?;
+    f::seed(&mut state, &s, std::slice::from_ref(&row), 0, 0)?;
+    let mut log = seeded_log(&dir, &s, &row)?;
     drop(state);
     let before_capture = f::cohort(&path)?;
     let wanted_old = f::snapshot_wire(&s, &before_capture, 1)?;
@@ -415,7 +424,7 @@ fn transition(
     );
     drop(state);
     assert_eq!(f::cohort(path)?, *expected);
-    let patch = f::frame(
+    let pending_frame = f::frame(
         s,
         b"pending",
         101,
@@ -428,7 +437,7 @@ fn transition(
         apply_complete_core_policy_patch_transaction(
             &mut state,
             s,
-            patch.as_bytes(),
+            pending_frame.as_bytes(),
             f::log(2),
             f::limits()
         ),

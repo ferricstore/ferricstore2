@@ -1,5 +1,6 @@
-//! One retained batch5 response grammar, owned by the ports response parser.
+//! Shared retained framing with explicit versioned response validation.
 
+use wf_domain::policy::complete::{PolicySchemaCharge, PolicySchemaLimits};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{
     ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
@@ -15,6 +16,9 @@ use super::{
     StateValueError, add, allocate, copy, finish, put_raw, raw, raw_size, read_u16, read_u64,
     start, take,
 };
+
+mod policy;
+pub use policy::{encode_outcome_profiled, outcome_policy_validation_bytes, scan_outcome_profiled};
 
 /// Validated borrowed metadata and response, without transaction authority.
 ///
@@ -135,6 +139,13 @@ pub fn encode_outcome(
     if status != outcome.status() {
         return Err(StateValueError::InvalidValue);
     }
+    encode_fields(outcome, maximum_bytes)
+}
+
+fn encode_fields(
+    outcome: &RetainedOutcome,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
     let scope = outcome.scope();
     let identities = [
         scope.tenant().as_bytes(),
@@ -176,6 +187,117 @@ pub fn scan_outcome<'input>(
     limits: AdmissionLimits,
     maximum_wire_bytes: usize,
 ) -> Result<ScannedRetainedOutcome<'input>, StateValueError> {
+    scan_with_policy(
+        bytes,
+        expected_scope,
+        expected_request,
+        limits,
+        maximum_wire_bytes,
+        None,
+    )
+}
+
+fn scan_with_policy<'input>(
+    bytes: &'input [u8],
+    expected_scope: &RequestScope,
+    expected_request: &RequestId,
+    limits: AdmissionLimits,
+    maximum_wire_bytes: usize,
+    profile: Option<(PolicySchemaLimits, &mut PolicySchemaCharge, usize)>,
+) -> Result<ScannedRetainedOutcome<'input>, StateValueError> {
+    with_frame(
+        bytes,
+        maximum_wire_bytes,
+        |fields,
+         intent_version,
+         digest,
+         original_position,
+         original_time,
+         expires_at,
+         response_version| {
+            let [tenant, group, recovery, request, response] = fields;
+            if tenant != expected_scope.tenant().as_bytes()
+                || group != expected_scope.group().as_bytes()
+                || recovery != expected_scope.recovery().as_bytes()
+                || request != expected_request.as_bytes()
+                || expires_at <= original_time
+                || (response.len() > limits.decision_bytes()
+                    && !(intent_version == 1 && response_version == 3)
+                    && !(intent_version == 2 && profile.is_some()))
+            {
+                return Err(StateValueError::InvalidValue);
+            }
+            let intent = match intent_version {
+                1 => {
+                    ClientIntent::new(1, digest).map_err(|_| StateValueError::UnsupportedVersion)?
+                }
+                2 if profile.is_some() => ClientIntent::complete_core_policy_patch(digest),
+                5 => ClientIntent::record_batch(digest),
+                6 => ClientIntent::independent_record_batch(digest),
+                _ => return Err(StateValueError::UnsupportedVersion),
+            };
+            let (status, response_count) = if intent_version == 2 {
+                let (schema, charge, maximum_owner) =
+                    profile.ok_or(StateValueError::UnsupportedVersion)?;
+                (
+                    policy::retained_status(
+                        intent,
+                        response_version,
+                        response,
+                        limits,
+                        (schema, charge),
+                        maximum_owner,
+                    )?,
+                    None,
+                )
+            } else if intent_version == 1 && response_version == 3 {
+                claim_retained_summary(intent, response_version, response, original_time, limits)
+                    .map_err(claim_error)?
+            } else if intent_version == 1 {
+                (
+                    public_mutation_retained_status(intent, response_version, response)?,
+                    None,
+                )
+            } else {
+                record_batch_retained_summary(intent, response_version, response)?
+            };
+            let mut owned_bytes = 512;
+            for field in fields {
+                add(&mut owned_bytes, field.len())?;
+            }
+            Ok(ScannedRetainedOutcome {
+                tenant,
+                group,
+                recovery,
+                request,
+                response,
+                intent,
+                original_position,
+                original_time,
+                expires_at,
+                response_version,
+                status,
+                limits,
+                owned_bytes,
+                response_count,
+            })
+        },
+    )
+}
+
+fn with_frame<'input, T>(
+    bytes: &'input [u8],
+    maximum_wire_bytes: usize,
+    inspect: impl FnOnce(
+        [&'input [u8]; 5],
+        u16,
+        [u8; 32],
+        LogIdentity,
+        TimestampMillis,
+        TimestampMillis,
+        u16,
+    ) -> Result<T, StateValueError>,
+) -> Result<T, StateValueError> {
     let mut offset = start(bytes, *b"FWSO", maximum_wire_bytes)?;
     let tenant = raw(bytes, &mut offset)?;
     let group = raw(bytes, &mut offset)?;
@@ -193,59 +315,15 @@ pub fn scan_outcome<'input>(
     let response_version = read_u16(bytes, &mut offset)?;
     let response = raw(bytes, &mut offset)?;
     finish(bytes, offset)?;
-    if tenant != expected_scope.tenant().as_bytes()
-        || group != expected_scope.group().as_bytes()
-        || recovery != expected_scope.recovery().as_bytes()
-        || request != expected_request.as_bytes()
-        || expires_at <= original_time
-        || (response.len() > limits.decision_bytes()
-            && !(intent_version == 1 && response_version == 3))
-    {
-        return Err(StateValueError::InvalidValue);
-    }
-    let intent = match intent_version {
-        1 => ClientIntent::new(1, digest).map_err(|_| StateValueError::UnsupportedVersion)?,
-        5 => ClientIntent::record_batch(digest),
-        6 => ClientIntent::independent_record_batch(digest),
-        _ => return Err(StateValueError::UnsupportedVersion),
-    };
-    let (status, response_count) = if intent_version == 1 && response_version == 3 {
-        claim_retained_summary(
-            intent,
-            response_version,
-            response,
-            TimestampMillis::new(original_time),
-            limits,
-        )
-        .map_err(claim_error)?
-    } else if intent_version == 1 {
-        (
-            public_mutation_retained_status(intent, response_version, response)?,
-            None,
-        )
-    } else {
-        record_batch_retained_summary(intent, response_version, response)?
-    };
-    let mut owned_bytes = 512;
-    for field in [tenant, group, recovery, request, response] {
-        add(&mut owned_bytes, field.len())?;
-    }
-    Ok(ScannedRetainedOutcome {
-        tenant,
-        group,
-        recovery,
-        request,
-        response,
-        intent,
-        original_position: LogIdentity::new(term, node, AppliedPosition::new(index)),
-        original_time: TimestampMillis::new(original_time),
-        expires_at: TimestampMillis::new(expires_at),
+    inspect(
+        [tenant, group, recovery, request, response],
+        intent_version,
+        digest,
+        LogIdentity::new(term, node, AppliedPosition::new(index)),
+        TimestampMillis::new(original_time),
+        TimestampMillis::new(expires_at),
         response_version,
-        status,
-        limits,
-        owned_bytes,
-        response_count,
-    })
+    )
 }
 
 fn claim_error(error: CodecError) -> StateValueError {

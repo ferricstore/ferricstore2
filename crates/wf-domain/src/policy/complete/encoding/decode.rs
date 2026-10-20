@@ -16,6 +16,12 @@ mod governance;
 pub(super) fn decode_snapshot(
     reader: &mut Reader<'_, '_>,
 ) -> Result<CompletePolicyData, CompletePolicyEncodingError> {
+    decode_snapshot_with_state_profile(reader, false)
+}
+pub(super) fn decode_snapshot_with_state_profile(
+    reader: &mut Reader<'_, '_>,
+    profiled: bool,
+) -> Result<CompletePolicyData, CompletePolicyEncodingError> {
     reader.node()?; // Structural snapshot.
     reader.node()?; // Owning normalized Data root.
     if reader.take(4)? != b"FWPS" {
@@ -24,11 +30,17 @@ pub(super) fn decode_snapshot(
     if reader.u16()? != 2 {
         return Err(CompletePolicyEncodingError::UnsupportedVersion);
     }
-    decode_data_fields(reader)
+    decode_data_fields_with_state_profile(reader, profiled)
 }
 
 pub(in crate::policy::complete) fn decode_data_fields(
     reader: &mut Reader<'_, '_>,
+) -> Result<CompletePolicyData, CompletePolicyEncodingError> {
+    decode_data_fields_with_state_profile(reader, false)
+}
+fn decode_data_fields_with_state_profile(
+    reader: &mut Reader<'_, '_>,
+    profiled: bool,
 ) -> Result<CompletePolicyData, CompletePolicyEncodingError> {
     let bytes = reader.raw(MAX_POLICY_SNAPSHOT_BYTES)?;
     let workflow_type = copy_leaf(bytes, reader)?;
@@ -36,7 +48,7 @@ pub(in crate::policy::complete) fn decode_data_fields(
     let max_active_ms = reader.optional(Reader::u64)?;
     let retry = reader.optional(read_retry)?;
     let retention = reader.optional(read_retention)?;
-    let count = reader.count(reader.limits.policy_limits().max_states())?;
+    let count = reader.state_count(profiled)?;
     reader.node()?; // Owning state map.
     let mut states = BTreeMap::new();
     let mut previous = None;

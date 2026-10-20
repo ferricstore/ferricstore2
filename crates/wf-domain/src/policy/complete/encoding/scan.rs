@@ -17,6 +17,14 @@ pub(super) fn scan_value(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(u64, Range<usize>), CompletePolicyEncodingError> {
+    scan_value_with_state_profile(encoded, limits, charge, false)
+}
+pub(super) fn scan_value_with_state_profile(
+    encoded: &[u8],
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    profiled: bool,
+) -> Result<(u64, Range<usize>), CompletePolicyEncodingError> {
     let mut reader = Reader::new(encoded, limits, charge);
     reader.node()?;
     if reader.take(4)? != b"FWPV" {
@@ -49,12 +57,15 @@ pub(super) fn scan_value(
         return Err(CompletePolicyEncodingError::TrailingBytes);
     }
     let mut snapshot = reader.region(start..end)?;
-    scan_snapshot(&mut snapshot)?;
+    scan_snapshot(&mut snapshot, profiled)?;
     snapshot.finish()?;
     Ok((generation, start..end))
 }
 
-fn scan_snapshot(reader: &mut Reader<'_, '_>) -> Result<(), CompletePolicyEncodingError> {
+fn scan_snapshot(
+    reader: &mut Reader<'_, '_>,
+    profiled: bool,
+) -> Result<(), CompletePolicyEncodingError> {
     reader.node()?;
     if reader.take(4)? != b"FWPS" {
         return Err(CompletePolicyEncodingError::Malformed);
@@ -62,18 +73,24 @@ fn scan_snapshot(reader: &mut Reader<'_, '_>) -> Result<(), CompletePolicyEncodi
     if reader.u16()? != 2 {
         return Err(CompletePolicyEncodingError::UnsupportedVersion);
     }
-    scan_data_fields(reader)
+    scan_data_fields_with_state_profile(reader, profiled)
 }
 
 pub(in crate::policy::complete) fn scan_data_fields(
     reader: &mut Reader<'_, '_>,
+) -> Result<(), CompletePolicyEncodingError> {
+    scan_data_fields_with_state_profile(reader, false)
+}
+fn scan_data_fields_with_state_profile(
+    reader: &mut Reader<'_, '_>,
+    profiled: bool,
 ) -> Result<(), CompletePolicyEncodingError> {
     reader.raw(MAX_POLICY_SNAPSHOT_BYTES)?;
     reader.optional(scan_version)?;
     reader.optional(Reader::u64)?;
     reader.optional(scan_retry)?;
     reader.optional(scan_retention)?;
-    let count = reader.count(reader.limits.policy_limits().max_states())?;
+    let count = reader.state_count(profiled)?;
     let mut previous = None;
     for _ in 0..count {
         reader.node()?;

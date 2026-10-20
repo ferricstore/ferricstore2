@@ -19,7 +19,12 @@ use super::{hash_core_patch_intent, map_codec_error, write_core_patch_intent};
 mod apply;
 mod decode;
 
-pub use apply::{CompleteCorePolicyPatchRequestPlan, decide_complete_core_policy_patch_frame};
+pub use apply::{
+    CompleteCorePolicyPatchPointInspection, CompleteCorePolicyPatchRequestPlan,
+    FreshCompleteCorePolicyPatchFrame, decide_complete_core_policy_patch_frame,
+    decide_complete_core_policy_patch_point_fresh, inspect_complete_core_policy_patch_point,
+    prepare_complete_core_policy_patch_point_frame,
+};
 pub use decode::{DecodedCompleteCorePolicyPatchFrame, decode_complete_core_policy_patch_frame};
 
 /// Verified original bytes and their restored private request header.

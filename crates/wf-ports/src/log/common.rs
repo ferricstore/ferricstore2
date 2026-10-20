@@ -23,6 +23,7 @@ pub fn normal_recovery_header(
         (1, 6) => 6,
         (4, 1) => 1,
         (3, 1) => 3,
+        (5, 2) => 2,
         _ => return Err(CodecError::UnsupportedTag),
     };
     Ok((
@@ -64,7 +65,7 @@ pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, Codec
         return Err(CodecError::UnsupportedVersion);
     }
     let operation_tag = reader.byte()?;
-    if !matches!(operation_tag, 1..=4) {
+    if !matches!(operation_tag, 1..=5) {
         return Err(CodecError::UnsupportedTag);
     }
     let tenant = reader.nonempty(8_192)?;
@@ -77,6 +78,7 @@ pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, Codec
         (1, _) => ClientIntent::new(1, digest).map_err(|_| CodecError::UnsupportedVersion)?,
         (5, 1) => ClientIntent::record_batch(digest),
         (6, 1) => ClientIntent::independent_record_batch(digest),
+        (2, 5) => ClientIntent::complete_core_policy_patch(digest),
         _ => return Err(CodecError::UnsupportedVersion),
     };
     let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;

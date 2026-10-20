@@ -88,6 +88,15 @@ pub fn prepare_complete_policy_value_v2(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<CompletePolicyValue, CompletePolicyEncodingError> {
+    let encoded = encode_complete_policy_candidate_v2(&candidate, limits, charge)?;
+    Ok(CompletePolicyValue { candidate, encoded })
+}
+
+pub(super) fn encode_complete_policy_candidate_v2(
+    candidate: &CompletePolicyCandidate,
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Vec<u8>, CompletePolicyEncodingError> {
     if charge.profile() != limits {
         return Err(CompletePolicyEncodingError::Schema(
             PolicySchemaError::ProfileMismatch,
@@ -99,12 +108,8 @@ pub fn prepare_complete_policy_value_v2(
         ));
     }
     admit_complete(candidate.data(), limits, charge, false).map_err(current_error)?;
-    let encoded = {
-        let measured =
-            encode::measure_value(candidate.generation(), candidate.data(), limits, charge)?;
-        encode::emit_value(&measured, limits, charge)?
-    };
-    Ok(CompletePolicyValue { candidate, encoded })
+    let measured = encode::measure_value(candidate.generation(), candidate.data(), limits, charge)?;
+    encode::emit_value(&measured, limits, charge)
 }
 
 /// Re-admits current content and streams its V2 bytes against the existing owner.
@@ -154,7 +159,27 @@ pub fn decode_complete_policy_value_v2(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<CompletePolicyValue, CompletePolicyEncodingError> {
-    let candidate = decode_complete_policy_candidate_v2(encoded, limits, charge)?;
+    decode_value(encoded, limits, charge, false)
+}
+
+/// Decodes the same complete value with explicit configured-state-cap attribution.
+/// # Errors
+/// Only the selected state count cap becomes a typed schema `StateBudget` refusal;
+/// hard grammar/count limits, work, profile and allocation errors stay exact.
+pub fn decode_complete_policy_value_v2_profiled(
+    encoded: &[u8],
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<CompletePolicyValue, CompletePolicyEncodingError> {
+    decode_value(encoded, limits, charge, true)
+}
+fn decode_value(
+    encoded: &[u8],
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    profiled: bool,
+) -> Result<CompletePolicyValue, CompletePolicyEncodingError> {
+    let candidate = decode_candidate(encoded, limits, charge, profiled)?;
     let work = u64::try_from(encoded.len())
         .ok()
         .and_then(|n| n.checked_add(128))
@@ -179,6 +204,14 @@ pub(super) fn decode_complete_policy_candidate_v2(
     limits: PolicySchemaLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<CompletePolicyCandidate, CompletePolicyEncodingError> {
+    decode_candidate(encoded, limits, charge, false)
+}
+fn decode_candidate(
+    encoded: &[u8],
+    limits: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    profiled: bool,
+) -> Result<CompletePolicyCandidate, CompletePolicyEncodingError> {
     if charge.profile() != limits {
         return Err(CompletePolicyEncodingError::Schema(
             PolicySchemaError::ProfileMismatch,
@@ -187,13 +220,21 @@ pub(super) fn decode_complete_policy_candidate_v2(
     if encoded.len() > MAX_ENCODED_POLICY_BYTES {
         return Err(CompletePolicyEncodingError::ByteLimit);
     }
-    let (generation, range) = scan::scan_value(encoded, limits, charge)?;
+    let (generation, range) = if profiled {
+        scan::scan_value_with_state_profile(encoded, limits, charge, true)?
+    } else {
+        scan::scan_value(encoded, limits, charge)?
+    };
     let data = {
         let bytes = encoded
             .get(range)
             .ok_or(CompletePolicyEncodingError::Malformed)?;
         let mut reader = Reader::new(bytes, limits, charge);
-        let data = decode::decode_snapshot(&mut reader)?;
+        let data = if profiled {
+            decode::decode_snapshot_with_state_profile(&mut reader, true)?
+        } else {
+            decode::decode_snapshot(&mut reader)?
+        };
         reader.finish()?;
         data
     };

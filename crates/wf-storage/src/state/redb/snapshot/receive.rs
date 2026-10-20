@@ -28,13 +28,14 @@ fn header(
     input: &mut impl std::io::Read,
     limits: SnapshotLimits,
     state: &mut (Sha256, usize),
-) -> Result<(usize, usize), SnapshotError> {
+) -> Result<(usize, usize, u16), SnapshotError> {
     let mut magic = [0; 6];
     piece(tx, input, limits, state, &mut magic)?;
     if &magic[..4] != b"FWSP" {
         return Err(SnapshotError::Malformed);
     }
-    if &magic[4..] != b"\0\x01" {
+    let version = u16::from_be_bytes([magic[4], magic[5]]);
+    if !matches!(version, 1 | 2) {
         return Err(SnapshotError::UnsupportedVersion);
     }
     for expected in [tx.group.as_bytes(), tx.recovery.as_bytes()] {
@@ -56,10 +57,13 @@ fn header(
     for (target, bytes) in values.iter_mut().zip(counts.as_chunks::<8>().0) {
         *target = usize::try_from(u64::from_be_bytes(*bytes)).map_err(|_| SnapshotError::Limit)?;
     }
-    if values[0] != 2 {
+    let metadata = if version == 2 { 3 } else { 2 };
+    if values[0] != metadata {
         return Err(SnapshotError::Malformed);
     }
-    let rows = values[1].checked_add(2).ok_or(SnapshotError::Limit)?;
+    let rows = values[1]
+        .checked_add(metadata)
+        .ok_or(SnapshotError::Limit)?;
     if rows > limits.maximum_rows() || values[2] > limits.maximum_encoded_bytes() {
         return Err(SnapshotError::Limit);
     }
@@ -71,7 +75,7 @@ fn header(
     if values[1] == 0 || values[2] < minimum {
         return Err(SnapshotError::Malformed);
     }
-    Ok((values[1], values[2]))
+    Ok((values[1], values[2], version))
 }
 
 fn row(
@@ -81,7 +85,7 @@ fn row(
     state: &mut (Sha256, usize),
     buffer: &mut (Vec<u8>, usize),
     wire: usize,
-    position: (bool, usize),
+    position: (bool, usize, u16),
 ) -> Result<(), SnapshotError> {
     if wire.checked_sub(state.1).is_none_or(|n| n < 44) {
         return Err(SnapshotError::Malformed);
@@ -127,9 +131,17 @@ fn row(
     let (key, value) = buffer.0.split_at(key_size);
     let expected: &[u8] = if position.1 == 0 {
         b"manifest"
-    } else {
+    } else if position.1 == 1 {
         b"membership"
+    } else {
+        b"origin"
     };
+    if position.0 && position.1 == 0 {
+        let wanted = if position.2 == 2 { [0, 5] } else { [0, 3] };
+        if value.get(4..6) != Some(wanted.as_slice()) {
+            return Err(SnapshotError::Malformed);
+        }
+    }
     if position.0 && key != expected {
         return Err(SnapshotError::Malformed);
     }
@@ -208,11 +220,11 @@ pub(super) fn receive(
     store: &RedbStateStore,
     input: &mut impl std::io::Read,
     limits: SnapshotLimits,
-) -> Result<([u8; 32], usize, usize), SnapshotError> {
+) -> Result<([u8; 32], usize, usize, u16), SnapshotError> {
     let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::Stage)?;
     fresh(&tx).map_err(SnapshotError::Stage)?;
     let mut state = (Sha256::new(), 0);
-    let (rows, wire) = header(&tx, input, limits, &mut state)?;
+    let (rows, wire, version) = header(&tx, input, limits, &mut state)?;
     for definition in [
         super::super::META,
         super::super::ROWS,
@@ -229,7 +241,7 @@ pub(super) fn receive(
     }
     {
         let mut buffer = (Vec::new(), 0);
-        for (meta, count) in [(true, 2), (false, rows)] {
+        for (meta, count) in [(true, if version == 2 { 3 } else { 2 }), (false, rows)] {
             for index in 0..count {
                 row(
                     &tx,
@@ -238,7 +250,7 @@ pub(super) fn receive(
                     &mut state,
                     &mut buffer,
                     wire,
-                    (meta, index),
+                    (meta, index, version),
                 )?;
             }
         }
@@ -253,8 +265,25 @@ pub(super) fn receive(
     }
     state.0.update(footer);
     io::eof(&tx, input, limits)?;
-    let facts = (state.0.finalize().into(), rows + 2, wire);
-    super::put_descriptor(&tx, Some(facts)).map_err(SnapshotError::Stage)?;
+    let facts = (
+        state.0.finalize().into(),
+        rows + if version == 2 { 3 } else { 2 },
+        wire,
+    );
+    if version == 2 {
+        super::policy::upgrade_catalog(
+            &tx,
+            &super::catalog::SnapshotCatalog {
+                slots: [Some(facts), None],
+                current: Some(0),
+                anchor: None,
+                pending: None,
+            },
+        )
+        .map_err(SnapshotError::Stage)?;
+    } else {
+        super::put_descriptor(&tx, Some(facts)).map_err(SnapshotError::Stage)?;
+    }
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     if validate::complete(&mut tx, &mut charge, limits).map_err(SnapshotError::Stage)?
         != Some(facts)
@@ -262,5 +291,5 @@ pub(super) fn receive(
         return Err(SnapshotError::Stage(Error::Corrupt));
     }
     super::commit(tx).map_err(SnapshotError::Stage)?;
-    Ok(facts)
+    Ok((facts.0, facts.1, facts.2, if version == 2 { 5 } else { 3 }))
 }

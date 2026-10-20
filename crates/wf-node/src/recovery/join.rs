@@ -3,17 +3,20 @@
 use super::{CommittedRecoveryError as Error, CommittedRecoveryLimits, total};
 use sha2::{Digest, Sha256};
 use wf_consensus::apply::read_applied_state;
+use wf_domain::policy::complete::{CompleteCorePolicyPatchApplyError, PolicySchemaCharge};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlState, EntryIdentity, EntryStamp, PreparedDigest};
 use wf_ports::log::{
     CodecError, RaftLogEntry, RaftLogStore, measure_control_entry, normal_recovery_header,
     prepare_claim_phase, prepare_independent_record_batch, prepare_public_mutation,
-    prepare_record_batch,
+    prepare_record_batch, verify_complete_core_policy_patch_frame,
 };
 use wf_ports::state::GroupApplyStore;
 use wf_storage::log::RedbLogStore;
 use wf_storage::state::RedbStateStore;
-use wf_storage::transaction::{ClaimTransactionError, RecordBatchTransactionError};
+use wf_storage::transaction::{
+    ClaimTransactionError, CorePolicyTransactionError, RecordBatchTransactionError,
+};
 use wf_types::identity::{GroupId, RecoveryId};
 use wf_types::version::{CommittedTime, LogIdentity};
 
@@ -180,7 +183,10 @@ fn audit_normal(
     limits: CommittedRecoveryLimits,
     base: usize,
 ) -> Result<EntryStamp, Error> {
-    let (profile, _, _) = normal_header(body, namespace, limits)?;
+    let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if profile == 2 {
+        return audit_core_policy(body, limits, base, stamp);
+    }
     let available = limits
         .workspace_bytes()
         .checked_sub(total(&[base, 512])?)
@@ -207,4 +213,37 @@ fn audit_normal(
     let stamp = EntryStamp::Stamped(decoded.request().stamp);
     drop(decoded);
     Ok(stamp)
+}
+
+fn audit_core_policy(
+    body: &[u8],
+    limits: CommittedRecoveryLimits,
+    base: usize,
+    stamp: CommittedTime,
+) -> Result<EntryStamp, Error> {
+    if !limits.core_policy_patches() {
+        return Err(Error::UnsupportedEntry);
+    }
+    let header = body
+        .len()
+        .checked_mul(3)
+        .and_then(|bytes| bytes.checked_add(2048))
+        .ok_or(Error::Limit)?;
+    limits.admit(&[base, 512, header])?;
+    let driver = limits.normal_limits();
+    let mut charge = PolicySchemaCharge::new(driver.schema);
+    let verified = verify_complete_core_policy_patch_frame(
+        body,
+        driver.schema,
+        driver.codec.admission(),
+        &mut charge,
+    )
+    .map_err(|error| {
+        Error::CorePolicy(CorePolicyTransactionError::Apply(
+            CompleteCorePolicyPatchApplyError::Request(error),
+        ))
+    })?;
+    // The verifier uses the original body/grammar and owns no reconstructed Patch.
+    drop(verified);
+    Ok(EntryStamp::Stamped(stamp))
 }

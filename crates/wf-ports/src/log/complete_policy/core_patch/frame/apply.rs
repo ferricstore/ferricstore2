@@ -1,10 +1,12 @@
 //! Ordered raw core-Patch composition; persistence remains an outer obligation.
 
+use sha2::{Digest, Sha256};
 use wf_domain::policy::complete::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,
-    CompleteCorePolicyPatchFresh, PolicySchemaCharge, PolicySchemaLimits,
-    prepare_complete_core_policy_patch_fresh,
+    CompleteCorePolicyPatchFresh, CompletePolicyValue, PolicySchemaCharge, PolicySchemaError,
+    PolicySchemaLimits, prepare_complete_core_policy_patch_fresh_with_query,
 };
+use wf_domain::policy::installation::MAX_ENCODED_POLICY_BYTES;
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlPlan, ControlState};
 use wf_domain::workflow::request::DispatchDecision;
@@ -16,6 +18,14 @@ use wf_types::version::LogIdentity;
 use super::decode::consume_verified_frame;
 use super::verify_frame;
 
+mod point;
+
+pub use point::{
+    CompleteCorePolicyPatchPointInspection, FreshCompleteCorePolicyPatchFrame,
+    decide_complete_core_policy_patch_point_fresh, inspect_complete_core_policy_patch_point,
+    prepare_complete_core_policy_patch_point_frame,
+};
+
 /// Complete mathematical parent with original reply and coherent compare inputs.
 ///
 /// No public constructor, transaction or durable publication is supplied.
@@ -24,6 +34,9 @@ pub struct CompleteCorePolicyPatchRequestPlan<'view> {
     base_control: ControlState,
     control: ControlPlan,
     decision: DispatchDecision<'view, CompleteCorePolicyPatchFresh>,
+    rejected_query: Option<Vec<u8>>,
+    predecessor_identity: Option<(usize, [u8; 32])>,
+    used_history_max_events_limit: Option<u32>,
 }
 
 impl<'view> CompleteCorePolicyPatchRequestPlan<'view> {
@@ -49,6 +62,42 @@ impl<'view> CompleteCorePolicyPatchRequestPlan<'view> {
     #[must_use]
     pub const fn decision(&self) -> &DispatchDecision<'view, CompleteCorePolicyPatchFresh> {
         &self.decision
+    }
+
+    /// Reads history context only when Fresh preparation reached its valid getter.
+    /// The consuming store still checks this mathematical value against its own.
+    #[must_use]
+    pub const fn used_history_max_events_limit(&self) -> Option<u32> {
+        self.used_history_max_events_limit
+    }
+
+    /// Borrows the original Fresh query; non-Fresh has no current-policy query.
+    /// Rejected queries retain their original owner, including an empty type.
+    #[must_use]
+    pub fn workflow_type(&self) -> Option<&[u8]> {
+        match &self.decision {
+            DispatchDecision::Fresh((Some((_, value)), _)) => Some(&value.data().workflow_type),
+            DispatchDecision::Fresh((None, _)) => self.rejected_query.as_deref(),
+            _ => None,
+        }
+    }
+
+    /// Checks correspondence to the predecessor used during pure preparation.
+    ///
+    /// This fixed digest uses the same collision assumption as private frames.
+    /// Each actual hash is bounded native O(P) work, outside the logical g tariff;
+    /// equality does not prove stored origin or committed authority.
+    #[must_use]
+    pub fn matches_predecessor(&self, predecessor: Option<&CompletePolicyValue>) -> bool {
+        match (self.predecessor_identity, predecessor) {
+            (None, None) => true,
+            (Some((length, digest)), Some(value))
+                if length <= MAX_ENCODED_POLICY_BYTES && value.encoded().len() == length =>
+            {
+                digest == <[u8; 32]>::from(Sha256::digest(value.encoded()))
+            }
+            _ => false,
+        }
     }
 
     /// Moves all proposed owners and compare inputs without copying reply bytes.
@@ -105,19 +154,27 @@ pub fn decide_complete_core_policy_patch_frame<'view>(
     let expected_revision = view.revision;
     let base_control = view.gate.control;
     let control = gate.control();
+    let mut rejected_query = None;
+    let mut predecessor_identity = None;
+    let mut used_history_max_events_limit = None;
     let decision = match gate.decision() {
         GateDecision::Fresh => {
             let input = consume_verified_frame(verified, limits, admission, charge)
                 .map_err(Request)?
                 .into_input();
-            DispatchDecision::Fresh(prepare_complete_core_policy_patch_fresh(
-                view,
-                input,
-                (intent, log, control.execution_time()),
-                limits,
-                admission,
-                charge,
-            )?)
+            let (prepared, query, current, used_history) =
+                prepare_complete_core_policy_patch_fresh_with_query(
+                    view,
+                    input,
+                    (intent, log, control.execution_time()),
+                    limits,
+                    admission,
+                    charge,
+                )?;
+            rejected_query = query;
+            predecessor_identity = capture_predecessor(current)?;
+            used_history_max_events_limit = used_history;
+            DispatchDecision::Fresh(prepared)
         }
         GateDecision::Replay(original) => DispatchDecision::Replay(original),
         GateDecision::IntentConflict => DispatchDecision::IntentConflict,
@@ -129,5 +186,25 @@ pub fn decide_complete_core_policy_patch_frame<'view>(
         base_control,
         control,
         decision,
+        rejected_query,
+        predecessor_identity,
+        used_history_max_events_limit,
     })
+}
+
+fn capture_predecessor(
+    current: Option<&CompletePolicyValue>,
+) -> Result<Option<(usize, [u8; 32])>, CompleteCorePolicyPatchApplyError> {
+    current
+        .map(|value| {
+            let length = value.encoded().len();
+            if length > MAX_ENCODED_POLICY_BYTES {
+                return Err(CompleteCorePolicyPatchApplyError::Request(
+                    PolicySchemaError::InvalidAuthority.into(),
+                ));
+            }
+            // The validated current owner bounds this additional native hash walk.
+            Ok((length, Sha256::digest(value.encoded()).into()))
+        })
+        .transpose()
 }

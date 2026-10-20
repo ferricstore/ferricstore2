@@ -10,8 +10,9 @@ use wf_ports::state::GroupApplyStore;
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
     ClaimTransactionLimits, ClaimTransactionOutcome, RecordBatchTransactionOutcome,
-    apply_claim_transaction, apply_independent_record_batch_transaction,
-    apply_public_mutation_transaction, apply_record_batch_transaction,
+    apply_claim_transaction, apply_complete_core_policy_patch_transaction,
+    apply_independent_record_batch_transaction, apply_public_mutation_transaction,
+    apply_record_batch_transaction,
 };
 use wf_types::identity::{GroupId, RecoveryId, TenantId};
 
@@ -89,6 +90,9 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
+    if profile == 2 && !limits.core_policy_patches() {
+        return Err(Error::UnsupportedEntry);
+    }
     let claim_work = if profile == 3 {
         Some(limits.claim_work_limits().ok_or(Error::UnsupportedEntry)?)
     } else {
@@ -127,19 +131,30 @@ fn normal(
         drop(scope);
         return Ok(control);
     }
-    let outcome = match profile {
-        5 => apply_record_batch_transaction(state, &scope, entry.body(), entry.id(), driver),
-        6 => apply_independent_record_batch_transaction(
+    let outcome = if profile == 2 {
+        apply_complete_core_policy_patch_transaction(
             state,
             &scope,
             entry.body(),
             entry.id(),
             driver,
-        ),
-        1 => apply_public_mutation_transaction(state, &scope, entry.body(), entry.id(), driver),
-        _ => return Err(Error::UnsupportedEntry),
-    }
-    .map_err(Error::Normal)?;
+        )
+        .map_err(Error::CorePolicy)?
+    } else {
+        match profile {
+            5 => apply_record_batch_transaction(state, &scope, entry.body(), entry.id(), driver),
+            6 => apply_independent_record_batch_transaction(
+                state,
+                &scope,
+                entry.body(),
+                entry.id(),
+                driver,
+            ),
+            1 => apply_public_mutation_transaction(state, &scope, entry.body(), entry.id(), driver),
+            _ => return Err(Error::UnsupportedEntry),
+        }
+        .map_err(Error::Normal)?
+    };
     let control = match outcome {
         RecordBatchTransactionOutcome::Retained { control, outcome } => {
             drop(outcome);

@@ -1305,7 +1305,8 @@ process kills and exact/tight logical profiles supplement selection/replay tests
 The separate pinned native compatibility executable also passes. These results
 establish no power-loss theorem, measured CPU/RSS improvement, Linux execution,
 full source/setup/profile parity, public Claim/governance or accepted runtime
-readiness. Durable complete-policy activation is the required next route. See
+readiness. At that checkpoint, durable complete-policy activation was the required
+next route; the section below records its private implementation. See
 [ADR-007](adr/007-durable-log-storage.md#selected-durable-physical-claim-leaf).
 
 
@@ -1328,3 +1329,41 @@ source review preserve the old Full and uncharged paths. This is the prerequisit
 for real point/Fresh policy publication; it does not implement that publication,
 reindexing, a policy-aware layout, snapshots, public parent/governance or runtime.
 See [ADR-006](adr/006-private-prepared-command-codec.md#selected-charged-policy-point-prerequisite).
+
+
+## Durable complete core-policy publication
+
+ARCH-M1M2-DURABLE-COMPLETE-CORE-PATCH1-CREATE1 and its precise refinements join
+the complete normalized core Patch to the existing exclusive state writer.
+Thirteen private production children remain grouped under domain, ports and
+storage feature parents; redb stays in storage. The wire remains FWCP1 tag5,
+ClientIntent2 and response1; recovery's local profile2 is a classifier rather
+than a wire operation tag. One charged retained point gate precedes Fresh-only
+command ownership and current-policy preparation.
+
+The sealed mathematical plan binds the original query and exact preparation
+predecessor. Every Fresh commit repeats actual predecessor correspondence,
+including business rejection; accepted replies match complete value content and
+generation. A private scalar records history context only when preparation
+reaches its valid getter. The consuming writer compares it with actual store
+configuration, preserving earlier stale-generation rejection. These values
+confer no durable authority until the real guard validates and commits them.
+
+Accepted publication scans the entire target-tenant canonical record stream,
+validates untouched predecessor indexes and captures each original FIFO head
+before mutation. Final lane repair follows genuine end of stream. One Immediate
+transaction publishes policy, indexes, original response, control and current
+catalog metadata. Rejection and retained decisions skip reindexing. The first
+accepted publication upgrades LIVE3/4 to5, preserving immutable canonical birth
+metadata and old snapshot bytes/IDs. FWSP2 carries canonical5 plus origin; FWSP1
+remains valid as an older base. Explicit recovery opt-in audits the complete
+policy frame and replays the actual driver.
+
+Logical decoder owners, work, schema scratch and storage budgets remain
+prospectively admitted. Both boxed point variants use Rust's ordinary allocation
+behavior; they add no fallible-allocation or measured performance guarantee.
+The handoff records current tests and remaining validation. Durable publication
+for public Policy.set/Flow, distributed migrations, governing-owner/public Claim,
+accepted consensus/runtime, full original setup/profile parity and native Linux
+acceptance remain required. See
+[ADR-007](adr/007-durable-log-storage.md#durable-complete-core-policy-publication).

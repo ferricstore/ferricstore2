@@ -82,9 +82,13 @@ impl ClientIntent {
             Err(RequestValueError::UnsupportedVersion)
         }
     }
-    /// Selects the complete-core-Patch registry after same-frame digest comparison.
+    /// Selects the mathematical complete-core-Patch grammar for an explicit digest.
+    ///
+    /// Performs no verification, admission, payment or authorization and proves
+    /// no committed outcome. Frame callers must verify the actual original bytes;
+    /// persisted-outcome callers must validate their full framing and response.
     #[must_use]
-    pub(crate) const fn complete_core_policy_patch(digest: [u8; 32]) -> Self {
+    pub const fn complete_core_policy_patch(digest: [u8; 32]) -> Self {
         Self { version: 2, digest }
     }
 

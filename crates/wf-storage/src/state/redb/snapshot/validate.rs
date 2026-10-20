@@ -70,7 +70,7 @@ pub(in crate::state::redb) fn retained(
     profile: SnapshotLimits,
     layout: u16,
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
-    if layout == 4 {
+    if matches!(layout, 4 | 5) {
         let supported = tx.limits.snapshot_limits();
         return super::catalog::retained(tx, charge, supported);
     }
@@ -96,7 +96,7 @@ fn retained_inner(
     expected: ([u8; 32], usize, usize),
 ) -> Result<(), Error> {
     let (layout, saved) = recovery::cohort(tx, charge)?;
-    if layout != 3 || format::facts(tx, profile)? != expected {
+    if !matches!(layout, 3 | 5) || format::facts(tx, profile)? != expected {
         return Err(Error::Corrupt);
     }
     tx.step()?;
@@ -108,12 +108,21 @@ fn retained_inner(
         .map_err(admission::table_error)?;
     let old_manifest = get(tx, &old, b"manifest")?;
     let live_manifest = get(tx, &live, b"manifest")?;
+    let old_origin = super::policy::origin(tx, &old, old_manifest.value())?;
+    let live_origin = super::policy::origin(tx, &live, live_manifest.value())?;
     let old_member = get(tx, &old, membership::KEY)?;
     let live_member = get(tx, &live, membership::KEY)?;
     values(
         tx,
         (saved, current),
-        (old_manifest.value(), live_manifest.value()),
+        (
+            old_origin
+                .as_ref()
+                .map_or(old_manifest.value(), redb::AccessGuard::value),
+            live_origin
+                .as_ref()
+                .map_or(live_manifest.value(), redb::AccessGuard::value),
+        ),
         (old_member.value(), live_member.value()),
     )
     .map_err(|_| Error::Corrupt)
@@ -191,6 +200,8 @@ pub(super) fn compatible(
         .map_err(admission::table_error)
         .map_err(SnapshotError::Stage)?;
     let new_manifest = get(source, &source_table, b"manifest").map_err(SnapshotError::Stage)?;
+    let new_origin = super::policy::origin(source, &source_table, new_manifest.value())
+        .map_err(SnapshotError::Stage)?;
     let new_member = get(source, &source_table, membership::KEY).map_err(SnapshotError::Stage)?;
     target.carry_from(source);
     let current = target.control().map_err(SnapshotError::State)?;
@@ -201,12 +212,21 @@ pub(super) fn compatible(
         .map_err(admission::table_error)
         .map_err(SnapshotError::State)?;
     let old_manifest = get(target, &target_table, b"manifest").map_err(SnapshotError::State)?;
+    let old_origin = super::policy::origin(target, &target_table, old_manifest.value())
+        .map_err(SnapshotError::State)?;
     let old_member = get(target, &target_table, membership::KEY).map_err(SnapshotError::State)?;
     source.carry_from(target);
     values(
         source,
         (current, incoming),
-        (old_manifest.value(), new_manifest.value()),
+        (
+            old_origin
+                .as_ref()
+                .map_or(old_manifest.value(), redb::AccessGuard::value),
+            new_origin
+                .as_ref()
+                .map_or(new_manifest.value(), redb::AccessGuard::value),
+        ),
         (old_member.value(), new_member.value()),
     )
 }
@@ -221,7 +241,7 @@ pub(super) fn complete(
     if layout < 3 {
         return Err(Error::UnsupportedLayout);
     }
-    if tables != if layout == 4 { 6 } else { 4 } {
+    if tables != if matches!(layout, 4 | 5) { 6 } else { 4 } {
         return Err(Error::Corrupt);
     }
     retained(tx, charge, profile, layout)

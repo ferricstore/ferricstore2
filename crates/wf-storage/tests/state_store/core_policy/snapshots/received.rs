@@ -30,10 +30,10 @@ fn policy_snapshot2_receive_install_and_downgrade_refusal_are_atomic() -> TestRe
     assert_eq!(f::cohort(&source)?, expected);
     let target = dir.join("target");
     let mut active = f::create(&target, &s, &[b"p"], &[])?;
-    let stage = stage(&dir.join("stage"), &wire)?;
+    let incoming = stage(&dir.join("stage"), &wire)?;
     assert_eq!(
         active
-            .install_snapshot(stage, SnapshotLimits::default())?
+            .install_snapshot(incoming, SnapshotLimits::default())?
             .id(),
         &facts.0
     );

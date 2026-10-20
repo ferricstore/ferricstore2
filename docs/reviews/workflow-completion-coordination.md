@@ -46231,3 +46231,181 @@ b61ba705f8e28b296c452af307a5d0b21fff8aec3b1a3797ddca6bf3dda31b24;
 Parent fn accepted onward is byte-identical to d1d332d; child357LF/parent347LF,
 two unique moved identities and no duplication. Source correction is still held
 at this checkpoint. No parity/profile credit is created by a module move.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-SOURCE5 — used-history authority correction
+
+Tests are frozen in e937c8c after genuine RED2 and passing first-executed stale
+positive; both peers read actual grouped tests and accepted the conserved body.
+Root RELEASES only ARCH API13's exact existing-artifact refinement. Writer owns
+existing domain Full/point retaining wrappers, ONE shared reducer, and backend
+actual captured scalar comparison. The retaining tuple gains fourth Option<u32>,
+set ONLY after the existing history getter succeeds and unchanged range check
+passes, immediately before merge; old wrappers discard extras. Bundle existing
+query/history mutable outputs in one tuple argument to preserve seven arguments.
+Root owns existing RequestPlan private used_history_max_events_limit field and
+const getter, Full/point carry wiring and non-Fresh None. The backend compares
+Some(used) to actual tx.limits history after profile/control/response validation,
+before publication. Mismatch InvalidChanges, no owner fencing; unreached None
+keeps early-CAS/non-Fresh order. No new file/type/alias/model/dependency, I/O, heap
+owner, g/p/R/S/C fee or scope expansion is released. Ordinary reciprocal review
+and actual coherent tests/strict checks remain required; full product stays open.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-SOURCE6 — exact strict type alias
+
+API13 actual storage15/15 passes at raw2437749+2090/
+a3b80971638f249515743528d74dd41faa22fd028f381836a36ce141636895c0.
+Full quality1370input epoch6fea00e0a6649835bc0c314af10ec7f7bdb58e8db403ce4e0054bf5bc7ca2e4a
+passes formatter and all-target check; strict stops only on three new four-tuple
+Result type_complexity errors, raw2441243+1900/
+d1da1eb568ff05d30d04c0025a5f74213a2827401ec3c23fd7a1732138801432.
+Every input stayed unchanged. Root whole-read/hash-verified ARCH API14 at
+3086436+1707/6d3863bb7a5f570ee18d16ec7fe231d988d5bb5079c480bb10193576cf4c4d4b.
+Root RELEASES exactly one transparent existing-artifact alias
+CompleteCorePolicyPatchPreparation<'current> of the identical four-tuple. Writer
+owns definition/docs in existing request.rs, reexport in existing complete.rs,
+and import/use in existing point.rs, replacing only three Result spellings.
+No body/test/runtime/heap owner/lifetime/tariff/model/path/dependency or waiver
+changes. Original selected inventory is seven nominals, two traits and one alias.
+Backend and ports stay exact. Root formats and resumes strict/full validation.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-STRICT3 — disjoint mechanical cleanup
+
+Alias SOURCE6 is independently reviewed with whole-file inverse proofs.
+Epoch1370/389ff571d24bb1e6211e463845cd5f6356812a5b72c3d605c6a6ca04628a2681
+passes formatter/check, then strict stops at raw2444524+7593/
+0fb3667ae2982edd14d246ee72228e18c7abf077cad44b8d7a2adaaa27cfd725:
+three backend redundant closures, canonical while-let spelling, nested snapshot
+return complexity, two profile tuple needlessly passed-by-value diagnoses,
+driver138/100 lines and two ports test style diagnoses. Inputs unchanged.
+Root RELEASES Writer only existing backend method references and reindex while-let
+spelling; PERF owns only existing outcome/policy.rs tuple destructuring without
+signature/profile/account changes; Root owns boolean conversion and explicit raw
+pointer syntax in the existing point test. No oracle/fee/decode/behavior changes.
+Driver extraction and private snapshot flattening await exact ARCH decision
+before source edits; no lint/size waiver or extra alias/model is selected.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-SOURCE7 — exact existing-seam geometry
+
+Root whole-read/hash-verified ARCH API15 at3092840+2644/
+ccde109e66e655a07e7245f06e7b2db2f7f59f45d406851c5a434214a4a2a1c8.
+RELEASE Writer only existing transaction/core_policy.rs same-file apply_fresh
+helper, exactly seven arguments/selected return, moving the actual Fresh arm;
+main updates cached layout only after its actual committed result. Also RELEASE
+existing snapshot/receive.rs private four-scalar flat return and sole stage.rs
+caller reconstructing the identical existing facts triple. Original commit,
+charge, query, owner and error order remain; no new path/alias/model/trait or
+fee/waiver. Backend/reindex style and PERF tuple destructures have stable whole-
+file inverse handoffs; Root's two ports test spellings likewise reverse ENTIRELY
+to e937c8c. All exact oracles remain. Root alone formats and resumes validation.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-STRICT4 — tests-only remaining diagnoses
+
+Source7 epoch1370/9ef4d97d8f04f29e13267dbd0d289f0765de55e1917db295372f65af6106b233
+passes formatter/all-target check and all production lint compilation. Strict
+stops only on test styles at2453110+6628/
+0ef564d1f3ec8d02bc0665c4b6bc613a371294765cdb217b83bec94ff2ce6b1c:
+two local similar names, fixtures filter tuple complexity, checksum Vec argument,
+one116-line snapshot test and shared check_probe borrowed Option. No production
+refinement, alias or waiver is needed. Root owns existing fixtures/snapshot test
+mechanics; PERF owns only existing faults/backend.rs Option<&> +two as_ref callers.
+The exact seeded_log same-file helper awaits ARCH selection before creation.
+
+Separate native source proof17 remains byte-identical to55bcbd85. All1387 combined
+inputs stayed unchanged (bece90108e5760263f171348fa46aaaed4186cacaadbad47f68ae863ca01f25d).
+Pinned formatter/check/strict/complete native executable pass, native log
+1160314+0;1160390+574/56de80294c36a98f7f791cf36070a1f37a7befb98690cd4eb8e7ca550932e8eb;
+1161056+184/567faa2720f16cc22e3b97bae4a8bc28155c852615cf00d827bc4772b41d5dd4;
+1161300+660/78d01f3d2258c698dd2145c4f3fa5d9dd40e62d29800f1f292a5605069684c78.
+This is native Darwin compatibility for stable Source7 production; later test-only
+style changes are a different repository-input epoch and need full tests/strict.
+
+ARCH TEST9 at3095484+1500/
+f3f7f313d6075a4086125edfef18241a5fb13d1d193bad81211cf7210f12b19a
+whole-read/hash-verified. Native pin is terminal0, so Root RELEASES exactly
+existing snapshots.rs seeded_log helper of the named three arguments, moving
+only actual PreparedCreate/log create/append/save, keeping state seed and all
+later custody/oracles. No new path/type/identity/fee; all production stays frozen.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-FULL1 — legacy unsupported-version fixture
+
+Final1370/992124c epoch passes all-target strict at2460239+260/ecacb79a.
+Full tests then stop on one OLD snapshot negative at2460583+91142/
+21d6bda1853c89985c60eb2c7d89e0149c1d47b7fe346d0e7c8b1341d69c6502.
+All inputs unchanged; all15 policy storage cases pass; state target80pass/1fail.
+The old unknown-version operand2 is now explicitly supported FWSP2. Tagging the
+frozen two-metadata-row FWSP1 body with2 correctly returnsMalformed, rather than
+UnsupportedVersion. This is a version-extension fixture conflict, not permission
+to change receiver error precedence or relabel a corrupted valid2 body.
+Root keeps its original UnsupportedVersion assertion with future version3 and
+adds a same-identity legacy-body-as-v2 subcase requiringMalformed. Every other
+old mutation/assertion remains, all14 original labels/indices are conserved;
+new valid FWSP2 positives already execute in the frozen policy tests. No source,
+format contract, identity, model, path or waiver changes. Peers review actual
+old/new fixture and selected1|2 header/metadata grammar before final acceptance.
+
+Legacy version fixture targeted GREEN: raw2551849+548/
+fb020b769abe5f21adb0d566a42f74d8e9130bd468028688a820fbb2b2866d7a,
+1pass/80filtered,659 scoped inputs unchanged. ARCH/Writer independently read
+actual old/new fixture and header1|2/meta2|3; both accept unknown3 plus malformed
+legacybody2, preserving all old labels/other assertions and no product edit.
+Final coherent quality rerun now pins1370 inputs at
+ba64a788fa8b223d6a10345920a161bfa63f5ccbe63cc1db0034f463bc40945b.
+
+Root independently reconstructed ENTIRE earlier repository/native audit epochs
+in memory, without source edits: replacing ONLY five known test files with
+e937c8c baseline bytes gives exactly1370/
+9ef4d97d8f04f29e13267dbd0d289f0765de55e1917db295372f65af6106b233,
+and with all17 native proof files exactly1387/
+bece90108e5760263f171348fa46aaaed4186cacaadbad47f68ae863ca01f25d.
+Replacing ONLY legacy corruption.rs for the audit universe gives exactly831/
+e4ece1c9e1077b3daab45f54145446fa7e9053b68c1aedcef40de3308d64c65d.
+All17 native files still match55bcbd85 byte-for-byte. These exact whole-universe
+inverses prove production/dependency/policy inputs unchanged since passing native
+and cached-audit runs; only disclosed test fixtures changed. No rerun of unaffected
+native or audit behavior is needed. Full Rust tests/strict use the new final pin.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-FINAL2 — reviewed native-Darwin component acceptance
+
+Final1370 non-Markdown universe ba64a788fa8b223d6a10345920a161bfa63f5ccbe63cc1db0034f463bc40945b
+stayed unchanged after EVERY command and at final independent reconstruction.
+Actual locked/offline pinned1.99 results in source-pin-validation.log:
+- fmt2552474+0; alltargetcheck2552558+169/08eafb8124713eda8d6557be8575fce2883fa8fe040d6fd59702d381b1c7d952.
+- strict2552827+169/bc581d4d9cf30dc191842f3087aeddf8533d43bd5eb2e04e75dfdf946279717a.
+- alltargettests2553079+95121/1740cdc7d694ab02de1a9c5ce5ff85ad77a2b87442bb2b9a151fb308a40168c0:
+  ALL906/90targets, zero failed/ignored/filtered.
+- doc-tests2648275+2707/dc51623416adde2c97ccf79da422dc39bea17586902f10df6895d2a77c018328:
+  six compile-fail examples,15targets, zero failed/ignored/filtered.
+- warnings-deniedrustdoc2651060+1252/77d87d1a706b9242c86cc57330bd39378a1a248de07b29c19c7df4ab7cb43bca.
+- architecture2652350+5023/19478c3bb947523e738d34be756d89912726adf9e73ff7d1a7ae08ff8dda5740.
+- reference2657416+365/248ad1838ee64b2933c43a48e973b7ccf5c2fb3a1f350acb302422ae7951c04d.
+- progress2657823+559/bdd5a7d18890e513fe64dc5b670778edec70b2f0355fa23a5c1260256ecf303d:
+  exact85declarations/95mappings/384links;5903registered/4222linked/1681unmatched/1655unresolved.
+Separate native/cached audit passes and exact whole-universe test-only inverses
+are recorded immediately above. All17 native proof files still match55bcbd85.
+Actual global Rust census422production/389tooling-test files has zero size
+violations (400/600LF); full strict enforces the100-line function policy.
+
+Actual reciprocal Source7/8/legacy-fixture reviews have no remaining scoped
+finding. Root whole-read/hash-verified next ARCH3103484+8742/fd5f9794 and
+DOMAIN4115388+8973/da3c28cc; their shared earliest-next recommendation is direct
+original PUBLIC SET allocator publication+GET, not another generic pure layer.
+Root requested a concrete DESIGN proposal only from Writer/ARCH/PERF; all
+successor production/tests/new artifacts remain held. Existing note appends are
+UNSELECTED_NEXT and outside this source epoch. Root accepts this Darwin component
+for local reviewed integration, not full parity, original public policy/Claim,
+Linux, accepted runtime or any M1–M8 exit. Full-completion goal remains ACTIVE.
+
+Full-parity gate was actually rerun and remains exit1, raw2658508+453/
+c6d8519e6283486d3c79fa700d96e4c9fe54e44a340bda860342f6f04d1ddb34;
+1350 scoped inputs unchanged. It explicitly reports incomplete source/Rust
+execution for all required cases, mandatory profiles, setup, fixtures and
+adapters. Registration/partial assertion links are not full passing parity.
+This expected global failure remains open and does not erase the executed
+906-test current-component result; Root does not mark the full goal complete.

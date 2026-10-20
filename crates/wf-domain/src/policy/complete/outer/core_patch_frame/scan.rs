@@ -82,11 +82,11 @@ pub(super) fn scan_frame<'a>(
             return Err(CompletePolicyEncodingError::TrailingBytes.into());
         }
         let original_intent = &encoded[start..end];
-        let inner_tenant = {
+        let (inner_tenant, state_changes) = {
             let mut intent = reader.region(start..end)?;
-            let tenant = scan_intent(&mut intent)?;
+            let facts = scan_intent(&mut intent)?;
             intent.finish()?;
-            tenant
+            facts
         };
         let scanned = ScannedCorePatchFrame {
             encoded,
@@ -97,13 +97,16 @@ pub(super) fn scan_frame<'a>(
             request,
             stamp,
             intent_digest,
+            state_changes,
         };
         (scanned, inner_tenant)
     };
     Ok((scanned, inner_tenant))
 }
 
-fn scan_intent<'a>(reader: &mut Reader<'a, '_>) -> Result<&'a [u8], CompletePolicyEncodingError> {
+fn scan_intent<'a>(
+    reader: &mut Reader<'a, '_>,
+) -> Result<(&'a [u8], usize), CompletePolicyEncodingError> {
     reader.node()?;
     if reader.take(33)? != b"WF-INTENT\0COMPLETE-CORE-PATCH\0V2\0" {
         return Err(CompletePolicyEncodingError::Malformed);
@@ -129,8 +132,8 @@ fn scan_intent<'a>(reader: &mut Reader<'a, '_>) -> Result<&'a [u8], CompletePoli
     if scan_field_patch(reader)? == 1 {
         scan_retention(reader)?;
     }
-    scan_state_changes(reader)?;
-    Ok(tenant)
+    let count = scan_state_changes(reader)?;
+    Ok((tenant, count))
 }
 
 fn scan_field_patch(reader: &mut Reader<'_, '_>) -> Result<u8, CompletePolicyEncodingError> {
@@ -211,7 +214,7 @@ fn scan_retention(reader: &mut Reader<'_, '_>) -> Result<(), CompletePolicyEncod
     Ok(())
 }
 
-fn scan_state_changes(reader: &mut Reader<'_, '_>) -> Result<(), CompletePolicyEncodingError> {
+fn scan_state_changes(reader: &mut Reader<'_, '_>) -> Result<usize, CompletePolicyEncodingError> {
     let count = reader.count(usize::MAX)?;
     let mut previous = None;
     for _ in 0..count {
@@ -227,7 +230,7 @@ fn scan_state_changes(reader: &mut Reader<'_, '_>) -> Result<(), CompletePolicyE
         }
         previous = Some(key);
     }
-    Ok(())
+    Ok(count)
 }
 
 fn scan_state_patch(reader: &mut Reader<'_, '_>) -> Result<(), CompletePolicyEncodingError> {

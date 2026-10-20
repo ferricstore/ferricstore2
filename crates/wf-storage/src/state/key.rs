@@ -18,8 +18,8 @@ pub use ordered::{
     encode_history_prefix, fifo_observation_key_owned_bytes,
 };
 pub use point::{
-    encode_control_key, encode_outcome_key, encode_outcome_prefix, encode_placement_key,
-    encode_policy_key, encode_record_key,
+    encode_catalog_prefix, encode_control_key, encode_outcome_key, encode_outcome_prefix,
+    encode_placement_key, encode_policy_key, encode_record_key, encode_record_prefix,
 };
 
 /// One independently owned decoded key; namespace checks convey no authority.

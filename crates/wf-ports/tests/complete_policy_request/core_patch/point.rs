@@ -202,7 +202,7 @@ fn assert_nonfresh_without_decoder() -> TestResult {
             )?;
             let classification = inspect_complete_core_policy_patch_point(
                 verified,
-                log(if class == 0 { 0 } else { 1 }),
+                log(u64::from(class != 0)),
                 PointGateView {
                     scope: &scope,
                     control,
@@ -221,7 +221,7 @@ fn assert_nonfresh_without_decoder() -> TestResult {
                 (0, DispatchDecision::LogReplay) => assert_eq!(plan.control().next(), control),
                 (1, DispatchDecision::Replay(outcome)) => {
                     let outcome: &RetainedOutcome = outcome;
-                    assert!(std::ptr::eq(outcome, &original));
+                    assert!(std::ptr::eq(outcome, &raw const original));
                     assert_eq!(outcome.response().as_ptr(), original.response().as_ptr());
                     assert_eq!(
                         (outcome.original_time().get(), outcome.expires_at().get()),

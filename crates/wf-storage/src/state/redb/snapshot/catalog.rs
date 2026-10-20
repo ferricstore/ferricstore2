@@ -14,11 +14,11 @@ mod format;
 pub(super) use format::decode;
 
 #[derive(Clone, Copy)]
-pub(super) struct SnapshotCatalog {
-    pub(super) slots: [Option<([u8; 32], usize, usize)>; 2],
-    pub(super) current: Option<u8>,
-    pub(super) anchor: Option<u8>,
-    pub(super) pending: Option<SnapshotTransition>,
+pub(in crate::state::redb) struct SnapshotCatalog {
+    pub(in crate::state::redb) slots: [Option<([u8; 32], usize, usize)>; 2],
+    pub(in crate::state::redb) current: Option<u8>,
+    pub(in crate::state::redb) anchor: Option<u8>,
+    pub(in crate::state::redb) pending: Option<SnapshotTransition>,
 }
 
 impl SnapshotCatalog {
@@ -139,7 +139,7 @@ pub(super) fn retained(
         select(tx, slot);
         if let Some(expected) = catalog.slots[usize::from(slot)] {
             let (layout, saved) = recovery::cohort(tx, charge)?;
-            if layout != 3 || super::format::facts(tx, limits)? != expected {
+            if !matches!(layout, 3 | 5) || super::format::facts(tx, limits)? != expected {
                 return Err(Error::Corrupt);
             }
             compatible(tx, saved, live)?;
@@ -185,12 +185,21 @@ fn compatible(
         .map_err(admission::table_error)?;
     let old_manifest = validate::get(tx, &old, b"manifest")?;
     let new_manifest = validate::get(tx, &new, b"manifest")?;
+    let old_origin = super::policy::origin(tx, &old, old_manifest.value())?;
+    let new_origin = super::policy::origin(tx, &new, new_manifest.value())?;
     let old_member = validate::get(tx, &old, super::super::membership::KEY)?;
     let new_member = validate::get(tx, &new, super::super::membership::KEY)?;
     validate::values(
         tx,
         (saved, live),
-        (old_manifest.value(), new_manifest.value()),
+        (
+            old_origin
+                .as_ref()
+                .map_or(old_manifest.value(), redb::AccessGuard::value),
+            new_origin
+                .as_ref()
+                .map_or(new_manifest.value(), redb::AccessGuard::value),
+        ),
         (old_member.value(), new_member.value()),
     )
     .map_err(|_| Error::Corrupt)

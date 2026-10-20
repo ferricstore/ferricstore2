@@ -12,12 +12,21 @@ use wf_domain::retention::RetentionOverride;
 use super::intent::{CompletePolicyIntentSink, IntentHasher, map_codec_error};
 
 mod frame;
+mod response;
 
-pub use frame::{CompleteCorePolicyPatchRequestPlan, decide_complete_core_policy_patch_frame};
+pub use frame::{
+    CompleteCorePolicyPatchPointInspection, CompleteCorePolicyPatchRequestPlan,
+    FreshCompleteCorePolicyPatchFrame, decide_complete_core_policy_patch_frame,
+    decide_complete_core_policy_patch_point_fresh, inspect_complete_core_policy_patch_point,
+    prepare_complete_core_policy_patch_point_frame,
+};
 pub use frame::{
     DecodedCompleteCorePolicyPatchFrame, VerifiedCompleteCorePolicyPatchFrame,
     decode_complete_core_policy_patch_frame, prepare_complete_core_policy_patch_frame,
     verify_complete_core_policy_patch_frame,
+};
+pub use response::{
+    complete_core_policy_patch_response_matches, complete_core_policy_patch_retained_status,
 };
 
 pub(super) fn hash_core_patch_intent(

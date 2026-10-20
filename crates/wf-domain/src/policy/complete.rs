@@ -39,7 +39,8 @@ mod validation;
 
 pub use admission::{PolicySchemaCharge, PolicySchemaLimits, complete_policy_value_owned_bytes};
 pub use encoding::{
-    CompletePolicyEncodingError, decode_complete_policy_value_v2, prepare_complete_policy_value_v2,
+    CompletePolicyEncodingError, decode_complete_policy_value_v2,
+    decode_complete_policy_value_v2_profiled, prepare_complete_policy_value_v2,
     verify_complete_policy_value_v2,
 };
 pub use error::{CircuitTrackingFailure, GovernanceField, GovernanceRuleKind, PolicySchemaError};
@@ -75,9 +76,10 @@ pub use outer::{
     CompleteCorePolicyPatchCaller, CompleteCorePolicyPatchFrameHeader,
     CompleteCorePolicyPatchRequestInput, CompletePolicyReplaceCaller, CompletePolicyReplaceInput,
     CompletePolicyRequestError, ScannedCorePatchFrame,
-    decode_complete_core_policy_patch_frame_input, prepare_complete_core_policy_patch_caller,
-    prepare_complete_core_policy_patch_frame_caller, prepare_complete_policy_replace_caller,
-    restore_complete_core_policy_patch_frame_header, scan_complete_core_policy_patch_frame,
+    complete_core_policy_patch_frame_decode_bound, decode_complete_core_policy_patch_frame_input,
+    prepare_complete_core_policy_patch_caller, prepare_complete_core_policy_patch_frame_caller,
+    prepare_complete_policy_replace_caller, restore_complete_core_policy_patch_frame_header,
+    scan_complete_core_policy_patch_frame,
 };
 pub use outer::{
     CompletePolicyReplaceFrameHeader, ScannedCompletePolicyReplaceFrame,
@@ -125,7 +127,11 @@ pub use replace_request::{
 };
 pub use request::{
     CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchApplyView,
-    CompleteCorePolicyPatchFresh, prepare_complete_core_policy_patch_fresh,
+    CompleteCorePolicyPatchFresh, CompleteCorePolicyPatchFreshView,
+    CompleteCorePolicyPatchPreparation, core_policy_patch_rejection_for_response,
+    prepare_complete_core_policy_patch_fresh, prepare_complete_core_policy_patch_fresh_with_query,
+    prepare_complete_core_policy_patch_point_fresh,
+    prepare_complete_core_policy_patch_point_fresh_with_query,
 };
 pub use resolution::{ResolvedGovernance, resolve_governance};
 pub use restoration::{restore_complete_policy, validate_stored_complete_policy};

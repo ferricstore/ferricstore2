@@ -90,7 +90,9 @@ impl PolicySchemaCharge {
         self.g + self.p
     }
 
-    pub(crate) const fn profile(&self) -> PolicySchemaLimits {
+    /// Reads the selected profile without validation, credit or authority.
+    #[must_use]
+    pub const fn profile(&self) -> PolicySchemaLimits {
         self.limits
     }
 }

@@ -38,7 +38,13 @@ pub use replace::{
     verify_complete_policy_replace_frame,
 };
 
-pub use core_patch::{CompleteCorePolicyPatchRequestPlan, decide_complete_core_policy_patch_frame};
+pub use core_patch::{
+    CompleteCorePolicyPatchPointInspection, CompleteCorePolicyPatchRequestPlan,
+    FreshCompleteCorePolicyPatchFrame, complete_core_policy_patch_response_matches,
+    complete_core_policy_patch_retained_status, decide_complete_core_policy_patch_frame,
+    decide_complete_core_policy_patch_point_fresh, inspect_complete_core_policy_patch_point,
+    prepare_complete_core_policy_patch_point_frame,
+};
 pub use core_patch::{
     DecodedCompleteCorePolicyPatchFrame, VerifiedCompleteCorePolicyPatchFrame,
     decode_complete_core_policy_patch_frame, prepare_complete_core_policy_patch_frame,

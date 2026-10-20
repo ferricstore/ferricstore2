@@ -10,10 +10,11 @@ use wf_ports::state::StateTransactionError;
 use wf_types::identity::{GroupId, RecoveryId};
 
 mod capture;
-mod catalog;
+pub(in crate::state::redb) mod catalog;
 mod format;
 mod install;
 mod io;
+pub(in crate::state::redb) mod policy;
 mod read;
 mod receive;
 mod stage;
@@ -244,7 +245,9 @@ pub(super) fn copy(
             .recovery_row(key.value(), value.value())
             .map_err(SnapshotError::State)?;
         let normalized = if key.value() == b"manifest" && to.name() != super::META.name() {
-            if value.value().get(4..6) == Some([0, 3].as_slice()) {
+            if value.value().get(4..6) == Some([0, 3].as_slice())
+                || value.value().get(4..6) == Some([0, 5].as_slice())
+            {
                 None
             } else {
                 Some(format::manifest(target, value.value(), 3).map_err(SnapshotError::State)?)
@@ -304,7 +307,12 @@ impl StateSnapshotStore for RedbStateStore {
         )
         .map_err(|_| SnapshotError::Limit)?;
         admit(&self.group, &self.recovery, self.limits, limits, extra)?;
-        active(self, install::install(self, stage, limits))
+        let incoming_layout = stage.store.layout;
+        let metadata = active(self, install::install(self, stage, limits))?;
+        if incoming_layout == 5 {
+            self.layout = 5;
+        }
+        Ok(metadata)
     }
     fn pin_snapshot(
         &mut self,

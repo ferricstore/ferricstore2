@@ -32,7 +32,7 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<u16, StateTransactionEr
         }
         return Err(StateTransactionError::UnsupportedLayout);
     }
-    if tables != if layout == 4 { 6 } else { 4 } {
+    if tables != if matches!(layout, 4 | 5) { 6 } else { 4 } {
         return Err(StateTransactionError::Corrupt);
     }
     let _ = super::snapshot::validate::retained(
@@ -83,6 +83,20 @@ pub(super) fn cohort(
     } else {
         None
     };
+    if layout == 5 {
+        tx.step()?;
+        let (key, origin) = meta_rows
+            .next()
+            .transpose()
+            .map_err(|e| storage_error(&e))?
+            .ok_or(StateTransactionError::Corrupt)?;
+        tx.recovery_row(key.value(), origin.value())?;
+        if key.value() != b"origin" {
+            return Err(StateTransactionError::Corrupt);
+        }
+        let current = super::core_policy::catalog::parse5(tx, manifest.value())?;
+        super::core_policy::catalog::bind_origin(tx, current, origin.value())?;
+    }
     if layout >= 3 && !tx.snapshot_cohort {
         tx.step()?;
         let (key, bytes) = meta_rows
@@ -94,7 +108,7 @@ pub(super) fn cohort(
         if key.value() != super::snapshot::KEY {
             return Err(StateTransactionError::Corrupt);
         }
-        if (layout == 4) != bytes.value().starts_with(b"FWSD\0\x03") {
+        if (matches!(layout, 4 | 5)) != bytes.value().starts_with(b"FWSD\0\x03") {
             return Err(StateTransactionError::Corrupt);
         }
         super::snapshot::check_descriptor(tx, bytes.value())?;
@@ -106,6 +120,9 @@ pub(super) fn cohort(
         return Err(StateTransactionError::Corrupt);
     }
     let control = tx.control()?;
+    if layout == 5 && control.last_entry().is_none() {
+        return Err(StateTransactionError::Corrupt);
+    }
     if control.last_entry().is_none() && control.time() != initial {
         return Err(StateTransactionError::Corrupt);
     }
@@ -116,7 +133,7 @@ pub(super) fn cohort(
         super::membership::validate_value(tx, bytes.value(), control)?;
     }
     let (actual_placements, actual_policies, hash) =
-        validate_rows(tx, control.last_entry().is_some(), charge)?;
+        validate_rows(tx, control.last_entry().is_some(), layout, charge)?;
     if placements != actual_placements || policies != actual_policies || expected != hash {
         return Err(StateTransactionError::Corrupt);
     }
@@ -156,7 +173,7 @@ pub(super) fn inventory(tx: &RedbStateTransaction<'_>) -> Result<usize, StateTra
     Ok(count)
 }
 
-fn check_manifest(
+pub(super) fn check_manifest(
     bytes: &[u8],
     tx: &RedbStateTransaction<'_>,
     layout: &mut u16,
@@ -166,6 +183,10 @@ fn check_manifest(
         return Err(StateTransactionError::Corrupt);
     }
     *layout = value::read_u16(bytes, &mut at).map_err(value_error)?;
+    if *layout == 5 {
+        return super::core_policy::catalog::parse5(tx, bytes)
+            .map(super::core_policy::catalog::facts);
+    }
     if !matches!(*layout, 1..=4) {
         return Err(StateTransactionError::Corrupt);
     }
@@ -204,6 +225,7 @@ fn check_manifest(
 fn validate_rows(
     tx: &RedbStateTransaction<'_>,
     applied: bool,
+    layout: u16,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(u64, u64, [u8; 32]), StateTransactionError> {
     tx.step()?;
@@ -212,7 +234,11 @@ fn validate_rows(
     let mut entries = table.iter().map_err(|e| storage_error(&e))?;
     let mut counts = [0_u64; 2];
     let mut hash = Sha256::new();
-    hash.update(b"wf-state-genesis-v1");
+    hash.update(if layout == 5 {
+        super::core_policy::catalog::CURRENT_CATALOG_DOMAIN
+    } else {
+        b"wf-state-genesis-v1"
+    });
     loop {
         tx.step()?;
         let Some(row) = entries.next() else {

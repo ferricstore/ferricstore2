@@ -13,7 +13,12 @@ pub(super) fn install(
     stage: RedbSnapshotStage,
     limits: SnapshotLimits,
 ) -> Result<SnapshotMetadata, SnapshotError> {
-    if store.layout == 4 {
+    if store.layout == 5 && stage.store.layout != 5 {
+        return Err(SnapshotError::State(
+            StateTransactionError::UnsupportedLayout,
+        ));
+    }
+    if matches!(store.layout, 4 | 5) || stage.store.layout == 5 {
         return advance(store, stage, limits, None)?
             .ok_or(SnapshotError::State(StateTransactionError::Corrupt));
     }
@@ -77,6 +82,11 @@ pub(super) fn advance(
     transition: Option<wf_ports::snapshot::SnapshotTransition>,
 ) -> Result<Option<SnapshotMetadata>, SnapshotError> {
     let source_store = stage.store;
+    if store.layout == 5 && source_store.layout != 5 {
+        return Err(SnapshotError::State(
+            StateTransactionError::UnsupportedLayout,
+        ));
+    }
     if store.group != source_store.group || store.recovery != source_store.recovery {
         return Err(SnapshotError::NamespaceMismatch);
     }
@@ -86,7 +96,12 @@ pub(super) fn advance(
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     validate::complete(&mut target, &mut charge, store.limits.snapshot_limits())
         .map_err(SnapshotError::State)?;
-    let mut catalog = super::catalog::load(&target).map_err(SnapshotError::State)?;
+    let mut catalog = if store.layout == 3 {
+        super::policy::publication_catalog(&target)
+    } else {
+        super::catalog::load(&target)
+    }
+    .map_err(SnapshotError::State)?;
     if catalog.pending.is_some() && catalog.pending != transition {
         return Err(SnapshotError::TransitionPending);
     }
@@ -121,6 +136,9 @@ pub(super) fn advance(
     target.carry_from(&source);
     validate::compatible(&source, &target)?;
     target.carry_from(&source);
+    if store.layout == 3 {
+        super::policy::upgrade_catalog(&target, &catalog).map_err(SnapshotError::State)?;
+    }
     let existing = catalog.find(facts.0);
     let slot = existing.unwrap_or_else(|| catalog.destination());
     for table in [super::super::META, super::super::ROWS] {
@@ -128,7 +146,9 @@ pub(super) fn advance(
     }
     super::copy(&source, &target, super::super::META, super::super::META)?;
     super::copy(&source, &target, super::super::ROWS, super::super::ROWS)?;
-    super::format::set_manifest(&target, 4).map_err(SnapshotError::State)?;
+    if source_store.layout != 5 {
+        super::format::set_manifest(&target, 4).map_err(SnapshotError::State)?;
+    }
     if existing.is_none() {
         super::catalog::retire(&target, slot).map_err(SnapshotError::State)?;
         let [meta, rows] = super::catalog::tables(slot);

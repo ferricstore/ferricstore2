@@ -75,6 +75,20 @@ impl RedbStateTransaction<'_> {
         tenant: &TenantId,
         request: &RequestId,
     ) -> Result<Option<RetainedOutcome>, StateTransactionError> {
+        let schema = self.limits.schema();
+        let mut charge = PolicySchemaCharge::new(schema);
+        self.read_outcome_charged(tenant, request, schema, &mut charge)
+    }
+    pub(in super::super) fn read_outcome_charged(
+        &self,
+        tenant: &TenantId,
+        request: &RequestId,
+        schema: PolicySchemaLimits,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<Option<RetainedOutcome>, StateTransactionError> {
+        if charge.profile() != schema {
+            return Err(StateTransactionError::InvalidChanges);
+        }
         self.step()?;
         let scope = self.scope(tenant)?;
         let key = self.key(
@@ -97,12 +111,18 @@ impl RedbStateTransaction<'_> {
             return Ok(None);
         };
         self.recovery_row(&key, guard.value())?;
-        let scanned = value::scan_outcome(
+        let maximum = self.outcome_wire_limit(tenant, request)?;
+        let validation =
+            value::outcome_policy_validation_bytes(guard.value(), maximum).map_err(value_error)?;
+        self.admit_read(validation)?;
+        let scanned = value::scan_outcome_profiled(
             guard.value(),
             &scope,
             request,
             self.admission,
-            self.outcome_wire_limit(tenant, request)?,
+            maximum,
+            (schema, charge),
+            validation,
         )
         .map_err(value_error)?;
         if scanned

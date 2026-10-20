@@ -9,6 +9,8 @@ use wf_ports::log::{CodecLimits, RecordBatchApplyError};
 use wf_ports::state::StateTransactionError;
 
 mod claim;
+mod core_policy;
+pub use core_policy::{CorePolicyTransactionError, apply_complete_core_policy_patch_transaction};
 mod load;
 mod observations;
 mod record_batch;

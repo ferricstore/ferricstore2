@@ -64,7 +64,11 @@ pub use complete_policy::{
     verify_complete_core_policy_patch_frame,
 };
 pub use complete_policy::{
-    CompleteCorePolicyPatchRequestPlan, decide_complete_core_policy_patch_frame,
+    CompleteCorePolicyPatchPointInspection, CompleteCorePolicyPatchRequestPlan,
+    FreshCompleteCorePolicyPatchFrame, complete_core_policy_patch_response_matches,
+    complete_core_policy_patch_retained_status, decide_complete_core_policy_patch_frame,
+    decide_complete_core_policy_patch_point_fresh, inspect_complete_core_policy_patch_point,
+    prepare_complete_core_policy_patch_point_frame,
 };
 pub use complete_policy::{
     CompletePolicyReplaceRequestPlan, decide_complete_policy_replace_frame,

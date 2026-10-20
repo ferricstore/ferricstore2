@@ -121,6 +121,25 @@ impl<'b, 'c> Reader<'b, 'c> {
         Ok(count)
     }
 
+    pub(in crate::policy::complete) fn state_count(
+        &mut self,
+        profiled: bool,
+    ) -> Result<usize, CompletePolicyEncodingError> {
+        let count = usize::try_from(self.u32()?)
+            .map_err(|_| CompletePolicyEncodingError::Schema(PolicySchemaError::LengthOverflow))?;
+        if count > self.limits.policy_limits().max_states() {
+            return Err(if profiled {
+                CompletePolicyEncodingError::Schema(PolicySchemaError::Policy(
+                    crate::policy::installation::PolicyError::StateBudget,
+                ))
+            } else {
+                CompletePolicyEncodingError::ItemLimit
+            });
+        }
+        self.node()?;
+        Ok(count)
+    }
+
     pub(in crate::policy::complete) fn node(&mut self) -> Result<(), CompletePolicyEncodingError> {
         charge_schema(self.charge, 128, 0).map_err(CompletePolicyEncodingError::Schema)
     }

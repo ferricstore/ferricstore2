@@ -16,7 +16,10 @@ pub(crate) use membership::inspect_membership;
 pub use membership::{
     decode_applied_membership, encode_applied_membership, measure_applied_membership,
 };
-pub use outcome::{ScannedRetainedOutcome, decode_outcome, encode_outcome, scan_outcome};
+pub use outcome::{
+    ScannedRetainedOutcome, decode_outcome, encode_outcome, encode_outcome_profiled,
+    outcome_policy_validation_bytes, scan_outcome, scan_outcome_profiled,
+};
 pub use record::{
     ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields, scan_record_point,
     scan_record_point_profiled,
@@ -44,7 +47,7 @@ pub enum StateValueError {
     Allocation,
     /// A complete membership count/address/owner profile was exhausted.
     MembershipLimit,
-    /// A healthy Claim receipt exceeds the actual captured response profile.
+    /// A healthy response exceeds the actual captured response profile.
     ProfileLimit,
     /// Namespace, typed value, status or positive profile is invalid.
     InvalidValue,

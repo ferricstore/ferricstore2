@@ -334,7 +334,7 @@ pub(super) fn claim_frame(
     kind: &[u8],
     worker: &[u8],
 ) -> TestResult<Vec<u8>> {
-    claim_frame_with_filters(namespace, request, now, kind, worker, (None, None))
+    claim_frame_with_filters(namespace, request, now, kind, worker, None, None)
 }
 
 pub(super) fn claim_frame_scoped(
@@ -352,7 +352,8 @@ pub(super) fn claim_frame_scoped(
         now,
         kind,
         worker,
-        (Some(states), Some(partitions)),
+        Some(states),
+        Some(partitions),
     )
 }
 
@@ -373,7 +374,8 @@ fn claim_frame_with_filters(
     now: u64,
     kind: &[u8],
     worker: &[u8],
-    filters: (Option<&[&[u8]]>, Option<&[&[u8]]>),
+    states: Option<&[&[u8]]>,
+    partitions: Option<&[&[u8]]>,
 ) -> TestResult<Vec<u8>> {
     let mut bytes = b"FWCP\0\x01\x03".to_vec();
     for field in [
@@ -390,9 +392,9 @@ fn claim_frame_with_filters(
     bytes.extend_from_slice(&0_u16.to_be_bytes());
     bytes.extend_from_slice(&now.to_be_bytes());
     raw(&mut bytes, kind)?;
-    filter(&mut bytes, filters.0)?;
+    filter(&mut bytes, states)?;
     bytes.extend_from_slice(&0_u32.to_be_bytes());
-    filter(&mut bytes, filters.1)?;
+    filter(&mut bytes, partitions)?;
     bytes.push(0); // Any priority.
     raw(&mut bytes, worker)?;
     bytes.extend_from_slice(&30_000_u64.to_be_bytes());

@@ -7,8 +7,12 @@ use redb::{ReadableTable, TableHandle};
 use sha2::{Digest, Sha256};
 use wf_ports::state::StateTransactionError as Error;
 
-fn sizes(tx: &RedbStateTransaction<'_>, limits: SnapshotLimits) -> Result<(usize, usize), Error> {
+fn sizes(
+    tx: &RedbStateTransaction<'_>,
+    limits: SnapshotLimits,
+) -> Result<(usize, usize, u16), Error> {
     let mut rows = 0_usize;
+    let mut version = 1_u16;
     let mut wire = admission::total(
         66,
         [tx.group.as_bytes().len(), tx.recovery.as_bytes().len()],
@@ -34,6 +38,9 @@ fn sizes(tx: &RedbStateTransaction<'_>, limits: SnapshotLimits) -> Result<(usize
             {
                 continue;
             }
+            if key.value() == b"manifest" && value.value().get(4..6) == Some([0, 5].as_slice()) {
+                version = 2;
+            }
             pair(key.value().len(), value.value().len(), limits)?;
             rows = admission::total(rows, [1])?;
             wire = admission::total(wire, [12, key.value().len(), value.value().len()])?;
@@ -42,7 +49,7 @@ fn sizes(tx: &RedbStateTransaction<'_>, limits: SnapshotLimits) -> Result<(usize
             }
         }
     }
-    Ok((rows, wire))
+    Ok((rows, wire, version))
 }
 
 pub(super) fn pair(key: usize, value: usize, limits: SnapshotLimits) -> Result<(), Error> {
@@ -74,16 +81,27 @@ fn header<W: std::io::Write>(
     output: &mut Option<&mut W>,
     limits: SnapshotLimits,
     hash: &mut Sha256,
-    counts: (usize, usize),
+    counts: (usize, usize, u16),
 ) -> Result<(), SnapshotError> {
-    push(tx, output, limits, hash, b"FWSP\0\x01")?;
+    push(
+        tx,
+        output,
+        limits,
+        hash,
+        if counts.2 == 2 {
+            b"FWSP\0\x02"
+        } else {
+            b"FWSP\0\x01"
+        },
+    )?;
     for part in [tx.group.as_bytes(), tx.recovery.as_bytes()] {
         let n = u16::try_from(part.len()).map_err(|_| SnapshotError::Limit)?;
         push(tx, output, limits, hash, &n.to_be_bytes())?;
         push(tx, output, limits, hash, part)?;
     }
-    let rows = counts.0.checked_sub(2).ok_or(SnapshotError::Malformed)?;
-    for n in [2, rows, counts.1] {
+    let meta = if counts.2 == 2 { 3 } else { 2 };
+    let rows = counts.0.checked_sub(meta).ok_or(SnapshotError::Malformed)?;
+    for n in [meta, rows, counts.1] {
         let n = u64::try_from(n).map_err(|_| SnapshotError::Limit)?;
         push(tx, output, limits, hash, &n.to_be_bytes())?;
     }

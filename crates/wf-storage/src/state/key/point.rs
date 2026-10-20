@@ -121,3 +121,31 @@ pub fn encode_placement_key(
         maximum_bytes,
     )
 }
+
+/// Encodes the complete canonical tenant prefix, without inventing row membership.
+/// # Errors
+/// Refuses zero/excess caps, overflow or allocation failure.
+pub fn encode_record_prefix(
+    scope: &RequestScope,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    encode_components(
+        1,
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+        ],
+        maximum_bytes,
+    )
+}
+
+/// Encodes one global policy/placement family prefix.
+/// # Errors
+/// Refuses other families, zero/excess caps or allocation failure.
+pub fn encode_catalog_prefix(family: u8, maximum_bytes: usize) -> Result<Vec<u8>, StateValueError> {
+    if !matches!(family, 6 | 7) {
+        return Err(StateValueError::UnsupportedTag);
+    }
+    encode_components(family, &[], maximum_bytes)
+}

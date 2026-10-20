@@ -33,11 +33,11 @@ impl StorageBackend for DiskFaultBackend {
         {
             return Err(io::Error::other("injected control getter read failure"));
         }
-        check_probe(&self.read_probe)?;
+        check_probe(self.read_probe.as_ref())?;
         self.inner.read(offset, output)
     }
     fn write(&self, offset: u64, input: &[u8]) -> io::Result<()> {
-        check_probe(&self.write_probe)?;
+        check_probe(self.write_probe.as_ref())?;
         self.inner.write(offset, input)
     }
     fn set_len(&self, length: u64) -> io::Result<()> {
@@ -107,7 +107,7 @@ pub(crate) fn fault_database(
     fault_database_counted(path, fault, cache_size, None, None)
 }
 
-fn check_probe(probe: &Option<(Arc<AtomicUsize>, Arc<AtomicUsize>)>) -> io::Result<()> {
+fn check_probe(probe: Option<&(Arc<AtomicUsize>, Arc<AtomicUsize>)>) -> io::Result<()> {
     let Some((attempts, remaining)) = probe else {
         return Ok(());
     };

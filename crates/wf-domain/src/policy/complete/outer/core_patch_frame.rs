@@ -25,9 +25,26 @@ pub struct ScannedCorePatchFrame<'a> {
     request: &'a [u8],
     stamp: CommittedTime,
     intent_digest: [u8; 32],
+    state_changes: usize,
 }
 
 impl<'a> ScannedCorePatchFrame<'a> {
+    /// Computes the prospective owning-command bound from reached structure.
+    /// # Errors
+    /// Refuses checked arithmetic overflow; conveys no reusable paid credit.
+    pub fn decode_bound(&self) -> Result<usize, CompletePolicyRequestError> {
+        self.encoded
+            .len()
+            .checked_mul(4)
+            .and_then(|n| {
+                self.state_changes
+                    .checked_mul(2048)
+                    .and_then(|m| n.checked_add(m))
+            })
+            .and_then(|n| n.checked_add(4096))
+            .ok_or_else(|| PolicySchemaError::LengthOverflow.into())
+    }
+
     /// Borrows the exact original partial-command identity bytes for recomputation.
     #[must_use]
     pub const fn original_intent(&self) -> &'a [u8] {
@@ -47,6 +64,7 @@ impl<'a> ScannedCorePatchFrame<'a> {
             request,
             stamp,
             intent_digest,
+            state_changes: _,
         } = self;
         charge_schema(charge, 128, 0)?;
         charge_schema(charge, 128, 0)?;
@@ -260,4 +278,16 @@ pub fn decode_complete_core_policy_patch_frame_input(
     charge: &mut PolicySchemaCharge,
 ) -> Result<CompleteCorePolicyPatchRequestInput, CompletePolicyRequestError> {
     decode::decode_input(header, limits, admission, charge)
+}
+
+/// Prices a real additional borrowed grammar walk before original Patch ownership.
+/// # Errors
+/// Preserves frame, profile, cumulative work and checked-size refusals.
+pub fn complete_core_policy_patch_frame_decode_bound(
+    encoded: &[u8],
+    limits: PolicySchemaLimits,
+    admission: AdmissionLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<usize, CompletePolicyRequestError> {
+    scan_complete_core_policy_patch_frame(encoded, limits, admission, charge)?.decode_bound()
 }

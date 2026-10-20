@@ -5,26 +5,42 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-Current development is the selected durable complete-policy publication batch.
-The reviewed test/helper paths and original regression identities are frozen in
-`d1d332d`, followed by matcher/predecessor controls in `fc25d7a` and `e537850`.
-All five affected integration targets reached genuine missing-contract RED before
-policy implementation. The thirteen selected production paths and their existing
-seams have disjoint owners and reciprocal architecture/performance review.
-The broader domain/ports run passed 539 tests across 52 targets before the latest
-binding refinement. Its latest targeted reruns pass all101 port tests and all14
-policy storage tests. Node recovery16 plus snapshot41 now pass all57 tests,
-including both corrected fixture setups. These are separate component runs.
+The durable complete core-policy publication batch is implemented and validated
+on macOS. Its 31 selected regression identities span 19 reviewed test/helper
+paths; thirteen private production children stay under the existing feature
+parents. Tests were frozen before implementation and later authority repairs,
+including `d1d332d`, `fc25d7a`, `e537850` and `e937c8c`. Independent architecture,
+performance and implementation reviews preserve full values, original replies,
+actual predecessor/context authority and exact logical resource accounts.
 
-Review found a further immutable-history authority gap: an ordinary mathematical
-view can prepare a candidate using65 although the actual store limit is64. The
-new storage regression genuinely fails at consumed commit before correction.
-ARCH API13/TEST8 selects a used-only history scalar seal, checked against the
-actual guard before publication, preserving early stale-CAS bypass. Two new
-storage tests move into the explicitly approved private replay/authority.rs child,
-with the old parent body conserved; the history identity includes a real stale
-positive with false but unused history. Tests must freeze before source release.
-Strict/full and native checks remain required before component acceptance.
+The final coherent checkpoint passes **906 tests across 90 targets**, with zero
+failures, ignored or filtered tests, plus **six compile-fail examples across
+15 documentation targets**. Formatting, all-target compilation, strict all-target
+Clippy, warnings-denied rustdoc, architecture and reference/progress checks pass.
+All 1,370 captured non-Markdown repository inputs stayed unchanged throughout
+that final sequence. Production files satisfy 400 physical lines, tooling/tests
+600, and the checked function-size policy. Separate pinned native compatibility
+and all four cached dependency-audit categories pass. Whole-input reconstruction
+proves their production/dependency/policy inputs unchanged by the five subsequent
+test-only cleanups; the 17 native proof files remain byte-identical. No online
+advisory refresh, native Linux result or measured performance gain is claimed.
+
+The original-query/predecessor and used-history authority gaps now have actual
+failing regressions followed by passing fixes. Both node fixture corrections
+pass, and the old unknown-snapshot-version control remains with future version3
+alongside a new malformed legacy-body-as-version2 check. All prior unrelated
+assertions and immutable reference inputs are preserved.
+
+Next, the architecture, implementation and performance agents are preparing the
+concrete tests/source proposal for the existing original public Policy.set path
+through durable original ETF publication and real SET/GET. Current pure parents
+already exist. ETF/FWPV2 coexistence, receipts/recovery/snapshots and immediate
+indexed catalog/migration effects need an explicit contract before successor
+creation. No successor source is released by this handoff. Full original
+case/setup/profile parity, native Linux acceptance, accepted consensus/runtime,
+public governance and the remaining ordered M1–M8 work remain open; the full
+completion goal stays active. Source-derived progress remains 85 declarations,
+95 mappings and 384 assertion links, with no new parity credit from this batch.
 
 The priority repairs in `af046e8` passed 878 tests across 90 targets and six
 compile-fail examples across 15 documentation targets in an isolated exact
@@ -2071,8 +2087,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **77 reviewed
-source declarations, 87 counterpart records and 326 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **85 reviewed
+source declarations, 95 counterpart records and 384 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

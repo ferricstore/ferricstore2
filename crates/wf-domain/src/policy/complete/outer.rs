@@ -35,8 +35,8 @@ pub use replace_frame::{
 
 pub use core_patch_frame::{
     CompleteCorePolicyPatchFrameHeader, ScannedCorePatchFrame,
-    decode_complete_core_policy_patch_frame_input, restore_complete_core_policy_patch_frame_header,
-    scan_complete_core_policy_patch_frame,
+    complete_core_policy_patch_frame_decode_bound, decode_complete_core_policy_patch_frame_input,
+    restore_complete_core_policy_patch_frame_header, scan_complete_core_policy_patch_frame,
 };
 
 pub use model::{

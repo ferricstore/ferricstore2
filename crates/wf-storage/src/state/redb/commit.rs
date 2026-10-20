@@ -15,6 +15,7 @@ use wf_ports::state::{GroupApplyChanges, GroupApplyTransaction, StateTransaction
 
 pub(super) mod claim;
 pub(super) mod control;
+pub(super) mod core_policy;
 mod independent;
 
 pub(super) fn apply(

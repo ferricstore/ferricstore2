@@ -675,3 +675,82 @@ Actual process kills and pre-sync uncertainty are not power-loss/final-flush
 proof. Every required original setup/profile, complete public parent/governance,
 real policy publication/activation, accepted Raft callbacks/runtime/read barriers,
 both-host validation and full M1–M8 acceptance remain mandatory successors.
+
+
+## Durable complete core-policy publication
+
+ARCH-M1M2-DURABLE-COMPLETE-CORE-PATCH1-CREATE1 selects complete normalized core
+Patch publication through the existing redb owner and neutral transaction ports.
+The thirteen private production children and existing seams implement the
+selected responsibility split: domain ordered preparation, ports original frame/
+reply correspondence, storage actual loading/reindex/publication and node
+recovery orchestration. Seven new structs/enums, two traits and the one precisely
+approved transparent CompleteCorePolicyPatchPreparation tuple alias introduce
+no dependency, alternative backend or public runtime. Existing Full preparation
+shares the same reducer and preserves its original fees, ordering and return.
+
+FWCP1 operation tag5 with ClientIntent2 remains distinct from recovery's local
+profile2. Response1 accepted bytes are a complete FWPV2 value; rejected bytes
+match the closed existing business-message registry. Validation uses the same
+full semantic decoder and continuous schema account. Actual smaller profiles
+are healthy limit refusals; malformed persisted/source content is corruption.
+The old unprofiled outcome API still refuses intent2. Cross-operation retained
+readers use a separately bounded validation account under captured store profiles.
+A Core operation instead threads its same received charge through every actual
+repeat; cross-operation support grants it no reset or credit.
+
+One actual retained point classification occurs before Fresh Patch ownership.
+Non-Fresh preserves the original retained result and skips current/context work.
+Fresh uses actual current/layout/history context; the recognized closed layouts
+contain no migration work rows. The mathematical plan retains the original
+rejected query without cloning and seals the same captured predecessor's
+optional length/SHA256. Both Full and point paths preserve the independent
+retained lifetime. Constructor and consuming backend reject predecessor
+substitution, including rejected Fresh. Native hashes are explicitly bounded
+by the hard policy cap and remain additional O(P) work outside the logical g
+tariff; no physical CPU/latency bound follows. A used-history Option is Some
+only after the existing getter succeeds and passes its unchanged range check.
+The backend compares Some to its actual immutable configuration after existing
+profile/control/response validation and before writes. Early stale-CAS paths
+retain None. Mismatches are InvalidChanges and leave a healthy owner usable.
+
+Accepted publication scans every actual target-tenant canonical row, including
+unrelated types, running/future/unscheduled records and every valid priority.
+A due/FIFO subset cannot certify completion. Each affected lane captures its
+original head ID or observed emptiness before mutation; the old scheduled head
+tag is removed once. Later rows validate untouched predecessor facts against
+that captured state. Only genuine stream exhaustion permits final lane repair.
+Canonical records, leases, counters, order and histories remain unchanged by
+reindexing. Both old and new recovery-wide catalog passes pay actual key/value
+inspection, decoding, owners and engine steps. One Immediate commit publishes
+the candidate, resulting indexes, original retained outcome, control and
+metadata; uncertain completion fences the owner and returns no acknowledgement.
+Rejected Fresh and retained outcomes do not run the catalog/reindex protocol.
+
+The first accepted policy publication upgrades LIVE3/4 to six-table LIVE5. Its
+immutable origin contains canonical FWSS3 birth bytes; old4 normalizes only the
+version/checksum. FWSS5 carries current placement/policy counts, a distinct
+current-catalog domain hash and the origin hash, and requires applied control.
+FWSP2 contains exactly manifest/membership/origin metadata with canonical5; old
+FWSP1/two-row/canonical3 DATA bytes and IDs remain unchanged. Existing pinned
+and anchored DATA remain addressable through mixed-generation custody. Receive/
+install adopt actual5 atomically; a live5 target refuses downgrade. A pending
+transition prevents accepted policy publication before index mutation; this
+adds no permission to serve unresolved paired owners. Node's explicit policy
+opt-in performs bounded full borrowed audit and committed replay through the
+real driver, including snapshot bases and purged logs.
+
+Resource admission retains distinct header/decoded-command ownership, same-
+decoder allowance, original reply copy, schema scratch and cumulative R/S/C
+accounts. One copied stable query and owned original-head inventory are admitted
+before copying. Both point enum variants are boxed inside the existing logical
+phase reserves; ordinary allocator abort remains possible. These logical bounds
+certify no native RSS, engine cache, latency, speedup or power-loss theorem.
+
+Tests were frozen after genuine missing-contract and behavioral failures;
+additional full-response, predecessor and history controls preceded their
+corrections. The handoff separates focused macOS results from final strict/
+workspace/native validation. This private component does not complete public
+Policy.set/Flow ETF semantics, distributed migration, governing-owner/public
+Claim, accepted consensus/transport/strong reads, offline lineage, original
+source setup/profile parity, native Linux or the M1–M8 exit gates.

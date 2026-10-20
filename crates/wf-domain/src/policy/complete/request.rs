@@ -17,6 +17,12 @@ use crate::workflow::request::{
     RetainedOutcome, RetainedStatus,
 };
 
+mod point;
+pub use point::{
+    CompleteCorePolicyPatchFreshView, prepare_complete_core_policy_patch_point_fresh,
+    prepare_complete_core_policy_patch_point_fresh_with_query,
+};
+
 use super::admission::charge_schema;
 use super::patch::{
     check_complete_core_patch_guard, encode_core_patch_content, merge_core_patch_content,
@@ -49,6 +55,15 @@ pub struct CompleteCorePolicyPatchApplyView<'view> {
 /// Proposed optional policy/predecessor and immutable original retained outcome.
 pub type CompleteCorePolicyPatchFresh = (Option<(u64, CompletePolicyValue)>, RetainedOutcome);
 
+/// Mathematical Fresh owners, original rejected query, same validated current,
+/// and the history bound actually reached. This grants no stored authority.
+pub type CompleteCorePolicyPatchPreparation<'current> = (
+    CompleteCorePolicyPatchFresh,
+    Option<Vec<u8>>,
+    Option<&'current CompletePolicyValue>,
+    Option<u32>,
+);
+
 /// Operational composition failure; no partial parent is returned.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CompleteCorePolicyPatchApplyError {
@@ -58,6 +73,13 @@ pub enum CompleteCorePolicyPatchApplyError {
     Apply(ApplyError),
     /// Original outcome construction failed without a retained status.
     Outcome(RequestValueError),
+    /// Prospective outer owner/workspace admission failed.
+    Workspace {
+        /// Complete simultaneous logical owner requirement.
+        bytes: usize,
+        /// Caller-supplied workspace ceiling.
+        maximum: usize,
+    },
 }
 
 impl fmt::Display for CompleteCorePolicyPatchApplyError {
@@ -66,6 +88,7 @@ impl fmt::Display for CompleteCorePolicyPatchApplyError {
             Self::Request(error) => fmt::Display::fmt(error, formatter),
             Self::Apply(error) => fmt::Display::fmt(error, formatter),
             Self::Outcome(error) => fmt::Display::fmt(error, formatter),
+            Self::Workspace { .. } => formatter.write_str("complete core patch workspace limit"),
         }
     }
 }
@@ -88,91 +111,25 @@ pub fn prepare_complete_core_policy_patch_fresh(
     admission: AdmissionLimits,
     charge: &mut PolicySchemaCharge,
 ) -> Result<CompleteCorePolicyPatchFresh, CompleteCorePolicyPatchApplyError> {
-    use CompleteCorePolicyPatchApplyError::{Apply, Request};
+    point::prepare(&view, input, committed, limits, admission, charge)
+}
 
-    if charge.profile() != limits {
-        return Err(Request(PolicySchemaError::ProfileMismatch.into()));
-    }
-    charge_schema(charge, 128, 0).map_err(|error| Request(error.into()))?;
-    let (scope, request, _stamp, command) = input.into_parts();
-    let lookup_work = u64::try_from(command.workflow_type.len())
-        .ok()
-        .and_then(|length| length.checked_add(128))
-        .ok_or(Request(PolicySchemaError::LengthOverflow.into()))?;
-    charge_schema(charge, lookup_work, 0).map_err(|error| Request(error.into()))?;
-    let existing = match view.policies.get(command.workflow_type.as_slice()) {
-        Some(Ok(value)) => Some(value),
-        Some(Err(error)) => return Err(Apply(*error)),
-        None => None,
-    };
-    if let Some(existing) = existing {
-        validate_complete_core_patch_current(existing, &command.workflow_type, limits, charge)
-            .map_err(|error| Request(error.into()))?;
-    }
-    charge_schema(charge, 128, 0).map_err(|error| Request(error.into()))?;
-    let stored = existing.map_or(0, CompletePolicyValue::generation);
-    let prepared = 'prepare: {
-        if let Err(error) = check_complete_core_patch_guard(stored, command.expected_generation) {
-            let error = match error {
-                PolicyError::InvalidAuthority => PolicySchemaError::InvalidAuthority,
-                error => PolicySchemaError::Policy(error),
-            };
-            break 'prepare Err(Request(error.into()));
-        }
-        let data = if let Some(existing) = existing {
-            restore_core_patch_current(Some(existing), command.workflow_type, limits, charge)
-                .map_err(|error| Request(error.into()))?
-        } else {
-            match restore_core_patch_current(None, command.workflow_type, limits, charge) {
-                Ok(data) => data,
-                Err(error) => break 'prepare Err(Request(error.into())),
-            }
-        };
-        charge_schema(charge, 128, 0).map_err(|error| Request(error.into()))?;
-        let history_limit = view.history_max_events_limit.map_err(Apply)?;
-        if history_limit == 0 || history_limit > MAX_HISTORY_EVENTS {
-            return Err(Apply(ApplyError::InvalidAuthority));
-        }
-        let data = match merge_core_patch_content(
-            data,
-            command.patch,
-            existing.is_some(),
-            history_limit,
-            limits,
-            charge,
-        ) {
-            Ok(data) => data,
-            Err(error) => break 'prepare Err(Request(error.into())),
-        };
-        charge_schema(charge, lookup_work, 0).map_err(|error| Request(error.into()))?;
-        let active = match view.active_migrations.get(data.workflow_type.as_slice()) {
-            Some(value) => (*value).map_err(Apply)?,
-            None => 0,
-        };
-        if active > MAX_POLICY_GENERATION {
-            return Err(Apply(ApplyError::InvalidAuthority));
-        }
-        charge_schema(charge, lookup_work, 0).map_err(|error| Request(error.into()))?;
-        let completed = match view.completed_migrations.get(data.workflow_type.as_slice()) {
-            Some(value) => (*value).map_err(Apply)?,
-            None => 0,
-        };
-        if completed > MAX_POLICY_GENERATION {
-            return Err(Apply(ApplyError::InvalidAuthority));
-        }
-        encode_core_patch_content(stored, active.max(completed), data, limits, charge)
-            .map(|value| (stored, value))
-            .map_err(|error| Request(error.into()))
-    };
-    retain_core_patch_outcome(
-        scope,
-        request,
-        committed,
-        prepared,
-        view.outcome_retention_ms,
-        admission,
-        charge,
-    )
+/// Prepares original Fresh owners and returns their captured preparation context.
+///
+/// The query owner is returned only for business rejection. The current borrow
+/// is the same already validated input, without a second lookup or stored proof.
+/// The final scalar records only a successfully reached contextual history bound.
+/// # Errors
+/// Preserves the old preparation order, fees and operational diagnoses.
+pub fn prepare_complete_core_policy_patch_fresh_with_query<'current>(
+    view: CompleteCorePolicyPatchApplyView<'current>,
+    input: CompleteCorePolicyPatchRequestInput,
+    committed: (ClientIntent, LogIdentity, TimestampMillis),
+    limits: PolicySchemaLimits,
+    admission: AdmissionLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<CompleteCorePolicyPatchPreparation<'current>, CompleteCorePolicyPatchApplyError> {
+    point::prepare_with_query(&view, input, committed, limits, admission, charge)
 }
 
 fn core_patch_business_message(error: PolicyError) -> Option<&'static [u8]> {
@@ -327,4 +284,67 @@ fn retain_core_patch_outcome(
     charge_schema(charge, 128, 0).map_err(|error| Request(error.into()))?;
     let outcome = RetainedOutcome::new(metadata, 1, copied, admission).map_err(Outcome)?;
     Ok((prepared.ok(), outcome))
+}
+
+/// Identifies one exact fixed business response on the received schema account.
+/// # Errors
+/// Rejects a mismatched profile or cumulative work/length refusal.
+pub fn core_policy_patch_rejection_for_response(
+    response: &[u8],
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<PolicyRejection>, PolicySchemaError> {
+    if charge.profile() != schema {
+        return Err(PolicySchemaError::ProfileMismatch);
+    }
+    charge_schema(charge, 128, 0)?;
+    let errors = [
+        PolicyError::InvalidVersion,
+        PolicyError::InvalidMaxActive,
+        PolicyError::InvalidStateMode,
+        PolicyError::InvalidStatePolicy,
+        PolicyError::InvalidGeneration,
+        PolicyError::StaleGeneration,
+        PolicyError::GenerationExhausted,
+        PolicyError::Retention(RetentionError::Ttl),
+        PolicyError::Retention(RetentionError::History),
+        PolicyError::Domain(DomainError::EmptyValue(InputField::Type)),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(
+            RetryPolicyField::MaxRetries,
+        )),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(
+            RetryPolicyField::BaseMillis,
+        )),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(RetryPolicyField::MaxMillis)),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(
+            RetryPolicyField::JitterPercent,
+        )),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(
+            RetryPolicyField::ExhaustedTo,
+        )),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(
+            RetryPolicyField::RunningExhaustion,
+        )),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(RetryPolicyField::State)),
+        PolicyError::Domain(DomainError::InvalidRetryPolicy(
+            RetryPolicyField::RunningState,
+        )),
+    ];
+    for error in errors {
+        let message =
+            core_patch_business_message(error).ok_or(PolicySchemaError::InvalidAuthority)?;
+        let work = response
+            .len()
+            .checked_add(message.len())
+            .and_then(|n| n.checked_add(128))
+            .and_then(|n| u64::try_from(n).ok())
+            .ok_or(PolicySchemaError::LengthOverflow)?;
+        charge_schema(charge, work, 0)?;
+        if response == message {
+            return PolicyRejection::new(error)
+                .map(Some)
+                .map_err(|_| PolicySchemaError::InvalidAuthority);
+        }
+    }
+    Ok(None)
 }

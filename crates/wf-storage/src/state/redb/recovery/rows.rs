@@ -28,7 +28,7 @@ pub(super) fn validate(
             let owner = record(tx, key, bytes)?;
             index::canonical(tx, table, &owner, charge)?;
         }
-        2 => outcome(tx, key, bytes)?,
+        2 => outcome(tx, key, bytes, charge)?,
         3 | 4 => index::reverse(tx, table, key, bytes, charge)?,
         5 => history(tx, key, bytes)?,
         6 => {
@@ -77,17 +77,23 @@ fn outcome(
     tx: &RedbStateTransaction<'_>,
     key: &DecodedStateKey,
     bytes: &[u8],
+    charge: &mut PolicySchemaCharge,
 ) -> Result<(), StateTransactionError> {
     let scope = tx.scope_bytes(key.part(2))?;
     tx.temporary(key.part(3).len())?;
     let request =
         RequestId::new(copy_bytes(key.part(3))?).map_err(|_| StateTransactionError::Corrupt)?;
-    let scanned = value::scan_outcome(
+    let maximum = tx.outcome_wire_limit(scope.tenant(), &request)?;
+    let validation = value::outcome_policy_validation_bytes(bytes, maximum).map_err(value_error)?;
+    tx.temporary(validation)?;
+    let scanned = value::scan_outcome_profiled(
         bytes,
         &scope,
         &request,
         tx.admission,
-        tx.outcome_wire_limit(scope.tenant(), &request)?,
+        maximum,
+        (tx.limits.schema(), charge),
+        validation,
     )
     .map_err(value_error)?;
     if scanned
