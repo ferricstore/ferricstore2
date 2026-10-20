@@ -63,10 +63,16 @@ publication, purge permission and successful-commit cache timing remain preserve
 
 Full product completion remains open. The next required work is B2 actual
 runtime source profiles/order, B3 authoritative indexed record effects and B4
-durable migration jobs. B2 is a design-only architecture/performance consultation;
-no runtime producer, new profile or artifact roster is selected yet. Pinned OTP
-research identifies runtime identity, future-key closure and durable replay facts
-that require concrete ownership and bounded accounting before implementation.
+durable migration jobs. B2's four-artifact runtime capture prerequisite is now
+selected in [ADR-008](adr/008-runtime-policy-profile-import.md), with seven
+reviewed tests authored before either tool implementation. Their actual run
+fails all seven tests at the missing bootstrap API; native behavior is not yet
+validated. The broader Rust runtime profile/model/wire roster remains unselected.
+The installed OTP28.4.2 cannot satisfy the exact OTP28.3.1 build requirement;
+source checkout and official release download both failed DNS resolution.
+Pinned source identity is verified through GitHub reads, but the isolated native
+VM/build and Linux execution remain pending. Implementation and reciprocal
+source review must establish native lifetime, bounds and source fidelity.
 
 Full pinned Elixir scenario/assertion/setup/profile parity, governing services,
 accepted consensus/runtime, application/transports and Linux/macOS acceptance

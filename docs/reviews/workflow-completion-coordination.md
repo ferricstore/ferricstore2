@@ -47746,3 +47746,111 @@ failing parity, documentation and the reviewed production checkpoint. B2 actual
 runtime profile/order, B3 indexed effects, B4 durable jobs, real governance/
 Claim/consensus/services/transports, full original acceptance and native Linux
 AND macOS/M1–M8 remain required. Full goal stays ACTIVE; no completion or impasse.
+
+ROOT-B2-DESIGN-INPUTS1 (2026-10-20)
+
+B1 is committed as7a6eb74; all command handles are terminal. The previous goal
+turn is PROGRESS through that reviewed source checkpoint and actual951+6/full
+quality/native/cached-audit results. No further source or test mutation followed.
+Root actually whole/hash-read the B2 DOMAIN proposal4321656+24952/f563d011 and
+all5231 bytes of P1/P2/P3 through4351839; the complete30183-byte proposal is
+0c0cfe3b26bc8d465d48c59fd1eb857694d3a038bad7420e0450ecbc0f4abd94.
+PERF2797222+11570/5519f3b1 was also actually whole/hash-read. All remain proposals.
+
+Fresh clean-environment tooling inventory: elixir1.19.5; Erlang/OTP28,
+ERTS16.3.1; code.root_dir=/opt/homebrew/Cellar/erlang/28.4.2/lib/erlang.
+The installed releases/28/OTP_VERSION actually contains28.4.2. Public erl_nif.h
+is present; rg finds no installed erl_term.h. This is NOT exactOTP28.3.1 evidence.
+No new probe artifact, source VM mutation, package install or toolchain switch
+was performed. Producer selection must name an isolated exact VM/build/headers
+and reject this mismatched VM; the old major-only wrapper is not native-profile
+attestation. ARCH and Writer received these actual observations directly.
+
+Root's finite representation read: current TermSpan has sixu32 fields and its
+decoder already reserves each span against an explicit32-byte envelope. A seventh
+u32 may fit that existing envelope, subject to actual selected-layout checks on
+both targets; unchanged native allocation is not claimed. This source fact was
+sent ARCH/PERF without creating a test/model or waiving prospective ownership.
+Other review duties are captured native lifetime/extension closure, retained
+versus active profile use, precise producer pins/build API and consumed cutoff
+registration. No producer/ADR/new source/test artifact is yet selected or created.
+The Rust service/pure core and full original case/profile objective remain intact.
+
+ROOT-B2-CREATE-PRODUCER1-RELEASE-TESTS (2026-10-20)
+
+Root actually whole/hash-read ARCH3566404+11522/669fdfc0 and bootstrap P1
+3577926+1230/ef8edba7 through3579156 BEFORE creating any selected artifact.
+B2-CREATE-PRODUCER1/P1 approves exactly:
+docs/adr/008-runtime-policy-profile-import.md;
+tools/policy_runtime_capture.exs;
+tools/policy_runtime_capture.c;
+tools/tests/policy_runtime_capture_test.exs.
+Only tool modules Ferricstore.PolicyRuntimeCapture and its Native child plus
+Ferricstore.PolicyRuntimeCaptureTest are named. Native.abi/0, load/2 and
+capture_terms/2; Capture.bootstrap/1, capture_epoch/4, extend_epoch/4 and
+close_epoch/1 are selected. No unconditional on_load. Seven exact ExUnit test
+identities are in the recorded ARCH decision; no Rust model/profile/wire/layout
+or broader eleven-source/six-test roster is released.
+Root now authors ADR/tests and owns exact build/execution/Git; Writer's two tools
+remain HELD until Root's real RED/freeze and explicit implementation release.
+The isolated generated third-party/build/NIF/fixture tree is
+/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1; no committed binary,
+copied OTP tree or unnamed first-party helper is authorized. Later acceptance
+requires actual native pin/build/boundary tests and reciprocal source review.
+
+ROOT-B2-PRODUCER-TESTS-FINAL-RED (2026-10-20)
+
+Root authored only the four-artifact decision's ADR and seven-test file after
+recorded ARCH approval. Final test is594LF/20411B/SHA256
+734cb61763370e0a914bd3074d75e0cdd945f4ac9238d1ce843f58d8ce03e0bc;
+ADR136LF/8475B/e9f3568d7f71b7f92fcbf148c03b573e8e21d5e7eb191054b8f9c7fe2c311bf5.
+The594-line test stays under600; no new module/helper artifact or Rust profile,
+wire version, source model or dependency was introduced. Writer's tools remain
+absent during RED; source release follows the tests/design freeze commit.
+
+Three independent peer reviews found actual fixture issues before that freeze:
+fun sentinels now capture their test owner outside the closure; direct bad-ABI,
+wrong-package and DEBUG Native.load negatives run in fresh processes; native
+atom/node/export scalars have independent source hash oracles and unsigned64
+bounds. Local fun fields match actual public fun_info. The node/export leaf
+oracle runs after the three GC cycles but before the original keeper closes,
+so its decode neither masks keeper pins during GC nor samples a retired identity.
+The refused extension keeps the exact old donor/fact/order state and compares
+both retained/new hashes with the independent live VM reference. Close permits
+address reuse while requiring a new session nonce. Actual keeper ownership still
+requires source review; GC alone is not a proof against delayed node deletion.
+
+Initial473/191782 test actually failed7missing-bootstrap at3465905+6612/6d0f7bd0.
+Corrected594/34b139 also failed7missing-bootstrap, raw3472839+6614/a48d2e06,
+1485inputs unchanged/3b18691363ef5305d5d9e3f7b71938dfabfe3cee437c77df86caa021e6351185.
+FINAL594/734cb617 actually exited1 with7tests/7failures, all UndefinedFunctionError
+at the absent Capture.bootstrap/1, not at native assertions. Raw final output:
+3479778+6614/6dc326fa3a8e0cfda1a21d214bc4e3641b7f87b5b6d8405b0f36f0490426fccb,
+seed511232, in /private/tmp/ferricstore2-m2-source-pin-validation.log.
+All1485captured inputs stayed unchanged, fingerprint
+a9d89370df4686b5707b7d5a8772dae3e04d54edd9fa42a53b3b776b2d555fb6.
+Only the three concurrently appending peer notes were outside that pin.
+No skipped tests, placeholder success, executed native assertion, producer
+acceptance, Linux result or new source-case parity credit is claimed.
+
+Actual exact-pin build dependency remains unresolved. git clone --depth1
+--branch OTP-28.3.1 from github.com exited128: could not resolve host. A distinct
+official erlang.org/download/otp_src_28.3.1.tar.gz fetch exited6 with DNS failure;
+no archive or source checkout was obtained. No same-host retry, host VM mutation,
+package install, Linux infra re-probe or weakened exact-pin requirement occurred.
+Approved generated root exists, with no successfully downloaded source/build.
+
+GitHub READ connector actually returned exact annotated tag70bf388b6c1a46ae740bcee18f99e7da318433d5,
+commit aa5b1d3366762ff8f420f2aa6a52604b481530c9 and tree
+00a6886018c7ad040e79d6c572d66a988634c21c. The tag lists ERTS16.2 and is unsigned;
+this is source identity metadata, not a verified signature or local build.
+Release metadata lists source archive104884866bytes with SHA256
+faf7293df4aaf13ae297508597d3f758353b952dcc99dd88483993cd0548ea12.
+The connector can read source text/metadata but does not supply binary archives.
+Installed28.4.2/ERTS16.3.1 remains the authentic wrong-version control.
+
+This turn is concrete PROGRESS through real fixture review, strengthened tests,
+selected architecture record and actual final missing-API RED. Full B2 producer
+and Rust integration, B3/B4, original scenario/assertion/setup/profile parity,
+services/consensus/transports and native Linux AND macOS acceptance remain open.
+The unbounded full-completion goal stays ACTIVE; independent work remains.
