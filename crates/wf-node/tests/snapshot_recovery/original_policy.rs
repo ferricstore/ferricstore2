@@ -232,7 +232,19 @@ fn legacy_base(
     )?;
     assert_eq!(log.state()?.last_purged(), Some(f::at(position)));
     assert_eq!(state.snapshot_pin(SnapshotLimits::default())?, Some(id));
-    artifact(&mut state, &old)?;
+    if complete {
+        artifact(&mut state, &old)?;
+    } else {
+        // LIVE3 retains one current artifact before transition capability exists.
+        assert!(!state.supports_snapshot_transitions()?);
+        let mut actual = Vec::new();
+        let metadata = state
+            .current_snapshot(&mut actual, SnapshotLimits::default())?
+            .ok_or("retained legacy current missing")?;
+        assert_eq!(metadata.id(), &id);
+        assert_eq!(metadata.encoded_bytes(), old.len());
+        assert_eq!(actual, old);
+    }
     Ok((log, state, old, position))
 }
 

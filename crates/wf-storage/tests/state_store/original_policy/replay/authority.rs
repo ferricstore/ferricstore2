@@ -13,6 +13,7 @@ fn consumed_original_changes_repeat_all_fresh_authority() -> TestResult {
     use wf_domain::workflow::batch::ApplyError;
     use wf_ports::state::GroupOriginalPolicyChanges;
     let dir = f::directory("original-consumed-authority")?;
+    assert_direct_publication_reuses_owner(&dir.join("direct-cache"))?;
     let path = dir.join("state");
     drop(f::create(&path, &[], 64)?);
     install(&path, b"job", b"original", 0, 10, 64)?;
@@ -97,6 +98,90 @@ fn consumed_original_changes_repeat_all_fresh_authority() -> TestResult {
     Ok(())
 }
 
+fn assert_direct_publication_reuses_owner(path: &Path) -> TestResult {
+    use wf_domain::policy::complete::{OriginalPolicyReadValue, OriginalPolicySetFreshView};
+    use wf_ports::state::{
+        GroupApplyStore, GroupOriginalPolicyChanges, GroupOriginalPolicyTransaction,
+    };
+
+    drop(f::create(path, &[], 64)?);
+    let before = f::cohort(path)?;
+    let s = f::scope()?;
+    let caps = f::limits();
+    let frame = public_frame(b"job", b"direct", 100, Raw::Map(&[]), Raw::List(&[]))?;
+    let raw = raw_policy(1, b"job")?;
+    let mut store = f::open(path, 64)?;
+    let mut charge = PolicySchemaCharge::new(caps.schema);
+    let view = OriginalPolicySetFreshView {
+        current: OriginalPolicyReadValue::Absent,
+        active_migration: Ok(0),
+        completed_migration: Ok(0),
+        history_max_events_limit: Ok(64),
+        outcome_retention_ms: Ok(1000),
+    };
+    let (control, plan) = point_plan(&mut store, &frame, view, &mut charge)?;
+    let changes = GroupOriginalPolicyChanges::new(
+        &s,
+        control,
+        None,
+        plan,
+        (caps.codec.admission(), caps.schema),
+        &mut charge,
+        1_000_000,
+    )?;
+    let tx = store.begin_apply(
+        s.group(),
+        s.recovery(),
+        caps.codec.admission(),
+        caps.maximum_read_steps,
+        caps.maximum_read_bytes,
+        caps.maximum_adapter_bytes,
+    )?;
+    assert_eq!(
+        tx.commit_original_policy(changes, caps.schema, &mut charge)?,
+        6
+    );
+    let observed = {
+        let tx = store.begin_apply(
+            s.group(),
+            s.recovery(),
+            caps.codec.admission(),
+            caps.maximum_read_steps,
+            caps.maximum_read_bytes,
+            caps.maximum_adapter_bytes,
+        )?;
+        tx.original_policy_current(s.tenant(), b"job", caps.schema, &mut charge)
+    };
+    drop(store);
+    let mut expected = before;
+    f::rows_mut(&mut expected)?.insert(f::key(6, &[b"g", b"z", b"t", b"job"]), raw.clone());
+    let metadata = f::metadata(
+        &s,
+        b"direct",
+        0,
+        100,
+        f::frame_intent(&frame, 0)?,
+        RetainedStatus::Accepted,
+    )?;
+    f::finish(
+        &mut expected,
+        &s,
+        &frame,
+        f::log(0),
+        (f::clock(100)?, f::clock(100)?),
+        Some((&metadata, 1, &raw)),
+    )?;
+    f::upgrade6(
+        &mut expected,
+        &s,
+        f::catalog(&s, [None, None], None, None, None)?,
+    )?;
+    assert_eq!(f::cohort(path)?, expected);
+    drop(f::open(path, 64)?);
+    assert_eq!(observed, Ok(Some(raw)));
+    Ok(())
+}
+
 fn point_plan(
     store: &mut wf_storage::state::RedbStateStore,
     frame: &[u8],
@@ -135,7 +220,9 @@ fn point_plan(
         assert!(tx.outcome(s.tenant(), request)?.is_none());
         (tx.control()?, tx.retained_nonempty(s.tenant())?)
     };
-    let at = control.position().get() + 1;
+    let at = control
+        .last_entry()
+        .map_or(0, |_| control.position().get() + 1);
     let inspected = inspect_original_policy_set_point_frame_bounded(
         PointGateView {
             scope: &s,

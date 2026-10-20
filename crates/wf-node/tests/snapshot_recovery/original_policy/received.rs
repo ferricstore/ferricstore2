@@ -275,7 +275,7 @@ fn failed_install(dir: &Path, wire: &[u8], mode: u8, before: RaftLogState) -> Te
             log.install_snapshot_boundary(before, f::at(1), hash, id),
             Err(RaftLogError::Uncertain)
         );
-        assert_eq!(log.state(), Err(RaftLogError::Unavailable));
+        assert_eq!(log.state(), Err(RaftLogError::Fenced));
         drop((log, state));
     } else {
         fault.store(if mode == 0 { 3 } else { 4 }, Ordering::SeqCst);

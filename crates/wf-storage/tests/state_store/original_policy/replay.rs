@@ -198,7 +198,7 @@ fn original_receipt_precedes_changed_format_context_and_order() -> TestResult {
             &f::scope()?,
             &conflict,
             f::log(next + 1),
-            (f::clock(now)?, f::clock(now)?),
+            (f::clock(now)?, f::clock(100)?),
             None,
         )?;
         drop(store);
@@ -222,7 +222,7 @@ fn original_receipt_precedes_changed_format_context_and_order() -> TestResult {
             &f::scope()?,
             &frame,
             f::log(next + 3),
-            (f::clock(1100)?, f::clock(1100)?),
+            (f::clock(1100)?, f::clock(100)?),
             None,
         )?;
         drop(store);
@@ -261,7 +261,7 @@ fn nonfresh(
         &f::scope()?,
         frame,
         f::log(at),
-        (f::clock(now)?, f::clock(now)?),
+        (f::clock(now)?, f::clock(100)?),
         None,
     )?;
     assert!(matches!(
