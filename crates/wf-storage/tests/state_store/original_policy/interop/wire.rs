@@ -6,7 +6,8 @@ use wf_domain::policy::complete::{
     CompleteCorePolicyPatchInput, CompleteCorePolicyPatchRequestInput, CompletePolicyData,
     CompletePolicyEncodingError as EncodingError, CompletePolicyValue, CompleteStatePolicyData,
     GovernanceData, OriginalPolicyReplyError, OriginalPolicyReplyValue, PolicySchemaCharge,
-    RawFlowPolicyValue as Raw, prepare_complete_policy_value_v2, restore_complete_policy,
+    PolicySchemaLimits, RawFlowPolicyValue as Raw, prepare_complete_policy_value_v2,
+    restore_complete_policy,
 };
 use wf_domain::policy::definition::{PolicyPatch, PolicyVersion, StateMode};
 use wf_domain::retention::RetentionOverride;
@@ -234,6 +235,25 @@ pub(super) fn accepted(
     intent: ClientIntent,
     response: (u16, &[u8]),
 ) -> TestResult<RetainedOutcome> {
+    accepted_with_schema(
+        expected,
+        frame,
+        request,
+        position,
+        intent,
+        response,
+        f::limits().schema,
+    )
+}
+pub(super) fn accepted_with_schema(
+    expected: &mut f::Cohort,
+    frame: &[u8],
+    request: &[u8],
+    position: (u64, u64),
+    intent: ClientIntent,
+    response: (u16, &[u8]),
+    schema: PolicySchemaLimits,
+) -> TestResult<RetainedOutcome> {
     let (at, now) = position;
     let (version, body) = response;
     let scope = f::scope()?;
@@ -258,10 +278,10 @@ pub(super) fn accepted(
         body.to_vec(),
         f::limits().codec.admission(),
     )?;
-    assert_outcome_wire(&outcome)?;
+    assert_outcome_wire(&outcome, schema)?;
     Ok(outcome)
 }
-fn assert_outcome_wire(outcome: &RetainedOutcome) -> TestResult {
+fn assert_outcome_wire(outcome: &RetainedOutcome, schema: PolicySchemaLimits) -> TestResult {
     use wf_storage::state::value::{encode_outcome_profiled, scan_outcome_profiled};
     let scope = outcome.scope();
     let caps = f::limits();
@@ -298,13 +318,13 @@ fn assert_outcome_wire(outcome: &RetainedOutcome) -> TestResult {
     } else {
         0
     };
-    let mut charge = PolicySchemaCharge::new(caps.schema);
+    let mut charge = PolicySchemaCharge::new(schema);
     assert_eq!(
         encode_outcome_profiled(
             outcome,
             literal.len(),
             caps.codec.admission(),
-            caps.schema,
+            schema,
             &mut charge,
             owner
         )?,
@@ -316,7 +336,7 @@ fn assert_outcome_wire(outcome: &RetainedOutcome) -> TestResult {
         outcome.request(),
         caps.codec.admission(),
         literal.len(),
-        (caps.schema, &mut charge),
+        (schema, &mut charge),
         owner,
     )?;
     assert_eq!(scanned.owned_bytes(), 512 + fields);

@@ -47568,3 +47568,32 @@ This test-only freeze precedes release of the already selected keyword/binary
 behavior repair and remaining redundant-closure lint. Domain source is still
 held at this record. New complete acceptance, parity, Linux, runtime and later
 milestone work remain open. Peer notes remain their independent owned records.
+
+ROOT-B1-EXPANDED-FIXTURE2 (2026-10-20)
+
+Reviewed ordinary fixture correction is authored: expanded432LF/15221B/
+94c73288746f13181d0395e24de08cf0d8d206930e601e69dee0efb951aa6c15,
+wire433LF/14369B/be21a522145e8f03e96f8a6a5f9e9d25d303a2224f266612b90ea063c1a484c6.
+All16384 removals remain an exact typed front SnapshotBytes negative/no writes;
+1024 and15360 removals now have distinct genuine requests/positions, exact full
+ETF2 remaining15360 (261173 bytes) and ETF3 empty53, whole receipts/cohorts and
+strict reopen after EACH. ARCH independently packed both complete expected wires
+and proved whole inverses plus exact earlier GET/lazy bodies; PERF independently
+proved the same initial inverse and19+17n bounds. No production cap changes.
+
+PERF also found a SOURCE-DERIVED expected-wire setup capacity mismatch: its two
+semantic validations on ONE old128MiB charge exceed that budget for15360 names.
+ARCH explicitly selected existing accepted as oldschema wrapper plus ordinary
+same-file accepted_with_schema seventh argument, forwarding schema into existing
+assert_outcome_wire. Only expanded reductions pass their actual2bn schema; all
+old literal encoding/decoding/owned checks and SAME charge/two passes remain.
+ARCH whole helper inverse is TRUE to old413/a9ad7382; final expanded call inverse
+is TRUE to431/4bee and ordinary fixture inverse to390/ab46. No executed work-limit
+failure or product/performance defect is claimed from that capacity prediction.
+These corrected tests await actual execution after Writer's stable handoff.
+
+ARCH additionally selected SAME D3/SAME compatibility child chained-proper-list
+coverage, now469LF/5b7ef911: zeroLIST alias around LIST1 then LIST4, unrelated
+version patch raw preservation and changed LAST/duplicate-Clear-all full wire.
+This extension follows repair release; do not call it a pre-code RED. Actual
+review/execution remain pending. No path/type/alias/profile/dependency added.

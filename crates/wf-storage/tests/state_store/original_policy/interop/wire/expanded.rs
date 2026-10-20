@@ -48,9 +48,8 @@ pub(super) fn run(dir: &std::path::Path) -> TestResult {
     let before = f::cohort(&path)?;
     check_get(&path, &names).map_err(|error| format!("expanded GET: {error}"))?;
     assert_eq!(f::cohort(&path)?, before);
-    let empty =
-        lazy_updates(&path, &before).map_err(|error| format!("expanded lazy updates: {error}"))?;
-    reducing_merge(dir, &before, &names, &empty)
+    lazy_updates(&path, &before).map_err(|error| format!("expanded lazy updates: {error}"))?;
+    reducing_merge(dir, &before, &names)
         .map_err(|error| format!("expanded reducing merge: {error}").into())
 }
 fn seed(path: &std::path::Path) -> TestResult<Vec<Vec<u8>>> {
@@ -332,12 +331,7 @@ fn pure_lazy(
     assert_eq!(outcome.status() == RetainedStatus::Accepted, at != 0);
     Ok(())
 }
-fn reducing_merge(
-    dir: &std::path::Path,
-    before: &f::Cohort,
-    names: &[Vec<u8>],
-    empty: &[u8],
-) -> TestResult {
+fn reducing_merge(dir: &std::path::Path, before: &f::Cohort, names: &[Vec<u8>]) -> TestResult {
     let path = dir.join("expanded-reducing-merge");
     let scope = f::scope()?;
     let caps = expanded_caps()?;
@@ -345,46 +339,94 @@ fn reducing_merge(
     // surrogate; the accepted stored output still obeys persisted ETF263168.
     drop(f::create(&path, &[], 64)?);
     f::replace(&path, before)?;
-    let mut store = expanded_open(&path)?;
     let removes = names
         .iter()
         .map(|name| (Raw::Binary(name), Raw::Nil))
         .collect::<Vec<_>>();
-    let attrs = [(Raw::Atom("states"), Raw::Map(&removes))];
-    let bytes = f::public_frame(
-        &scope,
-        &RequestId::new(b"reduce".to_vec())?,
-        10,
-        b"job",
-        Raw::Map(&attrs),
-        Raw::List(&[]),
-        &mut PolicySchemaCharge::new(caps.schema),
-    )?;
-    let wf_storage::transaction::RecordBatchTransactionOutcome::Retained { outcome, .. } =
-        f::apply(
-            &mut store,
-            &bytes,
-            0,
-            caps,
-            &mut PolicySchemaCharge::new(caps.schema),
-        )?
-    else {
-        return Err("reducing merge did not retain".into());
-    };
+    assert_eq!(names.len(), 16_384);
+    assert_oversized_merge(&path, before, &removes)?;
     let mut expected = before.clone();
-    assert_eq!(
-        *outcome,
-        accepted(
-            &mut expected,
-            &bytes,
-            b"reduce",
-            (0, 10),
-            f::frame_intent(&bytes, 0)?,
-            (1, empty)
-        )?
-    );
-    drop(store);
-    assert_eq!(f::cohort(&path)?, expected);
-    drop(expanded_open(&path)?);
+    for (at, range, request, stamp) in [
+        (0, 0..1024, b"reduce-first".as_slice(), 10),
+        (1, 1024..16_384, b"reduce-rest".as_slice(), 11),
+    ] {
+        let selected = &removes[range.clone()];
+        assert_eq!(
+            19 + 17 * selected.len(),
+            if at == 0 { 17_427 } else { 261_139 }
+        );
+        let attrs = [(Raw::Atom("states"), Raw::Map(selected))];
+        let bytes = f::public_frame(
+            &scope,
+            &RequestId::new(request.to_vec())?,
+            stamp,
+            b"job",
+            Raw::Map(&attrs),
+            Raw::List(&[]),
+            &mut PolicySchemaCharge::new(caps.schema),
+        )?;
+        let empty_map = f::etf_map(&[])?;
+        let rows = names[range.end..]
+            .iter()
+            .map(|name| Ok((f::binary(name)?, empty_map.clone())))
+            .collect::<TestResult<Vec<_>>>()?;
+        let states = f::etf_map(&rows)?;
+        let raw = f::etf_policy(at + 2, b"job", &[(b"states", &states)])?;
+        assert_eq!(raw.len(), if at == 0 { 261_173 } else { 53 });
+        let mut store = expanded_open(&path)?;
+        let wf_storage::transaction::RecordBatchTransactionOutcome::Retained { outcome, .. } =
+            f::apply(
+                &mut store,
+                &bytes,
+                at,
+                caps,
+                &mut PolicySchemaCharge::new(caps.schema),
+            )?
+        else {
+            return Err("reducing merge did not retain".into());
+        };
+        assert_eq!(
+            *outcome,
+            super::accepted_with_schema(
+                &mut expected,
+                &bytes,
+                request,
+                (at, stamp),
+                f::frame_intent(&bytes, at)?,
+                (1, &raw),
+                caps.schema,
+            )?
+        );
+        drop(store);
+        assert_eq!(f::cohort(&path)?, expected);
+        drop(expanded_open(&path)?);
+    }
+    Ok(())
+}
+
+fn assert_oversized_merge(
+    path: &std::path::Path,
+    before: &f::Cohort,
+    removes: &[(Raw<'_>, Raw<'_>)],
+) -> TestResult {
+    use wf_domain::policy::complete::{
+        OriginalPolicySetInputRejection, prepare_original_policy_set_request,
+    };
+
+    let caps = expanded_caps()?;
+    let pair = [Raw::Atom("states"), Raw::Map(removes)];
+    // Existing normalized patch metric: 19 framing +17 per removal.
+    assert!(19 + 17 * removes.len() > 262_144);
+    assert!(matches!(
+        prepare_original_policy_set_request(
+            &Raw::Binary(b"job"),
+            &Raw::List(&[Raw::Tuple(&pair)]),
+            caps.schema,
+            &mut PolicySchemaCharge::new(caps.schema),
+        )?,
+        Err(OriginalPolicySetInputRejection::SnapshotBytes)
+    ));
+    assert_eq!(f::cohort(path)?, *before);
+    drop(expanded_open(path)?);
     Ok(())
 }

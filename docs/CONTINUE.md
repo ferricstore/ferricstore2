@@ -76,8 +76,12 @@ satisfy 400 formatted lines; strict Domain Clippy now has one closure spelling
 issue after the reviewed lint-only repair. All three Ports interop tests pass
 with independently corrected existing Original verifier accounting. The Storage
 target compiles; S1 reaches its final expanded reducing-merge fixture, which
-exceeds the unchanged public patch byte cap. Preserve that oversized rejection
-and use two valid reductions for the positive case. Remaining storage/node and
+exceeds the unchanged public patch byte cap. The reviewed fixture correction
+retains that exact rejection and uses two valid reductions with independent full
+ETF/cohort/reopen checks. Its large expected-wire validator receives the explicit
+expanded schema; old callers keep their original profile and both validations
+still share one account. This corrected positive fixture is not yet executed.
+Remaining storage/node and
 full-workspace execution is still required; no new whole-workspace PASS exists.
 Full pinned Elixir scenario/assertion/setup/profile
 parity, governing services, accepted consensus/runtime, application/transports
