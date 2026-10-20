@@ -46492,3 +46492,163 @@ ARCH and PERF were assigned finite review of that actual roster, including its
 proposed ETF-specific owner envelope and required full-contract completion
 batches. This byte receipt identifies an UNSELECTED proposal; Root has not yet
 whole-read the full52,159-byte proposal or released its artifacts/source.
+
+### ROOT-ORIGINAL-PUBLIC-SET1-PROPOSAL-READ1 — frozen RED and concrete corrections
+
+Receipt tests are frozen in2d70f4f. Their targeted strict Clippy also actually
+passes: raw2,660,102+262,
+00a82cdcf177f6e620b8bf6aae7b9825c611e85203a714ec0eda43dbb5ad0ed0,
+exit0, same832/fc739b88 inputs unchanged. Session31035 is terminal. This is lint
+evidence, not passing runtime assertions; both new tests still have actual RED.
+
+Root subsequently whole-read/hash-verified the complete main proposal plus
+PRECISION1: DOMAIN4,125,010+55,427,
+38f54e378c879446a10754190591cae6a22904bb2e25539b3e39067fafa1ff02.
+Five contiguous read ranges covered offsets0..11982..23708..34720..46434..55427.
+It names12 production/15 test-helper paths, six nominals/two traits/one production
+alias plus the exact test alias,28 additional test identities and required
+full-contract B1–B4 successors. It remains a concrete UNSELECTED proposal.
+
+PERF found a small-input counterexample to its proposed4096+256P ETF envelope.
+Corrected candidate X(P)=65536+256P includes the named fixed source scratch.
+Root independently inspected scan/compound/runtime local_fun, two-pass allocation
+and catalog code: each reached term consumes a distinct tag byte, n<=P−1;
+successful first pass has2k<=n−1; virtual-fun slots f<=n. Failed first pass returns
+before index allocation. Thus64(n+k+f)+8n+128<256P for P>=1, including reached
+runtime/malformed paths. Raw donors, merge/layout and reply owners remain
+separately charged. This is a prospective logical bound, not a native stack/RSS
+measurement. The corrected coefficient must be selected before budget literals.
+
+Root requested only concrete precisions: exact transaction-error variants and
+domain unsupported-origin mapping; strict malformed-vs-profile decoder behavior;
+actual canonical-table and rejection-parser homes without phantom/unlisted
+children. ARCH also identified the actual two-lifetime PointGateView spelling
+and selected representation concern for boxing the large Complete union payload.
+PERF identified the exact historical audit workspace-signature ambiguity.
+These are implementation/test contract corrections, not another readiness audit.
+No successor path/type/module/alias or production implementation is released here.
+
+### ROOT-ORIGINAL-PUBLIC-ALLOCATOR1-TEST-RELEASE1 — exact creation decision executed
+
+Root whole-read/hash-verified ARCH-M1M2-ORIGINAL-PUBLIC-ALLOCATOR1-CREATE1,
+ARCH3,123,131+19,462,
+a30173aa97fbadb8e355bfc4edd9d415a42d4d9d65c168ba77754cf2d1d489e9,
+in contiguous0..10457..19462 ranges. The corrected DOMAIN chain through P3 is
+4,125,010+66,362,
+03e608c83879603f4747b87208330d2fb4bdd7807d338eaaa1487720ff86b65e;
+Root actually whole-read every constituent. PERF independently read that whole
+chain and reports no remaining resource correction, including X, historical
+workspace, boxed Complete and the exact new bounded Workspace origin.
+
+Root RELEASES TESTS ONLY: exactly T1–T15 paths and their named existing target
+registrations,28 substantive IDs plus the two already frozen receipt IDs.
+Writer owns T1/T2/T5–T13 and the domain/storage registrations. Root owns T3/T4/
+T14/T15 and ports/node registrations. All ordinary mechanical helpers stay in
+the exact named files with existing types, except the explicitly selected T6
+Cohort alias. P5 must use reachable public Changes/Full/point correspondence
+controls, not a fake private-plan mutation constructor or unsafe seam. ARCH is
+recording that oracle precision in the existing note; it creates no new artifact.
+
+The twelve selected production paths, six nominals, two traits and production
+alias are NOT released for implementation yet. Actual reviewed failing tests
+and ordinary reciprocal source/oracle review must precede the exact production
+assignment. Root alone runs formatter/Cargo/Git and changes shared metadata.
+No dependency, unsafe code, test suppression, weakened old assertion, broad
+directory permission or source-parity credit is introduced. Required B1–B4 and
+the full remaining objective stay active, including both native hosts.
+
+Root whole-read ARCH CREATE1 PRECISION1 at3,142,593+1,257,
+66ce7527bc589770f2bd50bece56ccfa01f1e6f7a2b7a201d7a0c60d91cd401c;
+its reachable P5 controls agree with the release. Writer is now explicitly
+assigned T1/T2/T5–T13 authoring, with disjoint Root T3/T4/T14/T15 ownership.
+
+Root authored the first T4/P4 identity in the approved new response.rs:
+86LF/103b7b7ad29e874899911197935d0ba6f7fd566b4863bb52fd61398e2bbd3d22.
+It uses real original ETF/status grammar and the selected X, including a valid
+unknown-atom profile refusal followed by trailing-byte corruption precedence.
+P5 and the rest of Root's selected tests are still required; this is a finite
+first authored subset, not a finished test batch. Removing only mod response
+reconstructs the ENTIRE old parent file, preserving every existing body.
+
+Actual P4 target compile RED: missing original_policy_set_response_status and
+CodecError::UnsupportedPolicyProfile, exactly selected absent contracts, exit101.
+Raw2,660,504+1,082,
+c57443d95a5082d5882bf5fae65f5b6d61a45fd51268839f3397bde2fddf683f.
+All338 selected production/dependency/Root-target inputs stayed unchanged:
+f2c035286385d82ce5384e7179dbbc456d67c61cd0bec7742a5839242d4d92b2.
+Writer-owned domain/storage test files are deliberately outside this target
+pin while their disjoint authoring runs. Session52380 is terminal. ARCH/PERF
+are assigned actual finite P4 test/oracle review. No P4 assertion GREEN or
+production release is inferred from missing-API RED.
+
+### ROOT-ORIGINAL-PUBLIC-ALLOCATOR1-DOMAIN-RED1 — real subset and reciprocal repair
+
+Writer's selected T1/T2 were handed off stable; Root read them, formatted them
+and compiled the existing complete_policy target. At that epoch T1 was443LF/
+9b6846a4e5e5c83b3f4bf56b21f4c22302f60f0aa23350cd87925a98d1f25a50,
+T2 was172LF/3e3058875675c7fdd9eb926767d5bd5a0f79abb5297dda5a4350d911cb695342.
+Actual missing-contract RED at2,661,733+3,886,
+ea9e725585688fdc2a2c9588360714aec3417030c12c6d9604738b702c79aa14:
+exactly missing selected FreshView/pointFresh, portable decode/measure/project
+APIs and the two new domain operational variants, four compiler errors. No
+assertions ran. All280 selected production/domain-target/config inputs stayed
+unchanged,9f18e899b4715c1c9c87b4a7edba9f666d26467f4f097b28e316e7f8ecc4df1c.
+Root session96286 is terminal; disjoint storage test authoring continues.
+
+Root whole-read ARCH's exact D2 fixture decision at3,146,107+2,360/e9a814b6.
+The approved FILELESS computation inverted/forward-checked exactly two16B
+inputs, with parameters b0=0/1. Results:
+6695b9741d408ef0d2267d0e14dc9065 and e613c3ec92d69bc962d74a65908addcd
+are distinct and both have full64-bit reference fingerprint zero. PERF
+independently confirmed both against the pinned recipe; descending byte ties
+place the second first. This is exact reference arithmetic, not SUT/native
+execution, performance measurement, a birthday search or a new artifact.
+Actual >32-key tie behavior remains the test's future execution obligation.
+
+ARCH/PERF actual P4 reviews and missing-API evidence have no remaining finding;
+Root freezes that ONE response identity separately. P5 remains required.
+T2 has independent projection totals1298/2094 and exact foreign-type authority
+refusal. T1 is NOT frozen: PERF found governance(0,2) fails to distinguish HAMT
+from lexical order and the selected update/duplicate-list-LAST threshold case
+was absent. Root accepted both same-file/same-ID repairs; ARCH withdrew its
+earlier T1 no-remaining-coverage disposition for these concrete omissions.
+Writer is authoring the stronger inverse-order governance pair and final-unique
+32/33 list-LAST/update controls. No source or additional artifact is released.
+
+### ROOT-ORIGINAL-PUBLIC-ALLOCATOR1-SUBSET-FREEZE1 — reviewed first six new cases
+
+The concrete T1 repairs are now actual: formatted496LF/
+485870a9e183d889941ef53708992c7c9b0cf783d6d5d0f20d4619ed7b81c212.
+Gov(2,1)/(1,2) distinguishes HAMT from lexical traversal; CURRENT32 update
+distinguishes an applied patch from an ignored one. The public duplicate-list
+input really compacts to ONE committed patch row, then merges with31 current
+states to32 unique states. The separate independent full generation2 FIFO ETF
+positive checks LAST's actual final value in both installation and response.
+No raw33-row native-input claim is made. T2 remains172LF/3e305887 with independent
+owner totals and exact foreign-type authority rejection.
+
+Final actual domain target compile RED at2,665,766+3,886,
+c76d81a3053306073e6eb43c912845e3934ab5da5209122b04a46b54496d343d,
+contains only the four selected missing-contract diagnostics; no assertions ran.
+All280 scoped inputs unchanged:
+565fdbea65d91996d60da8ce62fd298647a75efd7f585f3cff7a7b748570e644.
+Session16678 is terminal; no Root command remains live. The prior443LF RED is
+not relabelled as execution of these revised bytes.
+
+Root whole-read/hash-verified ARCH's superseding3,154,718+3,429/
+8693a19a5e580b1487f6c93952869c1e5e284230e90ebcbb0d336b8458e69d2c
+and PERF's final2,478,977+2,986/
+b867656083ee9f46c8a6d3b58fead2189f031e8fdacb44c7051ca91f40f7e89e.
+Both peers actually inspected final files/RED and independently inverted the
+complete refinement delta, with no remaining setup/oracle finding. Earlier
+non-discriminating intermediate cases are explicitly superseded. The existing
+domain parent differs only by its two selected registrations and separator;
+ports parent differs only by mod response. No old assertion/body changed.
+
+Root freezes exactly THREE native-order tests, TWO projection tests and ONE
+ports response test, with their two existing parents. These six are additional
+to the two receipt tests already frozen in2d70f4f: eight of the selected thirty
+component identities authored/frozen, not thirty complete or passing. The other
+four ports, fourteen physical storage and four node cases remain required and
+under authoring. P5 stays required. No source, parity credit, native execution
+or measured optimization is released or inferred by this subset freeze.

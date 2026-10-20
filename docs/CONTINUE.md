@@ -11,8 +11,13 @@ preserve an independent complete ETF/FWSO literal with customer version2^128+1,
 original receipt ownership/metadata and dynamic history-error maxima. Architecture
 and performance independently verified the literals and conservation of all older
 tests. Production remains at the passing `cb68b87` checkpoint below; these two new
-tests deliberately expose missing support. The cohesive allocator SET/GET proposal
-is saved for concrete architecture/performance review before further creation.
+tests deliberately expose missing support. Architecture and performance have
+selected the exact next allocator SET/GET contract and released tests-only
+authoring for28 additional identities. The first ports response case and five
+domain cases are reviewed and frozen after actual missing-API RED. Cross-review
+strengthened the governance, update and list-LAST ordering controls before that
+freeze. Production implementation remains held; the remaining tests are being
+authored with disjoint ownership.
 
 The durable complete core-policy publication batch is implemented and validated
 on macOS. Its 31 selected regression identities span 19 reviewed test/helper
@@ -40,12 +45,14 @@ pass, and the old unknown-snapshot-version control remains with future version3
 alongside a new malformed legacy-body-as-version2 check. All prior unrelated
 assertions and immutable reference inputs are preserved.
 
-Next, the architecture, implementation and performance agents are preparing the
-concrete tests/source proposal for the existing original public Policy.set path
-through durable original ETF publication and real SET/GET. Current pure parents
-already exist. ETF/FWPV2 coexistence, receipts/recovery/snapshots and immediate
-indexed catalog/migration effects need an explicit contract before successor
-creation. No successor source is released by this handoff. Full original
+The selected next batch connects the existing original public Policy.set path
+through durable original ETF publication and real SET/GET. Its exact twelve
+production paths and fifteen test/helper paths are recorded under
+ARCH-M1M2-ORIGINAL-PUBLIC-ALLOCATOR1-CREATE1. Test authoring is split between Root
+and the implementation agent with independent architecture/performance review.
+Same-type ETF/FWPV2 interoperability, wider source profiles/order, actual indexed
+record/catalog effects and durable migration jobs remain required named
+successors. No successor source is released by this handoff. Full original
 case/setup/profile parity, native Linux acceptance, accepted consensus/runtime,
 public governance and the remaining ordered M1–M8 work remain open; the full
 completion goal stays active. Source-derived progress remains 85 declarations,
