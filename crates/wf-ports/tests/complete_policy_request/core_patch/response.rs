@@ -346,3 +346,79 @@ fn intent2_response_profiles_separate_refusal_from_malformed_grammar() -> TestRe
     assert_eq!((charge.g(), charge.p()), (0, 0));
     Ok(())
 }
+
+#[test]
+fn full_core_patch_plan_binds_the_predecessor_used_for_preparation() -> TestResult {
+    use std::collections::BTreeMap;
+    use wf_domain::policy::complete::{
+        CompleteCorePolicyPatchApplyView, decode_complete_policy_value_v2,
+    };
+    use wf_domain::workflow::control::ControlState;
+    use wf_domain::workflow::request::{RequestScope, gate::GateView};
+    use wf_ports::log::decide_complete_core_policy_patch_frame;
+    use wf_ports::state::{GroupCorePolicyChanges, StateTransactionError};
+    use wf_types::identity::{GroupId, RecoveryId, TenantId};
+    use wf_types::version::{CommittedTime, HlcTimestamp};
+
+    let schema = profile(100_000_000)?;
+    let mut charge = PolicySchemaCharge::new(schema);
+    let scope = RequestScope::new(
+        TenantId::new(b"t".to_vec())?,
+        GroupId::new(b"g".to_vec())?,
+        RecoveryId::new(b"r".to_vec())?,
+    );
+    let control = ControlState::initial(CommittedTime::new(HlcTimestamp::new(0, 0)?, 0)?);
+    let actual = decode_complete_policy_value_v2(&full_value()?, schema, &mut charge)?;
+    let policies = BTreeMap::from([(
+        b"r".to_vec(),
+        Ok(decode_complete_policy_value_v2(
+            &minimal_value(),
+            schema,
+            &mut charge,
+        )?),
+    )]);
+    let outcomes = BTreeMap::new();
+    let migrations = BTreeMap::new();
+    let mut mismatches = Vec::new();
+    for case in [0, 14] {
+        let frame = decode_core_patch_literal(FROZEN_CORE_PATCH_FRAMES[case].0)?;
+        let view = CompleteCorePolicyPatchApplyView {
+            gate: GateView {
+                scope: &scope,
+                control,
+                outcomes: &outcomes,
+            },
+            revision: control.position().get(),
+            policies: &policies,
+            active_migrations: &migrations,
+            completed_migrations: &migrations,
+            history_max_events_limit: Ok(1000),
+            outcome_retention_ms: Ok(100),
+        };
+        let plan = decide_complete_core_policy_patch_frame(
+            view,
+            &frame,
+            LogIdentity::new(1, 7, AppliedPosition::new(0)),
+            schema,
+            AdmissionLimits::default(),
+            &mut charge,
+        )?;
+        mismatches.push(
+            GroupCorePolicyChanges::new(
+                &scope,
+                control,
+                Some(&actual),
+                plan,
+                (schema, AdmissionLimits::default()),
+                &mut charge,
+                1_000_000,
+            )
+            .err(),
+        );
+    }
+    assert_eq!(
+        mismatches,
+        vec![Some(StateTransactionError::InvalidChanges); 2]
+    );
+    Ok(())
+}

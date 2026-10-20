@@ -91,7 +91,7 @@ fn fresh<'input>(
         charge,
         workspace,
     )? {
-        CompleteCorePolicyPatchPointInspection::Fresh(value) => Ok(value),
+        CompleteCorePolicyPatchPointInspection::Fresh(value) => Ok(*value),
         CompleteCorePolicyPatchPointInspection::Complete(_) => {
             Err("initial request was not Fresh".into())
         }
@@ -216,7 +216,7 @@ fn assert_nonfresh_without_decoder() -> TestResult {
             let CompleteCorePolicyPatchPointInspection::Complete(plan) = classification else {
                 return Err("retained call reconstructed Fresh command".into());
             };
-            let plan: CompleteCorePolicyPatchRequestPlan<'_> = plan;
+            let plan: CompleteCorePolicyPatchRequestPlan<'_> = *plan;
             match (class, plan.decision()) {
                 (0, DispatchDecision::LogReplay) => assert_eq!(plan.control().next(), control),
                 (1, DispatchDecision::Replay(outcome)) => {
@@ -461,6 +461,33 @@ fn complete_core_patch_changes_bind_current_control_policy_and_response() -> Tes
             assert_eq!((wrong_account.g(), wrong_account.p()), (0, 0));
         }
     }
+    let minimal = decode_complete_policy_value_v2(&minimal_value(), schema, &mut charge)?;
+    let accepted = plan(&bytes, &scope, Some(&minimal), schema, &mut charge)?;
+    let accepted_substitution = GroupCorePolicyChanges::new(
+        &scope,
+        expected,
+        Some(&old),
+        accepted,
+        (schema, AdmissionLimits::default()),
+        &mut charge,
+        1_000_000,
+    )
+    .err();
+    let rejected = plan(&frame(5)?, &scope, None, schema, &mut charge)?;
+    let rejected_substitution = GroupCorePolicyChanges::new(
+        &scope,
+        expected,
+        Some(&old),
+        rejected,
+        (schema, AdmissionLimits::default()),
+        &mut charge,
+        1_000_000,
+    )
+    .err();
+    assert_eq!(
+        [accepted_substitution, rejected_substitution],
+        [Some(StateTransactionError::InvalidChanges); 2],
+    );
     assert_response_correspondence(schema)?;
     Ok(())
 }

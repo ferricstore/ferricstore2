@@ -383,7 +383,11 @@ fn policy_snapshot_receive_purge_and_crash_reopen_keep_exact_generations() -> Te
     let source = f::directory("policy-received-source")?;
     let (_, wire) = seed(&source, false)?;
     let reference = f::directory("policy-received-reference")?;
-    drop(f::create_pair(&reference)?);
+    let (log, state) = f::create_pair(&reference)?;
+    drop((
+        log,
+        state.upgrade_snapshot_layout(SnapshotLimits::default())?,
+    ));
     let (log, mut state) = install(&reference, &wire)?;
     inspect(&mut state)?;
     let id: [u8; 32] = Sha256::digest(&wire).into();
@@ -394,7 +398,11 @@ fn policy_snapshot_receive_purge_and_crash_reopen_keep_exact_generations() -> Te
     assert!(expected.iter().all(Option::is_some));
     let logs = (f::log_rows(&reference)?, f::log_meta(&reference)?);
     let dir = f::directory("policy-received-kill")?;
-    drop(f::create_pair(&dir)?);
+    let (log, state) = f::create_pair(&dir)?;
+    drop((
+        log,
+        state.upgrade_snapshot_layout(SnapshotLimits::default())?,
+    ));
     std::fs::write(dir.join("wire.bin"), &wire)?;
     let mut child = Command::new(std::env::current_exe()?)
         .args([

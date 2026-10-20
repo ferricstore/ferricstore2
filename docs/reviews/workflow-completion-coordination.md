@@ -46099,3 +46099,77 @@ An earlier short exact-filter invocation selected zero tests and is no evidence
 of RED or GREEN. This appended control is frozen before correcting the matcher.
 ARCH selected a private ordinary helper reusing the ONE already decoded full
 value for complete equality; no second decoder/U/g/p or new model/path is added.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-SOURCE3 — strict representation precision
+
+Actual broad domain/ports validation passes539 tests across52 targets, with no
+failures/ignored/filtered cases and503 scoped inputs unchanged. Raw2338195+56716/
+SHAf739c6303f999b81bfcb0e64ee6f9db20682717e03e8261226d2734691acd719.
+Strict Clippy then identified exact documentation/import repairs, followed by the
+new PointInspection large enum (Complete>=960,Fresh>=744). No waiver is selected.
+Root releases ARCH API-PRECISION11: Box BOTH existing payloads with Box::new;
+old RequestPlan/Full representation stays unchanged. The new phase uses standard
+native allocation abort semantics, consistent with existing boxes; it does not
+promise recoverable allocation failure or measured latency/RSS gains. Dh2048/D4096
+cover the fixed moved payloads; variable owners and g/p/RSC remain exact. Complete
+also compares Pg+Dh before boxing, including callers of other Verified producers;
+Fresh already compares Pg+D. Only mechanical payload extraction changes in the
+existing driver/test setup are authorized; all behavioral oracles remain exact.
+
+The first real storage compile exits101 on one ambiguous range key type and two
+warnings, before assertions. Raw2399021+2292/SHAebefeae257f12e1578a5fb4c00eaad7c67ec65c5f5e8831238440dfcab99bebf;
+658 scoped inputs unchanged. Root releases exact type/import/parentheses/unused
+binding repairs and PERF-confirmed Allocation error attribution in the existing
+backend mapper. All31 changed storage source files fit400 LF after formatting.
+
+
+### ROOT-COMPLETE-CORE-PATCH1-BINDING-RED1 — original query and preparation predecessor
+
+Actual storage integration GREEN3 passes13 selected tests with66 old cases
+filtered, zero failures/ignored. Raw2402205+1698/SHA256
+9dce2ead84bca6336a3d7a0ca061b398e0c5dbb32453c79e811b6f20a93a5a83;
+658 scoped inputs unchanged. This does not close later independent review gaps.
+
+Root found rejected Fresh skips actual predecessor correspondence; Writer
+confirmed the selected contract requires it. PERF/ARCH then independently found
+that a plan prepared against B could be paired with valid actual A of the same
+type/generation. Query binding alone does not prevent that substitution.
+Root added controls without new files/types and before source correction:
+
+- Existing P4 now aggregates accepted B→A and rejected None→Some substitutions.
+  Actual RED returns[None,None] versus[Some(InvalidChanges);2], one failed and
+  99filtered. Raw2411675+1178/SHA81893f56525be9b70a74f1abc3573412752b763d43b480ecc003da01e1c40509;
+  503 scoped inputs unchanged.
+- New existing-file Full-plan counterpart checks both accepted and rejected B→A.
+  Actual RED returns the same wrong pair, one failed/100filtered.
+  Raw2414199+1174/SHAd709cdb9369886a642ac8ce0a8e3c318c5b77ba5261dd7ec72fef9b5b762f630;
+  503 scoped inputs unchanged.
+- New existing-file storage test supplies a legally prepared rejected absent
+  predecessor while actual genesis contains job/gen1. Actual consumed commit
+  returnsOk(3), expectedInvalidChanges; onefailed/79filtered.
+  Raw2412998+1060/SHAd2bbea87da08ceaa6a12f46709f10d387fa9d3019843707858ebb23b35c6bcf9;
+  658 scoped inputs unchanged. The frozen healthy matched rejection/replay cases
+  remain, and new control requires complete rollback plus healthy same-handle
+  acquisition and strict reopen after the corrected refusal.
+
+These add two identities (30 selected identities, still18 test/helper paths),
+all within600LF, alongside the earlier matcher controls and mechanical Box
+payload extraction. No previous assertion/oracle was weakened.
+
+Node recovery first run passes15/16; N1 reference setup stops on the restricted
+Claim leaf's correct UnsupportedGovernance before recovery. Rich governed r
+policy remains exact; the reviewed correction creates/Claims one-byte ungoverned
+u and explicitly asserts its type. Node snapshot first run passes40/41; N4
+initial legacy3 target fails its existing explicit-upgrade precondition. Both
+reference and kill targets now explicitly upgrade before coordinator receive.
+Source wire, expected new5 cohort, ACK/kill/reopen and other legacy refusal
+controls remain. These are setup corrections, not product behavior repairs.
+
+ARCH API12 is whole-read/hash-verified at3058302+8045/
+821569bbb640aeb41525668ad5fe09905f181f384654bdebb114b8b073fa056b.
+It selects clone-free ORIGINAL rejected query and SAME captured current triple,
+fixed predecessor length/SHA seal, actual ALL-Fresh current comparison, unchanged
+old g/p and independent plan lifetime. Each SHA walk has explicit hard P cap and
+bounded native O(P) cost; no measured speed/CPU claim is made. Source stays held
+until this test checkpoint and Root's following explicit release.

@@ -6,15 +6,19 @@ performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
 Current development is the selected durable complete-policy publication batch.
-The eighteen reviewed test/helper paths and 28 substantive regression identities
+The eighteen reviewed test/helper paths and 30 substantive regression identities
 are frozen in `d1d332d` and its priority-test predecessor. All five affected
 integration targets reached genuine missing-contract compilation RED before
 policy implementation. Root explicitly released the thirteen selected production
 paths in ROOT-COMPLETE-CORE-PATCH1-SOURCE1; domain, ports/node, storage and retained
 codec work now have disjoint owners and reciprocal architecture/performance review.
 The domain complete-policy target passes all 131 tests, including both frozen
-current-only Fresh regressions. Ports validation is in progress; transactional
-storage, snapshots and node integration still require their passing checks.
+current-only Fresh regressions. The broader domain/ports run passes 539 tests across 52 targets. All thirteen
+initial policy storage tests pass, including exact resource, fault and kill
+controls. Independent review then found missing original-query/predecessor
+binding; three added controls have actual behavioral RED and are frozen before
+correction. Two node setup incompatibilities are corrected and await rerun.
+Strict/full/node and native checks remain required before component acceptance.
 
 The priority repairs in `af046e8` passed 878 tests across 90 targets and six
 compile-fail examples across 15 documentation targets in an isolated exact

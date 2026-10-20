@@ -2,19 +2,133 @@
 
 use super::{TestResult, fixtures as f};
 use std::path::Path;
-use wf_domain::policy::complete::CompleteCorePolicyPatchApplyError;
+use wf_domain::policy::complete::{
+    CompleteCorePolicyPatchApplyError, CompleteCorePolicyPatchFreshView, PolicySchemaCharge,
+};
 use wf_domain::policy::definition::{FieldPatch, PolicyPatch, StateMode};
 use wf_domain::policy::installation::{MAX_POLICY_GENERATION, PolicyError};
 use wf_domain::retention::RetentionOverride;
+use wf_domain::workflow::request::gate::PointGateView;
 use wf_domain::workflow::request::{
     PolicyRejection, RequestScope, RetainedOutcome, RetainedStatus,
 };
-use wf_ports::state::{GroupApplyStore, StateTransactionError};
+use wf_ports::log::{
+    CompleteCorePolicyPatchPointInspection, decide_complete_core_policy_patch_point_fresh,
+    inspect_complete_core_policy_patch_point, prepare_complete_core_policy_patch_point_frame,
+};
+use wf_ports::state::{
+    GroupApplyStore, GroupApplyTransaction, GroupCorePolicyChanges, GroupCorePolicyTransaction,
+    StateTransactionError,
+};
 use wf_storage::transaction::{
     CorePolicyTransactionError, RecordBatchTransactionOutcome,
     apply_complete_core_policy_patch_transaction,
 };
+use wf_types::identity::RequestId;
 use wf_types::version::TimestampMillis;
+
+#[test]
+fn rejected_core_patch_rechecks_actual_policy_predecessor() -> TestResult {
+    let dir = f::directory("policy-rejected-predecessor")?;
+    let path = dir.join("state");
+    let s = f::scope()?;
+    let old = f::policy(b"job", 1, &[], false)?;
+    let mut store = f::create(&path, &s, &[b"p"], &[(s.tenant().clone(), old)])?;
+    drop(store);
+    let before = f::cohort(&path)?;
+    store = f::open(&path, &s)?;
+    let caps = f::limits();
+    let mut charge = PolicySchemaCharge::new(caps.schema);
+    let request = RequestId::new(b"forged".to_vec())?;
+    let (control, nonempty, original, history) = {
+        let tx = store.begin_apply(
+            s.group(),
+            s.recovery(),
+            caps.codec.admission(),
+            caps.maximum_read_steps,
+            caps.maximum_read_bytes,
+            caps.maximum_adapter_bytes,
+        )?;
+        assert_eq!(tx.core_policy_layout()?, 3);
+        (
+            tx.control()?,
+            tx.retained_nonempty(s.tenant())?,
+            tx.core_policy_outcome(s.tenant(), &request, caps.schema, &mut charge)?,
+            tx.core_policy_history_max_events_limit(),
+        )
+    };
+    let bytes = f::frame(&s, b"forged", 100, b"job", Some(1), PolicyPatch::default())?;
+    let verified = prepare_complete_core_policy_patch_point_frame(
+        bytes.as_bytes(),
+        caps.schema,
+        caps.codec.admission(),
+        &mut charge,
+        caps.workspace_bytes,
+    )?;
+    let inspected = inspect_complete_core_policy_patch_point(
+        verified,
+        f::log(0),
+        PointGateView {
+            scope: &s,
+            control,
+            outcome: original.as_ref(),
+            retained_nonempty: nonempty,
+        },
+        (caps.schema, caps.codec.admission()),
+        &mut charge,
+        caps.workspace_bytes,
+    )?;
+    let CompleteCorePolicyPatchPointInspection::Fresh(fresh) = inspected else {
+        return Err("missing Fresh invalid-proposal fixture".into());
+    };
+    // Deliberately false mathematical absence; actual genesis contains job/gen1.
+    let plan = decide_complete_core_policy_patch_point_fresh(
+        *fresh,
+        CompleteCorePolicyPatchFreshView {
+            workflow_type: b"job",
+            current: Ok(None),
+            active_migration: Ok(None),
+            completed_migration: Ok(None),
+            history_max_events_limit: Ok(history),
+            outcome_retention_ms: Ok(caps.outcome_ttl_ms),
+        },
+        &mut charge,
+    )?;
+    let changes = GroupCorePolicyChanges::new(
+        &s,
+        control,
+        None,
+        plan,
+        (caps.schema, caps.codec.admission()),
+        &mut charge,
+        0,
+    )?;
+    let tx = store.begin_apply(
+        s.group(),
+        s.recovery(),
+        caps.codec.admission(),
+        caps.maximum_read_steps,
+        caps.maximum_read_bytes,
+        caps.maximum_adapter_bytes,
+    )?;
+    assert_eq!(
+        tx.commit_core_policy(&changes, &mut charge),
+        Err(StateTransactionError::InvalidChanges)
+    );
+    drop(store.begin_apply(
+        s.group(),
+        s.recovery(),
+        caps.codec.admission(),
+        caps.maximum_read_steps,
+        caps.maximum_read_bytes,
+        caps.maximum_adapter_bytes,
+    )?);
+    drop(store);
+    assert_eq!(f::cohort(&path)?, before);
+    drop(f::open(&path, &s)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
 
 fn accepted(path: &Path, s: &RequestScope) -> TestResult<(f::Cohort, Box<RetainedOutcome>)> {
     drop(f::create(path, s, &[b"p"], &[])?);

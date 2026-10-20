@@ -80,7 +80,7 @@ fn claim() -> TestResult<Vec<u8>> {
     out.extend_from_slice(&12_u64.to_be_bytes());
     out.extend_from_slice(&0_u16.to_be_bytes());
     out.extend_from_slice(&12_u64.to_be_bytes());
-    raw(&mut out, b"r")?;
+    raw(&mut out, b"u")?;
     out.extend_from_slice(&[0; 7]);
     raw(&mut out, b"w")?;
     out.extend_from_slice(&50_u64.to_be_bytes());
@@ -183,7 +183,13 @@ fn seed(dir: &Path, complete: bool) -> TestResult {
     let member = f::member(EntryStamp::Unstamped, 4)?;
     f::append(&mut log, 0, member.as_bytes())?;
     f::apply_control(&mut state, 0, member.as_bytes())?;
-    let create = f::frame(5, b"create", 10, vec![(b"i", f::create_op())])?;
+    // The restricted Claim leaf uses a separate type without governance.
+    let mut create_op = f::create_op();
+    let wf_domain::workflow::Operation::Create(create) = &mut create_op else {
+        return Err("Create fixture changed operation".into());
+    };
+    create.workflow_type = b"u".to_vec();
+    let create = f::frame(5, b"create", 10, vec![(b"i", create_op)])?;
     let policy = policy(11)?;
     let claim = claim()?;
     let blank = f::blank(EntryStamp::Unstamped)?;
@@ -255,11 +261,12 @@ fn inspect(state: &mut RedbStateStore) -> TestResult {
         .ok_or("missing actual claimed row")?;
     assert_eq!(
         (
+            row.record.workflow_type(),
             row.record.state(),
             row.record.version(),
             row.record.fence().get()
         ),
-        (b"running".as_slice(), 2, 1)
+        (b"u".as_slice(), b"running".as_slice(), 2, 1)
     );
     assert_eq!(
         row.record.lease().ok_or("missing lease")?.token.as_bytes(),

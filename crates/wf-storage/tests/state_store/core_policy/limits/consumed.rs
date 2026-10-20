@@ -171,7 +171,7 @@ fn prepare_plan<'retained>(
         return Err("new consumed fixture request was not Fresh".into());
     };
     Ok(decide_complete_core_policy_patch_point_fresh(
-        fresh,
+        *fresh,
         CompleteCorePolicyPatchFreshView {
             workflow_type: b"job",
             current: Ok(Some(old)),
