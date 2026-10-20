@@ -87,7 +87,7 @@ pub(super) fn assert_keyword_groups(profile: PolicySchemaLimits) -> TestResult {
             assert_eq!(original(&old)?, raw);
         }
     }
-    Ok(())
+    assert_chained_keyword_groups(profile)
 }
 
 fn group(keywords: bool, rows: &[(&str, Vec<u8>)]) -> Vec<u8> {
@@ -99,10 +99,26 @@ fn group(keywords: bool, rows: &[(&str, Vec<u8>)]) -> Vec<u8> {
 }
 
 fn keyword_wire(generation: u64, phase: u8, keywords: bool) -> Vec<u8> {
+    keyword_wire_full(
+        generation,
+        phase,
+        keywords,
+        keyword_retry(phase == 2, keywords),
+        false,
+    )
+}
+
+fn keyword_wire_full(
+    generation: u64,
+    phase: u8,
+    keywords: bool,
+    retry: Vec<u8>,
+    version_patch: bool,
+) -> Vec<u8> {
     let changed = phase == 2;
-    let mut retry = vec![("max_retries", integer(if changed { 2 } else { 3 }))];
+    let mut state_retry = vec![("max_retries", integer(if changed { 2 } else { 3 }))];
     if keywords {
-        retry.insert(0, ("max_retries", integer(1)));
+        state_retry.insert(0, ("max_retries", integer(1)));
     }
     let retained = group(
         keywords,
@@ -112,13 +128,13 @@ fn keyword_wire(generation: u64, phase: u8, keywords: bool) -> Vec<u8> {
     if !changed {
         config.push(("retention", retained.clone()));
     }
-    config.push(("retry", group(keywords, &retry)));
+    config.push(("retry", group(keywords, &state_retry)));
     if !changed && keywords {
         config.push(("retention", retained));
     }
     config.push(("indexed_state_meta", vec![108, 0, 0, 0, 0, 106]));
     let mut rows = vec![
-        (atom("retry"), keyword_retry(changed, keywords)),
+        (atom("retry"), retry),
         (binary(b"retry"), fields(&[("max_retries", integer(999))])),
         (
             atom("retention"),
@@ -138,14 +154,88 @@ fn keyword_wire(generation: u64, phase: u8, keywords: bool) -> Vec<u8> {
     ];
     if !changed {
         rows.extend([
-            (atom("version"), integer(7)),
+            (
+                atom("version"),
+                integer(if version_patch && phase == 1 { 9 } else { 7 }),
+            ),
             (binary(b"version"), integer(8)),
         ]);
     }
-    if phase > 0 {
+    if phase > 0 && (!version_patch || changed) {
         rows.push((atom("max_active_ms"), integer(3)));
     }
     envelope(generation, &map(&rows))
+}
+
+fn assert_chained_keyword_groups(profile: PolicySchemaLimits) -> TestResult {
+    use wf_domain::policy::complete::decode_original_complete_policy_entry_portable;
+    use wf_domain::policy::definition::PolicyVersion;
+
+    let raw = chained_wire(7, 0);
+    let mut charge = PolicySchemaCharge::new(profile);
+    let entry = decode_original_complete_policy_entry_portable(&raw, profile, &mut charge)?
+        .ok_or("healthy chained keyword donor did not decode")?;
+    assert_eq!(
+        (entry.generation(), entry.workflow_type()),
+        (7, Some(b"r".as_slice()))
+    );
+    assert_eq!(entry.encoded(), raw);
+    let old = StoredPolicyValue::Original(raw.clone());
+    for phase in [1, 2] {
+        let mut delta = if phase == 1 {
+            PolicyPatch {
+                version: FieldPatch::Set(PolicyVersion::Number(9)),
+                ..PolicyPatch::default()
+            }
+        } else {
+            partial_change()
+        };
+        if phase == 2 {
+            let FieldPatch::Set(retry) = &mut delta.retry else {
+                return Err("partial chained retry fixture".into());
+            };
+            retry.max_retries = Some(9);
+        }
+        let result = patch(
+            Some(&old),
+            0,
+            input(Some(7), delta),
+            64,
+            profile,
+            &mut charge,
+            0,
+        );
+        assert_eq!(original(&old)?, raw);
+        let actual = result.map_err(|error| format!("chained phase={phase}: {error:?}"))?;
+        assert_eq!(original(&actual)?, chained_wire(8, phase));
+    }
+    Ok(())
+}
+
+fn chained_wire(generation: u64, phase: u8) -> Vec<u8> {
+    let retry = if phase == 2 {
+        keyword_retry(true, true)
+    } else {
+        let backoff = keyword(&[
+            ("base_ms", integer(17)),
+            ("jitter_pct", integer(4)),
+            ("kind", atom("fixed")),
+            ("max_ms", integer(33)),
+            ("version", vec![110, 3, 0, 1, 0, 0]),
+        ]);
+        // Zero-LIST alias -> LIST(1) -> LIST(4) -> NIL is one proper list.
+        let mut out = vec![108, 0, 0, 0, 0, 108, 0, 0, 0, 1, 104, 2];
+        out.extend_from_slice(&atom("max_retries"));
+        out.extend_from_slice(&integer(1));
+        out.extend_from_slice(&keyword(&[
+            ("backoff", backoff),
+            ("exhausted_to", binary(b"dead")),
+            ("max_retries", integer(7)),
+            ("type", binary(b"\0\xffopaque")),
+        ]));
+        out
+    };
+    keyword_wire_full(generation, phase, true, retry, true)
 }
 
 fn assert_scalar_forms(profile: PolicySchemaLimits) -> TestResult {

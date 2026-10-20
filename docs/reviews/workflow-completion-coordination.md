@@ -47597,3 +47597,23 @@ coverage, now469LF/5b7ef911: zeroLIST alias around LIST1 then LIST4, unrelated
 version patch raw preservation and changed LAST/duplicate-Clear-all full wire.
 This extension follows repair release; do not call it a pre-code RED. Actual
 review/execution remain pending. No path/type/alias/profile/dependency added.
+
+ROOT-B1-CHAINED-TEST-FREEZE3 (2026-10-20)
+
+Both peers independently accept corrected same-D3 compatibility469LF/15520B/
+11196acd27f704c4099017e1b874344374018dc4ce02ad239de5dcf3e6b8fd6a.
+A local state-retry shadow in the first5b7ef911 draft was corrected before any
+execution; supplied root raw bytes now reach the intended field. Root and both
+reviewers independently restore the ENTIRE prior379/318e24c8 with explicit
+selected-helper inverses. All old scalar/numeric/flat-keyword controls remain.
+The added valid zeroLIST alias->LIST1->LIST4->NIL donor checks full raw preservation
+under unrelated version9 and LAST/Clear-all/unknown leaves after partial patch.
+Runtime pending; this is post-release coverage, not an executed pre-code RED.
+
+This checkpoint stages only Root's read review prefixes: ARCH through3539200,
+PERF through2766562, DOMAIN through4313231. Subsequent peer-owned suffixes remain
+unstaged. ARCH9c455dc7 records exact existing-home keyword factor, real tuple-child
+depth and verbatim Debug move if needed; PERF9f18efe6 records own final fixture
+inverses and prospective capacity derivation. No new artifact/model/profile is
+introduced. Writer alone continues the explicitly released Domain behavior work;
+Root alone owns formatter/Cargo/Git. Full goal remains active.
