@@ -1307,3 +1307,24 @@ establish no power-loss theorem, measured CPU/RSS improvement, Linux execution,
 full source/setup/profile parity, public Claim/governance or accepted runtime
 readiness. Durable complete-policy activation is the required next route. See
 [ADR-007](adr/007-durable-log-storage.md#selected-durable-physical-claim-leaf).
+
+
+### Charged policy point-gate prerequisite
+
+ARCH-NEXT-M1M2-POLICY-POINT1-CREATE1 adds a private gate/point.rs child under
+workflow/request. The existing uncharged point entry and new charged policy
+entry share the actual header/cohort/control/retained validators. Exact log replay
+skips the later requested-outcome tariff; other paths pay it before Some/None
+classification on the same continuous schema account. Prior work and scratch
+peak remain admitted, and a mismatch refuses before work. The returned retained
+borrow is independent of the expected query scope. No current-policy read,
+command owner, fake outcome map or second gate is introduced.
+
+Two reviewed tests reached missing-function RED before implementation; the old
+request-gate target moved intact into main.rs with private charged controls.
+The full875-test macOS suite, six compile-fail examples, strict checks and separate
+pinned native compatibility pass. Whole-file conservation and reciprocal actual
+source review preserve the old Full and uncharged paths. This is the prerequisite
+for real point/Fresh policy publication; it does not implement that publication,
+reindexing, a policy-aware layout, snapshots, public parent/governance or runtime.
+See [ADR-006](adr/006-private-prepared-command-codec.md#selected-charged-policy-point-prerequisite).

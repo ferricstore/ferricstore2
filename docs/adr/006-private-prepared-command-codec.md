@@ -1415,3 +1415,45 @@ histories with outcome/control. Retained replies move their original owned
 buffers only after commit. This private profile and the isolated native proof
 do not implement public normalization/submission hooks, SDK/wire compatibility,
 production dependency adoption or full original setup/runtime/Linux acceptance.
+
+
+## Selected charged policy point prerequisite
+
+ARCH-NEXT-M1M2-POLICY-POINT1-CREATE1 and its exact test-geometry precision select
+one private production gate/point.rs child and the existing parent reexports.
+inspect_complete_core_policy_patch_point_gate takes the ordinary same-revision
+PointGateView, committed header, actual profiles and one continuous schema charge.
+It checks profile equality before any debit, then shares actual header, coherent
+cohort, control and retained classification with the old point path. No new
+nominal model, alias, trait, dependency, command/policy/map owner or authority
+certificate is introduced. The independently elided query lifetime does not
+enter the returned retained borrow.
+
+Only non-LogReplay reaches the conservative logical request observation tariff
+128+actual request bytes, before Some/None classification. It claims no physical
+map lookup or copied request owner. For tenant/group/recovery/request lengths
+6/5/8/7, gate-only cumulative prefixes are128,294,422,557,723,865,993,1189,1317:
+Fresh557, exact LogReplay422, conflict1189, Replay/Expired1317. Prior g and p stay
+on the same account, failed debit preserves the last successful prefix, and no
+scratch is newly requested. None retains the existing uncharged helper bypass
+before checked fee arithmetic; all old order/results/fees remain exact.
+
+The original386-line integration root moved byte-for-byte to request_gate/main.rs
+plus one private registration; charged.rs contains exactly two additional
+identities and four private assertion helpers. Actual reciprocal review covers
+accepted/rejected original owners, pointer/metadata/lifetime, corrupt cohort and
+retained facts, exact LogReplay bypass, unapplied/applied-zero, each exact/tight
+event, profile mismatch and real prior-peak/repeated-call admission. Tests were
+frozen in04c7f4d after an actual missing-function RED. The first strict diagnostic
+was only an elidable lifetime name; its equivalent spelling has an executed
+whole-file inverse without a waiver or changed oracle.
+
+All875 workspace tests/90 targets and six compile-fail examples/15 targets pass
+on macOS, alongside strict checks, frozen reference/progress and separate pinned
+native compatibility. Actual source reviews include complete parent and style
+inverses. Full durable policy publication still requires real closed Fresh
+staging, current/context/migration authority, canonical discovery/reindexing,
+atomic policy/outcome/control publication, explicit origin/current layout and
+snapshot propagation. Those future artifacts are not selected by this gate.
+Public policy/Claim/governance, accepted runtime, every original setup/profile,
+Linux and full M1–M8 acceptance remain required; no CPU/RSS/speed claim follows.

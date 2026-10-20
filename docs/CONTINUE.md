@@ -5,13 +5,28 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest completed component is the durable physical Claim increment (`a422638`).
+The latest implemented policy prerequisite adds a genuinely charged retained
+point gate. Its two reviewed tests were frozen in `04c7f4d` after genuine
+missing-function RED. One approved private production child shares the existing
+validators and preserves the old uncharged path; no new model or dependency was
+added. Architecture and performance reviewed the actual source and each other's
+findings. The complete macOS workspace now passes **875 tests across 90 targets**
+plus **six compile-fail examples across 15 documentation targets**, with zero
+failures or ignored tests. Formatting, strict all-target Clippy, warnings-denied
+rustdoc, architecture, reference/progress, cached dependency policy and separate
+pinned native compatibility all pass. All 1,338 repository and 17 native inputs
+stayed unchanged through validation. Full parity still fails; no new source-case
+mapping, native Linux result or measured optimization is claimed. The complete
+durable policy publication/reindex/layout/snapshot contract remains under review
+before its concrete artifact selection and tests-first release.
+
+The preceding completed component is the durable physical Claim increment (`a422638`).
 Commit `e080ef4` freezes 31 substantive tests after reviewed missing-API RED.
 The implementation spans thirteen approved private production files and existing
 seams, with separate domain/storage and ports/node ownership. Architecture and
 performance review found three domain authority/order gaps; additional controls
 reproduced them before the fixes. Every production file is within 400 physical
-lines. The complete macOS workspace now passes **873 tests across 90 targets**
+lines. That complete macOS checkpoint passed **873 tests across 90 targets**
 and **six compile-fail examples across 15 documentation targets**, with zero
 failures or ignored tests. Formatting, strict all-target Clippy, warnings-denied
 rustdoc, architecture and frozen-reference checks pass; all 1,336 non-Markdown

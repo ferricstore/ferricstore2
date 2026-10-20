@@ -45501,3 +45501,90 @@ and old point behavior/fees stay unchanged. ARCH/PERF review actual source norma
 after save. Whole policy publication and full original goal remain mandatory;
 Root whole-read separate16647B/eeebbbd8 UNSELECTED successor audit as evidence,
 not as broad source permission. No native CPU/RSS/speed/Linux/full-parity claim.
+
+
+### ROOT-NEXT-M1M2-POLICY-POINT1-GREEN1 — actual source conservation and complete current validation
+
+Tests/decisions are frozen in04c7f4d after the qualified E0432 RED. Root authored
+ONLY selected production gate/point.rs and existing gate.rs factor. Final parent
+11955B/330LF/SHAd371a90bca34f5a7aa2f13def1d0a89759abf519067dbe4172ffa4cc6d40d2ad
+has an executed ENTIRE inverse replacing only child registration/reexport with
+old point docs/body to restore frozen13314B/367LF/80887b9a exactly. ARCH and PERF
+independently executed the same complete inverse. Existing old point docs and
+signature stay verbatim; None still bypasses checked charge arithmetic, and
+actual shared validators/cohort/control/retained order remains identical.
+
+Focused request_gate ran6/6 with0ignored/filtered, raw1971199+848/SHA92813d3805da8d9cd3995c21666b3018181a89adbb8e0758825094c02a701d94,
+all1338 inputs unchanged1c567efb8a9f3ee2a0d6bede1ccbc891f09952b59eade07023eddeb68b4dc14b.
+Initial strict reported ONLY the explicitly named new 'scope lifetime as elidable,
+raw1972148+1113/SHA5a8baecb82b6ce2e2cfc06e97e65b7b9dad051724eb5350c8c8f6e741eb34c75.
+Root elided that unused name, preserving independent PointGateView query/retained
+lifetimes. The ENTIRE inverse of exactly two signature spellings restores
+prestylec55c9ec1867478979a811c2b91d1bbf1dd0d1a9e6f26d1916fb7506ac06fdb91;
+final3271B/81LF child isad740e09d0562dfe09b133b012533fc2e88b557649b1c8e9679481e86f8feddf.
+No body/oracle/profile/fee/owner/waiver changed; domain strict then passed, and
+subsequent full-workspace strict below supplies the final complete command proof.
+
+Root whole-read/hash-verified final PERF5660/c9f990ad and4500/3e434fc2 receipts,
+ARCH4791/132fe9cb plus earlier precise creation/geometry/test/resource decisions.
+Both reviewers whole-read final source/tests and each other's finite findings;
+both complete-parent and equivalent-lifetime inverses TRUE, no remaining finding.
+The shared gate introduces no new model/alias/trait/dependency/current owner/map,
+reads no physical/current-policy authority and preserves all prior g/p. This is
+one actual paid-point prerequisite, not the complete policy route.
+
+ALL1338 repository non-Markdown source/test/policy/script/CI/reference inputs
+stayed81b126673fe39c2cc33057ece6f44d88c0ca28103b22757b1c345bef3099462f
+after EVERY current workspace and separate final command. Rust1.99.0, locked/
+offline, build/rustdoc warnings denied. Exact raw spans in the existing log:
+
+| Current workspace command | Exit | Offset+bytes | SHA256 |
+|---|---:|---:|---|
+| fmt check |0|1973302+0|e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855|
+| all-target strict Clippy |0|1973389+1045|31b5bfd5749dd6c4499670ee7bbb76d7f3bdc12c9fff4aad2c7d3398f97c61ab|
+| all-target tests |0|1974504+93032|103fc54619ef3b6e553b6d32b65929a9bed4368b2695020c9357efdd05aa3dae|
+| doc tests |0|2067598+2707|a079b8d3bad34e9733850e8e5d4e754a99ba4f593570ceee79458c4f5947c933|
+| no-deps warnings-denied rustdoc |0|2070370+2228|4f55b1251bd95286daff18483ed9c7b9c1f09bdc62d5339d1fbcf044475e285b|
+| cargo arch |0|2072623+5023|71eb987f1ed2edf793be82a5872529c1f34d2d5a2c197f134ddca010b2b739a7|
+| cargo reference |0|2077676+365|ca4afb1bd4a5a63e9ccc322316d9c961fac85e506c11bcac9267c890070bef43|
+| cargo progress |0|2078070+559|bdd5a7d18890e513fe64dc5b670778edec70b2f0355fa23a5c1260256ecf303d|
+
+Actual parsed totals875passed/90 target results, docs6passed/15 targets; both have
+0failed/ignored/measured/filtered. Architecture separately reports39+4+3+1.
+The unchanged source clock/context/node/fault/parity/policy regression runs are
+part of that actual suite; no post-fix test assertion/fixture was altered.
+
+| Separate current final command | Exit | Offset+bytes | SHA256 |
+|---|---:|---:|---|
+| progress |0|2078708+559|bdd5a7d18890e513fe64dc5b670778edec70b2f0355fa23a5c1260256ecf303d|
+| require-parity (required incomplete scope) |1|2079397+453|2fc2435c1f8cf3f23c1922dbd40e61f96ee2d5fe2bd8c4ea08deba99956968d6|
+| cached cargo-deny advisories/bans/licenses/sources, deny unmatched-skip |0|2080028+48|f1a0fca39d4280363937aabd77783990ea6480bd9ca257816de3b68fc8efa845|
+| native fmt check |0|2080180+0|e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855|
+| native all-target check |0|2080308+574|46d81d2fdb2dc14d3f2f37bea71d1e865a366164b96b0ff4c59f50ddb2e519fd|
+| native all-target strict |0|2081026+184|833f2f70453b7f58a8889565bc0e3e6a5b446725532d7f181566f9a7d628ae30|
+| native complete persistence/fault executable |0|2081322+659|118414c45fcd12248e3916602dcc34855e9f2c18ee893154cacb928daab92415|
+
+Native17 inputs stayed exactly saved55bcbd85 and fingerprint028ebfdcc7e0ae1fd152ebd657bd88d89ba978c3519454b531337ca7e33b05d5,
+alongside the same1338 repository inputs. Current actual path dependencies were
+compiled/executed on Darwin arm64. Audit is cached-only with no new exclusion/
+waiver or fresh online advisory claim. Root independently verified all15 current
+raw spans; no Linux or native CPU/RSS/latency result is inferred.
+
+The two tests add no original source-case mapping: progress stays85/95/384,
+5903registered/4222linked/1681unmatched runtime and1655unresolved declarations.
+Actual full parity still exits1. Root updates current architecture/ADR006/handoff
+with these scoped facts; complete durable policy publication/reindex/origin5/
+snapshot2, public parent/governance/identified owner, accepted runtime/read barriers,
+all original profiles/fixtures/assertions, both supported hosts and full M1–M8
+remain active mandatory work. Writer is preparing one exact cohesive13-path/
+8model+2trait proposal with ARCH/PERF before creation. That proposal remains
+UNSELECTED; no future artifact/source release or new acknowledgment gate follows
+from current point GREEN. This goal turn is PROGRESS, not full completion.
+
+
+Current point GREEN closing prose has actual independent ARCH and PERF reads of
+architecture1323B, ADR0062753B and CONTINUE current875 opening. Both confirm the
+scoped gate-only facts, logical tariff/prior g+p/None bypass/borrow/RED-style
+qualifications and open complete policy/public/runtime/Linux/parity duties, with
+no material finding or added gate. Root proceeds to a reviewed source checkpoint;
+whole-policy proposal remains separately unselected and source-held.

@@ -124,45 +124,8 @@ pub fn inspect_request<'view>(
     inspect_request_impl(view, header, limits, None).map_err(apply_error)
 }
 
-/// Inspects one requested outcome and its exact scoped cohort before fresh guards.
-///
-/// The caller supplies coherent same-revision observations. A missing requested
-/// outcome does not establish an empty cohort. Exact log replay skips retained
-/// metadata only after header and cohort integrity have passed.
-///
-/// # Errors
-/// Rejects foreign/corrupt authority, incoherent cohort or conflicting log identity.
-pub fn inspect_point_request<'retained>(
-    view: PointGateView<'_, 'retained>,
-    header: CommittedHeader<'_>,
-    limits: AdmissionLimits,
-) -> Result<RequestGate<'retained>, ApplyError> {
-    let mut charge = None;
-    validate_header(view.scope, header, limits, &mut charge).map_err(apply_error)?;
-    if (view.outcome.is_some() && !view.retained_nonempty)
-        || (view.control.last_entry().is_none() && view.retained_nonempty)
-    {
-        return Err(ApplyError::InvalidAuthority);
-    }
-    let control = prepare_control(view.control, header, &mut charge).map_err(apply_error)?;
-    let decision = if control.is_log_replay() {
-        GateDecision::LogReplay
-    } else if let Some(retained) = view.outcome {
-        classify_retained(
-            view.scope,
-            view.control,
-            header,
-            control,
-            retained,
-            limits,
-            &mut charge,
-        )
-        .map_err(apply_error)?
-    } else {
-        GateDecision::Fresh
-    };
-    Ok(RequestGate { control, decision })
-}
+mod point;
+pub use point::{inspect_complete_core_policy_patch_point_gate, inspect_point_request};
 
 /// Operational charged inspection refusal; it grants no execution authority.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
