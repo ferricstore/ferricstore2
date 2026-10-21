@@ -41,39 +41,16 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
 
   def query(%{atoms: atoms, exports: exports}, limits)
       when is_list(atoms) and is_list(exports) do
-    with :ok <- check(length(atoms) + length(exports), limits.facts, :facts),
-         true <- Enum.all?(atoms, &is_binary/1),
-         true <- Enum.all?(exports, &valid_export/1) do
-      bytes =
-        Enum.reduce(atoms, 0, &(byte_size(&1) + &2)) +
-          Enum.reduce(exports, 0, fn {m, f, _}, sum -> sum + byte_size(m) + byte_size(f) end)
-
-      with :ok <- check(bytes, limits.text_bytes, :text_bytes) do
-        atom_results = Map.new(atoms, &{&1, existing(&1) != :error})
-
-        export_results =
-          Map.new(exports, fn {m, f, a} = item ->
-            result =
-              case {existing(m), existing(f)} do
-                {{:ok, module}, {:ok, function}} -> :erlang.function_exported(module, function, a)
-                _ -> false
-              end
-
-            {item, result}
-          end)
-
-        {:ok, %{atoms: atom_results, exports: export_results}}
-      end
-    else
-      {:error, _} = error -> error
-      _ -> {:error, :invalid_queries}
+    with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits),
+         :ok <- query_budget(11, bytes, limits) do
+      query_atoms(atoms, exports, %{}, 11, bytes, limits)
     end
   end
 
   def query(_, _), do: {:error, :invalid_queries}
 
-  def compact_queries(%{atoms: atoms, exports: exports} = queries, limits, retained) do
-    with {:ok, _} <- query(queries, limits) do
+  def compact_queries(%{atoms: atoms, exports: exports}, limits, retained) do
+    with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits) do
       strings = atoms ++ Enum.flat_map(exports, fn {m, f, _} -> [m, f] end)
       bytes = Enum.reduce(strings, 0, &(:binary.referenced_byte_size(&1) + byte_size(&1) + &2))
 
@@ -89,15 +66,120 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
 
   def compact_queries(_, _, _), do: {:error, :invalid_queries}
 
+  defp query_shape(atoms, exports, limits) when is_list(atoms) and is_list(exports) do
+    cond do
+      not proper_list?(atoms) or not proper_list?(exports) ->
+        {:error, :invalid_queries}
+
+      count_left(exports, count_left(atoms, limits.facts)) < 0 ->
+        {:error, {:limit, :facts}}
+
+      not atom_queries?(atoms) or not export_queries?(exports) ->
+        {:error, :invalid_queries}
+
+      true ->
+        remaining = export_text_left(exports, atom_text_left(atoms, limits.text_bytes))
+
+        if remaining < 0,
+          do: {:error, {:limit, :text_bytes}},
+          else: limits.text_bytes - remaining
+    end
+  end
+
+  defp query_shape(_, _, _), do: {:error, :invalid_queries}
+
+  defp proper_list?([]), do: true
+  defp proper_list?([_ | tail]), do: proper_list?(tail)
+  defp proper_list?(_), do: false
+
+  defp count_left(_, -1), do: -1
+  defp count_left([], remaining), do: remaining
+  defp count_left([_ | _], 0), do: -1
+  defp count_left([_ | tail], remaining), do: count_left(tail, remaining - 1)
+
+  defp atom_queries?([]), do: true
+  defp atom_queries?([name | tail]), do: is_binary(name) and atom_queries?(tail)
+
+  defp export_queries?([]), do: true
+  defp export_queries?([item | tail]), do: valid_export(item) and export_queries?(tail)
+
+  defp atom_text_left([], remaining), do: remaining
+
+  defp atom_text_left([name | tail], remaining) do
+    size = byte_size(name)
+    if size > remaining, do: -1, else: atom_text_left(tail, remaining - size)
+  end
+
+  defp export_text_left(_, -1), do: -1
+  defp export_text_left([], remaining), do: remaining
+
+  defp export_text_left([{module, function, _} | tail], remaining) do
+    module_bytes = byte_size(module)
+    function_bytes = byte_size(function)
+
+    if module_bytes > remaining or function_bytes > remaining - module_bytes,
+      do: -1,
+      else: export_text_left(tail, remaining - module_bytes - function_bytes)
+  end
+
+  defp query_atoms([], exports, results, used, bytes, limits),
+    do: query_exports(exports, results, %{}, used, bytes, limits)
+
+  defp query_atoms([name | tail], exports, results, used, bytes, limits) do
+    next = used + 117 + query_put_words(map_size(results))
+
+    with :ok <- query_budget(next, bytes, limits) do
+      available = existing(name) != :error
+      query_atoms(tail, exports, Map.put(results, name, available), next, bytes, limits)
+    end
+  end
+
+  defp query_exports([], atoms, exports, _used, _bytes, _limits),
+    do: {:ok, %{atoms: atoms, exports: exports}}
+
+  defp query_exports(
+         [{module_name, function_name, arity} = item | tail],
+         atoms,
+         results,
+         used,
+         bytes,
+         limits
+       ) do
+    next = used + 237 + query_put_words(map_size(results))
+
+    with :ok <- query_budget(next, bytes, limits) do
+      available =
+        case {existing(module_name), existing(function_name)} do
+          {{:ok, module}, {:ok, function}} -> :erlang.function_exported(module, function, arity)
+          _ -> false
+        end
+
+      query_exports(tail, atoms, Map.put(results, item, available), next, bytes, limits)
+    end
+  end
+
+  defp query_put_words(size) when size < 32, do: 19 + 2 * size
+  defp query_put_words(32), do: 111_048
+  defp query_put_words(size), do: size + 487
+
+  defp query_budget(words, bytes, limits) do
+    cond do
+      words > limits.decoded_words -> {:error, {:limit, :decoded_words}}
+      bytes > limits.pinned_bytes -> {:error, {:limit, :pinned_bytes}}
+      words > div(limits.pinned_bytes - bytes, 8) -> {:error, {:limit, :pinned_bytes}}
+      true -> :ok
+    end
+  end
+
   defp valid_export({m, f, a}),
     do: is_binary(m) and is_binary(f) and is_integer(a) and a in 0..255
 
   defp valid_export(_), do: false
 
   defp existing(name) do
-    {:ok, String.to_existing_atom(name)}
-  rescue
-    ArgumentError -> :error
+    {:ok, :erlang.binary_to_existing_atom(name, :utf8)}
+  catch
+    :error, :badarg -> :error
   end
 
   defp check(value, maximum, field),
