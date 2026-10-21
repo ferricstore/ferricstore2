@@ -71,8 +71,8 @@ failed. Its optimized ERTS16.2 runtime and crypto now build, install and start o
 macOS. The capture NIF compiles with strict warnings against its actual header
 closure; a generated manifest binds those headers and linked library bytes.
 
-The latest completed native run executes eighteen tests: sixteen pass and two
-fail. The query construction regression was frozen in `9ab4629` after genuine
+The accepted actual-value checkpoint executes eighteen native tests: sixteen
+pass and two fail. The query construction regression was frozen in `9ab4629` after genuine
 zero-word/zero-pin acceptance and an improper-list exception were observed. Its
 reviewed implementation now passes the entire identity, including the 33-key
 boundary, guard precedence, duplicate keys, extra fields and input reuse. The
@@ -82,6 +82,12 @@ request/report control, repeated real binary backing, depth64/63, malformed-mode
 precedence and healthy reuse. The strict native rebuild preserves all89 pinned
 headers and all302 compiler inputs through execution. This measures real graphs
 for later encoder/copy admission; the original two wrapper failures remain open.
+The next original-input regression brings the latest native run to nineteen
+tests, with sixteen passing and three failing. It exposes fresh capture and
+extension accepting a 600KB ignored query field under a 128KB pin cap; the
+incorrectly accepted extension advances the parent and breaks the old-parent
+retry. All earlier eighteen test bodies remain unchanged. The actual-original
+private handoff is selected, with Input/root implementation still pending.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific

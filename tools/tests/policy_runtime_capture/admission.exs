@@ -9,6 +9,80 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
   @controller Path.expand("../policy_runtime_capture_test.exs", __DIR__)
   @generated "/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/native"
 
+  test "original_inputs_remain_funded_through_capture_and_extend" do
+    SourceTest.bootstrap!()
+    bytes = :binary.copy("x", 600_000)
+    empty = %{atoms: [], exports: []}
+    queries = Map.put(empty, :ignored, bytes)
+    limits = SourceTest.limits()
+    tight = %{limits | pinned_bytes: 128_000}
+    expected_hash = sha(TermCodec.encode(empty))
+    fresh = Capture.capture_epoch([], queries, nil, tight)
+
+    case fresh do
+      {:ok, unexpected, _} -> assert :ok = Capture.close_epoch(unexpected)
+      _ -> :ok
+    end
+
+    assert {:ok, session, first} = Capture.capture_epoch([], empty, nil, tight)
+
+    try do
+      assert {:ok, adequate, captured} = Capture.capture_epoch([], queries, nil, limits)
+
+      try do
+        wrong_parent = Capture.extend_epoch(session, [], queries, nil)
+        extension = Capture.extend_epoch(session, [], queries, first.identity)
+        retry = Capture.extend_epoch(session, [], empty, first.identity)
+        fresh_status = if match?({:ok, _, _}, fresh), do: :unexpected_success, else: fresh
+        extend_status = if match?({:ok, _}, extension), do: :unexpected_success, else: extension
+        retry_status = if match?({:ok, _}, retry), do: :ok, else: retry
+
+        assert fresh == {:error, {:limit, :pinned_bytes}},
+               "eager original-input results: #{inspect({fresh_status, wrong_parent, extend_status, retry_status}, limit: :infinity)}"
+
+        assert captured.query_hash == expected_hash
+        assert captured.queries == %{atoms: %{}, exports: %{}}
+        assert captured.donor_hashes == []
+
+        for field <- [:hashes, :atoms, :nodes, :exports, :local_funs, :orders] do
+          assert Map.fetch!(captured, field) == []
+        end
+
+        assert wrong_parent == {:error, :parent_mismatch}
+        assert extension == {:error, {:limit, :pinned_bytes}}
+        assert {:ok, again} = retry
+        assert again.parent == first.identity
+        assert again.session_id == first.session_id
+        assert first.query_hash == expected_hash
+        assert first.queries == %{atoms: %{}, exports: %{}}
+        assert first.donor_hashes == []
+
+        for field <- [
+              :donor_hashes,
+              :query_hash,
+              :queries,
+              :orders,
+              :hashes,
+              :atoms,
+              :nodes,
+              :exports,
+              :local_funs,
+              :abi
+            ] do
+          assert Map.fetch!(again, field) == Map.fetch!(first, field)
+        end
+
+        assert queries == %{atoms: [], exports: [], ignored: bytes}
+        assert bytes == :binary.copy("x", 600_000)
+        assert :binary.referenced_byte_size(bytes) == 600_000
+      after
+        assert :ok = Capture.close_epoch(adequate)
+      end
+    after
+      assert :ok = Capture.close_epoch(session)
+    end
+  end
+
   test "live_measurement_counts_actual_graph_and_report_control" do
     SourceTest.bootstrap!()
     limits = %{SourceTest.limits() | donor_bytes: 0, facts: 0, text_bytes: 0, output_bytes: 0}
