@@ -579,6 +579,7 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
 end
 
 Code.require_file("policy_runtime_capture/admission.exs", __DIR__)
+Code.require_file("policy_runtime_capture/query_admission.exs", __DIR__)
 
 case System.argv() do
   ["--admission-child", mode] ->

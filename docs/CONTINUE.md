@@ -110,6 +110,15 @@ each new binary donor is decoded once. Checked arithmetic and the source-derived
 normal continuation bound preserve cumulative word/pin credit. Actual BEAM sort
 provider binding and complete native/IPC/failure/retirement accounting remain open;
 this functional result does not accept the complete producer or Rust profiles.
+The next cumulative-query regression now reproduces a real failure before any
+query-composition implementation. Its reviewed cleanup revision executes
+**twenty-one tests: twenty pass and one fails**, with all 1,492 captured repository
+inputs unchanged. Both the 400-word and 3,500-byte pin requests incorrectly
+return success; the first typed word-limit assertion fails. Later pin/adequate
+result assertions remain unexecuted and receive no credit. A separate related
+test child preserves all twenty earlier bodies and caps, and closes acquired
+sessions even if a later capture raises. Query costs still need to be combined
+with and retained alongside the current request/session admission bank.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific
