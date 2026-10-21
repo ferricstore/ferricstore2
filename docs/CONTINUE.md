@@ -87,7 +87,7 @@ with sixteen passing and three failing. Fresh capture and extension incorrectly
 accepted a 600KB ignored query field under a 128KB pin cap; the accepted extension
 advanced the parent and broke the old-parent retry. The plain-input preparation
 and session handoff now pass that complete identity and the combined query/donor
-ownership identity. The latest actual native run has **nineteen tests, eighteen
+ownership identity. That plain-input checkpoint has **nineteen tests, eighteen
 passing and one failing**, with all 1,491 captured repository inputs unchanged.
 Original inputs and prepared copies retain word/pin credit through transfer;
 the keeper independently measures actual received roots instead of trusting a
@@ -95,6 +95,15 @@ caller certificate. Saturating backing scans refuse before an unbounded alias
 sum, and each new donor is decoded once. All nineteen test bodies remain
 unchanged. Adequate source-anchor binding is the remaining failing assertion;
 complete wrapper/native/IPC allocation accounting remains open separately.
+The next retained-anchor regression brings the latest suite to **twenty tests,
+eighteen passing and two failing**, with all 1,491 repository inputs unchanged.
+Its short-lived source-producing Task returns no live anchor to the caller;
+planned assertions require caller exit, keeper GC, historical anchor restoration,
+indexed byte mismatch, healthy retry and complete session continuity. Review
+strengthened root-hash counts to prevent vacuous prefix checks. The actual first
+capture still returns `invalid_donors`, so every later new assertion remains
+unexecuted. All nineteen earlier bodies and the provider sources are unchanged;
+the reviewed failing test is frozen before binding implementation.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific

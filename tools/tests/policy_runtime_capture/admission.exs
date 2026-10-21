@@ -9,6 +9,90 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
   @controller Path.expand("../policy_runtime_capture_test.exs", __DIR__)
   @generated "/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/native"
 
+  test "source_anchors_remain_bound_across_session_extensions" do
+    SourceTest.bootstrap!()
+    empty = %{atoms: [], exports: []}
+    limits = SourceTest.limits()
+
+    task =
+      Task.async(fn ->
+        anchor = :binary.compile_pattern(String.duplicate("x", 4_096))
+        encoded = TermCodec.encode(anchor)
+
+        case Capture.capture_epoch([%{encoded: encoded, source_term: anchor}], empty, nil, limits) do
+          {:ok, keeper, captured} -> {:ok, keeper, captured, encoded}
+          error -> error
+        end
+      end)
+
+    caller = task.pid
+    caller_monitor = Process.monitor(caller)
+    initial = Task.await(task)
+    assert {:ok, keeper, first, encoded} = initial
+    monitor = Process.monitor(keeper)
+
+    try do
+      assert_receive {:DOWN, ^caller_monitor, :process, ^caller, _}, 1_000
+      assert :erlang.garbage_collect(keeper)
+      plain = TermCodec.encode(1)
+      assert first.donor_hashes == [sha(encoded)]
+      assert length(first.hashes) == 1
+      assert {:ok, second} = Capture.extend_epoch(keeper, [plain], empty, first.identity)
+      assert second.parent == first.identity
+      assert second.session_id == first.session_id
+      assert second.donor_hashes == [sha(encoded), sha(plain)]
+      assert length(second.hashes) == 2
+      assert Enum.take(second.hashes, length(first.hashes)) == first.hashes
+
+      for field <- [:atoms, :nodes, :exports, :local_funs, :orders, :queries, :abi] do
+        assert Map.fetch!(second, field) == Map.fetch!(first, field)
+      end
+
+      anchor = :binary.compile_pattern(String.duplicate("y", 4_096))
+      next_encoded = TermCodec.encode(anchor)
+      mapped = %{encoded: next_encoded, source_term: anchor}
+      wrong = %{mapped | source_term: 7}
+
+      assert Capture.extend_epoch(keeper, [plain, wrong], empty, nil) ==
+               {:error, :parent_mismatch}
+
+      assert Capture.extend_epoch(keeper, [plain, wrong], empty, second.identity) ==
+               {:error, {:source_anchor_mismatch, 1}}
+
+      assert {:ok, third} = Capture.extend_epoch(keeper, [mapped], empty, second.identity)
+      assert third.parent == second.identity
+      assert third.session_id == first.session_id
+      assert third.abi == first.abi
+      assert third.donor_hashes == [sha(encoded), sha(plain), sha(next_encoded)]
+      assert length(third.hashes) == 3
+      assert Enum.take(third.hashes, length(second.hashes)) == second.hashes
+      assert :erlang.garbage_collect(self())
+      assert :erlang.garbage_collect(keeper)
+      assert {:ok, final} = Capture.extend_epoch(keeper, [], empty, third.identity)
+      assert final.parent == third.identity
+      assert final.session_id == first.session_id
+
+      for field <- [
+            :donor_hashes,
+            :hashes,
+            :atoms,
+            :nodes,
+            :exports,
+            :local_funs,
+            :orders,
+            :queries,
+            :abi
+          ] do
+        assert Map.fetch!(final, field) == Map.fetch!(third, field)
+      end
+    after
+      assert :ok = Capture.close_epoch(keeper)
+    end
+
+    assert_receive {:DOWN, ^monitor, :process, ^keeper, :normal}, 1_000
+    assert {:error, :closed_session} = Capture.extend_epoch(keeper, [], empty, first.identity)
+  end
+
   test "original_inputs_remain_funded_through_capture_and_extend" do
     SourceTest.bootstrap!()
     bytes = :binary.copy("x", 600_000)
