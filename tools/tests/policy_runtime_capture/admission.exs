@@ -52,6 +52,8 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
       |> :erlang.binary_to_term([:safe])
       |> Map.put(:native_sha256, sha(changed_bytes))
 
+    %{source_revision: _, headers: _, header_digest: _, native_sha256: _} = metadata
+    assert map_size(metadata) == 4
     raw = :erlang.term_to_binary(metadata, [:deterministic])
     changed = fixture(original, raw, changed_bytes)
 
