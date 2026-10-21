@@ -105,8 +105,7 @@ static void push_fact(struct capture_state *s, unsigned kind, ERL_NIF_TERM item)
 }
 static int walk(struct capture_state *, Eterm, uint64_t);
 
-static int atom_fact(struct capture_state *s, Eterm term) {
-    if ((s->emitting == 2 || s->emitting == 3)) return 1;
+static ERTS_NOINLINE int atom_fact(struct capture_state *s, Eterm term) {
     char name[1021]; unsigned length;
     const char *keys[] = {"name", "native_word"};
     if (!name_bytes(s, term, name, &length) || !fact_room(s, 2, length, 1, keys)) return 0;
@@ -116,9 +115,8 @@ static int atom_fact(struct capture_state *s, Eterm term) {
     }
     return 1;
 }
-static int node_fact(struct capture_state *s, Eterm term, uint64_t depth) {
+static ERTS_NOINLINE int node_fact(struct capture_state *s, Eterm term) {
     const ExternalThing *thing = external_thing_ptr(term);
-    if ((s->emitting == 2 || s->emitting == 3)) return walk(s, thing->node->sysname, depth + 1);
     char name[1021]; unsigned length;
     const char *keys[] = {"name", "creation", "hash_input"};
     if (!name_bytes(s, thing->node->sysname, name, &length) || !fact_room(s, 3, length, 2, keys)) return 0;
@@ -128,12 +126,10 @@ static int node_fact(struct capture_state *s, Eterm term, uint64_t depth) {
             enif_make_uint64(s->env, (uint64_t)(uintptr_t)thing->node)};
         push_fact(s, 2, map(s->env, keys, values, 3));
     }
-    return walk(s, thing->node->sysname, depth + 1);
+    return 1;
 }
-static int export_fact(struct capture_state *s, const ErlFunThing *fun, uint64_t depth) {
+static ERTS_NOINLINE int export_fact(struct capture_state *s, const ErlFunThing *fun) {
     const ErtsCodeMFA *mfa = &fun->entry.exp->info.mfa;
-    if ((s->emitting == 2 || s->emitting == 3))
-        return walk(s, mfa->module, depth + 1) && walk(s, mfa->function, depth + 1);
     char module[1021], function[1021]; unsigned ml, fl;
     const char *keys[] = {"module", "function", "arity", "hash_input"};
     if (!name_bytes(s, mfa->module, module, &ml) || !name_bytes(s, mfa->function, function, &fl) ||
@@ -144,16 +140,10 @@ static int export_fact(struct capture_state *s, const ErlFunThing *fun, uint64_t
             enif_make_uint64(s->env, (uint64_t)(uintptr_t)fun->entry.exp)};
         push_fact(s, 3, map(s->env, keys, values, 4));
     }
-    return walk(s, mfa->module, depth + 1) && walk(s, mfa->function, depth + 1);
+    return 1;
 }
-static int local_fact(struct capture_state *s, const ErlFunThing *fun, uint64_t depth) {
+static ERTS_NOINLINE int local_fact(struct capture_state *s, const ErlFunThing *fun) {
     const ErlFunEntry *entry = fun->entry.fun;
-    if ((s->emitting == 2 || s->emitting == 3)) {
-        if (!walk(s, entry->module, depth + 1)) return 0;
-        for (unsigned i = 0; i < fun_num_free(fun); i++)
-            if (!walk(s, fun->env[i], depth + 1)) return 0;
-        return 1;
-    }
     char module[1021]; unsigned length;
     const char *keys[] = {"module", "index", "arity", "uniq", "old_uniq"};
     if (!name_bytes(s, entry->module, module, &length) || !fact_room(s, 5, length + 16, 3, keys)) return 0;
@@ -163,14 +153,21 @@ static int local_fact(struct capture_state *s, const ErlFunThing *fun, uint64_t 
             enif_make_int(s->env, entry->old_uniq)};
         push_fact(s, 4, map(s->env, keys, values, 5));
     }
-    if (!walk(s, entry->module, depth + 1)) return 0;
-    for (unsigned i = 0; i < fun_num_free(fun); i++) if (!walk(s, fun->env[i], depth + 1)) return 0;
     return 1;
 }
 static int walk_fun(struct capture_state *s, Eterm term, uint64_t depth) {
     const ErlFunThing *fun = (const ErlFunThing *)fun_val(term);
     if (!debit(s, WORDS, ERL_FUN_SIZE + fun_num_free(fun))) return 0;
-    return is_local_fun(fun) ? local_fact(s, fun, depth) : export_fact(s, fun, depth);
+    if (is_local_fun(fun)) {
+        if (s->emitting != 2 && s->emitting != 3 && !local_fact(s, fun)) return 0;
+        if (!walk(s, fun->entry.fun->module, depth + 1)) return 0;
+        for (unsigned i = 0; i < fun_num_free(fun); i++)
+            if (!walk(s, fun->env[i], depth + 1)) return 0;
+        return 1;
+    }
+    const ErtsCodeMFA *mfa = &fun->entry.exp->info.mfa;
+    if (s->emitting != 2 && s->emitting != 3 && !export_fact(s, fun)) return 0;
+    return walk(s, mfa->module, depth + 1) && walk(s, mfa->function, depth + 1);
 }
 static int walk_hamt(struct capture_state *s, Eterm term, uint64_t depth, unsigned level) {
     const Eterm *p = boxed_val(term);
@@ -213,7 +210,8 @@ static int walk_list(struct capture_state *s, Eterm term, uint64_t depth) {
 static int walk(struct capture_state *s, Eterm term, uint64_t depth) {
     if (depth > s->cap[DEPTH]) { s->refusal = "depth"; return 0; }
     if (!debit(s, TERMS, 1)) return 0;
-    if (enif_is_atom(s->env, term)) return atom_fact(s, term);
+    if (enif_is_atom(s->env, term))
+        return s->emitting == 2 || s->emitting == 3 || atom_fact(s, term);
     if (enif_is_empty_list(s->env, term)) return 1;
     if (enif_is_list(s->env, term)) return walk_list(s, term, depth);
     const ERL_NIF_TERM *items; int arity;
@@ -226,7 +224,8 @@ static int walk(struct capture_state *s, Eterm term, uint64_t depth) {
     if (enif_is_fun(s->env, term)) return walk_fun(s, term, depth);
     if (is_external(term)) {
         if (!debit(s, WORDS, 1 + header_arity(*boxed_val(term)))) return 0;
-        return node_fact(s, term, depth);
+        if (s->emitting != 2 && s->emitting != 3 && !node_fact(s, term)) return 0;
+        return walk(s, external_thing_ptr(term)->node->sysname, depth + 1);
     }
     if (is_bitstring(term) && *boxed_val(term) == HEADER_SUB_BITS) {
         const ErlSubBits *sub = (const ErlSubBits *)boxed_val(term);
