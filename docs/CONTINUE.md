@@ -110,15 +110,19 @@ each new binary donor is decoded once. Checked arithmetic and the source-derived
 normal continuation bound preserve cumulative word/pin credit. Actual BEAM sort
 provider binding and complete native/IPC/failure/retirement accounting remain open;
 this functional result does not accept the complete producer or Rust profiles.
-The next cumulative-query regression now reproduces a real failure before any
-query-composition implementation. Its reviewed cleanup revision executes
-**twenty-one tests: twenty pass and one fails**, with all 1,492 captured repository
-inputs unchanged. Both the 400-word and 3,500-byte pin requests incorrectly
-return success; the first typed word-limit assertion fails. Later pin/adequate
-result assertions remain unexecuted and receive no credit. A separate related
-test child preserves all twenty earlier bodies and caps, and closes acquired
-sessions even if a later capture raises. Query costs still need to be combined
-with and retained alongside the current request/session admission bank.
+The cumulative-query regression was frozen in `21d0880` after a real twenty-one
+test run with twenty passing and one failing. Both the 400-word and 3,500-byte
+pin requests incorrectly returned success; the first typed word assertion
+failed, leaving later assertions unexecuted in that RED run. Its reviewed
+implementation now passes **all twenty-one capture tests**, with all 1,492
+captured repository inputs unchanged. Both typed refusals, adequate query
+observation/hash, input reuse and cleanup now execute successfully. The shared
+builder preserves standalone query behavior and prospectively adds its complete
+word/pin bank to the current retained bank. Fresh and extended sessions carry
+that full bank through subsequent decoding/observation and publication without
+refunding previous query work. Both source files fit the existing directory and
+600-line tooling limit. Complete merge/native/crypto/control/retirement accounting
+and actual executing-BEAM sort correspondence remain separate open duties.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific

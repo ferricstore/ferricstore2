@@ -417,6 +417,16 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
 
   def query(_, _), do: {:error, :invalid_queries}
 
+  def query_admission(%{atoms: atoms, exports: exports}, limits, retained)
+      when is_list(atoms) and is_list(exports) do
+    with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits),
+         :ok <- query_budget(20, bytes, limits, retained) do
+      query_atoms(atoms, exports, %{}, 20, bytes, limits, retained)
+    end
+  end
+
+  def query_admission(_, _, _), do: {:error, :invalid_queries}
+
   def compact_queries(%{atoms: atoms, exports: exports}, limits, retained) do
     with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits) do
       strings = atoms ++ Enum.flat_map(exports, fn {m, f, _} -> [m, f] end)
@@ -490,20 +500,31 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
       else: export_text_left(tail, remaining - module_bytes - function_bytes)
   end
 
-  defp query_atoms([], exports, results, used, bytes, limits),
-    do: query_exports(exports, results, %{}, used, bytes, limits)
+  defp query_atoms(atoms, exports, results, used, bytes, limits),
+    do: query_atoms(atoms, exports, results, used, bytes, limits, nil)
 
-  defp query_atoms([name | tail], exports, results, used, bytes, limits) do
+  defp query_atoms([], exports, results, used, bytes, limits, retained),
+    do: query_exports(exports, results, %{}, used, bytes, limits, retained)
+
+  defp query_atoms([name | tail], exports, results, used, bytes, limits, retained) do
     next = used + 117 + query_put_words(map_size(results))
 
-    with :ok <- query_budget(next, bytes, limits) do
+    with :ok <- query_budget(next, bytes, limits, retained) do
       available = existing(name) != :error
-      query_atoms(tail, exports, Map.put(results, name, available), next, bytes, limits)
+      query_atoms(tail, exports, Map.put(results, name, available), next, bytes, limits, retained)
     end
   end
 
-  defp query_exports([], atoms, exports, _used, _bytes, _limits),
+  defp query_exports([], atoms, exports, _used, _bytes, _limits, nil),
     do: {:ok, %{atoms: atoms, exports: exports}}
+
+  defp query_exports([], atoms, exports, used, bytes, _limits, retained) do
+    {:ok, %{atoms: atoms, exports: exports},
+     %{
+       decoded_words: retained.decoded_words + used,
+       pinned_bytes: retained.pinned_bytes + 8 * used + bytes
+     }}
+  end
 
   defp query_exports(
          [{module_name, function_name, arity} = item | tail],
@@ -511,24 +532,39 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
          results,
          used,
          bytes,
-         limits
+         limits,
+         retained
        ) do
     next = used + 237 + query_put_words(map_size(results))
 
-    with :ok <- query_budget(next, bytes, limits) do
+    with :ok <- query_budget(next, bytes, limits, retained) do
       available =
         case {existing(module_name), existing(function_name)} do
           {{:ok, module}, {:ok, function}} -> :erlang.function_exported(module, function, arity)
           _ -> false
         end
 
-      query_exports(tail, atoms, Map.put(results, item, available), next, bytes, limits)
+      query_exports(tail, atoms, Map.put(results, item, available), next, bytes, limits, retained)
     end
   end
 
   defp query_put_words(size) when size < 32, do: 19 + 2 * size
   defp query_put_words(32), do: 111_048
   defp query_put_words(size), do: size + 487
+
+  defp query_budget(words, bytes, limits, nil), do: query_budget(words, bytes, limits)
+
+  defp query_budget(words, bytes, limits, retained) do
+    word_room = limits.decoded_words - retained.decoded_words
+    pin_room = limits.pinned_bytes - retained.pinned_bytes
+
+    cond do
+      word_room < 0 or words > word_room -> {:error, {:limit, :decoded_words}}
+      pin_room < 0 or bytes > pin_room -> {:error, {:limit, :pinned_bytes}}
+      words > div(pin_room - bytes, 8) -> {:error, {:limit, :pinned_bytes}}
+      true -> :ok
+    end
+  end
 
   defp query_budget(words, bytes, limits) do
     cond do

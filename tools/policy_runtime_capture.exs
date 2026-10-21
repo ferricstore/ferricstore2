@@ -167,7 +167,7 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          {:ok, caller} <- normalization_admission(prepared, limits, caller, true),
          {donors, anchors} when is_list(donors) and is_list(anchors) <- Input.normalize(prepared),
          {:ok, terms, admission} <- decode(donors, prepared, limits, caller),
-         {:ok, observed} <- Input.query(queries, limits) do
+         {:ok, observed, admission} <- Input.query_admission(queries, limits, admission) do
       id = :crypto.strong_rand_bytes(32)
 
       state = %{
@@ -280,7 +280,7 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          {binaries, anchors} when is_list(binaries) and is_list(anchors) <-
            Input.normalize(donors),
          all when is_list(all) <- Input.raw_contexts(state.donors, state.anchors, donors),
-         {:ok, queries, observed} <- query_extension(state, queries),
+         {:ok, queries, observed, retained} <- query_extension(state, queries, retained),
          {:ok, terms, admission} <- decode(binaries, all, state.limits, retained),
          :ok <- source_current(state.context.source) do
       candidate = %{
@@ -332,7 +332,8 @@ defmodule Ferricstore.PolicyRuntimeCapture do
 
   defp normalization_admission(prepared, limits, retained, initial?) do
     # Two24-word state versions, normalize tuple3, this pair/ok11, fresh closure3.
-    extra = 8 * length(prepared) + if(initial?, do: 65, else: 62)
+    # Keeper additionally prepays query_extension's five-word success tuple.
+    extra = 8 * length(prepared) + if(initial?, do: 65, else: 67)
 
     with :ok <- check(retained.decoded_words + extra, limits.decoded_words, :decoded_words),
          :ok <- check(retained.pinned_bytes, limits.pinned_bytes, :pinned_bytes),
@@ -499,7 +500,7 @@ defmodule Ferricstore.PolicyRuntimeCapture do
     end
   end
 
-  defp query_extension(state, next) do
+  defp query_extension(state, next, retained) do
     count =
       length(state.queries.atoms) + length(next.atoms) +
         length(state.queries.exports) + length(next.exports)
@@ -510,13 +511,16 @@ defmodule Ferricstore.PolicyRuntimeCapture do
         exports: Enum.uniq(state.queries.exports ++ next.exports)
       }
 
-      with {:ok, observed} <- Input.query(combined, state.limits) do
+      with {:ok, observed, admission} <-
+             Input.query_admission(combined, state.limits, retained) do
         same =
           Enum.all?([:atoms, :exports], fn field ->
             Enum.all?(state.observed[field], fn {key, value} -> observed[field][key] == value end)
           end)
 
-        if same, do: {:ok, combined, observed}, else: {:error, :runtime_context_changed}
+        if same,
+          do: {:ok, combined, observed, admission},
+          else: {:error, :runtime_context_changed}
       end
     end
   end
