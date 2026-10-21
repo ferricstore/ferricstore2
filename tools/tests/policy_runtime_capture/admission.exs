@@ -3,6 +3,7 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
   alias Ferricstore.PolicyRuntimeCapture, as: Capture
   alias Ferricstore.PolicyRuntimeCapture.Native
   alias Ferricstore.PolicyRuntimeCaptureTest, as: SourceTest
+  alias Ferricstore.TermCodec
 
   @controller Path.expand("../policy_runtime_capture_test.exs", __DIR__)
   @generated "/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/native"
@@ -100,6 +101,68 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
     assert_raise ArgumentError, fn -> String.to_existing_atom(query) end
     assert :binary.referenced_byte_size(query) == 600_000
     assert byte_size(donor) == 200_000
+  end
+
+  test "live_preflight_preserves_policy_depth_without_fact_emission" do
+    SourceTest.bootstrap!()
+    term = Enum.reduce(1..64, nil, fn _, value -> {value} end)
+    encoded = TermCodec.encode(term)
+    donors = [%{encoded: encoded, source_term: term}]
+    queries = %{atoms: [], exports: []}
+    roots = {:preflight, {:anchors, [donors, queries]}}
+    limits = %{SourceTest.limits() | facts: 0, text_bytes: 0, output_bytes: 0}
+
+    assert {:ok, report} = Native.capture_terms(roots, limits)
+    assert_live_report!(report, limits)
+    assert report.live_words >= 128
+    assert report.live_terms >= 65
+
+    assert Native.capture_terms(roots, %{limits | depth: 63}) ==
+             {:error, {:limit, :depth}}
+
+    assert Enum.reduce(1..64, term, fn _, {value} -> value end) == nil
+    assert [%{encoded: ^encoded, source_term: ^term}] = donors
+    assert queries == %{atoms: [], exports: []}
+    assert byte_size(encoded) > 64
+  end
+
+  test "live_preflight_counts_pattern_and_original_backings" do
+    SourceTest.bootstrap!()
+    query = :binary.copy("q", 600_000)
+    donor = :binary.copy(<<131, 109, 199_994::unsigned-big-32, 0::size(199_994)-unit(8)>>)
+    pattern_bytes = String.duplicate("x", 4_096)
+    pattern = :binary.compile_pattern(pattern_bytes)
+    encoded = TermCodec.encode(pattern)
+    assert byte_size(query) == 600_000
+    assert :binary.referenced_byte_size(query) == 600_000
+    assert byte_size(donor) == 200_000
+    assert :binary.referenced_byte_size(donor) == 200_000
+    assert byte_size(encoded) < 1_024
+    donors = [donor, %{encoded: encoded, source_term: pattern}]
+    queries = %{atoms: [query], exports: []}
+    roots = {:preflight, {:anchors, [donors, queries]}}
+    limits = %{SourceTest.limits() | facts: 0, text_bytes: 0, output_bytes: 0}
+
+    assert {:ok, report} = Native.capture_terms(roots, limits)
+    assert_live_report!(report, limits)
+    assert report.live_pinned_bytes >= 804_096
+
+    assert Native.capture_terms(roots, %{limits | pinned_bytes: 700_000}) ==
+             {:error, {:limit, :pinned_bytes}}
+
+    assert :binary.match(pattern_bytes, pattern) == {0, 4_096}
+    assert :binary.referenced_byte_size(query) == 600_000
+    assert :binary.referenced_byte_size(donor) == 200_000
+    assert [^donor, %{encoded: ^encoded, source_term: ^pattern}] = donors
+    assert queries == %{atoms: [query], exports: []}
+  end
+
+  defp assert_live_report!(report, limits) do
+    assert map_size(report) == 3
+    assert %{live_words: words, live_pinned_bytes: pins, live_terms: terms} = report
+    assert is_integer(words) and words in 0..limits.decoded_words
+    assert is_integer(pins) and pins in 0..limits.pinned_bytes
+    assert is_integer(terms) and terms in 0..limits.terms
   end
 
   def run_child("local-chain") do
