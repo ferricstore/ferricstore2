@@ -49,9 +49,9 @@ static int raw_external(struct capture_state *s, const byte **p, const byte *end
     unsigned creation = tag == 88 || tag == 89 || tag == 90 || tag == 120 ? 4 : 1;
     uint64_t tail = ref ? 4 * n : tag == 120 ? 8 : tag == 88 || tag == 103 ? 8 : 4;
     if ((uint64_t)(end - *p) < creation + tail) { s->refusal = "invalid_external_term"; return 0; }
-    /* No registry lookup is made by this tool. Marker-clear ordinary refs
-     * proceed to TermCodec; possible magic refs need a future live anchor. */
-    if (ref && n > 1 && ((*p)[creation + 4 + 1] & 2)) {
+    /* Only this bound donor's COMPLETE live walk can authorize phase4.
+     * Plain binaries still require a source anchor for a possible magic ref. */
+    if (s->emitting != 4 && ref && n > 1 && ((*p)[creation + 4 + 1] & 2)) {
         s->refusal = "source_anchor_required";
         return 0;
     }
@@ -120,10 +120,18 @@ static ERL_NIF_TERM refused(struct capture_state *s) {
             enif_make_tuple2(s->env, atom(s->env, "limit"), atom(s->env, cap_names[i])));
     return error(s->env, s->refusal ? s->refusal : "invalid_term");
 }
+static ERL_NIF_TERM owner_refused(struct capture_state *s, uint64_t index) {
+    if (s->refusal && !strcmp(s->refusal, "source_anchor_required"))
+        return enif_make_tuple2(s->env, atom(s->env, "error"),
+            enif_make_tuple2(s->env, atom(s->env, "source_anchor_required"), enif_make_uint64(s->env, index)));
+    return refused(s);
+}
 static ERL_NIF_TERM preflight(struct capture_state *s, ERL_NIF_TERM donors) {
     ERL_NIF_TERM item, tail = donors;
     uint64_t i = 0;
     while (enif_get_list_cell(s->env, tail, &item, &tail)) {
+        s->emitting = 0; /* Permission never escapes to a following donor. */
+        if (enif_is_map(s->env, item) && !anchor_donor(s, item, &item)) return owner_refused(s, i);
         if (!is_bitstring(item)) return error(s->env, "invalid_donors");
         const byte *base; Uint offset, bits;
         ERTS_GET_BITSTRING(item, base, offset, bits);
@@ -140,6 +148,7 @@ static ERL_NIF_TERM preflight(struct capture_state *s, ERL_NIF_TERM donors) {
             return enif_make_tuple2(s->env, atom(s->env, "error"), enif_make_tuple3(s->env,
                 atom(s->env, "source_decode"), enif_make_uint64(s->env, i), atom(s->env, "invalid_external_term")));
         }
+        s->emitting = 0;
         /* B2TContext is private to external.c. Bound its exact field roster
          * by SUMMING all three union members, with each scalar rounded to a
          * word: main11, size6, decode6, uncompress2. No copied C type/layout.

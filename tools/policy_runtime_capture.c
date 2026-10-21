@@ -3,6 +3,7 @@
 #include "global.h"
 #include "erl_nif.h"
 #include "erl_fun.h"
+#include "erl_bif_unique.h"
 #include "erl_node_tables.h"
 #include "erl_bits.h"
 #include "erl_map.h"
@@ -100,7 +101,7 @@ static void push_fact(struct capture_state *s, unsigned kind, ERL_NIF_TERM item)
 static int walk(struct capture_state *, Eterm, uint64_t);
 
 static int atom_fact(struct capture_state *s, Eterm term) {
-    if (s->emitting == 2) return 1;
+    if ((s->emitting == 2 || s->emitting == 3)) return 1;
     char name[1021]; unsigned length;
     const char *keys[] = {"name", "native_word"};
     if (!name_bytes(s, term, name, &length) || !fact_room(s, 2, length, 1, keys)) return 0;
@@ -112,7 +113,7 @@ static int atom_fact(struct capture_state *s, Eterm term) {
 }
 static int node_fact(struct capture_state *s, Eterm term, uint64_t depth) {
     const ExternalThing *thing = external_thing_ptr(term);
-    if (s->emitting == 2) return walk(s, thing->node->sysname, depth + 1);
+    if ((s->emitting == 2 || s->emitting == 3)) return walk(s, thing->node->sysname, depth + 1);
     char name[1021]; unsigned length;
     const char *keys[] = {"name", "creation", "hash_input"};
     if (!name_bytes(s, thing->node->sysname, name, &length) || !fact_room(s, 3, length, 2, keys)) return 0;
@@ -126,7 +127,7 @@ static int node_fact(struct capture_state *s, Eterm term, uint64_t depth) {
 }
 static int export_fact(struct capture_state *s, const ErlFunThing *fun, uint64_t depth) {
     const ErtsCodeMFA *mfa = &fun->entry.exp->info.mfa;
-    if (s->emitting == 2)
+    if ((s->emitting == 2 || s->emitting == 3))
         return walk(s, mfa->module, depth + 1) && walk(s, mfa->function, depth + 1);
     char module[1021], function[1021]; unsigned ml, fl;
     const char *keys[] = {"module", "function", "arity", "hash_input"};
@@ -142,7 +143,7 @@ static int export_fact(struct capture_state *s, const ErlFunThing *fun, uint64_t
 }
 static int local_fact(struct capture_state *s, const ErlFunThing *fun, uint64_t depth) {
     const ErlFunEntry *entry = fun->entry.fun;
-    if (s->emitting == 2) {
+    if ((s->emitting == 2 || s->emitting == 3)) {
         if (!walk(s, entry->module, depth + 1)) return 0;
         for (unsigned i = 0; i < fun_num_free(fun); i++)
             if (!walk(s, fun->env[i], depth + 1)) return 0;
@@ -232,7 +233,13 @@ static int walk(struct capture_state *s, Eterm term, uint64_t depth) {
          * require one byte-alignment copy of the visible bitstring. */
         return debit(s, WORDS, ERL_REFC_BITS_SIZE) && debit(s, PINS,
             sizeof(Binary) + (uint64_t)ref->val->orig_size +
-            (s->emitting == 2 ? 0 : (sub->end - sub->start + 7) / 8));
+            ((s->emitting == 2 || s->emitting == 3) ? 0 : (sub->end - sub->start + 7) / 8));
+    }
+    /* An ordinary live ref may carry the wire magic marker after a
+     * registry miss. Inspect only its real number storage, never as an mb. */
+    if (s->emitting == 3 && is_internal_ordinary_ref(term) &&
+        (internal_ordinary_ref_numbers(term)[1] & ERTS_REF1_MAGIC_MARKER_BIT__)) {
+        s->refusal = "source_anchor_required"; return 0;
     }
     if (is_internal_magic_ref(term)) {
         const ErtsMRefThing *ref = magic_ref_thing_ptr(term);
@@ -256,12 +263,13 @@ static int roots(struct capture_state *s, ERL_NIF_TERM list) {
     if (!enif_is_empty_list(s->env, tail)) { s->refusal = "invalid_terms"; return 0; }
     return 1;
 }
+static int anchor_donor(struct capture_state *, Eterm, Eterm *);
 #include "policy_runtime_capture/raw.inc"
 /* Phase2 counts original live owners without facts, names, hashes or decoding.
  * Fixed carrier/query wrappers consume actual heap, not source-policy depth. */
 static int live_list(struct capture_state *, Eterm, unsigned);
 static int live_donor(struct capture_state *, Eterm);
-static int live_map(struct capture_state *, Eterm, unsigned);
+static int live_map(struct capture_state *, Eterm, unsigned, Eterm *);
 static int live_binary(struct capture_state *s, Eterm term) {
     if (!enif_is_binary(s->env, term)) { s->refusal = "invalid_donors"; return 0; }
     const byte *base; Uint offset, bits;
@@ -269,11 +277,15 @@ static int live_binary(struct capture_state *s, Eterm term) {
     (void)base; (void)offset;
     return debit(s, DONOR, bits / 8) && walk(s, term, 0);
 }
-static int live_pair(struct capture_state *s, Eterm key, Eterm value, unsigned kind) {
-    /* kind1=query map, kind2=exact anchored donor; no term-key hashing. */
-    if (kind == 2) {
-        if (enif_is_identical(key, atom(s->env, "encoded")))
-            return walk(s, key, 0) && live_binary(s, value);
+static int live_pair(struct capture_state *s, Eterm key, Eterm value, unsigned kind, Eterm *encoded) {
+    /* kind1=query, kind2=live donor, kind3=bound donor; no key hashing. */
+    if (kind == 2 || kind == 3) {
+        if (enif_is_identical(key, atom(s->env, "encoded"))) {
+            if (kind == 2) return walk(s, key, 0) && live_binary(s, value);
+            if (!enif_is_binary(s->env, value)) { s->refusal = "invalid_donors"; return 0; }
+            *encoded = value;
+            return walk(s, key, 0) && walk(s, value, 0);
+        }
         if (!enif_is_identical(key, atom(s->env, "source_term"))) {
             s->refusal = "invalid_donors"; return 0;
         }
@@ -285,7 +297,7 @@ static int live_pair(struct capture_state *s, Eterm key, Eterm value, unsigned k
         return live_list(s, value, 1);
     return walk(s, value, 0);
 }
-static int live_hamt(struct capture_state *s, Eterm term, unsigned kind, unsigned level) {
+static int live_hamt(struct capture_state *s, Eterm term, unsigned kind, unsigned level, Eterm *encoded) {
     const Eterm *p = boxed_val(term);
     Eterm header = *p++;
     unsigned count, head = !is_arity_value(header) && is_hashmap_header_head(header);
@@ -300,18 +312,18 @@ static int live_hamt(struct capture_state *s, Eterm term, unsigned kind, unsigne
     for (unsigned i = 0; i < count; i++) {
         if (is_list(p[i])) {
             const Eterm *pair = list_val(p[i]);
-            if (!debit(s, WORDS, 2) || !live_pair(s, CAR(pair), CDR(pair), kind)) return 0;
-        } else if (!live_hamt(s, p[i], kind, level + 1)) return 0;
+            if (!debit(s, WORDS, 2) || !live_pair(s, CAR(pair), CDR(pair), kind, encoded)) return 0;
+        } else if (!live_hamt(s, p[i], kind, level + 1, encoded)) return 0;
     }
     return 1;
 }
-static int live_map(struct capture_state *s, Eterm term, unsigned kind) {
-    if (is_hashmap(term)) return live_hamt(s, term, kind, 0);
+static int live_map(struct capture_state *s, Eterm term, unsigned kind, Eterm *encoded) {
+    if (is_hashmap(term)) return live_hamt(s, term, kind, 0, encoded);
     const flatmap_t *mp = (const flatmap_t *)flatmap_val(term);
     Uint n = flatmap_get_size(mp);
     const Eterm *keys = flatmap_get_keys(mp), *values = flatmap_get_values(mp);
     if (!debit(s, WORDS, MAP_HEADER_FLATMAP_SZ + (n ? 1 + n : 0) + n)) return 0;
-    for (Uint i = 0; i < n; i++) if (!live_pair(s, keys[i], values[i], kind)) return 0;
+    for (Uint i = 0; i < n; i++) if (!live_pair(s, keys[i], values[i], kind, encoded)) return 0;
     return 1;
 }
 static int live_donor(struct capture_state *s, Eterm term) {
@@ -321,7 +333,7 @@ static int live_donor(struct capture_state *s, Eterm term) {
         s->refusal = "invalid_donors"; return 0;
     }
     /* Unique map keys + exact size + pair classification prove exact shape. */
-    return debit(s, TERMS, 1) && live_map(s, term, 2);
+    return debit(s, TERMS, 1) && live_map(s, term, 2, NULL);
 }
 static int live_list(struct capture_state *s, Eterm term, unsigned kind) {
     Eterm item, tail = term;
@@ -351,7 +363,7 @@ static ERL_NIF_TERM live_preflight(struct capture_state *s, Eterm carrier) {
     s->emitting = 2;
     /* Two protocol tuples + two-cell carrier; count their five term visits. */
     if (!debit(s, WORDS, 10) || !debit(s, TERMS, 5) || !live_list(s, donors, 2) ||
-        !debit(s, TERMS, 1) || !live_map(s, queries, 1)) return refused(s);
+        !debit(s, TERMS, 1) || !live_map(s, queries, 1, NULL)) return refused(s);
     /* enif_make_map_from_arrays(3):10 words, <=6 for three uint64 boxes,
      * plus the3-word ok tuple. Admit BEFORE constructing control output.
      * Returned word/pin envelopes include this fixed report allowance. */
@@ -361,6 +373,21 @@ static ERL_NIF_TERM live_preflight(struct capture_state *s, Eterm carrier) {
     ERL_NIF_TERM values[] = {enif_make_uint64(s->env, s->used[WORDS]),
         enif_make_uint64(s->env, s->used[PINS]), enif_make_uint64(s->env, s->used[TERMS])};
     return enif_make_tuple2(s->env, atom(s->env, "ok"), map(s->env, keys, values, 3));
+}
+/* Explicit POST source-byte-binding API: the caller owns that real check.
+ * This walk measures every live leaf, not an aggregate some-magic flag. */
+static int anchor_donor(struct capture_state *s, Eterm term, Eterm *encoded) {
+    size_t size;
+    if (!enif_get_map_size(s->env, term, &size) || size != 2) {
+        s->refusal = "invalid_donors"; return 0;
+    }
+    s->emitting = 3;
+    /* Full two-field report<=15 words; raw finalization already admits3.
+     * Conservatively reserve the remaining12 for EACH mapped donor. */
+    if (!debit(s, WORDS, 12) || !debit(s, TERMS, 1) ||
+        !live_map(s, term, 3, encoded)) return 0;
+    s->emitting = 4;
+    return 1;
 }
 static ERL_NIF_TERM capture_terms(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
     struct capture_state state = {.env = env};
