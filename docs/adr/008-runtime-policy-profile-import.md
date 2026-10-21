@@ -158,9 +158,24 @@ The pin quota covers directly known VM object/binary/MagicBinary storage.
 Opaque destructor-owned external graphs can outlive their caller through a
 retained anchor; their size is not established by MagicBinary.orig_size.
 Neither that field nor this quota proves a total native-retention or RSS bound.
-The frozen anchor regression now reaches and fails its adequate-limit capture
-assertion after passing the low-pin refusal. Its binding implementation remains
-pending; later assertions are not counted as executed acceptance.
+The frozen anchor regressions now pass their complete capture, mismatch, retained
+context, caller-exit/GC, extension and healthy-retry assertions. Input measures each
+actual source term at semantic depth zero before sizing, prepays both sizing and
+encoding, and compares actual deterministic bytes before post-binding native RAW.
+The keeper repeats binding for new donors and retains parallel source contexts;
+historical contexts are restored without re-encoding old anchors.
+
+B2-ARCH-ANCHOR-BINDING1-SOURCE1/P1/P2 selects checked, cumulative encoder bounds
+using the actual native layout and source metrics. The normal-release continuation
+bound uses the verified positive scheduler entry scaled by32; its byte-copy term
+is `ceil(Ecap/32)`. The prospective maximum `Ecap = U + 1023*T` covers implicit
+local-node name growth beyond the sizing maximum `U`. Actual emitted bytes still
+decide equality. All reached reports, maps, source-MD5 results, trap/context/output
+debt and caller/keeper copies remain additive. This does not establish a whole
+process or native-memory ceiling. The reviewed sort bound still needs binding to
+the executing BEAM provider; trace/control, first-budget, crypto/RNG, failure and
+retirement duties remain open. Passing the twenty-test local suite accepts the
+functional binding slice, without accepting the complete producer or Linux.
 
 Seven selected tests cover authentic ABI/version refusal; opposite atom creation
 histories and 31/32/33 maps; release hashes and full-width collision ties; source

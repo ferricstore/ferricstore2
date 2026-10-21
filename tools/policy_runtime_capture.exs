@@ -155,7 +155,7 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          :ok <- source_current(context.source),
          :ok <- validate_parent(parent),
          :ok <- validate_limits(limits),
-         {:ok, donors, queries, caller} <-
+         {:ok, prepared, queries, caller} <-
            Input.prepare(
              donors,
              queries,
@@ -164,7 +164,9 @@ defmodule Ferricstore.PolicyRuntimeCapture do
              context.source
            ),
          :ok <- source_current(context.source),
-         {:ok, terms, admission} <- decode(donors, donors, limits, caller),
+         {:ok, caller} <- normalization_admission(prepared, limits, caller, true),
+         {donors, anchors} when is_list(donors) and is_list(anchors) <- Input.normalize(prepared),
+         {:ok, terms, admission} <- decode(donors, prepared, limits, caller),
          {:ok, observed} <- Input.query(queries, limits) do
       id = :crypto.strong_rand_bytes(32)
 
@@ -173,6 +175,7 @@ defmodule Ferricstore.PolicyRuntimeCapture do
         limits: limits,
         terms: terms,
         donors: donors,
+        anchors: anchors,
         queries: queries,
         observed: observed,
         session_id: id,
@@ -181,7 +184,8 @@ defmodule Ferricstore.PolicyRuntimeCapture do
       }
 
       with {:ok, capture} <- observe(state, parent) do
-        keeper = spawn(fn -> keep(%{state | capture: capture}) end)
+        ready = %{state | capture: capture}
+        keeper = spawn(fn -> keep(ready) end)
         {:ok, keeper, capture}
       end
     end
@@ -270,13 +274,20 @@ defmodule Ferricstore.PolicyRuntimeCapture do
              state.admission,
              custody
            ),
+         {:ok, retained} <-
+           Input.bind_admission(donors, state.limits, retained, state.context.source, 2),
+         {:ok, retained} <- normalization_admission(donors, state.limits, retained, false),
+         {binaries, anchors} when is_list(binaries) and is_list(anchors) <-
+           Input.normalize(donors),
+         all when is_list(all) <- Input.raw_contexts(state.donors, state.anchors, donors),
          {:ok, queries, observed} <- query_extension(state, queries),
-         {:ok, terms, admission} <- decode(donors, state.donors ++ donors, state.limits, retained),
+         {:ok, terms, admission} <- decode(binaries, all, state.limits, retained),
          :ok <- source_current(state.context.source) do
       candidate = %{
         state
         | terms: state.terms ++ terms,
-          donors: state.donors ++ donors,
+          donors: state.donors ++ binaries,
+          anchors: state.anchors ++ anchors,
           queries: queries,
           observed: observed,
           admission: admission
@@ -306,8 +317,8 @@ defmodule Ferricstore.PolicyRuntimeCapture do
   defp proper_count(_, _), do: :invalid
 
   defp caller_custody(retained, rows, old_donors, limits) do
-    # Caller prepare94, RAW49, transfer31, this map8, dead prepend and append spines.
-    extra = 182 + 2 * rows + 6 * old_donors
+    # Caller prepare94, RAW49, transfer31, this map8; restored/candidate old spines.
+    extra = 182 + 2 * rows + 10 * old_donors
 
     with :ok <- check(retained.decoded_words + extra, limits.decoded_words, :decoded_words),
          :ok <- check(retained.pinned_bytes, limits.pinned_bytes, :pinned_bytes),
@@ -316,6 +327,21 @@ defmodule Ferricstore.PolicyRuntimeCapture do
         decoded_words: retained.decoded_words + extra,
         pinned_bytes: retained.pinned_bytes + 8 * extra
       }
+    end
+  end
+
+  defp normalization_admission(prepared, limits, retained, initial?) do
+    # Two24-word state versions, normalize tuple3, this pair/ok11, fresh closure3.
+    extra = 8 * length(prepared) + if(initial?, do: 65, else: 62)
+
+    with :ok <- check(retained.decoded_words + extra, limits.decoded_words, :decoded_words),
+         :ok <- check(retained.pinned_bytes, limits.pinned_bytes, :pinned_bytes),
+         :ok <- check(extra, div(limits.pinned_bytes - retained.pinned_bytes, 8), :pinned_bytes) do
+      {:ok,
+       %{
+         decoded_words: retained.decoded_words + extra,
+         pinned_bytes: retained.pinned_bytes + 8 * extra
+       }}
     end
   end
 
@@ -407,8 +433,7 @@ defmodule Ferricstore.PolicyRuntimeCapture do
   end
 
   defp decode(donors, all, limits, retained) when is_list(donors) do
-    with :ok <- Input.donor_limit(all, limits),
-         {:ok, raw} <- Input.decode_admission(all, limits, retained),
+    with {:ok, raw} <- Input.decode_admission(all, limits, retained),
          admission when is_map(admission) <- decode_budget(donors, limits, raw),
          {:ok, values} <- decode_values(donors, 0, []) do
       {:ok, values, admission}

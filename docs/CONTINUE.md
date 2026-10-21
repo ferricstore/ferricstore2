@@ -95,15 +95,21 @@ caller certificate. Saturating backing scans refuse before an unbounded alias
 sum, and each new donor is decoded once. All nineteen test bodies remain
 unchanged. Adequate source-anchor binding is the remaining failing assertion;
 complete wrapper/native/IPC allocation accounting remains open separately.
-The next retained-anchor regression brings the latest suite to **twenty tests,
-eighteen passing and two failing**, with all 1,491 repository inputs unchanged.
-Its short-lived source-producing Task returns no live anchor to the caller;
-planned assertions require caller exit, keeper GC, historical anchor restoration,
-indexed byte mismatch, healthy retry and complete session continuity. Review
-strengthened root-hash counts to prevent vacuous prefix checks. The actual first
-capture still returns `invalid_donors`, so every later new assertion remains
-unexecuted. All nineteen earlier bodies and the provider sources are unchanged;
-the reviewed failing test is frozen before binding implementation.
+The retained-anchor regression was frozen in `07f8318` after a twenty-test run
+with eighteen passing and two failing, both at adequate anchor capture. Its
+reviewed implementation now passes the **entire twenty-test native suite, with
+zero failures**, preserving all 1,491 captured repository inputs through execution.
+The short-lived source-producing Task returns no live anchor to the caller;
+caller exit, keeper GC, historical anchor restoration, indexed byte mismatch,
+healthy retry, exact root-hash counts and complete session continuity now execute
+successfully. All twenty test bodies and original caps remain unchanged.
+The wrapper measures actual source terms before sizing, prepays the size/encoding
+envelopes, compares actual deterministic bytes and retains parallel source anchors.
+The keeper independently repeats new binding and restores historical RAW contexts;
+each new binary donor is decoded once. Checked arithmetic and the source-derived
+normal continuation bound preserve cumulative word/pin credit. Actual BEAM sort
+provider binding and complete native/IPC/failure/retirement accounting remain open;
+this functional result does not accept the complete producer or Rust profiles.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific
@@ -117,10 +123,11 @@ The measurement implementation and helper grouping have independent source revie
 The native per-leaf/per-donor anchor regression now passes all three branches and
 the healthy retry. Its rebuilt manifest binds all89 actual OTP headers, including
 the reference-classification and encoder-context dependencies. The Capture wrapper's
-source-anchor capture still fails when adequate limits should admit the actual
-anchor. Its low-pin refusal now passes, as does the complete combined query/donor
-ownership regression; subsequent assertions in the failing identity remain
-unexecuted. This does not establish complete ownership accounting.
+source-anchor capture now passes the complete bounds identity, including adequate
+capture, exact donor hashes, low-pin refusal and source-byte mismatch. The retained
+anchor identity also passes after caller exit and multiple extensions. The complete
+combined query/donor ownership regression remains passing. These functional tests
+do not establish complete native ownership accounting.
 The header-layout regression now passes all five-field/64-to65 relationships and
 exact control-word/pin refusals. Separate real-runtime checks pass malformed,
 overflow, maximum-safe-u64 and limit-precedence cases. The arithmetic mode charges
