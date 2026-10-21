@@ -82,12 +82,19 @@ request/report control, repeated real binary backing, depth64/63, malformed-mode
 precedence and healthy reuse. The strict native rebuild preserves all89 pinned
 headers and all302 compiler inputs through execution. This measures real graphs
 for later encoder/copy admission; the original two wrapper failures remain open.
-The next original-input regression brings the latest native run to nineteen
-tests, with sixteen passing and three failing. It exposes fresh capture and
-extension accepting a 600KB ignored query field under a 128KB pin cap; the
-incorrectly accepted extension advances the parent and breaks the old-parent
-retry. All earlier eighteen test bodies remain unchanged. The actual-original
-private handoff is selected, with Input/root implementation still pending.
+The original-input regression was frozen in `2f00754` after a nineteen-test run
+with sixteen passing and three failing. Fresh capture and extension incorrectly
+accepted a 600KB ignored query field under a 128KB pin cap; the accepted extension
+advanced the parent and broke the old-parent retry. The plain-input preparation
+and session handoff now pass that complete identity and the combined query/donor
+ownership identity. The latest actual native run has **nineteen tests, eighteen
+passing and one failing**, with all 1,491 captured repository inputs unchanged.
+Original inputs and prepared copies retain word/pin credit through transfer;
+the keeper independently measures actual received roots instead of trusting a
+caller certificate. Saturating backing scans refuse before an unbounded alias
+sum, and each new donor is decoded once. All nineteen test bodies remain
+unchanged. Adequate source-anchor binding is the remaining failing assertion;
+complete wrapper/native/IPC allocation accounting remains open separately.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific
@@ -101,7 +108,10 @@ The measurement implementation and helper grouping have independent source revie
 The native per-leaf/per-donor anchor regression now passes all three branches and
 the healthy retry. Its rebuilt manifest binds all89 actual OTP headers, including
 the reference-classification and encoder-context dependencies. The Capture wrapper's
-source-anchor admission and combined ownership accounting still fail.
+source-anchor capture still fails when adequate limits should admit the actual
+anchor. Its low-pin refusal now passes, as does the complete combined query/donor
+ownership regression; subsequent assertions in the failing identity remain
+unexecuted. This does not establish complete ownership accounting.
 The header-layout regression now passes all five-field/64-to65 relationships and
 exact control-word/pin refusals. Separate real-runtime checks pass malformed,
 overflow, maximum-safe-u64 and limit-precedence cases. The arithmetic mode charges

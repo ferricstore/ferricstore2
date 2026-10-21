@@ -136,6 +136,19 @@ The caller separately funds the bounded six-word refusal channel. Full caller
 ownership subtraction, compaction, transfer and keeper accounting remain open;
 the local query guard does not certify those frontiers.
 
+B2-ARCH-CALLER-ORIGINAL-I1-PREFIX1/P1/P2 selects plain-input preparation inside
+the existing Input module and session wrapper. Actual original donor/query roots,
+including ignored fields and real binary backing, are admitted before any copy.
+One cumulative bank prepays the complete compact destination cohort and its
+constructors. The private session transfer carries actual originals; the keeper
+independently measures both original and prepared roots with sender/receiver
+credit and caller construction debt. Metadata measurement and source/destination
+copy bounds precede the main transfer. Both word and pin credit survive decoding
+and native observation. The source-derived fixed controls and layout bounds are
+conservative reservations, not measured process memory or optimization gains.
+This selected prefix leaves source-anchor binding, the earlier budget exchange,
+signal/timer/crypto/spawn and complete retained-allocation retirement duties open.
+
 The selected anchor extension accepts an exact source-produced donor with its
 actual live source term. It preflights that caller-owned term before encoding,
 handoff or decoding, binds the actual encoded bytes and preserves ownership
@@ -145,7 +158,9 @@ The pin quota covers directly known VM object/binary/MagicBinary storage.
 Opaque destructor-owned external graphs can outlive their caller through a
 retained anchor; their size is not established by MagicBinary.orig_size.
 Neither that field nor this quota proves a total native-retention or RSS bound.
-Anchor behavior remains held until its genuinely reached tests fail and freeze.
+The frozen anchor regression now reaches and fails its adequate-limit capture
+assertion after passing the low-pin refusal. Its binding implementation remains
+pending; later assertions are not counted as executed acceptance.
 
 Seven selected tests cover authentic ABI/version refusal; opposite atom creation
 histories and 31/32/33 maps; release hashes and full-width collision ties; source

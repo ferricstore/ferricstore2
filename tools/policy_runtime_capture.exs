@@ -155,9 +155,16 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          :ok <- source_current(context.source),
          :ok <- validate_parent(parent),
          :ok <- validate_limits(limits),
-         {:ok, queries} <- Input.compact_queries(queries, limits, 0),
-         {:ok, donors} <- Input.compact(donors, limits, 0),
-         {:ok, terms, admission} <- decode(donors, donors, limits),
+         {:ok, donors, queries, caller} <-
+           Input.prepare(
+             donors,
+             queries,
+             limits,
+             %{decoded_words: 0, pinned_bytes: 0},
+             context.source
+           ),
+         :ok <- source_current(context.source),
+         {:ok, terms, admission} <- decode(donors, donors, limits, caller),
          {:ok, observed} <- Input.query(queries, limits) do
       id = :crypto.strong_rand_bytes(32)
 
@@ -181,12 +188,14 @@ defmodule Ferricstore.PolicyRuntimeCapture do
   end
 
   def extend_epoch(session, donors, queries, parent) do
-    # Ask using only small scalars BEFORE sending any new donor backing.
-    with {:ok, limits, retained} <- call(session, {:budget, parent}),
-         {:ok, queries} <- Input.compact_queries(queries, limits, retained),
-         {:ok, donors} <- Input.compact(donors, limits, retained),
-         {:ok, _} <- Input.decode_admission(donors, limits, retained) do
-      call(session, {:extend, donors, queries, parent})
+    with {:ok, limits, retained, source} <- call(session, {:budget, parent}),
+         :ok <- source_current(source),
+         {:ok, prepared, compact, caller} <-
+           Input.prepare(donors, queries, limits, retained, source),
+         :ok <- source_current(source),
+         {:ok, caller} <- Input.decode_admission(prepared, limits, caller),
+         {:ok, _transfer} <- transfer_admission(parent, source, limits, retained, caller) do
+      call(session, {:extend, prepared, compact, {parent, donors, queries}})
     end
   end
 
@@ -206,15 +215,19 @@ defmodule Ferricstore.PolicyRuntimeCapture do
 
       {:capture, caller, ref, {:budget, parent}} ->
         result =
-          if parent == state.capture.identity,
-            do: {:ok, state.limits, state.admission.pinned_bytes},
-            else: {:error, :parent_mismatch}
+          with true <- parent == state.capture.identity,
+               :ok <- source_current(state.context.source) do
+            {:ok, state.limits, state.admission, state.context.source}
+          else
+            false -> {:error, :parent_mismatch}
+            {:error, _} = error -> error
+          end
 
         send(caller, {ref, result})
-        keep(state)
+        if result != {:error, :source_code_changed}, do: keep(state)
 
-      {:capture, caller, ref, {:extend, donors, queries, parent}} ->
-        case extend(state, donors, queries, parent) do
+      {:capture, caller, ref, {:extend, donors, queries, original}} ->
+        case extend(state, donors, queries, original) do
           {:ok, next} ->
             send(caller, {ref, {:ok, next.capture}})
             keep(next)
@@ -232,11 +245,33 @@ defmodule Ferricstore.PolicyRuntimeCapture do
     end
   end
 
-  defp extend(state, donors, queries, parent) do
+  defp extend(state, donors, queries, {parent, original_donors, original_queries}) do
     with true <- parent == state.capture.identity,
          :ok <- source_current(state.context.source),
+         original_rows when is_integer(original_rows) <-
+           custody_rows(original_donors, original_queries),
+         prepared_rows when is_integer(prepared_rows) <- custody_rows(donors, queries),
+         {:ok, original} <-
+           Input.original_admission(
+             original_donors,
+             original_queries,
+             state.limits,
+             state.admission,
+             2
+           ),
+         {:ok, prepared} <- Input.original_admission(donors, queries, state.limits, original, 2),
+         custody when is_map(custody) <-
+           caller_custody(prepared, prepared_rows, length(state.donors), state.limits),
+         {:ok, retained} <-
+           transfer_admission(
+             parent,
+             state.context.source,
+             state.limits,
+             state.admission,
+             custody
+           ),
          {:ok, queries, observed} <- query_extension(state, queries),
-         {:ok, terms, admission} <- decode(donors, state.donors ++ donors, state.limits),
+         {:ok, terms, admission} <- decode(donors, state.donors ++ donors, state.limits, retained),
          :ok <- source_current(state.context.source) do
       candidate = %{
         state
@@ -251,7 +286,75 @@ defmodule Ferricstore.PolicyRuntimeCapture do
            do: {:ok, %{candidate | capture: capture}}
     else
       false -> {:error, :parent_mismatch}
+      :invalid -> {:error, :invalid_donors}
       {:error, _} = error -> error
+    end
+  end
+
+  defp extend(_, _, _, _), do: {:error, :invalid_donors}
+
+  defp custody_rows(donors, %{atoms: atoms, exports: exports}) do
+    with d when is_integer(d) <- proper_count(donors, 0),
+         a when is_integer(a) <- proper_count(atoms, 0),
+         e when is_integer(e) <- proper_count(exports, 0),
+         do: d + a + e
+  end
+
+  defp custody_rows(_, _), do: :invalid
+  defp proper_count([], count), do: count
+  defp proper_count([_ | tail], count), do: proper_count(tail, count + 1)
+  defp proper_count(_, _), do: :invalid
+
+  defp caller_custody(retained, rows, old_donors, limits) do
+    # Caller prepare94, RAW49, transfer31, this map8, dead prepend and append spines.
+    extra = 182 + 2 * rows + 6 * old_donors
+
+    with :ok <- check(retained.decoded_words + extra, limits.decoded_words, :decoded_words),
+         :ok <- check(retained.pinned_bytes, limits.pinned_bytes, :pinned_bytes),
+         :ok <- check(extra, div(limits.pinned_bytes - retained.pinned_bytes, 8), :pinned_bytes) do
+      %{
+        decoded_words: retained.decoded_words + extra,
+        pinned_bytes: retained.pinned_bytes + 8 * extra
+      }
+    end
+  end
+
+  defp transfer_admission(parent, source, limits, retained, caller) do
+    words = caller.decoded_words
+    pins = caller.pinned_bytes
+
+    with :ok <- check(words + 61, limits.decoded_words, :decoded_words),
+         :ok <- check(pins + 488, limits.pinned_bytes, :pinned_bytes),
+         native_limits = %{
+           donor_bytes: limits.donor_bytes,
+           decoded_words: limits.decoded_words - words - 31,
+           terms: 0xFFFF_FFFF,
+           facts: limits.facts,
+           text_bytes: limits.text_bytes,
+           depth: 64,
+           pinned_bytes: limits.pinned_bytes - pins - 248,
+           output_bytes: limits.output_bytes
+         },
+         {:ok, report} <-
+           Native.capture_terms(
+             {:measure_terms, [parent, source, limits, retained]},
+             native_limits
+           ),
+         destination_words = words + report.live_words + 14,
+         destination_pins = pins + report.live_pinned_bytes + 112,
+         total_words = words + report.live_words + 45 + destination_words,
+         :ok <- check(total_words, limits.decoded_words, :decoded_words),
+         source_pins = pins + report.live_pinned_bytes + 360,
+         :ok <- check(source_pins, limits.pinned_bytes, :pinned_bytes),
+         :ok <-
+           check(destination_pins, div(limits.pinned_bytes - source_pins, 2), :pinned_bytes),
+         remaining = limits.pinned_bytes - source_pins - 2 * destination_pins,
+         :ok <- check(destination_words, div(remaining, 24), :pinned_bytes) do
+      {:ok,
+       %{
+         decoded_words: total_words,
+         pinned_bytes: source_pins + 2 * destination_pins + 24 * destination_words
+       }}
     end
   end
 
@@ -281,7 +384,8 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          {:ok, orders} <- orders(state.terms, state.limits),
          native_limits = %{
            state.limits
-           | pinned_bytes: state.limits.pinned_bytes - state.admission.pinned_bytes
+           | decoded_words: state.limits.decoded_words - state.admission.decoded_words,
+             pinned_bytes: state.limits.pinned_bytes - state.admission.pinned_bytes
          },
          {:ok, native} <- Native.capture_terms(state.terms, native_limits),
          :ok <- source_current(state.context.source) do
@@ -302,25 +406,44 @@ defmodule Ferricstore.PolicyRuntimeCapture do
     end
   end
 
-  defp decode(donors, all, limits) when is_list(donors) do
+  defp decode(donors, all, limits, retained) when is_list(donors) do
     with :ok <- Input.donor_limit(all, limits),
-         {:ok, admission} <- Input.decode_admission(all, limits, 0) do
-      donors
-      |> Enum.with_index()
-      |> Enum.reduce_while({:ok, []}, fn {bytes, index}, {:ok, acc} ->
-        case TermCodec.decode(bytes) do
-          {:ok, term} -> {:cont, {:ok, [term | acc]}}
-          {:error, reason} -> {:halt, {:error, {:source_decode, index, reason}}}
-        end
-      end)
-      |> case do
-        {:ok, values} -> {:ok, Enum.reverse(values), admission}
-        error -> error
-      end
+         {:ok, raw} <- Input.decode_admission(all, limits, retained),
+         admission when is_map(admission) <- decode_budget(donors, limits, raw),
+         {:ok, values} <- decode_values(donors, 0, []) do
+      {:ok, values, admission}
     end
   end
 
-  defp decode(_, _, _), do: {:error, :invalid_donors}
+  defp decode(_, _, _, _), do: {:error, :invalid_donors}
+
+  defp decode_budget(donors, limits, retained) do
+    extra = 12 * length(donors) + 23
+    words = retained.decoded_words + extra
+
+    cond do
+      words > limits.decoded_words ->
+        {:error, {:limit, :decoded_words}}
+
+      retained.pinned_bytes > limits.pinned_bytes ->
+        {:error, {:limit, :pinned_bytes}}
+
+      extra > div(limits.pinned_bytes - retained.pinned_bytes, 8) ->
+        {:error, {:limit, :pinned_bytes}}
+
+      true ->
+        %{decoded_words: words, pinned_bytes: retained.pinned_bytes + 8 * extra}
+    end
+  end
+
+  defp decode_values([], _index, values), do: {:ok, Enum.reverse(values)}
+
+  defp decode_values([bytes | tail], index, values) do
+    case TermCodec.decode(bytes) do
+      {:ok, term} -> decode_values(tail, index + 1, [term | values])
+      {:error, reason} -> {:error, {:source_decode, index, reason}}
+    end
+  end
 
   defp orders(terms, limits) do
     terms
