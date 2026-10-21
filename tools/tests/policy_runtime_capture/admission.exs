@@ -9,6 +9,47 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
   @controller Path.expand("../policy_runtime_capture_test.exs", __DIR__)
   @generated "/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/native"
 
+  test "live_measurement_counts_actual_graph_and_report_control" do
+    SourceTest.bootstrap!()
+    limits = %{SourceTest.limits() | donor_bytes: 0, facts: 0, text_bytes: 0, output_bytes: 0}
+    bytes = :binary.copy("x", 4_096)
+    graph = %{first: bytes, second: bytes}
+    nested = Enum.reduce(1..64, [], fn _, value -> {value} end)
+    empty = Native.capture_terms({:measure_terms, []}, limits)
+    repeated = Native.capture_terms({:measure_terms, graph}, limits)
+    deep = Native.capture_terms({:measure_terms, nested}, limits)
+    low_words = Native.capture_terms({:measure_terms, []}, %{limits | decoded_words: 21})
+    low_pins = Native.capture_terms({:measure_terms, []}, %{limits | pinned_bytes: 175})
+
+    assert empty == {:ok, %{live_words: 22, live_pinned_bytes: 176, live_terms: 3}},
+           "eager live reports: #{inspect({empty, repeated, deep, low_words, low_pins}, limit: :infinity)}"
+
+    assert {:ok, report} = repeated
+    assert_live_report!(report, limits)
+    assert report.live_pinned_bytes >= 8_192
+    assert deep == {:ok, %{live_words: 150, live_pinned_bytes: 1_200, live_terms: 67}}
+    assert low_words == {:error, {:limit, :decoded_words}}
+    assert low_pins == {:error, {:limit, :pinned_bytes}}
+
+    assert Native.capture_terms({:measure_terms, nested}, %{limits | depth: 63}) ==
+             {:error, {:limit, :depth}}
+
+    for malformed <- [:measure_terms, {:measure_terms}, {:measure_terms, [], []}] do
+      assert Native.capture_terms(malformed, limits) == {:error, :invalid_terms}
+
+      assert Native.capture_terms(malformed, %{limits | depth: 65}) ==
+               {:error, :invalid_limits}
+    end
+
+    assert Native.capture_terms({:measure_terms, []}, limits) == empty
+    assert Native.capture_terms({:measure_terms, graph}, limits) == repeated
+    assert Native.capture_terms({:measure_terms, nested}, limits) == deep
+    assert graph == %{first: bytes, second: bytes}
+    assert bytes == :binary.copy("x", 4_096)
+    assert :binary.referenced_byte_size(bytes) == 4_096
+    assert Enum.reduce(1..64, nested, fn _, {value} -> value end) == []
+  end
+
   test "query_result_builders_preflight_control_before_observation" do
     SourceTest.bootstrap!()
     limits = SourceTest.limits()
