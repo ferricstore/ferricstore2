@@ -123,6 +123,20 @@ that full bank through subsequent decoding/observation and publication without
 refunding previous query work. Both source files fit the existing directory and
 600-line tooling limit. Complete merge/native/crypto/control/retirement accounting
 and actual executing-BEAM sort correspondence remain separate open duties.
+A bounded provider observation verified the on-disk encoder/import chain and
+genuinely bootstrapped and encoded on the exact VM. LLDB reported "no such
+process" when attaching to its recorded PID; no live slot or provider bytes were
+obtained. The owned VM shut down cleanly. This result is inconclusive, with no
+live-provider or Linux credit; the underlying attach cause is unestablished.
+The next original-control regression executes **twenty-two tests: twenty-one
+pass and one fails**, with all 1,492 captured repository inputs unchanged. A
+genuine compact 600 KB ignored limits value is accepted under a 128 KB pin cap;
+the first typed refusal assertion fails. Both healthy controls returned success,
+but their later field/hash/reuse/extension assertions remain unexecuted. The
+source repair is still pending. Reusing the current depth-limited measurement
+without further work would narrow accepted metadata; that is not an accepted
+fix. Earlier tiny query caps may also refuse at the new control gate, so future
+green assertions alone must not be credited as query-guard branch coverage.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific

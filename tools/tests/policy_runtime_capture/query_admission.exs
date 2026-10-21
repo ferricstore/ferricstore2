@@ -39,6 +39,71 @@ defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
     )
   end
 
+  test "accounts_original_limits_owners_across_capture_and_extension" do
+    abi = SourceTest.bootstrap!()
+    bytes = :binary.copy("x", 600_000)
+    queries = %{atoms: [], exports: []}
+    defaults = SourceTest.limits()
+    extra = Map.put(defaults, :ignored_capture_budget, bytes)
+    low = Map.put(extra, :pinned_bytes, 128_000)
+    clean = Map.put(defaults, :pinned_bytes, 128_000)
+    query_hash = :crypto.hash(:sha256, TermCodec.encode(queries))
+    assert byte_size(bytes) == 600_000
+    assert :binary.referenced_byte_size(bytes) == 600_000
+
+    with_captures([low, clean, extra], queries, [], fn results ->
+      statuses =
+        Enum.map(results, fn
+          {:ok, _keeper, _captured} -> :ok
+          error -> error
+        end)
+
+      assert Enum.at(statuses, 0) == {:error, {:limit, :pinned_bytes}}, inspect(statuses)
+      assert Enum.at(statuses, 1) == :ok, inspect(statuses)
+      assert Enum.at(statuses, 2) == :ok, inspect(statuses)
+      {:ok, _clean_keeper, clean_capture} = Enum.at(results, 1)
+      {:ok, keeper, first} = Enum.at(results, 2)
+
+      for captured <- [clean_capture, first] do
+        assert captured.donor_hashes == []
+        assert captured.hashes == []
+        assert captured.queries == %{atoms: %{}, exports: %{}}
+        assert captured.abi == abi
+        assert captured.query_hash == query_hash
+      end
+
+      assert extra == Map.put(defaults, :ignored_capture_budget, bytes)
+      assert low == Map.put(extra, :pinned_bytes, 128_000)
+      assert clean == Map.put(defaults, :pinned_bytes, 128_000)
+      assert byte_size(bytes) == 600_000
+      assert :binary.referenced_byte_size(bytes) == 600_000
+      assert {:ok, next} = Capture.extend_epoch(keeper, [], queries, first.identity)
+      assert next.parent == first.identity
+      assert next.session_id == first.session_id
+
+      for field <- [
+            :abi,
+            :query_hash,
+            :donor_hashes,
+            :queries,
+            :hashes,
+            :orders,
+            :atoms,
+            :nodes,
+            :exports,
+            :local_funs
+          ] do
+        assert Map.fetch!(next, field) == Map.fetch!(first, field)
+      end
+
+      assert extra == Map.put(defaults, :ignored_capture_budget, bytes)
+      assert low == Map.put(extra, :pinned_bytes, 128_000)
+      assert clean == Map.put(defaults, :pinned_bytes, 128_000)
+      assert byte_size(bytes) == 600_000
+      assert :binary.referenced_byte_size(bytes) == 600_000
+    end)
+  end
+
   defp with_captures([], _queries, results, body), do: body.(Enum.reverse(results))
 
   defp with_captures([limits | tail], queries, results, body) do
