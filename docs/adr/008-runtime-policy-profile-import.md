@@ -1,7 +1,7 @@
 # ADR-008: versioned source-runtime policy capture and import
 
 Status: the four-artifact, tests-first producer prerequisite is selected under
-B2-CREATE-PRODUCER1/P1. The producer is not implemented or accepted. Rust runtime
+B2-CREATE-PRODUCER1/P1. A producer draft is under native review and is not accepted. Rust runtime
 profiles, models, command/receipt formats and storage layouts remain unselected.
 
 ## Reason for the decision
@@ -34,7 +34,11 @@ The selected files are `tools/policy_runtime_capture.exs`, its native bridge
 Root owns this ADR, tests, builds, execution and Git. The implementation owner may
 write the two tools only after the coordinator freezes genuine failing tests and
 explicitly releases implementation. No other first-party helper or module is
-selected by this decision.
+selected by the initial decision. B2-ARCH-ADMISSION-TEST1 additionally selects
+`tools/tests/policy_runtime_capture/admission.exs` and its admission test module.
+B2-ARCH-BOOTSTRAP-HOME1 selects `tools/policy_runtime_capture/bootstrap.exs`
+and `Ferricstore.PolicyRuntimeCapture.Bootstrap.verify/1` for the existing
+verification responsibility, preserving load order, context and outer rescue.
 
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported
@@ -54,6 +58,13 @@ that session and expected parent before adding donors/facts. `close_epoch/1`
 releases source handles and invalidates continuity. Output binds actual source,
 build/session, donor/query bytes and parent. The prototype is not a Rust profile
 constructor or an assignment of future production wire bytes.
+
+Map observations are operation-specific. `orders[].keys` records the policy
+validation order from `Map.to_list` and `Enum.reduce_while`. On the pinned runtime,
+direct `Enum.map`/fold traverses HAMTs in the opposite direction; tests retain
+that independent observation. Flatmaps agree. Frozen Rust policy-order vectors
+remain unchanged; this producer prototype does not establish every merge or
+nested traversal profile.
 
 ## Native lifetime and build requirements
 
@@ -96,6 +107,17 @@ source pins, scratch and output at their actual simultaneous frontiers. Refusal
 and cleanup paths are included. Per-donor bounds do not bound a long-lived union
 of epochs. Native heap/IPC ownership is separate from Rust logical work/scratch;
 this decision assigns no new Rust tariff or unproved memory coefficient.
+
+The selected anchor extension accepts an exact source-produced donor with its
+actual live source term. It preflights that caller-owned term before encoding,
+handoff or decoding, binds the actual encoded bytes and preserves ownership
+through handoff. Ordinary raw references retain their route; a potentially
+resource-bearing raw reference without ownership needs source-anchor context.
+The pin quota covers directly known VM object/binary/MagicBinary storage.
+Opaque destructor-owned external graphs can outlive their caller through a
+retained anchor; their size is not established by MagicBinary.orig_size.
+Neither that field nor this quota proves a total native-retention or RSS bound.
+Anchor behavior remains held until its genuinely reached tests fail and freeze.
 
 Seven selected tests cover authentic ABI/version refusal; opposite atom creation
 histories and 31/32/33 maps; release hashes and full-width collision ties; source

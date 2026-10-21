@@ -26,41 +26,8 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     pinned_bytes: 16_777_216,
     output_bytes: 1_048_576
   }
-  @hamt33 [
-    0,
-    2,
-    21,
-    18,
-    5,
-    22,
-    15,
-    26,
-    4,
-    20,
-    6,
-    32,
-    31,
-    27,
-    23,
-    10,
-    9,
-    19,
-    30,
-    14,
-    17,
-    1,
-    13,
-    29,
-    8,
-    24,
-    3,
-    25,
-    11,
-    7,
-    16,
-    12,
-    28
-  ]
+  @hamt33 [0, 2, 21, 18, 5, 22, 15, 26, 4, 20, 6, 32, 31, 27, 23, 10] ++
+            [9, 19, 30, 14, 17, 1, 13, 29, 8, 24, 3, 25, 11, 7, 16, 12, 28]
 
   test "refuses_vm_headers_word_layout_or_debug_build_outside_exact_pin" do
     claimed = Map.put(config(), :claimed_otp_package, "28.3.1")
@@ -148,7 +115,8 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     names = Enum.map(1..33, &"s#{String.pad_leading(to_string(&1), 2, "0")}")
     map = Map.new(names, &{&1, 0})
     expected = Enum.map(@hamt33, &Enum.at(names, &1))
-    assert Enum.map(map, fn {key, _} -> key end) == expected
+    assert Enum.map(Map.to_list(map), &elem(&1, 0)) == expected
+    assert Enum.map(map, fn {key, _} -> key end) == Enum.reverse(expected)
     assert Map.keys(map) == expected
     assert_order!(map, expected)
 
@@ -157,7 +125,8 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     order = Enum.filter(@hamt33, &(&1 < 31)) ++ [32, 31]
     expected = Enum.map(order, &Enum.at(keys, &1))
     assert Enum.take(expected, -2) == [second, first]
-    assert Enum.map(collision_map, fn {key, _} -> key end) == expected
+    assert Enum.map(Map.to_list(collision_map), &elem(&1, 0)) == expected
+    assert Enum.map(collision_map, fn {key, _} -> key end) == Enum.reverse(expected)
     assert Map.keys(collision_map) == expected
     assert_order!(collision_map, expected)
   end
@@ -244,6 +213,7 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     # actual source decoder, rather than declared invalid by a portable table.
     for raw <- [
           unknown,
+          encode(make_ref()),
           valid <> <<0>>,
           compressed,
           <<131, 73, 0, 0>>,
@@ -346,6 +316,30 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     assert again.local_funs == c.local_funs
     with_internal_hash(fn hash -> assert again.hashes == [hash.(nil), hash.(1)] end)
     assert :ok = Capture.close_epoch(s)
+
+    anchor = :binary.compile_pattern(String.duplicate("x", 4_096))
+    encoded = encode(anchor)
+    assert byte_size(encoded) < 1_024
+    anchored = %{encoded: encoded, source_term: anchor}
+
+    assert {:error, {:source_anchor_required, 0}} =
+             Capture.capture_epoch([encoded], empty_queries(), nil, @limits)
+
+    assert {:error, {:limit, :pinned_bytes}} =
+             Capture.capture_epoch([anchored], empty_queries(), nil, %{
+               @limits
+               | pinned_bytes: 1_024
+             })
+
+    assert {:ok, keeper, captured} =
+             Capture.capture_epoch([anchored], empty_queries(), nil, @limits)
+
+    assert captured.donor_hashes == [sha(encoded)]
+    assert :ok = Capture.close_epoch(keeper)
+
+    assert {:error, {:source_anchor_mismatch, 0}} =
+             Capture.capture_epoch([%{anchored | source_term: 7}], empty_queries(), nil, @limits)
+
     # An integer supplied directly to the native API is never a pointer input.
     assert {:ok, integers} = Native.capture_terms([0x7FFF_FFFF_FFFF], @limits)
     assert length(integers.hashes) == 1
@@ -401,7 +395,8 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
       names: names,
       words: words,
       word_matches: word_matches,
-      order_matches: Enum.zip_with(actual, enum_orders, &(&1 == &2)),
+      order_matches:
+        Enum.zip_with(actual, List.update_at(enum_orders, 2, &Enum.reverse/1), &(&1 == &2)),
       key_bif_matches: Enum.zip_with(actual, bif_orders, &(&1 == &2))
     })
   end
@@ -410,7 +405,7 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     {s, c} = capture!([encode(map)])
     assert [%{donor: 0, keys: keys}] = c.orders
     assert keys == Enum.map(expected, &encode/1)
-    assert keys == Enum.map(map, fn {key, _} -> encode(key) end)
+    assert keys == Enum.map(Map.to_list(map), fn {key, _} -> encode(key) end)
     assert keys == Enum.map(Map.keys(map), &encode/1)
     assert :ok = Capture.close_epoch(s)
   end
@@ -464,7 +459,7 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     {session, captured}
   end
 
-  defp bootstrap! do
+  def bootstrap! do
     assert {:ok, abi} = Capture.bootstrap(config())
 
     oracle =
@@ -474,7 +469,9 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
     abi
   end
 
-  defp config do
+  def limits, do: @limits
+
+  def config do
     base = "/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1"
 
     %{
@@ -581,7 +578,12 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
   defp sha(bytes), do: :crypto.hash(:sha256, bytes)
 end
 
+Code.require_file("policy_runtime_capture/admission.exs", __DIR__)
+
 case System.argv() do
+  ["--admission-child", mode] ->
+    Ferricstore.PolicyRuntimeCaptureAdmissionTest.run_child(mode)
+
   ["--capture-child", mode] ->
     Ferricstore.PolicyRuntimeCaptureTest.run_child(mode)
 
