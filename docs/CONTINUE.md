@@ -1,6 +1,6 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-20. The active full-completion goal continues beyond this reviewed
+Updated: 2026-10-22. The active full-completion goal continues beyond this reviewed
 increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
@@ -65,14 +65,50 @@ Full product completion remains open. The next required work is B2 actual
 runtime source profiles/order, B3 authoritative indexed record effects and B4
 durable migration jobs. B2's four-artifact runtime capture prerequisite is now
 selected in [ADR-008](adr/008-runtime-policy-profile-import.md), with seven
-reviewed tests authored before either tool implementation. Their actual run
-fails all seven tests at the missing bootstrap API; native behavior is not yet
-validated. The broader Rust runtime profile/model/wire roster remains unselected.
-The installed OTP28.4.2 cannot satisfy the exact OTP28.3.1 build requirement;
-source checkout and official release download both failed DNS resolution.
-Pinned source identity is verified through GitHub reads, but the isolated native
-VM/build and Linux execution remain pending. Implementation and reciprocal
-source review must establish native lifetime, bounds and source fidelity.
+reviewed tests frozen before either tool implementation. The exact OTP28.3.1
+source was reconstructed through verified upstream reads after direct downloads
+failed. Its optimized ERTS16.2 runtime and crypto now build, install and start on
+macOS. The capture NIF compiles with strict warnings against its actual header
+closure; a generated manifest binds those headers and linked library bytes.
+
+The latest completed native run executes eighteen tests: sixteen pass and two
+fail. The query construction regression was frozen in `9ab4629` after genuine
+zero-word/zero-pin acceptance and an improper-list exception were observed. Its
+reviewed implementation now passes the entire identity, including the 33-key
+boundary, guard precedence, duplicate keys, extra fields and input reuse. The
+actual-value measurement regression was frozen in `00f529e` after genuine
+output-limit refusals. Its implementation passes the complete identity: exact
+request/report control, repeated real binary backing, depth64/63, malformed-mode
+precedence and healthy reuse. The strict native rebuild preserves all89 pinned
+headers and all302 compiler inputs through execution. This measures real graphs
+for later encoder/copy admission; the original two wrapper failures remain open.
+Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
+policy-order repairs. Compression and trailing bytes now refuse before decoding;
+the changed-library check preserves the original loaded artifact. Source-specific
+tests distinguish Enum traversal from Map.keys/Map.to_list at33 entries, preserving
+the frozen Rust policy-order vectors. OTP's supported switch-dispatch debug build
+starts and genuine optimized/wrong-version/debug ABI guards pass.
+
+Both direct live-input tests now pass completely on the exact runtime, including
+depth64/63 and actual binary/resource backing limits with fact emission disabled.
+The measurement implementation and helper grouping have independent source review.
+The native per-leaf/per-donor anchor regression now passes all three branches and
+the healthy retry. Its rebuilt manifest binds all89 actual OTP headers, including
+the reference-classification and encoder-context dependencies. The Capture wrapper's
+source-anchor admission and combined ownership accounting still fail.
+The header-layout regression now passes all five-field/64-to65 relationships and
+exact control-word/pin refusals. Separate real-runtime checks pass malformed,
+overflow, maximum-safe-u64 and limit-precedence cases. The arithmetic mode charges
+its report heap and does not attest encoder execution or operating conditions.
+Architecture has selected the session source and owner contracts; encoder scratch
+and continuation allocations remain separate source-derived proof duties. The
+producer draft is not accepted as complete.
+The reviewed fact-leaf separation reduces the actual Darwin compiler frame for
+recursive fun traversal from 2192 to 48 bytes. Its native run preserved all 14
+then-passing identities and the same two wrapper failures. This is frame-placement
+evidence, not a total stack-margin, CPU-latency or Linux result.
+The broader Rust runtime profile/model/wire roster and native Linux execution
+remain pending.
 
 Full pinned Elixir scenario/assertion/setup/profile parity, governing services,
 accepted consensus/runtime, application/transports and Linux/macOS acceptance

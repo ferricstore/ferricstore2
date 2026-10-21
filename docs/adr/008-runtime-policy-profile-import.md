@@ -49,6 +49,13 @@ The selected private `{:encoder_layout, E}` request to `Native.capture_terms/2`
 exposes actual header-derived encoder layouts, with its own bounded control
 report. It performs arithmetic only; encoder admission still requires the
 selected operating conditions, actual libc correspondence and complete owner sums.
+The selected `{:measure_terms, actual_value}` request measures one real graph at
+semantic depth zero using the same call-local live traversal. Its three existing
+live metrics include the request and bounded report envelope. It emits no facts,
+hashes or encoded terms and consumes no donor-byte quota. This supplies actual
+graph operands for encoder/copy admission without a synthetic donor or a configured
+fact maximum substituted for an actual graph; it does not establish source-byte
+binding, deferred-allocation retirement or complete wrapper accounting.
 
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported
@@ -117,6 +124,17 @@ source pins, scratch and output at their actual simultaneous frontiers. Refusal
 and cleanup paths are included. Per-donor bounds do not bound a long-lived union
 of epochs. Native heap/IPC ownership is separate from Rust logical work/scratch;
 this decision assigns no new Rust tariff or unproved memory coefficient.
+
+The selected `Input.query/2` construction guard receives already validated
+remaining word and pin limits. It validates proper shape, facts, item types and
+text before observations, then prepays each lookup and persistent-map insertion
+with a cumulative bank across both result maps. The insertion bank uses actual
+map cardinality, including the 32-to-33 factory transition. Its constants are
+conservative bounds from the pinned OTP source for binary and MFA keys, not Rust
+fees or measured memory. Total query text also funds sequential alignment scratch.
+The caller separately funds the bounded six-word refusal channel. Full caller
+ownership subtraction, compaction, transfer and keeper accounting remain open;
+the local query guard does not certify those frontiers.
 
 The selected anchor extension accepts an exact source-produced donor with its
 actual live source term. It preflights that caller-owned term before encoding,

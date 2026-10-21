@@ -378,6 +378,20 @@ static ERL_NIF_TERM live_preflight(struct capture_state *s, Eterm carrier) {
         enif_make_uint64(s->env, s->used[PINS]), enif_make_uint64(s->env, s->used[TERMS])};
     return enif_make_tuple2(s->env, atom(s->env, "ok"), map(s->env, keys, values, 3));
 }
+static ERL_NIF_TERM measure_terms(struct capture_state *s, Eterm value) {
+    s->emitting = 2;
+    /* The real request tuple and its tag add3 words and2 administrative
+     * visits. The payload itself starts at semantic depth0. */
+    if (!debit(s, WORDS, 3) || !debit(s, TERMS, 2) || !walk(s, value, 0)) return refused(s);
+    /* Same19-word maximum as live_preflight, admitted before construction.
+     * Returned pins include both actual backing and all heap/control words. */
+    uint64_t report_words = MAP_HEADER_FLATMAP_SZ + 7 + 6 + 3;
+    if (!debit(s, WORDS, report_words) || !debit(s, PINS, s->used[WORDS] * 8)) return refused(s);
+    const char *keys[] = {"live_words", "live_pinned_bytes", "live_terms"};
+    ERL_NIF_TERM values[] = {enif_make_uint64(s->env, s->used[WORDS]),
+        enif_make_uint64(s->env, s->used[PINS]), enif_make_uint64(s->env, s->used[TERMS])};
+    return enif_make_tuple2(s->env, atom(s->env, "ok"), map(s->env, keys, values, 3));
+}
 /* Explicit POST source-byte-binding API: the caller owns that real check.
  * This walk measures every live leaf, not an aggregate some-magic flag. */
 static int anchor_donor(struct capture_state *s, Eterm term, Eterm *encoded) {
@@ -432,6 +446,10 @@ static ERL_NIF_TERM capture_terms(ErlNifEnv *env, int argc, const ERL_NIF_TERM a
     }
     if (state.cap[DEPTH] > 64) return error(env, "invalid_limits");
     const ERL_NIF_TERM *mode; int arity;
+    if (enif_is_identical(argv[0], atom(env, "measure_terms"))) return error(env, "invalid_terms");
+    if (enif_get_tuple(env, argv[0], &arity, &mode) && arity > 0 &&
+        enif_is_identical(mode[0], atom(env, "measure_terms")))
+        return arity == 2 ? measure_terms(&state, mode[1]) : error(env, "invalid_terms");
     if (enif_is_identical(argv[0], atom(env, "encoder_layout"))) return error(env, "invalid_encoder_layout");
     if (enif_get_tuple(env, argv[0], &arity, &mode) && arity > 0 &&
         enif_is_identical(mode[0], atom(env, "encoder_layout")))
@@ -500,7 +518,7 @@ static int load(ErlNifEnv *env, void **private_data, ERL_NIF_TERM info) {
         "arity", "uniq", "index", "old_uniq", "ok", "error", "limit", "allocation_failure",
         "preflight", "anchors", "encoded", "source_term", "live_words", "live_pinned_bytes", "live_terms",
         "encoder_layout", "invalid_encoder_layout", "size_result_words", "trap_return_words",
-        "result_words", "binary_bytes", "context_bytes"};
+        "result_words", "binary_bytes", "context_bytes", "measure_terms", "invalid_terms"};
     for (unsigned i = 0; i < sizeof(names)/sizeof(names[0]); i++) (void)atom(env, names[i]);
     for (unsigned i = 0; i < 8; i++) (void)atom(env, cap_names[i]);
     for (unsigned i = 0; i < 5; i++) (void)atom(env, result_names[i]);
