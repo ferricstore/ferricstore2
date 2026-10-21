@@ -187,6 +187,46 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
     assert Native.capture_terms({:preflight, [good]}, limits) == single
   end
 
+  test "encoder_layout_uses_pinned_headers_and_charges_control" do
+    SourceTest.bootstrap!()
+    limits = %{SourceTest.limits() | facts: 0, text_bytes: 0, output_bytes: 0}
+    at64 = Native.capture_terms({:encoder_layout, 64}, limits)
+    at65 = Native.capture_terms({:encoder_layout, 65}, limits)
+    words_low = Native.capture_terms({:encoder_layout, 65}, %{limits | decoded_words: 26})
+    pins_low = Native.capture_terms({:encoder_layout, 65}, %{limits | pinned_bytes: 215})
+
+    assert match?({:ok, _}, at64), inspect({at64, at65, words_low, pins_low})
+    assert {:ok, first} = at64
+    assert {:ok, second} = at65
+
+    for report <- [first, second] do
+      assert map_size(report) == 5
+
+      assert %{
+               size_result_words: _,
+               trap_return_words: _,
+               result_words: _,
+               binary_bytes: _,
+               context_bytes: _
+             } = report
+
+      for value <- Map.values(report), do: assert(is_integer(value) and value >= 0)
+      assert report.size_result_words > 0
+      assert report.trap_return_words > 5
+      assert report.result_words > 0
+      assert report.context_bytes > 0
+    end
+
+    assert first.binary_bytes >= 64
+    assert second.binary_bytes == first.binary_bytes + 1
+    assert second.size_result_words == first.size_result_words
+    assert second.trap_return_words == first.trap_return_words
+    assert second.result_words == first.result_words
+    assert second.context_bytes == first.context_bytes
+    assert words_low == {:error, {:limit, :decoded_words}}
+    assert pins_low == {:error, {:limit, :pinned_bytes}}
+  end
+
   defp reference_owner_fixture do
     previous = :erts_debug.set_internal_state(:available_internal_state, true)
 
