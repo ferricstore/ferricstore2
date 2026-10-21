@@ -157,6 +157,61 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
     assert queries == %{atoms: [query], exports: []}
   end
 
+  test "post_binding_preflight_checks_each_anchor_and_resets_per_donor" do
+    SourceTest.bootstrap!()
+    {pattern, ordinary} = reference_owner_fixture()
+    encoded = TermCodec.encode(pattern)
+    good = %{encoded: encoded, source_term: pattern}
+    mixed_term = {pattern, ordinary}
+    mixed_encoded = TermCodec.encode(mixed_term)
+    mixed = %{encoded: mixed_encoded, source_term: mixed_term}
+    limits = SourceTest.limits()
+
+    single = Native.capture_terms({:preflight, [good]}, limits)
+    following = Native.capture_terms({:preflight, [good, encoded]}, limits)
+    mixed_result = Native.capture_terms({:preflight, [mixed]}, limits)
+
+    assert match?({:ok, _}, single), inspect({single, following, mixed_result})
+    {:ok, report} = single
+    assert map_size(report) == 2
+    assert %{decoded_words: words, pinned_bytes: pins} = report
+    assert is_integer(words) and words in 0..limits.decoded_words
+    assert is_integer(pins) and pins in 0..limits.pinned_bytes
+    assert following == {:error, {:source_anchor_required, 1}}
+    assert mixed_result == {:error, {:source_anchor_required, 0}}
+    assert :binary.match(String.duplicate("x", 4_096), pattern) == {0, 4_096}
+    assert is_reference(ordinary)
+    assert good == %{encoded: encoded, source_term: pattern}
+    assert mixed == %{encoded: mixed_encoded, source_term: {pattern, ordinary}}
+    assert byte_size(mixed_encoded) > byte_size(encoded)
+    assert Native.capture_terms({:preflight, [good]}, limits) == single
+  end
+
+  defp reference_owner_fixture do
+    previous = :erts_debug.set_internal_state(:available_internal_state, true)
+
+    try do
+      raw = TermCodec.encode(make_ref())
+      assert <<131, 90, 0, 3, _::binary>> = raw
+      prefix_size = byte_size(raw) - 12
+      <<prefix::binary-size(prefix_size), word0::32, word1::32, word2::32>> = raw
+      assert Bitwise.band(word1, 0x30000) == 0
+
+      marked =
+        prefix <>
+          <<word0::32, Bitwise.bor(word1, 0x20000)::32, Bitwise.bxor(word2, 0x80000000)::32>>
+
+      assert {:ok, ordinary} = TermCodec.decode(marked)
+      assert :erts_debug.get_internal_state({:magic_ref, ordinary}) == true
+      assert {:bm, resource_ref} = pattern = :binary.compile_pattern(String.duplicate("x", 4_096))
+      genuine = :erts_debug.get_internal_state({:magic_ref, resource_ref})
+      assert is_tuple(genuine) and tuple_size(genuine) == 3
+      {pattern, ordinary}
+    after
+      :erts_debug.set_internal_state(:available_internal_state, previous)
+    end
+  end
+
   defp assert_live_report!(report, limits) do
     assert map_size(report) == 3
     assert %{live_words: words, live_pinned_bytes: pins, live_terms: terms} = report
