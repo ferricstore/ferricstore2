@@ -1,12 +1,69 @@
 defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
   use ExUnit.Case, async: false
   alias Ferricstore.PolicyRuntimeCapture, as: Capture
+  alias Ferricstore.PolicyRuntimeCapture.Input
   alias Ferricstore.PolicyRuntimeCapture.Native
   alias Ferricstore.PolicyRuntimeCaptureTest, as: SourceTest
   alias Ferricstore.TermCodec
 
   @controller Path.expand("../policy_runtime_capture_test.exs", __DIR__)
   @generated "/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/native"
+
+  test "query_result_builders_preflight_control_before_observation" do
+    SourceTest.bootstrap!()
+    limits = SourceTest.limits()
+
+    queries = %{
+      atoms: ["nil", "nil"],
+      exports: [{"erlang", "length", 1}, {"erlang", "length", 1}],
+      ignored: true
+    }
+
+    expected = %{atoms: %{"nil" => true}, exports: %{{"erlang", "length", 1} => true}}
+    low_words = Input.query(queries, %{limits | decoded_words: 0})
+    low_pins = Input.query(queries, %{limits | pinned_bytes: 0})
+    adequate = Input.query(queries, limits)
+    names = Enum.map(0..32, fn index -> <<255, index>> end)
+    wide = Input.query(%{atoms: names, exports: []}, limits)
+
+    improper =
+      try do
+        Input.query(%{atoms: ["true" | :bad_tail], exports: []}, limits)
+      rescue
+        ArgumentError -> :raised_argument_error
+      end
+
+    assert low_words == {:error, {:limit, :decoded_words}},
+           "eager query returns: #{inspect({low_words, low_pins, adequate, wide, improper})}"
+
+    assert low_pins == {:error, {:limit, :pinned_bytes}}
+    assert adequate == {:ok, expected}
+    assert wide == {:ok, %{atoms: Map.new(names, &{&1, false}), exports: %{}}}
+    assert improper == {:error, :invalid_queries}
+
+    invalid = %{atoms: [7], exports: []}
+
+    assert Input.query(invalid, %{limits | facts: 0, decoded_words: 0}) ==
+             {:error, {:limit, :facts}}
+
+    assert Input.query(invalid, %{limits | decoded_words: 0}) == {:error, :invalid_queries}
+
+    assert Input.query(queries, %{limits | text_bytes: 0, decoded_words: 0, pinned_bytes: 0}) ==
+             {:error, {:limit, :text_bytes}}
+
+    assert Input.query(%{atoms: :invalid, exports: []}, limits) == {:error, :invalid_queries}
+    assert Input.query(%{atoms: [], exports: :invalid}, limits) == {:error, :invalid_queries}
+    assert Input.query(%{}, limits) == {:error, :invalid_queries}
+    assert Input.query(queries, limits) == {:ok, expected}
+
+    assert queries == %{
+             atoms: ["nil", "nil"],
+             exports: [{"erlang", "length", 1}, {"erlang", "length", 1}],
+             ignored: true
+           }
+
+    assert names == Enum.map(0..32, fn index -> <<255, index>> end)
+  end
 
   test "local_wrapper_preflight_uses_bounded_native_stack" do
     SourceTest.bootstrap!()
