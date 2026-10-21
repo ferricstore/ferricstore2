@@ -9,6 +9,7 @@
 #include "erl_map.h"
 #include "erl_utils.h"
 #include "external.h"
+#include "dist.h"
 #include "erl_zlib.h"
 #include "export.h"
 #include <stdint.h>
@@ -22,6 +23,10 @@
 #error "The capture ABI requires the selected optimized little-endian release"
 #endif
 _Static_assert(sizeof(Eterm) == 8 && sizeof(ERL_NIF_TERM) == 8, "capture requires 64-bit terms");
+_Static_assert(sizeof(void *) == 8 && sizeof(void (*)(void)) == 8 &&
+    sizeof(long) == 8 && sizeof(size_t) == 8, "encoder proof requires LP64 scalar widths");
+_Static_assert(_Alignof(void *) <= 8 && _Alignof(void (*)(void)) <= 8 &&
+    _Alignof(long) <= 8 && _Alignof(size_t) <= 8, "encoder proof requires alignment<=8");
 
 #define DONOR 0
 #define WORDS 1
@@ -389,6 +394,32 @@ static int anchor_donor(struct capture_state *s, Eterm term, Eterm *encoded) {
     s->emitting = 4;
     return 1;
 }
+/* Arithmetic only: these actual header layouts attest no encoder run,
+ * scheduler quiescence, libc sort implementation or live input ownership. */
+static ERL_NIF_TERM encoder_layout(struct capture_state *s, ERL_NIF_TERM size) {
+    ErlNifUInt64 length;
+    if (!enif_get_uint64(s->env, size, &length)) return error(s->env, "invalid_encoder_layout");
+    uint64_t binary_header = ERTS_SIZEOF_Binary(0);
+    uint64_t context_header = ERTS_MAGIC_BIN_SIZE(0), context_size = sizeof(TTBContext);
+    /* Check both representations BEFORE evaluating their addition macros. */
+    if (length > UINT64_MAX - binary_header || length > (uint64_t)SIZE_MAX - binary_header ||
+        context_size > UINT64_MAX - context_header || context_size > (uint64_t)SIZE_MAX - context_header) {
+        s->refusal = "pinned_bytes"; return refused(s);
+    }
+    uint64_t small = length < 64 ? length : 64;
+    uint64_t heap = heap_bits_size(small * 8);
+    uint64_t result = heap > ERL_REFC_BITS_SIZE ? heap : ERL_REFC_BITS_SIZE;
+    uint64_t payload = ERTS_SIZEOF_Binary((size_t)length);
+    uint64_t context = ERTS_MAGIC_BIN_SIZE(sizeof(TTBContext));
+    /* Five-key flatmap14 + <=10 uint64-box words +3-word ok tuple.
+     * No fact/text/output counters are consumed by this control report. */
+    if (!debit(s, WORDS, 27) || !debit(s, PINS, 27 * sizeof(Eterm))) return refused(s);
+    const char *keys[] = {"size_result_words", "trap_return_words", "result_words", "binary_bytes", "context_bytes"};
+    ERL_NIF_TERM values[] = {enif_make_uint64(s->env, BIG_UINT_HEAP_SIZE),
+        enif_make_uint64(s->env, ERTS_MAGIC_REF_THING_SIZE + 5), enif_make_uint64(s->env, result),
+        enif_make_uint64(s->env, payload), enif_make_uint64(s->env, context)};
+    return enif_make_tuple2(s->env, atom(s->env, "ok"), map(s->env, keys, values, 5));
+}
 static ERL_NIF_TERM capture_terms(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
     struct capture_state state = {.env = env};
     ERL_NIF_TERM cap;
@@ -402,6 +433,10 @@ static ERL_NIF_TERM capture_terms(ErlNifEnv *env, int argc, const ERL_NIF_TERM a
     }
     if (state.cap[DEPTH] > 64) return error(env, "invalid_limits");
     const ERL_NIF_TERM *mode; int arity;
+    if (enif_is_identical(argv[0], atom(env, "encoder_layout"))) return error(env, "invalid_encoder_layout");
+    if (enif_get_tuple(env, argv[0], &arity, &mode) && arity > 0 &&
+        enif_is_identical(mode[0], atom(env, "encoder_layout")))
+        return arity == 2 ? encoder_layout(&state, mode[1]) : error(env, "invalid_encoder_layout");
     if (enif_get_tuple(env, argv[0], &arity, &mode) && arity == 2 &&
         enif_is_identical(mode[0], atom(env, "preflight"))) {
         const ERL_NIF_TERM *inner; int count;
@@ -464,7 +499,9 @@ static int load(ErlNifEnv *env, void **private_data, ERL_NIF_TERM info) {
     if (endian[0] != 1 || !enif_is_identical(info, abi(env, 0, NULL))) return -1;
     const char *names[] = {"name", "native_word", "creation", "hash_input", "module", "function",
         "arity", "uniq", "index", "old_uniq", "ok", "error", "limit", "allocation_failure",
-        "preflight", "anchors", "encoded", "source_term", "live_words", "live_pinned_bytes", "live_terms"};
+        "preflight", "anchors", "encoded", "source_term", "live_words", "live_pinned_bytes", "live_terms",
+        "encoder_layout", "invalid_encoder_layout", "size_result_words", "trap_return_words",
+        "result_words", "binary_bytes", "context_bytes"};
     for (unsigned i = 0; i < sizeof(names)/sizeof(names[0]); i++) (void)atom(env, names[i]);
     for (unsigned i = 0; i < 8; i++) (void)atom(env, cap_names[i]);
     for (unsigned i = 0; i < 5; i++) (void)atom(env, result_names[i]);

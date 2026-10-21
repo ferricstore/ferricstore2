@@ -45,6 +45,10 @@ part of the same native translation unit. B2-ARCH-INPUT-HOME1 selects
 for caller input admission and binding helpers. Their mechanical moves preserve
 the original behavior; later owner/encoder changes require separate validation.
 These are first-party build inputs, separate from the manifest's OTP header pairs.
+The selected private `{:encoder_layout, E}` request to `Native.capture_terms/2`
+exposes actual header-derived encoder layouts, with its own bounded control
+report. It performs arithmetic only; encoder admission still requires the
+selected operating conditions, actual libc correspondence and complete owner sums.
 
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported
