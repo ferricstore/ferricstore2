@@ -39,6 +39,12 @@ selected by the initial decision. B2-ARCH-ADMISSION-TEST1 additionally selects
 B2-ARCH-BOOTSTRAP-HOME1 selects `tools/policy_runtime_capture/bootstrap.exs`
 and `Ferricstore.PolicyRuntimeCapture.Bootstrap.verify/1` for the existing
 verification responsibility, preserving load order, context and outer rescue.
+B2-ARCH-RAW-HOME1 selects `tools/policy_runtime_capture/raw.inc` as an included
+part of the same native translation unit. B2-ARCH-INPUT-HOME1 selects
+`tools/policy_runtime_capture/input.exs` and `Ferricstore.PolicyRuntimeCapture.Input`
+for caller input admission and binding helpers. Their mechanical moves preserve
+the original behavior; later owner/encoder changes require separate validation.
+These are first-party build inputs, separate from the manifest's OTP header pairs.
 
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported
