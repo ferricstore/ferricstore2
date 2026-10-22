@@ -5,7 +5,15 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest runtime capture checkpoint passes **all 26 tests on macOS**. A frozen
+The active runtime capture regression checkpoint runs **27 tests on macOS:
+26 pass and one fails**. The new keeper-send trace observes nine limit fields,
+including ignored metadata, in the first successful budget reply before caller
+preparation. The same caller's invalid-query attempt and healthy same-parent
+retry both return before the wire-shape assertion fails. No projection repair
+is implemented; allocation funding and prior/concurrent reply ownership remain
+required before source release.
+
+The preceding runtime capture checkpoint passes **all 26 tests on macOS**. A frozen
 send-trace regression first reproduced an invalid parent graph entering the first
 budget request; the narrow scalar normalization now passes with all 25 prior
 tests, preserving parent-first rejection, invalid/dead-session errors and healthy
@@ -32,15 +40,15 @@ passes 27 tests and the complete restored-code checkpoint above passes. This is
 pure existing-code conformance, with original public setup, phase scheduling,
 durability and complete required profiles still open.
 
-The next missing pure operation is atomic StepContinue: keep physical running,
+The current pure-operation increment is atomic StepContinue: keep physical running,
 rotate the actual lease token/fence once, change logical state and preserve entry
 order through actual-guard Retry and later FIFO activation. The reviewed interface
-scaffold passes the complete checkpoint above while explicitly refusing execution
-and retaining closed wire/storage profiles. Its two new boundary tests and one
-architecture test account for the three additional tests. The approved three-file,
-eight-test behavior suite now compiles and fails at runtime against this scaffold:
-the three core positives reach UnsupportedOperation. Its recorded RED checkpoint
-must be committed before the guarded body is released. Reciprocal review preserved the
+scaffold passed the complete checkpoint above with execution explicitly refused
+and wire/storage profiles closed. Its two new boundary tests and one architecture
+test account for the three additional tests. The approved three-file, eight-test
+behavior suite was frozen in `94e7dc1` after genuine runtime RED. The guarded body
+now passes all eight unchanged tests; complete current-workspace validation is
+pending. Wire/storage profiles remain closed. Reciprocal review preserved the
 source's unconditional running-FIFO rejection. The full original six-assertion
 case, public/durable codecs and profiles remain required; selected unit tests
 alone will not certify that case.

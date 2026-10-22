@@ -356,6 +356,103 @@ defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
     end)
   end
 
+  test "bounds_first_budget_reply_to_known_caps" do
+    abi = SourceTest.bootstrap!()
+    owner = self()
+    metadata = :erlang.make_tuple(4_096, owner)
+    defaults = SourceTest.limits()
+    limits = Map.put(defaults, :ignored_capture_budget, metadata)
+    queries = %{atoms: [], exports: []}
+    assert tuple_size(metadata) == 4_096
+    assert elem(metadata, 0) == owner
+    assert elem(metadata, 4_095) == owner
+    assert map_size(defaults) == 8
+
+    with_captures([limits], queries, [], fn [{:ok, keeper, first}] ->
+      {caller, monitor} =
+        spawn_monitor(fn ->
+          receive do
+            :attempt ->
+              result = Capture.extend_epoch(keeper, [], :invalid_queries, first.identity)
+              send(owner, {:budget_reply_attempt, self(), result})
+          end
+
+          receive do
+            :retry ->
+              result = Capture.extend_epoch(keeper, [], queries, first.identity)
+              send(owner, {:budget_reply_retry, self(), result})
+          end
+        end)
+
+      try do
+        assert :erlang.trace(keeper, true, [:send, {:tracer, owner}]) == 1
+        send(caller, :attempt)
+        assert_receive {:budget_reply_attempt, ^caller, rejected}, 5_000
+        fence = :erlang.trace_delivered(keeper)
+        assert_receive {:trace_delivered, ^keeper, ^fence}, 5_000
+
+        assert_receive {:trace, ^keeper, :send, {ref, {:ok, wire_limits, retained, source}},
+                        ^caller},
+                       5_000
+
+        assert :erlang.trace(keeper, false, [:send]) == 1
+        send(caller, :retry)
+        assert_receive {:budget_reply_retry, ^caller, retried}, 5_000
+
+        diagnostic =
+          "budget caps=#{map_size(wire_limits)} " <>
+            "ignored=#{Map.has_key?(wire_limits, :ignored_capture_budget)}"
+
+        wire_caps_match = wire_limits == defaults
+        assert wire_caps_match, diagnostic
+        assert map_size(wire_limits) == 8
+        refute Map.has_key?(wire_limits, :ignored_capture_budget)
+        assert is_reference(ref)
+        assert rejected == {:error, :invalid_queries}
+        assert {:ok, next} = retried
+        assert next.parent == first.identity
+        assert next.session_id == first.session_id
+        assert next.abi == abi
+        assert next.query_hash == :crypto.hash(:sha256, TermCodec.encode(queries))
+
+        for field <- [
+              :abi,
+              :query_hash,
+              :donor_hashes,
+              :queries,
+              :hashes,
+              :orders,
+              :atoms,
+              :nodes,
+              :exports,
+              :local_funs
+            ] do
+          assert Map.fetch!(next, field) == Map.fetch!(first, field)
+        end
+
+        assert Enum.sort(Map.keys(retained)) == [:decoded_words, :pinned_bytes]
+
+        for field <- [:decoded_words, :pinned_bytes] do
+          assert is_integer(retained[field]) and retained[field] in 0..defaults[field]
+        end
+
+        assert Enum.sort(Map.keys(source)) == [:md5, :source_sha]
+        assert source.md5 == TermCodec.module_info(:md5)
+        assert is_binary(source.source_sha) and byte_size(source.source_sha) == 32
+        inputs_unchanged = limits == Map.put(defaults, :ignored_capture_budget, metadata)
+        assert inputs_unchanged
+        assert queries == %{atoms: [], exports: []}
+        assert tuple_size(metadata) == 4_096
+        assert elem(metadata, 0) == owner
+        assert elem(metadata, 4_095) == owner
+      after
+        if Process.alive?(keeper), do: :erlang.trace(keeper, false, [:send])
+        Process.exit(caller, :kill)
+        assert_receive {:DOWN, ^monitor, :process, ^caller, _reason}, 5_000
+      end
+    end)
+  end
+
   defp with_captures([], _queries, results, body), do: body.(Enum.reverse(results))
 
   defp with_captures([limits | tail], queries, results, body) do
