@@ -104,6 +104,59 @@ defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
     end)
   end
 
+  test "preserves_ignored_control_depth_across_capture_and_extension" do
+    abi = SourceTest.bootstrap!()
+    deep = Enum.reduce(1..128, nil, fn _, term -> {term} end)
+    defaults = SourceTest.limits()
+    limits = Map.put(defaults, :ignored_capture_budget, deep)
+    queries = %{atoms: [], exports: []}
+    query_hash = :crypto.hash(:sha256, TermCodec.encode(queries))
+    assert Enum.reduce(1..128, deep, fn _, {inner} -> inner end) == nil
+    assert map_size(defaults) == 8
+    assert defaults.depth == 64
+    assert Map.delete(limits, :ignored_capture_budget) == defaults
+
+    with_captures([limits], queries, [], fn [result] ->
+      assert match?({:ok, _, _}, result), inspect(result, limit: 5, printable_limit: 120)
+      {:ok, keeper, first} = result
+      assert first.abi == abi
+      assert first.query_hash == query_hash
+      assert first.donor_hashes == []
+      assert first.queries == %{atoms: %{}, exports: %{}}
+
+      for field <- [:hashes, :orders, :atoms, :nodes, :exports, :local_funs] do
+        assert Map.fetch!(first, field) == []
+      end
+
+      extended = Capture.extend_epoch(keeper, [], queries, first.identity)
+      assert match?({:ok, _}, extended), inspect(extended, limit: 5, printable_limit: 120)
+      {:ok, next} = extended
+      assert next.parent == first.identity
+      assert next.session_id == first.session_id
+
+      for field <- [
+            :abi,
+            :query_hash,
+            :donor_hashes,
+            :queries,
+            :hashes,
+            :orders,
+            :atoms,
+            :nodes,
+            :exports,
+            :local_funs
+          ] do
+        assert Map.fetch!(next, field) == Map.fetch!(first, field)
+      end
+
+      assert limits == Map.put(defaults, :ignored_capture_budget, deep)
+      assert Map.delete(limits, :ignored_capture_budget) == defaults
+      assert defaults.depth == 64
+      assert queries == %{atoms: [], exports: []}
+      assert Enum.reduce(1..128, deep, fn _, {inner} -> inner end) == nil
+    end)
+  end
+
   defp with_captures([], _queries, results, body), do: body.(Enum.reverse(results))
 
   defp with_captures([limits | tail], queries, results, body) do

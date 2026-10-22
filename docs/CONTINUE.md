@@ -137,6 +137,15 @@ source repair is still pending. Reusing the current depth-limited measurement
 without further work would narrow accepted metadata; that is not an accepted
 fix. Earlier tiny query caps may also refuse at the new control gate, so future
 green assertions alone must not be credited as query-guard branch coverage.
+The separate healthy-depth regression now executes **twenty-three tests:
+twenty-one pass and two fail**, preserving all 1,492 captured repository inputs.
+Fresh capture accepts actual 128-level ignored tuple metadata with the unchanged
+64-level policy limit and passes its ABI, hash and empty-observation assertions.
+The one empty extension then incorrectly returns a depth refusal; later
+continuity and reuse assertions remain unexecuted. Both new regressions precede
+their source repairs. Administrative traversal must be bounded independently of
+semantic policy depth, with its frontier allocation charged before allocation;
+the old depth checks and original test limits remain required.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific
