@@ -195,7 +195,9 @@ defmodule Ferricstore.PolicyRuntimeCapture do
   end
 
   def extend_epoch(session, donors, queries, parent) do
-    with {:ok, limits, retained, source} <- call(session, {:budget, parent}),
+    budget_parent = if is_binary(parent) and byte_size(parent) == 32, do: parent, else: nil
+
+    with {:ok, limits, retained, source} <- call(session, {:budget, budget_parent}),
          :ok <- source_current(source),
          {:ok, prepared, compact, caller} <-
            Input.prepare(donors, queries, limits, retained, source),

@@ -5,10 +5,14 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest runtime capture checkpoint passes **all 25 tests on macOS**, including
-the original-limits ownership and deep-metadata extension regressions. Its strict
-native build and complete compiler/header/library pins pass. Full runtime
-accounting, Rust source profiles, original Elixir parity and Linux acceptance
+The latest runtime capture checkpoint passes **all 26 tests on macOS**. A frozen
+send-trace regression first reproduced an invalid parent graph entering the first
+budget request; the narrow scalar normalization now passes with all 25 prior
+tests, preserving parent-first rejection, invalid/dead-session errors and healthy
+retry continuity. Independent architecture, domain and performance reviews accept
+the exact source inverse and actual GREEN. The unchanged strict native build and
+compiler/header/library pins remain verified. Valid-parent backing, the complete
+budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
 The latest Rust checkpoint passes **953 tests across 90 targets on macOS**, with

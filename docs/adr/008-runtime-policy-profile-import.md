@@ -82,6 +82,15 @@ Original limits are retained and measured rather than narrowed to recognized
 fields. Earlier budget exchange, crypto/RNG and complete failure/retirement
 accounting remain separate duties.
 
+B2-FIRST-BUDGET-PARENT1-SOURCE1 bounds invalid extension parents before the first
+budget request: an original 32-byte binary is passed unchanged, and every other
+parent is represented by nil in that request. The keeper's identity comparison
+retains parent-mismatch precedence; the existing call retains invalid/dead-session
+origins. Later calls still use the original parent. A frozen real send-trace
+regression precedes this repair and passes with all 26 capture tests. This closes
+invalid-parent graph transfer only. Valid-binary backing, the complete limits
+reply and fixed message/signal/crypto/retirement accounting remain open.
+
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported
 host must receive a structured refusal before native loading or private access.
