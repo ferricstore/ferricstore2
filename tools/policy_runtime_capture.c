@@ -46,6 +46,9 @@ struct capture_state {
     uint64_t cap[8];
     uint64_t used[8];
     ERL_NIF_TERM lists[5];
+    Eterm *work;
+    size_t pending;
+    size_t capacity;
     int emitting;
     const char *refusal;
 };
@@ -76,7 +79,36 @@ static int debit(struct capture_state *s, unsigned field, uint64_t amount) {
         s->refusal = cap_names[field];
         return 0;
     }
+    if (s->work != NULL && field == WORDS) {
+        if (amount > (s->cap[PINS] - s->used[PINS]) / sizeof(Eterm)) {
+            s->refusal = cap_names[PINS];
+            return 0;
+        }
+        s->used[PINS] += amount * sizeof(Eterm);
+    }
     s->used[field] += amount;
+    return 1;
+}
+static int control_push(struct capture_state *s, Eterm term) {
+    uint64_t room = s->cap[TERMS] - s->used[TERMS];
+    if ((uint64_t)s->pending >= room) { s->refusal = "terms"; return 0; }
+    if (s->pending == s->capacity) {
+        size_t capacity = 1;
+        if (s->capacity)
+            capacity = s->capacity > room / 2 ? (size_t)room : s->capacity * 2;
+        if (capacity <= s->pending || capacity > SIZE_MAX / sizeof(Eterm)) {
+            s->refusal = "terms"; return 0;
+        }
+        size_t bytes = capacity * sizeof(Eterm);
+        if (!debit(s, PINS, (uint64_t)bytes)) return 0;
+        Eterm *work = enif_alloc(bytes);
+        if (!work) { s->refusal = "allocation_failure"; return 0; }
+        if (s->pending && s->work) memcpy(work, s->work, s->pending * sizeof(Eterm));
+        if (s->work) enif_free(s->work);
+        s->work = work;
+        s->capacity = capacity;
+    }
+    s->work[s->pending++] = term;
     return 1;
 }
 static int name_bytes(struct capture_state *s, Eterm value, char *bytes, unsigned *length) {
@@ -208,6 +240,7 @@ static int walk_list(struct capture_state *s, Eterm term, uint64_t depth) {
     return enif_is_empty_list(s->env, tail) || walk(s, tail, depth + 1);
 }
 static int walk(struct capture_state *s, Eterm term, uint64_t depth) {
+    if (s->work != NULL && depth > 0) return control_push(s, term);
     if (depth > s->cap[DEPTH]) { s->refusal = "depth"; return 0; }
     if (!debit(s, TERMS, 1)) return 0;
     if (enif_is_atom(s->env, term))
@@ -392,6 +425,24 @@ static ERL_NIF_TERM measure_terms(struct capture_state *s, Eterm value) {
         enif_make_uint64(s->env, s->used[PINS]), enif_make_uint64(s->env, s->used[TERMS])};
     return enif_make_tuple2(s->env, atom(s->env, "ok"), map(s->env, keys, values, 3));
 }
+static ERL_NIF_TERM measure_control(struct capture_state *s, Eterm value) {
+    s->emitting = 2;
+    /* Prepay request/report plus the three declared LP64 control fields. */
+    int ok = debit(s, WORDS, 22) && debit(s, PINS, 22 * sizeof(Eterm)) &&
+        debit(s, PINS, 24) && debit(s, TERMS, 2) && control_push(s, value);
+    while (ok && s->pending) {
+        Eterm current = s->work[--s->pending];
+        ok = walk(s, current, 0);
+    }
+    if (s->work) enif_free(s->work);
+    s->work = NULL;
+    s->pending = s->capacity = 0;
+    if (!ok) return refused(s);
+    const char *keys[] = {"live_words", "live_pinned_bytes", "live_terms"};
+    ERL_NIF_TERM values[] = {enif_make_uint64(s->env, s->used[WORDS]),
+        enif_make_uint64(s->env, s->used[PINS]), enif_make_uint64(s->env, s->used[TERMS])};
+    return enif_make_tuple2(s->env, atom(s->env, "ok"), map(s->env, keys, values, 3));
+}
 /* Explicit POST source-byte-binding API: the caller owns that real check.
  * This walk measures every live leaf, not an aggregate some-magic flag. */
 static int anchor_donor(struct capture_state *s, Eterm term, Eterm *encoded) {
@@ -446,6 +497,10 @@ static ERL_NIF_TERM capture_terms(ErlNifEnv *env, int argc, const ERL_NIF_TERM a
     }
     if (state.cap[DEPTH] > 64) return error(env, "invalid_limits");
     const ERL_NIF_TERM *mode; int arity;
+    if (enif_is_identical(argv[0], atom(env, "measure_control"))) return error(env, "invalid_terms");
+    if (enif_get_tuple(env, argv[0], &arity, &mode) && arity > 0 &&
+        enif_is_identical(mode[0], atom(env, "measure_control")))
+        return arity == 2 ? measure_control(&state, mode[1]) : error(env, "invalid_terms");
     if (enif_is_identical(argv[0], atom(env, "measure_terms"))) return error(env, "invalid_terms");
     if (enif_get_tuple(env, argv[0], &arity, &mode) && arity > 0 &&
         enif_is_identical(mode[0], atom(env, "measure_terms")))
@@ -518,7 +573,7 @@ static int load(ErlNifEnv *env, void **private_data, ERL_NIF_TERM info) {
         "arity", "uniq", "index", "old_uniq", "ok", "error", "limit", "allocation_failure",
         "preflight", "anchors", "encoded", "source_term", "live_words", "live_pinned_bytes", "live_terms",
         "encoder_layout", "invalid_encoder_layout", "size_result_words", "trap_return_words",
-        "result_words", "binary_bytes", "context_bytes", "measure_terms", "invalid_terms"};
+        "result_words", "binary_bytes", "context_bytes", "measure_terms", "measure_control", "invalid_terms"};
     for (unsigned i = 0; i < sizeof(names)/sizeof(names[0]); i++) (void)atom(env, names[i]);
     for (unsigned i = 0; i < 8; i++) (void)atom(env, cap_names[i]);
     for (unsigned i = 0; i < 5; i++) (void)atom(env, result_names[i]);

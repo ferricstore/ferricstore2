@@ -66,7 +66,7 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
     end
   end
 
-  defp preparation_shape(donors, %{atoms: atoms, exports: exports}, limits, retained) do
+  def preparation_shape(donors, %{atoms: atoms, exports: exports}, limits, retained) do
     with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits),
          # Preserve the old scalar query-copy refusal before donor validation.
          backing =
@@ -80,7 +80,7 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
     end
   end
 
-  defp preparation_shape(_, _, _, _), do: {:error, :invalid_queries}
+  def preparation_shape(_, _, _, _), do: {:error, :invalid_queries}
 
   defp preparation_donors([], _limits, _count, _bytes), do: :ok
 

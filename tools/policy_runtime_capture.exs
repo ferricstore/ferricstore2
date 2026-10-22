@@ -155,12 +155,15 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          :ok <- source_current(context.source),
          :ok <- validate_parent(parent),
          :ok <- validate_limits(limits),
+         zero = %{decoded_words: 0, pinned_bytes: 0},
+         :ok <- Input.preparation_shape(donors, queries, limits, zero),
+         {:ok, controls} <- transfer_admission(parent, context, limits, zero, zero),
          {:ok, prepared, queries, caller} <-
            Input.prepare(
              donors,
              queries,
              limits,
-             %{decoded_words: 0, pinned_bytes: 0},
+             controls,
              context.source
            ),
          :ok <- source_current(context.source),
@@ -364,7 +367,7 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          },
          {:ok, report} <-
            Native.capture_terms(
-             {:measure_terms, [parent, source, limits, retained]},
+             {:measure_control, [parent, source, limits, retained]},
              native_limits
            ),
          destination_words = words + report.live_words + 14,

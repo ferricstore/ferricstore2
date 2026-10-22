@@ -1,6 +1,8 @@
 defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
   use ExUnit.Case, async: false
   alias Ferricstore.PolicyRuntimeCapture, as: Capture
+  alias Ferricstore.PolicyRuntimeCapture.Input
+  alias Ferricstore.PolicyRuntimeCapture.Native
   alias Ferricstore.PolicyRuntimeCaptureTest, as: SourceTest
   alias Ferricstore.TermCodec
 
@@ -155,6 +157,64 @@ defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
       assert queries == %{atoms: [], exports: []}
       assert Enum.reduce(1..128, deep, fn _, {inner} -> inner end) == nil
     end)
+  end
+
+  test "query_admission_composes_unmasked_actual_prior_roots" do
+    SourceTest.bootstrap!()
+    prior = :erlang.make_tuple(52, nil)
+    name = :binary.copy("q")
+    queries = %{atoms: [name], exports: []}
+    actual_roots = [prior, queries]
+    defaults = SourceTest.limits()
+    assert tuple_size(prior) == 52
+    assert Enum.all?(Tuple.to_list(prior), &is_nil/1)
+    assert byte_size(name) == 1
+    assert :binary.referenced_byte_size(name) == 1
+    assert Atom.to_string(:q) == name
+    assert {:ok, report} = Native.capture_terms({:measure_terms, actual_roots}, defaults)
+    assert Enum.sort(Map.keys(report)) == [:live_pinned_bytes, :live_terms, :live_words]
+    assert report.live_words == 92
+    assert report.live_pinned_bytes == 736
+    assert report.live_words + 8 <= defaults.decoded_words
+    assert report.live_pinned_bytes + 64 <= defaults.pinned_bytes
+
+    retained = %{
+      decoded_words: report.live_words + 8,
+      pinned_bytes: report.live_pinned_bytes + 64
+    }
+
+    assert retained == %{decoded_words: 100, pinned_bytes: 800}
+    word_limits = Map.put(defaults, :decoded_words, 200)
+    pin_limits = Map.put(defaults, :pinned_bytes, 1_500)
+
+    results = [
+      Input.query(queries, word_limits),
+      Input.query(queries, pin_limits),
+      Input.query_admission(queries, word_limits, retained),
+      Input.query_admission(queries, pin_limits, retained),
+      Input.query_admission(queries, defaults, retained)
+    ]
+
+    observed = %{atoms: %{name => true}, exports: %{}}
+    diagnostic = inspect(results, limit: 40, printable_limit: 120)
+    assert Enum.at(results, 0) == {:ok, observed}, diagnostic
+    assert Enum.at(results, 1) == {:ok, observed}, diagnostic
+    assert Enum.at(results, 2) == {:error, {:limit, :decoded_words}}, diagnostic
+    assert Enum.at(results, 3) == {:error, {:limit, :pinned_bytes}}, diagnostic
+
+    assert Enum.at(results, 4) ==
+             {:ok, observed, %{decoded_words: 256, pinned_bytes: 2_049}},
+           diagnostic
+
+    assert tuple_size(prior) == 52
+    assert Enum.all?(Tuple.to_list(prior), &is_nil/1)
+    assert actual_roots == [prior, queries]
+    assert queries == %{atoms: [name], exports: []}
+    assert byte_size(name) == 1
+    assert :binary.referenced_byte_size(name) == 1
+    assert retained == %{decoded_words: 100, pinned_bytes: 800}
+    assert Map.delete(word_limits, :decoded_words) == Map.delete(defaults, :decoded_words)
+    assert Map.delete(pin_limits, :pinned_bytes) == Map.delete(defaults, :pinned_bytes)
   end
 
   defp with_captures([], _queries, results, body), do: body.(Enum.reverse(results))

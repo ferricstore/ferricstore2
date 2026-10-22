@@ -5,6 +5,12 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The latest runtime capture checkpoint passes **all 24 tests on macOS**, including
+the original-limits ownership and deep-metadata extension regressions. Its strict
+native build and complete compiler/header/library pins pass. Full runtime
+accounting, Rust source profiles, original Elixir parity and Linux acceptance
+remain open.
+
 The same-type ETF/V2 interoperability batch is implemented and validated on
 macOS. Real SET, GET and Core patches preserve complete values, original unknown
 bytes and actual predecessor/context authority across both formats. Six approved
@@ -128,17 +134,17 @@ genuinely bootstrapped and encoded on the exact VM. LLDB reported "no such
 process" when attaching to its recorded PID; no live slot or provider bytes were
 obtained. The owned VM shut down cleanly. This result is inconclusive, with no
 live-provider or Linux credit; the underlying attach cause is unestablished.
-The next original-control regression executes **twenty-two tests: twenty-one
-pass and one fails**, with all 1,492 captured repository inputs unchanged. A
+The original-control regression was frozen in `b48c4b5` after **twenty-two tests:
+twenty-one passing and one failing**, with all 1,492 repository inputs unchanged. A
 genuine compact 600 KB ignored limits value is accepted under a 128 KB pin cap;
 the first typed refusal assertion fails. Both healthy controls returned success,
 but their later field/hash/reuse/extension assertions remain unexecuted. The
-source repair is still pending. Reusing the current depth-limited measurement
+repair was pending at that checkpoint. Reusing the depth-limited measurement
 without further work would narrow accepted metadata; that is not an accepted
 fix. Earlier tiny query caps may also refuse at the new control gate, so future
 green assertions alone must not be credited as query-guard branch coverage.
-The separate healthy-depth regression now executes **twenty-three tests:
-twenty-one pass and two fail**, preserving all 1,492 captured repository inputs.
+The healthy-depth regression was frozen in `3003c81` after **twenty-three tests:
+twenty-one passing and two failing**, preserving all 1,492 repository inputs.
 Fresh capture accepts actual 128-level ignored tuple metadata with the unchanged
 64-level policy limit and passes its ABI, hash and empty-observation assertions.
 The one empty extension then incorrectly returns a depth refusal; later
@@ -146,6 +152,22 @@ continuity and reuse assertions remain unexecuted. Both new regressions precede
 their source repairs. Administrative traversal must be bounded independently of
 semantic policy depth, with its frontier allocation charged before allocation;
 the old depth checks and original test limits remain required.
+The reviewed repair now passes **all twenty-four capture tests**, with all 1,492
+repository inputs unchanged. Fresh capture admits the actual complete original
+limits and verified context before preparation, preserving scalar error order.
+Administrative metadata uses a paid explicit work stack; every growth request
+is checked before allocation and its cumulative credit is retained through
+cleanup. Semantic policy-depth checks remain unchanged. Both complete owner and
+deep-extension identities now pass every assertion, including healthy controls,
+hashes, continuity, original-input reuse and cleanup. A supplemental direct
+query test uses actual prior roots to exercise cumulative per-row refusals and
+an adequate positive without the earlier wrapper gate; this is coverage added
+after query implementation, not preimplementation TDD. All earlier test bodies
+and caps remain unchanged. Strict native compilation passes with the same 89
+OTP headers and all 302 compiler inputs pinned through execution. Requested
+buffer storage is accounted for; allocator overhead, total native stack/RSS,
+opaque resource graphs, first-message/crypto/retirement accounting and actual
+BEAM sort-provider correspondence remain separate open duties.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific
