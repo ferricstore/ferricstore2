@@ -41,6 +41,7 @@ mod activated_priority;
 mod admission;
 mod fifo_indexes;
 mod fifo_middle_cancel;
+mod fifo_mixed_due;
 mod fifo_reclaim;
 mod fifo_step_entry;
 mod fifo_transition_unblock;

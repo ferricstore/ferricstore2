@@ -5,7 +5,28 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The active native component regression checkpoint runs **40 tests on macOS:
+The active native checkpoint runs **40 tests on macOS: 32 pass and eight fail**.
+All six frozen direct component regressions now pass against the real native
+kernel. They execute registration and caller authority, reference/epoch binding,
+repeated-report charging and terminal single use, cancellation and reuse,
+owner-loss/abandon/close tombstones, and keeper-death isolation. All 26 preceding
+passes are conserved. The remaining eight failures require public Budget/Capture
+integration and complete accounting; the Native entry witness now receives
+`:unmanaged` from the still-unregistered legacy Capture keeper.
+
+The kernel uses the pinned tree, one active permit, atomic word/pin accounting
+and a single cleanup owner. Independent reviews caught and repaired guard ordering
+and pre-bind phase advancement; actual strict compilation caught incompatible
+integer parser pointers, corrected with the public NIF type. The unchanged tests
+were frozen in `03be370` before implementation. The strict build now binds 304
+compiler inputs, 90 OTP headers and twelve tool sources; the actual tree header
+is the sole added compiler input. All 1,813 repository/native inputs stayed
+unchanged during the final runtime run. This establishes the native component
+increment, with internal cleanup races still source-reviewed rather than parked
+by a debug hook. Public BEAM cohorts, parent/source and encoder accounting,
+original profiles, full parity and Linux acceptance remain open.
+
+The preceding frozen native component checkpoint runs **40 tests on macOS:
 26 pass and fourteen fail**. Six direct Native cases use real self-registering
 keepers, owning processes and ordinary references. The first reaches the loaded
 zero-word registration refusal; the other five reach the loaded registration
@@ -17,8 +38,8 @@ source, including independent terminal progress and original-cap bounds.
 Its longest test is 96 lines (97 including the following separator).
 The unchanged NIF still binds 303 compiler inputs and 89 OTP headers; the new
 test joins twelve capture-tool source bindings. All 1,811 repository/native
-inputs stayed unchanged during the final actual run. Freeze these direct
-component regressions before releasing the native-only `budget.inc` kernel.
+inputs stayed unchanged during that actual run. These direct component
+regressions were frozen before releasing the native-only `budget.inc` kernel.
 Public Budget/Capture integration and complete BEAM accounting remain separate.
 
 The preceding runtime capture regression checkpoint runs **34 tests on macOS:
@@ -59,15 +80,28 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **966 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **967 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
-all four cached offline dependency-audit categories pass. All 1,501 captured
+all four cached offline dependency-audit categories pass. The full check script
+exited 1 only when its online advisory refresh could not resolve GitHub; the
+remaining audit then passed with explicit `--offline`. All 1,506 captured
 repository inputs stayed unchanged through that sequence, excluding only the
 three append-only peer review notes. No fresh advisory or Linux result is claimed.
 
-The newest source-derived FIFO counterpart executes the complete pure
+The newest mixed-state counterpart publishes both original parallel Creates,
+then actually selects and claims the earlier-due entry under the mixed FIFO and
+Parallel state filter. Both saved index sets start empty and advance through
+actual indexed deltas. Four source links preserve the two Create acceptances,
+actual singleton selection and returned earlier ID; source payloads and deadlines
+remain exact. The focused claim target passes 29 tests and the complete checkpoint
+above passes. Independent performance review verifies the entire parent and
+ledger inverses. Prepared policy remains fixture authority; public committed
+installation, mixed planner dispatch, projections, durability, profiles and Linux
+acceptance remain open. This is existing-behavior coverage, without a new TDD RED.
+
+The preceding source-derived FIFO counterpart executes the complete pure
 selection/StepContinue/actual-guard Retry/FIFO-activation sequence. Its six inline
 observations preserve both Creates, actual first selection, Step and Retry
 success, and actual final singleton/waiting ID. Activation uses actual mode
@@ -2414,7 +2448,7 @@ remain historical evidence; they are not the current verification totals.
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
 [progress ledger](../tests/parity/workflow-progress.json) now has **89 reviewed
-source declarations, 99 counterpart records and 406 assertion links**. Links
+source declarations, 100 counterpart records and 410 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

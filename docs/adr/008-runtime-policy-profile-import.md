@@ -111,7 +111,7 @@ registry, resource, persistent environment, monitor or message is instantiated
 by those bodies. Existing capture behavior and the frozen 28 test bodies remain
 unchanged. Compiling this interface establishes no functional protocol success.
 
-The separately released kernel will enforce one active permit with authoritative
+The separately released native kernel enforces one active permit with authoritative
 consumed debt and disjoint unused credit in both word and pin banks. Public
 sessions remain PIDs; private continuations bind the actual resource, epoch,
 owner and copied request reference. An owned environment and public NIF copy and
@@ -137,6 +137,16 @@ Direct component regressions belong in
 keepers and owners. Their empty-native opening bank excludes fixture storage;
 they establish neither public Capture readiness nor full pipeline accounting.
 
+The native kernel now passes all six frozen component regressions on macOS,
+preserving the preceding 26 passing capture cases. The complete suite still has
+eight public integration/accounting failures. Its actual strict build binds the
+pinned tree header in the compiler and header closure. Parser destinations use
+the public `ErlNifUInt64` type; equal-width C integer pointers are not interchangeable.
+Bound-state validation precedes saved-owner/reference comparisons and any phase
+advance that would prevent the initial bind. Early cancellation cleanup remains
+permitted. These source and runtime results do not establish execution of internal
+cleanup interleavings, public BEAM constructor accounting or Linux acceptance.
+
 An occupied session's operational Busy refusal precedes reference, monitor and
 request construction. A short global registry-lock collision has a separate
 same-PID tail retry before those allocations; the real wrapper needs its own
@@ -153,8 +163,8 @@ Real kernel and metered public integration require separate releases after
 genuine behavioral failure evidence. Valid 32-byte parent backing before IPC,
 exceptional source checks, the complete control/terminal constructor census,
 encoder metering, original profiles and both operating systems remain required.
-No fixed fee, source-cost closure or complete producer acceptance follows from
-this rejecting interface.
+No complete public fee census, source-cost closure or producer acceptance follows
+from the rejecting public Budget interface or the native-only kernel.
 
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported
