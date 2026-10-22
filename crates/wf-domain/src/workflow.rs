@@ -30,7 +30,9 @@ pub use command::{
 pub use plan::{Outcome, RecordWrite, TransitionPlan};
 
 use create_claim::{claim_record, create_record};
-use lifecycle::{cancel_record, extend_record, terminal_record, transition_record};
+use lifecycle::{
+    cancel_record, extend_record, step_continue_record, terminal_record, transition_record,
+};
 use retry_transition::{policy_retry_record, retry_record};
 use validation::{require_record, validate_run_at};
 
@@ -278,6 +280,8 @@ fn reduce_profile(
         ),
         Operation::ExtendLease(extend) => extend_record(require_record(record)?, command, extend),
         Operation::Cancel(cancel) => cancel_record(require_record(record)?, command, cancel),
-        Operation::StepContinue(_) => Err(DomainError::UnsupportedOperation),
+        Operation::StepContinue(step) => {
+            step_continue_record(require_record(record)?, command, step)
+        }
     }
 }

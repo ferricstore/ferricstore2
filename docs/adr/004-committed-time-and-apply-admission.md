@@ -181,8 +181,10 @@ This stage selects no wire or schema migration. Existing public/independent
 allowlists, command/intent/response tags and storage event tables stay closed;
 new core-only values receive explicit unsupported errors at those adapters.
 [ADR-006](006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition)
-retains its eight-mutation wire profile. The guarded body, complete original
-six-assertion selection/Step/actual-guard Retry/FIFO-activation case, durable
+retains its eight-mutation wire profile. The guarded body now passes the eight
+unchanged tests frozen against its rejecting shell; see the handoff for the
+complete macOS checkpoint. The complete original six-assertion
+selection/Step/actual-guard Retry/FIFO-activation case, durable
 codecs/public orchestration, governance, profiles and both Linux/macOS execution
 remain required. Unit coverage alone will not certify those successors.
 

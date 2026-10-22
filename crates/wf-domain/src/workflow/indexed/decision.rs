@@ -142,6 +142,11 @@ pub(super) fn next_ordering(
     let record = &write.record;
     let after_mode = view.mode(record)?;
     if after_mode == StateMode::Fifo
+        && matches!(item.item.command.operation, Operation::StepContinue(_))
+    {
+        return Ok(Err(IndexRejection::DirectRunningFifoEntry));
+    }
+    if after_mode == StateMode::Fifo
         && priority != 0
         && active(record)
         && matches!(

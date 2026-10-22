@@ -23,11 +23,11 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **957 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **965 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
-all four cached offline dependency-audit categories pass. All 1,497 captured
+all four cached offline dependency-audit categories pass. All 1,500 captured
 repository inputs stayed unchanged through that sequence, excluding only the
 three append-only peer review notes. No fresh advisory or Linux result is claimed.
 
@@ -43,12 +43,14 @@ durability and complete required profiles still open.
 The current pure-operation increment is atomic StepContinue: keep physical running,
 rotate the actual lease token/fence once, change logical state and preserve entry
 order through actual-guard Retry and later FIFO activation. The reviewed interface
-scaffold passed the complete checkpoint above with execution explicitly refused
+scaffold passed its 957-test checkpoint with execution explicitly refused
 and wire/storage profiles closed. Its two new boundary tests and one architecture
 test account for the three additional tests. The approved three-file, eight-test
 behavior suite was frozen in `94e7dc1` after genuine runtime RED. The guarded body
-now passes all eight unchanged tests; complete current-workspace validation is
-pending. Wire/storage profiles remain closed. Reciprocal review preserved the
+now passes all eight unchanged tests and the complete 965-test checkpoint above.
+Independent architecture and performance reviews accepted all six changed source
+files and verified the held boundaries and frozen tests. Wire/storage profiles
+remain closed. Reciprocal review preserved the
 source's unconditional running-FIFO rejection. The full original six-assertion
 case, public/durable codecs and profiles remain required; selected unit tests
 alone will not certify that case.

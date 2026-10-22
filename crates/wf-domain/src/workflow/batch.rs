@@ -8,7 +8,9 @@ use wf_types::identity::{GroupId, PartitionId};
 use crate::claim::ScopedRecordId;
 use crate::policy::InstalledRetryPolicy;
 
-use super::admission::{AdmissionError, AdmissionLimits, add, admit_command, record_bytes};
+use super::admission::{
+    AdmissionError, AdmissionLimits, add, admit_command, record_bytes, step_continue_bytes,
+};
 use super::{
     CommittedCommand, DomainError, Operation, TransitionPlan, WorkflowRecord, reduce_with_policy,
 };
@@ -286,6 +288,12 @@ fn admitted_with_identity<'input, K: Ord>(
                 admit_retry_policy(record, policy, limits, &mut total)?;
             }
             if let Err(error) = limits.check_total(total) {
+                return Ok(Err(BatchRejection::Admission(error)));
+            }
+            if let Err(error) = step_continue_bytes(record, item.command, limits)
+                .and_then(|bytes| add(&mut total, bytes))
+                .and_then(|()| limits.check_total(total))
+            {
                 return Ok(Err(BatchRejection::Admission(error)));
             }
         }

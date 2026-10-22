@@ -132,8 +132,9 @@ public prepared/retained and application boundaries remain implementation work.
 
 The [selected StepContinue core](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-stepcontinue-core)
 keeps committed ownership and a deterministic raw-owner/time/fence token in the
-pure domain, with typed DirectRunningFifoEntry refusal. Its first stage is a
-rejecting interface shell, followed by frozen runtime RED and guarded behavior.
+pure domain, with typed DirectRunningFifoEntry refusal. The guarded body follows
+a rejecting interface shell and genuinely frozen runtime RED; all eight unchanged
+behavior tests now pass in the complete macOS checkpoint.
 [The wire profile](adr/006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition),
 public/independent callers and storage event codecs remain explicitly unsupported
 for this operation. This selection completes no source scenario or durability gate.

@@ -38,7 +38,6 @@ pub struct Transition {
 }
 
 /// Inputs for advancing a logical step while retaining a running lease.
-/// Execution is currently rejected as unsupported.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct StepContinue {
     /// Current running ownership proof.
@@ -81,7 +80,7 @@ pub struct Cancel {
     pub error: Option<Vec<u8>>,
 }
 
-/// Typed single-record operations, including explicitly refused variants.
+/// Typed single-record operations.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Operation {
     /// Create one new record.
@@ -92,7 +91,7 @@ pub enum Operation {
     Reclaim(Claim),
     /// Change to a nonterminal state.
     Transition(Transition),
-    /// Advance a running logical step; currently rejected as unsupported.
+    /// Advance a running logical step while retaining current ownership.
     StepContinue(StepContinue),
     /// Complete the current run.
     Complete(Terminal),

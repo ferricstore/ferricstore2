@@ -302,6 +302,40 @@ pub fn record_bytes(
     Ok(total)
 }
 
+pub(super) fn step_continue_bytes(
+    record: &WorkflowRecord,
+    command: &CommittedCommand,
+    limits: AdmissionLimits,
+) -> Result<usize, AdmissionError> {
+    if !matches!(command.operation, Operation::StepContinue(_))
+        || record.version().checked_add(1).is_none()
+    {
+        return Ok(0);
+    }
+    let Some(lease) = record.lease() else {
+        return Ok(0);
+    };
+    let Some(fence) = record.fence().checked_next() else {
+        return Ok(0);
+    };
+    let mut bytes = lease.worker.len();
+    add(&mut bytes, 2)?;
+    for mut value in [command.now.get(), fence.get()] {
+        add(&mut bytes, 1)?;
+        while value >= 10 {
+            value /= 10;
+            add(&mut bytes, 1)?;
+        }
+    }
+    if bytes > limits.inline_bytes() {
+        return Err(AdmissionError::ValueTooLarge {
+            bytes,
+            maximum: limits.inline_bytes(),
+        });
+    }
+    Ok(bytes)
+}
+
 pub(super) fn add(total: &mut usize, bytes: usize) -> Result<(), AdmissionError> {
     *total = total
         .checked_add(bytes)
