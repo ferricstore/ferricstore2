@@ -140,6 +140,52 @@ Opaque external blob references remain rejected until a replicated availability
 protocol is implemented; source blob guarantees still require an equivalent
 validated port before full parity.
 
+### Selected pure committed StepContinue core
+
+STEP-CONTINUE1 P2/P3 selects a typed `StepContinue`, `StepContinued` history kind
+and `DirectRunningFifoEntry` rejection within the existing pure domain. The first
+stage is a representable interface with a rejecting `UnsupportedOperation` shell.
+Freeze positive tests and demonstrate an actual runtime RED before implementing
+the guarded behavior. API scaffolding precedes those tests; a missing enum name
+is not behavioral RED. The exact thirteen existing homes and three cohesive
+400-line unit children are recorded in the
+[architecture selection](../reviews/workflow-completion-architecture.md).
+
+The selected behavior preserves global ID/time/fence checks and normalized
+state/deadline validation, then checks actual running token/fence, logical source,
+nonempty actual owner and optional worker equality, and terminal destination.
+It adds no expiry predicate for an unreclaimed current lease. One touched write
+and history keep physical running, replace logical state, increment version and
+fence once, retain owner and derive token from raw owner bytes, decimal committed
+time and next fence separated by colons. No host clock, randomness, UTF-8 owner
+conversion or caller-supplied new token participates. Optional payload preserves
+omitted versus present-empty. Equal logical state rotates the lease without a
+new entry ordinal; an accepted logical change uses the actual committed entry
+order. The source FIFO-entry guard refuses physical running before its partition
+or priority alternatives. The typed indexed route places that refusal after the
+core plan and actual target-mode resolution, before its existing FIFO-priority
+and ordinal logic, including priority zero and equal-state FIFO entry. Earlier
+batch admission, placement and core guard failures retain their existing order.
+
+Prospective admission measures generated token length
+`N = actual_owner.len() + 2 + digits(now) + digits(checked_next_fence)`, with
+`digits(0) = 1`, without constructing token or decimal buffers. Copied command and
+current-record bytes plus N remain in the same unchanged checked `4*V + 1024`
+per-item account and inline cap. Missing lease or overflowing counters do not
+manufacture a generated output. Profiled admission may refuse oversized inputs
+before core guard errors; this is not a full public malformed-option precedence
+contract. This logical estimate proves no native allocation count or RSS bound.
+Bare legacy reduction remains unprofiled.
+
+This stage selects no wire or schema migration. Existing public/independent
+allowlists, command/intent/response tags and storage event tables stay closed;
+new core-only values receive explicit unsupported errors at those adapters.
+[ADR-006](006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition)
+retains its eight-mutation wire profile. The guarded body, complete original
+six-assertion selection/Step/actual-guard Retry/FIFO-activation case, durable
+codecs/public orchestration, governance, profiles and both Linux/macOS execution
+remain required. Unit coverage alone will not certify those successors.
+
 ## Verification and deployment gates
 
 Before M1 acceptance, execute independent source-derived admission/model cases

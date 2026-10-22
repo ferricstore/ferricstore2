@@ -228,6 +228,8 @@ pub enum IndexRejection {
     Batch(BatchRejection),
     /// Creation priority is outside the source bands zero through two.
     InvalidPriority,
+    /// Source rejects direct running entry into a FIFO logical state.
+    DirectRunningFifoEntry,
     /// Source FIFO entry permits priority zero only.
     FifoPriority,
     /// Named claim/reclaim is not the real authoritative FIFO head.

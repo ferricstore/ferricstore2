@@ -155,6 +155,22 @@ See [the architecture review](reviews/infrastructure-architecture-review.md)
 for actual checks, reciprocal findings and dispositions, and
 [CONTINUE.md](CONTINUE.md) for the next authorized work.
 
+### Pure committed StepContinue boundaries
+
+The [selected core contract](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-stepcontinue-core)
+uses the existing domain purity and ports/value classifications. Its source unit
+children retain the runtime 400-line limit and every function remains within100
+physical lines. The named architecture regression
+`step_continue_core_stays_pure_and_server_side` checks approved imports, effect
+refusal and value/client facade separation for these actual homes and types.
+No parser, graph, allowlist, dependency or size-policy exemption is selected.
+
+These source checks differ from the typed guard, generated-byte and entry-order
+tests and the closed response/event boundary controls. The
+[eight-mutation wire profile](adr/006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition)
+stays closed. Neither source checks nor unit boundaries establish durable or
+public operation support, the complete original case or Linux/macOS parity.
+
 ## Pure storage value boundary
 
 ARCH-NEXT-M2-STATE-CONTRACT1-CREATE1 applies the existing pure-source rules to

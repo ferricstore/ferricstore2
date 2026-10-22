@@ -24,7 +24,9 @@ pub mod indexed;
 pub mod request;
 pub mod restoration;
 
-pub use command::{Cancel, CommittedCommand, Create, Operation, Terminal, Transition};
+pub use command::{
+    Cancel, CommittedCommand, Create, Operation, StepContinue, Terminal, Transition,
+};
 pub use plan::{Outcome, RecordWrite, TransitionPlan};
 
 use create_claim::{claim_record, create_record};
@@ -227,6 +229,7 @@ fn reduce_profile(
     }
     let fence = match &command.operation {
         Operation::Transition(transition) => Some(transition.fence),
+        Operation::StepContinue(step) => Some(step.guard.fence),
         Operation::Complete(terminal) | Operation::Fail(terminal) => Some(terminal.guard.fence),
         Operation::Retry(retry) => Some(retry.guard.fence),
         Operation::RetryWithPolicy(retry) => Some(retry.guard.fence),
@@ -275,5 +278,6 @@ fn reduce_profile(
         ),
         Operation::ExtendLease(extend) => extend_record(require_record(record)?, command, extend),
         Operation::Cancel(cancel) => cancel_record(require_record(record)?, command, cancel),
+        Operation::StepContinue(_) => Err(DomainError::UnsupportedOperation),
     }
 }

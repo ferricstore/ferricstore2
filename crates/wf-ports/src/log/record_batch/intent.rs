@@ -134,7 +134,9 @@ fn operation(
         Operation::RetryWithPolicy(_) => 8,
         Operation::ExtendLease(_) => 9,
         Operation::Cancel(_) => 10,
-        Operation::Claim(_) | Operation::Reclaim(_) => return Err(CodecError::UnsupportedTag),
+        Operation::Claim(_) | Operation::Reclaim(_) | Operation::StepContinue(_) => {
+            return Err(CodecError::UnsupportedTag);
+        }
     }]);
     match value {
         Operation::Create(value) => {
@@ -205,6 +207,8 @@ fn operation(
             }
             optional_raw(hash, bytes, value.error.as_deref())
         }
-        Operation::Claim(_) | Operation::Reclaim(_) => Err(CodecError::UnsupportedTag),
+        Operation::Claim(_) | Operation::Reclaim(_) | Operation::StepContinue(_) => {
+            Err(CodecError::UnsupportedTag)
+        }
     }
 }

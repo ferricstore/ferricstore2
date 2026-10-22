@@ -232,6 +232,10 @@ fn command_bytes(
             ],
             &[transition.payload.as_deref()],
         ),
+        Operation::StepContinue(step) => (
+            &[&step.from, &step.to, step.guard.token.as_bytes()],
+            &[step.worker.as_deref(), step.payload.as_deref()],
+        ),
         Operation::Complete(terminal) | Operation::Fail(terminal) => (
             &[terminal.guard.token.as_bytes()],
             &[terminal.payload.as_deref(), terminal.value.as_deref()],

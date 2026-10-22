@@ -27,6 +27,8 @@ pub enum EventKind {
     Claimed,
     /// Dedicated nonterminal state transition.
     Transitioned,
+    /// A running lease continued into a logical step.
+    StepContinued,
     /// Successful terminal effect.
     Completed,
     /// Failed terminal effect.
@@ -57,6 +59,7 @@ impl EventKind {
             Self::Created => "created",
             Self::Claimed => "claimed",
             Self::Transitioned => "transitioned",
+            Self::StepContinued => "step_continued",
             Self::Completed => "completed",
             Self::Failed => "failed",
             Self::Retry => "retry",

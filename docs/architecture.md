@@ -130,6 +130,14 @@ guarded policy timing. The private explicit-sample path stays separate. These
 mathematical values do not establish authorization or durable submission; the
 public prepared/retained and application boundaries remain implementation work.
 
+The [selected StepContinue core](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-stepcontinue-core)
+keeps committed ownership and a deterministic raw-owner/time/fence token in the
+pure domain, with typed DirectRunningFifoEntry refusal. Its first stage is a
+rejecting interface shell, followed by frozen runtime RED and guarded behavior.
+[The wire profile](adr/006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition),
+public/independent callers and storage event codecs remain explicitly unsupported
+for this operation. This selection completes no source scenario or durability gate.
+
 ## Command execution and durability
 
 1. Authenticate and enforce tenant, request and payload bounds at the edge. Construct typed command and idempotency key.

@@ -37,6 +37,24 @@ pub struct Transition {
     pub payload: Option<Vec<u8>>,
 }
 
+/// Inputs for advancing a logical step while retaining a running lease.
+/// Execution is currently rejected as unsupported.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct StepContinue {
+    /// Current running ownership proof.
+    pub guard: LeaseGuard,
+    /// Expected logical run state, distinct from the physical running label.
+    pub from: Vec<u8>,
+    /// Nonterminal logical destination; the running label is forbidden.
+    pub to: Vec<u8>,
+    /// Optional expected owner; omission retains the actual current owner.
+    pub worker: Option<Vec<u8>>,
+    /// Positive lease duration relative to committed command time.
+    pub lease_ms: u64,
+    /// Optional replacement payload; empty bytes differ from omission.
+    pub payload: Option<Vec<u8>>,
+}
+
 /// Inputs shared by complete and fail, whose effect remains distinct.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Terminal {
@@ -63,7 +81,7 @@ pub struct Cancel {
     pub error: Option<Vec<u8>>,
 }
 
-/// Only the implemented single-record operation surface is representable.
+/// Typed single-record operations, including explicitly refused variants.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Operation {
     /// Create one new record.
@@ -74,6 +92,8 @@ pub enum Operation {
     Reclaim(Claim),
     /// Change to a nonterminal state.
     Transition(Transition),
+    /// Advance a running logical step; currently rejected as unsupported.
+    StepContinue(StepContinue),
     /// Complete the current run.
     Complete(Terminal),
     /// Fail the current run.

@@ -201,3 +201,63 @@ fn assert_record_batch_exports() -> CheckResult<()> {
     }
     Ok(())
 }
+
+#[test]
+fn step_continue_core_stays_pure_and_server_side() -> CheckResult<()> {
+    for module in [
+        "workflow::command",
+        "workflow::lifecycle",
+        "workflow::admission",
+        "workflow::indexed",
+        "workflow::indexed::decision",
+        "history",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-domain",
+                module,
+                "use std::collections::BTreeMap; use crate::lease::LeaseGuard; use wf_types::version::Fence;"
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "unclassified standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+        ] {
+            let findings = source_check("wf-domain", module, source)?;
+            assert!(
+                findings.iter().any(|finding| finding.contains(diagnosis)),
+                "{module}: {findings:?}"
+            );
+        }
+    }
+    for path in [
+        "workflow::StepContinue",
+        "workflow::indexed::IndexRejection",
+        "history::EventKind",
+    ] {
+        for (package, module, prefix, diagnosis) in [
+            (
+                "wf-wire",
+                "value",
+                "wf_domain",
+                "wire may reference only wf_domain::value",
+            ),
+            ("wf-ports", "client", "wf_domain", "client port facade"),
+            (
+                "wf-domain",
+                "value",
+                "crate",
+                "approved domain value module",
+            ),
+        ] {
+            let source = format!("pub use {prefix}::{path};");
+            let findings = source_check(package, module, &source)?;
+            assert!(
+                findings.iter().any(|finding| finding.contains(diagnosis)),
+                "{package}::{module}: {findings:?}"
+            );
+        }
+    }
+    Ok(())
+}

@@ -208,3 +208,17 @@ pub fn decode_record(
 ) -> Result<StoredWorkflowRecord, StateValueError> {
     scan::scan_legacy(bytes, group, recovery, limits, maximum_bytes)?.into_owned(usize::MAX)
 }
+
+#[cfg(test)]
+#[test]
+fn step_continue_event_keeps_storage_wire_closed() {
+    assert_eq!(
+        event_tag(EventKind::StepContinued),
+        Err(StateValueError::InvalidValue)
+    );
+    assert_eq!(event(13), Err(StateValueError::UnsupportedTag));
+    assert_eq!(event_tag(EventKind::Created), Ok(0));
+    assert_eq!(event(0), Ok(EventKind::Created));
+    assert_eq!(event_tag(EventKind::ChildrenSpawned), Ok(12));
+    assert_eq!(event(12), Ok(EventKind::ChildrenSpawned));
+}

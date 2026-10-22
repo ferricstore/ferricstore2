@@ -15,7 +15,7 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **954 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **957 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
@@ -34,11 +34,15 @@ durability and complete required profiles still open.
 
 The next missing pure operation is atomic StepContinue: keep physical running,
 rotate the actual lease token/fence once, change logical state and preserve entry
-order through actual-guard Retry and later FIFO activation. Architecture selected
-the precise interface-shell, frozen behavioral RED and guarded-body stages after
-reciprocal review caught unconditional running-FIFO rejection and closed-codec
-requirements. The full original six-assertion case, public/durable codecs and
-profiles remain required; selected unit tests alone will not certify that case.
+order through actual-guard Retry and later FIFO activation. The reviewed interface
+scaffold passes the complete checkpoint above while explicitly refusing execution
+and retaining closed wire/storage profiles. Its two new boundary tests and one
+architecture test account for the three additional tests. The approved three-file,
+eight-test behavior suite must reach and freeze real runtime RED against this
+scaffold before the guarded body is released. Reciprocal review preserved the
+source's unconditional running-FIFO rejection. The full original six-assertion
+case, public/durable codecs and profiles remain required; selected unit tests
+alone will not certify that case.
 
 The preceding source-derived FIFO counterpart transitions the first claimed flow
 from running to waiting outside its queued FIFO state, using its actual returned
@@ -60,13 +64,16 @@ unchanged original Elixir case stopped in Mix.PubSub TCP startup with `:eperm`
 before any test ran. Public setup, committed policy installation, durable
 publication, original profiles and full source parity remain open.
 
-The indexed-batch benchmark passes optimized correctness smoke. Exactly four
+The indexed-batch benchmark at the preceding `f059de5` code epoch passes optimized
+correctness smoke. Exactly four
 ABBA blocks (16 processes, 1,280 sample rows) compare immutable A/B artifacts with
 matching compiler, profile, features and complete flags. Accepted singleton
 B/A=0.9843 fails the predeclared 5% gain and noise rules; several bulk controls also
 fail their 2% overall or 5% block gates. Independent performance review recomputes
 every process statistic and exact rational comparison. The original product
-source is restored byte for byte and passes the complete checkpoint above.
+source was restored byte for byte and passed that epoch's 954-test checkpoint.
+These measurements precede the StepContinue interface addition and do not measure
+the current workspace.
 Preserve both recorded artifacts in their reserved target roots. CPU model/core
 counts remain unavailable; these are exploratory same-host macOS component
 measurements, without allocation-count, Linux, p99 or M8 acceptance.

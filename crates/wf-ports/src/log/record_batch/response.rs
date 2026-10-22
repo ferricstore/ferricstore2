@@ -32,6 +32,7 @@ pub(in crate::log) fn push_rejection(
 ) -> Result<(), CodecError> {
     bytes.push(1);
     match reason {
+        IndexRejection::DirectRunningFifoEntry => return Err(CodecError::UnsupportedTag),
         IndexRejection::InvalidPriority => bytes.extend_from_slice(&[4, 0]),
         IndexRejection::FifoPriority => bytes.extend_from_slice(&[5, 0]),
         IndexRejection::NotFifoHead => bytes.extend_from_slice(&[6, 0]),
@@ -286,4 +287,13 @@ fn decoded_domain(code: u8, detail: Option<u8>) -> Result<DomainError, CodecErro
         22 => DomainError::UnsupportedOperation,
         _ => return Err(CodecError::UnsupportedTag),
     })
+}
+
+#[cfg(test)]
+#[test]
+fn step_continue_rejection_keeps_wire_profile_closed() {
+    let rejected = IndexedDecision::Rejected(IndexRejection::DirectRunningFifoEntry);
+    assert_eq!(encode(&rejected), Err(CodecError::UnsupportedTag));
+    assert_eq!(rejection(&[1, 7, 0]), Err(CodecError::UnsupportedTag));
+    assert_eq!(rejection(&[1, 5, 0]), Ok((IndexRejection::FifoPriority, 3)));
 }

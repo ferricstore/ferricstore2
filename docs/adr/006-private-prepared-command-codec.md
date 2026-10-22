@@ -1221,6 +1221,12 @@ The eight supported mutations are Create, Transition, Complete, Fail, Retry,
 RetryWithPolicy, ExtendLease and Cancel. Named Claim/Reclaim remain available
 through the old codec and their appropriate data-reply paths.
 
+The [selected pure StepContinue core](004-committed-time-and-apply-admission.md#selected-pure-committed-stepcontinue-core)
+is not a ninth Registry5 mutation. Its command and intent encoders return
+UnsupportedTag; the new DirectRunningFifoEntry response reason also remains
+unsupported. Existing decoder/tag grammar and independent/public allowlists stay
+closed. No operation, response or history tag/version is added by that core stage.
+
 One existing request inspection precedes all Fresh current-record, retry-policy
 and index work. Fresh checks effective committed time, binds exact derived keys
 and each present payload/result/error occurrence, then calls the existing
@@ -1230,9 +1236,9 @@ signature lifetime splits keep returned predecessor references tied solely to
 the authoritative view. Scratch, decoded operation, keys and isolation drop
 before namespace/request owners move into retention.
 
-The private retained response version1 is acceptance `[0]` or an exhaustive
-business-rejection code and scalar payload of at most19 bytes. Explicit matches
-preserve every selected Domain/Admission/Batch/Index code; Rust enum layouts are
+The private retained response version1 is acceptance `[0]` or a business-rejection
+code exhaustive for this selected wire profile, with scalar payload of at most19 bytes. Explicit matches
+preserve every supported Domain/Admission/Batch/Index code; Rust enum layouts are
 not serialized. Typed status and immutable original time/position/expiry remain
 bound to the response. Operational decode, resource, authority, allocation and
 expiry errors are never retained as business outcomes. Replay borrows its exact
