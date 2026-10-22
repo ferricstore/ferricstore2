@@ -49417,3 +49417,95 @@ entire-byte equal through Root's unique81LF inverse. Source case/metadata work
 remains pending its complete-quality commit; CONTINUE honestly records28/2.
 Complete B2 failure/concurrent protocol design and all full-goal duties remain
 active. No Root validation handle is live after this terminal result.
+
+
+## Root F2F7 complete-quality run custody
+
+Native repeated-bank regression is frozen BEFORE production in commit
+dd6cf7da554cf4c06fec40766f3a42419a69da50. No wrapper/native repair is released.
+Root now runs the complete ten-command Rust quality sequence ONCE after the
+new source counterpart, reviewed six-link ledger and current honest28/2 handoff.
+All included files are HELD for the whole sequence; only the three append-only
+peer notes may change. Source authors stopped, formatter terminal, native90820
+terminal; no lost/expired handle was restarted. No mutation of source/ledger/
+policy/Root docs occurs while validation is live. Full expected count is not
+preclaimed from focused28; actual summaries will be independently parsed.
+
+Root's current source/metadata peer evidence is canonical PERF3739/d9f2e883 and
+DOMAIN4169/eb55d954, both whole/hash-read and scoped no-finding. Architecture's
+actual final source review is pending its finite B2 contract work, not invented.
+Original public/setup/durable/policy authority/governance/profiles and Linux
+remain active regardless of this run's result. No native/benchmark repetition
+or fresh external audit is implied by cached offline dependency checks.
+
+
+## Root F2F7 terminal complete-quality acceptance
+
+Full35677 is TERMINAL EXIT0. Root independently parsed ALL TEN actual raw records,
+not just last output or expected counts. Every command exits0/UNCHANGED True
+against1501-input5e70f85d22592788f2555e8c600b40ed0c05f0aa251f7ab098c07154657f5604.
+Actual raw log command/offset+length/SHA256:
+
+- 1 ["cargo", "fmt", "--all", "--", "--check"]: 4709473+0/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- 2 ["cargo", "check", "--workspace", "--all-targets", "--locked"]: 4709675+167/8fa7912df3b0200dce287d983a04a35ceca87f0ee020b436a3698095e3d55cc4
+- 3 ["cargo", "clippy", "--workspace", "--all-targets", "--locked", "--", "-D", "warnings"]: 4710069+167/f0093355336d55e85f002837361aedac8b007674498bba0ec7940146dada6253
+- 4 ["cargo", "test", "--workspace", "--all-targets", "--locked"]: 4710437+101284/4d0e43d9232a828a67c78979924f45b5d53dd99c3838a9e95bcc1ce3e06188bc
+- 5 ["cargo", "test", "--workspace", "--doc", "--locked"]: 4811914+2706/1de95fe1abd72852efd4909241c485ce018ecf722e40dba5086724963d102fdb
+- 6 ["cargo", "doc", "--workspace", "--no-deps", "--locked"]: 4814816+279/c798dbb8c9fc0211cbbd374904e8ed57d00348d62ee6364e144a4a0bb8a11055
+- 7 ["cargo", "arch"]: 4815252+5116/bf4d8e652514807b1b9bc8438fb6dd66bdd642742af9ee7763c30833bd300be6
+- 8 ["cargo", "reference"]: 4820530+365/ca4afb1bd4a5a63e9ccc322316d9c961fac85e506c11bcac9267c890070bef43
+- 9 ["cargo", "progress"]: 4821056+559/30534cf0e142a179984cee44e31b9f3c819693adeeb1563c0268ad34f4f1e9a5
+- 10 [".tools/bin/cargo-deny", "--offline", "--locked", "--workspace", "check", "--deny", "unmatched-skip", "advisories", "bans", "licenses", "sources"]: 4821903+48/f1a0fca39d4280363937aabd77783990ea6480bd9ca257816de3b68fc8efa845
+
+Independently summed ALL90 executable summaries:966passed/0failed/0ignored/
+0measured/0filtered, plus6 passing compile-fail examples in15 documentation
+targets. Architecture's48 overlap966. All-target benchmark correctness smoke
+is not an extra #[test] or a new timing campaign. Three existing storage fault
+cases reported over60seconds then finished successfully before later targets;
+no hang/restart/flaky exception is manufactured. Formatting/check/strictClippy/
+warnings-denied rustdoc/architecture/reference/progress and all four cached
+offline audits pass. No fresh RustSec or Linux/native producer acceptance follows.
+
+Root actually WHOLE/hash-read final independent ARCH4074836+4230/
+5e1ad9448785501dd0adf6358e85b676b9ad3952e1ddd8a35b719b1e46812a3d:
+OWN old publisher reassembly, entire shared/parent inverses, literal old six
+helpers/three cases, six inline source observations and600/100 natural geometry
+accepted. PERF3739/d9f2e883 and reciprocal DOMAIN4169/eb55d954 already accepted
+actual source/metadata. ARCH's pending-full statement is accurately superseded
+by this actual terminal proof; no independent rerun is invented.
+
+Also WHOLE/hash-read DOMAIN4769759+4244/
+9333cc37e9f0954f8c356060b89d84360d0b48862f75a654fcd48908b75b3f50
+accepting the frozen new budget test's complete inverse/control order/cleanup.
+Actual28/2 native RED stays frozen dd6cf7d, untouched by this Rust case commit.
+CONTINUE now records966/6 and1501 inputs plus complete pure f2f7 GREEN and89/99/406
+links; source setup/public/policy-authority/durable/governance/profiles/bothOS
+and complete workflow parity remain explicitly open. Status-only final edits
+follow the complete code/ledger validation, with no source or oracle changes.
+
+Root WHOLE/hash-read B2 DESIGN1 ARCH4065054+9782/
+dd3dce12325a32cb0e7e71ad290778c59c7b0a4b37e0bd779bbcf578407afcae.
+It proposes R+disjoint U, one enforced heavy grant, pinned metered ordinary
+settlement and unused-promise release; unknown issued work consumes full promise.
+It precisely leaves native pre-entry ownership/fields/storage/fees and exhausted
+entry/error escrow unselected. Waiting conformant request controls need admission
+before make_ref/monitor/send; arbitrary forged PID/RSS is not the theorem. Root
+has released NO proposed Budget/Encoder/native include/resource/type/helper/API
+or fee for creation. ARCH/PERF/DOMAIN now work finite disjoint READ-ONLY concrete
+native-ingress/test/precedence proposals and communicate directly. No source
+writer is live. Full goal remains ACTIVE beyond this implemented case.
+
+
+## Root F2F7 selected commit custody
+
+Status-only final progress95374 is TERMINAL EXIT0, raw4822119+559/
+ff92bb77915a11e71fe9670bb8c31d2b9ba06a3fffe8644c6d25742956239a41,
+1501-inputa0ff47ff0705d1ebfaa29defa9dbd7736d7349751766a3be075354db4e52572b
+unchanged. Counts89/99/406 and5903/4222/1681/1655 remain valid/incomplete; no
+full parity/OS acceptance is inferred. No Root live validation handle remains.
+Root now selects exactly three reviewed test paths, progress JSON/MD, CONTINUE
+and this coordination record; all three concurrent append-only peer notes remain
+unstaged. Source/ledger whole hashes equal their complete966/6 quality epoch.
+No wrapper/native repair, benchmark change, denied remote retry or original Elixir
+reset/clean occurs. This local checkpoint advances the full active M1–M8 goal;
+B2 native ingress/metering and every source/setup/profile/OS duty remain required.

@@ -194,3 +194,20 @@ storage, consensus, worker/API, query/recovery and wider workflow scope remain
 incomplete. Fencing counterparts count emitted reducer events in a deterministic
 harness. Each new counterpart states its omitted original observations; partial
 assertion links cannot make the complete source scenario pass.
+
+
+The complete pure StepContinue entry-order sequence adds six direct links for
+source f2f7a6b246087607. Both actual Creates, real first singleton/ID, actual
+Step result, actual-guard Retry result and real final waiting singleton/ID stay
+inline. Actual post-Retry mode deltas preserve saved ordinals2/4 and full records;
+no membership rebuild or expected-ID lookup chooses the winner. Its first
+focused execution passes all28 claim tests and48 architecture checks on macOS.
+Independent performance review proves complete old shared/parent inverses and
+unchanged preceding FIFO scenarios. This is post-body conformance, not a new
+preimplementation RED. The ledger now has89 source declarations,99 counterpart
+records and406 links; only three existing parent hashes/eleven shifted anchors
+plus this new declaration changed, with all5854 other declarations and every
+runtime identity unchanged. The generator's older fixed roster is not rerun.
+Prepared policy modes remain fixture authority: public setup/normalization,
+committed policy CAS/encoding, durable publication, governance, original profiles,
+native Linux and complete original-case/workflow parity remain required.

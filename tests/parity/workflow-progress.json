@@ -4843,20 +4843,20 @@
         {
           "scenario_id": "m1-587581adc9eb0ceb",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "46def1f3914a1706cf81b04ec63708e838748b003209f1ed46d7d6c1ec78e113",
+          "rust_file_sha256": "da8ea97990a7491677162d9d648c4f1945e2fc55ce6450f1a8f272f755d2ed28",
           "rust_module": "",
           "rust_function": "source_fifo_activation_preserves_populated_state_entry_order",
           "assertions": [
             {
               "source_line": 783,
               "source_text": "assert {:ok, [%{id: ^first_id}]} =",
-              "rust_line": 535,
+              "rust_line": 536,
               "rust_text": "assert_eq!(selected, (1, ids[0]));"
             },
             {
               "source_line": 792,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 539,
+              "rust_line": 540,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             }
           ],
@@ -4923,7 +4923,59 @@
       "runtime_case_ids": [
         "f9febe60bccd0050c4136383b478f5b65139619bc8ed9353d952cd30a76f5a42"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-f2f7a6b246087607",
+          "rust_file": "crates/wf-domain/tests/claim_apply/fifo_step_entry.rs",
+          "rust_file_sha256": "8df04cc5f150d032622f63091e87ecac27f5f9aab837bbdafd804c2f73a44386",
+          "rust_module": "",
+          "rust_function": "fifo_step_continue_preserves_entry_before_activation",
+          "assertions": [
+            {
+              "source_line": 857,
+              "source_text": "assert :ok =",
+              "rust_line": 388,
+              "rust_text": "assert!(created.is_ok(), \"{created:?}\");"
+            },
+            {
+              "source_line": 866,
+              "source_text": "assert :ok =",
+              "rust_line": 397,
+              "rust_text": "assert!(created.is_ok(), \"{created:?}\");"
+            },
+            {
+              "source_line": 875,
+              "source_text": "assert {:ok, [claimed]} =",
+              "rust_line": 407,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 884,
+              "source_text": "assert {:ok, continued} =",
+              "rust_line": 422,
+              "rust_text": "assert!(continued.is_ok(), \"{continued:?}\");"
+            },
+            {
+              "source_line": 896,
+              "source_text": "assert :ok =",
+              "rust_line": 431,
+              "rust_text": "assert!(retried.is_ok(), \"{retried:?}\");"
+            },
+            {
+              "source_line": 907,
+              "source_text": "assert {:ok, [%{id: ^waiting_id}]} =",
+              "rust_line": 452,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived pure-core assertion links; actual Rust execution, original reference execution and complete behavioral parity remain separate evidence.",
+            "The exact source sequence creates reserve at1000/due2000 and charge at1001/due2200 with omitted payload; real reserve selection/Claim at2000 uses parallel-worker, limit1 and default30000. Step at2100 uses its actual claimed guard, reserve-to-charge and the same optional worker; Retry at2101 uses the actual returned Step guard, explicit2200, omitted payload and the exact29-byte source ETF map error. Only opaque positive ID/type/partition suffixes are normalized. Six inline observations preserve both Create successes, actual first singleton/ID, actual Step success, actual Retry success and actual final singleton/waiting ID. Invoked source setup/helper assertions are not counted as declaration links.",
+            "Canonical records and saved FIFO/Parallel membership advance only through actual indexed publication deltas. Initial default Parallel policy is a prepared fixture; only AFTER Retry is charge FIFO prepared, then actual index_delta_for_policy_modes results move both saved rows using their real metadata. No record-filter rebuild, synthesized ordinal or expected-ID selection replaces the actual count/ID. Creates allocate ordinals1/2, Step allocates4 and Retry preserves4; FIFO activation preserves complete records/metadata and the real final Claim selects waiting ordinal2 ahead of transitioning4. Source error bytes are a source-derived opaque fixture, without executed VM encoding or public term/value-reference proof. Bounded harness clones are not product allocation or throughput gains.",
+            "This is post-body existing-behavior conformance: the first focused Rust execution passed28 claim tests and48 architecture checks on macOS; it is not a new tests-before-production RED. Public replies and normalization, committed policy authority/CAS/encoding, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and cleanup, original phase orchestration, durable record/index/head/history/outcome/control publication, governance and every required original runtime profile remain open. No original Elixir case execution or independently executed Linux acceptance is supplied by these links. Full original case and complete workflow parity remain incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "4e48b0f1ca72d413",
@@ -5051,38 +5103,38 @@
         {
           "scenario_id": "m1-0bf563deac76e307",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "46def1f3914a1706cf81b04ec63708e838748b003209f1ed46d7d6c1ec78e113",
+          "rust_file_sha256": "da8ea97990a7491677162d9d648c4f1945e2fc55ce6450f1a8f272f755d2ed28",
           "rust_module": "",
           "rust_function": "source_leased_and_terminal_records_are_absent_from_later_claims",
           "assertions": [
             {
               "source_line": 1250,
               "source_text": "assert :ok =",
-              "rust_line": 361,
+              "rust_line": 362,
               "rust_text": "assert_eq!((record.state(), record.payload()), created);"
             },
             {
               "source_line": 1259,
               "source_text": "assert {:ok, [claimed]} =",
-              "rust_line": 437,
+              "rust_line": 438,
               "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
             },
             {
               "source_line": 1267,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 441,
+              "rust_line": 442,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             },
             {
               "source_line": 1275,
               "source_text": "assert :ok =",
-              "rust_line": 386,
+              "rust_line": 387,
               "rust_text": "assert_eq!(outcome, Outcome::Changed);"
             },
             {
               "source_line": 1282,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 441,
+              "rust_line": 442,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             }
           ],
@@ -5102,32 +5154,32 @@
         {
           "scenario_id": "m1-4bda857b47effb76",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "46def1f3914a1706cf81b04ec63708e838748b003209f1ed46d7d6c1ec78e113",
+          "rust_file_sha256": "da8ea97990a7491677162d9d648c4f1945e2fc55ce6450f1a8f272f755d2ed28",
           "rust_module": "",
           "rust_function": "source_future_due_boundary_preserves_empty_and_singleton_claims",
           "assertions": [
             {
               "source_line": 1295,
               "source_text": "assert :ok =",
-              "rust_line": 272,
+              "rust_line": 273,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 1304,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 337,
+              "rust_line": 338,
               "rust_text": "assert!(claim.batch().is_none());"
             },
             {
               "source_line": 1312,
               "source_text": "assert {:ok, [claimed]} =",
-              "rust_line": 340,
+              "rust_line": 341,
               "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
             },
             {
               "source_line": 1320,
               "source_text": "assert claimed.id == id",
-              "rust_line": 345,
+              "rust_line": 346,
               "rust_text": "assert_eq!(write.record.id(), record.id());"
             }
           ],

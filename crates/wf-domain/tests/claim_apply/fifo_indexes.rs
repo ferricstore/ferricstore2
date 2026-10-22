@@ -8,8 +8,8 @@ use wf_domain::claim::{
 use wf_domain::history::EventKind;
 use wf_domain::workflow::batch::BatchItem;
 use wf_domain::workflow::indexed::{
-    EntryOrder, IndexDelta, IndexRows, IndexedBatchItem, IndexedDecision, OrderingMetadata,
-    decide_indexed_batch,
+    EntryOrder, IndexDelta, IndexRows, IndexedBatchItem, IndexedBatchPlan, IndexedDecision,
+    OrderingMetadata, decide_indexed_batch,
 };
 
 pub(super) type Records = BTreeMap<Vec<u8>, (WorkflowRecord, OrderingMetadata)>;
@@ -51,7 +51,7 @@ fn checked_row<'view>(
     Ok(row)
 }
 
-fn with_published<T>(
+pub(super) fn with_published<T>(
     scope: (&[u8], &[u8]),
     rows: &Records,
     members: &FifoMembers,
@@ -139,8 +139,9 @@ fn with_published<T>(
     )
 }
 
-fn update_row(
+pub(super) fn update_row(
     scope: (&[u8], &[u8]),
+    expected_fifo_state: &[u8],
     row: IndexRows<'_>,
     insert: bool,
     fifo: &mut FifoMembers,
@@ -154,7 +155,7 @@ fn update_row(
         } => {
             assert_eq!(
                 (lane.workflow_type, lane.state, lane.partition_key),
-                (scope.0, b"queued".as_slice(), scope.1)
+                (scope.0, expected_fifo_state, scope.1)
             );
             if let Some(due) = head_candidate {
                 assert_eq!(
@@ -287,11 +288,61 @@ pub(super) fn publish(
     command: &CommittedCommand,
     index: u64,
 ) -> TestResult {
+    publish_checked(
+        scope,
+        rows,
+        members,
+        parallel,
+        policy,
+        (index, command, b"queued"),
+        |previous, plan| {
+            let predecessor = previous.map(|(record, _)| record);
+            let changed = plan.batch().items()[0].plan();
+            let write = changed.write().ok_or("accepted command has no write")?;
+            let history = changed.history().ok_or("accepted command has no history")?;
+            let metadata = plan.metadata().next().ok_or("missing ordering metadata")?;
+            let enters = matches!(
+                &command.operation,
+                Operation::Create(_) | Operation::Transition(_)
+            );
+            let expected_sequence = if enters {
+                u128::from(index) << 32
+            } else {
+                previous
+                    .ok_or("missing predecessor metadata")?
+                    .1
+                    .state_enter_seq
+            };
+            assert_eq!(
+                (metadata.priority, metadata.state_enter_seq),
+                (0, expected_sequence)
+            );
+            assert_eq!(plan.consumed_ordinals(), u32::from(enters));
+            let delta = plan.deltas().next().ok_or("missing publication delta")?;
+            check_delta(scope, command, history.kind, &delta, predecessor)?;
+            assert_eq!(write.record.payload(), Some(command.id.as_bytes()));
+            Ok(())
+        },
+    )
+}
+
+pub(super) fn publish_checked<T>(
+    scope: (&[u8], &[u8]),
+    rows: &mut Records,
+    members: &mut FifoMembers,
+    parallel: &mut ParallelMembers,
+    policy: &PolicySnapshot,
+    step: (u64, &CommittedCommand, &[u8]),
+    checker: impl FnOnce(
+        Option<&(WorkflowRecord, OrderingMetadata)>,
+        &IndexedBatchPlan<'_>,
+    ) -> Result<T, TestError>,
+) -> Result<T, TestError> {
+    let (index, command, fifo_state) = step;
     let previous = rows.get(command.id.as_bytes());
-    let predecessor = previous.map(|(record, _)| record);
     let mut next_members = members.clone();
     let mut next_parallel = parallel.clone();
-    let (record, metadata) = with_published(
+    let (record, metadata, output) = with_published(
         scope,
         rows,
         members,
@@ -322,42 +373,44 @@ pub(super) fn publish(
             let changed = plan.batch().items()[0].plan();
             assert_eq!(changed.outcome(), Outcome::Changed);
             let write = changed.write().ok_or("accepted command has no write")?;
-            let history = changed.history().ok_or("accepted command has no history")?;
-            let metadata = plan.metadata().next().ok_or("missing ordering metadata")?;
-            let enters = matches!(
-                &command.operation,
-                Operation::Create(_) | Operation::Transition(_)
-            );
-            let expected_sequence = if enters {
-                u128::from(index) << 32
-            } else {
-                previous
-                    .ok_or("missing predecessor metadata")?
-                    .1
-                    .state_enter_seq
-            };
-            assert_eq!(
-                (metadata.priority, metadata.state_enter_seq),
-                (0, expected_sequence)
-            );
-            assert_eq!(plan.consumed_ordinals(), u32::from(enters));
-            let delta = plan.deltas().next().ok_or("missing publication delta")?;
-            check_delta(scope, command, history.kind, &delta, predecessor)?;
+            changed.history().ok_or("accepted command has no history")?;
             assert_eq!(write.record.id(), &command.id);
             assert_eq!(write.record.workflow_type(), scope.0);
-            assert_eq!(write.record.payload(), Some(command.id.as_bytes()));
+            assert_eq!(
+                write.expected_version,
+                previous.map(|(record, _)| record.version())
+            );
+            let mut metadata = plan.metadata();
+            let actual_metadata = metadata.next().ok_or("missing ordering metadata")?;
+            assert!(metadata.next().is_none());
+            let mut deltas = plan.deltas();
+            let delta = deltas.next().ok_or("missing publication delta")?;
+            assert!(deltas.next().is_none());
+            let output = checker(previous, &plan)?;
             for (row, insert) in [(delta.before, false), (delta.after, true)] {
                 if let Some(row) = row {
-                    update_row(scope, row, insert, &mut next_members, &mut next_parallel)?;
+                    let id = match row {
+                        IndexRows::Fifo { member, .. } => member.id(),
+                        IndexRows::Parallel { due } => due.id,
+                    };
+                    assert_eq!(id, command.id.as_bytes());
+                    update_row(
+                        scope,
+                        fifo_state,
+                        row,
+                        insert,
+                        &mut next_members,
+                        &mut next_parallel,
+                    )?;
                 }
             }
-            Ok((write.record.clone(), metadata))
+            Ok((write.record.clone(), actual_metadata, output))
         },
     )?;
     *members = next_members;
     *parallel = next_parallel;
     rows.insert(record.id().as_bytes().to_vec(), (record, metadata));
-    Ok(())
+    Ok(output)
 }
 
 pub(super) fn claim_one(

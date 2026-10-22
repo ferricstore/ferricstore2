@@ -5,12 +5,16 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The active runtime capture regression checkpoint runs **27 tests on macOS:
-26 pass and one fails**. The new keeper-send trace observes nine limit fields,
+The active runtime capture regression checkpoint runs **28 tests on macOS:
+26 pass and two fail**. The first keeper-send trace observes nine limit fields,
 including ignored metadata, in the first successful budget reply before caller
 preparation. The same caller's invalid-query attempt and healthy same-parent
 retry both return before the wire-shape assertion fails. No projection repair
-is implemented; allocation funding and prior/concurrent reply ownership remain
+is implemented. A second real send-trace regression observes the same retained
+bank across two successful budget replies: 624 words and 11,056 bytes each. Both
+public invalid-query attempt outcomes and the same-caller retry outcome return
+before its first independent minimum-growth assertion fails; later oracles are
+not credited. Allocation funding and prior/concurrent reply ownership remain
 required before source release.
 
 The preceding runtime capture checkpoint passes **all 26 tests on macOS**. A frozen
@@ -23,15 +27,27 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **965 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **966 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
-all four cached offline dependency-audit categories pass. All 1,500 captured
+all four cached offline dependency-audit categories pass. All 1,501 captured
 repository inputs stayed unchanged through that sequence, excluding only the
 three append-only peer review notes. No fresh advisory or Linux result is claimed.
 
-The newest source-derived FIFO counterpart reclaims the expired running head
+The newest source-derived FIFO counterpart executes the complete pure
+selection/StepContinue/actual-guard Retry/FIFO-activation sequence. Its six inline
+observations preserve both Creates, actual first selection, Step and Retry
+success, and actual final singleton/waiting ID. Activation uses actual mode
+deltas and saved entry metadata after Retry; the Step entry's ordinal4 stays
+behind the waiting entry's ordinal2. The focused claim target passes all 28 tests
+and architecture checks pass; the complete 966-test checkpoint above also passes.
+Independent architecture and performance reviews accept the canonical source and
+complete old-helper/parent inverses. Prepared policy modes remain fixture
+authority; original public setup, durable publication, profiles and Linux remain
+required. This is post-body conformance, without a new tests-first RED claim.
+
+The preceding source-derived FIFO counterpart reclaims the expired running head
 with its new worker and 50ms lease while the queued follower stays blocked. Four
 actual selection calls preserve the source times, limits and worker values;
 canonical records and saved membership advance only through actual publication
@@ -47,13 +63,13 @@ scaffold passed its 957-test checkpoint with execution explicitly refused
 and wire/storage profiles closed. Its two new boundary tests and one architecture
 test account for the three additional tests. The approved three-file, eight-test
 behavior suite was frozen in `94e7dc1` after genuine runtime RED. The guarded body
-now passes all eight unchanged tests and the complete 965-test checkpoint above.
+now passes all eight unchanged tests and the complete 966-test checkpoint above.
 Independent architecture and performance reviews accepted all six changed source
 files and verified the held boundaries and frozen tests. Wire/storage profiles
 remain closed. Reciprocal review preserved the
-source's unconditional running-FIFO rejection. The full original six-assertion
-case, public/durable codecs and profiles remain required; selected unit tests
-alone will not certify that case.
+source's unconditional running-FIFO rejection. The six-observation pure sequence
+now passes as described above; original public setup, public/durable codecs and
+profiles remain required. These checks do not certify the whole original case.
 
 The preceding source-derived FIFO counterpart transitions the first claimed flow
 from running to waiting outside its queued FIFO state, using its actual returned
@@ -2365,8 +2381,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **88 reviewed
-source declarations, 98 counterpart records and 400 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **89 reviewed
+source declarations, 99 counterpart records and 406 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 
