@@ -274,6 +274,88 @@ defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
     assert term_limits == %{base | terms: 5}
   end
 
+  test "bounds_invalid_parent_before_first_budget_send" do
+    SourceTest.bootstrap!()
+    limits = SourceTest.limits()
+    queries = %{atoms: [], exports: []}
+    owner = self()
+
+    with_captures([limits], queries, [], fn [{:ok, keeper, first}] ->
+      {caller, monitor} =
+        spawn_monitor(fn ->
+          parent = :erlang.make_tuple(65_536, nil)
+
+          receive do
+            :attempt ->
+              result = Capture.extend_epoch(keeper, :invalid_donors, :invalid_queries, parent)
+
+              send(owner, {:parent_attempt, self(), result, tuple_size(parent), elem(parent, 0)})
+          end
+
+          receive do
+            :retry ->
+              result = Capture.extend_epoch(keeper, [], queries, first.identity)
+              send(owner, {:parent_retry, self(), result, tuple_size(parent)})
+          end
+
+          receive do
+            :stop -> :ok
+          end
+        end)
+
+      try do
+        assert :erlang.trace(caller, true, [:send, {:tracer, owner}]) == 1
+        send(caller, :attempt)
+        assert_receive {:parent_attempt, ^caller, rejected, 65_536, nil}, 5_000
+        fence = :erlang.trace_delivered(caller)
+        assert_receive {:trace_delivered, ^caller, ^fence}, 5_000
+
+        assert_receive {:trace, ^caller, :send, {:capture, ^caller, _ref, {:budget, wire_parent}},
+                        ^keeper},
+                       5_000
+
+        assert :erlang.trace(caller, false, [:send]) == 1
+        send(caller, :retry)
+        assert_receive {:parent_retry, ^caller, retried, 65_536}, 5_000
+        {dead, dead_monitor} = spawn_monitor(fn -> :ok end)
+        assert_receive {:DOWN, ^dead_monitor, :process, ^dead, :normal}, 5_000
+        invalid = Capture.extend_epoch(:not_a_pid, :invalid_donors, :invalid_queries, :bad_parent)
+        closed = Capture.extend_epoch(dead, :invalid_donors, :invalid_queries, :bad_parent)
+
+        assert is_nil(wire_parent), "first budget parent is a tuple: #{is_tuple(wire_parent)}"
+        assert rejected == {:error, :parent_mismatch}
+        assert invalid == {:error, :invalid_session}
+        assert closed == {:error, :closed_session}
+        assert {:ok, next} = retried
+        assert next.parent == first.identity
+        assert next.session_id == first.session_id
+        assert next.query_hash == :crypto.hash(:sha256, TermCodec.encode(queries))
+
+        for field <- [
+              :abi,
+              :query_hash,
+              :donor_hashes,
+              :queries,
+              :hashes,
+              :orders,
+              :atoms,
+              :nodes,
+              :exports,
+              :local_funs
+            ] do
+          assert Map.fetch!(next, field) == Map.fetch!(first, field)
+        end
+
+        assert limits == SourceTest.limits()
+        assert queries == %{atoms: [], exports: []}
+      after
+        if Process.alive?(caller), do: :erlang.trace(caller, false, [:send])
+        Process.exit(caller, :kill)
+        assert_receive {:DOWN, ^monitor, :process, ^caller, _reason}, 5_000
+      end
+    end)
+  end
+
   defp with_captures([], _queries, results, body), do: body.(Enum.reverse(results))
 
   defp with_captures([limits | tail], queries, results, body) do
