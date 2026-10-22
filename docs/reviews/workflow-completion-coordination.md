@@ -50454,3 +50454,108 @@ whitespace5129606+0/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852
 89/100/410 mapping and full-parity-incomplete status retained; no Rust source
 changed after967checkpoint. This saves the concrete407 repair, not a completed
 workflow engine. Active501/layout consultation continues without source release.
+
+ROOT CONTINUATION AUDIT / NATIVE-HOME1 AUTHOR RELEASE — 2026-10-23
+
+Previous continuation made actual PROGRESS: bf44b2592bd38f63c509f3b86e4d870b6d7da854
+saves the reviewed funded first-reply cap repair. Actual frozen40 runtime reaches
+33pass/7fail on native macOS; complete407 now GREEN and native6 stay GREEN.
+The967Rust/macOS checkpoint and cached offline audit remain scoped evidence;
+full M1-M8, all required original scenarios/profiles and Linux remain unfinished.
+User status request is steering, not cancellation. Four slots are active:
+Root plus ARCH, PERF and DOMAIN, with disjoint append-only review responsibilities.
+Current HEAD bf44b25 and worktree only ARCH planning note were checked. All old
+Root validation processes are terminal; no frozen run is active now.
+
+ACTUALLY WHOLE/hash-read ARCH4170352+4768/
+bbf7e96122035a6abe606972a316c5413c840b5e3bbfb28ee5cc29fa5bfdf0e2,
+including exact NATIVE-HOME1 selection and scoped407 runtime acceptance.
+Also WHOLE/hash-read DOMAIN4873172+4777/
+fe7320e74b3f62b1447f1e0009b95235b0daf4021b7efa39536b193b8163c125:
+501 local debt must persist, source/failure/terminal accounting requires selected
+real costs; no grant/ACK prerequisite or invented11W tariff is released here.
+
+Root RELEASES and owns ONLY the selected mechanical extraction:
+NEW tools/policy_runtime_capture/native.exs receives byte-exact125LF/4015B/
+530c7e2b7df2055fb0c3e30e7caedb79522ff8036eac1204e1869c283775fa2a
+existing Native definition from current597LF/20523B/
+9a52a8bf66c8b71c288b8abcae13287336978009d25e7accb018c3704bfe0037 parent.
+Replace only that prefix with
+Code.require_file("policy_runtime_capture/native.exs", __DIR__)
+retaining following blank and Budget/Bootstrap/Input require order. Expected
+parent473LF/16572B/d47a33dc13a21c2569b0b6c1e7a0192950a80eee8fa6d837545e5c5ac06692cd.
+Before release Root verified full parent, selected prefix and absent child.
+No new module/function/type/behavior/API/alias, no Bootstrap move and no C/kernel
+change. Root also owns existing receipt12->13 source binding and ADR008 roster,
+CONTINUE evidence, formatting, actual unchanged40 run and appropriate governance.
+Exact inverse plus independent stopped-source/runtime review is required before
+saving. No fake RED/new probe for an exact behavior-preserving move. ARCH/PERF/
+DOMAIN continue finite501 notes and direct consultation without interruption.
+Their501 behavior implementation is NOT released by this mechanical home decision.
+
+NATIVE-HOME1 STOPPED SOURCE / ACTUAL RUNTIME — exact mechanical extraction
+
+Parent473LF/16572B/d47a33dc13a21c2569b0b6c1e7a0192950a80eee8fa6d837545e5c5ac06692cd
+plus child125LF/4015B/530c7e2b7df2055fb0c3e30e7caedb79522ff8036eac1204e1869c283775fa2a
+match selected images. Root independently removes the unique first require and
+prepends child; ENTIRE original597LF/20523B/9a52a8bf66c8b71c288b8abcae13287336978009d25e7accb018c3704bfe0037
+is byte-equal to HEADbf44. Native has no relative require/directory dependency;
+existing Native->Budget->Bootstrap->Input load order and all Capture bodies stay
+literal. No function/type/module/API/alias/behavior/test/C/header change.
+
+EXS binding report5129672+1517/
+effee7d1684056790ffada40cbfdb34b047d7d508de6d21d583cf1ed083c040a.
+Existing receipt now8747393B/
+7926fa3814e7a7b8cc1ac0efba4fc46f56f91c6df987d860ef0fdd6803282101
+binds actual13 tool sources. All304 compiler inputs rehashed unchanged, along
+with71832B/nativecb2a,90headers/7d4b,manifest0aec and exactcommand9b072.
+Only capture_tool_sources and named scoped historical report changed; this is
+NOT a C rebuild. Bootstrap does not consume that EXS roster; actual receipt/run
+pins own first-party source custody. No live allowlist or ABI export invented.
+
+Actual Root runtime16906 TERMINAL1, seed81583/56.1s, raw5132099+13825/
+e0efe7d54656900e7ada7d63dd58bf4fc8a021de787ebc4a8c34cd5cbcb1c03a.
+Exact isolated OTP28.3.1/ERTS16.2/Elixir1.19.5/opt/8/little are asserted.
+Parent and new child plus original controller/native test sources are canonically
+formatted. All1814 repository/native inputs stayed unchanged:
+9fadbb3fd2d1198ba25a7d9858b49cd89219b494a5fc48ed68b791ecb0195464.
+Actual40tests/7failures means all33 prior passes conserved, including complete407
+and native6. Same seven first failures:501624->624W/11056->11056P;
+protocol42unmanaged,111/277unsupportedrequest,233missingACK,
+390lateencoder624<18580W,4411455invalidqueries/noexhaustion.
+Later masked assertions stay uncredited. Existing TermCodec forward-reference
+warnings remain visible; no clean whole public suite/Linux result is inferred.
+
+ACTUALLY WHOLE/hash-read ARCH source4175120+1394/
+5f77a7e1ba1b2fcdda17c503bcda79a76c5bfba4e5e96348f1098ebf96e213b4
+and DOMAIN source4877949+2815/
+5ddc04b4258e68408e97e88e0b78b57f6865f8f3143ef14fac0348249a4c1b85.
+Both independently reconstruct whole old wrapper and accept exact move; no
+behavior/501 proof substituted. Root updated existing ADR008 and CONTINUE with
+scoped outcomes. Peer actual reviews follow; appropriate architecture/reference/
+progress and whitespace checks follow. Do not rerun unchanged967Rust/fullnative/
+benchmark/deniednetwork paths. Full workflow/Elixirprofiles/bothOS goal ACTIVE;
+501 exact fee/exceptional/terminal/concurrent ownership selection stays separate.
+
+NATIVE-HOME1 final governance34573 TERMINAL0:48architecturetests,reference,
+progress and git diff --check all pass on1507 unchanged repository inputs:
+998051927a7081caeb540d1d82270b657069ce2fe90ed38476a0854c05cafa00.
+Actual48 raw5146082+5116/2ed87322f770f915e89438cfcc9023bb1ded5e1d03e821905b6db764c26c2ff8;
+reference5151361+365/ca4afb1bd4a5a63e9ccc322316d9c961fac85e506c11bcac9267c890070bef43;
+progress5151888+560/0025e1b8b3ab1e3cd61fc4b2384b34f5cf3924ffd68632d01bc75ace5fd0fa23;
+whitespace5152615+0/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+89/100/410 partial mappings and complete-parity-incomplete status unchanged.
+No new Rust behavior or full967 rerun, native C build, benchmark, Linux result,
+advisory refresh or frozen reference mutation. Root-owned validations terminal.
+
+NATIVE-HOME1 independent final acceptance: Root ACTUALLY WHOLE/hash-read DOMAIN
+4880764+2816/d71613e6571c47e2b3ae512cdaca312a7aef262ed0514ba349795d5d32a702a9.
+It independently parsed the actual40/7 failure identity set versus preceding407,
+rehashed actual13tool/304compiler/3first-party rows and all native artifacts,
+and accepts exact33/7 conservation with no new failure or masked outcome claim.
+Together with ARCH's exact-source/inverse acceptance and Root's actual frozen
+runtime/governance, this completes the finite mechanical move. PERF continues
+independent501 arithmetic with ARCH; that new behavior is not a prerequisite
+or released implementation for this saved layout. Root may save only these
+reviewed source/docs and complete peer-record prefixes; later append-only501
+planning remains separate. Full-completion goal remains ACTIVE and unfinished.

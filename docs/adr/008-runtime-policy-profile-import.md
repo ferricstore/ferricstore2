@@ -39,6 +39,11 @@ selected by the initial decision. B2-ARCH-ADMISSION-TEST1 additionally selects
 B2-ARCH-BOOTSTRAP-HOME1 selects `tools/policy_runtime_capture/bootstrap.exs`
 and `Ferricstore.PolicyRuntimeCapture.Bootstrap.verify/1` for the existing
 verification responsibility, preserving load order, context and outer rescue.
+NATIVE-HOME1 moves the existing Native definition intact into
+`tools/policy_runtime_capture/native.exs`, loaded first by the existing wrapper.
+The capture body and subsequent Budget, Bootstrap and Input load order remain
+unchanged. This adds one tool-source binding without changing the native ABI,
+compiler inputs or runtime behavior.
 B2-ARCH-RAW-HOME1 selects `tools/policy_runtime_capture/raw.inc` as an included
 part of the same native translation unit. B2-ARCH-INPUT-HOME1 selects
 `tools/policy_runtime_capture/input.exs` and `Ferricstore.PolicyRuntimeCapture.Input`
