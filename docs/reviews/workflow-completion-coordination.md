@@ -50559,3 +50559,167 @@ independent501 arithmetic with ARCH; that new behavior is not a prerequisite
 or released implementation for this saved layout. Root may save only these
 reviewed source/docs and complete peer-record prefixes; later append-only501
 planning remains separate. Full-completion goal remains ACTIVE and unfinished.
+
+ROOT REPLY-DEBT1 AUTHOR RELEASE — frozen501 RED before implementation
+
+Mechanical NATIVE-HOME1 checkpoint is saved as db8d4e15ae29cf33668e2a28a3dadb665757d5fb; all33 prior runtime passes
+and actual48architecture/reference/progress checks conserved. Current parent is
+473LF/16572B/d47a33dc13a21c2569b0b6c1e7a0192950a80eee8fa6d837545e5c5ac06692cd.
+Root ACTUALLY WHOLE/hash-read ARCH4176514+9118/
+8dfc6651dd57290b7ff5cfc24e2b221adcecbea1ec16b047e8e14135f235bd03,
+explicit REPLY-DEBT1 SOURCE1 SELECT. Actual frozen40 run16906 is TERMINAL1;
+query501 still624->624W/11056->11056P after two invalid outcomes and healthyretry,
+raw5132099+13825/e0efe7d54656900e7ada7d63dd58bf4fc8a021de787ebc4a8c34cd5cbcb1c03a.
+This is reached preimplementation behavioral RED, not a new post-code test.
+
+Root RELEASES DOMAIN /root/claim_writer_sol61 as the sole source author for ONLY
+existing tools/policy_runtime_capture.exs, ONLY keep/1 budget receive arm and
+normalization_admission/4. Preserve every other body byte-exact, Native child,
+Budget/Input/Bootstrap, C/kernel/includes, all40 tests/caps and frozen references.
+No helper/function/type/module/API/message/tag/state key/newfile/probe is released.
+No author formatter/build/test/VM/native metadata/Git; Root owns those and docs.
+Author may append only its own existing DOMAIN note with exact stopped-source
+hash/LF and independently reconstructed inverse; stop source writes afterwards.
+
+Selected source upper packet57W and additive ordinary cohorts are S101W/2264P,
+continuing-parent E47W/680P, once-closing T34W/736P. H88 is the upper pinned-header
+alternative, not a measured Darwin value transplanted to Linux. ARCH/PERF caught
+and included normal DOWN9W/72P plus descriptor before T selection. These are
+local ordinary keeper liabilities, not a full public process/allocator ceiling.
+Initial normalization preserves ALL original guards byte/order, then prospectively
+adds T only when initial? into the SAME existing output pair; noninitial adds0.
+No intermediate result/map carrier. Budget compare parent FIRST; mismatch
+charges/adopts E before send+keep(next) if both caps fit, otherwise sends SAME
+parent_mismatch from T and ENDS. Matching parent checks existing source_current
+BEFORE quota. On loaded-source ok, check R+S WORDS then PINS before constructing
+new Rpair/state/success/outer, adopt nextstate before send and tailcall keep(next).
+On typed limit or source_code_changed send that original error once and END;
+never renew T or refund old debt. Explicit close and all other arms stay literal.
+Keep natural function<=100LF/file<=600LF; no packing or unselected extra home.
+
+Frozen501 must finish both independent growth floors and ALL later ref/F8/R/u32/
+source/ABI/hash/input/healthy continuity oracles; all33 prior passes required.
+Exhaustion prefix may advance honestly into a later unimplemented terminal case.
+ARCH and PERF independently review exact stopped body and actual compiled map/
+tuple path; Root rebinds EXS source receipt then runs unchanged40 and appropriate
+checks. No C/header/native rebuild. Native registration/grants/ACK/K/concurrent
+preparation, exceptional source rescue, actual crypto provider, initial caller
+channel/Process.monitor, parent backing and retirement remain OPEN. Full all-M/
+originalparity/profiles/Linux+macOS goal remains ACTIVE, not closed by this repair.
+
+REPLY-DEBT1 reciprocal cost review before actual source acceptance: Root ACTUALLY
+WHOLE/hash-read PERF3288570+4857/
+09619092cb2d4bbe3323e52e895af07ce8fd344d447973250030f5b464e5e2e4
+and ARCH4187436+1259/419c1aae3c7268ebb59cce7a800ae64025a7e2a4f4373bf99b91fc589ac403b6.
+Independent57W packet and S/E/T arithmetic agree, including normalDOWN9W and
+second descriptor. H88 is a conservative pinned LP64 source alternative, while
+actual Linux compiler/header/layout binding stays a separate required gate.
+Online official OTP28 guides were consulted by PERF and served28.5.0.8 is
+explicitly distinguished from actual pinned28.3.1 numeric source operands.
+No optimization speedup/RSS/allocation measurement is claimed. All exceptional
+source, caller/monitor/queue, concurrency/grant/K/ACK/retirement duties remain.
+Root also WHOLE/hash-read post-commit NATIVE-HOME1 PERF3286496+2074/85f803cd,
+ARCH4185632+1337/e1dc91e1 and wording467/1ccfd4a3; mechanical full source/runtime
+acceptance is now independently recorded by all three peers. The24 coefficient
+means bytes per unfolded packet word; no selected fee or behavior was revised.
+Only DOMAIN is authorized to write the existing two function spans. Root awaits
+its stopped hash before any formatter/compiler/metadata/runtime operation.
+
+REPLY-DEBT1 STOPPED SOURCE / ACTUAL COMPILE / REACHED501 GREEN — local scope
+
+DOMAIN source502LF/17797B/f7caa6d6ceb10c2b3f3fbf6f14c3fc24b08c25c53d3b932bb2784cd6446837aa
+is STOPPED and canonically formatted without mutation. Keep61LF/norm21LF/max99.
+Root independently reconstructs entire old473/16572/d47a via both two-function
+and STRONG narrower budget-arm+normalization substitution; exact byte equality.
+Other receive arms and all12 sibling/test/kernel sources stay literal. Actual
+whole author DOMAIN4883580+3679/c8ecb80d was read/hash-checked, as were independent
+ARCH source4188695+3260/ebf6f8ed and PERF3293427+3325/31c5f5d1+356/520ba5d2.
+No extra helper/carrier/module/type/API/state key/Native mode or file was added.
+
+Actual compile64392 TERMINAL0. Raw5154088+39160/
+0c3ec6380dd08bde7d3ca5a4944bf81014f579c54acdb66ba22406a8f74853b7,
+logged in-memory BEAM40c46e43c3706a50f6e9a09228c26de6f0f2a92119e24a83858118765a244d04.
+BEAM bytes were not persisted; do not call this an independent rehash. Root read
+complete raw and explicitly re-read384-389 after tool elision. Actual parent327
+precedes source333, S101/2264 and word352/pin359 checks; pair360 and state update
+precede success/outer/send369. Actual newstate is retained before send and tail
+keep. E401 similarly updates pair/state before send; quota/source/terminal403
+send tailreturns without keep. Norm oldchecks434/440/446 precede conditional
+34/736 and newguards459/462; same existing pair/ok returned. No new map carrier
+or fallible Native report. Source bounds fit actual emitted path, not measured
+JIT allocations, GC/allocator/stack/RSS/retirement or a benchmark speedup.
+All1507 compiler-run inputs unchanged:
+cd242a75e85ef9b18b4a3462f5a2598c6b91ef0e4bbfebd506987327877b83fc.
+WHOLE/hash-read ARCHcompiled4191955+2672/8db8660a and PERF3297108+2919/05ca6baf;
+independent actual emitted-path/source-binding conclusions agree.
+
+EXS-only binding5193313+1665/
+38592ff9257ee76f790d97c9777b28f1c0d11a37e65d2277883d568e9819cdf2.
+Actual existing receipt8749035B/
+c8f9798e8bb5feda656c8b931b7397e0a82647965e3c3b719293664b6244ca8b
+changes only current wrapper binding plus scoped historical report. All13tool/
+304compiler/3first-party rows and native71832/cb2a,90headers/7d4b,manifest0aec,
+command9b072 rehashed unchanged. No C/header/native library rebuild occurred.
+
+Actual unchanged40 runtime86871 TERMINAL1 seed751407/57.4s, raw5195887+13559/
+9aa03c86828775fd20480fc6a86e7d956be007f89c2827492047813a8efcc61f.
+Exact isolated28.3.1/ERTS16.2/Elixir1.19.5/opt/8/little asserted. ALL1814 repo/
+native inputs unchangedcb34f515f165fb3e31e612c5a69442902a0af72493d602d8cb16ccc2552592c5.
+40tests/6failures=34pass, preserving all33 earlierpasses/native6/complete407.
+Root independently compares the full failed declaration/module identity sets:
+ONLY501 disappears, no new failure. Complete frozen501 now executes BOTH
+independent11W/88P lower floors and every previously masked distinctref/F8/R/u32/
+sourceMD5/SHA32/ABI/session/parent/queryhash/fullcapture/input/cleanup oracle after
+TWO typedinvalid outcomes and actual SAME-caller healthy retry already returned.
+No exact successful wire bank values were logged or invented; lower floors are
+not the full tariff. Source scopes S/E/T remain conditional local ordinary costs.
+
+Protocol441-449 now actually reaches typed pinned limit, count<1455, DOWN,
+closed_session and unchangedlimits/queries; its later native terminal crossproduct
+fails462 at :unmanaged. No whole exhaustion declaration GREEN claimed. Remaining
+six:42publicnativeunmanaged,111/277requestunsupported,233missingACK,
+390lateencoder860<18715W (laterpins/hash masked),462nativecrossproductunmanaged.
+Adequate128k ordinary failures+healthyretry still return before ACKfailure233.
+Existing TermCodec forward-reference warnings remain visible; no suppression.
+
+WHOLE/hash-read independent actual ARCH4194627+3583/11d93c6f and
+PERF3300027+2717/8838a209. Both accept full501/all33 conservation and precise new
+exhaustion reachability with no scoped finding. Root updates existing ADR008 and
+CONTINUE; appropriate governance follows. Unchanged967Rust/fullnative/benchmarks/
+deniednetwork routes are not rerun. Full caller/channel/monitor/concurrency,
+source exceptions/provider, grants/ACK/K/retirement, originalparity/profiles and
+Linux/compiler/header/layout remain OPEN. Full all-M goal ACTIVE/unfinished.
+DOMAIN may only propose one next Rust pure-M1 source observation in its own note
+and consult ARCH/PERF; no Rust/newartifact/source release is inferred here.
+
+REPLY-DEBT1 final governance17242 TERMINAL0:48architecturetests, reference,
+progress and git diff --check pass on1507 unchanged repository inputs:
+d57e4ffeef4df3d02b372a62812be4732c6b276b9fd61dcc44cc1eab2070eb29.
+Actual48 raw5209603+5116/132e129edfb317d07c18ceca5c87591535818bacf0e7534bab847c2e1d7e6c7f;
+reference5214881+365/ca4afb1bd4a5a63e9ccc322316d9c961fac85e506c11bcac9267c890070bef43;
+progress5215407+560/0025e1b8b3ab1e3cd61fc4b2384b34f5cf3924ffd68632d01bc75ace5fd0fa23;
+whitespace5216133+0/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+89/100/410 partial mappings and fullparity incomplete retained. No Rust behavior
+changed after967checkpoint; no unchanged fullRust/native/benchmark/deniednetwork
+rerun. All Root validation processes terminal. Save reviewed local501 repair,
+then continue Rust-parity/protocol/optimization work with exact architecture
+consultation, disjoint owners and source-frozen actual validation.
+
+REPLY-DEBT1 author/oracle final review: Root ACTUALLY WHOLE/hash-read DOMAIN
+4887259+3423/35eb44ada76d50153b8b09630ed7d965a97d0e712b249b81dcaadf286484064a.
+It rechecks complete501 and newly reached441-449 controls against actual raw,
+without labeling later462 terminal/native crossproducts GREEN. Independent
+ARCH/PERF acceptance and Root's actual input-frozen compile/runtime/governance
+already establish this local checkpoint. No source changes remain authorized.
+
+Next finite work is assigned without interrupting peers: DOMAIN proposes one
+actual omitted pure-M1 Rust initial-selection observation in existing invariant
+fixture homes; ARCH reviews the exact named artifacts/ownership/geometry before
+any creation; PERF reviews that proposal and one concrete Rust allocation
+candidate with current official primary docs and a meaningful A/B proposal.
+All proposal work stays in each owner's existing note. No new Rust test/helper/
+probe/file, parity ledger update, benchmark or behavior source is released by
+these assignments. Root must first whole-read the concrete architecture decision
+and separately freeze real required RED/normal verification and source custody.
+Current native/public integration sixfail, all-M/originalparity/profiles and
+Linux/macOS acceptance remain open; the full goal remains ACTIVE.

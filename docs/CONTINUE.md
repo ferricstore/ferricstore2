@@ -5,9 +5,26 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The existing Native module now lives in
+The active runtime checkpoint runs **40 tests on macOS: 34 pass and six fail**.
+The complete frozen repeated-budget-reply regression now passes. Each ordinary
+successful reply adds its funded cost to the keeper-owned bank before sending;
+later attempts retain that bank. Initial admission reserves one ordinary closing
+response, including a possible process-DOWN message. Parent mismatch retains
+precedence over source checks; matching parents check source before quota.
+Actual compiled instructions confirm the selected construction and state order.
+All 33 preceding passes, including the six native components, remain green.
+The exhaustion regression now reaches its typed pin limit, DOWN, closed-session
+and input-preservation checks before failing at later unmanaged native entry.
+The wrapper is 502 lines, with the two changed functions at 61 and 21 lines.
+All 1,814 repository/native inputs stayed unchanged during execution; thirteen
+tool bindings, 304 compiler inputs, 90 headers and the native library are verified.
+Native integration, grants, settlement ACK and encoder accounting still fail.
+Complete caller/concurrent/exceptional-source accounting, original profiles,
+full parity and Linux acceptance remain open; this is a local ordinary reply fix.
+
+The preceding file-layout checkpoint moved the existing Native module into
 `tools/policy_runtime_capture/native.exs`, loaded first by the wrapper. The exact
-module extraction reduces the wrapper from 597 to 473 lines; reconstructing the
+module extraction reduced the wrapper from 597 to 473 lines; reconstructing the
 original file gives byte equality. The unchanged 40-test runtime suite preserves
 all 33 passes and the same seven failures below. All 1,814 repository/native
 inputs stayed unchanged during execution. The source receipt now binds thirteen
@@ -15,7 +32,7 @@ tool files; the native library, 304 compiler inputs and 90 headers are unchanged
 This preserves behavior and leaves room for the separately reviewed keeper debt
 work; it does not resolve that accounting or establish Linux acceptance.
 
-The active runtime checkpoint runs **40 tests on macOS: 33 pass and seven fail**.
+The preceding runtime checkpoint runs **40 tests on macOS: 33 pass and seven fail**.
 The frozen first-budget-reply regression now completes: the keeper sends exactly
 the eight validated scalar caps, preserving healthy retry, capture/hash identity,
 retained/source shapes and the original ignored input graph. Raw limits still pass

@@ -106,6 +106,19 @@ The compiled literal path and unchanged regression pass on macOS, preserving eve
 prior passing capture case. This local reply-shape repair does not accumulate
 per-attempt debt or establish complete public channel/retirement accounting.
 
+REPLY-DEBT1 adds cumulative ordinary budget-reply accounting in the existing
+keeper and normalization functions. The current keeper bank funds each reply
+before construction and survives the next request. Initial admission reserves
+one closing response, including a possible normal DOWN message. Parent mismatch
+precedes source checks; a matching parent checks source before word/pin refusal.
+A terminal response ends the keeper and cannot renew that reserve. The frozen
+repeated-reply regression now passes on macOS, preserving all preceding passes;
+the exhaustion regression advances to its later unmanaged native-entry failure.
+This local fixed-packet proof does not settle caller preparation, concurrent
+grants, exceptional source checks, encoder credit, ACK or retirement. Actual
+compiled bodies and the EXS source receipt are bound separately from the unchanged
+native library; Linux compiler/header/layout acceptance remains required.
+
 B2-BUDGET-PROTOCOL1-NATIVE-INGRESS1 selects a staged private admission protocol.
 The rejecting interface adds `tools/policy_runtime_capture/budget.inc` to the
 same native translation unit, `tools/policy_runtime_capture/budget.exs` with

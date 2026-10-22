@@ -121,17 +121,42 @@ defmodule Ferricstore.PolicyRuntimeCapture do
         send(caller, {ref, :ok})
 
       {:capture, caller, ref, {:budget, parent}} ->
-        result =
-          with true <- parent == state.capture.identity,
-               :ok <- source_current(state.context.source) do
-            {:ok, state.limits, state.admission, state.context.source}
-          else
-            false -> {:error, :parent_mismatch}
-            {:error, _} = error -> error
-          end
+        if parent != state.capture.identity do
+          words = state.admission.decoded_words + 47
+          pins = state.admission.pinned_bytes + 680
 
-        send(caller, {ref, result})
-        if result != {:error, :source_code_changed}, do: keep(state)
+          if words <= state.limits.decoded_words and pins <= state.limits.pinned_bytes do
+            admission = %{decoded_words: words, pinned_bytes: pins}
+            next = %{state | admission: admission}
+            send(caller, {ref, {:error, :parent_mismatch}})
+            keep(next)
+          else
+            send(caller, {ref, {:error, :parent_mismatch}})
+          end
+        else
+          case source_current(state.context.source) do
+            :ok ->
+              words = state.admission.decoded_words + 101
+              pins = state.admission.pinned_bytes + 2_264
+
+              cond do
+                words > state.limits.decoded_words ->
+                  send(caller, {ref, {:error, {:limit, :decoded_words}}})
+
+                pins > state.limits.pinned_bytes ->
+                  send(caller, {ref, {:error, {:limit, :pinned_bytes}}})
+
+                true ->
+                  admission = %{decoded_words: words, pinned_bytes: pins}
+                  next = %{state | admission: admission}
+                  send(caller, {ref, {:ok, state.limits, admission, state.context.source}})
+                  keep(next)
+              end
+
+            {:error, _} = error ->
+              send(caller, {ref, error})
+          end
+        end
 
       {:capture, caller, ref, {:extend, donors, queries, original}} ->
         case extend(state, donors, queries, original) do
@@ -242,11 +267,15 @@ defmodule Ferricstore.PolicyRuntimeCapture do
 
     with :ok <- check(retained.decoded_words + extra, limits.decoded_words, :decoded_words),
          :ok <- check(retained.pinned_bytes, limits.pinned_bytes, :pinned_bytes),
-         :ok <- check(extra, div(limits.pinned_bytes - retained.pinned_bytes, 8), :pinned_bytes) do
+         :ok <- check(extra, div(limits.pinned_bytes - retained.pinned_bytes, 8), :pinned_bytes),
+         words = retained.decoded_words + extra + if(initial?, do: 34, else: 0),
+         pins = retained.pinned_bytes + 8 * extra + if(initial?, do: 736, else: 0),
+         :ok <- check(words, limits.decoded_words, :decoded_words),
+         :ok <- check(pins, limits.pinned_bytes, :pinned_bytes) do
       {:ok,
        %{
-         decoded_words: retained.decoded_words + extra,
-         pinned_bytes: retained.pinned_bytes + 8 * extra
+         decoded_words: words,
+         pinned_bytes: pins
        }}
     end
   end
