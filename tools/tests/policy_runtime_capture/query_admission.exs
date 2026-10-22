@@ -453,6 +453,87 @@ defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
     end)
   end
 
+  test "accounts_successful_budget_replies_before_next_attempt" do
+    abi = SourceTest.bootstrap!()
+    owner = self()
+    defaults = SourceTest.limits()
+    queries = %{atoms: [], exports: []}
+
+    with_captures([defaults], queries, [], fn [{:ok, keeper, first}] ->
+      {caller, monitor} =
+        spawn_monitor(fn ->
+          receive do
+            :attempt ->
+              rejected1 = Capture.extend_epoch(keeper, [], :invalid_queries, first.identity)
+              rejected2 = Capture.extend_epoch(keeper, [], :invalid_queries, first.identity)
+              send(owner, {:repeated_budget_attempts, self(), rejected1, rejected2})
+          end
+
+          receive do
+            :retry ->
+              result = Capture.extend_epoch(keeper, [], queries, first.identity)
+              send(owner, {:repeated_budget_retry, self(), result})
+          end
+
+          receive do
+            :stop -> :ok
+          end
+        end)
+
+      try do
+        assert :erlang.trace(keeper, true, [:send, {:tracer, owner}]) == 1
+        send(caller, :attempt)
+        assert_receive {:repeated_budget_attempts, ^caller, rejected1, rejected2}, 5_000
+        fence = :erlang.trace_delivered(keeper)
+        assert_receive {:trace_delivered, ^keeper, ^fence}, 5_000
+        assert_receive {:trace, ^keeper, :send, wire1, ^caller}, 5_000
+        assert_receive {:trace, ^keeper, :send, wire2, ^caller}, 5_000
+        {ref1, {:ok, _, retained1, _}} = wire1
+        {ref2, {:ok, _, retained2, _}} = wire2
+        assert :erlang.trace(keeper, false, [:send]) == 1
+        send(caller, :retry)
+        assert_receive {:repeated_budget_retry, ^caller, retried}, 5_000
+
+        diagnostic =
+          "budget words=#{retained1.decoded_words}->#{retained2.decoded_words} " <>
+            "pins=#{retained1.pinned_bytes}->#{retained2.pinned_bytes}"
+
+        assert retained2.decoded_words >= retained1.decoded_words + 11, diagnostic
+        assert retained2.pinned_bytes >= retained1.pinned_bytes + 88, diagnostic
+        assert is_reference(ref1) and is_reference(ref2) and ref1 != ref2
+        assert rejected1 == {:error, :invalid_queries}
+        assert rejected2 == {:error, :invalid_queries}
+
+        for wire <- [wire1, wire2] do
+          {:ok, caps, retained, source} = elem(wire, 1)
+          assert caps == defaults and map_size(caps) == 8
+          assert Enum.sort(Map.keys(retained)) == [:decoded_words, :pinned_bytes]
+
+          for field <- [:decoded_words, :pinned_bytes] do
+            assert is_integer(retained[field]) and retained[field] in 0..defaults[field]
+          end
+
+          assert Enum.sort(Map.keys(source)) == [:md5, :source_sha]
+          assert source.md5 == TermCodec.module_info(:md5)
+          assert is_binary(source.source_sha) and byte_size(source.source_sha) == 32
+        end
+
+        assert {:ok, next} = retried
+        assert next.parent == first.identity
+        assert next.session_id == first.session_id
+        assert next.abi == abi
+        assert next.query_hash == :crypto.hash(:sha256, TermCodec.encode(queries))
+        assert Map.drop(next, [:identity, :parent]) == Map.drop(first, [:identity, :parent])
+        assert defaults == SourceTest.limits()
+        assert queries == %{atoms: [], exports: []}
+      after
+        if Process.alive?(keeper), do: :erlang.trace(keeper, false, [:send])
+        Process.exit(caller, :kill)
+        assert_receive {:DOWN, ^monitor, :process, ^caller, _reason}, 5_000
+      end
+    end)
+  end
+
   defp with_captures([], _queries, results, body), do: body.(Enum.reverse(results))
 
   defp with_captures([limits | tail], queries, results, body) do

@@ -49172,3 +49172,248 @@ Progress remains88/98/400; no full product/parity/Linux claim. This does not add
 Commit selects exactly the six reviewed source homes, CONTINUE, architecture,
 ADR004 and this coordination file. Three peer notes stay unstaged. The B2 frozen
 regression and wrapper are not modified. No native or benchmark rerun occurred.
+
+
+## Root F2F7-STEP-ENTRY1 TEST1 — exact three-path precreation custody RELEASE
+
+Actual guarded Step body is committed9ca0a77f6d1b1f532e631bfa107ca562de400a41
+after frozen94e7dc1d runtimeRED, unchanged8GREEN, complete965/6 ALL10 terminal96806
+and independent whole-source ARCH/PERF reviews. Root status-doc follow-up68351
+also terminated0. No Root validation handle remains live. This is post-body
+source conformance, not a new tests-before-production TDD claim.
+
+Root actually WHOLE/hash-read and adopts EXACT ARCH4026380+8673/
+34cb991548a197a3ef81f79198f707e761055048cd89a7b0d6170a7814fc7cd2
+and DOMAIN4698675+11544/
+db18eeda47c28ebe4264985b2a52e8a02c2862ea2da212c5c825b60dfe4ceddb.
+Both complete records, not an abridged inferred helper roster, govern this
+release. DOMAIN must whole/hash-read this release and both exact records before
+creation. Released AUTHOR write set ONLY:
+
+1. NEW crates/wf-domain/tests/claim_apply/fifo_step_entry.rs, test
+   fifo_step_continue_preserves_entry_before_activation, exactly six approved
+   ordinary helpers create_step_entry/5, publish_step_entry/6, claim_step_entry/6,
+   continue_step_entry/5, retry_step_entry/5, activate_step_charge/4.
+2. EXISTING crates/wf-domain/tests/claim_apply/fifo_indexes.rs, old465LF/16030B/
+   052176e704c7832911af97b34541ea13ce3552cf9b5a29751380abbfdf765347.
+   Expose with_published/7 with literal whole body, add exactly the selected
+   publish_checked<T>/7 and IndexedBatchPlan import, preserve old publish checker
+   assertions and no extra old-case output clone, update_row/5->6 with explicit
+   checked FIFO state and otherwise literal checks. Other old helpers/aliases
+   stay literal; prove ENTIRE before-image inverses, not just diffstat.
+3. EXISTING crates/wf-domain/tests/claim_apply/main.rs, old553LF/19459B/
+   46def1f3914a1706cf81b04ec63708e838748b003209f1ed46d7d6c1ec78e113,
+   ONLY mod fifo_step_entry; =>554. Exact parent inverse required.
+
+No production/Cargo/other test/ledger/docs writes except DOMAIN's own append-only
+peer note. No new helper/type/alias/file beyond the exact selected roster. All
+natural files<=600/functions<=100; consult architecture and Root before expansion,
+never pack lines or suppress checks. Root owns formatting/builds/execution/Git
+and source-assertion metadata AFTER actual reviewed passing execution. Author
+stops all source writes and sends exact full hashes, geometry and old inverses
+for independent ARCH/PERF review.
+
+Preserve every source observation857/866/875/884/896/907 INLINE in the test,
+actual selection/cardinality/ID (no expected-ID selection parameter), actual Step
+output guard into Retry, source payloadNone and opaque29-byte map error, and
+ONLY actual saved-metadata mode deltas at policy activation AFTER Retry. Initial
+Parallel candidate is fixture authority only; actual candidate accessor policy(),
+not absent snapshot(). Exact source TYPE/partition/IDs/workers/times and scalar
+entry/fence/deadline ledger remain those in both approved full records. No
+synthesized head/ordinal, record-based membership rebuild or installed/durable
+policy claim. All prior scenario/helper assertions and bodies remain conserved.
+Full source setup/public/durable/governance/profiles and both native OS gates
+remain active; no six-link/full-case credit until Root actual execution/review.
+
+
+## Root continuation — previous progress, exact producer scope and pending source handoff
+
+Previous goal turn is PROGRESS: reviewed guarded body was committed9ca0a77,
+actual965/6 all-ten acceptance was independently parsed, status docs checked,
+and exact f2f7 author release4035975+3318/6fa671d3 recorded before creation.
+Current authoritative agent inventory confirms ARCH and DOMAIN live; PERF's
+finite source-prep review completed normally, with stopped candidate review still
+pending. No Root test/native/benchmark process is live or restarted from timeout.
+
+Actually WHOLE/hash-read PERF3174746+6788/a2d599c2776c8fb61bfdd37d2752976f7f99ed855c490e82b43d400c77b06342
+and PERF3181534+2248/f70c0121f10f3c221eda686b78c27000aabf4e5d9ab0d292becf486657168987.
+The former verifies conditional local success pricing and concretely separates
+MD5/failure/concurrent obligations; the latter independently read the exact
+source850–915, approved contract, complete committed owners and mode APIs. It
+accepts no in-flight author buffer and grants no execution or source-case credit.
+
+Root reread ALL250LF ADR008. Its producer is a trusted import tool with tracked
+actual simultaneous frontier admission, including refusal/cleanup. It explicitly
+does NOT establish whole-process/native-memory/RSS or opaque-destructor bounds.
+Root relayed those exact boundaries to ARCH: do not silently strengthen the
+contract to arbitrary direct PID injection or all mailbox traffic as a new
+completion blocker. Within conformant public calls, complete tracked prior debt,
+early original-copy admission and concurrent preparations still need actual
+custody/consumption or source-backed retirement. Parent/source error order and
+healthy same-parent retry when a paid cohort fits remain required. No new Budget
+helper/API/fee/protocol/model or success-debt test has been released by Root.
+
+Read current check.yml/scripts/check.sh and local branch state: ubuntu24.04 and
+macos15 remain selected CI hosts; branch is132 commits ahead of saved remote.
+Prior actual DNS push failure, GitHub404 access and Docker socket denial remain
+recorded external conditions; Root does not repeat unchanged failed routes or
+claim native Linux from authored matrix/history. Local cached audits remain
+separate from unavailable fresh RustSec refresh. Meaningful product/test work
+continues, so goal is ACTIVE, neither complete nor blocked.
+
+Ledger preparation only: the future one-line parent registration affects exactly
+THREE existing counterpart hashes and ELEVEN assertion positions. Root will
+preserve their complete observations and update only hashes/+1 positions after
+canonical execution, then add new f2f7's six reviewed links. Do not run stale
+generate-progress.py: its fixed roster predates the most recent manual mappings.
+Every remaining required case/setup/profile, public/durable integration, ordered
+M1–M8 and native Linux/macOS acceptance remains in the full goal.
+
+
+## Root F2F7-STEP-ENTRY1 — canonical stopped-write epoch before first execution
+
+DOMAIN handed stopped3-path440/519/554 source epoch; Root alone ran canonical
+cargo fmt with pinned1.99.0, formatter41431 TERMINAL EXIT0. Final images:
+child469LF/16266B/8df04cc5f150d032622f63091e87ecac27f5f9aab837bbdafd804c2f73a44386;
+shared518/17966/5c5aec0c975d3bf9cca6f407e05bd56178f477d5332c2da91ff9610522b15424;
+parent554/19480/da8ea97990a7491677162d9d648c4f1945e2fc55ce6450f1a8f272f755d2ed28.
+Root whole-read child and entire shared/parent diff against9ca0a77. Independent
+natural full-function census: child20/94/76/38/39/74 plus test100; shared
+18/15/87/60/78/46/86/34/68; parent unchanged max98. All three files<=600,
+no packing/suppression/helper expansion. Six helpers exactly as released.
+
+Root sees actual select count/observed ID drive named Claim, actual Step record
+supplies Retry guard, exact29B ETF-map error, candidate only after Retry and
+actual saved-metadata mode deltas before adoption. Previous records/metadata are
+explicitly compared unchanged across activation; final waiting ordinal2 beats
+transitioning ordinal4. Bounded fixture copies are not product optimizations.
+Old queued adapter preserves prior dues/history/metadata/payload checks and T=()
+has no extra output-record clone. Independent PERF complete actual review is
+underway; source and six assertion links remain uncredited until real execution.
+
+Root now owns first focused claim_apply execution and actual architecture check.
+All included repository inputs are HELD for the sequence; only three append-only
+peer notes may change. No native/B2 author is released while this validation is
+live. Original setup/public/durable/policy-authority/governance/profiles/bothOS
+and complete goal remain mandatory; new pure case is post-body conformance.
+
+
+## Root F2F7 first actual GREEN and repeated-budget test precreation RELEASE
+
+Focused97817 is TERMINAL EXIT0. Actual claim_apply raw4693986+2694/
+a68d2efb6d70d0eb464d05e96aea397a41fdda30d033f7a18439b53b5b0a1268
+was whole/hash-read:28passed/0failed/0ignored/0filtered and the new exact
+fifo_step_continue_preserves_entry_before_activation is explicitly ok alongside
+all27 old tests. Actual architecture4696839+5116/
+682ece0aa096cf0fd0609c7987149795a6649940e3439f57219f9f5d1ad8cb6c
+passes48 (overlap with workspace totals, not48 new tests). Both commands preserve
+1501-input62423afc61b2588f7ef34864b275d9998e91943ed08e68b9e024061270342c12.
+This is conformance of existing implemented behavior, not new tests-first RED.
+
+Actually WHOLE/hash-read DOMAIN4756188+9402/
+7e06903a5a6b9dfd22206c91a5519e9088adb3e37502f0d05e9529d08570121f.
+Author's440LF images precede Root formatting; final canonical469/518/554 hashes
+and natural100LF test are the Root canonical receipt, not silently attributed
+to the old author epoch. Independent PERF final source review reports no scoped
+defect and whole old publisher reconstruction; final saved receipt is pending.
+Root will add exactly six inline source observations plus the three old parent
+hashes/eleven+1 anchors. Full quality remains required before the selected commit.
+
+Root actually WHOLE/hash-read ARCH4061832+3222/
+3d6d55306ad11db88f4ce30e1ac6b7cfa7a5baf2521dafb7a9a277108637fa50
+and adopts its EXACT tests-only roster. No validation is live now. RELEASE PERF
+as sole AUTHOR of ONE existing-path new test
+accounts_successful_budget_replies_before_next_attempt in
+ tools/tests/policy_runtime_capture/query_admission.exs,
+Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest. Current ENTIRE before-image
+470LF/17435B/7610b1eebf1a7ae2c46abaa2f5d7b4143a5e22c58b53aef71d4f2db4d4d386a0
+is verified unchanged just before release. Test<=100 physical LF, file<=600;
+no new helper/module/file/type/alias/production API/fee/cap/source change. All
+current27 test/helper bodies, including first-wire-shape RED, stay byte-exact;
+prove ENTIRE old-child inverse after unique insertion removal.
+
+One actual monitored SAME public caller performs two valid-parent invalid-query
+attempts. Capture actual keeper sends with real trace/fence and both OUTER wires,
+then disable trace; same-caller same-parent adequate retry MUST return BEFORE
+independent >=11-word/>=88-pin-byte second-minus-first bank oracles. Hold both
+actual trace roots; source-backed ordinary-ref3+outer3+inner5 floor is independent
+of SUT fees. Distinct refs, both actual invalid_queries results, cap/source shape,
+retry parent/session continuity and original input reuse remain inline. Existing
+with_captures owns keeper close; nested after must turn tracing off and kill/
+observe caller DOWN on all paths. Bounded scalar diagnostic only. No raw forged
+request, fabricated count, producer charge for observer traces, quota/RSS/failure/
+concurrent-grant/full producer claim. Current expected equal-bank RED is not yet
+executed or frozen.
+
+PERF must whole/hash-read this release AND exact ARCH3222 before any write.
+Root owns later canonical formatter, first native execution/freeze, native receipt
+pins, Git and all repository checks. Author may append PERF only besides the
+single query child. No build/test/VM/probe/Git or writer beyond this release.
+Stop source writes and hand full hashes/census/whole inverse; DOMAIN/ARCH review
+actual candidate, not an intended patch. Full protocol design remains required,
+separate from this known-success debt regression and from f2f7 quality. Root will
+not start any frozen-input run until this disjoint source writer has stopped.
+
+
+## Root repeated-budget canonical epoch — actual native RED execution begins
+
+All source writers are STOPPED. Root whole-read complete actual new80LF test and
+its diff, ran exact-OTP formatter TERMINAL EXIT0; formatter left551LF/20903B/
+9c5a420aae4ba8ad36b48530077e667209a3710ae966be775453cc567951073c
+BYTE-UNCHANGED. Root OWN actual unique81LF/3468B insertion removal reconstructs
+ENTIRE470LF/17435B/7610b1ee before-image, preserving all27 prior identities/helpers.
+Insertion SHA959e5656ee271b21a8e5ef4ecf1f53ddef316b09b18102b5db7a7991f4bdbed7.
+Both public attempts return, actual two keeper OUTER replies/fence are held,
+trace turns off and same-caller retry receive precedes first >=11W bank oracle.
+Actual source shape/refs/retry/input oracles remain afterward; failures will be
+reported as reached/masked honestly, not retroactively called passing.
+
+Actually whole/hash-read author PERF3187521+3261/
+4435777e7efaa41fce1f29eeb501e2e9fed5cda1fac2b5b2c7f2e0595041844d;
+independent DOMAIN actual review is underway. Also whole/hash-read reciprocal
+f2f7 metadata DOMAIN4765590+4169/
+eb55d954b85fb0a004ddcb08c96c908d1853a06cdc9085eb74a9065a0d8dace9
+and canonical source PERF3183782+3739/d9f2e8830858433901429dc9ef1bdb177cd6db449a80982ee69e32ad87716117:
+no scoped finding, whole ledger/shared/parent inverses and actual focused28+48
+accepted with full scope duties preserved. Current ledger89/99/406 is new
+reviewed bookkeeping, not full original/runtime/public/durable/profile parity.
+
+Root starts ONE new native suite run because one genuine regression was added.
+The existing exact-OTP/native runner's pin logic is unchanged; only run label and
+diagnostic name changed. It checks all302 compiler inputs/native receipt/NIF/
+headers/manifest plus repository and retained baseline artifact. No NIF source
+or rebuild, denied network/provider/Linux retry or benchmark action. All included
+inputs HELD while native run is live; only three append-only peer notes may
+change. Production wrapper and complete failure/concurrent-grant repair remain
+unreleased; expected equal banks are not yet actual RED.
+
+
+## Root B2 repeated budget — genuine terminal runtime RED, freeze before repair
+
+Native90820 is TERMINAL EXIT1, not a live/expired observation. Root whole output
+was returned unclipped and independently raw/hash-checked4702164+7127/
+757428e07616621198665eacda5f19a68aa93a9ee0c8a1b37a56eb3f32f8d94f.
+All1807 repository/native inputs remain unchanged against
+f66c0a4c8dd3b8e69b5192d2c4ce1ed36cfe4837a634a21f6f36dc2e36702f76,
+including302 native compiler inputs and unchanged NIF/headers/receipt artifacts.
+Actual28tests/2failures: the existing shape identity still fails407 with
+budget caps=9 ignored=true; the NEW accounts_successful_budget_replies_before_next_attempt
+fails501 at its FIRST >=11WORDS inequality, with bounded actual diagnostic
+budget words=624->624 pins=11056->11056. All26 unrelated prior cases pass.
+
+Both public attempt outcomes and the same-caller valid-query retry outcome
+were RECEIVED, actual delivery fence and both successful four-field outer reply
+patterns executed, and tracing was disabled before that first bank oracle.
+The later >=88PIN assertion, reference/type/error/cap/source/healthy-continuity/
+input assertions are MASKED in this RED and are not called passing; equal pin
+values are observed diagnostic operands only. Cleanup executes on failure.
+Existing TermCodec load-order/redefinition and ERTS internal-state warnings remain
+visible, not suppressed or recategorized as new product RED. No Linux, N-caller
+stress, quota/RSS/native allocation, failure/grant closure or source repair claim.
+
+Root freezes ONLY the canonical551LF/9c5a420a query-child test plus this custody
+record before any corresponding production repair. Existing27 bodies remain
+entire-byte equal through Root's unique81LF inverse. Source case/metadata work
+remains pending its complete-quality commit; CONTINUE honestly records28/2.
+Complete B2 failure/concurrent protocol design and all full-goal duties remain
+active. No Root validation handle is live after this terminal result.
