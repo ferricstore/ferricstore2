@@ -4728,7 +4728,59 @@
       "runtime_case_ids": [
         "1a3168bb7cc2ee42736275127f26f4df7c4a962bcf38f95daf40b2229399d1cc"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-75afbefe8cf622e2",
+          "rust_file": "crates/wf-domain/tests/claim_apply/fifo_middle_cancel.rs",
+          "rust_file_sha256": "4d72f355a7dfd555203c55a95610fd6c952382e43f7a3f645d0e27e6d92be0a4",
+          "rust_module": "",
+          "rust_function": "fifo_cancelled_middle_preserves_source_claim_order",
+          "assertions": [
+            {
+              "source_line": 737,
+              "source_text": "assert :ok =",
+              "rust_line": 337,
+              "rust_text": "assert!(cancelled.is_ok(), \"{cancelled:?}\");"
+            },
+            {
+              "source_line": 744,
+              "source_text": "assert {:ok, [first]} =",
+              "rust_line": 346,
+              "rust_text": "assert_eq!(first_count, 1);"
+            },
+            {
+              "source_line": 753,
+              "source_text": "assert first.id == first_id",
+              "rust_line": 348,
+              "rust_text": "assert_eq!(first.id().as_bytes(), IDS[0]);"
+            },
+            {
+              "source_line": 755,
+              "source_text": "assert :ok =",
+              "rust_line": 369,
+              "rust_text": "assert!(completed.is_ok(), \"{completed:?}\");"
+            },
+            {
+              "source_line": 762,
+              "source_text": "assert {:ok, [%{id: ^third_id}]} =",
+              "rust_line": 378,
+              "rust_text": "assert_eq!(third_count, 1);"
+            },
+            {
+              "source_line": 762,
+              "source_text": "assert {:ok, [%{id: ^third_id}]} =",
+              "rust_line": 380,
+              "rust_text": "assert_eq!(third.id().as_bytes(), IDS[2]);"
+            }
+          ],
+          "limitations": [
+            "Source-derived pure-core assertion links; checked mapping, original reference execution and full behavioral parity are separate evidence.",
+            "The fixture prepares the source queued-only FIFO policy, then executes seven mutation entries: creates first/second/third at 1000/1001/1002 with payload=id and due 2000, cancels the unleased middle with fence 0 at 1500, actually selects and claims the first at 2000, completes it at 2100 using the actual returned lease token/fence, then actually selects and claims the third at 2101. Exact state/partition filters, limit 1, fifo-worker and pinned default lease_ms 30000 are retained. Original ID/type/partition prefixes are exact; only opaque positive unique suffixes are normalized to fixed :1/:2. Source helper assertions at 1379/1384 remain setup obligations outside the declaration and are not counted as direct source links.",
+            "Canonical records and separately saved FIFO membership are fixture-owned values. Actual indexed plan deltas alone update saved membership; every saved member is validated before real claim selection, and terminal canonical records remain present. Actual selected counts and published IDs provide the six inline links; the final source singleton assertion maps separately to count and ID. Explicit nonempty committed Claim token inputs do not implement the public token producer. Fixture clones and borrowed view reconstruction are not product allocation or throughput measurements.",
+            "This counterpart covers existing pure indexed lifecycle and selection behavior, with a first passing focused run rather than preimplementation TDD. Committed policy installation, public :ok/{:ok,...} replies and projections, routing/placement, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and cleanup, physical FIFO-head persistence, atomic durable record/index/history/outcome publication, original governed runtime profiles and complete Linux/macOS acceptance remain open. The unchanged original Elixir case attempt stopped in Mix.PubSub local TCP startup with :eperm before any ExUnit assertion; no original case PASS or RED is inferred."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "587581adc9eb0ceb",
@@ -4739,20 +4791,20 @@
         {
           "scenario_id": "m1-587581adc9eb0ceb",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "f38354c660391a4256ef06c5040d695ce56fc47af5db1a6b63aeb35639f045d1",
+          "rust_file_sha256": "d6d1bcd83e3be70ddf7d2376b3a6e38bbbf1cf1b0fc5fe0c4575b83dba826532",
           "rust_module": "",
           "rust_function": "source_fifo_activation_preserves_populated_state_entry_order",
           "assertions": [
             {
               "source_line": 783,
               "source_text": "assert {:ok, [%{id: ^first_id}]} =",
-              "rust_line": 531,
+              "rust_line": 532,
               "rust_text": "assert_eq!(selected, (1, ids[0]));"
             },
             {
               "source_line": 792,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 535,
+              "rust_line": 536,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             }
           ],
@@ -4907,38 +4959,38 @@
         {
           "scenario_id": "m1-0bf563deac76e307",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "f38354c660391a4256ef06c5040d695ce56fc47af5db1a6b63aeb35639f045d1",
+          "rust_file_sha256": "d6d1bcd83e3be70ddf7d2376b3a6e38bbbf1cf1b0fc5fe0c4575b83dba826532",
           "rust_module": "",
           "rust_function": "source_leased_and_terminal_records_are_absent_from_later_claims",
           "assertions": [
             {
               "source_line": 1250,
               "source_text": "assert :ok =",
-              "rust_line": 357,
+              "rust_line": 358,
               "rust_text": "assert_eq!((record.state(), record.payload()), created);"
             },
             {
               "source_line": 1259,
               "source_text": "assert {:ok, [claimed]} =",
-              "rust_line": 433,
+              "rust_line": 434,
               "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
             },
             {
               "source_line": 1267,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 437,
+              "rust_line": 438,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             },
             {
               "source_line": 1275,
               "source_text": "assert :ok =",
-              "rust_line": 382,
+              "rust_line": 383,
               "rust_text": "assert_eq!(outcome, Outcome::Changed);"
             },
             {
               "source_line": 1282,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 437,
+              "rust_line": 438,
               "rust_text": "assert_eq!((claim.batch().is_none(), claim.stop()), empty);"
             }
           ],
@@ -4958,32 +5010,32 @@
         {
           "scenario_id": "m1-4bda857b47effb76",
           "rust_file": "crates/wf-domain/tests/claim_apply/main.rs",
-          "rust_file_sha256": "f38354c660391a4256ef06c5040d695ce56fc47af5db1a6b63aeb35639f045d1",
+          "rust_file_sha256": "d6d1bcd83e3be70ddf7d2376b3a6e38bbbf1cf1b0fc5fe0c4575b83dba826532",
           "rust_module": "",
           "rust_function": "source_future_due_boundary_preserves_empty_and_singleton_claims",
           "assertions": [
             {
               "source_line": 1295,
               "source_text": "assert :ok =",
-              "rust_line": 268,
+              "rust_line": 269,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 1304,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 333,
+              "rust_line": 334,
               "rust_text": "assert!(claim.batch().is_none());"
             },
             {
               "source_line": 1312,
               "source_text": "assert {:ok, [claimed]} =",
-              "rust_line": 336,
+              "rust_line": 337,
               "rust_text": "assert_eq!(batch.batch().items().len(), 1);"
             },
             {
               "source_line": 1320,
               "source_text": "assert claimed.id == id",
-              "rust_line": 341,
+              "rust_line": 342,
               "rust_text": "assert_eq!(write.record.id(), record.id());"
             }
           ],

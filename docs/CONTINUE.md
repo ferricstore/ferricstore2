@@ -11,6 +11,23 @@ native build and complete compiler/header/library pins pass. Full runtime
 accounting, Rust source profiles, original Elixir parity and Linux acceptance
 remain open.
 
+The latest Rust checkpoint passes **952 tests across 90 targets on macOS**, with
+zero failures, ignored or filtered tests, plus six compile-fail examples across
+15 documentation targets. Formatting, all-target compilation, strict Clippy,
+warnings-denied documentation, architecture, reference and progress checks pass;
+all four cached offline dependency-audit categories pass. All 1,493 captured
+repository inputs stayed unchanged through that sequence, excluding only the
+three append-only peer review notes. No fresh advisory or Linux result is claimed.
+
+The new source-derived FIFO counterpart cancels the middle of three entries,
+claims and completes the first with its actual returned lease guard, then claims
+the third. Saved index membership advances only from actual publication deltas.
+Architecture, performance and implementation owners independently reviewed the
+source and assertion links. This adds existing-code conformance coverage; the
+unchanged original Elixir case stopped in Mix.PubSub TCP startup with `:eperm`
+before any test ran. Public setup, committed policy installation, durable
+publication, original profiles and full source parity remain open.
+
 The same-type ETF/V2 interoperability batch is implemented and validated on
 macOS. Real SET, GET and Core patches preserve complete values, original unknown
 bytes and actual predecessor/context authority across both formats. Six approved
@@ -18,7 +35,7 @@ private Domain children preserve the existing crate/dependency boundaries. The
 fifteen new behavior identities include substitutions, FIFO, physical fault cuts,
 mixed snapshot lineage, large transient conversions and committed node recovery.
 
-The reviewed B1 tree passes **951 tests across 90 targets**, with zero failures,
+The prior reviewed B1 checkpoint passed **951 tests across 90 targets**, with zero failures,
 ignored or filtered tests, plus **six compile-fail examples across
 15 documentation targets**. Formatting, all-target compilation, strict all-target
 Clippy, warnings-denied rustdoc, architecture and reference/progress checks pass.
@@ -211,8 +228,8 @@ remain pending.
 
 Full pinned Elixir scenario/assertion/setup/profile parity, governing services,
 accepted consensus/runtime, application/transports and Linux/macOS acceptance
-remain required. Progress remains 85 source-derived declarations, 95 mappings and
-384 assertion links; this increment adds no complete source-case parity credit.
+remain required. That native-only increment retained 85 source-derived declarations,
+95 mappings and 384 assertion links; it added no complete source-case parity credit.
 The full parity gate was executed and still fails. The active full-completion
 goal continues beyond this reviewed component.
 
@@ -356,8 +373,8 @@ suite above. Both backends retain canonical redb 4.4.0/no-default/std-only.
 Actual execution is Darwin arm64. Separate native Linux validation remains required.
 No runtime framework, new dependency or consensus-to-storage edge was introduced.
 
-The executed full parity gate still fails. Current ledger counts are 85 source-derived
-declarations, 95 mappings and 384 assertion links; 1,681 runtime cases remain
+The executed full parity gate still fails. Current ledger counts are 86 source-derived
+declarations, 96 mappings and 390 assertion links; 1,681 runtime cases remain
 unmatched and 1,655 declarations unresolved. These component tests add no complete
 source-case parity credit. Every pinned Elixir setup, fixture, mandatory profile
 and runtime scenario remains required. The full goal stays active.
@@ -2287,8 +2304,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **85 reviewed
-source declarations, 95 counterpart records and 384 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **86 reviewed
+source declarations, 96 counterpart records and 390 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 
