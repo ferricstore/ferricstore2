@@ -217,6 +217,63 @@ defmodule Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest do
     assert Map.delete(pin_limits, :pinned_bytes) == Map.delete(defaults, :pinned_bytes)
   end
 
+  test "control_measurement_bounds_clipped_growth_and_reuses_inputs" do
+    SourceTest.bootstrap!()
+    tuple = :erlang.make_tuple(3, nil)
+    defaults = SourceTest.limits()
+
+    base = %{
+      defaults
+      | donor_bytes: 0,
+        decoded_words: 26,
+        terms: 6,
+        facts: 0,
+        text_bytes: 0,
+        depth: 0,
+        pinned_bytes: 280,
+        output_bytes: 0
+    }
+
+    word_limits = %{base | decoded_words: 25}
+    pin_limits = %{base | pinned_bytes: 279}
+    term_limits = %{base | terms: 5}
+    assert tuple_size(tuple) == 3
+    assert Enum.all?(Tuple.to_list(tuple), &is_nil/1)
+
+    results =
+      Enum.map([word_limits, pin_limits, term_limits, base], fn limits ->
+        Native.capture_terms({:measure_control, tuple}, limits)
+      end)
+
+    assert results == [
+             {:error, {:limit, :decoded_words}},
+             {:error, {:limit, :pinned_bytes}},
+             {:error, {:limit, :terms}},
+             {:ok, %{live_words: 26, live_pinned_bytes: 280, live_terms: 6}}
+           ],
+           inspect(results, limit: 40, printable_limit: 120)
+
+    assert tuple == {nil, nil, nil}
+    assert tuple_size(tuple) == 3
+    assert Enum.all?(Tuple.to_list(tuple), &is_nil/1)
+    assert defaults == SourceTest.limits()
+
+    assert base == %{
+             donor_bytes: 0,
+             decoded_words: 26,
+             terms: 6,
+             facts: 0,
+             text_bytes: 0,
+             depth: 0,
+             pinned_bytes: 280,
+             output_bytes: 0
+           }
+
+    assert word_limits == %{base | decoded_words: 25}
+    assert pin_limits == %{base | pinned_bytes: 279}
+    assert term_limits == %{base | terms: 5}
+  end
+
   defp with_captures([], _queries, results, body), do: body.(Enum.reverse(results))
 
   defp with_captures([limits | tail], queries, results, body) do

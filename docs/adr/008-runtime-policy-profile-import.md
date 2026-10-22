@@ -45,6 +45,9 @@ part of the same native translation unit. B2-ARCH-INPUT-HOME1 selects
 for caller input admission and binding helpers. Their mechanical moves preserve
 the original behavior; later owner/encoder changes require separate validation.
 These are first-party build inputs, separate from the manifest's OTP header pairs.
+The existing `tools/tests/policy_runtime_capture/query_admission.exs` child groups
+the selected query, original-control and administrative-frontier regressions;
+its module is `Ferricstore.PolicyRuntimeCaptureQueryAdmissionTest`.
 The selected private `{:encoder_layout, E}` request to `Native.capture_terms/2`
 exposes actual header-derived encoder layouts, with its own bounded control
 report. It performs arithmetic only; encoder admission still requires the
@@ -56,6 +59,28 @@ hashes or encoded terms and consumes no donor-byte quota. This supplies actual
 graph operands for encoder/copy admission without a synthetic donor or a configured
 fact maximum substituted for an actual graph; it does not establish source-byte
 binding, deferred-allocation retirement or complete wrapper accounting.
+
+B2-ARCH-FIRST-CONTROL1-SOURCE1 selects the private
+`{:measure_control, actual_value}` request with the same three live report fields.
+It measures original administrative roots through an explicit call-local work
+stack independently of semantic policy depth. It preserves the old semantic
+`measure_terms` behavior and all existing live-value classifications. LIFO child
+visitation gives this new mode its own deterministic refusal order. Request and
+report storage, declared native control fields, reached heap/backing and every
+frontier allocation are prospectively admitted. Checked growth allocates and
+copies before freeing the old buffer; cumulative requested bytes retain credit
+for every allocation, including clipped growth. Every exit frees the owned
+frontier before returning its funded report or refusal. Requested bytes do not
+establish allocator overhead, total native stack/RSS or opaque destructor graphs.
+
+Fresh capture preserves source/parent/known-limit checks and scalar input error
+order, then measures the complete original limits and verified context before
+preparation. Its full word/pin bank seeds preparation and survives the existing
+downstream ownership checks. Extensions use the same administrative measurement,
+preserving deep ignored metadata without weakening semantic policy-depth limits.
+Original limits are retained and measured rather than narrowed to recognized
+fields. Earlier budget exchange, crypto/RNG and complete failure/retirement
+accounting remain separate duties.
 
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported

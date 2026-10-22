@@ -5,7 +5,7 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest runtime capture checkpoint passes **all 24 tests on macOS**, including
+The latest runtime capture checkpoint passes **all 25 tests on macOS**, including
 the original-limits ownership and deep-metadata extension regressions. Its strict
 native build and complete compiler/header/library pins pass. Full runtime
 accounting, Rust source profiles, original Elixir parity and Linux acceptance
@@ -168,6 +168,15 @@ OTP headers and all 302 compiler inputs pinned through execution. Requested
 buffer storage is accounted for; allocator overhead, total native stack/RSS,
 opaque resource graphs, first-message/crypto/retirement accounting and actual
 BEAM sort-provider correspondence remain separate open duties.
+An additional supplemental test passes exact administrative-frontier boundaries:
+the actual three-element tuple needs 26 words, 280 requested bytes and six term
+visits. One less word, byte or term produces its exact typed refusal, followed
+by healthy reuse of the same input. The clipped 1-to-2-to-3 growth retains all
+48 requested buffer bytes. All previous 24 tests remain unchanged and pass in
+the complete 25-test run, with repository and external native inputs unchanged.
+This is existing-code coverage and functional reuse evidence; cleanup source
+review remains distinct from allocation-leak measurement. ADR-008 now documents
+the already selected administrative mode and original-control responsibility.
 Genuine failing regressions preceded donor-limit, manifest, loaded-library identity and
 policy-order repairs. Compression and trailing bytes now refuse before decoding;
 the changed-library check preserves the original loaded artifact. Source-specific
