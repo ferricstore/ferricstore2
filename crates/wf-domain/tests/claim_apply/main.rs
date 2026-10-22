@@ -39,7 +39,9 @@ use wf_types::version::{
 
 mod activated_priority;
 mod admission;
+mod fifo_indexes;
 mod fifo_middle_cancel;
+mod fifo_transition_unblock;
 mod observed;
 mod replay_models;
 mod source_scenarios;

@@ -11,3 +11,7 @@ workspace = true
 
 [dependencies]
 wf-types.workspace = true
+
+[[bench]]
+name = "indexed_singleton"
+harness = false
