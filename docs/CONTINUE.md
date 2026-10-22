@@ -38,8 +38,9 @@ order through actual-guard Retry and later FIFO activation. The reviewed interfa
 scaffold passes the complete checkpoint above while explicitly refusing execution
 and retaining closed wire/storage profiles. Its two new boundary tests and one
 architecture test account for the three additional tests. The approved three-file,
-eight-test behavior suite must reach and freeze real runtime RED against this
-scaffold before the guarded body is released. Reciprocal review preserved the
+eight-test behavior suite now compiles and fails at runtime against this scaffold:
+the three core positives reach UnsupportedOperation. Its recorded RED checkpoint
+must be committed before the guarded body is released. Reciprocal review preserved the
 source's unconditional running-FIFO rejection. The full original six-assertion
 case, public/durable codecs and profiles remain required; selected unit tests
 alone will not certify that case.
