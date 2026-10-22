@@ -15,15 +15,32 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **953 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **954 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
-all four cached offline dependency-audit categories pass. All 1,496 captured
+all four cached offline dependency-audit categories pass. All 1,497 captured
 repository inputs stayed unchanged through that sequence, excluding only the
 three append-only peer review notes. No fresh advisory or Linux result is claimed.
 
-The newest source-derived FIFO counterpart transitions the first claimed flow
+The newest source-derived FIFO counterpart reclaims the expired running head
+with its new worker and 50ms lease while the queued follower stays blocked. Four
+actual selection calls preserve the source times, limits and worker values;
+canonical records and saved membership advance only through actual publication
+deltas. Six direct source assertion links are reviewed. The focused claim target
+passes 27 tests and the complete restored-code checkpoint above passes. This is
+pure existing-code conformance, with original public setup, phase scheduling,
+durability and complete required profiles still open.
+
+The next missing pure operation is atomic StepContinue: keep physical running,
+rotate the actual lease token/fence once, change logical state and preserve entry
+order through actual-guard Retry and later FIFO activation. Architecture selected
+the precise interface-shell, frozen behavioral RED and guarded-body stages after
+reciprocal review caught unconditional running-FIFO rejection and closed-codec
+requirements. The full original six-assertion case, public/durable codecs and
+profiles remain required; selected unit tests alone will not certify that case.
+
+The preceding source-derived FIFO counterpart transitions the first claimed flow
 from running to waiting outside its queued FIFO state, using its actual returned
 lease guard, then claims the follower. Saved FIFO and Parallel membership advances
 only through actual publication deltas. Its four direct assertion links and the
@@ -43,15 +60,16 @@ unchanged original Elixir case stopped in Mix.PubSub TCP startup with `:eperm`
 before any test ran. Public setup, committed policy installation, durable
 publication, original profiles and full source parity remain open.
 
-The reviewed indexed-batch benchmark compiles and passes strict Clippy and its
-five-profile correctness smoke. One retained, optimized unchanged-code baseline
-executes all 80 sample rows, with the executable and repository inputs pinned
-through smoke and measurement. Actual Cargo profile and compiler flags are
-recorded in the coordination note. CPU model/core counts remain unavailable;
-this single macOS process establishes exploratory component measurements only.
-No candidate optimization, comparison, allocation count, speedup, Linux result
-or M8 completion is claimed. Preserve baseline A in place; do not rebuild its
-target directory after a future product edit.
+The indexed-batch benchmark passes optimized correctness smoke. Exactly four
+ABBA blocks (16 processes, 1,280 sample rows) compare immutable A/B artifacts with
+matching compiler, profile, features and complete flags. Accepted singleton
+B/A=0.9843 fails the predeclared 5% gain and noise rules; several bulk controls also
+fail their 2% overall or 5% block gates. Independent performance review recomputes
+every process statistic and exact rational comparison. The original product
+source is restored byte for byte and passes the complete checkpoint above.
+Preserve both recorded artifacts in their reserved target roots. CPU model/core
+counts remain unavailable; these are exploratory same-host macOS component
+measurements, without allocation-count, Linux, p99 or M8 acceptance.
 
 The same-type ETF/V2 interoperability batch is implemented and validated on
 macOS. Real SET, GET and Core patches preserve complete values, original unknown
@@ -2329,8 +2347,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **87 reviewed
-source declarations, 97 counterpart records and 394 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **88 reviewed
+source declarations, 98 counterpart records and 400 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

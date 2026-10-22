@@ -204,14 +204,33 @@ fn check_delta(
     command: &CommittedCommand,
     history_kind: EventKind,
     delta: &IndexDelta<'_>,
+    previous: Option<&WorkflowRecord>,
 ) -> TestResult {
     let (kind, expected_dues) = match &command.operation {
         Operation::Create(_) => (EventKind::Created, (None, Some(Some(2_000)))),
         Operation::Cancel(_) => (EventKind::Cancelled, (Some(Some(2_000)), None)),
-        Operation::Claim(_) => (
+        Operation::Claim(claim) => (
             EventKind::Claimed,
-            (Some(Some(2_000)), Some(Some(command.now.get() + 30_000))),
+            (
+                Some(Some(2_000)),
+                Some(Some(command.now.get() + claim.lease_ms)),
+            ),
         ),
+        Operation::Reclaim(claim) => {
+            let previous = previous.ok_or("reclaim has no canonical predecessor")?;
+            assert_eq!(previous.state(), b"running");
+            assert_eq!(
+                previous.next_run_at(),
+                previous.lease().map(|lease| lease.deadline)
+            );
+            (
+                EventKind::Claimed,
+                (
+                    Some(previous.next_run_at().map(TimestampMillis::get)),
+                    Some(Some(command.now.get() + claim.lease_ms)),
+                ),
+            )
+        }
         Operation::Complete(_) => (EventKind::Completed, (Some(Some(32_000)), None)),
         Operation::Transition(_) => (
             EventKind::Transitioned,
@@ -268,7 +287,8 @@ pub(super) fn publish(
     command: &CommittedCommand,
     index: u64,
 ) -> TestResult {
-    let previous = rows.get(command.id.as_bytes()).map(|(_, meta)| *meta);
+    let previous = rows.get(command.id.as_bytes());
+    let predecessor = previous.map(|(record, _)| record);
     let mut next_members = members.clone();
     let mut next_parallel = parallel.clone();
     let (record, metadata) = with_published(
@@ -313,6 +333,7 @@ pub(super) fn publish(
             } else {
                 previous
                     .ok_or("missing predecessor metadata")?
+                    .1
                     .state_enter_seq
             };
             assert_eq!(
@@ -321,7 +342,7 @@ pub(super) fn publish(
             );
             assert_eq!(plan.consumed_ordinals(), u32::from(enters));
             let delta = plan.deltas().next().ok_or("missing publication delta")?;
-            check_delta(scope, command, history.kind, &delta)?;
+            check_delta(scope, command, history.kind, &delta, predecessor)?;
             assert_eq!(write.record.id(), &command.id);
             assert_eq!(write.record.workflow_type(), scope.0);
             assert_eq!(write.record.payload(), Some(command.id.as_bytes()));
@@ -349,6 +370,41 @@ pub(super) fn claim_one(
     expected_id: &[u8],
 ) -> Result<(usize, Option<WorkflowRecord>), TestError> {
     let (now, index, limit) = step;
+    let partitions = [scope.1];
+    let states = [b"queued".as_slice()];
+    let request = SelectionRequest {
+        partitions: PartitionFilter::Only(&partitions),
+        states: StateFilter::Only(&states),
+        limit,
+        ..SelectionRequest::new(b"g", scope.0, TimestampMillis::new(now))
+    };
+    let claim = Claim {
+        expected_state: b"queued".to_vec(),
+        worker: b"fifo-worker".to_vec(),
+        token: LeaseToken::new(format!("fifo-worker:{now}:1").into_bytes())?,
+        lease_ms: 30_000,
+    };
+    claim_requested(
+        scope,
+        rows,
+        members,
+        parallel,
+        policy,
+        (index, request, claim),
+        expected_id,
+    )
+}
+
+pub(super) fn claim_requested(
+    scope: (&[u8], &[u8]),
+    rows: &mut Records,
+    members: &mut FifoMembers,
+    parallel: &mut ParallelMembers,
+    policy: &PolicySnapshot,
+    step: (u64, SelectionRequest<'_>, Claim),
+    expected_id: &[u8],
+) -> Result<(usize, Option<WorkflowRecord>), TestError> {
+    let (index, request, claim) = step;
     let (count, selected) = with_published(
         scope,
         rows,
@@ -357,18 +413,15 @@ pub(super) fn claim_one(
         policy,
         index - 1,
         |_, view| {
+            assert_eq!(
+                (request.group, request.workflow_type),
+                (view.group, scope.0)
+            );
             let partitions = [scope.1];
             let states = [b"queued".as_slice()];
-            let selection = select(
-                &view,
-                SelectionRequest {
-                    partitions: PartitionFilter::Only(&partitions),
-                    states: StateFilter::Only(&states),
-                    limit,
-                    ..SelectionRequest::new(view.group, scope.0, TimestampMillis::new(now))
-                },
-                None,
-            )?;
+            assert_eq!(request.partitions, PartitionFilter::Only(&partitions));
+            assert_eq!(request.states, StateFilter::Only(&states));
+            let selection = select(&view, request, None)?;
             let count = selection.records().len();
             if count != 1 {
                 return Ok((count, None));
@@ -376,22 +429,31 @@ pub(super) fn claim_one(
             let selected = selection.records()[0];
             assert_eq!(selected.record.id().as_bytes(), expected_id);
             assert_eq!(selected.partition_key, scope.1);
-            assert_eq!(selected.action, SelectionAction::Claim);
-            Ok((count, Some(selected.record.id().as_bytes().to_vec())))
+            assert_eq!(selected.record.state(), claim.expected_state);
+            assert_eq!(
+                selected.action,
+                if claim.expected_state == b"running" {
+                    SelectionAction::Reclaim
+                } else {
+                    SelectionAction::Claim
+                }
+            );
+            Ok((
+                count,
+                Some((selected.record.id().as_bytes().to_vec(), selected.action)),
+            ))
         },
     )?;
-    let Some(selected) = selected else {
+    let Some((selected, action)) = selected else {
         return Ok((count, None));
     };
     let command = CommittedCommand {
         id: RecordId::new(selected.clone())?,
-        now: TimestampMillis::new(now),
-        operation: Operation::Claim(Claim {
-            expected_state: b"queued".to_vec(),
-            worker: b"fifo-worker".to_vec(),
-            token: LeaseToken::new(format!("fifo-worker:{now}:1").into_bytes())?,
-            lease_ms: 30_000,
-        }),
+        now: request.now,
+        operation: match action {
+            SelectionAction::Claim => Operation::Claim(claim),
+            SelectionAction::Reclaim => Operation::Reclaim(claim),
+        },
     };
     publish(scope, rows, members, parallel, policy, &command, index)?;
     let record = &rows
