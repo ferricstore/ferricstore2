@@ -177,11 +177,27 @@ defmodule Ferricstore.PolicyRuntimeCapture do
          {donors, anchors} when is_list(donors) and is_list(anchors) <- Input.normalize(prepared),
          {:ok, terms, admission} <- decode(donors, prepared, limits, caller),
          {:ok, observed, admission} <- Input.query_admission(queries, limits, admission) do
+      caps =
+        if map_size(limits) == 8 do
+          limits
+        else
+          %{
+            donor_bytes: limits.donor_bytes,
+            decoded_words: limits.decoded_words,
+            terms: limits.terms,
+            facts: limits.facts,
+            text_bytes: limits.text_bytes,
+            depth: limits.depth,
+            pinned_bytes: limits.pinned_bytes,
+            output_bytes: limits.output_bytes
+          }
+        end
+
       id = :crypto.strong_rand_bytes(32)
 
       state = %{
         context: context,
-        limits: limits,
+        limits: caps,
         terms: terms,
         donors: donors,
         anchors: anchors,
@@ -345,6 +361,8 @@ defmodule Ferricstore.PolicyRuntimeCapture do
     # Two24-word state versions, normalize tuple3, this pair/ok11, fresh closure3.
     # Keeper additionally prepays query_extension's five-word success tuple.
     extra = 8 * length(prepared) + if(initial?, do: 65, else: 67)
+    # Initial ignored metadata needs one static-key cap map after raw admission.
+    extra = extra + if(initial? and map_size(limits) > 8, do: 11, else: 0)
 
     with :ok <- check(retained.decoded_words + extra, limits.decoded_words, :decoded_words),
          :ok <- check(retained.pinned_bytes, limits.pinned_bytes, :pinned_bytes),

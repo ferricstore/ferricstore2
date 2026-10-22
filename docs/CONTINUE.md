@@ -5,7 +5,21 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The active native checkpoint runs **40 tests on macOS: 32 pass and eight fail**.
+The active runtime checkpoint runs **40 tests on macOS: 33 pass and seven fail**.
+The frozen first-budget-reply regression now completes: the keeper sends exactly
+the eight validated scalar caps, preserving healthy retry, capture/hash identity,
+retained/source shapes and the original ignored input graph. Raw limits still pass
+every original admission before normalization. Extra-key inputs prospectively fund
+one eleven-word cap map; exact eight-key inputs reuse their map. Original graph and
+copy credit is retained without refund. Actual compiled instructions confirm the
+static-key constructor and prepayment order; this is not a process-heap/RSS bound.
+All 32 preceding passes, including the six native components, remain green.
+Only the EXS source binding changed; the verified native library, 304 compiler
+inputs and 90 headers are unchanged. All 1,813 repository/native inputs stayed
+unchanged during execution. Seven public debt/grant/ACK/encoder/exhaustion failures,
+complete producer accounting, original profiles, full parity and Linux remain open.
+
+The preceding native checkpoint runs **40 tests on macOS: 32 pass and eight fail**.
 All six frozen direct component regressions now pass against the real native
 kernel. They execute registration and caller authority, reference/epoch binding,
 repeated-report charging and terminal single use, cancellation and reuse,

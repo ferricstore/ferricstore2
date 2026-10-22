@@ -88,8 +88,18 @@ parent is represented by nil in that request. The keeper's identity comparison
 retains parent-mismatch precedence; the existing call retains invalid/dead-session
 origins. Later calls still use the original parent. A frozen real send-trace
 regression precedes this repair and passes with all 26 capture tests. This closes
-invalid-parent graph transfer only. Valid-binary backing, the complete limits
-reply and fixed message/signal/crypto/retirement accounting remain open.
+invalid-parent graph transfer only. Valid-binary backing, per-attempt reply
+accounting and fixed message/signal/crypto/retirement accounting remain open.
+
+CAP-WIRE1 closes the first successful reply's ignored-limit graph escape. Original
+raw limits retain every upstream control, input, decode and query admission. The
+initial normalization admission prospectively adds eleven words/eighty-eight bytes
+only for extra-key inputs. After all admission succeeds, one static-key map of the
+eight validated scalar caps replaces the keeper's raw limit map; exact eight-key
+inputs reuse their map. Previously paid raw graph/copy credit is never refunded.
+The compiled literal path and unchanged regression pass on macOS, preserving every
+prior passing capture case. This local reply-shape repair does not accumulate
+per-attempt debt or establish complete public channel/retirement accounting.
 
 B2-BUDGET-PROTOCOL1-NATIVE-INGRESS1 selects a staged private admission protocol.
 The rejecting interface adds `tools/policy_runtime_capture/budget.inc` to the

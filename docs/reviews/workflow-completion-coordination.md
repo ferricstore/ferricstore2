@@ -50341,3 +50341,116 @@ progress raw5077910+560/0025e1b8b3ab1e3cd61fc4b2384b34f5cf3924ffd68632d01bc75ace
 All frozen inputs retained; current89/100/410 and fullparity incomplete verified.
 Root saves reviewed native-component implementation and mixed-state conformance;
 this is an intermediate full-goal checkpoint, not completion or a paused goal.
+
+Goal continuation audit after d7c6b7a: previous turn is PROGRESS, not a wait or
+status-only turn. Authoritative commit changes the native kernel and adds the
+executed mixed-state counterpart. Actual967Rust tests/6compile-fails and native
+32pass/8publicfailures plus304-input strict build and final governance are saved.
+Current checkout was clean at entry,137ahead; all3assigned agents verified live.
+No prior Root compiler/runtime/check session remains live or is being restarted.
+Full ordered M1-M8/parity/profile/Linux+macOS objective remains active/incomplete.
+Current next action is a concrete finite repair of the frozen first-budget-reply
+raw-limit graph escape, with exact constructor/copy funding selected by ARCH and
+PERF before production edits; originalcaps/tests/rawinput accounting stay held.
+No new artifact/API/body is released by this audit classification.
+
+CAP-WIRE1 SOURCE1 — Root exact existing-wrapper author release
+
+ACTUALLY WHOLE/hash-read ARCH4160173+6132/5d83487189f62fd8c6c5bf7f5f92cbb45078eea363de86ebe78550414df35334
+and DOMAIN4861474+4097/fb7d14f02dc26ebeafb97a6747d07d436c5243e1fb9bb8b9c64c912fb002d704.
+Root independently read actual capture_epoch/normalization/transfer/keep and frozen
+query407/501. Whole recent real runtime5057378+14514/1f54481c reaches caps9 with
+ignored=true at407 before this change; its unchanged test is committed in d7c6b7a
+and earlier frozen regressions. This is existing executed RED, not a new compile
+failure or a post-body conformance claim. Current wrapper579/19923/77765607 held.
+
+RELEASE DOMAIN as sole source writer ONLY tools/policy_runtime_capture.exs in the
+TWO existing functions capture_epoch/4 and normalization_admission/4. Initial raw
+map_size>8 adds11W/88P through the existing prospective checks; exact8/noninitial
+adds0. All with-clauses keep the complete original raw limits through the final
+query admission. Afterward reuse exact8 or build ONE exact static-key8scalar map
+and put it in existing state.limits. No newhelper/file/type/API/statefield, Map.take,
+intermediate list/carrier or copied raw-state field; no original R refund or cap
+change. Keep input/control/rawcopy accounting and all other bodies literally held.
+Native C/include, Budget, Input, bootstrap, all40tests and Rust sources remain exact.
+Pinned literal loader/emitter and fullraw mapcopy dominate the projection, including
+larger maps; no processheap/carrier/RSS/fullproducer claim follows from11W/88P.
+Return a real geometry issue rather than pack; file<=600/functions<=100 natural.
+
+All Root validators are terminal. Author reads exact selection/release, writes only
+this finite body delta, then STOP with completehash/geometry/entireinverse roster.
+No author formatter/build/test/VM/probe/Git. ARCH/PERF independently review stopped
+source while Root alone canonical-formats and validates. Selected Root in-memory
+actual-wrapper Code.compile_file/beam disassembly goes into existing validationlog,
+then existing EXS source bindings update and unchanged40tests run. No C rebuild
+or new probe artifact is needed. Frozen407/allcontrols/native6 must actually pass;
+501/grants/ACK/lateK/terminal and fullparity/profiles/bothOS remain ordered next.
+
+CAP-WIRE1 actual frozen407 GREEN — Root integrated source/compiler/runtime record
+
+Root canonical formatting is terminal0 and byte-identical:wrapper597LF/20523B/
+9a52a8bf66c8b71c288b8abcae13287336978009d25e7accb018c3704bfe0037,
+functions59/17,maxline99. OWN three literal region reversals inside the selected
+TWO functions restore ENTIRE579/19923/77765607 TRUE against d7c6b7a. All other
+wrapper bodies plus Native/Budget/Input/bootstrap/all40tests/Rust are literal.
+Frozen407's actual caps9/ignored=true RED precedes this body; this is a real
+regression repair without test/cap/oracle changes or retroactive conformance RED.
+
+Selected actual-wrapper in-memory compile/disassembly41116 TERMINAL0:
+raw5079661+27019/2103f9ba631ed48ad09726d8ad534d4eae958ffef8239a6ff5e1020589bc92ce.
+Actual Elixir1.19.5/OTP28.3.1/ERTS16.2,opt8little; logged actualBEAM
+62ff03369f338ffbbb36d42351cbecae2040b3b56c5c7db85285539174e6ad09.
+Raw argument y12 survives through final query admission; size8 bypasses the
+constructor. Other inputs build exactly8staticatomkeys from emptyliteral map,
+then the result feeds existing state.limits. Initial?/raw>=9 selects11else0
+BEFORE old W/P/div8checks; returned pins add8*extra. This actual BEAM path matches
+the pinned literal-key loader/emitter11owner proof, not observed JIT/RSS/GC peak.
+All1506repository inputs stayed unchanged050bb8e9b5a0cb9c06f5483151616b6be593629a6f74c986eb8d6e2ee44e29a2.
+
+Only existing EXS tool-source binding changed, with real report5106738+1517/
+101effcbb9c983ef4a8e160fc884bc6fb4b68cbc27e3f61de332f77b9bc156a2.
+Current8745745B receipt776571c0bfb8d9121c9e8790c1ee059812ff76ca12ba6028adf256ecc1c595f2
+binds all12current tool sources; ALL304Ccompiler blobs, native71832/cb2a5eb3,
+manifest0aec7246,headers90/7d4b6bce,compile-command remain exactly unchanged.
+No fake C/header/native rebuild was run for this EXS-only change.
+
+Actual unchanged40 runtime89111 TERMINAL1, seed707336/56.4s,33passes/7failures:
+raw5109081+13826/da5eb9e3355f3b41dcd10d4ef9e7055365246343ab26bd882813e6b203ab6f2a.
+All1813repository/native inputs unchanged4884e89079d5f6bef967521b3a61257d3d078bb7e9dee3f2186eebf97be758a8.
+COMPLETE frozen bounds_first_budget_reply_to_known_caps now passes, preserving
+ALL32prior passes including native6. Exact8caps/noignored/reference, actual typed
+invalidquery and samecaller/parent healthyretry, session/ABI/independenthash,
+ten full capture fields, retained/source shape/ranges/currentMD5/SHA32, full
+caller rawlimits/query/4096PIDtuple preservation and fixture cleanup all reached.
+Old raw600k/128000 refusal, deep128 metadata and clean/exact8 controls remain.
+No ignored raw credit was refunded and no new receiver raw/caps duplicate exists.
+
+Remaining7 are unchangedfirstfailures: query501 same624W/11056P; protocol42
+unmanaged legacykeeper,111/277 unsupportedBudgetrequest,233missingACK,390lateK
+624<18580W,4411455invalidqueries/noexhaustion. Their later pin/cap/hash/terminal
+cross-products stay masked. This is not accumulated replydebt, concurrentgrant,
+sourceMD5/error/ACK/encoder/retirement/fullproducer/public40 GREEN or Linux proof.
+Full M1-M8, allrequiredElixir scenarios/profiles and bothOS remain active/open.
+
+ACTUALLY WHOLE/hash-read ARCH source2320/fb8fd289+compiled1727/3d54353f,
+PERF7166/16e1+HAMT1056/b110+source3244/6bac+compiled2271/5cce+actual2448/840d,
+DOMAIN source3658/c3b5 and actual4869229+3943/
+9fd864fa096fb5adb1725cc2ef71e559077972a18d27b46d4e6e663c28604804.
+Independent reviews agree local rawcopy dominance for both map layouts and
+actual complete407 controls. Current-version online OTP guidance is distinguished
+from pinned28.3.1 source operands; no performance-gain claim or allocator probe.
+Root updates CONTINUE/ADR008; no Rust/frozen parity inputs or A/B roots changed.
+Final governance follows; unchanged967Rust/native C compiler/benchmark/denied
+network is not rerun. ARCH separately chooses next501/file boundary; that finite
+planning is not a prerequisite for saving this already reviewed local repair.
+
+CAP-WIRE1 final governance9701 TERMINAL0:48architecturetests,reference,progress,
+and git diff --check all pass on1506unchanged repositoryinputs
+ aa1ecba945fac97b5ce0d33251fd81a1a97784c44dcb114f805536de85b5c81e.
+Actual48 raw5123067+5116/eb58c0155ca6d76d0c9d778cfcc3a4d5b4832caa2d6fdf3a1e2ea3dba4c2ba79;
+reference5128348+365/ca4afb1bd4a5a63e9ccc322316d9c961fac85e506c11bcac9267c890070bef43;
+progress5128877+560/0025e1b8b3ab1e3cd61fc4b2384b34f5cf3924ffd68632d01bc75ace5fd0fa23;
+whitespace5129606+0/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+89/100/410 mapping and full-parity-incomplete status retained; no Rust source
+changed after967checkpoint. This saves the concrete407 repair, not a completed
+workflow engine. Active501/layout consultation continues without source release.
