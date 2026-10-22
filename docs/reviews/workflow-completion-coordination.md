@@ -49509,3 +49509,391 @@ unstaged. Source/ledger whole hashes equal their complete966/6 quality epoch.
 No wrapper/native repair, benchmark change, denied remote retry or original Elixir
 reset/clean occurs. This local checkpoint advances the full active M1–M8 goal;
 B2 native ingress/metering and every source/setup/profile/OS duty remain required.
+
+
+## Root continuation after completed f2f7 — native pre-entry decision audit
+
+Previous goal turn is PROGRESS, not merely status: actual new repeated-bank
+runtime RED28/2 was frozen dd6cf7d before repair; complete pure source f2f7 and
+six links were committed7f00ba0 after full966/6 all-ten/1501-input acceptance,
+independent ARCH/PERF source inverses and reciprocal DOMAIN metadata review.
+Current authoritative tree has only three append-only peer notes dirty; all Root
+native/Rust/metadata processes are terminal, no missing handle restarted.
+
+Authoritative inventory confirms all THREE requested6.1-sol/max owners active on
+disjoint READ-ONLY next design: ARCH selects native entry/resource/semantics,
+PERF checks pinned NIF lifecycle/requested costs/PID reuse/nonallocating return,
+DOMAIN proposes deterministic precise test homes and functional error precedence.
+No new actual C type, file, module, model, helper, API or probe is released.
+Root read current complete entry-state/load/export C regions and actual call/2:
+make_ref/monitor/send precede keeper admission today. A no-wait native permit
+before that frontier is the concrete preferred candidate. Operational Busy
+would be an EXPLICIT earlier admission origin, not silently relabeled parent or
+source mismatch. Preserve parent-before-source ON actually admitted calls and
+all frozen invalid/dead-session/adequate ordinary retry observations. Its actual
+source compatibility and native requested layout/escrow remain under consultation.
+No arbitrary forged-PID/RSS/all-VM theorem is invented. No hidden caller cap,
+cap division, returned unproved spend certificate or unknown-work refund.
+
+Root relayed this concrete choice to ARCH for decision against ADR008/tests;
+module-global mutex/registry ownership and keeper/active-caller death/PID reuse
+must have explicit source-backed custody rather than a generic lock assumption.
+Current native frozen551LF test and wrapper573/native585 inputs stay untouched.
+Full Rust966/6 remains the completed current source epoch; no unchanged full,
+native, benchmark, denied network/provider or Linux route has been reexecuted.
+All original setup/public/durable/profiles/Linux/macOS and M1–M8 remain required.
+
+
+## Root BUSY-LITERAL-PROBE1 precreation release
+
+Actually WHOLE/hash-read ARCH4079066+1638/
+9582f9c303d34ef3bcbe59eac6395e591b7d6118a3d35139cdaed4a027976e9f
+and adopt its exact narrow probe before any compilation/creation. Root RELEASES
+only in-memory Ferricstore.PolicyRuntimeCapture.BusyLiteralProbe with busy_result/0
+and from_native/1 clauses as selected. ExactOTP28.3.1/Elixir1.19.5 clean process,
+quoted compilation, in-memory BEAM disassembly, actual versions and source/BEAM
+hashes plus COMPLETE both-function instructions in existing validation log.
+No physical source/BEAM/report, capture Native load, allocator/RSS experiment,
+repeated timing or denied route. Hash decoded in-memory AST/BEAM in Python to
+avoid introducing a crypto NIF load for this compiler-only observation.
+Actual future wrapper branch still needs its own compiled-body proof. This
+selection creates no production Budget/Native/resource API/model/helper and pays
+none of their fields/channels. No Root process or peer source writer is live.
+
+
+## Root BUSY-LITERAL-PROBE1 — actual compiler evidence and native owner corrections
+
+Approved compiler-only probe executed once, TERMINAL EXIT0/UNCHANGED True,
+1501-inputd73e255bcd32adfc962d9c397e1bdd39fa54cf080399c18a4b05de73959cae5b.
+Root whole actual output and independent raw hash4822804+1722/
+c280055f385574b5e80347f58f27c9f011769726b7cf21b66bb0ba4bca4f4303.
+Actual Macro.to_string source235B(excluding display LF)/
+95483c9a0093afe45dc3cd28f4259d9eb87fd6aaf033f07190546caa0e9617ae;
+quoted AST725B/43440d946ca9922bf1f46daa1f6d4f616a4f6cab70edd9020dafa650a64b7877;
+in-memory BEAM2172B/19e074e1f26641e80841e342c5a3a8cbc12c630d2e7c18512c7bd79ac618a0e9.
+No physical source/BEAM/report was created. Hashing happened in Python; actual
+capture_native_loaded=false and crypto_loaded=false are printed. Versions/root
+OTP28.3.1,ERTS16.2,Elixir1.19.5 are printed; opt/wordsize8 were ASSERTED in the
+recorded run command, not printed as new stdout fields. There was no fresh endian
+assertion: earlier strict Native ABI's little-endian result remains separate.
+
+Both actual named functions' COMPLETE instructions were inspected. busy_result/0
+and from_native/1's Busy branch move {:literal,{:error,:session_busy}} directly
+to x0 and return, without tuple/heap construction on those branches. Real calls
+return expected Busy envelope and ok. The unknown-input inlined function-clause
+tail is separate and gets no allocation claim. This proves these compiled probe
+bodies ONLY, not a future wrapper's different code, Native try-enter, monitors,
+resource handles/channels, global quota/RSS or a timing gain. PERF has independently
+whole/hash-read output/ARCH selection/Root precreation and agrees with the narrow
+literal result; its exact final receipt is forthcoming. No rerun is needed.
+
+Also actually WHOLE/hash-read DOMAIN4774003+11364/
+fe3b4c7906f68c6ec717f8a210b9c50e8e655e1bb613245db534e25006c3931e
+and PERF3190782+14081/
+c20f4622fecd4122f481cc9203c95190ac1477cdb64f319cebfa0008cb99598e.
+Six concrete tests/five helper proposal is NOT a creation release; its atom-only
+entry sketch predates paid resource+epoch direction. The real same-ref funded
+settlement ACK must follow authoritative debt commit AND native release before
+public completion, or immediate same-caller retry races its own entry. Late old
+ACK/abort must not free a new exact resource/epoch/owner/phase. Actual source
+also places process-table deletion before yielding DOWN cleanup; full PID key
+is not eternal no-wrap. Callbacks must use supplied resource incarnation, not
+lookup a newly registered PID and delete it. PERFs recommended pinned intrusive
+RB transplant avoids custom crit-bit branch-storage relocation; actual named
+implementation/initialization roster remains for ARCH selection.
+
+Native success7W/56P is visible tuple+MagicRef only, NOT its whole requested bank.
+Actual NIF constructor env can additionally request <=HEAP_FRAG_SIZE(204) for
+those exact3W+4W constructors; resource/monitor/ordinary Process.monitor/global
+mutex/ACK/unknown-exit owners remain additive. Proposed session176/node40 and
+resource/M_resource/M_proc/mutex formulas are source/ABI arithmetic, not newly
+instantiated or executed sizeof types. Dtor/demonitor return supplies no immediate
+retirement. Public session remains PID; exact opaque internal resource+small epoch
+can protect stale continuation, with actual construction prepaid. Valid32-parent
+backing/earlier source predicate is an explicit separate required frontier, not
+silently covered by a fixed entry E. Native fullM/provider/escrow/OS duties remain.
+
+Goal is ACTIVE. Frozen native28/2 and current Rust966/6 remain unchanged. No new
+production artifact/type/API/helper/resource, native workload/build/benchmark,
+denied environment probe or hidden capacity cap is released by these decisions.
+
+
+## Root continuation — finite peer evidence accepted; first-wire ref correction
+
+The preceding status turn completed a finite review: Root WHOLE/hash-read
+PERF3204863+2684/550461f7a1520f3b957a862b78c1a023ce1dc8b6e74a352c41f33d94853072ae.
+Actual probe Busy bodies use literals; this does not license the future wrapper
+or pay resource construction. No probe/native/Rust suite is repeated unchanged.
+HEAD remains7f00ba0; only the four review records are dirty; no Root validation
+process is live. Full goal remains ACTIVE, including all original cases/profiles
+and both Linux/macOS, rather than just this component checkpoint.
+
+Authoritative agent inventory showed ARCH active and the two finite reviews
+terminal. Root reactivated existing DOMAIN/PERF owners for disjoint notes-only
+reciprocal review of the exact resource/epoch/owner/first-wire protocol; all three
+now run. No agent was interrupted or spawned and no source writer was released.
+ARCH owns the exact named native API/type/field/home/phase selection, DOMAIN the
+existing six-test/five-helper update, PERF the actual public-NIF ref/lifetime costs.
+
+The frozen first budget payload is a2tuple, so an unselected handle/epoch field
+cannot be added to it. ARCH proposes binding the actual ref before that unchanged
+send. PERF's actual pinned-header review finds NO public enif_get_ref extractor;
+uint32[3] via internal_ref_val would introduce a private layout contract, not a
+public API. A source-priced owned environment and enif_make_copy/enif_is_identical
+is the smallest public-API alternative under review. No hash-only identity,
+borrowed Eterm/env, uninstantiated session192 sizeof or allocation-free success
+is accepted. Exact constructor/owner pricing and creation release remain pending.
+
+Root reread current complete wrapper573LF and native entry/load/export regions,
+the ADR008 selected roster and actual controller/bootstrap source paths. Existing
+make_ref/monitor/send happen before keeper admission. The new no-wait entry must
+precede them; its admitted actions still preserve parent then source checks.
+Funded settlement ACK follows authoritative debt commit AND native release before
+public return. Late old resource/epoch/ref actions cannot unlock newer grants.
+Frozen28/2 and Rust966/6 stay unchanged; no new artifact/API/helper/type or
+production repair is released by this continuation.
+
+
+## Root NATIVE-INGRESS1 Stage A precreation release
+
+Actually WHOLE/hash-read ARCH4080704+20628/
+30e95f260f3a2383c5d98b7e9960fba14c3c1280eea5996478ccc9506d19130c,
+DOMAIN4785367+8033/f34c5b82554f6b38372b058ad2c5f02267783ecff39a30d617312cbe75fc9f26,
+and PERF3207547+5634/608dbfbaba50ee1fea2df8ea20e43b8581efa0db57681c0ea8cece0e0acf3016
+plus3213181+538/adcf3515d54d97dab54c91ffae144e64359b0dc7d17f0988ef446512b81b4a8c.
+Root adopts ONLY the exact rejecting Stage A before creation; no real kernel,
+Capture wiring, partial fee repair or metered Input implementation is released.
+
+Disjoint writes: PERF owns NEW tools/policy_runtime_capture/budget.inc and existing
+tools/policy_runtime_capture.c only. Create budget_load/2,budget_unload/2 and the
+five env/argc/argv Native bodies budget_register,budget_enter,budget_bind,
+budget_read,budget_control. Prewarm selected atoms, include/export the exact
+register4/enter1/bind3/read3/control4 regular entry points. Each loaded body
+returns unsupported_budget_protocol. Omit speculative C structures/template
+instantiation in this rejecting stage, as ARCH explicitly permits; no mutex,
+resource type, owned env, ref, monitor or message is instantiated. Existing
+abi/capture_terms actual bodies stay literal. Root alone rebuilds/executes.
+
+Root owns NEW budget.exs / Ferricstore.PolicyRuntimeCapture.Budget and existing
+wrapper five Native not_loaded fallbacks plus one require. Exactly start1,
+request2,permission1,issue1,cancel1,abandon1,settle2,finish2 return literal
+{:error,:unsupported_budget_protocol}; Capture body stays literal. Root owns ADR
+roster/docs/source receipt/whole pins/Git. No allocating helper ledger is licensed.
+
+DOMAIN owns NEW tools/tests/policy_runtime_capture/budget_protocol.exs/module
+Ferricstore.PolicyRuntimeCaptureBudgetProtocolTest plus exactly one controller
+require. SAME six identities/five named helpers as selected ARCH/DOMAIN; actual
+opaque handle+epoch, existing firstref, real phase/ACK barriers, known independent
+K and finite88P floor. No new helper, fake fee/refund/callback or changed old28
+bodies/caps. Natural600LF/functions100; report geometry instead of packing.
+
+Authors stop writes and send exact hashes/census/whole old-source inverse before
+Root formatting/build/run. Reciprocal actual-source reviews follow; no test/build
+by peers, no writes while Root included-input validation is live. Stage A compile
+errors are not functional RED. Genuine unsupported/missing-behavior test outcomes
+will be frozen before separately released Stage B/C. Full-parent backing, source
+exception/full-control escrow, all original profiles and both OS remain required.
+
+
+## Root NATIVE-INGRESS1 actual scaffold custody and first strict rebuild
+
+Whole/hash-read TEST-SHAPES1 ARCH4101332+3091/44a47a3dabb8fa5e40b0f940332b923d87622eeb91eba49ca9a26d97d26f4755;
+Root adopts actual Capture fixtures, exact eight facade success shapes and REAL
+unissued cancellation ACK for test2. No metered Input adapter/fake state/counters.
+Also whole/hash-read actual author PERF3213719+4881/3309df01 and reciprocal
+PERF3218600+2410/b793c183, ARCH4104423+2333/eda081d7: exact rejecting source
+and complete C/wrapper/ADR inverses accepted independently. Root OWN four-region
+ENTIRE C inverse restores585LF/30454B/31474485; wrapper six-line inverse restores
+573/19581/28304103 and entire Capture body is equal.
+
+Source now HELD: C591/30753/439d198e, new include54/1613/416cf45c, wrapper579/
+19923/77765607, Budget14/808/42ffd72a, ADR298/19931/ae5cb0b5. ExactOTP formatter
+TERMINAL0 formatted only the four selected EXS paths. Root removed its own
+accidentally duplicated final newline; wrapper/Budget/controller are exactly
+the handed-off bytes again. New canonical test is531LF/18756B/
+abaffa99b490425506d601bd8078dbda32f23b43d0f8149cd37c423681659880,
+controller598/21765/f30a5328. Root OWN unique require deletion reconstructs
+ENTIRE old597/21692/446d2f35 controller. New six-test spans69/93/80/93/52/51;
+five helpers18/17/5/8/26, all within100 and file600 without packing.
+All28 old bodies remain held; test authors stopped. Root whole-read all531
+new test lines after formatting; peer canonical review is pending.
+
+DOMAIN correctly flags last-terminal wrong-parent/changed-source cross-product
+not yet directly exercised by this test6 candidate. Root is consulting ARCH on
+a real Native terminal-entry fixture; no weaker full coverage claim is accepted.
+Test3/5/K and literal immediate retry remain. Any next test refinement will occur
+AFTER this build terminates and receive refreshed tool-source binding; tests are
+not C compiler dependencies. No runtime RED/GREEN or complete test acceptance
+is claimed.
+
+Root now executes ONE strict rebuild for changed C/include. Existing exact
+compile flags/command stay fixed. All included repository inputs HELD through
+execution; three append-only peer notes excluded. Actual compiler closure must
+be rediscovered: new first-party include may add a dependency, no fake302 count.
+Existing89 OTP headers and their digest must remain byteequal for this Stage A.
+Native library/manifest/build receipt are intentional output updates. The receipt
+will bind actual production tools AND all four capture test sources. No fullRust,
+benchmark, denied external/Linux/provider retry or private resource kernel run.
+
+
+## Root Stage A dependency-audit correction and complete terminal test fixture
+
+First strict compiler invocation is TERMINAL EXIT0 with EMPTY diagnostics, raw
+4827131+0/e3b0c442; all1505 repo-plus-retained-artifact inputs stayed unchanged
+against2253866f81be36605ed58ac3eb810b0a3e3c165efc9994598ea7c7b7e6cfb70e.
+The surrounding build script is TERMINAL1 at its postcompile dependency audit: 
+actual closure additionally contains SDK pthread.h,pthread/pthread.h,sched.h
+and the selected budget.inc. The compiler did NOT fail and no functional RED
+is inferred. Native.so was compiled, while original manifest/build receipt
+were deliberately not published after that assertion. No build handle is live.
+
+Root does not waive the extra dependencies or rerun an unchanged accepted build.
+The corrected build will prospectively pin all three observed SDK headers plus
+new include, rediscover the actual closure and require all those bytes unchanged.
+The old89 OTP headers/digest remain a separate invariant. Its report explicitly
+records the prior unpublished library alongside the old canonical receipt.
+
+Actually WHOLE/hash-read TEST1-P1 ARCH4106756+2936/
+cdf3b9adc00bf2fee1b3c67297a9657ac1cd942d668ba0208bd0a03a62c1595e
+BEFORE amending tests. Canonical child now575LF/20439B/
+e437a85876e7dffb49cb3cea079d75140623e6a9d0a999e42593cba2bc5f5008.
+Only changes from531/abaffa are first competitor parent=nil and44 formattedLF
+in test6. The real Native terminal tuple alone selects the final source/parent
+check; normal actual budget replies/cancelACK fund the known1455 bound. Two
+independent terminal observer monitors cannot be flushed with ticket channels.
+Actual errors/DOWN/subsequent closed are required; public valid-parent exhaustion
+and all earlier origin assertions stay. No fee/phase injection or new helper.
+Six spans69/93/80/93/52/95; same five helpers18/17/5/8/26. File575/functions95
+are natural; no packing/waiver. Formatter TERMINAL0. All source writes STOPPED;
+ARCH/PERF/DOMAIN review actual amended bytes, notes-only. No test execution or
+StageB/C release yet. Root now performs the corrected strictly pinned rebuild.
+
+
+## Root dependency-path correction — preserve actual compiler namespace
+
+The preceding extra-SDK-header interpretation was Root's audit mistake. The
+compiler depfile uses lexical header paths, as does the existing receipt; the
+new audit incorrectly called Path.resolve and compared SDK symlink targets.
+Actual lexical closure is303 names: all302 old paths plus budget.inc, NO removed
+or added SDK header. pthread.h resolves to pthread/pthread.h and sched.h to
+pthread/sched.h; resolving names created the apparent difference. Root verified
+the raw depfile sets and actual alias hashes directly. All303 actual inputs were
+prospectively covered by the first build's old302-plus-new-include pin bank.
+
+The proposed corrected-rebuild wrapper is TERMINAL1 BEFORE invoking any compiler
+(its new-header assertion exposed this mistake). There was exactly ONE compiler
+invocation, EXIT0/emptydiagnostics, and no additional compilation is necessary.
+Native485d22fbef185de877624e6271ef30bf25a1bb9d5e270e7470d8f62240df53a1
+is the unpublished first-build artifact. Root will finalize its unchanged303
+lexical input/89OTP-header closure, manifest and receipt using the existing real
+build result, and separately refresh final575-test source bindings. The earlier
+build's1505-input2253866f epoch remains distinct from the amended test epoch.
+No functional RED, extra-header requirement or second-build success is invented.
+
+
+## Root Stage A build accepted; actual compiler/runtime validation starts
+
+Build finalization is TERMINAL0 with1505 inputs unchanged, source-binding epoch
+7c873d725b7104840374c6bfbe8120098dc77cf16073587cbdf9d0c90981f307.
+Whole/hash actual report4827223+2247/2f46f96d45ebbbe6435b03d087fd25261355dc96383f77c827f5cf2d73f1ca96.
+There was exactly ONE strictclang compile0 with no diagnostics. Actual lexical
+closure303=old302+budget.inc; no SDK change. All303 source/header bytes equal
+the original prospective operands; unchanged89OTP-header digest6ec16daa.
+NIF485d22fb, manifest89d4d292 and receipt71d0299b are now consistent. Receipt
+binds actual7 production sources plus4 capture test files (11), preserving all
+prior evidence and explicitly separating old531 build epoch from final575 tests.
+No resource/kernel/fullM/Linux or runtime acceptance follows from this build.
+
+Actually WHOLE/hash-read final independent ARCH4109692+3194/49c2fd6d,
+PERF3224489+3504/67820880 and reciprocal DOMAIN4801266+4234/46a7274a.
+All575 lines, exact two-region531 inverse, full controller597 inverse, actual
+all28 old bodies, natural95-function/575-file limits and genuine terminal/ACK
+instrumentation accepted with no scoped finding. The earlier source-coverage
+holds are closed in source, not precredited as executed behavior.
+
+All source writers are STOPPED; all included sources/Rootdocs/metadata held.
+Root now runs TWO commands under exactOTP/ABI/303inputs/NIF/manifest/receipt
+pins: actual four-EXS formatting check plus complete eight-facade literal-body
+BEAM disassembly/calls; then the real28-old+6-new native suite. Compiler proof
+compiles the actual existing Budget module in memory, no physical BEAM/probe
+module/file. Print actual compiler/runtime identity and hash actual BEAM/source.
+Current unsupported bodies have no Busy/retry branch; their future actual proof
+remains required. Genuine reached runtime failures will be distinguished from
+compile/API errors, and masked later oracles will not be credited. No production
+resource/phase/kernel or Capture integration release precedes the real freeze.
+Only the three append-only peer notes may change during this held run.
+
+
+## Root NATIVE-INGRESS1 genuine terminal runtime RED and literal proof
+
+Runtime39422 is TERMINAL1; both commands held1810 inputs unchanged against
+1bd7cb094c6ed3d2903426f368d648820330dd324e61d9d4bb3d310f157bec15.
+The first launch wrapper had a Python string SyntaxError before ANY subprocess;
+Root fixed JS replacement-string handling, then the two actual commands ran once.
+No lost/expired process or duplicated suite is hidden.
+
+Actual compiler/format step exits0. Whole raw4831754+7665/
+93dd85e8c3ebe312813bc807ec9fd7566fadf47065db8bf3c5cc48fb54414c34
+is independently rehashed; actual source808B/42ffd72a and decoded in-memory
+BEAM3980B/99ed02a21aab54accbbf6c5f69a14a76c0fe8feed881b9d21dd72f7af1e821d4.
+All EIGHT complete real facade bodies move the unsupported error LITERAL then
+return. Four selected EXS paths match actual exact-OTP formatting. Printed and
+asserted identity includes OTP28.3.1/Elixir1.19.5/ERTS16.2/opt/8/little and exact
+root. Actual Native/crypto loaded=false. Unlike the earlier separate two-function
+probe, this step explicitly asserts endian. No future Busy/retry/native allocation
+or all-VM/CPU/RSS claim follows; no physical BEAM/probe module was created.
+
+Actual native suite raw4839642+14399/
+a19549c246dd86bb1ae7445901a3659dbb70da0de7b38ed277cc2d0711300829
+WHOLE read/rehashed, outer34tests/8failures independently parsed. All26 previously
+passing identities stay passing; old two remain: caps9/ignoredtrue at407 and
+624->624words/11056->11056pins at501. The same previous reached/masked limits
+apply. No compilation, undefined-API or NIF-load exception is counted as RED.
+
+New genuine reached failures: entry test42 gets Native cached atom
+unsupported_budget_protocol; grant test111 and cancel test277 receive actual
+facade {:error,:unsupported_budget_protocol} before resource/permission phases.
+Those are missing operational behaviors, not executed grants/stale-ACK proof.
+Serial test233 FIRST ACK-order oracle fails AFTER actual invalid1,invalid2,
+real depth refusal and healthy same-parent retry, all four budget sends and
+continuity checks returned. Its later bank/input assertions are MASKED.
+LateK test390 fails first >=17956W comparison: actual624 vs required18580,
+AFTER real mismatch index1, healthy retry, two actual successful budget wires
+and distinct refs. Later280870PIN/hash/input assertions are MASKED.
+Terminal test441 observes actual{1455,nil}: all1455 invalid-query public attempts
+returned with no consumptive typed limit. Earlier idle invalid/dead/parent/source
+assertions ran; later terminal/DOWN/closed and two terminal component cases are
+MASKED. No late or unexecuted oracle is retroactively credited. Warnings for
+load-order/redefinition/internal-state remain visible. Actual runtime49.5s.
+
+Source remains rejecting/unwired, full parent/backing/source-exception/control/
+terminal escrow/provider/OS/parity and fullM duties remain open. Root will freeze
+these exact6new tests plus rejecting interfaces BEFORE a separate real-kernel
+release. CONTINUE now records actual34/8; Rust966/6 remains its last unchanged
+source checkpoint. Root next runs only relevant architecture/reference/progress
+checks for the new tooling/docs, not an unchanged complete Rust/native suite.
+
+
+## Root Stage A governance and selected tests-before-kernel freeze
+
+Governance35693 TERMINAL0: all1504 repository inputs unchanged against
+75c9a1f3b32338faa4a8d99927f0a0d1437815fcba90924500371c4e60e36c9b.
+Actually whole/hash checked three raw slices: architecture4854210+5116/
+6ac9a77d2a4abec64bf17a8c2e45d12be0dadab256a75d27500fd7e2c24bc640
+(48 overlapping existing checks PASS); reference4859500+365/ca4afb1b PASS;
+progress4860038+559/30534cf0 PASS with unchanged89/99/406 and explicitly
+incomplete5903registered/4222linked/1681unmatched/1655unresolved.
+The initial JS runner invocation failed before spawning any process; corrected
+existing runner then executed these three commands once. No repeated fullRust
+or native test run is inferred. Selected source/docs diff whitespace check0.
+
+Root now selects exactly NINE paths: native C, wrapper, new budget.inc, new
+budget.exs, controller, new six-test child, ADR008, CONTINUE and this custody
+record. The three concurrently append-only peer notes stay UNSTAGED. No real
+resource/registry/phase body or metered Capture/Input integration exists. These
+exact rejecting interfaces plus six actual runtime-failing expectations are
+frozen before any separate StageB/C implementation. Existing old2 budget REDs
+remain frozen earlier in dd6cf7d; all28 old bodies/caps are still literal.
+Native actual34/8 and compiled actual8-literal refusals are distinct from full
+producer or kernel success. No source change follows validation. Full goal ACTIVE
+through all remaining design/parity/profile/OS/M1-M8 requirements.

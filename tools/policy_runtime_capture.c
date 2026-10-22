@@ -14,6 +14,7 @@
 #include "export.h"
 #include <stdint.h>
 #include <string.h>
+#include "policy_runtime_capture/budget.inc"
 
 #ifndef FS_CAPTURE_HEADER_SHA256
 #error "Define FS_CAPTURE_HEADER_SHA256 from the actual compiler header manifest"
@@ -577,9 +578,14 @@ static int load(ErlNifEnv *env, void **private_data, ERL_NIF_TERM info) {
     for (unsigned i = 0; i < sizeof(names)/sizeof(names[0]); i++) (void)atom(env, names[i]);
     for (unsigned i = 0; i < 8; i++) (void)atom(env, cap_names[i]);
     for (unsigned i = 0; i < 5; i++) (void)atom(env, result_names[i]);
-    return 0;
+    return budget_load(env, private_data);
 }
 static ErlNifFunc functions[] = {
-    {"abi", 0, abi, 0}, {"capture_terms", 2, capture_terms, ERL_NIF_DIRTY_JOB_CPU_BOUND}
+    {"abi", 0, abi, 0}, {"capture_terms", 2, capture_terms, ERL_NIF_DIRTY_JOB_CPU_BOUND},
+    {"budget_register", 4, budget_register, 0},
+    {"budget_enter", 1, budget_enter, 0},
+    {"budget_bind", 3, budget_bind, 0},
+    {"budget_read", 3, budget_read, 0},
+    {"budget_control", 4, budget_control, 0}
 };
-ERL_NIF_INIT(Elixir.Ferricstore.PolicyRuntimeCapture.Native, functions, load, NULL, NULL, NULL)
+ERL_NIF_INIT(Elixir.Ferricstore.PolicyRuntimeCapture.Native, functions, load, NULL, NULL, budget_unload)

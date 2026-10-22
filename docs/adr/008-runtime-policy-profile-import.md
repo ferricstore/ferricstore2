@@ -91,6 +91,54 @@ regression precedes this repair and passes with all 26 capture tests. This close
 invalid-parent graph transfer only. Valid-binary backing, the complete limits
 reply and fixed message/signal/crypto/retirement accounting remain open.
 
+B2-BUDGET-PROTOCOL1-NATIVE-INGRESS1 selects a staged private admission protocol.
+The rejecting interface adds `tools/policy_runtime_capture/budget.inc` to the
+same native translation unit, `tools/policy_runtime_capture/budget.exs` with
+`Ferricstore.PolicyRuntimeCapture.Budget`, and
+`tools/tests/policy_runtime_capture/budget_protocol.exs` with
+`Ferricstore.PolicyRuntimeCaptureBudgetProtocolTest`. These join actual tool
+source binding and repository input pins. A later instantiated tree header must
+join the actual compiler/header closure; its dependency count is not fixed at
+the preceding build's count.
+
+The five regular Native interfaces are `budget_register/4`, `budget_enter/1`,
+`budget_bind/3`, `budget_read/3` and `budget_control/4`. In the rejecting stage,
+their loaded bodies return the precreated `unsupported_budget_protocol` atom.
+Budget's `start/1`, `request/2`, `permission/1`, `issue/1`, `cancel/1`,
+`abandon/1`, `settle/2` and `finish/2` return the literal
+`{:error, :unsupported_budget_protocol}`. Capture does not call them yet. No
+registry, resource, persistent environment, monitor or message is instantiated
+by those bodies. Existing capture behavior and the frozen 28 test bodies remain
+unchanged. Compiling this interface establishes no functional protocol success.
+
+The separately released kernel will enforce one active permit with authoritative
+consumed debt and disjoint unused credit in both word and pin banks. Public
+sessions remain PIDs; private continuations bind the actual resource, epoch,
+owner and copied request reference. An owned environment and public NIF copy and
+identity APIs preserve the first request's unchanged inner `{:budget, parent}`
+tuple. There is no public `enif_get_ref` extractor. The ordinary reference-copy
+bound applies to the trusted pinned wrapper's actual `make_ref/0`, rather than
+arbitrary external or magic references.
+
+An occupied session's operational Busy refusal precedes reference, monitor and
+request construction. A short global registry-lock collision has a separate
+same-PID tail retry before those allocations; the real wrapper needs its own
+compiled-body evidence. This supplies no fairness or latency guarantee. Admitted
+calls preserve parent-before-source checks. Ordinary settlement commits debt
+and releases the permit before sending its funded acknowledgment; public return
+waits for that acknowledgment. Stale actions cannot release a newer grant, and
+unknown issued work or owner loss consumes its unresolved promise and closes.
+
+The exact staged contracts and reciprocal reviews are recorded in
+[the architecture review](../reviews/workflow-completion-architecture.md) and
+[Root's release record](../reviews/workflow-completion-coordination.md).
+Real kernel and metered public integration require separate releases after
+genuine behavioral failure evidence. Valid 32-byte parent backing before IPC,
+exceptional source checks, the complete control/terminal constructor census,
+encoder metering, original profiles and both operating systems remain required.
+No fixed fee, source-cost closure or complete producer acceptance follows from
+this rejecting interface.
+
 `Capture.bootstrap/1` authenticates the actual VM, source and generated-header
 build before `Native.load/2`. There is no unconditional `@on_load`: an unsupported
 host must receive a structured refusal before native loading or private access.

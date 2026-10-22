@@ -24,6 +24,11 @@ defmodule Ferricstore.PolicyRuntimeCapture.Native do
   def load(_, _), do: {:error, :invalid_load}
   def abi, do: {:error, :not_loaded}
   def capture_terms(_, _), do: {:error, :not_loaded}
+  def budget_register(_, _, _, _), do: {:error, :not_loaded}
+  def budget_enter(_), do: {:error, :not_loaded}
+  def budget_bind(_, _, _), do: {:error, :not_loaded}
+  def budget_read(_, _, _), do: {:error, :not_loaded}
+  def budget_control(_, _, _, _), do: {:error, :not_loaded}
 
   defp artifact(path) do
     prefix = Path.expand(path)
@@ -119,6 +124,7 @@ defmodule Ferricstore.PolicyRuntimeCapture.Native do
   end
 end
 
+Code.require_file("policy_runtime_capture/budget.exs", __DIR__)
 Code.require_file("policy_runtime_capture/bootstrap.exs", __DIR__)
 Code.require_file("policy_runtime_capture/input.exs", __DIR__)
 

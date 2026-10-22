@@ -5,8 +5,24 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The active runtime capture regression checkpoint runs **28 tests on macOS:
-26 pass and two fail**. The first keeper-send trace observes nine limit fields,
+The active runtime capture regression checkpoint runs **34 tests on macOS:
+26 pass and eight fail**. Six reviewed protocol tests were added alongside an
+explicitly rejecting Native/Budget interface; Capture behavior is unchanged.
+Three new cases stop at actual unsupported entry/request outcomes. The other
+three reach missing settlement acknowledgment, lost failed-encoder credit
+(624 retained words versus the required 18,580), and 1,455 invalid-query attempts
+without consumptive exhaustion. Later oracles, including the added terminal
+error cross-product, remain unexecuted after those failures. The two preceding
+regressions below also remain. All 26 previously passing cases still pass.
+The strict NIF build passes against its actual 303 compiler inputs and unchanged
+89 OTP headers. Actual eight-facade BEAM bodies load their refusal literal and
+return; this proves neither future Busy/retry branches nor the resource kernel.
+All 1,810 repository/native inputs stayed unchanged during compiler and runtime
+validation. Native kernel and metered public integration require separate
+releases after this regression checkpoint is frozen.
+
+The preceding **28-test checkpoint has 26 passes and two failures**.
+The first keeper-send trace observes nine limit fields,
 including ignored metadata, in the first successful budget reply before caller
 preparation. The same caller's invalid-query attempt and healthy same-parent
 retry both return before the wire-shape assertion fails. No projection repair
