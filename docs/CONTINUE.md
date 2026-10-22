@@ -1,11 +1,27 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-22. The active full-completion goal continues beyond this reviewed
+Updated: 2026-10-23. The active full-completion goal continues beyond this reviewed
 increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The active runtime capture regression checkpoint runs **34 tests on macOS:
+The active native component regression checkpoint runs **40 tests on macOS:
+26 pass and fourteen fail**. Six direct Native cases use real self-registering
+keepers, owning processes and ordinary references. The first reaches the loaded
+zero-word registration refusal; the other five reach the loaded registration
+body and receive its unsupported atom. Their later lifecycle, charging,
+cancellation, terminal, stale-reference and cleanup assertions remain unexecuted.
+All eight preceding failures remain and all 26 prior passing cases still pass.
+Architecture and performance independently reviewed the final 535-line test
+source, including independent terminal progress and original-cap bounds.
+Its longest test is 96 lines (97 including the following separator).
+The unchanged NIF still binds 303 compiler inputs and 89 OTP headers; the new
+test joins twelve capture-tool source bindings. All 1,811 repository/native
+inputs stayed unchanged during the final actual run. Freeze these direct
+component regressions before releasing the native-only `budget.inc` kernel.
+Public Budget/Capture integration and complete BEAM accounting remain separate.
+
+The preceding runtime capture regression checkpoint runs **34 tests on macOS:
 26 pass and eight fail**. Six reviewed protocol tests were added alongside an
 explicitly rejecting Native/Budget interface; Capture behavior is unchanged.
 Three new cases stop at actual unsupported entry/request outcomes. The other

@@ -581,6 +581,7 @@ end
 Code.require_file("policy_runtime_capture/admission.exs", __DIR__)
 Code.require_file("policy_runtime_capture/query_admission.exs", __DIR__)
 Code.require_file("policy_runtime_capture/budget_protocol.exs", __DIR__)
+Code.require_file("policy_runtime_capture/native_budget.exs", __DIR__)
 
 case System.argv() do
   ["--admission-child", mode] ->

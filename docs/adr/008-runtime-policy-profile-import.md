@@ -120,6 +120,23 @@ tuple. There is no public `enif_get_ref` extractor. The ordinary reference-copy
 bound applies to the trusted pinned wrapper's actual `make_ref/0`, rather than
 arbitrary external or magic references.
 
+The native-only kernel selection keeps its implementation in `budget.inc`.
+Its closed registration remains lookup-visible until the actual keeper DOWN;
+an alive closing keeper cannot fall through to unmanaged legacy calls. One
+pinned cleanup owner holds the permit through saved-reference clearing and
+demonitor calls. A delayed callback cannot clear a newer reference or reopen
+a closed session. The destructor only finalizes already unlinked user data.
+
+Every successful native read pays for its report, including a keeper read of
+a cancelled bound request. Cancellation prevents another grant; the keeper
+still needs the actual consumed bank before settlement. Word and pin checks
+are atomic, and unused-credit settlement preserves the unconsumed terminal
+floor. The selected native cohorts do not account for the complete BEAM channel.
+Direct component regressions belong in
+`tools/tests/policy_runtime_capture/native_budget.exs`, using real registered
+keepers and owners. Their empty-native opening bank excludes fixture storage;
+they establish neither public Capture readiness nor full pipeline accounting.
+
 An occupied session's operational Busy refusal precedes reference, monitor and
 request construction. A short global registry-lock collision has a separate
 same-PID tail retry before those allocations; the real wrapper needs its own

@@ -49897,3 +49897,188 @@ remain frozen earlier in dd6cf7d; all28 old bodies/caps are still literal.
 Native actual34/8 and compiled actual8-literal refusals are distinct from full
 producer or kernel success. No source change follows validation. Full goal ACTIVE
 through all remaining design/parity/profile/OS/M1-M8 requirements.
+
+## Root Stage B contract custody and direct component-test dependency
+
+The previous user-status turn made no implementation progress; it verified
+HEAD21733d5 and live architecture work without claiming a new passing result.
+Root now actually whole/hash-read ARCH4115450+11218/
+6b72bc346c05ac6ca08a27ac26f97469799cd7508bbecf37e0b98b15a41fc273.
+This selects the native-only existing budget.inc kernel, exact three types,
+fifteen handwritten functions, five APIs and24 cached atoms; host C and all
+EXS behavior remain literal. CLOSED tombstones stay until keeper DOWN; cleanup
+has one pinned CLEARING owner, and each actual read prospectively pays its
+report while preserving unconsumed native terminal/cohort rights. Source
+banks E_n15/T_n27 are not the complete held public BEAM E/T account.
+
+Root found the existing six protocol tests use legacy/unregistered Capture,
+so they cannot independently establish a Stage B kernel. DOMAIN is proposing
+one direct Native component test child with real self-registering keeper and
+owning processes. ARCH selects its exact names/helpers before creation.
+OpeningR=0 describes the empty native component only, excluding fixture
+process storage; it is no fake Capture readiness or complete pipeline bank.
+Internal CLEARING scheduling and residual burn without a public observation
+remain source-proof scope, with no test-only parking/counter hooks.
+
+PERF prepares the implementation and requested official NIF lifetime research;
+DOMAIN owns the future selected child/controller line; ARCH reviews contracts.
+Root owns release, binding/strict builds/native runs and Git. No component
+test has been created and no kernel body has been released yet: actual direct
+component RED and its freeze commit must precede that release. The entire
+full-completion goal stays active with parity/profiles/runtime/OS work open.
+
+## Root Stage B TEST1 precreation author release
+
+ACTUALLY whole/hash-read ARCH4126668+6451/
+75adde10d4727aa281021d6bf151073dfe4887f70071d93358fb94ae1fdb60e2,
+including the exact six identities/four helpers and KERNEL1-P1 corrections.
+Also whole/hash-read PERF3237260+7215/
+a70aa3ea874eaea09617945a8d4307b514c9562634cc37196d6bb145d69fc950: official
+NIF/driver learning is version-qualified; pinned28.3.1 source owns exact sizes.
+No concrete test/source incompatibility remains in these finite selections.
+
+Root NOW releases DOMAIN to create ONLY tools/tests/policy_runtime_capture/
+native_budget.exs defining Ferricstore.PolicyRuntimeCaptureNativeBudgetTest,
+with exactly TEST1's six tests and four helpers, and add ONE require to existing
+tools/tests/policy_runtime_capture_test.exs. The complete controller single-line
+inverse must restore598/21765/f30a5328180eeb4390e0b75fb9586078ae77da7641578a1dda6d93e576ccb3c6.
+All other test sources, old28 bodies/caps, protocol575/e437a858 and every
+production body are held literal. Child<=600LF and functions<=100 naturally;
+no helper/model/file/fee/parking hook or compacting waiver is released.
+
+Direct component R0 excludes fixture storage. Use real keeper/owner identities,
+ordinary refs, authoritative reports and actual remaining rights including floor;
+no completed-work invoice is fabricated. Cancelled keeper READ remains funded;
+CANCELLED reserve refuses. Word/pin denial must mutate neither bank. Failed
+report retains last real R; unused retry/commit preserves terminal floor. Internal
+CLEARING scheduling and numeric closed-U burn stay explicit source-proof limits.
+
+DOMAIN stops source writes after handoff; Root formats, binds exact test inputs
+and executes unchanged native stubs to obtain reached RED, then freezes it.
+ARCH/PERF review canonical sources independently. PERF still has NO native body
+release. No build/test/native process is live at this release, and no repeat
+of unchanged Rust966 or denied Linux/remote/benchmark routes is selected.
+
+## Root Stage B component canonical custody and actual RED run start
+
+DOMAIN stopped ALL source writes at raw400/17980/9fca82f6 and controller
+599/21836/6afb3251. Root alone canonical-formatted both using the pinned
+OTP28.3.1/Elixir1.19.5; controller was already canonical. New child is
+532LF/19052B/52558c760a1e780b434153f2ed574234b5ab3417fb3d1b5b4aa8d54c44926502.
+Root whole-read its complete canonical532 lines. Exactly six tests/four helpers;
+conservative boundary spans93/94/76/60/72/83 and16/11/11/9, longest line100.
+No natural size violation or packing. Controller71B single-require inverse
+restores complete598/f30a. ADR008's selected17LF addition gives315/21045/
+2592bccb381333497fdfbcea38cac0ce8607830b4a943820189bca4a871e9bac.
+It documents native lifecycle/floor/cancelled-report/component limits while
+keeping the actual rejecting current behavior distinct.
+
+Root actually whole/hash-read DOMAIN4811247+8757/9b67a661; selected source uses
+actual resource/epoch/ref/owner, reports and total remaining native rights.
+No fake completed-work result, internal park/counter getter or public Capture
+readiness fixture is present. Sequential clear reuse and old-resource closure
+are external observations, not final callback/destructor retirement. ARCH/PERF
+now independently review exact canonical held sources; only their existing
+append-only notes may change during Root validation.
+
+Root bound the new child and controller into existing build receipt: raw
+4860662+1576/340d803e843cac1b5786801fa1323f8e45f3b7688e73ea68434a4471c81fc7f3.
+Top tool bindings11->12; ALL303 compiler inputs and actual NIF/headers/command
+were verified unchanged before binding. Receipt now8733289B/
+3762e9e2c8cab22fb8d92a5ffd69578f6ebe3f502ac9614e2606f22feca3bae6.
+This is TEST input metadata only; no recompile, extra native phase or passing
+behavior is inferred. NIF stays69912B/485d22fb, manifest stays89d4d292, and
+89-header digest remains6ec16daa. Root starts the actual full40-case native
+suite once against these unchanged rejecting bodies, with canonical format
+and exact VM identity checked first. Expected missing behavior is not yet
+an actual result. No source/doc mutation follows until its terminal result.
+
+## Root Stage B first actual RED and selected terminal-report amendment
+
+Native86082 is TERMINAL1, not live and not restarted. Root actually whole/hash
+read raw4863077+19070/310ea44f7e83067fa1d6e9584d94a73a40d901c3d598c7cd77f4550bd10aeccc.
+Actual OTP28.3.1/Elixir1.19.5/ERTS16.2/opt/8/little assertions and canonical
+format passed first; real ExUnit seed382807,56.1s completed40tests/14failures.
+ALL1811 repository/native inputs stayed unchanged9ace6a35a8f782c7827fd832ddbed162a6bd0be87ff97bc0ace1290b914f3bb9.
+All26 previous unrelated cases pass; all8 existing failures remain at their
+same reached observations. New case1 reaches actual loaded zero-word register
+refusal at12: unsupported_budget_protocol instead of decoded_words. Its zero-pin,
+positive registration/authority and later checks are MASKED. New cases2-6
+reach actual self-register call and helper494 receives unsupported rather than
+{:ok,resource,Rw,Rp}. Their read/phase/lifetime/cleanup oracles are MASKED.
+No fixture-cleanup failure or compile/missing-API error is reported; this is
+actual callable behavior RED, not any executed kernel/lifecycle theorem.
+
+PERF found terminal successful-report values lacked independent cap bounds; ARCH
+accepted exactly two existing-test assertions: terminal_words>=lastwords+15
+and <=word cap; terminal_pins>=lastpins+96 and <=pin cap. Native enter7+bind3+
+report5 provides15W, enter/report output terms alone provide96P. No SUT fee
+certificate, new helper/test/API/cap or production body is involved. Root edited
+ONLY after the process ended, then canonical-formatted: final child535LF/19209B/
+1327ded5c942de41d656926c1653e1d4838bfae05134c71d63a84f3b4510b869.
+Formatter adds one normal separator, so exact3LF/157B COMPLETE inverse restores
+532/19052/52558c76. Initial two-LF inverse assertion failed before any new run;
+corrected actual three-LF inverse succeeds. Test2 boundary97, all others<=93;
+exact six identities/four helpers unchanged. Both peers have final amended hash.
+
+Root updated ONLY current test binding metadata; all303 compiler inputs/NIF
+remain unchanged. Amendment raw4882227+941/
+1a1d1eb9ac9b6489938fa31890b3db1c05ee1989df055700a3533689a0953319;
+receipt8734326B/ff454bf49484d2ea9b14ed20fb0c90ed14a9cbbccfbefc944cf388441c338c7f.
+The first actual runtime is historical532 source only. Root now runs the changed
+535 source epoch once against unchanged native before its tests-first freeze.
+No source/doc mutation follows this start until terminal. Native body HELD.
+
+## Root Stage B final actual component RED and reviewed freeze custody
+
+Amended native13427 is TERMINAL1; no process remains and no unchanged rerun is
+selected. Root whole/hash-audited complete final raw4884015+19070/
+61909fbc56d1e35360cb141702ae8ff1d0471249ac51d6457e9e17a63402b9f9,
+including every14 failure block. Actual seed113851/55.6s:40tests14failures,
+26prior passes, zero excluded or compile/missing-function failures. All1811
+repository/native inputs stayed unchanged163ab1b4d8374bbbdff8c480ec808480349dd47b93eaa3971a1903945ca83539.
+New first case reaches loaded zero-W registration at12 (unsupported instead of
+decoded_words); other5 reach real self-registration and helper497 gets actual
+unsupported instead of success. Their deeper resource/read/ref/phase/terminal/
+clear/callback/tombstone/isolation assertions remain MASKED, including added
+terminal bounds. Old2 query+6 public protocol failures retain their previous
+reached sites and masked tails. No secondary fixture cleanup failure is shown;
+this proves no leak/retirement theorem or real kernel/public pipeline success.
+
+Root actually whole/hash-read final independent source receipts ARCH4133119+3813/
+dbeaabef5d4369717a6c21ac7daeb7c72512a7be7ae62dd8a932d449d13ba55b and
+PERF3246202+3510/36443a660835e3133eeb5130e3d70f71ef35dd01b51977739fdfd6321eac8703.
+Both accept final535/1327 exact3LF/157B amendment inverse, controller complete
+71B inverse, ADR complete17LF inverse, genuine component ownership/unusedrights
+and qualified observer/source scopes. Reciprocal PERF3249712+436/dde10a7c also
+records its actual read of ARCH final source receipt. DOMAIN now independently
+reviews final actual raw/source, without source/build execution.
+
+Root updates CONTINUE with actual40/14, source/instrumentation limits and the
+separate still-held kernel/public stages. Root now runs the three applicable
+architecture/reference/progress checks for the new tool artifact/docs. Only
+peer notes may append while input pins are live. All actual native code remains
+literal21733; strict new build is unnecessary for these test-only changes.
+After checks, exactly new child, controller, ADR008, CONTINUE and Root custody
+will be frozen; concurrent peer notes remain unstaged. The full M1-M8/source/
+profile/runtime/Linux+macOS objective remains active without narrower success.
+
+## Root Stage B governance and tests-before-native-body freeze
+
+Governance30740 TERMINAL0; all1505 repository inputs unchanged
+7b0d15fdd1b00728e2f5e893da98d25cb749cab611cd460d5ac7e574114ba771.
+Root whole/hash-read architecture4903264+5116/
+e0d07ca4fa217220222539a1a7d9e5064a42eaea7ea208ec7c50943339795c33
+(48checksPASS), reference4908564+365/80b952018db158a9eaff16e61b677371ce3f969d7785e76bc8d83b7037c890b4
+PASS and progress4909112+559/30534cf0 PASS. Counts stay89/99/406 and
+5903registered/4222linked/1681unmatched/1655unresolved, explicitly incomplete.
+These are new tool-source/docs checks, not a repeated Rust966/native run or
+full workflow acceptance. Source/cached diff whitespace must pass beforecommit.
+
+Exactly FIVE freeze paths: native_budget.exs535/1327, controller599/6afb,
+ADR008315/2592, CONTINUE and this Root custody record. All native/BEAM
+production sources still equal21733. Three peer append-only notes stay
+UNSTAGED. Actual final40/14 against unchanged C has been reached and recorded
+BEFORE any real native type/registry/resource/phase body. Once this commit
+exists, Root may release ONLY the selected existing budget.inc kernel under
+KERNEL1+P1; public Budget/Capture/Input integration remains held.
