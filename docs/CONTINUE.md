@@ -15,19 +15,25 @@ value. Standard B-tree node allocation remains outside paid admission. All four
 original standalone Elixir cases pass; full original profiles and Linux remain
 required.
 
-The current native decoder regression checkpoint runs **60 tests: 49 pass and
-11 fail**. All eight older public Budget/keeper failures are retained, with only
-three new decoder failures added. Two new cases reach absent metered decode
-calls; the third completes the actual preflight tariff and zero-call controls,
-then returns preflight success instead of the required budget error. Later graph
-and paid-prefix assertions remain masked. Reached raw control prefixes pass;
-all nine executing module identities match, and the fixture cleans up its held worker and traces
-before assertions. Review corrected a test premise using the configured native
-ABI: scalar preflight advances the forecast by 115 words and the cut is +161.
-No decoder body has been written. It still needs the matching prepared NEW
-source contexts and final compiled frame/payment contract before implementation;
-initial root ownership, full control envelopes, public settlement, required
-profiles and Linux remain open.
+The current native decoder regression checkpoint runs **61 tests: 48 pass and
+13 fail**, with the same result on one unchanged retry. All eight older public
+Budget/keeper failures remain, alongside four genuine new decoder failures and
+one repeated startup timeout in the existing wrong-runtime rejection test. The
+fourth decoder test passes its real compiled-pattern source binding and raw
+operational reference controls, then reaches the absent metered decode call.
+The earlier three failure points are preserved. Later graph and paid-prefix
+assertions remain masked; all nine executing module identities match. Both
+startup crash outputs are preserved separately, and source/input snapshots match
+after moving only those generated artifacts. The startup timeout remains
+unresolved; neither run is a clean whole-suite baseline.
+
+The fixture cleans up its held worker and traces before assertions. The corrected
+scalar preflight forecast remains +115 words, with the refusal cut at +161.
+No decoder body has been written. Architecture has selected the prepared NEW
+source contexts and conditional frame/payment contract; implementation still
+requires saving this regression checkpoint and inspecting the complete compiled
+payment order before paid execution. Initial root ownership, full control
+envelopes, public settlement, required profiles and Linux remain open.
 
 The ManyItemOpts implementation now passes **all thirteen Rust tests and all
 eight focused checks** after its callable zero-pass/thirteen-failure baseline was
@@ -92,10 +98,10 @@ The checked partial ledger records **111 source-derived declarations,
 still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
 reference and frozen workflow mapping remain unchanged. Full original Elixir
 case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and
-the wider ordered runtime milestones remain open. The implementation and
-performance agents are closing the next decoder frame/payment contract and
-consulting architecture on a prepared-source regression before further source
-work. The active goal must continue beyond this reviewed increment.
+the wider ordered runtime milestones remain open. The fourth prepared-source
+decoder regression is written and executed; architecture and performance are
+reviewing its actual results before the next implementation stage. The active
+goal must continue beyond this reviewed increment.
 
 The entries below retain preceding checkpoints; the results above describe the
 current tree.

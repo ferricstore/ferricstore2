@@ -1,6 +1,7 @@
 defmodule Ferricstore.PolicyRuntimeCaptureObservationDecodeTest do
   use ExUnit.Case, async: false
   alias Ferricstore.PolicyRuntimeCapture.Input
+  alias Ferricstore.PolicyRuntimeCapture.Native
   alias Ferricstore.PolicyRuntimeCapture.Observation
   alias Ferricstore.PolicyRuntimeCaptureTest, as: SourceTest
   alias Ferricstore.TermCodec
@@ -147,6 +148,57 @@ defmodule Ferricstore.PolicyRuntimeCaptureObservationDecodeTest do
       )
 
       assert donors == [<<131, 97, 7>>, <<131, 97, 7>>]
+    end)
+  end
+
+  test "metered_decode_preserves_bound_magic_reference_context" do
+    with_context(fn limits, forecast, gw, gp ->
+      needle = String.duplicate("x", 4_096)
+      pattern = :binary.compile_pattern(needle)
+      assert {:bm, resource_ref} = pattern
+      assert is_reference(resource_ref)
+      assert :binary.match(needle, pattern) == {0, 4_096}
+      encoded = TermCodec.encode(pattern)
+      assert byte_size(encoded) < 1_024
+      mapped = %{encoded: encoded, source_term: pattern}
+      context = :persistent_term.get({Ferricstore.PolicyRuntimeCapture, :verified_bootstrap})
+
+      # Authentic encoding/binding and observer storage are outside decoder G.
+      assert {:ok, bound} =
+               Input.bind_admission([mapped], limits, forecast, context.source, 1)
+
+      assert Native.capture_terms({:preflight, [encoded]}, limits) ==
+               {:error, {:source_anchor_required, 0}}
+
+      expected = Observation.decode([encoded], [mapped], limits, bound)
+      assert {:ok, [decoded], admission} = expected
+      assert decoded === pattern
+      assert :binary.match(needle, decoded) == {0, 4_096}
+
+      with_decode_trace(
+        fn -> Observation.decode([encoded], [mapped], limits, {:metered, bound, gw, gp}) end,
+        fn result, events ->
+          assert [{:trace, worker, :call, _} | _] = events
+
+          assert events == [
+                   {:trace, worker, :call, {TermCodec, :decode, [encoded]}},
+                   {:trace, worker, :return_from, {TermCodec, :decode, 1}, {:ok, pattern}}
+                 ]
+
+          assert {^expected, words, pins} = result
+          assert {{:ok, [paid_pattern], ^admission}, ^words, ^pins} = result
+          assert paid_pattern === pattern
+          assert :binary.match(needle, paid_pattern) == {0, 4_096}
+          assert is_integer(words) and gw < words and words < bound.decoded_words
+          assert is_integer(pins) and gp < pins and pins < bound.pinned_bytes
+          assert words <= limits.decoded_words and pins <= limits.pinned_bytes
+        end
+      )
+
+      assert needle == String.duplicate("x", 4_096)
+      assert pattern === {:bm, resource_ref} and TermCodec.encode(pattern) == encoded
+      assert mapped == %{encoded: encoded, source_term: pattern}
+      assert :binary.match(needle, pattern) == {0, 4_096}
     end)
   end
 
