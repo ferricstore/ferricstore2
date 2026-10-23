@@ -121,37 +121,38 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **969 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **974 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
 all four cached offline dependency-audit categories pass. All eleven explicit
-local commands exit zero, including the audit with `--offline`. All 1,507 captured
+local commands exit zero, including the audit with `--offline`. All 1,509 captured
 repository inputs stayed unchanged through that sequence, excluding only the
-three append-only peer review notes. Architecture and performance reviews accept
-the source and its boundaries. No fresh advisory or Linux result is claimed.
+three append-only peer review notes. Architecture and performance independently
+accept the source and complete raw results. No fresh advisory or Linux result
+is claimed.
 
-The atomic StartAndClaim tests now run against the saved refusing shell:
-**35 focused tests: 30 pass and five fail**, with no ignored or filtered tests.
-Formatting, focused compilation and strict Clippy pass. The first valid
-custom-cap request reaches the actual UnsupportedOperation rejection; the FIFO
-and first scalar checks also reach that refusal. Both source-publisher cases
-stop at generic command rejection. Later field, guard, history, Retry and
-resource observations remain unexecuted. All 1,509 captured inputs stayed
-unchanged during the sequence, excluding only the three peer review notes.
-The current tree intentionally contains these five tests awaiting behavior;
-the 969-test passing checkpoint above predates them.
+The atomic StartAndClaim body now passes **all 35 focused tests**, with no
+failures, ignored or filtered tests. Formatting, focused compilation and strict
+Clippy pass. The five unchanged regressions were saved in `e72be8f` after actual
+runtime UnsupportedOperation failures. Their later record, history, real-guard
+Retry, FIFO, eight resource cases and scalar/duplicate assertions now execute.
+All 1,509 captured inputs stayed unchanged during this sequence, excluding only
+the three peer review notes. The complete workspace checkpoint above includes
+these five tests. Independent reviews verify the six whole-file source inverses,
+resource/error order and actual passing output; the ledger received separate
+reciprocal review.
 
-The selected interface represents five input fields and returns
-UnsupportedOperation after the existing global guards. Copied-input admission
-and command/intent refusals preserve the closed profiles; no token, record or
-history is constructed. The tests preserve three pinned source scenarios and
-two resource/error-order controls in a 587-line module and 159-line FIFO child;
-every function remains at most 100 physical lines. Freeze these compiled
-runtime failures and independent review before releasing the atomic body.
-The selected behavior creates one version-1/attempt-1/fence-1 running record and
-one Created event. Public and durable integration, original profiles, full
-Elixir parity and both-OS acceptance remain open.
+The pure constructor creates one version-1/attempt-1/fence-1 leased running
+record and one Created event. Fresh-only token sizing checks the physical
+running state and generated binary token before plan construction, preserving
+the old admission/error prefix. Direct FIFO entry refuses before ordinal
+allocation. Six existing production files stay within 400 physical lines,
+and all functions within 100; the frozen tests remain 587 and 159 lines.
+Three source-derived component counterparts add 27 direct assertion links.
+Command/intent and independent/public profiles remain closed. Public defaults
+and hydration, committed policy installation, durable integration, original
+profiles, full Elixir parity and both-OS acceptance remain open.
 
 The newest source-derived FIFO counterpart uses limit one to claim the queued
 head, reclaim that expired running head for the new worker, then observe the

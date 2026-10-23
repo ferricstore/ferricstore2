@@ -2187,7 +2187,58 @@
       "runtime_case_ids": [
         "e80ef0bb1f2e23aac5292a787646f8b6ac2b28cbf42fb37fcfad5e3767c4e459"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-23e4645b7b46c5b7-atomic-start",
+          "rust_file": "crates/wf-domain/tests/claim_apply/start_and_claim.rs",
+          "rust_file_sha256": "dac7142465cc742a89c747ed1bc1cea0f576b22a4b41329f7471197d5e414b0e",
+          "rust_module": "",
+          "rust_function": "source_atomic_start_creates_leased_running_execution",
+          "assertions": [
+            {
+              "source_line": 37,
+              "source_text": "assert {:ok, record} =",
+              "rust_line": 277,
+              "rust_text": "assert!(result.is_ok(), \"{result:?}\");"
+            },
+            {
+              "source_line": 45,
+              "source_text": "assert record.state == \"running\"",
+              "rust_line": 279,
+              "rust_text": "assert_eq!(record.state(), b\"running\");"
+            },
+            {
+              "source_line": 46,
+              "source_text": "assert record.run_state == \"queued\"",
+              "rust_line": 280,
+              "rust_text": "assert_eq!(record.run_state(), Some(b\"queued\".as_slice()));"
+            },
+            {
+              "source_line": 47,
+              "source_text": "assert record.lease_owner == \"validation-worker\"",
+              "rust_line": 282,
+              "rust_text": "assert_eq!(lease.worker, b\"validation-worker\");"
+            },
+            {
+              "source_line": 48,
+              "source_text": "assert is_binary(record.lease_token)",
+              "rust_line": 283,
+              "rust_text": "assert_ne!(lease.token.as_bytes(), []);"
+            },
+            {
+              "source_line": 49,
+              "source_text": "assert record.lease_deadline_ms == now + 30_000",
+              "rust_line": 284,
+              "rust_text": "assert_eq!(lease.deadline.get(), 31_000);"
+            }
+          ],
+          "limitations": [
+            "Pure M1 typed/indexed decisions and publication into canonical saved in-memory record/index fixtures; production durable publication, public API/transport and original FlowCase/profile execution remain required.",
+            "Prepared policy is fixture authority; committed policy installation, public default/clock handling and value hydration are not executed. Nondeterministic suffixes and explicit source clocks are normalized as recorded in the test.",
+            "This counterpart does not establish full source-case parity or independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "638e99446faee280",
@@ -5089,7 +5140,47 @@
       "runtime_case_ids": [
         "f4e130937625b343a2ded455f8daf7287b6413b445d3b1ec2e6cffff7a438d18"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-945df5266fddc8cb-atomic-start",
+          "rust_file": "crates/wf-domain/tests/claim_apply/start_and_claim/fifo.rs",
+          "rust_file_sha256": "6bb556fa41e1453dacc38d1862cea1d2837b6ce040bcb6361efb489d1b46eb87",
+          "rust_module": "",
+          "rust_function": "source_fifo_rejects_atomic_start_without_reserving_identity",
+          "assertions": [
+            {
+              "source_line": 1067,
+              "source_text": "assert {:error, \"ERR flow direct running entry is not supported for fifo state\"} =",
+              "rust_line": 93,
+              "rust_text": "assert_eq!(refused, IndexRejection::DirectRunningFifoEntry);"
+            },
+            {
+              "source_line": 1074,
+              "source_text": "assert :ok =",
+              "rust_line": 114,
+              "rust_text": "assert!(created.is_ok(), \"{created:?}\");"
+            },
+            {
+              "source_line": 1084,
+              "source_text": "assert {:ok, [claimed]} =",
+              "rust_line": 126,
+              "rust_text": "assert_eq!(count, 1);"
+            },
+            {
+              "source_line": 1093,
+              "source_text": "assert {:error, \"ERR flow direct running entry is not supported for fifo state\"} =",
+              "rust_line": 152,
+              "rust_text": "assert_eq!(refused, IndexRejection::DirectRunningFifoEntry);"
+            }
+          ],
+          "limitations": [
+            "Pure M1 typed/indexed decisions and publication into canonical saved in-memory record/index fixtures; production durable publication, public API/transport and original FlowCase/profile execution remain required.",
+            "Prepared policy is fixture authority; committed policy installation, public default/clock handling and value hydration are not executed. Nondeterministic suffixes and explicit source clocks are normalized as recorded in the test.",
+            "This counterpart does not establish full source-case parity or independent Linux acceptance.",
+            "The source policy_set assertion1059 remains fixture-only with no direct link. Typed DirectRunningFifoEntry is observed; public error-string rendering and policy persistence remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "bea9ae0f6f1e970c",
@@ -24732,7 +24823,125 @@
       "runtime_case_ids": [
         "1ccf0b4a7e3a17f1335609c6ffdbe386617c51554a00bf315144c15f5de458ab"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-1186468cb4da234a-atomic-start",
+          "rust_file": "crates/wf-domain/tests/claim_apply/start_and_claim.rs",
+          "rust_file_sha256": "dac7142465cc742a89c747ed1bc1cea0f576b22a4b41329f7471197d5e414b0e",
+          "rust_module": "",
+          "rust_function": "source_atomic_start_preserves_first_step_and_returned_retry_guard",
+          "assertions": [
+            {
+              "source_line": 1326,
+              "source_text": "assert {:ok, started} =",
+              "rust_line": 335,
+              "rust_text": "assert!(result.is_ok(), \"{result:?}\");"
+            },
+            {
+              "source_line": 1335,
+              "source_text": "assert started.id == id",
+              "rust_line": 337,
+              "rust_text": "assert_eq!(record.id().as_bytes(), id);"
+            },
+            {
+              "source_line": 1336,
+              "source_text": "assert started.type == type",
+              "rust_line": 338,
+              "rust_text": "assert_eq!(record.workflow_type(), workflow_type);"
+            },
+            {
+              "source_line": 1337,
+              "source_text": "assert started.state == \"running\"",
+              "rust_line": 339,
+              "rust_text": "assert_eq!(record.state(), b\"running\");"
+            },
+            {
+              "source_line": 1338,
+              "source_text": "assert started.run_state == \"reserve_inventory\"",
+              "rust_line": 340,
+              "rust_text": "assert_eq!(record.run_state(), Some(b\"reserve_inventory\".as_slice()));"
+            },
+            {
+              "source_line": 1339,
+              "source_text": "assert started.attempts == 1",
+              "rust_line": 341,
+              "rust_text": "assert_eq!(record.attempts(), 1);"
+            },
+            {
+              "source_line": 1340,
+              "source_text": "assert started.fencing_token == 1",
+              "rust_line": 342,
+              "rust_text": "assert_eq!(record.fence().get(), 1);"
+            },
+            {
+              "source_line": 1341,
+              "source_text": "assert started.lease_owner == \"contract-start-worker\"",
+              "rust_line": 344,
+              "rust_text": "assert_eq!(lease.worker, b\"contract-start-worker\");"
+            },
+            {
+              "source_line": 1342,
+              "source_text": "assert is_binary(started.lease_token)",
+              "rust_line": 345,
+              "rust_text": "assert_ne!(lease.token.as_bytes(), []);"
+            },
+            {
+              "source_line": 1343,
+              "source_text": "assert started.lease_deadline_ms == now_ms + 7_000",
+              "rust_line": 346,
+              "rust_text": "assert_eq!(lease.deadline.get(), 8_000);"
+            },
+            {
+              "source_line": 1344,
+              "source_text": "assert started.next_run_at_ms == now_ms + 7_000",
+              "rust_line": 347,
+              "rust_text": "assert_eq!(record.next_run_at(), Some(TimestampMillis::new(8_000)));"
+            },
+            {
+              "source_line": 1346,
+              "source_text": "assert {:error, \"ERR flow already exists\"} =",
+              "rust_line": 368,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 1353,
+              "source_text": "assert :ok =",
+              "rust_line": 396,
+              "rust_text": "assert!(retried.is_ok(), \"{retried:?}\");"
+            },
+            {
+              "source_line": 1361,
+              "source_text": "assert {:ok, retried} = FerricStore.flow_get(id, partition_key: partition)",
+              "rust_line": 399,
+              "rust_text": "assert!(read.is_some());"
+            },
+            {
+              "source_line": 1362,
+              "source_text": "assert retried.state == \"reserve_inventory\"",
+              "rust_line": 401,
+              "rust_text": "assert_eq!(read.state(), b\"reserve_inventory\");"
+            },
+            {
+              "source_line": 1363,
+              "source_text": "assert retried.run_state == nil",
+              "rust_line": 402,
+              "rust_text": "assert_eq!(read.run_state(), None);"
+            },
+            {
+              "source_line": 1364,
+              "source_text": "assert retried.next_run_at_ms == now_ms + 1_000",
+              "rust_line": 403,
+              "rust_text": "assert_eq!(read.next_run_at(), Some(TimestampMillis::new(2_000)));"
+            }
+          ],
+          "limitations": [
+            "Pure M1 typed/indexed decisions and publication into canonical saved in-memory record/index fixtures; production durable publication, public API/transport and original FlowCase/profile execution remain required.",
+            "Prepared policy is fixture authority; committed policy installation, public default/clock handling and value hydration are not executed. Nondeterministic suffixes and explicit source clocks are normalized as recorded in the test.",
+            "This counterpart does not establish full source-case parity or independent Linux acceptance.",
+            "Payload/error use exact pinned opaque ETF bytes; no original VM encoder/hydration executes. Start clock is normalized to1000 and Retry to1100; the source omits the Retry clock. Actual returned lease/fence authorize Retry."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "34b559b69d9934eb",

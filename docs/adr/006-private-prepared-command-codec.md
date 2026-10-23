@@ -1233,7 +1233,7 @@ encoders explicitly return `UnsupportedTag`; value inspection returns no
 supported value shape. Decoder grammar and independent/public allowlists stay
 closed. Storage's existing Create-only policy discovery does not discover
 StartAndClaim policy; that durable integration remains required separately.
-The interface shell supplies no public or durable operation support.
+The passing pure body supplies no public or durable operation support.
 
 One existing request inspection precedes all Fresh current-record, retry-policy
 and index work. Fresh checks effective committed time, binds exact derived keys

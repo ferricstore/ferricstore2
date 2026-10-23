@@ -4,7 +4,7 @@ use wf_types::version::Fence;
 
 use crate::claim::Claim;
 use crate::history::{EventKind, LatestEvent};
-use crate::lease::Lease;
+use crate::lease::{Lease, LeaseToken};
 use crate::value::{Counter, InputField};
 
 use super::plan::{changed_plan, noop_plan};
@@ -12,7 +12,9 @@ use super::validation::{
     lease_deadline, next_version, require_nonempty, retry_run_state, terminal_state,
     validate_run_at,
 };
-use super::{CommittedCommand, Create, DomainError, Outcome, TransitionPlan, WorkflowRecord};
+use super::{
+    CommittedCommand, Create, DomainError, Outcome, StartAndClaim, TransitionPlan, WorkflowRecord,
+};
 
 pub(super) fn create_record(
     record: Option<&WorkflowRecord>,
@@ -51,6 +53,60 @@ pub(super) fn create_record(
             kind: EventKind::Created,
             version: 1,
             fence: Fence::new(0),
+        },
+    };
+    Ok(changed_plan(None, next, EventKind::Created, command.now))
+}
+
+pub(super) fn start_and_claim_record(
+    record: Option<&WorkflowRecord>,
+    command: &CommittedCommand,
+    start: &StartAndClaim,
+) -> Result<TransitionPlan, DomainError> {
+    if record.is_some() {
+        return Err(DomainError::AlreadyExists);
+    }
+    require_nonempty(&start.workflow_type, InputField::Type)?;
+    if start.workflow_type == b"__ferricstore_schedule" {
+        return Err(DomainError::ReservedType);
+    }
+    require_nonempty(&start.state, InputField::State)?;
+    if start.state == b"running" {
+        return Err(DomainError::RunningTransition);
+    }
+    if terminal_state(&start.state) {
+        return Err(DomainError::TerminalTransition);
+    }
+    require_nonempty(&start.worker, InputField::Worker)?;
+    let deadline = lease_deadline(command.now, start.lease_ms)?;
+    let mut token = start.worker.clone();
+    token.push(b':');
+    token.extend_from_slice(command.now.get().to_string().as_bytes());
+    token.extend_from_slice(b":1");
+    let token = LeaseToken::new(token)?;
+    let next = WorkflowRecord {
+        id: command.id.clone(),
+        workflow_type: start.workflow_type.clone(),
+        state: b"running".to_vec(),
+        version: 1,
+        fence: Fence::new(1),
+        attempts: 1,
+        created_at: command.now,
+        updated_at: command.now,
+        next_run_at: Some(deadline),
+        run_state: Some(start.state.clone()),
+        lease: Some(Lease {
+            worker: start.worker.clone(),
+            token,
+            deadline,
+        }),
+        payload: start.payload.clone(),
+        result: None,
+        error: None,
+        latest_event: LatestEvent {
+            kind: EventKind::Created,
+            version: 1,
+            fence: Fence::new(1),
         },
     };
     Ok(changed_plan(None, next, EventKind::Created, command.now))

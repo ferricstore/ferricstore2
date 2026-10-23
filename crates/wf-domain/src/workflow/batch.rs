@@ -9,7 +9,8 @@ use crate::claim::ScopedRecordId;
 use crate::policy::InstalledRetryPolicy;
 
 use super::admission::{
-    AdmissionError, AdmissionLimits, add, admit_command, record_bytes, step_continue_bytes,
+    AdmissionError, AdmissionLimits, add, admit_command, record_bytes, start_and_claim_bytes,
+    step_continue_bytes,
 };
 use super::{
     CommittedCommand, DomainError, Operation, TransitionPlan, WorkflowRecord, reduce_with_policy,
@@ -276,7 +277,8 @@ fn admitted_with_identity<'input, K: Ord>(
         {
             return Ok(Err(BatchRejection::Admission(error)));
         }
-        if let Some(record) = view.record(identity(*item))? {
+        let record = view.record(identity(*item))?;
+        if let Some(record) = record {
             if record.id() != &item.command.id {
                 return Err(ApplyError::InvalidAuthority);
             }
@@ -296,6 +298,12 @@ fn admitted_with_identity<'input, K: Ord>(
             {
                 return Ok(Err(BatchRejection::Admission(error)));
             }
+        }
+        if let Err(error) = start_and_claim_bytes(record, item.command, limits)
+            .and_then(|bytes| add(&mut total, bytes))
+            .and_then(|()| limits.check_total(total))
+        {
+            return Ok(Err(BatchRejection::Admission(error)));
         }
     }
     Ok(Ok(total))

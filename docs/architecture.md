@@ -140,11 +140,12 @@ public/independent callers and storage event codecs remain explicitly unsupporte
 for this operation. This selection completes no source scenario or durability gate.
 
 The [selected atomic StartAndClaim core](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
-uses the same pure domain and existing Created history. Its current interface
-returns UnsupportedOperation; copied-input admission and explicit unsupported
-codec matches preserve closed profiles. Atomic record/token construction and
-indexed FIFO behavior require separately frozen runtime RED before implementation.
-No new crate, dependency, event tag or public/durable operation is introduced.
+uses the same pure domain and existing Created history. After the saved
+UnsupportedOperation regressions, the body creates one fresh leased running
+record and one Created event. All five unchanged tests now pass, including
+generated-token admission, duplicate/error ordering and direct FIFO refusal.
+Explicit unsupported codec matches preserve the closed profiles. No new crate,
+dependency, event tag or public/durable operation is introduced.
 
 ## Command execution and durability
 

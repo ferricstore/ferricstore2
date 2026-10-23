@@ -192,11 +192,12 @@ remain required. Unit coverage alone will not certify those successors.
 
 START-AND-CLAIM1 selects `StartAndClaim` with explicit binary type, logical
 initial state, raw worker, positive lease duration and optional payload. The
-interface stage returns `UnsupportedOperation` after the existing global
-ID/time/current-identity guards. It admits copied input fields but constructs no
-token, record or history. Compiled positive tests must reach runtime RED and be
-frozen before the separately released atomic body; a missing enum or compile
-error is not behavioral RED.
+interface stage returned `UnsupportedOperation` after the existing global
+ID/time/current-identity guards. It admitted copied input fields without
+constructing a token, record or history. Five compiled regressions, including a
+valid positive runtime witness, were saved before the separately released
+atomic body. A missing enum or compile error was not counted as behavioral RED.
+The unchanged tests now pass.
 
 The selected body must create one running record at version1, attempts1 and
 fence1, with the initial logical state, deadline/due equal to committed time plus
@@ -218,10 +219,12 @@ actual target-mode resolution, before the existing FIFO-priority predicate and
 ordinal allocation. Earlier admission, placement and invalid-create-priority
 checks keep their order. Rejection publishes no record, history or index.
 
-At this stage only the rejecting interface is implemented. Atomic behavior,
-source counterparts, public defaults/hydration, committed policy installation,
-durable command/replay integration and both-OS/profile acceptance remain open.
-The existing private wire and independent/public operation profiles stay closed;
+The pure body and three source-derived component counterparts are implemented.
+The focused claim target passes all 35 tests, including eight explicit resource
+cases and scalar/duplicate ordering controls. Public defaults/hydration,
+committed policy installation, durable command/replay integration and
+both-OS/profile acceptance remain open. The existing private wire and
+independent/public operation profiles stay closed;
 see [ADR-006](006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition).
 
 ## Verification and deployment gates

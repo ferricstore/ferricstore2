@@ -29,7 +29,7 @@ pub use command::{
 };
 pub use plan::{Outcome, RecordWrite, TransitionPlan};
 
-use create_claim::{claim_record, create_record};
+use create_claim::{claim_record, create_record, start_and_claim_record};
 use lifecycle::{
     cancel_record, extend_record, step_continue_record, terminal_record, transition_record,
 };
@@ -256,7 +256,7 @@ fn reduce_profile(
     }
     match &command.operation {
         Operation::Create(create) => create_record(record, command, create),
-        Operation::StartAndClaim(_) => Err(DomainError::UnsupportedOperation),
+        Operation::StartAndClaim(start) => start_and_claim_record(record, command, start),
         Operation::Claim(claim) => claim_record(require_record(record)?, command, claim, false),
         Operation::Reclaim(claim) => claim_record(require_record(record)?, command, claim, true),
         Operation::Transition(transition) => {

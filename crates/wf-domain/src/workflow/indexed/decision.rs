@@ -142,7 +142,10 @@ pub(super) fn next_ordering(
     let record = &write.record;
     let after_mode = view.mode(record)?;
     if after_mode == StateMode::Fifo
-        && matches!(item.item.command.operation, Operation::StepContinue(_))
+        && matches!(
+            item.item.command.operation,
+            Operation::StartAndClaim(_) | Operation::StepContinue(_)
+        )
     {
         return Ok(Err(IndexRejection::DirectRunningFifoEntry));
     }
@@ -237,8 +240,10 @@ pub(super) fn validate(
     bytes: &mut usize,
 ) -> Result<Option<IndexRejection>, ApplyError> {
     let Some(entry) = view.current(item.item)? else {
-        return Ok((matches!(item.item.command.operation, Operation::Create(_))
-            && item.create_priority > 2)
+        return Ok((matches!(
+            item.item.command.operation,
+            Operation::Create(_) | Operation::StartAndClaim(_)
+        ) && item.create_priority > 2)
             .then_some(IndexRejection::InvalidPriority));
     };
     if entry.priority > 2 {

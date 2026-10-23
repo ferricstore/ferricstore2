@@ -211,3 +211,15 @@ runtime identity unchanged. The generator's older fixed roster is not rerun.
 Prepared policy modes remain fixture authority: public setup/normalization,
 committed policy CAS/encoding, durable publication, governance, original profiles,
 native Linux and complete original-case/workflow parity remain required.
+
+The pure atomic-start body adds three component counterparts and 27 direct
+links for declarations 23e4645b7b46c5b7, 1186468cb4da234a and 945df5266fddc8cb.
+The frozen tests first reached UnsupportedOperation, then all five unchanged
+regressions passed with the 30 preceding claim tests. Actual returned leases
+authorize Retry/Step; saved publication deltas preserve both index sets. Eight
+explicit resource cases and scalar/duplicate controls also pass. The ledger now
+contains 92 source-derived declarations, 104 counterparts and 442 links. All
+other declaration objects and runtime identities remain unchanged. Prepared
+policy, normalized clocks and opaque value bytes remain fixture inputs; public
+defaults/hydration, committed policy installation, durable publication, original
+profiles, both-OS acceptance and full source-case/workflow parity remain required.

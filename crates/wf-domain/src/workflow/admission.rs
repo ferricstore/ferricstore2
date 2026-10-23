@@ -340,6 +340,35 @@ pub(super) fn step_continue_bytes(
     Ok(bytes)
 }
 
+pub(super) fn start_and_claim_bytes(
+    record: Option<&WorkflowRecord>,
+    command: &CommittedCommand,
+    limits: AdmissionLimits,
+) -> Result<usize, AdmissionError> {
+    if record.is_some() {
+        return Ok(0);
+    }
+    let Operation::StartAndClaim(start) = &command.operation else {
+        return Ok(0);
+    };
+    limits.check_value(b"running")?;
+    let mut bytes = start.worker.len();
+    add(&mut bytes, 3)?;
+    let mut now = command.now.get();
+    add(&mut bytes, 1)?;
+    while now >= 10 {
+        now /= 10;
+        add(&mut bytes, 1)?;
+    }
+    if bytes > limits.inline_bytes() {
+        return Err(AdmissionError::ValueTooLarge {
+            bytes,
+            maximum: limits.inline_bytes(),
+        });
+    }
+    Ok(bytes)
+}
+
 pub(super) fn add(total: &mut usize, bytes: usize) -> Result<(), AdmissionError> {
     *total = total
         .checked_add(bytes)

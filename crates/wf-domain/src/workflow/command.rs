@@ -21,8 +21,6 @@ pub struct Create {
 }
 
 /// Inputs for an atomic initial logical step with a running lease.
-///
-/// The current reducer shell rejects these inputs as unsupported.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct StartAndClaim {
     /// Nonempty binary workflow type.
@@ -102,7 +100,7 @@ pub struct Cancel {
 pub enum Operation {
     /// Create one new record.
     Create(Create),
-    /// Atomic fresh start and claim; currently refused by the reducer.
+    /// Atomic fresh start and claim.
     StartAndClaim(StartAndClaim),
     /// Claim a named due unleased record, without selecting a partition candidate.
     Claim(Claim),
