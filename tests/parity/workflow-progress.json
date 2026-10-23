@@ -7495,28 +7495,262 @@
       "runtime_case_ids": [
         "a9ce358add7acabbcfe1a5e56fcd5bb905c6502ba545bd8f63cc732926e26092"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-65c3497d7edaac81-binary-options",
+          "rust_file": "crates/wf-domain/tests/options.rs",
+          "rust_file_sha256": "8766f0150456107ceec77cda01ebc072348fa5e3c70c26091916881a9009ea05",
+          "rust_module": "",
+          "rust_function": "binary_options_validate_required_and_optional_strings",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert Options.required_binary([worker: \"w\"], :worker) == {:ok, \"w\"}",
+              "rust_line": 21,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 9,
+              "source_text": "assert Options.required_binary([], :worker) == {:error, \"ERR flow worker is required\"}",
+              "rust_line": 25,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 11,
+              "source_text": "assert Options.required_binary([worker: \"\"], :worker) ==",
+              "rust_line": 31,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 14,
+              "source_text": "assert Options.optional_binary([], :state, \"queued\") == {:ok, \"queued\"}",
+              "rust_line": 37,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 16,
+              "source_text": "assert Options.optional_binary([state: \"\"], :state, \"queued\") ==",
+              "rust_line": 41,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 19,
+              "source_text": "assert Options.optional_binary_or_nil([], :parent, nil) == {:ok, nil}",
+              "rust_line": 51,
+              "rust_text": "assert_eq!(optional_binary_or_nil(&[], \"parent\", Raw::Nil), Ok(None));"
+            },
+            {
+              "source_line": 20,
+              "source_text": "assert Options.optional_binary_or_nil([parent: \"p\"], :parent, nil) == {:ok, \"p\"}",
+              "rust_line": 52,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 22,
+              "source_text": "assert Options.optional_binary_or_nil([parent: 1], :parent, nil) ==",
+              "rust_line": 56,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure Options case, in source order, with async:true/flow provenance and no local setup. Captured option rows are proper atom-key keyword lists; map row views have unique keys and no observable VM map traversal order.",
+            "Opaque binaries and option names remain borrowed. Typed nil-or-binary reference checks and source-strict Copy/Eq map values do not implement malformed VM function-clause exceptions, arbitrary term equality, public command capture or admission authority. Fallible row reservation is an operational Rust error.",
+            "All eight Options Rust tests and all four original standalone Elixir Options cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "80d4eb10e36def0f",
       "runtime_case_ids": [
         "0c7a3522052a0b447d96ebfc55b8f9090c4753001d256a644b8b81f6b33614e6"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-80d4eb10e36def0f-integer-boolean-options",
+          "rust_file": "crates/wf-domain/tests/options.rs",
+          "rust_file_sha256": "8766f0150456107ceec77cda01ebc072348fa5e3c70c26091916881a9009ea05",
+          "rust_module": "",
+          "rust_function": "integer_and_boolean_options_preserve_flow_error_messages",
+          "assertions": [
+            {
+              "source_line": 27,
+              "source_text": "assert Options.required_non_neg_integer([now_ms: 0], :now_ms) == {:ok, 0}",
+              "rust_line": 66,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 29,
+              "source_text": "assert Options.required_non_neg_integer([], :now_ms) ==",
+              "rust_line": 70,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 32,
+              "source_text": "assert Options.optional_non_neg_integer([], :run_at_ms, nil) == {:ok, nil}",
+              "rust_line": 76,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 33,
+              "source_text": "assert Options.optional_non_neg_integer([], :run_at_ms, 10) == {:ok, 10}",
+              "rust_line": 80,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 35,
+              "source_text": "assert Options.optional_non_neg_integer([run_at_ms: -1], :run_at_ms, nil) ==",
+              "rust_line": 84,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 38,
+              "source_text": "assert Options.optional_boolean([], :payload, false) == {:ok, false}",
+              "rust_line": 90,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 39,
+              "source_text": "assert Options.optional_boolean([payload: true], :payload, false) == {:ok, true}",
+              "rust_line": 94,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 41,
+              "source_text": "assert Options.optional_boolean([payload: \"true\"], :payload, false) ==",
+              "rust_line": 102,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure Options case, in source order, with async:true/flow provenance and no local setup. Captured option rows are proper atom-key keyword lists; map row views have unique keys and no observable VM map traversal order.",
+            "Opaque binaries and option names remain borrowed. Typed nil-or-binary reference checks and source-strict Copy/Eq map values do not implement malformed VM function-clause exceptions, arbitrary term equality, public command capture or admission authority. Fallible row reservation is an operational Rust error.",
+            "All eight Options Rust tests and all four original standalone Elixir Options cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "4d368797bb881b6f",
       "runtime_case_ids": [
         "ac6128a51dfed3f852b89cd1047f9646d0cf7cd67369e73d67fdd244a1cb59c2"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-4d368797bb881b6f-integer-exact-ceiling",
+          "rust_file": "crates/wf-domain/tests/options.rs",
+          "rust_file_sha256": "8766f0150456107ceec77cda01ebc072348fa5e3c70c26091916881a9009ea05",
+          "rust_module": "",
+          "rust_function": "integer_options_reject_values_above_flows_exact_integer_ceiling",
+          "assertions": [
+            {
+              "source_line": 48,
+              "source_text": "assert Options.required_non_neg_integer([fencing_token: max_exact_integer], :fencing_token) ==",
+              "rust_line": 117,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 51,
+              "source_text": "assert Options.required_non_neg_integer(",
+              "rust_line": 124,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 57,
+              "source_text": "assert Options.optional_non_neg_integer([to_ms: max_exact_integer], :to_ms, nil) ==",
+              "rust_line": 133,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 60,
+              "source_text": "assert Options.optional_non_neg_integer([to_ms: max_exact_integer + 1], :to_ms, nil) ==",
+              "rust_line": 141,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure Options case, in source order, with async:true/flow provenance and no local setup. Captured option rows are proper atom-key keyword lists; map row views have unique keys and no observable VM map traversal order.",
+            "Opaque binaries and option names remain borrowed. Typed nil-or-binary reference checks and source-strict Copy/Eq map values do not implement malformed VM function-clause exceptions, arbitrary term equality, public command capture or admission authority. Fallible row reservation is an operational Rust error.",
+            "All eight Options Rust tests and all four original standalone Elixir Options cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "429276b19282e6e1",
       "runtime_case_ids": [
         "5387f25945ed27c30fe6cedfe9bf331e061caacd78bcabd494fd95abe2ce8b39"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-429276b19282e6e1-ref-size-and-put",
+          "rust_file": "crates/wf-domain/tests/options.rs",
+          "rust_file_sha256": "8766f0150456107ceec77cda01ebc072348fa5e3c70c26091916881a9009ea05",
+          "rust_module": "",
+          "rust_function": "ref_size_and_put_helpers_preserve_existing_semantics",
+          "assertions": [
+            {
+              "source_line": 65,
+              "source_text": "assert Options.validate_ref_size(:payload_ref, nil) == :ok",
+              "rust_line": 155,
+              "rust_text": "assert_eq!(validate_ref_size(\"payload_ref\", None), Ok(()));"
+            },
+            {
+              "source_line": 66,
+              "source_text": "assert Options.validate_ref_size(:payload_ref, String.duplicate(\"x\", 4_096)) == :ok",
+              "rust_line": 157,
+              "rust_text": "assert_eq!(validate_ref_size(\"payload_ref\", Some(&boundary)), Ok(()));"
+            },
+            {
+              "source_line": 68,
+              "source_text": "assert Options.validate_ref_size(:payload_ref, String.duplicate(\"x\", 4_097)) ==",
+              "rust_line": 159,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 71,
+              "source_text": "assert Options.maybe_put_keyword([a: 1], :b, nil) == [a: 1]",
+              "rust_line": 166,
+              "rust_text": "assert_eq!(maybe_put_keyword(&rows, \"b\", None)?.as_ref(), &rows);"
+            },
+            {
+              "source_line": 72,
+              "source_text": "assert Options.maybe_put_keyword([a: 1], :b, 2) == [b: 2, a: 1]",
+              "rust_line": 167,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 73,
+              "source_text": "assert Options.maybe_put_attr(%{a: 1}, :b, nil) == %{a: 1}",
+              "rust_line": 171,
+              "rust_text": "assert_eq!(maybe_put_attr(&rows, \"b\", None)?.as_ref(), &rows);"
+            },
+            {
+              "source_line": 74,
+              "source_text": "assert Options.maybe_put_attr(%{a: 1}, :b, 2) == %{a: 1, b: 2}",
+              "rust_line": 172,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 75,
+              "source_text": "assert Options.maybe_put_default_attr(%{}, :priority, 0, 0) == %{}",
+              "rust_line": 177,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 76,
+              "source_text": "assert Options.maybe_put_default_attr(%{}, :priority, 1, 0) == %{priority: 1}",
+              "rust_line": 181,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure Options case, in source order, with async:true/flow provenance and no local setup. Captured option rows are proper atom-key keyword lists; map row views have unique keys and no observable VM map traversal order.",
+            "Opaque binaries and option names remain borrowed. Typed nil-or-binary reference checks and source-strict Copy/Eq map values do not implement malformed VM function-clause exceptions, arbitrary term equality, public command capture or admission authority. Fallible row reservation is an operational Rust error.",
+            "All eight Options Rust tests and all four original standalone Elixir Options cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "49e1130e5fb3fbd4",

@@ -1,78 +1,66 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-23. The active full-completion goal continues beyond this reviewed
-increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
-performance review and disjoint writes. See
-[the active coordination record](reviews/workflow-completion-coordination.md).
+Updated: 2026-10-23. The active full-completion goal remains unfinished.
+GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
+performance reviews. Current decisions and execution evidence are in
+[the coordination record](reviews/workflow-completion-coordination.md).
 
-The latest full Rust checkpoint passes **1,008 tests across 91 targets on macOS**,
-with zero failures, ignored or filtered tests, plus **six compile-fail examples
-across 15 documentation targets**. All eleven checks pass: formatting, workspace
-compilation, strict Clippy, warnings-denied documentation, all 50 architecture
-checks, reference/progress, four cached offline dependency-audit categories and
-whitespace. All 1,534 captured inputs stayed unchanged, excluding only three
-append-only peer notes. Exact target/executable/name/status comparison preserves
-all 1,000 preceding tests and adds only the eight child-policy tests. Both
-benchmark correctness smokes pass. No measured performance gain is claimed.
+The latest full Rust checkpoint passes **1,017 tests across 92
+targets on macOS**, with zero failed, ignored or filtered tests, plus **six
+compile-fail examples across 15 documentation targets**. All eleven local checks
+pass: formatting, workspace compilation, strict Clippy, warnings-denied
+documentation, all 51 architecture checks, reference/progress validation, four
+cached offline dependency-audit categories and whitespace. All 1,540 captured
+inputs stayed unchanged, excluding only the three append-only peer notes.
+Exact target/executable/name/status comparison preserves all 1,008 preceding
+tests and adds only eight Options tests and one architecture test.
+Both existing benchmark correctness smokes pass. No measured speedup is claimed.
 
-All five pinned pure ChildPolicy cases now have Rust counterparts preserving
-their eleven assertions in order, exact errors, option precedence and values.
-The remaining four cases were saved with three rejecting APIs in `e58675a`;
-actual runtime preserved five passes and exposed seven failures before the body.
-The final 12-test target passes, including shallow improper-list, atom-key ID,
-nil/duplicate option, malformed-map, opaque binary and borrowed-pointer controls.
-The complete original caller/test prefixes remain byte-identical. All five
-original Elixir cases also pass in the standalone source-only VM. Architecture
-and performance independently reviewed source and execution. Public capture,
-original project setup/profiles and independent Linux acceptance remain open.
+All four pinned pure Options cases now have Rust counterparts preserving their
+**29 assertions in source order**, exact errors, first-key/default/nil behavior,
+the exact integer ceiling, inclusive reference bound and put semantics. Eight
+Rust tests pass, including opaque borrowed binaries, padded/signed integers,
+duplicate keyword removal, unchanged borrowed rows, nonvacuous payload-pointer
+checks and strict-default/nil distinctions. Genuine compiled runtime RED
+(0/8 passing) was saved in `4f4318f` before the selected body. Updated immutable
+rows use one fallible reservation for the required row count; no-op rows borrow
+their input. No arbitrary Clone, Box conversion, total-allocation or measured
+performance claim follows. Architecture and performance independently reviewed
+the implementation and assertion links. All four original standalone Elixir
+cases also pass; full original project setup/profiles and Linux acceptance remain
+open.
 
-The current normalization regression checkpoint runs **55 native tests on macOS:
-45 pass and ten fail**. The two new tests preserve all eight preceding failure
-identities and fail only because existing Input APIs return bare invalid-donor
-errors for the new accounting mode. Raw controls pass first; later exact prefix,
-borrowed suffix and refusal assertions remain masked. These tests and genuine
-runtime RED are saved in `96516f1` before implementation. Architecture selected a
-Meter-only normalization child, unchanged raw facades and six-element value-mode
-support; its isolated body is being written in the three approved source paths.
-No initial tag reconstruction is needed. Source-backed row fees and independent
-matched-error deltas distinguish reached work from future forecasts. Formatting,
-all 50 architecture tests, reference/progress and whitespace pass at this R0.
+The current native-capture checkpoint runs **55 tests on macOS: 47 pass and
+eight fail**. Both normalization/restoration regressions saved before the body in
+`96516f1` now pass; exact failure comparison removes only those two names and
+preserves the six existing public Budget-protocol and two keeper-debt failures.
+The new Meter-only normalization child retains raw API behavior, carries the
+incoming six-element value mode without an initial tag copy, funds reached
+accumulators and reversals before construction, and preserves paid totals on
+refusal. Empty old-prefix restoration retains the borrowed suffix directly.
+A supplemental direct unsettled-value check is recorded honestly as later API
+conformance. Both peers reviewed the actual source, compiled constructors and
+executing module identities. The complete native/public accounting bridge,
+genuine initial root ownership and full control envelopes remain required;
+constructor bounds do not prove process allocation, GC, RSS or complete admission.
 
-All four original Options tests also pass in a standalone pinned-source VM.
-Their four cases and 29 assertions are still awaiting reviewed Rust counterparts;
-the exact helper/error/ownership API is under separate architecture consultation.
-Neither standalone source execution nor registration marks full parity passing.
+All five pinned pure ChildPolicy cases retain their eleven source assertions in
+Rust; the 12-test target and all five original standalone Elixir cases pass.
+Their source/error/ownership and derived regression review remains accepted.
+Options and ChildPolicy are pure components, not a completed workflow engine.
 
-The preceding reviewed native-capture checkpoint runs **53 tests on macOS:
-45 pass and eight fail**. All six metering cases pass. Four original paid-prefix regressions
-were saved before implementation; they now exercise retained encoder/copy work,
-actual-versus-forecast counts, decode estimates and query-prefix debt. Review
-added genuine regressions for lost unsettled state and guard-frame entry before
-its reservation. Both fail at their intended checks in saved `9a3f516` (53/10),
-then pass after symmetric terminal forwarding and caller-side prepayment.
-The SAME six public budget-protocol and two keeper-debt failures remain; full
-native/public budget integration is incomplete.
+The checked partial ledger records **101 source-derived declarations,
+113 Rust counterpart mappings and 482 assertion links**. Runtime reconciliation
+still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
+reference and frozen workflow mapping remain unchanged. Full original Elixir
+case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and
+the wider ordered runtime milestones remain open. The implementation agent is
+preparing the next public-accounting prerequisite for explicit architecture
+consultation before any new artifact. The active goal must continue beyond this
+reviewed increment.
 
-Input, Meter, Query and Binding are grouped by responsibility, with 514, 179,
-353 and 360 physical lines. All 151 clauses fit 100 lines (maximum 94); the six
-tests and two fixture helpers fit 55. Only the reached encoder cohort is issued;
-prospective forecasts remain separate. Known and unsettled outcomes retain their
-paid totals, and guard costs are reserved before entry. Source-only tooling binds
-21 files while the native library, four C sources and 305 compiler inputs remain
-unchanged. Actual compiled guard/caller inspection and all seven executing
-module identities are bound to the tested code. These are operation/retention
-bounds, not physical allocation measurements or public admission authority.
-
-The final two metering corrections change no Rust body, frozen Rust tests or
-ledger from the full 1,008-test checkpoint. Formatting, all 50 architecture tests,
-reference/progress and whitespace checks also pass after those corrections.
-The partial progress ledger records **97 source-derived declarations,
-109 Rust counterpart mappings and 453 assertion links**. Runtime reconciliation
-still has 1,681 unmatched cases and 1,655 unresolved declarations. Full Elixir
-case/profile parity, Linux validation and the wider runtime milestones remain
-open. Normalization/restoration has its concrete selected TDD scope above;
-public bridge activation and complete initial ownership/settlement remain later
-required work. The active full-completion goal remains unfinished.
+The entries below retain preceding checkpoints; the results above describe the
+current tree.
 
 The atomic-start recovery integration now passes **all eight regressions saved
 in `ae7a0ce` before implementation**. The borrowed header dispatches profile7;

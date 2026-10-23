@@ -10,7 +10,10 @@ fn options_module_classification_preserves_purity_and_forbidden_edges() -> Check
         ("options::put", "crates/wf-domain/src/options/put.rs"),
     ] {
         let actual = std::fs::read_to_string(root()?.join(path))?;
-        assert!(source_check("wf-domain", module, &actual)?.is_empty());
+        assert_eq!(
+            source_check("wf-domain", module, &actual)?,
+            Vec::<String>::new()
+        );
         assert!(
             source_check(
                 "wf-domain",
@@ -39,7 +42,10 @@ fn options_module_classification_preserves_purity_and_forbidden_edges() -> Check
         Some(&true)
     );
     let original = metadata()?;
-    assert!(graph::check(&original, &configured, &root()?)?.is_empty());
+    assert_eq!(
+        graph::check(&original, &configured, &root()?)?,
+        Vec::<String>::new()
+    );
     let mut ports = original.clone();
     package_mut(&mut ports, "wf-domain")?["dependencies"]
         .as_array_mut()
