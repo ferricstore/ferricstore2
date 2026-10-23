@@ -15,3 +15,7 @@ wf-types.workspace = true
 [[bench]]
 name = "indexed_singleton"
 harness = false
+
+[[bench]]
+name = "terminal_clone"
+harness = false

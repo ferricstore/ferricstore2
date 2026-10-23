@@ -121,6 +121,13 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
+The terminal-operation benchmark baseline passes its no-clock smoke: all ten
+profiles are validated twice, covering all record fields, history, input
+immutability, exact refusals and payload/value presence. The naturally formatted
+benchmark is 361 lines; its six functions are at most 91 lines. The product
+terminal constructor remains unchanged. No optimized baseline, pilot, candidate,
+timing campaign, allocation count or speedup has been established.
+
 The atomic-start codec interface has six explicitly refusing server entry
 points and primitive intent7 selection. No new frame, Fresh plan, retained
 response, storage policy discovery or recovery support is enabled. The exact
@@ -132,10 +139,11 @@ with zero failures, ignored or filtered tests, plus six compile-fail examples
 across 15 documentation targets. All eleven local checks pass, including strict
 Clippy, warnings-denied documentation, 50 architecture checks, reference and
 progress validation, and all four cached offline dependency-audit categories.
-All 1,510 captured inputs stayed unchanged, excluding only the three append-only
-peer review notes. Architecture and performance independently accept the final
-source and complete raw results. This adds interface enforcement; durable
-behavior, full parity and Linux remain open.
+All 1,511 captured inputs stayed unchanged, excluding only the three append-only
+peer review notes. Both benchmark smokes pass. Architecture and performance
+independently accept the source and complete raw results.
+This adds interface enforcement and benchmark correctness; durable behavior,
+full parity and Linux remain open.
 
 The preceding full Rust checkpoint passes **974 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
