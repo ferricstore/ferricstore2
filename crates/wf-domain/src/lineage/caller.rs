@@ -66,3 +66,36 @@ fn normalize_child_failure_value(value: ChildFailureValue<'_>) -> Option<ChildFa
         ChildFailureValue::Binary(_) | ChildFailureValue::Other => None,
     }
 }
+
+use crate::policy::complete::RawFlowPolicyValue as Raw;
+
+/// Rejecting baseline for the source's shallow nonempty-list guard.
+///
+/// # Errors
+/// Returns the source refusal until the separately tested body is implemented.
+pub fn validate_children(_children: Raw<'_>) -> Result<(), &'static str> {
+    Err("ERR flow children must be a non-empty list")
+}
+
+/// Rejecting baseline for binary parent IDs and captured child-map rows.
+///
+/// Map rows have unique actual keys; map-shape classification happens outside.
+/// # Errors
+/// Returns the source refusal until the separately tested body is implemented.
+pub fn validate_no_parent_child_id<'v>(
+    _parent_id: &[u8],
+    _child_attrs: &[&[(Raw<'v>, Raw<'v>)]],
+) -> Result<(), &'static str> {
+    Err("ERR flow child id must differ from parent id")
+}
+
+/// Rejecting baseline for ordered, captured atom-key exhaustion options.
+///
+/// Returned states will borrow opaque binary inputs; this entry owns no map.
+/// # Errors
+/// Returns the source refusal until the separately tested body is implemented.
+pub fn exhaust_to_opts<'v>(
+    _opts: &[(&str, Raw<'v>)],
+) -> Result<(&'v [u8], &'v [u8]), &'static str> {
+    Err("ERR flow exhaust_to must include success and failure states")
+}

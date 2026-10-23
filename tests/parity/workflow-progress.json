@@ -1722,7 +1722,7 @@
         {
           "scenario_id": "m1-981b590378d8a60d-child-failure-option",
           "rust_file": "crates/wf-domain/tests/child_policy.rs",
-          "rust_file_sha256": "07cf7b5a8811931aadf23f35ee50ca017a26413b8e1c645dcaf056250354bdc4",
+          "rust_file_sha256": "e4a596873ba06363d10662994e9dfc516184058986a98f19fced44a485abbb0e",
           "rust_module": "",
           "rust_function": "optional_policy_normalizes_binary_values_and_rejects_unsupported_values",
           "assertions": [
