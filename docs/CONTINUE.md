@@ -5,6 +5,25 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
+The current in-progress R0 adds six compiled HistoryEntry Rust tests: **zero
+pass and six fail** against the deliberately empty/absent callable baselines.
+Formatting, all-target domain compilation, strict Clippy, all 51 architecture
+checks, reference/progress and whitespace pass. The four original standalone
+Elixir cases pass. These saved regressions precede the two implementation bodies;
+the four source observations and derived ownership/flat-list controls remain
+unmapped until actual Rust GREEN and review.
+
+Observation extraction also preserves the old function bodies and all existing
+test content. Its two new regressions produce genuine context-comparison and
+known-facts failures: the first full run is **57 tests, 47 passes, ten failures**,
+retaining exactly the eight preceding failure identities. Review corrected the
+owned fixture teardown. The corrected full run has **eleven failures**, including
+an additional existing wrong-VM startup timeout during concurrent compilation.
+Serial validation with the original timeout is required before the paid body;
+neither that extra failure nor the later masked assertions count as passing.
+The complete raw append/map BEAM, nine executing module identities and current
+file/function geometry are bound. No paid Observation body is implemented yet.
+
 The latest full Rust checkpoint passes **1,017 tests across 92
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks

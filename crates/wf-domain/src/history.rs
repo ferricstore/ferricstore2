@@ -5,6 +5,8 @@ use wf_types::version::{Fence, TimestampMillis};
 use crate::policy::RetryPolicy;
 use crate::retry::RetryDecision;
 
+pub mod original;
+
 /// The nine source retry metadata observations, retained as typed values.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RetryHistory {
