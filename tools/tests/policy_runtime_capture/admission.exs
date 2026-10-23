@@ -582,3 +582,5 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
 end
 
 Code.require_file("admission/source_guard.exs", __DIR__)
+
+Code.require_file("paid_prefix.exs", __DIR__)
