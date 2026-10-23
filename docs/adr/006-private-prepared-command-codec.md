@@ -1294,11 +1294,48 @@ length must not match each other's plans. Fresh workspace6531/6532
 and standalone SAME-response caps114/113 and token8/7 are distinct tests; no
 late-only or tiny-response-budget Fresh witness is claimed.
 
-GroupApplyChanges, stored-outcome FWSO encoding/scanning, policy discovery,
-storage transaction binding and adapters remain closed to this profile until
-separately tested integration. Common recovery dispatch and a recovery-header
+The stored integration below adds GroupApplyChanges, FWSO encoding/scanning,
+policy discovery and transactional adapters under separately saved regressions.
+Common recovery dispatch and a recovery-header
 helper are deferred until an actual selected caller needs them. No private
 postimage alone establishes durable/public/profile or Linux/macOS acceptance.
+
+### Selected stored atomic-start integration
+
+The seven compiled regressions saved in `be13b91` precede this selected body.
+The existing dedicated `apply_atomic_start_transaction` reuses the common
+exclusive transaction driver with isolated preparation and point inspection.
+Fresh discovers StartAndClaim's actual type through the existing charged query
+and policy path, including absent current records. Accepted publication includes
+record, ordering, indexes, Created history, outcome and control in one consumed
+Immediate commit; rejection publishes outcome/control. Replay returns the
+original response after committing only processing control. Failed or uncertain
+commit exposes no retained acknowledgement.
+
+The private ports `state::transaction::atomic_start::validate` compares original
+scope/full log/time/status and singleton count against independent actual Fresh
+control, then matches the actual plan/postimage/history/response. Its existing
+hard ceilings (512 MiB inline and 100,000 items, with actual response length)
+check structural coherence. They supply no captured-cap or persistence
+certificate. Existing generic predecessor and older-profile checks stay intact.
+
+The private storage `state::value::outcome::atomic_start` functions `wire_status`
+and `scan` share D1 response validation through unchanged FWSO1 framing. Only
+intent7/response4 gains this route. Healthy narrowed response limits reach
+`ProfileLimit`, including the same donor at decision114/113 and inline8/7.
+The backend independently repeats scanning under actual transaction admission
+before output-key/frame allocation; point and reopen readers use the same scan
+before admitting/copying a returned owner. Existing older error origins remain.
+
+Retained ownership stays `O = 512 + H + R` and wire ownership
+`F = 102 + H + R`. These and the key debit use their existing cumulative banks;
+the reserved read/staging/adapter sum L is charged once. Fresh moves the same
+producer Box; Replay moves the original response Vec after erasing its borrow.
+Reopen pays for a new independent owner. No layout/event version, cloned
+response, tariff, common Normal recovery dispatcher or public-wire route is
+introduced. All seven unchanged regressions now pass within the full 988-test
+macOS checkpoint, including the complete state suite. Full original profiles,
+parity and Linux acceptance remain required.
 
 ### Existing Registry5 inspection and scalar retention
 

@@ -195,8 +195,17 @@ and unsafe blocks for each exact module. Each similarly named `_backend`
 neighbor remains outside those clauses. All six client-facade exports stay
 forbidden. No descendant-prefix or parser/allowlist exemption is added. Six
 compiled runtime regressions were saved before body implementation; all six now
-pass and the expanded matrix passes within all 50 architecture checks. Storage,
-policy discovery and recovery are separate gates.
+pass and the expanded matrix passes within all 50 architecture checks. Storage
+and policy discovery have separate passing integration regressions; common
+committed-log recovery remains a separate gate.
+
+The selected private `state::transaction::atomic_start` consumer uses the same
+namespace-boundary purity rule as the independent consumer, including nested
+modules. Its `_backend` neighbor remains effectful. The existing matrix also
+names `state::value::outcome::atomic_start` and its nested modules under the
+existing pure storage-value rule. An executed missing-diagnosis regression
+precedes the classifier repair; all 50 architecture checks now pass. No new
+checker function, parser exemption, client export or size exception is added.
 
 ## Pure storage value boundary
 

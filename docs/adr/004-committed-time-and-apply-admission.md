@@ -258,6 +258,19 @@ check supplies neither storage provenance nor same-index term/node proof.
 Storage publication, committed policy discovery, recovery, public profiles,
 full source parity and both supported OS results remain separate obligations.
 
+Seven compiled storage regressions were saved in `be13b91` before selecting the
+dedicated transaction body. Its private consumer must compare Fresh's original
+full log and time to independent actual control before matching the real plan
+and response. Hard structural ceilings provide no historical-cap certificate:
+the backend repeats the response scan under its captured admission before
+allocating the output key/frame. The existing point and reopen readers repeat
+those limits before admitting a new retained owner. Existing decoder/Fresh/late
+accounts, commit authority and response-owner moves remain unchanged. See the
+[stored integration contract](006-private-prepared-command-codec.md#selected-stored-atomic-start-integration).
+The unchanged seven regressions now pass within the full 988-test macOS
+checkpoint. Common committed-log recovery, public dispatch and complete original
+profiles on both supported operating systems remain required.
+
 ## Verification and deployment gates
 
 Before M1 acceptance, execute independent source-derived admission/model cases

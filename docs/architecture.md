@@ -160,6 +160,15 @@ storage publication, policy discovery and recovery remain closed until their
 separately tested integrations. See
 [ADR-006](adr/006-private-prepared-command-codec.md#selected-private-atomic-start-codec).
 
+Seven compiled storage regressions were saved in `be13b91` before the selected
+transaction integration. That integration reuses the exclusive apply guard,
+persisted-policy discovery and consumed commit, with private consumer and stored
+response validators. Structural validation and the transaction's captured limits
+remain separate checks. All seven frozen regressions now pass within the full
+988-test macOS checkpoint; committed-log recovery and public dispatch remain
+separate work. See
+[the stored integration contract](adr/006-private-prepared-command-codec.md#selected-stored-atomic-start-integration).
+
 ## Command execution and durability
 
 1. Authenticate and enforce tenant, request and payload bounds at the edge. Construct typed command and idempotency key.

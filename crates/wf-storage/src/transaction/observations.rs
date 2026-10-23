@@ -8,8 +8,9 @@ use wf_domain::policy::definition::{PolicySnapshot, StateMode};
 use wf_domain::workflow::indexed::TouchedIndexedGroupView;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::log::{
-    FreshRecordBatch, RecordBatchApplyPlan, decide_fresh_independent_record_batch_touched,
-    decide_fresh_public_mutation_touched, decide_fresh_record_batch_touched,
+    FreshRecordBatch, RecordBatchApplyPlan, decide_fresh_atomic_start_touched,
+    decide_fresh_independent_record_batch_touched, decide_fresh_public_mutation_touched,
+    decide_fresh_record_batch_touched,
 };
 use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId};
@@ -74,6 +75,8 @@ pub(super) fn decide<'current>(
             live_bytes,
             limits.outcome_ttl_ms,
         )
+    } else if fresh.decoded().request().intent.version() == 7 {
+        decide_fresh_atomic_start_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
     } else {
         decide_fresh_record_batch_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
     }?)

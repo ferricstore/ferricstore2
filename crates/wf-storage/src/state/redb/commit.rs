@@ -9,8 +9,10 @@ use crate::state::{key, value};
 use redb::Durability;
 use wf_domain::workflow::control::{ControlState, EntryStamp};
 use wf_domain::workflow::indexed::IndexedBatchPlan;
-use wf_domain::workflow::request::{RequestScope, RetainedOutcome};
-use wf_ports::log::{claim_retained_summary, record_batch_retained_summary};
+use wf_domain::workflow::request::{RequestScope, RetainedOutcome, RetainedStatus};
+use wf_ports::log::{
+    atomic_start_retained_summary, claim_retained_summary, record_batch_retained_summary,
+};
 use wf_ports::state::{GroupApplyChanges, GroupApplyTransaction, StateTransactionError};
 
 pub(super) mod claim;
@@ -178,6 +180,30 @@ fn write_outcome(
         .is_some_and(|count| count > tx.admission.batch_items())
     {
         return Err(StateTransactionError::Limit);
+    }
+    if outcome.intent().version() == 7 && outcome.response_version() == 4 {
+        let (status, count) = atomic_start_retained_summary(
+            outcome.intent(),
+            outcome.response_version(),
+            outcome.response(),
+            outcome.original_position(),
+            outcome.original_time(),
+            tx.admission,
+        )
+        .map_err(|error| match error {
+            wf_ports::log::CodecError::ByteLimit
+            | wf_ports::log::CodecError::ItemLimit
+            | wf_ports::log::CodecError::ValueLimit => StateTransactionError::Limit,
+            _ => StateTransactionError::InvalidChanges,
+        })?;
+        let expected = match status {
+            RetainedStatus::Accepted => Some(1),
+            RetainedStatus::IndexedRejected(_) => None,
+            _ => return Err(StateTransactionError::InvalidChanges),
+        };
+        if status != outcome.status() || count != expected {
+            return Err(StateTransactionError::InvalidChanges);
+        }
     }
     let size = total(
         102,

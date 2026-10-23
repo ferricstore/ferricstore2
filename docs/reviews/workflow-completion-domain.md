@@ -49753,3 +49753,68 @@ Stored-owner case uses the SAME genuine accepted donor and independently fixed F
 Own preservation proof from actual post-write full reads: remove the UNIQUE appended cfg(test) seam to restore ENTIRE feature root157/5378/a258ef374fd5d689bd315fefc4ae681cc471ba4799ee76ac9f42c4dfe2e42d5a TRUE; remove ONLY each exact mod atomic_start; line to restore ENTIRE recording main254/8425/8879840e3fcf4b10f666c342ec672284378b13dd27a651bc431bae73d84deb16 and state main541/17205/f090ad30eed74b2194ad53b26758474d75b8446ea70e386d8541630ed5985329 TRUE. New children correspond to recorded absence. All1,512 held full hashes after writing are equal, ZERO drift. In-memory complete before/current unified diff witness 1006 LF / 39174 B / SHA256 dfb554e060b97e1c3bfc641086bbef42de9590b2a9733a2451c11f85ce7429d5; no patch/artifact file was created.
 
 All seven are intended SUCCESS obligations; none expects UnsupportedVersion as desired behavior. No compiler, formatter, Cargo/test, VM/native/benchmark/probe or Git was run by author. Runtime RED versus compiler/setup/lint failure, later masked controls, old-test conservation and exact save are Root's next actual evidence before any D2 body. No new parity/OS/profile/public/recovery/performance credit or whole-goal completion is claimed. ALL SIX SOURCE WRITES ARE STOPPED; Root owns canonicalization/validation and ARCH/PERF stopped-source reciprocal review. Only these six paths and this existing DOMAIN append were written.
+
+
+### D2 BODY1 stopped runtime handoff — eight-path selected body
+
+Implemented only after Root's explicit release at coordination4281971+2524/
+7578017721e5072ac60a987b52c3ddbea3bf89667d4e2b7c031812ac0a8d0b08.
+Actually whole/hash-read ARCH4480007+13379/e6743419 and
+PERF3431785+3450/2d452b3c before coding. Actual six source beforeimages match
+that selection; both named child paths were absent. Root's actual saved seven
+compiled runtime RED cases at be13b91 precede this body; no test was edited.
+
+The existing dedicated driver now selects one AtomicStart variant in the common
+apply driver, preserving the single live reservation, scope comparison, exclusive
+begin, point-before-current ordering, loaded-owner lifetime and consumed commit.
+StartAndClaim's raw type uses the existing charged discovery/append_type path even
+when current is absent. The same touched view reaches the dedicated Fresh reducer.
+Existing complete_kind/fresh_reply bodies remain byte-literal, so Fresh moves the
+producer Box and Replay moves the original response Vec after erasing its borrow.
+
+New validate/4 compares independent actual full control log/time and exact
+scope/intent7/response4/status before the hard-ceiling scan, exact singleton count
+and actual postimage/history response matcher. Structural ceilings are not captured
+transaction admission. New wire_status/2 and scan/6 return only scalar status/count;
+the latter reuses parent claim_error. Exact7/4 has the selected FWSO dispatch and
+only its selected early-B exception. The backend separately rescans under actual
+tx.admission, requiring exact status and acceptedSome1/rejectedNone before K/F
+allocation. Byte/Item/Value failures retain Limit/ProfileLimit origins; old Claim,
+V5/V6/policy/point/reopen/recovery paths and O/F/K fees are preserved.
+
+Stopped source inventory (physical LF lines, byte count, SHA256):
+
+| Path | Lines | Bytes | SHA256 |
+|---|---:|---:|---|
+| crates/wf-ports/src/state/transaction.rs | 358 | 15837 | f89b072d5002cde9ecd1711a79cc48a2e8a92a30d21163817b4250592e5c2763 |
+| crates/wf-storage/src/transaction/record_batch.rs | 261 | 9428 | 26f5f73cc093c0b5b76badfd2c635ff26c12a0960da8670e2d4dad0af3e2b5b2 |
+| crates/wf-storage/src/transaction/load.rs | 311 | 11084 | 401486231a8ff6f1c43608fc67acc9188fd73078002aeb3fd0c979d5ca083d2c |
+| crates/wf-storage/src/transaction/observations.rs | 243 | 8806 | 227fdac19b82b0a48b2b87ce6054eed54c0e1146724268ec4dfd3dc2f4e57d3d |
+| crates/wf-storage/src/state/value/outcome.rs | 374 | 13410 | 13eb855bd44c6f1439753b9998d1b7fed1994c325821492f8c5f481f441040c0 |
+| crates/wf-storage/src/state/redb/commit.rs | 233 | 7890 | 5788bd4de6f755ae5365e0b14a616469e3dd5b5529418439ff9f8dc60f7caba7 |
+| crates/wf-ports/src/state/transaction/atomic_start.rs | 56 | 2217 | 9f882566788fc92bb41033e1b64f9c5772aff45a0664752817b679cbdac54e70 |
+| crates/wf-storage/src/state/value/outcome/atomic_start.rs | 54 | 1774 | 8e038936399681510bdfbc99481d2d91aaaeba95f66a361ffeeed26cc143e416 |
+
+Exactly eight existing function bodies changed: GroupApplyChanges::new;
+apply_atomic_start_transaction and private apply; copy_queries; observations::decide;
+encode_outcome and scan_with_policy; write_outcome. The three new helpers have
+arities4/2/6 and46/17/27 lines. Read-only function census covers all56 actual
+bodies, maximum99 (scan_with_policy); changed counts are60/16/87/42/63/44/99/88.
+All eight files are<=400 and all functions<=100 without packing or exemptions.
+This is an authoring census, not an actual rustfmt/compiler/checker claim.
+
+Actual in-memory whole-file inverses replaced only those eight selected bodies
+plus exact allowed import/module/private-variant/docs deltas, then reconstructed
+ALL SIX original byte images with equality:15593/d96d4171,9105/92250c45,
+10974/c1ca3079,8613/6aa32476,12821/e9cdbab5,6828/b8abbbd7. Full beforeimages,
+two child absences and each held-input hash remain in memory. All1512 held inputs
+(excluding only these8 paths and4 append-only notes) are unchanged at canonical
+sorted compact-JSON SHA25631915b079fe20e1e766059e6eefa7531092da55eef2858443b1591fc7d29f23f.
+This includes every frozen test, D1 source, root-owned checker/docs and all
+Cargo/config/ledger/native/reference inputs. No probe/artifact file was created.
+
+All8 runtime buffers are STOPPED at this handoff. No formatter, compiler, test,
+Git, VM or benchmark was run by this author. Root owns subsequent actual GREEN,
+full-workspace verification and reciprocal ARCH/PERF source review. No speed,
+allocation/RSS, Linux acceptance, full original parity or M1–M8 completion is
+claimed; the full both-OS objective remains active.

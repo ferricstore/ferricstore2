@@ -117,15 +117,18 @@ impl LoadedRecordBatch {
                         .map_err(|_| StateTransactionError::Corrupt)?,
                 ));
             }
-            if let Operation::Create(create) = &item.command.operation {
-                append_type(
-                    &mut self.policy_types,
-                    seen_types,
-                    &mut self.staging_used,
-                    &create.workflow_type,
-                    cap,
-                )?;
-            }
+            let kind = match &item.command.operation {
+                Operation::Create(create) => &create.workflow_type,
+                Operation::StartAndClaim(start) => &start.workflow_type,
+                _ => continue,
+            };
+            append_type(
+                &mut self.policy_types,
+                seen_types,
+                &mut self.staging_used,
+                kind,
+                cap,
+            )?;
         }
         Ok(())
     }

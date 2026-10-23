@@ -6,9 +6,9 @@ use wf_domain::workflow::request::RequestScope;
 use wf_domain::workflow::request::gate::PointGateView;
 use wf_ports::log::{
     RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, RecordBatchInspection,
-    inspect_independent_record_batch_point, inspect_public_mutation_point,
-    inspect_record_batch_point, prepare_independent_record_batch, prepare_public_mutation,
-    prepare_record_batch,
+    inspect_atomic_start_point, inspect_independent_record_batch_point,
+    inspect_public_mutation_point, inspect_record_batch_point, prepare_atomic_start,
+    prepare_independent_record_batch, prepare_public_mutation, prepare_record_batch,
 };
 use wf_ports::state::{
     GroupApplyChanges, GroupApplyStore, GroupApplyTransaction, StateTransactionError,
@@ -24,6 +24,7 @@ use super::{
 #[derive(Clone, Copy)]
 enum RecordBatchProfile {
     Atomic,
+    AtomicStart,
     Independent,
     Public,
 }
@@ -53,20 +54,25 @@ pub fn apply_record_batch_transaction<S: GroupApplyStore>(
     )
 }
 
-/// Reserves the dedicated atomic-start driver with an explicitly refusing body.
+/// Applies one atomic start under the common exclusive gate and consumed commit.
 ///
 /// # Errors
-/// Returns unsupported-version without acquiring transaction authority.
+/// Rejects preparation, authority, budgets or unproved durable completion.
 pub fn apply_atomic_start_transaction<S: GroupApplyStore>(
-    _store: &mut S,
-    _expected_scope: &RequestScope,
-    _encoded: &[u8],
-    _log: LogIdentity,
-    _limits: RecordBatchTransactionLimits,
+    store: &mut S,
+    expected_scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: RecordBatchTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
-    Err(RecordBatchTransactionError::Apply(
-        RecordBatchApplyError::Encoding(wf_ports::log::CodecError::UnsupportedVersion),
-    ))
+    apply(
+        store,
+        expected_scope,
+        encoded,
+        log,
+        limits,
+        RecordBatchProfile::AtomicStart,
+    )
 }
 
 /// Applies one verified V6 vector with final-once records and every history.
@@ -132,6 +138,7 @@ fn apply<S: GroupApplyStore>(
             prepare_independent_record_batch(encoded, limits.codec, available)?
         }
         RecordBatchProfile::Atomic => prepare_record_batch(encoded, limits.codec, available)?,
+        RecordBatchProfile::AtomicStart => prepare_atomic_start(encoded, limits.codec, available)?,
         RecordBatchProfile::Public => prepare_public_mutation(encoded, limits.codec, available)?,
     };
     if &decoded.request().scope != expected_scope {
@@ -164,6 +171,9 @@ fn apply<S: GroupApplyStore>(
         )?,
         RecordBatchProfile::Atomic => {
             inspect_record_batch_point(decoded, log, view, limits.codec, limits.workspace_bytes)?
+        }
+        RecordBatchProfile::AtomicStart => {
+            inspect_atomic_start_point(decoded, log, view, limits.codec, limits.workspace_bytes)?
         }
         RecordBatchProfile::Public => {
             inspect_public_mutation_point(decoded, log, view, limits.codec, limits.workspace_bytes)?

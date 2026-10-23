@@ -16,6 +16,7 @@ use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId, 
 use super::{StateTransactionError, StoredPolicyValue};
 use crate::log::{RecordBatchApplyDecision, RecordBatchApplyPlan, record_batch_retained_status};
 
+mod atomic_start;
 mod independent;
 
 /// Typed core record with its tenant, placement and canonical ordering metadata.
@@ -265,6 +266,11 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
             return Err(StateTransactionError::InvalidChanges);
         }
         match plan.decision() {
+            RecordBatchApplyDecision::Fresh { operation, outcome }
+                if outcome.intent().version() == 7 =>
+            {
+                atomic_start::validate(scope, control, operation, outcome)?;
+            }
             RecordBatchApplyDecision::Fresh { operation, outcome } => {
                 let status = match operation {
                     IndexedDecision::Accepted(_) => RetainedStatus::Accepted,

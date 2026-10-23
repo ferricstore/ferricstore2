@@ -17,6 +17,7 @@ use super::{
     start, take,
 };
 
+mod atomic_start;
 mod policy;
 pub(crate) use policy::outcome_policy_validation_bytes_in_layout;
 pub use policy::{encode_outcome_profiled, outcome_policy_validation_bytes, scan_outcome_profiled};
@@ -96,7 +97,7 @@ impl ScannedRetainedOutcome<'_> {
     }
 }
 
-/// Encodes original metadata and a single canonical batch5/response1 body.
+/// Encodes original metadata with its explicitly supported canonical response.
 ///
 /// # Errors
 /// Rejects other profiles, inconsistent status/body, byte limits or allocation failure.
@@ -125,6 +126,8 @@ pub fn encode_outcome(
         )
         .map_err(claim_error)?
         .0
+    } else if outcome.intent().version() == 7 && outcome.response_version() == 4 {
+        atomic_start::wire_status(outcome, maximum_bytes)?
     } else {
         let parse = if outcome.intent().version() == 1 {
             public_mutation_retained_status
@@ -224,6 +227,7 @@ fn scan_with_policy<'input>(
                 || expires_at <= original_time
                 || (response.len() > limits.decision_bytes()
                     && !(intent_version == 1 && response_version == 3)
+                    && !(intent_version == 7 && response_version == 4)
                     && !(matches!(intent_version, 2 | 4) && profile.is_some()))
             {
                 return Err(StateValueError::InvalidValue);
@@ -236,6 +240,7 @@ fn scan_with_policy<'input>(
                 4 if profile.is_some() => ClientIntent::original_policy_set(digest),
                 5 => ClientIntent::record_batch(digest),
                 6 => ClientIntent::independent_record_batch(digest),
+                7 => ClientIntent::atomic_start(digest),
                 _ => return Err(StateValueError::UnsupportedVersion),
             };
             let (status, response_count) = if matches!(intent_version, 2 | 4) {
@@ -255,6 +260,15 @@ fn scan_with_policy<'input>(
             } else if intent_version == 1 && response_version == 3 {
                 claim_retained_summary(intent, response_version, response, original_time, limits)
                     .map_err(claim_error)?
+            } else if intent_version == 7 {
+                atomic_start::scan(
+                    intent,
+                    response_version,
+                    response,
+                    original_position,
+                    original_time,
+                    limits,
+                )?
             } else if intent_version == 1 {
                 (
                     public_mutation_retained_status(intent, response_version, response)?,

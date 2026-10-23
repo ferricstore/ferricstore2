@@ -5,7 +5,29 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The atomic-start storage regression checkpoint compiles cleanly and runs **seven
+The latest full Rust checkpoint passes **988 tests across 90 targets on macOS**,
+with zero failures, ignored or filtered tests, plus **six compile-fail examples
+across 15 documentation targets**. All eleven local checks pass, including strict
+Clippy, warnings-denied documentation, all 50 architecture checks, reference and
+progress validation, the four cached offline audit categories and whitespace.
+All 1,521 captured inputs stayed unchanged, excluding only the three append-only
+peer notes. Exact target/name/status comparison preserves all 981 preceding tests
+and adds only the seven frozen storage regressions. Both benchmark smokes pass.
+
+The dedicated atomic-start transaction now passes **all seven regressions saved
+in `be13b91` before implementation**. They execute independent full-control and
+postimage validation, actual persisted-policy discovery, consumed commit and its
+failure paths, original response-buffer replay, real leased Created rows/reopen,
+FIFO refusal without business writes, a real later Complete and original reply
+after lost delivery, plus exact stored wire/owner/profile bounds. All 105 state
+tests run in the full checkpoint, including the 101 filtered from focused runs.
+The eight runtime files have at most 374 physical lines; their 56 function bodies
+have at most 99. Architecture and performance independently accept the source;
+the new purity matrix has its own actual RED/GREEN. Committed-log recovery,
+public dispatch, full original Elixir parity and Linux acceptance remain open.
+No allocation count or measured speedup is claimed.
+
+The preceding atomic-start storage regression checkpoint compiled cleanly and ran **seven
 new failing tests on macOS**. The private consumer test reaches `InvalidChanges`
 on its first valid plan; the two recording-driver and four real-store tests reach
 `Apply(Encoding(UnsupportedVersion))` on their first dedicated-driver call.
@@ -20,10 +42,11 @@ consumed commit, original-response replay, restart, FIFO refusal, a real later
 Complete and stored-owner/profile limits. Those later assertions remain masked
 by the initial refusals. The three new files have 188, 215 and 578 physical lines;
 their 15 functions have at most 94. Source review and saving this runtime RED
-precede the separately reviewed integration body. No integration body has been
-implemented. The full green checkpoint below predates these seven regressions.
+preceded the separately reviewed integration body. At that checkpoint no body
+had been implemented. The preceding full green checkpoint below predates these
+seven regressions.
 
-The latest full Rust checkpoint passes **981 tests across 90 targets on macOS**,
+The preceding full Rust checkpoint passes **981 tests across 90 targets on macOS**,
 with zero failures, ignored or filtered tests, plus **six compile-fail examples
 across 15 documentation targets**. All eleven local checks pass: formatting,
 all-target compilation, strict Clippy, warnings-denied documentation, all 50
@@ -33,13 +56,14 @@ stayed unchanged, excluding only the three append-only peer review notes. Exact
 target/name/status comparison preserves all 975 preceding tests and adds only
 the six frozen atomic-start regressions; both benchmark smokes pass.
 
-The private atomic-start codec now passes **all 22 focused tests**. The six tests
+The private atomic-start codec checkpoint passes **all 22 focused tests**. The six tests
 saved in `37afcf6` before implementation now execute their frame, actual Created
 postimage, same-length payload, resource-cap and original-response replay checks.
 Architecture and performance independently accepted the source and focused
 results. The four runtime modules fit 400 lines and their 20 functions fit 100
-(maximum 93). Storage publication, persisted-policy discovery, FWSO integration,
-common recovery and public dispatch remain separate work. No measured speedup,
+(maximum 93). The separately tested storage integration above adds publication,
+persisted-policy discovery and FWSO support. Common recovery and public dispatch
+remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
 The current native-capture checkpoint runs **40 tests on macOS: 34 pass and six fail**.
