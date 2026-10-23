@@ -37,17 +37,33 @@ pub struct RawHistoryEntry<'a> {
     pub fields: BTreeMap<&'a [u8], &'a Raw<'a>>,
 }
 
-/// Callable empty-map baseline before the source-derived regression body.
+/// Selects the last value for each binary key from fixed positional pairs.
+///
+/// Invalid keys consume their entire pair; a trailing singleton is ignored.
+/// Key bytes and value descriptors borrow the caller's original backing.
 #[must_use]
-pub fn fields_to_map<'a>(_fields: &'a [Raw<'a>]) -> BTreeMap<&'a [u8], &'a Raw<'a>> {
-    BTreeMap::new()
+pub fn fields_to_map<'a>(fields: &'a [Raw<'a>]) -> BTreeMap<&'a [u8], &'a Raw<'a>> {
+    let mut output = BTreeMap::new();
+    for pair in fields.as_chunks::<2>().0 {
+        if let [Raw::Binary(key), value] = pair {
+            output.insert(*key, value);
+        }
+    }
+    output
 }
 
-/// Callable absent-entry baseline before the source-derived regression body.
+/// Borrows the original event ID and converts the entry's flat field positions.
 ///
-/// The implemented boundary uses `None` only for an empty captured list. That
+/// This boundary uses `None` only for an empty captured list. That
 /// Rust sentinel represents an unmatched source clause, not returned Elixir nil.
 #[must_use]
-pub fn to_tuple(_entry: OriginalHistoryInput<'_>) -> Option<RawHistoryEntry<'_>> {
-    None
+pub fn to_tuple(entry: OriginalHistoryInput<'_>) -> Option<RawHistoryEntry<'_>> {
+    let (event_id, fields) = match entry {
+        OriginalHistoryInput::Tuple { event_id, fields } => (event_id, fields),
+        OriginalHistoryInput::List(items) => items.split_first()?,
+    };
+    Some(RawHistoryEntry {
+        event_id,
+        fields: fields_to_map(fields),
+    })
 }

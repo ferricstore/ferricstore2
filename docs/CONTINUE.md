@@ -5,34 +5,35 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current in-progress R0 adds six compiled HistoryEntry Rust tests: **zero
-pass and six fail** against the deliberately empty/absent callable baselines.
-Formatting, all-target domain compilation, strict Clippy, all 51 architecture
-checks, reference/progress and whitespace pass. The four original standalone
-Elixir cases pass. These saved regressions precede the two implementation bodies;
-the four source observations and derived ownership/flat-list controls remain
-unmapped until actual Rust GREEN and review.
+The six HistoryEntry Rust tests now pass after the callable zero-pass/six-failure
+baseline and tests were saved in `a8e100b`. All eight focused checks pass, including
+strict Clippy and all 51 architecture checks. The four original complete source
+observations now have assertion links; full Rust workspace validation now passes below. The implementation borrows IDs, binary keys and value descriptors,
+consumes fixed pairs without resynchronizing, and preserves the last duplicate
+value. Standard B-tree node allocation remains outside paid admission. All four
+original standalone Elixir cases pass; full original profiles and Linux remain
+required.
 
-Observation extraction also preserves the old function bodies and all existing
-test content. Its two new regressions produce genuine context-comparison and
-known-facts failures: the first full run is **57 tests, 47 passes, ten failures**,
-retaining exactly the eight preceding failure identities. Review corrected the
-owned fixture teardown. The corrected full run has **eleven failures**, including
-an additional existing wrong-VM startup timeout during concurrent compilation.
-Serial validation with the original timeout is required before the paid body;
-neither that extra failure nor the later masked assertions count as passing.
-The complete raw append/map BEAM, nine executing module identities and current
-file/function geometry are bound. No paid Observation body is implemented yet.
+The current native observation checkpoint runs **57 tests: 47 pass and ten
+fail**. Both new regressions expose genuine context-comparison and known-facts
+accounting failures; exact identity comparison preserves the eight preceding
+public/keeper failures and adds only these two. Review corrected the owned fixture
+teardown. An earlier concurrent run timed out in an existing wrong-VM startup
+case; the serial rerun passes that check with its original timeout and no filters.
+The raw extraction preserves all old bodies and tests. Its actual append/map
+BEAM and nine executing module identities are bound. The reviewed paid two-file
+implementation is stopped in isolation, awaiting Root integration, compiled
+validation and execution. No whole native/public accounting GREEN is claimed.
 
-The latest full Rust checkpoint passes **1,017 tests across 92
+The latest full Rust checkpoint passes **1,023 tests across 93
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
 documentation, all 51 architecture checks, reference/progress validation, four
-cached offline dependency-audit categories and whitespace. All 1,540 captured
+cached offline dependency-audit categories and whitespace. All 1,544 captured
 inputs stayed unchanged, excluding only the three append-only peer notes.
-Exact target/executable/name/status comparison preserves all 1,008 preceding
-tests and adds only eight Options tests and one architecture test.
+Exact target/executable/name/status comparison preserves all 1,017 preceding
+tests and adds only the six HistoryEntry regressions.
 Both existing benchmark correctness smokes pass. No measured speedup is claimed.
 
 All four pinned pure Options cases now have Rust counterparts preserving their
@@ -68,8 +69,8 @@ Rust; the 12-test target and all five original standalone Elixir cases pass.
 Their source/error/ownership and derived regression review remains accepted.
 Options and ChildPolicy are pure components, not a completed workflow engine.
 
-The checked partial ledger records **101 source-derived declarations,
-113 Rust counterpart mappings and 482 assertion links**. Runtime reconciliation
+The checked partial ledger records **105 source-derived declarations,
+117 Rust counterpart mappings and 486 assertion links**. Runtime reconciliation
 still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
 reference and frozen workflow mapping remain unchanged. Full original Elixir
 case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and

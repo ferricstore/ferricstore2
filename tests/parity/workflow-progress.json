@@ -3434,28 +3434,112 @@
       "runtime_case_ids": [
         "7a966b50306529f4ed3b4bdc575b130d08e6a39328014c6855f792088a4a6cda"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-history-b7a84d20f573b949-tuple-fields",
+          "rust_file": "crates/wf-domain/tests/history_original.rs",
+          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_module": "",
+          "rust_function": "converts_tuple_history_entries_to_event_id_and_fields_map",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert HistoryEntry.to_tuple({\"1-0\", [\"event\", \"created\", \"state\", \"queued\"]}) ==",
+              "rust_line": 25,
+              "rust_text": "assert!(actual.is_some_and(|entry| {"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure HistoryEntry observation with async:true/flow provenance and no local setup. Tuple/list cases compare the event ID, exact map cardinality and every expected key/value; field-only cases compare the complete expected map.",
+            "Inputs are already captured flat proper tuple/list views. Decoder and fragmented-list acquisition, opaque Other hidden-payload correspondence and public history/storage authority remain outside this helper. None for the empty captured list is a Rust sentinel for the source unmatched clause, not returned Elixir nil. Sorted map order is a Rust representation; only key-byte equality and last value are promised.",
+            "Keys, values and IDs remain borrowed; standard B-tree nodes allocate infallibly, with no paid admission or total-allocation bound. All six Rust tests and all four original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider history/workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "22ee880548e0bc4d",
       "runtime_case_ids": [
         "f02e1c99912b33fe8f02d5df9b0fd4c7a9a92257ebbdbeb3eb590e7425934366"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-history-22ee880548e0bc4d-flat-list-fields",
+          "rust_file": "crates/wf-domain/tests/history_original.rs",
+          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_module": "",
+          "rust_function": "converts_list_history_entries_to_event_id_and_fields_map",
+          "assertions": [
+            {
+              "source_line": 13,
+              "source_text": "assert HistoryEntry.to_tuple([\"2-0\", \"event\", \"completed\", \"state\", \"completed\"]) ==",
+              "rust_line": 49,
+              "rust_text": "assert!(actual.is_some_and(|entry| {"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure HistoryEntry observation with async:true/flow provenance and no local setup. Tuple/list cases compare the event ID, exact map cardinality and every expected key/value; field-only cases compare the complete expected map.",
+            "Inputs are already captured flat proper tuple/list views. Decoder and fragmented-list acquisition, opaque Other hidden-payload correspondence and public history/storage authority remain outside this helper. None for the empty captured list is a Rust sentinel for the source unmatched clause, not returned Elixir nil. Sorted map order is a Rust representation; only key-byte equality and last value are promised.",
+            "Keys, values and IDs remain borrowed; standard B-tree nodes allocate infallibly, with no paid admission or total-allocation bound. All six Rust tests and all four original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider history/workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "52f04602d920078f",
       "runtime_case_ids": [
         "59597ba0374a4098e790392e2b905298818ff2b70060e4d5464c939c6fb6caae"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-history-52f04602d920078f-last-duplicate-value",
+          "rust_file": "crates/wf-domain/tests/history_original.rs",
+          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_module": "",
+          "rust_function": "last_duplicate_field_wins",
+          "assertions": [
+            {
+              "source_line": 18,
+              "source_text": "assert HistoryEntry.fields_to_map([\"event\", \"created\", \"event\", \"retry\"]) == %{",
+              "rust_line": 72,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure HistoryEntry observation with async:true/flow provenance and no local setup. Tuple/list cases compare the event ID, exact map cardinality and every expected key/value; field-only cases compare the complete expected map.",
+            "Inputs are already captured flat proper tuple/list views. Decoder and fragmented-list acquisition, opaque Other hidden-payload correspondence and public history/storage authority remain outside this helper. None for the empty captured list is a Rust sentinel for the source unmatched clause, not returned Elixir nil. Sorted map order is a Rust representation; only key-byte equality and last value are promised.",
+            "Keys, values and IDs remain borrowed; standard B-tree nodes allocate infallibly, with no paid admission or total-allocation bound. All six Rust tests and all four original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider history/workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "4addaed858369256",
       "runtime_case_ids": [
         "46fe73cac6c80fea7445b75b2c935bb3f665f6674d06fe3b04f67c430438c622"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-history-4addaed858369256-fixed-invalid-pairs",
+          "rust_file": "crates/wf-domain/tests/history_original.rs",
+          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_module": "",
+          "rust_function": "malformed_stored_fields_do_not_crash_history_reads",
+          "assertions": [
+            {
+              "source_line": 24,
+              "source_text": "assert HistoryEntry.fields_to_map([",
+              "rust_line": 87,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure HistoryEntry observation with async:true/flow provenance and no local setup. Tuple/list cases compare the event ID, exact map cardinality and every expected key/value; field-only cases compare the complete expected map.",
+            "Inputs are already captured flat proper tuple/list views. Decoder and fragmented-list acquisition, opaque Other hidden-payload correspondence and public history/storage authority remain outside this helper. None for the empty captured list is a Rust sentinel for the source unmatched clause, not returned Elixir nil. Sorted map order is a Rust representation; only key-byte equality and last value are promised.",
+            "Keys, values and IDs remain borrowed; standard B-tree nodes allocate infallibly, with no paid admission or total-allocation bound. All six Rust tests and all four original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider history/workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "7c1b034ba633e299",
