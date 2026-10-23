@@ -54,6 +54,15 @@ pub fn optional_child_failure<'key, 'value>(
 fn normalize_child_failure_value(value: ChildFailureValue<'_>) -> Option<ChildFailure> {
     match value {
         ChildFailureValue::Atom(value) => Some(value),
+        ChildFailureValue::Binary(value) if value.eq_ignore_ascii_case("ignore") => {
+            Some(ChildFailure::Ignore)
+        }
+        ChildFailureValue::Binary(value)
+            if value.eq_ignore_ascii_case("fail_parent")
+                || value.eq_ignore_ascii_case("fail-parent") =>
+        {
+            Some(ChildFailure::FailParent)
+        }
         ChildFailureValue::Binary(_) | ChildFailureValue::Other => None,
     }
 }
