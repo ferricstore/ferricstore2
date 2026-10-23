@@ -53,6 +53,22 @@ pub fn apply_record_batch_transaction<S: GroupApplyStore>(
     )
 }
 
+/// Reserves the dedicated atomic-start driver with an explicitly refusing body.
+///
+/// # Errors
+/// Returns unsupported-version without acquiring transaction authority.
+pub fn apply_atomic_start_transaction<S: GroupApplyStore>(
+    _store: &mut S,
+    _expected_scope: &RequestScope,
+    _encoded: &[u8],
+    _log: LogIdentity,
+    _limits: RecordBatchTransactionLimits,
+) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
+    Err(RecordBatchTransactionError::Apply(
+        RecordBatchApplyError::Encoding(wf_ports::log::CodecError::UnsupportedVersion),
+    ))
+}
+
 /// Applies one verified V6 vector with final-once records and every history.
 /// The same exclusive guard and point gate precede all bounded Fresh reads.
 /// # Errors

@@ -25,8 +25,8 @@ pub use claim::{
 };
 
 pub use record_batch::{
-    apply_independent_record_batch_transaction, apply_public_mutation_transaction,
-    apply_record_batch_transaction,
+    apply_atomic_start_transaction, apply_independent_record_batch_transaction,
+    apply_public_mutation_transaction, apply_record_batch_transaction,
 };
 
 /// Explicit per-call logical profile, separate from native cache/pages and RSS.
