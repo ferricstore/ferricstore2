@@ -108,7 +108,27 @@ persisted-policy discovery and FWSO support. Common recovery and public dispatch
 remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
-The current native-capture checkpoint runs **43 tests on macOS: 37 pass and
+The current native-capture regression checkpoint runs **45 tests on macOS:
+37 pass and eight fail**. Two new keeper-debt cases compile and reach the real
+query-context and combined-output failures. Their first post-error keeper banks
+equal their entry banks: **134,104 to 134,104** and **133,988 to 133,988** words.
+Both fail the selected minimum issued-debt increase before any later budget reply.
+Exact failure-name comparison preserves the six preceding public failures and
+adds only these two cases; all 43 preceding bodies remain intact.
+
+The tests distinguish actual keeper issuance from caller credit and unused copy
+reservations. Their later upper, pin, caller-finalization, encoder-return, ACK and
+healthy-retry assertions remain masked by the first debt failure. Architecture
+and performance independently accept the source. The child has 328 physical
+lines, its two test bodies have 82 each, and its seven helpers have at most 43.
+The single require preserves the entire preceding 599-line controller by exact
+inverse and brings it to 600. All 1,843 captured repository/compiler/runtime/
+artifact inputs stayed unchanged during execution, excluding only three peer
+notes; 16 tool sources and 305 compiler inputs are bound. This is genuine
+preimplementation failure evidence, not repaired public accounting, complete
+BEAM envelopes, original parity or Linux execution.
+
+The preceding native-capture checkpoint runs **43 tests on macOS: 37 pass and
 six fail**. All three KernelProfile regressions frozen in `a1c8f5e` now pass.
 Exact failure-name comparison removes only those three failures and preserves
 the six earlier public protocol/accounting failures; all 40 earlier bodies stay

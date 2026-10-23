@@ -208,6 +208,18 @@ The four existing resource-lifetime functions move verbatim into the private
 exception accounting, metered failure prefixes and real settlement ACK remain
 separate required work.
 
+Two separately selected keeper-debt regressions now reach real query-context and
+combined-output failures in a 45-test run. The first keeper tail preserves the
+unchanged entry bank in each case, failing the minimum reached-work increase.
+The preceding 43 bodies and their six failure identities remain intact. These
+tests use the actual private extension-entry/first-tail interval before another
+budget reply, with one issued encoder cohort and an independent native-tuple
+minimum. Their later guards reject treating the full copy reservation as spent;
+those guards, pin checks, caller-finalization, ACK and retry assertions remain
+masked by the first failure. Legacy financial admission is not yet certified as
+the native paid bank. Production metering and the complete caller/keeper bridge
+remain separate implementation work; no full E/T or Linux acceptance follows.
+
 The exact staged contracts and reciprocal reviews are recorded in
 [the architecture review](../reviews/workflow-completion-architecture.md) and
 [Root's release record](../reviews/workflow-completion-coordination.md).
