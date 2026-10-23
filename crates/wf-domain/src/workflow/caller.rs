@@ -7,6 +7,8 @@ use crate::policy::RetryOverride;
 mod input;
 mod normalize;
 
+pub mod many;
+
 pub use input::measure_core_mutation_input;
 pub use normalize::normalize_core_mutation;
 

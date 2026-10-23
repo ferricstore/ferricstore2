@@ -26,11 +26,16 @@ ownership and full control envelopes remain required. No whole native GREEN,
 physical allocation/GC/RSS bound or measured speedup is claimed. Review also fixed
 fixture teardown; serial validation passes the existing startup check with its
 original timeout. All six original standalone ManyItemOpts cases pass; their Rust
-batch now has explicit architecture approval and is in test-first preparation;
-its callable rejecting APIs and tests will precede implementation. No Rust
-ManyItemOpts parity mappings are claimed yet.
+batch now has a genuine callable Rust baseline: **zero pass and thirteen fail**,
+with no ignored or filtered tests. Its seven preceding checks pass, including
+strict Clippy and all 51 architecture checks. The thirty original assertions are
+preserved in order; early failures mask later observations. The five reviewed
+files fit the ordinary size limits. Real parsing/merge implementation follows
+this saved baseline; no ManyItemOpts parity mappings are claimed yet. Three
+decoder tests are stopped in isolation and await Root validation.
 
-The latest full Rust checkpoint passes **1,023 tests across 93
+The latest full Rust checkpoint, preceding the new rejecting ManyItemOpts
+baseline above, passes **1,023 tests across 93
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
