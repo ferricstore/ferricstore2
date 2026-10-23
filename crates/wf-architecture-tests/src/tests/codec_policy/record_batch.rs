@@ -316,3 +316,77 @@ fn start_and_claim_core_stays_pure_and_server_side() -> CheckResult<()> {
     }
     Ok(())
 }
+
+#[test]
+fn atomic_start_retained_profile_stays_pure_and_server_side() -> CheckResult<()> {
+    let module = "log::record_batch::atomic_start";
+    assert_eq!(
+        source_check(
+            "wf-ports",
+            module,
+            "use std::collections::BTreeMap; use wf_domain::workflow::{request, indexed, admission}; use wf_types::version;"
+        )?,
+        Vec::<String>::new()
+    );
+    for (source, diagnosis) in [
+        ("use std::fs;", "standard-library module"),
+        ("use std::env;", "standard-library module"),
+        (
+            "use std as hidden; pub use hidden::env;",
+            "standard-library module",
+        ),
+        ("pub async fn effect() {}", "declares async behavior"),
+        ("fn hidden() { future.await; }", "awaits effects"),
+        ("static GLOBAL: u64 = 0;", "declares global state"),
+        ("static mut GLOBAL: u64 = 0;", "declares global state"),
+        ("fn hidden() { unsafe {} }", "unsafe block"),
+    ] {
+        let findings = source_check("wf-ports", module, source)?;
+        assert!(
+            findings.iter().any(|finding| finding.contains(diagnosis)),
+            "{module}: missing {diagnosis}: {findings:?}"
+        );
+    }
+    assert_eq!(
+        source_check(
+            "wf-ports",
+            "log::record_batch::atomic_start_backend",
+            "use std::fs; pub async fn effect() {} static GLOBAL: u64 = 0;"
+        )?,
+        Vec::<String>::new()
+    );
+    for name in [
+        "encode_atomic_start",
+        "prepare_atomic_start",
+        "inspect_atomic_start_point",
+        "decide_fresh_atomic_start_touched",
+        "atomic_start_retained_summary",
+        "atomic_start_response_matches",
+    ] {
+        assert!(
+            source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::log::{name};")
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
+        );
+    }
+    for (package, prefix, diagnosis) in [
+        (
+            "wf-wire",
+            "wf_domain",
+            "wire may reference only wf_domain::value",
+        ),
+        ("wf-domain", "crate", "approved domain value module"),
+    ] {
+        let source = format!("pub use {prefix}::workflow::request::ClientIntent;");
+        assert!(
+            source_check(package, "value", &source)?
+                .iter()
+                .any(|finding| finding.contains(diagnosis))
+        );
+    }
+    Ok(())
+}

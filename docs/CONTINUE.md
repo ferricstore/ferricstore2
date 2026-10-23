@@ -121,7 +121,23 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **974 tests across 90 targets on macOS**, with
+The atomic-start codec interface has six explicitly refusing server entry
+points and primitive intent7 selection. No new frame, Fresh plan, retained
+response, storage policy discovery or recovery support is enabled. The exact
+module and client-facade matrix receive one passing architecture test. Positive
+compiled runtime RED must still precede behavioral codec implementation.
+
+The latest full Rust checkpoint passes **975 tests across 90 targets on macOS**,
+with zero failures, ignored or filtered tests, plus six compile-fail examples
+across 15 documentation targets. All eleven local checks pass, including strict
+Clippy, warnings-denied documentation, 50 architecture checks, reference and
+progress validation, and all four cached offline dependency-audit categories.
+All 1,510 captured inputs stayed unchanged, excluding only the three append-only
+peer review notes. Architecture and performance independently accept the final
+source and complete raw results. This adds interface enforcement; durable
+behavior, full parity and Linux remain open.
+
+The preceding full Rust checkpoint passes **974 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;

@@ -1235,6 +1235,21 @@ closed. Storage's existing Create-only policy discovery does not discover
 StartAndClaim policy; that durable integration remains required separately.
 The passing pure body supplies no public or durable operation support.
 
+The separate atomic-start interface now reserves six server-side functions.
+`encode_atomic_start` returns `UnsupportedTag`; `prepare_atomic_start`,
+`inspect_atomic_start_point`, `decide_fresh_atomic_start_touched`,
+`atomic_start_retained_summary` and `atomic_start_response_matches` return
+`UnsupportedVersion`. The matcher returns an error rather than a match verdict.
+`ClientIntent::atomic_start` constructs registry7 as a primitive digest identity;
+the version1-only generic constructor is unchanged. No new frame/tag grammar,
+value inspection, supported retained-version pair, policy discovery, transaction
+binding or storage/recovery dispatch is enabled. The later private data response
+must retain the actual leased postimage and original outcome. Compiled runtime
+RED, implementation and durable/public/profile acceptance remain required.
+The existing generic response1 constructor is unchanged; it does not independently
+reject every mathematical intent7 value. Stored-outcome scanning still rejects
+intent7, and no atomic-start retained data profile is enabled.
+
 One existing request inspection precedes all Fresh current-record, retry-policy
 and index work. Fresh checks effective committed time, binds exact derived keys
 and each present payload/result/error occurrence, then calls the existing

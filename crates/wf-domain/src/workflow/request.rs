@@ -124,6 +124,14 @@ impl ClientIntent {
         Self { version: 6, digest }
     }
 
+    /// Selects the private atomic-start digest identity only.
+    /// No digest verification, framing, admission, payment, runtime origin or
+    /// apply authority is supplied by this primitive registry selection.
+    #[must_use]
+    pub const fn atomic_start(digest: [u8; 32]) -> Self {
+        Self { version: 7, digest }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

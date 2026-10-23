@@ -227,6 +227,14 @@ both-OS/profile acceptance remain open. The existing private wire and
 independent/public operation profiles stay closed;
 see [ADR-006](006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition).
 
+The next private codec stage provides an explicitly refusing interface only.
+`ClientIntent::atomic_start` constructs the mathematical intent7 identity,
+without verifying a digest or granting framing, resource or apply authority.
+Six ports entry points return unsupported errors; no frame, Fresh plan or
+retained response is accepted. Compiled positive runtime failures must still
+be saved before their behavioral implementation. No additional source parity,
+durability or OS result follows from this interface.
+
 ## Verification and deployment gates
 
 Before M1 acceptance, execute independent source-derived admission/model cases

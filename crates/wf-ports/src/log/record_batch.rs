@@ -18,6 +18,7 @@ use super::{
     reader::Reader, scan, writer::Writer,
 };
 
+mod atomic_start;
 mod fresh;
 mod independent;
 mod intent;
@@ -28,6 +29,11 @@ pub(super) use fresh::decide_independent;
 pub(super) use phase::finish_inspection;
 pub(super) use response::{push_rejection, rejection};
 
+pub use atomic_start::{
+    atomic_start_response_matches, atomic_start_retained_summary,
+    decide_fresh_atomic_start_touched, encode_atomic_start, inspect_atomic_start_point,
+    prepare_atomic_start,
+};
 pub use independent::{
     decide_fresh_independent_record_batch_touched, encode_independent_record_batch,
     inspect_independent_record_batch_point, prepare_independent_record_batch,

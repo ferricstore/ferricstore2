@@ -181,11 +181,19 @@ facade separation. Production files remain within400 physical lines, tooling
 within600 and every function within100; no parser, dependency, allowlist or size
 exception is selected.
 
-This existing-policy regression is distinct from later atomic behavior and
-generated-owner admission tests. The current shell rejects execution, while
-command/intent codecs and public/independent profiles remain closed. Source
-enforcement does not establish public or durable support, complete original
-scenarios or Linux/macOS parity.
+These source checks are distinct from the passing pure atomic behavior and
+generated-owner admission tests. Command/intent codecs and public/independent
+profiles remain closed. Source enforcement does not establish public or durable
+support, complete original scenarios or Linux/macOS parity.
+
+The separate refusing codec interface adds exactly
+`log::record_batch::atomic_start` to the existing pure-source matches arm.
+`atomic_start_retained_profile_stays_pure_and_server_side` checks approved
+imports, filesystem/environment aliases, async/await, immutable/mutable globals,
+unsafe blocks and all six client-facade exports. Its backend neighbor remains
+outside that exact clause. No descendant-prefix or parser/allowlist exemption
+is added. Primitive intent7 construction enables no frame, retained-response,
+storage or recovery profile; the six interfaces return unsupported errors.
 
 ## Pure storage value boundary
 

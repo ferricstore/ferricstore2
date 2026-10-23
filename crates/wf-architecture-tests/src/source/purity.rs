@@ -11,7 +11,10 @@ impl Inspector<'_, '_> {
         };
         let ports_module = matches!(
             self.module.as_str(),
-            "log::record_batch" | "log::record_batch::intent" | "log::record_batch::response"
+            "log::record_batch"
+                | "log::record_batch::intent"
+                | "log::record_batch::response"
+                | "log::record_batch::atomic_start"
         ) || [
             "log::record_batch::phase",
             "log::record_batch::fresh",

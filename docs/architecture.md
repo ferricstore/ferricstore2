@@ -147,6 +147,12 @@ generated-token admission, duplicate/error ordering and direct FIFO refusal.
 Explicit unsupported codec matches preserve the closed profiles. No new crate,
 dependency, event tag or public/durable operation is introduced.
 
+The separate private codec interface reserves six server-side entry points and
+an explicit intent7 digest identity. Every entry point returns an unsupported
+error. It produces no encoded frame, Fresh plan or retained data response; the
+existing wire, outcome, storage and recovery profiles remain closed. Its exact
+module is subject to the existing purity and client-facade checks.
+
 ## Command execution and durability
 
 1. Authenticate and enforce tenant, request and payload bounds at the edge. Construct typed command and idempotency key.
