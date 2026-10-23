@@ -114,6 +114,9 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Meter do
   def finish(_result, {{:error, _}, words, pins} = outcome, _limits)
       when is_integer(words) and is_integer(pins), do: outcome
 
+  def finish(_result, {:unsettled, _previous, words, pins} = outcome, _limits)
+      when is_integer(words) and is_integer(pins), do: outcome
+
   def finish(result, {:metered_copy, _, _, _, _, words, pins} = state, limits) do
     unless is_integer(words) and words >= 0 and is_integer(pins) and pins >= 0 and
              words <= limits.decoded_words - 5 and pins <= limits.pinned_bytes - 40,

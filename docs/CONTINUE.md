@@ -5,32 +5,57 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest full Rust checkpoint passes **1,000 tests across 91 targets on macOS**,
+The latest full Rust checkpoint passes **1,008 tests across 91 targets on macOS**,
 with zero failures, ignored or filtered tests, plus **six compile-fail examples
 across 15 documentation targets**. All eleven checks pass: formatting, workspace
 compilation, strict Clippy, warnings-denied documentation, all 50 architecture
 checks, reference/progress, four cached offline dependency-audit categories and
-whitespace. All 1,530 captured inputs stayed unchanged during validation, excluding
-only the three append-only peer notes. Exact target/executable/name/status
-comparison preserves all 996 preceding tests and adds only the four child-policy
-tests saved before binary normalization. Both benchmark correctness smokes pass.
-No measured performance gain is claimed.
+whitespace. All 1,534 captured inputs stayed unchanged, excluding only three
+append-only peer notes. Exact target/executable/name/status comparison preserves
+all 1,000 preceding tests and adds only the eight child-policy tests. Both
+benchmark correctness smokes pass. No measured performance gain is claimed.
 
-The borrowed child-failure option normalizer now passes both assertions from
-pinned declaration `981b590378d8a60d`, preserving their order, exact keys, defaults,
-allowed values and error text. Three additional controls cover atoms, absent and
-unsupported defaults, first-key selection, membership, case/hyphen aliases and
-no trimming. A real typed-only baseline ran two passing and two failing tests
-before the nine-line binary implementation. Architecture and performance
-independently reviewed the source, frozen tests and execution. The finite valid
-UTF-8 implementation uses no allocating normalization and remains separate from
-public command capture and other child-policy options.
+All five pinned pure ChildPolicy cases now have Rust counterparts preserving
+their eleven assertions in order, exact errors, option precedence and values.
+The remaining four cases were saved with three rejecting APIs in `e58675a`;
+actual runtime preserved five passes and exposed seven failures before the body.
+The final 12-test target passes, including shallow improper-list, atom-key ID,
+nil/duplicate option, malformed-map, opaque binary and borrowed-pointer controls.
+The complete original caller/test prefixes remain byte-identical. All five
+original Elixir cases also pass in the standalone source-only VM. Architecture
+and performance independently reviewed source and execution. Public capture,
+original project setup/profiles and independent Linux acceptance remain open.
 
-The partial progress ledger now records **93 source-derived declarations,
-105 Rust counterpart mappings and 444 assertion links**. Runtime reconciliation
-still has 1,681 unmatched cases and 1,655 unresolved declarations. These partial
-links do not certify full case/profile parity. Linux validation, native-capture
-integration and the wider runtime milestones remain open.
+The current native-capture checkpoint runs **53 tests on macOS: 45 pass and
+eight fail**. All six metering cases pass. Four original paid-prefix regressions
+were saved before implementation; they now exercise retained encoder/copy work,
+actual-versus-forecast counts, decode estimates and query-prefix debt. Review
+added genuine regressions for lost unsettled state and guard-frame entry before
+its reservation. Both fail at their intended checks in saved `9a3f516` (53/10),
+then pass after symmetric terminal forwarding and caller-side prepayment.
+The SAME six public budget-protocol and two keeper-debt failures remain; full
+native/public budget integration is incomplete.
+
+Input, Meter, Query and Binding are grouped by responsibility, with 514, 179,
+353 and 360 physical lines. All 151 clauses fit 100 lines (maximum 94); the six
+tests and two fixture helpers fit 55. Only the reached encoder cohort is issued;
+prospective forecasts remain separate. Known and unsettled outcomes retain their
+paid totals, and guard costs are reserved before entry. Source-only tooling binds
+21 files while the native library, four C sources and 305 compiler inputs remain
+unchanged. Actual compiled guard/caller inspection and all seven executing
+module identities are bound to the tested code. These are operation/retention
+bounds, not physical allocation measurements or public admission authority.
+
+The final two metering corrections change no Rust body, frozen Rust tests or
+ledger from the full 1,008-test checkpoint. Formatting, all 50 architecture tests,
+reference/progress and whitespace checks also pass after those corrections.
+The partial progress ledger records **97 source-derived declarations,
+109 Rust counterpart mappings and 453 assertion links**. Runtime reconciliation
+still has 1,681 unmatched cases and 1,655 unresolved declarations. Full Elixir
+case/profile parity, Linux validation and the wider runtime milestones remain
+open. The proposed normalization/restoration increment requires concrete
+architecture selection before creation; it is not implemented or public bridge
+activation. The active full-completion goal remains unfinished.
 
 The atomic-start recovery integration now passes **all eight regressions saved
 in `ae7a0ce` before implementation**. The borrowed header dispatches profile7;
@@ -124,7 +149,7 @@ persisted-policy discovery and FWSO support. Common recovery and public dispatch
 remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
-The current native-capture regression checkpoint runs **51 tests on macOS:
+The preceding native-capture regression checkpoint runs **51 tests on macOS:
 39 pass and 12 fail**. Four new tests call the existing Input APIs with an explicit
 paid-work mode. Prepare and bind reach real `BadMapError` failures; decode and
 query return their original errors without the required paid-work totals. Raw

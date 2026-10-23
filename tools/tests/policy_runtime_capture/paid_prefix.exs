@@ -231,6 +231,9 @@ defmodule Ferricstore.PolicyRuntimeCapturePaidPrefixTest do
               outcome = Input.bind_admission([donor], limits, mode, source, 1)
               send(owner, {:guard_refusal, self(), outcome})
               receive do: (:stop -> :ok)
+
+            :stop ->
+              :ok
           end
         end)
 

@@ -71,6 +71,8 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Binding do
     do: Meter.finish({:error, :invalid_donors}, retained, limits)
 
   defp bind_one(expected, term, index, limits, retained, source, copies, layout) do
+    frame = match?(%{md5: _}, source)
+
     with measured <- binding_add(retained, limits, 58, 464, copies),
          %{} = forecast <- Meter.forecast(measured),
          paid <- Meter.issue(measured, limits, 23, 184),
@@ -102,13 +104,17 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Binding do
            ),
          sized <- binding_add(state, limits, layout.size_result_words, size_pins, copies),
          %{} <- Meter.forecast(sized),
-         guarded = source_current(source, limits, sized),
+         guarded <- if(frame, do: Meter.issue(sized, limits, 5, 40), else: sized),
+         %{} <- Meter.forecast(guarded),
+         guarded = source_current(source, limits, guarded),
          guarded = if(guarded == :ok, do: sized, else: guarded),
          %{} <- Meter.forecast(guarded),
          sized <- Meter.issue(guarded, limits, layout.size_result_words, size_pins),
          %{} <- Meter.forecast(sized),
          maximum = :erlang.external_size(term, [:deterministic]),
-         guarded = source_current(source, limits, sized),
+         guarded <- if(frame, do: Meter.issue(sized, limits, 5, 40), else: sized),
+         %{} <- Meter.forecast(guarded),
+         guarded = source_current(source, limits, guarded),
          guarded = if(guarded == :ok, do: sized, else: guarded),
          %{} <- Meter.forecast(guarded),
          ecap =
@@ -128,7 +134,9 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Binding do
               raw -> raw
             end),
          %{} <- Meter.forecast(budget),
-         guarded = source_current(source, limits, budget),
+         guarded <- if(frame, do: Meter.issue(budget, limits, 5, 40), else: budget),
+         %{} <- Meter.forecast(guarded),
+         guarded = source_current(source, limits, guarded),
          guarded = if(guarded == :ok, do: budget, else: guarded),
          %{} <- Meter.forecast(guarded),
          issued <-
@@ -138,7 +146,9 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Binding do
             end),
          %{} <- Meter.forecast(issued),
          encoded = TermCodec.encode(term),
-         guarded = source_current(source, limits, issued),
+         guarded <- if(frame, do: Meter.issue(issued, limits, 5, 40), else: issued),
+         %{} <- Meter.forecast(guarded),
+         guarded = source_current(source, limits, guarded),
          guarded = if(guarded == :ok, do: issued, else: guarded),
          %{} <- Meter.forecast(guarded) do
       case check(byte_size(encoded), ecap, :pinned_bytes) do
@@ -234,38 +244,32 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Binding do
 
   defp source_current(_), do: {:error, :source_code_changed}
 
-  defp source_current(%{md5: md5}, limits, {:metered, _, _, _} = incoming) do
-    case Meter.issue(incoming, limits, 5, 40) do
-      {:metered, _, words, pins} = state ->
-        with :ok <- preparation_room(words + 87 + 10, pins + @source_error_pins + 80, limits) do
-          branch =
-            try do
-              if :erlang.get_module_info(TermCodec, :md5) == md5,
-                do: :ok,
-                else: :source_code_changed
-            catch
-              :error, :badarg -> :badarg
-              :error, _ -> :unsettled
-            end
-
-          if branch == :unsettled do
-            Meter.finish({:error, :source_code_changed}, state, :unsettled)
-          else
-            heap_words = if branch == :badarg, do: 87, else: 4
-            heap_pins = if branch == :badarg, do: @source_error_pins, else: 32
-
-            with {:metered, _, _, _} = paid <- Meter.issue(state, limits, heap_words, heap_pins) do
-              if branch == :ok,
-                do: paid,
-                else: Meter.finish({:error, :source_code_changed}, paid, limits)
-            end
-          end
-        else
-          error -> Meter.finish(error, state, limits)
+  defp source_current(%{md5: md5}, limits, {:metered, _, words, pins} = state) do
+    with :ok <- preparation_room(words + 87 + 10, pins + @source_error_pins + 80, limits) do
+      branch =
+        try do
+          if :erlang.get_module_info(TermCodec, :md5) == md5,
+            do: :ok,
+            else: :source_code_changed
+        catch
+          :error, :badarg -> :badarg
+          :error, _ -> :unsettled
         end
 
-      outcome ->
-        outcome
+      if branch == :unsettled do
+        Meter.finish({:error, :source_code_changed}, state, :unsettled)
+      else
+        heap_words = if branch == :badarg, do: 87, else: 4
+        heap_pins = if branch == :badarg, do: @source_error_pins, else: 32
+
+        with {:metered, _, _, _} = paid <- Meter.issue(state, limits, heap_words, heap_pins) do
+          if branch == :ok,
+            do: paid,
+            else: Meter.finish({:error, :source_code_changed}, paid, limits)
+        end
+      end
+    else
+      error -> Meter.finish(error, state, limits)
     end
   end
 
