@@ -97,9 +97,37 @@ impl<'a> OriginalHistoryMillis<'a> {
 /// Malformed and nonbinary inputs represent positive zero. Nonzero results
 /// borrow the binary payload rather than its temporary descriptor.
 #[must_use]
-pub fn original_history_event_ms(_event_id: Raw<'_>) -> OriginalHistoryMillis<'_> {
-    OriginalHistoryMillis {
+pub fn original_history_event_ms(event_id: Raw<'_>) -> OriginalHistoryMillis<'_> {
+    let zero = OriginalHistoryMillis {
         negative: false,
         digits: b"0",
+    };
+    let Raw::Binary(bytes) = event_id else {
+        return zero;
+    };
+    let (negative, digits) = match bytes {
+        [b'-', rest @ ..] => (true, rest),
+        [b'+', rest @ ..] => (false, rest),
+        _ => (false, bytes),
+    };
+
+    let mut end = 0;
+    while end < digits.len() && digits[end].is_ascii_digit() {
+        end += 1;
+    }
+    if end == 0 || (end < digits.len() && digits[end] != b'-') {
+        return zero;
+    }
+
+    let mut start = 0;
+    while start < end && digits[start] == b'0' {
+        start += 1;
+    }
+    if start == end {
+        return zero;
+    }
+    OriginalHistoryMillis {
+        negative,
+        digits: &digits[start..end],
     }
 }

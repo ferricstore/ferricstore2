@@ -1,6 +1,6 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-23. The active full-completion goal remains unfinished.
+Updated: 2026-10-24. The active full-completion goal remains unfinished.
 GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
@@ -15,15 +15,19 @@ value. Standard B-tree node allocation remains outside paid admission. All four
 original standalone Elixir cases pass; full original profiles and Linux remain
 required.
 
-The new HistoryEvent callable baseline runs **12 Rust tests: seven pass and
-five fail**. All six older history-entry tests remain passing and unchanged.
-The new malformed-input case passes; the two valid original cases and three
-edge-case tests reach the zero-only parser and fail on its result. Later pointer,
-wide-integer and remainder assertions remain masked. All seven quality checks
-pass after ordinary lifetime elision and refreshing only the four existing
-whole-file evidence hashes. The three original standalone Elixir cases pass.
-The substantive parser still requires saving this genuine baseline and its
-separate implementation release; the new cases have no ledger coverage credit.
+The HistoryEvent parser now passes **all twelve tests in the existing Rust
+target and all eight focused checks** after the genuine seven-pass/five-failure
+baseline was saved in `772c8e5`. The three original standalone Elixir cases also
+pass. All five original integer assertions remain independent sign-and-digit
+comparisons in source order; the six older history-entry tests are unchanged.
+The parser preserves signed values of arbitrary width, canonical positive zero,
+ASCII prefix rules, opaque suffix bytes after a hyphen, and nonbinary fallback.
+Nonzero digits borrow the original buffer beyond the temporary descriptor's
+lifetime. Source inspection proves bounded scans with no result-buffer allocation;
+borrowing may retain the original backing, and no measured speedup is claimed.
+The source is 133 physical lines, its parser is 34, and its test file is 350.
+Three new declaration mappings and five assertion links are recorded below;
+the full workspace checkpoint below includes this unchanged target.
 
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
 All four decoder regressions saved before implementation now pass: NEW-only
@@ -66,15 +70,15 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full Rust checkpoint passes **1,036 tests across 94
+The latest full Rust checkpoint passes **1,042 tests across 94
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
 documentation, all 51 architecture checks, reference/progress validation, four
 cached offline dependency-audit categories and whitespace. All 1,551 captured
 inputs stayed unchanged, excluding only the three append-only peer notes.
-Exact target/executable/name/status comparison preserves all 1,023 preceding
-tests and adds only the thirteen ManyItemOpts cases.
+Exact target/executable/name/status comparison preserves all 1,036 preceding
+tests and adds only the six HistoryEvent cases.
 Both existing benchmark correctness smokes pass. No measured speedup is claimed.
 
 All four pinned pure Options cases now have Rust counterparts preserving their
@@ -110,13 +114,13 @@ Rust; the 12-test target and all five original standalone Elixir cases pass.
 Their source/error/ownership and derived regression review remains accepted.
 Options and ChildPolicy are pure components, not a completed workflow engine.
 
-The checked partial ledger records **111 source-derived declarations,
-123 Rust counterpart mappings and 516 assertion links**. Runtime reconciliation
+The checked partial ledger records **114 source-derived declarations,
+126 Rust counterpart mappings and 521 assertion links**. Runtime reconciliation
 still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
 reference and frozen workflow mapping remain unchanged. Full original Elixir
 case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and
-the wider ordered runtime milestones remain open. HistoryEvent now has the architecture-selected type and zero-only callable
-baseline; its correct parser and assertion links remain unfinished. The active
+the wider ordered runtime milestones remain open. HistoryEvent now has its reviewed parser and completed source assertions;
+the broader runtime work and required profiles remain unfinished. The active
 goal must continue beyond this reviewed increment.
 
 The entries below retain preceding checkpoints; the results above describe the

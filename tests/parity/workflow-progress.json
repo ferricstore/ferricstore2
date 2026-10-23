@@ -3546,21 +3546,96 @@
       "runtime_case_ids": [
         "b75ac593c0b747217d326ef01b28f142b3347b71d2477353e1bd91583309a49d"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-history-event-7c1b034ba633e299-generated-ms-prefix",
+          "rust_file": "crates/wf-domain/tests/history_original.rs",
+          "rust_file_sha256": "3ae590a8db2e9e5f9bf59ccf35e2d8d5b969d9e894dd2dee7593824b31d40799",
+          "rust_module": "",
+          "rust_function": "parses_millisecond_prefix_from_generated_event_ids",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert HistoryEvent.ms(\"12345-7\") == 12_345",
+              "rust_line": 192,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure HistoryEvent observation with source async:true/flow provenance and no local setup. Each original integer equality is one independent canonical sign-and-digit equality in source order; optional ASCII sign, arbitrary-width decimal prefix, empty-or-hyphen remainder and positive zero follow the original helper.",
+            "Inputs are already captured visible Raw descriptors. Nonzero magnitudes borrow the original binary payload, even after the temporary descriptor disappears; malformed/nonbinary/zero results use static positive zero. The byte-only parser uses at most two prefix passes and no new result buffer or fixed-width conversion. Borrowing may retain the caller backing. Other has no hidden VM-payload correspondence proof; this helper does not authorize clocks/history reads, decode inputs or establish paid admission, whole-module allocation/OOM bounds, or measured speedup.",
+            "All twelve tests in the existing Rust target and all three original standalone Elixir cases pass on macOS after the genuine callable zero-only baseline was saved in 772c8e5. The old six history-entry cases remain unchanged. Full original project setup/profiles, wider workflow/history parity, Linux validation, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "92c6291d9e6b36ba",
       "runtime_case_ids": [
         "cafdb307a996b08454da6d51af8a66ac3b5597a940c4d086b093ab9791f1456f"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-history-event-92c6291d9e6b36ba-bare-ms",
+          "rust_file": "crates/wf-domain/tests/history_original.rs",
+          "rust_file_sha256": "3ae590a8db2e9e5f9bf59ccf35e2d8d5b969d9e894dd2dee7593824b31d40799",
+          "rust_module": "",
+          "rust_function": "parses_bare_millisecond_event_ids",
+          "assertions": [
+            {
+              "source_line": 12,
+              "source_text": "assert HistoryEvent.ms(\"98765\") == 98_765",
+              "rust_line": 201,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure HistoryEvent observation with source async:true/flow provenance and no local setup. Each original integer equality is one independent canonical sign-and-digit equality in source order; optional ASCII sign, arbitrary-width decimal prefix, empty-or-hyphen remainder and positive zero follow the original helper.",
+            "Inputs are already captured visible Raw descriptors. Nonzero magnitudes borrow the original binary payload, even after the temporary descriptor disappears; malformed/nonbinary/zero results use static positive zero. The byte-only parser uses at most two prefix passes and no new result buffer or fixed-width conversion. Borrowing may retain the caller backing. Other has no hidden VM-payload correspondence proof; this helper does not authorize clocks/history reads, decode inputs or establish paid admission, whole-module allocation/OOM bounds, or measured speedup.",
+            "All twelve tests in the existing Rust target and all three original standalone Elixir cases pass on macOS after the genuine callable zero-only baseline was saved in 772c8e5. The old six history-entry cases remain unchanged. Full original project setup/profiles, wider workflow/history parity, Linux validation, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "2321ee3114be6a3e",
       "runtime_case_ids": [
         "29657abd6b6aefb5cb9ab585a6dd1a858116a5c47e4f9740f28f650bb16e43e1"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-history-event-2321ee3114be6a3e-malformed-and-nonbinary-zero",
+          "rust_file": "crates/wf-domain/tests/history_original.rs",
+          "rust_file_sha256": "3ae590a8db2e9e5f9bf59ccf35e2d8d5b969d9e894dd2dee7593824b31d40799",
+          "rust_module": "",
+          "rust_function": "returns_zero_for_malformed_and_non_binary_event_ids",
+          "assertions": [
+            {
+              "source_line": 16,
+              "source_text": "assert HistoryEvent.ms(\"abc-1\") == 0",
+              "rust_line": 210,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 17,
+              "source_text": "assert HistoryEvent.ms(\"123abc\") == 0",
+              "rust_line": 215,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 18,
+              "source_text": "assert HistoryEvent.ms(nil) == 0",
+              "rust_line": 220,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure HistoryEvent observation with source async:true/flow provenance and no local setup. Each original integer equality is one independent canonical sign-and-digit equality in source order; optional ASCII sign, arbitrary-width decimal prefix, empty-or-hyphen remainder and positive zero follow the original helper.",
+            "Inputs are already captured visible Raw descriptors. Nonzero magnitudes borrow the original binary payload, even after the temporary descriptor disappears; malformed/nonbinary/zero results use static positive zero. The byte-only parser uses at most two prefix passes and no new result buffer or fixed-width conversion. Borrowing may retain the caller backing. Other has no hidden VM-payload correspondence proof; this helper does not authorize clocks/history reads, decode inputs or establish paid admission, whole-module allocation/OOM bounds, or measured speedup.",
+            "All twelve tests in the existing Rust target and all three original standalone Elixir cases pass on macOS after the genuine callable zero-only baseline was saved in 772c8e5. The old six history-entry cases remain unchanged. Full original project setup/profiles, wider workflow/history parity, Linux validation, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "3d0e7980d47b0c0f",
