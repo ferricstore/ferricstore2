@@ -8,8 +8,10 @@ use std::fmt;
 use crate::policy::complete::RawFlowPolicyValue as Raw;
 
 mod put;
+mod score_bound;
 
 pub use put::{maybe_put_attr, maybe_put_default_attr, maybe_put_keyword};
+pub use score_bound::{OriginalScoreBound, OriginalScoreBoundError, parse_original_score_bound};
 
 const MAX_REF_SIZE: usize = 4_096;
 const MAX_EXACT_INTEGER: u64 = 9_007_199_254_740_991;

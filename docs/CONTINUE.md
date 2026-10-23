@@ -29,6 +29,17 @@ The source is 133 physical lines, its parser is 34, and its test file is 350.
 Three new declaration mappings and five assertion links are recorded below;
 the full workspace checkpoint below includes this unchanged target.
 
+The new ScoreBound callable baseline runs **six Rust tests: one passes and
+five fail**. All seven quality checks pass, including strict Clippy and the 51
+architecture checks. The rejected-input source case passes; valid bounds,
+grammar, IEEE values and overflow origin reach the always-error parser and fail.
+Later assertions remain masked. The original three standalone Elixir cases pass,
+and 36 separate reference observations establish grammar, exception ordering and
+floating-point bit boundaries. Architecture and performance reviewed the API,
+all seven source assertions and the stopped baseline. The parser body remains
+absent; no new source mappings receive coverage credit. Related code lives under
+`src/options/score_bound.rs`, with reviews under `docs/reviews/score-bound/`.
+
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
 All four decoder regressions saved before implementation now pass: NEW-only
 calls preserve historical forecasts, a late source error retains completed work,
@@ -70,7 +81,8 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full Rust checkpoint passes **1,042 tests across 94
+The latest full passing Rust checkpoint, before the new ScoreBound baseline,
+passes **1,042 tests across 94
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
