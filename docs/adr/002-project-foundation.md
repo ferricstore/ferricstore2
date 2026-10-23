@@ -52,3 +52,28 @@ ports/runtime dependencies through mutated metadata. No checker rule, effect
 permission, dependency edge or profile is relaxed. Its preclassification failure
 is architecture evidence; the eight option behavior tests require their own
 executed failing baseline and passing implementation.
+
+## Captured metadata module classification
+
+Register public `wf-domain::metadata` with `metadata = true` in the complete
+root module classification. Its private `metadata::attributes` and
+`metadata::state_meta` children retain the package-wide domain purity and
+dependency rules. The flag declares visibility; it grants no effects, dependency
+edges, public admission or durable state authority.
+
+This module owns the complete original canonical metadata predicates and both
+normalizers. A metadata-specific input view preserves floats, arbitrary
+integers, atom aliases, captured map order and proper/improper lists. Shared
+policy input, its closed ETF profiles and outer-frame accounting stay unchanged.
+Separate descriptor and leaf lifetimes permit owned output spines to outlive
+temporary descriptors while borrowing payloads. Public results remain ordinary
+values. Source-returned, source-raised and real reservation errors stay distinct.
+Logical byte limits are not heap or admission bills.
+
+The named classification regression checks all three actual source files and
+pure UTF-8/trim/float controls, rejects environment/file/I/O/async/global-state
+examples, and rejects declared ports/runtime dependencies through graph checks.
+Its actual preclassification assertion reports an unclassified production
+module. Registering this one module does not weaken checker logic or permissions.
+That architecture failure is separate from the required compiled behavioral
+baseline, source assertion preservation and passing metadata implementation.

@@ -14,7 +14,7 @@ modules = { identity = true, version = true, bounds = true, error = true }
 kind = "runtime"
 normal = ["wf-types"]
 dev = ["wf-test-support"]
-modules = { value = true, workflow = true, claim = true, lease = true, retry = true, policy = true, signal = true, schedule = true, lineage = true, history = true, retention = true, options = true }
+modules = { value = true, workflow = true, claim = true, lease = true, retry = true, policy = true, signal = true, schedule = true, lineage = true, history = true, retention = true, options = true, metadata = true }
 
 [packages.wf-ports]
 kind = "runtime"

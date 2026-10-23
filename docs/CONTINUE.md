@@ -45,6 +45,25 @@ Three new source mappings and seven assertion links are recorded below; the
 full workspace checkpoint includes this unchanged target. Related code lives under
 `src/options/score_bound.rs`, with reviews under `docs/reviews/score-bound/`.
 
+The new metadata callable baseline runs **twelve Rust tests: one passes and
+eleven fail**. All seven quality checks pass, including strict Clippy and the
+expanded 52-test architecture suite. The two original canonical-map cases reach
+false validators and fail; their later scalar/refute observations remain masked.
+The original invalid-name normalization case passes its three error-pattern
+assertions against the root-error stubs. Nine derived tests expose missing
+success, exact-error, improper-list, size/order and borrowing behavior. The
+two-lifetime ownership test compiles, but its runtime pointer assertions remain
+masked. No metadata source mapping receives coverage credit yet.
+
+All three original standalone metadata cases pass, with 23 separate reference
+edge groups. Actual pinned Elixir map traversal is recorded for the 64/65-state
+fixtures. Source and tests are grouped under `src/metadata.rs`, its private
+children, and `tests/metadata_validation/main.rs` with three sibling modules.
+A separate architecture regression first failed on missing classification and
+now passes after registering the public module. Shared policy input and its
+closed profiles remain unchanged. The substantive nineteen helpers, limits and
+normalizers still require saving this genuine baseline and separate release.
+
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
 All four decoder regressions saved before implementation now pass: NEW-only
 calls preserve historical forecasts, a late source error retains completed work,
@@ -86,7 +105,8 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full Rust checkpoint passes **1,048 tests across 95
+The latest full passing Rust checkpoint, before the metadata baseline, passes
+**1,048 tests across 95
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
