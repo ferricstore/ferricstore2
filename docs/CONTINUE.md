@@ -128,11 +128,19 @@ benchmark is 361 lines; its six functions are at most 91 lines. The product
 terminal constructor remains unchanged. No optimized baseline, pilot, candidate,
 timing campaign, allocation count or speedup has been established.
 
-The atomic-start codec interface has six explicitly refusing server entry
+The atomic-start persistence regression checkpoint runs **22 focused tests:
+16 pass and six fail**. All six new tests compile and stop at the first valid
+encode with `Encoding(UnsupportedTag)`. Formatting, focused compilation, strict
+Clippy, all 50 architecture checks, reference and progress validation pass.
+All 1,513 captured inputs stay unchanged, excluding only the three peer notes.
+The test children are 386 and 451 lines, with functions at most 93 lines.
+Later frame, actual-postimage, same-length payload, cap and replay assertions
+remain unexecuted behind that refusal. This is runtime RED before implementation.
+
+The atomic-start codec interface still has six explicitly refusing server entry
 points and primitive intent7 selection. No new frame, Fresh plan, retained
 response, storage policy discovery or recovery support is enabled. The exact
-module and client-facade matrix receive one passing architecture test. Positive
-compiled runtime RED must still precede behavioral codec implementation.
+module and client-facade matrix receive one passing architecture test.
 
 The latest full Rust checkpoint passes **975 tests across 90 targets on macOS**,
 with zero failures, ignored or filtered tests, plus six compile-fail examples
@@ -143,7 +151,8 @@ All 1,511 captured inputs stayed unchanged, excluding only the three append-only
 peer review notes. Both benchmark smokes pass. Architecture and performance
 independently accept the source and complete raw results.
 This adds interface enforcement and benchmark correctness; durable behavior,
-full parity and Linux remain open.
+full parity and Linux remain open. This saved green checkpoint predates the six
+failing regressions above.
 
 The preceding full Rust checkpoint passes **974 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
@@ -2547,8 +2556,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **89 reviewed
-source declarations, 101 counterpart records and 415 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **92 reviewed
+source declarations, 104 counterpart records and 442 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 
