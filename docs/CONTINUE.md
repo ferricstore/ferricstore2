@@ -29,15 +29,20 @@ The source is 133 physical lines, its parser is 34, and its test file is 350.
 Three new declaration mappings and five assertion links are recorded below;
 the full workspace checkpoint below includes this unchanged target.
 
-The new ScoreBound callable baseline runs **six Rust tests: one passes and
-five fail**. All seven quality checks pass, including strict Clippy and the 51
-architecture checks. The rejected-input source case passes; valid bounds,
-grammar, IEEE values and overflow origin reach the always-error parser and fail.
-Later assertions remain masked. The original three standalone Elixir cases pass,
-and 36 separate reference observations establish grammar, exception ordering and
-floating-point bit boundaries. Architecture and performance reviewed the API,
-all seven source assertions and the stopped baseline. The parser body remains
-absent; no new source mappings receive coverage credit. Related code lives under
+The ScoreBound parser now passes **all six unchanged Rust tests and all eight
+focused checks** after the genuine one-pass/five-failure baseline was saved in
+`224e4d2`. All seven original assertions retain exact bound kinds, literal
+floating-point bits and error bytes. The three original standalone Elixir cases
+also pass; 36 reference observations supplement grammar, overflow-origin and
+IEEE boundary controls. Plain overflow remains distinct from a returned error,
+including when a suffix follows; complete exponents retain the source rescue.
+The parser scans borrowed ASCII bytes, converts the unsigned prefix before
+rejecting remainders, and preserves negative zero. Numeric/static-error results
+retain no input buffer. No wrapper String or result buffer is constructed; no
+measured speedup or whole-process allocation bound is claimed. The source has
+113 physical lines, its two functions have 49 and 33, and its tests have 226.
+Three new source mappings and seven assertion links are recorded below; the
+full workspace checkpoint includes this unchanged target. Related code lives under
 `src/options/score_bound.rs`, with reviews under `docs/reviews/score-bound/`.
 
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
@@ -81,16 +86,15 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full passing Rust checkpoint, before the new ScoreBound baseline,
-passes **1,042 tests across 94
+The latest full Rust checkpoint passes **1,048 tests across 95
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
 documentation, all 51 architecture checks, reference/progress validation, four
-cached offline dependency-audit categories and whitespace. All 1,551 captured
-inputs stayed unchanged, excluding only the three append-only peer notes.
-Exact target/executable/name/status comparison preserves all 1,036 preceding
-tests and adds only the six HistoryEvent cases.
+cached offline dependency-audit categories and whitespace. All 1,556 captured
+inputs stayed unchanged, excluding only the three active feature review notes.
+Exact target/executable/name/status comparison preserves all 1,042 preceding
+tests and adds only the six ScoreBound cases.
 Both existing benchmark correctness smokes pass. No measured speedup is claimed.
 
 All four pinned pure Options cases now have Rust counterparts preserving their
@@ -126,8 +130,8 @@ Rust; the 12-test target and all five original standalone Elixir cases pass.
 Their source/error/ownership and derived regression review remains accepted.
 Options and ChildPolicy are pure components, not a completed workflow engine.
 
-The checked partial ledger records **114 source-derived declarations,
-126 Rust counterpart mappings and 521 assertion links**. Runtime reconciliation
+The checked partial ledger records **117 source-derived declarations,
+129 Rust counterpart mappings and 528 assertion links**. Runtime reconciliation
 still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
 reference and frozen workflow mapping remain unchanged. Full original Elixir
 case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and

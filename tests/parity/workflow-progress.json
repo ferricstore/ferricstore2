@@ -16787,21 +16787,108 @@
       "runtime_case_ids": [
         "ff1308ac4b5754ca3c571dc4847ddb5942599161ca79a97bd1d581da7cfee856"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-score-bound-302351265d6e869f-infinity-sentinels",
+          "rust_file": "crates/wf-domain/tests/score_bound.rs",
+          "rust_file_sha256": "ca7256479f5f079d0f2038fbaf4fad486e5bd2a6a3a6577bb922897b7216211f",
+          "rust_module": "",
+          "rust_function": "parse_supports_infinities",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert ScoreBound.parse(\"-inf\") == :neg_inf",
+              "rust_line": 16,
+              "rust_text": "assert_eq!(parse_original_score_bound(b\"-inf\"), Ok(Bound::NegInf));"
+            },
+            {
+              "source_line": 9,
+              "source_text": "assert ScoreBound.parse(\"+inf\") == :pos_inf",
+              "rust_line": 17,
+              "rust_text": "assert_eq!(parse_original_score_bound(b\"+inf\"), Ok(Bound::PosInf));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure ScoreBound binary case with async:true/flow provenance and no local setup. The three original cases retain all seven separate observations in source order: exact infinity variants, inclusive/exclusive kinds with literal expected binary64 bits, and exact returned business-error bytes.",
+            "Inputs are already captured byte slices. Nonbinary source FunctionClauseError lies outside this acquisition boundary. Plain numeric overflow is represented by RaisedArgumentError, distinct from Returned(source message); prefix conversion precedes suffix rejection and only complete exponents rescue the source conversion failure. Successful numeric outputs are finite under the selected nearest/ties-even profile; externally constructed enum values are not finite-value witnesses. Results copy floats/static diagnostics without retaining the input. Borrowed ASCII scanning and checked conversion create no wrapper String/result buffer or input precision cap. No whole-process allocation, stack/RSS, OOM, paid admission, public query authority, measured speedup or universal libc/locale/FENV equivalence is proved.",
+            "All six unchanged Rust tests and all three original standalone Elixir cases pass on macOS after the genuine callable rejection baseline was saved in 224e4d2. Thirty-six original edge observations supplement the source tests. Full original project setup/profiles, Linux validation, remaining workflow parity, native admission, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "ad80a44b66da3f16",
       "runtime_case_ids": [
         "2150011ce732fa4c209a2f390ff18023219585d56c06e1b00d473eb13fdbd17e"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-score-bound-ad80a44b66da3f16-inclusive-exclusive",
+          "rust_file": "crates/wf-domain/tests/score_bound.rs",
+          "rust_file_sha256": "ca7256479f5f079d0f2038fbaf4fad486e5bd2a6a3a6577bb922897b7216211f",
+          "rust_module": "",
+          "rust_function": "parse_supports_inclusive_and_exclusive_float_bounds",
+          "assertions": [
+            {
+              "source_line": 13,
+              "source_text": "assert ScoreBound.parse(\"42\") == {:inclusive, 42.0}",
+              "rust_line": 22,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 14,
+              "source_text": "assert ScoreBound.parse(\"-1.5\") == {:inclusive, -1.5}",
+              "rust_line": 26,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 15,
+              "source_text": "assert ScoreBound.parse(\"(3.25\") == {:exclusive, 3.25}",
+              "rust_line": 30,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure ScoreBound binary case with async:true/flow provenance and no local setup. The three original cases retain all seven separate observations in source order: exact infinity variants, inclusive/exclusive kinds with literal expected binary64 bits, and exact returned business-error bytes.",
+            "Inputs are already captured byte slices. Nonbinary source FunctionClauseError lies outside this acquisition boundary. Plain numeric overflow is represented by RaisedArgumentError, distinct from Returned(source message); prefix conversion precedes suffix rejection and only complete exponents rescue the source conversion failure. Successful numeric outputs are finite under the selected nearest/ties-even profile; externally constructed enum values are not finite-value witnesses. Results copy floats/static diagnostics without retaining the input. Borrowed ASCII scanning and checked conversion create no wrapper String/result buffer or input precision cap. No whole-process allocation, stack/RSS, OOM, paid admission, public query authority, measured speedup or universal libc/locale/FENV equivalence is proved.",
+            "All six unchanged Rust tests and all three original standalone Elixir cases pass on macOS after the genuine callable rejection baseline was saved in 224e4d2. Thirty-six original edge observations supplement the source tests. Full original project setup/profiles, Linux validation, remaining workflow parity, native admission, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "1be2c83f0aed7528",
       "runtime_case_ids": [
         "f3b4f08fded1cbae958103045ffbd6fa4dd6c1289c0e3d16c9b15ec42ab3a529"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-score-bound-1be2c83f0aed7528-invalid-binary",
+          "rust_file": "crates/wf-domain/tests/score_bound.rs",
+          "rust_file_sha256": "ca7256479f5f079d0f2038fbaf4fad486e5bd2a6a3a6577bb922897b7216211f",
+          "rust_module": "",
+          "rust_function": "parse_rejects_non_float_bounds",
+          "assertions": [
+            {
+              "source_line": 19,
+              "source_text": "assert ScoreBound.parse(\"bad\") == {:error, \"ERR min or max is not a float\"}",
+              "rust_line": 38,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 20,
+              "source_text": "assert ScoreBound.parse(\"(bad\") == {:error, \"ERR min or max is not a float\"}",
+              "rust_line": 42,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure ScoreBound binary case with async:true/flow provenance and no local setup. The three original cases retain all seven separate observations in source order: exact infinity variants, inclusive/exclusive kinds with literal expected binary64 bits, and exact returned business-error bytes.",
+            "Inputs are already captured byte slices. Nonbinary source FunctionClauseError lies outside this acquisition boundary. Plain numeric overflow is represented by RaisedArgumentError, distinct from Returned(source message); prefix conversion precedes suffix rejection and only complete exponents rescue the source conversion failure. Successful numeric outputs are finite under the selected nearest/ties-even profile; externally constructed enum values are not finite-value witnesses. Results copy floats/static diagnostics without retaining the input. Borrowed ASCII scanning and checked conversion create no wrapper String/result buffer or input precision cap. No whole-process allocation, stack/RSS, OOM, paid admission, public query authority, measured speedup or universal libc/locale/FENV equivalence is proved.",
+            "All six unchanged Rust tests and all three original standalone Elixir cases pass on macOS after the genuine callable rejection baseline was saved in 224e4d2. Thirty-six original edge observations supplement the source tests. Full original project setup/profiles, Linux validation, remaining workflow parity, native admission, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "65e485ac9a969ace",
