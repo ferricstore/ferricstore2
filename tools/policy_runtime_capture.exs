@@ -495,7 +495,9 @@ defmodule Ferricstore.PolicyRuntimeCapture do
   end
 
   defp source_current(%{md5: md5}) do
-    if TermCodec.module_info(:md5) == md5, do: :ok, else: {:error, :source_code_changed}
+    if :erlang.get_module_info(TermCodec, :md5) == md5,
+      do: :ok,
+      else: {:error, :source_code_changed}
   rescue
     _ -> {:error, :source_code_changed}
   end

@@ -108,7 +108,25 @@ persisted-policy discovery and FWSO support. Common recovery and public dispatch
 remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
-The current native-capture regression checkpoint runs **47 tests on macOS:
+The current native-capture checkpoint runs **47 tests on macOS: 39 pass and
+eight fail**. Both SourceGuard cases frozen in `de4aea1` now complete: absent
+source returns `source_code_changed`, stays unloaded and produces no autoload
+event. Exact failure comparison removes only those two failures and preserves
+the eight existing public-protocol/keeper-debt failures; all tests stay frozen.
+
+Only the two existing MD5 calls changed to direct Erlang BIF calls, with their
+rescues and Input fallback preserved. Architecture and performance independently
+accepted the exact whole-file inverses. The files have 504 and 593 physical lines;
+both modified guard bodies have seven. Actual compiled inspection covers all
+guard clauses, confirms constant arguments and the direct BIF, and finds no
+cooked stacktrace or exception normalization. Both executing module MD5s match
+the inspected BEAMs, with the same-path require cache checked before tests.
+All 1,844 captured repository/compiler/runtime/artifact inputs stayed unchanged
+during execution, excluding only three peer notes. This closes the selected
+autoload behavior, not complete exception/control pricing, public budget
+integration, original parity, Linux acceptance or a measured performance gain.
+
+The preceding native-capture regression checkpoint runs **47 tests on macOS:
 37 pass and ten fail**. Two new SourceGuard cases demonstrate genuine autoload:
 the existing Capture and Input guards reload the authentic temporary BEAM,
 return success and each emit one observed undefined-function call. Input returns

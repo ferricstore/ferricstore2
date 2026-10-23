@@ -234,6 +234,16 @@ compiled-guard inspection must bind the actual executing bytecode and exclude
 cooked stacktrace/normalization paths before using the raw exception operand in
 complete producer costs. This selects no complete public fee or Linux result.
 
+The two SourceGuard tests frozen in `de4aea1` now pass in a 47-test run with the
+same eight earlier failures. Both existing guard expressions use the direct BIF;
+rescues, Input fallback and all test bodies remain intact. The cases complete
+their typed refusal, unloaded-module, empty autoload-event and cleanup checks.
+Actual complete-guard disassembly confirms direct constant-argument BIF calls
+without cooked stacktrace/normalization paths. Runtime-loaded module MD5s equal
+the inspected BEAM identities, and same-path require caching is verified.
+This satisfies that compiled premise for the executed run; raw exception,
+catch/control and complete public E/T accounting remain separate obligations.
+
 The exact staged contracts and reciprocal reviews are recorded in
 [the architecture review](../reviews/workflow-completion-architecture.md) and
 [Root's release record](../reviews/workflow-completion-coordination.md).
