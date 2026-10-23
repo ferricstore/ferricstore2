@@ -1,8 +1,6 @@
 ExUnit.start(autorun: false)
 
 tool = Path.expand("../policy_runtime_capture.exs", __DIR__)
-# Run the real test bodies before the selected provider exists: undefined APIs
-# are the initial RED, rather than a conditional success or skipped test.
 if File.regular?(tool), do: Code.require_file(tool)
 
 defmodule Ferricstore.PolicyRuntimeCaptureTest do
@@ -578,11 +576,13 @@ defmodule Ferricstore.PolicyRuntimeCaptureTest do
   defp sha(bytes), do: :crypto.hash(:sha256, bytes)
 end
 
-Code.require_file("policy_runtime_capture/admission.exs", __DIR__)
-Code.require_file("policy_runtime_capture/query_admission.exs", __DIR__)
-Code.require_file("policy_runtime_capture/budget_protocol.exs", __DIR__)
-Code.require_file("policy_runtime_capture/native_budget.exs", __DIR__)
-Code.require_file("policy_runtime_capture/keeper_debt.exs", __DIR__)
+unless match?(["--capture-child", _], System.argv()) do
+  Code.require_file("policy_runtime_capture/admission.exs", __DIR__)
+  Code.require_file("policy_runtime_capture/query_admission.exs", __DIR__)
+  Code.require_file("policy_runtime_capture/budget_protocol.exs", __DIR__)
+  Code.require_file("policy_runtime_capture/native_budget.exs", __DIR__)
+  Code.require_file("policy_runtime_capture/keeper_debt.exs", __DIR__)
+end
 
 case System.argv() do
   ["--admission-child", mode] ->

@@ -1,9 +1,13 @@
 defmodule Ferricstore.PolicyRuntimeCapture.Observation do
   @moduledoc false
   alias Ferricstore.PolicyRuntimeCapture.Input
+  alias Ferricstore.PolicyRuntimeCapture.Input.Binding
   alias Ferricstore.PolicyRuntimeCapture.Input.{Meter, Query}
   alias Ferricstore.PolicyRuntimeCapture.Native
   alias Ferricstore.TermCodec
+
+  # Entry/helper control is caller-owned; each new worker entry is funded here.
+  @decode_worker_frame_words 32
 
   @doc false
   def observe(state, parent) do
@@ -34,6 +38,42 @@ defmodule Ferricstore.PolicyRuntimeCapture.Observation do
   end
 
   @doc false
+  def decode(donors, all, limits, {:metered, _, _, _} = incoming) when is_list(donors) do
+    case Input.decode_admission(all, limits, incoming) do
+      {{:ok, preflight}, _, _} = result ->
+        with {:metered, _, _, _} = retained <- Meter.carry(preflight, result, limits),
+             :ok <- decode_budget(donors, limits, retained),
+             {:metered, _, words, pins} <-
+               Meter.issue(
+                 retained,
+                 limits,
+                 18 + @decode_worker_frame_words,
+                 144 + 8 * @decode_worker_frame_words
+               ) do
+          extra = 12 * length(donors) + 23
+
+          forecast = %{
+            decoded_words: preflight.decoded_words + extra,
+            pinned_bytes: preflight.pinned_bytes + 8 * extra
+          }
+
+          prepared = :lists.nthtail(length(all) - length(donors), all)
+
+          decode_values(
+            {:metered, {donors, prepared}, limits, forecast, words, pins},
+            0,
+            []
+          )
+        end
+
+      terminal ->
+        terminal
+    end
+  end
+
+  def decode(_, _, limits, {:metered, _, _, _} = incoming),
+    do: Meter.finish({:error, :invalid_donors}, incoming, limits)
+
   def decode(donors, all, limits, retained) when is_list(donors) do
     with {:ok, raw} <- Input.decode_admission(all, limits, retained),
          admission when is_map(admission) <- decode_budget(donors, limits, raw),
@@ -43,6 +83,25 @@ defmodule Ferricstore.PolicyRuntimeCapture.Observation do
   end
 
   def decode(_, _, _, _), do: {:error, :invalid_donors}
+
+  defp decode_budget(donors, limits, {:metered, forecast, _, _} = retained) do
+    extra = 12 * length(donors) + 23
+    words = forecast.decoded_words + extra
+
+    cond do
+      words > limits.decoded_words ->
+        Meter.finish({:error, {:limit, :decoded_words}}, retained, limits)
+
+      forecast.pinned_bytes > limits.pinned_bytes ->
+        Meter.finish({:error, {:limit, :pinned_bytes}}, retained, limits)
+
+      extra > div(limits.pinned_bytes - forecast.pinned_bytes, 8) ->
+        Meter.finish({:error, {:limit, :pinned_bytes}}, retained, limits)
+
+      true ->
+        :ok
+    end
+  end
 
   defp decode_budget(donors, limits, retained) do
     extra = 12 * length(donors) + 23
@@ -60,6 +119,75 @@ defmodule Ferricstore.PolicyRuntimeCapture.Observation do
 
       true ->
         %{decoded_words: words, pinned_bytes: retained.pinned_bytes + 8 * extra}
+    end
+  end
+
+  defp decode_values(
+         {:metered, {[], []}, limits, forecast, _, _} = retained,
+         _index,
+         values
+       ) do
+    count = length(values)
+    words = if(count < 2, do: 0, else: 2 * count) + 4
+
+    with {:metered, _, _, _} = paid <- Meter.issue(retained, limits, words, 8 * words) do
+      Meter.finish({:ok, :lists.reverse(values), forecast}, paid, limits)
+    end
+  end
+
+  defp decode_values(
+         {:metered, {[bytes | tail], [prepared | contexts]}, limits, forecast, _, _} = incoming,
+         index,
+         values
+       ) do
+    with {:metered, _, _, _} = requested <- Meter.issue(incoming, limits, 5, 40),
+         result <-
+           Binding.native_estimate({:preflight, [prepared]}, limits, limits, requested, :raw),
+         {{:ok, report}, _, _} <- result,
+         {:metered, _, words, pins} = retained <- Meter.carry(forecast, result, limits) do
+      common_words = report.decoded_words + 18
+      common_pins = report.pinned_bytes + 224
+      failure_words = 87
+      failure_pins = 856
+      room_words = common_words + 5 + failure_words + 5 + 22 + @decode_worker_frame_words
+      room_pins = common_pins + 40 + failure_pins + 40 + 176 + 8 * @decode_worker_frame_words
+
+      cond do
+        words + room_words > limits.decoded_words ->
+          Meter.finish({:error, {:limit, :decoded_words}}, retained, limits)
+
+        pins + room_pins > limits.pinned_bytes ->
+          Meter.finish({:error, {:limit, :pinned_bytes}}, retained, limits)
+
+        true ->
+          with {:metered, _, _, _} = entered <-
+                 Meter.issue(retained, limits, common_words, common_pins) do
+            case TermCodec.decode(bytes) do
+              {:ok, term} when is_binary(prepared) or is_map(prepared) ->
+                with {:metered, _, _, _} = returned <- Meter.issue(entered, limits, 6, 88),
+                     {:metered, _, next_words, next_pins} <-
+                       Meter.issue(
+                         returned,
+                         limits,
+                         12 + @decode_worker_frame_words,
+                         96 + 8 * @decode_worker_frame_words
+                       ) do
+                  decode_values(
+                    {:metered, {tail, contexts}, limits, forecast, next_words, next_pins},
+                    index + 1,
+                    [term | values]
+                  )
+                end
+
+              {:error, reason} when is_binary(prepared) or is_map(prepared) ->
+                with {:metered, _, _, _} = returned <-
+                       Meter.issue(entered, limits, failure_words, failure_pins),
+                     {:metered, _, _, _} = finished <- Meter.issue(returned, limits, 7, 56) do
+                  Meter.finish({:error, {:source_decode, index, reason}}, finished, limits)
+                end
+            end
+          end
+      end
     end
   end
 

@@ -351,8 +351,11 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Binding do
     }
 
   defp preparation_room(words, pins, limits) do
-    with :ok <- check(words, limits.decoded_words, :decoded_words),
-         do: check(pins, limits.pinned_bytes, :pinned_bytes)
+    cond do
+      words > limits.decoded_words -> {:error, {:limit, :decoded_words}}
+      pins > limits.pinned_bytes -> {:error, {:limit, :pinned_bytes}}
+      true -> :ok
+    end
   end
 
   defp check(value, maximum, field),
