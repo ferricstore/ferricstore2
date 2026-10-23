@@ -184,6 +184,25 @@ and releases the permit before sending its funded acknowledgment; public return
 waits for that acknowledgment. Stale actions cannot release a newer grant, and
 unknown issued work or owner loss consumes its unresolved promise and closes.
 
+The separately frozen KernelProfile component batch selects a paired form of
+the existing `budget_register/4`: word and pin coordinates each carry
+`{spent, entry_extra, terminal_extra}`. The four numeric arguments retain their
+native-only contract. The prospective profiled resource uses four immutable
+trailing u64 values; numeric userdata stays 192 bytes and profiled userdata is
+224, priced through the full aligned resource/monitor expression. Configured
+terminal credit must survive registration, reset, reserve and settlement; normal
+entry adds its configured promise before owner exposure. These component inputs
+do not establish the complete public caller/keeper envelope.
+
+The three compiled regressions currently reach the numeric-only kernel's
+`:stale` refusal, preserving all earlier 40 bodies and their six failures in a
+43-test run. Their independent numeric controls, same-operation pin deltas,
+cap154 word-reset discriminator and actual lifecycle observations must execute
+after the separately released kernel body. The tests claim no isolated pin-reset
+or post-close spent-pair observation. Full public E/T, startup/parent/source/
+exception accounting, metered failure prefixes and real settlement ACK remain
+separate required work.
+
 The exact staged contracts and reciprocal reviews are recorded in
 [the architecture review](../reviews/workflow-completion-architecture.md) and
 [Root's release record](../reviews/workflow-completion-coordination.md).

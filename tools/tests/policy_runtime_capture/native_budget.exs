@@ -533,3 +533,5 @@ defmodule Ferricstore.PolicyRuntimeCaptureNativeBudgetTest do
     end
   end
 end
+
+Code.require_file("native_budget/kernel_profile.exs", __DIR__)

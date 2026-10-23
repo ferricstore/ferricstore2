@@ -108,7 +108,27 @@ persisted-policy discovery and FWSO support. Common recovery and public dispatch
 remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
-The current native-capture checkpoint runs **40 tests on macOS: 34 pass and six fail**.
+The current native-capture regression checkpoint runs **43 tests on macOS:
+34 pass and nine fail**. Three new KernelProfile component tests compile and
+reach `:stale` at the first valid paired-tuple registration against the unchanged
+numeric-only NIF. All 40 earlier test bodies remain intact, and the same six
+earlier failure identities remain. Numeric controls in the first two new tests
+execute; later profile, reset, terminal and owner-loss assertions stay masked.
+
+The selected component form adds immutable entry/terminal reservation inputs
+without changing the four numeric arguments' existing behavior. The tests use
+declared component credits, not estimates of complete public BEAM costs. Their
+cap154 sequence distinguishes a configured word reset from an erroneous native
+default; pin reset remains an explicit C-source review obligation. The new file
+has 325 physical lines and its seven test/helper bodies have at most 99.
+Architecture, performance and author reciprocal reviews accept the source.
+All 1,841 repository/compiler/runtime/artifact inputs stayed unchanged during
+execution, excluding only three peer notes; 14 tool bindings and 304 compiler
+inputs were verified. This is preimplementation failure evidence. C/profile/
+lifetime and the broader registered capture bridge still require their separate
+implementation and execution. Full original parity and Linux remain open.
+
+The preceding native-capture checkpoint runs **40 tests on macOS: 34 pass and six fail**.
 The complete frozen repeated-budget-reply regression now passes. Each ordinary
 successful reply adds its funded cost to the keeper-owned bank before sending;
 later attempts retain that bank. Initial admission reserves one ordinary closing
