@@ -754,3 +754,37 @@ workspace/native validation. This private component does not complete public
 Policy.set/Flow ETF semantics, distributed migration, governing-owner/public
 Claim, accepted consensus/transport/strong reads, offline lineage, original
 source setup/profile parity, native Linux or the M1–M8 exit gates.
+
+
+## Selected atomic-start committed recovery
+
+The eight regressions saved in `ae7a0ce` precede this three-function integration.
+The existing borrowed Normal header admits only the new exact root1/intent7 pair
+as profile7. Global encoded admission comes first; ordinary framing, bounded
+identifiers, complete digest and allowed pairing precede HLC/wall validation.
+Supported Normal dispatch follows the complete stamp, preserving legacy malformed
+stamp precedence. Original-policy delegation and the shared legacy header remain
+unchanged. Header success verifies no command body, derived intent, EOF or accepted
+consensus authority.
+
+Historical audit calls the full atomic-start preparer under the existing
+`W - base - 512` allowance and namespace ordering. Committed replay invokes the
+actual dedicated transaction driver, preserving expected-control comparison,
+consumed commit, original retained response and completed-prefix semantics.
+Existing purge/snapshot/matching-received/fresh-restore callers share these paths;
+trusted received snapshots still require their existing caller authority.
+
+Point ownership remains `J = 512 + E`; singleton audit `D` already includes `E`
+and decoded scope. Replay still prospectively admits
+`base + max(J + Q, 512 + Q + normalW)` before copying scope. The driver bank already
+owns `E` and one reserved `L`; the returned outcome drops before scope and the
+next point. No helper, owner, queue, response clone, bank, refund, dependency,
+layout, public-wire change or new runtime module is introduced.
+
+All eight frozen tests pass in the full 996-test macOS checkpoint, including the
+44 older snapshot cases filtered from focused execution. Exact comparison retains
+all 988 earlier tests. Independent architecture/performance reviews accept the
+three runtime files (maximum 253 physical lines) and their 19 bodies (maximum 91).
+Full original profiles/parity, Linux execution, public dispatch and the ordered
+consensus/service milestone gates remain required. Correctness smokes supply no
+measured allocation, RSS, latency or throughput improvement.

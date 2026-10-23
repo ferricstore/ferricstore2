@@ -8,8 +8,8 @@ use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlState, EntryIdentity, EntryStamp, PreparedDigest};
 use wf_ports::log::{
     CodecError, RaftLogEntry, RaftLogStore, measure_control_entry, normal_recovery_header,
-    prepare_claim_phase, prepare_independent_record_batch, prepare_public_mutation,
-    prepare_record_batch, verify_complete_core_policy_patch_frame,
+    prepare_atomic_start, prepare_claim_phase, prepare_independent_record_batch,
+    prepare_public_mutation, prepare_record_batch, verify_complete_core_policy_patch_frame,
 };
 use wf_ports::state::GroupApplyStore;
 use wf_storage::log::RedbLogStore;
@@ -203,6 +203,7 @@ fn audit_normal(
         match profile {
             5 => prepare_record_batch(body, codec, available),
             6 => prepare_independent_record_batch(body, codec, available),
+            7 => prepare_atomic_start(body, codec, available),
             1 => prepare_public_mutation(body, codec, available),
             _ => return Err(Error::UnsupportedEntry),
         }

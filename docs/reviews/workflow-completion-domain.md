@@ -49941,3 +49941,72 @@ no source edits, compiler/test/workload/formatter/Git/VM/native/benchmark/probe 
 artifact. Root alone owns SAVE and the separate selected three-function body release.
 Full original parity, Linux/macOS and M1–M8 objective remains active. Finite ordinary
 reciprocal review complete; no additional readiness gate or permission requested.
+
+
+### D3 BODY1 stopped three-function handoff
+
+Whole-read Root release4302599+1658/93f67a45 after actual TEST1 SAVE
+ ae7a0ce8e37faebacb52eb693ce8c4a0be03daae, selected ARCH4504567+13755/66c28d70
+and4518322+331/314eae40, and all3 current beforeimages before coding.
+Changed ONLY normal_recovery_header, audit_normal and replay::normal plus the
+latter two selected imports. No new file/helper/type/model/module/API or other delta.
+
+Stopped author inventory (LF/bytes/SHA256; changed function lines):
+- common.rs164/5769/8207baa25b214a8b023e33ae50e01c525cda206b0bcef1602fa120ae249dc896;43.
+- join.rs253/8726/4dddadd0b67f381aa05d8a0eb2276ffbae1c1422836610971bb65a7a4a0c7ab1;41.
+- replay.rs184/6601/821e78ee751dd8c2df552f73948411ed7229153f159ca5f19651815934d6763b;91.
+All19 actual bodies<=100, maximum91; all3 files<=400 without packing or waiver.
+
+Header parsing borrows only, keeps global cap/root9 delegation first, validates
+ordinary FWCP/version/root-range/IDs/request/all32 digest bytes/allowed pair before
+HLC+wall, and selects the supported Normal pair after stamp. Exact1/7 gains7;
+legacy malformed-stamp precedence and common::header/original_policy_header stay
+literal. Audit7 invokes actual prepare under unchanged W-base-512/namespace/drop.
+Replay7 invokes the actual dedicated driver under unchanged scope/owner admission,
+expected-control relation and outcome/scope drops. No E/J/Q/L/O/F/K fee or owner added.
+
+Actual in-memory whole-file inverses restore ALL3 exact beforeimages by replacing
+only those3 functions and2 imports:5001/2e9ed02f,8641/1bff4e59,6471/623430a5.
+At STOP all1520 held inputs (excluding3 owned paths/4 append-only notes) match their
+captured hashes at compact sorted JSON SHA256
+433e76d45505ebedff4f6169562a28146f50fd73ce0de4e93ebbd6ca0a77d28c,
+including every frozen test and all other runtime/config/Cargo/ledger/native/reference.
+Full beforeimages/hash manifest are retained for this author handoff.
+
+All3 runtime buffers STOPPED and Root/reviewers directly notified BEFORE this note;
+Root may format/validate while only this note appends. No author formatter/compiler/
+test/Git/VM/native/benchmark/probe/artifact. Actual GREEN and canonical reviews remain
+Root/peer custody; full both-OS/parity/M1–M8 objective remains active and incomplete.
+
+
+### D3 BODY1 final source and focused GREEN — DOMAIN reciprocal acceptance
+
+Actually whole/hash-read ARCH4527047+3071/774207de and PERF3463647+4555/1e6e6130
+plus3468202+851/10334e91. Whole-read/rehashed final common164/5765/2cb6d1e4,
+join253/8726/4dddadd0 and replay184/6601/821e78ee; no scoped discrepancy.
+The only Root lint repair5|6|7=>5..=7 is the identical u16 set. Own unique in-memory
+inverse reconstructs ENTIRE author5769/8207baa2. All9 frozen TEST1 full hashes
+independently remain exact. Header43/audit41/normal91 keep19 bodies/max91 and400/100.
+
+Borrowed-header cap/root/digest/pair/stamp order and root9/closed legacy header remain
+as selected. Actual prepare7 and dedicated driver7 share unchanged available,
+namespace/control, scope-admission and outcome/scope/point retirement paths. No new
+owner, E/J/Q/L/O/F/K fee, clone, helper/API/layout or authority certificate appears.
+Current full baseline inverses are separately confirmed in ARCH's saved-blob proof.
+
+Actually whole/hash-read Root quality6194271+9494/cccc749b306f9d648774a5e9e1009f6620e9af1e9e2045a6de5dacfb2c296067
+and focused6203765+5130/8f6b239ffed589919cf13ed683f5b745e5df7adc805794c5accf23791480ae02:
+all10 actual argv/header/raw/EXIT0/UNCHANGED True phases at1524/
+e186b05a4c83c863f52723bafe78bee587df2ae70875545d2eb70e2de4cc9fbd.
+Quality7 pass, architecture50; focused3/22/4 pass. Own exact target/name/status map
+comparison against saved RED preserves ALL23 preceding passes and changes ONLY
+six FAIL toOK, with the same29 identities. Thus all8 new regressions pass; old
+header2/recovery19 and existing storage controls2 stay green. Later header/R2/R3,
+ordered same-tail inline7/8, purged startup and both received compositions now finish.
+Snapshot44 older cases remain explicitly FILTERED here, not full runtime evidence.
+
+No scoped blocker. Root's full eleven-command validation is still running and is
+not accepted or called GREEN by this note. Only this existing DOMAIN append; no
+source edit/compiler/test/workload/formatter/Git/VM/native/benchmark/probe/artifact.
+Full parity, Linux/macOS and M1–M8 completion remain separate active obligations.
+Finite reciprocal source/focused review complete, without a new gate.

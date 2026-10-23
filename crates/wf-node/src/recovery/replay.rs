@@ -10,9 +10,9 @@ use wf_ports::state::GroupApplyStore;
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
     ClaimTransactionLimits, ClaimTransactionOutcome, RecordBatchTransactionOutcome,
-    apply_claim_transaction, apply_complete_core_policy_patch_transaction,
-    apply_independent_record_batch_transaction, apply_public_mutation_transaction,
-    apply_record_batch_transaction,
+    apply_atomic_start_transaction, apply_claim_transaction,
+    apply_complete_core_policy_patch_transaction, apply_independent_record_batch_transaction,
+    apply_public_mutation_transaction, apply_record_batch_transaction,
 };
 use wf_types::identity::{GroupId, RecoveryId, TenantId};
 
@@ -156,6 +156,7 @@ fn normal(
                 driver,
             ),
             1 => apply_public_mutation_transaction(state, &scope, entry.body(), entry.id(), driver),
+            7 => apply_atomic_start_transaction(state, &scope, entry.body(), entry.id(), driver),
             _ => return Err(Error::UnsupportedEntry),
         }
         .map_err(Error::Normal)?

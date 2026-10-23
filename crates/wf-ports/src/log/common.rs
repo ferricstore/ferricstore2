@@ -20,20 +20,37 @@ pub fn normal_recovery_header(
         return original_policy_header(encoded, limits);
     }
     let mut reader = Reader::new(encoded, limits);
-    let header = header(&mut reader)?;
-    let profile = match (header.operation_tag, header.intent.version()) {
+    if reader.take(4)? != b"FWCP" {
+        return Err(CodecError::Malformed);
+    }
+    if reader.u16()? != 1 {
+        return Err(CodecError::UnsupportedVersion);
+    }
+    let operation_tag = reader.byte()?;
+    if !matches!(operation_tag, 1..=5) {
+        return Err(CodecError::UnsupportedTag);
+    }
+    let tenant = reader.nonempty(8_192)?;
+    let group = reader.nonempty(256)?;
+    let recovery = reader.nonempty(256)?;
+    let _request = reader.nonempty(256)?;
+    let version = reader.u16()?;
+    let _digest = reader.take(32)?;
+    if !matches!((version, operation_tag), (1, _) | (5..=7, 1) | (2, 5)) {
+        return Err(CodecError::UnsupportedVersion);
+    }
+    let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;
+    let stamp = CommittedTime::new(hlc, reader.u64()?).map_err(|_| CodecError::Malformed)?;
+    let profile = match (operation_tag, version) {
         (1, 5) => 5,
         (1, 6) => 6,
+        (1, 7) => 7,
         (4, 1) => 1,
         (3, 1) => 3,
         (5, 2) => 2,
         _ => return Err(CodecError::UnsupportedTag),
     };
-    Ok((
-        profile,
-        [header.tenant, header.group, header.recovery],
-        header.stamp,
-    ))
+    Ok((profile, [tenant, group, recovery], stamp))
 }
 
 fn original_policy_header(

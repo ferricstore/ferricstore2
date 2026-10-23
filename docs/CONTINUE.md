@@ -5,7 +5,30 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The next atomic-start recovery regression checkpoint compiles cleanly and runs
+The latest full Rust checkpoint passes **996 tests across 90 targets on macOS**,
+with zero failures, ignored or filtered tests, plus **six compile-fail examples
+across 15 documentation targets**. All eleven checks pass: formatting, workspace
+compilation, strict Clippy, warnings-denied documentation, all 50 architecture
+checks, reference/progress, four cached offline dependency-audit categories and
+whitespace. All 1,524 captured inputs stayed unchanged during validation, excluding
+only the three append-only peer notes. Exact target/executable/name/status
+comparison preserves all 988 preceding tests and adds only the eight frozen
+recovery regressions. All 48 snapshot and 105 state-store tests execute; both
+benchmark correctness smokes pass. No measured performance gain is claimed.
+
+The atomic-start recovery integration now passes **all eight regressions saved
+in `ae7a0ce` before implementation**. The borrowed header dispatches profile7;
+historical audit verifies the full original body; committed replay uses the real
+consumed transaction driver. Restart, purge, matching received install, fresh
+restore and original-response replay after completion all pass. Ordered inline7
+refusal followed by inline8 success on the same pending tail proves original
+response validation precedes current-state reads. Architecture and performance
+independently reviewed the source, execution and old-test conservation. Only three
+existing runtime functions changed; their files have at most 253 physical lines
+and their 19 function bodies at most 91. Public dispatch, full original Elixir
+parity, Linux acceptance and the wider runtime milestones remain open.
+
+The preceding atomic-start recovery regression checkpoint compiles cleanly and runs
 **eight new tests on macOS: two snapshot controls pass and six recovery cases
 fail**. The header case reaches `UnsupportedVersion`; three committed-recovery
 cases reach `Codec(UnsupportedVersion)`; purged startup and trusted received
@@ -24,7 +47,7 @@ saved checkpoint. The nine test files fit 600 physical lines and their function
 bodies fit 100. This is preimplementation failure evidence, not completed
 committed-log recovery, full original Elixir parity or Linux acceptance.
 
-The latest full Rust checkpoint passes **988 tests across 90 targets on macOS**,
+The preceding full Rust checkpoint passes **988 tests across 90 targets on macOS**,
 with zero failures, ignored or filtered tests, plus **six compile-fail examples
 across 15 documentation targets**. All eleven local checks pass, including strict
 Clippy, warnings-denied documentation, all 50 architecture checks, reference and

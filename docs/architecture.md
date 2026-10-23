@@ -169,6 +169,16 @@ remain separate checks. All seven frozen regressions now pass within the full
 separate work. See
 [the stored integration contract](adr/006-private-prepared-command-codec.md#selected-stored-atomic-start-integration).
 
+Eight recovery regressions were saved in `ae7a0ce` before the three-function
+integration. The existing borrowed Normal header now classifies exact root1/
+intent7 as profile7; it grants no body or consensus authority. Historical audit
+uses the complete atomic-start preparer, and committed replay uses the same real
+transaction driver. Existing snapshot and trusted received compositions inherit
+these routes without another owner, response copy or resource bank. All eight
+pass within the 996-test macOS checkpoint; public dispatch, full source parity
+and Linux acceptance remain open. See
+[the recovery contract](adr/007-durable-log-storage.md#selected-atomic-start-committed-recovery).
+
 ## Command execution and durability
 
 1. Authenticate and enforce tenant, request and payload bounds at the edge. Construct typed command and idempotency key.
