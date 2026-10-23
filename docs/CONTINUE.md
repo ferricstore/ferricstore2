@@ -124,7 +124,32 @@ persisted-policy discovery and FWSO support. Common recovery and public dispatch
 remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
-The current native-capture checkpoint runs **47 tests on macOS: 39 pass and
+The current native-capture regression checkpoint runs **51 tests on macOS:
+39 pass and 12 fail**. Four new tests call the existing Input APIs with an explicit
+paid-work mode. Prepare and bind reach real `BadMapError` failures; decode and
+query return their original errors without the required paid-work totals. Raw
+controls pass before those failures. Later single-encoder, copy-reservation,
+decoder-estimate and query-prefix assertions remain masked.
+
+Exact failure comparison preserves all eight preceding failure identities and
+adds only the four paid-prefix cases. The new child has 193 physical lines, four
+tests and two helpers, with bodies at most 55 lines. Its 47-byte require seam
+preserves the entire old 584-line parent and brings it to 586. All 1,847 captured
+repository/runtime/compiler/artifact inputs stayed unchanged during execution,
+excluding only the three peer notes; 18 tool sources and 305 compiler inputs are
+bound, with the native library unchanged. Architecture/reference/progress and
+whitespace checks pass. This is genuine new-mode failure evidence, not completed
+Input metering, the public budget bridge or original workflow parity.
+
+Separate compiled inspection covers the complete current Input atom-lookup catch
+and pinned TermCodec decoder clauses. Both use their direct BIFs without cooked
+stacktrace construction or exception normalization. Executing module identities
+match the inspected Input and decoder identities. These premises do not supply
+complete allocation prices; edited Input and moved Query code need their own
+compiled binding. Source-reviewed estimator-report, native-call and binary-copy
+operands support the selected Input/Meter/Query implementation successor.
+
+The preceding SourceGuard checkpoint runs **47 tests on macOS: 39 pass and
 eight fail**. Both SourceGuard cases frozen in `de4aea1` now complete: absent
 source returns `source_code_changed`, stays unloaded and produces no autoload
 event. Exact failure comparison removes only those two failures and preserves
