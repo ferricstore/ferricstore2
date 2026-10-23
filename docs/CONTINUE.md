@@ -131,17 +131,27 @@ repository inputs stayed unchanged through that sequence, excluding only the
 three append-only peer review notes. Architecture and performance reviews accept
 the source and its boundaries. No fresh advisory or Linux result is claimed.
 
-The new atomic StartAndClaim interface represents the selected five input fields
-and explicitly returns UnsupportedOperation after the existing global guards.
-Copied-input admission and command/intent refusals preserve the closed profiles;
-no token, record or history is constructed. The additional architecture test
-checks existing purity and facade rules. Complete source inverses preserve all
-old behavior, and the checkpoint above passes. The atomic body remains pending:
-save this shell, create the three source-case tests and two resource/guard
-controls, then freeze compiled positive runtime RED before releasing behavior.
-The selected contract creates one version-1/attempt-1/fence-1 running record and
-one Created event; ordinary Create followed by Claim is not equivalent. Public
-and durable integration, original profiles and both-OS acceptance remain open.
+The atomic StartAndClaim tests now run against the saved refusing shell:
+**35 focused tests: 30 pass and five fail**, with no ignored or filtered tests.
+Formatting, focused compilation and strict Clippy pass. The first valid
+custom-cap request reaches the actual UnsupportedOperation rejection; the FIFO
+and first scalar checks also reach that refusal. Both source-publisher cases
+stop at generic command rejection. Later field, guard, history, Retry and
+resource observations remain unexecuted. All 1,509 captured inputs stayed
+unchanged during the sequence, excluding only the three peer review notes.
+The current tree intentionally contains these five tests awaiting behavior;
+the 969-test passing checkpoint above predates them.
+
+The selected interface represents five input fields and returns
+UnsupportedOperation after the existing global guards. Copied-input admission
+and command/intent refusals preserve the closed profiles; no token, record or
+history is constructed. The tests preserve three pinned source scenarios and
+two resource/error-order controls in a 587-line module and 159-line FIFO child;
+every function remains at most 100 physical lines. Freeze these compiled
+runtime failures and independent review before releasing the atomic body.
+The selected behavior creates one version-1/attempt-1/fence-1 running record and
+one Created event. Public and durable integration, original profiles, full
+Elixir parity and both-OS acceptance remain open.
 
 The newest source-derived FIFO counterpart uses limit one to claim the queued
 head, reclaim that expired running head for the new worker, then observe the

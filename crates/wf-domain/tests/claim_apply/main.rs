@@ -48,6 +48,7 @@ mod fifo_transition_unblock;
 mod observed;
 mod replay_models;
 mod source_scenarios;
+mod start_and_claim;
 
 type TestError = Box<dyn std::error::Error>;
 type TestResult = Result<(), TestError>;
