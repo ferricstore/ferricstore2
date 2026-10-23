@@ -1,6 +1,7 @@
 defmodule Ferricstore.PolicyRuntimeCapture.Observation do
   @moduledoc false
   alias Ferricstore.PolicyRuntimeCapture.Input
+  alias Ferricstore.PolicyRuntimeCapture.Input.{Meter, Query}
   alias Ferricstore.PolicyRuntimeCapture.Native
   alias Ferricstore.TermCodec
 
@@ -101,6 +102,49 @@ defmodule Ferricstore.PolicyRuntimeCapture.Observation do
   end
 
   @doc false
+  def query_extension(state, next, {:metered, _, _, _} = incoming) do
+    limits = state.limits
+
+    count =
+      length(state.queries.atoms) + length(next.atoms) +
+        length(state.queries.exports) + length(next.exports)
+
+    case count <= limits.facts do
+      true ->
+        with {:metered, atoms, _, _, _, _} = atom_state <-
+               query_unique(state.queries.atoms, next.atoms, %{}, [], limits, incoming),
+             {:metered, exports, _, _, _, _} = export_state <-
+               query_unique(state.queries.exports, next.exports, %{}, [], limits, atom_state),
+             {:metered, _, _, _} = paid <- Meter.issue(export_state, limits, 8, 64) do
+          combined = %{atoms: atoms, exports: exports}
+          result = Input.query_admission(combined, limits, paid)
+
+          case result do
+            {{:ok, observed, admission}, _, _} ->
+              with {:metered, _, _, _} = resumed <- Meter.carry(admission, result, limits) do
+                same =
+                  query_same(state.queries.atoms, state.observed.atoms, observed.atoms) and
+                    query_same(state.queries.exports, state.observed.exports, observed.exports)
+
+                if same do
+                  with {:metered, _, _, _} = finished <- Meter.issue(resumed, limits, 5, 40) do
+                    Meter.finish({:ok, combined, observed, admission}, finished, limits)
+                  end
+                else
+                  Meter.finish({:error, :runtime_context_changed}, resumed, limits)
+                end
+              end
+
+            terminal ->
+              terminal
+          end
+        end
+
+      false ->
+        Meter.finish({:error, {:limit, :facts}}, incoming, limits)
+    end
+  end
+
   def query_extension(state, next, retained) do
     count =
       length(state.queries.atoms) + length(next.atoms) +
@@ -124,6 +168,40 @@ defmodule Ferricstore.PolicyRuntimeCapture.Observation do
           else: {:error, :runtime_context_changed}
       end
     end
+  end
+
+  defp query_unique([], [_ | _] = next, seen, acc, limits, retained),
+    do: query_unique(next, [], seen, acc, limits, retained)
+
+  defp query_unique([], [], _seen, acc, limits, retained) do
+    count = length(acc)
+    reversal_words = if count < 2, do: 0, else: 2 * count
+    words = reversal_words + 7
+
+    with {:metered, forecast, paid_words, paid_pins} <-
+           Meter.issue(retained, limits, words, 8 * words) do
+      {:metered, :lists.reverse(acc), limits, forecast, paid_words, paid_pins}
+    end
+  end
+
+  defp query_unique([item | old], next, seen, acc, limits, retained) do
+    if :erlang.is_map_key(item, seen) do
+      query_unique(old, next, seen, acc, limits, retained)
+    else
+      words = Query.query_put_words(map_size(seen)) + 2
+
+      with {:metered, _, _, _} = paid <- Meter.issue(retained, limits, words, 8 * words) do
+        query_unique(old, next, Map.put(seen, item, true), [item | acc], limits, paid)
+      end
+    end
+  end
+
+  defp query_same([], _old, _new), do: true
+
+  defp query_same([key | tail], old, new) do
+    if :erlang.map_get(key, old) == :erlang.map_get(key, new),
+      do: query_same(tail, old, new),
+      else: false
   end
 
   defp output_limit(capture, limits),

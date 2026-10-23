@@ -14,16 +14,21 @@ value. Standard B-tree node allocation remains outside paid admission. All four
 original standalone Elixir cases pass; full original profiles and Linux remain
 required.
 
-The current native observation checkpoint runs **57 tests: 47 pass and ten
-fail**. Both new regressions expose genuine context-comparison and known-facts
-accounting failures; exact identity comparison preserves the eight preceding
-public/keeper failures and adds only these two. Review corrected the owned fixture
-teardown. An earlier concurrent run timed out in an existing wrong-VM startup
-case; the serial rerun passes that check with its original timeout and no filters.
-The raw extraction preserves all old bodies and tests. Its actual append/map
-BEAM and nine executing module identities are bound. The reviewed paid two-file
-implementation is stopped in isolation, awaiting Root integration, compiled
-validation and execution. No whole native/public accounting GREEN is claimed.
+The current native observation checkpoint runs **57 tests: 49 pass and eight
+fail**. Both observation regressions saved before implementation now complete;
+exact failure comparison removes only those two names and preserves the six
+older public Budget-protocol and two keeper-debt failures. The paid query branch
+uses funded tail workers, one shared map tariff and coherent snapshot lookups;
+raw behavior remains literal. Actual compiled code binds issuance before map,
+cons, reversal, live-tag and result construction. All nine executing module
+identities match inspection. The complete public bridge, genuine initial root
+ownership and full control envelopes remain required. No whole native GREEN,
+physical allocation/GC/RSS bound or measured speedup is claimed. Review also fixed
+fixture teardown; serial validation passes the existing startup check with its
+original timeout. All six original standalone ManyItemOpts cases pass; their Rust
+batch now has explicit architecture approval and is in test-first preparation;
+its callable rejecting APIs and tests will precede implementation. No Rust
+ManyItemOpts parity mappings are claimed yet.
 
 The latest full Rust checkpoint passes **1,023 tests across 93
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
@@ -50,7 +55,7 @@ the implementation and assertion links. All four original standalone Elixir
 cases also pass; full original project setup/profiles and Linux acceptance remain
 open.
 
-The current native-capture checkpoint runs **55 tests on macOS: 47 pass and
+The preceding native-capture checkpoint runs **55 tests on macOS: 47 pass and
 eight fail**. Both normalization/restoration regressions saved before the body in
 `96516f1` now pass; exact failure comparison removes only those two names and
 preserves the six existing public Budget-protocol and two keeper-debt failures.

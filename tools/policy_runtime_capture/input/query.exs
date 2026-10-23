@@ -297,9 +297,10 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input.Query do
     end
   end
 
-  defp query_put_words(size) when size < 32, do: 19 + 2 * size
-  defp query_put_words(32), do: 111_048
-  defp query_put_words(size), do: size + 487
+  @doc false
+  def query_put_words(size) when size < 32, do: 19 + 2 * size
+  def query_put_words(32), do: 111_048
+  def query_put_words(size), do: size + 487
 
   defp query_budget(words, bytes, limits, {:metered, _, _, _} = retained) do
     case Meter.issue(retained, limits, 0, 0) do
