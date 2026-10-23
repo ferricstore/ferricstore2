@@ -182,18 +182,21 @@ within600 and every function within100; no parser, dependency, allowlist or size
 exception is selected.
 
 These source checks are distinct from the passing pure atomic behavior and
-generated-owner admission tests. Command/intent codecs and public/independent
+generated-owner admission tests. Shared legacy codecs and public/independent
 profiles remain closed. Source enforcement does not establish public or durable
 support, complete original scenarios or Linux/macOS parity.
 
-The separate refusing codec interface adds exactly
-`log::record_batch::atomic_start` to the existing pure-source matches arm.
-`atomic_start_retained_profile_stays_pure_and_server_side` checks approved
-imports, filesystem/environment aliases, async/await, immutable/mutable globals,
-unsafe blocks and all six client-facade exports. Its backend neighbor remains
-outside that exact clause. No descendant-prefix or parser/allowlist exemption
-is added. Primitive intent7 construction enables no frame, retained-response,
-storage or recovery profile; the six interfaces return unsupported errors.
+The private atomic-start body selects four exact pure-source matches:
+`log::record_batch::atomic_start`, its `codec` and `response` children, and
+`response::scan`. The existing
+`atomic_start_retained_profile_stays_pure_and_server_side` matrix covers approved
+imports, filesystem/environment aliases, async/await, immutable/mutable globals
+and unsafe blocks for each exact module. Each similarly named `_backend`
+neighbor remains outside those clauses. All six client-facade exports stay
+forbidden. No descendant-prefix or parser/allowlist exemption is added. Six
+compiled runtime regressions were saved before body implementation; all six now
+pass and the expanded matrix passes within all 50 architecture checks. Storage,
+policy discovery and recovery are separate gates.
 
 ## Pure storage value boundary
 

@@ -15,6 +15,9 @@ impl Inspector<'_, '_> {
                 | "log::record_batch::intent"
                 | "log::record_batch::response"
                 | "log::record_batch::atomic_start"
+                | "log::record_batch::atomic_start::codec"
+                | "log::record_batch::atomic_start::response"
+                | "log::record_batch::atomic_start::response::scan"
         ) || [
             "log::record_batch::phase",
             "log::record_batch::fresh",

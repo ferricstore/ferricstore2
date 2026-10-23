@@ -227,13 +227,36 @@ both-OS/profile acceptance remain open. The existing private wire and
 independent/public operation profiles stay closed;
 see [ADR-006](006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition).
 
-The next private codec stage provides an explicitly refusing interface only.
-`ClientIntent::atomic_start` constructs the mathematical intent7 identity,
-without verifying a digest or granting framing, resource or apply authority.
-Six ports entry points return unsupported errors; no frame, Fresh plan or
-retained response is accepted. Compiled positive runtime failures must still
-be saved before their behavioral implementation. No additional source parity,
-durability or OS result follows from this interface.
+The private codec body is selected after the refusing interface and six compiled
+positive `UnsupportedTag` regressions saved in `37afcf6`. The unchanged regressions
+now pass within the 22-test focused target and full 981-test macOS checkpoint.
+`ClientIntent::atomic_start` remains only a mathematical intent7 identity; the
+dedicated decoder must validate the complete borrowed frame and
+admit decoded ownership before materialization. Existing shared codecs stay
+closed. See the [isolated codec contract](006-private-prepared-command-codec.md#selected-private-atomic-start-codec).
+
+Fresh must consume the same decoded owner and actual touched authority, preserve
+the indexed guard order and bind the actual full processing log and execution
+time to the original outcome. Retain the actual single Created postimage,
+history and ordering, moving the response Vec once into the existing outcome
+Box. Drop decoded operation, isolation, keys and filters before late ownership.
+For singleton encoded bytes E, decision cap B, header bytes H, actual response
+length R and declared additional live bytes L, preserve decoder admission
+`4E + B + 3072`, Fresh staging `4E + 2B + 3520 + L`, and checked late ownership
+`E + B + H + 512 + R + L`. The scalar531 account is unchanged for older routes;
+it is replaced by512+R only here. Measure and check R and all represented value
+bounds before allocating output. These are scoped logical accounts, not native
+allocation, capacity, RSS or engine-copy measurements.
+
+After one generic point gate, only its Replay branch validates the original
+response using original intent/version/full log/time and the decoded request's
+current captured limits. Require exact retained status and accepted count1 or
+rejected countNone before exposing Complete. Keep earlier log-replay, conflict,
+expiry and authority/response-length error precedence. Replay processing time
+may advance while original log/time/bytes/expiry stay unchanged. Its syntax
+check supplies neither storage provenance nor same-index term/node proof.
+Storage publication, committed policy discovery, recovery, public profiles,
+full source parity and both supported OS results remain separate obligations.
 
 ## Verification and deployment gates
 

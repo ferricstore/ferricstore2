@@ -319,42 +319,48 @@ fn start_and_claim_core_stays_pure_and_server_side() -> CheckResult<()> {
 
 #[test]
 fn atomic_start_retained_profile_stays_pure_and_server_side() -> CheckResult<()> {
-    let module = "log::record_batch::atomic_start";
-    assert_eq!(
-        source_check(
-            "wf-ports",
-            module,
-            "use std::collections::BTreeMap; use wf_domain::workflow::{request, indexed, admission}; use wf_types::version;"
-        )?,
-        Vec::<String>::new()
-    );
-    for (source, diagnosis) in [
-        ("use std::fs;", "standard-library module"),
-        ("use std::env;", "standard-library module"),
-        (
-            "use std as hidden; pub use hidden::env;",
-            "standard-library module",
-        ),
-        ("pub async fn effect() {}", "declares async behavior"),
-        ("fn hidden() { future.await; }", "awaits effects"),
-        ("static GLOBAL: u64 = 0;", "declares global state"),
-        ("static mut GLOBAL: u64 = 0;", "declares global state"),
-        ("fn hidden() { unsafe {} }", "unsafe block"),
+    for module in [
+        "log::record_batch::atomic_start",
+        "log::record_batch::atomic_start::codec",
+        "log::record_batch::atomic_start::response",
+        "log::record_batch::atomic_start::response::scan",
     ] {
-        let findings = source_check("wf-ports", module, source)?;
-        assert!(
-            findings.iter().any(|finding| finding.contains(diagnosis)),
-            "{module}: missing {diagnosis}: {findings:?}"
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                module,
+                "use std::collections::BTreeMap; use wf_domain::workflow::{request, indexed, admission}; use wf_types::version;"
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::fs;", "standard-library module"),
+            ("use std::env;", "standard-library module"),
+            (
+                "use std as hidden; pub use hidden::env;",
+                "standard-library module",
+            ),
+            ("pub async fn effect() {}", "declares async behavior"),
+            ("fn hidden() { future.await; }", "awaits effects"),
+            ("static GLOBAL: u64 = 0;", "declares global state"),
+            ("static mut GLOBAL: u64 = 0;", "declares global state"),
+            ("fn hidden() { unsafe {} }", "unsafe block"),
+        ] {
+            let findings = source_check("wf-ports", module, source)?;
+            assert!(
+                findings.iter().any(|finding| finding.contains(diagnosis)),
+                "{module}: missing {diagnosis}: {findings:?}"
+            );
+        }
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                &format!("{module}_backend"),
+                "use std::fs; pub async fn effect() {} static GLOBAL: u64 = 0;"
+            )?,
+            Vec::<String>::new()
         );
     }
-    assert_eq!(
-        source_check(
-            "wf-ports",
-            "log::record_batch::atomic_start_backend",
-            "use std::fs; pub async fn effect() {} static GLOBAL: u64 = 0;"
-        )?,
-        Vec::<String>::new()
-    );
     for name in [
         "encode_atomic_start",
         "prepare_atomic_start",

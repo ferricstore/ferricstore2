@@ -81,7 +81,7 @@ pub(in crate::log) fn push_rejection(
     Ok(())
 }
 
-fn domain(reason: DomainError) -> (u8, Option<u8>) {
+pub(in crate::log::record_batch) fn domain(reason: DomainError) -> (u8, Option<u8>) {
     let code = match reason {
         DomainError::NotFound => 0,
         DomainError::AlreadyExists => 1,

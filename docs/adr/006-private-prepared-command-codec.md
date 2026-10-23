@@ -1228,27 +1228,79 @@ unsupported. Existing decoder/tag grammar and independent/public allowlists stay
 closed. No operation, response or history tag/version is added by that core stage.
 
 The [selected pure StartAndClaim core](004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
-also remains outside this eight-mutation profile. Both command and intent
-encoders explicitly return `UnsupportedTag`; value inspection returns no
-supported value shape. Decoder grammar and independent/public allowlists stay
+also remains outside this eight-mutation profile. Both shared command and intent
+encoders explicitly return `UnsupportedTag`; value inspection within those
+profiles returns no supported value shape. Decoder grammar and independent/public allowlists stay
 closed. Storage's existing Create-only policy discovery does not discover
 StartAndClaim policy; that durable integration remains required separately.
 The passing pure body supplies no public or durable operation support.
 
-The separate atomic-start interface now reserves six server-side functions.
-`encode_atomic_start` returns `UnsupportedTag`; `prepare_atomic_start`,
-`inspect_atomic_start_point`, `decide_fresh_atomic_start_touched`,
-`atomic_start_retained_summary` and `atomic_start_response_matches` return
-`UnsupportedVersion`. The matcher returns an error rather than a match verdict.
-`ClientIntent::atomic_start` constructs registry7 as a primitive digest identity;
-the version1-only generic constructor is unchanged. No new frame/tag grammar,
-value inspection, supported retained-version pair, policy discovery, transaction
-binding or storage/recovery dispatch is enabled. The later private data response
-must retain the actual leased postimage and original outcome. Compiled runtime
-RED, implementation and durable/public/profile acceptance remain required.
-The existing generic response1 constructor is unchanged; it does not independently
-reject every mathematical intent7 value. Stored-outcome scanning still rejects
-intent7, and no atomic-start retained data profile is enabled.
+### Selected private atomic-start codec
+
+Six server-side functions retain their existing signatures:
+`encode_atomic_start`, `prepare_atomic_start`, `inspect_atomic_start_point`,
+`decide_fresh_atomic_start_touched`, `atomic_start_retained_summary` and
+`atomic_start_response_matches`. Six compiled regressions reached a valid first
+encode and failed with `UnsupportedTag`; they were frozen in `37afcf6` before
+this body release. All six now pass within the 22-test focused target and full
+981-test macOS checkpoint. The feature root and three private
+codec/response/response-scan children introduce no new
+type, public API, dependency or legacy decoder allowance.
+
+The isolated prepared grammar is FWCP format1, top-level Batch1, intent7,
+exactly one item and item tag11. Caller intent hashes `WF-ATOMIC-START`, NUL,
+`V7`, NUL, then fixed-width big-endian length-prefixed raw tenant, partition,
+ID, type, logical initial state and worker, followed by lease, priority and
+explicit payload absence/presence/content. It has no V5 batch count or opcode.
+Request/group/recovery identity and coherent prepared command time/stamp are
+excluded from caller intent but must survive exact frame encoding/decoding.
+Borrowed count, field, key-length, optionality and EOF checks precede owned
+materialization and use the existing checked decoder admission. The primitive
+intent constructor authenticates no digest or origin. Shared command/intent
+codecs and independent/public operation profiles stay closed.
+
+The new retained response is FWAS format1, externally paired as response4 with
+intent7. One accepted/rejected kind follows its six-byte prefix. Accepted data
+represents the actual one-record Changed/expectedNone Created plan, full leased
+postimage, raw worker/token, v1/fence1/attempt1, original times, ordering and
+payload presence; fresh result/error remain absent. Rejected data retains the
+exact indexed business reason, including local DirectRunningFifoEntry, without
+an accepted plan or count. Accepted summary is Some(1), rejection is None.
+The old rejection grammar stays unchanged. Writer measurement, allocation and
+verification share one grammar; a matcher scans the complete actual bytes
+before comparing the actual plan. Valid different content yields false;
+malformed/profile/cap errors remain errors.
+
+Only the primitive outcome constructor gains response4/intent7 with Accepted or
+IndexedRejected. Its broad existing response1 branch is unchanged and does not
+independently reject every mathematical intent7 value. A generic point gate
+does not parse response bytes. The atomic-start Replay branch must therefore
+scan the original response, using original metadata and the decoded request's
+current captured limits, and require exact status/count before returning the
+same borrowed owner. Syntax/profile/cap failures remain Encoding errors; status
+inconsistency is InvalidAuthority. Earlier generic gate precedence is preserved.
+Original log/time/expiry are not renewed by later processing control. Standalone
+syntax/index checks do not authenticate term/node identity or persisted origin;
+Fresh binds full original metadata to its actual control before splitting.
+
+Encoding retains checked input/output admission. Decoder and Fresh/late logical
+accounts are specified in ADR-004. R is measured before output allocation and
+must fit B and each represented field bound. Accepted responses also require
+the implicit seven-byte physical `running` label to fit the inline limit.
+A retained `ValueTooLarge { bytes: 7, maximum: 6 }` rejection remains scannable
+with an inline limit of six. The None response is 114 bytes, present-empty 118
+and one-byte payload 119. Real Some(v)/Some(x) responses of the same 119-byte
+length must not match each other's plans. Fresh workspace6531/6532
+and standalone SAME-response caps114/113 and token8/7 are distinct tests; no
+late-only or tiny-response-budget Fresh witness is claimed.
+
+GroupApplyChanges, stored-outcome FWSO encoding/scanning, policy discovery,
+storage transaction binding and adapters remain closed to this profile until
+separately tested integration. Common recovery dispatch and a recovery-header
+helper are deferred until an actual selected caller needs them. No private
+postimage alone establishes durable/public/profile or Linux/macOS acceptance.
+
+### Existing Registry5 inspection and scalar retention
 
 One existing request inspection precedes all Fresh current-record, retry-policy
 and index work. Fresh checks effective committed time, binds exact derived keys

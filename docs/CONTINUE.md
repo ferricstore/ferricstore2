@@ -5,7 +5,26 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The active runtime checkpoint runs **40 tests on macOS: 34 pass and six fail**.
+The latest full Rust checkpoint passes **981 tests across 90 targets on macOS**,
+with zero failures, ignored or filtered tests, plus **six compile-fail examples
+across 15 documentation targets**. All eleven local checks pass: formatting,
+all-target compilation, strict Clippy, warnings-denied documentation, all 50
+architecture checks, reference and progress validation, the four cached offline
+dependency-audit categories and whitespace validation. All 1,516 captured inputs
+stayed unchanged, excluding only the three append-only peer review notes. Exact
+target/name/status comparison preserves all 975 preceding tests and adds only
+the six frozen atomic-start regressions; both benchmark smokes pass.
+
+The private atomic-start codec now passes **all 22 focused tests**. The six tests
+saved in `37afcf6` before implementation now execute their frame, actual Created
+postimage, same-length payload, resource-cap and original-response replay checks.
+Architecture and performance independently accepted the source and focused
+results. The four runtime modules fit 400 lines and their 20 functions fit 100
+(maximum 93). Storage publication, persisted-policy discovery, FWSO integration,
+common recovery and public dispatch remain separate work. No measured speedup,
+complete Elixir parity or Linux acceptance is claimed.
+
+The current native-capture checkpoint runs **40 tests on macOS: 34 pass and six fail**.
 The complete frozen repeated-budget-reply regression now passes. Each ordinary
 successful reply adds its funded cost to the keeper-owned bank before sending;
 later attempts retain that bank. Initial admission reserves one ordinary closing
@@ -128,7 +147,7 @@ benchmark is 361 lines; its six functions are at most 91 lines. The product
 terminal constructor remains unchanged. No optimized baseline, pilot, candidate,
 timing campaign, allocation count or speedup has been established.
 
-The atomic-start persistence regression checkpoint runs **22 focused tests:
+The preceding atomic-start persistence regression checkpoint runs **22 focused tests:
 16 pass and six fail**. All six new tests compile and stop at the first valid
 encode with `Encoding(UnsupportedTag)`. Formatting, focused compilation, strict
 Clippy, all 50 architecture checks, reference and progress validation pass.
@@ -137,12 +156,12 @@ The test children are 386 and 451 lines, with functions at most 93 lines.
 Later frame, actual-postimage, same-length payload, cap and replay assertions
 remain unexecuted behind that refusal. This is runtime RED before implementation.
 
-The atomic-start codec interface still has six explicitly refusing server entry
-points and primitive intent7 selection. No new frame, Fresh plan, retained
-response, storage policy discovery or recovery support is enabled. The exact
-module and client-facade matrix receive one passing architecture test.
+At the preceding interface checkpoint, the atomic-start codec had six explicitly
+refusing server entry points and primitive intent7 selection. No new frame, Fresh
+plan, retained response, storage policy discovery or recovery support was enabled.
+The exact module and client-facade matrix received one passing architecture test.
 
-The latest full Rust checkpoint passes **975 tests across 90 targets on macOS**,
+The preceding full Rust checkpoint passes **975 tests across 90 targets on macOS**,
 with zero failures, ignored or filtered tests, plus six compile-fail examples
 across 15 documentation targets. All eleven local checks pass, including strict
 Clippy, warnings-denied documentation, 50 architecture checks, reference and

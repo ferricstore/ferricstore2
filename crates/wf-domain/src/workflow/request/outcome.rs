@@ -131,6 +131,12 @@ impl RetainedOutcome {
                     status,
                     RetainedStatus::Accepted | RetainedStatus::ClaimRejected(_)
                 ))
+            && !(response_version == 4
+                && intent.version() == 7
+                && matches!(
+                    status,
+                    RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
+                ))
         {
             return Err(RequestValueError::UnsupportedVersion);
         }

@@ -147,11 +147,18 @@ generated-token admission, duplicate/error ordering and direct FIFO refusal.
 Explicit unsupported codec matches preserve the closed profiles. No new crate,
 dependency, event tag or public/durable operation is introduced.
 
-The separate private codec interface reserves six server-side entry points and
-an explicit intent7 digest identity. Every entry point returns an unsupported
-error. It produces no encoded frame, Fresh plan or retained data response; the
-existing wire, outcome, storage and recovery profiles remain closed. Its exact
-module is subject to the existing purity and client-facade checks.
+The selected private atomic-start codec uses isolated intent7, a singleton
+prepared frame and an original leased-postimage response. Its six regression
+tests were saved in `37afcf6` after compiled `UnsupportedTag` runtime failures;
+all six now pass within the 22-test focused target and the full 981-test workspace
+checkpoint on macOS. The independently reviewed Fresh path consumes the actual
+touched authority and retains its original full
+log/time and response. Replay validates the original response before borrowing
+it, using the request's captured admission limits. The four exact feature modules
+remain pure and server-side. Shared legacy codecs, public/independent profiles,
+storage publication, policy discovery and recovery remain closed until their
+separately tested integrations. See
+[ADR-006](adr/006-private-prepared-command-codec.md#selected-private-atomic-start-codec).
 
 ## Command execution and durability
 
