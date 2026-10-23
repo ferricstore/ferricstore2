@@ -4563,44 +4563,44 @@
         {
           "scenario_id": "m1-3483f6cec1191aa4",
           "rust_file": "crates/wf-domain/tests/claim_apply/fifo_reclaim.rs",
-          "rust_file_sha256": "7acef74aa42e441f17ea0970bef289c0fee16cc5e4e8e0aa045c82a745ca5743",
+          "rust_file_sha256": "fbf5814360e2f89750e058a6a6594988cf39c3a67c72b492359ab0774c44161b",
           "rust_module": "",
           "rust_function": "fifo_reclaims_expired_head_before_queued_follower",
           "assertions": [
             {
               "source_line": 424,
               "source_text": "assert {:ok, [%{id: ^first_id}]} =",
-              "rust_line": 110,
+              "rust_line": 130,
               "rust_text": "assert_eq!((results[0].0, first_id), (1, Some(IDS[0])));"
             },
             {
               "source_line": 434,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 118,
+              "rust_line": 138,
               "rust_text": "assert_eq!(results[1].0, 0);"
             },
             {
               "source_line": 443,
               "source_text": "assert {:ok, [reclaimed]} =",
-              "rust_line": 119,
+              "rust_line": 139,
               "rust_text": "assert_eq!(results[2].0, 1);"
             },
             {
               "source_line": 453,
               "source_text": "assert reclaimed.id == first_id",
-              "rust_line": 125,
+              "rust_line": 145,
               "rust_text": "assert_eq!(reclaimed.id().as_bytes(), IDS[0]);"
             },
             {
               "source_line": 454,
               "source_text": "assert reclaimed.lease_owner == \"new-worker\"",
-              "rust_line": 126,
+              "rust_line": 146,
               "rust_text": "assert_eq!(lease.worker, b\"new-worker\");"
             },
             {
               "source_line": 456,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 127,
+              "rust_line": 147,
               "rust_text": "assert_eq!(results[3].0, 0);"
             }
           ],
@@ -4655,6 +4655,52 @@
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
             "Pure borrowed authoritative-view observations only; snapshot completeness/revision identity, FIFO policy installation, native/durable index maintenance, automatic reclaim and public claim projections remain adapter obligations. Fixed fixture IDs/times preserve source order rather than original generated namespaces.",
             "Explicit expired-head selection/reducer reclaim represents the final observations; automatic reclaim scheduling and initial selection are omitted."
+          ]
+        },
+        {
+          "scenario_id": "m1-485560e32e405cf1-fifo_limit_one_reclaims_head_before_queued_follower",
+          "rust_file": "crates/wf-domain/tests/claim_apply/fifo_reclaim.rs",
+          "rust_file_sha256": "fbf5814360e2f89750e058a6a6594988cf39c3a67c72b492359ab0774c44161b",
+          "rust_module": "",
+          "rust_function": "fifo_limit_one_reclaims_head_before_queued_follower",
+          "assertions": [
+            {
+              "source_line": 477,
+              "source_text": "assert {:ok, [%{id: ^first_id}]} =",
+              "rust_line": 236,
+              "rust_text": "assert_eq!((results[0].0, first_id), (1, Some(ids[0])));"
+            },
+            {
+              "source_line": 487,
+              "source_text": "assert {:ok, [reclaimed]} =",
+              "rust_line": 241,
+              "rust_text": "assert_eq!(results[1].0, 1);"
+            },
+            {
+              "source_line": 497,
+              "source_text": "assert reclaimed.id == first_id",
+              "rust_line": 244,
+              "rust_text": "assert_eq!(reclaimed.id().as_bytes(), ids[0]);"
+            },
+            {
+              "source_line": 498,
+              "source_text": "assert reclaimed.lease_owner == \"new-worker\"",
+              "rust_line": 245,
+              "rust_text": "assert_eq!(lease.worker, b\"new-worker\");"
+            },
+            {
+              "source_line": 500,
+              "source_text": "assert {:ok, []} =",
+              "rust_line": 246,
+              "rust_text": "assert_eq!(results[2].0, 0);"
+            }
+          ],
+          "limitations": [
+            "Source-derived pure-core assertion links; actual original reference execution, setup and complete behavioral/profile parity remain separate acceptance evidence.",
+            "Both actual Creates preserve original type/partition/ID prefixes, payload=id, times1000/1001 and due2000; only positive opaque suffixes are normalized. Three actual limit-one selections preserve queued logical/partition filters: old-worker/lease50 at2000, new-worker/lease50 at2100 and follower-worker/default30000 at2101. Actual selected ID and SelectionAction drive Claim then Reclaim; the final actual empty result publishes nothing. Five inline observations retain initial singleton count plus ID, reclaimed count/ID/new worker and final empty. Invoked setup assertions outside this declaration are not counted as direct links.",
+            "Independently saved FIFO/Parallel membership changes only through actual indexed deltas. Existing publication validates borrowed canonical predecessor, history, policy mode and before/after rows before adopting owned candidate keys. First/reclaimed snapshots retain version2/fence1/deadline2050 then version3/fence2/deadline2150, queued run_state and original entry sequences; the follower remains queued/version1 and blocked. Scoped partition/request owners outlive borrowed selection; returned snapshots and fixture tokens do not prove product allocation or a public token producer.",
+            "The pure selector explicitly permits expired Reclaim. It does not execute the limit1/default-reclaim_ratio25 NORMAL-first then running-fallback public dispatcher, public hydration/projections, committed policy installation, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup/cleanup, durable record/index/history/outcome/control publication, retained inquiry or governance. Original reference execution and all required profiles remain acceptance obligations.",
+            "This existing-behavior conformance passed its first actual focused Rust execution without a preimplementation functional RED; it is not TDD or complete declaration parity. The existing four-link partial counterpart is preserved literally. The unchanged denied original Mix startup was not retried. Native Linux/macOS full acceptance and source parity remain incomplete."
           ]
         }
       ]

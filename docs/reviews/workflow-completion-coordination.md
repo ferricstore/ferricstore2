@@ -50723,3 +50723,171 @@ these assignments. Root must first whole-read the concrete architecture decision
 and separately freeze real required RED/normal verification and source custody.
 Current native/public integration sixfail, all-M/originalparity/profiles and
 Linux/macOS acceptance remain open; the full goal remains ACTIVE.
+
+ROOT CONTINUATION AUDIT — 2026-10-23, after 2528aa3b5b2e13418752aec89ec3f6b35c39a067
+
+Previous goal turn classified PROGRESS, not wait/status-only: it saved exact
+Native feature-directory extraction db8d4e1 and actual repeated-reply repair
+2528aa3. Changed-wrapper canonical/compiled proof and unchanged40 runtime
+improved33->34passes with six public-protocol failures, all1814 inputs held;
+48architecture/reference/progress/whitespace checks passed on1507 held inputs.
+Original full objective remains ACTIVE: partial M1/scoped M2, full source parity,
+all required profiles, later milestones and native Linux/macOS acceptance open.
+
+Current HEAD/status rechecked: 2528aa3, clean worktree, ahead140; no push or
+fresh remote/Linux result inferred. All prior Root compile/runtime/governance
+handles were terminal in actual saved outputs; none was restarted. Four agents
+are currently live: Root, ARCH, DOMAIN and PERF. Their next work remains disjoint
+append-only proposal/review notes until concrete architecture selection and Root
+source release. DOMAIN is preparing the next existing-home Rust invariant
+selection counterpart; ARCH/PERF review responsibility/resource/geometry first.
+PERF also examines one justified Rust allocation candidate and current official
+primary docs; no benchmark/source/probe/new artifact is released by planning.
+Root re-read AGENTS, CONTINUE, README, ordered plan and parity contract. Every
+required original case/profile remains acceptance input; current89/100/410 links
+and5903 runtime registration are not complete coverage or full M1 acceptance.
+
+ROOT M1 FIFO LIMIT-ONE RECLAIM TEST1 AUTHOR RELEASE — source conformance
+
+ACTUALLY WHOLE/hash-read ARCH4198210+7838/
+7a117d756bbf18a9a4e1a3c9b22a06981597f838b252289f78033dcc656da21c,
+DOMAIN4890682+8566/1108589256d2254a5ff4ccba0d26d60d872da025c2cba0f4f5c920358c8758af,
+and PERF3302744+3071/d82cc2d685b96b64864b28bf49ba27bc05061696b4b6af739ae7a783beef67fc.
+Root independently read actual original466-508, current134 child/shared518,
+parent555 and progress6289031f record485560e32e405cf1. Actual known gap is omitted
+initial singleton selection477 and continuous saved publication in old partial
+counterpart. No product defect/functional RED is known. This is existing-behavior
+conformance coverage plus exact constructor reuse, NOT preimplementation TDD.
+The original four counterpart links remain literal; full declaration/profile
+parity, public normal-first dispatcher and predecessor milestone gates remain.
+
+Root RELEASES DOMAIN /root/claim_writer_sol61 as sole source author for ONLY
+EXISTING crates/wf-domain/tests/claim_apply/fifo_reclaim.rs current134LF/4953B/
+7acef74aa42e441f17ea0970bef289c0fee16cc5e4e8e0aa045c82a745ca5743.
+Create ONLY selected private source_scoped_reclaim_step<'scope>/7 and #[test]
+fifo_limit_one_reclaims_head_before_queued_follower; old source_reclaim_step/6
+becomes literal-old-scope adapter with unchanged signature/'static result.
+New helper exactly borrows (type, caller-owned partitions) with explicit 'scope,
+keeps queued STATES/group/reclaim_expired/request limit/time, owns Claim inputs
+and old token formatting. Insert helper after adapter/before old test; append new
+test after the whole old attribute+test. No file/module/registration/import/type/
+alias/model/API/shared/newhelper beyond this concrete roster is released.
+
+Keep old constants275B/32684f5a and ENTIRE old test97LF/3683B/a2cce76d literal.
+Main555/68238052, shared518/5c5aec0c, old partial344/46a6e6ef and ALL SUT remain
+literal. Strong whole inverse removes exactly new helper/test and restores old
+constructor739B/96a42a23 ->ENTIRE134/4953/7acef74a. Author independently rehashes
+old test/constants and held homes, returns exact stopped hash/LF/geometry and
+review receipt in existing DOMAIN only. Source custody then returns to Root.
+No author formatter/build/test/VM/benchmark/Git/ledger/docs-other-owner action.
+
+Exact test source prefixes/times/due/payloads/modes/defaults and five direct
+observations477/487/497/498/500 follow ARCH selection. Real Creates1/2 then
+actual Claim selection3 at2000 oldworker/50, Reclaim4 at2100 newworker/50 and
+empty5 at2101 followerworker/30000; all limit1 and queued logical filter.
+Use actual selected ID/action and actual published records with independently
+saved FIFO/parallel deltas, not synthetic running state/count/expected-ID lookup.
+Retain supporting membership/follower/version/fence/deadline/sequence controls.
+Natural newtest/helper<=100LF/file<=600, no packing; report actual need before
+creating another helper/home. First actual focused Rust run may be GREEN because
+behavior already exists; never manufacture RED or count first-pass as TDD.
+
+Root owns canonical formatting, whole inverse, actual focused/full required
+checks, shared ledger/docs/Git. ARCH/PERF reciprocally review stopped source and
+actual observation links. Root later adds ONLY new five-link counterpart under
+same485560 source/runtimeidentity and refreshes old3483 hash/shifted six anchors;
+source/frozenM0 mapping/old4links remain literal. No ledger change before actual
+execution or original-runtime/profile/Linux/macOS completion claim. Current
+native compatibility34/40 and its six protocol failures stay separate/unmodified.
+
+M1 LIMIT-ONE stopped canonical source / focused execution / Root ledger
+
+DOMAIN STOPPED child253LF/9177B/
+fbf5814360e2f89750e058a6a6594988cf39c3a67c72b492359ab0774c44161b;
+fourfunctions18/24/96/97LF/max99. Root ACTUALLY whole-read source and author
+DOMAIN4899248+5047/15217a50. Root OWN exact newhelper/test removal+oldconstructor
+restoration reconstructs ENTIRE134/4953/7ace; full old97LF/a2cce test/header/
+constants literal. ActualselectedID/action drives Claim3/Reclaim4/empty5 through
+unchanged shared saved-delta publisher. Scoped partitions live through selection;
+no false-static localarray or new model/API/shared/SUT code. All old3483 inputs,
+limit10 rows/defaults and existing partial485560 four observations are preserved.
+
+Actual focused98266 TERMINAL0: formatter CHECK unchanged253/fbf581, then existing
+claim_apply target30pass/0fail/ignored/filtered. Rawfmt5216310+0/e3b0c442;
+actualfocused5216531+2854/
+3e089aea55f622422541e5c5138a665c14de5dbfe061f5c69a8f360a9b47e3d3.
+Both old/new reclaim names explicitly pass. All1507 inputs unchanged:
+1bfcde587ea3cbc9d433e8c0a81f3bdccc63ba69e50bc734753090ff7c99f380.
+This is first-pass existing-behavior source conformance, NOT genuine TDD/RED.
+No production defect or original runtime/profile execution is invented.
+
+Root WHOLE/hash-read independent ARCHsource4206048+3530/5bb4822f,
+ARCHfocused4209578+1610/fef5bc9f and PERF3305815+3389/3dc3c0b5.
+Independent whole inverses and oldtest/constants/source ownership/geometry agree;
+actualfiveobservations477/487/497/498/500->236/241/244/245/246 all execute.
+Meaningful saved-membership, blockedfollower, physical/logicalstate, leaseworker,
+deadline/version/fence and entry-sequence controls remain alongside directlinks.
+No generic extra gate or claim of full public NORMAL-first dispatcher execution.
+
+After actualfocused success Root updates EXISTING workflow-progress.json ONLY:
+1311806B/7798fec9f439582820628e560eb252cb2b0829d8e6bcb949cf249fc936c86684.
+Old3483child hash refreshed and its six old inline pointers move+20 into the
+literal oldbody. Under SAME485560 declaration/runtimecaseID, append one five-link
+counterpart for actualnewtest; OLD4counterpart is entirely literal. Exact full
+JSON inverse removes this newentry and restores only old3483hash/pointers and
+matches original1307897/6289031f BYTE-for-BYTE. All5858declarations/runtimeIDs/
+collection/provenance/limitations/unrelatedrecords retained. Counts89/101/415,
+not sourcecase/profile or full passingparity. Frozenreferences/M0mapping untouched.
+New limitations preserve preparedpolicy/setup/publicdispatch/durable/governance/
+original/profile/bothOS obligations and no productallocation/opaque-token claim.
+
+Full required local Rust commands follow source-frozen: fmt/check/strictClippy,
+allworkspacealltargets tests/docs/doctests, architecture/reference/progress and
+allfour cachedoffline deny categories, whitespace. Existing unchanged denied
+freshRustSec/DNS/Linux/remote/native/benchmark routes are not retried. This is
+explicit local quality coverage with cachedaudit, not a fresh online wrapper or
+Linux result. No nativeC/header/NIF or compatibilitytoolsource changed, so the
+unchanged34/40 capturecheckpoint is not rerun. All-M/fullparity goal ACTIVE.
+
+M1 LIMIT-ONE FULL REQUIRED LOCAL QUALITY — actual terminal acceptance
+
+Root process27601 TERMINAL0; all ELEVEN explicitly recorded local commands pass.
+All1507 captured inputs unchangeda017217473d0472818f9e921f074511d18634da40c15765a1bab10699449aa7e.
+Root independently reparsed every actual raw summary: alltargets968pass/90targets,
+zero fail/ignored/measured/filtered; docs6compilefail/15targets withzeroothers.
+The new and old reclaim identities both explicitly PASS. Architecture48 overlaps
+the full968, not48additional unique tests. Custom benchmark smoke is not another
+functional test identity or an optimization/M8 result. Slow real storage I/O/
+uncertain-commit tests emitted >60second notices and completed successfully in
+THIS same uninterrupted process; no timeout was treated as terminal/restarted.
+
+Strict formatting, locked alltargetcompilation, strictClippy, alltargettests,
+doctests, warnings-denied documentation, architecture, preservedreference,
+progress89/101/415, allFOUR cachedoffline audits and whitespace each exit0.
+This is explicit local11commandcoverage; freshonline advisory/DNS/nativeLinux,
+originalfullprofiles/producer and fullparity remain unproved. No unchanged
+network/native compatibility/A-Bcampaign was rerun or represented as accepted.
+Whole source253/fbf581 and ledger1311806/7798 remain the tested epoch.
+
+Root ACTUALLY WHOLE/hash-read independent ledger ARCH4211188+3138/179b755b
+and PERF3309204+1802/5d73dc3c: both independent entire JSON inverses reconstruct
+1307897/6289, preserve all oldpartial/runtimeIDs/frozen inputs and confirm exact
+newfive/old6anchors/scopes/limitations. No scoped source/metadata finding.
+Full actual peer acceptance follows; Root updates existing CONTINUE to968 and
+89/101/415, then finaldoc governance and selected commit. All-M goal ACTIVE.
+
+RAW_QUALITY_RECORDS [{"step":1,"argv":["cargo","fmt","--all","--","--check"],"offset":5219574,"bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","exit":0,"unchanged":true},{"step":2,"argv":["cargo","check","--workspace","--all-targets","--locked"],"offset":5219783,"bytes":167,"sha256":"4a94135c8cc737fb407b1745faf3b1b08ed3400b93ebd991afb3fa5ca243b612","exit":0,"unchanged":true},{"step":3,"argv":["cargo","clippy","--workspace","--all-targets","--locked","--","-D","warnings"],"offset":5220184,"bytes":167,"sha256":"bdb33e42e1059299110dcf21e344ed10c325f1319a9f69effc205f78e8336cc5","exit":0,"unchanged":true},{"step":4,"argv":["cargo","test","--workspace","--all-targets","--locked"],"offset":5220559,"bytes":101444,"sha256":"fd66cf562979bbf649e4000c4841e6b5dcc64ab53cde98c9e412e03b7a16ed57","exit":0,"unchanged":true},{"step":5,"argv":["cargo","test","--workspace","--doc","--locked"],"offset":5322203,"bytes":2706,"sha256":"b6560b3be8a37e5b49c3a898a8f0156f343b766748ddce60755b1e078692124b","exit":0,"unchanged":true},{"step":6,"argv":["cargo","doc","--workspace","--no-deps","--locked"],"offset":5325112,"bytes":1678,"sha256":"13bf901b95d83e2834b592724e566d91c6940054ac666644066ac798130ffaba","exit":0,"unchanged":true},{"step":7,"argv":["cargo","arch"],"offset":5326954,"bytes":5116,"sha256":"7baae80f0010cb4854458807c10a1221efba1d750112e7f3abc25241afbeea4a","exit":0,"unchanged":true},{"step":8,"argv":["cargo","reference"],"offset":5332239,"bytes":365,"sha256":"248ad1838ee64b2933c43a48e973b7ccf5c2fb3a1f350acb302422ae7951c04d","exit":0,"unchanged":true},{"step":9,"argv":["cargo","progress"],"offset":5332772,"bytes":560,"sha256":"6791efb27ea1e2b981f8df5df719d456291db74849f6653c90486db161ca85e1","exit":0,"unchanged":true},{"step":10,"argv":[".tools/bin/cargo-deny","--offline","--locked","--workspace","check","--deny","unmatched-skip","advisories","bans","licenses","sources"],"offset":5333627,"bytes":48,"sha256":"f1a0fca39d4280363937aabd77783990ea6480bd9ca257816de3b68fc8efa845","exit":0,"unchanged":true},{"step":11,"argv":["git","diff","--check"],"offset":5333849,"bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","exit":0,"unchanged":true}]
+
+ROOT LIMIT-ONE REVIEWED HANDOFF1 — local checkpoint accepted; full goal active
+
+Actually whole/hash-read ARCH full-quality4223706+2856/fbe6be0744de545366c794a27b1f447884d4c033df42e2aa70da0b2e79f0a472 and PERF3321923+1886/051522bfae75241136c261e80b0aa05933d0ed3b45dbfa660b477dc1fec83f68. Both independently parsed all90 targets/968passes and15doc targets/sixcompilefail, all11 terminal EXIT0/UNCHANGED footers and1507-input pin; both rehashed sourcefbf581 and ledger7798fec9. Their acceptance is scoped existing-behavior/local conformance, no new TDD, full original source/profile/public-dispatch/durability/Linux or performance claim. No further FIFO review gate remains.
+
+Root updated CONTINUE current totals967->968,1506->1507 and89/100/410->89/101/415, replaced the historical online-wrapper failure description with the actual eleven successful explicit local commands including cachedoffline audits, and added the actual limit-one sequence/omissions. Native checkpoint remains34/40; full completion remains ACTIVE. Production SUT is unchanged. Final changed-document governance will run once before saving this reviewed increment; no unchanged full Rust/native/benchmark rerun is authorized by a prose update.
+
+Actually whole/hash-read ARCH TERMINAL-CLONE1 4214326+9380/9d642426d68f62178d4bb2511727d60da8e7e824c69dae503bf247160570ba03 and PERF clarification3323809+1452/1cefa7657c1d2ff51ff9b675f4a9776fcb91a2ebd503789b5d8f95c5a3b9b030. Exact six-function benchmark scope and staged product/campaign selection are understood; no source/new-file/config/build/pilot/product/campaign author release yet. Actually whole/hash-read DOMAIN StartAndClaim4904295+14458/d7c8ea9fbc1bc8dd81d1145d2e800ceec8ef0e7bfd7d2d3ff581b164f53f7560. Missing atomic operation is a real static feature gap, not an executed RED. ARCH and PERF are reviewing exact named staged scope and communicating directly; DOMAIN has completed notes-only proposal and remains available. No scaffold/test/body/create permission inferred. Required functionality is prioritized while the independent performance experiment remains held.
+
+ROOT LIMIT-ONE FINAL DOC GOVERNANCE/SAVE1
+
+Actual existing runner session28637 terminal0: cargo arch48/0 (overlapping full968), reference480/5858, progress89/101/415 and gitdiffcheck all EXIT0/UNCHANGEDTrue against1507inputs/1ebcf8c4d4cadef1a2a45142af0bfaa537738f72f7d1c995c1b1afbc03f09f07. Root independently rehashed all four actual raw spans and following terminal footers in retained validation log:5334014+5116/a1f458ee06f370a921b7bdfa618f7c25d1372096a3c1f69bdc13b42f1f7146c0;5339300+365/ca4afb1bd4a5a63e9ccc322316d9c961fac85e506c11bcac9267c890070bef43;5339834+560/6791efb27ea1e2b981f8df5df719d456291db74849f6653c90486db161ca85e1;5340568+0/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855. Source253/9177/fbf581 and ledger1311806/7798fec9 rehashed exact before save. No full suite or compatibility rerun after prose-only edits.
+
+Save only reviewed source/ledger/CONTINUE/Root coordination and whole-read peer prefixes ARCH4226562, PERF3325261, DOMAIN4918753; any concurrent later append stays in worktree and is not staged implicitly. Root verifies each committed old note is a literal prefix before staging the known note prefix. Local reversible commit only, no push. Atomic StartAndClaim and terminal-clone proposals in those prefixes remain planning/selection, not source author release. Goal stays active; all wider obligations remain.

@@ -121,17 +121,29 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **967 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **968 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
-all four cached offline dependency-audit categories pass. The full check script
-exited 1 only when its online advisory refresh could not resolve GitHub; the
-remaining audit then passed with explicit `--offline`. All 1,506 captured
+all four cached offline dependency-audit categories pass. All eleven explicit
+local commands exit zero, including the audit with `--offline`. All 1,507 captured
 repository inputs stayed unchanged through that sequence, excluding only the
-three append-only peer review notes. No fresh advisory or Linux result is claimed.
+three append-only peer review notes. Independent architecture and performance
+reviews accept the actual results. No fresh advisory or Linux result is claimed.
 
-The newest mixed-state counterpart publishes both original parallel Creates,
+The newest source-derived FIFO counterpart uses limit one to claim the queued
+head, reclaim that expired running head for the new worker, then observe the
+queued follower still blocked. Saved FIFO and Parallel membership starts empty
+and advances only through actual publication deltas; both Creates and all three
+selection results are observed directly. Five source assertion links preserve
+the source namespaces, times, worker and lease values. The focused claim target passes
+30 tests and the complete checkpoint above passes. The preceding reclaim test
+body and original partial counterpart remain unchanged. This is existing-behavior
+conformance, without a new TDD RED. Public normal-first dispatch and hydration,
+committed policy installation, original setup, durability and full required
+profiles remain open.
+
+The preceding mixed-state counterpart publishes both original parallel Creates,
 then actually selects and claims the earlier-due entry under the mixed FIFO and
 Parallel state filter. Both saved index sets start empty and advance through
 actual indexed deltas. Four source links preserve the two Create acceptances,
@@ -2489,7 +2501,7 @@ remain historical evidence; they are not the current verification totals.
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
 [progress ledger](../tests/parity/workflow-progress.json) now has **89 reviewed
-source declarations, 100 counterpart records and 410 assertion links**. Links
+source declarations, 101 counterpart records and 415 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 
