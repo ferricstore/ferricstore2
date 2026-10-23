@@ -29,8 +29,8 @@ public command capture and other child-policy options.
 The partial progress ledger now records **93 source-derived declarations,
 105 Rust counterpart mappings and 444 assertion links**. Runtime reconciliation
 still has 1,681 unmatched cases and 1,655 unresolved declarations. These partial
-links do not certify full case/profile parity. Linux validation, the eight native
-capture failures and the wider runtime milestones remain open.
+links do not certify full case/profile parity. Linux validation, native-capture
+integration and the wider runtime milestones remain open.
 
 The atomic-start recovery integration now passes **all eight regressions saved
 in `ae7a0ce` before implementation**. The borrowed header dispatches profile7;
@@ -147,7 +147,8 @@ stacktrace construction or exception normalization. Executing module identities
 match the inspected Input and decoder identities. These premises do not supply
 complete allocation prices; edited Input and moved Query code need their own
 compiled binding. Source-reviewed estimator-report, native-call and binary-copy
-operands support the selected Input/Meter/Query implementation successor.
+operands support the selected Input implementation and its Meter, Query and
+Binding feature children.
 
 The preceding SourceGuard checkpoint runs **47 tests on macOS: 39 pass and
 eight fail**. Both SourceGuard cases frozen in `de4aea1` now complete: absent
@@ -364,12 +365,16 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The terminal-operation benchmark baseline passes its no-clock smoke: all ten
-profiles are validated twice, covering all record fields, history, input
-immutability, exact refusals and payload/value presence. The naturally formatted
-benchmark is 361 lines; its six functions are at most 91 lines. The product
-terminal constructor remains unchanged. No optimized baseline, pilot, candidate,
-timing campaign, allocation count or speedup has been established.
+The terminal-operation benchmark passes optimized baseline correctness smoke:
+all ten profiles are validated twice, covering all record fields, history, input
+immutability, exact refusals and payload/value presence. Two unchanged-A pilot
+processes retain all 256 sample rows. The preserve-payload process medians vary
+by **5.61%**, exceeding the predeclared 5% repeatability gate; all other profiles
+fit that gate. The experiment therefore stopped before any candidate source
+change, B build or ABBA run. The baseline artifact is preserved in its separate
+target root. The product terminal constructor and 361-line benchmark remain
+unchanged. No optimization, allocation count, speedup, Linux or M8 acceptance
+follows from this unstable pilot.
 
 The preceding atomic-start persistence regression checkpoint runs **22 focused tests:
 16 pass and six fail**. All six new tests compile and stop at the first valid
