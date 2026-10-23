@@ -155,3 +155,6 @@ pub fn decide_fresh_atomic_start_touched<'current>(
         },
     })
 }
+
+#[cfg(test)]
+mod tests;

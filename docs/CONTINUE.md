@@ -5,6 +5,24 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The atomic-start storage regression checkpoint compiles cleanly and runs **seven
+new failing tests on macOS**. The private consumer test reaches `InvalidChanges`
+on its first valid plan; the two recording-driver and four real-store tests reach
+`Apply(Encoding(UnsupportedVersion))` on their first dedicated-driver call.
+Eight existing tests in the two related targets still pass. The focused real-store
+run filters 101 older cases; it does not reexecute them. Formatting, all-target
+compilation and strict Clippy for ports/storage, all 50 architecture checks,
+reference/progress and whitespace checks pass. All four phases preserve the same
+1,519 captured inputs, excluding only the three append-only peer notes.
+
+The seven tests cover consumer postimage/origin validation, persisted policy,
+consumed commit, original-response replay, restart, FIFO refusal, a real later
+Complete and stored-owner/profile limits. Those later assertions remain masked
+by the initial refusals. The three new files have 188, 215 and 578 physical lines;
+their 15 functions have at most 94. Source review and saving this runtime RED
+precede the separately reviewed integration body. No integration body has been
+implemented. The full green checkpoint below predates these seven regressions.
+
 The latest full Rust checkpoint passes **981 tests across 90 targets on macOS**,
 with zero failures, ignored or filtered tests, plus **six compile-fail examples
 across 15 documentation targets**. All eleven local checks pass: formatting,

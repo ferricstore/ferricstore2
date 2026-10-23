@@ -24,6 +24,7 @@ use wf_storage::transaction::{
 use wf_types::identity::{RecordId, RequestId};
 use wf_types::version::{Fence, TimestampMillis};
 
+mod atomic_start;
 mod bootstrap;
 mod claim;
 mod control;

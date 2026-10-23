@@ -34,6 +34,7 @@ use wf_types::version::{
 };
 
 mod admission;
+mod atomic_start;
 mod gate;
 mod independent;
 mod load;
