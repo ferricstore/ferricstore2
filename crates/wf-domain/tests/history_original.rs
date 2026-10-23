@@ -181,3 +181,170 @@ fn history_input_views_preserve_nonbinary_ids_and_flat_list_boundaries() {
                 .is_some_and(|value| std::ptr::eq(*value, &raw const fields[2]))
     }));
 }
+
+// Pinned HistoryEventTest at 66586c596e271408d9184af32eb31cd7218c126e.
+// Source async:true/flow, with no local setup; five observations in source order.
+use wf_domain::history::original::original_history_event_ms;
+
+#[test]
+fn parses_millisecond_prefix_from_generated_event_ids() {
+    let actual = original_history_event_ms(Raw::Binary(b"12345-7"));
+    assert_eq!(
+        (actual.is_negative(), actual.digits()),
+        (false, b"12345".as_slice())
+    );
+}
+
+#[test]
+fn parses_bare_millisecond_event_ids() {
+    let actual = original_history_event_ms(Raw::Binary(b"98765"));
+    assert_eq!(
+        (actual.is_negative(), actual.digits()),
+        (false, b"98765".as_slice())
+    );
+}
+
+#[test]
+fn returns_zero_for_malformed_and_non_binary_event_ids() {
+    let actual = original_history_event_ms(Raw::Binary(b"abc-1"));
+    assert_eq!(
+        (actual.is_negative(), actual.digits()),
+        (false, b"0".as_slice())
+    );
+    let actual = original_history_event_ms(Raw::Binary(b"123abc"));
+    assert_eq!(
+        (actual.is_negative(), actual.digits()),
+        (false, b"0".as_slice())
+    );
+    let actual = original_history_event_ms(Raw::Nil);
+    assert_eq!(
+        (actual.is_negative(), actual.digits()),
+        (false, b"0".as_slice())
+    );
+}
+
+#[test]
+fn history_millis_preserves_sign_zero_and_arbitrary_integer_width() {
+    for (input, negative, digits) in [
+        (b"+00012-4".as_slice(), false, b"12".as_slice()),
+        (b"-00012".as_slice(), true, b"12".as_slice()),
+        (b"00012--x".as_slice(), false, b"12".as_slice()),
+        (b"0".as_slice(), false, b"0".as_slice()),
+        (b"-0".as_slice(), false, b"0".as_slice()),
+        (b"+000".as_slice(), false, b"0".as_slice()),
+        (b"-000-1".as_slice(), false, b"0".as_slice()),
+    ] {
+        let actual = original_history_event_ms(Raw::Binary(input));
+        assert_eq!(
+            (actual.is_negative(), actual.digits()),
+            (negative, digits),
+            "{input:?}"
+        );
+    }
+
+    let magnitude = [b'9'; 96];
+    let positive = original_history_event_ms(Raw::Binary(&magnitude));
+    assert_eq!(
+        (positive.is_negative(), positive.digits()),
+        (false, magnitude.as_slice())
+    );
+    let mut signed = [b'9'; 97];
+    signed[0] = b'-';
+    let negative = original_history_event_ms(Raw::Binary(&signed));
+    assert_eq!(
+        (negative.is_negative(), negative.digits()),
+        (true, &signed[1..])
+    );
+    assert_eq!(magnitude, [b'9'; 96]);
+    assert_eq!(&signed[1..], magnitude.as_slice());
+}
+
+#[test]
+fn history_millis_accepts_only_source_remainders_and_binary_inputs() {
+    for (input, negative) in [
+        (b"12-".as_slice(), false),
+        (b"-12--x".as_slice(), true),
+        (b"+0012-\xff".as_slice(), false),
+        (b"12- \0".as_slice(), false),
+    ] {
+        let actual = original_history_event_ms(Raw::Binary(input));
+        assert_eq!(
+            (actual.is_negative(), actual.digits()),
+            (negative, b"12".as_slice()),
+            "{input:?}"
+        );
+    }
+
+    for input in [
+        b"".as_slice(),
+        b"+",
+        b"-",
+        b"--1",
+        b"++1",
+        b"+-1",
+        b"-+1",
+        b" 12",
+        b"12 ",
+        b"\t12",
+        b"12\t",
+        b"12.0",
+        b"1_2",
+        b"12e1",
+        b"0x12",
+        b"\xd9\xa1",
+        b"\xef\xbc\x91",
+        b"12+suffix",
+        b"12\xff",
+        b"\xff-12",
+    ] {
+        let actual = original_history_event_ms(Raw::Binary(input));
+        assert_eq!(
+            (actual.is_negative(), actual.digits()),
+            (false, b"0".as_slice()),
+            "{input:?}"
+        );
+    }
+
+    let magnitude = [0xff; 17];
+    let nested = [Raw::Binary(b"12345")];
+    let nil = Raw::Nil;
+    for input in [
+        Raw::Integer(12_345),
+        Raw::BigInteger {
+            negative: true,
+            little_endian: &magnitude,
+        },
+        Raw::Atom("12345"),
+        Raw::Nil,
+        Raw::Map(&[]),
+        Raw::List(&nested),
+        Raw::Tuple(&nested),
+        Raw::ImproperList {
+            prefix: &nested,
+            tail: &nil,
+        },
+        Raw::Other,
+    ] {
+        let actual = original_history_event_ms(input);
+        assert_eq!(
+            (actual.is_negative(), actual.digits()),
+            (false, b"0".as_slice())
+        );
+    }
+}
+
+#[test]
+fn history_millis_borrows_only_normalized_nonzero_digit_prefix() {
+    let backing = *b"-00012345-\xff";
+    let expected_digits = &backing[4..9];
+    let actual = {
+        let descriptor = Raw::Binary(&backing);
+        original_history_event_ms(descriptor)
+    };
+    assert_eq!(
+        (actual.is_negative(), actual.digits()),
+        (true, b"12345".as_slice())
+    );
+    assert!(std::ptr::eq(actual.digits(), expected_digits));
+    assert_eq!(backing, *b"-00012345-\xff");
+}

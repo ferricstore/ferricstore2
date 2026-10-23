@@ -15,6 +15,16 @@ value. Standard B-tree node allocation remains outside paid admission. All four
 original standalone Elixir cases pass; full original profiles and Linux remain
 required.
 
+The new HistoryEvent callable baseline runs **12 Rust tests: seven pass and
+five fail**. All six older history-entry tests remain passing and unchanged.
+The new malformed-input case passes; the two valid original cases and three
+edge-case tests reach the zero-only parser and fail on its result. Later pointer,
+wide-integer and remainder assertions remain masked. All seven quality checks
+pass after ordinary lifetime elision and refreshing only the four existing
+whole-file evidence hashes. The three original standalone Elixir cases pass.
+The substantive parser still requires saving this genuine baseline and its
+separate implementation release; the new cases have no ledger coverage credit.
+
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
 All four decoder regressions saved before implementation now pass: NEW-only
 calls preserve historical forecasts, a late source error retains completed work,
@@ -105,10 +115,9 @@ The checked partial ledger records **111 source-derived declarations,
 still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
 reference and frozen workflow mapping remain unchanged. Full original Elixir
 case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and
-the wider ordered runtime milestones remain open. The next pure parity
-candidate, HistoryEvent, is still unported; architecture consultation precedes
-any new Rust type or parser. The active goal must continue beyond this reviewed
-increment.
+the wider ordered runtime milestones remain open. HistoryEvent now has the architecture-selected type and zero-only callable
+baseline; its correct parser and assertion links remain unfinished. The active
+goal must continue beyond this reviewed increment.
 
 The entries below retain preceding checkpoints; the results above describe the
 current tree.

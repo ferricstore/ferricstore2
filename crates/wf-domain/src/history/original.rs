@@ -67,3 +67,39 @@ pub fn to_tuple(entry: OriginalHistoryInput<'_>) -> Option<RawHistoryEntry<'_>> 
         fields: fields_to_map(fields),
     })
 }
+
+/// A canonical source millisecond value with borrowed decimal magnitude.
+///
+/// Nonzero digits omit the sign and leading zeros. Zero is always nonnegative
+/// and uses static backing. This view is not a clock or history-read authority.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct OriginalHistoryMillis<'a> {
+    negative: bool,
+    digits: &'a [u8],
+}
+
+impl<'a> OriginalHistoryMillis<'a> {
+    /// Whether the mathematical value is strictly negative.
+    #[must_use]
+    pub const fn is_negative(self) -> bool {
+        self.negative
+    }
+
+    /// The normalized ASCII magnitude, borrowing the original binary payload.
+    #[must_use]
+    pub const fn digits(self) -> &'a [u8] {
+        self.digits
+    }
+}
+
+/// Returns the original helper's millisecond value as a canonical decimal view.
+///
+/// Malformed and nonbinary inputs represent positive zero. Nonzero results
+/// borrow the binary payload rather than its temporary descriptor.
+#[must_use]
+pub fn original_history_event_ms(_event_id: Raw<'_>) -> OriginalHistoryMillis<'_> {
+    OriginalHistoryMillis {
+        negative: false,
+        digits: b"0",
+    }
+}

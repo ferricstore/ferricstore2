@@ -3438,7 +3438,7 @@
         {
           "scenario_id": "pure-history-b7a84d20f573b949-tuple-fields",
           "rust_file": "crates/wf-domain/tests/history_original.rs",
-          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_file_sha256": "3ae590a8db2e9e5f9bf59ccf35e2d8d5b969d9e894dd2dee7593824b31d40799",
           "rust_module": "",
           "rust_function": "converts_tuple_history_entries_to_event_id_and_fields_map",
           "assertions": [
@@ -3466,7 +3466,7 @@
         {
           "scenario_id": "pure-history-22ee880548e0bc4d-flat-list-fields",
           "rust_file": "crates/wf-domain/tests/history_original.rs",
-          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_file_sha256": "3ae590a8db2e9e5f9bf59ccf35e2d8d5b969d9e894dd2dee7593824b31d40799",
           "rust_module": "",
           "rust_function": "converts_list_history_entries_to_event_id_and_fields_map",
           "assertions": [
@@ -3494,7 +3494,7 @@
         {
           "scenario_id": "pure-history-52f04602d920078f-last-duplicate-value",
           "rust_file": "crates/wf-domain/tests/history_original.rs",
-          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_file_sha256": "3ae590a8db2e9e5f9bf59ccf35e2d8d5b969d9e894dd2dee7593824b31d40799",
           "rust_module": "",
           "rust_function": "last_duplicate_field_wins",
           "assertions": [
@@ -3522,7 +3522,7 @@
         {
           "scenario_id": "pure-history-4addaed858369256-fixed-invalid-pairs",
           "rust_file": "crates/wf-domain/tests/history_original.rs",
-          "rust_file_sha256": "be621d157fa3f6eb3faaf8cc207d41799c01e40a42ac0d2d61c11cf6c1cc9772",
+          "rust_file_sha256": "3ae590a8db2e9e5f9bf59ccf35e2d8d5b969d9e894dd2dee7593824b31d40799",
           "rust_module": "",
           "rust_function": "malformed_stored_fields_do_not_crash_history_reads",
           "assertions": [
