@@ -580,3 +580,5 @@ defmodule Ferricstore.PolicyRuntimeCaptureAdmissionTest do
   defp emit(value),
     do: IO.puts("B2_ADMISSION_CHILD:" <> Base.encode64(:erlang.term_to_binary(value)))
 end
+
+Code.require_file("admission/source_guard.exs", __DIR__)

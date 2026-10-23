@@ -220,6 +220,20 @@ masked by the first failure. Legacy financial admission is not yet certified as
 the native paid bank. Production metering and the complete caller/keeper bridge
 remain separate implementation work; no full E/T or Linux acceptance follows.
 
+The selected SourceGuard change rejects an absent pinned source module even when
+it could be autoloaded. Two independently reviewed regressions now demonstrate
+the old behavior: real Capture and Input calls reload authentic temporary source
+code, return success and each produce one observed undefined-function event.
+The 47-test run preserves all eight preceding failures and adds only these two.
+The required refusal assertion fails before the later unloaded/no-autoload
+checks; these are preimplementation results. The separately released body will
+replace only the two existing MD5 external calls with direct
+`erlang:get_module_info/2` calls, preserving loaded comparisons and error results.
+Its residual BADARG and rescue allocations still need source pricing. A later
+compiled-guard inspection must bind the actual executing bytecode and exclude
+cooked stacktrace/normalization paths before using the raw exception operand in
+complete producer costs. This selects no complete public fee or Linux result.
+
 The exact staged contracts and reciprocal reviews are recorded in
 [the architecture review](../reviews/workflow-completion-architecture.md) and
 [Root's release record](../reviews/workflow-completion-coordination.md).

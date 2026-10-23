@@ -108,7 +108,27 @@ persisted-policy discovery and FWSO support. Common recovery and public dispatch
 remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
-The current native-capture regression checkpoint runs **45 tests on macOS:
+The current native-capture regression checkpoint runs **47 tests on macOS:
+37 pass and ten fail**. Two new SourceGuard cases demonstrate genuine autoload:
+the existing Capture and Input guards reload the authentic temporary BEAM,
+return success and each emit one observed undefined-function call. Input returns
+its real 1,601-word/20,096-pin admission result. Both fail the required
+`source_code_changed` assertion; later unloaded/no-autoload assertions are masked.
+Exact failure comparison preserves all eight preceding failure identities and
+adds only these two cases. All 45 preceding bodies remain intact.
+
+The selected change will reject an absent source module even when it is
+autoloadable, preserving loaded same/changed-source behavior. Its two BIF call
+substitutions remain unimplemented at this checkpoint. Architecture and
+performance independently reviewed the source and genuine failure output.
+The child has 162 physical lines, two test bodies of 23 and 21, and three helpers
+of at most 68. Its require seam preserves the entire preceding 582-line parent
+by exact inverse and brings it to 584. All 1,844 captured repository/compiler/
+runtime/artifact inputs stayed unchanged during execution, excluding only three
+peer notes; 17 tool sources and 305 compiler inputs are bound. Public budget
+accounting, complete BEAM envelopes, original parity and Linux remain open.
+
+The preceding native-capture regression checkpoint runs **45 tests on macOS:
 37 pass and eight fail**. Two new keeper-debt cases compile and reach the real
 query-context and combined-output failures. Their first post-error keeper banks
 equal their entry banks: **134,104 to 134,104** and **133,988 to 133,988** words.
