@@ -34,3 +34,21 @@ layer access, unsafe expressions and malformed syntax remain executable controls
 Other macro and generated-code audit requirements remain in force. This changes
 neither crate dependencies nor domain capabilities and establishes no measured
 native performance gain.
+
+## Captured option module classification
+
+The October 23 option-helper increment adds public `wf-domain::options` and its
+private `options::put` child. Register `options = true` in the complete root
+module classification; the flag declares public visibility. Package-wide domain
+purity continues to cover both modules, with the same dependency allowlist.
+
+The module validates captured proper atom-key options and borrows their values
+and diagnostic keys. Row updates operate on typed keyword or unique-map views
+with explicit source-strict, deterministic equality and fallible row allocation.
+This supplies no generic VM parser, opaque term equality or public admission.
+The checker regression accepts both actual files and pure borrowed-value code,
+rejects environment/file/I/O/async/global-state examples, and exercises forbidden
+ports/runtime dependencies through mutated metadata. No checker rule, effect
+permission, dependency edge or profile is relaxed. Its preclassification failure
+is architecture evidence; the eight option behavior tests require their own
+executed failing baseline and passing implementation.

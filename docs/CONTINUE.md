@@ -26,8 +26,25 @@ original Elixir cases also pass in the standalone source-only VM. Architecture
 and performance independently reviewed source and execution. Public capture,
 original project setup/profiles and independent Linux acceptance remain open.
 
-The current native-capture checkpoint runs **53 tests on macOS: 45 pass and
-eight fail**. All six metering cases pass. Four original paid-prefix regressions
+The current normalization regression checkpoint runs **55 native tests on macOS:
+45 pass and ten fail**. The two new tests preserve all eight preceding failure
+identities and fail only because existing Input APIs return bare invalid-donor
+errors for the new accounting mode. Raw controls pass first; later exact prefix,
+borrowed suffix and refusal assertions remain masked. These tests and genuine
+runtime RED are saved in `96516f1` before implementation. Architecture selected a
+Meter-only normalization child, unchanged raw facades and six-element value-mode
+support; its isolated body is being written in the three approved source paths.
+No initial tag reconstruction is needed. Source-backed row fees and independent
+matched-error deltas distinguish reached work from future forecasts. Formatting,
+all 50 architecture tests, reference/progress and whitespace pass at this R0.
+
+All four original Options tests also pass in a standalone pinned-source VM.
+Their four cases and 29 assertions are still awaiting reviewed Rust counterparts;
+the exact helper/error/ownership API is under separate architecture consultation.
+Neither standalone source execution nor registration marks full parity passing.
+
+The preceding reviewed native-capture checkpoint runs **53 tests on macOS:
+45 pass and eight fail**. All six metering cases pass. Four original paid-prefix regressions
 were saved before implementation; they now exercise retained encoder/copy work,
 actual-versus-forecast counts, decode estimates and query-prefix debt. Review
 added genuine regressions for lost unsettled state and guard-frame entry before
@@ -53,9 +70,9 @@ The partial progress ledger records **97 source-derived declarations,
 109 Rust counterpart mappings and 453 assertion links**. Runtime reconciliation
 still has 1,681 unmatched cases and 1,655 unresolved declarations. Full Elixir
 case/profile parity, Linux validation and the wider runtime milestones remain
-open. The proposed normalization/restoration increment requires concrete
-architecture selection before creation; it is not implemented or public bridge
-activation. The active full-completion goal remains unfinished.
+open. Normalization/restoration has its concrete selected TDD scope above;
+public bridge activation and complete initial ownership/settlement remain later
+required work. The active full-completion goal remains unfinished.
 
 The atomic-start recovery integration now passes **all eight regressions saved
 in `ae7a0ce` before implementation**. The borrowed header dispatches profile7;

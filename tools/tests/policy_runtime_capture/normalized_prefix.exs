@@ -37,6 +37,12 @@ defmodule Ferricstore.PolicyRuntimeCaptureNormalizedPrefixTest do
       assert Input.normalize(value) == raw
     end
 
+    assert Ferricstore.PolicyRuntimeCapture.Input.Meter.finish(
+             error,
+             {:metered, [], limits, forecast, gw, gp},
+             :unsettled
+           ) == {:unsettled, error, gw + 5, gp + 40}
+
     early = Input.normalize({:metered, [:invalid], limits, forecast, gw, gp})
     late = Input.normalize({:metered, [plain, mapped, :invalid], limits, forecast, gw, gp})
     empty = Input.normalize({:metered, [], limits, forecast, gw, gp})

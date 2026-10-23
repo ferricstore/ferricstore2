@@ -1,11 +1,12 @@
 Code.require_file("input/meter.exs", __DIR__)
 Code.require_file("input/query.exs", __DIR__)
 Code.require_file("input/binding.exs", __DIR__)
+Code.require_file("input/normalization.exs", __DIR__)
 
 defmodule Ferricstore.PolicyRuntimeCapture.Input do
   @moduledoc false
   alias Ferricstore.PolicyRuntimeCapture.Native
-  alias Ferricstore.PolicyRuntimeCapture.Input.{Meter, Query, Binding}
+  alias Ferricstore.PolicyRuntimeCapture.Input.{Meter, Query, Binding, Normalization}
 
   def decode_admission(donors, limits, retained)
       when (is_map(retained) and is_map_key(retained, :decoded_words) and
@@ -437,39 +438,10 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
   def bind_admission(donors, limits, retained, source, copies) when copies in [1, 2],
     do: Binding.bind_admission(donors, limits, retained, source, copies)
 
-  def normalize(prepared), do: normalize(prepared, [], [])
-  defp normalize([], donors, anchors), do: {:lists.reverse(donors), :lists.reverse(anchors)}
+  def normalize(prepared), do: Normalization.normalize(prepared)
 
-  defp normalize([binary | tail], donors, anchors) when is_binary(binary),
-    do: normalize(tail, [binary | donors], [nil | anchors])
-
-  defp normalize([%{encoded: encoded, source_term: _} = mapped | tail], donors, anchors)
-       when map_size(mapped) == 2 and is_binary(encoded),
-       do: normalize(tail, [encoded | donors], [mapped | anchors])
-
-  defp normalize(_, _, _), do: {:error, :invalid_donors}
-
-  def raw_contexts(donors, anchors, new_prepared) do
-    if proper_list?(new_prepared),
-      do: raw_contexts(donors, anchors, new_prepared, []),
-      else: {:error, :invalid_donors}
-  end
-
-  defp raw_contexts([], [], new_prepared, acc), do: :lists.reverse(acc, new_prepared)
-
-  defp raw_contexts([binary | donors], [nil | anchors], new_prepared, acc) when is_binary(binary),
-    do: raw_contexts(donors, anchors, new_prepared, [binary | acc])
-
-  defp raw_contexts(
-         [binary | donors],
-         [%{encoded: encoded, source_term: _} = mapped | anchors],
-         new_prepared,
-         acc
-       )
-       when map_size(mapped) == 2 and is_binary(binary) and encoded == binary,
-       do: raw_contexts(donors, anchors, new_prepared, [mapped | acc])
-
-  defp raw_contexts(_, _, _, _), do: {:error, :invalid_donors}
+  def raw_contexts(donors, anchors, new_prepared),
+    do: Normalization.raw_contexts(donors, anchors, new_prepared)
 
   def compact(donors, limits, retained) when is_list(donors) do
     with :ok <- donor_limit(donors, limits),
@@ -504,10 +476,6 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
 
   def compact_queries(queries, limits, retained),
     do: Query.compact_queries(queries, limits, retained)
-
-  defp proper_list?([]), do: true
-  defp proper_list?([_ | tail]), do: proper_list?(tail)
-  defp proper_list?(_), do: false
 
   defp check(value, maximum, field),
     do: if(value <= maximum, do: :ok, else: {:error, {:limit, field}})

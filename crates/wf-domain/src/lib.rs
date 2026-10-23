@@ -12,6 +12,7 @@ pub mod claim;
 pub mod history;
 pub mod lease;
 pub mod lineage;
+pub mod options;
 pub mod policy;
 pub mod retention;
 pub mod retry;
