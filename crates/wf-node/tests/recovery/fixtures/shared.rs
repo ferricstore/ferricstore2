@@ -9,13 +9,14 @@ use std::{
 use redb::{ReadableDatabase, ReadableTable, TableDefinition};
 use wf_consensus::apply::{apply_control_entry, read_applied_state};
 use wf_domain::{
+    lease::LeaseGuard,
     policy::complete::{PolicySchemaCharge, PolicySchemaLimits, decode_complete_policy_value_v2},
     workflow::{
-        Cancel, CommittedCommand, Create, Operation,
+        Cancel, CommittedCommand, Create, Operation, StartAndClaim, Terminal,
         admission::AdmissionLimits,
         caller::{MutationFieldValue as V, MutationInput, normalize_core_mutation},
         control::{ControlState, EntryStamp},
-        request::{ClientIntent, RequestScope},
+        request::{ClientIntent, RequestScope, RetainedOutcome, RetainedStatus},
     },
 };
 use wf_ports::{
@@ -24,19 +25,19 @@ use wf_ports::{
         RaftMembership, RaftMembershipLimits,
     },
     log::{
-        CodecLimits, PreparedBytes, RaftLogEntry, RaftLogLimits, RaftLogStore,
+        CodecLimits, PreparedBytes, RaftLogEntry, RaftLogLimits, RaftLogStore, encode_atomic_start,
         encode_independent_record_batch, encode_public_mutation, encode_raft_blank,
         encode_raft_membership, encode_record_batch,
     },
-    state::GroupApplyStore,
+    state::{GroupApplyStore, GroupApplyTransaction},
 };
 use wf_storage::{
     log::RedbLogStore,
     state::{RedbStateStore, StateStoreGenesis, StateStoreLimits},
     transaction::{
         RecordBatchTransactionLimits, RecordBatchTransactionOutcome,
-        apply_independent_record_batch_transaction, apply_public_mutation_transaction,
-        apply_record_batch_transaction,
+        apply_atomic_start_transaction, apply_independent_record_batch_transaction,
+        apply_public_mutation_transaction, apply_record_batch_transaction,
     },
 };
 use wf_types::{
@@ -217,6 +218,79 @@ pub(crate) fn cancel_op() -> Operation {
     })
 }
 
+pub(crate) fn atomic_start_op(workflow_type: &[u8]) -> Operation {
+    Operation::StartAndClaim(StartAndClaim {
+        workflow_type: workflow_type.to_vec(),
+        state: b"q".to_vec(),
+        worker: b"w\0\xff".to_vec(),
+        lease_ms: 1,
+        payload: None,
+    })
+}
+
+pub(crate) fn atomic_complete_frame(state: &mut RedbStateStore) -> TestResult<PreparedBytes> {
+    let s = scope()?;
+    let tx = state.begin_apply(
+        s.group(),
+        s.recovery(),
+        AdmissionLimits::default(),
+        100,
+        16 * MIB,
+        16 * MIB,
+    )?;
+    let stored = tx
+        .record(
+            s.tenant(),
+            &PartitionId::new(b"p".to_vec())?,
+            &RecordId::new(b"i".to_vec())?,
+        )?
+        .ok_or("atomic current record absent")?;
+    let lease = stored.record.lease().ok_or("actual atomic lease absent")?;
+    let operation = Operation::Complete(Terminal {
+        guard: LeaseGuard {
+            token: lease.token.clone(),
+            fence: stored.record.fence(),
+        },
+        payload: None,
+        value: Some(b"done".to_vec()),
+    });
+    drop(tx);
+    frame(5, b"complete", 17, vec![(b"i", operation)])
+}
+
+pub(crate) fn atomic_original(state: &mut RedbStateStore) -> TestResult<RetainedOutcome> {
+    let s = scope()?;
+    let tx = state.begin_apply(
+        s.group(),
+        s.recovery(),
+        AdmissionLimits::default(),
+        100,
+        16 * MIB,
+        16 * MIB,
+    )?;
+    let original = tx
+        .outcome(s.tenant(), &RequestId::new(b"q".to_vec())?)?
+        .ok_or("actual original atomic outcome absent")?;
+    assert_eq!(original.scope(), &s);
+    assert_eq!(original.request().as_bytes(), b"q");
+    assert_eq!(original.intent().version(), 7);
+    assert_eq!(original.response_version(), 4);
+    assert_eq!(original.status(), RetainedStatus::Accepted);
+    assert_eq!(original.original_position(), at(1));
+    assert_eq!(original.original_time().get(), 17);
+    assert_eq!(original.expires_at().get(), 1017);
+    assert_eq!(
+        original.response(),
+        hex(concat!(
+            "465741530001000000000170000000016900000001750000000171000000037700ff",
+            "000000087700ff3a31373a31000000000000000100000000000000010000000000000012",
+            "000000000000001100000000000000110000000000000001000000000000000000000000",
+            "0100000000000000"
+        ))?
+    );
+    Ok(original)
+}
+
 pub(crate) fn frame(
     profile: u16,
     request: &[u8],
@@ -296,6 +370,7 @@ pub(crate) fn frame_for(
     Ok(match profile {
         5 => encode_record_batch(request, limits.codec, limits.workspace_bytes)?,
         6 => encode_independent_record_batch(request, limits.codec, limits.workspace_bytes)?,
+        7 => encode_atomic_start(request, limits.codec, limits.workspace_bytes)?,
         _ => return Err("unsupported fixture profile".into()),
     })
 }
@@ -343,6 +418,7 @@ pub(crate) fn apply_normal(
             apply_independent_record_batch_transaction(state, &s, body, at(index), driver_limits())?
         }
         1 => apply_public_mutation_transaction(state, &s, body, at(index), driver_limits())?,
+        7 => apply_atomic_start_transaction(state, &s, body, at(index), driver_limits())?,
         _ => return Err("unsupported fixture profile".into()),
     })
 }

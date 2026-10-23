@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod advance;
+mod atomic_start;
 mod claim;
 mod core_policy;
 #[path = "../../../wf-storage/tests/state_store/faults/backend.rs"]

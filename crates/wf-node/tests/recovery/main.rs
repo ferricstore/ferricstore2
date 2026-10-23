@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+mod atomic_start;
 mod claim;
 mod core_policy;
 mod faults;

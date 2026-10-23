@@ -49818,3 +49818,126 @@ Git, VM or benchmark was run by this author. Root owns subsequent actual GREEN,
 full-workspace verification and reciprocal ARCH/PERF source review. No speed,
 allocation/RSS, Linux acceptance, full original parity or M1–M8 completion is
 claimed; the full both-OS objective remains active.
+
+
+### D3 TEST1 stopped author handoff — borrowed header and actual recovery callers
+
+Root explicitly released the exact9-path TEST1 batch at
+coordination4291019+2305/d03221395c7f871999497390604320fb60f7e8a56283715d860841c68c6421bb
+after actual D2 full988/SAVE0e3b7e3. Before authoring, whole/hash-read
+ARCH4504567+13755/66c28d70, its4518322+331/314eae40 precedence precision and
+PERF3444602+3956/5404a530. Runtime three-body release remains HELD.
+
+Exactly the selected eight tests and eleven named ordinary helpers were written.
+The header test retains empty/garbage-body success, actual borrowed field pointers,
+complete stamp, all prefix truncations, encoded caps, root/version and scope/request
+bounds, including the legacy stamp-before-unsupported-Normal selection. Every old
+header test and packed helper stays byte-literal.
+
+The real mixed sequence uses distinct legacy b/b at0, actual u/i atomic q at17/1,
+Complete from the persisted lease token/fence at17/2, original retry at18/3 and
+blank4, retaining an uncommitted poisoned tail. Complete current/history and exact
+114-byte original FWAS/origin/expiry1017 are independent observations. Type u absence
+is actually read from the complete policy capability. Source-cohort, applied-prefix,
+full audit/error precedence and consuming-failure reopen assertions are present.
+R3 isolates audit D on frames[..2], tests J/cumulative wire/early point-count and
+D boundaries, raw worker3/inline2, a reachable normalW-dominated outer envelope and
+a real tiny inner-driver refusal preserving only an independently prepared blank
+prefix. It claims no small-scope J+Q discriminator or fee-derived budget.
+
+Legacy snapshot cases use actual capture/current DATA, native receive/into_store/
+install, independently rehashed corrupt-token/time envelopes and full four-table
+cohorts. S3 checks broad captured/purged completed base2, including an actual read
+of completed9/v2/resultdone/no lease; inline7 refusal runs FIRST with unchanged full
+base/log cohorts and immediate reopen. Inline8 must then succeed on the SAME pending
+original retry and advance control3 while preserving original metadata and DATA.
+This distinguishes original token8 from current completed9. Upgraded install and
+private fresh restore use real matching atomic local log1, existing stage/six-table
+observers, actual Complete/retry/control suffixes and two restarts. The fixture
+explicitly retains trusted accepted-snapshot caller authority, not checksum authority.
+
+Stopped source inventory (physical LF lines, bytes, SHA256):
+
+| Path | Lines | Bytes | SHA256 |
+|---|---:|---:|---|
+| crates/wf-node/tests/recovery/atomic_start.rs | 331 | 12210 | 8a7920f2715dd3921d6ad10413eeafc46765e117fb6e22ff961dd39dde428591 |
+| crates/wf-node/tests/snapshot_recovery/atomic_start.rs | 370 | 14241 | 0aedbf9eec00bf0d33667081a1af883f4e8327bf7743cb9c57998176bcb8e526 |
+| crates/wf-node/tests/snapshot_recovery/advance/atomic_start.rs | 122 | 5092 | 1117934cb65b694e2d9453802e7f6fd03bf9991ad339219aac4f94933d059619 |
+| crates/wf-ports/tests/recovery_header.rs | 184 | 7084 | 6ba28d86cf9e89eeec14b4026ea0fa348f5c3afd880f813579c4a074361cb40e |
+| crates/wf-node/tests/recovery/main.rs | 58 | 1769 | f9c7ad48658b38bdd953bbabc035a3aec088af1aaf9586f4d8227af220ed6873 |
+| crates/wf-node/tests/snapshot_recovery/main.rs | 39 | 1070 | a68acd37a0b2438ca655d4d6a87d0cb4942c05cfdec1ea346ed7a199c0d2f4ee |
+| crates/wf-node/tests/snapshot_recovery/advance.rs | 391 | 14847 | 9adacca0b3a9a79b644270a48f00de7f44c27698f7e14ec904fa8fc8293db8e1 |
+| crates/wf-node/tests/recovery/fixtures/shared.rs | 478 | 14978 | 613fff4b56a0e2e560ff6229d204979fbd217943aca4e053014b8e6f46804cd0 |
+| crates/wf-node/tests/recovery/fixtures.rs | 29 | 1168 | 7cdad7267db0a52142ab4ce8c0c4e951ab4ced5e5b22ed47b32855ea9b767537 |
+
+Read-only census: all62 function bodies across9 owned files are<=100, maximum89
+(R3); largest file478. New test counts H84/R63/R59/R89/S73/S52/S79/A72; new helper
+counts shared9/29/32, recovery50/28/15, snapshot60/11/45/23, advance38. No packing,
+exemption, new helper/path/type/model/alias/hook/API or visibility delta was needed.
+This is a source census, not a rustfmt/compiler/checker result.
+
+Actual in-memory whole-file inverses reconstruct ALL SIX old byte images exactly:
+header3560/0d8439d6; recovery main1751/b7712c18; snapshot main1052/3be59c6d;
+advance14829/0d5e540f; shared12251/aec11de8; fixtures1107/0e0d294e.
+They remove only the named appended test, three module seams, three shared helpers/
+imports, the two selected shared bodies and their three fixture reexports. Full
+six beforeimages, three child absences and all held hashes remain in memory.
+All1514 held inputs (excluding only9 owned paths and4 append-only notes) remain
+EXACT unchanged at compact sorted JSON SHA256
+fc0e736dd189b25d9b93e17bac49d3acd0d561c982512b2ae48c7050f4775b82,
+including all D1/D2/runtime/Cargo/config/ledger/native/reference inputs.
+
+All9 source buffers are STOPPED. No formatter, compiler, test, Git, VM, native,
+benchmark or probe/artifact file was used/created by this author. Root owns actual
+compile/runtime reach, genuine FAIL and already-PASS controls, source freeze and
+later body release. No all8RED, successful D3 recovery, full parity, Linux or
+M1–M8 completion is claimed. The full both-OS/original objective remains active.
+
+
+### D3 TEST1 canonical and actual RED — finite DOMAIN reciprocal acceptance
+
+Actually whole/hash-read both final independent receipts:
+ARCH4523098+3949/bd77cfb98d6f49605fd76c5025bcbaa46ea64953157499b3f5fea19bf2bb2708
+and PERF3455223+7340/4a0ed7fa862f8da1f77d09b2fafeb21bb5117e620c53c0317630260ab3590a72.
+Both read the prior author receipt5003148+5323/42b77ea2 and agree. No scoped
+ownership, authority, error-origin or resource discrepancy remains.
+
+Whole-read/rehashed ALL9 final canonical sources after Root's stopped lint repair.
+The children are362/f8f6003e,392/576929e9,125/a855f2d0; header187/21d4b71d,
+shared477/3b45bc7c, fixtures29/fafb66e0 and three mains58/f9c7ad48,
+39/a68acd37,391/9adacca0. Own direct census is62 bodies/max100 at R3, maxfile477.
+The fully qualified TimestampMillis::get spelling preserves the actual Option::map
+operation and every assertion. Earlier actual author whole6 inverses remain
+separate evidence from this turn's direct canonical source/hash review; ARCH and
+Root independently reconstruct the six ENTIRE saved-D2 images now. ARCH's whole
+receipt also proves all3 new-child absences, old tests/helpers and runtime3 literal.
+No second independent Git/inverse claim is invented by this reviewer.
+
+Challenged the budget causality: R3's audit slice excludes longer Complete frames;
+legacyE121<atomicE129, B129, J641, D3717, base3588 give exact W7817 above initial
+observation5255. The count shortage may stop before audit; cumulative wire shortage
+reaches the next point. The outer peak is normalW-dominated, with no tiny J+Q claim.
+Broad outer/tiny inner limits retain the real independently prepared blank2 prefix,
+not whole-call rollback. Worker3/inline2 belongs to FWCP audit; token8/inline7 belongs
+to retained scanning. S3's actual completed9 base, inline7-FIRST full no-write/reopen
+and SAME-tail inline8/control3 distinguish original-before-current. New fixture
+observations are newly admitted owners/content comparisons, never fee credit.
+Received DATA remains trusted caller input, not a checksum-generated consensus fact.
+
+Actually whole/hash-read QUALITY2 6176996+7912/e8f2e97c in the existing Root log:
+all7 ordered argv/raw/EXIT0 UNCHANGED True, including arch50 and explicitly incomplete
+reference/progress. Whole/hash-read runtime raw blocks6185109+898/2137d5f9,
+6186228+3966/1a03f4da and6190440+1324/d3c2957d plus actual headers/EXIT101 footers
+at the SAME1524/9f56d9d9db01a13a326cde5d516b4bb41dc6bd0c923997dd7a5fc283a869048b.
+Exact new8 are6FAIL/2PASS. Old header2 and recovery19 pass; snapshot44 are FILTERED.
+R2's BodyMismatch/no-write/reopen case finishes before the next trailing case fails
+Codec(UnsupportedVersion) versus Normal(Apply(Encoding(TrailingBytes))). Header's
+first positive, R1/R3 and S3/A1 reach the real unsupported header route. Later header/
+R2/R3 boundaries, S3 ordered caps and A1 fresh restore remain masked. S1/S2 are actual
+already-supported GREEN storage controls. No all8RED or completed D3 behavior claim.
+
+No source acceptance blocker for the exact TEST1 save. Only this DOMAIN append;
+no source edits, compiler/test/workload/formatter/Git/VM/native/benchmark/probe or new
+artifact. Root alone owns SAVE and the separate selected three-function body release.
+Full original parity, Linux/macOS and M1–M8 objective remains active. Finite ordinary
+reciprocal review complete; no additional readiness gate or permission requested.

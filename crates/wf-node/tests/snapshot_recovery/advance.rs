@@ -8,6 +8,7 @@ use super::{
 use wf_domain::workflow::control::{EntryIdentity, EntryStamp};
 use wf_ports::snapshot::{SnapshotTransition, StateSnapshotTransitionStore};
 
+mod atomic_start;
 mod faults;
 mod fixtures;
 mod limits;

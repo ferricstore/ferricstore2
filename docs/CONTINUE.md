@@ -5,6 +5,25 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
+The next atomic-start recovery regression checkpoint compiles cleanly and runs
+**eight new tests on macOS: two snapshot controls pass and six recovery cases
+fail**. The header case reaches `UnsupportedVersion`; three committed-recovery
+cases reach `Codec(UnsupportedVersion)`; purged startup and trusted received
+composition reach `Recovery(Codec(UnsupportedVersion))`. The first unsupported
+route masks later body, resource and replay assertions. Both older header tests
+and all 19 older recovery tests pass. The focused snapshot run filters 44 older
+cases, which must run in the later full checkpoint.
+
+Formatting, all-target ports/node compilation, strict Clippy, all 50 architecture
+checks, reference/progress and whitespace checks pass after an ordinary test
+method-reference lint fix. Quality and all three runtime sequences preserve the
+same 1,524 captured inputs, excluding only the three append-only peer notes.
+Six explicit whole-file inverses preserve the previous test homes; the three
+recovery runtime files and frozen storage regressions remain byte-exact to the
+saved checkpoint. The nine test files fit 600 physical lines and their function
+bodies fit 100. This is preimplementation failure evidence, not completed
+committed-log recovery, full original Elixir parity or Linux acceptance.
+
 The latest full Rust checkpoint passes **988 tests across 90 targets on macOS**,
 with zero failures, ignored or filtered tests, plus **six compile-fail examples
 across 15 documentation targets**. All eleven local checks pass, including strict

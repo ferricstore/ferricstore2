@@ -96,3 +96,92 @@ fn normal_recovery_header_rejects_wrong_profiles_framing_and_byte_caps()
     }
     Ok(())
 }
+
+#[test]
+fn normal_recovery_header_borrows_atomic_start_without_body_authority()
+-> Result<(), Box<dyn std::error::Error>> {
+    let scopes: [&[u8]; 3] = [b"t\0\xff", b"g\0", b"z\xff"];
+    let header = packed(1, 7, scopes)?;
+    for suffix in [&[][..], b"unverified atomic operation".as_slice()] {
+        let mut bytes = header.clone();
+        bytes.extend_from_slice(suffix);
+        let cap = CodecLimits::new(AdmissionLimits::new(1, bytes.len(), 1)?);
+        let (profile, borrowed, stamp) = normal_recovery_header(&bytes, cap)?;
+        assert_eq!(profile, 7);
+        assert_eq!(borrowed, scopes);
+        let mut at = 7;
+        for field in borrowed {
+            at += 4;
+            assert_eq!(field.as_ptr(), bytes[at..].as_ptr());
+            at += field.len();
+        }
+        assert_eq!(stamp, CommittedTime::new(HlcTimestamp::new(17, 3)?, 11)?);
+        let below = CodecLimits::new(AdmissionLimits::new(1, bytes.len() - 1, 1)?);
+        assert_eq!(
+            normal_recovery_header(&bytes, below),
+            Err(CodecError::ByteLimit)
+        );
+    }
+    for length in 0..header.len() {
+        assert!(normal_recovery_header(&header[..length], CodecLimits::default()).is_err());
+    }
+    for (offset, byte, expected) in [
+        (0, b'X', CodecError::Malformed),
+        (5, 2, CodecError::UnsupportedVersion),
+        (6, 2, CodecError::UnsupportedVersion),
+        (6, 6, CodecError::UnsupportedTag),
+    ] {
+        let mut changed = header.clone();
+        changed[offset] = byte;
+        assert_eq!(
+            normal_recovery_header(&changed, CodecLimits::default()),
+            Err(expected)
+        );
+    }
+    for scopes in [
+        [&[][..], b"g", b"z"],
+        [&[0xff; 8193][..], b"g", b"z"],
+        [b"t", &[1; 257][..], b"z"],
+        [b"t", b"g", &[2; 257][..]],
+    ] {
+        assert!(normal_recovery_header(&packed(1, 7, scopes)?, CodecLimits::default()).is_err());
+    }
+    for scopes in [[b"t".as_slice(), &[], b"z"], [b"t".as_slice(), b"g", &[]]] {
+        assert!(normal_recovery_header(&packed(1, 7, scopes)?, CodecLimits::default()).is_err());
+    }
+    let exact = packed(1, 7, [&[1; 8192], &[2; 256], &[3; 256]])?;
+    assert_eq!(normal_recovery_header(&exact, CodecLimits::default())?.0, 7);
+    for request_len in [0_u32, 256, 257] {
+        let mut changed = packed(1, 7, [b"t", b"g", b"z"])?;
+        changed[22..26].copy_from_slice(&request_len.to_be_bytes());
+        drop(changed.splice(26..33, vec![b'q'; usize::try_from(request_len)?]));
+        assert_eq!(
+            normal_recovery_header(&changed, CodecLimits::default()).is_ok(),
+            request_len == 256
+        );
+    }
+    assert_eq!(
+        normal_recovery_header(&packed(1, 8, [b"t", b"g", b"z"])?, CodecLimits::default()),
+        Err(CodecError::UnsupportedVersion)
+    );
+    for root in [1, 2] {
+        let legacy = packed(root, 1, [b"t", b"g", b"z"])?;
+        assert_eq!(
+            normal_recovery_header(&legacy, CodecLimits::default()),
+            Err(CodecError::UnsupportedTag)
+        );
+        let mut truncated = legacy[..legacy.len() - 1].to_vec();
+        assert_eq!(
+            normal_recovery_header(&truncated, CodecLimits::default()),
+            Err(CodecError::Malformed)
+        );
+        truncated = legacy;
+        let start = truncated.len() - 18;
+        truncated[start..start + 8].copy_from_slice(&u64::MAX.to_be_bytes());
+        assert_eq!(
+            normal_recovery_header(&truncated, CodecLimits::default()),
+            Err(CodecError::Malformed)
+        );
+    }
+    Ok(())
+}

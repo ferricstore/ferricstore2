@@ -6,9 +6,10 @@ use std::path::Path;
 mod shared;
 use shared::bytes_table;
 pub(super) use shared::{
-    MIB, Rows, append, applied, apply_control, apply_normal, at, blank, cancel_op, clock,
-    create_op, create_pair, create_pair_for, directory, driver_limits, frame, frame_for, hex,
-    log_meta, log_rows, member, open_pair, open_pair_for, scope, scope_for, state_rows,
+    MIB, Rows, append, applied, apply_control, apply_normal, at, atomic_complete_frame,
+    atomic_original, atomic_start_op, blank, cancel_op, clock, create_op, create_pair,
+    create_pair_for, directory, driver_limits, frame, frame_for, hex, log_meta, log_rows, member,
+    open_pair, open_pair_for, scope, scope_for, state_rows,
 };
 
 pub(super) fn state_meta(dir: &Path) -> TestResult<Rows> {
