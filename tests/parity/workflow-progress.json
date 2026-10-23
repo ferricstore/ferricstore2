@@ -1718,7 +1718,34 @@
       "runtime_case_ids": [
         "14b3850a39be1f725f1c1236d321f6dd1f90a4338192d43ec0e6768293a41b68"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-981b590378d8a60d-child-failure-option",
+          "rust_file": "crates/wf-domain/tests/child_policy.rs",
+          "rust_file_sha256": "07cf7b5a8811931aadf23f35ee50ca017a26413b8e1c645dcaf056250354bdc4",
+          "rust_module": "",
+          "rust_function": "optional_policy_normalizes_binary_values_and_rejects_unsupported_values",
+          "assertions": [
+            {
+              "source_line": 22,
+              "source_text": "assert ChildPolicy.optional_policy(",
+              "rust_line": 14,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 32,
+              "source_text": "assert ChildPolicy.optional_policy([on_child_failure: \"bad\"], :on_child_failure, :ignore, [",
+              "rust_line": 24,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Pure child-failure option normalization preserves both source assertions, their order, the flow tag and the absence of local setup. This finite borrowed valid-UTF8 vocabulary does not implement every ChildPolicy option or invalid-UTF8 input.",
+            "The source helper's on_child_failure/default-ignore pair remains distinct from the public command's on_child_failed/default-fail-parent pair; public command, storage, transport and complete original profile execution remain required.",
+            "The focused four-test target passes on macOS. This partial assertion link does not certify full source-case parity or independent Linux acceptance."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "aa52ad13e737fc75",

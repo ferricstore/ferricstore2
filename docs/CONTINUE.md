@@ -5,16 +5,32 @@ increment. GPT-6.1-sol/max owners communicate with dedicated architecture and
 performance review and disjoint writes. See
 [the active coordination record](reviews/workflow-completion-coordination.md).
 
-The latest full Rust checkpoint passes **996 tests across 90 targets on macOS**,
+The latest full Rust checkpoint passes **1,000 tests across 91 targets on macOS**,
 with zero failures, ignored or filtered tests, plus **six compile-fail examples
 across 15 documentation targets**. All eleven checks pass: formatting, workspace
 compilation, strict Clippy, warnings-denied documentation, all 50 architecture
 checks, reference/progress, four cached offline dependency-audit categories and
-whitespace. All 1,524 captured inputs stayed unchanged during validation, excluding
+whitespace. All 1,530 captured inputs stayed unchanged during validation, excluding
 only the three append-only peer notes. Exact target/executable/name/status
-comparison preserves all 988 preceding tests and adds only the eight frozen
-recovery regressions. All 48 snapshot and 105 state-store tests execute; both
-benchmark correctness smokes pass. No measured performance gain is claimed.
+comparison preserves all 996 preceding tests and adds only the four child-policy
+tests saved before binary normalization. Both benchmark correctness smokes pass.
+No measured performance gain is claimed.
+
+The borrowed child-failure option normalizer now passes both assertions from
+pinned declaration `981b590378d8a60d`, preserving their order, exact keys, defaults,
+allowed values and error text. Three additional controls cover atoms, absent and
+unsupported defaults, first-key selection, membership, case/hyphen aliases and
+no trimming. A real typed-only baseline ran two passing and two failing tests
+before the nine-line binary implementation. Architecture and performance
+independently reviewed the source, frozen tests and execution. The finite valid
+UTF-8 implementation uses no allocating normalization and remains separate from
+public command capture and other child-policy options.
+
+The partial progress ledger now records **93 source-derived declarations,
+105 Rust counterpart mappings and 444 assertion links**. Runtime reconciliation
+still has 1,681 unmatched cases and 1,655 unresolved declarations. These partial
+links do not certify full case/profile parity. Linux validation, the eight native
+capture failures and the wider runtime milestones remain open.
 
 The atomic-start recovery integration now passes **all eight regressions saved
 in `ae7a0ce` before implementation**. The borrowed header dispatches profile7;
