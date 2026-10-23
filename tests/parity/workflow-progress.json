@@ -7425,42 +7425,318 @@
       "runtime_case_ids": [
         "d0ec26b5b050c456303f049d3073eaa0ecd402a12067754660ceb6e229e2ab73"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-many-item-opts-1d6dcdb8aab953f1",
+          "rust_file": "crates/wf-domain/tests/many_item_opts/main.rs",
+          "rust_file_sha256": "aa2341665fb95d117f069cb3841092ae41208fb9d78e1a98dcb1432830a7e748",
+          "rust_module": "",
+          "rust_function": "create_parses_binary_tuple_and_map_item_shapes",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert ManyItemOpts.create(\"flow-1\") == {:ok, \"flow-1\", []}",
+              "rust_line": 37,
+              "rust_text": "assert!(parsed_match(&many::create(&id), b\"flow-1\", None, &[]));"
+            },
+            {
+              "source_line": 9,
+              "source_text": "assert ManyItemOpts.create({\"flow-1\", [payload: \"p\"]}) == {:ok, \"flow-1\", [payload: \"p\"]}",
+              "rust_line": 43,
+              "rust_text": "assert!(parsed_match("
+            },
+            {
+              "source_line": 11,
+              "source_text": "assert ManyItemOpts.create({:id, \"flow-1\", :payload_ref, \"ref\"}) ==",
+              "rust_line": 57,
+              "rust_text": "assert!(parsed_match("
+            },
+            {
+              "source_line": 14,
+              "source_text": "assert ManyItemOpts.create({:id, \"flow-1\", :partition_key, \"p\", :payload, \"payload\"}) ==",
+              "rust_line": 73,
+              "rust_text": "assert!(parsed_match("
+            },
+            {
+              "source_line": 17,
+              "source_text": "assert {:ok, \"flow-1\", opts} =",
+              "rust_line": 90,
+              "rust_text": "assert!(matches!(&parsed, Ok(value) if value.id == b\"flow-1\" && value.lease_token.is_none()));"
+            },
+            {
+              "source_line": 20,
+              "source_text": "assert opts[:type] == \"email\"",
+              "rust_line": 93,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 21,
+              "source_text": "assert opts[:partition_key] == \"p\"",
+              "rust_line": 102,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves all 7 complete pinned pure ManyItemOpts observations in source order, including exact errors, result shape and option fields. Source async:true/flow provenance has no local setup; seven derived controls additionally preserve full fixed-map orders, nil/duplicate/lease guards, opaque borrowing and merge lifetime behavior.",
+            "Inputs are already captured canonical proper-list/tuple/map descriptors with source-equal unique map keys and captured atom spellings. Fragment acquisition, native VM shape/enumeration and hidden Other payload correspondence remain caller obligations. This helper grants no command, transport, business-policy or admission authority.",
+            "IDs, terminal leases and option values stay borrowed. One fallible output-row Vec reservation follows semantic checks; source diagnoses and operational reserve failure stay distinct. No payload clone, automatic Box conversion, whole allocation/GC/RSS bound or measured speedup is claimed.",
+            "All thirteen Rust target cases and all six original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider workflow/service parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "9530810dd595a373",
       "runtime_case_ids": [
         "90cb8d5d099b1185c9e92adb9cc7f7baa365dd1ac9f5a49394c97506b4253ddf"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-many-item-opts-9530810dd595a373",
+          "rust_file": "crates/wf-domain/tests/many_item_opts/main.rs",
+          "rust_file_sha256": "aa2341665fb95d117f069cb3841092ae41208fb9d78e1a98dcb1432830a7e748",
+          "rust_module": "",
+          "rust_function": "terminal_item_parsers_preserve_map_values_and_lease_tuple_shapes",
+          "assertions": [
+            {
+              "source_line": 26,
+              "source_text": "assert {:ok, \"flow-1\", \"lease\", opts} = ManyItemOpts.complete(item)",
+              "rust_line": 126,
+              "rust_text": "assert!(matches!(&parsed, Ok(value)"
+            },
+            {
+              "source_line": 27,
+              "source_text": "assert opts[:fencing_token] == 7",
+              "rust_line": 130,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 28,
+              "source_text": "assert opts[:result] == \"ok\"",
+              "rust_line": 139,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 29,
+              "source_text": "assert opts[:payload] == \"p\"",
+              "rust_line": 148,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 31,
+              "source_text": "assert ManyItemOpts.retry({:id, \"flow-1\", :lease_token, \"lease\", :fencing_token, 7}) ==",
+              "rust_line": 166,
+              "rust_text": "assert!(parsed_match("
+            },
+            {
+              "source_line": 34,
+              "source_text": "assert ManyItemOpts.fail({\"flow-1\", [lease_token: \"lease\", fencing_token: 7]}) ==",
+              "rust_line": 178,
+              "rust_text": "assert!(parsed_match("
+            }
+          ],
+          "limitations": [
+            "Preserves all 6 complete pinned pure ManyItemOpts observations in source order, including exact errors, result shape and option fields. Source async:true/flow provenance has no local setup; seven derived controls additionally preserve full fixed-map orders, nil/duplicate/lease guards, opaque borrowing and merge lifetime behavior.",
+            "Inputs are already captured canonical proper-list/tuple/map descriptors with source-equal unique map keys and captured atom spellings. Fragment acquisition, native VM shape/enumeration and hidden Other payload correspondence remain caller obligations. This helper grants no command, transport, business-policy or admission authority.",
+            "IDs, terminal leases and option values stay borrowed. One fallible output-row Vec reservation follows semantic checks; source diagnoses and operational reserve failure stay distinct. No payload clone, automatic Box conversion, whole allocation/GC/RSS bound or measured speedup is claimed.",
+            "All thirteen Rust target cases and all six original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider workflow/service parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f903d6ac5351550c",
       "runtime_case_ids": [
         "11ac92d4a6b5ed06d3b7820d345369422384c3b043f65e645ed065ac08648822"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-many-item-opts-f903d6ac5351550c",
+          "rust_file": "crates/wf-domain/tests/many_item_opts/main.rs",
+          "rust_file_sha256": "aa2341665fb95d117f069cb3841092ae41208fb9d78e1a98dcb1432830a7e748",
+          "rust_module": "",
+          "rust_function": "cancel_and_transition_preserve_optional_lease_and_partition_keys",
+          "assertions": [
+            {
+              "source_line": 39,
+              "source_text": "assert ManyItemOpts.cancel(%{\"id\" => \"flow-1\", \"fencing_token\" => 3, \"partition_key\" => \"p\"}) ==",
+              "rust_line": 200,
+              "rust_text": "assert!(parsed_match("
+            },
+            {
+              "source_line": 42,
+              "source_text": "assert {:ok, \"flow-1\", opts} =",
+              "rust_line": 220,
+              "rust_text": "assert!(matches!(&parsed, Ok(value) if value.id == b\"flow-1\" && value.lease_token.is_none()));"
+            },
+            {
+              "source_line": 50,
+              "source_text": "assert opts[:state_meta] == %{\"version\" => 4}",
+              "rust_line": 223,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 51,
+              "source_text": "assert opts[:attributes_merge] == %{\"phase\" => \"cancelled\"}",
+              "rust_line": 228,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 53,
+              "source_text": "assert ManyItemOpts.transition(",
+              "rust_line": 245,
+              "rust_text": "assert!(parsed_match("
+            }
+          ],
+          "limitations": [
+            "Preserves all 5 complete pinned pure ManyItemOpts observations in source order, including exact errors, result shape and option fields. Source async:true/flow provenance has no local setup; seven derived controls additionally preserve full fixed-map orders, nil/duplicate/lease guards, opaque borrowing and merge lifetime behavior.",
+            "Inputs are already captured canonical proper-list/tuple/map descriptors with source-equal unique map keys and captured atom spellings. Fragment acquisition, native VM shape/enumeration and hidden Other payload correspondence remain caller obligations. This helper grants no command, transport, business-policy or admission authority.",
+            "IDs, terminal leases and option values stay borrowed. One fallible output-row Vec reservation follows semantic checks; source diagnoses and operational reserve failure stay distinct. No payload clone, automatic Box conversion, whole allocation/GC/RSS bound or measured speedup is claimed.",
+            "All thirteen Rust target cases and all six original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider workflow/service parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "aa429f07c817d858",
       "runtime_case_ids": [
         "1de0c9a9e8104229cb9a978d90c0d70625fa66a84513fbf18c50655f08a2f6cb"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-many-item-opts-aa429f07c817d858",
+          "rust_file": "crates/wf-domain/tests/many_item_opts/main.rs",
+          "rust_file_sha256": "aa2341665fb95d117f069cb3841092ae41208fb9d78e1a98dcb1432830a7e748",
+          "rust_module": "",
+          "rust_function": "merge_applies_item_opts_over_base_opts_and_pins_partition_key",
+          "assertions": [
+            {
+              "source_line": 62,
+              "source_text": "assert opts[:type] == \"email\"",
+              "rust_line": 268,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 63,
+              "source_text": "assert opts[:state] == \"queued\"",
+              "rust_line": 275,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 64,
+              "source_text": "assert opts[:partition_key] == \"item\"",
+              "rust_line": 282,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves all 3 complete pinned pure ManyItemOpts observations in source order, including exact errors, result shape and option fields. Source async:true/flow provenance has no local setup; seven derived controls additionally preserve full fixed-map orders, nil/duplicate/lease guards, opaque borrowing and merge lifetime behavior.",
+            "Inputs are already captured canonical proper-list/tuple/map descriptors with source-equal unique map keys and captured atom spellings. Fragment acquisition, native VM shape/enumeration and hidden Other payload correspondence remain caller obligations. This helper grants no command, transport, business-policy or admission authority.",
+            "IDs, terminal leases and option values stay borrowed. One fallible output-row Vec reservation follows semantic checks; source diagnoses and operational reserve failure stay distinct. No payload clone, automatic Box conversion, whole allocation/GC/RSS bound or measured speedup is claimed.",
+            "All thirteen Rust target cases and all six original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider workflow/service parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "774af4e22ef02146",
       "runtime_case_ids": [
         "0261f4802529e5de49aece40259a8deab26a6c413e48293e4d92d074ed2cf6fa"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-many-item-opts-774af4e22ef02146",
+          "rust_file": "crates/wf-domain/tests/many_item_opts/main.rs",
+          "rust_file_sha256": "aa2341665fb95d117f069cb3841092ae41208fb9d78e1a98dcb1432830a7e748",
+          "rust_module": "",
+          "rust_function": "invalid_item_opts_keep_existing_error_messages",
+          "assertions": [
+            {
+              "source_line": 68,
+              "source_text": "assert ManyItemOpts.create({\"flow-1\", [:bad]}) ==",
+              "rust_line": 297,
+              "rust_text": "assert!(matches!(many::create(&create), Err(error)"
+            },
+            {
+              "source_line": 71,
+              "source_text": "assert ManyItemOpts.complete({\"flow-1\", [fencing_token: 1]}) ==",
+              "rust_line": 304,
+              "rust_text": "assert!(matches!(many::complete(&complete), Err(error)"
+            },
+            {
+              "source_line": 74,
+              "source_text": "assert ManyItemOpts.transition(:bad) == {:error, \"ERR flow id must be a non-empty string\"}",
+              "rust_line": 307,
+              "rust_text": "assert!(matches!(many::transition(&Raw::Atom(\"bad\")), Err(error)"
+            }
+          ],
+          "limitations": [
+            "Preserves all 3 complete pinned pure ManyItemOpts observations in source order, including exact errors, result shape and option fields. Source async:true/flow provenance has no local setup; seven derived controls additionally preserve full fixed-map orders, nil/duplicate/lease guards, opaque borrowing and merge lifetime behavior.",
+            "Inputs are already captured canonical proper-list/tuple/map descriptors with source-equal unique map keys and captured atom spellings. Fragment acquisition, native VM shape/enumeration and hidden Other payload correspondence remain caller obligations. This helper grants no command, transport, business-policy or admission authority.",
+            "IDs, terminal leases and option values stay borrowed. One fallible output-row Vec reservation follows semantic checks; source diagnoses and operational reserve failure stay distinct. No payload clone, automatic Box conversion, whole allocation/GC/RSS bound or measured speedup is claimed.",
+            "All thirteen Rust target cases and all six original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider workflow/service parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "deb84a5db1b0a073",
       "runtime_case_ids": [
         "efb60833262d4af20cd5f5be67cf84d61959aa45b334bda3f5895fbb8635196b"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-many-item-opts-deb84a5db1b0a073",
+          "rust_file": "crates/wf-domain/tests/many_item_opts/main.rs",
+          "rust_file_sha256": "aa2341665fb95d117f069cb3841092ae41208fb9d78e1a98dcb1432830a7e748",
+          "rust_module": "",
+          "rust_function": "item_parsers_reject_empty_ids_and_required_lease_tokens_at_the_boundary",
+          "assertions": [
+            {
+              "source_line": 78,
+              "source_text": "assert ManyItemOpts.create(\"\") == {:error, \"ERR flow id must be a non-empty string\"}",
+              "rust_line": 314,
+              "rust_text": "assert!(matches!(many::create(&Raw::Binary(b\"\")), Err(error)"
+            },
+            {
+              "source_line": 80,
+              "source_text": "assert ManyItemOpts.create(%{id: \"\", type: \"email\"}) ==",
+              "rust_line": 322,
+              "rust_text": "assert!(matches!(many::create(&create), Err(error)"
+            },
+            {
+              "source_line": 83,
+              "source_text": "assert ManyItemOpts.complete({\"flow-1\", \"\", [fencing_token: 1]}) ==",
+              "rust_line": 333,
+              "rust_text": "assert!(matches!(many::complete(&complete), Err(error)"
+            },
+            {
+              "source_line": 86,
+              "source_text": "assert ManyItemOpts.complete(%{id: \"flow-1\", lease_token: \"\", fencing_token: 1}) ==",
+              "rust_line": 342,
+              "rust_text": "assert!(matches!(many::complete(&map), Err(error)"
+            },
+            {
+              "source_line": 89,
+              "source_text": "assert ManyItemOpts.cancel(%{id: \"flow-1\", lease_token: \"\", fencing_token: 1}) ==",
+              "rust_line": 345,
+              "rust_text": "assert!(matches!(many::cancel(&map), Err(error)"
+            },
+            {
+              "source_line": 92,
+              "source_text": "assert ManyItemOpts.transition({:id, \"flow-1\", :fencing_token, 1, :lease_token, \"\"}) ==",
+              "rust_line": 357,
+              "rust_text": "assert!(matches!(many::transition(&transition), Err(error)"
+            }
+          ],
+          "limitations": [
+            "Preserves all 6 complete pinned pure ManyItemOpts observations in source order, including exact errors, result shape and option fields. Source async:true/flow provenance has no local setup; seven derived controls additionally preserve full fixed-map orders, nil/duplicate/lease guards, opaque borrowing and merge lifetime behavior.",
+            "Inputs are already captured canonical proper-list/tuple/map descriptors with source-equal unique map keys and captured atom spellings. Fragment acquisition, native VM shape/enumeration and hidden Other payload correspondence remain caller obligations. This helper grants no command, transport, business-policy or admission authority.",
+            "IDs, terminal leases and option values stay borrowed. One fallible output-row Vec reservation follows semantic checks; source diagnoses and operational reserve failure stay distinct. No payload clone, automatic Box conversion, whole allocation/GC/RSS bound or measured speedup is claimed.",
+            "All thirteen Rust target cases and all six original standalone Elixir cases pass on macOS. Full original project setup/profiles, wider workflow/service parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "061afac872554c51",

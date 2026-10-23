@@ -1,8 +1,24 @@
 //! Source item-shape capture with borrowed IDs, leases and option descriptors.
+//!
+//! Inputs require canonical proper-list descriptors and source-unique map keys.
+//! Source capture, list fragments and opaque-value correspondence remain caller work.
 
 use std::fmt;
 
 use crate::policy::complete::RawFlowPolicyValue as Raw;
+
+mod map;
+mod shape;
+
+#[derive(Clone, Copy)]
+enum ManyItemKind {
+    Create,
+    Complete,
+    Retry,
+    Fail,
+    Cancel,
+    Transition,
+}
 
 /// One source many-item result; this grants no mutation or admission authority.
 #[derive(Debug)]
@@ -53,59 +69,111 @@ impl std::error::Error for ManyItemOptionsError {
 /// Captures a source create item.
 ///
 /// # Errors
-/// Returns the source identity diagnosis in the deliberately rejecting R0 body.
-pub fn create<'a>(_item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
-    Err(ManyItemOptionsError::Id)
+/// Returns a source shape or lease diagnosis, or an operational reservation failure.
+pub fn create<'a>(item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
+    shape::parse(item, ManyItemKind::Create)
 }
 
 /// Captures a source complete item.
 ///
 /// # Errors
-/// Returns the source identity diagnosis in the deliberately rejecting R0 body.
-pub fn complete<'a>(_item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
-    Err(ManyItemOptionsError::Id)
+/// Returns a source shape or lease diagnosis, or an operational reservation failure.
+pub fn complete<'a>(item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
+    shape::parse(item, ManyItemKind::Complete)
 }
 
 /// Captures a source retry item.
 ///
 /// # Errors
-/// Returns the source identity diagnosis in the deliberately rejecting R0 body.
-pub fn retry<'a>(_item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
-    Err(ManyItemOptionsError::Id)
+/// Returns a source shape or lease diagnosis, or an operational reservation failure.
+pub fn retry<'a>(item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
+    shape::parse(item, ManyItemKind::Retry)
 }
 
 /// Captures a source fail item.
 ///
 /// # Errors
-/// Returns the source identity diagnosis in the deliberately rejecting R0 body.
-pub fn fail<'a>(_item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
-    Err(ManyItemOptionsError::Id)
+/// Returns a source shape or lease diagnosis, or an operational reservation failure.
+pub fn fail<'a>(item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
+    shape::parse(item, ManyItemKind::Fail)
 }
 
 /// Captures a source cancel item.
 ///
 /// # Errors
-/// Returns the source identity diagnosis in the deliberately rejecting R0 body.
-pub fn cancel<'a>(_item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
-    Err(ManyItemOptionsError::Id)
+/// Returns a source shape or lease diagnosis, or an operational reservation failure.
+pub fn cancel<'a>(item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
+    shape::parse(item, ManyItemKind::Cancel)
 }
 
 /// Captures a source transition item.
 ///
 /// # Errors
-/// Returns the source identity diagnosis in the deliberately rejecting R0 body.
-pub fn transition<'a>(_item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
-    Err(ManyItemOptionsError::Id)
+/// Returns a source shape or lease diagnosis, or an operational reservation failure.
+pub fn transition<'a>(item: &'a Raw<'a>) -> Result<ParsedManyItem<'a>, ManyItemOptionsError> {
+    shape::parse(item, ManyItemKind::Transition)
 }
 
 /// Merges borrowed option rows and pins the caller's partition descriptor.
 ///
 /// # Errors
-/// The deliberate R0 body returns an empty result before row reservation exists.
+/// Returns the operational error if reserving the merged output rows fails.
 pub fn merge<'a>(
-    _base: &[(&'a str, &'a Raw<'a>)],
-    _item: &[(&'a str, &'a Raw<'a>)],
-    _partition: &'a Raw<'a>,
+    base: &[(&'a str, &'a Raw<'a>)],
+    item: &[(&'a str, &'a Raw<'a>)],
+    partition: &'a Raw<'a>,
 ) -> Result<Vec<(&'a str, &'a Raw<'a>)>, ManyItemOptionsError> {
-    Ok(Vec::new())
+    let mut count = 1;
+    for &(key, _) in base {
+        if key != "partition_key" && !item.iter().any(|(item_key, _)| *item_key == key) {
+            count += 1;
+        }
+    }
+    for &(key, _) in item {
+        if key != "partition_key" {
+            count += 1;
+        }
+    }
+    let mut rows = reserve_rows(count)?;
+    rows.push(("partition_key", partition));
+    for &(key, value) in base {
+        if key != "partition_key" && !item.iter().any(|(item_key, _)| *item_key == key) {
+            rows.push((key, value));
+        }
+    }
+    for &(key, value) in item {
+        if key != "partition_key" {
+            rows.push((key, value));
+        }
+    }
+    Ok(rows)
+}
+
+fn validate_id(bytes: &[u8]) -> Result<(), ManyItemOptionsError> {
+    if bytes.is_empty() {
+        Err(ManyItemOptionsError::Id)
+    } else {
+        Ok(())
+    }
+}
+
+fn required_lease<'a>(value: &Raw<'a>) -> Result<&'a [u8], ManyItemOptionsError> {
+    match value {
+        Raw::Binary(bytes) if !bytes.is_empty() => Ok(bytes),
+        _ => Err(ManyItemOptionsError::LeaseToken),
+    }
+}
+
+fn optional_lease(value: Option<&Raw<'_>>) -> Result<(), ManyItemOptionsError> {
+    match value {
+        None | Some(Raw::Nil | Raw::Atom("nil")) => Ok(()),
+        Some(value) => required_lease(value).map(|_| ()),
+    }
+}
+
+fn reserve_rows<'a>(count: usize) -> Result<Vec<(&'a str, &'a Raw<'a>)>, ManyItemOptionsError> {
+    let mut rows = Vec::new();
+    rows.try_reserve_exact(count)
+        .map_err(ManyItemOptionsError::Allocation)?;
+    Ok(rows)
 }

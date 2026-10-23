@@ -588,3 +588,5 @@ Code.require_file("paid_prefix.exs", __DIR__)
 Code.require_file("normalized_prefix.exs", __DIR__)
 
 Code.require_file("observation_query.exs", __DIR__)
+
+Code.require_file("observation_decode.exs", __DIR__)

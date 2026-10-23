@@ -8,42 +8,50 @@ performance reviews. Current decisions and execution evidence are in
 The six HistoryEntry Rust tests now pass after the callable zero-pass/six-failure
 baseline and tests were saved in `a8e100b`. All eight focused checks pass, including
 strict Clippy and all 51 architecture checks. The four original complete source
-observations now have assertion links; full Rust workspace validation now passes below. The implementation borrows IDs, binary keys and value descriptors,
+observations now have assertion links; full Rust workspace validation passes
+below. The implementation borrows IDs, binary keys and value descriptors,
 consumes fixed pairs without resynchronizing, and preserves the last duplicate
 value. Standard B-tree node allocation remains outside paid admission. All four
 original standalone Elixir cases pass; full original profiles and Linux remain
 required.
 
-The current native observation checkpoint runs **57 tests: 49 pass and eight
-fail**. Both observation regressions saved before implementation now complete;
-exact failure comparison removes only those two names and preserves the six
-older public Budget-protocol and two keeper-debt failures. The paid query branch
-uses funded tail workers, one shared map tariff and coherent snapshot lookups;
-raw behavior remains literal. Actual compiled code binds issuance before map,
-cons, reversal, live-tag and result construction. All nine executing module
-identities match inspection. The complete public bridge, genuine initial root
-ownership and full control envelopes remain required. No whole native GREEN,
-physical allocation/GC/RSS bound or measured speedup is claimed. Review also fixed
-fixture teardown; serial validation passes the existing startup check with its
-original timeout. All six original standalone ManyItemOpts cases pass; their Rust
-batch now has a genuine callable Rust baseline: **zero pass and thirteen fail**,
-with no ignored or filtered tests. Its seven preceding checks pass, including
-strict Clippy and all 51 architecture checks. The thirty original assertions are
-preserved in order; early failures mask later observations. The five reviewed
-files fit the ordinary size limits. Real parsing/merge implementation follows
-this saved baseline; no ManyItemOpts parity mappings are claimed yet. Three
-decoder tests are stopped in isolation and await Root validation.
+The current native decoder regression checkpoint runs **60 tests: 49 pass and
+11 fail**. All eight older public Budget/keeper failures are retained, with only
+three new decoder failures added. Two new cases reach absent metered decode
+calls; the third completes the actual preflight tariff and zero-call controls,
+then returns preflight success instead of the required budget error. Later graph
+and paid-prefix assertions remain masked. Reached raw control prefixes pass;
+all nine executing module identities match, and the fixture cleans up its held worker and traces
+before assertions. Review corrected a test premise using the configured native
+ABI: scalar preflight advances the forecast by 115 words and the cut is +161.
+No decoder body has been written. It still needs the matching prepared NEW
+source contexts and final compiled frame/payment contract before implementation;
+initial root ownership, full control envelopes, public settlement, required
+profiles and Linux remain open.
 
-The latest full Rust checkpoint, preceding the new rejecting ManyItemOpts
-baseline above, passes **1,023 tests across 93
+The ManyItemOpts implementation now passes **all thirteen Rust tests and all
+eight focused checks** after its callable zero-pass/thirteen-failure baseline was
+saved in `afb3336`. All six original cases preserve their thirty assertions in
+source order, and all six standalone original Elixir cases also pass. Architecture
+and performance independently reviewed the full 404-line source behavior, the
+implementation, unchanged tests and actual results. Option rows borrow IDs,
+leases and value descriptors, with one fallible result-row reservation after
+semantic checks. Map key-family selection, nil, duplicate keyword rows, lease
+errors and merge order remain faithful. The three production files have at most
+255 physical lines and functions at most 62. No allocation-count, native memory
+bound or measured speedup is claimed. The six verified ledger additions are
+recorded below; the full Rust workspace validation includes this unchanged
+parser target.
+
+The latest full Rust checkpoint passes **1,036 tests across 94
 targets on macOS**, with zero failed, ignored or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
 documentation, all 51 architecture checks, reference/progress validation, four
-cached offline dependency-audit categories and whitespace. All 1,544 captured
+cached offline dependency-audit categories and whitespace. All 1,551 captured
 inputs stayed unchanged, excluding only the three append-only peer notes.
-Exact target/executable/name/status comparison preserves all 1,017 preceding
-tests and adds only the six HistoryEntry regressions.
+Exact target/executable/name/status comparison preserves all 1,023 preceding
+tests and adds only the thirteen ManyItemOpts cases.
 Both existing benchmark correctness smokes pass. No measured speedup is claimed.
 
 All four pinned pure Options cases now have Rust counterparts preserving their
@@ -79,15 +87,15 @@ Rust; the 12-test target and all five original standalone Elixir cases pass.
 Their source/error/ownership and derived regression review remains accepted.
 Options and ChildPolicy are pure components, not a completed workflow engine.
 
-The checked partial ledger records **105 source-derived declarations,
-117 Rust counterpart mappings and 486 assertion links**. Runtime reconciliation
+The checked partial ledger records **111 source-derived declarations,
+123 Rust counterpart mappings and 516 assertion links**. Runtime reconciliation
 still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
 reference and frozen workflow mapping remain unchanged. Full original Elixir
 case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and
-the wider ordered runtime milestones remain open. The implementation agent is
-preparing the next public-accounting prerequisite for explicit architecture
-consultation before any new artifact. The active goal must continue beyond this
-reviewed increment.
+the wider ordered runtime milestones remain open. The implementation and
+performance agents are closing the next decoder frame/payment contract and
+consulting architecture on a prepared-source regression before further source
+work. The active goal must continue beyond this reviewed increment.
 
 The entries below retain preceding checkpoints; the results above describe the
 current tree.
