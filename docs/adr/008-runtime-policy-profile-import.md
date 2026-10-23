@@ -194,12 +194,17 @@ terminal credit must survive registration, reset, reserve and settlement; normal
 entry adds its configured promise before owner exposure. These component inputs
 do not establish the complete public caller/keeper envelope.
 
-The three compiled regressions currently reach the numeric-only kernel's
-`:stale` refusal, preserving all earlier 40 bodies and their six failures in a
-43-test run. Their independent numeric controls, same-operation pin deltas,
-cap154 word-reset discriminator and actual lifecycle observations must execute
-after the separately released kernel body. The tests claim no isolated pin-reset
-or post-close spent-pair observation. Full public E/T, startup/parent/source/
+The three regressions were frozen in `a1c8f5e` after a compiled 43-test run
+reached the numeric-only kernel's `:stale` refusal. The separately released body
+now passes all three, preserving all earlier 40 bodies and the same six public
+failures in a 43-test run. Their independent numeric controls, same-operation
+pin deltas, cap154 word-reset discriminator and real lifecycle observations
+execute against the strict-built pinned kernel. Both configured reset coordinates
+are independently source-reviewed. The tests claim no isolated pin-reset
+or post-close spent-pair observation. The unchanged numeric form never accesses
+the optional tail; reset and close preserve the configured flag and issued debt.
+The four existing resource-lifetime functions move verbatim into the private
+`budget/lifetime.inc` at the same definition point. Full public E/T, startup/parent/source/
 exception accounting, metered failure prefixes and real settlement ACK remain
 separate required work.
 

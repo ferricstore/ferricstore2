@@ -108,7 +108,28 @@ persisted-policy discovery and FWSO support. Common recovery and public dispatch
 remain separate work. No measured speedup,
 complete Elixir parity or Linux acceptance is claimed.
 
-The current native-capture regression checkpoint runs **43 tests on macOS:
+The current native-capture checkpoint runs **43 tests on macOS: 37 pass and
+six fail**. All three KernelProfile regressions frozen in `a1c8f5e` now pass.
+Exact failure-name comparison removes only those three failures and preserves
+the six earlier public protocol/accounting failures; all 40 earlier bodies stay
+unchanged. The configured resource, word/pin entry credit, word-reset boundary,
+terminal entry and real owner-loss assertions now execute. Pin reset is also
+independently source-reviewed; no isolated pin-reset mutation test or observable
+post-close spent pair is claimed.
+
+The strict native build passes with warnings treated as errors against the pinned
+OTP tree. It binds 305 compiler inputs, 90 headers and 15 tool sources. Numeric
+userdata remains 192 bytes; the configured form uses 224 bytes, charged through
+the full aligned resource/monitor formula. Five existing functions change and
+four lifetime functions move verbatim into a private child; the two files have
+520 and 86 physical lines, with function bodies at most 74. Architecture and
+performance independently accept the stopped source. All 1,842 captured
+repository/compiler/runtime/artifact inputs stayed unchanged during execution,
+excluding only the three peer notes. Public startup, grants, settlement ACK,
+caller/keeper failure debt, complete BEAM envelopes, original parity and Linux
+execution remain open. No measured performance gain is claimed.
+
+The preceding native-capture regression checkpoint runs **43 tests on macOS:
 34 pass and nine fail**. Three new KernelProfile component tests compile and
 reach `:stale` at the first valid paired-tuple registration against the unchanged
 numeric-only NIF. All 40 earlier test bodies remain intact, and the same six
