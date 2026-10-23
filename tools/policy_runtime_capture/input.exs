@@ -1,21 +1,54 @@
+Code.require_file("input/meter.exs", __DIR__)
+Code.require_file("input/query.exs", __DIR__)
+Code.require_file("input/binding.exs", __DIR__)
+
 defmodule Ferricstore.PolicyRuntimeCapture.Input do
   @moduledoc false
   alias Ferricstore.PolicyRuntimeCapture.Native
-  alias Ferricstore.TermCodec
+  alias Ferricstore.PolicyRuntimeCapture.Input.{Meter, Query, Binding}
 
-  def decode_admission(donors, limits, %{decoded_words: words, pinned_bytes: pins}) do
-    # Remaining limits20 + request3 + RAW report15 + returned pair/ok11.
+  def decode_admission(donors, limits, retained)
+      when (is_map(retained) and is_map_key(retained, :decoded_words) and
+              is_map_key(retained, :pinned_bytes)) or
+             (is_tuple(retained) and tuple_size(retained) == 4 and elem(retained, 0) == :metered) do
+    forecast = Meter.forecast(retained)
+    words = forecast.decoded_words
+    pins = forecast.pinned_bytes
+
     with :ok <- preparation_donors(donors, limits, 0, 0),
          :ok <- preparation_room(words, pins, limits),
          backing = preparation_backing(donors, 0, limits.pinned_bytes),
          :ok <- preparation_room(words + 49, pins + backing + 392, limits),
-         native_limits = remaining_limits(limits, words + 49, pins + backing + 392, 2),
-         {:ok, report} <- Native.capture_terms({:preflight, donors}, native_limits) do
-      {:ok,
-       %{
-         decoded_words: words + 49 + 2 * report.decoded_words,
-         pinned_bytes: pins + backing + 392 + 2 * report.pinned_bytes
-       }}
+         paid <- Meter.issue(retained, limits, 23, 184),
+         %{} <- Meter.forecast(paid),
+         result =
+           Binding.native_estimate(
+             {:preflight, donors},
+             remaining_limits(limits, words + 49, pins + backing + 392, 2),
+             limits,
+             paid,
+             :raw
+           ),
+         state <- Meter.carry(forecast, result, limits),
+         %{} <- Meter.forecast(state),
+         {:ok, report} <-
+           (case result do
+              {native, w, p} when is_integer(w) and is_integer(p) -> native
+              raw -> raw
+            end),
+         state <- Meter.issue(state, limits, 11, 88),
+         %{} <- Meter.forecast(state) do
+      Meter.finish(
+        {:ok,
+         %{
+           decoded_words: words + 49 + 2 * report.decoded_words,
+           pinned_bytes: pins + backing + 392 + 2 * report.pinned_bytes
+         }},
+        state,
+        limits
+      )
+    else
+      error -> Meter.finish(error, retained, limits)
     end
   end
 
@@ -31,56 +64,129 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
   end
 
   def prepare(donors, queries, limits, retained, source) do
-    with :ok <- preparation_shape(donors, queries, limits, retained),
-         {:ok, original} <- original_admission(donors, queries, limits, retained, 1),
-         # Layout request3 + report27 + this remaining-limit map20.
-         :ok <- preparation_room(original.decoded_words + 50, original.pinned_bytes + 400, limits),
-         native_limits =
-           remaining_limits(limits, original.decoded_words + 23, original.pinned_bytes + 184, 1),
-         {:ok, layout} <- Native.capture_terms({:encoder_layout, 64}, native_limits),
-         admission when is_map(admission) <-
-           preparation_budget(donors, queries, limits, original, layout),
-         {:ok, admission} <- bind_with_layout(donors, limits, admission, source, 1, layout) do
-      copied_queries = copy_queries(queries)
-      {:ok, copy_donors(donors, []), copied_queries, admission}
+    original =
+      with :ok <- preparation_shape(donors, queries, limits, Meter.forecast(retained)),
+           do: original_admission(donors, queries, limits, retained, 1)
+
+    state =
+      case original do
+        {{:ok, forecast}, _, _} -> Meter.carry(forecast, original, limits)
+        {:ok, forecast} -> forecast
+        error -> Meter.finish(error, retained, limits)
+      end
+
+    with %{} = forecast <- Meter.forecast(state),
+         :ok <- preparation_room(forecast.decoded_words + 50, forecast.pinned_bytes + 400, limits),
+         paid <- Meter.issue(state, limits, 23, 184),
+         %{} <- Meter.forecast(paid),
+         result =
+           Binding.native_estimate(
+             {:encoder_layout, 64},
+             remaining_limits(
+               limits,
+               forecast.decoded_words + 23,
+               forecast.pinned_bytes + 184,
+               1
+             ),
+             limits,
+             paid,
+             :layout
+           ),
+         state <- Meter.carry(forecast, result, limits),
+         %{} <- Meter.forecast(state),
+         {:ok, layout} <-
+           (case result do
+              {native, w, p} when is_integer(w) and is_integer(p) -> native
+              raw -> raw
+            end),
+         budget <- preparation_budget(donors, queries, limits, state, layout),
+         %{} <- Meter.forecast(budget),
+         bound = Binding.bind_with_layout(donors, limits, budget, source, 1, layout) do
+      case bound do
+        {{:ok, forecast}, _, _} ->
+          with {:metered, _, _, _} = copied <- Meter.carry(forecast, bound, limits),
+               {:metered, _, w, p} <- Meter.issue(copied, limits, 8, 64),
+               {:metered_copy, copied_queries, _, _, _, _, _} = queried <-
+                 copy_queries({:metered_copy, queries, layout, limits, forecast, w, p}),
+               {:metered, _, w, p} <- Meter.issue(queried, limits, 8, 64),
+               {:metered_copy, copied_donors, _, _, _, _, _} = copied <-
+                 copy_donors(donors, {:metered_copy, [], layout, limits, forecast, w, p}),
+               {:metered, _, _, _} = finished <- Meter.issue(copied, limits, 5, 40) do
+            Meter.finish({:ok, copied_donors, copied_queries, forecast}, finished, limits)
+          end
+
+        {:ok, forecast} ->
+          copied_queries = copy_queries(queries)
+          {:ok, copy_donors(donors, []), copied_queries, forecast}
+
+        error ->
+          error
+      end
     else
-      {:error, _} = error -> error
+      error -> Meter.finish(error, state, limits)
     end
   end
 
   def original_admission(donors, queries, limits, retained, copies) when copies in [1, 2] do
-    # Remaining-limit map20 + this pair/ok11. LIVE itself includes29.
-    words = retained.decoded_words
-    pins = retained.pinned_bytes
+    forecast = Meter.forecast(retained)
+    words = forecast.decoded_words
+    pins = forecast.pinned_bytes
 
     with :ok <- preparation_room(words, pins, limits),
          :ok <- preparation_room(words + 31 + copies * 29, pins + 248 + copies * 232, limits),
-         native_limits = remaining_limits(limits, words + 31, pins + 248, copies),
+         paid <- Meter.issue(retained, limits, 30, 240),
+         %{} <- Meter.forecast(paid),
+         result =
+           Binding.native_estimate(
+             {:preflight, {:anchors, [donors, queries]}},
+             remaining_limits(limits, words + 31, pins + 248, copies),
+             limits,
+             paid,
+             :live
+           ),
+         state <- Meter.carry(forecast, result, limits),
+         %{} <- Meter.forecast(state),
          {:ok, report} <-
-           Native.capture_terms({:preflight, {:anchors, [donors, queries]}}, native_limits) do
-      {:ok,
-       %{
-         decoded_words: words + 31 + copies * report.live_words,
-         pinned_bytes: pins + 248 + copies * report.live_pinned_bytes
-       }}
+           (case result do
+              {native, w, p} when is_integer(w) and is_integer(p) -> native
+              raw -> raw
+            end),
+         state <- Meter.issue(state, limits, 11, 88),
+         %{} <- Meter.forecast(state) do
+      Meter.finish(
+        {:ok,
+         %{
+           decoded_words: words + 31 + copies * report.live_words,
+           pinned_bytes: pins + 248 + copies * report.live_pinned_bytes
+         }},
+        state,
+        limits
+      )
+    else
+      error -> Meter.finish(error, retained, limits)
     end
   end
 
   def preparation_shape(donors, %{atoms: atoms, exports: exports}, limits, retained) do
-    with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits),
-         # Preserve the old scalar query-copy refusal before donor validation.
-         backing =
-           preparation_backing(
-             atoms,
-             export_backing(exports, 0, limits.pinned_bytes),
-             limits.pinned_bytes
-           ),
-         :ok <- check(retained.pinned_bytes + backing + bytes, limits.pinned_bytes, :pinned_bytes) do
-      preparation_donors(donors, limits, 0, 0)
-    end
+    forecast = Meter.forecast(retained)
+
+    result =
+      with bytes when is_integer(bytes) <- Query.query_shape(atoms, exports, limits),
+           backing =
+             preparation_backing(
+               atoms,
+               export_backing(exports, 0, limits.pinned_bytes),
+               limits.pinned_bytes
+             ),
+           :ok <-
+             check(forecast.pinned_bytes + backing + bytes, limits.pinned_bytes, :pinned_bytes),
+           do: preparation_donors(donors, limits, 0, 0)
+
+    Meter.finish(result, retained, limits)
   end
 
-  def preparation_shape(_, _, _, _), do: {:error, :invalid_queries}
+  def preparation_shape(_, _, limits, retained),
+    do: Meter.finish({:error, :invalid_queries}, retained, limits)
 
   defp preparation_donors([], _limits, _count, _bytes), do: :ok
 
@@ -116,6 +222,8 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
     do: mapped_count(tail, count + if(is_map(head), do: 1, else: 0))
 
   defp preparation_budget(donors, %{atoms: atoms, exports: exports}, limits, original, layout) do
+    retained = original
+    original = Meter.forecast(retained)
     donor_count = length(donors)
     atom_count = length(atoms)
     export_count = length(exports)
@@ -137,12 +245,19 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
              extra_words,
              div(limits.pinned_bytes - original.pinned_bytes - 400 - backing, 8),
              :pinned_bytes
-           ) do
-      # Return the funded map directly; prepare owns the5-word outer tuple.
-      %{
-        decoded_words: words,
-        pinned_bytes: original.pinned_bytes + 400 + backing + 8 * extra_words
-      }
+           ),
+         state <- Meter.issue(retained, limits, 8, 64),
+         %{} <- Meter.forecast(state) do
+      Meter.carry(
+        %{
+          decoded_words: words,
+          pinned_bytes: original.pinned_bytes + 400 + backing + 8 * extra_words
+        },
+        state,
+        limits
+      )
+    else
+      error -> Meter.finish(error, retained, limits)
     end
   end
 
@@ -196,8 +311,64 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
       else: export_backing(tail, bytes + module_bytes + function_bytes, maximum)
   end
 
+  defp copy_queries(
+         {:metered_copy, %{atoms: atoms, exports: exports}, layout, limits, forecast, _, _} =
+           context
+       ) do
+    with {:metered, _, words, pins} <- Meter.issue(context, limits, 8, 64),
+         {:metered_copy, copied_atoms, _, _, _, _, _} = atoms_state <-
+           copy_donors(atoms, {:metered_copy, [], layout, limits, forecast, words, pins}),
+         {:metered, _, words, pins} <- Meter.issue(atoms_state, limits, 8, 64),
+         {:metered_copy, copied_exports, _, _, _, _, _} = exports_state <-
+           copy_exports(exports, {:metered_copy, [], layout, limits, forecast, words, pins}),
+         {:metered, _, words, pins} <- Meter.issue(exports_state, limits, 16, 128) do
+      {:metered_copy, %{atoms: copied_atoms, exports: copied_exports}, layout, limits, forecast,
+       words, pins}
+    end
+  end
+
   defp copy_queries(%{atoms: atoms, exports: exports}),
     do: %{atoms: copy_donors(atoms, []), exports: copy_exports(exports, [])}
+
+  defp copy_donors(donors, {:metered_copy, acc, layout, limits, forecast, _, _} = context) do
+    case donors do
+      [] when acc == [] ->
+        context
+
+      [] ->
+        words = 2 * length(acc) + 8
+
+        with {:metered, _, paid_words, paid_pins} <-
+               Meter.issue(context, limits, words, 8 * words),
+             do:
+               {:metered_copy, :lists.reverse(acc), layout, limits, forecast, paid_words,
+                paid_pins}
+
+      [head | tail] ->
+        binary = prepared_binary(head)
+        size = byte_size(binary)
+        output_words = if size <= 64, do: 2 + div(size + 7, 8), else: 8
+        payload = if size > 64, do: layout.binary_bytes - 64 + size, else: 0
+
+        retention =
+          :binary.referenced_byte_size(binary) + layout.binary_bytes - 64 +
+            16 * layout.result_words
+
+        output_pins = 40 + 8 * output_words + payload + retention
+        structure_words = 2 + 8 + if(is_map(head), do: 8, else: 0)
+
+        with {:metered, _, _, _} = copied <-
+               Meter.issue(context, limits, output_words, output_pins),
+             value = :binary.copy(binary),
+             {:metered, _, words, pins} <-
+               Meter.issue(copied, limits, structure_words, 8 * structure_words) do
+          item =
+            if is_map(head), do: %{encoded: value, source_term: head.source_term}, else: value
+
+          copy_donors(tail, {:metered_copy, [item | acc], layout, limits, forecast, words, pins})
+        end
+    end
+  end
 
   defp copy_donors([], acc), do: :lists.reverse(acc)
 
@@ -205,149 +376,66 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
     do: copy_donors(tail, [%{encoded: :binary.copy(encoded), source_term: term} | acc])
 
   defp copy_donors([head | tail], acc), do: copy_donors(tail, [:binary.copy(head) | acc])
+
+  defp copy_exports(exports, {:metered_copy, acc, layout, limits, forecast, _, _} = context) do
+    case exports do
+      [] when acc == [] ->
+        context
+
+      [] ->
+        words = 2 * length(acc) + 8
+
+        with {:metered, _, paid_words, paid_pins} <-
+               Meter.issue(context, limits, words, 8 * words),
+             do:
+               {:metered_copy, :lists.reverse(acc), layout, limits, forecast, paid_words,
+                paid_pins}
+
+      [{module, function, arity} | tail] ->
+        module_size = byte_size(module)
+        module_words = if module_size <= 64, do: 2 + div(module_size + 7, 8), else: 8
+        module_payload = if module_size > 64, do: layout.binary_bytes - 64 + module_size, else: 0
+
+        module_retention =
+          :binary.referenced_byte_size(module) + layout.binary_bytes - 64 +
+            16 * layout.result_words
+
+        module_pins = 40 + 8 * module_words + module_payload + module_retention
+        function_size = byte_size(function)
+        function_words = if function_size <= 64, do: 2 + div(function_size + 7, 8), else: 8
+
+        function_payload =
+          if function_size > 64, do: layout.binary_bytes - 64 + function_size, else: 0
+
+        function_retention =
+          :binary.referenced_byte_size(function) + layout.binary_bytes - 64 +
+            16 * layout.result_words
+
+        function_pins = 40 + 8 * function_words + function_payload + function_retention
+
+        with {:metered, _, _, _} = module_state <-
+               Meter.issue(context, limits, module_words, module_pins),
+             copied_module = :binary.copy(module),
+             {:metered, _, _, _} = function_state <-
+               Meter.issue(module_state, limits, function_words, function_pins),
+             copied_function = :binary.copy(function),
+             {:metered, _, words, pins} <- Meter.issue(function_state, limits, 14, 112) do
+          copy_exports(
+            tail,
+            {:metered_copy, [{copied_module, copied_function, arity} | acc], layout, limits,
+             forecast, words, pins}
+          )
+        end
+    end
+  end
+
   defp copy_exports([], acc), do: :lists.reverse(acc)
 
   defp copy_exports([{module, function, arity} | tail], acc),
     do: copy_exports(tail, [{:binary.copy(module), :binary.copy(function), arity} | acc])
 
-  def bind_admission(donors, limits, retained, source, copies) when copies in [1, 2] do
-    with budget when is_map(budget) <- binding_add(retained, limits, 50, 400, copies),
-         {:ok, layout} <-
-           Native.capture_terms({:encoder_layout, 64}, remaining_limits(limits, 0, 0, 1)),
-         do: bind_with_layout(donors, limits, budget, source, copies, layout)
-  end
-
-  defp bind_with_layout(donors, limits, retained, source, copies, layout) do
-    with budget when is_map(budget) <- binding_add(retained, limits, 0, 0, copies),
-         result when is_map(result) <-
-           bind_donors(donors, 0, limits, budget, source, copies, layout),
-         do: {:ok, result}
-  end
-
-  defp bind_donors([], _index, _limits, retained, _source, _copies, _layout), do: retained
-
-  defp bind_donors([binary | tail], index, limits, retained, source, copies, layout)
-       when is_binary(binary),
-       do: bind_donors(tail, index + 1, limits, retained, source, copies, layout)
-
-  defp bind_donors(
-         [%{encoded: encoded, source_term: term} = mapped | tail],
-         index,
-         limits,
-         retained,
-         source,
-         copies,
-         layout
-       )
-       when map_size(mapped) == 2 and is_binary(encoded) do
-    with budget when is_map(budget) <-
-           bind_one(encoded, term, index, limits, retained, source, copies, layout),
-         do: bind_donors(tail, index + 1, limits, budget, source, copies, layout)
-  end
-
-  defp bind_donors(_, _, _, _, _, _, _), do: {:error, :invalid_donors}
-
-  defp bind_one(expected, term, index, limits, retained, source, copies, layout) do
-    # Metric42 plus FOUR source-MD5 results, each on-heap16B:4 words/32 pins.
-    with measured when is_map(measured) <- binding_add(retained, limits, 58, 464, copies),
-         {:ok, metrics} <-
-           Native.capture_terms({:measure_terms, term}, remaining_limits(limits, 0, 0, 1)),
-         size_pins =
-           cap_sum(
-             cap_product(8, layout.size_result_words, limits.pinned_bytes),
-             metrics.live_pinned_bytes,
-             limits.pinned_bytes
-           ),
-         size_pins =
-           cap_sum(
-             size_pins,
-             cap_product(128, metrics.live_terms, limits.pinned_bytes),
-             limits.pinned_bytes
-           ),
-         sized when is_map(sized) <-
-           binding_add(measured, limits, layout.size_result_words, size_pins, copies),
-         :ok <- source_current(source),
-         maximum = :erlang.external_size(term, [:deterministic]),
-         :ok <- source_current(source),
-         ecap =
-           cap_sum(
-             maximum,
-             cap_product(1023, metrics.live_terms, limits.pinned_bytes),
-             limits.pinned_bytes
-           ),
-         :ok <- check(ecap, limits.pinned_bytes, :pinned_bytes),
-         encoded_budget when is_map(encoded_budget) <-
-           encoder_budget(metrics, ecap, layout, sized, limits, copies),
-         :ok <- source_current(source),
-         encoded = TermCodec.encode(term),
-         :ok <- source_current(source),
-         :ok <- check(byte_size(encoded), ecap, :pinned_bytes) do
-      if encoded == expected, do: encoded_budget, else: {:error, {:source_anchor_mismatch, index}}
-    end
-  end
-
-  defp encoder_budget(metrics, ecap, layout, retained, limits, copies) do
-    wc = limits.decoded_words
-    pc = limits.pinned_bytes
-    t = metrics.live_terms
-    n = div(t - 1, 2)
-    y = cap_sum(1, cap_product(11, t, wc), wc)
-    y = cap_sum(y, cap_product(2, metrics.live_words, wc), wc)
-    y = cap_sum(y, div(ecap, 32) + if(rem(ecap, 32) == 0, do: 0, else: 1), wc)
-    y = cap_sum(y, cap_product(n, n, wc), wc)
-    y = cap_sum(y, cap_product(3, n, wc), wc)
-    h = cap_sum(layout.size_result_words, cap_product(y, layout.trap_return_words, wc), wc)
-    h = cap_sum(h, layout.result_words, wc)
-    b = cap_sum(layout.binary_bytes - 64, ecap, pc)
-    sort = if n == 0, do: 0, else: cap_sum(144, cap_product(192, max(1, n - 15), pc), pc)
-    sort = cap_sum(sort, if(n > 16, do: 232, else: 0), pc)
-    work = cap_sum(b, cap_product(288, t, pc), pc)
-    work = cap_sum(work, cap_product(16, n, pc), pc)
-    work = cap_sum(work, max(sort, 16), pc)
-    work = max(cap_product(128, t, pc), max(work, cap_product(2, b, pc)))
-    pins = cap_sum(cap_product(8, h, pc), layout.context_bytes, pc)
-    pins = cap_sum(pins, metrics.live_pinned_bytes, pc)
-    binding_add(retained, limits, h, cap_sum(pins, work, pc), copies)
-  end
-
-  defp binding_add(retained, limits, words, pins, copies) do
-    # Each direct map uses8 words; its3-word slack funds the final ok wrapper.
-    words = cap_sum(words, 11, limits.decoded_words)
-    pins = cap_sum(pins, 88, limits.pinned_bytes)
-
-    words =
-      cap_sum(
-        retained.decoded_words,
-        cap_product(copies, words, limits.decoded_words),
-        limits.decoded_words
-      )
-
-    pins =
-      cap_sum(
-        retained.pinned_bytes,
-        cap_product(copies, pins, limits.pinned_bytes),
-        limits.pinned_bytes
-      )
-
-    with :ok <- preparation_room(words, pins, limits),
-         do: %{decoded_words: words, pinned_bytes: pins}
-  end
-
-  defp cap_sum(a, b, maximum),
-    do: if(a > maximum or b > maximum - a, do: maximum + 1, else: a + b)
-
-  defp cap_product(a, b, maximum),
-    do: if(a != 0 and b > div(maximum, a), do: maximum + 1, else: a * b)
-
-  defp source_current(%{md5: md5}) do
-    if :erlang.get_module_info(TermCodec, :md5) == md5,
-      do: :ok,
-      else: {:error, :source_code_changed}
-  rescue
-    _ -> {:error, :source_code_changed}
-  end
-
-  defp source_current(_), do: {:error, :source_code_changed}
+  def bind_admission(donors, limits, retained, source, copies) when copies in [1, 2],
+    do: Binding.bind_admission(donors, limits, retained, source, copies)
 
   def normalize(prepared), do: normalize(prepared, [], [])
   defp normalize([], donors, anchors), do: {:lists.reverse(donors), :lists.reverse(anchors)}
@@ -409,184 +497,17 @@ defmodule Ferricstore.PolicyRuntimeCapture.Input do
 
   defp donor_limit(_, _, _, _), do: {:error, :invalid_donors}
 
-  def query(%{atoms: atoms, exports: exports}, limits)
-      when is_list(atoms) and is_list(exports) do
-    with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits),
-         :ok <- query_budget(11, bytes, limits) do
-      query_atoms(atoms, exports, %{}, 11, bytes, limits)
-    end
-  end
+  def query(queries, limits), do: Query.query(queries, limits)
 
-  def query(_, _), do: {:error, :invalid_queries}
+  def query_admission(queries, limits, retained),
+    do: Query.query_admission(queries, limits, retained)
 
-  def query_admission(%{atoms: atoms, exports: exports}, limits, retained)
-      when is_list(atoms) and is_list(exports) do
-    with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits),
-         :ok <- query_budget(20, bytes, limits, retained) do
-      query_atoms(atoms, exports, %{}, 20, bytes, limits, retained)
-    end
-  end
-
-  def query_admission(_, _, _), do: {:error, :invalid_queries}
-
-  def compact_queries(%{atoms: atoms, exports: exports}, limits, retained) do
-    with bytes when is_integer(bytes) <- query_shape(atoms, exports, limits) do
-      strings = atoms ++ Enum.flat_map(exports, fn {m, f, _} -> [m, f] end)
-      bytes = Enum.reduce(strings, 0, &(:binary.referenced_byte_size(&1) + byte_size(&1) + &2))
-
-      with :ok <- check(retained + bytes, limits.pinned_bytes, :pinned_bytes) do
-        {:ok,
-         %{
-           atoms: Enum.map(atoms, &:binary.copy/1),
-           exports: Enum.map(exports, fn {m, f, a} -> {:binary.copy(m), :binary.copy(f), a} end)
-         }}
-      end
-    end
-  end
-
-  def compact_queries(_, _, _), do: {:error, :invalid_queries}
-
-  defp query_shape(atoms, exports, limits) when is_list(atoms) and is_list(exports) do
-    cond do
-      not proper_list?(atoms) or not proper_list?(exports) ->
-        {:error, :invalid_queries}
-
-      count_left(exports, count_left(atoms, limits.facts)) < 0 ->
-        {:error, {:limit, :facts}}
-
-      not atom_queries?(atoms) or not export_queries?(exports) ->
-        {:error, :invalid_queries}
-
-      true ->
-        remaining = export_text_left(exports, atom_text_left(atoms, limits.text_bytes))
-
-        if remaining < 0,
-          do: {:error, {:limit, :text_bytes}},
-          else: limits.text_bytes - remaining
-    end
-  end
-
-  defp query_shape(_, _, _), do: {:error, :invalid_queries}
+  def compact_queries(queries, limits, retained),
+    do: Query.compact_queries(queries, limits, retained)
 
   defp proper_list?([]), do: true
   defp proper_list?([_ | tail]), do: proper_list?(tail)
   defp proper_list?(_), do: false
-
-  defp count_left(_, -1), do: -1
-  defp count_left([], remaining), do: remaining
-  defp count_left([_ | _], 0), do: -1
-  defp count_left([_ | tail], remaining), do: count_left(tail, remaining - 1)
-
-  defp atom_queries?([]), do: true
-  defp atom_queries?([name | tail]), do: is_binary(name) and atom_queries?(tail)
-
-  defp export_queries?([]), do: true
-  defp export_queries?([item | tail]), do: valid_export(item) and export_queries?(tail)
-
-  defp atom_text_left([], remaining), do: remaining
-
-  defp atom_text_left([name | tail], remaining) do
-    size = byte_size(name)
-    if size > remaining, do: -1, else: atom_text_left(tail, remaining - size)
-  end
-
-  defp export_text_left(_, -1), do: -1
-  defp export_text_left([], remaining), do: remaining
-
-  defp export_text_left([{module, function, _} | tail], remaining) do
-    module_bytes = byte_size(module)
-    function_bytes = byte_size(function)
-
-    if module_bytes > remaining or function_bytes > remaining - module_bytes,
-      do: -1,
-      else: export_text_left(tail, remaining - module_bytes - function_bytes)
-  end
-
-  defp query_atoms(atoms, exports, results, used, bytes, limits),
-    do: query_atoms(atoms, exports, results, used, bytes, limits, nil)
-
-  defp query_atoms([], exports, results, used, bytes, limits, retained),
-    do: query_exports(exports, results, %{}, used, bytes, limits, retained)
-
-  defp query_atoms([name | tail], exports, results, used, bytes, limits, retained) do
-    next = used + 117 + query_put_words(map_size(results))
-
-    with :ok <- query_budget(next, bytes, limits, retained) do
-      available = existing(name) != :error
-      query_atoms(tail, exports, Map.put(results, name, available), next, bytes, limits, retained)
-    end
-  end
-
-  defp query_exports([], atoms, exports, _used, _bytes, _limits, nil),
-    do: {:ok, %{atoms: atoms, exports: exports}}
-
-  defp query_exports([], atoms, exports, used, bytes, _limits, retained) do
-    {:ok, %{atoms: atoms, exports: exports},
-     %{
-       decoded_words: retained.decoded_words + used,
-       pinned_bytes: retained.pinned_bytes + 8 * used + bytes
-     }}
-  end
-
-  defp query_exports(
-         [{module_name, function_name, arity} = item | tail],
-         atoms,
-         results,
-         used,
-         bytes,
-         limits,
-         retained
-       ) do
-    next = used + 237 + query_put_words(map_size(results))
-
-    with :ok <- query_budget(next, bytes, limits, retained) do
-      available =
-        case {existing(module_name), existing(function_name)} do
-          {{:ok, module}, {:ok, function}} -> :erlang.function_exported(module, function, arity)
-          _ -> false
-        end
-
-      query_exports(tail, atoms, Map.put(results, item, available), next, bytes, limits, retained)
-    end
-  end
-
-  defp query_put_words(size) when size < 32, do: 19 + 2 * size
-  defp query_put_words(32), do: 111_048
-  defp query_put_words(size), do: size + 487
-
-  defp query_budget(words, bytes, limits, nil), do: query_budget(words, bytes, limits)
-
-  defp query_budget(words, bytes, limits, retained) do
-    word_room = limits.decoded_words - retained.decoded_words
-    pin_room = limits.pinned_bytes - retained.pinned_bytes
-
-    cond do
-      word_room < 0 or words > word_room -> {:error, {:limit, :decoded_words}}
-      pin_room < 0 or bytes > pin_room -> {:error, {:limit, :pinned_bytes}}
-      words > div(pin_room - bytes, 8) -> {:error, {:limit, :pinned_bytes}}
-      true -> :ok
-    end
-  end
-
-  defp query_budget(words, bytes, limits) do
-    cond do
-      words > limits.decoded_words -> {:error, {:limit, :decoded_words}}
-      bytes > limits.pinned_bytes -> {:error, {:limit, :pinned_bytes}}
-      words > div(limits.pinned_bytes - bytes, 8) -> {:error, {:limit, :pinned_bytes}}
-      true -> :ok
-    end
-  end
-
-  defp valid_export({m, f, a}),
-    do: is_binary(m) and is_binary(f) and is_integer(a) and a in 0..255
-
-  defp valid_export(_), do: false
-
-  defp existing(name) do
-    {:ok, :erlang.binary_to_existing_atom(name, :utf8)}
-  catch
-    :error, :badarg -> :error
-  end
 
   defp check(value, maximum, field),
     do: if(value <= maximum, do: :ok, else: {:error, {:limit, field}})

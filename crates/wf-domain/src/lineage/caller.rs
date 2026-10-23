@@ -69,33 +69,93 @@ fn normalize_child_failure_value(value: ChildFailureValue<'_>) -> Option<ChildFa
 
 use crate::policy::complete::RawFlowPolicyValue as Raw;
 
-/// Rejecting baseline for the source's shallow nonempty-list guard.
+/// Checks only that the captured list has a nonempty cons prefix.
 ///
 /// # Errors
-/// Returns the source refusal until the separately tested body is implemented.
-pub fn validate_children(_children: Raw<'_>) -> Result<(), &'static str> {
-    Err("ERR flow children must be a non-empty list")
+/// Returns the source refusal for an empty list or any non-list value.
+pub fn validate_children(children: Raw<'_>) -> Result<(), &'static str> {
+    match children {
+        Raw::List(prefix) | Raw::ImproperList { prefix, .. } if !prefix.is_empty() => Ok(()),
+        _ => Err("ERR flow children must be a non-empty list"),
+    }
 }
 
-/// Rejecting baseline for binary parent IDs and captured child-map rows.
+/// Rejects a child whose atom-keyed ID equals the binary parent ID.
 ///
 /// Map rows have unique actual keys; map-shape classification happens outside.
 /// # Errors
-/// Returns the source refusal until the separately tested body is implemented.
+/// Returns the source refusal if any child has the parent ID.
 pub fn validate_no_parent_child_id<'v>(
-    _parent_id: &[u8],
-    _child_attrs: &[&[(Raw<'v>, Raw<'v>)]],
+    parent_id: &[u8],
+    child_attrs: &[&[(Raw<'v>, Raw<'v>)]],
 ) -> Result<(), &'static str> {
-    Err("ERR flow child id must differ from parent id")
+    if child_attrs.iter().any(|attrs| {
+        matches!(child_map_field(attrs, "id", true), Some(Raw::Binary(id)) if id == parent_id)
+    }) {
+        Err("ERR flow child id must differ from parent id")
+    } else {
+        Ok(())
+    }
 }
 
-/// Rejecting baseline for ordered, captured atom-key exhaustion options.
+/// Selects nonempty binary exhaustion states from captured atom-key options.
 ///
-/// Returned states will borrow opaque binary inputs; this entry owns no map.
+/// Options use first-key precedence. Explicit maps prefer a complete atom-key
+/// pair, then a complete binary-key pair; only nil uses top-level states.
+/// Returned states borrow opaque binary inputs; this entry owns no map.
 /// # Errors
-/// Returns the source refusal until the separately tested body is implemented.
-pub fn exhaust_to_opts<'v>(
-    _opts: &[(&str, Raw<'v>)],
+/// Returns the source refusal for missing, empty or nonbinary states.
+pub fn exhaust_to_opts<'v>(opts: &[(&str, Raw<'v>)]) -> Result<(&'v [u8], &'v [u8]), &'static str> {
+    match child_option(opts, "exhaust_to") {
+        Raw::Nil | Raw::Atom("nil") => {
+            exhaust_to_states(child_option(opts, "success"), child_option(opts, "failure"))
+        }
+        Raw::Map(rows) => {
+            if let (Some(success), Some(failure)) = (
+                child_map_field(rows, "success", true),
+                child_map_field(rows, "failure", true),
+            ) {
+                return exhaust_to_states(success, failure);
+            }
+            match (
+                child_map_field(rows, "success", false),
+                child_map_field(rows, "failure", false),
+            ) {
+                (Some(success), Some(failure)) => exhaust_to_states(success, failure),
+                _ => Err("ERR flow exhaust_to must include success and failure states"),
+            }
+        }
+        _ => Err("ERR flow exhaust_to must include success and failure states"),
+    }
+}
+
+fn child_option<'v>(opts: &[(&str, Raw<'v>)], key: &str) -> Raw<'v> {
+    opts.iter()
+        .find_map(|(name, value)| (*name == key).then_some(*value))
+        .unwrap_or(Raw::Nil)
+}
+
+fn child_map_field<'v>(rows: &[(Raw<'v>, Raw<'v>)], key: &str, atom_key: bool) -> Option<Raw<'v>> {
+    rows.iter().find_map(|(name, value)| {
+        let matches = match name {
+            Raw::Atom(name) if atom_key => *name == key,
+            Raw::Binary(name) if !atom_key => *name == key.as_bytes(),
+            _ => false,
+        };
+        matches.then_some(*value)
+    })
+}
+
+fn exhaust_to_states<'v>(
+    success: Raw<'v>,
+    failure: Raw<'v>,
 ) -> Result<(&'v [u8], &'v [u8]), &'static str> {
-    Err("ERR flow exhaust_to must include success and failure states")
+    match (success, failure) {
+        (Raw::Binary(success), Raw::Binary(failure))
+            if !success.is_empty() && !failure.is_empty() =>
+        {
+            Ok((success, failure))
+        }
+        _ => Err("ERR flow exhaust_to must include success and failure states"),
+    }
 }

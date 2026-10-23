@@ -1704,14 +1704,68 @@
       "runtime_case_ids": [
         "4d719fd199126005dd5725818b01e96a708de1844c8f1517cfbebb5353f479ea"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-ad58b42e24cd22f6-nonempty-child-list",
+          "rust_file": "crates/wf-domain/tests/child_policy.rs",
+          "rust_file_sha256": "e4a596873ba06363d10662994e9dfc516184058986a98f19fced44a485abbb0e",
+          "rust_module": "",
+          "rust_function": "validate_children_requires_a_non_empty_list",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert ChildPolicy.validate_children([%{id: \"child\"}]) == :ok",
+              "rust_line": 160,
+              "rust_text": "assert_eq!(validate_children(Raw::List(&children)), Ok(()));"
+            },
+            {
+              "source_line": 10,
+              "source_text": "assert ChildPolicy.validate_children([]) ==",
+              "rust_line": 161,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure ChildPolicy case, in source order, with async:true/flow provenance and no local setup. Captured map rows have unique actual keys; keyword rows preserve order and duplicates.",
+            "The typed binary-parent/map-row and borrowed opaque state-pair boundaries do not implement malformed-map VM exceptions, general term equality or public command capture. The two returned state fields are represented by a fixed borrowed pair.",
+            "All 12 child-policy Rust tests and all five original standalone Elixir ChildPolicy cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "c19941c513d4a376",
       "runtime_case_ids": [
         "116c521c6298ca9601d5a0fc22de5d3b16d85b7a8bf33b92e6a124c2464e57a3"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-c19941c513d4a376-child-parent-id",
+          "rust_file": "crates/wf-domain/tests/child_policy.rs",
+          "rust_file_sha256": "e4a596873ba06363d10662994e9dfc516184058986a98f19fced44a485abbb0e",
+          "rust_module": "",
+          "rust_function": "validate_no_parent_child_id_rejects_parent_id_as_child_id",
+          "assertions": [
+            {
+              "source_line": 15,
+              "source_text": "assert ChildPolicy.validate_no_parent_child_id(\"parent\", [%{id: \"child\"}]) == :ok",
+              "rust_line": 171,
+              "rust_text": "assert_eq!(validate_no_parent_child_id(b\"parent\", &[&child]), Ok(()));"
+            },
+            {
+              "source_line": 17,
+              "source_text": "assert ChildPolicy.validate_no_parent_child_id(\"parent\", [%{id: \"parent\"}]) ==",
+              "rust_line": 172,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure ChildPolicy case, in source order, with async:true/flow provenance and no local setup. Captured map rows have unique actual keys; keyword rows preserve order and duplicates.",
+            "The typed binary-parent/map-row and borrowed opaque state-pair boundaries do not implement malformed-map VM exceptions, general term equality or public command capture. The two returned state fields are represented by a fixed borrowed pair.",
+            "All 12 child-policy Rust tests and all five original standalone Elixir ChildPolicy cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "981b590378d8a60d",
@@ -1752,14 +1806,74 @@
       "runtime_case_ids": [
         "352c541ad119f823ce27df23180bd47a8e253ad6a808236eb887881ae0042726"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-aa52ad13e737fc75-exhaustion-state-selection",
+          "rust_file": "crates/wf-domain/tests/child_policy.rs",
+          "rust_file_sha256": "e4a596873ba06363d10662994e9dfc516184058986a98f19fced44a485abbb0e",
+          "rust_module": "",
+          "rust_function": "exhaust_to_opts_accepts_explicit_map_or_success_failure_options",
+          "assertions": [
+            {
+              "source_line": 39,
+              "source_text": "assert ChildPolicy.exhaust_to_opts(success: \"done\", failure: \"failed\") ==",
+              "rust_line": 189,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 42,
+              "source_text": "assert ChildPolicy.exhaust_to_opts(exhaust_to: %{success: \"done\", failure: \"failed\"}) ==",
+              "rust_line": 196,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 45,
+              "source_text": "assert ChildPolicy.exhaust_to_opts(exhaust_to: %{\"success\" => \"done\", \"failure\" => \"failed\"}) ==",
+              "rust_line": 200,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure ChildPolicy case, in source order, with async:true/flow provenance and no local setup. Captured map rows have unique actual keys; keyword rows preserve order and duplicates.",
+            "The typed binary-parent/map-row and borrowed opaque state-pair boundaries do not implement malformed-map VM exceptions, general term equality or public command capture. The two returned state fields are represented by a fixed borrowed pair.",
+            "All 12 child-policy Rust tests and all five original standalone Elixir ChildPolicy cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "42748dd4f4677cbc",
       "runtime_case_ids": [
         "54a87f54d7227448310a32e6510c86b4ab78aec4f80ddacd7680497c6f576e46"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-42748dd4f4677cbc-exhaustion-state-refusal",
+          "rust_file": "crates/wf-domain/tests/child_policy.rs",
+          "rust_file_sha256": "e4a596873ba06363d10662994e9dfc516184058986a98f19fced44a485abbb0e",
+          "rust_module": "",
+          "rust_function": "exhaust_to_opts_rejects_missing_or_empty_states",
+          "assertions": [
+            {
+              "source_line": 50,
+              "source_text": "assert ChildPolicy.exhaust_to_opts([]) ==",
+              "rust_line": 208,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 53,
+              "source_text": "assert ChildPolicy.exhaust_to_opts(success: \"\", failure: \"failed\") ==",
+              "rust_line": 212,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this pinned pure ChildPolicy case, in source order, with async:true/flow provenance and no local setup. Captured map rows have unique actual keys; keyword rows preserve order and duplicates.",
+            "The typed binary-parent/map-row and borrowed opaque state-pair boundaries do not implement malformed-map VM exceptions, general term equality or public command capture. The two returned state fields are represented by a fixed borrowed pair.",
+            "All 12 child-policy Rust tests and all five original standalone Elixir ChildPolicy cases pass on macOS. Full original project setup/profiles, wider workflow parity and independent Linux acceptance remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "b9ca0a7e955f4df3",
@@ -5343,7 +5457,7 @@
           ],
           "limitations": [
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
-            "Typed successful reduce(Create) fixture and fresh apply-selected plans retain the original type/state/payload, times, first limit 1 and later limits 10, worker and create\u2192claim\u2192leased-empty\u2192guarded-complete\u2192terminal-empty order. Source line 1250 links typed successful creation and retained state/payload only; line 1275 links Changed completion with the actual selected lease token/fence only. Public :ok/{:ok, ...} projections, automatic default partition placement/routing, public claim parent reclaim/governance/timeout orchestration, durable record/index/history/outcome/control writes, persisted retained replay, real encoded-entry/hash verification, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and required original profiles remain omitted. Each view is rebuilt in memory from the current proposed record, rather than validating a persisted index mutation. Fixed ID/type prefixes replace unique suffixes; explicit lease_ms 30000 preserves the pinned default. Typed complete result/state and complete-selection stop checks are supplemental. The inert proposal supplies no assertion execution or passing status. A first passing run covers existing behavior and supplies no tests-first RED or full original/public/durable/profile parity. Independent Linux and macOS execution remain required."
+            "Typed successful reduce(Create) fixture and fresh apply-selected plans retain the original type/state/payload, times, first limit 1 and later limits 10, worker and create→claim→leased-empty→guarded-complete→terminal-empty order. Source line 1250 links typed successful creation and retained state/payload only; line 1275 links Changed completion with the actual selected lease token/fence only. Public :ok/{:ok, ...} projections, automatic default partition placement/routing, public claim parent reclaim/governance/timeout orchestration, durable record/index/history/outcome/control writes, persisted retained replay, real encoded-entry/hash verification, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and required original profiles remain omitted. Each view is rebuilt in memory from the current proposed record, rather than validating a persisted index mutation. Fixed ID/type prefixes replace unique suffixes; explicit lease_ms 30000 preserves the pinned default. Typed complete result/state and complete-selection stop checks are supplemental. The inert proposal supplies no assertion execution or passing status. A first passing run covers existing behavior and supplies no tests-first RED or full original/public/durable/profile parity. Independent Linux and macOS execution remain required."
           ]
         }
       ]

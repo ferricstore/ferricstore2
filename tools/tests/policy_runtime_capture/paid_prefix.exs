@@ -2,6 +2,7 @@ defmodule Ferricstore.PolicyRuntimeCapturePaidPrefixTest do
   use ExUnit.Case, async: false
   alias Ferricstore.PolicyRuntimeCapture, as: Capture
   alias Ferricstore.PolicyRuntimeCapture.Input
+  alias Ferricstore.PolicyRuntimeCapture.Input.Meter
   alias Ferricstore.PolicyRuntimeCaptureTest, as: SourceTest
   alias Ferricstore.TermCodec
 
@@ -171,6 +172,87 @@ defmodule Ferricstore.PolicyRuntimeCapturePaidPrefixTest do
       # Only the old final success graph (<=20W/160P) can be absent at refusal.
       assert late_words >= one_words - 20 and late_pins >= one_pins - 160
       assert two == %{atoms: [nil_name, true_name], exports: []}
+    end)
+  end
+
+  test "metered_success_and_carry_preserve_funded_return_credit" do
+    with_context(fn limits, _source, _mode ->
+      forecast = %{decoded_words: 100, pinned_bytes: 800}
+      mode = {:metered, forecast, 100, 800}
+      refusal = {:error, :source_code_changed}
+
+      both = %{limits | decoded_words: 105, pinned_bytes: 840}
+      assert Meter.finish(:ok, mode, both) == {{:error, {:limit, :decoded_words}}, 104, 832}
+
+      for axis <- [:decoded_words, :pinned_bytes] do
+        five = Map.put(limits, axis, if(axis == :decoded_words, do: 105, else: 840))
+        nine = Map.put(limits, axis, if(axis == :decoded_words, do: 109, else: 872))
+        fourteen = Map.put(limits, axis, if(axis == :decoded_words, do: 114, else: 912))
+        financial = {:error, {:limit, axis}}
+
+        # A final result must remain payable when another operation is refused.
+        assert Meter.finish(:ok, mode, five) == {financial, 104, 832}
+        success = Meter.finish(:ok, mode, nine)
+        assert success == {:ok, 104, 832}
+        stopped = Meter.carry(forecast, success, nine)
+        assert stopped == {financial, 108, 864}
+        assert Meter.carry(forecast, stopped, nine) == stopped
+        assert Meter.finish(refusal, stopped, nine) == stopped
+
+        success = Meter.finish(:ok, mode, fourteen)
+        assert success == {:ok, 104, 832}
+        live = Meter.carry(forecast, success, fourteen)
+        assert live == {:metered, forecast, 109, 872}
+        assert Meter.finish(refusal, live, fourteen) == {refusal, 113, 904}
+        unknown = Meter.finish(refusal, live, :unsettled)
+        assert unknown == {:unsettled, refusal, 114, 912}
+        assert Meter.carry(forecast, unknown, fourteen) == unknown
+        assert Meter.finish(:ok, unknown, fourteen) == unknown
+
+        assert Meter.finish(refusal, mode, five) == {refusal, 104, 832}
+        assert Meter.finish(refusal, mode, :unsettled) == {:unsettled, refusal, 105, 840}
+      end
+    end)
+  end
+
+  test "metered_source_guard_refuses_before_unfunded_frame_entry" do
+    with_context(fn limits, source, _mode ->
+      limits = %{limits | decoded_words: 1_205}
+      forecast = %{decoded_words: 0, pinned_bytes: 0}
+      mode = {:metered, forecast, 1_000, 8_000}
+      donor = %{encoded: TermCodec.encode(7), source_term: 7}
+      guard = Ferricstore.PolicyRuntimeCapture.Input.Binding
+      owner = self()
+
+      {worker, monitor} =
+        spawn_monitor(fn ->
+          receive do
+            :go ->
+              outcome = Input.bind_admission([donor], limits, mode, source, 1)
+              send(owner, {:guard_refusal, self(), outcome})
+              receive do: (:stop -> :ok)
+          end
+        end)
+
+      try do
+        1 = :erlang.trace_pattern({guard, :source_current, 3}, true, [:local])
+        1 = :erlang.trace(worker, true, [:call, {:tracer, self()}])
+        send(worker, :go)
+
+        assert_receive {:guard_refusal, ^worker,
+                        {{:error, {:limit, :decoded_words}}, 1_200, paid_pins}},
+                       5_000
+
+        assert is_integer(paid_pins) and paid_pins >= 8_000
+        fence = :erlang.trace_delivered(worker)
+        assert_receive {:trace_delivered, ^worker, ^fence}, 5_000
+        refute_received {:trace, ^worker, :call, {^guard, :source_current, [_, _, _]}}
+      after
+        if Process.alive?(worker), do: :erlang.trace(worker, false, [:call])
+        :erlang.trace_pattern({guard, :source_current, 3}, false, [:local])
+        send(worker, :stop)
+        assert_receive {:DOWN, ^monitor, :process, ^worker, _reason}, 5_000
+      end
     end)
   end
 
