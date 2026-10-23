@@ -4,6 +4,8 @@ use crate::workflow::active::ActiveValueRef;
 use std::collections::BTreeMap;
 use wf_types::identity::{PartitionId, RecordId};
 
+pub mod caller;
+
 mod group;
 pub(crate) use group::{
     count_terminal, mark_cancelled, resolve_group, running_children, validate_group,
