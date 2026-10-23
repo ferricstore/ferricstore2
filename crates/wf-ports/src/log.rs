@@ -204,7 +204,7 @@ impl DecodedRequest<'_> {
         Some(match operation {
             Operation::Create(value) => [value.payload.as_deref(), None],
             Operation::Transition(value) => [value.payload.as_deref(), None],
-            Operation::StepContinue(_) => return None,
+            Operation::StartAndClaim(_) | Operation::StepContinue(_) => return None,
             Operation::Complete(value) | Operation::Fail(value) => {
                 [value.payload.as_deref(), value.value.as_deref()]
             }

@@ -171,6 +171,22 @@ tests and the closed response/event boundary controls. The
 stays closed. Neither source checks nor unit boundaries establish durable or
 public operation support, the complete original case or Linux/macOS parity.
 
+### Pure committed StartAndClaim boundaries
+
+The [selected atomic-start contract](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
+uses existing command, create/claim, admission, batch and indexed-decision homes.
+`start_and_claim_core_stays_pure_and_server_side` exercises their approved pure
+imports, environment/async refusal and StartAndClaim/Operation value/client
+facade separation. Production files remain within400 physical lines, tooling
+within600 and every function within100; no parser, dependency, allowlist or size
+exception is selected.
+
+This existing-policy regression is distinct from later atomic behavior and
+generated-owner admission tests. The current shell rejects execution, while
+command/intent codecs and public/independent profiles remain closed. Source
+enforcement does not establish public or durable support, complete original
+scenarios or Linux/macOS parity.
+
 ## Pure storage value boundary
 
 ARCH-NEXT-M2-STATE-CONTRACT1-CREATE1 applies the existing pure-source rules to

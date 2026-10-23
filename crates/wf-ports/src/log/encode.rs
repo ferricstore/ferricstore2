@@ -189,7 +189,9 @@ fn operation(value: &Operation, writer: &mut Writer<'_>, maximum: usize) -> Resu
         Operation::Claim(_) => 2,
         Operation::Reclaim(_) => 3,
         Operation::Transition(_) => 4,
-        Operation::StepContinue(_) => return Err(CodecError::UnsupportedTag),
+        Operation::StartAndClaim(_) | Operation::StepContinue(_) => {
+            return Err(CodecError::UnsupportedTag);
+        }
         Operation::Complete(_) => 5,
         Operation::Fail(_) => 6,
         Operation::Retry(_) => 7,
@@ -201,7 +203,7 @@ fn operation(value: &Operation, writer: &mut Writer<'_>, maximum: usize) -> Resu
         Operation::Create(value) => create(value, writer, maximum),
         Operation::Claim(value) | Operation::Reclaim(value) => claim(value, writer, maximum),
         Operation::Transition(value) => transition(value, writer, maximum),
-        Operation::StepContinue(_) => Err(CodecError::UnsupportedTag),
+        Operation::StartAndClaim(_) | Operation::StepContinue(_) => Err(CodecError::UnsupportedTag),
         Operation::Complete(value) | Operation::Fail(value) => terminal(value, writer, maximum),
         Operation::Retry(value) => retry(value, writer, maximum),
         Operation::RetryWithPolicy(value) => policy_retry(value, writer, maximum),

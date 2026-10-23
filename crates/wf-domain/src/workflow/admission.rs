@@ -217,6 +217,10 @@ fn command_bytes(
             &[&create.workflow_type, &create.state],
             &[create.payload.as_deref()],
         ),
+        Operation::StartAndClaim(start) => (
+            &[&start.workflow_type, &start.state, &start.worker],
+            &[start.payload.as_deref()],
+        ),
         Operation::Claim(claim) | Operation::Reclaim(claim) => (
             &[&claim.expected_state, &claim.worker, claim.token.as_bytes()],
             &[],

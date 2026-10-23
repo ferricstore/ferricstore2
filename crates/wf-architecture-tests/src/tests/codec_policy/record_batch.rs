@@ -261,3 +261,58 @@ fn step_continue_core_stays_pure_and_server_side() -> CheckResult<()> {
     }
     Ok(())
 }
+
+#[test]
+fn start_and_claim_core_stays_pure_and_server_side() -> CheckResult<()> {
+    for module in [
+        "workflow::command",
+        "workflow::create_claim",
+        "workflow::admission",
+        "workflow::batch",
+        "workflow::indexed::decision",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-domain",
+                module,
+                "use std::collections::BTreeMap; use crate::lease::LeaseToken; use wf_types::version::Fence;"
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "unclassified standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+        ] {
+            let findings = source_check("wf-domain", module, source)?;
+            assert!(
+                findings.iter().any(|finding| finding.contains(diagnosis)),
+                "{module}: {findings:?}"
+            );
+        }
+    }
+    for path in ["workflow::StartAndClaim", "workflow::Operation"] {
+        for (package, module, prefix, diagnosis) in [
+            (
+                "wf-wire",
+                "value",
+                "wf_domain",
+                "wire may reference only wf_domain::value",
+            ),
+            ("wf-ports", "client", "wf_domain", "client port facade"),
+            (
+                "wf-domain",
+                "value",
+                "crate",
+                "approved domain value module",
+            ),
+        ] {
+            let source = format!("pub use {prefix}::{path};");
+            let findings = source_check(package, module, &source)?;
+            assert!(
+                findings.iter().any(|finding| finding.contains(diagnosis)),
+                "{package}::{module}: {findings:?}"
+            );
+        }
+    }
+    Ok(())
+}

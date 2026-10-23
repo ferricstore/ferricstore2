@@ -1227,6 +1227,14 @@ UnsupportedTag; the new DirectRunningFifoEntry response reason also remains
 unsupported. Existing decoder/tag grammar and independent/public allowlists stay
 closed. No operation, response or history tag/version is added by that core stage.
 
+The [selected pure StartAndClaim core](004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
+also remains outside this eight-mutation profile. Both command and intent
+encoders explicitly return `UnsupportedTag`; value inspection returns no
+supported value shape. Decoder grammar and independent/public allowlists stay
+closed. Storage's existing Create-only policy discovery does not discover
+StartAndClaim policy; that durable integration remains required separately.
+The interface shell supplies no public or durable operation support.
+
 One existing request inspection precedes all Fresh current-record, retry-policy
 and index work. Fresh checks effective committed time, binds exact derived keys
 and each present payload/result/error occurrence, then calls the existing

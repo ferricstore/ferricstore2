@@ -20,6 +20,23 @@ pub struct Create {
     pub payload: Option<Vec<u8>>,
 }
 
+/// Inputs for an atomic initial logical step with a running lease.
+///
+/// The current reducer shell rejects these inputs as unsupported.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct StartAndClaim {
+    /// Nonempty binary workflow type.
+    pub workflow_type: Vec<u8>,
+    /// Initial logical state; running and terminal names are forbidden.
+    pub state: Vec<u8>,
+    /// Nonempty binary owner for the first running lease.
+    pub worker: Vec<u8>,
+    /// Positive lease duration relative to committed command time.
+    pub lease_ms: u64,
+    /// Inline optional payload; empty bytes differ from omission.
+    pub payload: Option<Vec<u8>>,
+}
+
 /// Nonterminal state change guarded by current state, fence and optional lease.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Transition {
@@ -85,6 +102,8 @@ pub struct Cancel {
 pub enum Operation {
     /// Create one new record.
     Create(Create),
+    /// Atomic fresh start and claim; currently refused by the reducer.
+    StartAndClaim(StartAndClaim),
     /// Claim a named due unleased record, without selecting a partition candidate.
     Claim(Claim),
     /// Claim a named expired running record, preserving its logical run state.

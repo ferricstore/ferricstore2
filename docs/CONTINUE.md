@@ -121,15 +121,27 @@ compiler/header/library pins remain verified. Valid-parent backing, the complete
 budget reply, runtime accounting, original profiles/parity and Linux acceptance
 remain open.
 
-The latest Rust checkpoint passes **968 tests across 90 targets on macOS**, with
+The latest Rust checkpoint passes **969 tests across 90 targets on macOS**, with
 zero failures, ignored or filtered tests, plus six compile-fail examples across
 15 documentation targets. Formatting, all-target compilation, strict Clippy,
 warnings-denied documentation, architecture, reference and progress checks pass;
 all four cached offline dependency-audit categories pass. All eleven explicit
 local commands exit zero, including the audit with `--offline`. All 1,507 captured
 repository inputs stayed unchanged through that sequence, excluding only the
-three append-only peer review notes. Independent architecture and performance
-reviews accept the actual results. No fresh advisory or Linux result is claimed.
+three append-only peer review notes. Architecture and performance reviews accept
+the source and its boundaries. No fresh advisory or Linux result is claimed.
+
+The new atomic StartAndClaim interface represents the selected five input fields
+and explicitly returns UnsupportedOperation after the existing global guards.
+Copied-input admission and command/intent refusals preserve the closed profiles;
+no token, record or history is constructed. The additional architecture test
+checks existing purity and facade rules. Complete source inverses preserve all
+old behavior, and the checkpoint above passes. The atomic body remains pending:
+save this shell, create the three source-case tests and two resource/guard
+controls, then freeze compiled positive runtime RED before releasing behavior.
+The selected contract creates one version-1/attempt-1/fence-1 running record and
+one Created event; ordinary Create followed by Claim is not equivalent. Public
+and durable integration, original profiles and both-OS acceptance remain open.
 
 The newest source-derived FIFO counterpart uses limit one to claim the queued
 head, reclaim that expired running head for the new worker, then observe the
@@ -175,7 +187,7 @@ passes 27 tests and the complete restored-code checkpoint above passes. This is
 pure existing-code conformance, with original public setup, phase scheduling,
 durability and complete required profiles still open.
 
-The current pure-operation increment is atomic StepContinue: keep physical running,
+The latest implemented pure operation is atomic StepContinue: keep physical running,
 rotate the actual lease token/fence once, change logical state and preserve entry
 order through actual-guard Retry and later FIFO activation. The reviewed interface
 scaffold passed its 957-test checkpoint with execution explicitly refused

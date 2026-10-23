@@ -25,7 +25,7 @@ pub mod request;
 pub mod restoration;
 
 pub use command::{
-    Cancel, CommittedCommand, Create, Operation, StepContinue, Terminal, Transition,
+    Cancel, CommittedCommand, Create, Operation, StartAndClaim, StepContinue, Terminal, Transition,
 };
 pub use plan::{Outcome, RecordWrite, TransitionPlan};
 
@@ -237,7 +237,10 @@ fn reduce_profile(
         Operation::RetryWithPolicy(retry) => Some(retry.guard.fence),
         Operation::ExtendLease(extend) => Some(extend.guard.fence),
         Operation::Cancel(cancel) => Some(cancel.fence),
-        Operation::Create(_) | Operation::Claim(_) | Operation::Reclaim(_) => None,
+        Operation::Create(_)
+        | Operation::StartAndClaim(_)
+        | Operation::Claim(_)
+        | Operation::Reclaim(_) => None,
     };
     if fence.is_some_and(|fence| fence.get() > MAX_EXACT_MILLIS) {
         return Err(DomainError::FenceTooLarge);
@@ -253,6 +256,7 @@ fn reduce_profile(
     }
     match &command.operation {
         Operation::Create(create) => create_record(record, command, create),
+        Operation::StartAndClaim(_) => Err(DomainError::UnsupportedOperation),
         Operation::Claim(claim) => claim_record(require_record(record)?, command, claim, false),
         Operation::Reclaim(claim) => claim_record(require_record(record)?, command, claim, true),
         Operation::Transition(transition) => {

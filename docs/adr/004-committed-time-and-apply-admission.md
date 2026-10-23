@@ -188,6 +188,42 @@ selection/Step/actual-guard Retry/FIFO-activation case, durable
 codecs/public orchestration, governance, profiles and both Linux/macOS execution
 remain required. Unit coverage alone will not certify those successors.
 
+### Selected pure committed StartAndClaim core
+
+START-AND-CLAIM1 selects `StartAndClaim` with explicit binary type, logical
+initial state, raw worker, positive lease duration and optional payload. The
+interface stage returns `UnsupportedOperation` after the existing global
+ID/time/current-identity guards. It admits copied input fields but constructs no
+token, record or history. Compiled positive tests must reach runtime RED and be
+frozen before the separately released atomic body; a missing enum or compile
+error is not behavioral RED.
+
+The selected body must create one running record at version1, attempts1 and
+fence1, with the initial logical state, deadline/due equal to committed time plus
+lease, and exactly one `Created` event. Ordinary Create followed by Claim is not
+equivalent. Existing identity rejection precedes fresh type/state/worker/lease
+validation and token creation. Token bytes concatenate raw worker, a colon,
+decimal committed time and `:1`; no host clock, randomness or UTF-8 worker
+conversion participates. No new event kind or business error is selected.
+
+Prospective fresh-only admission must check the seven-byte physical `running`
+state and generated token length `N = worker.len() + digits(now) + 3`, with
+`digits(0) = 1`, before constructing owners. Existing identities and other
+operations generate no new token. Preserve the old copied-input/current-record
+aggregate prefix and include N in the unchanged checked `4*V + 1024` account.
+Typed admission can precede core guard errors; this does not specify full public
+malformed-option precedence or allocator/RSS bounds. Bare reduction remains
+unprofiled. Indexed direct-running FIFO entry must refuse after core guards and
+actual target-mode resolution, before the existing FIFO-priority predicate and
+ordinal allocation. Earlier admission, placement and invalid-create-priority
+checks keep their order. Rejection publishes no record, history or index.
+
+At this stage only the rejecting interface is implemented. Atomic behavior,
+source counterparts, public defaults/hydration, committed policy installation,
+durable command/replay integration and both-OS/profile acceptance remain open.
+The existing private wire and independent/public operation profiles stay closed;
+see [ADR-006](006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition).
+
 ## Verification and deployment gates
 
 Before M1 acceptance, execute independent source-derived admission/model cases

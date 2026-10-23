@@ -139,6 +139,13 @@ behavior tests now pass in the complete macOS checkpoint.
 public/independent callers and storage event codecs remain explicitly unsupported
 for this operation. This selection completes no source scenario or durability gate.
 
+The [selected atomic StartAndClaim core](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
+uses the same pure domain and existing Created history. Its current interface
+returns UnsupportedOperation; copied-input admission and explicit unsupported
+codec matches preserve closed profiles. Atomic record/token construction and
+indexed FIFO behavior require separately frozen runtime RED before implementation.
+No new crate, dependency, event tag or public/durable operation is introduced.
+
 ## Command execution and durability
 
 1. Authenticate and enforce tenant, request and payload bounds at the edge. Construct typed command and idempotency key.
