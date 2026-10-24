@@ -70,6 +70,30 @@ classification regression passed after its recorded missing-classification
 failure. The complete Rust workspace checkpoint below includes these bodies;
 full original profiles and Linux remain required.
 
+The next active feature is complete history-value hydration through the FSV2
+typed-ETF codec and the real storage-read/routing boundaries. All three original
+standalone HistoryValues cases pass on pinned Elixir 1.19.5/OTP 28.3.1, preserving
+their four assertions, async:true/flow tags and no local setup. The real compiled
+Router's 65,535-byte key limit was checked against its abstract code and source;
+the five relevant codec/history/read-result modules were compiled from pinned
+source. Five module-redefinition warnings remained visible. This is standalone
+reference evidence, not bulk-store integration or new Rust coverage. Seventy-three
+separate reference observations now cover typed compounds, exact stored sizes,
+header/error/ref boundaries, existing-field overlays, semantic map-key equality,
+bignum signs and legacy float decoding. Architecture,
+performance and domain agents reviewed the complete success/error/omission
+contract under `docs/reviews/history-values/`. The first prerequisite now has its
+six-model owned decoder interface, five checked views and ten regression tests.
+The compiled rejecting baseline runs **one pass and nine intended assertion
+failures**, with zero ignored or filtered cases. All seven focused quality checks
+pass, including strict Clippy and 52 architecture checks. Only the all-negative
+wrapper control passes; positive decoding fails before later numerical, foreign,
+limit and moved-buffer pointer assertions. Those runtime tails remain unproved.
+The genuine baseline must be saved before decoder implementation; real value
+publication/read/recovery and hydration still follow. The three source case
+arrays remain empty; the full 1,061-test checkpoint below predates this new
+rejecting target.
+
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
 All four decoder regressions saved before implementation now pass: NEW-only
 calls preserve historical forecasts, a late source error retains completed work,

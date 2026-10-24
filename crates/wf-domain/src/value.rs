@@ -2,6 +2,14 @@
 
 use std::fmt;
 
+mod original_flow;
+
+pub use original_flow::{
+    OriginalFlowValueError, OriginalValueContext, OriginalValueDocument,
+    OriginalValueFunctionIdentity, OriginalValueLimits, OriginalValueNode,
+    decode_original_flow_value,
+};
+
 /// A business rejection; no record or history write accompanies an error.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DomainError {
