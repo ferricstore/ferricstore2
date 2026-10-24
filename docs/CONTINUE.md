@@ -45,24 +45,30 @@ Three new source mappings and seven assertion links are recorded below; the
 full workspace checkpoint includes this unchanged target. Related code lives under
 `src/options/score_bound.rs`, with reviews under `docs/reviews/score-bound/`.
 
-The new metadata callable baseline runs **twelve Rust tests: one passes and
-eleven fail**. All seven quality checks pass, including strict Clippy and the
-expanded 52-test architecture suite. The two original canonical-map cases reach
-false validators and fail; their later scalar/refute observations remain masked.
-The original invalid-name normalization case passes its three error-pattern
-assertions against the root-error stubs. Nine derived tests expose missing
-success, exact-error, improper-list, size/order and borrowing behavior. The
-two-lifetime ownership test compiles, but its runtime pointer assertions remain
-masked. No metadata source mapping receives coverage credit yet.
+The metadata implementation now passes **all twelve unchanged Rust tests and
+all eight focused checks**, including strict Clippy and all 52 architecture
+checks. Its genuine one-pass/eleven-failure callable baseline was saved in
+`20fb4d3` before the bodies were released. Exact test-name comparison preserves
+all twelve cases and changes precisely the eleven failures to passes. All 28
+original observations and derived error, count, collision, byte-boundary and
+nonempty borrowing assertions now execute. Architecture and performance reviewed
+the complete source, actual focused results and each other's written findings;
+no defect was found. Three source mappings now preserve all 28 observations
+through 22 physical assertion links, including the seven-input scalar loop.
+Independent mapping review and the post-mapping progress check both pass.
 
 All three original standalone metadata cases pass, with 23 separate reference
 edge groups. Actual pinned Elixir map traversal is recorded for the 64/65-state
-fixtures. Source and tests are grouped under `src/metadata.rs`, its private
-children, and `tests/metadata_validation/main.rs` with three sibling modules.
-A separate architecture regression first failed on missing classification and
-now passes after registering the public module. Shared policy input and its
-closed profiles remain unchanged. The substantive nineteen helpers, limits and
-normalizers still require saving this genuine baseline and separate release.
+fixtures. Canonical predicates inspect borrowed values without rebuilding maps;
+normalizers validate every raw row before choosing last normalized occurrences,
+then reserve final result spines fallibly. Leaves outlive temporary descriptors
+without copying payloads. Source files have 301, 241 and 201 physical lines,
+with a longest function of 47. No measured speedup or total heap/admission bound
+is claimed. Related code lives under `src/metadata.rs` and its private children;
+the four-file test target is `tests/metadata_validation/main.rs`. The separate
+classification regression passed after its recorded missing-classification
+failure. The complete Rust workspace checkpoint below includes these bodies;
+full original profiles and Linux remain required.
 
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
 All four decoder regressions saved before implementation now pass: NEW-only
@@ -105,17 +111,18 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full passing Rust checkpoint, before the metadata baseline, passes
-**1,048 tests across 95
-targets on macOS**, with zero failed, ignored or filtered tests, plus **six
+The latest full passing Rust checkpoint passes **1,061 tests across 96 targets
+on macOS**, with zero failed, ignored, measured or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven local checks
 pass: formatting, workspace compilation, strict Clippy, warnings-denied
-documentation, all 51 architecture checks, reference/progress validation, four
-cached offline dependency-audit categories and whitespace. All 1,556 captured
-inputs stayed unchanged, excluding only the three active feature review notes.
-Exact target/executable/name/status comparison preserves all 1,042 preceding
-tests and adds only the six ScoreBound cases.
+documentation, all 52 architecture checks, reference/progress validation, four
+cached offline dependency-audit categories and whitespace. All 1,567 captured
+inputs stayed unchanged, excluding only the three active metadata review notes.
+Exact target/executable/name/status comparison preserves all 1,048 preceding
+tests and adds only the twelve metadata cases and one architecture regression.
 Both existing benchmark correctness smokes pass. No measured speedup is claimed.
+This full run checked the preceding 117/129/528 ledger; the three metadata links
+were added afterward and passed separate progress and whitespace checks.
 
 All four pinned pure Options cases now have Rust counterparts preserving their
 **29 assertions in source order**, exact errors, first-key/default/nil behavior,
@@ -150,8 +157,9 @@ Rust; the 12-test target and all five original standalone Elixir cases pass.
 Their source/error/ownership and derived regression review remains accepted.
 Options and ChildPolicy are pure components, not a completed workflow engine.
 
-The checked partial ledger records **117 source-derived declarations,
-129 Rust counterpart mappings and 528 assertion links**. Runtime reconciliation
+The partial ledger now records **120 source-derived declarations,
+132 Rust counterpart mappings and 550 assertion links**, validated after the
+metadata additions. Runtime reconciliation
 still has 1,681 unmatched cases and 1,655 unresolved declarations. The immutable
 reference and frozen workflow mapping remain unchanged. Full original Elixir
 case/profile parity, Linux validation, consensus, live HTTP/TLS-TCP, workers and

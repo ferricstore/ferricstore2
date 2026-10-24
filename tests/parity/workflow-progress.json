@@ -7853,21 +7853,198 @@
       "runtime_case_ids": [
         "6649df74c96149886b065d2bd755289265a25fc776d623825dce43e3e4f0e303"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-metadata-ca42c6b45ed50200-attributes_identify_canonical_persisted_metadata_without_rebuilding_it",
+          "rust_file": "crates/wf-domain/tests/metadata_validation/main.rs",
+          "rust_file_sha256": "b00cd784bd84609d3fb42949294760cff4d97bbdb8f355d2a6f1dfa89515ef60",
+          "rust_module": "",
+          "rust_function": "attributes_identify_canonical_persisted_metadata_without_rebuilding_it",
+          "assertions": [
+            {
+              "source_line": 16,
+              "source_text": "assert Attributes.valid_normalized?(canonical)",
+              "rust_line": 33,
+              "rust_text": "assert!(valid_attrs(I::Map(&canonical)));"
+            },
+            {
+              "source_line": 19,
+              "source_text": "assert Attributes.valid_scalar?(scalar)",
+              "rust_line": 44,
+              "rust_text": "assert!(valid_scalar(scalar));"
+            },
+            {
+              "source_line": 22,
+              "source_text": "assert Attributes.valid_list?([\"one\", \"two\"])",
+              "rust_line": 46,
+              "rust_text": "assert!(valid_list(I::List(&list)));"
+            },
+            {
+              "source_line": 23,
+              "source_text": "refute Attributes.valid_scalar?([\"one\"])",
+              "rust_line": 47,
+              "rust_text": "assert!(!valid_scalar(I::List(&[I::Binary(b\"one\")])));"
+            },
+            {
+              "source_line": 24,
+              "source_text": "refute Attributes.valid_scalar?(:binary.copy(\"x\", 257))",
+              "rust_line": 48,
+              "rust_text": "assert!(!valid_scalar(I::Binary(&[b'x'; 257])));"
+            },
+            {
+              "source_line": 25,
+              "source_text": "refute Attributes.valid_list?([])",
+              "rust_line": 49,
+              "rust_text": "assert!(!valid_list(I::List(&[])));"
+            },
+            {
+              "source_line": 26,
+              "source_text": "refute Attributes.valid_list?([\"same\", \"same\"])",
+              "rust_line": 51,
+              "rust_text": "assert!(!valid_list(I::List(&duplicate)));"
+            },
+            {
+              "source_line": 27,
+              "source_text": "refute Attributes.valid_list?([\"one\", 2])",
+              "rust_line": 53,
+              "rust_text": "assert!(!valid_list(I::List(&mixed)));"
+            },
+            {
+              "source_line": 29,
+              "source_text": "refute Attributes.valid_normalized?(%{\"empty\" => []})",
+              "rust_line": 54,
+              "rust_text": "assert!(!valid_attrs(I::Map(&[(I::Binary(b\"empty\"), I::List(&[]))])));"
+            },
+            {
+              "source_line": 30,
+              "source_text": "refute Attributes.valid_normalized?(%{\"duplicate\" => [\"same\", \"same\"]})",
+              "rust_line": 55,
+              "rust_text": "assert!(!valid_attrs(I::Map(&[("
+            },
+            {
+              "source_line": 31,
+              "source_text": "refute Attributes.valid_normalized?(%{\" padded\" => \"value\"})",
+              "rust_line": 59,
+              "rust_text": "assert!(!valid_attrs(I::Map(&[("
+            },
+            {
+              "source_line": 32,
+              "source_text": "refute Attributes.valid_normalized?(%{<<0xFF>> => \"value\"})",
+              "rust_line": 63,
+              "rust_text": "assert!(!valid_attrs(I::Map(&[("
+            },
+            {
+              "source_line": 33,
+              "source_text": "refute Attributes.valid_normalized?(%{atom_key: \"value\"})",
+              "rust_line": 67,
+              "rust_text": "assert!(!valid_attrs(I::Map(&[("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure MetadataValidation case with async:true, no flow tag and no local setup. All three cases retain all 28 expanded source observations in original order (19/6/3). The scalar-loop assertion is one physical link preserving all seven inputs: nil, false, true, -1, 1.5, empty binary and a 256-byte binary.",
+            "Inputs are already captured immutable finite acyclic metadata descriptors. Map keys are unique under exact Erlang equality and rows retain actual source reduce order; leaf acquisition and backing storage remain the caller responsibility. Canonical predicates inspect borrowed input without rebuilding maps. Normalizers validate every raw row before winner scans, retain last normalized occurrences, enforce raw counts before collision/deduplication and logical-byte totals after final values, then fallibly reserve only owned result spines. Outputs borrow leaves independently of descriptor containers. ReserveFailed is an operational lane; no injected OOM, exact allocator capacity, total heap/admission/RSS bound or measured speedup is proved.",
+            "All twelve unchanged Rust metadata tests and all three original standalone Elixir cases pass on macOS after the genuine one-pass/eleven-failure rejecting baseline was saved in 20fb4d3. Twenty-three original edge groups and actual pinned-OTP 64/65-state map traversals supplement the source cases. Full original project setup/profiles, Linux validation, native admission, remaining workflow parity, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "6fbaf005c2b4dc11",
       "runtime_case_ids": [
         "44391424345e48bbaae494d825b17e80bd85a508048fea1f13b62819fa7243f9"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-metadata-6fbaf005c2b4dc11-state_metadata_identifies_canonical_scalar_only_persisted_metadata",
+          "rust_file": "crates/wf-domain/tests/metadata_validation/main.rs",
+          "rust_file_sha256": "b00cd784bd84609d3fb42949294760cff4d97bbdb8f355d2a6f1dfa89515ef60",
+          "rust_module": "",
+          "rust_function": "state_metadata_identifies_canonical_scalar_only_persisted_metadata",
+          "assertions": [
+            {
+              "source_line": 47,
+              "source_text": "assert StateMeta.valid_normalized?(canonical)",
+              "rust_line": 82,
+              "rust_text": "assert!(valid_states(I::Map(&[("
+            },
+            {
+              "source_line": 49,
+              "source_text": "refute StateMeta.valid_normalized?(%{\"queued\" => %{\"list\" => [\"invalid\"]}})",
+              "rust_line": 88,
+              "rust_text": "assert!(!valid_states(I::Map(&[("
+            },
+            {
+              "source_line": 50,
+              "source_text": "refute StateMeta.valid_normalized?(%{\" queued\" => %{\"worker\" => \"one\"}})",
+              "rust_line": 93,
+              "rust_text": "assert!(!valid_states(I::Map(&[("
+            },
+            {
+              "source_line": 51,
+              "source_text": "refute StateMeta.valid_normalized?(%{\"queued\" => %{\" worker\" => \"one\"}})",
+              "rust_line": 98,
+              "rust_text": "assert!(!valid_states(I::Map(&[("
+            },
+            {
+              "source_line": 52,
+              "source_text": "refute StateMeta.valid_normalized?(%{<<0xFF>> => %{\"worker\" => \"one\"}})",
+              "rust_line": 102,
+              "rust_text": "assert!(!valid_states(I::Map(&[("
+            },
+            {
+              "source_line": 53,
+              "source_text": "refute StateMeta.valid_normalized?(%{\"queued\" => %{<<0xFF>> => \"one\"}})",
+              "rust_line": 107,
+              "rust_text": "assert!(!valid_states(I::Map(&[("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure MetadataValidation case with async:true, no flow tag and no local setup. All three cases retain all 28 expanded source observations in original order (19/6/3). The scalar-loop assertion is one physical link preserving all seven inputs: nil, false, true, -1, 1.5, empty binary and a 256-byte binary.",
+            "Inputs are already captured immutable finite acyclic metadata descriptors. Map keys are unique under exact Erlang equality and rows retain actual source reduce order; leaf acquisition and backing storage remain the caller responsibility. Canonical predicates inspect borrowed input without rebuilding maps. Normalizers validate every raw row before winner scans, retain last normalized occurrences, enforce raw counts before collision/deduplication and logical-byte totals after final values, then fallibly reserve only owned result spines. Outputs borrow leaves independently of descriptor containers. ReserveFailed is an operational lane; no injected OOM, exact allocator capacity, total heap/admission/RSS bound or measured speedup is proved.",
+            "All twelve unchanged Rust metadata tests and all three original standalone Elixir cases pass on macOS after the genuine one-pass/eleven-failure rejecting baseline was saved in 20fb4d3. Twenty-three original edge groups and actual pinned-OTP 64/65-state map traversals supplement the source cases. Full original project setup/profiles, Linux validation, native admission, remaining workflow parity, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "d482759cd391b8c3",
       "runtime_case_ids": [
         "8e1a4bfc04835a7139d8f39365318fe916f5a51d161bd410f7c8ee986e116696"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "pure-metadata-d482759cd391b8c3-normalization_rejects_names_that_cannot_be_addressed_by_fql",
+          "rust_file": "crates/wf-domain/tests/metadata_validation/main.rs",
+          "rust_file_sha256": "b00cd784bd84609d3fb42949294760cff4d97bbdb8f355d2a6f1dfa89515ef60",
+          "rust_module": "",
+          "rust_function": "normalization_rejects_names_that_cannot_be_addressed_by_fql",
+          "assertions": [
+            {
+              "source_line": 57,
+              "source_text": "assert {:error, _reason} = Attributes.normalize(%{<<0xFF>> => \"value\"})",
+              "rust_line": 115,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 58,
+              "source_text": "assert {:error, _reason} = StateMeta.normalize(%{<<0xFF>> => %{\"worker\" => \"one\"}})",
+              "rust_line": 120,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 59,
+              "source_text": "assert {:error, _reason} = StateMeta.normalize(%{\"queued\" => %{<<0xFF>> => \"one\"}})",
+              "rust_line": 125,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned pure MetadataValidation case with async:true, no flow tag and no local setup. All three cases retain all 28 expanded source observations in original order (19/6/3). The scalar-loop assertion is one physical link preserving all seven inputs: nil, false, true, -1, 1.5, empty binary and a 256-byte binary.",
+            "Inputs are already captured immutable finite acyclic metadata descriptors. Map keys are unique under exact Erlang equality and rows retain actual source reduce order; leaf acquisition and backing storage remain the caller responsibility. Canonical predicates inspect borrowed input without rebuilding maps. Normalizers validate every raw row before winner scans, retain last normalized occurrences, enforce raw counts before collision/deduplication and logical-byte totals after final values, then fallibly reserve only owned result spines. Outputs borrow leaves independently of descriptor containers. ReserveFailed is an operational lane; no injected OOM, exact allocator capacity, total heap/admission/RSS bound or measured speedup is proved.",
+            "All twelve unchanged Rust metadata tests and all three original standalone Elixir cases pass on macOS after the genuine one-pass/eleven-failure rejecting baseline was saved in 20fb4d3. Twenty-three original edge groups and actual pinned-OTP 64/65-state map traversals supplement the source cases. Full original project setup/profiles, Linux validation, native admission, remaining workflow parity, consensus, transports and workers remain required."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "421f0b4eb08e34d7",
