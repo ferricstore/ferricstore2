@@ -1,6 +1,7 @@
-//! Blob boundary for `wf-ports`.
+//! Pure source value-reference and logical-binary preparation.
 //!
-//! Reserved for the reviewed contract; no workflow behavior is implemented here.
+//! Borrowed shapes and prepared bytes grant no storage, placement, publication
+//! or admission authority. Logical binaries are never implicitly typed ETF.
 
 mod encoding;
 mod reference;

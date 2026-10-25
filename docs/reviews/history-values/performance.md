@@ -1538,3 +1538,502 @@ behavioral pass/failure status is inferred in this receipt. Source-golden and
 nonempty borrow tails remain runtime-unclaimed until the actual target executes.
 Genuine R0 RED/SAVE and separate BODY release remain required. Only this own note
 was appended; no source/workload/Git/probe or added readiness/ACK gate.
+
+## PERF-NEXT-VALUE-PROVENANCE1 independent prospective resource/API review
+
+This is a finite NEXT recommendation, not creation/BODY/storage authority. I did
+NOT inspect ANY of the five moving REF-BINARY1 BODY paths or run a workload,
+compiler/VM/test/Git/probe. Only this own note is appended. Root's reported saved
+REF R0/technical results are not independently re-certified in this task.
+
+I actually whole/hash-read ARCH171780+22049/
+cdf3241816b194e1259fee1b859e56bf708fe1fdc0c59ba455acf9abd372894c,end193829,
+then actual215700+2234/daa5f9f01df2bd0a1f8c9994d214b36e5491ff4aa347496c74d30719f3c9e0ae,
+end217934. The latter is the important explicit F/R correction, not wording that
+was already closed in the earlier22K proposal. ARCH also reports a separate
+large successor matrix193829+21871/6d4fd518; I have NOT whole-read that matrix in
+this finite task and do not claim its additional registry audit as my own.
+
+Stable actual source read at the model/slot/index/drop/coexistence/commit sites:
+log.rs394/2e75f4d6, record_batch.rs344/686d964e, fresh.rs207/ec3b93f6,
+phase.rs254/b6c45c97, independent.rs168/dd7e64c1, public_mutation/apply.rs164/
+5f1d635d, atomic_start.rs160/8f0472c4, intent.rs218/42b18971; domain batch372/
+4f0f09ff and indexed/independent294/3043b8f4; ports state/transaction358/f89b072d;
+storage transaction/record_batch261/26f5f73c, redb/commit233/5788bd4d and
+commit/independent79/20d99c22. These are existing frozen paths outside the live
+REF writer. Relevant complete functions and four producer tails were read;
+none of this is fabricated callback/store or source-registration evidence.
+
+The FINAL borrowed inspector is a sound improvement over the withdrawn detached
+owned-output sketch. Its &'plan result depends ONLY on RecordBatchApplyPlan;
+the verification DecodedRequest can drop, and the returned borrow refers to the
+SAME already-attached owner rather than a second Vec. Private scalar row fields
+and private Vec simplify views but convey no storage/authorization/provenance
+grant by themselves. The builder must join the effect owner in the real producer
+BEFORE decoded destructure/drop in EACH V5 atomic, V6 independent, V1 public and
+V7 atomic-start path. Current actual source releases request.operation/isolation/
+state_keys/claim_filters before its late response allocation; preserving that
+release point avoids retaining decoded payload owners merely for inspection.
+The numeric rows do not borrow payload/ref/namespace or need a recursive owner.
+
+First bind control.next.last_entry.prepared to decoded.digest, using the existing
+verified digest, not a rehash or matching IDs alone. Check the actual profile,
+cardinality, scoped identity, accepted write/history relationship and version.
+Use Operation slots, not fresh::stage_values' flattened ValueRow: Cancel slot0
+is ERROR, Complete slot1 RESULT, Fail/Retry/RetryWithPolicy slot1 ERROR; payload
+is its actual optional source field. Some(empty) and Some(equal-to-old) remain
+SUPPLIED and generate a new-version effect. Omission must not suppress a genuine
+zero-mask carry-history row. Independent results must be enumerated BEFORE
+filtering failures/no-ops/history absence, retaining holes and EVERY intermediate
+same-ID write. Atomic batch items are already input-aligned. final_indices or a
+new enumeration of history_plans would be wrong.
+
+ONE concrete source-profile correction was found in the earlier proposal's
+Claim/Extend example and communicated directly to ARCH/Root. Actual V5/V6 intent
+operation matching rejects Claim, Reclaim, StepContinue and StartAndClaim; generic
+value_bytes zero slots for Claim/Reclaim are NOT profile support. StepContinue
+is unsupported throughout these selected byte profiles. StartAndClaim is admitted
+ONLY by its V7 profile. Use actual ExtendLease as the supported zero-mask real
+history witness, and preserve explicit UnsupportedProfile for unsupported/crossed
+operations. This is not a blanket zero-mask fallback. Root independently found
+the same source fact; ARCH reports its matrix explicitly supersedes that example.
+No new profile, ClaimApplyPlan route or source file is authorized by this review.
+
+Replay/log-replay/conflict/expired, whole rejection and real no-history results
+have no effect Vec; missing attachment for a real accepted history must remain
+UnsupportedProfile rather than an empty known binding. The inspector checks and
+borrows the producer's identical attachment. A detached success-only inspector
+cannot fulfill this increment's tests or substitute for producer integration.
+Source semantic/count prepass precedes ONE exact fallible result reserve; then
+the second same-predicate pass fills only the surviving rows. There is no map/set,
+string/key/ref copy, B64/hash/encoding, Box, temporary payload collector or owned
+record clone needed. Actual allocator reserve failures remain operational, not
+business rejection or fabricated OOM-test coverage.
+
+The key proposed-accounting omission is now CLOSED by the actual2234-byte
+amendment: separate output R from resident F.
+R = checked(real_history_count * size_of::<RecordBatchValueEffect>()).
+F = size_of::<Option<RecordBatchValueEffects>>() for the ACTUAL future type.
+The public maximum_effect_bytes caps R ONLY. Genuine None has R0/no allocated
+Vec, so cap0 can return Ok(None) after separately paid association/work checks.
+Every returned plan still includes its new field F even on None/replay/rejection;
+count that term explicitly, ONCE, without assuming a free enum niche or charging
+an absent row allocation. Do not count the Vec owner metadata twice: it is part
+of the actual Option/Effects representation measured by F. These are declared
+logical owner charges, not guaranteed exact allocator/stack/RSS measurements.
+
+I re-derived the actual current early expression from fresh::inputs and
+decoder_bound: with encoded length E, item count n, decision cap B and declared
+additional live A, it is4E+2B+1216n+2304+A. Its old192n allowance does NOT silently
+pay a new Vec. After the real accepted semantic/count decision and BEFORE the
+new reserve, admit the new fixed field and actual row term F+R against the real
+remaining workspace. Do not introduce a blanket worst-case row allocation charge
+ahead of an otherwise earlier business rejection. None still needs fixed metadata,
+not fictional rows. The existing late formulas after decoded donors drop are
+V5:E+B+H+531+A and V6/V1/V7:E+B+H+512+S+A, where H is remaining header bytes and S
+the measured response. EACH needs its retained F+R term before response/outcome
+allocation. This preserves actual early-versus-late coexistence instead of
+keeping all donors or inventing a refund.
+
+Complete retained-gate returns need F as well. I independently read actual
+finish_inspection4, which currently returns plain Inspection and constructs
+Complete after dropping decoded; five existing callers wrap it in Ok. The
+adopted narrow future change keeps its name/arity, returns Result instead, and
+admits checked decoder_bound+F AFTER the actual retained gate and BEFORE Complete
+construction, then drops decoded. Propagate that result through the same five
+callers; no extra gate/helper/model/public API is required. Fresh keeps the
+existing boxed handoff, with F+R admitted at its actual later producer/plan
+construction. Old512/531/192n slack is not asserted to own the new field. Full
+physical Rust enum/frame layout remains outside this logical ownership theorem.
+
+The64+64n+4E work envelope is a plausible conservative per-call algorithm profile,
+CONDITIONAL on the future actual code census. It is not already proved by names
+or a constructor table. Both builder passes, failed/no-op item visits, descriptor
+validation/push and the existing digest comparison must share one monotonic
+account, charged BEFORE work. Comparisons are only source partition/ID and
+actually supplied bytes; their source lengths are represented in E. Two passes
+that charge both sides of these byte comparisons fit the4E component. The64n
+term must cover the declared repeated scalar/item/result operations, not reset
+for the second pass. Do NOT add an unrelated whole old-record/omitted-payload/
+event-ID scan, formatting, reducer rerun or nested-search algorithm while keeping
+this envelope. The public borrowed inspector has its own explicitly admitted
+verification call; its work is not magically free because a producer previously
+built the owner. Existing caller buffers/current owners remain separately owned.
+Actual future BODY source/census must discharge all branch-specific spends.
+
+Root requested a concrete optional representation assessment before models exist.
+Actual common::count reads checked u32 and then AdmissionLimits; MAX_BATCH_ITEMS
+is100000, default1000. encode checks nonempty/count then checked u32 emission.
+Thus source indices in selected batches are0..99999, preserving holes; singleton
+V1/V7 index0. I recommend checked u32 for the private source index AND its getter
+only if ARCH explicitly refines that contract BEFORE creation. It matches the
+bounded wire ordinal and may reduce a large numeric spine, with one checked
+usize->u32 conversion when deriving each row and checked conversion at later
+usize lookup. There is no truncating cast, compacted ordinal or new helper/model.
+Current usize is still semantically sound and should not block completion.
+I do NOT claim actual24->16-byte row size or a speedup: that awaits the ordinary
+approved type build/size_of, not an extra layout probe. This recommendation is not
+misrepresented as already present in the22049-byte contract's usize field.
+
+I independently read the directly relevant official primary layout guidance:
+[Rust representation](https://doc.rust-lang.org/reference/type-layout.html#the-rust-representation)
+does not guarantee default field order/exact composite size;
+[Option representation](https://doc.rust-lang.org/std/option/index.html#representation)
+provides specific guarantees, not a license to assume this uncreated wrapper is
+free; and [Vec guarantees](https://doc.rust-lang.org/std/vec/struct.Vec.html#guarantees)
+distinguish its owner header from its separate allocation/capacity. Live std docs
+identify1.99.1; executing compiler is1.99.0. Stable documented guarantees are
+context, NOT an actual layout measurement for the uncreated types. Use real
+size_of in the declared arithmetic, never hardcoded24/16, repr(packed), unsafe,
+a gratuitous Box or extra allocation to force a desired number. Requested
+try_reserve_exact capacity can overprovide; no capacity-equality/OOM/RSS theorem.
+
+The named private helper cut is reasonable within future ordinary400/100 bounds;
+it does not itself prove geometry before actual code exists. The one charge
+model/method, two child responsibilities and five scalar/slice accessors are
+explicit; no generic callback/trait/cache or hidden helper is needed. The eight
+proposed tests must call ACTUAL producers in all four supported profiles, then
+inspect the SAME plan owner. Test holes/intermediates, equal/empty/omitted slots,
+unsupported profiles, digest mismatch, no-history cap0 with sufficient work,
+true workspace coexistence and a returned plan borrow after temporary decoded
+verification drops. An always-Err callable inspector is honest R0; missing
+symbols, classifier/lint errors or fake storage success are not its behavioral
+RED. No future test names/artifacts are created or runtime counts predicted here.
+
+Real storage transfer is still a required successor. I read actual
+transaction/record_batch119..203 and GroupApplyChanges237..325: it OWNS the whole
+plan through authentic consumed tx.commit(&changes), and only afterward extracts
+it for reply. Current final RecordBatchApplyPlan::into_parts would discard a
+future attachment; that is a final reply handoff, not a precommit loss today.
+The later catalog publisher must access the attachment while the whole plan is
+still present before that reply destructure. Same-transaction bytes/current refs/
+EVERY history refs/control/outcome and real snapshot/recovery/read/retention are
+still mandatory; this numeric-only owner is not that endpoint. No output row
+manufactures current binding availability, expires_at, captured terminal policy
+or scope/placement authority. Reduced terminal commands cannot borrow Timeout's
+real captured expiry or substitute request-outcome TTL. No historical catalog
+can be recreated from final inline bytes alone; missing/expired values remain
+distinct from an unavailable legacy binding and from corrupt storage.
+
+All concrete findings were sent directly to Root/ARCH without interrupting the
+REF writer. No remaining ownership/API objection after the explicit profile and
+F/R refinements; future actual code/work/geometry/results still require normal
+independent review. No current REF BODY readiness gate or new source/model/test
+release is introduced. Complete real publication/catalog/ordered routed reads,
+hydration original-three coverage, lifecycle/typed profile, Linux/full original
+profiles, native8/initialR/E-T/settlement and measured performance remain open.
+Finite consultation stopped.
+
+## PERF-HVAL-REF-BINARY1 actual BODY source/resource review and marker refinement
+
+This is the actual current REF BODY, separate from my completed NEXT provenance
+proposal. I whole-read all FIVE stopped canonical production homes and actual
+DOMAIN7943+1638/f60f34030cdd50fee6c7ec7593c6f216d721b2341470921dbac66bc8f6e41dd0.
+No source/test/Git/build/VM/probe or new artifact was changed/run by this reviewer.
+Only this active note changes. Root/DOMAIN's1590/ba9c5bfa inventory hold remains
+explicitly attributed; my actual file/tail/source checks are below.
+
+Canonical read binding:
+blob74/2739/3e742999d88b4c15038b4f9ca9e5546d348d9bb4f85052f89817611c4be931f4;
+encoding46/1279/57df5621e61a92acc424857839152389bcf33f9d33377abca2921988fe7ea599;
+base6476/2411/370e3db486b97f0edb87a3880ed04f7fd4df681aa619b229a0825f8b055662ef;
+tag95/2864/ad068b278e53352fb16744a38eeb5d108b8e19c7aae85d3079f6453bb337f0b8.
+I first whole-read reference242/7827/
+54f3cfb80118ea4a6cf60d5bb7c528c4ddc15694f512c96b70e12ab010464949.
+During a later read-only census I noticed245LF and immediately treated that file
+as moving rather than claiming the old hash still current. Root then handed off
+FINAL STOP245/7881/4d6911a08d4c798ed871c80afa13690dc2157e75420e7be273cee45f5d98b608;
+I WHOLE-read that final version after STOP. Reversing ONLY its bounded-marker
+expression exactly reproduces ENTIRE242/7827/54f3cfb8 in memory, no source write.
+
+Actual parent last2514 bytes still hash
+ a17016b17f7b7260714eeaec2fa85c9038b5234b180dc0660228173f8d2feb7a.
+Combining that actual unchanged model/reexport tail with the original120-byte
+header independently reproduces ENTIRE73/2634/0035c760 R0 parent. Thus four
+public models/derives/error lanes/reexports and all five API denotational types
+remain unchanged; only the purpose docs now describe implemented pure behavior.
+No new model/method/alias/dependency, encoded-owner type or implicit typed ETF.
+A source census finds EXACT19 functions and four named constants: MAX_KEY_BYTES,
+MAX_VALUE_VERSION, BASE64_URL_ALPHABET, AUTO_PARTITION_PREFIX. Maximum function is
+tag::render_tag57physical LF; maximum file final reference245. No packing, size
+waiver, unsafe/set_len, infallible collection/clone/shrink/Box or extra helper.
+
+Correctness source review found no scoped defect. Parser uses first source
+}:v: marker, validates only canonical f/fa:/f:digest inner tags, then LAST regular
+colon/nonempty opaque ID or exactly three named fields. Named component views
+are ORIGINAL ENCODED spans. Empty named fields, URL alphabet violations/padding,
+impossible remainder1 and nonzero unused tail bits refuse; empty base64 alone
+is not accidentally accepted because the named/digest callers enforce their
+own required nonemptiness/length43. Version parsing is bounded checked ASCII
+accumulation with zero canonicalization and MAX9007199254740991, no signs/trim/
+UTF8 parse. Noncanonical/huge numbers safely return None. Input bytes/IDs remain
+opaque and whole-key/ID size is uncapped at this syntax API. There is no decoded
+component Vec, normalized String, ownership clone or trusted placement proof.
+
+Both builders reject invalid mandatory components/version FIRST, including at
+max0. Regular fixed bytes are checked ID length+decimal digits+6; named fixed
+bytes are checked encoded-owner+encoded-name+decimal digits+7. They enforce the
+separate min(caller,65535) output maximum, subtract fixed bytes BEFORE tag work,
+then pass actual remaining space to the selected four-argument render_tag.
+The wider raw Keys integer/empty-component renderings and4096 ValueStore public
+option cap remain explicitly outside these eligible constructor decisions.
+
+The actual tag worker implements Global5, Automatic8..10 and hashed49 COMPLETE
+prefix bytes. Automatic refuses remaining<8 BEFORE CRC, then checks the actual
+one/two/three-digit bucket length BEFORE writing. This preserves the frozen auto
+25-success/24-Limit oracle instead of pessimistically requiring10 prefix bytes.
+Explicit canonical auto keys select their bucket; malformed auto-looking binary
+keys fall through to SHA of the WHOLE original bytes. Global checks5 before copy;
+hash checks49 BEFORE Sha256::digest. Empty Explicit hashes, distinct from Global.
+The reflected CRC uses0xedb88320, initial all-ones and final complement; explicit
+low-byte extraction is endian-independent modulo256. Named Automatic uses the
+raw OWNER bytes, not their encoded spelling. SHA writes exactly32-byte digest's
+43-character canonical URL representation into fixed49 scratch. No dynamic tag
+or intermediate encoded owner/name buffer is created.
+
+Each successful builder invokes ONE reserve_key on its exact logical final size.
+That helper checks the source cap, creates one empty Vec, calls actual
+try_reserve_exact(length), propagates the genuine TryReserveError, then resize
+zero-fills length. Because reservation guarantees capacity>=length, this resize
+requires no second growth. The zero-fill is a REAL additional byte pass, followed
+by checked final content writes; it is not hidden as a removed cost. put checks
+cursor addition and destination ranges; named B64 encodes DIRECTLY into its
+measured final intervals and checks returned counts; final cursors must match.
+The B64 quotient/remainder length calculation is checked before allocation/copy.
+Fixed decimal scratch is20bytes; bounded u64 digits and checked cursor movement
+avoid panic or string formatting. All untrusted slicing uses checked ranges;
+there is no recursion or recursively owned output tree/drop.
+
+This proves the one explicit fallible KEY-owner reserve in these wrappers, not
+that the entire allocator/dependency/engine runs once or returns exact capacity.
+sha2's selected digest is an existing permitted dependency, not a newly measured
+allocation/CPU backend. No fake OOM/capacity==requested assertion, Vec->Box swap,
+extra escaped-value owner or total native heap/stack/RSS/admission theorem.
+CRC/SHA may inspect the whole supplied ID/partition; bounded output does not cap
+input backing or CPU. Named Base64, key zero-fill, copy and bounded decimal passes
+remain real work. Caller acquisition/input/work authority is still external.
+
+Binary length/parts are source-direct: checked len+5 ONLY if starts_withFSV2,
+otherwise original len, then compare caller maximum without a65535 reference cap.
+parts first performs that check, chooses static FSV2+1 or empty prefix and returns
+[that prefix, ENTIRE original input]. No logical value is trusted as already typed
+or escaped, even if its prefix looks like type2 ETF or a prior escape. Empty/max0
+is valid. The returned borrow is tied only to original backing and can keep a
+larger caller owner alive; no new buffer is joined here. This is a narrow wrapper
+borrowing fact, not a whole zero-copy durable publication claim. Actual read-only
+source uses no allocating call in binary len/parts; runtime pointer evidence is
+separately attributed to the exact executed snapshot below.
+
+Marker optimization was independently assessed and endorsed before Root changed
+it. Accepted INNER tags have lengths1 (f),4..6 (fa:digits), or45 (f:+43digest).
+Thus any valid FIRST four-byte }:v: marker begins at most position45 in rest;
+rest[..min(rest.len(),49)] contains that entire last marker. Searching its four-
+byte windows preserves first-marker semantics. If the first marker starts later,
+the preceding inner tag is already invalid, so earlier None is equivalent.
+The suffix still comes from FULL input, not that prefix view. At most46 windows
+are examined even on malformed huge-tag data; valid hashed prefixes, long IDs
+and nested marker bytes inside IDs remain accepted exactly as before. This is
+source-proven bounded malformed-tag search work, NOT measured throughput/latency
+or a new input/ID cap. Root applied only this expression AFTER its first target
+terminal, then formatted and stopped; no helper/constant/model/test was needed.
+
+I re-read the frozen actual target bytes by identity and independently rechecked
+every source-oracle byte literal: main18/868/f3e07147, references304/9909/d22a95a2,
+encoding111/3972/752e8203 match the fully read R0 snapshot. All15 reference,
+20 predicate and9 binary input/output literals are present; EIGHT selected test
+names and all65535/65536/auto25vs24/invalid-at-max0 oracles are unchanged. The
+nonempty dynamic parser owners and binary owned128-byte array retain their exact
+content/range/fat-pointer checks after temporary descriptor scopes. concat and
+fixture repeated-byte owners are test allocations, not production behavior or
+allocator evidence. None can vacuously pass the positive Some/Ok preconditions.
+
+I actually whole/hash-read PRE-MARKER target8978174+1090/
+8a97cf534b0ffbcf2f1d9852298e8d8954fbbe39d2ce03dc5b3653b79254026f:
+all8PASS and zero failed/ignored/measured/filtered. This evidence belongs to the
+242/54f3 version, not the final marker expression. Root's stated R0 comparison
+preserves its prior negative PASS and repairs only7; I have not independently
+claimed a R0 Counter from an unsupplied raw span in this task. Final6046 at
+1595/e32b7496005121656939aade0c1aebe818f87e427edfb3a6c0509dc5a143c572
+was still live; no final eight/full-workspace result is inferred here.
+
+Direct ARCH source findings agree on the fixed scratch/reserve/tag-cap and exact
+49-byte marker proof; its actual final written BODY receipt will be ordinary-read
+when available, not fabricated from the relay or used as a readiness gate.
+DOMAIN1638 was actually read and retains its own no-execution qualification.
+No remaining scoped source/resource/semantic defect found. Actual final tests/
+quality and full conservation remain separate follow-up evidence. Original
+HistoryValues-three mappings, real catalog/current+all-history publication,
+ordered routed reads, retention/snapshot/recovery/typed profile, Linux/native8/
+initialR/E-T/settlement and measured performance remain required/unclaimed.
+Only this own note was appended; finite source review stopped without an ACK gate.
+
+### REF BODY final canonical Base64 lint refinement
+
+I WHOLE-read final base6476LF/2436B/
+caa419b3d457ccc8d7eedf1ab1e5e7b065429cf2f4c8889bbbeff17db09fe46b after Root STOP.
+Its ONLY source change is canonical-tail predicates value.trailing_zeros()>=4
+and>=2. For a nonzero u8 these are exactly low4/low2-zero; zero has eight trailing
+zeros, so remains valid. The two expressions preserve the accepted URL sextet
+set and every canonical/invalid Base64 observation. There is no new allocation,
+helper/constant/model, shift/panic, weakened assertion or claimed faster code.
+My in-memory reversal of ONLY those two expressions reproduces ENTIRE76LF/
+2411B/370e3db486b97f0edb87a3880ed04f7fd4df681aa619b229a0825f8b055662ef.
+
+I actually whole/hash-read the1265-byte technical diagnostic at raw8980047/
+30731894eacb33fad9f646667a0951c850c767721e7c6d97532758a36e14dfcb: exactly two
+verbose_bit_mask errors with those replacements, no suppression. It is Clippy
+technical feedback, not behavioral RED or a changed source oracle. Root reports
+that run6046 stopped101 at step3 before its behavioral target; my prior note
+only marked it live/pending and does not promote it to a pass. Current final
+78238 under1595/84442280c6e77b8347518221348127ed6e4904d18eff4800ea262631158e656a
+remains result-pending here. Final reference245/4d6911a0, other three source files,
+modeltail/frozen tests remain bound as above. No further scoped source defect;
+no workload/source/Git/probe or extra ACK gate.
+
+### REF-BINARY1 actual final focused GREEN and written reciprocity
+
+I now WHOLE/hash-read the complete actual saved R0 target8973812+4138/SHA256
+46d8d0a06f46a8fe954b748aee01dd2f770458efbe5ab27cbfe77f373dbe3ce7,
+not merely Root/ARCH's attributed Counter. It has1PASS/7assertionFAIL, zero
+ignored/measured/filtered; only the noncanonical-reference negative case passes.
+The positive stubs fail actual None/InvalidInput assertions and mask their later
+golden/borrow/cap tails. This is genuine callable runtime RED, distinct from all
+previous technical import/lint/classification feedback and saved before BODY.
+
+I also WHOLE/hash-read FINAL focused packet8981337+9479/SHA256
+e07e620e465420b6b3e565dff59bc8d0e8d7f240d8b75d960935de0c65a12d15,
+and its entire final target8982511+1089/SHA256
+bf07720fdad1a63c9eb718c8568d805a72e852c2169d0ebd139a9f1303165538.
+This is the evidence for final reference245/4d6911a0 and B6476/caa419b3, not a
+substitution of the earlier pre-marker1090 target or failed Clippy sequence.
+
+My independent static-source/R0/final exact eight-name/status Counters agree.
+ONLY the seven saved FAILED names become ok; the same original negative case
+stays ok. Final is8PASS, zero failed/ignored/measured/filtered. Both nonempty
+borrow witnesses, all15/20/9 source-golden literals, canonical tail bits, hashed
+full-prefix boundary, uncapped65536 syntax, eligible65535/caller caps,25vs24 auto
+cap, invalid-at-max0 priority and binary prefix-once/zero-cap/large-input tails
+now ACTUALLY finish. These are finite correctness/ownership observations, not
+an allocator counter, fake/exercised OOM, speed or whole input-R/backing theorem.
+
+I parsed ALL eight command headers/terminal records: ALL EXIT0/UNCHANGEDTrue
+under the SAME1595/84442280c6e77b8347518221348127ed6e4904d18eff4800ea262631158e656a input.
+Actual order is fmt, ports all-target check, strict ports Clippy, target8,
+arch53, reference480, progress120/132/550 and diff. The new blob purity guard is
+among the real executed architecture cases; no current-source suppression or
+dependency expansion was needed. The progress output still explicitly reports
+incomplete runtime reconciliation/full parity. It does not certify original
+HistoryValues-three or genuine publication/catalog/hydration execution.
+
+Ordinary written peer findings are also actually closed: I WHOLE/hash-read
+ARCH217934+11322/09b6495f6bacb8ae02cbe79e027156b2d952ecbdecba0d9e5346c341065fdbeb
+and229256+2122/b8cd468de1e19e4b99ed72126e4aae6e76009034d14cf48997e7ad0ecaade18f,
+end231378. Complete source/tail/frozen-oracle/19fn4constant/marker/B64 inverse/
+source-profile conclusions agree with my actual reads. Their earlier pending
+final78238 status is honestly a predecessor note; it is resolved by my actual
+9479/1089 packet above, not silently rewritten. No substantive dispute or extra
+appendix/ACK cycle is required. DOMAIN1638 handoff remains actually read.
+
+ACCEPT final scoped REF-BINARY1 source/resource/API behavior and all focused
+checks; no remaining scoped defect found. Full workspace18656 was still live
+when this receipt was written, so all-target conservation/docs/smokes/audit are
+NOT yet promoted. Linux/full-project profiles, measured performance/native
+allocation, native8/initialR/E-T/settlement and complete real publication/read/
+retention/recovery/typed/hydration endpoints remain separate. No source/workload/
+Git/probe was run or changed; only this own note appended. Finite review STOP.
+
+## PERF-REF-BINARY1 actual full-workspace conservation and guard-style closure
+
+Finite read-only final-result review. I read/hash-checked complete actual packet
+8994421+127281/SHA256
+e1759e07ef777673e0733b11bb79ab10e7c175890776dd58db95d1bcf43e75c8,
+parsed EVERY all-target/doc header/result and reviewed the full non-runtime
+command output. All ELEVEN numbered headers and ELEVEN terminal footers are
+EXIT0/UNCHANGEDTrue under the SAME1595/
+3f58f24bf11ddf9e80b085e7f9d1058d7d0b1cfc1e28bc0a3295cb62f1400100 input.
+No workload/source/compiler/VM/test/Git/probe or new artifact was run/changed by
+this reviewer. Only this active note is appended.
+
+Independent exact TARGET/EXECUTABLE/NAME/STATUS Counter comparison:
+old8816257+112238/51d2c9cd8ce8d67d5cc818bb545c8954ecf739482b804e60f0f4da68242523b2
+has1071ok records,97summaries,99Running headers;
+new8996522+113172/358e36cacc7e766535f2546127880275b16e2f27b63b38e2bc7aaa01285a6efa
+has1080ok records,98summaries,100Running headers.
+Counter subtraction removes NOTHING. It adds EXACTLY the EIGHT frozen
+workflow_value_bytes tests plus tests::blob_policy::workflow_value_bytes_stay_pure_and_server_side
+under the existing architecture executable. Header subtraction adds ONLY
+ tests/workflow_value_bytes/main.rs
+ with target/debug/deps/workflow_value_bytes-4c68cbf35ef7651a.
+No old target/executable/name/status tuple is lost or changed. The full-target
+executable is recorded as actually run; it need not equal the focused profile's
+08f13e77 executable. Summed actual totals are1080passed and zero failed/ignored/
+measured/filtered. Long existing durable/fault cases finish normally with their
+exact old names/statuses conserved, not just a favorable aggregate pass number.
+
+The complete prior/current doc spans are respectively
+8928690+2706/d3a41db1f96e1ad79e0a8a250c34fc6891b12d703b3aac3b3d7bb1e798bc00a3
+and9109899+2706/2fa10c8db6a73bf9e297f37382428f92aeacd190aafd182a8e89678d17039928.
+My full15-target Counter and all six exact named compile-fail example/status
+tuples are IDENTICAL. Six passed, no failed/ignored/measured/filtered examples.
+The separate workspace doc-generation command also exits0. Command headers
+explicitly show strict Clippy -Dwarnings; Root owns the runner's doc warning
+policy/environment, not an env measurement invented from stdout here.
+
+BOTH complete actual benchmark smoke sections are BYTE-IDENTICAL to old:
+indexed_singleton153B/3869ef2cfb5bb23cdf68f3597790d2c8cef8356035270d44a8dea7d4a1595c7b
+validates five profiles twice;
+terminal_clone142B/019f8de711e5e84bf02e2b88b35dcb6f4d69821e180e887aaacb2ef6cf79867a
+validates ten profiles twice.
+Their exact existing executable headers remain too. These are correctness smoke
+runs, not decoder/reference latency/throughput/allocation benchmarks. Different
+compilation/test aggregate durations do not establish a causal speedup.
+
+Full actual checks are fmt; workspace all-target check; workspace strict Clippy;
+workspace all-target tests; workspace doc tests; workspace docs; arch53;
+reference480; progress120/132/550; offline advisory/bans/licenses/sources audits;
+diff. No unexpected error/warning/panic/failure diagnostic appears in this final
+packet. Cached offline audits are not a freshly fetched vulnerability database.
+The progress text still explicitly states incomplete runtime reconciliation/full
+parity and retains5903/4222/1681/1655 counts. No reference syntax/encoding helper
+is credited as the original-three HistoryValues full storage/hydration route.
+
+I WHOLE-read current architecture guard44LF/1414B/
+6f40722409fd2fe463dcb5d5227847b07a3d95697822a5db683da92531dad9f0.
+Its positive four module-prefix fixtures and fs/time/thread negatives are literal;
+client reexport and worker direct-access refusals now use assert_ne(actual,
+Vec::<String>::new()). Both source_check calls, ? error propagation and required
+nonempty result remain; no case/helper/type/condition/suppression is added or
+removed. Reversing ONLY those TWO macros independently reproduces ENTIRE38LF/
+1344B/12bba58af3bceb781b6329a7a2fcbe3dd7022958f81d2ad7d50b07039727d9f1,
+without Git or a source beforeimage file. This confirms equivalent assertions,
+not a relaxed classifier. I also read the entire prior full-attempt window
+8990816+3605/e131a7e1e1f5888f9877fe194e6ba183ad1e121fcea8e8cb6d5e21629cf98c50:
+fmt/check0, then exactly the two assert_is_empty Clippy diagnoses and EXIT101.
+That technical1916 diagnostic is not behavioral RED or a new SUT defect; the
+successful new full packet is the current quality evidence.
+
+Fresh actual hashes of ALL FIVE accepted production homes and ALL THREE frozen
+target files still match: blob3e742999, reference4d6911a0, encoding57df5621,
+base64caa419b3, tagad068b27; mainf3e07147/referencesd22a95a2/encoding752e8203.
+Thus no production/oracle delta accompanies the Root guard style correction.
+The all1595-file inventory definition/freeze remains Root-runner custody evidence;
+I independently parsed each eleven-command identical header/unchanged footer and
+rehashed the eight scoped files/guard, rather than falsely claiming to have
+recomputed an unspecified whole-tree inventory recipe. No other Main mutation
+was performed by this reviewer.
+
+Ordinary written reciprocity is also actually closed: I whole/hash-read
+ARCH231378+5405/2002036ee42308df1237f2114434bbf40b8628a5b96d510d9a630a8aa3839344,
+end236783. Its actual focused source/result/name-conservation and preceding
+source/inverse conclusions agree. Its separately recorded future checked u32
+index choice is now seen as an explicit ARCH decision, not a pending PERF-only
+suggestion or source creation release; no new layout/size/gain proof is inferred.
+No appendix/ACK loop is required for this current full-result closure.
+
+ACCEPT actual full macOS workspace/component conservation and the unchanged
+scoped REF source/API behavior; no remaining conservation/guard/source defect
+found. This is not full original project profiles, Linux, publication/catalog/
+current+every-history refs/ordered routed reads/retention/recovery/typed values/
+hydration or original-three mapping acceptance. Native8/initialR/E-T/settlement,
+measured performance and the complete goal remain open. Only this own note was
+appended; finite review STOP.

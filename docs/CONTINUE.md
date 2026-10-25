@@ -104,19 +104,31 @@ oracles or the selected tariff. Related private children stay under
 the longest function is 94. No measured speedup, allocator-failure execution or
 whole-process memory/CPU bound is claimed.
 
-The next reference and logical-binary prerequisite has a genuine callable
-baseline: **one test passes and seven fail across the eight unchanged test
-names**, with no ignored or filtered cases. All seven technical checks pass,
-including strict Clippy and all 53 architecture checks. Independent source
-review preserves the captured 15 reference outputs, 20 predicate controls and
-nine binary encodings, plus exact size/error-priority and nonempty borrowing
-assertions. The five public functions still reject every input; their bodies
-follow only after this baseline is saved. This does not establish storage,
-history hydration or new original-case coverage.
+The reference and logical-binary prerequisite now passes **all eight unchanged
+tests and all eight focused checks**, including strict Clippy and all 53
+architecture checks. Its genuine one-pass/seven-failure callable baseline was
+saved in `39f1b3d` before implementation. Exact source/runtime comparison preserves
+the negative control and changes only the seven failures to passes. The captured
+15 reference outputs, 20 predicate controls and nine binary encodings execute,
+alongside exact size/error-priority and nonempty borrowing assertions.
 
-The full passing Rust checkpoint below includes the ten decoder tests. Real
-value publication,
-reference catalog, ordered routed reads, recovery/retention and complete history
+Reference parsing borrows original spans and recognizes valid shapes above the
+separate 65,535-byte checked-construction limit. The first tag-marker search
+checks at most 46 windows without capping the full ID/key. Key builders use one
+fallibly reserved final buffer, including its real zero-fill pass, with direct
+Base64 writes and fixed tag/decimal scratch. Binary parts borrow the entire
+logical input with one static escape prefix when required, without joining a
+new buffer. Independent architecture and performance reviews accept the complete
+source, actual results and each other's findings. Five production files contain
+19 functions and four constants; the largest has 245 physical lines and the
+longest function has 57. No measured speedup, allocator-failure execution,
+input/backing admission or whole-process memory/CPU bound is claimed.
+
+The full passing Rust checkpoint below includes these helpers and the ten decoder
+tests. Next, accepted-operation provenance must join each real producer plan
+before decoded inputs drop, preserving field presence and every intermediate
+history. Real value publication, reference catalog, ordered routed reads,
+recovery/retention and complete history
 hydration still follow. Existing opaque command bytes retain their logical binary
 meaning; a later typed input path requires its own versioned contract. The three
 original HistoryValues mapping arrays remain empty until the real route exists.
@@ -163,16 +175,18 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full passing Rust checkpoint passes **1,071 tests across 97 targets
+The latest full passing Rust checkpoint passes **1,080 tests across 98 targets
 on macOS**, with zero failed, ignored, measured or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven checks pass:
 formatting, workspace compilation, strict Clippy, warnings-denied documentation,
-all 52 architecture checks, reference/progress validation, four cached offline
-dependency-audit categories and whitespace. All 1,587 captured inputs stayed
+all 53 architecture checks, reference/progress validation, four cached offline
+dependency-audit categories and whitespace. All 1,595 captured inputs stayed
 unchanged, excluding only the three active HistoryValues review notes. Exact
-target/executable/name/status comparison preserves all 1,061 preceding tests and
-adds only the ten decoder cases; the only new target header is their integration
-target. Both existing benchmark correctness-smoke sections are byte-identical,
+target/executable/name/status comparison preserves all 1,071 preceding tests and
+adds only the eight value-byte cases and their architecture regression; the only
+new target header is the grouped value-byte integration target. Independent
+performance review reproduces this complete comparison. Both existing benchmark
+correctness-smoke sections are byte-identical,
 validating their five and ten profiles twice. All six documentation examples and
 15 target identities are preserved. This run includes the unchanged 120/132/550
 progress ledger. No measured speedup or full workflow parity is claimed.

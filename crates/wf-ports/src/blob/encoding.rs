@@ -1,27 +1,46 @@
-//! Logical-binary rejection baselines, independent of typed ETF decoding.
+//! Borrowed logical-binary framing, independent of typed ETF decoding.
 
 use crate::blob::OriginalValueBuildError;
 
-/// Callable rejection baseline for a logical binary's exact stored length.
+/// Measure exact stored bytes, escaping a leading source FSV2 marker once.
 ///
 /// # Errors
 ///
-/// Always returns [`OriginalValueBuildError::InvalidInput`] in this R0 stage.
+/// Returns an operational limit on overflow or a caller cap breach.
 pub fn original_binary_stored_len(
-    _input: &[u8],
-    _maximum: usize,
+    input: &[u8],
+    maximum: usize,
 ) -> Result<usize, OriginalValueBuildError> {
-    Err(OriginalValueBuildError::InvalidInput)
+    let length = if input.starts_with(b"FSV2") {
+        input
+            .len()
+            .checked_add(5)
+            .ok_or(OriginalValueBuildError::Limit)?
+    } else {
+        input.len()
+    };
+    if length > maximum {
+        return Err(OriginalValueBuildError::Limit);
+    }
+    Ok(length)
 }
 
-/// Callable rejection baseline for borrowed prefix and unchanged binary parts.
+/// Borrow a static escape prefix and the entire unchanged logical input.
+///
+/// The slices retain their input backing; this is not an input-owner memory cap.
 ///
 /// # Errors
 ///
-/// Always returns [`OriginalValueBuildError::InvalidInput`] in this R0 stage.
+/// Returns an operational limit on overflow or a caller cap breach.
 pub fn original_binary_stored_parts(
-    _input: &[u8],
-    _maximum: usize,
+    input: &[u8],
+    maximum: usize,
 ) -> Result<[&[u8]; 2], OriginalValueBuildError> {
-    Err(OriginalValueBuildError::InvalidInput)
+    original_binary_stored_len(input, maximum)?;
+    let prefix = if input.starts_with(b"FSV2") {
+        b"FSV2\x01".as_slice()
+    } else {
+        b"".as_slice()
+    };
+    Ok([prefix, input])
 }

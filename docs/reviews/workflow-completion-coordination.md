@@ -52757,3 +52757,182 @@ Root-read or released; preserve that uncommitted tail rather than stage it as
 reviewed evidence. BODY remains unreleased until this genuine RED SAVE exists.
 All3 original HistoryValues arrays remain[]; real publication/catalog/hydration,
 typed input, original profiles, Linux/native8 and the full M1-M8 goal remain open.
+
+
+REF-BINARY1 genuine RED SAVED39f1b3d and sole BODY release
+Root commit39f1b3d saves exactly15 reviewed paths, including all six callable
+R0 sources/tests, Root M0 guard/prefix/ADR, CONTINUE, coordination and fully read
+role prefixes ARCH171780,PERF104831,DOMAIN7943. The unreviewed later22049-byte
+ARCH proposal tail is preserved verbatim UNCOMMITTED in its existing file.
+Exact HEAD test-byte checks bind all eight names/oracles to actual48965 RED
+(1PASS7FAIL/0other), after final technical7 GREEN under one1593/7ccae711 source
+freeze. No BODY code or BODY-only child existed at SAVE.
+
+Root now releases only d2_implementation_sol61 for the already selected
+ARCH-HVAL-REF-BINARY1 BODY roster: existing blob.rs/reference.rs/encoding.rs and
+NEW blob/reference/base64.rs plus blob/reference/tag.rs, all under wf-ports/src.
+The parent may update ONLY its initial module documentation; the full model/
+module/reexport tail stays byte-exact. The other two homes implement the five
+existing APIs plus14 named private helpers across the two named children,19
+functions total, four exact constants, no new types/helpers/methods/dependencies.
+render_tag has the approved FOUR-argument remaining-tag-cap signature, not the
+older three-argument proposal. All R0 public signatures/models and all three
+test files/main are frozen as saved39f1b3d; no parser/input/output caps or
+semantic-before-Limit priority may be weakened.
+
+Root captures the exact remaining regular Main hold after this append, excluding
+only those five production paths and the three active role notes. Root holds all
+source/doc/Git mutations and compiler/VM/benchmark workloads through the sole
+writer turn, then owns ordinary format/actual same-eight checks/full quality.
+Writer runs no workloads and stops normally after full source/resource/inverse
+readback; ARCH/PERF independently review the actual stopped implementation and
+each other's findings afterward. The next producer-provenance proposal remains
+separate preparation, not BODY permission or a full-goal replacement. Original3
+HistoryValues arrays remain[]; real catalog/publication/routed reads/hydration,
+retention/snapshot/typed input, original profiles/Linux/native8 remain required.
+
+
+REF-BINARY1 BODY source STOP and Root actual validation custody
+Sole writer stops normally with exactly19 functions/four constants/no new type.
+Root independently confirms1590 held inputs unchanged atba9c5bfa966e42d108c02d935dabb70c09f4f56daf71b64718ef217e095dab72
+and the complete2514B public model/module/reexport tail a17016b1 exact. Root
+whole-reads all five source homes plus DOMAIN7943+1638/f60f34030cdd50fee6c7ec7593c6f216d721b2341470921dbac66bc8f6e41dd0.
+Existing API types/lifetimes and all eight saved39f1b3d test names/oracles stay
+exact; only ordinary underscore input bindings and implementation docs change.
+
+Root formatter57621 terminal0. Stopped source: parent74/2739/3e742999;
+reference242/7827/54f3cfb8; encoding46/1279/57df5621; base6476/2411/370e3db4;
+tag95/2864/ad068b27. Root begins same-eight runtime under whole-input freeze,
+then technical/full checks. Independent ARCH/PERF complete-source/resource review
+is released against this exact corpus, with ordinary reciprocal written reads.
+No compiler/test result is inferred from author readback or source review.
+
+Root also whole-read NEXT ARCH171780+22049/cdf32418 while the writer was live,
+and PERF is consulting that future proposal. The later durable-matrix and F/R
+notes are not yet Root-read or source-released. A possible bounded first-marker
+search optimization is sent to both actual source reviewers; source is unchanged
+and no benchmark/speed/input-cap claim follows. All3 original mapping arrays[]
+and the real catalog/publication/hydration/runtime/platform/full-goal gates remain.
+
+
+REF-BINARY1 first actual same-eight GREEN and reviewed bounded marker search
+Session20195 terminal0 with all1595 inputs unchanged atf8a6bc83035ae20f719c7fb32d91514b7e237879ed0c7be6e6c8207c0e3d9ffd.
+Root whole/hash-read target8978174+1090/8a97cf534b0ffbcf2f1d9852298e8d8954fbbe39d2ce03dc5b3653b79254026f:
+8PASS, one summary, zero failed/ignored/measured/filtered. Exact name/status
+Counter comparison with saved39f1b3d/48965 preserves the one negative PASS and
+repairs ONLY the seven prior failures. Golden, cap, priority and nonempty pointer/
+lifetime assertions now execute. Full quality is still pending; no original3
+hydration/parity credit or measured speedup follows from these eight helpers.
+
+Both independent actual-source reviewers accept a precise optimization AFTER
+that run terminal: a valid inner tag has length1,4..6 or45, so the first4-byte
+marker's latest valid start is45. Search only rest[..min(len,49)].windows(4),
+at most46 candidate windows. Keep the FULL original rest/input for tag/suffix/
+ID extraction. Any first marker later than45 already fails canonical tag shape;
+no valid reference,65536-byte ID, source first-marker choice or input/key cap is
+changed. Root changes ONLY that existing expression, no helper/type/constant/API/
+test. The maximum SHA-prefix positive and large-ID tests remain independent
+boundary controls. This is a source-proven bounded malformed-header search,
+not a benchmark or a whole parser/input CPU/memory/admission theorem.
+Root ordinary formatting and fresh same-eight/full-quality runs follow before
+SAVE; peer actual stopped-source and reciprocal reviews bind the final version.
+
+Root also whole/hash-read NEXT ARCH193829+21871/6d4fd518 and215700+2234/daa5f9f0,
+plus PERF104831+13084/673c3a67. Durable closed-registry/snapshot/claim/captured-
+retention successor and the explicit F-every-plan/R-row-byte refinement are
+understood as future contracts, not enabled source. Checked u32 effect indices
+remain a recommendation pending explicit ARCH refinement before any creation.
+No next R0 or catalog/layout activation is released by this current increment.
+
+
+REF-BINARY1 focused technical diagnostics after marker refinement
+Session6046 terminal101, all1595 inputs unchanged ate32b7496005121656939aade0c1aebe818f87e427edfb3a6c0509dc5a143c572.
+Fmt/check pass; Clippy exposes ONLY two verbose_bit_mask expressions in canonical
+B64 tail validation. Whole8980047+1265/30731894eacb33fad9f646667a0951c850c767721e7c6d97532758a36e14dfcb
+was read. Target/arch/reference/progress/diff not reached in this run; no new
+behavioral failure or final quality pass is inferred. After terminal Root uses
+value.trailing_zeros()>=4/2 instead of low4/2-bit-mask equality. This is exact
+for all u8 digits INCLUDING0 (whose trailing-zero count is8); canonical unused
+bits, alphabets and all source oracles remain unchanged. No waiver/new helper/
+type/API. Existing marker expression alone has the complete-file inverse back
+to prior54f3cfb8; the final two-expression B64 inverse is recorded separately.
+Root formatting and fresh same-eight focused validation follow; peers receive
+the canonical stopped-source hashes, with no extra approval/ACK gate.
+
+
+REF-BINARY1 final focused8 GREEN; first workspace lint and Root guard correction
+Final78238 terminal0, all1595 inputs unchanged84442280c6e77b8347518221348127ed6e4904d18eff4800ea262631158e656a.
+Root whole/hash-read COMPLETE8981337+9479/e07e620e465420b6b3e565dff59bc8d0e8d7f240d8b75d960935de0c65a12d15.
+All8commands0; final target8982511+1089/bf07720fdad1a63c9eb718c8568d805a72e852c2169d0ebd139a9f1303165538
+has8PASS/0other, strictClippy0, arch53/ref480/progress120-132-550/diff/fmt/check0.
+Exact frozen source/R0/final Counter preserves1negativePASS and repairs ONLY7.
+Final reference245/7881/4d6911a0 and B6476/2436/caa419b3 bind the bounded marker
+and exact canonical-bit idiom; complete byte inverses reproduce54f3 and370e.
+
+Without a Main/source mutation Root launched full11 session18656 under that
+SAME1595/8444 freeze. It TERMINATED101 at step3: whole-workspace check0, Clippy
+finds ONLY two assert_is_empty style diagnostics in Root's new blob_policy.rs
+server-boundary negative controls. Whole8992480+1916/d2169e0135ee1780163be6350f40d873770a51821f93d80fd674996ea9a95da3
+was read; alltargets/docs/remaining commands did NOT run. Focused Clippy scoped
+to wf-ports did not lint this separate tooling crate. No full pass is claimed.
+
+After terminal Root preserves the SAME two nonempty-findings assertions as
+assert_ne(actual,Vec::<String>::new()). Exact fixture source, client/worker
+boundaries and all prior assertions stay unchanged; no new test/helper/type/
+capability rule, allocation probe or lint waiver. Ordinary formatting and the
+SAME full11 run follow under a new complete-input freeze. Production five homes,
+public model tail and frozen eight tests are unchanged from focused8 GREEN.
+Independent source reviews found no scoped defect; their final result packets
+are ordinary evidence to read, not an added readiness/ACK gate. Full goal ACTIVE.
+
+
+REF-BINARY1 full workspace GREEN and independent conservation closure
+Full11 session64206 terminal0, ALL1595 captured inputs unchanged at
+3f58f24bf11ddf9e80b085e7f9d1058d7d0b1cfc1e28bc0a3295cb62f1400100.
+Root hashes/parses COMPLETE8994421+127281/
+e1759e07ef777673e0733b11bb79ab10e7c175890776dd58db95d1bcf43e75c8.
+Alltargets8996522+113172/358e36cacc7e766535f2546127880275b16e2f27b63b38e2bc7aaa01285a6efa
+contains1080PASS/98summaries/100Runningheaders and zero failed,ignored,measured,
+filtered. Exact old8816257+112238/51d2c9cd TARGET/EXE/NAME/STATUS Counter loses
+NOTHING from1071; adds ONLY eight frozen workflow_value_bytes cases plus the
+existing architecture target's new blob guard. Header99->100 adds only that
+new integration target/executable, not another hidden/filtered replacement.
+
+Docs9109899+2706/2fa10c8db6a73bf9e297f37382428f92aeacd190aafd182a8e89678d17039928
+has EXACT same6 compile-fail example/status and15target Counters as preceding
+8928690+2706/d3a41db1. Both FULL benchmark sections are byte-identical:
+indexed_singleton153B/3869ef2cfb5bb23cdf68f3597790d2c8cef8356035270d44a8dea7d4a1595c7b,
+terminal_clone142B/019f8de711e5e84bf02e2b88b35dcb6f4d69821e180e887aaacb2ef6cf79867a;
+five/ten correctness profiles twice, not an elapsed/allocation/speed benchmark.
+All11 numbered headers/footers EXIT0/UNCHANGEDTrue: fmt,workspacecheck,strict
+workspaceClippy,alltargets,doctests,warnings-denieddoc,arch53,reference480,
+progress120-132-550,cachedofflineDeny4,diff. Existing >60s real fault cases finish
+normally; none restarted/timed out/weakened. This is actual macOS evidence only.
+
+Root whole/hash-read actual ARCH217934+11322/09b6495f,229256+2122/b8cd468d,
+231378+5405/2002036e and PERF117915+9987/314b89c0,127902+1477/17df9dca,
+129379+3452/5d7f66c4. Both actually read each other's written findings and
+reproduce final marker/B64/model-tail/19fn4constant/cap/source-runtime8 proofs.
+No scoped source/API/resource/geometry or unresolved reciprocal defect remains.
+Root also whole/hash-reads PERF132831+6234/90288081137c2ce98971a9e07615ef9f9ec78aa75c3f075346df7c30a87710b2.
+It independently parses complete fullpacket, exact1071->1080 tuple preservation,
+docs6/15 and byte-identical smoke blocks, actual44/6f407 guard plus ENTIRE
+two-macro inverse to38/12bba58a, and all accepted production/frozen test hashes.
+Input-freeze recipe remains honestly Root-runner attributed; no fake independent
+before-state capture is claimed. Its scoped full-macOS acceptance agrees.
+
+After full command terminal and peer finite STOP, Root updates CONTINUE with
+these actual results and prepares SAVE of the implementation/Root guard style,
+coordination and inspected role prefixes. All original three HistoryValues arrays
+remain[] in unchanged ledger677d/120-132-550; real publication/current+every-
+history refs/ordered routing/retention/typed/hydration, original profiles/Linux,
+native8/publicinitialR and full M1-M8 remain OPEN. No helper pass substitutes them.
+
+Root also whole/hash-read the exact NEXT precreation fixture decision
+ARCH236783+14171/4e53b19a355d28ac3beda20bfdd49aae14e89a10814395eae98b0226987b3fe0
+and250954+857/664a9629df4c1da44a6b02ca8491bd8fa3ff9e0b11eb30f26a127f0e0175fa00.
+It selects one local fixtures.rs/main seam,16 exact test helpers/one alias/one
+WORKSPACE constant/no fixture model and only existing real four-profile calls;
+no shared-path/dependency/policy change. Future R0 becomes SIX paths, retaining
+the exact eight names and borrowed inspector, checkedu32 and explicit F/R terms.
+No future file/model/helper is created or released before this current SAVE.

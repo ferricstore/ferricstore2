@@ -32,7 +32,13 @@ fn workflow_value_bytes_stay_pure_and_server_side() -> CheckResult<()> {
             );
         }
     }
-    assert!(!source_check("wf-ports", "client", "pub use crate::blob;")?.is_empty());
-    assert!(!source_check("wf-worker", "worker", "use wf_ports::blob;")?.is_empty());
+    assert_ne!(
+        source_check("wf-ports", "client", "pub use crate::blob;")?,
+        Vec::<String>::new()
+    );
+    assert_ne!(
+        source_check("wf-worker", "worker", "use wf_ports::blob;")?,
+        Vec::<String>::new()
+    );
     Ok(())
 }

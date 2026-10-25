@@ -127,3 +127,30 @@ at STOP all1587 held inputs matched
 d0744cbe35ce38cc7788aa555ed48b3f582f96ac6f52c869bd6a5589921415f8.
 No formatter/compiler/VM/test/Git ran. Actual RED/SAVE and BODY are Root later
 steps; no storage/hydration, native8, original3 mapping, Linux or gain credit.
+
+## REF-BINARY1 BODY author STOP
+
+All five approved source buffers stopped after complete readback. Exactly19
+functions/four constants, no new type/API/helper beyond the selected roster.
+Parser is uncapped and borrowed: first marker, last regular colon, exact named
+components, canonical B64/version. Eligible builders reject semantic input
+FIRST even at max0, then enforce min(caller,65535). Binary len/parts retain the
+ENTIRE logical input and one static escape prefix; empty/max0 remains valid.
+
+Known tag caps precede SHA/copy; Automatic admits8 before CRC then exact8/9/10.
+Named B64 writes directly into the single final fallibly reserved Vec, whose
+zero-fill is a real additional pass. Fixed49/20 scratch is not a whole-memory,
+CPU, backing-release, admission or measured-gain claim. Actual reserve errors
+propagate; no fake OOM test or source workload ran.
+
+Author LF/hash: blob74/3e742999; reference223/9433eee4; encoding43/cd1a16e7;
+base6468/57e83784; tag89/9201118b. Max function51LF before Root formatting;
+all five public header types/lifetimes and the2514-byte model/reexport tail
+remain exact (a17016b17f7b7260714eeaec2fa85c9038b5234b180dc0660228173f8d2feb7a).
+Three complete R0 beforeimages and both new-child absences are held in memory;
+parent docs inverse recovers its entire beforeimage. At STOP all1590 held files
+match ba9c5bfa966e42d108c02d935dabb70c09f4f56daf71b64718ef217e095dab72.
+
+No formatter/compiler/VM/test/Git ran. Actual same-eight/strict/full results
+belong to Root. Real publication/catalog/read/hydration, original3 mappings,
+retention/profiles/Linux/native8 and the complete product goal remain open.
