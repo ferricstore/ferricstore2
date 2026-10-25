@@ -417,3 +417,117 @@ snapshot/read/retention integration. Root relays them to ARCH/author before the
 next concrete R0 selection.
 
 Inspected-scope file bindings: {"flow_claim_native_plan.ex": {"bytes": 34746, "sha256": "6abe1477401341a1af4970840d9248dc0b34213cf11ee610f0ab389191627ec0"}, "flow_create.ex": {"bytes": 57564, "sha256": "b684c85247545ea2e240daf8c050a23cf433599bd2fdd13d61190eb5f93b19a7"}, "flow_transition.ex": {"bytes": 58503, "sha256": "cbe11833bbe97d0c015e62866773a4a2997218dcf84a487de4a5e233177e4a5a"}}
+
+
+## VALUE-CONSUMED1 attributed candidate relay; NOT creation approval
+
+After saved5255116/full11, author relayed the exact connected candidate to Root.
+Proposed models (fields/signatures still UNSETTLED): PreparedValueBatch,
+ValueItemInputs,ValueDefaultsSnapshot,ValueKnowledge,ValueLifecycleState,
+ValuePublicationPlan,ValueCatalogRow,ordered ValueReadResult; reuse existing refs/
+capture/codec models. Proposed calls/helpers: encode_value_batch,
+prepare_value_batch,apply_value_record_batch_transaction,capture_value_births,
+build_value_publication,publish_value_changes,open_value_read_session,
+read_value_batch,validate_value_cohort plus GENUINE cleanup/rewind routes.
+No constructor/ordinary metadata becomes authority, and no self-reference is
+permitted between an owned moved plan and borrowed postimage parts.
+
+Candidate homes, NOT a blanket approved write set: ports consensus/value.rs,
+log/value_batch.rs,blob/catalog.rs,state/value.rs and existing parent seams;
+storage transaction/value_batch.rs and value_batch/capture.rs,state/key/value.rs,
+state/value/blob.rs,binding.rs,state/redb/values/publish.rs,read.rs,
+state/redb/recovery/values.rs plus existing actual load/observations/consumed
+commit/independent/snapshot/manifest seams. Grouped storage target
+workflow_values/{main,fixtures,publication,reads,retention,recovery}.rs.
+Every exact model/field/signature/helper/path/registry number still needs ARCH's
+written selection before Root release;400/600/100 remain natural limits.
+
+TEN exact candidate tests:
+value_commit_keeps_every_intermediate_binding;
+value_omission_equal_empty_and_holes_preserve_source_actions;
+value_birth_and_terminal_override_presence_survive_replay;
+value_reads_preserve_order_duplicates_and_truthful_failures;
+value_reopen_preserves_capture_after_policy_change;
+value_snapshot_preserves_catalog_and_rejects_missing_local_rows;
+value_capability_refuses_populated_legacy_upgrade;
+value_passive_terminal_expiry_keeps_payload;
+value_explicit_cleanup_removes_owned_payload_and_result;
+value_rewind_preserves_refs_refreshes_existing_bytes_and_clears_deadline.
+Real redb/reopen/copy-receive-install, no seeded catalog or fake router. Last3
+retain pinned source IDs0e1a95de/6907b04b/76630580. They cannot pass by editing
+expiry metadata in place of missing real Operation/guarded continuation routes.
+No original HistoryValues mapping or full hydration/routing credit is inferred.
+
+Accepted-birth capture must follow ACTUAL Created intermediate postimages;
+pre-capturing every attempted Create can turn a real rejection/no-op into a new
+operational/work refusal. Retain/return the SAME parent schema charge from
+load_policies (currently local and dropped), never a fresh account per birth.
+Move only admitted Copy per-step override/default/time/encoding metadata before
+decoded owners drop; no policy/operation clone or re-decode. Backend renders
+current logical-binary parts from live accepted postimages and uses retained
+source-kind/masks/loaded refs for true keep/clear/replace behavior.
+
+Unsettled primary decisions: whole intent/frame/key/current/history/catalog/
+layout/snapshot registry; genuine cleanup/rewind operations and continuations;
+fresh-owner activation supporting actual initial policy/bootstrap commits;
+source creationversion1 versus distinct incarnation with public value key
+omitting incarnation, so no assumed global version uniqueness/overwrite denial.
+Logical-binary first-profile work may be a dependency, but named actual typed
+FSV2 HistoryValues hydration/apply from SAME publication/read and mandatory
+original cases remain part of the endpoint, not replaceable by owned raw reads.
+
+PERF verified actual pinned redb primary source: begin_read captures one committed
+snapshot; ReadOnlyTable owns Arc/guard state, allowing owned session tables
+without self-reference/unsafe. Open fixed tables once per session as a source-
+justified candidate, price metadata/probes, drop ALL guards before claiming
+snapshot released. Outputs own separate encoded buffers; no measured gain or
+physical resource theorem. Real commit errors can already be durable and must
+preserve Uncertain/fencing rather than retry as KnownAborted. No source, helper,
+API, profile number or extra artifact is released by this attributed relay.
+
+
+## VALUE-CONSUMED1 pinned policy/target guard obligations discovered by Root
+
+Root's bounded source search for recreation found mandatory workflow cases in
+raft/state_machine_test/sections/flow_command_time.exs. Actual read scopes
+330..365,366..424 and427..~480 show: SAME-generation conflicting policy body
+must reject; an existing-flow command with old type/incarnation policy_guard
+must reject; unstamped creation cannot read replica-local policy as authority.
+PERF independently read320..490 and bound the entire file SHA256
+7f9337fe74850842b76834127e2ae453c051bd4e82581c7415ea0f0377bf0039.
+This is source observation, not a newly executed reference result or mapping.
+
+A full current policy donor and trusted defaults identity alone do not establish
+those source command-policy/record-target guarantees. The new intent/apply
+registry needs its actual logged reference/revision/content and target semantics,
+or an explicit required follower/migration disposition; never silent omission
+or full policy parity credit. Current lifecycle helper correctly supplies only
+ordinary mathematical data and stays unchanged. Root sent exact scopes to ARCH/
+PERF, which agreed. The source case's manual replacement is its actual assertion
+fixture; it does not by itself execute a real recreation/GC route.
+
+Related finite decisions remain in ARCH: explicit fresh value-capable genesis
+must allow real policy/bootstrap commits BEFORE the first workflow; public alias
+to incarnation-qualified immutable bytes handles repeated public version1 refs.
+Bare historical public refs resolve CURRENT alias in the captured read snapshot,
+not silently pinned old bytes; stale cleanup must compare current owner/target
+before deletion. Exact registry/helper/resource creation is still unapproved.
+No Source test array/status/profile coverage or production artifact changed.
+
+
+## VALUE-CONSUMED-BINARY1-M0-PURITY1 actual technical RED
+
+Root adopted ARCH's exact existing-file classification batch and added ONLY
+consensus::value,log::value_batch,clock to the existing blob_policy module loop.
+All four original modules/SHA+Vec positives/fs+time+thread negatives/client+
+worker controls remain literal. No new function/file/test identity/model/helper.
+Actual selected test1429 TERMINAL101: raw9648402+948/
+a74cebd2817a6332f4a2e52664436fa1c6dc83289646ac5aed6e6cb1698b1d94,
+0PASS1FAIL/44 deliberately filtered, unchanged1605/8aae41297077c1869a09c889b4c91c1775664df13d7b1823a000487b8350f51e.
+Compilation and the old four modules plus the new first SHA/Vec positive finish;
+intended assertion30 fails because std::fs is not rejected in consensus::value.
+Later new-module/effect tails remain masked. This is missing ARCH DIAGNOSTIC
+technical RED, never missing workflow business behavior or full-source coverage.
+Root saves the callable existing test regression before adding the three exact
+recursive prefixes and ADR006 rationale; production classification is unchanged
+at this checkpoint. Existing workflow full-green checkpoint stays5255116.

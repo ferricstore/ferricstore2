@@ -9,6 +9,9 @@ fn workflow_value_bytes_stay_pure_and_server_side() -> CheckResult<()> {
         "blob::reference",
         "blob::reference::tag",
         "blob::encoding",
+        "consensus::value",
+        "log::value_batch",
+        "clock",
     ] {
         assert!(
             source_check(

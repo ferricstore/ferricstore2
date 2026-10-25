@@ -53566,3 +53566,67 @@ whole smokes, and rehashes all three source/two tests/unchanged parent. It actua
 read final ARCH3539 and agrees. Finite current review stopped; no remaining
 scoped defect or additional acknowledgement gate. Root now stages exact current
 eight-path checkpoint, protecting any future ARCH suffix as recorded above.
+
+
+### STORED-CREATION-LIFECYCLE1 saved; next connected endpoint consultation
+
+Root saved exact eight-path corrected BODY/full-reviewed checkpoint in
+5255116536588f7e4a9294ae98b5bc656a9eff16, then verified the tree CLEAN. No ARCH
+future suffix existed at staging; its complete386254B reviewed prefix is saved
+(SHA2562a853a45cd7ae4c62e5e8bedaa0cb3abdd3e570e4d342f5d25b5735049f3f708).
+Final1605/a6b reconstruction substitutes ONLY the two prior shared-doc hashes;
+all code and frozen tests still match actual full11. No additional workload was
+run for those documentation-only updates. Full goal remains ACTIVE.
+
+VALUE-CONSUMED1 is READ-ONLY precreation work, no source/model/file/profile number
+is released. Author completed and sent ARCH the connected proposal, with10 real
+backend acceptance cases and required complete registry/genuine cleanup/rewind
+route decisions still open. ARCH owns only its note; PERF may resource-review
+that actual proposal after finishing the accepted full audit; Root owns DOMAIN,
+shared documents, index/Git/workloads. Exact creation batch must be recorded and
+adopted before writing. No peer source overwrite or interruption.
+
+Current source proof: observations::decide takes &'current mut LoadedRecordBatch
+and returns RecordBatchApplyPlan<'current>, pinning aggregate access. Capture
+therefore needs real field-splitting or preparation while Fresh/full donor fields
+remain accessible. Avoid a self-referential owner containing both moved plan and
+borrowed postimage parts; attach admitted numeric/Copy/owned metadata and render
+stored parts in the same consumed backend while the accepted plan lives.
+Explicit source presence/time/config/encoding, event-specific omission/terminal
+TTL selection, old-profile/fresh-capability/recovery registry, authentic read
+clock, and all distinct passive/cleanup/rewind duties remain acceptance inputs.
+The actual Original/internal-hot/hydration/route/native/Linux/full M1-M8 gates
+are not closed by the saved lifecycle helper.
+
+
+### VALUE-CONSUMED-BINARY1-M0-PURITY1 exact technical batch adoption
+
+Root adopts ARCH's explicit existing-file technical classification consultation:
+crates/wf-architecture-tests/src/tests/blob_policy.rs extends its EXISTING one
+module loop with consensus::value,log::value_batch,clock, retaining every original
+blob module, SHA/Vec positive, fs/time/thread negative and client/worker control.
+Root first executes this extended loop against old classification and records
+its intended missing-diagnostic assertion RED. Only afterward does Root add
+EXACTLY these three recursive prefixes to existing source/purity.rs and append
+a narrow rationale to existing docs/adr/006-private-prepared-command-codec.md.
+No new file/model/function/trait/helper/dependency/test identity or waiver.
+This is M0 technical evidence, NOT workflow business RED or endpoint support.
+
+Root alone owns these three paths and shared docs/Git/workloads. Other agents
+continue read-only endpoint/fixture proposals and their own role notes; NO
+production R0 source is released by this adoption. All1605/a2c60bef consultation
+inputs matched before this record. A failing classification checkpoint precedes
+its narrow rule fix; actual GREEN and reciprocal review follow. Current completed
+workflow baseline stays5255116/full1093/all11; real VALUE-CONSUMED-BINARY1 R0
+artifacts still require the full exact public/registry+fixture decision.
+
+
+M0 actual selected regression1429 TERMINAL101 compiles and fails the intended
+missing standard-library diagnostic at existing blob_policy.rs30 for
+consensus::value/use std::fs. Raw9648402+948/
+a74cebd2817a6332f4a2e52664436fa1c6dc83289646ac5aed6e6cb1698b1d94,
+0PASS1FAIL/44 selected-out, unchanged1605/8aae4129. Old controls and safe positive
+premises precede that assertion; remaining new tails masked. This is technical
+classification evidence only. Root saves ONLY existing test+own shared record/
+DOMAIN note before the exact prefix/ADR fix; active ARCH/PERF proposal notes are
+left untouched and unstaged, with no peer interruption. No production R0 release.
