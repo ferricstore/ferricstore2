@@ -53353,3 +53353,73 @@ Policy(Schema(InvalidAuthority)); only Original cap-zero predecode refusal is
 frozen, Complete cap-zero is unasserted until BODY selection. R0 API must remain
 literal UnsupportedPolicyProfile until genuine assertion RED is saved. No
 shared capture helper or future BODY roster is implicitly approved.
+
+
+### STORED-CREATION-LIFECYCLE1 R0 release after saved full-green checkpoint
+
+Root saved NEXT-VALUE-PROVENANCE1 in b66a74c7b9388d4111764a36a8c848e52d99912e,
+exact25 staged paths, staged diff check PASS, then verified a clean tree.
+The1602/ec886 input reconstruction and all four frozen new test hashes matched;
+only the two documented shared-doc updates followed the full run.
+
+Root NOW releases the exact four-path R0 from ARCH322206+17067/6bc46ca5 plus
+339273+3730/a288e9e8 to d2_implementation_sol61. Existing complete.rs may add
+only the private child/reexports; new stored_lifecycle.rs contains only the two
+named ordinary models and one literal UnsupportedPolicyProfile entry; grouped
+tests/stored_lifecycle/main.rs and fixtures.rs contain exactly five cases, the
+one alias and two named fixtures. BOTH full donors use the selected wrong-type
+Policy(Schema(InvalidAuthority)) lane; Original-only cap-zero refusal is frozen,
+Complete-cap-zero remains unasserted. All original defaults/type/state/command,
+source validation and lifetime assertions remain. No BODY/private helper,
+constant, extra file/type/test/dependency or root configuration mutation.
+
+Author owns only those four paths; ARCH and PERF own only their respective
+history-values note. Root owns domain note/shared docs/Git/workloads and holds
+all other regular inputs. Author must send exact geometry/hash/test-name/status
+and STOP before Root formatting/compiler/test work. Peers communicate by actual
+file reads and messages; no interruption or concurrent rewrite. Each reviewer
+must review the other's actual findings and the stopped source before final
+acceptance. Root will save genuine compiled five-assertion RED before selecting
+or releasing any BODY roster. Architecture/resource/optimization consultation
+continues throughout; Linux and full-original coverage remain separate gates.
+
+
+### STORED-CREATION-LIFECYCLE1 compiled assertion RED before implementation
+
+Root whole-read the exact stopped four-file corpus, parent inverse and held1601
+match. Canonical formatting changed only main whitespace. Technical16640 stopped
+at architecture52PASS1FAIL solely for missing required test-target forbid(unsafe_code);
+compile/Clippy passed and later checks were unrun. Root's25B target-attribute-only
+correction restores the prior whole main when removed; no assertion/model/helper
+or source policy changed. Failed raw9482719+5968/8bf703e9 remains retained.
+
+Corrected technical27360 TERMINAL0: all seven checks PASS/UNCHANGED1605/
+8a6c079e6d3d30929b59d4fceb8ad9ab26aba0961b1ce37c40fcdb7984b54908,
+including architecture53, reference480, progress120/132/550 and strict Clippy.
+Runtime19521 TERMINAL101 is the intended compiled0PASS5FAIL baseline:
+raw9497313+2163/31ee2dcfd1e9e44d2449392f7eaa09f119d57c39e6b29b2b670013b3ee2421e7.
+All five exact named tests reach their first expected-positive capture assertion
+(main55/137/186/265/342), each reports Some(Policy(UnsupportedPolicyProfile)).
+Both fixtures already passed real constructor/reader checks. Later tails remain
+masked until BODY. There is no technical/setup RED or passing parity credit.
+
+Root source/runtime evidence and final four hashes are in DOMAIN append after24290.
+New source49LF, main373LF, fixtures92LF; eight functions max90. Root will save
+this exact callable baseline plus reviewed notes/shared handoff before any BODY
+helper creation. Only CONTINUE/coord updates occur after the completed1605/8a6c
+runs; Root captured both previous hashes for exact reconstruction. The two test
+files and all unapproved inputs remain held. Full M1-M8 goal stays ACTIVE.
+
+
+R0 reciprocal/result closure before SAVE: Root whole/hash-read ARCH343003+6138/
+845df849 and349141+5138/61edacd4, plus PERF212717+6477/96d831cd and219194+4949/
+1e262a99f62d9d2d559755ea1fe8b86980f7b64bea1e9754e405af26dce23348.
+Both actually read the other's findings, acknowledge the missing-target-header
+review omission and independently verify the corrected source and genuine five
+assertion failures. No disagreement remains; all three peers stopped normally.
+Root independently hash/parses the COMPLETE corrected technical7 packet
+9488713+8356/968bc521118e84886bfc708c72985c1f6b0dc693b65aafdd7bd43b05b5d21f65:
+seven numbered commands/seven EXIT0/UNCHANGED1605/8a6c footers. The official
+Rust Copy source read is in PERF with the shared-reference caveat; no trait-only
+ownership, allocator or speed claim. Exact nine-path R0 checkpoint is now ready
+for Root save. BODY roster remains unselected/unreleased until that save.

@@ -35,6 +35,7 @@ mod restoration;
 mod retention_input;
 mod retry_input;
 mod rules;
+mod stored_lifecycle;
 mod validation;
 
 pub use admission::{PolicySchemaCharge, PolicySchemaLimits, complete_policy_value_owned_bytes};
@@ -157,6 +158,9 @@ pub use retry_input::{
     normalize_complete_policy_retry_override_input,
 };
 pub use rules::{ResolvedBudget, ResolvedCircuit};
+pub use stored_lifecycle::{
+    StoredLifecycleCaptureError, StoredLifecycleCaptureInput, capture_stored_creation_lifecycle,
+};
 
 /// Owned complete normalized content; supplied empty groups remain present.
 ///

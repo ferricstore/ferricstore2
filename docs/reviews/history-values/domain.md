@@ -218,3 +218,50 @@ Proposed real-test cut: state_store/values.rs plus values/{publication,read,reco
 Before any activation ARCH must freeze: capture/input ABI and truthful legacy refusal; scoped key/envelope/knowledge encoding plus registered layout/snapshot transitions (no selected family8 or frame numbers here); read-clock/expiry contract; and whether expired rows are retained logically or reclaimed with enough expiry/ownership evidence for recovery. A valid old history may reference a legitimately expired/missing value; neither universal dangling-ref corruption nor unchecked missing-new-value acceptance is adequate. Current/pinned/alternate/received cohorts and old snapshot IDs must remain valid; policy upgrades cannot downgrade the capability.
 
 Resource scope: pre-admit cumulative probes, exact logical refs/physical keys, every intermediate binding, registry entries, envelope and encoded bytes, slot/owner spines, collision comparisons and backend copies; borrowed plan leaves avoid extra payload owners. Fallible reserves after semantic sizing, no cap-as-I/O/RSS theorem or reuse of old192n/512 slack. Portable checked fixed-width formats; actual Linux/macOS reopen/fault/snapshot evidence separately required. No source/artifact/helper/model/API created, workload/Git run or old-body buffer reopened. Original HistoryValues3 arrays remain[] until actual typed decode+persisted routed reads+full hydration; native8 and full M1–M8 stay open. Finite proposal STOP.
+
+
+## STORED-CREATION-LIFECYCLE1 R0: Root source and actual failure checkpoint
+
+Author d2_implementation stopped exactly four approved buffers without workload
+or note/shared-doc/Git mutations. Root whole-read all four and independently
+reproduced held1601/deb0ab420d21ad48e55a40e82c0552baa83220e6fcfce68b7c2c656eb0b0d1a7.
+Removing only the private child declaration and three-line explicit reexports
+restores the ENTIRE prior complete.rs320LF/12257B/7261aad56aea9b67f16f43e2847663fec8439d00a545b1a59a1e54ea27c98a47.
+Three child paths were absent before. No existing policy/capture body changed.
+The exact two ordinary models and arity-five literal UnsupportedPolicyProfile
+rejector contain no decode, charge, partial capture or helper.
+
+Pinned formatter72773 EXIT0 changes only main whitespace, inverse non-whitespace
+stream exact, held1601 unchanged. Initial technical16640 passes fmt/compile/
+strictClippy but architecture has52PASS1FAIL solely because the new test target
+lacked its required forbid(unsafe_code). Root adds ONLY that25B/two-LF target
+attribute. Exact inverse restores ENTIRE371LF/12369B/8136ec9e807ad598d79500167e9f294179d50459a7b2cf46d459bae4a8561510.
+This is technical feedback, never the intended behavior RED; no suppression,
+assertion removal, policy weakening or new artifact. Failed raw9482719+5968/
+8bf703e96ce4c4d8c9ad5b0f8e0e5d18c100069efdb2966226840099fc316bab
+is retained; its reference/progress/diff suffix did not run.
+
+Final four files: complete.rs324/12407/b015a80409b2d6c9a44099637979301708398c9e98d40fe480656582ae3d8189;
+stored_lifecycle.rs49/1979/6b2c9cb3e2b4e131c21354bdb52d3f00ea27ca5ad58d78989c55a0a025c831d8;
+test main373/12394/da5ef001a9080cdd7a8793b62cd57af5a42950c18801a3552665453bf3cc2cbf;
+fixtures92/3849/67a9ebd3e67e7a6251bc66d1b7e769dc4a55d724040133894630ea8248601246.
+Eight new functions have canonical spans11/70/90/66/79/44/18/60, max90.
+Exactly five cases, two named fixtures, one TestResult alias and no constants.
+Root independently joined the literal Original184B, SHA256
+6a94f5971f3d7725f5afa90b6c9355cf9775268c6f6dcf21bc7423dd72567cfd.
+Complete restore/prepare/verify and its independent literal Original reader
+acceptance precede every new first-positive assertion.
+
+Corrected technical27360 TERMINAL0: all seven checks pass, including arch53,
+reference480 and unchanged120/132/550 progress; all1605 inputs/
+8a6c079e6d3d30929b59d4fceb8ad9ab26aba0961b1ce37c40fcdb7984b54908
+remain unchanged. Runtime19521 TERMINAL101 is genuine compiled0PASS5FAIL:
+raw9497313+2163/31ee2dcfd1e9e44d2449392f7eaa09f119d57c39e6b29b2b670013b3ee2421e7.
+Root independently compares exact five test names and five panic identities:
+all are Some(Policy(UnsupportedPolicyProfile)) at first expected-success sites
+main55/137/186/265/342. No fixture/technical/setup failure. Later precedence,
+wrong-type/unsupported/resource/scalar-lifetime tails remain honestly masked.
+Original-only cap0 and BOTH-donor InvalidAuthority lanes remain frozen; Complete
+cap0 is unasserted. No source HistoryValues mapping, allocation measurement,
+Linux/native-eight/full-project/full-goal or new passing parity claim follows.
+Root owns exact R0 SAVE before any concrete BODY consultation/release.

@@ -4995,3 +4995,175 @@ capture126..144 and loader194..214. No disagreement remains. This is the exact
 ordinary contract refinement Root requested, not a new design/ACK cycle or a
 release of source. Current component's reported full1088/all11 result is a
 separate Root checkpoint; no new feature credit follows. Finite STOP.
+
+### STORED-CREATION-LIFECYCLE1 R0: independent stopped-source and canonical-oracle review
+
+Actual source review under Root's release4693247+1863/442d31b0 and the exact
+17067/6bc46ca5 plus3730/a288e9e8 decisions. I read ALL FOUR stopped author files,
+then whole-read canonical main after Root's pinned formatter. No source/test,
+shared file, Git, formatter, compiler, VM or probe was changed/run by me. Only
+this allowed note is appended. No BODY helper or implementation is selected.
+
+Actual canonical bindings (LF/bytes/SHA256):
+- policy/complete.rs324/12407/
+  b015a80409b2d6c9a44099637979301708398c9e98d40fe480656582ae3d8189.
+- policy/complete/stored_lifecycle.rs49/1979/
+  6b2c9cb3e2b4e131c21354bdb52d3f00ea27ca5ad58d78989c55a0a025c831d8.
+- tests/stored_lifecycle/main.rs371/12369/
+  8136ec9e807ad598d79500167e9f294179d50459a7b2cf46d459bae4a8561510.
+- tests/stored_lifecycle/fixtures.rs92/3849/
+  67a9ebd3e67e7a6251bc66d1b7e769dc4a55d724040133894630ea8248601246.
+All paths above are under crates/wf-domain. My in-memory removal of EXACTLY the
+private child declaration and three-line reexport removes150B and reproduces
+ENTIRE old complete.rs320/12257/
+7261aad56aea9b67f16f43e2847663fec8439d00a545b1a59a1e54ea27c98a47.
+No existing parent body/model changes. Reversing ONLY main's two formatter wraps
+reproduces ENTIRE author368/12339/
+7d00230446573ef59144a55db50c1bd0bfaf2ab122ac0b8fc9013e3842ffe0a5.
+The two wraps expand the InvalidCapturedActive pattern and other_schema call;
+assertions, literals, statements and order stay exact. The other three files are
+literal author bytes. Root's1601-input hold is reported separately, not a claim
+that I ran its hold checker.
+
+The child contains EXACTLY the two selected ordinary public models. Input has
+borrowed workflow_type/initial_state and Copy overrides/defaults; derive is only
+Clone/Copy/Eq/PartialEq. Error derives Debug only and has Policy(complete error)
+and Capture(active error). The sole arity5 entry returns CapturedLifecycle by
+value and is an11LF unconditional Policy(UnsupportedPolicyProfile) rejector.
+There is no reader, validation/default resolution, charge mutation, hidden
+partial positive, private helper, new constant, output owner or authority token.
+The parent exports precisely these three names behind its private child.
+
+All five selected case identities are exact:
+stored_lifecycle_captures_complete_policy_precedence;
+stored_lifecycle_captures_original_policy_without_mode_projection_loss;
+stored_lifecycle_distinguishes_absence_type_and_profile;
+stored_lifecycle_admits_work_and_temporary_owners_before_decode;
+stored_lifecycle_capture_survives_backing_drop.
+Canonical spans are15..84=70LF,87..176=90LF,179..244=66LF,247..325=79LF,
+328..371=44LF. Fixtures input14..31=18LF and policy_pair33..92=60LF; API39..49=11LF.
+Thus EXACTLY eight new functions, maximum90LF, source49/test371+92 within natural
+limits, no packed code or waived geometry. One TestResult alias, two fixture
+functions, no test helpers/constants/extra case or fixture artifact are present.
+
+Every first intended API assertion follows policy_pair's independent premises:
+Complete data is restored at generation7, genuinely encoded, then verified by
+existing complete APIs; generation/type/max-active are checked. Original bytes
+are independently literal, portable-decoded with an existing reader, then checked
+for generation7/type r/exact retained encoding before returning the two owners.
+Neither fixture calls the new SUT or computes expected captures. I separately
+examined the184 literal bytes (SHA256
+6a94f5971f3d7725f5afa90b6c9355cf9775268c6f6dcf21bc7423dd72567cfd)
+as source data, without invoking Rust or a VM: exact ETF envelope
+{flow_policy_v1,7,map}, root type r/max_active5000/type ttl11000/history30,
+q-state ttl22000/history40, exact EOF and no duplicate map keys. This is an
+independent literal audit, not a newly executed upstream golden or product test.
+
+The cases use literal scalar goldens: q-state versus other-state type fallback,
+command active6000/ttl33000/hot4/history50, Original infinity/hot0 and configured
+clamp3/25, absent-policy defaults None/7000/2/10. These catch the older mode/retry
+projection's erased lifecycle fields. Wrong type for BOTH full donors expects
+Policy(Schema(InvalidAuthority)); unsupported Original is independently checked
+with the old portable reader before the new API assertion. Reached bad active,
+retention/default values use Capture origin. No simultaneous invalid-input
+precedence is invented. The selected later refusal tails remain source oracles,
+not runtime evidence from this source read.
+
+Resource/lifetime source is also faithful: valid Original-only cap0 expects
+Policy(ByteLimit), with sufficient work and an independently accepted donor;
+no Complete-cap0 behavior is asserted. A funded Original call is bracketed by
+one continuous account and followed by refused-cap/retry checks; Work1 and profile
+mismatch expect unchanged prospective counters. These are refusal/continuity
+oracles, not allocator instrumentation or a complete future work census. Output
+captures cross a block that drops BOTH full backing owners and its charge; the
+outside four-scalar checks are nonvacuous only after both earlier is_ok guards.
+No source borrow is returned. OS-neutral scalar/standard collections and byte
+literals add no filesystem, native or target-specific dependency; no Linux run
+or universal resource theorem follows.
+
+Scoped source acceptance: NO concrete model/API/oracle/ownership/geometry defect.
+I communicated actual findings directly to Root, DOMAIN and PERF. First intended
+positive assertions are canonical53/135/184/263/340. Root compilation/runtime
+and PERF's written source receipt are still separate pending evidence at this
+append; do NOT infer genuine five-assertion RED, reached later tails or BODY
+permission from the source shape. Original HistoryValues mappings, catalog,
+consumed publication/read/recovery/retention, Linux/native8/full-goal remain held.
+Ordinary actual runtime and written-peer reads will close this bounded review;
+no readiness acknowledgement or extra source-acceptance gate is requested.
+
+### STORED-CREATION-LIFECYCLE1 R0: technical correction, actual five-assertion RED, reciprocal closure
+
+This closes the source receipt343003+6138/845df849 with actual corrected source,
+Root execution and the written peer read. I missed the new integration target's
+required explicit forbid(unsafe_code) declaration during that first source pass.
+Its broad no-defect conclusion is superseded for this exact technical omission;
+the model/oracle/ownership findings remain sound. No check was suppressed or
+weakened. Root added ONLY the required target attribute after the module doc.
+
+I whole/hash-read the actual first architecture failure at validation-log
+9482719+5968/
+8bf703e96ce4c4d8c9ad5b0f8e0e5d18c100069efdb2966226840099fc316bab:
+52PASS1FAIL, solely workspace's missing-target-attribute diagnostic. Root reports
+fmt/domain all-target check/strict Clippy had passed and later technical commands
+had not yet run. NO behavioral case ran in that attempt; it is not the TDD RED.
+Current main is373LF/12394B/
+da5ef001a9080cdd7a8793b62cd57af5a42950c18801a3552665453bf3cc2cbf.
+My removal of ONLY its25B `#![forbid(unsafe_code)]` block reproduces ENTIRE
+canonical371/12369/8136ec9e807ad598d79500167e9f294179d50459a7b2cf46d459bae4a8561510.
+Together with my prior exact formatter inverse this also binds the original
+368/7d002 author assertions. The other three production/fixture identities and
+150B entire-parent inverse in the source receipt stay literal. Test spans merely
+shift two lines; maximum90 and exact eight-function/five-test census unchanged.
+
+The corrected seven-command technical sequence27360 is Root-reported terminal0,
+all1605 inputs unchanged/8a6c079e: fmt, domain all-target check, strict Clippy,
+arch53, reference480, progress120/132/550 and diff pass. I independently
+whole/hash-read its corrected architecture output9489935+5593/
+1d5cd34c7d74a60599e606c840a8541efb1d6b08db0d466c2e1e36deb4553d5f:
+45unit+4archunit+3visibility+1workspace=53PASS, zero other statuses. Other six
+command outcomes/hold are attributed to Root; I did not run a workload or pretend
+the architecture slice contains the entire seven-command packet.
+
+I then whole/hash-read ACTUAL compiled R0 target9497313+2163/
+31ee2dcfd1e9e44d2449392f7eaa09f119d57c39e6b29b2b670013b3ee2421e7.
+It compiles the stored_lifecycle target and reports EXACTLY0PASS5FAIL,
+0ignored/measured/filtered. My independent Counter of all five source names
+matches the runtime's five unique FAILED statuses exactly. Every panic is the
+intended Some(Policy(UnsupportedPolicyProfile)) from the literal rejecting API:
+Complete precedence main55; Original full-field precedence137; actual absence186;
+work/temp265; backing-drop342. Full Complete restore/prepare/verify and literal
+Original reader premises therefore complete in EACH case before its intended
+first-positive failure; the work case's extra original-reader prerequisite also
+finishes. There is no setup, missing symbol, compiler, doc, lint or technical
+failure masquerading as these five runtime assertions. Root reports session19521
+terminal101 with the same1605/8a6c inputs unchanged.
+
+Precise limits of that execution: no positive scalar golden is yet compared;
+remaining type/state/command iterations, error-origin/refusal/profile/retry tails
+and outside-block scalar checks are MASKED by each first-positive assertion.
+The backing-drop case fails at its first Complete capture, so the second Original
+capture and actual drop/use tail do not execute; its lifetime shape is compiled,
+not an executed successful ownership demonstration. The current rejecting body
+does no capture/work/decode; these tests are future BODY obligations rather than
+proof of allocator limits, a continuous work tariff or completed lifecycle.
+
+Ordinary written reciprocity is ACTUAL: I whole/hash-read PERF212717+6477/
+96d831cddac49c66f1bfcba9cba1cda76ad7d4e3b534fc3f679a9562b91a4501,end219194.
+It independently binds all four sources/full parent inverse/literal184 donor,
+exact oracles/resource qualifications and natural geometry. I agree; no source,
+semantic, lifetime or resource disagreement remains. PERF actually read my6138
+source receipt and directly agreed. Both acknowledged the target-attribute
+review omission and exact technical correction; actual runtime findings were
+communicated directly. No extra appendix or acknowledgement is needed for this
+reciprocity. Any later peer runtime receipt may be read ordinarily without a
+new source/SAVE gate.
+
+Scoped acceptance: corrected callable R0 and genuine five assertion RED are
+established; Root may record/save that checkpoint under its custody. NO BODY
+helper/model/field-reader roster is selected or source released here. The later
+full-donor bridge must still use actual full typed/Original fields with continuous
+admitted work and the selected variant-level temporary contract. No original
+HistoryValues counterpart, catalog/publication/read/recovery/retention/clock,
+Linux/native8/full-goal or measured resource gain follows. Only this allowed note
+was appended; no source/tests/shared artifact/Git/build/VM/probe mutation or
+execution by me. Finite current review STOP.

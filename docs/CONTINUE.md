@@ -5,6 +5,17 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
+The stored-policy creation-lifecycle resolver now has a compiled callable
+baseline: **zero passing and five failing tests**. Every failure reaches the
+intended first capture assertion after independently accepted full Complete and
+Original policy fixtures. All seven technical checks pass, including strict
+Clippy and all 53 architecture checks. Literal assertions cover policy/default/
+state/command precedence, operational errors, resource refusals and scalar
+results after both backing owners drop; later assertions remain masked until
+the implementation. Exact implementation helpers remain unselected. The latest
+full passing checkpoint is `b66a74c`;
+the new five-case baseline adds no passing parity coverage.
+
 The current value-provenance increment passes **all eight unchanged tests**
 after its genuine compiled zero-pass/eight-failure baseline was saved in
 `57a77a2`. All eleven full-workspace checks pass. Numeric provenance now belongs
@@ -187,7 +198,7 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full passing Rust checkpoint passes **1,088 tests across 99 targets
+The latest full passing Rust checkpoint, `b66a74c`, passes **1,088 tests across 99 targets
 on macOS**, with zero failed, ignored, measured or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven checks pass:
 formatting, workspace compilation, strict Clippy, warnings-denied documentation,
