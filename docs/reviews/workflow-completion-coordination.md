@@ -52936,3 +52936,152 @@ WORKSPACE constant/no fixture model and only existing real four-profile calls;
 no shared-path/dependency/policy change. Future R0 becomes SIX paths, retaining
 the exact eight names and borrowed inspector, checkedu32 and explicit F/R terms.
 No future file/model/helper is created or released before this current SAVE.
+
+
+REF-BINARY1 SAVED54c5aff; NEXT-VALUE-PROVENANCE1 exact callable R0 release
+Root54c5aff saves the independently reviewed implementation and final full11
+macOS evidence in11 exact paths. Source five/19functions/4constants, frozen
+eight tests/old1071 conservation, docs6/15/smokes and Root guard equivalent-style
+proof are saved; worktree was independently confirmed clean after commit.
+No pending source/full-result review or extra approval/ACK gate remains.
+
+Root adopts the NEXT exact staged contracts actually read: ARCH171780+22049/
+cdf32418,215700+2234/daa5f9f0,231378+5405/2002036e and236783+14171/4e53b19a
+plus250954+857/664a9629, with independent PERF104831+13084/673c3a67. These
+select one borrowed inspector over an eventual SAME-producer-owned numeric
+attachment, checkedu32 source indices/getter, explicit F everyplan/R row bytes,
+true source-index holes and supported profiles only. Terminal flag gives no TTL.
+
+SOLE d2_implementation_sol61 R0 write set is SIX paths:
+EXISTING crates/wf-ports/src/blob.rs: only private publication seam+explicit
+reexports, preserve every existing model/API/module doc/algorithm byte otherwise;
+NEW crates/wf-ports/src/blob/publication.rs: EXACT three models/five read
+accessors/one public unconditional Err(UnsupportedProfile) inspector;
+NEW crates/wf-ports/tests/workflow_value_effects/main.rs;
+NEW crates/wf-ports/tests/workflow_value_effects/provenance.rs;
+NEW crates/wf-ports/tests/workflow_value_effects/intermediate.rs;
+NEW crates/wf-ports/tests/workflow_value_effects/fixtures.rs.
+The last file has ONLY the selected16 helper signatures, one TestResult alias
+and WORKSPACE constant. No fixture model/enum/trait, generic fake-storage API,
+shared-path/Cargo/lib/policy/dependency/old-test/ledger edit. All actual encoders/
+preparers/gates/touched producers/retained owners remain real; setup versus real
+SUT errors stay separate. Literal effect rows/assertions stay in SAME eight
+named tests. No unavailable BODY-only value_effects getter may enter R0 tests.
+The selected new error is Debug-only, matched explicitly; no hidden Error trait.
+
+No production helper/charge type/work constant/BODY child/plan field/producer
+change exists or is released yet. The sole inspector always refuses, no
+inspection/digest/profile/work/attachment logic. Genuine compiled same-eight
+behavioral RED and SAVE must precede the separately selected integrated BODY.
+That BODY must actually attach before decoded drop in all four producers,
+not implement a detached inspection endpoint. Real catalog/layout/claim/typed/
+terminal/shared/routed/hydration and all original profiles/Linux remain required.
+
+Root captures every other regular Main input after this append, excluding ONLY
+those six paths and the three active Hval role notes. Root holds all Main/Git/
+format/compiler/VM/benchmark mutations/workloads until normal sole-author STOP;
+peers only append their own role note. All saved codecs/value-byte source/tests,
+old plan/storage/snapshot/fixtures/ledger stay byte-exact. Source author reads
+its whole ordinary draft, verifies beforeimages/absences/hold and stops with
+finite report. No source file/type/helper beyond the exact named batch may be
+created without another concrete ARCH decision; no packing or assertion loss.
+
+
+NEXT R0 author STOP / Root custody and exact private error-context adoption
+The sole author stopped all SIX source buffers and DOMAIN12168. Root whole-read
+the drafts and DOMAIN9581+2587/fd482235, then independently reproduced1594
+held regular inputs/f470425af4f593b4f87e8482faff5cdba3c4c6d05bfe8c6585cac42b63cff524
+with zero deltas. Root formatter99671 terminated0. Root added the already
+selected exact fresh I+F+R one-short assertion inside the existing budget test,
+retaining its old-I refusal assertion. Current intermediate238/9741/9e8c29f6;
+no new function/type/model/helper/path, BODY or assertion weakening. The next
+ordinary format check verifies the final surface; no formatter result is assumed
+from the later truncated tool observation. All eight test names stay selected.
+
+Root independently read original flow_transition1474..1480/604..610 and
+lmdb804: repeated Cancel rejects terminal current. Repeated Complete is the
+real no-op, also preserved in fencing_retry33..50. Therefore independent holes
+are actual errors, not invented no-ops or changed source expectations.
+
+Root whole/hash-read and adopts ARCH263123+7755/6f3bb077b6c17318be25b255e115c494e4f284c7c4ab219432591edf2b8b13d7
+and PERF152179+4037/bc79709a4323e76a6c35970574d0266412e2bd63265c8479cd520a3d86806274.
+The prospective BODY builder private tuple carries (I,max) and only actual
+post-census representable coexistence refusal carries (E,Some((attempted,max))).
+Other causes carry None; public E/inspector, two passes, F-only/no-owner and real
+R-only public cap stay unchanged. No new source artifact is released by this
+adoption. Genuine compiled same-eight runtime RED and SAVE still precede BODY.
+
+ARCH and PERF now independently review the stopped final R0 sources and write
+only their own excluded role notes. Root owns all format/compiler/test/VM/Git
+and shared notes. The upcoming seven technical checks do not count as runtime
+RED or passing new behavior; actual new assertions must run separately.
+
+NEXT R0 first technical packet terminal101 at strict Clippy, not behavior RED.
+Fmt0/compiler0; raw Clippy9122498+1225/2d9e449825d92346222c6c6054bb7fe0ae7f3eca351461ab60015d856059f050
+has ONLY elidable_lifetime_names in fixtures::prepare. Root elides its sole
+input lifetime and corresponding returned DecodedRequest lifetime; borrow
+relationship, signatures/arity/16helper roster and every assertion unchanged.
+No lint suppression or public/model/BODY change. Reviewers receive the exact
+amendment; seven technical checks rerun on this stopped surface.
+
+
+NEXT R0 actual technical PASS and compiled behavioral RED
+Final seven technical checks session39443 TERMINAL0 under1600 regular inputs
+/a5c429eb23e3db613454481a773081f75a694f9729c6b15649497474aa50ce7c, ALLunchanged.
+Fmt/check/strictClippy0; arch53PASS; reference480; progress120/132/550 and
+unchanged1681unmatched/1655unresolved; diff0. Raw final compile9124148+165/
+f2dcc0b0c3ab37289624e0009cddcb698287f92f23456144880876747359e964;
+Clippy9124561+165/5ee5ee61a1205fb1bb52661c673edc70093a1dc24cbc336fb95818437cb91f82;
+architecture9124901+5593/d9ee6e55ec7597f68819ea2539f60d564e52e512fb58388b281c0c2fde2a7d48.
+The routine lifetime spelling fix leaves fixtures324/10950/
+86acaa03bc0528895ee404d709213414aa6fcf4a1f1a543c4dc6fd2bd81920c5.
+
+Same exact8 test target session45738 TERMINAL101. Raw9132197+4279/
+01efa4412d998e6c7639429ebc3afc8e7f28645fa9ecc9a3b4e693c5c27a8d63:
+0PASS/8FAIL/0ignored/measured/filtered; ALLsame1600inputs unchanged. Root whole/
+hash-read every byte and Counter-compares exact source-qualified test names.
+All8 failures are the intended positive inspector assertions with real
+UnsupportedProfile: provenance76/138/224/288/377, intermediate83/125/204.
+No compilation/setup/import/style failure substitutes for behavioral RED.
+The earlier premises execute; later masked tail/profile/boundary/ownership
+assertions are NOT yet counted as executed. The public stub is still wholly
+rejecting and no attached owner/producer/BODY source exists. Save precedes BODY.
+Root updates CONTINUE to distinguish this active failing baseline from the
+saved54c5aff full1080PASS checkpoint. Original three HistoryValues ledger
+arrays remain empty and every real downstream/full-goal requirement remains.
+
+
+NEXT R0 independent review closure before SAVE
+Root whole/hash-read final ARCH 270878+12621 /
+7809e44300657ab1644650493acf26a88ed7debfd308fe17c44722d33f3fb3e7,
+end 283499, and PERF 156216+10830 /
+799826b08678f7ea45e8255c17109d0fc539f838a6dcdb8c08478dc56d6617bd,
+end 167046. Both read all six final sources, the complete actual runtime packet
+and each other's written findings. They agree: no scoped defect. ARCH also
+independently parses all seven technical results. Exact 30 functions comprise
+five getters, one rejecting inspector, sixteen fixtures and eight tests; the
+longest function is 95 physical lines. Source files fit 400 and tests fit 600.
+Both reproduce the full parent seam inverse and the 19-byte fixture lifetime
+inverse. All eight genuine runtime failures occur at intended assertions;
+masked downstream assertions and profile iterations retain no passing credit.
+
+Root independently reproduces the entire held 1594-input fingerprint after
+substituting only its documented CONTINUE/coordination updates. No other held
+input changed. Entire parent inverse again equals 74/2739/3e742999. Actual
+seven-check whole packet is 9123748+8238 /
+7039aad626a37640376b7af35d05092310ff2843b8697b6e600a52ecf7f9da73;
+Root includes the preceding newline, whereas ARCH starts at the following R
+and includes the following newline. Both identify the same seven actual checks.
+Full R0 runtime/header/footer packet is 9131986+4515 /
+b8cd095845a0405a58258e7dfc0e25dad754c7fc6aea5ef0cee179a6b45e7381.
+
+Root adopts the recorded private spelling precision: value_effects field uses
+pub(super), matching existing plan fields; fallback mappings are InvalidChanges
+to Apply(InvalidAuthority), UnsupportedProfile to Encoding(UnsupportedTag),
+bare Limit to Encoding(ByteLimit), ReserveFailed to Encoding(Allocation).
+Only genuine (Limit, Some((attempted, maximum))) maps to Workspace. No new
+helper or model is authorized by these spellings. Source author read-only BODY
+preparation has stopped with no source/note/workload changes and no unresolved
+contract issue. Independent reviewers stop normally; no extra acknowledgement
+cycle is required. Root saves this genuine RED before releasing the separately
+selected ten-path producer implementation. All full-goal requirements stay open.

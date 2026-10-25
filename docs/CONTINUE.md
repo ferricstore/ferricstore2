@@ -5,6 +5,16 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
+The current value-provenance increment has a compiled callable baseline:
+**zero passing and eight failing tests**, all reaching the intended missing
+inspector behavior after real producer premises. All seven technical checks
+pass, including strict Clippy and all 53 architecture checks. The forthcoming
+implementation must attach numeric provenance to the same accepted plan before
+decoded inputs are released across the four supported producers. Publication,
+history hydration, original profile coverage and Linux acceptance remain open.
+The latest complete passing workspace checkpoint remains the 1,080-test result
+below; the new baseline is not passing coverage.
+
 The six HistoryEntry Rust tests now pass after the callable zero-pass/six-failure
 baseline and tests were saved in `a8e100b`. All eight focused checks pass, including
 strict Clippy and all 51 architecture checks. The four original complete source

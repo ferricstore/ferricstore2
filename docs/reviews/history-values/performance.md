@@ -2037,3 +2037,428 @@ current+every-history refs/ordered routed reads/retention/recovery/typed values/
 hydration or original-three mapping acceptance. Native8/initialR/E-T/settlement,
 measured performance and the complete goal remain open. Only this own note was
 appended; finite review STOP.
+
+## NEXT prospective work census on stable producers; no BODY acceptance
+
+This is finite source-backed preparation while DOMAIN alone owns the moving six
+R0 paths. I did not read blob.rs/publication.rs or the moving effect tests, run a
+workload, or create a source/helper/model/probe. REF54c5aff's full1080 result is
+already recorded separately. No NEXT BODY implementation or runtime result is
+inferred here.
+
+I re-read the exact immutable architecture selection171780+22049/SHA256
+cdf3241816b194e1259fee1b859e56bf708fe1fdc0c59ba455acf9abd372894c,
+and whole/hash-read the adopted F/R215700+2234/daa5f9f01df2bd0a1f8c9994d214b36e5491ff4aa347496c74d30719f3c9e0ae
+and checked-u32231378+5405/2002036ee42308df1237f2114434bbf40b8628a5b96d510d9a630a8aa3839344
+amendments. The nine scan functions, step value_effect4/supplied_value_fields1,
+private monotonic Charge/spend and three work constants remain the selected
+prospective roster. ARCH's newer fixture-only revision is not credited as an
+independent read here. The broad durable matrix is not a new BODY permission.
+
+Stable source rechecks include phase254/b6c45c97, fresh207/ec3b93f6,
+independent168/dd7e64c1, public_mutation/apply164/5f1d635d and
+atomic_start160/8f0472c4. I read the relevant fixed-slot/intent/codec and domain
+plan/result sections, including the complete V7 codec277/69e75189. Other exact
+operands include public codec357/38f2182d, common164/2cb6d1e4,
+reader96/933828e5, writer116/778b2fe2, independent indexed294/3043b8f4
+and TransitionPlan120/0828f7cc. These are stable source observations, not a
+reproduction of Root's whole1594-file hold.
+
+### Concrete variable-byte proof and forbidden additional passes
+
+Let E be decoded.encoded().len(), n the actual represented source item count,
+and L the sum BY OCCURRENCE of each item's partition length, ID length, and
+lengths of only its actually SUPPLIED payload/result/error operands. V5/V6
+encode.rs64..82 writes each pair of IDs and operation fields explicitly. The
+public codec163..164 and219..312 writes the same raw pair and explicit optional
+values. V7 codec143..154 writes the singleton pair and optional payload; its
+materializer229..244 copies those exact operands. Reader.raw46..51 reads one
+u32-length-delimited span, and Writer.raw84..89 writes that span literally.
+Therefore L<=E in each supported validated profile. Identical source bytes in
+two items count twice in L AND occur twice in E; shared content does not break
+the bound. No compression, base64 expansion or external value resolution occurs
+in these selected command fields.
+
+A source/postimage equality must first pay its fixed shape/length test. On unequal
+lengths it may reject without traversing the larger old owner. On equal lengths,
+pay both byte spans prospectively before equality. One comparison of each pair
+per pass costs at most2L; the complete count+emission traversal costs at most4L,
+which is <=4E. Some(empty) has zero byte length but still has real presence/shape
+visits and must retain a true supplied bit. Equal supplied replacement is still
+supplied, independent of its predecessor's bytes. Omitted values require no old
+payload/result/error scan.
+
+Do not recompute a whole command digest: decoded.digest() is already cached, and
+EntryIdentity::prepared supplies a fixed32-byte value. One association comparison
+can conservatively admit32+32=64 examined bytes. Do not re-encode or rehash E in
+each walk/check helper. Do not recompute HistoryEntry.event_id, compare entire
+WorkflowRecord/ScopedPlan values via derived Eq, inspect old omitted value blobs,
+rerun reducers, walk predecessor state/history strings, derive keys/refs, or
+perform a nested search for each source index. Those add work unrelated to the
+listed raw operands or repeat L beyond two passes, so the proposed envelope does
+not prove them funded. HistoryEntry itself has no second variable partition/ID
+copy: scalar kind/version/outcome agreement suffices for this provenance slice.
+The source's already executed reducer/retention/response work remains in its
+existing admission contract rather than being falsely counted as the new scan.
+
+### Proposed reached-event ledger within64+64*n+4E
+
+The following is a concrete CONDITIONAL design budget for the unimplemented
+roster, not a claim the later source automatically meets it. Each listed amount
+is an upper slot count on one item's path in ONE pass:
+
+| Reached fixed event category | Maximum slots |
+| --- | ---: |
+| Item visit, result classification, loop continuation | 3 |
+| Supported operation/presence dispatch and checked source-index conversion | 2 |
+| Outcome, write and history shape visits | 3 |
+| Kind/version/terminal/shape-consistency validations | 4 |
+| Partition and ID equality length guards | 2 |
+| Source and postimage Option visits for three value kinds | 6 |
+| Numeric descriptor construction OR attached-descriptor validation | 1 |
+| Checked emitted-count advance | 1 |
+| Prospective output slot/capacity check | 1 |
+| Output push | 1 |
+| Total upper bound per item per pass | 24 |
+
+A concrete future implementation may use fewer events, including no push in the
+count pass. Each reached validation, result/no-op classification and continuation
+must be admitted before it executes; a skipped branch is not falsely billed as
+reached work. Do not use this table to hide a second real validation/visit inside
+a label after source inspection reveals it. The literal future code census must
+show how every reached event maps to a slot, or revise the bound/algorithm before
+acceptance. This is a logical high-level tariff, not one unit per Rust field
+access, native instruction, memory allocation, stack word or physical CPU cycle.
+
+Reserve at most16 further call-wide fixed slots: account/cap setup; checked bound
+arithmetic; supported profile; root representation; actual count; result-count
+association; next-entry presence; digest shape; attachment lane; completed
+semantic-count check; checked real-R multiplication; R-cap comparison; actual
+workspace comparison; one reserve transition; final emitted/attached count
+agreement; owner-return state. Count only those actually reached. These fixed
+operations must not contain hidden variable scans. Besides them the fixed digest
+byte comparison costs<=64. Supported frames have n>=1: common::count144..153
+rejects0 and V1/V7 are singleton. A complete two-pass ceiling is consequently
+
+  64 +16 +2*24*n +4L <=64 +64*n +4E.
+
+The16n margin pays the16 call-wide events even for n1; it is not permission to
+spend an unbounded remainder or reclaim/refund already spent work. Both passes,
+all helper calls and reached comparisons use ONE monotonically increasing
+Charge account. Checked additions/multiplications refuse overflow. Preflight
+may prove that the caller's maximum_work admits the envelope, but it must not
+reset the used count before emission or before check helpers. The inspector's
+one source/attached verification traversal can fit the stronger ceiling without
+allocating or rebuilding the owner. A separately invoked inspector has its own
+explicit caller work cap; earlier producer work is not free credit for that call.
+
+The selected u32 conversion is reached once per real effect row PER PASS, before
+construction/validation, not once for the batch and not an unchecked cast. The
+source count is u32-framed and admitted<=100000; indices remain0..n-1, including
+holes. Later descriptor-driven access needs a checked usize conversion and a
+bounds-checked lookup. That is another reached fixed validation if the chosen
+code uses it, not an uncharged linear source search. No extra index Vec is needed.
+
+Walk independent.results().enumerate() before filtering. A real Err and a
+successful no-op both have reached item/result/continuation work, in BOTH passes
+if a second pass is reached because other rows survive. Neither emits a row.
+Do not use final_indices() or history_plans() to recover source positions: the
+former loses intermediate histories, the latter loses error/no-op holes. Every
+real write/history, including ExtendLease's zero supplied mask, emits its original
+index/version. Root's source correction is incorporated: repeated Cancel after
+Cancel is a real terminal-record error; the separate repeated Complete against
+completed state is the genuine no-history case. This changes no SUT claim or
+workload evidence. StepContinue/Claim/Reclaim remain unsupported in V5/V6;
+StartAndClaim is only supported in V7. Generic value_bytes zero slots do not
+make an unsupported operation an admitted carry row. Cancel's slot0 is ERROR,
+Complete slot1 is RESULT, Fail/Retry slot1 is ERROR; do not infer kind from the
+flattened ValueRow built by fresh::stage_values.
+
+### Real R after semantic count, F on every returned plan
+
+Complete immutable semantic/count validation precedes result allocation. Only
+then calculate R=checked(real_row_count*size_of::<actual Effect>()). The public
+maximum_effect_bytes caps R. bounds2 may calculate n*size_of as an arithmetic
+upper estimate, but must NOT enforce that estimate against the public cap before
+the semantic pass: all-no-history None has realR0 and no Vec allocation, so cap0
+can succeed with adequate association/work checks. Zero-mask REAL history has
+realR>0 and cannot be silently returned as None. No temporary collector/map/set,
+payload clone, per-item Box, shrink or Vec-to-Box conversion is warranted.
+
+F=size_of::<Option<actual Effects>>() is separate fixed resident metadata on EVERY
+returned plan, even None/replay/conflict/expired/whole rejection. Count F once;
+the Option already includes its Vec-owner representation. Neither assumed NPO
+nor old512/531/192n slack owns it. Use actual compiled size_of later, not an
+invented24/16-byte row or a layout/probe claim. One final try_reserve_exact for
+real rows is fallible, after semantic checks and prospective coexistence; normal
+allocator overprovision is not capacity==requested or a total physical bound.
+ReserveFailed is operational; no fake OOM or exercised-failure claim is made.
+
+I rederived the four actual Fresh coexistence sites. Let B be captured decision
+bytes, A caller additional_live, H actual retained header byte lengths and S the
+measured response size. decoder_bound305..315 is4E+B+1024n+2048; inputs157..163
+adds192n+256+B+A. Thus keep the existing conservative early owner bound
+4E+2B+1216n+2304+A and add F+R BEFORE the new reserve. After the accepted decision
+and before decoded destruction, build the numeric owner while those source fields
+remain available. Release operation, isolation, state_keys, claim_filters in the
+current order; do not retain decoded value Vecs through response construction.
+Late V5 phase221..227 is E+B+H+531+A; V6 independent131..141, V1 public127..137
+and V7 atomic121..131 are E+B+H+512+S+A. Add the SAME retained F+R to each before
+its original response/outcome allocation. R is never subtracted merely because
+the first pass or a source donor completed.
+
+The five Complete callers still converge on phase::finish_inspection95..118:
+phase full/point, independent point, public point and atomic-start point. The
+selected Result refinement must admit checked decoder_bound+F AFTER the existing
+gate/replay validation and BEFORE decoded drop/Complete construction. Preserve
+all existing authority/profile/time/retained grammar/operational ? returns and
+earlier reducer failures. An Err that constructs no plan does not invent a row
+owner. Whole rejection that really returns a plan still needs F, but never an
+n-row reserve or fictional R. Moving blanket new row/work admission before an
+earlier business decision would reorder source behavior and is not selected.
+
+ARCH has directly proposed two private factoring helpers in existing phase.rs:
+release_decoded_inputs1, preserving the four drops and returning only the owned
+scope/request/intent header; retain_record_batch_outcome6, moving the existing
+expiry/outcome/Box sequence after original response encoding and late admission.
+They introduce no new provenance, digest, state-key or reducer scan and no extra
+numeric owner; I see no resource objection if their exact recorded selection
+preserves these boundaries. They were not in the inspected stable source and are
+not treated here as already created/approved/executed. Natural function geometry
+and exact current helper signatures remain ARCH/Root's selection responsibility.
+
+Concrete findings, L<=E proof, conditional event ledger and the bounds2 cap-order
+constraint were sent directly to ARCH and Root. No new source permission was
+requested or inferred. Later actual BODY source must be recounted against this
+ledger, real callable R0 saved first, and actual same-owner producer tests run.
+This predecessor supplies no expiry/catalog/storage authority. Genuine same-tx
+catalog/current/every-intermediate-history publication, ordered routed reads,
+recovery/snapshot/retention/typed payload profile and full HistoryValues hydration
+remain required, with original3 mappings unearned. No new Linux, native initialR,
+full E/T, measured speed, allocator/RSS or complete product result is asserted.
+Finite work-census preparation STOP.
+
+### NEXT private refusal-context bridge: exact real-R Workspace without rescanning
+
+Root identified a material preimplementation error-context gap after reading the
+preceding census: build_*5's bare E loses the real counted R and cannot distinguish
+its row-coexistence Limit from work exhaustion. effects_apply_error1 therefore
+cannot report the required Workspace{attempted:I+F+REAL R,maximum} by translating
+all bare Limits. Reconstructing R by another source pass violates the selected
+two-pass census; using n*size_of would also break real-count/cap0 semantics.
+This is an actual proposal correction, not a passing implementation claim.
+
+I independently checked the existing selected helper roles and stable error/
+producer boundaries, without reading the current R0 files or running anything.
+I proposed a private tuple-only context bridge directly to ARCH/Root. ARCH then
+selected the following exact arithmetic-order refinement in direct message; its
+later written decision remains ARCH's record, not an own source creation:
+
+- Keep build_atomic_value_effects and build_independent_value_effects arity5.
+  Argument4 becomes PRIVATE (old_live_I,workspace_max), rather than an already
+  truncated remaining-row allowance; argument5 remains maximum_work.
+- Keep budget3's arity; return the flat private scalar tuple
+  (I,workspace_max,maximum_work). It does not introduce an earlier F/R rejection.
+  The already reached old I admission remains in its original producer stage.
+- After the COMPLETE semantic/count pass, calculate checked real
+  R=k*size_of::<actual Effect>(), then checked attempted=I+F+R. Both F and R
+  arithmetic occur here: computing I+F earlier could let its overflow mask a
+  preceding InvalidChanges. No count or byte-comparison pass is repeated.
+- The private builder error becomes (E,Option<(attempted,maximum)>).
+  ONLY a representable coexistence refusal is
+  (E::Limit,Some((attempted,workspace_max))). Semantic, work, checked-arithmetic
+  and real reserve errors carry None and keep the existing error mapping.
+  An arithmetic overflow has no representable attempted usize; do not fabricate
+  one or silently report a worst-case n-row Workspace.
+- effects_apply_error retains arity1 and consumes that private tuple. Only the
+  tagged Some pair maps to the existing Workspace error. Public E's four lanes,
+  models, public borrowed inspector/getters and their signatures remain frozen.
+- k0 still executes the exact F-only check BEFORE returning None, with no row
+  Vec. After an admitted representable I+F+R, derive remainingR=max-(I+F)
+  checked and call the existing reserve_effects2 once for k rows. No independent
+  F pre-refusal, inferred zero-size None or fake output owner is introduced.
+
+The bridge is feasible within the selected responsibility cut. It carries only
+fixed scalar/error context, not bytes, a count-cache Vec, a new error type,
+owner, callback, source borrow or third traversal. None leaves the old semantic/
+work/allocation error origins intact; Some identifies the only error whose exact
+attempted row count must survive. The same real numeric owner still attaches
+before decoded donors are released, and retained late F+R accounting is unchanged.
+The public inspector continues to enforce its explicit R-only cap and returns
+its original E; it does not acquire producer workspace authority from this tuple.
+
+I found no resource or ordering conflict with ARCH's refined (I,max) choice.
+The new fixed tuple/error/check steps must be counted in the later actual BODY
+work census; neither this agreement nor an unused constant-event slot proves
+those future operations free. No exact private stack layout/native frame/RSS or
+new physical-memory theorem follows from avoiding a heap owner. Actual source,
+limits/refusal order, natural geometry and unchanged-oracle execution still need
+Root's later post-RED/SAVE BODY review. Current R0 authorship is not held by this
+consultation; no source/API/helper artifact was created or changed here.
+Finite private-context consultation STOP.
+
+## NEXT actual stopped R0 source, resource oracles and genuine eight-case RED
+
+I independently whole-read all SIX approved final paths. Exact current roster:
+- crates/wf-ports/src/blob.rs79LF/2905B/SHA256
+  4faf3c4b7f23552df93c0a9a6432a11630517f2fa1a71f18aaffce81d3709ee7;
+- src/blob/publication.rs80LF/2566B/
+  1e92c1dabd433caf5595bc4601dcb80f14bbf4277d3fdfe088b8866af0d681e6;
+- tests/workflow_value_effects/main.rs7LF/151B/
+  e7866225c9d6fe5c56b347a2cd4cc7ba2385e5ae0fae699eefcdeba0a981f5a1;
+- fixtures.rs324LF/10950B/
+  86acaa03bc0528895ee404d709213414aa6fcf4a1f1a543c4dc6fd2bd81920c5;
+- provenance.rs432LF/16195B/
+  b401cc558671f20c087d01fecf8012ec5a9c8f6b68324bf40a105b437850ce7a;
+- intermediate.rs238LF/9741B/
+  9e8c29f6975afabfe6177243e7663512fbf3d1798d82333b80f592e306774b12.
+The latter test paths are relative to crates/wf-ports/tests/workflow_value_effects.
+
+My own literal parent inverse removes ONLY mod publication and its four-name
+reexport:166B/5LF removed reproduces ENTIRE old74LF/2739B/SHA256
+3e742999d88b4c15038b4f9ca9e5546d348d9bb4f85052f89817611c4be931f4.
+The reference/binary models and approved bodies after the seam remain literal.
+The final fixtures amendment changes only prepare's single input/output lifetime
+spellings to their elided equivalent. My19B inverse reproduces ENTIRE author/
+prelint324LF/10969B/75a6f0f53dea09c9d22c1626d17c5b146a819cb746df66f4031bf7bae1e71779.
+Current prepare240..252 has bytes:&[u8] and DecodedRequest<'_>; the return remains
+borrowed from its one byte-slice input. No assertion, input, producer, helper or
+runtime behavior changed. Root's initial Clippy101 is technical evidence only.
+
+The production delta is EXACTLY three selected models, five immutable getters
+and the callable unconditional UnsupportedProfile inspector. Effect is private
+u32 index/u64 version/[bool;3]/bool with Clone/Copy/Debug/Eq/PartialEq; Effects is
+private Vec with Debug/Eq/PartialEq and no Clone/Default; Error is Debug-only
+with the four selected lanes and actual std TryReserveError. The inspector's
+returned lifetime is tied only to &'plan RecordBatchApplyPlan, not decoded.
+Its sole executed statement constructs the existing enum diagnosis and returns
+Err. No allocation, scan, work counter, owner attachment, hash/reducer/storage
+call, mode, callback, side effect or BODY helper shell is present. The later
+scan/step/lifecycle/error-context roster is deliberately absent. An unexecuted
+Vec field in a declared model does not constitute a producer allocation or
+resident attachment on the current R0 plan.
+
+There are EXACTLY eight tests, no duplicate identities: five provenance and
+three intermediate. Their spans are77/50/95/92/87 and79/76/59 physical lines;
+all below100. The existing approved fixtures contain sixteen helper functions,
+maximum60 lines; largest test file432 and fixture file324 are below600. There
+is no packing, waiver or new production helper/type inferred by the tests.
+
+### Resource and ownership oracle assessment
+
+The fixtures actually encode and prepare supported requests, inspect the real
+retained gate, then invoke real Fresh producers. with_view builds explicit
+mathematical touched observations from actual record owners; its test callback
+merely scopes those borrowed maps around the real decision. It is neither a
+mocked successful storage route nor a durable publication callback. claimed uses
+real create and claim reducers. public_frame uses the real normalizer/public
+encoder. atomic_frame uses the real StartAndClaim encoder. Their Vec/BTreeMap/
+Box/String/error allocations are test/setup owners, not evidence of production
+allocation count or native/initial-R admission. No external storage is exercised.
+
+Presence goldens distinguish omission from Some(empty) and equal-to-old supplied
+replacement, and directly inspect accepted postimage payload/version before
+provenance. Atomic slots verify Complete result versus Fail/Retry/Cancel error,
+with Cancel's generic value slot0 explicitly checked as error. Version3/masks
+and terminal flags use literal expectations, independent of an effect builder.
+ExtendLease is a real zero-mask write/history, not a missing-output surrogate.
+The same case separately constructs a completed donor and asserts real repeated
+Complete LegacyNoop/no history; missing-current ExtendLease is a whole rejection.
+Both actual no-output cases require inspector Ok(None) at Rcap0.
+
+The V6 five-source-item scenario explicitly requires errors at1/WrongState and
+4/Terminal, three histories at original indices0/2/3 with versions1/2/3, and final
+index3 only. Therefore an implementation using final_indices or compacted
+history indices cannot pass. Stable lifecycle184..228 independently confirms
+Cancel rejects terminal state before constructing a record; duplicate Cancel
+is not a no-op. The fixture correction preserves source semantics. The source
+repeatedComplete case is separate; no source or workload is silently adapted to
+an invented successful Cancel.
+
+The work/memory case uses actual size_of::<Effect>() for R and
+size_of::<Option<Effects>>() for F and first asserts both positive. There is no
+assumed24/16-byte layout, Option niche, capacity==requested or exact allocator
+measurement. It derives the old D=4E+B+1024+2048 and I=D+192+256+B for its actual
+singleton frame, then exact owned=I+F+R. It requires Workspace{attempted:owned,
+maximum:actual} BOTH at maximumI and at owned-1, and success at owned. This tests
+full real R even when maximum is below I+F, as well as the one-short boundary.
+It separately tests Complete/log replay D+F-1 refusal and D+F success before
+Rcap0/None, so always-resident F cannot be omitted on non-Fresh plans. Earlier
+D/I refusal stages remain the responsibility of preserved existing tests; no
+blanket F/R addition to their attempted numbers is justified here.
+
+The public positive-row R cap accepts one actual row-size and refuses one less;
+work0 and1 must return Limit. A no-output replay with work0 must still refuse.
+These are meaningful minimum-work and cap controls. They do not independently
+prove the entire two-pass monotonic event census or exact consumed work; that
+requires the later complete BODY source audit already selected. No fabricated
+allocator fault or exercised ReserveFailed branch is asserted.
+
+The lifetime test first requires BOTH accepted plans to own actual histories.
+Same-plan first/repeated views each require exactly ONE row before ptr::eq on
+view and row pointers; therefore the equality is not vacuous empty-slice equality.
+The views escape the temporary decoded verification block and are read afterward.
+A second simultaneously live plan must produce the same numeric contents but
+DIFFERENT view and row addresses. This prevents a detached rebuilt or globally
+shared result from supplying the intended same-plan owner. No frame/payload
+borrow is required in the numeric view. The source test proves the intended type
+relation at compilation; runtime pointer claims require reaching the later
+assertions and are not earned merely from their presence in source.
+
+Crossed-profile preparations, mismatched actual prepared digest, real retained
+intent conflict/replay and separate outcome expiry1002 have literal expectations.
+That expiry is explicitly request retention, never a workflow-value TTL grant.
+No reference key, stored binary, catalog/expiry/storage authority or original
+HistoryValues case is credited by this predecessor.
+
+### Independently read genuine runtime, with precise masking
+
+I whole/hash-read the exact packet in
+/private/tmp/ferricstore2-m2-source-pin-validation.log9132197+4279/SHA256
+01efa4412d998e6c7639429ebc3afc8e7f28645fa9ecc9a3b4e693c5c27a8d63,
+and separately read its following EXIT101/UNCHANGEDTrue footer. It compiles and
+runs the actual workflow_value_effects target, then reports0PASS8FAIL and zero
+ignored/measured/filtered. My independent regex Counter of source module/function
+identities and runtime NAME/STATUS tuples is EXACTLY equal: all eight occur once,
+all FAILED. All eight diagnostic bodies are Some(UnsupportedProfile), at intended
+positive inspector assertions, not imports/setup/lints or a different error.
+
+Actual failure sites: provenance76 (four-profile binding),138 (presence),224
+(atomic kinds),288 (carry),377 (crossed/expiry); intermediate83 (holes),125
+(resource),204 (lifetime). Each preceding reached producer/accepted-history
+premise succeeds. The resource test's actual F/R size calculations and positivity
+assertion121..123 execute before125. The V6 errors0/2/3 premises execute before83.
+This is genuine callable behavioral RED for the selected rejector, after the
+technical lifetime-elision correction, not TDD credit from Clippy feedback.
+
+Masking is material: the four-profile loop fails on its FIRST profile5 inspector,
+so later publicV1/atomicV7 producer iterations and their assertions do NOT finish.
+Their frames were encoded in setup, which is not producer/effect parity. V5 and
+V6 premises in the reached tests do execute. The presence loop stops on its
+first omission branch. Later row/mask output comparisons, Some(empty)/equal
+branches, reserve/work/one-short/Complete boundaries, no-op/replay/crossed tails,
+and actual nonempty pointer/lifetime assertions are masked behind the first
+positive failures. Typechecking the lifetime relation is distinct from executing
+those pointer assertions. No partial run is promoted to full four-profile or
+all-oracle runtime acceptance.
+
+Root reports its separate final seven technical checks all0 under1600 inputs/
+a5c429eb, including strict Clippy/arch53/reference480/progress120132550/diff.
+Those seven are coordinator-attributed here; my actual runtime/footer/Counter
+read is independent. Root's whole1594 held-input confirmation is likewise
+attributed, not a claimed own inventory reconstruction. No execution, build,
+compiler/VM/test/probe/Git or shared-file mutation ran in this review.
+
+I found no scoped source/resource/oracle defect. Ordinary written ARCH source/
+runtime reciprocity can close by reading its published receipt; no new design
+or acknowledgement gate is introduced. Actual BODY source must still satisfy the
+continuous-work census, private exact-Workspace bridge, pre-reserve semantic
+ordering, F/R coexistence and same-plan ownership tests AFTER genuine R0 SAVE.
+Full catalog/current+every-intermediate-history publication, ordered real reads,
+retention/recovery/snapshots/typed hydration, original source mappings, Linux and
+native8/initialR/full E/T remain unearned. No measured performance, allocation,
+capacity, RSS or complete product claim follows. Finite R0 review STOP.
+
+Wording clarification: the preceding short phrase "V6 errors0/2/3" means its
+checked premises, not error indices. Actual errors are at1/4; the three real
+history rows retain source indices0/2/3, as stated explicitly above.

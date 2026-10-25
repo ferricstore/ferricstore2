@@ -154,3 +154,21 @@ match ba9c5bfa966e42d108c02d935dabb70c09f4f56daf71b64718ef217e095dab72.
 No formatter/compiler/VM/test/Git ran. Actual same-eight/strict/full results
 belong to Root. Real publication/catalog/read/hydration, original3 mappings,
 retention/profiles/Linux/native8 and the complete product goal remain open.
+
+## NEXT-VALUE-PROVENANCE1 callable R0 author STOP
+
+Read the five exact ARCH spans cdf32418/daa5f9f0/2002036e/4e53b19a/664a9629 and PERF673c3a67 before authoring. ONLY the released six paths changed. Production has exactly three models, five getters and the callable unconditional UnsupportedProfile baseline; no plan attachment, producer, work/byte inspection or BODY logic exists.
+
+Author LF/bytes/SHA256:
+- blob.rs 79/2905/4faf3c4b7f23552df93c0a9a6432a11630517f2fa1a71f18aaffce81d3709ee7
+- blob/publication.rs 80/2566/1e92c1dabd433caf5595bc4601dcb80f14bbf4277d3fdfe088b8866af0d681e6
+- tests/workflow_value_effects/main.rs 7/151/e7866225c9d6fe5c56b347a2cd4cc7ba2385e5ae0fae699eefcdeba0a981f5a1
+- fixtures.rs 302/10672/219d14db35c53b83100abe466de5cb25d61ac3ff82e0d1ce4fb7b30cbd623987
+- provenance.rs 373/15552/776861c5dab8e9ad2793c4b52006e48df117af4c9e62c9e0a416711e51373887
+- intermediate.rs 227/9578/589c93bf5cb307b720594ddf2d3d3eadd6acdae1d666a65c913302915062058b
+
+Exactly eight selected tests, sixteen selected fixture functions, one TestResult alias and one WORKSPACE constant. Static author census: thirty functions total, maximum78LF. Publication getter starts17/23/29/35/49, inspector73..80; five provenance spans24..91/94..143/146..223/226..301/304..373; three intermediate spans21..97/100..167/170..227. Root formatting/canonical census remains pending.
+
+Actual four encoder/preparer/gate/touched-producer routes precede inspector assertions. Nested setup and SUT errors stay separate; the inspector's Debug-only error is explicitly asserted/matched. Source truth: duplicate Cancel is Terminal rejection, retaining independent indices0/2/3 and versions1/2/3; genuine no-history uses repeated Complete on a real completed donor. Root confirmed the pinned originals. Replay/Complete controls sit with profile/digest controls to retain ordinary geometry. F/R use actual type sizes; plan-only lifetimes and nonempty same/cross-owner pointers remain test assertions, not claimed results.
+
+The entire166B seam inverse restores the ENTIRE parent74LF/2739B/3e742999d88b4c15038b4f9ca9e5546d348d9bb4f85052f89817611c4be931f4. All five new paths were absent before. Full held map1594/f470425af4f593b4f87e8482faff5cdba3c4c6d05bfe8c6585cac42b63cff524 matches before/after with ZERO member deltas. All six written files were actually reread; no formatter/compiler/VM/test/Git mutation or other artifact ran. Runtime RED, technical quality and SAVE belong to Root. No catalog/hydration/storage, Linux or product completion credit. ALL six source buffers and this author note are now STOPPED.

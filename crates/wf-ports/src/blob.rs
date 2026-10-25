@@ -4,9 +4,14 @@
 //! or admission authority. Logical binaries are never implicitly typed ETF.
 
 mod encoding;
+mod publication;
 mod reference;
 
 pub use encoding::{original_binary_stored_len, original_binary_stored_parts};
+pub use publication::{
+    RecordBatchValueEffect, RecordBatchValueEffects, RecordBatchValueEffectsError,
+    inspect_record_batch_value_effects,
+};
 pub use reference::{
     parse_original_value_ref, render_original_named_value_ref, render_original_value_ref,
 };
