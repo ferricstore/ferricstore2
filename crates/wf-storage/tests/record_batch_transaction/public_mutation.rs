@@ -1,5 +1,7 @@
 //! Recording contracts only; actual retained bytes and durability use native tests.
 
+use std::mem::size_of;
+
 use wf_domain::claim::Claim;
 use wf_domain::history::EventKind;
 use wf_domain::lease::LeaseToken;
@@ -9,6 +11,7 @@ use wf_domain::workflow::batch::BatchRejection;
 use wf_domain::workflow::caller::{MutationFieldValue, MutationInput, normalize_core_mutation};
 use wf_domain::workflow::control::{EntryIdentity, EntryStamp, PreparedDigest};
 use wf_domain::workflow::indexed::{IndexRejection, OrderingMetadata};
+use wf_ports::blob::RecordBatchValueEffects;
 use wf_ports::log::{encode_public_mutation, prepare_public_mutation};
 use wf_storage::transaction::apply_public_mutation_transaction;
 
@@ -360,11 +363,14 @@ fn whole_refusal_replays() -> TestResult {
 
 fn workspace_limits() -> TestResult {
     let bytes = hex(PUBLIC_FRAME)?;
-    // E117,n1,B16MiB: D16,780,756; F33,558,420; L=R64+S64+C32MiB.
+    // E117,n1,B16MiB: D16,780,756; I33,558,420; L=R64+S64+C32MiB.
+    let owned = 201_330_580 + size_of::<Option<RecordBatchValueEffects>>();
     for (workspace, attempted, maximum, opened) in [
         (184_552_915, 16_780_756, 16_780_755, false),
         (184_552_916, 201_330_580, 184_552_916, true),
         (201_330_579, 201_330_580, 201_330_579, true),
+        (201_330_580, owned, 201_330_580, true),
+        (owned - 1, owned, owned - 1, true),
     ] {
         let mut store = fresh_store(false)?;
         let mut profile = limits();
@@ -380,12 +386,14 @@ fn workspace_limits() -> TestResult {
     }
     let mut store = fresh_store(false)?;
     let mut profile = limits();
-    profile.workspace_bytes = 201_330_580;
+    profile.workspace_bytes = owned;
     assert_eq!(
         reply(apply(&mut store, &bytes, 2, profile)?)?.1.response(),
         [2, 0, 0]
     );
     assert!(store.committed);
+    assert_eq!(store.writes, [] as [RecordWrite; 0]);
+    assert_eq!(store.histories, [] as [HistoryEntry; 0]);
     Ok(())
 }
 

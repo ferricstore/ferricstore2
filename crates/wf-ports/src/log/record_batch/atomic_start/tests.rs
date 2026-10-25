@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use wf_domain::claim::ScopedRecordId;
 use wf_domain::workflow::control::{ControlState, EntryStamp, PreparedDigest, plan_control};
 use wf_domain::workflow::indexed::{IndexRejection, IndexedDecision};
-use wf_domain::workflow::request::{ClientIntent, RequestScope};
+use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome};
 use wf_domain::workflow::{CommittedCommand, Operation, StartAndClaim};
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, CommittedTime, HlcTimestamp, TimestampMillis};
@@ -119,6 +119,7 @@ fn atomic_start_changes_reject_mismatched_retained_postimage()
         let (scope, expected, plan) = atomic_start_changes_fixture(17, Some(b"v"))?;
         let RecordBatchApplyPlan {
             control,
+            value_effects,
             decision:
                 RecordBatchApplyDecision::Fresh {
                     mut operation,
@@ -174,6 +175,7 @@ fn atomic_start_changes_reject_mismatched_retained_postimage()
         }
         let changed = RecordBatchApplyPlan {
             control,
+            value_effects,
             decision: RecordBatchApplyDecision::Fresh { operation, outcome },
         };
         assert!(

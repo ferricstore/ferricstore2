@@ -53085,3 +53085,271 @@ preparation has stopped with no source/note/workload changes and no unresolved
 contract issue. Independent reviewers stop normally; no extra acknowledgement
 cycle is required. Root saves this genuine RED before releasing the separately
 selected ten-path producer implementation. All full-goal requirements stay open.
+
+
+NEXT R0 SAVED 57a77a2; exact producer-joined BODY release
+Commit 57a77a24893e75408db68964b08efa2ba6503b78 saves the independently
+reviewed genuine callable 0/8 baseline and eleven exact paths. Root verified
+the worktree clean afterward. Seven technical checks pass; the eight new
+behavior tests deliberately fail until this separately selected implementation.
+
+The sole implementation owner may now edit exactly these TEN production paths
+relative to crates/wf-ports/src:
+blob.rs; blob/publication.rs; NEW blob/publication/scan.rs;
+NEW blob/publication/step.rs; log/record_batch.rs;
+log/record_batch/phase.rs; log/record_batch/fresh.rs;
+log/record_batch/independent.rs; log/record_batch/atomic_start.rs;
+log/public_mutation/apply.rs. Only the two named children may be created.
+It may also append its own DOMAIN note. All other regular inputs, including
+all eight saved test bodies, all old tests, reference data, ledger, policies,
+CONTINUE and this shared coordination file, are held byte-exact during authorship.
+
+The exact previously selected scan/step helper roster, ValueEffectsCharge with
+only spend, three work constants, plan getter, effects_apply_error, budget helper
+and two phase lifecycle helpers are the complete authorized artifact batch.
+No new helper/model/file or signature change is inferred from this release.
+Applicable decisions are ARCH 171780+22049/cdf32418, 215700+2234/daa5f9f0,
+231378+5405/2002036e, 251811+11312/088721f2, 263123+7755/6f3bb077 and the
+private spelling precision in 270878+12621/7809e443; PERF census is
+139065+13114/eca6874a and bridge 152179+4037/bc79709a. Later bridge signatures
+supersede the earlier bare-error/remaining-row proposal. Exact same numeric
+owner must join all four actual producers before decoded operands drop.
+
+Full semantic/count pass precedes actual R and I+F+R arithmetic/admission,
+then one fallible reserve and second build pass with the same work account.
+Only representable coexistence refusal carries exact Workspace context. Keep
+all real intermediate histories, original source-index holes, field presence,
+zero-mask history, and no-history None. Complete plans admit D+F; late plans
+include the same resident F+R. Preserve original retained expiry/response/drop
+order and existing earlier D/I refusal stages. F is always counted; the public
+effect cap covers R alone. No value-expiry/publication authority is invented.
+
+Root holds Git, formatter, compiler, VM, tests and benchmarks until normal
+source-author STOP. Reviewers have stopped normally and will review actual
+stopped BODY and results reciprocally. Source author whole-reads its ordinary
+draft, reports actual physical geometry, beforeimages/held-input verification
+and stops. No packing, waivers, suppression or speculative performance claim.
+Root alone later integrates mathematically affected old tight-bound assertions,
+retaining their scenarios and earlier-stage failures, after the unchanged new
+eight tests execute. Full product and original required profiles remain open.
+Root captures the complete held-input fingerprint immediately after this append.
+
+
+NEXT BODY author STOP and Root source/format custody
+All ten source buffers and DOMAIN stopped normally. Root independently
+reproduces the entire 1592-file held fingerprint fe1f45d5f81a1e7e8f913a4a552d9f0ce29ccf8a9b41aa8cc8c94393b4250f98
+before any Main integration. Root whole/hash-reads DOMAIN 12168+3902 /
+1061b1e5809640f0b49c89244586cb1433b9e956e5d4d1be31c41e5be8e47f75,
+end 16070, and all ten actual source files. Two combined displays truncated;
+Root rereads the affected full fresh.rs separately rather than treating a
+truncated display as complete. Only scan.rs and step.rs are new source paths.
+
+Root whole/hash-read ARCH 283499+16590 /
+3b190e77d8f0356589ac6a8d441eb0430950b0f06b775c6c4ae7b281fe465881
+and PERF 167046+5198 /
+a3a62c60a663adfcf3a610a3e41f1336c4620f4c8b476a946a63c9a4924ab7c9.
+Root adopts only the nine named existing-test integrations now, not the next
+catalog artifact candidates or family/profile activation. All old D and early I
+refusal assertions remain literal; exact successes add actual F/R. Existing
+Fresh bound cases now include actual one-short refusals for V5, V6, public V1,
+V7 and touched additional residency. Complete success adds F alone. The internal
+forged-postimage test moves the SAME value_effects binding through its existing
+two literals, preserving all six invalid cases. No new helper/type/constant/test
+identity or saved eight-case assertion changes. All original behaviors remain.
+
+Root formatter session50035 TERMINAL0. Formatted production maximum is381
+physical lines (scan), other new step114/facade139; all eight existing bound
+test files remain at most588. The four ENTIRE saved new target files retain
+main e7866225, fixtures86acaa03, provenanceb401cc55, intermediate9e8c29f6.
+No new behavior is yet claimed passing. Root now runs the seven technical
+checks before the exact saved eight-case runtime; reviewer notes are the only
+three excluded input paths. Actual event/work recensus remains required.
+
+Separately, an isolated Git-only Elixir checkpoint was safe before the Rust
+handoff: Root verified that it touches no held Rust input or workload, then
+reproduced the same complete 1592-file fingerprint afterward. This narrows the
+earlier conservative commit hold for that disjoint checkout only. Root saved
+exactly the previously reviewed LMDB source/test pair as
+6605cb4b699b0e42daae752d41e2c92045045a0d above7c351783a. Current file hashes are
+fdb703a7bff9fa5dcd260eb70823f067b92f5dd457afbb1d8cadfb4a530edb58 and
+aa5434fe12bf06ac964119086f3452361b02b48e889916a748c7169c1d4ed929;
+Root independently read the complete guard/test diff and verified both full
+HEAD donor inverses and empty index. All2241 regular input contents stayed
+identical, fingerprint1159a1fe858bfed8eb6b9e012e215afe66ac90238fb4679ad9645e37492d56ff.
+The governance/child tests and untracked probe remain exact and uncommitted.
+Existing pure13-failure/two-pass RED to15-pass GREEN and supplemental native
+LMDB27 results (19 pass,8 physical EPERM, both added cases pass) retain their
+original scope; no new execution or whole-suite/profile/Linux claim follows.
+The immutable Elixir baseline remains clean. The mixed-phase reservation issue
+is source-predicted and still requires actual native RED; no repair was released.
+
+Root independently verifies the source retention distinction in pinned payload
+file31595/9588e98c: ordinary terminal record expiry retains the created payload;
+explicit cleanup deletes owned created payload and completed result; rewind
+preserves ref, clears deadline and reads beyond the prior deadline. The next
+catalog must preserve all three. This is source evidence, not executed coverage.
+Full catalog/publication/hydration, native debt, required profiles, Linux and the
+entire ordered completion goal remain open after this producer-only increment.
+
+First BODY technical packet79683 terminates101 at compilation only. Fmt0;
+raw9136893+913/008ab3213d2a22656e2cc58a723521f3fbb3d34a60ec30b0a421313a016dc220
+reports two missing retained type imports in the old internal atomic-start test.
+Moving their old production uses into the selected retention helper removed
+names inherited by its test glob. Root explicitly imports the SAME existing
+RetainedMetadata/RetainedOutcome types in that already selected ninth test
+path; no new type/helper/API/assertion or production change. New frozen target
+remains exact. This is a technical integration correction, not behavior RED.
+
+
+NEXT actual interim8 PASS; architecture selects exact fee/lint refinement
+Interim runtime12221 TERMINAL0, all1602/40f2cc6d inputs unchanged. Root
+whole/hash-reads target9156790+1085 /
+ea5ae9751415deaa7a5f511ac343c16bd07f6385e9cdde4662496ed2c2775b11
+and Counter-compares all eight saved source-qualified names:8PASS/0others.
+Previously masked profile/presence/bounds/replay/pointer assertions now finish.
+This is interim behavior evidence only: known work-fee and lint defects remain.
+Technical94592 had compilation0 but strict Clippy101 at9154492+2034 /
+ef402e85cda1580c49ce1beaea5707ff6ea7e7c3e586b2b72d6d36459874823f:
+two builder type_complexity diagnostics and one needless_pass_by_value converter.
+
+Before any new alias/signature change, Root consulted ARCH with exact paths,
+name/type, ownership and resource behavior. ARCH explicitly SELECTED the batch
+in its actual written message after coordinating PERF; Root records that exact
+precreation decision here, without waiting for an additional acknowledgement:
+- ONE private ValueEffectsBuildResult alias in existing publication/scan.rs,
+  exactly Result<Option<RecordBatchValueEffects>,(E,Option<(usize,usize)>)>.
+  Same two builders return the alias; no nominal model, public error or owner.
+- Existing effects_apply_error remains arity1, borrowing its error tuple.
+  Inline map_err closures borrow the owned local tuple, copy only usize context
+  and let the actual error cause drop naturally. No clone/Box/suppression.
+- Existing supplied_value_fields becomes arity2 with &mut ValueEffectsCharge.
+  Its caller pays dispatch; each arm prospectively pays its exact1/2 source
+  Option as_deref visits. ExtendLease has zero such visits.
+- Descriptor prepay5 covers constructor1, presence-map Option visits3 and
+  terminal classification1. Both builder walk count fees become2, including
+  the output Option examination. Both reserve calls prepay3 for actual helper
+  row arithmetic/cap/reserve transition. No new helper/function/model/file.
+- Only EFFECTS_ITEM_WORK changes64 to96; BASE64 and ENCODED4 remain.
+  Actual corrected worst builder is85+66n+4L. For valid n>=1 and L<=E,
+  (64+96n+4E)-(85+66n+4L)=30n-21+4(E-L)>=9. This honestly funds the
+  actual algorithm without invented spare slots or unselected framing credit.
+  Public byte caps, producer workspace formulas and all saved tests stay exact.
+
+ARCH independently counts67 actual functions, not author's66. All are selected:
+50 preexisting plus17 added; this is receipt arithmetic, not an extra helper.
+Actual formatted maximum381/file and88/function. Its nine-test reverse read
+reproduces every whole old file, and four saved target files remain exact.
+Existing production diff before correction is9157966+31452 /
+05379f9cf71bc736c8c9039b6c9c392f535f40e0576b66554fb68529d07b2590.
+Root now applies only the explicitly selected batch, then formats and reruns
+technical and exact-eight behavior checks on the new stopped surface.
+
+Exact selected fee/lint batch is now applied and Root formatter23102 TERMINAL0.
+The helper's explicit operand-only lifetime is named operation and returns no
+Charge borrow. Current scan383/12513/023bce5f and step139/5220/68ffc12c;
+parent367/13082/f3378c26. No helper/function/model beyond the one selected private
+alias was added. All four frozen new target files remain ENTIRELY exact.
+Only the selected fees, ITEM96, alias/borrow conversion and inline borrow
+closures changed from source A. Root now repeats technical7 on this corrected
+stopped surface; actual8 must rerun afterward before final acceptance.
+
+Corrected B same-eight target10304 STEP1 exits0: raw9197985+1084 /
+832a4a38ee46a22098d0b67bf79f252a9138cf1dcba5aa2d04358771b2d93532,
+8PASS/0others, all1602/03b6caa1 inputs unchanged. Same run STEP2 all-ports exits101:
+raw9199303+16836/6cd7d3f806b52d7ef7a3e56372ddb6fbeeff871bd4a3dab72f2f5ffc60d9fa23,
+156PASS/1FAIL before Cargo stops at public_mutation. Root's new one-short test
+had incorrectly assumed one real row for that EXISTING missing-current Complete
+case. Actual caller builds Complete and no history is emitted, so real R=0.
+ARCH independently identifies the same mistake from source and actual failure.
+Production correctly admits I+F. Root removes only the mistaken row term and
+unused Effect import in that same existing wire helper, keeps old D/I negatives,
+exact new one-short and original retained [2,0,0] assertion, and explicitly asserts
+plan.value_effects is None. No SUT/input/frozen new test/helper/model change.
+This makes the new cap exact rather than preserving accidental surplus.
+Corrected source B quality7 already passed; technical and behavioral checks now
+rerun for the changed existing test. No full passing-ports/workspace claim yet.
+
+
+Full70749 terminates101 at workspace alltargets STEP4. All1602/6bdc19b2 inputs
+unchanged. Raw9250094+97446/6a27cad5ec420444ec1d338ae589ca2de661fb79467741b37e793046e14c1b8e
+has922PASS/1FAIL/87 summaries, then stops; later docs/audit steps did NOT run.
+The one existing storage-driver public_item_driver_preserves_gate_and_owned_result
+fails at its old exact-success workspace201330580 with actual attempted201330604.
+Root whole-read the entire existing535LF public_mutation.rs in that target.
+Its missing Complete has k0, as its existing no-write/no-history/NotFound checks
+confirm, so the new resident term is F alone. All three existing D/earlyI
+refusal tuples remain correct and literal. Root also searches remaining storage/
+node workspace assignments; previous Node cases already passed and no other
+affected exact-positive assignment was identified. This is not a full pass.
+
+Root consults ARCH/PERF with the exact newly discovered EXISTING tenth test
+path and formula, then integrates the same already selected F-only contract:
+actual size_of<Option<Effects>>, exact success atoldI+F, new refusals atoldI
+andowned-1, preserving call-order/no-publication/retained[2,0,0]/commit checks.
+Exact success additionally asserts empty writes/history. No file/helper/type/
+constant, fixture/business/wire/source change or huge cap is introduced.
+Root now checks this changed storage target and strict quality before repeating
+the mandatory complete workspace run. Failed whole output remains preserved.
+
+Targeted storage check33894 compiles but strict Clippy exits101 only on the two
+new empty-vector assertions (assert_is_empty). Root uses the SAME explicit
+zero-length RecordWrite/HistoryEntry array comparisons already present in this
+file, retaining both observations and improving failure data. No allow or test
+removal. Original storage test is535LF, corrected from an earlier537 estimate;
+current amended file is543LF. Runtime target was not reached in that technical
+packet; it now runs after the corrected strict checks.
+
+
+### NEXT-VALUE-PROVENANCE1: final full validation and checkpoint preparation
+
+2026-10-26 Root closes the stopped BODY B checkpoint. Final full session15839
+is TERMINAL0, raw9355097+126384/SHA256
+8a4f3aa00ad7950643b96fccee23d4b326d50cdbf98939fa4d36e6eed77799cd.
+All eleven numbered commands EXIT0/UNCHANGEDTrue, with1602 regular inputs and
+input fingerprint ec886e068dc3d1c8f8624b5896508bde6d213c5dc6e64e3011a59df95a8645ba,
+excluding ONLY the three active history-values role notes. This includes strict
+Clippy, architecture53, four cached offline cargo-deny categories, exact preserved
+reference sources and unchanged120/132/550 progress. Earlier genuine failures
+and their narrow existing-test premise/style corrections remain recorded above.
+
+Root independently compared the same full invocation: all1080 prior exact
+(target, executable, full case name, status) tuples remain; ONLY the eight frozen
+workflow_value_effects cases are added. Final1088PASS/99 summaries/101 headers,
+zero other statuses. The sole new header is that grouped target. All six exact
+compile-fail case identities and all15 documentation-target identities remain.
+The two entire benchmark correctness-smoke blocks are byte-identical to the
+previous full run (indexed153B/3869ef2c; terminal142B/019f8de7). No focused
+artifact normalization, omitted old failure, measured speed or allocation claim.
+
+PERF independently reproduced the complete raw/full/doc/smoke comparison and
+rehashed all ten production, four frozen new test, final public-wire and storage
+integration files. Its final receipt is207999+4718/
+fbe4baa904261cf07fa00c5404ba604c0a7be6b568b9f394cf7871ee64c21924,
+end212717. Root whole/hash-read the remaining PERF202761..212717 and ARCH
+339273..343003. Architecture and performance source/reciprocal/result reviews
+are accepted without a remaining scoped defect; all three peers stopped
+normally. No extra acknowledgment gate is needed.
+
+Root changes ONLY CONTINUE and this coordination record after capturing their
+pre-update hashes, then reconstructs the full input fingerprint substituting
+ONLY those two prior hashes. The runner recipe uses sorted pathlib.Path values;
+a preceding string-sort check used a different ordering and was rejected as a
+recipe mismatch, not evidence of a source mutation. Frozen new target files
+remain byte-exact. The intended checkpoint has25 exact paths: ten production,
+ten existing test integrations, these two shared docs and three review notes.
+No new source test or workload is needed for the documentation-only close.
+
+Separate Elixir reviewed guard/regression pair is saved locally in6605cb4b;
+no pinned reference or main Rust source was changed by that Git-only save.
+This checkpoint is executed macOS/component evidence only. Real catalog and
+publication, stored lifecycle capture, ordered reads, expiry/cleanup/recovery,
+original mappings/profiles, native old-eight and Linux remain required. The
+full M1-M8 completion goal stays ACTIVE.
+
+Next R0 is NOT released by this closure. Exact four-path/two-model/one-API/
+five-test STORED-CREATION-LIFECYCLE1 contract is ARCH322206+17067/6bc46ca5,
+refined by339273+3730/a288e9e8: BOTH full donors bind wrong workflow type to
+Policy(Schema(InvalidAuthority)); only Original cap-zero predecode refusal is
+frozen, Complete cap-zero is unasserted until BODY selection. R0 API must remain
+literal UnsupportedPolicyProfile until genuine assertion RED is saved. No
+shared capture helper or future BODY roster is implicitly approved.

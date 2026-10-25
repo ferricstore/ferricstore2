@@ -1,4 +1,6 @@
 use super::*;
+use std::mem::size_of;
+use wf_ports::blob::RecordBatchValueEffects;
 use wf_ports::log::{decode_prepared, prepare_independent_record_batch, prepare_record_batch};
 
 #[test]
@@ -134,9 +136,18 @@ fn assert_prospective_decode(bytes: &[u8]) -> TestResult {
     assert!(
         matches!(decide_missing(bytes, 33_558_419), Err(error) if error.downcast_ref::<RecordBatchApplyError>() == Some(&RecordBatchApplyError::Workspace { attempted: 33_558_420, maximum: 33_558_419 }))
     );
-    assert_eq!(
-        retained(&decide_missing(bytes, 33_558_420)?)?.response(),
-        [2, 0, 0]
-    );
+    let owner_bytes = size_of::<Option<RecordBatchValueEffects>>();
+    let owned = 33_558_420 + owner_bytes;
+    assert!(matches!(
+        decide_missing(bytes, owned - 1),
+        Err(error) if error.downcast_ref::<RecordBatchApplyError>()
+            == Some(&RecordBatchApplyError::Workspace {
+                attempted: owned,
+                maximum: owned - 1,
+            })
+    ));
+    let plan = decide_missing(bytes, owned)?;
+    assert!(plan.value_effects().is_none());
+    assert_eq!(retained(&plan)?.response(), [2, 0, 0]);
     Ok(())
 }

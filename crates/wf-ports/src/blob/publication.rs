@@ -1,6 +1,20 @@
 //! Numeric value provenance borrowed from one exact prepared apply plan.
 
-use crate::log::{DecodedRequest, RecordBatchApplyPlan};
+use std::mem::size_of;
+
+use crate::log::{DecodedRequest, RecordBatchApplyDecision, RecordBatchApplyPlan};
+
+mod scan;
+mod step;
+
+pub(crate) use scan::{
+    build_atomic_value_effects, build_independent_value_effects, value_effects_bounds,
+};
+
+use scan::{
+    ValueEffectsCharge, check_atomic_effects, check_independent_effects, validate_effect_entry,
+    walk_atomic_effects, walk_independent_effects,
+};
 
 /// One original input position with a real accepted record/history mutation.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -66,15 +80,60 @@ pub enum RecordBatchValueEffectsError {
 
 /// Inspects numeric provenance without borrowing the verification descriptor.
 ///
-/// This callable rejecting baseline grants no storage, expiry or apply authority.
+/// The returned owner is attached to the same plan. This grants no storage,
+/// expiry, placement or durable apply authority and allocates no output.
 ///
 /// # Errors
-/// The baseline reports an unsupported provenance profile for every input.
+/// Rejects crossed changes, unavailable profiles and explicit byte/work limits.
 pub fn inspect_record_batch_value_effects<'plan>(
-    _decoded: &DecodedRequest<'_>,
-    _plan: &'plan RecordBatchApplyPlan<'_>,
-    _maximum_effect_bytes: usize,
-    _maximum_work: usize,
+    decoded: &DecodedRequest<'_>,
+    plan: &'plan RecordBatchApplyPlan<'_>,
+    maximum_effect_bytes: usize,
+    maximum_work: usize,
 ) -> Result<Option<&'plan RecordBatchValueEffects>, RecordBatchValueEffectsError> {
-    Err(RecordBatchValueEffectsError::UnsupportedProfile)
+    let mut charge = ValueEffectsCharge {
+        maximum_work,
+        work: 0,
+    };
+    charge.spend(1)?;
+    validate_effect_entry(decoded, plan.control(), &mut charge)?;
+    charge.spend(1)?;
+    let attached = plan.value_effects();
+    let count = match (plan.decision(), attached) {
+        (RecordBatchApplyDecision::Fresh { operation, .. }, Some(effects)) => {
+            check_atomic_effects(decoded, operation, effects.steps(), &mut charge)?;
+            effects.steps().len()
+        }
+        (RecordBatchApplyDecision::IndependentFresh { operation, .. }, Some(effects)) => {
+            check_independent_effects(decoded, operation, effects.steps(), &mut charge)?;
+            effects.steps().len()
+        }
+        (RecordBatchApplyDecision::Fresh { operation, .. }, None) => {
+            walk_atomic_effects(decoded, operation, &mut charge, None)?
+        }
+        (RecordBatchApplyDecision::IndependentFresh { operation, .. }, None) => {
+            walk_independent_effects(decoded, operation, &mut charge, None)?
+        }
+        (_, None) => 0,
+        (_, Some(_)) => return Err(RecordBatchValueEffectsError::InvalidChanges),
+    };
+    charge.spend(1)?;
+    if count != 0 && attached.is_none() {
+        return Err(RecordBatchValueEffectsError::UnsupportedProfile);
+    }
+    charge.spend(1)?;
+    let bytes = count
+        .checked_mul(size_of::<RecordBatchValueEffect>())
+        .ok_or(RecordBatchValueEffectsError::Limit)?;
+    charge.spend(1)?;
+    if bytes > maximum_effect_bytes {
+        return Err(RecordBatchValueEffectsError::Limit);
+    }
+    charge.spend(1)?;
+    match (count, attached) {
+        (0, None) => Ok(None),
+        (0, Some(_)) => Err(RecordBatchValueEffectsError::InvalidChanges),
+        (_, Some(effects)) => Ok(Some(effects)),
+        (_, None) => Err(RecordBatchValueEffectsError::UnsupportedProfile),
+    }
 }

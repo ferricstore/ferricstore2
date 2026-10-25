@@ -12,6 +12,9 @@ pub use publication::{
     RecordBatchValueEffect, RecordBatchValueEffects, RecordBatchValueEffectsError,
     inspect_record_batch_value_effects,
 };
+pub(crate) use publication::{
+    build_atomic_value_effects, build_independent_value_effects, value_effects_bounds,
+};
 pub use reference::{
     parse_original_value_ref, render_original_named_value_ref, render_original_value_ref,
 };

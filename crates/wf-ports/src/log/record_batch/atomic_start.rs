@@ -1,12 +1,16 @@
 //! Isolated atomic-start preparation, original-response replay and Fresh ownership.
 
+use std::mem::size_of;
+
+use crate::blob::{RecordBatchValueEffect, RecordBatchValueEffects, build_atomic_value_effects};
+use crate::log::record_batch::{
+    effects_apply_error, release_decoded_inputs, retain_record_batch_outcome, value_effects_budget,
+};
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::control::EntryIdentity;
 use wf_domain::workflow::indexed::{EntryOrder, TouchedIndexedGroupView};
+use wf_domain::workflow::request::RetainedStatus;
 use wf_domain::workflow::request::gate::{GateDecision, PointGateView, inspect_point_request};
-use wf_domain::workflow::request::{
-    RequestValueError, RetainedMetadata, RetainedOutcome, RetainedStatus,
-};
 use wf_types::version::LogIdentity;
 
 use crate::log::{CodecError, CodecLimits, DecodedRequest};
@@ -55,7 +59,7 @@ pub fn inspect_atomic_start_point<'input, 'retained>(
             return Err(ApplyError::InvalidAuthority.into());
         }
     }
-    Ok(finish_inspection(decoded, log, gate, workspace_limit))
+    finish_inspection(decoded, log, gate, workspace_limit)
 }
 
 /// Consumes actual Fresh authority once, moving the admitted response owner.
@@ -99,23 +103,23 @@ pub fn decide_fresh_atomic_start_touched<'current>(
         workspace_limit,
         additional_live_bytes,
     )?;
+    let (live, cap, work) = value_effects_budget(&decoded, workspace_limit, additional_live_bytes)?;
+    let value_effects =
+        build_atomic_value_effects(&decoded, control, &operation, (live, cap), work)
+            .map_err(|error| effects_apply_error(&error))?;
+    let effect_bytes = value_effects
+        .as_ref()
+        .map_or(0, |effects| effects.steps().len())
+        .checked_mul(size_of::<RecordBatchValueEffect>())
+        .and_then(|rows| rows.checked_add(size_of::<Option<RecordBatchValueEffects>>()))
+        .ok_or(CodecError::LengthOverflow)?;
     let encoded_len = decoded.encoded.len();
-    let DecodedRequest {
-        request,
-        isolation,
-        state_keys,
-        claim_filters,
-        ..
-    } = decoded;
-    drop(request.operation);
-    drop(isolation);
-    drop(state_keys);
-    drop(claim_filters);
+    let (scope, request, intent) = release_decoded_inputs(decoded);
     let header = sum(&[
-        request.scope.tenant().as_bytes().len(),
-        request.scope.group().as_bytes().len(),
-        request.scope.recovery().as_bytes().len(),
-        request.request.as_bytes().len(),
+        scope.tenant().as_bytes().len(),
+        scope.group().as_bytes().len(),
+        scope.recovery().as_bytes().len(),
+        request.as_bytes().len(),
     ])?;
     let size = response::measure(&operation, log, time, admission)?;
     admit(
@@ -126,33 +130,23 @@ pub fn decide_fresh_atomic_start_touched<'current>(
             512,
             size,
             additional_live_bytes,
+            effect_bytes,
         ])?,
         workspace_limit,
     )?;
     let (response, status) = response::encode(&operation, log, time, admission, size)?;
-    let expires_at = time
-        .checked_add(outcome_ttl_ms)
-        .ok_or(RequestValueError::InvalidExpiry)?;
-    let outcome = RetainedOutcome::new(
-        RetainedMetadata {
-            scope: request.scope,
-            request: request.request,
-            intent: request.intent,
-            original_position: log,
-            original_time: time,
-            expires_at,
-            status,
-        },
-        4,
-        response,
+    let outcome = retain_record_batch_outcome(
+        (scope, request, intent),
+        log,
+        time,
+        outcome_ttl_ms,
+        (4, response, status),
         admission,
     )?;
     Ok(RecordBatchApplyPlan {
         control,
-        decision: RecordBatchApplyDecision::Fresh {
-            operation,
-            outcome: Box::new(outcome),
-        },
+        value_effects,
+        decision: RecordBatchApplyDecision::Fresh { operation, outcome },
     })
 }
 

@@ -1,6 +1,7 @@
 //! Bounded raw preparation and one retained gate before complete current authority.
 
 use std::collections::BTreeMap;
+use std::mem::size_of;
 
 use wf_domain::claim::Claim;
 use wf_domain::history::EventKind;
@@ -14,6 +15,7 @@ use wf_domain::workflow::indexed::{IndexRejection, IndexRows, IndexedDecision, I
 use wf_domain::workflow::request::gate::GateView;
 use wf_domain::workflow::request::indexed::IndexedRequestView;
 use wf_domain::workflow::request::{ClientIntent, RetainedOutcome, RetainedStatus};
+use wf_ports::blob::RecordBatchValueEffects;
 use wf_ports::consensus::PreparedOperation;
 use wf_ports::log::{
     CodecError, CodecLimits, DecodedRequest, FreshRecordBatch, RecordBatchApplyDecision,
@@ -178,6 +180,7 @@ fn assert_complete_class(
     })?;
     let encoded = encode_record_batch(value, limits(), WORKSPACE)?;
     let workspace = if class == 1 { 16_780_764 } else { MIN_D };
+    let workspace = workspace + size_of::<Option<RecordBatchValueEffects>>();
     let decoded = prepare_record_batch(encoded.as_bytes(), limits(), workspace)?;
     let inspected = inspect_record_batch(
         decoded,

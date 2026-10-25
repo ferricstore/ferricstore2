@@ -1,6 +1,7 @@
 //! Bounded Fresh inputs and additive caller-residency admission.
 
 use std::collections::BTreeMap;
+use std::mem::size_of;
 
 use wf_domain::claim::{Claim, ClaimRecord, DueOrder, LaneKey, ScopedRecordId};
 use wf_domain::history::EventKind;
@@ -16,6 +17,7 @@ use wf_domain::workflow::request::gate::PointGateView;
 use wf_domain::workflow::{
     CommittedCommand, Operation, WorkflowRecord, reduce, reduce_with_policy,
 };
+use wf_ports::blob::{RecordBatchValueEffect, RecordBatchValueEffects};
 use wf_ports::log::{
     CodecError, FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError,
     RecordBatchApplyPlan, RecordBatchInspection, decide_fresh_record_batch_touched,
@@ -100,7 +102,18 @@ fn empty_decision(
 fn touched_fresh_matches_complete_output() -> TestResult {
     let encoded = hex(VALUE_FRAME)?;
     assert_eq!(encoded.len(), 120);
-    let fresh = inspected(&encoded, FRESH_WITH_L, ControlState::initial(clock(0)?), 0)?;
+    let owner_bytes =
+        size_of::<Option<RecordBatchValueEffects>>() + size_of::<RecordBatchValueEffect>();
+    let owned = FRESH_WITH_L + owner_bytes;
+    let fresh = inspected(&encoded, owned - 1, ControlState::initial(clock(0)?), 0)?;
+    assert_eq!(
+        empty_decision(fresh, 17, true).err(),
+        Some(RecordBatchApplyError::Workspace {
+            attempted: owned,
+            maximum: owned - 1,
+        })
+    );
+    let fresh = inspected(&encoded, owned, ControlState::initial(clock(0)?), 0)?;
     assert_eq!(
         fresh.decoded().value_bytes(0).ok_or("values absent")?[0],
         Some(b"v".as_slice())

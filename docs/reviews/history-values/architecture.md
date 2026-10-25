@@ -4127,3 +4127,871 @@ No disagreement or further source change is required. PERF attributes technical7
 to Root; my preceding8238-byte independent read additionally binds those seven
 actual records. This is ordinary evidence reciprocity, not a new approval gate;
 no further appendix/acknowledgement loop or wait for BODY is needed. Review STOP.
+
+### VALUE-DURABLE next boundary: consumed publication, retained knowledge and lifecycle
+
+Finite next-increment preparation ONLY while DOMAIN owns the current numeric
+provenance BODY. I did NOT read its moving blob/publication/scan/step or log
+producer buffers, mutate source/tests/shared metadata, create an artifact, or
+run a workload/Git. This note reuses the closed193829+21871/6d4fd518 inventory;
+it does not reopen the native/foreign ABI or select format/family numbers. The
+current BODY's later actual review/SAVE remains independent of this proposal.
+
+The original design's actual duties remain architecture.md193..205: one ordered
+apply owner, publish only after persistence, retained rejections/control and
+atomic authoritative indexes; bounded inline bytes are acceptable initially,
+but a reference must never be acknowledged before its bytes are available to
+all apply/snapshot paths. Lines211..215 separately require read-barrier/applied
+position and tenant/query scope. The catalog is therefore an extension of the
+EXISTING consumed transaction, not a seed API, detached callback or a second
+preupload database. Existing inline payload/result/error already persist;
+the missing durable information is versioned bytes/refs and their historical
+and lifecycle relations, not basic inline persistence.
+
+Actual unchanged source witnesses read in this task:
+- ports/state/transaction.rs358/f89b072d: GroupApplyChanges237..305 MOVES the full
+  RecordBatchApplyPlan into its private owner; plan319/into_plan325 expose the
+  same owner. GroupApplyTransaction::commit199 consumes the stable revision.
+- storage/transaction/record_batch.rs261/26f5f73c: apply147 opens the real guard,
+  scope/control/outcome gate precedes Fresh load;197..202 decides, constructs
+  GroupApplyChanges, calls tx.commit(&changes), THEN consumes the plan for reply.
+  Thus accepted postimage Vecs and attached numeric provenance can remain live
+  through the actual commit; decoded donors need not survive to supply bytes.
+- state/redb/commit.rs233/5788bd4d: publish32..75 checks readiness, group/recovery,
+  exact expected control, versions/indexes, records/history, outcome/control,
+  sets Immediate and consumes commit. publish errors fence through apply24..29;
+  once consumed, engine failure is Uncertain, not an unchanged-predecessor proof.
+- commit/independent.rs79/20d99c22:45..52 writes final cores once;53..63 writes
+  EVERY successful history. Value publication must follow the latter stream,
+  preserving original source indices/results and intermediate record versions.
+- publication.rs296/1753832e:99..154 currently serializes core and history;
+  put192..201 is generic insert/REPLACE. Immutable versioned bytes cannot blindly
+  reuse replace semantics: validate exact namespace/key identity and collision
+  before reservation/insertion; an ordinary retry is handled by the real gate.
+- commit/claim.rs138/3c199c28:21..64 is a DISTINCT consumed Claim transaction,
+  with its own validation/outcome and shared write_records. Claim carry/history
+  integration is not supplied by admitting Claim into V5/V6 mutation profiles.
+These are actual stable file identities, not reads of the current BODY drafts.
+
+The smallest coherent REAL successor is a value-enabled local state profile
+whose publication, read and reopen/snapshot paths work together. Recommend that
+Root's next architecture batch name VALUE-DURABLE1 around these boundaries:
+
+1. Capture actual binding knowledge in the SAME loaded transaction revision.
+   New genuine absence can establish the new record's KnownEmpty birth; a
+   present legacy record/history frame remains LegacyUnavailable/LegacyUnknown,
+   never KnownEmpty inferred from payload=None. A known set with zero refs is
+   a positive represented fact, unlike an unavailable profile or missing row.
+   Existing current bytes cannot reconstruct discarded older history. Migration
+   needs real retained replay/backfill evidence or explicit refusal; no manifest
+   relabeling or fabricated historical refs. Legacy reads may remain available
+   under their old capability, without being promoted to hydrated-value reads.
+
+2. Join the numeric SAME-plan row with its actual accepted write postimage and
+   authentic existing binding state. Supplied masks already distinguish equal
+   replacement and Some(empty) from omission; stored bytes may borrow the
+   accepted record's p/r/e owner while the full plan is live. For each history
+   in source order, form the next full binding snapshot; supplied fields create
+   NEW versioned identity/bytes, omitted fields carry actual prior refs. Emit
+   all intermediate history snapshots/value versions, then final current refs
+   once. Do not inspect only final_indices, clone omitted payloads, compact V6
+   indices or infer field kind from a flattened slot. Real zero-mask histories
+   carry refs; replay/refusal/no-op create no new versioned value.
+
+3. Render generated refs from the ACTUAL prepared partition as Explicit(bytes),
+   alongside actual group/recovery/tenant and owner/version/kind. Public absent
+   or :global caller partition was already resolved before preparation; direct
+   raw Keys Global goldens are not authority to choose a different namespace.
+   Syntactic/hash-tag rendering does not prove placement or authorize tenant
+   reads. Preserve opaque logical command Vec meaning and one FSV2 escape;
+   NEVER reinterpret an existing prefix as trusted encoded ETF. The catalog
+   frame stores source-neutral ENCODED bytes plus separately represented expiry,
+   leaving the later explicitly versioned typed/shared/external input route
+   possible. The row schema must not be hard-wired to a Binary-only node.
+
+4. Validate all required capability/knowledge/association/retention before any
+   durable effect under the same guard; then place bytes, every history binding,
+   final current bindings and existing indexes/outcome/control in that ONE write
+   transaction. Unknown legacy or missing writer capability fails closed, not
+   a None attachment silently using old encoders. No externally successful ref
+   or in-memory publication occurs before Immediate commit succeeds. Preserve
+   existing KnownAborted/Uncertain/fencing distinctions and reconcile after
+   reopen; never blindly repeat a Fresh write on uncertain commit.
+
+5. Supply an actual ordered owned read from persisted rows after the original
+   prepared buffers/plans are gone. One slot per requested ref, including
+   duplicates/misses; a stable scope/control revision and actual placement are
+   required. Inspect borrowed envelopes before copying; omission uses complete
+   STORED length, including escape/header, without decoding. Empty bytes at
+   max0 are a value. Storage corruption/backend failure differs from valid
+   stored bytes which later produce invalid-flow/context diagnoses. A local
+   read revision is NOT the application quorum barrier/cross-group router.
+   Current consuming decoder still requires admitted per-occurrence owned
+   bytes; fetch dedup does not grant free clones or an unselected decode cache.
+
+6. Reopen and snapshot must understand the feature BEFORE it can be enabled.
+   Actual physical families remain0..7. recovery.rs176..222 accepts manifests
+   1..4 or dispatches5/6 through the existing policy registry;225..273 validates
+   every row but hashes only policy/placement families6/7 for that catalog hash.
+   recovery/rows14..48 rejects unknown families. Current format.rs41..46 maps
+   FWSS5->FWSP2 and FWSS6->FWSP3. New bytes/bindings require joint closed key,
+   frame, layout/origin/profile, row-relation/inventory and snapshot capture/
+   receive/install/restore/cohort decisions. No family8/range-only widening,
+   new header number, changed old immutable snapshot ID or accidental downgrade
+   through policy publication is selected. Valid stored typed payload must not
+   require live safe-atom/export context merely to reopen a storage envelope.
+
+The concrete next artifact candidates needing a LATER exact API/type/helper
+creation decision are ports/blob/catalog.rs (knowledge/row semantics),
+ports/blob/read.rs (owned ordered read capability), storage/state/key/value.rs
+(scoped physical grammar), storage/state/value/blob.rs (source-neutral envelope)
+and storage/state/redb/values.rs (same-guard publication/read integration).
+They are responsibility names only: no shell/model/helper is approved now.
+Existing transaction.rs/transaction/{load,observations}, state/redb/commit.rs,
+commit/{independent,claim}, publication.rs, read/point.rs, record/history frame
+code and the exact recovery/snapshot matrix in21871 all need coordinated edits.
+A possible real-test grouping is existing state_store/main.rs seam plus proposed
+state_store/values.rs and values/{publication,read,recovery,retention}.rs; exact
+fixtures/helpers/case cuts must be consulted before those files are created.
+Reuse existing real FileBackend, delegated DiskFaultBackend and prepared apply
+functions, not a catalog seeding constructor or successful mock storage callback.
+
+### Retention predecessor and a material three-way source distinction
+
+Reduced Terminal/Cancel still lack authentic captured workflow retention. The
+existing active/values.rs TimeoutValueWrite and active/plan274..289 carry only
+THAT timeout trace's actual capture; they are not authority for Complete/Fail/
+Cancel or request-outcome TTL. Before terminal publication, freeze the genuine
+creation capture and terminal apply-time witness/profile. Source deadline uses
+captured retention with the original max(requested_now,apply_now) rule/clamp;
+current policy, requested-now alone or outcome_ttl_ms cannot substitute. Known
+no-expiry must also be distinguished from unavailable legacy capture. Keep this
+as a concrete missing input, not a fabricated constructor/default or reason to
+claim complete terminal support from a nonterminal predecessor.
+
+I re-hash-bound the WHOLE pinned FlowValuePayloadTest31,595B/
+9588e98cb82aebd1fdfe3379797604c8a330c7a94e3a42bd4ec7acceeda0c17d
+against workflow-test-manifest.json commit66586c596e271408d9184af32eb31cd7218c126e,
+then read the following actual assertion bodies. Root independently agrees:
+- 0e1a95deda23f709,182..219: after ORDINARY terminal record removal, the old
+  created payload ref remains mget-readable with its full original value.
+- 6907b04baf38b9f7,383..436: EXPLICIT retention cleanup reports values>=2 and
+  removes BOTH created.payload_ref and completed.result_ref, as well as record
+  and history. An old value surviving passive record expiry does not make it
+  immune to source-authorized explicit owned-value cleanup.
+- 76630580ff263e03,608..670: rewind keeps the original payload ref, clears the
+  terminal deadline and reads that payload past the previous deadline. This
+  requires the actual rewind/retention relation; it is not permission to infer
+  an undocumented mutable-expiry operation from the case name alone.
+Therefore immutable stored BYTES/version identity is distinct from expiry and
+explicit cleanup/rewind transitions. Neither universal cascade-on-record-delete
+nor blanket no-cascade-ever/immutable-expiry is source-faithful. Determine exact
+owned-ref enumeration/cleanup authorization and rewind behavior from its real
+producer before selecting those APIs. Preserve values required by frozen/pinned/
+received snapshot cohorts; row/binding expiry is not permission to break recovery.
+No original VM/profile was run in this review.
+
+Minimal meaningful predecessor acceptance, before any value-profile activation:
+- Production prepared V5/V6/selected public/V7 commit publishes supplied empty/
+  equal/omitted values correctly, preserves each intermediate same-ID version,
+  real holes and final current bindings, then reads them after input owners drop.
+- Genuine KnownEmpty birth versus actual legacy unavailable frames, with truthful
+  migration refusal and no invented old history; real Claim carries refs through
+  its separate consumed commit/history path.
+- Same transaction known abort versus uncertain/fenced reopen/replay: exact
+  predecessor or complete successor, never bytes without bindings/control or
+  acknowledged refs without bytes. Enforce immutable key collision semantics.
+- Ordered persisted old/new/duplicate/missing/expired/omitted/error reads and
+  restart/reopen, checking source stored length and row-vs-payload error origins.
+- Current/pinned/alternate/received snapshot capture/install/fresh restore and
+  policy upgrades preserve the value capability, rows, bindings and expiry;
+  old FWSS/FWSP byte identities and refusals remain exact.
+- Genuine terminal capture/no-capture refusal, new terminal value deadline,
+  passive expiry vs explicit cleanup vs rewind, and old payload availability.
+These name REQUIRED executable seams, not already created tests or a full new
+helper roster. A bounded nonterminal binary subprofile can precede them only
+as explicit progress; it cannot replace terminal/typed/shared/routed success.
+Original three HistoryValues arrays remain[] until the complete actual route
+and hydration, including its real error/missing/flag semantics, pass. M2/M3
+predecessor authority/barriers and Linux+macOS durability/fault/snapshot evidence
+remain separate gates; portable fixed-width framing is not execution evidence.
+
+Resource/ownership condition: charge keys/ref-spines/current+every-history
+bindings/catalog metadata/encoded bytes and temporary scans before ownership;
+do not reuse old512/192n allowances or treat max_bytes as an I/O/RSS bound.
+Use source-neutral row scanning before payload copies, prospective cumulative
+transaction counters, and genuine fallible reserves. The pinned redb direct-row
+insert_reserve opportunity remains UNSELECTED; it replaces an existing key and
+cannot prove immutable collision handling or reduced engine costs by itself.
+I actually whole/hash-read PERF37949+12323/
+77291c18be33e800bc564a85b4f8dd57e7c05fbccd845678bdd42a52c67087ad,end50272;
+its positional kinds, intermediate histories, lifetime/copy/legacy/fault and
+row-vs-payload distinctions agree. No gain/allocator/RSS/initial-R/full E/T or
+new storage model/fee/dependency authority is inferred. Material seam/retention
+findings were sent directly to Root/PERF; no acknowledgement gates current BODY.
+
+### Ordinary existing-test integration after current BODY STOP
+
+Root's concrete old-bound audit fits the already selected geometry/ownership
+contract. Its eight existing wf-ports test homes and actual current bound spans:
+record_batch/main.rs:582LF, owned-stage function85LF; phases.rs559, Complete
+helper92; point.rs318/helper67; replay.rs488/helpers90/86; touched.rs349/bound
+functions44/22; independent_batch/main.rs478/bound68; public_mutation/wire.rs142/
+helper18; record_batch/atomic_start/response.rs451/bound86. Root may, AFTER the
+source writer STOP, import actual Effect/Effects and size_of, rebase ONLY exact
+success caps by actual F/R and add real I+F+R one-short checks in those SAME
+Fresh bound functions where natural formatting stays<=100. Complete exact D
+success needs D+F; None has no row R. Preserve EVERY earlier decoder D/Fresh I
+attempted number, additional-live case, business/replay/response/pointer assertion;
+no huge WORKSPACE replacement, new helper/type/constant or weakened scenario.
+main582 has only18 file lines spare, so its final whole-file census matters.
+Near92LF Complete helpers need no forced new one-short duplication when the
+new intermediate test already covers that case. No packing/waiver is approved.
+
+One further exact test-only field integration is accepted: existing
+crates/wf-ports/src/log/record_batch/atomic_start/tests.rs188LF/7046B/
+8976568c8f8b0f76949972dcdb58836e9bafc2fe75502e84281352d1534a5565.
+I read113..188, actual forged-retained-postimage function76LF. AFTER author STOP,
+Root may bind value_effects in the120 destructure and MOVE the SAME binding into
+the175 reconstructed plan literal. Exactly two field lines preserve the real
+numeric owner through ALL six original invalid postimage cases and unchanged
+baseline/InvalidChanges assertions. No None substitution, clone, rest-pattern
+drop, new helper/artifact/assertion or current writer-scope expansion. The donor
+.decision partial move is not another plan literal. This ninth existing path
+remains naturally below100/function and400/file after the two-field integration.
+
+Finite proposal/integration consultation STOP. These are concrete later adoption
+inputs only, not source release, family/profile activation, completed catalog,
+terminal capture, storage/hydration coverage or a hold on the current writer.
+
+### NEXT actual BODY A: complete review, concrete fee defects and exact minimal refinement
+
+Root57a77a2 saved genuine R0 BEFORE author release. I independently read ALL
+TEN stopped/formatted production files and DOMAIN12168+3902/
+1061b1e5809640f0b49c89244586cb1433b9e956e5d4d1be31c41e5be8e47f75,
+end16070. I also read the exact nine-test integration diff and reconstructed its
+whole beforeimages in memory. No compiler/test/VM/Git/probe/source/shared-file
+mutation ran here; only this note changes. The A code's interim eight tests pass,
+but reached-work omissions and technical lints prevent final source acceptance.
+The following is the EXACT prospective delta Root may adopt before changing A;
+it is not a claim those changes have already been written or verified.
+
+SELECT one PRIVATE alias inside EXISTING blob/publication/scan.rs:
+type ValueEffectsBuildResult =
+ Result<Option<RecordBatchValueEffects>,(E,Option<(usize,usize)>)>;
+Use it ONLY as the return spelling of the existing atomic/independent builders.
+No nominal model/variant/owner, public export, fee or error shape changes.
+Keep effects_apply_error arity1, but take
+ &(RecordBatchValueEffectsError,Option<(usize,usize)>).
+Its existing case mapping is unchanged; copy only attempted/maximum usize from
+the borrowed pair. Existing producer map_err closures borrow their OWN owned
+local error tuple; value_effects_budget similarly borrows its temporary
+(error,None). The real reserve cause stays alive through the mapping and drops
+normally afterward. No Clone/Box/helper/trait or suppression is selected.
+
+SELECT these literal prospective work fixes in the SAME existing functions:
+- supplied_value_fields changes arity1->2 and uses the exact independent return
+  lifetime: supplied_value_fields<'a>(operation:&'a Operation,
+  charge:&mut ValueEffectsCharge)->Result<[Option<&'a[u8]>;3],E>.
+  The returned operand slices borrow ONLY operation; charge's short mutable
+  borrow never constrains them. The caller's existing prepay1 owns dispatch.
+  Inside each existing arm, BEFORE as_deref, spend1 for Create/Transition/
+  StartAndClaim/Cancel, spend2 for Complete/Fail/Retry/RetryWithPolicy, and0
+  such visits for ExtendLease. Unsupported dispatch does not invent a visit.
+- step.rs A90 preconstructor spend1 becomes5: descriptor construction1,
+  THREE unconditionally reached fields.map(is_some) Option examinations3 and
+  actual terminal-state classification1. These were not free descriptor
+  metadata. Keep the same mask/state/value semantics and borrowed operands.
+- scan.rs A173/A216 preceding count spend1 becomes2, BEFORE checked count and
+  output.as_deref_mut. The latter Option is reached EVEN in the count pass
+  when output is None. Capacity and push retain their separate existing fees.
+- A89/A136 reserve call prepay1 becomes3 BEFORE entering reserve_effects2:
+  repeated checked R multiplication1, byte-cap comparison1, reserve transition1.
+  The helper is not an undeclared single opaque cohort. Its one actual
+  try_reserve_exact and real ReserveFailed cause remain unchanged.
+No new function, model, cache, frame, file, test, mutable public view or predicate
+is selected. The only added declared name is the one private type alias.
+
+SELECT default work constants64 BASE /96 ITEM /4 ENCODED; ONLY ITEM changes
+from64 to96. PERF's complete actual-function census, checked against these
+source paths, gives the corrected maximum:
+Let a<=2 be source as_deref visits and s<=a actual supplied fields per real row.
+value_effect fixed22+a+s<=26 plus2*Li compared operand bytes. Atomic count/
+emission walk overhead5/7 yields<=64n fixed across two passes; independent
+6/8 yields<=66n. Call-wide fixed work85 includes BOTH walk headers, actual
+entry digest64, new context checks and reserve's three selected operations.
+Thus builder<=85+66n+4L with L=sum partition+ID+supplied operand lengths<=E.
+Its default64+96n+4E exceeds this by30n-21+4(E-L)>=9 for valid nonempty n>=1.
+Old64 ITEM is insufficient under this literal tariff without unselected framing
+credit;80 ITEM is also insufficient at n1.87 is the mathematical coefficient
+minimum for this bound, while96 is the selected simple conservative constant.
+No unnamed encoded-frame slack, future free fixed events or reset work account.
+The attached independent inspector has the lower one-pass bound78+33n+2L
+(atomic78+32n+2L); caller limits still apply prospectively, including0/1.
+This is a logical event/byte profile, not one unit for every Rust field/native
+instruction, allocator latency, full frame/E-T/RSS or a measured CPU bound.
+After Root writes the selected delta, actual source/census/format/quality/runtime
+must be rebound; this arithmetic alone is not acceptance of unseen B code.
+
+### Actual A identities, geometry and semantic/ownership findings
+
+All paths below relative to crates/wf-ports/src; full independently hashed A:
+blob.rs82/3025/68d4c97e50c0d594e3c3c99770a4d584f04eb703ac79f204371cc7b695d35b6d;
+blob/publication.rs139/4793/0f4b7ea196447a0c2e6a8a64c0f41b278c2d89685584a1bc8991afdb364ca408;
+publication/scan.rs381/12501/9f01f56e6a2bf90b14d2eca0f68144514037dccb6b144a8ff7adb09ab69963f8;
+publication/step.rs114/4733/00473ab2eb9adbe4ad391164318380e38770546271e9aedbc17bab30cc783610;
+log/record_batch.rs366/13049/03da07bf4c080723f2fa94720adbfc62c81d0ee2060f297d8890695b3cc3fe63;
+record_batch/phase.rs313/11130/4f5812ac7c9368251f942416bb2ef3a668d3890080b5929e23e5ce7aa25db2e8;
+record_batch/fresh.rs232/7515/e8a15436ad0be819b8d540906f1f76922ffd095e34b6e23fc3a245f5ed03c588;
+record_batch/independent.rs161/6222/75b0a90ce7782ef5d61ad0c7d7bae2766ce29b24070223d3f09736497df0be3b;
+record_batch/atomic_start.rs154/5669/09e9fc5213ee05ac2f28a9265055a179277c8d5c9e8076eff54d7e1a29f204b0;
+log/public_mutation/apply.rs157/5710/e483d3e114c92a70460804f1e96929ac5e7e27e6ac4577301496f2e249a8ec68.
+The scan/step names above are children of blob/publication, not extra roots.
+
+Actual A census is67 functions/methods, NOT author's66: facade6 +scan10
+(including spend)+step2+record21+phase10+fresh9+independent4+atomic2+public3.
+Every name is selected: old R0 count50 plus17 additions. This is receipt
+arithmetic, not discovery of an unapproved helper. Maxfile381, maxfn88 at
+value_effect10..97. The four Fresh functions are75/80/83/85LF; lifecycle helpers
+16/29; Complete finish_inspection41. All naturally fit400/100 without packing.
+The private alias adds no function; revised natural census still needs checking.
+
+I actually whole/hash-read the exact production reverse diff in the existing
+validation log9157966+31452/
+05379f9cf71bc736c8c9039b6c9c392f535f40e0576b66554fb68529d07b2590.
+My IN-MEMORY reverse reproduces ENTIRE eight pre-BODY files:
+blob4faf3c4b/publication1e92c1da/record686d964e/phaseb6c45c97/
+freshec3b93f6/independentdd7e64c1/atomic8f0472c4/public5f1d635d,
+with the full256-bit SHA identities already recorded for each R0 beforeimage.
+Both new children are separately complete-read sources. The public three-model/
+five-getter block1842B/eab73b763e179c8e582e7291180b1fd35c4680981075226a29e1483fb8e48b8b
+also independently reconstructs WHOLE R0 publication2566/1e92c1da with the saved
+old import/docs/rejector tail. Model fields/traits/privacy are literal, not a
+similarity claim. Blob's private export inverse alone removes120B->whole4faf.
+All unselected wire/intent/staging/reducer functions are preserved by the actual
+diff. No encoder/catalog/storage/expiry/routing feature was added.
+
+Source checks found the selected semantic cut implemented correctly apart from
+those explicit work omissions:
+- validate_effect_entry binds actual next-entry prepared digest to decoded,
+  supports exactly1/5/6/7, nonempty items and singleton public/V7, and the actual
+  PublicMutation root. No digest recomputation or invented source authority.
+- Atomic rows stay input-aligned; independent iterates results().enumerate(),
+  paying Err visits and retaining holes, never final_indices/history enumeration
+  indices. Correct source partition/ID, supported operation family, write+
+  history+Changed shape, history kind/version and supplied postimage bytes are
+  checked. LegacyNoop/NotEligible with no write/history produce no row; malformed
+  shapes refuse. Claim/Reclaim/StepContinue stay unsupported; V7 alone accepts
+  StartAndClaim. ExtendLease is a real zero-mask history. Cancel error is mapped
+  from its actual error field; Complete/Fail/Retry retain correct p/r/e order.
+- Some(empty) and equal supplied values remain supplied. Omitted old payload/
+  result/error contents are never scanned. Byte comparisons prepay both actual
+  sides after length equality, and usize->u32 is checked before each real row.
+  Only numeric descriptors survive; no input/descriptor borrow in the owner.
+- Complete semantic census finishes BEFORE actual R/F arithmetic and exact
+  I+F+R check; only representable workspace refusal returns Some(attempted,max).
+  Arithmetic/work/semantic/reserve errors use None. k0 still checks F before
+  returning None, with no row reserve. Positive k gets ONE fallible exact
+  reserve and pushes behind capacity checks, preserving allocator>=requested
+  rather than capacity==requested. Same immutable predicate drives pass2;
+  emitted==count is verified. Charge stays continuous across both passes.
+- Public inspector checks the ATTACHED existing owner, does not allocate a new
+  result, and returns its plan-only borrow after the decoded verifier drops.
+  Missing owner on a nonempty real history returns UnsupportedProfile; empty
+  attachment or attached owner on Complete is InvalidChanges. Public byte cap
+  is actual R only, separate from work; no-history None permits cap0 with work.
+- All four producers build before the same explicit drop group. Header3 and
+  response3 cohorts move, never clone. V5 late E+B+H+531+A+F+R and other three
+  E+B+H+512+S+A+F+R are checked before response allocation. Old D/I admission
+  remains upstream in unchanged fresh::inputs. Response versions1/1/4/2 and
+  response encode -> outcome-expiry check -> RetainedOutcome validation -> one
+  Box remain; request-outcome TTL never grants workflow-value expiry.
+- finish_inspection's five callers preserve their old profile/gate/replay checks.
+  Complete admits D+F then drops decoded and constructs None; Fresh keeps the
+  existing boxed handoff. The new field's nonpublic crate::log visibility permits
+  sibling producer construction. GroupApplyChanges can retain the whole owner
+  through existing consumed commit; into_parts remains the later reply drop.
+
+### Exact nine existing-test integrations and actual interim result
+
+I actually whole/hash-read log9137884+15773/
+13ca80610e6bb184bdbb5b477032f3fdc27e689bad10e41b74802dc44bd78ad2.
+My independent in-memory reverse of EVERY hunk reproduces ENTIRE saved nine
+beforeimages: internal atomic tests8976568c, independent main1bbd53ae,
+public wirecdb1ece2, V7 response86742bc1, record maind8188368,
+phases23d50d6e, point2fe84e47, replay3947df83, touched05bedc31.
+Current whole hashes (same order)681dd106/b3db8e5a/2e7d5979/76dd5c9b/
+4a21e998/8c1c6980/ab60fc2f/48fcc46a/b65a1f5a are independently bound.
+The changes are exactly actual size_of imports/F/R success caps, new exact
+one-short cases, two moved value_effects fields and the ninth test's explicit
+RetainedMetadata/RetainedOutcome imports. Every old D/earlierI refusal attempted
+number and original business/version/state/response/replay/pointer/forgery
+assertion remains. No None substitution or clone defeats the six forged retained
+postimage cases. No helper/type/constant/path was added; record main588<600.
+All four NEW target files remain whole-byte-exact e7866225/86acaa03/b401cc55/
+9e8c29f6, so the same eight named oracles are exercised without weakening.
+
+I actually whole/hash-read strict Clippy2034 bytes at9154492/
+ef402e85cda1580c49ce1beaea5707ff6ea7e7c3e586b2b72d6d36459874823f:
+two exact type_complexity diagnostics on builder return types and one
+needless_pass_by_value on effects_apply_error. The private alias/borrow choice
+above addresses these without changing data/error semantics or adding allows.
+Earlier inherited test-import correction is technical integration, not RED.
+
+I also actually whole/hash-read interim target9156790+1085/
+ea5ae9751415deaa7a5f511ac343c16bd07f6385e9cdde4662496ed2c2775b11.
+Own exact source/R0/current name Counters conserve EIGHT identities and flip ONLY
+all eight FAILED->ok:8PASS/0failed/ignored/measured/filtered. Root binds its
+EXIT0/unchanged1602/40f2cc6d inputs. The previously masked publicV1/V7 producer,
+empty/equal replacement, real repeatedComplete/rejection/replay, source holes,
+actual F/R one-short/Complete and nonempty pointer/lifetime tails now finish.
+That result is real behavioral evidence for A, NOT final quality/work acceptance:
+the literal work omissions and three Clippy diagnostics remain OPEN until the
+selected correction is written, source-reviewed and actually validated.
+
+PERF independently whole-read A and found the same Option/state/output/reserve
+omissions, derived the literal85+66n+4L ceiling, and supplied the exact independent
+operation lifetime for arity2. I agree; no cohort/metadata wording exemption is
+used. Its forthcoming bounded written receipt can be read ordinarily. No general
+ACK gate or second architecture cycle is needed: Root has an exact one-alias/
+borrow/arity/charge/96 delta, with no extra helper/model/file/public API/test.
+No final-source acceptance, full workspace/current catalog/hydration, original
+three mappings, native8, Linux, allocation/speed/RSS or full-goal claim follows.
+Finite A review and prospective refinement selection STOP.
+
+Ordinary A written reciprocity closed: I actually whole/hash-read PERF172244+
+13850/d68a3682f87e4321bb1ac73923770fca20ef7c92d2ad24dbb961b5580054097f,
+end186094. It agrees on complete A identities/inverses, exact nine-test changes,
+interim eight repaired statuses, ownership/order and the still-open Option/
+state/output/reserve fees; its actual85+66n+4L census and K96/lifetime precision
+match this exact selection. No disagreement remains and no additional appendix/
+ACK loop is needed. Root's subsequently stopped B is a NEW actual source delta,
+not retroactively accepted by the interim A result or this reciprocal read.
+
+### NEXT actual corrected BODY B: exact delta accepted; one existing-test premise corrected
+
+After reading the published A review/selection, Root recorded adoption BEFORE
+creating the one private alias or applying the fee/borrow changes, formatted
+23102 and returned stable B custody. I read the actual revised scan/step and
+all changed mapper/caller sites. Own WHOLE-file inverse of EACH changed B path
+reproduces its complete A hash, not just selected similar lines. Blob/facade
+remain byte-literal. No code/workload/Git/shared mutation ran here.
+
+Actual changed B identities relative to crates/wf-ports/src:
+- blob/publication/scan.rs383LF/12513B/023bce5f95041ba09df99339e0a45c347f57bdf5b45ba6977be5678576348c5e;
+- blob/publication/step.rs139/5220/68ffc12cedf2d50b063bd306c17c0c2e83e63d6560ed7e8b5293cd43bf35bbb9;
+- log/record_batch.rs367/13082/f3378c2683bbbd4570b754516c1211184befd738f6675a68dfea4a9b9becbd67;
+- record_batch/phase.rs313/11146/81251065a6b58df2fe8371a1c3efaf77a23dd6ae338065d0f436281cd7aa67c5;
+- record_batch/fresh.rs232/7516/a16912474a5f8687db2f0fe1b901a638bb2c5f41f6b8dee6d4e385fd61809412;
+- record_batch/independent.rs161/6238/d9aed639fffcf391543d1cf11f72e95af9293230cbcbc3dc66cac2688e8512d1;
+- record_batch/atomic_start.rs154/5685/de444ddb2f940f9485fb3c8a29e7b525b3e2069871d6e57d38d33d02efea765b;
+- log/public_mutation/apply.rs157/5726/5e5cd1835e4a79204e16e8feb472141324f1e0bebf6e4c08bab63f26dbddab66.
+Their whole inverse identities are respectively A9f01f56e/00473ab2/03da07bf/
+4f5812ac/e8a15436/75b0a90c/09e9fc52/e483d3e1, with full hashes bound in A.
+The remaining blob68d4c97e/facade0f4b7ea1 are still literal. Thus prior complete
+A source inspection plus the actual B delta covers all ten current sources.
+
+The delta is EXACTLY the selected alias, borrow signatures/closures, operation-
+only helper lifetime, four categories of missing fees and ITEM96. In detail:
+scan18 has PRIVATE ValueEffectsBuildResult, returned by only the same two
+builders; no model/error/owner change. Mapper borrows its tuple and copies only
+the two numeric bounds. Four inline producer closures borrow their local owned
+error; fresh budget borrows its temporary(error,None). Real cause lifetime/drop
+and all existing error diagnoses remain intact, with no Clone/Box or allow.
+step99..139 has explicit 'operation tied ONLY to &Operation; charge is a separate
+short borrow. Its1/2 arm prepayments precede EVERY actual as_deref, including
+None; ExtendLease has0. Caller dispatch1 remains before entry. The descriptor
+site90 prepays5 before its three Option examinations/state classification and
+construction. Both walk count sites175/218 prepay2 BEFORE checked count/output
+Option, including the count pass's reached None. Both reserve calls91/138
+prepay3 BEFORE multiplication/cap/reserve. One charge persists across both
+semantic/build passes; none of the predicates, byte comparisons, row ownership,
+real-R exact workspace checks or source error ordering changed.
+
+Actual B census remains67 functions and now ONE selected private result alias;
+maxfile383 and maxfn88. Step helper grows only to41LF. No synthetic helper,
+public API/model/variant/file/test change, packing or geometry waiver occurred.
+The corrected actual census85+66n+4L is covered by64+96n+4E with margin>=9 for
+valid n>=1/L<=E, as derived in the preceding exact selection. Inspector remains
+one-pass<=78+33n+2L. No remaining separately reached unpaid event was found in
+this bounded component review. Logical-work completeness does not imply total
+CPU/frame/allocator/initial-R/full E/T or physical-memory completeness.
+
+I actually whole/hash-read the COMPLETE corrected technical7 record at
+log9189419+8337/dfad5736c7507190320087ffdbd2b7e0cbc50588b6715b99502afe4ecc78430a,
+end9197756. Own parsed footers are7xEXIT0/UNCHANGEDTrue; every header binds
+1602/03b6caa145f8f758f644a88f2dce689cc7988092e7208739ea5bf0cec59f05d2.
+Fmt/check/strictClippy/architecture53/reference480/progress120132550/diff all
+pass on actual B. No former lint is relabeled behavior. I also actually read
+corrected target9197985+1084/
+832a4a38ee46a22098d0b67bf79f252a9138cf1dcba5aa2d04358771b2d93532,
+end9199069, with header/footer:8PASS/0failed/ignored/measured/filtered,
+EXIT0/UNCHANGEDTrue. Own Counter preserves all eight R0 names and flips only
+the original eight FAILED->ok. Both fee-fixed source and all former masked
+semantic/cap/pointer/profile tails are now actual scoped evidence, unlike A's
+interim fee-defective pass. Broader all-ports/workspace acceptance is separate.
+
+### Explicit supersession of one wrongly assumed test-integration row count
+
+The subsequent actual all-ports run terminated101 at
+public_mutation/wire.rs142, the newly added one-short assertion. I read its
+actual diagnostic and the stable original setup: main caller84 constructs
+COMPLETE, and decide_missing's touched-current157..163 is None. It produces
+no accepted history, so actual k0/R0. Our earlier generic F+oneRow adjustment
+in THIS single existing test was wrong; I accepted that inference too quickly
+when reading the patch without following its original fixture all the way.
+PERF independently confirms the same premise. This is a test integration error,
+not a reason to change the correct B no-history result or manufacture a create.
+
+Select the exact minimal correction in EXISTING
+crates/wf-ports/tests/public_mutation/wire.rs ONLY:
+owner_bytes=size_of::<Option<RecordBatchValueEffects>>() (F alone), remove the
+now-unused RecordBatchValueEffect import, and keep the same one-short, exact
+success and retained[2,0,0] assertions. Keep every old decoder D and earlier I
+refusal attempted number. No setup/operation/current observation is changed;
+no new helper/type/constant/file/test, huge cap or assertion removal. The actual
+bound is I+F for this missing Complete, not I+F+R. Positive-row publicV1 is
+already covered by the unchanged selected eight-case creation loop; it must
+not be substituted for this genuine zero-row predecessor scenario.
+
+This supersedes the preceding blanket statement that ALL nine derived cap
+integrations were sound: the other eight exact diff/beforeimage checks remain,
+while this one formula needs actual-k correction. The original current fields,
+wire goldens, missing Complete response and control assertions stay intact.
+Root alone applies it after authoritative all-ports termination and binds the
+new whole test hash/results. The failed whole run is preserved, not called a
+passing all-ports packet or hidden by filtering. No production fee/model/API/
+wire or owner change is requested. Actual B production source has no remaining
+scoped defect; wider test/runtime closure awaits that exact correction and
+ordinary complete execution. No final full-suite/product parity is inferred.
+
+Root/PERF were directly notified of the exact B identities, whole inverses and
+this test-premise correction. Ordinary written B reciprocity can close when
+its bounded receipt is available, without another approval/append-ACK loop.
+Original HistoryValues3, real catalog/publication/read/retention/recovery,
+Linux/native8 and whole-goal gates remain unearned. B review STOP on that scope.
+
+Ordinary B written reciprocity closed: I actually whole/hash-read PERF186094+
+7249/76e5e516eb1ebc3acca9e70c4d50bf9676af6529e93725d1008bba5e2304d251 and
+193343+3419/354c3d334ce8fa5e72f992d9649de2a249e074238ff5a37fd45e90ae9ab0bf95,
+end196762. Its full B delta/inverses/67-function census, exact charge/lifetime/
+96 proof, actual technical7 and corrected8 Counters agree. Both reviews
+explicitly retract the mistaken one-row public-wire cap premise and require
+F-only for missing Complete, preserving all original assertions. No production
+or resource-contract disagreement remains; that existing-test correction and
+wider actual execution belong to Root. No further append/ACK cycle is needed.
+Finite B source/result review STOP.
+
+### VALUE-CAPTURE decision: resolve four policies, select the necessary full-donor R0 first
+
+This is a NEW bounded precreation decision, not reopening accepted numeric BODY B.
+No source/model/file/test/ADR/policy/workload/Git change was made; only this note.
+I actually whole/hash-read DOMAIN16070+8220/
+846a4a7a63b3501e1678b8c5818fd67f5978367685b3d613fbd9ce1236a8a5ec,end24290,
+and re-read the stable capture, policy projection/loader, clock primitives and
+transaction/recovery evidence. The full endpoint remains actual SAME consumed
+transaction bytes+current+EVERY history refs, ordered owned persisted reads,
+reopen/snapshots and genuine terminal lifecycle; no codec-only endpoint is chosen.
+
+A PRECISE necessary predecessor is visible in current source, not an external
+input shortage. LoadedRecordBatch::load_policies174..238 already retains the
+FULL StoredPolicyValue under the exclusive transaction. But its projections
+are intentionally ONLY mode/retry: complete/record_projection.rs177..193 sets
+state/root retention to default and max_active=None; original.rs79..95 does
+the same. Passing those snapshots to capture_lifecycle would silently capture
+the wrong TTL/state/default policy. Therefore the next R0 must operate on the
+retained full COMPLETE or ORIGINAL donor, not broaden/relabel the old mode
+projection or construct a fake current-policy absence. This is concrete work
+needed before real stored capture/publication, not another optional audit.
+
+Actual reusable source: workflow/active/capture.rs221/47d4197e provides
+LifecycleDefaults, LifecycleOverrides, CapturedLifecycle and capture_lifecycle;
+policy/definition.rs preserves type/state retention; StoredPolicyValue is full
+Complete(Box<...>) or Original(Vec). create/terminal command types carry no
+capture. Existing TimestampMillis explicitly certifies no clock authority;
+CommittedTime is committed data, not a live read clock. ports/clock.rs is still
+a three-line reservation; ManualClock is test input, not an implemented port.
+These distinctions prevent four shortcuts that would otherwise produce green
+but source-incompatible storage tests.
+
+#### Binding/capture input and policy-revision decision
+
+Select creation capture from full borrowed policy data while the SAME transaction
+revision is held. The storage driver will use the actually returned
+StoredPolicyValue for each workflow type, not a caller substitute or a later
+policy lookup. None means actual observed installed-policy absence; an operational
+lookup/profile failure is never converted to None. No artificial generation is
+invented for original backing: the exclusive revision/control and full retained
+donor establish the read association. The capture result is ordinary mathematical
+data until the real producer/consumed transaction persists it.
+
+Reuse LifecycleDefaults/Overrides/CapturedLifecycle rather than invent another
+TTL scalar or reuse ActiveRecord blindly. New accepted creations resolve
+configured defaults -> type -> initial state -> explicit command in the existing
+source order, retaining max-active/hot/complete-history fields as well as TTL.
+The future committed VALUE command profile MUST preserve override PRESENCE and
+trusted configuration/default identity plus requested time separately from its
+trusted prepared/apply time. Old V1/V5/V6/V7 bytes cannot acquire new overrides by
+an optional unlogged sidecar or by inspecting payload prefixes. Source-compatible
+input normalization and that explicit command/profile registry must precede
+admitting such public options. Existing command Vecs remain logical binaries.
+
+CapturedLifecycle's validated new-creation TTL is positive. That does NOT license
+rejecting all source restored records with absent/nonpositive capture: future
+ValueRetentionKnowledge remains LegacyUnavailable versus Known(Option<ttl>),
+where authenticated known absent/nonpositive source capture is Known(None),
+not default TTL or unavailable. A legacy FWSR1 row with no capture field is
+LegacyUnavailable, not proof of Known(None). Keep known no-expiry compatibility
+outside the positive new-creation constructor. ActiveRecord's terminal-iff-
+deadline guard must NOT be imported as a universal invariant. Source terminal
+stamp math stays captured TTL + clamped max(requested,actual apply witness),
+with no new value expiry for authenticated no-positive-capture; never outcome
+TTL, present policy, caller time alone or a fabricated timeout capture.
+
+#### Registered layout and migration decision
+
+First value-capable layout is an EXPLICIT fresh capability, not an in-place
+populated legacy upgrade. Preserve every old FWSS1..6/FWSP1..3 codec/ID/profile
+and old readers exactly. Opened legacy data exposes LegacyUnavailable value
+knowledge; it cannot service a new known-binding writer by treating None as
+KnownEmpty. New genuine record absence under the guard can establish KnownEmpty
+at birth. Populated legacy conversion is refused until a real retained replay/
+backfill contract is selected; discarded history cannot be reconstructed from
+current inline bytes. No range-only family acceptance or guessed family8/layout7
+number is selected here. The later VALUE-DURABLE R0 must freeze one complete
+key/frame/profile/origin/snapshot registry and preserve it through both policy
+publication variants, capture/copy/receive/install/restore and pinned cohorts.
+This is a concrete no-silent-upgrade policy, not an indefinitely open choice.
+
+#### Authenticated read-clock decision
+
+Value expiry uses ONE server-owned source-compatible HLC/read-time observation
+per ordered batch/session, captured before row iteration under the trusted
+application/storage composition. The public read request has NO read_now field.
+Reuse TimestampMillis as the numerical result, not as a token proving origin;
+old committed control time cannot replace current read time. Clock failure is
+operational, never Missing. The future read session owns scope/control/revision
+and this one time observation, so duplicate slots cannot straddle clock samples.
+No clock is consulted by deterministic reducers or by recovery validation.
+The future ports clock contract must be implemented by the actual server clock;
+ManualClock can back an explicitly scoped test adapter but is not itself proof
+of production authority. Do not expose a default method which accepts an arbitrary
+caller timestamp and calls it authenticated. Strong/quorum barrier, applied
+position and real routing remain separate M2/M3/application gates.
+
+#### Expired/missing-row recovery decision: keep evidence, do not guess
+
+Select retention of expired LOCAL generated catalog rows while any authoritative
+current/history binding references them. Reads hide them using the authenticated
+read clock; expiry by itself does NOT physically erase the bytes. Recovery can
+therefore validate a known Versioned(local) ref against its actual row/envelope
+without knowing current wall time. A missing required local generated row is
+Corrupt, not silently 'probably expired'. Explicit Opaque/external refs preserve
+their source availability semantics and may truthfully be missing; do not infer
+local ownership merely from a parseable key spelling. LegacyUnavailable makes
+no positive local-ref assertion. KnownEmpty is positively represented.
+
+Physical explicit cleanup must remove referencing authoritative bindings/history
+first (bounded phases/continuation), and delete a value only when no remaining
+local binding in that cohort requires it. Old snapshots retain their OWN coherent
+row cohort; live cleanup cannot destroy an anchor/received snapshot's payloads.
+Do not introduce tombstones in the first profile: retaining the actual row until
+reference-safe deletion supplies the needed evidence with fewer models. A later
+physical TTL collector/tombstone optimization would need its own complete
+receipt/evidence/retained-cohort design before source creation. This supersedes
+my earlier unselected tombstone suggestion, not an implemented format change.
+Unexpired or expired orphan data still requires bounded explicit lifecycle/GC;
+there is no immortal-value or free disk-growth claim.
+
+Preserve the already hash-bound source three-way distinction: passive terminal
+record removal leaves old payload readable; explicit retention cleanup deletes
+old payload plus new terminal value/history/state; rewind preserves refs and
+rewrites SAME encoded bytes/active expiry where the real source path does so,
+skipping missing/nonbinary values rather than resurrecting them. Source tests
+and the actual retention helper paths must determine the precise cleanup phase/
+continuation/owned-member rules. A simplistic cascade or immutable-expiry rule
+is forbidden. These are acceptance obligations of the eventual lifecycle route,
+not permission to replace its public/typed/rewind cases with a nonterminal test.
+
+#### Exact next R0 creation batch: STORED-CREATION-LIFECYCLE1
+
+Select ONLY the following FOUR paths for a later Root release after current
+full validation/SAVE:
+1. EXISTING crates/wf-domain/src/policy/complete.rs: private child declaration
+   and reexports only (current320LF, no existing body/model edits).
+2. NEW crates/wf-domain/src/policy/complete/stored_lifecycle.rs.
+3. NEW crates/wf-domain/tests/stored_lifecycle/main.rs.
+4. NEW crates/wf-domain/tests/stored_lifecycle/fixtures.rs.
+No storage/log/command/version/frame/clock/registry/policy/ADR helper shell is
+created in this R0. Existing complete-module purity applies; Root owns any actual
+technical classification feedback, not a blanket policy allowance.
+
+EXACT public models in the new child:
+StoredLifecycleCaptureInput<'input> with public workflow_type:&'input[u8],
+initial_state:&'input[u8], overrides:LifecycleOverrides, defaults:LifecycleDefaults.
+Derive Clone/Copy/Eq/PartialEq only, matching the existing scalar inputs; no new
+Debug implementation on existing types or constructor/authority token.
+StoredLifecycleCaptureError, derive Debug ONLY, exactly
+Policy(CompletePolicyEncodingError) and Capture(ActiveValueError).
+Do not collapse operational profile/work/byte/allocation into a business capture
+error, or add Display/Error/Clone just for test '?'. Existing backing types and
+CapturedLifecycle are reused unchanged; no seventh value model/view is added.
+
+ONE exact entry API (arity5):
+capture_stored_creation_lifecycle(
+ policy:Option<&StoredPolicyValue>, input:StoredLifecycleCaptureInput<'_>,
+ schema:PolicySchemaLimits, charge:&mut PolicySchemaCharge,
+ maximum_temporary_bytes:usize
+)->Result<CapturedLifecycle,StoredLifecycleCaptureError>.
+There is no borrowed output: after the policy/index drops, the returned Copy
+capture remains valid. Complete and original full data must supply actual root/
+selected-state lifecycle fields; no mode/retry projection or unrelated field
+normalization may replace them. Original unsupported context/profile remains
+operational Policy(...), never corrupt/absent. Caller scalar rejection remains
+Capture(...). This is a creation-only resolver, not a record/retention authority.
+
+R0 body is literally unconditional
+Err(StoredLifecycleCaptureError::Policy(
+ CompletePolicyEncodingError::UnsupportedPolicyProfile)).
+NO reader, field scan, bounds/charge loop, source inspection, helper, default
+resolution or partial positive implementation in R0. After genuine compiled
+RED/SAVE, the exact private BODY read/field/capture helper roster is selected
+before any additional name is created; this is not blanket parser permission.
+Existing capture_lifecycle/old projection bodies remain frozen in R0.
+
+Resource contract for later BODY: one continuous supplied PolicySchemaCharge,
+matching schema profile, no refund/reset; full backing stays the caller's owner.
+Before any temporary decode/index allocation, admit the checked conservative
+65536+256*encoded_backing_len logical temporary envelope for Some policy, reusing
+the existing original loader profile rather than allocating a second policy
+snapshot/map silently. None needs no backing index. The explicit temporary cap
+is distinct from source field validity; a valid original donor at cap0 refuses
+before its decode. Copy only scalar lifecycle fields/return value; no retained
+source borrow or output Vec/Box. Actual decoder/verifier allocation and work
+must be audited against that chosen bound after BODY; it is not a native-frame,
+allocator capacity/RSS/CPU or initial-R/full E/T proof. No OOM harness/probe.
+
+EXACT five new #[test] names in main.rs, no extra cases:
+stored_lifecycle_captures_complete_policy_precedence;
+stored_lifecycle_captures_original_policy_without_mode_projection_loss;
+stored_lifecycle_distinguishes_absence_type_and_profile;
+stored_lifecycle_admits_work_and_temporary_owners_before_decode;
+stored_lifecycle_capture_survives_backing_drop.
+They begin with valid positive expected capture, so the callable rejector yields
+genuine assertion RED; later refusal tails are honestly masked until BODY.
+Goldens are literal default/type/state/command results, not expected values
+computed by the new SUT or by invoking capture_lifecycle as an oracle.
+Use defaults TTL7000/hot2/history10, max-hot100/max-history1000;
+type max-active5000/TTL11000/history30; initial q-state TTL22000/history40;
+command override6000/TTL33000/history50/hot4. Check absent-policy defaults,
+type fallback for another state, command precedence, explicit active infinity,
+hot0 and real clamping/source validation, wrong type/unsupported original lane,
+work/cap refusal and scalar output after BOTH backing owners drop. Raw original
+fixture must carry the actual full root/state fields, not a mode-only snapshot;
+complete/original setup must be independently accepted by existing constructors/
+readers before the first new-function assertion. No HistoryValues case mapping.
+
+EXACT test-only fixtures: one TestResult<T=()> alias to
+Result<T,Box<dyn std::error::Error>>, NO constants, and TWO functions:
+input()->StoredLifecycleCaptureInput<'static>, returning the named borrowed
+static request/default/override cohort; policy_pair()->TestResult<
+(StoredPolicyValue,StoredPolicyValue)>, constructing real complete backing plus
+its independently literal original ETF donor. Neither fixture invokes the new
+SUT, computes expected outputs, returns storage success or creates an authority
+model. New SUT Debug-only errors are matched explicitly. No shared fixture import,
+#[path], dependency, extra type/model or fixture file is authorized. Natural
+source<=400/test<=600/function<=100; if the complete draft needs another helper
+or split, consult its exact responsibility BEFORE creation, never pack/drop cases.
+
+This necessary predecessor does NOT count as the catalog endpoint. Its direct
+following integration is under the existing real LoadedRecordBatch guard:
+resolve each genuine birth from the retained FULL policy/default/command inputs,
+carry immutable capture on the same accepted plan, and persist it with current+
+EVERY intermediate history refs/catalog bytes at consumed commit. The explicit
+new command/current/history/value registry, actual ordered read clock/session,
+reference-safe cleanup/rewind and closed reopen/snapshot matrix must be selected
+and implemented together before value capability activation. No further detached
+inspection API or an invented always-positive TTL may substitute. Full typed/
+shared/routed/public setup and original3 mapping wait for the actual endpoint.
+
+#### Ordinary tenth existing-test correction while this design is prepared
+
+Root's failed full-run report is preserved (922PASS/1FAIL,87 summaries; not
+full GREEN). Actual-read current storage test public_mutation.rs535LF/18500B/
+783ce6c566e5a65bfbf09d5824d42f72c5d141111408c988d2ab73a66567943d:
+workspace_limits361..390=30LF; earlier missing_rejection348..349 explicitly
+requires empty writes/history. Its old exact success201330580 now needs F ONLY,
+consistent with the already corrected missing Complete port case. Accept Root's
+same-file import size_of/Effects and local owned=201330580+size_of<Option<Effects>>;
+retain all three old tuples and add (oldI,owned,oldI,true) and
+(owned-1,owned,owned-1,true), exact success at owned. Preserve call-order last
+'record', assert_no_publication, response[2,0,0] and committed checks; optionally
+assert the already-established empty writes/history at success. No R, huge cap,
+helper/type/constant/wire/fixture or new path; geometry has ample30/535 headroom.
+This is ordinary Root-only test integration after terminal, not a production or
+clock/capture-model change, and creates no gate on current validation.
+
+Four blocker policies are now concrete and the first exact R0 is named. No
+external user input is missing: the required full policy data exists; the gap
+is the lifecycle bridge and later explicitly registered persistence integration.
+No source/artifact release, family number activation, storage/expiry authority,
+original3 credit, Linux/native8/full-workspace/full-goal or measured gain is
+inferred. Root must adopt/release after the current checkpoint, then genuine
+R0/save before BODY. Finite next-decision STOP; no acknowledgement loop.
+
+### STORED-CREATION-LIFECYCLE1: exact type-error and variant-level temporary refinement
+
+Finite two-point precreation clarification of322206+17067/6bc46ca5 ONLY. The
+FOUR paths, TWO models, ONE literal rejecting API, FIVE test names, TWO fixtures
+and one TestResult alias are unchanged. No helper/model/file/source/workload/
+Git/clock/layout/profile activation was created or released.
+
+1. SELECT the new bridge's exact reached WRONG-WORKFLOW-TYPE lane for BOTH full
+   backing variants:
+   StoredLifecycleCaptureError::Policy(
+     CompletePolicyEncodingError::Schema(PolicySchemaError::InvalidAuthority)).
+   Do NOT classify this stored-donor identity mismatch as
+   Capture(ActiveValueError::WrongPolicyType). Actual complete/restoration.rs
+   90..124 validates the full donor and returns InvalidAuthority at121..122;
+   original projection/read111..126 returns the SAME schema diagnosis at122..123.
+   The new tests supply valid other inputs and enough schema/temp allowance to
+   reach this binding check. This selects its lane without reordering an earlier
+   profile/work/byte refusal or freezing simultaneous bad-default precedence.
+   Capture(...) remains for reached scalar/default/override capture failures.
+   Existing direct capture_lifecycle's own WrongPolicyType behavior is unchanged;
+   no error variant, public model or trait implementation is added.
+
+2. SELECT ORIGINAL cap0 predecode refusal as the R0 resource oracle. Leave
+   COMPLETE cap0 behavior UNASSERTED until its exact BODY temporary route is
+   selected. This supersedes the earlier blanket Some-policy temporary-minimum
+   wording: load.rs208..232's65536+256E profile is the ORIGINAL raw decode/index
+   branch, not an existing Complete decode cost or a mandatory minimum for every
+   Some backing. None requires no backing index. Complete.data() already borrows
+   typed max-active/type/selected-state retention fields; full validation and
+   lookup still consume schema work even if they create no temporary owner.
+
+Source precision: capture_lifecycle126 ALREADY borrows Option<&PolicySnapshot>.
+An existing correct snapshot needs no clone. CompletePolicyData is a DIFFERENT
+borrowed type, so there is no direct cast; the old mode/retry projection still
+erases required fields. Prefer a later explicitly selected shared scalar-core
+responsibility INSIDE existing capture.rs, preserving its current public entry,
+so Complete can supply borrowed identity/Copy layers and Original can pay ONE
+index then supply the same layers. Do not construct duplicate snapshots/full
+Complete clones merely to adapt the signature. That helper's name/visibility/
+body roster is NOT authorized now; it follows genuine R0 SAVE and separate
+exact BODY consultation. No new trait/model is implicitly required.
+
+The R0 resource test must therefore exercise a VALID Original donor at cap0,
+with enough work to reach the temp gate, and require the Policy byte-limit lane
+before its decode. It may not demand Complete-cap0 refusal or treat zero temp
+as zero validation work. Actual prospective owner/work proof remains the later
+complete BODY review; returned refusal alone is no allocator instrumentation.
+All other literal defaults/type/state/command/scalar-lifetime oracles remain.
+
+I actually whole/hash-read PERF204553+3446/
+e1f22c57adab751db9f6da827e156d220c5c6c048504bc2fb5551b9be3a9e0a6,
+end207999, and re-read the exact restoration/original identity checks plus
+capture126..144 and loader194..214. No disagreement remains. This is the exact
+ordinary contract refinement Root requested, not a new design/ACK cycle or a
+release of source. Current component's reported full1088/all11 result is a
+separate Root checkpoint; no new feature credit follows. Finite STOP.

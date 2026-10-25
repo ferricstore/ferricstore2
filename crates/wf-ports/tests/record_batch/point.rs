@@ -1,6 +1,7 @@
 //! A truthful retained point/cohort observation; no current workflow authority.
 
 use std::collections::BTreeMap;
+use std::mem::size_of;
 
 use wf_domain::workflow::Operation;
 use wf_domain::workflow::batch::{ApplyError, GroupView};
@@ -9,6 +10,7 @@ use wf_domain::workflow::indexed::IndexedGroupView;
 use wf_domain::workflow::request::gate::{GateView, PointGateView};
 use wf_domain::workflow::request::indexed::IndexedRequestView;
 use wf_domain::workflow::request::{RetainedMetadata, RetainedOutcome};
+use wf_ports::blob::RecordBatchValueEffects;
 use wf_ports::consensus::PreparedOperation;
 use wf_ports::log::{
     CodecLimits, DecodedRequest, RecordBatchApplyDecision, RecordBatchApplyError,
@@ -60,6 +62,7 @@ fn complete_class(control: ControlState, original: &RetainedOutcome, class: u8) 
     })?;
     let encoded = encode_record_batch(value, limits(), WORKSPACE)?;
     let workspace = if class == 1 { 16_780_764 } else { DECODE };
+    let workspace = workspace + size_of::<Option<RecordBatchValueEffects>>();
     let query = scope()?;
     let result = inspect_record_batch_point(
         prepare_record_batch(encoded.as_bytes(), limits(), workspace)?,

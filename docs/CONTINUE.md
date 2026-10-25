@@ -1,19 +1,21 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-25. The active full-completion goal remains unfinished.
+Updated: 2026-10-26. The active full-completion goal remains unfinished.
 GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current value-provenance increment has a compiled callable baseline:
-**zero passing and eight failing tests**, all reaching the intended missing
-inspector behavior after real producer premises. All seven technical checks
-pass, including strict Clippy and all 53 architecture checks. The forthcoming
-implementation must attach numeric provenance to the same accepted plan before
-decoded inputs are released across the four supported producers. Publication,
-history hydration, original profile coverage and Linux acceptance remain open.
-The latest complete passing workspace checkpoint remains the 1,080-test result
-below; the new baseline is not passing coverage.
+The current value-provenance increment passes **all eight unchanged tests**
+after its genuine compiled zero-pass/eight-failure baseline was saved in
+`57a77a2`. All eleven full-workspace checks pass. Numeric provenance now belongs
+to the same accepted plan before decoded inputs are released across all four
+supported producers. Original operation indices, omitted versus supplied empty
+values and intermediate versions are preserved. The inspector borrows that
+owner; rows receive one fallible reservation after semantic and resource checks.
+Architecture and performance reviews independently accepted the implementation
+and exact preservation of all earlier test identities. Full stored-policy
+lifecycle capture is the next predecessor; publication, history hydration,
+original profile coverage and Linux acceptance remain open.
 
 The six HistoryEntry Rust tests now pass after the callable zero-pass/six-failure
 baseline and tests were saved in `a8e100b`. All eight focused checks pass, including
@@ -185,16 +187,16 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full passing Rust checkpoint passes **1,080 tests across 98 targets
+The latest full passing Rust checkpoint passes **1,088 tests across 99 targets
 on macOS**, with zero failed, ignored, measured or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven checks pass:
 formatting, workspace compilation, strict Clippy, warnings-denied documentation,
 all 53 architecture checks, reference/progress validation, four cached offline
-dependency-audit categories and whitespace. All 1,595 captured inputs stayed
+dependency-audit categories and whitespace. All 1,602 captured inputs stayed
 unchanged, excluding only the three active HistoryValues review notes. Exact
-target/executable/name/status comparison preserves all 1,071 preceding tests and
-adds only the eight value-byte cases and their architecture regression; the only
-new target header is the grouped value-byte integration target. Independent
+target/executable/name/status comparison preserves all 1,080 preceding tests and
+adds only the eight accepted-plan value-provenance cases; the only new target
+header is the grouped workflow_value_effects integration target. Independent
 performance review reproduces this complete comparison. Both existing benchmark
 correctness-smoke sections are byte-identical,
 validating their five and ten profiles twice. All six documentation examples and
@@ -2187,6 +2189,11 @@ The user also requested a dedicated Elixir bug-fix owner. GPT-6.1-sol/max
 initially clean `/Users/yoavgea/repos/ferricstore2-elixir-bugfix` worktree at
 the pinned66586c5 commit, on `codex/workflow-elixir-bugfixes`. Its findings and
 future reproduction/fix review live in [the owned bug-fix note](reviews/workflow-completion-elixir-bugs.md).
+The reviewed nonempty-binary owner guard and its two regression declarations
+are now saved locally in `6605cb4b`, above `7c351783`. The saved pair preserves
+the earlier pure fifteen-comparison green evidence and both new passing native
+cases; its broader native run still has eight physical EPERM failures. Saving
+the reviewed pair adds no fresh full-project, Linux or native-profile result.
 The dirty original and frozen Rust reference baseline remain unchanged; no bug
 is claimed reproduced or fixed by checkout preparation.
 

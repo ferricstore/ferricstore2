@@ -13,10 +13,13 @@ use wf_domain::workflow::indexed::{
 use wf_types::identity::GroupId;
 use wf_types::version::TimestampMillis;
 
+use crate::blob::value_effects_bounds;
 use crate::consensus::{PreparedBatchItem, PreparedOperation};
 use crate::log::{CodecError, CodecLimits, DecodedRequest};
 
-use super::{RecordBatchApplyError, admit, decoder_bound, product, reserve, sum};
+use super::{
+    RecordBatchApplyError, admit, decoder_bound, effects_apply_error, product, reserve, sum,
+};
 
 type ValueRow<'a> = ([&'a [u8]; 2], usize);
 
@@ -162,6 +165,28 @@ fn inputs<'a>(
     ])?;
     admit(sum(&[bound, additional_live_bytes])?, workspace)?;
     Ok(prepared)
+}
+
+pub(in crate::log) fn value_effects_budget(
+    decoded: &DecodedRequest<'_>,
+    workspace_limit: usize,
+    additional_live_bytes: usize,
+) -> Result<(usize, usize, usize), RecordBatchApplyError> {
+    let items = decoded
+        .request
+        .operation
+        .mutation_items()
+        .ok_or(CodecError::UnsupportedTag)?;
+    let (_, work) = value_effects_bounds(decoded.encoded.len(), items.len())
+        .map_err(|error| effects_apply_error(&(error, None)))?;
+    let live = sum(&[
+        decoder_bound(decoded.encoded.len(), items.len(), decoded.limits)?,
+        product(items.len(), 192)?,
+        256,
+        decoded.limits.admission.decision_bytes(),
+        additional_live_bytes,
+    ])?;
+    Ok((live, workspace_limit, work))
 }
 
 fn stage_values<'a>(

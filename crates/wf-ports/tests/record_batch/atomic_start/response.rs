@@ -1,8 +1,10 @@
 //! Actual leased replies, retained matching and separate workspace/field frontiers.
 
 use super::*;
+use std::mem::size_of;
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::request::{RetainedMetadata, RetainedOutcome};
+use wf_ports::blob::{RecordBatchValueEffect, RecordBatchValueEffects};
 use wf_ports::log::RecordBatchApplyError::{Apply, Encoding};
 
 fn check_atomic_postimage(
@@ -233,11 +235,14 @@ fn atomic_start_response_matches_actual_plan_and_option_presence() -> TestResult
 #[test]
 fn atomic_start_workspace_and_response_caps_are_independent() -> TestResult {
     let profile = CodecLimits::new(AdmissionLimits::new(8, 1_248, 1)?);
+    let owner_bytes =
+        size_of::<Option<RecordBatchValueEffects>>() + size_of::<RecordBatchValueEffect>();
     // E129/H4/V48+N8=56; B1248 gives decoder4836/Fresh6532, not late2007.
     for (worker, now, workspace, length) in [
         (b"w\0\xff".as_slice(), 17, 6_531, 114),
-        (b"w\0\xff".as_slice(), 17, 6_532, 114),
-        (b"w".as_slice(), 0, 6_532, 109),
+        (b"w\0\xff".as_slice(), 17, 6_531 + owner_bytes, 114),
+        (b"w\0\xff".as_slice(), 17, 6_532 + owner_bytes, 114),
+        (b"w".as_slice(), 0, 6_532 + owner_bytes, 109),
     ] {
         let result = with_atomic_view(None, |gate, view| {
             let frame =
@@ -255,12 +260,17 @@ fn atomic_start_workspace_and_response_caps_are_independent() -> TestResult {
             };
             Ok(decide_fresh_atomic_start_touched(fresh, view, 0, 100))
         })?;
-        if workspace == 6_531 {
+        if workspace == 6_531 || workspace == 6_531 + owner_bytes {
+            let attempted = if workspace == 6_531 {
+                6_532
+            } else {
+                6_532 + owner_bytes
+            };
             assert_eq!(
                 result.err(),
                 Some(RecordBatchApplyError::Workspace {
-                    attempted: 6_532,
-                    maximum: 6_531,
+                    attempted,
+                    maximum: workspace,
                 })
             );
             continue;

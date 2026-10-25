@@ -1,22 +1,29 @@
 //! One retained inspection, with current indexed authority deferred until Fresh.
 
 use std::collections::BTreeMap;
+use std::mem::size_of;
 
+use crate::blob::{RecordBatchValueEffect, RecordBatchValueEffects, build_atomic_value_effects};
 use wf_domain::policy::InstalledRetryPolicy;
+use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::control::ControlPlan;
 use wf_domain::workflow::indexed::{EntryOrder, IndexedGroupView, TouchedIndexedGroupView};
 use wf_domain::workflow::request::gate::{
     GateDecision, GateView, PointGateView, RequestGate, inspect_point_request, inspect_request,
 };
-use wf_domain::workflow::request::{RequestValueError, RetainedMetadata, RetainedOutcome};
-use wf_types::version::LogIdentity;
+use wf_domain::workflow::request::{
+    ClientIntent, RequestScope, RequestValueError, RetainedMetadata, RetainedOutcome,
+    RetainedStatus,
+};
+use wf_types::identity::RequestId;
+use wf_types::version::{LogIdentity, TimestampMillis};
 
-use super::super::{CodecLimits, DecodedRequest};
+use super::super::{CodecError, CodecLimits, DecodedRequest};
 use super::fresh::FreshAuthority;
 use super::{
     RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, admit, check_decoded,
-    response, sum,
+    decoder_bound, effects_apply_error, response, sum, value_effects_budget,
 };
 
 /// Complete retained classification or an opaque fresh decision input.
@@ -69,7 +76,7 @@ pub fn inspect_record_batch<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace_limit, 5)?;
     let gate = inspect_request(view, decoded.header(log), limits.admission)?;
-    Ok(finish_inspection(decoded, log, gate, workspace_limit))
+    finish_inspection(decoded, log, gate, workspace_limit)
 }
 
 /// Checks actual decoded data and inspects one original outcome and scoped cohort.
@@ -89,7 +96,7 @@ pub fn inspect_record_batch_point<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace_limit, 5)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
-    Ok(finish_inspection(decoded, log, gate, workspace_limit))
+    finish_inspection(decoded, log, gate, workspace_limit)
 }
 
 pub(in crate::log) fn finish_inspection<'input, 'retained>(
@@ -97,24 +104,41 @@ pub(in crate::log) fn finish_inspection<'input, 'retained>(
     log: LogIdentity,
     gate: RequestGate<'retained>,
     workspace_limit: usize,
-) -> RecordBatchInspection<'input, 'retained> {
+) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     let control = gate.control();
     let decision = match gate.decision() {
         GateDecision::Fresh => {
-            return RecordBatchInspection::Fresh(FreshRecordBatch {
+            return Ok(RecordBatchInspection::Fresh(FreshRecordBatch {
                 decoded: Box::new(decoded),
                 log,
                 control,
                 workspace_limit,
-            });
+            }));
         }
         GateDecision::Replay(original) => RecordBatchApplyDecision::Replay(original),
         GateDecision::IntentConflict => RecordBatchApplyDecision::IntentConflict,
         GateDecision::Expired => RecordBatchApplyDecision::Expired,
         GateDecision::LogReplay => RecordBatchApplyDecision::LogReplay,
     };
+    let count = decoded
+        .request
+        .operation
+        .mutation_items()
+        .ok_or(super::super::CodecError::UnsupportedTag)?
+        .len();
+    admit(
+        sum(&[
+            decoder_bound(decoded.encoded.len(), count, decoded.limits)?,
+            size_of::<Option<RecordBatchValueEffects>>(),
+        ])?,
+        workspace_limit,
+    )?;
     drop(decoded);
-    RecordBatchInspection::Complete(RecordBatchApplyPlan { control, decision })
+    Ok(RecordBatchInspection::Complete(RecordBatchApplyPlan {
+        control,
+        decision,
+        value_effects: None,
+    }))
 }
 
 /// Consumes fresh inputs with complete current indexed authority, without gating again.
@@ -180,10 +204,7 @@ fn finish_fresh<'current>(
         control,
         workspace_limit,
     } = fresh;
-    let decoded = {
-        let boxed = decoded;
-        *boxed
-    };
+    let decoded = *decoded;
     let limits = decoded.limits;
     if authority.group() != decoded.request.scope.group() {
         return Err(ApplyError::InvalidAuthority.into());
@@ -200,7 +221,53 @@ fn finish_fresh<'current>(
         workspace_limit,
         additional_live_bytes,
     )?;
+    let (live, cap, work) = value_effects_budget(&decoded, workspace_limit, additional_live_bytes)?;
+    let value_effects =
+        build_atomic_value_effects(&decoded, control, &operation, (live, cap), work)
+            .map_err(|error| effects_apply_error(&error))?;
+    let effect_bytes = value_effects
+        .as_ref()
+        .map_or(0, |effects| effects.steps().len())
+        .checked_mul(size_of::<RecordBatchValueEffect>())
+        .and_then(|rows| rows.checked_add(size_of::<Option<RecordBatchValueEffects>>()))
+        .ok_or(CodecError::LengthOverflow)?;
     let encoded_len = decoded.encoded.len();
+    let (scope, request, intent) = release_decoded_inputs(decoded);
+    let header_bytes = sum(&[
+        scope.tenant().as_bytes().len(),
+        scope.group().as_bytes().len(),
+        scope.recovery().as_bytes().len(),
+        request.as_bytes().len(),
+    ])?;
+    let late = sum(&[
+        encoded_len,
+        limits.admission.decision_bytes(),
+        header_bytes,
+        531,
+    ])?;
+    admit(
+        sum(&[late, additional_live_bytes, effect_bytes])?,
+        workspace_limit,
+    )?;
+    let (response, status) = response::encode(&operation)?;
+    let outcome = retain_record_batch_outcome(
+        (scope, request, intent),
+        log,
+        control.execution_time(),
+        outcome_ttl_ms,
+        (1, response, status),
+        limits.admission,
+    )?;
+    Ok(RecordBatchApplyPlan {
+        control,
+        value_effects,
+        decision: RecordBatchApplyDecision::Fresh { operation, outcome },
+    })
+}
+
+pub(in crate::log) fn release_decoded_inputs(
+    decoded: DecodedRequest<'_>,
+) -> (RequestScope, RequestId, ClientIntent) {
     let DecodedRequest {
         request,
         isolation,
@@ -212,43 +279,35 @@ fn finish_fresh<'current>(
     drop(isolation);
     drop(state_keys);
     drop(claim_filters);
-    let header_bytes = sum(&[
-        request.scope.tenant().as_bytes().len(),
-        request.scope.group().as_bytes().len(),
-        request.scope.recovery().as_bytes().len(),
-        request.request.as_bytes().len(),
-    ])?;
-    let late = sum(&[
-        encoded_len,
-        limits.admission.decision_bytes(),
-        header_bytes,
-        531,
-    ])?;
-    admit(sum(&[late, additional_live_bytes])?, workspace_limit)?;
-    let (response, status) = response::encode(&operation)?;
-    let expires_at = control
-        .execution_time()
+    (request.scope, request.request, request.intent)
+}
+
+pub(in crate::log) fn retain_record_batch_outcome(
+    header: (RequestScope, RequestId, ClientIntent),
+    log: LogIdentity,
+    time: TimestampMillis,
+    outcome_ttl_ms: u64,
+    response: (u16, Vec<u8>, RetainedStatus),
+    admission: AdmissionLimits,
+) -> Result<Box<RetainedOutcome>, RecordBatchApplyError> {
+    let (scope, request, intent) = header;
+    let (version, bytes, status) = response;
+    let expires_at = time
         .checked_add(outcome_ttl_ms)
         .ok_or(RequestValueError::InvalidExpiry)?;
     let outcome = RetainedOutcome::new(
         RetainedMetadata {
-            scope: request.scope,
-            request: request.request,
-            intent: request.intent,
+            scope,
+            request,
+            intent,
             original_position: log,
-            original_time: control.execution_time(),
+            original_time: time,
             expires_at,
             status,
         },
-        1,
-        response,
-        limits.admission,
+        version,
+        bytes,
+        admission,
     )?;
-    Ok(RecordBatchApplyPlan {
-        control,
-        decision: RecordBatchApplyDecision::Fresh {
-            operation,
-            outcome: Box::new(outcome),
-        },
-    })
+    Ok(Box::new(outcome))
 }

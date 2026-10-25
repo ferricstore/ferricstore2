@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 use std::collections::BTreeMap;
+use std::mem::size_of;
 
 use wf_domain::claim::{ClaimRecord, DueOrder, LaneKey, ScopedRecordId};
 use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
@@ -20,6 +21,7 @@ use wf_domain::workflow::{
     Cancel, CommittedCommand, Create, DomainError, Operation, Terminal, Transition, WorkflowRecord,
     reduce,
 };
+use wf_ports::blob::{RecordBatchValueEffect, RecordBatchValueEffects};
 use wf_ports::consensus::{PreparedBatchItem, PreparedOperation, PreparedRequest};
 use wf_ports::log::{
     CodecError, CodecLimits, FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError,
@@ -423,7 +425,14 @@ fn prospective_workspace_and_profiles() -> TestResult {
         );
     }
     assert!(prepare_independent_record_batch(encoded.as_bytes(), limits(), 16_780_748).is_ok());
-    for (maximum, live, attempted) in [(33_558_411, 0, 33_558_412), (33_558_418, 7, 33_558_419)] {
+    let owner_bytes =
+        size_of::<Option<RecordBatchValueEffects>>() + size_of::<RecordBatchValueEffect>();
+    let owned = 33_558_419 + owner_bytes;
+    for (maximum, live, attempted) in [
+        (33_558_411, 0, 33_558_412),
+        (33_558_418, 7, 33_558_419),
+        (owned - 1, 7, owned),
+    ] {
         let f = fresh(encoded.as_bytes(), limits(), maximum)?;
         with_view(&[], &[b"c"], |view| {
             assert!(
@@ -439,7 +448,7 @@ fn prospective_workspace_and_profiles() -> TestResult {
             &[b"c"],
             encoded.as_bytes(),
             limits(),
-            33_558_419,
+            owned,
             7
         )?)?
         .results()

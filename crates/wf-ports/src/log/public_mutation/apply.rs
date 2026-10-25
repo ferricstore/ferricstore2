@@ -1,9 +1,16 @@
 //! One verified public profile gate and the shared independent Fresh planner.
 
+use std::mem::size_of;
+
+use crate::blob::{
+    RecordBatchValueEffect, RecordBatchValueEffects, build_independent_value_effects,
+};
+use crate::log::record_batch::{
+    effects_apply_error, release_decoded_inputs, retain_record_batch_outcome, value_effects_budget,
+};
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::indexed::{EntryOrder, TouchedIndexedGroupView};
 use wf_domain::workflow::request::gate::{GateDecision, PointGateView, inspect_point_request};
-use wf_domain::workflow::request::{RequestValueError, RetainedMetadata, RetainedOutcome};
 use wf_types::version::LogIdentity;
 
 use super::super::{
@@ -57,7 +64,7 @@ pub fn inspect_public_mutation_point<'input, 'retained>(
     {
         return Err(ApplyError::InvalidAuthority.into());
     }
-    Ok(finish_inspection(decoded, log, gate, workspace))
+    finish_inspection(decoded, log, gate, workspace)
 }
 
 /// Consumes public Fresh once, retaining only original canonical borrows.
@@ -83,10 +90,7 @@ pub fn decide_fresh_public_mutation_touched<'current>(
         control,
         workspace_limit,
     } = fresh;
-    let decoded = {
-        let boxed = decoded;
-        *boxed
-    };
+    let decoded = *decoded;
     if view.group != decoded.request.scope.group() {
         return Err(ApplyError::InvalidAuthority.into());
     }
@@ -101,24 +105,24 @@ pub fn decide_fresh_public_mutation_touched<'current>(
         workspace_limit,
         additional_live_bytes,
     )?;
+    let (live, cap, work) = value_effects_budget(&decoded, workspace_limit, additional_live_bytes)?;
+    let value_effects =
+        build_independent_value_effects(&decoded, control, &operation, (live, cap), work)
+            .map_err(|error| effects_apply_error(&error))?;
+    let effect_bytes = value_effects
+        .as_ref()
+        .map_or(0, |effects| effects.steps().len())
+        .checked_mul(size_of::<RecordBatchValueEffect>())
+        .and_then(|rows| rows.checked_add(size_of::<Option<RecordBatchValueEffects>>()))
+        .ok_or(CodecError::LengthOverflow)?;
     let encoded_len = decoded.encoded.len();
     let limits = decoded.limits;
-    let DecodedRequest {
-        request,
-        isolation,
-        state_keys,
-        claim_filters,
-        ..
-    } = decoded;
-    drop(request.operation);
-    drop(isolation);
-    drop(state_keys);
-    drop(claim_filters);
+    let (scope, request, intent) = release_decoded_inputs(decoded);
     let header = sum(&[
-        request.scope.tenant().as_bytes().len(),
-        request.scope.group().as_bytes().len(),
-        request.scope.recovery().as_bytes().len(),
-        request.request.as_bytes().len(),
+        scope.tenant().as_bytes().len(),
+        scope.group().as_bytes().len(),
+        scope.recovery().as_bytes().len(),
+        request.as_bytes().len(),
     ])?;
     let size = super::response::measure(&operation)?;
     if size > limits.admission.decision_bytes() {
@@ -132,33 +136,22 @@ pub fn decide_fresh_public_mutation_touched<'current>(
             512,
             size,
             additional_live_bytes,
+            effect_bytes,
         ])?,
         workspace_limit,
     )?;
     let (response, status) = super::response::encode(&operation, size)?;
-    let expires_at = control
-        .execution_time()
-        .checked_add(outcome_ttl_ms)
-        .ok_or(RequestValueError::InvalidExpiry)?;
-    let outcome = RetainedOutcome::new(
-        RetainedMetadata {
-            scope: request.scope,
-            request: request.request,
-            intent: request.intent,
-            original_position: log,
-            original_time: control.execution_time(),
-            expires_at,
-            status,
-        },
-        2,
-        response,
+    let outcome = retain_record_batch_outcome(
+        (scope, request, intent),
+        log,
+        control.execution_time(),
+        outcome_ttl_ms,
+        (2, response, status),
         limits.admission,
     )?;
     Ok(RecordBatchApplyPlan {
         control,
-        decision: RecordBatchApplyDecision::IndependentFresh {
-            operation,
-            outcome: Box::new(outcome),
-        },
+        value_effects,
+        decision: RecordBatchApplyDecision::IndependentFresh { operation, outcome },
     })
 }

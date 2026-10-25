@@ -1,6 +1,7 @@
 //! Genuine retained results precede current workflow/index/guard execution.
 
 use std::collections::BTreeMap;
+use std::mem::size_of;
 
 use wf_domain::claim::{Claim, ClaimRecord, DueOrder, ScopedRecordId};
 use wf_domain::lease::{LeaseGuard, LeaseToken};
@@ -13,6 +14,7 @@ use wf_domain::workflow::request::gate::GateView;
 use wf_domain::workflow::request::indexed::IndexedRequestView;
 use wf_domain::workflow::request::{RequestValueError, RetainedOutcome, RetainedStatus};
 use wf_domain::workflow::{CommittedCommand, Operation, WorkflowRecord, reduce};
+use wf_ports::blob::RecordBatchValueEffects;
 use wf_ports::consensus::PreparedOperation;
 use wf_ports::log::{
     RecordBatchApplyDecision, RecordBatchApplyError, decide_record_batch, encode_record_batch,
@@ -124,7 +126,7 @@ fn assert_exact_replay(
         &retries,
         0,
         limits(),
-        16_780_748,
+        16_780_748 + size_of::<Option<RecordBatchValueEffects>>(),
     )?;
     drop(encoded);
     let RecordBatchApplyDecision::Replay(replayed) = plan.decision() else {
@@ -195,7 +197,7 @@ fn assert_gate_branches(control: ControlState, outcome: RetainedOutcome) -> Test
         &retries,
         0,
         limits(),
-        16_780_748,
+        16_780_748 + size_of::<Option<RecordBatchValueEffects>>(),
     )?;
     assert!(matches!(
         replay.decision(),
@@ -239,7 +241,7 @@ fn assert_gate_branches(control: ControlState, outcome: RetainedOutcome) -> Test
         &retries,
         0,
         limits(),
-        16_780_748,
+        16_780_748 + size_of::<Option<RecordBatchValueEffects>>(),
     )?;
     assert!(matches!(plan.decision(), RecordBatchApplyDecision::Expired));
     assert_operational_branches(view, original.as_bytes())?;

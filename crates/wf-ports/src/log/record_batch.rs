@@ -11,6 +11,7 @@ use wf_domain::workflow::request::indexed::IndexedRequestView;
 use wf_domain::workflow::request::{ClientIntent, RequestValueError, RetainedOutcome};
 use wf_types::version::LogIdentity;
 
+use crate::blob::{RecordBatchValueEffects, RecordBatchValueEffectsError};
 use crate::consensus::{PreparedOperation, PreparedRequest};
 
 use super::{
@@ -25,8 +26,8 @@ mod intent;
 mod phase;
 mod response;
 
-pub(super) use fresh::decide_independent;
-pub(super) use phase::finish_inspection;
+pub(super) use fresh::{decide_independent, value_effects_budget};
+pub(super) use phase::{finish_inspection, release_decoded_inputs, retain_record_batch_outcome};
 pub(super) use response::{push_rejection, rejection};
 
 pub use atomic_start::{
@@ -52,6 +53,7 @@ pub use response::{
 pub struct RecordBatchApplyPlan<'view> {
     pub(super) control: ControlPlan,
     pub(super) decision: RecordBatchApplyDecision<'view>,
+    pub(super) value_effects: Option<RecordBatchValueEffects>,
 }
 
 impl<'view> RecordBatchApplyPlan<'view> {
@@ -64,6 +66,11 @@ impl<'view> RecordBatchApplyPlan<'view> {
     #[must_use]
     pub const fn decision(&self) -> &RecordBatchApplyDecision<'view> {
         &self.decision
+    }
+    /// Borrows the same attached numeric owner, without publication authority.
+    #[must_use]
+    pub const fn value_effects(&self) -> Option<&RecordBatchValueEffects> {
+        self.value_effects.as_ref()
     }
     /// Transfers the operation/outcome without borrowing decoded input scratch.
     #[must_use]
@@ -147,6 +154,22 @@ impl From<ApplyError> for RecordBatchApplyError {
 impl From<RequestValueError> for RecordBatchApplyError {
     fn from(value: RequestValueError) -> Self {
         Self::Retained(value)
+    }
+}
+
+pub(in crate::log) fn effects_apply_error(
+    error: &(RecordBatchValueEffectsError, Option<(usize, usize)>),
+) -> RecordBatchApplyError {
+    use RecordBatchValueEffectsError::{InvalidChanges, Limit, ReserveFailed, UnsupportedProfile};
+    match error {
+        (Limit, Some((attempted, maximum))) => RecordBatchApplyError::Workspace {
+            attempted: *attempted,
+            maximum: *maximum,
+        },
+        (InvalidChanges, _) => ApplyError::InvalidAuthority.into(),
+        (UnsupportedProfile, _) => CodecError::UnsupportedTag.into(),
+        (Limit, None) => CodecError::ByteLimit.into(),
+        (ReserveFailed(_), _) => CodecError::Allocation.into(),
     }
 }
 

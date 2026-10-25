@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 use std::collections::BTreeMap;
+use std::mem::size_of;
 
 use sha2::{Digest, Sha256};
 use wf_domain::claim::Claim;
@@ -17,6 +18,7 @@ use wf_domain::workflow::request::gate::GateView;
 use wf_domain::workflow::request::indexed::IndexedRequestView;
 use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedStatus};
 use wf_domain::workflow::{Cancel, CommittedCommand, Create, Operation, Terminal, Transition};
+use wf_ports::blob::{RecordBatchValueEffect, RecordBatchValueEffects};
 use wf_ports::consensus::{
     PreparedBatchItem, PreparedClaimPhase, PreparedClaimQuery, PreparedOperation, PreparedRequest,
 };
@@ -511,7 +513,11 @@ fn record_batch_workspace_refuses_before_each_owned_stage() -> TestResult {
     assert_workspace(frame.as_bytes(), 16_780_747, 16_780_748)?;
     assert_workspace(frame.as_bytes(), 16_780_748, 33_558_412)?;
     assert_workspace(frame.as_bytes(), 33_558_411, 33_558_412)?;
-    with_empty(frame.as_bytes(), limits(), 33_558_412, |result| {
+    let owner_bytes =
+        size_of::<Option<RecordBatchValueEffects>>() + size_of::<RecordBatchValueEffect>();
+    let owned = 33_558_412 + owner_bytes;
+    assert_workspace(frame.as_bytes(), owned - 1, owned)?;
+    with_empty(frame.as_bytes(), limits(), owned, |result| {
         let plan: RecordBatchApplyPlan<'_> = result?;
         let RecordBatchApplyDecision::Fresh { operation, outcome } = plan.decision() else {
             return Err("not fresh".into());
