@@ -12,6 +12,7 @@ use crate::{
     source::{self, Context},
 };
 
+mod blob_policy;
 mod codec_policy;
 mod metadata_policy;
 mod options;

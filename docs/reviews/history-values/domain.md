@@ -100,3 +100,30 @@ Whole scoped inverse restores920B/9885907d; nine absences captured. At STOP all
 1576 held members matched112a9c33795a28ef8667fb7a9836a908b670ee99e89b7790393e343d88f837de.
 No build/test/VM/format/Git ran. Real catalog/read/hydration, original3 mappings,
 native8, full profiles/Linux and the overall goal remain open.
+
+## REF-BINARY1 R0 author STOP
+
+All six approved buffers stopped. Whole-read ARCH16522/e280f005 plus2341/7a4a,
+PERF10588/c859842b and actual original7569/c9f1f4dc. Pinned Keys and Support
+functions were reread. Four ordinary models/five callable rejectors only:
+parse ALWAYS None; four Results ALWAYS InvalidInput, for every argument.
+No CRC/SHA/B64/escape BODY, constant, helper or future child was created.
+
+Eight exact tests retain all15 reference/20 predicate/9 binary literal vectors
+byte-for-byte; static literal comparison found none missing. Both65535/65536
+shapes, separate builder/caller caps, auto25 success/24 Limit, named opaque
+parts and binary lengths0/2/3/9/11/11/13/10/35 are asserted. Borrow witnesses
+use nonempty source backing after descriptor scopes; those tails are not yet
+executed. Raw invalid Keys rendering remains outside the eligible constructors.
+
+Author LF/hash: blob73/0035c760; reference42/04ba0dd9; encoding27/8a95724c;
+main18/14ca1298; references171/681dfcfd; tests-encoding90/f5bbae93.
+Function spans: reference10..12/19..27/34..42; encoding10..15/22..27;
+tests refs4..45/48..77/80..117/120..146/149..171; binary4..25/28..60/63..90.
+13 functions/max42LF BEFORE Root's ordinary formatting/quality/runtime.
+
+Entire2514-byte append inverse restores3LF/120B/3392a4d1. Five absences captured;
+at STOP all1587 held inputs matched
+d0744cbe35ce38cc7788aa555ed48b3f582f96ac6f52c869bd6a5589921415f8.
+No formatter/compiler/VM/test/Git ran. Actual RED/SAVE and BODY are Root later
+steps; no storage/hydration, native8, original3 mapping, Linux or gain credit.

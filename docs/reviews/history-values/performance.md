@@ -1146,3 +1146,395 @@ snapshot/recovery or hydration/overlay coverage. Linux, full original project
 profiles, native old8/opening/settlement, total allocation/RSS/CPU/stack bounds,
 exercised reserve failure and measured performance remain unclaimed. Finite
 review stopped; no new source/API or readiness gate is introduced.
+
+## PERF-HVAL-REF-BINARY1 finite precreation resource/API consultation
+
+This reviews the NEXT reference/logical-binary prerequisite after saved CODEC1,
+not a substitute for genuine versioned publication/catalog/ordered read/hydration.
+No source, model, file, helper, test, workload, VM/compiler, Git, probe, policy or
+shared artifact was created/changed. Only this active note is appended. Existing
+codec source/models/tests stay frozen. Root still owns original oracle execution,
+all exact creation releases, genuine callable R0 RED/SAVE, then separate BODY.
+
+I independently read the complete relevant pinned source families: Keys1..190,
+687..689,713..937 plus value_key?514; Support125..180; ValueStore raw-filter/
+cardinality restoration254..316 and its option/size guards, including715..721;
+Router part05 actual65535 constant223..228. Full source hashes are Keys937LF/
+32363B/bf9cbe380b9a59ef275a7efe9f94b8ee86ff10d2a7c4162eeb3a6dc24c6d8349,
+Support680/25028/67ea918f9582cc190f24df6424e54158ced9b965ff54d294a1bf5d106efd48b6,
+ValueStore727/22731/0c4dcc8333297cc6cfd19757e7010e3dd8fefc6ff775e693e6eeb140537760b2.
+Actual ports/blob is the existing three-line reservation, blob is already public
+in ports/lib, and Cargo/policy already pin sha2=0.11.0 without default features.
+I read current source/purity, source path rules, policy entries and existing hash
+negative controls: ports::blob is NOT currently classified pure. No existing
+rule authorizes a domain SHA edge or grants read/write/routing authority here.
+
+Actual grammar/resource conclusions, communicated directly to ARCH/Root:
+- Shape parsing has NO65535 or4096 limit. It recognizes f, canonical fa:0..255,
+  or canonical43-character SHA-shaped base64url tag. It does not authenticate a
+  digest's origin or partition placement. Regular p/r/e/s uses the LAST colon:
+  the nonempty ID can itself contain colons, NUL and invalidUTF8. Versions are
+  exact canonical decimal0..9007199254740991, not signs/leading zeroes/trimmed text.
+- Named n requires exactly encoded-owner:encoded-name:version. Decoded owner/name
+  must be nonempty; both encoded components must be canonical unpadded URL Base64.
+  Return clearly named ORIGINAL ENCODED borrowed spans, not fake decoded slices.
+  URL alphabet/length-remainder/canonical unused-bit validation needs no decoded
+  Vec: remainder1 is impossible; remainder2 needs low4 zero bits, remainder3 low2.
+  The fixed43-character digest needs the corresponding exact32-byte shape.
+- The raw Keys integer renderers themselves also print negative/unbounded
+  versions and regular empty IDs, which then FAIL the shape predicate. The new
+  typed constructors therefore cover the explicitly selected CANONICAL ELIGIBLE
+  subset, not alleged full raw-constructor parity. Version>MAX or empty mandatory
+  fields is InvalidInput; checked arithmetic/excess output is operational Limit;
+  actual std TryReserveError remains ReserveFailed. ValueStore's public owner/
+  name4096 option cap is a distinct API and must not leak into this Keys-level
+  parser/render profile. The renderer's separate limit is min(maximum,65535).
+- Omitted value-key partition is Automatic=CRC32(ID)%256; named uses OWNER ID.
+  It differs from Global={f}. Explicit canonical __flow_auto__:0..255 selects
+  that bucket; malformed auto-looking bytes are SHA256-hashed WHOLE, not rejected
+  or coerced. Empty Explicit binary is the actual SHA(empty) tag branch, distinct
+  from Global. All IDs/names/partitions are opaque binary bytes; no trim/UTF8 rule.
+
+I actually whole/hash-read the written named ARCH decision133717+16522/
+e280f0055b575f655e46bc281d87c82464121a7aefd086e033f995679d1f6048,end150239.
+Its four models/five APIs/six R0 source-test paths/eight tests and Root-only four
+purity/ADR paths agree with these findings. It selects no dependency/Cargo/policy
+TOML widening, no new lib facade, no source-term decoder/encoder or fake callback.
+The first three Copy/borrowed view models grant no validated-reference proof;
+Debug-only build error carries the actual reserve failure. The existing parent
+plus two rejecting children are an honest callable R0; the later base64/tag
+children and fourteen helpers belong ONLY to separately released BODY. No count
+of future test failures is inferred before Root executes the frozen R0 target.
+
+ARCH's direct refinement after that written span changes ONLY BODY render_tag
+arity3->4, adding maximum_tag_bytes before its fixed49-byte scratch argument.
+I reviewed and accepted its exact payment/order purpose: the complete f:{...}
+prefix lengths are Global5, auto8..10 and SHA49. The public renderer computes
+checked fixed ID/B64/version/separator sizes, subtracts from min(maximum,65535),
+then supplies the remaining tag space. Explicit-hash needs49 and can refuse
+BEFORE hashing/copying borrowed partition bytes. Explicit canonical auto/global
+have known exact lengths. Automatic must first admit minimum8, compute the
+actual CRC bucket, then check its real one-to-three-digit tag length; rejecting
+all at a worst-case10 would wrongly reject fitting8/9-byte tags. No extra helper,
+model, cache or public API follows. This direct refinement is not misrepresented
+as text already inside the16522-byte span; ARCH records its bounded supersession.
+
+Primary uncertain CRC operand was closed ONLINE against actual pinned OTP source,
+not a platform/default Rust hash assumption. At OTP28.3.1 revision
+aa5b1d3366762ff8f420f2aa6a52604b481530c9, actual
+[erlang.erl](https://github.com/erlang/otp/blob/aa5b1d3366762ff8f420f2aa6a52604b481530c9/erts/preloaded/src/erlang.erl)
+blobcfb724920adece4b1c9d1f2ffcb0a9f41d19651f documents IEEE802.3 CRC32.
+The pinned bundled
+[crc32.c](https://github.com/erlang/otp/blob/aa5b1d3366762ff8f420f2aa6a52604b481530c9/erts/emulator/zlib/crc32.c)
+blob6c38f5c04c6a87e711ecb50b668e17131fa8fae2 shows reflected polynomial
+0xedb88320 and pre/post complement. This is NOT CRC32C or architecture-dependent
+random hashing. Current official OTP28 docs corroborate the checksum family;
+the pinned source, not the newer doc release, binds this operand. Independent
+literal source VM goldens for empty and ID123456789 remain Root's validation,
+not an experiment or passing source test performed by this reviewer.
+
+Prospective allocation/work design is appropriate within the selected roster.
+Compute Base64 output using checked quotient/remainder arithmetic rather than
+unchecked4*(n+2)/3. Validate semantic fields before measured output admission,
+then ONE fallible final-key Vec reservation for the exact logical result length.
+Write owner/name Base64 directly to that final buffer, with checked destination
+ranges and a fixed decimal scratch; do not allocate intermediate encoded-owner,
+encoded-name, tag, format String or escaped-value Vec. If the chosen safe writer
+zero-initializes the result before filling it, that is an additional real byte
+pass, not a claimed removed allocation. Actual Vec capacity can exceed requested
+length; no capacity-equality assertion, shrink/Box conversion or fabricated OOM
+probe is justified. Real reserve-error propagation is reviewable without claiming
+that small bounded key tests exercise allocator failure.
+
+CRC work is proportional to ID length; SHA to WHOLE explicit partition length;
+Base64/copy/zero-fill to their actual input/output lengths. A bounded49-byte SHA
+tag does not bound the borrowed partition's input bytes or acquisition cost.
+Checked output caps may reject before unnecessary hashing, but do not mint an
+ingress/work budget. The allocation-free shape parser still examines caller-
+provided bytes; avoiding source decode/reencode temporaries does not prove total
+CPU, nativeR, allocator behavior or measured speed. Slice views can retain a much
+larger caller backing. Caller ownership/admission remains a real later boundary.
+
+Support's logical binary encoding needs only a borrowed two-part description:
+if and ONLY if input STARTS_WITH b"FSV2", prefix it with static b"FSV2\x01";
+otherwise prefix is empty; second slice is the ENTIRE unchanged input. Stored
+length is input.len() or checked input.len()+5, compared to the supplied maximum.
+There is NO reference65535 limit here. max0/empty succeeds; it is not an invalid
+limits value. Exact FSV2, unknown modes, type2-looking ETF and already escaped-
+looking logical input must all be escaped ONCE rather than trusted/reinterpreted.
+The two borrowed parts and usize result need no joined buffer or source decode.
+Their lifetime belongs to input backing, not a temporary slice descriptor. A
+nonempty pointer/content witness after that descriptor scope is meaningful;
+empty cases alone cannot establish the borrowing property. Later storage will
+still own/serialize its real consumed output, so this is not a whole zero-copy
+publication/transaction claim.
+
+The eight selected tests cover genuine missing positive behavior before BODY:
+all p/r/e/s/n view kinds with Some and literal counts BEFORE pointer checks;
+last-colon opaque IDs, canonical/invalid decimal and B64 tails; Global versus
+Automatic versus explicit canonical/malformed auto/SHA; named opaque raw parts
+encoded exactly once; BOTH65535 and65536 shape-positive inputs with separately
+bounded construction; binary empty/max0, exact and one-less stored lengths,
+nonempty backing and prefix-once behavior. Source-generated literal goldens must
+be captured independently by Root before tests freeze. They must not invoke the
+Rust SUT to compute expected output. Constructor limit failures are not source
+syntax errors; classification RED/PASS is not callable business RED. No fake
+reserve-failure or forged huge slice is needed to cover the checked overflow
+path, and no unsafe/hidden helper/extra probe artifact is selected.
+
+The named purity classification is necessary: add ONLY blob (with descendants)
+to existing pure ports prefixes, and use the selected source literals to reject
+fs/time/thread effects, forbidden client reexports and worker direct imports.
+Existing exact SHA package/version/features/source and forbidden domain/wire
+edges remain. Source hashing purpose is recorded in ADR006, not treated as log
+command ownership. This is a legitimate narrow prerequisite; real catalog bytes
+and reference/history publication in one consumed transaction, real ordered
+routed reads, retention/recovery/snapshot and typed-value profile remain required.
+No original HistoryValues-three mapping, storage/I/O parity, initialR, native8,
+Linux/full-profile completion or performance gain is earned. No concrete resource/
+API disagreement remains; finite consultation stopped without an ACK gate.
+
+## PERF-HVAL-REF-BINARY1 actual pre-R0 source oracle review
+
+I whole/hash-read exact raw8948996+7569/SHA256
+c9f1f4dcf4e922cc5b5183a1650f6d5d006b4b0d018043543087c1551118ddb0 in
+/private/tmp/ferricstore2-m2-source-pin-validation.log, then whole/hash-read my
+existing77392+10588/c859842b contract through87980. I independently parsed all
+observation labels/hex/lengths: EXACT15 references,20 predicates,2 oversized
+shapes and9 binary outputs. This is the actual pinned-source oracle, not Rust
+execution, an ExUnit case count, passing R0 or permission to implement BODY.
+No workload/source/file/model/helper/test/probe/Git/compiler was run or changed.
+
+Root reports session48551 EXIT0 with1906inputs unchanged3389d8558a6731a34a92c8aff8d5a204c5b7c4fa6d1abf8112280eb5f894498f,
+after its independently verified exact61-header OTP restoration. That restoration,
+input inventory and process terminal are Root-owned evidence, not another audit
+performed here. The7569-byte stdout itself shows the pinned Support/Codec/
+TermCodec/ReadResult/HistoryValues/real Router inputs, actual Keys/Support source
+paths loaded, actual Router.max_key_size65535, and TWO unsuppressed module
+redefinition warnings for the intentional Keys/Support source loading. No clean
+full-project/Mix/Linux/profile or C-recompile claim follows from this oracle.
+
+Every returned reference's literal hex length independently agrees with the
+printed length and source predicate=true. Actual global p/r/e/s counts are
+14/14/29/17, including MAX version and colon/NUL/FF shared ID. Omitted and explicit
+nil both produce f:{fa:38}:v:p:123456789:0,25bytes. The separately printed source
+CRC is3421780262=0xCBF43926 and modulo256=38, agreeing with the pinned IEEE rather
+than CRC32C premise. Named opaque owner/name becomes YTr_:ADo; Global is20bytes,
+while Automatic uses owner bucket241 and MAX version,40bytes. This does not
+conflate global with omitted partition or CRC the encoded owner spelling.
+
+Explicit empty, tenant, malformed __flow_auto__:00, malformed __flow_auto__:256
+and opaque partition bytes each produce their independent literal SHA-shaped
+49-byte prefix and58-byte complete id/version reference. Explicit canonical
+0/255 instead produce auto prefixes8/10bytes and complete17/19byte keys. No
+malformed-auto coercion/rejection, UTF8/string normalization, global fallback,
+trusted placement or capped input-work conclusion is supported. The automatic
+123456789 example has a9-byte prefix: exact25-byte full construction must fit
+its25 cap, while24 must refuse. That useful existing-case oracle guards against
+wrongly requiring the worst-case10-byte auto prefix when the actual bucket fits.
+
+The20 predicate rows independently count5true and15false. Positive observations
+include zero/MAX decimal, opaque LAST-colon ID, named zero-byte components, and
+canonical SHA-shaped digest. Negative rows cover negative/plus/leading-zero/
+MAX+1 versions, empty mandatory IDs/components, extra named field, impossible
+Base64 length, noncanonical unused bits, padding, malformed auto tag digits and
+wrong digest alphabet/bits. These agree with borrowed encoded-span parsing and
+canonical Base64 checks without a decode/reencode temporary Vec. Shape validation
+continues to convey no partition-origin or durable-reference authority.
+
+Both printed shape-size observations65535 and65536 are TRUE while actual Router
+max is65535. This independently confirms the selected uncapped parser versus
+eligible constructor/I/O admission distinction. The constructors still validate
+mandatory fields/version first, measure checked lengths, then enforce
+min(maximum,65535) and real fallible allocation. The raw Keys wider integer/
+empty-component renderer domain and ValueStore's4096 owner/name option cap
+remain separate as recorded before. This source oracle does not exercise a
+Rust reserve failure or license a capacity==requested assertion.
+
+I independently decoded every binary input/output hex and checked each literal
+output against [static b"FSV2\x01" iff input starts b"FSV2", otherwise empty;
+ENTIRE input]. All nine match exactly, with stored lengths0,2,3,9,11,11,13,10,35.
+Empty/opaque/incompleteFSV stay unchanged. Exact magic, modes0/1/2/unknown and
+nested escaped-looking logical binary gain exactly the one outer5-byte prefix;
+no ETF decode, trusted typed frame, recursive escaping or input mutation occurs.
+The empty result's0bytes agrees with max0 eligibility; exact/one-less cap behavior
+is a prospective Rust API test, not an option accepted by Support.encode_value.
+
+No observation disagrees with ARCH's selected19-function BODY roster plus the
+render_tag4 remaining-space amendment, both actually read previously. Semantic
+and checked fixed-size admission precede final allocation; known Global5/SHA49/
+explicit-auto lengths gate work first, Automatic min8->CRC->exact8..10 remains
+necessary. Renderers may use ONE fallible final-key reserve and direct Base64
+writes; two-part logical binary APIs may borrow input without an escaped Vec.
+Those are still future code properties to verify after genuine R0 RED/SAVE and
+separate BODY release. The VM goldens measure neither Rust allocations nor its
+CPU/stack/RSS. SHA work can grow with arbitrarily large borrowed partition input,
+and returned borrowed key/binary spans can retain larger caller backing; no
+acquisitionR, input-work budget, total zero-copy publication or release theorem
+is invented. No Box/extra buffer/dependency/probe is needed from this evidence.
+
+Actual observations and concrete exact-cap control were communicated directly
+to Root/ARCH. No resource/API/source-oracle discrepancy found. Root can use these
+independent literals in the already selected eight tests before freezing the
+callable rejection-only R0; no predicted pass/fail count or extra ACK gate.
+Complete real catalog/versioned publication, intermediate history refs, genuine
+ordered routed reads, retention/snapshot/recovery, typed input/encoding and
+HistoryValues hydration remain required; original three mappings, native8 and
+Linux/full-project/performance acceptance are not earned. Finite review stopped.
+
+## PERF-HVAL-REF-BINARY1 actual callable R0 source/oracle review
+
+I whole-read all SIX stopped approved source/test files and actual DOMAIN6359+
+1584/7e755b6570a71fc16389bb872ad29a0440fdda6556bfcd78220e49cbe77ca039.
+No production/test/shared source, workload, Git/compiler/VM/probe or new artifact
+was changed/run here. This is source review BEFORE genuine behavioral baseline;
+Root's format/compile/lint/classification results are not behavior RED.
+
+Actual source binding: blob73LF/2634B/
+0035c76041879f7105b5a7ef3b56451fb0f301f104e1d0eae845978894868dad;
+encoding27/823/8a95724c87087e2da0c5aba0d6fe6106acb8810ae97c3c7da686f5a3e008282d;
+main18/866/14ca1298d544d33370499af7047e25282122849a71491b68e4d96ad6efb80fb7.
+I first read reference42/1334/04ba0dd915f2bf2bd133a3997a575fe9f0599b4c10247b30f158353095af1e5f,
+then re-read the complete stopped updated43/1346/
+2316e4dd9617653ba47fe8e1701df6bbdd5244fce8267d06471ac67484050b91.
+Removing ONLY #[must_use] plus its newline restores ENTIRE old42/04ba0dd9.
+Root reports its necessity as the sole technical Clippy diagnostic after fmt/check
+pass, with no callable target executed; I do not call that behavioral RED or
+claim to have independently read a diagnostic packet not supplied in this task.
+
+The exact FOUR models and five signatures agree with actual ARCH16522/e280 plus
+2341/7a4a previously read. Kind and Partition and borrowed Ref are Copy/Debug/Eq
+ordinary mathematical values; Error is Debug-only with genuine std TryReserveError.
+Regular id/tag bytes and named ORIGINAL ENCODED component spans have one input
+lifetime; no decoded-name ownership or UTF8 coercion is implied. The binary-parts
+signature returns [&[u8];2] tied only to input, with the static prefix admissible
+under that lifetime. Public data can be fabricated and grants no namespace,
+placement, availability, acquisition or durable-publication authority. There are
+no manual methods/constructors/Display/Default, extra types/constants/helpers or
+BODY logic. parse is unconditionally None; the other FOUR functions unconditionally
+Err(InvalidInput), using underscore arguments. No CRC/SHA/B64/escape/allocation
+algorithm, seed, successful placeholder or future base64/tag child exists.
+
+My own complete parent inverse takes ONLY its original first3LF/120B; hash is
+3392a4d1588190aba8139e0cc432f62aac9debcb561044ca832cb9a6832061ff.
+The exact2514-byte append contains the selected two private children/reexports
+and four models. I directly checked BOTH BODY-only child paths are absent.
+Author's all1587/d0744cbe hold and five absences remain explicitly author/Root-
+attributed inventory evidence; I did not repeat that external inventory audit.
+
+All five reference tests were whole-read at the formatted296LF/9603B/
+472f1af86576b63763b7b27aed08860af3544c692e470029b79dfafdc23ee64a,
+and all three binary tests at111LF/3970B/
+cb47a6df7a446b07059deec7c9df18b70e912ab2b4fd53af09554cb862fe9a29.
+There are EXACT eight selected #[test] function names, no helper/fixture module
+beyond their approved main/two children. In this snapshot the longest function
+is the first reference parser witness91 physical lines; regular renderer85 and
+named renderer40, with no packing/geometry waiver. This binds the pre-priority-
+refinement tests actually read, not an unobserved future hash.
+
+I independently parsed byte literals from both complete Rust files and compared
+them with the actual7569/c9f1 source oracle: NONE of the15 reference literals,
+20 predicate literals or nine binary input/output pairs is missing. Source
+omitted/nil collapse deliberately to the SAME typed Automatic value (the two
+loop entries document both source observations, not two distinct Rust branches).
+All four regular families, named Global/Automatic owner bytes, MAX version,
+CRC38 and owner241, canonical auto0/255 and malformed-auto/opaque SHA fallbacks
+are literal exact-output controls, with independently literal expected sizes.
+The auto25-success/24-Limit case is present. Both65535/65536 shape positives are
+constructed independently from fixed syntax and fixture-owned repeated ID bytes;
+only bounded construction refuses65536. The ID-size formula subtracts the exact
+12-byte fixed regular overhead, not a SUT-rendered expected result. Valid
+maximum0 references correctly expect Limit, while binary max0/empty expects Ok.
+
+Borrow witnesses are meaningful: parser first asserts Some with exact
+kind/content/version BEFORE its if-let pointer checks, so None cannot vacuously
+skip the witness. Backings are dynamically owned Vecs and IDs/named components
+are nonempty; prefix, ID and named encoded slices are checked against exact
+original ranges after temporary descriptor scopes. The binary witness uses a
+128-byte owner with escaped8-byte and plain5-byte nonempty subranges; it checks
+exact payload, length, slice equality and actual source pointer afterward.
+Untouched backing regions are asserted. This supports the eventual borrowing
+contract without claiming backing size equals view size or that caller storage
+can be released. R0 has not yet executed those positive/pointer tails. The type
+signature's lifetime and later actual execution remain different evidence.
+
+The binary cases preserve whole original logical input and expected prefix-once
+bytes for all nine observations, including type2-looking ETF and unknown/nested
+modes. stored_len is checked against independent literal sizes and exact/one-less
+caps; >65535 plain and escaped logical payloads explicitly remain eligible when
+their caller maximum permits. spans.concat is TEST-owned fixture comparison,
+not a production escaped Vec or allocator measurement. No fake OOM/capacity
+assertion, native accounting or whole zero-copy pipeline claim is present.
+
+ONE bounded oracle weakness was found and sent directly to ARCH/Root: selected
+InvalidInput-before-Limit priority is currently tested with invalid components
+at65535, while zero caps are tested only with valid components. A cap-first BODY
+could satisfy those current assertions yet violate the selected diagnostic order.
+Root explicitly AGREED to preserve every existing assertion and add an extra
+max0 Err(InvalidInput) assertion for EACH invalid tuple in the TWO EXISTING regular
+and named test loops, only after its current technical validator terminal. No
+new case/helper/file/model or production BODY follows. This same-test refinement
+is selected but its revised hash/runtime is NOT claimed here. The current R0
+refusals themselves are honest and have no source/API/resource defect. Parent
+will supply the ordinary corrected-source/actual-baseline follow-up; this is not
+an added readiness/acknowledgment gate.
+
+The selected one-reserve/direct Base64 writer, fixed tag-cap-before-hash and
+borrowed static-prefix+payload implementation are still later BODY obligations,
+not properties proven by rejection stubs. Genuine compiled eight-test RED must
+be recorded and saved first; no runtime/failure count is invented now. Actual
+source grammar predicates versus eligible65535 builders/4096 public option caps,
+input-dependent hashing work, real caller backing and custody remain as in my
+10588/c859 consultation. Original HistoryValues-three mappings, catalog/current/
+intermediate-history atomic publication, genuine ordered reads/routing,
+retention/recovery/snapshot, typed profile, Linux/native8 and performance gain
+remain separate required endpoints. Finite source review stopped.
+
+### REF-BINARY1 final stopped source refinement before behavioral baseline
+
+Root closed the technical edit window and I WHOLE-read all three updated target
+files after its final format STOP: main18/868/
+f3e071475f004d007a6f9ee6ffad0af15504005e59dadfb84c9c97a008ec5e54;
+references304/9909/d22a95a250d2eeacc499e3c4490f82418406fae780b384a889ee1fab95428b70;
+encoding111/3972/752e8203686e983b10463098c7dad896ad940c4953a33c5de62b3171a2479ee4.
+Models/other rejector and current43/2316e4dd parser remain the reviewed literal
+R0. BODY children, logic, constants, helpers, new API/model/test name remain absent.
+
+The reported lint corrections preserve the actual oracle: main only adds two
+HistoryValues doc backticks; the six safe &raw const addresses preserve wide
+slice pointer identity/range checks without unsafe dereference or suppression;
+assert_ne!(payload,b"") preserves the nonempty witness. The binary128-byte
+fixture owner is now an ordinary OWNED ARRAY, not Vec. All subrange contents,
+lengths, temporary descriptor scope, actual returned-payload pointer and original
+unmodified regions remain exact. This supersedes any earlier wording that called
+that particular backing heap/dynamically allocated. The contract never required
+heap-specific ownership: both stack/heap backings must outlive a returned borrow;
+no backing release or production allocator claim follows. Parser fixtures still
+use owned Vecs and their nonempty actual-input range identity checks.
+
+The selected error-priority gap is NOW corrected in the SAME two invalid-input
+loops: references218..221 and262..265 additionally require InvalidInput at max0
+for EVERY existing invalid regular/named tuple, retaining their prior65535
+assertions. Valid max0 still requires Limit elsewhere. No original positive,
+negative, cap/25-vs24, scalar/golden or pointer assertion was weakened/removed.
+Eight function names remain exactly the same, with no test helper. Actual
+physical spans are reference91/36/89/44/33 and binary32/35/37; maximum91, natural
+file304/111. I corrected the static brace census to remove string literals BEFORE
+comments, so the literal digest containing // does not corrupt that census.
+
+My in-memory byte inverses independently reproduce the ENTIRE earlier formatted
+target files: remove ONLY main's two backticks ->18/866/14ca1298; reverse ONLY
+five reference raw-address spellings plus the two added four-line priority
+assertions ->296/9603/472f1af8; reverse ONLY encoding's raw address, owned-array
+spelling and nonempty assertion style ->111/3970/cb47a6df. No temporary/source
+artifact was written. The parser's exact12-byte must_use inverse already proved
+its entire42/04ba beforeimage. These bind the actual narrowly changed bytes,
+not a claim that technical lint feedback is behavioral RED.
+
+The prior source consultation is accepted with that now-resolved bounded oracle
+refinement. No further scoped source/API/resource/oracle defect found. Root's
+new technical71094 run is reported live at1593/7ccae711; no callable target or
+behavioral pass/failure status is inferred in this receipt. Source-golden and
+nonempty borrow tails remain runtime-unclaimed until the actual target executes.
+Genuine R0 RED/SAVE and separate BODY release remain required. Only this own note
+was appended; no source/workload/Git/probe or added readiness/ACK gate.

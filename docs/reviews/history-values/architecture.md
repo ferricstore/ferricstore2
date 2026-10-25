@@ -2045,3 +2045,515 @@ ordered reads/routing, complete hydration/overlay, retained refs/expiry and
 snapshot/restore are still required. Full workspace conservation belongs to the
 separate actual41164 result. Original setup/profiles, Linux/macOS completion,
 old native8/public opening/settlement and the overall goal remain unfinished.
+
+## ARCH-HVAL-REF-BINARY1: exact staged prerequisite selection before creation
+
+This selects a coherent NEXT pure prerequisite, not catalog/publication authority
+or completion of HistoryValues. No artifact except this existing note was created
+or mutated; no build/VM/Git/test/probe ran. Root first saves the completed CODEC1
+increment, then owns the separate release/one-writer custody. All original three
+HistoryValues arrays stay[] through this prerequisite and until the real route.
+The complete required next path remains same-transaction versioned publication,
+current and EVERY intermediate history refs, ordered genuine reads/routing,
+retention/recovery/snapshots and separately versioned common typed input/encoding.
+Existing command Vec/Base64 bytes remain LOGICAL BINARY, never implicit ETF.
+
+### Actual source and policy basis
+
+I read actual pinned Keys relevant complete families:1..115,687..710,710..937,
+Support125..180 and ValueStore254..316, reusing the prior full HistoryValues /
+read-routing evidence. Keys SHA remains bf9cbe38; Support67ea918f; ValueStore
+0c4dcc83 at66586c. Required distinctions:
+- value_key?/value_ref_kind recognizes p/r/e/s using LAST colon before version,
+  nonempty opaque ID, canonical decimal0..9007199254740991; IDs may contain
+  colons/NUL/nonUTF8. Named n has EXACTLY encoded-owner:encoded-name:version;
+  both decoded components nonempty, canonical unpadded base64url.
+- Accepted tags are f, fa:<canonical0..255>, or f:<canonical unpadded43-character
+  base64url digest decoding to32 bytes>. No trim, UTF8 normalization or padding.
+- Keys.value_key? itself has NO65535 ceiling. HistoryValues/Router applies that
+  separate key limit. Recognize valid shape above65535, then gate actual output/
+  I/O separately; do not silently change the source predicate.
+- Omitted/nil value_key partition uses auto_partition_key(ID), CRC32(ID)%256.
+  Named omitted/nil uses OWNER ID. This differs from explicit :global ->{f}.
+  Explicit binary __flow_auto__:<canonical0..255> selects that auto bucket;
+  malformed auto-looking bytes are SHA256-hashed WHOLE, not rejected/coerced.
+- Source binary encoding is identity except a logical binary starting FSV2 is
+  prefixed with FSV2+tag1 ONCE. Bytes after it remain untouched, even if they
+  resemble type2 ETF/compressed/invalid data. Empty binary at stored max0 is valid.
+
+Actual checked custody: ports/blob.rs3/120/3392a4d1; ports Cargo19/368/bf2b3422;
+architecture/policy.toml128/5041/b1eb1ec2; source/purity.rs44/1665/6698c05c;
+architecture-tests tests.rs595/19027/133a8041. All proposed children/test files
+below are actually absent. Cargo already allows exact sha2=0.11.0/no defaults/
+features; no new dependency or Cargo/TOML edit is selected. Actual module-level
+checker has NO separate sha2-in-blob prohibition, but blob is NOT yet in the
+pure ports-module prefixes. ADR006's old purpose was private log hashing; it does
+not itself document this new source partition-tag purpose. The narrow missing
+purity classification and source-purpose rationale are selected below, rather
+than misuse a prepared-log digest or open a hash edge into domain/wire/client.
+
+### Exact R0 artifact and public contract roster
+
+SIX author paths ONLY for callable R0/models/frozen tests:
+1. EXISTING crates/wf-ports/src/blob.rs (four public models plus private children
+   and five explicit function reexports; no lib.rs edit, blob already public).
+2. NEW crates/wf-ports/src/blob/reference.rs (THREE rejecting callable functions).
+3. NEW crates/wf-ports/src/blob/encoding.rs (TWO rejecting callable functions).
+4. NEW crates/wf-ports/tests/workflow_value_bytes/main.rs (imports, forbid unsafe,
+   mod references/mod encoding only; automatic Cargo target, no Cargo seam).
+5. NEW crates/wf-ports/tests/workflow_value_bytes/references.rs (five tests).
+6. NEW crates/wf-ports/tests/workflow_value_bytes/encoding.rs (three tests).
+No helper/constant/extra child shell in R0. Later BODY-only children are named
+separately below; no catalog/application/storage/domain/test fixture changes.
+
+EXACT four public models, no manual methods/constructors/Display/Default:
+
+OriginalValueRefKind = Payload | Result | Error | Shared.
+OriginalValuePartition<'a> = Automatic | Global | Explicit(&'a [u8]).
+OriginalValueRef<'a> =
+  Regular { tag_prefix:&'a [u8], kind:OriginalValueRefKind,
+            id:&'a [u8], version:u64 }
+  | Named { tag_prefix:&'a [u8], owner_component:&'a [u8],
+            name_component:&'a [u8], version:u64 }.
+OriginalValueBuildError = InvalidInput | Limit |
+  ReserveFailed(std::collections::TryReserveError).
+
+First three derive Clone,Copy,Debug,Eq,PartialEq; Error derives Debug ONLY.
+tag_prefix is the COMPLETE borrowed f:{...} prefix including closing brace.
+Named component views are the ORIGINAL ENCODED base64url spans, not alleged
+borrowed decoded bytes. No decoded-component Vec is needed to recognize their
+canonical grammar/nonemptiness. Version is the parsed mathematical bounded u64.
+These ordinary public values can be fabricated and convey no source provenance,
+namespace/placement/read/write/durable-reference or allocation authority.
+
+EXACT five public APIs (numeric suffixes here are arity, not identifier text):
+- parse_original_value_ref(input:&[u8])->Option<OriginalValueRef<'_>>.
+- render_original_value_ref(id:&[u8], kind:OriginalValueRefKind, version:u64,
+    partition:OriginalValuePartition<'_>, maximum:usize)
+    ->Result<Vec<u8>,OriginalValueBuildError>.
+- render_original_named_value_ref(owner:&[u8], name:&[u8], version:u64,
+    partition:OriginalValuePartition<'_>, maximum:usize)
+    ->Result<Vec<u8>,OriginalValueBuildError>.
+- original_binary_stored_len(input:&[u8], maximum:usize)
+    ->Result<usize,OriginalValueBuildError>.
+- original_binary_stored_parts(input:&[u8], maximum:usize)
+    ->Result<[&[u8];2],OriginalValueBuildError>.
+
+parse is the source BINARY shape predicate + borrowed view, with no length cap
+or allocation. Nonbinary source acquisition is outside this &[u8] API; do not
+pretend a nonbinary source input was parsed and rejected. The constructors
+render CANONICAL ELIGIBLE references: regular ID/nonempty owner+name and version
+0..MAX inclusive. Source Keys' raw integer renderer can also print negative /
+unbounded versions or empty components which FAIL value_key?; that wider invalid
+renderer domain is explicitly outside these typed constructors, not silently
+called ported. Source p/r/e/s/n canonical eligible rendering is covered fully.
+Both constructors reject those invalid fields as InvalidInput, then checked
+measurement/overflow/output>min(maximum,65535) as operational Limit. maximum0 is
+valid as a cap (all real keys exceed it); no arbitrary InvalidLimits variant.
+
+Binary len/parts have NO reference/Router65535 cap. Their maximum is caller's
+explicit stored-byte bound; checked input.len()+5 only on FSV2 prefix, overflow
+or excess ->Limit. Empty/max0 succeeds. parts returns [static FSV2+1 prefix OR
+empty slice, the ENTIRE unchanged input slice]. Static prefix coerces to input
+lifetime; payload borrows its backing, not a transient descriptor. No allocator,
+callback, joined Vec, decoding, source-term coercion or input mutation occurs.
+len and parts must agree, including unknown/incomplete/raw-looking FSV2 values.
+Borrowing can retain a larger caller backing; it is not proof that backing is
+small, released, already funded, or equivalent to native/initialR accounting.
+
+R0 is deliberately honest: parse ALWAYS None; all four Result functions ALWAYS
+Err(InvalidInput), using underscore inputs. Types/fields/functions are genuinely
+callable and compile before behavioral tests. No parser, SHA, CRC, base64, escape
+logic, private helper or body-only child is created yet. Save the actual compiled
+same-eight-test RED before separately releasing BODY; technical import/lint/
+classification failures are not behavioral RED and stubs need not fail every
+negative case. No guessed six/eight/failure count is asserted before execution.
+
+### Later BODY-only exact source cut and private roster
+
+After genuine R0 SAVE, change only those three production homes and add TWO
+private children:
+crates/wf-ports/src/blob/reference/base64.rs and
+crates/wf-ports/src/blob/reference/tag.rs.
+reference.rs privately declares them; use explicit crate::blob paths. No public
+module, extra model/alias, hash facade, encoder-for-ETF or callback. This gives
+five natural production files, all<=400LF/functions<=100; estimates are not a
+waiver. If actual ordinary formatter exceeds these bounds consult the exact
+additional responsibility before creation, never pack/drop cases.
+
+EXACT BODY functions: existing five APIs plus FOURTEEN private helpers =19:
+- reference.rs split_tag1(&[u8])->Option<(&[u8],&[u8])>;
+  parse_version1(&[u8])->Option<u64>;
+  decimal_length1(u64)->usize;
+  reserve_key1(usize)->Result<Vec<u8>,E>;
+  put3(&mut[u8],&mut usize,&[u8])->Result<(),E>;
+  put_version3(&mut[u8],&mut usize,u64)->Result<(),E>.
+- base64.rs encoded_len1(usize)->Result<usize,E>;
+  valid1(&[u8])->bool;
+  encode_into2(&[u8],&mut[u8])->Result<usize,E>;
+  digit1(u8)->Option<u8>.
+- tag.rs valid_tag1(&[u8])->bool (INNER tag without outer f:{/});
+  render_tag3(OriginalValuePartition<'_>,&[u8],&mut[u8;49])
+    ->Result<usize,E>;
+  crc_bucket1(&[u8])->u8;
+  auto_bucket1(&[u8])->Option<u8>.
+E is only an import alias for OriginalValueBuildError, not a new type alias.
+No methods beyond specified derives. Named immutable BODY constants are only
+MAX_KEY_BYTES65535, MAX_VALUE_VERSION9007199254740991, BASE64_URL_ALPHABET64 and
+AUTO_PARTITION_PREFIX; FSV2 bytes/CRC IEEE polynomial may remain inline literals.
+
+Use first source marker, exact tag validation, last regular colon and exact named
+three-part split, all borrowed. Base64 validation checks URL alphabet, impossible
+length remainder1 and canonical unused tail bits; digest additionally length43
+(decodes32). No decode/reencode temporary Vec. Version parser uses checked bounded
+ASCII accumulation, canonical zero/no leading sign/zeroes. Regular IDs are never
+UTF8-decoded, trimmed or split at their first colon. Auto bucket parser recognizes
+only canonical0..255; CRC32 is standard reflected IEEE initial/final xor, not a
+random platform hash. render_tag writes its complete prefix into FIXED49-byte
+stack scratch: Global5 bytes, auto<=10, SHA256 tag49. Named base64 writes directly
+into the final admitted key, no encoded-owner/name temporary buffers. Decimal
+uses fixed20-byte local scratch and no to_string/format allocation.
+
+Render validates semantic fields and computes checked sizes before ONE real
+try_reserve_exact on empty output, then initializes/fills only that bounded Vec
+(with actual capacity>=requested, never capacity==size assertion). A zero-filled
+exact-length Vec is acceptable for checked in-place writing; count that pass,
+not a fictitious allocation reduction. put/encode_into check their target ranges;
+no unsafe/set_len, implicit Vec growth, unchecked writer cursor or second full
+escaped-value/frame buffer. SHA/CRC/input scans remain proportional to borrowed
+input lengths; output cap alone is NOT a CPU/input-byte cap. Real caller admission
+must own all input/backing/work before these helpers. This prerequisite does not
+mint an opening budget/F/G/permit or total allocator/stack/CPU/RSS bound. Real
+ReserveFailed is propagated; no deterministic fake-OOM/capacity-overflow harness
+or claim to have exercised allocation failure is selected.
+
+### Frozen eight-test roster and source-oracle custody
+
+No test helper/fixture/new module beyond the grouped target and two children.
+references.rs exact five test names:
+1. original_value_refs_parse_all_five_families_and_borrow_original_spans
+2. original_value_refs_reject_noncanonical_tags_versions_and_named_components
+3. original_value_ref_rendering_matches_global_automatic_and_hashed_partitions
+4. original_named_refs_encode_opaque_owner_and_name_once
+5. original_value_ref_key_limit_does_not_change_shape_recognition
+encoding.rs exact three test names:
+6. logical_binary_parts_preserve_plain_and_escape_fsv2_prefix_once
+7. logical_binary_stored_length_and_zero_cap_boundaries_are_exact
+8. logical_binary_parts_borrow_original_payload_backing
+
+Use independent literal source bytes/versions/kinds, assert Some/Ok and exact
+length/kind before pointer/range checks. Cover p/r/e/s/n; global/auto0/255/hashed;
+opaque colon/NUL/invalidUTF8 IDs, encoded named components; version0/MAX and
+invalid negative/sign/leading-zero/MAX+1; invalid digest alphabet/tail bits,
+padding/empty named/extra separator, malformed auto input HASH fallback. Parsing
+well-shaped65535 AND65536 keys remains Some; construction exact65535 succeeds,
+65536/caller bound refuses Limit. Explicit nil-vs-global choice is tested, never
+conflated. Existing automatic and explicit-auto spelling round trips are source
+observations, not actual routing/placement authority. Binary literals cover empty,
+plain/incomplete FSV, exact FSV2, modes0/1/2/unknown, opaque bytes and nested-looking
+escape: no decoder is needed for the independent exact stored-byte oracle.
+Stored max0/size boundaries and returned lengths use literal expected counts.
+Borrow witness keeps input backing outside a temporary slice-descriptor block,
+then uses both spans and pointer/content afterward; no vacuous empty zip. All
+functions<=100 and test files<=600 naturally, no packing/coverage removal.
+
+Root after CODEC SAVE owns original inline oracle capture BEFORE this R0 writer
+needs its final literal vectors, using actual Keys/Support and no new probe file:
+regular/named omitted-vs-global, CRC ID123456789, explicit empty/binary partition,
+canonical auto0/255, malformed auto00/256 and opaque partition; named opaque
+owner a:FF/name00:; predicate regular/named canonical/invalid versions and both
+65535/65536 sizes; binary prefixes above. Known standard CRC/SHA examples are
+not called actual pinned VM results until Root captures them. Put resulting
+literal constants directly in existing selected tests, not a SUT-generated oracle
+or an extra fixture artifact. This is one concrete normal integration step, not
+an open-ended research/ACK gate or reason to hold the saved codec checkpoint.
+
+### Exact Root-only module-policy/source control footprint
+
+NO Cargo.toml, architecture/policy.toml, dependency version/features, log hash
+visibility, domain/wire or public lib.rs edit is selected. Root alone owns:
+- EXISTING crates/wf-architecture-tests/src/source/purity.rs: add ONLY the
+  blob prefix to pure ports modules, including descendants through current under.
+- NEW crates/wf-architecture-tests/src/tests/blob_policy.rs: ONE named test
+  workflow_value_bytes_stay_pure_and_server_side, no helper/fixture.
+- EXISTING crates/wf-architecture-tests/src/tests.rs: ONLY mod blob_policy seam
+  (current595 leaves room<=600; no unrelated assertion rewrite).
+- EXISTING docs/adr/006-private-prepared-command-codec.md: append narrow rationale
+  for source SHA256 partition tags in private blob reference implementation,
+  unchanged exact dependency/server/purity boundary and no command authority.
+
+The one guard uses existing source_check literals: positives for blob,
+blob::reference, blob::reference::tag, blob::encoding with safe slice/Vec/scalar
+operations and existing SHA import; negatives for std::fs/std::time/std::thread
+at these same prefixes, plus client reexport of crate::blob and worker direct
+wf_ports::blob access. Existing exact SHA package graph/feature/source drift and
+forbidden domain/wire edges remain unchanged. Root runs actual guard BEFORE new
+pure prefix to expose that technical policy gap, then adds ONLY prefix/rationale
+and reruns the SAME guard positive; no pure-all-ports blanket. That M0 classifier
+RED/PASS is separate from callable reference/encoding eight-test behavioral RED.
+Root coordinates these shared edits while no author/source workload is live,
+then captures the exact author hold and releases only six R0 paths. No two writers
+or held-file rebase is inferred. Every later BODY source is separately released
+after real RED SAVE, normal review and independent resource consultation.
+
+PERF/DOMAIN received this finite direction directly; independent resource/API
+consultation is normal next evidence before Root release, not a generic approval
+or appendix-ACK loop. This note is the concrete selection; no source is written.
+No original3 mapping, actual publication/read/expiry/routing/snapshot, typed
+encoder/input path, Linux/macOS/profile, initialR or native8 completion is earned.
+
+### REF-BINARY1 prospective tag-cap refinement (same staged roster)
+
+Independent PERF actual whole/hash-read of16522/e280f005 agrees with the exact
+four-model/five-API/six-path R0/eight-test/purity selection and eligible-renderer
+boundary. Its source/resource consultation also confirms opaque inputs, canonical
+B64 pad bits, IEEE CRC32 (not CRC32C), separate4096 options versus Keys bounds,
+max0 empty binary and input-dependent hashing work. No source was created.
+
+Select ONE precise private BODY signature refinement before creation:
+reference/tag.rs render_tag FOUR arguments, replacing the prior render_tag3:
+
+render_tag(partition:OriginalValuePartition<'_>, id:&[u8],
+           maximum_tag_bytes:usize, output:&mut[u8;49])->Result<usize,E>.
+
+The public renderer FIRST checks semantic fields, checked regular ID or named
+base64 output lengths, decimal digits and separator sums. It subtracts those
+fixed non-tag bytes from min(maximum,65535), refusing Limit on underflow, then
+passes remaining capacity to render_tag4. Prefix lengths INCLUDE f:: Global5,
+auto8..10 and hashed49. Fixed Global/SHA/explicit-canonical-auto lengths must fit
+BEFORE hashing or copying their bytes. Automatic ID CRC is needed to know whether
+the bucket has one/two/three decimal digits: reject below minimum8 first, compute
+the source CRC bucket, then check its EXACT tag length before writing. Do not
+reject a fitting one-digit auto tag using a fictitious ten-byte maximum. This
+is no permission to claim an output cap bounds the borrowed partition's SHA work.
+
+Every actual checked overflow/cap check which is independent of the digest runs
+before SHA and final Vec reserve/copy. Hash only after the known49-byte tag fits;
+no expensive hash is done merely to discover that an already-known size fails.
+Retain fixed49-byte scratch, one admitted output Vec and direct in-place named
+B64 writing. No extra helper/model/constant/API/test/file is added: total BODY
+functions remain19, with this helper arity4. All other public signatures and R0
+rejectors remain literal; the tag/base64 children are still BODY-only after real
+RED SAVE. PERF directly agrees on the lengths/order and no further concrete
+resource disagreement. Its bounded written receipt is ordinary next evidence,
+not an additional source-creation/ACK cycle. Root alone records/releases work.
+
+## ENV-OTP28-RESTORE61: exact absent accepted-header restoration batch
+
+Root's reused nativeWhole preflight failed BEFORE VM launch; no new Keys/Support
+original goldens exist from that attempt. This finite environment-only decision
+adds no product model/API/class/profile, compiler input, native build or proof
+scope. I performed ONLY read-only metadata/content integrity inspection and this
+allowed note append; I did not fetch/download, restore/write a header, run a VM,
+compiler/test/Git/probe, alter a receipt or rebuild the .so.
+
+My actual audit reproduces exactly305 receipt compiler_inputs,61 truly absent
+leaf .h files and ZERO mismatches among244 surviving files. For each absent
+entry os.path.lexists is false (not a dangling symlink), its parent already exists,
+and its path is beneath the existing OTP src root. All61 join UNIQUELY to saved
+source-inputs.jsonl entries of mode100644 with exact Git blob SHA1 and size.
+Capture tools26 and first-party sources4 all independently hash-match. Existing
+policy_runtime_capture.so71880 bytes matches saved native SHA256
+ a362f921af1ca58310eb4d748bf1ac3f611f2d239413a6ce3136a5136e1e820a.
+No surviving content change, loader/library mismatch or rebuilt native artifact
+is inferred. Why headers became absent is not established by this audit.
+
+Immutable anchors actually read:
+- /private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/native/build-receipt.json
+  8779270B/SHA256bcd81ab56ed7d3b5828594bfda60e226cb2fbc8eb2fed28ccd01d59f492683db.
+- SAME BASE/source-inputs.jsonl1947 rows/240204B/SHA256
+  44fe76a2157cc37b4573d752e801283de5b65612b4ee781f1ff14953859d042b.
+- Pinned repository erlang/otp, OTP28.3.1 accepted commit
+  aa5b1d3366762ff8f420f2aa6a52604b481530c9. Saved mapping path/blob identities
+  below are not a moving branch/ref or regenerated header recipe.
+
+APPROVE Root restoring ONLY the61 absent paths enumerated below. Each relative
+path resolves under EXACT existing base:
+/private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/src/.
+No new directory, mirror/archive, source manifest, fixture, patch or receipt is
+selected. Root may retrieve those exact PUBLIC Git blobs to memory through its
+available read-only connector/cache. Root reports a working fetch_blob route for
+atom.h4631B (blob08a525..., receipt32a864...) and in-memory dual verification;
+that availability observation is explicitly Root-attributed, not my download.
+There is no present retrieval blocker reported; other61 contents are NOT claimed
+already fetched/verified/restored by this reviewer.
+
+For EVERY proposed file before any file write: bind pinned commit/path to the
+saved blob identity; require exact decoded RAW byte count and SHA256 in this table
+AND Git blob identity SHA1("blob " + decimal byte length + NUL + raw bytes).
+Preserve raw bytes/LF/encoding; no text normalization, guessed generated variant,
+platform header substitution or content assembled from a nearby release. A path,
+size or either-hash disagreement is a concrete blocker for that file; preserve
+all existing inputs and report it, never relax the receipt or fabricate a VM
+result. Verify all available bytes in memory before the restoration batch.
+
+Immediately before creation recheck true absence. Never overwrite, replace,
+rename away, chmod or delete a PREEXISTING entry, including symlinks. Use exclusive
+no-replace creation for these leaf files only, source mode100644/ordinary644
+(subject to normal process policy); no executable or directory permission change.
+A newly appeared matching file can be audited/skipped without mutation; a
+nonmatching/racing entry stops that path. If a newly created write fails, only
+Root's OWN newly created incomplete inode may be rolled back; no other file may
+be removed. Read back and verify each restored byte stream against BOTH hashes.
+Do not leave partial content and call the repair complete.
+
+Afterward Root repeats the SAME complete receipt preflight: all305 compiler
+inputs present/matching,26 tools/4 first-party inputs matching, identical receipt
+and source-map bytes and identical71880B .so. Do NOT modify compiler_inputs,
+compiler_inputs_sha256/header_digest/native_sha256, rebuild/relink a NIF, refresh
+the receipt, widen a source exclusion, bypass the reused preflight or infer any
+new native/runtime acceptance. This restores already accepted source inputs;
+only a subsequent real permitted oracle run can produce its source observations.
+Rust M0 blob controls can progress independently. The six-path R0 writer is not
+released by this environment repair or the failed preflight.
+
+Exact allowlist columns: relative path | saved receipt SHA256 | pinned Git blob
+SHA1 | exact byte count. The61 sorted TAB-delimited rows (including final LF)
+have SHA2561d88337b578c6610c616702a3b60e6b062c3599df08c4538841def57b7639c60:
+
+```text
+erts/emulator/beam/atom.h	32a8641941dc5ea6b08633a76d4a53177a36b66ad24cb548aa18b9493850da9e	08a5256177c879d81338ed123263b50ba854ac37	4631
+erts/emulator/beam/beam_code.h	3464860854325cb8fd96001e869a56134164767daa2343f98ceda8dff4985fa3	10dd5fe7276128be245fc908b5d1e469c26d73f1	5283
+erts/emulator/beam/big.h	de05a3d78bacfba4250c80efa1ac56bc45a5c9202bd241155eec879cdc6632e6	6ec877a37d4a27887e66ba984c35cafd1475c069	5859
+erts/emulator/beam/code_ix.h	42495c711d3df910cea7474e4583e822f09933471c6679f8f39514fa5e717c0e	565c8b539675277020534d70c6e144bb50b428a4	11312
+erts/emulator/beam/dtrace-wrapper.h	e9c39d791a88b87c70a118eb8289591bc8f0afc8b33b79f5e46f32fcafd74d4d	f862618ed319b446731a306f2bff06f44d92f7fb	5056
+erts/emulator/beam/erl_async.h	ca7f61bdfcd38c2e9eeb3cc20366d74b1ec020a43f4e616376cca821ec776995	eb89943449b625b2769ab62b3f54a9d9cfbd4e0b	1334
+erts/emulator/beam/erl_bif_unique.h	2cd8cb50c5fde120f4d7319afcc3258ba2f06df0a6b4e79ba30f38cf6155f66d	1a3eddb6030f384fe893e954b07c656ad1de1a3c	15630
+erts/emulator/beam/erl_binary.h	31ba99c1b20ee2c2e67ebc1654b65c6638ffa6372b6b4e972396c36adbfc80a5	6a7115f22391e62faba65c98b7da7fbaa984a510	13869
+erts/emulator/beam/erl_db.h	32bc1544579d3743a5e034fb34c655f5a20a484f4d7ed2370c534f0761be5ae2	1c2e54c68a0314fb6bba7df18be2e4b1a0197b8d	10317
+erts/emulator/beam/erl_debug.h	f197310b7810b3870bbcc507308f3ad38c3922e558b0019c9909c6dbcbefbd4f	8153feed9a2f647eaf951de4faf4621512ac227a	3170
+erts/emulator/beam/erl_drv_nif.h	52417b60e2cb8f685545d2424e66e137cda4b59478b897a8fef14547e81dd02f	e98b3c1ad90482c5db8dda79f5f733c77821285b	6756
+erts/emulator/beam/erl_dyn_lock_check.h	5205a2dac4057ada813ebc766b757286f4772156d0c77e067f2580dd3c53a187	dfb94162803b4213959d5346053168455ef0ae3f	1717
+erts/emulator/beam/erl_fun.h	f59affc7351d82ba847e56104c5b9732571451b6d91594db7c42e893780e66c4	0f8fdeba319de236fabed4ccb62908dfa1c59718	4991
+erts/emulator/beam/erl_gc.h	2ab46a9d8857102a6558130be2a8bfd9e26b37818f6b832af3e40f571818147f	2518aab70db3ae3ad89600133f6547be3c1cb877	6942
+erts/emulator/beam/erl_hl_timer.h	fc3f7c60c20eba29287757c06087c51e17396cd9ebe796ce640e42f525bd01d5	0261cb89a1b993f79a2b3e40188f87b666616cc7	2919
+erts/emulator/beam/erl_io_queue.h	7e40e0778fa75d864ed18462a15219eaeb6e008dcbce94d286de803189e5b190	614a5f880e4339858925c113c010aeb8a764d9c9	6391
+erts/emulator/beam/erl_lock_check.h	52dcbe17449c73b68be24fddfbbc1599f1a4d05cb58dc53285dcfca78a6cb2a5	5eefa0dba1194ecddc87b338dc283e9daf32739a	4782
+erts/emulator/beam/erl_lock_flags.h	890574b8c9a31a7d49a873f37ed89b431bf85e7b6b70188063bda9d22ad8f5f8	9d947a93b56a6dfa9b85221312374601ac1d40f1	2953
+erts/emulator/beam/erl_map.h	346349550ff1e86df887c930afd22ef6bb8cf50af67e588a0f1db1ce37d48fc0	80dd84ae118c591ff6f84c8c7621b56233b5969c	8414
+erts/emulator/beam/erl_msacc.h	2d4c59cb6748d3859e00c262f0408ea53f92552d6327e26841a0ba5727ef2c6c	c5ee23cd34e6a7331bd5bc4f0547c469716c3656	15691
+erts/emulator/beam/erl_nif.h	1b6e2551504807d43e8b727c527096c7add8a498500841d774d5b3c325264c82	72f97a3979fbe6c4f6ba6abcd9bf6dc6c4cf5e74	13783
+erts/emulator/beam/erl_node_container_utils.h	a7f0c4c49a3043042f4cd4c644f3d1ae6b70d9e49daf3a76e82d4509f0b3692d	8ec903dbab51c145f2b7b6fcd9f214f5153746dc	13783
+erts/emulator/beam/erl_node_tables.h	b67b0e26740014b49da842982c210c2c69ea4c33c575f3544d889fdaada57c70	e3d8944462a92b5bdd65862af7bd033c01017dd1	11816
+erts/emulator/beam/erl_port_task.h	9fd9ea30c9f1d7786a120624be7400f118c5260ef635e8af8e27d33e19574e4f	212096fc395eac2d37429d1d6a336a8d39877f88	8467
+erts/emulator/beam/erl_process_dict.h	a27ab41585833b5e54a52734c21402274ce0ddfa6b96472be1a6cb4e5121aca8	9ea27a27af1be702c9d3a2f03a5630eec63475a4	1718
+erts/emulator/beam/erl_ptab.h	a90826c7e6f32c8c7785b6013cf3771b871e07af0aecc35a3b7cb278465a7a09	1a0cb77bb9d9b6cf48e55c5604dc4e90fb59003f	14257
+erts/emulator/beam/erl_sched_spec_pre_alloc.h	3dd3802d55eedf151ca0efe9042e5b1b94ae7b9da56966014ff6d455cce73010	1a2e8be049cd2c24db17af76ea5b1a15bdf7287f	6783
+erts/emulator/beam/erl_sys_driver.h	4b3e43204e2e694c5b462ac43f1be8538fb5df1b5f6620179bed70a0fa862fbb	6d84d77d0c95875ffd0022a1532c43f76a69aaa5	2316
+erts/emulator/beam/erl_term_hashing.h	34a40ab29c639428cae541d4c76f33478c99942a84ee2201f48e1a2806d07e38	72d3c6be5699b840b598a6da7fb65c50698c632b	2406
+erts/emulator/beam/erl_thr_progress.h	33eccacc1c05e83c3594e34d94ef6094f3a8c0b870021ac054c64f93f582469a	89d6c25aa4f04f6690831a09c970a3922bcef9eb	9731
+erts/emulator/beam/erl_time.h	eeba16d9038f19e3bd7b824ec9b7bdf988eeec6988ae2d6521d9969c666acce2	b560fa8c64e45531ce15d04b315397f60e93d354	16059
+erts/emulator/beam/erl_trace.h	f19bc63a6d377ca44f947d434f93f4209d5eb1e5f464931606c49034dd9263fb	38d19b3d55f46cf9ba9d57283c049e07ff92bce5	13824
+erts/emulator/beam/erl_utils.h	dad589935f12dacf7004f68588417df30e041b34499a8dc1e6336a0a292e78c4	f34c5a67bad024339d19da7f125eb66a04efd7af	9580
+erts/emulator/beam/erl_vm.h	c362c2c222f5342bc0edd3b666ba58ef571dff6d6f37542169316c208fab9816	b9477af50e5d92290ca89a3cf1a22b862d635860	11233
+erts/emulator/beam/erl_zlib.h	6da4ca5a99cca30a95a61584fdf0b74724804e6da048f25f5947c4061d9cfb04	6167add102e32928e1d8653ecf91a9dfc2d021ec	2216
+erts/emulator/beam/error.h	5770e4e7c290081cc5f5cef96810b497442b3ca46761c982b432c9da418e8e3d	c37b5089ea8bb6af0d793fa9b21db38be5208310	7991
+erts/emulator/beam/export.h	9be17e5c506b4b352eb070d790097218d5bc6174dcb7bcf20d63ca02e7c9d9fa	7a218f27b785cd5be2ccb403ee3d0ed5d340bd37	6216
+erts/emulator/beam/external.h	5c8115922b43b6b5a01814683b5e9cb979bd752fa5c621295b18aba631846b4f	cfe4b956b2f556a00827b1be5ce883a87af75b53	7960
+erts/emulator/beam/hash.h	9d4523310ac9362320b463cc48cefe28e6f5a46acdacd80229352a8252afbe22	c9216176e2dfb9f34a7dafda867cc92e2771d870	4404
+erts/emulator/beam/index.h	ba80a66a63aec55768d234353ae870d300074ad51283db84882e93737f22a48c	61f4e608eb58f2f24f73b19a0cfc1e9f27d13d0a	2571
+erts/emulator/beam/lttng-wrapper.h	bae3fe696f1e0bfecef8263ad6c20cabd19f0bc5c63927f088e8fef81c43e141	19836b54003b07dc49937786f9f6bfb40ed3699a	4142
+erts/emulator/beam/module.h	77bb9228410fb8218885326c26286945f2670247cb52904804e8e23e6ea1c418	3449837e5d930a39f776b909a881bfdf3cb1f871	3960
+erts/emulator/beam/register.h	30a639922109102f94ce364c0743ecf451a18365926c4fe8e8b88c90361cb561	785591a3317016e333bd29791546212d516dfe95	1733
+erts/emulator/openssl/include/erl_md5.h	b9b2c05218d902842f17021c26d4ad39dd357af83ec1d506216c518f70e1e9d5	e0749241b5a7727ed78254bbe2f35787e215b5fe	1158
+erts/emulator/openssl/include/openssl_local/md5.h	0d17bae572aa65c588e4b8b967e176c9f9a32c92ab0ce6845d3288b84e0ff329	c9b42ecb115c49b03898cf8014e111d796d163c8	2358
+erts/emulator/sys/common/erl_mmap.h	88065258178fa71cba581a96655020ece70500020da4ffb109ea0234ee224afc	3218f67974982ffd4161e307ff4256c7b9403f27	7854
+erts/emulator/sys/common/erl_mseg.h	ea3d88bf653293d64e17ba449f451623bc34218e776da880dcd4a1f5f2a84e72	024563ee2668388b0e5274cfdf35e26fd56fa4c4	3369
+erts/emulator/sys/common/erl_poll.h	e07752c8044ddec116af68cfe446ae525e8cbc193ded85ce0f58b36fd8adfe78	de89d231ce75169f083410776a8228d31cba4696	11386
+erts/emulator/sys/common/erl_poll_api.h	216fd9a4429163062742c83ad1195266a0b2aaa57a0925361fab334efe66256d	b4bd99a285c4cea5ce33ee99b1913989e6a38e70	5242
+erts/emulator/sys/unix/erl_unix_sys.h	1d536b01ca03d79bc77ec2b9a8a63f9ea6b9bef5a7c797c9c26796a60e166758	a63f0b43f9e90bca419447f6a84848028e13eb52	11799
+erts/include/internal/erl_errno.h	18c685e488656796280f8dac1c1d270eb4f75eaa2accdc2f725eaafc00a8bad5	2a03e4c7381b4d8500f32e2539514a667b86a619	1311
+erts/include/internal/erl_misc_utils.h	713cc91a76a8adfc2d80ed03891cabcb977179a672fb079ab9d19363eaccb823	b15ac5c191092e2b9fea11869e3150d3096e2188	2751
+erts/include/internal/erl_printf.h	64b3f6cac58954654f8a140582dc48466d0e544146c0ca78ab2da14e17a022b1	bbc4af7a7b68d8ec11a1d577852321e84822661b	2307
+erts/include/internal/ethr_optimized_fallbacks.h	5fb17ded59c0a07a8d1aed1880830089dec5306bcca5287896c540859b3129f2	21eba6cda4c07cf7c75e631a7959e6435656a9c7	5643
+erts/include/internal/ethread_inline.h	c296da363c365e68488cc1b8ff7653ee424cb9e0c25d202b4f11f4fe33d2e7e6	962a46139d4922ae0c941f1d3e4e9310e5163186	2743
+erts/include/internal/gcc/ethr_atomic.h	bbb5f997aba5c7fe9570a78bfbaebd7f3aa3c7a774e8aacf05fb3bfd475ebc24	655056676cf635b7f17b5ba9a5917cedc42022ec	15431
+erts/include/internal/gcc/ethr_dw_atomic.h	36bac82a3b1c2fc35b6cda62a89c57948094640fe00ebf7cfa1cc66bbe9f4315	ab38f0f5923a7f7d747d8380901361eb266bc16b	7775
+erts/include/internal/gcc/ethr_membar.h	2e8d5d7c7639681c9cc7005a12ed427bbe6fe57e0961ebe445332578151db94c	7dea71be137d9d98fa796f0342d965fdd718f68c	10485
+erts/include/internal/gcc/ethread.h	86b61a35b04ff5ccb7e142562f22b72c73184e09058b3a012c37579c39f075e9	dad78c0bfd54069678d0cef14e0ed8a4d6bcba0b	13563
+erts/include/internal/libatomic_ops/ethread.h	331c7060e5bdc957eac4170a700c1083fee29eee35688b5748e63666469d6227	dffb0d34814580dcfdbf0e4ca831c32665b7b375	1288
+erts/include/internal/pthread/ethr_event.h	8ef357ac55d1f3c71d38dc3b3f127821b03d99646d5d223dc09ed8fd11f9e977	f5764536651ba275cf263358fdbf3dc7361bc5f8	4612
+```
+
+No user permission, new acknowledgment gate, full parity claim or source-code
+creation authority follows. Root owns the exact restoration and subsequent
+read-only audit/normal original-oracle execution under its existing custody.
+
+## REF-BINARY1 M0 actual classification guard review
+
+Finite independent read-only source/actual-log review, no source/workload/Git or
+shared-file mutation. I reread the selected16522/e280f005 contract and2341/7a4a79fc
+amendment, the complete new guard, complete final purity child, sole registration,
+actual source_check setup and Inspector path/facade rules. This writes ONLY the
+existing Hval architecture note. No R0 author or BODY is released by this review.
+
+Actual Root-owned guard:
+crates/wf-architecture-tests/src/tests/blob_policy.rs38LF/1344B/SHA256
+12bba58af3bceb781b6329a7a2fcbe3dd7022958f81d2ad7d50b07039727d9f1.
+Exactly ONE named test workflow_value_bytes_stay_pure_and_server_side, no private
+helper/fixture/new model. Function6..38=33 physical lines. Its four cases are
+blob, blob::reference, blob::reference::tag and blob::encoding. Each first accepts
+safe SHA256 plus borrowed-slice/scalar/Vec operations, then separately refuses
+std::fs, std::time and std::thread with the standard-library diagnosis. This is
+parsed-source capability rejection, not execution of filesystem/clock/thread
+operations and not a promise that pure Vec code has no allocation.
+
+The two server controls refuse client pub use crate::blob and worker direct
+wf_ports::blob. They assert a nonempty finding rather than a particular message;
+I independently followed the actual valid-source/known-module paths: source_check
+uses runtime classifications, test_file=false and root_file=false; these inputs
+reach respectively the existing client-port-facade server-capability rule and
+worker-only-wf_ports::client rule. No malformed syntax, missing classification,
+root-file unsafe declaration or unrelated size failure accounts for their result.
+There is no current false-positive fixture or newly opened client/server edge.
+The existing exact dependency/source/features graph controls remain separate.
+
+Actual sole tests.rs registration596LF/19044B/SHA256
+4ac3645e75922c1c6868bdde3b7795ae9830e34bf9b8e7567d37f8fabab5d38f.
+My exact17-byte removal of mod blob_policy plus LF restores the ENTIRE prior
+595LF/19027B/SHA256
+133a8041c0efd146a64c150b19c5794d09af9d9d2bba0f81467d027e49234f8c.
+No prior test/assertion registration or helper changed. Both tooling files remain
+within600 and the new function within100, without packed code or a size waiver.
+
+Final purity.rs45LF/1685B/SHA256
+a83dcbc6bbe8de210cc86658abd11b428f003d7ced97c66d42a6c155d9060db2.
+My exact20-byte removal of the single indented blob prefix plus LF restores
+ENTIRE44LF/1665B/SHA256
+6698c05c37606294acaf15139e0a1017237f5bf6126fd521dc59262f854c5cfc.
+The existing under predicate requires an empty or :: suffix: blob and all its
+private descendants become pure, not blob-like sibling names or every ports
+module. Existing test exemptions, domain/wire/storage classifications, effect
+allowlist, forbidden edges, aliases and runtime inspection remain literal. This
+ADDS restrictions at the approved feature boundary; it does not allow an effect.
+SHA remains the existing exact sha2=0.11.0/no-default-features dependency. No Cargo,
+TOML policy, domain/wire/client facade or source-check rule relaxation is selected.
+
+I read the final appended ADR006 section Pure workflow value references and
+binary storage bytes: source SHA256 partition rendering, source CRC32 convention,
+private child purity inheritance, unchanged server-only access, and no placement,
+transaction/admission/durability authority. It matches the selected narrow reason
+for the existing hash edge, not a new hash facade or arbitrary I/O permission.
+Actual ADR whole106410B/1593LF/SHA25607d566161946f60f219144e63686b683086f8617dc858c8bc7d5cf85df42fd68;
+new final section starts105439, length971, SHA25688c1a5081723742fc44dc1c09459c18a276a122c4fbf068d3320fa60317267d9.
+I do not claim an independently retained full ADR before-image; the exact whole
+purity/registration inverses above ARE independently reproduced from actual bytes.
+
+Actual pre-prefix Root63346 packet is /private/tmp/ferricstore2-m2-source-pin-validation.log
+8940546+1022/SHA256
+d7fd1ed1a8efa77c8c686a8e235755055a64362b126cd01e20ec223a7a7b1c1f,
+whole-read/hash-verified. Runtime1 test:0PASS1FAIL,44 filtered, no ignored/measured.
+The safe first blob positive executes, then assertion27 fails specifically because
+std::fs in blob had no forbidden-standard-library finding. This is the intended
+M0 classification gap on the old prefix, not reference/encoding behavioral RED,
+a source oracle, a missing-symbol failure or a weakened expected result.
+
+No concrete scoped rule weakening, server leak, false-positive or geometry defect
+found. ACCEPT the final source footprint and the genuine pre-prefix classifier
+failure. A post-prefix same-guard PASS/full-quality result is NOT yet claimed by
+this reviewer and follows ordinary Root execution; no additional approval/ACK gate
+is added. Environment restoration is separate and remains Root-only. The six-path
+R0 still needs its original vectors, real callable behavioral RED/SAVE and separate
+BODY release. Original three HistoryValues mappings remain[]; actual publication,
+read/routing/retention/recovery/hydration, typed input/encoding, Linux, public budget
+and native8/full-goal obligations remain open. Finite review STOP.

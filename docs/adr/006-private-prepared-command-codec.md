@@ -1575,3 +1575,19 @@ atomic policy/outcome/control publication, explicit origin/current layout and
 snapshot propagation. Those future artifacts are not selected by this gate.
 Public policy/Claim/governance, accepted runtime, every original setup/profile,
 Linux and full M1–M8 acceptance remain required; no CPU/RSS/speed claim follows.
+
+## Pure workflow value references and binary storage bytes
+
+ARCH-REF-BINARY1 selects pure borrowed reference parsing, checked canonical
+reference construction and borrowed logical-binary storage parts under
+wf-ports::blob. Its private children inherit the existing parsed-source purity
+rules. Standard-library filesystem, clock and thread effects remain forbidden;
+the client facade and worker still cannot expose or import this server module.
+
+Explicit partition tags use SHA-256 through the existing exact sha2 dependency
+without default features. This is deterministic source-compatible byte
+construction, not storage access or a new dependency edge. Automatic partition
+selection preserves the source CRC32 convention. Borrowed views and constructed
+keys grant no placement, transaction, authorization, admission or durability
+authority. Actual publication, routed reads and history hydration remain later
+contracts; no domain, wire or client boundary changes here.

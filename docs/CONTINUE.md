@@ -104,7 +104,18 @@ oracles or the selected tariff. Related private children stay under
 the longest function is 94. No measured speedup, allocator-failure execution or
 whole-process memory/CPU bound is claimed.
 
-The full Rust checkpoint below includes these ten tests. Real value publication,
+The next reference and logical-binary prerequisite has a genuine callable
+baseline: **one test passes and seven fail across the eight unchanged test
+names**, with no ignored or filtered cases. All seven technical checks pass,
+including strict Clippy and all 53 architecture checks. Independent source
+review preserves the captured 15 reference outputs, 20 predicate controls and
+nine binary encodings, plus exact size/error-priority and nonempty borrowing
+assertions. The five public functions still reject every input; their bodies
+follow only after this baseline is saved. This does not establish storage,
+history hydration or new original-case coverage.
+
+The full passing Rust checkpoint below includes the ten decoder tests. Real
+value publication,
 reference catalog, ordered routed reads, recovery/retention and complete history
 hydration still follow. Existing opaque command bytes retain their logical binary
 meaning; a later typed input path requires its own versioned contract. The three

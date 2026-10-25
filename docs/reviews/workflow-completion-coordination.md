@@ -52542,3 +52542,218 @@ preserving any later next-prerequisite proposal append in its original file.
 The next reference/logical-binary encoding artifact selection is independent
 preparation only; no new source creation before this SAVE and exact later
 Root release/resource consultation. Full goal stays ACTIVE.
+
+
+REF-BINARY1 exact next prerequisite selected after CODEC SAVE797da55
+Root verified797da55 is the reviewed decoder implementation checkpoint and
+whole/hash-read ARCH133717+16522/e280f0055b575f655e46bc281d87c82464121a7aefd086e033f995679d1f6048
+plus150239+2341/7a4a79fc20b2ef867bb3ea0f335e4b03f476242b98c82955b6ed455f1a4186f2,
+and PERF77392+10588/c859842b17b42aad88e68b12e17890abc064ebe172496245f159ac3d7652ab79.
+Actual written reciprocal consultation is closed by direct ARCH report; no
+concrete API/resource disagreement or extra appendix acknowledgment remains.
+
+Root adopts that exact staged prerequisite: four named public borrowed/scalar
+models, five APIs, six R0 source/test paths and eight literal-oracle tests.
+Parser is uncapped shape recognition; checked constructors cover canonical
+eligible refs, not the raw Keys renderer's invalid-field domain. Automatic
+CRC32 routing differs from Global; malformed auto-looking binary hashes WHOLE.
+Binary len/parts preserve logical bytes with one static5-byte escape prefix
+only for FSV2 starts; empty/max0 is valid and no joined Vec is created. No
+context/backing/namespace/placement/durable authority is inferred from views.
+No original3 mapping or actual storage/publication/hydration endpoint is earned.
+
+Before writer release, Root alone captures the precisely selected original
+Keys/Support inline observations and implements the narrow M0 guard. The Root
+artifact approval covers NEW wf-architecture-tests/src/tests/blob_policy.rs
+(one workflow_value_bytes_stay_pure_and_server_side test), existing tests.rs
+mod seam, existing source/purity.rs blob-only prefix and existing ADR006
+rationale. No Cargo,TOML,dependency,publiclib or general-ports policy opening.
+Run the real guard before prefix for technical classifier RED, then same
+guard after exact prefix/rationale for PASS; distinct from business R0 RED.
+All source/model/test/body-only reference/tag.rs and base64.rs creation still
+waits the explicit six-path author release. Real eight-case RED SAVE precedes
+any BODY. Later BODY roster19functions uses render_tag4 with prospective
+remaining-tag cap before SHA, no worst-case auto over-rejection.
+
+All codec11source/public models/ten tests/old fixtures/ledger remain frozen.
+Only three active HistoryValues role notes are peer append exceptions. Root
+now owns finite oracle/Root-policy work; no peer may run workloads or mutate
+source. Full goal retains real catalog/versioned publication/EVERY history ref,
+ordered genuine reads/routing, retention/recovery/snapshots, typed input path,
+original profiles/Linux and native8; this prerequisite is not a replacement.
+
+
+REF-BINARY1 M0 classifier RED and exact cached-source recovery adoption
+Root formatter13224 exited0. The selected guard63346 genuinely compiled and
+exited101 before the blob classification: zero pass, one failure,44 filtered,
+literal failure rejecting std::fs in blob. Raw8940546+1022/
+d7fd1ed1a8efa77c8c686a8e235755055a64362b126cd01e20ec223a7a7b1c1f
+was inspected. This technical classifier RED is separate from the future
+eight-case business baseline. Root now adds ONLY blob to the existing pure
+ports prefix list and the selected ADR006 rationale; no dependency change.
+
+The prepared original Keys/Support oracle failed reused native receipt preflight
+before VM launch, because61 accepted OTP header leaves were absent. No goldens
+or runtime result came from this attempt. Root whole-read and adopts ARCH
+152580+13945/296a3358f9483e5e16696d1a9f75284325eec082a349331ad4cad2ded03ce747
+for exact environment-only restoration. All61 public upstream contents are
+already verified in memory against saved byte counts, receipt SHA256 and Git
+blob SHA1. Separate exact commit/path fetches of all61 from erlang/otp commit
+aa5b1d3366762ff8f420f2aa6a52604b481530c9 match those same raw contents.
+The sorted61-row allowlist hash is1d88337b578c6610c616702a3b60e6b062c3599df08c4538841def57b7639c60.
+Root alone will exclusively create these absent leaves under the existing OTP
+src root, never replace an existing entry, verify readback, and repeat the
+same305/26/4 receipt audit with unchanged receipt/source map/native .so.
+No NIF rebuild, receipt edit, source exclusion or product artifact is selected.
+The cause of the missing leaves is unknown. No R0 author is released yet.
+
+
+ENV-OTP28-RESTORE61 actual recovery and original oracle PASS
+All eight exclusive-create batches finished0, restoring exactly61 selected
+headers/426041 raw bytes. Every readback matched receipt SHA256, Git blob SHA1
+and saved size. The complete post-audit has305/305 compiler inputs,26/26 tools
+and4/4 first-party inputs; receipt bcd81ab5, source map44fe76a2 and71880-byte
+NIF a362f921 are byte-identical. No receipt/source manifest/NIF write or build.
+
+Root then reran the SAME previously prepared original oracle, after this actual
+external-state repair. Session48551 exited0 with all1906 inputs unchanged at
+3389d8558a6731a34a92c8aff8d5a204c5b7c4fa6d1abf8112280eb5f894498f.
+Whole raw8948996+7569/c9f1f4dcf4e922cc5b5183a1650f6d5d006b4b0d018043543087c1551118ddb0
+was whole-read and hash/counter checked:15 actual reference constructors,20
+canonical predicate controls,2 oversized shape observations and9 binary escape
+cases, plus actual CRC32(123456789)=3421780262/automatic bucket38. Exact source
+modules loaded from pinned files, Router actual limit65535, two visible module
+redefinition warnings and final15/20/2/9 marker retained. Both65535- and65536-byte
+keys are recognized by Keys.value_key?; this is not checked-builder eligibility.
+Source/beam hashes and OTP28.3.1/Elixir1.19.5 assertions passed; no Mix/project
+profile, bulk storage integration or new original-case coverage is claimed.
+A first Root packet-audit regex used an incorrect output label and failed;
+the corrected actual original_reference counter is15 without rerunning the VM.
+The original oracle itself had already exited0 unchanged.
+
+
+REF-BINARY1 Root-only M0 GREEN and exact R0 author release
+Formatter85455 exited0; same named M0 guard44607 exited0,1PASS/44filtered,
+all1588 inputs unchanged4181ccc89ba50404cd6f14dd7122f8e046cc31348b73680766d86d64d3705213.
+Root whole-read477B at8956832/SHA2562a8a9d19fa1440725e5207521484555d941c80f752c286a4556e9375606ef312.
+Root whole/hash-read actual ARCH166525+5255/03f50b0b5d4bc43ac8c7b5f7edcb8ccd069d9a7e5f628e5fe0fab1708a916f13.
+Its independent final classification/registration inverses, boundary-aware prefix,
+valid positive/effect/server controls and ADR rationale review finds no scoped
+defect. This is technical M0 evidence, not the future eight business test RED.
+
+The selected original packet is now actual; Root releases only DOMAIN
+d2_implementation_sol61 as sole R0 author for these exact six paths:
+crates/wf-ports/src/blob.rs; crates/wf-ports/src/blob/reference.rs;
+crates/wf-ports/src/blob/encoding.rs;
+crates/wf-ports/tests/workflow_value_bytes/main.rs;
+crates/wf-ports/tests/workflow_value_bytes/references.rs;
+crates/wf-ports/tests/workflow_value_bytes/encoding.rs.
+The exact ARCH-HVAL-REF-BINARY1 staged four models/five APIs/eight test names
+and prospective render_tag4 amendment remain the contract. R0 parse alwaysNone;
+all four Result APIs alwaysErr(InvalidInput); no private helpers/constants/BODY
+children, Cargo/lib/policy/dependency/other artifact or source mutation. Literal
+goldens derive from actual8948996+7569/c9f1f4dc, never SUT-generated output.
+Root captures every other regular Main input after this journal append, omitting
+only those six author paths and three active role notes. All original/source/
+old tests/ledger stay literal. Root performs no mutation or workload during
+this author turn; peers write only their own active note. Writer must stop
+normally with complete finite report; actual callable eight-test RED must be
+compiled, inspected and SAVED before any BODY. Full goal remains ACTIVE.
+
+
+REF-BINARY1 sole R0 source STOP and Root validation custody
+DOMAIN source+note stopped normally, no workloads. Root independently confirms
+all1587 held inputs unchanged atd0744cbe and whole-reads all six source files.
+Root whole/hash-reads DOMAIN6359+1584/7e755b6570a71fc16389bb872ad29a0440fdda6556bfcd78220e49cbe77ca039.
+Exactly four public models/five unconditional rejectors/eight frozen named tests,
+no private helper/constant/BODY child. Full parent append inverse restores the
+original120B three-line reservation. All original literal vectors, independent
+exact stored sizes, canonical positive/negative cases, source key shape versus
+output caps and nonempty post-descriptor borrowing assertions are present.
+
+Root normal formatter86631 exited0. Production3/main stay byte-identical to
+author report. References becomes296LF/9603B/472f1af86576b63763b7b27aed08860af3544c692e470029b79dfafdc23ee64a;
+binary tests111LF/3970B/cb47a6df7a446b07059deec7c9df18b70e912ab2b4fd53af09554cb862fe9a29.
+Ordinary formatting preserves all eight cases/oracles. Source is now STOPPED
+for seven technical checks followed by the separate callable eight-case target.
+No technical failure may be reported as behavioral RED. PERF independently
+reviews this stopped corpus; ARCH's next producer-provenance recommendation
+is preparation only and does not hold this R0. Actual RED SAVE still precedes
+all BODY creation/release. Original3 mappings remain[]; full goal stays ACTIVE.
+
+
+REF-BINARY1 first technical run and narrow lint correction
+Session43957 terminal101 under unchanged1593-input8ad652d97f3b023b8b4b5aa0b35e3538c100a6e5f01027d4572a2e3a0e2c872a:
+format/check pass, strict Clippy has exactly one must_use_candidate diagnostic
+on parse_original_value_ref. Raw check8957700+166/04376ae8 and Clippy8958098+954/
+6079ebd61cb9758afaf47d9e8dd2ae4980e80df9efde127e2821a220cbe43c67
+were whole-read. Architecture/reference/progress/diff were not reached; no
+behavioral target was run and this is NOT behavioral RED. After terminal Root
+adds the required must_use attribute to that existing callable parser only,
+without a lint waiver, body/signature/test/model change. All eight source test
+names and literal oracles remain frozen. A fresh same-seven technical run follows.
+
+
+REF-BINARY1 second technical diagnostics and peer boundary strengthening
+Session23687 terminal101, all1593 inputs unchanged at2b35af52f7f4966042142be2281ce316fd45da02311a2663fed24ac53e51e4db.
+Fmt/check pass; the corrected lib reaches test Clippy and exposes nine style
+diagnostics in8959870+5425/36b49bef2c7cbeff3b83a7d5b831ed0e35034505b5cb1a39a8f1a804216f6dfd,
+whole-read: one doc Markdown, one nonempty assertion, six borrow_as_ptr and one
+useless_vec. No architecture/reference/progress/diff or behavioral target ran.
+After terminal Root backticks HistoryValues, expresses nonempty as assert_ne,
+uses safe raw-const addresses preserving fat-pointer equality and metadata,
+and uses an owned128-byte array for the same larger-backing borrow witness.
+All content/range/length/lifetime/nonempty assertions remain; no heap-allocation
+or native-retention theorem depended on the fixture container. No suppression.
+
+PERF independently identifies an uncovered selected priority: invalid inputs
+were checked at65535 only, so a cap-first BODY might pass. Root preserves each
+existing invalid-input assertion and adds max0 InvalidInput in the SAME regular
+and named loops (two regular/three named input tuples). No new helper/test/path/
+model/API. These five additional checks strengthen semantic-before-Limit before
+the first actual behavioral baseline; no business RED or saved oracle is changed.
+Fresh ordinary formatting and same seven technical checks follow; BODY remains
+unreleased until genuine compiled eight-case RED and SAVE.
+
+
+REF-BINARY1 actual seven-check GREEN and compiled eight-case RED before SAVE
+Formatter52860 exited0. Final technical71094 exited0 with ALL1593 inputs
+unchanged at7ccae711aa231eda8d7f27d008ebabede22ef0cce9ede392e80751e4c7ec4204.
+Root whole/hash-read COMPLETE8965320+8288/
+7928139cf2abc1d46c53af5da0f785f592c307cc7f81b1d740b315d37360905c:
+fmt/check/strictClippy/arch/reference/progress/diff all0. Architecture actual53
+PASS/5 summaries/zero failed ignored measured filtered. Preserved reference480
+and progress120/132/550 remain integrity/accounting, not full behavior parity.
+
+Without any source/Main mutation, Root then ran the actual callable target.
+Session48965 TERMINAL101 under the SAME1593/7ccae711 freeze. Whole target raw
+8973812+4138/46d8d0a06f46a8fe954b748aee01dd2f770458efbe5ab27cbfe77f373dbe3ce7
+was whole-read/hash-checked. EXACT8 source/runtime identities: negative canonical
+rejection control PASS, other7 FAIL at valid Some/Ok/length expectations; zero
+ignored/measured/filtered, one summary. This is genuine behavioral RED with
+compiled/callable models/APIs, not a technical diagnostic. Root retains the exact
+name/status Counter for later same-test repair comparison. No BODY exists.
+
+Root independently extracts all Rust byte literals and checks every actual15
+reference output,20 predicate key and9 binary input/output pairs against the
+whole pinned original7569/c9f1 packet: none missing; all printed lengths agree.
+Both65535/65536 shape inputs are independent fixed grammar fixtures; source
+constructor/I/O caps stay separate. Actual final test hashes are mainf3e07147,
+references304/9909/d22a95a2 and binary111/3972/752e8203, with maximum function91.
+Model parent0035c760 and encoder rejector8a95724c are unchanged. Parser43/1346/
+2316e4dd differs from original rejector only the required12B must_use attribute.
+
+Root whole/hash-read PERF94092+7405/56f31bd3af31b71e5655a071ac1126f9fd0db37d4edcc5fd6aed08e77c28e79e
+and101497+3334/5ed24a9e69ae07b23bc55cd5112720d81a55e4b09e75dd52530e0e5bbc68e866.
+Independent exact full-file style/priority inverses, source literal extraction,
+eight names, nonvacuous larger-backing pointer/lifetime witnesses and semantic
+error-before-Limit refinement all agree; no scoped source/resource defect remains.
+Its runtime-pending wording is respected: actual results above are Root evidence.
+
+Root updates CONTINUE with this scoped RED checkpoint and prepares local SAVE
+of exact R0 six paths, Root M0 controls/ADR, coordination and inspected role-note
+prefixes. The later ARCH producer recommendation171780+22049/cdf32418 is NOT yet
+Root-read or released; preserve that uncommitted tail rather than stage it as
+reviewed evidence. BODY remains unreleased until this genuine RED SAVE exists.
+All3 original HistoryValues arrays remain[]; real publication/catalog/hydration,
+typed input, original profiles, Linux/native8 and the full M1-M8 goal remain open.
