@@ -71,3 +71,32 @@ all1569 held members were byte-identical, canonical digest
 No formatter/compiler/VM/test/Git or other source mutation was run. Actual RED,
 SAVE and separate BODY selection remain Root's next steps; no new parity,
 full hydration, native old8, Linux or memory/performance credit is claimed.
+
+## CODEC1 BODY1 author STOP
+
+All ten approved buffers are stopped; Root has full hashes and source custody.
+The complete selected common/ordinary five-family foreign DATA decoder replaces
+R0, without changing public models/tests. One grammar drives census/build,
+postorder nodes/contiguous edges, exact EOF and encoded alias depth. Captured
+function canonicalization precedes free values. Iterative list/map equality
+retains semantic aliases and distinct float bits. No foreign execution occurs.
+
+Continuous logical work covers both scans, reached captures, normalization,
+comparison, frame visits and prospective scratch/result growth. Reserve targets
+use target-minus-len and checked old-capacity relocation; no ceiling prealloc.
+FLOAT99 uses its mandatory first NUL/fixed31-byte buffer. Context/profile,
+source-invalid, limit and real reserve errors remain separate. This is neither
+native paid R nor a whole heap/CPU/RSS or platform-equivalence claim.
+
+Author pre-format LF/hash: root96/68311043; budget100/ebf45380;
+context213/af394876; scan199/a2bf4a53; frame35/7992235c;
+scalar174/9653c416; sequence84/0c44714e; foreign210/2f13ea52;
+equality181/19d2d78c; equality-scalar181/2fc76af8. Census58 functions,
+13 selected private types; maximum57LF. The sole added helper identity_fields3
+has Root's precreation ARCH3923/8b3d0ea3 release. Root must measure ordinary
+formatted400/100 geometry and execute the unchanged oracles/checks.
+
+Whole scoped inverse restores920B/9885907d; nine absences captured. At STOP all
+1576 held members matched112a9c33795a28ef8667fb7a9836a908b670ee99e89b7790393e343d88f837de.
+No build/test/VM/format/Git ran. Real catalog/read/hydration, original3 mappings,
+native8, full profiles/Linux and the overall goal remain open.

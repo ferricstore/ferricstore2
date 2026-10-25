@@ -235,3 +235,914 @@ whole allocator/stack/CPU behavior:
 
 This finite consultation is complete. No code, context acquisition authority,
 dependency, extra test/benchmark artifact or workload is released by the review.
+
+## UNAPPROVED CODEC BODY algorithm and resource proposal during R0 authorship
+
+This is a finite proposal, not parser implementation or creation permission.
+I actually read ARCH17921+14882/e94ca114fb38d16cf1a141077d292716a0ae5a30512811975d5c67faa0b6be46
+and32803+3601/00dadab44370050a0af0ffc59f9ffd7c26143ed04c2a8c9929d5abe42e2046ec.
+The latter's PRIVATE document and five checked views supersede public-document
+wording. Both complete stored len and incoming Vec<u8> capacity count toward
+max_encoded_bytes; the decoder neither shrinks nor copies the input to evade
+that owner profile. Root has also explicitly selected ENCODED typed-subterm
+depth, root1/each child+1, INCLUDING zero-head LIST alias wrappers. That relay
+supersedes my earlier semantic-depth suggestion. Normalizing an alias in the
+returned model does not erase its admitted encoded nesting. No moving R0 source
+was read. Actual rejecting runtime/SAVE and exact BODY frame/helper/file
+selection remain future Root/ARCH responsibilities.
+
+### Minimum iterative producer
+
+Use one checked grammar driver in census and build modes, with a single
+monotonically spent work account covering BOTH passes, context lookups and final
+semantic-key validation. Do not maintain two subtly different byte grammars or
+reset the budget at a phase boundary. Initial profile validation/input-owner
+checks precede scratch/result allocation. Raw, unknown/incomplete FSV2 and escape1
+branches need one binary node and no context lookup; a typed branch requires
+version/exact EOF and the selected source tag rules. All error offsets remain
+relative to the complete stored input.
+
+Census retains only a flat continuation stack, one active sibling position per
+compound rather than enqueuing every future child. Before each frame push check
+encoded depth, checked counts/work and prospective scratch growth; propagate a
+real failed reservation. Aliases still count wire depth. Count the ACTUAL model
+nodes/edges, including STRING-expanded integer heads and list tail, normalized
+zero-head aliases, alternating map key/value IDs and foreign free-variable
+edges. Foreign ref words and leaf bytes stay ranges in the input owner. Do not
+preallocate a maximum deployment limit merely because it is large; use actual
+counts and checked arithmetic. An enormous valid profile is not itself an
+instruction to allocate it.
+
+After census, perform one checked fallible exact reservation for the node Vec
+and one for the edge Vec. Reuse or release census scratch deliberately. Build
+with the same grammar, allocate each compound's contiguous edge slots and fill
+node IDs through explicit continuations. Completion checks must establish every
+slot is filled, exact counted totals, one root and exact EOF before returning.
+Build never inserts encoded backreferences into a recursive Rust owner graph.
+The private document owns the moved bytes and flat spines; dropping it remains
+flat Vec destruction. No leaf String/Vec copy, recursive owned tree, public
+constructor, new output wrapper or encoder is implied.
+
+Syntax/safe/numeric checks possible during census should happen there. Semantic
+duplicate maps require built typed keys; allocation may therefore already have
+occurred when that validation refuses. This is not a promise that EVERY invalid
+input can be rejected with no scratch or final arena allocation. Partial owners
+stay private and are dropped on error. There is no partial successful document
+or storage authority.
+
+### Exact keys without a new hashing/interner subsystem
+
+For the minimum BODY I recommend an iterative same_term evaluator with flat
+continuation frames, and pairwise duplicate-key lookup per map. The earlier
+canonical-rank/hash optimization is deferred. No additional interning model or
+collision theorem is needed. Validate nested maps before their containing maps,
+using the builder's acyclic ordering or an admitted explicit postorder walk;
+keep the document's original pair ordering unchanged.
+
+An equality frame retains sequence progress or ONE map candidate at a time and
+pushes one actual child comparison. It never invokes itself recursively or
+materializes a normalized key tree. Map equality matches each left key in the
+right map and then its value, independent of pair ordering. With both maps already
+unique there is at most one matching candidate. Every unsuccessful candidate and
+every revisited nested term/byte consumes work. This can be quadratic or worse
+under nested structural comparison; max_work_units is its explicit operational
+stop, not proof of linear total CPU.
+
+A list cursor walks each node's heads and then its tail, crossing segmented
+LIST/STRING aliases without constructing a new list. Mathematical integers unify
+small/signed/padded/large encodings; zero has no negative sign and any nonzero
+source sign byte is negative. Latin1/UTF8 atoms compare as Unicode scalar names
+without constructing a normalized String. Integer/float are distinct; finite
+float bits preserve BOTH zero signs. Binary/bitstring comparison uses logical
+bit length/content, including unused-bit normalization where required by the
+selected source family. Foreign identity normalization must follow its actual
+source fields/context, not encoded-byte equality or claimed execution. Ordinary
+Atom nil and EmptyList remain distinct. No Raw::Other, FWPV or metadata-scalar
+projection substitutes for a type.
+
+### Proposed prospective work and reservation tariff
+
+Before BODY, ARCH must record an exact tariff matching the implementation. My
+concrete minimum proposal uses one unit per consumed wire byte in each pass,
+plus one per produced/visited node or edge, continuation visit/push/pop, map
+candidate and context row. Additional normalization/equality inspections charge
+one per examined byte on EVERY visit, including UTF8/Latin1 comparison and
+high-zero scans. Charging a consumed opaque span is a declared logical parser
+handling tariff; it is not a claim that the CPU physically reread every byte.
+Deduct before the operation/loop span; checked overflow or exhausted work returns
+Limit. A raw constant-size jump is not evidence that subsequent key/UTF8 work is
+free. Native Meter R/F, elapsed CPU and whole allocator/GC/RSS are separate.
+
+Scratch reservations themselves need a precise growth policy. Grow only when
+needed, using checked bounded batches rather than blind reserve_exact(1) at
+every nesting step. Charge the reached live operations and a conservative
+old-capacity*size_of(frame) relocation allowance BEFORE a fallible growth call;
+check that product before calling the allocator. Frame/equality task counts
+remain bounded by reached depth and available work, and only one candidate's
+continuations are live. This makes physical-capacity-dependent operational
+headroom explicit; it is not a portable exact CPU tariff. If ARCH instead selects
+a deterministic logical-copy tariff, allocator excess/copy latency must remain
+explicitly outside that bound. Do not silently claim both properties. Requested
+scratch/result counts are bounded, while allocator overprovision can still make
+capacity exceed the request. No capacity==requested, boxed-slice shrink or
+allocator-failure harness is selected.
+
+Context rows are borrowed captures, not inferred from the untrusted value.
+None is unavailable; Some-known-absent is the source safe refusal. Reached table
+validation/lookup must be charged, including compared name bytes and any
+coherence/duplicate scan. The six-model error roster has no InvalidContext:
+either coherent capture remains an explicit ingress precondition, or ARCH must
+state that malformed/incoherent supplied capture yields UnsupportedContext at
+the reached tag. It must not manufacture a known-absent atom from unusable
+context. Unused context need not be traversed for a raw binary. Separate known
+unsupported LOCAL/native-index profiles from malformed data and from real
+TryReserveError. No returned context lifetime or BEAM lease is introduced.
+
+### Pinned legacy float mechanics and the remaining boundary
+
+I located and fetched the ACTUAL official Unix source online:
+[OTP28.3.1 Unix sys_float.c](https://github.com/erlang/otp/blob/aa5b1d3366762ff8f420f2aa6a52604b481530c9/erts/emulator/sys/unix/sys_float.c#L73),
+blob911464c25a106eefe9ee58a86c9d60219111178c. Its complete3720 bytes match the
+local pinned source at /private/tmp/ferricstore2-policy-runtime-capture-otp-28.3.1/src/erts/emulator/sys/unix/sys_float.c
+(SHA2567dc6c4402691788d9ec4590443c670c26c05e9b2f86566da858cb6e4bbabea30).
+The earlier attempted common/sys_float path was wrong; it supplied no evidence.
+I now read the complete actual file, not only a helper declaration.
+
+Its syntax is optional sign, one-or-more ASCII digits, dot OR comma,
+one-or-more digits, optional COMPLETE e/E exponent with optional sign and
+one-or-more digits, then NUL. Whitespace and other suffix bytes before NUL
+refuse. Conversion uses strtod, finite checks and a radix-character retry;
+overflow refuses, while complete underflow to zero is accepted. These source
+facts match Root's26 observations. The grammar is not ScoreBound's scanner or
+unchecked Rust f64 FromStr. A selected Rust scalar helper can validate this
+bounded prefix, normalize comma in at most31 local bytes, borrow checked ASCII
+as str and perform checked finite conversion. It must not modify the owned
+encoded buffer, whose public view promises unchanged bytes. A fixed local
+buffer creates no whole-stack/allocator or libc/FENV/Linux equivalence theorem.
+
+One precise operand remains: a FLOAT_EXT field with NO NUL among its31 bytes.
+external.c delegates to a NUL-oriented helper then advances31; current goldens
+do not settle that boundary. Before claiming total bounded behavior, Root may
+use its existing inline wrapper after authorSTOP for (a) root field '1.' plus
+29 zero bytes, and (b) the same field followed by a SMALL_INTEGER sibling in a
+tuple. No new file/module/probe is proposed. Without that closure, select an
+honest UnsupportedProfile case rather than inventing InvalidFlowValue or
+assuming zero padding/full-field UTF8. Numeric tie/range portability remains
+conditional on the actual selected conversion contract and separate OS evidence.
+
+This proposal needs no R0 source change, test weakening, new public API or
+workload. After genuine saved R0, ARCH can select exact private frame/helpers,
+source subdivisions and the stated profile/error/work rules. Root then verifies
+actual source/compiled geometry and unchanged-oracle target outcomes. The ten
+supplemental codec cases do not map the original three HistoryValues cases;
+real catalog/publication/routed reads/full hydration and old8/Linux remain open.
+
+## CODEC1 stopped canonical R0 source/resource review
+
+I whole-read the actual eight MAIN files after author custody returned. Canonical
+source identities: value185/7825/775cd167e5cf5db1fec65d4527ff0b7323beec14c8987dc0495d5bd469991ac1;
+original_flow25/920/9885907dfc46bbd99b718d19059fbd197d57799ef64717f40353ab94a678e8f0;
+model233/7691/2f0738de6aa2b49b7220e28cef54f0502ed8884a3ed1ecdfb3d1f74336b1a514.
+Tests: main19/817/b5b9bb47ea9966c3f2b1315ba90f041c812cb15ca4cbe3c30198b99319832a49,
+wrappers85/2563/42072ba76dfc6215cc3e06822ed6c1bd0fc02919583d051f8ff2b7c2a520ba79,
+scalars136/4650/dee1dc4108703728df43f400eb0216a6cdf2199982ac04eed50b74e05b9c14ae,
+structure232/10359/57ee2b32c8b859c4090650e77cef6fd3f151bbf17dac758cdcb55c912a09b072,
+context302/10522/ce68cc6762c0e2eff5d998f6d99b1a70c63453109ebf3b2f680ac54e35e84972.
+These scalar bytes precede the agreed additional NUL-last positive below; there
+is no claim that an unrun refinement already has these hashes or runtime status.
+
+I read exact R0 decisions e94ca114/00dadab4 and the subsequent two-helper
+geometry36404+1728/SHA7121a84809c1f4ce42d1e34740432c8d70ecb32ae956fc39e452e74cfa6ec660.
+DOMAIN3053+1553/b02ac9a394611f2e47f165aa595fad2f5cf140f8dbc3bf8955dda26cbe1be337
+was actually whole/hash-read. Only its author snapshots/held1569/551cc793 are
+attributed author/Root inventory evidence; I did not rerun that inventory.
+My independent229-byte seam removal reproduces the ENTIRE old value177/7596/
+6013552c8d2bf51c88663a029cb563ba17b5743fe030225fba5f03a8c44fd47d.
+The sole private original_flow child file is model.rs; no BODY/frame/helper
+shell or encoder is present. Actual tests are ten names plus the two explicitly
+approved assertion helpers, twelve function spans total, maximum83 physical LF.
+No packing, waiver, new error/class or public callback is introduced.
+
+The new function is an honest ALWAYS-InvalidFlowValue baseline; it performs no
+wrapper/ETF parse, context lookup, limit enforcement or output-arena allocation.
+It consumes and drops the incoming Vec on failure. Therefore this source is not
+an implemented resource gate or a passing old decoder. The six models match the
+selected data contract: private encoded/node/edge/root owners; flat range/ID
+nodes; finite float bits; arbitrary-width borrowed magnitude ranges; explicit
+foreign identity DATA; optional captured tables; five positive resource axes;
+source/context/profile/limit/actual-reservation error lanes. Debug-only document,
+nodes and error avoid an implied payload Clone/Eq implementation. Copy context/
+limits/function metadata do not own or execute a foreign runtime resource.
+
+All five document views use ordinary checked slice access; bad IDs/ranges return
+None. No public constructor, mutable view or context lifetime escapes. The model
+has no recursively owned child graph. Limits explicitly include full stored
+len AND moved input capacity, encoded depth including LIST0 wrappers, actual
+node/edge spines and admitted work. Their existence is not enforcement by R0,
+allocator-overprovision coverage, public opening R or storage availability.
+No capacity==requested, automatic Box conversion, shrink or fake OOM is claimed.
+
+The test oracles are meaningful and source-derived. Wrapper controls distinguish
+raw/empty/incomplete/unknown magic from one-level escape and typed corruption.
+Integer cases cover truthy sign2/255, empty/padded zero, i64 endpoints and a
+nonzero20-byte magnitude with padding. Float expectations use literal binary64
+bits, comma/NUL grammar and nonfinite/malformed refusal. The184-byte compound is
+byte-for-byte equal to the actual original compound in packet8722488+11999;
+its SHA256 is87d0e580ac0b3f9ba92c6e3dc696671b3b4a479f09aca4bfed342f20566df5fa.
+The helper checks exact16-ID cardinality BEFORE indexing and all eight typed
+values; nil atom, empty list, empty tuple and STRING/list cases remain distinct.
+
+Each duplicate-map alias is first shown valid alone, then both pair orders must
+refuse; this prevents an all-invalid decoder from satisfying the negative oracle.
+Nested unordered-map, segmented/zero-head list, integer and Latin1/UTF8 atom
+aliases are represented. The four-key map requires all exact members, including
+both signed zeros and integer/float distinction. assert_foreign checks each
+family's actual fields and rejects unknown classes; Root's added creator PID
+node'n' assertion is present. No BEAM invocation, storage callback or fake
+context capability is substituted. Unsupported native/local profiles stay
+operational, not InvalidFlowValue or full-profile credit.
+
+Limits first require a valid positive decode before axis refusals, zero invalid
+profiles, over-capacity input and encoded alias-depth2/3 controls. No unselected
+exact work price or reservation-failure execution is asserted. The ownership
+case moves nonstatic bytes into decode, drops temporary String/context rows,
+then requires success and exact nonempty content before pointer/range checks.
+It tests unchanged moved backing and leaf offsets after those descriptors die;
+it is not a measurement of every internal allocation or retained capacity.
+Fixture Vec/String allocations and clones are outside production-work claims.
+
+I whole-read/hash-checked Root's post-STOP original boundary packet8757813+4392/
+0373edb42e9a1e94e572e220177e8c46f0e470dc3d04e5c285b66cd5d7c5febf.
+The selected pinned controls close the previous no-NUL operand: full31-byte
+no-NUL root/nested fields refuse; NUL before invalid UTF8 and at the final field
+byte accept1.0. This supersedes the pending-boundary wording in the proposal
+above, without a universal libc/FENV/Linux theorem. The actual C NEW_FUN sizing
+path intentionally ignores a faulty Size field, so the zero-Size captured-data
+fixture is not automatically malformed. No arbitrary function execution follows.
+
+One finite oracle refinement was sent directly to Root/ARCH and accepted: add
+the observed30-byte positive text '1.' plus28 zero bytes to the EXISTING scalar
+loop, where resize33 supplies NUL at the last field byte, expected literal1.0bits.
+Current positives cover early NUL/ignored invalid tail; the addition catches a
+last-byte off-by-one. Root will apply it ONLY after the current validator stops.
+No new name/helper/model/API is needed. Current source review finds no scoped
+model/ownership/oracle defect; that accepted coverage refinement and actual Rust
+runtime are pending, not blockers retroactively invented for these bytes.
+
+No Rust runtime result is inferred here. Root's active eight-command run owns
+all compiler/VM/test evidence; the eventual behavioral R0 receipt will identify
+actual reached failures and masked tails. Supplemental codec cases do not
+advance the original three HistoryValues/four-observation mappings or complete
+publication/routing/storage/hydration. BODY proposals remain unapproved until
+genuine saved R0; native old8, initialR/fullE-T, Linux and full profiles stay open.
+
+## CODEC1 latest canonical bindings and genuine rejecting runtime closure
+
+The earlier source receipt's pending refinements are now resolved. I actually
+whole-read latest main19/821/2445d36f8baeaa33fd378abbfe6ee69dcb30ddf73d005b9dc0f0407d32d41b90,
+structure232/10372/8b85c338520ccd5d0dbc7607d0f2262322a6370f4cc5b4d435c3d23886c163a4,
+and scalars137/4718/ad000d6f5e76ab70925d6ef7795b944423b1fc03702d6dfc67cdf891e782e56d.
+My exact whole inverses restore main817/b5b9bb47 by removing four header
+backticks, structure10359/57ee2b32 by undoing two as_chunks replacements
+(including the zip iterator spelling), and scalar4650/dee1dc41 by removing only
+the68-byte/one-LF NUL-last positive row. That text is exactly30 bytes; existing
+resize33 places NUL at the31st field byte. Assertion meaning/cardinality and
+all ten names/two helpers remain, with maximum83 LF. No source fee changes.
+
+I also read updated model233/7791/
+23a3e61e175edb82f060eaffb1862f60da97dc5404cd1f32f95cda395e024423.
+Undoing ONLY four pub(in crate::value::original_flow) spellings restores the
+ENTIRE7691B/2f0738de model. That path is exactly model's immediate ancestor,
+the same feature-private boundary as pub(super). No field becomes public and
+no constructor/API/type/checker/policy changes. I read actual source.rs200..208:
+its value facade guard rejects an unqualified first super path. The explicit
+ancestor spelling makes the existing value-descendant target visible to that
+guard; no rule is disabled or broadened.
+
+The prior four Clippy diagnostics and later workspace field-path rejection
+were technical failures before target execution, not behavioral RED. The final
+Root69588 packet is different: I whole-read/hash-checked ALL eight commands at
+8772786+13059/SHA2173ded078a3e2ade47c514a52c0496597ad76ea3e8464caf36358804be634f3,
+including complete target8781257+4563/
+d17da2c93fef371973b9ed26f6e72941d6c416d301347188fabe5d176d64d4ae.
+My parsed eight footer sequence is0/0/0/0/0/0/0/101, ALL UNCHANGED True with
+1577 inputs/efad1205f603f064b307faa9f70469c003fe33d7d59296de8f0457e7bafcdc91.
+First seven pass: fmt, all-target domain compile, strict Clippy, arch52,
+reference480, progress120/132/550 and whitespace. No suppression, ignore,
+filter or fake runtime success is used.
+
+I extracted expected names independently from the actual ten #[test] functions
+and compared an exact (module::name,status) Counter to complete target output.
+All ten appear once:1PASS/9assertionFAIL, zero ignored/measured/filtered. Only
+wrappers::flow_value_rejects_compression_trailing_truncation_and_bad_lengths
+passes. Other tests fail at their first positive with Err(InvalidFlowValue):
+empty raw35, small integer33, float+0bits98, compound39, standalone map-key103,
+distinct-key map145, foreign PID45, limits-positive102 and ownership-positive194.
+This is the genuine NEW rejecting-decoder baseline after technical checks,
+not an old regression or a compile/missing-symbol failure.
+
+The entire negative wrapper loop executes. Later raw/escape, i64/wide/sign/zero,
+FLOAT99/NUL/nonfinite, semantic-map alias, foreign/helper, positive-limit/zero/
+capacity/depth and owned-pointer/range assertions remain MASKED by earlier
+positive failures. The ownership/context-drop control TYPECHECKS in actual
+all-target compilation, but runtime content/pointer preservation is unproved.
+Original VM boundary evidence is separate from these masked Rust assertions.
+The always-rejecting SUT still implements no successful decode or resource gate.
+
+Ordinary reciprocity: I actually whole/hash-read ARCH57221+8078/
+880657caef88467a37d7376f354b8cbf335a133315c393d47a1fbecf7c236b84 and DOMAIN1553/b02ac9a3;
+their source/ownership/inverse/oracle findings agree. I also read UNAPPROVED
+BODY38132+19089/cd3e251a28ea735c27579701d86fc7f908b8c4a2c0d4fc6b34cb7fa65fbe9119;
+its earlier no-NUL fallback is superseded by the actual4392 controls/refined
+oracle. That read does not grant BODY files/helpers. Final peer runtime notes
+can be read ordinarily without another source-readiness or ACK loop.
+
+Finite R0 review conclusion: no scoped model/ownership/oracle defect. Genuine
+R0 may be saved before a separate exact BODY selection. Root reports original
+three HistoryValues arrays still empty; these supplemental ten cases neither
+supply publication/catalog/routed reads/hydration nor full profile/Linux/native8
+closure. No measured speed, allocation/RSS/OOM, whole stack/CPU, public opening
+R or overall goal completion is claimed. Only this performance note was written.
+
+## NEXT catalog/publication/ordered-read source and resource proposal
+
+This finite stable-source assessment grants NO source/model/API/helper/test or
+workload authority. DOMAIN's decoder BODY remains moving and was not reviewed.
+I actually whole/hash-read corresponding ARCH90694+15139/
+b37e5990a0145a27f5fa0fd996d8c8c393eaeaf341b294e0b9d20b3f2ed261e8.
+Its source-neutral catalog, supplied-kind provenance, intermediate history,
+legacy capability gating and per-occurrence decode ownership agree with the
+findings below. Exact later artifact/helper/profile selection remains with
+Root/ARCH. No independent seed API, data-only callback success, new decoder
+cache, third-party dependency or creation release follows from this proposal.
+
+### What already exists and what is genuinely missing
+
+I read stable WorkflowRecord64..145 and actual record encoding through180;
+inline payload/result/error are ALREADY persisted in FWSR, not an unimplemented
+blob abstraction. The actual ports/log.rs145..221 DecodedRequest owns represented
+commands and borrows its encoded donor; value_bytes(index) borrows those existing
+value owners without another copy. Publication::write_record and record_size
+serialize all current inline fields. A catalog must preserve historical/generated/
+shared reference availability; copying every unchanged current field into a new
+value row on every transition would add gratuitous ownership and wrong versions.
+Current reduced FWSH encodes event metadata but lacks those reference snapshots.
+ActiveValueRef explicitly supplies logical identity without stored availability.
+Ports/blob.rs and storage/blob.rs remain three-line reservations.
+
+Fresh exact stable read identities include transaction358/f89b072d, store295/
+7c0c6bb3, commit233/5788bd4d, commit/independent79/20d99c22, publication296/
+1753832e, read/point211/63786911, key295/d221820c and physical106/fd179712.
+These complete files were read except the broader workflow/log/record modules,
+whose relevant ranges above define this review. I also read complete claim
+commit138, claim trait1..125, recovery/rows1..160, recovery245..273 and current
+snapshot format1..125/165..230 and validation1..140. Full-file hashes do not
+claim unrelated source scopes were re-audited.
+
+The exact earliest data deficit is explicit accepted per-item value/ref intent.
+Original flow_create652..663 generates a NEW versioned reference on field
+PRESENCE, even if the supplied bytes equal the old bytes; otherwise explicit or
+old refs survive. flow_values323..345 writes only supplied fields. Therefore
+comparing before/after bytes cannot recover the required intent. Actual log.rs
+201..219 is positional: Cancel slot0 is ERROR; Complete/Fail slot1 is result/error;
+Retry slot1 is error. fresh::stage_values167..185 FLATTENS Option slots. Its
+flattened index cannot establish kind, and an absent payload can shift positions.
+Join the actual Operation, explicit supplied-kind/presence and matching accepted
+postimage/version. The proposed private publication attachment owns bounded
+indices/descriptors, not a second payload Vec or a self-borrow into its owner.
+
+Independent commit writes each final record once but EVERY successful history
+plan. Catalog bytes/current refs/history refs must follow that full per-item
+stream, including repeated same-ID intermediate values, not final_indices alone.
+Claim has its own consumed commit_claim path and must carry refs into each real
+claim history too. Genuine no-op/replay/rejection must create no new value row.
+The single existing redb transaction already validates predecessor/control,
+writes core/index/history/outcome/control, uses Immediate commit and fences
+uncertainty. Extend that authority; do not publish to a second database first or
+return a successful reference before the atomic commit.
+
+### Concrete next responsibility cut, still unapproved
+
+I support the candidate ports/blob value/reference/publication responsibility,
+source-neutral stored-byte row plus independent expiry, profiled current/history
+bindings and authentic ordered reader on the actual state owner. Existing
+log/Fresh/independent/public-mutation/atomic-start/claim preparation must provide
+and validate the attachment; storage key/value/redb/commit/read must consume it.
+The first bounded generated nonterminal binary route can be real progress, with
+legacy, typed/preencoded, terminal-retention, shared/named/external and public
+routing gates EXPLICIT. It is not full HistoryValues or the original three maps.
+The row schema must not hard-wire Binary as its only possible future value type.
+
+Existing command Vec bytes are LOGICAL BINARY, not trusted stored ETF. Publication
+must preserve source Support's escape rule: prepend FSV2+tag1 only when logical
+bytes start FSV2, otherwise preserve them. A typed/preencoded discriminator,
+intent/log version and full value encoder need their own later contract; never
+reinterpret an existing Vec merely because its prefix resembles type2. Catalog
+stored_len includes that source wrapper, while record payload bytes keep their
+current semantics. None and Some(empty) differ. Do not replace core inline
+fields with refs or Box as an incidental optimization.
+
+Current source flow_values103..107 gives no expiry absent positive captured
+terminal retention;414..425 explicitly leaves OLD terminal refs' TTL untouched.
+New terminal values need the authentic captured expiry witness, which the
+reduced durable core does not yet fully represent. Do not derive it from a later
+clock/policy or cascade-delete old unexpired catalog values when record/history
+retention runs. Shared/named linkage, ownership and cleanup remain real required
+producer/lifecycle work, not an arbitrary opaque-key seeding fixture.
+
+I verified current snapshot behavior, not the older summary: FWSS6 selects FWSP3;
+FWSS5 selects FWSP2. Physical families remain0..7, and recovery rejects unknown
+families. New catalog family/record/history envelopes require joint layout,
+semantic row/relation/inventory, snapshot/cohort/receive/install/restore and
+replay changes. A header/range edit alone is insufficient. On a value-enabled
+layout, legacy plans cannot silently bypass ref/history maintenance. Replay or
+backfill from real retained evidence, or explicitly refuse unsupported migration;
+current inline bytes cannot reconstruct discarded historical values. Existing
+snapshot cohorts and log-purge protection must retain the values they need.
+Proposed family8/new layout are only reserved architecture candidates here.
+
+### Ordered read ownership, costs and one concrete optimization candidate
+
+A batch must have a slot for EVERY requested key, including duplicates/missing,
+and may keep unique owned encoded buffers indexed by aligned slots. Use actual
+scope/placement and one stable revision/control watermark; group-local coherence
+is not a quorum barrier or proof of cross-group routing. Original routing uses
+captured slot assignment after crc32&1023 over the real flow hash tag, not a
+random HashMap or a caller's invented partition. Invalid source ref grammar is
+screened by the compatibility collector; it is not authorization to read another
+tenant/group. No real session can call unknown/missing routing 'successful nil'.
+
+Redb point reads already inspect borrowed guards before copying admitted owners.
+The same pattern can validate a catalog envelope/namespace/length/expiry and
+return Omitted(stored_len) without copying/decoding the payload. This avoids a
+user-owned payload buffer; it does NOT prove fewer disk reads or less engine
+page/cache materialization. Zero-length stored data at max_bytes0 is Bytes,
+not Missing or Omitted. Corrupt storage envelope/read failure differs from
+valid stored bytes whose typed FSV2 payload later fails decoding. Reopen must
+not depend on a live atom/export table or turn a context-dependent value into
+storage corruption. The projector preserves the source's redacted error versus
+missing/omitted rules and sticky fields. max_bytes is not a whole I/O/memory cap.
+
+The current decoder consumes Vec. Stable fetch dedup therefore does NOT remove
+copies needed for source per-occurrence decode. Admit a reached fallible copy
+for each occurrence before moving it into the decoder, including actual retained
+capacity under its profile; do not move the same unique owner repeatedly or
+introduce a silent cache. Count ref/key/slot/unique-owner arrays, serialization
+frames, existing command/postimage owners, temporary copies and decode scratch
+with clear live ranges. Drop retired buffers when safe. A borrowed redb guard
+cannot escape its transaction as an owned document, and no self-referential
+read batch is acceptable. A future read-only MVCC session could avoid taking
+the current exclusive apply writer for queries, but must capture scope/control/
+rows in one snapshot; that new capability is not created by this review.
+
+One source-proven caller-buffer opportunity merits a later named experiment:
+the ALREADY selected redb4.4.0 commit7061f7e60d4573311c0636e161d417b93e9fd2b1
+Table::insert_reserve accepts a length and returns a mutable in-place row guard.
+I fetched/read official table.rs300..347/425..476 online, blob
+8cb910f0d5b9fb01347e2d5c7978d82aa54dd9ef:
+[pinned redb table API](https://github.com/cberner/redb/blob/7061f7e60d4573311c0636e161d417b93e9fd2b1/src/table.rs#L451).
+It could let a future serializer fill the complete catalog frame plus conditional
+escape directly from borrowed command bytes, avoiding a full caller-side escaped
+Vec followed by another frame Vec. It REPLACES an existing key: immutable
+version-key absence/collision and all scope/size/admission checks must precede
+reservation, and any subsequent failure aborts the whole consumed transaction.
+Internal engine allocation/copy/zeroing and failure bounds need their own source
+review before reducing existing charges. The API's existence is no measurement,
+allocation theorem, selected adoption or new dependency/security review result.
+
+### Meaningful validation using the existing real harness
+
+The existing wf-storage/tests/state_store target creates real files, drives
+prepared production apply functions and reopens observed rows. Its delegated
+DiskFaultBackend uses FileBackend, counts actual read/write attempts and exposes
+acknowledged before/after-sync process boundaries. I read main1..95/315..378,
+fixtures1..135/170..223 and backend1..180. Reuse those facilities, not an independent
+catalog seed API. Candidate cases must prove equal supplied bytes create distinct
+versioned refs, unsupplied refs carry through claim, every same-ID intermediate
+history remains readable, ordered old/new/duplicate/missing/omission slots align,
+and byte/ref/history/core/outcome/control publication is atomic across known
+abort and uncertain reopen/replay. Snapshot receive/install/restore must preserve
+bytes, refs and expiry. Terminal cleanup needs its retention predecessor first.
+Real missing, expired, corrupt and backend failure remain different observations.
+
+Actual backend calls vary with cache/page state and are not one-to-one with
+logical probes. Count known logical ownership/I/O attempts under an explicit
+profile and inspect actual delegated calls; do not infer wall-time improvement
+from them. Existing indexed_singleton and terminal_clone are domain correctness/
+measurement harnesses, not catalog/store benchmarks. Their five/ten-profile
+smokes can preserve old semantics, but cannot measure a new routed read path.
+The closed terminal A/A stop is not reopened or retuned. Any new storage timing
+artifact needs exact prior architecture approval and a predeclared stable
+comparison; no benchmark, allocator probe or unchanged retry was run here.
+
+I sent the positional-kind, intermediate history, migration/error and ownership
+findings directly; ARCH incorporated them. No substantive resource-contract
+conflict remains in its bounded candidate. Its later node-level route tests can
+supplement, not replace, the existing genuine storage harness. This is source-
+proven cost/ownership assessment, not measured speedup, whole CPU/heap/RSS,
+Linux/macOS execution, durability/power-loss theorem or completed hydration.
+Full common typed publication, real complete routing/shared/external/lifecycle,
+original setup/profiles and the wider goal remain required. Only this note changed.
+
+## BODY1 complete canonical A source review, actual first target and corrections
+
+I actually read ALL ten stopped canonical A files in full, before Root's
+postterminal six-path edits. No moving decoder source was reviewed and no build,
+VM/test/probe/Git/source mutation was performed. A identities (LF/full SHA256):
+root146/57883ecc605ae12c1dab2abc8f37db76713e035154eb9745929c7e88498bdfdf;
+budget115/9871a2342c0b13c98bafb5b7bb6bdcdbb9c945d352a0323fa818d0073e782917;
+context353/760758c0ec00a26c997ec6027431bb1a7f407dae61d7a56814acad97c78c9850;
+scan271/6322fb932dc0f68acafc222d38349c7fd780db66052f89793eeb071834b7bf32;
+frame66/d96d54107d095e0d30e048ea0bdd6c31f39bff5a4a8a1fef0bfe6d196c4084a1;
+scalar284/bee3c40e350aa1423c5bc3b33ddaac325bd19ce19d9271090c4330c35d186f1a;
+sequence193/223f55c6bc276b6e30e04e63f3a27a2959ecb502060d195115e9d60187db6272;
+foreign480/4f7e95821881c51a32199e5b4514c7cc9c5ffd2bf42d9a5951f9b42ec7e2c233;
+equality332/eac64e51f9c531f91ef11da41866fe4dbb71c47acf5254922d9c40f6aa59c0a0;
+eqscalar342/7c7433f6587cca8d3fd8534d2ed6c9046c8809ce932c4e99d4667a196ec40676.
+Paths are under value/original_flow, except the feature root original_flow.rs;
+frame/scalar/sequence/foreign are scan children and eqscalar is equality/scalar.
+The58 functions and13 private types agree with the concrete selected roster.
+Frozen R0 model/public seam/oracles are not replaced by BODY-derived expectations.
+Root/DOMAIN's full1576/112a9c33 held proof and root/nine-absence inverse are
+attributed; I did not manufacture an independent whole-inventory run.
+
+I actually whole/hash-read DOMAIN4606+1753/c2fd256b23477ea30c0cfcac0ad3e18e8f60cd3b002b9f2645730ca967562041,
+ARCH109756+12075/08865cfb9f7efab039aeef28b34d892c611c27d53d3148f0299c6c61baf38619,
+and its work supersession121831+1887/
+270441b7e33c892581da037789612d61234439bc5bfa146140163efa2fbaee8a.
+The following findings go beyond the ten visible positives. Root is already
+implementing separately selected corrections; this A receipt does not promote
+unread revised source or infer a revised runtime result.
+
+### Iterative ownership/count/depth proof from actual source
+
+Budget checks all five positive limits plus WHOLE input len AND capacity before
+new scratch/arenas. One work account spans wrapper/census/build/context/fixup.
+The raw branch retains unchanged original bytes and one Binary range, including
+escape-empty; typed mode requires version/exact EOF. Scanner::take bounds the
+span before admitting its declared handling and advancing. A missing/truncated
+span does not falsely charge a nonexistent huge operand. No original buffer
+is normalized or replaced; Float99 uses fixed local scratch.
+
+Census and build are modes of the SAME driver. Every loop either completes,
+admits a next encoded node, processes a paid continuation or emits a paid
+synthetic STRING element. No recursive scanner, recursive input tree or enqueue
+of all future children exists. One current sibling continuation per encoded
+level is retained. begin_node checks encoded depth INCLUDING each LIST0 alias;
+push_frame grows prospectively and child depth is checked on entry. STRING
+synthetic cells consume output counts/work but no invented encoded nesting.
+Known-count minimum checks may still allocate bounded scratch before a later
+refusal; there is no all-invalid-input/no-allocation promise.
+
+slots checks cumulative edge counts, admits initialization, and fills only
+already reserved result space. emit checks the node bound/work before arena
+append and build's expected count. write_edge checks a finished child ID and
+admitted slot before mutation. Children complete before parent IDs: tuple/map/
+list, foreign module/node/creator/free children and STRING head/tail nodes are
+postorder. A zero-head alias reuses its completed tail ID without adding a graph
+cycle. Build requires exact finished/edge/max-depth counts and exact EOF. Final
+edge validation catches sentinel/unfilled IDs before map publication. Private
+node ranges/IDs originate from checked input/counters, and all public views
+remain checked. No external document constructor can introduce a cycle.
+
+Census frames drop before exact node/edge reservations; immutable context and
+bounded virtual function bindings intentionally survive into build, then drop
+before returning. Parsing, equality and document destruction own only flat Vecs
+of fixed metadata/ranges/IDs. Deep invalid input returns with flat scratch/partial
+arena drop, not an input-depth-dependent recursive destructor. Fixed stack enum/
+argument assembly and standard-library internals are not a whole-stack theorem.
+I found no unbounded native recursive call or attacker-controlled allocating
+leaf conversion in these paths; actual deep-profile execution remains separate.
+
+### Equality, context and prospective resource inspection
+
+Map validation walks postorder so maps used as keys are already unique. Iterative
+comparison holds one actual candidate/continuation and no recursive call. Map
+keys/values match independent of pair ordering; list cursors cross head ranges
+and tail-list segments, preserving improper tails without materializing a new
+list. Empty-list/atom nil and integer/float classes differ. Normalized small/big
+integers, sign truthiness/padding/zero, STRING/LIST and Latin1/UTF8 atom aliases
+are mathematical; finite floats retain distinct zero bits. Bit comparisons mask
+unused last bits. No raw encoded-key comparator, normalized tree, random hash,
+rank interner or shared mutable runtime is introduced. Pairwise/nested comparison
+can be nonlinear; exhausted work is an explicit operational Limit.
+
+Reached captured tables are validated once per decode, but every actual lookup,
+row/digest/name comparison and normalization traversal is charged again. Name
+validation/UTF8/character iteration has admitted lengths; equality does not
+allocate normalized strings. Virtual function bindings use original input spans
+plus fixed metadata. Full-entry/old-uniq collision profiles stay explicit rather
+than guessing equality or invoking a function. Ordinary foreign PID/port/ref/
+export/function DATA retains source ordering/guards and no execution capability.
+I cross-checked pinned external.c dec_pid/port/reference/export/newfun ranges.
+The extra official pinned export.h declarations confirm active-export arity is
+unsigned, supporting the selected low32 conversion after the LP64 small-integer
+guard (blob7a218f27b785cd5be2ccb403ee3d0ed5d340bd37):
+[pinned export interface](https://github.com/erlang/otp/blob/aa5b1d3366762ff8f420f2aa6a52604b481530c9/erts/emulator/beam/export.h#L131).
+Known unsupported native/local, zero-ref/empty-bit and function-collision lanes
+are visible operational limits, not blanket unsupported common types or corrupt
+data. No foreign execution bridge or full source-profile claim is implied.
+
+reserve_exact first admits checked target*sizeof(T)+old_capacity*sizeof(T)+1,
+then calls try_reserve_exact(target-LEN). Scratch grows in bounded batches only
+when reached capacity is insufficient. Result pushes stay within the census
+reservation; continuation/binding pushes stay within prospectively obtained
+capacity. There is no refund or budget reset between passes/maps. Allocator
+excess capacity and latency, compiler-elided loads, backend/native memory,
+GC/RSS and fixed helper stack remain outside this logical operation theorem.
+Parser pop+dispatch is one admitted continuation cohort; ARCH directly confirmed
+that interpretation. It is not one unit per every Rust metadata peek/field read;
+equality has its separately admitted concrete transitions. That qualification
+DOES NOT excuse the distinct repeated node/edge omissions below.
+
+### Concrete findings: three omitted charges and one ordering defect
+
+I found and immediately sent Root/ARCH/DOMAIN these three A omissions; ARCH
+independently confirmed and selected exact existing-helper corrections:
+
+- equality validate_maps59..62 spends1 candidate, then reads TWO edge IDs.
+  The selected cohort is candidate1+edge2, so spend3 BEFORE both reads.
+- equality/scalar foreign_equal199 looks up two distinct foreign node-atom
+  children without the2-node debit used by functions_equal321. Spend2 BEFORE
+  those gets; top-level pair-node admission does not fund different children.
+- equality list_step285..288 repeats two node gets after paid cursor folding.
+  Spend2 BEFORE final dispatch, without inventing a new cursor/view model.
+
+ARCH subsequently found an additional ordering defect and I confirmed it in
+my saved A read: equality compare_pair119..123 reads tuple/local-fun environment
+edge IDs THEN spends2. Move that EXISTING charge before the let-pair reads, same
+total tariff/no helper/API. It is distinct from the three omissions and not a
+metadata-cohort ambiguity. Root will apply only after its current revised live
+run terminates; I make no claim that an unread/unrun correction already passed.
+Ten semantic positives cannot prove prospective work accounting.
+
+There are also real natural geometry/quality failures: foreign480>400;
+context::local_function242..353=112, foreign::start8..109=102 and
+finish_identity193..304=112 physical LF. Root's selected identity child and
+three helpers preserve responsibility, spends/order and ownership; flat metadata
+tuple/frame borrows/eager comparisons/doc markup add no model or fee reduction.
+The borrowed identity/export frames contain only copied fixed fields; the local
+fun frame still consumes its owned Range. No packing, waiver, branch deletion,
+checker relaxation or new oracle is accepted. Exact revised bytes/geometry and
+remaining prospective-order fix need their ordinary follow-up source review.
+
+### Actual first execution, with the quality boundary kept honest
+
+I whole-read/hash-checked first target8786044+1161/
+c9d4ce261250b06f7c61079496025d3c069df3993da2240a465a464b75f0bd32:
+10PASS, zero failed/ignored/measured/filtered. It contains the SAME ten names as
+actual saved R0; only the nine failures flip to ok and the negative wrapper pass
+survives. Numeric/foreign/graph/alias, capacity/depth/limit and moved-owner/context-
+drop/pointer/range assertions now execute. This is real unchanged-oracle behavior,
+not a source read or a surrogate error-only proxy.
+
+I also whole-read6485/36df3e6acaa8aabc4a035f245c5263e1e58cc783d60b6b20914de17f08ba3d7d
+at8787998. It is11 technical Clippy diagnostics after fmt/check0, not quality
+GREEN: five bool operators, metadata tuple complexity, two length diagnostics,
+two borrowed-frame suggestions and FloatExt doc markup. Root's1586/9f54b1d7
+unchanged snapshot and actual wrapper exits are attributed. No later quality step,
+full workspace, revised source result or allocation/performance evidence follows.
+
+Source A is therefore accepted for the described common/data semantics and flat
+ownership WITH the four explicit work defects/geometry-quality corrections above;
+it is not complete resource/quality acceptance. Root now has stopped revised
+sources and a live unchanged target; those are a separate actual delta/result
+review, not an ACK gate. Original three HistoryValues mappings, real encoded
+publication/catalog/ordered I/O/hydration, Linux/full profiles, native old8 and
+initialR/fullE-T/public settlement remain open. Only this note was written.
+
+### Supersession: literal parser continuation admission
+
+Root correctly rejected the preceding combined pop/process cohort interpretation
+as too broad for the SELECTED separate continuation visit/push/pop units. That
+wording is superseded here; it must not be read as complete accounting acceptance.
+ARCH confirmed the same concrete unchanged scan.rs sites and selected no new
+helper/model/cache: accept_child256 prepop1 becomes2 (pop plus semantic processing
+visit); STRING run116 prepop1 becomes2; top STRING-frame peek115 and expects_atom
+peek121 each spend1 BEFORE inspecting a NONEMPTY frame. is_empty metadata needs
+no frame visit. Existing push_frame already pays its push; equality's pop/resume
+are separately admitted. This counts high-level distinct frame inspections and
+processing, not every scalar field access or physical CPU instruction.
+
+These are actual missing pre-admission sites under the selected tariff, not a
+renamed free cohort or measured CPU claim. Root owns exact source changes after
+live validation terminates, rebinds the write set and reruns unchanged oracles.
+No additional distinct unpaid continuation site was found in the full A read.
+The previously confirmed edge/node omissions and late edge-pair debit remain
+separate required corrections. Revised source/results are not inferred here.
+
+## PERF-HVAL-CODEC1 final revised source, exact work admissions, and focused result
+
+This is the finite follow-up to my actual A review at50272+11233/012953dd and
+literal parser-tariff supersession at61505+1325/7dfee82e. I whole-read the stopped
+revised files, then the final scan/equality after Root closed their edit window.
+No code, test, workload, probe, compiler, Git or shared artifact was changed by
+this reviewer. This is acceptance of the selected decoder component, not the
+complete HistoryValues/storage/hydration path or its three original mappings.
+
+Actual final files read in full, LF/bytes/SHA256:
+- context.rs382/11254/6cafc1a6cfd205f4079621519b3d080114a578681a4f4770819b6445ed31b72b;
+- scan/foreign.rs320/9156/36b56f7f1383ef627b7095ee5a04959eb2629672bbbceda50acb43a58ab238a0;
+- scan/foreign/identity.rs185/5636/3d018265f83417084f8fc34f92f6b826c1c67f4f891d6c607404e1a9098d30d9;
+- scan/scalar.rs284/9157/166c4f96dc306a4367fab5355e58e7049c39bd092cfc1e9f02e043ac5f1d4127;
+- equality/scalar.rs343/9989/adbc4824edd8ffe077688885ed4e0a196b4dcec05f0e2fa3ba1c6a74d552222a;
+- FINAL scan.rs285/9885/d23d764627d559ca6b5f04ceabda2694f8d4e7115622eb93da457ebde4f96057;
+- FINAL equality.rs333/10125/7b310daa6ab1eeb4f9301dbef411b1a718b717d8118878d63ece420078645450.
+
+The previously whole-read feature146/57883ecc, budget115/9871a234,
+frame66/d96d5410 and sequence193/223f55c6 are still byte-literal by actual hashes.
+The private public-model boundary remains model233/7791/23a3e61e and its five
+checked views; parent value185/775cd167 and all five frozen target files match
+the recorded R0 bytes. Actual test hashes are main2445d36f, wrappers42072ba7,
+scalarsad000d6f, structure8b85c338 and contextce68cc67. There was no altered
+positive oracle, input-capacity witness, pointer assertion, limit or test name.
+A direct source census over the eleven BODY files finds61functions and13private
+struct/enum types; maximum file382LF and maximum function sequence::start94LF.
+No packing, size waiver, suppressed lint, extra public model or decoder API.
+
+The geometry/Clippy changes are substantive clean grouping within the selected
+contract. identity.rs owns the existing fixed identity fields and local-reference
+normalization; start_local_fun isolates the existing112 header/free-count/frame
+branch; check_function_collisions isolates the existing captured and virtual
+collision scans after canonical lookup and before a virtual binding append.
+They retain the same source order, range checks and prospective work spends.
+The seven-part private function metadata tuple removes the nested-type lint
+without a new carrier/model. Both arity and16-byte digest comparisons are still
+computed eagerly under the existing33-unit debit before their logical&&, so the
+Clippy spelling does not reduce the admitted digest work. Borrowing the unused
+continuation frame in identity/export avoids an unnecessary owned argument;
+Range metadata and identity payloads still have no new heap owner. These are
+source observations, not a claim about compiler allocation counts or speed.
+
+I verified all EIGHT distinct correction sites prospectively in actual final
+source (my earlier direct message called the enumerated eight sites seven; this
+paragraph corrects that count):
+1. equality.rs61 spends3 BEFORE reading the two prior/current key edges: one
+   candidate plus two edge visits.
+2. equality/scalar.rs199 spends2 BEFORE its two foreign child-node gets.
+3. equality.rs285 spends2 BEFORE the final two list-cursor node dispatch reads,
+   separately from the already paid cursor-fold visits.
+4. equality.rs119 spends the EXISTING2 BEFORE either sequence/localfun free-edge
+   get. The prior total was unchanged; its previous after-read position is gone.
+5. scan.rs119 pays1 BEFORE the reached nonempty STRING top-frame peek.
+6. scan.rs131 pays1 BEFORE the separate reached nonempty expects_atom peek.
+7. scan.rs270 pays2 BEFORE accept_child pop and semantic processing visit.
+8. scan.rs123 pays2 BEFORE STRING pop and its string_step processing visit.
+Empty-stack is_empty checks do not inspect a continuation payload. Both actual
+peeks remain; there is no cached-frame shortcut or absent-frame debit. Existing
+push_frame pays its owned continuation push before Vec::push. Processing a
+popped frame's fixed dispatch/metadata is its admitted visit, distinct from its
+pop, push and either repeated stored-frame inspection. This is the literal
+selected high-level unit table, not an attempt to charge every Rust scalar field
+access or compiler instruction. Equality already has separate pre-pop1 and
+resume1. I found no further distinct unpaid continuation event after this review.
+
+For exact local inverses, removing only scalar's two doc backticks restores the
+ENTIRE284LF/bee3c40e A file. Removing only the foreign child-node spend2 restores
+ENTIRE342LF/7c7433f6 equality/scalar A. Reversing final equality's candidate3->1,
+list final-node2 insertion, and sequence spend2 position reproduces ENTIRE
+332LF/10103B/eac64e51f9c531f91ef11da41866fe4dbb71c47acf5254922d9c40f6aa59c0a0.
+The complete final scan was manually reviewed against the selected four-site
+rewrite; I do not claim an independently reproduced whole scan beforeimage.
+
+The broader source resource conclusions in my A receipt still apply. Both
+census and build share one continuous checked Budget, including reached context
+tables and virtual bindings, names/UTF8 passes, scalar normalization, fixed
+identity bytes, synthetic STRING nodes/edges, parser continuations and semantic
+map-key comparisons. Census does not create a result arena; exact final logical
+node/edge targets are reserved fallibly before build. Scratch growth admits the
+requested target and actual old-capacity relocation before reserve; the reserve
+argument is target-minus-len, not target-minus-capacity. This is deliberately not
+capacity==requested, allocator failure coverage, a total live-heap ceiling or a
+physical CPU/RSS tariff. Incoming moved Vec len AND capacity remain checked.
+
+Parsing and comparison keep flat, owned arenas and iterative continuation Vecs;
+there is no recursively owned child tree to recursively drop on invalid/deep
+input. Encoded nesting includes LIST0 alias wrappers, while synthetic STRING
+integers/list representation do not invent encoded nesting. Segmented/improper
+list comparison follows and pays each reached cursor node and edge, then its
+semantic tail pair. Nested map equality uses admitted pairwise candidate search
+and a single outstanding candidate continuation; it compares key/value content
+independently of map pair order. Worst-case comparisons, captured-table duplicate
+checks, repeated names and repeated passes can be superlinear. max_work_units is
+an operational rejection bound for this stated logical work, not a linear-time
+claim from a linear syntax walk. Result and scratch spines are fallible; stable
+backing ranges remain checked; no payload cloning, string normalization buffer,
+automatic Box conversion, hashing/interning model or retained context lifetime
+was added. Common atoms/integer/STRING aliases and finite bitwise signed-zero
+keys keep their selected semantics. Ordinary foreign identities remain DATA;
+explicit unsupported context/profile lanes are not mislabeled invalid source.
+No new live BEAM invocation/owner requirement is imposed on the workflow product.
+
+Actual final evidence WHOLE-read and independently hash-checked in
+/private/tmp/ferricstore2-m2-source-pin-validation.log:
+- final whole8 raw8803947+9423/SHA256
+  8fff26260841829df4e6bf30431fbf7ce58031c4154e902056ffe76d758e92a1;
+- its full target raw8804145+1161/SHA256
+  bd86cd04d2cc5f262117d88b93250f8c75aff493b179103872d6241d47fde36c.
+I parsed all eight headers and terminal records: every step EXIT0/UNCHANGEDTrue,
+all at1587/a5a9a6f337b0f9bcc583b8547c72e99ea40c24cbd601c5a75057c193daad6c8b.
+They are target10, fmt, all-target domain check, strict domain Clippy, arch52,
+reference480, progress120/132/550, and diff. Progress still explicitly says full
+runtime reconciliation/parity is incomplete; those figures are not hydration
+mapping credit. The prior71141/ecde8731 eight-command pass predates the last
+parser/order corrections and is not substituted for this final packet.
+
+My own exact name/status Counters from whole R0 target4563/d17da2c9, A target
+1161/c9d4ce26 and final1161/bd86cd04 preserve the SAME ten names; a separate
+source #[test] Counter matches those names exactly. R0's wrapper-negative PASS
+is retained, and ONLY its nine FAILED names become ok. Final is10PASS with zero
+failed/ignored/measured/filtered. Every formerly masked numeric, ordinary foreign,
+context-drop, nonempty output-owner/pointer/range, spare-capacity, resource and
+alias oracle can now finish. That is real correctness/ownership evidence, not a
+measured allocation, reserve-failure, throughput, latency or Linux result. The
+full workspace eleven-command run was still live at this scoped closure; no
+workspace conservation, original three-case mapping or complete profile result
+is inferred from this focused pass.
+
+Ordinary architecture reciprocity: I actually whole/hash-read the complete
+109756+12075/08865cfb review,121831+1887/270441b7 work correction and the final
+123718+3355/afe5a189f8ca27549be019b94bf5699c9bf10c089b136438612e28b503e19d40
+amendment through127073. Their exact helper split, eager33 work, three initial
+omissions, edge ordering and literal parser tariff agree with the actual code
+and my superseding findings. DOMAIN's actual stopped4606+1753/c2fd256b handoff
+was also read; its own no-execution qualification is retained. No further scoped
+source/resource/semantic defect found in the selected common/foreign-DATA
+profile. Native old8, initialR/E-T, settlement, portable/libc edge equivalence,
+Linux, typed publication, genuine ordered routed storage reads and complete
+HistoryValues hydration remain separate. No additional acknowledgment gate.
+
+## PERF-HVAL-CODEC1 actual full-workspace conservation
+
+This finite read-only follow-up binds the actual completed41164 run to the final
+source reviewed above. I read/hash-checked the complete byte spans in
+/private/tmp/ferricstore2-m2-source-pin-validation.log, parsed every runtime
+result/header and doc example, and reviewed all non-runtime command output.
+No workload, source, probe, Git, compiler, test or new artifact was run/changed.
+
+Actual complete full11 packet8813370+126932/SHA256
+b8bc87bf1e5cafc18e8cf03d2877a41a959f72a9ca5b7a6fd0be782238b7e660 has ALL11
+numbered command headers and ALL11 EXIT0/UNCHANGEDTrue footers, each at the SAME
+1587/a5a9a6f337b0f9bcc583b8547c72e99ea40c24cbd601c5a75057c193daad6c8b input.
+They are fmt; workspace all-target check; workspace strict Clippy; workspace
+all-target tests; workspace doc tests; workspace no-dependency doc generation;
+arch52; reference480; progress120/132/550; the offline advisory/bans/licenses/
+sources audits; and diff check. No unexpected error/warning/panic/failure block
+appeared in the parsed packet. Offline audit success is the current cached
+source/advisory data result, not a fresh online security update.
+
+My independent exact TARGET/EXECUTABLE/NAME/STATUS Counter comparison reads:
+- prior all-target8583271+111363/SHA256
+  5d3c94cf2cfddeed5eacbc9a74f7c4c008121f6649ebbcd924778e7099c05c05:
+  1061ok records,96 summaries,98 Running headers;
+- final all-target8816257+112238/SHA256
+  51d2c9cd8ce8d67d5cc818bb545c8954ecf739482b804e60f0f4da68242523b2:
+  1071ok records,97 summaries,99 Running headers.
+Counter subtraction removes NO prior tuple. It adds EXACTLY the ten frozen
+original_flow_value functions already checked against source/R0/focused final,
+all under tests/original_flow_value/main.rs and the actual executable
+target/debug/deps/original_flow_value-c085fcd1a73fccad. The complete header
+Counter likewise removes none and adds ONLY that target/executable. Summed
+reported totals are1071passed and zero failed/ignored/measured/filtered. No
+aggregate pass total substitutes for this exact identity/status conservation.
+
+Both actual all-target benchmark smoke blocks are byte-for-byte identical to
+the prior run, including their unchanged executable headers:
+- indexed_singleton153B/SHA256
+  3869ef2cfb5bb23cdf68f3597790d2c8cef8356035270d44a8dea7d4a1595c7b,
+  five profiles validated twice;
+- terminal_clone142B/SHA256
+  019f8de711e5e84bf02e2b88b35dcb6f4d69821e180e887aaacb2ef6cf79867a,
+  ten profiles validated twice.
+These are genuine existing benchmark correctness-smoke executions. They are not
+a timed decoder/catalog workload, per-profile latency evidence or speedup claim.
+Compilation/runtime aggregate durations in the log do not establish one either.
+
+The doc spans were separately read and completely compared:
+old8694853+2706/fea6ad4c59cfd82b179a0ea469d6cc98e42e85de99662768d879cad5c7878c3a;
+new8928690+2706/d3a41db1f96e1ad79e0a8a250c34fc6891b12d703b3aac3b3d7bb1e798bc00a3.
+Their full15-target Counter and all six named example/status tuples are
+identical; all six are the existing compile-fail examples and pass as intended.
+Each run has six passed and zero failed/ignored/measured/filtered examples.
+The actual separate doc build also completes successfully.
+
+I actually whole/hash-read ARCH127073+6644/
+6eef920c3c3e34cae3439289433da14a27f95739d8dfa09a070bbab3d3a61c05,end133717.
+Its complete final source/focused result and eight exact work/order corrections
+agree with my actual review. The whole Scan/context/foreign inverse proofs in
+that note are ARCH's independently reproduced results; my own direct inverses
+remain specifically those documented in the previous receipt. No attribution is
+silently promoted. Ordinary written reciprocity is closed without another
+appendix/acknowledgment cycle.
+
+The final scoped decoder and full existing Rust workspace are accepted on this
+actual macOS evidence, with no further conservation defect found. Root's input
+freeze proves the reviewed code was unchanged during the eleven commands; later
+handoff/docs edits are separate from that execution. The current ledger still
+reports120/132/550 and incomplete runtime reconciliation. This does NOT create
+HistoryValues original-three mapping credit or complete typed publication,
+reference/catalog persistence, stable ordered routed reads, retained expiry,
+snapshot/recovery or hydration/overlay coverage. Linux, full original project
+profiles, native old8/opening/settlement, total allocation/RSS/CPU/stack bounds,
+exercised reserve failure and measured performance remain unclaimed. Finite
+review stopped; no new source/API or readiness gate is introduced.

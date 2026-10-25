@@ -1,6 +1,6 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-24. The active full-completion goal remains unfinished.
+Updated: 2026-10-25. The active full-completion goal remains unfinished.
 GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
@@ -82,17 +82,34 @@ separate reference observations now cover typed compounds, exact stored sizes,
 header/error/ref boundaries, existing-field overlays, semantic map-key equality,
 bignum signs and legacy float decoding. Architecture,
 performance and domain agents reviewed the complete success/error/omission
-contract under `docs/reviews/history-values/`. The first prerequisite now has its
-six-model owned decoder interface, five checked views and ten regression tests.
-The compiled rejecting baseline runs **one pass and nine intended assertion
-failures**, with zero ignored or filtered cases. All seven focused quality checks
-pass, including strict Clippy and 52 architecture checks. Only the all-negative
-wrapper control passes; positive decoding fails before later numerical, foreign,
-limit and moved-buffer pointer assertions. Those runtime tails remain unproved.
-The genuine baseline must be saved before decoder implementation; real value
-publication/read/recovery and hydration still follow. The three source case
-arrays remain empty; the full 1,061-test checkpoint below predates this new
-rejecting target.
+contract under `docs/reviews/history-values/`. The first prerequisite, the owned
+FSV2/ETF decoder, now passes **all ten unchanged
+regression tests and all eight focused checks**, including strict Clippy and
+all 52 architecture checks. Its genuine one-pass/nine-failure baseline was
+saved in `0f60bb1` before implementation. Exact source/runtime test-name comparison
+preserves the negative control and changes only the nine failures to passes.
+Numeric, compound, semantic-key, foreign identity, context, limit/depth/capacity
+and nonempty moved-buffer/pointer assertions now execute.
+
+One iterative grammar performs census and build into flat postorder node/edge
+arenas; exact map equality uses iterative continuations. Leaves retain ranges in
+the unchanged moved input. Captured context and operational failures remain
+distinct from invalid source data; foreign identities are data without execution.
+Input length and capacity, encoded nesting, fallible reservations and repeated
+logical work are bounded by explicit profiles. Architecture and performance
+independently reviewed the full implementation, actual results and each other's
+findings. Their eight admission corrections are incorporated without weakening
+oracles or the selected tariff. Related private children stay under
+`src/value/original_flow/`; the largest source file is 382 physical lines and
+the longest function is 94. No measured speedup, allocator-failure execution or
+whole-process memory/CPU bound is claimed.
+
+The full Rust checkpoint below includes these ten tests. Real value publication,
+reference catalog, ordered routed reads, recovery/retention and complete history
+hydration still follow. Existing opaque command bytes retain their logical binary
+meaning; a later typed input path requires its own versioned contract. The three
+original HistoryValues mapping arrays remain empty until the real route exists.
+Linux and full original setup/profile acceptance remain separate requirements.
 
 The current native checkpoint runs **61 tests: 53 pass and eight fail**.
 All four decoder regressions saved before implementation now pass: NEW-only
@@ -135,18 +152,19 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full passing Rust checkpoint passes **1,061 tests across 96 targets
+The latest full passing Rust checkpoint passes **1,071 tests across 97 targets
 on macOS**, with zero failed, ignored, measured or filtered tests, plus **six
-compile-fail examples across 15 documentation targets**. All eleven local checks
-pass: formatting, workspace compilation, strict Clippy, warnings-denied
-documentation, all 52 architecture checks, reference/progress validation, four
-cached offline dependency-audit categories and whitespace. All 1,567 captured
-inputs stayed unchanged, excluding only the three active metadata review notes.
-Exact target/executable/name/status comparison preserves all 1,048 preceding
-tests and adds only the twelve metadata cases and one architecture regression.
-Both existing benchmark correctness smokes pass. No measured speedup is claimed.
-This full run checked the preceding 117/129/528 ledger; the three metadata links
-were added afterward and passed separate progress and whitespace checks.
+compile-fail examples across 15 documentation targets**. All eleven checks pass:
+formatting, workspace compilation, strict Clippy, warnings-denied documentation,
+all 52 architecture checks, reference/progress validation, four cached offline
+dependency-audit categories and whitespace. All 1,587 captured inputs stayed
+unchanged, excluding only the three active HistoryValues review notes. Exact
+target/executable/name/status comparison preserves all 1,061 preceding tests and
+adds only the ten decoder cases; the only new target header is their integration
+target. Both existing benchmark correctness-smoke sections are byte-identical,
+validating their five and ten profiles twice. All six documentation examples and
+15 target identities are preserved. This run includes the unchanged 120/132/550
+progress ledger. No measured speedup or full workflow parity is claimed.
 
 All four pinned pure Options cases now have Rust counterparts preserving their
 **29 assertions in source order**, exact errors, first-key/default/nil behavior,

@@ -52295,3 +52295,250 @@ The full passing1,061-test f68b22f checkpoint predates this new rejecting target
 CODEC1 actual R0 reciprocal closure and local save preparation
 Both independent reviewers actually read/hash-parsed complete13059/2173ded0 and target4563/d17da2c9, independently matched all ten source/runtime test names and1PASS9FAIL statuses, verified seven quality successes and unchanged1577/efad, and confirmed current source/test whole-byte correction inverses. They report no source/ownership/oracle/geometry defect and explicitly retain masked positive/pointer tails. They also actually read each other's final written receipts (ARCH65299+6628/ae054525 and PERF33446+4503/c08f93f4) and agree; no extra readiness/append acknowledgment gate remains.
 Root has not yet consumed the intervening unapproved BODY proposals/final written tails in full. The baseline save therefore stages ONLY already inspected HvalARCH38132/PERF15885/DOMAIN4606 prefixes, preserving every later proposal/review byte unstaged in its original file. Actual final reciprocal findings are attributed to their direct reports here, not falsely called Root whole-file reads. Metadata's approved note-home decision through50783 is fully inspected and included. All eight actual R0 source/test files, current handoff and Root coordination are saved before substantive BODY selection. This proves genuine compiled rejection baseline chronology, not complete decoder, catalog/read/hydration, Linux/profile/native8 or whole-product success. The overall goal stays ACTIVE and subsequent implementation must continue through the real required path.
+
+
+CODEC1 BODY1 selected release after saved rejecting baseline, 2026-10-25
+Root verified HEAD0f60bb1 and the active full-completion goal. Only the later
+HistoryValues architecture/performance note tails are dirty; no production
+BODY exists. Root now whole/hash-read ARCH38132+19089/cd3e251a,
+57221+8078/880657ca,65299+6628/ae054525 and71927+18767/c85438c7,
+plus PERF15885+10645/6f3707f3,26530+6916/370d89e1 and33446+4503/c08f93f4.
+The historical proposal is superseded by A-HISTORY-VALUES-CODEC1-BODY1.
+Actual R0 reciprocal review is closed without an extra acknowledgment gate.
+
+Root adopts that exact recorded selection and assigns /root/d2_implementation_sol61
+as sole BODY author. Its complete write set is existing
+crates/wf-domain/src/value/original_flow.rs plus nine NEW private children:
+value/original_flow/budget.rs,context.rs,scan.rs,scan/frame.rs,scan/scalar.rs,
+scan/sequence.rs,scan/foreign.rs,equality.rs,equality/scalar.rs under that same
+crates/wf-domain/src prefix. ONLY its own domain review note may also append.
+All thirteen private control types and exact helpers/arities are those in
+ARCH71927+18767/c85438c77843e1822750c949618f4c6c48bcf1a268af2ff396c2271495d1bb6a.
+No additional helper/type/file/API/dependency is inferred from assignment.
+Before creation, the owner must verify all nine absences and every held input
+against Root's fresh inventory; any newly needed artifact goes to ARCH first.
+
+Public parent value185/775cd167, model233/23a3e61e and all five test files
+2445d36f/42072ba7/ad000d6f/8b85c338/ce68cc67 remain byte-frozen. Every other
+tracked/untracked nonignored regular Main input, including Root coordination,
+Cargo, policy/checkers/ADR/ledger and all old review homes, is held. ONLY the
+three active HistoryValues role notes and the ten selected BODY paths are
+excluded from the fresh hold. Source author runs no formatter/compiler/VM/test/
+benchmark/Git. Root makes no source/shared-file mutation or workload until
+normal author STOP; direct private consultation messages and bounded own-note
+appends are allowed. Root alone resumes canonical formatting and validation.
+
+The decoder must implement the complete selected common and five-family foreign
+DATA profile, one iterative census/build grammar, postorder flat arenas and
+iterative semantic map equality. Work is continuous across both passes, context
+validation and fixup; requested growth admits relocation and uses additional
+target-minus-len. Encoded-depth aliases, exact EOF, moved input capacity,
+FLOAT99 first-NUL/last-NUL/no-NUL vectors and all distinct error lanes stay
+unchanged. No Box/shrink/copy, recursive owner, live BEAM execution, fake I/O,
+blanket foreign refusal or production panic/unwrap/expect/unsafe is authorized.
+Source400/function100 physical-line limits apply without packing/suppression.
+
+All ten source buffers and the author's handoff must stop before Root formats
+or reviewers inspect current source. ARCH and PERF independently review the
+complete stopped implementation, actual same-oracle results and each other's
+findings. Root's exact ten-name comparison must preserve the negative pass and
+repair precisely nine failures before the full-workspace run. No original
+HistoryValues mapping is earned by this pure prerequisite: real catalog/value
+publication, ordered routed reads/recovery and complete hydration follow. The
+1,061-test full checkpoint predates rejecting R0; native eight failures, full
+original profiles, Linux and wider M1-M8 remain open. Goal stays active.
+
+
+CODEC1 BODY1 stopped delivery and canonical custody, 2026-10-25
+DOMAIN returned all ten source buffers, then stopped its own note at
+4606+1753/c2fd256b23477ea30c0cfcac0ad3e18e8f60cd3b002b9f2645730ca967562041,
+end6359; Root whole-read that receipt. Root independently reproduced the EXACT
+1576-input112a9c33795a28ef8667fb7a9836a908b670ee99e89b7790393e343d88f837de
+hold with zero deltas before formatting. All public model/parent/test bytes
+remain literal. Nine new child absences were captured before creation.
+
+During author custody ARCH selected the concrete geometry amendment
+105833+3923/8b3d0ea3f6e737dad04494fcc5809755c035fa0c570feda9b23379d1b5c47bad.
+Root whole-read and explicitly released identity_fields3 by direct message
+BEFORE creation, while preserving the held coordination file. This records
+that prior release: only same-order fixed-width reads/conversions/reference
+range arithmetic via the same funded take/Budget moved from finish_identity3.
+No lookup/emit/allocation/local normalization/new model/file was included.
+Normal local parameter bindings replaced the R0 underscore spellings without
+changing any public type/lifetime/arity/return contract.
+
+Root formatter12835 exited0 before further source inspection. An independent
+post-format inventory again preserved all1576 held inputs with zero deltas.
+Canonical source LF: feature146,budget115,context353,scan271,frame66,scalar284,
+sequence193,foreign480,equality332,equality-scalar342. The foreign file exceeds
+400; function geometry also needs actual review. No packing/waiver is allowed.
+Root resumes compiler/test custody and requests exact architecture refinements
+before any new helper/file. The first unchanged ten-case target will expose
+technical or behavioral feedback under a fresh whole-input freeze. A technical
+compile failure is not passing behavior or a new TDD baseline.
+
+Root also whole-read the finite NEXT catalog proposals ARCH90694+15139/
+b37e5990 and PERF37949+12323/77291c18. Actual written reciprocity is complete
+in ARCH3923/8b3d0ea3. They are proposals, not creation authority: current opaque
+bytes stay logical binary with exact source escape; accepted-operation presence/
+kind drives every intermediate history/value write in one consumed transaction.
+Old payload expiry stays independent. Current FWSS6/FWSP3 and closed0..7 keys
+require a joint explicit catalog/recovery/snapshot profile. No seed API, fake
+read, typed-input reinterpretation, insert_reserve adoption or reduced fee is
+selected. Full real catalog/typed publication/routed read/hydration follows
+codec completion; original three arrays remain empty and all wider gates open.
+
+
+CODEC1 first real BODY target GREEN; quality refinements required
+First target43277 exited0 under1586 unchanged inputs/
+9f54b1d713fb9dfc871d62b181d685d1497a94964c8dd674d6c3b06b5a0facba.
+Root whole-read/hash-checked raw8786044+1161/
+c9d4ce261250b06f7c61079496025d3c069df3993da2240a465a464b75f0bd32,
+and independently compared exact source/R0/GREEN test-name Counters using
+the original4563/d17da2c9 packet. All ten names appear once; exactly nine
+assertion failures become passes and the all-negative wrapper pass remains.
+Zero ignored/measured/filtered. Scalar, alias/map, five foreign DATA families,
+context/error, encoded-depth/capacity/limits and nonempty moved-buffer/context-
+drop/pointer/checked-view tails now actually execute. No internal allocation,
+measured gain, Linux/full-profile or original HistoryValues mapping follows.
+
+Quality18475 exited101 with the same1586 unchanged inputs. Formatting and
+domain all-target compilation passed. Entire Clippy output8787998+6485/
+36df3e6acaa8aabc4a035f245c5263e1e58cc783d60b6b20914de17f08ba3d7d
+contains11 technical diagnostics: five eager bool-& spellings, complex private
+function metadata tuple, two function lengths, two needless owned-frame args
+and one FLOAT_EXT doc enclosure. Architecture/reference/progress/whitespace
+steps did not run after Clippy refusal. No quality failure is hidden as a
+behavioral pass or new TDD baseline. Source remains the exact canonical first-
+GREEN bytes while ARCH selects concrete new private split/helpers. Root has
+read all ten BODY sources, the complete frozen model/tests and actual results.
+No suppression/packing/public model/test/ledger/dependency change is authorized.
+
+
+CODEC1 exact post-terminal geometry and work correction adopted
+Root whole/hash-read ARCH109756+12075/08865cfb9f7efab039aeef28b34d892c611c27d53d3148f0299c6c61baf38619
+and121831+1887/270441b7e33c892581da037789612d61234439bc5bfa146140163efa2fbaee8a.
+All preceding formatter/test/quality sessions are terminal. Before creation,
+Root adopts ONLY one new private scan/foreign/identity.rs child for existing
+finish_identity3/identity_fields3, normalize_local_reference4 there,
+start_local_fun3 in existing foreign.rs and check_function_collisions5 in
+existing context.rs. Same13 private models/61functions/11BODYfiles expected.
+Flatten local_function metadata to the selected seven-tuple, preserve5arity;
+borrow fixed identity/export frames, precompute both equality operands before
+&& under unchanged33-unit admission, and add scalar docbackticks. All actual
+wire/error/context/canonical-binding order is retained; no packing or waiver.
+
+PERF independently found and ARCH confirmed three work-tariff omissions in
+the first canonical source. The earlier no-additional-defect conclusion is
+superseded for these three omissions: candidate admission1 must be3 before
+two edge reads; two foreign child-node reads need pre-spend2; list dispatch's
+two repeated node gets need pre-spend2. Existing helpers receive exactly
+those charges before reads; no new helper/model/test/probe/fee reduction.
+These are prospective logical contract corrections, not a claimed semantic
+regression or measured gain. Tight work ceilings may refuse earlier correctly.
+
+Root's next narrow patch owns ONLY existing context.rs,scan/foreign.rs,
+scan/scalar.rs,equality.rs,equality/scalar.rs and NEW scan/foreign/identity.rs
+under crates/wf-domain/src/value/original_flow/. Every other Main regular
+input is freshly held, except the three active role notes. Peers retain
+read-only review of the preceding fixed snapshot and unchanged modules;
+Root will stop/rebind all six buffers before revised source/result review.
+No public model,parent,test,ledger,Cargo,dependency,policy/checker/ADR or
+encoder/catalog change is authorized. Original ten-case GREEN remains
+first-version evidence; revised GREEN/geometry/strict checks are unproved
+until actually executed. Full goal and all real-route/platform gates remain.
+
+
+CODEC1 selected refinements stopped; natural geometry restored
+Root applied only the recorded one-child/three-helper/private-binding/borrow/
+doc delta and the three prospective work charges. Formatter28001 exited0.
+Independent post-format scope reproduced ALL1581 held inputs1600be3047691b1852c6268333da875500c21b2dbfba8e052b9d072a55e2ccbc
+with ZERO deltas. Six allowed buffers are stopped: context382/6cafc1a6,
+foreign320/36b56f7f,newidentity185/3d018265,scalar284/166c4f96,
+equality333/0a1deb64,equality-scalar343/adbc4824. The five other BODY files,
+public parent/model/all tests and every other held file remain literal.
+Natural census is exactly61functions/13private models/11BODYfiles, maximum
+file382 and function94; local_function88, finish_identity84. No packing,
+suppression, test weakening, model or dependency change occurred.
+
+Collision validation stays after canonical lookup and before binding growth;
+local reference normalization stays after reached local context, using the
+same paid wire/range cohort. All three newly charged reads are admitted before
+the corresponding edge/node visits. Root has checked changed source and
+returns it to both independent reviewers. The ordinary eight-step target/
+format/compile/Clippy/architecture/reference/progress/whitespace run follows
+under a new complete-input freeze. Results and quality are not assumed from
+the earlier ten-case pass; original HistoryValues mappings remain empty.
+
+
+CODEC1 eight-check B pass and final literal prospective tariff corrections
+Session71141 exited0: all eight commands passed with1587 inputs unchanged at
+f82f16f314e02cbc25a879ce9bc05eb7c76c689e59ae98e8d2aa614cbe04ec85.
+Root whole-read/hash-checked entire8794508+9439/
+ecde8731d699b84a95a1185b009e308dde87d698e7b8f0c184d280adc414fabe.
+Target10PASS, strictClippy0, arch52PASS and reference/progress/diff0 are actual.
+That run predates the final corrections below and proves no complete budget
+accounting merely because all checks passed.
+
+ARCH/PERF independently identified one still-postpaid sequence edge cohort and
+confirmed the literal continuation visit/push/pop tariff. Root whole-read exact
+ARCH123718+3355/afe5a189f8ca27549be019b94bf5699c9bf10c089b136438612e28b503e19d40.
+After71141 terminal, Root moved the existing equality spend2 BEFORE the two
+tuple/localfun edge reads (same total), changed parser accept_child/STRING
+prepop1 to2 for separate pop+process visit, and prepaid1 before EACH actually
+reached nonempty-frame STRING/atom-guard peek. Empty-vector metadata remains
+free; begin_node/source guard order stays unchanged. Earlier one-unit pop+
+process cohort wording is explicitly superseded rather than used to hide an
+unpaid event. No cache/model/helper/public API/test or tariff narrowing.
+
+Final formatter24375 exited0. Source buffers are STOPPED: scan285/9885/
+d23d764627d559ca6b5f04ceabda2694f8d4e7115622eb93da457ebde4f96057;
+equality333/10125/7b310daa6ab1eeb4f9301dbef411b1a718b717d8118878d63ece420078645450.
+Root exact equality-only statement inverse restores ENTIRE prior333/10125/
+0a1deb64. Every member of the preceding1581-input hold remains literal except
+the explicitly added scan.rs write and Root coordination journal; all other
+BODY/refinement/public model/test/ledger/source inputs remain unchanged.
+The other six refinement hashes are unchanged. Independent revised source/
+resource/result review and the current final eight/full-workspace runs follow.
+All three original HistoryValues arrays and wider platform/runtime gates remain
+open; no generic codec pass is called full original or product parity.
+
+
+CODEC1 full workspace GREEN and actual independent closure
+Full11 session41164 exited0, every1587 captured input unchanged at
+a5a9a6f337b0f9bcc583b8547c72e99ea40c24cbd601c5a75057c193daad6c8b.
+Whole packet8813370+126932/b8bc87bf1e5cafc18e8cf03d2877a41a959f72a9ca5b7a6fd0be782238b7e660
+was fully hashed/parsed. Alltargets8816257+112238/
+51d2c9cd8ce8d67d5cc818bb545c8954ecf739482b804e60f0f4da68242523b2
+contains1071PASS/97summaries/zero failed,ignored,measured,filtered. Root
+independently compares every target/executable/name/status tuple with pinned
+prior8583271+111363/5d3c94cf: ALL1061 preserved, ONLY the ten frozen codec
+functions added. Headers98->99 only original_flow_value. Both existing bench
+sections are byte-identical, five/ten correctness profiles validated twice.
+Docs8928690+2706/d3a41db1 contain exactly the same6 compile-fail example/status
+and15target Counters as preceding2706/fea6ad4c. No new/excluded doc example.
+Fmt,workspacecheck,strictworkspaceClippy,alltargets,doctests,warnings-denieddoc,
+arch52,reference480,progress120-132-550,cachedoffline-deny4 anddiff all EXIT0.
+Long storage fault cases were allowed to finish; no timeout was restarted or
+weakened. This is actual macOS evidence, not Linux or original setup/profile
+execution, admission authority, power-loss theorem or measured speedup.
+
+Root whole-read finalARCH127073+6644/6eef920c and PERF62830+9913/a15a5c0e.
+Both independently bound final source, exact61functions/13private types/11files/
+max382-94, all eight prospective correction sites, complete focused9423/8fff
+and exact R0/final ten-name Counter. They read each other's actual written
+findings (ARCH reports its later actual9913 read directly; no extra appendix
+ACK was introduced). Root also whole-read PERF72743+4649/
+1198117e35023d88be1291ceb66b8f7f219bdf022986fd316fde1ab64d1ec07b:
+its independent full-packet/old1061-vs1071/docs/bench/11-footer proof agrees.
+No source or conservation defect remains in this selected codec increment.
+
+After fullrun terminal, Root updates CONTINUE with these results and remaining
+real publication/catalog/routed reads/typed-input/history-hydration gates.
+All3 original HistoryValues arrays remain empty in unchanged ledger677d/
+120-132-550; native8, full original profiles, Linux and wider M1-M8 remain.
+Root prepares local SAVE of reviewed implementation and inspected note prefixes,
+preserving any later next-prerequisite proposal append in its original file.
+The next reference/logical-binary encoding artifact selection is independent
+preparation only; no new source creation before this SAVE and exact later
+Root release/resource consultation. Full goal stays ACTIVE.
