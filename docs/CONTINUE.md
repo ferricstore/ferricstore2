@@ -5,16 +5,18 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The stored-policy creation-lifecycle resolver now has a compiled callable
-baseline: **zero passing and five failing tests**. Every failure reaches the
-intended first capture assertion after independently accepted full Complete and
-Original policy fixtures. All seven technical checks pass, including strict
-Clippy and all 53 architecture checks. Literal assertions cover policy/default/
-state/command precedence, operational errors, resource refusals and scalar
-results after both backing owners drop; later assertions remain masked until
-the implementation. Exact implementation helpers remain unselected. The latest
-full passing checkpoint is `b66a74c`;
-the new five-case baseline adds no passing parity coverage.
+The stored-policy creation-lifecycle resolver passes **all five unchanged tests**
+after its compiled zero-pass/five-failure baseline was saved in `c2d9ceb`.
+All eight focused and eleven full-workspace checks pass. Complete policies lend
+their validated scalar fields; Original policies use one prospectively admitted
+decode/catalog on the same continuous work account. A shared scalar resolver
+preserves the existing public API and default/type/state/command precedence.
+Results survive both backing owners being dropped. Architecture and performance
+reviews corrected an underestimated retention-validation allowance and accepted
+the final source. The largest file is 291 physical lines and function 87.
+Explicit unsupported Original fields remain visible; this is not arbitrary-raw
+policy or full workflow parity. Actual transaction attachment, persisted values,
+ordered reads, original profiles and Linux acceptance remain open.
 
 The current value-provenance increment passes **all eight unchanged tests**
 after its genuine compiled zero-pass/eight-failure baseline was saved in
@@ -24,8 +26,8 @@ supported producers. Original operation indices, omitted versus supplied empty
 values and intermediate versions are preserved. The inspector borrows that
 owner; rows receive one fallible reservation after semantic and resource checks.
 Architecture and performance reviews independently accepted the implementation
-and exact preservation of all earlier test identities. Full stored-policy
-lifecycle capture is the next predecessor; publication, history hydration,
+and exact preservation of all earlier test identities. Stored-policy lifecycle
+capture is implemented above; its transaction attachment, publication, history hydration,
 original profile coverage and Linux acceptance remain open.
 
 The six HistoryEntry Rust tests now pass after the callable zero-pass/six-failure
@@ -198,16 +200,16 @@ bound or measured speedup is claimed. The six verified ledger additions are
 recorded below; the full Rust workspace validation includes this unchanged
 parser target.
 
-The latest full passing Rust checkpoint, `b66a74c`, passes **1,088 tests across 99 targets
+The latest full passing Rust run passes **1,093 tests across 100 targets
 on macOS**, with zero failed, ignored, measured or filtered tests, plus **six
 compile-fail examples across 15 documentation targets**. All eleven checks pass:
 formatting, workspace compilation, strict Clippy, warnings-denied documentation,
 all 53 architecture checks, reference/progress validation, four cached offline
-dependency-audit categories and whitespace. All 1,602 captured inputs stayed
+dependency-audit categories and whitespace. All 1,605 captured inputs stayed
 unchanged, excluding only the three active HistoryValues review notes. Exact
-target/executable/name/status comparison preserves all 1,080 preceding tests and
-adds only the eight accepted-plan value-provenance cases; the only new target
-header is the grouped workflow_value_effects integration target. Independent
+target/executable/name/status comparison preserves all 1,088 preceding tests and
+adds only the five stored-policy lifecycle cases; the only new target header is
+the grouped stored_lifecycle integration target. Independent
 performance review reproduces this complete comparison. Both existing benchmark
 correctness-smoke sections are byte-identical,
 validating their five and ten profiles twice. All six documentation examples and

@@ -265,3 +265,155 @@ Original-only cap0 and BOTH-donor InvalidAuthority lanes remain frozen; Complete
 cap0 is unasserted. No source HistoryValues mapping, allocation measurement,
 Linux/native-eight/full-project/full-goal or new passing parity claim follows.
 Root owns exact R0 SAVE before any concrete BODY consultation/release.
+
+
+## STORED-CREATION-LIFECYCLE1 author BODY proposal after saved R0
+
+Attributed read-only proposal from d2_implementation after exact R0 c2d9ceb
+save/clean and actual0PASS5FAIL; no source/workload change. THREE EXISTING paths:
+active/capture.rs, active.rs and complete/stored_lifecycle.rs. No new file,
+public model/trait or test edit. New shared capture_lifecycle_layers/7 takes
+policy_type,workflow_type,max_active,type_retention,state_retention,overrides,
+defaults; old public capture_lifecycle/5 delegates after a borrowed state lookup.
+Existing resolve_active/2 and resolve_captured_retention/4 switch to scalar
+inputs. active.rs exports the shared core crate-only. In stored_lifecycle.rs,
+existing entry/5 gains BODY and ONLY four private helpers are proposed:
+read_original/5, field/5, retention/3, number/3. Thus FIVE new helper functions
+across the two bodies, FOUR of them private in the stored child; the existing
+API is not another newly created helper. A shorter author final message's
+'five private helpers in stored_lifecycle' is superseded by this exact roster.
+
+Complete validates the full typed owner then uses a paid linear exact-state
+lookup and borrowed Copy fields. Original checked65536+256E cap precedes ONE
+actual retained portable decode plus catalog. The catalog is necessary for
+valid zero-head LIST cursor aliases; do not omit it merely because queried data
+is map/scalar. PERF's proposed requested logical coexistence<=200E+192 includes
+index64(n+k+f),catalog8n+128,retention64 with n/k/f<=E, fitting that envelope.
+No allocator capacity/native stack/RSS theorem or measured gain. One continuous
+schema charge, matching profile before work, prospective admission and both
+comparison byte sides remain mandatory. The32_768 fixed dispatch/scalar cohort
+is a conservative proposal under review, not yet a Root source release.
+
+Source precision from actual pinned retry_policy.ex210..240,746..769: noninteger
+policy max-active falls toNone; atom-root/retention fields and binary-state keys
+stay distinct; nonmap retention/config is ignored by source. Public input
+borrow_retention accepts aliases/keywords, so it is not substituted for these
+stored-map semantics. Unrepresentable integer/retention or internal-hot profile
+handling must be explicit rather than silently dropped or called complete
+original compatibility. ARCH is settling the final selection with PERF.
+
+Author estimates stored<350/capture<280/active233LF, eachfunction<100, and has
+STOPPED proposal work without source/Git/notes/workloads. Root revalidated all
+1605/eababb90570c8541da31c6088d402e2caec9736806124eae04d082320567e9c5
+consultation inputs, excluding ONLY the three active role notes. Frozen tests
+remain main373/da5ef001 and fixtures92/67a9. Exact ARCH decision and Root release
+are still required; this attributed proposal alone authorizes no creation.
+
+
+## Root read-only successor ownership observation during lifecycle authorship
+
+No new artifact/API/BODY scope or source permission. Actual inspected scopes:
+transaction/record_batch.rs Fresh arm calls LoadedRecordBatch::load under tx,
+observations::decide, GroupApplyChanges::new, SAME consumed tx.commit, then
+fresh_reply. state/redb/commit/independent.rs45..63 writes final records once
+and EVERY successful history; commit.rs32..75 publishes outcome/control in the
+same Immediate transaction before acknowledgment. Current commit has no value
+catalog publication, so none is claimed.
+
+IndependentIndexedPlan.results/history_plans retain every successful intermediate
+ScopedPlan WITH its owned write.record, not merely a reduced persisted HistoryEntry.
+Ports blob/publication/step.rs actually checks supplied operation p/r/e slices
+against each such postimage before attaching numeric source-index/version/mask
+provenance. Therefore future publication for the EXISTING logical-binary command
+profiles can potentially render source-encoded bytes from paired retained
+postimages plus that spine after decoded operation owners drop, avoiding another
+retained operation copy or re-decode. Omitted fields still carry old refs; only
+supplied masks mint versions, including equal/empty values. Typed/encoded input
+profiles need their own representation contract and cannot be inferred here.
+
+RecordBatchApplyPlan::into_parts currently returns control/decision and drops
+its numeric spine; real publication must use the same accepted plan BEFORE
+fresh_reply consumes it. This is a concrete source ownership observation for
+later exact catalog/lifecycle/registry/read integration, not a detached inspector
+or another success-only endpoint. Required resource admission, every intermediate
+history binding, snapshot/recovery/cleanup/read-clock and original profiles
+remain. Root sent this factual optimization candidate to ARCH; current three-file
+lifecycle authorship and frozen tests remain untouched.
+
+
+## STORED-CREATION-LIFECYCLE1 BODY A actual source and ordinary tariff correction
+
+Author stopped all three buffers. Root whole-read every source and complete
+formatter diff. Initial author capture243/8909/a18bf68a,active233/8328/f3143f2b,
+stored289/10983/b4c2c32a. Pinned formatter62251 EXIT0 changes ONLY stored import
+order and one rows.next error wrap, yielding291/11044/
+477c239ddec1362cf261fa4292b575140337523460c648af83070be808a692e4.
+Other two hashes stay literal. Before/after held1602/b89c15ee match, including
+entire main373/da5ef001 and fixtures92/67a9. Root's full inverses recover old
+capture221/47d4197e,active232/b1c22cc8 and literal rejector49/6b2c9cb3; both
+public models are byte-exact. Exactly five new helpers,24 total functions,max87.
+An initial Root census regex missed the unchanged generic expire_active_batch;
+correcting that reader yields24, no source mutation or product defect.
+
+BODY A focused8 session27849 TERMINAL0, all eight EXIT0/UNCHANGED1605/
+ba7a89c283a2736b194844cac25c4e47c96ab2e4d7fb72eff1b6cb8790883701.
+Same frozen target raw9500855+730/
+a5104a65d1faa94eecb180e1451b76ba9f870ab49b03941d591f3c3961ff2e05
+has5PASS0others, same a438ac334992b1ef artifact as R0. Every formerly masked
+precedence/error/refusal/retry/scalar-use tail now finishes. Fmt/domain all-target
+compile/strictClippy/arch53/reference480/progress120132550/diff all pass. This is
+correctness evidence; resource review remains independently necessary.
+
+Root identified that retention's fixed16-event/2048 allowance must include the
+actual RetentionOverride::validate Option/range/control visits, not charge them
+to the DIFFERENT later shared core. ARCH explicitly agreed an ordinary existing
+literal2048->4096 refinement; PERF independently confirms the16 underbound and
+proposes a closed<=30-group bound within32*128: header4,TTL4,hot2,history5,
+result/return3,FULL validation+propagation12. Paid field/number loops stay
+additional. SourceA GREEN therefore does NOT close the tariff defect. Root now
+applies ONLY that existing literal in the already selected retention helper;
+no new artifact/API/oracle/model/helper/constant or byte cap. This is the ordinary
+consulted existing-code correction, not a new precreation or acknowledgement gate.
+Final canonical source and focused/full evidence must rebind after it.
+
+
+## Root/author successor correction: omission is operation-specific, not blanket carry
+
+This supersedes ONLY the overbroad omission sentence in Root30356+1997/f3023a88.
+The retained-postimage optimization remains a CANDIDATE for existing logical
+binary profiles, but existing bindings MUST follow the actual event's source
+updates rather than treating every absent mask as carry. Author identified this
+while doing read-only successor preparation. Root independently read the pinned
+section scopes: flow_create652..668; flow_claim_native_plan552..607;
+flow_transition1083..1134,1326..1380,1474..1536. File bindings below identify those
+scopes; this does not claim a whole-file semantic audit.
+
+flow_value_ref's supplied bytes mint a new version; an explicit supported ref
+can win next; otherwise it uses its actual fallback argument, default nil.
+Complete passes the old payload ref as fallback but gives result NO old fallback,
+so an omitted result clears. Fail/Retry similarly carry omitted payload but
+clear omitted error. Cancel's error fallback is attrs.reason_ref, not the old
+record error, so omitted error/reason clears. Unmentioned ref fields in each
+source record update remain as source copies; e.g. Complete does not erase old
+error_ref merely because the reduced inline postimage has no error bytes.
+Future binding fold therefore needs operation-specific keep/clear/replace
+BEHAVIOR using retained kind+mask+postimages and loaded bindings. Those words
+create no new enum/type/helper/model or source permission. Typed/named/external
+ref inputs need their explicit logged representation before activation.
+
+The same inspected Complete/Fail/Cancel source selects attrs.ttl_ms OR the old
+record's captured retention TTL before terminal stamping. Thus the future command
+profile must also log terminal TTL override PRESENCE and reproduce that reached
+selection; it cannot silently force the birth TTL when an allowed explicit
+terminal override exists, or substitute present policy/outcome TTL. Creation
+capture itself remains this increment's scalar-only responsibility. ARCH must
+settle how immutable birth capture and the effective terminal selection persist
+in the closed real endpoint; no unlogged sidecar/old-wire reinterpretation.
+
+No current lifecycle source/test/registry was changed, no new runtime/parity
+claim, no extra gate on full61737. These are concrete pinned-source obligations
+for the following real catalog/current+EVERYhistory/consumed publication and
+snapshot/read/retention integration. Root relays them to ARCH/author before the
+next concrete R0 selection.
+
+Inspected-scope file bindings: {"flow_claim_native_plan.ex": {"bytes": 34746, "sha256": "6abe1477401341a1af4970840d9248dc0b34213cf11ee610f0ab389191627ec0"}, "flow_create.ex": {"bytes": 57564, "sha256": "b684c85247545ea2e240daf8c050a23cf433599bd2fdd13d61190eb5f93b19a7"}, "flow_transition.ex": {"bytes": 58503, "sha256": "cbe11833bbe97d0c015e62866773a4a2997218dcf84a487de4a5e233177e4a5a"}}

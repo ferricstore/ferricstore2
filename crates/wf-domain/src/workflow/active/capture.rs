@@ -130,12 +130,36 @@ pub fn capture_lifecycle(
     overrides: LifecycleOverrides,
     defaults: LifecycleDefaults,
 ) -> Result<CapturedLifecycle, ActiveValueError> {
+    capture_lifecycle_layers(
+        policy.map(PolicySnapshot::workflow_type),
+        workflow_type,
+        policy.and_then(PolicySnapshot::max_active_ms),
+        policy.map_or_else(RetentionOverride::default, PolicySnapshot::type_retention),
+        policy.and_then(|p| p.states().get(initial_state).map(|s| s.retention)),
+        overrides,
+        defaults,
+    )
+}
+
+/// Resolves already selected scalar policy layers without owning a snapshot.
+///
+/// Policy admission and prospective work remain the caller's responsibility.
+pub(crate) fn capture_lifecycle_layers(
+    policy_type: Option<&[u8]>,
+    workflow_type: &[u8],
+    max_active_ms: Option<u64>,
+    type_retention: RetentionOverride,
+    state_retention: Option<RetentionOverride>,
+    overrides: LifecycleOverrides,
+    defaults: LifecycleDefaults,
+) -> Result<CapturedLifecycle, ActiveValueError> {
     validate_defaults(defaults)?;
-    if policy.is_some_and(|p| p.workflow_type() != workflow_type) {
+    if policy_type.is_some_and(|kind| kind != workflow_type) {
         return Err(ActiveValueError::WrongPolicyType);
     }
-    let max_active_ms = resolve_active(policy, overrides.active)?;
-    let (retention, hot) = resolve_captured_retention(policy, initial_state, overrides, defaults)?;
+    let max_active_ms = resolve_active(max_active_ms, overrides.active)?;
+    let (retention, hot) =
+        resolve_captured_retention(type_retention, state_retention, overrides, defaults)?;
     Ok(CapturedLifecycle {
         max_active_ms,
         retention_ttl_ms: retention.ttl_ms,
@@ -163,11 +187,11 @@ fn validate_defaults(defaults: LifecycleDefaults) -> Result<(), ActiveValueError
 }
 
 fn resolve_active(
-    policy: Option<&PolicySnapshot>,
+    max_active_ms: Option<u64>,
     command: MaxActiveOverride,
 ) -> Result<Option<u64>, ActiveValueError> {
     let value = match command {
-        MaxActiveOverride::Inherit => policy.and_then(PolicySnapshot::max_active_ms),
+        MaxActiveOverride::Inherit => max_active_ms,
         MaxActiveOverride::Infinite => None,
         MaxActiveOverride::Millis(n) => Some(n),
     };
@@ -179,8 +203,8 @@ fn resolve_active(
 }
 
 fn resolve_captured_retention(
-    policy: Option<&PolicySnapshot>,
-    state: &[u8],
+    type_retention: RetentionOverride,
+    state_retention: Option<RetentionOverride>,
     command: LifecycleOverrides,
     defaults: LifecycleDefaults,
 ) -> Result<(ResolvedRetention, u32), ActiveValueError> {
@@ -199,11 +223,9 @@ fn resolve_captured_retention(
         ttl_ms: defaults.ttl_ms,
         history_max_events: defaults.history_max_events,
     };
-    if let Some(policy) = policy {
-        crate::retention::merge(&mut result, policy.type_retention());
-        if let Some(state) = policy.states().get(state) {
-            crate::retention::merge(&mut result, state.retention);
-        }
+    crate::retention::merge(&mut result, type_retention);
+    if let Some(state) = state_retention {
+        crate::retention::merge(&mut result, state);
     }
     crate::retention::merge(&mut result, command.retention);
     result.history_max_events = result

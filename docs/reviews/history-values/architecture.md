@@ -5167,3 +5167,476 @@ HistoryValues counterpart, catalog/publication/read/recovery/retention/clock,
 Linux/native8/full-goal or measured resource gain follows. Only this allowed note
 was appended; no source/tests/shared artifact/Git/build/VM/probe mutation or
 execution by me. Finite current review STOP.
+
+### STORED-CREATION-LIFECYCLE1 BODY: exact three-existing-path selection after saved RED
+
+Root saved the genuine five-assertion baseline in
+c2d9ceb36f644953bac953536f49564b4ac245fd and verified clean. I actually read the
+latest coordination tail4695110+4633/09fa75cd and the unchanged source, the
+attributed author proposal DOMAIN27498+2858/
+4e9527757e5ee2a039531cacf6b38f4d136fea28c2ad88456ca7f5b299c2b168,end30356,
+and PERF224143+9068/
+da0a4ac5868e6192eb3d339974cfb47787dbf32c8a43203faa1b5a86c6ce329b,end233211.
+I also whole/hash-read final R0 PERF219194+4949/1e262a99; its actual five RED,
+whole corrected technical7 and honest masking agree with my closing receipt.
+This is an EXACT precreation decision for later Root adoption/release, not code
+creation or permission for an agent to start independently.
+
+SELECT ONLY THREE EXISTING production paths, all under crates/wf-domain/src:
+1. workflow/active/capture.rs, current221LF/8111B/
+   47d4197e0c3a0fc92e8d5b5c41c26d07efeb0e996d9ae82efef79c6ba67e3061.
+2. workflow/active.rs, current232LF/8278B/
+   b1c22cc872999d1e25f4306560115a71798ce9dc7f846040c8f57a3053181488.
+3. policy/complete/stored_lifecycle.rs, current49LF/1979B/
+   6b2c9cb3e2b4e131c21354bdb52d3f00ea27ca5ad58d78989c55a0a025c831d8.
+NO new file, nominal model/type/trait, dependency, constant, test/helper/fixture,
+public API, policy/ADR/clock/command/storage/layout/profile activation. Existing
+complete.rs parent/reexports and original decoder/normalizer files stay literal.
+The TWO test files are ENTIRE frozen main373/da5ef001a9080cdd7a8793b62cd57af5a42950c18801a3552665453bf3cc2cbf and fixtures92/
+67a9ebd3e67e7a6251bc66d1b7e769dc4a55d724040133894630ea8248601246.
+Existing two public models/traits/error variants and the arity5 entry signature
+remain exact. Author owns only the three paths after explicit Root release.
+
+#### Exact shared scalar core and old entry compatibility
+
+ONE NEW crate-private function in capture.rs, arity7:
+capture_lifecycle_layers(
+ policy_type:Option<&[u8]>, workflow_type:&[u8], max_active_ms:Option<u64>,
+ type_retention:RetentionOverride, state_retention:Option<RetentionOverride>,
+ overrides:LifecycleOverrides, defaults:LifecycleDefaults
+)->Result<CapturedLifecycle,ActiveValueError>.
+Define it pub(crate); active.rs adds ONLY its pub(crate) reexport. It is ordinary
+scalar resolution, not policy admission or transaction authority. No public
+facade export or generic callback/trait is added.
+
+The existing public capture_lifecycle/5 keeps its signature and returned-error
+order. Its wrapper gathers one infallible borrowed type/state layer and delegates;
+no new map, snapshot, clone or fallible reader is inserted there. The shared core
+performs validate_defaults -> optional identity -> active -> command-retention
+validation/hot crosscheck -> defaults/type/state/command merge -> existing clamps
+and result construction. Its pure borrowed state gather can happen before these
+checks without changing the returned diagnoses; that does not claim identical
+CPU/lookup timing. The existing validate_defaults body/semantics stay exact.
+Generalize ONLY the existing private resolve_active/2 to
+(max_active_ms:Option<u64>,command:MaxActiveOverride), and
+resolve_captured_retention/4 to
+(type_retention:RetentionOverride,state_retention:Option<RetentionOverride>,
+ command:LifecycleOverrides,defaults:LifecycleDefaults), retaining their result
+and validation/merge/clamp math. No second scalar engine or additional named
+helper is authorized. This is one shared core plus the existing two workers.
+
+#### Exact stored BODY/helper roster
+
+Replace ONLY the existing public capture_stored_creation_lifecycle/5 rejector
+body/docs and needed imports. Add EXACTLY FOUR private functions in the SAME
+stored_lifecycle.rs, no helper child or type alias:
+- read_original/5(raw:&[u8],input:StoredLifecycleCaptureInput<'_>,
+  schema:PolicySchemaLimits,charge:&mut PolicySchemaCharge,max_temp:usize)
+  ->Result<(Option<u64>,RetentionOverride,Option<RetentionOverride>),
+           CompletePolicyEncodingError>.
+- field/5(index:&OriginalPolicyCurrentIndex<'_, '_>,map:TermPosition,
+  name:&[u8],atom_key:bool,charge:&mut PolicySchemaCharge)
+  ->Result<Option<TermPosition>,CompletePolicyEncodingError>.
+- retention/3(index:&OriginalPolicyCurrentIndex<'_, '_>,
+  position:Option<TermPosition>,charge:&mut PolicySchemaCharge)
+  ->Result<RetentionOverride,CompletePolicyEncodingError>.
+- number/3(index:&OriginalPolicyCurrentIndex<'_, '_>,position:TermPosition,
+  charge:&mut PolicySchemaCharge)
+  ->Result<Option<u64>,CompletePolicyEncodingError>.
+Thus FIVE NEW helper functions TOTAL (one shared plus four private), not five
+private stored helpers. Existing type import renames such as Index/Error/Cursor
+may refer ONLY to the already-defined index/error/cursor; no new typedef/model.
+Reuse existing decode_portable_retained, TermPosition/current cursors,
+charge_schema, flow_input::value::unsigned and existing retention constants.
+No new read accessor or visibility widening of original modules is necessary.
+
+The public bridge checks charge.profile()==schema FIRST; mismatch returns
+Policy(Schema(ProfileMismatch)) without advancing counters. It then prepays the
+fixed scalar/wrapper cohort below before touching policy branch/scalar inputs.
+None uses no backing index and resolves actual defaults. Complete calls EXISTING
+validate_stored_complete_policy on the SAME account, preserving full current
+content/type/generation/profile validation. It then borrows data() and Copy
+max-active/type retention, with a prospectively paid linear exact-binary state
+lookup. Every reached row and both byte operands are admitted; old validation's
+name charge does not pay this second lookup. No unpriced BTreeMap.get shortcut.
+The found state's optional retention is copied, preserving empty/absent fallback.
+No Complete snapshot, map, backing clone or second validation projection.
+
+Original read_original performs ONE actual retained portable decode and ONE
+catalog, with type identity checked while the index is live. Ok(None) from the
+strict reader becomes Policy(Malformed), never policy absence/default. Existing
+unsupported context/profile, allocation, work and checked-arithmetic diagnoses
+propagate through Policy. Build the catalog before using normalized cursors:
+CurrentCursor::new resolves valid zero-head LIST aliases through that catalog.
+The earlier no-catalog idea is explicitly rejected. Then read only atom-root
+max_active_ms/retention/states, binary-selected state, atom config retention and
+atom retention scalar labels. Return only the Copy scalar triple; index/catalog
+drop naturally before the shared core. No second decode, projection, snapshot,
+map construction or retained output borrow occurs. After genuine Original type
+equality, the caller may use Some(input.workflow_type) for the core's repeated
+identity check; it is another reached comparison and its two byte sides are paid.
+Complete can pass its actual borrowed type. None passes no policy type.
+
+field/5 is a narrowly scoped PAID LINEAR map lookup using retained positions.
+For atom_key=true, compare ONLY atom keys; for false, compare ONLY binary keys.
+Do not use key_bytes() to merge classes, reinterpret :q as <<q>>, or rely on a
+mixed-key ordering shortcut. Root/state/retention unknown keys stay unselected.
+The existing strict reader already proves map identity; no new dedup/canonical
+map owner is created. Missing/nonmap containers follow the source fallback below.
+
+#### Source-exact fallback versus explicit supported-profile refusal
+
+I actually read baseline retry_policy.ex995LF/32083B/
+f6392af3042c6a13f6e1b4af363eba801df88362bbf47479205d6e235ce2e1a0,
+lines210..240 and746..769. This corrects the earlier generic retention-normalizer
+suggestion: public borrow_retention accepts keyword/binary aliases and forbids
+hot; it is NOT the stored resolver's atom-only map merge. Do NOT substitute it.
+Source max-active is integer-only: absent OR any noninteger portable term falls
+toNone, including nil/binary infinity. number/3 checks Integer kind first;
+noninteger ->Ok(None), without numeric interpretation or scanning its subtree.
+For an Integer, call existing paid unsigned(Current,u64::MAX,same charge), keeping
+padded arbitrary integer encodings representing u64. An unrepresentable/negative
+nonzero integer is UnsupportedPolicyProfile, not silently absent. The caller
+requires selected max-active integer1..MAX_RETENTION_MILLIS; outside this positive
+captured profile is explicit Policy(UnsupportedPolicyProfile). This does not
+pretend every arbitrary raw source integer is representable by CapturedLifecycle.
+
+Absent/nonmap root retention, states or state config/retention preserves source
+fallback; a nonmap layer is NOT malformed merely for being nonmap. An actual
+retention MAP selects ONLY atom ttl_ms/history_max_events. Their PRESENT selected
+values must yield Some(number) and satisfy positive TTL/source history bounds;
+otherwise Policy(UnsupportedPolicyProfile), not Capture or absent fallback.
+Unknown/binary-name labels do not become atom fields. Source also merges internal
+atom history_hot_max_events, which RetentionOverride cannot carry: SELECT an
+EXPLICIT UnsupportedPolicyProfile lane whenever that atom key is present in a
+reached root/selected-state retention map. Binary-only hot is ignored by source.
+Do not silently discard atom hot, fabricate a new scalar model or advertise full
+arbitrary-Original compatibility. An unknown atom/context that the existing
+portable decoder cannot admit retains its existing operational refusal. This
+source-compatible common-profile bridge plus visible unsupported lanes earns no
+original workflow mapping; broader retained raw/internal-hot support stays an
+explicit later compatibility obligation if required by the full endpoint.
+
+Stored-donor type mismatch is exactly Policy(Schema(InvalidAuthority)) for BOTH
+variants, after actual donor validation. Invalid reached defaults/command scalars
+from the shared engine stay Capture(existing ActiveValueError); do not recast
+unrepresentable stored scalars as user Capture errors. Operational stored
+validation precedes the core on this NEW entry; simultaneous invalid stored and
+caller inputs have not acquired an invented cross-source priority. Old direct
+capture_lifecycle retains its own defaults-before-identity return order.
+
+#### Exact prospective resource tariff and owner boundary
+
+Use ONE supplied continuous PolicySchemaCharge; no new/reset/refund account.
+All following are actual prospective logical G/P debits, not native CPU or free
+permission from a forecast. Select literal fixed allowances, NO new constants:
+- Public fixed scalar+wrapper G=16_384 AFTER profile match and BEFORE policy
+  branching/argument extraction. It reserves128 events at128: current core table
+  defaults/validation40,identity/control2,active8,command retention12,hot crosscheck8,
+  result defaults4,optional merges18,history clamp4,hot/conversion12,result fields4
+  totals112; at most16 additional bounded wrapper selection/copy/control events.
+  No data-dependent row, byte or magnitude loop is included. This supersedes the
+  author's earlier tentative32_768, not a change to a frozen runtime oracle.
+- read_original prepays fixed4096 (32 nonloop metadata/cap/layer/dispatch events)
+  BEFORE its body; retention prepays2048 (16 nonloop Option/class/validate/result
+  events) BEFORE its body. These bounded cohorts exclude helper/row/byte loops.
+- field entry prepays128 before map-kind/length inspection. Each reached map row
+  or typed state row prepays384 for the iteration/key/value visit BEFORE row/key/
+  value access. Before each actual equality, additionally pay checked
+  128+left.len()+right.len() for BOTH operands. Failed class matches do not compare
+  unrelated bytes. Loop termination/presence/control stays in the named bounded
+  helper/header cohort; there is no unbounded uncharged iteration.
+- number entry prepays128 before cursor/kind inspection. ONLY a reached Integer
+  additionally pays its WHOLE selected encoded scalar length BEFORE unsigned;
+  existing unsigned magnitude-scan fees are additional, same account. This pays
+  initial bounded integer decoding as well as padded fallback, without turning
+  a noninteger ignored subtree into a numeric parse.
+- The shared core's repeated identity also pays both actual byte operands plus
+  its128 comparison visit BEFORE invocation when policy identity is present.
+  Original's first genuine donor identity comparison is separately paid likewise.
+All usize sums/products/u64 conversions are checked; overflow is
+Policy(Schema(LengthOverflow)). Failed charge preserves its admitted prefix;
+work exhaustion stays Policy(Schema(WorkBytes)), no error is funded afterwards.
+These are explicit upper cohorts, NOT one unit for every machine instruction.
+Actual stopped code must be recounted against112+16/32/16 and every dynamic site;
+a new loop/extra path cannot borrow unnamed slack or rename an unpaid visit.
+
+Original temporary permission: E=FULL borrowed encoded backing length. Compute
+checked65536+256E and compare max_temp BEFORE decoder allocation; insufficient
+cap is Policy(ByteLimit), including valid Original at cap0. That ceiling alone
+issues no G credit and is separate from the work account. Reuse the existing
+strict decoder's prospective actual reservation/G/P debits. For its ONE catalog,
+pass conservative live=192E+128 (checked) so reserved n/k/f capacity, including
+portable reserved f with virtual_funs.len()==0, is not lost by a length-only
+owner_bound. Existing catalog admission adds at most8n+128, so with n,k,f<=E the
+logical requested coexistence is <=200E+256 <65536+256E. No extra external P
+forecast is imposed as an invented issued credit; build_catalog itself debits
+its prospective peak before reserve. No scalar retention scratch owner is built.
+Peak P remains charged after temporary drop; genuine allocator failures from the
+existing decoder/catalog remain Policy(AllocationFailure), not Missing/absence.
+
+Complete creates NO new temporary collection/index on its selected canonical=false
+validation and borrowed-scalar lookup route. Its max_temp0 therefore need not
+fail; sufficient work/current validation still apply. That is a real route
+property, not a new Complete-cap0 test assertion or a claim its retained caller
+Box/Vec backing is free. Original's cap covers the selected logical requested
+owners, not Vec overprovision, allocator metadata, raw backing capacity, recursive
+parser/key-comparison call stack, RSS/CPU or native initial-R/fullE-T. No Box/shrink,
+allocation-failure harness, benchmark/speed claim or OS-specific API is selected.
+
+#### Geometry, peer closure and exact release boundary
+
+Author's natural estimates are stored<350/capture<280/active233 and functions<100;
+these are planning estimates, not proof or a size waiver. Root formatter/actual
+whole-source review must establish source<=400/function<=100. If the five-helper
+cut cannot naturally fit, consult the exact additional responsibility BEFORE
+creating it; do not pack/delete comments/drop cases. Imports/docs/body changes
+are confined to the three paths and named workers. All other model/API/source,
+the entire two frozen tests, old direct capture scenarios and mandatory original
+acceptance obligations remain. Later validation must run unchanged-five GREEN
+and old regression/full workspace; macOS evidence does not satisfy Linux.
+
+Direct author and PERF consultation resolved catalog necessity, key classes,
+noninteger fallback, explicit hot/range profile lane, shared-core identity debt
+and the requested-owner bound. My actual written9068 PERF/2858 DOMAIN reads
+agree; PERF directly checked the final concrete fixed/dynamic table subject to
+actual stopped-code census. It will read this recorded decision ordinarily;
+no additional appendix/readiness acknowledgement or design gate is requested.
+No source/workload/Git/shared mutation by me. Root must whole-read/adopt/release
+this EXACT three-path batch before sole authorship; no one may infer permission
+from this note alone. The real catalog/current+EVERYhistory/consumed transaction,
+authentic retention/ordered read/recovery/profile migration/full typed hydration,
+original3/Linux/native8 and ordered full-goal endpoint remain required. Finite
+BODY precreation decision STOP.
+
+### STORED-CREATION-LIFECYCLE1 actual BODY A/B review and retention-cohort correction
+
+Actual independent written-source review AFTER all three author buffers STOPPED.
+I read the adopted release4699743+2905/cb6142fa, actually whole-read all three
+author files, then whole-read the canonical stored file and its one-fee B revision.
+Only this allowed architecture note is written by me; no source/tests/shared
+artifact/Git/compiler/formatter/VM/probe workload was changed or run by me.
+This reviews the implemented exact three-path batch after saved REDc2d9ceb,
+not another catalog/clock/layout or public authority decision.
+
+Canonical CURRENT source B (all paths under crates/wf-domain/src):
+- workflow/active/capture.rs243LF/8909B/
+  a18bf68a32065cbf7a769c3115e743993cf00f2f6028e5803e1ca52a7287637f.
+- workflow/active.rs233LF/8328B/
+  f3143f2b21ed9b450ea7d4582aa1f2ae23460cf52cf3a46a0ccd35b9c086aad2.
+- policy/complete/stored_lifecycle.rs291LF/11044B/
+  f70f427c0a4cca7be44ca7832d0907ea90e8e4604b5051e940a34f707a718b2d.
+Root's formatter changed ONLY stored imports/order and rows.next error wrapping
+from author289/10983/b4c2c32a2fbe5a7adbf196cb7af4d39dd5ae320afac0ab4a293a93e071643491
+to source A291/11044/477c239ddec1362cf261fa4292b575140337523460c648af83070be808a692e4.
+My exact two-part in-memory inverse recovers the ENTIRE author file, not just a
+whitespace-insensitive comparison. Capture/active stay literal author bytes.
+
+My independent whole scoped inverses reconstruct ALL THREE old sources exactly:
+remove only the shared core and restore the selected old public/scalar worker
+bodies -> capture221/8111/47d4197e0c3a0fc92e8d5b5c41c26d07efeb0e996d9ae82efef79c6ba67e3061;
+remove only the50B crate reexport -> active232/8278/
+b1c22cc872999d1e25f4306560115a71798ce9dc7f846040c8f57a3053181488;
+retain the byte-identical public model block and reverse the allowed imports/
+public docs/body/private additions -> literal R0 child49/1979/
+6b2c9cb3e2b4e131c21354bdb52d3f00ea27ca5ad58d78989c55a0a025c831d8.
+The B-to-A inverse below composes with that last proof. No hidden old helper,
+model/trait/error variant/public signature or unselected body edit remains.
+
+Entire frozen tests STILL hash to main373/12394/
+da5ef001a9080cdd7a8793b62cd57af5a42950c18801a3552665453bf3cc2cbf and fixtures92/3849/
+67a9ebd3e67e7a6251bc66d1b7e769dc4a55d724040133894630ea8248601246.
+Complete parent324/b015a804 is also byte-exact. Root's full held1602/b89c proof
+is attributed; I independently bound these full test/model/source inverses.
+
+Exactly the selected FIVE new helpers exist: crate-only layers7 and private
+read_original5/field5/retention3/number3. Twenty-four functions TOTAL across the
+three files, including the unchanged generic expire_active_batch. New core
+147..169=23LF; stored public49..135=87,read137..198=62,field200..234=35,
+retention236..270=35,number272..291=20. All files<=400, all functions<=100,
+maximum file291/function87; ordinary formatting, no packing or waiver. Existing
+old capture wrapper126..142 and generalized active189..203/retention205..243
+are the selected existing workers. No new file/nominal type/alias/trait/constant,
+view/accessor/extra helper/test or broader public reexport is present.
+
+#### Actual semantics and ownership
+
+The old public capture wrapper gathers one pure borrowed layer and delegates;
+inside the shared core defaults fail first, then identity, active and retention/
+hot crosschecks, followed by the SAME defaults/type/state/command merges and
+clamps. My old-source inverse proves validate_defaults and all remaining old
+math unchanged. Borrowed state gathering can precede these checks but cannot
+allocate/fail/change a returned diagnosis. I also read the stable unchanged
+active_timeout/capture.rs283/8605/c797f204bc0054f34fb7699effcf74e585efe38271b0988050d6e84163ef7769:
+existing infinity/live-policy, layering/caps/numeric-extreme and restore controls
+remain. Their actual regression execution still requires Root's full run.
+
+The stored entry FIRST checks schema/profile, then once prepays16_384 before
+policy branching. None makes no backing index. Complete calls the existing FULL
+current validator on the same charge, borrows data(), then prepays384 BEFORE
+explicit iterator.next (stored72 versus75), and both name/request byte lengths
+plus128 BEFORE equality89. It copies only actual max-active/type/selected-state
+retention. There is no snapshot/Complete clone/map builder or new collection on
+this canonical=false path; a zero temporary cap is not an invented failure.
+The retained caller Box/Vec still belongs to the outer owner and is not free.
+
+Original prepays4096, checks full E's65536+256E cap BEFORE the ONE strict decoder
+call153, genuinely compares stored type with paid BOTH bytes before163, then
+builds ONE catalog at171 with checked live192E+128. Valid zero-head LIST aliases
+therefore remain supported. Catalog/index never escape: read returns only three
+Copy scalars and drops them before the shared core. The repeated core identity
+is separately charged122 before invocation125; Original's Some(input.workflow_type)
+is used ONLY after actual full-donor equality succeeded. No fresh charge, second
+decode/projection/snapshot/map or borrowed output is hidden in the route.
+
+field's128 precedes kind/length inspection,384 precedes row/key/value access214,
+and128+both actual byte operands precedes equality228. Atom labels are selected
+ONLY by atom_bytes, binary state ONLY by binary_bytes: neither :q nor binary
+retention aliases are accidentally treated as an atom field. Nonmap/missing
+layers follow source fallback; noninteger max-active returnsNone before numeric
+interpretation. Reached Integers prepay their full resolved encoded span before
+unsigned; padded integer encodings retain its existing paid magnitude path.
+Known unrepresentable/negative/range-invalid integer and present invalid retention
+values preserve the selected operational UnsupportedPolicyProfile. Reached
+internal atom hot is explicit unsupported, binary-only hot unselected. Root/
+selected-state unknown fields are ignored without erasing operational decoder
+context failures. These are the documented common profile and visible unsupported
+lanes, not complete arbitrary-Original or internal-hot parity.
+
+Stored type errors are Policy(Schema(InvalidAuthority)); malformed/unsupported,
+work/length/allocation/byte-cap errors retain Policy origin. Reached invalid
+caller/default scalars retain Capture. Matching-profile checks leave refused
+accounts unchanged and no error refunds an admitted prefix. New stored validation
+precedes the scalar engine as selected; old direct capture returned-error order
+is preserved. No field/capture is a persistence/namespace/clock/admission token.
+Scalar output has no input lifetime or collection owner; both backing drops and
+post-drop uses are tested later by the frozen case, not justified by Copy alone.
+
+#### Concrete resource defect found and exact existing-literal repair
+
+Our PRECREATION16-event retention allowance was too small: result.validate calls
+the real RetentionOverride validator, including its own Option/range/control
+visits. Those visits cannot be paid by the DIFFERENT later shared core's112
+allowance. Root flagged this, I explicitly agreed the existing-literal increase,
+and PERF independently confirmed a conservative30-event bound:
+header/class/default-return4 + TTL option/number-result/capture/propagation4 +
+hot presence/refusal2 + history option/number-result/u32/capture/propagation5 +
+result fields/return3 + FULL validator/propagation12 =30. The validator component
+includes2Options,4zero/range comparisons,min bound,2OR controls,2if controls and
+result propagation. Field/number helper internals and dynamic bytes stay paid
+additionally. This is a logical semantic-visit/control table, not per-machine
+instruction pricing or permission to regroup an unpaid path away.
+
+SELECT/accept ONLY retention's EXISTING entry literal2048->4096 (32*128), as
+already recorded/applied by Root after A's focused run terminal. No new helper,
+model/constant/test/byte ceiling or ownership/branch change. I whole-read actual
+Bf70f, and reversing ONLY that statement INSIDE fn retention reproduces ENTIRE
+A477c. read_original's separate4096 stays unchanged; a global4096 inverse would
+be the wrong reconstruction. A's passing tests did NOT close this undercharge.
+The B change preserves full geometry, old-source inverses/models/oracles and
+all branch outcomes; corrected B execution still needs its own actual packet.
+
+Other actual closed fixed bounds, reviewed with PERF against the source:
+- Shared core112 plus wrapper<=16 fits once16_384; the wrapper slots are
+  dispatch/data/local/iterator+len5,typed type/active/retention3,policy-presence1,
+  identity metadata/dispatch3,core input copies3,origin conversion1. The matched
+  retention read is in its separately paid row value visit. No variable scan is
+  hidden in those slots.
+- read_original<=32:cap/arith/refusal5,decoded presence/entry3,identity metadata4,
+  live calculation4,root cursor2,active Option/range4,type-retention binding1,
+  states/selected dispatch3,triple3,bounded call/propagation3. Decoder/catalog,
+  helpers and comparison/magnitude bytes pay their separate prospectives.
+- Retention NOW30<=32. The actual row/byte/number ordering sites above have no
+  remaining distinct reached unpaid event under this selected logical table.
+All account debits remain continuous; an attempted debit advances nothing on
+refusal. Requested owner n/k/f<=E gives decoder64(n+k+f)<=192E; catalog adds
+<=8E+128 to live192E+128, so<=200E+256 fits65536+256E. Reserved function capacity
+is included even if final virtual-fun length is0. The permission bound is NOT
+issued G credit; actual decoder/catalog admission does the work/peak debit before
+reserve. No allocator capacity/RSS, raw backing capacity, recursion/native-frame,
+CPU/initial-R/fullE-T or total-allocation theorem follows. No shrink/Box/probe.
+
+#### Actual A runtime and current acceptance boundary
+
+I whole/hash-read saved R0 target9497313+2163/31ee2dcf and actual A target
+9500855+730/a5104a65d1faa94eecb180e1451b76ba9f870ab49b03941d591f3c3961ff2e05.
+My source/R0/GREEN Counters preserve EXACT five names and change only five
+FAILED to ok, same stored_lifecycle-a438ac334992b1ef executable identity. Actual
+A result5PASS/zero failed,ignored,measured,filtered means ALL previously masked
+literal/precedence/error/refusal/retry and both-owner drop/use tails finish.
+It does not execute additional untested raw-profile permutations or prove the
+resource tariff on its own. No oracle or test bytes changed after genuine RED.
+
+Root reports initial A focused27849 all eight commands0/unchanged1605/ba7a:
+fmt/check/strictClippy/target5/arch53/reference480/progress120132550/diff.
+I independently whole/hash-read actual A architecture9501766+5593/
+f177a9dd850187bc13ffa23d0f9fdd2d327400ef9ac83d1c8e1f91713bd798f2,
+53PASS/zero others and exact same architecture name/status Counter as corrected
+R0. Other six command/whole hold outcomes are Root-attributed here. This SOURCE A
+GREEN remains separate from the now-corrected B fee and its pending full evidence.
+
+I actually read Root's attributed source/correction DOMAIN32353+2323/
+028f7ec2e017f4228f671f183866b850c22942ad1937b37a795558c875151035,end34676.
+It agrees on all source identities/inverses/geometry, A correctness and the
+independently necessary tariff correction. Prior actual PERF3909 precreation
+closure was read at this review's start; current actual-source census findings
+were exchanged directly and resolved above. PERF's written BODY receipt and
+corrected B result will be read ordinarily for final reciprocal/runtime closure,
+without an extra readiness/SAVE gate. No remaining scoped B semantic/ownership/
+resource/geometry defect is identified, subject to those actual checks. This is
+NOT full workspace/old public regression, Linux, original3 mapping, genuine
+catalog/current+EVERYhistory/consumed transaction/retention/read/recovery/typed
+profile or full-goal completion. Only this role note changed by me.
+
+### STORED-CREATION-LIFECYCLE1 final B focused-result and written-peer closure
+
+Closes the actual source/fee receipt370628+12087/01456482. I independently read
+and parsed the COMPLETE corrected B focused packet in the existing append-only
+validation log:9508870+9377/
+3861bdcb1b98973ad61f92703448f95a53fae1525812facce9fb3ade414be6b5,
+end9518247 (starts at ROOT header, includes the final blank LF). Exact numbered
+headers1..8, eight EXIT0/UNCHANGEDTrue footers, and all eight INPUTS headers are
+1605/a6b31162bddc1dd9ea8e6f96cbf43c7ab70be7df602c4c26597972b399fe0223.
+Thus the eight actual commands on corrected bytes pass: fmt, domain all-target
+check, strict Clippy, target5, arch53, reference480, progress120/132/550, diff.
+This is my own full-packet read, superseding pending/Root-only attribution for
+CURRENT B in the prior receipt. No workload was executed by me.
+
+I separately whole/hash-read final target9510184+730/
+ff5f20451242870aad44918eac16496a83a6d807cda9b2afee663efb75d0efac:
+5PASS,0failed/ignored/measured/filtered. My comparison with saved R02163/31ee2dcf
+and all five frozen source identities preserves EXACT names and changes only
+all five FAILED->ok, same a438ac334992b1ef artifact. I separately read B arch
+9511107+5593/add4e86d753c2e92568da72384b68954ec6abd209e22061fafee2f8ea22065fc;
+its53PASS name/status Counter equals A and corrected R0. No compilation/technical
+failure is substituted for behavioral evidence; both entire frozen tests are
+unchanged after the genuine RED/save. Every former fixed-test tail now finishes,
+including both full-owner drops and outside-block scalar use. This does not
+exercise unasserted raw-policy permutations or instrument allocator behavior.
+
+Final actual source rebindings remain capture243/8909/a18bf68a,active233/8328/
+f3143f2b,stored291/11044/f70f427c; the whole hashes/inverses are in the primary
+receipt and were rechecked. Models/public signatures/frozen tests stay literal.
+Retention's32-event4096 fee includes its FULL nested validator:30<=32. The old
+16-event design underestimate is explicitly corrected, not redefined as a free
+callee or charged to the later shared core. Other fixed112+16/32 and dynamic
+row/byte/number sites remain as actually reviewed. No remaining scoped source,
+semantic, ownership, resource or natural-geometry defect is identified.
+
+Written reciprocal review is ACTUAL. I whole/hash-read PERF237120+11017/
+ede4c0ef5daf9560d2684cb7ef1d9411643a4c11aefc869bed1fea57291b0148,
+end248137. It independently binds all three full sources, old/formatter/fee
+inverses,24functions/max87,frozen models/tests, initial16underbound and corrected
+30<=32 table, full A/B execution and exact five-status conservation. I agree;
+no substantive disagreement remains. PERF actually read my12087/01456482 before
+publishing that receipt. This closes ordinary mutual written-source/resource
+review; its later actual read of this result closure requires no extra appendix,
+acknowledgement or source/SAVE gate.
+
+Root's full11 session61737 remains separate at this finite close; no full workspace,
+old direct-capture runtime conservation, Linux or later checkpoint result is
+inferred from focused8. Original HistoryValues mappings, genuine persisted
+catalog/current+EVERYhistory/consumed transaction/retention/ordered-read/recovery/
+full typed profiles, native old-eight and full M1-M8 endpoint remain required.
+Only own allowed note was appended; no source/test/shared file/Git/compiler/VM/
+benchmark/probe action. Scoped corrected BODY B acceptance complete; finite STOP.

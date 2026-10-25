@@ -53423,3 +53423,146 @@ seven numbered commands/seven EXIT0/UNCHANGED1605/8a6c footers. The official
 Rust Copy source read is in PERF with the shared-reference caveat; no trait-only
 ownership, allocator or speed claim. Exact nine-path R0 checkpoint is now ready
 for Root save. BODY roster remains unselected/unreleased until that save.
+
+
+### STORED-CREATION-LIFECYCLE1 BODY precreation consultation after R0 SAVE
+
+Root saved exact nine-path callable five-assertion RED in
+c2d9ceb36f644953bac953536f49564b4ac245fd, then verified clean. Tests remain frozen
+main373/da5ef001 and fixtures92/67a9ebd3. All technical7 passed before save;
+actual runtime remains intended0PASS5FAIL until BODY.
+
+Root NOW requests the concrete BODY decision, NOT source release. ARCH owns only
+its role note, PERF only its role note, implementation owner proposes by message
+and read-only source study (Root may append attributed proposal to DOMAIN).
+Select exact paths/helper names/visibility/arity/responsibility BEFORE creation.
+Reuse existing capture scalar resolution with a named shared core inside existing
+capture.rs and minimal active export seam; preserve its existing public API and
+source validation/precedence. Complete should use full borrowed typed fields,
+Original one paid retained decode/index; no duplicate full snapshot/map/clone.
+Select the exact full identity/schema/profile/work, state lookup and scalar read
+route, prospective Original65536+256E temporary admission and continuous same
+charge including reached error paths. Complete cap0 behavior may follow the real
+selected route; do not invent a temporary owner. No new public model/trait,
+clock/storage/command registry or endpoint source by implication.
+
+All source/tests/shared policy remain held during this finite consultation.
+Each reviewer must actually read the other's proposal and resolve concrete
+resource/geometry issues. Root selects/releases only a fully named agreed BODY
+roster, then author alone writes it and stops before Root workload/Git work.
+No source inspection-only approval substitutes for later written-code reciprocal
+review and unchanged-five GREEN/full regression validation. The actual catalog,
+consumed transaction lifecycle/bindings/current+all history, original profiles,
+Linux and ordered M1-M8 endpoint remain required.
+
+
+### STORED-CREATION-LIFECYCLE1 exact BODY adoption and sole-author release
+
+Root whole/hash-read ARCH354279+16349/
+986cba53a6622c00e602ea9669d484cbdd06f94ed5e9a2cb81b3038392276b5e,
+end370628, and PERF224143+9068/da0a4ac5. ARCH actually read PERF's written
+proposal and attributed DOMAIN27498+2858/4e952775; direct consultation resolves
+key classes, source fallback, explicit hot/range profile lanes, catalog necessity
+and the scalar/owner bounds. PERF's ordinary final written-decision read may
+finish during authorship; no new readiness acknowledgment gate. Root verified
+all1605/eababb90 consultation inputs unchanged before this release.
+
+Root ADOPTS that exact decision and NOW RELEASES ONLY THREE EXISTING paths to
+d2_implementation_sol61: workflow/active/capture.rs, workflow/active.rs and
+policy/complete/stored_lifecycle.rs under crates/wf-domain/src. Exactly one new
+crate-only capture_lifecycle_layers/7 and four private stored helpers
+read_original/5,field/5,retention/3,number/3. Existing two scalar workers may be
+generalized; old public entry/type/error order remains. Existing unused R0
+parameter binding names may become ordinary live names; arity/types/models stay
+exact. active.rs adds only the crate-private export. No other helper/file/type/
+constant/alias/trait/test/dependency/configuration or public API is authorized.
+
+Final selected scalar/wrapper prepayment is16_384, superseding tentative32_768;
+read4096/retention2048/number128+actual INTEGER encoded length/field128 and each
+row384 plus checked128+both comparison lengths follow the exact decision.
+ONE supplied monotonic account, profile gate first, one actual Original decode+
+catalog, checked65536+256E permission before decode and cataloglive192E+128.
+This is a logical requested-owner profile, never forecast credit or native/RSS/
+allocator/speed proof. Complete borrows full validated typed data; no duplicate
+snapshot/map/backing clone. Noninteger stored max-active source-fallback and
+atom-root/binary-state distinctions remain; reached unrepresentable integer/
+retention/internal atom-hot uses the explicit operational unsupported profile,
+not silent defaults or full-original compatibility credit.
+
+Author alone writes these three paths and reports complete hash/function/geometry
+roster then STOP before Root formatter/compiler/tests/Git. ARCH/PERF own only
+their separate notes and review actual stopped code plus each other's findings;
+Root owns DOMAIN/shared docs/workloads/Git. Entire R0 test files main373/da5ef001
+and fixtures92/67a9 and all other inputs stay held. Physical400/file100/function
+limits remain; no packing or waived checks. Root must recensus the actual work
+sites and run unchanged-five GREEN plus full prior regressions. The real stored
+catalog/consumed transaction/current+EVERYhistory/ordered reads/lifecycle/recovery,
+full original profiles, Linux/native8 and all M1-M8 remain required.
+
+
+### STORED-CREATION-LIFECYCLE1 BODY B final full checkpoint preparation
+
+Root closes actual full61737 TERMINAL0: raw9518246+129822/SHA256
+982379472763ef6051dca0e59ea2f227f7b06ae756eb59800bf33207029230f1,
+end9648068. Eleven numbered commands EXIT0/UNCHANGED1605/
+a6b31162bddc1dd9ea8e6f96cbf43c7ab70be7df602c4c26597972b399fe0223,
+excluding ONLY the three active history-values role notes. Full alltargets
+9521253+114719/f6636f037667e41fdb48d2fc749dec259b5e0311c28f2c84541fc9b89ccfa7bc
+is1093PASS/100summaries/102headers, zero other statuses. Root independently
+compares SAME-full exact target/executable/name/status Counters: all1088 old
+tuples preserved, only the five frozen stored_lifecycle cases/new target added.
+No focused artifact normalization. All old direct-capture regressions are included.
+
+Docs9636197+2706/203742f3beb2f116a453389a0de1132087e3a3bd1ad7b808b2254b760f39c2de
+preserve all six compile-fail identities and15 doc targets. Both entire raw
+smokes remain byte-identical (indexed153/3869ef2c,terminal142/019f8de7), correctness
+profiles only/no measured gain. Warnings-denied docs, arch53, reference480,
+unchanged120/132/550 ledger, four cached offline deny categories and diff pass.
+No Linux/original-profile/native-eight/full-product result is inferred.
+
+Actual B source/source-resource/reciprocal review is closed in ARCH370628+12087/
+01456482 and382715+3539/1011cde4, PERF237120+11017/ede4c0ef. Root whole/hash-read
+these exact receipts; peers actually read each other and current B/frozen tests.
+The initial retention16-event allowance was underestimated despite A5GREEN;
+ordinary exact existing literal2048->4096 includes the actual nested validator
+within30<=32. No new helper/model/constant/oracle. Actual B focused8 all0 and
+unchanged-fiveGREEN followed. The full source/formatter/fee inverses,24 functions,
+max291LF/file and87LF/function, exact two public models/old public API and frozen
+main373/da5ef001+fixtures92/67a9 are bound in those notes. Other fixed/dynamic
+work and the one prospective Original decode/catalog are actually recounted;
+no native memory/allocation theorem or measured speed claim.
+
+Root verifies the final1605/a6b input fingerprint and all three source/two test
+hashes BEFORE updating ONLY CONTINUE and this record; the pre-update hashes are
+captured for exact reconstruction. No source/tests/workload changes follow this
+full run. Intended current BODY save is eight paths: three production, two
+shared docs and three role notes. ARCH is concurrently preparing the next
+read-only endpoint proposal; Root may stage ONLY its complete reviewed source-B
+prefix through386254 to avoid racing future appends. Future note suffixes stay
+untouched/unstaged for the next checkpoint; no peer interruption/truncation.
+PERF's finite independent complete-full audit receipt follows ordinarily before
+Root saves. Root owns all Git/index operations.
+
+Next endpoint remains the actual same consumed transaction: explicit logged
+birth/terminal override presence and trusted defaults identity; captured lifecycle,
+catalog/current+EVERY intermediate history bindings; ordered owned reads with one
+server clock; reopen/snapshot/expiry/cleanup/rewind and full original hydration.
+Root/author corrected blanket omitted-field carry from pinned sources (DOMAIN
+34676+2980/f70464e6): payload carry differs from result/error clearing and other
+untouched refs, so fold by actual event kind/mask/loaded bindings. Explicit terminal
+TTL override can replace old captured TTL before stamping and must be logged.
+Whole-Loaded borrow and self-reference constraints require real field splitting/
+pre-capture plus numeric/Copy metadata, not retained borrowed parts inside a
+moved plan. Future artifacts/registry/real missing operations need exact ARCH
+selection after this checkpoint; no new source/profile is released here.
+Full M1-M8 completion goal remains ACTIVE.
+
+
+Final independent full receipt is ACTUAL: PERF248137+5073/
+3cec275296abdfe75fa68798f2e72dd938ab982187591ae03600eb079a15f0f0,
+end253210. Root whole/hash-read it. PERF independently reads the complete129822
+packet/all11, strict old1088+only5 tuple conservation, exact docs6/15 and both
+whole smokes, and rehashes all three source/two tests/unchanged parent. It actually
+read final ARCH3539 and agrees. Finite current review stopped; no remaining
+scoped defect or additional acknowledgement gate. Root now stages exact current
+eight-path checkpoint, protecting any future ARCH suffix as recorded above.

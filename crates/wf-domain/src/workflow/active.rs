@@ -23,6 +23,7 @@ mod releases;
 mod trace;
 mod values;
 
+pub(crate) use capture::capture_lifecycle_layers;
 pub use capture::{
     ActiveValueError, CapturedLifecycle, LifecycleDefaults, LifecycleOverrides, MaxActiveOverride,
     capture_lifecycle,
