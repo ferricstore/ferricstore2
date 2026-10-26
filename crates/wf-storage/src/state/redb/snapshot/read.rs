@@ -76,7 +76,7 @@ pub(super) fn current<W: std::io::Write>(
     else {
         return Ok(None);
     };
-    if matches!(store.layout.get(), 4..=6) {
+    if matches!(store.layout.get(), 4..=7) {
         let catalog = super::catalog::load(&tx).map_err(SnapshotError::State)?;
         super::catalog::select(
             &mut tx,
@@ -102,7 +102,7 @@ pub(super) fn pin(
     let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::State)?;
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     let facts = validate::complete(&mut tx, &mut charge, limits).map_err(SnapshotError::State)?;
-    if matches!(store.layout.get(), 4..=6) {
+    if matches!(store.layout.get(), 4..=7) {
         let mut catalog = super::catalog::load(&tx).map_err(SnapshotError::State)?;
         let pinned = catalog
             .anchor

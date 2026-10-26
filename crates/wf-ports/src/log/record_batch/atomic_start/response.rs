@@ -30,6 +30,15 @@ pub fn atomic_start_retained_summary(
     scan::summary(response, original_position, original_time, admission)
 }
 
+pub(in crate::log) fn body_summary(
+    response: &[u8],
+    position: LogIdentity,
+    time: TimestampMillis,
+    admission: AdmissionLimits,
+) -> Result<(RetainedStatus, Option<usize>), CodecError> {
+    scan::summary(response, position, time, admission)
+}
+
 /// Scans syntax first, then verifies the same grammar against the actual decision.
 /// Full original term/node authority is the Fresh wrapper's separate obligation.
 /// # Errors

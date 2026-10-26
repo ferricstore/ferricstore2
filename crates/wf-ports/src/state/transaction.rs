@@ -266,6 +266,12 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
             return Err(StateTransactionError::InvalidChanges);
         }
         match plan.decision() {
+            RecordBatchApplyDecision::Fresh { outcome, .. }
+            | RecordBatchApplyDecision::IndependentFresh { outcome, .. }
+                if outcome.intent().version() == 8 =>
+            {
+                crate::log::validate_workflow_value_changes(scope, control, plan.decision())?;
+            }
             RecordBatchApplyDecision::Fresh { operation, outcome }
                 if outcome.intent().version() == 7 =>
             {

@@ -399,3 +399,110 @@ fn assert_action(store: &mut RedbStateStore, scope: &RequestScope, case: u8) -> 
     }
     Ok(())
 }
+
+use wf_domain::policy::RetryOverride;
+use wf_domain::retry::{JitterSample, PolicyRetry};
+use wf_domain::workflow::StartAndClaim;
+use wf_ports::blob::WorkflowValueBindingKnowledge;
+
+#[test]
+fn value_binary_retry_terminalization_inherits_effective_ttl() -> TestResult {
+    let directory = crate::fixtures::directory("value-retry-inherits-ttl")?;
+    let path = directory.join("state");
+    let fresh = f::fresh(&path)?;
+    assert!(fresh.is_ok(), "{:?}", fresh.as_ref().err());
+    let Ok(mut store) = fresh else {
+        return Err("expected fresh value capability".into());
+    };
+    let scope = crate::fixtures::scope()?;
+    let partition = PartitionId::new(b"p".to_vec())?;
+    let mut items = Vec::new();
+    let mut inputs = Vec::new();
+    for (index, id) in [b"positive".as_slice(), b"zero"].into_iter().enumerate() {
+        let start = Operation::StartAndClaim(StartAndClaim {
+            workflow_type: b"r".to_vec(),
+            state: b"q".to_vec(),
+            worker: b"w".to_vec(),
+            lease_ms: 1_000,
+            payload: Some(b"A".to_vec()),
+        });
+        let now = [100, 200][index];
+        let prepared = f::batch(
+            7,
+            id,
+            now,
+            PreparedOperation::Batch(vec![f::item(id, now, start)?]),
+            vec![f::input(0, 0)],
+            vec![f::witness(b"r", None)?],
+        )?;
+        f::apply_value(&mut store, &scope, &prepared, u64::try_from(index)?)?;
+        let id = RecordId::new(id.to_vec())?;
+        let before =
+            store.workflow_value_binding(&scope, &partition, &id, None, f::read_limits())?;
+        let WorkflowValueBindingKnowledge::Known(Some(before)) = before else {
+            return Err("real Start has no captured binding".into());
+        };
+        assert_eq!(before.lifecycle.birth.retention_ttl_ms(), 7_000);
+        assert_eq!(before.lifecycle.effective_ttl_ms, Some(7_000));
+        let retry = Operation::RetryWithPolicy(PolicyRetry {
+            guard: running_guard(&mut store, &scope, &id)?,
+            run_at: None,
+            policy_override: RetryOverride {
+                max_retries: Some(0),
+                backoff: None,
+                exhausted_to: Some(b"failed".to_vec()),
+            },
+            jitter: JitterSample::new(0),
+            payload: None,
+            error: None,
+        });
+        items.push(f::item(id.as_bytes(), 400, retry)?);
+        let mut input = f::input(u32::try_from(index)?, 0);
+        input.terminal_ttl_ms = [Some(1), Some(0)][index];
+        inputs.push(input);
+    }
+    let prepared = f::batch(
+        6,
+        b"retry-inherits",
+        400,
+        PreparedOperation::Batch(items),
+        inputs,
+        vec![f::witness(b"r", None)?],
+    )?;
+    f::apply_value(&mut store, &scope, &prepared, 2)?;
+    let limits = f::limits().record_batch;
+    let tx = store.begin_apply(
+        scope.group(),
+        scope.recovery(),
+        limits.codec.admission(),
+        limits.maximum_read_steps,
+        limits.maximum_read_bytes,
+        limits.maximum_adapter_bytes,
+    )?;
+    for id in [b"positive".as_slice(), b"zero"] {
+        let id = RecordId::new(id.to_vec())?;
+        let core = tx.record(scope.tenant(), &partition, &id)?;
+        let core = core.ok_or("retried core missing")?;
+        assert_eq!(core.record.state(), b"failed");
+        assert_eq!(core.record.version(), 2);
+    }
+    drop(tx);
+    for (index, id) in [b"positive".as_slice(), b"zero"].into_iter().enumerate() {
+        let id = RecordId::new(id.to_vec())?;
+        for event in [None, Some("400-2")] {
+            let binding =
+                store.workflow_value_binding(&scope, &partition, &id, event, f::read_limits())?;
+            f::assert_binding(
+                &binding,
+                (b"p", id.as_bytes()),
+                u128::try_from(index)? << 32,
+                [Some(1), None, None],
+                (None, 7_000, 2, 10, Some(7_000), Some(7_400)),
+                &prepared.policies[0],
+            )?;
+        }
+    }
+    drop(store);
+    std::fs::remove_dir_all(directory)?;
+    Ok(())
+}

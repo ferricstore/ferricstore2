@@ -23,7 +23,7 @@ pub(super) fn value_effect(
     charge.spend(1)?;
     let fields = supplied_value_fields(&source.command.operation, charge)?;
     charge.spend(1)?;
-    if (decoded.request().intent.version() == 7)
+    if (profile(decoded, charge)? == 7)
         != matches!(source.command.operation, Operation::StartAndClaim(_))
     {
         return Err(E::UnsupportedProfile);
@@ -94,6 +94,23 @@ pub(super) fn value_effect(
         supplied: fields.map(|field| field.is_some()),
         terminal: matches!(record.state(), b"completed" | b"failed" | b"cancelled"),
     }))
+}
+
+pub(super) fn profile(
+    decoded: &DecodedRequest<'_>,
+    charge: &mut ValueEffectsCharge,
+) -> Result<u16, E> {
+    let version = decoded.request().intent.version();
+    if version != 8 {
+        return Ok(version);
+    }
+    charge.spend(12)?;
+    Ok(u16::from(
+        decoded
+            .workflow_value_metadata()
+            .ok_or(E::UnsupportedProfile)?
+            .profile,
+    ))
 }
 
 pub(super) fn supplied_value_fields<'operation>(

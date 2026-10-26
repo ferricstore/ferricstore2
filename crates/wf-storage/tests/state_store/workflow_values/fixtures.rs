@@ -79,8 +79,10 @@ pub(super) fn defaults() -> WorkflowValueDefaults {
 }
 
 pub(super) fn limits() -> WorkflowValueTransactionLimits {
+    let mut record_batch = crate::fixtures::driver_limits();
+    record_batch.workspace_bytes = 512 * crate::fixtures::MIB;
     WorkflowValueTransactionLimits {
-        record_batch: crate::fixtures::driver_limits(),
+        record_batch,
         maximum_value_rows: 1_024,
         maximum_value_bytes: 64 * crate::fixtures::MIB,
         maximum_value_work: 64 * crate::fixtures::MIB,

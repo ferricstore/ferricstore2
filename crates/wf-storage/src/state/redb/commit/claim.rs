@@ -23,6 +23,9 @@ fn publish(
     changes: &GroupClaimChanges<'_, '_>,
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
+    if tx.layout == 7 {
+        return Err(StateTransactionError::UnsupportedLayout);
+    }
     let scope = changes.scope();
     if scope.group() != tx.group || scope.recovery() != tx.recovery {
         return Err(StateTransactionError::InvalidChanges);

@@ -19,7 +19,7 @@ use super::RecordBatchApplyError;
 mod apply;
 mod codec;
 mod intent;
-mod response;
+pub(in crate::log) mod response;
 
 pub use apply::{
     decide_fresh_public_mutation_touched, inspect_public_mutation_point, prepare_public_mutation,

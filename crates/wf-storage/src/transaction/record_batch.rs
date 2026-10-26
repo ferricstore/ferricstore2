@@ -5,8 +5,8 @@ use wf_domain::workflow::control::ControlState;
 use wf_domain::workflow::request::RequestScope;
 use wf_domain::workflow::request::gate::PointGateView;
 use wf_ports::log::{
-    RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan, RecordBatchInspection,
-    inspect_atomic_start_point, inspect_independent_record_batch_point,
+    FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan,
+    RecordBatchInspection, inspect_atomic_start_point, inspect_independent_record_batch_point,
     inspect_public_mutation_point, inspect_record_batch_point, prepare_atomic_start,
     prepare_independent_record_batch, prepare_public_mutation, prepare_record_batch,
 };
@@ -184,27 +184,71 @@ fn apply<S: GroupApplyStore>(
             let changes = GroupApplyChanges::new(expected_scope, predecessor, plan)?;
             tx.commit(&changes)?;
             let (control, kind) = complete_kind(changes.into_plan())?;
-            Ok(match kind {
-                0 => RecordBatchTransactionOutcome::Retained {
-                    control,
-                    outcome: Box::new(original.ok_or(StateTransactionError::Corrupt)?),
-                },
-                1 => RecordBatchTransactionOutcome::IntentConflict(control),
-                2 => RecordBatchTransactionOutcome::Expired(control),
-                _ => RecordBatchTransactionOutcome::LogReplay(control),
-            })
+            complete_reply(control, kind, original)
         }
         RecordBatchInspection::Fresh(fresh) => {
-            let mut loaded = LoadedRecordBatch::load(&tx, expected_scope, fresh.decoded(), limits)?;
-            let plan = observations::decide(fresh, expected_scope, &mut loaded, limits, live)?;
-            let changes = GroupApplyChanges::new(expected_scope, predecessor, plan)?;
-            tx.commit(&changes)?;
-            fresh_reply(changes.into_plan())
+            apply_fresh(tx, expected_scope, fresh, predecessor, limits, live)
         }
     }
 }
 
-fn live_bytes(limits: RecordBatchTransactionLimits) -> Result<usize, RecordBatchTransactionError> {
+fn apply_fresh<T: GroupApplyTransaction>(
+    tx: T,
+    scope: &RequestScope,
+    fresh: FreshRecordBatch<'_>,
+    predecessor: ControlState,
+    limits: RecordBatchTransactionLimits,
+    live: usize,
+) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
+    let mut loaded = LoadedRecordBatch::load(&tx, scope, fresh.decoded(), limits)?;
+    let LoadedRecordBatch {
+        queries,
+        records,
+        placements,
+        policy_types,
+        projections,
+        parallel,
+        members,
+        heads,
+        staging_used,
+        ..
+    } = &mut loaded;
+    let view = observations::RecordBatchObservationView {
+        queries,
+        records,
+        placements,
+        policy_types,
+        projections,
+        parallel,
+        members,
+        heads,
+        staging_used,
+    };
+    let plan = observations::decide(fresh, scope, view, limits, live)?;
+    let changes = GroupApplyChanges::new(scope, predecessor, plan)?;
+    tx.commit(&changes)?;
+    fresh_reply(changes.into_plan())
+}
+
+pub(super) fn complete_reply(
+    control: ControlState,
+    kind: u8,
+    original: Option<wf_domain::workflow::request::RetainedOutcome>,
+) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
+    Ok(match kind {
+        0 => RecordBatchTransactionOutcome::Retained {
+            control,
+            outcome: Box::new(original.ok_or(StateTransactionError::Corrupt)?),
+        },
+        1 => RecordBatchTransactionOutcome::IntentConflict(control),
+        2 => RecordBatchTransactionOutcome::Expired(control),
+        _ => RecordBatchTransactionOutcome::LogReplay(control),
+    })
+}
+
+pub(super) fn live_bytes(
+    limits: RecordBatchTransactionLimits,
+) -> Result<usize, RecordBatchTransactionError> {
     if limits.maximum_read_steps == 0
         || limits.maximum_read_bytes == 0
         || limits.maximum_staging_bytes == 0
@@ -222,7 +266,7 @@ fn live_bytes(limits: RecordBatchTransactionLimits) -> Result<usize, RecordBatch
 }
 
 // Erase the retained borrow before moving its original owner into the reply.
-fn complete_kind(
+pub(super) fn complete_kind(
     plan: RecordBatchApplyPlan<'_>,
 ) -> Result<(ControlState, u8), RecordBatchTransactionError> {
     let (control, decision) = plan.into_parts();
@@ -239,7 +283,7 @@ fn complete_kind(
     Ok((control.next(), kind))
 }
 
-fn fresh_reply(
+pub(super) fn fresh_reply(
     plan: RecordBatchApplyPlan<'_>,
 ) -> Result<RecordBatchTransactionOutcome, RecordBatchTransactionError> {
     let (control, decision) = plan.into_parts();

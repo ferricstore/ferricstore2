@@ -39,7 +39,9 @@ fn sizes(
                 continue;
             }
             if key.value() == b"manifest" {
-                if value.value().get(4..6) == Some([0, 5].as_slice()) {
+                if value.value().get(4..6) == Some([0, 7].as_slice()) {
+                    version = 4;
+                } else if value.value().get(4..6) == Some([0, 5].as_slice()) {
                     version = 2;
                 } else if value.value().get(4..6) == Some([0, 6].as_slice()) {
                     version = 3;
@@ -93,6 +95,7 @@ fn header<W: std::io::Write>(
         limits,
         hash,
         match counts.2 {
+            4 => b"FWSP\0\x04",
             3 => b"FWSP\0\x03",
             2 => b"FWSP\0\x02",
             _ => b"FWSP\0\x01",

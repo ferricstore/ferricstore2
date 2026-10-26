@@ -59,6 +59,10 @@ pub fn public_mutation_retained_status(
     if intent.version() != 1 || response_version != 2 {
         return Err(CodecError::UnsupportedVersion);
     }
+    body_status(response)
+}
+
+pub(in crate::log) fn body_status(response: &[u8]) -> Result<RetainedStatus, CodecError> {
     if response == [0] {
         return Ok(RetainedStatus::Accepted);
     }
@@ -86,11 +90,7 @@ pub fn public_mutation_response_matches(
     decision: &IndependentIndexedDecision<'_>,
     response: &[u8],
 ) -> Result<bool, CodecError> {
-    let status = public_mutation_retained_status(
-        ClientIntent::new(1, [0; 32]).map_err(|_| CodecError::UnsupportedVersion)?,
-        2,
-        response,
-    )?;
+    let status = body_status(response)?;
     let (root, reason) = expected(decision)?;
     Ok(response.first() == Some(&root)
         && status == reason.map_or(RetainedStatus::Accepted, RetainedStatus::IndexedRejected))

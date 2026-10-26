@@ -129,7 +129,7 @@ fn publish(
         publication::put(&tx, &key, install.encoded())?;
         catalog::publish_original(&tx, old_layout, manifest, &saved)?;
         super::core_policy::put_outcome(&tx, scope, outcome, &encoded)?;
-        layout = snapshot::original::LAYOUT;
+        layout = old_layout.max(snapshot::original::LAYOUT);
     } else {
         publish_no_business(&tx, changes, schema, charge)?;
     }

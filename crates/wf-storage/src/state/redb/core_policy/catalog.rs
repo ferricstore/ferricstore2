@@ -18,11 +18,11 @@ pub(in crate::state::redb) const CURRENT_CATALOG_DOMAIN: &[u8] = b"wf-state-curr
 
 #[derive(Clone, Copy)]
 pub(in crate::state::redb) struct CurrentPolicyManifest {
-    initial_time: CommittedTime,
-    placements: u64,
-    policies: u64,
-    catalog_hash: [u8; 32],
-    origin_hash: [u8; 32],
+    pub(in crate::state::redb) initial_time: CommittedTime,
+    pub(in crate::state::redb) placements: u64,
+    pub(in crate::state::redb) policies: u64,
+    pub(in crate::state::redb) catalog_hash: [u8; 32],
+    pub(in crate::state::redb) origin_hash: [u8; 32],
 }
 
 pub(in crate::state::redb) fn read(
@@ -39,7 +39,7 @@ pub(in crate::state::redb) fn read(
         .map_err(|e| storage_error(&e))?
         .ok_or(Error::Corrupt)?;
     let version = version(bytes.value())?;
-    let facts = if matches!(version, 5 | 6) {
+    let facts = if matches!(version, 5..=7) {
         parse5(tx, bytes.value())?
     } else {
         let mut layout = 0;
@@ -58,7 +58,7 @@ pub(in crate::state::redb) fn read(
     };
     tx.step()?;
     let origin = table.get(ORIGIN_KEY).map_err(|e| storage_error(&e))?;
-    if matches!(version, 5 | 6) {
+    if matches!(version, 5..=7) {
         bind_origin(tx, facts, origin.ok_or(Error::Corrupt)?.value())?;
     } else if origin.is_some() {
         return Err(Error::Corrupt);
@@ -82,6 +82,9 @@ pub(in crate::state::redb) fn parse5(
     bytes: &[u8],
 ) -> Result<CurrentPolicyManifest, Error> {
     let layout = version(bytes)?;
+    if layout == 7 {
+        return Ok(super::super::values::manifest::parse(bytes, tx.group, tx.recovery)?.policy);
+    }
     if !matches!(layout, 5 | 6) {
         return Err(Error::Corrupt);
     }
@@ -173,9 +176,12 @@ pub(in crate::state::redb) fn verify(
     }
     Ok(())
 }
-fn census(tx: &RedbStateTransaction<'_>, layout: u16) -> Result<(u64, u64, [u8; 32]), Error> {
+pub(in crate::state::redb) fn census(
+    tx: &RedbStateTransaction<'_>,
+    layout: u16,
+) -> Result<(u64, u64, [u8; 32]), Error> {
     let mut hash = Sha256::new();
-    hash.update(if layout == 6 {
+    hash.update(if matches!(layout, 6 | 7) {
         super::super::snapshot::original::CATALOG_DOMAIN
     } else if layout == POLICY_LAYOUT {
         CURRENT_CATALOG_DOMAIN
@@ -241,7 +247,13 @@ pub(in crate::state::redb) fn publish_original(
     manifest: CurrentPolicyManifest,
     catalog: &super::super::snapshot::catalog::SnapshotCatalog,
 ) -> Result<(), Error> {
-    publish_target(tx, old_layout, manifest, catalog, 6)
+    publish_target(
+        tx,
+        old_layout,
+        manifest,
+        catalog,
+        if old_layout == 7 { 7 } else { 6 },
+    )
 }
 
 fn publish_target(
@@ -282,6 +294,16 @@ fn publish_target(
     manifest.placements = placements;
     manifest.policies = policies;
     manifest.catalog_hash = hash;
+    if target == 7 {
+        let defaults = super::super::values::manifest::read(tx)?.defaults;
+        return super::super::values::manifest::publish(
+            tx,
+            super::super::values::manifest::ValueManifest {
+                policy: manifest,
+                defaults,
+            },
+        );
+    }
     let n = total(
         if target == 6 { 144 } else { 140 },
         [tx.group.as_bytes().len(), tx.recovery.as_bytes().len()],

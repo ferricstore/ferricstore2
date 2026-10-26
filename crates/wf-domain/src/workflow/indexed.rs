@@ -21,8 +21,9 @@ mod independent;
 pub(crate) use authority::IndexedAuthority;
 pub(crate) use decision::{decide_selected_claims, decide_selected_claims_touched};
 pub use independent::{
-    IndependentIndexedDecision, IndependentIndexedPlan,
+    IndependentIndexedDecision, IndependentIndexedPlan, IndependentIndexedWithOrdering,
     decide_public_mutation_touched_indexed_batch, decide_touched_independent_indexed_batch,
+    decide_touched_independent_indexed_batch_with_ordering,
 };
 
 /// Current canonical records, modes and complete correctness indexes.

@@ -55,7 +55,8 @@ pub fn inspect_public_mutation_point<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace, 1)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
-    if let GateDecision::Replay(original) = gate.decision()
+    if decoded.request.intent.version() != 8
+        && let GateDecision::Replay(original) = gate.decision()
         && super::response::public_mutation_retained_status(
             original.intent(),
             original.response_version(),
@@ -76,7 +77,7 @@ pub fn decide_fresh_public_mutation_touched<'current>(
     additional_live_bytes: usize,
     outcome_ttl_ms: u64,
 ) -> Result<RecordBatchApplyPlan<'current>, RecordBatchApplyError> {
-    if fresh.decoded.request.intent.version() != 1
+    if super::super::value_batch::response::effective_profile(&fresh.decoded)? != 1
         || !matches!(
             fresh.decoded.request.operation,
             crate::consensus::PreparedOperation::PublicMutation { .. }
@@ -91,6 +92,7 @@ pub fn decide_fresh_public_mutation_touched<'current>(
         workspace_limit,
     } = fresh;
     let decoded = *decoded;
+    let response_version = super::super::value_batch::response::response_version(&decoded, 2)?;
     if view.group != decoded.request.scope.group() {
         return Err(ApplyError::InvalidAuthority.into());
     }
@@ -146,7 +148,7 @@ pub fn decide_fresh_public_mutation_touched<'current>(
         log,
         control.execution_time(),
         outcome_ttl_ms,
-        (2, response, status),
+        (response_version, response, status),
         limits.admission,
     )?;
     Ok(RecordBatchApplyPlan {

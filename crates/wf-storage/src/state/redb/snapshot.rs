@@ -89,7 +89,27 @@ pub(super) fn initialize(tx: &RedbStateTransaction<'_>) -> Result<(), StateTrans
                 .map_err(admission::table_error)?,
         );
     }
-    put_descriptor(tx, None)
+    if tx.layout == 7 {
+        for definition in [ALT_META, ALT_ROWS] {
+            tx.step()?;
+            drop(
+                tx.write
+                    .open_table(definition)
+                    .map_err(admission::table_error)?,
+            );
+        }
+        catalog::put(
+            tx,
+            &catalog::SnapshotCatalog {
+                slots: [None, None],
+                current: None,
+                anchor: None,
+                pending: None,
+            },
+        )
+    } else {
+        put_descriptor(tx, None)
+    }
 }
 
 pub(super) fn admit(
@@ -247,7 +267,7 @@ pub(super) fn copy(
             .map_err(SnapshotError::State)?;
         let normalized = if key.value() == b"manifest" && to.name() != super::META.name() {
             if value.value().get(4..6) == Some([0, 3].as_slice())
-                || matches!(value.value().get(4..6), Some([0, 5 | 6]))
+                || matches!(value.value().get(4..6), Some([0, 5..=7]))
             {
                 None
             } else {

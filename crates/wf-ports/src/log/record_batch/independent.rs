@@ -3,9 +3,11 @@
 use std::mem::size_of;
 
 use wf_domain::workflow::batch::ApplyError;
-use wf_domain::workflow::indexed::{EntryOrder, TouchedIndexedGroupView};
+use wf_domain::workflow::indexed::{
+    EntryOrder, IndependentIndexedWithOrdering, TouchedIndexedGroupView,
+};
 use wf_domain::workflow::request::gate::{GateDecision, PointGateView, inspect_point_request};
-use wf_types::version::LogIdentity;
+use wf_types::version::{LogIdentity, TimestampMillis};
 
 use crate::blob::{
     RecordBatchValueEffect, RecordBatchValueEffects, build_independent_value_effects,
@@ -59,7 +61,9 @@ pub fn inspect_independent_record_batch_point<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace_limit, 6)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
-    if let GateDecision::Replay(original) = gate.decision() {
+    if decoded.request.intent.version() != 8
+        && let GateDecision::Replay(original) = gate.decision()
+    {
         let (status, count) = response::record_batch_retained_summary(
             original.intent(),
             original.response_version(),
@@ -88,6 +92,30 @@ pub fn decide_fresh_independent_record_batch_touched<'current>(
     if fresh.decoded.request.intent.version() != 6 {
         return Err(CodecError::UnsupportedVersion.into());
     }
+    finish_fresh(fresh, view, additional_live_bytes, outcome_ttl_ms, false).map(|(plan, _)| plan)
+}
+
+pub(in crate::log) fn decide_with_ordering<'current>(
+    fresh: FreshRecordBatch<'_>,
+    view: TouchedIndexedGroupView<'_, 'current>,
+    additional_live_bytes: usize,
+    outcome_ttl_ms: u64,
+) -> Result<crate::log::WorkflowValueDecision<'current>, RecordBatchApplyError> {
+    if fresh.decoded.request.intent.version() != 8
+        || super::super::value_batch::response::effective_profile(&fresh.decoded)? != 6
+    {
+        return Err(CodecError::UnsupportedVersion.into());
+    }
+    finish_fresh(fresh, view, additional_live_bytes, outcome_ttl_ms, true)
+}
+
+fn finish_fresh<'current>(
+    fresh: FreshRecordBatch<'_>,
+    view: TouchedIndexedGroupView<'_, 'current>,
+    additional_live_bytes: usize,
+    outcome_ttl_ms: u64,
+    retain_ordering: bool,
+) -> Result<crate::log::WorkflowValueDecision<'current>, RecordBatchApplyError> {
     let FreshRecordBatch {
         decoded,
         log,
@@ -95,19 +123,22 @@ pub fn decide_fresh_independent_record_batch_touched<'current>(
         workspace_limit,
     } = fresh;
     let decoded = *decoded;
+    let response_version = super::super::value_batch::response::response_version(&decoded, 1)?;
     if view.group != decoded.request.scope.group() {
         return Err(ApplyError::InvalidAuthority.into());
     }
-    let operation = super::fresh::decide_independent(
+    let order = EntryOrder {
+        identity: log,
+        first_ordinal: 0,
+    };
+    let (operation, ordering) = decide_operation(
         &decoded,
         view,
-        EntryOrder {
-            identity: log,
-            first_ordinal: 0,
-        },
+        order,
         control.execution_time(),
         workspace_limit,
         additional_live_bytes,
+        retain_ordering,
     )?;
     let (live, cap, work) = value_effects_budget(&decoded, workspace_limit, additional_live_bytes)?;
     let value_effects =
@@ -150,12 +181,45 @@ pub fn decide_fresh_independent_record_batch_touched<'current>(
         log,
         control.execution_time(),
         outcome_ttl_ms,
-        (1, response, status),
+        (response_version, response, status),
         limits.admission,
     )?;
-    Ok(RecordBatchApplyPlan {
-        control,
-        value_effects,
-        decision: RecordBatchApplyDecision::IndependentFresh { operation, outcome },
-    })
+    Ok((
+        RecordBatchApplyPlan {
+            control,
+            value_effects,
+            decision: RecordBatchApplyDecision::IndependentFresh { operation, outcome },
+        },
+        ordering,
+    ))
+}
+
+fn decide_operation<'current>(
+    decoded: &DecodedRequest<'_>,
+    view: TouchedIndexedGroupView<'_, 'current>,
+    order: EntryOrder,
+    time: TimestampMillis,
+    workspace_limit: usize,
+    additional_live_bytes: usize,
+    retain_ordering: bool,
+) -> Result<IndependentIndexedWithOrdering<'current>, RecordBatchApplyError> {
+    if retain_ordering {
+        return super::fresh::decide_independent_with_ordering(
+            decoded,
+            view,
+            order,
+            time,
+            workspace_limit,
+            additional_live_bytes,
+        );
+    }
+    let operation = super::fresh::decide_independent(
+        decoded,
+        view,
+        order,
+        time,
+        workspace_limit,
+        additional_live_bytes,
+    )?;
+    Ok((operation, Vec::new()))
 }

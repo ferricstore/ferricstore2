@@ -1,4 +1,4 @@
-//! Explicit value-capable genesis and coherent read boundary.
+//! Explicit value-capable genesis, same-guard mutation and owned read boundary.
 
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::blob::{
@@ -11,20 +11,27 @@ use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId};
 
 use super::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
 
+pub(crate) mod binding;
+pub(crate) mod budget;
+mod genesis;
+pub(crate) mod manifest;
+pub(crate) mod read;
+pub(crate) mod validate;
+
 impl RedbStateStore {
     /// Creates a fresh authority with explicit workflow value capability.
     ///
     /// # Errors
-    /// Refuses unsupported persistent value layouts.
+    /// Refuses nonempty/invalid genesis or unproved durable completion.
     pub fn create_value_database(
-        _database: redb::Database,
-        _group: GroupId,
-        _recovery: RecoveryId,
-        _genesis: StateStoreGenesis<'_>,
-        _defaults: WorkflowValueDefaults,
-        _limits: StateStoreLimits,
+        database: redb::Database,
+        group: GroupId,
+        recovery: RecoveryId,
+        genesis: StateStoreGenesis<'_>,
+        defaults: WorkflowValueDefaults,
+        limits: StateStoreLimits,
     ) -> Result<Self, StateTransactionError> {
-        Err(StateTransactionError::UnsupportedLayout)
+        genesis::create(database, group, recovery, genesis, defaults, limits)
     }
 
     /// Reads ordered references against one committed snapshot and clock pair.
@@ -33,12 +40,12 @@ impl RedbStateStore {
     /// Refuses unsupported persistent value layouts or operational failure.
     pub fn read_workflow_value_batch<C: WorkflowValueReadClock>(
         &self,
-        _clock: &mut C,
-        _scope: &RequestScope,
-        _refs: &[&[u8]],
-        _limits: WorkflowValueReadLimits,
+        clock: &mut C,
+        scope: &RequestScope,
+        refs: &[&[u8]],
+        limits: WorkflowValueReadLimits,
     ) -> Result<WorkflowValueReadBatch, StateTransactionError> {
-        Err(StateTransactionError::UnsupportedLayout)
+        read::read(self, clock, scope, refs, limits)
     }
 
     /// Observes a current binding or one explicit historical binding.
@@ -47,12 +54,29 @@ impl RedbStateStore {
     /// Refuses unsupported persistent value layouts or operational failure.
     pub fn workflow_value_binding(
         &self,
-        _scope: &RequestScope,
-        _partition: &PartitionId,
-        _id: &RecordId,
-        _history: Option<&str>,
-        _limits: WorkflowValueReadLimits,
+        scope: &RequestScope,
+        partition: &PartitionId,
+        id: &RecordId,
+        history: Option<&str>,
+        limits: WorkflowValueReadLimits,
     ) -> Result<WorkflowValueBindingKnowledge, StateTransactionError> {
-        Err(StateTransactionError::UnsupportedLayout)
+        binding::observe(self, scope, partition, id, history, limits)
+    }
+}
+
+impl super::RedbStateTransaction<'_> {
+    pub(crate) fn value_manifest(&self) -> Result<manifest::ValueManifest, StateTransactionError> {
+        if self.layout != 7 {
+            return Err(StateTransactionError::UnsupportedLayout);
+        }
+        manifest::read(self)
+    }
+
+    pub(crate) fn commit_values(
+        self,
+        changes: &wf_ports::state::GroupApplyChanges<'_, '_>,
+        publication: &mut crate::transaction::ValuePublicationPlan<'_>,
+    ) -> Result<(), StateTransactionError> {
+        super::commit::values::apply(self, changes, publication)
     }
 }

@@ -21,7 +21,7 @@ impl GroupCorePolicyTransaction for RedbStateTransaction<'_> {
         if self.recovering || self.snapshot_cohort {
             return Err(StateTransactionError::InvalidChanges);
         }
-        if !matches!(self.layout, 3..=6) {
+        if !matches!(self.layout, 3..=7) {
             return Err(StateTransactionError::UnsupportedLayout);
         }
         Ok(self.layout)

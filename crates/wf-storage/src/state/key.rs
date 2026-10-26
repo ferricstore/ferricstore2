@@ -8,8 +8,10 @@ use super::value::{StateValueError, add, allocate, read_u8, start};
 mod ordered;
 mod physical;
 mod point;
+mod workflow_values;
 
 pub(crate) use physical::{DecodedStateKey, decode_state_key};
+pub(crate) use workflow_values::{encode_alias_key, encode_binding_key, encode_immutable_key};
 
 pub use ordered::{
     decode_due_key, decode_fifo_key, decode_fifo_observation_key, decode_history_key,
@@ -117,7 +119,7 @@ pub(super) fn key_start(
     length: usize,
     maximum: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if family > 7 {
+    if family > 7 && ![8, 9, 10, 11].contains(&family) {
         return Err(StateValueError::UnsupportedTag);
     }
     if length < 7 {

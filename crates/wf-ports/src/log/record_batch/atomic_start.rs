@@ -23,7 +23,7 @@ use super::{
 };
 
 mod codec;
-mod response;
+pub(in crate::log) mod response;
 
 pub use codec::{encode_atomic_start, prepare_atomic_start};
 pub use response::{atomic_start_response_matches, atomic_start_retained_summary};
@@ -41,7 +41,9 @@ pub fn inspect_atomic_start_point<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace_limit, 7)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
-    if let GateDecision::Replay(original) = gate.decision() {
+    if decoded.request.intent.version() != 8
+        && let GateDecision::Replay(original) = gate.decision()
+    {
         let (status, count) = atomic_start_retained_summary(
             original.intent(),
             original.response_version(),
@@ -72,7 +74,7 @@ pub fn decide_fresh_atomic_start_touched<'current>(
     additional_live_bytes: usize,
     outcome_ttl_ms: u64,
 ) -> Result<RecordBatchApplyPlan<'current>, RecordBatchApplyError> {
-    if fresh.decoded.request.intent.version() != 7 {
+    if super::super::value_batch::response::effective_profile(&fresh.decoded)? != 7 {
         return Err(CodecError::UnsupportedVersion.into());
     }
     let FreshRecordBatch {
@@ -90,6 +92,7 @@ pub fn decide_fresh_atomic_start_touched<'current>(
     }
     let time = control.execution_time();
     let limits = decoded.limits;
+    let response_version = super::super::value_batch::response::response_version(&decoded, 4)?;
     let admission = limits.admission;
     let operation = super::fresh::decide(
         &decoded,
@@ -140,7 +143,7 @@ pub fn decide_fresh_atomic_start_touched<'current>(
         log,
         time,
         outcome_ttl_ms,
-        (4, response, status),
+        (response_version, response, status),
         admission,
     )?;
     Ok(RecordBatchApplyPlan {

@@ -6,9 +6,10 @@ use wf_domain::claim::ScopedRecordId;
 use wf_domain::policy::InstalledRetryPolicy;
 use wf_domain::workflow::batch::{ApplyError, BatchItem};
 use wf_domain::workflow::indexed::{
-    EntryOrder, IndependentIndexedDecision, IndexedBatchItem, IndexedDecision, IndexedGroupView,
-    TouchedIndexedGroupView, decide_indexed_batch, decide_public_mutation_touched_indexed_batch,
-    decide_touched_independent_indexed_batch, decide_touched_indexed_batch,
+    EntryOrder, IndependentIndexedDecision, IndependentIndexedWithOrdering, IndexedBatchItem,
+    IndexedDecision, IndexedGroupView, TouchedIndexedGroupView, decide_indexed_batch,
+    decide_public_mutation_touched_indexed_batch, decide_touched_independent_indexed_batch,
+    decide_touched_independent_indexed_batch_with_ordering, decide_touched_indexed_batch,
 };
 use wf_types::identity::GroupId;
 use wf_types::version::TimestampMillis;
@@ -126,6 +127,32 @@ pub(in crate::log) fn decide_independent<'current>(
         decide_touched_independent_indexed_batch
     };
     Ok(decide(
+        view,
+        &items,
+        order,
+        decoded.encoded,
+        decoded.limits.admission,
+    )?)
+}
+
+pub(in crate::log) fn decide_independent_with_ordering<'current>(
+    decoded: &DecodedRequest<'_>,
+    view: TouchedIndexedGroupView<'_, 'current>,
+    order: EntryOrder,
+    now: TimestampMillis,
+    workspace: usize,
+    additional_live_bytes: usize,
+) -> Result<IndependentIndexedWithOrdering<'current>, RecordBatchApplyError> {
+    let prepared = inputs(
+        decoded,
+        now,
+        decoded.limits,
+        workspace,
+        additional_live_bytes,
+    )?;
+    let values = stage_values(decoded, prepared.len())?;
+    let items = stage_items(decoded, prepared, &values)?;
+    Ok(decide_touched_independent_indexed_batch_with_ordering(
         view,
         &items,
         order,

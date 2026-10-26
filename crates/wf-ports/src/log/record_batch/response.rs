@@ -160,8 +160,15 @@ pub fn record_batch_retained_summary(
     if !matches!(intent.version(), 5 | 6) || response_version != 1 {
         return Err(CodecError::UnsupportedVersion);
     }
+    body_summary(intent.version(), response)
+}
+
+pub(in crate::log) fn body_summary(
+    profile: u16,
+    response: &[u8],
+) -> Result<(RetainedStatus, Option<usize>), CodecError> {
     match response.first().copied().ok_or(CodecError::Malformed)? {
-        0 if intent.version() == 5 => {
+        0 if profile == 5 => {
             if response.len() != 1 {
                 return Err(CodecError::Malformed);
             }
@@ -174,9 +181,23 @@ pub fn record_batch_retained_summary(
             }
             Ok((RetainedStatus::IndexedRejected(reason), None))
         }
-        2 if intent.version() == 6 => independent::summary(response),
+        2 if profile == 6 => independent::summary(response),
         _ => Err(CodecError::UnsupportedTag),
     }
+}
+
+pub(in crate::log) fn independent_body_matches(
+    decision: &wf_domain::workflow::indexed::IndependentIndexedDecision<'_>,
+    response: &[u8],
+) -> Result<bool, CodecError> {
+    if response.first() == Some(&2) {
+        return independent_record_batch_response_matches(decision, response);
+    }
+    let (status, count) = body_summary(6, response)?;
+    Ok(count.is_none()
+        && matches!(decision,
+            wf_domain::workflow::indexed::IndependentIndexedDecision::Rejected(reason)
+                if status == RetainedStatus::IndexedRejected(*reason)))
 }
 
 pub(in crate::log) fn rejection(response: &[u8]) -> Result<(IndexRejection, usize), CodecError> {

@@ -9,6 +9,7 @@ mod history;
 mod membership;
 mod outcome;
 mod record;
+mod workflow_values;
 
 pub use control::{decode_control, encode_control};
 pub use history::{decode_history, encode_history};
@@ -24,6 +25,9 @@ pub use outcome::{
 pub use record::{
     ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields, scan_record_point,
     scan_record_point_profiled,
+};
+pub(crate) use workflow_values::{
+    ValueAlias, ValueBindingData, decode_alias, decode_binding, encode_alias, encode_binding,
 };
 
 /// Operational persisted-value failure, never a retained business rejection.

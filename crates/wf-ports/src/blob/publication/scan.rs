@@ -2,7 +2,7 @@
 
 use std::mem::size_of;
 
-use crate::blob::publication::step::value_effect;
+use crate::blob::publication::step::{profile, value_effect};
 use crate::blob::publication::{
     RecordBatchValueEffect, RecordBatchValueEffects, RecordBatchValueEffectsError as E,
 };
@@ -12,7 +12,7 @@ use wf_domain::workflow::control::ControlPlan;
 use wf_domain::workflow::indexed::{IndependentIndexedDecision, IndexedDecision};
 
 const EFFECTS_BASE_WORK: usize = 64;
-const EFFECTS_ITEM_WORK: usize = 96;
+const EFFECTS_ITEM_WORK: usize = 128;
 const EFFECTS_ENCODED_WORK: usize = 4;
 
 type ValueEffectsBuildResult = Result<Option<RecordBatchValueEffects>, (E, Option<(usize, usize)>)>;
@@ -342,8 +342,8 @@ pub(super) fn validate_effect_entry(
         return Err(E::InvalidChanges);
     }
     charge.spend(1)?;
-    let version = decoded.request().intent.version();
-    if !matches!(version, 1 | 5 | 6 | 7) {
+    let version = profile(decoded, charge)?;
+    if !matches!(version, 1 | 5..=7) {
         return Err(E::UnsupportedProfile);
     }
     charge.spend(1)?;

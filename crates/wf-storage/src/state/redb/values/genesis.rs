@@ -1,0 +1,115 @@
+//! One empty-database Immediate publication of all value-capable genesis facts.
+
+use redb::Durability;
+use sha2::{Digest, Sha256};
+use std::mem::size_of;
+use wf_ports::consensus::WorkflowValueDefaults;
+use wf_ports::state::StateTransactionError as Error;
+use wf_types::identity::{GroupId, RecoveryId};
+
+use super::super::{
+    META, StateStoreGenesis, StateStoreLimits, admission, bootstrap,
+    core_policy::catalog::CurrentPolicyManifest, membership, snapshot, store::RedbStateStore,
+};
+use super::manifest::{self, ValueManifest};
+
+pub(super) fn create(
+    database: redb::Database,
+    group: GroupId,
+    recovery: RecoveryId,
+    genesis: StateStoreGenesis<'_>,
+    defaults: WorkflowValueDefaults,
+    limits: StateStoreLimits,
+) -> Result<RedbStateStore, Error> {
+    defaults.to_bytes().map_err(|_| Error::InvalidChanges)?;
+    let scratch = bootstrap::admit(&group, &recovery, &genesis, limits)?;
+    admission::workspace(
+        &group,
+        &recovery,
+        limits,
+        admission::total(scratch, [additional(&group, &recovery)?])?,
+    )?;
+    let store = RedbStateStore::unvalidated(database, group, recovery, limits);
+    initialize(&store, &genesis, defaults, scratch)?;
+    Ok(store)
+}
+
+fn initialize(
+    store: &RedbStateStore,
+    genesis: &StateStoreGenesis<'_>,
+    defaults: WorkflowValueDefaults,
+    scratch: usize,
+) -> Result<(), Error> {
+    let mut tx = store.transaction(
+        false,
+        store.limits.admission(),
+        store.limits.maximum_recovery_steps(),
+        usize::MAX,
+        store.limits.maximum_temporary_bytes(),
+    )?;
+    bootstrap::ensure_empty(&tx.write)?;
+    tx.temporary(admission::total(
+        scratch,
+        [additional(&store.group, &store.recovery)?],
+    )?)?;
+    let genesis_hash = bootstrap::write_genesis_rows(&tx, genesis)?;
+    let origin_size = admission::total(
+        108,
+        [
+            store.group.as_bytes().len(),
+            store.recovery.as_bytes().len(),
+        ],
+    )?;
+    tx.temporary(origin_size)?;
+    let origin = bootstrap::manifest(store, genesis, genesis_hash, origin_size)?;
+    let current_hash = current_hash(&tx)?;
+    let current = ValueManifest {
+        policy: CurrentPolicyManifest {
+            initial_time: genesis.initial_time,
+            placements: u64::try_from(genesis.placements.len()).map_err(|_| Error::Limit)?,
+            policies: u64::try_from(genesis.policies.len()).map_err(|_| Error::Limit)?,
+            catalog_hash: current_hash,
+            origin_hash: Sha256::digest(&origin).into(),
+        },
+        defaults,
+    };
+    let mut table = tx.write.open_table(META).map_err(admission::table_error)?;
+    tx.step()?;
+    admission::engine_pair(6, origin.len())?;
+    table
+        .insert(b"origin".as_slice(), origin.as_slice())
+        .map_err(|e| admission::storage_error(&e))?;
+    drop(table);
+    manifest::publish(&tx, current)?;
+    membership::write(&tx, None, None)?;
+    tx.layout = 7;
+    snapshot::initialize(&tx)?;
+    let saved_layout = tx.committed_layout;
+    tx.write
+        .set_durability(Durability::Immediate)
+        .map_err(|_| Error::Unavailable)?;
+    tx.write.commit().map_err(|_| Error::Uncertain)?;
+    saved_layout.set(7);
+    Ok(())
+}
+
+fn additional(group: &GroupId, recovery: &RecoveryId) -> Result<usize, Error> {
+    admission::total(
+        size_of::<ValueManifest>(),
+        [
+            2 * size_of::<Vec<u8>>(),
+            size_of::<WorkflowValueDefaults>(),
+            size_of::<Sha256>(),
+            60,
+            32,
+            admission::total(108, [group.as_bytes().len(), recovery.as_bytes().len()])?,
+            admission::total(208, [group.as_bytes().len(), recovery.as_bytes().len()])?,
+        ],
+    )
+}
+
+fn current_hash(tx: &super::super::store::RedbStateTransaction<'_>) -> Result<[u8; 32], Error> {
+    // Reuse the actual family6/7 census and its retained original-policy domain.
+    let (_, _, hash) = super::super::core_policy::catalog::census(tx, 7)?;
+    Ok(hash)
+}

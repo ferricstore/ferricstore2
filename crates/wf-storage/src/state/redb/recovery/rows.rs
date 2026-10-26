@@ -43,6 +43,7 @@ pub(super) fn validate(
                 return Err(StateTransactionError::Corrupt);
             }
         }
+        8..=11 if layout == 7 => {}
         _ => return Err(StateTransactionError::Corrupt),
     }
     Ok(())

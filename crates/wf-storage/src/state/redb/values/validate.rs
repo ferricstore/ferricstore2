@@ -1,0 +1,387 @@
+//! One cumulative, clock-free validation of complete value and core closure.
+
+use redb::ReadableTable;
+use sha2::{Digest, Sha256};
+use wf_domain::workflow::request::RequestScope;
+use wf_ports::blob::{OriginalValuePartition, OriginalValueRefKind, render_original_value_ref};
+use wf_ports::consensus::WorkflowValueDefaults;
+use wf_ports::state::StateTransactionError as Error;
+use wf_types::identity::{PartitionId, RecordId};
+
+use super::super::{admission, store::RedbStateTransaction};
+use super::{
+    budget::{ValueCharge, product, total},
+    read,
+};
+use crate::state::{
+    key::{self, DecodedStateKey},
+    value::{self, ValueBindingData},
+};
+
+pub(crate) fn cohort(
+    tx: &RedbStateTransaction<'_>,
+    defaults: WorkflowValueDefaults,
+) -> Result<(), Error> {
+    let maximum_work = total(
+        product(tx.maximum_steps, 65_536)?,
+        [product(tx.maximum_wire, 128)?],
+    )?;
+    let mut charge = ValueCharge::new(
+        tx.maximum_inspected.max(1),
+        tx.maximum_wire.max(1),
+        maximum_work,
+        tx.maximum_temporary,
+    )?;
+    tx.step()?;
+    let table = tx
+        .write
+        .open_table(tx.rows_table)
+        .map_err(admission::table_error)?;
+    tx.step()?;
+    let mut rows = table.iter().map_err(|e| admission::storage_error(&e))?;
+    loop {
+        charge.candidate()?;
+        tx.step()?;
+        let Some(row) = rows.next() else {
+            break;
+        };
+        let (physical, bytes) = row.map_err(|e| admission::storage_error(&e))?;
+        if !matches!(physical.value().get(6), Some(1 | 5 | 8..=11)) {
+            continue;
+        }
+        charge.work(total(
+            128,
+            [product(physical.value().len(), 6)?, bytes.value().len()],
+        )?)?;
+        tx.recovery_row(physical.value(), bytes.value())?;
+        let owner = total(256, [physical.value().len()])?;
+        charge.temporary(total(owner, [std::mem::size_of::<ValueCharge>()])?)?;
+        tx.temporary(owner)?;
+        let decoded = key::decode_state_key(
+            physical.value(),
+            tx.group,
+            tx.recovery,
+            physical.value().len(),
+            owner,
+        )
+        .map_err(admission::value_error)?;
+        let scope = tx.scope_bytes(decoded.part(2))?;
+        match decoded.family() {
+            1 | 5 | 10 | 11 => companion(
+                tx,
+                &table,
+                (&decoded, physical.value(), bytes.value()),
+                &scope,
+                defaults,
+                &mut charge,
+            )?,
+            8 => immutable(tx, &table, &scope, &decoded, bytes.value(), &mut charge)?,
+            9 => alias(
+                tx,
+                &table,
+                &scope,
+                decoded.part(3),
+                bytes.value(),
+                &mut charge,
+            )?,
+            _ => return Err(Error::Corrupt),
+        }
+    }
+    Ok(())
+}
+
+fn companion(
+    tx: &RedbStateTransaction<'_>,
+    table: &impl ReadableTable<&'static [u8], &'static [u8]>,
+    row: (&DecodedStateKey, &[u8], &[u8]),
+    scope: &RequestScope,
+    defaults: WorkflowValueDefaults,
+    charge: &mut ValueCharge,
+) -> Result<(), Error> {
+    charge.helper()?;
+    let (decoded, physical, bytes) = row;
+    let fields = total(decoded.part(3).len(), [decoded.part(4).len()])?;
+    let live = total(
+        std::mem::size_of::<ValueCharge>(),
+        [physical.len(), fields, 512],
+    )?;
+    charge.work(fields)?;
+    charge.temporary(live)?;
+    tx.temporary(fields)?;
+    let partition =
+        PartitionId::new(admission::copy_bytes(decoded.part(3))?).map_err(|_| Error::Corrupt)?;
+    let id = RecordId::new(admission::copy_bytes(decoded.part(4))?).map_err(|_| Error::Corrupt)?;
+    charge.work(physical.len())?;
+    charge.temporary(total(live, [physical.len()])?)?;
+    let mut other = admission::copy_bytes(physical)?;
+    other[6] = match decoded.family() {
+        1 => 10,
+        5 => 11,
+        10 => 1,
+        11 => 5,
+        _ => return Err(Error::Corrupt),
+    };
+    charge.candidate()?;
+    tx.step()?;
+    let counterpart = table
+        .get(other.as_slice())
+        .map_err(|e| admission::storage_error(&e))?
+        .ok_or(Error::Corrupt)?;
+    tx.recovery_row(&other, counterpart.value())?;
+    charge.work(total(
+        128,
+        [counterpart.value().len(), product(bytes.len(), 4)?],
+    )?)?;
+    let (binding, source) = if matches!(decoded.family(), 1 | 5) {
+        (counterpart.value(), bytes)
+    } else {
+        (bytes, counterpart.value())
+    };
+    let data = value::decode_binding(binding, defaults).map_err(admission::value_error)?;
+    let version = source_version(tx, decoded, source, scope, &partition, &id)?;
+    if data.versions.iter().flatten().any(|value| *value > version) {
+        return Err(Error::Corrupt);
+    }
+    binding_refs(tx, table, scope, (&partition, &id), data, charge)?;
+    Ok(())
+}
+
+fn source_version(
+    tx: &RedbStateTransaction<'_>,
+    key: &DecodedStateKey,
+    bytes: &[u8],
+    scope: &RequestScope,
+    partition: &PartitionId,
+    id: &RecordId,
+) -> Result<u64, Error> {
+    if matches!(key.family(), 1 | 10) {
+        return value::scan_record_point_profiled(
+            bytes,
+            scope,
+            partition,
+            id,
+            tx.admission,
+            admission::wire_record_limit(tx.admission)?,
+        )
+        .map(|record| record.version())
+        .map_err(admission::value_error);
+    }
+    // The primary recovery pass validates the full history grammar. This second
+    // pass binds its already-validated version and event to the companion key.
+    let mut at = value::start(bytes, *b"FWSH", bytes.len()).map_err(admission::value_error)?;
+    for expected in [
+        scope.group().as_bytes(),
+        scope.recovery().as_bytes(),
+        scope.tenant().as_bytes(),
+        partition.as_bytes(),
+        id.as_bytes(),
+    ] {
+        if value::raw(bytes, &mut at).map_err(admission::value_error)? != expected {
+            return Err(Error::Corrupt);
+        }
+    }
+    if value::raw(bytes, &mut at).map_err(admission::value_error)? != key.part(5) {
+        return Err(Error::Corrupt);
+    }
+    value::read_u8(bytes, &mut at).map_err(admission::value_error)?;
+    value::read_u64(bytes, &mut at).map_err(admission::value_error)?;
+    value::read_u64(bytes, &mut at).map_err(admission::value_error)
+}
+
+fn binding_refs(
+    tx: &RedbStateTransaction<'_>,
+    table: &impl ReadableTable<&'static [u8], &'static [u8]>,
+    scope: &RequestScope,
+    identity: (&PartitionId, &RecordId),
+    binding: ValueBindingData,
+    charge: &mut ValueCharge,
+) -> Result<(), Error> {
+    charge.helper()?;
+    for (index, version) in binding.versions.into_iter().enumerate() {
+        charge.candidate()?;
+        let Some(version) = version else {
+            continue;
+        };
+        let kind = match index {
+            0 => OriginalValueRefKind::Payload,
+            1 => OriginalValueRefKind::Result,
+            _ => OriginalValueRefKind::Error,
+        };
+        let logical = total(identity.0.as_bytes().len(), [identity.1.as_bytes().len()])?;
+        charge.work(product(logical, 4)?)?;
+        charge.temporary(total(65_535, [logical, 512])?)?;
+        let reference = render_original_value_ref(
+            identity.1.as_bytes(),
+            kind,
+            version,
+            OriginalValuePartition::Explicit(identity.0.as_bytes()),
+            65_535,
+        )
+        .map_err(|error| read::build_error(&error))?;
+        let maximum = total(
+            32,
+            [product(
+                total(read::scope_bytes(scope), [reference.len()])?,
+                2,
+            )?],
+        )?;
+        charge.work(product(
+            total(read::scope_bytes(scope), [reference.len()])?,
+            16,
+        )?)?;
+        charge.temporary(total(maximum, [reference.len(), logical, 512])?)?;
+        let key = tx.key(
+            &[
+                scope.group().as_bytes(),
+                scope.recovery().as_bytes(),
+                scope.tenant().as_bytes(),
+                &reference,
+            ],
+            0,
+            |cap| key::encode_alias_key(scope, &reference, cap),
+        )?;
+        charge.candidate()?;
+        tx.step()?;
+        let bytes = table
+            .get(key.as_slice())
+            .map_err(|e| admission::storage_error(&e))?
+            .ok_or(Error::Corrupt)?;
+        tx.recovery_row(&key, bytes.value())?;
+        charge.work(total(128, [bytes.value().len()])?)?;
+        let data = value::decode_alias(bytes.value()).map_err(admission::value_error)?;
+        charge.compare(data.partition.len(), identity.0.as_bytes().len())?;
+        charge.compare(data.id.len(), identity.1.as_bytes().len())?;
+        if data.partition != identity.0.as_bytes()
+            || data.id != identity.1.as_bytes()
+            || data.kind != kind
+            || data.version != version
+            || data.incarnation != binding.lifecycle.incarnation
+        {
+            return Err(Error::Corrupt);
+        }
+        alias(tx, table, scope, &reference, bytes.value(), charge)?;
+    }
+    Ok(())
+}
+
+fn alias(
+    tx: &RedbStateTransaction<'_>,
+    table: &impl ReadableTable<&'static [u8], &'static [u8]>,
+    scope: &RequestScope,
+    reference: &[u8],
+    bytes: &[u8],
+    charge: &mut ValueCharge,
+) -> Result<(), Error> {
+    charge.helper()?;
+    charge.work(bytes.len())?;
+    let alias = value::decode_alias(bytes).map_err(admission::value_error)?;
+    charge.work(product(total(alias.partition.len(), [alias.id.len()])?, 4)?)?;
+    let maximum = total(
+        64,
+        [product(
+            total(read::scope_bytes(scope), [reference.len()])?,
+            2,
+        )?],
+    )?;
+    charge.temporary(total(maximum, [65_535, bytes.len(), 512])?)?;
+    let rendered = render_original_value_ref(
+        alias.id,
+        alias.kind,
+        alias.version,
+        OriginalValuePartition::Explicit(alias.partition),
+        65_535,
+    )
+    .map_err(|_| Error::Corrupt)?;
+    charge.compare(rendered.len(), reference.len())?;
+    if rendered != reference {
+        return Err(Error::Corrupt);
+    }
+    charge.work(product(
+        total(read::scope_bytes(scope), [reference.len()])?,
+        16,
+    )?)?;
+    let key = tx.key(
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            reference,
+        ],
+        16,
+        |cap| key::encode_immutable_key(scope, reference, alias.incarnation, cap),
+    )?;
+    charge.candidate()?;
+    tx.step()?;
+    let stored = table
+        .get(key.as_slice())
+        .map_err(|e| admission::storage_error(&e))?
+        .ok_or(Error::Corrupt)?;
+    tx.recovery_row(&key, stored.value())?;
+    charge.work(total(128, [stored.value().len()])?)?;
+    if alias.stored_len != u64::try_from(stored.value().len()).map_err(|_| Error::Limit)?
+        || Sha256::digest(stored.value()).as_slice() != alias.digest
+    {
+        return Err(Error::Corrupt);
+    }
+    binary(stored.value())
+}
+
+fn immutable(
+    tx: &RedbStateTransaction<'_>,
+    table: &impl ReadableTable<&'static [u8], &'static [u8]>,
+    scope: &RequestScope,
+    decoded: &DecodedStateKey,
+    bytes: &[u8],
+    charge: &mut ValueCharge,
+) -> Result<(), Error> {
+    charge.helper()?;
+    let reference = decoded.part(3);
+    charge.work(product(
+        total(read::scope_bytes(scope), [reference.len()])?,
+        16,
+    )?)?;
+    let maximum = total(
+        32,
+        [product(
+            total(read::scope_bytes(scope), [reference.len()])?,
+            2,
+        )?],
+    )?;
+    charge.temporary(total(
+        product(maximum, 2)?,
+        [256, std::mem::size_of::<ValueCharge>()],
+    )?)?;
+    let key = tx.key(
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            reference,
+        ],
+        0,
+        |cap| key::encode_alias_key(scope, reference, cap),
+    )?;
+    charge.candidate()?;
+    tx.step()?;
+    let raw = table
+        .get(key.as_slice())
+        .map_err(|e| admission::storage_error(&e))?
+        .ok_or(Error::Corrupt)?;
+    tx.recovery_row(&key, raw.value())?;
+    charge.work(total(128, [raw.value().len(), bytes.len()])?)?;
+    let data = value::decode_alias(raw.value()).map_err(admission::value_error)?;
+    if data.incarnation != decoded.number()
+        || data.stored_len != u64::try_from(bytes.len()).map_err(|_| Error::Limit)?
+        || Sha256::digest(bytes).as_slice() != data.digest
+    {
+        return Err(Error::Corrupt);
+    }
+    alias(tx, table, scope, reference, raw.value(), charge)
+}
+
+fn binary(bytes: &[u8]) -> Result<(), Error> {
+    if bytes.starts_with(b"FSV2") && !bytes.starts_with(b"FSV2\x01FSV2") {
+        return Err(Error::Corrupt);
+    }
+    Ok(())
+}

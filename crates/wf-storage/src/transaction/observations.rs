@@ -8,9 +8,10 @@ use wf_domain::policy::definition::{PolicySnapshot, StateMode};
 use wf_domain::workflow::indexed::TouchedIndexedGroupView;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::log::{
-    FreshRecordBatch, RecordBatchApplyPlan, decide_fresh_atomic_start_touched,
-    decide_fresh_independent_record_batch_touched, decide_fresh_public_mutation_touched,
-    decide_fresh_record_batch_touched,
+    FreshRecordBatch, RecordBatchApplyPlan, WorkflowValueDecision,
+    decide_fresh_atomic_start_touched, decide_fresh_independent_record_batch_touched,
+    decide_fresh_public_mutation_touched, decide_fresh_record_batch_touched,
+    decide_fresh_workflow_value_batch_touched,
 };
 use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId};
@@ -18,14 +19,49 @@ use wf_types::identity::{PartitionId, RecordId};
 use super::load::{LoadedRecordBatch, debit, entry, reserve_slots};
 use super::{RecordBatchTransactionError, RecordBatchTransactionLimits};
 
+pub(super) struct RecordBatchObservationView<'query, 'current> {
+    pub(super) queries: &'query [(PartitionId, RecordId)],
+    pub(super) records: &'current [Option<StoredWorkflowRecord>],
+    pub(super) placements: &'query BTreeMap<PartitionId, wf_types::identity::GroupId>,
+    pub(super) policy_types: &'query [Vec<u8>],
+    pub(super) projections: &'query [Option<(PolicySnapshot, InstalledRetryPolicy)>],
+    pub(super) parallel: &'query [(usize, bool)],
+    pub(super) members: &'query [(usize, bool)],
+    pub(super) heads: &'current [(usize, Option<StoredWorkflowRecord>)],
+    pub(super) staging_used: &'query mut usize,
+}
+
 pub(super) fn decide<'current>(
     fresh: FreshRecordBatch<'_>,
     scope: &RequestScope,
-    loaded: &'current mut LoadedRecordBatch,
+    view: RecordBatchObservationView<'_, 'current>,
     limits: RecordBatchTransactionLimits,
     live_bytes: usize,
 ) -> Result<RecordBatchApplyPlan<'current>, RecordBatchTransactionError> {
-    let LoadedRecordBatch {
+    let (plan, ordering) = decide_profile(fresh, scope, view, limits, live_bytes, false)?;
+    drop(ordering);
+    Ok(plan)
+}
+
+pub(super) fn decide_values<'current>(
+    fresh: FreshRecordBatch<'_>,
+    scope: &RequestScope,
+    view: RecordBatchObservationView<'_, 'current>,
+    limits: RecordBatchTransactionLimits,
+    live_bytes: usize,
+) -> Result<WorkflowValueDecision<'current>, RecordBatchTransactionError> {
+    decide_profile(fresh, scope, view, limits, live_bytes, true)
+}
+
+fn decide_profile<'current>(
+    fresh: FreshRecordBatch<'_>,
+    scope: &RequestScope,
+    view: RecordBatchObservationView<'_, 'current>,
+    limits: RecordBatchTransactionLimits,
+    live_bytes: usize,
+    values: bool,
+) -> Result<WorkflowValueDecision<'current>, RecordBatchTransactionError> {
+    let RecordBatchObservationView {
         queries,
         records,
         placements,
@@ -35,8 +71,7 @@ pub(super) fn decide<'current>(
         members,
         heads,
         staging_used,
-        ..
-    } = loaded;
+    } = view;
     let cap = limits.maximum_staging_bytes;
     let current = current_facts(queries, records, staging_used, cap)?;
     let parallel = parallel_facts(parallel, records, staging_used, cap)?;
@@ -63,7 +98,15 @@ pub(super) fn decide<'current>(
         policies: &modes,
         retry_policies: &retries,
     };
-    Ok(if matches!(
+    if values {
+        return Ok(decide_fresh_workflow_value_batch_touched(
+            fresh,
+            view,
+            live_bytes,
+            limits.outcome_ttl_ms,
+        )?);
+    }
+    let plan = if matches!(
         fresh.decoded().request().operation,
         wf_ports::consensus::PreparedOperation::PublicMutation { .. }
     ) {
@@ -79,7 +122,8 @@ pub(super) fn decide<'current>(
         decide_fresh_atomic_start_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
     } else {
         decide_fresh_record_batch_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
-    }?)
+    }?;
+    Ok((plan, Vec::new()))
 }
 
 fn current_facts<'query, 'current>(

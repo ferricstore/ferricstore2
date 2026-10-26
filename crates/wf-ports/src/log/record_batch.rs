@@ -19,13 +19,13 @@ use super::{
     reader::Reader, scan, writer::Writer,
 };
 
-mod atomic_start;
-mod fresh;
-mod independent;
+pub(in crate::log) mod atomic_start;
+pub(in crate::log) mod fresh;
+pub(in crate::log) mod independent;
 mod intent;
 pub(in crate::log) use intent::operation as hash_operation;
 mod phase;
-mod response;
+pub(in crate::log) mod response;
 
 pub(super) use fresh::{decide_independent, value_effects_budget};
 pub(super) use phase::{finish_inspection, release_decoded_inputs, retain_record_batch_outcome};
@@ -270,7 +270,8 @@ pub(super) fn check_decoded(
         .operation
         .mutation_items()
         .ok_or(CodecError::UnsupportedTag)?;
-    if (version == 1)
+    let profile = super::value_batch::response::effective_profile(decoded)?;
+    if (profile == 1)
         != matches!(
             decoded.request.operation,
             PreparedOperation::PublicMutation { .. }
@@ -278,7 +279,7 @@ pub(super) fn check_decoded(
     {
         return Err(CodecError::UnsupportedVersion.into());
     }
-    if decoded.request.intent.version() != version {
+    if profile != version {
         return Err(CodecError::UnsupportedVersion.into());
     }
     if decoded.limits != limits {
@@ -349,7 +350,7 @@ pub(super) fn decoder_bound(
     ])
 }
 
-fn product(value: usize, multiplier: usize) -> Result<usize, CodecError> {
+pub(in crate::log) fn product(value: usize, multiplier: usize) -> Result<usize, CodecError> {
     value
         .checked_mul(multiplier)
         .ok_or(CodecError::LengthOverflow)

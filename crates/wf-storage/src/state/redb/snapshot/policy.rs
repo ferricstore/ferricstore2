@@ -68,7 +68,7 @@ pub(super) fn origin<'a>(
     table: &'a impl ReadableTable<&'static [u8], &'static [u8]>,
     manifest: &[u8],
 ) -> Result<Option<redb::AccessGuard<'a, &'static [u8]>>, Error> {
-    if !matches!(manifest.get(4..6), Some([0, 5 | 6])) {
+    if !matches!(manifest.get(4..6), Some([0, 5..=7])) {
         return Ok(None);
     }
     validate::get(tx, table, b"origin").map(Some)

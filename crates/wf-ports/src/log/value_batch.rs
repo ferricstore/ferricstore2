@@ -12,11 +12,16 @@ use crate::consensus::{
     WorkflowValuePolicyWitness,
 };
 
+mod apply;
 mod budget;
 mod frame;
 mod intent;
 mod metadata;
 mod operation;
+pub(crate) mod response;
+
+pub use apply::{WorkflowValueDecision, decide_fresh_workflow_value_batch_touched};
+pub use response::workflow_value_retained_summary;
 
 use budget::{BASE_WORK, BYTE_WORK, ITEM_WORK, KEY_WORK, POLICY_WORK, ValueBatchCharge};
 

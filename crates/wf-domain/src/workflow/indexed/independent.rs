@@ -138,6 +138,13 @@ pub enum IndependentIndexedDecision<'current> {
     Rejected(IndexRejection),
 }
 
+/// Independent outcomes and actual ordering for each original input slot.
+/// Accepted errors and no-ops have no ordering; rejected profiles return no slots.
+pub type IndependentIndexedWithOrdering<'current> = (
+    IndependentIndexedDecision<'current>,
+    Vec<Option<(OrderingMetadata, StateMode)>>,
+);
+
 /// Decides eight independent mutation operations against coherent touched facts.
 ///
 /// Original index authority is checked before accepting its first real write.
@@ -155,6 +162,33 @@ pub fn decide_touched_independent_indexed_batch<'current>(
     encoded_entry: &[u8],
     limits: AdmissionLimits,
 ) -> Result<IndependentIndexedDecision<'current>, ApplyError> {
+    decide_profile(
+        view,
+        items,
+        order,
+        encoded_entry,
+        limits,
+        IndependentProfile::Indexed,
+    )
+    .map(|(decision, _)| decision)
+}
+
+/// Decides independent mutations and retains every real write's actual ordering.
+///
+/// Accepted ordering aligns with original input slots, including errors and no-ops.
+/// Whole-profile rejection returns an empty vector. This moves existing kernel
+/// storage; callers must admit its retained header and slots in later live phases.
+/// Only original current owners remain borrowed by the decision.
+///
+/// # Errors
+/// Refuses invalid authority, ordinal overflow or a fallible output allocation.
+pub fn decide_touched_independent_indexed_batch_with_ordering<'current>(
+    view: TouchedIndexedGroupView<'_, 'current>,
+    items: &[IndexedBatchItem<'_>],
+    order: EntryOrder,
+    encoded_entry: &[u8],
+    limits: AdmissionLimits,
+) -> Result<IndependentIndexedWithOrdering<'current>, ApplyError> {
     decide_profile(
         view,
         items,
@@ -190,6 +224,7 @@ pub fn decide_public_mutation_touched_indexed_batch<'current>(
         limits,
         IndependentProfile::Public,
     )
+    .map(|(decision, _)| decision)
 }
 
 fn decide_profile<'current>(
@@ -199,7 +234,7 @@ fn decide_profile<'current>(
     encoded_entry: &[u8],
     limits: AdmissionLimits,
     profile: IndependentProfile,
-) -> Result<IndependentIndexedDecision<'current>, ApplyError> {
+) -> Result<IndependentIndexedWithOrdering<'current>, ApplyError> {
     let authority = IndexedAuthority::Touched(view);
     if let Some(error) = independent_preflight(
         authority.batch(),
@@ -208,9 +243,10 @@ fn decide_profile<'current>(
         limits,
         profile,
     )? {
-        return Ok(IndependentIndexedDecision::Rejected(IndexRejection::Batch(
-            error,
-        )));
+        return Ok((
+            IndependentIndexedDecision::Rejected(IndexRejection::Batch(error)),
+            Vec::new(),
+        ));
     }
     let mut commands = Vec::new();
     commands
@@ -246,12 +282,14 @@ fn decide_profile<'current>(
     )? {
         Ok(fold) => fold,
         Err(error) => {
-            return Ok(IndependentIndexedDecision::Rejected(IndexRejection::Batch(
-                error,
-            )));
+            return Ok((
+                IndependentIndexedDecision::Rejected(IndexRejection::Batch(error)),
+                Vec::new(),
+            ));
         }
     };
-    finish(&state, items, fold, finals)
+    let decision = finish(&state, items, fold, finals)?;
+    Ok((decision, state.ordering))
 }
 
 fn finish<'current>(

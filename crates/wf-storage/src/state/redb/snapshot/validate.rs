@@ -70,7 +70,7 @@ pub(in crate::state::redb) fn retained(
     profile: SnapshotLimits,
     layout: u16,
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
-    if matches!(layout, 4..=6) {
+    if matches!(layout, 4..=7) {
         let supported = tx.limits.snapshot_limits();
         return super::catalog::retained(tx, charge, supported);
     }
@@ -96,7 +96,7 @@ fn retained_inner(
     expected: ([u8; 32], usize, usize),
 ) -> Result<(), Error> {
     let (layout, saved) = recovery::cohort(tx, charge)?;
-    if !matches!(layout, 3 | 5 | 6) || format::facts(tx, profile)? != expected {
+    if !matches!(layout, 3 | 5..=7) || format::facts(tx, profile)? != expected {
         return Err(Error::Corrupt);
     }
     tx.step()?;
@@ -216,6 +216,7 @@ pub(super) fn compatible(
         .map_err(SnapshotError::State)?;
     let old_member = get(target, &target_table, membership::KEY).map_err(SnapshotError::State)?;
     source.carry_from(target);
+    value_defaults_compatible(source, old_manifest.value(), new_manifest.value())?;
     values(
         source,
         (current, incoming),
@@ -231,6 +232,28 @@ pub(super) fn compatible(
     )
 }
 
+pub(super) fn value_defaults_compatible(
+    tx: &RedbStateTransaction<'_>,
+    old: &[u8],
+    new: &[u8],
+) -> Result<(), SnapshotError> {
+    let old_value = old.get(4..6) == Some([0, 7].as_slice());
+    let new_value = new.get(4..6) == Some([0, 7].as_slice());
+    if old_value != new_value {
+        return Err(SnapshotError::GenesisMismatch);
+    }
+    if old_value {
+        let a = super::super::values::manifest::parse(old, tx.group, tx.recovery)
+            .map_err(SnapshotError::State)?;
+        let b = super::super::values::manifest::parse(new, tx.group, tx.recovery)
+            .map_err(SnapshotError::Stage)?;
+        if a.defaults != b.defaults {
+            return Err(SnapshotError::GenesisMismatch);
+        }
+    }
+    Ok(())
+}
+
 pub(super) fn complete(
     tx: &mut RedbStateTransaction<'_>,
     charge: &mut PolicySchemaCharge,
@@ -241,7 +264,7 @@ pub(super) fn complete(
     if layout < 3 {
         return Err(Error::UnsupportedLayout);
     }
-    if tables != if matches!(layout, 4..=6) { 6 } else { 4 } {
+    if tables != if matches!(layout, 4..=7) { 6 } else { 4 } {
         return Err(Error::Corrupt);
     }
     retained(tx, charge, profile, layout)

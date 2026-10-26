@@ -21,7 +21,7 @@ mod read;
 mod recovery;
 pub(crate) mod snapshot;
 mod store;
-mod values;
+pub(crate) mod values;
 
 pub use cursor::RedbStateDueCursor;
 pub use store::{RedbStateStore, RedbStateTransaction};

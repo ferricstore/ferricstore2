@@ -74,7 +74,12 @@ pub fn inspect_record_batch<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    check_decoded(&decoded, limits, workspace_limit, 5)?;
+    let profile = if decoded.request.intent.version() == 8 {
+        super::super::value_batch::response::effective_profile(&decoded)?
+    } else {
+        5
+    };
+    check_decoded(&decoded, limits, workspace_limit, profile)?;
     let gate = inspect_request(view, decoded.header(log), limits.admission)?;
     finish_inspection(decoded, log, gate, workspace_limit)
 }
@@ -94,7 +99,12 @@ pub fn inspect_record_batch_point<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    check_decoded(&decoded, limits, workspace_limit, 5)?;
+    let profile = if decoded.request.intent.version() == 8 {
+        super::super::value_batch::response::effective_profile(&decoded)?
+    } else {
+        5
+    };
+    check_decoded(&decoded, limits, workspace_limit, profile)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
     finish_inspection(decoded, log, gate, workspace_limit)
 }
@@ -105,6 +115,11 @@ pub(in crate::log) fn finish_inspection<'input, 'retained>(
     gate: RequestGate<'retained>,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
+    if decoded.request.intent.version() == 8
+        && let GateDecision::Replay(original) = gate.decision()
+    {
+        super::super::value_batch::response::check_replay(&decoded, original)?;
+    }
     let control = gate.control();
     let decision = match gate.decision() {
         GateDecision::Fresh => {
@@ -197,7 +212,7 @@ fn finish_fresh<'current>(
     additional_live_bytes: usize,
     outcome_ttl_ms: u64,
 ) -> Result<RecordBatchApplyPlan<'current>, RecordBatchApplyError> {
-    if fresh.decoded.request.intent.version() != 5 {
+    if super::super::value_batch::response::effective_profile(&fresh.decoded)? != 5 {
         return Err(super::super::CodecError::UnsupportedVersion.into());
     }
     let FreshRecordBatch {
@@ -208,6 +223,7 @@ fn finish_fresh<'current>(
     } = fresh;
     let decoded = *decoded;
     let limits = decoded.limits;
+    let response_version = super::super::value_batch::response::response_version(&decoded, 1)?;
     if authority.group() != decoded.request.scope.group() {
         return Err(ApplyError::InvalidAuthority.into());
     }
@@ -257,7 +273,7 @@ fn finish_fresh<'current>(
         log,
         control.execution_time(),
         outcome_ttl_ms,
-        (1, response, status),
+        (response_version, response, status),
         limits.admission,
     )?;
     Ok(RecordBatchApplyPlan {

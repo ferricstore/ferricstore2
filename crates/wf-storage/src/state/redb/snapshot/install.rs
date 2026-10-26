@@ -18,7 +18,7 @@ pub(super) fn install(
             StateTransactionError::UnsupportedLayout,
         ));
     }
-    if matches!(store.layout.get(), 4..=6) || stage.store.layout.get() >= 5 {
+    if matches!(store.layout.get(), 4..=7) || stage.store.layout.get() >= 5 {
         return advance(store, stage, limits, None)?
             .ok_or(SnapshotError::State(StateTransactionError::Corrupt));
     }

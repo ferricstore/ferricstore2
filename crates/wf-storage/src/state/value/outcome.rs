@@ -7,7 +7,7 @@ use wf_domain::workflow::request::{
 };
 use wf_ports::log::{
     CodecError, claim_retained_summary, public_mutation_retained_status,
-    record_batch_retained_status, record_batch_retained_summary,
+    record_batch_retained_status,
 };
 use wf_types::identity::{GroupId, RecoveryId, RequestId, TenantId};
 use wf_types::version::{AppliedPosition, LogIdentity, TimestampMillis};
@@ -128,6 +128,15 @@ pub fn encode_outcome(
         .0
     } else if outcome.intent().version() == 7 && outcome.response_version() == 4 {
         atomic_start::wire_status(outcome, maximum_bytes)?
+    } else if outcome.intent().version() == 8 {
+        // The profiled encoder and real reads repeat the captured admission.
+        let ceiling = AdmissionLimits::new(
+            wf_domain::workflow::admission::MAX_INLINE_BYTES,
+            maximum_bytes,
+            wf_domain::workflow::admission::MAX_BATCH_ITEMS,
+        )
+        .map_err(|_| StateValueError::InvalidValue)?;
+        policy::workflow_value_status(outcome, ceiling)?
     } else {
         let parse = if outcome.intent().version() == 1 {
             public_mutation_retained_status
@@ -228,55 +237,20 @@ fn scan_with_policy<'input>(
                 || (response.len() > limits.decision_bytes()
                     && !(intent_version == 1 && response_version == 3)
                     && !(intent_version == 7 && response_version == 4)
+                    && intent_version != 8
                     && !(matches!(intent_version, 2 | 4) && profile.is_some()))
             {
                 return Err(StateValueError::InvalidValue);
             }
-            let intent = match intent_version {
-                1 => {
-                    ClientIntent::new(1, digest).map_err(|_| StateValueError::UnsupportedVersion)?
-                }
-                2 if profile.is_some() => ClientIntent::complete_core_policy_patch(digest),
-                4 if profile.is_some() => ClientIntent::original_policy_set(digest),
-                5 => ClientIntent::record_batch(digest),
-                6 => ClientIntent::independent_record_batch(digest),
-                7 => ClientIntent::atomic_start(digest),
-                _ => return Err(StateValueError::UnsupportedVersion),
-            };
-            let (status, response_count) = if matches!(intent_version, 2 | 4) {
-                let (schema, charge, maximum_owner) =
-                    profile.ok_or(StateValueError::UnsupportedVersion)?;
-                (
-                    policy::retained_status(
-                        intent,
-                        response_version,
-                        response,
-                        limits,
-                        (schema, charge),
-                        maximum_owner,
-                    )?,
-                    None,
-                )
-            } else if intent_version == 1 && response_version == 3 {
-                claim_retained_summary(intent, response_version, response, original_time, limits)
-                    .map_err(claim_error)?
-            } else if intent_version == 7 {
-                atomic_start::scan(
-                    intent,
-                    response_version,
-                    response,
-                    original_position,
-                    original_time,
-                    limits,
-                )?
-            } else if intent_version == 1 {
-                (
-                    public_mutation_retained_status(intent, response_version, response)?,
-                    None,
-                )
-            } else {
-                record_batch_retained_summary(intent, response_version, response)?
-            };
+            let intent = policy::restore_intent(intent_version, digest, profile.is_some())?;
+            let (status, response_count) = policy::response_summary(
+                intent,
+                response_version,
+                response,
+                (original_position, original_time),
+                limits,
+                profile,
+            )?;
             let mut owned_bytes = 512;
             for field in fields {
                 add(&mut owned_bytes, field.len())?;

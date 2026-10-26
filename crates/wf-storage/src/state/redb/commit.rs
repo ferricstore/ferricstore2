@@ -20,20 +20,27 @@ pub(super) mod control;
 pub(super) mod core_policy;
 mod independent;
 pub(super) mod original_policy;
+pub(super) mod values;
 
 pub(super) fn apply(
     tx: RedbStateTransaction<'_>,
     changes: &GroupApplyChanges<'_, '_>,
 ) -> Result<(), StateTransactionError> {
     let fenced = tx.fenced;
-    publish(tx, changes).inspect_err(|error| fence(fenced, *error))
+    publish(tx, changes, None).inspect_err(|error| fence(fenced, *error))
 }
 
 fn publish(
     mut tx: RedbStateTransaction<'_>,
     changes: &GroupApplyChanges<'_, '_>,
+    mut values: Option<&mut crate::transaction::ValuePublicationPlan<'_>>,
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
+    match values.as_deref_mut() {
+        None if tx.layout == 7 => return Err(StateTransactionError::UnsupportedLayout),
+        Some(publication) => values::validate(&tx, changes, publication)?,
+        None => {}
+    }
     let scope = changes.scope();
     if scope.group() != tx.group || scope.recovery() != tx.recovery {
         return Err(StateTransactionError::InvalidChanges);
@@ -61,6 +68,9 @@ fn publish(
     }
     if let Some(business) = changes.independent_business() {
         independent::apply(&tx, scope, business)?;
+    }
+    if let Some(publication) = values {
+        values::publish(&tx, scope, publication)?;
     }
     if let Some(outcome) = changes.outcome() {
         write_outcome(&tx, scope, outcome)?;

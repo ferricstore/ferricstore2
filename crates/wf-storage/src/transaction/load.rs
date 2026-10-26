@@ -41,6 +41,19 @@ impl LoadedRecordBatch {
         decoded: &DecodedRequest<'_>,
         limits: RecordBatchTransactionLimits,
     ) -> Result<Self, RecordBatchTransactionError> {
+        let mut loaded = Self::load_points_only(tx, scope, decoded, limits)?;
+        let mut charge = PolicySchemaCharge::new(limits.schema);
+        loaded.load_policies(tx, scope, limits, &mut charge)?;
+        super::observations::load_indexes(&mut loaded, tx, scope, limits.maximum_staging_bytes)?;
+        Ok(loaded)
+    }
+
+    pub(super) fn load_points_only<T: GroupApplyTransaction>(
+        tx: &T,
+        scope: &RequestScope,
+        decoded: &DecodedRequest<'_>,
+        limits: RecordBatchTransactionLimits,
+    ) -> Result<Self, RecordBatchTransactionError> {
         let items = decoded
             .request()
             .operation
@@ -60,8 +73,6 @@ impl LoadedRecordBatch {
             )?;
         }
         drop(seen_types);
-        loaded.load_policies(tx, scope, limits)?;
-        super::observations::load_indexes(&mut loaded, tx, scope, limits.maximum_staging_bytes)?;
         Ok(loaded)
     }
 
@@ -171,11 +182,12 @@ impl LoadedRecordBatch {
         Ok(())
     }
 
-    fn load_policies<T: GroupApplyTransaction>(
+    pub(super) fn load_policies<T: GroupApplyTransaction>(
         &mut self,
         tx: &T,
         scope: &RequestScope,
         limits: RecordBatchTransactionLimits,
+        charge: &mut PolicySchemaCharge,
     ) -> Result<(), RecordBatchTransactionError> {
         let cap = limits.maximum_staging_bytes;
         reserve_slots(
@@ -190,10 +202,8 @@ impl LoadedRecordBatch {
             &mut self.staging_used,
             cap,
         )?;
-        let mut charge = PolicySchemaCharge::new(limits.schema);
         for kind in &self.policy_types {
-            let policy =
-                tx.stored_policy_value(scope.tenant(), kind, limits.schema, &mut charge)?;
+            let policy = tx.stored_policy_value(scope.tenant(), kind, limits.schema, charge)?;
             let projection = match &policy {
                 Some(StoredPolicyValue::Complete(policy)) => {
                     if policy.data().workflow_type != *kind {
@@ -202,7 +212,7 @@ impl LoadedRecordBatch {
                     let bytes = record_batch_policy_projection_bytes(policy)?;
                     debit(&mut self.staging_used, bytes, cap)?;
                     let (mode, retry) =
-                        project_record_batch_policy(policy, limits.schema, &mut charge, bytes)?;
+                        project_record_batch_policy(policy, limits.schema, charge, bytes)?;
                     Some((mode.into_policy(), retry))
                 }
                 Some(StoredPolicyValue::Original(raw)) => {
@@ -216,7 +226,7 @@ impl LoadedRecordBatch {
                         raw,
                         kind,
                         limits.schema,
-                        &mut charge,
+                        charge,
                     )?;
                     debit(
                         &mut self.staging_used,
@@ -227,7 +237,7 @@ impl LoadedRecordBatch {
                         raw,
                         kind,
                         limits.schema,
-                        &mut charge,
+                        charge,
                         bytes,
                     )?)
                 }

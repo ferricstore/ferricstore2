@@ -3,7 +3,7 @@
 use super::{
     META, ROWS, StateStoreGenesis, StateStoreLimits,
     admission::{self, engine_pair, policy_error, storage_error, table_error, total, value_error},
-    store::RedbStateStore,
+    store::{RedbStateStore, RedbStateTransaction},
 };
 use crate::state::{key, value};
 use redb::Durability;
@@ -95,64 +95,7 @@ pub(super) fn initialize(
     )?;
     ensure_empty(&tx.write)?;
     tx.temporary(scratch)?;
-    let mut rows = tx.write.open_table(ROWS).map_err(table_error)?;
-    let mut hash = Sha256::new();
-    hash.update(b"wf-state-genesis-v1");
-    for (tenant, policy) in genesis.policies {
-        let scope = tx.scope(tenant)?;
-        let key = tx.output_key(
-            &[
-                store.group.as_bytes(),
-                store.recovery.as_bytes(),
-                tenant.as_bytes(),
-                &policy.data().workflow_type,
-            ],
-            0,
-            policy.encoded().len(),
-            |cap| key::encode_policy_key(&scope, &policy.data().workflow_type, cap),
-        )?;
-        engine_pair(key.len(), policy.encoded().len())?;
-        hash_row(&mut hash, &key, policy.encoded())?;
-        rows.insert(key.as_slice(), policy.encoded())
-            .map_err(|e| storage_error(&e))?;
-    }
-    for (partition, target) in genesis.placements {
-        let key = tx.output_key(
-            &[store.recovery.as_bytes(), partition.as_bytes()],
-            0,
-            target.as_bytes().len(),
-            |cap| key::encode_placement_key(&store.recovery, partition, cap),
-        )?;
-        engine_pair(key.len(), target.as_bytes().len())?;
-        hash_row(&mut hash, &key, target.as_bytes())?;
-        rows.insert(key.as_slice(), target.as_bytes())
-            .map_err(|e| storage_error(&e))?;
-    }
-    let bytes = total(
-        33,
-        [
-            store.group.as_bytes().len(),
-            store.recovery.as_bytes().len(),
-        ],
-    )?;
-    let control_key = tx.output_key(
-        &[store.group.as_bytes(), store.recovery.as_bytes()],
-        0,
-        bytes,
-        |cap| key::encode_control_key(&store.group, &store.recovery, cap),
-    )?;
-    engine_pair(control_key.len(), bytes)?;
-    tx.temporary(bytes)?;
-    let control = value::encode_control(
-        &store.group,
-        &store.recovery,
-        ControlState::initial(genesis.initial_time),
-        bytes,
-    )
-    .map_err(value_error)?;
-    rows.insert(control_key.as_slice(), control.as_slice())
-        .map_err(|e| storage_error(&e))?;
-    drop(rows);
+    let genesis_hash = write_genesis_rows(&tx, genesis)?;
     let bytes = total(
         108,
         [
@@ -162,7 +105,7 @@ pub(super) fn initialize(
     )?;
     tx.temporary(bytes)?;
     engine_pair(8, bytes)?;
-    let manifest = manifest(store, genesis, hash.finalize().into(), bytes)?;
+    let manifest = manifest(store, genesis, genesis_hash, bytes)?;
     let mut meta = tx.write.open_table(META).map_err(table_error)?;
     meta.insert(b"manifest".as_slice(), manifest.as_slice())
         .map_err(|e| storage_error(&e))?;
@@ -177,7 +120,69 @@ pub(super) fn initialize(
         .map_err(|_| StateTransactionError::Uncertain)
 }
 
-fn ensure_empty(write: &redb::WriteTransaction) -> Result<(), StateTransactionError> {
+pub(super) fn write_genesis_rows(
+    tx: &RedbStateTransaction<'_>,
+    genesis: &StateStoreGenesis<'_>,
+) -> Result<[u8; 32], StateTransactionError> {
+    let mut rows = tx.write.open_table(ROWS).map_err(table_error)?;
+    let mut hash = Sha256::new();
+    hash.update(b"wf-state-genesis-v1");
+    for (tenant, policy) in genesis.policies {
+        let scope = tx.scope(tenant)?;
+        let key = tx.output_key(
+            &[
+                tx.group.as_bytes(),
+                tx.recovery.as_bytes(),
+                tenant.as_bytes(),
+                &policy.data().workflow_type,
+            ],
+            0,
+            policy.encoded().len(),
+            |cap| key::encode_policy_key(&scope, &policy.data().workflow_type, cap),
+        )?;
+        engine_pair(key.len(), policy.encoded().len())?;
+        hash_row(&mut hash, &key, policy.encoded())?;
+        rows.insert(key.as_slice(), policy.encoded())
+            .map_err(|e| storage_error(&e))?;
+    }
+    for (partition, target) in genesis.placements {
+        let key = tx.output_key(
+            &[tx.recovery.as_bytes(), partition.as_bytes()],
+            0,
+            target.as_bytes().len(),
+            |cap| key::encode_placement_key(tx.recovery, partition, cap),
+        )?;
+        engine_pair(key.len(), target.as_bytes().len())?;
+        hash_row(&mut hash, &key, target.as_bytes())?;
+        rows.insert(key.as_slice(), target.as_bytes())
+            .map_err(|e| storage_error(&e))?;
+    }
+    let bytes = total(
+        33,
+        [tx.group.as_bytes().len(), tx.recovery.as_bytes().len()],
+    )?;
+    let control_key = tx.output_key(
+        &[tx.group.as_bytes(), tx.recovery.as_bytes()],
+        0,
+        bytes,
+        |cap| key::encode_control_key(tx.group, tx.recovery, cap),
+    )?;
+    engine_pair(control_key.len(), bytes)?;
+    tx.temporary(bytes)?;
+    let control = value::encode_control(
+        tx.group,
+        tx.recovery,
+        ControlState::initial(genesis.initial_time),
+        bytes,
+    )
+    .map_err(value_error)?;
+    rows.insert(control_key.as_slice(), control.as_slice())
+        .map_err(|e| storage_error(&e))?;
+    drop(rows);
+    Ok(hash.finalize().into())
+}
+
+pub(super) fn ensure_empty(write: &redb::WriteTransaction) -> Result<(), StateTransactionError> {
     if write
         .list_tables()
         .map_err(|e| storage_error(&e))?
@@ -194,7 +199,7 @@ fn ensure_empty(write: &redb::WriteTransaction) -> Result<(), StateTransactionEr
     Ok(())
 }
 
-fn manifest(
+pub(super) fn manifest(
     store: &RedbStateStore,
     genesis: &StateStoreGenesis<'_>,
     hash: [u8; 32],

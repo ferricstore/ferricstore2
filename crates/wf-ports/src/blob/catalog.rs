@@ -63,6 +63,7 @@ pub struct WorkflowValueReadBatch {
 }
 
 /// Explicit logical ceilings, separate from native page cache and RSS.
+#[derive(Clone, Copy)]
 pub struct WorkflowValueReadLimits {
     /// Maximum number of input references.
     pub maximum_references: usize,

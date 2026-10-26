@@ -139,7 +139,7 @@ pub(super) fn retained(
         select(tx, slot);
         if let Some(expected) = catalog.slots[usize::from(slot)] {
             let (layout, saved) = recovery::cohort(tx, charge)?;
-            if !matches!(layout, 3 | 5 | 6) || super::format::facts(tx, limits)? != expected {
+            if !matches!(layout, 3 | 5..=7) || super::format::facts(tx, limits)? != expected {
                 return Err(Error::Corrupt);
             }
             compatible(tx, saved, live)?;
@@ -189,6 +189,8 @@ fn compatible(
     let new_origin = super::policy::origin(tx, &new, new_manifest.value())?;
     let old_member = validate::get(tx, &old, super::super::membership::KEY)?;
     let new_member = validate::get(tx, &new, super::super::membership::KEY)?;
+    validate::value_defaults_compatible(tx, old_manifest.value(), new_manifest.value())
+        .map_err(|_| Error::Corrupt)?;
     validate::values(
         tx,
         (saved, live),

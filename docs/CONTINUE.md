@@ -1,40 +1,54 @@
 # ferricstore2: implementation handoff
 
 Updated: 2026-10-26. The active full-completion goal remains unfinished.
-GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
-performance reviews. Current decisions and execution evidence are in
+GPT-6.1-sol/max agents use disjoint writes and dedicated architecture and
+performance reviews. Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-All **nine workflow-value codec and wire tests now pass**. The two semantic
-regressions were saved failing in `622db0f` before the correction. Typed5/6/7
-preserve raw priorities and unresolved extension presence for guarded domain
-interpretation; public1 retains its existing priority normalization. Structural,
-defaults, order, intent, ownership, retry-jitter and work checks remain intact.
-No new owner, wire/hash stream or performance guarantee accompanies this fix.
+All **nineteen original workflow-value feature cases now pass**, including the
+ten complete real-store tails: same-transaction publication and every history,
+ordered owned reads and expiry, replay/guards/limits, policy provenance, healthy
+reopen and complete snapshot round trips. Fresh FWSS7/defaults and FWSP4 are real
+backend operations. Canonical formatting and strict workspace/all-target Clippy
+pass. All53 architecture checks passed after natural geometry decomposition.
 
-The ten real-store integration cases still fail at their first fresh value-store
-constructor with UnsupportedLayout. Their publication, ordered-read, replay,
-expiry, ownership and snapshot tails remain compiled but masked. Peer review
-found three incorrect producer premises: the read/terminal/snapshot fixtures used
-atomic5 for sequential same-ID writes, which the existing atomic reducer rejects.
-Only those three profile literals now use independent6. Every assertion, helper,
-case identity and same-transaction scenario remains intact. The corrected
-nineteen-case run is nine pure PASS and ten genuine constructor failures; save
-this corrected failing checkpoint before connected storage implementation.
+Three new regressions have genuinely reached their intended failures. Both
+current-value corruption cases successfully create/reopen healthy state, perform
+their exact resealed mutations and then observe successful reopen where Corrupt
+is required. Retry proves both real failed/version2 cores, then observes
+effectiveTTL1/deadline401 instead of inherited7000/deadline7400. The actual22-case
+run is **19 PASS / 3 FAIL**, zero ignored,105 filtered. No corresponding semantic
+production correction is written in this checkpoint; preserve and save this
+baseline before applying the selected fixes.
 
-Fresh compatibility commands execute **1,097 passing tests**: all 1,093 earlier
-identities plus the four captured-lifecycle restore cases, across the same 102
-targets. Exact package/kind/source-target/logical-target/test/status counters and
-both benchmark correctness-smoke outputs match. The three subsequent fixture
-literal changes affect only the separately executed feature cases and have
-whole-file/inventory inverses back to that checked input.
+The earlier eleven Workspace failures came from underfunded positive producer
+envelopes. The reviewed amendment changes only local W to512MiB and two local
+policy-install bindings. All individual R/S/C/schema/value ceilings, cap refusal
+assertions, original nineteen case bodies and shared state_store fixtures remain
+unchanged. Recovery reuses its held manifest view to avoid an illegal second
+writable META open. Both reviewers verified these changes and exact inverses.
 
-Formatting, workspace compilation and strict Clippy pass. Six documentation
-tests across fifteen targets, all **53 architecture checks**, reference/progress
-integrity, documentation build and offline dependency checks pass. The progress
-ledger remains incomplete: 120 source-derived declarations, 132 counterpart
-mappings and 550 assertion links. Runtime reconciliation, full behavioral parity
-and Linux execution remain open; local macOS checks provide no Linux evidence.
+The selected current-core correction adds only borrowed field views and exact
+current presence/stored-binary comparison in four existing modules. The selected
+Retry correction permits terminal TTL overrides only for Complete/Fail/Cancel,
+while Retry exhaustion inherits and still receives terminal stamping. These
+are the next production changes after the genuine failing checkpoint is saved.
+All22 cases and complete compatibility must then be rerun and reviewed.
+
+The previous verified compatibility baseline is **1,097 passing tests** across
+102 targets. Its documentation, architecture, reference/progress and dependency
+checks passed; it does not certify the current backend source. No full-workspace
+compatibility result or native/Linux acceptance is claimed for this checkpoint.
+Logical resource accounting adds no measured speed, capacity, RSS or recoverable
+Box-allocation guarantee.
+
+Node actual8 dispatch/admission remains the immediate required successor after
+the backend gate. Typed/shared/external values, public hydration, real lifecycle
+cleanup/rewind/recreation, mandatory original Elixir profiles, native failures,
+Linux and macOS acceptance and the remaining ordered M1-M8 work remain open.
+The progress ledger remains120 source-derived declarations,132 counterpart
+mappings and550 assertion links; full behavioral parity is unfinished.
+Local macOS results provide no Linux execution evidence.
 
 Captured-lifecycle restoration passes all nine unchanged tests, including the
 four saved failing in `9b5bd52`. It validates recorded birth configuration and

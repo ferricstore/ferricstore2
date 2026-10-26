@@ -99,7 +99,7 @@ pub(in crate::workflow_values) fn install_complete(
     at: u64,
     now: u64,
 ) -> TestResult {
-    let limits = crate::fixtures::driver_limits();
+    let limits = super::limits().record_batch;
     let frame = prepare_complete_core_policy_patch_frame(
         CompleteCorePolicyPatchRequestInput::new(
             scope.clone(),
@@ -137,7 +137,7 @@ pub(in crate::workflow_values) fn install_original(
     at: u64,
     now: u64,
 ) -> TestResult {
-    let limits = crate::fixtures::driver_limits();
+    let limits = super::limits().record_batch;
     let mut charge = PolicySchemaCharge::new(limits.schema);
     let entry = decode_original_complete_policy_entry_portable(raw, limits.schema, &mut charge)?
         .ok_or("original fixture requires a valid donor")?;

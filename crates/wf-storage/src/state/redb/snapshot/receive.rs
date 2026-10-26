@@ -35,7 +35,7 @@ fn header(
         return Err(SnapshotError::Malformed);
     }
     let version = u16::from_be_bytes([magic[4], magic[5]]);
-    if !matches!(version, 1..=3) {
+    if !matches!(version, 1..=4) {
         return Err(SnapshotError::UnsupportedVersion);
     }
     for expected in [tx.group.as_bytes(), tx.recovery.as_bytes()] {
@@ -138,6 +138,7 @@ fn row(
     };
     if position.0 && position.1 == 0 {
         let wanted = match position.2 {
+            4 => [0, 7],
             3 => [0, 6],
             2 => [0, 5],
             _ => [0, 3],
@@ -300,6 +301,7 @@ pub(super) fn receive(
         facts.1,
         facts.2,
         match version {
+            4 => 7,
             3 => 6,
             2 => 5,
             _ => 3,

@@ -41,11 +41,11 @@ pub(crate) fn decode_state_key(
     let mut length = 0_usize;
     let (before, after) = match family {
         0 | 7 => (2, 0),
-        1 => (5, 0),
-        2 | 6 => (4, 0),
+        1 | 10 => (5, 0),
+        2 | 6 | 8 | 9 => (4, 0),
         3 => (3, 4),
         4 => (6, 1),
-        5 => (5, 1),
+        5 | 11 => (5, 1),
         _ => return Err(StateValueError::UnsupportedTag),
     };
     for part in &mut parts[..before] {
@@ -61,8 +61,8 @@ pub(crate) fn decode_state_key(
         0
     };
     let number = match family {
-        3 | 5 => u128::from(read_u64(bytes, &mut offset)?),
-        4 => read_u128(bytes, &mut offset)?,
+        3 | 5 | 11 => u128::from(read_u64(bytes, &mut offset)?),
+        4 | 8 => read_u128(bytes, &mut offset)?,
         _ => 0,
     };
     for part in &mut parts[before..before + after] {
@@ -99,7 +99,19 @@ pub(crate) fn decode_state_key(
         bytes: owned,
         ranges,
     };
-    if family == 5 && u128::from(canonical_history_position(decoded.part(5))?.0) != number {
+    if matches!(family, 5 | 11)
+        && u128::from(canonical_history_position(decoded.part(5))?.0) != number
+    {
+        return Err(StateValueError::InvalidValue);
+    }
+    if matches!(family, 8 | 9) {
+        super::workflow_values::validate_reference(decoded.part(3))?;
+    }
+    if matches!(family, 10 | 11)
+        && [decoded.part(3), decoded.part(4)]
+            .iter()
+            .any(|part| part.is_empty() || part.len() > 65_535)
+    {
         return Err(StateValueError::InvalidValue);
     }
     Ok(decoded)

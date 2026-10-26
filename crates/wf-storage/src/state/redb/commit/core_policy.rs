@@ -190,7 +190,7 @@ fn publish_original(
     publication::put(tx, &key, candidate)?;
     catalog::publish_original(tx, tx.layout, manifest, &saved)?;
     put_outcome(tx, scope, outcome, &encoded)?;
-    Ok(snapshot::original::LAYOUT)
+    Ok(tx.layout.max(snapshot::original::LAYOUT))
 }
 
 fn validate(
@@ -220,7 +220,7 @@ fn validate(
                 || outcome.original_time() != control.execution_time()
                 || (outcome.intent().version() == 2
                     && outcome.response_version() == 2
-                    && tx.layout != snapshot::original::LAYOUT)
+                    && !matches!(tx.layout, 6 | 7))
             {
                 return Err(Error::InvalidChanges);
             }
@@ -237,7 +237,7 @@ fn validate(
             if outcome.scope() != changes.scope()
                 || (outcome.intent().version() == 2
                     && outcome.response_version() == 2
-                    && tx.layout != snapshot::original::LAYOUT)
+                    && !matches!(tx.layout, 6 | 7))
             {
                 return Err(Error::InvalidChanges);
             }

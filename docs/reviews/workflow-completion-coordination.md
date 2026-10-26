@@ -53886,3 +53886,144 @@ Prepare an exact SAVE of the two corrected production files, three corrected fix
 
 
 The corrected-RED save uses only the already reviewed architecture-note prefix through byte558449. Later storage-decision appends remain intact in the worktree and outside this checkpoint, so the reviewer can finish without interruption. DOMAIN and PERF stopped at97833 and364424. The exact index contains five source files and five documentation paths; the architecture index blob intentionally equals that reviewed prefix, while every other staged blob equals its current worktree file. This selective staging grants no new storage artifact or BODY authority.
+
+
+## VALUE-CONSUMED-BINARY1-BACKEND author release
+
+Root has whole/hash-read and adopted ARCH558449+27432/ddfcd7fe15a29bbbd742899429901dde25d63ebe3c6e26066d439dd8875cb8f2 through585881. The corrected RED is saved in96565b453fdc4ada4d36906444758c8ef369ce1f. This authorizes the exact14newfiles,10private models,twoordinary aliases,existingfour endpoints and protocol/ownership/resource contracts in that note. Routine private helper decomposition inside those exact responsibilities is authorized under400/100; additional files/types/modules/aliases/public APIs or contract changes still require consultation. No Node artifact is released; its genuine R0/BODY/fixed-owner work is the immediate required next gate before any full-capability/service/recovery handoff claim. All typed/hydration/lifecycle/native/Linux/M1-M8 requirements remain active.
+
+A focused independent reviewer also approved ARCH-M2-VALUE-INDEPENDENT-ORDERING-MOVE1 in memory after reading actual source. Its exact approval is the SAME public IndependentIndexedWithOrdering alias and decide_touched_independent_indexed_batch_with_ordering5 in existing independent.rs, with indexed.rs reexport; private decide_profile returns the existing moved ordering Vec after unchanged finish, old wrappers drop it before returning, whole-profile rejection returns empty Vec, and all other kernel/profile/step/plan/allocation/admission order remains. The existing4V+2688n covers current kernel peak; every NEW caller overlap must separately fund retained Vec header+actual n-slot bytes. No new file, helper, allocation, clone or reducer replay is selected by that focused decision.
+
+Before any source creation, Root explicitly hands ONLY domain workflow/indexed.rs and indexed/independent.rs to ordering_architecture_sol61 as a finite source author; Root does not edit those while live. After its normal STOP, custody returns to Root for integration/review. DOMAIN d2_implementation_sol61 owns the exact17-path set below. Root owns its listed52-path set, except for the temporary two-file handoff. Neither writer touches another's live source or shared documents; each may append only its existing role note (the focused writer returns its receipt in memory). All tests remain96565b4 bytes. No formatter/compiler/test/Git mutation is run until ALL source authors STOP. Source can be read provisionally during authorship, but final reviews bind stopped actual bytes. Root owns policy, shared journal/CONTINUE, validation and Git. Current full scope remains the FOUR real backend endpoints and ALL TEN full tails, not merely constructor success.
+
+ROOT path set (including the two explicitly transferred ordering paths):
+- crates/wf-domain/src/workflow/indexed.rs
+- crates/wf-domain/src/workflow/indexed/independent.rs
+- crates/wf-domain/src/workflow/request/outcome.rs
+- crates/wf-ports/src/log.rs
+- crates/wf-ports/src/log/value_batch.rs
+- crates/wf-ports/src/log/value_batch/apply.rs
+- crates/wf-ports/src/log/value_batch/response.rs
+- crates/wf-ports/src/log/record_batch.rs
+- crates/wf-ports/src/log/record_batch/fresh.rs
+- crates/wf-ports/src/log/record_batch/phase.rs
+- crates/wf-ports/src/log/record_batch/independent.rs
+- crates/wf-ports/src/log/record_batch/atomic_start.rs
+- crates/wf-ports/src/log/record_batch/response.rs
+- crates/wf-ports/src/log/record_batch/atomic_start/response.rs
+- crates/wf-ports/src/log/public_mutation/apply.rs
+- crates/wf-ports/src/log/public_mutation/response.rs
+- crates/wf-ports/src/blob/publication/scan.rs
+- crates/wf-ports/src/blob/publication/step.rs
+- crates/wf-ports/src/state/transaction.rs
+- crates/wf-ports/src/state/transaction/independent.rs
+- crates/wf-ports/src/state/transaction/atomic_start.rs
+- crates/wf-storage/src/state/key.rs
+- crates/wf-storage/src/state/key/physical.rs
+- crates/wf-storage/src/state/key/workflow_values.rs
+- crates/wf-storage/src/state/value.rs
+- crates/wf-storage/src/state/value/workflow_values.rs
+- crates/wf-storage/src/state/value/outcome.rs
+- crates/wf-storage/src/state/value/outcome/policy.rs
+- crates/wf-storage/src/state/redb.rs
+- crates/wf-storage/src/state/redb/store.rs
+- crates/wf-storage/src/state/redb/bootstrap.rs
+- crates/wf-storage/src/state/redb/core_policy.rs
+- crates/wf-storage/src/state/redb/core_policy/catalog.rs
+- crates/wf-storage/src/state/redb/commit/claim.rs
+- crates/wf-storage/src/state/redb/commit/core_policy.rs
+- crates/wf-storage/src/state/redb/commit/original_policy.rs
+- crates/wf-storage/src/state/redb/recovery.rs
+- crates/wf-storage/src/state/redb/recovery/rows.rs
+- crates/wf-storage/src/state/redb/snapshot.rs
+- crates/wf-storage/src/state/redb/snapshot/capture.rs
+- crates/wf-storage/src/state/redb/snapshot/format.rs
+- crates/wf-storage/src/state/redb/snapshot/receive.rs
+- crates/wf-storage/src/state/redb/snapshot/validate.rs
+- crates/wf-storage/src/state/redb/snapshot/install.rs
+- crates/wf-storage/src/state/redb/snapshot/policy.rs
+- crates/wf-storage/src/state/redb/snapshot/upgrade.rs
+- crates/wf-storage/src/state/redb/snapshot/transition.rs
+- crates/wf-storage/src/state/redb/snapshot/original.rs
+- crates/wf-storage/src/state/redb/snapshot/read.rs
+- crates/wf-storage/src/state/redb/snapshot/stage.rs
+- crates/wf-storage/src/state/redb/snapshot/catalog.rs
+- crates/wf-storage/src/state/redb/snapshot/catalog/format.rs
+
+DOMAIN path set:
+- crates/wf-storage/src/transaction.rs
+- crates/wf-storage/src/transaction/value_batch.rs
+- crates/wf-storage/src/transaction/load.rs
+- crates/wf-storage/src/transaction/observations.rs
+- crates/wf-storage/src/transaction/record_batch.rs
+- crates/wf-storage/src/transaction/value_batch/prepare.rs
+- crates/wf-storage/src/transaction/value_batch/plan.rs
+- crates/wf-storage/src/transaction/value_batch/step.rs
+- crates/wf-storage/src/state/redb/values.rs
+- crates/wf-storage/src/state/redb/values/budget.rs
+- crates/wf-storage/src/state/redb/values/manifest.rs
+- crates/wf-storage/src/state/redb/values/genesis.rs
+- crates/wf-storage/src/state/redb/values/read.rs
+- crates/wf-storage/src/state/redb/values/binding.rs
+- crates/wf-storage/src/state/redb/values/validate.rs
+- crates/wf-storage/src/state/redb/commit.rs
+- crates/wf-storage/src/state/redb/commit/values.rs
+
+
+## VALUE-CONSUMED-BINARY1-BACKEND — combined source handoff and validation release
+
+All source authors returned custody normally before Root's first formatter/compiler/test invocation. No peer was interrupted and no shared source was edited while assigned to another live author. The stopped-source inventory has exactly the selected14 new files; all460 tracked test paths checked against HEAD96565b4 are unchanged. Root independently verified the DOMAIN17 LF/byte/hash inventory and the remaining1566 held inputs, SHA256696d96398f5e074ee543b2fa89d5f7665d762cd327ee3e5cfb07d70419ac9bcb.
+
+Explicit disjoint in-memory transfers now journaled: ordering_architecture_sol61 authored indexed.rs plus indexed/independent.rs, stopped, then the selected ports20 paths (the original19 plus public_mutation.rs parent), stopped, then outcome.rs plus outcome/policy.rs, stopped. Ports final parents are log.rs353LF/7226abb8, value_batch.rs303/e95e923b, new apply.rs64/ea4e7647 and response.rs212/a1d0d614; ordering2 final318/2d0bf341 and332/6ff98115; outcome2 final348/4af5a0cd and287/39d8381b. The two legacy ports state child files remained byte-exact. All were read-only to Root while live. The focused author's role receipt was returned in memory, without a new review file.
+
+PERF authored only the five selected key/value paths and stopped; full author receipt is performance.md364424+5758/a951fede476c7bda558f4a484f2f2caaec918bbd97a4b19fc8e14b60896a92ea, end370182. Root authored its stopped26-path integration set. DOMAIN's final17-path handoff is domain.md97833+13343/67f9da962defbfc7103621d93232ae8ac0ee3e1993b97d9a5d887e745ffe1a3f, end111176; Root actually read the whole range, rehashed it and verified every source entry. Preformat maximum DOMAIN file322LF/function88LF. Source delivery is not execution evidence.
+
+Three existing private ancillary seams were explicitly transferred and held before edit: ports log/public_mutation.rs one response-module visibility line; storage state/redb/original_policy.rs Original6-or7 eligibility; storage state.rs one redb module visibility line. Each original held-set equality was verified before its named exclusion; the initial1569/12fff8fc hold was not silently replaced. No new artifact, public model or external dependency was added through these seams.
+
+Independent stopped-source reviews: ARCH587512+6543/fd9103f23f3aa4869c343dea57a714ba4638d80c52f7415fef45bcdb582419e2, end594055 covers the kernel/ports/outcome/pure30-file set; PERF370182+4956/363ba1fe5f0d79777bca68df1b415141990cdccb92a33bc383c5018dd7fab20b, end375138 covers Root26 integration. Both exclude formerly moving DOMAIN code. Root has now requested separate architecture and resource reviews of actual stopped DOMAIN17; reviewers may append only their own existing role notes and may not mutate source or run workloads.
+
+Root applied the precise selected ARCH585881+1631/89b84f04af2e14a1cef2074493de82d1cec829f724fdf610321f4c213986522c tariff correction: publication::step::profile reads actual intent version once and prepays12 before eager workflow-value metadata, while scan's per-item allowance rises96 to128. Existing base64/encoded4 and caller debit remain. No wire, test or allocation contract changes.
+
+All source is now Root custody for formatting, technical corrections and real frozen19/full-compatibility execution. Only the three named role notes are excluded from runtime input freezes; shared journal/CONTINUE/tests/configuration stay held for each run. Compiler/lint failures are technical, not genuine business RED. No backend test pass, Node8 support, source parity, measured performance, milestone exit, Linux execution or readiness claim is made here. Node actual8 R0/BODY remains the immediate required successor, with all typed/public hydration, lifecycle, native and wider ordered milestones still open.
+
+
+## BACKEND technical integration and supplemental regression handoffs
+
+DOMAIN returned its exact17 source paths, then the separately selected recovery.rs test-only handoff returned normally. Actual whole-read supplemental receipt DOMAIN111176+3225/03af704a1fd44e67fb9ab901770b4367c7a407440c19e76f0340a50bce316126 ends114401. Its entire old287LF/10508B prefix SHA0ad6885ed9fd99be37b80ad9025726ae0dfa5f56145c32480c3b5ddb2e9329b8 remains exact after canonical formatting; only the two appended cases changed for ordinary formatting and equivalent named insert booleans/direct known-key value assertion. No original oracle was weakened.
+
+Root applied actual-read ARCH594055+850/903d5cea scalar Copy refinement to existing catalog.rs and transaction limits; catalog beforeimage3049B/fecb51f64185c67f0fc212a0f3eb9220c886b99044e2a14eec8ccc8c87ac2c32. No new file/model/field/signature. Actual-read ARCH594905+2638/0f9590cf selects two corruption cases then genuine RED+SAVE before the borrowed scanner/current closure fix;597543+2176/1f19a822 selects parser/render/overlap/binding/type-reserve account fixes;599719+1496/b27bd1df selects the exact checked P-map bound before both reused workers and Complete header admission;601215+1662/1990a786 selects the still-unwritten Retry TTL regression before its correction. All ranges were actually read and rehashed, not accepted from a title.
+
+Technical1 runner14246 compiled unsuccessfully on one redb guard lifetime and two unused imports; Root explicitly drops the absent guard before its table and removes unused private prefix/imports. Technical2 runner92134 passed whole all-target compilation, then strict Clippy stopped on a range style. Technical3 runner16076 stopped on two ports styles. Technical4 runner94895 stopped on fifteen storage styles, corrected without suppression, extra model or changed legacy wrapper. Technical5 runner79464 compiled production clean and stopped only on the new104-line test; technical6 runner72071 stopped only on that test at102lines. All six input freezes remained unchanged; no feature test executed and no business RED was claimed. Whole raw packets remain in the existing validation log; their exact receipts are retained in coordinator memory.
+
+Resource corrections now include four-times reference/parser and partition/ID renderer byte prepayment; actual immutable-key guard/output overlap; fixed_owner table names throughout binding observation; final leaves plus one conversion leaf/header; one full checked K+P type-spine staging reservation and prospective relocation work before witness iteration; exact selected P-map work before load_indexes and decide_values; whole Complete publication header before empty. Final PERF review also found two alias-guard revisits missing cumulative tx.recovery_row debit; Root added that existing debit before decode/hash in binding_refs and immutable. Logical accounting is separate from allocator/native/RSS claims.
+
+No current-core semantic validator fix or Retry TTL fix has been written. Their genuine reached regression RED+SAVE gates remain mandatory. The next frozen run retries strict lint and then all21 feature identities; any earlier setup/apply/healthy-open failure is explicitly masked for the two corruption cases. Current backend integration, full compatibility, immediate Node8, source parity, native and both-OS acceptance remain open. Shared CONTINUE is updated to distinguish the authored batch from its previous constructor-RED checkpoint.
+
+
+## BACKEND actual strict success and masked runtime failure
+
+Technical7 runner77129 is TERMINAL101 with unchanged1638/c1481ea993700c46847e04e9534031f5e330b547639cf90a3bea9985de6c10fc. fmt0 raw10330953+0; strict workspace/all-target Clippy0 raw10331198+261/c3f3ccd8e76184282d00a7b9a5e862ac4ceffc1de00414a80dff2e2741916f51; actual21 feature test101 raw10331712+7714/a26365cf8c9879968b8d394ac3428d53dd96216449cf5cadc4a6ad9686aacfb2: ninePASS/twelveFAIL/zeroignored/105filtered. Constructors succeed; eight fresh apply cases exceedW256MiB by4728..9224 bytes, two CompletePolicy cases need about288MiB and one Original case about288MiB, and limits case returnsCorrupt. All eleven Workspace failures need source-backed owner/profile reconciliation, not a silent fixture widening or missing-owner exemption. Both new current-corruption controls fail at setup Apply/Workspace, so remain MASKED; no genuine intended closure RED, save or production fix is claimed.
+
+Actual whole/hash-read PERF375138+8172/fae7c5558b620c40ba3fb9cf1b7f65e0410d17d2717170d02e7ba4e50516002c through383310 qualifies the17-path resource review, with current-core/Retry semantics and publish_value geometry open. Main ARCH also reports existing record_batch::apply102physicalLF and publish_value105; natural same-file routine decomposition remains required. Strict Clippy passing is not complete physical geometry acceptance. Read-only follow-ups now split: ARCH/PERF actual Workspace owner/profile audit; DOMAIN isolated limitsCorrupt source diagnosis. They may append only existing role notes, never source/workload/Git. Root retains write/validation custody. Full compatibility rerun, immediate Node8, typed/hydration/lifecycle/original parity/native/both-OS/milestone gates remain active.
+
+
+## BACKEND corrected producer/healthy-open run release
+
+All source authors STOPPED. Root applied the exact actual-read ARCH602877+1817/beefddf0 producer correction: W512 only in local value limits and two policy-install bindings; whole-file inverse proves every other byte unchanged (dc02d8cb/dffd2418). The individual R/S/C/schema/value ceilings and all original nineteen case bodies stay literal. Shared state_store fixtures are untouched. Independent five-path reviews ARCH610716+3534/17de20f2 and PERF388165+3763/9766adf5 were whole/hash-read and verified both natural helper extractions, counters/owners/order, actual manifest-guard reuse and producer scope. Physical apply/helper75/37, publish_value/write_alias92/23, files305/398. Root's postgeometry/preproducer runner38961 passed fmt and all53 architecture tests, unchanged1638/441598db; raw arch10339801+5593/225fb41e.
+
+Actual-read DOMAIN114401+4390/b4eb49dc and PERF383310+4855/09822659 distinguish the false healthy-open Corrupt from intended data corruption. Root reuses values::manifest::parse(manifest.value(),selected scope) instead of reopening writable META. The pinned redb source inner_open rejects an already-held writable name; table-error classification is unchanged. Current corrected recovery47080 is not the old failing-source beforeimage; canonical inverse de7649 is explicitly distinguished from PERF's separately formatted textual reconstruction.
+
+DOMAIN returned the Retry-only publication handoff: whole/hash-read118791+4456/85dab2a5, end123247. Its selected single case uses actual two Start7 entries and one independent6 retry batch, proves both real failed/version2 cores first, then requires inherited7000/deadline7400 in each current/history binding. Both Some1/Some0 extensions are carried. Pinned own-file rustfmt was expressly authorized for this finite task and passed, with file508/function100 physicalLF; no other workload or source touched. Whole original14619B/b28506f9e3481266c74c81a8c4487c9dc6f8d8613bc1a2e2c1eb7c4f8fd090bf prefix matches HEAD exactly. No new helper/model/file; all22 complete oracles now await actual execution.
+
+Root will run strict fmt/Clippy and all22. No current-core or Retry semantic correction has been written. Genuine reached intended regression RED and SAVE remain required; any earlier setup failure is still masked. Full compatibility/Node8/typed/public hydration/lifecycle/original/native/Linux/macOS/all milestones remain open.
+
+
+## BACKEND genuine corrected22 RED checkpoint
+
+Root actually executed corrected22 runner1001, unchanged1638/7711ea0ada63eb3fae2f9396b60f910de13c48c565853043591afaca3169ddf0: fmt0, strictworkspace/alltargetClippy0 (raw10345847+261/5203a42f), feature19PASS/3FAIL/zeroignored/105filtered raw10346365+4410/33f31034e0731997934936862fe18a0f03c36e612e7a2cc0d6289c16a798d0c0. ALLoriginal19 cases pass their complete bodies, including all ten formerly factory-masked real-store tails. The only failures are the two added current-core corruption cases and added Retry inheritance case.
+
+Root refined ONLY the two NEW final corruption assertions to the equivalent explicit error=open(...).err(); assert_eq!(error,Some(Corrupt)). This exposes actual None versus another error and naturally keeps the last new function below100physicalLF; the full old287LF recovery prefix remains literal. Final diagnostic runner41865 is TERMINAL101 unchanged1638/032d320e67291810a022e38da383b9b74d7c7e1d394e35a9107554c49c3e37c3: strictworkspaceClippy0 raw10351037+169/a147066d39f8c983ecee086e0e03b799061e8e7799c1633430347d47cdfb8dc7; complete22 feature19PASS/3FAIL raw10351474+4186/388adc819f123d325dbbd805a97471fbf1501231eafb34f3240c375a0f94a1ca. BOTH corruption final actual errors areNone (successful reopen), expectedSome(Corrupt), after every healthy setup/old-core/mutation/row/manifest premise. Retry reaches current lifecycle actual(None,7000,2,10,Some1,Some401), expected inheritedSome7000/deadline7400, after BOTH real failed/version2 cores. This is genuine intended RED, not a setup failure.
+
+All source and role writers stopped before save preparation. Runtime input fingerprint, exact selected14 new-source roster, scope allowlist, all original publication/recovery prefixes and role EOFs were verified; index was empty. Save scope is62 modified plus14 selected new files, including actual author/review evidence. Full compatibility/native/Linux/Node8/parity remains open; no production current-closure or Retry fix has been written before this checkpoint.
+
+Root actually whole/hash-read ARCH614250+5765/2f069c2dea8967d039cb8a27d4f80e10383a6eb8abc422a9528236f30a5c5d3b selecting the post-RED correction in FOUR existing modules, including the one non-nominal ValueSourceFields alias and fixedF/both-byte budgets. No new file/model is selected. The saved RED must precede that implementation and the separately selected EventKind TTL filter. The full goal remains unchanged.

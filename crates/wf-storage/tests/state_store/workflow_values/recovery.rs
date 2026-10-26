@@ -285,3 +285,198 @@ fn remove_required_immutable(path: &Path) -> TestResult {
     assert_eq!(f::raw_manifest(path)?, manifest);
     Ok(())
 }
+
+use sha2::{Digest, Sha256};
+
+#[test]
+fn value_binary_reopen_rejects_missing_current_value_binding() -> TestResult {
+    let directory = crate::fixtures::directory("value-missing-current-binding")?;
+    let path = directory.join("state");
+    let fresh = f::fresh(&path)?;
+    assert!(fresh.is_ok(), "{:?}", fresh.as_ref().err());
+    let Ok(mut store) = fresh else {
+        return Err("expected fresh value capability".into());
+    };
+    let scope = crate::fixtures::scope()?;
+    let create = Operation::Create(Create {
+        workflow_type: b"r".to_vec(),
+        state: b"q".to_vec(),
+        run_at: None,
+        payload: Some(b"A".to_vec()),
+    });
+    let prepared = f::batch(
+        5,
+        b"missing-current",
+        100,
+        PreparedOperation::Batch(vec![f::item(b"i", 100, create)?]),
+        vec![f::input(0, 0)],
+        vec![f::witness(b"r", None)?],
+    )?;
+    let applied = f::apply_value(&mut store, &scope, &prepared, 0)?;
+    assert!(
+        matches!(&applied, RecordBatchTransactionOutcome::Retained { outcome, .. }
+        if outcome.status() == wf_domain::workflow::request::RetainedStatus::Accepted)
+    );
+    drop((applied, prepared, store));
+    let healthy = RedbStateStore::open(
+        &path,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreLimits::default(),
+    );
+    assert!(healthy.is_ok(), "{:?}", healthy.as_ref().err());
+    drop(healthy?);
+    let mut expected = crate::fixtures::raw_rows(&path)?;
+    let core = expected
+        .iter()
+        .find(|(key, _)| key.starts_with(b"FWPK\0\x01\x01"))
+        .ok_or("created record has no core row")?;
+    let core = wf_storage::state::value::decode_record(
+        core.1,
+        scope.group(),
+        scope.recovery(),
+        crate::fixtures::driver_limits().codec.admission(),
+        core.1.len(),
+    )?;
+    assert_eq!(core.record.payload(), Some(b"A".as_slice()));
+    let (key, mut damaged) = expected
+        .iter()
+        .find(|(key, _)| key.starts_with(b"FWPK\0\x01\x0a"))
+        .map(|(key, bytes)| (key.clone(), bytes.clone()))
+        .ok_or("created record has no current binding")?;
+    assert_eq!(damaged.len(), 165);
+    assert_eq!(&damaged[..6], b"FWVB\0\x01");
+    assert_eq!(&damaged[6..15], b"\x01\0\0\0\0\0\0\0\x01");
+    let original_seal = Sha256::digest(&damaged[..133]);
+    assert_eq!(&damaged[133..], original_seal.as_slice());
+    damaged[6] = 0;
+    drop(damaged.drain(7..15));
+    let seal_at = damaged.len() - 32;
+    let seal = Sha256::digest(&damaged[..seal_at]);
+    damaged[seal_at..].copy_from_slice(&seal);
+    assert_eq!(damaged.len(), 157);
+    expected.insert(key.clone(), damaged.clone());
+    let manifest = f::raw_manifest(&path)?;
+    let database = redb::Builder::new().open(&path)?;
+    let mut write = database.begin_write()?;
+    write.set_durability(Durability::Immediate)?;
+    let mut table = write.open_table(crate::fixtures::ROWS)?;
+    assert!(table.insert(key.as_slice(), damaged.as_slice())?.is_some());
+    drop(table);
+    write.commit()?;
+    drop(database);
+    assert_eq!(crate::fixtures::raw_rows(&path)?, expected);
+    assert_eq!(f::raw_manifest(&path)?, manifest);
+    let error = RedbStateStore::open(
+        &path,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreLimits::default(),
+    )
+    .err();
+    assert_eq!(error, Some(StateTransactionError::Corrupt));
+    std::fs::remove_dir_all(directory)?;
+    Ok(())
+}
+
+#[test]
+fn value_binary_reopen_rejects_current_value_bytes_mismatch() -> TestResult {
+    let directory = crate::fixtures::directory("value-current-bytes-mismatch")?;
+    let path = directory.join("state");
+    let fresh = f::fresh(&path)?;
+    assert!(fresh.is_ok(), "{:?}", fresh.as_ref().err());
+    let Ok(mut store) = fresh else {
+        return Err("expected fresh value capability".into());
+    };
+    let scope = crate::fixtures::scope()?;
+    let create = Operation::Create(Create {
+        workflow_type: b"r".to_vec(),
+        state: b"q".to_vec(),
+        run_at: None,
+        payload: Some(b"A".to_vec()),
+    });
+    let prepared = f::batch(
+        5,
+        b"current-mismatch",
+        100,
+        PreparedOperation::Batch(vec![f::item(b"i", 100, create)?]),
+        vec![f::input(0, 0)],
+        vec![f::witness(b"r", None)?],
+    )?;
+    let applied = f::apply_value(&mut store, &scope, &prepared, 0)?;
+    assert!(
+        matches!(&applied, RecordBatchTransactionOutcome::Retained { outcome, .. }
+        if outcome.status() == wf_domain::workflow::request::RetainedStatus::Accepted)
+    );
+    drop((applied, prepared, store));
+    let healthy = RedbStateStore::open(
+        &path,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreLimits::default(),
+    );
+    assert!(healthy.is_ok(), "{:?}", healthy.as_ref().err());
+    drop(healthy?);
+    let mut expected = crate::fixtures::raw_rows(&path)?;
+    let core = expected
+        .iter()
+        .find(|(key, _)| key.starts_with(b"FWPK\0\x01\x01"))
+        .ok_or("created record has no core row")?;
+    let core = wf_storage::state::value::decode_record(
+        core.1,
+        scope.group(),
+        scope.recovery(),
+        crate::fixtures::driver_limits().codec.admission(),
+        core.1.len(),
+    )?;
+    assert_eq!(core.record.payload(), Some(b"A".as_slice()));
+    let immutable = expected
+        .keys()
+        .find(|key| key.starts_with(b"FWPK\0\x01\x08"))
+        .ok_or("created payload has no immutable row")?
+        .clone();
+    assert_eq!(expected[&immutable].as_slice(), b"A");
+    let (alias_key, mut alias) = expected
+        .iter()
+        .find(|(key, _)| key.starts_with(b"FWPK\0\x01\x09"))
+        .map(|(key, bytes)| (key.clone(), bytes.clone()))
+        .ok_or("created payload has no alias row")?;
+    assert_eq!(alias.len(), 121);
+    assert_eq!(&alias[..17], b"FWVA\0\x01\0\0\0\x01p\0\0\0\x01i\x01");
+    assert_eq!(&alias[49..57], &1_u64.to_be_bytes());
+    assert_eq!(&alias[57..89], Sha256::digest(b"A").as_slice());
+    assert_eq!(&alias[89..], Sha256::digest(&alias[..89]).as_slice());
+    alias[57..89].copy_from_slice(&Sha256::digest(b"B"));
+    let seal = Sha256::digest(&alias[..89]);
+    alias[89..].copy_from_slice(&seal);
+    expected.insert(immutable.clone(), b"B".to_vec());
+    expected.insert(alias_key.clone(), alias.clone());
+    let manifest = f::raw_manifest(&path)?;
+    let database = redb::Builder::new().open(&path)?;
+    let mut write = database.begin_write()?;
+    write.set_durability(Durability::Immediate)?;
+    let mut table = write.open_table(crate::fixtures::ROWS)?;
+    let replaced_immutable = table
+        .insert(immutable.as_slice(), b"B".as_slice())?
+        .is_some();
+    assert!(replaced_immutable);
+    let replaced_alias = table
+        .insert(alias_key.as_slice(), alias.as_slice())?
+        .is_some();
+    assert!(replaced_alias);
+    drop(table);
+    write.commit()?;
+    drop(database);
+    assert_eq!(crate::fixtures::raw_rows(&path)?, expected);
+    assert_eq!(f::raw_manifest(&path)?, manifest);
+    let error = RedbStateStore::open(
+        &path,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreLimits::default(),
+    )
+    .err();
+    assert_eq!(error, Some(StateTransactionError::Corrupt));
+    std::fs::remove_dir_all(directory)?;
+    Ok(())
+}
