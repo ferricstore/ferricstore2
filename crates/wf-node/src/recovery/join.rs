@@ -184,6 +184,9 @@ fn audit_normal(
     if profile == 4 {
         return super::original_policy::audit(body, limits, base, stamp);
     }
+    if profile == 8 {
+        return super::workflow_values::audit(body, limits, base, stamp);
+    }
     let available = limits
         .workspace
         .checked_sub(total(&[base, 512])?)

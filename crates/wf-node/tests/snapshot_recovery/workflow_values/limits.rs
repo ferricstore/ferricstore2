@@ -324,3 +324,58 @@ fn external_scope(limits: &Limits) -> TestResult {
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn value_recovery_scope_conversion_is_admitted_before_identity_owners() -> TestResult {
+    let enabled =
+        v::limits()?.with_workflow_value_limits(1_024, 64 * f::MIB, 64 * f::MIB, 64 * f::MIB);
+    assert!(
+        enabled.is_ok(),
+        "explicit value recovery opt-in must succeed"
+    );
+    let limits = enabled?;
+    let dir = f::directory("value-scope-conversion-owner")?;
+    let scope = f::scope_for(&[0xff; 4_096], b"g", b"z")?;
+    let (mut log, state) = v::pair_for(&dir, &scope)?;
+    let frame = v::encode(&v::batch(
+        &scope,
+        5,
+        b"conversion",
+        100,
+        vec![v::create(b"i", 100, b"A")?],
+        v::witness(None)?,
+    )?)?;
+    f::append(&mut log, 0, frame.as_bytes())?;
+    log.save_committed(f::at(0))?;
+    drop((log, state));
+    let before = v::cohort(&dir)?;
+    let logs = f::log_rows(&dir)?;
+    let metadata = f::log_meta(&dir)?;
+    let mut normal = limits.normal_limits();
+    normal.workspace_bytes = 1;
+    let q = 512 + 4_096 + 1 + 1;
+    let old_peak = base()
+        + size_of::<Option<WorkflowValueTransactionLimits>>()
+        + 512
+        + frame.as_bytes().len()
+        + q
+        + 1;
+    let cap = profile(
+        normal,
+        old_peak,
+        (1, frame.as_bytes().len(), 512 + frame.as_bytes().len()),
+        (100, 1536, 1024, 131),
+    )?
+    .with_workflow_value_limits(1_024, 64 * f::MIB, 64 * f::MIB, 64 * f::MIB)?;
+    let (log, state) = f::open_pair_for(&dir, &scope)?;
+    assert_eq!(
+        recover_committed(log, state, scope.group(), scope.recovery(), cap).err(),
+        Some(Error::Limit)
+    );
+    drop(f::open_pair_for(&dir, &scope)?);
+    assert_eq!(v::cohort(&dir)?, before);
+    assert_eq!(f::log_rows(&dir)?, logs);
+    assert_eq!(f::log_meta(&dir)?, metadata);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

@@ -65,7 +65,8 @@ fn snapshot_case(mode: u8, limits: &super::Limits) -> TestResult {
     for route in ["matching", "fresh"] {
         let target = dir.join(route);
         std::fs::create_dir(&target)?;
-        received(&target, route, &wire, &suffix, &policy, original, limits)?;
+        received(&target, route, &wire, &suffix, &policy, original, limits)
+            .map_err(|error| format!("value snapshot mode {mode}, route {route}: {error:?}"))?;
         finish(&target, &wire, mode, &policy, limits)?;
         let observed = v::cohort(&target)?;
         assert_eq!(observed[1], expected[1]);

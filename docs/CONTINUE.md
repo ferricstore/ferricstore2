@@ -5,7 +5,7 @@ GPT-6.1-sol/max agents use disjoint writes and dedicated architecture and
 performance reviews. Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The last completed backend checkpoint825051f passed **1,119 Rust tests**: all 1,097 compatibility identities
+The last completed backend checkpoint `825051f` passed **1,119 Rust tests**: all 1,097 compatibility identities
 plus all 22 workflow-value feature cases. Exact package/target/name/status
 comparison preserves the earlier 1,093 identities and four restoration cases,
 all 102 targets and both benchmark correctness smokes. Six documentation tests
@@ -34,24 +34,29 @@ remain; separate known4-malformed controls were added. Whole-file inverses prove
 every other prior case/order/assertion unchanged. Earlier local W512 producer
 funding likewise preserves all individual caps and shared fixtures.
 
-The IMMEDIATE next gate is real Node operation8 audit/replay after the reviewed
-compiled rejecting checkpoint. All70 existing recovery identities pass EXACTLY:
-22 committed-recovery cases and48 snapshot cases. Strict workspace/all-target
-Clippy and all53 architecture checks pass. Eight new source-complete scenario
-tests compile and all eight fail only at their explicit first opt-in assertion:
-session54232, unchanged1650/c35160b0, raw10593007+4759/07e5e351. Their later audit,
-replay, snapshot, resource and fault tails remain masked. The setter literally
-refuses UnsupportedEntry; actual8 routing remains disabled. Missing-contract
-compiler evidence preceded the selected data/error/profile scaffold.
+The Node operation-8 rejecting checkpoint is saved in `032939b`: 70 old recovery
+identities passed and all eight new tests failed at their first opt-in assertion.
+Real audit/replay bodies were written only afterward. The first complete run
+passes seven original scenario tests. The snapshot scenario fails because its
+receiver fixture commits suffix 2 before offering snapshot 1; the existing
+strictly-newer guard correctly rejects that premise. Mode/route diagnostics
+confirm the reached mode-1 matching receiver.
 
-Internal immutable-profile borrowing clears the280-byte passing lint without
-changing public APIs or adding allocation. Legacy producers retain raw old caps
-and F-funded original decoder/scope/driver boundaries. Complete four/six-table
-oracles follow actual fixture construction; all original assertions remain.
-Architecture/performance/author reviews and complete beforeimage inverses close
-the technical edits; no waiver/native-speed or full parity claim follows.
-The actual compiled eight-RED checkpoint MUST be saved before real setter and
-audit/replay BODY is enabled. See the coordination record for the exact release.
+Performance review found a separate scope Vec-to-Box construction allowance.
+A ninth test reaches the intended failure: actual inner Value/Record/Transaction
+Limit, expected an earlier Node Limit at the old outer peak. Session 9036 records
+7 passes and these 2 failures, unchanged 1650/43039f26,
+raw 10613813+2253/58a52b75; strict Clippy passes. All original eight assertions
+and producers remain intact except diagnostic context. The genuine counterexample
+must be saved before either selected correction.
+
+The selected correction admits scope Q plus max(driver V, largest actual scope
+leaf + Vec header), retaining full J and Qv. It preserves the original V=1 inner
+refusal behind a funded outer producer. Snapshot receivers must install boundary 1
+before committing/replaying suffix 2; all modes and full value/catalog/owned-read
+oracles remain. Identity APIs, legacy budgets and production snapshot guards stay
+unchanged. The coordination record assigns disjoint authors after the save.
+No passing nine-test, accepted-service, full parity or measured-speed claim exists.
 
 Typed/shared/external values, public hydration, real lifecycle cleanup/rewind/
 recreation, mandatory original Elixir profiles, native failures, Linux and macOS

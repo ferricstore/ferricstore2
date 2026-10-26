@@ -85,6 +85,9 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
+    if profile == 8 {
+        return super::workflow_values::apply(state, entry, fields, (limits, base));
+    }
     if profile == 2 && !limits.core_policy {
         return Err(Error::UnsupportedEntry);
     }
@@ -169,7 +172,7 @@ fn normal(
     Ok(control)
 }
 
-fn copy(bytes: &[u8]) -> Result<Vec<u8>, Error> {
+pub(super) fn copy(bytes: &[u8]) -> Result<Vec<u8>, Error> {
     let mut output = Vec::new();
     output
         .try_reserve_exact(bytes.len())
