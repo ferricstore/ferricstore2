@@ -20,6 +20,9 @@ impl Inspector<'_, '_> {
                 | "log::record_batch::atomic_start::response::scan"
         ) || [
             "blob",
+            "clock",
+            "consensus::value",
+            "log::value_batch",
             "log::record_batch::phase",
             "log::record_batch::fresh",
             "log::record_batch::independent",

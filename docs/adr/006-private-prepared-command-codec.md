@@ -1591,3 +1591,23 @@ selection preserves the source CRC32 convention. Borrowed views and constructed
 keys grant no placement, transaction, authorization, admission or durability
 authority. Actual publication, routed reads and history hydration remain later
 contracts; no domain, wire or client boundary changes here.
+
+
+## Value integration port purity classification prerequisite
+
+VALUE-CONSUMED-BINARY1-M0-PURITY1 extends the existing recursive pure-source
+classification to exactly wf-ports::consensus::value,log::value_batch and clock.
+They hold deterministic preparation data/codec work and clock PORT contracts;
+real clock observation belongs to a separately selected effectful server adapter.
+Filesystem, standard-library time and thread effects remain forbidden here.
+The existing exact hash dependency/Vec positives and client/worker boundaries
+remain; no dependency, visibility, unsafe, suppression or size exemption is added.
+
+The existing value-byte architecture test loop first produces an actual compiled
+missing-diagnostic assertion failure under old classification, saved in627eecc.
+The fix adds only those three recursive prefixes, with all old module controls
+retained. This technical M0 evidence does not establish value publication,
+clock authority, business TDD, an encoding/layout version or workflow parity.
+The connected value R0 still requires its exact public/registry/test creation
+contract before any source/model/helper release. Linux and macOS evidence stay
+separate; no runtime, allocation or performance result is inferred here.

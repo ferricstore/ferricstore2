@@ -531,3 +531,38 @@ technical RED, never missing workflow business behavior or full-source coverage.
 Root saves the callable existing test regression before adding the three exact
 recursive prefixes and ADR006 rationale; production classification is unchanged
 at this checkpoint. Existing workflow full-green checkpoint stays5255116.
+
+
+## VALUE-CONSUMED-BINARY1-M0-PURITY1 exact rule fix and technical GREEN
+
+The missing-diagnostic regression was saved in627eecc before implementation.
+Root adds ONLY clock,consensus::value,log::value_batch to the recursive pure
+prefix array, preserving the exact ancestor-boundary matcher and all old rules.
+New purity.rs48LF/1770B/22bf8b60262cd6dc359f078eeeea7d06d5f75c2f515f5359556c68d8004e6bb2;
+remove ONLY those three lines ->ENTIRE olda83dcbc6. Existing test stays ENTIRE
+47LF/1487B/89f90d2a7326b72b1313438fd32588ece64f53753cdb0bcb61414483945d2f97.
+ADR006 retains its entire prior106410B/07d56616 prefix and appends1243B of narrow
+port/codec/abstract-clock purity rationale. No runtime encoder/clock/format,
+new file/function/model/helper/test identity/dependency/waiver or business work.
+
+Actual technical8 session58090 TERMINAL0/UNCHANGED1605/
+b7c9b3bb49a2d9f1807d27e2488533af4febc9ec81f6cdd6ad152c49fee6fbdd.
+Whole packet9649375+9339/00f0f78d626f3763d2debb9157661a568c978c19e7fe12522a03f6ab68a0ff14.
+Target9650809+477/a81671d22abece15ab106c8923a08a085245fce662bcf2b44fdba9e32059a2e7
+is1PASS/44 deliberately selected out; all new loop tails now finish. All arch53
+pass at9651473+5713/d256011133d4ec4109b58c71833fe26acd7bb8bb3b220c4f8cab7de5a97bff87.
+Root independently compares exact old53 name/status Counters with the prior
+same cargo-arch output9640572+5593/9a95b7bb. Format/tooling all-target compile/
+strictClippy/reference480/progress120132550/diff pass. No current full1093 rerun,
+new workflow business RED, Linux or endpoint result follows this M0 increment.
+PERF is independently reviewing Root's exact three-file technical change.
+
+
+M0 independent finite Root cross-review accepted: PERF276740+4727/
+ac89c00609208ef4651aa3f8562153fa95c67ed7f7e63c0b629aa9aed86ca227,
+end281467, actually whole/hash-read by Root. Reviewer independently checks the
+three complete source/ADR inverses, diagnostic RED, full GREEN8, same selected
+case/artifact and all53 old architecture names/statuses. No remaining scoped
+classification defect or extra acknowledgement gate. Root saves only this small
+technical fix and its two own records; new source R0 is still unreleased until
+the exact core33935/e5dfa264+amend19569/1eb322b5 are adopted.
