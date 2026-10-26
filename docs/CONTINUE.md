@@ -51,22 +51,26 @@ compile/doc/architecture/reference/progress/dependency/diff checks. Its exact
 identity Counter is 51afde2c; only nine Node cases extend the prior 1,119.
 This is local macOS execution, not Linux or mandatory original-profile evidence.
 
-Architecture and performance selected complete HistoryValues collection/overlay
-as the next pure prerequisite. Its exact eighteen-case, six-file test batch now
-compiles against ordinary models and two literal rejecting functions. All
-eighteen cases actually fail their first healthy prepare assertion with Limit;
-their complete later tails are compiled and masked. Focused compilation,
-strict Clippy, all53 architecture checks, formatting, domain documentation,
-reference/progress integrity and diff checks pass after technical corrections.
-Reciprocal source review is complete. This is the reviewed rejecting baseline
-required before business implementation; the coordination record binds its save
-and subsequent disjoint authorship release.
+The pure HistoryValues collector/overlay now passes all eighteen unchanged
+full-tail cases after its saved rejecting baseline `00133c0`. Reciprocal source
+and resource-account reviews are complete. Formatting, whole-workspace
+compilation and strict Clippy pass. Full workspace execution remains unverified:
+the old architecture checker stopped on iterator metadata classification and
+bare-crate visibility metadata, with four findings in the new pure sources.
+
+The selected M0 correction preserves the existing architecture identities and
+adds 43 specific forbidden controls, 14 collected positive examples and a real
+private-helper E0603 compiler control. Under the unchanged checker, all forbidden
+controls execute before the intended terminal positive-example failure; all
+three real compiler visibility tests pass. This reached M0 RED must be saved
+before the narrow classifier change. It provides no full-workspace GREEN,
+source mapping, public hydration or platform acceptance credit.
 
 The selected behavior borrows original entries while ordered writes own full
 decoded values. Each decode attempt, including corrupt data followed by
 continuation, retains its full work and cumulative requested-byte allowance.
 The concrete selection and staged authorship release are in the coordination
-record. These models and failing tests establish no working hydration behavior.
+record. Passing pure writes establish no physical acquisition or public hydration.
 
 Real size-aware reads, separately versioned typed publication, shared/named/
 external availability, ordered history hydration and authoritative routing/read

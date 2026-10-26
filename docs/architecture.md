@@ -1444,3 +1444,29 @@ explicit value-limit opt-in; [its audit/replay contract](adr/007-durable-log-sto
 retains the original body, captured context and consumed storage driver. Typed/shared/
 external values, public hydration, real lifecycle maintenance, required original
 profiles, native/Linux acceptance and the ordered milestone exits remain open.
+
+
+## Selected pure history-value overlay
+
+HISTORY-VALUE-OVERLAY1 keeps collection and field projection in the pure domain.
+An entry borrows its complete original source and captured reference fields;
+preparation returns stable references for a caller's later read. Application
+consumes captured results and returns ordered field writes whose decoded values
+own complete documents. No fetch, callback, document clone, source reconstruction
+or new dependency edge is introduced. Unwritten fields retain their original
+values, including stale flags and unrelated typed data.
+
+Semantic omission uses complete stored byte counts. It precedes per-occurrence
+copying and decoder context/profile validation. Repeated references share one
+collected reference; each decode attempt copies its input independently.
+One continuous work account and cumulative requested-owner account span
+preparation and application, including corrupt-data continuation. The
+[codec ADR](adr/006-private-prepared-command-codec.md#selected-pure-history-value-overlay)
+records the selected cardinality, threshold, error and resource contracts.
+
+Captured results and pure writes establish no storage availability, authorization,
+placement or strong-read authority. Real size-aware acquisition, separately
+versioned typed publication, shared/named/external availability, ordered history
+and binding acquisition, service routing/read barriers and lifecycle maintenance
+remain required connected work. Implementation and execution status is in the
+[handoff](CONTINUE.md); this selection earns no full-parity or platform credit.

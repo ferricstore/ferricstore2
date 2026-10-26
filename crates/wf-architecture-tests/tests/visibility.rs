@@ -102,6 +102,13 @@ fn approved_facades_compile_and_private_facades_fail_for_the_right_reason()
         )?,
         "E0603",
     )?;
+    assert_error(
+        &compile(
+            "pub use wf_domain::value::decode_fixed_bytes;",
+            &["wf-domain"],
+        )?,
+        "E0603",
+    )?;
     Ok(())
 }
 

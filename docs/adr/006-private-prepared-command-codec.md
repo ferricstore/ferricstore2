@@ -1644,3 +1644,60 @@ and snapshot semantics are in
 [ADR-007](007-durable-log-storage.md#binary-workflow-values-and-captured-lifecycle).
 This private profile does not establish transport/public hydration capability,
 full source/setup parity or accepted runtime readiness.
+
+
+## Selected pure history-value overlay
+
+HISTORY-VALUE-OVERLAY1 selects two callback-free domain operations: prepare stable
+references from borrowed original entries, then consume a captured read batch
+into ordered writes over the same original base. Generic original sources may
+retain arbitrary typed fields and event identities; the transformer neither
+clones nor reconstructs them. Decoded writes own complete original-value
+documents and retain no borrow into dropped read buffers or compatibility tables.
+Collection preserves event and payload/result/error order and the first equal
+binary backing, without requiring a generated storage-key grammar.
+
+Disabled or genuinely empty history skips reads and threshold computation.
+Every enabled nonempty history computes a checked positive threshold, even when
+no references can be fetched: signed maxima below1 yield1, otherwise max+1 must
+fit usize. An empty fetch list requires batch=None but still processes oversized
+reference errors. Captured direct lists preserve source zip truncation; mixed
+eligibility masks with a mismatched reply length restore missing slots. Actual
+backend adapters remain responsible for their ordered cardinality and failures.
+
+Missing writes nil then its missing flag; stored-size omission writes its omitted
+flag then the exact complete stored size. Success writes the full decoded value
+then stored size. Storage failure and invalid stored-value corruption write only
+their static sanitized errors; unrelated result classes write nothing. No branch
+implicitly clears stale fields. Only InvalidFlowValue becomes a field error;
+context/profile, resource and reservation failures remain operational errors.
+Stored-size selection precedes per-occurrence copying and compatibility checks.
+Each decode attempt, including repeated fields, gets an independent fallibly
+reserved input owner.
+
+The plan retains one checked work account and one conservative CUMULATIVE
+requested-owner liability across preparation and application. Six positive
+outer-limit checks form a bounded bootstrap before the account exists. After
+that bootstrap, incoming read capacities, reference/result/write spines, copies,
+relocation, fixed metadata, each reached event and both equality operands are
+prospectively admitted. Every
+decode attempt independently prepays its entire decoder work cap W on BOTH work
+and requested backing liabilities, without refund after invalid-data continuation.
+The old public decoder, private workers and meter remain unchanged.
+
+Private fixed-byte helpers expose conservative checked decoder metadata H using
+the actual target types. Caller coverage additionally names the helpers'14/6
+size/count arrays and IntoIter phases, scalar/result metadata and bounded
+computation work before calling them. These allowances are distinct from W and
+the input/outer owners. They do not certify allocator capacity, native stack,
+RSS, recoverable OOM or a measured speed improvement. Actual stopped-source
+event/coexistence review and complete test execution remain acceptance gates.
+
+This pure capture/delta contract adds no persistent representation, fetch,
+physical fallback, accepted service or read barrier. Actual size-aware reads,
+separately versioned typed/common publication preserving binary8 bytes,
+shared/named/external availability, ordered history acquisition and public
+hydration/routing remain required. The coordination record binds the selected
+files/models and genuine saved RED before BODY; the handoff records current
+execution status. The original source mappings, native/Linux/macOS evidence and
+ordered milestone exits remain separate and unfinished.

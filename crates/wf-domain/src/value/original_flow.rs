@@ -15,6 +15,39 @@ pub use model::{
     OriginalValueFunctionIdentity, OriginalValueLimits, OriginalValueNode,
 };
 
+/// Conservative fixed decoder metadata, excluding separately charged backing.
+pub(crate) fn decode_fixed_bytes() -> Result<usize, OriginalFlowValueError> {
+    use std::mem::size_of;
+
+    let parts = [
+        (size_of::<OriginalValueDocument>(), 1),
+        (
+            size_of::<Result<OriginalValueDocument, OriginalFlowValueError>>(),
+            1,
+        ),
+        (size_of::<Budget>(), 1),
+        (size_of::<OriginalValueLimits>(), 1),
+        (size_of::<ContextState>(), 1),
+        (size_of::<Scanner<'static, 'static, 'static, 'static>>(), 2),
+        (size_of::<ScanTarget<'static>>(), 2),
+        (size_of::<scan::Census>(), 2),
+        (size_of::<scan::TermSummary>(), 8),
+        (size_of::<Option<scan::TermSummary>>(), 4),
+        (size_of::<scan::frame::ParseFrame>(), 4),
+        (size_of::<OriginalValueNode>(), 4),
+        (size_of::<ValueEncoding>(), 1),
+        (equality::fixed_owner_bytes()?, 1),
+    ];
+    parts
+        .into_iter()
+        .try_fold(0_usize, |total, (width, count)| {
+            width
+                .checked_mul(count)
+                .and_then(|part| total.checked_add(part))
+                .ok_or(OriginalFlowValueError::Limit)
+        })
+}
+
 /// Decode stored source value bytes into an owned typed document.
 ///
 /// The unchanged input owner and flat postorder arenas retain typed values.

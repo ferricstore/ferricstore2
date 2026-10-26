@@ -42,6 +42,28 @@ struct ListCursor {
     position: usize,
 }
 
+/// Conservative fixed equality metadata; scratch backing is separately charged.
+pub(in crate::value::original_flow) fn fixed_owner_bytes() -> Result<usize, E> {
+    use std::mem::size_of;
+
+    let parts = [
+        (size_of::<Vec<CompareFrame>>(), 1),
+        (size_of::<CompareStep>(), 2),
+        (size_of::<CompareFrame>(), 3),
+        (size_of::<ListCursor>(), 4),
+        (size_of::<(usize, usize)>(), 2),
+        (size_of::<Range<usize>>(), 2),
+    ];
+    parts
+        .into_iter()
+        .try_fold(0_usize, |total, (width, count)| {
+            width
+                .checked_mul(count)
+                .and_then(|part| total.checked_add(part))
+                .ok_or(E::Limit)
+        })
+}
+
 pub(in crate::value::original_flow) fn validate_maps(
     document: &D,
     budget: &mut Budget,

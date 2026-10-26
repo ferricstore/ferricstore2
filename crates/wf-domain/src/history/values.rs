@@ -3,7 +3,10 @@
 //! Captured references and read results carry no storage or routing authority.
 //! Requested-byte counters are conservative cumulative ownership liabilities.
 
+mod apply;
 mod budget;
+mod collect;
+mod decode;
 mod model;
 mod overlay;
 
@@ -21,11 +24,11 @@ use crate::value::OriginalValueContext;
 ///
 /// Returns an operational error when the request cannot be admitted.
 pub fn prepare_history_values<'a, T: ?Sized>(
-    _history: &'a [HistoryValueEntry<'a, T>],
-    _value_return: HistoryValueReturn,
-    _limits: HistoryValueLimits,
+    history: &'a [HistoryValueEntry<'a, T>],
+    value_return: HistoryValueReturn,
+    limits: HistoryValueLimits,
 ) -> Result<HistoryValuePlan<'a, T>, HistoryValueError> {
-    Err(HistoryValueError::Limit)
+    collect::prepare(history, value_return, limits)
 }
 
 /// Apply captured results as ordered writes without changing original entries.
@@ -34,9 +37,9 @@ pub fn prepare_history_values<'a, T: ?Sized>(
 ///
 /// Returns malformed-batch, operational decode, resource or reservation errors.
 pub fn apply_history_value_results<'a, T: ?Sized>(
-    _plan: HistoryValuePlan<'a, T>,
-    _batch: Option<HistoryValueReadBatch<'_>>,
-    _context: &OriginalValueContext<'_>,
+    plan: HistoryValuePlan<'a, T>,
+    batch: Option<HistoryValueReadBatch<'_>>,
+    context: &OriginalValueContext<'_>,
 ) -> Result<HistoryValueOverlay<'a, T>, HistoryValueError> {
-    Err(HistoryValueError::Limit)
+    apply::apply(plan, batch, context)
 }
