@@ -22,6 +22,15 @@ documentation build and offline dependency checks pass. Existing tests were
 checked separately from the twelve new cases, whose actual failures are recorded
 above. These checks do not establish full workflow parity or Linux acceptance.
 
+The separate captured-lifecycle restoration prerequisite now passes **all nine
+unchanged tests**: the five earlier cases and four tests saved failing in
+`9b5bd52`. All ten focused checks pass, including strict Clippy, the domain
+documentation test and 53 architecture checks. Restoration validates recorded
+birth configuration and exact persisted scalars without clamping or consulting
+current policy. The performance reviewer independently checked source, the
+whole-file inverse and actual results. This focused result does not constitute
+a new full-workspace run; connected value publication and Linux remain open.
+
 Architecture, implementation and performance owners reviewed each other's
 actual source and the failing runtime packet. Review strengthened the valid
 65,536-byte reference control, cross-log original-reply assertions and literal

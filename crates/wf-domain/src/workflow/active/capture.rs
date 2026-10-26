@@ -126,13 +126,31 @@ impl std::error::Error for ActiveValueError {}
 /// # Errors
 /// Refuses invalid configuration, active duration or captured retention counts.
 pub fn restore_captured_lifecycle(
-    _max_active_ms: Option<u64>,
-    _retention_ttl_ms: u64,
-    _history_hot_max_events: u32,
-    _history_max_events: u32,
-    _defaults: LifecycleDefaults,
+    max_active_ms: Option<u64>,
+    retention_ttl_ms: u64,
+    history_hot_max_events: u32,
+    history_max_events: u32,
+    defaults: LifecycleDefaults,
 ) -> Result<CapturedLifecycle, ActiveValueError> {
-    Err(ActiveValueError::InvalidCapturedRetention)
+    validate_defaults(defaults)?;
+    let max_active_ms = resolve_active(max_active_ms, MaxActiveOverride::Inherit)?;
+    RetentionOverride {
+        ttl_ms: Some(retention_ttl_ms),
+        history_max_events: Some(history_max_events),
+    }
+    .validate(defaults.max_history_max_events)
+    .map_err(|_| ActiveValueError::InvalidCapturedRetention)?;
+    if u64::from(history_hot_max_events) > defaults.max_history_hot_max_events
+        || history_hot_max_events > history_max_events
+    {
+        return Err(ActiveValueError::InvalidCapturedRetention);
+    }
+    Ok(CapturedLifecycle {
+        max_active_ms,
+        retention_ttl_ms,
+        history_hot_max_events,
+        history_max_events,
+    })
 }
 
 /// Resolves defaults/type/state/command before retaining any new byte owner.

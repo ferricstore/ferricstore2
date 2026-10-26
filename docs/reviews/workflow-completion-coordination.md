@@ -53765,3 +53765,15 @@ future codec consultation notes remain untouched/UNSTAGED. No scalar BODY
 executes before this SAVE, no codec source release or endpoint/parity/Linux
 completion is implied. The prior journal hash is retained for exact cddc
 validated-inventory reconstruction after this single controlled append.
+
+
+STORED-LIFECYCLE-RESTORE1 R0 is now actually SAVED9b5bd5279d7cda77e6f9ef53f296d809ea5d53e3 (exact source3+own journal; future codec notes unstaged). Root releases ONLY existing capture.rs restore_captured_lifecycle5 BODY under the unchanged selected3784/33043406 semantics: old defaults validator first, optional active validation, bounded positive TTL/history and hot<=history/config cap, exact scalar construction. Reuse existing private validators; no new helper/type/owner. Active reexport, all nine tests and fixture stay frozen. All other repository inputs except three active role notes are held through Root STOP/workloads. No codec writer is released; finite source/runtime peer reviews follow normally.
+
+
+### STORED-LIFECYCLE-RESTORE1 BODY checkpoint
+
+Saved R0 is9b5bd5279d7cda77e6f9ef53f296d809ea5d53e3. Root changed only the selected restore function: capture277/10115/5ce4f1bc7924a018db36d74c4cc120605f2f48d819a71ef0e8497007df4460bb; exact function inverse restores ENTIRE R0capture259/9467/9103ba1f. Tests498/d2d775a4, active reexport and fixtures remain literal. Held1617/55d8df73 remained unchanged.
+
+Focused10 is terminal0 with all ten EXIT0/UNCHANGED1618/afddcf62: fmt, domain all-targets check/strict Clippy, exact lifecycle9, domain doc1/doc build, arch53, reference, progress and diff. Actual target9868832+1018/316cbff36f51878db4f385ce675dd22737680e0ca9b734e5f21df12496d69e66 preserves exact old5+new4 names; only the four saved R0 failures become passes. Maximum/no-clamp/default-first/active-first and None/hot0 tails now execute. Root independently hashed all ten raw outputs and verified the complete source inverse.
+
+Actual PERF source/runtime acceptance315336+2924/cc4c55298fceb9a975eb2dadd506c5e5d73e85c28bdca25edbb228e2ddf99eca was whole/hash-read; bounded scalar validation adds no byte owner, clone or policy lookup. ARCH's later codec note/reciprocal BODY receipt remains separate; no unsupported written-review claim or additional ACK gate. Root saves only capture.rs, CONTINUE and this journal. Active future codec notes remain unstaged. This focused checkpoint does not claim full1097 execution, new endpoint GREEN, native/Linux acceptance or completion of the unchanged full M1-M8/parity goal. The pre-update shared-document hashes are retained for whole-inventory reconstruction after this controlled insertion/append.
