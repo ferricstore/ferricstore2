@@ -10,8 +10,10 @@ use wf_domain::policy::complete::{
     PolicySchemaLimits, StoredLifecycleCaptureError as CaptureError, StoredPolicyValue,
     capture_stored_creation_lifecycle, decode_original_complete_policy_entry_portable,
 };
-use wf_domain::retention::RetentionOverride;
-use wf_domain::workflow::active::{ActiveValueError, LifecycleOverrides, MaxActiveOverride};
+use wf_domain::retention::{MAX_HISTORY_EVENTS, MAX_RETENTION_MILLIS, RetentionOverride};
+use wf_domain::workflow::active::{
+    ActiveValueError, LifecycleOverrides, MaxActiveOverride, restore_captured_lifecycle,
+};
 
 #[test]
 fn stored_lifecycle_captures_complete_policy_precedence() -> TestResult {
@@ -368,6 +370,129 @@ fn stored_lifecycle_capture_survives_backing_drop() -> TestResult {
             ),
             (Some(5_000), 22_000, 2, 40),
         );
+    }
+    Ok(())
+}
+
+#[test]
+fn stored_lifecycle_restore_preserves_exact_birth_scalars() -> TestResult {
+    let restored = restore_captured_lifecycle(Some(5_000), 22_000, 4, 40, input().defaults);
+    assert!(restored.is_ok(), "{:?}", restored.as_ref().err());
+    let Ok(restored) = restored else {
+        return Err("expected exact persisted capture".into());
+    };
+    assert_eq!(
+        (
+            restored.max_active_ms(),
+            restored.retention_ttl_ms(),
+            restored.history_hot_max_events(),
+            restored.history_max_events()
+        ),
+        (Some(5_000), 22_000, 4, 40),
+    );
+    Ok(())
+}
+
+#[test]
+fn stored_lifecycle_restore_accepts_infinite_active_and_zero_hot() -> TestResult {
+    let mut defaults = input().defaults;
+    defaults.history_hot_max_events = 0;
+    let restored = restore_captured_lifecycle(None, 33_000, 0, 50, defaults);
+    assert!(restored.is_ok(), "{:?}", restored.as_ref().err());
+    let Ok(restored) = restored else {
+        return Err("expected infinite active and zero hot capture".into());
+    };
+    assert_eq!(
+        (
+            restored.max_active_ms(),
+            restored.retention_ttl_ms(),
+            restored.history_hot_max_events(),
+            restored.history_max_events()
+        ),
+        (None, 33_000, 0, 50),
+    );
+    Ok(())
+}
+
+#[test]
+fn stored_lifecycle_restore_refuses_corrupt_scalars_without_clamping() -> TestResult {
+    let defaults = input().defaults;
+    let restored = restore_captured_lifecycle(Some(5_000), 22_000, 2, 40, defaults);
+    assert!(restored.is_ok(), "{:?}", restored.as_ref().err());
+    let Ok(_) = restored else {
+        return Err("expected valid restoration control".into());
+    };
+    let boundary = restore_captured_lifecycle(
+        Some(MAX_RETENTION_MILLIS),
+        MAX_RETENTION_MILLIS,
+        100,
+        1_000,
+        defaults,
+    );
+    assert!(boundary.is_ok(), "{:?}", boundary.as_ref().err());
+    let boundary = boundary?;
+    assert_eq!(
+        (
+            boundary.max_active_ms(),
+            boundary.retention_ttl_ms(),
+            boundary.history_hot_max_events(),
+            boundary.history_max_events()
+        ),
+        (Some(MAX_RETENTION_MILLIS), MAX_RETENTION_MILLIS, 100, 1_000),
+    );
+    for active in [Some(0), Some(MAX_RETENTION_MILLIS + 1)] {
+        assert!(matches!(
+            restore_captured_lifecycle(active, 22_000, 2, 40, defaults),
+            Err(ActiveValueError::InvalidCapturedActive)
+        ));
+    }
+    assert!(matches!(
+        restore_captured_lifecycle(Some(0), 0, 101, 0, defaults),
+        Err(ActiveValueError::InvalidCapturedActive)
+    ));
+    for (ttl, hot, total) in [
+        (0, 2, 40),
+        (MAX_RETENTION_MILLIS + 1, 2, 40),
+        (22_000, 2, 0),
+        (22_000, 2, 1_001),
+        (22_000, 41, 40),
+        (22_000, 101, 200),
+    ] {
+        assert!(matches!(
+            restore_captured_lifecycle(Some(5_000), ttl, hot, total, defaults),
+            Err(ActiveValueError::InvalidCapturedRetention)
+        ));
+    }
+    Ok(())
+}
+
+#[test]
+fn stored_lifecycle_restore_revalidates_configured_defaults() -> TestResult {
+    let restored = restore_captured_lifecycle(Some(5_000), 22_000, 2, 40, input().defaults);
+    assert!(restored.is_ok(), "{:?}", restored.as_ref().err());
+    let Ok(_) = restored else {
+        return Err("expected valid configuration control".into());
+    };
+    for case in 0..9 {
+        let mut defaults = input().defaults;
+        match case {
+            0 => defaults.max_history_hot_max_events = 0,
+            1 => defaults.max_history_max_events = 0,
+            2 => defaults.max_history_max_events = MAX_HISTORY_EVENTS + 1,
+            3 => defaults.history_max_events = 1_001,
+            4 => {
+                defaults.history_max_events = 200;
+                defaults.history_hot_max_events = 101;
+            }
+            5 => defaults.history_hot_max_events = 11,
+            6 | 8 => defaults.ttl_ms = 0,
+            _ => defaults.ttl_ms = MAX_RETENTION_MILLIS + 1,
+        }
+        let active = if case == 8 { Some(0) } else { Some(5_000) };
+        assert!(matches!(
+            restore_captured_lifecycle(active, 22_000, 2, 40, defaults),
+            Err(ActiveValueError::InvalidCapturedRetention)
+        ));
     }
     Ok(())
 }

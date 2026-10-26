@@ -26,7 +26,7 @@ mod values;
 pub(crate) use capture::capture_lifecycle_layers;
 pub use capture::{
     ActiveValueError, CapturedLifecycle, LifecycleDefaults, LifecycleOverrides, MaxActiveOverride,
-    capture_lifecycle,
+    capture_lifecycle, restore_captured_lifecycle,
 };
 pub use history::{ActiveHistory, HistoryKey, HistoryTrim};
 pub use indexes::{ActiveIndexDelta, ActiveIndexKey, ActiveIndexRows, active_rows, index_deltas};

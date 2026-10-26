@@ -53738,3 +53738,30 @@ the complete validated e096 inventory after this controlled documentation change
 Progress remains120/132/550 with original HistoryValues arrays empty; M1-M8,
 full required source/profiles, real typed/shared/external/hydration/cleanup/
 rewind/recreation, native failures and independent Linux acceptance remain open.
+
+
+### STORED-LIFECYCLE-RESTORE1 exact scalar R0 release
+
+Root actually whole/hash-read ARCH476461+3784/330434067ad91cafaca0753c15a16a1a26d27905816a2f730503e5becc0690a7 and adopts its exact three-existing-path batch. Root alone writes active/capture.rs (one restore_captured_lifecycle5 literal InvalidCapturedRetention rejector), active.rs reexport, and tests/stored_lifecycle/main.rs (the four named restore cases). No new file/type/helper/dependency/byte owner. Existing five functions/fixtures and the saved value-integration twelve cases remain literal. Capture uses recorded birth configuration/caps; no current-policy recapture/clamp/authority grant.
+
+Codec source is still consultation-held; other agents append only their own three active notes. All other regular repository inputs are held. Root STOP/technical checks/genuine four first-positive assertion failures/SAVE precede scalar BODY. No formatter/compiler/VM/Git/shared-file mutation while any source writer is live. This necessary recovery predecessor does not reduce the active full M1-M8/parity/Linux objective.
+
+
+STORED-LIFECYCLE-RESTORE1 micro-R0 is compiled and independently accepted.
+Technical3 all exit0/UNCHANGED1618/cddcd40fb2dc288c723f525c4e7df287053fa577f90f07a2a29d3958b8492a29.
+RED4 session38581 TERMINAL101: fullpacket9865503+2111/
+d8df56470ba9f62901771af8da13bd77ba60e0afc8e2815bf25c2ebb0f294d19;
+raw9865757+1832/12ca2a05571b0114a712a84b0128d4801307dc3aac772b73bb05e3bf9e73b102.
+Root/ARCH/PERF exact four-name Counter0PASS4FAIL/0ignored/measured/5oldfiltered;
+all fail the first restored.is_ok with InvalidCapturedRetention. Getter/max/
+no-clamp/default-priority tails are masked, not passing. Canonical source3
+9103ba1f/6051b05e/d2d775a4; new spans17/19/50/29, target498.
+Whole inverses recover capture243/a18bf68a,active233/f3143f2b and ENTIRE old
+main373/da5ef001; old fixtures and all1615/50a5aece held inputs remain literal.
+Actual reciprocal source/runtime reviews ARCH480245+2097/0952b968 and
+PERF313728+1608/dd022276 are whole/hash-read and agree, no remaining issue.
+Root saves ONLY these three source paths and this existing journal; active
+future codec consultation notes remain untouched/UNSTAGED. No scalar BODY
+executes before this SAVE, no codec source release or endpoint/parity/Linux
+completion is implied. The prior journal hash is retained for exact cddc
+validated-inventory reconstruction after this single controlled append.

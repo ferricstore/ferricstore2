@@ -119,6 +119,22 @@ impl fmt::Display for ActiveValueError {
 }
 impl std::error::Error for ActiveValueError {}
 
+/// Restores exact birth scalars using their recorded creation configuration.
+///
+/// This validates ordinary data; storage separately establishes its binding.
+///
+/// # Errors
+/// Refuses invalid configuration, active duration or captured retention counts.
+pub fn restore_captured_lifecycle(
+    _max_active_ms: Option<u64>,
+    _retention_ttl_ms: u64,
+    _history_hot_max_events: u32,
+    _history_max_events: u32,
+    _defaults: LifecycleDefaults,
+) -> Result<CapturedLifecycle, ActiveValueError> {
+    Err(ActiveValueError::InvalidCapturedRetention)
+}
+
 /// Resolves defaults/type/state/command before retaining any new byte owner.
 ///
 /// # Errors
