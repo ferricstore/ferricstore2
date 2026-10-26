@@ -54,17 +54,22 @@ This is local macOS execution, not Linux or mandatory original-profile evidence.
 The pure HistoryValues collector/overlay now passes all eighteen unchanged
 full-tail cases after its saved rejecting baseline `00133c0`. Reciprocal source
 and resource-account reviews are complete. Formatting, whole-workspace
-compilation and strict Clippy pass. Full workspace execution remains unverified:
-the old architecture checker stopped on iterator metadata classification and
-bare-crate visibility metadata, with four findings in the new pure sources.
+compilation and strict Clippy pass. The narrow iterator-metadata and bare-crate
+visibility correction passes all 53 focused architecture checks. Full workspace
+execution remains unverified, and peer review found an import-order gap requiring
+a new failing regression before correction.
 
 The selected M0 correction preserves the existing architecture identities and
 adds 43 specific forbidden controls, 14 collected positive examples and a real
 private-helper E0603 compiler control. Under the unchanged checker, all forbidden
 controls execute before the intended terminal positive-example failure; all
-three real compiler visibility tests pass. This reached M0 RED must be saved
-before the narrow classifier change. It provides no full-workspace GREEN,
-source mapping, public hydration or platform acceptance credit.
+three real compiler visibility tests pass. That reached M0 RED was saved in
+`13e471c` before the narrow classifier change. Four further std/core forward and
+reversed named-import controls now reach the intended failure: all four return
+empty findings under that classifier. This reproducible RED is saved before the
+separately selected ordering fix; the same test identity and old controls remain.
+This provides no full-workspace GREEN, source mapping, public hydration or
+platform acceptance credit.
 
 The selected behavior borrows original entries while ordered writes own full
 decoded values. Each decode attempt, including corrupt data followed by

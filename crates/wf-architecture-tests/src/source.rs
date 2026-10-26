@@ -112,15 +112,8 @@ impl Inspector<'_, '_> {
         self.violations.push(message.to_owned());
     }
 
-    fn path(&mut self, written: &[String]) {
-        let Some(first) = written.first() else { return };
-        let path = if let Some(alias) = self.aliases.get(first) {
-            let mut path = alias.clone();
-            path.extend_from_slice(&written[1..]);
-            path
-        } else {
-            written.to_vec()
-        };
+    fn path(&mut self, written: &[String], exact_metadata: bool) {
+        let path = self.resolved_path(written);
         let Some(first) = path.first() else { return };
         let canonical = self
             .context
@@ -140,33 +133,7 @@ impl Inspector<'_, '_> {
             self.report("runtime source references M0-only tooling");
         }
         if self.pure() && matches!(first.as_str(), "std" | "core" | "alloc") {
-            const PURE_MODULES: &[&str] = &[
-                "borrow",
-                "cmp",
-                "collections",
-                "convert",
-                "default",
-                "error",
-                "fmt",
-                "hash",
-                "iter",
-                "marker",
-                "mem",
-                "num",
-                "ops",
-                "option",
-                "result",
-                "slice",
-                "str",
-                "string",
-                "vec",
-            ];
-            if path
-                .get(1)
-                .is_none_or(|module| !PURE_MODULES.contains(&module.as_str()))
-            {
-                self.report("pure values/domain source references effects or an unclassified standard-library module");
-            }
+            self.standard_path(&path, exact_metadata);
         }
         if self.context.package == "wf-wire"
             && canonical == "wf-domain"
@@ -311,6 +278,13 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
         syn::visit::visit_attribute(self, attribute);
     }
 
+    fn visit_visibility(&mut self, visibility: &'ast Visibility) {
+        if matches!(visibility, Visibility::Restricted(scope) if scope.path.is_ident("crate")) {
+            return;
+        }
+        syn::visit::visit_visibility(self, visibility);
+    }
+
     fn visit_path(&mut self, path: &'ast syn::Path) {
         self.path(
             &path
@@ -318,6 +292,7 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
                 .iter()
                 .map(|segment| segment.ident.to_string())
                 .collect::<Vec<_>>(),
+            true,
         );
         syn::visit::visit_path(self, path);
     }
@@ -326,7 +301,7 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
         let mut paths = Vec::new();
         use_paths(&item.tree, Vec::new(), &mut paths);
         for (path, alias) in paths {
-            self.path(&path);
+            self.path(&path, alias.is_some());
             if self.context.package == "wf-worker"
                 && !matches!(item.vis, Visibility::Inherited)
                 && (path.first().is_some_and(|first| first == "client")
@@ -338,7 +313,13 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
                 self.report("private worker transport modules cannot be re-exported");
             }
             if let Some(alias) = alias {
-                self.aliases.insert(alias, path);
+                let resolved = self.resolved_path(&path);
+                let target = if Self::metadata_iterator(&resolved) {
+                    resolved
+                } else {
+                    path
+                };
+                self.aliases.insert(alias, target);
             }
         }
         syn::visit::visit_item_use(self, item);
@@ -346,7 +327,7 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
 
     fn visit_item_extern_crate(&mut self, item: &'ast syn::ItemExternCrate) {
         let path = vec![item.ident.to_string()];
-        self.path(&path);
+        self.path(&path, false);
         if let Some((_, alias)) = &item.rename {
             self.aliases.insert(alias.to_string(), path);
         }

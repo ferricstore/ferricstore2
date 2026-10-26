@@ -44,6 +44,7 @@ fn workflow_value_bytes_stay_pure_and_server_side() -> CheckResult<()> {
         Vec::<String>::new()
     );
     assert_overlay_metadata_rejections()?;
+    assert_overlay_metadata_forward_alias_rejections()?;
     assert_overlay_metadata_positives()?;
     Ok(())
 }
@@ -146,6 +147,45 @@ fn assert_overlay_metadata_rejections() -> CheckResult<()> {
             "{package}::{module}: {source}: expected {diagnosis}, got {findings:?}"
         );
     }
+    Ok(())
+}
+
+fn assert_overlay_metadata_forward_alias_rejections() -> CheckResult<()> {
+    let mut observed = Vec::new();
+    for namespace in ["std", "core"] {
+        for (label, source) in [
+            (
+                "use after call",
+                format!(
+                    "fn hidden() {{ let _ = I::new([]); }} use {namespace}::array::IntoIter as I;"
+                ),
+            ),
+            (
+                "rename before anchor",
+                format!(
+                    "use First as Second; use {namespace}::array::IntoIter as First; fn hidden() {{ let _ = Second::new([]); }}"
+                ),
+            ),
+        ] {
+            let findings = source_check("wf-domain", "history::values::decode", &source);
+            observed.push((namespace, label, source, findings));
+        }
+    }
+    assert_eq!(observed.len(), 4);
+    let diagnostics = format!("{observed:#?}");
+    let mut rejected = true;
+    for (_, _, _, findings) in observed {
+        if !findings?
+            .iter()
+            .any(|finding| finding.contains("standard-library module"))
+        {
+            rejected = false;
+        }
+    }
+    assert!(
+        rejected,
+        "all forward/reversed metadata alias controls: {diagnostics}"
+    );
     Ok(())
 }
 

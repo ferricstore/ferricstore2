@@ -54394,3 +54394,31 @@ Source/account B acceptance and actual18 full-tail PASS remain separate; wholewo
 
 
 Final M0RED doc-sensitive15307 TERMINAL0 unchanged1663/48dc17e105c0b3e60f17f1f0e1dfb76558475e23ec6dfae19033310cf9dc56c0: reference10847417+365/80b95201, unchangedpartial progress10847949+561/c889cb4c, diff10848682+0. Root reverified this ENTIRE checked fingerprint immediately before only two CONTINUE word-spacing corrections and this controlled final journal append; actual00133 parent/emptyindex/exact17 selected paths, unchangedOLD checker pair and all six overlaytests held. Actual newpositiveRED and3PASS realprivacy evidence remain47962 above. Local M0RED save may stage ONLY these17 paths; no checkerBODY until successful actual save, no fullworkspace/product/platform claim.
+
+
+## OVERLAY-M0-METADATA1 actual RED save and checker BODY release
+
+Actual local M0RED13e471c7840ce73f10777efc35f990ea4a01c2a6 succeeded CLEAN with exact17 selected paths and unchanged checker pair. It contains reached old-checker terminalpositive0PASS1FAIL/all14 rows,43 earlier forbidden controls and real3PASS compilerprivacy, plus already reviewed18PASS businessB. No fullworkspaceGREEN/push/platform/parity completion.
+
+Root alone now receives checkerBODY for EXACT existing source.rs/purity.rs plus selected architecture paragraph, as ARCHcd6d7008. Preserve complete old PURE_MODULES list/condition/facade and all existing guards; move membership responsibility to existing purity impl for600line geometry. Add only narrow barecrate restricted-visibility traversal distinction, exact non-glob std/core3-segment IntoIter metadata, ordinary/use/extern rolebool and canonical storage of KNOWN metadata aliases to close suffix hiding. No new nominal field/type/model/file/dependency/public helper authority; all A0control/test bytes and all businessB/sixoverlaytests HELD. Root owns source/formatter/runtime/Git; peer actual-source/equivalence review follows Root STOP. No another general ACK gate. New uncovered semantic loopholes still require reachedRED+SAVE before correction. Fullgoal unchanged.
+
+
+Root exact M0BODY source/doc STOP: only existing source.rs/purity.rs and selected architecture paragraph changed; pinned owned-leaf formatting0. Old entire PURE_MODULES membership, facade_path, explicit root/worker module guards and complete old pure() body compared unchanged; all M0saved control files and complete businessB tree are byte-held against13e471c. No Inspector field/model/alias/dependency/public helper privilege added. Root retained exact before/after source images. The only path changes are selected rolebool/nonglob exactstd/core leaf, scoped knownmetadata alias canonicalization, extracted one-prefix resolver and restrictedbarecrate visibility skip; generic recursion/body visiting remains.
+
+Root runs frozen formatting/M0compile/strict/all53architecture checks now; finite peer source/equivalence/privacy review follows on stopped sources. No source edits until peer STOP; no general ACKgate. Genuine old-checkerRED/privacy save precedes this code. Full compatibility/identity/docs/dep checks and connected/fullgoal/platform duties remain separate and pending.
+
+
+## M0 metadata first BODY: actual focused PASS, peer naming regression selected
+
+Recovered session76117 from its terminal raw log (the last observation was truncated; no rerun). Frozen1663/c4ceacb5d1f1d6bcccb41a93239a655ca315ed1a36cc53e47b436488bc1f0643: fmt0; all-target check0 raw10849086+192/d4f03559; strict Clippy0 raw10849523+192/ab748c4b; cargo arch0 raw10849874+5713/974a09acefd452da327be280ee40ace0333df64ef3e6cf43fb0a8baebfdf8c1e. Actual53 PASS =45 unit,4 archunit,3 real visibility,1 workspace. This is focused execution, not complete workspace1146 evidence.
+
+Root whole-read ARCH762912+5889/1d6235bd and PERF496009+7116/fde49144: other inverse/role/privacy predicates accepted; required imported-alias order gap remains qualified. ARCH selected exactly four std/core forward-call/reversed-named-use rejection controls in the existing blob identity, new private assert_overlay_metadata_forward_alias_rejections helper before positives, no new path/model/identity. DOMAIN owns only that existing test file and its own note; Root owns checker/shared/Git. Old43/14 helpers and businessB/six overlay test sources remain held. Current checker must actually fail these controls and that RED must be saved before correction. General type-flow/type-alias resolution is outside this finite selection.
+
+Root also whole-read DOMAIN230536+3867/bf08dc70 size-aware preparation: no additional artifact/API/privacy blocker; next real reader proposal remains pending current reviewed GREEN. Dedicated ARCH is selecting a narrow metadata-use ordering correction. Full completion/parity/Linux/native/M1-M8 goal remains active and unfinished.
+
+
+## Forward named-use regression: actual RED saved before correction
+
+DOMAIN234403+2492/dc57d3d0 whole-read; blob267/55d0fb2a adds only57B call+1259B helper; inverse restores complete8178B/52eb6960. Old43/14 helpers literal; all four std/core rows collected before terminal diagnosis assertion. Root session68118 terminal101, frozen1663/16e0ec74415ba8c237e85aecf838d36ca0869dd05df26acbf12a7dde1f7b03c9: fmt0 raw10855778+0; exact existing blob test0PASS1FAIL44filtered raw10856098+1694/c4ba795b4784c880aca0696a0440769fd26fd6bf64f5601cd0240160dc222f5c. Entire raw read: every row returns Ok([]), not parse/setup failure, and original43 negatives execute first. No checker correction has been written.
+
+This local SAVE contains the first narrow checker BODY plus the reproducible newly discovered naming regression. No complete workspace GREEN, parity, native or platform acceptance is claimed. ARCH is selecting the scoped metadata-only import-order correction; PERF reciprocally reviews stopped new controls. Full goal remains active.

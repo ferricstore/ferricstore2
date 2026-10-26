@@ -1470,3 +1470,11 @@ versioned typed publication, shared/named/external availability, ordered history
 and binding acquisition, service routing/read barriers and lifecycle maintenance
 remain required connected work. Implementation and execution status is in the
 [handoff](CONTINUE.md); this selection earns no full-parity or platform credit.
+
+The M0 source checker classifies the exact non-glob `std::array::IntoIter` and
+`core::array::IntoIter` metadata paths, retaining their canonical identity through
+named imports and renames. Generic arguments and actual import/call/type paths
+retain their effect and layer checks. Restricted bare-crate visibility is scope
+metadata; item and worker visibility rules continue to inspect the declared
+visibility. Compiler consumer controls keep the sizing helper crate-private.
+Array modules, globs and associated suffixes retain their existing rejection.
