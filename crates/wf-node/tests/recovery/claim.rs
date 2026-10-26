@@ -506,6 +506,8 @@ fn claim_startup_exact_tight_point_body_scope_and_driver_peak() -> TestResult {
     let bytes = body.len();
     let d = 4 * bytes + 2048;
     let exact = 3588 + 512 + d;
+    let header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
+    let funded = exact.checked_add(header).ok_or("header budget overflow")?;
     refusal(
         &dir,
         &s,
@@ -517,11 +519,22 @@ fn claim_startup_exact_tight_point_body_scope_and_driver_peak() -> TestResult {
             },
         )),
     )?;
+    refusal(
+        &dir,
+        &s,
+        profile(f::driver_limits(), (1, bytes), 512 + bytes, funded - 1)?,
+        Error::Claim(ClaimTransactionError::Apply(
+            RecordBatchApplyError::Workspace {
+                attempted: d + header,
+                maximum: d + header - 1,
+            },
+        )),
+    )?;
     for (wire, entry) in [(bytes - 1, 512 + bytes), (bytes, 511 + bytes)] {
         refusal(
             &dir,
             &s,
-            profile(f::driver_limits(), (1, wire), entry, exact)?,
+            profile(f::driver_limits(), (1, wire), entry, funded)?,
             Error::Log(RaftLogError::Limit),
         )?;
     }
@@ -531,7 +544,7 @@ fn claim_startup_exact_tight_point_body_scope_and_driver_peak() -> TestResult {
         state,
         s.group(),
         s.recovery(),
-        profile(f::driver_limits(), (1, bytes), 512 + bytes, exact)?,
+        profile(f::driver_limits(), (1, bytes), 512 + bytes, funded)?,
     )?);
     let (mut log, state) = f::open_pair(&dir)?;
     let blank = f::blank(EntryStamp::Unstamped)?;
@@ -542,13 +555,13 @@ fn claim_startup_exact_tight_point_body_scope_and_driver_peak() -> TestResult {
     refusal(
         &dir,
         &s,
-        profile(f::driver_limits(), (1, bytes + 13), 512 + bytes, exact)?,
+        profile(f::driver_limits(), (1, bytes + 13), 512 + bytes, funded)?,
         Error::Limit,
     )?;
     refusal(
         &dir,
         &s,
-        profile(f::driver_limits(), (2, bytes + 12), 512 + bytes, exact)?,
+        profile(f::driver_limits(), (2, bytes + 12), 512 + bytes, funded)?,
         Error::Log(RaftLogError::Limit),
     )?;
     let (log, state) = f::open_pair(&dir)?;
@@ -557,7 +570,7 @@ fn claim_startup_exact_tight_point_body_scope_and_driver_peak() -> TestResult {
         state,
         s.group(),
         s.recovery(),
-        profile(f::driver_limits(), (2, bytes + 13), 512 + bytes, exact)?,
+        profile(f::driver_limits(), (2, bytes + 13), 512 + bytes, funded)?,
     )?);
     std::fs::remove_dir_all(dir)?;
     scope_peak()

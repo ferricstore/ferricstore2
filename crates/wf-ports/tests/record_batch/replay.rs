@@ -126,7 +126,9 @@ fn assert_exact_replay(
         &retries,
         0,
         limits(),
-        16_780_748 + size_of::<Option<RecordBatchValueEffects>>(),
+        16_780_748
+            + size_of::<Option<RecordBatchValueEffects>>()
+            + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>(),
     )?;
     drop(encoded);
     let RecordBatchApplyDecision::Replay(replayed) = plan.decision() else {
@@ -197,7 +199,9 @@ fn assert_gate_branches(control: ControlState, outcome: RetainedOutcome) -> Test
         &retries,
         0,
         limits(),
-        16_780_748 + size_of::<Option<RecordBatchValueEffects>>(),
+        16_780_748
+            + size_of::<Option<RecordBatchValueEffects>>()
+            + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>(),
     )?;
     assert!(matches!(
         replay.decision(),
@@ -241,7 +245,9 @@ fn assert_gate_branches(control: ControlState, outcome: RetainedOutcome) -> Test
         &retries,
         0,
         limits(),
-        16_780_748 + size_of::<Option<RecordBatchValueEffects>>(),
+        16_780_748
+            + size_of::<Option<RecordBatchValueEffects>>()
+            + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>(),
     )?;
     assert!(matches!(plan.decision(), RecordBatchApplyDecision::Expired));
     assert_operational_branches(view, original.as_bytes())?;

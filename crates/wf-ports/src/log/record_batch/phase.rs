@@ -126,11 +126,13 @@ pub(in crate::log) fn finish_inspection<'input, 'retained>(
         .mutation_items()
         .ok_or(super::super::CodecError::UnsupportedTag)?
         .len();
+    let bound = sum(&[
+        decoder_bound(decoded.encoded.len(), count, decoded.limits)?,
+        size_of::<Option<RecordBatchValueEffects>>(),
+    ])?;
+    admit(bound, workspace_limit)?;
     admit(
-        sum(&[
-            decoder_bound(decoded.encoded.len(), count, decoded.limits)?,
-            size_of::<Option<RecordBatchValueEffects>>(),
-        ])?,
+        sum(&[bound, size_of::<DecodedRequest<'static>>()])?,
         workspace_limit,
     )?;
     drop(decoded);
@@ -273,12 +275,14 @@ pub(in crate::log) fn release_decoded_inputs(
         isolation,
         state_keys,
         claim_filters,
+        value_metadata,
         ..
     } = decoded;
     drop(request.operation);
     drop(isolation);
     drop(state_keys);
     drop(claim_filters);
+    drop(value_metadata);
     (request.scope, request.request, request.intent)
 }
 

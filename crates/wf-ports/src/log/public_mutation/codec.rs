@@ -79,7 +79,7 @@ fn canonical_cap(limits: CodecLimits) -> Result<usize, CodecError> {
         .ok_or(CodecError::LengthOverflow)
 }
 
-fn auto_partition(id: &[u8], bytes: &mut [u8; 17]) -> usize {
+pub(in crate::log) fn auto_partition(id: &[u8], bytes: &mut [u8; 17]) -> usize {
     let mut crc = u32::MAX;
     for byte in id {
         crc ^= u32::from(*byte);
@@ -318,7 +318,11 @@ pub(in crate::log) fn write_owned(
     writer: &mut Writer<'_>,
     limits: CodecLimits,
 ) -> Result<(), CodecError> {
-    super::with_caller(request, limits, |caller| {
+    let crate::consensus::PreparedOperation::PublicMutation { item, evidence } = &request.operation
+    else {
+        return Err(CodecError::UnsupportedTag);
+    };
+    super::with_caller(item, evidence, limits, |caller| {
         write(
             &request.scope,
             &request.request,
@@ -336,7 +340,11 @@ pub(in crate::log) fn decoded_intent(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<ClientIntent, CodecError> {
-    super::with_caller(request, limits, |caller| {
+    let crate::consensus::PreparedOperation::PublicMutation { item, evidence } = &request.operation
+    else {
+        return Err(CodecError::UnsupportedTag);
+    };
+    super::with_caller(item, evidence, limits, |caller| {
         let mut verify = Writer::verify(encoded, limits.admission.decision_bytes())?;
         write(
             &request.scope,

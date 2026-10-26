@@ -160,8 +160,17 @@ fn normal_recovery_header_borrows_atomic_start_without_body_authority()
             request_len == 256
         );
     }
+    let value_header = packed(1, 8, scopes)?;
+    let (profile, borrowed, stamp) = normal_recovery_header(&value_header, CodecLimits::default())?;
+    assert_eq!(profile, 8);
+    assert_eq!(borrowed, scopes);
+    assert_eq!(borrowed[0].as_ptr(), value_header[11..].as_ptr());
+    assert_eq!(stamp, CommittedTime::new(HlcTimestamp::new(17, 3)?, 11)?);
     assert_eq!(
-        normal_recovery_header(&packed(1, 8, [b"t", b"g", b"z"])?, CodecLimits::default()),
+        normal_recovery_header(
+            &packed(1, u16::MAX, [b"t", b"g", b"z"])?,
+            CodecLimits::default()
+        ),
         Err(CodecError::UnsupportedVersion)
     );
     for root in [1, 2] {

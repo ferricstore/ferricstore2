@@ -3,11 +3,18 @@
 use super::{CodecError, CodecLimits, claim, common, keys, policy, reader::Reader};
 
 pub(super) fn preflight(encoded: &[u8], limits: CodecLimits) -> Result<(), CodecError> {
+    super::value_batch::validate(encoded, limits)
+}
+
+pub(super) fn legacy_preflight(encoded: &[u8], limits: CodecLimits) -> Result<(), CodecError> {
     if encoded.len() > limits.admission.decision_bytes() {
         return Err(CodecError::ByteLimit);
     }
     let mut reader = Reader::new(encoded, limits);
     let header = common::header(&mut reader)?;
+    if header.intent.version() == 8 {
+        return Err(CodecError::UnsupportedVersion);
+    }
     let scope = keys::scope_length(header.scope())?;
     let mut derived = scope;
     if header.operation_tag == 4 {

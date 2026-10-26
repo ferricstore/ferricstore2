@@ -112,7 +112,7 @@ fn name(operation: &CoreMutation<'_>) -> &'static str {
     }
 }
 
-fn canonical(
+pub(in crate::log) fn canonical(
     tenant: &[u8],
     caller: &NormalizedMutation<'_>,
     out: &mut dyn FnMut(&[u8]) -> Result<(), CodecError>,

@@ -183,7 +183,11 @@ fn cancel(value: &Cancel, writer: &mut Writer<'_>, maximum: usize) -> Result<(),
     bytes(value.error.as_deref(), writer, maximum)
 }
 
-fn operation(value: &Operation, writer: &mut Writer<'_>, maximum: usize) -> Result<(), CodecError> {
+pub(super) fn operation(
+    value: &Operation,
+    writer: &mut Writer<'_>,
+    maximum: usize,
+) -> Result<(), CodecError> {
     writer.byte(match value {
         Operation::Create(_) => 1,
         Operation::Claim(_) => 2,

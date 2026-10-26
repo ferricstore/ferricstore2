@@ -10,7 +10,9 @@ use wf_ports::blob::{
     RecordBatchValueEffect, RecordBatchValueEffects, RecordBatchValueEffectsError,
     inspect_record_batch_value_effects,
 };
-use wf_ports::log::{RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchInspection};
+use wf_ports::log::{
+    DecodedRequest, RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchInspection,
+};
 use wf_types::version::Fence;
 
 use crate::fixtures::{
@@ -140,24 +142,44 @@ fn value_effects_admit_continuous_work_and_descriptor_coexistence() -> TestResul
     let decoder_bound = 4 * encoded + limits().admission().decision_bytes() + 1_024 + 2_048;
     let early_bound = decoder_bound + 192 + 256 + limits().admission().decision_bytes();
     let owned_bound = early_bound + field_bytes + row_bytes;
-    for maximum in [early_bound, owned_bound - 1] {
+    let header_bytes = size_of::<DecodedRequest<'static>>();
+    let funded_early = early_bound + header_bytes;
+    let funded_owned = owned_bound + header_bytes;
+    assert!(header_bytes > field_bytes + row_bytes);
+    assert!(decoder_bound + header_bytes <= early_bound);
+    for (maximum, expected) in [
+        (decoder_bound - 1, decoder_bound),
+        (early_bound, funded_early),
+        (owned_bound - 1, funded_early),
+        (owned_bound, funded_early),
+        (funded_early - 1, funded_early),
+        (funded_early, funded_owned),
+        (funded_owned - 1, funded_owned),
+    ] {
         let refused = decide(5, &[], &[b"i"], frame.as_bytes(), maximum, 0)?;
         assert!(matches!(
             refused,
             Err(RecordBatchApplyError::Workspace { attempted, maximum: actual })
-                if attempted == owned_bound && actual == maximum
+                if attempted == expected && actual == maximum
         ));
     }
-    assert!(decide(5, &[], &[b"i"], frame.as_bytes(), owned_bound, 0)?.is_ok());
+    assert!(decide(5, &[], &[b"i"], frame.as_bytes(), funded_owned, 0)?.is_ok());
     let complete_bound = decoder_bound + field_bytes;
+    let funded_complete = complete_bound + header_bytes;
     let next = plan.control().next();
-    let refused = inspection(5, frame.as_bytes(), complete_bound - 1, next, None, 1)?;
-    assert!(matches!(
-        refused,
-        Err(RecordBatchApplyError::Workspace { attempted, maximum })
-            if attempted == complete_bound && maximum == complete_bound - 1
-    ));
-    let replay = inspection(5, frame.as_bytes(), complete_bound, next, None, 1)??;
+    for (maximum, expected) in [
+        (complete_bound - 1, decoder_bound + header_bytes),
+        (complete_bound, decoder_bound + header_bytes),
+        (funded_complete - 1, funded_complete),
+    ] {
+        let refused = inspection(5, frame.as_bytes(), maximum, next, None, 1)?;
+        assert!(matches!(
+            refused,
+            Err(RecordBatchApplyError::Workspace { attempted, maximum: actual })
+                if attempted == expected && actual == maximum
+        ));
+    }
+    let replay = inspection(5, frame.as_bytes(), funded_complete, next, None, 1)??;
     let RecordBatchInspection::Complete(replay) = replay else {
         return Err("log replay dispatched Fresh".into());
     };

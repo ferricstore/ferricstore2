@@ -62,7 +62,9 @@ fn complete_class(control: ControlState, original: &RetainedOutcome, class: u8) 
     })?;
     let encoded = encode_record_batch(value, limits(), WORKSPACE)?;
     let workspace = if class == 1 { 16_780_764 } else { DECODE };
-    let workspace = workspace + size_of::<Option<RecordBatchValueEffects>>();
+    let workspace = workspace
+        + size_of::<Option<RecordBatchValueEffects>>()
+        + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
     let query = scope()?;
     let result = inspect_record_batch_point(
         prepare_record_batch(encoded.as_bytes(), limits(), workspace)?,

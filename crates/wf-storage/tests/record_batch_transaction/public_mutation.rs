@@ -362,14 +362,37 @@ fn whole_refusal_replays() -> TestResult {
 }
 
 fn workspace_limits() -> TestResult {
+    let decoded_header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
     let bytes = hex(PUBLIC_FRAME)?;
     // E117,n1,B16MiB: D16,780,756; I33,558,420; L=R64+S64+C32MiB.
-    let owned = 201_330_580 + size_of::<Option<RecordBatchValueEffects>>();
+    let owned = 201_330_580 + size_of::<Option<RecordBatchValueEffects>>() + decoded_header;
     for (workspace, attempted, maximum, opened) in [
         (184_552_915, 16_780_756, 16_780_755, false),
-        (184_552_916, 201_330_580, 184_552_916, true),
+        (
+            184_552_916 + decoded_header - 1,
+            16_780_756 + decoded_header,
+            16_780_755 + decoded_header,
+            false,
+        ),
+        (
+            184_552_916 + decoded_header,
+            201_330_580,
+            184_552_916 + decoded_header,
+            true,
+        ),
         (201_330_579, 201_330_580, 201_330_579, true),
-        (201_330_580, owned, 201_330_580, true),
+        (
+            201_330_580 + decoded_header - 1,
+            201_330_580 + decoded_header,
+            201_330_580 + decoded_header - 1,
+            true,
+        ),
+        (
+            201_330_580 + decoded_header,
+            owned,
+            201_330_580 + decoded_header,
+            true,
+        ),
         (owned - 1, owned, owned - 1, true),
     ] {
         let mut store = fresh_store(false)?;

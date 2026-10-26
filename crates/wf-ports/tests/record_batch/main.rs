@@ -498,6 +498,7 @@ fn assert_present_value_admission() -> TestResult {
 
 #[test]
 fn record_batch_workspace_refuses_before_each_owned_stage() -> TestResult {
+    let decoded_header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
     assert_present_value_admission()?;
     let value = request(vec![create(b"i")?])?;
     // Frozen source grammar: owned input8, U1544, E115, D=B+3532, Fresh=2B+3980.
@@ -511,11 +512,15 @@ fn record_batch_workspace_refuses_before_each_owned_stage() -> TestResult {
     let frame = encode_record_batch(value, limits(), 1_659)?;
     assert_eq!(frame.as_bytes(), hex(MIN_FRAME)?);
     assert_workspace(frame.as_bytes(), 16_780_747, 16_780_748)?;
-    assert_workspace(frame.as_bytes(), 16_780_748, 33_558_412)?;
+    let decoded_bound = 16_780_748 + decoded_header;
+    assert_workspace(frame.as_bytes(), decoded_bound - 1, decoded_bound)?;
+    assert_workspace(frame.as_bytes(), decoded_bound, 33_558_412)?;
     assert_workspace(frame.as_bytes(), 33_558_411, 33_558_412)?;
     let owner_bytes =
         size_of::<Option<RecordBatchValueEffects>>() + size_of::<RecordBatchValueEffect>();
-    let owned = 33_558_412 + owner_bytes;
+    let input_bound = 33_558_412 + decoded_header;
+    assert_workspace(frame.as_bytes(), input_bound - 1, input_bound)?;
+    let owned = input_bound + owner_bytes;
     assert_workspace(frame.as_bytes(), owned - 1, owned)?;
     with_empty(frame.as_bytes(), limits(), owned, |result| {
         let plan: RecordBatchApplyPlan<'_> = result?;

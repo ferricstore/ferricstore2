@@ -155,6 +155,7 @@ pub struct DecodedRequest<'a> {
     isolation: Vec<u8>,
     state_keys: Vec<Vec<u8>>,
     claim_filters: Option<claim::ClaimFilterRefs<'a>>,
+    value_metadata: Option<value_batch::ValueBatchMetadata>,
     limits: CodecLimits,
     record_batch_intent: Result<ClientIntent, CodecError>,
 }
@@ -209,7 +210,13 @@ impl DecodedRequest<'_> {
         Some(match operation {
             Operation::Create(value) => [value.payload.as_deref(), None],
             Operation::Transition(value) => [value.payload.as_deref(), None],
-            Operation::StartAndClaim(value) if self.request.intent.version() == 7 => {
+            Operation::StartAndClaim(value)
+                if self.request.intent.version() == 7
+                    || (self.request.intent.version() == 8
+                        && self
+                            .workflow_value_metadata()
+                            .is_some_and(|metadata| metadata.profile == 7)) =>
+            {
                 [value.payload.as_deref(), None]
             }
             Operation::StartAndClaim(_) | Operation::StepContinue(_) => return None,
@@ -336,8 +343,7 @@ pub fn decode_prepared(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<DecodedRequest<'_>, CodecError> {
-    scan::preflight(encoded, limits)?;
-    decode::read(encoded, limits)
+    value_batch::read_decoded(encoded, limits)
 }
 
 fn digest(bytes: &[u8]) -> PreparedDigest {

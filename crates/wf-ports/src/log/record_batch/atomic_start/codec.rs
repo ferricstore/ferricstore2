@@ -12,7 +12,9 @@ use crate::log::reader::{Reader, copy};
 use crate::log::writer::Writer;
 use crate::log::{CodecError, CodecLimits, DecodedRequest, PreparedBytes, common, digest, keys};
 
-use super::super::{RecordBatchApplyError, admit, check_decoded, decoder_bound, reserve, sum};
+use super::super::{
+    RecordBatchApplyError, admit, admit_decoded_request, check_decoded, reserve, sum,
+};
 
 /// Derives the singleton caller identity and measures the exact new frame.
 /// # Errors
@@ -48,7 +50,7 @@ pub fn prepare_atomic_start(
     workspace_limit: usize,
 ) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
     preflight(encoded, limits)?;
-    admit(decoder_bound(encoded.len(), 1, limits)?, workspace_limit)?;
+    admit_decoded_request(encoded.len(), 1, limits, workspace_limit)?;
     let decoded = materialize(encoded, limits)?;
     check_decoded(&decoded, limits, workspace_limit, 7)?;
     Ok(decoded)
@@ -261,6 +263,7 @@ fn materialize(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest<'_>
         isolation,
         state_keys,
         claim_filters: None,
+        value_metadata: None,
         limits,
         record_batch_intent,
     })

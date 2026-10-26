@@ -18,7 +18,7 @@ use super::super::{
     RecordBatchApplyError, RecordBatchApplyPlan, RecordBatchInspection, common, decode,
     reader::Reader,
     record_batch::{
-        admit, check_decoded, decide_independent, decoder_bound, finish_inspection, sum,
+        admit, admit_decoded_request, check_decoded, decide_independent, finish_inspection, sum,
     },
     scan,
 };
@@ -37,7 +37,7 @@ pub fn prepare_public_mutation(
     if header.operation_tag != 4 || header.intent.version() != 1 {
         return Err(CodecError::UnsupportedVersion.into());
     }
-    admit(decoder_bound(encoded.len(), 1, limits)?, workspace_limit)?;
+    admit_decoded_request(encoded.len(), 1, limits, workspace_limit)?;
     let decoded = decode::read(encoded, limits)?;
     check_decoded(&decoded, limits, workspace_limit, 1)?;
     Ok(decoded)

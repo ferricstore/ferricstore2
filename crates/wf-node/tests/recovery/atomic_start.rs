@@ -284,40 +284,69 @@ fn atomic_start_recovery_admits_exact_log_audit_and_driver_owners() -> TestResul
     normal.codec = CodecLimits::new(AdmissionLimits::new(1024, e, 1)?);
     let d = 4 * e + e + 3072;
     let exact = 3588 + 512 + d;
+    let header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
+    let funded = exact.checked_add(header).ok_or("header budget overflow")?;
+    assert!(matches!(
+        wf_ports::log::prepare_atomic_start(frames[1].1.as_bytes(), normal.codec, d - 1),
+        Err(Workspace { attempted, maximum }) if attempted == d && maximum == d - 1
+    ));
+    let first = 4 * frames[0].1.as_bytes().len() + e + 3072;
     for (work, point, workspace, expected) in [
-        ((2, wire), 511 + e, exact, Error::Log(RaftLogError::Limit)),
+        ((2, wire), 511 + e, funded, Error::Log(RaftLogError::Limit)),
         (
             (2, wire - 1),
             512 + e,
-            exact,
+            funded,
             Error::Log(RaftLogError::Limit),
         ),
-        ((1, wire), 512 + e, exact, Error::Limit),
+        ((1, wire), 512 + e, funded, Error::Limit),
         (
             (2, wire),
             512 + e,
             exact - 1,
             Error::Normal(Apply(Workspace {
-                attempted: d,
+                attempted: first + header,
                 maximum: d - 1,
+            })),
+        ),
+        (
+            (2, wire),
+            512 + e,
+            funded - 1,
+            Error::Normal(Apply(Workspace {
+                attempted: d + header,
+                maximum: d + header - 1,
             })),
         ),
     ] {
         assert_refusal(&dir, profile(normal, work, point, workspace)?, expected)?;
     }
     let (log, state) = f::open_pair(&dir)?;
-    let cap = profile(normal, (2, wire), 512 + e, exact)?;
+    let cap = profile(normal, (2, wire), 512 + e, funded)?;
     drop(recover_committed(log, state, s.group(), s.recovery(), cap)?);
     normal.codec = CodecLimits::new(AdmissionLimits::new(2, e, 1)?);
     assert_refusal(
         &dir,
-        profile(normal, (2, wire), 512 + e, exact)?,
+        profile(normal, (2, wire), 512 + e, funded)?,
         Error::Normal(Apply(Encoding(CodecError::ValueLimit))),
     )?;
     std::fs::remove_dir_all(dir)?;
+    check_atomic_driver_peaks(&mut frames, reference)
+}
+
+fn check_atomic_driver_peaks(
+    frames: &mut Vec<(u16, PreparedBytes)>,
+    reference: std::path::PathBuf,
+) -> TestResult {
+    let s = f::scope()?;
+    let e = frames[1].1.as_bytes().len();
+    let wire = frames
+        .iter()
+        .map(|(_, frame)| frame.as_bytes().len())
+        .sum::<usize>();
     let outer = f::directory("atomic-outer-envelope")?;
-    seed(&outer, &frames, 1, None)?;
-    normal = f::driver_limits();
+    seed(&outer, frames, 1, None)?;
+    let mut normal = f::driver_limits();
     let peak = 3588 + 512 + 515 + normal.workspace_bytes;
     assert_refusal(
         &outer,
@@ -334,9 +363,9 @@ fn atomic_start_recovery_admits_exact_log_audit_and_driver_owners() -> TestResul
         f::frame(7, b"q", 18, vec![(b"i", f::atomic_start_op(b"u"))])?,
     ));
     let expected = f::directory("atomic-inner-prefix")?;
-    seed(&expected, &frames, 3, None)?;
+    seed(&expected, frames, 3, None)?;
     let dir = f::directory("atomic-inner-refusal")?;
-    seed(&dir, &frames, 2, None)?;
+    seed(&dir, frames, 2, None)?;
     let logs = (f::log_rows(&dir)?, f::log_meta(&dir)?);
     normal.workspace_bytes = 1;
     let (log, state) = f::open_pair(&dir)?;

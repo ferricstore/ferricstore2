@@ -1,5 +1,7 @@
 //! One retained gate and prospectively bounded physical Claim ownership.
 
+use std::mem::size_of;
+
 use wf_domain::claim::apply::{
     ClaimDecision, ClaimObservedWindow, ClaimRejection, ClaimWorkLimits, decide_observed_claim,
     preflight_observed_claim_query,
@@ -122,7 +124,12 @@ pub fn prepare_claim_phase(
     }
     let count = super::occurrences(&mut reader)?;
     reader.finish()?;
-    admit(decoder_bound(encoded.len(), count)?, workspace_limit)?;
+    let bound = decoder_bound(encoded.len(), count)?;
+    admit(bound, workspace_limit)?;
+    admit(
+        sum(&[bound, size_of::<DecodedRequest<'static>>()])?,
+        workspace_limit,
+    )?;
     let decoded = decode::read(encoded, limits)?;
     check_decoded(&decoded, limits, workspace_limit)?;
     Ok(decoded)
@@ -200,14 +207,20 @@ pub fn decide_fresh_claim_phase_observed<'current>(
         additional_live_bytes,
     ])?;
     admit(base, workspace_limit)?;
+    admit(
+        sum(&[base, size_of::<DecodedRequest<'static>>()])?,
+        workspace_limit,
+    )?;
     let operation = match (preflight, window) {
         (Err(reason), None) => ClaimDecision::Rejected(reason),
         (Ok((_, prior_work)), Some(window)) => {
             if window.indexed.group != decoded.request.scope.group() {
                 return Err(ApplyError::InvalidAuthority.into());
             }
+            let observed = sum(&[base, decoded.limits.admission().decision_bytes()])?;
+            admit(observed, workspace_limit)?;
             admit(
-                sum(&[base, decoded.limits.admission().decision_bytes()])?,
+                sum(&[observed, size_of::<DecodedRequest<'static>>()])?,
                 workspace_limit,
             )?;
             let envelope = decoded
@@ -250,6 +263,7 @@ fn retain<'current>(
         isolation,
         state_keys,
         claim_filters,
+        value_metadata,
         limits,
         ..
     } = decoded;
@@ -257,6 +271,7 @@ fn retain<'current>(
     drop(isolation);
     drop(state_keys);
     drop(claim_filters);
+    drop(value_metadata);
     let header_bytes = sum(&[
         request.scope.tenant().as_bytes().len(),
         request.scope.group().as_bytes().len(),
@@ -324,6 +339,10 @@ fn check_decoded(
     let count = sum(&[filters[0].len(), filters[1].len(), filters[2].len()])?;
     let bound = decoder_bound(decoded.encoded.len(), count)?;
     admit(bound, workspace)?;
+    admit(
+        sum(&[bound, size_of::<DecodedRequest<'static>>()])?,
+        workspace,
+    )?;
     Ok(bound)
 }
 

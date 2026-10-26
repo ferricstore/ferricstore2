@@ -23,6 +23,7 @@ mod atomic_start;
 mod fresh;
 mod independent;
 mod intent;
+pub(in crate::log) use intent::operation as hash_operation;
 mod phase;
 mod response;
 
@@ -248,10 +249,7 @@ fn prepare_profile(
         return Err(CodecError::UnsupportedVersion.into());
     }
     let count = common::count(&mut reader)?;
-    admit(
-        decoder_bound(encoded.len(), count, limits)?,
-        workspace_limit,
-    )?;
+    admit_decoded_request(encoded.len(), count, limits, workspace_limit)?;
     let decoded = decode::read(encoded, limits)?;
     check_decoded(&decoded, limits, workspace_limit, version)?;
     Ok(decoded)
@@ -286,10 +284,7 @@ pub(super) fn check_decoded(
     if decoded.limits != limits {
         return Err(ApplyError::InvalidAuthority.into());
     }
-    admit(
-        decoder_bound(decoded.encoded.len(), items.len(), limits)?,
-        workspace,
-    )?;
+    admit_decoded_request(decoded.encoded.len(), items.len(), limits, workspace)?;
     if decoded.record_batch_intent? != decoded.request.intent {
         return Err(RecordBatchApplyError::IntentMismatch);
     }
@@ -323,6 +318,22 @@ pub fn decide_record_batch<'view>(
             decide_fresh_record_batch(fresh, view.group, retry_policies, outcome_ttl_ms)
         }
     }
+}
+
+// Preserve the old refusal first, then cover the complete enlarged header.
+// This additional full-header allowance is conservative, not another allocation.
+pub(super) fn admit_decoded_request(
+    encoded: usize,
+    count: usize,
+    limits: CodecLimits,
+    workspace: usize,
+) -> Result<(), RecordBatchApplyError> {
+    let bound = decoder_bound(encoded, count, limits)?;
+    admit(bound, workspace)?;
+    admit(
+        sum(&[bound, std::mem::size_of::<DecodedRequest<'static>>()])?,
+        workspace,
+    )
 }
 
 pub(super) fn decoder_bound(

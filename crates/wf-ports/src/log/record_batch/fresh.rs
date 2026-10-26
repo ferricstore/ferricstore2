@@ -163,7 +163,12 @@ fn inputs<'a>(
         256,
         limits.admission.decision_bytes(),
     ])?;
-    admit(sum(&[bound, additional_live_bytes])?, workspace)?;
+    let bound = sum(&[bound, additional_live_bytes])?;
+    admit(bound, workspace)?;
+    admit(
+        sum(&[bound, std::mem::size_of::<DecodedRequest<'static>>()])?,
+        workspace,
+    )?;
     Ok(prepared)
 }
 
@@ -185,6 +190,7 @@ pub(in crate::log) fn value_effects_budget(
         256,
         decoded.limits.admission.decision_bytes(),
         additional_live_bytes,
+        std::mem::size_of::<DecodedRequest<'static>>(),
     ])?;
     Ok((live, workspace_limit, work))
 }

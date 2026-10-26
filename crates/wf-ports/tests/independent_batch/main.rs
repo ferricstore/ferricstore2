@@ -411,6 +411,9 @@ fn assert_index_refusal() -> TestResult {
 
 #[test]
 fn prospective_workspace_and_profiles() -> TestResult {
+    let decoded_header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
+    let decoded_bound = 16_780_748 + decoded_header;
+    let input_bound = 33_558_419 + decoded_header;
     let encoded = encode_independent_record_batch(
         request(vec![item(b"c", create())?])?,
         limits(),
@@ -424,13 +427,19 @@ fn prospective_workspace_and_profiles() -> TestResult {
             Err(RecordBatchApplyError::Workspace { attempted: actual, maximum: cap }) if actual == attempted && cap == maximum)
         );
     }
-    assert!(prepare_independent_record_batch(encoded.as_bytes(), limits(), 16_780_748).is_ok());
+    assert!(matches!(
+        prepare_independent_record_batch(encoded.as_bytes(), limits(), decoded_bound - 1),
+        Err(RecordBatchApplyError::Workspace { attempted, maximum })
+            if attempted == decoded_bound && maximum == attempted - 1
+    ));
+    assert!(prepare_independent_record_batch(encoded.as_bytes(), limits(), decoded_bound).is_ok());
     let owner_bytes =
         size_of::<Option<RecordBatchValueEffects>>() + size_of::<RecordBatchValueEffect>();
-    let owned = 33_558_419 + owner_bytes;
+    let owned = input_bound + owner_bytes;
     for (maximum, live, attempted) in [
         (33_558_411, 0, 33_558_412),
         (33_558_418, 7, 33_558_419),
+        (input_bound - 1, 7, input_bound),
         (owned - 1, 7, owned),
     ] {
         let f = fresh(encoded.as_bytes(), limits(), maximum)?;

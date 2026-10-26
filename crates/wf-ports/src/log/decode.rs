@@ -20,6 +20,9 @@ use super::{
 pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest<'_>, CodecError> {
     let mut reader = Reader::new(encoded, limits);
     let header = common::header(&mut reader)?;
+    if header.intent.version() == 8 {
+        return Err(CodecError::UnsupportedVersion);
+    }
     let isolation = keys::scope(header.scope())?;
     let scope = RequestScope::new(
         TenantId::new(reader::copy(header.tenant)?).map_err(|_| CodecError::Malformed)?,
@@ -90,6 +93,7 @@ pub(super) fn read(encoded: &[u8], limits: CodecLimits) -> Result<DecodedRequest
         isolation,
         state_keys,
         claim_filters,
+        value_metadata: None,
         limits,
         record_batch_intent,
     })

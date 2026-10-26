@@ -148,12 +148,15 @@ fn op3_decode_admits_three_structural_spines_before_owned_materialization() -> T
             + phase.query.exclude_states.len()
             + phase.query.partitions.as_ref().map_or(0, Vec::len);
         let bound = 4 * encoded.len() + 2_048 + 576 * occurrences;
-        assert!(matches!(
-            prepare_claim_phase(&encoded, codec, bound - 1),
-            Err(RecordBatchApplyError::Workspace { attempted, maximum })
-                if attempted == bound && maximum == bound - 1
-        ));
-        let decoded = prepare_claim_phase(&encoded, codec, bound)?;
+        let decoded_bound = bound + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
+        for (cap, expected) in [(bound - 1, bound), (decoded_bound - 1, decoded_bound)] {
+            assert!(matches!(
+                prepare_claim_phase(&encoded, codec, cap),
+                Err(RecordBatchApplyError::Workspace { attempted, maximum })
+                    if attempted == expected && maximum == cap
+            ));
+        }
+        let decoded = prepare_claim_phase(&encoded, codec, decoded_bound)?;
         assert_eq!(decoded.request(), &expected, "{name}");
         count += 1;
     }
@@ -168,12 +171,15 @@ fn op3_decode_admits_three_structural_spines_before_owned_materialization() -> T
     let encoded = encode_prepared(&raw, codec)?;
     drop(raw);
     let bound = 4 * encoded.as_bytes().len() + 2_048 + 172_800_000;
-    assert!(matches!(
-        prepare_claim_phase(encoded.as_bytes(), codec, bound - 1),
-        Err(RecordBatchApplyError::Workspace { attempted, maximum })
-            if attempted == bound && maximum == bound - 1
-    ));
-    let decoded = prepare_claim_phase(encoded.as_bytes(), codec, bound)?;
+    let decoded_bound = bound + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
+    for (cap, expected) in [(bound - 1, bound), (decoded_bound - 1, decoded_bound)] {
+        assert!(matches!(
+            prepare_claim_phase(encoded.as_bytes(), codec, cap),
+            Err(RecordBatchApplyError::Workspace { attempted, maximum })
+                if attempted == expected && maximum == cap
+        ));
+    }
+    let decoded = prepare_claim_phase(encoded.as_bytes(), codec, decoded_bound)?;
     let envelope = decoded.claim_envelope(at(1)).ok_or("missing query")?;
     let wf_domain::claim::apply::ClaimStates::Only(states) = envelope.query.states else {
         return Err("missing represented state list".into());

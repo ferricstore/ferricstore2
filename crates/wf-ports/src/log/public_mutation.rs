@@ -39,21 +39,20 @@ pub fn prepare_public_mutation_intent(
     Ok(intent::prepare(tenant.as_bytes(), caller, maximum_bytes)?)
 }
 
+pub(in crate::log) use codec::auto_partition;
 pub(super) use codec::{decoded_intent, write_owned};
+pub(in crate::log) use intent::canonical;
 
 // A bounded borrowed adapter, used only inside this frame's verifier/writer.
 // Re-normalization detects default/presence contradictions before byte binding.
-fn with_caller<T>(
-    request: &crate::consensus::PreparedRequest,
+pub(in crate::log) fn with_caller<T>(
+    item: &PreparedBatchItem,
+    evidence: &PublicMutationEvidence,
     limits: super::CodecLimits,
     inspect: impl FnOnce(&NormalizedMutation<'_>) -> Result<T, super::CodecError>,
 ) -> Result<T, super::CodecError> {
-    use crate::consensus::PreparedOperation;
     use wf_domain::workflow::caller::{
         MutationFieldValue as V, MutationInput, normalize_core_mutation,
-    };
-    let PreparedOperation::PublicMutation { item, evidence } = &request.operation else {
-        return Err(super::CodecError::UnsupportedTag);
     };
     let mut fields = [("", V::Nil); 8];
     let mut used = 0;

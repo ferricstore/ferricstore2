@@ -188,6 +188,8 @@ fn committed_recovery_audit_decoder_and_external_large_scope_are_paid() -> TestR
     let mut normal = fixtures::driver_limits();
     normal.codec = CodecLimits::new(AdmissionLimits::new(1024, 128, 1)?);
     let exact = 3588 + 512 + 4 * bytes + 128 + 1024 + 2048;
+    let header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
+    let funded = exact.checked_add(header).ok_or("header budget overflow")?;
     let make = |workspace| {
         Limits::new(
             RaftMembershipLimits::default(),
@@ -208,6 +210,16 @@ fn committed_recovery_audit_decoder_and_external_large_scope_are_paid() -> TestR
             },
         )),
     )?;
+    assert_refusal(
+        &dir,
+        make(funded - 1)?,
+        Error::Normal(wf_storage::transaction::RecordBatchTransactionError::Apply(
+            wf_ports::log::RecordBatchApplyError::Workspace {
+                attempted: 4 * bytes + 128 + 1024 + 2048 + header,
+                maximum: funded - 1 - 3588 - 512,
+            },
+        )),
+    )?;
     let (log, state) = fixtures::open_pair(&dir)?;
     let s = fixtures::scope()?;
     drop(recover_committed(
@@ -215,7 +227,7 @@ fn committed_recovery_audit_decoder_and_external_large_scope_are_paid() -> TestR
         state,
         s.group(),
         s.recovery(),
-        make(exact)?,
+        make(funded)?,
     )?);
     std::fs::remove_dir_all(dir)?;
     large_scope_peak()

@@ -132,6 +132,12 @@ impl ClientIntent {
         Self { version: 7, digest }
     }
 
+    /// Selects value-batch caller identity without verification or apply authority.
+    #[must_use]
+    pub const fn workflow_value_batch(digest: [u8; 32]) -> Self {
+        Self { version: 8, digest }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

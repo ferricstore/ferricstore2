@@ -35,6 +35,16 @@ pub struct LifecycleDefaults {
     pub max_history_max_events: u32,
 }
 
+impl LifecycleDefaults {
+    /// Checks recorded configuration without policy access or substitution.
+    ///
+    /// # Errors
+    /// Refuses invalid configured retention defaults or history caps.
+    pub fn validate(self) -> Result<(), ActiveValueError> {
+        validate_defaults(self)
+    }
+}
+
 /// Explicit command overrides, including the internal hot-history command field.
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub struct LifecycleOverrides {

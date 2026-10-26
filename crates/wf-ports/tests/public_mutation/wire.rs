@@ -125,6 +125,7 @@ fn assert_presence_and_time() -> TestResult {
 }
 
 fn assert_prospective_decode(bytes: &[u8]) -> TestResult {
+    let decoded_header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
     assert!(matches!(
         prepare_public_mutation(bytes, limits(), 16_780_755),
         Err(RecordBatchApplyError::Workspace {
@@ -132,12 +133,17 @@ fn assert_prospective_decode(bytes: &[u8]) -> TestResult {
             maximum: 16_780_755
         })
     ));
-    assert!(prepare_public_mutation(bytes, limits(), 16_780_756).is_ok());
+    assert!(matches!(
+        prepare_public_mutation(bytes, limits(), 16_780_756 + decoded_header - 1),
+        Err(RecordBatchApplyError::Workspace { attempted, maximum })
+            if attempted == 16_780_756 + decoded_header && maximum == attempted - 1
+    ));
+    assert!(prepare_public_mutation(bytes, limits(), 16_780_756 + decoded_header).is_ok());
     assert!(
         matches!(decide_missing(bytes, 33_558_419), Err(error) if error.downcast_ref::<RecordBatchApplyError>() == Some(&RecordBatchApplyError::Workspace { attempted: 33_558_420, maximum: 33_558_419 }))
     );
     let owner_bytes = size_of::<Option<RecordBatchValueEffects>>();
-    let owned = 33_558_420 + owner_bytes;
+    let owned = 33_558_420 + owner_bytes + decoded_header;
     assert!(matches!(
         decide_missing(bytes, owned - 1),
         Err(error) if error.downcast_ref::<RecordBatchApplyError>()

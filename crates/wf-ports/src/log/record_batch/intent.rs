@@ -119,7 +119,7 @@ fn retry_override(
     optional_raw(hash, bytes, retry.exhausted_to.as_deref())
 }
 
-fn operation(
+pub(in crate::log) fn operation(
     hash: &mut Sha256,
     bytes: &mut usize,
     value: &Operation,

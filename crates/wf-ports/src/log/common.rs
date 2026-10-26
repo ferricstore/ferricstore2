@@ -38,7 +38,9 @@ pub fn normal_recovery_header(
     let _request = reader.nonempty(256)?;
     let version = reader.u16()?;
     let _digest = reader.take(32)?;
-    if !matches!((version, operation_tag), (1, _) | (5..=7, 1) | (2, 5)) {
+    if !matches!((version, operation_tag), (1, _) | (5..=7, 1) | (2, 5))
+        && (version, operation_tag) != (8, 1)
+    {
         return Err(CodecError::UnsupportedVersion);
     }
     let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;
@@ -47,6 +49,7 @@ pub fn normal_recovery_header(
         (1, 5) => 5,
         (1, 6) => 6,
         (1, 7) => 7,
+        (1, 8) => 8,
         (4, 1) => 1,
         (3, 1) => 3,
         (5, 2) => 2,
@@ -127,6 +130,7 @@ pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, Codec
         (1, _) => ClientIntent::new(1, digest).map_err(|_| CodecError::UnsupportedVersion)?,
         (5, 1) => ClientIntent::record_batch(digest),
         (6, 1) => ClientIntent::independent_record_batch(digest),
+        (8, 1) => ClientIntent::workflow_value_batch(digest),
         (2, 5) => ClientIntent::complete_core_policy_patch(digest),
         _ => return Err(CodecError::UnsupportedVersion),
     };

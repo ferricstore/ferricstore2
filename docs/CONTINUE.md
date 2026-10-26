@@ -5,58 +5,60 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current workflow-value integration checkpoint is a **compiled failing
-baseline**, before business implementation. All twelve new tests execute and
-fail at their intended positive assertions: two reject the missing encoder and
-ten reject the missing fresh value-store capability. No cases are ignored.
-Their later publication, ordered-read, replay, expiry and snapshot assertions
-are compiled but remain masked. The selected six production APIs still return
-literal unsupported errors; the passing feature checkpoints below predate this
-new integration target.
+The workflow-value codec now passes all seven original codec/wire cases,
+including independent bytes, tamper/order negatives, limits, donor ownership
+and retry jitter. Its implementation follows the named private-module contract,
+retains the actual profile-8 header and uses one continuous prospectively
+charged validation account. Defaults have a fixed validated representation;
+the decoded metadata sidecar owns its inputs and exposes a borrowed view.
 
-Formatting, workspace compilation and strict Clippy pass. All **1,093 existing
-Rust tests**, six documentation tests across fifteen targets, and all **53
-architecture checks** pass with their prior logical test identities preserved.
-The two existing benchmark correctness smokes, reference/progress integrity,
-documentation build and offline dependency checks pass. Existing tests were
-checked separately from the twelve new cases, whose actual failures are recorded
-above. These checks do not establish full workflow parity or Linux acceptance.
+Two additional regressions compile and genuinely fail at their first positive
+encoder assertions with Malformed: typed priority inputs and unresolved
+extension presence are being rejected before the domain reducer can decide.
+Their later decoder/round-trip assertions remain masked. Preserve this complete
+implementation plus the failing tests in Git before applying the recorded
+two-function correction; public profile-1 normalization and structural/default,
+order, bounds, intent and work checks must remain intact.
 
-Five supplemental codec tests now also compile and fail at their first
-expected-positive encoder assertions. Their independent frame, tamper, limit,
-ownership and retry-jitter checks remain masked until implementation. Formatting,
-workspace compilation, strict Clippy and all 53 architecture checks pass for
-this exact baseline. Peer review added full encoded-slice equality and
-independently resealed decoder ordering negatives. The metadata accessor uses
-a named borrowed view after an actual Clippy diagnostic; it owns no backing.
-The original twelve integration tests remain unchanged.
+The ten unchanged real-store integration cases still fail at their first fresh
+value-store constructor with UnsupportedLayout. Their later publication,
+ordered reads, replay, expiry, ownership and snapshot assertions are compiled
+but masked. Passing pure codecs do not establish connected storage behavior.
 
-The separate captured-lifecycle restoration prerequisite now passes **all nine
-unchanged tests**: the five earlier cases and four tests saved failing in
-`9b5bd52`. All ten focused checks pass, including strict Clippy, the domain
-documentation test and 53 architecture checks. Restoration validates recorded
-birth configuration and exact persisted scalars without clamping or consulting
-current policy. The performance reviewer independently checked source, the
-whole-file inverse and actual results. This focused result does not constitute
-a new full-workspace run; connected value publication and Linux remain open.
+Compatibility evidence preserves all **1,093 prior Rust test identities** plus
+the four captured-lifecycle restore cases: **1,097 pass**. This is an exact
+package/target/name/status union of an immutable passing prefix, complete
+remaining targets and one reviewed test-only rerun, rather than a claimed new
+single-command workspace run. Existing budget tests retain their original cap
+observations and add funded one-short/exact controls for the larger decoded
+header; actual earlier refusals remain visible. Header-only version dispatch
+does not grant body or persistence authority.
 
-Architecture, implementation and performance owners reviewed each other's
-actual source and the failing runtime packet. Review strengthened the valid
-65,536-byte reference control, cross-log original-reply assertions and literal
-intermediate A/B/C reads after donor/store drops. The code has thirteen ordinary
-data types, one clock trait and six rejecting APIs. Present bindings use the
-reviewed boxed representation after an actual Clippy size diagnostic; ordinary
-Box allocation adds no recoverable-OOM or measured performance guarantee.
+Formatting, workspace compilation and strict Clippy pass. Six documentation
+tests across fifteen targets, all **53 architecture checks**, the two existing
+benchmark correctness smokes, reference/progress integrity, documentation build
+and offline dependency checks pass. The progress ledger remains incomplete:
+120 source-derived declarations, 132 counterpart mappings and 550 assertion
+links; runtime reconciliation and full behavioral parity remain open. These
+local macOS results provide no Linux execution evidence.
+
+Captured-lifecycle restoration passes all nine unchanged tests, including the
+four saved failing in `9b5bd52`. It validates recorded birth configuration and
+exact persisted scalars without clamping or consulting current policy.
+Architecture, implementation and performance owners independently reviewed
+actual source, whole-file inverses and runtime results. The reviewed Box usage
+adds no recoverable-OOM, native allocation, RSS or measured speed guarantee.
 Production files remain within 400 physical lines, integration files within
-600, and every new function within 100 (current maximum 98).
+600, and functions within 100.
 
-Continue with the exact private BODY consultation in the history-values review
-notes before creating further artifacts. Preserve these twelve tests while
-implementing the real profile-8 codec, fresh capability/defaults, same-transaction
-policy/target validation, current/every-history value publication, ordered reads
-and complete reopen/snapshot recovery. Typed/shared/external values, hydration,
-real retirement/cleanup/rewind/recreation, required original profiles, native
-failures, Linux execution and the remaining ordered M1-M8 work stay open.
+After the codec correction and its passing gate, consult architecture on the
+exact connected storage artifacts before creation. Implement the real fresh
+capability/defaults, same-transaction policy and target validation, current and
+every-history value publication, ordered reads and complete reopen/snapshot
+recovery. Preserve the original twelve integration tests and five supplemental
+codec cases. Typed/shared/external values, hydration, retirement/cleanup/rewind/
+recreation, mandatory original profiles, native failures, Linux and macOS
+acceptance, and the remaining ordered M1-M8 work all stay open.
 
 The stored-policy creation-lifecycle resolver passes **all five unchanged tests**
 after its compiled zero-pass/five-failure baseline was saved in `c2d9ceb`.

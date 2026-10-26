@@ -104,7 +104,8 @@ fn touched_fresh_matches_complete_output() -> TestResult {
     assert_eq!(encoded.len(), 120);
     let owner_bytes =
         size_of::<Option<RecordBatchValueEffects>>() + size_of::<RecordBatchValueEffect>();
-    let owned = FRESH_WITH_L + owner_bytes;
+    let owned =
+        FRESH_WITH_L + owner_bytes + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
     let fresh = inspected(&encoded, owned - 1, ControlState::initial(clock(0)?), 0)?;
     assert_eq!(
         empty_decision(fresh, 17, true).err(),

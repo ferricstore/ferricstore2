@@ -122,6 +122,7 @@ fn assert_fresh_error(
 
 #[test]
 fn bounded_record_batch_prepare_admits_before_decode() -> TestResult {
+    let decoded_header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
     let encoded = hex(MIN_FRAME)?;
     assert_eq!(encoded.len(), 115);
     for maximum in [0, MIN_D - 1] {
@@ -130,14 +131,19 @@ fn bounded_record_batch_prepare_admits_before_decode() -> TestResult {
             Err(RecordBatchApplyError::Workspace { attempted: MIN_D, maximum: cap }) if cap == maximum
         ));
     }
-    let fresh = fresh_phase(&encoded, MIN_D)?;
+    assert!(matches!(
+        prepare_record_batch(&encoded, limits(), MIN_D + decoded_header - 1),
+        Err(RecordBatchApplyError::Workspace { attempted, maximum })
+            if attempted == MIN_D + decoded_header && maximum == attempted - 1
+    ));
+    let fresh = fresh_phase(&encoded, MIN_D + decoded_header)?;
     assert_eq!(fresh.control().execution_time(), TimestampMillis::new(1));
     assert_fresh_error(
         fresh,
         false,
         RecordBatchApplyError::Workspace {
             attempted: 33_558_412,
-            maximum: MIN_D,
+            maximum: MIN_D + decoded_header,
         },
     )?;
     let mut trailing = encoded.clone();
@@ -180,7 +186,9 @@ fn assert_complete_class(
     })?;
     let encoded = encode_record_batch(value, limits(), WORKSPACE)?;
     let workspace = if class == 1 { 16_780_764 } else { MIN_D };
-    let workspace = workspace + size_of::<Option<RecordBatchValueEffects>>();
+    let workspace = workspace
+        + size_of::<Option<RecordBatchValueEffects>>()
+        + std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
     let decoded = prepare_record_batch(encoded.as_bytes(), limits(), workspace)?;
     let inspected = inspect_record_batch(
         decoded,

@@ -3,12 +3,14 @@
 use std::mem::size_of;
 
 use sha2::{Digest, Sha256};
-use wf_domain::lease::{LeaseGuard, LeaseToken};
+use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
 use wf_domain::policy::RetryOverride;
+use wf_domain::retention::RetentionOverride;
 use wf_domain::retry::{JitterSample, PolicyRetry};
+use wf_domain::workflow::active::{LifecycleOverrides, MaxActiveOverride};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::caller::PublicMutationEvidence;
-use wf_domain::workflow::{Create, Operation};
+use wf_domain::workflow::{Create, Operation, StartAndClaim};
 use wf_ports::consensus::{
     PreparedBatchItem, PreparedOperation, PreparedWorkflowValueBatch, WorkflowValueItemInput,
     WorkflowValuePolicyWitness, WorkflowValueTargetGuard,
@@ -456,5 +458,115 @@ fn reseal(encoded: &mut [u8]) -> TestResult {
     let footer = encoded.len().checked_sub(32).ok_or("missing footer")?;
     let digest = Sha256::digest(&encoded[..footer]);
     encoded[footer..].copy_from_slice(&digest);
+    Ok(())
+}
+
+#[test]
+fn value_binary_codec_preserves_reducer_priority_inputs() -> TestResult {
+    let limits = f::limits().record_batch.codec;
+    for mode in [5, 6, 7] {
+        for priority in [3, 255] {
+            let mut request = codec_request()?;
+            request.profile = mode;
+            let PreparedOperation::Batch(items) = &mut request.operation else {
+                return Err("priority input batch".into());
+            };
+            items[0].create_priority = priority;
+            if mode == 7 {
+                items[0].command.operation = Operation::StartAndClaim(StartAndClaim {
+                    workflow_type: b"r".to_vec(),
+                    state: b"q".to_vec(),
+                    worker: b"w".to_vec(),
+                    lease_ms: 100,
+                    payload: Some(vec![0, 255]),
+                });
+            }
+            let encoded = encode_workflow_value_batch(&request, limits);
+            assert!(
+                encoded.is_ok(),
+                "mode {mode}, priority {priority}: {:?}",
+                encoded.as_ref().err()
+            );
+            let encoded = encoded?;
+            let decoded = decode_workflow_value_batch(encoded.as_bytes(), limits);
+            assert!(decoded.is_ok(), "{:?}", decoded.as_ref().err());
+            let decoded = decoded?;
+            assert_eq!(decoded.profile, mode);
+            assert!(decoded.operation == request.operation);
+            let items = decoded
+                .operation
+                .mutation_items()
+                .ok_or("priority output")?;
+            assert_eq!(items[0].create_priority, priority);
+        }
+    }
+    for mode in [5, 6] {
+        let mut request = codec_request()?;
+        request.profile = mode;
+        let PreparedOperation::Batch(items) = &mut request.operation else {
+            return Err("ignored priority batch".into());
+        };
+        items[0].create_priority = 255;
+        items[0].command.operation = Operation::ExtendLease(ExtendLease {
+            guard: LeaseGuard {
+                token: LeaseToken::new(b"lease".to_vec())?,
+                fence: Fence::new(3),
+            },
+            lease_ms: 100,
+        });
+        let encoded = encode_workflow_value_batch(&request, limits);
+        assert!(encoded.is_ok(), "{:?}", encoded.as_ref().err());
+        let encoded = encoded?;
+        let decoded = decode_workflow_value_batch(encoded.as_bytes(), limits);
+        assert!(decoded.is_ok(), "{:?}", decoded.as_ref().err());
+        let decoded = decoded?;
+        assert!(decoded.operation == request.operation);
+        let items = decoded
+            .operation
+            .mutation_items()
+            .ok_or("ignored priority output")?;
+        assert_eq!(items[0].create_priority, 255);
+    }
+    Ok(())
+}
+
+#[test]
+fn value_binary_codec_preserves_unresolved_extension_presence() -> TestResult {
+    let mut request = codec_request()?;
+    let PreparedOperation::Batch(items) = &mut request.operation else {
+        return Err("unresolved input batch".into());
+    };
+    items[0].command.operation = Operation::ExtendLease(ExtendLease {
+        guard: LeaseGuard {
+            token: LeaseToken::new(b"lease".to_vec())?,
+            fence: Fence::new(3),
+        },
+        lease_ms: 100,
+    });
+    request.inputs[0].birth = Some(LifecycleOverrides {
+        active: MaxActiveOverride::Millis(0),
+        retention: RetentionOverride {
+            ttl_ms: Some(0),
+            history_max_events: Some(0),
+        },
+        history_hot_max_events: Some(u64::MAX),
+    });
+    request.inputs[0].terminal_ttl_ms = Some(-1);
+    let limits = f::limits().record_batch.codec;
+    let encoded = encode_workflow_value_batch(&request, limits);
+    assert!(encoded.is_ok(), "{:?}", encoded.as_ref().err());
+    let encoded = encoded?;
+    let decoded = decode_workflow_value_batch(encoded.as_bytes(), limits);
+    assert!(decoded.is_ok(), "{:?}", decoded.as_ref().err());
+    let decoded = decoded?;
+    assert!(decoded.operation == request.operation);
+    assert!(decoded.inputs[0] == request.inputs[0]);
+    drop((encoded, request));
+    let birth = decoded.inputs[0].birth.ok_or("unresolved birth omitted")?;
+    assert!(matches!(birth.active, MaxActiveOverride::Millis(0)));
+    assert_eq!(birth.retention.ttl_ms, Some(0));
+    assert_eq!(birth.retention.history_max_events, Some(0));
+    assert_eq!(birth.history_hot_max_events, Some(u64::MAX));
+    assert_eq!(decoded.inputs[0].terminal_ttl_ms, Some(-1));
     Ok(())
 }
