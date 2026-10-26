@@ -19,6 +19,12 @@ pub use original_policy::{
 mod load;
 mod observations;
 mod record_batch;
+mod value_batch;
+
+pub use value_batch::{
+    WorkflowValueTransactionError, WorkflowValueTransactionLimits,
+    apply_workflow_value_batch_transaction,
+};
 
 pub use claim::{
     ClaimTransactionError, ClaimTransactionLimits, ClaimTransactionOutcome, apply_claim_transaction,

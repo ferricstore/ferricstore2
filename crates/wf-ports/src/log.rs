@@ -31,9 +31,11 @@ mod reader;
 mod record_batch;
 mod scan;
 mod storage;
+mod value_batch;
 pub use control::{
     decode_raft_membership_body, encode_raft_blank, encode_raft_membership, measure_control_entry,
 };
+pub use value_batch::{decode_workflow_value_batch, encode_workflow_value_batch};
 mod writer;
 
 pub use storage::{

@@ -3,10 +3,15 @@
 //! Borrowed shapes and prepared bytes grant no storage, placement, publication
 //! or admission authority. Logical binaries are never implicitly typed ETF.
 
+mod catalog;
 mod encoding;
 mod publication;
 mod reference;
 
+pub use catalog::{
+    WorkflowValueBinding, WorkflowValueBindingKnowledge, WorkflowValueLifecycle,
+    WorkflowValueReadBatch, WorkflowValueReadFailure, WorkflowValueReadLimits,
+};
 pub use encoding::{original_binary_stored_len, original_binary_stored_parts};
 pub use publication::{
     RecordBatchValueEffect, RecordBatchValueEffects, RecordBatchValueEffectsError,

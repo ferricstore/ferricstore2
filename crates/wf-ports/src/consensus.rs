@@ -12,6 +12,7 @@ use wf_types::version::CommittedTime;
 mod claim;
 mod membership;
 mod mutation;
+mod value;
 pub use membership::{
     AppliedRaftMembership, RaftMembership, RaftMembershipError, RaftMembershipLimits,
     raft_membership_owned_bytes,
@@ -19,6 +20,10 @@ pub use membership::{
 
 pub use claim::{PreparedClaimPhase, PreparedClaimQuery};
 pub use mutation::{MutationNotSubmitted, MutationSubmission, MutationSubmitPort, MutationUnknown};
+pub use value::{
+    PreparedWorkflowValueBatch, WorkflowValueDefaults, WorkflowValueItemInput,
+    WorkflowValuePolicyWitness, WorkflowValueTargetGuard,
+};
 
 /// One explicitly prepared item; current policies remain authoritative apply state.
 #[derive(Clone, Eq, PartialEq)]

@@ -53653,3 +53653,88 @@ exact four-path classifier/ADR+own-record fix, leaving endpoint design notes
 untouched/unstaged. Exact production/test R0 core+final fixture amendment has
 been received/read, but creation waits this save and Root's explicit journaled
 release/hold, then two disjoint authors and both STOP before any workload.
+
+
+### VALUE-CONSUMED-BINARY1 exact R0 two-author release
+
+Root adopts the actual whole-read ARCH core386254+33935/e5dfa264 and final
+fixture/public amendment420189+19569/1eb322b5, with PERF reciprocal resource
+review253210+23530/47a907c8. M0 is saved6315c389e10210b3388379238f2bbe7cc9b9a9db.
+Root owns exactly the eleven production paths and existing state_store/main.rs
+module seam named in that decision; DOMAIN owns exactly the eight new
+workflow_values integration files named there. No writes overlap. All other
+tracked/untracked nonignored regular files are held except the three active
+role notes. Production R0 is only thirteen ordinary data types, the one clock
+trait, six literal rejecting APIs, normal error Display/Error and explicit
+module/reexport seams. No substantive encoder/store/apply/read body is released.
+
+DOMAIN freezes twelve callable tests: two explicit positive encoder assertions
+and ten explicit fresh-constructor assertions. The real apply/read/reopen/
+snapshot assertions remain compiled tails, honestly masked in R0. Both authors
+must report STOP and exact artifact hashes/physical geometry before any Root
+formatter/compiler/test/VM/Git workload or shared-record mutation. Reviewers
+read actual stopped files and append only their own active notes. Root then
+formats, checks compilation, executes the intended12FAIL baseline and saves
+R0 before any business BODY release. Full Elixir parity, real value publication/
+recovery, all later M1-M8 gates and Linux execution remain open.
+
+
+### VALUE-CONSUMED-BINARY1 R0 terminal audit and SAVE boundary
+
+Both authors returned custody: Root fifteen paths and DOMAIN five, after the
+explicit unstarted-file transfers. All twenty code/test paths are frozen at
+1618/e096ff5701bc5286617bbf8af3389e0028f383962b619d70cb1eb7b91a8fbaba;
+the1598 held-input digest stayed a22b341752f1faad3b8db640adef84fb72c8f7ec5805f163489d630fc83febb0.
+All precreation decisions were actually read: core386254+33935/e5dfa264,
+final fixture420189+19569/1eb322b5 and exact named amendments through
+470507+1541/c4130f32. Final code is thirteen ordinary types, one clock trait,
+six literal rejectors, twelve tests and twenty-eight helpers plus clock method.
+Measured canonical new-function maximum98; production396 and test-main543.
+No BODY, fake seeding, suppressed check or extra compiler target was introduced.
+
+The actual304B minimum Clippy enum diagnostic selected
+Known(Option<Box<WorkflowValueBinding>>), with no box for legacy/known-missing.
+Whole inverse binds pre-box18cfbe68 and both-doc inverse7d40d0fd.
+Future BODY must price actual outer/pointee/backing ownership; ordinary Box
+behavior is not a fallible-OOM/layout/RSS/speed promise. Technical corrections
+also fixed four old-renderer error conversions, two old intent constructors and
+four style diagnostics. Measured107/115LF recovery setup was factored only
+through the explicitly selected helpers; no assertion was dropped.
+
+Technical4 allTHREE exit0/unchanged: fmt, workspace/alltargets check and strict
+Clippy, under the SAME e096 input. Genuine RED12 session42378 is TERMINAL101:
+packet9672914+5918/9387b67306b3136b1dd49f8a3c54074fad0fb14e087e97fbc349de5d441dedfe;
+raw9673154+5653/1aa9f5a33c867b94ef19ff2938cec001228cf2900e386abe409a29e6190b003f.
+Root, ARCH and PERF independently match EXACT twelve source/runtime names and
+panic sites:0PASS12FAIL/0ignored/measured/105oldfiltered, two encoder
+UnsupportedTag and ten fresh UnsupportedLayout. Earlier OLD premises passed;
+only the first mode-loop iteration runs. Decoder/publication/read/guards/replay/
+limits/snapshot/legacy/boxed-return tails remain MASKED, not successful evidence.
+The strengthened65536 shape, A/B/C bytes and original-log1 reply stay frozen.
+
+The first compatibility invocation incorrectly forwarded libtest's --skip to
+a custom benchmark and stopped after552 passing tests at its usage error.
+No benchmark/source workaround was added. Corrected SPLIT9 session84828 is
+TERMINAL0 for allNINE unchanged commands, fullpacket9738292+126211/
+7d7ea7ba8c546d19c55fa8f355a62b8b4b87cb047345f1370a1b2075202ffa5d.
+Workspace-except-storage/alltargets gives925PASS; storage/lib+tests gives
+168PASS with ONLY the new module's12 cases separately filtered. Independent
+comparison preserves all1093 old logical target/name/status tuples,100 summaries
+and102 executable headers. Package-scoped Cargo generated six different storage
+binary hash suffixes; ONLY those six header aliases were paired by exact target,
+never test names/statuses. Both old benchmark correctness outputs match exactly.
+Doc6cases/15targets and arch53 exact prior identities remain. Documentation,
+reference/progress integrity, offline deny and whitespace checks all pass.
+This is old-suite compatibility plus a SEPARATE genuine new RED, not full GREEN.
+
+Reciprocal actual reviews are closed/stopped: DOMAIN50987+4815/2b5744f0;
+ARCH472048+4413/d4f6c37d; PERF295123+3461/fa020dec and298584+2302/5462c8a4.
+Root actually whole/hash-read their complete recorded suffixes and all twenty
+code files; all three role files are append-only relative to HEAD6315c389.
+No remaining scoped source/oracle disagreement or extra ACK gate. Root now
+updates only existing CONTINUE/this journal and saves the exact R0 before any
+business BODY release. The pre-update shared hashes are retained to reconstruct
+the complete validated e096 inventory after this controlled documentation change.
+Progress remains120/132/550 with original HistoryValues arrays empty; M1-M8,
+full required source/profiles, real typed/shared/external/hydration/cleanup/
+rewind/recreation, native failures and independent Linux acceptance remain open.

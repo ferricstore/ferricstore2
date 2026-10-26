@@ -5,6 +5,41 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
+The current workflow-value integration checkpoint is a **compiled failing
+baseline**, before business implementation. All twelve new tests execute and
+fail at their intended positive assertions: two reject the missing encoder and
+ten reject the missing fresh value-store capability. No cases are ignored.
+Their later publication, ordered-read, replay, expiry and snapshot assertions
+are compiled but remain masked. The selected six production APIs still return
+literal unsupported errors; the passing feature checkpoints below predate this
+new integration target.
+
+Formatting, workspace compilation and strict Clippy pass. All **1,093 existing
+Rust tests**, six documentation tests across fifteen targets, and all **53
+architecture checks** pass with their prior logical test identities preserved.
+The two existing benchmark correctness smokes, reference/progress integrity,
+documentation build and offline dependency checks pass. Existing tests were
+checked separately from the twelve new cases, whose actual failures are recorded
+above. These checks do not establish full workflow parity or Linux acceptance.
+
+Architecture, implementation and performance owners reviewed each other's
+actual source and the failing runtime packet. Review strengthened the valid
+65,536-byte reference control, cross-log original-reply assertions and literal
+intermediate A/B/C reads after donor/store drops. The code has thirteen ordinary
+data types, one clock trait and six rejecting APIs. Present bindings use the
+reviewed boxed representation after an actual Clippy size diagnostic; ordinary
+Box allocation adds no recoverable-OOM or measured performance guarantee.
+Production files remain within 400 physical lines, integration files within
+600, and every new function within 100 (current maximum 98).
+
+Continue with the exact private BODY consultation in the history-values review
+notes before creating further artifacts. Preserve these twelve tests while
+implementing the real profile-8 codec, fresh capability/defaults, same-transaction
+policy/target validation, current/every-history value publication, ordered reads
+and complete reopen/snapshot recovery. Typed/shared/external values, hydration,
+real retirement/cleanup/rewind/recreation, required original profiles, native
+failures, Linux execution and the remaining ordered M1-M8 work stay open.
+
 The stored-policy creation-lifecycle resolver passes **all five unchanged tests**
 after its compiled zero-pass/five-failure baseline was saved in `c2d9ceb`.
 All eight focused and eleven full-workspace checks pass. Complete policies lend
@@ -3039,8 +3074,8 @@ remain historical evidence; they are not the current verification totals.
 
 The immutable reference remains **480 files and 5,858 textual declarations**;
 `tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **92 reviewed
-source declarations, 104 counterpart records and 442 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **120 reviewed
+source declarations, 132 counterpart records and 550 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

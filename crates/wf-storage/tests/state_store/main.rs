@@ -34,6 +34,7 @@ mod faults;
 mod fixtures;
 mod recovery;
 mod snapshot;
+mod workflow_values;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
