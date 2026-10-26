@@ -126,7 +126,12 @@ pub(super) fn advance(
         }
     }
     if matches!(record.state(), b"completed" | b"failed" | b"cancelled") {
-        if let Some(ttl) = input.terminal_ttl_ms {
+        if let Some(ttl) = input.terminal_ttl_ms
+            && matches!(
+                history.kind,
+                EventKind::Completed | EventKind::Failed | EventKind::Cancelled
+            )
+        {
             binding.lifecycle.effective_ttl_ms = u64::try_from(ttl).ok().filter(|ttl| *ttl != 0);
         }
         let base = input.requested_at.unwrap_or(execution).max(execution).get();

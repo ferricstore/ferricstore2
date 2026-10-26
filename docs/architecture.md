@@ -1416,3 +1416,30 @@ for public Policy.set/Flow, distributed migrations, governing-owner/public Claim
 accepted consensus/runtime, full original setup/profile parity and native Linux
 acceptance remain required. See
 [ADR-007](adr/007-durable-log-storage.md#durable-complete-core-policy-publication).
+
+
+## Binary workflow value storage boundary
+
+VALUE-CONSUMED-BINARY1 joins the existing pure value codec and captured lifecycle
+resolver to the same consumed state transaction as workflow records, indexes,
+every successful history, retained outcome and control. Storage owns redb and
+durability; ports retain deterministic preparation and clock contracts. Related
+code stays under the existing value, transaction and backend feature children.
+No dependency edge, second state owner or accepted service dispatcher is added.
+
+The explicit fresh value profile uses FWSS7 and complete FWSP4 snapshots. Current
+value bindings must agree with the workflow core's field presence and stored
+binary bytes; historical bindings validate their available references without
+inventing old payload postimages. Creation captures actual accepted ordering,
+policy and committed defaults once. Retry exhaustion inherits its effective
+TTL. Owned reads retain one real snapshot and return buffers independent of the
+input/store lifetime.
+
+[ADR-006](adr/006-private-prepared-command-codec.md#consumed-binary-value-command-profile)
+describes the closed command profile;
+[ADR-007](adr/007-durable-log-storage.md#binary-workflow-values-and-captured-lifecycle)
+describes publication, recovery, snapshots and resource ownership. Executed
+component evidence is in the handoff. Node startup still refuses operation8
+until the separately selected audit/replay gate is implemented. Typed/shared/
+external values, public hydration, real lifecycle maintenance, required original
+profiles, native/Linux acceptance and the ordered milestone exits remain open.

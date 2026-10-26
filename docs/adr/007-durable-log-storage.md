@@ -788,3 +788,56 @@ three runtime files (maximum 253 physical lines) and their 19 bodies (maximum 91
 Full original profiles/parity, Linux execution, public dispatch and the ordered
 consensus/service milestone gates remain required. Correctness smokes supply no
 measured allocation, RSS, latency or throughput improvement.
+
+
+## Binary workflow values and captured lifecycle
+
+VALUE-CONSUMED-BINARY1 creates a fresh explicit value authority in layout7.
+FWSS7 retains immutable canonical FWSS3 origin, current policy-catalog identity
+and committed value defaults. It has six physical tables and four active
+metadata keys. Legacy layouts are not implicitly promoted; core/original policy
+and control paths preserve value defaults, while old business/Claim paths that
+cannot publish value companions refuse layout7.
+
+Scoped families8/9/10/11 represent immutable stored bytes per reference/birth,
+public alias ownership/expiry/digest, current binding and every-history binding.
+Nonmagic logical binary bytes are stored directly; a leading FSV2 is escaped
+once using the existing borrowed two-part grammar. Required local targets must
+exist even when expired. Recovery checks alias identity, length/SHA and birth,
+and requires current field presence and canonical stored bytes to agree with
+the validated workflow core. Historical rows have no inline value postimage;
+their namespace, event/version and reference closure remain the available proof.
+
+The same consumed writer publishes core/index/current/every-history changes,
+value rows, retained outcome and control before Immediate commit and reply.
+Only actual successful Created postimages capture birth policy/defaults, using
+true per-step accepted ordering, including independent source-index holes.
+Omitted payload carries, explicit empty/equal values replace, and the selected
+terminal/retry result/error omissions clear. Birth provenance stays immutable.
+Complete/Fail/Cancel may select an explicit terminal TTL; Retry exhaustion
+inherits. All terminal postimages still stamp their deterministic bounded
+deadline. Retained replay precedes Fresh-only recapture or current-policy checks.
+
+Ordered reads use one real snapshot and one server clock pair for an eligible
+batch, preserve duplicate slots and own returned stored bytes after donor/store
+drop. Missing, unsupported, unsafe drift and operational failure remain distinct;
+clock failure alone does not fence a healthy database. Recovery uses no clock.
+FWSP4 carries three wire metadata rows, while the local descriptor remains local;
+row_count is physical data rows plus3. Receive/install/reopen preserve committed
+defaults, origin and complete value/core closure without a legacy downgrade.
+
+Logical work and owner admission remain prospective and continuous. The current
+closure reserves the source-view tuple, optional array view and optional expected
+slice on every path, including None/history. Each reached comparison pays both
+byte operands separately from fixed control/hash/key visits. The checks do not
+claim native-frame, allocator-capacity, RSS, OOM recovery or measured speed bounds.
+
+The genuine current-presence/current-byte/Retry regressions were saved failing
+in5fa3d20 before their corrections. Current component tests and unchanged legacy
+compatibility are bound in the [handoff](../CONTINUE.md) and
+[reciprocal reviews](../reviews/history-values/architecture.md). The two old
+unknown-snapshot producers now use an actually unregistered version and retain
+separate known4-malformed controls. Node8 audit/replay remains the immediate
+successor; typed/shared/external values, actual hydration/lifecycle maintenance,
+original profiles, native and Linux evidence and full M1-M8 acceptance remain
+required.

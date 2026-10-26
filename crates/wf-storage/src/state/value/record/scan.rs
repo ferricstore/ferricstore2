@@ -43,11 +43,17 @@ pub struct ScannedWorkflowRecord<'input> {
     owned_bytes: usize,
 }
 
-impl ScannedWorkflowRecord<'_> {
+impl<'input> ScannedWorkflowRecord<'input> {
     /// Reads the validated predecessor version without materializing an owner.
     #[must_use]
     pub const fn version(&self) -> u64 {
         self.version
+    }
+
+    /// Borrows validated value leaves for the encoded donor's full lifetime.
+    #[must_use]
+    pub(crate) const fn value_fields(&self) -> [Option<&'input [u8]>; 3] {
+        [self.payload, self.result, self.error]
     }
 
     /// Reads 512 plus every variable byte returned by materialization.

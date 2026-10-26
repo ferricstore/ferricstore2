@@ -1611,3 +1611,34 @@ clock authority, business TDD, an encoding/layout version or workflow parity.
 The connected value R0 still requires its exact public/registry/test creation
 contract before any source/model/helper release. Linux and macOS evidence stay
 separate; no runtime, allocation or performance result is inferred here.
+
+
+## Consumed binary value command profile
+
+VALUE-CONSUMED-BINARY1 keeps actual intent/Normal profile8 throughout preparation,
+retained inspection and publication. Contained producer modes1/5/6/7 reuse their
+existing headerless operation grammar; they are not nested old frames or
+relabeled old intents. Their retained response versions are8/5/6/7 respectively.
+The complete prepared digest binds server context separately from caller intent.
+
+The bounded codec retains raw typed priorities and unresolved extension presence
+until guarded interpretation; public mode1 keeps its existing normalization.
+One decoded operation and metadata owner supplies actual codec work to the same
+continuous value account used by the real driver. The independent planner's
+actual ordering vector is moved into the new path with its header/slots admitted;
+legacy wrappers discard it before their unchanged return shapes.
+
+A real retained point gate precedes Fresh-only target, capture-marker, policy and
+default checks. Reprepare therefore preserves the original outcome even after
+server context changes. Fresh creation uses one external schema account through
+policy loading, projection, witness verification and reached birth capture.
+Unsupported profiles remain explicit operational refusals rather than fabricated
+business outcomes. Canonical footer/intent/metadata/EOF validation remains
+mandatory even though Node startup dispatch for8 is the next separate gate.
+
+The exact selected wire and owner decisions are recorded in the
+[architecture review](../reviews/history-values/architecture.md); durable rows
+and snapshot semantics are in
+[ADR-007](007-durable-log-storage.md#binary-workflow-values-and-captured-lifecycle).
+This private profile does not establish transport/public hydration capability,
+full source/setup parity or accepted runtime readiness.

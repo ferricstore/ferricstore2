@@ -5,50 +5,46 @@ GPT-6.1-sol/max agents use disjoint writes and dedicated architecture and
 performance reviews. Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-All **nineteen original workflow-value feature cases now pass**, including the
-ten complete real-store tails: same-transaction publication and every history,
-ordered owned reads and expiry, replay/guards/limits, policy provenance, healthy
-reopen and complete snapshot round trips. Fresh FWSS7/defaults and FWSP4 are real
-backend operations. Canonical formatting and strict workspace/all-target Clippy
-pass. All53 architecture checks passed after natural geometry decomposition.
+The current backend passes **1,119 Rust tests**: all 1,097 compatibility identities
+plus all 22 workflow-value feature cases. Exact package/target/name/status
+comparison preserves the earlier 1,093 identities and four restoration cases,
+all 102 targets and both benchmark correctness smokes. Six documentation tests
+across fifteen targets, formatting, all-target compilation, strict Clippy,
+all 53 architecture checks, documentation build, reference/progress integrity,
+offline dependency checks and diff checks pass.
 
-Three new regressions have genuinely reached their intended failures. Both
-current-value corruption cases successfully create/reopen healthy state, perform
-their exact resealed mutations and then observe successful reopen where Corrupt
-is required. Retry proves both real failed/version2 cores, then observes
-effectiveTTL1/deadline401 instead of inherited7000/deadline7400. The actual22-case
-run is **19 PASS / 3 FAIL**, zero ignored,105 filtered. No corresponding semantic
-production correction is written in this checkpoint; preserve and save this
-baseline before applying the selected fixes.
+The genuine 19-pass/3-failure baseline was saved in5fa3d20 before correction.
+Recovery now rejects current binding presence/byte disagreements with the actual
+workflow core. Retry exhaustion retains its inherited TTL and terminal deadline;
+Complete/Fail/Cancel retain their explicit overrides. All ten original real-store
+tails and both controls in the new Retry test complete. Source authors and the
+architecture/performance reviewers checked the stopped code reciprocally.
 
-The earlier eleven Workspace failures came from underfunded positive producer
-envelopes. The reviewed amendment changes only local W to512MiB and two local
-policy-install bindings. All individual R/S/C/schema/value ceilings, cap refusal
-assertions, original nineteen case bodies and shared state_store fixtures remain
-unchanged. Recovery reuses its held manifest view to avoid an illegal second
-writable META open. Both reviewers verified these changes and exact inverses.
+Fresh FWSS7/defaults, consumed value publication, every-history bindings, owned
+ordered reads, replay, limits and complete FWSP4 round trips use real backend
+operations. Pure helpers borrow existing bytes and authenticated targets rather
+than cloning records or inventing historical payload. All three simultaneous
+metadata headers and both comparison operands are prospectively admitted.
+No native-frame, allocator-capacity, RSS, OOM recovery or measured speed theorem
+is claimed.
 
-The selected current-core correction adds only borrowed field views and exact
-current presence/stored-binary comparison in four existing modules. The selected
-Retry correction permits terminal TTL overrides only for Complete/Fail/Cancel,
-while Retry exhaustion inherits and still receives terminal stamping. These
-are the next production changes after the genuine failing checkpoint is saved.
-All22 cases and complete compatibility must then be rerun and reviewed.
+The two compatibility fixtures that used now-supported snapshot version4 as
+unknown now select an unregistered version. Their UnsupportedVersion assertions
+remain; separate known4-malformed controls were added. Whole-file inverses prove
+every other prior case/order/assertion unchanged. Earlier local W512 producer
+funding likewise preserves all individual caps and shared fixtures.
 
-The previous verified compatibility baseline is **1,097 passing tests** across
-102 targets. Its documentation, architecture, reference/progress and dependency
-checks passed; it does not certify the current backend source. No full-workspace
-compatibility result or native/Linux acceptance is claimed for this checkpoint.
-Logical resource accounting adds no measured speed, capacity, RSS or recoverable
-Box-allocation guarantee.
+The IMMEDIATE next gate is Node operation8 audit/replay. Its concrete production,
+test, error/profile admission and missing-contract -> compiled RED -> SAVE ->
+BODY selection is recorded in the architecture review; no Node artifact or
+capability is implemented yet. Existing startup remains fail-closed for8.
 
-Node actual8 dispatch/admission remains the immediate required successor after
-the backend gate. Typed/shared/external values, public hydration, real lifecycle
-cleanup/rewind/recreation, mandatory original Elixir profiles, native failures,
-Linux and macOS acceptance and the remaining ordered M1-M8 work remain open.
-The progress ledger remains120 source-derived declarations,132 counterpart
-mappings and550 assertion links; full behavioral parity is unfinished.
-Local macOS results provide no Linux execution evidence.
+Typed/shared/external values, public hydration, real lifecycle cleanup/rewind/
+recreation, mandatory original Elixir profiles, native failures, Linux and macOS
+acceptance and the remaining ordered M1-M8 work remain open. The progress ledger
+remains120 source-derived declarations,132 counterpart mappings and550 assertion
+links, with1,681 unmatched runtime cases and1,655 unresolved declarations.
+Local macOS results provide no Linux execution evidence; full parity is unfinished.
 
 Captured-lifecycle restoration passes all nine unchanged tests, including the
 four saved failing in `9b5bd52`. It validates recorded birth configuration and

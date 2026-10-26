@@ -26,11 +26,23 @@ pub(crate) fn cohort(
         product(tx.maximum_steps, 65_536)?,
         [product(tx.maximum_wire, 128)?],
     )?;
+    let fixed = total(
+        std::mem::size_of::<value::ValueSourceFields<'static>>(),
+        [
+            std::mem::size_of::<Option<&'static [u8]>>(),
+            std::mem::size_of::<Option<&'static [Option<&'static [u8]>; 3]>>(),
+        ],
+    )?;
+    tx.temporary(fixed)?;
+    let maximum_temporary = tx
+        .maximum_temporary
+        .checked_sub(fixed)
+        .ok_or(Error::Limit)?;
     let mut charge = ValueCharge::new(
         tx.maximum_inspected.max(1),
         tx.maximum_wire.max(1),
         maximum_work,
-        tx.maximum_temporary,
+        maximum_temporary,
     )?;
     tx.step()?;
     let table = tx
@@ -83,6 +95,7 @@ pub(crate) fn cohort(
                 decoded.part(3),
                 bytes.value(),
                 &mut charge,
+                None,
             )?,
             _ => return Err(Error::Corrupt),
         }
@@ -99,6 +112,7 @@ fn companion(
     charge: &mut ValueCharge,
 ) -> Result<(), Error> {
     charge.helper()?;
+    charge.work(8_192)?;
     let (decoded, physical, bytes) = row;
     let fields = total(decoded.part(3).len(), [decoded.part(4).len()])?;
     let live = total(
@@ -138,54 +152,34 @@ fn companion(
         (bytes, counterpart.value())
     };
     let data = value::decode_binding(binding, defaults).map_err(admission::value_error)?;
-    let version = source_version(tx, decoded, source, scope, &partition, &id)?;
+    let history = matches!(decoded.family(), 5 | 11).then_some(decoded.part(5));
+    let maximum_wire = if history.is_some() {
+        source.len()
+    } else {
+        admission::wire_record_limit(tx.admission)?
+    };
+    let (version, fields) = value::binding_source_fields(
+        source,
+        scope,
+        (&partition, &id),
+        history,
+        tx.admission,
+        maximum_wire,
+    )
+    .map_err(admission::value_error)?;
     if data.versions.iter().flatten().any(|value| *value > version) {
         return Err(Error::Corrupt);
     }
-    binding_refs(tx, table, scope, (&partition, &id), data, charge)?;
+    binding_refs(
+        tx,
+        table,
+        scope,
+        (&partition, &id),
+        data,
+        charge,
+        fields.as_ref(),
+    )?;
     Ok(())
-}
-
-fn source_version(
-    tx: &RedbStateTransaction<'_>,
-    key: &DecodedStateKey,
-    bytes: &[u8],
-    scope: &RequestScope,
-    partition: &PartitionId,
-    id: &RecordId,
-) -> Result<u64, Error> {
-    if matches!(key.family(), 1 | 10) {
-        return value::scan_record_point_profiled(
-            bytes,
-            scope,
-            partition,
-            id,
-            tx.admission,
-            admission::wire_record_limit(tx.admission)?,
-        )
-        .map(|record| record.version())
-        .map_err(admission::value_error);
-    }
-    // The primary recovery pass validates the full history grammar. This second
-    // pass binds its already-validated version and event to the companion key.
-    let mut at = value::start(bytes, *b"FWSH", bytes.len()).map_err(admission::value_error)?;
-    for expected in [
-        scope.group().as_bytes(),
-        scope.recovery().as_bytes(),
-        scope.tenant().as_bytes(),
-        partition.as_bytes(),
-        id.as_bytes(),
-    ] {
-        if value::raw(bytes, &mut at).map_err(admission::value_error)? != expected {
-            return Err(Error::Corrupt);
-        }
-    }
-    if value::raw(bytes, &mut at).map_err(admission::value_error)? != key.part(5) {
-        return Err(Error::Corrupt);
-    }
-    value::read_u8(bytes, &mut at).map_err(admission::value_error)?;
-    value::read_u64(bytes, &mut at).map_err(admission::value_error)?;
-    value::read_u64(bytes, &mut at).map_err(admission::value_error)
 }
 
 fn binding_refs(
@@ -195,8 +189,13 @@ fn binding_refs(
     identity: (&PartitionId, &RecordId),
     binding: ValueBindingData,
     charge: &mut ValueCharge,
+    fields: Option<&[Option<&[u8]>; 3]>,
 ) -> Result<(), Error> {
     charge.helper()?;
+    if let Some(fields) = fields {
+        value::validate_binding_fields(&binding.versions, fields)
+            .map_err(admission::value_error)?;
+    }
     for (index, version) in binding.versions.into_iter().enumerate() {
         charge.candidate()?;
         let Some(version) = version else {
@@ -259,7 +258,15 @@ fn binding_refs(
         {
             return Err(Error::Corrupt);
         }
-        alias(tx, table, scope, &reference, bytes.value(), charge)?;
+        alias(
+            tx,
+            table,
+            scope,
+            &reference,
+            bytes.value(),
+            charge,
+            fields.and_then(|fields| fields[index]),
+        )?;
     }
     Ok(())
 }
@@ -271,6 +278,7 @@ fn alias(
     reference: &[u8],
     bytes: &[u8],
     charge: &mut ValueCharge,
+    expected: Option<&[u8]>,
 ) -> Result<(), Error> {
     charge.helper()?;
     charge.work(bytes.len())?;
@@ -323,7 +331,10 @@ fn alias(
     {
         return Err(Error::Corrupt);
     }
-    binary(stored.value())
+    if let Some(expected) = expected {
+        charge.compare(stored.value().len(), total(expected.len(), [5])?)?;
+    }
+    value::validate_stored_binary(stored.value(), expected).map_err(admission::value_error)
 }
 
 fn immutable(
@@ -376,12 +387,5 @@ fn immutable(
     {
         return Err(Error::Corrupt);
     }
-    alias(tx, table, scope, reference, raw.value(), charge)
-}
-
-fn binary(bytes: &[u8]) -> Result<(), Error> {
-    if bytes.starts_with(b"FSV2") && !bytes.starts_with(b"FSV2\x01FSV2") {
-        return Err(Error::Corrupt);
-    }
-    Ok(())
+    alias(tx, table, scope, reference, raw.value(), charge, None)
 }

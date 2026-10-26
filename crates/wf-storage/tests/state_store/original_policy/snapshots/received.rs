@@ -128,7 +128,7 @@ fn original_snapshot_profile_corruption_and_target_carry_are_prospective() -> Te
 
 fn malformed_streams(dir: &Path, original: &[u8]) -> TestResult {
     let s = f::scope()?;
-    for case in 0..4 {
+    for case in 0..5 {
         let mut wire = original.to_vec();
         let expected = if case == 0 {
             SnapshotError::UnsupportedVersion
@@ -136,12 +136,14 @@ fn malformed_streams(dir: &Path, original: &[u8]) -> TestResult {
             SnapshotError::Malformed
         };
         match case {
-            0 => wire[5] = 4,
+            0 => wire[5] = u8::MAX,
             1 => wire[5] = 2,
             2 => wire[19] = 2,
-            _ => wire.push(0),
+            3 => wire.push(0),
+            4 => wire[5] = 4,
+            _ => return Err("unknown original snapshot mutation".into()),
         }
-        if case < 3 {
+        if case != 3 {
             f::rehash(&mut wire)?;
         }
         let path = dir.join(format!("bad-stream-{case}"));

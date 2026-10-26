@@ -2,9 +2,12 @@
 
 use sha2::{Digest, Sha256};
 use wf_domain::workflow::active::restore_captured_lifecycle;
+use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::PreparedDigest;
-use wf_ports::blob::{OriginalValueRefKind, WorkflowValueLifecycle};
+use wf_domain::workflow::request::RequestScope;
+use wf_ports::blob::{OriginalValueRefKind, WorkflowValueLifecycle, original_binary_stored_parts};
 use wf_ports::consensus::WorkflowValueDefaults;
+use wf_types::identity::{PartitionId, RecordId};
 use wf_types::version::TimestampMillis;
 
 use super::{
@@ -13,6 +16,8 @@ use super::{
 };
 
 const MAX_VALUE_VERSION: u64 = 9_007_199_254_740_991;
+
+pub(crate) type ValueSourceFields<'input> = (u64, Option<[Option<&'input [u8]>; 3]>);
 
 #[derive(Clone, Copy)]
 pub(crate) struct ValueAlias<'a> {
@@ -244,6 +249,81 @@ fn verify_checksum(bytes: &[u8], mut at: usize) -> Result<(), Error> {
     finish(bytes, at)?;
     if checksum != Sha256::digest(&bytes[..hash_at]).as_slice() {
         return Err(Error::InvalidValue);
+    }
+    Ok(())
+}
+
+pub(crate) fn binding_source_fields<'input>(
+    bytes: &'input [u8],
+    scope: &RequestScope,
+    identity: (&PartitionId, &RecordId),
+    history: Option<&[u8]>,
+    admission: AdmissionLimits,
+    maximum_wire_bytes: usize,
+) -> Result<ValueSourceFields<'input>, Error> {
+    let (partition, id) = identity;
+    let Some(history) = history else {
+        let record = super::scan_record_point_profiled(
+            bytes,
+            scope,
+            partition,
+            id,
+            admission,
+            maximum_wire_bytes,
+        )?;
+        return Ok((record.version(), Some(record.value_fields())));
+    };
+    // The primary pass validates the complete history. Only its namespace,
+    // full event identity and version enter this companion cross-check.
+    let mut at = start(bytes, *b"FWSH", maximum_wire_bytes)?;
+    for expected in [
+        scope.group().as_bytes(),
+        scope.recovery().as_bytes(),
+        scope.tenant().as_bytes(),
+        partition.as_bytes(),
+        id.as_bytes(),
+    ] {
+        if raw(bytes, &mut at)? != expected {
+            return Err(Error::InvalidValue);
+        }
+    }
+    if raw(bytes, &mut at)? != history {
+        return Err(Error::InvalidValue);
+    }
+    read_u8(bytes, &mut at)?;
+    read_u64(bytes, &mut at)?;
+    Ok((read_u64(bytes, &mut at)?, None))
+}
+
+pub(crate) fn validate_binding_fields(
+    versions: &[Option<u64>; 3],
+    fields: &[Option<&[u8]>; 3],
+) -> Result<(), Error> {
+    for (version, field) in versions.iter().zip(fields) {
+        if version.is_some() != field.is_some() {
+            return Err(Error::InvalidValue);
+        }
+    }
+    Ok(())
+}
+
+pub(crate) fn validate_stored_binary(stored: &[u8], expected: Option<&[u8]>) -> Result<(), Error> {
+    if stored.starts_with(b"FSV2") && !stored.starts_with(b"FSV2\x01FSV2") {
+        return Err(Error::InvalidValue);
+    }
+    if let Some(expected) = expected {
+        let [prefix, payload] = original_binary_stored_parts(expected, usize::MAX)
+            .map_err(|_| Error::LengthOverflow)?;
+        let length = prefix
+            .len()
+            .checked_add(payload.len())
+            .ok_or(Error::LengthOverflow)?;
+        if stored.len() != length
+            || !stored.starts_with(prefix)
+            || &stored[prefix.len()..] != payload
+        {
+            return Err(Error::InvalidValue);
+        }
     }
     Ok(())
 }

@@ -27,7 +27,8 @@ pub use record::{
     scan_record_point_profiled,
 };
 pub(crate) use workflow_values::{
-    ValueAlias, ValueBindingData, decode_alias, decode_binding, encode_alias, encode_binding,
+    ValueAlias, ValueBindingData, ValueSourceFields, binding_source_fields, decode_alias,
+    decode_binding, encode_alias, encode_binding, validate_binding_fields, validate_stored_binary,
 };
 
 /// Operational persisted-value failure, never a retained business rejection.
