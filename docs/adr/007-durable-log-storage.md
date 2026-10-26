@@ -837,7 +837,48 @@ in5fa3d20 before their corrections. Current component tests and unchanged legacy
 compatibility are bound in the [handoff](../CONTINUE.md) and
 [reciprocal reviews](../reviews/history-values/architecture.md). The two old
 unknown-snapshot producers now use an actually unregistered version and retain
-separate known4-malformed controls. Node8 audit/replay remains the immediate
-successor; typed/shared/external values, actual hydration/lifecycle maintenance,
+separate known4-malformed controls. Explicit Node operation-8 audit/replay is
+implemented as described below; typed/shared/external values, actual hydration/lifecycle maintenance,
 original profiles, native and Linux evidence and full M1-M8 acceptance remain
 required.
+
+## Operation-8 startup audit and replay
+
+Committed and snapshot startup recovery can opt into the private value command
+through `with_workflow_value_limits`. Ordinary construction remains disabled.
+The four value ceilings are positive, and the point-count/per-entry-work product
+is checked before enabling the profile. The getter reuses the one selected Normal
+profile. Private recovery helpers borrow that immutable configuration.
+
+The actual original operation-8 body and log identity reach one consumed storage
+driver. Existing scope, full applied-body digest, stamp, clock, membership and
+expected-control checks remain. Historical audit performs complete bounded
+footer/intent/metadata/EOF validation and drops its decoded owner; it does not
+consult current policy or recapture birth. Driver errors remain lossless
+`CommittedRecoveryError::Value` errors. Owned outcomes and scope are dropped
+before recovery returns scalar control. Legacy preparers and dispatch stay unchanged.
+
+Let `B` include the existing namespace/phase owners plus the target-derived new
+option/error-header allowance `F`. All startup paths pay `F`; only operation 8
+pays `Qv = size_of<Option<WorkflowValueTransactionLimits>>` before its getter,
+including the disabled case. The full point owner `J = 512 + encoded_length`
+remains live. Audit admits `B + J + Qv` and gives only the checked residual to
+the bounded preparer. Replay admits `B + Qv + J + Q + max(V, C)` before copies,
+where `Q` owns the final scope, `V` is the unchanged driver workspace and `C` is
+the checked largest actual scope leaf plus a Vec header. Scope construction ends
+before driver ownership starts. Value temporary ownership is already inside `V`.
+These are logical requested-owner allowances, not native allocation/RSS or timing
+measurements; conversion cannot assume exact allocator capacity or an in-place shrink.
+
+The same routes serve local snapshots, matching received snapshots and fresh
+restore. Received boundaries remain strictly newer than committed/purged state:
+installation acknowledges the snapshot before the retained suffix is committed
+and replayed. No guard is relaxed. Full operation-1/5/6/7 value, history, lifecycle,
+retained-response, uncertainty, durable-prefix, snapshot and reopen scenarios
+execute through these real APIs. The initial rejecting checkpoint is `032939b`;
+`da81bd8` preserves the later conversion-budget counterexample before correction.
+
+This startup composition assumes an already durable committed prefix. It is not
+a live accepted-service dispatcher, a consensus/read-barrier implementation or
+full workflow parity. Typed/shared/external values, public hydration, lifecycle
+maintenance, original/native/Linux profiles and all milestone exits remain open.

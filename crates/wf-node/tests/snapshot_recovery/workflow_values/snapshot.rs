@@ -37,7 +37,7 @@ fn snapshot_case(mode: u8, limits: &super::Limits) -> TestResult {
     let original = mode != 6;
     let (wire, policy) = seed(&source, original)?;
     let suffix = suffix_frame(mode, &policy)?;
-    append_tail(&source, &suffix)?;
+    append_tail(&source, &suffix, true)?;
     let scope = f::scope()?;
     let (log, state) = f::open_pair(&source)?;
     let (log, state) = purge_snapshot(
@@ -160,11 +160,13 @@ fn suffix_frame(mode: u8, policy: &WorkflowValuePolicyWitness) -> TestResult<Pre
     )?)
 }
 
-fn append_tail(dir: &Path, suffix: &PreparedBytes) -> TestResult {
+fn append_tail(dir: &Path, suffix: &PreparedBytes, commit: bool) -> TestResult {
     let (mut log, state) = f::open_pair(dir)?;
     f::append(&mut log, 2, suffix.as_bytes())?;
     f::append(&mut log, 3, b"uncommitted opaque tail")?;
-    log.save_committed(f::at(2))?;
+    if commit {
+        log.save_committed(f::at(2))?;
+    }
     drop((log, state));
     Ok(())
 }
@@ -191,13 +193,24 @@ fn received(
     limits: &super::Limits,
 ) -> TestResult {
     let scope = f::scope()?;
-    if route == "matching" {
-        let (local, _) = seed(dir, original)?;
-        assert_eq!(local, wire);
-        append_tail(dir, suffix)?;
+    let (mut log, mut state) = if route == "matching" {
+        let (mut log, mut state) = v::pair(dir)?;
+        v::install(&mut log, &mut state, original, None, 0, 10)?;
+        assert_eq!(log.state()?.committed(), Some(f::at(0)));
+        assert_eq!(
+            v::control(&mut state)?
+                .last_entry()
+                .map(wf_domain::workflow::control::EntryIdentity::log),
+            Some(f::at(0))
+        );
+        let base = base_frame(policy)?;
+        f::append(&mut log, 1, base.as_bytes())?;
+        drop((log, state));
+        append_tail(dir, suffix, false)?;
         let candidate = stage(&dir.join("incoming.redb"), wire)?;
-        let (log, state) = f::open_pair(dir)?;
-        drop(install_received_snapshot(
+        let (mut log, state) = f::open_pair(dir)?;
+        assert_eq!(log.state()?.committed(), Some(f::at(0)));
+        install_received_snapshot(
             log,
             state,
             candidate,
@@ -205,7 +218,7 @@ fn received(
             scope.recovery(),
             *limits,
             SnapshotLimits::default(),
-        )?);
+        )?
     } else if route == "fresh" {
         let mut log = v::log(dir)?;
         let policy_frame = v::policy_frame(original, None, 0, 10)?;
@@ -214,19 +227,30 @@ fn received(
         f::append(&mut log, 1, base.as_bytes())?;
         f::append(&mut log, 2, suffix.as_bytes())?;
         f::append(&mut log, 3, b"uncommitted opaque tail")?;
-        log.save_committed(f::at(2))?;
+        assert_eq!(log.state()?.committed(), None);
         let candidate = stage(&dir.join("state.redb"), wire)?;
-        drop(restore_received_snapshot(
+        restore_received_snapshot(
             log,
             candidate,
             scope.group(),
             scope.recovery(),
             *limits,
             SnapshotLimits::default(),
-        )?);
+        )?
     } else {
         return Err("unknown received route".into());
+    };
+    assert_eq!(log.state()?.committed(), Some(f::at(1)));
+    assert_eq!(log.state()?.last_log(), Some(f::at(3)));
+    if route == "matching" {
+        let mut local = Vec::new();
+        state
+            .current_snapshot(&mut local, SnapshotLimits::default())?
+            .ok_or("installed matching FWSP4 missing")?;
+        assert_eq!(local, wire);
     }
+    log.save_committed(f::at(2))?;
+    drop((log, state));
     drop(f::open_pair(dir)?);
     Ok(())
 }

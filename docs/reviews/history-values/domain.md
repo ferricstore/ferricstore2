@@ -1083,3 +1083,195 @@ Concrete author fixture mistake: matching received() first seed(target) publishe
 Minimal proposed same-file correction, subject to Root/ARCH adoption: matching receiver has genuine value genesis and consumed/logged policy0/current0, retains canonical base1 plus suffix2 and opaque3, but leaves commitment0; fresh log leaves commitmentNone (or valid0) before restore. The public install/restore first acknowledges snapshot1. Only AFTER that call returns, public save_committed2 advances the same retained suffix; existing finish then replays it. Keep all four modes, local purge route, both received routes, original bodies/indices/opaque3, six-table/full-value/default/origin/artifact/pin/owned-read/reopen assertions. Preserve the literal local==wire assertion by reading public current_snapshot on the returned installed target, instead of constructing an already-applied target boundary1 before a strictly-newer install. This changes producer timing/receiver premises, no expected success/error/oracle. No fake raw metadata/regression or seed is proposed.
 
 Likely first actual failure is matching after the initial mode1 local path; the aggregate error alone does NOT establish that stage. Local Transition::local predicates are mathematically valid for snapshot1/committed2/tail3. If additional location evidence is desired, add only error context at existing local purge/recover and matching/fresh install/restore calls (mode/route/stage); no new case/helper/model/file or production edit is needed. Root and ARCH received the exact source guard/proposal. PERF's separate scope-conversion question remains outside this diagnosis and unedited. Only existing DOMAIN appended; finite read-only diagnosis STOP, all source/runtime custody Root-owned.
+
+
+## NODE8 received producers — post-da81 SOURCE STOP
+
+Root explicitly released only existing workflow_values/snapshot.rs after clean savedda81bd84276ceb841ab90f543e63326612c8f112 captured actual7PASS/2FAIL and mode1/matching diagnostic before corrections. I read the shared post-save release and WHOLE exact ARCH671003+8171/SHA57eeda004c8933382de3f2b78e97b44bc61272348b1ce2b1a7a5c9874c9e849d before writing. Root alone owns the separate conversion admission/limit funding; those files and saved ninth case were untouched by this author. No production snapshot/transition guard was changed.
+
+Actual final owned source: crates/wf-node/tests/snapshot_recovery/workflow_values/snapshot.rs375LF/11829B/SHA256482a6d43b1570f644841eb759d4c286824e016b57c60096fe2af7d473fff306b. Same11 functions; append_tail163..172/10LF gains only the selected commit bool, received186..256/71LF contains valid reception timing, largest71LF. The exact single test name/first-positive setter/fourmode loop and mode/route error diagnostic remain. No helper/file/type/model/alias/constant/API/target is added.
+
+Matching now constructs real value genesis and actual logged/consumed policy0. Explicit actual log-commit0/current-entry0 checks precede appending SAME canonical base1 without apply/commit. append_tail(false) retains SAME suffix2/opaque3 without committing. Fresh retains the identical0/1/2/3 frames with explicit committedNone. Both real public install/restore calls run against a strictly newer snapshot1. Returned log must acknowledge committed1 and retain lastlog3 before any new suffix commitment. Matching's literal local==wire oracle is preserved via actual public current_snapshot of its successfully installed target. Only AFTER received acknowledgement does public save_committed2 advance the SAME retained suffix; existing finish performs actual replay. Local source append_tail(true) retains its original commit2 behavior.
+
+Complete source inverse was independently executed IN MEMORY: restore only the former append_tail/received function blocks and remove only local caller's literaltrue argument; ENTIRE351LF/10852B/SHAf33c6b0a4445032994dc4e2ecebd072c364b050d5fd837fe7d99b3f3adc73a54 returns exactly. This proves every other function body, source operations/binary payloads/identities/indices/policy donors, all-mode localpurge/matching/fresh routes, opaque-tail preservation and fulltable/default/origin/immutable/alias/current/history/artifact/pin/ownedread/reopen oracles are byte-held outside the selected changes. No raw metadata mutation, log regression, fake seed/success or weakened expected error exists. Added guard assertions expose the corrected premise rather than hide it.
+
+Owned leaf was read back completely. Pinned1.99 --edition2024 --config skip_children=true formatting and --check EXIT0; natural375/71 geometry. No Cargo/globalformatter/compiler/tests/VM/probes/Git/shared-document/peer-source workload or mutation. Only this existing DOMAIN note appended. All source/note buffers SOURCE STOP now, custody returns to Root; current postcorrection runtime is unexecuted by this author. Root owns combined validation and save. Full Node/service/typed/hydration/lifecycle/parity/Linux/macOS/native/M1-M8 gates remain open; no extra acknowledgement requested.
+
+
+## HISTORY-VALUES-NEXT1: finite source-chain audit after Node9 G2
+
+Read-only preparation, not artifact/API approval or source release. Root reports
+G2 nine complete Node feature cases, strict checks and arch53 GREEN; its full
+workspace/conservation/save gate is still owned by Root. I ran no compiler,
+formatter, VM, test, native/Linux/Docker/Mix/ps retry, probe or Git mutation.
+Only this existing DOMAIN note is appended. Current CONTINUE98a43e51 and ordered
+plan c00eb1b1 retain M2 persistence before M3 consensus and M4 service; local
+snapshot/startup recovery is not a public strong-read barrier.
+
+I whole-read the pinned HistoryValues107LF/3445B/d287d697ebc67daab0f731beed8572f483f84c4aaad340d67946a1760274ae32 and original test47LF/1401B/85719d7dbdcbebadd2ed76fa5020b7bba5c2d482ac77ddd5716a88740bc6e041.
+The preserved baseline remains66586c596e271408d9184af32eb31cd7218c126e.
+The three exact declarations, in source order, are:
+
+- 7486b505b2ba580e, line8, "history hydration marks storage failures without exposing their reason": ReadResult.failure({missing_file,"/private/secret/path"}) overlays ONLY the sanitized payload_error string "ERR storage read failed".
+- bdafcf374348156d, line21, "history file-reference size is the exact stored byte count": file_ref("/segment",10,100), cap10, overlays payload_omitted=true and payload_size=100.
+- 381f48c9d21d1d52, line32, "history hydration marks corrupted typed values": FSV2+mode2+"not-an-external-term", cap1024, yields the exact invalid-flow string AND no payload key.
+
+There are FOUR assert/refute observations, async:true, module tag flow and NO
+local setup. These helper calls intentionally use the arbitrary string "ref";
+substituting a valid generated key would change their premises. Mapping.json
+still has status unported and empty runtime_case_ids/rust_counterparts for all
+three. Progress.json retains collected runtime identities but rust_assertions
+is empty. No mapping/ledger update is authorized by this audit.
+
+Source-chain reads also cover complete ReadResult31/1192/54bd71ef and
+TermCodec22/727/fa1f00df; Support125..180 (whole identity67ea918f);
+ValueStore254..430 plus reached locator/materialization restoration (whole
+727/22731/0c4dcc83); HistoryRead public hydration call sites758..784/808..831;
+Keys81..114/514, Router part01 shard_for980, part02 batch/file read1263..1365,
+and SlotMap15..65 (whole119/3590/7ba7200b). I reread the prior accepted
+ARCH1492+16429/11f8843ad60ae79a6ac6af7dc9b3c719d7d0499273d9be385b58a8d6c25f5430
+whole; the backend freeze558449+27432/ddfcd7fe's final follower obligations
+remain applicable. This is source evidence, not a new original VM result.
+
+The full helper contract must survive the next selection. Collection order is
+events then payload/result/error, first-occurrence uniqueness BEFORE binary,
+nonempty and65535-byte filtering. Nil/empty/nonbinary refs leave fields intact;
+long binaries add the kind-specific too-large error without fetching that key.
+ValueStore separately recognizes p/r/e/s/n shapes, restores invalid slots, and
+falls back ONLY for primary nil, never failure/binary/file metadata. Its private
+"generated payload" predicate actually delegates to all Keys.value_key? kinds.
+All-valid malformed batch replies zip-truncate at HistoryValues; mixed-key
+mismatches restore nil slots. The source-shaped compatibility collector needs
+that distinction; a real Rust adapter should always supply exact cardinality.
+
+Overlay order is payload/result/error. Missing puts value=nil plus missing=true;
+storage failure puts only sanitized error; file/proven metadata puts only
+omitted=true and exact STORED size; byte length greater than max omits BEFORE
+any decode. Successful decode puts value and stored size; corruption puts only
+invalid-flow error. Other source result classes are unchanged. Existing value,
+size/error/missing/omitted fields and unrelated data are never implicitly
+cleared. Disabled/empty history invokes neither storage nor context. Threshold
+is1 for max<1, else max+1; overflow is operational, not invented omission.
+
+Implemented responsibilities actually found
+
+The owned decoder in domain value/original_flow.rs146/4732/57883ecc and
+model.rs233/7791/23a3e61e is real common/foreign-DATA decoding: unchanged moved
+encoded owner, checked flat node/edge views, arbitrary integers, bitstrings,
+proper/improper lists, finite signed-zero bits and exact semantic map keys.
+Raw, incomplete/unknown magic and one-level mode1 escape are preserved;
+mode2 safe ETF requires exact EOF and rejects compressed terms. Explicit
+safe atom/export/local tables remain caller captures; None is unavailable,
+not an allow-any table. Foreign identity is DATA, not a BEAM execution demand.
+Current context/profile/Limit/reservation errors are distinct from corrupt
+bytes. A hydration wrapper must not turn any of them into InvalidFlowValue.
+
+The real FWSS7/catalog/consumed publication/Node chain now provides regular
+local p/r/e logical BINARY values, current/every-history bindings, retained
+birth/lifecycle provenance, reopen and complete snapshots. Current read.rs
+350/11362/22c637d4 creates one committed redb snapshot and one server clock pair,
+returns exact ordered slots and one byte owner per successful distinct ref,
+and keeps known missing/UnsafeDrift/profile refusal distinct. It returns STORED
+FSV2 bytes, not a decoded document. read::one175..192 explicitly refuses shared
+and named kinds as UnsupportedProfile; the pure parser/renderers recognizing
+s/n are not availability implementations. ReadFailed/Unavailable variants in
+ports catalog are not currently produced by this backend's per-slot code;
+backend corruption/read errors remain real outer errors, not fabricated slots.
+
+Current logical input beginning FSV2+2 is always escaped as BINARY; real tests
+use FSV2+1+FSV2+2+opaque. No decoder invocation occurs in application/storage/
+Node source. The current prepared batch has no per-value typed discriminator,
+and there is no generic typed encoder/publication API. Treating old payload
+Vec bytes as already-stored ETF would violate saved binary meaning and digest/
+replay identity. A separately logged representation/version and manifest/alias/
+current closure rules are required before typed bytes can be published there.
+
+Domain HistoryEntry is a reduced authoritative event; FWSH stores it separately
+from family11 value bindings. history/original.rs133/4646/1ae5d490 is a borrowed
+legacy field-list conversion, uses closed policy Raw and an infallible BTreeMap;
+it is not a complete arbitrary-value hydration/cumulative-admission model.
+Existing point workflow_value_binding(history=Some) can supply a binding, but
+there is no real public bounded ordered history+binding read/orchestration yet.
+Application queries/routing/authorization, consensus read, Node composition and
+projection history remain reservations. One local redb snapshot/clock does not
+supply authorization, placement, leader/quorum barrier or applied watermark.
+
+Concrete smallest consultation proposal, NOT selected artifacts
+
+I sent ARCH/PERF a complete HISTORY-VALUE-OVERLAY1 prerequisite, rather than a
+three-error proxy: existing domain history.rs seam; candidate history/values.rs
+with private values/{model,collect,apply}.rs only if exact geometry warrants;
+grouped tests/history_values/{main,overlay,collection,decoding}.rs. The feature
+would collect refs and produce ALL source-selected field writes over retained
+original fields, owning successful OriginalValueDocuments per occurrence.
+Untouched fields keep their real descriptors; valid decoded values must not be
+collapsed to policy Raw::Other. The exact ABI/helper/model roster is still for
+ARCH to choose BEFORE creation. No current path, type or method is approved by
+this paragraph. Aim production<=400/test<=600/function<=100 naturally.
+
+Input result classes must distinguish actual missing, storage failure, proven
+stored-size omission/file metadata, stored bytes and unrelated source class.
+A field-write overlay is preferable to copying/rebuilding every unrelated
+history value, provided materialization preserves the exact source map rules.
+Fetch dedup does not imply decode dedup: decode is reached for EACH occurrence.
+One owned read buffer cannot be moved into multiple documents. Admit explicit
+per-occurrence copies (last use may move), retaining unique read buffers plus
+all completed output arenas and patch spines; no Document Clone/self-reference.
+Cap omission is checked before copy/context/decode. The outer account must pay
+all candidates and both equality byte operands, final spines/fallible reserves,
+and every decode call. Since the decoder exposes no actual-spent API, a wrapper
+can prospectively debit the call's full max_work_units cohort on its continuous
+outer account instead of claiming that repeatedly reset inner budgets are one
+actual-spent counter. Any narrower shared-meter seam needs explicit selection.
+Input len AND actual capacity, nodes, edges, encoded depth, context lookup and
+per-occurrence map comparisons retain existing decoder limits. No heap/RSS,
+allocator-capacity, native CPU or measured gain theorem is proposed.
+
+Full proposed oracles are the exact three source cases/four observations above
+plus raw/escaped/unknown-magic/empty-at-zero; the independently captured184-byte
+compound at cap184 success versus183 omission; proper/improper/BigInt/bitstring/
+signed-zero/map-alias types; stale existing value/error/size/flags and unrelated
+fields; nil/empty/nonbinary/65535/65536 refs; p/r/e occurrence order, stable dedup
+and both cardinality branches; disabled/empty no-read/no-context; per-occurrence
+context/work/copy refusal; true invalid bytes versus unavailable context/profile
+and actual allocation/resource error lanes. Existing decoder literals may be
+copied as independent golden inputs, never generated by a new encoder under
+test. Original file-ref100 controls stay literal metadata, not invented real
+redb file locators. No mapping/full hydration claim follows from pure success.
+
+Required connected followers, no scope reduction
+
+1. A real size-aware read mode: current aggregate stored-byte Limit is NOT
+history omission. Under one snapshot/clock validate authoritative alias/row
+length/digest and return proven STORED-size metadata before payload ownership
+when max is exceeded. Preserve real storage/failure/unsafe lanes; do not forge
+a file path or treat operational exhaustion as omitted. The current119+P+ID
+alias metadata can establish size, but backend key/envelope/hash visits still
+need work/temp admission. Exact new read model/API requires its own decision.
+2. Separately versioned typed/common value ingress, codec and SAME consumed
+publication/current/every-history/reopen/snapshot/Node audit. Preserve existing
+binary profiles byte-for-byte. Capture safety contexts honestly, preserve typed
+foreign identity DATA, refuse unavailable native/local context operationally;
+no arbitrary BEAM execution engine is a new common-data prerequisite.
+3. Real shared s/n publication, named versions/override/link reachability and
+external-reference availability. Source value_put uses real writes and named
+commands; pure renderers/ActiveValueRef are no proof. Key-tag CRC32&1023 plus
+captured slot mapping or an explicit reviewed Rust placement equivalent must
+be owned server-side. Cross-authority input needs a proven availability protocol
+or explicit refusal. Nil-only physical fallback is required only where that
+selected physical fallback exists; never route failures through fake fallback.
+4. Actual ordered history/FWSH+family11 reads and complete application hydration,
+with original event ordering and per-occurrence decode/omission/error overlays.
+Then accepted read authorization/routing, leader/quorum/applied barrier and
+projection watermark/position semantics through the real service. A callback,
+coherent local snapshot or startup replay cannot establish those capabilities.
+5. Real cleanup/rewind/retirement/recreation, mandatory original setup/profile
+execution, native failures, both Linux/macOS and remaining ordered M1-M8 remain
+required. Passive expiry, explicit deletion and rewind refresh keep distinct
+source semantics and reference safety; no broad no-cascade assumption returns.
+
+ARCH and PERF were sent concrete findings/candidate by direct messages; both
+were idle after their finite previous tasks, so no new independent approval is
+claimed. Root may reactivate the exact consultation after its current backend/
+Node full validation and save. This author created no successor buffer or
+artifact; ONLY this note appended. Finite read-only task STOP.

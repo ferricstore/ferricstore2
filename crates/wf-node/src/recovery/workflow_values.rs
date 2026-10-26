@@ -95,12 +95,16 @@ pub(super) fn apply(
         .workflow_value_limits()
         .ok_or(CommittedRecoveryError::UnsupportedEntry)?;
     let scope_owner = total(&[512, fields[0].len(), fields[1].len(), fields[2].len()])?;
+    let conversion = total(&[
+        fields[0].len().max(fields[1].len()).max(fields[2].len()),
+        size_of::<Vec<u8>>(),
+    ])?;
     limits.admit(&[
         base,
         profile_header,
         entry_owner,
         scope_owner,
-        profile.record_batch.workspace_bytes,
+        profile.record_batch.workspace_bytes.max(conversion),
     ])?;
     let scope = RequestScope::new(
         TenantId::new(replay::copy(fields[0])?)

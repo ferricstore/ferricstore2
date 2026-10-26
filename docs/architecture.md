@@ -1439,7 +1439,8 @@ input/store lifetime.
 describes the closed command profile;
 [ADR-007](adr/007-durable-log-storage.md#binary-workflow-values-and-captured-lifecycle)
 describes publication, recovery, snapshots and resource ownership. Executed
-component evidence is in the handoff. Node startup still refuses operation8
-until the separately selected audit/replay gate is implemented. Typed/shared/
+component evidence is in the handoff. Node startup supports operation 8 under an
+explicit value-limit opt-in; [its audit/replay contract](adr/007-durable-log-storage.md#operation-8-startup-audit-and-replay)
+retains the original body, captured context and consumed storage driver. Typed/shared/
 external values, public hydration, real lifecycle maintenance, required original
 profiles, native/Linux acceptance and the ordered milestone exits remain open.

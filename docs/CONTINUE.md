@@ -5,13 +5,12 @@ GPT-6.1-sol/max agents use disjoint writes and dedicated architecture and
 performance reviews. Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The last completed backend checkpoint `825051f` passed **1,119 Rust tests**: all 1,097 compatibility identities
-plus all 22 workflow-value feature cases. Exact package/target/name/status
-comparison preserves the earlier 1,093 identities and four restoration cases,
-all 102 targets and both benchmark correctness smokes. Six documentation tests
-across fifteen targets, formatting, all-target compilation, strict Clippy,
-all 53 architecture checks, documentation build, reference/progress integrity,
-offline dependency checks and diff checks pass.
+The current workspace passes **1,128 Rust tests**. Exact package/target/source/
+name/status comparison preserves all 1,119 prior identities and adds only the
+nine Node recovery cases. All 102 targets and both benchmark correctness smokes
+are preserved. Six documentation tests across fifteen targets, formatting,
+all-target compilation, strict Clippy, all 53 architecture checks, documentation
+build, reference/progress integrity, offline dependency checks and diff checks pass.
 
 The genuine 19-pass/3-failure baseline was saved in5fa3d20 before correction.
 Recovery now rejects current binding presence/byte disagreements with the actual
@@ -34,29 +33,31 @@ remain; separate known4-malformed controls were added. Whole-file inverses prove
 every other prior case/order/assertion unchanged. Earlier local W512 producer
 funding likewise preserves all individual caps and shared fixtures.
 
-The Node operation-8 rejecting checkpoint is saved in `032939b`: 70 old recovery
-identities passed and all eight new tests failed at their first opt-in assertion.
-Real audit/replay bodies were written only afterward. The first complete run
-passes seven original scenario tests. The snapshot scenario fails because its
-receiver fixture commits suffix 2 before offering snapshot 1; the existing
-strictly-newer guard correctly rejects that premise. Mode/route diagnostics
-confirm the reached mode-1 matching receiver.
+Node operation-8 startup audit/replay passes all **nine complete feature tests**,
+after saved rejecting checkpoints `032939b` and `da81bd8`. All four contained
+modes, local purge, matching/fresh received snapshots, retained outcomes,
+ordered values, complete historical audit, resource cuts, uncertainty and durable
+prefix/reopen tails execute. Ordinary construction remains opted out.
 
-Performance review found a separate scope Vec-to-Box construction allowance.
-A ninth test reaches the intended failure: actual inner Value/Record/Transaction
-Limit, expected an earlier Node Limit at the old outer peak. Session 9036 records
-7 passes and these 2 failures, unchanged 1650/43039f26,
-raw 10613813+2253/58a52b75; strict Clippy passes. All original eight assertions
-and producers remain intact except diagnostic context. The genuine counterexample
-must be saved before either selected correction.
+The scope conversion peak is admitted separately from driver ownership using
+max(V,C), with full point and returned-profile headers retained. The original
+thin-driver refusal remains independently reached under a funded outer profile.
+Received fixtures install snapshot 1 before committing/replaying suffix 2,
+preserving the strict production guard and every catalog/value/read oracle.
+Architecture, performance and author reviews/inverses are closed.
 
-The selected correction admits scope Q plus max(driver V, largest actual scope
-leaf + Vec header), retaining full J and Qv. It preserves the original V=1 inner
-refusal behind a funded outer producer. Snapshot receivers must install boundary 1
-before committing/replaying suffix 2; all modes and full value/catalog/owned-read
-oracles remain. Identity APIs, legacy budgets and production snapshot guards stay
-unchanged. The coordination record assigns disjoint authors after the save.
-No passing nine-test, accepted-service, full parity or measured-speed claim exists.
+Full session 98800 passed on unchanged 1650/741131c0: 1,128 tests, 6 doc tests,
+compile/doc/architecture/reference/progress/dependency/diff checks. Its exact
+identity Counter is 51afde2c; only nine Node cases extend the prior 1,119.
+This is local macOS execution, not Linux or mandatory original-profile evidence.
+
+The next consultation is complete HistoryValues collection/overlay as a
+prerequisite, with real size-aware reads, separately versioned typed publication,
+shared/named/external availability, ordered history hydration and authoritative
+routing/read barriers still required. DOMAIN's evidence/proposal is recorded;
+no successor artifact is approved or implemented yet. Do not substitute its three
+source error cases for complete success/omission/overlay behavior or full routing.
+No accepted service, full Elixir parity or milestone completion is claimed.
 
 Typed/shared/external values, public hydration, real lifecycle cleanup/rewind/
 recreation, mandatory original Elixir profiles, native failures, Linux and macOS

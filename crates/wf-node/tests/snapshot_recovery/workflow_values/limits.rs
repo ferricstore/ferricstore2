@@ -295,10 +295,19 @@ fn external_scope(limits: &Limits) -> TestResult {
         + frame.as_bytes().len()
         + q
         + 1;
+    let conversion = 4_096_usize
+        .checked_add(size_of::<Vec<u8>>())
+        .ok_or("scope conversion overflow")?;
+    let funded = exact
+        .checked_sub(normal.workspace_bytes)
+        .and_then(|bytes| bytes.checked_add(normal.workspace_bytes.max(conversion)))
+        .ok_or("scope profile overflow")?;
     for (outer, expected) in [
         (exact - 1, Error::Limit),
+        (exact, Error::Limit),
+        (funded - 1, Error::Limit),
         (
-            exact,
+            funded,
             Error::Value(WorkflowValueTransactionError::Record(
                 RecordBatchTransactionError::Transaction(StateTransactionError::Limit),
             )),

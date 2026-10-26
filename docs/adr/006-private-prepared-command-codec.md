@@ -1634,7 +1634,9 @@ server context changes. Fresh creation uses one external schema account through
 policy loading, projection, witness verification and reached birth capture.
 Unsupported profiles remain explicit operational refusals rather than fabricated
 business outcomes. Canonical footer/intent/metadata/EOF validation remains
-mandatory even though Node startup dispatch for8 is the next separate gate.
+mandatory in direct storage application and explicitly enabled Node operation-8
+startup audit/replay. Historical audit uses the bounded complete preparer without
+recapturing current policy or defaults; replay invokes the original consumed driver.
 
 The exact selected wire and owner decisions are recorded in the
 [architecture review](../reviews/history-values/architecture.md); durable rows
