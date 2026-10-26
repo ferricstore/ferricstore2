@@ -6,6 +6,7 @@ use crate::policy::RetryPolicy;
 use crate::retry::RetryDecision;
 
 pub mod original;
+pub mod values;
 
 /// The nine source retry metadata observations, retained as typed values.
 #[derive(Clone, Debug, Eq, PartialEq)]

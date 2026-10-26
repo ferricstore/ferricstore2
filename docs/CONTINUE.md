@@ -5,7 +5,7 @@ GPT-6.1-sol/max agents use disjoint writes and dedicated architecture and
 performance reviews. Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current workspace passes **1,128 Rust tests**. Exact package/target/source/
+The last saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/
 name/status comparison preserves all 1,119 prior identities and adds only the
 nine Node recovery cases. All 102 targets and both benchmark correctness smokes
 are preserved. Six documentation tests across fifteen targets, formatting,
@@ -51,11 +51,27 @@ compile/doc/architecture/reference/progress/dependency/diff checks. Its exact
 identity Counter is 51afde2c; only nine Node cases extend the prior 1,119.
 This is local macOS execution, not Linux or mandatory original-profile evidence.
 
-The next consultation is complete HistoryValues collection/overlay as a
-prerequisite, with real size-aware reads, separately versioned typed publication,
-shared/named/external availability, ordered history hydration and authoritative
-routing/read barriers still required. DOMAIN's evidence/proposal is recorded;
-no successor artifact is approved or implemented yet. Do not substitute its three
+Architecture and performance selected complete HistoryValues collection/overlay
+as the next pure prerequisite. Its exact eighteen-case, six-file test batch now
+compiles against ordinary models and two literal rejecting functions. All
+eighteen cases actually fail their first healthy prepare assertion with Limit;
+their complete later tails are compiled and masked. Focused compilation,
+strict Clippy, all53 architecture checks, formatting, domain documentation,
+reference/progress integrity and diff checks pass after technical corrections.
+Reciprocal source review is complete. This is the reviewed rejecting baseline
+required before business implementation; the coordination record binds its save
+and subsequent disjoint authorship release.
+
+The selected behavior borrows original entries while ordered writes own full
+decoded values. Each decode attempt, including corrupt data followed by
+continuation, retains its full work and cumulative requested-byte allowance.
+The concrete selection and staged authorship release are in the coordination
+record. These models and failing tests establish no working hydration behavior.
+
+Real size-aware reads, separately versioned typed publication, shared/named/
+external availability, ordered history hydration and authoritative routing/read
+barriers remain required. Architecture and performance are preparing the real
+size-aware read successor without source changes. Do not substitute the three
 source error cases for complete success/omission/overlay behavior or full routing.
 No accepted service, full Elixir parity or milestone completion is claimed.
 
