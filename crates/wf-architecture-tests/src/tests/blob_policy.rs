@@ -45,6 +45,7 @@ fn workflow_value_bytes_stay_pure_and_server_side() -> CheckResult<()> {
     );
     assert_overlay_metadata_rejections()?;
     assert_overlay_metadata_forward_alias_rejections()?;
+    assert_overlay_metadata_scope_controls()?;
     assert_overlay_metadata_positives()?;
     Ok(())
 }
@@ -186,6 +187,75 @@ fn assert_overlay_metadata_forward_alias_rejections() -> CheckResult<()> {
         rejected,
         "all forward/reversed metadata alias controls: {diagnostics}"
     );
+    Ok(())
+}
+
+fn assert_overlay_metadata_scope_controls() -> CheckResult<()> {
+    let mut observed = Vec::new();
+    for namespace in ["std", "core"] {
+        for (label, rejected, source) in [
+            (
+                "block restores ordinary outer binding",
+                false,
+                format!(
+                    "use core::ops::Range as I; fn hidden() {{ {{ use {namespace}::array::IntoIter as I; let _ = core::mem::size_of::<I<u8, 0>>(); }} let _ = I::from(0_u8..0_u8); }}"
+                ),
+            ),
+            (
+                "module restores ordinary outer binding",
+                false,
+                format!(
+                    "use core::ops::Range as I; mod child {{ use {namespace}::array::IntoIter as I; type Header = I<u8, 0>; }} fn outer() {{ let _ = I::from(0_u8..0_u8); }}"
+                ),
+            ),
+            (
+                "module masks outer metadata binding",
+                false,
+                format!(
+                    "use {namespace}::array::IntoIter as I; mod child {{ type I = core::ops::Range<u8>; fn hidden() {{ let _ = I::from(0_u8..0_u8); }} }}"
+                ),
+            ),
+            (
+                "local ordinary import masks throughout block",
+                false,
+                format!(
+                    "use {namespace}::array::IntoIter as I; fn hidden() {{ let _ = I::from(0_u8..0_u8); use core::ops::Range as I; }}"
+                ),
+            ),
+            (
+                "nested block retains outer metadata binding",
+                true,
+                format!(
+                    "use {namespace}::array::IntoIter as I; fn hidden() {{ {{ let _ = I::new([]); }} }}"
+                ),
+            ),
+            (
+                "module nested block resolves reverse imports",
+                true,
+                format!(
+                    "mod child {{ fn hidden() {{ {{ let _ = Second::new([]); use First as Second; use {namespace}::array::IntoIter as First; }} }} }}"
+                ),
+            ),
+        ] {
+            let findings = source_check("wf-domain", "history::values::decode", &source);
+            observed.push((namespace, label, source, rejected, findings));
+        }
+    }
+    assert_eq!(observed.len(), 12);
+    let diagnostics = format!("{observed:#?}");
+    let mut correct = true;
+    for (_, _, _, rejected, findings) in observed {
+        let findings = findings?;
+        let expected = if rejected {
+            findings
+                .iter()
+                .any(|finding| finding.contains("standard-library module"))
+        } else {
+            findings.is_empty()
+        };
+        correct &= expected;
+    }
+    assert!(correct, "all metadata scope controls: {diagnostics}");
     Ok(())
 }
 
