@@ -2,6 +2,7 @@
 
 use super::TestResult;
 
+mod codec;
 mod fixtures;
 mod guards;
 mod publication;

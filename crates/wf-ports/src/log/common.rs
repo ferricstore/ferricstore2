@@ -1,9 +1,11 @@
 //! Fixed header and item fields shared by borrowed validation and owned decoding.
 
+use std::fmt;
+
 use wf_domain::workflow::request::ClientIntent;
 use wf_types::version::{CommittedTime, HlcTimestamp, TimestampMillis};
 
-use super::{CodecError, CodecLimits, reader::Reader};
+use super::{CodecLimits, reader::Reader};
 
 /// Borrows supported Normal profile/scope/stamp facts without validating its body.
 /// Complete intent, operations, derived keys and EOF remain the driver's duty.
@@ -162,3 +164,61 @@ pub(super) fn item<'a>(reader: &mut Reader<'a>) -> Result<RawItem<'a>, CodecErro
         tag: reader.byte()?,
     })
 }
+
+/// Operational preparation/corruption failure; never a retained business outcome.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CodecError {
+    /// Private command version is unsupported.
+    UnsupportedVersion,
+    /// An operation/backoff discriminator is unknown.
+    UnsupportedTag,
+    /// Structurally valid original ETF needs another captured atom profile.
+    UnsupportedPolicyProfile,
+    /// A present/absent tag is neither zero nor one.
+    InvalidOptionality,
+    /// Fixed fields, typed identities or input continuity are invalid.
+    Malformed,
+    /// Bytes remain after the complete represented command.
+    TrailingBytes,
+    /// Complete input/output or derived-key aggregate exceeds its profile.
+    ByteLimit,
+    /// A batch is empty or a batch/filter count exceeds its structural profile.
+    ItemLimit,
+    /// A length-prefixed variable/nested field exceeds its configured byte cap.
+    ValueLimit,
+    /// Complete derived state key exceeds 65,535 bytes.
+    KeyLimit,
+    /// Complete derived isolation scope exceeds 8,192 bytes.
+    ScopeLimit,
+    /// A checked length/count cannot fit its explicit representation.
+    LengthOverflow,
+    /// The complete logical work cohort exceeds its explicit cap.
+    WorkLimit,
+    /// Requested simultaneous logical ownership exceeds its explicit cap.
+    OwnedLimit,
+    /// A safe fallible builder reservation failed.
+    Allocation,
+}
+
+impl fmt::Display for CodecError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(match self {
+            Self::UnsupportedVersion => "unsupported private prepared version",
+            Self::UnsupportedTag => "unsupported private prepared tag",
+            Self::UnsupportedPolicyProfile => "unsupported original policy profile",
+            Self::InvalidOptionality => "invalid private prepared optionality",
+            Self::Malformed => "malformed private prepared command",
+            Self::TrailingBytes => "trailing private prepared bytes",
+            Self::ByteLimit => "private prepared byte budget exceeded",
+            Self::ItemLimit => "private prepared item budget exceeded",
+            Self::ValueLimit => "private prepared field budget exceeded",
+            Self::KeyLimit => "private prepared state key too large",
+            Self::ScopeLimit => "private prepared isolation scope too large",
+            Self::LengthOverflow => "private prepared length overflow",
+            Self::WorkLimit => "private prepared work budget exceeded",
+            Self::OwnedLimit => "private prepared owned-byte budget exceeded",
+            Self::Allocation => "private prepared allocation failed",
+        })
+    }
+}
+impl std::error::Error for CodecError {}

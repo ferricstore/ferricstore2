@@ -1,7 +1,5 @@
 //! Prepared command codecs and consensus-neutral durable log capabilities.
 
-use std::fmt;
-
 use sha2::{Digest, Sha256};
 use wf_domain::policy::installation::{PolicyCandidate, PolicyLimits, PolicyValue};
 use wf_domain::workflow::admission::AdmissionLimits;
@@ -19,7 +17,7 @@ pub use claim::{
     inspect_claim_phase_point, prepare_claim_phase,
 };
 mod common;
-pub use common::normal_recovery_header;
+pub use common::{CodecError, normal_recovery_header};
 mod complete_policy;
 mod control;
 mod decode;
@@ -35,7 +33,10 @@ mod value_batch;
 pub use control::{
     decode_raft_membership_body, encode_raft_blank, encode_raft_membership, measure_control_entry,
 };
-pub use value_batch::{decode_workflow_value_batch, encode_workflow_value_batch};
+pub use value_batch::{
+    WorkflowValueMetadata, decode_workflow_value_batch, encode_workflow_value_batch,
+    prepare_workflow_value_batch,
+};
 mod writer;
 
 pub use storage::{
@@ -293,58 +294,6 @@ impl DecodedRequest<'_> {
         })
     }
 }
-
-/// Operational preparation/corruption failure; never a retained business outcome.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum CodecError {
-    /// Private command version is unsupported.
-    UnsupportedVersion,
-    /// An operation/backoff discriminator is unknown.
-    UnsupportedTag,
-    /// Structurally valid original ETF needs another captured atom profile.
-    UnsupportedPolicyProfile,
-    /// A present/absent tag is neither zero nor one.
-    InvalidOptionality,
-    /// Fixed fields, typed identities or input continuity are invalid.
-    Malformed,
-    /// Bytes remain after the complete represented command.
-    TrailingBytes,
-    /// Complete input/output or derived-key aggregate exceeds its profile.
-    ByteLimit,
-    /// A batch is empty or a batch/filter count exceeds its structural profile.
-    ItemLimit,
-    /// A length-prefixed variable/nested field exceeds its configured byte cap.
-    ValueLimit,
-    /// Complete derived state key exceeds 65,535 bytes.
-    KeyLimit,
-    /// Complete derived isolation scope exceeds 8,192 bytes.
-    ScopeLimit,
-    /// A checked length/count cannot fit its explicit representation.
-    LengthOverflow,
-    /// A safe fallible builder reservation failed.
-    Allocation,
-}
-
-impl fmt::Display for CodecError {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str(match self {
-            Self::UnsupportedVersion => "unsupported private prepared version",
-            Self::UnsupportedTag => "unsupported private prepared tag",
-            Self::UnsupportedPolicyProfile => "unsupported original policy profile",
-            Self::InvalidOptionality => "invalid private prepared optionality",
-            Self::Malformed => "malformed private prepared command",
-            Self::TrailingBytes => "trailing private prepared bytes",
-            Self::ByteLimit => "private prepared byte budget exceeded",
-            Self::ItemLimit => "private prepared item budget exceeded",
-            Self::ValueLimit => "private prepared field budget exceeded",
-            Self::KeyLimit => "private prepared state key too large",
-            Self::ScopeLimit => "private prepared isolation scope too large",
-            Self::LengthOverflow => "private prepared length overflow",
-            Self::Allocation => "private prepared allocation failed",
-        })
-    }
-}
-impl std::error::Error for CodecError {}
 
 /// Prepares one normalized policy envelope without installation or submission.
 ///

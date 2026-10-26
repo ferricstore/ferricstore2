@@ -22,6 +22,15 @@ documentation build and offline dependency checks pass. Existing tests were
 checked separately from the twelve new cases, whose actual failures are recorded
 above. These checks do not establish full workflow parity or Linux acceptance.
 
+Five supplemental codec tests now also compile and fail at their first
+expected-positive encoder assertions. Their independent frame, tamper, limit,
+ownership and retry-jitter checks remain masked until implementation. Formatting,
+workspace compilation, strict Clippy and all 53 architecture checks pass for
+this exact baseline. Peer review added full encoded-slice equality and
+independently resealed decoder ordering negatives. The metadata accessor uses
+a named borrowed view after an actual Clippy diagnostic; it owns no backing.
+The original twelve integration tests remain unchanged.
+
 The separate captured-lifecycle restoration prerequisite now passes **all nine
 unchanged tests**: the five earlier cases and four tests saved failing in
 `9b5bd52`. All ten focused checks pass, including strict Clippy, the domain
