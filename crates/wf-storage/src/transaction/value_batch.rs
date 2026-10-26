@@ -49,7 +49,7 @@ pub struct WorkflowValueTransactionLimits {
 }
 
 /// Operational refusal; never retained as a fabricated business outcome.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WorkflowValueTransactionError {
     /// Existing record driver refusal.
     Record(RecordBatchTransactionError),

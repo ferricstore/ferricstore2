@@ -33,7 +33,7 @@ fn stage_namespace(
 pub(super) fn matching(
     log: &mut RedbLogStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
     saved: ControlState,
     before: RaftLogState,
@@ -60,7 +60,7 @@ fn retry(
     log: &mut RedbLogStore,
     state: &mut RedbStateStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     snapshot: SnapshotLimits,
     initial: (ControlState, Option<(EntryIdentity, EntryStamp)>),
     context: (usize, &mut [usize; 2]),
@@ -124,6 +124,7 @@ pub fn install_received_snapshot(
     limits: CommittedRecoveryLimits,
     snapshot: SnapshotLimits,
 ) -> Result<(RedbLogStore, RedbStateStore), Error> {
+    let limits = &limits;
     let namespace = (group, recovery);
     let base = super::namespace(&log, &state, namespace)?;
     let stage_owner = stage_namespace(&candidate, namespace)?;
@@ -149,7 +150,7 @@ pub fn install_received_snapshot(
         .zip(metadata.membership().stamp());
     drop(metadata);
     let entry = saved.last_entry().ok_or(Error::UnappliedSnapshot)?;
-    let mut work = [0, limits.maximum_log_body_bytes()];
+    let mut work = [0, limits.work.1];
     if before.last_purged() == Some(entry.log()) && before.purged_snapshot_id() == Some(id) {
         retry(
             &mut log,
@@ -201,6 +202,7 @@ pub fn restore_received_snapshot(
     limits: CommittedRecoveryLimits,
     snapshot: SnapshotLimits,
 ) -> Result<(RedbLogStore, RedbStateStore), Error> {
+    let limits = &limits;
     let namespace = (group, recovery);
     stage_namespace(&candidate, namespace)?;
     if log.group() != group || log.recovery() != recovery {
@@ -218,7 +220,7 @@ pub fn restore_received_snapshot(
     drop(metadata);
     let entry = saved.last_entry().ok_or(Error::UnappliedSnapshot)?;
     let transition = SnapshotTransition::received(before, entry.log(), id)?;
-    let mut work = [0, limits.maximum_log_body_bytes()];
+    let mut work = [0, limits.work.1];
     matching(&mut log, namespace, limits, base, saved, before, &mut work)?;
     let state = candidate.into_store()?;
     phase(limits, snapshot, base)?;

@@ -445,7 +445,12 @@ fn assert_header_only_peak() -> TestResult {
     let before = cohort(&dir)?;
     let s = f::scope()?;
     let exact = 3588 + 512 + 2048 + 3 * bytes.len();
-    for workspace in [exact - 1, exact] {
+    for workspace in [
+        exact - 1,
+        exact,
+        with_headers(exact)? - 1,
+        with_headers(exact)?,
+    ] {
         let cap = CommittedRecoveryLimits::new(
             RaftMembershipLimits::default(),
             (100, 1536, 1024, 131),
@@ -457,7 +462,7 @@ fn assert_header_only_peak() -> TestResult {
         .with_core_policy_patches();
         let (log, state) = f::open_pair(&dir)?;
         let result = recover_committed(log, state, s.group(), s.recovery(), cap);
-        if workspace == exact {
+        if workspace == with_headers(exact)? {
             drop(result?);
         } else {
             assert_eq!(result.err(), Some(Error::Limit));
@@ -467,4 +472,14 @@ fn assert_header_only_peak() -> TestResult {
     }
     std::fs::remove_dir_all(dir)?;
     Ok(())
+}
+
+fn with_headers(bytes: usize) -> TestResult<usize> {
+    let fixed = std::mem::size_of::<Option<[usize; 4]>>()
+        .checked_add(
+            std::mem::size_of::<wf_node::recovery::CommittedRecoveryError>()
+                .max(std::mem::size_of::<wf_node::recovery::SnapshotRecoveryError>()),
+        )
+        .ok_or("fixed recovery header overflow")?;
+    Ok(bytes.checked_add(fixed).ok_or("outer profile overflow")?)
 }

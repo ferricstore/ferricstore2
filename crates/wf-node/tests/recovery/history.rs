@@ -37,7 +37,7 @@ fn committed_recovery_audits_latest_membership_and_every_historical_clock() -> T
             }
             _ => Error::UnsupportedEntry,
         };
-        assert_refusal(&dir, limits()?, expected)?;
+        assert_refusal(&dir, &limits()?, expected)?;
         std::fs::remove_dir_all(dir)?;
     }
     Ok(())
@@ -148,7 +148,7 @@ fn committed_recovery_checks_original_stamp_and_complete_normal_body() -> TestRe
                 &key::encode_control_key(s.group(), s.recovery(), fixtures::MIB)?,
                 &value::encode_control(s.group(), s.recovery(), changed, fixtures::MIB)?,
             )?;
-            assert_refusal(&dir, limits()?, Error::StampMismatch)?;
+            assert_refusal(&dir, &limits()?, Error::StampMismatch)?;
         } else {
             let frame = fixtures::frame(5, b"old", 1, vec![(b"i", fixtures::create_op())])?;
             let mut malformed = frame.as_bytes().to_vec();
@@ -173,7 +173,7 @@ fn committed_recovery_checks_original_stamp_and_complete_normal_body() -> TestRe
             };
             assert_refusal(
                 &dir,
-                limits()?,
+                &limits()?,
                 Error::Normal(wf_storage::transaction::RecordBatchTransactionError::Apply(
                     expected,
                 )),
@@ -253,7 +253,7 @@ fn committed_recovery_binds_full_checkpoint_identity_and_actual_body() -> TestRe
             "body" => Error::BodyMismatch,
             _ => Error::IncompatibleCheckpoint,
         };
-        assert_refusal(&dir, limits()?, expected)?;
+        assert_refusal(&dir, &limits()?, expected)?;
         std::fs::remove_dir_all(dir)?;
     }
     Ok(())

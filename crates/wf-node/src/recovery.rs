@@ -12,7 +12,7 @@ use wf_storage::log::RedbLogStore;
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
     ClaimTransactionError, CorePolicyTransactionError, OriginalPolicyTransactionError,
-    RecordBatchTransactionError, RecordBatchTransactionLimits,
+    RecordBatchTransactionError, RecordBatchTransactionLimits, WorkflowValueTransactionError,
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
@@ -20,6 +20,7 @@ mod join;
 mod original_policy;
 mod replay;
 mod snapshot;
+mod workflow_values;
 
 pub use snapshot::{
     SnapshotRecoveryError, install_received_snapshot, purge_snapshot, recover_snapshotted,
@@ -36,6 +37,7 @@ pub struct CommittedRecoveryLimits {
     claim_work: Option<ClaimWorkLimits>,
     core_policy: bool,
     original_policy: bool,
+    workflow_values: Option<[usize; 4]>,
     work: (usize, usize),
     entry: usize,
     workspace: usize,
@@ -81,6 +83,7 @@ impl CommittedRecoveryLimits {
             claim_work: None,
             core_policy: false,
             original_policy: false,
+            workflow_values: None,
             work,
             entry: maximum_owned_entry_bytes,
             workspace: workspace_bytes,
@@ -169,9 +172,12 @@ impl CommittedRecoveryLimits {
             recovery.as_bytes().len(),
             2048,
             512,
+            std::mem::size_of::<Option<[usize; 4]>>(),
+            std::mem::size_of::<CommittedRecoveryError>()
+                .max(std::mem::size_of::<SnapshotRecoveryError>()),
         ])
     }
-    fn admit(self, parts: &[usize]) -> Result<(), CommittedRecoveryError> {
+    fn admit(&self, parts: &[usize]) -> Result<(), CommittedRecoveryError> {
         if total(parts)? > self.workspace {
             return Err(CommittedRecoveryError::Limit);
         }
@@ -226,6 +232,8 @@ pub enum CommittedRecoveryError {
     CorePolicy(CorePolicyTransactionError),
     /// Original public Policy.set preparation/transaction diagnosis.
     OriginalPolicy(OriginalPolicyTransactionError),
+    /// Existing consumed workflow-value transaction diagnosis.
+    Value(WorkflowValueTransactionError),
     /// Header-only parsing failure.
     Codec(CodecError),
     /// Closed Blank/Membership parsing failure.
@@ -252,6 +260,7 @@ impl fmt::Display for CommittedRecoveryError {
             Self::Claim(error) => return fmt::Display::fmt(error, f),
             Self::CorePolicy(error) => return fmt::Display::fmt(error, f),
             Self::OriginalPolicy(error) => return fmt::Display::fmt(error, f),
+            Self::Value(error) => return fmt::Display::fmt(error, f),
             Self::Codec(error) => return fmt::Display::fmt(error, f),
             Self::Membership(error) => return fmt::Display::fmt(error, f),
         })
@@ -272,6 +281,7 @@ pub fn recover_committed(
     limits: CommittedRecoveryLimits,
 ) -> Result<(RedbLogStore, RedbStateStore), CommittedRecoveryError> {
     use CommittedRecoveryError as Error;
+    let limits = &limits;
     if log.group() != group
         || log.recovery() != recovery
         || state.group() != group
@@ -290,7 +300,7 @@ pub fn recover_committed(
     let audit_end = initial
         .last_entry()
         .map_or(0, |entry| u128::from(entry.log().index().get()) + 1);
-    let mut work = [0, limits.maximum_log_body_bytes()];
+    let mut work = [0, limits.work.1];
     let mut latest = None;
     for position in 0..audit_end {
         let index = u64::try_from(position).map_err(|_| Error::Limit)?;

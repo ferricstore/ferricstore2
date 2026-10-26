@@ -13,7 +13,7 @@ pub(super) fn apply(
     log: &mut RedbLogStore,
     state: &mut RedbStateStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     context: (usize, Option<LogIdentity>),
     initial: (ControlState, Option<(EntryIdentity, EntryStamp)>),
     work: &mut [usize; 2],

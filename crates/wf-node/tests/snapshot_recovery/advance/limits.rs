@@ -62,7 +62,7 @@ fn fault_stage(dir: &Path, wire: &[u8], fault: Arc<AtomicU8>) -> TestResult<Redb
     )?)
 }
 
-fn received_refusal(dir: &Path, wire: &[u8], fresh: bool, exact: usize) -> TestResult {
+fn received_refusal(dir: &Path, wire: &[u8], fresh: bool, maximum: usize) -> TestResult {
     let before = if fresh {
         None
     } else {
@@ -91,7 +91,7 @@ fn received_refusal(dir: &Path, wire: &[u8], fresh: bool, exact: usize) -> TestR
     let scope = f::scope()?;
     let (log, state) = f::open_pair(dir)?;
     fault.store(3, Ordering::SeqCst);
-    let cap = profile((3, 39), 525, exact - 1)?;
+    let cap = profile((3, 39), 525, maximum)?;
     let result = if fresh {
         drop(state);
         restore_received_snapshot(
@@ -127,6 +127,10 @@ fn received_refusal(dir: &Path, wire: &[u8], fresh: bool, exact: usize) -> TestR
     }
     assert_eq!(f::log_meta(dir)?, meta);
     assert_eq!(f::log_rows(dir)?, rows);
+    let path = dir.join("fault-stage.redb");
+    if path.exists() {
+        std::fs::remove_file(path)?;
+    }
     Ok(())
 }
 
@@ -211,8 +215,10 @@ fn live_and_fresh_receive_pay_each_actual_namespace_before_source_reads() -> Tes
         drop((log, state));
         let exact = 4100 + 2050 + f::MIB + if fresh { 0 } else { 514 };
         assert_eq!(exact, if fresh { 1_054_726 } else { 1_055_240 });
-        received_refusal(&target, &wire, fresh, exact)?;
-        received_success(&target, &wire, &expected, fresh, exact)?;
+        for maximum in [exact - 1, exact, with_headers(exact)? - 1] {
+            received_refusal(&target, &wire, fresh, maximum)?;
+        }
+        received_success(&target, &wire, &expected, fresh, with_headers(exact)?)?;
         std::fs::remove_dir_all(target)?;
     }
     std::fs::remove_dir_all(dir)?;
@@ -242,10 +248,20 @@ fn seed(dir: &std::path::Path, upgraded: bool) -> TestResult {
 
 fn refusal(
     dir: &std::path::Path,
-    cap: CommittedRecoveryLimits,
+    cap: &CommittedRecoveryLimits,
     expected: CommittedRecoveryError,
+    upgraded: bool,
 ) -> TestResult {
-    let before = fixtures::cohort(dir)?;
+    let before = if upgraded {
+        Some(fixtures::cohort(dir)?)
+    } else {
+        None
+    };
+    let legacy = if upgraded {
+        None
+    } else {
+        Some(super::super::fixtures::cohort(dir)?)
+    };
     let meta = f::log_meta(dir)?;
     let rows = f::log_rows(dir)?;
     let (log, state) = f::open_pair(dir)?;
@@ -255,14 +271,19 @@ fn refusal(
         state,
         scope.group(),
         scope.recovery(),
-        cap,
+        *cap,
         snapshot()?,
     )
     .err()
     .ok_or("bounded recovery accepted")?;
     assert_eq!(error, Error::Recovery(expected));
     drop(f::open_pair(dir)?);
-    assert_eq!(fixtures::cohort(dir)?, before);
+    if let Some(before) = before {
+        assert_eq!(fixtures::cohort(dir)?, before);
+    }
+    if let Some(legacy) = legacy {
+        assert_eq!(super::super::fixtures::cohort(dir)?, legacy);
+    }
     assert_eq!(f::log_meta(dir)?, meta);
     assert_eq!(f::log_rows(dir)?, rows);
     Ok(())
@@ -279,8 +300,17 @@ fn scalar_mode_dispatch_keeps_legacy_exact_workspace_and_pays_new_context_before
         if upgraded {
             refusal(
                 &dir,
-                profile((3, 39), 525, exact - 1)?,
+                &profile((3, 39), 525, exact - 1)?,
                 CommittedRecoveryError::Limit,
+                upgraded,
+            )?;
+        }
+        for maximum in [exact, with_headers(exact)? - 1] {
+            refusal(
+                &dir,
+                &profile((3, 39), 525, maximum)?,
+                CommittedRecoveryError::Limit,
+                upgraded,
             )?;
         }
         let (log, state) = f::open_pair(&dir)?;
@@ -291,7 +321,7 @@ fn scalar_mode_dispatch_keeps_legacy_exact_workspace_and_pays_new_context_before
             state,
             scope.group(),
             scope.recovery(),
-            profile((3, 39), 525, exact)?,
+            profile((3, 39), 525, with_headers(exact)?)?,
             snapshot()?,
         )?;
         assert_eq!(
@@ -325,7 +355,7 @@ fn one_actual_point_body_pool_covers_orphan_pin_audit_then_replay() -> TestResul
             CommittedRecoveryError::Log(RaftLogError::Limit),
         ),
     ] {
-        refusal(&dir, profile(work, entry, 4 * f::MIB)?, error)?;
+        refusal(&dir, &profile(work, entry, 4 * f::MIB)?, error, true)?;
     }
     let (log, state) = f::open_pair(&dir)?;
     let scope = f::scope()?;
@@ -428,8 +458,10 @@ fn large_normal_scope_is_admitted_before_copies_even_with_tiny_driver_workspace(
     normal.workspace_bytes = 1;
     for (workspace, expected) in [
         (exact - 1, CommittedRecoveryError::Limit),
+        (exact, CommittedRecoveryError::Limit),
+        (with_headers(exact)? - 1, CommittedRecoveryError::Limit),
         (
-            exact,
+            with_headers(exact)?,
             CommittedRecoveryError::Normal(
                 wf_storage::transaction::RecordBatchTransactionError::Apply(
                     wf_ports::log::RecordBatchApplyError::Workspace {
@@ -468,4 +500,14 @@ fn large_normal_scope_is_admitted_before_copies_even_with_tiny_driver_workspace(
     }
     std::fs::remove_dir_all(dir)?;
     Ok(())
+}
+
+fn with_headers(bytes: usize) -> TestResult<usize> {
+    let fixed = std::mem::size_of::<Option<[usize; 4]>>()
+        .checked_add(
+            std::mem::size_of::<wf_node::recovery::CommittedRecoveryError>()
+                .max(std::mem::size_of::<wf_node::recovery::SnapshotRecoveryError>()),
+        )
+        .ok_or("fixed recovery header overflow")?;
+    Ok(bytes.checked_add(fixed).ok_or("outer profile overflow")?)
 }

@@ -23,29 +23,24 @@ use wf_types::version::{CommittedTime, LogIdentity};
 pub(super) fn observe(
     state: &mut RedbStateStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
     membership: &mut Option<(EntryIdentity, EntryStamp)>,
 ) -> Result<ControlState, Error> {
-    limits.admit(&[
-        base,
-        limits.maximum_applied_state_bytes(),
-        limits.maximum_temporary_bytes(),
-    ])?;
+    limits.admit(&[base, limits.state.1, limits.state.3])?;
     let admission = AdmissionLimits::new(1, 1, 1).map_err(|_| Error::InvalidLimits)?;
     let tx = state
         .begin_apply(
             namespace.0,
             namespace.1,
             admission,
-            limits.maximum_state_read_steps(),
-            limits.maximum_applied_state_bytes(),
-            limits.maximum_temporary_bytes(),
+            limits.state.0,
+            limits.state.1,
+            limits.state.3,
         )
         .map_err(Error::State)?;
     let (control, value) =
-        read_applied_state(&tx, limits.membership_limits(), limits.workspace_bytes())
-            .map_err(Error::State)?;
+        read_applied_state(&tx, limits.membership, limits.workspace).map_err(Error::State)?;
     *membership = match (value.entry(), value.stamp()) {
         (None, None) => None,
         (Some(entry), Some(stamp)) => Some((entry, stamp)),
@@ -60,7 +55,7 @@ pub(super) fn observe(
 pub(super) fn boundary(
     applied: ControlState,
     committed: Option<LogIdentity>,
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
 ) -> Result<u128, Error> {
     if let Some(entry) = applied.last_entry() {
         let end = committed.ok_or(Error::IncompatibleCheckpoint)?;
@@ -71,7 +66,7 @@ pub(super) fn boundary(
         }
     }
     let stop = committed.map_or(0, |id| u128::from(id.index().get()) + 1);
-    if stop > limits.maximum_log_points() as u128 {
+    if stop > limits.work.0 as u128 {
         return Err(Error::Limit);
     }
     Ok(stop)
@@ -80,15 +75,15 @@ pub(super) fn boundary(
 pub(super) fn point(
     log: &mut RedbLogStore,
     index: u64,
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
     work: &mut [usize; 2],
 ) -> Result<RaftLogEntry, Error> {
     work[0] = total(&[work[0], 1])?;
-    if work[0] > limits.maximum_log_points() {
+    if work[0] > limits.work.0 {
         return Err(Error::Limit);
     }
-    let cap = 512 + (limits.maximum_owned_entry_bytes() - 512).min(work[1]);
+    let cap = 512 + (limits.entry - 512).min(work[1]);
     limits.admit(&[base, cap])?;
     let entry = log
         .read_entry(index, cap)
@@ -113,9 +108,9 @@ pub(super) fn identity(entry: &RaftLogEntry) -> EntryIdentity {
 pub(super) fn normal_header<'a>(
     body: &'a [u8],
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = normal_recovery_header(body, limits.normal_limits().codec).map_err(|error| {
+    let header = normal_recovery_header(body, limits.normal.codec).map_err(|error| {
         if error == CodecError::UnsupportedTag {
             Error::UnsupportedEntry
         } else {
@@ -131,18 +126,17 @@ pub(super) fn normal_header<'a>(
 pub(super) fn control(
     body: &[u8],
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
 ) -> Result<(EntryStamp, bool), Error> {
-    let (stamp, owner) =
-        measure_control_entry(body, namespace.0, namespace.1, limits.membership_limits())
-            .map_err(Error::Membership)?;
+    let (stamp, owner) = measure_control_entry(body, namespace.0, namespace.1, limits.membership)
+        .map_err(Error::Membership)?;
     Ok((stamp, owner.is_some()))
 }
 
 pub(super) fn audit(
     entry: &RaftLogEntry,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
     applied: ControlState,
     latest: &mut Option<(EntryIdentity, EntryStamp)>,
@@ -180,7 +174,7 @@ pub(super) fn audit(
 fn audit_normal(
     body: &[u8],
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
@@ -191,12 +185,12 @@ fn audit_normal(
         return super::original_policy::audit(body, limits, base, stamp);
     }
     let available = limits
-        .workspace_bytes()
+        .workspace
         .checked_sub(total(&[base, 512])?)
         .ok_or(Error::Limit)?;
-    let codec = limits.normal_limits().codec;
+    let codec = limits.normal.codec;
     let decoded = if profile == 3 {
-        limits.claim_work_limits().ok_or(Error::UnsupportedEntry)?;
+        limits.claim_work.ok_or(Error::UnsupportedEntry)?;
         prepare_claim_phase(body, codec, available)
             .map_err(|error| Error::Claim(ClaimTransactionError::Apply(error)))?
     } else {
@@ -221,11 +215,11 @@ fn audit_normal(
 
 fn audit_core_policy(
     body: &[u8],
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
     stamp: CommittedTime,
 ) -> Result<EntryStamp, Error> {
-    if !limits.core_policy_patches() {
+    if !limits.core_policy {
         return Err(Error::UnsupportedEntry);
     }
     let header = body
@@ -234,7 +228,7 @@ fn audit_core_policy(
         .and_then(|bytes| bytes.checked_add(2048))
         .ok_or(Error::Limit)?;
     limits.admit(&[base, 512, header])?;
-    let driver = limits.normal_limits();
+    let driver = limits.normal;
     let mut charge = PolicySchemaCharge::new(driver.schema);
     let verified = verify_complete_core_policy_patch_frame(
         body,

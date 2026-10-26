@@ -252,7 +252,7 @@ fn atomic_start_recovery_audits_complete_body_before_suffix_publication() -> Tes
             if mode == "boundary" { 2 } else { 5 },
             Some(&changed),
         )?;
-        assert_refusal(&dir, cap, expected)?;
+        assert_refusal(&dir, &cap, expected)?;
         std::fs::remove_dir_all(dir)?;
     }
     std::fs::remove_dir_all(reference)?;
@@ -291,6 +291,7 @@ fn atomic_start_recovery_admits_exact_log_audit_and_driver_owners() -> TestResul
         Err(Workspace { attempted, maximum }) if attempted == d && maximum == d - 1
     ));
     let first = 4 * frames[0].1.as_bytes().len() + e + 3072;
+    raw_atomic_budgets(&dir, normal, wire, e, first)?;
     for (work, point, workspace, expected) in [
         ((2, wire), 511 + e, funded, Error::Log(RaftLogError::Limit)),
         (
@@ -319,15 +320,19 @@ fn atomic_start_recovery_admits_exact_log_audit_and_driver_owners() -> TestResul
             })),
         ),
     ] {
-        assert_refusal(&dir, profile(normal, work, point, workspace)?, expected)?;
+        assert_refusal(
+            &dir,
+            &profile(normal, work, point, with_headers(workspace)?)?,
+            expected,
+        )?;
     }
     let (log, state) = f::open_pair(&dir)?;
-    let cap = profile(normal, (2, wire), 512 + e, funded)?;
+    let cap = profile(normal, (2, wire), 512 + e, with_headers(funded)?)?;
     drop(recover_committed(log, state, s.group(), s.recovery(), cap)?);
     normal.codec = CodecLimits::new(AdmissionLimits::new(2, e, 1)?);
     assert_refusal(
         &dir,
-        profile(normal, (2, wire), 512 + e, funded)?,
+        &profile(normal, (2, wire), 512 + e, with_headers(funded)?)?,
         Error::Normal(Apply(Encoding(CodecError::ValueLimit))),
     )?;
     std::fs::remove_dir_all(dir)?;
@@ -348,13 +353,15 @@ fn check_atomic_driver_peaks(
     seed(&outer, frames, 1, None)?;
     let mut normal = f::driver_limits();
     let peak = 3588 + 512 + 515 + normal.workspace_bytes;
-    assert_refusal(
-        &outer,
-        profile(normal, (2, wire), 512 + e, peak - 1)?,
-        Error::Limit,
-    )?;
+    for maximum in [peak - 1, peak, with_headers(peak)? - 1] {
+        assert_refusal(
+            &outer,
+            &profile(normal, (2, wire), 512 + e, maximum)?,
+            Error::Limit,
+        )?;
+    }
     let (log, state) = f::open_pair(&outer)?;
-    let cap = profile(normal, (2, wire), 512 + e, peak)?;
+    let cap = profile(normal, (2, wire), 512 + e, with_headers(peak)?)?;
     drop(recover_committed(log, state, s.group(), s.recovery(), cap)?);
     std::fs::remove_dir_all(outer)?;
     frames.push((0, f::blank(EntryStamp::Unstamped)?));
@@ -388,4 +395,43 @@ fn check_atomic_driver_peaks(
         std::fs::remove_dir_all(dir)?;
     }
     Ok(())
+}
+
+fn raw_atomic_budgets(
+    dir: &Path,
+    normal: RecordBatchTransactionLimits,
+    wire: usize,
+    e: usize,
+    first: usize,
+) -> TestResult {
+    let d = 4 * e + e + 3072;
+    let exact = 3588 + 512 + d;
+    let header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
+    let funded = exact.checked_add(header).ok_or("header budget overflow")?;
+    for outer in [exact - 1, funded - 1] {
+        let available = outer - with_headers(3588)? - 512;
+        let attempted = [first, first + header, d, d + header]
+            .into_iter()
+            .find(|n| *n > available)
+            .ok_or("raw atomic cap must refuse")?;
+        assert_refusal(
+            dir,
+            &profile(normal, (2, wire), 512 + e, outer)?,
+            Error::Normal(Apply(Workspace {
+                attempted,
+                maximum: available,
+            })),
+        )?;
+    }
+    Ok(())
+}
+
+fn with_headers(bytes: usize) -> TestResult<usize> {
+    let fixed = std::mem::size_of::<Option<[usize; 4]>>()
+        .checked_add(
+            std::mem::size_of::<wf_node::recovery::CommittedRecoveryError>()
+                .max(std::mem::size_of::<wf_node::recovery::SnapshotRecoveryError>()),
+        )
+        .ok_or("fixed recovery header overflow")?;
+    Ok(bytes.checked_add(fixed).ok_or("outer profile overflow")?)
 }

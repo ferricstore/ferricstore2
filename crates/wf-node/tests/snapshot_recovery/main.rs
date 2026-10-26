@@ -16,6 +16,7 @@ mod limits;
 mod original_policy;
 mod provenance;
 mod replay;
+mod workflow_values;
 
 use fixture_data as f;
 use wf_node::recovery::{

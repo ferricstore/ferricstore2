@@ -35,7 +35,7 @@ fn limits() -> TestResult<CommittedRecoveryLimits> {
 
 fn assert_refusal(
     dir: &std::path::Path,
-    cap: CommittedRecoveryLimits,
+    cap: &CommittedRecoveryLimits,
     expected: CommittedRecoveryError,
 ) -> TestResult {
     let rows = fixtures::state_rows(dir)?;
@@ -44,7 +44,7 @@ fn assert_refusal(
     let log_meta = fixtures::log_meta(dir)?;
     let (log, state) = fixtures::open_pair(dir)?;
     let s = fixtures::scope()?;
-    let Err(error) = recover_committed(log, state, s.group(), s.recovery(), cap) else {
+    let Err(error) = recover_committed(log, state, s.group(), s.recovery(), *cap) else {
         return Err("recovery accepted inconsistent authority".into());
     };
     assert_eq!(error, expected);

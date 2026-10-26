@@ -9,7 +9,7 @@ use wf_types::identity::{GroupId, RecoveryId};
 pub(super) fn boundary(
     controls: [ControlState; 2],
     metadata: RaftLogState,
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     purge: bool,
 ) -> Result<(), Error> {
     let [saved, current] = controls;
@@ -44,7 +44,7 @@ pub(super) fn boundary(
     let count = stop
         .checked_sub(start)
         .ok_or(Error::IncompatibleCheckpoint)?;
-    if count > limits.maximum_log_points() as u128 {
+    if count > limits.work.0 as u128 {
         return Err(Error::Limit);
     }
     Ok(())
@@ -53,7 +53,7 @@ pub(super) fn boundary(
 pub(super) fn from(
     log: &mut RedbLogStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     controls: [ControlState; 2],
     memberships: &[Option<(EntryIdentity, EntryStamp)>; 3],
     work: &mut [usize; 2],
@@ -101,7 +101,7 @@ pub(super) fn from(
 pub(super) fn audit(
     log: &mut RedbLogStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     controls: [ControlState; 2],
     memberships: [Option<(EntryIdentity, EntryStamp)>; 2],
     work: &mut [usize; 2],

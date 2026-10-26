@@ -927,3 +927,131 @@ Independent IN-MEMORY full inverse succeeds for BOTH files. For corruption, remo
 The full inverses establish all prior test/helper bodies, literal fixtures, expected errors, mutations and order outside the selected refinements remain unchanged. In corruption, existing labels retain indices and known4 is appended afterv3; it inheritsMalformed and the existing reseal path. In received, original cases0/1/2/3 retain order; trailing remainscase3 and alone skips reseal; appendedcase4 sets4, expectsMalformed, is resealed and runs the existing assert_empty_stage. Unknown255 still expectsUnsupportedVersion. The new unreachable-default guard cannot replace a former reached case in the explicit0..5 loop. No assertion is removed/weakened and no production source changes. Modified functions remain natural77LF (38..114) and28LF (129..156); files remain below600.
 
 This closes the earlier pending scoped-inverse review. It verifies the supported-version producer-premise correction, not a passing rerun or completed1097 compatibility union. Root owns affected storage/runtime and remaining checks; no workloads/Git/source/test/shared-document mutations were performed by this reviewer. Only existing DOMAIN was appended, and finite review/writes STOP now. No extra acknowledgement or artifact approval is requested.
+
+
+## NODE8 A0 — DOMAIN ten-file test SOURCE STOP
+
+Root explicitly released this test-only batch after clean backendSAVE825051f9439d4a173eec1ead88eba05f3397b666. Before creation I actually whole/hash-read ARCH628254+16997/SHA bbfc4e0a25ce52d17d69d1d500adc17d5cd3261ebf7a506ff0129409ea77f57f through645251. All TEN selected paths were checked absent before writing. This author changed only those ten new files and appended this existing DOMAIN note. Root owns main.rs registration, all production/data/error/rejector and seven legacy-budget paths. No existing source/test/fixture/Cargo/target/dependency/policy/root-document was edited by this author.
+
+Exact new source metadata, read back after formatting:
+
+- workflow_values.rs: 16LF/371B/SHA256 e7f48098569c43bfeb8be2de231fbe8a80e4552f12ec131cc6565e5d920a94d1, 0 functions.
+- workflow_values/audit.rs: 125LF/4516B/SHA256 fe4ca282ca8ab7c8e26569d64c9dcc9d4de79c45e9ff9659bebd9d36873c7e46, 3 functions.
+- workflow_values/faults.rs: 206LF/6798B/SHA256 6a2f3c17ff5e2a527b9cd06e80e686c2a691c4a1171d784894042323f9951cf5, 6 functions.
+- workflow_values/fixtures/policy.rs: 262LF/9242B/SHA256 92156ab55471b28a22316b272a19f8d7d1b434d73b224ae1d003fbf38abe15ab, 5 functions.
+- workflow_values/fixtures.rs: 466LF/15084B/SHA256 aacf205f9881ffc463b5a8cd8b11147f6332ba9becd1043994897e5a9549d2d4, 23 functions.
+- workflow_values/guards.rs: 223LF/7456B/SHA256 f57b427388f87524e4e089aa7e43a3bd4e0512c84d1e1d478a97bebe6eb0832c, 6 functions.
+- workflow_values/independent.rs: 116LF/3879B/SHA256 3e5093daa73bde00279699432db11563f8724c0ac7bbbac5c6cadfbaed1fd4d1, 2 functions.
+- workflow_values/limits.rs: 325LF/10873B/SHA256 1e25deefc390034183b1b45cedb4e4ee3f393de74da956b6c31f0d784dee785f, 9 functions.
+- workflow_values/replay.rs: 294LF/10051B/SHA256 9e3ded73a76113f0c80583911f5079045ea0ce9330ac7bb57813e9456e77a136, 8 functions.
+- workflow_values/snapshot.rs: 347LF/10682B/SHA256 c6b70ec5d29d88f350163064ad7f153db200029b923c9a7c6bc8b9c1ec827fad, 11 functions.
+
+The complete inverse for this author slice is removal of ONLY these ten previously absent files; there is no modified old-file prefix to reconstruct. The same-target existing f, disk_backend and TestResult are reused; no cross-target path was created. The sole nominal declaration is approved test ValueReadClock{hlc,wall}, with only its WorkflowValueReadClock::read_snapshot implementation. No new alias/constant/enum/production model/trait/helper API was created. Routine private fixture/scenario decomposition stays inside the approved children.
+
+Exactly eight test names are present:
+
+- value_recovery_audits_complete_applied_frames.
+- value_recovery_uncertain_and_later_refusal_preserve_reopenable_prefix.
+- value_recovery_opt_in_and_layout_guards_remain_fail_closed.
+- value_recovery_independent_holes_preserve_every_intermediate_value.
+- value_recovery_limits_admit_headers_decoders_and_outer_scope.
+- value_recovery_replays_all_contained_modes_and_preserves_births.
+- value_recovery_retained_reprepare_preserves_original_outcome.
+- value_snapshot_recovery_preserves_catalog_for_all_contained_modes.
+
+Each of the eight begins with the direct expected-positive with_workflow_value_limits call and assert!(enabled.is_ok()) BEFORE enabled? propagation or any later fixture/new getter/Value-arm use. Existing Limits::new and scalar helpers are the only preceding premise. Missing setter/getter/Value diagnostics are expected at A0; this author ran NO compiler and does not claim those are the only actual diagnostics. Root must subsequently install only selected R0 data/error/rejector shape, execute all eight first-positive assertion failures and save that real RED before BODY. All later tails are currently unexecuted and must not be credited from source alone.
+
+Source-backed full tails: replay covers BOTH real logged Complete/Original policy donors crossed with contained1/5/6/7, actual8/response8/5/6/7, direct-driver whole-cohort references and literal current/EVERY-history/lifecycle/incarnation/read assertions after donor drops and repeated reopen. Retained reprepare changes server defaults/witness/marker/target/stamp after an actual policy update; direct Retained/IntentConflict/Expired/LogReplay premises and original position1/time20/expiry1020/response[0] remain explicit. Startup does not pretend to reapply an already applied index.
+
+Independent source slots0..4 contain real duplicate-Create rejection and a genuine Transition-to-current-state legacy no-op; the ignored no-op payload cannot create a row. Literal counted response[2,0,0,0,5,0,1,0,1,0,0,0], ordinal2 for sourceindex3, three intermediate A/B/C owners and history/current reference versions are asserted. Audit first runs a healthy full prefix, then earlier malformed8 under a separately valid last Blank, with independent footer/resealed-intent/EOF/optionality/namespace/stamp lanes; a separately changed LAST applied Blank expectsBodyMismatch. Structurally valid server-only metadata is accepted by historical audit without current authority checks.
+
+Guards preserve disabled/default capability, populated legacy, old business-on7, unknown contained mode, marker/generation/digest/target/default origins and complete no-change/reopen checks; real Core/Original/control remain usable. Bounds use actual target sizeof F/Qv plus full live J and scope, literal key lengths21/41/K62 and N=P=1 for complete bounded prepare. Old outer5268, F-funded one-short/exact disabled Blank, Qv exact/one-short, codec owned/work/encoded refusal, four value-write rows cap3/cap4, byte/work/temp caps and large external scope all remain separate. Source tests keep Codec(OwnedLimit/WorkLimit) distinct from Value(Record(Transaction(Limit))); no old profile is silently enlarged.
+
+Snapshot loops EACH mode through local pin/purge and matching received installation plus fresh received restore, then real committed8 suffix replay. The uncommitted opaque tail is retained/ignored. Actual six tables, FOUR active metadata keys/FWSS7/default60/FWSD3, THREE wire metadata rows/row_count=ROWS+3, original artifact, origin/manifest, aliases/immutable/current/history and owned reads/reopen are asserted. Faults use existing delegated disk backend's reached mode4, require actual consumption/Value(Uncertain), allow only entire-old or entire-new cohort, then reopen/recover the same log. A later two-Create8-row refusal undercap4 must leave the actual preceding one-Create4-row commit durable and resume with wider caps without changing logs. No catalog seed, raw production mutation, fake router/durable callback or successful stub is introduced.
+
+Pinned1.99 rustfmt --edition2024 --config skip_children=true was used ONLY on the ten owned files; option supported without warnings. Final exact ten-file --check EXIT0. No Cargo formatter/compiler/test/VM/probe/benchmark/Git or other workload was run. Physical census is73 functions =8 cases+64 private helpers+1 clock method, longest95LF, maxfile466LF, all limits natural with no suppression/packing. Complete actual corpus was read back and the sole witness-copy helper copies only ordinary test witness fields because production WorkflowValuePolicyWitness intentionally has no Clone; no trait/model change was inferred.
+
+Actual function spans (inclusive physical lines):
+
+- workflow_values.rs: module imports/declarations only.
+- workflow_values/audit.rs: value_recovery_audits_complete_applied_frames 11..33/23; audit_case 35..100/66; mutate 102..125/24.
+- workflow_values/faults.rs: value_recovery_uncertain_and_later_refusal_preserve_reopenable_prefix 18..29/12; state_backend 31..39/9; uncertain_input 41..59/19; uncertain_commit 61..112/52; prefix_input 114..147/34; later_refusal 149..206/58.
+- workflow_values/fixtures/policy.rs: policy_frame 34..77/44; original_frame 79..152/74; install 154..195/42; load_policy 197..218/22; witness 220..262/43.
+- workflow_values/fixtures.rs: read_snapshot 44..46/3; defaults 49..68/20; copy_policy 70..77/8; limits 79..92/14; driver 94..102/9; read_limits 104..111/8; log 113..121/9; pair 123..125/3; pair_for 127..153/27; item 155..165/11; create 167..178/12; batch 180..224/45; encode 226..231/6; apply 233..246/14; accepted 248..272/25; outcome 274..290/17; cohort 292..335/44; refused 337..352/16; reference 354..367/14; read 369..378/10; assert_read 380..393/14; binding 395..462/68; control 464..466/3.
+- workflow_values/guards.rs: value_recovery_opt_in_and_layout_guards_remain_fail_closed 15..31/17; disabled_then_enabled 33..64/32; populated_legacy 66..100/35; legacy_business 102..119/18; unknown_mode 121..153/33; live_guard 155..223/69.
+- workflow_values/independent.rs: value_recovery_independent_holes_preserve_every_intermediate_value 11..105/95; assert_value_families 107..116/10.
+- workflow_values/limits.rs: value_recovery_limits_admit_headers_decoders_and_outer_scope 24..63/40; fixed 65..67/3; base 69..72/4; profile 74..88/15; disabled_blank_headers 90..133/44; audit_owners_and_work 135..171/37; audit_boundaries 173..223/51; replay_value_caps 225..268/44; external_scope 270..325/56.
+- workflow_values/replay.rs: value_recovery_replays_all_contained_modes_and_preserves_births 16..30/15; mode_case 32..98/67; mode_frame 100..146/47; verify_mode 148..186/39; value_recovery_retained_reprepare_preserves_original_outcome 189..208/20; retained_case 210..270/61; check_retained_branch 272..284/13; assert_original 286..294/9.
+- workflow_values/snapshot.rs: value_snapshot_recovery_preserves_catalog_for_all_contained_modes 19..31/13; snapshot_case 33..84/52; seed 86..118/33; base_frame 120..129/10; suffix_frame 131..157/27; append_tail 159..166/8; stage 168..178/11; received 180..228/49; finish 230..274/45; verify_values 276..332/57; assert_values 334..347/14.
+
+All TEN source buffers and this author note are SOURCE STOPPED now; custody returns to Root. Only Root may create the agreed production R0 and execute missing-contract/compiler/quality/eight-RED/save evidence. No passing Node8 runtime, endpoint/service acceptance, originalHistoryValues mapping, M1-M8 completion, performance gain or Linux/macOS/native completion is claimed. Required typed/shared/external/hydration/cleanup/rewind/recreation/parity/full-goal followers remain open. No further acknowledgement gate is requested.
+
+
+## NODE8 R0 — finite reciprocal source/actual A0 review STOP
+
+Actually whole/hash-read raw10518541+12230/SHA5aa1331c650bb46e8b7e7654c79901edb3a4b09952dc358f05f4b851a186ecef. Own exact diagnostic extraction finds25E0599, no other coded compiler errors, plus only the two unused-import warnings RaftLogStore(fixtures) and StateSnapshotTransitionStore(snapshot). This is actual missing-contract A0 evidence before production shape, not compiled behavioralRED. Root's frozen51138 execution is live; no passing technical/R0/eight-case result is claimed here.
+
+Whole stopped production read: recovery.rs359LF/13585B/SHAa8c05058df5e690a69dac1fd8621a8e6c080c1aae64d196b957529ce6a1987d4; new recovery/workflow_values.rs35LF/1226B/SHAe91dd9bc3b00444c1ce88191d50e8f98cecf6cd046b45cd548b3ab5ea975ed24; storage transaction/value_batch.rs381LF/13571B/SHAe5cb2379932dd323e897173d7e151dc30a27ead4d427eb8da6da91f9d8fa5113. They match selected ARCH16997/bbfc R0: one private Option<[usize;4]> initializedNone, getter reconstructing ALL four extra ceilings from that field with record_batch=self.normal, literal unconditional setterErr(UnsupportedEntry) with underscore inputs. No positivity/product/route/body logic is smuggled into R0.
+
+Value(error) delegatesDisplay without normalization; existing storage error gains only derivedClone/Copy/Eq/PartialEq because RecordBatchTransactionError and all other unit variants already support them. No owned payload/operation is cloned. Shared base appends target-derived Y=sizeof<Option<[usize;4]>> and Z=max(sizeofCommittedRecoveryError,sizeofSnapshotRecoveryError), through existing checkedtotal. Existing committed/snapshot algorithms inherit F=Y+Z on disabled/control/legacy paths too; namespace refusal order remains. No Qv/runtime profile getter is introduced on legacy routes. New child contains only the two selected methods, no runtime worker/model/account/allocation.
+
+Independent complete inverses, IN MEMORY with no Git/file artifact: remove only the import/module/fieldNone/baseY+Z/Valuevariant+Display deltas from recovery and recover whole350LF/13100B/SHA1579a910cea0c0da3ed90b0cb2fa506997bfd7192228200f432c525c5bbc22ac; reverse only the storage error derive toDebug and recover whole381LF/13543B/SHA920defaaf12f42e2e9d2ce260d57c14f11325bd9fbf85854289cc7738f130958. Actual join253/4dddadd0 and replay184/821e78ee hashes remain literal, so both audit and replay still refuse8. No hidden BODY/source rewrite or manufactured success exists.
+
+All ten test source hashes were independently checked: seven remain byte-literal to my STOP. Exact complete single-change inverses restore the remaining three: fixtures466/42d0f66a restores466/aacf205f by only restoring unusedRaftLogStore; snapshot347/0ed5474e restores347/c6b70ec5 by only restoring unusedStateSnapshotTransitionStore; limits325/07459f58 restores325/1e25deef by only reversing AdmissionLimits::new(4096,encoded-1,1). My prior constructor operands were wrong: the actual API order is inline,decision,count. Root's correction preserves the ORIGINAL ByteLimit assertion and now supplies its intended decisionE-1 producer; no oracle is weakened. No eight-case name/body/first-positive setter assertion/remaining tail is otherwise changed.
+
+No additional concrete R0 defect found. GetterNone/data/error/F are ordinary rejecting-baseline scaffolding, not actual Node8 acceptance. Root must still observe exactly eight reached first-positive failures after compilation, preserve all honest later masking, SAVE, and only then authorize positive setter/getter/runtime BODY. Only existing DOMAIN was appended by this reviewer; no source/test/shared metadata/Git/formatter/compiler/VM/test/probe workload. Finite source/note review STOP; Root retains all mutation/validation/save custody, with no further acknowledgement gate.
+
+
+## NODE8 BORROW1 — finite reciprocal nine-source review STOP
+
+Actually read all NINE stopped production files, original HEAD825051f9439d4a173eec1ead88eba05f3397b666 sources and their full diffs. Root explicitly permitted read-only Git show/diff for this finite task after the initial no-Git restriction; only git show was invoked, with no Git mutation or filesystem artifact. HEAD825 originals total65987B; adding the already reviewed485B R0 parent shape yields the stated66472B pre-BORROW baseline. Actually whole/hash-read ARCH647460+8399/SHA78c53e709f11d47230e3940bca0c39269ae3310b7e3ce8bf2246989937b51314, selecting the measured23 private reference parameters and unchanged public signatures/arity.
+
+Actual current source bindings:
+
+- crates/wf-node/src/recovery.rs: 360LF/13594B/SHA256 7492a68e4d4e2a31ff5e44c120687708a98d741634e2366f06bcfebdb1207ec0.
+- crates/wf-node/src/recovery/join.rs: 247LF/8449B/SHA256 1e0c8af064478d6aff0b1bb6999a200ec9e01824cc6e454f0c4947ef3526a062.
+- crates/wf-node/src/recovery/original_policy.rs: 80LF/2675B/SHA256 06fb0b2f75d73ce3c9fbce209c099ee3ace17cf0d233a69f6e86df9be906abeb.
+- crates/wf-node/src/recovery/replay.rs: 179LF/6414B/SHA256 5bceac29bb686ef598273ed7e558599ff27416ef01e94cd841d3fe35b57b9f3a.
+- crates/wf-node/src/recovery/snapshot.rs: 256LF/8298B/SHA256 a30c8ff3cc19851cee4007f32e1151f53dd187e014e7c00f576c5e11872ac53d.
+- crates/wf-node/src/recovery/snapshot/advance.rs: 352LF/10874B/SHA256 4b53c06f3c3534751a4162e58339a17fad29c86a6ffe00ab89c06c5835e5b30f.
+- crates/wf-node/src/recovery/snapshot/provenance.rs: 136LF/4868B/SHA256 84b9fc916d49904762776262b31eaf074589f7943c8f769932f4822b99f16a92.
+- crates/wf-node/src/recovery/snapshot/received.rs: 239LF/8755B/SHA256 f8ad157d39d500e879731a5f68db10b2dde1862dc89741388fdee2f61c4ac3fd.
+- crates/wf-node/src/recovery/snapshot/replay.rs: 53LF/2082B/SHA256 6b0088148d03bb7f926d86f47915f4fa429d575ce7c1fc449635d88e9a975077.
+
+All FIVE public signatures are independently BYTE-EXACT toHEAD825: recover_committed, purge_snapshot, recover_snapshotted, install_received_snapshot, restore_received_snapshot. Each consuming public entry creates exactly one immutable letlimits=&limits. Direct private parameters borrow23 times; three existing snapshot profile tuples additionally carry a reference. Private admit changes only receiver to&self. No extra argument/helper/model/field/owner/return lifetime appears; decoded/log/state/guard values retain original boundaries. Existing public fallback deliberately passes *limits to recover_committed; this is not a claim that every native copy disappears.
+
+Field substitutions match actual getter bodies: state0=steps/state1=observationR/state2=controlR/state3=C; work0=points/work1=copiedbody profile; entry=pointJ; workspace=outerW; normal/membership/Claim/core/original opt-ins retain exact data. Normal and Claim subprofiles remain ordinary Copy inputs at the same reached calls. Point/body mutable counters are the SAME accounts; no reset/refund/cache/new profile. Historical clock/identity/stamp/member checks, namespace/error precedence, before.max(during), original-policy3E+2048/PG/X admission, snapshot phase/stage/pin/transition/drop/Immediate order and shared target-derived F remain unchanged. Repeated/pending/received paths use the same borrowed entry profile.
+
+Precise mechanical inverse checked IN MEMORY against ALL NINE HEAD825 sources: reverse23 borrowed signatures/three tuple references, five entry loans/privateadmit borrow, direct-field→oldgetter substitutions and sole fallbackdereference, then remove only KNOWN R0 import/module/OptionNone/F/Value additions in parent. Full token streams match across allnine, preserving string/comment contents; only formatting whitespace and two optional trailing array commas in collapsed join/control admit arrays require normalization. This is token/formula conservation, NOT a false byte-identical rustfmt inverse. Seven match before comma normalization; join/replay differ only by that one optional comma each. No other statement/operator/branch/arity change remains.
+
+Selected newchild35/e91dd9bc3b00444c1ce88191d50e8f98cecf6cd046b45cd548b3ab5ea975ed24 and storageerror381/e5cb2379932dd323e897173d7e151dc30a27ead4d427eb8da6da91f9d8fa5113 remain BYTE-EXACT to preceding R0 review. Setter remains literalUnsupportedEntry; getter only reconstructs ordinary fields. Actual8 routes remain absent in audit_normal/replay_normal, so no BODY/gain/capability is inferred.
+
+No additional concrete source/resource/ownership defect found. PERF direct message independently agrees on same immutable owner/accounts/formulas and explicit public fallback; its final written receipt is separate. ARCH8399 reports prior8first-positive runtimeFAIL with tails masked; this reviewer did not execute a post-BORROW runner or promote the live technical result. Root reports production diagnostics closed and is selecting remaining test-only lint corrections, outside this review.
+
+Only existing DOMAIN appended. No source/test/shared-document/formatter/compiler/VM/test/probe/Git mutation or other workload by this reviewer. Finite read-only review/note STOP; Root retains all source/technical/RED/SAVE custody. Node8 runtime/service/M1-M8/original parity/Linux/macOS/native completion remains unclaimed; no extra acknowledgement gate.
+
+
+## NODE8 TEST-BORROW1 — ten-file correction SOURCE STOP
+
+Root explicitly reassigned exclusive custody of ONLY the ten original new workflow_values test paths. Before edits I actually whole/hash-read ARCH655859+4767/SHA4399af4114f03a963da7dd765389593b7ced09dc06a02719c5afe2fe94537404 and actual diagnostic raw10549169+15492/SHA7fc0d97fc301b41b0dc03bb3ec0612896179a08dbcf733c24834bfd3db981df1. Exact diagnostics are21 private profile copies (17 in this slice/four Root), seven EntryIdentity::log closures and one nonempty assertion style. Root owns all old helper/budget/Claim-child/production paths; no overlap or edit there by this author.
+
+Complete beforeimages of allten were captured IN MEMORY; this baseline includes Root's previously accepted two import removals and corrected AdmissionLimits inline/decision/count order. Only selected corrections were authored:17 private cap/limits parameters become shared references,22 matching owned private-call operands borrow,14 calls to unchanged consuming PUBLIC recovery APIs explicitly copy *limits, and two unchanged public builder calls copy (*limits). Existing public by-value getters remain their existing semantics. Seven closures become the exact fully qualified EntryIdentity::log method pointer; fixtures::accepted changes only assert!(!response.is_empty()) to assert_ne!(response,[]). No new helper/type/alias/constant/model/API/field, profile authority, owner/account or capability BODY exists.
+
+Actual complete final source metadata/functions, after pinned own-file formatting:
+
+- workflow_values.rs: 16LF/371B/SHA256 e7f48098569c43bfeb8be2de231fbe8a80e4552f12ec131cc6565e5d920a94d1, 0 functions; full before SHA e7f48098569c43bfeb8be2de231fbe8a80e4552f12ec131cc6565e5d920a94d1.
+- workflow_values/audit.rs: 125LF/4548B/SHA256 ef66eb675981945c648bf8ff48ef729691e34805d7b0e1af04dd0e421aac383e, 3 functions; full before SHA fe4ca282ca8ab7c8e26569d64c9dcc9d4de79c45e9ff9659bebd9d36873c7e46.
+- workflow_values/faults.rs: 206LF/6866B/SHA256 a3f228b87014c588655714763c51d7d2aad63b56abe4e53469b00b7ba5755a92, 6 functions; full before SHA 6a2f3c17ff5e2a527b9cd06e80e686c2a691c4a1171d784894042323f9951cf5.
+- workflow_values/fixtures/policy.rs: 262LF/9242B/SHA256 92156ab55471b28a22316b272a19f8d7d1b434d73b224ae1d003fbf38abe15ab, 5 functions; full before SHA 92156ab55471b28a22316b272a19f8d7d1b434d73b224ae1d003fbf38abe15ab.
+- workflow_values/fixtures.rs: 466LF/15069B/SHA256 2922842490773c4589d0578ed32cb00633a5d269bc25fe3e9fb9114ab065cf1b, 23 functions; full before SHA 42d0f66a43d0cac8aee1899925f6c7a0c8b028c6fbc662680b6a2d1ac04e34a6.
+- workflow_values/guards.rs: 223LF/7469B/SHA256 9a01ecda9e1b35f4e13e130badd41f655d4565e3fa2af47e54c180dbac341ccc, 6 functions; full before SHA f57b427388f87524e4e089aa7e43a3bd4e0512c84d1e1d478a97bebe6eb0832c.
+- workflow_values/independent.rs: 116LF/3879B/SHA256 3e5093daa73bde00279699432db11563f8724c0ac7bbbac5c6cadfbaed1fd4d1, 2 functions; full before SHA 3e5093daa73bde00279699432db11563f8724c0ac7bbbac5c6cadfbaed1fd4d1.
+- workflow_values/limits.rs: 326LF/10894B/SHA256 451a49bc0cbecea7ecfe2b2503c5cf891f754557c6c87ab528978ab93fe3104d, 9 functions; full before SHA 07459f58f125bc401a38b208ab0d047d9bdf2b9eebe327cfc1cebdef6d87575b.
+- workflow_values/replay.rs: 294LF/10116B/SHA256 b8d374874415318ac5bd587503686832f85bcc4918aff54a78cef461a0cd1214, 8 functions; full before SHA 9e3ded73a76113f0c80583911f5079045ea0ce9330ac7bb57813e9456e77a136.
+- workflow_values/snapshot.rs: 350LF/10758B/SHA256 7f0a5969e5eaaa0e233e8989f18cbdf2a3ccd79b63309fc527b02c4b42ff9f94, 11 functions; full before SHA 0ed5474ec449549fe09834c9af35c2f974f8fe178cd56af5860bb3e3d1c1b1bc.
+
+Parent feature, fixture policy and independent scenario are BYTE-EXACT to their beforeimages. For allten, captured textual edit/reformat inverses recover the ENTIRE beforeimage bytes/hashes listed above. A separate token check proves final formatted source equals the closed expected17/22/14/2/7/1 transformation, preserving all strings/comments/values; only whitespace/optional trailing separators are normalized for rustfmt. Eight exact test identities, direct first-positive setter assertions, full literal oracles/F/Qv/J/D/X/K62/work/limit formulas, body/entry scopes, driver/error origins, all-mode matrices, Complete/Original fixtures, no-op/hole/retained/snapshot/uncertain/prefix/read/drop/reopen tails are conserved. AdmissionLimits::new(4096,encoded-1,1) stays correct; no assertion/cap reduction or source reinterpretation was introduced.
+
+Only own10 files were formatted with pinned1.99 --edition2024 --config skip_children=true; final ten-file --check EXIT0. No Cargo/global formatter/compiler/test/VM/probe/benchmark/Git/shared-document or peer-source mutation. Census remains73 functions=8 cases+64 private helpers+one approved clock method, longest95LF/maxfile466LF; no new declaration or geometry waiver. Source corpus/diffs were read back after canonicalization.
+
+All ten source buffers and own note are SOURCE STOPPED now, custody returned to Root. No new runtime/technical GREEN or postcorrection8RED/SAVE is claimed by this author. Root owns disjoint source integration, full frozen checks, genuine rejecting-baseline conservation and later separate BODY release. Node8 service/full M1-M8/original profiles/Linux/macOS/native goals remain open; no further acknowledgement gate.

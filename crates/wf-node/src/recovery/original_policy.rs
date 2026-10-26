@@ -28,14 +28,14 @@ impl CommittedRecoveryLimits {
 
 pub(super) fn audit(
     body: &[u8],
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
     stamp: CommittedTime,
 ) -> Result<EntryStamp, Error> {
-    if !limits.original_policy_sets() {
+    if !limits.original_policy {
         return Err(Error::UnsupportedEntry);
     }
-    let driver = limits.normal_limits();
+    let driver = limits.normal;
     let pg = usize::try_from(driver.schema.max_work_bytes()).map_err(|_| Error::Limit)?;
     let header = body
         .len()
@@ -44,7 +44,7 @@ pub(super) fn audit(
         .ok_or(Error::Limit)?;
     limits.admit(&[base, 512, pg, 65_536, header])?;
     let available = limits
-        .workspace_bytes()
+        .workspace
         .checked_sub(total(&[base, 512])?)
         .ok_or(Error::Limit)?;
     let mut charge = PolicySchemaCharge::new(driver.schema);

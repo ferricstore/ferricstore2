@@ -73,7 +73,7 @@ pub(super) fn seeded(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore, [u
 pub(super) fn assert_refusal(
     dir: &Path,
     purge: bool,
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     snapshot: SnapshotLimits,
     expected: Error,
 ) -> TestResult {
@@ -83,9 +83,9 @@ pub(super) fn assert_refusal(
     let s = f::scope()?;
     let (log, active) = f::open_pair(dir)?;
     let result = if purge {
-        purge_snapshot(log, active, s.group(), s.recovery(), limits, snapshot)
+        purge_snapshot(log, active, s.group(), s.recovery(), *limits, snapshot)
     } else {
-        recover_snapshotted(log, active, s.group(), s.recovery(), limits, snapshot)
+        recover_snapshotted(log, active, s.group(), s.recovery(), *limits, snapshot)
     };
     let error = result.err().ok_or("invalid snapshot join accepted")?;
     assert_eq!(error, expected);

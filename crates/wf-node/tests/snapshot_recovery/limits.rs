@@ -57,13 +57,15 @@ fn snapshot_phase_workspace_is_admitted_before_other_owners_and_exact_profile_su
     blank_pair(&dir)?;
     let cap = snapshot()?;
     let exact = 3588 + 2050 + f::MIB;
-    fixtures::assert_refusal(
-        &dir,
-        false,
-        profile((3, 39), 525, exact - 1)?,
-        cap,
-        Error::Recovery(CommittedRecoveryError::Limit),
-    )?;
+    for outer in [exact - 1, exact, with_headers(exact)? - 1] {
+        fixtures::assert_refusal(
+            &dir,
+            false,
+            &profile((3, 39), 525, outer)?,
+            cap,
+            Error::Recovery(CommittedRecoveryError::Limit),
+        )?;
+    }
     let (log, state) = f::open_pair(&dir)?;
     let s = f::scope()?;
     let (log, mut state) = recover_snapshotted(
@@ -71,7 +73,7 @@ fn snapshot_phase_workspace_is_admitted_before_other_owners_and_exact_profile_su
         state,
         s.group(),
         s.recovery(),
-        profile((3, 39), 525, exact)?,
+        profile((3, 39), 525, with_headers(exact)?)?,
         cap,
     )?;
     assert_eq!(
@@ -121,7 +123,7 @@ fn one_point_body_pool_counts_audit_and_replay_and_excludes_only_purged_points()
             fixtures::assert_refusal(
                 &dir,
                 false,
-                profile(work, entry, 4 * f::MIB)?,
+                &profile(work, entry, 4 * f::MIB)?,
                 snapshot()?,
                 Error::Recovery(expected),
             )?;
@@ -258,8 +260,10 @@ fn external_large_tenant_is_admitted_before_scope_copy_with_tiny_driver_workspac
     normal.workspace_bytes = 1;
     for (workspace, expected) in [
         (exact - 1, CommittedRecoveryError::Limit),
+        (exact, CommittedRecoveryError::Limit),
+        (with_headers(exact)? - 1, CommittedRecoveryError::Limit),
         (
-            exact,
+            with_headers(exact)?,
             CommittedRecoveryError::Normal(
                 wf_storage::transaction::RecordBatchTransactionError::Apply(
                     wf_ports::log::RecordBatchApplyError::Workspace {
@@ -278,8 +282,18 @@ fn external_large_tenant_is_admitted_before_scope_copy_with_tiny_driver_workspac
             512 + length,
             workspace,
         )?;
-        fixtures::assert_refusal(&dir, false, cap, snapshot()?, Error::Recovery(expected))?;
+        fixtures::assert_refusal(&dir, false, &cap, snapshot()?, Error::Recovery(expected))?;
     }
     std::fs::remove_dir_all(dir)?;
     Ok(())
+}
+
+fn with_headers(bytes: usize) -> TestResult<usize> {
+    let fixed = std::mem::size_of::<Option<[usize; 4]>>()
+        .checked_add(
+            std::mem::size_of::<wf_node::recovery::CommittedRecoveryError>()
+                .max(std::mem::size_of::<wf_node::recovery::SnapshotRecoveryError>()),
+        )
+        .ok_or("fixed recovery header overflow")?;
+    Ok(bytes.checked_add(fixed).ok_or("outer profile overflow")?)
 }

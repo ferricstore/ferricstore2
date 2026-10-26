@@ -1,19 +1,20 @@
 //! Real Claim dispatch, historical admission and shared startup resource limits.
 
 use super::{CommittedRecoveryError as Error, CommittedRecoveryLimits, TestResult};
-use super::{fixtures as f, limits, recover_committed};
+use super::{fixtures as f, recover_committed};
+
+mod limits;
 use std::path::Path;
 use wf_domain::claim::apply::ClaimWorkLimits;
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{EntryIdentity, EntryStamp};
 use wf_domain::workflow::request::{RequestScope, RetainedStatus};
 use wf_domain::workflow::{Create, Operation};
-use wf_ports::log::{CodecError, CodecLimits, RaftLogError, RaftLogStore, RecordBatchApplyError};
+use wf_ports::log::{CodecError, CodecLimits, RaftLogStore, RecordBatchApplyError};
 use wf_ports::state::{GroupApplyStore, GroupApplyTransaction};
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
-    ClaimTransactionError, ClaimTransactionLimits, ClaimTransactionOutcome,
-    RecordBatchTransactionLimits, apply_claim_transaction,
+    ClaimTransactionError, ClaimTransactionLimits, ClaimTransactionOutcome, apply_claim_transaction,
 };
 use wf_types::identity::{PartitionId, RecordId, RequestId};
 
@@ -91,7 +92,7 @@ fn create() -> Operation {
 }
 
 fn caps() -> TestResult<CommittedRecoveryLimits> {
-    Ok(limits()?.with_claim_work_limits(ClaimWorkLimits::default()))
+    Ok(super::limits()?.with_claim_work_limits(ClaimWorkLimits::default()))
 }
 
 fn frames() -> TestResult<Vec<(u16, Vec<u8>)>> {
@@ -199,7 +200,7 @@ fn build(dir: &Path, prefix: usize) -> TestResult {
 fn refusal(
     dir: &Path,
     s: &RequestScope,
-    cap: CommittedRecoveryLimits,
+    cap: &CommittedRecoveryLimits,
     expected: Error,
 ) -> TestResult {
     let before = (
@@ -209,7 +210,7 @@ fn refusal(
         f::log_meta(dir)?,
     );
     let (log, state) = f::open_pair_for(dir, s)?;
-    let error = recover_committed(log, state, s.group(), s.recovery(), cap)
+    let error = recover_committed(log, state, s.group(), s.recovery(), *cap)
         .err()
         .ok_or("unpaid or malformed Claim startup accepted")?;
     assert_eq!(error, expected);
@@ -352,17 +353,17 @@ fn claim_audit_validates_full_op3_body_and_profiles_before_any_replay() -> TestR
                     RecordBatchApplyError::Encoding(CodecError::Malformed),
                 )),
             ),
-            "no-profile" => (limits()?, Error::UnsupportedEntry),
+            "no-profile" => (super::limits()?, Error::UnsupportedEntry),
             _ => {
                 let mut normal = f::driver_limits();
                 normal.codec = CodecLimits::new(AdmissionLimits::new(1024, length - 1, 1000)?);
                 (
-                    profile(normal, (1000, 64 * f::MIB), 16 * f::MIB, 512 * f::MIB)?,
+                    limits::profile(normal, (1000, 64 * f::MIB), 16 * f::MIB, 512 * f::MIB)?,
                     Error::Codec(CodecError::ByteLimit),
                 )
             }
         };
-        refusal(&dir, &s, cap, error)?;
+        refusal(&dir, &s, &cap, error)?;
         std::fs::remove_dir_all(dir)?;
     }
     Ok(())
@@ -422,156 +423,7 @@ fn claim_replay_failure_retains_only_completed_prefix() -> TestResult {
     Ok(())
 }
 
-fn profile(
-    normal: RecordBatchTransactionLimits,
-    work: (usize, usize),
-    entry: usize,
-    workspace: usize,
-) -> TestResult<CommittedRecoveryLimits> {
-    Ok(CommittedRecoveryLimits::new(
-        wf_ports::consensus::RaftMembershipLimits::default(),
-        (100, 1536, 1024, 131),
-        normal,
-        work,
-        entry,
-        workspace,
-    )?
-    .with_claim_work_limits(ClaimWorkLimits::default()))
-}
-
-fn scope_peak() -> TestResult {
-    let dir = f::directory("claim-large-scope")?;
-    let s = f::scope_for(&[255; 4096], b"g", b"z")?;
-    let (mut log, state) = f::create_pair_for(&dir, &s)?;
-    let body = phase(&s, b"empty", 1, b"absent", 1)?;
-    f::append(&mut log, 0, &body)?;
-    log.save_committed(f::at(0))?;
-    drop((log, state));
-    let normal = f::driver_limits();
-    let q = 512 + 4096 + 1 + 1;
-    let exact = 3588 + 512 + q + normal.workspace_bytes;
-    refusal(
-        &dir,
-        &s,
-        profile(normal, (1, body.len()), 512 + body.len(), exact - 1)?,
-        Error::Limit,
-    )?;
-    let (log, state) = f::open_pair_for(&dir, &s)?;
-    let (log, mut state) = recover_committed(
-        log,
-        state,
-        s.group(),
-        s.recovery(),
-        profile(normal, (1, body.len()), 512 + body.len(), exact)?,
-    )?;
-    let tx = state.begin_apply(
-        s.group(),
-        s.recovery(),
-        AdmissionLimits::default(),
-        100,
-        16 * f::MIB,
-        16 * f::MIB,
-    )?;
-    let outcome = tx
-        .outcome(s.tenant(), &RequestId::new(b"empty".to_vec())?)?
-        .ok_or("large-scope outcome missing")?;
-    assert_eq!(outcome.response(), empty_receipt());
-    assert_eq!(outcome.scope().tenant(), s.tenant());
-    drop(tx);
-    drop((log, state));
-    drop(f::open_pair_for(&dir, &s)?);
-    std::fs::remove_dir_all(dir)?;
-    Ok(())
-}
-
 #[test]
 fn claim_startup_exact_tight_point_body_scope_and_driver_peak() -> TestResult {
-    let dir = f::directory("claim-audit-budget")?;
-    let s = f::scope()?;
-    let (mut log, mut state) = f::create_pair(&dir)?;
-    let body = phase(&s, b"empty", 1, b"absent", 1)?;
-    f::append(&mut log, 0, &body)?;
-    drop(apply_claim_transaction(
-        &mut state,
-        &s,
-        &body,
-        f::at(0),
-        ClaimTransactionLimits {
-            base: f::driver_limits(),
-            work: ClaimWorkLimits::default(),
-        },
-    )?);
-    log.save_committed(f::at(0))?;
-    drop((log, state));
-    let bytes = body.len();
-    let d = 4 * bytes + 2048;
-    let exact = 3588 + 512 + d;
-    let header = std::mem::size_of::<wf_ports::log::DecodedRequest<'static>>();
-    let funded = exact.checked_add(header).ok_or("header budget overflow")?;
-    refusal(
-        &dir,
-        &s,
-        profile(f::driver_limits(), (1, bytes), 512 + bytes, exact - 1)?,
-        Error::Claim(ClaimTransactionError::Apply(
-            RecordBatchApplyError::Workspace {
-                attempted: d,
-                maximum: d - 1,
-            },
-        )),
-    )?;
-    refusal(
-        &dir,
-        &s,
-        profile(f::driver_limits(), (1, bytes), 512 + bytes, funded - 1)?,
-        Error::Claim(ClaimTransactionError::Apply(
-            RecordBatchApplyError::Workspace {
-                attempted: d + header,
-                maximum: d + header - 1,
-            },
-        )),
-    )?;
-    for (wire, entry) in [(bytes - 1, 512 + bytes), (bytes, 511 + bytes)] {
-        refusal(
-            &dir,
-            &s,
-            profile(f::driver_limits(), (1, wire), entry, funded)?,
-            Error::Log(RaftLogError::Limit),
-        )?;
-    }
-    let (log, state) = f::open_pair(&dir)?;
-    drop(recover_committed(
-        log,
-        state,
-        s.group(),
-        s.recovery(),
-        profile(f::driver_limits(), (1, bytes), 512 + bytes, funded)?,
-    )?);
-    let (mut log, state) = f::open_pair(&dir)?;
-    let blank = f::blank(EntryStamp::Unstamped)?;
-    assert_eq!(blank.as_bytes().len(), 13);
-    f::append(&mut log, 1, blank.as_bytes())?;
-    log.save_committed(f::at(1))?;
-    drop((log, state));
-    refusal(
-        &dir,
-        &s,
-        profile(f::driver_limits(), (1, bytes + 13), 512 + bytes, funded)?,
-        Error::Limit,
-    )?;
-    refusal(
-        &dir,
-        &s,
-        profile(f::driver_limits(), (2, bytes + 12), 512 + bytes, funded)?,
-        Error::Log(RaftLogError::Limit),
-    )?;
-    let (log, state) = f::open_pair(&dir)?;
-    drop(recover_committed(
-        log,
-        state,
-        s.group(),
-        s.recovery(),
-        profile(f::driver_limits(), (2, bytes + 13), 512 + bytes, funded)?,
-    )?);
-    std::fs::remove_dir_all(dir)?;
-    scope_peak()
+    limits::startup()
 }

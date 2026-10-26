@@ -354,7 +354,7 @@ fn atomic_start_purged_startup_replays_completion_and_original() -> TestResult {
             fixtures::assert_refusal(
                 &narrow,
                 false,
-                cap,
+                &cap,
                 SnapshotLimits::default(),
                 Error::Recovery(CommittedRecoveryError::Normal(
                     RecordBatchTransactionError::Transaction(StateTransactionError::Limit),

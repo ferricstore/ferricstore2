@@ -69,7 +69,7 @@ fn namespace(
 }
 
 fn phase(
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     snapshot: SnapshotLimits,
     base: usize,
 ) -> Result<(), SnapshotRecoveryError> {
@@ -113,6 +113,7 @@ pub fn purge_snapshot(
     limits: CommittedRecoveryLimits,
     snapshot_limits: SnapshotLimits,
 ) -> Result<(RedbLogStore, RedbStateStore), SnapshotRecoveryError> {
+    let limits = &limits;
     let base = namespace(&log, &state, (group, recovery))?;
     if state.supports_snapshot_transitions()? {
         return advance::run(
@@ -153,7 +154,7 @@ pub fn purge_snapshot(
         &mut current_member,
     )?;
     provenance::boundary([saved, current], metadata, limits, true)?;
-    let mut work = [0, limits.maximum_log_body_bytes()];
+    let mut work = [0, limits.work.1];
     provenance::audit(
         &mut log,
         (group, recovery),
@@ -190,6 +191,7 @@ pub fn recover_snapshotted(
     limits: CommittedRecoveryLimits,
     snapshot_limits: SnapshotLimits,
 ) -> Result<(RedbLogStore, RedbStateStore), SnapshotRecoveryError> {
+    let limits = &limits;
     let base = namespace(&log, &state, (group, recovery))?;
     if state.supports_snapshot_transitions()? {
         return advance::run(
@@ -209,7 +211,7 @@ pub fn recover_snapshotted(
             return Err(SnapshotRecoveryError::MissingSnapshot);
         }
         return Ok(super::recover_committed(
-            log, state, group, recovery, limits,
+            log, state, group, recovery, *limits,
         )?);
     };
     let saved = snapshot.control();
@@ -231,7 +233,7 @@ pub fn recover_snapshotted(
         &mut current_member,
     )?;
     provenance::boundary([saved, current], metadata, limits, false)?;
-    let mut work = [0, limits.maximum_log_body_bytes()];
+    let mut work = [0, limits.work.1];
     provenance::audit(
         &mut log,
         (group, recovery),

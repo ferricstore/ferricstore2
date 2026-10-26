@@ -20,7 +20,7 @@ pub(super) fn apply(
     state: &mut RedbStateStore,
     entry: &RaftLogEntry,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
     previous: ControlState,
 ) -> Result<ControlState, Error> {
@@ -49,25 +49,20 @@ fn control(
     state: &mut RedbStateStore,
     entry: &RaftLogEntry,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
 ) -> Result<ControlState, Error> {
     let actual = total(&[512, entry.body().len()])?;
-    limits.admit(&[
-        base,
-        actual,
-        limits.maximum_control_apply_bytes(),
-        limits.maximum_temporary_bytes(),
-    ])?;
+    limits.admit(&[base, actual, limits.state.2, limits.state.3])?;
     let admission = AdmissionLimits::new(1, 1, 1).map_err(|_| Error::InvalidLimits)?;
     let tx = state
         .begin_apply(
             namespace.0,
             namespace.1,
             admission,
-            limits.maximum_state_read_steps(),
-            limits.maximum_control_apply_bytes(),
-            limits.maximum_temporary_bytes(),
+            limits.state.0,
+            limits.state.2,
+            limits.state.3,
         )
         .map_err(Error::State)?;
     apply_control_entry(
@@ -76,8 +71,8 @@ fn control(
         namespace.1,
         entry.body(),
         entry.id(),
-        limits.membership_limits(),
-        limits.workspace_bytes(),
+        limits.membership,
+        limits.workspace,
     )
     .map_err(Error::State)
 }
@@ -86,23 +81,23 @@ fn normal(
     state: &mut RedbStateStore,
     entry: &RaftLogEntry,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
-    if profile == 2 && !limits.core_policy_patches() {
+    if profile == 2 && !limits.core_policy {
         return Err(Error::UnsupportedEntry);
     }
-    if profile == 4 && !limits.original_policy_sets() {
+    if profile == 4 && !limits.original_policy {
         return Err(Error::UnsupportedEntry);
     }
     let claim_work = if profile == 3 {
-        Some(limits.claim_work_limits().ok_or(Error::UnsupportedEntry)?)
+        Some(limits.claim_work.ok_or(Error::UnsupportedEntry)?)
     } else {
         None
     };
     let scope_bytes = total(&[512, fields[0].len(), fields[1].len(), fields[2].len()])?;
-    let driver = limits.normal_limits();
+    let driver = limits.normal;
     let before = total(&[512, entry.body().len(), scope_bytes])?;
     let during = total(&[512, scope_bytes, driver.workspace_bytes])?;
     limits.admit(&[base, before.max(during)])?;

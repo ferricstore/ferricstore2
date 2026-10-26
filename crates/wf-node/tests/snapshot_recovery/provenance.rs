@@ -55,7 +55,7 @@ fn snapshot_provenance_checks_membership_and_independent_clocks_at_s_despite_val
             fixtures::assert_refusal(
                 &dir,
                 purge,
-                caps()?,
+                &caps()?,
                 SnapshotLimits::default(),
                 Error::Recovery(expected),
             )?;
@@ -136,7 +136,7 @@ fn snapshot_local_provenance_binds_full_s_identity_actual_body_and_original_stam
             fixtures::assert_refusal(
                 &dir,
                 purge,
-                caps()?,
+                &caps()?,
                 SnapshotLimits::default(),
                 Error::Recovery(expected),
             )?;
@@ -196,7 +196,7 @@ fn missing_unapplied_unpinned_and_mismatched_snapshot_cannot_authorize_purge_or_
         fixtures::assert_refusal(
             &dir,
             case == "missing" || case == "unapplied",
-            caps()?,
+            &caps()?,
             SnapshotLimits::default(),
             expected,
         )?;

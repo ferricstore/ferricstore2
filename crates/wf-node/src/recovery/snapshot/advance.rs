@@ -18,7 +18,7 @@ use wf_types::identity::{GroupId, RecoveryId};
 pub(super) fn data(
     state: &mut RedbStateStore,
     expected: Option<[u8; 32]>,
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     snapshot: SnapshotLimits,
     base: usize,
     member: &mut Option<(EntryIdentity, EntryStamp)>,
@@ -61,7 +61,7 @@ pub(super) fn run(
     mut log: RedbLogStore,
     mut state: RedbStateStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     snapshot: SnapshotLimits,
     purge: bool,
     base: usize,
@@ -70,7 +70,7 @@ pub(super) fn run(
     phase(limits, snapshot, base)?;
     let pending = state.snapshot_transition(snapshot)?;
     let mut metadata = log.state().map_err(CommittedRecoveryError::Log)?;
-    let mut work = [0, limits.maximum_log_body_bytes()];
+    let mut work = [0, limits.work.1];
     let (mut member, mut id) = (None, [0; 32]);
     let saved = data(
         &mut state,
@@ -172,7 +172,7 @@ fn resume_pending(
     log: &mut RedbLogStore,
     state: &mut RedbStateStore,
     namespace: (&GroupId, &RecoveryId),
-    profiles: &(CommittedRecoveryLimits, SnapshotLimits),
+    profiles: &(&CommittedRecoveryLimits, SnapshotLimits),
     initial: &(SnapshotTransition, ControlState),
     context: (usize, &mut RaftLogState, &mut [usize; 2]),
 ) -> Result<bool, Error> {
@@ -209,7 +209,7 @@ fn resume_pending(
 fn old_base(
     state: &mut RedbStateStore,
     metadata: RaftLogState,
-    profiles: &(CommittedRecoveryLimits, SnapshotLimits),
+    profiles: &(&CommittedRecoveryLimits, SnapshotLimits),
     base: usize,
     candidate: (ControlState, [u8; 32]),
     seed: &mut Option<(EntryIdentity, EntryStamp)>,
@@ -255,7 +255,7 @@ fn publish(
     log: &mut RedbLogStore,
     state: &mut RedbStateStore,
     initial: &(RaftLogState, ControlState, [u8; 32]),
-    profiles: &(CommittedRecoveryLimits, SnapshotLimits),
+    profiles: &(&CommittedRecoveryLimits, SnapshotLimits),
     base: usize,
     pending: Option<SnapshotTransition>,
 ) -> Result<(), Error> {
@@ -285,7 +285,7 @@ fn plain(
     log: &mut RedbLogStore,
     state: &mut RedbStateStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     context: (usize, RaftLogState),
     initial: (ControlState, Option<(EntryIdentity, EntryStamp)>),
     work: &mut [usize; 2],
@@ -318,7 +318,7 @@ fn recover(
     mut log: RedbLogStore,
     mut state: RedbStateStore,
     namespace: (&GroupId, &RecoveryId),
-    limits: CommittedRecoveryLimits,
+    limits: &CommittedRecoveryLimits,
     context: (usize, bool),
     initial: (ControlState, Option<(EntryIdentity, EntryStamp)>),
     work: &mut [usize; 2],

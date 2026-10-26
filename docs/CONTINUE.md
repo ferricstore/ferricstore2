@@ -5,7 +5,7 @@ GPT-6.1-sol/max agents use disjoint writes and dedicated architecture and
 performance reviews. Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current backend passes **1,119 Rust tests**: all 1,097 compatibility identities
+The last completed backend checkpoint825051f passed **1,119 Rust tests**: all 1,097 compatibility identities
 plus all 22 workflow-value feature cases. Exact package/target/name/status
 comparison preserves the earlier 1,093 identities and four restoration cases,
 all 102 targets and both benchmark correctness smokes. Six documentation tests
@@ -34,10 +34,24 @@ remain; separate known4-malformed controls were added. Whole-file inverses prove
 every other prior case/order/assertion unchanged. Earlier local W512 producer
 funding likewise preserves all individual caps and shared fixtures.
 
-The IMMEDIATE next gate is Node operation8 audit/replay. Its concrete production,
-test, error/profile admission and missing-contract -> compiled RED -> SAVE ->
-BODY selection is recorded in the architecture review; no Node artifact or
-capability is implemented yet. Existing startup remains fail-closed for8.
+The IMMEDIATE next gate is real Node operation8 audit/replay after the reviewed
+compiled rejecting checkpoint. All70 existing recovery identities pass EXACTLY:
+22 committed-recovery cases and48 snapshot cases. Strict workspace/all-target
+Clippy and all53 architecture checks pass. Eight new source-complete scenario
+tests compile and all eight fail only at their explicit first opt-in assertion:
+session54232, unchanged1650/c35160b0, raw10593007+4759/07e5e351. Their later audit,
+replay, snapshot, resource and fault tails remain masked. The setter literally
+refuses UnsupportedEntry; actual8 routing remains disabled. Missing-contract
+compiler evidence preceded the selected data/error/profile scaffold.
+
+Internal immutable-profile borrowing clears the280-byte passing lint without
+changing public APIs or adding allocation. Legacy producers retain raw old caps
+and F-funded original decoder/scope/driver boundaries. Complete four/six-table
+oracles follow actual fixture construction; all original assertions remain.
+Architecture/performance/author reviews and complete beforeimage inverses close
+the technical edits; no waiver/native-speed or full parity claim follows.
+The actual compiled eight-RED checkpoint MUST be saved before real setter and
+audit/replay BODY is enabled. See the coordination record for the exact release.
 
 Typed/shared/external values, public hydration, real lifecycle cleanup/rewind/
 recreation, mandatory original Elixir profiles, native failures, Linux and macOS

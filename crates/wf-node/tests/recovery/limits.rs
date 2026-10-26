@@ -88,6 +88,13 @@ fn committed_recovery_point_wire_and_actual_guard_caps_are_prospective() -> Test
     fixtures::append(&mut log, 0, blank.as_bytes())?;
     log.save_committed(fixtures::at(0))?;
     drop((log, state));
+    for outer in [5267, 5268] {
+        assert_refusal(
+            &dir,
+            &profile(state_caps, (1, 13), 525, outer)?,
+            Error::Limit,
+        )?;
+    }
     for (state, work, entry, workspace, expected) in [
         (state_caps, (1, 13), 525, 5267, Error::Limit),
         (
@@ -133,7 +140,12 @@ fn committed_recovery_point_wire_and_actual_guard_caps_are_prospective() -> Test
             Error::Limit,
         ),
     ] {
-        assert_refusal(&dir, profile(state, work, entry, workspace)?, expected)?;
+        let outer = if workspace == usize::MAX {
+            workspace
+        } else {
+            with_headers(workspace)?
+        };
+        assert_refusal(&dir, &profile(state, work, entry, outer)?, expected)?;
     }
     let (log, state) = fixtures::open_pair(&dir)?;
     let s = fixtures::scope()?;
@@ -142,7 +154,7 @@ fn committed_recovery_point_wire_and_actual_guard_caps_are_prospective() -> Test
         state,
         s.group(),
         s.recovery(),
-        profile(state_caps, (1, 13), 525, 5268)?,
+        profile(state_caps, (1, 13), 525, with_headers(5268)?)?,
     )?;
     assert_eq!(
         fixtures::applied(&mut state)?
@@ -152,25 +164,7 @@ fn committed_recovery_point_wire_and_actual_guard_caps_are_prospective() -> Test
         Some(fixtures::at(0))
     );
     drop((log, state));
-    // Historical audit and suffix share one wire allowance, without refunds.
-    let (mut log, state) = fixtures::open_pair(&dir)?;
-    fixtures::append(&mut log, 1, blank.as_bytes())?;
-    log.save_committed(fixtures::at(1))?;
-    drop((log, state));
-    assert_refusal(&dir, profile(state_caps, (1, 26), 525, 5268)?, Error::Limit)?;
-    assert_refusal(
-        &dir,
-        profile(state_caps, (2, 25), 525, 5268)?,
-        Error::Log(RaftLogError::Limit),
-    )?;
-    let (log, state) = fixtures::open_pair(&dir)?;
-    drop(recover_committed(
-        log,
-        state,
-        s.group(),
-        s.recovery(),
-        profile(state_caps, (2, 26), 525, 5268)?,
-    )?);
+    shared_blank_budget(&dir, &s, state_caps, &blank)?;
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
@@ -200,9 +194,27 @@ fn committed_recovery_audit_decoder_and_external_large_scope_are_paid() -> TestR
             workspace,
         )
     };
+    for outer in [exact - 1, funded - 1] {
+        let available = outer - with_headers(3588)? - 512;
+        let d = 4 * bytes + 128 + 1024 + 2048;
+        let attempted = [d, d + header]
+            .into_iter()
+            .find(|n| *n > available)
+            .ok_or("raw audit cap must refuse")?;
+        assert_refusal(
+            &dir,
+            &make(outer)?,
+            Error::Normal(wf_storage::transaction::RecordBatchTransactionError::Apply(
+                wf_ports::log::RecordBatchApplyError::Workspace {
+                    attempted,
+                    maximum: available,
+                },
+            )),
+        )?;
+    }
     assert_refusal(
         &dir,
-        make(exact - 1)?,
+        &make(with_headers(exact - 1)?)?,
         Error::Normal(wf_storage::transaction::RecordBatchTransactionError::Apply(
             wf_ports::log::RecordBatchApplyError::Workspace {
                 attempted: 4 * bytes + 128 + 1024 + 2048,
@@ -212,7 +224,7 @@ fn committed_recovery_audit_decoder_and_external_large_scope_are_paid() -> TestR
     )?;
     assert_refusal(
         &dir,
-        make(funded - 1)?,
+        &make(with_headers(funded - 1)?)?,
         Error::Normal(wf_storage::transaction::RecordBatchTransactionError::Apply(
             wf_ports::log::RecordBatchApplyError::Workspace {
                 attempted: 4 * bytes + 128 + 1024 + 2048 + header,
@@ -227,7 +239,7 @@ fn committed_recovery_audit_decoder_and_external_large_scope_are_paid() -> TestR
         state,
         s.group(),
         s.recovery(),
-        make(funded)?,
+        make(with_headers(funded)?)?,
     )?);
     std::fs::remove_dir_all(dir)?;
     large_scope_peak()
@@ -259,8 +271,10 @@ fn large_scope_peak() -> TestResult {
     };
     for (workspace, expected) in [
         (workspace - 1, Error::Limit),
+        (workspace, Error::Limit),
+        (with_headers(workspace)? - 1, Error::Limit),
         (
-            workspace,
+            with_headers(workspace)?,
             Error::Normal(wf_storage::transaction::RecordBatchTransactionError::Apply(
                 wf_ports::log::RecordBatchApplyError::Workspace {
                     attempted: 160 * fixtures::MIB,
@@ -336,6 +350,7 @@ fn committed_recovery_membership_observation_has_real_captured_profiles() -> Tes
     fixtures::apply_control(&mut state, 0, member.as_bytes())?;
     log.save_committed(fixtures::at(0))?;
     drop((log, state));
+    let outer = with_headers(8892)?;
     let make = |membership, read| {
         Limits::new(
             membership,
@@ -343,7 +358,7 @@ fn committed_recovery_membership_observation_has_real_captured_profiles() -> Tes
             fixtures::driver_limits(),
             (1, 134),
             646,
-            8892,
+            outer,
         )
     };
     for fields in [
@@ -358,21 +373,32 @@ fn committed_recovery_membership_observation_has_real_captured_profiles() -> Tes
             RaftMembershipLimits::new(fields.0, fields.1, fields.2, fields.3, fields.4, fields.5)?;
         assert_refusal(
             &dir,
-            make(p, 5173)?,
+            &make(p, 5173)?,
             Error::State(wf_ports::state::StateTransactionError::Limit),
         )?;
     }
     let exact = RaftMembershipLimits::new(3, 6, 4, 2, 134, 4661)?;
+    for outer in [8892, with_headers(8892)? - 1] {
+        let cap = Limits::new(
+            exact,
+            (100, 5173, 1024, 131),
+            fixtures::driver_limits(),
+            (1, 134),
+            646,
+            outer,
+        )?;
+        assert_refusal(&dir, &cap, Error::Limit)?;
+    }
     assert_refusal(
         &dir,
-        make(exact, 5172)?,
+        &make(exact, 5172)?,
         Error::State(wf_ports::state::StateTransactionError::Limit),
     )?;
     let larger =
         RaftMembershipLimits::new(65, 1_000_000, 65_536, 1_048_576, 16_777_216, 67_108_864)?;
     assert_refusal(
         &dir,
-        make(larger, 5173)?,
+        &make(larger, 5173)?,
         Error::State(wf_ports::state::StateTransactionError::InvalidChanges),
     )?;
     let (log, state) = fixtures::open_pair(&dir)?;
@@ -385,5 +411,47 @@ fn committed_recovery_membership_observation_has_real_captured_profiles() -> Tes
         make(exact, 5173)?,
     )?);
     std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+fn with_headers(bytes: usize) -> TestResult<usize> {
+    let fixed = std::mem::size_of::<Option<[usize; 4]>>()
+        .checked_add(
+            std::mem::size_of::<wf_node::recovery::CommittedRecoveryError>()
+                .max(std::mem::size_of::<wf_node::recovery::SnapshotRecoveryError>()),
+        )
+        .ok_or("fixed recovery header overflow")?;
+    Ok(bytes.checked_add(fixed).ok_or("outer profile overflow")?)
+}
+
+fn shared_blank_budget(
+    dir: &std::path::Path,
+    s: &wf_domain::workflow::request::RequestScope,
+    state_caps: (usize, usize, usize, usize),
+    blank: &wf_ports::log::PreparedBytes,
+) -> TestResult {
+    // Historical audit and suffix share one wire allowance, without refunds.
+    let (mut log, state) = fixtures::open_pair(dir)?;
+    fixtures::append(&mut log, 1, blank.as_bytes())?;
+    log.save_committed(fixtures::at(1))?;
+    drop((log, state));
+    assert_refusal(
+        dir,
+        &profile(state_caps, (1, 26), 525, with_headers(5268)?)?,
+        Error::Limit,
+    )?;
+    assert_refusal(
+        dir,
+        &profile(state_caps, (2, 25), 525, with_headers(5268)?)?,
+        Error::Log(RaftLogError::Limit),
+    )?;
+    let (log, state) = fixtures::open_pair(dir)?;
+    drop(recover_committed(
+        log,
+        state,
+        s.group(),
+        s.recovery(),
+        profile(state_caps, (2, 26), 525, with_headers(5268)?)?,
+    )?);
     Ok(())
 }
