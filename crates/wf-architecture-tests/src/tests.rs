@@ -576,6 +576,7 @@ fn client_port_facade_cannot_reexport_server_capabilities() -> CheckResult<()> {
 fn weakened_required_root_lint_is_rejected() -> CheckResult<()> {
     let real = root()?;
     let fixture = tempfile::tempdir()?;
+    source_pins::write_readability_configuration(fixture.path())?;
     std::fs::copy(
         real.join("rust-toolchain.toml"),
         fixture.path().join("rust-toolchain.toml"),
@@ -592,5 +593,6 @@ fn weakened_required_root_lint_is_rejected() -> CheckResult<()> {
             .iter()
             .any(|failure| failure.contains("rust_2018_idioms must be deny"))
     );
+    source_pins::assert_readability_policy(&real)?;
     Ok(())
 }

@@ -5,6 +5,70 @@ use super::{CheckResult, Policy, graph, json, metadata, package_mut, root, sourc
 const SOURCE: &str =
     "git+https://github.com/cberner/redb?rev=7061f7e60d4573311c0636e161d417b93e9fd2b1";
 
+pub(super) fn write_readability_configuration(directory: &std::path::Path) -> CheckResult<()> {
+    std::fs::write(
+        directory.join("clippy.toml"),
+        "excessive-nesting-threshold = 4\ncognitive-complexity-threshold = 25\ntoo-many-lines-threshold = 100\n",
+    )?;
+    Ok(())
+}
+
+pub(super) fn assert_readability_policy(real: &std::path::Path) -> CheckResult<()> {
+    let fixture = tempfile::tempdir()?;
+    std::fs::copy(
+        real.join("rust-toolchain.toml"),
+        fixture.path().join("rust-toolchain.toml"),
+    )?;
+    write_readability_configuration(fixture.path())?;
+    let mut baseline: toml::Value = std::fs::read_to_string(real.join("Cargo.toml"))?.parse()?;
+    let lints = baseline["workspace"]["lints"]["clippy"]
+        .as_table_mut()
+        .ok_or("missing workspace Clippy lints")?;
+    for lint in ["excessive_nesting", "cognitive_complexity"] {
+        lints.insert(lint.into(), "deny".into());
+    }
+    std::fs::write(fixture.path().join("Cargo.toml"), toml::to_string(&baseline)?)?;
+    assert!(super::manifest::check_root(fixture.path())?.is_empty());
+    for lint in ["excessive_nesting", "cognitive_complexity"] {
+        let mut weakened = baseline.clone();
+        weakened["workspace"]["lints"]["clippy"][lint] = "allow".into();
+        std::fs::write(fixture.path().join("Cargo.toml"), toml::to_string(&weakened)?)?;
+        let findings = super::manifest::check_root(fixture.path())?;
+        assert!(
+            findings
+                .iter()
+                .any(|finding| finding
+                    .contains(&format!("workspace lint clippy::{lint} must be deny"))),
+            "weakened {lint} escaped policy: {findings:?}"
+        );
+    }
+    std::fs::write(fixture.path().join("Cargo.toml"), toml::to_string(&baseline)?)?;
+    for (setting, required) in [
+        ("excessive-nesting-threshold", 4),
+        ("cognitive-complexity-threshold", 25),
+        ("too-many-lines-threshold", 100),
+    ] {
+        for invalid in ["0".to_owned(), (required + 1).to_string(), "'4'".into()] {
+            write_readability_configuration(fixture.path())?;
+            let config = fixture.path().join("clippy.toml");
+            let weakened = std::fs::read_to_string(&config)?.replace(
+                &format!("{setting} = {required}"),
+                &format!("{setting} = {invalid}"),
+            );
+            std::fs::write(&config, weakened)?;
+            let findings = super::manifest::check_root(fixture.path())?;
+            assert!(
+                findings.iter().any(|finding| finding
+                    .contains(&format!("Clippy setting {setting} must be {required}"))),
+                "weakened {setting}={invalid} escaped policy: {findings:?}"
+            );
+        }
+    }
+    std::fs::remove_file(fixture.path().join("clippy.toml"))?;
+    assert!(super::manifest::check_root(fixture.path()).is_err());
+    Ok(())
+}
+
 #[test]
 fn shared_test_helpers_require_exact_literal_owner_and_module_paths() -> CheckResult<()> {
     for (package, module, name, path) in [

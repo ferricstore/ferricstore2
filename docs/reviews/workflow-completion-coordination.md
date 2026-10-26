@@ -54439,3 +54439,15 @@ Root added the named private scope helper with six selected controls in std/core
 
 
 Expanded scoped-control RED execution90557 terminal101 on unchanged1663/3e63d41f41e4d8365a16b5a86f43e3b0a8a11cd323412c2be3939297d7c7a7ab: fmt0, exact existing blob test0PASS1FAIL44filtered raw10858301+1695/6b14411e6d098242c1ac62e915d0a6403ab93d4ff1b890920154c071ba66e297. Whole raw read: allfourforwardrows still Ok([]), allold43 negatives execute first; added12scope rows/later14positives compile but remain masked by intended earlier forward assertion. This SAVE precedes any scoped classifier correction.
+
+
+## Scoped metadata-use BODY SOURCE STOP
+
+After clean saved329c8ff, Root changed only selected existing checker/source paragraph: source586/21313/c492f6100dc19b8107cbd8479533e8d7a3b25e2c0eafd406d1a37ce7f27ada39 and purity200/6800/3dafc7994b84a646d513eb6d494b84a88b056f4ccd6dd4aa3bc99d756757f551. Pinned leaf rustfmt0. Existing blob337/12287/010d39b9 and every business/overlay/compiler-private test held. Root complete in-memory inverse removes only new hook/helper/import additions and restores ENTIRE firstBODY487f/2999. Alias storage/path classification/oldfacade/runtime/safety predicates are unchanged. Bounded immediate metadata-only closure plus lexical begin/end wraps normal visits; no new field/model/dependency/artifact/type-flow authority. ARCH/PERF review actualstoppedcode, writesonlyownnotes. Root now freezes complete maininputs for focused quality/architecture execution. Isolated size-aware A0 authorship is outside this input set.
+
+
+## Solo lint-policy request, 2026-10-26
+
+The user stopped agent work and paused the full completion goal; this change is limited to the later explicit nesting/complexity request. No agent is used. Select root clippy.toml with block nesting4, cognitive complexity25 (Clippy default) and explicit existing function length100; deny both named new lints in inherited workspace policy. These are project guardrails, not a universal Rust standard or a proof of comprehensibility. Guard canonical settings/required lint levels through existing manifest checker and same existing weakened-root-lint test identity; no new product/API/model/dependency or runtime behavior. New config is explicitly within the user-requested setup; solo design review replaces earlier agent consultation for this task.
+
+Genuine policy RED: session23046 compiled and reached tests::weakened_required_root_lint_is_rejected,0PASS1FAIL44filtered. The new canonical fixture passes; changing excessive_nesting to allow then returns[], and the specific required-diagnosis assertion fails (source_pins.rs37). Initial fixture serialization setup was corrected before this causal run. Later complexity/threshold controls are compiled but masked by that first assertion. Save selected test edits before implementing policy. Existing unrelated checker BODY changes remain unstaged/held.
