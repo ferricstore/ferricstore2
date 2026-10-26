@@ -5,60 +5,59 @@ GPT-6.1-sol/max owners use disjoint writes and dedicated architecture and
 performance reviews. Current decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The workflow-value codec now passes all seven original codec/wire cases,
-including independent bytes, tamper/order negatives, limits, donor ownership
-and retry jitter. Its implementation follows the named private-module contract,
-retains the actual profile-8 header and uses one continuous prospectively
-charged validation account. Defaults have a fixed validated representation;
-the decoded metadata sidecar owns its inputs and exposes a borrowed view.
+All **nine workflow-value codec and wire tests now pass**. The two semantic
+regressions were saved failing in `622db0f` before the correction. Typed5/6/7
+preserve raw priorities and unresolved extension presence for guarded domain
+interpretation; public1 retains its existing priority normalization. Structural,
+defaults, order, intent, ownership, retry-jitter and work checks remain intact.
+No new owner, wire/hash stream or performance guarantee accompanies this fix.
 
-Two additional regressions compile and genuinely fail at their first positive
-encoder assertions with Malformed: typed priority inputs and unresolved
-extension presence are being rejected before the domain reducer can decide.
-Their later decoder/round-trip assertions remain masked. Preserve this complete
-implementation plus the failing tests in Git before applying the recorded
-two-function correction; public profile-1 normalization and structural/default,
-order, bounds, intent and work checks must remain intact.
+The ten real-store integration cases still fail at their first fresh value-store
+constructor with UnsupportedLayout. Their publication, ordered-read, replay,
+expiry, ownership and snapshot tails remain compiled but masked. Peer review
+found three incorrect producer premises: the read/terminal/snapshot fixtures used
+atomic5 for sequential same-ID writes, which the existing atomic reducer rejects.
+Only those three profile literals now use independent6. Every assertion, helper,
+case identity and same-transaction scenario remains intact. The corrected
+nineteen-case run is nine pure PASS and ten genuine constructor failures; save
+this corrected failing checkpoint before connected storage implementation.
 
-The ten unchanged real-store integration cases still fail at their first fresh
-value-store constructor with UnsupportedLayout. Their later publication,
-ordered reads, replay, expiry, ownership and snapshot assertions are compiled
-but masked. Passing pure codecs do not establish connected storage behavior.
-
-Compatibility evidence preserves all **1,093 prior Rust test identities** plus
-the four captured-lifecycle restore cases: **1,097 pass**. This is an exact
-package/target/name/status union of an immutable passing prefix, complete
-remaining targets and one reviewed test-only rerun, rather than a claimed new
-single-command workspace run. Existing budget tests retain their original cap
-observations and add funded one-short/exact controls for the larger decoded
-header; actual earlier refusals remain visible. Header-only version dispatch
-does not grant body or persistence authority.
+Fresh compatibility commands execute **1,097 passing tests**: all 1,093 earlier
+identities plus the four captured-lifecycle restore cases, across the same 102
+targets. Exact package/kind/source-target/logical-target/test/status counters and
+both benchmark correctness-smoke outputs match. The three subsequent fixture
+literal changes affect only the separately executed feature cases and have
+whole-file/inventory inverses back to that checked input.
 
 Formatting, workspace compilation and strict Clippy pass. Six documentation
-tests across fifteen targets, all **53 architecture checks**, the two existing
-benchmark correctness smokes, reference/progress integrity, documentation build
-and offline dependency checks pass. The progress ledger remains incomplete:
-120 source-derived declarations, 132 counterpart mappings and 550 assertion
-links; runtime reconciliation and full behavioral parity remain open. These
-local macOS results provide no Linux execution evidence.
+tests across fifteen targets, all **53 architecture checks**, reference/progress
+integrity, documentation build and offline dependency checks pass. The progress
+ledger remains incomplete: 120 source-derived declarations, 132 counterpart
+mappings and 550 assertion links. Runtime reconciliation, full behavioral parity
+and Linux execution remain open; local macOS checks provide no Linux evidence.
 
 Captured-lifecycle restoration passes all nine unchanged tests, including the
 four saved failing in `9b5bd52`. It validates recorded birth configuration and
 exact persisted scalars without clamping or consulting current policy.
-Architecture, implementation and performance owners independently reviewed
-actual source, whole-file inverses and runtime results. The reviewed Box usage
-adds no recoverable-OOM, native allocation, RSS or measured speed guarantee.
-Production files remain within 400 physical lines, integration files within
-600, and functions within 100.
+Architecture, implementation and performance owners reviewed actual source,
+whole-file inverses and runtime results reciprocally. The performance review
+also consulted current official redb4.4 documentation and pinned source for
+snapshot guards, replacement inserts and consumed Immediate commit semantics.
+Ordinary Box allocation adds no recoverable-OOM, RSS or measured speed guarantee.
+Production files remain within 400 physical lines, integration files within 600,
+and functions within 100.
 
-After the codec correction and its passing gate, consult architecture on the
-exact connected storage artifacts before creation. Implement the real fresh
-capability/defaults, same-transaction policy and target validation, current and
-every-history value publication, ordered reads and complete reopen/snapshot
-recovery. Preserve the original twelve integration tests and five supplemental
-codec cases. Typed/shared/external values, hydration, retirement/cleanup/rewind/
-recreation, mandatory original profiles, native failures, Linux and macOS
-acceptance, and the remaining ordered M1-M8 work all stay open.
+The concrete connected-storage proposal is in the role notes. Implement only
+the exact architecture-selected artifact batch after the corrected RED is saved:
+real fresh FWSS7 genesis/defaults, same-transaction target/policy validation,
+current and every-history publication, owned ordered reads, and complete
+FWSP4/reopen/receive/install/Node recovery. Retain one external schema account
+through guarded birth capture and use actual per-step kernel ordering, including
+independent source-index holes; do not infer birth from final metadata.
+
+Typed/shared/external values, hydration, retirement/cleanup/rewind/recreation,
+mandatory original profiles, native failures, Linux and macOS acceptance, and
+the remaining ordered M1-M8 work all remain required and unfinished.
 
 The stored-policy creation-lifecycle resolver passes **all five unchanged tests**
 after its compiled zero-pass/five-failure baseline was saved in `c2d9ceb`.

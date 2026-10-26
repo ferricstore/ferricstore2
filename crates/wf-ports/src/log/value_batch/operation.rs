@@ -126,7 +126,7 @@ pub(super) fn scan(
             }
             scan::operation(reader, item.tag, false)?;
         }
-        if item.priority > 2 || (item.tag != 1 && item.tag != 11 && item.priority != 0) {
+        if mode == 1 && (item.priority > 2 || (item.tag != 1 && item.priority != 0)) {
             return Err(CodecError::Malformed);
         }
     }

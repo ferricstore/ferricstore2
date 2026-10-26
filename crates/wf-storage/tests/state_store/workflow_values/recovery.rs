@@ -259,7 +259,7 @@ fn publish_snapshot_values(store: &mut RedbStateStore, scope: &RequestScope) -> 
     ]);
     let inputs = vec![f::input(0, 0), f::input(1, 0)];
     let policies = vec![f::witness(b"r", None)?];
-    let prepared = f::batch(5, b"snapshot", 100, operation, inputs, policies)?;
+    let prepared = f::batch(6, b"snapshot", 100, operation, inputs, policies)?;
     f::apply_value(store, scope, &prepared, 0)?;
     Ok(())
 }

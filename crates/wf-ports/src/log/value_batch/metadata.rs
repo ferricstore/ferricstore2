@@ -226,25 +226,10 @@ pub(super) fn check(
         }
         previous = Some(&policy.workflow_type);
     }
-    for (ordinal, (item, input)) in items.iter().zip(&batch.inputs).enumerate() {
+    for (ordinal, input) in batch.inputs.iter().enumerate() {
         if usize::try_from(input.source_index).map_err(|_| CodecError::LengthOverflow)? != ordinal
             || usize::try_from(input.policy_index).map_err(|_| CodecError::LengthOverflow)?
                 >= batch.policies.len()
-            || item.create_priority > 2
-        {
-            return Err(CodecError::Malformed);
-        }
-        let birth = matches!(
-            item.command.operation,
-            Operation::Create(_) | Operation::StartAndClaim(_)
-        );
-        let terminal = matches!(
-            item.command.operation,
-            Operation::Complete(_) | Operation::Fail(_) | Operation::Cancel(_)
-        );
-        if (input.birth.is_some() && !birth)
-            || (input.terminal_ttl_ms.is_some() && !terminal)
-            || (!birth && item.create_priority != 0)
         {
             return Err(CodecError::Malformed);
         }
@@ -255,6 +240,12 @@ pub(super) fn check(
     if let PreparedOperation::PublicMutation { item, evidence } = &batch.operation {
         if batch.profile != 1 || items.len() != 1 {
             return Err(CodecError::UnsupportedTag);
+        }
+        if item.create_priority > 2
+            || (!matches!(item.command.operation, Operation::Create(_))
+                && item.create_priority != 0)
+        {
+            return Err(CodecError::Malformed);
         }
         if batch.inputs[0].requested_at.map(TimestampMillis::get) != evidence.requested_now_ms
             || item.command.now.get()

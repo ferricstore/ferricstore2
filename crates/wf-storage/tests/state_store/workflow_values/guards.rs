@@ -145,7 +145,7 @@ fn value_binary_fresh_capability_refuses_legacy_and_unimplemented_lifecycle() ->
     terminal.terminal_ttl_ms = Some(10);
     let inputs = vec![f::input(0, 0), terminal];
     let policies = vec![f::witness(b"r", None)?];
-    let birth = f::batch(5, b"terminal", 100, operation, inputs, policies)?;
+    let birth = f::batch(6, b"terminal", 100, operation, inputs, policies)?;
     f::apply_value(&mut store, &scope, &birth, 0)?;
     drop(store);
     let create = Operation::Create(Create {

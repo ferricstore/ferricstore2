@@ -41,7 +41,7 @@ fn value_binary_ordered_reads_preserve_duplicates_missing_and_expiry() -> TestRe
     ]);
     let inputs = vec![f::input(0, 0), terminal];
     let policies = vec![f::witness(b"r", None)?];
-    let prepared = f::batch(5, b"read", 200, operation, inputs, policies)?;
+    let prepared = f::batch(6, b"read", 200, operation, inputs, policies)?;
     f::apply_value(&mut store, &scope, &prepared, 0)?;
     drop(prepared);
     let partition = OriginalValuePartition::Explicit(b"p");
