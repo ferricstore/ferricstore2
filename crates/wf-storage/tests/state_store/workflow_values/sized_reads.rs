@@ -14,6 +14,7 @@ use wf_types::version::{HlcTimestamp, TimestampMillis};
 use super::{TestResult, fixtures as f};
 
 mod fixtures;
+mod projection;
 use fixtures::{
     assert_history, assert_scope_refusals, assert_source_catalog, assert_values, metadata, publish,
     publish_steps, read_clock, reference, setup, unsupported_refs,

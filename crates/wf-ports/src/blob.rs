@@ -5,6 +5,7 @@
 
 mod catalog;
 mod encoding;
+mod history;
 mod publication;
 mod reference;
 
@@ -14,6 +15,9 @@ pub use catalog::{
     WorkflowValueSizedReadBatch, WorkflowValueSizedReadValue,
 };
 pub use encoding::{original_binary_stored_len, original_binary_stored_parts};
+pub use history::{
+    HistoryValueReadConversionError, HistoryValueReadConversionLimits, convert_history_value_reads,
+};
 pub use publication::{
     RecordBatchValueEffect, RecordBatchValueEffects, RecordBatchValueEffectsError,
     inspect_record_batch_value_effects,
