@@ -297,7 +297,7 @@ pub(super) mod fixture_data {
             ));
             match std::fs::create_dir(&path) {
                 Ok(()) => return Ok(path),
-                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {}
                 Err(error) => return Err(error.into()),
             }
         }

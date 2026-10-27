@@ -7,14 +7,14 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,146 tests across 103
+The current local Rust quality checkpoint passes all 1,156 tests across 103
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,128 case and
-adds only the 18 already saved HistoryValues cases. After that full run, one
-fixture allocation was refined; its complete 109-case target passed again with
-the exact identities, and all other frozen source/ledger inputs were unchanged.
-Workspace compilation, strict all-target Clippy, documentation build, reference
-and progress integrity, offline dependency policy and diff checks pass.
+15 targets. Exact identity comparison preserves every earlier 1,146 case and
+adds only the ten size-aware value-read cases. Workspace compilation, strict
+all-target Clippy, documentation build, reference and progress integrity,
+offline dependency policy and diff checks pass. The offline audit uses the
+unchanged primary advisory cache with the feature's explicit manifest; no fresh
+advisory fetch or Linux execution is claimed.
 
 The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
 literals and 84 test function identities. All files remain within the existing
@@ -23,16 +23,21 @@ only four existing Rust-source hashes changed. This is Rust quality evidence,
 not full workflow parity: 1,681 runtime cases remain unmatched and 1,655 source
 declarations unresolved.
 
-Next implement the selected real size-aware value reader. The older isolated
-A0 draft now has ten identities in four properly sized files, preserves all
-103 original assertions and adds five scope/corruption checks. It has only
-compile-time missing-contract evidence; its two private unit cases are not yet
-linked. Adopt only those reviewed test files onto this checkpoint, introduce
-the selected ordinary models/API and literal R0 worker, execute and save all
-ten genuine compiled failures before writing the body. Exact paths, fixture
-split decisions, ownership/resource constraints and receipts are in the
-coordination record. Full workspace feature validation, native/Linux/macOS,
-complete Elixir coverage and the ordered product milestones remain open.
+The real size-aware reader now authenticates each distinct stored value in one
+snapshot before expiry and threshold classification. Omitted values retain the
+exact stored size and avoid the payload copy; copied-byte exhaustion stays an
+error. The old API's complete source inverse is exact. Current-base A0/R0 and
+all ten genuine compiled rejecting cases were saved in c0cfffc before the body.
+All success, corruption, ownership, resource, reopen and snapshot tails now pass.
+One redundant fixture continue was removed for Clippy with no changed assertion
+or expectation. Root performed the review solo; no independent review is claimed.
+
+Next review the concrete collector/acquisition integration and separately
+versioned typed ingress against the ordered architecture gates before creating
+more artifacts. Shared/named/external availability, history/query hydration,
+authority/routing/read barriers, lifecycle cleanup, native/Linux/macOS acceptance,
+complete Elixir coverage and remaining product milestones stay open. Exact
+paths, resource census and execution receipts are in the coordination record.
 
 The earlier saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/
 name/status comparison preserves all 1,119 prior identities and adds only the

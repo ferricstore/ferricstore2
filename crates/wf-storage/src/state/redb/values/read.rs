@@ -265,9 +265,7 @@ fn immutable_value(
         .map_err(|e| admission::storage_error(&e))?
         .ok_or(Error::Corrupt)?;
     charge.work(total(128, [size])?)?;
-    if bytes.value().len() != size || Sha256::digest(bytes.value()).as_slice() != alias.digest {
-        return Err(Error::Corrupt);
-    }
+    authenticate(bytes.value(), size, &alias.digest)?;
     match expiry(alias.expires_at, time.0, time.1) {
         Err(error) => return Ok(Err(error)),
         Ok(false) => return Ok(Ok(None)),
@@ -275,6 +273,13 @@ fn immutable_value(
     }
     let live = total(live, [bound, immutable.len(), alias_bytes])?;
     owned_value(charge, bytes.value(), live).map(|bytes| Ok(Some(bytes)))
+}
+
+fn authenticate(bytes: &[u8], size: usize, digest: &[u8; 32]) -> Result<(), Error> {
+    if bytes.len() != size || Sha256::digest(bytes).as_slice() != digest {
+        return Err(Error::Corrupt);
+    }
+    Ok(())
 }
 
 fn owned_value(charge: &mut ValueCharge, bytes: &[u8], live: usize) -> Result<Vec<u8>, Error> {
