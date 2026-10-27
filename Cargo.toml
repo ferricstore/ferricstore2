@@ -58,6 +58,8 @@ bare_urls = "deny"
 [workspace.lints.clippy]
 all = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -1 }
+excessive_nesting = "deny"
+cognitive_complexity = "deny"
 unwrap_used = "deny"
 expect_used = "deny"
 panic = "deny"

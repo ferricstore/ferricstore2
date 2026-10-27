@@ -42,6 +42,16 @@ durability require their separate tests and review.
 
 ## Validation
 
+The 2026-10-26 maintainability extension also fixes Clippy block nesting at4,
+cognitive complexity at25 and function length at100 in the root `clippy.toml`.
+These are project guardrails; nesting includes enclosing inline item scopes,
+and the complexity score does not prove comprehensibility. Workspace lint
+levels deny nesting and complexity explicitly. The manifest checker protects
+both levels and all three integer thresholds, including disabled, raised or
+mistyped settings; a missing configuration remains an error. The CI wrapper
+selects the repository configuration explicitly. Existing code exceeding the
+new thresholds is a failing lint baseline, not an exemption or a green gate.
+
 Observed preimplementation failures cover 400/401 production and 600/601
 tooling/integration boundaries, comment/blank-line counting, CRLF, missing final
 newline and attempts to acquire a test budget by naming a runtime module

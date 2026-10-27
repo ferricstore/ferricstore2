@@ -1,8 +1,10 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-26. The active full-completion goal remains unfinished.
-GPT-6.1-sol/max agents use disjoint writes and dedicated architecture and
-performance reviews. Decisions and execution evidence are in
+Updated: 2026-10-27. The user resumed the unfinished full-completion goal.
+The user now requires solo work without agents; earlier agent instructions are
+superseded. The separately authorized lint-policy update sets nesting4,
+complexity25 and function length100; existing lint violations remain visible.
+Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
 The last saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/

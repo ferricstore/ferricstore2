@@ -1,0 +1,4 @@
+# Project maintainability limits; block depth includes enclosing item scopes.
+excessive-nesting-threshold = 4
+cognitive-complexity-threshold = 25
+too-many-lines-threshold = 100

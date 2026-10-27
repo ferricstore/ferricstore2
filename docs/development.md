@@ -77,6 +77,16 @@ dbg and lock-across-await restrictions. Test exceptions must be narrow, explain
 the reason, and undergo review; broad allowances are rejected by architecture
 checks. There is no first-party open-source license grant.
 
+The root `clippy.toml` fixes block nesting at **4**, cognitive complexity at **25**
+and function length at **100** Clippy-counted lines. Nesting includes enclosing
+inline item scopes, not just `if` and loop bodies. These are project limits;
+Rust has no universal nesting standard. Cognitive complexity is a coarse lint
+guardrail, not a reliable measure of how understandable code is. Both nesting
+and complexity lints are denied explicitly, and `cargo arch` rejects weakened
+lint levels, changed thresholds or a missing config. The CI wrapper selects this
+root config explicitly. See the official [nesting lint](https://rust-lang.github.io/rust-clippy/stable/index.html#excessive_nesting)
+and [complexity lint](https://rust-lang.github.io/rust-clippy/stable/index.html#cognitive_complexity).
+
 `deny.toml` permits MIT, Apache-2.0 and verified Unicode-3.0 third-party licenses, rejects unknown
 registries and unapproved Git sources, duplicate versions and wildcard requirements, and
 denies yanked, unmaintained and unsound dependencies. Unpublished workspace

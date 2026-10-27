@@ -27,12 +27,21 @@ pub(super) fn assert_readability_policy(real: &std::path::Path) -> CheckResult<(
     for lint in ["excessive_nesting", "cognitive_complexity"] {
         lints.insert(lint.into(), "deny".into());
     }
-    std::fs::write(fixture.path().join("Cargo.toml"), toml::to_string(&baseline)?)?;
-    assert!(super::manifest::check_root(fixture.path())?.is_empty());
+    std::fs::write(
+        fixture.path().join("Cargo.toml"),
+        toml::to_string(&baseline)?,
+    )?;
+    assert_eq!(
+        super::manifest::check_root(fixture.path())?,
+        Vec::<String>::new()
+    );
     for lint in ["excessive_nesting", "cognitive_complexity"] {
         let mut weakened = baseline.clone();
         weakened["workspace"]["lints"]["clippy"][lint] = "allow".into();
-        std::fs::write(fixture.path().join("Cargo.toml"), toml::to_string(&weakened)?)?;
+        std::fs::write(
+            fixture.path().join("Cargo.toml"),
+            toml::to_string(&weakened)?,
+        )?;
         let findings = super::manifest::check_root(fixture.path())?;
         assert!(
             findings
@@ -42,7 +51,10 @@ pub(super) fn assert_readability_policy(real: &std::path::Path) -> CheckResult<(
             "weakened {lint} escaped policy: {findings:?}"
         );
     }
-    std::fs::write(fixture.path().join("Cargo.toml"), toml::to_string(&baseline)?)?;
+    std::fs::write(
+        fixture.path().join("Cargo.toml"),
+        toml::to_string(&baseline)?,
+    )?;
     for (setting, required) in [
         ("excessive-nesting-threshold", 4),
         ("cognitive-complexity-threshold", 25),

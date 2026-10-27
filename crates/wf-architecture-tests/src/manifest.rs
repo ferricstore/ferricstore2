@@ -15,6 +15,8 @@ pub(crate) fn check_root(root: &Path) -> CheckResult<Vec<String>> {
         ("rustdoc", "bare_urls", "deny"),
         ("clippy", "all", "deny"),
         ("clippy", "pedantic", "deny"),
+        ("clippy", "excessive_nesting", "deny"),
+        ("clippy", "cognitive_complexity", "deny"),
         ("clippy", "unwrap_used", "deny"),
         ("clippy", "expect_used", "deny"),
         ("clippy", "panic", "deny"),
@@ -54,6 +56,22 @@ pub(crate) fn check_root(root: &Path) -> CheckResult<Vec<String>> {
         .and_then(toml::Value::as_array);
     if profiles.is_none_or(|values| values.len() != 1 || values[0].as_str() != Some("default")) {
         violations.push("unclassified workspace feature profile".into());
+    }
+    violations.extend(check_clippy_configuration(root)?);
+    Ok(violations)
+}
+
+fn check_clippy_configuration(root: &Path) -> CheckResult<Vec<String>> {
+    let config: toml::Value = fs::read_to_string(root.join("clippy.toml"))?.parse()?;
+    let mut violations = Vec::new();
+    for (setting, required) in [
+        ("excessive-nesting-threshold", 4),
+        ("cognitive-complexity-threshold", 25),
+        ("too-many-lines-threshold", 100),
+    ] {
+        if config.get(setting).and_then(toml::Value::as_integer) != Some(required) {
+            violations.push(format!("Clippy setting {setting} must be {required}"));
+        }
     }
     Ok(violations)
 }

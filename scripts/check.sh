@@ -41,6 +41,7 @@ fi
 
 export RUSTUP_TOOLCHAIN="$rust_version"
 export CARGO_BUILD_WARNINGS=deny
+export CLIPPY_CONF_DIR="$repo_root"
 export RUSTDOCFLAGS="${RUSTDOCFLAGS:-} -D warnings"
 # Cargo's encoded form takes precedence over RUSTDOCFLAGS; use the checked form.
 unset CARGO_ENCODED_RUSTDOCFLAGS

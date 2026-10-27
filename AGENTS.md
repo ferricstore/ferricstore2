@@ -1,5 +1,11 @@
 # Workflow implementation with TDD
 
+Current user override (2026-10-26): work solo; do not spawn or delegate to agents.
+The full-completion goal resumed on 2026-10-27; continue it without agents.
+Earlier agent/architecture-agent requirements below are superseded by this
+instruction. For authorized new artifacts, perform and record the concrete
+architecture/design review yourself; do not claim independent peer review.
+
 The user explicitly requested finishing all remaining implementation and required Elixir test coverage, with TDD and GPT-6.1-sol/max subagents that communicate and review each other. Keep dedicated architecture and performance review across milestones. Follow the active full-completion goal, docs/reviews/workflow-completion-coordination.md and the ordered milestones in docs/implementation-plan.md; do not stop or declare completion after one narrow increment. Later runtime adapters require their predecessor gates. Do not add fake durability/service behavior or mark full workflow parity passing without executed counterparts for all required cases.
 
 Read README.md and docs/architecture.md before proposing changes. Keep the workflow-only scope. Source observations, proposed decisions and unresolved validation gates must be distinguished. Cite source paths and upstream primary documentation. Record disagreements and resolutions in docs/reviews; do not claim independent review unless it happened.

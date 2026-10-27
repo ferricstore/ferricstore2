@@ -1478,3 +1478,8 @@ retain their effect and layer checks. Restricted bare-crate visibility is scope
 metadata; item and worker visibility rules continue to inspect the declared
 visibility. Compiler consumer controls keep the sizing helper crate-private.
 Array modules, globs and associated suffixes retain their existing rejection.
+Direct metadata imports and bare rename chains resolve throughout their immediate
+file, module or block; lexical blocks inherit metadata bindings and inline modules
+isolate them, without general type or qualified module resolution, following the
+[Rust item rules](https://doc.rust-lang.org/reference/items.html) and
+[item scopes](https://doc.rust-lang.org/reference/names/scopes.html#item-scopes).

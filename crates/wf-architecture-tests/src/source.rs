@@ -254,6 +254,16 @@ impl Inspector<'_, '_> {
 }
 
 impl<'ast> Visit<'ast> for Inspector<'_, '_> {
+    fn visit_file(&mut self, file: &'ast syn::File) {
+        let previous = self.begin_metadata_scope(file.items.iter(), false);
+        syn::visit::visit_file(self, file);
+        self.end_metadata_scope(previous);
+    }
+
+    fn visit_block(&mut self, block: &'ast syn::Block) {
+        self.visit_metadata_block(block);
+    }
+
     fn visit_attribute(&mut self, attribute: &'ast Attribute) {
         self.lint(&attribute.meta);
         let approved = match (self.context.package, self.module.as_str()) {
@@ -363,7 +373,10 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
         {
             self.report("worker client transport modules must remain private");
         }
+        let previous_aliases =
+            self.begin_metadata_scope(item.content.iter().flat_map(|(_, items)| items), true);
         syn::visit::visit_item_mod(self, item);
+        self.end_metadata_scope(previous_aliases);
         self.module = previous_module;
         self.test = previous_test;
     }
