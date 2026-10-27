@@ -7,10 +7,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,177 tests across 104
+The current local Rust quality checkpoint passes all 1,184 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,171 case and
-adds only the six stored-value physical-profile cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,177 case and
+adds only the seven durable stored-value publication cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -47,7 +47,8 @@ Its six genuine rejecting cases were saved in 46e53c6 before implementation;
 all full tails now pass. Binary8 wire, caller stream, caps and old direct-header
 refusal order remain preserved. Shared header/frame/intent scoped inverses
 recover the complete earlier source after rustfmt. Generic prepared decoding
-supports9; normal recovery and durable application still reject it. See
+supports9; normal recovery still rejects it and durable9 requires explicit
+profile2 authority through the separate consumed driver below. See
 [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
 The physical predecessor now explicitly creates FWSS7 alias profile2 through
@@ -57,16 +58,26 @@ unchanged. Recovery and both readers enforce the declared capability and complet
 alias/immutable closure. Catalog updates preserve the profile; snapshots require
 equal alias profile and defaults. The two unit and four real-store full tails pass
 after genuine rejecting b09e499. One late fixture correction reads its witness
-from the actually installed policy, preserving every assertion. Stored9 publication
-and Node registration remain closed; the real-store tests use actual binary8.
+from the actually installed policy, preserving every assertion. These predecessor
+cases use actual binary8; the following publisher tests exercise actual stored9.
 
-Next implement the consumed stored intent9 writer through current/every-history
-bindings, retained outcomes, recovery, snapshots and Node audit/replay. Require
-the actual profile2 manifest for every stored9 outcome, including commands with
-no value rows. Preserve each carried alias's encoding and all binary8 behavior.
-Do not guess from an FSV2 prefix or relax binary validation. Intent version9 is
-separate from the existing original-policy operation tag9. The conversion uses
-caller-captured history; actual
+The explicit stored9 consumed driver now publishes immutable/alias/current/
+every-history/core/control/outcome changes in the same Immediate transaction.
+All four contained modes preserve complete raw/escaped/typed/malformed/empty
+source bytes. Mixed8/9 carries keep the actual previous alias; terminal payload,
+result and error bytes remain stored. Reopen and full FWSP4 receive/install retain
+actual outcomes and data. Every9 outcome requires the actual profile2 manifest,
+including commands with no alias rows. Recovery borrows its already-open manifest
+rather than opening metadata twice. All seven full tails pass unchanged after
+genuine rejecting5108cf6, including resource aborts and corruption. Fifteen full
+source inverses preserve binary8 behavior; no earlier test assertion changed.
+
+Next register stored9 in Node startup auditing and replay with explicit opt-in
+to actual profile2 authority. Normal recovery remains closed until those real
+tests pass. Preserve each carried alias's encoding and all binary8 behavior;
+do not infer typed data from an FSV2 prefix. Intent version9 is separate from
+the existing original-policy operation tag9. The conversion uses caller-captured
+history; actual
 ordered FWSH/family11 acquisition and public query services remain required.
 Shared/named/external availability, authority/routing/read barriers, lifecycle
 cleanup, native/Linux/macOS acceptance, complete Elixir coverage and remaining

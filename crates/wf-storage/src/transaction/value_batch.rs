@@ -6,14 +6,8 @@ use std::mem::size_of;
 use wf_domain::policy::complete::PolicySchemaCharge;
 use wf_domain::workflow::control::ControlState;
 use wf_domain::workflow::request::RequestScope;
-use wf_domain::workflow::request::gate::PointGateView;
-use wf_ports::log::{
-    CodecError, DecodedRequest, FreshRecordBatch, RecordBatchApplyError, RecordBatchApplyPlan,
-    RecordBatchInspection, inspect_record_batch_point, prepare_workflow_value_batch,
-};
-use wf_ports::state::{
-    GroupApplyChanges, GroupApplyStore, GroupApplyTransaction, StateTransactionError,
-};
+use wf_ports::log::{CodecError, FreshRecordBatch, RecordBatchApplyError, RecordBatchApplyPlan};
+use wf_ports::state::{GroupApplyChanges, StateTransactionError};
 use wf_types::version::LogIdentity;
 
 use super::load::LoadedRecordBatch;
@@ -28,6 +22,7 @@ use super::{
     RecordBatchTransactionError, RecordBatchTransactionLimits, RecordBatchTransactionOutcome,
 };
 
+mod driver;
 mod plan;
 mod prepare;
 mod step;
@@ -95,13 +90,13 @@ impl std::error::Error for WorkflowValueTransactionError {}
 /// # Errors
 /// Refuses unsupported capability or unproved durable completion.
 pub fn apply_workflow_stored_value_batch_transaction(
-    _store: &mut RedbStateStore,
-    _scope: &RequestScope,
-    _encoded: &[u8],
-    _log: LogIdentity,
-    _limits: WorkflowValueTransactionLimits,
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: WorkflowValueTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
-    Err(WorkflowValueTransactionError::UnsupportedProfile)
+    driver::apply(store, scope, encoded, log, limits, 9)
 }
 
 /// Applies one prepared value command through the existing consumed driver.
@@ -116,97 +111,7 @@ pub fn apply_workflow_value_batch_transaction(
     log: LogIdentity,
     limits: WorkflowValueTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
-    let mut charge = ValueCharge::new(
-        limits.maximum_value_rows,
-        limits.maximum_value_bytes,
-        limits.maximum_value_work,
-        limits.maximum_value_temporary_bytes,
-    )
-    .map_err(storage_error)?;
-    let (decoded, live) = decode(encoded, &limits, &mut charge)?;
-    if decoded.request().scope != *scope || decoded.request().intent.version() != 8 {
-        return Err(WorkflowValueTransactionError::InvalidInput);
-    }
-    let mode = decoded
-        .workflow_value_metadata()
-        .ok_or(WorkflowValueTransactionError::UnsupportedProfile)?
-        .profile;
-    let prepared = decoded.digest();
-    let tx = store
-        .begin_apply(
-            scope.group(),
-            scope.recovery(),
-            limits.record_batch.codec.admission(),
-            limits.record_batch.maximum_read_steps,
-            limits.record_batch.maximum_read_bytes,
-            limits.record_batch.maximum_adapter_bytes,
-        )
-        .map_err(storage_error)?;
-    tx.value_manifest().map_err(|error| {
-        if error == StateTransactionError::UnsupportedLayout {
-            WorkflowValueTransactionError::UnsupportedProfile
-        } else {
-            storage_error(error)
-        }
-    })?;
-    charge.helper().map_err(storage_error)?;
-    let predecessor = tx.control().map_err(storage_error)?;
-    let retained_nonempty = tx
-        .retained_nonempty(scope.tenant())
-        .map_err(storage_error)?;
-    let original = tx
-        .outcome(scope.tenant(), &decoded.request().request)
-        .map_err(storage_error)?;
-    let inspection = inspect_record_batch_point(
-        decoded,
-        log,
-        PointGateView {
-            scope,
-            control: predecessor,
-            outcome: original.as_ref(),
-            retained_nonempty,
-        },
-        limits.record_batch.codec,
-        limits.record_batch.workspace_bytes,
-    )
-    .map_err(|error| record_error(error.into()))?;
-    match inspection {
-        RecordBatchInspection::Complete(result) => {
-            let (control, kind) =
-                commit_complete(tx, scope, predecessor, result, prepared, mode, charge)?;
-            record_batch::complete_reply(control, kind, original).map_err(record_error)
-        }
-        RecordBatchInspection::Fresh(fresh) => {
-            drop(original);
-            apply_fresh(tx, scope, fresh, predecessor, &limits, live, charge)
-        }
-    }
-}
-
-fn decode<'input>(
-    encoded: &'input [u8],
-    limits: &WorkflowValueTransactionLimits,
-    charge: &mut ValueCharge,
-) -> Result<(DecodedRequest<'input>, usize), WorkflowValueTransactionError> {
-    let live = total(
-        record_batch::live_bytes(limits.record_batch).map_err(record_error)?,
-        [limits.maximum_value_temporary_bytes],
-    )
-    .map_err(storage_error)?;
-    let available = limits
-        .record_batch
-        .workspace_bytes
-        .checked_sub(live)
-        .ok_or_else(|| storage_error(StateTransactionError::Limit))?;
-    let (decoded, spent) = prepare_workflow_value_batch(
-        encoded,
-        limits.record_batch.codec,
-        available,
-        charge.remaining_work(),
-    )
-    .map_err(codec_error)?;
-    charge.work(spent).map_err(storage_error)?;
-    Ok((decoded, live))
+    driver::apply(store, scope, encoded, log, limits, 8)
 }
 
 fn commit_complete(
@@ -214,7 +119,7 @@ fn commit_complete(
     scope: &RequestScope,
     predecessor: ControlState,
     result: RecordBatchApplyPlan<'_>,
-    prepared: wf_domain::workflow::control::PreparedDigest,
+    (prepared, intent_version): (wf_domain::workflow::control::PreparedDigest, u16),
     mode: u8,
     mut charge: ValueCharge,
 ) -> Result<(ControlState, u8), WorkflowValueTransactionError> {
@@ -222,7 +127,7 @@ fn commit_complete(
     charge
         .temporary(size_of::<ValuePublicationPlan<'_>>())
         .map_err(storage_error)?;
-    let mut publication = plan::empty(prepared, mode, charge);
+    let mut publication = plan::empty((prepared, intent_version), mode, charge);
     tx.commit_values(&changes, &mut publication)
         .map_err(storage_error)?;
     record_batch::complete_kind(changes.into_plan()).map_err(record_error)

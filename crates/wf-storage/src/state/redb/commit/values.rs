@@ -1,6 +1,5 @@
 //! Immutable values, aliases and every companion share the consumed core writer.
 
-use redb::ReadableTable;
 use sha2::{Digest, Sha256};
 use wf_domain::history::EventKind;
 use wf_domain::workflow::request::RequestScope;
@@ -24,6 +23,9 @@ use crate::state::{
 };
 use crate::transaction::{ValuePublicationPlan, ValueStep};
 
+mod immutable;
+use immutable::{immutable_value, key_bound, put, write_exact};
+
 pub(crate) fn apply(
     tx: RedbStateTransaction<'_>,
     changes: &GroupApplyChanges<'_, '_>,
@@ -41,6 +43,12 @@ pub(super) fn validate(
     publication.charge.helper()?;
     if tx.layout != 7 {
         return Err(Error::UnsupportedLayout);
+    }
+    if publication.intent_version == 9 && tx.value_manifest()?.alias_format != 2 {
+        return Err(Error::UnsupportedPolicyProfile);
+    }
+    if !matches!(publication.intent_version, 8 | 9) {
+        return Err(Error::InvalidChanges);
     }
     if !matches!(publication.mode, 1 | 5 | 6 | 7)
         || changes
@@ -60,7 +68,9 @@ pub(super) fn validate(
             7 => 7,
             _ => return Err(Error::InvalidChanges),
         };
-        if outcome.intent().version() != 8 || outcome.response_version() != response {
+        if outcome.intent().version() != publication.intent_version
+            || outcome.response_version() != response
+        {
             return Err(Error::InvalidChanges);
         }
     }
@@ -118,7 +128,11 @@ pub(super) fn publish(
                     tx,
                     scope,
                     step,
-                    (index, field.ok_or(Error::InvalidChanges)?),
+                    (
+                        index,
+                        field.ok_or(Error::InvalidChanges)?,
+                        publication.intent_version == 9,
+                    ),
                     &mut publication.charge,
                     live,
                 )?;
@@ -136,7 +150,7 @@ fn publish_value(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
     step: &ValueStep<'_>,
-    field: (usize, &[u8]),
+    field: (usize, &[u8], bool),
     charge: &mut ValueCharge,
     live: usize,
 ) -> Result<(), Error> {
@@ -171,16 +185,22 @@ fn publish_value(
         65_535,
     )
     .map_err(|error| build_error(&error))?;
-    let stored_len =
-        original_binary_stored_len(field.1, usize::MAX).map_err(|error| build_error(&error))?;
-    let parts =
-        original_binary_stored_parts(field.1, usize::MAX).map_err(|error| build_error(&error))?;
+    let stored_len = if field.2 {
+        field.1.len()
+    } else {
+        original_binary_stored_len(field.1, usize::MAX).map_err(|error| build_error(&error))?
+    };
+    let parts = if field.2 {
+        [b"".as_slice(), field.1]
+    } else {
+        original_binary_stored_parts(field.1, usize::MAX).map_err(|error| build_error(&error))?
+    };
     charge.work(stored_len)?;
     let mut hash = Sha256::new();
     hash.update(parts[0]);
     hash.update(parts[1]);
     let alias = ValueAlias {
-        stored: false,
+        stored: field.2,
         partition,
         id,
         kind,
@@ -250,73 +270,6 @@ fn write_alias(
     write_exact(tx, &alias_key, &encoded, charge, live)
 }
 
-fn immutable_value(
-    tx: &RedbStateTransaction<'_>,
-    key: &[u8],
-    parts: [&[u8]; 2],
-    charge: &mut ValueCharge,
-    live: usize,
-) -> Result<(), Error> {
-    charge.candidate()?;
-    tx.step()?;
-    let table = tx
-        .write
-        .open_table(tx.rows_table)
-        .map_err(admission::table_error)?;
-    tx.step()?;
-    let previous = table.get(key).map_err(|e| admission::storage_error(&e))?;
-    let size = total(parts[0].len(), [parts[1].len()])?;
-    if let Some(previous) = previous {
-        charge.compare(previous.value().len(), size)?;
-        if previous.value().len() != size
-            || !previous.value().starts_with(parts[0])
-            || &previous.value()[parts[0].len()..] != parts[1]
-        {
-            return Err(Error::Corrupt);
-        }
-        return Ok(());
-    }
-    drop(previous);
-    drop(table);
-    if parts[0].is_empty() {
-        return put(tx, key, parts[1], charge, live);
-    }
-    charge.work(size)?;
-    charge.temporary(total(live, [size])?)?;
-    let mut stored = Vec::new();
-    stored
-        .try_reserve_exact(size)
-        .map_err(|_| Error::Allocation)?;
-    stored.extend_from_slice(parts[0]);
-    stored.extend_from_slice(parts[1]);
-    put(tx, key, &stored, charge, total(live, [stored.len()])?)
-}
-
-fn write_exact(
-    tx: &RedbStateTransaction<'_>,
-    key: &[u8],
-    bytes: &[u8],
-    charge: &mut ValueCharge,
-    live: usize,
-) -> Result<(), Error> {
-    charge.candidate()?;
-    tx.step()?;
-    let table = tx
-        .write
-        .open_table(tx.rows_table)
-        .map_err(admission::table_error)?;
-    tx.step()?;
-    if let Some(previous) = table.get(key).map_err(|e| admission::storage_error(&e))? {
-        charge.compare(previous.value().len(), bytes.len())?;
-        if previous.value() != bytes {
-            return Err(Error::Corrupt);
-        }
-        return Ok(());
-    }
-    drop(table);
-    put(tx, key, bytes, charge, live)
-}
-
 fn publish_binding(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
@@ -365,35 +318,4 @@ fn publish_binding(
     } else {
         write_exact(tx, &key, &encoded, charge, live)
     }
-}
-
-fn put(
-    tx: &RedbStateTransaction<'_>,
-    key: &[u8],
-    bytes: &[u8],
-    charge: &mut ValueCharge,
-    live: usize,
-) -> Result<(), Error> {
-    charge.output(1, total(key.len(), [bytes.len()])?)?;
-    charge.work(total(key.len(), [bytes.len()])?)?;
-    charge.temporary(total(live, [key.len(), bytes.len()])?)?;
-    tx.temporary(total(key.len(), [bytes.len()])?)?;
-    admission::engine_pair(key.len(), bytes.len())?;
-    tx.step()?;
-    let mut table = tx
-        .write
-        .open_table(tx.rows_table)
-        .map_err(admission::table_error)?;
-    tx.step()?;
-    table
-        .insert(key, bytes)
-        .map_err(|e| admission::storage_error(&e))?;
-    Ok(())
-}
-
-fn key_bound(scope: &RequestScope, reference: usize, scalar: usize) -> Result<usize, Error> {
-    total(
-        32,
-        [product(total(scope_bytes(scope), [reference])?, 2)?, scalar],
-    )
 }

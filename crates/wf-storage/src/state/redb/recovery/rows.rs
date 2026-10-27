@@ -17,7 +17,7 @@ pub(super) fn validate(
     key: &DecodedStateKey,
     bytes: &[u8],
     charge: &mut PolicySchemaCharge,
-    layout: u16,
+    (layout, manifest): (u16, &[u8]),
 ) -> Result<(), StateTransactionError> {
     match key.family() {
         0 => {
@@ -27,7 +27,7 @@ pub(super) fn validate(
             let owner = record(tx, key, bytes)?;
             index::canonical(tx, table, &owner, charge, layout)?;
         }
-        2 => outcome(tx, key, bytes, charge, layout)?,
+        2 => outcome(tx, key, bytes, charge, (layout, manifest))?,
         3 | 4 => index::reverse(tx, table, key, bytes, charge, layout)?,
         5 => history(tx, key, bytes)?,
         6 => {
@@ -78,7 +78,7 @@ fn outcome(
     key: &DecodedStateKey,
     bytes: &[u8],
     charge: &mut PolicySchemaCharge,
-    layout: u16,
+    (layout, manifest): (u16, &[u8]),
 ) -> Result<(), StateTransactionError> {
     let scope = tx.scope_bytes(key.part(2))?;
     tx.temporary(key.part(3).len())?;
@@ -98,6 +98,19 @@ fn outcome(
         validation,
     )
     .map_err(value_error)?;
+    if scanned.intent_version() == 9 {
+        tx.temporary(total(
+            scanned.owned_bytes(),
+            [
+                manifest.len(),
+                std::mem::size_of::<super::super::values::manifest::ValueManifest>(),
+            ],
+        )?)?;
+        let facts = super::super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
+        if facts.alias_format != 2 {
+            return Err(StateTransactionError::Corrupt);
+        }
+    }
     if scanned
         .response_count()
         .is_some_and(|n| n > tx.admission.batch_items())

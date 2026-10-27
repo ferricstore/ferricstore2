@@ -61,7 +61,7 @@ pub fn inspect_independent_record_batch_point<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace_limit, 6)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
-    if decoded.request.intent.version() != 8
+    if !matches!(decoded.request.intent.version(), 8 | 9)
         && let GateDecision::Replay(original) = gate.decision()
     {
         let (status, count) = response::record_batch_retained_summary(
@@ -101,7 +101,7 @@ pub(in crate::log) fn decide_with_ordering<'current>(
     additional_live_bytes: usize,
     outcome_ttl_ms: u64,
 ) -> Result<crate::log::WorkflowValueDecision<'current>, RecordBatchApplyError> {
-    if fresh.decoded.request.intent.version() != 8
+    if !matches!(fresh.decoded.request.intent.version(), 8 | 9)
         || super::super::value_batch::response::effective_profile(&fresh.decoded)? != 6
     {
         return Err(CodecError::UnsupportedVersion.into());

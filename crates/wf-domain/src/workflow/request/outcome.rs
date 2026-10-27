@@ -115,7 +115,7 @@ impl RetainedOutcome {
             expires_at,
             status,
         } = metadata;
-        if intent.version() == 8
+        if matches!(intent.version(), 8 | 9)
             && (!matches!(response_version, 5..=8)
                 || !matches!(
                     status,
@@ -124,7 +124,7 @@ impl RetainedOutcome {
         {
             return Err(RequestValueError::UnsupportedVersion);
         }
-        if intent.version() != 8
+        if !matches!(intent.version(), 8 | 9)
             && response_version != 1
             && !(response_version == 2
                 && intent.version() == 2

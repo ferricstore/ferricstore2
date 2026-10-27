@@ -132,8 +132,12 @@ pub(super) fn cohort(
     if let Some(bytes) = member {
         super::membership::validate_value(tx, bytes.value(), control)?;
     }
-    let (actual_placements, actual_policies, hash) =
-        validate_rows(tx, control.last_entry().is_some(), layout, charge)?;
+    let (actual_placements, actual_policies, hash) = validate_rows(
+        tx,
+        control.last_entry().is_some(),
+        (layout, manifest.value()),
+        charge,
+    )?;
     if placements != actual_placements || policies != actual_policies || expected != hash {
         return Err(StateTransactionError::Corrupt);
     }
@@ -229,7 +233,7 @@ pub(super) fn check_manifest(
 fn validate_rows(
     tx: &RedbStateTransaction<'_>,
     applied: bool,
-    layout: u16,
+    (layout, manifest): (u16, &[u8]),
     charge: &mut PolicySchemaCharge,
 ) -> Result<(u64, u64, [u8; 32]), StateTransactionError> {
     tx.step()?;
@@ -265,7 +269,14 @@ fn validate_rows(
         if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=11) {
             return Err(StateTransactionError::Corrupt);
         }
-        rows::validate(tx, &table, &decoded, value.value(), charge, layout)?;
+        rows::validate(
+            tx,
+            &table,
+            &decoded,
+            value.value(),
+            charge,
+            (layout, manifest),
+        )?;
         if matches!(decoded.family(), 6 | 7) {
             counts[usize::from(decoded.family() - 6)] = counts[usize::from(decoded.family() - 6)]
                 .checked_add(1)

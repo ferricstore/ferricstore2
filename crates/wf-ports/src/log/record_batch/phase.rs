@@ -74,7 +74,7 @@ pub fn inspect_record_batch<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    let profile = if decoded.request.intent.version() == 8 {
+    let profile = if matches!(decoded.request.intent.version(), 8 | 9) {
         super::super::value_batch::response::effective_profile(&decoded)?
     } else {
         5
@@ -99,7 +99,7 @@ pub fn inspect_record_batch_point<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    let profile = if decoded.request.intent.version() == 8 {
+    let profile = if matches!(decoded.request.intent.version(), 8 | 9) {
         super::super::value_batch::response::effective_profile(&decoded)?
     } else {
         5
@@ -115,7 +115,7 @@ pub(in crate::log) fn finish_inspection<'input, 'retained>(
     gate: RequestGate<'retained>,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    if decoded.request.intent.version() == 8
+    if matches!(decoded.request.intent.version(), 8 | 9)
         && let GateDecision::Replay(original) = gate.decision()
     {
         super::super::value_batch::response::check_replay(&decoded, original)?;

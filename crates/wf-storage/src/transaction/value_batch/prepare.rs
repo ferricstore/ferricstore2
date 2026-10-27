@@ -35,6 +35,7 @@ pub(super) struct BoundValuePolicy {
 pub(super) struct ValueInputs {
     pub(super) prepared: PreparedDigest,
     pub(super) mode: u8,
+    pub(super) intent_version: u16,
     pub(super) defaults: WorkflowValueDefaults,
     pub(super) inputs: Vec<WorkflowValueItemInput>,
     pub(super) policies: Vec<BoundValuePolicy>,
@@ -198,6 +199,7 @@ pub(super) fn bind(
     }
     Ok(ValueInputs {
         prepared: decoded.digest(),
+        intent_version: decoded.request().intent.version(),
         mode: metadata.profile,
         defaults,
         inputs,

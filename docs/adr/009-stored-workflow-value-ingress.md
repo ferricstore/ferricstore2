@@ -1,7 +1,8 @@
 # ADR-009: explicit stored workflow value ingress
 
-Status: private codec and explicit physical capability implemented and locally
-verified. Stored intent9 publication and recovery registration remain required.
+Status: private codec, explicit physical capability and consumed stored9
+publication/outcome recovery implemented and locally verified. Node9 startup
+audit/replay registration remains required.
 
 The binary command's intent8 interprets supplied payload/result/error bytes as
 logical binaries. Publication escapes a leading `FSV2` once. Inferring a typed
@@ -47,14 +48,23 @@ malformed ETF may have a valid storage envelope. FWVB1 is unchanged, so carrying
 a value retains its actual alias and encoding. No prefix inference or additional
 payload owner is introduced.
 
-Normal recovery and durable drivers remain closed to intent9 until actual
-atomic publication and outcome recovery are implemented. Next publish immutable/
-alias/current/every-history/core/control/outcome changes in the same consumed
-transaction. Bind stored9 outcomes to the actual profile2 manifest even when
-there are no value rows. Fresh opt-in, mixed8/9, retained replay, corruption,
-reopen, full snapshot receive/install and Node audit/replay require executed
-tests before durable registration. The existing original-policy operation tag9
-is independent of the stored-value intent version9.
+The additive apply_workflow_stored_value_batch_transaction explicitly requires
+profile2 authority before retained or fresh inspection. The old driver stays
+8-only. One private driver selects the matching codec, and the actual decoded
+intent version travels with both fresh and empty publication plans. The consumed
+writer checks that capability again, then atomically publishes immutable/alias/
+current/every-history/core/control/outcome changes. Stored parts borrow complete
+source bytes directly; binary8 retains its original escaping and charge order.
+The existing FWSO response5..8 grammars retain exact count/status/time/position
+validation for value intents8|9. No response format number or table changes.
+
+Every9 outcome binds the actual profile2 manifest even when there are no value
+rows. Recovery threads its already-open manifest through the existing row walk;
+it prospectively admits the complete retained owner, manifest bytes and typed
+header before the9-only capability parse. It does not open metadata twice or
+infer capability from aliases. Normal recovery and Node9 registration stay
+closed until actual startup auditing/replay tests pass. The existing original-
+policy operation tag9 remains independent of stored-value intent version9.
 
 Full common/foreign typed ingress, original HistoryValues observations, actual
 history acquisition, shared/named/external availability, authorization, routing,
@@ -83,3 +93,16 @@ both correctness smokes, retaining all earlier1,171 identities. Formatting,
 compilation, strict all-target Clippy, architecture, reference/progress integrity,
 documentation and offline dependency checks pass. This establishes physical
 capability and binary publication under it, not stored9 publication or full parity.
+
+The following consumed publisher's seven genuine rejecting cases were saved in
+5108cf6 before implementation. All seven complete tails now pass byte-exact:
+twenty mode/value combinations, mixed8/9 carries with independent source holes
+and every-history bindings, terminal payload/result/error values, exact/retained/
+conflict/cross-profile behavior, full FWSP4 custody and replay, profile downgrade
+without alias rows, four actual resource cuts and immutable corruption. The
+full run preserves all earlier1,177 identities and adds only these seven:
+1,184 Rust cases across104 targets, six documentation cases and both correctness
+smokes. Strict quality and offline dependency checks pass. Fifteen complete
+binary8 source inverses and four moved write-helper bodies preserve the prior
+path; all new and old storage tests remain saved-R0 exact. These are local
+storage results, not Node9 registration, complete Elixir parity or Linux evidence.

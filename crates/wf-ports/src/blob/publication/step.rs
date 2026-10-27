@@ -101,7 +101,7 @@ pub(super) fn profile(
     charge: &mut ValueEffectsCharge,
 ) -> Result<u16, E> {
     let version = decoded.request().intent.version();
-    if version != 8 {
+    if !matches!(version, 8 | 9) {
         return Ok(version);
     }
     charge.spend(12)?;

@@ -268,7 +268,7 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
         match plan.decision() {
             RecordBatchApplyDecision::Fresh { outcome, .. }
             | RecordBatchApplyDecision::IndependentFresh { outcome, .. }
-                if outcome.intent().version() == 8 =>
+                if matches!(outcome.intent().version(), 8 | 9) =>
             {
                 crate::log::validate_workflow_value_changes(scope, control, plan.decision())?;
             }

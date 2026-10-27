@@ -44,6 +44,10 @@ pub struct ScannedRetainedOutcome<'input> {
 }
 
 impl ScannedRetainedOutcome<'_> {
+    pub(crate) const fn intent_version(&self) -> u16 {
+        self.intent.version()
+    }
+
     /// Reads 512 plus every variable byte returned by materialization.
     #[must_use]
     pub const fn owned_bytes(&self) -> usize {
@@ -128,7 +132,7 @@ pub fn encode_outcome(
         .0
     } else if outcome.intent().version() == 7 && outcome.response_version() == 4 {
         atomic_start::wire_status(outcome, maximum_bytes)?
-    } else if outcome.intent().version() == 8 {
+    } else if matches!(outcome.intent().version(), 8 | 9) {
         // The profiled encoder and real reads repeat the captured admission.
         let ceiling = AdmissionLimits::new(
             wf_domain::workflow::admission::MAX_INLINE_BYTES,
@@ -229,16 +233,15 @@ fn scan_with_policy<'input>(
          expires_at,
          response_version| {
             let [tenant, group, recovery, request, response] = fields;
+            let extended_response = matches!((intent_version, response_version), (1, 3) | (7, 4))
+                || matches!(intent_version, 8 | 9)
+                || (matches!(intent_version, 2 | 4) && profile.is_some());
             if tenant != expected_scope.tenant().as_bytes()
                 || group != expected_scope.group().as_bytes()
                 || recovery != expected_scope.recovery().as_bytes()
                 || request != expected_request.as_bytes()
                 || expires_at <= original_time
-                || (response.len() > limits.decision_bytes()
-                    && !(intent_version == 1 && response_version == 3)
-                    && !(intent_version == 7 && response_version == 4)
-                    && intent_version != 8
-                    && !(matches!(intent_version, 2 | 4) && profile.is_some()))
+                || (response.len() > limits.decision_bytes() && !extended_response)
             {
                 return Err(StateValueError::InvalidValue);
             }

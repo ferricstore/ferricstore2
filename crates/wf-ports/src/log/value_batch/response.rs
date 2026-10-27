@@ -14,7 +14,7 @@ use crate::log::public_mutation::response as public;
 use crate::log::record_batch::{atomic_start::response as atomic, response as batch};
 
 pub(in crate::log) fn effective_profile(decoded: &DecodedRequest<'_>) -> Result<u16, CodecError> {
-    if decoded.request.intent.version() != 8 {
+    if !matches!(decoded.request.intent.version(), 8 | 9) {
         return Ok(decoded.request.intent.version());
     }
     let mode = u16::from(
@@ -46,7 +46,7 @@ pub(in crate::log) fn response_version(
     decoded: &DecodedRequest<'_>,
     legacy_version: u16,
 ) -> Result<u16, CodecError> {
-    if decoded.request.intent.version() != 8 {
+    if !matches!(decoded.request.intent.version(), 8 | 9) {
         return Ok(legacy_version);
     }
     match effective_profile(decoded)? {
@@ -68,7 +68,7 @@ pub fn workflow_value_retained_summary(
     time: TimestampMillis,
     admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), CodecError> {
-    if intent.version() != 8 {
+    if !matches!(intent.version(), 8 | 9) {
         return Err(CodecError::UnsupportedVersion);
     }
     if response.len() > admission.decision_bytes() {
@@ -94,7 +94,7 @@ pub(in crate::log) fn check_replay(
     original: &RetainedOutcome,
 ) -> Result<(), crate::log::RecordBatchApplyError> {
     let mode = effective_profile(decoded)?;
-    if decoded.request.intent.version() != 8
+    if !matches!(decoded.request.intent.version(), 8 | 9)
         || original.intent() != decoded.request.intent
         || original.response_version() != response_version(decoded, 0)?
     {
@@ -142,7 +142,7 @@ pub(crate) fn validate_changes(
         .ok_or(StateTransactionError::InvalidChanges)?
         .log();
     let time = control.execution_time();
-    if outcome.intent().version() != 8
+    if !matches!(outcome.intent().version(), 8 | 9)
         || outcome.scope() != scope
         || outcome.original_position() != position
         || outcome.original_time() != time

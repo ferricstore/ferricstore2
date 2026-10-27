@@ -34,6 +34,7 @@ pub(crate) struct ValuePublicationPlan<'plan> {
     pub(crate) steps: Vec<ValueStep<'plan>>,
     pub(crate) prepared: PreparedDigest,
     pub(crate) mode: u8,
+    pub(crate) intent_version: u16,
     pub(crate) charge: ValueCharge,
 }
 
@@ -92,6 +93,7 @@ pub(super) fn build<'plan>(
         steps,
         prepared: inputs.prepared,
         mode: inputs.mode,
+        intent_version: inputs.intent_version,
         charge,
     })
 }
@@ -157,7 +159,7 @@ fn build_step<'plan>(
 }
 
 pub(super) fn empty(
-    prepared: PreparedDigest,
+    (prepared, intent_version): (PreparedDigest, u16),
     mode: u8,
     charge: ValueCharge,
 ) -> ValuePublicationPlan<'static> {
@@ -165,6 +167,7 @@ pub(super) fn empty(
         steps: Vec::new(),
         prepared,
         mode,
+        intent_version,
         charge,
     }
 }
