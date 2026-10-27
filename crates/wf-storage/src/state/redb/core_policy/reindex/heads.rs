@@ -45,37 +45,38 @@ impl PolicyReindexHeads {
         if (old == StateMode::Fifo) != head.is_some() {
             return Err(StateTransactionError::Corrupt);
         }
-        if let Some(head) = &head {
-            if head.ordering.priority > 2 || LaneKey::for_record(&entry(head)) != Some(lane) {
+        let Some(head) = &head else {
+            return self.retain(tx, owner, lane.state, None);
+        };
+        if head.ordering.priority > 2 || LaneKey::for_record(&entry(head)) != Some(lane) {
+            return Err(StateTransactionError::Corrupt);
+        }
+        if let Some(due) = DueOrder::for_record(&entry(head)) {
+            let key = tx.due_key(scope, due)?;
+            tx.step()?;
+            let mut table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
+            tx.step()?;
+            if table
+                .get(key.as_slice())
+                .map_err(|e| storage_error(&e))?
+                .ok_or(StateTransactionError::Corrupt)?
+                .value()
+                != [1]
+            {
                 return Err(StateTransactionError::Corrupt);
             }
-            if let Some(due) = DueOrder::for_record(&entry(head)) {
-                let key = tx.due_key(scope, due)?;
-                tx.step()?;
-                let mut table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
-                tx.step()?;
-                {
-                    let value = table
-                        .get(key.as_slice())
-                        .map_err(|e| storage_error(&e))?
-                        .ok_or(StateTransactionError::Corrupt)?;
-                    if value.value() != [1] {
-                        return Err(StateTransactionError::Corrupt);
-                    }
-                }
-                self.retain(tx, owner, lane.state, Some(head.record.id()))?;
-                tx.step()?;
-                let removed = table
-                    .remove(key.as_slice())
-                    .map_err(|e| storage_error(&e))?
-                    .ok_or(StateTransactionError::Corrupt)?;
-                if removed.value() != [1] {
-                    return Err(StateTransactionError::Corrupt);
-                }
-                return Ok(());
+            self.retain(tx, owner, lane.state, Some(head.record.id()))?;
+            tx.step()?;
+            let removed = table
+                .remove(key.as_slice())
+                .map_err(|e| storage_error(&e))?
+                .ok_or(StateTransactionError::Corrupt)?;
+            if removed.value() != [1] {
+                return Err(StateTransactionError::Corrupt);
             }
+            return Ok(());
         }
-        self.retain(tx, owner, lane.state, head.as_ref().map(|h| h.record.id()))
+        self.retain(tx, owner, lane.state, Some(head.record.id()))
     }
     fn retain(
         &mut self,
@@ -140,19 +141,29 @@ impl PolicyReindexHeads {
                     state,
                     partition_key: partition.as_bytes(),
                 };
-                let head = tx.fifo_head(scope.tenant(), lane)?;
-                if mode(state) == StateMode::Parallel {
-                    if head.is_some() {
-                        return Err(StateTransactionError::Corrupt);
-                    }
-                } else if let Some(head) = head
-                    && let Some(due) = DueOrder::for_record(&entry(&head))
-                {
-                    let key = tx.due_key(scope, due)?;
-                    publication::put(tx, &key, &[1])?;
-                }
+                finish_lane(tx, scope, lane, &mode)?;
             }
         }
         Ok(())
     }
+}
+
+fn finish_lane(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    lane: LaneKey<'_>,
+    mode: &impl Fn(&[u8]) -> StateMode,
+) -> Result<(), StateTransactionError> {
+    let head = tx.fifo_head(scope.tenant(), lane)?;
+    if mode(lane.state) == StateMode::Parallel {
+        if head.is_some() {
+            return Err(StateTransactionError::Corrupt);
+        }
+    } else if let Some(head) = head
+        && let Some(due) = DueOrder::for_record(&entry(&head))
+    {
+        let key = tx.due_key(scope, due)?;
+        publication::put(tx, &key, &[1])?;
+    }
+    Ok(())
 }

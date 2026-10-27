@@ -137,31 +137,32 @@ pub(super) fn retained(
     let live = tx.control()?;
     for slot in 0_u8..2 {
         select(tx, slot);
-        if let Some(expected) = catalog.slots[usize::from(slot)] {
-            let (layout, saved) = recovery::cohort(tx, charge)?;
-            if !matches!(layout, 3 | 5..=7) || super::format::facts(tx, limits)? != expected {
-                return Err(Error::Corrupt);
-            }
-            compatible(tx, saved, live)?;
-            if catalog.pending.is_some_and(|t| {
-                catalog.current == Some(slot)
-                    && saved.last_entry().map(EntryIdentity::log) != Some(t.position())
-            }) {
-                return Err(Error::Corrupt);
-            }
-            if let Some(t) = catalog.pending {
-                if catalog.anchor == Some(slot)
-                    && t.before().last_purged().is_some()
-                    && saved.last_entry().map(EntryIdentity::log) != t.before().last_purged()
-                {
-                    return Err(Error::Corrupt);
-                }
-                if catalog.current == Some(slot) && t.is_received() && saved != live {
-                    return Err(Error::Corrupt);
-                }
-            }
-        } else {
+        let Some(expected) = catalog.slots[usize::from(slot)] else {
             validate::empty(tx)?;
+            continue;
+        };
+        let (layout, saved) = recovery::cohort(tx, charge)?;
+        if !matches!(layout, 3 | 5..=7) || super::format::facts(tx, limits)? != expected {
+            return Err(Error::Corrupt);
+        }
+        compatible(tx, saved, live)?;
+        if catalog.pending.is_some_and(|t| {
+            catalog.current == Some(slot)
+                && saved.last_entry().map(EntryIdentity::log) != Some(t.position())
+        }) {
+            return Err(Error::Corrupt);
+        }
+        let Some(t) = catalog.pending else {
+            continue;
+        };
+        if catalog.anchor == Some(slot)
+            && t.before().last_purged().is_some()
+            && saved.last_entry().map(EntryIdentity::log) != t.before().last_purged()
+        {
+            return Err(Error::Corrupt);
+        }
+        if catalog.current == Some(slot) && t.is_received() && saved != live {
+            return Err(Error::Corrupt);
         }
     }
     super::select(tx, false);

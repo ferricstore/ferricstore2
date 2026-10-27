@@ -23,40 +23,62 @@ impl LoadedClaim {
     ) -> Result<(), ClaimTransactionError> {
         let mut cursor = tx.claim_lane_cursor(scope.tenant(), query)?;
         loop {
-            match cursor.next()? {
+            let lane = match cursor.next()? {
                 ClaimLaneStep::RangeEnd => break,
                 ClaimLaneStep::BudgetEnd => return Err(StateTransactionError::Limit.into()),
-                ClaimLaneStep::Lane(lane) => {
-                    if self.mode(lane.state) != StateMode::Fifo {
-                        return Err(StateTransactionError::Corrupt.into());
-                    }
-                    if !self.load_head(tx, scope, lane, budget, cap)? {
-                        return Ok(());
-                    }
-                }
+                ClaimLaneStep::Lane(lane) => lane,
+            };
+            if self.mode(lane.state) != StateMode::Fifo {
+                return Err(StateTransactionError::Corrupt.into());
+            }
+            if !self.load_head(tx, scope, lane, budget, cap)? {
+                return Ok(());
             }
         }
         drop(cursor);
-        if let (PartitionFilter::Only(partitions), ClaimStates::Only(states)) =
+        let (PartitionFilter::Only(partitions), ClaimStates::Only(states)) =
             (query.partitions, query.states)
-        {
-            for state in states {
-                if *state == b"running" || self.mode(state) != StateMode::Fifo {
-                    continue;
-                }
-                for partition in partitions {
-                    let lane = LaneKey {
-                        workflow_type: query.workflow_type,
-                        state,
-                        partition_key: partition,
-                    };
-                    if !self.load_head(tx, scope, lane, budget, cap)? {
-                        return Ok(());
-                    }
-                }
+        else {
+            return Ok(());
+        };
+        for state in states {
+            if *state == b"running" || self.mode(state) != StateMode::Fifo {
+                continue;
+            }
+            if !self.probe_partitions(
+                tx,
+                scope,
+                (query.workflow_type, state),
+                partitions,
+                budget,
+                cap,
+            )? {
+                return Ok(());
             }
         }
         Ok(())
+    }
+
+    fn probe_partitions<T: GroupClaimTransaction>(
+        &mut self,
+        tx: &T,
+        scope: &RequestScope,
+        (workflow_type, state): (&[u8], &[u8]),
+        partitions: &[&[u8]],
+        budget: usize,
+        cap: usize,
+    ) -> Result<bool, ClaimTransactionError> {
+        for partition in partitions {
+            let lane = LaneKey {
+                workflow_type,
+                state,
+                partition_key: partition,
+            };
+            if !self.load_head(tx, scope, lane, budget, cap)? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 
     fn load_head<T: GroupClaimTransaction>(

@@ -224,25 +224,44 @@ fn one(
         &mut context.charge,
         total(live, [alias_key.len()])?,
     )?;
+    immutable_value(
+        &context.rows,
+        &mut context.charge,
+        scope,
+        reference,
+        alias,
+        time,
+        (live, bound, alias_key.len(), raw.value().len()),
+    )
+}
+
+fn immutable_value(
+    rows: &redb::ReadOnlyTable<&'static [u8], &'static [u8]>,
+    charge: &mut ValueCharge,
+    scope: &RequestScope,
+    reference: &[u8],
+    alias: value::ValueAlias<'_>,
+    time: (HlcTimestamp, TimestampMillis),
+    (live, bound, alias_key_bytes, alias_bytes): (usize, usize, usize, usize),
+) -> Result<Result<Option<Vec<u8>>, WorkflowValueReadFailure>, Error> {
     let size = usize::try_from(alias.stored_len).map_err(|_| Error::Limit)?;
-    context.charge.work(total(
+    charge.work(total(
         128,
         [product(total(reference.len(), [scope_bytes(scope)])?, 16)?],
     )?)?;
     let immutable_bound = total(bound, [16])?;
-    context.charge.temporary(total(
+    charge.temporary(total(
         live,
-        [alias_key.len(), raw.value().len(), immutable_bound],
+        [alias_key_bytes, alias_bytes, immutable_bound],
     )?)?;
     let immutable = key::encode_immutable_key(scope, reference, alias.incarnation, immutable_bound)
         .map_err(admission::value_error)?;
-    context.charge.candidate()?;
-    let bytes = context
-        .rows
+    charge.candidate()?;
+    let bytes = rows
         .get(immutable.as_slice())
         .map_err(|e| admission::storage_error(&e))?
         .ok_or(Error::Corrupt)?;
-    context.charge.work(total(128, [size])?)?;
+    charge.work(total(128, [size])?)?;
     if bytes.value().len() != size || Sha256::digest(bytes.value()).as_slice() != alias.digest {
         return Err(Error::Corrupt);
     }
@@ -251,8 +270,8 @@ fn one(
         Ok(false) => return Ok(Ok(None)),
         Ok(true) => {}
     }
-    let live = total(live, [bound, immutable.len(), raw.value().len()])?;
-    owned_value(&mut context.charge, bytes.value(), live).map(|bytes| Ok(Some(bytes)))
+    let live = total(live, [bound, immutable.len(), alias_bytes])?;
+    owned_value(charge, bytes.value(), live).map(|bytes| Ok(Some(bytes)))
 }
 
 fn owned_value(charge: &mut ValueCharge, bytes: &[u8], live: usize) -> Result<Vec<u8>, Error> {

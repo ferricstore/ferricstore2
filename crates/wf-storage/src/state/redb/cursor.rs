@@ -114,11 +114,10 @@ impl RedbStateDueCursor<'_, '_> {
             else {
                 return Ok(self.budget_end());
             };
-            if let Err(error) = self.transaction.admit_read(bytes) {
-                if error == StateTransactionError::Limit {
-                    return Ok(self.budget_end());
-                }
-                return Err(error);
+            match self.transaction.admit_read(bytes) {
+                Ok(()) => {}
+                Err(StateTransactionError::Limit) => return Ok(self.budget_end()),
+                Err(error) => return Err(error),
             }
             let matched = match self.matches(&decoded, tag) {
                 Err(StateTransactionError::Limit) => return Ok(self.budget_end()),

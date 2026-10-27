@@ -38,15 +38,7 @@ fn sizes(
             {
                 continue;
             }
-            if key.value() == b"manifest" {
-                if value.value().get(4..6) == Some([0, 7].as_slice()) {
-                    version = 4;
-                } else if value.value().get(4..6) == Some([0, 5].as_slice()) {
-                    version = 2;
-                } else if value.value().get(4..6) == Some([0, 6].as_slice()) {
-                    version = 3;
-                }
-            }
+            version = snapshot_version(key.value(), value.value(), version);
             pair(key.value().len(), value.value().len(), limits)?;
             rows = admission::total(rows, [1])?;
             wire = admission::total(wire, [12, key.value().len(), value.value().len()])?;
@@ -324,4 +316,16 @@ pub(super) fn decode_descriptor(
     }
     value::finish(bytes, at).map_err(admission::value_error)?;
     Ok(result)
+}
+
+fn snapshot_version(key: &[u8], value: &[u8], previous: u16) -> u16 {
+    if key != b"manifest" {
+        return previous;
+    }
+    match value.get(4..6) {
+        Some([0, 7]) => 4,
+        Some([0, 5]) => 2,
+        Some([0, 6]) => 3,
+        _ => previous,
+    }
 }

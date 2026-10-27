@@ -194,7 +194,7 @@ impl RedbStateTransaction<'_> {
         for field in fields {
             bytes = total(bytes, [2])?;
             for byte in *field {
-                bytes = total(bytes, [if *byte == 0 { 2 } else { 1 }])?;
+                bytes = total(bytes, [1 + usize::from(*byte == 0)])?;
             }
         }
         engine_pair(bytes, value_bytes)?;

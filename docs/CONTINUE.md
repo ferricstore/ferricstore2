@@ -7,13 +7,20 @@ complexity25 and function length100; existing lint violations remain visible.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The first solo lint-cleanup batch passes604 Rust tests and1 documentation test:
-architecture53, domain495 (including all18 HistoryValues cases) and parity56.
-Exact package/target/source/name/status comparison preserves every prior selected
-identity across59 targets. Workspace all-target compilation, formatting,
-reference integrity and progress-ledger checks pass. Architecture/parity strict
-Clippy passes; domain still has39 nesting and2 complexity findings in22 files.
-Downstream linting and complete workspace execution remain required.
+The latest stopped domain/ports regression passes 810 Rust tests and 3
+documentation tests: architecture 53, domain 495, parity 56 and ports 206. Exact
+test identities across 73 targets are preserved. The final domain cleanup also
+passes all 495 tests, both benchmark smokes and strict Clippy for every domain
+target. An assertion audit preserves all 1,304 macros across 35 changed test and
+benchmark files. Ports production Clippy and its 206 tests pass. Existing parity
+records retain all 132 counterparts and 550 assertion links; only source hashes
+and line anchors changed. All original 82 upstream source lint findings are
+cleared. Storage production Clippy and all 190 existing tests also pass; its nine
+reviewed refactors are now adopted. The final all-target Clippy scan has no
+production-source findings; 48 violations remain across 30 integration-test files
+(40 ports, 6 storage, 2 application). Formatting, all 53 architecture tests and
+reference/progress integrity pass on the combined tree. Whole workspace lint,
+full workspace execution, Linux/macOS and complete Elixir parity remain open.
 
 The last saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/
 name/status comparison preserves all 1,119 prior identities and adds only the

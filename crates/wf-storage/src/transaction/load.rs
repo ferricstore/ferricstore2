@@ -204,11 +204,13 @@ impl LoadedRecordBatch {
         )?;
         for kind in &self.policy_types {
             let policy = tx.stored_policy_value(scope.tenant(), kind, limits.schema, charge)?;
+            if let Some(StoredPolicyValue::Complete(policy)) = &policy
+                && policy.data().workflow_type != *kind
+            {
+                return Err(StateTransactionError::Corrupt.into());
+            }
             let projection = match &policy {
                 Some(StoredPolicyValue::Complete(policy)) => {
-                    if policy.data().workflow_type != *kind {
-                        return Err(StateTransactionError::Corrupt.into());
-                    }
                     let bytes = record_batch_policy_projection_bytes(policy)?;
                     debit(&mut self.staging_used, bytes, cap)?;
                     let (mode, retry) =
