@@ -11,6 +11,7 @@ mod reference;
 pub use catalog::{
     WorkflowValueBinding, WorkflowValueBindingKnowledge, WorkflowValueLifecycle,
     WorkflowValueReadBatch, WorkflowValueReadFailure, WorkflowValueReadLimits,
+    WorkflowValueSizedReadBatch, WorkflowValueSizedReadValue,
 };
 pub use encoding::{original_binary_stored_len, original_binary_stored_parts};
 pub use publication::{

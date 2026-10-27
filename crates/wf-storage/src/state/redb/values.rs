@@ -3,6 +3,7 @@
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::blob::{
     WorkflowValueBindingKnowledge, WorkflowValueReadBatch, WorkflowValueReadLimits,
+    WorkflowValueSizedReadBatch,
 };
 use wf_ports::clock::WorkflowValueReadClock;
 use wf_ports::consensus::WorkflowValueDefaults;
@@ -46,6 +47,22 @@ impl RedbStateStore {
         limits: WorkflowValueReadLimits,
     ) -> Result<WorkflowValueReadBatch, StateTransactionError> {
         read::read(self, clock, scope, refs, limits)
+    }
+
+    /// Reads authenticated live values, omitting bytes at a positive threshold.
+    ///
+    /// Omission uses complete stored size. Copied-byte exhaustion stays an error.
+    /// # Errors
+    /// Refuses zero threshold, invalid scope/profile or operational failure.
+    pub fn read_workflow_value_batch_with_sizes<C: WorkflowValueReadClock>(
+        &self,
+        clock: &mut C,
+        scope: &RequestScope,
+        refs: &[&[u8]],
+        omission_threshold: usize,
+        limits: WorkflowValueReadLimits,
+    ) -> Result<WorkflowValueSizedReadBatch, StateTransactionError> {
+        read::read_sized(self, clock, scope, refs, omission_threshold, limits)
     }
 
     /// Observes a current binding or one explicit historical binding.

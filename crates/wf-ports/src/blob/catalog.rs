@@ -62,6 +62,27 @@ pub struct WorkflowValueReadBatch {
     pub slots: Vec<Result<Option<usize>, WorkflowValueReadFailure>>,
 }
 
+/// One authenticated live stored-value observation.
+#[derive(Debug)]
+pub enum WorkflowValueSizedReadValue {
+    /// Independently owned complete stored FSV2 bytes.
+    Stored(Vec<u8>),
+    /// Authenticated stored bytes omitted at the requested positive threshold.
+    Omitted {
+        /// Exact stored byte count, including any FSV2 escape header.
+        stored_bytes: usize,
+    },
+}
+
+/// Ordered slots share a stored owner or size observation per distinct reference.
+#[derive(Debug)]
+pub struct WorkflowValueSizedReadBatch {
+    /// Distinct authenticated live observations; no guard or input borrow escapes.
+    pub values: Vec<WorkflowValueSizedReadValue>,
+    /// Original request order; absence means missing or expired.
+    pub slots: Vec<Result<Option<usize>, WorkflowValueReadFailure>>,
+}
+
 /// Explicit logical ceilings, separate from native page cache and RSS.
 #[derive(Clone, Copy)]
 pub struct WorkflowValueReadLimits {

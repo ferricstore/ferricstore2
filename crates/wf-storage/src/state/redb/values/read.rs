@@ -20,6 +20,9 @@ use super::{
 };
 use crate::state::{key, value};
 
+mod sized;
+pub(super) use sized::read_sized;
+
 pub(crate) struct ValueReadContext {
     read: redb::ReadTransaction,
     pub(super) rows: redb::ReadOnlyTable<&'static [u8], &'static [u8]>,
