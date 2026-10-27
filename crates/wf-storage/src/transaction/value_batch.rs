@@ -90,6 +90,20 @@ impl fmt::Display for WorkflowValueTransactionError {
 
 impl std::error::Error for WorkflowValueTransactionError {}
 
+/// Applies an explicitly stored-byte command to opted-in durable authority.
+///
+/// # Errors
+/// Refuses unsupported capability or unproved durable completion.
+pub fn apply_workflow_stored_value_batch_transaction(
+    _store: &mut RedbStateStore,
+    _scope: &RequestScope,
+    _encoded: &[u8],
+    _log: LogIdentity,
+    _limits: WorkflowValueTransactionLimits,
+) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
+    Err(WorkflowValueTransactionError::UnsupportedProfile)
+}
+
 /// Applies one prepared value command through the existing consumed driver.
 ///
 /// # Errors

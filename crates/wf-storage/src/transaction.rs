@@ -24,7 +24,7 @@ pub(crate) use value_batch::{ValuePublicationPlan, ValueStep};
 
 pub use value_batch::{
     WorkflowValueTransactionError, WorkflowValueTransactionLimits,
-    apply_workflow_value_batch_transaction,
+    apply_workflow_stored_value_batch_transaction, apply_workflow_value_batch_transaction,
 };
 
 pub use claim::{

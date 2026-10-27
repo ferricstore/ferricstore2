@@ -11,4 +11,5 @@ mod recovery;
 mod sized_reads;
 mod stored_codec;
 mod stored_profile;
+mod stored_publication;
 mod wire;
