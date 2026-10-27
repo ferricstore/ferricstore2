@@ -24,9 +24,10 @@ use crate::state::{
 mod backend;
 mod fixtures;
 mod incarnation;
+mod read_failure;
 use backend::fixture_data::{ReadFaultClock, database};
 use fixtures::fixture_data::{
-    clock, directory_for_fault, fixture, limits, publish, query, rewrite, rows,
+    clock, directory_for_fault, fixture, limits, publish_for_read_fault, query, rewrite, rows,
 };
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
@@ -264,7 +265,7 @@ fn history_hydration_sanitizes_actual_backend_read_failure() -> TestResult {
     let path = directory.join("state");
     let arm = Arc::new(AtomicBool::new(false));
     let hits = Arc::new(AtomicUsize::new(0));
-    let (store, scope) = publish(database(&path, arm.clone(), hits.clone())?)?;
+    let (store, scope) = publish_for_read_fault(database(&path, arm.clone(), hits.clone())?)?;
     let partition = PartitionId::new(b"p".to_vec())?;
     let id = RecordId::new(b"i".to_vec())?;
     let mut ordinary = clock()?;
@@ -273,7 +274,7 @@ fn history_hydration_sanitizes_actual_backend_read_failure() -> TestResult {
         &scope,
         &partition,
         &id,
-        query(100),
+        query(262_144),
         limits(),
     );
     assert!(
@@ -290,7 +291,7 @@ fn history_hydration_sanitizes_actual_backend_read_failure() -> TestResult {
         &scope,
         &partition,
         &id,
-        query(100),
+        query(262_144),
         limits(),
     )?;
     assert_eq!(failing.calls, 1);
@@ -301,8 +302,6 @@ fn history_hydration_sanitizes_actual_backend_read_failure() -> TestResult {
     ));
     assert!(field(&failed, 0, "payload").is_none());
     assert!(field(&failed, 0, "payload_missing").is_none());
-    assert_eq!(rows(&store, false)?, before);
-    assert_eq!(rows(&store, true)?, meta);
     assert!(matches!(
         store.read_workflow_history_page(&scope, &partition, &id, query(0).query, limits().history),
         Err(StateTransactionError::Unavailable)
@@ -314,12 +313,14 @@ fn history_hydration_sanitizes_actual_backend_read_failure() -> TestResult {
         scope.recovery().clone(),
         StateStoreLimits::default(),
     )?;
+    assert_eq!(rows(&reopened, false)?, before);
+    assert_eq!(rows(&reopened, true)?, meta);
     let restored = reopened.read_workflow_history_page_with_values(
         &mut ordinary,
         &scope,
         &partition,
         &id,
-        query(100),
+        query(262_144),
         limits(),
     )?;
     assert!(matches!(

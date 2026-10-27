@@ -3,16 +3,21 @@
 use std::mem::size_of;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::blob::{
-    OriginalValueRef, OriginalValueRefKind, WorkflowValueReadFailure, WorkflowValueReadLimits,
-    WorkflowValueSizedReadBatch, WorkflowValueSizedReadValue, parse_original_value_ref,
+    WorkflowValueReadFailure, WorkflowValueReadLimits, WorkflowValueSizedReadBatch,
+    WorkflowValueSizedReadValue,
 };
 use wf_ports::clock::WorkflowValueReadClock;
 use wf_ports::state::StateTransactionError as Error;
 use wf_types::version::{HlcTimestamp, TimestampMillis};
 
 use super::super::budget::{ValueCharge, product, total};
-use super::{RedbStateStore, ValueReadContext, admission, scope_bytes};
-use crate::state::{key, value};
+use super::RedbStateStore;
+use crate::state::value;
+
+mod captured;
+mod point;
+pub(in crate::state::redb) use captured::read_captured;
+use point::one;
 
 pub(in super::super) fn read_sized<C: WorkflowValueReadClock>(
     store: &RedbStateStore,
@@ -161,118 +166,6 @@ fn duplicate(
         }
     }
     Ok(None)
-}
-
-fn one(
-    context: &mut ValueReadContext,
-    scope: &RequestScope,
-    reference: &[u8],
-    time: (HlcTimestamp, TimestampMillis),
-    threshold: usize,
-    live: usize,
-) -> Result<Result<Option<WorkflowValueSizedReadValue>, WorkflowValueReadFailure>, Error> {
-    context.charge.helper()?;
-    context.charge.work(product(reference.len(), 4)?)?;
-    let Some(OriginalValueRef::Regular {
-        kind:
-            OriginalValueRefKind::Payload | OriginalValueRefKind::Result | OriginalValueRefKind::Error,
-        version,
-        ..
-    }) = parse_original_value_ref(reference)
-    else {
-        return Ok(Err(WorkflowValueReadFailure::UnsupportedProfile));
-    };
-    if version == 0 {
-        return Ok(Ok(None));
-    }
-    context.charge.work(total(
-        128,
-        [product(total(reference.len(), [scope_bytes(scope)])?, 16)?],
-    )?)?;
-    let bound = total(
-        64,
-        [product(total(reference.len(), [scope_bytes(scope)])?, 2)?],
-    )?;
-    context.charge.temporary(total(live, [bound])?)?;
-    let alias_key = key::encode_alias_key(
-        scope,
-        reference,
-        bound.min(context.limits.maximum_temporary_bytes()),
-    )
-    .map_err(admission::value_error)?;
-    context.charge.candidate()?;
-    let Some(raw) = context
-        .rows
-        .get(alias_key.as_slice())
-        .map_err(|e| admission::storage_error(&e))?
-    else {
-        return Ok(Ok(None));
-    };
-    context.charge.work(total(128, [raw.value().len()])?)?;
-    context
-        .charge
-        .temporary(total(live, [alias_key.len(), raw.value().len()])?)?;
-    let alias = super::checked_alias(
-        raw.value(),
-        reference,
-        &mut context.charge,
-        total(live, [alias_key.len()])?,
-        context.alias_format,
-    )?;
-    immutable(
-        &context.rows,
-        &mut context.charge,
-        scope,
-        reference,
-        (alias, alias_key.len(), raw.value().len(), bound),
-        time,
-        (threshold, live),
-    )
-}
-
-fn immutable(
-    rows: &redb::ReadOnlyTable<&'static [u8], &'static [u8]>,
-    charge: &mut ValueCharge,
-    scope: &RequestScope,
-    reference: &[u8],
-    (alias, alias_key_bytes, alias_bytes, bound): (value::ValueAlias<'_>, usize, usize, usize),
-    time: (HlcTimestamp, TimestampMillis),
-    (threshold, live): (usize, usize),
-) -> Result<Result<Option<WorkflowValueSizedReadValue>, WorkflowValueReadFailure>, Error> {
-    let size = usize::try_from(alias.stored_len).map_err(|_| Error::Limit)?;
-    charge.work(total(
-        128,
-        [product(total(reference.len(), [scope_bytes(scope)])?, 16)?],
-    )?)?;
-    let immutable_bound = total(bound, [16])?;
-    let guard_live = total(live, [alias_key_bytes, alias_bytes, immutable_bound, size])?;
-    charge.temporary(guard_live)?;
-    let immutable = key::encode_immutable_key(scope, reference, alias.incarnation, immutable_bound)
-        .map_err(admission::value_error)?;
-    // Fund the complete guard extent and hash before acquiring the immutable row.
-    charge.work(total(128, [size])?)?;
-    charge.candidate()?;
-    let bytes = rows
-        .get(immutable.as_slice())
-        .map_err(|e| admission::storage_error(&e))?
-        .ok_or(Error::Corrupt)?;
-    // The shared predicate checks actual length before traversing any bytes.
-    super::authenticate(bytes.value(), size, &alias.digest)?;
-    charge.candidate()?;
-    match super::expiry(alias.expires_at, time.0, time.1) {
-        Err(error) => return Ok(Err(error)),
-        Ok(false) => return Ok(Ok(None)),
-        Ok(true) => {}
-    }
-    charge.candidate()?;
-    if size >= threshold {
-        return Ok(Ok(Some(WorkflowValueSizedReadValue::Omitted {
-            stored_bytes: size,
-        })));
-    }
-    // The current guard extent remains live while the independent copy is funded.
-    super::owned_value(charge, bytes.value(), guard_live)
-        .map(|bytes| Ok(Some(WorkflowValueSizedReadValue::Stored(bytes))))
 }
 
 #[cfg(test)]

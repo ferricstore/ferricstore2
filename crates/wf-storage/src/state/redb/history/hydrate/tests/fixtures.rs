@@ -55,6 +55,19 @@ pub(super) mod fixture_data {
     pub(in super::super) fn publish(
         database: redb::Database,
     ) -> TestResult<(RedbStateStore, RequestScope)> {
+        publish_with(database, b"first".to_vec())
+    }
+
+    pub(in super::super) fn publish_for_read_fault(
+        database: redb::Database,
+    ) -> TestResult<(RedbStateStore, RequestScope)> {
+        publish_with(database, vec![b'x'; 16_384])
+    }
+
+    fn publish_with(
+        database: redb::Database,
+        first: Vec<u8>,
+    ) -> TestResult<(RedbStateStore, RequestScope)> {
         let scope = RequestScope::new(
             TenantId::new(b"t".to_vec())?,
             GroupId::new(b"g".to_vec())?,
@@ -73,7 +86,7 @@ pub(super) mod fixture_data {
             defaults(),
             StateStoreLimits::default(),
         )?;
-        let request = prepared(&scope)?;
+        let request = prepared(&scope, first)?;
         let limits = transaction_limits();
         let encoded = encode_workflow_stored_value_batch(&request, limits.record_batch.codec)?;
         let outcome = apply_workflow_stored_value_batch_transaction(
@@ -90,7 +103,7 @@ pub(super) mod fixture_data {
         Ok((store, scope))
     }
 
-    fn prepared(scope: &RequestScope) -> TestResult<PreparedWorkflowValueBatch> {
+    fn prepared(scope: &RequestScope, first: Vec<u8>) -> TestResult<PreparedWorkflowValueBatch> {
         let operations = [
             (
                 b"i",
@@ -98,7 +111,7 @@ pub(super) mod fixture_data {
                     workflow_type: b"r".to_vec(),
                     state: b"q".to_vec(),
                     run_at: None,
-                    payload: Some(b"first".to_vec()),
+                    payload: Some(first),
                 }),
             ),
             (

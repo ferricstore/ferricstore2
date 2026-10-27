@@ -2,8 +2,8 @@
 
 Status: private codec, explicit physical capability, consumed stored9 publication/
 outcome recovery and opted-in Node9 startup audit/replay implemented and locally
-verified. Bounded physical history capture is implemented; logical typed
-preparation, hydration composition and public history services remain required.
+verified. Bounded physical history capture and coherent value hydration are
+implemented; logical typed preparation and public history services remain required.
 
 The binary command's intent8 interprets supplied payload/result/error bytes as
 logical binaries. Publication escapes a leading `FSV2` once. Inferring a typed
@@ -86,7 +86,7 @@ consumed driver retain the existing scope-conversion max(V,C), complete profile
 headers, reply drop-after-commit and fail-stop/uncertain semantics. Named bool
 ownership is admitted only on the selected path; disabled/8 fees stay unchanged.
 
-Full common/foreign typed ingress, original HistoryValues composition,
+Full common/foreign typed ingress, accepted original history services,
 shared/named/external availability, authorization, routing,
 read barriers and Linux/macOS acceptance remain required. This ADR establishes
 neither a public query service nor complete workflow parity.
@@ -120,11 +120,52 @@ decoded-key, binding and complete output owners, with conservative working
 allowances. These are not allocator-capacity, engine-page, RSS or speed claims.
 
 This physical capture carries no read barrier, authorization, lifecycle/expiry
-visibility, hot/cold routing or public HistoryAPI guarantee. Hydration must still
-compose it with authenticated value acquisition and source field conversion.
+visibility, hot/cold routing or public HistoryAPI guarantee. The additive
+hydration composition below retains these physical-capture boundaries.
 Architecture checks keep the cursor module pure and the five models out of the
 worker client facade; all existing workspace boundaries and size/complexity
 limits remain in force.
+
+`read_workflow_history_page_with_values` combines physical capture with actual
+sized acquisition, consuming conversion and the existing pure HistoryValues
+collector/projector. Metadata, aliases and immutable bytes share the same read
+transaction and table owners. References come from actual historical bindings;
+the adapter deduplicates typed identities before rendering each unique key once.
+Temporary borrowed entry views retain the Page as their source. The result owns
+the original page and ordered field writes, indexed over selected entries then
+lookahead. No self-reference, current payload clone or stored-buffer clone is
+introduced at this boundary; the projector retains its required per-occurrence
+decoded ownership.
+
+Four server-only models describe the request, limits, output and structured stage
+errors. Disabled hydration and empty pages skip unused value/decoder profiles,
+clock and value I/O. Nonempty legacy pages explicitly refuse unavailable
+provenance. Stored-size omission includes wrappers and still authenticates full
+bytes first. The alias birth must also match the captured binding birth before
+expiry or omission; a valid standalone textual alias/immutable pair cannot
+override that metadata witness. Malformed typed content becomes the exact field
+error through the existing projector, while missing, omitted, unsafe drift,
+unavailable compatibility context and operational limits keep their distinctions.
+
+Only the new borrowed value path projects actual per-reference backend read
+unavailability as sanitized storage-failure slots. It separately records the
+failure and fences the store even if a later stage refuses; immutable corruption
+remains a whole-read fatal error. Clock errors have their own stage variant and
+alone never fence. Existing standalone full/sized read behavior stays unchanged.
+Two existing sized-point helpers move to a private child; the old context wrapper
+specializes the added birth witness to None with unchanged charge/error order.
+No database/table is reopened and no schema, dependency or writer changes.
+
+Independent stage profiles remain in force. A separate composition account pays
+each reached stage's declared maximum work as a nonrefundable cohort plus adapter
+work. Peak logical admission covers the live physical context/Page, reference,
+index and view owners, actual retained plan charges and each reached stage's
+temporary/requested bound. Checked arithmetic and fallible reservations precede
+requested allocations. These conservative accounts do not assert exact native
+capacity, engine allocation, stack use, RSS or measured speed. Public lifecycle
+visibility, read barriers, authorization/routing and final page trimming still
+belong to the accepted history service; logical typed preparation and remaining
+source/profile/platform acceptance remain required.
 
 Root performs the current review solo under the user override. Concrete paths,
 TDD stages and validation are recorded in

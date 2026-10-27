@@ -89,6 +89,11 @@ fn assert_effectful_transaction_neighbors() -> CheckResult<()> {
         ("wf-storage", "state::redb::history::read"),
         ("wf-storage", "state::redb::history::page"),
         ("wf-storage", "state::redb::history::row"),
+        ("wf-storage", "state::redb::history::hydrate"),
+        ("wf-storage", "state::redb::history::hydrate::references"),
+        ("wf-storage", "state::redb::history::hydrate::budget"),
+        ("wf-storage", "state::redb::values::read::sized::captured"),
+        ("wf-storage", "state::redb::values::read::sized::point"),
         ("wf-ports", "log::record_batch::response_backend"),
         ("wf-ports", "log::claim_backend"),
         ("wf-ports", "state::transaction::independent_backend"),
@@ -132,6 +137,10 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         "WorkflowHistoryReadLimits",
         "StoredWorkflowHistoryRow",
         "WorkflowHistoryPage",
+        "WorkflowHistoryHydrationRequest",
+        "WorkflowHistoryHydrationLimits",
+        "WorkflowHistoryHydrationError",
+        "WorkflowHistoryValuePage",
     ] {
         assert!(
             source_check(

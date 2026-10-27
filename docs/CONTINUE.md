@@ -1,16 +1,16 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-27. The user resumed the unfinished full-completion goal.
+Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 The user now requires solo work without agents; earlier agent instructions are
 superseded. Rust lint policy enforces nesting 4, cognitive complexity 25 and
 function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,198 tests across 104
+The current local Rust quality checkpoint passes all 1,209 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,191 case and
-adds only the seven physical history-page cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,198 case and
+adds only eleven coherent history-hydration cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -22,6 +22,31 @@ literals and 84 test function identities. All files remain within the existing
 only four existing Rust-source hashes changed. This is Rust quality evidence,
 not full workflow parity: 1,681 runtime cases remain unmatched and 1,655 source
 declarations unresolved.
+
+The coherent history-value reader now hydrates actual selected and lookahead
+rows through their real historical bindings, aliases and immutable bytes on the
+same snapshot. Typed identities render once, stored buffers move through the
+existing conversion, and the pure projector retains its per-occurrence decoded
+ownership. Exact stored sizes, raw/escaped/typed/malformed/empty values, expiry,
+drift and captured decoder-context refusals keep their distinctions. Alias birth
+must match the captured binding birth before omission or expiry. Disabled/empty
+requests skip value I/O and clock; clock failure alone does not fence. Actual
+backend read failures become sanitized field errors and still fence after a
+later projection refusal. Independent stage and aggregate work/ownership caps
+remain explicit, with no native/RSS or measured-speed claim.
+
+Ten genuine compiled refusals were saved in `50ec582`/`7c912ab` before the body;
+one supplementary failure/fence regression was added after implementation and
+receives no tests-first credit. All eleven full tails pass, including actual
+clock-time committed mutation returning the old snapshot, a self-consistent
+wrong-birth alias/value pair refused by the metadata-bound reader, real armed
+disk-read failures, twenty resource cuts and full reopen/FWSP4 custody. The read
+fault fixture needed a real16KiB extent and unchanged equality assertions moved
+to the fresh owner after redb poisoned the failed owner. Complete default-fixture
+and test inverses preserve their original assertions; five whole production
+source inverses preserve prior APIs. Root reviewed this solo. Logical typed
+preparation and the accepted authority/lifecycle/public history service remain
+required; see [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
 The actual physical history reader now captures current/control metadata,
 ordered FWSH events and their mandatory historical bindings on one snapshot.
@@ -35,8 +60,8 @@ corruption/lookahead, ownership, budget, reopen and FWSP4 tails now pass.
 One birth-incarnation fixture literal was corrected from the existing sequence
 formula; a test-only fixture scope/import correction preserves every helper
 statement and assertion. Five complete production source inverses preserve old
-behavior. Root reviewed this solo. Actual hydration composition, logical typed
-preparation, lifecycle visibility, authoritative read barriers and accepted
+behavior. Root reviewed this solo. Logical typed preparation, lifecycle
+visibility, authoritative read barriers and accepted
 history services remain required; see [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
 The real size-aware reader now authenticates each distinct stored value in one

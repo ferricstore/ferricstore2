@@ -21,6 +21,7 @@ use super::{
 use crate::state::{key, value};
 
 mod sized;
+pub(in crate::state::redb) use sized::read_captured;
 pub(super) use sized::read_sized;
 
 pub(crate) struct ValueReadContext {
