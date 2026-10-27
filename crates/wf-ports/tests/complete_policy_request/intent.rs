@@ -69,6 +69,10 @@ fn complete_replace_intent_has_fixed_minimal_bytes_and_digest() -> TestResult {
         owners
     );
 
+    assert_supplied_empty_groups()
+}
+
+fn assert_supplied_empty_groups() -> TestResult {
     // An independent input preserves supplied empty groups rather than None.
     let empty_limits = profile(100_000)?;
     let mut empty_charge = PolicySchemaCharge::new(empty_limits);

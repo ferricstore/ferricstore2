@@ -120,21 +120,7 @@ fn atomic_start_driver_discovers_fresh_policy_and_consumes_commit() -> TestResul
         if fifo {
             assert_eq!(outcome.response(), hex("465741530001010700")?);
         } else {
-            let record = &store.writes[0].record;
-            assert_eq!(store.writes[0].expected_version, None);
-            assert_eq!(
-                (record.version(), record.fence(), record.attempts()),
-                (1, Fence::new(1), 1)
-            );
-            assert_eq!(record.state(), b"running");
-            assert_eq!(record.run_state(), Some(b"q".as_slice()));
-            assert_eq!(record.next_run_at(), Some(TimestampMillis::new(18)));
-            assert_eq!(
-                record.lease().ok_or("lease absent")?.token.as_bytes(),
-                b"w\0\xff:17:1"
-            );
-            assert_eq!(store.histories[0].kind, EventKind::Created);
-            assert_eq!(store.histories[0].event_id, "17-1");
+            assert_atomic_record(&store)?;
         }
     }
     for failure in [
@@ -211,5 +197,24 @@ fn atomic_start_driver_replays_original_before_current_reads() -> TestResult {
     assert_eq!(outcome.original_position(), log(1));
     assert_eq!(outcome.original_time(), TimestampMillis::new(17));
     assert_eq!(outcome.expires_at(), TimestampMillis::new(1_017));
+    Ok(())
+}
+
+fn assert_atomic_record(store: &ObservedStore) -> TestResult {
+    let record = &store.writes[0].record;
+    assert_eq!(store.writes[0].expected_version, None);
+    assert_eq!(
+        (record.version(), record.fence(), record.attempts()),
+        (1, Fence::new(1), 1)
+    );
+    assert_eq!(record.state(), b"running");
+    assert_eq!(record.run_state(), Some(b"q".as_slice()));
+    assert_eq!(record.next_run_at(), Some(TimestampMillis::new(18)));
+    assert_eq!(
+        record.lease().ok_or("lease absent")?.token.as_bytes(),
+        b"w\0\xff:17:1"
+    );
+    assert_eq!(store.histories[0].kind, EventKind::Created);
+    assert_eq!(store.histories[0].event_id, "17-1");
     Ok(())
 }

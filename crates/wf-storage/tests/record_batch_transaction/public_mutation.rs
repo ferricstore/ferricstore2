@@ -181,18 +181,7 @@ fn fresh_publication() -> TestResult {
         );
         assert_eq!(store.histories[0].event_id, "2000-3");
         assert_eq!(store.written_outcome.as_ref(), Some(outcome.as_ref()));
-        assert_eq!(control.position(), AppliedPosition::new(2));
-        assert_eq!(outcome.intent().version(), 1);
-        assert_eq!(
-            outcome.intent().digest().as_slice(),
-            hex("ad27fb04f2617b292c86a42ad3e31ef6346e62938f4586d81588f1c76ad58466")?
-        );
-        assert_eq!(outcome.response_version(), 2);
-        assert_eq!(outcome.response(), [0]);
-        assert_eq!(outcome.status(), RetainedStatus::Accepted);
-        assert_eq!(outcome.original_position(), log(2));
-        assert_eq!(outcome.original_time(), TimestampMillis::new(2_000));
-        assert_eq!(outcome.expires_at(), TimestampMillis::new(3_000));
+        assert_fresh_receipt(control, &outcome)?;
         if fifo {
             assert_eq!(store.policy_bytes, [(b"r".to_vec(), policy)]);
         }
@@ -563,4 +552,20 @@ fn public_item_driver_preserves_gate_and_owned_result() -> TestResult {
     staging_limits()?;
     preparation_refusals()?;
     operational_errors()
+}
+
+fn assert_fresh_receipt(control: ControlState, outcome: &RetainedOutcome) -> TestResult {
+    assert_eq!(control.position(), AppliedPosition::new(2));
+    assert_eq!(outcome.intent().version(), 1);
+    assert_eq!(
+        outcome.intent().digest().as_slice(),
+        hex("ad27fb04f2617b292c86a42ad3e31ef6346e62938f4586d81588f1c76ad58466")?
+    );
+    assert_eq!(outcome.response_version(), 2);
+    assert_eq!(outcome.response(), [0]);
+    assert_eq!(outcome.status(), RetainedStatus::Accepted);
+    assert_eq!(outcome.original_position(), log(2));
+    assert_eq!(outcome.original_time(), TimestampMillis::new(2_000));
+    assert_eq!(outcome.expires_at(), TimestampMillis::new(3_000));
+    Ok(())
 }

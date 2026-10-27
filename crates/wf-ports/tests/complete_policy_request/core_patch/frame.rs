@@ -178,26 +178,14 @@ fn core_patch_frame_binds_header_scope_request_stamp_and_log_identity() -> TestR
         assert_eq!(value.original_intent(), expected_intent.as_slice());
         assert_eq!(value.digest(), PreparedDigest::new(prepared));
         assert_eq!(value.isolation_scope(), scope.as_slice());
-        for log in [
-            LogIdentity::new(1, 2, AppliedPosition::new(3)),
-            LogIdentity::new(9, 8, AppliedPosition::new(7)),
-        ] {
-            let header = value.header(log);
-            assert_eq!(header.format_version, 1);
-            assert_eq!(header.scope.tenant().as_bytes(), &[expected_ids[0]]);
-            assert_eq!(header.scope.group().as_bytes(), &[expected_ids[1]]);
-            assert_eq!(header.scope.recovery().as_bytes(), &[expected_ids[2]]);
-            assert_eq!(header.request.as_bytes(), &[expected_ids[3]]);
-            assert_eq!(header.intent.version(), 2);
-            assert_eq!(header.intent.digest(), &original);
-            assert_eq!(header.stamp, stamp);
-            assert_eq!(
-                header.identity,
-                EntryIdentity::new(log, PreparedDigest::new(prepared))
-            );
-            assert_eq!(header.encoded_entry, encoded.as_slice());
-            assert_eq!(header.encoded_isolation_scope, scope.as_slice());
-        }
+        assert_changed_headers(
+            &value,
+            expected_ids,
+            (original, prepared),
+            stamp,
+            &encoded,
+            &scope,
+        );
         assert_eq!((charge.g(), charge.p()), (before + 4_423, 0));
     }
     let exact = AdmissionLimits::new(1_048_576, 135, 1_000)?;
@@ -358,39 +346,7 @@ fn core_patch_frame_keeps_original_bytes_borrowed_without_patch_materialization(
             verify_complete_core_policy_patch_frame(&encoded, limits, admission, &mut charge)?;
         assert_core_patch_default_frame(&value, &encoded, intent);
         assert_eq!((charge.g(), charge.p(), charge.total()), (8_846, 0, 8_846));
-        for case in [0, 1] {
-            let before = charge.g();
-            let scanned =
-                scan_complete_core_policy_patch_frame(&encoded, limits, admission, &mut charge)?;
-            let supplied_limits = if case == 0 {
-                profile(19_999_999)?
-            } else {
-                limits
-            };
-            let supplied_admission = if case == 1 {
-                AdmissionLimits::new(1_048_576, 134, 1_000)?
-            } else {
-                admission
-            };
-            let result = restore_complete_core_policy_patch_frame_header(
-                scanned,
-                recomputed,
-                supplied_limits,
-                supplied_admission,
-                &mut charge,
-            );
-            let error = if case == 0 {
-                CompletePolicyEncodingError::Schema(PolicySchemaError::ProfileMismatch)
-            } else {
-                CompletePolicyEncodingError::ByteLimit
-            };
-            let expected = CompletePolicyRequestError::Encoding(error);
-            assert_eq!(
-                result.err().ok_or("expected restore metadata refusal")?,
-                expected
-            );
-            assert_eq!((charge.g(), charge.p()), (before + 1_853, 0));
-        }
+        assert_restore_profiles(&encoded, recomputed, limits, admission, &mut charge)?;
         assert_eq!(
             (charge.g(), charge.p(), charge.total()),
             (12_552, 0, 12_552)
@@ -484,5 +440,77 @@ fn core_patch_frame_freezes_same_account_refusal_and_repeat_fees() -> TestResult
         expected
     );
     assert_eq!((charge.g(), charge.p(), charge.total()), (0, 0, 0));
+    Ok(())
+}
+
+fn assert_changed_headers(
+    value: &wf_ports::log::VerifiedCompleteCorePolicyPatchFrame<'_>,
+    expected_ids: [u8; 4],
+    (original, prepared): ([u8; 32], [u8; 32]),
+    stamp: CommittedTime,
+    encoded: &[u8],
+    scope: &[u8],
+) {
+    for log in [
+        LogIdentity::new(1, 2, AppliedPosition::new(3)),
+        LogIdentity::new(9, 8, AppliedPosition::new(7)),
+    ] {
+        let header = value.header(log);
+        assert_eq!(header.format_version, 1);
+        assert_eq!(header.scope.tenant().as_bytes(), &[expected_ids[0]]);
+        assert_eq!(header.scope.group().as_bytes(), &[expected_ids[1]]);
+        assert_eq!(header.scope.recovery().as_bytes(), &[expected_ids[2]]);
+        assert_eq!(header.request.as_bytes(), &[expected_ids[3]]);
+        assert_eq!(header.intent.version(), 2);
+        assert_eq!(header.intent.digest(), &original);
+        assert_eq!(header.stamp, stamp);
+        assert_eq!(
+            header.identity,
+            EntryIdentity::new(log, PreparedDigest::new(prepared))
+        );
+        assert_eq!(header.encoded_entry, encoded);
+        assert_eq!(header.encoded_isolation_scope, scope);
+    }
+}
+
+fn assert_restore_profiles(
+    encoded: &[u8],
+    recomputed: [u8; 32],
+    limits: PolicySchemaLimits,
+    admission: AdmissionLimits,
+    charge: &mut PolicySchemaCharge,
+) -> TestResult {
+    for case in [0, 1] {
+        let before = charge.g();
+        let scanned = scan_complete_core_policy_patch_frame(encoded, limits, admission, charge)?;
+        let supplied_limits = if case == 0 {
+            profile(19_999_999)?
+        } else {
+            limits
+        };
+        let supplied_admission = if case == 1 {
+            AdmissionLimits::new(1_048_576, 134, 1_000)?
+        } else {
+            admission
+        };
+        let result = restore_complete_core_policy_patch_frame_header(
+            scanned,
+            recomputed,
+            supplied_limits,
+            supplied_admission,
+            charge,
+        );
+        let error = if case == 0 {
+            CompletePolicyEncodingError::Schema(PolicySchemaError::ProfileMismatch)
+        } else {
+            CompletePolicyEncodingError::ByteLimit
+        };
+        let expected = CompletePolicyRequestError::Encoding(error);
+        assert_eq!(
+            result.err().ok_or("expected restore metadata refusal")?,
+            expected
+        );
+        assert_eq!((charge.g(), charge.p()), (before + 1_853, 0));
+    }
     Ok(())
 }

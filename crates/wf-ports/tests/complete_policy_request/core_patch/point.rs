@@ -190,7 +190,7 @@ fn assert_nonfresh_without_decoder() -> TestResult {
                 core_patch_prepare_literal_frame(
                     &original_bytes[83..],
                     [b"t", b"g", b"r", b"q"],
-                    stamp(if class == 3 { 100 } else { 0 })?,
+                    stamp(100 * u64::from(class == 3))?,
                 )?
             };
             let workspace = usize::try_from(schema.max_work_bytes())? + 2048 + 3 * bytes.len();

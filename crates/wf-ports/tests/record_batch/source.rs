@@ -534,26 +534,26 @@ fn assert_creation_priority() -> TestResult {
                     RetainedStatus::IndexedRejected(IndexRejection::FifoPriority)
                 );
                 assert_eq!(outcome.response(), [1, 5, 0]);
-            } else {
-                let IndexedDecision::Accepted(batch) = operation else {
-                    return Err("valid creation rejected".into());
-                };
-                assert_eq!(
-                    batch.metadata().next().ok_or("metadata absent")?.priority,
-                    priority
+                return Ok(());
+            }
+            let IndexedDecision::Accepted(batch) = operation else {
+                return Err("valid creation rejected".into());
+            };
+            assert_eq!(
+                batch.metadata().next().ok_or("metadata absent")?.priority,
+                priority
+            );
+            assert_eq!(batch.consumed_ordinals(), 1);
+            let delta = batch.deltas().next().ok_or("index delta absent")?;
+            assert_eq!(delta.before, None);
+            if fifo {
+                assert!(
+                    matches!(delta.after, Some(IndexRows::Fifo { head_candidate: Some(due), .. }) if due.priority == 0)
                 );
-                assert_eq!(batch.consumed_ordinals(), 1);
-                let delta = batch.deltas().next().ok_or("index delta absent")?;
-                assert_eq!(delta.before, None);
-                if fifo {
-                    assert!(
-                        matches!(delta.after, Some(IndexRows::Fifo { head_candidate: Some(due), .. }) if due.priority == 0)
-                    );
-                } else {
-                    assert!(
-                        matches!(delta.after, Some(IndexRows::Parallel { due }) if due.priority == 2)
-                    );
-                }
+            } else {
+                assert!(
+                    matches!(delta.after, Some(IndexRows::Parallel { due }) if due.priority == 2)
+                );
             }
             Ok(())
         })?;

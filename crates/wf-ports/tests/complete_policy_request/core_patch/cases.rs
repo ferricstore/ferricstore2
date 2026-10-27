@@ -156,43 +156,8 @@ pub(super) fn assert_core_patch_state_actions(
         }
         assert_eq!(literal.len(), bytes);
         let digest: [u8; 32] = Sha256::digest(&literal).into();
-        let mut patch = PolicyPatch::default();
-        let mut expected = PolicyPatch::default();
-        for value in [&mut patch, &mut expected] {
-            if case == 9 {
-                value.states.insert(b"a".to_vec(), StateChange::Remove);
-                value.states.insert(b"b".to_vec(), StateChange::Remove);
-                for (name, mode) in [
-                    (vec![0], StateMode::Parallel),
-                    (vec![0xff], StateMode::Fifo),
-                ] {
-                    value.states.insert(
-                        name,
-                        StateChange::Patch(StatePolicyPatch {
-                            mode: FieldPatch::Set(mode),
-                            ..StatePolicyPatch::default()
-                        }),
-                    );
-                }
-            } else if case == 8 {
-                value.states.insert(b"a".to_vec(), StateChange::Remove);
-            } else {
-                let mut state = StatePolicyPatch::default();
-                match case {
-                    1 => state.mode = FieldPatch::Set(StateMode::Parallel),
-                    2 => state.mode = FieldPatch::Set(StateMode::Fifo),
-                    3 => state.mode = FieldPatch::Clear,
-                    4 => state.retry = FieldPatch::Clear,
-                    5 => state.retry = FieldPatch::Set(RetryPatch::default()),
-                    6 => state.retention = FieldPatch::Clear,
-                    7 => state.retention = FieldPatch::Set(RetentionOverride::default()),
-                    _ => {}
-                }
-                value
-                    .states
-                    .insert(b"a".to_vec(), StateChange::Patch(state));
-            }
-        }
+        let patch = core_patch_state_action(case);
+        let expected = core_patch_state_action(case);
         let input = core_patch_input(CompleteCorePolicyPatchInput {
             workflow_type: b"r".to_vec(),
             expected_generation: None,
@@ -591,4 +556,42 @@ pub(super) fn assert_core_patch_account_case(
         assert_eq!(held.generation(), 1);
     }
     Ok(())
+}
+
+fn core_patch_state_action(case: usize) -> PolicyPatch {
+    let mut value = PolicyPatch::default();
+    if case == 9 {
+        value.states.insert(b"a".to_vec(), StateChange::Remove);
+        value.states.insert(b"b".to_vec(), StateChange::Remove);
+        for (name, mode) in [
+            (vec![0], StateMode::Parallel),
+            (vec![0xff], StateMode::Fifo),
+        ] {
+            value.states.insert(
+                name,
+                StateChange::Patch(StatePolicyPatch {
+                    mode: FieldPatch::Set(mode),
+                    ..StatePolicyPatch::default()
+                }),
+            );
+        }
+    } else if case == 8 {
+        value.states.insert(b"a".to_vec(), StateChange::Remove);
+    } else {
+        let mut state = StatePolicyPatch::default();
+        match case {
+            1 => state.mode = FieldPatch::Set(StateMode::Parallel),
+            2 => state.mode = FieldPatch::Set(StateMode::Fifo),
+            3 => state.mode = FieldPatch::Clear,
+            4 => state.retry = FieldPatch::Clear,
+            5 => state.retry = FieldPatch::Set(RetryPatch::default()),
+            6 => state.retention = FieldPatch::Clear,
+            7 => state.retention = FieldPatch::Set(RetentionOverride::default()),
+            _ => {}
+        }
+        value
+            .states
+            .insert(b"a".to_vec(), StateChange::Patch(state));
+    }
+    value
 }

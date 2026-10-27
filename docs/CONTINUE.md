@@ -2,27 +2,39 @@
 
 Updated: 2026-10-27. The user resumed the unfinished full-completion goal.
 The user now requires solo work without agents; earlier agent instructions are
-superseded. The separately authorized lint-policy update sets nesting4,
-complexity25 and function length100; existing lint violations remain visible.
+superseded. Rust lint policy enforces nesting 4, cognitive complexity 25 and
+function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The latest stopped domain/ports regression passes 810 Rust tests and 3
-documentation tests: architecture 53, domain 495, parity 56 and ports 206. Exact
-test identities across 73 targets are preserved. The final domain cleanup also
-passes all 495 tests, both benchmark smokes and strict Clippy for every domain
-target. An assertion audit preserves all 1,304 macros across 35 changed test and
-benchmark files. Ports production Clippy and its 206 tests pass. Existing parity
-records retain all 132 counterparts and 550 assertion links; only source hashes
-and line anchors changed. All original 82 upstream source lint findings are
-cleared. Storage production Clippy and all 190 existing tests also pass; its nine
-reviewed refactors are now adopted. The final all-target Clippy scan has no
-production-source findings; 48 violations remain across 30 integration-test files
-(40 ports, 6 storage, 2 application). Formatting, all 53 architecture tests and
-reference/progress integrity pass on the combined tree. Whole workspace lint,
-full workspace execution, Linux/macOS and complete Elixir parity remain open.
+The current local Rust quality checkpoint passes all 1,146 tests across 103
+targets, both benchmark correctness smokes and six documentation tests across
+15 targets. Exact identity comparison preserves every earlier 1,128 case and
+adds only the 18 already saved HistoryValues cases. After that full run, one
+fixture allocation was refined; its complete 109-case target passed again with
+the exact identities, and all other frozen source/ledger inputs were unchanged.
+Workspace compilation, strict all-target Clippy, documentation build, reference
+and progress integrity, offline dependency policy and diff checks pass.
 
-The last saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/
+The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
+literals and 84 test function identities. All files remain within the existing
+400/600-line caps. The parity ledger retains all 132 counterparts and 550 links;
+only four existing Rust-source hashes changed. This is Rust quality evidence,
+not full workflow parity: 1,681 runtime cases remain unmatched and 1,655 source
+declarations unresolved.
+
+Next implement the selected real size-aware value reader. The older isolated
+A0 draft now has ten identities in four properly sized files, preserves all
+103 original assertions and adds five scope/corruption checks. It has only
+compile-time missing-contract evidence; its two private unit cases are not yet
+linked. Adopt only those reviewed test files onto this checkpoint, introduce
+the selected ordinary models/API and literal R0 worker, execute and save all
+ten genuine compiled failures before writing the body. Exact paths, fixture
+split decisions, ownership/resource constraints and receipts are in the
+coordination record. Full workspace feature validation, native/Linux/macOS,
+complete Elixir coverage and the ordered product milestones remain open.
+
+The earlier saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/
 name/status comparison preserves all 1,119 prior identities and adds only the
 nine Node recovery cases. All 102 targets and both benchmark correctness smokes
 are preserved. Six documentation tests across fifteen targets, formatting,

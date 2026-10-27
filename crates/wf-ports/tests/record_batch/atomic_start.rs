@@ -141,6 +141,13 @@ fn atomic_start_frame_is_isolated_from_legacy_profiles() -> TestResult {
     assert_eq!(decoded.encoded(), encoded.as_bytes());
     assert_eq!(decoded.state_key(0).ok_or("missing actual key")?.len(), 41);
     assert_eq!(decoded.value_bytes(0), Some([None, None]));
+    assert_legacy_and_damaged_frames(input, &encoded)
+}
+
+fn assert_legacy_and_damaged_frames(
+    input: PreparedRequest,
+    encoded: &wf_ports::log::PreparedBytes,
+) -> TestResult {
     assert_eq!(
         decode_prepared(encoded.as_bytes(), limits()).err(),
         Some(CodecError::UnsupportedVersion)

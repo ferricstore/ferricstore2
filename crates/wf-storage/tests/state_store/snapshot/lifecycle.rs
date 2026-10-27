@@ -45,16 +45,7 @@ fn literal_initial_frame_descriptor_and_fresh_restore() -> TestResult {
     let mut wire = Vec::new();
     let meta = state.capture_snapshot(&mut wire, SnapshotLimits::default())?;
     assert_eq!(wire, literal);
-    assert_eq!(
-        meta.id().as_slice(),
-        s::hex("1e4bc7621eeb5aba5567c8fc9c2470d758faf7cd7663e4eb4c156370dc7a8080")?
-    );
-    assert_eq!(meta.row_count(), 3);
-    assert_eq!(meta.encoded_bytes(), 325);
-    assert_eq!(meta.group().as_bytes(), b"g");
-    assert_eq!(meta.recovery().as_bytes(), b"z");
-    assert!(meta.control().last_entry().is_none());
-    assert!(meta.membership().entry().is_none());
+    assert_initial_metadata(&meta)?;
     let mut current = Vec::new();
     let saved = state
         .current_snapshot(&mut current, SnapshotLimits::default())?
@@ -359,5 +350,19 @@ fn binary_roundtrip(dir: &std::path::Path) -> TestResult {
         result[s::META][b"snapshot".as_slice()],
         s::descriptor(namespace, meta.row_count(), &wire)?
     );
+    Ok(())
+}
+
+fn assert_initial_metadata(meta: &wf_ports::snapshot::SnapshotMetadata) -> TestResult {
+    assert_eq!(
+        meta.id().as_slice(),
+        s::hex("1e4bc7621eeb5aba5567c8fc9c2470d758faf7cd7663e4eb4c156370dc7a8080")?
+    );
+    assert_eq!(meta.row_count(), 3);
+    assert_eq!(meta.encoded_bytes(), 325);
+    assert_eq!(meta.group().as_bytes(), b"g");
+    assert_eq!(meta.recovery().as_bytes(), b"z");
+    assert!(meta.control().last_entry().is_none());
+    assert!(meta.membership().entry().is_none());
     Ok(())
 }

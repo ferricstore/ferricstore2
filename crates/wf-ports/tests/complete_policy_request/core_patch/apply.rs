@@ -172,32 +172,32 @@ fn core_patch_parent_preserves_stored_cas_context_and_high_water_order() -> Test
         } else {
             let plan = result?;
             assert_core_patch_parent_control(&plan, view, &frame, 0, 0, false)?;
-            if case == 3 {
-                let DispatchDecision::Fresh((None, outcome)) = plan.decision() else {
-                    return Err("expected late exhaustion business outcome".into());
-                };
-                assert_core_patch_parent_outcome(
-                    outcome,
-                    CORE_PATCH_PARENT_BUSINESS[6].1,
-                    RetainedStatus::PolicyRejected(PolicyRejection::new(
-                        PolicyError::GenerationExhausted,
-                    )?),
-                    &frame[83..],
-                    (b"q", 0, 0),
-                )?;
-            } else {
-                let mut expected = CORE_PATCH_PARENT_MINIMAL.to_vec();
-                expected[6..14].copy_from_slice(
-                    &(if case == 5 { MAX_POLICY_GENERATION } else { 6 }).to_be_bytes(),
-                );
-                assert_core_patch_parent_accepted(
-                    &plan,
-                    &minimal_data(),
-                    &expected,
-                    0,
-                    &frame,
-                    (b"q", 0, 0),
-                )?;
+            match (case, plan.decision()) {
+                (3, DispatchDecision::Fresh((None, outcome))) => {
+                    assert_core_patch_parent_outcome(
+                        outcome,
+                        CORE_PATCH_PARENT_BUSINESS[6].1,
+                        RetainedStatus::PolicyRejected(PolicyRejection::new(
+                            PolicyError::GenerationExhausted,
+                        )?),
+                        &frame[83..],
+                        (b"q", 0, 0),
+                    )?;
+                }
+                (3, _) => return Err("expected late exhaustion business outcome".into()),
+                _ => {
+                    let mut expected = CORE_PATCH_PARENT_MINIMAL.to_vec();
+                    let generation = [6, MAX_POLICY_GENERATION][usize::from(case == 5)];
+                    expected[6..14].copy_from_slice(&generation.to_be_bytes());
+                    assert_core_patch_parent_accepted(
+                        &plan,
+                        &minimal_data(),
+                        &expected,
+                        0,
+                        &frame,
+                        (b"q", 0, 0),
+                    )?;
+                }
             }
         }
         assert!(policies.is_empty() && outcomes.is_empty());

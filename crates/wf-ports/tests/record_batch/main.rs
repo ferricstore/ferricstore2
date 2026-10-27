@@ -475,21 +475,21 @@ fn assert_present_value_admission() -> TestResult {
                 assert_eq!(operation, &IndexedDecision::Rejected(reason));
                 assert_eq!(outcome.status(), RetainedStatus::IndexedRejected(reason));
                 assert_eq!(outcome.response(), [1, 1, 4]);
-            } else {
-                let IndexedDecision::Accepted(batch) = operation else {
-                    return Err("exact core budget rejected".into());
-                };
-                assert_eq!(
-                    batch.batch().items()[0]
-                        .plan()
-                        .write()
-                        .ok_or("write absent")?
-                        .record
-                        .payload(),
-                    Some(b"v".as_slice())
-                );
-                assert_eq!(outcome.response(), [0]);
+                return Ok(());
             }
+            let IndexedDecision::Accepted(batch) = operation else {
+                return Err("exact core budget rejected".into());
+            };
+            assert_eq!(
+                batch.batch().items()[0]
+                    .plan()
+                    .write()
+                    .ok_or("write absent")?
+                    .record
+                    .payload(),
+                Some(b"v".as_slice())
+            );
+            assert_eq!(outcome.response(), [0]);
             Ok(())
         })?;
     }

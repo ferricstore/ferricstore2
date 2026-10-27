@@ -168,21 +168,8 @@ fn core_patch_intent_preserves_unchanged_clear_and_empty_set() -> TestResult {
             let nodes = 5 + if action == 2 { extra_nodes } else { 0 };
             let fee = 256 * nodes + 3 * bytes + 128;
             let digest: [u8; 32] = Sha256::digest(&literal).into();
-            let mut patch = PolicyPatch::default();
-            let mut expected = PolicyPatch::default();
-            for value in [&mut patch, &mut expected] {
-                match (field, action) {
-                    (0, 1) => value.version = FieldPatch::Clear,
-                    (0, 2) => value.version = FieldPatch::Set(PolicyVersion::Bytes(Vec::new())),
-                    (1, 1) => value.max_active_ms = FieldPatch::Clear,
-                    (1, 2) => value.max_active_ms = FieldPatch::Set(0),
-                    (2, 1) => value.retry = FieldPatch::Clear,
-                    (2, 2) => value.retry = FieldPatch::Set(RetryPatch::default()),
-                    (3, 1) => value.retention = FieldPatch::Clear,
-                    (3, 2) => value.retention = FieldPatch::Set(RetentionOverride::default()),
-                    _ => {}
-                }
-            }
+            let patch = core_patch_scalar_action(field, action);
+            let expected = core_patch_scalar_action(field, action);
             let input = core_patch_input(CompleteCorePolicyPatchInput {
                 workflow_type: b"r".to_vec(),
                 expected_generation: None,
@@ -512,23 +499,8 @@ fn assert_core_patch_raw_limits(
             } else {
                 b"r".to_vec()
             };
-            let mut patch = PolicyPatch::default();
-            let mut expected = PolicyPatch::default();
-            for value in [&mut patch, &mut expected] {
-                match field {
-                    1 => value.version = FieldPatch::Set(PolicyVersion::Bytes(vec![b'x'; length])),
-                    2 => {
-                        value.retry = FieldPatch::Set(RetryPatch {
-                            exhausted_to: Some(vec![b'x'; length]),
-                            ..RetryPatch::default()
-                        });
-                    }
-                    3 => {
-                        value.states.insert(vec![b'x'; length], StateChange::Remove);
-                    }
-                    _ => {}
-                }
-            }
+            let patch = core_patch_raw_action(field, length);
+            let expected = core_patch_raw_action(field, length);
             let input = core_patch_input(CompleteCorePolicyPatchInput {
                 workflow_type,
                 expected_generation: None,
@@ -589,3 +561,37 @@ pub(super) fn assert_core_patch_profile_refusal(
 }
 
 mod apply;
+
+fn core_patch_scalar_action(field: usize, action: usize) -> PolicyPatch {
+    let mut value = PolicyPatch::default();
+    match (field, action) {
+        (0, 1) => value.version = FieldPatch::Clear,
+        (0, 2) => value.version = FieldPatch::Set(PolicyVersion::Bytes(Vec::new())),
+        (1, 1) => value.max_active_ms = FieldPatch::Clear,
+        (1, 2) => value.max_active_ms = FieldPatch::Set(0),
+        (2, 1) => value.retry = FieldPatch::Clear,
+        (2, 2) => value.retry = FieldPatch::Set(RetryPatch::default()),
+        (3, 1) => value.retention = FieldPatch::Clear,
+        (3, 2) => value.retention = FieldPatch::Set(RetentionOverride::default()),
+        _ => {}
+    }
+    value
+}
+
+fn core_patch_raw_action(field: usize, length: usize) -> PolicyPatch {
+    let mut value = PolicyPatch::default();
+    match field {
+        1 => value.version = FieldPatch::Set(PolicyVersion::Bytes(vec![b'x'; length])),
+        2 => {
+            value.retry = FieldPatch::Set(RetryPatch {
+                exhausted_to: Some(vec![b'x'; length]),
+                ..RetryPatch::default()
+            });
+        }
+        3 => {
+            value.states.insert(vec![b'x'; length], StateChange::Remove);
+        }
+        _ => {}
+    }
+    value
+}

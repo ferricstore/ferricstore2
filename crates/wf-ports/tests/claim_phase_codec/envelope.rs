@@ -70,6 +70,10 @@ fn decoded_claim_envelope_binds_header_physical_filters_and_original_bytes() -> 
     );
     assert!(decoded.value_bytes(0).is_none());
     assert!(decoded.policy_envelope(log).is_none());
+    assert_any_and_empty_filters(log)
+}
+
+fn assert_any_and_empty_filters(log: LogIdentity) -> TestResult {
     let expected = request("claim_any")?;
     let encoded = encode_prepared(&expected, CodecLimits::default())?;
     let decoded = decode_prepared(encoded.as_bytes(), CodecLimits::default())?;

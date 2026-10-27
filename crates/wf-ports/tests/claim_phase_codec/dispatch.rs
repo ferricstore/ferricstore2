@@ -154,41 +154,10 @@ fn assert_claim_plan(
     let write = item.plan().write().ok_or("missing record write")?;
     assert_eq!(write.expected_version, Some(1));
     let record = &write.record;
-    assert_eq!(record.id(), original.id());
-    assert_eq!(record.workflow_type(), original.workflow_type());
-    assert_eq!(record.payload(), Some([0, 1, 255].as_slice()));
-    assert_eq!(record.created_at().get(), 5);
-    assert_eq!(record.updated_at().get(), 11);
-    assert_eq!(
-        (record.version(), record.fence().get(), record.attempts()),
-        (2, 1, 0)
-    );
-    assert_eq!(record.status(), WorkflowStatus::Running);
-    assert_eq!(record.state(), b"running");
-    assert_eq!(record.run_state(), Some(b"waiting".as_slice()));
-    assert_eq!(record.next_run_at(), Some(TimestampMillis::new(61)));
-    let lease = record.lease().ok_or("missing lease")?;
-    assert_eq!(lease.worker, [b'w', 255]);
-    assert_eq!(lease.token.as_bytes(), b"w\xFF:11:1");
-    assert_eq!(lease.deadline.get(), 61);
+    assert_claim_record(record, original)?;
     assert_eq!(item.plan().history().iter().len(), 1);
     let history = item.plan().history().ok_or("missing claim history")?;
-    assert_eq!(history.event_id, "11-2");
-    assert_eq!(history.kind, EventKind::Claimed);
-    assert_eq!(
-        (
-            history.occurred_at.get(),
-            history.version,
-            history.fence.get()
-        ),
-        (11, 2, 1)
-    );
-    assert_eq!(history.attempts, 0);
-    assert_eq!(history.state, b"running");
-    assert_eq!(history.worker.as_deref(), Some([b'w', 255].as_slice()));
-    assert_eq!(history.lease_deadline.get(), 61);
-    assert_eq!(history.next_run_at, Some(TimestampMillis::new(61)));
-    assert!(history.retry.is_none());
+    assert_claim_history(history);
     let metadata = batch.metadata().collect::<Vec<_>>();
     assert_eq!(metadata.len(), 1);
     assert_eq!((metadata[0].priority, metadata[0].state_enter_seq), (2, 11));
@@ -522,4 +491,44 @@ fn actual_decoded_retained_claim_replays_before_changed_server_phase_inputs() ->
         assert_eq!(control.position().get(), 1);
     }
     Ok(())
+}
+
+fn assert_claim_record(record: &WorkflowRecord, original: &WorkflowRecord) -> TestResult {
+    assert_eq!(record.id(), original.id());
+    assert_eq!(record.workflow_type(), original.workflow_type());
+    assert_eq!(record.payload(), Some([0, 1, 255].as_slice()));
+    assert_eq!(record.created_at().get(), 5);
+    assert_eq!(record.updated_at().get(), 11);
+    assert_eq!(
+        (record.version(), record.fence().get(), record.attempts()),
+        (2, 1, 0)
+    );
+    assert_eq!(record.status(), WorkflowStatus::Running);
+    assert_eq!(record.state(), b"running");
+    assert_eq!(record.run_state(), Some(b"waiting".as_slice()));
+    assert_eq!(record.next_run_at(), Some(TimestampMillis::new(61)));
+    let lease = record.lease().ok_or("missing lease")?;
+    assert_eq!(lease.worker, [b'w', 255]);
+    assert_eq!(lease.token.as_bytes(), b"w\xFF:11:1");
+    assert_eq!(lease.deadline.get(), 61);
+    Ok(())
+}
+
+fn assert_claim_history(history: &wf_domain::history::HistoryEntry) {
+    assert_eq!(history.event_id, "11-2");
+    assert_eq!(history.kind, EventKind::Claimed);
+    assert_eq!(
+        (
+            history.occurred_at.get(),
+            history.version,
+            history.fence.get()
+        ),
+        (11, 2, 1)
+    );
+    assert_eq!(history.attempts, 0);
+    assert_eq!(history.state, b"running");
+    assert_eq!(history.worker.as_deref(), Some([b'w', 255].as_slice()));
+    assert_eq!(history.lease_deadline.get(), 61);
+    assert_eq!(history.next_run_at, Some(TimestampMillis::new(61)));
+    assert!(history.retry.is_none());
 }

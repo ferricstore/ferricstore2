@@ -310,13 +310,10 @@ fn kill(path: &Path, operation: u8, after: bool) -> TestResult {
         let (sender, receiver) = mpsc::sync_channel(1);
         let reader = signal_reader(stdout, sender, after)?;
         let acknowledged = (|| -> TestResult {
-            for phase in 0..2 {
-                receiver.recv_timeout(Duration::from_secs(20))??;
-                if phase == 0 {
-                    stdin.write_all(b"A")?;
-                    stdin.flush()?;
-                }
-            }
+            receiver.recv_timeout(Duration::from_secs(20))??;
+            stdin.write_all(b"A")?;
+            stdin.flush()?;
+            receiver.recv_timeout(Duration::from_secs(20))??;
             if child.try_wait()?.is_some() {
                 return Err("acknowledged catalog child exited before termination".into());
             }

@@ -166,11 +166,8 @@ fn config_absence_empty_zero_and_requested_time_are_distinct() -> TestResult {
                 "priority" => input.priority = Some(value),
                 "governance_shard" => input.governance_shard_id = Some(value),
                 "governance_scope" => {
-                    input.governance_limit_scope = Some(if value == 0 {
-                        b"".as_slice()
-                    } else {
-                        b"\0\xff".as_slice()
-                    });
+                    input.governance_limit_scope =
+                        Some([b"".as_slice(), b"\0\xff".as_slice()][usize::from(value != 0)]);
                 }
                 "lease" => input.lease_ms = Some(value),
                 "limit" => input.limit = Some(value),

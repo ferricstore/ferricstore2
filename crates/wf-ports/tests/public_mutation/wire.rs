@@ -41,25 +41,7 @@ fn public_mutation_v1_matches_generic_and_independent_vectors() -> TestResult {
     assert_eq!(items[0].command.id.as_bytes(), b"i");
     assert_eq!(items[0].command.now, TimestampMillis::new(2_000));
     assert_eq!(decoded.state_key(0).ok_or("state key")?.len(), 41);
-    assert!(prepare_record_batch(bytes.as_bytes(), limits(), WORKSPACE).is_err());
-    assert!(prepare_independent_record_batch(bytes.as_bytes(), limits(), WORKSPACE).is_err());
-    for end in 0..bytes.as_bytes().len() {
-        assert!(prepare_public_mutation(&bytes.as_bytes()[..end], limits(), WORKSPACE).is_err());
-    }
-    for offset in [6, 79, 80, 81, 92, 101] {
-        let mut bad = bytes.as_bytes().to_vec();
-        bad[offset] = 255;
-        assert!(prepare_public_mutation(&bad, limits(), WORKSPACE).is_err());
-    }
-    for tag in [2, 3, 7] {
-        let mut bad = bytes.as_bytes().to_vec();
-        bad[101] = tag;
-        assert!(prepare_public_mutation(&bad, limits(), WORKSPACE).is_err());
-    }
-    let mut trailing = bytes.as_bytes().to_vec();
-    trailing.push(0);
-    assert!(prepare_public_mutation(&trailing, limits(), WORKSPACE).is_err());
-    assert!(decode_prepared(&trailing, limits()).is_err());
+    assert_mutation_frame_refusals(&bytes);
     assert_presence_and_time()?;
     assert_prospective_decode(bytes.as_bytes())
 }
@@ -156,4 +138,26 @@ fn assert_prospective_decode(bytes: &[u8]) -> TestResult {
     assert!(plan.value_effects().is_none());
     assert_eq!(retained(&plan)?.response(), [2, 0, 0]);
     Ok(())
+}
+
+fn assert_mutation_frame_refusals(bytes: &PreparedBytes) {
+    assert!(prepare_record_batch(bytes.as_bytes(), limits(), WORKSPACE).is_err());
+    assert!(prepare_independent_record_batch(bytes.as_bytes(), limits(), WORKSPACE).is_err());
+    for end in 0..bytes.as_bytes().len() {
+        assert!(prepare_public_mutation(&bytes.as_bytes()[..end], limits(), WORKSPACE).is_err());
+    }
+    for offset in [6, 79, 80, 81, 92, 101] {
+        let mut bad = bytes.as_bytes().to_vec();
+        bad[offset] = 255;
+        assert!(prepare_public_mutation(&bad, limits(), WORKSPACE).is_err());
+    }
+    for tag in [2, 3, 7] {
+        let mut bad = bytes.as_bytes().to_vec();
+        bad[101] = tag;
+        assert!(prepare_public_mutation(&bad, limits(), WORKSPACE).is_err());
+    }
+    let mut trailing = bytes.as_bytes().to_vec();
+    trailing.push(0);
+    assert!(prepare_public_mutation(&trailing, limits(), WORKSPACE).is_err());
+    assert!(decode_prepared(&trailing, limits()).is_err());
 }

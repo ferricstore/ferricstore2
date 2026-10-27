@@ -31,60 +31,7 @@ fn value_binary_codec_rejects_truncation_and_trailing_bytes() -> TestResult {
     assert!(encoded.is_ok(), "{:?}", encoded.as_ref().err());
     let encoded = encoded?;
     let raw = encoded.as_bytes();
-    assert_eq!(raw.len(), 286);
-    assert_eq!(
-        &raw[..32],
-        b"FWCP\0\x01\x01\0\0\0\x01t\0\0\0\x01g\0\0\0\x01z\0\0\0\x04wire\0\x08",
-    );
-    assert_eq!(&raw[64..72], &100_u64.to_be_bytes());
-    assert_eq!(&raw[72..74], &[0, 0]);
-    assert_eq!(&raw[74..82], &100_u64.to_be_bytes());
-    assert_eq!(&raw[82..86], &[1, 5, 1, 1]);
-    let default_scalars = [
-        7_000_u64.to_be_bytes().as_slice(),
-        &2_u32.to_be_bytes(),
-        &10_u32.to_be_bytes(),
-        &100_u64.to_be_bytes(),
-        &1_000_u32.to_be_bytes(),
-    ]
-    .concat();
-    assert_eq!(&raw[86..114], default_scalars);
-    let configuration = [
-        b"wf-workflow-value-defaults-v1".as_slice(),
-        &default_scalars,
-    ]
-    .concat();
-    assert_eq!(&raw[114..146], Sha256::digest(configuration).as_slice());
-    assert_eq!(&raw[146..150], &1_u32.to_be_bytes());
-    assert_eq!(&raw[150..156], b"\0\0\0\x01r\0");
-    assert_eq!(&raw[156..164], &[0; 8]);
-    assert_eq!(
-        &raw[164..196],
-        &[
-            0x6e, 0x99, 0x78, 0x63, 0x6a, 0x60, 0x17, 0xb6, 0xe2, 0xab, 0xf8, 0x16, 0x47, 0xa5,
-            0xaa, 0xb1, 0xb7, 0x1f, 0x00, 0x3b, 0x16, 0xe2, 0x3a, 0xd9, 0x31, 0xa1, 0xbe, 0xda,
-            0x2d, 0x62, 0xb9, 0xa9,
-        ],
-    );
-    assert_eq!(&raw[196..200], &1_u32.to_be_bytes());
-    assert_eq!(
-        &raw[200..238],
-        b"\0\0\0\x01p\0\0\0\x01i\0\0\0\0\0\0\0\0d\x01\0\0\0\x01r\0\0\0\x01q\0\x01\0\0\0\x02\0\xff",
-    );
-    assert_eq!(
-        &raw[238..254],
-        &[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
-    );
-    let caller = [
-        b"WF-WORKFLOW-VALUE\0V8\0".as_slice(),
-        b"\0\0\0\x01t\0\0\0\x01g\0\0\0\x01z\x05\0\0\0\x01",
-        b"\0\0\0\x01p\0\0\0\x01i\x01\0\0\0\0\x01r\0\0\0\x01q\0\x01\0\0\0\x02\0\xff",
-        b"\0\0\0\x01\0\0\0",
-    ]
-    .concat();
-    assert_eq!(&raw[32..64], Sha256::digest(&caller).as_slice());
-    assert_eq!(&raw[254..], Sha256::digest(&raw[..254]).as_slice());
-    assert_eq!(encoded.digest().as_bytes(), Sha256::digest(raw).as_slice());
+    assert_literal_value_wire(raw, &encoded);
     for length in 0..raw.len() {
         assert!(
             decode_workflow_value_batch(&raw[..length], limits).is_err(),
@@ -302,29 +249,7 @@ fn value_binary_codec_owned_and_generic_decoders_preserve_distinct_ownership() -
     assert_eq!(generic.digest(), encoded.digest());
     assert_eq!(generic.encoded().as_ptr(), encoded.as_bytes().as_ptr());
     assert_eq!(generic.encoded(), encoded.as_bytes());
-    let isolation = b"FWSC\0\x01\0\0\0\x01t\0\0\0\x01g\0\0\0\x01z";
-    assert_eq!(generic.isolation_scope(), isolation);
-    let expected_key = [
-        b"FWSK\0\x01\0\0\0\x15".as_slice(),
-        isolation,
-        b"\0\0\0\x01p\0\0\0\x01i",
-    ]
-    .concat();
-    assert_eq!(generic.state_key(0), Some(expected_key.as_slice()));
-    assert_eq!(generic.state_key(1), None);
-    let metadata = generic
-        .workflow_value_metadata()
-        .ok_or("missing value metadata")?;
-    assert_eq!(metadata.profile, 5);
-    assert_eq!(metadata.policy_references_captured, Some(true));
-    assert!(metadata.defaults == f::defaults());
-    let (policies, inputs) = (metadata.policies, metadata.inputs);
-    assert_eq!(policies.len(), 1);
-    assert_eq!(policies[0].workflow_type, b"r");
-    assert_eq!((policies[0].profile, policies[0].generation), (0, 0));
-    assert_eq!(policies[0].digest, request.policies[0].digest);
-    assert_eq!(inputs.len(), 1);
-    assert!(inputs[0] == request.inputs[0]);
+    assert_generic_metadata(&generic, &request)?;
     let generic_items = generic
         .request()
         .operation
@@ -568,5 +493,92 @@ fn value_binary_codec_preserves_unresolved_extension_presence() -> TestResult {
     assert_eq!(birth.retention.history_max_events, Some(0));
     assert_eq!(birth.history_hot_max_events, Some(u64::MAX));
     assert_eq!(decoded.inputs[0].terminal_ttl_ms, Some(-1));
+    Ok(())
+}
+
+fn assert_literal_value_wire(raw: &[u8], encoded: &wf_ports::log::PreparedBytes) {
+    assert_eq!(raw.len(), 286);
+    assert_eq!(
+        &raw[..32],
+        b"FWCP\0\x01\x01\0\0\0\x01t\0\0\0\x01g\0\0\0\x01z\0\0\0\x04wire\0\x08",
+    );
+    assert_eq!(&raw[64..72], &100_u64.to_be_bytes());
+    assert_eq!(&raw[72..74], &[0, 0]);
+    assert_eq!(&raw[74..82], &100_u64.to_be_bytes());
+    assert_eq!(&raw[82..86], &[1, 5, 1, 1]);
+    let default_scalars = [
+        7_000_u64.to_be_bytes().as_slice(),
+        &2_u32.to_be_bytes(),
+        &10_u32.to_be_bytes(),
+        &100_u64.to_be_bytes(),
+        &1_000_u32.to_be_bytes(),
+    ]
+    .concat();
+    assert_eq!(&raw[86..114], default_scalars);
+    let configuration = [
+        b"wf-workflow-value-defaults-v1".as_slice(),
+        &default_scalars,
+    ]
+    .concat();
+    assert_eq!(&raw[114..146], Sha256::digest(configuration).as_slice());
+    assert_eq!(&raw[146..150], &1_u32.to_be_bytes());
+    assert_eq!(&raw[150..156], b"\0\0\0\x01r\0");
+    assert_eq!(&raw[156..164], &[0; 8]);
+    assert_eq!(
+        &raw[164..196],
+        &[
+            0x6e, 0x99, 0x78, 0x63, 0x6a, 0x60, 0x17, 0xb6, 0xe2, 0xab, 0xf8, 0x16, 0x47, 0xa5,
+            0xaa, 0xb1, 0xb7, 0x1f, 0x00, 0x3b, 0x16, 0xe2, 0x3a, 0xd9, 0x31, 0xa1, 0xbe, 0xda,
+            0x2d, 0x62, 0xb9, 0xa9,
+        ],
+    );
+    assert_eq!(&raw[196..200], &1_u32.to_be_bytes());
+    assert_eq!(
+        &raw[200..238],
+        b"\0\0\0\x01p\0\0\0\x01i\0\0\0\0\0\0\0\0d\x01\0\0\0\x01r\0\0\0\x01q\0\x01\0\0\0\x02\0\xff",
+    );
+    assert_eq!(
+        &raw[238..254],
+        &[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+    );
+    let caller = [
+        b"WF-WORKFLOW-VALUE\0V8\0".as_slice(),
+        b"\0\0\0\x01t\0\0\0\x01g\0\0\0\x01z\x05\0\0\0\x01",
+        b"\0\0\0\x01p\0\0\0\x01i\x01\0\0\0\0\x01r\0\0\0\x01q\0\x01\0\0\0\x02\0\xff",
+        b"\0\0\0\x01\0\0\0",
+    ]
+    .concat();
+    assert_eq!(&raw[32..64], Sha256::digest(&caller).as_slice());
+    assert_eq!(&raw[254..], Sha256::digest(&raw[..254]).as_slice());
+    assert_eq!(encoded.digest().as_bytes(), Sha256::digest(raw).as_slice());
+}
+
+fn assert_generic_metadata(
+    generic: &DecodedRequest<'_>,
+    request: &PreparedWorkflowValueBatch,
+) -> TestResult {
+    let isolation = b"FWSC\0\x01\0\0\0\x01t\0\0\0\x01g\0\0\0\x01z";
+    assert_eq!(generic.isolation_scope(), isolation);
+    let expected_key = [
+        b"FWSK\0\x01\0\0\0\x15".as_slice(),
+        isolation,
+        b"\0\0\0\x01p\0\0\0\x01i",
+    ]
+    .concat();
+    assert_eq!(generic.state_key(0), Some(expected_key.as_slice()));
+    assert_eq!(generic.state_key(1), None);
+    let metadata = generic
+        .workflow_value_metadata()
+        .ok_or("missing value metadata")?;
+    assert_eq!(metadata.profile, 5);
+    assert_eq!(metadata.policy_references_captured, Some(true));
+    assert!(metadata.defaults == f::defaults());
+    let (policies, inputs) = (metadata.policies, metadata.inputs);
+    assert_eq!(policies.len(), 1);
+    assert_eq!(policies[0].workflow_type, b"r");
+    assert_eq!((policies[0].profile, policies[0].generation), (0, 0));
+    assert_eq!(policies[0].digest, request.policies[0].digest);
+    assert_eq!(inputs.len(), 1);
+    assert!(inputs[0] == request.inputs[0]);
     Ok(())
 }

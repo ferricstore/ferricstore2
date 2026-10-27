@@ -199,18 +199,18 @@ pub(super) fn assert_core_patch_prepare_raw_caps(
             let mut intent = minimal[83..].to_vec();
             let mut payload = u32::try_from(length)?.to_be_bytes().to_vec();
             payload.extend(std::iter::repeat_n(b'x', length));
+            let prefix = if field == 1 {
+                &[1, 0][..]
+            } else {
+                &[1, 0, 0, 1][..]
+            };
+            let offset = if field == 1 { 44 } else { 46 };
             match field {
                 0 => {
                     drop(intent.splice(39..44, payload));
                 }
                 1 | 2 => {
-                    let prefix = if field == 1 {
-                        &[1, 0][..]
-                    } else {
-                        &[1, 0, 0, 1][..]
-                    };
                     drop(payload.splice(0..0, prefix.iter().copied()));
-                    let offset = if field == 1 { 44 } else { 46 };
                     drop(intent.splice(offset..=offset, payload));
                 }
                 3 => {

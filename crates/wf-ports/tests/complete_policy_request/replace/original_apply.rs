@@ -222,18 +222,18 @@ fn original_current_replace_keeps_decode_cas_and_type_priority() -> TestResult {
             let mut supplied = view(gate, &policies, &marks, safety());
             supplied.history_max_events_limit = Err(ApplyError::AllocationFailed);
             let result = apply(&supplied, &bytes, 0, limits, &mut charge);
-            if expected == Some(1) {
-                let plan = result?;
-                rejected(&plan, b"ERR stale flow policy generation", &bytes)?;
-                let DispatchDecision::Fresh((None, out)) = plan.decision() else {
-                    return Err("stale branch".into());
-                };
-                assert!(
-                    matches!(out.status(), RetainedStatus::PolicyRejected(reason) if reason.error() == PolicyError::StaleGeneration)
-                );
-            } else {
+            if expected != Some(1) {
                 assert_eq!(result.err(), Some(corrupt()));
+                continue;
             }
+            let plan = result?;
+            rejected(&plan, b"ERR stale flow policy generation", &bytes)?;
+            let DispatchDecision::Fresh((None, out)) = plan.decision() else {
+                return Err("stale branch".into());
+            };
+            assert!(
+                matches!(out.status(), RetainedStatus::PolicyRejected(reason) if reason.error() == PolicyError::StaleGeneration)
+            );
         }
     }
     let raw = current(0)?;
@@ -402,19 +402,17 @@ fn original_current_replace_preserves_nonfresh_and_real_retained_replays() -> Te
             let before = charge.g();
             let plan = apply(&supplied, &bytes, index, limits, &mut charge)?;
             control(&plan, base, &bytes, time, index, case == 0)?;
-            match case {
-                0 => assert!(matches!(plan.decision(), DispatchDecision::LogReplay)),
-                1 => {
-                    let DispatchDecision::Replay(out) = plan.decision() else {
-                        return Err("real retained replay".into());
-                    };
+            match (case, plan.decision()) {
+                (0, _) => assert!(matches!(plan.decision(), DispatchDecision::LogReplay)),
+                (1, DispatchDecision::Replay(out)) => {
                     outcome(out, &original, &expected, 0, 0);
                     assert_eq!(out.status(), outcomes[&request].status());
                     let replayed: &RetainedOutcome = out;
                     let original: &RetainedOutcome = &outcomes[&request];
                     assert!(std::ptr::eq(replayed, original));
                 }
-                2 => assert!(matches!(plan.decision(), DispatchDecision::Expired)),
+                (2, _) => assert!(matches!(plan.decision(), DispatchDecision::Expired)),
+                (1, _) => return Err("real retained replay".into()),
                 _ => assert!(matches!(plan.decision(), DispatchDecision::IntentConflict)),
             }
             if kind != 1 {

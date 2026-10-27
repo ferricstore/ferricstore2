@@ -66,33 +66,15 @@ pub(super) fn assert_core_patch_decoded(
         scope.extend_from_slice(id);
     }
     assert_eq!(decoded.isolation_scope(), scope.as_slice());
-    for log in [
-        LogIdentity::new(1, 2, AppliedPosition::new(3)),
-        LogIdentity::new(9, 8, AppliedPosition::new(7)),
-    ] {
-        let header = decoded.header(log);
-        assert_eq!(header.format_version, 1);
-        assert_eq!(header.scope.tenant().as_bytes(), ids[0]);
-        assert_eq!(header.scope.group().as_bytes(), ids[1]);
-        assert_eq!(header.scope.recovery().as_bytes(), ids[2]);
-        assert_eq!(header.request.as_bytes(), ids[3]);
-        assert_eq!(header.stamp, stamp);
-        assert_eq!(header.intent.version(), 2);
-        assert_eq!(
-            header.intent.digest(),
-            &<[u8; 32]>::from(Sha256::digest(original))
-        );
-        assert_eq!(
-            header.intent.digest().as_slice(),
-            &expected[25 + size..57 + size]
-        );
-        assert_eq!(
-            header.identity,
-            EntryIdentity::new(log, PreparedDigest::new(digest))
-        );
-        assert_eq!(header.encoded_entry, expected);
-        assert_eq!(header.encoded_isolation_scope, scope.as_slice());
-    }
+    assert_decoded_headers(
+        decoded,
+        expected,
+        (original, size),
+        digest,
+        ids,
+        stamp,
+        &scope,
+    );
     Ok(())
 }
 
@@ -486,4 +468,42 @@ fn assert_core_patch_decode_backoff(
         assert_eq!((charge.g(), charge.p()), (before + 7_068, 0));
     }
     Ok(())
+}
+
+fn assert_decoded_headers(
+    decoded: &DecodedCompleteCorePolicyPatchFrame<'_>,
+    expected: &[u8],
+    (original, size): (&[u8], usize),
+    digest: [u8; 32],
+    ids: [&[u8]; 4],
+    stamp: CommittedTime,
+    scope: &[u8],
+) {
+    for log in [
+        LogIdentity::new(1, 2, AppliedPosition::new(3)),
+        LogIdentity::new(9, 8, AppliedPosition::new(7)),
+    ] {
+        let header = decoded.header(log);
+        assert_eq!(header.format_version, 1);
+        assert_eq!(header.scope.tenant().as_bytes(), ids[0]);
+        assert_eq!(header.scope.group().as_bytes(), ids[1]);
+        assert_eq!(header.scope.recovery().as_bytes(), ids[2]);
+        assert_eq!(header.request.as_bytes(), ids[3]);
+        assert_eq!(header.stamp, stamp);
+        assert_eq!(header.intent.version(), 2);
+        assert_eq!(
+            header.intent.digest(),
+            &<[u8; 32]>::from(Sha256::digest(original))
+        );
+        assert_eq!(
+            header.intent.digest().as_slice(),
+            &expected[25 + size..57 + size]
+        );
+        assert_eq!(
+            header.identity,
+            EntryIdentity::new(log, PreparedDigest::new(digest))
+        );
+        assert_eq!(header.encoded_entry, expected);
+        assert_eq!(header.encoded_isolation_scope, scope);
+    }
 }

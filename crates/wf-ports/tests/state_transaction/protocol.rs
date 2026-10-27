@@ -484,12 +484,7 @@ fn same_transaction_binds_points_heads_and_range_budget() -> TestResult {
             assert!(matches!(cursor.next()?, DueCursorStep::BudgetEnd));
             assert_eq!(tx.steps.get(), spent);
         }
-        {
-            let mut resumed = tx.due_cursor(scope.tenant(), query(), Some(rows[1]), 2, 1_000)?;
-            assert!(matches!(resumed.next()?, DueCursorStep::Row(row) if row.id == b"c"));
-            assert!(matches!(resumed.next()?, DueCursorStep::RangeEnd));
-            assert!(matches!(resumed.next()?, DueCursorStep::RangeEnd));
-        }
+        assert_resumed(&tx, rows[1])?;
         assert_eq!(
             tx.record(
                 scope.tenant(),
@@ -593,5 +588,13 @@ fn assert_retained_probe(changes: &GroupApplyChanges<'_, '_>) -> TestResult {
         );
         assert_eq!((tx.steps.get(), tx.bytes.get()), (4, 1_035));
     }
+    Ok(())
+}
+
+fn assert_resumed(tx: &RecordingGroupTransaction<'_, '_>, after: DueOrder<'_>) -> TestResult {
+    let mut resumed = tx.due_cursor(tx.store.scope.tenant(), query(), Some(after), 2, 1_000)?;
+    assert!(matches!(resumed.next()?, DueCursorStep::Row(row) if row.id == b"c"));
+    assert!(matches!(resumed.next()?, DueCursorStep::RangeEnd));
+    assert!(matches!(resumed.next()?, DueCursorStep::RangeEnd));
     Ok(())
 }

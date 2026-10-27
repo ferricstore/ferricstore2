@@ -151,63 +151,7 @@ fn complete_replace_intent_preserves_local_empty_presence() -> TestResult {
         for present in [false, true] {
             let (mut value, mut expected) = (present_data(), present_data());
             for data in [&mut value, &mut expected] {
-                let retry = data.retry.as_mut().ok_or("missing retry")?;
-                let state = data
-                    .states
-                    .get_mut(b"s".as_slice())
-                    .ok_or("missing state")?;
-                let gov = data.governance.as_mut().ok_or("missing governance")?;
-                let effects = gov.effects.as_mut().ok_or("missing effects")?;
-                let approvals = gov.approvals.as_mut().ok_or("missing approvals")?;
-                let budgets = gov.budgets.as_mut().ok_or("missing budgets")?;
-                let budget = budgets.get_mut(b"b".as_slice()).ok_or("missing budget")?;
-                let circuits = gov.circuits.as_mut().ok_or("missing circuits")?;
-                let circuit = circuits.get_mut(b"c".as_slice()).ok_or("missing circuit")?;
-                match case {
-                    0 => data.version = present.then_some(PolicyVersion::Bytes(Vec::new())),
-                    1 => retry.exhausted_to = present.then_some(Vec::new()),
-                    2 => data.indexed_state_meta = present.then_some(Vec::new()),
-                    3 => budget.unit = present.then_some(Vec::new()),
-                    4 => data.indexed_attributes = present.then_some(Vec::new()),
-                    5 => effects.allowed = present.then_some(Vec::new()),
-                    6 => effects.denied = present.then_some(Vec::new()),
-                    7 => circuit.error_classes = present.then_some(Vec::new()),
-                    8 => approvals.effects = present.then_some(Vec::new()),
-                    9 => approvals.states = present.then_some(Vec::new()),
-                    10 => approvals.assignees = present.then_some(Vec::new()),
-                    11 => gov.limits = present.then_some(BTreeMap::new()),
-                    12 => gov.budgets = present.then_some(BTreeMap::new()),
-                    13 => gov.circuits = present.then_some(BTreeMap::new()),
-                    14 => {
-                        gov.effects = present.then_some(EffectsData {
-                            allowed: None,
-                            denied: None,
-                            require_idempotency_key: None,
-                        });
-                    }
-                    15 => {
-                        gov.audit = present.then_some(AuditData {
-                            effect_events: None,
-                            denials: None,
-                        });
-                    }
-                    16 => {
-                        gov.approvals = present.then_some(ApprovalsData {
-                            effects: None,
-                            states: None,
-                            assignees: None,
-                            timeout_ms: None,
-                        });
-                    }
-                    17 => state.retry = present.then_some(RetryOverride::default()),
-                    18 => state.retention = present.then_some(RetentionOverride::default()),
-                    19 => {
-                        if !present {
-                            state.governance = None;
-                        }
-                    }
-                    _ => return Err("unknown empty-field case".into()),
-                }
+                configure_empty_data(data, case, present)?;
             }
             let replacement = if present { empty } else { b"\0" };
             let mut literal = PRESENT_INTENT_BYTES[..start].to_vec();
@@ -260,4 +204,65 @@ fn local_empty_intent_cases() -> [(usize, usize, usize, &'static [u8]); 20] {
         (18, 119, 134, b"\x01\0\0"),           // state Retention
         (19, 134, 142, b"\x01\0\0\0\0\0\0\0"), // state Gov
     ]
+}
+
+fn configure_empty_data(data: &mut CompletePolicyData, case: usize, present: bool) -> TestResult {
+    let retry = data.retry.as_mut().ok_or("missing retry")?;
+    let state = data
+        .states
+        .get_mut(b"s".as_slice())
+        .ok_or("missing state")?;
+    let gov = data.governance.as_mut().ok_or("missing governance")?;
+    let effects = gov.effects.as_mut().ok_or("missing effects")?;
+    let approvals = gov.approvals.as_mut().ok_or("missing approvals")?;
+    let budgets = gov.budgets.as_mut().ok_or("missing budgets")?;
+    let budget = budgets.get_mut(b"b".as_slice()).ok_or("missing budget")?;
+    let circuits = gov.circuits.as_mut().ok_or("missing circuits")?;
+    let circuit = circuits.get_mut(b"c".as_slice()).ok_or("missing circuit")?;
+    match case {
+        0 => data.version = present.then_some(PolicyVersion::Bytes(Vec::new())),
+        1 => retry.exhausted_to = present.then_some(Vec::new()),
+        2 => data.indexed_state_meta = present.then_some(Vec::new()),
+        3 => budget.unit = present.then_some(Vec::new()),
+        4 => data.indexed_attributes = present.then_some(Vec::new()),
+        5 => effects.allowed = present.then_some(Vec::new()),
+        6 => effects.denied = present.then_some(Vec::new()),
+        7 => circuit.error_classes = present.then_some(Vec::new()),
+        8 => approvals.effects = present.then_some(Vec::new()),
+        9 => approvals.states = present.then_some(Vec::new()),
+        10 => approvals.assignees = present.then_some(Vec::new()),
+        11 => gov.limits = present.then_some(BTreeMap::new()),
+        12 => gov.budgets = present.then_some(BTreeMap::new()),
+        13 => gov.circuits = present.then_some(BTreeMap::new()),
+        14 => {
+            gov.effects = present.then_some(EffectsData {
+                allowed: None,
+                denied: None,
+                require_idempotency_key: None,
+            });
+        }
+        15 => {
+            gov.audit = present.then_some(AuditData {
+                effect_events: None,
+                denials: None,
+            });
+        }
+        16 => {
+            gov.approvals = present.then_some(ApprovalsData {
+                effects: None,
+                states: None,
+                assignees: None,
+                timeout_ms: None,
+            });
+        }
+        17 => state.retry = present.then_some(RetryOverride::default()),
+        18 => state.retention = present.then_some(RetentionOverride::default()),
+        19 => {
+            if !present {
+                state.governance = None;
+            }
+        }
+        _ => return Err("unknown empty-field case".into()),
+    }
+    Ok(())
 }

@@ -22500,7 +22500,7 @@
         {
           "scenario_id": "m1-88c6507d3eccfe8c",
           "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
-          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_file_sha256": "471062123a766b48a8d6ce65f99ddad2f591f01e47e0fbde20a2dca2769a49fc",
           "rust_module": "",
           "rust_function": "pinned_complete_many_preserves_order_and_atomic_guard_rollback",
           "assertions": [
@@ -22531,7 +22531,7 @@
         {
           "scenario_id": "m1-6286a35397e402f7",
           "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
-          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_file_sha256": "471062123a766b48a8d6ce65f99ddad2f591f01e47e0fbde20a2dca2769a49fc",
           "rust_module": "",
           "rust_function": "pinned_complete_many_preserves_order_and_atomic_guard_rollback",
           "assertions": [
@@ -23066,7 +23066,7 @@
         {
           "scenario_id": "m1-1222bd491908472b",
           "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
-          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_file_sha256": "471062123a766b48a8d6ce65f99ddad2f591f01e47e0fbde20a2dca2769a49fc",
           "rust_module": "",
           "rust_function": "pinned_fail_many_preserves_order_and_atomic_guard_rollback",
           "assertions": [
@@ -23097,7 +23097,7 @@
         {
           "scenario_id": "m1-dab579f2989c77fd",
           "rust_file": "crates/wf-ports/tests/record_batch/source.rs",
-          "rust_file_sha256": "58e02904c4a55dcb1cd2076ee9cb880e5f081d45017a300754fac6a76a822061",
+          "rust_file_sha256": "471062123a766b48a8d6ce65f99ddad2f591f01e47e0fbde20a2dca2769a49fc",
           "rust_module": "",
           "rust_function": "pinned_fail_many_preserves_order_and_atomic_guard_rollback",
           "assertions": [

@@ -153,11 +153,7 @@ pub(super) fn assert_replace_frame_raw_limits(
             } else {
                 let prepared = result?;
                 let length = u64::try_from(length)?;
-                let fee = if field == 1 {
-                    47_609 + 6 * length
-                } else {
-                    47_249 + (if listed { 7 } else { 6 }) * (length - 1)
-                };
+                let fee = replace_raw_fee(field, listed, length);
                 assert_eq!(
                     (charge.g(), charge.p()),
                     (before.0 + fee, before.1.max(128))
@@ -581,4 +577,12 @@ pub(super) fn assert_replace_frame_tags(
         }
     }
     Ok(())
+}
+
+fn replace_raw_fee(field: usize, listed: bool, length: u64) -> u64 {
+    if field == 1 {
+        47_609 + 6 * length
+    } else {
+        47_249 + (if listed { 7 } else { 6 }) * (length - 1)
+    }
 }

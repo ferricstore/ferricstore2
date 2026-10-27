@@ -192,17 +192,15 @@ fn original_flow_parent_preserves_nonfresh_before_all_changed_reads() -> TestRes
                 &mut charge,
             )?;
             control(&plan, base, &bytes, time, index, case == 0)?;
-            match case {
-                0 => assert!(matches!(plan.decision(), DispatchDecision::LogReplay)),
-                1 => {
-                    let DispatchDecision::Replay(out) = plan.decision() else {
-                        return Err("Replay".into());
-                    };
+            match (case, plan.decision()) {
+                (0, _) => assert!(matches!(plan.decision(), DispatchDecision::LogReplay)),
+                (1, DispatchDecision::Replay(out)) => {
                     let replayed: &RetainedOutcome = out;
                     assert!(std::ptr::eq(replayed, &raw const outcomes[&request_id]));
                     assert_eq!(out.response(), old_body);
                     assert_eq!(out.status(), old_status);
                 }
+                (1, _) => return Err("Replay".into()),
                 _ => assert!(matches!(plan.decision(), DispatchDecision::Expired)),
             }
             if kind == 0 {

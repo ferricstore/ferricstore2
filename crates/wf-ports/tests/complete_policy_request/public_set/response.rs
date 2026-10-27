@@ -36,36 +36,7 @@ fn accepted_original_etf_and_dynamic_rejections_restore_exactly() -> TestResult 
     assert_eq!(status(&minimal(1)?)?, RetainedStatus::Accepted);
     // Generation zero is a valid current entry, never an allocated success.
     assert!(status(&minimal(0)?).is_err());
-    for error in [
-        PolicyError::InvalidGeneration,
-        PolicyError::StaleGeneration,
-        PolicyError::GenerationExhausted,
-    ] {
-        let body = match error {
-            PolicyError::InvalidGeneration => b"ERR invalid flow policy generation".as_slice(),
-            PolicyError::StaleGeneration => b"ERR stale flow policy generation",
-            _ => b"ERR flow policy generation exhausted",
-        };
-        assert_eq!(
-            status(body)?,
-            RetainedStatus::PolicyRejected(PolicyRejection::new(error)?)
-        );
-    }
-    for maximum in [1, 64, 1_000_000] {
-        let body = format!("ERR flow retention history_max_events must be between 1 and {maximum}");
-        assert_eq!(
-            status(body.as_bytes())?,
-            RetainedStatus::OriginalPolicySetRejected(FlowPolicyInputRejection::Retention(
-                PolicyRetentionInputRejection::History { maximum }
-            ),)
-        );
-    }
-    for suffix in ["", "0", "064", "+64", " 64", "1000001", "64\n"] {
-        let body = format!("ERR flow retention history_max_events must be between 1 and {suffix}");
-        assert!(status(body.as_bytes()).is_err());
-    }
-    assert!(status(b"ERR flow governance unit must be a positive integer").is_err());
-    assert!(status(b"ERR unrelated error").is_err());
+    assert_dynamic_rejections()?;
     let mut unsupported = minimal(1)?;
     // Independent ETF positions: root map starts21; its states atom starts28.
     assert_eq!(&unsupported[28..34], b"states");
@@ -434,5 +405,39 @@ fn assert_absence_correspondence(original: &[u8], schema: PolicySchemaLimits) ->
             }
         }
     }
+    Ok(())
+}
+
+fn assert_dynamic_rejections() -> TestResult {
+    for error in [
+        PolicyError::InvalidGeneration,
+        PolicyError::StaleGeneration,
+        PolicyError::GenerationExhausted,
+    ] {
+        let body = match error {
+            PolicyError::InvalidGeneration => b"ERR invalid flow policy generation".as_slice(),
+            PolicyError::StaleGeneration => b"ERR stale flow policy generation",
+            _ => b"ERR flow policy generation exhausted",
+        };
+        assert_eq!(
+            status(body)?,
+            RetainedStatus::PolicyRejected(PolicyRejection::new(error)?)
+        );
+    }
+    for maximum in [1, 64, 1_000_000] {
+        let body = format!("ERR flow retention history_max_events must be between 1 and {maximum}");
+        assert_eq!(
+            status(body.as_bytes())?,
+            RetainedStatus::OriginalPolicySetRejected(FlowPolicyInputRejection::Retention(
+                PolicyRetentionInputRejection::History { maximum }
+            ),)
+        );
+    }
+    for suffix in ["", "0", "064", "+64", " 64", "1000001", "64\n"] {
+        let body = format!("ERR flow retention history_max_events must be between 1 and {suffix}");
+        assert!(status(body.as_bytes()).is_err());
+    }
+    assert!(status(b"ERR flow governance unit must be a positive integer").is_err());
+    assert!(status(b"ERR unrelated error").is_err());
     Ok(())
 }

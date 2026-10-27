@@ -462,34 +462,7 @@ fn assert_type_binding(gate: GateView<'_>, limits: PolicySchemaLimits) -> TestRe
         let missing = envelope(1, &map(&[])?)?;
         for raw in [&raw, &missing] {
             let policies = BTreeMap::from([(b"r".to_vec(), ReadValue::Binary(raw))]);
-            for guard in [Raw::Integer(0), Raw::Integer(1), Raw::Nil] {
-                let bytes = frame(guard, Raw::Map(&[]))?;
-                let mut charge = PolicySchemaCharge::new(limits);
-                let mut supplied = view(gate, &policies, &marks, &marks, safety());
-                supplied.history_max_events_limit = Err(ApplyError::AllocationFailed);
-                let result = apply(
-                    &supplied,
-                    &bytes,
-                    0,
-                    limits,
-                    AdmissionLimits::default(),
-                    &mut charge,
-                );
-                if matches!(guard, Raw::Integer(0)) {
-                    let plan = result?;
-                    assert!(
-                        matches!(retained(&plan)?.status(), RetainedStatus::PolicyRejected(r)
-                        if r.error() == PolicyError::StaleGeneration)
-                    );
-                    outcome(
-                        retained(&plan)?,
-                        &bytes,
-                        b"ERR stale flow policy generation",
-                    );
-                } else {
-                    assert_eq!(result.err(), Some(corrupt()));
-                }
-            }
+            assert_type_guard_cases(gate, limits, &policies, &marks)?;
         }
     }
     for (class, error) in [
@@ -560,5 +533,42 @@ pub(super) fn assert_highwater(gate: GateView<'_>, limits: PolicySchemaLimits) -
         &bytes,
         b"ERR flow policy generation exhausted",
     );
+    Ok(())
+}
+
+fn assert_type_guard_cases(
+    gate: GateView<'_>,
+    limits: PolicySchemaLimits,
+    policies: &BTreeMap<Vec<u8>, ReadValue<'_>>,
+    marks: &BTreeMap<Vec<u8>, Result<u64, ApplyError>>,
+) -> TestResult {
+    for guard in [Raw::Integer(0), Raw::Integer(1), Raw::Nil] {
+        let bytes = frame(guard, Raw::Map(&[]))?;
+        let mut charge = PolicySchemaCharge::new(limits);
+        let mut supplied = view(gate, policies, marks, marks, safety());
+        supplied.history_max_events_limit = Err(ApplyError::AllocationFailed);
+        let result = apply(
+            &supplied,
+            &bytes,
+            0,
+            limits,
+            AdmissionLimits::default(),
+            &mut charge,
+        );
+        if matches!(guard, Raw::Integer(0)) {
+            let plan = result?;
+            assert!(
+                matches!(retained(&plan)?.status(), RetainedStatus::PolicyRejected(r)
+                if r.error() == PolicyError::StaleGeneration)
+            );
+            outcome(
+                retained(&plan)?,
+                &bytes,
+                b"ERR stale flow policy generation",
+            );
+        } else {
+            assert_eq!(result.err(), Some(corrupt()));
+        }
+    }
     Ok(())
 }

@@ -422,31 +422,32 @@ fn complete_replace_parent_retains_only_source_business_origins_and_original_his
             .len(),
         37
     );
-    for (kind, expected) in rows {
-        for invalid in [true, false] {
-            let supplied = business_data(kind, invalid)?;
-            let frame = input_frame(business_data(kind, invalid)?, None)?;
-            let plan = apply(view, &frame, 0, limits, &mut charge)?;
-            let DispatchDecision::Fresh((write, outcome)) = plan.decision() else {
-                return Err("expected reached source content branch".into());
+    for ((kind, expected), invalid) in rows
+        .into_iter()
+        .flat_map(|row| [true, false].map(move |invalid| (row, invalid)))
+    {
+        let supplied = business_data(kind, invalid)?;
+        let frame = input_frame(business_data(kind, invalid)?, None)?;
+        let plan = apply(view, &frame, 0, limits, &mut charge)?;
+        let DispatchDecision::Fresh((write, outcome)) = plan.decision() else {
+            return Err("expected reached source content branch".into());
+        };
+        if invalid {
+            assert!(write.is_none());
+            let RetainedStatus::CompletePolicyReplaceRejected(reason) = outcome.status() else {
+                return Err("caller diagnostic must retain its own source kind".into());
             };
-            if invalid {
-                assert!(write.is_none());
-                let RetainedStatus::CompletePolicyReplaceRejected(reason) = outcome.status() else {
-                    return Err("caller diagnostic must retain its own source kind".into());
-                };
-                assert_eq!(reason.kind(), kind);
-                assert_eq!(reason.history_max_events_limit(), None);
-                assert_outcome(outcome, &frame, expected, (0, 0))?;
-            } else {
-                let (_, value) = write.as_ref().ok_or("valid neighbor must install")?;
-                assert!(value.data() == &supplied);
-                assert_eq!(outcome.status(), RetainedStatus::Accepted);
-                assert_outcome(outcome, &frame, value.encoded(), (0, 0))?;
-            }
-            assert!(supplied == business_data(kind, invalid)?);
-            assert!(empty.is_empty() && outcomes.is_empty() && marks.is_empty());
+            assert_eq!(reason.kind(), kind);
+            assert_eq!(reason.history_max_events_limit(), None);
+            assert_outcome(outcome, &frame, expected, (0, 0))?;
+        } else {
+            let (_, value) = write.as_ref().ok_or("valid neighbor must install")?;
+            assert!(value.data() == &supplied);
+            assert_eq!(outcome.status(), RetainedStatus::Accepted);
+            assert_outcome(outcome, &frame, value.encoded(), (0, 0))?;
         }
+        assert!(supplied == business_data(kind, invalid)?);
+        assert!(empty.is_empty() && outcomes.is_empty() && marks.is_empty());
     }
     assert_history_limits(view, limits, &mut charge)?;
     assert_content_order(view, limits, &mut charge)?;

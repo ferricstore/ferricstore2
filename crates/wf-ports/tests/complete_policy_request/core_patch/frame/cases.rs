@@ -296,14 +296,7 @@ pub(super) fn assert_core_patch_frame_account_case(
         let delta = if intent.len() == 116 { 6_791 } else { 4_423 };
         let final_fee = 128 + u64::try_from(encoded.len())?;
         let g = setup + (index + 1) * delta - if refused { final_fee } else { 0 };
-        assert_eq!(
-            (charge.g(), charge.p(), charge.total()),
-            (g, scratch, g + scratch)
-        );
-        if let Some(held) = &held {
-            assert!(held.data() == &indexed_expected);
-            assert_eq!(held.generation(), 1);
-        }
+        assert_retained_prefix(&charge, (g, scratch), held.as_ref(), &indexed_expected);
     }
     let before = (charge.g(), charge.p(), charge.total());
     let wrong = profile(maximum + 1)?;
@@ -321,4 +314,20 @@ pub(super) fn assert_core_patch_frame_account_case(
         assert_eq!(held.generation(), 1);
     }
     Ok(())
+}
+
+fn assert_retained_prefix(
+    charge: &PolicySchemaCharge,
+    (g, scratch): (u64, u64),
+    held: Option<&wf_domain::policy::complete::CompletePolicyCandidate>,
+    indexed_expected: &wf_domain::policy::complete::CompletePolicyData,
+) {
+    assert_eq!(
+        (charge.g(), charge.p(), charge.total()),
+        (g, scratch, g + scratch)
+    );
+    if let Some(held) = held {
+        assert!(held.data() == indexed_expected);
+        assert_eq!(held.generation(), 1);
+    }
 }
