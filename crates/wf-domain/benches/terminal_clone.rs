@@ -216,17 +216,15 @@ fn validate_decision(
         assert!(event.worker.is_none() && event.retry.is_none());
         &write.record
     };
-    assert_eq!(record.id().as_bytes(), b"terminal-bench");
-    assert_eq!(record.workflow_type(), b"job");
-    assert_eq!(record.state(), state);
-    let scalars = (record.version(), record.fence().get(), record.attempts());
-    assert_eq!(scalars, (3, 1, 0));
-    let times = (record.created_at().get(), record.updated_at().get());
-    assert_eq!(times, (1_000, 2_050));
-    assert_eq!(record.next_run_at(), None);
-    assert_eq!(record.run_state(), Some(b"queued".as_slice()));
-    assert!(record.lease().is_none());
-    assert_eq!(record.latest_event_witness(), (kind, 3, Fence::new(1)));
+    validate_terminal_record(record, kind, state);
+    validate_values(record, profile, fail)
+}
+
+fn validate_values(
+    record: &WorkflowRecord,
+    profile: usize,
+    fail: bool,
+) -> Result<(), Box<dyn Error>> {
     let payload = record.payload().ok_or("terminal payload presence lost")?;
     let (length, byte) = match profile {
         2 => (65_536, 0xA1),
@@ -341,14 +339,7 @@ fn run_case(profile: usize, measure: bool) -> Result<(), Box<dyn Error>> {
             let _warmup = sample_decisions(view, items, limits, profile, iterations)?;
             for sample in 0..16 {
                 let elapsed = sample_decisions(view, items, limits, profile, iterations)?;
-                if elapsed.is_zero() {
-                    return Err("zero-duration terminal sample; discard this measurement".into());
-                }
-                println!(
-                    "profile={} sample={sample} iterations={iterations} elapsed_ns={}",
-                    names[profile],
-                    elapsed.as_nanos()
-                );
+                print_sample(names[profile], sample, iterations, elapsed)?;
             }
         }
         let after = decide_group_batch(view, items, b"terminal-bench-entry", limits)?;
@@ -358,4 +349,35 @@ fn run_case(profile: usize, measure: bool) -> Result<(), Box<dyn Error>> {
         assert_eq!(command, &command_before);
         Ok(())
     })
+}
+
+fn print_sample(
+    name: &str,
+    sample: usize,
+    iterations: usize,
+    elapsed: Duration,
+) -> Result<(), Box<dyn Error>> {
+    if elapsed.is_zero() {
+        return Err("zero-duration terminal sample; discard this measurement".into());
+    }
+    println!(
+        "profile={} sample={sample} iterations={iterations} elapsed_ns={}",
+        name,
+        elapsed.as_nanos()
+    );
+    Ok(())
+}
+
+fn validate_terminal_record(record: &WorkflowRecord, kind: EventKind, state: &[u8]) {
+    assert_eq!(record.id().as_bytes(), b"terminal-bench");
+    assert_eq!(record.workflow_type(), b"job");
+    assert_eq!(record.state(), state);
+    let scalars = (record.version(), record.fence().get(), record.attempts());
+    assert_eq!(scalars, (3, 1, 0));
+    let times = (record.created_at().get(), record.updated_at().get());
+    assert_eq!(times, (1_000, 2_050));
+    assert_eq!(record.next_run_at(), None);
+    assert_eq!(record.run_state(), Some(b"queued".as_slice()));
+    assert!(record.lease().is_none());
+    assert_eq!(record.latest_event_witness(), (kind, 3, Fence::new(1)));
 }

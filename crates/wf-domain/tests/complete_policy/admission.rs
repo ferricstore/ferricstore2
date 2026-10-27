@@ -100,21 +100,7 @@ fn opaque_names_and_canonical_metadata_keep_separate_rules() -> TestResult {
                 format!("x{ch}"),
                 format!("x{ch}y"),
             ] {
-                let valid = key.starts_with('x') && key.ends_with('y');
-                let mut value = data(vec![b'r'], None, BTreeMap::new());
-                if metadata {
-                    value.indexed_state_meta = Some(key.as_bytes().to_vec());
-                } else {
-                    value.indexed_attributes = Some(vec![key.as_bytes().to_vec()]);
-                }
-                let mut charge = PolicySchemaCharge::new(profile);
-                let result = restore_complete_policy(1, value, profile, &mut charge);
-                let error = if metadata {
-                    PolicySchemaError::InvalidIndexedStateMeta
-                } else {
-                    PolicySchemaError::InvalidIndexedAttributes
-                };
-                assert_eq!(result.err(), (!valid).then_some(error));
+                check_metadata_name(profile, metadata, &key);
             }
         }
         check_metadata_owners(profile, metadata)?;
@@ -536,4 +522,22 @@ fn check_rule_counts_and_names(profile: PolicySchemaLimits) {
             error
         );
     }
+}
+
+fn check_metadata_name(profile: PolicySchemaLimits, metadata: bool, key: &str) {
+    let valid = key.starts_with('x') && key.ends_with('y');
+    let mut value = data(vec![b'r'], None, BTreeMap::new());
+    if metadata {
+        value.indexed_state_meta = Some(key.as_bytes().to_vec());
+    } else {
+        value.indexed_attributes = Some(vec![key.as_bytes().to_vec()]);
+    }
+    let mut charge = PolicySchemaCharge::new(profile);
+    let result = restore_complete_policy(1, value, profile, &mut charge);
+    let error = if metadata {
+        PolicySchemaError::InvalidIndexedStateMeta
+    } else {
+        PolicySchemaError::InvalidIndexedAttributes
+    };
+    assert_eq!(result.err(), (!valid).then_some(error));
 }

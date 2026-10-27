@@ -207,11 +207,11 @@ fn core_patch_pays_semantic_copy_and_keeps_one_nonrollback_account() -> TestResu
                 (first.as_ref(), 2),
                 (next.as_ref(), generation),
             ])?;
-            if let Some(next) = next {
+            if let Some(next) = &next {
                 assert_eq!(next.data().workflow_type.as_ptr(), descriptor);
-                if index == 0 {
-                    first = Some(next);
-                }
+            }
+            if index == 0 {
+                first = next;
             }
             let delta = if has_base { 8_122 } else { 3_836 };
             let g = if refused {
@@ -263,15 +263,13 @@ fn core_patch_merges_backoff_without_expanding_omitted_overrides() -> TestResult
     for state_level in [false, true] {
         for case in 0..6 {
             let mut original = preserved_core_patch_data();
+            let backoff = (case == 0).then_some(previous);
+            let exhausted_to = (case == 3).then(|| b"dead".to_vec());
             let retry = if matches!(case, 0 | 3 | 5) {
                 Some(RetryOverride {
                     max_retries: Some(7),
-                    backoff: if case == 0 { Some(previous) } else { None },
-                    exhausted_to: if case == 3 {
-                        Some(b"dead".to_vec())
-                    } else {
-                        None
-                    },
+                    backoff,
+                    exhausted_to,
                 })
             } else {
                 None

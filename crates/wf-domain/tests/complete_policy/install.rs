@@ -364,88 +364,85 @@ fn complete_replace_rechecks_current_type_bytes_and_generation() -> TestResult {
 #[test]
 fn complete_replace_keeps_one_nonrollback_schema_account() -> TestResult {
     for maximum in [13_167, 13_166] {
-        let profile = limits(maximum)?;
-        let mut charge = PolicySchemaCharge::new(profile);
-        let first = prepare_complete_policy_replace(
-            None,
-            0,
-            None,
-            data(b"r".to_vec(), None, BTreeMap::new()),
-            profile,
-            &mut charge,
-        )?;
-        assert_eq!((charge.g(), charge.p()), (2_684, 0));
-        let second = prepare_complete_policy_replace(
-            Some(first.value()),
-            0,
-            Some(1),
-            data(b"r".to_vec(), None, BTreeMap::new()),
-            profile,
-            &mut charge,
-        )?;
-        assert_eq!((charge.g(), charge.p()), (7_925, 0));
-        assert_eq!(first.value().generation(), 1);
-        assert_eq!(second.value().generation(), 2);
-        assert_eq!(second.expected_generation(), Some(1));
-        assert!(first.value().data() == &data(b"r".to_vec(), None, BTreeMap::new()));
-        assert!(second.value().data() == &data(b"r".to_vec(), None, BTreeMap::new()));
-        let result = decide_complete_policy_replace(
-            Some(first.value()),
-            0,
-            b"r",
-            &second,
-            profile,
-            &mut charge,
-        );
-        match result {
-            Ok(plan) => {
-                assert_eq!(maximum, 13_167);
-                assert_eq!((charge.g(), charge.p()), (13_167, 0));
-                assert_eq!(plan.expected_generation(), 1);
-                assert_eq!(plan.value().generation(), 2);
-                assert!(plan.value().data() == &data(b"r".to_vec(), None, BTreeMap::new()));
-                assert_eq!(plan.value().encoded(), second.value().encoded());
-                assert!(std::ptr::eq(plan.value(), second.value()));
-            }
-            Err(error) => {
-                assert_eq!(maximum, 13_166);
-                assert_eq!(
-                    error,
-                    Schema(WorkBytes {
-                        bytes: 13_167,
-                        maximum: 13_166
-                    })
-                );
-                assert_eq!((charge.g(), charge.p()), (13_165, 0));
-            }
-        }
-        let before = (charge.g(), charge.p());
-        let result = decide_complete_policy_replace(
-            Some(first.value()),
-            0,
-            b"r",
-            &second,
-            profile,
-            &mut charge,
-        );
-        assert!(
-            matches!(result, Err(Schema(WorkBytes { bytes, maximum: cap }))
-            if bytes == before.0 + 128 && cap == maximum)
-        );
-        assert_eq!((charge.g(), charge.p()), before);
-        let other = limits(maximum + 1)?;
-        let result = decide_complete_policy_replace(
-            Some(first.value()),
-            0,
-            b"r",
-            &second,
-            other,
-            &mut charge,
-        );
-        assert!(matches!(result, Err(Schema(ProfileMismatch))));
-        assert_eq!((charge.g(), charge.p()), before);
+        assert_nonrollback_account(maximum)?;
     }
     assert_replacement_scratch_and_scalar_refusal()?;
+    Ok(())
+}
+
+fn assert_nonrollback_account(maximum: u64) -> TestResult {
+    let profile = limits(maximum)?;
+    let mut charge = PolicySchemaCharge::new(profile);
+    let first = prepare_complete_policy_replace(
+        None,
+        0,
+        None,
+        data(b"r".to_vec(), None, BTreeMap::new()),
+        profile,
+        &mut charge,
+    )?;
+    assert_eq!((charge.g(), charge.p()), (2_684, 0));
+    let second = prepare_complete_policy_replace(
+        Some(first.value()),
+        0,
+        Some(1),
+        data(b"r".to_vec(), None, BTreeMap::new()),
+        profile,
+        &mut charge,
+    )?;
+    assert_eq!((charge.g(), charge.p()), (7_925, 0));
+    assert_eq!(first.value().generation(), 1);
+    assert_eq!(second.value().generation(), 2);
+    assert_eq!(second.expected_generation(), Some(1));
+    assert!(first.value().data() == &data(b"r".to_vec(), None, BTreeMap::new()));
+    assert!(second.value().data() == &data(b"r".to_vec(), None, BTreeMap::new()));
+    let result =
+        decide_complete_policy_replace(Some(first.value()), 0, b"r", &second, profile, &mut charge);
+    match result {
+        Ok(plan) => {
+            assert_eq!(maximum, 13_167);
+            assert_eq!((charge.g(), charge.p()), (13_167, 0));
+            assert_eq!(plan.expected_generation(), 1);
+            assert_eq!(plan.value().generation(), 2);
+            assert!(plan.value().data() == &data(b"r".to_vec(), None, BTreeMap::new()));
+            assert_eq!(plan.value().encoded(), second.value().encoded());
+            assert!(std::ptr::eq(plan.value(), second.value()));
+        }
+        Err(error) => {
+            assert_eq!(maximum, 13_166);
+            assert_eq!(
+                error,
+                Schema(WorkBytes {
+                    bytes: 13_167,
+                    maximum: 13_166
+                })
+            );
+            assert_eq!((charge.g(), charge.p()), (13_165, 0));
+        }
+    }
+    assert_replacement_refusals(&first, &second, profile, &mut charge, maximum)
+}
+
+fn assert_replacement_refusals(
+    first: &wf_domain::policy::complete::PreparedCompletePolicyReplace,
+    second: &wf_domain::policy::complete::PreparedCompletePolicyReplace,
+    profile: wf_domain::policy::complete::PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    maximum: u64,
+) -> TestResult {
+    let before = (charge.g(), charge.p());
+    let result =
+        decide_complete_policy_replace(Some(first.value()), 0, b"r", second, profile, charge);
+    assert!(
+        matches!(result, Err(Schema(WorkBytes { bytes, maximum: cap }))
+        if bytes == before.0 + 128 && cap == maximum)
+    );
+    assert_eq!((charge.g(), charge.p()), before);
+    let other = limits(maximum + 1)?;
+    let result =
+        decide_complete_policy_replace(Some(first.value()), 0, b"r", second, other, charge);
+    assert!(matches!(result, Err(Schema(ProfileMismatch))));
+    assert_eq!((charge.g(), charge.p()), before);
     Ok(())
 }
 

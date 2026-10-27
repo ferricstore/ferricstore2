@@ -391,7 +391,10 @@ fn assert_complete_owner_values(value: &CompletePolicyData) -> TestResult {
     assert!(value.states.is_empty());
     assert_eq!(value.indexed_attributes, Some(vec![b"priority".to_vec()]));
     assert_eq!(value.indexed_state_meta, Some(b"tag".to_vec()));
-    let gov = value.governance.as_ref().ok_or("governance")?;
+    assert_complete_governance(value.governance.as_ref().ok_or("governance")?)
+}
+
+fn assert_complete_governance(gov: &GovernanceData) -> TestResult {
     let effect = gov.effects.as_ref().ok_or("effects")?;
     let budget = gov
         .budgets
@@ -507,7 +510,24 @@ fn assert_complete_state(
                 lease_size: None,
             }
     );
-    let other = &restored.data().states[b"other".as_slice()];
+    assert_other_state(restored.data())?;
+    assert_eq!(name.as_ptr(), state_owner);
+    assert_eq!(
+        state
+            .retry
+            .as_ref()
+            .ok_or("retry")?
+            .exhausted_to
+            .as_ref()
+            .ok_or("target")?
+            .as_ptr(),
+        target_owner
+    );
+    Ok(())
+}
+
+fn assert_other_state(data: &CompletePolicyData) -> TestResult {
+    let other = &data.states[b"other".as_slice()];
     assert_eq!(other.mode, None);
     let retry = other.retry.as_ref().ok_or("other retry")?;
     assert_eq!(retry.max_retries, None);
@@ -521,17 +541,5 @@ fn assert_complete_state(
     assert!(gov.budgets.is_none());
     assert!(gov.circuits.is_none());
     assert!(gov.approvals.is_none());
-    assert_eq!(name.as_ptr(), state_owner);
-    assert_eq!(
-        state
-            .retry
-            .as_ref()
-            .ok_or("retry")?
-            .exhausted_to
-            .as_ref()
-            .ok_or("target")?
-            .as_ptr(),
-        target_owner
-    );
     Ok(())
 }

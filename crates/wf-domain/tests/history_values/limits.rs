@@ -228,6 +228,14 @@ fn history_values_admits_read_owners_patch_spines_and_per_occurrence_copies() ->
             assert!(matches!(applied, Err(E::Limit)));
         }
     }
+    assert_history_capacities(&history, limits, full)
+}
+
+fn assert_history_capacities(
+    history: &[super::HistoryValueEntry<'_, &str>],
+    limits: HistoryValueLimits,
+    full: usize,
+) -> TestResult {
     let mut spare = Vec::with_capacity(full.checked_add(1).ok_or("incoming capacity bound")?);
     spare.extend_from_slice(b"x");
     let bounded = HistoryValueLimits {
@@ -235,7 +243,7 @@ fn history_values_admits_read_owners_patch_spines_and_per_occurrence_copies() ->
         ..limits
     };
     assert!(spare.capacity() > bounded.maximum_requested_bytes);
-    let prepared = prepare_history_values(&history, Return::Enabled { max_bytes: 1 }, bounded);
+    let prepared = prepare_history_values(history, Return::Enabled { max_bytes: 1 }, bounded);
     assert!(prepared.is_ok(), "{:?}", prepared.as_ref().err());
     assert!(matches!(
         apply_history_value_results(
@@ -253,7 +261,7 @@ fn history_values_admits_read_owners_patch_spines_and_per_occurrence_copies() ->
         ..limits
     };
     assert!(values.capacity() * size_of::<R<'_>>() > bounded.maximum_requested_bytes);
-    let prepared = prepare_history_values(&history, Return::Enabled { max_bytes: 1 }, bounded);
+    let prepared = prepare_history_values(history, Return::Enabled { max_bytes: 1 }, bounded);
     assert!(prepared.is_ok(), "{:?}", prepared.as_ref().err());
     assert!(matches!(
         apply_history_value_results(prepared?, Some(B::Values(values)), &f::context()),
@@ -264,7 +272,7 @@ fn history_values_admits_read_owners_patch_spines_and_per_occurrence_copies() ->
             maximum_writes: maximum,
             ..limits
         };
-        let prepared = prepare_history_values(&history, Return::Enabled { max_bytes: 1 }, bounded);
+        let prepared = prepare_history_values(history, Return::Enabled { max_bytes: 1 }, bounded);
         assert!(prepared.is_ok(), "{:?}", prepared.as_ref().err());
         let applied = apply_history_value_results(
             prepared?,

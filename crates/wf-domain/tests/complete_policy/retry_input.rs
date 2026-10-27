@@ -430,27 +430,34 @@ fn retry_input_reconstructs_original_normalize_cases_before_timing() -> TestResu
         .get();
     assert!((1_000..=1_250).contains(&time));
     let mut count = 0;
-    for kind in ["none", "fixed", "linear", "exponential"] {
-        for base in [0, 1, 100, 60_000, 2_592_000_000] {
-            for maximum in [0, 1, 50, 1_000, 2_592_000_000] {
-                for jitter in [0, 25, 100] {
-                    for attempt in [0, 1, 2, 3, 10, 1_000] {
-                        let raw = backoff(kind, base, maximum, jitter);
-                        let policy = full(
-                            &Raw::Keyword(&fields(&raw, 1_000, b"failed")),
-                            profile,
-                            &mut charge,
-                        )?;
-                        let now = TimestampMillis::new(123_456);
-                        let sample = JitterSample::new(42_731_729);
-                        let first = policy.next_run_at(now, attempt, sample)?;
-                        let second = policy.next_run_at(now, attempt, sample)?;
-                        assert_eq!(first, second);
-                        assert!(first >= now);
-                        assert!(first.get() <= 123_456 + u64::try_from(maximum)?);
-                        count += 1;
-                    }
-                }
+    let cases = ["none", "fixed", "linear", "exponential"]
+        .into_iter()
+        .flat_map(|kind| {
+            [0, 1, 100, 60_000, 2_592_000_000]
+                .into_iter()
+                .flat_map(move |base| {
+                    [0, 1, 50, 1_000, 2_592_000_000]
+                        .into_iter()
+                        .map(move |maximum| (kind, base, maximum))
+                })
+        });
+    for (kind, base, maximum) in cases {
+        for jitter in [0, 25, 100] {
+            for attempt in [0, 1, 2, 3, 10, 1_000] {
+                let raw = backoff(kind, base, maximum, jitter);
+                let policy = full(
+                    &Raw::Keyword(&fields(&raw, 1_000, b"failed")),
+                    profile,
+                    &mut charge,
+                )?;
+                let now = TimestampMillis::new(123_456);
+                let sample = JitterSample::new(42_731_729);
+                let first = policy.next_run_at(now, attempt, sample)?;
+                let second = policy.next_run_at(now, attempt, sample)?;
+                assert_eq!(first, second);
+                assert!(first >= now);
+                assert!(first.get() <= 123_456 + u64::try_from(maximum)?);
+                count += 1;
             }
         }
     }

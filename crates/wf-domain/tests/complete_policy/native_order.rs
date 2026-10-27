@@ -197,11 +197,7 @@ fn binary_named_maps_cross_32_33_and_shrink() -> TestResult {
         let names = names(count);
         for adjacent in order.windows(2) {
             for swap in [false, true] {
-                let wrong = if swap {
-                    (adjacent[1], adjacent[0])
-                } else {
-                    (adjacent[0], adjacent[1])
-                };
+                let wrong = (adjacent[usize::from(swap)], adjacent[usize::from(!swap)]);
                 state_failure(&state_policy(&names, wrong)?, Raw::List(&[]), &empty, !swap)?;
             }
         }

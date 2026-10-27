@@ -409,30 +409,31 @@ pub(super) fn assert_governance_enum_neighbors() -> TestResult {
             snapshot(b"r", &[("governance", map(&[("limits", expected)])?)])?
         );
     }
-    for (name, accepted) in [
+    let modes = [
         ("mode", &["minimal", "ledger", "full"][..]),
         ("denials", &["off", "sampled", "all"][..]),
-    ] {
-        for &value in accepted {
-            let uppercase = value.to_ascii_uppercase();
-            for raw in [Raw::Atom(value), Raw::Binary(uppercase.as_bytes())] {
-                let fields = [(Raw::Atom(name), raw)];
-                let audit = [(Raw::Atom("audit"), Raw::Map(&fields))];
-                let group = if name == "mode" {
-                    Raw::Map(&fields)
-                } else {
-                    Raw::Map(&audit)
-                };
-                let expected = if name == "mode" {
-                    map(&[("mode", atom(value)?)])?
-                } else {
-                    map(&[("audit", map(&[("denials", atom(value)?)])?)])?
-                };
-                assert_eq!(
-                    success(&Raw::Map(&[(Raw::Atom("governance"), group)]))?,
-                    snapshot(b"r", &[("governance", expected)])?
-                );
-            }
+    ]
+    .into_iter()
+    .flat_map(|(name, accepted)| accepted.iter().map(move |&value| (name, value)));
+    for (name, value) in modes {
+        let uppercase = value.to_ascii_uppercase();
+        for raw in [Raw::Atom(value), Raw::Binary(uppercase.as_bytes())] {
+            let fields = [(Raw::Atom(name), raw)];
+            let audit = [(Raw::Atom("audit"), Raw::Map(&fields))];
+            let group = if name == "mode" {
+                Raw::Map(&fields)
+            } else {
+                Raw::Map(&audit)
+            };
+            let expected = if name == "mode" {
+                map(&[("mode", atom(value)?)])?
+            } else {
+                map(&[("audit", map(&[("denials", atom(value)?)])?)])?
+            };
+            assert_eq!(
+                success(&Raw::Map(&[(Raw::Atom("governance"), group)]))?,
+                snapshot(b"r", &[("governance", expected)])?
+            );
         }
     }
     for bad in [

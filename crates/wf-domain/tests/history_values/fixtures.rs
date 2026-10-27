@@ -109,6 +109,10 @@ pub(super) fn assert_compound(document: &OriginalValueDocument) -> TestResult {
         assert!(matches!(document.node(pair[0]), Some(N::Atom { bytes, .. })
             if document.byte_range(bytes.clone()) == Some(key)));
     }
+    assert_compound_values(document, ids)
+}
+
+fn assert_compound_values(document: &OriginalValueDocument, ids: &[usize]) -> TestResult {
     assert!(matches!(document.node(ids[1]), Some(N::Atom { bytes, .. })
         if document.byte_range(bytes.clone()) == Some(b"ok".as_slice())));
     assert!(matches!(document.node(ids[3]), Some(N::Binary { bytes })

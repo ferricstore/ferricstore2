@@ -147,40 +147,56 @@ pub(super) fn check_blocked_head_admission(
                         AdmissionLimits::new(inline, 64 * 1_048_576, 1)?,
                         ClaimWorkLimits::new(maximum)?,
                     );
-                    if invalid_value {
-                        assert!(matches!(result, Err(ApplyError::InvalidAuthority)));
-                    } else {
-                        let plan = result?;
-                        let expected = if state.len() > 65_535 {
-                            Some(ClaimRejection::ValueTooLarge {
-                                bytes: 65_536,
-                                maximum: 65_535,
-                            })
-                        } else {
-                            expected_bytes.map(|bytes| ClaimRejection::WorkBytes { bytes, maximum })
-                        };
-                        match (plan.decision(), expected) {
-                            (DispatchDecision::Fresh(ClaimDecision::Accepted(claim)), None) => {
-                                assert!(claim.batch().is_none());
-                                assert_eq!(
-                                    (claim.head_reads(), claim.scanned(), claim.stop()),
-                                    (1, 1, SelectionStop::Complete)
-                                );
-                                assert!(plan.requires_outcome_write());
-                            }
-                            (
-                                DispatchDecision::Fresh(ClaimDecision::Rejected(actual)),
-                                Some(expected),
-                            ) => assert_eq!(*actual, expected),
-                            _ => return Err("blocked FIFO head boundary failed".into()),
-                        }
-                    }
+                    assert_blocked_head_result(
+                        result,
+                        state,
+                        maximum,
+                        expected_bytes,
+                        invalid_value,
+                    )?;
                 }
                 Ok(())
             },
         )?;
         assert_eq!(record, before);
         assert_eq!(record.lease_deadline(), TimestampMillis::new(100));
+    }
+    Ok(())
+}
+
+fn assert_blocked_head_result(
+    result: Result<wf_domain::workflow::request::DispatchPlan<'_, ClaimDecision<'_>>, ApplyError>,
+    state: &[u8],
+    maximum: u64,
+    expected_bytes: Option<u64>,
+    invalid_value: bool,
+) -> TestResult {
+    if invalid_value {
+        assert!(matches!(result, Err(ApplyError::InvalidAuthority)));
+    } else {
+        let plan = result?;
+        let expected = if state.len() > 65_535 {
+            Some(ClaimRejection::ValueTooLarge {
+                bytes: 65_536,
+                maximum: 65_535,
+            })
+        } else {
+            expected_bytes.map(|bytes| ClaimRejection::WorkBytes { bytes, maximum })
+        };
+        match (plan.decision(), expected) {
+            (DispatchDecision::Fresh(ClaimDecision::Accepted(claim)), None) => {
+                assert!(claim.batch().is_none());
+                assert_eq!(
+                    (claim.head_reads(), claim.scanned(), claim.stop()),
+                    (1, 1, SelectionStop::Complete)
+                );
+                assert!(plan.requires_outcome_write());
+            }
+            (DispatchDecision::Fresh(ClaimDecision::Rejected(actual)), Some(expected)) => {
+                assert_eq!(*actual, expected);
+            }
+            _ => return Err("blocked FIFO head boundary failed".into()),
+        }
     }
     Ok(())
 }

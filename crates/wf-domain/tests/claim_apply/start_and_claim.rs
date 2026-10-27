@@ -471,20 +471,7 @@ fn atomic_start_admits_generated_token_before_plan() -> TestResult {
                     );
                 } else {
                     assert!(matches!(&actual, BatchDecision::Accepted(_)), "{actual:?}");
-                    let BatchDecision::Accepted(plan) = actual else {
-                        return Err("valid custom-cap atomic start rejected".into());
-                    };
-                    assert_eq!(plan.items().len(), 1);
-                    let changed = plan.items()[0].plan();
-                    assert_eq!(changed.outcome(), Outcome::Changed);
-                    let write = changed.write().ok_or("custom-cap atomic write absent")?;
-                    let history = changed
-                        .history()
-                        .ok_or("custom-cap atomic history absent")?;
-                    assert_eq!(write.expected_version, None);
-                    assert_eq!(history.kind, EventKind::Created);
-                    assert_eq!(write.record.state(), b"running");
-                    assert_eq!(write.record.fence().get(), 1);
+                    assert_custom_cap_start(actual)?;
                 }
                 assert_eq!(command, retained);
             }
@@ -583,5 +570,23 @@ fn atomic_start_preserves_scalar_and_duplicate_error_order() -> TestResult {
         },
     )?;
     assert!(rows.is_empty() && fifo.is_empty() && parallel.is_empty());
+    Ok(())
+}
+
+fn assert_custom_cap_start(actual: BatchDecision) -> TestResult {
+    let BatchDecision::Accepted(plan) = actual else {
+        return Err("valid custom-cap atomic start rejected".into());
+    };
+    assert_eq!(plan.items().len(), 1);
+    let changed = plan.items()[0].plan();
+    assert_eq!(changed.outcome(), Outcome::Changed);
+    let write = changed.write().ok_or("custom-cap atomic write absent")?;
+    let history = changed
+        .history()
+        .ok_or("custom-cap atomic history absent")?;
+    assert_eq!(write.expected_version, None);
+    assert_eq!(history.kind, EventKind::Created);
+    assert_eq!(write.record.state(), b"running");
+    assert_eq!(write.record.fence().get(), 1);
     Ok(())
 }

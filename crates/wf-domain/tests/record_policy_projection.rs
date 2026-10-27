@@ -66,20 +66,7 @@ fn record_policy_projection_preserves_mode_retry_and_generation()
     assert_eq!(std::ptr::from_ref(value.data()), data_address);
     assert_eq!(value.encoded().as_ptr(), bytes_address);
     assert_eq!(value.encoded(), encoded);
-    let data = value.data();
-    assert_eq!(data.version, Some(PolicyVersion::Number(u64::MAX)));
-    assert_eq!(data.max_active_ms, Some(31_536_000_000));
-    assert!(data.retention.is_some());
-    assert_eq!(data.indexed_attributes.as_deref(), Some([].as_slice()));
-    assert_eq!(
-        data.indexed_state_meta.as_deref(),
-        Some(b"phase".as_slice())
-    );
-    assert!(data.governance.is_some());
-    let state = data.states.get(b"q".as_slice()).ok_or("state missing")?;
-    assert!(state.retry.is_some());
-    assert!(state.retention.is_some());
-    assert!(state.governance.is_some());
+    assert_rich_backing(value.data())?;
     drop(value);
     drop(encoded);
     assert_eq!(mode.policy().state_mode(b"q"), StateMode::Fifo);
@@ -200,5 +187,22 @@ fn record_policy_projection_admits_exact_bytes_and_preserves_backing()
     };
     assert_eq!(version.len(), 262_117);
     assert!(version.iter().all(|byte| *byte == 0));
+    Ok(())
+}
+
+fn assert_rich_backing(data: &CompletePolicyData) -> Result<(), Box<dyn std::error::Error>> {
+    assert_eq!(data.version, Some(PolicyVersion::Number(u64::MAX)));
+    assert_eq!(data.max_active_ms, Some(31_536_000_000));
+    assert!(data.retention.is_some());
+    assert_eq!(data.indexed_attributes.as_deref(), Some([].as_slice()));
+    assert_eq!(
+        data.indexed_state_meta.as_deref(),
+        Some(b"phase".as_slice())
+    );
+    assert!(data.governance.is_some());
+    let state = data.states.get(b"q".as_slice()).ok_or("state missing")?;
+    assert!(state.retry.is_some());
+    assert!(state.retention.is_some());
+    assert!(state.governance.is_some());
     Ok(())
 }

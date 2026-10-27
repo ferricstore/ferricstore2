@@ -502,9 +502,7 @@ fn original_flow_input_preserves_continuous_work_and_held_owners() -> TestResult
             } else {
                 let bytes = actual?.map_err(|reason| format!("unexpected {reason:?}"))?;
                 assert_eq!(bytes, expected);
-                if first.is_none() {
-                    first = Some(bytes);
-                }
+                first.get_or_insert(bytes);
             }
             if let Some(bytes) = &first {
                 assert_eq!(bytes, &expected);

@@ -130,6 +130,10 @@ fn keyword_lease_validation_and_shape_guards_preserve_error_order() {
             }
         }
     }
+    assert_keyword_lease_shapes();
+}
+
+fn assert_keyword_lease_shapes() {
     for lease in [Other, Binary(b""), Nil, Binary(b"lease")] {
         let parts = [
             Atom("id"),

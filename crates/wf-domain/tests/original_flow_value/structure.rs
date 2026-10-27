@@ -204,29 +204,33 @@ fn assert_compound(document: &D) {
                 && matches!(document.node(*tail), Some(N::Atom { bytes, .. })
                     if document.byte_range(bytes.clone()) == Some(b"tail".as_slice())))
         );
-        let mut magnitude = [0; 26];
-        magnitude[0] = 5;
-        magnitude[25] = 1;
-        assert!(
-            matches!(document.node(ids[11]), Some(N::BigInteger { negative: false, digits })
-            if document.byte_range(digits.clone()) == Some(magnitude.as_slice()))
-        );
-        assert!(matches!(document.node(ids[13]), Some(N::Map { entries })
-            if document.edge_range(entries.clone()).is_some_and(|pairs| matches!(pairs, [key, value]
-                if matches!(document.node(*key), Some(N::Binary { bytes })
-                    if document.byte_range(bytes.clone()) == Some(b"k".as_slice()))
-                    && matches!(document.node(*value), Some(N::List { heads, tail })
-                        if matches!(document.node(*tail), Some(N::EmptyList))
-                            && document.edge_range(heads.clone()).is_some_and(|heads| matches!(heads, [one, truth, nil]
-                                if matches!(document.node(*one), Some(N::Integer(1)))
-                                    && matches!(document.node(*truth), Some(N::Atom { bytes, .. })
-                                        if document.byte_range(bytes.clone()) == Some(b"true".as_slice()))
-                                    && matches!(document.node(*nil), Some(N::Atom { bytes, .. })
-                                        if document.byte_range(bytes.clone()) == Some(b"nil".as_slice())))))))));
-        assert!(matches!(document.node(ids[15]), Some(N::Tuple { children })
-            if document.edge_range(children.clone()).is_some_and(|children| matches!(children, [binary, integer]
-                if matches!(document.node(*binary), Some(N::Binary { bytes })
-                    if document.byte_range(bytes.clone()) == Some(b"x".as_slice()))
-                    && matches!(document.node(*integer), Some(N::Integer(-9)))))));
+        assert_compound_tail(document, ids);
     }
+}
+
+fn assert_compound_tail(document: &D, ids: &[usize]) {
+    let mut magnitude = [0; 26];
+    magnitude[0] = 5;
+    magnitude[25] = 1;
+    assert!(
+        matches!(document.node(ids[11]), Some(N::BigInteger { negative: false, digits })
+        if document.byte_range(digits.clone()) == Some(magnitude.as_slice()))
+    );
+    assert!(matches!(document.node(ids[13]), Some(N::Map { entries })
+        if document.edge_range(entries.clone()).is_some_and(|pairs| matches!(pairs, [key, value]
+            if matches!(document.node(*key), Some(N::Binary { bytes })
+                if document.byte_range(bytes.clone()) == Some(b"k".as_slice()))
+                && matches!(document.node(*value), Some(N::List { heads, tail })
+                    if matches!(document.node(*tail), Some(N::EmptyList))
+                        && document.edge_range(heads.clone()).is_some_and(|heads| matches!(heads, [one, truth, nil]
+                            if matches!(document.node(*one), Some(N::Integer(1)))
+                                && matches!(document.node(*truth), Some(N::Atom { bytes, .. })
+                                    if document.byte_range(bytes.clone()) == Some(b"true".as_slice()))
+                                && matches!(document.node(*nil), Some(N::Atom { bytes, .. })
+                                    if document.byte_range(bytes.clone()) == Some(b"nil".as_slice())))))))));
+    assert!(matches!(document.node(ids[15]), Some(N::Tuple { children })
+        if document.edge_range(children.clone()).is_some_and(|children| matches!(children, [binary, integer]
+            if matches!(document.node(*binary), Some(N::Binary { bytes })
+                if document.byte_range(bytes.clone()) == Some(b"x".as_slice()))
+                && matches!(document.node(*integer), Some(N::Integer(-9)))))));
 }

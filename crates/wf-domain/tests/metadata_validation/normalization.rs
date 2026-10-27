@@ -4,6 +4,12 @@ use super::{A, E, I, S, attrs, states, valid_attrs, valid_list, valid_scalar};
 
 #[test]
 fn metadata_names_preserve_unicode_trim_errors_and_reserved_rules() {
+    unicode_whitespace_is_trimmed();
+    other_marks_are_preserved();
+    name_errors_and_boundaries();
+}
+
+fn unicode_whitespace_is_trimmed() {
     for space in [
         '\u{9}', '\u{a}', '\u{b}', '\u{c}', '\u{d}', ' ', '\u{85}', '\u{a0}', '\u{1680}',
         '\u{2000}', '\u{2001}', '\u{2002}', '\u{2003}', '\u{2004}', '\u{2005}', '\u{2006}',
@@ -27,6 +33,9 @@ fn metadata_names_preserve_unicode_trim_errors_and_reserved_rules() {
             if out.states.len() == 1 && out.states[0].1.len() == 1 && out.states[0].1[0].0 == "k")
         );
     }
+}
+
+fn other_marks_are_preserved() {
     for mark in ['\u{feff}', '\u{200b}', '\u{180e}', '\u{2060}'] {
         let name = format!("{mark}k{mark}");
         let rows = [(I::Binary(name.as_bytes()), I::Binary(b"v"))];
@@ -35,6 +44,9 @@ fn metadata_names_preserve_unicode_trim_errors_and_reserved_rules() {
             matches!(attrs(I::Map(&rows)), Ok(out) if out.entries.len() == 1 && out.entries[0].0 == name)
         );
     }
+}
+
+fn name_errors_and_boundaries() {
     for (name, error) in [
         (b" ".as_slice(), "ERR flow attribute key must not be empty"),
         (b"__x".as_slice(), "ERR flow attribute key is reserved"),
@@ -235,6 +247,12 @@ fn state_metadata_collisions_replace_whole_inner_maps() {
 
 #[test]
 fn metadata_list_classes_preserve_improper_argument_error_and_guard_refusal() {
+    improper_lists_raise_or_refuse();
+    proper_list_boundaries();
+    scalar_and_root_classes();
+}
+
+fn improper_lists_raise_or_refuse() {
     let tail = I::Nil;
     for prefix in [&[I::Binary(b"one")][..], &[I::Binary(b"one"); 17][..]] {
         let improper = I::ImproperList {
@@ -262,6 +280,9 @@ fn metadata_list_classes_preserve_improper_argument_error_and_guard_refusal() {
             ))
         ));
     }
+}
+
+fn proper_list_boundaries() {
     assert!(matches!(
         attrs(I::Map(&[(I::Binary(b"k"), I::List(&[]))])),
         Err(E::SourceReturned(
@@ -291,6 +312,9 @@ fn metadata_list_classes_preserve_improper_argument_error_and_guard_refusal() {
         if out.entries.len() == 1 && matches!(&out.entries[0].1, A::List(values)
             if values.len() == 16 && values[0] == b"00" && values[15] == b"15"))
     );
+}
+
+fn scalar_and_root_classes() {
     let x256 = [b'x'; 256];
     assert!(
         matches!(attrs(I::Map(&[(I::Binary(b"k"), I::Binary(&x256))])), Ok(out)

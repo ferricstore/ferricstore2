@@ -43,14 +43,7 @@ fn dense_map() -> Vec<(Raw<'static>, Raw<'static>)> {
 #[test]
 fn create_map_options_follow_source_prepend_order() {
     for binary_keys in [false, true] {
-        let mut rows = dense_map();
-        if binary_keys {
-            for (key, _) in &mut rows {
-                if let Atom(name) = key {
-                    *key = Binary(name.as_bytes());
-                }
-            }
-        }
+        let rows = map_rows(binary_keys);
         let item = Map(&rows);
         let expected = [
             ("history_max_events", &rows[21].1),
@@ -126,14 +119,7 @@ fn create_map_options_follow_source_prepend_order() {
 fn terminal_map_option_groups_preserve_source_order() {
     let lease = Some(b"l".as_slice());
     for binary_keys in [false, true] {
-        let mut rows = dense_map();
-        if binary_keys {
-            for (key, _) in &mut rows {
-                if let Atom(name) = key {
-                    *key = Binary(name.as_bytes());
-                }
-            }
-        }
+        let rows = map_rows(binary_keys);
         let item = Map(&rows);
         let expected = [
             ("fencing_token", &rows[2].1),
@@ -223,14 +209,7 @@ fn terminal_map_option_groups_preserve_source_order() {
 #[test]
 fn cancel_transition_map_and_flat_lease_presence_remain_distinct() {
     for binary_keys in [false, true] {
-        let mut rows = dense_map();
-        if binary_keys {
-            for (key, _) in &mut rows {
-                if let Atom(name) = key {
-                    *key = Binary(name.as_bytes());
-                }
-            }
-        }
+        let rows = map_rows(binary_keys);
         let item = Map(&rows);
         let expected = [
             ("fencing_token", &rows[2].1),
@@ -303,4 +282,16 @@ fn cancel_transition_map_and_flat_lease_presence_remain_distinct() {
         let parts = [Atom("id"), Binary(b"id"), label, Other];
         assert!(matches!(many::cancel(&Tuple(&parts)), Err(Id)));
     }
+}
+
+fn map_rows(binary_keys: bool) -> Vec<(Raw<'static>, Raw<'static>)> {
+    let mut rows = dense_map();
+    if binary_keys {
+        for (key, _) in &mut rows {
+            if let Atom(name) = key {
+                *key = Binary(name.as_bytes());
+            }
+        }
+    }
+    rows
 }

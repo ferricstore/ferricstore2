@@ -172,31 +172,32 @@ fn assert_priority_neighbors(
         ("ttl_ms", 0, Reason::Ttl),
         ("history_max_events", 18, Reason::History { maximum: 17 }),
     ] {
-        for (atom, binary, accepted) in [
+        let cases = [
             (Raw::Integer(1), Raw::Nil, true),
             (Raw::Integer(1), Raw::Integer(bad), true),
             (Raw::Integer(bad), Raw::Integer(1), false),
-        ] {
-            for reversed in [false, true] {
-                let mut rows = [
-                    (Key::Atom(name), atom),
-                    (Key::Binary(name.as_bytes()), binary),
-                ];
-                if reversed {
-                    rows.reverse();
-                }
-                let actual = normalize(&Raw::Map(&rows), 17, profile, charge)?;
-                if accepted {
-                    assert_eq!(
-                        actual,
-                        Ok(Some(RetentionOverride {
-                            ttl_ms: (name == "ttl_ms").then_some(1),
-                            history_max_events: (name == "history_max_events").then_some(1),
-                        }))
-                    );
-                } else {
-                    assert_eq!(actual, Err(reason));
-                }
+        ]
+        .into_iter()
+        .flat_map(|case| [false, true].map(|reversed| (case, reversed)));
+        for ((atom, binary, accepted), reversed) in cases {
+            let mut rows = [
+                (Key::Atom(name), atom),
+                (Key::Binary(name.as_bytes()), binary),
+            ];
+            if reversed {
+                rows.reverse();
+            }
+            let actual = normalize(&Raw::Map(&rows), 17, profile, charge)?;
+            if accepted {
+                assert_eq!(
+                    actual,
+                    Ok(Some(RetentionOverride {
+                        ttl_ms: (name == "ttl_ms").then_some(1),
+                        history_max_events: (name == "history_max_events").then_some(1),
+                    }))
+                );
+            } else {
+                assert_eq!(actual, Err(reason));
             }
         }
     }

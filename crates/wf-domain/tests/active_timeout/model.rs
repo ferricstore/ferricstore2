@@ -6,91 +6,96 @@ fn terminal_closure_matches_independent_wait_policy_tuple_oracle() -> TestResult
     checks::assert_unresolved_running_parent()?;
     assert_deep_cancellation_order()?;
     let captured = fixtures::lifecycle(MaxActiveOverride::Millis(1), 100, 0, 100)?;
-    for wait in [ChildWait::All, ChildWait::Any, ChildWait::None] {
-        for failure in [ChildFailure::Ignore, ChildFailure::FailParent] {
-            for closed_none in [false, true] {
-                if closed_none && wait != ChildWait::None {
-                    continue;
-                }
-                let mut parent = fixture(
-                    b"parent",
-                    b"p",
-                    b"waiting",
-                    TimestampMillis::new(0),
-                    None,
-                    captured,
-                )?;
-                let group = ChildGroup {
-                    wait,
-                    on_child_failed: failure,
-                    on_parent_closed: ParentClosed::Abandon,
-                    success_state: b"ok".to_vec(),
-                    failure_state: b"bad".to_vec(),
-                    request_hash: Vec::new(),
-                    children: [(
-                        RecordId::new(b"child".to_vec())?,
-                        ChildMember {
-                            partition: Some(PartitionId::new(b"different".to_vec())?),
-                            status: ChildStatus::Running,
-                            result: None,
-                        },
-                    )]
-                    .into(),
-                    summary: ChildSummary {
-                        total: 1,
-                        completed: 0,
-                        failed: 0,
-                        cancelled: 0,
-                    },
-                    resolved: closed_none.then_some(ChildResolution::Success),
-                };
-                parent.child_groups.insert(b"a".to_vec(), group.clone());
-                parent.child_groups.insert(b"b".to_vec(), group);
-                let mut child = fixture(
-                    b"child",
-                    b"p",
-                    b"queued",
-                    TimestampMillis::new(0),
-                    Some(TimestampMillis::new(0)),
-                    captured,
-                )?;
-                child.parent = Some(ParentLink {
-                    id: b"parent".to_vec(),
-                    partition: None,
-                });
-                let records = [
-                    restore_active(parent, AdmissionLimits::default())?,
-                    restore_active(child, AdmissionLimits::default())?,
-                ];
-                with_view(
-                    &records,
-                    &BTreeMap::new(),
-                    &BTreeMap::new(),
-                    ReleaseOutboxState { head: 1, tail: 0 },
-                    |view| {
-                        let ActiveTimeoutDecision::Accepted(plan) = expire_at(
-                            view,
-                            &[ScopedRecordId {
-                                partition_key: b"p",
-                                id: b"child",
-                            }],
-                            TimestampMillis::new(1),
-                            EntryOrder {
-                                identity: LogIdentity::new(1, 7, AppliedPosition::new(3)),
-                                first_ordinal: 0,
-                            },
-                            (AdmissionLimits::default(), TimeoutLimits::default()),
-                        )?
-                        else {
-                            return Err("oracle rejected".into());
-                        };
-                        checks::assert_child_tuple(&plan, wait, failure, closed_none)?;
-                        assert!(plan.deltas().all(|d| d.is_ok()));
-                        Ok(())
-                    },
-                )?;
-            }
+    let cases = [ChildWait::All, ChildWait::Any, ChildWait::None]
+        .into_iter()
+        .flat_map(|wait| {
+            [ChildFailure::Ignore, ChildFailure::FailParent]
+                .into_iter()
+                .flat_map(move |failure| {
+                    [false, true].map(move |closed_none| (wait, failure, closed_none))
+                })
+        });
+    for (wait, failure, closed_none) in cases {
+        if closed_none && wait != ChildWait::None {
+            continue;
         }
+        let mut parent = fixture(
+            b"parent",
+            b"p",
+            b"waiting",
+            TimestampMillis::new(0),
+            None,
+            captured,
+        )?;
+        let group = ChildGroup {
+            wait,
+            on_child_failed: failure,
+            on_parent_closed: ParentClosed::Abandon,
+            success_state: b"ok".to_vec(),
+            failure_state: b"bad".to_vec(),
+            request_hash: Vec::new(),
+            children: [(
+                RecordId::new(b"child".to_vec())?,
+                ChildMember {
+                    partition: Some(PartitionId::new(b"different".to_vec())?),
+                    status: ChildStatus::Running,
+                    result: None,
+                },
+            )]
+            .into(),
+            summary: ChildSummary {
+                total: 1,
+                completed: 0,
+                failed: 0,
+                cancelled: 0,
+            },
+            resolved: closed_none.then_some(ChildResolution::Success),
+        };
+        parent.child_groups.insert(b"a".to_vec(), group.clone());
+        parent.child_groups.insert(b"b".to_vec(), group);
+        let mut child = fixture(
+            b"child",
+            b"p",
+            b"queued",
+            TimestampMillis::new(0),
+            Some(TimestampMillis::new(0)),
+            captured,
+        )?;
+        child.parent = Some(ParentLink {
+            id: b"parent".to_vec(),
+            partition: None,
+        });
+        let records = [
+            restore_active(parent, AdmissionLimits::default())?,
+            restore_active(child, AdmissionLimits::default())?,
+        ];
+        with_view(
+            &records,
+            &BTreeMap::new(),
+            &BTreeMap::new(),
+            ReleaseOutboxState { head: 1, tail: 0 },
+            |view| {
+                let ActiveTimeoutDecision::Accepted(plan) = expire_at(
+                    view,
+                    &[ScopedRecordId {
+                        partition_key: b"p",
+                        id: b"child",
+                    }],
+                    TimestampMillis::new(1),
+                    EntryOrder {
+                        identity: LogIdentity::new(1, 7, AppliedPosition::new(3)),
+                        first_ordinal: 0,
+                    },
+                    (AdmissionLimits::default(), TimeoutLimits::default()),
+                )?
+                else {
+                    return Err("oracle rejected".into());
+                };
+                checks::assert_child_tuple(&plan, wait, failure, closed_none)?;
+                assert!(plan.deltas().all(|d| d.is_ok()));
+                Ok(())
+            },
+        )?;
     }
     Ok(())
 }

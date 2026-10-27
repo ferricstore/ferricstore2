@@ -473,14 +473,7 @@ pub(super) fn assert_rule_order() -> TestResult {
                 (Raw::Atom("window_ms"), Raw::Integer(1)),
             ];
             for (name, _, _) in &selected[first..] {
-                if let Some(row) = rows
-                    .iter_mut()
-                    .find(|row| matches!(row.0, Raw::Atom(key) if key == *name))
-                {
-                    row.1 = Raw::Other;
-                } else {
-                    rows.push((Raw::Atom(name), Raw::Other));
-                }
+                invalidate_rule_field(&mut rows, name);
             }
             assert_rule_error(group, &rows, selected[first].1, selected[first].2)?;
         }
@@ -571,4 +564,15 @@ fn assert_big_integer_errors(zero: Raw<'_>) -> TestResult {
         b"ERR flow governance open_ms must be a positive integer",
     )?;
     Ok(())
+}
+
+fn invalidate_rule_field<'a>(rows: &mut Vec<(Raw<'a>, Raw<'a>)>, name: &'a str) {
+    if let Some(row) = rows
+        .iter_mut()
+        .find(|row| matches!(row.0, Raw::Atom(key) if key == name))
+    {
+        row.1 = Raw::Other;
+    } else {
+        rows.push((Raw::Atom(name), Raw::Other));
+    }
 }

@@ -366,80 +366,69 @@ fn generated_policy_deadline_can_exceed_the_explicit_input_ceiling() -> TestResu
 
 #[test]
 fn generated_policy_retry_exhaustion_matches_independent_attempt_model() -> TestResult {
-    for limit in [0_u16, 1, 3, 8] {
-        for target in [b"manual".as_slice(), b"failed", b"completed", b"cancelled"] {
-            let mut scenario = Scenario::claimed(b"model-payment", b"queued")?;
-            let policy = configured(limit, BackoffKind::Fixed, 7, target);
-            let (mut now, mut version, mut fence, mut events) = (2_000, 2, 1, 2);
-            for attempt in 1..=u64::from(limit) + 1 {
-                let exhausted = attempt > u64::from(limit);
-                let terminal = exhausted && target != b"manual";
-                let state = if exhausted { target } else { b"queued" };
-                let due = (!terminal).then_some(now + if exhausted { 0 } else { 7 });
-                let retry = scenario.retry(policy.clone())?;
-                assert_eq!(
-                    scenario.apply(now, Operation::RetryWithPolicy(retry.clone()), None)?,
-                    Outcome::Changed
-                );
-                version += 1;
-                events += 1;
-                assert_eq!(scenario.record.state(), state);
-                assert_eq!(scenario.record.attempts(), attempt);
-                assert_eq!(scenario.record.version(), version);
-                assert_eq!(scenario.record.fence().get(), fence);
-                assert_eq!(scenario.record.next_run_at(), due.map(TimestampMillis::new));
-                assert_eq!(scenario.record.lease(), None);
-                assert_eq!(scenario.record.run_state(), None);
-                assert_eq!(scenario.history.len(), events);
-                let event = scenario.history.last().ok_or("model retry event absent")?;
-                assert_eq!(event.kind, EventKind::Retry);
-                assert_eq!(event.occurred_at, TimestampMillis::new(now));
-                assert_eq!(event.version, version);
-                assert_eq!(event.fence.get(), fence);
-                assert_eq!(event.attempts, attempt);
-                assert_eq!(event.state, state);
-                assert_eq!(event.next_run_at, due.map(TimestampMillis::new));
-                let metadata = event.retry.as_ref().ok_or("model retry metadata absent")?;
-                assert_eq!(
-                    metadata.decision,
-                    if exhausted {
-                        RetryDecision::Exhausted
-                    } else {
-                        RetryDecision::Scheduled
-                    }
-                );
-                assert_eq!(metadata.run_state, b"queued");
-                assert_eq!(metadata.next_run_at, due.map(TimestampMillis::new));
-                let previous = scenario.record.clone();
-                let history = scenario.history.clone();
-                assert_eq!(
-                    scenario.apply(now + 1, Operation::RetryWithPolicy(retry), None)?,
-                    Outcome::LegacyNoop
-                );
-                assert_eq!(scenario.record, previous);
-                assert_eq!(scenario.history, history);
-                if !exhausted {
-                    assert_eq!(
-                        scenario.apply(now + 6, Operation::Claim(claim(b"queued")?), None)?,
-                        Outcome::NotEligible
-                    );
-                    assert_eq!(scenario.record, previous);
-                    assert_eq!(scenario.history, history);
-                    assert_eq!(
-                        scenario.apply(now + 7, Operation::Claim(claim(b"queued")?), None)?,
-                        Outcome::Changed
-                    );
-                    version += 1;
-                    fence += 1;
-                    events += 1;
-                    assert_eq!(scenario.record.state(), b"running");
-                    assert_eq!(scenario.record.version(), version);
-                    assert_eq!(scenario.record.fence().get(), fence);
-                    assert_eq!(scenario.record.attempts(), attempt);
-                    assert_eq!(scenario.history.len(), events);
-                    now += 18;
-                }
-            }
+    let cases = [0_u16, 1, 3, 8].into_iter().flat_map(|limit| {
+        [b"manual".as_slice(), b"failed", b"completed", b"cancelled"]
+            .map(move |target| (limit, target))
+    });
+    for (limit, target) in cases {
+        assert_retry_exhaustion_model(limit, target)?;
+    }
+    Ok(())
+}
+
+fn assert_retry_exhaustion_model(limit: u16, target: &[u8]) -> TestResult {
+    let mut scenario = Scenario::claimed(b"model-payment", b"queued")?;
+    let policy = configured(limit, BackoffKind::Fixed, 7, target);
+    let (mut now, mut version, mut fence, mut events) = (2_000, 2, 1, 2);
+    for attempt in 1..=u64::from(limit) + 1 {
+        let exhausted = attempt > u64::from(limit);
+        let terminal = exhausted && target != b"manual";
+        let state = if exhausted { target } else { b"queued" };
+        let due = (!terminal).then_some(now + if exhausted { 0 } else { 7 });
+        let retry = scenario.retry(policy.clone())?;
+        assert_eq!(
+            scenario.apply(now, Operation::RetryWithPolicy(retry.clone()), None)?,
+            Outcome::Changed
+        );
+        version += 1;
+        events += 1;
+        assert_retry_model_step(
+            &scenario,
+            now,
+            (version, fence, events),
+            attempt,
+            state,
+            due,
+            exhausted,
+        )?;
+        let previous = scenario.record.clone();
+        let history = scenario.history.clone();
+        assert_eq!(
+            scenario.apply(now + 1, Operation::RetryWithPolicy(retry), None)?,
+            Outcome::LegacyNoop
+        );
+        assert_eq!(scenario.record, previous);
+        assert_eq!(scenario.history, history);
+        if !exhausted {
+            assert_eq!(
+                scenario.apply(now + 6, Operation::Claim(claim(b"queued")?), None)?,
+                Outcome::NotEligible
+            );
+            assert_eq!(scenario.record, previous);
+            assert_eq!(scenario.history, history);
+            assert_eq!(
+                scenario.apply(now + 7, Operation::Claim(claim(b"queued")?), None)?,
+                Outcome::Changed
+            );
+            version += 1;
+            fence += 1;
+            events += 1;
+            assert_eq!(scenario.record.state(), b"running");
+            assert_eq!(scenario.record.version(), version);
+            assert_eq!(scenario.record.fence().get(), fence);
+            assert_eq!(scenario.record.attempts(), attempt);
+            assert_eq!(scenario.history.len(), events);
+            now += 18;
         }
     }
     Ok(())
@@ -479,5 +468,44 @@ fn generated_retry_deadline_survives_core_record_restoration() -> TestResult {
         wf_domain::workflow::admission::AdmissionLimits::default(),
     )?;
     assert_eq!(restored, scenario.record);
+    Ok(())
+}
+
+fn assert_retry_model_step(
+    scenario: &Scenario,
+    now: u64,
+    (version, fence, events): (u64, u64, usize),
+    attempt: u64,
+    state: &[u8],
+    due: Option<u64>,
+    exhausted: bool,
+) -> TestResult {
+    assert_eq!(scenario.record.state(), state);
+    assert_eq!(scenario.record.attempts(), attempt);
+    assert_eq!(scenario.record.version(), version);
+    assert_eq!(scenario.record.fence().get(), fence);
+    assert_eq!(scenario.record.next_run_at(), due.map(TimestampMillis::new));
+    assert_eq!(scenario.record.lease(), None);
+    assert_eq!(scenario.record.run_state(), None);
+    assert_eq!(scenario.history.len(), events);
+    let event = scenario.history.last().ok_or("model retry event absent")?;
+    assert_eq!(event.kind, EventKind::Retry);
+    assert_eq!(event.occurred_at, TimestampMillis::new(now));
+    assert_eq!(event.version, version);
+    assert_eq!(event.fence.get(), fence);
+    assert_eq!(event.attempts, attempt);
+    assert_eq!(event.state, state);
+    assert_eq!(event.next_run_at, due.map(TimestampMillis::new));
+    let metadata = event.retry.as_ref().ok_or("model retry metadata absent")?;
+    assert_eq!(
+        metadata.decision,
+        if exhausted {
+            RetryDecision::Exhausted
+        } else {
+            RetryDecision::Scheduled
+        }
+    );
+    assert_eq!(metadata.run_state, b"queued");
+    assert_eq!(metadata.next_run_at, due.map(TimestampMillis::new));
     Ok(())
 }

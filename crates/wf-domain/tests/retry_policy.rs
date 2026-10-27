@@ -93,28 +93,33 @@ fn flow_retry_policy_accepts_thirty_day_backoff_cap() -> TestResult {
 #[test]
 fn flow_retry_policy_keeps_generated_backoff_values_bounded_and_deterministic() -> TestResult {
     let now = TimestampMillis::new(123_456);
-    for kind in [
+    let cases = [
         BackoffKind::None,
         BackoffKind::Fixed,
         BackoffKind::Linear,
         BackoffKind::Exponential,
-    ] {
-        for base_ms in [0, 1, 100, 60_000, 2_592_000_000] {
-            for max_ms in [0, 1, 50, 1_000, 2_592_000_000] {
-                for jitter_pct in [0, 25, 100] {
-                    for attempt in [0, 1, 2, 3, 10, 1_000] {
-                        let resolved = policy(&RetryOverride {
-                            max_retries: Some(1_000),
-                            ..configured(kind, base_ms, max_ms, jitter_pct)
-                        })?;
-                        let sample = JitterSample::new(42_731_729);
-                        let first = resolved.next_run_at(now, attempt, sample)?;
-                        let second = resolved.next_run_at(now, attempt, sample)?;
-                        assert_eq!(first, second);
-                        assert!(first >= now);
-                        assert!(first.get() <= now.get() + max_ms);
-                    }
-                }
+    ]
+    .into_iter()
+    .flat_map(|kind| {
+        [0, 1, 100, 60_000, 2_592_000_000]
+            .into_iter()
+            .flat_map(move |base_ms| {
+                [0, 1, 50, 1_000, 2_592_000_000].map(move |max_ms| (kind, base_ms, max_ms))
+            })
+    });
+    for (kind, base_ms, max_ms) in cases {
+        for jitter_pct in [0, 25, 100] {
+            for attempt in [0, 1, 2, 3, 10, 1_000] {
+                let resolved = policy(&RetryOverride {
+                    max_retries: Some(1_000),
+                    ..configured(kind, base_ms, max_ms, jitter_pct)
+                })?;
+                let sample = JitterSample::new(42_731_729);
+                let first = resolved.next_run_at(now, attempt, sample)?;
+                let second = resolved.next_run_at(now, attempt, sample)?;
+                assert_eq!(first, second);
+                assert!(first >= now);
+                assert!(first.get() <= now.get() + max_ms);
             }
         }
     }

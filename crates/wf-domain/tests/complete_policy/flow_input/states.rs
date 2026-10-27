@@ -552,45 +552,46 @@ fn assert_long_hash_order() -> TestResult {
     ];
     let bad_mode = [(Raw::Atom("mode"), Raw::Other)];
     let bad_active = [(Raw::Atom("max_active_ms"), Raw::Integer(1))];
-    for adjacent in order.windows(2) {
-        for mode_first in [false, true] {
-            let mode_at = adjacent[usize::from(!mode_first)];
-            let active_at = adjacent[usize::from(mode_first)];
-            let pairs = names
-                .iter()
-                .enumerate()
-                .map(|(index, name)| {
-                    let value = if index == mode_at {
-                        Raw::Map(&bad_mode)
-                    } else if index == active_at {
-                        Raw::Map(&bad_active)
-                    } else {
-                        Raw::Map(&[])
-                    };
-                    [Raw::Binary(name), value]
-                })
-                .collect::<Vec<_>>();
-            let leaves = pairs
-                .iter()
-                .map(|pair| Raw::Tuple(pair))
-                .collect::<Vec<_>>();
-            let (reason, body) = if mode_first {
-                (
-                    Reason::StateMode,
-                    b"ERR flow state mode must be parallel or fifo".as_slice(),
-                )
-            } else {
-                (
-                    Reason::StateMaxActive,
-                    b"ERR flow max_active_ms is type-level only".as_slice(),
-                )
-            };
-            rejection(
-                &Raw::Map(&[(Raw::Atom("states"), Raw::List(&leaves))]),
-                reason,
-                body,
-            )?;
-        }
+    let cases = order
+        .windows(2)
+        .flat_map(|adjacent| [false, true].map(move |mode_first| (adjacent, mode_first)));
+    for (adjacent, mode_first) in cases {
+        let mode_at = adjacent[usize::from(!mode_first)];
+        let active_at = adjacent[usize::from(mode_first)];
+        let pairs = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let value = if index == mode_at {
+                    Raw::Map(&bad_mode)
+                } else if index == active_at {
+                    Raw::Map(&bad_active)
+                } else {
+                    Raw::Map(&[])
+                };
+                [Raw::Binary(name), value]
+            })
+            .collect::<Vec<_>>();
+        let leaves = pairs
+            .iter()
+            .map(|pair| Raw::Tuple(pair))
+            .collect::<Vec<_>>();
+        let (reason, body) = if mode_first {
+            (
+                Reason::StateMode,
+                b"ERR flow state mode must be parallel or fifo".as_slice(),
+            )
+        } else {
+            (
+                Reason::StateMaxActive,
+                b"ERR flow max_active_ms is type-level only".as_slice(),
+            )
+        };
+        rejection(
+            &Raw::Map(&[(Raw::Atom("states"), Raw::List(&leaves))]),
+            reason,
+            body,
+        )?;
     }
     Ok(())
 }

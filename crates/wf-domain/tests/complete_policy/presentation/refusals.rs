@@ -37,6 +37,11 @@ fn presentation_preserves_profile_authority_and_continuous_account_refusals() ->
             assert_eq!((charge.g(), charge.p()), (retained, 0));
         }
     }
+    assert_continuous_presentations(defaults)?;
+    Ok(())
+}
+
+fn assert_continuous_presentations(defaults: ResolvedRetention) -> TestResult {
     for (maximum, attempts, target, retained) in [
         (4_856, 1, 4_856, 4_856),
         (4_855, 1, 4_856, 4_728),
@@ -79,6 +84,10 @@ fn presentation_preserves_profile_authority_and_continuous_account_refusals() ->
             b"FWPV\0\x02\0\0\0\0\0\0\0\x01\0\0\0\x16FWPS\0\x02\0\0\0\x01r\0\0\0\0\0\0\0\0\0\0\0"
         );
     }
+    assert_seeded_presentations(defaults)
+}
+
+fn assert_seeded_presentations(defaults: ResolvedRetention) -> TestResult {
     for (maximum, retained, success) in [(2_377, 2_313, true), (2_376, 2_185, false)] {
         let p = limits(maximum)?;
         let mut charge = PolicySchemaCharge::new(p);

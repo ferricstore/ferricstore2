@@ -76,25 +76,25 @@ pub(super) fn assert_events(
                 work(target, target - 1, current)
             );
             assert_eq!((charge.g(), charge.p()), (g, p), "event{i}");
-            if complete {
-                let limits = profile(target)?;
-                let mut charge = PolicySchemaCharge::new(limits);
-                let result = run(limits, &mut charge);
-                if let Some(&(future, next_peak, next_current)) = events.get(i + 1) {
-                    let attempted = next_g + future + next_p.max(next_peak);
-                    assert_eq!(
-                        *result
-                            .err()
-                            .ok_or("next refusal")?
-                            .downcast::<RawError>()
-                            .map_err(|_| "next origin")?,
-                        work(attempted, target, next_current)
-                    );
-                } else {
-                    accepted(&result?, 0, 1, &current::minimal(1)?)?;
-                }
-                assert_eq!((charge.g(), charge.p()), (next_g, next_p));
+        }
+        if target > g + p && complete {
+            let limits = profile(target)?;
+            let mut charge = PolicySchemaCharge::new(limits);
+            let result = run(limits, &mut charge);
+            if let Some(&(future, next_peak, next_current)) = events.get(i + 1) {
+                let attempted = next_g + future + next_p.max(next_peak);
+                assert_eq!(
+                    *result
+                        .err()
+                        .ok_or("next refusal")?
+                        .downcast::<RawError>()
+                        .map_err(|_| "next origin")?,
+                    work(attempted, target, next_current)
+                );
+            } else {
+                accepted(&result?, 0, 1, &current::minimal(1)?)?;
             }
+            assert_eq!((charge.g(), charge.p()), (next_g, next_p));
         }
         (g, p) = (next_g, next_p);
     }

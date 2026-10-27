@@ -68,10 +68,7 @@ pub(super) fn assert_keyword_groups(profile: PolicySchemaLimits) -> TestResult {
                 partial_change()
             };
             if phase == 2 {
-                let FieldPatch::Set(retry) = &mut delta.retry else {
-                    return Err("partial retry fixture".into());
-                };
-                retry.max_retries = Some(9);
+                set_partial_retry(&mut delta)?;
             }
             let changed = patch(
                 Some(&old),
@@ -465,4 +462,12 @@ fn numeric_wire(generation: u64, phase: u8, field: u8) -> Vec<u8> {
         rows.push((atom("version"), integer(9)));
     }
     envelope(generation, &map(&rows))
+}
+
+fn set_partial_retry(delta: &mut PolicyPatch) -> TestResult {
+    let FieldPatch::Set(retry) = &mut delta.retry else {
+        return Err("partial retry fixture".into());
+    };
+    retry.max_retries = Some(9);
+    Ok(())
 }

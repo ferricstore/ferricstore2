@@ -71,6 +71,12 @@ fn metadata_integer_and_float_classes_preserve_exact_boundaries() {
 
 #[test]
 fn attribute_normalization_preserves_atoms_opaque_binaries_and_last_list_occurrences() {
+    empty_metadata_classes();
+    scalar_atom_aliases();
+    list_atom_aliases_and_opaque_values();
+}
+
+fn empty_metadata_classes() {
     for input in [I::Nil, I::Atom("nil"), I::Map(&[])] {
         assert_eq!(valid_attrs(input), matches!(input, I::Map(_)));
         assert_eq!(valid_states(input), matches!(input, I::Map(_)));
@@ -81,6 +87,9 @@ fn attribute_normalization_preserves_atoms_opaque_binaries_and_last_list_occurre
             if out.states.len() == 1 && out.states[0].1.is_empty())
         );
     }
+}
+
+fn scalar_atom_aliases() {
     for (input, tag) in [
         (I::Nil, 0),
         (I::Atom("nil"), 0),
@@ -97,6 +106,9 @@ fn attribute_normalization_preserves_atoms_opaque_binaries_and_last_list_occurre
             _ => false,
         }));
     }
+}
+
+fn list_atom_aliases_and_opaque_values() {
     let aliases = [
         I::Atom("a"),
         I::Binary(b"b"),
@@ -161,35 +173,55 @@ fn metadata_outputs_borrow_leaves_and_keep_input_graphs_unchanged() {
     assert!(attributes.is_ok());
     assert!(state_meta.is_ok());
     if let (Ok(attributes), Ok(state_meta)) = (attributes, state_meta) {
-        assert_eq!(attributes.entries.len(), 2);
-        assert_eq!(state_meta.states.len(), 1);
-        assert_eq!(state_meta.states[0].1.len(), 1);
-        assert_eq!(attributes.entries[0].0, "k");
-        assert_eq!(
-            attributes.entries[0].0.as_ptr(),
-            attribute_key[1..2].as_ptr()
+        assert_borrowed_metadata(
+            &attributes,
+            &state_meta,
+            &attribute_key,
+            &state_name,
+            &state_key,
+            &binary,
+            &member,
         );
-        assert!(matches!(&attributes.entries[0].1, A::List(values) if values.len() == 1));
-        if let A::List(values) = &attributes.entries[0].1 {
-            assert_eq!(values.len(), 1);
-            assert_eq!(values[0], member.as_slice());
-            assert_eq!(values[0].as_ptr(), member.as_ptr());
-        }
-        assert!(matches!(attributes.entries[1].1, A::Scalar(S::Binary(v))
-            if v == binary.as_slice() && v.as_ptr() == binary.as_ptr()));
-        assert_eq!(state_meta.states[0].0, "queued");
-        assert_eq!(state_meta.states[0].0.as_ptr(), state_name[1..7].as_ptr());
-        assert_eq!(state_meta.states[0].1[0].0, "worker");
-        assert_eq!(
-            state_meta.states[0].1[0].0.as_ptr(),
-            state_key[1..7].as_ptr()
-        );
-        assert!(matches!(state_meta.states[0].1[0].1, S::Binary(v)
-            if v == binary.as_slice() && v.as_ptr() == binary.as_ptr()));
     }
     assert_eq!(attribute_key, b" k ");
     assert_eq!(state_name, b" queued ");
     assert_eq!(state_key, b" worker ");
     assert_eq!(binary, [255, 0, 7]);
     assert_eq!(member, [254, 0, 8]);
+}
+
+fn assert_borrowed_metadata(
+    attributes: &wf_domain::metadata::OriginalAttributes<'_>,
+    state_meta: &wf_domain::metadata::OriginalStateMeta<'_>,
+    attribute_key: &[u8],
+    state_name: &[u8],
+    state_key: &[u8],
+    binary: &[u8],
+    member: &[u8],
+) {
+    assert_eq!(attributes.entries.len(), 2);
+    assert_eq!(state_meta.states.len(), 1);
+    assert_eq!(state_meta.states[0].1.len(), 1);
+    assert_eq!(attributes.entries[0].0, "k");
+    assert_eq!(
+        attributes.entries[0].0.as_ptr(),
+        attribute_key[1..2].as_ptr()
+    );
+    assert!(matches!(&attributes.entries[0].1, A::List(values) if values.len() == 1));
+    if let A::List(values) = &attributes.entries[0].1 {
+        assert_eq!(values.len(), 1);
+        assert_eq!(values[0], member);
+        assert_eq!(values[0].as_ptr(), member.as_ptr());
+    }
+    assert!(matches!(attributes.entries[1].1, A::Scalar(S::Binary(v))
+        if v == binary && v.as_ptr() == binary.as_ptr()));
+    assert_eq!(state_meta.states[0].0, "queued");
+    assert_eq!(state_meta.states[0].0.as_ptr(), state_name[1..7].as_ptr());
+    assert_eq!(state_meta.states[0].1[0].0, "worker");
+    assert_eq!(
+        state_meta.states[0].1[0].0.as_ptr(),
+        state_key[1..7].as_ptr()
+    );
+    assert!(matches!(state_meta.states[0].1[0].1, S::Binary(v)
+        if v == binary && v.as_ptr() == binary.as_ptr()));
 }

@@ -235,14 +235,13 @@ fn mutate_activated_head(
 
 #[test]
 fn global_fifo_head_blocks_other_priority_without_spending_candidate_scan() -> TestResult {
-    for head_priority in 0..=2 {
-        for requested in 0..=2 {
-            for scan_budget in [16_384, 1] {
-                assert_global_head_priority(head_priority, requested, false, scan_budget)?;
-                if requested != head_priority {
-                    // B=1 must remain available to an eligible independent parallel row.
-                    assert_global_head_priority(head_priority, requested, true, scan_budget)?;
-                }
+    let priorities = (0..=2).flat_map(|head| (0..=2).map(move |requested| (head, requested)));
+    for (head_priority, requested) in priorities {
+        for scan_budget in [16_384, 1] {
+            assert_global_head_priority(head_priority, requested, false, scan_budget)?;
+            if requested != head_priority {
+                // B=1 must remain available to an eligible independent parallel row.
+                assert_global_head_priority(head_priority, requested, true, scan_budget)?;
             }
         }
     }

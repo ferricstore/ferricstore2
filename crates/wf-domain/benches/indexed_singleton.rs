@@ -139,19 +139,7 @@ fn validate_decision(
         let event = scoped.plan().history().ok_or("missing created history")?;
         let record = &write.record;
         assert_eq!(write.expected_version, None);
-        assert_eq!(record.id(), &item.item.command.id);
-        assert_eq!(record.workflow_type(), b"job");
-        assert_eq!(record.state(), b"queued");
-        assert_eq!(record.payload(), Some(item.item.command.id.as_bytes()));
-        assert_eq!(
-            (record.version(), record.fence().get(), record.attempts()),
-            (1, 0, 0)
-        );
-        assert_eq!(record.created_at(), TimestampMillis::new(1_000));
-        assert_eq!(record.updated_at(), TimestampMillis::new(1_000));
-        assert_eq!(record.next_run_at(), Some(TimestampMillis::new(2_000)));
-        assert_eq!(record.status(), WorkflowStatus::Scheduled);
-        assert!(record.lease().is_none());
+        validate_created_record(record, item);
         assert_eq!(event.event_id, "1000-1");
         assert_eq!(event.kind, EventKind::Created);
         assert_eq!(event.occurred_at, TimestampMillis::new(1_000));
@@ -256,4 +244,23 @@ fn run_case(count: usize, refuse: bool, measure: bool) -> Result<(), Box<dyn Err
         let after = decide_indexed_batch(view, items, order, b"indexed-bench", limits)?;
         validate_decision(&after, items, refuse)
     })
+}
+
+fn validate_created_record(
+    record: &wf_domain::workflow::WorkflowRecord,
+    item: &IndexedBatchItem<'_>,
+) {
+    assert_eq!(record.id(), &item.item.command.id);
+    assert_eq!(record.workflow_type(), b"job");
+    assert_eq!(record.state(), b"queued");
+    assert_eq!(record.payload(), Some(item.item.command.id.as_bytes()));
+    assert_eq!(
+        (record.version(), record.fence().get(), record.attempts()),
+        (1, 0, 0)
+    );
+    assert_eq!(record.created_at(), TimestampMillis::new(1_000));
+    assert_eq!(record.updated_at(), TimestampMillis::new(1_000));
+    assert_eq!(record.next_run_at(), Some(TimestampMillis::new(2_000)));
+    assert_eq!(record.status(), WorkflowStatus::Scheduled);
+    assert!(record.lease().is_none());
 }

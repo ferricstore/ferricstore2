@@ -69,21 +69,7 @@ fn source_reclaim_boundary_preserves_claim_and_explicit_reclaim_scenarios() -> T
             ),
             (None, None, None)
         );
-        let history = &scenario.history;
-        assert!(history.iter().map(|event| event.kind).eq(events));
-        assert_eq!(scenario.count(Created), 1);
-        assert_eq!(scenario.count(Claimed), 2);
-        let last = scenario.history.last().ok_or("missing reclaim history")?;
-        assert_eq!(
-            (
-                last.version,
-                last.fence.get(),
-                last.occurred_at.get(),
-                last.lease_deadline.get(),
-                last.worker.as_deref()
-            ),
-            (3, 2, 1_050, 1_100, Some(b"worker-b".as_slice()))
-        );
+        assert_reclaim_history(&scenario, events)?;
     }
     Ok(())
 }
@@ -423,4 +409,26 @@ fn source_claimed(id: &[u8], workflow_type: &[u8], lease_ms: u64) -> Result<Scen
         Outcome::Changed
     );
     Ok(scenario)
+}
+
+fn assert_reclaim_history(
+    scenario: &Scenario,
+    events: [wf_domain::history::EventKind; 3],
+) -> TestResult {
+    let history = &scenario.history;
+    assert!(history.iter().map(|event| event.kind).eq(events));
+    assert_eq!(scenario.count(Created), 1);
+    assert_eq!(scenario.count(Claimed), 2);
+    let last = scenario.history.last().ok_or("missing reclaim history")?;
+    assert_eq!(
+        (
+            last.version,
+            last.fence.get(),
+            last.occurred_at.get(),
+            last.lease_deadline.get(),
+            last.worker.as_deref()
+        ),
+        (3, 2, 1_050, 1_100, Some(b"worker-b".as_slice()))
+    );
+    Ok(())
 }

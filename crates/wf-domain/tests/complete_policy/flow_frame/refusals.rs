@@ -171,29 +171,29 @@ fn assert_producer_prefixes(case: usize, expected: Raw<'_>, patch: Raw<'_>) -> T
                 AdmissionLimits::default(),
                 &mut charge,
             );
-            if exact {
-                assert_eq!(
-                    (charge.g(), charge.p()),
-                    (next_g, next_p),
-                    "exact producer case{case} event{index}"
-                );
-                if index + 1 == events.len() {
-                    assert!(actual.is_ok());
-                } else {
-                    assert!(matches!(
-                        actual,
-                        Err(RequestError::Encoding(Error::Schema(
-                            PolicySchemaError::WorkBytes { .. }
-                        )))
-                    ));
-                }
-            } else {
+            if !exact {
                 assert_eq!(
                     actual.err(),
                     Some(work(target, maximum)),
                     "tight producer case{case} event{index}"
                 );
                 assert_eq!((charge.g(), charge.p()), (g, p));
+                continue;
+            }
+            assert_eq!(
+                (charge.g(), charge.p()),
+                (next_g, next_p),
+                "exact producer case{case} event{index}"
+            );
+            if index + 1 == events.len() {
+                assert!(actual.is_ok());
+            } else {
+                assert!(matches!(
+                    actual,
+                    Err(RequestError::Encoding(Error::Schema(
+                        PolicySchemaError::WorkBytes { .. }
+                    )))
+                ));
             }
         }
         (g, p) = (next_g, next_p);
@@ -219,29 +219,29 @@ fn assert_verifier_prefixes(case: usize) -> TestResult {
             let limits = profile(maximum)?;
             let mut charge = PolicySchemaCharge::new(limits);
             let actual = restore(&frame, recomputed, limits, &mut charge);
-            if exact {
-                assert_eq!(
-                    (charge.g(), charge.p()),
-                    (target, 0),
-                    "exact verifier case{case} event{index}"
-                );
-                if index + 1 == events.len() {
-                    assert!(actual.is_ok());
-                } else {
-                    assert!(matches!(
-                        actual,
-                        Err(RequestError::Encoding(Error::Schema(
-                            PolicySchemaError::WorkBytes { .. }
-                        )))
-                    ));
-                }
-            } else {
+            if !exact {
                 assert_eq!(
                     actual.err(),
                     Some(work(target, maximum)),
                     "tight verifier case{case} event{index}"
                 );
                 assert_eq!((charge.g(), charge.p()), (g, 0));
+                continue;
+            }
+            assert_eq!(
+                (charge.g(), charge.p()),
+                (target, 0),
+                "exact verifier case{case} event{index}"
+            );
+            if index + 1 == events.len() {
+                assert!(actual.is_ok());
+            } else {
+                assert!(matches!(
+                    actual,
+                    Err(RequestError::Encoding(Error::Schema(
+                        PolicySchemaError::WorkBytes { .. }
+                    )))
+                ));
             }
         }
         g = target;

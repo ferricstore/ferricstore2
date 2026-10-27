@@ -2332,7 +2332,7 @@
         {
           "scenario_id": "m1-23e4645b7b46c5b7-atomic-start",
           "rust_file": "crates/wf-domain/tests/claim_apply/start_and_claim.rs",
-          "rust_file_sha256": "dac7142465cc742a89c747ed1bc1cea0f576b22a4b41329f7471197d5e414b0e",
+          "rust_file_sha256": "f446390907989b26b52c27853e224b266a8a48746841c30202a027efb2ba3e65",
           "rust_module": "",
           "rust_function": "source_atomic_start_creates_leased_running_execution",
           "assertions": [
@@ -5616,7 +5616,7 @@
           ],
           "limitations": [
             "Source-derived assertion mapping; registration and command execution are separate evidence.",
-            "Typed successful reduce(Create) fixture and fresh apply-selected plans retain the original type/state/payload, times, first limit 1 and later limits 10, worker and create→claim→leased-empty→guarded-complete→terminal-empty order. Source line 1250 links typed successful creation and retained state/payload only; line 1275 links Changed completion with the actual selected lease token/fence only. Public :ok/{:ok, ...} projections, automatic default partition placement/routing, public claim parent reclaim/governance/timeout orchestration, durable record/index/history/outcome/control writes, persisted retained replay, real encoded-entry/hash verification, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and required original profiles remain omitted. Each view is rebuilt in memory from the current proposed record, rather than validating a persisted index mutation. Fixed ID/type prefixes replace unique suffixes; explicit lease_ms 30000 preserves the pinned default. Typed complete result/state and complete-selection stop checks are supplemental. The inert proposal supplies no assertion execution or passing status. A first passing run covers existing behavior and supplies no tests-first RED or full original/public/durable/profile parity. Independent Linux and macOS execution remain required."
+            "Typed successful reduce(Create) fixture and fresh apply-selected plans retain the original type/state/payload, times, first limit 1 and later limits 10, worker and create\u2192claim\u2192leased-empty\u2192guarded-complete\u2192terminal-empty order. Source line 1250 links typed successful creation and retained state/payload only; line 1275 links Changed completion with the actual selected lease token/fence only. Public :ok/{:ok, ...} projections, automatic default partition placement/routing, public claim parent reclaim/governance/timeout orchestration, durable record/index/history/outcome/control writes, persisted retained replay, real encoded-entry/hash verification, FlowCase shard/WARaft/FLUSHDB/MemoryGuard setup and required original profiles remain omitted. Each view is rebuilt in memory from the current proposed record, rather than validating a persisted index mutation. Fixed ID/type prefixes replace unique suffixes; explicit lease_ms 30000 preserves the pinned default. Typed complete result/state and complete-selection stop checks are supplemental. The inert proposal supplies no assertion execution or passing status. A first passing run covers existing behavior and supplies no tests-first RED or full original/public/durable/profile parity. Independent Linux and macOS execution remain required."
           ]
         }
       ]
@@ -15958,32 +15958,32 @@
         {
           "scenario_id": "m1-deb8dc5136bd2e4e",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
+          "rust_file_sha256": "9ef006870a52cb9284669f8b62d25ea2842da66091e9242f89c788df4f44619a",
           "rust_module": "",
           "rust_function": "original_flow_policy_rejects_both_malformed_state_policy_recipes",
           "assertions": [
             {
               "source_line": 9,
               "source_text": "assert ^error =",
-              "rust_line": 364,
+              "rust_line": 369,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 9,
               "source_text": "assert ^error =",
-              "rust_line": 374,
+              "rust_line": 379,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 12,
               "source_text": "assert ^error =",
-              "rust_line": 364,
+              "rust_line": 369,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 12,
               "source_text": "assert ^error =",
-              "rust_line": 374,
+              "rust_line": 379,
               "rust_text": "assert_eq!("
             }
           ],
@@ -16003,32 +16003,32 @@
         {
           "scenario_id": "m1-9e5df11d9c3d3842",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
+          "rust_file_sha256": "9ef006870a52cb9284669f8b62d25ea2842da66091e9242f89c788df4f44619a",
           "rust_module": "",
           "rust_function": "original_flow_policy_omits_absent_fields_and_preserves_the_exact_empty_state",
           "assertions": [
             {
               "source_line": 19,
               "source_text": "assert {:ok, policy} =",
-              "rust_line": 414,
+              "rust_line": 419,
               "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
             },
             {
               "source_line": 22,
               "source_text": "refute Map.has_key?(policy, :version)",
-              "rust_line": 414,
+              "rust_line": 419,
               "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
             },
             {
               "source_line": 23,
               "source_text": "refute Map.has_key?(policy, :max_active_ms)",
-              "rust_line": 414,
+              "rust_line": 419,
               "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
             },
             {
               "source_line": 24,
               "source_text": "assert policy.states == %{\"queued\" => %{}}",
-              "rust_line": 414,
+              "rust_line": 419,
               "rust_text": "assert_eq!(actual, Ok(expected.to_vec()));"
             }
           ],
@@ -16048,74 +16048,74 @@
         {
           "scenario_id": "m1-3cc1821bd694c95e",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
+          "rust_file_sha256": "9ef006870a52cb9284669f8b62d25ea2842da66091e9242f89c788df4f44619a",
           "rust_module": "",
           "rust_function": "original_flow_policy_retains_independently_configured_execution_modes",
           "assertions": [
             {
               "source_line": 28,
               "source_text": "assert {:ok, policy} =",
-              "rust_line": 434,
+              "rust_line": 439,
               "rust_text": "assert!(snapshot.is_ok());"
             },
             {
               "source_line": 36,
               "source_text": "assert RetryPolicy.state_mode(policy, \"queued\") == :fifo",
-              "rust_line": 473,
+              "rust_line": 478,
               "rust_text": "assert_eq!(mode.atom_bytes(), Some(expected));"
             },
             {
               "source_line": 37,
               "source_text": "assert RetryPolicy.state_mode(policy, \"review\") == :parallel",
-              "rust_line": 473,
+              "rust_line": 478,
               "rust_text": "assert_eq!(mode.atom_bytes(), Some(expected));"
             },
             {
               "source_line": 38,
               "source_text": "assert RetryPolicy.state_mode(policy, \"undeclared\") == :parallel",
-              "rust_line": 473,
+              "rust_line": 478,
               "rust_text": "assert_eq!(mode.atom_bytes(), Some(expected));"
             },
             {
               "source_line": 39,
               "source_text": "assert RetryPolicy.fifo_states(policy) == MapSet.new([\"queued\"])",
-              "rust_line": 487,
+              "rust_line": 492,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 39,
               "source_text": "assert RetryPolicy.fifo_states(policy) == MapSet.new([\"queued\"])",
-              "rust_line": 499,
+              "rust_line": 504,
               "rust_text": "assert_eq!(fifo_states, BTreeSet::from([b\"queued\".as_slice()]));"
             },
             {
               "source_line": 40,
               "source_text": "assert RetryPolicy.any_fifo_state?(policy)",
-              "rust_line": 500,
+              "rust_line": 505,
               "rust_text": "assert!(actual.values().any(|&mode| mode == b\"fifo\"));"
             },
             {
               "source_line": 41,
               "source_text": "assert RetryPolicy.any_fifo_state?(policy, &(&1 == \"queued\"))",
-              "rust_line": 501,
+              "rust_line": 506,
               "rust_text": "assert!("
             },
             {
               "source_line": 42,
               "source_text": "refute RetryPolicy.any_fifo_state?(policy, &(&1 == \"review\"))",
-              "rust_line": 506,
+              "rust_line": 511,
               "rust_text": "assert!("
             },
             {
               "source_line": 43,
               "source_text": "refute RetryPolicy.any_fifo_state?(nil)",
-              "rust_line": 522,
+              "rust_line": 527,
               "rust_text": "assert_eq!(modes.len(), 0);"
             },
             {
               "source_line": 43,
               "source_text": "refute RetryPolicy.any_fifo_state?(nil)",
-              "rust_line": 523,
+              "rust_line": 528,
               "rust_text": "assert!(!modes.values().any(|&mode| mode == b\"fifo\"));"
             }
           ],
@@ -22654,38 +22654,38 @@
         {
           "scenario_id": "m1-2f84fe8c1b8f4eb7",
           "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
-          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_file_sha256": "f95a9529a90dad8a63554fca464e301671da0f2babed2d2dde3ab0e1f1e26498",
           "rust_module": "",
           "rust_function": "source_completed_record_preserves_transition_cancel_and_extension_errors",
           "assertions": [
             {
               "source_line": 143,
               "source_text": "assert {:ok, completed} =",
-              "rust_line": 209,
+              "rust_line": 195,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 149,
               "source_text": "assert completed.state == \"completed\"",
-              "rust_line": 223,
+              "rust_line": 209,
               "rust_text": "assert_eq!(record.state(), b\"completed\");"
             },
             {
               "source_line": 151,
               "source_text": "assert {:error, \"ERR flow is terminal; use FLOW.REWIND\"} =",
-              "rust_line": 261,
+              "rust_line": 247,
               "rust_text": "assert_eq!(error.to_string(), expected);"
             },
             {
               "source_line": 156,
               "source_text": "assert {:error, \"ERR flow is terminal; use FLOW.REWIND\"} =",
-              "rust_line": 261,
+              "rust_line": 247,
               "rust_text": "assert_eq!(error.to_string(), expected);"
             },
             {
               "source_line": 160,
               "source_text": "assert still_completed.state == \"completed\"",
-              "rust_line": 265,
+              "rust_line": 251,
               "rust_text": "assert_eq!(record.state(), b\"completed\");"
             }
           ],
@@ -22724,7 +22724,7 @@
         {
           "scenario_id": "m1-e1a8cf7f619f136a",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
+          "rust_file_sha256": "ae22be6c7b15795ea06418ab570f9c3bd6bc6c7f9bda95dee5ac52379c0c5c06",
           "rust_module": "",
           "rust_function": "flow_retry_returns_to_claimed_run_state_with_computed_backoff",
           "assertions": [
@@ -22857,7 +22857,7 @@
         {
           "scenario_id": "m1-78839ca2df54b42f",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
+          "rust_file_sha256": "ae22be6c7b15795ea06418ab570f9c3bd6bc6c7f9bda95dee5ac52379c0c5c06",
           "rust_module": "",
           "rust_function": "flow_retry_exhausts_to_configured_active_state",
           "assertions": [
@@ -22912,7 +22912,7 @@
         {
           "scenario_id": "m1-537f7338ecf1c648",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
+          "rust_file_sha256": "ae22be6c7b15795ea06418ab570f9c3bd6bc6c7f9bda95dee5ac52379c0c5c06",
           "rust_module": "",
           "rust_function": "flow_retry_terminal_exhaustion_keeps_stable_audit_metadata",
           "assertions": [
@@ -23334,80 +23334,80 @@
         {
           "scenario_id": "m1-a765ee1199887142",
           "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
-          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_file_sha256": "f95a9529a90dad8a63554fca464e301671da0f2babed2d2dde3ab0e1f1e26498",
           "rust_module": "",
           "rust_function": "source_fail_and_unleased_cancel_remove_due_work_and_reject_stale_fail",
           "assertions": [
             {
               "source_line": 747,
               "source_text": "assert {:ok, [claimed]} =",
-              "rust_line": 296,
+              "rust_line": 282,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 756,
               "source_text": "assert claimed.id == fail_id",
-              "rust_line": 308,
+              "rust_line": 294,
               "rust_text": "assert_eq!(failed.record.id(), &RecordId::new(fail_id.to_vec())?);"
             },
             {
               "source_line": 758,
               "source_text": "assert {:error, \"ERR stale flow lease\"} =",
-              "rust_line": 323,
+              "rust_line": 309,
               "rust_text": "assert_eq!(error.to_string(), \"ERR stale flow lease\");"
             },
             {
               "source_line": 765,
               "source_text": "assert {:ok, failed} =",
-              "rust_line": 359,
+              "rust_line": 345,
               "rust_text": "assert_eq!(scenario.apply(1_500, operation)?, Outcome::Changed);"
             },
             {
               "source_line": 772,
               "source_text": "assert failed.state == \"failed\"",
-              "rust_line": 361,
+              "rust_line": 347,
               "rust_text": "assert_eq!((record.state(), record.error()), (state, Some(body)));"
             },
             {
               "source_line": 775,
               "source_text": "assert failed.lease_token == nil",
-              "rust_line": 363,
+              "rust_line": 349,
               "rust_text": "assert_eq!((record.lease(), record.next_run_at()), (None, None));"
             },
             {
               "source_line": 776,
               "source_text": "assert failed.next_run_at_ms == nil",
-              "rust_line": 363,
+              "rust_line": 349,
               "rust_text": "assert_eq!((record.lease(), record.next_run_at()), (None, None));"
             },
             {
               "source_line": 778,
               "source_text": "assert {:ok, cancelled} =",
-              "rust_line": 359,
+              "rust_line": 345,
               "rust_text": "assert_eq!(scenario.apply(1_500, operation)?, Outcome::Changed);"
             },
             {
               "source_line": 785,
               "source_text": "assert cancelled.state == \"cancelled\"",
-              "rust_line": 361,
+              "rust_line": 347,
               "rust_text": "assert_eq!((record.state(), record.error()), (state, Some(body)));"
             },
             {
               "source_line": 788,
               "source_text": "assert cancelled.next_run_at_ms == nil",
-              "rust_line": 363,
+              "rust_line": 349,
               "rust_text": "assert_eq!((record.lease(), record.next_run_at()), (None, None));"
             },
             {
               "source_line": 790,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 381,
+              "rust_line": 367,
               "rust_text": "assert_eq!(plan.outcome(), Outcome::NotEligible);"
             },
             {
               "source_line": 799,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 381,
+              "rust_line": 367,
               "rust_text": "assert_eq!(plan.outcome(), Outcome::NotEligible);"
             }
           ],
@@ -24182,7 +24182,7 @@
         {
           "scenario_id": "m1-4b70723c9149fbe8-retention_input_preserves_optional_presence_and_original_type_state_values",
           "rust_file": "crates/wf-domain/tests/complete_policy/retention_input.rs",
-          "rust_file_sha256": "c75a6b5bed402342e028079e9dc78425a51525982ea852baf3afb5f9a873eda2",
+          "rust_file_sha256": "45392937d8521829c09db9962bad497c5771ca327c6fa625e68ee947d80c77f6",
           "rust_module": "",
           "rust_function": "retention_input_preserves_optional_presence_and_original_type_state_values",
           "assertions": [
@@ -24261,20 +24261,20 @@
         {
           "scenario_id": "m1-bb1cff7dbab51d19",
           "rust_file": "crates/wf-domain/tests/complete_policy/retention_input.rs",
-          "rust_file_sha256": "c75a6b5bed402342e028079e9dc78425a51525982ea852baf3afb5f9a873eda2",
+          "rust_file_sha256": "45392937d8521829c09db9962bad497c5771ca327c6fa625e68ee947d80c77f6",
           "rust_module": "",
           "rust_function": "retention_input_preserves_ttl_internal_history_and_captured_error_order",
           "assertions": [
             {
               "source_line": 140,
               "source_text": "assert {:error, \"ERR flow retention history_hot_max_events is internal\"} =",
-              "rust_line": 216,
+              "rust_line": 217,
               "rust_text": "assert_eq!(result, Err(Reason::HistoryHot));"
             },
             {
               "source_line": 140,
               "source_text": "assert {:error, \"ERR flow retention history_hot_max_events is internal\"} =",
-              "rust_line": 217,
+              "rust_line": 218,
               "rust_text": "assert_eq!("
             }
           ],
@@ -24292,7 +24292,7 @@
         {
           "scenario_id": "m1-6ad2cd82f0217fe3",
           "rust_file": "crates/wf-domain/tests/complete_policy/flow_input/states.rs",
-          "rust_file_sha256": "149ec521cb7f165ec72efc0b7ae4bacb4ea0710c2aede28042f7aac386554e8e",
+          "rust_file_sha256": "f9605623d2a87210c25eaf71287598ea0c00e751a73f7fb942b13eb477d68642",
           "rust_module": "",
           "rust_function": "original_flow_input_preserves_state_map_keyword_and_pair_semantics",
           "assertions": [
@@ -24343,7 +24343,7 @@
         {
           "scenario_id": "m1-ab0be7e9b8c01099",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
+          "rust_file_sha256": "ae22be6c7b15795ea06418ab570f9c3bd6bc6c7f9bda95dee5ac52379c0c5c06",
           "rust_module": "",
           "rust_function": "stored_state_retry_policy_drives_retry_exhaustion_without_command_override",
           "assertions": [
@@ -24374,7 +24374,7 @@
         {
           "scenario_id": "m1-579ae5ad18ea20b4",
           "rust_file": "crates/wf-domain/tests/retry_policy_transitions.rs",
-          "rust_file_sha256": "7a6680bda0d0e52432106f1e5322227d341824cf4afdf36b03f1e75f00ccaa49",
+          "rust_file_sha256": "ae22be6c7b15795ea06418ab570f9c3bd6bc6c7f9bda95dee5ac52379c0c5c06",
           "rust_module": "",
           "rust_function": "command_retry_policy_overrides_stored_state_policy",
           "assertions": [
@@ -24405,7 +24405,7 @@
         {
           "scenario_id": "m1-999b558a2dc276d2",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
+          "rust_file_sha256": "9ef006870a52cb9284669f8b62d25ea2842da66091e9242f89c788df4f44619a",
           "rust_module": "",
           "rust_function": "flow_retry_policy_accepts_thirty_day_backoff_cap",
           "assertions": [
@@ -24430,7 +24430,7 @@
         {
           "scenario_id": "m1-999b558a2dc276d2-retry_input_reconstructs_original_normalize_cases_before_timing",
           "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
-          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_file_sha256": "da0c9979a99aeb6e9e5e06df812ce4a43975d7e210a2bef5925479847e51af00",
           "rust_module": "",
           "rust_function": "retry_input_reconstructs_original_normalize_cases_before_timing",
           "assertions": [
@@ -24461,7 +24461,7 @@
         {
           "scenario_id": "m1-bd7d579285676091",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
+          "rust_file_sha256": "9ef006870a52cb9284669f8b62d25ea2842da66091e9242f89c788df4f44619a",
           "rust_module": "",
           "rust_function": "flow_retry_policy_computes_standard_backoff_timing",
           "assertions": [
@@ -24534,7 +24534,7 @@
         {
           "scenario_id": "m1-bd7d579285676091-retry_input_reconstructs_original_normalize_cases_before_timing",
           "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
-          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_file_sha256": "da0c9979a99aeb6e9e5e06df812ce4a43975d7e210a2bef5925479847e51af00",
           "rust_module": "",
           "rust_function": "retry_input_reconstructs_original_normalize_cases_before_timing",
           "assertions": [
@@ -24613,44 +24613,44 @@
         {
           "scenario_id": "m1-ecaed3fd34f388ec",
           "rust_file": "crates/wf-domain/tests/retry_policy.rs",
-          "rust_file_sha256": "78c33322c390c057073e2b4de4e216b8450005a08db3e943f57c8b04173b16cf",
+          "rust_file_sha256": "9ef006870a52cb9284669f8b62d25ea2842da66091e9242f89c788df4f44619a",
           "rust_module": "",
           "rust_function": "flow_retry_policy_keeps_generated_backoff_values_bounded_and_deterministic",
           "assertions": [
             {
               "source_line": 562,
               "source_text": "assert first == second",
-              "rust_line": 113,
+              "rust_line": 120,
               "rust_text": "assert_eq!(first, second);"
             },
             {
               "source_line": 563,
               "source_text": "assert first >= now_ms",
-              "rust_line": 114,
+              "rust_line": 121,
               "rust_text": "assert!(first >= now);"
             },
             {
               "source_line": 564,
               "source_text": "assert first <= now_ms + max_ms",
-              "rust_line": 115,
+              "rust_line": 122,
               "rust_text": "assert!(first.get() <= now.get() + max_ms);"
             },
             {
               "source_line": 567,
               "source_text": "assert Ferricstore.Flow.RetryPolicy.attempt_allowed?(",
-              "rust_line": 121,
+              "rust_line": 126,
               "rust_text": "assert!(RetryPolicy::default().attempt_allowed(3));"
             },
             {
               "source_line": 572,
               "source_text": "refute Ferricstore.Flow.RetryPolicy.attempt_allowed?(",
-              "rust_line": 122,
+              "rust_line": 127,
               "rust_text": "assert!(!RetryPolicy::default().attempt_allowed(4));"
             },
             {
               "source_line": 580,
               "source_text": "refute Ferricstore.Flow.RetryPolicy.attempt_allowed?(no_retries, 1)",
-              "rust_line": 127,
+              "rust_line": 132,
               "rust_text": "assert!(!no_retries.attempt_allowed(1));"
             }
           ],
@@ -24663,44 +24663,44 @@
         {
           "scenario_id": "m1-ecaed3fd34f388ec-retry_input_reconstructs_original_normalize_cases_before_timing",
           "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
-          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_file_sha256": "da0c9979a99aeb6e9e5e06df812ce4a43975d7e210a2bef5925479847e51af00",
           "rust_module": "",
           "rust_function": "retry_input_reconstructs_original_normalize_cases_before_timing",
           "assertions": [
             {
               "source_line": 562,
               "source_text": "assert first == second",
-              "rust_line": 448,
+              "rust_line": 457,
               "rust_text": "assert_eq!(first, second);"
             },
             {
               "source_line": 563,
               "source_text": "assert first >= now_ms",
-              "rust_line": 449,
+              "rust_line": 458,
               "rust_text": "assert!(first >= now);"
             },
             {
               "source_line": 564,
               "source_text": "assert first <= now_ms + max_ms",
-              "rust_line": 450,
+              "rust_line": 459,
               "rust_text": "assert!(first.get() <= 123_456 + u64::try_from(maximum)?);"
             },
             {
               "source_line": 567,
               "source_text": "assert Ferricstore.Flow.RetryPolicy.attempt_allowed?(",
-              "rust_line": 459,
+              "rust_line": 466,
               "rust_text": "assert!(policy.attempt_allowed(3));"
             },
             {
               "source_line": 572,
               "source_text": "refute Ferricstore.Flow.RetryPolicy.attempt_allowed?(",
-              "rust_line": 460,
+              "rust_line": 467,
               "rust_text": "assert!(!policy.attempt_allowed(4));"
             },
             {
               "source_line": 580,
               "source_text": "refute Ferricstore.Flow.RetryPolicy.attempt_allowed?(no_retries, 1)",
-              "rust_line": 465,
+              "rust_line": 472,
               "rust_text": "assert!(!full(&Raw::Keyword(&zero), profile, &mut charge)?.attempt_allowed(1));"
             }
           ],
@@ -24718,7 +24718,7 @@
         {
           "scenario_id": "m1-146040b0f178fda6",
           "rust_file": "crates/wf-domain/tests/complete_policy/retry_input.rs",
-          "rust_file_sha256": "29d43a9e0f7db210e8aa66bb7ef5c79d5ad7e0d418a797a6f0741dde0329860f",
+          "rust_file_sha256": "da0c9979a99aeb6e9e5e06df812ce4a43975d7e210a2bef5925479847e51af00",
           "rust_module": "",
           "rust_function": "retry_input_preserves_source_diagnostics_and_field_order",
           "assertions": [
@@ -24789,7 +24789,7 @@
         {
           "scenario_id": "m1-d9078b362e9f0d80",
           "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
-          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_file_sha256": "f95a9529a90dad8a63554fca464e301671da0f2babed2d2dde3ab0e1f1e26498",
           "rust_module": "",
           "rust_function": "source_reclaim_boundary_preserves_claim_and_explicit_reclaim_scenarios",
           "assertions": [
@@ -24851,7 +24851,7 @@
         {
           "scenario_id": "m1-284e6d5206fd4919",
           "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
-          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_file_sha256": "f95a9529a90dad8a63554fca464e301671da0f2babed2d2dde3ab0e1f1e26498",
           "rust_module": "",
           "rust_function": "source_reclaim_boundary_preserves_claim_and_explicit_reclaim_scenarios",
           "assertions": [
@@ -24901,56 +24901,56 @@
         {
           "scenario_id": "m1-16b7387e060b86f8",
           "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
-          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_file_sha256": "f95a9529a90dad8a63554fca464e301671da0f2babed2d2dde3ab0e1f1e26498",
           "rust_module": "",
           "rust_function": "source_extension_preserves_ownership_deadline_and_reclaim_ineligibility",
           "assertions": [
             {
               "source_line": 847,
               "source_text": "assert {:ok, extended} =",
-              "rust_line": 109,
+              "rust_line": 95,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 854,
               "source_text": "assert extended.state == \"running\"",
-              "rust_line": 122,
+              "rust_line": 108,
               "rust_text": "assert_eq!(record.state(), b\"running\");"
             },
             {
               "source_line": 855,
               "source_text": "assert extended.version == claimed.version + 1",
-              "rust_line": 123,
+              "rust_line": 109,
               "rust_text": "assert_eq!(record.version(), 3);"
             },
             {
               "source_line": 856,
               "source_text": "assert extended.lease_token == claimed.lease_token",
-              "rust_line": 125,
+              "rust_line": 111,
               "rust_text": "assert_eq!(lease.token, claimed.token);"
             },
             {
               "source_line": 857,
               "source_text": "assert extended.fencing_token == claimed.fencing_token",
-              "rust_line": 126,
+              "rust_line": 112,
               "rust_text": "assert_eq!(record.fence(), claimed.fence);"
             },
             {
               "source_line": 858,
               "source_text": "assert extended.lease_deadline_ms == 1_520",
-              "rust_line": 127,
+              "rust_line": 113,
               "rust_text": "assert_eq!(record.lease_deadline().get(), 1_520);"
             },
             {
               "source_line": 860,
               "source_text": "assert {:ok, []} =",
-              "rust_line": 152,
+              "rust_line": 138,
               "rust_text": "assert_eq!(early.outcome(), Outcome::NotEligible);"
             },
             {
               "source_line": 868,
               "source_text": "assert {:error, \"ERR stale flow lease\"} =",
-              "rust_line": 168,
+              "rust_line": 154,
               "rust_text": "assert_eq!(error.to_string(), \"ERR stale flow lease\");"
             }
           ],
@@ -24969,20 +24969,20 @@
         {
           "scenario_id": "m1-becdbf189214b351",
           "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
-          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_file_sha256": "f95a9529a90dad8a63554fca464e301671da0f2babed2d2dde3ab0e1f1e26498",
           "rust_module": "",
           "rust_function": "source_extension_preserves_ownership_deadline_and_reclaim_ineligibility",
           "assertions": [
             {
               "source_line": 900,
               "source_text": "assert extended.version == claimed.version + 1",
-              "rust_line": 123,
+              "rust_line": 109,
               "rust_text": "assert_eq!(record.version(), 3);"
             },
             {
               "source_line": 901,
               "source_text": "assert extended.lease_deadline_ms == 1_520",
-              "rust_line": 127,
+              "rust_line": 113,
               "rust_text": "assert_eq!(record.lease_deadline().get(), 1_520);"
             }
           ],
@@ -25092,20 +25092,20 @@
         {
           "scenario_id": "m1-9466123fbaacecff",
           "rust_file": "crates/wf-domain/tests/lease_lifecycle.rs",
-          "rust_file_sha256": "1281371f09e9a5b432cf103e0c641c67a8ce6f39c3e15ce3c5221d901b38146f",
+          "rust_file_sha256": "f95a9529a90dad8a63554fca464e301671da0f2babed2d2dde3ab0e1f1e26498",
           "rust_module": "",
           "rust_function": "source_completed_record_preserves_transition_cancel_and_extension_errors",
           "assertions": [
             {
               "source_line": 969,
               "source_text": "assert {:ok, _completed} =",
-              "rust_line": 209,
+              "rust_line": 195,
               "rust_text": "assert_eq!("
             },
             {
               "source_line": 975,
               "source_text": "assert {:error, \"ERR stale flow lease\"} =",
-              "rust_line": 261,
+              "rust_line": 247,
               "rust_text": "assert_eq!(error.to_string(), expected);"
             }
           ],
@@ -25901,7 +25901,7 @@
         {
           "scenario_id": "m1-1186468cb4da234a-atomic-start",
           "rust_file": "crates/wf-domain/tests/claim_apply/start_and_claim.rs",
-          "rust_file_sha256": "dac7142465cc742a89c747ed1bc1cea0f576b22a4b41329f7471197d5e414b0e",
+          "rust_file_sha256": "f446390907989b26b52c27853e224b266a8a48746841c30202a027efb2ba3e65",
           "rust_module": "",
           "rust_function": "source_atomic_start_preserves_first_step_and_returned_retry_guard",
           "assertions": [

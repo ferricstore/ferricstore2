@@ -414,21 +414,21 @@ pub(super) fn assert_generic_unscheduled_fifo_budget(
                 let limits = AdmissionLimits::new(1_048_576, maximum, 1)?;
                 let decision =
                     decide_indexed_batch(view.indexed, &[item], order, b"entry", limits)?;
-                if maximum == 1204 {
-                    let IndexedDecision::Accepted(plan) = decision else {
-                        return Err("exact generic budget rejected".into());
-                    };
-                    assert_eq!(plan.batch().items().len(), 1);
-                    assert!(plan.batch().items()[0].plan().write().is_some());
-                    assert_eq!(plan.consumed_ordinals(), 0);
-                } else {
+                if maximum != 1204 {
                     assert_eq!(
                         decision,
                         IndexedDecision::Rejected(IndexRejection::Batch(
                             BatchRejection::Admission(AdmissionError::DecisionBytes)
                         ))
                     );
+                    continue;
                 }
+                let IndexedDecision::Accepted(plan) = decision else {
+                    return Err("exact generic budget rejected".into());
+                };
+                assert_eq!(plan.batch().items().len(), 1);
+                assert!(plan.batch().items()[0].plan().write().is_some());
+                assert_eq!(plan.consumed_ordinals(), 0);
             }
             Ok(())
         },

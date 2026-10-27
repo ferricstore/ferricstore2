@@ -123,11 +123,11 @@ pub(super) fn assert_core_patch_state_removals(
                         governance: None,
                     },
                 );
-                if selector == b"queued" {
-                    expected.states.remove(b"queued".as_slice());
-                }
             } else {
                 expected.states.clear();
+            }
+            if had_states && selector == b"queued" {
+                expected.states.remove(b"queued".as_slice());
             }
             assert!(merged.data() == &expected);
             assert_eq!(merged.generation(), 2);
