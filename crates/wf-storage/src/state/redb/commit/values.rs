@@ -180,6 +180,7 @@ fn publish_value(
     hash.update(parts[0]);
     hash.update(parts[1]);
     let alias = ValueAlias {
+        stored: false,
         partition,
         id,
         kind,

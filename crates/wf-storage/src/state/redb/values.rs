@@ -20,6 +20,20 @@ pub(crate) mod read;
 pub(crate) mod validate;
 
 impl RedbStateStore {
+    /// Creates fresh explicit stored-alias capability without seeded records.
+    /// # Errors
+    /// Refuses unsupported capability, invalid/nonempty genesis or durability failure.
+    pub fn create_stored_value_database(
+        _database: redb::Database,
+        _group: GroupId,
+        _recovery: RecoveryId,
+        _genesis: StateStoreGenesis<'_>,
+        _defaults: WorkflowValueDefaults,
+        _limits: StateStoreLimits,
+    ) -> Result<Self, StateTransactionError> {
+        Err(StateTransactionError::UnsupportedPolicyProfile)
+    }
+
     /// Creates a fresh authority with explicit workflow value capability.
     ///
     /// # Errors

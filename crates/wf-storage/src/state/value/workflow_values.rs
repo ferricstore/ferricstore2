@@ -17,6 +17,9 @@ use super::{
 
 const MAX_VALUE_VERSION: u64 = 9_007_199_254_740_991;
 
+#[cfg(test)]
+mod tests;
+
 pub(crate) type ValueSourceFields<'input> = (u64, Option<[Option<&'input [u8]>; 3]>);
 
 #[derive(Clone, Copy)]
@@ -29,6 +32,7 @@ pub(crate) struct ValueAlias<'a> {
     pub(crate) expires_at: Option<TimestampMillis>,
     pub(crate) stored_len: u64,
     pub(crate) digest: [u8; 32],
+    pub(crate) stored: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -39,6 +43,9 @@ pub(crate) struct ValueBindingData {
 
 pub(crate) fn encode_alias(alias: ValueAlias<'_>, maximum: usize) -> Result<Vec<u8>, Error> {
     validate_alias(alias)?;
+    if alias.stored {
+        return Err(Error::UnsupportedVersion);
+    }
     let mut size = 111;
     for field in [alias.partition, alias.id] {
         add(&mut size, raw_size(field)?)?;
@@ -83,6 +90,7 @@ pub(crate) fn decode_alias(bytes: &[u8]) -> Result<ValueAlias<'_>, Error> {
         expires_at: (expiry != 0).then_some(TimestampMillis::new(expiry)),
         stored_len: read_u64(bytes, &mut at)?,
         digest: read_digest(bytes, &mut at)?,
+        stored: false,
     };
     verify_checksum(bytes, at)?;
     validate_alias(alias)?;
