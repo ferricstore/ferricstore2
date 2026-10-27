@@ -23,6 +23,21 @@ CLAIM = "crates/wf-domain/tests/claim_selection.rs"
 FIFO = "crates/wf-domain/tests/claim_selection_fifo.rs"
 LANE = "crates/wf-domain/tests/claim_selection_lane.rs"
 LINKS = [
+    ("7486b505b2ba580e", "crates/wf-domain/tests/history_values/overlay.rs",
+     "history_overlay_marks_storage_failures_without_exposing_their_reason", 8,
+     [(11, 4)]),
+    ("bdafcf374348156d", "crates/wf-domain/tests/history_values/overlay.rs",
+     "history_overlay_file_reference_size_is_exact_stored_count", 8,
+     [(22, 4), (22, 5)]),
+    ("381f48c9d21d1d52", "crates/wf-domain/tests/history_values/overlay.rs",
+     "history_overlay_marks_corrupted_typed_values_without_inserting_payload", 5,
+     [(44, 2), (45, 3)]),
+    ("bdafcf374348156d", "crates/wf-storage/tests/state_store/workflow_values/history_hydration/source.rs",
+     "history_hydration_preserves_original_file_reference_size", 5,
+     [(22, 1), (22, 2)]),
+    ("381f48c9d21d1d52", "crates/wf-storage/tests/state_store/workflow_values/history_hydration/source.rs",
+     "history_hydration_preserves_original_corrupted_typed_value", 6,
+     [(44, 1), (45, 2)]),
     ("deb8dc5136bd2e4e", POLICY,
      "original_flow_policy_rejects_both_malformed_state_policy_recipes", 2,
      [(9, 0), (9, 1), (12, 0), (12, 1)]),
@@ -335,6 +350,10 @@ def counterparts(manifest):
             assertions.append(dict(source_line=source_line, source_text=source_text,
                                    rust_line=rust_line, rust_text=rust_text))
         limitations = ["Source-derived assertion mapping; registration and command execution are separate evidence."]
+        if rust_file == "crates/wf-domain/tests/history_values/overlay.rs":
+            limitations.append("Exact pure HistoryValuesTest helper fixtures preserve arbitrary payload_ref=ref, missing_file with /private/secret/path, file-reference /segment/offset10/stored100 with cap10, or FSV2+2+not-an-external-term with cap1024. Source11 links the exact sanitized error; source22 links both omitted=true and stored-size100; source44/45 link the exact invalid-value error and absent payload. Typed ordered overlay writes represent the source map updates while retaining the original borrowed fields. These pure tests do not acquire physical values or execute BEAM/Bitcask; real coherent acquisition and backend fault controls are separate evidence. Links are added after the existing implementation and carry no retroactive tests-first RED. Original ExUnit flow-tag/setup, all required profiles and independent Linux/macOS acceptance remain open; this is not full case/workflow parity.")
+        if rust_file == "crates/wf-storage/tests/state_store/workflow_values/history_hydration/source.rs":
+            limitations.append("After-body storage conformance checks publish real consumed9 workflow data, capture coherent history/bindings, authenticate aliases and immutable bytes, convert actual sized reads and run the pure projector. They preserve exact source stored100/cap10 or FSV2+2+not-an-external-term/cap1024 and repeat after reopen. Genuine rendered aliases replace the source helper's arbitrary ref; /segment/offset10 is not a Rust physical layout promise. The exact arbitrary-ref/diagnostic/file-tuple pure fixtures are separately linked. Full-read and omission-before-decoding controls are supplemental. First execution is existing-behavior conformance, never preimplementation RED. Native ExUnit setup, all required profiles, public history authority/lifecycle and independent Linux acceptance remain required; local macOS execution does not establish full case/workflow parity.")
         if rust_file == "crates/wf-domain/tests/lease_lifecycle.rs":
             limitations.append("Pure single-record proposed writes only. Original fixtures execute separately with actual Create and Claim outputs carried forward. Fixed positive identity suffixes and distinct committed tokens normalize only generated identities; explicit omitted-source clocks are disclosed. Direct typed Changed/NotEligible/Error links represent business components, never public replies, selection cardinality, aliases/default dispatch, physical reads/index maintenance/history queries or atomic durable writes. Helper setup assertions are not mapped to unrelated direct test macros. Original FlowTest async:false, flow/global_state tags, 120000 timeout, live shards, FLUSHDB and cleanup, invoked public helpers and every required source execution profile remain open; no FlowCase MemoryGuard is added to this host. Independent Linux/macOS execution remains required. First PASS covers existing behavior without retroactive tests-first RED or full case parity.")
         if rust_file == FENCING:

@@ -48,6 +48,7 @@ unset CARGO_ENCODED_RUSTDOCFLAGS
 
 printf 'Checking Rust %s, Elixir %s / OTP release %s, default features, all workspace targets\n' "$rust_version" "$elixir_version" "$otp_release"
 cargo fmt --all -- --check
+python3 -B -m unittest discover -s tests/parity -p 'test_*.py'
 cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --all-targets --locked

@@ -54866,3 +54866,90 @@ All ten selected full tails plus one supplementary regression pass. Scenarios co
 Full pipeline47766 terminal0 passes fmt, workspace/all-target check and strict Clippy, all1,209 Rust cases across104 targets (all53 architecture cases), both benchmark correctness smokes, all six documentation cases across15 targets, warnings-denied docs, reference/progress integrity, offline dependency policy and diff checks. All1,678 nonreview inputs including1,060 Rust files remain hash-exact through completion. Exact Counter retains every earlier1,198 case and adds only the eleven listed hydration cases: ten genuine-R0 and one after-body regression; canonical SHA32d20f7804f64b609f644a93cbaf8205f713219f5aee44a97bcf11928ab4f8d1. Receipts /private/tmp/ferricstore2-history-hydration-{genuine-r0,full-identity,green}.json. Offline audit uses the unchanged primary advisory cache and explicit feature manifest; no fresh advisory fetch or Linux execution is claimed. Root reviewed solo; no independent review is claimed.
 
 Continue full goal SOLO on real logical typed preparation, accepted history/query authority/lifecycle composition and the ordered remaining gates. Current physical hydration does not establish shared/named/external availability, public HistoryAPI/hot-cold/filtering/retention behavior, consensus/read barriers, authentication, HTTPS/TLS-TCP/worker integration, remaining workflow breadth, complete source profiles/parity, cleanup or Linux/macOS acceptance. Ledger remains120 derived/132 counterparts/550 links,1681 unmatched runtime cases and1655 unresolved declarations. No complete product/parity/milestone claim. Full goal ACTIVE; no agents, pushes, external messages or unchanged denied native probes.
+
+
+## HISTORY-SOURCE-CONFORMANCE1 — solo architecture selection before edits
+
+2026-10-28: Root continues solo under the user override. The previous turn
+verified existing nesting4/cognitive25/function100 and all53 architecture cases;
+it made no implementation change. Current clean primary and feature trees both
+start at1cb91bca7116bfc988de1deb4cc00322bec23dc8. Revalidation exposes an
+actionable acceptance gap: the exact three pinned HistoryValuesTest counterparts
+already execute in wf-domain/tests/history_values/overlay.rs but remain unlinked.
+Their arbitrary ref, private diagnostic, source file-reference tuple and malformed
+bytes are retained. Real coherent acquisition now exists, so extend its tests
+with the exact source stored-size100/cap10 and FSV2+2+not-an-external-term/cap1024
+fixtures before adding narrow accounting links. These are AFTER-BODY conformance
+checks, never genuine preimplementation RED or whole workflow/profile parity.
+
+BEFORE creation select only the new integration child
+crates/wf-storage/tests/state_store/workflow_values/history_hydration/source.rs,
+linked by existing history_hydration.rs. Two test identities:
+history_hydration_preserves_original_file_reference_size and
+history_hydration_preserves_original_corrupted_typed_value. Reuse the existing
+real genesis, consumed9 publication, clocks, page/field helpers and bounded limits;
+no new type/model, public API, runtime module, schema, dependency or fixture owner.
+Require exact omission true/100 bytes, funded full read, exact invalid-value error
+and absent payload, then reopen and repeat both observations. Existing real
+delegated read-failure proof remains unchanged. Preserve every old test body.
+Runtime aliases are genuine rendered identities; the exact arbitrary ref and
+private reason belong to the existing pure counterparts, not fabricated physical
+rows. No physical Bitcask path/offset or BEAM execution is implied.
+
+Add five reviewed counterpart records through existing generate-progress.py:
+three exact pure cases (source11,22,44,45 with compound22 linked twice) and the two
+new real storage cases (source22 twice,44,45). Retain every old counterpart,
+limitation and runtime case binding; add explicit pure/physical layer and
+after-body/macOS-only limitations. Keep workflow-mapping.json and reference inputs
+immutable and full parity fail-closed. Update only accounting prose, the stale
+original_flow_value/main.rs introductory status comment, handoff and this record.
+No agents, pushes, external messages or unchanged denied native probes. The full
+logical typed writer, public query/authority/lifecycle, all remaining milestones
+and Linux/macOS acceptance remain open. Architecture review is Root's own, with
+no independent reviewer claimed. Keep400/600 physical lines, function100, nesting4
+and cognitive25; fixture allocations are outside production resource claims.
+
+HISTORY-SOURCE-CONFORMANCE1 bookkeeping amendment BEFORE generator body/tests:
+actual candidate regeneration produced88 declarations/100 counterparts/393 links
+versus saved120/132/550:37 old counterparts disappeared and only five were added;
+all retained records were exact. Discard that candidate and restore the exact
+HEAD ledger. The generator owns only LINKS and currently omits later manually
+reviewed records. Select preservation of those records by scenario identity,
+while refreshing explicitly generated records, and reject conflicting lineage,
+duplicate declaration/scenario identities or stale provenance before writing.
+No pass-status field, fabricated registration or weakened validator is added.
+
+Select new tooling-only tests/parity/test_generate_progress.py, using stdlib
+unittest/tempfile/importlib/unittest.mock, with isolated tiny manifests and
+reviewed-record sentinels. Tests must first execute and genuinely reject the
+unchanged generator's record loss, bad provenance, malformed declaration
+accounting and duplicate scenario acceptance; assert refusal leaves bytes exact.
+Require additive refresh and byte-idempotent regeneration. Save rejecting tests
+before implementing the preservation body. Add its explicit unittest discovery
+command to existing scripts/check.sh and document Python3 stdlib tooling in
+docs/development.md. CI already delegates to that script; no runtime dependency
+or platform-specific path is introduced. This is a real tooling data-loss defect,
+separate from the two after-body storage conformance tests. All old source/link
+records must compare byte-for-byte after the final regeneration, plus exactly
+the five selected records. Full source/profile/product acceptance stays open.
+
+The selected Python test type is ProgressGeneratorTests(unittest.TestCase); its
+setUp/tearDown own only one TemporaryDirectory and a patched imported generator,
+with helper methods write_ledger, generate and assert_refused_without_write.
+Selected five methods are test_preserves_manual_and_refreshes_generated_links,
+test_rejects_bad_provenance, test_rejects_bad_declaration_accounting,
+test_rejects_duplicate_scenarios and test_preserves_existing_runtime_bindings.
+The last test requires an explicit matching --collection when existing runtime
+bindings exist, preventing default regeneration from silently dropping them.
+No production model or new library is selected.
+
+GENERATOR-PRESERVATION1 actual R0: stdlib unittest executes all five methods
+and exits1 with nine real assertion failures: manual link erased, missing
+collection accepted, missing/duplicate/unknown declarations accepted, all three
+stale provenance values accepted and duplicate scenario accepted. Later
+idempotence/refresh/cross-declaration/refusal-byte tails remain masked and receive
+no RED credit. No generator preservation body exists. Exact sources/output at
+/private/tmp/ferricstore2-history-source-generator-r0{.json,.log}. The two new
+storage conformance cases independently pass after real publication and reopen;
+these remain after-body coverage. Save this rejecting tooling baseline before
+implementing its data-preservation behavior.
