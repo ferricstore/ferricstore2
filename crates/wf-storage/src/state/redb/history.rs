@@ -6,6 +6,7 @@ use wf_ports::state::{
 };
 use wf_types::identity::{PartitionId, RecordId};
 
+mod hydrate;
 mod page;
 mod read;
 mod row;

@@ -5,6 +5,12 @@ use wf_domain::workflow::control::ControlState;
 
 use crate::blob::WorkflowValueBindingKnowledge;
 
+mod hydration;
+pub use hydration::{
+    WorkflowHistoryHydrationError, WorkflowHistoryHydrationLimits, WorkflowHistoryHydrationRequest,
+    WorkflowHistoryValuePage,
+};
+
 /// Physical numeric-millisecond/original-ID traversal direction.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WorkflowHistoryDirection {

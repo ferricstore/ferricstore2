@@ -17,8 +17,9 @@ pub use claim::{
 pub use control::{GroupControlChanges, GroupControlTransaction};
 pub use core_policy::{GroupCorePolicyChanges, GroupCorePolicyTransaction};
 pub use history::{
-    StoredWorkflowHistoryRow, WorkflowHistoryDirection, WorkflowHistoryPage, WorkflowHistoryQuery,
-    WorkflowHistoryReadLimits,
+    StoredWorkflowHistoryRow, WorkflowHistoryDirection, WorkflowHistoryHydrationError,
+    WorkflowHistoryHydrationLimits, WorkflowHistoryHydrationRequest, WorkflowHistoryPage,
+    WorkflowHistoryQuery, WorkflowHistoryReadLimits, WorkflowHistoryValuePage,
 };
 pub use original_policy::{GroupOriginalPolicyChanges, GroupOriginalPolicyTransaction};
 pub use policy::{OriginalPolicyGetReader, StoredPolicyValue, read_original_policy_get_reply};

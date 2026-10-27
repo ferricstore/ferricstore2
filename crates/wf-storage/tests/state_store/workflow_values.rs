@@ -5,6 +5,7 @@ use super::TestResult;
 mod codec;
 mod fixtures;
 mod guards;
+mod history_hydration;
 mod history_page;
 mod publication;
 mod reads;
