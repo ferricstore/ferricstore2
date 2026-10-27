@@ -18,7 +18,11 @@ pub(super) fn write(
     intent: Option<ClientIntent>,
     writer: &mut Writer<'_>,
     limits: CodecLimits,
+    version: u16,
 ) -> Result<(), CodecError> {
+    if !matches!(version, 8 | 9) {
+        return Err(CodecError::UnsupportedVersion);
+    }
     if !matches!(batch.profile, 1 | 5 | 6 | 7) {
         return Err(CodecError::UnsupportedTag);
     }
@@ -57,7 +61,7 @@ pub(super) fn write(
         writer.raw(bytes, maximum)?;
     }
     writer.raw(batch.request.as_bytes(), 256)?;
-    writer.u16(8)?;
+    writer.u16(version)?;
     writer.write(
         intent
             .as_ref()
@@ -86,6 +90,7 @@ pub(super) fn preflight(
     encoded: &[u8],
     limits: CodecLimits,
     charge: &mut ValueBatchCharge,
+    version: u16,
 ) -> Result<(usize, usize, usize, usize, ClientIntent), CodecError> {
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
@@ -97,8 +102,8 @@ pub(super) fn preflight(
             .ok_or(CodecError::LengthOverflow)?,
     )?;
     let mut reader = Reader::new(encoded, limits);
-    let header = common::header(&mut reader)?;
-    if header.operation_tag != 1 || header.intent.version() != 8 {
+    let header = value_header(&mut reader, version)?;
+    if header.operation_tag != 1 || header.intent.version() != version {
         return Err(CodecError::UnsupportedVersion);
     }
     let scope_length = keys::scope_length(header.scope())?;
@@ -134,9 +139,10 @@ pub(super) fn preflight(
 pub(super) fn materialize(
     encoded: &[u8],
     limits: CodecLimits,
+    version: u16,
 ) -> Result<PreparedWorkflowValueBatch, CodecError> {
     let mut reader = Reader::new(encoded, limits);
-    let header = common::header(&mut reader)?;
+    let header = value_header(&mut reader, version)?;
     if reader.byte()? != 1 {
         return Err(CodecError::UnsupportedVersion);
     }
@@ -172,4 +178,15 @@ pub(super) fn materialize(
         operation,
         inputs,
     })
+}
+
+fn value_header<'input>(
+    reader: &mut Reader<'input>,
+    version: u16,
+) -> Result<common::RawHeader<'input>, CodecError> {
+    match version {
+        8 => common::header(reader),
+        9 => common::stored_header(reader),
+        _ => Err(CodecError::UnsupportedVersion),
+    }
 }

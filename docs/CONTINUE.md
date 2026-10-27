@@ -7,10 +7,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,165 tests across 104
+The current local Rust quality checkpoint passes all 1,171 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,156 case and
-adds only the nine history read-conversion cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,165 case and
+adds only the six stored-value codec cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -41,9 +41,21 @@ body. Six conversion tests and three real-store compositions now execute their
 complete projection, resource, refusal, ownership and reopen tails. No existing
 domain/backend implementation or old test assertion changed.
 
-Next review separately versioned typed ingress through consumed publication,
-current/every-history bindings, recovery, snapshots and Node audit before
-creating more artifacts. This conversion uses caller-captured history; actual
+The explicit stored-byte codec now uses its own intent9 and canonical separator,
+with complete unchanged stored bytes and one existing operation/metadata owner.
+Its six genuine rejecting cases were saved in 46e53c6 before implementation;
+all full tails now pass. Binary8 wire, caller stream, caps and old direct-header
+refusal order remain preserved. Shared header/frame/intent scoped inverses
+recover the complete earlier source after rustfmt. Generic prepared decoding
+supports9; normal recovery and durable application still reject it. See
+[ADR-009](adr/009-stored-workflow-value-ingress.md).
+
+Next select the concrete versioned physical representation and consumed writer
+contract, then implement stored intent9 through current/every-history bindings,
+retained outcomes, recovery, snapshots and Node audit/replay. Do not guess from
+an FSV2 prefix or relax binary validation. Persistent format numbers are not yet
+selected. Intent version9 is separate from the existing original-policy
+operation tag9. This conversion uses caller-captured history; actual
 ordered FWSH/family11 acquisition and public query services remain required.
 Shared/named/external availability, authority/routing/read barriers, lifecycle
 cleanup, native/Linux/macOS acceptance, complete Elixir coverage and remaining

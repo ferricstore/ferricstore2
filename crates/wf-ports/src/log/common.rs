@@ -110,6 +110,14 @@ pub(super) struct RawItem<'a> {
 }
 
 pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, CodecError> {
+    read_header(reader, false)
+}
+
+pub(super) fn stored_header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, CodecError> {
+    read_header(reader, true)
+}
+
+fn read_header<'a>(reader: &mut Reader<'a>, stored: bool) -> Result<RawHeader<'a>, CodecError> {
     if reader.take(4)? != b"FWCP" {
         return Err(CodecError::Malformed);
     }
@@ -131,6 +139,7 @@ pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, Codec
         (5, 1) => ClientIntent::record_batch(digest),
         (6, 1) => ClientIntent::independent_record_batch(digest),
         (8, 1) => ClientIntent::workflow_value_batch(digest),
+        (9, 1) if stored => ClientIntent::workflow_stored_value_batch(digest),
         (2, 5) => ClientIntent::complete_core_policy_patch(digest),
         _ => return Err(CodecError::UnsupportedVersion),
     };

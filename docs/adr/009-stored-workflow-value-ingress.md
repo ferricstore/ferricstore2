@@ -1,7 +1,7 @@
 # ADR-009: explicit stored workflow value ingress
 
-Status: selected private codec predecessor. Durable publication and recovery are
-required following gates; they are not implemented by declaring this format.
+Status: private codec implemented and locally verified. Durable publication and
+recovery remain required following gates; this codec does not implement them.
 
 The binary command's intent8 interprets supplied payload/result/error bytes as
 logical binaries. Publication escapes a leading `FSV2` once. Inferring a typed
@@ -47,3 +47,11 @@ neither a public query service nor complete workflow parity.
 Root performs the current review solo under the user override. Concrete paths,
 TDD stages and validation are recorded in
 [the coordination journal](../reviews/workflow-completion-coordination.md).
+
+The six genuine compiled rejecting cases were saved in `46e53c6` before the
+codec body. They now pass, including all four producer modes, independent
+ownership/work bounds, exact typed/raw/escaped bytes, corruption, cross-profile
+retagging, preparation identity and explicit durable-header refusal. The complete
+local run preserves all earlier1,165 cases and adds only these six;1,171 Rust
+tests, six documentation tests, both correctness smokes and strict quality gates
+pass. These results do not add original scenario/parity or current Linux credit.

@@ -31,32 +31,32 @@ use budget::{BASE_WORK, BYTE_WORK, ITEM_WORK, KEY_WORK, POLICY_WORK, ValueBatchC
 /// # Errors
 /// Rejects invalid structure, caller association and operational admission.
 pub fn encode_workflow_stored_value_batch(
-    _batch: &PreparedWorkflowValueBatch,
-    _limits: CodecLimits,
+    batch: &PreparedWorkflowValueBatch,
+    limits: CodecLimits,
 ) -> Result<PreparedBytes, CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    encode_profile(batch, limits, 9)
 }
 
 /// Decode complete stored-byte intent9 into one owned operation and metadata.
 /// # Errors
 /// Rejects crossed profiles, corruption, malformed fields and operational limits.
 pub fn decode_workflow_stored_value_batch(
-    _encoded: &[u8],
-    _limits: CodecLimits,
+    encoded: &[u8],
+    limits: CodecLimits,
 ) -> Result<PreparedWorkflowValueBatch, CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    decode_profile(encoded, limits, 9)
 }
 
 /// Prepare bounded intent9 ownership and report its continuous codec work.
 /// # Errors
 /// Rejects crossed profiles, corruption and explicit owned/work ceilings.
 pub fn prepare_workflow_stored_value_batch(
-    _encoded: &[u8],
-    _limits: CodecLimits,
-    _maximum_owned: usize,
-    _maximum_work: usize,
+    encoded: &[u8],
+    limits: CodecLimits,
+    maximum_owned: usize,
+    maximum_work: usize,
 ) -> Result<(DecodedRequest<'_>, usize), CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    prepare_profile(encoded, limits, maximum_owned, maximum_work, 9)
 }
 
 /// Borrowed value metadata beside one decoded operation; no apply authority.
@@ -90,6 +90,14 @@ pub fn encode_workflow_value_batch(
     batch: &PreparedWorkflowValueBatch,
     limits: CodecLimits,
 ) -> Result<PreparedBytes, CodecError> {
+    encode_profile(batch, limits, 8)
+}
+
+fn encode_profile(
+    batch: &PreparedWorkflowValueBatch,
+    limits: CodecLimits,
+    version: u16,
+) -> Result<PreparedBytes, CodecError> {
     let items = batch
         .operation
         .mutation_items()
@@ -117,7 +125,7 @@ pub fn encode_workflow_value_batch(
     }
     let maximum = limits.admission().decision_bytes();
     let mut measure = Writer::measure(maximum);
-    frame::write(batch, None, &mut measure, limits)?;
+    frame::write(batch, None, &mut measure, limits, version)?;
     let body_length = measure.len();
     let length = body_length
         .checked_add(32)
@@ -126,9 +134,9 @@ pub fn encode_workflow_value_batch(
         return Err(CodecError::ByteLimit);
     }
     metadata::check(batch, limits)?;
-    let intent = intent::derive(batch, limits)?;
+    let intent = intent::derive(batch, limits, version)?;
     let mut writer = Writer::allocate(length, maximum)?;
-    frame::write(batch, Some(intent), &mut writer, limits)?;
+    frame::write(batch, Some(intent), &mut writer, limits, version)?;
     let mut bytes = writer.finish()?;
     if bytes.len() != body_length || bytes.capacity() < length {
         return Err(CodecError::LengthOverflow);
@@ -149,11 +157,19 @@ pub fn decode_workflow_value_batch(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<PreparedWorkflowValueBatch, CodecError> {
+    decode_profile(encoded, limits, 8)
+}
+
+fn decode_profile(
+    encoded: &[u8],
+    limits: CodecLimits,
+    version: u16,
+) -> Result<PreparedWorkflowValueBatch, CodecError> {
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
     }
     let (maximum_owned, maximum_work) = budget::limits(limits, false)?;
-    read_owned(encoded, limits, maximum_owned, maximum_work).map(|(batch, _, _)| batch)
+    read_owned(encoded, limits, maximum_owned, maximum_work, version).map(|(batch, _, _)| batch)
 }
 
 /// Prepares one bounded generic owner and reports the same work account's spend.
@@ -166,12 +182,22 @@ pub fn prepare_workflow_value_batch(
     maximum_owned: usize,
     maximum_work: usize,
 ) -> Result<(DecodedRequest<'_>, usize), CodecError> {
+    prepare_profile(encoded, limits, maximum_owned, maximum_work, 8)
+}
+
+fn prepare_profile(
+    encoded: &[u8],
+    limits: CodecLimits,
+    maximum_owned: usize,
+    maximum_work: usize,
+    version: u16,
+) -> Result<(DecodedRequest<'_>, usize), CodecError> {
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
     }
     let mut charge = ValueBatchCharge::new(maximum_work);
     charge.debit(BASE_WORK)?;
-    let decoded = prepare_charged(encoded, limits, maximum_owned, &mut charge)?;
+    let decoded = prepare_charged(encoded, limits, maximum_owned, &mut charge, version)?;
     Ok((decoded, charge.spent))
 }
 
@@ -180,20 +206,22 @@ fn read_owned(
     limits: CodecLimits,
     maximum_owned: usize,
     maximum_work: usize,
+    version: u16,
 ) -> Result<(PreparedWorkflowValueBatch, ClientIntent, usize), CodecError> {
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
     }
     let mut charge = ValueBatchCharge::new(maximum_work);
     charge.debit(BASE_WORK)?;
-    let (items, policies, _, bytes, expected) = frame::preflight(encoded, limits, &mut charge)?;
+    let (items, policies, _, bytes, expected) =
+        frame::preflight(encoded, limits, &mut charge, version)?;
     budget::admit(
         budget::owned(bytes, items, policies, 0, false)?,
         maximum_owned,
     )?;
-    let batch = frame::materialize(encoded, limits)?;
+    let batch = frame::materialize(encoded, limits, version)?;
     metadata::check(&batch, limits)?;
-    if intent::derive(&batch, limits)? != expected {
+    if intent::derive(&batch, limits, version)? != expected {
         return Err(CodecError::Malformed);
     }
     Ok((batch, expected, charge.spent))
@@ -208,11 +236,11 @@ pub(super) fn read_decoded(
     }
     let mut charge = ValueBatchCharge::new(BASE_WORK);
     charge.debit(BASE_WORK)?;
-    let is_value = {
+    let version = {
         let mut reader = Reader::new(encoded, limits);
-        common::header(&mut reader)?.intent.version() == 8
+        common::stored_header(&mut reader)?.intent.version()
     };
-    if !is_value {
+    if !matches!(version, 8 | 9) {
         scan::legacy_preflight(encoded, limits)?;
         return decode::read(encoded, limits);
     }
@@ -221,7 +249,7 @@ pub(super) fn read_decoded(
         return Err(CodecError::WorkLimit);
     }
     charge.maximum = maximum_work;
-    prepare_charged(encoded, limits, maximum_owned, &mut charge)
+    prepare_charged(encoded, limits, maximum_owned, &mut charge, version)
 }
 
 pub(super) fn validate(encoded: &[u8], limits: CodecLimits) -> Result<(), CodecError> {
@@ -230,11 +258,11 @@ pub(super) fn validate(encoded: &[u8], limits: CodecLimits) -> Result<(), CodecE
     }
     let mut charge = ValueBatchCharge::new(BASE_WORK);
     charge.debit(BASE_WORK)?;
-    let is_value = {
+    let version = {
         let mut reader = Reader::new(encoded, limits);
-        common::header(&mut reader)?.intent.version() == 8
+        common::stored_header(&mut reader)?.intent.version()
     };
-    if !is_value {
+    if !matches!(version, 8 | 9) {
         return scan::legacy_preflight(encoded, limits);
     }
     let (_, maximum_work) = budget::limits(limits, false)?;
@@ -242,7 +270,7 @@ pub(super) fn validate(encoded: &[u8], limits: CodecLimits) -> Result<(), CodecE
         return Err(CodecError::WorkLimit);
     }
     charge.maximum = maximum_work;
-    frame::preflight(encoded, limits, &mut charge).map(|_| ())
+    frame::preflight(encoded, limits, &mut charge, version).map(|_| ())
 }
 
 fn prepare_charged<'input>(
@@ -250,8 +278,10 @@ fn prepare_charged<'input>(
     limits: CodecLimits,
     maximum_owned: usize,
     charge: &mut ValueBatchCharge,
+    version: u16,
 ) -> Result<DecodedRequest<'input>, CodecError> {
-    let (items, policies, key_bytes, bytes, expected) = frame::preflight(encoded, limits, charge)?;
+    let (items, policies, key_bytes, bytes, expected) =
+        frame::preflight(encoded, limits, charge, version)?;
     charge.debit(
         key_bytes
             .checked_mul(KEY_WORK)
@@ -261,9 +291,9 @@ fn prepare_charged<'input>(
         budget::owned(bytes, items, policies, key_bytes, true)?,
         maximum_owned,
     )?;
-    let batch = frame::materialize(encoded, limits)?;
+    let batch = frame::materialize(encoded, limits, version)?;
     metadata::check(&batch, limits)?;
-    if intent::derive(&batch, limits)? != expected {
+    if intent::derive(&batch, limits, version)? != expected {
         return Err(CodecError::Malformed);
     }
     let scope = [

@@ -216,7 +216,7 @@ impl DecodedRequest<'_> {
             Operation::Transition(value) => [value.payload.as_deref(), None],
             Operation::StartAndClaim(value)
                 if self.request.intent.version() == 7
-                    || (self.request.intent.version() == 8
+                    || (matches!(self.request.intent.version(), 8 | 9)
                         && self
                             .workflow_value_metadata()
                             .is_some_and(|metadata| metadata.profile == 7)) =>

@@ -13,14 +13,20 @@ use crate::log::{CodecError, CodecLimits, public_mutation, record_batch};
 pub(super) fn derive(
     batch: &PreparedWorkflowValueBatch,
     limits: CodecLimits,
+    version: u16,
 ) -> Result<ClientIntent, CodecError> {
     let items = batch
         .operation
         .mutation_items()
         .ok_or(CodecError::UnsupportedTag)?;
+    let prefix = match version {
+        8 => b"WF-WORKFLOW-VALUE\0V8\0".as_slice(),
+        9 => b"WF-WORKFLOW-STORED-VALUE\0V9\0".as_slice(),
+        _ => return Err(CodecError::UnsupportedVersion),
+    };
     let mut hash = Sha256::new();
-    hash.update(b"WF-WORKFLOW-VALUE\0V8\0");
-    let mut size = 21_usize;
+    hash.update(prefix);
+    let mut size = prefix.len();
     for value in [
         batch.scope.tenant().as_bytes(),
         batch.scope.group().as_bytes(),
@@ -73,7 +79,12 @@ pub(super) fn derive(
         _ => return Err(CodecError::UnsupportedTag),
     }
     extensions(&batch.inputs, batch.profile, &mut hash, &mut size)?;
-    Ok(ClientIntent::workflow_value_batch(hash.finalize().into()))
+    let digest = hash.finalize().into();
+    Ok(if version == 8 {
+        ClientIntent::workflow_value_batch(digest)
+    } else {
+        ClientIntent::workflow_stored_value_batch(digest)
+    })
 }
 
 fn extensions(
