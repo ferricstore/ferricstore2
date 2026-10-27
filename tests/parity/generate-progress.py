@@ -385,6 +385,50 @@ def counterparts(manifest):
     return result
 
 
+def previous_ledger(manifest, collection_path):
+    path = ROOT / "tests/parity/workflow-progress.json"
+    if not path.exists():
+        return None
+    previous = json.loads(path.read_bytes())
+    if (previous.get("schema_version") != 1
+            or previous.get("source_commit") != SOURCE_COMMIT
+            or previous.get("reference_manifest_sha256") != MANIFEST_SHA256):
+        raise ValueError("existing progress has unexpected provenance")
+    entries = previous["declarations"]
+    expected = {item["id"] for item in manifest["declarations"]}
+    identities = [entry["source_declaration_id"] for entry in entries]
+    if len(identities) != len(set(identities)) or set(identities) != expected:
+        raise ValueError("existing progress has missing, duplicate or unknown declarations")
+    scenarios = [item["scenario_id"] for entry in entries for item in entry["rust_assertions"]]
+    if any(not item.strip() for item in scenarios) or len(scenarios) != len(set(scenarios)):
+        raise ValueError("existing progress has empty or duplicate scenarios")
+    if not collection_path and (previous["runtime_collection"] is not None
+                                or any(entry["runtime_case_ids"] for entry in entries)):
+        raise ValueError("existing runtime bindings require an explicit --collection")
+    return previous
+
+
+def preserve_reviewed_links(mappings, previous):
+    if previous is None:
+        return
+    owners = {item["scenario_id"]: entry["source_declaration_id"]
+              for entry in previous["declarations"] for item in entry["rust_assertions"]}
+    generated = set()
+    for source_id, records in mappings.items():
+        for record in records:
+            scenario = record["scenario_id"]
+            if scenario in generated or owners.get(scenario, source_id) != source_id:
+                raise ValueError("generated scenario is duplicated or changes source lineage")
+            generated.add(scenario)
+    for entry in previous["declarations"]:
+        source_id = entry["source_declaration_id"]
+        refreshed = {item["scenario_id"]: item for item in mappings.get(source_id, [])}
+        records = [refreshed.pop(item["scenario_id"], item) for item in entry["rust_assertions"]]
+        records.extend(refreshed.values())
+        if records:
+            mappings[source_id] = records
+
+
 def generate(collection_path):
     manifest_bytes = (ROOT / "tests/reference/workflow-test-manifest.json").read_bytes()
     if digest(manifest_bytes) != MANIFEST_SHA256:
@@ -392,7 +436,9 @@ def generate(collection_path):
     manifest = json.loads(manifest_bytes)
     if manifest["source_commit"] != SOURCE_COMMIT:
         raise ValueError("unexpected source commit")
+    previous = previous_ledger(manifest, collection_path)
     mappings = counterparts(manifest)
+    preserve_reviewed_links(mappings, previous)
     registration = {}
     reference = None
     if collection_path:
@@ -410,6 +456,11 @@ def generate(collection_path):
                     rust_assertions=mappings.get(item["id"], [])) for item in manifest["declarations"]]
     if set(registration) - {item["id"] for item in manifest["declarations"]}:
         raise ValueError("registration contains unknown declaration IDs")
+    if previous is not None:
+        for entry in previous["declarations"]:
+            retained = registration.get(entry["source_declaration_id"], [])
+            if not set(entry["runtime_case_ids"]).issubset(retained):
+                raise ValueError("collection would remove existing runtime bindings")
     ledger = dict(schema_version=1, source_commit=SOURCE_COMMIT,
                   reference_manifest_sha256=MANIFEST_SHA256,
                   runtime_collection=reference, declarations=entries)

@@ -223,3 +223,28 @@ other declaration objects and runtime identities remain unchanged. Prepared
 policy, normalized clocks and opaque value bytes remain fixture inputs; public
 defaults/hydration, committed policy installation, durable publication, original
 profiles, both-OS acceptance and full source-case/workflow parity remain required.
+
+
+The 2026-10-28 HistoryValues conformance checkpoint adds the exact three original
+helper cases and two real storage counterparts: **123 source-derived declarations,
+137 counterpart records and 559 assertion links**. All132 previous counterpart
+objects and every runtime binding are unchanged. Source11 links the sanitized
+error; source22 links omitted=true and exact stored100; source44/45 link the
+invalid typed-value error and absent payload. The pure fixtures preserve ref,
+/private/secret/path, /segment/offset10/100, cap10 and the exact malformed typed
+bytes/cap1024. The physical tests use actual rendered aliases and real consumed9
+publication, coherent acquisition and reopen; they preserve stored100/cap10 and
+the exact malformed bytes/cap1024. These are component/conformance links, not
+whole-case, mandatory-profile or Linux acceptance. Both new storage cases are
+after-body verification and receive no tests-first RED credit.
+
+The offline generator now preserves reviewed records outside its fixed LINKS
+roster, refreshes explicitly generated records in place and rejects stale
+provenance, duplicate/conflicting identities and removal of existing runtime
+bindings. Existing registration requires explicit --collection. Seven stdlib
+regressions run through scripts/check.sh: five saved failing methods preceded
+the preservation body and two adversarial controls followed it. Regenerating the
+actual ledger twice preserves all old records and gives identical bytes. This
+repairs the previous fixed-roster limitation without weakening check-progress
+or require-parity. Registration remains5903 raw/4222 linked/1681 unmatched and
+1655 unresolved declarations; full workflow parity remains incomplete.

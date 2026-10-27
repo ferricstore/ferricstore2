@@ -12,6 +12,11 @@ Use Rust **1.99.0**, edition **2024**, on Linux or macOS. The CI host matrix is
 `ubuntu-24.04` and `macos-15`; local checks use the current native host. Windows
 and cross compilation are not part of the supported M0 matrix.
 
+The offline parity ledger generator and its regression checks require **Python 3**
+with its standard library. The wrapper runs those bookkeeping tests with
+`python3 -B -m unittest discover -s tests/parity -p 'test_*.py'` on both hosts.
+These tests check lossless regeneration, not workflow execution or parity.
+
 Compiler-lineage process controls also require installed **Elixir 1.19.5** and
 **Erlang/OTP release 28** on PATH. CI pins OTP **28.3.1**; the local wrapper checks
 the release major, while source-capture verification binds the actual build
@@ -43,7 +48,8 @@ an unavailable prerequisite is a failed check. Keep `Cargo.lock` in version
 control with the workspace; checks use `--locked` and cannot resolve a new
 dependency graph.
 
-CI calls the same wrapper on both hosts. It runs formatting; warnings-denied,
+CI calls the same wrapper on both hosts. It runs formatting; Python bookkeeping
+regressions; warnings-denied,
 locked workspace check and Clippy on all targets; workspace tests; doctests;
 documentation with warnings denied; `cargo arch`; `cargo reference`; and all four
 `cargo-deny` checks (advisories, bans, licenses and sources). `CARGO_BUILD_WARNINGS`

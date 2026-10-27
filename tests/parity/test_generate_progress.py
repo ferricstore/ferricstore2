@@ -129,6 +129,30 @@ class ProgressGeneratorTests(unittest.TestCase):
         self.assertEqual(result["declarations"][0]["runtime_case_ids"], ["registered"])
         self.assertEqual(result["declarations"][0]["rust_assertions"], [self.manual])
 
+    def test_rejects_removed_runtime_bindings(self):
+        # Supplementary after-body refusal: even explicit collection may lose cases.
+        collection = {
+            "source_commit": self.generator.SOURCE_COMMIT,
+            "reference_manifest_sha256": self.manifest_hash,
+            "cases": [],
+        }
+        collection_path = self.root / "tests/parity/registration.json"
+        collection_path.write_text(json.dumps(collection))
+        ledger = copy.deepcopy(self.ledger)
+        ledger["declarations"][0]["runtime_case_ids"] = ["must remain"]
+        self.assert_refused_without_write(ledger, "tests/parity/registration.json")
+
+    def test_rejects_generated_lineage_conflicts(self):
+        # Supplementary after-body controls; original R0 methods remain unchanged.
+        for records in [
+            {"second": [self.manual]},
+            {"second": [self.generated, self.generated]},
+        ]:
+            with self.subTest(records=records), patch.object(
+                self.generator, "counterparts", return_value=records
+            ):
+                self.assert_refused_without_write(self.ledger)
+
 
 if __name__ == "__main__":
     unittest.main()

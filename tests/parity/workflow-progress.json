@@ -4315,21 +4315,143 @@
       "runtime_case_ids": [
         "9407bdb0da6369dfc0534d70202c37782adad39fb9578a87d68807d908c42e19"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-7486b505b2ba580e",
+          "rust_file": "crates/wf-domain/tests/history_values/overlay.rs",
+          "rust_file_sha256": "eb55adf6fc224fedc24b57916018c51d254c0d7a74af31cd96310158244a2b20",
+          "rust_module": "",
+          "rust_function": "history_overlay_marks_storage_failures_without_exposing_their_reason",
+          "assertions": [
+            {
+              "source_line": 11,
+              "source_text": "assert %{\"payload_error\" => \"ERR storage read failed\"} =",
+              "rust_line": 31,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Exact pure HistoryValuesTest helper fixtures preserve arbitrary payload_ref=ref, missing_file with /private/secret/path, file-reference /segment/offset10/stored100 with cap10, or FSV2+2+not-an-external-term with cap1024. Source11 links the exact sanitized error; source22 links both omitted=true and stored-size100; source44/45 link the exact invalid-value error and absent payload. Typed ordered overlay writes represent the source map updates while retaining the original borrowed fields. These pure tests do not acquire physical values or execute BEAM/Bitcask; real coherent acquisition and backend fault controls are separate evidence. Links are added after the existing implementation and carry no retroactive tests-first RED. Original ExUnit flow-tag/setup, all required profiles and independent Linux/macOS acceptance remain open; this is not full case/workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "bdafcf374348156d",
       "runtime_case_ids": [
         "93ecc59b890fa309da3f30c6c2d3e97f654539f4a9fb14cc11fd664223392e24"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-bdafcf374348156d",
+          "rust_file": "crates/wf-domain/tests/history_values/overlay.rs",
+          "rust_file_sha256": "eb55adf6fc224fedc24b57916018c51d254c0d7a74af31cd96310158244a2b20",
+          "rust_module": "",
+          "rust_function": "history_overlay_file_reference_size_is_exact_stored_count",
+          "assertions": [
+            {
+              "source_line": 22,
+              "source_text": "assert %{\"payload_omitted\" => true, \"payload_size\" => 100} =",
+              "rust_line": 65,
+              "rust_text": "assert!(matches!(overlay.writes[0].value, V::Boolean(true)));"
+            },
+            {
+              "source_line": 22,
+              "source_text": "assert %{\"payload_omitted\" => true, \"payload_size\" => 100} =",
+              "rust_line": 66,
+              "rust_text": "assert!(matches!(overlay.writes[1].value, V::StoredSize(100)));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Exact pure HistoryValuesTest helper fixtures preserve arbitrary payload_ref=ref, missing_file with /private/secret/path, file-reference /segment/offset10/stored100 with cap10, or FSV2+2+not-an-external-term with cap1024. Source11 links the exact sanitized error; source22 links both omitted=true and stored-size100; source44/45 link the exact invalid-value error and absent payload. Typed ordered overlay writes represent the source map updates while retaining the original borrowed fields. These pure tests do not acquire physical values or execute BEAM/Bitcask; real coherent acquisition and backend fault controls are separate evidence. Links are added after the existing implementation and carry no retroactive tests-first RED. Original ExUnit flow-tag/setup, all required profiles and independent Linux/macOS acceptance remain open; this is not full case/workflow parity."
+          ]
+        },
+        {
+          "scenario_id": "m1-bdafcf374348156d-history_hydration_preserves_original_file_reference_size",
+          "rust_file": "crates/wf-storage/tests/state_store/workflow_values/history_hydration/source.rs",
+          "rust_file_sha256": "cba28118955f1cbc23a1a9816a174930a53acf95dca1439c0eb5eae123a8c24b",
+          "rust_module": "",
+          "rust_function": "history_hydration_preserves_original_file_reference_size",
+          "assertions": [
+            {
+              "source_line": 22,
+              "source_text": "assert %{\"payload_omitted\" => true, \"payload_size\" => 100} =",
+              "rust_line": 38,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 22,
+              "source_text": "assert %{\"payload_omitted\" => true, \"payload_size\" => 100} =",
+              "rust_line": 42,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "After-body storage conformance checks publish real consumed9 workflow data, capture coherent history/bindings, authenticate aliases and immutable bytes, convert actual sized reads and run the pure projector. They preserve exact source stored100/cap10 or FSV2+2+not-an-external-term/cap1024 and repeat after reopen. Genuine rendered aliases replace the source helper's arbitrary ref; /segment/offset10 is not a Rust physical layout promise. The exact arbitrary-ref/diagnostic/file-tuple pure fixtures are separately linked. Full-read and omission-before-decoding controls are supplemental. First execution is existing-behavior conformance, never preimplementation RED. Native ExUnit setup, all required profiles, public history authority/lifecycle and independent Linux acceptance remain required; local macOS execution does not establish full case/workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "381f48c9d21d1d52",
       "runtime_case_ids": [
         "dac853e10683b96abdc8485b86a2128468b4f46155b2e69e9031adc09a082bd7"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-381f48c9d21d1d52",
+          "rust_file": "crates/wf-domain/tests/history_values/overlay.rs",
+          "rust_file_sha256": "eb55adf6fc224fedc24b57916018c51d254c0d7a74af31cd96310158244a2b20",
+          "rust_module": "",
+          "rust_function": "history_overlay_marks_corrupted_typed_values_without_inserting_payload",
+          "assertions": [
+            {
+              "source_line": 44,
+              "source_text": "assert hydrated[\"payload_error\"] == \"ERR invalid flow value\"",
+              "rust_line": 90,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 45,
+              "source_text": "refute Map.has_key?(hydrated, \"payload\")",
+              "rust_line": 94,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Exact pure HistoryValuesTest helper fixtures preserve arbitrary payload_ref=ref, missing_file with /private/secret/path, file-reference /segment/offset10/stored100 with cap10, or FSV2+2+not-an-external-term with cap1024. Source11 links the exact sanitized error; source22 links both omitted=true and stored-size100; source44/45 link the exact invalid-value error and absent payload. Typed ordered overlay writes represent the source map updates while retaining the original borrowed fields. These pure tests do not acquire physical values or execute BEAM/Bitcask; real coherent acquisition and backend fault controls are separate evidence. Links are added after the existing implementation and carry no retroactive tests-first RED. Original ExUnit flow-tag/setup, all required profiles and independent Linux/macOS acceptance remain open; this is not full case/workflow parity."
+          ]
+        },
+        {
+          "scenario_id": "m1-381f48c9d21d1d52-history_hydration_preserves_original_corrupted_typed_value",
+          "rust_file": "crates/wf-storage/tests/state_store/workflow_values/history_hydration/source.rs",
+          "rust_file_sha256": "cba28118955f1cbc23a1a9816a174930a53acf95dca1439c0eb5eae123a8c24b",
+          "rust_module": "",
+          "rust_function": "history_hydration_preserves_original_corrupted_typed_value",
+          "assertions": [
+            {
+              "source_line": 44,
+              "source_text": "assert hydrated[\"payload_error\"] == \"ERR invalid flow value\"",
+              "rust_line": 100,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 45,
+              "source_text": "refute Map.has_key?(hydrated, \"payload\")",
+              "rust_line": 104,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "After-body storage conformance checks publish real consumed9 workflow data, capture coherent history/bindings, authenticate aliases and immutable bytes, convert actual sized reads and run the pure projector. They preserve exact source stored100/cap10 or FSV2+2+not-an-external-term/cap1024 and repeat after reopen. Genuine rendered aliases replace the source helper's arbitrary ref; /segment/offset10 is not a Rust physical layout promise. The exact arbitrary-ref/diagnostic/file-tuple pure fixtures are separately linked. Full-read and omission-before-decoding controls are supplemental. First execution is existing-behavior conformance, never preimplementation RED. Native ExUnit setup, all required profiles, public history authority/lifecycle and independent Linux acceptance remain required; local macOS execution does not establish full case/workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "6dde6f9da85005d1",

@@ -7,10 +7,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,209 tests across 104
+The current local Rust quality checkpoint passes all 1,211 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,198 case and
-adds only eleven coherent history-hydration cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,209 case and
+adds only two pinned-fixture storage conformance cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -18,10 +18,27 @@ advisory fetch or Linux execution is claimed.
 
 The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
 literals and 84 test function identities. All files remain within the existing
-400/600-line caps. The parity ledger retains all 132 counterparts and 550 links;
-only four existing Rust-source hashes changed. This is Rust quality evidence,
+400/600-line caps. The parity ledger now has 137 counterparts and 559 links
+across 123 derived declarations, preserving all 132 earlier counterpart records
+exactly. The four Rust-source hash updates belong to that earlier cleanup.
+This is Rust quality evidence,
 not full workflow parity: 1,681 runtime cases remain unmatched and 1,655 source
 declarations unresolved.
+
+The three original HistoryValues helper cases now have exact checked assertion
+links. Two additional storage cases publish the source stored size 100/return cap 10 and exact
+malformed typed bytes/return cap 1024, hydrate real history and repeat after reopen. The
+existing genuine backend failure test remains unchanged. These links/cases are
+after-body conformance; public history authority/lifecycle and every required
+source profile/platform remain open.
+
+Fixed offline ledger regeneration losing 37 manually reviewed counterparts. It
+now preserves those records, refreshes generated records in place and rejects
+stale provenance, conflicting identities or lost runtime bindings before writing.
+Seven Python stdlib regressions run in scripts/check.sh: five genuine rejecting
+methods were saved in ca21788 before the fix; two controls followed the body.
+Actual regeneration retains all prior records/runtime bindings and is byte
+idempotent. Details and receipts are in the coordination record.
 
 The coherent history-value reader now hydrates actual selected and lookahead
 rows through their real historical bindings, aliases and immutable bytes on the
@@ -126,12 +143,13 @@ commit, and all four modes through local/matching/fresh FWSP4 routes and purge.
 Seven complete source inverses preserve disabled/8 behavior; no earlier test
 assertion changed. These compositions do not start an accepted service.
 
-Next close logical typed preparation and actual ordered history acquisition,
-then compose the real observations with HistoryValues hydration. Preserve each
-carried alias's encoding and all binary8 behavior; do not infer typed data from
-an FSV2 prefix. Intent version9 is separate from the existing original-policy
-operation tag9. The conversion currently uses caller-captured history; actual
-ordered FWSH/family11 acquisition and public query services remain required.
+Next close logical typed preparation, then the accepted public history/query
+service under real authority, lifecycle and read-barrier contracts. Physical
+ordered FWSH/binding acquisition and coherent hydration are now implemented as
+recorded above. Preserve each carried alias's encoding and all binary8 behavior;
+do not infer typed data from an FSV2 prefix. Intent version9 is separate from
+the existing original-policy operation tag9. Actual public query services remain
+required.
 Shared/named/external availability, authority/routing/read barriers, lifecycle
 cleanup, native/Linux/macOS acceptance, complete Elixir coverage and remaining
 product milestones stay open. Exact paths, resource census and execution

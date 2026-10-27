@@ -54953,3 +54953,83 @@ no RED credit. No generator preservation body exists. Exact sources/output at
 storage conformance cases independently pass after real publication and reopen;
 these remain after-body coverage. Save this rejecting tooling baseline before
 implementing its data-preservation behavior.
+
+GENERATOR-PRESERVATION1 body now passes all five unchanged saved test methods.
+Actual repository regeneration retains all132 old counterpart objects exactly,
+adds exactly five new records (123 declarations/137 records/559 links), preserves
+every declaration/runtime binding and repeats byte-exact. cargo progress actually
+validates those links and still reports the same1681 unmatched/1655 unresolved
+counts and incomplete parity. Receipt history-source-ledger-preservation.json.
+
+Before supplementary test edits, select two additional methods on the existing
+ProgressGeneratorTests: test_rejects_removed_runtime_bindings and
+test_rejects_generated_lineage_conflicts. Exercise a supplied collection that
+drops an old case, a generated scenario moved across declarations and duplicate
+generated IDs. These are AFTER-BODY adversarial controls, distinct from the five
+unchanged genuine-R0 methods. No new artifact/type/model or runtime contract.
+
+## HISTORY-SOURCE-CONFORMANCE1 / GENERATOR-PRESERVATION1 — validated solo checkpoint
+
+Previous goal turn classification: no product implementation progress (existing
+lint verification only). This turn revalidated the clean state and closed the
+newly feasible source-link/acquisition gap without redefining the full goal.
+
+The two new physical source cases pass after real consumed9 publication and
+reopen. They use exact stored100/cap10 and malformed FSV2+2+not-an-external-term
+with cap1024. Exact omitted/size and error/absent-payload assertions link to
+source22 and44/45. Fully funded binary read and omission before malformed decode
+are additional controls. Existing pure counterparts retain arbitrary ref,
+missing_file/private path and /segment/offset10/100. All old Rust test bodies
+remain exact; the only old test edits are a child module declaration and a
+corrected introductory status comment. All production Rust source is unchanged.
+
+Saved ca21788 contains genuine rejecting generator tests before preservation.
+All five original methods/helpers stay byte-exact; their complete tails now
+pass. Two explicitly supplementary after-body methods also pass, refusing
+loss from a supplied collection and generated lineage/duplicate conflicts.
+Generation preserves records outside LINKS, refreshes selected records in place
+and checks baseline/declaration/scenario provenance before writing. Existing
+runtime bindings require an explicit collection and cannot disappear. No stale
+manual hash is silently refreshed; check-progress retains that fail-closed
+review obligation. CI delegates to scripts/check.sh, which now runs all seven
+stdlib Python controls with -B on both configured hosts. No runtime dependency
+or new platform assumption was added. Root performed design/code/resource review
+solo; no independent review is claimed.
+
+The real ledger preserves every one of132 earlier counterpart objects exactly,
+including all550 prior links, and adds exactly five records/nine links for
+three declarations:123 derived/137 counterparts/559 links. Every registration
+binding and the collection receipt are exact; second generation is byte-exact.
+The immutable full-parity mapping and all reference inputs remain unchanged.
+cargo progress validates this accounting and still reports5903 raw/4222 linked/
+1681 unmatched/1655 unresolved. Actual cargo parity exits1 with the full-scope
+incomplete error. None of these component checks certifies full source cases.
+
+Final pipeline42246 terminal0 passes all twelve selected gates: seven Python
+regressions, shell syntax, fmt, workspace/all-target compile and strict Clippy,
+all1,211 Rust cases, six doctests, warnings-denied documentation, reference and
+progress integrity, offline dependency policy and diff check. There are104
+executable targets including two benchmark smokes (102 test-result targets),
+with all53 architecture cases; all15 doc targets and both smoke messages remain
+exact. Exact package/target/test/status Counter preserves all1,209 earlier
+cases and adds only the two declared storage conformance identities. Canonical
+Counter SHA bccdc0bdf2266078ea0d0b7469dd6a575255262d2aefbdc0f87e1848e10e7dd3.
+All1,648 non-Markdown inputs including1,061 Rust files stay hash-exact through
+the pipeline. The initial strict-Clippy attempt found only missing backticks
+in the new status comment; corrected that comment and reran the complete gate
+sequence, with the original refusal log preserved.
+
+Receipts: /private/tmp/ferricstore2-history-source-{generator-r0,ledger-preservation,
+pipeline,full-identity,full-parity}.json and associated stage logs. Offline audit
+uses the unchanged primary advisory cache and explicit feature manifest; no
+fresh advisory fetch, native source-profile run or Linux execution is claimed.
+No limits/allowances, tests, source assertions, runtime bindings or validators
+were weakened. Generator work is linear in declaration/link records;
+this is bookkeeping correctness, not measured production optimization. All Rust
+files retain400/600 caps and strict function100/nesting4/cognitive25.
+
+Full goal stays ACTIVE and SOLO: logical typed preparation, accepted public
+history/query authority/lifecycle/read barriers, runtime/transport integration,
+remaining workflow breadth, every mandatory source profile and Linux/macOS
+acceptance remain required. No agents, push, external messages or unchanged
+denied native probes. This checkpoint does not complete any broader milestone.
