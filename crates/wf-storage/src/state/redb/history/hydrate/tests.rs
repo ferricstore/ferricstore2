@@ -23,6 +23,7 @@ use crate::state::{
 
 mod backend;
 mod fixtures;
+mod incarnation;
 use backend::fixture_data::{ReadFaultClock, database};
 use fixtures::fixture_data::{
     clock, directory_for_fault, fixture, limits, publish, query, rewrite, rows,
