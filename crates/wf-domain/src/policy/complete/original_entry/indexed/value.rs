@@ -287,29 +287,28 @@ impl<'index, 'raw, 'context> OriginalPolicyCurrentCursor<'index, 'raw, 'context>
             return Some(i128::from(byte));
         }
         let span = self.span()?;
-        match span.tag() {
-            97 => Some(i128::from(span.keys)),
-            98 => Some(i128::from(i32::from_be_bytes(span.keys.to_be_bytes()))),
-            110 | 111 => {
-                let (negative, bytes) = self.big_integer()?;
-                if bytes.len() > 16 {
-                    return None;
-                }
-                let mut magnitude = [0; 16];
-                magnitude[..bytes.len()].copy_from_slice(bytes);
-                let number = u128::from_le_bytes(magnitude);
-                if negative && number == (1_u128 << 127) {
-                    Some(i128::MIN)
-                } else {
-                    let number = i128::try_from(number).ok()?;
-                    if negative {
-                        number.checked_neg()
-                    } else {
-                        Some(number)
-                    }
-                }
-            }
-            _ => None,
+        if !matches!(span.tag(), 110 | 111) {
+            return match span.tag() {
+                97 => Some(i128::from(span.keys)),
+                98 => Some(i128::from(i32::from_be_bytes(span.keys.to_be_bytes()))),
+                _ => None,
+            };
+        }
+        let (negative, bytes) = self.big_integer()?;
+        if bytes.len() > 16 {
+            return None;
+        }
+        let mut magnitude = [0; 16];
+        magnitude[..bytes.len()].copy_from_slice(bytes);
+        let number = u128::from_le_bytes(magnitude);
+        if negative && number == (1_u128 << 127) {
+            return Some(i128::MIN);
+        }
+        let number = i128::try_from(number).ok()?;
+        if negative {
+            number.checked_neg()
+        } else {
+            Some(number)
         }
     }
 

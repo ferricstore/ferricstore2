@@ -259,41 +259,46 @@ pub(in crate::policy::complete) fn borrow_metadata<'input>(
         return Ok(Ok(None));
     }
     match value.kind() {
-        Kind::List | Kind::ImproperList => {
-            let mut first = None;
-            let mut overflow = false;
-            let mut index = 0;
-            while let Some(child) = value.list_item(index, charge)? {
-                index += 1;
-                if depth >= 64 {
-                    return Err(Error::ItemLimit);
-                }
-                let name = match borrow_metadata(child, depth + 1, charge)? {
-                    Ok(name) => name,
-                    Err(reason) => return Ok(Err(reason)),
-                };
-                if let Some(name) = name {
-                    if overflow {
-                        continue;
-                    }
-                    if let Some(existing) = first {
-                        if !key::equal_keys(existing, name, charge)? {
-                            overflow = true;
-                        }
-                    } else {
-                        first = Some(name);
-                    }
-                }
-            }
-            Ok(if overflow {
-                Err(PolicyIndexedInputRejection::StateMetaCount)
-            } else {
-                Ok(first)
-            })
-        }
+        Kind::List | Kind::ImproperList => borrow_metadata_list(value, depth, charge),
         Kind::Atom | Kind::Binary => Ok(key::normalize_key(value, false, charge)?.map(Some)),
         _ => Ok(Err(PolicyIndexedInputRejection::StateMetaShape)),
     }
+}
+
+fn borrow_metadata_list<'input>(
+    value: Cursor<'input>,
+    depth: usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Result<Option<&'input [u8]>, PolicyIndexedInputRejection>, Error> {
+    let mut first = None;
+    let mut overflow = false;
+    let mut index = 0;
+    while let Some(child) = value.list_item(index, charge)? {
+        index += 1;
+        if depth >= 64 {
+            return Err(Error::ItemLimit);
+        }
+        let name = match borrow_metadata(child, depth + 1, charge)? {
+            Ok(name) => name,
+            Err(reason) => return Ok(Err(reason)),
+        };
+        let Some(name) = name else { continue };
+        if overflow {
+            continue;
+        }
+        if let Some(existing) = first {
+            if !key::equal_keys(existing, name, charge)? {
+                overflow = true;
+            }
+        } else {
+            first = Some(name);
+        }
+    }
+    Ok(if overflow {
+        Err(PolicyIndexedInputRejection::StateMetaCount)
+    } else {
+        Ok(first)
+    })
 }
 
 fn own_attributes(

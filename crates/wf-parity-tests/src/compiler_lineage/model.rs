@@ -306,21 +306,7 @@ fn compiler_schema_required_arrays_are_unique() -> Result<(), crate::CheckError>
     while let Some(value) = pending.pop() {
         match value {
             Value::Object(object) => {
-                if let Some(required) = object.get("required") {
-                    let names = required.as_array().ok_or_else(|| {
-                        crate::CheckError::new("compiler schema required field must be an array")
-                    })?;
-                    let mut unique = std::collections::BTreeSet::new();
-                    for name in names {
-                        let name = name.as_str().ok_or_else(|| {
-                            crate::CheckError::new("compiler schema required names must be strings")
-                        })?;
-                        if !unique.insert(name) {
-                            duplicates.push(name);
-                        }
-                    }
-                    checked += 1;
-                }
+                checked += check_required_names(object.get("required"), &mut duplicates)?;
                 pending.extend(object.values());
             }
             Value::Array(array) => pending.extend(array),
@@ -336,4 +322,27 @@ fn compiler_schema_required_arrays_are_unique() -> Result<(), crate::CheckError>
         "duplicate compiler schema required names: {duplicates:?}"
     );
     Ok(())
+}
+
+#[cfg(test)]
+fn check_required_names<'a>(
+    required: Option<&'a Value>,
+    duplicates: &mut Vec<&'a str>,
+) -> Result<usize, crate::CheckError> {
+    let Some(required) = required else {
+        return Ok(0);
+    };
+    let names = required
+        .as_array()
+        .ok_or_else(|| crate::CheckError::new("compiler schema required field must be an array"))?;
+    let mut unique = std::collections::BTreeSet::new();
+    for name in names {
+        let name = name.as_str().ok_or_else(|| {
+            crate::CheckError::new("compiler schema required names must be strings")
+        })?;
+        if !unique.insert(name) {
+            duplicates.push(name);
+        }
+    }
+    Ok(1)
 }

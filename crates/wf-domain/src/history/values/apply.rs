@@ -33,31 +33,34 @@ pub(super) fn apply<'a, T: ?Sized>(
         _ => None,
     };
     let mut writes = Vec::new();
-    if matches!(plan.value_return, HistoryValueReturn::Enabled { .. }) {
+    let history = if matches!(plan.value_return, HistoryValueReturn::Enabled { .. }) {
         let history = plan.history;
         plan.charge.events(&plan.limits, mul(history.len(), 4)?)?;
-        for (index, entry) in history.iter().enumerate() {
-            for (kind, reference) in [
-                (K::Payload, entry.references[0]),
-                (K::Result, entry.references[1]),
-                (K::Error, entry.references[2]),
-            ] {
-                let selected = match reference {
-                    Reference::Binary(bytes) if !bytes.is_empty() && bytes.len() <= 65_535 => {
-                        lookup(&mut plan, bytes, &slots, values)?
-                    }
-                    _ => None,
-                };
-                occurrence(
-                    &mut plan,
-                    &mut writes,
-                    index,
-                    kind,
-                    reference,
-                    selected,
-                    context,
-                )?;
-            }
+        history
+    } else {
+        &[]
+    };
+    for (index, entry) in history.iter().enumerate() {
+        for (kind, reference) in [
+            (K::Payload, entry.references[0]),
+            (K::Result, entry.references[1]),
+            (K::Error, entry.references[2]),
+        ] {
+            let selected = match reference {
+                Reference::Binary(bytes) if !bytes.is_empty() && bytes.len() <= 65_535 => {
+                    lookup(&mut plan, bytes, &slots, values)?
+                }
+                _ => None,
+            };
+            occurrence(
+                &mut plan,
+                &mut writes,
+                index,
+                kind,
+                reference,
+                selected,
+                context,
+            )?;
         }
     }
     let overlay = HistoryValueOverlay {

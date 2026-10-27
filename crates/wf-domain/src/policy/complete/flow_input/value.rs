@@ -258,17 +258,18 @@ pub(in crate::policy::complete) fn select<'input>(
     for index in 0..input.len(charge)? {
         let (key, value) = input.row_at(index, charge)?;
         visit(charge, key.key_bytes().map_or(0, <[u8]>::len))?;
-        if let Some(bytes) = key.key_bytes() {
-            visit(
-                charge,
-                bytes.len().checked_add(name.len()).ok_or_else(overflow)?,
-            )?;
-            if bytes == name {
-                if key.is_atom() {
-                    atom = Some(value);
-                } else {
-                    binary = Some(value);
-                }
+        let Some(bytes) = key.key_bytes() else {
+            continue;
+        };
+        visit(
+            charge,
+            bytes.len().checked_add(name.len()).ok_or_else(overflow)?,
+        )?;
+        if bytes == name {
+            if key.is_atom() {
+                atom = Some(value);
+            } else {
+                binary = Some(value);
             }
         }
     }

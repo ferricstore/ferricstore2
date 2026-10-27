@@ -7,6 +7,14 @@ complexity25 and function length100; existing lint violations remain visible.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
+The first solo lint-cleanup batch passes604 Rust tests and1 documentation test:
+architecture53, domain495 (including all18 HistoryValues cases) and parity56.
+Exact package/target/source/name/status comparison preserves every prior selected
+identity across59 targets. Workspace all-target compilation, formatting,
+reference integrity and progress-ledger checks pass. Architecture/parity strict
+Clippy passes; domain still has39 nesting and2 complexity findings in22 files.
+Downstream linting and complete workspace execution remain required.
+
 The last saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/
 name/status comparison preserves all 1,119 prior identities and adds only the
 nine Node recovery cases. All 102 targets and both benchmark correctness smokes
@@ -54,12 +62,11 @@ identity Counter is 51afde2c; only nine Node cases extend the prior 1,119.
 This is local macOS execution, not Linux or mandatory original-profile evidence.
 
 The pure HistoryValues collector/overlay now passes all eighteen unchanged
-full-tail cases after its saved rejecting baseline `00133c0`. Reciprocal source
-and resource-account reviews are complete. Formatting, whole-workspace
-compilation and strict Clippy pass. The narrow iterator-metadata and bare-crate
-visibility correction passes all 53 focused architecture checks. Full workspace
-execution remains unverified, and peer review found an import-order gap requiring
-a new failing regression before correction.
+full-tail cases after its saved rejecting baseline `00133c0`. Its prior reciprocal
+source/resource reviews are recorded. Current solo refactors retain its paid
+traversal, decode and owner phases. The iterator-metadata/bare-crate correction
+and scoped import-order fix now pass all53 architecture checks. Current full
+quality remains open under the stricter nesting/complexity policy above.
 
 The selected M0 correction preserves the existing architecture identities and
 adds 43 specific forbidden controls, 14 collected positive examples and a real
@@ -67,9 +74,11 @@ private-helper E0603 compiler control. Under the unchanged checker, all forbidde
 controls execute before the intended terminal positive-example failure; all
 three real compiler visibility tests pass. That reached M0 RED was saved in
 `13e471c` before the narrow classifier change. Four further std/core forward and
-reversed named-import controls now reach the intended failure: all four return
-empty findings under that classifier. This reproducible RED is saved before the
-separately selected ordering fix; the same test identity and old controls remain.
+reversed named-import controls reached the intended failure: all four returned
+empty findings under that classifier. This RED and the expanded scope controls
+were saved in`9d72389`/`329c8ff` before correction. All four alias controls,
+twelve scope controls and the old43/14 controls now execute successfully within
+the same preserved identity; actual compiler privacy controls also pass.
 This provides no full-workspace GREEN, source mapping, public hydration or
 platform acceptance credit.
 
@@ -81,8 +90,10 @@ record. Passing pure writes establish no physical acquisition or public hydratio
 
 Real size-aware reads, separately versioned typed publication, shared/named/
 external availability, ordered history hydration and authoritative routing/read
-barriers remain required. Architecture and performance are preparing the real
-size-aware read successor without source changes. Do not substitute the three
+barriers remain required. The isolated `ferricstore2-sized-value-read` worktree
+contains an unfinished ten-case tests-only draft; its API, compiled RED and
+implementation remain unexecuted. The user stopped all agent work; continue
+that draft solo after restoring the quality gate. Do not substitute the three
 source error cases for complete success/omission/overlay behavior or full routing.
 No accepted service, full Elixir parity or milestone completion is claimed.
 

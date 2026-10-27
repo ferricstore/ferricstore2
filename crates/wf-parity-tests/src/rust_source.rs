@@ -148,25 +148,26 @@ fn scan_items(
                 .find(|(_, token)| token.text == "{" || token.text == ";")
                 .ok_or_else(|| CheckError::new("Rust function has no body/terminator"))?
                 .0;
-            if tokens[open].text == "{" {
-                let end = close(tokens, open, "{", "}")?;
-                if attributes.test
-                    && !attributes.ignored
-                    && !attributes.unsupported_cfg
-                    && !unsupported_parent
-                {
-                    candidates.push(Candidate {
-                        module: module.to_owned(),
-                        name: name.text.clone(),
-                        body: TestBody {
-                            tokens: tokens[open + 1..end].to_vec(),
-                        },
-                    });
-                }
-                index = end + 1;
-            } else {
+            if tokens[open].text != "{" {
                 index = open + 1;
+                attributes = Attributes::default();
+                continue;
             }
+            let end = close(tokens, open, "{", "}")?;
+            if attributes.test
+                && !attributes.ignored
+                && !attributes.unsupported_cfg
+                && !unsupported_parent
+            {
+                candidates.push(Candidate {
+                    module: module.to_owned(),
+                    name: name.text.clone(),
+                    body: TestBody {
+                        tokens: tokens[open + 1..end].to_vec(),
+                    },
+                });
+            }
+            index = end + 1;
             attributes = Attributes::default();
             continue;
         }

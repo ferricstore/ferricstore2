@@ -211,34 +211,33 @@ fn indexed_metrics(
             false,
         ),
     ] {
-        if let Some(names) = names {
-            if names.len() > 3 {
-                return Err(PolicySchemaError::InvalidIndexedAttributes);
+        let Some(names) = names else { continue };
+        if names.len() > 3 {
+            return Err(PolicySchemaError::InvalidIndexedAttributes);
+        }
+        if attributes {
+            charge_schema(charge, 128, 0)?;
+            largest = largest
+                .max(u64::try_from(names.len()).map_err(|_| PolicySchemaError::LengthOverflow)?);
+        }
+        let invalid_name = if attributes {
+            PolicySchemaError::InvalidIndexedAttributes
+        } else {
+            PolicySchemaError::InvalidIndexedStateMeta
+        };
+        for name in names {
+            charge_schema(charge, 128, 0)?;
+            if name.len() > 64 {
+                return Err(invalid_name);
             }
-            if attributes {
-                charge_schema(charge, 128, 0)?;
-                largest = largest.max(
-                    u64::try_from(names.len()).map_err(|_| PolicySchemaError::LengthOverflow)?,
-                );
+            let n = u64::try_from(name.len()).map_err(|_| PolicySchemaError::LengthOverflow)?;
+            *bytes = bytes
+                .checked_add(n)
+                .ok_or(PolicySchemaError::LengthOverflow)?;
+            if *bytes > 262_144 {
+                return Err(PolicySchemaError::SnapshotBytes);
             }
-            for name in names {
-                charge_schema(charge, 128, 0)?;
-                if name.len() > 64 {
-                    return Err(if attributes {
-                        PolicySchemaError::InvalidIndexedAttributes
-                    } else {
-                        PolicySchemaError::InvalidIndexedStateMeta
-                    });
-                }
-                let n = u64::try_from(name.len()).map_err(|_| PolicySchemaError::LengthOverflow)?;
-                *bytes = bytes
-                    .checked_add(n)
-                    .ok_or(PolicySchemaError::LengthOverflow)?;
-                if *bytes > 262_144 {
-                    return Err(PolicySchemaError::SnapshotBytes);
-                }
-                charge_schema(charge, n, 0)?;
-            }
+            charge_schema(charge, n, 0)?;
         }
     }
     Ok(largest)

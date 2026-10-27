@@ -38,16 +38,9 @@ pub(super) fn states<'raw: 'a, 'a>(
             next = following;
             pay(128, charge)?;
             let name = index.raw_cursor(key).binary_bytes();
-            let mut update = None;
-            if let Some(name) = name {
-                for (wanted, candidate) in changes {
-                    pay(add(128, add(name.len(), wanted.len())?)?, charge)?;
-                    if wanted == name {
-                        update = Some(candidate);
-                        matched += 1;
-                        break;
-                    }
-                }
+            let update = changed_state(changes, name, charge)?;
+            if update.is_some() {
+                matched += 1;
             }
             if matches!(update, Some(StateChange::Remove)) {
                 continue;
@@ -115,6 +108,21 @@ pub(super) fn states<'raw: 'a, 'a>(
         return Err(policy(PolicyError::StateBudget));
     }
     Ok((root, length))
+}
+
+fn changed_state<'a>(
+    changes: &'a BTreeMap<Vec<u8>, StateChange>,
+    name: Option<&[u8]>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<&'a StateChange>, Error> {
+    let Some(name) = name else { return Ok(None) };
+    for (wanted, candidate) in changes {
+        pay(add(128, add(name.len(), wanted.len())?)?, charge)?;
+        if wanted == name {
+            return Ok(Some(candidate));
+        }
+    }
+    Ok(None)
 }
 
 fn exists(

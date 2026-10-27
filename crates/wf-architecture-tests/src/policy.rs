@@ -47,17 +47,7 @@ impl Policy {
                 "tooling" => false,
                 _ => return Err("unclassified package kind".into()),
             };
-            let mut modules = BTreeMap::new();
-            if let Some(table) = value.get("modules").and_then(toml::Value::as_table) {
-                for (name, public) in table {
-                    modules.insert(
-                        name.clone(),
-                        public
-                            .as_bool()
-                            .ok_or("module visibility must be boolean")?,
-                    );
-                }
-            }
+            let modules = modules(value)?;
             if runtime && modules.is_empty() {
                 return Err(format!("{name}: no module classification").into());
             }
@@ -83,6 +73,21 @@ impl Policy {
             worker_wire_modules: strings(&document, "worker_wire_modules")?,
         })
     }
+}
+
+fn modules(value: &toml::Value) -> CheckResult<BTreeMap<String, bool>> {
+    let mut modules = BTreeMap::new();
+    if let Some(table) = value.get("modules").and_then(toml::Value::as_table) {
+        for (name, public) in table {
+            modules.insert(
+                name.clone(),
+                public
+                    .as_bool()
+                    .ok_or("module visibility must be boolean")?,
+            );
+        }
+    }
+    Ok(modules)
 }
 
 fn externals(value: &toml::Value, key: &str) -> CheckResult<Vec<External>> {

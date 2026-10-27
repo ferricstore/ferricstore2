@@ -2,7 +2,9 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use super::{Inspector, use_paths};
+use syn::{Expr, Lit, Meta, Token, parse::Parser, punctuated::Punctuated, visit::Visit};
+
+use super::{Inspector, MatchArguments, VectorRepeat, use_paths};
 
 impl Inspector<'_, '_> {
     pub(super) fn begin_metadata_scope<'ast>(
@@ -32,15 +34,14 @@ impl Inspector<'_, '_> {
     ) -> BTreeMap<String, Vec<String>> {
         let mut bindings = BTreeMap::new();
         for item in items {
-            if let syn::Item::Use(item) = item {
-                let mut paths = Vec::new();
-                use_paths(&item.tree, Vec::new(), &mut paths);
-                for (path, alias) in paths {
-                    if let Some(alias) = alias {
-                        bindings.insert(alias, path);
-                    }
-                }
-            }
+            let syn::Item::Use(item) = item else { continue };
+            let mut paths = Vec::new();
+            use_paths(&item.tree, Vec::new(), &mut paths);
+            bindings.extend(
+                paths
+                    .into_iter()
+                    .filter_map(|(path, alias)| alias.map(|alias| (alias, path))),
+            );
         }
         bindings
     }
@@ -52,29 +53,57 @@ impl Inspector<'_, '_> {
         let mut known = inherited.clone();
         let mut resolved = BTreeMap::new();
         for _ in 0..raw.len() {
-            let mut changed = false;
-            for (name, path) in raw {
-                if known.contains_key(name) {
-                    continue;
-                }
-                let target = if let Some(prefix) = path.first().and_then(|first| known.get(first)) {
-                    let mut target = prefix.clone();
-                    target.extend_from_slice(&path[1..]);
-                    target
-                } else {
-                    path.clone()
-                };
-                if Self::metadata_iterator(&target) {
-                    known.insert(name.clone(), target.clone());
-                    resolved.insert(name.clone(), target);
-                    changed = true;
-                }
-            }
-            if !changed {
+            if !Self::resolve_metadata_pass(raw, &mut known, &mut resolved) {
                 break;
             }
         }
         resolved
+    }
+
+    fn resolve_metadata_pass(
+        raw: &BTreeMap<String, Vec<String>>,
+        known: &mut BTreeMap<String, Vec<String>>,
+        resolved: &mut BTreeMap<String, Vec<String>>,
+    ) -> bool {
+        let mut changed = false;
+        for (name, path) in raw {
+            if known.contains_key(name) {
+                continue;
+            }
+            let target = if let Some(prefix) = path.first().and_then(|first| known.get(first)) {
+                let mut target = prefix.clone();
+                target.extend_from_slice(&path[1..]);
+                target
+            } else {
+                path.clone()
+            };
+            if Self::metadata_iterator(&target) {
+                known.insert(name.clone(), target.clone());
+                resolved.insert(name.clone(), target);
+                changed = true;
+            }
+        }
+        changed
+    }
+
+    pub(super) fn store_alias(&mut self, alias: String, path: Vec<String>) {
+        let resolved = self.resolved_path(&path);
+        let target = if Self::metadata_iterator(&resolved) {
+            resolved
+        } else {
+            path
+        };
+        self.aliases.insert(alias, target);
+    }
+
+    pub(super) fn inspect_cfg_attr(&mut self, list: &syn::MetaList) {
+        if let Ok(nested) = list.parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated) {
+            for meta in &nested {
+                self.lint(meta);
+            }
+        } else {
+            self.report("uninspectable cfg_attr");
+        }
     }
 
     pub(super) fn end_metadata_scope(&mut self, previous: BTreeMap<String, Vec<String>>) {
@@ -199,5 +228,58 @@ impl Inspector<'_, '_> {
                 || (self.context.package == "wf-storage"
                     && (under("state::value") || under("state::key")))
                 || (self.context.package == "wf-ports" && ports_module))
+    }
+}
+
+impl Inspector<'_, '_> {
+    pub(super) fn inspect_expression_macro(&mut self, mac: &syn::Macro, name: Option<&str>) {
+        match name {
+            Some("format" | "vec" | "write") => self.inspect_list_macro(mac, name),
+            Some("matches") => self.inspect_matches_macro(mac),
+            _ => {}
+        }
+    }
+
+    fn inspect_list_macro(&mut self, mac: &syn::Macro, name: Option<&str>) {
+        let Ok(arguments) =
+            Punctuated::<Expr, Token![,]>::parse_terminated.parse2(mac.tokens.clone())
+        else {
+            if name == Some("vec") {
+                self.inspect_repeat_macro(mac);
+            } else {
+                self.report("uninspectable approved expression macro");
+            }
+            return;
+        };
+        if name == Some("write")
+            && !matches!(arguments.iter().nth(1), Some(Expr::Lit(literal))
+                if matches!(&literal.lit, Lit::Str(_)))
+        {
+            self.report("uninspectable approved expression macro");
+        }
+        for expression in &arguments {
+            self.visit_expr(expression);
+        }
+    }
+
+    fn inspect_repeat_macro(&mut self, mac: &syn::Macro) {
+        if let Ok(repeat) = syn::parse2::<VectorRepeat>(mac.tokens.clone()) {
+            self.visit_expr(&repeat.item);
+            self.visit_expr(&repeat.length);
+        } else {
+            self.report("uninspectable approved expression macro");
+        }
+    }
+
+    fn inspect_matches_macro(&mut self, mac: &syn::Macro) {
+        if let Ok(arguments) = syn::parse2::<MatchArguments>(mac.tokens.clone()) {
+            self.visit_expr(&arguments.item);
+            self.visit_pat(&arguments.pattern);
+            if let Some(guard) = &arguments.guard {
+                self.visit_expr(guard);
+            }
+        } else {
+            self.report("uninspectable approved expression macro");
+        }
     }
 }

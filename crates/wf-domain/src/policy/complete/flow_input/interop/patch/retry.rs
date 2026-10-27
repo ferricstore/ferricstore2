@@ -362,18 +362,20 @@ fn find<const N: usize>(
         pay(128, charge)?;
         let cursor = index.raw_cursor(key);
         let a = cursor.atom_bytes();
-        if let Some(bytes) = a.or_else(|| cursor.binary_bytes()) {
-            for (field, name) in names.iter().enumerate() {
-                pay(add(128, add(bytes.len(), name.len())?)?, charge)?;
-                if bytes == name.as_bytes() {
-                    if a.is_some() {
-                        atom[field] = Some(value);
-                    } else {
-                        binary[field] = Some(value);
-                    }
-                    break;
-                }
+        let Some(bytes) = a.or_else(|| cursor.binary_bytes()) else {
+            continue;
+        };
+        for (field, name) in names.iter().enumerate() {
+            pay(add(128, add(bytes.len(), name.len())?)?, charge)?;
+            if bytes != name.as_bytes() {
+                continue;
             }
+            if a.is_some() {
+                atom[field] = Some(value);
+            } else {
+                binary[field] = Some(value);
+            }
+            break;
         }
     }
     for (slot, fallback) in atom.iter_mut().zip(binary) {

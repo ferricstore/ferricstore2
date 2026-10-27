@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use syn::{
     Attribute, Expr, Lit, Meta, Token, UseTree, Visibility,
-    parse::{Parse, ParseStream, Parser},
+    parse::{Parse, ParseStream},
     punctuated::Punctuated,
     visit::Visit,
 };
@@ -63,17 +63,7 @@ pub(crate) fn check(source: &str, context: &Context<'_>) -> CheckResult<Vec<Stri
             visitor.report("unreviewed archunit ignore directive");
         }
         if context.module.is_empty() {
-            let modules: BTreeSet<_> = syntax
-                .items
-                .iter()
-                .filter_map(|item| {
-                    if let syn::Item::Mod(module) = item {
-                        Some(module.ident.to_string())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
+            let modules: BTreeSet<_> = syntax.items.iter().filter_map(declared_module).collect();
             let classified: BTreeSet<_> = context.classification.modules.keys().cloned().collect();
             if modules != classified {
                 visitor.report("root modules differ from complete module classification");
@@ -89,6 +79,14 @@ pub(crate) fn check(source: &str, context: &Context<'_>) -> CheckResult<Vec<Stri
     }
     visitor.visit_file(&syntax);
     Ok(visitor.violations)
+}
+
+fn declared_module(item: &syn::Item) -> Option<String> {
+    if let syn::Item::Mod(module) = item {
+        Some(module.ident.to_string())
+    } else {
+        None
+    }
 }
 
 fn forbids_unsafe(attribute: &Attribute) -> bool {
@@ -194,15 +192,7 @@ impl Inspector<'_, '_> {
     fn lint(&mut self, meta: &Meta) {
         let Meta::List(list) = meta else { return };
         if list.path.is_ident("cfg_attr") {
-            if let Ok(nested) =
-                list.parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)
-            {
-                for meta in &nested {
-                    self.lint(meta);
-                }
-            } else {
-                self.report("uninspectable cfg_attr");
-            }
+            self.inspect_cfg_attr(list);
         }
         if !list.path.is_ident("allow") && !list.path.is_ident("expect") {
             return;
@@ -323,13 +313,7 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
                 self.report("private worker transport modules cannot be re-exported");
             }
             if let Some(alias) = alias {
-                let resolved = self.resolved_path(&path);
-                let target = if Self::metadata_iterator(&resolved) {
-                    resolved
-                } else {
-                    path
-                };
-                self.aliases.insert(alias, target);
+                self.store_alias(alias, path);
             }
         }
         syn::visit::visit_item_use(self, item);
@@ -467,49 +451,6 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
             self.inspect_expression_macro(mac, name.as_deref());
         }
         syn::visit::visit_macro(self, mac);
-    }
-}
-
-impl Inspector<'_, '_> {
-    fn inspect_expression_macro(&mut self, mac: &syn::Macro, name: Option<&str>) {
-        match name {
-            Some("format" | "vec" | "write") => {
-                if let Ok(arguments) =
-                    Punctuated::<Expr, Token![,]>::parse_terminated.parse2(mac.tokens.clone())
-                {
-                    if name == Some("write")
-                        && !matches!(arguments.iter().nth(1), Some(Expr::Lit(literal))
-                            if matches!(&literal.lit, Lit::Str(_)))
-                    {
-                        self.report("uninspectable approved expression macro");
-                    }
-                    for expression in &arguments {
-                        self.visit_expr(expression);
-                    }
-                } else if name == Some("vec") {
-                    if let Ok(repeat) = syn::parse2::<VectorRepeat>(mac.tokens.clone()) {
-                        self.visit_expr(&repeat.item);
-                        self.visit_expr(&repeat.length);
-                    } else {
-                        self.report("uninspectable approved expression macro");
-                    }
-                } else {
-                    self.report("uninspectable approved expression macro");
-                }
-            }
-            Some("matches") => {
-                if let Ok(arguments) = syn::parse2::<MatchArguments>(mac.tokens.clone()) {
-                    self.visit_expr(&arguments.item);
-                    self.visit_pat(&arguments.pattern);
-                    if let Some(guard) = &arguments.guard {
-                        self.visit_expr(guard);
-                    }
-                } else {
-                    self.report("uninspectable approved expression macro");
-                }
-            }
-            _ => {}
-        }
     }
 }
 

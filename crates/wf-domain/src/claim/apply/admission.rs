@@ -64,14 +64,7 @@ pub(super) fn admit_query_with_prior(
     ] {
         for component in components {
             if component.is_empty() {
-                let error = if query.workflow_type.is_empty() {
-                    ClaimRejection::EmptyType
-                } else if query.worker.is_empty() {
-                    ClaimRejection::EmptyWorker
-                } else {
-                    ClaimRejection::InvalidScope
-                };
-                return Err(ClaimPreflightError::Business(error));
+                return Err(ClaimPreflightError::Business(empty_component(&query)));
             }
             let maximum = maximum.min(limits.inline_bytes());
             if component.len() > maximum {
@@ -129,6 +122,16 @@ pub(super) fn admit_query_with_prior(
         ));
     }
     Ok((q, g))
+}
+
+fn empty_component(query: &ClaimQuery<'_>) -> ClaimRejection {
+    if query.workflow_type.is_empty() {
+        ClaimRejection::EmptyType
+    } else if query.worker.is_empty() {
+        ClaimRejection::EmptyWorker
+    } else {
+        ClaimRejection::InvalidScope
+    }
 }
 
 fn admit_query_counts(

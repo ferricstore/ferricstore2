@@ -190,30 +190,40 @@ impl<'raw, 'context> OriginalPolicyCurrentIndex<'raw, 'context> {
                     charge,
                 )?;
             } else if matches!(span.tag(), 104 | 105 | 108) {
-                let count = if span.tag() == 108 {
-                    span.datum()
-                } else {
-                    span.keys
-                };
-                let start = u32::try_from(self.catalog.len()).map_err(|_| overflow())?;
-                let mut child = u32::try_from(index + 1).map_err(|_| overflow())?;
-                for _ in 0..count {
-                    pay(charge, 128)?;
-                    let next = self
-                        .spans
-                        .get(usize::try_from(child).map_err(|_| overflow())?)
-                        .ok_or(Error::Malformed)?
-                        .next;
-                    if self.catalog.len() == capacity {
-                        return Err(Error::ItemLimit);
-                    }
-                    self.catalog.push(child);
-                    child = next;
-                }
-                self.header(index, start, charge)?;
+                self.catalog_children(index, span, capacity, charge)?;
             }
         }
         Ok(())
+    }
+
+    fn catalog_children(
+        &mut self,
+        index: usize,
+        span: TermSpan,
+        capacity: usize,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<(), Error> {
+        let count = if span.tag() == 108 {
+            span.datum()
+        } else {
+            span.keys
+        };
+        let start = u32::try_from(self.catalog.len()).map_err(|_| overflow())?;
+        let mut child = u32::try_from(index + 1).map_err(|_| overflow())?;
+        for _ in 0..count {
+            pay(charge, 128)?;
+            let next = self
+                .spans
+                .get(usize::try_from(child).map_err(|_| overflow())?)
+                .ok_or(Error::Malformed)?
+                .next;
+            if self.catalog.len() == capacity {
+                return Err(Error::ItemLimit);
+            }
+            self.catalog.push(child);
+            child = next;
+        }
+        self.header(index, start, charge)
     }
 
     fn header(

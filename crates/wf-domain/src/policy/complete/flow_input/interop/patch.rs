@@ -216,17 +216,18 @@ pub(super) fn rewrite<'raw: 'a, 'a, const N: usize>(
         while let Some((key, child, following)) = index.raw_row_positions(parent, next)? {
             next = following;
             pay(128, charge)?;
-            if let Some((field, atom)) = selected(index, key, names, queries, charge)? {
-                if actions[field] == 2 {
-                    continue;
+            match selected(index, key, names, queries, charge)? {
+                Some((field, _)) if actions[field] == 2 => continue,
+                Some((field, atom)) => {
+                    rows[field * 2 + usize::from(!atom)] = Some((key, child, count));
                 }
-                rows[field * 2 + usize::from(!atom)] = Some((key, child, count));
-            } else {
-                let k = raw(index, key, depth + 1, stage, charge)?;
-                let v = raw(index, child, depth + 1, stage, charge)?;
-                edge(add(start, count * 2)?, k.0, stage)?;
-                edge(add(start, count * 2 + 1)?, v.0, stage)?;
-                length = add(length, add(k.1, v.1)?)?;
+                None => {
+                    let k = raw(index, key, depth + 1, stage, charge)?;
+                    let v = raw(index, child, depth + 1, stage, charge)?;
+                    edge(add(start, count * 2)?, k.0, stage)?;
+                    edge(add(start, count * 2 + 1)?, v.0, stage)?;
+                    length = add(length, add(k.1, v.1)?)?;
+                }
             }
             count = add(count, 1)?;
         }

@@ -29,21 +29,21 @@ impl Cursor<'_> {
     fn block_comment(&mut self) -> Result<(), CheckError> {
         self.index += 2;
         let mut depth = 1;
-        while let Some(byte) = self.peek(0) {
+        while depth != 0 {
+            let Some(byte) = self.peek(0) else {
+                return Err(CheckError::new("unterminated Rust block comment"));
+            };
             if byte == b'/' && self.peek(1) == Some(b'*') {
                 depth += 1;
                 self.index += 2;
             } else if byte == b'*' && self.peek(1) == Some(b'/') {
                 depth -= 1;
                 self.index += 2;
-                if depth == 0 {
-                    return Ok(());
-                }
             } else {
                 self.advance();
             }
         }
-        Err(CheckError::new("unterminated Rust block comment"))
+        Ok(())
     }
 
     fn quoted(&mut self, quote: u8) -> Result<(), CheckError> {
