@@ -7,10 +7,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,156 tests across 103
+The current local Rust quality checkpoint passes all 1,165 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,146 case and
-adds only the ten size-aware value-read cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,156 case and
+adds only the nine history read-conversion cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -32,12 +32,24 @@ All success, corruption, ownership, resource, reopen and snapshot tails now pass
 One redundant fixture continue was removed for Clippy with no changed assertion
 or expectation. Root performed the review solo; no independent review is claimed.
 
-Next review the concrete collector/acquisition integration and separately
-versioned typed ingress against the ordered architecture gates before creating
-more artifacts. Shared/named/external availability, history/query hydration,
-authority/routing/read barriers, lifecycle cleanup, native/Linux/macOS acceptance,
-complete Elixir coverage and remaining product milestones stay open. Exact
-paths, resource census and execution receipts are in the coordination record.
+The pure read-to-history conversion now moves actual Stored buffers, preserves
+exact omitted sizes and ordered missing/read-failure observations, and refuses
+drift/profile errors explicitly. Its conversion profile admits actual incoming
+capacities and the requested result spine independently of backend/domain
+accounts. All nine genuine rejecting cases were saved in 67d0509 before its
+body. Six conversion tests and three real-store compositions now execute their
+complete projection, resource, refusal, ownership and reopen tails. No existing
+domain/backend implementation or old test assertion changed.
+
+Next review separately versioned typed ingress through consumed publication,
+current/every-history bindings, recovery, snapshots and Node audit before
+creating more artifacts. This conversion uses caller-captured history; actual
+ordered FWSH/family11 acquisition and public query services remain required.
+Shared/named/external availability, authority/routing/read barriers, lifecycle
+cleanup, native/Linux/macOS acceptance, complete Elixir coverage and remaining
+product milestones stay open. Exact paths, resource census and execution
+receipts are in the coordination record. Work remains solo; the full goal stays
+active.
 
 The earlier saved green checkpoint `a485d57` passes **1,128 Rust tests**. Exact package/target/source/
 name/status comparison preserves all 1,119 prior identities and adds only the
