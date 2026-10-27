@@ -20,7 +20,11 @@ pub(super) fn create(
     genesis: StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     limits: StateStoreLimits,
+    alias_format: u16,
 ) -> Result<RedbStateStore, Error> {
+    if !matches!(alias_format, 1 | 2) {
+        return Err(Error::UnsupportedPolicyProfile);
+    }
     defaults.to_bytes().map_err(|_| Error::InvalidChanges)?;
     let scratch = bootstrap::admit(&group, &recovery, &genesis, limits)?;
     admission::workspace(
@@ -30,7 +34,7 @@ pub(super) fn create(
         admission::total(scratch, [additional(&group, &recovery)?])?,
     )?;
     let store = RedbStateStore::unvalidated(database, group, recovery, limits);
-    initialize(&store, &genesis, defaults, scratch)?;
+    initialize(&store, &genesis, defaults, scratch, alias_format)?;
     Ok(store)
 }
 
@@ -39,6 +43,7 @@ fn initialize(
     genesis: &StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     scratch: usize,
+    alias_format: u16,
 ) -> Result<(), Error> {
     let mut tx = store.transaction(
         false,
@@ -64,6 +69,7 @@ fn initialize(
     let origin = bootstrap::manifest(store, genesis, genesis_hash, origin_size)?;
     let current_hash = current_hash(&tx)?;
     let current = ValueManifest {
+        alias_format,
         policy: CurrentPolicyManifest {
             initial_time: genesis.initial_time,
             placements: u64::try_from(genesis.placements.len()).map_err(|_| Error::Limit)?,

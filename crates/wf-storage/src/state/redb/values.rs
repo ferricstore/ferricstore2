@@ -24,14 +24,14 @@ impl RedbStateStore {
     /// # Errors
     /// Refuses unsupported capability, invalid/nonempty genesis or durability failure.
     pub fn create_stored_value_database(
-        _database: redb::Database,
-        _group: GroupId,
-        _recovery: RecoveryId,
-        _genesis: StateStoreGenesis<'_>,
-        _defaults: WorkflowValueDefaults,
-        _limits: StateStoreLimits,
+        database: redb::Database,
+        group: GroupId,
+        recovery: RecoveryId,
+        genesis: StateStoreGenesis<'_>,
+        defaults: WorkflowValueDefaults,
+        limits: StateStoreLimits,
     ) -> Result<Self, StateTransactionError> {
-        Err(StateTransactionError::UnsupportedPolicyProfile)
+        genesis::create(database, group, recovery, genesis, defaults, limits, 2)
     }
 
     /// Creates a fresh authority with explicit workflow value capability.
@@ -46,7 +46,7 @@ impl RedbStateStore {
         defaults: WorkflowValueDefaults,
         limits: StateStoreLimits,
     ) -> Result<Self, StateTransactionError> {
-        genesis::create(database, group, recovery, genesis, defaults, limits)
+        genesis::create(database, group, recovery, genesis, defaults, limits, 1)
     }
 
     /// Reads ordered references against one committed snapshot and clock pair.

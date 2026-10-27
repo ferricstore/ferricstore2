@@ -29,7 +29,7 @@ pub(crate) struct ValueReadContext {
     metadata: redb::ReadOnlyTable<&'static [u8], &'static [u8]>,
     pub(super) charge: ValueCharge,
     pub(super) limits: StateStoreLimits,
-    pub(super) layout: u16,
+    pub(super) alias_format: u16,
     pub(super) defaults: wf_ports::consensus::WorkflowValueDefaults,
 }
 
@@ -66,7 +66,7 @@ pub(super) fn open(
         metadata,
         charge,
         limits: store.limits,
-        layout: 7,
+        alias_format: facts.alias_format,
         defaults: facts.defaults,
     })
 }
@@ -181,7 +181,7 @@ fn one(
     live: usize,
 ) -> Result<Result<Option<Vec<u8>>, WorkflowValueReadFailure>, Error> {
     context.charge.helper()?;
-    if context.layout != 7 {
+    if !matches!(context.alias_format, 1 | 2) {
         return Err(Error::UnsupportedLayout);
     }
     context.charge.work(product(reference.len(), 4)?)?;
@@ -226,6 +226,7 @@ fn one(
         reference,
         &mut context.charge,
         total(live, [alias_key.len()])?,
+        context.alias_format,
     )?;
     immutable_value(
         &context.rows,
@@ -300,10 +301,14 @@ fn checked_alias<'encoded>(
     reference: &[u8],
     charge: &mut ValueCharge,
     live: usize,
+    alias_format: u16,
 ) -> Result<value::ValueAlias<'encoded>, Error> {
     charge.helper()?;
     charge.temporary(total(live, [65_535, encoded.len()])?)?;
     let alias = value::decode_alias(encoded).map_err(admission::value_error)?;
+    if alias.stored && alias_format != 2 {
+        return Err(Error::Corrupt);
+    }
     charge.work(total(
         128,
         [

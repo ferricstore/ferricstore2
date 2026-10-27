@@ -11,8 +11,8 @@ use wf_types::identity::{PartitionId, RecordId};
 use wf_types::version::TimestampMillis;
 
 use super::{
-    StateValueError as Error, add, allocate, finish, flag, put_raw, raw, raw_size, read_u8,
-    read_u32, read_u64, read_u128, start, take,
+    StateValueError as Error, add, allocate, allocate_versioned, finish, flag, put_raw, raw,
+    raw_size, read_u8, read_u32, read_u64, read_u128, start, start_versioned, take,
 };
 
 const MAX_VALUE_VERSION: u64 = 9_007_199_254_740_991;
@@ -43,14 +43,12 @@ pub(crate) struct ValueBindingData {
 
 pub(crate) fn encode_alias(alias: ValueAlias<'_>, maximum: usize) -> Result<Vec<u8>, Error> {
     validate_alias(alias)?;
-    if alias.stored {
-        return Err(Error::UnsupportedVersion);
-    }
     let mut size = 111;
     for field in [alias.partition, alias.id] {
         add(&mut size, raw_size(field)?)?;
     }
-    let mut output = allocate(size, maximum, *b"FWVA")?;
+    let version = if alias.stored { 2 } else { 1 };
+    let mut output = allocate_versioned(size, maximum, *b"FWVA", version)?;
     put_raw(&mut output, alias.partition)?;
     put_raw(&mut output, alias.id)?;
     output.push(kind_tag(alias.kind)?);
@@ -69,7 +67,10 @@ pub(crate) fn encode_alias(alias: ValueAlias<'_>, maximum: usize) -> Result<Vec<
 }
 
 pub(crate) fn decode_alias(bytes: &[u8]) -> Result<ValueAlias<'_>, Error> {
-    let mut at = start(bytes, *b"FWVA", bytes.len())?;
+    let (mut at, format) = start_versioned(bytes, *b"FWVA", bytes.len())?;
+    if !matches!(format, 1 | 2) {
+        return Err(Error::UnsupportedVersion);
+    }
     let partition = raw(bytes, &mut at)?;
     let id = raw(bytes, &mut at)?;
     let kind = match read_u8(bytes, &mut at)? {
@@ -90,7 +91,7 @@ pub(crate) fn decode_alias(bytes: &[u8]) -> Result<ValueAlias<'_>, Error> {
         expires_at: (expiry != 0).then_some(TimestampMillis::new(expiry)),
         stored_len: read_u64(bytes, &mut at)?,
         digest: read_digest(bytes, &mut at)?,
-        stored: false,
+        stored: format == 2,
     };
     verify_checksum(bytes, at)?;
     validate_alias(alias)?;

@@ -7,10 +7,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,171 tests across 104
+The current local Rust quality checkpoint passes all 1,177 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,165 case and
-adds only the six stored-value codec cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,171 case and
+adds only the six stored-value physical-profile cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -50,12 +50,23 @@ recover the complete earlier source after rustfmt. Generic prepared decoding
 supports9; normal recovery and durable application still reject it. See
 [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
-Next select the concrete versioned physical representation and consumed writer
-contract, then implement stored intent9 through current/every-history bindings,
-retained outcomes, recovery, snapshots and Node audit/replay. Do not guess from
-an FSV2 prefix or relax binary validation. Persistent format numbers are not yet
-selected. Intent version9 is separate from the existing original-policy
-operation tag9. This conversion uses caller-captured history; actual
+The physical predecessor now explicitly creates FWSS7 alias profile2 through
+create_stored_value_database; the old factory stays profile1. FWVA2 means complete
+stored bytes, FWVA1 keeps its exact binary interpretation, and FWVB1/FWSP4 stay
+unchanged. Recovery and both readers enforce the declared capability and complete
+alias/immutable closure. Catalog updates preserve the profile; snapshots require
+equal alias profile and defaults. The two unit and four real-store full tails pass
+after genuine rejecting b09e499. One late fixture correction reads its witness
+from the actually installed policy, preserving every assertion. Stored9 publication
+and Node registration remain closed; the real-store tests use actual binary8.
+
+Next implement the consumed stored intent9 writer through current/every-history
+bindings, retained outcomes, recovery, snapshots and Node audit/replay. Require
+the actual profile2 manifest for every stored9 outcome, including commands with
+no value rows. Preserve each carried alias's encoding and all binary8 behavior.
+Do not guess from an FSV2 prefix or relax binary validation. Intent version9 is
+separate from the existing original-policy operation tag9. The conversion uses
+caller-captured history; actual
 ordered FWSH/family11 acquisition and public query services remain required.
 Shared/named/external availability, authority/routing/read barriers, lifecycle
 cleanup, native/Linux/macOS acceptance, complete Elixir coverage and remaining

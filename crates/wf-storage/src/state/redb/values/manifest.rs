@@ -18,6 +18,7 @@ use crate::state::value;
 pub(crate) struct ValueManifest {
     pub(in crate::state::redb) policy: CurrentPolicyManifest,
     pub(crate) defaults: WorkflowValueDefaults,
+    pub(crate) alias_format: u16,
 }
 
 pub(crate) fn read(tx: &RedbStateTransaction<'_>) -> Result<ValueManifest, Error> {
@@ -68,9 +69,12 @@ pub(crate) fn parse(
         .map_err(value_error)?
         .try_into()
         .map_err(|_| Error::Corrupt)?;
-    if value::read_u32(bytes, &mut at).map_err(value_error)? != 1
-        || value::read_u32(bytes, &mut at).map_err(value_error)? != 1
-    {
+    let alias_format = match value::read_u32(bytes, &mut at).map_err(value_error)? {
+        1 => 1,
+        2 => 2,
+        _ => return Err(Error::UnsupportedPolicyProfile),
+    };
+    if value::read_u32(bytes, &mut at).map_err(value_error)? != 1 {
         return Err(Error::UnsupportedPolicyProfile);
     }
     let raw = value::take(bytes, &mut at, 60)
@@ -92,6 +96,7 @@ pub(crate) fn parse(
             origin_hash,
         },
         defaults,
+        alias_format,
     })
 }
 
@@ -104,6 +109,9 @@ pub(crate) fn encode(
     let size = total(208, [group.as_bytes().len(), recovery.as_bytes().len()])?;
     if size > maximum {
         return Err(Error::Limit);
+    }
+    if !matches!(manifest.alias_format, 1 | 2) {
+        return Err(Error::UnsupportedPolicyProfile);
     }
     let defaults = manifest
         .defaults
@@ -130,7 +138,7 @@ pub(crate) fn encode(
     bytes.extend_from_slice(&policy.policies.to_be_bytes());
     bytes.extend_from_slice(&policy.catalog_hash);
     bytes.extend_from_slice(&policy.origin_hash);
-    bytes.extend_from_slice(&1_u32.to_be_bytes());
+    bytes.extend_from_slice(&u32::from(manifest.alias_format).to_be_bytes());
     bytes.extend_from_slice(&1_u32.to_be_bytes());
     bytes.extend_from_slice(&defaults);
     let checksum = Sha256::digest(&bytes);

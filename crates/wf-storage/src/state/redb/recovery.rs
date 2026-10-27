@@ -138,9 +138,8 @@ pub(super) fn cohort(
         return Err(StateTransactionError::Corrupt);
     }
     if layout == 7 {
-        let defaults =
-            super::values::manifest::parse(manifest.value(), tx.group, tx.recovery)?.defaults;
-        super::values::validate::cohort(tx, defaults)?;
+        let values = super::values::manifest::parse(manifest.value(), tx.group, tx.recovery)?;
+        super::values::validate::cohort(tx, values.defaults, values.alias_format)?;
     }
     Ok((layout, control))
 }

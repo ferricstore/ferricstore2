@@ -295,12 +295,12 @@ fn publish_target(
     manifest.policies = policies;
     manifest.catalog_hash = hash;
     if target == 7 {
-        let defaults = super::super::values::manifest::read(tx)?.defaults;
+        let provenance = super::super::values::manifest::read(tx)?;
         return super::super::values::manifest::publish(
             tx,
             super::super::values::manifest::ValueManifest {
                 policy: manifest,
-                defaults,
+                ..provenance
             },
         );
     }

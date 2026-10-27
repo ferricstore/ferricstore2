@@ -217,6 +217,7 @@ fn one(
         reference,
         &mut context.charge,
         total(live, [alias_key.len()])?,
+        context.alias_format,
     )?;
     immutable(
         &context.rows,

@@ -175,6 +175,7 @@ fn stored_value_profile_preserves_binary_publication_and_policy_updates() -> Tes
     publish(&mut store, &scope, b"FSV2\x02opaque")?;
     let policy = f::original_policy(1)?;
     f::install_original(&mut store, &scope, policy.encoded(), None, 1, 150)?;
+    let donor = f::load_policy(&mut store, &scope)?.ok_or("installed policy missing")?;
     let transition = f::batch(
         6,
         b"carry",
@@ -192,7 +193,7 @@ fn stored_value_profile_preserves_binary_publication_and_policy_updates() -> Tes
             }),
         )?]),
         vec![f::input(0, 0)],
-        vec![f::witness(b"r", Some(&policy))?],
+        vec![f::witness(b"r", Some(&donor))?],
     )?;
     f::apply_value(&mut store, &scope, &transition, 2)?;
     assert_read(&store, &scope, b"FSV2\x01FSV2\x02opaque")?;

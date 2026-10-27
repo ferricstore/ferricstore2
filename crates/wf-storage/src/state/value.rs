@@ -101,6 +101,18 @@ pub(super) fn start(
     magic: [u8; 4],
     maximum: usize,
 ) -> Result<usize, StateValueError> {
+    let (offset, version) = start_versioned(bytes, magic, maximum)?;
+    if version != 1 {
+        return Err(StateValueError::UnsupportedVersion);
+    }
+    Ok(offset)
+}
+
+pub(super) fn start_versioned(
+    bytes: &[u8],
+    magic: [u8; 4],
+    maximum: usize,
+) -> Result<(usize, u16), StateValueError> {
     if maximum == 0 {
         return Err(StateValueError::InvalidValue);
     }
@@ -114,10 +126,8 @@ pub(super) fn start(
     if take(bytes, &mut offset, 4)? != magic.as_slice() {
         return Err(StateValueError::UnsupportedTag);
     }
-    if read_u16(bytes, &mut offset)? != 1 {
-        return Err(StateValueError::UnsupportedVersion);
-    }
-    Ok(offset)
+    let version = read_u16(bytes, &mut offset)?;
+    Ok((offset, version))
 }
 
 pub(super) fn take<'a>(
@@ -216,6 +226,15 @@ pub(super) fn allocate(
     maximum: usize,
     magic: [u8; 4],
 ) -> Result<Vec<u8>, StateValueError> {
+    allocate_versioned(size, maximum, magic, 1)
+}
+
+pub(super) fn allocate_versioned(
+    size: usize,
+    maximum: usize,
+    magic: [u8; 4],
+    version: u16,
+) -> Result<Vec<u8>, StateValueError> {
     if maximum == 0 || size < 6 {
         return Err(StateValueError::InvalidValue);
     }
@@ -230,7 +249,7 @@ pub(super) fn allocate(
         .try_reserve_exact(size)
         .map_err(|_| StateValueError::Allocation)?;
     result.extend_from_slice(&magic);
-    result.extend_from_slice(&1_u16.to_be_bytes());
+    result.extend_from_slice(&version.to_be_bytes());
     Ok(result)
 }
 
