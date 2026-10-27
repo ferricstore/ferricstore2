@@ -39,11 +39,12 @@ fn admit_atoms(
         text(name, bytes)?;
         let hash = fingerprint(name.as_bytes());
         for (prior, &old_hash) in fingerprints[..index].iter().enumerate() {
-            if old_hash == hash {
-                comparison(name.len(), context.atoms[prior].len(), charge)?;
-                if name == context.atoms[prior] {
-                    return Err(Error::Malformed);
-                }
+            if old_hash != hash {
+                continue;
+            }
+            comparison(name.len(), context.atoms[prior].len(), charge)?;
+            if name == context.atoms[prior] {
+                return Err(Error::Malformed);
             }
         }
         fingerprints[index] = hash;
@@ -91,16 +92,17 @@ fn admit_exports(
             ^ fingerprint(function.as_bytes())
             ^ arity;
         for (prior, &old_hash) in fingerprints[..index].iter().enumerate() {
-            if hash == old_hash {
-                let (old_module, old_function, old_arity) = context.active_exports[prior];
-                comparison(
-                    module.len() + function.len() + 4,
-                    old_module.len() + old_function.len() + 4,
-                    charge,
-                )?;
-                if old_module == module && old_function == function && old_arity == arity {
-                    return Err(Error::Malformed);
-                }
+            if hash != old_hash {
+                continue;
+            }
+            let (old_module, old_function, old_arity) = context.active_exports[prior];
+            comparison(
+                module.len() + function.len() + 4,
+                old_module.len() + old_function.len() + 4,
+                charge,
+            )?;
+            if old_module == module && old_function == function && old_arity == arity {
+                return Err(Error::Malformed);
             }
         }
         fingerprints[index] = hash;
@@ -122,16 +124,17 @@ fn admit_funs(
             ^ u32::from(value.arity)
             ^ fingerprint(&value.uniq).rotate_left(9);
         for (prior, &old_hash) in fingerprints[..index].iter().enumerate() {
-            if old_hash == hash {
-                let old = context.local_funs[prior];
-                comparison(old.module.len() + 21, value.module.len() + 21, charge)?;
-                if old.module == value.module
-                    && old.index == value.index
-                    && old.arity == value.arity
-                    && old.uniq == value.uniq
-                {
-                    return Err(Error::Malformed);
-                }
+            if old_hash != hash {
+                continue;
+            }
+            let old = context.local_funs[prior];
+            comparison(old.module.len() + 21, value.module.len() + 21, charge)?;
+            if old.module == value.module
+                && old.index == value.index
+                && old.arity == value.arity
+                && old.uniq == value.uniq
+            {
+                return Err(Error::Malformed);
             }
         }
         fingerprints[index] = hash;

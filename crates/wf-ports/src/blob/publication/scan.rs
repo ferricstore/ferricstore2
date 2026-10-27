@@ -174,14 +174,7 @@ pub(super) fn walk_atomic_effects(
         if let Some(row) = effect {
             charge.spend(2)?;
             count = count.checked_add(1).ok_or(E::Limit)?;
-            if let Some(output) = output.as_deref_mut() {
-                charge.spend(1)?;
-                if output.len() >= output.capacity() {
-                    return Err(E::Limit);
-                }
-                charge.spend(1)?;
-                output.push(row);
-            }
+            append_effect(&mut output, row, charge)?;
         }
         charge.spend(1)?;
     }
@@ -217,14 +210,7 @@ pub(super) fn walk_independent_effects(
             if let Some(row) = effect {
                 charge.spend(2)?;
                 count = count.checked_add(1).ok_or(E::Limit)?;
-                if let Some(output) = output.as_deref_mut() {
-                    charge.spend(1)?;
-                    if output.len() >= output.capacity() {
-                        return Err(E::Limit);
-                    }
-                    charge.spend(1)?;
-                    output.push(row);
-                }
+                append_effect(&mut output, row, charge)?;
             }
         }
         charge.spend(1)?;
@@ -311,14 +297,7 @@ pub(super) fn check_independent_effects(
             let effect = value_effect(decoded, index, plan, charge)?;
             charge.spend(1)?;
             if let Some(expected) = effect {
-                charge.spend(1)?;
-                let row = rows.get(count).ok_or(E::InvalidChanges)?;
-                charge.spend(1)?;
-                if row != &expected {
-                    return Err(E::InvalidChanges);
-                }
-                charge.spend(1)?;
-                count = count.checked_add(1).ok_or(E::Limit)?;
+                verify_effect(rows, &mut count, &expected, charge)?;
             }
         }
         charge.spend(1)?;
@@ -380,4 +359,37 @@ pub(super) fn reserve_effects(
     let mut rows = Vec::new();
     rows.try_reserve_exact(count).map_err(E::ReserveFailed)?;
     Ok(rows)
+}
+
+fn append_effect(
+    output: &mut Option<&mut Vec<RecordBatchValueEffect>>,
+    row: RecordBatchValueEffect,
+    charge: &mut ValueEffectsCharge,
+) -> Result<(), E> {
+    if let Some(output) = output.as_deref_mut() {
+        charge.spend(1)?;
+        if output.len() >= output.capacity() {
+            return Err(E::Limit);
+        }
+        charge.spend(1)?;
+        output.push(row);
+    }
+    Ok(())
+}
+
+fn verify_effect(
+    rows: &[RecordBatchValueEffect],
+    count: &mut usize,
+    expected: &RecordBatchValueEffect,
+    charge: &mut ValueEffectsCharge,
+) -> Result<(), E> {
+    charge.spend(1)?;
+    let row = rows.get(*count).ok_or(E::InvalidChanges)?;
+    charge.spend(1)?;
+    if row != expected {
+        return Err(E::InvalidChanges);
+    }
+    charge.spend(1)?;
+    *count = count.checked_add(1).ok_or(E::Limit)?;
+    Ok(())
 }

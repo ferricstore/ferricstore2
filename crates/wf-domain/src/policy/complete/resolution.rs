@@ -242,18 +242,19 @@ impl<'v> ResolvedGovernance<'v> {
         )?;
         for rule in [type_rule, state_rule].into_iter().flatten() {
             charge_schema(charge, 128, 0)?;
-            if let Some(classes) = &rule.error_classes {
-                charge_schema(charge, 128, 0)?;
-                for class in classes {
-                    let n = u64::try_from(class.len())
-                        .map_err(|_| PolicySchemaError::LengthOverflow)?;
-                    charge_schema(
-                        charge,
-                        n.checked_add(128)
-                            .ok_or(PolicySchemaError::LengthOverflow)?,
-                        0,
-                    )?;
-                }
+            let Some(classes) = &rule.error_classes else {
+                continue;
+            };
+            charge_schema(charge, 128, 0)?;
+            for class in classes {
+                let n =
+                    u64::try_from(class.len()).map_err(|_| PolicySchemaError::LengthOverflow)?;
+                charge_schema(
+                    charge,
+                    n.checked_add(128)
+                        .ok_or(PolicySchemaError::LengthOverflow)?,
+                    0,
+                )?;
             }
         }
         Ok(merge_circuit(type_rule, state_rule))

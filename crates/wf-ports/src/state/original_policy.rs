@@ -101,17 +101,7 @@ impl<'view> GroupOriginalPolicyChanges<'view> {
                     return Err(Error::InvalidChanges);
                 }
                 if let DispatchDecision::Replay(outcome) = decision {
-                    validate_outcome(scope, outcome, profiles.0)?;
-                    let status = original_policy_set_response_status(
-                        outcome.response(),
-                        profiles.1,
-                        charge,
-                        maximum_policy_owner_bytes,
-                    )
-                    .map_err(codec_error)?;
-                    if status != outcome.status() {
-                        return Err(Error::InvalidChanges);
-                    }
+                    validate_replay(scope, outcome, profiles, charge, maximum_policy_owner_bytes)?;
                 }
             }
         }
@@ -218,6 +208,27 @@ fn validate_late_owners(
     }
     if total > admission.decision_bytes() {
         return Err(Error::Limit);
+    }
+    Ok(())
+}
+
+fn validate_replay(
+    scope: &RequestScope,
+    outcome: &RetainedOutcome,
+    profiles: (AdmissionLimits, PolicySchemaLimits),
+    charge: &mut PolicySchemaCharge,
+    maximum_policy_owner_bytes: usize,
+) -> Result<(), Error> {
+    validate_outcome(scope, outcome, profiles.0)?;
+    let status = original_policy_set_response_status(
+        outcome.response(),
+        profiles.1,
+        charge,
+        maximum_policy_owner_bytes,
+    )
+    .map_err(codec_error)?;
+    if status != outcome.status() {
+        return Err(Error::InvalidChanges);
     }
     Ok(())
 }

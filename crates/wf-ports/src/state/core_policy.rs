@@ -133,19 +133,13 @@ impl<'scope, 'old, 'retained> GroupCorePolicyChanges<'scope, 'old, 'retained> {
                     return Err(StateTransactionError::InvalidChanges);
                 }
                 if let DispatchDecision::Replay(outcome) = decision {
-                    validate_scope(scope, outcome)?;
-                    let status = complete_core_policy_patch_retained_status(
-                        outcome.intent(),
-                        outcome.response_version(),
-                        outcome.response(),
+                    validate_replay(
+                        scope,
+                        outcome,
                         profiles,
                         charge,
                         maximum_validation_owner_bytes,
-                    )
-                    .map_err(codec_error)?;
-                    if status != outcome.status() {
-                        return Err(StateTransactionError::InvalidChanges);
-                    }
+                    )?;
                 }
             }
         }
@@ -280,4 +274,27 @@ fn predecessor_generation(
             Ok(entry.generation())
         }
     }
+}
+
+fn validate_replay(
+    scope: &RequestScope,
+    outcome: &RetainedOutcome,
+    profiles: (PolicySchemaLimits, AdmissionLimits),
+    charge: &mut PolicySchemaCharge,
+    maximum_validation_owner_bytes: usize,
+) -> Result<(), StateTransactionError> {
+    validate_scope(scope, outcome)?;
+    let status = complete_core_policy_patch_retained_status(
+        outcome.intent(),
+        outcome.response_version(),
+        outcome.response(),
+        profiles,
+        charge,
+        maximum_validation_owner_bytes,
+    )
+    .map_err(codec_error)?;
+    if status != outcome.status() {
+        return Err(StateTransactionError::InvalidChanges);
+    }
+    Ok(())
 }

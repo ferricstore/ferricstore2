@@ -122,9 +122,9 @@ fn first_state<'input>(
             }
             if first.is_none() {
                 pay(charge, name.len().checked_add(133).ok_or_else(overflow)?)?;
-                if name == "state" {
-                    first = Some(pair[1]);
-                }
+            }
+            if first.is_none() && name == "state" {
+                first = Some(pair[1]);
             }
         }
         let Some(tail) = tail else {

@@ -264,25 +264,25 @@ pub(super) fn indexed(
         return Ok(());
     };
     let policy = index.cursor().position();
-    if let Some(value) = field(index, policy, b"indexed_attributes", charge)? {
-        let cursor = index.at(value);
-        if matches!(cursor.kind(), Kind::List | Kind::ImproperList) {
-            let mut names = [None; 3];
-            let normalized =
-                borrow_attributes(Some(PolicyInputCursor::Current(cursor)), &mut names, charge)
-                    .map_err(indexed_error)?;
-            if let Ok(Some(count)) = normalized {
-                for (slot, bytes) in names.into_iter().take(count).flatten().enumerate() {
-                    copy_name(
-                        bytes,
-                        slot,
-                        &mut owner.inline,
-                        &mut owner.coordinates,
-                        charge,
-                    )?;
-                }
-                owner.attributes = count;
+    if let Some(cursor) =
+        field(index, policy, b"indexed_attributes", charge)?.map(|value| index.at(value))
+        && matches!(cursor.kind(), Kind::List | Kind::ImproperList)
+    {
+        let mut names = [None; 3];
+        let normalized =
+            borrow_attributes(Some(PolicyInputCursor::Current(cursor)), &mut names, charge)
+                .map_err(indexed_error)?;
+        if let Ok(Some(count)) = normalized {
+            for (slot, bytes) in names.into_iter().take(count).flatten().enumerate() {
+                copy_name(
+                    bytes,
+                    slot,
+                    &mut owner.inline,
+                    &mut owner.coordinates,
+                    charge,
+                )?;
             }
+            owner.attributes = count;
         }
     }
     pay(charge, 128)?;

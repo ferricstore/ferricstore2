@@ -70,21 +70,25 @@ pub(in crate::value::original_flow) fn validate_maps(
 ) -> Result<(), E> {
     for node in &document.nodes {
         budget.spend(1)?;
-        if let N::Map { entries } = node {
-            let ids = document
-                .edges
-                .get(entries.clone())
-                .ok_or(E::InvalidFlowValue)?;
-            if ids.len() % 2 != 0 {
+        let N::Map { entries } = node else { continue };
+        let ids = document
+            .edges
+            .get(entries.clone())
+            .ok_or(E::InvalidFlowValue)?;
+        if ids.len() % 2 != 0 {
+            return Err(E::InvalidFlowValue);
+        }
+        validate_map_keys(document, ids, budget)?;
+    }
+    Ok(())
+}
+
+fn validate_map_keys(document: &D, ids: &[usize], budget: &mut Budget) -> Result<(), E> {
+    for row in (0..ids.len()).step_by(2) {
+        for prior in (0..row).step_by(2) {
+            budget.spend(3)?;
+            if same_term(document, ids[row], ids[prior], budget)? {
                 return Err(E::InvalidFlowValue);
-            }
-            for row in (0..ids.len()).step_by(2) {
-                for prior in (0..row).step_by(2) {
-                    budget.spend(3)?;
-                    if same_term(document, ids[row], ids[prior], budget)? {
-                        return Err(E::InvalidFlowValue);
-                    }
-                }
             }
         }
     }

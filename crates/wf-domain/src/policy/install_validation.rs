@@ -39,20 +39,21 @@ pub(super) fn validate_patch(
         if command.mode == InstallMode::Replace && matches!(change, StateChange::Remove) {
             return Err(PolicyError::InvalidStatePolicy);
         }
-        if let StateChange::Patch(policy) = change {
-            if matches!(policy.mode, FieldPatch::Clear) {
-                return Err(PolicyError::InvalidStateMode);
-            }
-            if let FieldPatch::Set(retention) = policy.retention {
-                retention
-                    .validate(MAX_HISTORY_EVENTS)
-                    .map_err(PolicyError::Retention)?;
-            }
-            if let FieldPatch::Set(retry) = &policy.retry {
-                validate_retry_patch(retry)?;
-                if let Some(target) = &retry.exhausted_to {
-                    add(&mut bytes, target.len())?;
-                }
+        let StateChange::Patch(policy) = change else {
+            continue;
+        };
+        if matches!(policy.mode, FieldPatch::Clear) {
+            return Err(PolicyError::InvalidStateMode);
+        }
+        if let FieldPatch::Set(retention) = policy.retention {
+            retention
+                .validate(MAX_HISTORY_EVENTS)
+                .map_err(PolicyError::Retention)?;
+        }
+        if let FieldPatch::Set(retry) = &policy.retry {
+            validate_retry_patch(retry)?;
+            if let Some(target) = &retry.exhausted_to {
+                add(&mut bytes, target.len())?;
             }
         }
     }

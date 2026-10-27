@@ -178,23 +178,35 @@ fn correspondence(
         let (p, q) =
             orders.patch_record(u32::try_from(id).map_err(|_| overflow())?, pairs, charge)?;
         for (half, expected) in [p, q].into_iter().enumerate() {
-            for (index, &rank) in expected.iter().enumerate() {
-                visit(charge, 16)?;
-                let offset = add(
-                    add(start, 8)?,
-                    add(half.checked_mul(pairs).ok_or_else(overflow)?, index)?
-                        .checked_mul(4)
-                        .ok_or_else(overflow)?,
-                )?;
-                if value::word(bytes, offset) != usize::try_from(rank).ok() {
-                    return Err(authority());
-                }
-            }
+            correspondence_half(bytes, start, pairs, half, expected, charge)?;
         }
     }
     visit(charge, 16)?;
     if maps != orders.patch_count() {
         return Err(authority());
+    }
+    Ok(())
+}
+
+fn correspondence_half(
+    bytes: &[u8],
+    start: usize,
+    pairs: usize,
+    half: usize,
+    expected: &[u32],
+    charge: &mut PolicySchemaCharge,
+) -> Result<(), Error> {
+    for (index, &rank) in expected.iter().enumerate() {
+        visit(charge, 16)?;
+        let offset = add(
+            add(start, 8)?,
+            add(half.checked_mul(pairs).ok_or_else(overflow)?, index)?
+                .checked_mul(4)
+                .ok_or_else(overflow)?,
+        )?;
+        if value::word(bytes, offset) != usize::try_from(rank).ok() {
+            return Err(authority());
+        }
     }
     Ok(())
 }
@@ -297,14 +309,7 @@ fn prepare_frame(
     if count != input.orders.patch_count() {
         return Err(authority().into());
     }
-    peak(charge, add(live, frame_length)?)?;
-    visit(charge, add(128, frame_length)?)?;
-    let mut output = Vec::new();
-    output
-        .try_reserve_exact(frame_length)
-        .map_err(|_| Error::AllocationFailure)?;
-    visit(charge, frame_length)?;
-    output.resize(frame_length, 0);
+    let mut output = frame_output(live, frame_length, charge)?;
     let mut emit = PolicySetFrameSink::Emit {
         output: &mut output,
         position: 0,
@@ -319,27 +324,54 @@ fn prepare_frame(
     if emitted_patch != patch {
         return Err(Error::Malformed.into());
     }
-    let PolicySetFrameSink::Emit {
-        position,
-        maps,
-        record,
-        ..
-    } = &emit
-    else {
-        return Err(Error::Malformed.into());
-    };
-    if *position != end || *maps != count || *record != frame_length {
-        return Err(Error::Malformed.into());
-    }
-    emit.patch(
-        add(end, add(4, count.checked_mul(4).ok_or_else(overflow)?)?)?,
-        side_length,
-        charge,
-    )?;
+    emit.finish((end, count, frame_length), side_length, charge)?;
     visit(charge, add(128, patch.len())?)?;
     visit(charge, add(128, intent_length)?)?;
     visit(charge, 160)?;
     visit(charge, add(128, frame_length)?)?;
     visit(charge, 192)?;
     Ok((output, digest, begin..end, patch))
+}
+
+impl PolicySetFrameSink<'_> {
+    fn finish(
+        &mut self,
+        (end, count, frame_length): (usize, usize, usize),
+        side_length: usize,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<(), Error> {
+        let Self::Emit {
+            position,
+            maps,
+            record,
+            ..
+        } = self
+        else {
+            return Err(Error::Malformed);
+        };
+        if *position != end || *maps != count || *record != frame_length {
+            return Err(Error::Malformed);
+        }
+        self.patch(
+            add(end, add(4, count.checked_mul(4).ok_or_else(overflow)?)?)?,
+            side_length,
+            charge,
+        )
+    }
+}
+
+fn frame_output(
+    live: usize,
+    frame_length: usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Vec<u8>, Error> {
+    peak(charge, add(live, frame_length)?)?;
+    visit(charge, add(128, frame_length)?)?;
+    let mut output = Vec::new();
+    output
+        .try_reserve_exact(frame_length)
+        .map_err(|_| Error::AllocationFailure)?;
+    visit(charge, frame_length)?;
+    output.resize(frame_length, 0);
+    Ok(output)
 }

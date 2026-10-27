@@ -43,31 +43,41 @@ pub(in super::super) fn plan_fifo_heads(
             .into_iter()
             .flatten()
         {
-            let names = lane.workflow_type.len() + lane.state.len() + lane.partition_key.len();
-            admit_visit(&mut trace.charge, names, work)?;
-            let mode = trace
-                .view
-                .indexed
-                .policies
-                .get(lane.workflow_type)
-                .map_or(StateMode::Parallel, |policy| policy.state_mode(lane.state));
-            if mode != StateMode::Fifo {
-                continue;
-            }
-            let mut known = false;
-            for (old, _) in &trace.heads {
-                let old_names = old.workflow_type.len() + old.state.len() + old.partition_key.len();
-                admit_visit(&mut trace.charge, names + old_names, work)?;
-                if *old == lane {
-                    known = true;
-                    break;
-                }
-            }
-            if !known {
-                let head = choose_overlay_head(trace, lane, limits, work)?;
-                trace.heads.push((lane, head));
-            }
+            observe_lane(trace, lane, limits, work)?;
         }
+    }
+    Ok(())
+}
+
+fn observe_lane<'v>(
+    trace: &mut TimeoutTrace<'v>,
+    lane: LaneKey<'v>,
+    limits: AdmissionLimits,
+    work: TimeoutLimits,
+) -> Result<(), Result<ActiveTimeoutRejection, ApplyError>> {
+    let names = lane.workflow_type.len() + lane.state.len() + lane.partition_key.len();
+    admit_visit(&mut trace.charge, names, work)?;
+    let mode = trace
+        .view
+        .indexed
+        .policies
+        .get(lane.workflow_type)
+        .map_or(StateMode::Parallel, |policy| policy.state_mode(lane.state));
+    if mode != StateMode::Fifo {
+        return Ok(());
+    }
+    let mut known = false;
+    for (old, _) in &trace.heads {
+        let old_names = old.workflow_type.len() + old.state.len() + old.partition_key.len();
+        admit_visit(&mut trace.charge, names + old_names, work)?;
+        if *old == lane {
+            known = true;
+            break;
+        }
+    }
+    if !known {
+        let head = choose_overlay_head(trace, lane, limits, work)?;
+        trace.heads.push((lane, head));
     }
     Ok(())
 }

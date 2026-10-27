@@ -193,14 +193,11 @@ fn prepare<'input>(
     owner.records.push(base);
     if let Some(query) = state {
         if owner.index.is_some() {
-            let config = if let (Some(index), Some(states)) = (&owner.index, states) {
-                if index.at(states).kind() == Kind::Map {
+            let config = match (&owner.index, states) {
+                (Some(index), Some(states)) if index.at(states).kind() == Kind::Map => {
                     source::selected(index, states, query, charge)?
-                } else {
-                    None
                 }
-            } else {
-                None
+                _ => None,
             };
             pay(charge, 128)?;
             let mut selected = resolve::state(&owner, config, Ref::Bytes(query), 0, charge)?;

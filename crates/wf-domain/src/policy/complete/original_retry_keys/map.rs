@@ -124,12 +124,11 @@ fn preflight_entries<M: OriginalMapVisit>(
                 return Err(Error::ByteLimit);
             }
             charge_schema(charge, length, 0).map_err(Error::Schema)?;
-            if let Some(bit) = queried_key_bit(entries, key, charge)? {
-                if queried & bit != 0 {
-                    return Err(Error::Malformed);
-                }
-                queried |= bit;
+            let bit = queried_key_bit(entries, key, charge)?.unwrap_or(0);
+            if queried & bit != 0 {
+                return Err(Error::Malformed);
             }
+            queried |= bit;
         }
         visit_descriptor(child_depth, &mut measured.0, node_limit, charge)?;
         if let Some(child) = entries.value_map(key) {

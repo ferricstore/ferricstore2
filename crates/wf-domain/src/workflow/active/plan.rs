@@ -356,14 +356,8 @@ pub(super) fn apply_shadow(
                 .ok_or(ApplyError::InvalidAuthority)?;
             member.status = *status;
             member.result = result.map(|(status, result_ref, error_ref)| {
-                let [result_ref, error_ref] = [result_ref, error_ref].map(|r| {
-                    r.map(|r| match r {
-                        TraceValueRef::Original(reference) => reference.clone(),
-                        TraceValueRef::Timeout { owner, version } => {
-                            timeout_value_ref(trace.owners[owner].original, version)
-                        }
-                    })
-                });
+                let [result_ref, error_ref] =
+                    [result_ref, error_ref].map(|r| r.map(|r| own_trace_reference(trace, r)));
                 ChildResult {
                     status,
                     result_ref,
@@ -373,4 +367,16 @@ pub(super) fn apply_shadow(
         }
     }
     Ok(())
+}
+
+fn own_trace_reference(
+    trace: &TimeoutTrace<'_>,
+    reference: TraceValueRef<'_>,
+) -> super::ActiveValueRef {
+    match reference {
+        TraceValueRef::Original(reference) => reference.clone(),
+        TraceValueRef::Timeout { owner, version } => {
+            timeout_value_ref(trace.owners[owner].original, version)
+        }
+    }
 }

@@ -94,57 +94,63 @@ impl<'input, 'context, 'state, 'out> Scanner<'input, 'context, 'state, 'out> {
     pub(in crate::value::original_flow) fn run(mut self) -> Result<(TermSummary, Census), E> {
         let mut completed = None;
         loop {
-            if let Some(term) = completed.take() {
-                if self.frames.is_empty() {
-                    if self.cursor != self.input.len()
-                        || self.counts.finished == 0
-                        || self.counts.planned != self.counts.finished
-                    {
-                        return Err(E::InvalidFlowValue);
-                    }
-                    if let ScanTarget::Build { expected, .. } = &self.target
-                        && (self.counts.finished != expected.finished
-                            || self.counts.edges != expected.edges
-                            || self.counts.max_depth != expected.max_depth)
-                    {
-                        return Err(E::InvalidFlowValue);
-                    }
-                    return Ok((term, self.counts));
-                }
-                completed = self.accept_child(term)?;
-            } else {
-                let string_frame = if self.frames.is_empty() {
-                    false
-                } else {
-                    self.budget.spend(1)?;
-                    matches!(self.frames.last(), Some(ParseFrame::String { .. }))
-                };
-                if string_frame {
-                    self.budget.spend(2)?;
-                    let frame = self.frames.pop().ok_or(E::InvalidFlowValue)?;
-                    completed = sequence::string_step(&mut self, frame)?;
-                } else {
-                    let (tag, offset) = self.begin_node(self.next_depth)?;
-                    let expects_atom = if self.frames.is_empty() {
-                        false
-                    } else {
-                        self.budget.spend(1)?;
-                        self.frames.last().is_some_and(frame::expects_atom)
-                    };
-                    if expects_atom && !matches!(tag, 100 | 115 | 118 | 119) {
-                        return Err(E::InvalidFlowValue);
-                    }
-                    completed = match tag {
-                        104 | 105 | 106 | 107 | 108 | 116 => {
-                            sequence::start(&mut self, tag, offset)?
-                        }
-                        101 | 114 | 90 | 103 | 88 | 102 | 89 | 120 | 113 | 112 => {
-                            foreign::start(&mut self, tag, offset)?
-                        }
-                        _ => scalar::parse(&mut self, tag, offset)?,
-                    };
-                }
+            let Some(term) = completed.take() else {
+                completed = self.scan_next()?;
+                continue;
+            };
+            if self.frames.is_empty() {
+                self.validate_finished()?;
+                return Ok((term, self.counts));
             }
+            completed = self.accept_child(term)?;
+        }
+    }
+
+    fn validate_finished(&self) -> Result<(), E> {
+        if self.cursor != self.input.len()
+            || self.counts.finished == 0
+            || self.counts.planned != self.counts.finished
+        {
+            return Err(E::InvalidFlowValue);
+        }
+        if let ScanTarget::Build { expected, .. } = &self.target
+            && (self.counts.finished != expected.finished
+                || self.counts.edges != expected.edges
+                || self.counts.max_depth != expected.max_depth)
+        {
+            return Err(E::InvalidFlowValue);
+        }
+        Ok(())
+    }
+
+    fn scan_next(&mut self) -> Result<Option<TermSummary>, E> {
+        let string_frame = if self.frames.is_empty() {
+            false
+        } else {
+            self.budget.spend(1)?;
+            matches!(self.frames.last(), Some(ParseFrame::String { .. }))
+        };
+        if string_frame {
+            self.budget.spend(2)?;
+            let frame = self.frames.pop().ok_or(E::InvalidFlowValue)?;
+            return sequence::string_step(self, frame);
+        }
+        let (tag, offset) = self.begin_node(self.next_depth)?;
+        let expects_atom = if self.frames.is_empty() {
+            false
+        } else {
+            self.budget.spend(1)?;
+            self.frames.last().is_some_and(frame::expects_atom)
+        };
+        if expects_atom && !matches!(tag, 100 | 115 | 118 | 119) {
+            return Err(E::InvalidFlowValue);
+        }
+        match tag {
+            104 | 105 | 106 | 107 | 108 | 116 => sequence::start(self, tag, offset),
+            101 | 114 | 90 | 103 | 88 | 102 | 89 | 120 | 113 | 112 => {
+                foreign::start(self, tag, offset)
+            }
+            _ => scalar::parse(self, tag, offset),
         }
     }
 

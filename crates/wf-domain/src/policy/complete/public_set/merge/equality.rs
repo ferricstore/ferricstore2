@@ -134,13 +134,14 @@ fn maps(
         for candidate in 0..right.len() {
             pay(charge, 128)?;
             let (other, nested) = right.row(candidate).ok_or_else(authority)?;
-            if pair(key, other, depth + 1, charge)? {
-                if !pair(value, nested, depth + 1, charge)? {
-                    return Ok(false);
-                }
-                found = true;
-                break;
+            if !pair(key, other, depth + 1, charge)? {
+                continue;
             }
+            if !pair(value, nested, depth + 1, charge)? {
+                return Ok(false);
+            }
+            found = true;
+            break;
         }
         if !found {
             return Ok(false);

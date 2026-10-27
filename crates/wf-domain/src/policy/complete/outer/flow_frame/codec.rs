@@ -194,6 +194,30 @@ impl FlowFrameSink<'_> {
         }
         Ok(())
     }
+    fn finish(
+        &mut self,
+        (end, count, frame_length): (usize, usize, usize),
+        side_length: usize,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<(), Error> {
+        let Self::Emit {
+            position,
+            maps,
+            record,
+            ..
+        } = self
+        else {
+            return Err(Error::Malformed);
+        };
+        if *position != end || *maps != count || *record != frame_length {
+            return Err(Error::Malformed);
+        }
+        self.patch(
+            add(end, add(4, count.checked_mul(4).ok_or_else(overflow)?)?)?,
+            side_length,
+            charge,
+        )
+    }
 }
 
 pub(super) fn prepare(
@@ -244,23 +268,7 @@ pub(super) fn prepare(
     super::write_header(input, intent_length, side_length, &mut emit, charge)?;
     emit.side_root(count, charge)?;
     intent(input, &mut emit, slots, charge)?;
-    let FlowFrameSink::Emit {
-        position,
-        maps,
-        record,
-        ..
-    } = &emit
-    else {
-        return Err(Error::Malformed.into());
-    };
-    if *position != end || *maps != count || *record != frame_length {
-        return Err(Error::Malformed.into());
-    }
-    emit.patch(
-        add(end, add(4, count.checked_mul(4).ok_or_else(overflow)?)?)?,
-        side_length,
-        charge,
-    )?;
+    emit.finish((end, count, frame_length), side_length, charge)?;
     visit(charge, add(128, intent_length)?)?;
     visit(charge, 160)?;
     visit(charge, add(128, frame_length)?)?;

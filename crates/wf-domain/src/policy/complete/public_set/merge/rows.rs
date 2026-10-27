@@ -95,32 +95,45 @@ pub(super) fn find_text(
         }
         if value != u64::MAX {
             let id = usize::try_from(value - 1).map_err(|_| overflow())?;
-            let row = arena.rows.get(id).ok_or_else(authority)?;
-            if row.hash == hash {
-                pay(charge, 128)?;
-                let key = arena.view(row.key);
-                let candidate = if atom {
-                    key.atom_bytes()
-                } else {
-                    key.binary_bytes()
-                };
-                if let Some(candidate) = candidate {
-                    pay(
-                        charge,
-                        128_usize
-                            .checked_add(bytes.len())
-                            .and_then(|n| n.checked_add(candidate.len()))
-                            .ok_or_else(overflow)?,
-                    )?;
-                    if bytes == candidate {
-                        return Ok(Some((id, map.table + slot)));
-                    }
-                }
+            if text_matches(arena, id, bytes, atom, hash, charge)? {
+                return Ok(Some((id, map.table + slot)));
             }
         }
         slot = (slot + 1) & (map.capacity - 1);
     }
     Ok(None)
+}
+
+fn text_matches(
+    arena: &Arena<'_>,
+    id: usize,
+    bytes: &[u8],
+    atom: bool,
+    hash: u64,
+    charge: &mut PolicySchemaCharge,
+) -> Result<bool, Error> {
+    let row = arena.rows.get(id).ok_or_else(authority)?;
+    if row.hash != hash {
+        return Ok(false);
+    }
+    pay(charge, 128)?;
+    let key = arena.view(row.key);
+    let candidate = if atom {
+        key.atom_bytes()
+    } else {
+        key.binary_bytes()
+    };
+    let Some(candidate) = candidate else {
+        return Ok(false);
+    };
+    pay(
+        charge,
+        128_usize
+            .checked_add(bytes.len())
+            .and_then(|n| n.checked_add(candidate.len()))
+            .ok_or_else(overflow)?,
+    )?;
+    Ok(bytes == candidate)
 }
 
 pub(super) fn replace<'input>(

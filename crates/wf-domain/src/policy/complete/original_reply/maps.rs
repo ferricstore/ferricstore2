@@ -161,25 +161,7 @@ pub(super) fn field<'input>(
             }
             Ok(None)
         }
-        Map::States => {
-            for &slot in &owner.order {
-                pay(charge, 128)?;
-                let index = owner.index.as_ref().ok_or(Error::Malformed)?;
-                let state = owner.records.get(slot as usize).ok_or(Error::Malformed)?;
-                let Ref::Source(position) = state.name else {
-                    return Err(Error::Malformed);
-                };
-                if let Some(bytes) = index.at(position).atom_bytes() {
-                    compare(bytes, name, charge)?;
-                    if bytes == name {
-                        return Ok(Some(Ref::Map(Map::State(slot))));
-                    }
-                } else {
-                    pay(charge, 128)?;
-                }
-            }
-            Ok(None)
-        }
+        Map::States => state_field(owner, name, charge),
         _ => {
             for i in 0..len(owner, map).ok_or(Error::Malformed)? {
                 let (key, value) = fixed(owner, map, i).ok_or(Error::Malformed)?;
@@ -232,6 +214,30 @@ pub(super) fn next<'input>(
     Ok(Some(row))
 }
 
+fn state_field<'input>(
+    owner: &Reply<'input>,
+    name: &[u8],
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<Ref<'input>>, Error> {
+    for &slot in &owner.order {
+        pay(charge, 128)?;
+        let index = owner.index.as_ref().ok_or(Error::Malformed)?;
+        let state = owner.records.get(slot as usize).ok_or(Error::Malformed)?;
+        let Ref::Source(position) = state.name else {
+            return Err(Error::Malformed);
+        };
+        if let Some(bytes) = index.at(position).atom_bytes() {
+            compare(bytes, name, charge)?;
+            if bytes == name {
+                return Ok(Some(Ref::Map(Map::State(slot))));
+            }
+        } else {
+            pay(charge, 128)?;
+        }
+    }
+    Ok(None)
+}
+
 fn backoff_next<'input>(
     owner: &Reply<'input>,
     slot: u32,
@@ -245,46 +251,66 @@ fn backoff_next<'input>(
         .ok_or(Error::Malformed)?
         .backoff;
     loop {
-        if *phase == 0 {
-            while *position < 4 {
-                pay(charge, 128)?;
-                let id = *position;
-                *position += 1;
-                if data.default_mask & (1 << id) == 0 {
-                    return Ok(Some((Ref::StaticAtom(default_name(id)), default_value(id))));
-                }
-            }
-        } else if *phase <= 2 {
-            let map = if *phase == 1 {
-                data.type_map
-            } else {
-                data.local_map
-            };
-            if let Some(map) = map {
-                let index = owner.index.as_ref().ok_or(Error::Malformed)?;
-                while *position < index.at(map).len() {
-                    pay(charge, 128)?;
-                    let (key, value) = index.at(map).row(*position).ok_or(Error::Malformed)?;
-                    *position += 1;
-                    if *phase == 1
-                        && let Some(local) = data.local_map
-                        && index.at(local).len() != 0
-                        && source::exact(index, local, key.position(), charge)?.is_some()
-                    {
-                        continue;
-                    }
-                    return Ok(Some((
-                        Ref::Source(key.position()),
-                        Ref::Source(value.position()),
-                    )));
-                }
-            }
-        } else {
-            return Ok(None);
+        let row = match *phase {
+            0 => default_backoff(data.default_mask, position, charge)?,
+            1 | 2 => source_backoff(owner, &data, *phase, position, charge)?,
+            _ => return Ok(None),
+        };
+        if row.is_some() {
+            return Ok(row);
         }
         *phase += 1;
         *position = 0;
     }
+}
+
+fn default_backoff(
+    mask: u8,
+    position: &mut usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<(Ref<'static>, Ref<'static>)>, Error> {
+    while *position < 4 {
+        pay(charge, 128)?;
+        let id = *position;
+        *position += 1;
+        if mask & (1 << id) == 0 {
+            return Ok(Some((Ref::StaticAtom(default_name(id)), default_value(id))));
+        }
+    }
+    Ok(None)
+}
+
+fn source_backoff<'input>(
+    owner: &Reply<'input>,
+    data: &Backoff,
+    phase: usize,
+    position: &mut usize,
+    charge: &mut PolicySchemaCharge,
+) -> Result<Option<(Ref<'input>, Ref<'input>)>, Error> {
+    let map = if phase == 1 {
+        data.type_map
+    } else {
+        data.local_map
+    };
+    let Some(map) = map else { return Ok(None) };
+    let index = owner.index.as_ref().ok_or(Error::Malformed)?;
+    while *position < index.at(map).len() {
+        pay(charge, 128)?;
+        let (key, value) = index.at(map).row(*position).ok_or(Error::Malformed)?;
+        *position += 1;
+        if phase == 1
+            && let Some(local) = data.local_map
+            && index.at(local).len() != 0
+            && source::exact(index, local, key.position(), charge)?.is_some()
+        {
+            continue;
+        }
+        return Ok(Some((
+            Ref::Source(key.position()),
+            Ref::Source(value.position()),
+        )));
+    }
+    Ok(None)
 }
 
 fn fixed<'input>(

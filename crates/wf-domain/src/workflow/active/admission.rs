@@ -224,23 +224,15 @@ pub(super) fn charge_materialization(
         )?;
         for (id, _, result) in &group.updates {
             admit_visit(&mut trace.charge, id.as_bytes().len(), work)?;
-            if let Some((_, result, error)) = result {
-                for reference in [*result, *error].into_iter().flatten() {
-                    let n = match reference {
-                        TraceValueRef::Original(r) => super::value_ref_bytes(r, limits)
-                            .map_err(|_| Err(ApplyError::InvalidAuthority))?,
-                        TraceValueRef::Timeout { owner, .. } => {
-                            trace.owners[owner].original.partition().as_bytes().len()
-                                + trace.owners[owner].original.core().id().as_bytes().len()
-                        }
-                    };
-                    admit_visit(&mut trace.charge, n, work)?;
-                    p = p
-                        .checked_add(
-                            u64::try_from(n).map_err(|_| Err(ApplyError::InvalidAuthority))?,
-                        )
-                        .ok_or(Err(ApplyError::InvalidAuthority))?;
-                }
+            let Some((_, result, error)) = result else {
+                continue;
+            };
+            for reference in [*result, *error].into_iter().flatten() {
+                let n = trace_reference_bytes(trace, reference, limits).map_err(Err)?;
+                admit_visit(&mut trace.charge, n, work)?;
+                p = p
+                    .checked_add(u64::try_from(n).map_err(|_| Err(ApplyError::InvalidAuthority))?)
+                    .ok_or(Err(ApplyError::InvalidAuthority))?;
             }
         }
     }
@@ -363,4 +355,20 @@ pub(super) fn charge_effect_copies(
 
     let _ = limits;
     Ok(())
+}
+
+fn trace_reference_bytes(
+    trace: &TimeoutTrace<'_>,
+    reference: TraceValueRef<'_>,
+    limits: AdmissionLimits,
+) -> Result<usize, ApplyError> {
+    match reference {
+        TraceValueRef::Original(r) => {
+            super::value_ref_bytes(r, limits).map_err(|_| ApplyError::InvalidAuthority)
+        }
+        TraceValueRef::Timeout { owner, .. } => {
+            Ok(trace.owners[owner].original.partition().as_bytes().len()
+                + trace.owners[owner].original.core().id().as_bytes().len())
+        }
+    }
 }

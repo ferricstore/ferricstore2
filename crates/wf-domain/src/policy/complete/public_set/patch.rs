@@ -71,39 +71,39 @@ fn states<'input>(
     if matches!(input, Raw::Map(_)) {
         return direct(input, arena, work, charge);
     }
-    if is_list(input) && state_pairs(input, charge)? {
-        debit(charge, 128)?;
-        let start = work.len();
-        let mut index = 0;
-        loop {
-            let (entry, proper) = item(input, index, charge)?;
-            let Some(Raw::Tuple(pair)) = entry else {
-                if entry.is_some() || !proper {
-                    return Err(Error::Malformed);
-                }
-                break;
-            };
-            let Raw::Binary(name) = pair[0] else {
-                return Err(Error::Malformed);
-            };
-            let cell = value(pair[1], arena, work, charge)?;
-            let hash = rows::fingerprint(name, charge)?;
-            rows::push(
-                work,
-                PolicySetPatchSlot {
-                    source: index,
-                    cell,
-                    hash,
-                },
-                charge,
-            )?;
-            index += 1;
-        }
-        let len = work.len() - start;
-        let len = rows::compact(input, work, start, len, charge)?;
-        return assemble(input, start, len, false, arena, work, charge);
+    if !is_list(input) || !state_pairs(input, charge)? {
+        return value(input, arena, work, charge);
     }
-    value(input, arena, work, charge)
+    debit(charge, 128)?;
+    let start = work.len();
+    let mut index = 0;
+    loop {
+        let (entry, proper) = item(input, index, charge)?;
+        let Some(Raw::Tuple(pair)) = entry else {
+            if entry.is_some() || !proper {
+                return Err(Error::Malformed);
+            }
+            break;
+        };
+        let Raw::Binary(name) = pair[0] else {
+            return Err(Error::Malformed);
+        };
+        let cell = value(pair[1], arena, work, charge)?;
+        let hash = rows::fingerprint(name, charge)?;
+        rows::push(
+            work,
+            PolicySetPatchSlot {
+                source: index,
+                cell,
+                hash,
+            },
+            charge,
+        )?;
+        index += 1;
+    }
+    let len = work.len() - start;
+    let len = rows::compact(input, work, start, len, charge)?;
+    assemble(input, start, len, false, arena, work, charge)
 }
 
 fn state_pairs(input: Raw<'_>, charge: &mut PolicySchemaCharge) -> Result<bool, Error> {

@@ -2,7 +2,7 @@
 
 use sha2::{Digest, Sha256};
 use wf_domain::workflow::Operation;
-use wf_domain::workflow::active::MaxActiveOverride;
+use wf_domain::workflow::active::{LifecycleOverrides, MaxActiveOverride};
 use wf_domain::workflow::request::ClientIntent;
 
 use crate::consensus::{
@@ -82,48 +82,26 @@ fn extensions(
     hash: &mut Sha256,
     size: &mut usize,
 ) -> Result<(), CodecError> {
-    let mut emit = |bytes: &[u8]| -> Result<(), CodecError> {
-        *size = size
-            .checked_add(bytes.len())
-            .ok_or(CodecError::LengthOverflow)?;
-        hash.update(bytes);
-        Ok(())
-    };
-    emit(
+    emit_bytes(
+        hash,
+        size,
         &u32::try_from(inputs.len())
             .map_err(|_| CodecError::LengthOverflow)?
             .to_be_bytes(),
     )?;
     for input in inputs {
-        emit(&[u8::from(input.birth.is_some())])?;
+        emit_bytes(hash, size, &[u8::from(input.birth.is_some())])?;
         if let Some(birth) = input.birth {
-            match birth.active {
-                MaxActiveOverride::Inherit => emit(&[0])?,
-                MaxActiveOverride::Infinite => emit(&[1])?,
-                MaxActiveOverride::Millis(value) => {
-                    emit(&[2])?;
-                    emit(&value.to_be_bytes())?;
-                }
-            }
-            for (value, width) in [
-                (birth.retention.ttl_ms, 8),
-                (birth.retention.history_max_events.map(u64::from), 4),
-                (birth.history_hot_max_events, 8),
-            ] {
-                emit(&[u8::from(value.is_some())])?;
-                if let Some(value) = value {
-                    emit(&value.to_be_bytes()[8 - width..])?;
-                }
-            }
+            birth_bytes(birth, hash, size)?;
         }
-        emit(&[u8::from(input.terminal_ttl_ms.is_some())])?;
+        emit_bytes(hash, size, &[u8::from(input.terminal_ttl_ms.is_some())])?;
         if let Some(value) = input.terminal_ttl_ms {
-            emit(&value.to_be_bytes())?;
+            emit_bytes(hash, size, &value.to_be_bytes())?;
         }
         if mode != 1 {
-            emit(&[u8::from(input.requested_at.is_some())])?;
+            emit_bytes(hash, size, &[u8::from(input.requested_at.is_some())])?;
             if let Some(value) = input.requested_at {
-                emit(&value.get().to_be_bytes())?;
+                emit_bytes(hash, size, &value.get().to_be_bytes())?;
             }
         }
     }
@@ -158,6 +136,40 @@ pub(super) fn start(
     hash.update([u8::from(value.payload.is_some())]);
     if let Some(value) = &value.payload {
         raw(hash, size, value)?;
+    }
+    Ok(())
+}
+
+fn emit_bytes(hash: &mut Sha256, size: &mut usize, bytes: &[u8]) -> Result<(), CodecError> {
+    *size = size
+        .checked_add(bytes.len())
+        .ok_or(CodecError::LengthOverflow)?;
+    hash.update(bytes);
+    Ok(())
+}
+
+fn birth_bytes(
+    birth: LifecycleOverrides,
+    hash: &mut Sha256,
+    size: &mut usize,
+) -> Result<(), CodecError> {
+    match birth.active {
+        MaxActiveOverride::Inherit => emit_bytes(hash, size, &[0])?,
+        MaxActiveOverride::Infinite => emit_bytes(hash, size, &[1])?,
+        MaxActiveOverride::Millis(value) => {
+            emit_bytes(hash, size, &[2])?;
+            emit_bytes(hash, size, &value.to_be_bytes())?;
+        }
+    }
+    for (value, width) in [
+        (birth.retention.ttl_ms, 8),
+        (birth.retention.history_max_events.map(u64::from), 4),
+        (birth.history_hot_max_events, 8),
+    ] {
+        emit_bytes(hash, size, &[u8::from(value.is_some())])?;
+        if let Some(value) = value {
+            emit_bytes(hash, size, &value.to_be_bytes()[8 - width..])?;
+        }
     }
     Ok(())
 }

@@ -109,42 +109,43 @@ fn merge_core_states(
     }
     for (name, change) in patch {
         charge_schema(charge, 128, 0)?;
-        if let StateChange::Patch(patch) = change {
-            if name.len() > MAX_POLICY_SNAPSHOT_BYTES {
-                return Err(PolicySchemaError::SnapshotBytes);
-            }
-            let n = u64::try_from(name.len())
-                .ok()
-                .ok_or(PolicySchemaError::LengthOverflow)?;
-            let work = n
-                .checked_add(128)
-                .ok_or(PolicySchemaError::LengthOverflow)?;
-            charge_schema(charge, work, 0)?;
-            if name.is_empty() || name == b"running" {
-                let field = if name.is_empty() {
-                    RetryPolicyField::State
-                } else {
-                    RetryPolicyField::RunningState
-                };
-                return Err(PolicySchemaError::Policy(PolicyError::Domain(
-                    DomainError::InvalidRetryPolicy(field),
-                )));
-            }
-            charge_schema(charge, work, 0)?;
-            let state = match current.entry(name) {
-                Entry::Occupied(entry) => entry.into_mut(),
-                Entry::Vacant(entry) => {
-                    charge_schema(charge, 128, 0)?;
-                    entry.insert(CompleteStatePolicyData {
-                        mode: None,
-                        retry: None,
-                        retention: None,
-                        governance: None,
-                    })
-                }
-            };
-            merge_core_state(state, patch, history_max_events_limit, charge)?;
+        let StateChange::Patch(patch) = change else {
+            continue;
+        };
+        if name.len() > MAX_POLICY_SNAPSHOT_BYTES {
+            return Err(PolicySchemaError::SnapshotBytes);
         }
+        let n = u64::try_from(name.len())
+            .ok()
+            .ok_or(PolicySchemaError::LengthOverflow)?;
+        let work = n
+            .checked_add(128)
+            .ok_or(PolicySchemaError::LengthOverflow)?;
+        charge_schema(charge, work, 0)?;
+        if name.is_empty() || name == b"running" {
+            let field = if name.is_empty() {
+                RetryPolicyField::State
+            } else {
+                RetryPolicyField::RunningState
+            };
+            return Err(PolicySchemaError::Policy(PolicyError::Domain(
+                DomainError::InvalidRetryPolicy(field),
+            )));
+        }
+        charge_schema(charge, work, 0)?;
+        let state = match current.entry(name) {
+            Entry::Occupied(entry) => entry.into_mut(),
+            Entry::Vacant(entry) => {
+                charge_schema(charge, 128, 0)?;
+                entry.insert(CompleteStatePolicyData {
+                    mode: None,
+                    retry: None,
+                    retention: None,
+                    governance: None,
+                })
+            }
+        };
+        merge_core_state(state, patch, history_max_events_limit, charge)?;
     }
     charge_schema(charge, 128, 0)?;
     for (name, state) in current {

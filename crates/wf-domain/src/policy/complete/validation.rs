@@ -288,43 +288,45 @@ fn validate_indexed(
         } else {
             PolicySchemaError::InvalidIndexedStateMeta
         };
-        if let Some(names) = names {
-            if names.len() > if attributes { 3 } else { 1 } {
+        let Some(names) = names else { continue };
+        if names.len() > if attributes { 3 } else { 1 } {
+            return Err(error);
+        }
+        if attributes {
+            charge_schema(charge, 128, 0)?;
+        }
+        let mut seen = (canonical && attributes).then(BTreeSet::new);
+        for name in names {
+            charge_schema(charge, 128, 0)?;
+            if name.len() > 64 {
                 return Err(error);
             }
-            if attributes {
-                charge_schema(charge, 128, 0)?;
+            let n = u64::try_from(name.len()).map_err(|_| PolicySchemaError::LengthOverflow)?;
+            let work = n
+                .checked_add(128)
+                .ok_or(PolicySchemaError::LengthOverflow)?;
+            charge_schema(charge, work, 0)?;
+            let text = std::str::from_utf8(name).map_err(|_| error)?;
+            charge_schema(charge, work, 0)?;
+            let trimmed = text.trim_matches(|ch| matches!(ch,
+                '\u{0009}'..='\u{000d}' | '\u{0020}' | '\u{0085}' | '\u{00a0}' | '\u{1680}'
+                | '\u{2000}'..='\u{200a}' | '\u{2028}' | '\u{2029}' | '\u{202f}' | '\u{205f}' | '\u{3000}'
+            ));
+            if trimmed.is_empty() || trimmed.len() != name.len() {
+                return Err(error);
             }
-            let mut seen = (canonical && attributes).then(BTreeSet::new);
-            for name in names {
-                charge_schema(charge, 128, 0)?;
-                if name.len() > 64 {
-                    return Err(error);
-                }
-                let n = u64::try_from(name.len()).map_err(|_| PolicySchemaError::LengthOverflow)?;
-                let work = n
-                    .checked_add(128)
-                    .ok_or(PolicySchemaError::LengthOverflow)?;
+            charge_schema(charge, work, 0)?;
+            if name.starts_with(b"__") {
+                return Err(error);
+            }
+            let duplicate = if let Some(seen) = &mut seen {
                 charge_schema(charge, work, 0)?;
-                let text = std::str::from_utf8(name).map_err(|_| error)?;
-                charge_schema(charge, work, 0)?;
-                let trimmed = text.trim_matches(|ch| matches!(ch,
-                    '\u{0009}'..='\u{000d}' | '\u{0020}' | '\u{0085}' | '\u{00a0}' | '\u{1680}'
-                    | '\u{2000}'..='\u{200a}' | '\u{2028}' | '\u{2029}' | '\u{202f}' | '\u{205f}' | '\u{3000}'
-                ));
-                if trimmed.is_empty() || trimmed.len() != name.len() {
-                    return Err(error);
-                }
-                charge_schema(charge, work, 0)?;
-                if name.starts_with(b"__") {
-                    return Err(error);
-                }
-                if let Some(seen) = &mut seen {
-                    charge_schema(charge, work, 0)?;
-                    if !seen.insert(name.as_slice()) {
-                        return Err(error);
-                    }
-                }
+                !seen.insert(name.as_slice())
+            } else {
+                false
+            };
+            if duplicate {
+                return Err(error);
             }
         }
     }

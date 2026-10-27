@@ -244,15 +244,16 @@ fn preflight_key(
                 .checked_add(name.len())
                 .ok_or(Error::Schema(PolicySchemaError::LengthOverflow))?;
             charge_visit(length, charge)?;
-            if bytes == name {
-                charge_schema(charge, 128, 0).map_err(Error::Schema)?;
-                let bit = 1 << (index + usize::from(matches!(key, Key::Binary(_))) * 3);
-                if unique && *queried & bit != 0 {
-                    return Err(Error::Malformed);
-                }
-                *queried |= bit;
-                break;
+            if bytes != name {
+                continue;
             }
+            charge_schema(charge, 128, 0).map_err(Error::Schema)?;
+            let bit = 1 << (index + usize::from(matches!(key, Key::Binary(_))) * 3);
+            if unique && *queried & bit != 0 {
+                return Err(Error::Malformed);
+            }
+            *queried |= bit;
+            break;
         }
     }
     Ok(())
