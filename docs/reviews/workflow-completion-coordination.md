@@ -55155,3 +55155,17 @@ old gates pass. No private encoding body/artifact is selected or implemented yet
 Next perform concrete private-artifact/ownership review, implement the complete
 common/foreign writer with source deterministic ordering and resource admission,
 then execute all nine tails and broader checks. Full goal stays ACTIVE/SOLO.
+
+Saved genuine rejecting baseline7da6c0d before any encoder body. Follow-up
+primary-source inspection for the next implementation: exact comparison orders
+all integers before floats; PID comparison is serial, ID, then node/creation,
+whereas ports and references compare node/creation first. Reference numbers
+compare most significant u32 words with zero extension. Local funs precede
+exports and compare module/index/canonical old_uniq/free-count/free-values;
+exports compare module/function/arity. These observations come from the already
+linked OTP-28.0 utils.c; no C implementation is copied. Existing decoder
+finish_local_fun canonicalizes old_uniq through explicit captured bindings;
+logical writer handling of that canonical data must be reviewed before body
+creation rather than assuming arbitrary legacy wire metadata is an entry.
+Concrete private artifacts and resource ownership remain UNSELECTED. Primary
+stays7e67000; draft branch codex/logical-value-preparation is not ready to merge.

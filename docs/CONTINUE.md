@@ -11,7 +11,7 @@ literal `Err(InvalidInput)` facade; no encoder body exists yet. The source map
 fixture spans all common and foreign key families, with scalar/list/tuple wire
 boundaries, duplicate identities, graph/depth/expansion/resource checks and
 owned-output tails compiled. Those later tails remain unexecuted at this stage.
-Save this RED before implementing the encoder, then keep working through its
+The RED is saved in `7da6c0d`; keep working through the encoder and its
 full tails and real publication; do not adopt the rejecting draft into primary.
 Architecture selection and exact receipts are in the coordination journal.
 
