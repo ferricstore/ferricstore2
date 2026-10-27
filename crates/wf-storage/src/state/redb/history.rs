@@ -6,6 +6,10 @@ use wf_ports::state::{
 };
 use wf_types::identity::{PartitionId, RecordId};
 
+mod page;
+mod read;
+mod row;
+
 #[cfg(test)]
 mod tests;
 
@@ -17,12 +21,17 @@ impl super::RedbStateStore {
     /// Refuses query, scope, control, resource, stored identity or backend failures.
     pub fn read_workflow_history_page(
         &self,
-        _scope: &RequestScope,
-        _partition: &PartitionId,
-        _id: &RecordId,
-        _query: WorkflowHistoryQuery<'_>,
-        _limits: WorkflowHistoryReadLimits,
+        scope: &RequestScope,
+        partition: &PartitionId,
+        id: &RecordId,
+        query: WorkflowHistoryQuery<'_>,
+        limits: WorkflowHistoryReadLimits,
     ) -> Result<WorkflowHistoryPage, StateTransactionError> {
-        Err(StateTransactionError::UnsupportedLayout)
+        let mut context =
+            read::open(self, scope, query, limits).map_err(|error| self.failed(error))?;
+        let rows = context.open_rows().map_err(|error| self.failed(error))?;
+        let result = page::capture(&mut context, &rows, scope, partition, id, query);
+        read::close(context, rows);
+        result.map_err(|error| self.failed(error))
     }
 }

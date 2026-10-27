@@ -16,8 +16,9 @@ pub(crate) use workflow_values::{encode_alias_key, encode_binding_key, encode_im
 pub use ordered::{
     decode_due_key, decode_fifo_key, decode_fifo_observation_key, decode_history_key,
     due_key_owned_bytes, encode_due_key, encode_due_prefix, encode_fifo_key,
-    encode_fifo_lane_upper_bound, encode_fifo_prefix, encode_fifo_type_prefix, encode_history_key,
-    encode_history_prefix, fifo_observation_key_owned_bytes,
+    encode_fifo_lane_upper_bound, encode_fifo_prefix, encode_fifo_type_prefix,
+    encode_history_cursor_key, encode_history_key, encode_history_prefix,
+    fifo_observation_key_owned_bytes,
 };
 pub use point::{
     encode_catalog_prefix, encode_control_key, encode_outcome_key, encode_outcome_prefix,

@@ -8,7 +8,7 @@ use wf_types::identity::{PartitionId, RecordId, TenantId};
 use crate::state::{key, value};
 
 mod fixtures;
-use fixtures::{fixture, limits, query, rewrite, rows};
+use fixtures::fixture_data::{fixture, limits, query, rewrite, rows};
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 

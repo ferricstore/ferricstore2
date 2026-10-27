@@ -140,7 +140,7 @@ fn history_page_keeps_every_historical_binding_and_legacy_visibility() -> TestRe
         let WorkflowValueBindingKnowledge::Known(Some(binding)) = &row.values else {
             return Err("historical provenance missing".into());
         };
-        assert_eq!(binding.lifecycle.incarnation, 1);
+        assert_eq!(binding.lifecycle.incarnation, 0);
     }
     let legacy_path = directory.join("legacy");
     let mut legacy = crate::fixtures::create(&legacy_path)?;

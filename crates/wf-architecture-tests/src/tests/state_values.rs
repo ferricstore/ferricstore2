@@ -16,6 +16,7 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::key"),
         ("wf-storage", "state::key::point"),
         ("wf-storage", "state::key::ordered"),
+        ("wf-storage", "state::key::ordered::history"),
         ("wf-storage", "state::key::ordered::nested"),
         ("wf-domain", "policy::complete::record_projection"),
         ("wf-domain", "policy::complete::record_projection::nested"),
@@ -84,6 +85,10 @@ fn assert_effectful_transaction_neighbors() -> CheckResult<()> {
         ("wf-storage", "state::value_backend"),
         ("wf-storage", "state::key_backend"),
         ("wf-storage", "state::keyed"),
+        ("wf-storage", "state::redb::history"),
+        ("wf-storage", "state::redb::history::read"),
+        ("wf-storage", "state::redb::history::page"),
+        ("wf-storage", "state::redb::history::row"),
         ("wf-ports", "log::record_batch::response_backend"),
         ("wf-ports", "log::claim_backend"),
         ("wf-ports", "state::transaction::independent_backend"),
@@ -122,6 +127,11 @@ fn state_transaction_stays_effectful_and_server_only() -> CheckResult<()> {
         "ClaimDueKind",
         "ClaimDueStep",
         "ClaimLaneStep",
+        "WorkflowHistoryDirection",
+        "WorkflowHistoryQuery",
+        "WorkflowHistoryReadLimits",
+        "StoredWorkflowHistoryRow",
+        "WorkflowHistoryPage",
     ] {
         assert!(
             source_check(

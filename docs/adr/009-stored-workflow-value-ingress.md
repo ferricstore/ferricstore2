@@ -2,7 +2,8 @@
 
 Status: private codec, explicit physical capability, consumed stored9 publication/
 outcome recovery and opted-in Node9 startup audit/replay implemented and locally
-verified. Logical typed preparation and public history services remain required.
+verified. Bounded physical history capture is implemented; logical typed
+preparation, hydration composition and public history services remain required.
 
 The binary command's intent8 interprets supplied payload/result/error bytes as
 logical binaries. Publication escapes a leading `FSV2` once. Inferring a typed
@@ -85,10 +86,45 @@ consumed driver retain the existing scope-conversion max(V,C), complete profile
 headers, reply drop-after-commit and fail-stop/uncertain semantics. Named bool
 ownership is admitted only on the selected path; disabled/8 fees stay unchanged.
 
-Full common/foreign typed ingress, original HistoryValues observations, actual
-history acquisition, shared/named/external availability, authorization, routing,
+Full common/foreign typed ingress, original HistoryValues composition,
+shared/named/external availability, authorization, routing,
 read barriers and Linux/macOS acceptance remain required. This ADR establishes
 neither a public query service nor complete workflow parity.
+
+The additive `RedbStateStore::read_workflow_history_page` captures actual FWSH
+events and FWVB historical companions under one read transaction, together with
+the matching current record version, current binding and group control. Five
+owned models live in `wf-ports::state::history`, re-exported from `state`; backend
+tables, guards and transaction types stay private. Legacy layouts explicitly
+report unavailable provenance. Value-capable layouts require current/history
+companions, matching value presence, bounded versions and immutable birth
+provenance. Corrupt rows latch the existing fatal state; resource or stale-control
+refusals leave it usable. No persistent format, dependency or writer changes.
+
+Physical ordering remains numeric event-ID milliseconds followed by the original
+event-ID bytes. A pure cursor-key encoder accepts the existing canonical u64
+grammar, including zero components, without constructing a fake event. Both
+directions use exclusive seeks within the complete escaped record prefix. The
+page retains the complete validated extra candidate: pinned HistoryRead hydrates
+limit+1 candidates before trimming, so discarding its metadata early would change
+later behavior. Continuation exists only when that candidate exists and names
+the last selected original ID. Core payloads are borrow-validated without copying.
+
+Independent positive ceilings bound selected entries, point/range candidates
+(including missing/end probes), cumulative inspected key/value bytes, returned
+ownership, continuous work and simultaneous temporary ownership. Checked sizes
+and fallible reservations precede copies. The selected Vec reserves limit slots;
+lookahead stays in the page's inline Option. Current/historical scalar bindings
+reuse the existing materializer. Logical fees cover named table/range/guard/key,
+decoded-key, binding and complete output owners, with conservative working
+allowances. These are not allocator-capacity, engine-page, RSS or speed claims.
+
+This physical capture carries no read barrier, authorization, lifecycle/expiry
+visibility, hot/cold routing or public HistoryAPI guarantee. Hydration must still
+compose it with authenticated value acquisition and source field conversion.
+Architecture checks keep the cursor module pure and the five models out of the
+worker client facade; all existing workspace boundaries and size/complexity
+limits remain in force.
 
 Root performs the current review solo under the user override. Concrete paths,
 TDD stages and validation are recorded in

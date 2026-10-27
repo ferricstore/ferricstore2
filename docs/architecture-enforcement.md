@@ -97,6 +97,15 @@ local/CI wrapper. There are no file-specific exemptions. Divide large files by
 responsibility while preserving the module allowlist, pure domain and existing
 public contracts. Clippy's long-function/argument checks remain enforced.
 
+The root [`clippy.toml`](../clippy.toml) sets a maximum nesting depth of **4**,
+cognitive complexity of **25**, and function length of **100 Clippy-counted
+lines**. Nesting depth includes enclosing item scopes. These are project policy
+limits; function length is measured separately from physical file size.
+Workspace Clippy treats violations as errors across all targets, including
+tests and benchmarks. Architecture tests reject missing configuration, changed
+thresholds, and weakened nesting or complexity lint levels. The local/CI wrapper
+explicitly selects the root configuration through `CLIPPY_CONF_DIR`.
+
 ## Archunit evaluation and compiler evidence
 
 The [official archunit API](https://docs.rs/archunit/latest/archunit/) identifies

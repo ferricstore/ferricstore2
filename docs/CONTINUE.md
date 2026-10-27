@@ -7,10 +7,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,191 tests across 104
+The current local Rust quality checkpoint passes all 1,198 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,184 case and
-adds only the seven stored-value Node recovery cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,191 case and
+adds only the seven physical history-page cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -22,6 +22,22 @@ literals and 84 test function identities. All files remain within the existing
 only four existing Rust-source hashes changed. This is Rust quality evidence,
 not full workflow parity: 1,681 runtime cases remain unmatched and 1,655 source
 declarations unresolved.
+
+The actual physical history reader now captures current/control metadata,
+ordered FWSH events and their mandatory historical bindings on one snapshot.
+Both directions support exclusive original-ID cursors, including absent cursor
+rows; the complete extra candidate is validated and retained for later hydration.
+Current payloads are borrow-validated without copying. Independent limits cover
+entries, point/range probes, inspected bytes, returned ownership, work and
+temporary ownership. All seven genuine rejecting cases were saved in `06380a0`
+before implementation. Their full ordering, mixed8/9 provenance, legacy,
+corruption/lookahead, ownership, budget, reopen and FWSP4 tails now pass.
+One birth-incarnation fixture literal was corrected from the existing sequence
+formula; a test-only fixture scope/import correction preserves every helper
+statement and assertion. Five complete production source inverses preserve old
+behavior. Root reviewed this solo. Actual hydration composition, logical typed
+preparation, lifecycle visibility, authoritative read barriers and accepted
+history services remain required; see [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
 The real size-aware reader now authenticates each distinct stored value in one
 snapshot before expiry and threshold classification. Omitted values retain the

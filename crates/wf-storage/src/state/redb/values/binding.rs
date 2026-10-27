@@ -163,7 +163,7 @@ pub(crate) fn load(
     Ok(result)
 }
 
-fn materialize(
+pub(in crate::state::redb) fn materialize(
     data: ValueBindingData,
     partition: &PartitionId,
     id: &RecordId,
