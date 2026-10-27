@@ -16,6 +16,19 @@ use wf_types::version::CommittedTime;
 use super::{CommittedRecoveryError, CommittedRecoveryLimits, replay, total};
 
 impl CommittedRecoveryLimits {
+    /// Selects explicit stored-value startup recovery and its shared ceilings.
+    /// # Errors
+    /// Refuses invalid ceilings or an unsupported recovery capability.
+    pub fn with_workflow_stored_value_limits(
+        self,
+        rows: usize,
+        bytes: usize,
+        work: usize,
+        temporary: usize,
+    ) -> Result<Self, CommittedRecoveryError> {
+        self.with_workflow_value_limits(rows, bytes, work, temporary)
+    }
+
     /// Selects additional publication ceilings for value-entry recovery.
     /// # Errors
     /// Refuses zero ceilings or overflow in the whole-call work upper bound.

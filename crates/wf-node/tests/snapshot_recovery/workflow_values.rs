@@ -14,3 +14,4 @@ mod independent;
 mod limits;
 mod replay;
 mod snapshot;
+mod stored;
