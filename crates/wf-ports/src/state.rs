@@ -5,6 +5,7 @@
 mod claim;
 mod control;
 mod core_policy;
+mod history;
 mod original_policy;
 mod policy;
 mod transaction;
@@ -15,6 +16,10 @@ pub use claim::{
 };
 pub use control::{GroupControlChanges, GroupControlTransaction};
 pub use core_policy::{GroupCorePolicyChanges, GroupCorePolicyTransaction};
+pub use history::{
+    StoredWorkflowHistoryRow, WorkflowHistoryDirection, WorkflowHistoryPage, WorkflowHistoryQuery,
+    WorkflowHistoryReadLimits,
+};
 pub use original_policy::{GroupOriginalPolicyChanges, GroupOriginalPolicyTransaction};
 pub use policy::{OriginalPolicyGetReader, StoredPolicyValue, read_original_policy_get_reply};
 pub use transaction::{
