@@ -2,18 +2,15 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
-Work in progress: logical typed preparation has a genuine rejecting baseline
-on `codex/logical-value-preparation` in the separate
-`ferricstore2-size-aware-solo` tree. The primary tree remains on
-the green `7e67000` checkpoint. Eight new domain cases and one real stored-value
-composition case compile and fail at healthy logical preparation against the
-literal `Err(InvalidInput)` facade; no encoder body exists yet. The source map
-fixture spans all common and foreign key families, with scalar/list/tuple wire
-boundaries, duplicate identities, graph/depth/expansion/resource checks and
-owned-output tails compiled. Those later tails remain unexecuted at this stage.
-The RED is saved in `7da6c0d`; keep working through the encoder and its
-full tails and real publication; do not adopt the rejecting draft into primary.
-Architecture selection and exact receipts are in the coordination journal.
+Work in progress on `codex/logical-value-preparation` in the separate
+`ferricstore2-size-aware-solo` tree. The primary remains green at `7e67000`.
+The encoder body passes the nine original full tails plus three after-body
+controls, and the full pre-context suite passes 1,223 Rust cases. Source audit
+found local-fun emission must use explicitly captured `erts_init_process_id`,
+not the received wire creator. This source-fidelity correction remains open;
+the passing data formatter is not ready to adopt as complete preparation.
+The original genuine RED is `7da6c0d`; the context extension receives its own
+rejecting test before its body. Decisions/evidence are in the coordination log.
 
 The user now requires solo work without agents; earlier agent instructions are
 superseded. Rust lint policy enforces nesting 4, cognitive complexity 25 and

@@ -55169,3 +55169,125 @@ logical writer handling of that canonical data must be reviewed before body
 creation rather than assuming arbitrary legacy wire metadata is an entry.
 Concrete private artifacts and resource ownership remain UNSELECTED. Primary
 stays7e67000; draft branch codex/logical-value-preparation is not ready to merge.
+
+
+## LOGICAL-VALUE-PREPARATION1 — concrete private implementation selection
+
+Previous turn is progress: saved genuine9-case R0 in7da6c0d and source findings
+in134cfa3, both revalidated clean. BEFORE creation select these private files
+under wf-domain/src/value/original_flow/prepare/: budget.rs (Budget, checked
+add/mul and fresh fallible reservations); layout.rs (Layout, NodePlan, ListInfo,
+TermView and postorder orchestration); layout/shape.rs (borrowed range/child/
+depth validation); layout/compound.rs (list/tuple/map/fun size plans); scalar.rs
+(integer/atom/bit sizing and bounded borrowed spelling); order.rs (CompareFrame,
+SeqSource, fallible iterative comparisons and heapsort); order/scalar.rs
+(NameChars and scalar/identity comparisons); order/sequence.rs (ListCursor,
+ListStep and sequence continuation); write.rs (EmitFrame, Output and iterative
+emission); write/scalar.rs and write/foreign.rs (literal ETF scalar/foreign
+output helpers). Add private module links only in the existing prepare facade.
+No new dependency, public model, persistent format or modification to any old
+decoder/binary8/stored9 body. All visibility uses explicit crate::value paths.
+
+One flat NodePlan per supplied node retains canonical alias ID, exact ETF size,
+logical depth, UTF8 atom length, flattened list facts, map order range and
+canonical i32 fun uniqueness. Layout borrows the input and owns only plans and
+map pair-offset order. Every child precedes parent; all supplied spines count
+against independent caps. Precount exact total map-pair slots (including reused
+input ranges), allocate fresh fixed plan/order buffers once, then sort each map
+using only already-complete child maps. Fallible heapsort stops at the first
+budget error; adjacent equal source keys are invalid. No hash-order dependence,
+recursive term tree, encoded-subterm cache, whole-document clone or Box/shrink.
+
+Comparison uses bounded reusable continuation frames and source exact term
+order, with list cursors flattening segments/zero-head aliases. Nested maps
+compare size, sorted keys then values. Integer and float key classes remain
+distinct, signed float zero is preserved, bit padding and trailing-zero reference
+words do not create distinct keys. Local fun identity uses module/index/
+canonical i32 old_uniq/free-count/free-values, with internally inconsistent
+entry descriptors refused; no VM invocation/catalog authority is manufactured.
+Foreign context flags remain ignored observations. The output preserves full
+foreign data forms and uses modern88/90/120/112/113 encodings.
+
+Budget validates positive profiles, charges before traversal/inspection/copy and
+uses checked arithmetic. Prospective requested ownership covers named fixed
+headers, exact plan/order slots, and at most2*actual_node_count+4 continuation
+slots. Comparison backing exists only when multi-key maps require it and is
+released before emission. Output reserves the exact complete stored length;
+iterative emission reuses one fixed continuation allocation and never grows
+beyond the admitted extent. Fixed headers use actual size_of of the selected
+owners/frames and conservative scalar working allowances. All returned metrics
+are logical requested/work accounting, not allocator capacity, native frames,
+RSS, OOM recovery or measured speed. Root binary escaping is applied once after
+logical alias resolution; nested binaries retain ETF representation.
+
+Root reviews this design solo. Nine saved test sources stay exact; execute full
+tails before claiming behavior. Additional adversarial findings must keep their
+actual test timing. Maintain400/600 physical lines, function100/nesting4/
+cognitive25 without suppression. Primary stays green7e67000 until acceptance;
+full product/profile/Linux/macOS goal remains active.
+
+First body79573 terminal0 executes all eight saved domain tails, including
+4,096-level traversal,65,535/65,536 lists, map families, foreign decode, ownership
+and independent budgets. Separate62790 terminal0 executes the unchanged real
+logical publication/hydration/reopen tail. The first strict lint run refuses one
+nested branch and a105-line identity function; factor function comparison from
+process/port/reference comparison and collapse guards without changing limits.
+Increase only conservative fixed metadata cohorts for nested borrowed views.
+
+BEFORE supplementary artifacts select tests/original_value_prepare/adversarial.rs
+and one mod link in its existing main.rs. Three AFTER-BODY test identities:
+logical_value_preparation_keeps_raw_caps_and_shared_edges_independent;
+logical_value_preparation_orders_foreign_identity_fields_and_fun_environment;
+logical_value_preparation_rejects_inconsistent_function_entries_and_invalid_foreign_shapes.
+No test model/type: same-file free helpers build independent literal byte recipes.
+Check exact raw-output caps (including empty), overlapping input edge ranges
+shared by sorted map and ordered tuple, PID serial/ID versus node ordering, port
+node precedence, reference u32 significance, fun free-values and ignored creator,
+coherent entry identity, bad reference widths/export arity/creator/legacy bounds.
+The nine original case functions/fixtures stay exact; stripping the one module
+link must recover the R0 main file. These new three cases receive no genuine RED
+credit. Clarify existing OriginalValueInput documentation: local-fun uniqueness
+uses its signed low32-bit source entry value and repeated descriptors must agree.
+No new public model, effect, schema, dependency, suppression or broader acceptance
+claim. Root reviews solo; full goal remains active and both platforms required.
+
+The pre-context body pipeline83645 terminal0 passes all twelve gates and1,223
+Rust cases, but final primary-source audit finds a real source-fidelity gap:
+OTP-28.0 external.c3721..3745 uses fe->old_index/old_uniq and the captured global
+erts_init_process_id for local-fun output; it does NOT serialize the incoming
+wire creator. That process ID is a runtime input, not a zero-ID assumption.
+The current data formatter preserves creator and is therefore NOT complete
+logical source preparation. Preserve this green evidence as pre-context only;
+do not adopt it or weaken the source target to make those fixtures sufficient.
+https://github.com/erlang/otp/blob/OTP-28.0/erts/emulator/beam/external.c#L3721
+
+BEFORE additions select public prepare_original_flow_value_with_init_pid(input,
+init_pid:usize,limits), reexported through existing prepare/original_flow/value.
+The index names an explicit captured initialization PID in the SAME borrowed
+input arena, preceding every reached local fun. No new public type or global
+lookup. Existing prepare_original_flow_value remains context-free and must
+return a new OriginalValueEncodeError::UnsupportedContext{node:usize} when a
+local fun is reached without capture; other classes stay supported. Add the
+error variant/display and a literal all-input rejecting facade for the new API
+BEFORE changing the formatter/old entrypoint. Save its genuine rejection first.
+
+Select new test child original_value_prepare/native.rs and module link, identity
+logical_value_preparation_uses_captured_initialization_pid. Its first valid new
+call uses an incoming creator n/id99/serial7/creation6 but explicitly captured
+runtime@host/id42/serial5/creation123. Independent expected bytes require the
+captured PID, Size65 instead of54, stable output despite changed obsolete
+creator, actual output-size refusal, missing/bad context lanes and unused
+context not inspected for plain integer. Do not assume initialization PID0.
+Later tails are masked at the rejecting facade. No actual VM capture is claimed.
+
+After SAVE, thread Option<usize> through existing private Layout/TermView and
+shape/size/emission. Use the captured PID for local-fun size/depth and wire fields,
+retain validation of obsolete source data, and require coherent canonical entry
+metadata. The existing nine case functions and literal recipes remain exact.
+Their one fixtures::prepared router may mechanically select the explicit test
+capture (the literal fixtures already name their initialization PID), and
+after-body adversarial function cases may call the new API explicitly. Record
+complete router/module-link inverses and preserve the original R0 receipt;
+this context extension has its own genuine RED. No source assertion is dropped
+or byte recipe rewritten to match the flawed data formatter. Full goal remains
+ACTIVE/SOLO, primary7e67000 stays unchanged.

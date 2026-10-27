@@ -7,6 +7,7 @@ use wf_domain::value::{
     OriginalValueNode as N, PreparedOriginalFlowValue as P, prepare_original_flow_value as prepare,
 };
 
+mod adversarial;
 mod budgets;
 mod fixtures;
 mod foreign;

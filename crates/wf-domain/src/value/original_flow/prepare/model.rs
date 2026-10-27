@@ -8,6 +8,8 @@ use crate::value::original_flow::OriginalValueNode;
 ///
 /// Node ranges address these pools. Every referenced child must precede its
 /// parent. Foreign context flags are observations and confer no authority.
+/// Local-fun uniqueness uses its signed low 32-bit source entry value;
+/// repeated entry descriptors must agree on that identity.
 #[derive(Clone, Copy, Debug)]
 pub struct OriginalValueInput<'a> {
     /// Borrowed logical byte pool, without ETF or stored-value wrappers.
