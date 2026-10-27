@@ -9,13 +9,15 @@ use wf_domain::workflow::control::{ControlState, EntryIdentity, EntryStamp, Prep
 use wf_ports::log::{
     CodecError, RaftLogEntry, RaftLogStore, measure_control_entry, normal_recovery_header,
     prepare_atomic_start, prepare_claim_phase, prepare_independent_record_batch,
-    prepare_public_mutation, prepare_record_batch, verify_complete_core_policy_patch_frame,
+    prepare_public_mutation, prepare_record_batch, stored_value_recovery_header,
+    verify_complete_core_policy_patch_frame,
 };
-use wf_ports::state::GroupApplyStore;
+use wf_ports::state::{GroupApplyStore, StateTransactionError};
 use wf_storage::log::RedbLogStore;
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
     ClaimTransactionError, CorePolicyTransactionError, RecordBatchTransactionError,
+    WorkflowValueTransactionError,
 };
 use wf_types::identity::{GroupId, RecoveryId};
 use wf_types::version::{CommittedTime, LogIdentity};
@@ -27,7 +29,16 @@ pub(super) fn observe(
     base: usize,
     membership: &mut Option<(EntryIdentity, EntryStamp)>,
 ) -> Result<ControlState, Error> {
-    limits.admit(&[base, limits.state.1, limits.state.3])?;
+    if limits.stored_workflow_values {
+        limits.admit(&[
+            base,
+            limits.state.1,
+            limits.state.3,
+            std::mem::size_of::<bool>(),
+        ])?;
+    } else {
+        limits.admit(&[base, limits.state.1, limits.state.3])?;
+    }
     let admission = AdmissionLimits::new(1, 1, 1).map_err(|_| Error::InvalidLimits)?;
     let tx = state
         .begin_apply(
@@ -39,6 +50,16 @@ pub(super) fn observe(
             limits.state.3,
         )
         .map_err(Error::State)?;
+    if limits.stored_workflow_values {
+        tx.require_stored_workflow_values()
+            .map_err(|error| match error {
+                StateTransactionError::UnsupportedLayout
+                | StateTransactionError::UnsupportedPolicyProfile => {
+                    Error::Value(WorkflowValueTransactionError::UnsupportedProfile)
+                }
+                other => Error::State(other),
+            })?;
+    }
     let (control, value) =
         read_applied_state(&tx, limits.membership, limits.workspace).map_err(Error::State)?;
     *membership = match (value.entry(), value.stamp()) {
@@ -110,7 +131,12 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = normal_recovery_header(body, limits.normal.codec).map_err(|error| {
+    let header = if limits.stored_workflow_values {
+        stored_value_recovery_header(body, limits.normal.codec)
+    } else {
+        normal_recovery_header(body, limits.normal.codec)
+    }
+    .map_err(|error| {
         if error == CodecError::UnsupportedTag {
             Error::UnsupportedEntry
         } else {
@@ -184,8 +210,8 @@ fn audit_normal(
     if profile == 4 {
         return super::original_policy::audit(body, limits, base, stamp);
     }
-    if profile == 8 {
-        return super::workflow_values::audit(body, limits, base, stamp);
+    if matches!(profile, 8 | 9) {
+        return super::workflow_values::audit(body, limits, base, stamp, profile);
     }
     let available = limits
         .workspace

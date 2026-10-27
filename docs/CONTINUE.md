@@ -7,10 +7,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,184 tests across 104
+The current local Rust quality checkpoint passes all 1,191 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,177 case and
-adds only the seven durable stored-value publication cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,184 case and
+adds only the seven stored-value Node recovery cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -47,8 +47,8 @@ Its six genuine rejecting cases were saved in 46e53c6 before implementation;
 all full tails now pass. Binary8 wire, caller stream, caps and old direct-header
 refusal order remain preserved. Shared header/frame/intent scoped inverses
 recover the complete earlier source after rustfmt. Generic prepared decoding
-supports9; normal recovery still rejects it and durable9 requires explicit
-profile2 authority through the separate consumed driver below. See
+supports9; the legacy recovery header still rejects it. Durable9 requires
+explicit profile2 authority and the separate consumed driver/Node opt-in below. See
 [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
 The physical predecessor now explicitly creates FWSS7 alias profile2 through
@@ -72,12 +72,24 @@ rather than opening metadata twice. All seven full tails pass unchanged after
 genuine rejecting5108cf6, including resource aborts and corruption. Fifteen full
 source inverses preserve binary8 behavior; no earlier test assertion changed.
 
-Next register stored9 in Node startup auditing and replay with explicit opt-in
-to actual profile2 authority. Normal recovery remains closed until those real
-tests pass. Preserve each carried alias's encoding and all binary8 behavior;
-do not infer typed data from an FSV2 prefix. Intent version9 is separate from
-the existing original-policy operation tag9. The conversion uses caller-captured
-history; actual
+Stored9 Node startup audit/replay now requires with_workflow_stored_value_limits
+and actual profile2 authority. Its ordinary constructor and binary8 opt-in keep9
+disabled; the legacy header stays strict. An additive stored-capable header is
+selected only by the new opt-in, followed by full canonical/body/footer/EOF
+validation. The capability check shares the bounded state-observation guard,
+including historical and zero-value entries. Replay calls the actual consumed
+stored driver and discards replies after commit. All seven full tails pass
+byte-exact after rejecting96cd5fa: all modes/retained/mixed8 traffic, source holes,
+historical corruption, explicit capability, six resource cuts, real uncertain
+commit, and all four modes through local/matching/fresh FWSP4 routes and purge.
+Seven complete source inverses preserve disabled/8 behavior; no earlier test
+assertion changed. These compositions do not start an accepted service.
+
+Next close logical typed preparation and actual ordered history acquisition,
+then compose the real observations with HistoryValues hydration. Preserve each
+carried alias's encoding and all binary8 behavior; do not infer typed data from
+an FSV2 prefix. Intent version9 is separate from the existing original-policy
+operation tag9. The conversion currently uses caller-captured history; actual
 ordered FWSH/family11 acquisition and public query services remain required.
 Shared/named/external availability, authority/routing/read barriers, lifecycle
 cleanup, native/Linux/macOS acceptance, complete Elixir coverage and remaining

@@ -96,6 +96,32 @@ impl RedbStateStore {
 }
 
 impl super::RedbStateTransaction<'_> {
+    /// Requires actual stored-value capability in this same bounded guard.
+    ///
+    /// No control, catalog or workflow row is changed by this observation.
+    /// # Errors
+    /// Refuses absent capability, invalid metadata or read/temporary admission.
+    pub fn require_stored_workflow_values(&self) -> Result<(), StateTransactionError> {
+        self.checked(|| {
+            let owner = super::admission::total(
+                512,
+                [
+                    super::admission::total(
+                        208,
+                        [self.group.as_bytes().len(), self.recovery.as_bytes().len()],
+                    )?,
+                    std::mem::size_of::<manifest::ValueManifest>(),
+                ],
+            )?;
+            self.admit_read(owner)?;
+            self.temporary(owner)?;
+            if self.value_manifest()?.alias_format != 2 {
+                return Err(StateTransactionError::UnsupportedPolicyProfile);
+            }
+            Ok(())
+        })
+    }
+
     pub(crate) fn value_manifest(&self) -> Result<manifest::ValueManifest, StateTransactionError> {
         if self.layout != 7 {
             return Err(StateTransactionError::UnsupportedLayout);

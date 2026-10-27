@@ -17,7 +17,7 @@ pub use claim::{
     inspect_claim_phase_point, prepare_claim_phase,
 };
 mod common;
-pub use common::{CodecError, normal_recovery_header};
+pub use common::{CodecError, normal_recovery_header, stored_value_recovery_header};
 mod complete_policy;
 mod control;
 mod decode;

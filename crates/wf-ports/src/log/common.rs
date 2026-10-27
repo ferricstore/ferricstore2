@@ -15,6 +15,25 @@ pub fn normal_recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
+    recovery_header(encoded, limits, false)
+}
+
+/// Borrows Normal header facts with explicit stored-value intent9 recognition.
+/// Complete body validation and actual persistent capability remain mandatory.
+/// # Errors
+/// Refuses unsupported headers, framing and the configured encoded byte cap.
+pub fn stored_value_recovery_header(
+    encoded: &[u8],
+    limits: CodecLimits,
+) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
+    recovery_header(encoded, limits, true)
+}
+
+fn recovery_header(
+    encoded: &[u8],
+    limits: CodecLimits,
+    stored: bool,
+) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
     }
@@ -38,9 +57,10 @@ pub fn normal_recovery_header(
     let _request = reader.nonempty(256)?;
     let version = reader.u16()?;
     let _digest = reader.take(32)?;
-    if !matches!((version, operation_tag), (1, _) | (5..=7, 1) | (2, 5))
-        && (version, operation_tag) != (8, 1)
-    {
+    let allowed = matches!((version, operation_tag), (1, _) | (5..=7, 1) | (2, 5))
+        || (version, operation_tag) == (8, 1)
+        || (stored && (version, operation_tag) == (9, 1));
+    if !allowed {
         return Err(CodecError::UnsupportedVersion);
     }
     let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;
@@ -50,6 +70,7 @@ pub fn normal_recovery_header(
         (1, 6) => 6,
         (1, 7) => 7,
         (1, 8) => 8,
+        (1, 9) => 9,
         (4, 1) => 1,
         (3, 1) => 3,
         (5, 2) => 2,

@@ -1,14 +1,16 @@
-//! Bounded operation-eight audit and consumed replay under an explicit opt-in.
+//! Bounded binary/stored value audit and consumed replay under explicit opt-ins.
 
 use std::mem::size_of;
 
 use wf_domain::workflow::control::{ControlState, EntryStamp};
 use wf_domain::workflow::request::RequestScope;
-use wf_ports::log::{RaftLogEntry, prepare_workflow_value_batch};
+use wf_ports::log::{
+    RaftLogEntry, prepare_workflow_stored_value_batch, prepare_workflow_value_batch,
+};
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
     RecordBatchTransactionOutcome, WorkflowValueTransactionLimits,
-    apply_workflow_value_batch_transaction,
+    apply_workflow_stored_value_batch_transaction, apply_workflow_value_batch_transaction,
 };
 use wf_types::identity::{GroupId, RecoveryId, TenantId};
 use wf_types::version::CommittedTime;
@@ -18,7 +20,7 @@ use super::{CommittedRecoveryError, CommittedRecoveryLimits, replay, total};
 impl CommittedRecoveryLimits {
     /// Selects explicit stored-value startup recovery and its shared ceilings.
     /// # Errors
-    /// Refuses invalid ceilings or an unsupported recovery capability.
+    /// Refuses zero ceilings or overflow in the whole-call work upper bound.
     pub fn with_workflow_stored_value_limits(
         self,
         rows: usize,
@@ -26,7 +28,19 @@ impl CommittedRecoveryLimits {
         work: usize,
         temporary: usize,
     ) -> Result<Self, CommittedRecoveryError> {
-        self.with_workflow_value_limits(rows, bytes, work, temporary)
+        let mut selected = self.with_workflow_value_limits(rows, bytes, work, temporary)?;
+        selected.stored_workflow_values = true;
+        Ok(selected)
+    }
+
+    /// Reads the shared ceilings only when stored recovery was explicitly selected.
+    #[must_use]
+    pub const fn workflow_stored_value_limits(self) -> Option<WorkflowValueTransactionLimits> {
+        if self.stored_workflow_values {
+            self.workflow_value_limits()
+        } else {
+            None
+        }
     }
 
     /// Selects additional publication ceilings for value-entry recovery.
@@ -71,19 +85,30 @@ pub(super) fn audit(
     limits: &CommittedRecoveryLimits,
     base: usize,
     stamp: CommittedTime,
+    version: u16,
 ) -> Result<EntryStamp, CommittedRecoveryError> {
     let entry = total(&[512, body.len()])?;
-    let profile_header = size_of::<Option<WorkflowValueTransactionLimits>>();
+    let profile_header = if version == 9 {
+        total(&[
+            size_of::<Option<WorkflowValueTransactionLimits>>(),
+            size_of::<bool>(),
+        ])?
+    } else {
+        size_of::<Option<WorkflowValueTransactionLimits>>()
+    };
     let live = total(&[base, entry, profile_header])?;
     limits.admit(&[live])?;
-    let profile = limits
-        .workflow_value_limits()
-        .ok_or(CommittedRecoveryError::UnsupportedEntry)?;
+    let profile = profile(limits, version)?;
     let available = limits
         .workspace
         .checked_sub(live)
         .ok_or(CommittedRecoveryError::Limit)?;
-    let (decoded, _spent) = prepare_workflow_value_batch(
+    let prepare = if version == 9 {
+        prepare_workflow_stored_value_batch
+    } else {
+        prepare_workflow_value_batch
+    };
+    let (decoded, _spent) = prepare(
         body,
         profile.record_batch.codec,
         available,
@@ -98,15 +123,20 @@ pub(super) fn apply(
     state: &mut RedbStateStore,
     entry: &RaftLogEntry,
     fields: [&[u8]; 3],
-    context: (&CommittedRecoveryLimits, usize),
+    context: (&CommittedRecoveryLimits, usize, u16),
 ) -> Result<ControlState, CommittedRecoveryError> {
-    let (limits, base) = context;
+    let (limits, base, version) = context;
     let entry_owner = total(&[512, entry.body().len()])?;
-    let profile_header = size_of::<Option<WorkflowValueTransactionLimits>>();
+    let profile_header = if version == 9 {
+        total(&[
+            size_of::<Option<WorkflowValueTransactionLimits>>(),
+            size_of::<bool>(),
+        ])?
+    } else {
+        size_of::<Option<WorkflowValueTransactionLimits>>()
+    };
     limits.admit(&[base, entry_owner, profile_header])?;
-    let profile = limits
-        .workflow_value_limits()
-        .ok_or(CommittedRecoveryError::UnsupportedEntry)?;
+    let profile = profile(limits, version)?;
     let scope_owner = total(&[512, fields[0].len(), fields[1].len(), fields[2].len()])?;
     let conversion = total(&[
         fields[0].len().max(fields[1].len()).max(fields[2].len()),
@@ -127,9 +157,13 @@ pub(super) fn apply(
         RecoveryId::new(replay::copy(fields[2])?)
             .map_err(|_| CommittedRecoveryError::Codec(wf_ports::log::CodecError::Malformed))?,
     );
-    let outcome =
-        apply_workflow_value_batch_transaction(state, &scope, entry.body(), entry.id(), profile)
-            .map_err(CommittedRecoveryError::Value)?;
+    let driver = if version == 9 {
+        apply_workflow_stored_value_batch_transaction
+    } else {
+        apply_workflow_value_batch_transaction
+    };
+    let outcome = driver(state, &scope, entry.body(), entry.id(), profile)
+        .map_err(CommittedRecoveryError::Value)?;
     let control = match outcome {
         RecordBatchTransactionOutcome::Retained { control, outcome } => {
             drop(outcome);
@@ -141,4 +175,16 @@ pub(super) fn apply(
     };
     drop(scope);
     Ok(control)
+}
+
+fn profile(
+    limits: &CommittedRecoveryLimits,
+    version: u16,
+) -> Result<WorkflowValueTransactionLimits, CommittedRecoveryError> {
+    let selected = match version {
+        8 => limits.workflow_value_limits(),
+        9 => limits.workflow_stored_value_limits(),
+        _ => None,
+    };
+    selected.ok_or(CommittedRecoveryError::UnsupportedEntry)
 }

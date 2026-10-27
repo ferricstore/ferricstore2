@@ -1,8 +1,8 @@
 # ADR-009: explicit stored workflow value ingress
 
-Status: private codec, explicit physical capability and consumed stored9
-publication/outcome recovery implemented and locally verified. Node9 startup
-audit/replay registration remains required.
+Status: private codec, explicit physical capability, consumed stored9 publication/
+outcome recovery and opted-in Node9 startup audit/replay implemented and locally
+verified. Logical typed preparation and public history services remain required.
 
 The binary command's intent8 interprets supplied payload/result/error bytes as
 logical binaries. Publication escapes a leading `FSV2` once. Inferring a typed
@@ -62,9 +62,28 @@ Every9 outcome binds the actual profile2 manifest even when there are no value
 rows. Recovery threads its already-open manifest through the existing row walk;
 it prospectively admits the complete retained owner, manifest bytes and typed
 header before the9-only capability parse. It does not open metadata twice or
-infer capability from aliases. Normal recovery and Node9 registration stay
-closed until actual startup auditing/replay tests pass. The existing original-
-policy operation tag9 remains independent of stored-value intent version9.
+infer capability from aliases. The existing original-policy operation tag9
+remains independent of stored-value intent version9.
+
+Node with_workflow_stored_value_limits explicitly enables9 and shares the
+existing four checked value ceilings. One private bool starts false; ordinary
+construction and binary8 opt-in leave9 disabled, while later shared-ceiling
+updates preserve an already explicit opt-in. Legacy normal_recovery_header
+remains strict. The additive stored_value_recovery_header admits9 only through
+the selected Node path, with unchanged original-policy-tag precedence. Every
+historical entry still runs its complete matching decoder/canonical/footer/EOF
+validation; header recognition alone grants no persistence capability.
+
+The existing startup observation transaction requires actual alias profile2
+before auditing or replaying any entry when9 is selected. The additive
+RedbStateTransaction::require_stored_workflow_values prospectively admits512
+fixed guard/helper bytes, the exact208+group+recovery manifest, and its target-
+sized ValueManifest against the same read/temporary accounts, then checks the
+real manifest under the checked/fatal-latch boundary. No second transaction,
+profile model or payload clone is introduced. Matching9 preparation and the real
+consumed driver retain the existing scope-conversion max(V,C), complete profile
+headers, reply drop-after-commit and fail-stop/uncertain semantics. Named bool
+ownership is admitted only on the selected path; disabled/8 fees stay unchanged.
 
 Full common/foreign typed ingress, original HistoryValues observations, actual
 history acquisition, shared/named/external availability, authorization, routing,
@@ -106,3 +125,16 @@ smokes. Strict quality and offline dependency checks pass. Fifteen complete
 binary8 source inverses and four moved write-helper bodies preserve the prior
 path; all new and old storage tests remain saved-R0 exact. These are local
 storage results, not Node9 registration, complete Elixir parity or Linux evidence.
+
+The following Node9 predecessor's seven genuine runtime refusals were saved in
+96cd5fa before its body. All seven complete tails now pass without any later
+fixture or assertion change, including all contained modes and mixed8 traffic,
+retained outcomes, independent source holes/every-history bindings, complete
+historical corruption and no-value audit, real profile/opt-in refusal, six
+resource cuts, actual uncertain commit/reopenable prefix, and all four modes
+through local purge, matching receive/install and fresh restore with full FWSP4
+custody. Current validation preserves all earlier1,184 identities and adds only
+these seven:1,191 Rust cases across104 targets, six documentation cases, both
+correctness smokes and strict/offline quality gates. Seven complete production
+source inverses preserve disabled/8 behavior. This is local startup composition
+evidence, not an accepted service, complete Elixir parity or Linux acceptance.
