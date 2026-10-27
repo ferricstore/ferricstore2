@@ -7,9 +7,10 @@ mod original_flow;
 pub(crate) use original_flow::decode_fixed_bytes;
 
 pub use original_flow::{
-    OriginalFlowValueError, OriginalValueContext, OriginalValueDocument,
-    OriginalValueFunctionIdentity, OriginalValueLimits, OriginalValueNode,
-    decode_original_flow_value,
+    OriginalFlowValueError, OriginalValueContext, OriginalValueDocument, OriginalValueEncodeError,
+    OriginalValueEncodeLimits, OriginalValueFunctionIdentity, OriginalValueInput,
+    OriginalValueLimits, OriginalValueNode, PreparedOriginalFlowValue, decode_original_flow_value,
+    prepare_original_flow_value,
 };
 
 /// A business rejection; no record or history write accompanies an error.

@@ -55033,3 +55033,125 @@ history/query authority/lifecycle/read barriers, runtime/transport integration,
 remaining workflow breadth, every mandatory source profile and Linux/macOS
 acceptance remain required. No agents, push, external messages or unchanged
 denied native probes. This checkpoint does not complete any broader milestone.
+
+
+## LOGICAL-VALUE-PREPARATION1 — solo architecture selection before artifacts
+
+2026-10-28: prior turn made verified progress, adopted7e67000 with both trees
+clean. Continue full goal solo. Pinned Codec.Support125..130 distinguishes root
+binary/raw escaping from FSV2+2+TermCodec.encode(other). Actual TermCodec is
+apps/ferricstore/lib/ferricstore/term_codec.ex and uses deterministic uncompressed
+term_to_binary. Do not substitute a JSON subset, pre-encoded input, arbitrary map
+iteration or prefix inference. No agents, public service or storage authority.
+
+Select only R0 artifacts now: value/original_flow/prepare.rs private facade and
+prepare/model.rs, linked/reexported through existing original_flow.rs/value.rs.
+Four public models: OriginalValueInput<'a> borrows bytes:&[u8],
+nodes:&[OriginalValueNode], edges:&[usize], root:usize;
+OriginalValueEncodeLimits has positive max_input_bytes/max_nodes/max_edges/
+max_depth/max_encoded_bytes/max_work_units/max_temporary_bytes;
+OriginalValueEncodeError has InvalidInput/InvalidLimits/Limit/ReserveFailed;
+PreparedOriginalFlowValue privately owns bytes:Vec<u8>, work_units:usize and
+temporary_bytes:usize, exposing as_stored_bytes/into_stored_bytes/work_units/
+temporary_bytes. Reuse the existing node enum, with ranges addressing the borrowed
+logical byte/edge pools and children preceding parents. Foreign local_to_context
+flags are observations, not encoding authority; do not emit those booleans.
+Logical input is data without safe-atom/active-export/VM execution requirements.
+Every supported decoder common/foreign value family remains a writer target.
+
+prepare_original_flow_value(input,limits) returns the sealed complete stored
+owner; its R0 facade is literally Err(InvalidInput) for every input. No body,
+normalization, scratch builder or output writer before genuine RED is saved.
+No additional runtime/policy representation, dependency or persistence format.
+Max input bytes bounds the borrowed byte pool; node/edge caps independently bound
+all supplied spines. All are caller-owned, outside owned-output claims. Continuous
+work and prospective simultaneous output/scratch ownership, checked expansion,
+fallible reservations and iterative traversal must bound later implementation.
+Avoid all-subterm encoded caches, whole-document clones and shrink/Box copies.
+Concrete private implementation artifacts require another recorded selection.
+
+Select new integration target crates/wf-domain/tests/original_value_prepare/main.rs
+and private children fixtures.rs/scalars.rs/sequences.rs/maps.rs/foreign.rs/
+validation.rs/budgets.rs. No fixture type/model: functions return literal arenas
+and compare independent hand-built OTP28 byte recipes. Eight test identities:
+logical_value_preparation_escapes_only_root_binaries;
+logical_value_preparation_encodes_canonical_scalars;
+logical_value_preparation_encodes_lists_and_tuple_boundaries;
+logical_value_preparation_orders_complete_map_keys_deterministically;
+logical_value_preparation_preserves_foreign_data_formats;
+logical_value_preparation_rejects_invalid_graphs_and_duplicate_keys;
+logical_value_preparation_enforces_independent_budgets;
+logical_value_preparation_owns_output_after_inputs_drop.
+Each first calls a valid new prepare and asserts success so the all-error facade
+causes a real runtime rejection, not missing-symbol/compilation RED. Complete
+negative/context/expansion/depth/cycle/ownership tails compile but receive no
+execution credit until reached after the body. Add one real integration test to
+existing history_hydration/source.rs: history_hydration_prepares_and_publishes_
+logical_typed_values. Reuse actual profile2/consumed9 publication and query;
+compare typed tuple versus root binary containing identical FSV2 bytes.
+
+Primary references reviewed: OTP28 ETF documentation and OTP-28.0 external.c
+(map_key_compare calls CMP_TERM; strings use107 only for byte proper lists;
+modern source emits V4_PORT120 for ALL port widths, not89 for small IDs), plus
+OTP-28.0 utils.c exact term comparison. URLs:
+https://www.erlang.org/docs/28/apps/erts/erl_ext_dist.html
+https://raw.githubusercontent.com/erlang/otp/OTP-28.0/erts/emulator/beam/external.c
+https://raw.githubusercontent.com/erlang/otp/OTP-28.0/erts/emulator/beam/utils.c
+Do not infer native byte equality from docs alone or copy the C implementation.
+Keep full deterministic key order and duplicate semantic equality; source foreign
+identities are data only. Existing binary8/stored9/decoder APIs and all older test
+bodies stay unchanged, with strict400/600/function100/nesting4/cognitive25.
+Root performs the review solo, with no independent review claim. Full typed
+publication/public query/runtime/profile/Linux/macOS/product gates stay ACTIVE.
+
+Initial logical R0 actually executes all eight domain cases and the real-store
+case: cargo exits101 with0PASS/8FAIL and0PASS/1FAIL, all at healthy logical
+preparation Some(InvalidInput). No body exists; later tails remain masked.
+Initial receipts/source hashes are preserved at logical-value-initial-*.
+Before final SAVE strengthen the same map identity with a complete13-key source
+rank matrix including reference, local fun, export, port and PID alongside all
+common families. Select same-file foreign_keys/foreign_key_nodes fixture helpers
+in maps.rs and fixtures::local_fun_body for the independently constructed54-byte
+NEW_FUN size recipe, reused by foreign.rs. No new file/type/runtime model.
+Rerun all nine genuine runtime refusals after those test-only amendments; retain
+the original receipt and never claim later tail execution at R0.
+
+Final R0 test refinements before SAVE: foreign roundtrip helper converts its
+existing non-Error decode diagnostic explicitly to test text; invalid fixtures
+split by graph/atom versus numeric/shape responsibility under function100;
+source publication construction factors one same-file logical_create helper
+that moves the prepared Vec without copying. No suppression, packed lines or
+removed assertion. Additional255/256 big-integer/tuple boundaries and the13-key
+foreign/common matrix compile before any body. All earlier storage test bodies
+and complete decoder bodies are exact to7e67000. Only the two existing physical
+source counterpart hashes and their+4 import-shift anchors refresh; all other135
+records and every runtime binding are exact. Counts stay123/137/559.
+
+Final strengthened genuine R0 executes eight domain failures and one actual
+storage-composition failure, both cargo exits101, all exactly the healthy
+prepare assertion Some(InvalidInput). Later semantic/resource/reopen tails are
+compiled but masked. Complete source hashes and logs are preserved at
+/private/tmp/ferricstore2-logical-value-genuine-r0.json and r0-{domain,storage}.log;
+the initial earlier matrix receipts remain separately preserved. The facade is
+still literally all-input Err(InvalidInput). No encoder/private implementation
+body may precede the upcoming SAVE. Root reviewed source fixtures solo; no
+independent review or native VM/profile/Linux execution is claimed.
+
+The first architecture run correctly refuses pub(super) in the approved value
+facade. Use the existing decoder's explicit pub(in crate::value::...) visibility
+style for the three private result fields, preserving the same Rust visibility
+without weakening the checker. The model's node import now names its precise
+private original_flow owner. Re-run architecture and strict lint after this fix.
+
+LOGICAL-VALUE-PREPARATION1 final R0 gate32177 terminal0 confirms two actual
+cargo exits101 (eight domain cases, one storage target case), followed by actual
+strict workspace/all-target Clippy0, all53 architecture tests0, progress0 and
+reference0. All source hashes in logical-value-genuine-r0.json remain exact.
+The real storage tail has not yet executed: its first prepare call rejects before
+publication, and no durable/semantic tail is credited. Save this exact rejecting
+baseline on codex/logical-value-preparation in the existing separate feature
+tree; keep the primary tree at green7e67000 until all new full tails and required
+old gates pass. No private encoding body/artifact is selected or implemented yet.
+Next perform concrete private-artifact/ownership review, implement the complete
+common/foreign writer with source deterministic ordering and resource admission,
+then execute all nine tails and broader checks. Full goal stays ACTIVE/SOLO.

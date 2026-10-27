@@ -4,6 +4,7 @@ mod budget;
 mod context;
 mod equality;
 mod model;
+mod prepare;
 mod scan;
 
 use crate::value::original_flow::budget::{Budget, reserve_exact};
@@ -13,6 +14,10 @@ use crate::value::original_flow::scan::{ScanTarget, Scanner};
 pub use model::{
     OriginalFlowValueError, OriginalValueContext, OriginalValueDocument,
     OriginalValueFunctionIdentity, OriginalValueLimits, OriginalValueNode,
+};
+pub use prepare::{
+    OriginalValueEncodeError, OriginalValueEncodeLimits, OriginalValueInput,
+    PreparedOriginalFlowValue, prepare_original_flow_value,
 };
 
 /// Conservative fixed decoder metadata, excluding separately charged backing.

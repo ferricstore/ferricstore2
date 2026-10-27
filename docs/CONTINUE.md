@@ -1,13 +1,27 @@
 # ferricstore2: implementation handoff
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
+
+Work in progress: logical typed preparation has a genuine rejecting baseline
+on `codex/logical-value-preparation` in the separate
+`ferricstore2-size-aware-solo` tree. The primary tree remains on
+the green `7e67000` checkpoint. Eight new domain cases and one real stored-value
+composition case compile and fail at healthy logical preparation against the
+literal `Err(InvalidInput)` facade; no encoder body exists yet. The source map
+fixture spans all common and foreign key families, with scalar/list/tuple wire
+boundaries, duplicate identities, graph/depth/expansion/resource checks and
+owned-output tails compiled. Those later tails remain unexecuted at this stage.
+Save this RED before implementing the encoder, then keep working through its
+full tails and real publication; do not adopt the rejecting draft into primary.
+Architecture selection and exact receipts are in the coordination journal.
+
 The user now requires solo work without agents; earlier agent instructions are
 superseded. Rust lint policy enforces nesting 4, cognitive complexity 25 and
 function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,211 tests across 104
+The last adopted local Rust quality checkpoint passes all 1,211 tests across 104
 targets, both benchmark correctness smokes and six documentation tests across
 15 targets. Exact identity comparison preserves every earlier 1,209 case and
 adds only two pinned-fixture storage conformance cases. Workspace compilation, strict
