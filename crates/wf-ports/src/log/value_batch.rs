@@ -25,6 +25,40 @@ pub use response::workflow_value_retained_summary;
 
 use budget::{BASE_WORK, BYTE_WORK, ITEM_WORK, KEY_WORK, POLICY_WORK, ValueBatchCharge};
 
+/// Encode an explicit intent9 command whose supplied values are stored bytes.
+///
+/// This codec grants no durable publication or successful typed-decode promise.
+/// # Errors
+/// Rejects invalid structure, caller association and operational admission.
+pub fn encode_workflow_stored_value_batch(
+    _batch: &PreparedWorkflowValueBatch,
+    _limits: CodecLimits,
+) -> Result<PreparedBytes, CodecError> {
+    Err(CodecError::UnsupportedVersion)
+}
+
+/// Decode complete stored-byte intent9 into one owned operation and metadata.
+/// # Errors
+/// Rejects crossed profiles, corruption, malformed fields and operational limits.
+pub fn decode_workflow_stored_value_batch(
+    _encoded: &[u8],
+    _limits: CodecLimits,
+) -> Result<PreparedWorkflowValueBatch, CodecError> {
+    Err(CodecError::UnsupportedVersion)
+}
+
+/// Prepare bounded intent9 ownership and report its continuous codec work.
+/// # Errors
+/// Rejects crossed profiles, corruption and explicit owned/work ceilings.
+pub fn prepare_workflow_stored_value_batch(
+    _encoded: &[u8],
+    _limits: CodecLimits,
+    _maximum_owned: usize,
+    _maximum_work: usize,
+) -> Result<(DecodedRequest<'_>, usize), CodecError> {
+    Err(CodecError::UnsupportedVersion)
+}
+
 /// Borrowed value metadata beside one decoded operation; no apply authority.
 #[derive(Clone, Copy)]
 pub struct WorkflowValueMetadata<'a> {

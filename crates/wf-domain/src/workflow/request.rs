@@ -138,6 +138,12 @@ impl ClientIntent {
         Self { version: 8, digest }
     }
 
+    /// Selects explicit stored-byte caller identity without apply authority.
+    #[must_use]
+    pub const fn workflow_stored_value_batch(digest: [u8; 32]) -> Self {
+        Self { version: 9, digest }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

@@ -9,4 +9,5 @@ mod publication;
 mod reads;
 mod recovery;
 mod sized_reads;
+mod stored_codec;
 mod wire;

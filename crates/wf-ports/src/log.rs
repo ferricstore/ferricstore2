@@ -36,7 +36,9 @@ pub use control::{
 pub(crate) use value_batch::response::validate_changes as validate_workflow_value_changes;
 pub use value_batch::{
     WorkflowValueDecision, WorkflowValueMetadata, decide_fresh_workflow_value_batch_touched,
-    decode_workflow_value_batch, encode_workflow_value_batch, prepare_workflow_value_batch,
+    decode_workflow_stored_value_batch, decode_workflow_value_batch,
+    encode_workflow_stored_value_batch, encode_workflow_value_batch,
+    prepare_workflow_stored_value_batch, prepare_workflow_value_batch,
     workflow_value_retained_summary,
 };
 mod writer;
