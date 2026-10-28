@@ -102,6 +102,15 @@ fn encode_profile(
     limits: CodecLimits,
     version: u16,
 ) -> Result<PreparedBytes, CodecError> {
+    encode_profile_with_intent(batch, limits, version, None).map(|(bytes, _)| bytes)
+}
+
+fn encode_profile_with_intent(
+    batch: &PreparedWorkflowValueBatch,
+    limits: CodecLimits,
+    version: u16,
+    maximum_frame_bytes: Option<usize>,
+) -> Result<(PreparedBytes, ClientIntent), CodecError> {
     let items = batch
         .operation
         .mutation_items()
@@ -137,6 +146,9 @@ fn encode_profile(
     if length > maximum {
         return Err(CodecError::ByteLimit);
     }
+    if let Some(maximum_frame_bytes) = maximum_frame_bytes {
+        budget::admit(length, maximum_frame_bytes)?;
+    }
     metadata::check(batch, limits)?;
     let intent = intent::derive(batch, limits, version)?;
     let mut writer = Writer::allocate(length, maximum)?;
@@ -147,10 +159,13 @@ fn encode_profile(
     }
     let footer: [u8; 32] = Sha256::digest(&bytes).into();
     bytes.extend_from_slice(&footer);
-    Ok(PreparedBytes {
-        digest: digest(&bytes),
-        bytes,
-    })
+    Ok((
+        PreparedBytes {
+            digest: digest(&bytes),
+            bytes,
+        },
+        intent,
+    ))
 }
 
 /// Decodes one complete owned command, retaining no input lifetime.

@@ -55866,3 +55866,82 @@ The pinned Keys source explicitly selects prefix __flow_auto__: and256 buckets;
 independent stdlib CRC32 goldens cover3/80/194/198/210 without VM execution.
 No implementation/ownership/shared-encoder body exists at this SAVE. Commit
 this rejecting checkpoint before implementing the selected composition.
+
+LOGICAL-BINDING1 body and solo review: R0 committed as eb0f03d BEFORE creation
+of ownership.rs or modification of either codec body. The first focused Clippy
+run rejects only ref_option on the new private optional-capacity helper; change
+its argument to Option<&Vec<u8>> and pass as_ref at each call. No allowance.
+Corrected focused Clippy exits0, then actual runtime execution exits0 with all
+seven full tails passing and171 earlier cases filtered. The five CRC goldens
+execute across all seven mutation kinds; explicit opaque partition/time, typed
+versus identical binary frame equality, returned intent, seven contradiction
+axes, request/stamp exclusion, exact owned boundary and excess-capacity refusals
+all execute. Real configured auto-partition publication retains the same intent
+and hydrates its escaped binary/history size before and after reopen. All seven
+saved test files/fixtures/assertions stay exact; no after-body oracle adjustment.
+
+The new composition moves caller/context owners into one existing public item
+and input spine. Ownership census admits count/spine capacity before traversal,
+all declared Vec capacity and identity/token lengths, reported upstream peak,
+prospective fixed/pointee/input/conversion requests, and the measured frame.
+The reported upstream work, conservative binding cohort and unchanged codec
+maximum are paid together. Positive caps, checked arithmetic, explicit resource
+errors and fallible Vec reservations remain. Allocator-reported surplus input,
+partition and final-frame capacity is checked after reservation. No extra
+payload owner, canonical buffer, decoder, shrink or payload Box conversion.
+The existing identity conversion and public-item Box remain and are admitted;
+this is not an allocator/frame/RSS/OOM or measured-speed theorem.
+
+Root read the upstream primary Vec documentation online during performance
+review: [try_reserve_exact](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.try_reserve_exact)
+does not promise precisely minimal capacity, while
+[into_boxed_slice](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.into_boxed_slice)
+discards spare capacity and may require shrinking. Therefore preserve complete
+value Vec owners, use the existing exact request plus capacity checks, and do
+not assert that changing every Vec to Box improves performance. No benchmark
+speedup is claimed. No OS-specific operation/dependency/runtime effect is added.
+
+The shared encoder now returns its existing derived intent through one helper.
+Old APIs select None and recover their complete original body/order/fees;
+only the new caller supplies an optional exact measured-frame ceiling before
+allocation. /private/tmp/ferricstore2-logical-binding-inverses.json proves five
+complete existing-file inverses, including that encoder, both entry mod links,
+log reexports and only-additive architecture test probes. Nine R0 sources remain
+hash-exact, including all five new test artifacts and the public context model.
+Existing pure descendant rules and client-facade rules reject effects/leaks;
+their concrete new module/model probes add no exception or policy relaxation.
+Root performs design/performance/source review solo, without independent peer
+review claims. Full validation, identity preservation and adoption remain next.
+
+LOGICAL-BINDING1 prospective-work review, before corrective test/body: the first
+full pipeline is still running against its frozen1698-input tree. Source review
+finds that ownership::admit checks the enclosing work maximum only AFTER its
+policy-capacity loop. Count/spine/owner checks bound that loop, but a tiny work
+ceiling should refuse BEFORE scanning it. Once this run is terminal, select one
+additional test function in the EXISTING logical_binding/limits.rs:
+logical_binding_prepays_work_before_witness_census. With admitted fixed/spine
+owners, max_work1 and an oversized witness buffer it must return WorkLimit before
+the buffer census's OwnedLimit; existing healthy-work capacity tests still
+require OwnedLimit. Add exact successful work/one-unit-cut checks as its later
+tail, without duplicating the fee formula. Save its genuine current-body RED
+before changing ownership.rs. Then select a private work-admission function in
+that SAME ownership.rs, invoked before the bounded policy loop and after the
+complete capacity census, before encoding. The initial admission covers all
+control scans through the declared spine cohort; the final admission includes
+all buffer work. No new file/model/API, changed old fee or weakened assertion.
+Original seven R0 tests stay exact; report this as an after-body review finding.
+
+LOGICAL-BINDING1 initial pipeline is now terminal0: all twelve gates pass,
+including1245 cases with all earlier1238 identities retained, all53 architecture
+cases, both correctness smokes, six doctests/fifteen targets and offline audit.
+All1698 non-Markdown/1111 Rust inputs stayed exact. Preserve this initial body
+evidence separately as /private/tmp/ferricstore2-logical-binding-first-pipeline.json
+and first-* logs; it does not certify the later corrective source.
+
+The selected after-body regression now compiles and actually fails at its
+prepayment assertion: Some(OwnedLimit), before the exact-work-boundary tail.
+Runtime exits101 with0 passed/1 failed/0 ignored/178 filtered. Receipt
+/private/tmp/ferricstore2-logical-binding-work-genuine-r0.json saves that complete
+log hash and the current producer/test source hashes. No work-prepayment body
+has changed. Commit this genuine failing review case with the initial verified
+binding body before applying the corrective admission order.

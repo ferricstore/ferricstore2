@@ -11,6 +11,9 @@ fn workflow_value_bytes_stay_pure_and_server_side() -> CheckResult<()> {
         "blob::encoding",
         "consensus::value",
         "log::value_batch",
+        "log::value_batch::logical",
+        "log::value_batch::logical::model",
+        "log::value_batch::logical::ownership",
         "clock",
     ] {
         assert!(
@@ -43,6 +46,21 @@ fn workflow_value_bytes_stay_pure_and_server_side() -> CheckResult<()> {
         source_check("wf-worker", "worker", "use wf_ports::blob;")?,
         Vec::<String>::new()
     );
+    for name in [
+        "LogicalMutationFrameContext",
+        "LogicalMutationFrameLimits",
+        "encode_logical_mutation_frame",
+    ] {
+        assert!(
+            source_check(
+                "wf-ports",
+                "client",
+                &format!("pub use crate::log::{name};")
+            )?
+            .iter()
+            .any(|finding| finding.contains("client port facade"))
+        );
+    }
     assert_overlay_metadata_rejections()?;
     assert_overlay_metadata_forward_alias_rejections()?;
     assert_overlay_metadata_scope_controls()?;

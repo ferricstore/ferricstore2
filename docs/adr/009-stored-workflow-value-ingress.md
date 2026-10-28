@@ -266,6 +266,29 @@ component tests, without additional source-case ledger credit. Accepted typed
 application services, multi-item adapters, native capture, public get/claim,
 mandatory profiles and independent platform acceptance remain required.
 
+The additive `encode_logical_mutation_frame` now consumes that caller and an
+owned `LogicalMutationFrameContext`, producing one stored9 frame and the same
+already-derived client intent. It resolves only an absent partition through
+the existing CRC resolver. Scope, request, stamp, defaults, ordered policy
+witnesses and the independent source input remain explicit observations.
+The original metadata checker refuses contradictory time/presence/policy inputs
+instead of repairing them. Freshness, origin, placement and authorization still
+belong to the accepted service. This pure function grants no submission power.
+
+`LogicalMutationFrameLimits` adds independent positive ownership/work ceilings.
+Admission includes reported upstream preparation, incoming Vec capacities,
+identity/token lengths, prospective item/input owners and partition conversion.
+Witness count and spine capacity are admitted before witness traversal. Exact
+frame measurement precedes its single reservation, and returned capacity is
+checked as well. Complete payloads and context owners move without cloning or
+another decode/canonical-buffer pass. The old binary8/stored9 entrypoints pass
+no additional frame cap and retain their complete encoding order and fees.
+These are conservative named-owner/work bounds, not allocator, RSS, native
+frame, OOM or measured-speed guarantees. Seven genuine refusals were committed
+in `eb0f03d`; all seven full tails now pass, including real auto-partition
+publication and history hydration before and after reopen. The original tests
+and explicit source/profile/platform acceptance requirements remain unchanged.
+
 The six genuine compiled rejecting cases were saved in `46e53c6` before the
 codec body. They now pass, including all four producer modes, independent
 ownership/work bounds, exact typed/raw/escaped bytes, corruption, cross-profile
