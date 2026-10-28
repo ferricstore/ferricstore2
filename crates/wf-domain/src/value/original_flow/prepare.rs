@@ -39,6 +39,22 @@ pub fn prepare_original_flow_value(
     })
 }
 
+/// Prepare with an explicitly captured encoder initialization PID node.
+///
+/// The PID belongs to the borrowed input arena and must precede reached local
+/// functions. It supplies data, never a runtime capability or global lookup.
+///
+/// # Errors
+///
+/// This rejecting TDD facade reports unavailable context until implemented.
+pub fn prepare_original_flow_value_with_init_pid(
+    input: OriginalValueInput<'_>,
+    _init_pid: usize,
+    _limits: OriginalValueEncodeLimits,
+) -> Result<PreparedOriginalFlowValue, OriginalValueEncodeError> {
+    Err(OriginalValueEncodeError::UnsupportedContext { node: input.root })
+}
+
 fn fixed_bytes() -> Result<usize, OriginalValueEncodeError> {
     use std::mem::size_of;
     let parts = [

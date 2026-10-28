@@ -55291,3 +55291,19 @@ complete router/module-link inverses and preserve the original R0 receipt;
 this context extension has its own genuine RED. No source assertion is dropped
 or byte recipe rewritten to match the flawed data formatter. Full goal remains
 ACTIVE/SOLO, primary7e67000 stays unchanged.
+
+Context correction actual R0: the new native case compiles and cargo exits101
+with0PASS/1FAIL/11filtered at healthy captured initialization PID:
+Some(UnsupportedContext{node:6}) from the literal new facade. Exact fields,
+size/old-creator invariance, no-context/bad/unused-context, old-index coherence
+and real decode tails are compiled but masked. Source/log hashes are saved in
+/private/tmp/ferricstore2-logical-value-native-r0.json/.log. Workspace/all-target
+strict Clippy passes with no canonical-context body. Save this baseline before
+threading the capture or changing default local-fun behavior.
+
+The captured input is the complete PID (node atom, ID, serial and creation),
+not a fabricated PID0 or a global read. Source erlang/otp erl_init.c assigns the
+actual initialization process result at runtime. The explicit node index also
+keeps its backing in the already bounded borrowed arenas. Same-entry old_index
+must agree as well as canonical old_uniq/arity/uniq: source emission reads that
+entry field, not arbitrary imported legacy metadata. Native test covers it.

@@ -78,6 +78,11 @@ impl PreparedOriginalFlowValue {
 /// Input validity, operational admission and actual allocation failure differ.
 #[derive(Debug)]
 pub enum OriginalValueEncodeError {
+    /// A reached local function needs the encoder's captured initialization PID.
+    UnsupportedContext {
+        /// Logical local-function node requiring the capture.
+        node: usize,
+    },
     /// Malformed logical nodes, graph references or duplicate map identities.
     InvalidInput,
     /// At least one required operational ceiling is zero.
@@ -91,6 +96,10 @@ pub enum OriginalValueEncodeError {
 impl fmt::Display for OriginalValueEncodeError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::UnsupportedContext { node } => write!(
+                formatter,
+                "missing flow value encoder context at node {node}"
+            ),
             Self::InvalidInput => formatter.write_str("invalid logical flow value"),
             Self::InvalidLimits => formatter.write_str("invalid value preparation limits"),
             Self::Limit => formatter.write_str("flow value preparation limit"),

@@ -18,6 +18,7 @@ pub use model::{
 pub use prepare::{
     OriginalValueEncodeError, OriginalValueEncodeLimits, OriginalValueInput,
     PreparedOriginalFlowValue, prepare_original_flow_value,
+    prepare_original_flow_value_with_init_pid,
 };
 
 /// Conservative fixed decoder metadata, excluding separately charged backing.

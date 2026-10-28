@@ -12,6 +12,7 @@ mod budgets;
 mod fixtures;
 mod foreign;
 mod maps;
+mod native;
 mod scalars;
 mod sequences;
 mod validation;
