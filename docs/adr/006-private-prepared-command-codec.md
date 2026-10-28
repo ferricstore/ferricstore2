@@ -7,6 +7,17 @@ the bounded physical-claim format now has initial exact-byte/boundary controls.
 Independent final review, complete operation coverage and persistence/runtime
 validation remain required.
 
+M2-STEP-CODEC1 selects a separate preparation-only intent10/item12 singleton for
+the existing pure StepContinue operation. It derives scope-bound caller fields
+and verifies complete bounded FWCP1 bytes before owned materialization. Caller
+intent differs from the complete prepared-frame digest; stamp, execution time
+and ignored nonbirth priority remain preparation fields. Exact grammar, identity
+and prospective tariffs are recorded in the coordination selection. Six actual
+runtime refusals precede all bodies. This does not activate legacy profiles,
+Fresh/replay handling, response vocabularies, storage/history formats, recovery
+dispatch, submission or public transports. Those require their own selected
+contracts and actual persistence/source/fault/profile evidence.
+
 ## Ownership
 
 Neutral owned preparation values belong to `wf-ports::consensus`. One private

@@ -2,6 +2,17 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+Work in progress on `codex/step-continue-codec`: six compiled runtime cases now
+genuinely reject at the healthy encode entry, after focused strict Clippy passed.
+The new intent10/item12 preparation contract is selected and saved before its
+grammar, hashing, parser or materialization bodies. Old command/response/storage
+and recovery profiles remain closed. This stage prepares verified data only;
+Fresh/replay, complete response/history formats, atomic publication and recovery
+are explicit successor requirements. No new source-ledger credit is claimed.
+See M2-STEP-CODEC1 and `/private/tmp/ferricstore2-step-codec-{source-recipes,genuine-r0}.json`.
+The primary checkout stays clean at `22c42c8`; its verified 1,275-case checkpoint
+below is distinct from this intentionally rejecting feature branch.
+
 The original FSH2 history codec now passes all eight full tails frozen in
 `f217eee` before behavior,
 the later equality regression saved in `bab403e`, and two separate after-body

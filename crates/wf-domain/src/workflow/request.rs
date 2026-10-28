@@ -144,6 +144,17 @@ impl ClientIntent {
         Self { version: 9, digest }
     }
 
+    /// Selects the private singleton Step identity without verification/authority.
+    /// The explicit codec must derive and verify the actual represented fields;
+    /// this mathematical registry selection supplies no admission or submission.
+    #[must_use]
+    pub const fn step_continue(digest: [u8; 32]) -> Self {
+        Self {
+            version: 10,
+            digest,
+        }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

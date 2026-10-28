@@ -190,6 +190,13 @@ remain required. Unit coverage alone will not certify those successors.
 
 ### Selected pure committed StartAndClaim core
 
+The later M2-STEP-CODEC1 preparation increment selects private intent10/item12
+bytes for the typed StepContinue inputs. Older profiles stay closed as above.
+The new codec provides mathematical identity and decoded data only; it does
+not select a Step response, historical logical-state schema, durable publication
+or recovery route. Complete those successors before claiming durable/public
+Step support. See ADR006 and the concrete coordination selection.
+
 START-AND-CLAIM1 selects `StartAndClaim` with explicit binary type, logical
 initial state, raw worker, positive lease duration and optional payload. The
 interface stage returned `UnsupportedOperation` after the existing global
