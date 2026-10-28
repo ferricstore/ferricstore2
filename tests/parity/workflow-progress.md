@@ -6,9 +6,20 @@ assertion links and optionally references actual coordinator-owned ExUnit
 registration. It has no pass/status or execution-proof fields. The full
 `require-parity` gate remains fail-closed.
 
-The new pure FlowCodecTest442/assertion443 counterpart preserves the complete
+Three new pure FSH2 counterparts preserve FlowCodecTest357/380/424, with 18
+checked source assertion links. Independent 95/51/249-byte recipes and complete
+decoded expectations replace the source's native implementation comparison in
+Rust; this does not execute or certify the NIF-versus-Elixir comparison. The
+source terminal refs/meta, compact omissions/context and long lengths remain
+exact. All eight saved rejecting cases now pass their complete tails, with one
+separate after-body carry-vector case. The ledger has 129 derived declarations,
+143 counterparts and 589 links, preserving every earlier counterpart and
+runtime binding. Native comparison/capture, JSON injection, public/durable
+history integration and required profiles/platforms remain open.
+
+The preceding pure FlowCodecTest442/assertion443 counterpart preserves the complete
 float1.5/nested-map/list/tuple recipe and exact singleton equality. The ledger
-now has126 derived declarations,140 counterparts and571 links, with every earlier
+then had126 derived declarations,140 counterparts and571 links, with every earlier
 counterpart and runtime binding retained. Seven genuine API refusals were saved
 in78ada59 before normalization; two later separately saved regressions correct
 shortest float ties and asymmetric power-of-two intervals. All nine focused

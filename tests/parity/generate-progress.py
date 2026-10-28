@@ -23,6 +23,16 @@ CLAIM = "crates/wf-domain/tests/claim_selection.rs"
 FIFO = "crates/wf-domain/tests/claim_selection_fifo.rs"
 LANE = "crates/wf-domain/tests/claim_selection_lane.rs"
 LINKS = [
+    ("88c3d8e9ce458865", "crates/wf-domain/tests/original_compact_history/source.rs",
+     "source_history_codec_keeps_terminal_metadata_and_refs", 7,
+     [(362, 0), (364, 1), (373, 2), (374, 3), (375, 4), (376, 5), (377, 6)]),
+    ("e8f30f518d2328fb", "crates/wf-domain/tests/original_compact_history/source.rs",
+     "source_history_codec_omits_immutable_metadata_and_restores_context", 10,
+     [(406, 0), (407, 1), (408, 2), (409, 3),
+      (417, 5), (418, 6), (419, 7), (420, 8), (421, 9)]),
+    ("f52f128c812f46e5", "crates/wf-domain/tests/original_compact_history/source.rs",
+     "source_history_codec_roundtrips_multibyte_length_headers", 2,
+     [(436, 0), (438, 1)]),
     ("5baf7621b3712082", "crates/wf-domain/tests/history_metadata/source.rs",
      "source_history_metadata_ignores_unsupported_compound_values", 1,
      [(443, 0)]),
@@ -374,6 +384,26 @@ def counterparts(manifest):
             assertions.append(dict(source_line=source_line, source_text=source_text,
                                    rust_line=rust_line, rust_text=rust_text))
         limitations = ["Source-derived assertion mapping; registration and command execution are separate evidence."]
+        if rust_file == "crates/wf-domain/tests/original_compact_history/source.rs":
+            limitations.append(
+                "Executed pure FSH2 scenarios retain the pinned terminal result reference, reason=ok, "
+                "compact transition/version12/attempts2/fence9/created1000/at2000/shared payload, "
+                "and the 160/190/180-byte context with 170-byte reason. Actual existing metadata "
+                "normalization feeds the new encoder. All source field/size/omission observations "
+                "are direct links. The original NIF-versus-Elixir byte and decode comparisons "
+                "use independent source-derived 95/51/249-byte golden recipes and complete "
+                "expected field lists as the Rust semantic counterpart; no native NIF or Elixir "
+                "execution is claimed by those equality links. Every snapshot/context value "
+                "is explicit mathematical input, without live record capture, atom/binary alias "
+                "acquisition, JSON sidecar injection, public history-read authority or durable "
+                "integration. Eight compiled rejecting API cases were saved in f217eee before "
+                "the codec body; their complete tails pass unchanged. Wide integer carry "
+                "vectors are additional after-body conformance without earlier RED credit. "
+                "Logical resource bounds and borrowed fields do not establish native RSS, "
+                "allocation or performance gains. Original ExUnit async:true/flow context, "
+                "native comparison, required profiles and independent Linux/macOS acceptance "
+                "remain required. These mappings do not certify complete source-case or workflow parity."
+            )
         if rust_file == "crates/wf-domain/tests/original_flow_value/source.rs":
             limitations.append(
                 "Exact FlowCodecTest451/469 fixtures preserve payload-bytes, FSV1 plus ETF %{old: true}, "

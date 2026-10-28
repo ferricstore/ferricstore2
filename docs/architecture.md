@@ -1448,6 +1448,15 @@ profiles, native/Linux acceptance and the ordered milestone exits remain open.
 
 ## Selected pure history-value overlay
 
+The additive `history::compact` codec prepares and decodes the original FSH2
+per-event format from explicit captured snapshots and normalized metadata.
+Immutable workflow fields are restored from resolved binary context, never
+read from storage by the codec. Shared measure/emission, arbitrary integer
+captures, complete borrowed validation and flat owned numeric fields retain
+the source wire semantics under independent operational limits. Source record
+capture/JSON injection, native comparisons, public history-read authority and
+durable integration remain separate requirements. See [ADR-009](adr/009-stored-workflow-value-ingress.md).
+
 The explicit bare external-term API in `value` reuses source value layout,
 ordering, writer and strict parser with a literal version131 header. It does
 not select FSV2 storage interpretation. Its distinct prepared owner and moved

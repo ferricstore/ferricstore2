@@ -6,6 +6,32 @@ verified. Bounded physical history capture and coherent value hydration are
 implemented. Pure logical preparation has explicit captured local-fun context;
 accepted typed-command and public history services remain required.
 
+The pure FSH2 history codec now consumes explicit captured snapshot fields and
+the existing ordered normalized metadata. It emits only per-event data; immutable
+id/type/parent/root/correlation values are restored from an explicitly resolved
+binary context at decode. This is a data codec, with no read or publication
+authority. Source record capture, atom/binary context lookup and record metadata
+JSON injection remain outer integration obligations.
+
+One shared grammar measures before fallible reservation, then emits into the
+same complete output owner. Arbitrary signed/padded integer captures retain the
+source's value+1 varint behavior. Decoding keeps the original ten-byte/70-bit
+bound, permissive nonminimal varints and unknown flags, exact EOF, defaults,
+nil event and filtered nullable metadata pairs. Malformed frames return empty
+fields; operational resources remain errors. Complete validation precedes field
+owners. Binary/context fields borrow their inputs; decimal text uses fixed
+scratch and fallibly reserved flat owners. Independent input, pair, encoded,
+decoded-output, work and requested-temporary limits are prospective.
+
+Eight real rejecting cases were saved in `f217eee` before these bodies. Their
+unchanged full tails and a separate after-body wide-carry case now pass locally.
+Three independent FSH2 recipes preserve the pinned terminal/ref/meta,
+compact/context and multibyte scenarios. The native NIF-versus-Elixir comparison
+has not run here; native capture/profiles, service/durability integration and both
+platforms remain required. Logical counters imply no native allocation, RSS,
+stack, OOM or speed guarantee. The older stored history and value codecs are
+unchanged.
+
 The explicit bare external-term APIs now expose the shared `TermCodec` grammar
 without interpreting FSV2 storage wrappers. `prepare_original_external_term`
 and its initialization-PID variant reuse the same admitted layout, ordering,

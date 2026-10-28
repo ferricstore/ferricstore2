@@ -18239,21 +18239,171 @@
       "runtime_case_ids": [
         "a251507371713fc1ef15cf2d4781efd916f4c8ff618ba9c4e2256d2b223e89fa"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-88c3d8e9ce458865",
+          "rust_file": "crates/wf-domain/tests/original_compact_history/source.rs",
+          "rust_file_sha256": "80761ad233c3fcfe201c584b2b883b6df3792734e93bf7ae1b1b7bd4f92571ec",
+          "rust_module": "",
+          "rust_function": "source_history_codec_keeps_terminal_metadata_and_refs",
+          "assertions": [
+            {
+              "source_line": 362,
+              "source_text": "assert encoded == elixir_encoded",
+              "rust_line": 12,
+              "rust_text": "assert_eq!(encoded.as_bytes(), reference);"
+            },
+            {
+              "source_line": 364,
+              "source_text": "assert Flow.decode_history_fields(encoded, record) ==",
+              "rust_line": 18,
+              "rust_text": "assert_eq!(f::pairs(&decoded), expected);"
+            },
+            {
+              "source_line": 373,
+              "source_text": "assert fields[\"event\"] == \"123-1\"",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(f::value(&decoded, b\"event\"), Some(b\"123-1\".as_slice()));"
+            },
+            {
+              "source_line": 374,
+              "source_text": "assert fields[\"version\"] == \"1\"",
+              "rust_line": 20,
+              "rust_text": "assert_eq!(f::value(&decoded, b\"version\"), Some(b\"1\".as_slice()));"
+            },
+            {
+              "source_line": 375,
+              "source_text": "assert fields[\"state\"] == \"completed\"",
+              "rust_line": 21,
+              "rust_text": "assert_eq!(f::value(&decoded, b\"state\"), Some(b\"completed\".as_slice()));"
+            },
+            {
+              "source_line": 376,
+              "source_text": "assert fields[\"result_ref\"] == \"flow/value/a/result/2\"",
+              "rust_line": 22,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 377,
+              "source_text": "assert fields[\"reason\"] == \"ok\"",
+              "rust_line": 26,
+              "rust_text": "assert_eq!(f::value(&decoded, b\"reason\"), Some(b\"ok\".as_slice()));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure FSH2 scenarios retain the pinned terminal result reference, reason=ok, compact transition/version12/attempts2/fence9/created1000/at2000/shared payload, and the 160/190/180-byte context with 170-byte reason. Actual existing metadata normalization feeds the new encoder. All source field/size/omission observations are direct links. The original NIF-versus-Elixir byte and decode comparisons use independent source-derived 95/51/249-byte golden recipes and complete expected field lists as the Rust semantic counterpart; no native NIF or Elixir execution is claimed by those equality links. Every snapshot/context value is explicit mathematical input, without live record capture, atom/binary alias acquisition, JSON sidecar injection, public history-read authority or durable integration. Eight compiled rejecting API cases were saved in f217eee before the codec body; their complete tails pass unchanged. Wide integer carry vectors are additional after-body conformance without earlier RED credit. Logical resource bounds and borrowed fields do not establish native RSS, allocation or performance gains. Original ExUnit async:true/flow context, native comparison, required profiles and independent Linux/macOS acceptance remain required. These mappings do not certify complete source-case or workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e8f30f518d2328fb",
       "runtime_case_ids": [
         "0d45e9407a4988b28df1fa842dfa15a5cc1ee156961bab9ead566ea35c9196bc"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-e8f30f518d2328fb",
+          "rust_file": "crates/wf-domain/tests/original_compact_history/source.rs",
+          "rust_file_sha256": "80761ad233c3fcfe201c584b2b883b6df3792734e93bf7ae1b1b7bd4f92571ec",
+          "rust_module": "",
+          "rust_function": "source_history_codec_omits_immutable_metadata_and_restores_context",
+          "assertions": [
+            {
+              "source_line": 406,
+              "source_text": "assert byte_size(encoded) <= 95",
+              "rust_line": 51,
+              "rust_text": "assert!(encoded.as_bytes().len() <= 95);"
+            },
+            {
+              "source_line": 407,
+              "source_text": "refute String.contains?(encoded, \"flow-compact-history\")",
+              "rust_line": 52,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 408,
+              "source_text": "refute String.contains?(encoded, \"iot-fanout-worker\")",
+              "rust_line": 58,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 409,
+              "source_text": "refute String.contains?(encoded, \"device-batch-2026-05-23\")",
+              "rust_line": 64,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 417,
+              "source_text": "assert fields[\"id\"] == \"flow-compact-history\"",
+              "rust_line": 72,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 418,
+              "source_text": "assert fields[\"type\"] == \"iot-fanout-worker\"",
+              "rust_line": 76,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 419,
+              "source_text": "assert fields[\"correlation_id\"] == \"device-batch-2026-05-23\"",
+              "rust_line": 80,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 420,
+              "source_text": "assert fields[\"payload_ref\"] == \"shared-payload-ref\"",
+              "rust_line": 84,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 421,
+              "source_text": "assert fields[\"state\"] == \"running\"",
+              "rust_line": 88,
+              "rust_text": "assert_eq!(f::value(&decoded, b\"state\"), Some(b\"running\".as_slice()));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure FSH2 scenarios retain the pinned terminal result reference, reason=ok, compact transition/version12/attempts2/fence9/created1000/at2000/shared payload, and the 160/190/180-byte context with 170-byte reason. Actual existing metadata normalization feeds the new encoder. All source field/size/omission observations are direct links. The original NIF-versus-Elixir byte and decode comparisons use independent source-derived 95/51/249-byte golden recipes and complete expected field lists as the Rust semantic counterpart; no native NIF or Elixir execution is claimed by those equality links. Every snapshot/context value is explicit mathematical input, without live record capture, atom/binary alias acquisition, JSON sidecar injection, public history-read authority or durable integration. Eight compiled rejecting API cases were saved in f217eee before the codec body; their complete tails pass unchanged. Wide integer carry vectors are additional after-body conformance without earlier RED credit. Logical resource bounds and borrowed fields do not establish native RSS, allocation or performance gains. Original ExUnit async:true/flow context, native comparison, required profiles and independent Linux/macOS acceptance remain required. These mappings do not certify complete source-case or workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f52f128c812f46e5",
       "runtime_case_ids": [
         "0dc5a105dd2207cb659df0884aa8d950ac9977a187697dfd908025d781a7ab7a"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-f52f128c812f46e5",
+          "rust_file": "crates/wf-domain/tests/original_compact_history/source.rs",
+          "rust_file_sha256": "80761ad233c3fcfe201c584b2b883b6df3792734e93bf7ae1b1b7bd4f92571ec",
+          "rust_module": "",
+          "rust_function": "source_history_codec_roundtrips_multibyte_length_headers",
+          "assertions": [
+            {
+              "source_line": 436,
+              "source_text": "assert encoded == elixir_encoded",
+              "rust_line": 108,
+              "rust_text": "assert_eq!(encoded.as_bytes(), f::long_wire());"
+            },
+            {
+              "source_line": 438,
+              "source_text": "assert Flow.decode_history_fields(encoded, record) ==",
+              "rust_line": 117,
+              "rust_text": "assert_eq!(f::pairs(&decoded), expected);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed pure FSH2 scenarios retain the pinned terminal result reference, reason=ok, compact transition/version12/attempts2/fence9/created1000/at2000/shared payload, and the 160/190/180-byte context with 170-byte reason. Actual existing metadata normalization feeds the new encoder. All source field/size/omission observations are direct links. The original NIF-versus-Elixir byte and decode comparisons use independent source-derived 95/51/249-byte golden recipes and complete expected field lists as the Rust semantic counterpart; no native NIF or Elixir execution is claimed by those equality links. Every snapshot/context value is explicit mathematical input, without live record capture, atom/binary alias acquisition, JSON sidecar injection, public history-read authority or durable integration. Eight compiled rejecting API cases were saved in f217eee before the codec body; their complete tails pass unchanged. Wide integer carry vectors are additional after-body conformance without earlier RED credit. Logical resource bounds and borrowed fields do not establish native RSS, allocation or performance gains. Original ExUnit async:true/flow context, native comparison, required profiles and independent Linux/macOS acceptance remain required. These mappings do not certify complete source-case or workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "5baf7621b3712082",

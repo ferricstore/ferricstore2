@@ -31,6 +31,17 @@ and mapping are preserved; no runtime/declaration identity is fabricated.
 
 ## Non-negotiable port contract
 
+FlowCodecTest357/380/424 now have pure FSH2 counterparts in
+`crates/wf-domain/tests/original_compact_history/source.rs`. They retain terminal
+metadata/references, the 95-byte compact ceiling and omitted identity strings,
+context reconstruction, long field lengths and the exact source values. The
+source NIF/Elixir equality observations use independent 95/51/249-byte recipes
+and complete expected decoded fields in Rust. These semantic counterparts do
+not execute the native comparison. Native capture, record metadata JSON
+injection, public history reads, durable integration, source profiles and
+independent Linux/macOS acceptance remain required; the ledger preserves those
+limitations and adds no full source-case passing certification.
+
 Every in-scope workflow case receives a stable source identity and a Rust counterpart mapping with test path, fixture/scenario ID, assertion mapping, harness layer and execution status. The initial manifest records references only, all unported. Expand template declarations to runtime case identities when collecting ExUnit; retain the original source ID as lineage. No missing mapping, ignored test or unexplained assertion removal can count as passing parity.
 
 Preserve command ordering, input values, returned fields, error conditions, ownership/fencing guards, result cardinality/order, atomic rollback boundaries and observable query/history behavior. Preserve negative tests and bugs/regression cases, not just the happy path. Random clocks/tokens/IDs can differ in representation only where the original assertion permits it. Normalize nondeterministic identities and elapsed time explicitly; never normalize away wrong fencing, ordering, missing data or transaction outcomes.

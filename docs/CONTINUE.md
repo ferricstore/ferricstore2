@@ -3,17 +3,25 @@
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
 Work in progress on `codex/compact-history-codec`: the original FSH2 history
-contract and eight new runtime cases are selected and saved before behavior.
-Focused strict Clippy passes; all eight tests genuinely fail at the rejecting
-healthy encode entry. Grammar, decoder, rendering and resource bodies remain
-unimplemented. The snapshot is borrowed after Clippy caught an avoidable
-496-byte control copy. Three independent byte recipes preserve the original
-terminal/ref/meta, compact/context and multibyte-length scenarios. No source
-equivalence or ledger credit is claimed while their tails are masked.
+codec now passes all eight full tails frozen in `f217eee` before behavior, plus
+one separate after-body wide-integer carry case. Focused strict Clippy passes.
+Shared measurement/emission, complete borrowed validation and flat field
+rendering preserve source primitives, flags, defaults, permissive wire and EOF.
+The snapshot is borrowed after Clippy caught an avoidable 496-byte control copy.
+Independent 95/51/249-byte recipes preserve terminal/ref/meta, compact/context
+and multibyte scenarios; native NIF-versus-Elixir execution remains required.
+The checked ledger now adds three pure-format counterparts and 18 links,
+retaining every earlier counterpart and runtime binding. Full workspace
+validation is pending; no complete source/profile parity is claimed.
+The first full pipeline passed 1,273 cases with all prior 1,264 identities
+retained. Subsequent review found a pure numeric-equality mismatch for an
+integral floating snapshot time. A separate genuine regression now fails before
+its correction; the first full run is archived separately. Public/native time
+validation is not inferred from this permissive pure helper contract.
 See COMPACT-HISTORY1 in the coordination record and
 `/private/tmp/ferricstore2-compact-history-{source-recipes,genuine-r0}.json`.
 The primary checkout remains clean at `b798485`; the last fully verified
-checkpoint below is distinct from this intentionally rejecting feature branch.
+checkpoint below is distinct from this feature branch awaiting full validation.
 
 The two shared `TermCodecTest` scenarios now use explicit bare ETF preparation
 and decoding over the existing layout/writer/parser. Bare binary roots are ETF;

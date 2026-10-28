@@ -1,6 +1,12 @@
 //! Original FSH2 per-event bytes, separate from authoritative history state.
 
+mod budget;
+mod decode;
+mod encode;
 mod model;
+mod number;
+mod primitives;
+mod project;
 
 pub use model::{
     DecodedOriginalCompactHistory, OriginalCompactHistoryContext, OriginalCompactHistoryError,
@@ -16,10 +22,10 @@ pub use model::{
 /// # Errors
 /// Invalid captures/profiles, operational limits and failed reservations differ.
 pub fn prepare_original_compact_history(
-    _snapshot: &OriginalCompactHistorySnapshot<'_, '_>,
-    _limits: OriginalCompactHistoryLimits,
+    snapshot: &OriginalCompactHistorySnapshot<'_, '_>,
+    limits: OriginalCompactHistoryLimits,
 ) -> Result<PreparedOriginalCompactHistory, OriginalCompactHistoryError> {
-    Err(OriginalCompactHistoryError::InvalidInput)
+    encode::run(snapshot, limits)
 }
 
 /// Decode the complete frame and restore its omitted immutable context fields.
@@ -30,9 +36,9 @@ pub fn prepare_original_compact_history(
 /// # Errors
 /// Invalid limits, operational resources and actual reservations remain errors.
 pub fn decode_original_compact_history<'a>(
-    _bytes: &'a [u8],
-    _context: OriginalCompactHistoryContext<'a>,
-    _limits: OriginalCompactHistoryLimits,
+    bytes: &'a [u8],
+    context: OriginalCompactHistoryContext<'a>,
+    limits: OriginalCompactHistoryLimits,
 ) -> Result<DecodedOriginalCompactHistory<'a>, OriginalCompactHistoryError> {
-    Err(OriginalCompactHistoryError::InvalidInput)
+    decode::run(bytes, context, limits)
 }

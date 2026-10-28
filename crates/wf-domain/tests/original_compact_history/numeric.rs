@@ -69,3 +69,99 @@ fn compact_history_numeric_presence_matches_original_primitives() -> TestResult 
     assert_eq!(negative.as_bytes(), b"FSH2\x02\x02e\x02\x01\x02s\0");
     Ok(())
 }
+
+#[test]
+fn compact_history_arbitrary_magnitudes_match_independent_wire_vectors() -> TestResult {
+    let carry128 = [0xff; 16];
+    let carry512 = [0xff; 64];
+    let padded_zero = [0; 64];
+    let mut encoded128 = vec![0x80; 18];
+    encoded128.push(4);
+    let mut encoded512 = vec![0x80; 73];
+    encoded512.push(2);
+    for (digits, integer, decoded) in [
+        (b"".as_slice(), b"\x01".as_slice(), Some(b"0".as_slice())),
+        (padded_zero.as_slice(), b"\x01", Some(b"0")),
+        (b"\x7e", b"\x7f", Some(b"126")),
+        (b"\x7f", b"\x80\x01", Some(b"127")),
+        (b"\x80", b"\x81\x01", Some(b"128")),
+        (b"\xff", b"\x80\x02", Some(b"255")),
+        (b"\xff\x3f", b"\x80\x80\x01", Some(b"16383")),
+        (carry128.as_slice(), encoded128.as_slice(), None),
+        (carry512.as_slice(), encoded512.as_slice(), None),
+    ] {
+        let mut snapshot = f::empty();
+        snapshot.version = M::BigInteger {
+            negative: false,
+            little_endian: digits,
+        };
+        let encoded = f::healthy(&snapshot, f::limits())?;
+        let mut expected = b"FSH2\x01\x02e".to_vec();
+        expected.extend_from_slice(integer);
+        expected.extend_from_slice(b"\x01\x02s");
+        assert_eq!(encoded.as_bytes(), expected);
+        let value = f::decoded(encoded.as_bytes(), C::default(), f::limits())?;
+        match decoded {
+            Some(text) => assert_eq!(f::value(&value, b"version"), Some(text)),
+            None => assert!(value.fields().is_empty()),
+        }
+    }
+    let mut snapshot = f::empty();
+    snapshot.version = M::BigInteger {
+        negative: true,
+        little_endian: &carry512,
+    };
+    let encoded = f::healthy(&snapshot, f::limits())?;
+    assert_eq!(encoded.as_bytes(), b"FSH2\x01\x02e\0\x01\x02s");
+    let value = f::decoded(encoded.as_bytes(), C::default(), f::limits())?;
+    assert_eq!(f::value(&value, b"version"), Some(b"0".as_slice()));
+    Ok(())
+}
+
+#[test]
+fn compact_history_flags_use_exact_nonstrict_numeric_equality() -> TestResult {
+    for (number, at, expected) in [
+        (
+            M::Integer(1),
+            M::Float(1.0),
+            b"FSH2\x01\x02e\x02\0\x02s".as_slice(),
+        ),
+        (M::Integer(0), M::Float(-0.0), b"FSH2\x01\x02e\x02\0\x02s"),
+        (M::Integer(-1), M::Float(-1.0), b"FSH2\x01\x02e\x02\0\x02s"),
+        (
+            M::Integer(1),
+            M::Float(1.5),
+            b"FSH2\x19\x02e\x02\0\x02s\x02\x02",
+        ),
+    ] {
+        let mut snapshot = f::empty();
+        snapshot.at = at;
+        snapshot.numbers[3] = number;
+        snapshot.numbers[4] = number;
+        let encoded = f::healthy(&snapshot, f::limits())?;
+        assert_eq!(encoded.as_bytes(), expected);
+    }
+    let mut magnitude = [0; 26];
+    magnitude[25] = 1;
+    let mut snapshot = f::empty();
+    snapshot.at = M::Float(f64::from_bits(1223_u64 << 52));
+    snapshot.numbers[3] = M::BigInteger {
+        negative: false,
+        little_endian: &magnitude,
+    };
+    snapshot.numbers[4] = snapshot.numbers[3];
+    let equal = f::healthy(&snapshot, f::limits())?;
+    assert_eq!(equal.as_bytes(), b"FSH2\x01\x02e\x02\0\x02s");
+    let mut neighbor = magnitude;
+    neighbor[0] = 1;
+    snapshot.numbers[3] = M::BigInteger {
+        negative: false,
+        little_endian: &neighbor,
+    };
+    let unequal = f::healthy(&snapshot, f::limits())?;
+    let mut expected = b"FSH2\x09\x02e\x02\0\x02s\x82".to_vec();
+    expected.extend_from_slice(&[0x80; 27]);
+    expected.push(0x10);
+    assert_eq!(unequal.as_bytes(), expected);
+    Ok(())
+}

@@ -56569,3 +56569,73 @@ bindings are byte-exact. Save this genuine rejecting checkpoint BEFORE bodies.
 Primary remains clean at b798485 with its verified1264-case checkpoint. This
 feature branch intentionally has eight failing new cases until implementation;
 no full source, native, Linux or completed-goal credit is claimed.
+
+COMPACT-HISTORY1 first body: all six selected private helpers and both facades
+are implemented only after f217eee. Focused strict Clippy exits0, then all eight
+unchanged tests pass through their complete tails. Source fixtures match95/51/
+249 bytes, full/context field observations and metadata normalization; malformed,
+permissive, numeric and exact resource controls also pass. No original test or
+model byte changed. The source grammar is shared by measure/emission, borrowed
+parsing validates EOF before field owners, and decimal text uses fixed scratch
+with prospectively admitted Vecs. No String, Box conversion or payload clone.
+
+COMPACT-HISTORY1-CARRY1 solo selection BEFORE supplemental case: append only
+compact_history_arbitrary_magnitudes_match_independent_wire_vectors to EXISTING
+tests/original_compact_history/numeric.rs. Preserve its complete R0 prefix. Use
+independent value+1 base128 boundary vectors, all-FF128/512-bit carry chains,
+padded zero and a negative wide magnitude. Compare complete wire bytes and
+decoder text/empty outcome under the original70-bit limit. Test fixture buffers
+are outside producer metrics. This is after-body conformance, not claimed RED;
+save any actual newly exposed failure before correcting a defect. No other new
+file/type/module/helper/model or dependency is selected. Add the eight named
+compact module paths to the existing architecture effect probes without policy
+widening. After these checks, review the three actual source assertion mappings;
+retain explicit independent-fixture-versus-native-NIF and capture/profile gaps.
+
+COMPACT-HISTORY1-NUMERIC-EQUALITY1 review BEFORE additional regression/repair:
+the pinned pure encode_history_flags helper compares created/updated with `!=`,
+not strict term inequality. Official [Kernel inequality documentation](https://hexdocs.pm/elixir/Kernel.html#!=/2)
+confirms numeric1 and1.0 compare equal. The selected snapshot capture represents
+noninteger numeric classes and uses the source nil primitive; number::equal
+currently refuses every Float comparison. That makes its pure flags differ for
+an integral floating at value. This is a flag-helper contract finding, not a
+claim that the original guarded public API or native NIF accepts a floating
+event time. Their typed validation/capture still belongs to later adapters.
+
+Wait for the confirmed live frozen validation23037 to terminate before changing
+non-Markdown inputs. Then select one appended test in EXISTING numeric.rs:
+compact_history_flags_use_exact_nonstrict_numeric_equality. Preserve the entire
+current prefix. Compare literal complete wire for integer1/float1.0, signed zero,
+negative equality and fractional inequality, then2^200 equality and its exact
+integer neighbor (which must not round into equality). Use the existing broad
+limits and shared healthy API. Save its actual failing first positive assertion
+and complete current-body checkpoint before repair. This is after-body RED.
+
+After that SAVE, select a functions-only correction in EXISTING number.rs:
+decode a finite integral IEEE float into a fixed128-byte little-endian magnitude
+and compare exact mathematical signs/bytes, retaining existing integer behavior.
+Reject fractional/nonfinite equality; do not cast arbitrary integers to floats.
+Budget must explicitly admit this fixed scratch and prepay its initialization/
+conversion work. No String, variable owner, new file/type/module/dependency or
+profile exemption. Source tests/model and prior supplemental prefix stay exact;
+rerun the full final pipeline on the corrected frozen tree. Preserve the first
+pipeline as historical evidence, never call it the final repaired validation.
+
+COMPACT-HISTORY1-NUMERIC-EQUALITY1 genuine SAVE: first full pipeline passes all12
+gates,1273 cases/109 targets, retaining every earlier1264 case identity. It is
+archived under /private/tmp/ferricstore2-compact-history-before-equality with
+all log hashes, frozen1736 inputs and a separate complete identity comparison.
+Four complete old-file inverses recover history.rs, architecture probe table,
+progress generator and entire old ledger; all1717 other prior inputs and every
+old counterpart/runtime binding are exact. The ledger now validates129/143/589,
+without changing5903/4222/1681/1655 runtime accounting or full parity status.
+
+After that process terminated, the selected appended equality test compiles and
+strict focused Clippy passes. Actual execution exits101 with0pass/1fail/0ignored/
+9filtered at the first literal wire comparison: created/updated integer1 versus
+floating1.0 emits flags24 instead of0. Later signed-zero, negative, fractional,
+2^200 and neighboring-integer tails remain masked. No repair exists yet.
+/private/tmp/ferricstore2-compact-history-equality-genuine-r0.json retains the
+complete failing log and three test/number/budget source hashes. Save this
+current-body checkpoint before changing comparison or scratch charges. This
+remains pure helper behavior, not native acceptance of invalid public time data.
