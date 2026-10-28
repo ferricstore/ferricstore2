@@ -1,11 +1,12 @@
 //! Separately preserved workflow dependencies from the same pinned source commit.
 //! These files add no invented primary declaration or native execution evidence.
 
-use std::path::Path;
+use std::{collections::BTreeSet, path::Path};
 
 use crate::{CheckError, artifact};
 
 pub(super) fn check(root: &Path) -> Result<(), CheckError> {
+    let mut paths = BTreeSet::new();
     for (path, expected) in [
         (
             "tests/reference/elixir-dependencies/apps/ferricstore/lib/ferricstore/term_codec.ex",
@@ -16,6 +17,7 @@ pub(super) fn check(root: &Path) -> Result<(), CheckError> {
             "b7ea7302f72bfa11cab66b0832890cd0fb215a7ccaa3d6c9791f1a23f37077d3",
         ),
     ] {
+        paths.insert(path.to_owned());
         let bytes = artifact::read(root, path, 8_192).map_err(|error| {
             CheckError::new(format!(
                 "workflow dependency snapshot cannot be read: {path}: {error}"
@@ -26,6 +28,11 @@ pub(super) fn check(root: &Path) -> Result<(), CheckError> {
                 "workflow dependency snapshot differs: {path}"
             )));
         }
+    }
+    if paths != artifact::snapshot_paths(root, "tests/reference/elixir-dependencies")? {
+        return Err(CheckError::new(
+            "workflow dependency snapshot contains missing or unreviewed files",
+        ));
     }
     Ok(())
 }

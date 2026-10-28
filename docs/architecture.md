@@ -1448,6 +1448,15 @@ profiles, native/Linux acceptance and the ordered milestone exits remain open.
 
 ## Selected pure history-value overlay
 
+The explicit bare external-term API in `value` reuses source value layout,
+ordering, writer and strict parser with a literal version131 header. It does
+not select FSV2 storage interpretation. Its distinct prepared owner and moved
+decoder input remain pure data with bounded operational profiles and explicit
+safe/foreign captures. Existing storage encoding and authority boundaries stay
+unchanged. The separately preserved shared dependency tests add acceptance
+inputs that still need native registration/profiles, without changing the
+frozen primary workflow inventory. See [ADR-009](adr/009-stored-workflow-value-ingress.md).
+
 The additive `history::metadata::prepare_original_history_metadata` normalizes
 explicit captured map rows in their original enumeration order. It preserves
 binary/atom key aliases, borrows binary/UTF8 text, converts nil/other atoms and

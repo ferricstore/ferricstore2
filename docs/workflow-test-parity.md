@@ -8,8 +8,26 @@ The existing Elixir workflow behavior tests must pass against equivalent Rust op
 - [Machine-readable manifest](../tests/reference/workflow-test-manifest.json): source commit, content hashes, navigational test declaration IDs, source locations and initial unported statuses.
 - `tests/reference/elixir-baseline/`: byte-identical test/support snapshots from `ferricstore/ferricstore` commit `66586c596e271408d9184af32eb31cd7218c126e`.
 - `tests/reference/elixir-working-tree/`: changed local workflow-related test inputs kept separate from the pinned baseline. Review their behavior before accepting a delta.
+- `tests/reference/elixir-dependencies/`: separately preserved shared workflow
+  dependencies from the same pinned commit. The current two files are
+  `apps/ferricstore/lib/ferricstore/term_codec.ex` and
+  `apps/ferricstore/test/ferricstore/term_codec_test.exs`; hash and closed-inventory
+  checks reject changes, removals or unreviewed added files.
 
 These files preserve the tests we already use; they are not runnable Rust tests or a self-contained Elixir application. M0 infrastructure, actual ExUnit registration and a partial pure M1 domain core now exist. A checked progress ledger records source-derived Rust assertions and reconciled runtime identities; it does not certify full workflow parity. The textual declaration index is navigation, not an ExUnit parser or executed-test count. Generated cases, macro origins, module/describe context, setup, fixtures and mandatory profiles require the collection and execution evidence described below. See [the handoff](CONTINUE.md) for current results.
+
+The shared `TermCodecTest` declarations at original lines 6 and 14 were absent
+from the frozen primary manifest. Their Rust scenarios live in
+`crates/wf-domain/tests/original_external_term/source.rs`: preserve all three
+roundtrip assertions for `{:current, %{value: "payload"}}`, the compressed
+`{:current, String.duplicate("compressible", 1024)}` recipe and its header/error
+assertions, and the trailing-byte rejection for `{:current, :value}`. The
+compressed fixture has an independently checked ETF/zlib recipe; it is not a
+native VM capture. Separate source integrity does not add these cases to the
+primary inventory's reported totals or confer main-ledger credit. Native
+registration, compiler lineage, required profile execution and final inventory
+consolidation for both cases remain required. The immutable primary manifest
+and mapping are preserved; no runtime/declaration identity is fabricated.
 
 ## Non-negotiable port contract
 

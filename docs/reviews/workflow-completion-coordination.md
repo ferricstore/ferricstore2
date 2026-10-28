@@ -56377,3 +56377,28 @@ because the named-hash-only guard accepts it. No inventory comparison exists.
 /private/tmp/ferricstore2-external-term-inventory-genuine-r0.json retains the
 complete log and guard/test source hashes. Commit this genuine after-body RED
 with the passing initial implementation before adding inventory closure.
+
+EXTERNAL-TERM1 full-workspace review: the closed dependency inventory now passes
+all eight CLI cases and strict all-target Clippy. Nine complete old-file
+inverses recover every previous body; all other1702 original non-Markdown inputs
+and nine saved new test/snapshot files are exact. The first full validation
+passes Python/shell/fmt/check/Clippy, then genuinely FAILS the existing
+missing_current_compiler_capture_stays_closed case. Its bounded reference copier
+selects only frozen main/dirty manifest paths, omitting the newly required two
+dependency snapshots. This failure occurs at its positive reference guard before
+the intended compiler-prerequisite assertion. Archive all six first-run gates in
+/private/tmp/ferricstore2-external-term-first-validation; the compiler-fixture-r0
+receipt retains the complete failing log hash and pre-repair fixture source hash.
+Do not claim workspace success or remove the new integrity requirement.
+
+EXTERNAL-TERM1-FIXTURE1 solo selection BEFORE repair: edit only the EXISTING
+copy_missing_capture_reference helper in wf-parity-tests/tests/compiler_lineage.rs.
+Add the two exact selected dependency paths to its existing path vector and
+initialize its duplicate set from that vector. Retain every old test body,
+compiler-v1 absence check, expected diagnostic, cleanup, portable/symlink checks,
+create_new semantics and16MiB aggregate/per-file limits. No new file/model/module
+or dependency. Other CLI/progress/registration fixtures already copy the complete
+reference root. Save this actual failing workspace checkpoint before the helper
+edit; then run its unchanged full tail and all workspace gates on a fresh frozen
+input set. This is fixture adaptation following a real integration finding,
+not a production behavior change or earlier test-first evidence.

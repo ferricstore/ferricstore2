@@ -6,6 +6,37 @@ verified. Bounded physical history capture and coherent value hydration are
 implemented. Pure logical preparation has explicit captured local-fun context;
 accepted typed-command and public history services remain required.
 
+The explicit bare external-term APIs now expose the shared `TermCodec` grammar
+without interpreting FSV2 storage wrappers. `prepare_original_external_term`
+and its initialization-PID variant reuse the same admitted layout, ordering,
+scalar/foreign writer and iterative continuations. One literal-header emitter
+writes either stored FSV2+2+131 or bare131; binary roots use ETF in the bare entry.
+`PreparedOriginalExternalTerm` owns that uncompressed output and its work/peak
+metrics, with distinct byte accessors. No intermediate wrapped owner, prefix
+drain, rebasing, duplicate encoder or payload clone is introduced.
+
+`decode_original_external_term` moves the same input into the existing strict
+census/build/equality parser at version offset0. It checks the selected safe
+tables/captures and complete EOF, rejecting compression and trailing bytes.
+It never selects stored/raw-binary inference or compatibility fallback.
+Existing error/resource vocabulary stays explicit; `InvalidFlowValue` denotes
+the shared invalid-term lane here. The document's spans address its complete
+original input under either explicitly selected decoder. No existing stored
+codec, publication, value interpretation or fee is changed.
+
+The two complete pinned `TermCodecTest` scenarios now run through this actual
+shared implementation. Their source/helper snapshots are separately preserved
+under `tests/reference/elixir-dependencies`, with hash and closed-inventory
+checks. The frozen480-file/5858-declaration primary manifest stays unchanged.
+These two dependency cases still require native registration/compiler lineage,
+required profiles and final acceptance-inventory consolidation; no fabricated
+main-ledger ID or full-parity credit is added. Seven genuine codec refusals and
+a real preservation failure were committed in `2c6f9a3`; a later unknown-file
+regression was saved in `865af55` before the inventory guard. All complete local
+tails pass. Captured foreign data and independently generated valid compressed
+fixtures do not establish a native VM/profile, allocation/RSS/speed or platform
+theorem. Existing storage and accepted-service gates remain required.
+
 The separate pure history metadata normalizer now covers original
 FlowCodecTest442/assertion443 through captured logical inputs. Map enumeration
 order, binary/atom keys, nil-to-empty, other atom spellings, arbitrary integer

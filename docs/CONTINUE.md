@@ -2,6 +2,19 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+The two shared `TermCodecTest` scenarios now use explicit bare ETF preparation
+and decoding over the existing layout/writer/parser. Bare binary roots are ETF;
+stored FSV2 interpretation remains separate. The same moved input owner, exact
+EOF, safe tables and captured local-function context are retained. Seven codec
+refusals plus one dependency-preservation failure were saved in `2c6f9a3` before
+the bodies; a later unknown-file refusal was saved in `865af55`. All seven codec
+tails and eight CLI checks pass locally. Complete workspace validation is pending.
+Two byte-exact helper/test snapshots now have hash and closed-inventory guards.
+They were absent from the frozen main manifest; their native collection,
+compiler lineage, required profiles and final inventory consolidation remain
+REQUIRED, with no invented IDs or main-ledger credit. The main manifest/mapping
+and all existing ledger/runtime bindings stay exact.
+
 Original history metadata now preserves FlowCodecTest442/assertion443: keep
 float1.5 and ignore the supplied nested map/list/tuple. The same pure API covers
 ordered atom/binary key aliases, nil, borrowed binary/UTF8 text, arbitrary
