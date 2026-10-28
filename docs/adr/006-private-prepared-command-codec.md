@@ -13,10 +13,22 @@ and verifies complete bounded FWCP1 bytes before owned materialization. Caller
 intent differs from the complete prepared-frame digest; stamp, execution time
 and ignored nonbirth priority remain preparation fields. Exact grammar, identity
 and prospective tariffs are recorded in the coordination selection. Six actual
-runtime refusals precede all bodies. This does not activate legacy profiles,
+runtime refusals saved in32f9045 precede all bodies. The complete borrowed scan,
+canonical hash and admitted materializer now pass seven focused cases. One
+saved field-cap expectation was corrected from ByteLimit to the existing
+ValueLimit vocabulary after a separate encode/decode conformance control;
+all original inputs and thresholds remain. This does not activate legacy profiles,
 Fresh/replay handling, response vocabularies, storage/history formats, recovery
 dispatch, submission or public transports. Those require their own selected
 contracts and actual persistence/source/fault/profile evidence.
+
+The Step facade and all private descendants are classified as pure values.
+Three exact module effect probes failed before the missing prefix was added;
+b21f87f preserves that genuine architecture failure. The stricter prefix adds
+no permitted effect or dependency. The shared singleton header accepts only the
+explicit7/10 selections; its7 specialization preserves the complete previous
+atomic-start header. Generic preparation and normal/stored recovery retain
+their older profile restrictions.
 
 ## Ownership
 

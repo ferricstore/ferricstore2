@@ -2,16 +2,31 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
-Work in progress on `codex/step-continue-codec`: six compiled runtime cases now
-genuinely reject at the healthy encode entry, after focused strict Clippy passed.
-The new intent10/item12 preparation contract is selected and saved before its
-grammar, hashing, parser or materialization bodies. Old command/response/storage
-and recovery profiles remain closed. This stage prepares verified data only;
+The intent10/item12 Step preparation checkpoint passes all seven focused cases and strict
+Clippy pass. Six genuine runtime refusals were saved in32f9045 before grammar,
+hashing, parser or materialization bodies. A separate effect-probe failure was
+saved in b21f87f before classifying the new namespace as pure. One documented
+test-oracle correction preserves the existing field-versus-frame error contract.
+Old command/response/storage and recovery profiles remain closed. This stage
+prepares verified data only. All 12 direct validation gates now pass with1,282
+Rust cases/110 targets, retaining every prior1,275 identity and multiplicity.
 Fresh/replay, complete response/history formats, atomic publication and recovery
 are explicit successor requirements. No new source-ledger credit is claimed.
 See M2-STEP-CODEC1 and `/private/tmp/ferricstore2-step-codec-{source-recipes,genuine-r0}.json`.
-The primary checkout stays clean at `22c42c8`; its verified 1,275-case checkpoint
-below is distinct from this intentionally rejecting feature branch.
+All1,746 non-Markdown validation inputs/1,157 Rust files are frozen. Seven complete
+old-file inverses and1,729 other exact original inputs preserve the old behavior;
+the shared header's7 specialization equals the complete former header. Eight
+whole R0 source files remain exact; the limits-file correction is precisely
+reversible and the new facade body is explicit. No new source-ledger credit.
+Receipts: `/private/tmp/ferricstore2-step-codec-{inverses,pipeline,full-identity,full-parity,adopted}.json`.
+Local adoption status and exact commit live in the adopted receipt.
+
+Next causal persistence review: current HistoryEntry/FWSH1 stores lifecycle
+state but omits the logical run_state. The original codec's explicit history
+snapshot also has a separate reduced field set. Do not infer a complete rewind
+snapshot from the current core history row or append only an event tag. Select
+the complete historical schema and compatibility boundary before durable Step
+record/history publication; Fresh/replay and the Step response also remain open.
 
 The original FSH2 history codec now passes all eight full tails frozen in
 `f217eee` before behavior,
@@ -124,18 +139,18 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,275 tests across 109
+The current local Rust quality checkpoint passes all 1,282 tests across 110
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,264 case and
-adds 11 compact history/source/numeric/resource cases. The interim 1,273-case
-checkpoint is also retained exactly.
+15 targets. Exact identity comparison preserves every earlier1,275 case and
+adds only seven Step preparation cases. The earlier1,264 and interim1,273
+checkpoints remain represented exactly.
 All 53 architecture cases pass. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
 advisory fetch or Linux execution is claimed.
 
-The compact history checkpoint retains four complete old-file inverses and
+The preceding compact history checkpoint retains four complete old-file inverses and
 all other 1,717 original non-Markdown inputs byte-exact. The eight unchanged
 R0 files, original numeric prefix and complete later equality-regression prefix
 are exact. Reversing only the Float dispatch/helpers and fixed scratch charge

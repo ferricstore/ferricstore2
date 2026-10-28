@@ -209,6 +209,7 @@ impl Inspector<'_, '_> {
             "log::value_batch",
             "log::record_batch::phase",
             "log::record_batch::fresh",
+            "log::record_batch::step_continue",
             "log::record_batch::independent",
             "log::record_batch::response::independent",
             "state::transaction::independent",

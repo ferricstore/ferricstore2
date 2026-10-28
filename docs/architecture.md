@@ -135,9 +135,11 @@ keeps committed ownership and a deterministic raw-owner/time/fence token in the
 pure domain, with typed DirectRunningFifoEntry refusal. The guarded body follows
 a rejecting interface shell and genuinely frozen runtime RED; all eight unchanged
 behavior tests now pass in the complete macOS checkpoint.
-[The wire profile](adr/006-private-prepared-command-codec.md#selected-original-indexed-mutation-batch-composition),
-public/independent callers and storage event codecs remain explicitly unsupported
-for this operation. This selection completes no source scenario or durability gate.
+The separate [intent10/item12 preparation codec](adr/006-private-prepared-command-codec.md)
+now verifies bounded singleton bytes and derives caller identity before owned
+materialization. The older wire profiles, public/independent callers, responses,
+storage event codecs and recovery routing remain unsupported for this operation.
+This selection completes no source scenario or durability gate.
 
 The [selected atomic StartAndClaim core](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
 uses the same pure domain and existing Created history. After the saved

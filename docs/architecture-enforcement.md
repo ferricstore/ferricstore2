@@ -180,6 +180,15 @@ tests and the closed response/event boundary controls. The
 stays closed. Neither source checks nor unit boundaries establish durable or
 public operation support, the complete original case or Linux/macOS parity.
 
+The separate M2-STEP-CODEC1 preparation facade and its input/wire children inherit
+the pure ports classification by the exact namespace prefix
+`log::record_batch::step_continue`. The existing
+`state_value_codecs_and_response_parser_reject_effects` test exercises all three
+actual homes. It genuinely failed before the stricter classification was saved
+in b21f87f and repaired; no effect/dependency or source-size exemption was added.
+Existing shared header purity also applies. This does not enable Fresh,
+response, durable history/publication or recovery routing for Step.
+
 ### Pure committed StartAndClaim boundaries
 
 The [selected atomic-start contract](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)

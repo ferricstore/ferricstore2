@@ -56873,3 +56873,50 @@ list. Its facade and private descendants must reject the same effects as the
 existing codecs. No allowlist widening, exemption, new artifact or production
 dependency is selected. ADR006 and architecture enforcement must describe this
 stricter boundary. Root performs this solo review; no peer review is claimed.
+
+M2-STEP-CODEC1-PURITY1 body: b21f87f saved the actual rejecting probe. Adding
+only the selected pure prefix now makes that exact test pass:1pass/0fail with
+44filtered. All old classifier branches and probe inputs remain. Full quality,
+complete existing-file inverses and exact old-case preservation remain to run.
+
+M2-STEP-CODEC1 final solo review: complete measure/emission and borrowed scanning
+use the same explicit widths/presence grammar. All fields and composed key caps
+precede encoder hashing/output and decoder hashing/materialization; the exact
+one-below logical tariff controls pass. Input scope/request/key/guard values are
+actual borrowed fields, not a claimed digest. Materialization reuses the verified
+intent and fallibly reserves only singleton vectors required by existing public
+owners; no extra payload owner or generic callback was added. Input release
+precedes whole-frame hashing. This is resource/ownership evidence, not measured
+allocator/RSS/latency improvement. Safe endian-explicit code adds no OS-specific
+operation; actual Linux execution remains required. This is Root's review only.
+
+Seven complete original-file inverses recover baseline22c42c8 and1,729 other
+old non-Markdown inputs are hash-exact. The shared helper specialized to7 equals
+the complete former atomic-start header body. Eight R0 sources remain entirely
+exact; the root log inverse recovers its complete R0 owner, and removing only
+the supplemental limits function plus the documented one-token oracle change
+recovers the entire R0 limits file. No weakened threshold/input/assertion or
+old-profile dispatch is hidden by those checks.
+
+All12 direct quality gates pass over1,746 frozen inputs/1,157 Rust files.
+Actual all-target runtime has1,282pass/0fail/0ignored across110 executable
+targets (108 result targets plus the same two benchmark correctness smokes).
+The complete Counter retains every prior1,275 target/name/status/multiplicity;
+only the seven Step cases and one target were added. All53 architecture cases,
+Python7 and6 doctests/15 targets pass. Audit is offline with the unchanged
+primary cache. Full parity actually exits1; ledger remains129/143/589, runtime
+5903 registered/4222linked/1681unmatched/1655unresolved. No native source, Linux,
+durable Step or completed-goal claim. Evidence is under
+/private/tmp/ferricstore2-step-codec-{inverses,pipeline,full-identity,full-parity}.json.
+
+Next schema review observations (not a new artifact approval): pinned
+flow_transition.ex:802–822 publishes the actual next record and step_continued
+history together; flow_history_reads.ex:1089–1140 creates the event from that
+record. flow/codec.ex:291–374 explicitly selects its own history snapshot fields;
+codec/support.ex:201–227 adds value refs/attributes/state-meta, not a standalone
+logical run_state field. Current Rust HistoryEntry/build_plan and FWSH1 are
+reduced lifecycle snapshots. Settle required logical-state/rewind ownership,
+resource tariffs and version boundaries before the storage successor. Merely
+extending the shared event table would hide this missing contract. Fresh/replay,
+new Step response, atomic publication, inquiry/fault/reopen, snapshots/recovery,
+value profiles, public ingress and original six-assertion scenario remain REQUIRED.
