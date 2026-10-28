@@ -211,3 +211,59 @@ fn logical_caller_refuses_bad_schema_before_value_preparation() -> TestResult {
     }
     Ok(())
 }
+
+// Supplementary after-body coverage; the complete R0 file prefix is unchanged.
+#[test]
+fn logical_caller_bounds_base_partition_and_captures_retry_presence() -> TestResult {
+    let fields = f::base_fields("create");
+    f::healthy("create", &fields)?;
+    let input = Input {
+        operation: "create",
+        id: b"id",
+        fields: &fields,
+    };
+    let limits = super::L {
+        max_raw_bytes: 32,
+        ..f::limits()
+    };
+    let base = [b'p'; 128];
+    assert!(matches!(
+        prepare(input, &[], Some(&base), f::stamp()?, limits),
+        Err(E::Caller(C::RawBytes))
+    ));
+    let result = {
+        let target = b"dead".to_vec();
+        let retry = wf_domain::policy::RetryOverride {
+            max_retries: Some(3),
+            backoff: None,
+            exhausted_to: Some(target),
+        };
+        let fields = [
+            ("lease_token", V::Scalar(S::Bytes(b"lease"))),
+            ("fencing_token", V::Scalar(S::Integer(7))),
+            ("retry", V::Scalar(S::Retry(&retry))),
+            ("now_ms", V::Scalar(S::Integer(80))),
+            ("payload", V::Scalar(S::Nil)),
+            ("error", V::Scalar(S::Bool(false))),
+        ];
+        f::healthy("retry", &fields)?
+    };
+    assert!(result.evidence().retry_override_present);
+    assert_eq!(result.evidence().requested_now_ms, Some(80));
+    assert_eq!(result.command().now.get(), 80);
+    assert_eq!(
+        f::payload(&result.command().operation),
+        Some(b"FSV2\x02\x83w\x03nil".as_slice())
+    );
+    assert_eq!(
+        f::secondary(&result.command().operation),
+        Some(b"FSV2\x02\x83w\x05false".as_slice())
+    );
+    assert!(
+        matches!(&result.command().operation, Operation::RetryWithPolicy(value)
+        if value.policy_override.max_retries == Some(3)
+        && value.policy_override.exhausted_to.as_deref() == Some(b"dead".as_slice())
+        && value.run_at.is_none() && value.jitter.get() == 0)
+    );
+    Ok(())
+}

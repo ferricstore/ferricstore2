@@ -2,6 +2,18 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+Owned logical caller preparation now covers all seven existing core mutation
+kinds. It preserves omitted versus nil/empty values, common-option overrides,
+caller time, partition/retry presence and captured local-function context.
+Complete stored buffers move into owned commands under independent value and
+aggregate raw/work/temporary limits. Actual codec9 and consumed publication
+preserve typed versus identical binary bytes; the source order/items payload
+hydrates correctly after reopen. Nine genuine rejecting cases were saved in
+`0083cc7`; one after-body base-partition/retry test follows them. All ten full
+tails pass. Accepted typed services, multi-item adapters, native capture and
+complete source/profile/platform acceptance remain required; no new ledger
+credit is claimed for these component tests.
+
 The explicit legacy value decoder now preserves FlowCodecTest451/469: malformed
 typed data returns its original ETF suffix and exact user byte size, while
 history decoding remains strict. Shared parsing retains the moved input buffer
@@ -33,10 +45,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,228 tests across 105
+The current local Rust quality checkpoint passes all 1,238 tests across 106
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,224 case and
-adds only four compatibility/resource cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,228 case and
+adds ten logical caller/codec/publication cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -44,10 +56,11 @@ advisory fetch or Linux execution is claimed.
 
 The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
 literals and 84 test function identities. All files remain within the existing
-400/600-line caps. The parity ledger now has 139 counterparts and 570 links
-across 125 derived declarations, preserving all 137 earlier counterpart records
-and every runtime binding exactly. Only the two new codec source entries change
-in this increment. The four Rust-source hash updates belong to that earlier cleanup.
+400/600-line caps. The parity ledger remains at 139 counterparts and 570 links
+across 125 derived declarations. The logical caller increment preserves every
+entry, runtime binding and immutable reference/mapping byte-exact. The preceding
+codec increment added two source entries while preserving all 137 earlier
+counterparts. The four Rust-source hash updates belong to that earlier cleanup.
 This is Rust quality evidence,
 not full workflow parity: 1,681 runtime cases remain unmatched and 1,655 source
 declarations unresolved.

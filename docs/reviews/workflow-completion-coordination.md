@@ -55698,3 +55698,85 @@ no RED credit. The final stamp has physical100/logical3/wall99, so tests also
 distinguish generated execution time from wall time. The former pre-SUT log is
 retained at /private/tmp/ferricstore2-logical-mutation-pre-stamp.log. Save the
 genuine nine-case checkpoint before implementing any preparation body.
+
+LOGICAL-MUTATION1 body review: all nine complete unchanged R0 tails pass on
+the first implementation, including actual codec9 publication and hydration
+after reopen. All-target workspace Clippy passes. Raw admission additionally
+counts the explicit base-partition input and the optional PID descriptor; no
+logical pool is traversed before original occurrence admission. Add one
+append-only supplementary after-body test in normalization.rs for a large base
+under a small raw cap and owned retry-override/presence/time/nil/error behavior.
+It carries no preimplementation RED credit. No new file, type or module is
+needed; the complete saved test file must recover by removing only that append.
+
+## LOGICAL-MUTATION1 — completed local increment, full goal active
+
+2026-10-28: Root reviewed design, implementation, source/resource behavior and
+final validation solo. Nine genuine compiled rejecting cases were saved in
+0083cc7 before any capture/value/budget/materialization body. All nine complete
+unchanged tails now pass, with one append-only after-body base/retry case.
+No independent peer review, agents, pushes or external messages are claimed.
+
+prepare_logical_mutation reuses the old normalizer through two fixed eight-row
+projections. It bounds and pays all original occurrences, including shadowed
+logical pools, optional PID descriptors and the base partition, before schema
+checks or logical traversal. Only selected opaque fields are encoded. Primitive
+binary/nil/bool/i128 and full logical arenas retain their exact source meaning;
+received local functions use the supplied encoder initialization-PID capture.
+Unknown fields, scalar-only type errors, duplicates, missing guards, bad source
+data, unsupported context and operational refusal stay explicit error lanes.
+
+The result owns all scalar metadata and complete stored buffers. Vecs move into
+Operation and into_stored_parts without a payload clone or Box/shrink conversion.
+The existing identity/token representation is unchanged. Prospective scalar
+copy/conversion liability, named fixed owners, retained results and each value's
+peak scratch are admitted before the corresponding allocation. Successive value
+profiles receive remaining aggregate work/temporary ceilings; completed work is
+debited before the next value. Exact reported work/peak profiles succeed and
+their one-unit cuts refuse. This is logical requested ownership/work evidence,
+not native capacity, frames, RSS, OOM or measured latency/speedup certification.
+No OS-specific operation, external dependency, clock or runtime lookup was added.
+
+All old scalar normalizer, encoder/decoder, codec8/9, storage and Node bodies are
+byte-exact. Complete caller-root and the two test-entry inverses recover their
+old files. Every new R0 model/oracle/recipe is unchanged; normalization.rs recovers
+byte-exact after removing only its supplementary append. Receipt:
+/private/tmp/ferricstore2-logical-mutation-inverses.json. The six new production
+files have58/191/95/169/179/107 physical lines, within400; all test children fit600,
+and function100/nesting4/cognitive25 pass without suppressions or packed lines.
+Existing architecture rules automatically cover this pure workflow namespace;
+the actual whole-workspace architecture check passes without any exemption.
+
+Actual intent9 encoding distinguishes the new typed tuple from a logical binary
+containing identical ETF bytes. Public-profile materialization receives the
+moved operation/evidence and its explicit partition without another payload
+copy. Actual consumed9 publication and coherent history hydration retain the
+source %{order_id: 123, items: ["book", "pen"]} payload's complete typed bytes after
+reopen. This uses the existing r/q/p/time100 physical harness and explicit safe
+atoms, not the original public get/claim/shard setup or native capture profile.
+No complete original case or additional ledger credit is claimed. The accepted
+application service still owns authorization, request routing, clock/capture,
+automatic-partition resolution and submission; many-call adapters remain work.
+
+Final pipeline /private/tmp/ferricstore2-logical-mutation-pipeline.json passes
+formatting, all-target compilation/strict Clippy, all workspace targets, doctests,
+documentation, reference/progress integrity, seven Python cases, shell syntax,
+offline dependency policy and diff checks. Every one of1690 non-Markdown inputs,
+including1103 Rust files, is frozen and hash-exact through validation. Identity
+receipt /private/tmp/ferricstore2-logical-mutation-full-identity.json retains all
+earlier1228 cases and adds only these ten:1238 passing cases across106 executable
+targets (104 test-result targets plus both correctness smokes), six doctests
+across15 targets and all53 architecture cases. Execution is local Darwin/arm64.
+The offline audit uses unchanged primary cache and explicit feature manifest;
+no fresh advisory fetch, native original profile or Linux result is claimed.
+
+The entire ledger, immutable mapping/reference and every runtime binding stay
+byte-exact:125 derived declarations/139 counterparts/570 links,5903 registered/
+4222 linked/1681 unmatched/1655 unresolved. The real require-parity gate still
+exits1 for incomplete required scope; receipt
+/private/tmp/ferricstore2-logical-mutation-full-parity.json. Full M1–M8, required
+Elixir scenarios/setup/profiles, accepted services/consensus/transports/workers,
+remaining breadth/queries/cleanup and independent Linux/macOS validation remain
+required. Continue SOLO from this verified predecessor; do not retry unchanged
+denied native/Linux/process probes. Full goal ACTIVE. Adopt only after checking
+the primary is still clean at1dbd924 and every verified input remains exact.

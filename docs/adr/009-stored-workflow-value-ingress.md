@@ -231,6 +231,41 @@ The additive API conservatively charges its own logical metadata, without
 changing the strict API's existing fees. This pure component adds no runtime,
 public ingress, native capture or storage authority.
 
+The additive `prepare_logical_mutation` caller path covers all seven existing
+scalar mutation kinds while keeping the original scalar normalizer unchanged.
+It bounds item/common options before inspection, charges every original scalar
+and logical occurrence, and uses fixed descriptor arrays to reuse the existing
+schema/default/guard rules. Local options override common options. Opaque
+binary, nil, boolean and i128 captures use the actual logical value encoder;
+explicit arenas cover compound and foreign data with optional captured encoder
+initialization PID. Supplied nil is distinct from omission and empty binary.
+
+The result owns a complete `CommittedCommand`, optional explicit partition,
+priority and original public caller evidence. No input arena or scalar buffer
+is borrowed afterward. Complete stored value Vecs move into operation fields;
+scalar IDs/state/type/token/partition/retry targets receive admitted fallible
+copies through the existing validated constructors. `into_stored_parts` moves
+these owners into explicit intent9 construction. An absent partition retains
+automatic-partition intent for the outer codec's existing resolver; the domain
+does not duplicate that algorithm or grant placement authority.
+
+Aggregate raw admission includes shadowed fields, full logical pools/spines,
+optional PID descriptors and the family base partition. Continuous work and
+simultaneous requested ownership cover scalar validation/copies, retained
+outputs and successive value preparation. Each value receives the remaining
+aggregate work/temporary limits and the existing inline ceiling; successful
+work is debited before moving its output. Existing identity/token conversion
+liability is conservatively included. No payload shrink/Box conversion or
+clone, native allocator-capacity/frame/RSS/OOM bound, or measured speedup is
+claimed. A supplied stamp remains pure data, without clock or origin authority.
+
+The real codec composition distinguishes a typed tuple from a binary containing
+its identical ETF bytes. A real consumed9 store also publishes the preserved
+order/items payload and hydrates its exact typed bytes after reopen. These are
+component tests, without additional source-case ledger credit. Accepted typed
+application services, multi-item adapters, native capture, public get/claim,
+mandatory profiles and independent platform acceptance remain required.
+
 The six genuine compiled rejecting cases were saved in `46e53c6` before the
 codec body. They now pass, including all four producer modes, independent
 ownership/work bounds, exact typed/raw/escaped bytes, corruption, cross-profile
