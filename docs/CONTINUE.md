@@ -2,6 +2,19 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+Owned logical callers now bind directly to one stored intent9 frame and its
+already-derived comparison intent. Automatic partitions reuse the existing
+resolver; explicit partitions, source time and caller evidence remain exact.
+Independent context is checked for contradictions. Seven genuine refusals were
+saved in `eb0f03d`; all seven complete tails pass, including actual automatic-
+partition publication and history hydration after reopen. A review regression
+saved in `ab39b14` then caught work admission after the witness scan. Control
+work is now admitted before that scan and buffer work before encoding; all eight
+focused cases pass, including exact work/owned boundaries and excess capacity.
+The corrective source passes all1,246 workspace cases and strict quality gates.
+Accepted services, multi-item adapters, native capture and full source/profile/
+platform acceptance remain required. These component tests add no ledger credit.
+
 Owned logical caller preparation now covers all seven existing core mutation
 kinds. It preserves omitted versus nil/empty values, common-option overrides,
 caller time, partition/retry presence and captured local-function context.
@@ -45,10 +58,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,238 tests across 106
+The current local Rust quality checkpoint passes all 1,246 tests across 106
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,228 case and
-adds ten logical caller/codec/publication cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,238 case and
+adds eight frame binding/resource/publication cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh

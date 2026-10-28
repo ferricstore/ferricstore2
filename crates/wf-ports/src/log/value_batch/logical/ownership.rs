@@ -50,7 +50,9 @@ pub(super) fn admit(
         .checked_mul(size_of::<crate::consensus::WorkflowValuePolicyWitness>())
         .ok_or(CodecError::LengthOverflow)?;
     add(&mut owned, spine, limits.maximum_owned)?;
-    // Count and the full declared spine capacity were admitted before traversal.
+    let (_, codec_work) = budget::limits(limits.codec, false)?;
+    // Prepay all control scans through the declared spine before traversing it.
+    admit_work(owned, preparation.0, codec_work, limits.maximum_work)?;
     for policy in &context.policies {
         add(
             &mut owned,
@@ -58,17 +60,27 @@ pub(super) fn admit(
             limits.maximum_owned,
         )?;
     }
-    let (_, codec_work) = budget::limits(limits.codec, false)?;
+    // All variable-buffer work is then admitted before encoding those buffers.
+    admit_work(owned, preparation.0, codec_work, limits.maximum_work)?;
+    Ok(owned)
+}
+
+fn admit_work(
+    owned: usize,
+    preparation_work: usize,
+    codec_work: usize,
+    maximum: usize,
+) -> Result<(), CodecError> {
     let work = owned
         .checked_mul(32)
-        .and_then(|value| value.checked_add(preparation.0))
+        .and_then(|value| value.checked_add(preparation_work))
         .and_then(|value| value.checked_add(codec_work))
         .and_then(|value| value.checked_add(budget::BASE_WORK))
         .ok_or(CodecError::LengthOverflow)?;
-    if work > limits.maximum_work {
+    if work > maximum {
         return Err(CodecError::WorkLimit);
     }
-    Ok(owned)
+    Ok(())
 }
 
 pub(super) fn add(total: &mut usize, amount: usize, maximum: usize) -> Result<(), CodecError> {

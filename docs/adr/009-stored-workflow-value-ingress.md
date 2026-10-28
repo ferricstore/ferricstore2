@@ -288,6 +288,10 @@ frame, OOM or measured-speed guarantees. Seven genuine refusals were committed
 in `eb0f03d`; all seven full tails now pass, including real auto-partition
 publication and history hydration before and after reopen. The original tests
 and explicit source/profile/platform acceptance requirements remain unchanged.
+An additional review regression was saved failing in `ab39b14`: the enclosing
+work ceiling must admit control scans before the witness-capacity loop, then
+all buffer work before encoding. It now passes together with exact successful
+work and one-unit-cut checks, without changing any of the seven original cases.
 
 The six genuine compiled rejecting cases were saved in `46e53c6` before the
 codec body. They now pass, including all four producer modes, independent

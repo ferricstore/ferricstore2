@@ -55945,3 +55945,51 @@ Runtime exits101 with0 passed/1 failed/0 ignored/178 filtered. Receipt
 log hash and the current producer/test source hashes. No work-prepayment body
 has changed. Commit this genuine failing review case with the initial verified
 binding body before applying the corrective admission order.
+
+LOGICAL-BINDING1 corrective body follows saved ab39b14: one private admit_work
+function keeps the same conservative fee calculation. The first call admits
+the complete declared-spine control cohort BEFORE witness traversal; the second
+admits every variable-buffer cohort BEFORE encoding. No old path fee changes.
+Actual focused execution now passes all eight cases, including the unchanged
+new regression's formerly masked exact-work/one-unit-cut tail;171 prior cases
+are filtered. All original seven functions/fixtures remain unchanged. The
+complete limits.rs inverse removes only the appended new test/helper; its
+original R0 file is recovered byte-exact. The complete later R0 test file is
+also hash-exact after the corrective body. The inverse receipt now records
+those facts along with all five old-file inverses and eight unchanged original
+R0 files. Rerun the complete frozen-input pipeline for this corrective source;
+the initial pipeline is preserved separately and cannot substitute for it.
+
+LOGICAL-BINDING1 final validation: corrected pipeline71507 is terminal0. All
+twelve gates pass: seven Python cases, shell syntax, formatting, all-target
+compilation and strict Clippy, all workspace targets, six doctests/fifteen
+targets, warnings-denied docs, reference/progress integrity, offline dependency
+policy and diff checks. All1698 non-Markdown validation inputs, including1111
+Rust files, remain frozen/hash-exact. Complete test identity Counter retains
+every earlier1238 case and adds only the eight selected cases:1246 passing
+cases across106 executable targets,104 test-result targets plus both unchanged
+correctness smokes. All53 architecture cases pass. Canonical Counter SHA:
+c0394d70c6e218b9ce216f836c96eef36309d07039531d0814ffcffa0fd21959.
+Receipts /private/tmp/ferricstore2-logical-binding-{pipeline,full-identity}.json.
+
+The new production files have84/37/153 physical lines; shared value_batch.rs386
+and log.rs356 stay within400. Tooling/tests600, functions100, nesting4 and
+cognitive25 remain strict without allowance or source packing. Five complete
+old-file inverses, eight unchanged original R0 sources, the complete original
+limits.rs append inverse and unchanged corrective R0 test file remain proven.
+Resource prepayment is now before witness scans and buffer encoding. Context
+and values move into one actual stored9 frame with the existing derived intent.
+The real publication/reopen test retains that intent and exact stored data.
+
+Ledger/mapping/reference and all existing runtime bindings remain byte-exact:
+125 derived declarations/139 counterparts/570 links;5903 registered/4222 linked/
+1681 unmatched/1655 unresolved. Actual require-parity still exits1 for incomplete
+required scope; /private/tmp/ferricstore2-logical-binding-full-parity.json records
+the genuine output/hash. Execution is local Darwin/arm64; the offline audit uses
+the unchanged primary cache and explicit feature manifest, with no fresh fetch,
+native original profile or Linux result claimed. Accepted typed/public history
+services, multi-item adapters, native captures, remaining breadth/lifecycle,
+all required Elixir scenarios/profiles and M1–M8/platform gates remain open.
+Root reviewed solo; no independent review claim. Full goal remains ACTIVE.
+Before adoption verify primary is still clean712f0f0 and every frozen input is
+exact; adopt through local fast-forward only, without push or native probes.
