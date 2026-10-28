@@ -2,6 +2,15 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+The explicit legacy value decoder now preserves FlowCodecTest451/469: malformed
+typed data returns its original ETF suffix and exact user byte size, while
+history decoding remains strict. Shared parsing retains the moved input buffer
+and continuously pays failed parsing, cleanup and fallback. Context, profile and
+resource failures remain errors. Three genuine rejecting cases were saved in
+`e54c2dc`; a fourth after-body budget test catches an actual temporary refund
+fault. All four complete tails pass. Eleven assertion links cover the two pinned
+source declarations; native capture/profiles and full workflow parity remain open.
+
 Pure logical value preparation is now implemented, including all common and
 foreign node families. Source-ordered map keys, semantic duplicate refusal,
 root-binary escaping, iterative deep/list traversal and independent resource
@@ -24,10 +33,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,224 tests across 105
+The current local Rust quality checkpoint passes all 1,228 tests across 105
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,211 case and
-adds only thirteen logical preparation/composition cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,224 case and
+adds only four compatibility/resource cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -35,9 +44,10 @@ advisory fetch or Linux execution is claimed.
 
 The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
 literals and 84 test function identities. All files remain within the existing
-400/600-line caps. The parity ledger now has 137 counterparts and 559 links
-across 123 derived declarations, preserving all 132 earlier counterpart records
-exactly. The four Rust-source hash updates belong to that earlier cleanup.
+400/600-line caps. The parity ledger now has 139 counterparts and 570 links
+across 125 derived declarations, preserving all 137 earlier counterpart records
+and every runtime binding exactly. Only the two new codec source entries change
+in this increment. The four Rust-source hash updates belong to that earlier cleanup.
 This is Rust quality evidence,
 not full workflow parity: 1,681 runtime cases remain unmatched and 1,655 source
 declarations unresolved.

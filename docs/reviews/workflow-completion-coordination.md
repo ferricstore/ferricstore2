@@ -55473,3 +55473,93 @@ documentation confirms the expanded body excludes version131:
 https://www.erlang.org/doc/apps/erts/erl_ext_dist.html#overall-format
 No native VM fixture/profile or Linux result is claimed. Save this real RED
 checkpoint before implementing the selected shared parser and compatibility body.
+
+ORIGINAL-VALUE-COMPAT1 final resource review: the prior raw-minimum budget check
+can exhaust typed parsing before corruption is established. It is valid limit
+coverage but alone cannot prove that fallback retains failed-attempt work.
+BEFORE supplementary work select one append-only test and one threshold helper
+in existing source/limits.rs: derive compatibility metadata from empty raw
+strict/compat boundaries, then fund the exact complete strict duplicate-map
+invalid parse plus that metadata. Fallback must refuse; a fresh raw suffix must
+fit that same budget. A temporary budget-reset mutation must make this new test
+fail at its explicit no-refund assertion, then restore production byte-exact.
+This is after-body resource/fault coverage, not genuine preimplementation RED.
+The original three test bodies and all recipes remain exact by append inverse.
+No new artifact, model or dependency is needed. The architecture gate also
+requires explicit value-root paths; use the existing absolute import and
+pub(in crate::value::original_flow) convention, without weakening the checker.
+
+The supplementary completed-invalid-parse test passes against the continuous
+budget. An actual temporary reset made exactly that test fail at its named
+no-refund assertion with an incorrectly successful binary result, exit101.
+Production compat.rs was then restored byte-exact to SHA256
+0151b9eabf09add3c994aae9a8c870449442e7277cab62d95c1b891a70f3d7e0.
+The new case/helper append to the complete unchanged e54c2dc limits file;
+the two source case files and every original recipe remain exact. Receipt:
+/private/tmp/ferricstore2-original-value-compat-budget-control.json.
+Earlier attempts retained their real needless-pass-by-value, doc-markdown and
+explicit-path architecture failures under the pre-borrow/pre-doc/pre-path
+pipeline receipts. Only private borrowing, two introduction comments and
+explicit same-scope paths changed; no lint allowance or checker weakening.
+
+## ORIGINAL-VALUE-COMPAT1 — completed local increment, full goal active
+
+2026-10-28: the preceding lint-only exchange verified existing policy without
+advancing remaining implementation; no-progress revalidation found the actual
+feature edits and no live build. This continuation saved genuine compiled RED
+in e54c2dc, implemented the selected API, reviewed its source/resource semantics
+and completed all local validation. Root worked solo under the user override;
+no independent peer review, agents, pushes or external messages are claimed.
+
+Shared decode.rs preserves complete raw/census/build/finish statements, strict
+work ordering, wrapper classification and fixed-byte accounting. Complete root
+and export token inverses, separately checked caller/dispatch scaffolds and the
+existing entrypoint's byte inverse pass. All other earlier Rust sources are
+byte-exact. The three genuine oracles/recipes stay exact; the entire R0 limits
+file recovers by removing only the append-only after-body case/helper. Source
+scanner/context/equality bodies, storage/Node drivers and binary8/stored9 formats
+are unchanged. Receipt /private/tmp/ferricstore2-original-value-compat-inverses.json
+pins the final reviewed source hashes and all5856 other ledger entries.
+
+The additive API admits full input length AND capacity before wrapper work,
+retains one moved input Vec, and returns exact raw/escape/typed suffix sizes.
+Only InvalidFlowValue from typed parsing reaches fallback. Captures/profiles,
+InvalidLimits, Limit and actual reservation errors propagate. Partial flat
+spines are discarded after paid cleanup; the replacement binary and all failed
+attempts use the original budget. Pointer/range/ownership checks and the actual
+reset fault demonstrate those properties; no payload clone, shrink, Box
+conversion, decompression, native-capacity/frame/RSS bound or measured speedup
+is claimed. Explicit value-root paths preserve the existing facade rule. This
+introduces no OS operation, effect, new dependency or public model. Production
+files have111/75/102 physical lines; new test children64/135/291, with all
+function100/nesting4/cognitive25 and file400/600 gates enforced.
+
+Final pipeline /private/tmp/ferricstore2-original-value-compat-pipeline.json
+passes formatting, all-target compilation and strict Clippy, all workspace
+targets, doctests/docs, reference/progress integrity, Python7, shell syntax,
+offline dependency policy and diff checks. All1676 non-Markdown validation
+inputs remain hash-exact, including1089 Rust files. Identity receipt
+/private/tmp/ferricstore2-original-value-compat-full-identity.json retains every
+prior1224 case and adds only the three genuine cases and one after-body control:
+1228 passing Rust cases across105 executable targets, including103 test-result
+targets and both benchmark correctness smokes. Six doctests across15 targets
+and all53 architecture cases pass. Execution is local Darwin/arm64; no new Linux,
+native original profile or fresh advisory fetch is claimed. The offline audit
+uses the unchanged primary cache and the feature's explicit manifest.
+
+The two reviewed codec declarations have all11 direct source anchors and actual
+full-tail Rust execution. Their mathematical safe tables and valid independently
+compressed fixture do not certify VM capture or complete source profiles. All
+137 earlier counterparts/runtime bindings remain exact; ledger totals are125
+derived declarations,139 counterparts and570 links. Registration stays5903/
+4222 linked/1681 unmatched/1655 unresolved. The real require-parity command
+still exits1 for incomplete required source/setup/fixture/adapter/profile scope;
+receipt /private/tmp/ferricstore2-original-value-compat-full-parity.json. No
+passing case status or immutable reference/mapping was fabricated.
+
+Continue the full goal SOLO on actual typed caller normalization/capture/ingress,
+accepted history authority/lifecycle/read barriers and the ordered M1–M8 work.
+Public workflow breadth, consensus, both transports/workers, cleanup, complete
+source profiles and independent Linux/macOS acceptance remain required. Adopt
+only this verified state after confirming the primary is still clean at ac11eab.
+Full goal ACTIVE; do not retry unchanged denied native/Linux/process probes.

@@ -3,12 +3,13 @@
 mod budget;
 mod compat;
 mod context;
+mod decode;
 mod equality;
 mod model;
 mod prepare;
 mod scan;
 
-use crate::value::original_flow::budget::{Budget, reserve_exact};
+use crate::value::original_flow::budget::Budget;
 use crate::value::original_flow::context::ContextState;
 use crate::value::original_flow::scan::{ScanTarget, Scanner};
 
@@ -74,66 +75,15 @@ pub fn decode_original_flow_value(
     limits: OriginalValueLimits,
 ) -> Result<OriginalValueDocument, OriginalFlowValueError> {
     let mut budget = Budget::new(limits, (encoded.len(), encoded.capacity()))?;
-    let mut nodes = Vec::new();
-    let mut edges = Vec::new();
-    let root = match decode_wrapper(&encoded, &mut budget)? {
-        ValueEncoding::Raw { start } => {
-            budget.require_depth(1)?;
-            budget.require_nodes(0, 1)?;
-            budget.spend(
-                encoded
-                    .len()
-                    .checked_sub(start)
-                    .ok_or(OriginalFlowValueError::InvalidFlowValue)?,
-            )?;
-            reserve_exact(&mut nodes, 1, &mut budget)?;
-            budget.spend(1)?;
-            nodes.push(OriginalValueNode::Binary {
-                bytes: start..encoded.len(),
-            });
-            0
-        }
-        ValueEncoding::Etf { version_offset } => {
-            let version = encoded
-                .get(version_offset)
-                .ok_or(OriginalFlowValueError::InvalidFlowValue)?;
-            budget.spend(1)?;
-            if *version != 131 {
-                return Err(OriginalFlowValueError::InvalidFlowValue);
-            }
-            let start = version_offset
-                .checked_add(1)
-                .ok_or(OriginalFlowValueError::Limit)?;
-            let mut state = ContextState::new();
-            let (_, census) = Scanner::new(
-                &encoded,
-                context,
-                &mut state,
-                &mut budget,
-                ScanTarget::Census,
-                start,
-            )
-            .run()?;
-            reserve_exact(&mut nodes, census.finished, &mut budget)?;
-            reserve_exact(&mut edges, census.edges, &mut budget)?;
-            let (root, _) = Scanner::new(
-                &encoded,
-                context,
-                &mut state,
-                &mut budget,
-                ScanTarget::Build {
-                    nodes: &mut nodes,
-                    edges: &mut edges,
-                    expected: census,
-                },
-                start,
-            )
-            .run()?;
-            drop(state);
-            root.id
-        }
+    let encoding = decode_wrapper(&encoded, &mut budget)?;
+    let mut document = OriginalValueDocument {
+        encoded,
+        nodes: Vec::new(),
+        edges: Vec::new(),
+        root: 0,
     };
-    finish_document(encoded, nodes, edges, root, &mut budget)
+    decode::parse(&mut document, &encoding, context, &mut budget)?;
+    Ok(document)
 }
 
 enum ValueEncoding {
@@ -158,30 +108,4 @@ fn decode_wrapper(
         2 => ValueEncoding::Etf { version_offset: 5 },
         _ => ValueEncoding::Raw { start: 0 },
     })
-}
-
-fn finish_document(
-    encoded: Vec<u8>,
-    nodes: Vec<OriginalValueNode>,
-    edges: Vec<usize>,
-    root: usize,
-    budget: &mut Budget,
-) -> Result<OriginalValueDocument, OriginalFlowValueError> {
-    if root >= nodes.len() {
-        return Err(OriginalFlowValueError::InvalidFlowValue);
-    }
-    for id in &edges {
-        budget.spend(1)?;
-        if *id >= nodes.len() {
-            return Err(OriginalFlowValueError::InvalidFlowValue);
-        }
-    }
-    let document = OriginalValueDocument {
-        encoded,
-        nodes,
-        edges,
-        root,
-    };
-    equality::validate_maps(&document, budget)?;
-    Ok(document)
 }

@@ -23,6 +23,12 @@ CLAIM = "crates/wf-domain/tests/claim_selection.rs"
 FIFO = "crates/wf-domain/tests/claim_selection_fifo.rs"
 LANE = "crates/wf-domain/tests/claim_selection_lane.rs"
 LINKS = [
+    ("5b12595d8af45093", "crates/wf-domain/tests/original_flow_value/source.rs",
+     "source_value_codec_preserves_raw_escape_and_typed_roundtrips", 7,
+     [(452, 0), (453, 1), (456, 2), (457, 3), (462, 4), (463, 5), (466, 6)]),
+    ("d7ba621e9eb64c5d", "crates/wf-domain/tests/original_flow_value/source.rs",
+     "source_typed_value_codec_returns_noncanonical_terms_without_deserializing", 7,
+     [(471, 0), (474, 2), (476, 3), (480, 4)]),
     ("7486b505b2ba580e", "crates/wf-domain/tests/history_values/overlay.rs",
      "history_overlay_marks_storage_failures_without_exposing_their_reason", 8,
      [(11, 4)]),
@@ -350,6 +356,24 @@ def counterparts(manifest):
             assertions.append(dict(source_line=source_line, source_text=source_text,
                                    rust_line=rust_line, rust_text=rust_text))
         limitations = ["Source-derived assertion mapping; registration and command execution are separate evidence."]
+        if rust_file == "crates/wf-domain/tests/original_flow_value/source.rs":
+            limitations.append(
+                "Exact FlowCodecTest451/469 fixtures preserve payload-bytes, FSV1 plus ETF %{old: true}, "
+                "FSV2+2+not-a-term escaping, %{kind: typed}, and typed repeated1024. The real logical "
+                "encoder and additive compatibility decoder run all source assertions: raw/escaped "
+                "roundtrips, exact typed map, typed prefix, trailing-zero raw suffix/user size, and "
+                "valid level9 compressed inequality. A stdlib-zlib9 golden is independently expanded "
+                "against the ETF recipe and checked against actual producer bytes; it is not a VM "
+                "capture. Exact binary fallback and valid strict decoding are supplemental controls. "
+                "Three compiled rejecting API cases were saved in e54c2dc before the compatibility "
+                "body; all complete source/resource tails now pass. Safe tables are explicit immutable "
+                "mathematical fixtures. A separate after-body completed-invalid-parse budget test "
+                "rejects a temporary budget-reset fault; it carries no preimplementation RED claim. "
+                "Live VM capture and public typed ingress are not established. "
+                "The original suite uses ExUnit async:true and flow tagging without storage setup. "
+                "Native original profiles and independent Linux/macOS acceptance remain required. "
+                "These links do not establish full source-case/profile or workflow parity."
+            )
         if rust_file == "crates/wf-domain/tests/history_values/overlay.rs":
             limitations.append("Exact pure HistoryValuesTest helper fixtures preserve arbitrary payload_ref=ref, missing_file with /private/secret/path, file-reference /segment/offset10/stored100 with cap10, or FSV2+2+not-an-external-term with cap1024. Source11 links the exact sanitized error; source22 links both omitted=true and stored-size100; source44/45 link the exact invalid-value error and absent payload. Typed ordered overlay writes represent the source map updates while retaining the original borrowed fields. These pure tests do not acquire physical values or execute BEAM/Bitcask; real coherent acquisition and backend fault controls are separate evidence. Links are added after the existing implementation and carry no retroactive tests-first RED. Original ExUnit flow-tag/setup, all required profiles and independent Linux/macOS acceptance remain open; this is not full case/workflow parity.")
         if rust_file == "crates/wf-storage/tests/state_store/workflow_values/history_hydration/source.rs":

@@ -6,6 +6,19 @@ assertion links and optionally references actual coordinator-owned ExUnit
 registration. It has no pass/status or execution-proof fields. The full
 `require-parity` gate remains fail-closed.
 
+Two exact FlowCodecTest451/469 counterparts add eleven direct source links,
+bringing the ledger to125 derived declarations,139 counterparts and570 links.
+Actual logical preparation and explicit compatibility decoding retain all raw,
+escape, typed-map, trailing-zero/user-size and valid compressed-payload checks.
+Three compiled rejecting cases were saved in e54c2dc before the fallback body;
+one after-body resource test also catches a temporary budget-reset fault.
+All four pass in the complete1,228-case local Rust run. Every prior counterpart
+and runtime binding stays exact. Safe tables and independently generated zlib9
+bytes are mathematical fixtures, without live VM/native-profile evidence.
+The original suite uses async:true/flow and no storage setup. Public typed
+ingress, all required profiles and independent Linux/macOS acceptance remain
+open; source-derived links and local execution do not establish full parity.
+
 Run the progress validator with the pinned compiler and an isolated target:
 
 ```sh

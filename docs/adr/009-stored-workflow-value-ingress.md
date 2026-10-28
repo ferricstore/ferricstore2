@@ -212,6 +212,25 @@ Root performs the current review solo under the user override. Concrete paths,
 TDD stages and validation are recorded in
 [the coordination journal](../reviews/workflow-completion-coordination.md).
 
+The additive `decode_original_flow_value_compat` entry point preserves the pinned
+FlowCodec `decode_value`/`decode_value_with_user_size` behavior. Valid typed ETF
+remains typed. Malformed typed values, including compressed ETF and trailing
+bytes, become a binary view of the entire original ETF suffix. Its returned
+user size includes the ETF version and excludes only recognized five-byte FSV2
+wrappers. Ordinary raw and mode1 escaped binary branches retain their own sizes.
+The strict `decode_original_flow_value` entry used by history acquisition keeps
+its existing corruption error and work ordering.
+
+Both entries share the same iterative parser. Compatibility retains its moved
+input Vec and pays failed parse, partial-spine cleanup, replacement node and
+fallback inspection through one continuous budget. Input length and capacity
+are checked before parsing. No payload clone, decompression, shrinking or budget
+reset is introduced. Missing captures, unsupported profiles and operational
+limit/reservation errors propagate; only the malformed-value lane falls back.
+The additive API conservatively charges its own logical metadata, without
+changing the strict API's existing fees. This pure component adds no runtime,
+public ingress, native capture or storage authority.
+
 The six genuine compiled rejecting cases were saved in `46e53c6` before the
 codec body. They now pass, including all four producer modes, independent
 ownership/work bounds, exact typed/raw/escaped bytes, corruption, cross-profile

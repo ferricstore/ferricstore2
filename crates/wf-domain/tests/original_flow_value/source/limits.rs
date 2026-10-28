@@ -223,3 +223,69 @@ fn owned_after_context_scope() -> TestResult {
     );
     Ok(())
 }
+
+// Added after the compatibility body; the three saved R0 oracles above are exact.
+#[test]
+fn compat_fallback_does_not_refund_a_completed_invalid_parse() -> TestResult {
+    let duplicate = b"FSV2\x02\x83t\0\0\0\x02a\x07a\0a\x07a\0";
+    let (document, _) = f::decoded(duplicate.to_vec())?;
+    assert_eq!(f::binary(&document)?, &duplicate[5..]);
+    let strict_empty = minimum_strict_work(b"", false)?;
+    let compat_empty = minimum_raw_work(b"")?;
+    let metadata = compat_empty
+        .checked_sub(strict_empty)
+        .ok_or("metadata difference")?;
+    let strict_invalid = minimum_strict_work(duplicate, true)?;
+    let parse_only = metadata
+        .checked_add(strict_invalid)
+        .ok_or("parse work overflow")?;
+    let funded_parse = L {
+        max_work_units: parse_only,
+        ..f::limits()
+    };
+    let exact_strict = L {
+        max_work_units: strict_invalid,
+        ..f::limits()
+    };
+    assert!(matches!(
+        decode(duplicate.to_vec(), &f::context(), exact_strict),
+        Err(E::InvalidFlowValue)
+    ));
+    assert!(matches!(
+        decode(
+            duplicate.to_vec(),
+            &f::context(),
+            L {
+                max_work_units: strict_invalid - 1,
+                ..f::limits()
+            }
+        ),
+        Err(E::Limit)
+    ));
+    assert!(compat(duplicate[5..].to_vec(), &f::context(), funded_parse).is_ok());
+    let actual = compat(duplicate.to_vec(), &f::context(), funded_parse);
+    assert!(
+        matches!(actual, Err(E::Limit)),
+        "completed invalid parse must not refund fallback work: {actual:?}"
+    );
+    Ok(())
+}
+
+fn minimum_strict_work(bytes: &[u8], invalid: bool) -> TestResult<usize> {
+    let mut low = 1;
+    let mut high = f::limits().max_work_units;
+    while low < high {
+        let middle = low + (high - low) / 2;
+        let limited = L {
+            max_work_units: middle,
+            ..f::limits()
+        };
+        match decode(bytes.to_vec(), &f::context(), limited) {
+            Ok(_) if !invalid => high = middle,
+            Err(E::InvalidFlowValue) if invalid => high = middle,
+            Err(E::Limit) => low = middle + 1,
+            other => return Err(format!("strict work boundary: {other:?}").into()),
+        }
+    }
+    Ok(low)
+}

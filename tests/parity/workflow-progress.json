@@ -18267,14 +18267,108 @@
       "runtime_case_ids": [
         "e2762dc93adfd58837e6517455d08e9b5c77b2a8dcd8358bd4e69bbdbdc73c8a"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-5b12595d8af45093",
+          "rust_file": "crates/wf-domain/tests/original_flow_value/source.rs",
+          "rust_file_sha256": "d2efbe8383bea9c01f7ca6061aed3c641e616e0bc1bbe1e7a0a6701972f4d282",
+          "rust_module": "",
+          "rust_function": "source_value_codec_preserves_raw_escape_and_typed_roundtrips",
+          "assertions": [
+            {
+              "source_line": 452,
+              "source_text": "assert Flow.encode_value(\"payload-bytes\") == \"payload-bytes\"",
+              "rust_line": 13,
+              "rust_text": "assert_eq!(plain, b\"payload-bytes\");"
+            },
+            {
+              "source_line": 453,
+              "source_text": "assert Flow.decode_value(\"payload-bytes\") == \"payload-bytes\"",
+              "rust_line": 15,
+              "rust_text": "assert_eq!(fixtures::binary(&decoded)?, b\"payload-bytes\");"
+            },
+            {
+              "source_line": 456,
+              "source_text": "assert Flow.encode_value(old_magic_prefixed) == old_magic_prefixed",
+              "rust_line": 20,
+              "rust_text": "assert_eq!(old_encoded, old_magic);"
+            },
+            {
+              "source_line": 457,
+              "source_text": "assert Flow.decode_value(old_magic_prefixed) == old_magic_prefixed",
+              "rust_line": 22,
+              "rust_text": "assert_eq!(fixtures::binary(&decoded)?, old_magic);"
+            },
+            {
+              "source_line": 462,
+              "source_text": "assert encoded_magic != magic_prefixed",
+              "rust_line": 25,
+              "rust_text": "assert_ne!(encoded_magic, magic_prefixed);"
+            },
+            {
+              "source_line": 463,
+              "source_text": "assert Flow.decode_value(encoded_magic) == magic_prefixed",
+              "rust_line": 27,
+              "rust_text": "assert_eq!(fixtures::binary(&decoded)?, magic_prefixed);"
+            },
+            {
+              "source_line": 466,
+              "source_text": "assert Flow.decode_value(Flow.encode_value(map_payload)) == map_payload",
+              "rust_line": 30,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Exact FlowCodecTest451/469 fixtures preserve payload-bytes, FSV1 plus ETF %{old: true}, FSV2+2+not-a-term escaping, %{kind: typed}, and typed repeated1024. The real logical encoder and additive compatibility decoder run all source assertions: raw/escaped roundtrips, exact typed map, typed prefix, trailing-zero raw suffix/user size, and valid level9 compressed inequality. A stdlib-zlib9 golden is independently expanded against the ETF recipe and checked against actual producer bytes; it is not a VM capture. Exact binary fallback and valid strict decoding are supplemental controls. Three compiled rejecting API cases were saved in e54c2dc before the compatibility body; all complete source/resource tails now pass. Safe tables are explicit immutable mathematical fixtures. A separate after-body completed-invalid-parse budget test rejects a temporary budget-reset fault; it carries no preimplementation RED claim. Live VM capture and public typed ingress are not established. The original suite uses ExUnit async:true and flow tagging without storage setup. Native original profiles and independent Linux/macOS acceptance remain required. These links do not establish full source-case/profile or workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "d7ba621e9eb64c5d",
       "runtime_case_ids": [
         "0b63570c377f9da30ea8b555e818cc4a6faa5f1bbed790fa106d95460da44124"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-d7ba621e9eb64c5d",
+          "rust_file": "crates/wf-domain/tests/original_flow_value/source.rs",
+          "rust_file_sha256": "d2efbe8383bea9c01f7ca6061aed3c641e616e0bc1bbe1e7a0a6701972f4d282",
+          "rust_module": "",
+          "rust_function": "source_typed_value_codec_returns_noncanonical_terms_without_deserializing",
+          "assertions": [
+            {
+              "source_line": 471,
+              "source_text": "assert <<\"FSV2\", 2, encoded::binary>> = Flow.encode_value(payload)",
+              "rust_line": 41,
+              "rust_text": "assert_eq!(encoded.get(..5), Some(b\"FSV2\\x02\".as_slice()));"
+            },
+            {
+              "source_line": 474,
+              "source_text": "assert Flow.decode_value(trailing) == encoded <> <<0>>",
+              "rust_line": 49,
+              "rust_text": "assert_eq!(fixtures::binary(&decoded)?, suffix);"
+            },
+            {
+              "source_line": 476,
+              "source_text": "assert Flow.decode_value_with_user_size(trailing) ==",
+              "rust_line": 51,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 480,
+              "source_text": "refute Flow.decode_value(compressed) == payload",
+              "rust_line": 58,
+              "rust_text": "assert!(!matches!(decoded.root(), Some(N::Map { .. })));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Exact FlowCodecTest451/469 fixtures preserve payload-bytes, FSV1 plus ETF %{old: true}, FSV2+2+not-a-term escaping, %{kind: typed}, and typed repeated1024. The real logical encoder and additive compatibility decoder run all source assertions: raw/escaped roundtrips, exact typed map, typed prefix, trailing-zero raw suffix/user size, and valid level9 compressed inequality. A stdlib-zlib9 golden is independently expanded against the ETF recipe and checked against actual producer bytes; it is not a VM capture. Exact binary fallback and valid strict decoding are supplemental controls. Three compiled rejecting API cases were saved in e54c2dc before the compatibility body; all complete source/resource tails now pass. Safe tables are explicit immutable mathematical fixtures. A separate after-body completed-invalid-parse budget test rejects a temporary budget-reset fault; it carries no preimplementation RED claim. Live VM capture and public typed ingress are not established. The original suite uses ExUnit async:true and flow tagging without storage setup. Native original profiles and independent Linux/macOS acceptance remain required. These links do not establish full source-case/profile or workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "9e533297e58922d8",
