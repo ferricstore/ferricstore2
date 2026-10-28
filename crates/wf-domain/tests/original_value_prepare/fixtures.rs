@@ -15,15 +15,22 @@ pub(super) fn limits() -> L {
 }
 
 pub(super) fn prepared(bytes: &[u8], nodes: &[N], edges: &[usize], root: usize) -> TestResult<P> {
-    let result = prepare(
-        I {
-            bytes,
-            nodes,
-            edges,
-            root,
-        },
-        limits(),
-    );
+    let input = I {
+        bytes,
+        nodes,
+        edges,
+        root,
+    };
+    let capture = nodes.iter().find_map(|node| match node {
+        N::ForeignLocalFun { creator, .. } => Some(*creator),
+        _ => None,
+    });
+    // These literal fixtures already name their captured initialization PID.
+    let result = if let Some(init_pid) = capture {
+        wf_domain::value::prepare_original_flow_value_with_init_pid(input, init_pid, limits())
+    } else {
+        prepare(input, limits())
+    };
     assert!(
         result.is_ok(),
         "healthy logical value preparation: {:?}",

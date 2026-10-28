@@ -3,7 +3,8 @@
 Status: private codec, explicit physical capability, consumed stored9 publication/
 outcome recovery and opted-in Node9 startup audit/replay implemented and locally
 verified. Bounded physical history capture and coherent value hydration are
-implemented; logical typed preparation and public history services remain required.
+implemented. Pure logical preparation has explicit captured local-fun context;
+accepted typed-command and public history services remain required.
 
 The binary command's intent8 interprets supplied payload/result/error bytes as
 logical binaries. Publication escapes a leading `FSV2` once. Inferring a typed
@@ -166,6 +167,46 @@ capacity, engine allocation, stack use, RSS or measured speed. Public lifecycle
 visibility, read barriers, authorization/routing and final page trimming still
 belong to the accepted history service; logical typed preparation and remaining
 source/profile/platform acceptance remain required.
+
+The pure `prepare_original_flow_value` API now accepts borrowed logical nodes,
+byte data and edge IDs, distinct from already-encoded stored input. Children
+precede parents. It validates every supplied arena, plans exact ETF sizes and
+logical depth, then emits one owned complete stored buffer. Root binaries keep
+the existing raw/escape distinction; nested binaries use ETF. Integers, finite
+float bits, UTF8 atoms, masked bitstrings, tuples, flattened proper/improper
+lists and source-ordered maps retain their distinctions. Exact source key order
+and semantic duplicate refusal include foreign identity and function data.
+
+Local functions additionally require
+`prepare_original_flow_value_with_init_pid`: an explicit PID node ID in the same
+bounded arena supplies the encoder's captured initialization process identity.
+The ordinary API returns structured `UnsupportedContext` when that capture is
+needed. No global is read or guessed. Source emission substitutes this captured
+PID for obsolete received creator data, including exact sizing and context
+depth. Canonical function entry descriptors must agree on old index and signed
+low32-bit uniqueness. The input carries immutable mathematical observations,
+not proof of live VM capture, execution capability or ownership of a process.
+Capturing real runtime/profile inputs remains an outer adapter obligation.
+
+Private flat plan and map-offset buffers avoid encoded-subterm caches and
+mutating shared input edge ranges. Fallible heapsort and explicit comparison/
+emission continuations keep traversal iterative, including deep nesting.
+Checked continuous work and prospective simultaneous requested ownership cover
+named fixed headers, exact plan/order slots and bounded continuation slots.
+Comparison backing is released before output emission. Only complete admitted
+output lengths are reserved; the result's Vec moves into stored ingress without
+a Box/shrink conversion. These accounts do not measure allocator capacity,
+native frames, RSS, elapsed time or speedup.
+
+Logical preparation carries no admission, routing or persistence authority and
+does not automatically select intent9. The explicit producer still selects the
+stored codec and actual profile2 owner. Frozen prepared bytes, rather than a
+new runtime lookup, enter canonical identity and committed replay. Existing
+binary8/stored9/decoder implementations and source error semantics are unchanged.
+The real composition test distinguishes a logical tuple from a binary containing
+identical FSV2-prefixed bytes through actual publication, hydration and reopen.
+This component does not establish public typed APIs, native VM/profile execution,
+Linux acceptance or complete workflow parity.
 
 Root performs the current review solo under the user override. Concrete paths,
 TDD stages and validation are recorded in

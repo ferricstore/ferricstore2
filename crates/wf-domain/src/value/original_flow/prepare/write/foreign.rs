@@ -84,7 +84,6 @@ pub(in crate::value::original_flow::prepare) fn node(
             index,
             uniq,
             old_index,
-            creator,
             free,
             ..
         } => {
@@ -100,7 +99,8 @@ pub(in crate::value::original_flow::prepare) fn node(
             scalar::atom(view, *module, output, budget)?;
             scalar::integer(output, *old_index, budget)?;
             scalar::integer(output, i64::from(view.plan(id)?.fun_uniq), budget)?;
-            if !identity(view, *creator, output, budget)? {
+            let init_pid = view.init_pid.ok_or(E::UnsupportedContext { node: id })?;
+            if !identity(view, init_pid, output, budget)? {
                 return Err(E::InvalidInput);
             }
         }

@@ -1,5 +1,7 @@
 //! Additional controls written after implementation, separate from genuine R0.
 
+use wf_domain::value::prepare_original_flow_value_with_init_pid as captured;
+
 use super::{E, I, N, TestResult, fixtures as f, prepare};
 
 #[test]
@@ -292,13 +294,14 @@ fn function_order() -> TestResult {
         N::Map { entries: 2..6 },
     ];
     assert!(matches!(
-        prepare(
+        captured(
             I {
                 bytes: b"mn",
                 nodes: &nodes,
                 edges: &[4, 4, 5, 4, 6, 4],
                 root: 7
             },
+            2,
             f::limits()
         ),
         Err(E::InvalidInput)
@@ -336,13 +339,14 @@ fn inconsistent_entries() {
             N::Tuple { children: 1..3 },
         ];
         assert!(matches!(
-            prepare(
+            captured(
                 I {
                     bytes: b"mn",
                     nodes: &nodes,
                     edges: &[3, 4, 5],
                     root: 6
                 },
+                2,
                 f::limits()
             ),
             Err(E::InvalidInput)

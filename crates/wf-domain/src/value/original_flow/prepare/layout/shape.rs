@@ -61,6 +61,7 @@ pub(in crate::value::original_flow::prepare) fn fun_coherent(
         index,
         arity,
         uniq,
+        old_index,
         ..
     } = view.input.nodes.get(id).ok_or(E::InvalidInput)?
     else {
@@ -80,6 +81,7 @@ pub(in crate::value::original_flow::prepare) fn fun_coherent(
             index: pi,
             arity: pa,
             uniq: pu,
+            old_index: po,
             ..
         } = node
             && index == pi
@@ -87,7 +89,9 @@ pub(in crate::value::original_flow::prepare) fn fun_coherent(
         {
             budget.spend(33)?;
             let same_entry = arity == pa && uniq == pu;
-            if same_entry != (canonical == view.plan(prior)?.fun_uniq) {
+            if same_entry != (canonical == view.plan(prior)?.fun_uniq)
+                || (same_entry && old_index != po)
+            {
                 return Err(E::InvalidInput);
             }
         }

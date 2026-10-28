@@ -34,6 +34,7 @@ pub(in crate::value::original_flow::prepare) struct NodePlan {
 
 pub(in crate::value::original_flow::prepare) struct Layout<'a> {
     pub(in crate::value::original_flow::prepare) input: I<'a>,
+    pub(in crate::value::original_flow::prepare) init_pid: Option<usize>,
     pub(in crate::value::original_flow::prepare) plans: Vec<NodePlan>,
     pub(in crate::value::original_flow::prepare) order: Vec<usize>,
 }
@@ -41,6 +42,7 @@ pub(in crate::value::original_flow::prepare) struct Layout<'a> {
 #[derive(Clone, Copy)]
 pub(in crate::value::original_flow::prepare) struct TermView<'a, 'b> {
     pub(in crate::value::original_flow::prepare) input: I<'a>,
+    pub(in crate::value::original_flow::prepare) init_pid: Option<usize>,
     pub(in crate::value::original_flow::prepare) plans: &'b [NodePlan],
     pub(in crate::value::original_flow::prepare) order: &'b [usize],
 }
@@ -73,6 +75,7 @@ impl Layout<'_> {
     pub(in crate::value::original_flow::prepare) fn view(&self) -> TermView<'_, '_> {
         TermView {
             input: self.input,
+            init_pid: self.init_pid,
             plans: &self.plans,
             order: &self.order,
         }
@@ -81,6 +84,7 @@ impl Layout<'_> {
 
 pub(in crate::value::original_flow::prepare) fn build<'a>(
     input: I<'a>,
+    init_pid: Option<usize>,
     budget: &mut Budget,
 ) -> Result<Layout<'a>, E> {
     if input.bytes.len() > budget.limits.max_input_bytes
@@ -96,6 +100,7 @@ pub(in crate::value::original_flow::prepare) fn build<'a>(
     let (slots, sorting) = map_slots(input)?;
     let mut layout = Layout {
         input,
+        init_pid,
         plans: budget.reserve(input.nodes.len())?,
         order: budget.reserve(slots)?,
     };

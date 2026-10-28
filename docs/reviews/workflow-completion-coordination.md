@@ -55307,3 +55307,89 @@ actual initialization process result at runtime. The explicit node index also
 keeps its backing in the already bounded borrowed arenas. Same-entry old_index
 must agree as well as canonical old_uniq/arity/uniq: source emission reads that
 entry field, not arbitrary imported legacy metadata. Native test covers it.
+
+Native-context body after saved471f20c now passes the complete new case in50791
+and all eleven earlier domain cases, followed by strict workspace Clippy72095.
+Default preparation supplies no capture; the explicit API threads a bounded PID
+index through the same Layout/TermView. Reached local funs validate both raw
+creator data and captured PID, but size/emit only the captured initialization
+identity. There is no PID0 assumption, global lookup or new owned context.
+Malformed/missing/unused captures keep separate reached lanes. Repeated source
+entry descriptors also require old_index agreement. Native's Size65/captured
+42/5/123, changed obsolete creator invariance, exact stored cap, bad/missing/
+unused context and actual decode tails pass. These are explicit fixture captures,
+not claims that a live VM was queried.
+
+The original nine case functions and literal recipes remain exact. Only one
+fixtures::prepared router mechanically selects the fixture's declared init PID
+for local-function cases; its complete inverse restores the7da6c0d file. Main's
+two declared module links also have an exact inverse. The native test remains
+471f20c hash-exact. After-body adversarial function calls now explicitly pass
+the same fixture capture; their expectations remain unchanged. Pre-context
+green evidence is preserved separately at logical-value-pre-context-pipeline.json.
+Final complete validation is running before adoption; full goal stays active.
+
+## LOGICAL-VALUE-PREPARATION1 — final validated solo checkpoint
+
+Final pipeline10495 terminal0 passes all twelve gates: Python7, shell syntax,
+fmt, workspace/all-target compile and strict Clippy, all1,224 Rust cases across
+105 executable targets (103 test-result targets plus two benchmark correctness
+smokes), all53 architecture cases, six doctests across15 targets, warnings-denied
+docs, reference/progress integrity, cached offline dependency policy and diff.
+All1,671 non-Markdown inputs including1,084 Rust files remain hash-exact through
+completion. Exact Counter preserves all1,211 prior cases and adds only13: the
+original nine, the separate genuine native-context case and three after-body
+adversarial controls. SHA5efa24f7ca578c6389ba85c4b8b3a2b6fa2b287dfff15cbb34c52849fb747d57.
+Receipts /private/tmp/ferricstore2-logical-value-{genuine-r0,native-r0,pipeline,
+full-identity}.json. Pre-context green evidence remains separate and was never
+used to certify native function preparation or adopted.
+
+Public logical input/output/error/limit models stay pure. All common and foreign
+families emit complete raw/escaped/typed source-compatible stored bytes. Native
+local functions require the explicit captured initialization PID; default
+preparation refuses missing context. Captured PID size/depth/work/ownership is
+funded from the same bounded arena, not an inferred creator or PID0. Source
+canonical entry descriptors agree on old index, old uniqueness and entry key.
+Actual initialization assignment is independently confirmed in pinned source:
+https://github.com/erlang/otp/blob/OTP-28.0/erts/emulator/beam/erl_init.c#L2421
+These are mathematical fixture captures, not executed VM/runtime provenance.
+
+Source exact comparison covers numeric type separation/signed zero, Unicode
+atom spellings, flattened lists, nested maps, masked bits, reference word
+significance, PID serial/ID/node ordering, port node ordering and function entry/
+free-value identity. Fallible heapsort sorts only pair offsets and stops at
+budget refusal; overlapping tuple/list edge ranges retain original order.
+Output is reserved once at its actual complete stored size; root binary caps
+count raw or escaped bytes rather than a nonexistent nested ETF header. Flat
+plans and fixed continuation buffers avoid recursion, subterm byte caches,
+payload clones and shrink/Box conversions. Named logical requested ownership
+and continuous work are admitted prospectively, with comparison backing dropped
+before emission. This establishes no native-capacity/frame/RSS/OOM or measured
+performance theorem. Both supported OS targets retain explicit byte order and
+no new OS operation or dependency.
+
+All earlier policy/value decoder production bodies and prior API
+implementation remain byte-exact (root exports only gain additive names); no
+storage/Node driver, binary8/stored9 format or writer body changed. All ten
+genuine case oracles/recipes remain exact: original main recovers after two mod
+links, original fixtures file recovers after the one explicit capture-router
+inverse, and native.rs is471f20c hash-exact. The three supplementary methods
+retain after-body timing. Actual real-store publication distinguishes a typed
+tuple from identical FSV2-prefixed logical binary bytes through reopen/hydration.
+No expectation, source identity, original setup/profile or validator was dropped.
+Ledger stays123 derived/137 counterparts/559 links,5903 registered/4222 linked/
+1681 unmatched/1655 unresolved. Full workflow parity remains incomplete.
+
+Root performed design, implementation, source/resource and final code review
+solo. No independent peer review is claimed. All file400/600/function100/
+nesting4/cognitive25 limits remain enforced without allowance or packed lines.
+Offline audit uses unchanged primary cache and explicit feature manifest; no
+fresh advisory fetch, native original profile or Linux result is claimed.
+
+Continue full goal SOLO on exact original codec acceptance, actual typed caller
+normalization/capture/ingress, accepted history authority/lifecycle/read barriers
+and ordered remaining milestones. Public APIs, consensus, transports/workers,
+remaining workflow breadth, cleanup, complete source profiles and independent
+Linux/macOS acceptance remain required. Full goal ACTIVE; no agents, pushes,
+external messages or unchanged denied native probes. Adopt only this final
+verified state after checking the primary still has no unrelated changes.

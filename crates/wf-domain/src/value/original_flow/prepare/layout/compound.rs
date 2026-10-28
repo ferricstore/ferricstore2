@@ -38,6 +38,7 @@ pub(in crate::value::original_flow::prepare) fn plan(
             let (prefix, current) = layout.order.split_at_mut(start);
             let view = TermView {
                 input: layout.input,
+                init_pid: layout.init_pid,
                 plans: &layout.plans,
                 order: prefix,
             };
@@ -173,12 +174,17 @@ fn local_fun(
             .map_err(|_| E::InvalidInput)?,
     );
     shape::fun_coherent(view, id, plan.fun_uniq, budget)?;
+    let init_pid = view.init_pid.ok_or(E::UnsupportedContext { node: id })?;
+    let init_plan = shape::child(view, init_pid, id)?;
+    if !matches!(view.node(init_pid)?, N::ForeignPid { .. }) {
+        return Err(E::InvalidInput);
+    }
     let old_size = add(
         scalar::integer_size(*old_index),
         scalar::integer_size(i64::from(plan.fun_uniq)),
     )?;
-    plan.size = add(30, add(ms, add(old_size, add(creator_plan.size, fs)?)?)?)?;
+    plan.size = add(30, add(ms, add(old_size, add(init_plan.size, fs)?)?)?)?;
     wire_length(plan.size.checked_sub(1).ok_or(E::Limit)?)?;
-    plan.depth = add(1, md.max(fd).max(creator_plan.depth))?;
+    plan.depth = add(1, md.max(fd).max(creator_plan.depth).max(init_plan.depth))?;
     Ok(())
 }

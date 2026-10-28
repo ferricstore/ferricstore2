@@ -22,21 +22,12 @@ pub use model::{
 /// Invalid logical data, invalid profiles, resource refusal and actual failed
 /// reservations remain distinct. Limits cover all supplied arenas, continuous
 /// work and prospectively requested ownership, including serialized expansion.
+/// Local functions require the explicit initialization-PID preparation entry.
 pub fn prepare_original_flow_value(
     input: OriginalValueInput<'_>,
     limits: OriginalValueEncodeLimits,
 ) -> Result<PreparedOriginalFlowValue, OriginalValueEncodeError> {
-    let mut budget = budget::Budget::new(limits)?;
-    let fixed = fixed_bytes()?;
-    budget.spend(fixed)?;
-    budget.admit(fixed)?;
-    let layout = layout::build(input, &mut budget)?;
-    let bytes = write::run(&layout, &mut budget)?;
-    Ok(PreparedOriginalFlowValue {
-        bytes,
-        work_units: budget.work,
-        temporary_bytes: budget.peak,
-    })
+    prepare_captured(input, None, limits)
 }
 
 /// Prepare with an explicitly captured encoder initialization PID node.
@@ -46,13 +37,31 @@ pub fn prepare_original_flow_value(
 ///
 /// # Errors
 ///
-/// This rejecting TDD facade reports unavailable context until implemented.
+/// Bad captures, malformed data and operational limits retain distinct errors.
 pub fn prepare_original_flow_value_with_init_pid(
     input: OriginalValueInput<'_>,
-    _init_pid: usize,
-    _limits: OriginalValueEncodeLimits,
+    init_pid: usize,
+    limits: OriginalValueEncodeLimits,
 ) -> Result<PreparedOriginalFlowValue, OriginalValueEncodeError> {
-    Err(OriginalValueEncodeError::UnsupportedContext { node: input.root })
+    prepare_captured(input, Some(init_pid), limits)
+}
+
+fn prepare_captured(
+    input: OriginalValueInput<'_>,
+    init_pid: Option<usize>,
+    limits: OriginalValueEncodeLimits,
+) -> Result<PreparedOriginalFlowValue, OriginalValueEncodeError> {
+    let mut budget = budget::Budget::new(limits)?;
+    let fixed = fixed_bytes()?;
+    budget.spend(fixed)?;
+    budget.admit(fixed)?;
+    let layout = layout::build(input, init_pid, &mut budget)?;
+    let bytes = write::run(&layout, &mut budget)?;
+    Ok(PreparedOriginalFlowValue {
+        bytes,
+        work_units: budget.work,
+        temporary_bytes: budget.peak,
+    })
 }
 
 fn fixed_bytes() -> Result<usize, OriginalValueEncodeError> {
@@ -82,6 +91,7 @@ fn fixed_bytes() -> Result<usize, OriginalValueEncodeError> {
         (size_of::<std::ops::Range<usize>>(), 8),
         (size_of::<[u8; 32]>(), 4),
         (size_of::<usize>(), 32),
+        (size_of::<Option<usize>>(), 3),
     ];
     parts.into_iter().try_fold(0, |total, (size, count)| {
         budget::add(total, budget::mul(size, count)?)

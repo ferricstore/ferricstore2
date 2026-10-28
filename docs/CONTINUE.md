@@ -2,15 +2,21 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
-Work in progress on `codex/logical-value-preparation` in the separate
-`ferricstore2-size-aware-solo` tree. The primary remains green at `7e67000`.
-The encoder body passes the nine original full tails plus three after-body
-controls, and the full pre-context suite passes 1,223 Rust cases. Source audit
-found local-fun emission must use explicitly captured `erts_init_process_id`,
-not the received wire creator. This source-fidelity correction remains open;
-the passing data formatter is not ready to adopt as complete preparation.
-The original genuine RED is `7da6c0d`; the context extension receives its own
-rejecting test before its body. Decisions/evidence are in the coordination log.
+Pure logical value preparation is now implemented, including all common and
+foreign node families. Source-ordered map keys, semantic duplicate refusal,
+root-binary escaping, iterative deep/list traversal and independent resource
+limits pass their complete tails. Local functions use an explicitly captured
+initialization PID; the ordinary API reports unavailable context when needed.
+A source audit caught and corrected received-creator serialization before
+adoption, with a separate genuine rejecting context test. Prepared buffers move
+into actual stored9 publication and hydrate correctly after reopen.
+
+Ten genuine cases were saved before their respective bodies in `7da6c0d` and
+`471f20c`; three additional adversarial cases followed implementation. Original
+case functions/byte recipes stay exact, with an explicit fixture capture-router
+and module-link inverse. This is pure preparation and local composition, not
+a live VM capture adapter, public typed API or complete source/profile parity.
+See [ADR-009](adr/009-stored-workflow-value-ingress.md) and the coordination log.
 
 The user now requires solo work without agents; earlier agent instructions are
 superseded. Rust lint policy enforces nesting 4, cognitive complexity 25 and
@@ -18,10 +24,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The last adopted local Rust quality checkpoint passes all 1,211 tests across 104
+The current local Rust quality checkpoint passes all 1,224 tests across 105
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,209 case and
-adds only two pinned-fixture storage conformance cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,211 case and
+adds only thirteen logical preparation/composition cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -72,9 +78,9 @@ disk-read failures, twenty resource cuts and full reopen/FWSP4 custody. The read
 fault fixture needed a real16KiB extent and unchanged equality assertions moved
 to the fresh owner after redb poisoned the failed owner. Complete default-fixture
 and test inverses preserve their original assertions; five whole production
-source inverses preserve prior APIs. Root reviewed this solo. Logical typed
-preparation and the accepted authority/lifecycle/public history service remain
-required; see [ADR-009](adr/009-stored-workflow-value-ingress.md).
+source inverses preserve prior APIs. Root reviewed this solo. Pure logical preparation is now implemented as recorded above. Actual native
+capture/typed caller adapters and accepted authority/lifecycle/public history
+services remain required; see [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
 The actual physical history reader now captures current/control metadata,
 ordered FWSH events and their mandatory historical bindings on one snapshot.
@@ -88,7 +94,7 @@ corruption/lookahead, ownership, budget, reopen and FWSP4 tails now pass.
 One birth-incarnation fixture literal was corrected from the existing sequence
 formula; a test-only fixture scope/import correction preserves every helper
 statement and assertion. Five complete production source inverses preserve old
-behavior. Root reviewed this solo. Logical typed preparation, lifecycle
+behavior. Root reviewed this solo. Actual typed caller integration, lifecycle
 visibility, authoritative read barriers and accepted
 history services remain required; see [ADR-009](adr/009-stored-workflow-value-ingress.md).
 
@@ -154,8 +160,9 @@ commit, and all four modes through local/matching/fresh FWSP4 routes and purge.
 Seven complete source inverses preserve disabled/8 behavior; no earlier test
 assertion changed. These compositions do not start an accepted service.
 
-Next close logical typed preparation, then the accepted public history/query
-service under real authority, lifecycle and read-barrier contracts. Physical
+Next port the original TermCodec/Codec.Support cases through the real logical
+preparer, then complete typed caller integration and the accepted public history/
+query service under real authority, lifecycle and read-barrier contracts. Physical
 ordered FWSH/binding acquisition and coherent hydration are now implemented as
 recorded above. Preserve each carried alias's encoding and all binary8 behavior;
 do not infer typed data from an FSV2 prefix. Intent version9 is separate from
