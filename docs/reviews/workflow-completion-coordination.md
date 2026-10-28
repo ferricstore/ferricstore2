@@ -55531,7 +55531,7 @@ reset fault demonstrate those properties; no payload clone, shrink, Box
 conversion, decompression, native-capacity/frame/RSS bound or measured speedup
 is claimed. Explicit value-root paths preserve the existing facade rule. This
 introduces no OS operation, effect, new dependency or public model. Production
-files have111/75/102 physical lines; new test children64/135/291, with all
+files have111/75/109 physical lines; new test children64/135/291, with all
 function100/nesting4/cognitive25 and file400/600 gates enforced.
 
 Final pipeline /private/tmp/ferricstore2-original-value-compat-pipeline.json
@@ -55563,3 +55563,12 @@ Public workflow breadth, consensus, both transports/workers, cleanup, complete
 source profiles and independent Linux/macOS acceptance remain required. Adopt
 only this verified state after confirming the primary is still clean at ac11eab.
 Full goal ACTIVE; do not retry unchanged denied native/Linux/process probes.
+
+Adopted the verified implementation at287e541 by guarded fast-forward from the
+clean ac11eab primary. Both trees are clean and all1676 validated non-Markdown
+inputs match in both trees; receipt
+/private/tmp/ferricstore2-original-value-compat-adopted.json. The final explicit
+visibility formatting makes decode.rs109 physical lines (the earlier102 count
+preceded that path repair); this documentation correction changes no code or
+validation input. Continue from the adopted implementation, with the full goal
+active and the remaining requirements above intact.
