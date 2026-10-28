@@ -28,6 +28,7 @@ use super::{TestResult, fixtures as f};
 
 mod boundaries;
 mod custody;
+mod logical_binding;
 mod logical_caller;
 mod source;
 mod values;

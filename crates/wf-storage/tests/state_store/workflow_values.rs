@@ -7,6 +7,7 @@ mod fixtures;
 mod guards;
 mod history_hydration;
 mod history_page;
+mod logical_binding;
 mod logical_codec;
 mod publication;
 mod reads;

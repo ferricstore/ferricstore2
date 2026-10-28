@@ -55780,3 +55780,89 @@ remaining breadth/queries/cleanup and independent Linux/macOS validation remain
 required. Continue SOLO from this verified predecessor; do not retry unchanged
 denied native/Linux/process probes. Full goal ACTIVE. Adopt only after checking
 the primary is still clean at1dbd924 and every verified input remains exact.
+
+## LOGICAL-BINDING1 — solo architecture selection before artifacts
+
+2026-10-28: previous turn made verified progress and adopted712f0f0, with1238
+Rust cases. Both trees are clean there; no live process remains. Continue SOLO.
+The next predecessor binds owned logical callers to actual stored-value frames,
+including automatic partitioning, without test-only header construction. Keep
+accepted authorization/routing/submission services and native profiles separate.
+
+BEFORE creation select private crates/wf-ports/src/log/value_batch/logical.rs and
+children logical/model.rs and logical/ownership.rs. New public models in model:
+LogicalMutationFrameContext (owned scope/request/stamp, captured marker/defaults,
+owned policy witnesses and one unchanged source input), LogicalMutationFrameLimits
+(existing codec plus positive maximum_owned/maximum_work). No new result or
+error type, trait, dependency or runtime effect is selected. Add public
+encode_logical_mutation_frame(PreparedLogicalMutation,context,limits)
+-> Result<(PreparedBytes,ClientIntent),CodecError>, reexported through existing
+value_batch.rs/log.rs. R0 adds only models and an all-input UnsupportedTag facade.
+No ownership, partition, frame or shared encoder body before saved runtime RED.
+
+After SAVE select ownership.rs functions, not another model. Bound witness
+count/capacity before traversal; census declared incoming Vec capacities,
+identity/token slice lengths, caller preparation work/peak and context owners.
+Prospectively admit metadata pointee/input spine, partition conversion and frame
+requests. Caps include reported upstream preparation and conservative encoding
+work; no metric is included in client intent. Keep error lanes for zero limits,
+overflow, work/ownership, metadata and allocation explicit. Retained frame
+capacity is checked after allocation as well. These are logical requested and
+declared-capacity bounds, not native allocator/frame/RSS/OOM or speed claims.
+
+Move command/partition/scope/request/policies into one existing profile1 value
+batch. Resolve only an absent automatic partition via the unchanged existing
+public_mutation::auto_partition helper; do not duplicate CRC or infer formats
+from bytes. Retain all caller evidence and the independent source input, including
+requested_at. Existing metadata checks must reject contradictions rather than
+repair them. Placement, policy freshness and origin remain outer authority.
+Use intent9 exclusively; binary8/default entry behavior stays unchanged.
+
+After SAVE factor existing encode_profile into a small old wrapper and one
+encode_profile_with_intent helper in the SAME value_batch.rs (keep below400).
+Its complete old body/order/fees stay exact except returning the already-derived
+intent and an additive optional measured-frame ownership ceiling. Old wrappers
+pass None; new binding passes its remaining frame allowance. Measure before the
+one final frame reservation; derive intent once, with no intermediate canonical
+buffer, decode/materialization pass or payload clone/shrink/Box conversion.
+Record complete encoder/source inverses and retain every old test identity.
+Existing scalar identity/partition and public-item Box representations remain,
+with prospective conversion/pointee liability and no native OOM guarantee.
+
+BEFORE creation select existing storage integration target children
+workflow_values/logical_binding.rs and logical_binding/{fixtures,cases,limits}.rs,
+plus history_hydration/logical_binding.rs; add only existing parent mod links.
+Use actual existing defaults/witness/codec/publication fixtures. Six codec case
+identities: logical_binding_resolves_auto_partition_for_all_mutation_kinds;
+logical_binding_keeps_explicit_partition_time_and_retry_evidence;
+logical_binding_preserves_stored_bytes_and_manual_frame_identity;
+logical_binding_rejects_conflicting_metadata_without_repair;
+logical_binding_excludes_request_and_generated_stamp_from_intent;
+logical_binding_enforces_owned_work_and_capacity_bounds. One physical identity:
+logical_binding_publishes_automatic_partition_through_reopen. Every case must
+first reach a healthy new-API call before masked tails. Independent stdlib CRC
+goldens cover one/two/three decimal digits and opaque IDs; no live VM claim.
+Physical auto-partition placement is explicitly configured, not inferred as
+authorization. Preserve typed values, actual aliases/history and reopen.
+
+Save all seven genuine compiled rejections and exact oracles before body.
+Supplementary after-body findings keep their timing. This is component
+integration, with no new original scenario/ledger credit or profile exemption.
+Do not change immutable manifest/mapping/reference or existing ledger/runtime
+bindings. Root reviews architecture/performance/source/resource behavior solo;
+no independent peer review is claimed. Use existing allowlists and file400/
+tooling600/function100/nesting4/cognitive25 with no allowance or packed lines.
+No agents, pushes, external messages or unchanged denied native/Linux/process
+probes. Full M1–M8/source/profile/platform goal remains ACTIVE.
+
+LOGICAL-BINDING1 genuine R0 SAVE (2026-10-28): focused all-warnings-denied
+Clippy exits0. Actual storage integration execution exits101 with exactly seven
+runtime failures, zero passes/ignored; each reaches the healthy new API and
+reports UnsupportedTag at fixtures.rs:101. No physical I/O or later metadata,
+identity, capacity or reopen tail is reached. Receipt
+/private/tmp/ferricstore2-logical-binding-genuine-r0.json retains all seven
+identities, the complete log hash and eleven authored/linked Rust hashes.
+The pinned Keys source explicitly selects prefix __flow_auto__: and256 buckets;
+independent stdlib CRC32 goldens cover3/80/194/198/210 without VM execution.
+No implementation/ownership/shared-encoder body exists at this SAVE. Commit
+this rejecting checkpoint before implementing the selected composition.
