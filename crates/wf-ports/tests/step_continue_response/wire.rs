@@ -1,0 +1,71 @@
+use super::{fixtures as f, *};
+use sha2::{Digest, Sha256};
+use wf_domain::value::{DomainError, InputField};
+use wf_domain::workflow::admission::AdmissionError;
+use wf_domain::workflow::batch::BatchRejection;
+
+#[test]
+fn accepted_reply_preserves_step_postimage_and_golden_bytes() -> TestResult {
+    let bytes = f::reply()?;
+    assert_eq!(bytes, f::hex(f::GOLDEN)?);
+    assert_eq!(bytes.len(), 160);
+    assert_eq!(
+        Sha256::digest(&bytes).as_slice(),
+        f::hex("3ebe50f3c23ab76616f718e2435d790eaefd9fb9a78bd07e6dd4d0283b6f0699")?
+    );
+    assert_eq!(f::summary(&bytes)?, (RetainedStatus::Accepted, Some(1)));
+    f::with_step(b"charge", Some(b"\0\xff"), |decision| {
+        assert!(step_continue_response_matches(
+            decision,
+            &bytes,
+            f::position(),
+            f::time(),
+            f::limits()?
+        )?);
+        Ok(())
+    })
+}
+
+#[test]
+fn reply_rejections_preserve_extended_reason_codes() -> TestResult {
+    f::reply()?;
+    for reason in [
+        IndexRejection::DirectRunningFifoEntry,
+        IndexRejection::InvalidPriority,
+        IndexRejection::FifoPriority,
+        IndexRejection::NotFifoHead,
+        IndexRejection::Batch(BatchRejection::DuplicateId),
+        IndexRejection::Batch(BatchRejection::CrossGroup),
+        IndexRejection::Batch(BatchRejection::Domain(DomainError::StaleLease)),
+        IndexRejection::Batch(BatchRejection::Domain(DomainError::EmptyValue(
+            InputField::To,
+        ))),
+        IndexRejection::Batch(BatchRejection::Admission(AdmissionError::ValueTooLarge {
+            bytes: 33,
+            maximum: 32,
+        })),
+    ] {
+        let decision = IndexedDecision::Rejected(reason);
+        let (bytes, status) =
+            encode_step_continue_response(&decision, f::position(), f::time(), f::limits()?)?;
+        assert_eq!(status, RetainedStatus::IndexedRejected(reason));
+        assert_eq!(f::summary(&bytes)?, (status, None));
+        assert!(step_continue_response_matches(
+            &decision,
+            &bytes,
+            f::position(),
+            f::time(),
+            f::limits()?
+        )?);
+        if reason == IndexRejection::DirectRunningFifoEntry {
+            assert_eq!(
+                bytes,
+                f::hex(concat!(
+                    "465753540001000000000000000100000000000000070000000000000009",
+                    "0000000000000002010700"
+                ))?
+            );
+        }
+    }
+    Ok(())
+}

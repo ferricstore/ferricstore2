@@ -2,6 +2,13 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+Next increment on codex/step-continue-response selects an explicit intent10/
+response9 data grammar with complete original log/time binding and actual Step
+postimages. Strict focused Clippy passes; all five compiled cases genuinely
+fail at healthy encoding against rejecting interfaces before implementation.
+The primary stays clean atdc39f5a and the passing1282-case
+checkpoint below. See M2-STEP-RESPONSE1; no Fresh/durable Step claim is added.
+
 The intent10/item12 Step preparation checkpoint passes all seven focused cases and strict
 Clippy pass. Six genuine runtime refusals were saved in32f9045 before grammar,
 hashing, parser or materialization bodies. A separate effect-probe failure was

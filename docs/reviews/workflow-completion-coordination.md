@@ -56920,3 +56920,83 @@ resource tariffs and version boundaries before the storage successor. Merely
 extending the shared event table would hide this missing contract. Fresh/replay,
 new Step response, atomic publication, inquiry/fault/reopen, snapshots/recovery,
 value profiles, public ingress and original six-assertion scenario remain REQUIRED.
+
+## M2-STEP-RESPONSE1 — solo selection before artifacts
+
+Stage A was locally adopted asdc39f5a with all12 gates/1282 cases. Continue on
+codex/step-continue-response; primary stays at that passing checkpoint. This
+increment supplies the Step response grammar required before retained/Fresh
+integration. It does not itself construct Fresh, publish or recover anything.
+
+Select response version9, associated ONLY with intent10, and magic FWST/u16v1.
+Encode full original u64 term/node/index/time before the result byte, so retained
+metadata and response bytes bind the complete original log identity. Status0
+then RAW partition,id,type,logical-state,worker,token; u64 version,fence,deadline,
+created,updated,attempts; u8priority/u128state-enter-sequence; optional payload,
+result,error with exact0/1 presence. Accepted values require an actual singleton
+Changed StepContinued plan, a predecessor version, matching history/postimage
+and latest witness, running lease/logical state and canonical worker:time:fence
+token. A Step can preserve old ordering for equal logical states or stamp new
+ordering; the grammar must handle both, not hard-code atomic-start counters.
+Preserve all three actual value fields, including omitted versus present empty.
+The original created time is independent of current execution time; do not add
+an invented created<=updated contract. Numeric times obey MAX_EXACT_MILLIS.
+
+Status1 uses the existing extended atomic-start rejection grammar, including
+DirectRunningFifoEntry as7,0. Share the old writer body by changing ONLY its
+server-private visibility; never widen generic/independent/public decoders.
+Accepted/rejected complete scans bind original full context, EOF, caps and tags.
+No backward format, public SDK or storage/event schema change is selected.
+
+Select three pure data APIs exported through existing Step facade, record_batch
+and log: encode_step_continue_response(decision,LogIdentity,TimestampMillis,
+AdmissionLimits)->Result<(Vec<u8>,RetainedStatus),CodecError>;
+step_continue_retained_summary(intent,response_version,bytes,log,time,limits)
+->Result<(RetainedStatus,Option<usize>),CodecError>;
+step_continue_response_matches(decision,bytes,log,time,limits)
+->Result<bool,CodecError>. Matching first completes syntax/context scan, then
+verifies the same measured grammar against the actual plan without a second
+output owner. Measurement validates all fields/caps before fallible exact output
+reservation. Input decision and caller captures remain externally owned; this
+API's output cap is not native RSS/CPU admission or persistence authority.
+
+Approve BEFORE creation: Step private response.rs with rejecting shells only;
+AFTER genuine saved RED private response/write.rs and response/scan.rs, functions
+only, no nominal type/trait/model. Existing Step facade and two export blocks may
+add the three APIs. Existing atomic_start/response.rs may expose only the same
+write_rejection body to the record_batch namespace AFTER RED. The existing pure
+Step prefix covers descendants; add exact three-home effect probe rows. All
+old module/dependency/size/lint restrictions stay intact. Keep400/600/100/4/25.
+
+Approve grouped test target tests/step_continue_response/main.rs with fixtures.rs,
+wire.rs,matching.rs,refusals.rs,limits.rs. No new test model: existing domain
+Create/Claim/indexed Step decisions produce actual owned postimages and borrowed
+predecessors in a finite fixture callback. Five first healthy encodes must fail
+against the rejecting API before bodies. Freeze independent Python frame/SHA/
+offset recipe; cover complete reply, all old closed profiles, full context,
+every truncation, tags/scalars/token/EOF, actual alternative plan/values, equal
+logical ordering, rejection reasons and exact output/inline caps. Save technical
+compile/lint repairs separately from genuine runtime failures. No source-ledger
+credit, fake history/publication or native/Linux claim. Root reviews solo.
+
+Pre-body response review: strict focused Clippy passes after replacing an
+unsupported SHA output formatter with byte comparison and extracting a nested
+test helper; these technical repairs are not RED. Five actual runtime cases
+all fail at healthy reply encoding with UnsupportedTag, not fixture construction.
+Before freezing tests, restoration.rs:90–122 shows a valid running predecessor
+may have fence0/attempts0 and created>updated. Remove the ungrounded attempts0
+malformation assumption; extend the existing matching case with a real restored
+predecessor version1/fence0/attempts0/created7/updated1 and preserved result/error.
+Approve existing-file helper functions with_record/with_legacy_step/
+check_legacy_fields only; no new nominal artifact. Re-run strict lint and all
+five genuine failures before the final rejecting checkpoint.
+
+M2-STEP-RESPONSE1 genuine R0 SAVE: final strict focused Clippy exits0. Actual
+compiled runtime exits101 with0pass/5fail/0ignored, all at healthy actual indexed
+Step response encoding with UnsupportedTag. Every later reply/replay-format/
+alternative/legacy-restoration/resource tail is still masked. The three APIs
+reject all inputs; no scan/write body exists and the atomic rejection helper is
+unchanged. The full160-byte Rust golden equals the independent Python recipe
+and SHA3ebe50f3c23ab76616f718e2435d790eaefd9fb9a78bd07e6dd4d0283b6f0699.
+Freeze complete source hashes and three existing-file inverses before bodies.
+Primary remains clean atdc39f5a; no new source/profile/native/Linux credit.

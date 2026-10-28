@@ -28,7 +28,10 @@ mod phase;
 pub(in crate::log) mod response;
 mod step_continue;
 
-pub use step_continue::{encode_step_continue, prepare_step_continue};
+pub use step_continue::{
+    encode_step_continue, encode_step_continue_response, prepare_step_continue,
+    step_continue_response_matches, step_continue_retained_summary,
+};
 
 pub(super) use fresh::{decide_independent, value_effects_budget};
 pub(super) use phase::{finish_inspection, release_decoded_inputs, retain_record_batch_outcome};

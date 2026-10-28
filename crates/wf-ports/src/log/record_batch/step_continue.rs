@@ -7,7 +7,12 @@ use wf_domain::workflow::request::ClientIntent;
 use super::{RecordBatchApplyError, admit, admit_decoded_request, sum};
 
 mod input;
+mod response;
 mod wire;
+
+pub use response::{
+    encode_step_continue_response, step_continue_response_matches, step_continue_retained_summary,
+};
 
 /// Derive caller intent and prepare complete singleton Step bytes.
 ///
