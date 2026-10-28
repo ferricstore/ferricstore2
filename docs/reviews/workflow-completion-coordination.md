@@ -56089,3 +56089,49 @@ new API and reports InvalidInput. All later scalar/order/resource/source tails
 are masked. /private/tmp/ferricstore2-history-meta-genuine-r0.json retains every
 identity, complete log hash and nine Rust source hashes. No private budget,
 text buffer, formatter or normalizer exists. Commit this checkpoint before body.
+
+HISTORY-META1 body executes all seven complete tails successfully with focused
+Clippy and full-workspace/all-target Clippy passing. The original source citation
+in the early note/comment was off by one: manifest5baf7621b3712082 starts442 and
+its assertion is443. Correct only that comment441->442; preserve the exact R0
+oracles/recipes with an explicit complete comment-only inverse. The generated
+source entry selects assertion443/direct macro0, not the wrong nearby line.
+An initial generator call without --collection correctly refuses before writing
+because real runtime bindings exist; use the existing exact reconciled collection
+path, preserving all prior mappings and bindings. This is tooling protection,
+not a new failed behavior case.
+
+BEFORE creating a temporary review probe select
+/private/tmp/ferricstore2-history-meta-float-probe.rs and its matching executable.
+It compares actual public normalizer decimal digits on one million deterministic
+finite samples against the already cached/compiled serde_json formatter's
+independent Zmij implementation, ignoring notation only. No repository dependency
+or manifest changes, fetching, source/native VM execution or speed claim.
+This probes shortest-digit choice independently of parsing round-trip tests;
+any mismatch requires investigation and saved regression before repair.
+
+HISTORY-META1 independent digit probe is terminal1:999504 finite samples and
+254 mismatches. Standard Rust shortest formatting chooses odd decimal ties
+away from zero (for example bitsc2eb754f894792c4 yields-241525276163222.13),
+while the independent shortest formatter yields the even neighbor-.12.
+All sample strings still round-trip; that earlier property is insufficient for
+source canonical text. Upstream Ryu's primary d2s implementation explicitly
+rounds exact halfway cases to even; source Elixir/OTP uses Ryu. Select a new
+function history_metadata_uses_even_shortest_float_ties appended only to the
+EXISTING scalars.rs. Save its actual odd/even mismatch before correction.
+Then in EXISTING numeric/float.rs select functions to parse standard shortest
+digits, detect exact binary/decimal midpoint ties using checked u128 powers
+of5 and the float's normalized odd mantissa/power of2, choose the even adjacent
+significand, and emit fixed/scientific notation from those SAME digits. No new
+model/file/dependency. This replaces duplicate float formatting with one digit
+conversion plus finite text emission. Zero/sign/notation/bounds stay exact;
+never treat independent sampling as native VM or complete-profile evidence.
+
+HISTORY-META1 even-tie genuine SAVE: the appended case compiles and exits101,
+0 pass/1 fail/0 ignored, reporting actual-.13 versus expected-.12 at its first
+byte equality. Other cases are filtered; later tie recipes remain masked.
+Receipt /private/tmp/ferricstore2-history-meta-even-genuine-r0.json saves the
+log, current producer/test and independent probe hashes, including254 mismatches
+among999504 finite samples. Commit this rejecting review case before changing
+the float conversion. Existing seven RED functions and all other producers
+remain exact except the documented source-line comment correction.

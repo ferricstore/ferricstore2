@@ -5,7 +5,7 @@ use super::{I, N, TestResult, fixtures as f};
 #[test]
 fn source_history_metadata_ignores_unsupported_compound_values() -> TestResult {
     f::ready()?;
-    // Exact FlowCodecTest441: float1.5, nested map/list/tuple, one equality.
+    // Exact FlowCodecTest442: float1.5, nested map/list/tuple, one equality.
     let nodes = [
         N::Binary { bytes: 0..5 },
         N::FloatBits(1.5_f64.to_bits()),
@@ -101,7 +101,10 @@ fn history_metadata_preserves_order_nil_and_borrowed_bytes() -> TestResult {
                 && matches!(field.value, Cow::Borrowed(_)))
     );
     assert!(std::ptr::eq(fields[0].key.as_ref(), &raw const bytes[..1]));
-    assert!(std::ptr::eq(fields[0].value.as_ref(), &raw const bytes[8..]));
+    assert!(std::ptr::eq(
+        fields[0].value.as_ref(),
+        &raw const bytes[8..]
+    ));
     assert!(std::ptr::eq(fields[3].key.as_ref(), &raw const bytes[..1]));
     let pointer = fields.as_ptr();
     let moved = value.into_fields();

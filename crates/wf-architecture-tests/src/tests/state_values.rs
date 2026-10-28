@@ -20,6 +20,13 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::key::ordered::nested"),
         ("wf-domain", "policy::complete::record_projection"),
         ("wf-domain", "policy::complete::record_projection::nested"),
+        ("wf-domain", "history::metadata"),
+        ("wf-domain", "history::metadata::model"),
+        ("wf-domain", "history::metadata::budget"),
+        ("wf-domain", "history::metadata::scalar"),
+        ("wf-domain", "history::metadata::numeric"),
+        ("wf-domain", "history::metadata::numeric::float"),
+        ("wf-domain", "history::metadata::text"),
         ("wf-ports", "log::record_batch::response"),
         ("wf-ports", "log::claim"),
         ("wf-ports", "log::claim::apply"),
@@ -256,6 +263,11 @@ fn checkpoint_join_dependency_is_exact_and_layered() -> CheckResult<()> {
 
 fn assert_domain_values_stay_server_only() -> CheckResult<()> {
     for path in [
+        "history::metadata::OriginalHistoryMetadataField",
+        "history::metadata::OriginalHistoryMetadataLimits",
+        "history::metadata::OriginalHistoryMetadataError",
+        "history::metadata::PreparedOriginalHistoryMetadata",
+        "history::metadata::prepare_original_history_metadata",
         "workflow::request::gate::PointGateView",
         "workflow::request::gate::inspect_point_request",
         "workflow::indexed::TouchedIndexedGroupView",

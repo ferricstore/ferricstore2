@@ -23,6 +23,9 @@ CLAIM = "crates/wf-domain/tests/claim_selection.rs"
 FIFO = "crates/wf-domain/tests/claim_selection_fifo.rs"
 LANE = "crates/wf-domain/tests/claim_selection_lane.rs"
 LINKS = [
+    ("5baf7621b3712082", "crates/wf-domain/tests/history_metadata/source.rs",
+     "source_history_metadata_ignores_unsupported_compound_values", 1,
+     [(443, 0)]),
     ("5b12595d8af45093", "crates/wf-domain/tests/original_flow_value/source.rs",
      "source_value_codec_preserves_raw_escape_and_typed_roundtrips", 7,
      [(452, 0), (453, 1), (456, 2), (457, 3), (462, 4), (463, 5), (466, 6)]),
@@ -269,6 +272,19 @@ LINKS = [
 # These limits describe this counterpart's represented observations, rather
 # than the complete implementation status of another owner or milestone.
 LIMITS = {
+    "5baf7621b3712082": (
+        "Exact FlowCodecTest442 preserves float1.5, the nested:true map, nested binary list "
+        "and nested/true tuple; the direct equality at443 returns only float=>1.5. "
+        "Captured logical map order and leaf spans drive the actual pure normalizer. "
+        "The source declares ExUnit.Case async:true/flow and no local setup; original "
+        "umbrella/native/mandatory profiles and independent Linux acceptance remain required. "
+        "Seven compiled healthy-API rejections were committed in78ada59 before the body. "
+        "All seven complete local tails pass, including separately supplemental alias/order/"
+        "borrow, arbitrary integer/Latin1/short-float, invalid selected capture and resource "
+        "controls. Float goldens/round-trip samples and explicit captures are not VM "
+        "execution, canonical equality against every native float, public history service, "
+        "storage authority or full source/profile/workflow parity."
+    ),
     "deb8dc5136bd2e4e": "Executed original-input normalization preserves both exact workflow type names, keyword states opts, queued state, integer42 and the one-element non-keyword atom list. The shared direct rejection-kind/body macros execute for BOTH original recipes; each source error tuple maps to both observations. This covers the complete pure rejection observations using existing Rust descriptors, without a runtime term decoder or transport claim. The source ExUnit.Case async:true file has no case setup or special tags; its original umbrella helper/profile still requires execution. The actual normal mix test attempt stopped before tests at Mix.PubSub TCP socket :eperm, retained as setup failure. First Rust PASS and strict checks are macOS acceptance of existing implemented behavior, not tests-first RED, original source execution, independent Linux validation or full workflow parity. The separate FIFO helper observations have their own public-view counterpart; complete original-case/profile acceptance remains open.",
     "9e5df11d9c3d3842": "Executed original-input normalization preserves compact-policy, original keyword states opts and queued empty state policy. One direct full Result/canonical ETF equality proves normalization success, exactly the states/type fields, absent version/max_active_ms and exactly queued=>empty map; all four original assertions are linked to that complete literal equality. Independent grammar packing proves all60 expected bytes; it is not an externally promised legacy wire format. The source ExUnit.Case async:true file has no case setup or special tags; original umbrella helper/profile execution still requires a usable Mix environment. Actual mix test stopped before tests at Mix.PubSub TCP socket :eperm. Existing-behavior Rust/macOS PASS adds neither retroactive TDD, independent Linux acceptance, source runtime/profile execution nor full workflow parity. The third execution-mode/FIFO observations now have a separate public-view counterpart; complete original-case/profile acceptance remains required.",
     "3cc1821bd694c95e": 'Executed original ordered-policy normalization preserves the exact keyword states recipe with queued FIFO and review parallel. The actual flow_policy_v1 reader and charged public reply resolver supply queued/review/undeclared modes and the complete two-row map before ordinary Rust set/any/queued/review predicates; actual Absent supplies an empty map and nil false. Nine original assertions map to direct success/mode/full-map/set/predicate macros in the named test, including both empty-map and false observations for nil. The two same-file helpers only construct the original raw recipe or mechanically inspect charged product map rows; they implement no mode fallback or FIFO business logic. This is the reviewed Rust public-view semantic counterpart, with no new named FIFO helper API. The explicit generation1 envelope and same-byte states span5 identity-order correspondence are represented fixtures, not VM/native map-order capture, authoritative storage or failure-order parity. A first attempt lacking required all-state correspondence failed InvalidAuthority; the fixture was corrected without changing production or claiming tests-first RED. All eleven retry-policy tests and strict lint pass on macOS; the mutable-output extractor refinement preserves the complete old13790-byte prefix and original observations. Original ExUnit.Case async:true umbrella setup/helper/profile execution remains required: the real source attempt stopped before assertions at Mix.PubSub TCP socket :eperm. No source runtime, transport, full source-case/workflow parity, independent Linux acceptance or measured performance is certified.',

@@ -107,3 +107,20 @@ fn history_metadata_formats_short_finite_floats() -> TestResult {
     }
     Ok(())
 }
+
+#[test]
+fn history_metadata_uses_even_shortest_float_ties() -> TestResult {
+    f::ready()?;
+    for (bits, expected) in [
+        (0xc2eb_754f_8947_92c4, "-241525276163222.12"),
+        (0x4313_4561_cab8_089d, "1356077718176295.2"),
+        (0x431e_2a11_9f8f_b7d1, "2122626120281588.2"),
+        (0x4303_e147_1692_a07a, "699464999392271.2"),
+        (0x430d_31bd_0d4f_caea, "1027182795815261.2"),
+        (0x431c_4a88_62dc_d185, "1990812245636193.2"),
+        (0x42d9_6792_08ce_8dc8, "111730489506359.12"),
+    ] {
+        assert_eq!(f::rendered(b"k", N::FloatBits(bits))?, expected.as_bytes());
+    }
+    Ok(())
+}
