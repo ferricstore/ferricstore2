@@ -56830,3 +56830,46 @@ are hash-exact. Main manifest/mapping/ledger/runtime bindings remain unchanged.
 Save this genuine rejecting feature checkpoint before Stage A bodies. Primary
 remains clean at22c42c8 with its1275-case quality checkpoint; no durable Step,
 source-case, native, Linux or completed-goal credit is claimed.
+
+M2-STEP-CODEC1 first-body review: compiled borrowed scan must retain the actual
+header field references, rather than the shorter elided borrow returned by
+RawHeader.scope; fix only that new callsite. The consuming encoder explicitly
+drops the transferred request after emission and before whole-frame hashing;
+this releases input owners at the intended boundary and satisfies the existing
+pass-by-value lint without suppression or cloning. No grammar body existed
+before32f9045. Strict focused Clippy now exits0.
+
+Actual first body run has5pass/1fail. Wire/goldens, all caller/preparation identity
+variants, complete malformed/legacy refusals and actual decoded Step reduction
+pass. The resource case reaches its oversized-payload assertion and fails:
+the frozen test expects ByteLimit for payload33 over inline32. Existing shared
+Writer.raw/Reader field bounds use ValueLimit; ByteLimit denotes the aggregate
+frame. Do not rewrite the shared production vocabulary to fit my mistaken
+test oracle. The first-body receipt preserves the complete failure and old hash.
+
+M2-STEP-CODEC1-ORACLE1 solo selection BEFORE correction: first append exactly
+step_codec_field_caps_precede_workspace_on_both_entries to EXISTING limits.rs.
+Require the precise ValueLimit with workspace0 for encode payload33/inline32,
+then construct a legitimate packet under inline33 and require ValueLimit at
+decode inline32/workspace0. This is after-body conformance, not RED. Once it
+confirms the actual shared contract, correct ONLY the wrong ByteLimit token in
+the saved resource case to ValueLimit. Preserve every input,32/33 boundary,
+zero-workspace precedence, other error and old-case assertion. Removing the new
+function and reversing that one documented token must recover the entire R0
+file. No production error remapping or broader oracle relaxation is selected.
+
+M2-STEP-CODEC1-ORACLE1 executed: the supplemental encode/decode control passes
+with ValueLimit before workspace admission. Only the selected ByteLimit token
+was corrected in the saved case; the seven complete focused tails and strict
+focused Clippy now pass. This correction is explicit, not an unchanged-test claim.
+
+M2-STEP-CODEC1-PURITY1 solo review BEFORE classifier repair: the new three exact
+effect probes run against the existing classifier and genuinely fail at
+wf-ports::log::record_batch::step_continue (missing standard-library effect
+diagnostic). Actual focused runtime exits101:0pass/1fail/44filtered. Preserve
+this log and checkpoint before changing the classifier. Select exactly one
+prefix, log::record_batch::step_continue, in the existing pure ports prefix
+list. Its facade and private descendants must reject the same effects as the
+existing codecs. No allowlist widening, exemption, new artifact or production
+dependency is selected. ADR006 and architecture enforcement must describe this
+stricter boundary. Root performs this solo review; no peer review is claimed.

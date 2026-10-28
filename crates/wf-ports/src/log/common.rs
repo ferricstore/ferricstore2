@@ -7,6 +7,46 @@ use wf_types::version::{CommittedTime, HlcTimestamp, TimestampMillis};
 
 use super::{CodecLimits, reader::Reader};
 
+// Only the two explicit singleton codecs use this header. Recovery and legacy
+// generic preparation retain their independent closed profile allowlists.
+pub(super) fn singleton_header<'input>(
+    reader: &mut Reader<'input>,
+    expected_intent: u16,
+) -> Result<RawHeader<'input>, CodecError> {
+    if reader.take(4)? != b"FWCP" {
+        return Err(CodecError::Malformed);
+    }
+    if reader.u16()? != 1 {
+        return Err(CodecError::UnsupportedVersion);
+    }
+    if reader.byte()? != 1 {
+        return Err(CodecError::UnsupportedTag);
+    }
+    let tenant = reader.nonempty(8_192)?;
+    let group = reader.nonempty(256)?;
+    let recovery = reader.nonempty(256)?;
+    let request = reader.nonempty(256)?;
+    if reader.u16()? != expected_intent {
+        return Err(CodecError::UnsupportedVersion);
+    }
+    let intent = match expected_intent {
+        7 => ClientIntent::atomic_start(reader.fixed()?),
+        10 => ClientIntent::step_continue(reader.fixed()?),
+        _ => return Err(CodecError::UnsupportedVersion),
+    };
+    let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;
+    let stamp = CommittedTime::new(hlc, reader.u64()?).map_err(|_| CodecError::Malformed)?;
+    Ok(RawHeader {
+        operation_tag: 1,
+        tenant,
+        group,
+        recovery,
+        request,
+        intent,
+        stamp,
+    })
+}
+
 /// Borrows supported Normal profile/scope/stamp facts without validating its body.
 /// Complete intent, operations, derived keys and EOF remain the driver's duty.
 /// # Errors

@@ -224,6 +224,9 @@ impl DecodedRequest<'_> {
             {
                 [value.payload.as_deref(), None]
             }
+            Operation::StepContinue(value) if self.request.intent.version() == 10 => {
+                [value.payload.as_deref(), None]
+            }
             Operation::StartAndClaim(_) | Operation::StepContinue(_) => return None,
             Operation::Complete(value) | Operation::Fail(value) => {
                 [value.payload.as_deref(), value.value.as_deref()]

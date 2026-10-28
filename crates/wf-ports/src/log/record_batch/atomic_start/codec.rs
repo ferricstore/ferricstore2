@@ -4,7 +4,6 @@ use sha2::{Digest, Sha256};
 use wf_domain::workflow::request::{ClientIntent, RequestScope};
 use wf_domain::workflow::{CommittedCommand, Operation, StartAndClaim};
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, RequestId, TenantId};
-use wf_types::version::{CommittedTime, HlcTimestamp};
 
 use crate::consensus::{PreparedBatchItem, PreparedOperation, PreparedRequest};
 use crate::log::common::RawHeader;
@@ -157,34 +156,7 @@ fn write(
 }
 
 fn header<'input>(reader: &mut Reader<'input>) -> Result<RawHeader<'input>, CodecError> {
-    if reader.take(4)? != b"FWCP" {
-        return Err(CodecError::Malformed);
-    }
-    if reader.u16()? != 1 {
-        return Err(CodecError::UnsupportedVersion);
-    }
-    if reader.byte()? != 1 {
-        return Err(CodecError::UnsupportedTag);
-    }
-    let tenant = reader.nonempty(8_192)?;
-    let group = reader.nonempty(256)?;
-    let recovery = reader.nonempty(256)?;
-    let request = reader.nonempty(256)?;
-    if reader.u16()? != 7 {
-        return Err(CodecError::UnsupportedVersion);
-    }
-    let intent = ClientIntent::atomic_start(reader.fixed()?);
-    let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;
-    let stamp = CommittedTime::new(hlc, reader.u64()?).map_err(|_| CodecError::Malformed)?;
-    Ok(RawHeader {
-        operation_tag: 1,
-        tenant,
-        group,
-        recovery,
-        request,
-        intent,
-        stamp,
-    })
+    common::singleton_header(reader, 7)
 }
 
 fn preflight(encoded: &[u8], limits: CodecLimits) -> Result<(), CodecError> {
