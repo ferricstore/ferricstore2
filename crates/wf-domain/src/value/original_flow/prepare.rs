@@ -48,23 +48,49 @@ pub fn prepare_original_flow_value_with_init_pid(
 
 /// Prepare deterministic uncompressed bare ETF, including binary roots.
 /// # Errors
-/// This rejecting TDD facade has no implementation yet.
+/// Rejects malformed logical inputs, missing reached initialization-PID capture,
+/// independent operational limits and actual reservation failure.
 pub fn prepare_original_external_term(
-    _input: OriginalValueInput<'_>,
-    _limits: OriginalValueEncodeLimits,
+    input: OriginalValueInput<'_>,
+    limits: OriginalValueEncodeLimits,
 ) -> Result<PreparedOriginalExternalTerm, OriginalValueEncodeError> {
-    Err(OriginalValueEncodeError::InvalidInput)
+    prepare_external_captured(input, None, limits)
 }
 
 /// Prepare bare ETF with an explicit encoder initialization-PID capture.
 /// # Errors
-/// This rejecting TDD facade has no implementation yet.
+/// Rejects invalid capture/data, operational ceilings and failed reservations.
 pub fn prepare_original_external_term_with_init_pid(
-    _input: OriginalValueInput<'_>,
-    _init_pid: usize,
-    _limits: OriginalValueEncodeLimits,
+    input: OriginalValueInput<'_>,
+    init_pid: usize,
+    limits: OriginalValueEncodeLimits,
 ) -> Result<PreparedOriginalExternalTerm, OriginalValueEncodeError> {
-    Err(OriginalValueEncodeError::InvalidInput)
+    prepare_external_captured(input, Some(init_pid), limits)
+}
+
+fn prepare_external_captured(
+    input: OriginalValueInput<'_>,
+    init_pid: Option<usize>,
+    limits: OriginalValueEncodeLimits,
+) -> Result<PreparedOriginalExternalTerm, OriginalValueEncodeError> {
+    use std::mem::size_of;
+    let mut budget = budget::Budget::new(limits)?;
+    let fixed = budget::add(
+        fixed_bytes()?,
+        budget::add(
+            size_of::<PreparedOriginalExternalTerm>(),
+            size_of::<Result<PreparedOriginalExternalTerm, OriginalValueEncodeError>>(),
+        )?,
+    )?;
+    budget.spend(fixed)?;
+    budget.admit(fixed)?;
+    let layout = layout::build(input, init_pid, &mut budget)?;
+    let bytes = write::run_external(&layout, &mut budget)?;
+    Ok(PreparedOriginalExternalTerm {
+        bytes,
+        work_units: budget.work,
+        temporary_bytes: budget.peak,
+    })
 }
 
 fn prepare_captured(

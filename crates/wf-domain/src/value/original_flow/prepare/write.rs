@@ -70,13 +70,25 @@ pub(in crate::value::original_flow::prepare) fn run(
     if let Some(bytes) = scalar::raw(view, view.input.root)? {
         return raw(bytes, budget);
     }
-    let size = budget.encoded(add(6, view.plan(view.input.root)?.size)?)?;
+    term(layout, b"FSV2\x02\x83", budget)
+}
+
+pub(in crate::value::original_flow::prepare) fn run_external(
+    layout: &Layout<'_>,
+    budget: &mut Budget,
+) -> Result<Vec<u8>, E> {
+    term(layout, b"\x83", budget)
+}
+
+fn term(layout: &Layout<'_>, header: &[u8], budget: &mut Budget) -> Result<Vec<u8>, E> {
+    let view = layout.view();
+    let size = budget.encoded(add(header.len(), view.plan(view.input.root)?.size)?)?;
     let mut output = Output {
         bytes: budget.reserve(size)?,
         expected: size,
     };
     let mut stack = budget.reserve::<EmitFrame>(frames(view.input.nodes.len())?)?;
-    output.put(b"FSV2\x02\x83", budget)?;
+    output.put(header, budget)?;
     push(view, &mut stack, EmitFrame::Node(view.input.root), budget)?;
     while let Some(frame) = stack.pop() {
         budget.spend(1)?;

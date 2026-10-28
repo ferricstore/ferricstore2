@@ -161,3 +161,18 @@ fn shared_term_codec_dependency_snapshots_cannot_drift() -> TestResult {
     }
     Ok(())
 }
+
+#[test]
+fn shared_term_codec_dependency_inventory_rejects_unreviewed_files() -> TestResult {
+    let resources = TestResources::new()?;
+    let target = resources.path().join("tests/reference");
+    copy_tree(&workspace_root().join("tests/reference"), &target)?;
+    check_reference(resources.path())?;
+    fs::write(
+        target.join("elixir-dependencies/unreviewed.exs"),
+        b"unreviewed source",
+    )?;
+    let error = check_reference(resources.path()).err();
+    assert!(error.is_some_and(|error| error.to_string().contains("workflow dependency snapshot")));
+    Ok(())
+}

@@ -33,7 +33,7 @@ pub struct OriginalValueEncodeLimits {
     pub max_edges: usize,
     /// Maximum logical nesting, including list aliases.
     pub max_depth: usize,
-    /// Maximum complete stored output length, including wrappers.
+    /// Maximum complete selected output; the stored profile includes its wrapper.
     pub max_encoded_bytes: usize,
     /// Maximum continuous validation, comparison and emission work.
     pub max_work_units: usize,

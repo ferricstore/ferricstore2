@@ -9,6 +9,8 @@ use serde::Deserialize;
 
 use crate::{CheckError, REFERENCE_MANIFEST_SHA256, SOURCE_COMMIT, artifact};
 
+mod dependencies;
+
 const MANIFEST_PATH: &str = "tests/reference/workflow-test-manifest.json";
 const BASELINE: &str = "tests/reference/elixir-baseline";
 const DIRTY: &str = "tests/reference/elixir-working-tree";
@@ -21,7 +23,7 @@ const DIRTY_COUNT: usize = 9;
 /// Verified artifact totals, with no runtime-case or passing-test count.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct ReferenceSummary {
-    /// Number of byte-exact pinned source/support/fixture files.
+    /// Primary inventory files; shared dependency snapshots are checked separately.
     pub files: usize,
     /// Number of navigational textual declarations, not `ExUnit` cases.
     pub declarations: usize,
@@ -97,6 +99,7 @@ pub(crate) fn load(root: &Path) -> Result<(Manifest, ReferenceSummary), CheckErr
     verify_declarations(&manifest, &sources)?;
     verify_dirty(root, &manifest)?;
     let static_require_edges = verify_closure(&sources)?;
+    dependencies::check(root)?;
     let summary = ReferenceSummary {
         files: manifest.files.len(),
         declarations: manifest.declarations.len(),

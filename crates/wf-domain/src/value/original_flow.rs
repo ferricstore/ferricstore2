@@ -89,13 +89,27 @@ pub fn decode_original_flow_value(
 
 /// Decode exactly one safe-table-checked bare external term, without FSV2 inference.
 /// # Errors
-/// This rejecting TDD facade has no implementation yet.
+/// Malformed/compressed/trailing bytes use the existing invalid-value lane.
+/// Missing compatibility context, limits and actual reservations remain distinct.
 pub fn decode_original_external_term(
-    _encoded: Vec<u8>,
-    _context: &OriginalValueContext<'_>,
-    _limits: OriginalValueLimits,
+    encoded: Vec<u8>,
+    context: &OriginalValueContext<'_>,
+    limits: OriginalValueLimits,
 ) -> Result<OriginalValueDocument, OriginalFlowValueError> {
-    Err(OriginalFlowValueError::InvalidFlowValue)
+    let mut budget = Budget::new(limits, (encoded.len(), encoded.capacity()))?;
+    let mut document = OriginalValueDocument {
+        encoded,
+        nodes: Vec::new(),
+        edges: Vec::new(),
+        root: 0,
+    };
+    decode::parse(
+        &mut document,
+        &ValueEncoding::Etf { version_offset: 0 },
+        context,
+        &mut budget,
+    )?;
+    Ok(document)
 }
 
 enum ValueEncoding {

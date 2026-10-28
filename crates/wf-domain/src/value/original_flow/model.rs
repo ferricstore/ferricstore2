@@ -14,7 +14,7 @@ pub struct OriginalValueDocument {
 }
 
 impl OriginalValueDocument {
-    /// Borrow the complete stored input, including its wrapper bytes.
+    /// Borrow the complete selected decoder input, including any stored wrapper.
     #[must_use]
     pub fn encoded(&self) -> &[u8] {
         &self.encoded

@@ -56348,3 +56348,32 @@ The actual Rust compressed constant is independently decompressed to the exact
 12304-byte ETF body for the source tuple/repeated1024 binary; its SHA2e102e26315e94a7df6f4b7ea736137caee9d423214ad47196ecbbd6c628e0f9 is
 saved in the source-recipes receipt. No VM or native zlib execution is claimed.
 Commit this genuine rejecting checkpoint before implementing either behavior.
+
+EXTERNAL-TERM1 first body/solo review: saved2c6f9a3 precedes both bodies. Focused
+strict Clippy exits0; all SEVEN codec full tails pass unchanged, including all
+six original assertions, valid compressed recipe/actual producer equality,
+explicit binary/stored profiles, exact encode metrics/cuts, moved decode owner/
+work/capacity cuts, source map ordering/captured initialization PID and2048-deep
+iterative tuple roundtrip. All SEVEN reference CLI tests pass, including existing
+six and the new corruption/removal test. Main source/ledger/mapping stay exact.
+
+EXTERNAL-TERM1-CLOSURE1 review BEFORE extra test/body: the new hash guard checks
+the two named dependency snapshots but still ignores unreviewed files added to
+that separate root. Close that inventory just like the primary snapshot. Select
+one appended function in EXISTING cli.rs:
+shared_term_codec_dependency_inventory_rejects_unreviewed_files. It first passes
+the real reference check, then adds an unknown source under elixir-dependencies
+and requires the dependency-inventory refusal. Save its actual current-body RED
+before repair. Then in EXISTING dependencies.rs collect the two expected paths
+and compare with existing artifact::snapshot_paths for that root. Reuse existing
+portable/symlink-safe traversal; add no model, schema, dependency or primary
+manifest change. Existing R0 functions/oracles stay unchanged. This is an honest
+after-body integrity finding, not earlier saved failing evidence.
+
+EXTERNAL-TERM1-CLOSURE1 genuine SAVE: actual current-body execution compiles
+then exits101 with0 pass/1 fail/0 ignored/7 filtered. The real positive reference
+check succeeds, an unknown dependency source is added, and the assertion FAILS
+because the named-hash-only guard accepts it. No inventory comparison exists.
+/private/tmp/ferricstore2-external-term-inventory-genuine-r0.json retains the
+complete log and guard/test source hashes. Commit this genuine after-body RED
+with the passing initial implementation before adding inventory closure.
