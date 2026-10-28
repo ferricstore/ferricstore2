@@ -46,6 +46,9 @@ fn magnitude<'a>(
 }
 
 pub(super) fn equal(a: M<'_, '_>, b: M<'_, '_>, budget: &mut Budget) -> Result<bool, E> {
+    if let M::Float(value) = b {
+        return equal_float(a, value, budget);
+    }
     let mut left = [0; 16];
     let mut right = [0; 16];
     let a = magnitude(a, &mut left, budget)?;
@@ -55,6 +58,65 @@ pub(super) fn equal(a: M<'_, '_>, b: M<'_, '_>, budget: &mut Budget) -> Result<b
     };
     budget.spend(add(add(ab.len(), bb.len())?, 1)?)?;
     Ok(an == bn && ab == bb)
+}
+
+fn equal_float(a: M<'_, '_>, value: f64, budget: &mut Budget) -> Result<bool, E> {
+    let mut left = [0; 16];
+    let a = magnitude(a, &mut left, budget)?;
+    budget.spend(129)?;
+    let mut floating = [0; 128];
+    let b = float_magnitude(value, &mut floating, budget)?;
+    let (Some((an, ab)), Some((bn, bb))) = (a, b) else {
+        return Ok(false);
+    };
+    budget.spend(add(add(ab.len(), bb.len())?, 1)?)?;
+    Ok(an == bn && ab == bb)
+}
+
+fn float_magnitude<'a>(
+    value: f64,
+    scratch: &'a mut [u8; 128],
+    budget: &mut Budget,
+) -> Result<Option<(bool, &'a [u8])>, E> {
+    budget.spend(512)?;
+    let bits = value.to_bits();
+    let exponent = i32::try_from((bits >> 52) & 2047).map_err(|_| E::InvalidInput)?;
+    if exponent == 2047 {
+        return Ok(None);
+    }
+    let mut mantissa = bits & ((1_u64 << 52) - 1);
+    let shift = if exponent == 0 {
+        -1074
+    } else {
+        mantissa |= 1 << 52;
+        exponent - 1075
+    };
+    if mantissa == 0 {
+        return Ok(Some((false, &scratch[..0])));
+    }
+    if shift < 0 {
+        let remove = shift.unsigned_abs();
+        if remove >= 64 || mantissa & ((1_u64 << remove) - 1) != 0 {
+            return Ok(None);
+        }
+        mantissa >>= remove;
+        scratch[..8].copy_from_slice(&mantissa.to_le_bytes());
+    } else {
+        let shift = usize::try_from(shift).map_err(|_| E::InvalidInput)?;
+        for bit in 0..53 {
+            if mantissa & (1 << bit) != 0 {
+                let position = add(shift, bit)?;
+                let byte = scratch.get_mut(position / 8).ok_or(E::InvalidInput)?;
+                *byte |= 1 << (position % 8);
+            }
+        }
+    }
+    budget.spend(129)?;
+    let mut end = scratch.len();
+    while end > 0 && scratch[end - 1] == 0 {
+        end -= 1;
+    }
+    Ok(Some((bits >> 63 != 0, &scratch[..end])))
 }
 
 pub(super) fn write(

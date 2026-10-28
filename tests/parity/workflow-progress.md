@@ -12,7 +12,9 @@ decoded expectations replace the source's native implementation comparison in
 Rust; this does not execute or certify the NIF-versus-Elixir comparison. The
 source terminal refs/meta, compact omissions/context and long lengths remain
 exact. All eight saved rejecting cases now pass their complete tails, with one
-separate after-body carry-vector case. The ledger has 129 derived declarations,
+separate after-body carry-vector case. A later genuine numeric-equality
+regression and signed exponent-range property also pass, with their distinct
+test-first and after-body provenance retained. The ledger has 129 derived declarations,
 143 counterparts and 589 links, preserving every earlier counterpart and
 runtime binding. Native comparison/capture, JSON injection, public/durable
 history integration and required profiles/platforms remain open.

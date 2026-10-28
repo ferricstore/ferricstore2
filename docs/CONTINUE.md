@@ -2,26 +2,30 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
-Work in progress on `codex/compact-history-codec`: the original FSH2 history
-codec now passes all eight full tails frozen in `f217eee` before behavior, plus
-one separate after-body wide-integer carry case. Focused strict Clippy passes.
+The original FSH2 history codec now passes all eight full tails frozen in
+`f217eee` before behavior,
+the later equality regression saved in `bab403e`, and two separate after-body
+carry/exponent cases. All 11 focused tests and strict Clippy pass.
 Shared measurement/emission, complete borrowed validation and flat field
 rendering preserve source primitives, flags, defaults, permissive wire and EOF.
 The snapshot is borrowed after Clippy caught an avoidable 496-byte control copy.
 Independent 95/51/249-byte recipes preserve terminal/ref/meta, compact/context
 and multibyte scenarios; native NIF-versus-Elixir execution remains required.
 The checked ledger now adds three pure-format counterparts and 18 links,
-retaining every earlier counterpart and runtime binding. Full workspace
-validation is pending; no complete source/profile parity is claimed.
+retaining every earlier counterpart and runtime binding. All 12 final direct
+validation gates pass with 1,275 Rust cases; no complete source/profile parity
+is claimed.
 The first full pipeline passed 1,273 cases with all prior 1,264 identities
 retained. Subsequent review found a pure numeric-equality mismatch for an
-integral floating snapshot time. A separate genuine regression now fails before
-its correction; the first full run is archived separately. Public/native time
-validation is not inferred from this permissive pure helper contract.
+integral floating snapshot time. Its separately saved regression now passes
+after exact magnitude comparison; the first full run is archived separately.
+All 2,048 signed integer powers across exponents 0–1023 and their exact neighbors
+pass the additional property. Public/native time validation is not inferred
+from this permissive pure helper contract.
 See COMPACT-HISTORY1 in the coordination record and
 `/private/tmp/ferricstore2-compact-history-{source-recipes,genuine-r0}.json`.
-The primary checkout remains clean at `b798485`; the last fully verified
-checkpoint below is distinct from this feature branch awaiting full validation.
+Final preservation, execution and adoption evidence is recorded below; the
+full source/profile/platform and runtime milestone goal remains active.
 
 The two shared `TermCodecTest` scenarios now use explicit bare ETF preparation
 and decoding over the existing layout/writer/parser. Bare binary roots are ETF;
@@ -109,17 +113,29 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,264 tests across 108
+The current local Rust quality checkpoint passes all 1,275 tests across 109
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,255 case and
-adds seven bare external-term scenarios plus two dependency-integrity cases.
+15 targets. Exact identity comparison preserves every earlier 1,264 case and
+adds 11 compact history/source/numeric/resource cases. The interim 1,273-case
+checkpoint is also retained exactly.
 All 53 architecture cases pass. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
 advisory fetch or Linux execution is claimed.
 
-The final codec checkpoint retains ten complete old-file inverses, all other
+The compact history checkpoint retains four complete old-file inverses and
+all other 1,717 original non-Markdown inputs byte-exact. The eight unchanged
+R0 files, original numeric prefix and complete later equality-regression prefix
+are exact. Reversing only the Float dispatch/helpers and fixed scratch charge
+recovers the complete prior number/budget files, including ordinary integer
+comparison/emission and fees. All 1,736 frozen inputs, including 1,147 Rust
+files, match the tested tree. Final receipts are
+`/private/tmp/ferricstore2-compact-history-{inverses,pipeline,full-identity,full-parity}.json`.
+The first passing run before the extra equality finding is retained separately
+under `/private/tmp/ferricstore2-compact-history-before-equality/`.
+
+The preceding bare ETF checkpoint retains ten complete old-file inverses, all other
 1,701 original non-Markdown inputs byte-exact, nine saved new test/snapshot
 files and both saved CLI test checkpoints. All 1,721 frozen validation inputs,
 including 1,132 Rust files, match the tested tree. Final receipts are
@@ -129,8 +145,10 @@ The first failing validation is retained separately under
 
 The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
 literals and 84 test function identities. All files remain within the existing
-400/600-line caps. The parity ledger now has 140 counterparts and 571 links
-across 126 derived declarations. The history metadata increment adds one source
+400/600-line caps. The parity ledger now has 143 counterparts and 589 links
+across 129 derived declarations. Compact history adds three counterparts and
+18 source links while preserving every earlier 140 counterpart and runtime
+binding. The preceding history metadata increment added one source
 counterpart/link while preserving every earlier entry, runtime binding and
 immutable reference/mapping byte-exact. The preceding
 codec increment added two source entries while preserving all 137 earlier
@@ -3420,8 +3438,8 @@ every original reference input and frozen `workflow-mapping.json` is preserved.
 The two separately guarded TermCodec dependency snapshots are additional inputs;
 their native registration, compiler lineage, profiles and final inventory
 consolidation remain required without main-ledger credit. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **126 reviewed
-source declarations, 140 counterpart records and 571 assertion links**. Links
+[progress ledger](../tests/parity/workflow-progress.json) now has **129 reviewed
+source declarations, 143 counterpart records and 589 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

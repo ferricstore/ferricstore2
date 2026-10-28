@@ -165,3 +165,38 @@ fn compact_history_flags_use_exact_nonstrict_numeric_equality() -> TestResult {
     assert_eq!(unequal.as_bytes(), expected);
     Ok(())
 }
+
+#[test]
+fn compact_history_float_equality_covers_complete_integer_exponent_range() -> TestResult {
+    for exponent in 0..1024 {
+        let mut magnitude = vec![0; exponent / 8 + 1];
+        magnitude[exponent / 8] = 1 << (exponent % 8);
+        let mut neighbor = magnitude.clone();
+        neighbor[0] += 1;
+        let bits = u64::try_from(1023 + exponent)? << 52;
+        for negative in [false, true] {
+            let mut snapshot = f::empty();
+            snapshot.at = M::Float(f64::from_bits(bits | (u64::from(negative) << 63)));
+            snapshot.numbers[3] = M::BigInteger {
+                negative,
+                little_endian: &magnitude,
+            };
+            snapshot.numbers[4] = snapshot.numbers[3];
+            let equal = f::healthy(&snapshot, f::limits())?;
+            assert_eq!(equal.as_bytes(), b"FSH2\x01\x02e\x02\0\x02s");
+            snapshot.numbers[3] = M::BigInteger {
+                negative,
+                little_endian: &neighbor,
+            };
+            let unequal = f::healthy(&snapshot, f::limits())?;
+            assert_eq!(unequal.as_bytes().get(..5), Some(b"FSH2\x09".as_slice()));
+        }
+    }
+    for bits in [1, 1_u64 << 52, 1022_u64 << 52] {
+        let mut snapshot = f::empty();
+        snapshot.at = M::Float(f64::from_bits(bits));
+        let unequal = f::healthy(&snapshot, f::limits())?;
+        assert_eq!(unequal.as_bytes(), b"FSH2\x19\x02e\x02\0\x02s\x01\x01");
+    }
+    Ok(())
+}

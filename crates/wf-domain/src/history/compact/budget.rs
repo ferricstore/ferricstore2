@@ -43,7 +43,7 @@ impl Budget {
             output: 0,
         };
         // Named control covers both facade/result lanes, parser/writer/renderer
-        // descriptors and fixed 16/40-byte numeric scratch. The additional 1024
+        // descriptors and fixed 16/40/128-byte numeric scratch. The additional 1024
         // is a conservative logical helper cohort, not a native stack bound.
         let mut control = 1024;
         for size in [
@@ -51,6 +51,7 @@ impl Budget {
             size_of::<Limits>(),
             size_of::<Context<'_>>(),
             size_of::<OriginalCompactHistorySnapshot<'_, '_>>(),
+            size_of::<[u8; 128]>(),
             size_of::<PreparedOriginalCompactHistory>(),
             size_of::<DecodedOriginalCompactHistory<'_>>(),
             size_of::<OriginalCompactHistoryField<'_>>(),

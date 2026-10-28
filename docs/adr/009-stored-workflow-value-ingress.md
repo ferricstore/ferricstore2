@@ -24,7 +24,12 @@ scratch and fallibly reserved flat owners. Independent input, pair, encoded,
 decoded-output, work and requested-temporary limits are prospective.
 
 Eight real rejecting cases were saved in `f217eee` before these bodies. Their
-unchanged full tails and a separate after-body wide-carry case now pass locally.
+unchanged full tails now pass locally. A separate genuine regression saved in
+`bab403e` precedes exact integer/float equality in the pure flag helper; signed
+zero, fractions, wide powers and neighboring integers retain the source numeric
+comparison without integer-to-float rounding. Wide-carry and complete signed
+integer-exponent properties are additional after-body conformance. Float scratch
+is fixed and explicitly admitted; the ordinary integer path keeps its old body.
 Three independent FSH2 recipes preserve the pinned terminal/ref/meta,
 compact/context and multibyte scenarios. The native NIF-versus-Elixir comparison
 has not run here; native capture/profiles, service/durability integration and both

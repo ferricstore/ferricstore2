@@ -56639,3 +56639,69 @@ floating1.0 emits flags24 instead of0. Later signed-zero, negative, fractional,
 complete failing log and three test/number/budget source hashes. Save this
 current-body checkpoint before changing comparison or scratch charges. This
 remains pure helper behavior, not native acceptance of invalid public time data.
+
+COMPACT-HISTORY1-NUMERIC-EQUALITY1 repair review: strict focused Clippy and all10
+complete tests pass unchanged after bab403e. The original integer comparison
+body is byte-exact behind one Float dispatch, so ordinary integer timestamps
+do not initialize float scratch. Float comparison uses exact finite integral
+binary magnitudes, independently charged128-byte fixed control and prepaid
+initialization/conversion work. No integer-to-float rounding or new variable
+owner is introduced. Signed zero, fractional inequality, negative equality and
+2^200 versus its nonrepresentable integer neighbor now reach their full tails.
+
+COMPACT-HISTORY1-EXPONENT1 solo selection BEFORE one after-body property case:
+append compact_history_float_equality_covers_complete_integer_exponent_range
+to EXISTING numeric.rs, preserving its complete bab403e prefix. Independently
+construct signed mathematical2^e captures for EVERY e=0..1023 and the matching
+finite IEEE powers, then require the literal omitted-field frame. For every
+power test its exact adjacent integer and require the created-only flag, without
+converting that integer to float. Include nonzero fractional/subnormal time
+against integer zero. This tests the newly added fixed128-byte boundary and
+precision rule across the entire exponent range; it is supplemental conformance,
+not additional pre-body RED or native VM evidence. Input fixture Vecs stay
+outside producer counters. No helper/file/type/module/model/dependency; the new
+test must naturally remain within100 lines. Then freeze the corrected tree for
+the final complete validation, keeping the first archived run distinct.
+
+COMPACT-HISTORY1-EXPONENT1 actual focused GREEN: strict Clippy and all11 tests
+pass. The additional property covers2048 signed mathematical powers across
+e=0..1023, every exact neighboring integer, plus three nonzero fractional/
+subnormal controls. Its fixture owners are outside producer budgets. Every
+saved R0/source assertion and full bab403e numeric prefix remains unchanged.
+No native VM, public floating-time acceptance or measured performance claim.
+Freeze the final corrected tree and run all quality gates before local adoption.
+
+COMPACT-HISTORY1 final solo validation/review: every final direct gate exits0:
+Python7, shell syntax, fmt, all-target check/strict Clippy, complete workspace
+tests, doctests/docs, reference, progress, cached offline audit and diff. Actual
+1275 Rust cases span109 executable targets (107 result targets+2 unchanged
+benchmark correctness smokes);53 architecture cases and6 doctests/15 targets
+pass. Complete Counter comparison retains every prior1264 case/108 target AND
+every interim1273 case/109 target. Added cases are exactly the saved8, wide carry,
+later genuine equality regression and exponent property. All1736 frozen inputs,
+including1147 Rust files, remain hash-exact through every final gate.
+
+Four complete baseline inverses recover history.rs, the architecture probe table,
+generator and entire prior ledger. All1717 other original inputs, all140 older
+counterparts/runtime bindings, eight R0 sources, original numeric prefix and
+complete bab403e numeric prefix remain exact. Removing only the Float dispatch
+and two functions restores the entire pre-equality number file; restoring the
+scratch comment/sizeof128 row restores its entire budget. No original stored
+codec, parser, frame, allocation/work fee, test assertion or native source was
+weakened. The ordinary integer path keeps its complete previous body. Float
+scratch is fixed/admitted/prepaid, and this is code/resource review with no
+native performance victory or independent peer-review claim.
+
+Final receipts /private/tmp/ferricstore2-compact-history-{inverses,pipeline,
+full-identity,full-parity}.json retain the exact logs, frozen input hashes and
+source correspondences. Complete test Counter SHA
+87c3141d078f6888be5dc8f2abb7a97d1765d6ce38d0efdfafa9143e1033db19.
+The first12-gate run before equality repair and both actual genuine RED receipts
+remain separate. Actual cargo parity exits1 for incomplete source/Rust behavior,
+setup/fixtures/adapters and profiles; ledger129/143/589 and runtime5903/4222/
+1681/1655 retain their distinct meaning. The three pure source equality links
+use independent recipes/expected fields, not native NIF-versus-Elixir execution.
+Record capture, context alias acquisition, JSON injection, public/durable history
+integration, all original profiles, Linux/macOS and complete M1–M8 acceptance
+remain required. Root adopts only after clean-baseline/frozen-input preflight;
+no agents, push, external messages or completed-goal claim. Full goal ACTIVE.
