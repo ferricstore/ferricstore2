@@ -1,6 +1,7 @@
 //! Owned source FSV2/ETF value compatibility, independent of policy envelopes.
 
 mod budget;
+mod compat;
 mod context;
 mod equality;
 mod model;
@@ -11,6 +12,7 @@ use crate::value::original_flow::budget::{Budget, reserve_exact};
 use crate::value::original_flow::context::ContextState;
 use crate::value::original_flow::scan::{ScanTarget, Scanner};
 
+pub use compat::decode_original_flow_value_compat;
 pub use model::{
     OriginalFlowValueError, OriginalValueContext, OriginalValueDocument,
     OriginalValueFunctionIdentity, OriginalValueLimits, OriginalValueNode,

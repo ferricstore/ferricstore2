@@ -16,5 +16,6 @@ use wf_domain::value::{
 
 mod context;
 mod scalars;
+mod source;
 mod structure;
 mod wrappers;

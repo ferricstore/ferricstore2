@@ -10,7 +10,8 @@ pub use original_flow::{
     OriginalFlowValueError, OriginalValueContext, OriginalValueDocument, OriginalValueEncodeError,
     OriginalValueEncodeLimits, OriginalValueFunctionIdentity, OriginalValueInput,
     OriginalValueLimits, OriginalValueNode, PreparedOriginalFlowValue, decode_original_flow_value,
-    prepare_original_flow_value, prepare_original_flow_value_with_init_pid,
+    decode_original_flow_value_compat, prepare_original_flow_value,
+    prepare_original_flow_value_with_init_pid,
 };
 
 /// A business rejection; no record or history write accompanies an error.

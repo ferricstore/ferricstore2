@@ -55393,3 +55393,83 @@ remaining workflow breadth, cleanup, complete source profiles and independent
 Linux/macOS acceptance remain required. Full goal ACTIVE; no agents, pushes,
 external messages or unchanged denied native probes. Adopt only this final
 verified state after checking the primary still has no unrelated changes.
+
+
+## ORIGINAL-VALUE-COMPAT1 — solo architecture selection before artifacts
+
+2026-10-28: previous goal turn is progress, adoptedac11eab and1,224 Rust cases.
+Revalidated primary clean and feature branch begins from the same tree. Continue
+solo. Pinned FlowCodecTest451 and469 require actual Codec.Support decode_value
+and decode_value_with_user_size fallback: malformed typed data returns the
+complete ETF suffix and its byte size. HistoryValues uses decode_value_result
+and must remain strict. Do not substitute strict rejection for the fallback
+assertions or count opaque compressed junk as the valid level9 source fixture.
+The generic TermCodecTest file is outside the frozen selected snapshot; do not
+fabricate an ID or mutate the immutable manifest to claim it mapped. These TWO
+frozen FlowCodec declarations are the current acceptance target.
+
+BEFORE creation select private value/original_flow/compat.rs and additive public
+decode_original_flow_value_compat(Vec<u8>,&OriginalValueContext,OriginalValueLimits)
+-> Result<(OriginalValueDocument,usize),OriginalFlowValueError>, reexported
+through existing original_flow.rs/value.rs. No new public model/dependency.
+R0 adds only its all-input Err(InvalidFlowValue) facade, links and tests.
+No shared parser move, fallback or user-size body until genuine RED is saved.
+
+After SAVE select private value/original_flow/decode.rs to share original raw/
+census/build/finish mechanics over one mutable owned Document. Original strict
+API uses the same Budget and exact ordering without extra fees. New compatibility
+API retains that document/input owner across InvalidFlowValue, drops paid partial
+node/edge spines and creates one Binary root over the original suffix. No byte
+clone, shrink, retry through a reset budget or decompression. Other error lanes
+(UnsupportedContext/UnsupportedProfile/InvalidLimits/Limit/ReserveFailed) remain
+errors. The complete input length AND capacity are checked first. Wrapper is
+classified once; user size excludes the five-byte FSV2 wrapper only for modes1/2,
+including ETF version for valid or invalid typed data. Failed-attempt work remains
+spent; cleanup and fallback reservation/copy liability are paid continuously.
+Extra compatibility tuple/control metadata is charged only on the additive API.
+Original context/scanner/equality implementation bodies stay unchanged. Record
+full strict-source/refactor inverses and run every preceding test identity.
+
+Select new test children original_flow_value/source.rs, source/fixtures.rs and
+source/limits.rs, linked from its existing main.rs. No fixture class/model.
+Three identities: source_value_codec_preserves_raw_escape_and_typed_roundtrips;
+source_typed_value_codec_returns_noncanonical_terms_without_deserializing;
+source_value_compat_keeps_operational_limits_and_owned_fallback. The first two
+preserve exact source payload-bytes, FSV1+ETF(%{old:true}), FSV2+2+not-a-term,
+%{kind:typed}, typed repeated1024, prefix, trailing-zero raw suffix/user size and
+valid compressed level9 inequality. Use the real encoder for every valid term.
+Independently generated stdlib-zlib9 golden bytes live as a small literal in
+fixtures.rs; verify decompression against the exact independent ETF map recipe
+and actual producer bytes. Fixture generation is not runtime decompression or
+VM execution. Third case covers strict unchanged, resource/profile refusal,
+closed versus missing safe tables, no budget reset and moved-buffer identity.
+Each reaches a real valid new-API positive before any masked tails. Save actual
+compiled runtime failures, then implement; no retroactive RED claim.
+
+Only after full tails pass add two reviewed generator/ledger counterparts for
+source IDs5b12595d8af45093/d7ba621e9eb64c5d with all direct source assertion
+anchors and explicit mathematical-context/native-profile/Linux limitations.
+Preserve every earlier record/runtime binding and immutable reference/mapping.
+The source tests are pure ExUnit async:true/flow helpers, not storage setup;
+physical services, complete profiles and native execution remain separate.
+Keep400/600 physical lines, function100/nesting4/cognitive25; no allowance,
+unsafe, agents, push, external messages or unchanged denied native probes.
+Root reviews design/performance/resource behavior solo, with no peer-review
+claim. Full product, source/profile and Linux/macOS goal remains ACTIVE.
+
+ORIGINAL-VALUE-COMPAT1 R0 execution: focused strict Clippy passes. The three
+compiled runtime cases all fail at the new facade's actual InvalidFlowValue
+rejection, exit101; no shared parser move or fallback body exists yet. Complete
+later source/context/ownership/budget tails remain masked and receive no GREEN
+claim. Receipt /private/tmp/ferricstore2-original-value-compat-genuine-r0.json
+pins all four source/test hashes and the exact runtime log. The typed source case
+first passes its real encoder prefix and independent ETF recipe controls.
+The level9 fixture independently expands to that same5136-byte ETF body,
+5137 including131; its59-byte compressed encoding has SHA256
+57832129dc5f573563b44812c8ee5dfa0be7a98c995ae674c51c7292631fd9d6.
+The stdlib generation/decompression receipt is
+/private/tmp/ferricstore2-original-value-compat-compressed.json. Primary format
+documentation confirms the expanded body excludes version131:
+https://www.erlang.org/doc/apps/erts/erl_ext_dist.html#overall-format
+No native VM fixture/profile or Linux result is claimed. Save this real RED
+checkpoint before implementing the selected shared parser and compatibility body.
