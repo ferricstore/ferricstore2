@@ -56447,3 +56447,125 @@ registration/compiler lineage/profiles/final inventory consolidation; no fabrica
 IDs, ledger credit, native VM, current Linux, performance victory or completed
 M1–M8/full-goal claim. Root adopts locally only after clean baseline/frozen-input
 preflight. No agents, push or external messages; full goal remains ACTIVE.
+
+## COMPACT-HISTORY1 — solo source/design selection before artifacts
+
+Baseline b798485 is clean in both adopted trees. Root continues solo under the
+latest user override. The previous goal turn is progress: real integration
+failure, bounded fixture correction, complete validation and local adoption.
+The existing five-subject pure M1 assessment already supplies its stated model
+duties. StepContinue's durable tags remain explicitly closed by ADR004; do not
+silently extend them while porting a different observation.
+
+Select the complete pure FSH2 per-event codec from the pinned original
+flow/codec.ex:289–694,1078–1143, codec/primitives.ex and codec/support.ex:112–123,
+182–190,237–270. Original FlowCodecTest declarations357,380,424 require terminal
+refs/meta, compact omission of immutable fields, context reconstruction and long
+length headers. Read the actual source and full base_record before selecting
+this contract. Existing normalized history metadata composes as actual ordered
+fields; do not invent another term parser or metadata normalizer.
+
+Approved new public pure child: history::compact at
+crates/wf-domain/src/history/compact.rs. New model home compact/model.rs owns
+OriginalCompactHistorySnapshot<'rows,'leaf>, OriginalCompactHistoryContext<'a>,
+OriginalCompactHistoryLimits, PreparedOriginalCompactHistory,
+OriginalCompactHistoryField<'a>, DecodedOriginalCompactHistory<'a> and
+OriginalCompactHistoryError. Reuse OriginalMetadataInput for arbitrary integer
+captures and existing OriginalHistoryMetadataField for normalized input pairs.
+Snapshot: binary event; captured version/at; optional binary state; seven captured
+numbers ordered priority,attempts,fence,created,updated,next-run,lease-deadline;
+five optional refs ordered owner,payload,result,error,rewound-event; immutable
+context id/type/parent/root/correlation; ordered normalized metadata. Context
+contains already resolved optional binary values, including empty binaries;
+acquiring atom/binary map aliases remains an explicit caller obligation.
+
+Public prepare_original_compact_history(snapshot,limits) returns owned FSH2 bytes
+and work/temporary metrics. Public decode_original_compact_history(bytes,context,
+limits) borrows bytes/context and returns the ordered 21 source base fields plus
+surviving metadata, preserving a nil event separately from empty binary. Numeric
+fields use source decimal/optional-decimal rules. Malformed/unsupported/trailing
+wire returns an empty field list; invalid profiles, resource/overflow and failed
+reservations remain distinct errors. Independent limits cover actual input
+occurrences, metadata count, complete encoded bytes, decoded field bytes,
+continuous work and prospective simultaneous requested owners. No native
+allocator/RSS/stack/OOM or measured speed claim.
+
+Complete format requirements: FSH2 header, source value+1 base128 primitives,
+nil0, exact13 presence flags and source defaults; integer zero/noninteger/
+negative/arbitrary magnitude and numeric equality; optional empty binary
+presence; arbitrary binary data, metadata order and duplicate normalized aliases.
+Decoder retains the original ten-byte/70-bit primitive bound, accepts supported
+nonminimal varints and unknown flag bits, consumes exact EOF, filters only
+nonbinary metadata pairs, and never imposes a new canonicalization rule.
+An encodable huge original integer can therefore produce bytes rejected by the
+original bounded decoder; preserve that distinction. Immutable fields never
+enter FSH2, and decode gets their actual caller context, with empty fallbacks.
+
+AFTER genuine RED, approved private helpers: compact/budget.rs with Budget;
+compact/primitives.rs with Reader, Output and DecodeError; compact/number.rs
+functions only; compact/encode.rs functions only; compact/decode.rs with Parsed;
+compact/project.rs functions only. Use one shared measure/emit grammar with
+fallible exact output reservations, borrowed payload slices, fixed numeric
+scratch and a flat metadata spine. Decode validates the complete frame before
+output owners, then renders fields and revisits metadata under the same charge.
+All allocations and copies are prospectively admitted; no whole payload clone,
+recursive owner, String decimal temporary, duplicate ETF machinery, dependency,
+authority, effect or policy allowance is selected. Keep400/600/function100/
+nesting4/cognitive25 without source packing or suppression.
+
+BEFORE bodies select one grouped target tests/original_compact_history/main.rs
+and private fixtures.rs, source.rs, numeric.rs, malformed.rs, limits.rs,
+metadata.rs. Main may define TestResult and import aliases M,S,C,L,P,D,E for
+existing/new API types. Exactly eight selected runtime cases:
+source_history_codec_keeps_terminal_metadata_and_refs;
+source_history_codec_omits_immutable_metadata_and_restores_context;
+source_history_codec_roundtrips_multibyte_length_headers;
+compact_history_numeric_presence_matches_original_primitives;
+compact_history_decoder_preserves_permissive_wire_and_empty_fallback;
+compact_history_metadata_preserves_order_and_filters_null_pairs;
+compact_history_encoding_admits_exact_resources;
+compact_history_decoding_admits_exact_resources.
+Source fixtures preserve every original value and assertion, using independent
+byte recipes rather than producer-derived expected output. Actual metadata
+normalization feeds the codec. Supplemental controls cover malformed prefixes/
+lengths/counts/EOF, permissive wire, arbitrary integers, nulls, duplicate/opaque
+metadata and exact resource boundaries. Start each case at a healthy new API
+against an all-input rejecting facade; save actual compiled runtime failures
+before any grammar, renderer or budget implementation. Technical repairs are
+not RED. Native NIF-versus-Elixir execution and original source setup/profiles
+remain required; independent fixture equality is not a native equivalence claim.
+
+Existing history.rs may add only the public child declaration. Existing
+architecture probes, architecture/ADR009/handoff/source-parity documentation,
+and progress generator/ledger may be updated after actual semantic review and
+passing source tails. Main immutable manifest/mapping/reference/runtime bindings
+stay exact. No new complete source-case passing status follows from this
+selection. Raw record_history_meta JSON capture/injection, native acquisition,
+public history service authority, durable integration and complete original
+source/profile/platform/M1–M8 acceptance remain required successors, not scope
+exclusions. Root performs and records its own design/performance/code review.
+
+COMPACT-HISTORY1 pre-RED technical/API correction: strict focused Clippy reports
+the captured snapshot is496 bytes and the test's by-value helper exceeds its
+256-byte guard. Select BEFORE changing the contract a shared borrow for both
+the public prepare entry and test helper/calls, and remove the snapshot's
+unneeded Copy/Clone derivation. It owns no data requiring transfer; returning
+the prepared byte owner has no input borrow. This avoids repeated control copies
+without Box allocation, suppressed lint or a native performance claim. No grammar
+or budget body exists, and this compile/lint finding is not runtime RED.
+
+COMPACT-HISTORY1 genuine R0 SAVE: after the borrowed-snapshot technical repair,
+strict focused Clippy exits0 without suppression. Actual compiled runtime exits101
+with0 pass/8 fail/0 ignored: all eight cases first reach the healthy encode call
+and observe InvalidInput. All wire/decode/source/resource tails remain masked.
+Both production entry points still reject every input, and compact/model.rs is
+the only child: no budget, primitive, grammar, parser or renderer exists.
+The actual three Rust fixtures independently match the source recipes at95/51/
+249 bytes. /private/tmp/ferricstore2-compact-history-genuine-r0.json saves complete
+log hashes, all ten authored source hashes and the pinned production/test source
+hashes. Removing only pub mod compact recovers the entire old history.rs; all
+other1720 prior non-Markdown inputs, immutable sources/mapping/ledger/runtime
+bindings are byte-exact. Save this genuine rejecting checkpoint BEFORE bodies.
+Primary remains clean at b798485 with its verified1264-case checkpoint. This
+feature branch intentionally has eight failing new cases until implementation;
+no full source, native, Linux or completed-goal credit is claimed.

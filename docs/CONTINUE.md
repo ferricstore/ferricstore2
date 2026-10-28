@@ -2,6 +2,19 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+Work in progress on `codex/compact-history-codec`: the original FSH2 history
+contract and eight new runtime cases are selected and saved before behavior.
+Focused strict Clippy passes; all eight tests genuinely fail at the rejecting
+healthy encode entry. Grammar, decoder, rendering and resource bodies remain
+unimplemented. The snapshot is borrowed after Clippy caught an avoidable
+496-byte control copy. Three independent byte recipes preserve the original
+terminal/ref/meta, compact/context and multibyte-length scenarios. No source
+equivalence or ledger credit is claimed while their tails are masked.
+See COMPACT-HISTORY1 in the coordination record and
+`/private/tmp/ferricstore2-compact-history-{source-recipes,genuine-r0}.json`.
+The primary checkout remains clean at `b798485`; the last fully verified
+checkpoint below is distinct from this intentionally rejecting feature branch.
+
 The two shared `TermCodecTest` scenarios now use explicit bare ETF preparation
 and decoding over the existing layout/writer/parser. Bare binary roots are ETF;
 stored FSV2 interpretation remains separate. The same moved input owner, exact
