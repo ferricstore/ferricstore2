@@ -93,12 +93,36 @@ fn ties_to_even(bits: u64, mantissa: u64, scale: i32) -> Result<u64, E> {
         (odd, factor)
     };
     let middle = u128::from(mantissa) * 2;
-    if (middle - 1).checked_mul(multiplier) == Some(target) {
+    if (middle - 1).checked_mul(multiplier) == Some(target)
+        && (fraction != 0 || exponent <= 1 || lower_neighbor_fits(exponent, scale, factor)?)
+    {
         mantissa.checked_sub(1).ok_or(E::InvalidInput)
     } else if (middle + 1).checked_mul(multiplier) == Some(target) {
         mantissa.checked_add(1).ok_or(E::InvalidInput)
     } else {
         Ok(mantissa)
+    }
+}
+
+fn lower_neighbor_fits(exponent: i32, scale: i32, factor: u128) -> Result<bool, E> {
+    // A normal power of two has half-sized spacing below it. Require the
+    // decimal half-spacing to fit that lower half-ULP, including its even bound.
+    if scale < 0 {
+        let shift = 1076 - exponent + scale;
+        if shift <= 0 {
+            return Ok(true);
+        }
+        Ok(1_u128
+            .checked_shl(u32::try_from(shift).map_err(|_| E::InvalidInput)?)
+            .is_some_and(|bound| bound <= factor))
+    } else {
+        let shift = exponent - 1076 - scale;
+        if shift < 0 {
+            return Ok(false);
+        }
+        Ok(1_u128
+            .checked_shl(u32::try_from(shift).map_err(|_| E::InvalidInput)?)
+            .is_none_or(|bound| factor <= bound))
     }
 }
 

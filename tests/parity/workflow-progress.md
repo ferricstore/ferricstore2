@@ -6,8 +6,21 @@ assertion links and optionally references actual coordinator-owned ExUnit
 registration. It has no pass/status or execution-proof fields. The full
 `require-parity` gate remains fail-closed.
 
-Two exact FlowCodecTest451/469 counterparts add eleven direct source links,
-bringing the ledger to125 derived declarations,139 counterparts and570 links.
+The new pure FlowCodecTest442/assertion443 counterpart preserves the complete
+float1.5/nested-map/list/tuple recipe and exact singleton equality. The ledger
+now has126 derived declarations,140 counterparts and571 links, with every earlier
+counterpart and runtime binding retained. Seven genuine API refusals were saved
+in78ada59 before normalization; two later separately saved regressions correct
+shortest float ties and asymmetric power-of-two intervals. All nine focused
+cases pass in the complete1,255-case local Rust checkpoint, including independent
+operational caps and borrowed binary text.
+The independent formatter probe reports zero digit mismatches across1028162
+finite samples, without native source-profile or complete canonical proof.
+The original async:true/flow file has no local setup; umbrella/native/mandatory
+profiles, accepted public history services and both platform runs remain required.
+
+The preceding exact FlowCodecTest451/469 counterparts added eleven source links,
+bringing that checkpoint to125 declarations,139 counterparts and570 links.
 Actual logical preparation and explicit compatibility decoding retain all raw,
 escape, typed-map, trailing-zero/user-size and valid compressed-payload checks.
 Three compiled rejecting cases were saved in e54c2dc before the fallback body;

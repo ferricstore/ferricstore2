@@ -22,7 +22,11 @@ An independent formatter comparison caught254 standard-Rust odd/even tie
 differences among999504 finite samples; a separate genuine failing case was
 committed before correction. Exact normalized binary/decimal midpoint checks
 choose the even significand. One standard digit conversion feeds both notation
-choices; fixed length is measured before construction. A32-byte private text
+choices; a normal power-of-two's narrower lower interval must also admit the
+neighbor before selecting it. A second genuine failing case precedes that guard.
+The extended independent probe reports zero mismatches across1028162 finite
+samples, retaining its earlier254 ordinary and two power-boundary failures.
+Fixed length is measured before construction. A32-byte private text
 buffer suffices, while the conservative control fee stays unchanged. Sampling
 and round-trip properties are mathematical evidence, without native VM/profile,
 allocator/RSS/OOM, measured speedup or independent Linux certification.

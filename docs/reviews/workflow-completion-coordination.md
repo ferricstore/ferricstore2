@@ -56173,3 +56173,67 @@ repair and all eight focused tails passed before this append. Receipt
 /private/tmp/ferricstore2-history-meta-power-genuine-r0.json saves exact current
 float/text/test and runtime/boundary-probe hashes. No interval guard exists.
 Commit this current-body failure before adding the selected integer guard.
+
+HISTORY-META1 correction follows saved85984b7: source shortest digits get exact
+tie-even correction only when the candidate also fits the actual round-trip
+interval. At normal powers of two above the subnormal boundary, the lower
+half-ULP is narrower; one checked integer comparison of powers2/5 enforces it.
+The existing4096 conversion cohort stays unchanged. Standard digit conversion
+runs once, and only the selected fixed candidate is constructed;32-byte text
+buffers replace384 without a fee relaxation or runtime dependency.
+
+Actual focused execution passes all NINE cases; all-target workspace Clippy
+also exits0. The unchanged extended probe now reports1028162 finite comparisons
+with ZERO digit mismatches, including every finite exponent, seven significand
+boundary patterns and both signs plus its million deterministic raw-bit inputs.
+This resolves the254 ordinary ties and two asymmetric interval failures.
+Receipts /private/tmp/ferricstore2-history-meta-{float-review,
+float-boundary-review,float-boundary-green}.json retain success/failure epochs
+and hashes; no native VM, exhaustive all-float canonical theorem, source profile,
+native allocation or speedup is inferred from this independent comparison.
+
+HISTORY-META1 complete preservation review: receipt
+/private/tmp/ferricstore2-history-meta-inverses.json proves FOUR complete existing
+file inverses: history.rs removes only its module line; state_values.rs removes
+only concrete new pure/server-only probe rows; the generator removes only this
+source's LINKS/LIMITS data; the ledger restores only this one new counterpart.
+Every prior counterpart/runtime binding and immutable manifest/reference/mapping
+is exact. Six R0 sources are byte-exact; the COMPLETE original scalar file is
+recovered after removing only its two after-body appended regressions. The
+complete source.rs inverse corrects only the one-line citation and normalizes
+the three documented pointer assertion wraps through rustfmt; every original
+token/argument/oracle remains. The complete final corrective R0 test file is
+hash-exact after the interval guard. No exception, dependency or source packing.
+
+HISTORY-META1 final pipeline84765 is terminal0: all twelve direct gates pass,
+including seven Python methods, shell syntax, formatting, all-target compiler/
+strict Clippy, all workspace targets, six doctests/fifteen targets, warnings-
+denied docs, reference/progress integrity, offline dependency audit and diff.
+All1711 non-Markdown validation inputs including1124 Rust files stayed frozen/
+hash-exact. Exact test Counter retains all earlier1246 cases and adds ONLY the
+nine selected metadata cases:1255 passing cases across107 executable targets,
+105 test-result targets and the two unchanged benchmark correctness smokes.
+All53 architecture cases pass. Counter SHA:
+6a2ee05bdc008e677e5e38a3f6e7366f1e451a56b7de0492b1fda30887e488cb.
+Receipts /private/tmp/ferricstore2-history-meta-{pipeline,full-identity}.json.
+
+The seven new production sources fit400 physical lines (largest186); all test
+files fit600 and function100/nesting4/cognitive25 remain strict. The actual
+pure namespace and all four public models/API reject effects and client leaks
+through the existing rules. No storage, retained-frame or old codec body changed.
+Scalar Cow owners preserve borrowed data; scratch is dropped before ownership
+release, complete buffers move, and work is never refunded/reset. Allocation
+requests/capacity surpluses remain separate from native OOM/RSS/speed claims.
+
+The actual ledger gate reports126 derived declarations/140 counterparts/571
+links, with5903 registered/4222 linked/1681 unmatched/1655 unresolved unchanged.
+Explicit collection regeneration is byte-idempotent. Actual require-parity exits1
+for incomplete required scope; /private/tmp/ferricstore2-history-meta-full-parity.json
+retains genuine output/hash and scope. All execution is local Darwin/arm64;
+offline dependency checks use the unchanged primary cache with explicit feature
+manifest. No fresh advisory fetch, native original profile or Linux result.
+Source setup/profiles, accepted history/typed services, remaining M1–M8 and full
+workflow/platform acceptance remain required. Full goal ACTIVE; work SOLO.
+Root reviewed design/source/resource/performance behavior; no independent peer
+review is claimed. Adopt only after primary remains clean afaf9ba and every
+frozen input is exact, using local fast-forward without push or native probes.

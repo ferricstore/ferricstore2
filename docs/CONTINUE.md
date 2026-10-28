@@ -8,8 +8,11 @@ ordered atom/binary key aliases, nil, borrowed binary/UTF8 text, arbitrary
 integers, Latin1 atoms and shortest finite float text under independent resource
 caps. Seven genuine API refusals were saved in `78ada59`. An independent
 formatter probe then caught254 odd/even tie differences; a separate rejecting
-case was saved in `26ae829` before the exact midpoint correction. All eight
-focused tails now pass. Complete workspace validation is pending. This adds one
+case was saved in `26ae829` before the exact midpoint correction. The broader
+boundary check found two asymmetric power-of-two intervals; another genuine
+refusal was saved in `85984b7` before its integer guard. All nine focused tails
+now pass, with zero independent digit mismatches across1,028,162 finite samples.
+Complete workspace validation passes all1,255 Rust cases. This adds one
 source-derived counterpart, without native/profile/public-history-service credit.
 
 Owned logical callers now bind directly to one stored intent9 frame and its
@@ -68,10 +71,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,246 tests across 106
+The current local Rust quality checkpoint passes all 1,255 tests across 107
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,238 case and
-adds eight frame binding/resource/publication cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,246 case and
+adds nine history metadata/conversion/resource cases. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
@@ -79,9 +82,10 @@ advisory fetch or Linux execution is claimed.
 
 The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
 literals and 84 test function identities. All files remain within the existing
-400/600-line caps. The parity ledger remains at 139 counterparts and 570 links
-across 125 derived declarations. The logical caller increment preserves every
-entry, runtime binding and immutable reference/mapping byte-exact. The preceding
+400/600-line caps. The parity ledger now has 140 counterparts and 571 links
+across 126 derived declarations. The history metadata increment adds one source
+counterpart/link while preserving every earlier entry, runtime binding and
+immutable reference/mapping byte-exact. The preceding
 codec increment added two source entries while preserving all 137 earlier
 counterparts. The four Rust-source hash updates belong to that earlier cleanup.
 This is Rust quality evidence,
