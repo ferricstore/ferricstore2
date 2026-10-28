@@ -56402,3 +56402,48 @@ reference root. Save this actual failing workspace checkpoint before the helper
 edit; then run its unchanged full tail and all workspace gates on a fresh frozen
 input set. This is fixture adaptation following a real integration finding,
 not a production behavior change or earlier test-first evidence.
+
+EXTERNAL-TERM1 final solo review/GREEN: the selected fixture repair reaches the
+unchanged full missing-capture tail (1pass,0fail). Rustfmt expands its duplicate
+set initializer; the inverse proof was rerun against that actual formatted
+source. Removing only the two added literal paths and restoring the original
+initializer recovers the entire old test/helper file. No old test body, safety
+check, copy limit, fixture absence/diagnostic or cleanup was weakened.
+
+Architecture/resource review: the explicit bare decoder shares the strict
+parser/census/build/equality and safe context while retaining the moved complete
+input owner and exact EOF. The bare writer emits its one-byte header directly
+through the original layout/order/emitter; no wrapped intermediate, drain,
+range rebasing, payload clone or duplicate parser/encoder is introduced. Original
+stored specialization and every old preparation/writer/parser fee recover
+byte-exact via the ten complete-file inverses. The new result uses an owned Vec
+for variable-length output; its conservative fixed control cohort additionally
+admits the bare result metadata. No native allocator/RSS/stack/OOM guarantee or
+measured speedup follows from these logical counters. No dependency, authority,
+policy allowance or public module boundary was widened. This is Root's own
+source/design/performance review, not independent peer approval.
+
+Final direct pipeline exits0 on all12 gates: Python7, shell syntax, fmt, all-target
+workspace check/strict Clippy, all workspace tests, doctests/docs, reference,
+progress, offline dependency audit and diff. Actual1264 passing cases cover108
+executable targets (106 result targets+2 benchmark correctness smokes), including
+all53 architecture cases. Six doctests span15 targets. Exact Counter comparison
+retains every prior1255 case/107 target and adds only7 bare-codec and2 dependency
+guard cases plus their one grouped target. Both benchmark correctness messages
+remain exact. All1721 frozen non-Markdown inputs, including1132 Rust files, are
+hash-exact through every final gate. Ten old-file inverses, all1701 other old
+inputs, nine saved new tests/snapshots and both saved CLI checkpoints are exact.
+Both snapshots were independently re-read with git show from the pinned original;
+the actual Rust compressed fixture exactly reproduces its body/zlib9 recipe.
+
+Receipts: /private/tmp/ferricstore2-external-term-{inverses,pipeline,full-identity,
+full-parity}.json; canonical complete case Counter SHA
+ae2eadbd5f9762c02ac5a317fa8a441c1f88b025e2060df9c73ec848ef2cfc26.
+The first failed six-gate run and compiler fixture RED remain archived separately.
+Actual cargo parity exits1 for incomplete source/Rust execution, profiles,
+setup/fixtures/adapters; main ledger remains126/140/571 and runtime accounting
+5903/4222/1681/1655. The two extra shared-dependency cases still require native
+registration/compiler lineage/profiles/final inventory consolidation; no fabricated
+IDs, ledger credit, native VM, current Linux, performance victory or completed
+M1–M8/full-goal claim. Root adopts locally only after clean baseline/frozen-input
+preflight. No agents, push or external messages; full goal remains ACTIVE.

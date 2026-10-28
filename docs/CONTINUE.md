@@ -8,7 +8,11 @@ stored FSV2 interpretation remains separate. The same moved input owner, exact
 EOF, safe tables and captured local-function context are retained. Seven codec
 refusals plus one dependency-preservation failure were saved in `2c6f9a3` before
 the bodies; a later unknown-file refusal was saved in `865af55`. All seven codec
-tails and eight CLI checks pass locally. Complete workspace validation is pending.
+tails and eight CLI checks pass locally. The first workspace run exposed an
+old compiler-lineage fixture copier that omitted these required snapshots;
+`247ebcf` saves that failure before the bounded copier repair. Its complete
+original checks and limits remain exact. All 12 direct validation gates now pass
+with 1,264 Rust cases, retaining every previous 1,255 case identity.
 Two byte-exact helper/test snapshots now have hash and closed-inventory guards.
 They were absent from the frozen main manifest; their native collection,
 compiler lineage, required profiles and final inventory consolidation remain
@@ -25,7 +29,7 @@ case was saved in `26ae829` before the exact midpoint correction. The broader
 boundary check found two asymmetric power-of-two intervals; another genuine
 refusal was saved in `85984b7` before its integer guard. All nine focused tails
 now pass, with zero independent digit mismatches across1,028,162 finite samples.
-Complete workspace validation passes all1,255 Rust cases. This adds one
+Its complete workspace checkpoint passed all1,255 Rust cases. This adds one
 source-derived counterpart, without native/profile/public-history-service credit.
 
 Owned logical callers now bind directly to one stored intent9 frame and its
@@ -84,14 +88,23 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,255 tests across 107
+The current local Rust quality checkpoint passes all 1,264 tests across 108
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier 1,246 case and
-adds nine history metadata/conversion/resource cases. Workspace compilation, strict
+15 targets. Exact identity comparison preserves every earlier 1,255 case and
+adds seven bare external-term scenarios plus two dependency-integrity cases.
+All 53 architecture cases pass. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,
 offline dependency policy and diff checks pass. The offline audit uses the
 unchanged primary advisory cache with the feature's explicit manifest; no fresh
 advisory fetch or Linux execution is claimed.
+
+The final codec checkpoint retains ten complete old-file inverses, all other
+1,701 original non-Markdown inputs byte-exact, nine saved new test/snapshot
+files and both saved CLI test checkpoints. All 1,721 frozen validation inputs,
+including 1,132 Rust files, match the tested tree. Final receipts are
+`/private/tmp/ferricstore2-external-term-{inverses,pipeline,full-identity,full-parity}.json`.
+The first failing validation is retained separately under
+`/private/tmp/ferricstore2-external-term-first-validation/`.
 
 The last 30-file cleanup preserves all 1,383 assertions, 1,734 string/byte-string
 literals and 84 test function identities. All files remain within the existing
@@ -3381,10 +3394,13 @@ remain historical evidence; they are not the current verification totals.
 
 ## Reference accounting and remaining gates
 
-The immutable reference remains **480 files and 5,858 textual declarations**;
-`tests/reference/**` and frozen `workflow-mapping.json` were preserved. The
-[progress ledger](../tests/parity/workflow-progress.json) now has **120 reviewed
-source declarations, 132 counterpart records and 550 assertion links**. Links
+The immutable primary reference remains **480 files and 5,858 textual declarations**;
+every original reference input and frozen `workflow-mapping.json` is preserved.
+The two separately guarded TermCodec dependency snapshots are additional inputs;
+their native registration, compiler lineage, profiles and final inventory
+consolidation remain required without main-ledger credit. The
+[progress ledger](../tests/parity/workflow-progress.json) now has **126 reviewed
+source declarations, 140 counterpart records and 571 assertion links**. Links
 retain exact source observations and explicit omitted scenario assertions; they
 do not certify complete original scenarios or executed full parity.
 

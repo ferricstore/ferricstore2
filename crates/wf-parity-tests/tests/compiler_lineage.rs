@@ -75,8 +75,15 @@ fn copy_missing_capture_reference(
     let manifest_path = "tests/reference/workflow-test-manifest.json";
     let manifest_bytes = read(manifest_path, 8 * 1024 * 1024)?;
     let manifest: serde_json::Value = serde_json::from_slice(&manifest_bytes)?;
-    let mut paths = vec![manifest_path];
-    let mut unique = std::collections::BTreeSet::from([manifest_path]);
+    let mut paths = vec![
+        manifest_path,
+        "tests/reference/elixir-dependencies/apps/ferricstore/lib/ferricstore/term_codec.ex",
+        "tests/reference/elixir-dependencies/apps/ferricstore/test/ferricstore/term_codec_test.exs",
+    ];
+    let mut unique = paths
+        .iter()
+        .copied()
+        .collect::<std::collections::BTreeSet<_>>();
     for (key, prefix, count) in [
         ("files", "tests/reference/elixir-baseline/", 480),
         (
