@@ -55993,3 +55993,99 @@ all required Elixir scenarios/profiles and M1–M8/platform gates remain open.
 Root reviewed solo; no independent review claim. Full goal remains ACTIVE.
 Before adoption verify primary is still clean712f0f0 and every frozen input is
 exact; adopt through local fast-forward only, without push or native probes.
+
+## HISTORY-META1 — solo source and architecture selection before artifacts
+
+2026-10-28: preceding turn made verified progress and adopted afaf9ba with1246
+cases/106 targets. Both authoritative trees are clean there. No process remains
+live. Continue SOLO; no agents, pushes or unchanged denied native/Linux probes.
+Pinned FlowCodecTest441 has one uncovered original assertion: normalization of
+float1.5 plus map/list/tuple values returns only [{"float","1.5"}]. Root reads
+the preserved complete source case and pinned flow/codec/support.ex. Source
+normalize_history_meta accepts map roots only; captures enumeration order;
+admits atom/binary keys; preserves binary values; maps nil to empty binary,
+other atoms to their spelling, arbitrary integers to decimal and finite floats
+to Float.to_string; all other value/key classes are ignored. It performs no
+recursive inspection of ignored compounds. Do not weaken this to a1.5-only
+formatter, add a new policy layer or claim a public query/storage service.
+
+Primary Float evidence: local Elixir1.19.5-otp-28 float.ex explicitly calls
+:erlang.float_to_binary(float,[:short]). Official OTP28 documentation
+https://beta.erlang.org/docs/28/apps/erts/erlang.html#float_to_list/2 requires
+shortest round-trip digits, shortest fixed/scientific notation inside the open
+(-2^53,2^53) range, and scientific outside it. Keep a fractional digit, signed
+zero and exponent spelling. Native execution remains separate/unavailable;
+do not rerun earlier denied probes or infer profile proof from docs/goldens.
+
+BEFORE creation select public history/metadata.rs plus private children
+metadata/model.rs, budget.rs, scalar.rs, numeric.rs, numeric/float.rs and text.rs
+under crates/wf-domain/src. Parent history.rs adds one module declaration.
+Public API prepare_original_history_metadata(OriginalValueInput, limits)
+returns PreparedOriginalHistoryMetadata<'a>. Reuse the existing borrowed logical
+arena; root map edges are captured enumeration order, not a new sort. Inspect
+only root pair positions and reached selected scalar spans; this is not whole-
+arena validation, term capture or authenticity proof. Byte-aligned BitString8
+is binary; nonaligned bitstrings/compounds/foreign classes are ignored. A
+nonmap root returns empty fields after operational input admission.
+
+New public models together in model.rs: OriginalHistoryMetadataLimits with
+positive max_input_bytes/max_pairs/max_output_bytes/max_work_units/
+max_temporary_bytes; OriginalHistoryMetadataError with InvalidLimits,
+InvalidInput, Limit and actual ReserveFailed(TryReserveError); the prepared
+result owning one Vec of (Cow<[u8]>,Cow<[u8]>) pairs plus work/peak metrics.
+Borrow opaque binaries and UTF8/ASCII atom spellings, retain duplicate
+normalized atom/binary key aliases and order, allocate only numeric/Latin1
+conversions and the finite pair spine. No new per-field model/type alias or
+dependency. Private Budget in budget.rs and ScalarText in text.rs are selected
+only AFTER saved RED. ScalarText uses a bounded384-byte fmt::Write buffer;
+no format! allocation, runtime lookup, atom interning or unsafe is selected.
+Big integer conversion uses checked prospective work, fallible finite buffers
+and one scratch cohort released after transfer; no budget reset/refund of work.
+Bounds include full borrowed pools/spines before traversal, selected scalar
+work before formatting, exact semantic output and prospective simultaneous
+requested owners with actual Vec capacity checked after reservation. Metrics
+are logical requests/control, not allocator/native-frame/RSS/OOM/speed claims.
+
+R0 creates only facade/model and literal all-input Err(InvalidInput), with no
+Budget/ScalarText/normalization/formatting body. BEFORE tests select new Cargo
+integration target tests/history_metadata/main.rs and children fixtures.rs,
+source.rs, scalars.rs, refusals.rs and budgets.rs. Seven named runtime cases:
+source_history_metadata_ignores_unsupported_compound_values;
+history_metadata_preserves_order_nil_and_borrowed_bytes;
+history_metadata_converts_integer_and_atom_ranges;
+history_metadata_formats_short_finite_floats;
+history_metadata_rejects_invalid_selected_captures;
+history_metadata_enforces_independent_resource_bounds;
+history_metadata_charges_continuous_work_and_temporary_ownership.
+Each first reaches a healthy new API before masked tails. Preserve the complete
+source map/list/tuple recipe and original equality, opaque/alias ordering and
+borrow pointers, arbitrary integer/Latin1 conversions, float boundary goldens
+and deterministic round-trip samples, ignored-compound nontraversal, invalid
+selected spans/classes, exact output/work/peak and one-unit cuts. Save/commit
+all seven genuine runtime failures before body, and keep their timing exact.
+
+Update existing ADR009/architecture/handoff and existing architecture test data
+for this pure server-only namespace, without widening a policy. After genuine
+GREEN, select an additive FlowCodecTest441 source/assertion ledger entry through
+the existing generator, preserving every earlier entry/runtime binding and all
+immutable reference/mapping inputs. Registration/assertion links never certify
+native/setup/profile/OS execution. Keep400/600/function100/nesting4/cognitive25;
+perform source/design/performance review solo, with no independent peer claim.
+Full required source/profile/platform/M1–M8 objective remains ACTIVE.
+
+HISTORY-META1 pre-RED model refinement: strict Clippy actually rejects the
+anonymous Vec<(Cow<[u8]>,Cow<[u8]>)> field/accessor types as type_complexity.
+Do not suppress it or hide it behind an alias. BEFORE creation select the
+public OriginalHistoryMetadataField<'a> struct in the SAME model.rs, with named
+key/value Cow<[u8]> fields. The result owns Vec<Field>, preserving the selected
+order/borrowing and without another allocation. Update only pre-RED test access
+to these semantic field names. No behavior or test evidence is claimed yet.
+
+HISTORY-META1 genuine R0 SAVE: type_complexity refinement and three test-only
+borrow_as_ptr corrections precede any runtime evidence. Focused strict Clippy
+now exits0. The actual new integration target compiles and exits101 with exactly
+seven runtime failures, zero passes/ignored: every test reaches the healthy
+new API and reports InvalidInput. All later scalar/order/resource/source tails
+are masked. /private/tmp/ferricstore2-history-meta-genuine-r0.json retains every
+identity, complete log hash and nine Rust source hashes. No private budget,
+text buffer, formatter or normalizer exists. Commit this checkpoint before body.

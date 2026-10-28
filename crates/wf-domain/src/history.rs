@@ -5,6 +5,7 @@ use wf_types::version::{Fence, TimestampMillis};
 use crate::policy::RetryPolicy;
 use crate::retry::RetryDecision;
 
+pub mod metadata;
 pub mod original;
 pub mod values;
 
