@@ -9,8 +9,10 @@ pub(crate) use original_flow::decode_fixed_bytes;
 pub use original_flow::{
     OriginalFlowValueError, OriginalValueContext, OriginalValueDocument, OriginalValueEncodeError,
     OriginalValueEncodeLimits, OriginalValueFunctionIdentity, OriginalValueInput,
-    OriginalValueLimits, OriginalValueNode, PreparedOriginalFlowValue, decode_original_flow_value,
-    decode_original_flow_value_compat, prepare_original_flow_value,
+    OriginalValueLimits, OriginalValueNode, PreparedOriginalExternalTerm,
+    PreparedOriginalFlowValue, decode_original_external_term, decode_original_flow_value,
+    decode_original_flow_value_compat, prepare_original_external_term,
+    prepare_original_external_term_with_init_pid, prepare_original_flow_value,
     prepare_original_flow_value_with_init_pid,
 };
 

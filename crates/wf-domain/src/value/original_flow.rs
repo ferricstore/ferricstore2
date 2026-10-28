@@ -20,7 +20,8 @@ pub use model::{
 };
 pub use prepare::{
     OriginalValueEncodeError, OriginalValueEncodeLimits, OriginalValueInput,
-    PreparedOriginalFlowValue, prepare_original_flow_value,
+    PreparedOriginalExternalTerm, PreparedOriginalFlowValue, prepare_original_external_term,
+    prepare_original_external_term_with_init_pid, prepare_original_flow_value,
     prepare_original_flow_value_with_init_pid,
 };
 
@@ -84,6 +85,17 @@ pub fn decode_original_flow_value(
     };
     decode::parse(&mut document, &encoding, context, &mut budget)?;
     Ok(document)
+}
+
+/// Decode exactly one safe-table-checked bare external term, without FSV2 inference.
+/// # Errors
+/// This rejecting TDD facade has no implementation yet.
+pub fn decode_original_external_term(
+    _encoded: Vec<u8>,
+    _context: &OriginalValueContext<'_>,
+    _limits: OriginalValueLimits,
+) -> Result<OriginalValueDocument, OriginalFlowValueError> {
+    Err(OriginalFlowValueError::InvalidFlowValue)
 }
 
 enum ValueEncoding {

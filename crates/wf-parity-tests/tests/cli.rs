@@ -136,3 +136,28 @@ fn changed_manifest_and_missing_mapping_fail_closed() -> TestResult {
     assert!(error.to_string().contains("manifest SHA-256 differs"));
     Ok(())
 }
+
+#[test]
+fn shared_term_codec_dependency_snapshots_cannot_drift() -> TestResult {
+    let resources = TestResources::new()?;
+    let target = resources.path().join("tests/reference");
+    copy_tree(&workspace_root().join("tests/reference"), &target)?;
+    check_reference(resources.path())?;
+    for path in [
+        "elixir-dependencies/apps/ferricstore/lib/ferricstore/term_codec.ex",
+        "elixir-dependencies/apps/ferricstore/test/ferricstore/term_codec_test.exs",
+    ] {
+        let file = target.join(path);
+        let bytes = fs::read(&file)?;
+        fs::write(&file, b"changed dependency")?;
+        let error = check_reference(resources.path()).err();
+        assert!(
+            error.is_some_and(|error| error.to_string().contains("workflow dependency snapshot"))
+        );
+        fs::write(&file, &bytes)?;
+        fs::remove_file(&file)?;
+        assert!(check_reference(resources.path()).is_err());
+        fs::write(&file, &bytes)?;
+    }
+    Ok(())
+}

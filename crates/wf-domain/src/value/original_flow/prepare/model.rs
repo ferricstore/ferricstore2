@@ -75,6 +75,45 @@ impl PreparedOriginalFlowValue {
     }
 }
 
+/// Complete bare ETF bytes, distinct from the stored FSV2 value profile.
+pub struct PreparedOriginalExternalTerm {
+    pub(in crate::value::original_flow::prepare) bytes: Vec<u8>,
+    pub(in crate::value::original_flow::prepare) work_units: usize,
+    pub(in crate::value::original_flow::prepare) temporary_bytes: usize,
+}
+
+impl PreparedOriginalExternalTerm {
+    /// Borrow the complete versioned external term, without a stored wrapper.
+    #[must_use]
+    pub fn as_external_term(&self) -> &[u8] {
+        &self.bytes
+    }
+
+    /// Move the same external-term owner without copying or shrinking.
+    #[must_use]
+    pub fn into_external_term(self) -> Vec<u8> {
+        self.bytes
+    }
+
+    /// Continuous logical work through successful preparation.
+    #[must_use]
+    pub const fn work_units(&self) -> usize {
+        self.work_units
+    }
+
+    /// Peak requested logical owners, without native allocation/RSS guarantees.
+    #[must_use]
+    pub const fn temporary_bytes(&self) -> usize {
+        self.temporary_bytes
+    }
+}
+
+impl fmt::Debug for PreparedOriginalExternalTerm {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("PreparedOriginalExternalTerm(<redacted>)")
+    }
+}
+
 /// Input validity, operational admission and actual allocation failure differ.
 #[derive(Debug)]
 pub enum OriginalValueEncodeError {

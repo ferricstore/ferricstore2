@@ -9,7 +9,7 @@ mod write;
 
 pub use model::{
     OriginalValueEncodeError, OriginalValueEncodeLimits, OriginalValueInput,
-    PreparedOriginalFlowValue,
+    PreparedOriginalExternalTerm, PreparedOriginalFlowValue,
 };
 
 /// Prepare a logical value as complete source-compatible stored bytes.
@@ -44,6 +44,27 @@ pub fn prepare_original_flow_value_with_init_pid(
     limits: OriginalValueEncodeLimits,
 ) -> Result<PreparedOriginalFlowValue, OriginalValueEncodeError> {
     prepare_captured(input, Some(init_pid), limits)
+}
+
+/// Prepare deterministic uncompressed bare ETF, including binary roots.
+/// # Errors
+/// This rejecting TDD facade has no implementation yet.
+pub fn prepare_original_external_term(
+    _input: OriginalValueInput<'_>,
+    _limits: OriginalValueEncodeLimits,
+) -> Result<PreparedOriginalExternalTerm, OriginalValueEncodeError> {
+    Err(OriginalValueEncodeError::InvalidInput)
+}
+
+/// Prepare bare ETF with an explicit encoder initialization-PID capture.
+/// # Errors
+/// This rejecting TDD facade has no implementation yet.
+pub fn prepare_original_external_term_with_init_pid(
+    _input: OriginalValueInput<'_>,
+    _init_pid: usize,
+    _limits: OriginalValueEncodeLimits,
+) -> Result<PreparedOriginalExternalTerm, OriginalValueEncodeError> {
+    Err(OriginalValueEncodeError::InvalidInput)
 }
 
 fn prepare_captured(

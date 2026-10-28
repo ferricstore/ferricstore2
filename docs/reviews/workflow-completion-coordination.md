@@ -56237,3 +56237,114 @@ workflow/platform acceptance remain required. Full goal ACTIVE; work SOLO.
 Root reviewed design/source/resource/performance behavior; no independent peer
 review is claimed. Adopt only after primary remains clean afaf9ba and every
 frozen input is exact, using local fast-forward without push or native probes.
+
+## EXTERNAL-TERM1 — solo architecture/source selection before artifacts
+
+2026-10-28: previous turn made verified progress and adopted8b0bb9c with1255
+Rust cases/107 targets. Both authoritative trees are clean there; no process is
+live. Continue SOLO. Read actual handoff/plan, domain encoder/parser and pinned
+TermCodec source plus its COMPLETE two-test file. TermCodec.encode calls native
+term_to_binary deterministic; decode rejects compressed131/80, requires safe
+binary_to_term used==complete input, catches invalid terms and rejects nonbinary.
+The existing source-value codec already has the required shared encoder/parser,
+but its public API interprets stored/raw/escaped FSV2 values. Expose an explicit
+bare ETF boundary, without prefix inference, another decoder or payload shifting.
+
+BEFORE artifacts select additive prepare_original_external_term and
+prepare_original_external_term_with_init_pid in EXISTING value/original_flow/
+prepare.rs, and decode_original_external_term in EXISTING original_flow.rs.
+Reexport through existing value.rs/original_flow.rs. One new public owned model
+PreparedOriginalExternalTerm belongs in EXISTING prepare/model.rs, with
+as_external_term/into_external_term plus work/temporary getters. It must not
+masquerade as PreparedOriginalFlowValue or suggest ETF is stored binary data.
+Reuse existing limits/error/context/document vocabulary; the document owns the
+complete selected decoder input, and node ranges always address that owner.
+Its documentation may clarify both explicit profiles. No new error, trait,
+dependency, private model, runtime context lookup, atom interning or effect.
+
+R0 adds only models/reexports and all-input rejecting facades: preparation
+InvalidInput, decoding InvalidFlowValue. No writer/parser/preparation body or
+existing function move until genuine compiled runtime RED is saved/committed.
+After SAVE, new preparation reuses the existing budget/layout/control cohort
+with additional new-result metadata admission and a dedicated writer entry.
+Factor existing write::run into unchanged binary-root dispatch plus one shared
+term emitter taking its literal header; old path selects FSV2+2+131, new path
+selects131 and always emits ETF even for binary roots. No intermediate FSV2
+allocation, prefix drain/rebase, duplicate canonical buffer or payload clone.
+Layout/scalars/foreign/equality/parser bodies and all old fees remain unchanged;
+prove complete old writer/entry source inverses. New decode uses existing
+Budget and ValueEncoding::Etf offset0, keeping the same moved input owner and
+continuous strict census/build/equality. It never selects compatibility fallback.
+Explicit initialization PID and existing safe/foreign captures remain required
+where reached; no runtime authority is granted. Work/temporary/length/depth/
+node/edge/reservation lanes remain independent and prospective. No native
+allocator/frame/RSS/OOM/speed or platform proof is inferred.
+
+BEFORE creation select tests/original_external_term/main.rs and children
+fixtures.rs, source.rs, binary.rs, limits.rs, foreign.rs and deep.rs under
+crates/wf-domain. Seven runtime identities:
+source_term_codec_roundtrips_current_uncompressed_deterministic_format;
+source_term_codec_rejects_compressed_and_trailing_external_terms;
+external_term_binary_roots_keep_storage_profiles_explicit;
+external_term_encoding_enforces_exact_resource_boundaries;
+external_term_decoding_keeps_input_owner_and_bounds;
+external_term_preparation_reuses_ordering_and_foreign_context;
+external_term_roundtrips_deep_sequences_without_recursive_owners.
+Each first reaches a healthy new API before masked tails. Preserve complete
+source {:current,%{value:"payload"}} and {:current,:value} recipes, compressed
+{:current,String.duplicate("compressible",1024)} and all six source assertions.
+The compressed fixture is independently generated stdlib-zlib9 over the exact
+ETF recipe, verified by decompression and actual producer bytes; no VM claim.
+Use [primary ETF framing](https://beta.erlang.org/doc/apps/erts/erl_ext_dist.html)
+for131/80, big-endian uncompressed body size and zlib payload. Binary root ETF,
+cross-profile refusal, ownership, exact encode/decode limits, captured local-fun
+and deep iterative data are additional controls. Save every real R0 before body.
+
+The two shared TermCodec tests were omitted from the FROZEN primary workflow
+manifest. Do not silently drop them, fabricate main declaration/runtime IDs or
+edit that immutable manifest/mapping. BEFORE creation select byte-exact pinned
+snapshots at tests/reference/elixir-dependencies/apps/ferricstore/lib/ferricstore/
+term_codec.ex and matching test/ferricstore/term_codec_test.exs. Record hashes and
+their separate original lines/setup/assertion correspondence. Native collection,
+compiler lineage, required profiles and final inventory consolidation for these
+two shared-dependency cases remain explicitly REQUIRED, without new main-ledger
+credit or passing-parity claims. This expands known acceptance inputs.
+
+AFTER genuine RED select private wf-parity-tests/src/reference/dependencies.rs
+with functions only, pinning those exact two source hashes through existing
+bounded artifact::read/digest. reference::load adds only this guard, retaining
+the original480-file/5858-declaration summary and every original check/order.
+Document the separately checked dependency snapshots. BEFORE creation select
+one additional test function in EXISTING tests/cli.rs:
+shared_term_codec_dependency_snapshots_cannot_drift. Actual reference checks
+must first pass, then reject corruption/removal of each new snapshot for the
+dependency guard's reason. The current checker ignores those roots, so save
+its genuine runtime failure before implementing the guard. No new tooling
+model/schema, changed primary source ID or waived native/profile prerequisite.
+
+Existing pure-value rules already cover these functions; update concrete
+architecture probes and ADR009/architecture/handoff with no policy widening.
+Keep400/600/function100/nesting4/cognitive25, no lint allowance/source packing.
+Root reviews source/design/resource/performance behavior solo; no independent
+peer review claim. No agents/push/external messages or unchanged denied probes.
+Full source/profile/platform/M1–M8 objective remains ACTIVE.
+
+EXTERNAL-TERM1 genuine R0 SAVE: test-only OriginalFlowValueError-to-Box conversion
+repairs and a doc backtick correction precede runtime evidence; the first generic
+patch matched the wrong test call, which was corrected before execution. Strict
+focused Clippy now exits0 without allowance. Actual codec execution compiles
+then exits101 with seven runtime failures, all at the healthy new preparation
+API's InvalidInput; decode/foreign/resource/source tails are masked. The separate
+actual reference regression first passes the full existing inventory check,
+corrupts the newly preserved dependency source and FAILS because the old checker
+still accepts it. It exits101 with0 pass/1 fail/0 ignored. No dependency guard
+or writer/parser/preparation body exists at this SAVE.
+
+/private/tmp/ferricstore2-external-term-genuine-r0.json retains eight exact
+identities, complete log hashes and authored source hashes. Both dependency
+snapshots match the pinned commit byte-for-byte: term_codec.ex SHAfa1f00dfb407569a19b0f36760fec83ba10defeab7178ba7154ed4227d3f5ee6;
+term_codec_test.exs SHAb7ea7302f72bfa11cab66b0832890cd0fb215a7ccaa3d6c9791f1a23f37077d3.
+The actual Rust compressed constant is independently decompressed to the exact
+12304-byte ETF body for the source tuple/repeated1024 binary; its SHA2e102e26315e94a7df6f4b7ea736137caee9d423214ad47196ecbbd6c628e0f9 is
+saved in the source-recipes receipt. No VM or native zlib execution is claimed.
+Commit this genuine rejecting checkpoint before implementing either behavior.
