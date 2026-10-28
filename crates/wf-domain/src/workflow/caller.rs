@@ -5,11 +5,16 @@ use std::fmt;
 use crate::policy::RetryOverride;
 
 mod input;
+mod logical;
 mod normalize;
 
 pub mod many;
 
 pub use input::measure_core_mutation_input;
+pub use logical::{
+    LogicalMutationError, LogicalMutationFieldValue, LogicalMutationInput, LogicalMutationLimits,
+    PreparedLogicalMutation, prepare_logical_mutation,
+};
 pub use normalize::normalize_core_mutation;
 
 /// One value in the explicitly supported transport-neutral capture vocabulary.

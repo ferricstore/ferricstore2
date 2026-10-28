@@ -55572,3 +55572,129 @@ visibility formatting makes decode.rs109 physical lines (the earlier102 count
 preceded that path repair); this documentation correction changes no code or
 validation input. Continue from the adopted implementation, with the full goal
 active and the remaining requirements above intact.
+
+## LOGICAL-MUTATION1 — solo architecture selection before artifacts
+
+2026-10-28: previous turn is verified progress, adopted at1dbd924 with1,228
+cases. Both trees are clean at that commit; no live process remains. Continue
+solo under the user override. The selected predecessor is actual logical-value
+caller preparation across every existing scalar core mutation kind, followed by
+real intent9 codec/publication composition. This does not replace the remaining
+accepted application service, native capture or mandatory source profiles.
+
+Pinned mutation_attrs.ex1212..1217 preserves every supplied opaque value,
+including nil, separately from omission; cancel676..680 maps reason to error.
+Create100..159 records source caller time and explicit versus automatic
+partitioning. Options/guards remain the existing scalar schema. The preserved
+FlowValuePayloadTest contains real create/transition/retry/terminal/get/claim
+scenarios with maps. Preserve those concrete payload recipes in relevant
+composition tests, without claiming full public get/claim/setup/profile parity
+from a lower-level publication test. No new ledger credit is selected now.
+
+BEFORE creation select domain workflow/caller/logical.rs and private children
+logical/model.rs, budget.rs, capture.rs, values.rs and materialize.rs. New public
+types in model.rs: LogicalMutationFieldValue (Scalar or logical arena plus
+optional explicit encoder init PID), LogicalMutationInput (operation/id/fields),
+LogicalMutationLimits (existing admission/value profiles plus aggregate raw,
+work and temporary ceilings), PreparedLogicalMutation (owned command, optional
+explicit partition, priority, original public evidence and resource metrics),
+LogicalMutationError (caller/value/invalid-profile/resource/reservation lanes).
+New private Budget in budget.rs has continuous work and prospectively admitted
+logical retained/temporary ownership. No other type/model is selected.
+
+The additive prepare_logical_mutation(input,common,base_partition,stamp,limits)
+returns PreparedLogicalMutation. R0 is only an all-input UnsupportedFeature
+rejecting facade, the new public model/getters and one private mod plus root
+reexports. NO capture, value, budget or materialization body before saved genuine
+compiled runtime RED. After SAVE select those private implementation children.
+The result owns all metadata and prepared bytes; no caller arena survives by
+borrow. into_stored_parts moves optional explicit partition, CommittedCommand,
+priority and PublicMutationEvidence into existing intent9 construction. Automatic
+partitioning remains marked absent for the outer codec's existing resolver; do
+not duplicate that CRC algorithm in domain or grant placement authority here.
+Captured stamp is pure input, never a clock/authorization/origin capability.
+
+Bound each item/common slice to eight before inspection. Measure every original
+field, name, scalar descriptor and entire logical pool/node/edge occurrence,
+including shadowed common values, with checked arithmetic before traversal.
+Fixed stack projections reuse the existing scalar normalizer and its original
+validation/order/default rules. On opaque fields Scalar binary/nil/bool/i128
+becomes logical binary/atom/integer data; explicit arenas cover all other common
+and foreign classes. Unknown fields, unsupported features, duplicate options,
+invalid guards and logical terms in scalar-only positions must refuse. Item
+overrides common exactly; only selected values are encoded. Empty, nil and
+omission stay distinct. Per-value source-compatible preparation receives the
+remaining aggregate work/temporary budgets and inline cap; successful work is
+debited continuously. No budget refresh between values, hidden native lookup,
+payload cloning, encoded-subterm caching or new payload Box/shrink conversion.
+
+Prospective metadata/output/scratch accounts precede allocation. Fallible copies
+own IDs, scalar state/type/token/partition and retry targets; existing validated
+RecordId/LeaseToken constructors retain their current representation. Prepared
+opaque Vecs move directly into Operation. Fixed headers and conservative scalar
+normalization/copy liability are charged explicitly; native allocator capacity,
+frame/RSS/OOM and latency/speedup are not certified. Preserve all old scalar
+normalizer, codec8/9, source encoder/decoder, storage and Node bodies byte-exact;
+only existing module/export/test links may change with complete inverses.
+
+BEFORE creation select tests/logical_mutation/main.rs with fixtures.rs,
+normalization.rs, values.rs, limits.rs and ownership.rs (domain); one new child
+crates/wf-ports/tests/workflow_value/logical.rs if that actual target uses the
+workflow_value directory, otherwise consult the concrete discovered path before
+creation; and crates/wf-storage/tests/state_store/workflow_values/history_hydration/
+logical_caller.rs linked from its existing parent. Seven domain case identities:
+logical_caller_prepares_all_seven_existing_mutation_kinds;
+logical_caller_preserves_presence_primitives_and_magic_bytes;
+logical_caller_prepares_compound_values_and_captured_functions;
+logical_caller_overrides_common_values_but_charges_all_captures;
+logical_caller_refuses_bad_schema_before_value_preparation;
+logical_caller_enforces_independent_aggregate_and_value_limits;
+logical_caller_owns_metadata_and_moves_stored_buffers. One ports roundtrip and
+one actual stored9 publication/hydration/reopen case complete the composition
+selection. Each must hit a healthy new-API call before masked tails; save all
+real runtime failures and exact oracles before implementation. Supplemental
+later findings retain their actual timing. Confirm test paths before writing.
+
+Keep existing crate dependencies, workflow functional purity and all file400/
+tooling600/function100/nesting4/cognitive25 gates. Record Root's design,
+performance/resource and final review solo, without claiming independent peer
+review. Linux and macOS remain separate required acceptance targets; no new OS
+operation is selected. Run all previous identities and strict quality gates,
+compare immutable inputs/ledger records, update the handoff and adopt only the
+verified state. The full M1–M8/source/profile/platform goal remains ACTIVE.
+
+LOGICAL-MUTATION1 concrete path correction BEFORE creation: actual intent9
+codec tests reside in wf-storage/tests/state_store/workflow_values/stored_codec.rs,
+not a ports workflow_value target. Select new sibling logical_codec.rs and its
+existing workflow_values.rs mod link for the codec roundtrip case, retaining
+logical_caller.rs under history_hydration for real publication/reopen. No new
+ports test file is selected. This reuses the actual defaults/witness/header
+fixtures rather than creating another harness. The one new executable target
+is the domain logical_mutation integration target. The prepared result owns a
+CommittedCommand and Option<Vec<u8>> explicit partition, never a borrowed caller;
+the outer codec still resolves automatic partitioning. Aggregate temporary
+ownership bounds final owners as well as concurrent scratch; per-value encoded
+and inline limits stay independent. No separate aggregate output ceiling/type
+is introduced. Error field names are static and diagnostics redact input data.
+
+Performance source review uses the official Vec contracts: try_reserve_exact
+can receive excess allocator capacity, and into_boxed_slice discards excess
+capacity through shrink behavior. Therefore retain moved payload Vecs and make
+only requested logical ownership/work claims, without claiming native capacity
+or infallible Box conversion. Existing scalar identity/token constructors stay
+unchanged and their conservative copy/conversion liability is admitted.
+https://doc.rust-lang.org/std/vec/struct.Vec.html#method.try_reserve_exact
+https://doc.rust-lang.org/std/vec/struct.Vec.html#method.into_boxed_slice
+
+LOGICAL-MUTATION1 genuine R0: all seven domain cases and both existing-target
+codec/storage compositions compile and fail at their actual healthy new-API
+UnsupportedFeature(logical_value) rejection, exit101 in each command. Receipt
+/private/tmp/ferricstore2-logical-mutation-genuine-r0.json pins all new models,
+facade and test hashes plus both actual logs. No implementation child exists.
+Full later schema/value/aggregate/ownership/publication/reopen tails are masked.
+The initial constructor-argument mistake, test helper length/complexity repairs
+and invalid wall101 after HLC physical100 happened before SUT execution and get
+no RED credit. The final stamp has physical100/logical3/wall99, so tests also
+distinguish generated execution time from wall time. The former pre-SUT log is
+retained at /private/tmp/ferricstore2-logical-mutation-pre-stamp.log. Save the
+genuine nine-case checkpoint before implementing any preparation body.
