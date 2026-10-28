@@ -6,6 +6,27 @@ verified. Bounded physical history capture and coherent value hydration are
 implemented. Pure logical preparation has explicit captured local-fun context;
 accepted typed-command and public history services remain required.
 
+The separate pure history metadata normalizer now covers original
+FlowCodecTest442/assertion443 through captured logical inputs. Map enumeration
+order, binary/atom keys, nil-to-empty, other atom spellings, arbitrary integer
+decimal and finite float text are preserved; unsupported compounds are ignored.
+One `OriginalHistoryMetadataField` spine owns numeric/Latin1 conversions and
+borrows unchanged binary/UTF8 text through Cow. Input, rows, exact output,
+continuous work and simultaneous requested owners have independent bounds.
+Selected capture errors remain distinct from ignored classes. No term capture,
+storage read, publication, atom interning or public query authority is granted.
+
+Float text uses the source [short notation rules](https://beta.erlang.org/docs/28/apps/erts/erlang.html#float_to_list/2)
+and [Ryu halfway rounding](https://github.com/ulfjack/ryu/blob/master/ryu/d2s.c).
+An independent formatter comparison caught254 standard-Rust odd/even tie
+differences among999504 finite samples; a separate genuine failing case was
+committed before correction. Exact normalized binary/decimal midpoint checks
+choose the even significand. One standard digit conversion feeds both notation
+choices; fixed length is measured before construction. A32-byte private text
+buffer suffices, while the conservative control fee stays unchanged. Sampling
+and round-trip properties are mathematical evidence, without native VM/profile,
+allocator/RSS/OOM, measured speedup or independent Linux certification.
+
 The binary command's intent8 interprets supplied payload/result/error bytes as
 logical binaries. Publication escapes a leading `FSV2` once. Inferring a typed
 value from those bytes would silently change its meaning. The reviewed source

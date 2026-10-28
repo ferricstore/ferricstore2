@@ -2,6 +2,16 @@
 
 Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
 
+Original history metadata now preserves FlowCodecTest442/assertion443: keep
+float1.5 and ignore the supplied nested map/list/tuple. The same pure API covers
+ordered atom/binary key aliases, nil, borrowed binary/UTF8 text, arbitrary
+integers, Latin1 atoms and shortest finite float text under independent resource
+caps. Seven genuine API refusals were saved in `78ada59`. An independent
+formatter probe then caught254 odd/even tie differences; a separate rejecting
+case was saved in `26ae829` before the exact midpoint correction. All eight
+focused tails now pass. Complete workspace validation is pending. This adds one
+source-derived counterpart, without native/profile/public-history-service credit.
+
 Owned logical callers now bind directly to one stored intent9 frame and its
 already-derived comparison intent. Automatic partitions reuse the existing
 resolver; explicit partitions, source time and caller evidence remain exact.

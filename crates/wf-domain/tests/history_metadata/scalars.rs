@@ -124,3 +124,16 @@ fn history_metadata_uses_even_shortest_float_ties() -> TestResult {
     }
     Ok(())
 }
+
+#[test]
+fn history_metadata_respects_shortest_float_power_intervals() -> TestResult {
+    f::ready()?;
+    for (bits, expected) in [
+        (0x3e70_0000_0000_0000, "5.960464477539063e-8"),
+        (0xbe70_0000_0000_0000, "-5.960464477539063e-8"),
+        (0x3e60_0000_0000_0000, "2.9802322387695312e-8"),
+    ] {
+        assert_eq!(f::rendered(b"k", N::FloatBits(bits))?, expected.as_bytes());
+    }
+    Ok(())
+}

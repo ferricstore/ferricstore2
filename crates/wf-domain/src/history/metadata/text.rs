@@ -3,14 +3,14 @@
 use std::fmt;
 
 pub(super) struct ScalarText {
-    bytes: [u8; 384],
+    bytes: [u8; 32],
     length: usize,
 }
 
 impl ScalarText {
     pub(super) const fn new() -> Self {
         Self {
-            bytes: [0; 384],
+            bytes: [0; 32],
             length: 0,
         }
     }

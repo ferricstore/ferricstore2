@@ -56135,3 +56135,41 @@ log, current producer/test and independent probe hashes, including254 mismatches
 among999504 finite samples. Commit this rejecting review case before changing
 the float conversion. Existing seven RED functions and all other producers
 remain exact except the documented source-line comment correction.
+
+HISTORY-META1 formatter refinement BEFORE corrective body: emit scientific
+text from the corrected <=17-digit significand, estimate the fixed text length
+without constructing it, and build fixed only when selected. The resulting
+text is at most the scientific length; finite science/raw text is <=24 bytes,
+and i64 decimal <=20. Select ScalarText's buffer384->32 in existing text.rs,
+without changing the conservative2048 control cohort or any existing fee.
+No long zero-filled candidate buffer or second float conversion is needed.
+
+HISTORY-META1 boundary review: the corrected first million-sample probe reports
+999504 finite/zero digit mismatches. Extending that SAME temporary probe with
+all2047 finite exponent bins, seven significand boundary patterns and both
+signs gives1028162 comparisons and TWO mismatches, bits3e70000000000000 and
+be70000000000000. These exact powers of two have a narrower lower round-trip
+interval: blindly choosing the even neighbor is wrong. Select another appended
+scalars.rs case history_metadata_respects_shortest_float_power_intervals and
+save its actual current-body failure. Then select one private lower_neighbor_fits
+function in EXISTING numeric/float.rs. Before a downward tie correction at a
+normal power of two above the subnormal boundary, compare decimal half-spacing
+with the narrower lower half-ULP using exact checked powers of2/5; no float
+parser or additional conversion pass. Preserve ordinary even ties and subnormal
+intervals. This is a second genuine after-body finding, not a passing probe.
+
+The initial inverse audit also catches post-R0 rustfmt reflow of three raw-pointer
+assertions: pointer syntax was repaired after the last initial fmt but before
+runtime RED. The later source442 comment correction is separate. Preserve every
+original oracle/argument/token; compare the COMPLETE source file after only
+that comment inverse and rustfmt normalization against the original R0 source.
+Do not falsely claim its raw bytes were unchanged. Other original files and the
+complete scalar-file append inverse remain exact.
+
+HISTORY-META1 power-interval genuine SAVE: the new appended case compiles and
+exits101 with0 pass/1 fail/0 ignored/8 filtered. Its first comparison reports
+the incorrect even...062 versus expected valid...063. The prior ordinary-tie
+repair and all eight focused tails passed before this append. Receipt
+/private/tmp/ferricstore2-history-meta-power-genuine-r0.json saves exact current
+float/text/test and runtime/boundary-probe hashes. No interval guard exists.
+Commit this current-body failure before adding the selected integer guard.

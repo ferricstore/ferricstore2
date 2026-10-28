@@ -1448,6 +1448,18 @@ profiles, native/Linux acceptance and the ordered milestone exits remain open.
 
 ## Selected pure history-value overlay
 
+The additive `history::metadata::prepare_original_history_metadata` normalizes
+explicit captured map rows in their original enumeration order. It preserves
+binary/atom key aliases, borrows binary/UTF8 text, converts nil/other atoms and
+arbitrary integers, and retains the source shortest finite float notation with
+exact halfway ties to even. Unsupported compound values are ignored without
+recursive inspection. A named field spine and independent input/row/output/
+work/temporary ceilings keep capture, conversion and authority distinct.
+This pure helper acquires no records, clock, native terms or read authority;
+all existing history formats and durable/query paths stay unchanged. Native
+profiles and the accepted public history service remain required. See
+[ADR-009](adr/009-stored-workflow-value-ingress.md).
+
 HISTORY-VALUE-OVERLAY1 keeps collection and field projection in the pure domain.
 An entry borrows its complete original source and captured reference fields;
 preparation returns stable references for a caller's later read. Application
