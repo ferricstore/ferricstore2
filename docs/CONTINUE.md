@@ -2,13 +2,25 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Work in progress on codex/step-changes-solo: M2-STEP-CHANGES1 adds three actual
-transaction-coherence cases and exact pure-home effect probes. Strict focused
-Clippy passes; actual runtime is0pass/3fail at healthy GroupApplyChanges::new
-InvalidChanges. The architecture probe also genuinely fails at the new home's
-missing std::fs diagnosis. Constructor/classifier bodies are still unchanged and
-the proposed validator is absent. Later scenario tails remain masked. See
-`/private/tmp/ferricstore2-step-changes-genuine-r0.json`; primary stays at70a57f4.
+The codex/step-changes-solo checkpoint adds pure Step transaction coherence.
+Three genuine constructor refusals and the separate effect-probe failure were
+saved in cb51fd7 before implementation/classification. All nine Step cases,
+strict focused Clippy and all53 architecture cases pass. All12 final direct
+gates pass with1,303 cases/113 targets, retaining every prior1,300 identity,
+status and multiplicity. Python7 and6 doctests/15 targets pass. All1,776 frozen
+inputs/1,187 Rust files remain exact. Four complete old-file inverses and1,770
+other exact original inputs preserve all prior behavior; the three saved
+test/probe sources remain entirely unchanged. No oracle, lint or source credit
+changed. The new borrowed validator checks scope, full original log/time,
+status/count and complete reply against the actual indexed decision. It supplies
+coherent proposed changes, not durable publication or actual transaction-budget
+payment. See M2-STEP-CHANGES1 and
+`/private/tmp/ferricstore2-step-changes-{genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json`.
+The adopted receipt binds both local trees and exact commit. Full parity actually
+exits1; the full goal remains active. Next selected M2-STEP-OUTCOME1 adds explicit
+Step retained data APIs while preserving closed generic storage front doors;
+physical schema, atomic companions/publication, inquiry/fault/reopen and recovery
+remain required. Source/profile/native/Linux requirements are unchanged.
 
 The codex/history-core-snapshot checkpoint implements private FWHS1 with the
 complete represented FWSR2 postimage and FWSH2 event; older v1 codecs stay closed.

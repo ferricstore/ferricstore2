@@ -925,3 +925,27 @@ Their unchanged complete tails now pass, with strict focused Clippy. Review and
 whole-workspace validation evidence live under M2-HISTORY-SNAPSHOT1 in the
 coordination record and handoff. Native original-profile execution and independent
 Linux/macOS acceptance remain separate gates.
+
+## Step transaction coherence
+
+The pure `GroupApplyChanges` boundary now checks Fresh intent10/response9 against
+the independently supplied complete control plan. Accepted means one actual
+indexed Step postimage; deterministic indexed rejection means no result count.
+Scope, status, full original log identity and committed execution time must
+agree, and the complete reply must match the actual decision through the
+existing Step response verifier. Structural hard ceilings used by this check
+do not pay or replace the narrower captured transaction budgets. Verification
+borrows existing response bytes and introduces no variable owner.
+
+Three compiled constructor refusals and a separately failing effect probe were
+saved in cb51fd7 before implementation/classification. Their unchanged tails
+cover accepted payload presence and grouped units, wrong scope/predecessor,
+actual stale/FIFO rejections and original replay/conflict/expiry/exact-log behavior
+without a current record. The private Step validator and descendants are pure;
+the neighboring backend namespace remains effectful. Old constructor branches
+and existing atomic-start/independent validators retain their prior behavior.
+
+This check supplies coherent proposed changes, not consumed storage authority or
+proof of durable success. FWSO intent10 admission, schema negotiation, actual
+record/index/history/value/outcome/control publication, historical rich/source
+companions, inquiry/fault/reopen behavior and recovery remain required.

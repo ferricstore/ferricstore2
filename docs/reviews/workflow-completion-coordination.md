@@ -57391,3 +57391,72 @@ these tests/probes before any body or classification change. Receipt and full
 logs are /private/tmp/ferricstore2-step-changes-{genuine-r0,r0-tests,r0-architecture,
 r0-clippy}.{json,log} as appropriate. This establishes no store/publication,
 source-case, profile or platform acceptance.
+
+M2-STEP-CHANGES1 solo body review: only the guarded intent10 constructor branch
+and private56-line validator are added. The full original position/time, scope,
+status/count and actual indexed decision are checked through borrowed existing
+Step response helpers. Hard structural ceilings are explicitly not actual budget
+credit. No variable owner, clone, origin flag or runtime capability is added.
+The exact namespace classification rejects effects for both the home and nested
+modules; the backend neighbor stays effectful. All nine Step cases, strict
+focused Clippy and all53 architecture cases actually pass. Saved test/probe
+sources remain unchanged. Existing atomic-start/independent validators remain
+entirely unchanged. Approve reuse of the existing temporary verification/pipeline
+orchestration with this checkpoint's prefix/base/R0 for full inverses, frozen
+gates and identity accounting; no new product or test artifact is selected here.
+
+M2-STEP-CHANGES1 final solo checkpoint: all12 direct gates pass on one frozen
+1,776-input/1,187-Rust tree. All1,303 cases/113 executable targets pass, including
+all53 architecture cases and both unchanged correctness smokes. Complete Counter
+comparison retains every prior1,300 target/name/status/multiplicity and adds only
+the three saved coherence cases. Python7 and6 doctests/15 targets pass. Full
+compiler, strict lint, docs, reference/progress integrity and offline audit pass.
+Four complete old-file inverses recover70a57f4, with1,770 other old inputs exact.
+All three whole R0 sources stay exact; no oracle/assertion/threshold was changed.
+Full parity actually exits1. Main ledger129/143/589 and runtime5903/4222/1681/1655
+remain unchanged, with no source/native/Linux credit. Receipts are under
+/private/tmp/ferricstore2-step-changes-{inverses,pipeline,full-identity,full-parity,
+adopted}.json. Adoption rechecks both clean local trees and every tested input;
+no push, store/consensus acceptance or completed-goal claim is authorized.
+
+## M2-STEP-OUTCOME1 — successor solo selection before artifacts
+
+Precondition: finish and locally adopt the complete M2-STEP-CHANGES1 gate run.
+Next close the missing intent10/response9 retained data codec before selecting
+physical schema/driver integration. Current generic FWSO readers restore only
+intents1/2/4/5/6/7/8/9; globally adding10 would silently open older store profiles.
+Keep those front doors unchanged and use explicitly selected Step-only data APIs.
+
+Approve new private storage state/value/outcome/step_continue.rs, declared and
+reexported in existing outcome.rs and value.rs. Before RED it contains only two
+rejecting APIs: encode_step_continue_outcome(&RetainedOutcome, max_wire_bytes,
+AdmissionLimits)->Vec and scan_step_continue_outcome(bytes,&RequestScope,
+&RequestId,AdmissionLimits,max_wire_bytes)->existing ScannedRetainedOutcome.
+No new model/capability/field/dependency is selected. Both initially reject all
+inputs UnsupportedVersion. After saved RED reuse parent encode_fields/with_frame,
+the existing Step summary and existing scanned owner's fallible materialization;
+do not modify any legacy parser/encoder/helper body or restore_intent allowlist.
+
+The explicit FWSO1 framing holds intent10, reply9 and original full log/time;
+namespace/request, expiry, status/count and complete Step reply must agree.
+The caller's actual AdmissionLimits constrain response bytes/fields. All borrowed
+validation precedes copies, and returned-owner admission remains512 plus each
+actual namespace/request/response byte through into_owned. One fallible output
+buffer, no temporary encoded body or cloned receipt/policy. This is data only,
+not storage upgrade, budget payment or authority. Zero/overflow/wire limits and
+ProfileLimit remain distinct using existing error origins.
+
+Approve new tests/state_values/step_continue.rs and its declaration in existing
+main.rs: three cases for writer golden/original-field preservation, reader owned
+lifetime/all truncations/context corruption, and explicit profiles/independent
+wire-owner-field limits. Independently freeze whole FWSO vectors around the
+already independently verified accepted FWST fixture and actual pure rejected
+Step responses. These are restoration-format controls, not business/source case
+execution. First healthy encode and first healthy scan must reject before bodies;
+save compiled causality without mistaking compile/lint errors for behavioral RED.
+Keep old assertions/profiles unchanged. Add exact outcome::step_continue and
+nested pure-home probes in existing state_values.rs; the existing state::value
+purity namespace already covers them. No classifier/edge/size/lint exemption.
+Keep400/600/100/4/25; record solo review, full old-file inverses and complete gates.
+Actual captured historical context, physical schema/publication, inquiry, faults,
+reopen and recovery remain mandatory successors. No agent or push is authorized.

@@ -18,6 +18,7 @@ use crate::log::{RecordBatchApplyDecision, RecordBatchApplyPlan, record_batch_re
 
 mod atomic_start;
 mod independent;
+mod step_continue;
 
 /// Typed core record with its tenant, placement and canonical ordering metadata.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -276,6 +277,11 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
                 if outcome.intent().version() == 7 =>
             {
                 atomic_start::validate(scope, control, operation, outcome)?;
+            }
+            RecordBatchApplyDecision::Fresh { operation, outcome }
+                if outcome.intent().version() == 10 =>
+            {
+                step_continue::validate(scope, control, operation, outcome)?;
             }
             RecordBatchApplyDecision::Fresh { operation, outcome } => {
                 let status = match operation {
