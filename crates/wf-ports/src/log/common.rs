@@ -55,7 +55,7 @@ pub fn normal_recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
-    recovery_header(encoded, limits, false)
+    recovery_header(encoded, limits, false, false)
 }
 
 /// Borrows Normal header facts with explicit stored-value intent9 recognition.
@@ -66,7 +66,7 @@ pub fn stored_value_recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
-    recovery_header(encoded, limits, true)
+    recovery_header(encoded, limits, true, false)
 }
 
 /// Borrows header facts with explicit Step and optional stored-value recognition.
@@ -74,17 +74,18 @@ pub fn stored_value_recovery_header(
 /// # Errors
 /// Refuses unsupported selection, framing and the configured encoded byte cap.
 pub fn step_continue_recovery_header(
-    _encoded: &[u8],
-    _limits: CodecLimits,
-    _stored: bool,
+    encoded: &[u8],
+    limits: CodecLimits,
+    stored: bool,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    recovery_header(encoded, limits, stored, true)
 }
 
 fn recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
     stored: bool,
+    step: bool,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
@@ -111,7 +112,8 @@ fn recovery_header(
     let _digest = reader.take(32)?;
     let allowed = matches!((version, operation_tag), (1, _) | (5..=7, 1) | (2, 5))
         || (version, operation_tag) == (8, 1)
-        || (stored && (version, operation_tag) == (9, 1));
+        || (stored && (version, operation_tag) == (9, 1))
+        || (step && (version, operation_tag) == (10, 1));
     if !allowed {
         return Err(CodecError::UnsupportedVersion);
     }
@@ -123,6 +125,7 @@ fn recovery_header(
         (1, 7) => 7,
         (1, 8) => 8,
         (1, 9) => 9,
+        (1, 10) => 10,
         (4, 1) => 1,
         (3, 1) => 3,
         (5, 2) => 2,

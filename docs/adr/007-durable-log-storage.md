@@ -1025,7 +1025,51 @@ post-RED corrections; they do not count as unchanged tests or additional source
 credit. All11 focused physical cases and7 history-codec cases pass; strict
 focused Clippy passes after flattening the new writer branch. Whole-workspace
 verification and adoption evidence belongs in M2-STEP-STORAGE1 and the handoff.
-Node operation10 startup replay, rich original context/attributes, the actual
+The Node operation10 successor below adds committed startup replay. Rich original
+context/attributes, the actual
 original Create→Claim→Step→Retry→FIFO chain, native/profile execution, and
 independent Linux/macOS milestone exits remain required. This component is not
 a completed live service or full workflow parity.
+
+## Explicit Step committed startup recovery
+
+`with_step_continue_limits` independently selects intent10 recovery using the
+existing positive, overflow-checked shared value ceilings. Legacy construction,
+binary-value selection and stored-value selection leave Step disabled. A private
+`StepRecoveryProfile` enum records only that opt-in; it is not persisted-format
+authority. The actual storage driver still requires an already upgraded format8
+owner. Startup never upgrades state or manufactures a policy/value witness.
+
+The explicit `step_continue_recovery_header` borrows profile/scope/stamp facts
+through the shared bounded parser. Its separate stored selector governs intent9.
+Old public header calls always select Step=false and retain their exact closed
+profiles. Header success does not validate the body. Node audits the full Step
+frame with `prepare_step_continue`, including intent, operation, fields, derived
+keys and EOF, even when the checkpoint has already applied that historical entry.
+
+Audit prospectively admits the actual entry/body, profile descriptor, remaining
+workspace and checked preparation work65536+4096+16*body.len. Shared admission
+charges the selected configuration descriptor in every phase; actual Step
+profile locals have their separate descriptor fee. Disabled selection retains
+old admission. Apply uses the real durable Step transaction and checks full
+control identity as other drivers do. One continuous point/body work account
+spans the whole committed-prefix call. No wrapping command, second value-batch
+decode, reply queue or fabricated current state is introduced.
+
+The shared route also covers snapshot recovery, trusted received boundaries and
+purged suffixes. A completed replay prefix remains durable on a later refusal;
+an uncertain commit consumes both owners, and reopen validates a complete old
+or new cohort. Uncommitted opaque tails are preserved and never interpreted.
+Plain Step payloads remain logical binary on both value alias profiles.
+
+Genuine rejection-only state a183712 predates bodies: one actual predecessor
+fixture control passes, eight Node scenarios fail at the healthy new selector,
+and an independent literal-header case fails at the healthy new header. The
+full saved tails were masked. Post-body controls demonstrate three incorrect
+test assumptions about event IDs, Retry logical state and older-profile error
+ordering; corrections and exact inverses are recorded. All10 focused Node
+cases and8 codec cases now pass with strict Clippy. The extra old-format control
+is not TDD or source-parity credit. Whole-workspace/adoption evidence belongs in
+M2-STEP-NODE1 and the handoff. Original named Create→Claim→Step→Retry→FIFO,
+rich captured attributes/context, native/profile/Linux/macOS execution and
+complete M1–M8 exits remain mandatory; this is not an accepted live service.

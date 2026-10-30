@@ -57871,3 +57871,81 @@ profile or platform acceptance credit is changed. Receipt and complete logs:
 /private/tmp/ferricstore2-step-node-{genuine-r0,r0-runs,r0-node,r0-header,
 r0-architecture,r0-clippy-final}.{json,log} as appropriate. Save the actual
 rejecting state in a local commit before implementing the selected bodies.
+
+M2-STEP-NODE1 R0 saved ina183712 before bodies. First body run passes6/9 Node
+cases and all8 codec cases; strict focused Clippy passes after representing the
+new8..10 dispatch as a range. Actual uncertainty, nonzero refusal prefix, limits,
+full historical audit and snapshot receive/purge/replay pass. Preserve
+step-node-first-body-{node,header,clippy}.log. Three previously masked replay
+oracles need independent controls, not production changes: plan.rs constructs
+event IDs from event_time/version (timestamp200 yields200-2); the unchanged
+retry_transition clears run_state while returning to the saved logical state;
+bare old limits refuse the earlier intent8 seed at profile selection, and stored
+limits additionally require actual alias2 before body audit. Select an appended
+post-body old7 control in the approved replay.rs to execute literal100-1/200-2
+history IDs and actual Retry state q/run_stateNone, then correct only those hard
+expectations and split old opt-in scenarios by their real prerequisites. This
+control supplies no TDD/source credit; record exact inverses of saved test edits.
+
+The supplemental old7 control actually passes without new opt-in or Step: exact
+100-1 Created/200-2 Retry IDs, state q/run_stateNone, manifest7. See
+step-node-legacy-oracle-control.log. Correct the Step timestamp oracle to200-2
+and assert Retry state charge/run_stateNone; do not change production semantics.
+Split disabled profiles: bare limits reject the earlier intent8 at UnsupportedEntry,
+binary limits reach Step header UnsupportedVersion, and stored limits use a
+real alias2 store before the same header refusal. Keep the upgraded8 recovery
+and actual7 refusal tails exact. These saved replay-source edits are explicit
+post-RED corrections, not unchanged tests or additional parity.
+
+Budget review before refinement: charge the selected Step enum configuration
+descriptor through existing CommittedRecoveryLimits::admit on every phase,
+including old entries under the new opt-in. Keep an additional local descriptor
+with an actual Step profile header; retain the old stored-bool observation fee.
+This replaces the new observe-only Step fee, rather than relying on it to cover
+disjoint point/audit/replay/snapshot phases. Disabled Step specializes to the
+complete old admission behavior. Existing approved recovery.rs owns this shared
+method; no new artifact/model or native-memory bound is introduced.
+
+M2-STEP-NODE1 solo implementation/performance review: only the explicit selector
+enables Step. Both old public headers still select false; the new helper reuses
+the same borrowed parser, with9 requiring its separate flag. Actual decode owns
+only the existing bounded request and drops it before returning audit metadata.
+Apply uses the same real driver signature and extracts checked control before
+dropping the bounded original receipt. No command wrapping, owner queue, copied
+postimage or default-profile widening. Shared admission prospectively pays the
+selected descriptor on every phase and Step preparation work is checked before
+decode. This is logical resource accounting and inspected allocation structure,
+not measured native gain, CPU/RSS bounds or Linux evidence.
+
+All10 focused Node cases now pass, including two controls; all8 codec cases pass.
+The full suite is frozen at1,796 inputs/1,207 Rust files. Eight complete existing
+file specializations recover822be44;1,781 other old inputs remain exact. All old
+selectors preserve Disabled and old header calls pass false, making those
+specializations reachable for every old API. Nine whole R0 sources stay exact;
+the complete replay.rs inverse accounts for the three corrections and appended
+post-body control. No other saved oracle changes. Receipt:
+/private/tmp/ferricstore2-step-node-inverses.json. No independent peer review,
+source-counterpart credit, native/profile/Linux or full-goal completion claim.
+
+M2-STEP-NODE1 final solo checkpoint: all12 direct gates pass on1,796 frozen
+inputs/1,207 Rust files. All1,329 cases/113 executable targets pass (111 result
+targets and two unchanged correctness smokes). Exact Counter comparisons retain
+every prior1,318 identity/status/multiplicity and all original1,294 cases, adding11.
+All53 architecture cases, Python7 and6 doctests/15 targets pass. Compiler, strict
+lint, docs, reference/progress and offline dependency audit pass. Eight complete
+old-file specializations and1,781 other exact original inputs preserve prior
+behavior; nine whole R0 sources and the complete corrected replay-file inverse
+are recorded. Full parity actually exits1, with unchanged129/143/589 source and
+5903/4222/1681/1655 runtime counts. No native/profile/Linux/source credit or
+completed-goal claim. Receipts: /private/tmp/ferricstore2-step-node-
+{genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json. Save and
+adopt by clean local fast-forward with exact frozen-input verification; no push.
+
+Delivery focus after the user's speed/status feedback: too much fragmentation
+and repeated validation has delayed a complete product path. Next prioritize
+actual original Create→named Claim→Step→Retry→FIFO with real captured values and
+full history; current named Claim deliberately refuses value-capable layouts7/8.
+Use cohesive functional batches and focused development checks, then full gates
+at meaningful checkpoints. Keep the complete source/profile/native/OS and M1–M8
+objective; consensus/application/listener work and rich source context are still
+open, and component-test totals do not establish a completed running service.

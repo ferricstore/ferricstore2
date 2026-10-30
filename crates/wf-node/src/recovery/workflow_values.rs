@@ -5,12 +5,14 @@ use std::mem::size_of;
 use wf_domain::workflow::control::{ControlState, EntryStamp};
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::log::{
-    RaftLogEntry, prepare_workflow_stored_value_batch, prepare_workflow_value_batch,
+    RaftLogEntry, prepare_step_continue, prepare_workflow_stored_value_batch,
+    prepare_workflow_value_batch,
 };
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
-    RecordBatchTransactionOutcome, WorkflowValueTransactionLimits,
-    apply_workflow_stored_value_batch_transaction, apply_workflow_value_batch_transaction,
+    RecordBatchTransactionOutcome, WorkflowValueTransactionError, WorkflowValueTransactionLimits,
+    apply_step_continue_transaction, apply_workflow_stored_value_batch_transaction,
+    apply_workflow_value_batch_transaction,
 };
 use wf_types::identity::{GroupId, RecoveryId, TenantId};
 use wf_types::version::CommittedTime;
@@ -48,8 +50,9 @@ impl CommittedRecoveryLimits {
         work: usize,
         temporary: usize,
     ) -> Result<Self, CommittedRecoveryError> {
-        let _ = (self, rows, bytes, work, temporary);
-        Err(CommittedRecoveryError::UnsupportedEntry)
+        let mut selected = self.with_workflow_value_limits(rows, bytes, work, temporary)?;
+        selected.step_continue = StepRecoveryProfile::new(true);
+        Ok(selected)
     }
 
     /// Reads the shared ceilings only when Step recovery was explicitly selected.
@@ -137,6 +140,11 @@ pub(super) fn audit(
             size_of::<Option<WorkflowValueTransactionLimits>>(),
             size_of::<bool>(),
         ])?
+    } else if version == 10 {
+        total(&[
+            size_of::<Option<WorkflowValueTransactionLimits>>(),
+            size_of::<StepRecoveryProfile>(),
+        ])?
     } else {
         size_of::<Option<WorkflowValueTransactionLimits>>()
     };
@@ -147,6 +155,25 @@ pub(super) fn audit(
         .workspace
         .checked_sub(live)
         .ok_or(CommittedRecoveryError::Limit)?;
+    if version == 10 {
+        let work = total(&[
+            65_536,
+            4096,
+            body.len()
+                .checked_mul(16)
+                .ok_or(CommittedRecoveryError::Limit)?,
+        ])?;
+        if work > profile.maximum_value_work {
+            return Err(CommittedRecoveryError::Limit);
+        }
+        let decoded = prepare_step_continue(body, profile.record_batch.codec, available).map_err(
+            |error| {
+                CommittedRecoveryError::Value(WorkflowValueTransactionError::Record(error.into()))
+            },
+        )?;
+        drop(decoded);
+        return Ok(EntryStamp::Stamped(stamp));
+    }
     let prepare = if version == 9 {
         prepare_workflow_stored_value_batch
     } else {
@@ -176,6 +203,11 @@ pub(super) fn apply(
             size_of::<Option<WorkflowValueTransactionLimits>>(),
             size_of::<bool>(),
         ])?
+    } else if version == 10 {
+        total(&[
+            size_of::<Option<WorkflowValueTransactionLimits>>(),
+            size_of::<StepRecoveryProfile>(),
+        ])?
     } else {
         size_of::<Option<WorkflowValueTransactionLimits>>()
     };
@@ -203,6 +235,8 @@ pub(super) fn apply(
     );
     let driver = if version == 9 {
         apply_workflow_stored_value_batch_transaction
+    } else if version == 10 {
+        apply_step_continue_transaction
     } else {
         apply_workflow_value_batch_transaction
     };
@@ -228,6 +262,7 @@ fn profile(
     let selected = match version {
         8 => limits.workflow_value_limits(),
         9 => limits.workflow_stored_value_limits(),
+        10 => limits.step_continue_limits(),
         _ => None,
     };
     selected.ok_or(CommittedRecoveryError::UnsupportedEntry)

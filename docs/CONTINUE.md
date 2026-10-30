@@ -2,18 +2,36 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Worktree branch: codex/step-node-solo. M2-STEP-NODE1 genuine compiled R0 passes
-the actual format8 fixture control and fails8 new recovery cases at the healthy
-selector UnsupportedEntry. The independent golden-header case fails at healthy
-UnsupportedVersion; all later recovery/header tails remain masked. Both new
-APIs reject all inputs. Strict focused Clippy and all53 architecture cases pass.
-Six complete old-file inverses and1,783 other exact inputs preserve822be44;
-all13 selected R0 sources are frozen. Earlier fourth-bool lint/byte-literal
-compile repairs are recorded, not behavioral RED. See the concrete solo
-selection and `/private/tmp/ferricstore2-step-node-genuine-r0.json`. Save this
-rejecting state before implementing committed-prefix audit/replay; keep old
-opt-ins closed and actual format8 mandatory. Primary remains at verified822be44.
-The full goal remains active, solo, with no new source/native/Linux credit.
+Product status: still incomplete. Named Claim currently refuses value-capable
+layouts7/8; the new Step path uses atomic StartAndClaim fixture setup. Prioritize
+the complete original Create→named Claim→Step→Retry→FIFO path with real value/
+history companions next. Rich captured context/attributes, remaining source
+operations, accepted consensus/read barriers, application authorization/submission,
+HTTP/TCP listeners and required native/profile/Linux/macOS validation remain
+open. Green component tests are not product completion. Consolidate functional
+batches and use focused checks during development; retain full milestone gates.
+
+Worktree branch: codex/step-node-solo. M2-STEP-NODE1 implements explicit Step
+committed-prefix audit/replay through the real format8 writer, retaining closed
+old opt-ins and sharing snapshot/received/purge recovery. Genuine rejecting
+runtime was saved ina183712 before bodies: one predecessor fixture control
+passes,8 recovery cases fail at healthy UnsupportedEntry and the independent
+header case fails at healthy UnsupportedVersion, with later tails masked.
+All10 focused Node cases and8 codec cases now pass with strict Clippy. The three
+documented post-RED replay-oracle corrections have a complete saved-file inverse;
+the extra old7 control is not TDD/source credit. Eight complete old-file
+specializations and1,781 other exact inputs preserve822be44;9 whole R0 sources
+stay exact. All12 direct gates pass on1,796 frozen inputs/1,207 Rust files, with
+1,329 cases/113 executable targets. Every prior1,318 identity/status/multiplicity
+and all original1,294 cases are preserved, adding11. All53 architecture cases,
+Python7 and6 doctests/15 targets pass. Full parity actually exits1 with unchanged
+129/143/589 and5903/4222/1681/1655 source/runtime counts. See M2-STEP-NODE1,
+ADR007 and `/private/tmp/ferricstore2-step-node-` genuine-r0/inverses/pipeline/
+full-identity/full-parity/adopted.json receipts. Local adoption rechecks both
+trees and every frozen input; no push. The full goal stays active and solo:
+actual original named Claim
+chain, rich captured context/attributes and all native/profile/Linux/macOS and
+later milestone exits remain mandatory. No new source-parity credit is claimed.
 
 The codex/step-storage-solo checkpoint implements consuming
 format7→8 upgrade, full new history captures and real Step value/core publication,

@@ -9,8 +9,8 @@ use wf_domain::workflow::control::{ControlState, EntryIdentity, EntryStamp, Prep
 use wf_ports::log::{
     CodecError, RaftLogEntry, RaftLogStore, measure_control_entry, normal_recovery_header,
     prepare_atomic_start, prepare_claim_phase, prepare_independent_record_batch,
-    prepare_public_mutation, prepare_record_batch, stored_value_recovery_header,
-    verify_complete_core_policy_patch_frame,
+    prepare_public_mutation, prepare_record_batch, step_continue_recovery_header,
+    stored_value_recovery_header, verify_complete_core_policy_patch_frame,
 };
 use wf_ports::state::{GroupApplyStore, StateTransactionError};
 use wf_storage::log::RedbLogStore;
@@ -131,7 +131,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if limits.stored_workflow_values {
+    let header = if limits.step_continue.enabled() {
+        step_continue_recovery_header(body, limits.normal.codec, limits.stored_workflow_values)
+    } else if limits.stored_workflow_values {
         stored_value_recovery_header(body, limits.normal.codec)
     } else {
         normal_recovery_header(body, limits.normal.codec)
@@ -210,7 +212,7 @@ fn audit_normal(
     if profile == 4 {
         return super::original_policy::audit(body, limits, base, stamp);
     }
-    if matches!(profile, 8 | 9) {
+    if matches!(profile, 8..=10) {
         return super::workflow_values::audit(body, limits, base, stamp, profile);
     }
     let available = limits
