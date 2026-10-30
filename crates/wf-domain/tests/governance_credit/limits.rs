@@ -79,3 +79,17 @@ fn credit_limits_and_canonical_state_refuse_before_new_owner_growth() -> TestRes
     );
     Ok(())
 }
+
+#[test]
+fn credit_owner_capture_preserves_source_finite_bounded_drain_rates() -> TestResult {
+    let owner = f::grant(f::owner(b"scope", 2)?, 1, 1, 100, 1000)?;
+    for rate in [-1.0, f64::NAN, f64::INFINITY, f64::MAX] {
+        let mut data = owner.clone().into_data();
+        data.leases[0].drain_rate_bits = rate.to_bits();
+        assert_eq!(
+            restore_credit_owner(data, CreditLimits::default()).err(),
+            Some(CreditError::InvalidState)
+        );
+    }
+    Ok(())
+}

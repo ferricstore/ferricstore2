@@ -388,6 +388,49 @@ controls remain distinct. Execute the required counterparts and profiles on
 BOTH Linux AND macOS; documented requirements and planner GREEN confer no
 5858-case coverage or service acceptance.
 
+### Pure governing-credit predecessor
+
+M1-CREDIT-OWNER1 adds a functional `governance::credit` boundary to wf-domain,
+with the same types-only dependency and enforced effect-free source rules.
+`new_credit_owner` and `restore_credit_owner` seal bounded canonical owner data;
+`decide_credit` consumes that owner through configuration, partial grants,
+spends, renewal, identified release and expiry. Known denial preserves actual
+expiry/reclaim-mark effects. Operational failure exposes no proposed transition.
+No public or stored success proves current governing-policy content, external
+reservation ownership, caller authorization or durable application.
+
+The complete source lease/cleanup fields remain captured data. Sorted vectors
+keep shard draining deterministic and permit fallible preallocation; existing
+owner and ID allocations move through decisions. Only genuinely new reservation
+IDs are copied. Identified complete retries precede changed spend time and
+expiry extension; partial-ID overlap refuses. Unknown/duplicate release cannot
+free a sibling, and captured non-amount legacy values stay inert. Policy
+fingerprints are explicit mathematical inputs, independently checked in test
+vectors; the later real owner adapter must bind complete current policy/version,
+scope/shard/epoch, original IDs and request outcomes.
+
+All six pinned CreditLease scenarios in flow_governance_models_test.exs:150–295
+have executed Rust counterparts with every source assertion linked. These are
+pure async:true ExUnit.Case scenarios with no local setup. Native source and
+required profiles/platforms are still unexecuted by this increment. An extra
+canonical-invariant correction clamps nonbinding pending_reclaim after new
+spend: the pinned helper can otherwise exceed available and fail its own
+LimitRecord validity condition. This preserves in-use credits and identified
+ownership; it is an explicit safety correction outside the six source traces.
+Expired reservation count slots are reusable without refunding work/byte peak
+charges. The strict source finite drain-rate ceiling remains enforced.
+
+Collection review uses the official [Vec insertion/retention contract](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.insert)
+and [fallible reservation contract](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.try_reserve_exact):
+insertion shifts descriptors, so those moves are charged before each insertion;
+expiry retains in place. Requested logical capacity is not an allocator or RSS
+guarantee. A reversed 1000-ID spend and duplicate retry verify complete identity,
+ordering and unchanged existing ID buffers. This is correctness/allocation-
+structure evidence, not proof that sorted vectors outperform an ordered tree.
+Native throughput, high-cardinality comparisons and Linux performance remain
+M8 requirements. The atomic Claim parent, monotone original-batch bind cursor,
+real governing-owner/outbox protocol and all M2–M8 exits remain unfinished.
+
 ## Original whole-flow replacement identity and admission
 
 The reviewed A-NEXT-M1-ORIGINAL-FLOW-PARENT1-CREATE1 increment implements the

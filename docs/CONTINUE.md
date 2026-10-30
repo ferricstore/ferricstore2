@@ -2,7 +2,46 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Current worktree: codex/stored-step-solo, M2-STORED-STEP1. Explicit stored Step
+Current worktree: codex/credit-owner-solo, M1-CREDIT-OWNER1. The pure governing
+credit reducer now executes configuration, partial grants, identified/anonymous
+compatibility spends, renewal, sibling-safe release and expiry without cloning
+an owner map. All 16 focused cases and strict Clippy pass. Twelve rejecting
+behavior cases were saved in c512600 before implementation; all remain intact.
+Two additional safety/resource failures and the drain-rate validity failure
+were saved before their corrections. The 1000-ID reversed/duplicate control is
+additional correctness evidence, not original TDD credit. Six pure original
+credit scenarios add six M1 counterparts / 57 assertion links: the checked
+ledger now has 135 source-derived declarations / 149 counterparts / 646 links.
+Native/runtime reconciliation and full required source/profile acceptance stay
+incomplete. All 12 workspace gates pass on 1,825 frozen inputs / 1,236 Rust
+files: 1,368 cases / 114 executable targets, 54 architecture cases, Python 7
+and 6 doctests / 15 targets. Every prior 1,351 test identity/status/multiplicity
+and all original 1,294 cases are preserved. The audit preserves 1,809 baseline
+inputs exactly, reviews four existing changes and accounts for seven production
+and five test files. Four saved test sources stay whole-file exact; the other
+two only append regressions and match their later saved failing versions.
+Actual full parity exits 1, with unchanged 5903/4222/1681/1655 runtime counts.
+See M1-CREDIT-OWNER1 and `/private/tmp/ferricstore2-credit-owner-` genuine-r0,
+supplement-genuine-r0, capture-genuine-r0, source-audit, pipeline, full-identity,
+full-parity and adopted JSON receipts. Local adoption checks both clean trees
+and every frozen input; no push.
+
+The matching Elixir safety fix is saved separately in
+/Users/yoavgea/repos/ferricstore-credit-pending-reclaim-solo at
+2e47c0cf26ac0cb8dbe73e0db9e0ff42d5507560. It changes the successful-spend
+pending-reclaim clamp and adds one full/partial/retry/owner-codec regression.
+Original test bodies, the dirty original checkout and pinned Rust references
+are preserved. Elixir runtime/formatter verification remains unexecuted; no
+native TDD or passing result is claimed. See the elixir-fix JSON receipt.
+
+This is a necessary domain predecessor for public governed Claim, not an
+authoritative or durable remote owner. The atomic public Claim parent, real
+governing-owner storage/outbox protocol, monotone batch reservation cursor,
+complete current policy checks, rich source captures and all native/profile/
+Linux/macOS and later milestone gates remain required. The full goal stays
+active and solo.
+
+Previous checkpoint: codex/stored-step-solo, M2-STORED-STEP1. Explicit stored Step
 intent 11 now shares the existing Step reducer, response 9 and consumed format 8
 writer, requiring actual alias 2. Plain intent 10 stays binary. All 5 storage,
 2 new codec and 3 Node cases pass; the 8 existing codec cases also pass. A sixth

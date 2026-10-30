@@ -2,7 +2,11 @@
 
 use crate::workflow::control::PreparedDigest;
 
+mod admission;
+mod capacity;
+mod decision;
 mod model;
+mod reservation;
 pub use model::{
     CreditDecision, CreditError, CreditLeaseData, CreditLimits, CreditOperation, CreditOwner,
     CreditOwnerData, CreditRejection, CreditReservationValue, CreditTransition,
@@ -12,23 +16,37 @@ pub use model::{
 /// # Errors
 /// Refuses invalid input, ownership/work limits or fallible reservation failure.
 pub fn new_credit_owner(
-    _scope: Vec<u8>,
-    _limit: u64,
-    _config_version: u64,
-    _policy_fingerprint: Option<PreparedDigest>,
-    _limits: CreditLimits,
+    scope: Vec<u8>,
+    limit: u64,
+    config_version: u64,
+    policy_fingerprint: Option<PreparedDigest>,
+    limits: CreditLimits,
 ) -> Result<CreditOwner, CreditError> {
-    Err(CreditError::InvalidState)
+    restore_credit_owner(
+        CreditOwnerData {
+            scope,
+            limit,
+            free: limit,
+            epoch: 0,
+            config_version,
+            policy_fingerprint,
+            cleanup_head: 1,
+            cleanup_tail: 0,
+            leases: Vec::new(),
+        },
+        limits,
+    )
 }
 
 /// Validates complete canonical data before sealing the moved owner.
 /// # Errors
 /// Refuses invalid scalars/order/capacity, resource limits or allocation failure.
 pub fn restore_credit_owner(
-    _data: CreditOwnerData,
-    _limits: CreditLimits,
+    data: CreditOwnerData,
+    limits: CreditLimits,
 ) -> Result<CreditOwner, CreditError> {
-    Err(CreditError::InvalidState)
+    admission::CreditCharge::inspect(&data, limits)?;
+    Ok(CreditOwner { data })
 }
 
 /// Consumes one owner into a complete mathematical business classification.
@@ -36,9 +54,11 @@ pub fn restore_credit_owner(
 /// # Errors
 /// Operational authority/input/allocation/work failure produces no transition.
 pub fn decide_credit(
-    _owner: CreditOwner,
-    _operation: CreditOperation<'_>,
-    _limits: CreditLimits,
+    mut owner: CreditOwner,
+    operation: CreditOperation<'_>,
+    limits: CreditLimits,
 ) -> Result<CreditTransition, CreditError> {
-    Err(CreditError::InvalidState)
+    let mut charge = admission::CreditCharge::inspect(&owner.data, limits)?;
+    let decision = decision::apply(&mut owner.data, operation, &mut charge)?;
+    Ok(CreditTransition { owner, decision })
 }

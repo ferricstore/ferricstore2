@@ -58374,3 +58374,103 @@ unclassified production files. With the explicit pure-root classification,
 all 54 architecture cases pass, including the existing 53 and new negative
 fixtures. Save these rejecting functions/tests before implementation. This
 establishes no passing credit semantics, durable owner, Claim parent or parity.
+
+M1-CREDIT-OWNER1 first body run passes all 12 saved behavior cases unchanged;
+strict focused Clippy passes after extracting configuration from the 111-line /
+28-complexity dispatcher, with no lint exception. Review identifies two further
+controls before acceptance. First, the pinned pure Spend helper can leave
+pending_reclaim above its reduced available balance; its strict LimitRecord
+validator rejects that state. Select a Rust canonical-invariant safety correction
+to clamp the nonbinding pending request after a successful new spend, preserving
+in-use credits, identities and every original six-case assertion. This is an
+explicit correction to unasserted source behavior, not broad source equivalence.
+Second, reservation count admission must retire actually expired entries before
+new spend inserts, while keeping work and owned-byte peak charges continuous.
+Add both actual failing regressions in the already selected protocol.rs before
+either correction. Add a separate 1000-ID reversed-input/duplicate-retry control
+to exercise the source public maximum mutation size; this additional bulk control
+follows implementation and is not original TDD credit. No file/type/dependency
+or resource-limit increase is selected.
+
+M1-CREDIT-OWNER1 supplemental runtime is genuinely 13 pass / 2 fail, zero
+ignored: pending tuple is (0,2,1) instead of canonical (0,2,0), and the retired
+one-entry reservation slot incorrectly refuses Limit. The original 12 still
+pass; the 1000-ID sorted/retry buffer-identity control passes as additional
+post-implementation correctness evidence. Preserve the full supplemental file
+and pre-correction source bytes before the two selected fixes. All 15 now pass
+with strict Clippy. Review of the complete pinned LimitRecord validity clauses
+also requires the finite drain-rate upper bound MAX_EXACT, not finite/positive
+alone; add the named invalid-rate capture regression in existing limits.rs
+before that input-validation correction. No ceiling or authority rule is relaxed.
+
+M1-CREDIT-OWNER1 source-mapping selection before ledger edits: the six credit
+declarations in FlowGovernanceModelsTest use async:true ExUnit.Case and no local
+setup or FlowCase adapter. Add scoped M1 counterparts to existing
+tests/parity/workflow-progress.json for 993aa75cf0d91408, 62cbfb2746ae42ac,
+1f154435217d5817, 8cc8266c06ba6f62, e4c948a3f69e25f6 and 60745710e80faa15,
+all in the frozen new governance_credit/source.rs. Preserve every original
+source assertion and all preexisting ledger entries. Tuple-success/error
+classifications are checked by the exercised grant/spend/configure helpers;
+their own-test anchors use the subsequent complete observed-state assertion,
+and limitations must state that correspondence explicitly. Preserve the exact
+original inputs and operation order, opaque invalid value shape/identity and
+independently derived ETF policy fingerprints. Retain existing runtime IDs.
+This adds source-derived M1 links only, with no native execution, full-profile,
+durable owner or public Claim credit. The separate pending-reclaim correction
+and new fault/resource/bulk controls are additional safety evidence, not original
+source-case assertions. No reference source, manifest, registration or full
+mapping status may be changed.
+
+M1-CREDIT-OWNER1 Elixir bug follow-up selection, before edits: the original
+checkout at 54c3bb9 still has the same successful-spend pending_reclaim defect;
+its two affected source/test files are clean. The earlier user request authorizes
+Elixir bug fixes. Use an isolated codex/credit-pending-reclaim-solo worktree based
+on that HEAD, preserving the original dirty checkout and pinned Rust reference.
+Edit only the existing credit_lease.ex successful-spend update and append one
+regression to existing flow_governance_models_test.exs. Clamp the nonbinding
+request to remaining available credits, preserving identities, in-use and global
+capacity. Exercise another-shard reclaim, full/partial spend, identified retry
+and LimitRecord encode/decode validity. No new file, module, type or dependency.
+This is a local source fix; unchanged denied native VM probes must not be retried.
+The Rust regression has real RED/GREEN evidence, but the Elixir regression must
+remain explicitly unexecuted until a supported native environment is available.
+Do not claim native TDD or merge the source fix into the dirty checkout.
+
+Elixir follow-up saved locally as 2e47c0cf26ac0cb8dbe73e0db9e0ff42d5507560
+in /Users/yoavgea/repos/ferricstore-credit-pending-reclaim-solo. The two-file
+inverse restores every original byte; all original test bodies and the original
+dirty checkout are preserved. The new regression covers spend amounts 1/2/3,
+exact identified retry and owner-codec acceptance. git diff --check passes.
+Elixir execution and formatter verification remain unavailable/unexecuted; no
+native passing result or TDD credit is claimed. See the elixir-fix JSON receipt.
+
+M1-CREDIT-OWNER1 final validation: all 12 direct gates pass on 1,825 frozen
+non-Markdown inputs / 1,236 Rust files. The full run passes 1,368 cases across
+114 executable targets (112 result targets and two existing benchmark correctness
+smokes), 54 architecture cases, Python 7 and 6 doctests / 15 targets. Every prior
+1,351 identity/status/multiplicity and all original 1,294 cases remain exact;
+17 new cases are the 16 credit scenarios and one architecture control. The six
+pure source scenarios add six checked M1 counterparts / 57 assertion links;
+actual progress is 135/149/646. Runtime reconciliation remains
+5903/4222/1681/1655, and actual full parity exits 1. No native, Linux, durable
+owner or public Claim acceptance is inferred.
+
+The source audit preserves 1,809 other baseline inputs, reviews exactly four
+existing changes and records seven new production files / five new test files.
+Four whole R0 test sources remain exact; the two others preserve their complete
+R0 prefixes and match the supplemental/capture genuine-RED whole-file hashes.
+Removing only the six new counterpart entries reconstructs every original
+progress-ledger byte. Dependencies, reference inputs, original test bodies,
+resource ceilings and all purity/size/complexity rules remain unchanged.
+The first dispatcher was refactored to meet the existing function/complexity
+limits; no lint exception was used. Sorted insertion has explicitly metered
+linear moves and requires native high-cardinality performance comparison in M8.
+
+Receipts: /private/tmp/ferricstore2-credit-owner-{genuine-r0,
+supplement-genuine-r0,capture-genuine-r0,source-audit,pipeline,full-identity,
+full-parity,adopted,elixir-fix}.json. This is a solo review. Local adoption must
+verify both clean trees and every frozen input; no push. Full completion stays
+active: the atomic public Claim parent, durable governing-owner and outbox
+protocol, rich source records/captures and every remaining milestone, original
+source/profile and native Linux/macOS gate remain mandatory. Next work must
+integrate a real functional owner/Claim path, not merely register a codec.

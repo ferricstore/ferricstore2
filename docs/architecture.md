@@ -31,7 +31,7 @@ The M0 crate boundaries below are scaffolded; types and domain operations are im
 | Crate | Modules and principal types | Allowed first-party dependencies |
 |---|---|---|
 | `wf-types` | identity, version, bounded values, errors; stable primitive newtypes | none |
-| `wf-domain` | workflow, claim, lease, retry, policy, signal, schedule, lineage, history, retention; Command, Event, WorkflowState, TransitionPlan | types |
+| `wf-domain` | workflow, claim, governance credit, lease, retry, policy, signal, schedule, lineage, history, retention; Command, Event, WorkflowState, TransitionPlan | types |
 | `wf-ports` | ConsensusPort, AuthoritativeReadPort, ProjectionReadPort, BlobPort, Clock, IdSource, NotificationPort, WorkflowClientPort; consistency and capability contracts | types, domain |
 | `wf-application` | admission, command preparation, query services, routing, response mapping; WorkflowService, QueryService | types, domain, ports |
 | `wf-storage` | log, state, transaction, snapshot staging, blob lifecycle; durable adapters | types, domain, ports |

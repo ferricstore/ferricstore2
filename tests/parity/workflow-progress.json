@@ -20220,42 +20220,474 @@
       "runtime_case_ids": [
         "dc096b4c5e12164ae31883ac87b3a2b12b6f00140dac8e222ff326ea78c753fb"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-credit-owner-993aa75cf0d91408",
+          "rust_file": "crates/wf-domain/tests/governance_credit/source.rs",
+          "rust_file_sha256": "10b67499f5a2a68944e380229d477f312722fd2da873591808f25b7a2780e16b",
+          "rust_module": "",
+          "rust_function": "source_credit_owner_grants_spends_and_refuses_over_limit",
+          "assertions": [
+            {
+              "source_line": 153,
+              "source_text": "assert {:ok, owner, lease} = CreditLease.grant(owner, 1, 6, now_ms: 1_000, ttl_ms: 5_000)",
+              "rust_line": 9,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.available, 6);"
+            },
+            {
+              "source_line": 154,
+              "source_text": "assert lease.available == 6",
+              "rust_line": 9,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.available, 6);"
+            },
+            {
+              "source_line": 155,
+              "source_text": "assert owner.free == 4",
+              "rust_line": 10,
+              "rust_text": "assert_eq!(owner.view().free, 4);"
+            },
+            {
+              "source_line": 157,
+              "source_text": "assert {:ok, owner, lease} = CreditLease.spend(owner, 1, 4, now_ms: 1_001)",
+              "rust_line": 12,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.available, 2);"
+            },
+            {
+              "source_line": 158,
+              "source_text": "assert lease.available == 2",
+              "rust_line": 12,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.available, 2);"
+            },
+            {
+              "source_line": 159,
+              "source_text": "assert lease.in_use == 4",
+              "rust_line": 13,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.in_use, 4);"
+            },
+            {
+              "source_line": 161,
+              "source_text": "assert {:ok, owner, lease} = CreditLease.grant(owner, 2, 5, now_ms: 1_002, ttl_ms: 5_000)",
+              "rust_line": 15,
+              "rust_text": "assert_eq!(f::lease(&owner, 2)?.available, 4);"
+            },
+            {
+              "source_line": 162,
+              "source_text": "assert lease.available == 4",
+              "rust_line": 15,
+              "rust_text": "assert_eq!(f::lease(&owner, 2)?.available, 4);"
+            },
+            {
+              "source_line": 163,
+              "source_text": "assert owner.free == 0",
+              "rust_line": 16,
+              "rust_text": "assert_eq!(owner.view().free, 0);"
+            },
+            {
+              "source_line": 165,
+              "source_text": "assert {:error, denial, owner} = CreditLease.grant(owner, 3, 1, now_ms: 1_003, ttl_ms: 5_000)",
+              "rust_line": 29,
+              "rust_text": "assert_eq!(denial.code(), Some(\"GOVERNANCE_LIMIT_EXCEEDED\"));"
+            },
+            {
+              "source_line": 166,
+              "source_text": "assert denial.code == \"GOVERNANCE_LIMIT_EXCEEDED\"",
+              "rust_line": 29,
+              "rust_text": "assert_eq!(denial.code(), Some(\"GOVERNANCE_LIMIT_EXCEEDED\"));"
+            },
+            {
+              "source_line": 167,
+              "source_text": "assert owner.free == 0",
+              "rust_line": 30,
+              "rust_text": "assert_eq!(owner.view().free, 0);"
+            }
+          ],
+          "limitations": [
+            "All original assertions and ordered input traces from this pure async:true ExUnit.Case are preserved. There is no local setup or FlowCase adapter in these six cases. Success/error tuple classifications execute in grant/spend/configure helpers; their own-test ledger anchor is the subsequent complete observed-state assertion, not a separate native-source result.",
+            "The owner is a canonical mathematical value, not current-policy, storage, routing, authorization, durable-outcome or remote-spend proof. Policy fingerprints are independently derived SHA256(ETF binary) captured inputs; invalid reservation map values retain opaque captured bytes and cannot release credit.",
+            "The source cases pass in the Rust governing-credit target on macOS. Original native VM/profile execution and independent Linux validation remain required. The separately tested pending-reclaim invariant correction, reservation-count reuse and 1000-ID controls add no original assertion or full-parity credit."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "62cbfb2746ae42ac",
       "runtime_case_ids": [
         "6c2c28e1ec36f84726ac54951f1a8f92fa50d0fbb13946fa27c34344139ad1fd"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-credit-owner-62cbfb2746ae42ac",
+          "rust_file": "crates/wf-domain/tests/governance_credit/source.rs",
+          "rust_file_sha256": "10b67499f5a2a68944e380229d477f312722fd2da873591808f25b7a2780e16b",
+          "rust_module": "",
+          "rust_function": "source_credit_owner_reclaims_expired_lease_credits",
+          "assertions": [
+            {
+              "source_line": 173,
+              "source_text": "assert {:ok, owner, _lease} = CreditLease.grant(owner, 1, 6, now_ms: 1_000, ttl_ms: 5)",
+              "rust_line": 37,
+              "rust_text": "assert_eq!(owner.view().free, 4);"
+            },
+            {
+              "source_line": 174,
+              "source_text": "assert owner.free == 4",
+              "rust_line": 37,
+              "rust_text": "assert_eq!(owner.view().free, 4);"
+            },
+            {
+              "source_line": 178,
+              "source_text": "assert owner.free == 10",
+              "rust_line": 45,
+              "rust_text": "assert_eq!(owner.view().free, 10);"
+            },
+            {
+              "source_line": 179,
+              "source_text": "refute Map.has_key?(owner.leases, 1)",
+              "rust_line": 46,
+              "rust_text": "assert!(owner.lease(1).is_none());"
+            }
+          ],
+          "limitations": [
+            "All original assertions and ordered input traces from this pure async:true ExUnit.Case are preserved. There is no local setup or FlowCase adapter in these six cases. Success/error tuple classifications execute in grant/spend/configure helpers; their own-test ledger anchor is the subsequent complete observed-state assertion, not a separate native-source result.",
+            "The owner is a canonical mathematical value, not current-policy, storage, routing, authorization, durable-outcome or remote-spend proof. Policy fingerprints are independently derived SHA256(ETF binary) captured inputs; invalid reservation map values retain opaque captured bytes and cannot release credit.",
+            "The source cases pass in the Rust governing-credit target on macOS. Original native VM/profile execution and independent Linux validation remain required. The separately tested pending-reclaim invariant correction, reservation-count reuse and 1000-ID controls add no original assertion or full-parity credit."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "1f154435217d5817",
       "runtime_case_ids": [
         "c10b87b3206a6e6d3f44f58bb15115a6b3b68120df901911df760b1958048a4a"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-credit-owner-1f154435217d5817",
+          "rust_file": "crates/wf-domain/tests/governance_credit/source.rs",
+          "rust_file_sha256": "10b67499f5a2a68944e380229d477f312722fd2da873591808f25b7a2780e16b",
+          "rust_module": "",
+          "rust_function": "source_identified_credit_release_is_idempotent_and_cannot_free_sibling",
+          "assertions": [
+            {
+              "source_line": 184,
+              "source_text": "assert {:ok, owner, _lease} = CreditLease.grant(owner, 1, 2, now_ms: 1_000, ttl_ms: 1_000)",
+              "rust_line": 57,
+              "rust_text": "assert_eq!(lease.in_use, 1);"
+            },
+            {
+              "source_line": 186,
+              "source_text": "assert {:ok, owner, _lease} =",
+              "rust_line": 57,
+              "rust_text": "assert_eq!(lease.in_use, 1);"
+            },
+            {
+              "source_line": 195,
+              "source_text": "assert owner.leases[1].in_use == 1",
+              "rust_line": 57,
+              "rust_text": "assert_eq!(lease.in_use, 1);"
+            },
+            {
+              "source_line": 196,
+              "source_text": "assert owner.leases[1].available == 1",
+              "rust_line": 58,
+              "rust_text": "assert_eq!(lease.available, 1);"
+            },
+            {
+              "source_line": 198,
+              "source_text": "assert owner.leases[1].reservations == %{\"reservation-b\" => 1}",
+              "rust_line": 59,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "All original assertions and ordered input traces from this pure async:true ExUnit.Case are preserved. There is no local setup or FlowCase adapter in these six cases. Success/error tuple classifications execute in grant/spend/configure helpers; their own-test ledger anchor is the subsequent complete observed-state assertion, not a separate native-source result.",
+            "The owner is a canonical mathematical value, not current-policy, storage, routing, authorization, durable-outcome or remote-spend proof. Policy fingerprints are independently derived SHA256(ETF binary) captured inputs; invalid reservation map values retain opaque captured bytes and cannot release credit.",
+            "The source cases pass in the Rust governing-credit target on macOS. Original native VM/profile execution and independent Linux validation remain required. The separately tested pending-reclaim invariant correction, reservation-count reuse and 1000-ID controls add no original assertion or full-parity credit."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "8cc8266c06ba6f62",
       "runtime_case_ids": [
         "fc6b3ca331e013f87b62fda5a02e6c3760181a49fca147d799559d294c0d6228"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-credit-owner-8cc8266c06ba6f62",
+          "rust_file": "crates/wf-domain/tests/governance_credit/source.rs",
+          "rust_file_sha256": "10b67499f5a2a68944e380229d477f312722fd2da873591808f25b7a2780e16b",
+          "rust_module": "",
+          "rust_function": "source_credit_release_preserves_invalid_reservation_value_shape",
+          "assertions": [
+            {
+              "source_line": 217,
+              "source_text": "assert owner.leases[1].in_use == 1",
+              "rust_line": 85,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.in_use, 1);"
+            },
+            {
+              "source_line": 218,
+              "source_text": "assert owner.leases[1].available == 0",
+              "rust_line": 86,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.available, 0);"
+            },
+            {
+              "source_line": 220,
+              "source_text": "assert owner.leases[1].reservations == %{",
+              "rust_line": 87,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.reservations, lease.reservations);"
+            }
+          ],
+          "limitations": [
+            "All original assertions and ordered input traces from this pure async:true ExUnit.Case are preserved. There is no local setup or FlowCase adapter in these six cases. Success/error tuple classifications execute in grant/spend/configure helpers; their own-test ledger anchor is the subsequent complete observed-state assertion, not a separate native-source result.",
+            "The owner is a canonical mathematical value, not current-policy, storage, routing, authorization, durable-outcome or remote-spend proof. Policy fingerprints are independently derived SHA256(ETF binary) captured inputs; invalid reservation map values retain opaque captured bytes and cannot release credit.",
+            "The source cases pass in the Rust governing-credit target on macOS. Original native VM/profile execution and independent Linux validation remain required. The separately tested pending-reclaim invariant correction, reservation-count reuse and 1000-ID controls add no original assertion or full-parity credit."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e4c948a3f69e25f6",
       "runtime_case_ids": [
         "1931c62d932ad5b8efbbcc7f8e9670272e8edae24acd9842853a4b7679ccf088"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-credit-owner-e4c948a3f69e25f6",
+          "rust_file": "crates/wf-domain/tests/governance_credit/source.rs",
+          "rust_file_sha256": "10b67499f5a2a68944e380229d477f312722fd2da873591808f25b7a2780e16b",
+          "rust_module": "",
+          "rust_function": "source_credit_owner_monotone_config_drains_without_erasing_in_use",
+          "assertions": [
+            {
+              "source_line": 232,
+              "source_text": "assert {:ok, owner, _lease} =",
+              "rust_line": 111,
+              "rust_text": "assert_eq!((owner.view().limit, owner.view().config_version), (6, 2));"
+            },
+            {
+              "source_line": 235,
+              "source_text": "assert {:ok, owner, _lease} =",
+              "rust_line": 111,
+              "rust_text": "assert_eq!((owner.view().limit, owner.view().config_version), (6, 2));"
+            },
+            {
+              "source_line": 241,
+              "source_text": "assert {:ok, owner, _lease} =",
+              "rust_line": 111,
+              "rust_text": "assert_eq!((owner.view().limit, owner.view().config_version), (6, 2));"
+            },
+            {
+              "source_line": 244,
+              "source_text": "assert {:ok, owner, _lease} =",
+              "rust_line": 111,
+              "rust_text": "assert_eq!((owner.view().limit, owner.view().config_version), (6, 2));"
+            },
+            {
+              "source_line": 250,
+              "source_text": "assert {:ok, owner} = CreditLease.reconfigure(owner, 6, 2, \"policy-v2\")",
+              "rust_line": 111,
+              "rust_text": "assert_eq!((owner.view().limit, owner.view().config_version), (6, 2));"
+            },
+            {
+              "source_line": 251,
+              "source_text": "assert owner.limit == 6",
+              "rust_line": 111,
+              "rust_text": "assert_eq!((owner.view().limit, owner.view().config_version), (6, 2));"
+            },
+            {
+              "source_line": 252,
+              "source_text": "assert owner.config_version == 2",
+              "rust_line": 111,
+              "rust_text": "assert_eq!((owner.view().limit, owner.view().config_version), (6, 2));"
+            },
+            {
+              "source_line": 253,
+              "source_text": "assert owner.policy_version == CreditLease.policy_version_fingerprint(\"policy-v2\")",
+              "rust_line": 112,
+              "rust_text": "assert_eq!(owner.view().policy_fingerprint, Some(f::fingerprint(2)?));"
+            },
+            {
+              "source_line": 254,
+              "source_text": "assert owner.free == 0",
+              "rust_line": 113,
+              "rust_text": "assert_eq!(owner.view().free, 0);"
+            },
+            {
+              "source_line": 255,
+              "source_text": "assert owner.leases[1].available == 0",
+              "rust_line": 114,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 256,
+              "source_text": "assert owner.leases[2].available == 0",
+              "rust_line": 114,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 257,
+              "source_text": "assert owner.leases[1].in_use + owner.leases[2].in_use == 8",
+              "rust_line": 121,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.in_use + f::lease(&owner, 2)?.in_use, 8);"
+            },
+            {
+              "source_line": 260,
+              "source_text": "assert reclaimed.free == 2",
+              "rust_line": 128,
+              "rust_text": "assert_eq!(expired.view().free, 2);"
+            },
+            {
+              "source_line": 261,
+              "source_text": "assert reclaimed.leases[1].in_use == 4",
+              "rust_line": 129,
+              "rust_text": "assert_eq!(f::lease(&expired, 1)?.in_use, 4);"
+            },
+            {
+              "source_line": 262,
+              "source_text": "refute Map.has_key?(reclaimed.leases, 2)",
+              "rust_line": 130,
+              "rust_text": "assert!(expired.lease(2).is_none());"
+            },
+            {
+              "source_line": 264,
+              "source_text": "assert {:ok, ^owner} = CreditLease.reconfigure(owner, 20, 1, \"stale-policy\")",
+              "rust_line": 131,
+              "rust_text": "assert_eq!(f::configure(owner.clone(), 20, 1, 4)?, owner);"
+            },
+            {
+              "source_line": 266,
+              "source_text": "assert {:error, \"ERR flow limit config_version conflict\", ^owner} =",
+              "rust_line": 140,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 266,
+              "source_text": "assert {:error, \"ERR flow limit config_version conflict\", ^owner} =",
+              "rust_line": 144,
+              "rust_text": "assert_eq!(conflict, owner);"
+            },
+            {
+              "source_line": 270,
+              "source_text": "assert owner.leases[1].in_use == 3",
+              "rust_line": 146,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 271,
+              "source_text": "assert owner.leases[1].available == 0",
+              "rust_line": 146,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 274,
+              "source_text": "assert owner.leases[1].in_use == 2",
+              "rust_line": 151,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 275,
+              "source_text": "assert owner.leases[1].available == 0",
+              "rust_line": 151,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 278,
+              "source_text": "assert owner.leases[1].in_use == 1",
+              "rust_line": 156,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 279,
+              "source_text": "assert owner.leases[1].available == 1",
+              "rust_line": 156,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 281,
+              "source_text": "assert {:ok, owner} = CreditLease.reconfigure(owner, 12, 3, \"policy-v3\")",
+              "rust_line": 161,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 282,
+              "source_text": "assert owner.limit == 12",
+              "rust_line": 161,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 283,
+              "source_text": "assert owner.config_version == 3",
+              "rust_line": 161,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 284,
+              "source_text": "assert owner.policy_version == CreditLease.policy_version_fingerprint(\"policy-v3\")",
+              "rust_line": 169,
+              "rust_text": "assert_eq!(owner.view().policy_fingerprint, Some(f::fingerprint(3)?));"
+            },
+            {
+              "source_line": 285,
+              "source_text": "assert owner.free == 6",
+              "rust_line": 161,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "All original assertions and ordered input traces from this pure async:true ExUnit.Case are preserved. There is no local setup or FlowCase adapter in these six cases. Success/error tuple classifications execute in grant/spend/configure helpers; their own-test ledger anchor is the subsequent complete observed-state assertion, not a separate native-source result.",
+            "The owner is a canonical mathematical value, not current-policy, storage, routing, authorization, durable-outcome or remote-spend proof. Policy fingerprints are independently derived SHA256(ETF binary) captured inputs; invalid reservation map values retain opaque captured bytes and cannot release credit.",
+            "The source cases pass in the Rust governing-credit target on macOS. Original native VM/profile execution and independent Linux validation remain required. The separately tested pending-reclaim invariant correction, reservation-count reuse and 1000-ID controls add no original assertion or full-parity credit."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "60745710e80faa15",
       "runtime_case_ids": [
         "dc559ed38998e20ef5d9adf87756805fb3659f90d5ee686b6982058aee3e2ac8"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-credit-owner-60745710e80faa15",
+          "rust_file": "crates/wf-domain/tests/governance_credit/source.rs",
+          "rust_file_sha256": "10b67499f5a2a68944e380229d477f312722fd2da873591808f25b7a2780e16b",
+          "rust_module": "",
+          "rust_function": "source_credit_owner_marks_reclaim_on_other_shard_exhaustion",
+          "assertions": [
+            {
+              "source_line": 291,
+              "source_text": "assert {:ok, owner, _lease} = CreditLease.grant(owner, 1, 10, now_ms: 1_000, ttl_ms: 5_000)",
+              "rust_line": 189,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.pending_reclaim, 1);"
+            },
+            {
+              "source_line": 292,
+              "source_text": "assert {:error, denial, owner} = CreditLease.grant(owner, 2, 1, now_ms: 1_001, ttl_ms: 5_000)",
+              "rust_line": 188,
+              "rust_text": "assert_eq!(denial.code(), Some(\"GOVERNANCE_LIMIT_EXCEEDED\"));"
+            },
+            {
+              "source_line": 294,
+              "source_text": "assert denial.code == \"GOVERNANCE_LIMIT_EXCEEDED\"",
+              "rust_line": 188,
+              "rust_text": "assert_eq!(denial.code(), Some(\"GOVERNANCE_LIMIT_EXCEEDED\"));"
+            },
+            {
+              "source_line": 295,
+              "source_text": "assert owner.leases[1].pending_reclaim == 1",
+              "rust_line": 189,
+              "rust_text": "assert_eq!(f::lease(&owner, 1)?.pending_reclaim, 1);"
+            }
+          ],
+          "limitations": [
+            "All original assertions and ordered input traces from this pure async:true ExUnit.Case are preserved. There is no local setup or FlowCase adapter in these six cases. Success/error tuple classifications execute in grant/spend/configure helpers; their own-test ledger anchor is the subsequent complete observed-state assertion, not a separate native-source result.",
+            "The owner is a canonical mathematical value, not current-policy, storage, routing, authorization, durable-outcome or remote-spend proof. Policy fingerprints are independently derived SHA256(ETF binary) captured inputs; invalid reservation map values retain opaque captured bytes and cannot release credit.",
+            "The source cases pass in the Rust governing-credit target on macOS. Original native VM/profile execution and independent Linux validation remain required. The separately tested pending-reclaim invariant correction, reservation-count reuse and 1000-ID controls add no original assertion or full-parity credit."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "9795f43e5007d3d5",
