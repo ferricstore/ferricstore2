@@ -14,13 +14,13 @@ use wf_ports::log::{
     decide_fresh_claim_phase_observed, inspect_claim_phase_point, prepare_claim_phase,
 };
 use wf_ports::state::{
-    GroupApplyStore, GroupApplyTransaction, GroupClaimChanges, GroupClaimTransaction,
-    StateTransactionError,
+    GroupApplyStore, GroupApplyTransaction, GroupClaimChanges, StateTransactionError,
 };
 use wf_types::version::LogIdentity;
 
 mod load;
 mod observations;
+pub(crate) mod values;
 
 /// Immutable server profile; entry budgets never raise its operational limits.
 #[derive(Clone, Copy)]
@@ -115,7 +115,23 @@ pub fn apply_claim_transaction(
     log: LogIdentity,
     limits: ClaimTransactionLimits,
 ) -> Result<ClaimTransactionOutcome, ClaimTransactionError> {
-    let live = live_bytes(limits.base)?;
+    apply(store, expected_scope, encoded, log, limits, None)
+}
+
+fn apply(
+    store: &mut RedbStateStore,
+    expected_scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: ClaimTransactionLimits,
+    value_resources: Option<values::ClaimValueResources>,
+) -> Result<ClaimTransactionOutcome, ClaimTransactionError> {
+    let live = super::load::sum(&[
+        live_bytes(limits.base)?,
+        value_resources.as_ref().map_or(0, |resources| {
+            resources.limits.maximum_value_temporary_bytes
+        }),
+    ])?;
     let available =
         limits
             .base
@@ -137,6 +153,9 @@ pub fn apply_claim_transaction(
         limits.base.maximum_read_bytes,
         limits.base.maximum_adapter_bytes,
     )?;
+    if value_resources.is_some() && tx.value_manifest()?.layout != 8 {
+        return Err(StateTransactionError::UnsupportedLayout.into());
+    }
     let predecessor = tx.control()?;
     let retained_nonempty = tx.retained_nonempty(expected_scope.tenant())?;
     let original = tx.outcome(expected_scope.tenant(), &decoded.request().request)?;
@@ -161,7 +180,7 @@ pub fn apply_claim_transaction(
                 plan,
                 limits.base.codec.admission(),
             )?;
-            tx.commit_claim(&changes)?;
+            values::commit(tx, &changes, value_resources)?;
             let (control, kind) = complete_kind(changes.into_plan())?;
             Ok(match kind {
                 0 => ClaimTransactionOutcome::Retained {
@@ -187,7 +206,7 @@ pub fn apply_claim_transaction(
                     plan,
                     limits.base.codec.admission(),
                 )?;
-                tx.commit_claim(&changes)?;
+                values::commit(tx, &changes, value_resources)?;
                 return fresh_reply(changes.into_plan());
             }
             let mut loaded = load::LoadedClaim::load(&tx, expected_scope, &fresh, limits)?;
@@ -198,7 +217,7 @@ pub fn apply_claim_transaction(
                 plan,
                 limits.base.codec.admission(),
             )?;
-            tx.commit_claim(&changes)?;
+            values::commit(tx, &changes, value_resources)?;
             fresh_reply(changes.into_plan())
         }
     }
@@ -215,8 +234,18 @@ pub fn apply_workflow_value_claim_transaction(
     limits: super::WorkflowValueTransactionLimits,
     work: ClaimWorkLimits,
 ) -> Result<ClaimTransactionOutcome, ClaimTransactionError> {
-    let _ = (store, scope, encoded, log, limits, work);
-    Err(StateTransactionError::UnsupportedLayout.into())
+    let resources = values::ClaimValueResources::new(limits, encoded.len())?;
+    apply(
+        store,
+        scope,
+        encoded,
+        log,
+        ClaimTransactionLimits {
+            base: limits.record_batch,
+            work,
+        },
+        Some(resources),
+    )
 }
 
 fn live_bytes(limits: RecordBatchTransactionLimits) -> Result<usize, ClaimTransactionError> {

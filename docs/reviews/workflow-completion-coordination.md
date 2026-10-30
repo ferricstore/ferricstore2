@@ -58048,3 +58048,51 @@ unchanged; only their named test visibility seam is broadened. Receipt/logs:
 r0-architecture,r0-clippy-first,r0-clippy-second}.{json,log} as appropriate.
 Save this runtime rejecting checkpoint before the selected implementation bodies.
 No ignored case, native/Linux execution, source credit or completed-goal claim.
+
+M2-VALUE-CLAIM1 bodies follow saved7ac9f66. All8 unchanged storage regressions
+pass, including source declarationf2f7a6b246087607's complete durable FIFO
+sequence, actual typed Retry error, both alias profiles, immutable-value counts,
+birth/TTL/history, all retained gates, empty/rejected outcomes, governance refusal,
+limits, delegated uncertainty and received snapshots. All3 unchanged Node cases
+pass for committed replay, old opt-in/cap refusal and received/purged suffixes.
+Strict focused Clippy passes. First body check found two unused imports, removed
+before runtime; preserve first-body-check.log rather than calling it behavior RED.
+
+Solo architecture/performance review: new opaque Claim publication owns one
+fallibly reserved step vector and borrows actual accepted plans/orderings. It
+copies only scalar binding data; no record/payload/query-key clone or birth/
+policy witness is added. Same-guard binding reads use actual expected versions
+and current defaults; the writer repeats complete Claim/control validation and
+plan/order correspondence, then publishes all core/index/history/binding/
+outcome/control units under the same Immediate transaction. Claim supplies no
+new values or aliases. Shared binding emission preserves the old field/key/
+work/temporary protocol. Layout8 is checked explicitly; old APIs and Node opt-ins
+retain their prior closed selection. Selected configuration/profile descriptors,
+value work and temporary capacity are paid before decode/ownership. Whole-call
+point/body counters are never reset. This is inspected allocation structure and
+logical accounting, not native allocator/RSS/throughput or Linux evidence.
+
+All13 saved test sources remain byte-exact; no post-RED oracle edit. Four saved
+implementation seams change as selected; only the two approved production files/
+three private models are created. Full validation freezes1,806 inputs/1,217 Rust
+files. Main source/parity ledgers remain unchanged: this is executed durable
+source-sequence conformance for the nongovernance trusted-parent leaf, not
+public Claim parent/governance/original-profile or full Elixir execution credit.
+
+M2-VALUE-CLAIM1 final workspace validation passes all 12 direct gates on the
+same 1,806 inputs / 1,217 Rust files. All 1,340 cases / 113 executable targets
+pass, including all 53 architecture cases and both unchanged benchmark
+correctness smokes. Complete identity/status/multiplicity comparisons retain
+every prior 1,329 case and all original 1,294 cases, adding exactly the 11 saved
+regressions. Python 7 and 6 doctests / 15 targets pass. Strict Clippy enforces
+the existing file/function/nesting/complexity limits without exemptions.
+
+The source audit accounts for all 15 changed existing inputs and the two
+approved new production files; 1,781 other baseline inputs remain exact. All
+13 saved test sources remain byte-exact. Actual full parity exits 1, preserving
+129 source-derived declarations / 143 counterparts / 589 assertion links and
+5903 registered / 4222 linked / 1681 unmatched / 1655 unresolved runtime counts.
+Receipts: /private/tmp/ferricstore2-value-claim-{source-audit,pipeline,
+full-identity,full-parity,adopted}.json. No source credit, native performance,
+Linux execution, independent peer review or full-product completion is claimed.
+Local adoption must verify both clean trees against every frozen input; no push.

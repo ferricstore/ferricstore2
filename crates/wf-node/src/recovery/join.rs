@@ -212,7 +212,7 @@ fn audit_normal(
     if profile == 4 {
         return super::original_policy::audit(body, limits, base, stamp);
     }
-    if matches!(profile, 8..=10) {
+    if matches!(profile, 8..=10) || (profile == 3 && limits.value_claim_work.is_some()) {
         return super::workflow_values::audit(body, limits, base, stamp, profile);
     }
     let available = limits

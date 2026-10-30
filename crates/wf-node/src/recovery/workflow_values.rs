@@ -6,14 +6,15 @@ use wf_domain::claim::apply::ClaimWorkLimits;
 use wf_domain::workflow::control::{ControlState, EntryStamp};
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::log::{
-    RaftLogEntry, prepare_step_continue, prepare_workflow_stored_value_batch,
+    RaftLogEntry, prepare_claim_phase, prepare_step_continue, prepare_workflow_stored_value_batch,
     prepare_workflow_value_batch,
 };
 use wf_storage::state::RedbStateStore;
 use wf_storage::transaction::{
-    RecordBatchTransactionOutcome, WorkflowValueTransactionError, WorkflowValueTransactionLimits,
-    apply_step_continue_transaction, apply_workflow_stored_value_batch_transaction,
-    apply_workflow_value_batch_transaction,
+    ClaimTransactionOutcome, RecordBatchTransactionOutcome, WorkflowValueTransactionError,
+    WorkflowValueTransactionLimits, apply_step_continue_transaction,
+    apply_workflow_stored_value_batch_transaction, apply_workflow_value_batch_transaction,
+    apply_workflow_value_claim_transaction,
 };
 use wf_types::identity::{GroupId, RecoveryId, TenantId};
 use wf_types::version::CommittedTime;
@@ -52,8 +53,9 @@ impl CommittedRecoveryLimits {
         work: usize,
         temporary: usize,
     ) -> Result<Self, CommittedRecoveryError> {
-        let _ = (self, claim_work, rows, bytes, work, temporary);
-        Err(CommittedRecoveryError::UnsupportedEntry)
+        let mut selected = self.with_workflow_value_limits(rows, bytes, work, temporary)?;
+        selected.value_claim_work = Some(claim_work);
+        Ok(selected)
     }
 
     /// Reads only explicitly selected named Claim work and shared value limits.
@@ -162,7 +164,9 @@ pub(super) fn audit(
     version: u16,
 ) -> Result<EntryStamp, CommittedRecoveryError> {
     let entry = total(&[512, body.len()])?;
-    let profile_header = if version == 9 {
+    let profile_header = if version == 3 {
+        size_of::<Option<(ClaimWorkLimits, WorkflowValueTransactionLimits)>>()
+    } else if version == 9 {
         total(&[
             size_of::<Option<WorkflowValueTransactionLimits>>(),
             size_of::<bool>(),
@@ -182,7 +186,7 @@ pub(super) fn audit(
         .workspace
         .checked_sub(live)
         .ok_or(CommittedRecoveryError::Limit)?;
-    if version == 10 {
+    if matches!(version, 3 | 10) {
         let work = total(&[
             65_536,
             4096,
@@ -193,11 +197,18 @@ pub(super) fn audit(
         if work > profile.maximum_value_work {
             return Err(CommittedRecoveryError::Limit);
         }
-        let decoded = prepare_step_continue(body, profile.record_batch.codec, available).map_err(
-            |error| {
+        let prepare = if version == 3 {
+            prepare_claim_phase
+        } else {
+            prepare_step_continue
+        };
+        let decoded = prepare(body, profile.record_batch.codec, available).map_err(|error| {
+            if version == 3 {
+                CommittedRecoveryError::Claim(error.into())
+            } else {
                 CommittedRecoveryError::Value(WorkflowValueTransactionError::Record(error.into()))
-            },
-        )?;
+            }
+        })?;
         drop(decoded);
         return Ok(EntryStamp::Stamped(stamp));
     }
@@ -225,7 +236,9 @@ pub(super) fn apply(
 ) -> Result<ControlState, CommittedRecoveryError> {
     let (limits, base, version) = context;
     let entry_owner = total(&[512, entry.body().len()])?;
-    let profile_header = if version == 9 {
+    let profile_header = if version == 3 {
+        size_of::<Option<(ClaimWorkLimits, WorkflowValueTransactionLimits)>>()
+    } else if version == 9 {
         total(&[
             size_of::<Option<WorkflowValueTransactionLimits>>(),
             size_of::<bool>(),
@@ -260,6 +273,31 @@ pub(super) fn apply(
         RecoveryId::new(replay::copy(fields[2])?)
             .map_err(|_| CommittedRecoveryError::Codec(wf_ports::log::CodecError::Malformed))?,
     );
+    if version == 3 {
+        let (work, _) = limits
+            .workflow_value_claim_limits()
+            .ok_or(CommittedRecoveryError::UnsupportedEntry)?;
+        let outcome = apply_workflow_value_claim_transaction(
+            state,
+            &scope,
+            entry.body(),
+            entry.id(),
+            profile,
+            work,
+        )
+        .map_err(CommittedRecoveryError::Claim)?;
+        let control = match outcome {
+            ClaimTransactionOutcome::Retained { control, outcome } => {
+                drop(outcome);
+                control
+            }
+            ClaimTransactionOutcome::IntentConflict(control)
+            | ClaimTransactionOutcome::Expired(control)
+            | ClaimTransactionOutcome::LogReplay(control) => control,
+        };
+        drop(scope);
+        return Ok(control);
+    }
     let driver = if version == 9 {
         apply_workflow_stored_value_batch_transaction
     } else if version == 10 {
@@ -287,6 +325,9 @@ fn profile(
     version: u16,
 ) -> Result<WorkflowValueTransactionLimits, CommittedRecoveryError> {
     let selected = match version {
+        3 => limits
+            .workflow_value_claim_limits()
+            .map(|(_, profile)| profile),
         8 => limits.workflow_value_limits(),
         9 => limits.workflow_stored_value_limits(),
         10 => limits.step_continue_limits(),

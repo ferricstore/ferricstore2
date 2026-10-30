@@ -85,7 +85,7 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
-    if matches!(profile, 8..=10) {
+    if matches!(profile, 8..=10) || (profile == 3 && limits.value_claim_work.is_some()) {
         return super::workflow_values::apply(state, entry, fields, (limits, base, profile));
     }
     if profile == 2 && !limits.core_policy {

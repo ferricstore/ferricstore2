@@ -136,4 +136,12 @@ impl super::RedbStateTransaction<'_> {
     ) -> Result<(), StateTransactionError> {
         super::commit::values::apply(self, changes, publication)
     }
+
+    pub(crate) fn commit_claim_values(
+        self,
+        changes: &wf_ports::state::GroupClaimChanges<'_, '_>,
+        publication: &mut crate::transaction::ClaimValuePublicationPlan<'_>,
+    ) -> Result<(), StateTransactionError> {
+        super::commit::claim::apply_values(self, changes, publication)
+    }
 }

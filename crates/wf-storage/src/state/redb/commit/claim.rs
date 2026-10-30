@@ -2,6 +2,7 @@
 
 use super::super::store::{RedbStateTransaction, fence};
 use super::{publication, validate_versions, write_control, write_outcome, write_records};
+use crate::transaction::ClaimValuePublicationPlan;
 use redb::Durability;
 use wf_domain::workflow::control::plan_control;
 use wf_domain::workflow::request::{RequestScope, RetainedOutcome};
@@ -10,21 +11,35 @@ use wf_ports::log::{
 };
 use wf_ports::state::{GroupApplyTransaction, GroupClaimChanges, StateTransactionError};
 
+mod values;
+
 pub(in super::super) fn apply(
     tx: RedbStateTransaction<'_>,
     changes: &GroupClaimChanges<'_, '_>,
 ) -> Result<(), StateTransactionError> {
     let fenced = tx.fenced;
-    publish(tx, changes).inspect_err(|error| fence(fenced, *error))
+    publish(tx, changes, None).inspect_err(|error| fence(fenced, *error))
+}
+
+pub(in super::super) fn apply_values(
+    tx: RedbStateTransaction<'_>,
+    changes: &GroupClaimChanges<'_, '_>,
+    publication: &mut ClaimValuePublicationPlan<'_>,
+) -> Result<(), StateTransactionError> {
+    let fenced = tx.fenced;
+    publish(tx, changes, Some(publication)).inspect_err(|error| fence(fenced, *error))
 }
 
 fn publish(
     mut tx: RedbStateTransaction<'_>,
     changes: &GroupClaimChanges<'_, '_>,
+    mut publication: Option<&mut ClaimValuePublicationPlan<'_>>,
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
-    if matches!(tx.layout, 7 | 8) {
-        return Err(StateTransactionError::UnsupportedLayout);
+    match publication.as_deref_mut() {
+        Some(values) => values::validate(&tx, changes, values)?,
+        None if matches!(tx.layout, 7 | 8) => return Err(StateTransactionError::UnsupportedLayout),
+        None => {}
     }
     let scope = changes.scope();
     if scope.group() != tx.group || scope.recovery() != tx.recovery {
@@ -54,6 +69,9 @@ fn publish(
         for lane in lanes {
             publication::head_due(&tx, scope, lane, true)?;
         }
+    }
+    if let Some(values) = publication {
+        values::publish(&tx, scope, values)?;
     }
     if let Some(outcome) = changes.outcome() {
         write_outcome(&tx, scope, outcome)?;

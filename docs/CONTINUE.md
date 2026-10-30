@@ -2,23 +2,36 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Current worktree: codex/value-claim-solo. M2-VALUE-CLAIM1 has actual compiled
-R0 evidence:8 healthy storage Claim calls refuse UnsupportedLayout and3 healthy
-Node selections refuse UnsupportedEntry; every later functional/source tail is
-masked. Strict focused Clippy and all53 architecture cases pass. All17 selected
-sources are frozen;1,787 other baseline inputs are exact. Save the rejecting
-checkpoint before bodies. See the concrete architecture selection and
-`/private/tmp/ferricstore2-value-claim-genuine-r0.json`. Primary remains at the
-passing83a1c5c Node Step checkpoint until full functional-batch verification.
+Current checkpoint: codex/value-claim-solo, M2-VALUE-CLAIM1. The explicit
+format 8 named Claim path now preserves captured values and complete history.
+The durable Create→named Claim→Step→typed Retry→FIFO trace uses original policy
+activation. All 8 storage and 3 Node regressions pass with every saved test file
+unchanged. Rejecting runtime was saved in 7ac9f66 before implementation.
 
-Product status: still incomplete. Named Claim currently refuses value-capable
-layouts7/8; the new Step path uses atomic StartAndClaim fixture setup. Prioritize
-the complete original Create→named Claim→Step→Retry→FIFO path with real value/
-history companions next. Rich captured context/attributes, remaining source
-operations, accepted consensus/read barriers, application authorization/submission,
-HTTP/TCP listeners and required native/profile/Linux/macOS validation remain
-open. Green component tests are not product completion. Consolidate functional
-batches and use focused checks during development; retain full milestone gates.
+All 12 workspace gates pass on 1,806 frozen inputs / 1,217 Rust files, with
+1,340 cases / 113 executable targets. Every prior 1,329 test identity, status
+and multiplicity remains, together with all original 1,294 cases. All 53
+architecture cases, Python 7 and 6 doctests / 15 targets pass. The source audit
+accounts for 15 changed existing inputs, preserves 1,781 other baseline inputs
+and verifies all 13 saved test sources byte for byte. See M2-VALUE-CLAIM1,
+ADR-007 and `/private/tmp/ferricstore2-value-claim-` genuine-r0, source-audit,
+pipeline, full-identity, full-parity and adopted JSON receipts. Local adoption
+checks both trees against the tested inputs; no push.
+
+Product status: still incomplete. The new Claim driver is a trusted-parent
+leaf; the old Claim API still refuses layouts 7/8. Public Claim parent migration,
+governance and automatic reclaim orchestration remain required. Typed Step maps,
+rich captured context/attributes, remaining source operations, accepted consensus
+and read barriers, application authorization/submission, HTTP/TCP listeners and
+required native/profile/Linux/macOS validation also remain open. Full parity
+actually exits 1, with unchanged 129/143/589 source and 5903/4222/1681/1655
+runtime counts. This batch adds durable source-sequence evidence, with no new
+full source-case, native or Linux execution credit. The full goal stays active
+and solo. Continue in functional batches, using focused development checks and
+full milestone gates.
+
+The following paragraphs record predecessor checkpoints and their remaining
+work at that time; the current status above supersedes their named-Claim gap.
 
 Worktree branch: codex/step-node-solo. M2-STEP-NODE1 implements explicit Step
 committed-prefix audit/replay through the real format8 writer, retaining closed

@@ -163,6 +163,62 @@ pub(crate) fn load(
     Ok(result)
 }
 
+pub(crate) fn load_at_version(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    (partition, id): (&PartitionId, &RecordId),
+    expected: u64,
+    defaults: wf_ports::consensus::WorkflowValueDefaults,
+    charge: &mut ValueCharge,
+    live: usize,
+) -> Result<ValueBindingData, Error> {
+    charge.candidate()?;
+    let logical = total(
+        read::scope_bytes(scope),
+        [partition.as_bytes().len(), id.as_bytes().len()],
+    )?;
+    charge.work(product(logical, 16)?)?;
+    let bound = total(64, [product(logical, 2)?])?;
+    charge.temporary(total(live, [bound])?)?;
+    let key = tx.key(
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            partition.as_bytes(),
+            id.as_bytes(),
+        ],
+        0,
+        |maximum| key::encode_binding_key(scope, partition, id, None, maximum),
+    )?;
+    tx.step()?;
+    let table = tx
+        .write
+        .open_table(tx.rows_table)
+        .map_err(admission::table_error)?;
+    tx.step()?;
+    let raw = table
+        .get(key.as_slice())
+        .map_err(|error| admission::storage_error(&error))?
+        .ok_or(Error::Corrupt)?;
+    tx.recovery_row(&key, raw.value())?;
+    charge.work(total(128, [raw.value().len()])?)?;
+    charge.temporary(total(
+        live,
+        [key.len(), raw.value().len(), size_of::<ValueBindingData>()],
+    )?)?;
+    let binding = value::decode_binding(raw.value(), defaults).map_err(admission::value_error)?;
+    if binding
+        .versions
+        .iter()
+        .flatten()
+        .any(|version| *version > expected)
+    {
+        return Err(Error::Corrupt);
+    }
+    Ok(binding)
+}
+
 pub(in crate::state::redb) fn materialize(
     data: ValueBindingData,
     partition: &PartitionId,

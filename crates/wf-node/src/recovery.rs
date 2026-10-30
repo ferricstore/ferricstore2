@@ -191,6 +191,9 @@ impl CommittedRecoveryLimits {
                 std::mem::size_of::<workflow_values::StepRecoveryProfile>(),
             ])?;
         }
+        if self.value_claim_work.is_some() {
+            owned = total(&[owned, std::mem::size_of::<Option<ClaimWorkLimits>>()])?;
+        }
         if owned > self.workspace {
             return Err(CommittedRecoveryError::Limit);
         }

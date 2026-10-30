@@ -280,19 +280,26 @@ fn publish_binding(
     charge: &mut ValueCharge,
     live: usize,
 ) -> Result<(), Error> {
+    publish_binding_fields(tx, scope, step.plan, step.binding, current, charge, live)
+}
+
+pub(super) fn publish_binding_fields(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    scoped: &wf_domain::workflow::batch::ScopedPlan,
+    binding: value::ValueBindingData,
+    current: bool,
+    charge: &mut ValueCharge,
+    live: usize,
+) -> Result<(), Error> {
     charge.helper()?;
-    let record = &step
-        .plan
-        .plan()
-        .write()
-        .ok_or(Error::InvalidChanges)?
-        .record;
-    let event = step.plan.plan().history().ok_or(Error::InvalidChanges)?;
+    let record = &scoped.plan().write().ok_or(Error::InvalidChanges)?.record;
+    let event = scoped.plan().history().ok_or(Error::InvalidChanges)?;
     let history = (!current).then_some(event.event_id.as_str());
     let logical = total(
         scope_bytes(scope),
         [
-            step.plan.partition().as_bytes().len(),
+            scoped.partition().as_bytes().len(),
             record.id().as_bytes().len(),
             history.map_or(0, str::len),
         ],
@@ -305,16 +312,14 @@ fn publish_binding(
             scope.group().as_bytes(),
             scope.recovery().as_bytes(),
             scope.tenant().as_bytes(),
-            step.plan.partition().as_bytes(),
+            scoped.partition().as_bytes(),
             record.id().as_bytes(),
             history.unwrap_or("").as_bytes(),
         ],
         8,
-        |maximum| {
-            key::encode_binding_key(scope, step.plan.partition(), record.id(), history, maximum)
-        },
+        |maximum| key::encode_binding_key(scope, scoped.partition(), record.id(), history, maximum),
     )?;
-    let encoded = value::encode_binding(step.binding, 197).map_err(admission::value_error)?;
+    let encoded = value::encode_binding(binding, 197).map_err(admission::value_error)?;
     if current {
         put(tx, &key, &encoded, charge, live)
     } else {

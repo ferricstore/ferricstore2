@@ -1073,3 +1073,38 @@ is not TDD or source-parity credit. Whole-workspace/adoption evidence belongs in
 M2-STEP-NODE1 and the handoff. Original named Create→Claim→Step→Retry→FIFO,
 rich captured attributes/context, native/profile/Linux/macOS execution and
 complete M1–M8 exits remain mandatory; this is not an accepted live service.
+
+## Named Claim with captured values and complete history
+
+`apply_workflow_value_claim_transaction` uses the existing op3/intent1/response3
+Claim format and existing Claim result/error types, with actual value ceilings
+and Claim work limits. It requires an explicitly upgraded format8 owner. The old
+Claim API keeps its7/8 refusal. Both paths share the original retained gate and
+Fresh selection; no new codec or selected-record input is introduced. The
+trusted-parent leaf's governance and broader orchestration refusals remain.
+
+One opaque publication plan borrows each actual accepted ScopedPlan and ordering
+and carries only its captured scalar binding data. Reads use the actual previous
+record version and installed defaults. Claim preserves all immutable value refs,
+birth retention/history and policy provenance, and clears effective TTL/deadline
+as pinned flow_retention_values.ex527–588 requires. It creates no value or alias.
+The consumed writer repeats full Claim/control/plan validation and publishes
+record/index/full history, both bindings, original outcome and control together.
+Old binding writers reuse the same borrowed-field emitter and accounting.
+
+Node selects this path separately with `with_workflow_value_claim_limits`; old
+Claim/value/Step opt-ins do not enable it. Complete historical audit uses the
+existing Claim decoder and real replay invokes the actual value Claim driver.
+Selected descriptors, value work/temporary and whole-call point/body budgets
+remain explicit through local/received/purged snapshot recovery. No query keys,
+record payloads or public receipts are cloned into a new adapter queue.
+
+Rejecting runtime was saved in7ac9f66 before bodies:8 storage and3 Node cases
+fail at healthy API/selector refusal. All11 complete tails now pass unchanged,
+including the original Create→named Claim→Step→Retry→FIFO sequence with actual
+typed Retry error and Original policy activation, both alias profiles, unchanged
+immutable rows, retained gates, governance refusal, uncertainty and full snapshot
+recovery. This advances durable source-sequence conformance; public Claim parent
+orchestration/governance, typed Step maps, rich source context, full original
+profile/native/Linux/macOS and service acceptance remain mandatory. It does not
+certify full source-case execution, native performance or product completion.
