@@ -16,6 +16,7 @@ pub use control::{decode_control, encode_control};
 pub use history::{decode_history, encode_history};
 pub use history_snapshot::{
     HistorySnapshotLimits, decode_history_snapshot, encode_history_snapshot,
+    encode_history_snapshot_fields,
 };
 pub(crate) use membership::inspect_membership;
 pub use membership::{

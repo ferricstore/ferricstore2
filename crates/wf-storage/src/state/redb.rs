@@ -15,6 +15,7 @@ mod commit;
 pub(crate) mod core_policy;
 mod cursor;
 mod history;
+mod history_snapshot;
 mod membership;
 pub(crate) mod original_policy;
 mod publication;

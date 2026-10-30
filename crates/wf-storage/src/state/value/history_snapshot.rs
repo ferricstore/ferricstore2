@@ -1,6 +1,8 @@
 //! Explicit represented-core snapshots; source provenance and publication are external.
 
 use wf_domain::history::HistoryEntry;
+use wf_domain::workflow::WorkflowRecord;
+use wf_domain::workflow::indexed::OrderingMetadata;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::{StoredWorkflowHistorySnapshot, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId};
@@ -11,6 +13,20 @@ mod model;
 mod scan;
 mod write;
 pub use model::HistorySnapshotLimits;
+
+/// Encodes borrowed represented fields without cloning a temporary record owner.
+/// # Errors
+/// Currently rejects every input until the selected tests-first body exists.
+pub fn encode_history_snapshot_fields(
+    _scope: &RequestScope,
+    _partition: &PartitionId,
+    _record: &WorkflowRecord,
+    _ordering: OrderingMetadata,
+    _event: &HistoryEntry,
+    _limits: HistorySnapshotLimits,
+) -> Result<Vec<u8>, StateValueError> {
+    Err(StateValueError::UnsupportedVersion)
+}
 
 /// Encodes the exact represented postimage and matching event into one owner.
 /// # Errors

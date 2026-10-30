@@ -2,6 +2,19 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
+Work in progress on codex/step-storage-solo: M2-STEP-STORAGE1 selects explicit
+consuming format7→8 upgrade, full new history captures and real Step value/core
+publication, preserving legacy rows and retained snapshot cohorts. Strict focused
+Clippy passes after a pre-runtime test-helper complexity/name correction, with
+the first log archived. Genuine compiled runtime:0pass/10fail storage cases stop
+at healthy upgrade UnsupportedLayout;0pass/1fail borrowed-field case stops at
+healthy encode UnsupportedVersion. All later storage/fault/snapshot tails remain
+masked. Three new APIs reject all inputs; no schema/driver bodies exist yet.
+Eight complete old-file inverses and1,770 other exact inputs preserve c90360f.
+All17 selected R0 sources are frozen. Exact new architecture probes pass.
+See M2-STEP-STORAGE1 and `/private/tmp/ferricstore2-step-storage-genuine-r0.json`.
+Primary remains at the passing c90360f checkpoint until verified adoption.
+
 The codex/step-outcome-solo checkpoint implements explicit Step-only FWSO data
 APIs while keeping every generic reader/encoder closed. Three genuine compiled
 refusals were saved in5d59712 before bodies: two healthy encodes and one healthy

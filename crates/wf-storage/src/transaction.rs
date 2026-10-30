@@ -23,7 +23,7 @@ mod value_batch;
 pub(crate) use value_batch::{ValuePublicationPlan, ValueStep};
 
 pub use value_batch::{
-    WorkflowValueTransactionError, WorkflowValueTransactionLimits,
+    WorkflowValueTransactionError, WorkflowValueTransactionLimits, apply_step_continue_transaction,
     apply_workflow_stored_value_batch_transaction, apply_workflow_value_batch_transaction,
 };
 

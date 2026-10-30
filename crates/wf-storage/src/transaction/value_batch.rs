@@ -28,6 +28,19 @@ mod prepare;
 mod step;
 pub(crate) use plan::{ValuePublicationPlan, ValueStep};
 
+/// Applies an explicitly selected Step through the complete-history/value writer.
+/// # Errors
+/// Currently rejects every input until the selected tests-first body exists.
+pub fn apply_step_continue_transaction(
+    _store: &mut RedbStateStore,
+    _scope: &RequestScope,
+    _encoded: &[u8],
+    _log: LogIdentity,
+    _limits: WorkflowValueTransactionLimits,
+) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
+    Err(WorkflowValueTransactionError::UnsupportedProfile)
+}
+
 /// Additional publication ceilings, carried with the existing driver profile.
 #[derive(Clone, Copy)]
 pub struct WorkflowValueTransactionLimits {

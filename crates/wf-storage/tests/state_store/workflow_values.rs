@@ -13,6 +13,7 @@ mod publication;
 mod reads;
 mod recovery;
 mod sized_reads;
+mod step_continue;
 mod stored_codec;
 mod stored_profile;
 mod stored_publication;

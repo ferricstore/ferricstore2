@@ -2,6 +2,26 @@ use super::{fixtures as f, *};
 use sha2::{Digest, Sha256};
 
 #[test]
+fn borrowed_snapshot_fields_encode_without_a_temporary_record_owner() -> TestResult {
+    let expected = f::step(Some(b"\0\xff"))?;
+    let result = wf_storage::state::value::encode_history_snapshot_fields(
+        &f::scope()?,
+        &expected.postimage.partition,
+        &expected.postimage.record,
+        expected.postimage.ordering,
+        &expected.event,
+        f::limits()?,
+    );
+    assert!(
+        result.is_ok(),
+        "healthy borrowed snapshot encode: {:?}",
+        result.as_ref().err()
+    );
+    assert_eq!(result?, f::hex(f::GOLDEN)?);
+    Ok(())
+}
+
+#[test]
 fn step_snapshot_preserves_full_core_and_golden_bytes() -> TestResult {
     let expected = f::step(Some(b"\0\xff"))?;
     let mut bytes = f::encoded(&expected)?;

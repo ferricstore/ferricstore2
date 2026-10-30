@@ -57529,3 +57529,116 @@ Connected-tool inventory exposes no suitable remote Linux execution surface for
 the unpublished local code; GitHub capabilities here only inspect/retry existing
 runs. No external action was taken. This changes no platform or native-source
 acceptance claim and does not block the meaningful local implementation work.
+
+## M2-STEP-STORAGE1 — solo architecture selection before artifacts
+
+Predecessor c90360f is locally adopted in both clean trees with1306 cases/all12
+gates. This selection integrates real storage, not another substitute data codec.
+Keep the full product/source/profile/OS objective. Pinned flow_transition.ex:
+516–595 and807–829 require actual values/indexes/core/history publication, rotated
+lease/fence and fresh logical entry order. The Step postimage explicitly clears
+ttl_ms and terminal_retention_until_ms while preserving captured birth metadata;
+the value companion must clear its effective TTL/deadline for Step only. Rich
+attribute/context support remains mandatory later; typed Step currently has no
+attribute input and this component does not certify full source parity.
+
+Select explicit consuming RedbStateStore::upgrade_history_snapshot_layout(self)
+->Result<Self,StateTransactionError>. BEFORE RED add a rejecting facade in NEW
+state/redb/history_snapshot.rs, declared by redb.rs. Only AFTER saved RED implement
+ready layout7→8, idempotent8, refusing other layouts. FWSS8 retains the entire
+FWSS7 body/defaults/origin/alias/binding grammar but explicitly selects current
+FWSR2 and new-history FWHS1. The version/checksum bind that new meaning; no old
+manifest field is repurposed. Extend existing private ValueManifest with actual
+layout:u16 and use that parsed fact, not a guessed global flag. Upgrade validates
+the complete old cohort, changes only the current manifest under the same consumed
+Immediate transaction, validates again, and sets the live layout only after
+proved success. Uncertain failure consumes/fences and requires reopen. Retained
+old snapshot cohorts keep their own actual format and immutable bytes.
+
+Under8, existing unrewritten FWSR1/FWSH1 rows remain explicit legacy data; new
+accepted writes emit FWSR2 plus complete FWHS1 at the existing history key. No
+historical postimage is backfilled from current data. Before RED add rejecting
+encode_history_snapshot_fields(scope,partition,record,ordering,event,limits) in
+existing value/history_snapshot.rs and its value.rs reexport, plus an appended
+healthy/golden case in existing tests/history_snapshot/wire.rs. AFTER RED factor
+the current owner encoder into that borrowed-field emitter, keeping its tenant
+check and full old specialization. One prospectively admitted output buffer;
+no cloned record to construct a temporary StoredWorkflowRecord.
+
+AFTER RED approve NEW pure state/value/history_snapshot/stored.rs for explicit
+layout-aware record/history/binding dispatch. Reuse the existing scanned snapshot
+and borrowed-history types, lifting only server-private visibility as needed;
+add bounded event-only materialization and borrowed event ID/version/core value
+accessors. No new proof/model/authority flag. Full framing/correspondence validates
+before copies. Reduced history queries/recovery borrow the full core and do not
+allocate a discarded record. Public complete decode retains its exact E/R/W
+contract. Physical new-path fixed descriptor workspace2048 and all actual encoded/
+returned fields are prospectively charged. Keep legacy charges/branches exact.
+Actual cohort layout must reach recovery/index/value validation; current owner's
+layout cannot replace the retained snapshot cohort's format. Extend existing
+outcome/step_continue.rs with server-private layout dispatch, reusing explicit
+Step APIs only under8; old generic codec/helper bodies remain unchanged.
+
+Before RED add rejecting apply_step_continue_transaction(&mut RedbStateStore,
+&RequestScope,bytes,LogIdentity,WorkflowValueTransactionLimits) in existing
+transaction/value_batch.rs and transaction.rs export. AFTER RED approve NEW
+transaction/value_batch/step_continue.rs for intent10 preparation, actual point
+gate and the existing consumed value/core writer. Require actual layout8 before
+publication. Replay/conflict/expiry/exact-log precede Fresh-only record/policy/
+binding reads. Reuse existing ValueInputs/ValuePublicationPlan, with one actual
+nonbirth Step input, no fabricated policy/birth witness. Existing captured binding
+and lifecycle stay authoritative; plain Step payload is logical binary even on
+an alias2-capable store. Existing value planner publishes current/history refs
+with the core/index/full-history/outcome/control atomically. Actual soft limits,
+no temporary-budget credit from structural checks, no reply before proved commit.
+
+Approve BEFORE tests NEW tests/state_store/workflow_values/step_continue.rs and
+children step_continue/{fixtures,upgrade,publication,replay,limits,snapshot,faults}.rs,
+declared by existing workflow_values.rs. Reuse actual value genesis/StartAndClaim,
+policies/read/bindings/raw disk/fault/snapshot helpers; no new test model. Cases
+cover consuming upgrade/legacy preservation/idempotence/refusal, actual Step
+guard/entry/value/full-history/receipt and payload presence, stale/FIFO rejection,
+retained replay after current mutation plus conflict/expiry/exact-log, admission
+with unchanged database, capture/receive/install/reopen with full closure, and
+delegated-sync uncertainty with no partial publication. First healthy upgrade is
+expected to fail against the shell; save later masked tails honestly. Full pinned
+Create→Claim→Step→Retry→FIFO and native/profile execution remain separate mandatory
+source acceptance, not replaced by StartAndClaim fixture setup. The separate
+borrowed-field encoder case must also reach its own healthy runtime refusal.
+
+Existing approved artifacts may change within these contracts: redb store/read/
+publication/commit/values/core-policy/recovery/snapshot files for explicit8 handling;
+value history_snapshot scan/write/model/stored, workflow_values binding dispatch,
+outcome Step dispatch; transaction value_batch prepare/plan/step/observations and
+exports. Preserve complete legacy specializations and non-Step functions. Upgrade
+and shared changed ValueManifest fields require callers to retain exact old7
+defaults/hash/size behavior. Incoming8 needs an explicitly8 target and incoming7
+cannot downgrade an8 target; retained7 cohorts remain auditable. No dependency,
+crate, key family, public capability/model or default-mode widening is selected.
+Add exact pure stored-codec home/nested and effectful adapter/driver probes to
+existing architecture tests. Any further new file/type/model needs a concrete
+amended selection BEFORE creation. Keep400/600/100/4/25 and ordinary formatting;
+no lint/size/behavior exemptions. Update ADR007/handoff with real results and
+limitations. Root reviews solo; no agents, independent review, push, source credit
+or full-goal completion claim. Node operation10 log replay is a required successor
+after storage/reopen/snapshot closure, not implicitly enabled by this selection.
+
+M2-STEP-STORAGE1 genuine R0: missing test import was corrected before compilation.
+First strict Clippy detects similar path/patch names and test cognitive27/25;
+archive r0-clippy-first.log, rename the policy variable and extract cohesive disk
+assertions without removal. Current strict focused Clippy actually exits0. Actual
+compiled storage run exits101 with0pass/10fail/0ignored/179filtered; every case
+stops at the healthy upgrade UnsupportedLayout. The separately compiled borrowed
+field case exits101 with0pass/1fail/0ignored/6filtered at healthy encode
+UnsupportedVersion. All later tails, including real Step apply and uncertainty,
+are still masked. Three selected new APIs reject all inputs and all schema/value/
+driver/recovery implementation bodies remain absent/unchanged. New exact pure/
+effectful architecture probes execute and pass3/3; no architecture RED is claimed.
+
+Eight complete existing-file inverses recover c90360f and all1,770 other original
+non-Markdown inputs stay exact. Freeze17 selected sources before any body. Receipt
+and complete logs: /private/tmp/ferricstore2-step-storage-{genuine-r0,r0-storage,
+r0-fields,r0-architecture,r0-clippy,r0-clippy-first}.{json,log} as appropriate.
+No ignored test, suppression, weakened assertion, source credit, native/Linux
+acceptance or completed-goal claim is introduced. Save this real rejecting state
+in a local commit before the approved implementation bodies.
