@@ -131,6 +131,79 @@ fn credit_store_full_cleanup_backlog_refuses_expiry_without_publishing_a_prefix(
     Ok(())
 }
 
+#[test]
+fn credit_store_full_queue_cleanup_drains_before_admitting_more_expired_pages() -> TestResult {
+    let dir = common::directory("credit-cleanup-progress")?;
+    let path = dir.join("state");
+    let mut owner = seed(&path)?.into_data();
+    owner.epoch = 257;
+    owner.cleanup_tail = 256;
+    owner.leases[0].epoch = 257;
+    owner.leases[0].available = 1;
+    owner.leases[0].in_use = 1;
+    owner.leases[0].reservation_page = 1;
+    owner.leases[0].reservation_page_fill = 1;
+    graph(
+        &path,
+        &restore_credit_owner(owner, CreditLimits::default())?,
+        1..=257,
+        1,
+        1,
+    )?;
+    drop(common::open(&path)?);
+    let before = business(&path)?;
+    let refused = f::execute(&path, b"backlog-refusal", (1, 2000), None, Mutation::Get)?;
+    assert_eq!(
+        refused.decision,
+        Decision::Rejected(Rejection::CleanupBacklogFull)
+    );
+    assert_eq!(business(&path)?, before);
+    let cleaned = f::execute(&path, b"drain-one", (2, 2000), None, Mutation::Cleanup)?;
+    assert_eq!(
+        cleaned.decision,
+        Decision::Cleaned {
+            deleted: 1,
+            pending: true
+        }
+    );
+    let owner = f::owner(&path)?;
+    assert_eq!(
+        (owner.view().cleanup_head, owner.view().cleanup_tail),
+        (2, 256)
+    );
+    let lease = owner
+        .lease(0)
+        .ok_or("expired lease lost before queuing its page")?;
+    assert_eq!((lease.epoch, lease.in_use, lease.available), (257, 1, 1));
+    assert_eq!(f::family_count(&path, 13)?, 256);
+    let expired = f::execute(&path, b"enqueue-expired", (3, 2000), None, Mutation::Get)?;
+    assert_eq!(expired.decision, Decision::Owner);
+    let owner = expired.owner.ok_or("missing reclaimed owner")?;
+    assert_eq!(
+        (owner.view().cleanup_head, owner.view().cleanup_tail),
+        (2, 257)
+    );
+    assert_eq!(owner.view().free, 2);
+    assert!(owner.lease(0).is_none());
+    let cleaned = f::execute(&path, b"drain-next", (4, 2000), None, Mutation::Cleanup)?;
+    assert_eq!(
+        cleaned.decision,
+        Decision::Cleaned {
+            deleted: 1,
+            pending: true
+        }
+    );
+    let owner = f::owner(&path)?;
+    assert_eq!(
+        (owner.view().cleanup_head, owner.view().cleanup_tail),
+        (3, 257)
+    );
+    assert_eq!(f::family_count(&path, 13)?, 255);
+    drop(common::open(&path)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
 fn seed(path: &Path) -> TestResult<CreditOwner> {
     drop(f::create(path)?);
     f::execute(

@@ -58952,3 +58952,33 @@ source mapping, ceiling or capability was weakened. Logs use node-regression,
 node-architecture, node-boundaries-clippy and boundaries-verified/architecture
 under /private/tmp/ferricstore2-identified-credit-. The cleanup-progress finding
 is an actual next action; do not run final acceptance or adopt until resolved.
+
+Cleanup progress correction selection before edits: extend existing
+storage/tests/state_store/credit/bounds.rs with a real complete256-task donor
+plus one newly expired current generation. A Get must still refuse the257th
+enqueue without effects; Cleanup must instead delete exactly one existing head
+page, retain the expired lease until its reference can fit, and let a later Get
+enqueue/reclaim it safely. Save the genuinely failing Rust control before any
+production correction. No new Rust artifact/model/API/schema or dependency.
+
+Selected contract correction: only Cleanup with an already nonempty queue may
+defer the expiry preparation that cannot fit. Normal operations retain the
+BacklogFull refusal; no expired capacity is reclaimed without a queued reference.
+The one-page budget and all rollback/fencing/resource rules remain unchanged.
+Mirror this exact exception in the isolated Elixir flow_governance_limit.ex
+prepare_owner clauses and add a complete donor regression in the existing
+flow_governance_limit_storage_test.exs. Original source files/pin stay preserved;
+native Elixir execution/formatter remain unverified, with no repeated denied
+probe or native TDD claim. This is a deliberate safety correction to the
+observed source stall, not a silent compatibility claim. More than256 newly
+expired generations with no queued work requires separate bounded-expiry review;
+this specific correction must not be claimed to solve that larger case.
+
+Cleanup genuine RED saved: one actual complete stored regression compiles and
+fails0pass/1fail/0ignored/223older filtered at Cleaned{deleted1,pendingtrue}
+versus actual Rejected(CleanupBacklogFull), after canonical reopen and the
+expected Get backlog refusal/unchanged business rows pass. Later requeue/reclaim
+and next-page assertions are masked. Strict focused Clippy passes. Exact source
+and log bindings are in /private/tmp/ferricstore2-credit-cleanup-progress-genuine-r0.json.
+Save before changing either reducer or coupled Elixir behavior. No native
+Elixir execution or native TDD evidence is claimed.
