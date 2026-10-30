@@ -4,6 +4,63 @@ use super::{CheckResult, graph, metadata, package_mut, policy, root, source_chec
 use serde_json::json;
 
 #[test]
+fn governance_credit_classification_preserves_pure_decisions() -> CheckResult<()> {
+    assert_eq!(
+        policy()?.packages["wf-domain"].modules.get("governance"),
+        Some(&true)
+    );
+    for module in [
+        "governance",
+        "governance::credit",
+        "governance::credit::model",
+        "governance::credit::admission",
+        "governance::credit::capacity",
+        "governance::credit::decision",
+        "governance::credit::reservation",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-domain",
+                module,
+                "pub fn finite(number: f64) -> bool { number.is_finite() }"
+            )?,
+            Vec::<String>::new()
+        );
+        for (source, diagnosis) in [
+            ("use std::env;", "standard-library module"),
+            ("use std::fs;", "standard-library module"),
+            ("use std::io;", "standard-library module"),
+            ("pub async fn effect() {}", "declares async behavior"),
+            ("static GLOBAL: u64 = 0;", "declares global state"),
+        ] {
+            assert!(
+                source_check("wf-domain", module, source)?
+                    .iter()
+                    .any(|finding| finding.contains(diagnosis))
+            );
+        }
+    }
+    for (module, path) in [
+        ("governance", "crates/wf-domain/src/governance.rs"),
+        (
+            "governance::credit",
+            "crates/wf-domain/src/governance/credit.rs",
+        ),
+        (
+            "governance::credit::model",
+            "crates/wf-domain/src/governance/credit/model.rs",
+        ),
+    ] {
+        let actual = std::fs::read_to_string(root()?.join(path))?;
+        assert_eq!(
+            source_check("wf-domain", module, &actual)?,
+            Vec::<String>::new()
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn metadata_module_classification_preserves_purity_and_forbidden_edges() -> CheckResult<()> {
     for (module, path) in [
         ("metadata", "crates/wf-domain/src/metadata.rs"),

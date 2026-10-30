@@ -9,6 +9,7 @@
 #![forbid(unsafe_code)]
 
 pub mod claim;
+pub mod governance;
 pub mod history;
 pub mod lease;
 pub mod lineage;

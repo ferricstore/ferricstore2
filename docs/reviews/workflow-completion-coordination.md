@@ -58289,3 +58289,88 @@ solo; public Claim parent/governance/reclaim orchestration, rich source captures
 public logical ingress and all later milestone/source/profile/native/Linux/macOS
 exits remain mandatory. Next selection must address an actual functional gap
 from these contracts, with no data-only codec substitute for the complete path.
+
+## M1-CREDIT-OWNER1 — concrete solo prerequisite selection before artifacts
+
+Previous goal turn: progress, adopted 9013518 in both clean local trees. The
+full goal remains active and solo. Public Claim requires the four ADR-004 parent
+migrations, including current governing-owner verification and identified
+compensation; the existing coordination Confirmed value supplies neither.
+Inspection found no governing credit reducer. Build that functional M1
+predecessor now rather than issuing multiple committed leaf Claims or treating
+an unverified batch as authoritative. The coupled atomic Claim parent, durable
+owner/outbox adapters and native/platform/profile acceptance remain required;
+this prerequisite does not redefine their completion.
+
+Pinned evidence: flow/governance/credit_lease.ex owner/reconfigure/grant/spend/
+renew/release/reclaim_expired and capacity helpers; flow_governance_models_test.exs
+149–296 contains six complete pure credit scenarios. Preserve all six original
+assertion traces, including partial grants, anonymous compatibility spend,
+identified sibling-safe release, invalid legacy reservation values, monotone
+configuration/fingerprint behavior, deterministic draining and pending reclaim.
+Keep source helper semantics distinct from public LimitStore validation and
+from durable/remote ownership. Policy fingerprints are explicit mathematical
+PreparedDigest inputs; no fingerprint proves installed current governance.
+
+Approve NEW production files before creation: wf-domain/src/governance.rs
+(public pure feature boundary), governance/credit.rs (consuming reducer API),
+credit/{model,admission,capacity,decision,reservation}.rs. Named models:
+CreditOwner, CreditOwnerData, CreditLeaseData, CreditReservationValue,
+CreditLimits, CreditError, CreditOperation, CreditDecision, CreditRejection,
+CreditTransition and private CreditCharge. The owner seals complete canonical
+data; restoration validates unique ascending shard/ID vectors and all scalar,
+capacity and resource invariants. Read-only views do not grant provenance.
+Opaque legacy reservation value bytes remain inert and cannot release credit.
+Retain unused source lease/cleanup fields as actual carried data, without
+inventing cleanup execution or a record codec.
+
+Public functions: new_credit_owner, restore_credit_owner and decide_credit.
+The consuming decision returns one owned CreditTransition (owner + business
+classification). Operational validation/allocation/limit errors yield no plan.
+Known source denials retain actual expiry/reclaim-mark changes in the returned
+owner, not a fabricated unchanged state. Support Configure, Grant, Spend,
+Renew, Release, ReleaseIdentifiedAmount and ReclaimExpired. Time is supplied;
+there is no clock/I/O/runtime dependency. Existing wf-types is the only runtime
+dependency. The eventual adapter must validate its own coherent owner, namespace,
+policy/config/epoch, original request and durable outcome, and publish atomically.
+
+Performance/ownership selection: consume and update only one owner, never clone
+its lease/reservation maps in production. Sorted vectors permit deterministic
+binary search and fallible reservation; existing payload/ID owners move through
+unchanged, and only new reservation IDs are copied. Bound complete current
+owner capacities, new descriptors/bytes, comparisons and insertion moves before
+allocation/mutation. CreditLimits supplies independent positive count/owned/work
+ceilings. These logical limits make no allocator/RSS/throughput claim.
+
+Approve NEW integration target wf-domain/tests/governance_credit/{main,fixtures,
+source,protocol,limits}.rs. New tests execute all six source traces and additional
+epoch/expiry/duplicate/partial-ID/backward-time/renewal/budget controls. Save
+actual compiled rejecting runtime before implementation. Add no storage format,
+key family, public service, fake owner or accepted Claim dispatcher here. Update
+existing domain lib.rs, architecture and ADR-004 to reflect this exact pure
+predecessor. Further artifacts or ownership contracts require another concrete
+solo selection. This is my review, not independent peer review.
+
+M1-CREDIT-OWNER1 classification refinement before edits: the actual architecture
+guard correctly rejects the new unclassified governance root. Select the exact
+existing architecture/policy.toml domain-module classification addition
+`governance = true`, with no dependency/size/purity relaxation. Add the named
+governance_credit_classification_preserves_pure_decisions test in existing
+architecture-tests/src/tests/metadata_policy.rs: require the explicit root and
+all selected child paths to remain pure, reject fs/env/io/async/global effects,
+and inspect the actual existing root/credit/model sources. Execute its genuine
+missing-classification failure before the policy edit; then verify all existing
+architecture cases plus this new negative-fixture control. No new artifact or
+tooling dependency is needed for this refinement.
+
+M1-CREDIT-OWNER1 genuine compiled RED: all 12 new behavior cases fail, zero
+ignored. Eleven stop at healthy owner creation and one at healthy restoration,
+each InvalidState because the new functions reject all inputs. All later
+grant/spend/config/release/expiry and resource tails remain masked. Strict
+focused Clippy passes after pre-runtime documentation and assertion-style
+repairs. The independent classification control actually fails None versus
+Some(true) before policy selection; the guard also diagnoses all three new
+unclassified production files. With the explicit pure-root classification,
+all 54 architecture cases pass, including the existing 53 and new negative
+fixtures. Save these rejecting functions/tests before implementation. This
+establishes no passing credit semantics, durable owner, Claim parent or parity.
