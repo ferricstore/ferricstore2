@@ -2,15 +2,22 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Work in progress on codex/history-core-snapshot: select private FWHS1 with full
-represented FWSR2 postimage and FWSH2 event; older v1 codecs remain closed. Six
-compiled cases genuinely reject healthy encoding after focused strict Clippy.
-Source review corrected a handoff assumption: pinned FSH2 history omits run_state;
-the internal complete core snapshot preserves it without adding a source field.
-Source refs/metadata/rich fields remain explicit companion/capture requirements.
-See M2-HISTORY-SNAPSHOT1 and
-`/private/tmp/ferricstore2-history-snapshot-{source-recipes,genuine-r0}.json`.
-Primary stays at the passing c62162f checkpoint; this feature is intentionally RED.
+The codex/history-core-snapshot checkpoint implements private FWHS1 with the
+complete represented FWSR2 postimage and FWSH2 event; older v1 codecs stay closed.
+Six genuine compiled refusals were saved in9466fd1 before the bodies. All six
+unchanged complete tails and all12 final direct gates pass with1,300 cases/113
+targets, preserving every prior1,294 identity/status/multiplicity. All53
+architecture cases, Python7 and6 doctests/15 targets pass. All1,774 frozen
+inputs/1,185 Rust files match the tested tree. Seven complete old-file inverses
+and1,756 other exact original inputs preserve earlier behavior. Eleven whole
+R0 sources, including all seven test files, remain unchanged. No oracle, lint,
+threshold or source-case credit changed. Full parity actually exits1.
+Pinned FSH2 history omits run_state; the internal full-core snapshot preserves
+it without adding a source field. Source refs/metadata/rich fields remain actual
+companion/capture obligations. Atomic publication, inquiry/fault/reopen, history
+queries and recovery integration remain required. See M2-HISTORY-SNAPSHOT1 and
+`/private/tmp/ferricstore2-history-snapshot-{source-recipes,genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json`.
+The adopted receipt records both local trees and exact commit; full goal stays active.
 
 The codex/step-continue-fresh checkpoint: six genuine runtime refusals were
 saved in e7a9291 before the bodies. All six unchanged complete cases, strict
@@ -69,12 +76,14 @@ reversible and the new facade body is explicit. No new source-ledger credit.
 Receipts: `/private/tmp/ferricstore2-step-codec-{inverses,pipeline,full-identity,full-parity,adopted}.json`.
 Local adoption status and exact commit live in the adopted receipt.
 
-Next causal persistence review: current HistoryEntry/FWSH1 stores lifecycle
-state but omits the logical run_state. The original codec's explicit history
-snapshot also has a separate reduced field set. Do not infer a complete rewind
-snapshot from the current core history row or append only an event tag. Select
-the complete historical schema and compatibility boundary before durable Step
-record/history publication; Fresh/replay and the Step response also remain open.
+The reduced HistoryEntry/FWSH1 is not a complete core postimage. Original FSH2
+intentionally has its own explicit field set without logical run_state. Private
+FWHS1 now preserves every currently represented core field without changing that
+source projection. Fresh/replay and Step response data are implemented; complete
+rich/source capture and transactional publication remain open. Do not infer
+missing historical state from a current record or enable storage by appending
+only an event tag. Step coherence, retained storage, schema negotiation, atomic
+record/index/history/value/control publication and recovery are next obligations.
 
 The original FSH2 history codec now passes all eight full tails frozen in
 `f217eee` before behavior,

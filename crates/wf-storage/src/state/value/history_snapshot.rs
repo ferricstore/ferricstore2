@@ -5,32 +5,52 @@ use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::{StoredWorkflowHistorySnapshot, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId};
 
-use super::StateValueError;
+use super::{StateValueError, add};
 
 mod model;
+mod scan;
+mod write;
 pub use model::HistorySnapshotLimits;
 
 /// Encodes the exact represented postimage and matching event into one owner.
 /// # Errors
-/// Currently refuses every input until the selected tests-first body exists.
+/// Rejects mismatched fields, explicit limits, size overflow or allocation failure.
 pub fn encode_history_snapshot(
-    _scope: &RequestScope,
-    _postimage: &StoredWorkflowRecord,
-    _event: &HistoryEntry,
-    _limits: HistorySnapshotLimits,
+    scope: &RequestScope,
+    postimage: &StoredWorkflowRecord,
+    event: &HistoryEntry,
+    limits: HistorySnapshotLimits,
 ) -> Result<Vec<u8>, StateValueError> {
-    Err(StateValueError::UnsupportedVersion)
+    write::encode(scope, postimage, event, limits)
 }
 
 /// Validates the complete explicit envelope before materializing either owner.
 /// # Errors
-/// Currently refuses every input until the selected tests-first body exists.
+/// Rejects malformed/foreign fields, explicit limits, overflow or allocation failure.
 pub fn decode_history_snapshot(
-    _bytes: &[u8],
-    _scope: &RequestScope,
-    _partition: &PartitionId,
-    _id: &RecordId,
-    _limits: HistorySnapshotLimits,
+    bytes: &[u8],
+    scope: &RequestScope,
+    partition: &PartitionId,
+    id: &RecordId,
+    limits: HistorySnapshotLimits,
 ) -> Result<StoredWorkflowHistorySnapshot, StateValueError> {
-    Err(StateValueError::UnsupportedVersion)
+    let scanned = scan::scan(bytes, scope, partition, id, limits)?;
+    let mut owned = scanned.record.owned_bytes();
+    add(&mut owned, scanned.history.owned_bytes()?)?;
+    admit(owned, limits.owned)?;
+    let mut workspace = bytes.len();
+    add(&mut workspace, owned)?;
+    add(&mut workspace, 2048)?;
+    admit(workspace, limits.workspace)?;
+    Ok(StoredWorkflowHistorySnapshot {
+        postimage: scanned.record.into_owned(owned)?,
+        event: scanned.history.into_owned()?,
+    })
+}
+
+fn admit(bytes: usize, maximum: usize) -> Result<(), StateValueError> {
+    if bytes > maximum {
+        return Err(StateValueError::Limit { bytes, maximum });
+    }
+    Ok(())
 }

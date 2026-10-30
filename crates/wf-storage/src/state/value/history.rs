@@ -33,6 +33,18 @@ pub fn encode_history(
     let tag = event_tag(history.kind)?;
     let size = history_size(scope, partition, id, history)?;
     let mut output = allocate(size, maximum_bytes, *b"FWSH")?;
+    put_history_body(&mut output, scope, partition, id, history, tag)?;
+    Ok(output)
+}
+
+pub(super) fn put_history_body(
+    output: &mut Vec<u8>,
+    scope: &RequestScope,
+    partition: &PartitionId,
+    id: &RecordId,
+    history: &HistoryEntry,
+    tag: u8,
+) -> Result<(), StateValueError> {
     for field in [
         scope.group().as_bytes(),
         scope.recovery().as_bytes(),
@@ -41,7 +53,7 @@ pub fn encode_history(
         id.as_bytes(),
         history.event_id.as_bytes(),
     ] {
-        put_raw(&mut output, field)?;
+        put_raw(output, field)?;
     }
     output.push(tag);
     for value in [
@@ -52,21 +64,21 @@ pub fn encode_history(
     ] {
         output.extend_from_slice(&value.to_be_bytes());
     }
-    put_raw(&mut output, &history.state)?;
-    put_time(&mut output, history.next_run_at);
+    put_raw(output, &history.state)?;
+    put_time(output, history.next_run_at);
     output.extend_from_slice(&history.lease_deadline.get().to_be_bytes());
     output.push(u8::from(history.worker.is_some()));
     if let Some(worker) = &history.worker {
-        put_raw(&mut output, worker)?;
+        put_raw(output, worker)?;
     }
     output.push(u8::from(history.retry.is_some()));
     if let Some(retry) = &history.retry {
-        put_retry(&mut output, retry)?;
+        put_retry(output, retry)?;
     }
-    Ok(output)
+    Ok(())
 }
 
-fn history_size(
+pub(super) fn history_size(
     scope: &RequestScope,
     partition: &PartitionId,
     id: &RecordId,
@@ -116,7 +128,10 @@ fn put_time(output: &mut Vec<u8>, value: Option<TimestampMillis>) {
     }
 }
 
-fn read_time(bytes: &[u8], offset: &mut usize) -> Result<Option<TimestampMillis>, StateValueError> {
+pub(super) fn read_time(
+    bytes: &[u8],
+    offset: &mut usize,
+) -> Result<Option<TimestampMillis>, StateValueError> {
     if flag(bytes, offset)? {
         Ok(Some(TimestampMillis::new(read_u64(bytes, offset)?)))
     } else {
@@ -141,7 +156,7 @@ fn put_retry(output: &mut Vec<u8>, retry: &RetryHistory) -> Result<(), StateValu
     put_raw(output, &retry.policy.exhausted_to)
 }
 
-fn decision(bytes: &[u8], offset: &mut usize) -> Result<RetryDecision, StateValueError> {
+pub(super) fn decision(bytes: &[u8], offset: &mut usize) -> Result<RetryDecision, StateValueError> {
     match read_u8(bytes, offset)? {
         0 => Ok(RetryDecision::Scheduled),
         1 => Ok(RetryDecision::Exhausted),
@@ -149,7 +164,7 @@ fn decision(bytes: &[u8], offset: &mut usize) -> Result<RetryDecision, StateValu
     }
 }
 
-fn policy_fields<'a>(
+pub(super) fn policy_fields<'a>(
     bytes: &'a [u8],
     offset: &mut usize,
 ) -> Result<(u16, Backoff, &'a [u8]), StateValueError> {

@@ -57282,3 +57282,57 @@ retry/resource/context tails remain masked. The four new codec APIs reject all
 inputs; no v2 tag/grammar/scan/materialization body or borrowed view exists yet.
 Freeze13 sources and four complete old-file inverses before bodies. All existing
 v1 codecs/tag tables and physical store/recovery profiles remain unchanged.
+
+M2-HISTORY-SNAPSHOT1 solo implementation review: complete shared record measure/
+emit and fixed-format scanner selection retain the old v1 grammar/event table.
+The existing history emitter is factored without changing its field order or
+retry/time helpers. New private scan/write children use borrowed field descriptors,
+validate full correspondence before decoded copies, and share one prospectively
+admitted output buffer. No temporary nested encoded Vec, policy clone, domain I/O,
+dependency, authority flag or public source-history field was introduced. Explicit
+u32 framing and checked usize sums remain portable; logical tariffs are not native
+memory or speed measurements. Record scan is398 physical lines; the new scanner
+is251, below the unchanged400 cap. Approve the existing four-home architecture
+matrix additions. All six saved cases and strict focused Clippy actually pass;
+all seven original test files remain unchanged. Full gates and whole-file inverse
+evidence are still required before adoption. Review is solo, not independent peer
+review. The larger product/source/profile/Linux requirements remain open.
+
+Solo verification-artifact selection: approve temporary
+`/private/tmp/ferricstore2-history-snapshot-verify.py` and
+`/private/tmp/ferricstore2-history-snapshot-pipeline.py` for mechanical full-file
+inverses/identity accounting and sequential frozen-input gates. They use only
+Python's standard library and existing pinned commands, create local receipts,
+and grant no product capability. A first inverse-script attempt detected an
+extra blank line left by removing a reexport; this is verifier reconstruction
+feedback, not a product behavior failure or reason to change product sources.
+
+M2-HISTORY-SNAPSHOT1 final solo checkpoint: all12 sequential direct gates pass
+against one frozen1,774-input/1,185-Rust tree. Workspace execution reaches1,300
+passing cases across113 executable targets (111 result targets plus two unchanged
+benchmark correctness smokes). Full target/name/status/multiplicity Counters retain
+every prior1,294 case and add exactly the six saved snapshot identities. All53
+architecture cases, Python7 and6 doctests/15 targets pass. Complete compiler/lint,
+docs, source/progress integrity and offline audit gates pass; no native original
+VM, fresh advisory fetch or Linux execution is inferred.
+
+Seven executed complete-file inverses recover c62162f, including full shared
+record/history measure/emit/scanner v1 specialization and every old architecture
+row/probe/assertion. All1,756 other old non-Markdown inputs are exact. Eleven
+whole R0 sources stay exact, including all seven test files, the limits model
+and original export/model glue. No oracle or assertion changed after RED. Full
+parity actually exits1; ledger129/143/589 and runtime5903/4222/1681/1655 remain
+unchanged. Receipts are /private/tmp/ferricstore2-history-snapshot-{inverses,
+pipeline,full-identity,full-parity,adopted}.json. Local adoption must recheck both
+clean trees and every frozen input; no push or completed-goal claim is authorized.
+
+Next causal source review: pinned flow_transition.ex:516–595 preserves rich
+attributes/value refs while rotating the lease and clearing terminal lifecycle;
+807–829 publishes values, indexes, core and history. invariant_test.exs:850–918
+requires fresh logical entry ordering through Step→Retry→FIFO activation. Current
+redb publication/recovery/history readers still require FWSR1/FWSH1; FWSO1
+validation does not restore intent10. Value publication allows only intent8/9 and
+modes1/5/6/7. GroupApplyChanges rejects Fresh intent10. These are real successor
+integration points, not reasons to relax old codecs or infer missing history.
+Actual captured companions, original attributes and independent native/profile/
+Linux coverage remain mandatory. No successor artifact is created by this review.

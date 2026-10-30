@@ -882,3 +882,46 @@ This startup composition assumes an already durable committed prefix. It is not
 a live accepted-service dispatcher, a consensus/read-barrier implementation or
 full workflow parity. Typed/shared/external values, public hydration, lifecycle
 maintenance, original/native/Linux profiles and all milestone exits remain open.
+
+## Explicit represented-core historical snapshots
+
+The private data codec selects FWHS1: magic `FWHS`, big-endian u16 version1,
+u32-length-prefixed FWSR2 postimage and FWSH2 event, followed by exact EOF.
+Both nested formats retain their v1 field grammar and tags0–12; only explicit
+version2 accepts StepContinued tag13. Normal v1 readers, recovery routing and
+store formats remain closed. Encoding or decoding these values grants no store,
+read, publication, rewind or snapshot-installation authority.
+
+The neutral `StoredWorkflowHistorySnapshot` owns the complete currently
+represented core record, its tenant/partition/ordering and its reduced event,
+including resolved retry observations. Namespace, original event-ID version,
+latest-event kind/version/fence, occurrence/update time, attempts, state, due
+time and lease worker/deadline must agree. Retry observations require Retry
+kind. Parsing validates the complete envelope and these relationships while
+borrowing the donor, before variable owners are copied. Existing record/history
+measurement and emission write directly into one reserved envelope buffer;
+there are no temporary encoded record/history vectors.
+
+Independent positive wire, returned-owner and logical workspace ceilings apply.
+For complete encoded size E, the encoder admits E+2048. Decoding admits R,
+the existing record owner bound plus512 plus each actual variable history
+occurrence, then admits E+R+2048 before materialization. Every sum is checked.
+These logical accounts do not establish native RSS, allocator capacity or CPU
+bounds. The owned-byte cap is for decoding; encoding only owns its output buffer.
+All numeric framing is portable big-endian and host-width conversions are checked.
+
+Pinned `apps/ferricstore/lib/ferricstore/flow/codec.ex:291–374` and
+`flow/codec/support.ex:201–227` show that original FSH2 history stores lifecycle
+state and does not encode logical run_state. This internal full-core postimage
+preserves run_state without adding it to the original source history fields.
+Rich ActiveRecord extensions, captured lifecycle and actual historical value
+provenance remain mandatory companion/capture work; absence is not inferred
+from a later current record. This codec alone supplies no complete rich-source
+parity or durable Step publication. Actual transactional integration, historical
+companion preservation, inquiry/fault/reopen behavior and recovery remain required.
+
+The six rejecting compiled cases were saved in9466fd1 before codec bodies.
+Their unchanged complete tails now pass, with strict focused Clippy. Review and
+whole-workspace validation evidence live under M2-HISTORY-SNAPSHOT1 in the
+coordination record and handoff. Native original-profile execution and independent
+Linux/macOS acceptance remain separate gates.

@@ -13,8 +13,9 @@ use wf_types::version::{Fence, TimestampMillis};
 
 use super::super::{
     StateValueError, add, copy, finish, flag, raw, read_u8, read_u64, read_u128, start,
+    start_versioned,
 };
-use super::event;
+use super::{RecordHistoryView, event_version};
 
 /// Validated borrowed wire fields, without allocation or transaction authority.
 ///
@@ -44,6 +45,25 @@ pub struct ScannedWorkflowRecord<'input> {
 }
 
 impl<'input> ScannedWorkflowRecord<'input> {
+    pub(in crate::state::value) const fn history_view(&self) -> RecordHistoryView<'input> {
+        RecordHistoryView {
+            state: self.state,
+            version: self.version,
+            fence: self.fence,
+            attempts: self.attempts,
+            updated: self.updated,
+            next: self.next,
+            worker: match self.lease {
+                Some((worker, _, _)) => Some(worker),
+                None => None,
+            },
+            deadline: match self.lease {
+                Some((_, _, deadline)) => deadline,
+                None => 0,
+            },
+            latest: self.latest,
+        }
+    }
     /// Reads the validated predecessor version without materializing an owner.
     #[must_use]
     pub const fn version(&self) -> u64 {
@@ -204,7 +224,7 @@ pub fn scan_record_point<'input>(
         Some((expected_scope.tenant(), expected_partition, expected_id)),
         limits,
         maximum_wire_bytes,
-        false,
+        (false, 1),
     )
 }
 
@@ -227,7 +247,7 @@ pub fn scan_record_point_profiled<'input>(
         Some((expected_scope.tenant(), expected_partition, expected_id)),
         limits,
         maximum_wire_bytes,
-        true,
+        (true, 1),
     )
 }
 
@@ -245,20 +265,29 @@ pub(super) fn scan_legacy<'input>(
         None,
         limits,
         maximum_wire_bytes,
-        false,
+        (false, 1),
     )
 }
 
-fn scan<'input>(
+pub(super) fn scan<'input>(
     bytes: &'input [u8],
     group: &GroupId,
     recovery: &RecoveryId,
     point: Option<(&TenantId, &PartitionId, &RecordId)>,
     limits: AdmissionLimits,
     maximum: usize,
-    profiled: bool,
+    profile: (bool, u16),
 ) -> Result<ScannedWorkflowRecord<'input>, StateValueError> {
-    let mut offset = start(bytes, *b"FWSR", maximum)?;
+    let (profiled, format) = profile;
+    let mut offset = if format == 1 {
+        start(bytes, *b"FWSR", maximum)?
+    } else {
+        let (offset, actual) = start_versioned(bytes, *b"FWSR", maximum)?;
+        if format != 2 || actual != 2 {
+            return Err(StateValueError::UnsupportedVersion);
+        }
+        offset
+    };
     let actual_group = raw(bytes, &mut offset)?;
     let actual_recovery = raw(bytes, &mut offset)?;
     let tenant = raw(bytes, &mut offset)?;
@@ -293,7 +322,11 @@ fn scan<'input>(
     let latest_version = read_u64(bytes, &mut offset)?;
     let latest_fence = read_u64(bytes, &mut offset)?;
     finish(bytes, offset)?;
-    let latest = (event(latest_tag)?, latest_version, latest_fence);
+    let latest = (
+        event_version(latest_tag, format)?,
+        latest_version,
+        latest_fence,
+    );
     if actual_group != group.as_bytes()
         || actual_recovery != recovery.as_bytes()
         || point.is_some_and(|(expected_tenant, expected_partition, expected_id)| {
