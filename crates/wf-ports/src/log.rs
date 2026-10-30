@@ -58,13 +58,15 @@ pub use record_batch::{
     FreshRecordBatch, RecordBatchApplyDecision, RecordBatchApplyError, RecordBatchApplyPlan,
     RecordBatchInspection, atomic_start_response_matches, atomic_start_retained_summary,
     decide_fresh_atomic_start_touched, decide_fresh_independent_record_batch_touched,
-    decide_fresh_record_batch, decide_fresh_record_batch_touched, decide_record_batch,
-    encode_atomic_start, encode_independent_record_batch, encode_record_batch,
-    encode_step_continue, encode_step_continue_response, independent_record_batch_response_matches,
+    decide_fresh_record_batch, decide_fresh_record_batch_touched,
+    decide_fresh_step_continue_touched, decide_record_batch, encode_atomic_start,
+    encode_independent_record_batch, encode_record_batch, encode_step_continue,
+    encode_step_continue_response, independent_record_batch_response_matches,
     inspect_atomic_start_point, inspect_independent_record_batch_point, inspect_record_batch,
-    inspect_record_batch_point, prepare_atomic_start, prepare_independent_record_batch,
-    prepare_record_batch, prepare_step_continue, record_batch_retained_status,
-    record_batch_retained_summary, step_continue_response_matches, step_continue_retained_summary,
+    inspect_record_batch_point, inspect_step_continue_point, prepare_atomic_start,
+    prepare_independent_record_batch, prepare_record_batch, prepare_step_continue,
+    record_batch_retained_status, record_batch_retained_summary, step_continue_response_matches,
+    step_continue_retained_summary,
 };
 
 pub use complete_policy::{

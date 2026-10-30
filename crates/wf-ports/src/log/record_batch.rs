@@ -29,8 +29,9 @@ pub(in crate::log) mod response;
 mod step_continue;
 
 pub use step_continue::{
-    encode_step_continue, encode_step_continue_response, prepare_step_continue,
-    step_continue_response_matches, step_continue_retained_summary,
+    decide_fresh_step_continue_touched, encode_step_continue, encode_step_continue_response,
+    inspect_step_continue_point, prepare_step_continue, step_continue_response_matches,
+    step_continue_retained_summary,
 };
 
 pub(super) use fresh::{decide_independent, value_effects_budget};

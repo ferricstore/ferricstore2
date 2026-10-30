@@ -6,9 +6,12 @@ use wf_domain::workflow::request::ClientIntent;
 
 use super::{RecordBatchApplyError, admit, admit_decoded_request, sum};
 
+mod fresh;
 mod input;
 mod response;
 mod wire;
+
+pub use fresh::{decide_fresh_step_continue_touched, inspect_step_continue_point};
 
 pub use response::{
     encode_step_continue_response, step_continue_response_matches, step_continue_retained_summary,

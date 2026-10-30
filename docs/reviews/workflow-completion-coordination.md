@@ -57057,3 +57057,80 @@ exact. The original recipe and first-body4/1 failure are preserved separately.
 Receipts: /private/tmp/ferricstore2-step-response-{inverses,pipeline,full-identity,
 full-parity,adopted}.json. Local adoption must verify both clean trees and every
 frozen input; no push/external communication is authorized.
+
+## M2-STEP-FRESH1 — solo architecture selection before artifacts
+
+Response/command predecessor8d32df6 is locally adopted with12 gates/1288 cases;
+both clean checkouts match all1755 inputs. Select the actual retained/Fresh
+composition on codex/step-continue-fresh. Primary stays at that tested checkpoint.
+This stage proposes plans; storage/history schema and publication remain separate
+mandatory successors. No service, commit or original source-case credit is supplied.
+
+Approve BEFORE creation private record_batch/step_continue/fresh.rs, initially
+rejecting both APIs with UnsupportedTag; AFTER genuine saved RED implement
+inspect_step_continue_point(decoded,log,PointGateView,CodecLimits,workspace)
+->RecordBatchInspection and decide_fresh_step_continue_touched(FreshRecordBatch,
+TouchedIndexedGroupView,additional_live_bytes,outcome_ttl_ms)->RecordBatchApplyPlan.
+Reuse the existing opaque Fresh owner; no new type/trait/model. Existing Step
+facade/record_batch/log export only those two APIs. Exact Batch/one Step/intent10
+and original codec limits are mandatory. Inspect one retained gate before current
+record/policy/index authority. Only Replay scans the complete original response9,
+full original log/time and retained status/cardinality. Conflict/Expired/LogReplay
+preserve their established precedence. Old drivers remain closed to10.
+
+Fresh consumes once, validates current group plus full control log/digest binding,
+and uses the existing touched indexed planner at actual execution time. Preserve
+Step's returned guard, equal-state ordering, payload presence and direct FIFO
+running-entry rejection. Derive metered numeric value provenance from the same
+decoded source and actual postimage. After releasing decoded command/key/filter
+owners, measure the existing FWST reply, prospectively admit output/retained
+liabilities and emit once into the same returned plan. Late tariff is unchanged
+atomic-start form: E+D+header+512+reply+additional+effect descriptors; decoder/
+staging/value-effects formulas remain shared. Original expiry/status/reply9 join
+the same proposed outcome; actual persistence is not implemented by this owner.
+
+AFTER RED existing Step response.rs may extract private measure and encode_measured
+helpers for that late boundary, retaining the public encoder's complete old
+measure/emit behavior. Existing domain request/outcome.rs may extract private
+validate_response_profile, preserving the complete former non10 specialization,
+and admit ONLY intent10/response9 with Accepted/IndexedRejected status. Reject
+crossed versions and other statuses; do not grant persistence from construction.
+
+The395-line blob/publication/scan.rs cannot absorb another profile body safely.
+AFTER RED move its complete validate_effect_entry function into EXISTING step.rs,
+reexporting the same server-private name from scan. Preserve all old charges and
+branches. Extend only the new10 branch: exactly one Batch Step, no value-profile
+wrapper, same control/digest association; its extra classification pays one
+logical work unit. Existing step.rs may add only the intent10-guarded
+StepContinued event arm and payload-only supplied-field arm. Existing legacy/
+independent/public decoders, value-profile mode allowlists, response registries,
+stored event tables and recovery dispatch remain closed. This is binary inline
+intent10 composition, not typed/stored value8/9 support for Step.
+
+Approve grouped tests/step_continue_apply/main.rs and fixtures.rs,views.rs,fresh.rs,
+replay.rs,refusals.rs,limits.rs. Only TestResult alias and helper functions; no
+new nominal fixture/model. Real Create/Claim and authoritative touched facts feed
+the new driver; finite fixture callbacks may borrow current owners. Six cases
+first reach healthy new inspection against the rejecting shell, then exercise
+actual guard/reply/index/effect/retention; equal-state and absent/empty payload;
+stale/FIFO retained refusal; original replay/conflict/expiry/log replay without
+current authority; crossed response/status and full-context corruption; exact
+workspace/additional/effect/work boundaries and rejection by foreign drivers.
+Freeze actual runtime failures and full source hashes before any of those bodies.
+No mock successful apply, source ledger credit, native/Linux claim or pushed work.
+
+The existing pure Step prefix covers fresh; add its exact effect-probe row and
+update ADR004/006, enforcement and handoff. Keep400/600/function100/nesting4/
+cognitive25 without suppression, packed code or weakened assertions. Root owns
+this architecture/resource review solo; no independent peer review is claimed.
+
+M2-STEP-FRESH1 genuine R0 SAVE: technical test fixes use the actual admission()
+getter and StateChange::Patch, inspect Debug-only effect errors with explicit
+Ok/Err assertions, remove an unused import and extract two focused helpers so
+every function stays within100 lines. These compilation/lint findings are not
+RED. Focused strict Clippy now exits0 without suppression. Actual compiled
+runtime exits101:0pass/6fail/0ignored, all at healthy Step inspection with
+Encoding(UnsupportedTag). Every retained/Fresh/index/effect/resource tail remains
+masked. Both new APIs still reject all inputs; shared outcome, response helpers,
+blob association and scanners are untouched. Freeze11 source hashes and three
+whole old-file inverses before any of those bodies. Primary remains at8d32df6.

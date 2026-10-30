@@ -2,6 +2,13 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
+Work in progress on codex/step-continue-fresh: strict focused Clippy passes and
+six compiled cases genuinely fail at the healthy inspection shell before bodies.
+Select intent10/response9 retained inspection, consumed touched decisions and
+metered payload provenance without enabling storage/recovery. Primary stays at
+the passing8d32df6 checkpoint below. See M2-STEP-FRESH1 and
+`/private/tmp/ferricstore2-step-fresh-genuine-r0.json`; full goal remains active.
+
 The codex/step-continue-response checkpoint implements an explicit intent10/
 response9 data grammar with complete original log/time binding and actual Step
 postimages. Five genuine runtime refusals were saved ind7faf8f before bodies.
