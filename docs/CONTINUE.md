@@ -2,12 +2,20 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Work in progress on codex/step-continue-fresh: strict focused Clippy passes and
-six compiled cases genuinely fail at the healthy inspection shell before bodies.
+The codex/step-continue-fresh checkpoint: six genuine runtime refusals were
+saved in e7a9291 before the bodies. All six unchanged complete cases, strict
+focused Clippy and exact purity probes pass. All12 final direct gates now pass
+with1,294 cases/112 targets, preserving every earlier1,288 identity and multiplicity.
 Select intent10/response9 retained inspection, consumed touched decisions and
-metered payload provenance without enabling storage/recovery. Primary stays at
-the passing8d32df6 checkpoint below. See M2-STEP-FRESH1 and
-`/private/tmp/ferricstore2-step-fresh-genuine-r0.json`; full goal remains active.
+metered payload provenance without enabling storage/recovery. All1,763 frozen
+inputs/1,174 Rust files match the tested tree. Eight complete old-file inverses
+and1,747 other exact original inputs preserve older behavior; all ten R0 files
+outside the implementation shell stay entirely exact, including all seven test
+files. A first Clippy attempt caught101/100 architecture-test lines; its full
+evidence is archived before the assertion helper extraction. No suppression,
+changed row/probe or source-case credit is claimed. See M2-STEP-FRESH1 and
+`/private/tmp/ferricstore2-step-fresh-{genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json`.
+The adopted receipt records both clean trees and exact commit. Full goal remains active.
 
 The codex/step-continue-response checkpoint implements an explicit intent10/
 response9 data grammar with complete original log/time binding and actual Step
@@ -25,9 +33,11 @@ credit is claimed. See M2-STEP-RESPONSE1 and
 `/private/tmp/ferricstore2-step-response-{genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json`.
 The adopted receipt records local status and exact commit; no push is performed.
 
-Next implement explicit Step retained inspection and consumed Fresh decisions,
-including metered payload-presence association under intent10. Existing drivers
-and value-profile allowlists remain closed. Historical schema, atomic publication,
+Step retained inspection and consumed Fresh decisions now include metered
+payload-presence association under intent10. Existing foreign drivers and
+value-profile mode allowlists remain closed. Next select the complete historical
+snapshot schema before enabling atomic Step publication. Historical schema,
+atomic publication,
 inquiry/fault/reopen and recovery follow; no durable/public Step claim is added.
 
 The intent10/item12 Step preparation checkpoint passes all seven focused cases
@@ -167,10 +177,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,288 tests across 111
+The current local Rust quality checkpoint passes all 1,294 tests across 112
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier1,282 case and
-adds only six Step response cases. The earlier1,264/interim1,273/1,275
+15 targets. Exact identity comparison preserves every earlier1,288 case and
+adds only six Step retained/Fresh cases. The earlier1,264/interim1,273/1,275/1,282
 checkpoints remain represented exactly.
 All 53 architecture cases pass. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,

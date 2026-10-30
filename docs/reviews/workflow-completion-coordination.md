@@ -57134,3 +57134,61 @@ Encoding(UnsupportedTag). Every retained/Fresh/index/effect/resource tail remain
 masked. Both new APIs still reject all inputs; shared outcome, response helpers,
 blob association and scanners are untouched. Freeze11 source hashes and three
 whole old-file inverses before any of those bodies. Primary remains at8d32df6.
+
+M2-STEP-FRESH1 body after e7a9291: all six complete saved cases pass unchanged on
+the first runtime attempt; strict focused Clippy and the exact fresh-module
+effect probe also pass. The old scanner is now358 lines; its same association
+function lives in step.rs with an explicit singleton intent10 branch. All prior
+charges/branches remain in the non10 specialization. No old decoder mode is opened.
+
+The actual Fresh path validates full log/prepared control before current planning,
+builds the same metered payload-presence owner, releases decoded variable owners,
+then admits the measured response before allocation. Existing response measure/
+emit bodies are extracted rather than cloned. Zero attempts, equal-state order,
+omitted/empty payload, original replay bytes and expiry/conflict/log precedence
+all pass. The new typed retained constructor permits exactly10/9 business status.
+These are pure proposal and ownership results, not persistence, allocator/RSS,
+latency or native/Linux measurements. Full workspace/source-preservation gates
+remain to run; no new assertion mapping or source-case credit is selected.
+
+First complete quality attempt passes Python/bash/fmt/check but strict workspace
+Clippy finds the existing architecture matrix at101/100 lines after adding the
+one fresh-module row. This is a technical lint failure, not a new runtime RED.
+Preserve that attempted pipeline/log/frozen snapshot. Select private helper
+assert_state_value_home(package,module) in EXISTING tests/state_values.rs;
+move only the complete per-home positive/negative assertions into it and invoke
+it for every unchanged matrix row. No new file/type, skipped home, changed probe,
+packed source or allowance. Re-run complete quality on the new frozen snapshot.
+
+The extracted per-home helper now passes strict architecture Clippy and the
+actual effect-matrix runtime. All prior matrix rows/probe assertions are retained;
+the inverse must inline that whole helper before comparing the complete old file.
+
+M2-STEP-FRESH1 final execution: all12 final direct gates pass over1,763 frozen
+non-Markdown inputs/1,174 Rust files. Runtime is1,294pass/0fail/0ignored across112
+executable targets (110 result targets plus the two unchanged benchmark correctness
+smokes). Complete Counter comparison preserves every prior1,288 target/name/
+status/multiplicity, adding exactly the six saved cases and one target. All53
+architecture cases, Python7 and6 doctests/15 targets pass. Compiler, strict lint,
+documentation, reference/progress integrity and offline audit all pass. The first
+101-line architecture lint attempt is archived separately, not represented as green.
+
+Eight complete old-file inverses recover8d32df6, including the full former retained
+constructor specialization, complete moved association/old charges, inlined reply
+measure/emit and complete old matrix/each probe assertion. All1,747 other old
+inputs are hash-exact. Ten complete R0 sources stay exact: three export/glue files
+and all seven saved test files. No oracle/assertion/threshold correction was
+needed in this increment. Full parity actually exits1. Main ledger129/143/589
+and runtime5903/4222/1681/1655 remain unchanged; no source-case/native/Linux,
+storage/recovery or completed-goal credit is claimed. Final evidence is under
+/private/tmp/ferricstore2-step-fresh-{inverses,pipeline,full-identity,full-parity,
+adopted}.json. Local adoption verifies both clean trees and every tested input.
+
+Next causal work remains the historical snapshot schema and actual atomic Step
+record/index/history/outcome/control publication, followed by inquiry, uncertain/
+fault/reopen behavior, snapshot/recovery routing and original source scenario.
+Current HistoryEntry/FWSH1 omits logical run_state; do not append only an event
+tag or infer complete rewind snapshots. Rich/captured lifecycle and value context
+also need explicit historical representation/disposition. No new schema/model
+is approved by this observation; select concrete ownership, fields and tariffs
+before those artifacts, preserving the wider full-product requirements.

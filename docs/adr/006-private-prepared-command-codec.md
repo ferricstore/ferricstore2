@@ -51,6 +51,26 @@ This format does not implement retained inspection, Fresh authority, historical
 snapshot representation, persistence, recovery or public transports. Complete
 those successors before claiming durable Step or the original source scenario.
 
+M2-STEP-FRESH1 joins the explicit intent10 command and response9 through the
+existing point retained gate and opaque consumed Fresh owner. Six genuine
+inspection refusals saved in e7a9291 precede implementation. Only Replay scans
+original response/context/status; conflict, expiry and exact-log precedence are
+unchanged and do not consult current workflow authority. Fresh checks actual
+group and full log/prepared control, uses the touched indexed planner and binds
+metered payload-presence provenance to its actual postimage. The same owner
+proposes indexes, history, original outcome and processing control.
+
+The response's existing measure/emit grammar is shared at the late ownership
+boundary: release decoded command/key/filter buffers before prospective reply
+admission and reservation. The shared singleton tariff remains E+D+header+512+
+reply+additional-live+effect-descriptors. Existing decoder/staging/effect work
+accounts are retained. The retained constructor admits only intent10/response9
+Accepted/IndexedRejected status; other intent specializations retain their
+previous profile/error order. Value-profile wrappers8/9 remain unsupported for
+Step. All six focused cases now pass unchanged, including exact one-below limits.
+This proposal supplies no actual writer, historical schema, recovery or public
+service. Those remain mandatory successors; no source-case credit is inferred.
+
 ## Ownership
 
 Neutral owned preparation values belong to `wf-ports::consensus`. One private

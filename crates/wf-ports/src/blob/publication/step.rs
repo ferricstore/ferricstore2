@@ -2,9 +2,11 @@
 
 use crate::blob::publication::scan::ValueEffectsCharge;
 use crate::blob::publication::{RecordBatchValueEffect, RecordBatchValueEffectsError as E};
+use crate::consensus::PreparedOperation;
 use crate::log::DecodedRequest;
 use wf_domain::history::EventKind;
 use wf_domain::workflow::batch::ScopedPlan;
+use wf_domain::workflow::control::ControlPlan;
 use wf_domain::workflow::{Operation, Outcome};
 
 pub(super) fn value_effect(
@@ -54,6 +56,9 @@ pub(super) fn value_effect(
         Operation::Retry(_) | Operation::RetryWithPolicy(_) => EventKind::Retry,
         Operation::ExtendLease(_) => EventKind::LeaseExtended,
         Operation::Cancel(_) => EventKind::Cancelled,
+        Operation::StepContinue(_) if decoded.request().intent.version() == 10 => {
+            EventKind::StepContinued
+        }
         _ => return Err(E::UnsupportedProfile),
     };
     charge.spend(1)?;
@@ -130,6 +135,10 @@ pub(super) fn supplied_value_fields<'operation>(
             charge.spend(1)?;
             [value.payload.as_deref(), None, None]
         }
+        Operation::StepContinue(value) => {
+            charge.spend(1)?;
+            [value.payload.as_deref(), None, None]
+        }
         Operation::Complete(value) => {
             charge.spend(2)?;
             [value.payload.as_deref(), value.value.as_deref(), None]
@@ -153,4 +162,50 @@ pub(super) fn supplied_value_fields<'operation>(
         Operation::ExtendLease(_) => [None, None, None],
         _ => return Err(E::UnsupportedProfile),
     })
+}
+
+pub(super) fn validate_effect_entry(
+    decoded: &DecodedRequest<'_>,
+    control: ControlPlan,
+    charge: &mut ValueEffectsCharge,
+) -> Result<(), E> {
+    charge.spend(1)?;
+    let entry = control.next().last_entry().ok_or(E::InvalidChanges)?;
+    charge.spend(64)?;
+    if entry.prepared() != decoded.digest() {
+        return Err(E::InvalidChanges);
+    }
+    charge.spend(1)?;
+    let version = profile(decoded, charge)?;
+    if !matches!(version, 1 | 5..=7 | 10) {
+        return Err(E::UnsupportedProfile);
+    }
+    charge.spend(1)?;
+    let items = decoded
+        .request()
+        .operation
+        .mutation_items()
+        .ok_or(E::UnsupportedProfile)?;
+    if items.is_empty() || (matches!(version, 1 | 7 | 10) && items.len() != 1) {
+        return Err(E::UnsupportedProfile);
+    }
+    charge.spend(1)?;
+    if (version == 1)
+        != matches!(
+            decoded.request().operation,
+            PreparedOperation::PublicMutation { .. }
+        )
+    {
+        return Err(E::UnsupportedProfile);
+    }
+    if version == 10 {
+        charge.spend(1)?;
+        if !matches!(decoded.request().operation, PreparedOperation::Batch(_))
+            || !matches!(items[0].command.operation, Operation::StepContinue(_))
+            || decoded.workflow_value_metadata().is_some()
+        {
+            return Err(E::UnsupportedProfile);
+        }
+    }
+    Ok(())
 }

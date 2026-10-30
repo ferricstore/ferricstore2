@@ -1,5 +1,42 @@
 use super::{CheckResult, graph, json, metadata, package_mut, policy, root, source_check};
 
+fn assert_state_value_home(package: &str, module: &str) -> CheckResult<()> {
+    assert_eq!(
+        source_check(
+            package,
+            module,
+            "use std::collections::BTreeMap; use std::fmt; use wf_types::version;"
+        )?,
+        Vec::<String>::new()
+    );
+    for (source, diagnosis) in [
+        ("use std::fs;", "standard-library module"),
+        ("pub use std::fs as exported;", "standard-library module"),
+        (
+            "use std as hidden; use hidden::env;",
+            "standard-library module",
+        ),
+        ("pub async fn effect() {}", "declares async behavior"),
+        ("static GLOBAL: u64 = 0;", "declares global state"),
+        (
+            "fn hidden() { let _ = format!(\"{}\", std::env::var(\"X\")); }",
+            "standard-library module",
+        ),
+        ("fn unchecked() { unsafe {} }", "unsafe block"),
+        (
+            "include!(\"generated.rs\");",
+            "runtime macro/generated code",
+        ),
+    ] {
+        let findings = source_check(package, module, source)?;
+        assert!(
+            findings.iter().any(|finding| finding.contains(diagnosis)),
+            "{package}::{module}: missing {diagnosis}: {findings:?}"
+        );
+    }
+    Ok(())
+}
+
 #[test]
 fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
     for (package, module) in [
@@ -42,6 +79,7 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-ports", "log::record_batch::response"),
         ("wf-ports", "log::record_batch::step_continue"),
         ("wf-ports", "log::record_batch::step_continue::input"),
+        ("wf-ports", "log::record_batch::step_continue::fresh"),
         ("wf-ports", "log::record_batch::step_continue::wire"),
         ("wf-ports", "log::record_batch::step_continue::response"),
         (
@@ -67,39 +105,7 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-ports", "snapshot::metadata"),
         ("wf-ports", "snapshot::metadata::nested"),
     ] {
-        assert_eq!(
-            source_check(
-                package,
-                module,
-                "use std::collections::BTreeMap; use std::fmt; use wf_types::version;"
-            )?,
-            Vec::<String>::new()
-        );
-        for (source, diagnosis) in [
-            ("use std::fs;", "standard-library module"),
-            ("pub use std::fs as exported;", "standard-library module"),
-            (
-                "use std as hidden; use hidden::env;",
-                "standard-library module",
-            ),
-            ("pub async fn effect() {}", "declares async behavior"),
-            ("static GLOBAL: u64 = 0;", "declares global state"),
-            (
-                "fn hidden() { let _ = format!(\"{}\", std::env::var(\"X\")); }",
-                "standard-library module",
-            ),
-            ("fn unchecked() { unsafe {} }", "unsafe block"),
-            (
-                "include!(\"generated.rs\");",
-                "runtime macro/generated code",
-            ),
-        ] {
-            let findings = source_check(package, module, source)?;
-            assert!(
-                findings.iter().any(|finding| finding.contains(diagnosis)),
-                "{package}::{module}: missing {diagnosis}: {findings:?}"
-            );
-        }
+        assert_state_value_home(package, module)?;
     }
     Ok(())
 }

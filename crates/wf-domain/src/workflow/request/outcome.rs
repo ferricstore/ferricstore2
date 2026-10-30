@@ -115,41 +115,7 @@ impl RetainedOutcome {
             expires_at,
             status,
         } = metadata;
-        if matches!(intent.version(), 8 | 9)
-            && (!matches!(response_version, 5..=8)
-                || !matches!(
-                    status,
-                    RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
-                ))
-        {
-            return Err(RequestValueError::UnsupportedVersion);
-        }
-        if !matches!(intent.version(), 8 | 9)
-            && response_version != 1
-            && !(response_version == 2
-                && intent.version() == 2
-                && status == RetainedStatus::Accepted)
-            && !(response_version == 2
-                && intent.version() == 1
-                && matches!(
-                    status,
-                    RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
-                ))
-            && !(response_version == 3
-                && intent.version() == 1
-                && matches!(
-                    status,
-                    RetainedStatus::Accepted | RetainedStatus::ClaimRejected(_)
-                ))
-            && !(response_version == 4
-                && intent.version() == 7
-                && matches!(
-                    status,
-                    RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
-                ))
-        {
-            return Err(RequestValueError::UnsupportedVersion);
-        }
+        validate_response_profile(intent, response_version, status)?;
         if expires_at <= original_time {
             return Err(RequestValueError::InvalidExpiry);
         }
@@ -239,3 +205,55 @@ impl fmt::Display for RequestValueError {
     }
 }
 impl std::error::Error for RequestValueError {}
+
+fn validate_response_profile(
+    intent: ClientIntent,
+    response_version: u16,
+    status: RetainedStatus,
+) -> Result<(), RequestValueError> {
+    if intent.version() == 10 {
+        return if response_version == 9
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
+            ) {
+            Ok(())
+        } else {
+            Err(RequestValueError::UnsupportedVersion)
+        };
+    }
+    if matches!(intent.version(), 8 | 9)
+        && (!matches!(response_version, 5..=8)
+            || !matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
+            ))
+    {
+        return Err(RequestValueError::UnsupportedVersion);
+    }
+    if !matches!(intent.version(), 8 | 9)
+        && response_version != 1
+        && !(response_version == 2 && intent.version() == 2 && status == RetainedStatus::Accepted)
+        && !(response_version == 2
+            && intent.version() == 1
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
+            ))
+        && !(response_version == 3
+            && intent.version() == 1
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::ClaimRejected(_)
+            ))
+        && !(response_version == 4
+            && intent.version() == 7
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::IndexedRejected(_)
+            ))
+    {
+        return Err(RequestValueError::UnsupportedVersion);
+    }
+    Ok(())
+}

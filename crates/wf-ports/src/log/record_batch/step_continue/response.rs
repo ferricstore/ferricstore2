@@ -19,9 +19,28 @@ pub fn encode_step_continue_response(
     time: TimestampMillis,
     limits: AdmissionLimits,
 ) -> Result<(Vec<u8>, RetainedStatus), CodecError> {
+    let length = measure(decision, position, time, limits)?;
+    encode_measured(decision, position, time, limits, length)
+}
+
+pub(super) fn measure(
+    decision: &IndexedDecision<'_>,
+    position: LogIdentity,
+    time: TimestampMillis,
+    limits: AdmissionLimits,
+) -> Result<usize, CodecError> {
     let mut measured = Writer::measure(limits.decision_bytes());
     write::write(decision, position, time, &mut measured, limits)?;
-    let length = measured.len();
+    Ok(measured.len())
+}
+
+pub(super) fn encode_measured(
+    decision: &IndexedDecision<'_>,
+    position: LogIdentity,
+    time: TimestampMillis,
+    limits: AdmissionLimits,
+    length: usize,
+) -> Result<(Vec<u8>, RetainedStatus), CodecError> {
     let mut output = Writer::allocate(length, limits.decision_bytes())?;
     let status = write::write(decision, position, time, &mut output, limits)?;
     if output.len() != length {

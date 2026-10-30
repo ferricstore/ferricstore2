@@ -205,6 +205,13 @@ encoder/complete scan/actual-plan matcher preserve zero attempts and all three
 optional fields. It supplies no retained/Fresh driver or durable publication.
 The historical logical-state schema still requires selection before storage.
 
+M2-STEP-FRESH1 now composes that command/reply data with one point retained gate
+and consumed touched authority. Full log/prepared control is revalidated before
+current planning. The same plan owns numeric payload presence and original9
+response under prospective workspace admission. Same-state ordering and stale/
+FIFO refusals retain existing core semantics. This remains a proposal, with
+actual publication and historical logical-state schema still required.
+
 ### Selected pure committed StartAndClaim core
 
 START-AND-CLAIM1 selects `StartAndClaim` with explicit binary type, logical

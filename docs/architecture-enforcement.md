@@ -195,6 +195,15 @@ writer gains only server-private sibling visibility; its complete body remains
 exact. No graph, parser, effect, size or lint exemption is selected. Response9 is
 a new data grammar; older response and persistence profiles remain closed.
 
+M2-STEP-FRESH1 adds the exact pure Step fresh-module probe. Its private sibling
+owns point-gate and proposal composition using the existing opaque Fresh type.
+The existing blob association function moves from the395-line scan to step,
+preserving old specializations and charges; the scan is now358 lines. An explicit
+intent10 singleton Step branch supplies payload-presence provenance, without
+opening value-wrapper8/9 mode allowlists. Domain retained-profile validation is
+factored into one private helper with the prior non10 behavior. No module,
+dependency, effect, source-size or lint exemption is introduced.
+
 ### Pure committed StartAndClaim boundaries
 
 The [selected atomic-start contract](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)

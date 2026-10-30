@@ -147,6 +147,12 @@ log/time binding. They preserve all three optional value fields. Retained/Fresh
 orchestration, historical schema and storage/recovery integration remain required;
 these pure response values supply none of those capabilities.
 
+The later M2-STEP-FRESH1 proposal composes one point retained gate and existing
+opaque consumed Fresh owner. Current indexed authority is reached only for Fresh;
+full control log/prepared identity, metered payload presence and original reply9
+join the same proposed plan after decoded owners are released. This still grants
+no durable commit, historical snapshot completeness, recovery or public service.
+
 The [selected atomic StartAndClaim core](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
 uses the same pure domain and existing Created history. After the saved
 UnsupportedOperation regressions, the body creates one fresh leased running

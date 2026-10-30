@@ -2,11 +2,11 @@
 
 use std::mem::size_of;
 
-use crate::blob::publication::step::{profile, value_effect};
+pub(super) use crate::blob::publication::step::validate_effect_entry;
+use crate::blob::publication::step::value_effect;
 use crate::blob::publication::{
     RecordBatchValueEffect, RecordBatchValueEffects, RecordBatchValueEffectsError as E,
 };
-use crate::consensus::PreparedOperation;
 use crate::log::DecodedRequest;
 use wf_domain::workflow::control::ControlPlan;
 use wf_domain::workflow::indexed::{IndependentIndexedDecision, IndexedDecision};
@@ -305,43 +305,6 @@ pub(super) fn check_independent_effects(
     charge.spend(1)?;
     if count != rows.len() {
         return Err(E::InvalidChanges);
-    }
-    Ok(())
-}
-
-pub(super) fn validate_effect_entry(
-    decoded: &DecodedRequest<'_>,
-    control: ControlPlan,
-    charge: &mut ValueEffectsCharge,
-) -> Result<(), E> {
-    charge.spend(1)?;
-    let entry = control.next().last_entry().ok_or(E::InvalidChanges)?;
-    charge.spend(64)?;
-    if entry.prepared() != decoded.digest() {
-        return Err(E::InvalidChanges);
-    }
-    charge.spend(1)?;
-    let version = profile(decoded, charge)?;
-    if !matches!(version, 1 | 5..=7) {
-        return Err(E::UnsupportedProfile);
-    }
-    charge.spend(1)?;
-    let items = decoded
-        .request()
-        .operation
-        .mutation_items()
-        .ok_or(E::UnsupportedProfile)?;
-    if items.is_empty() || (matches!(version, 1 | 7) && items.len() != 1) {
-        return Err(E::UnsupportedProfile);
-    }
-    charge.spend(1)?;
-    if (version == 1)
-        != matches!(
-            decoded.request().operation,
-            PreparedOperation::PublicMutation { .. }
-        )
-    {
-        return Err(E::UnsupportedProfile);
     }
     Ok(())
 }
