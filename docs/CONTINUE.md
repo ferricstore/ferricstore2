@@ -2,7 +2,8 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Current worktree: codex/credit-owner-solo, M1-CREDIT-OWNER1. The pure governing
+Current worktree: codex/identified-credit-solo, starting M2-IDENTIFIED-CREDIT1.
+The completed code checkpoint is 728650f, M1-CREDIT-OWNER1. The pure governing
 credit reducer now executes configuration, partial grants, identified/anonymous
 compatibility spends, renewal, sibling-safe release and expiry without cloning
 an owner map. All 16 focused cases and strict Clippy pass. Twelve rejecting
@@ -40,6 +41,18 @@ governing-owner storage/outbox protocol, monotone batch reservation cursor,
 complete current policy checks, rich source captures and all native/profile/
 Linux/macOS and later milestone gates remain required. The full goal stays
 active and solo.
+
+The next owner integration must keep detached active/released ID records,
+ordered 256-ID pages, epoch retirement and resumable cleanup. The pinned stored
+protocol replays released IDs while a sibling remains active, rotates epochs
+after full release, and compares a spend's expected epoch after retirement.
+Serializing the pure helper's live-ID map as an owner blob would lose those
+semantics and require loading historical IDs for a bounded spend. The concrete
+source review and batch exits are recorded under M2-IDENTIFIED-CREDIT1 in the
+coordination document. No new production artifact/type has been created for
+that batch yet. Select its exact port/entry/storage/recovery contracts and
+tests before creation, then implement the real atomic stored path; a codec or
+pure helper alone does not complete it.
 
 Previous checkpoint: codex/stored-step-solo, M2-STORED-STEP1. Explicit stored Step
 intent 11 now shares the existing Step reducer, response 9 and consumed format 8

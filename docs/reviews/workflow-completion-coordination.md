@@ -58474,3 +58474,55 @@ active: the atomic public Claim parent, durable governing-owner and outbox
 protocol, rich source records/captures and every remaining milestone, original
 source/profile and native Linux/macOS gate remain mandatory. Next work must
 integrate a real functional owner/Claim path, not merely register a codec.
+
+## M2-IDENTIFIED-CREDIT1 — continuing functional owner integration
+
+Previous goal turn: progress. Adopted 728650f after all 12 gates and preserved
+every previous test; saved the separately isolated Elixir pending-reclaim fix.
+Continue solo on codex/identified-credit-solo. The following source review
+changes the next implementation contract; it creates no new artifact/type and
+does not mark the next functional batch complete.
+
+Pinned flow_governance_limit.ex:15–227,228–265,359–668,842–1051 and
+governance/view.ex were inspected at 66586c5. The durable protocol is not the
+pure CreditLease map serialized as one row. Owners detach reservation maps;
+point records carry active/released status, and pages retain original ID order.
+All-known active OR released IDs replay a spend without charging. Partial overlap
+rejects. Release looks up the CURRENT lease epoch, marks actual active IDs
+released and releases only their count. An old ID cannot release a new epoch.
+When in_use becomes zero and pages exist, retire the epoch if cleanup has room;
+increment owner/lease generation, reset page/fill and enqueue the old page range.
+The next spend performs that retirement before comparing its expected epoch.
+Expiry similarly enqueues old page ranges before eventual bounded deletion.
+
+Source ceilings are 1,000 IDs per mutation, 256 IDs per page, 256 pages per epoch
+and 256 cleanup tasks. Cleanup deletes at most one actual page per command;
+advance its exact cursor or delete the completed task and increment head.
+Generation exhaustion, full history and cleanup backlog require explicit
+business/operational dispositions with no partial local publication. The pure
+credit reducer remains a capacity model; passing an ID-free Spend to it is
+acceptable only inside an adapter/protocol that has already validated the
+complete original identified batch under the same revision. Its anonymous
+compatibility API cannot establish those facts.
+
+Integrate actual point membership reads and one atomic owner/reservation/page/
+cleanup/outcome/control commit over the existing group/recovery authority.
+Do not load/clone every historical reservation to spend a bounded batch.
+Same-request retained replay must use the existing common namespace before
+changed owner/config/time inputs, and classify unknown outcomes without fresh
+IDs. New private entry/response and persistent layout/family contracts require
+an explicit ADR and concrete artifact selection before creation. Existing old
+capabilities remain closed; expanded capabilities need full recovery/snapshot/
+received-purge validation, including no-ID/no-value downgrade controls.
+
+Required batch exits: real stored lease→identified spend→partial release→retry
+with released IDs while a sibling remains active; full-release epoch rotation;
+stale-ID release; partial overlap; expiry and resumable 256-entry cleanup;
+monotone configuration; late read/write/admission failure with no prefix;
+uncertain commit fencing and reopen; retained originals through snapshots and
+Node committed replay. Preserve public owner/lease field omission from View.
+Inspect the original storage tests and their FlowCase setup/profiles before
+claiming any counterpart. Catalog repair/publication has its own source
+obligations and cannot disappear into registration metadata. The public Claim
+parent, governing policy authority and release outbox remain coupled successors;
+this batch is not complete when a codec or pure helper alone passes.
