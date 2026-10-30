@@ -24,14 +24,29 @@ four-row credit manifest instead of the legacy three-row helper; use the existin
 growth-skipping delegated publication-sync fault mode, preserving and extending
 the exact Uncertain/fenced/whole-cohort assertions.
 
-This is still an unfinished batch. Explicit Node full-body audit/replay,
-received/purged suffix recovery, remaining pinned stored-protocol source cases
-and dispositions, full workspace gates and adoption remain required. Native
+Node full-body audit and actual committed replay now work under an explicit
+immutable shard-count/credit profile. All112 existing/new Node cases and its
+doctest pass, including the four genuine RED controls saved in be1d2c4. Real
+received and purged snapshot suffixes preserve original IDs/outcomes; legacy
+opt-ins stay closed and changed actual capability fails before replay. Current
+focused storage credit coverage is19 passing cases, adding every-step rollback
+and complete canonical 65536-ID,256-task and MAX_EXACT boundary donors. The full
+prior219 state-store run remains recorded above; the new whole target has223
+cases and awaits the final full checks. Strict focused Clippy and all54
+architecture checks pass. Only one Node R0 test fixture needed the explicit
+drop-before-cohort-open setup repair; three saved test files remain exact.
+
+This is still an unfinished batch. A boundary review found that both the pinned
+source and Rust can reject Cleanup before draining an existing full task queue
+when another lease expires. Resolve and test that cleanup-progress finding,
+remaining pinned stored-protocol cases/dispositions, final workspace gates and
+adoption. Native
 Elixir/Linux acceptance remains unexecuted. The main checkout stays at the prior
 adopted green db1c3c9; do not adopt this branch yet. See
 `/private/tmp/ferricstore2-identified-credit-atomic-` focused, architecture,
-clippy-verified, old-tests and progress evidence. Continue with explicit Node
-integration and its real failing controls; preserve shared retained namespace,
+clippy-verified, old-tests and progress evidence, plus identified-credit-node-*
+and identified-credit-boundaries-* logs. Continue with a real failing cleanup
+progress control before its correction; preserve shared retained namespace,
 actual immutable shard authority and the same complete atomic writer.
 
 The completed code checkpoint is 728650f, M1-CREDIT-OWNER1. The pure governing

@@ -1,6 +1,6 @@
 //! Explicit credit capability contracts; no synthetic owner or success.
 
-use super::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
+use super::{RedbStateStore, RedbStateTransaction, StateStoreGenesis, StateStoreLimits};
 use wf_domain::governance::credit::{CreditLimits, CreditOwner};
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::consensus::WorkflowValueDefaults;
@@ -13,6 +13,21 @@ pub(super) mod recovery;
 mod write;
 pub(crate) use context::CreditReadContext;
 pub(crate) use write::apply as commit;
+
+impl RedbStateTransaction<'_> {
+    /// Observes the actual immutable credit capability under this same guard.
+    /// Absence is never inferred from owner or reservation row counts.
+    /// # Errors
+    /// Refuses unsupported capability, corruption or continuous admission.
+    pub fn require_identified_credit(&self) -> Result<u64, StateTransactionError> {
+        self.checked(|| {
+            self.admit_read(512)?;
+            self.value_manifest()?
+                .credit_shard_count
+                .ok_or(StateTransactionError::UnsupportedPolicyProfile)
+        })
+    }
+}
 
 impl RedbStateStore {
     /// Creates one atomic empty credit-capable authority with actual shard count.

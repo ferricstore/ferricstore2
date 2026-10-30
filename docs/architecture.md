@@ -1537,5 +1537,8 @@ checkpoint together; uncertainty fences. Capability is explicit and immutable,
 including snapshot comparisons and receipt-only downgrade checks. Canonical
 recovery proves complete closure using forward membership and a checked census.
 [ADR007](adr/007-durable-log-storage.md#selected-identified-governing-credit-integration)
-specifies the formats and invariants. Node opt-in/replay, public governed Claim,
-outbox/catalog/service behavior and full source/platform acceptance remain open.
+specifies the formats and invariants. Node explicitly selects the immutable
+shard count, verifies actual capability, audits complete historical bodies and
+replays through that same consumed writer, including received/purged snapshots.
+Cleanup-progress findings, public governed Claim, outbox/catalog/service behavior
+and full source/platform acceptance remain open.

@@ -257,3 +257,69 @@ fn credit_store_actual_shard_count_mismatch_is_an_authority_error() -> TestResul
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn credit_store_every_step_cut_aborts_the_complete_staged_release_cohort() -> TestResult {
+    let dir = common::directory("credit-every-step")?;
+    let path = dir.join("actual");
+    let expected = dir.join("expected");
+    f::seed(&path)?;
+    f::seed(&expected)?;
+    let before = f::cohort(&path)?;
+    assert_eq!(f::cohort(&expected)?, before);
+    let ids = vec![b"a".to_vec(), b"b".to_vec()];
+    let frame = f::frame(
+        b"release-cut",
+        1002,
+        None,
+        Mutation::Release {
+            shard_id: 0,
+            amount: 2,
+            reservation_ids: &ids,
+        },
+    )?;
+    f::retained(&expected, &frame, 2)?;
+    let after = f::cohort(&expected)?;
+    assert_ne!(before, after);
+    let mut success = None;
+    for steps in 1..=256 {
+        let mut limits = common::driver_limits();
+        limits.maximum_read_steps = steps;
+        let mut store = common::open(&path)?;
+        let result = apply_credit_transaction(
+            &mut store,
+            &common::scope()?,
+            frame.as_bytes(),
+            common::log(2),
+            limits,
+            CreditLimits::default(),
+        );
+        drop(store);
+        match result {
+            Err(CreditTransactionError::State(StateTransactionError::Limit)) => {
+                assert_eq!(
+                    f::cohort(&path)?,
+                    before,
+                    "step cut {steps} published a prefix"
+                );
+            }
+            Ok(wf_storage::transaction::RecordBatchTransactionOutcome::Retained {
+                control,
+                outcome,
+            }) => {
+                assert_eq!(control.position().get(), 2);
+                assert_eq!(f::reply(&outcome)?.decision, Decision::Released);
+                assert_eq!(f::cohort(&path)?, after);
+                success = Some(steps);
+                break;
+            }
+            other => return Err(format!("unexpected step cut {steps}: {other:?}").into()),
+        }
+    }
+    assert!(
+        success.is_some_and(|steps| steps > 12),
+        "did not exercise late step cuts: {success:?}"
+    );
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

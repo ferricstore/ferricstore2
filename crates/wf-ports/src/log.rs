@@ -24,9 +24,9 @@ mod complete_policy;
 mod control;
 mod credit;
 pub use credit::{
-    PreparedCreditRequest, credit_retained_summary, decode_credit_owner, decode_credit_reply,
-    encode_credit_owner, encode_credit_reply, encode_credit_reply_parts, encode_credit_request,
-    prepare_credit_request, verify_credit_reply_parts,
+    PreparedCreditRequest, credit_recovery_header, credit_retained_summary, decode_credit_owner,
+    decode_credit_reply, encode_credit_owner, encode_credit_reply, encode_credit_reply_parts,
+    encode_credit_request, prepare_credit_request, verify_credit_reply_parts,
 };
 mod decode;
 mod encode;

@@ -7,11 +7,11 @@ use wf_domain::policy::complete::{CompleteCorePolicyPatchApplyError, PolicySchem
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::control::{ControlState, EntryIdentity, EntryStamp, PreparedDigest};
 use wf_ports::log::{
-    CodecError, RaftLogEntry, RaftLogStore, measure_control_entry, normal_recovery_header,
-    prepare_atomic_start, prepare_claim_phase, prepare_independent_record_batch,
-    prepare_public_mutation, prepare_record_batch, step_continue_recovery_header,
-    stored_step_continue_recovery_header, stored_value_recovery_header,
-    verify_complete_core_policy_patch_frame,
+    CodecError, RaftLogEntry, RaftLogStore, credit_recovery_header, measure_control_entry,
+    normal_recovery_header, prepare_atomic_start, prepare_claim_phase,
+    prepare_independent_record_batch, prepare_public_mutation, prepare_record_batch,
+    step_continue_recovery_header, stored_step_continue_recovery_header,
+    stored_value_recovery_header, verify_complete_core_policy_patch_frame,
 };
 use wf_ports::state::{GroupApplyStore, StateTransactionError};
 use wf_storage::log::RedbLogStore;
@@ -61,6 +61,7 @@ pub(super) fn observe(
                 other => Error::State(other),
             })?;
     }
+    super::credit::require(&tx, limits)?;
     let (control, value) =
         read_applied_state(&tx, limits.membership, limits.workspace).map_err(Error::State)?;
     *membership = match (value.entry(), value.stamp()) {
@@ -132,7 +133,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if limits.step_continue.stored() {
+    let header = if body.get(6) == Some(&10) && limits.credit.is_some() {
+        credit_recovery_header(body, limits.normal.codec)
+    } else if limits.step_continue.stored() {
         stored_step_continue_recovery_header(
             body,
             limits.normal.codec,
@@ -214,6 +217,9 @@ fn audit_normal(
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if profile == 12 {
+        return super::credit::audit(body, limits, base, stamp);
+    }
     if profile == 2 {
         return audit_core_policy(body, limits, base, stamp);
     }

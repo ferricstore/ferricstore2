@@ -43,6 +43,26 @@ pub fn prepare_credit_request(
     decode::prepare(encoded, limits, maximum_owned_bytes)
 }
 
+/// Borrows only explicit private credit header facts for opted-in recovery.
+/// Full body, digest, field, scope and EOF validation remains mandatory.
+/// # Errors
+/// Refuses other profiles, malformed headers or the captured wire ceiling.
+pub fn credit_recovery_header(
+    encoded: &[u8],
+    limits: CodecLimits,
+) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(CodecError::ByteLimit);
+    }
+    let mut reader = crate::log::reader::Reader::new(encoded, limits);
+    let header = scan::header(&mut reader)?;
+    Ok((
+        12,
+        [header.tenant, header.group, header.recovery],
+        header.stamp,
+    ))
+}
+
 /// Restores a complete original canonical private response under explicit caps.
 /// # Errors
 /// Refuses unsupported/corrupt/profile/allocation failures.

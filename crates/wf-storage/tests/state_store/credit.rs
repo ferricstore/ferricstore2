@@ -10,6 +10,7 @@ use wf_domain::governance::identified::{
 use wf_ports::log::{decode_credit_reply, encode_credit_request};
 use wf_storage::transaction::{CreditTransactionError, apply_credit_transaction};
 
+mod bounds;
 mod fixtures;
 mod limits;
 mod recovery;

@@ -187,8 +187,8 @@ impl CommittedRecoveryLimits {
                 .max(std::mem::size_of::<SnapshotRecoveryError>()),
         ])
     }
-    fn admit(&self, parts: &[usize]) -> Result<(), CommittedRecoveryError> {
-        let mut owned = total(parts)?;
+    fn additional_profile_bytes(&self) -> Result<usize, CommittedRecoveryError> {
+        let mut owned = 0;
         if self.step_continue.enabled() || self.step_continue.stored() {
             owned = total(&[
                 owned,
@@ -198,6 +198,13 @@ impl CommittedRecoveryLimits {
         if self.value_claim_work.is_some() {
             owned = total(&[owned, std::mem::size_of::<Option<ClaimWorkLimits>>()])?;
         }
+        if self.credit.is_some() {
+            owned = total(&[owned, std::mem::size_of::<Option<(u64, CreditLimits)>>()])?;
+        }
+        Ok(owned)
+    }
+    fn admit(&self, parts: &[usize]) -> Result<(), CommittedRecoveryError> {
+        let owned = total(&[total(parts)?, self.additional_profile_bytes()?])?;
         if owned > self.workspace {
             return Err(CommittedRecoveryError::Limit);
         }

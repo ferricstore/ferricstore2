@@ -152,8 +152,9 @@ fn credit_node_explicit_selection_capability_and_narrow_budgets_preserve_all_tab
     }
     let old = dir.join("old");
     std::fs::create_dir(&old)?;
-    let (log, state) = c::pair(&old, None)?;
+    drop(c::pair(&old, None)?);
     let before = c::cohort(&old)?;
+    let (log, state) = f::open_pair(&old)?;
     assert_eq!(
         recover_committed(log, state, scope.group(), scope.recovery(), limits()?).err(),
         Some(E::Credit(CreditTransactionError::State(

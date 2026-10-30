@@ -1147,8 +1147,9 @@ live and retained snapshot cohorts; it does not infer capability from row count.
 
 M2-IDENTIFIED-CREDIT1 selects a real stored owner protocol under the existing
 exclusive group/recovery transaction. The storage leaf is implemented and its
-restart/snapshot/fault controls pass; explicit Node audit/replay and full batch
-acceptance remain unfinished. Initial rejecting contracts alone established no
+restart/snapshot/fault controls pass. Explicit Node historical audit/replay,
+received/purged suffixes and all112 Node cases now pass; cleanup progress and
+full batch acceptance remain unfinished. Initial rejecting contracts alone established no
 durability or public Claim authority.
 The exact artifact selection is in the coordination record. Keep the domain
 effect-free and its existing types-only dependency.

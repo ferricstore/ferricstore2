@@ -58893,3 +58893,62 @@ or limit was changed. Exact6 source/4 test-file bindings and logs are saved in
 /private/tmp/ferricstore2-identified-credit-node-genuine-r0.json. Save this RED
 before adding borrowed header selection, actual capability observation and
 credit audit/replay bodies. No new source parity or OS claim.
+
+Before Node bodies, refine the existing root admission helper into identical
+additional_profile_bytes plus the existing total/compare operation. Preserve
+the exact old Step/value-Claim charges and add only the selected credit option.
+Credit audit subtracts this same actual surcharge when sizing the prepared
+cohort; this prevents an apparent W reservation from forgetting retained opt-in
+metadata. No new type or file, and the legacy None surcharge remains identical.
+
+Node body development: one borrowed header lifetime compile error was corrected
+by returning its original input-field references directly; it was not behavioral
+RED. First compiled body run3pass/1fail. The opt-in/cap test reached a previously
+masked setup error: it attempted a raw cohort open while holding the old-cap
+pair. Drop that pair before observing its donor cohort, then reopen it for the
+same consuming refusal assertion. No predicate/profile is weakened. Preserve
+the other three R0 test files exactly and this one file's explicit setup inverse;
+the already saved genuine RED remains authoritative.
+
+Before the final stored checks, add a post-body correctness control in the
+existing storage credit/limits.rs: sweep the same release command's finite
+step allowance1..256 up to its first successful commit. Every refused allowance
+must return Limit and preserve the complete six-table predecessor; the first
+success must equal an independently committed full successor. The final paid
+step is the control-row publication after business/outcome staging, so this
+also covers late transactional rollback. No new file/type/profile or TDD/source
+credit is selected. Existing assertions and ceilings remain unchanged.
+
+Boundary review before artifacts: approve NEW storage/tests/state_store/credit/
+bounds.rs, registered under the existing credit module, with no new type or
+production API. Build complete, independently encoded physical test donors for
+65536 historical IDs,256 retired tasks and MAX_EXACT generation. Reuse public
+neutral owner encoding, literal published FWGI/FWGP/FWGQ grammars and binary
+escaped FWPK components. Each donor must pass actual canonical reopen before
+issuing the bounded command. Refusal preserves every business row; only its
+original retained rejection and control can advance. These are post-body
+correctness controls, not source/runtime parity or original TDD evidence.
+
+Pinned source history-cap test603..635 supplies only an owner header. The Rust
+strict store must reject such an incomplete graph at reopen; the existing pure
+control preserves its denial-before-page-read ordering. The additional stored
+control expands the donor into a complete graph with the same owner header and
+denial assertion. That migration difference remains explicit and uncredited.
+Source prepare_owner/reclaim_expired (27..40,484..520) also means a full pending
+queue can reject Cleanup before it drains a task when another lease expires;
+the Rust implementation currently follows it. Record this as an unresolved
+cleanup-progress/safety finding for the coupled source/Rust follow-up, not a
+completed production recovery guarantee. Do not silently count catalog/cleaner
+or public unknown-outcome/source scenarios as covered by these private tests.
+
+Node/boundary implementation progress: all112 Node cases (6 checkpoint,22
+committed,84 snapshot) and its doctest pass; all54 architecture cases pass.
+Focused storage credit19/19 pass, including the complete65536-ID history donor,
+256-task refusal and generation-exhaustion rollback. Every-step allowance
+refusal preserves the whole predecessor, and first success equals an
+independently committed complete successor. Strict focused Clippy is green
+after one fixture-only needless-value-argument correction. No older assertion,
+source mapping, ceiling or capability was weakened. Logs use node-regression,
+node-architecture, node-boundaries-clippy and boundaries-verified/architecture
+under /private/tmp/ferricstore2-identified-credit-. The cleanup-progress finding
+is an actual next action; do not run final acceptance or adopt until resolved.
