@@ -47,6 +47,8 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::value::outcome"),
         ("wf-storage", "state::value::outcome::atomic_start"),
         ("wf-storage", "state::value::outcome::atomic_start::nested"),
+        ("wf-storage", "state::value::outcome::step_continue"),
+        ("wf-storage", "state::value::outcome::step_continue::nested"),
         ("wf-storage", "state::value::history"),
         ("wf-storage", "state::value::history_snapshot"),
         ("wf-storage", "state::value::history_snapshot::model"),

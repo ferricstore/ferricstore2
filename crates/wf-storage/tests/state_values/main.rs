@@ -9,5 +9,6 @@ mod outcome;
 mod ownership;
 mod public_mutation;
 mod record;
+mod step_continue;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

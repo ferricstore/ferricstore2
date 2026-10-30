@@ -57460,3 +57460,17 @@ purity namespace already covers them. No classifier/edge/size/lint exemption.
 Keep400/600/100/4/25; record solo review, full old-file inverses and complete gates.
 Actual captured historical context, physical schema/publication, inquiry, faults,
 reopen and recovery remain mandatory successors. No agent or push is authorized.
+
+M2-STEP-OUTCOME1 genuine R0: independent FWSO recipes contain266 accepted bytes
+(response160, returned owner676) and147 rejected bytes (response41, owner557).
+Before runtime, remove one extra transcribed0x11 digest byte from each Rust
+constant; the entire vectors now exactly equal the frozen recipes and SHA values.
+This technical correction is not behavioral RED. Current strict focused Clippy
+exits0. Compiled runtime exits101:0pass/3fail/0ignored/18filtered. Two cases stop
+at first healthy encode UnsupportedVersion; the independent-literal reader stops
+at first healthy scan UnsupportedVersion. All later tails are masked. Both new
+APIs reject every input. Four complete-file inverses recover5af060d; all1,772
+other old inputs are exact. Freeze all six selected sources before bodies. No
+old outcome helper/owner/policy parser or generic store profile changed. Receipt
+and logs: /private/tmp/ferricstore2-step-outcome-{genuine-r0,inverses,r0-tests,
+r0-clippy}.{json,log} as appropriate. No source/native/Linux credit is granted.

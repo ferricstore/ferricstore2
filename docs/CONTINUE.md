@@ -2,6 +2,17 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
+Work in progress on codex/step-outcome-solo: M2-STEP-OUTCOME1 selects explicit
+Step-only FWSO data APIs while keeping every generic reader/encoder closed.
+Strict focused Clippy passes. Genuine compiled runtime is0pass/3fail: two first
+healthy encodes and one first healthy independent-literal scan return
+UnsupportedVersion; later tails are masked. Both APIs still reject all inputs.
+Independent266/147-byte recipes are exact after correcting one extra transcribed
+digest byte in each Rust constant before runtime. Four complete old-file inverses
+and1,772 other exact inputs preserve prior bodies. See
+`/private/tmp/ferricstore2-step-outcome-{source-recipes,genuine-r0,inverses}.json`.
+Primary remains at the passing5af060d checkpoint; this feature is intentionally RED.
+
 The codex/step-changes-solo checkpoint adds pure Step transaction coherence.
 Three genuine constructor refusals and the separate effect-probe failure were
 saved in cb51fd7 before implementation/classification. All nine Step cases,

@@ -24,7 +24,8 @@ pub use membership::{
 pub(crate) use outcome::outcome_policy_validation_bytes_in_layout;
 pub use outcome::{
     ScannedRetainedOutcome, decode_outcome, encode_outcome, encode_outcome_profiled,
-    outcome_policy_validation_bytes, scan_outcome, scan_outcome_profiled,
+    encode_step_continue_outcome, outcome_policy_validation_bytes, scan_outcome,
+    scan_outcome_profiled, scan_step_continue_outcome,
 };
 pub use record::{
     ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields,
