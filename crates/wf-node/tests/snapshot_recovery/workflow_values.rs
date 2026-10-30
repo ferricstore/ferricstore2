@@ -7,6 +7,7 @@ use wf_node::recovery::{
 };
 
 mod audit;
+mod claim;
 mod faults;
 mod fixtures;
 mod guards;

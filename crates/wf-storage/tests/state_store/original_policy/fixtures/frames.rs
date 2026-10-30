@@ -15,7 +15,7 @@ use wf_ports::log::{
 use wf_ports::state::StoredWorkflowRecord;
 use wf_types::identity::RequestId;
 
-pub(in super::super) fn public_frame(
+pub(crate) fn public_frame(
     namespace: &RequestScope,
     request: &RequestId,
     stamp: u64,

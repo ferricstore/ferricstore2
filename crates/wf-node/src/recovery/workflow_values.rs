@@ -1,6 +1,7 @@
 //! Bounded binary/stored value audit and consumed replay under explicit opt-ins.
 
 use std::mem::size_of;
+use wf_domain::claim::apply::ClaimWorkLimits;
 
 use wf_domain::workflow::control::{ControlState, EntryStamp};
 use wf_domain::workflow::request::RequestScope;
@@ -40,6 +41,32 @@ impl StepRecoveryProfile {
 }
 
 impl CommittedRecoveryLimits {
+    /// Selects named Claim recovery with its actual query and value ceilings.
+    /// # Errors
+    /// Refuses unsupported selection, invalid ceilings or whole-call overflow.
+    pub fn with_workflow_value_claim_limits(
+        self,
+        claim_work: ClaimWorkLimits,
+        rows: usize,
+        bytes: usize,
+        work: usize,
+        temporary: usize,
+    ) -> Result<Self, CommittedRecoveryError> {
+        let _ = (self, claim_work, rows, bytes, work, temporary);
+        Err(CommittedRecoveryError::UnsupportedEntry)
+    }
+
+    /// Reads only explicitly selected named Claim work and shared value limits.
+    #[must_use]
+    pub const fn workflow_value_claim_limits(
+        self,
+    ) -> Option<(ClaimWorkLimits, WorkflowValueTransactionLimits)> {
+        match (self.value_claim_work, self.workflow_value_limits()) {
+            (Some(work), Some(profile)) => Some((work, profile)),
+            _ => None,
+        }
+    }
+
     /// Selects explicit Step startup recovery and its shared value ceilings.
     /// # Errors
     /// Refuses unsupported selection, zero ceilings or whole-call work overflow.

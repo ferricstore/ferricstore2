@@ -27,7 +27,8 @@ use wf_types::identity::{PartitionId, RecordId, RequestId};
 use wf_types::version::{Fence, TimestampMillis};
 mod frames;
 mod wire;
-pub(super) use frames::{complete_frame, frame_intent, public_frame};
+pub(crate) use frames::public_frame;
+pub(super) use frames::{complete_frame, frame_intent};
 pub(super) use old::{clock, directory, log, scope};
 pub(super) use wire::{
     atom, binary, catalog, due, etf_map, etf_policy, finish, history_wire, key, manifest6, member,

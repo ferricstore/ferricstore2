@@ -204,6 +204,21 @@ pub fn apply_claim_transaction(
     }
 }
 
+/// Applies named Claim with captured value bindings on a full-history owner.
+/// # Errors
+/// Refuses unsupported layout, authority, budgets, governance or unproved commit.
+pub fn apply_workflow_value_claim_transaction(
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: super::WorkflowValueTransactionLimits,
+    work: ClaimWorkLimits,
+) -> Result<ClaimTransactionOutcome, ClaimTransactionError> {
+    let _ = (store, scope, encoded, log, limits, work);
+    Err(StateTransactionError::UnsupportedLayout.into())
+}
+
 fn live_bytes(limits: RecordBatchTransactionLimits) -> Result<usize, ClaimTransactionError> {
     if limits.maximum_read_steps == 0
         || limits.maximum_read_bytes == 0

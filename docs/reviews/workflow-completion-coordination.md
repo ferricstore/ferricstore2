@@ -57949,3 +57949,102 @@ Use cohesive functional batches and focused development checks, then full gates
 at meaningful checkpoints. Keep the complete source/profile/native/OS and M1–M8
 objective; consensus/application/listener work and rich source context are still
 open, and component-test totals do not establish a completed running service.
+
+## M2-VALUE-CLAIM1 — solo functional batch selection before artifacts
+
+Predecessor83a1c5c is adopted in both clean trees. Continue solo on
+codex/value-claim-solo. Close the real Create→named Claim→Step→Retry→FIFO path,
+not another substitute StartAndClaim or data-codec stage. Existing FWCP op3/
+intent1/response3 and PreparedClaimPhase encode/prepare already suffice; select
+no new command profile, event/key family, layout or dependency. Public Claim
+governance/reclaim-ratio/orchestration and rich typed Step payload support remain
+mandatory separate work; this trusted-parent leaf must retain those refusals.
+
+Pinned source: flow/invariant_test.exs850–920 supplies the actual two Creates,
+named reserve Claim, Step to charge, Retry at2200, original FIFO policy activation
+and waiting-record-first Claim. Preserve the actual inputs, including the Retry
+error map through the existing stored-value profile2/intent9. The source
+flow_write_contract_test.exs1257–1322 additionally requires a typed Step payload
+map, currently unsupported by plain binary intent10; do not claim that full case.
+Pinned raft/state_machine/sections/flow_retention_values.ex527–588 explicitly
+clears effective TTL/terminal deadline on Claim while retaining captured birth
+retention/history values. Read from66586c5, never the dirty newer source checkout.
+
+Approve BEFORE RED rejecting apply_workflow_value_claim_transaction(&mut store,
+&scope,bytes,LogIdentity,WorkflowValueTransactionLimits,ClaimWorkLimits) in existing
+transaction/claim.rs and transaction.rs reexport, using existing Claim outcome/
+error types. Reject UnsupportedLayout until saved compiled RED. AFTER RED share
+the existing retained-gate/fresh Claim flow with a private optional resource
+context; old apply_claim_transaction selects None and keeps its complete profile.
+Require actual layout8 and reserve value temporary plus existing R/S/C before
+preparation. Replay/conflict/expiry/exact-log must precede Fresh current/binding
+reads. Actual captured caps/work apply; no structural admission credit.
+
+AFTER RED approve NEW transaction/claim/values.rs with exactly private
+ClaimValueResources (actual limits/ValueCharge) and crate-private opaque
+ClaimValuePublicationPlan/ClaimValueStep. The plan owns one fallibly reserved
+step vector, borrows the actual accepted ScopedPlans/orderings and copies only
+scalar captured ValueBindingData; no record/payload/query-key cloning or fake
+policy/birth witness. Constructors stay private to the builder; narrow crate
+accessors expose immutable step facts and split charge access for publication.
+Load each actual binding at write.expected_version and current manifest defaults
+once, preserving all value versions/birth metadata and clearing only TTL/deadline.
+Empty/rejected/replayed plans have no value steps. No new immutable value/alias
+is written by Claim because it supplies no value fields.
+
+AFTER RED approve NEW state/redb/commit/claim/values.rs for actual8 validation and
+consumed Claim value publication. Extend existing claim commit with optional
+publication; None keeps the old7/8 refusal. Validate complete GroupClaimChanges,
+prepared identity and each actual plan/order/count before publishing core/index/
+full history, both captured bindings, original outcome and control under the
+same Immediate writer. Reuse the existing binding emitter by factoring borrowed
+ScopedPlan/ValueBindingData fields in commit/values.rs; old callers preserve
+their exact accounting. Add metered scalar load_at_version in existing
+values/binding.rs, factoring shared point logic only within its existing contract.
+Existing values.rs owns commit_claim_values. No public port/model is added.
+
+Couple Node integration in this batch: existing CommittedRecoveryLimits adds
+value_claim_work:Option<ClaimWorkLimits>, initialized None, plus rejecting
+with_workflow_value_claim_limits(claim_work,rows,bytes,work,temporary) and getter
+workflow_value_claim_limits()->Option<(ClaimWorkLimits,WorkflowValueTransactionLimits)>.
+AFTER saved RED validate shared ceilings and select the actual work profile.
+Old Claim/value/Step opt-ins do not select it. Reuse existing recovery/
+workflow_values.rs, join.rs and replay.rs for complete op3 audit and real-driver
+dispatch, paying actual selected configuration/profile descriptors in all
+phases. Keep one whole-call point/body account and existing typed error origins;
+old defaults stay exact. No new Node production file/type is selected.
+
+Approve BEFORE tests NEW storage workflow_values/claim.rs and children
+claim/{fixtures,chain,retention,replay,limits,faults}.rs under the existing
+state_store target; NEW Node snapshot_recovery/workflow_values/claim.rs under
+the existing target. Existing parents declare them. Tests cover real named
+Claim through complete source FIFO ordering, binding/history lifetime on both
+alias profiles, unchanged immutable values, original replies after later edits,
+zero/narrow/old-layout refusals, governance refusal, actual delegated uncertainty
+and complete snapshot/received/purge/startup replay. Reuse existing typed
+ClaimPhase encoder and actual value/policy adapters; never seed raw authority.
+First healthy named Claim/Node selection must reach the rejecting API; record
+masked tails honestly. Save the rejecting checkpoint before the approved bodies.
+New artifacts beyond these named paths/models require another solo selection.
+
+M2-VALUE-CLAIM1 test reuse amendment before edits: reuse the existing real
+Original SET frame builder instead of duplicating ETF/map-order logic. In the
+state_store test target only, make fixtures/frames.rs public_frame crate-visible,
+forward only that function through original_policy/fixtures.rs and expose it as
+original_policy::original_public_policy_frame from original_policy.rs. Keep
+module/raw-seeding helpers private and every implementation body unchanged.
+Those three existing test files are approved for this visibility-only seam.
+
+M2-VALUE-CLAIM1 genuine R0: strict focused Clippy passes after correcting similar
+stage/state names and the exact ClaimRejected(InvalidBudget) constructor before
+runtime. Actual compiled storage0PASS/8FAIL/0ignored/190filtered: every healthy
+named Claim refuses Transaction(UnsupportedLayout). Actual Node0PASS/3FAIL/
+0ignored/74filtered: every healthy selector refuses UnsupportedEntry. All later
+functional/source/replay/governance/fault/snapshot tails remain masked; both APIs
+still reject all inputs. All53 architecture cases pass. Freeze17 selected sources;
+1,787 other baseline inputs are exact. Existing Original SET builder bodies are
+unchanged; only their named test visibility seam is broadened. Receipt/logs:
+/private/tmp/ferricstore2-value-claim-{genuine-r0,r0-runs,r0-storage,r0-node,
+r0-architecture,r0-clippy-first,r0-clippy-second}.{json,log} as appropriate.
+Save this runtime rejecting checkpoint before the selected implementation bodies.
+No ignored case, native/Linux execution, source credit or completed-goal claim.

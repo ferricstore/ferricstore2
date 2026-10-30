@@ -28,7 +28,8 @@ pub use value_batch::{
 };
 
 pub use claim::{
-    ClaimTransactionError, ClaimTransactionLimits, ClaimTransactionOutcome, apply_claim_transaction,
+    ClaimTransactionError, ClaimTransactionLimits, ClaimTransactionOutcome,
+    apply_claim_transaction, apply_workflow_value_claim_transaction,
 };
 
 pub use record_batch::{

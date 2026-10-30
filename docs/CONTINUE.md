@@ -2,6 +2,15 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
+Current worktree: codex/value-claim-solo. M2-VALUE-CLAIM1 has actual compiled
+R0 evidence:8 healthy storage Claim calls refuse UnsupportedLayout and3 healthy
+Node selections refuse UnsupportedEntry; every later functional/source tail is
+masked. Strict focused Clippy and all53 architecture cases pass. All17 selected
+sources are frozen;1,787 other baseline inputs are exact. Save the rejecting
+checkpoint before bodies. See the concrete architecture selection and
+`/private/tmp/ferricstore2-value-claim-genuine-r0.json`. Primary remains at the
+passing83a1c5c Node Step checkpoint until full functional-batch verification.
+
 Product status: still incomplete. Named Claim currently refuses value-capable
 layouts7/8; the new Step path uses atomic StartAndClaim fixture setup. Prioritize
 the complete original Create→named Claim→Step→Retry→FIFO path with real value/
