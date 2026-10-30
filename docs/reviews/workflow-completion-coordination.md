@@ -59000,3 +59000,62 @@ execution/formatter remain unexecuted; no native TDD/passing or merge/push claim
 More than256 newly expired page generations with no queued work is still an
 open progress case and the next concrete boundary task. Full goal stays active;
 no final acceptance, source-case credit or main-checkout adoption yet.
+
+Previous goal turn: progress. Node actual audit/replay and snapshot custody were
+implemented; the compiled queued-backlog failure was corrected and verified,
+with an isolated, explicitly natively unverified Elixir counterpart. Continue
+solo on the same clean b681035 feature checkpoint; primary remains db1c3c9.
+
+Expiry-burst selection before artifacts: approve NEW storage/tests/state_store/
+credit/bounds/burst.rs under the existing bounds module. No new model/type or
+production dependency. Its complete actual512-shard-capability donor has257
+expired current generations and no tasks, with a second mixed live/page-free
+variant. Historical owner/ID/page rows are independently encoded, pass real
+canonical reopen, and the initial control/receipt comes from the actual driver.
+Save both genuine compiled failures before changing semantic bodies; later
+assertions must prove at most256 new tasks, one deleted page, preserved live and
+unqueued expired leases, exact free capacity and eventual remaining enqueue.
+
+Approve a new governance-only function expire_detached_bounded in existing
+credit/capacity.rs and the existing identified/cleanup.rs selection change.
+Only Cleanup with an empty queue and too many newly expired page generations
+selects the first256 in existing ascending shard order. Enqueue each exact
+reference before reclaiming those leases. A private bounded helper rejects
+embedded reservation maps, retains live/unselected expired leases in place,
+reclaims page-free expired leases and rebalances capacity. Ordinary expiry and
+its existing tariff remain unchanged. Existing queued-overflow cleanup still
+drains old work first. Use linear charged passes, no whole history load, sort,
+map clone, TTL rewriting, new authority flag or reduced shard ceiling. Keep the
+one-page cleanup budget and all existing admission/atomicity/recovery contracts.
+Coupled Elixir changes require their concrete source API review before edits;
+no native execution or source-case credit follows from these new Rust controls.
+
+Expiry-burst genuine RED: actual complete512-shard donors reopen successfully;
+both new cases compile and fail0pass/2fail/0ignored/224older filtered at actual
+Rejected(CleanupBacklogFull) versus expected one-page Cleaned. The ordinary Get
+refusal/unchanged rows passes first. All later capacity/requeue/live-lease
+assertions are masked. Strict focused Clippy and actual-workspace architecture
+check pass. Pre-RED setup corrections explicitly drop the donor database before
+reopen and use a diagnostic length assertion; their earlier Unavailable/style
+outputs are not semantic RED. Source/log bindings are saved in
+/private/tmp/ferricstore2-credit-expiry-burst-genuine-r0.json. Commit before bodies.
+
+Performance evidence: Rust's primary Vec::retain documentation confirms an
+in-place visit in original order with retained order preserved:
+https://doc.rust-lang.org/std/vec/struct.Vec.html#method.retain (online1.99.1;
+workspace remains pinned1.99.0 and its actual checks are authoritative). Select
+that mechanism to preserve the already sorted lease vector without another
+lease map/vector or sort. This is an algorithm/ownership choice, not a measured
+CPU/RSS/latency result or a completed M8 benchmark.
+
+Concrete coupled Elixir review before edits: add only
+CreditLease.reclaim_expired_bounded/3 to existing credit_lease.ex, returning the
+pure {owner,selected_refs} pair, and a regression in the existing
+flow_governance_models_test.exs. Reuse existing sorted expired_lease_refs, take
+at most256 and match a bounded MapSet of exact (shard,epoch,last_page) references;
+retain live/unselected leases and rebalance expired page-free capacity. The
+normal two-argument helper remains byte-exact. In the already selected Cleanup
+prepare clause, its empty-queue backlog branch uses that pair and the existing
+bounded enqueue; nonempty queues retain the prior drain-first fix. No new file,
+module/model or production API authority. Preserve all existing source/test
+bodies and no native execution/formatter/TDD claim without actual native tools.

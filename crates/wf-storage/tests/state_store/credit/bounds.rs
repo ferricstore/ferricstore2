@@ -8,6 +8,8 @@ use wf_domain::workflow::request::RequestScope;
 use wf_domain::workflow::{MAX_EXACT_MILLIS as MAX, request::RetainedStatus};
 use wf_ports::log::encode_credit_owner;
 
+mod burst;
+
 #[test]
 fn credit_store_full_history_rejects_without_any_detached_or_owner_prefix() -> TestResult {
     let dir = common::directory("credit-full-history")?;
