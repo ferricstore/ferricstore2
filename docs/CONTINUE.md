@@ -1,23 +1,37 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-28. The user resumed the unfinished full-completion goal.
+Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Next increment on codex/step-continue-response selects an explicit intent10/
+The codex/step-continue-response checkpoint implements an explicit intent10/
 response9 data grammar with complete original log/time binding and actual Step
-postimages. Strict focused Clippy passes; all five compiled cases genuinely
-fail at healthy encoding against rejecting interfaces before implementation.
-The primary stays clean atdc39f5a and the passing1282-case
-checkpoint below. See M2-STEP-RESPONSE1; no Fresh/durable Step claim is added.
+postimages. Five genuine runtime refusals were saved ind7faf8f before bodies.
+All six focused cases, strict Clippy and exact purity probes now pass. One
+documented golden correction preserves actual claim/Step attempts0; the separate
+counter control passed first. All12 direct gates pass with1,288 Rust cases/111
+targets, retaining every prior1,282 identity/status/multiplicity. All53 architecture
+cases, Python7 and6 doctests/15 targets pass. Full parity actually exits1.
+All1,755 tested inputs/1,166 Rust files are frozen; five complete old-file inverses
+and1,741 other exact original inputs preserve older behavior. Seven whole R0
+files are exact; reversing only the documented two recipe constants and removing
+the supplemental control recovers the remaining two test files. No source-ledger
+credit is claimed. See M2-STEP-RESPONSE1 and
+`/private/tmp/ferricstore2-step-response-{genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json`.
+The adopted receipt records local status and exact commit; no push is performed.
 
-The intent10/item12 Step preparation checkpoint passes all seven focused cases and strict
-Clippy pass. Six genuine runtime refusals were saved in32f9045 before grammar,
+Next implement explicit Step retained inspection and consumed Fresh decisions,
+including metered payload-presence association under intent10. Existing drivers
+and value-profile allowlists remain closed. Historical schema, atomic publication,
+inquiry/fault/reopen and recovery follow; no durable/public Step claim is added.
+
+The intent10/item12 Step preparation checkpoint passes all seven focused cases
+and strict Clippy. Six genuine runtime refusals were saved in32f9045 before grammar,
 hashing, parser or materialization bodies. A separate effect-probe failure was
 saved in b21f87f before classifying the new namespace as pure. One documented
 test-oracle correction preserves the existing field-versus-frame error contract.
 Old command/response/storage and recovery profiles remain closed. This stage
 prepares verified data only. All 12 direct validation gates now pass with1,282
 Rust cases/110 targets, retaining every prior1,275 identity and multiplicity.
-Fresh/replay, complete response/history formats, atomic publication and recovery
+Fresh/replay and response integration, complete historical schemas, atomic publication and recovery
 are explicit successor requirements. No new source-ledger credit is claimed.
 See M2-STEP-CODEC1 and `/private/tmp/ferricstore2-step-codec-{source-recipes,genuine-r0}.json`.
 All1,746 non-Markdown validation inputs/1,157 Rust files are frozen. Seven complete
@@ -146,10 +160,10 @@ function length 100. All workspace targets now pass strict Clippy.
 Decisions and execution evidence are in
 [the coordination record](reviews/workflow-completion-coordination.md).
 
-The current local Rust quality checkpoint passes all 1,282 tests across 110
+The current local Rust quality checkpoint passes all 1,288 tests across 111
 targets, both benchmark correctness smokes and six documentation tests across
-15 targets. Exact identity comparison preserves every earlier1,275 case and
-adds only seven Step preparation cases. The earlier1,264 and interim1,273
+15 targets. Exact identity comparison preserves every earlier1,282 case and
+adds only six Step response cases. The earlier1,264/interim1,273/1,275
 checkpoints remain represented exactly.
 All 53 architecture cases pass. Workspace compilation, strict
 all-target Clippy, documentation build, reference and progress integrity,

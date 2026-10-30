@@ -11,7 +11,7 @@ fn accepted_reply_preserves_step_postimage_and_golden_bytes() -> TestResult {
     assert_eq!(bytes.len(), 160);
     assert_eq!(
         Sha256::digest(&bytes).as_slice(),
-        f::hex("3ebe50f3c23ab76616f718e2435d790eaefd9fb9a78bd07e6dd4d0283b6f0699")?
+        f::hex("8fa7f0c9ff0f3d3dafb7b5a7b05f79a3250d5643d77dbca040c145615a505d38")?
     );
     assert_eq!(f::summary(&bytes)?, (RetainedStatus::Accepted, Some(1)));
     f::with_step(b"charge", Some(b"\0\xff"), |decision| {
@@ -68,4 +68,24 @@ fn reply_rejections_preserve_extended_reason_codes() -> TestResult {
         }
     }
     Ok(())
+}
+
+#[test]
+fn step_reply_preserves_claim_counter_without_incrementing() -> TestResult {
+    f::with_step(b"charge", Some(b"\0\xff"), |decision| {
+        let IndexedDecision::Accepted(plan) = decision else {
+            return Err("actual Step decision".into());
+        };
+        let record = &plan.batch().items()[0]
+            .plan()
+            .write()
+            .ok_or("actual Step write")?
+            .record;
+        assert_eq!(record.attempts(), 0);
+        let (bytes, status) =
+            encode_step_continue_response(decision, f::position(), f::time(), f::limits()?)?;
+        assert_eq!(&bytes[126..134], &0_u64.to_be_bytes());
+        assert_eq!(f::summary(&bytes)?, (status, Some(1)));
+        Ok(())
+    })
 }

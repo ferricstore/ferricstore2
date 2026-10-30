@@ -256,7 +256,10 @@ fn write_record(
     Ok(())
 }
 
-fn write_rejection(reason: IndexRejection, writer: &mut Writer<'_>) -> Result<(), CodecError> {
+pub(in crate::log::record_batch) fn write_rejection(
+    reason: IndexRejection,
+    writer: &mut Writer<'_>,
+) -> Result<(), CodecError> {
     writer.byte(1)?;
     match reason {
         IndexRejection::DirectRunningFifoEntry => writer.write(&[7, 0]),

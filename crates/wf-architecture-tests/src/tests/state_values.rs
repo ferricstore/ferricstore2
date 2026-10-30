@@ -43,6 +43,15 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-ports", "log::record_batch::step_continue"),
         ("wf-ports", "log::record_batch::step_continue::input"),
         ("wf-ports", "log::record_batch::step_continue::wire"),
+        ("wf-ports", "log::record_batch::step_continue::response"),
+        (
+            "wf-ports",
+            "log::record_batch::step_continue::response::scan",
+        ),
+        (
+            "wf-ports",
+            "log::record_batch::step_continue::response::write",
+        ),
         ("wf-ports", "log::claim"),
         ("wf-ports", "log::claim::apply"),
         ("wf-ports", "log::claim::apply::nested"),

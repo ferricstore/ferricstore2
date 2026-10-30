@@ -141,6 +141,12 @@ materialization. The older wire profiles, public/independent callers, responses,
 storage event codecs and recovery routing remain unsupported for this operation.
 This selection completes no source scenario or durability gate.
 
+The later intent10/response9 data functions encode, scan and compare the actual
+Step postimage, including rotated lease and logical state, with full original
+log/time binding. They preserve all three optional value fields. Retained/Fresh
+orchestration, historical schema and storage/recovery integration remain required;
+these pure response values supply none of those capabilities.
+
 The [selected atomic StartAndClaim core](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
 uses the same pure domain and existing Created history. After the saved
 UnsupportedOperation regressions, the body creates one fresh leased running

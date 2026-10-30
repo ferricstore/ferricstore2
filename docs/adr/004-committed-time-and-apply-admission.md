@@ -199,6 +199,12 @@ saved in32f9045. The shared header specializes exactly to the old atomic-start7
 grammar; normal/stored recovery and existing response/publication dispatch stay
 closed. This is preparation evidence, not completion of the remaining gates.
 
+The later M2-STEP-RESPONSE1 data grammar separately represents the actual Step
+postimage and full original log/time under intent10/response9. Its dedicated
+encoder/complete scan/actual-plan matcher preserve zero attempts and all three
+optional fields. It supplies no retained/Fresh driver or durable publication.
+The historical logical-state schema still requires selection before storage.
+
 ### Selected pure committed StartAndClaim core
 
 START-AND-CLAIM1 selects `StartAndClaim` with explicit binary type, logical

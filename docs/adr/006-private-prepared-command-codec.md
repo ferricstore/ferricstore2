@@ -30,6 +30,27 @@ explicit7/10 selections; its7 specialization preserves the complete previous
 atomic-start header. Generic preparation and normal/stored recovery retain
 their older profile restrictions.
 
+M2-STEP-RESPONSE1 adds a separate data-only intent10/response9 grammar after the
+five compiled refusals saved in d7faf8f. FWST1 binds all three original u64 log
+identity components and execution time, followed by the result. Accepted replies
+represent the actual singleton Changed StepContinued postimage, logical state,
+rotated lease, counters, ordering and all three optional value fields. Rejections
+share the complete existing extended atomic-start writer, including the dedicated
+DirectRunningFifoEntry reason; that helper's body and all older decoders remain
+unchanged. No generic/independent/public response profile is widened.
+
+Measurement validates complete bounded fields before output reservation.
+Complete borrowed scanning binds context and EOF; actual-plan matching verifies
+the same grammar without allocating a second response. Token verification uses
+bounded fixed decimal scratch. Preserved zero attempts and an independent
+creation time are valid; initial Claim and Step preserve the current attempts.
+The first golden incorrectly assumed1 and was corrected to0 after source review
+and a separate after-body control. The exact160-byte format, other fields,
+offsets and resource thresholds stay unchanged. All six focused tails now pass.
+This format does not implement retained inspection, Fresh authority, historical
+snapshot representation, persistence, recovery or public transports. Complete
+those successors before claiming durable Step or the original source scenario.
+
 ## Ownership
 
 Neutral owned preparation values belong to `wf-ports::consensus`. One private

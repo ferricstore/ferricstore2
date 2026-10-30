@@ -57000,3 +57000,60 @@ unchanged. The full160-byte Rust golden equals the independent Python recipe
 and SHA3ebe50f3c23ab76616f718e2435d790eaefd9fb9a78bd07e6dd4d0283b6f0699.
 Freeze complete source hashes and three existing-file inverses before bodies.
 Primary remains clean atdc39f5a; no new source/profile/native/Linux credit.
+
+M2-STEP-RESPONSE1 first body: strict focused Clippy and the three new pure-module
+effect probes pass. Actual runtime has4pass/1fail. The sole failure is the
+independent golden's attempts1 assumption; actual Create→Claim→Step keeps0.
+Pinned flow_retention_values.ex:548–592 preserves attempts in both claim map
+clauses; current create_claim.rs:149 does the same, and Step clones that field.
+The separate StartAndClaim fixture's1 was an incorrect recipe assumption here.
+Do not alter producer/domain counters to satisfy this wrong expectation.
+
+M2-STEP-RESPONSE1-ORACLE1 solo selection BEFORE correction: append only
+step_reply_preserves_claim_counter_without_incrementing to existing wire.rs.
+Inspect actual accepted domain postimage attempts0 before encoding; require the
+reply u64 at126..134 to be0 and a complete accepted summary. Run this independent
+after-body conformance control first. Then correct ONLY the golden's attempts
+u64 from1 to0 and its derived SHA; preserve length160, all offsets, inputs, caps,
+cases and other assertions. Keep the first-body log and original recipe. Complete
+R0 files must be recoverable by removing the supplemental function and reversing
+exactly those two recipe constants. No production behavior correction is selected.
+
+M2-STEP-RESPONSE1-ORACLE1 executed: the independent counter control passes1/0
+before changing the golden. Only its attempts u64 and derived SHA are corrected;
+all six complete focused cases now pass, including every saved later tail.
+Strict focused Clippy and exact three-home effect probes pass. The writer/parser
+child hashes match the first-body receipt; no producer workaround was applied.
+The corrected160-byte recipe SHA is
+8fa7f0c9ff0f3d3dafb7b5a7b05f79a3250d5643d77dbca040c145615a505d38.
+
+Solo architecture/performance review: the shared measure/emit/verify writer
+checks field and complete output caps before the encoder reserves output; the
+borrowed scanner materializes no fields. Actual-plan matching adds no response
+owner. Fixed20-byte decimal scratch checks the raw binary worker/time/fence token
+without string allocation. The32-byte context extension deliberately binds full
+original identity/time. These are ownership/logical-cap observations, not measured
+latency, allocator or RSS improvements. All code is safe/endian-explicit; native
+Linux evidence remains separate. Root reviews alone; no peer review is claimed.
+
+M2-STEP-RESPONSE1 final execution: all12 direct gates pass over1,755 frozen
+non-Markdown inputs/1,166 Rust files. Actual runtime is1,288pass/0fail/0ignored
+across111 executable targets (109 result targets plus the same two benchmark
+correctness smokes). Complete Counter comparison retains every earlier1,282
+target/name/status/multiplicity, adding only the six response cases and one
+target. All53 architecture cases, Python7,6 doctests/15 targets, documentation,
+reference/progress integrity, strict lint/compilation and offline audit pass.
+Full parity actually exits1, with the ledger129/143/589 and runtime
+5903registered/4222linked/1681unmatched/1655unresolved unchanged. No native
+source, Linux, persistence/Fresh or complete-goal credit is claimed.
+
+Five complete original-file inverses and1,741 other hash-exact old inputs are
+verified. The complete old extended rejection writer body is exact. Seven R0
+sources stay entirely exact. Reversing only golden byte133 (attempts0→1) recovers
+the full original fixture; removing only the supplemental counter function and
+reversing its derived SHA constant recovers the full original wire test file.
+All old case inputs, length160, offsets, thresholds and other assertions stay
+exact. The original recipe and first-body4/1 failure are preserved separately.
+Receipts: /private/tmp/ferricstore2-step-response-{inverses,pipeline,full-identity,
+full-parity,adopted}.json. Local adoption must verify both clean trees and every
+frozen input; no push/external communication is authorized.

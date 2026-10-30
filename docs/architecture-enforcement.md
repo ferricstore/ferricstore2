@@ -189,6 +189,12 @@ in b21f87f and repaired; no effect/dependency or source-size exemption was added
 Existing shared header purity also applies. This does not enable Fresh,
 response, durable history/publication or recovery routing for Step.
 
+M2-STEP-RESPONSE1 adds exact effect probes for the response facade and scan/write
+children under that same existing pure prefix. The old atomic-start rejection
+writer gains only server-private sibling visibility; its complete body remains
+exact. No graph, parser, effect, size or lint exemption is selected. Response9 is
+a new data grammar; older response and persistence profiles remain closed.
+
 ### Pure committed StartAndClaim boundaries
 
 The [selected atomic-start contract](adr/004-committed-time-and-apply-admission.md#selected-pure-committed-startandclaim-core)
