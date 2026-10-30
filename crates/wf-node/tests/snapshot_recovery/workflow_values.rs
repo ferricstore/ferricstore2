@@ -14,4 +14,5 @@ mod independent;
 mod limits;
 mod replay;
 mod snapshot;
+mod step_continue;
 mod stored;

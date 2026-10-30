@@ -57829,3 +57829,45 @@ case in existing ports tests/step_continue_codec/wire.rs; no new Cargo target.
 Record separately compiled real runtime failures and exact source hashes, then
 save a local rejection-only commit before any dispatch/parser/selector bodies.
 Consult another concrete solo selection if further files/types/models are needed.
+
+M2-STEP-NODE1 pretest clarification: the existing Node value cohort donor
+asserts manifest7. Keep that donor unchanged and implement format8 table
+observations within the already approved new fixtures.rs using existing raw
+table helpers. A standalone fixture-control test may pass before the new opt-in;
+it verifies actual policy/StartAndClaim/upgrade state and is not failing-test
+evidence for new dispatch. Step FWCP has no footer checksum: corrupt the final
+payload byte and intent digest separately, requiring complete intent/body
+validation rather than inventing a footer. The independent literal header is
+79 bytes (7 framing +four length-prefixed one-byte fields +intent2+digest32+
+clock18); verify each shorter prefix and exact79 success. These clarifications
+precede test creation and introduce no additional artifact/model.
+
+M2-STEP-NODE1 pre-runtime model amendment: first strict Clippy rejects a fourth
+boolean in CommittedRecoveryLimits (struct_excessive_bools); no runtime test has
+run and no behavior RED is claimed. Replace only the selected new bool with NEW
+private workflow_values::StepRecoveryProfile::{Disabled,Enabled} in the existing
+workflow_values.rs, derived Clone/Copy. Its explicit const bool constructor and
+enabled query own only startup opt-in selection, never storage-format authority.
+Parent constructor selects Disabled and the rejecting selector remains rejecting.
+The eventual selector selects Enabled after validating actual shared ceilings.
+Charge this actual enum descriptor where the Step flag overlaps other owners;
+do not waive Clippy or hide flags in bit arithmetic. This concrete enum/model
+selection precedes creation; no new file or old-profile semantic change.
+
+M2-STEP-NODE1 genuine R0: actual compiled Node run1PASS/8FAIL/0ignored/64filtered.
+The predecessor format8 policy/StartAndClaim fixture control passes before any
+new selection. Every other case reaches the healthy new selector and refuses
+UnsupportedEntry; later audit/replay/limits/fault/snapshot tails remain masked.
+Independent literal-header run0PASS/1FAIL/0ignored/7filtered reaches the healthy
+explicit-header UnsupportedVersion. Both new APIs still reject every input.
+All53 architecture cases pass. Strict focused Clippy on formatted inputs exits0;
+archive earlier fourth-bool and byte-literal compile findings separately. Those
+are pre-runtime repairs, not behavioral RED. No suppressed lint or ignored case.
+
+Six complete existing-file inverses recover822be44, and1,783 other original
+non-Markdown inputs remain exact. All13 selected R0 sources are frozen before
+any dispatch/parser/selector body. No test/assertion, source mapping, default
+profile or platform acceptance credit is changed. Receipt and complete logs:
+/private/tmp/ferricstore2-step-node-{genuine-r0,r0-runs,r0-node,r0-header,
+r0-architecture,r0-clippy-final}.{json,log} as appropriate. Save the actual
+rejecting state in a local commit before implementing the selected bodies.

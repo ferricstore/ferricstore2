@@ -21,3 +21,45 @@ fn step_codec_preserves_complete_fields_and_golden_bytes() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn explicit_step_recovery_header_borrows_golden_and_keeps_old_profiles_closed() -> TestResult {
+    use wf_ports::log::{
+        normal_recovery_header, step_continue_recovery_header, stored_value_recovery_header,
+    };
+    let wire = f::bytes(f::FRAME)?;
+    let (profile, fields, stamp) = step_continue_recovery_header(&wire, f::limits()?, false)?;
+    assert_eq!(profile, 10);
+    assert_eq!(fields, [b"t".as_slice(), b"g", b"z"]);
+    assert_eq!(fields[0].as_ptr(), wire[11..].as_ptr());
+    assert_eq!(stamp, f::clock(2)?);
+    for old in [normal_recovery_header, stored_value_recovery_header] {
+        assert!(matches!(
+            old(&wire, f::limits()?),
+            Err(CodecError::UnsupportedVersion)
+        ));
+    }
+    let mut changed = wire.clone();
+    changed[27..29].copy_from_slice(&9_u16.to_be_bytes());
+    assert!(matches!(
+        step_continue_recovery_header(&changed, f::limits()?, false),
+        Err(CodecError::UnsupportedVersion)
+    ));
+    assert_eq!(
+        step_continue_recovery_header(&changed, f::limits()?, true)?.0,
+        9
+    );
+    let narrow = CodecLimits::new(AdmissionLimits::new(32, wire.len() - 1, 4)?);
+    assert!(matches!(
+        step_continue_recovery_header(&wire, narrow, false),
+        Err(CodecError::ByteLimit)
+    ));
+    for end in 0..79 {
+        assert!(step_continue_recovery_header(&wire[..end], f::limits()?, false).is_err());
+    }
+    assert_eq!(
+        step_continue_recovery_header(&wire[..79], f::limits()?, false)?.0,
+        10
+    );
+    Ok(())
+}

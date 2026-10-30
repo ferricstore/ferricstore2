@@ -2,12 +2,18 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Next worktree branch: codex/step-node-solo. M2-STEP-NODE1 has a concrete solo
-architecture selection in the coordination record before artifacts. No Node
-Step APIs/tests/bodies exist yet. Save genuinely compiled rejecting opt-in and
-header scenarios before implementing committed-prefix audit/replay; keep old
-opt-ins closed and actual format8 mandatory. Primary remains at the verified
-822be44 storage checkpoint described below. The full goal remains active.
+Worktree branch: codex/step-node-solo. M2-STEP-NODE1 genuine compiled R0 passes
+the actual format8 fixture control and fails8 new recovery cases at the healthy
+selector UnsupportedEntry. The independent golden-header case fails at healthy
+UnsupportedVersion; all later recovery/header tails remain masked. Both new
+APIs reject all inputs. Strict focused Clippy and all53 architecture cases pass.
+Six complete old-file inverses and1,783 other exact inputs preserve822be44;
+all13 selected R0 sources are frozen. Earlier fourth-bool lint/byte-literal
+compile repairs are recorded, not behavioral RED. See the concrete solo
+selection and `/private/tmp/ferricstore2-step-node-genuine-r0.json`. Save this
+rejecting state before implementing committed-prefix audit/replay; keep old
+opt-ins closed and actual format8 mandatory. Primary remains at verified822be44.
+The full goal remains active, solo, with no new source/native/Linux credit.
 
 The codex/step-storage-solo checkpoint implements consuming
 format7→8 upgrade, full new history captures and real Step value/core publication,

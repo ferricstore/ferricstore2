@@ -17,7 +17,51 @@ use wf_types::version::CommittedTime;
 
 use super::{CommittedRecoveryError, CommittedRecoveryLimits, replay, total};
 
+#[derive(Clone, Copy)]
+pub(super) enum StepRecoveryProfile {
+    Disabled,
+    Enabled,
+}
+
+impl StepRecoveryProfile {
+    pub(super) const fn new(enabled: bool) -> Self {
+        if enabled {
+            Self::Enabled
+        } else {
+            Self::Disabled
+        }
+    }
+
+    pub(super) const fn enabled(self) -> bool {
+        matches!(self, Self::Enabled)
+    }
+}
+
 impl CommittedRecoveryLimits {
+    /// Selects explicit Step startup recovery and its shared value ceilings.
+    /// # Errors
+    /// Refuses unsupported selection, zero ceilings or whole-call work overflow.
+    pub fn with_step_continue_limits(
+        self,
+        rows: usize,
+        bytes: usize,
+        work: usize,
+        temporary: usize,
+    ) -> Result<Self, CommittedRecoveryError> {
+        let _ = (self, rows, bytes, work, temporary);
+        Err(CommittedRecoveryError::UnsupportedEntry)
+    }
+
+    /// Reads the shared ceilings only when Step recovery was explicitly selected.
+    #[must_use]
+    pub const fn step_continue_limits(self) -> Option<WorkflowValueTransactionLimits> {
+        if self.step_continue.enabled() {
+            self.workflow_value_limits()
+        } else {
+            None
+        }
+    }
+
     /// Selects explicit stored-value startup recovery and its shared ceilings.
     /// # Errors
     /// Refuses zero ceilings or overflow in the whole-call work upper bound.

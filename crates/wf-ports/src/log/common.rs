@@ -69,6 +69,18 @@ pub fn stored_value_recovery_header(
     recovery_header(encoded, limits, true)
 }
 
+/// Borrows header facts with explicit Step and optional stored-value recognition.
+/// Complete body validation and actual persistent capability remain mandatory.
+/// # Errors
+/// Refuses unsupported selection, framing and the configured encoded byte cap.
+pub fn step_continue_recovery_header(
+    _encoded: &[u8],
+    _limits: CodecLimits,
+    _stored: bool,
+) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
+    Err(CodecError::UnsupportedVersion)
+}
+
 fn recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
