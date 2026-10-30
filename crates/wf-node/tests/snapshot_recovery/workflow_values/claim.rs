@@ -358,7 +358,7 @@ fn verify(state: &mut RedbStateStore) -> TestResult {
     Ok(())
 }
 
-fn cohort(dir: &Path) -> TestResult<[f::Rows; 6]> {
+pub(super) fn cohort(dir: &Path) -> TestResult<[f::Rows; 6]> {
     let path = dir.join("state.redb");
     Ok([
         f::bytes_table(&path, "wf_state_meta_v1")?,

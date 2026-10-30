@@ -19,6 +19,7 @@ pub use claim::{
 mod common;
 pub use common::step_continue_recovery_header;
 pub use common::{CodecError, normal_recovery_header, stored_value_recovery_header};
+pub use record_batch::{encode_stored_step_continue, prepare_stored_step_continue};
 mod complete_policy;
 mod control;
 mod decode;

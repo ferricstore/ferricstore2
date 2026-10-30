@@ -18,4 +18,5 @@ mod step_continue;
 mod stored_codec;
 mod stored_profile;
 mod stored_publication;
+mod stored_step;
 mod wire;

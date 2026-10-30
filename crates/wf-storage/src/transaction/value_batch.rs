@@ -29,6 +29,19 @@ mod step;
 mod step_continue;
 pub(crate) use plan::{ValuePublicationPlan, ValueStep};
 
+/// Applies an explicitly stored-payload Step with complete durable companions.
+/// # Errors
+/// Refuses unsupported capabilities, invalid authority and operational failures.
+pub fn apply_stored_step_continue_transaction(
+    _store: &mut RedbStateStore,
+    _scope: &RequestScope,
+    _encoded: &[u8],
+    _log: LogIdentity,
+    _limits: WorkflowValueTransactionLimits,
+) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
+    Err(WorkflowValueTransactionError::UnsupportedProfile)
+}
+
 /// Applies an explicitly selected Step through the complete-history/value writer.
 /// # Errors
 /// Refuses unsupported format, invalid authority, budgets or unproved commit.

@@ -58096,3 +58096,85 @@ Receipts: /private/tmp/ferricstore2-value-claim-{source-audit,pipeline,
 full-identity,full-parity,adopted}.json. No source credit, native performance,
 Linux execution, independent peer review or full-product completion is claimed.
 Local adoption must verify both clean trees against every frozen input; no push.
+
+## M2-STORED-STEP1 — solo functional selection before artifacts
+
+Previous goal turn: progress. Commit 468e76d completes the selected durable named
+Claim batch and both local trees match all tested inputs. The full goal remains
+active and solo. This successor closes typed Step publication and recovery in
+one functional batch; it does not substitute another data-only codec increment.
+
+Pinned flow_write_contract_test.exs:1257–1322 requires typed `%{step: ...}`
+payloads on Create and Step, a fresh running lease, refusal of the old completion
+guard, and Retry to the new logical state. Intent 10 already specifies logical
+binary, including wrapper-looking bytes, so it cannot be reinterpreted. Select
+explicit singleton intent 11, with the exact existing Step operation tag 12 and
+wire fields, stored payload bytes, and domain-separated caller digest prefix
+`WF-STEP-CONTINUE\0V11\0`. No new operation, model, layout, key family, dependency
+or event is needed. Existing response 9 carries the complete Step postimage;
+the explicit Step retained APIs support intents 10 and 11. Generic legacy
+codecs and old plain-Step preparation remain closed. Stored bytes retain the
+existing alias-2 contract, including explicit invalid-value behavior on decode;
+the codec does not invent a successful typed-decode promise.
+
+Approve before edits: add ClientIntent::stored_step_continue in existing domain
+request.rs; encode_stored_step_continue and prepare_stored_step_continue in
+existing ports log/record_batch/step_continue.rs, reexported through existing
+facades. Parameterize the existing borrowed Step wire/intent implementation;
+keep identical intent-10 bytes. Share explicit Step Fresh inspection/decision,
+value provenance, response coherence and retained storage validation. Add
+apply_stored_step_continue_transaction to existing storage value_batch.rs and
+facade; share its existing Step driver with explicit version selection. Require
+actual layout 8 and alias 2 before retained/current authority. Publish supplied
+payload bytes exactly once using the existing stored-value emitter, with all
+binding/history/outcome/control rows in the same consumed Immediate transaction.
+Omitted payload preserves original refs; plain intent 10 retains binary wrapping.
+
+Node: extend existing StepRecoveryProfile with explicit stored-only/both
+selection, preserving old constructors and plain opt-in behavior. Add
+with_stored_step_continue_limits and stored_step_continue_limits in existing
+recovery/workflow_values.rs. Add stored_step_continue_recovery_header in existing
+ports log/common.rs with explicit plain/stored-value selections. Old header
+entry points retain their allowlists. Share real full-body audit and driver
+dispatch through join/replay, snapshots and received/purged suffixes. Factor the
+duplicated local profile-descriptor calculation inside the existing module to
+stay within 400 lines. Charge the actual selected descriptor in every phase,
+and preserve whole-call budgets and preparation work 4096 + 16 * encoded length.
+No new production file/type is approved or needed.
+
+Approve NEW test files before creation: ports
+tests/step_continue_codec/stored.rs; storage tests/state_store/workflow_values/
+stored_step.rs and stored_step/{fixtures,source,limits,recovery}.rs; Node
+tests/snapshot_recovery/workflow_values/stored_step.rs. Existing parents declare
+them. Reuse storage claim fixtures through a visibility-only seam: make its
+fixtures module visible within workflow_values, and widen only fresh, create,
+phase, apply, retained, retained_record, record, history and cohort to that scope.
+Expose only Node claim::input and claim::cohort to its workflow_values parent.
+Keep all old helper bodies and assertions unchanged. New tests cover the real
+typed source trace, logical typed hydration, stale guard, retained replay after
+Retry, wrapper-looking binary control, presence, limits, actual capability,
+complete full-history snapshots, recovery and uncertainty where existing fault
+adapters permit. Save actual compiled RED before implementation; no test written
+after implementation receives TDD credit. Any additional artifact requires a
+concrete solo selection first. This is my architecture/performance review, not
+independent peer review. Reuse bounded borrowed fields and fallible owners;
+no payload/query-key clone or native performance claim is selected.
+
+M2-STORED-STEP1 test reuse refinement before tests: Node needs actual alias-2
+genesis. Expose only existing stored::pair to the workflow_values parent, with
+its body unchanged; use claim::cohort for observations. Do not expose claim::input
+because that fixture selects alias 1. Storage's new fixture constructs typed
+Create via existing intent 9, then uses the real named Claim helper.
+
+M2-STORED-STEP1 genuine compiled RED: 0/2 codec, 0/5 storage and 0/3 Node
+pass, with zero ignored. Codec cases reject healthy encode / independent literal
+prepare with Encoding(UnsupportedVersion). Storage setup executes typed Create
+and real named Claim, then rejects the healthy new frame at the encoder; later
+storage/publication/fault/source tails are masked, not claimed as executed.
+Node cases reject the healthy opt-in with UnsupportedEntry; their recovery tails
+are masked. All 53 architecture cases pass before the final presence test was
+added; strict focused Clippy passes including that test. Pre-runtime compilation
+repairs corrected error-variant names, explicit non-Error conversions, unsupported
+page equality, unused import, similar names and a 26/25 test helper split. These
+are not behavioral RED. Logs preserve the attempts. Save this rejecting runtime
+checkpoint before bodies; all new APIs still refuse every input.

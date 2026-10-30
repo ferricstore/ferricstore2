@@ -31,7 +31,7 @@ fn limits() -> TestResult<Limits> {
     )?)
 }
 
-fn pair(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore)> {
+pub(super) fn pair(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore)> {
     let scope = f::scope()?;
     let placements = [(PartitionId::new(b"p".to_vec())?, scope.group().clone())];
     let state = RedbStateStore::create_stored_value_database(

@@ -18,7 +18,7 @@ pub(super) fn limits() -> WorkflowValueTransactionLimits {
     v::limits()
 }
 
-pub(super) fn fresh(path: &Path, stored: bool) -> TestResult<RedbStateStore> {
+pub(in crate::workflow_values) fn fresh(path: &Path, stored: bool) -> TestResult<RedbStateStore> {
     let store = if stored {
         let scope = f::scope()?;
         let placements = [(PartitionId::new(b"p".to_vec())?, scope.group().clone())];
@@ -40,7 +40,7 @@ pub(super) fn fresh(path: &Path, stored: bool) -> TestResult<RedbStateStore> {
     Ok(store.upgrade_history_snapshot_layout()?)
 }
 
-pub(super) fn create(
+pub(in crate::workflow_values) fn create(
     store: &mut RedbStateStore,
     id: &[u8],
     state: &[u8],
@@ -71,7 +71,7 @@ pub(super) fn create(
     Ok(())
 }
 
-pub(super) fn phase(
+pub(in crate::workflow_values) fn phase(
     request: &[u8],
     now: u64,
     state: &[u8],
@@ -116,7 +116,7 @@ pub(super) fn phase_with_intent(
     )?)
 }
 
-pub(super) fn apply(
+pub(in crate::workflow_values) fn apply(
     store: &mut RedbStateStore,
     frame: &PreparedBytes,
     at: u64,
@@ -137,14 +137,16 @@ pub(super) fn apply(
     Ok(result?)
 }
 
-pub(super) fn retained(result: ClaimTransactionOutcome) -> TestResult<Box<RetainedOutcome>> {
+pub(in crate::workflow_values) fn retained(
+    result: ClaimTransactionOutcome,
+) -> TestResult<Box<RetainedOutcome>> {
     let ClaimTransactionOutcome::Retained { outcome, .. } = result else {
         return Err("retained named Claim".into());
     };
     Ok(outcome)
 }
 
-pub(super) fn retained_record(
+pub(in crate::workflow_values) fn retained_record(
     result: wf_storage::transaction::RecordBatchTransactionOutcome,
 ) -> TestResult<Box<RetainedOutcome>> {
     let wf_storage::transaction::RecordBatchTransactionOutcome::Retained { outcome, .. } = result
@@ -154,7 +156,10 @@ pub(super) fn retained_record(
     Ok(outcome)
 }
 
-pub(super) fn record(store: &mut RedbStateStore, id: &[u8]) -> TestResult<StoredWorkflowRecord> {
+pub(in crate::workflow_values) fn record(
+    store: &mut RedbStateStore,
+    id: &[u8],
+) -> TestResult<StoredWorkflowRecord> {
     let scope = f::scope()?;
     Ok(store
         .begin_apply(
@@ -173,7 +178,10 @@ pub(super) fn record(store: &mut RedbStateStore, id: &[u8]) -> TestResult<Stored
         .ok_or("record")?)
 }
 
-pub(super) fn history(store: &RedbStateStore, id: &[u8]) -> TestResult<WorkflowHistoryPage> {
+pub(in crate::workflow_values) fn history(
+    store: &RedbStateStore,
+    id: &[u8],
+) -> TestResult<WorkflowHistoryPage> {
     Ok(store.read_workflow_history_page(
         &f::scope()?,
         &PartitionId::new(b"p".to_vec())?,
@@ -195,7 +203,9 @@ pub(super) fn history(store: &RedbStateStore, id: &[u8]) -> TestResult<WorkflowH
     )?)
 }
 
-pub(super) fn cohort(path: &Path) -> TestResult<[BTreeMap<Vec<u8>, Vec<u8>>; 6]> {
+pub(in crate::workflow_values) fn cohort(
+    path: &Path,
+) -> TestResult<[BTreeMap<Vec<u8>, Vec<u8>>; 6]> {
     let db = redb::Builder::new().open(path)?;
     let read = db.begin_read()?;
     let mut result = std::array::from_fn(|_| BTreeMap::new());

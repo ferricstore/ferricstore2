@@ -12,7 +12,7 @@ use wf_storage::transaction::{
 
 mod chain;
 mod faults;
-mod fixtures;
+pub(super) mod fixtures;
 mod limits;
 mod replay;
 mod retention;

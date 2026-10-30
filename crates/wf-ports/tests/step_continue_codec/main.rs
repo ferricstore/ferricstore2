@@ -7,6 +7,7 @@ mod fixtures;
 mod identity;
 mod limits;
 mod refusals;
+mod stored;
 mod wire;
 
 use wf_domain::lease::{LeaseGuard, LeaseToken};

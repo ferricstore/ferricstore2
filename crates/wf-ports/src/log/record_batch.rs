@@ -30,8 +30,8 @@ mod step_continue;
 
 pub use step_continue::{
     decide_fresh_step_continue_touched, encode_step_continue, encode_step_continue_response,
-    inspect_step_continue_point, prepare_step_continue, step_continue_response_matches,
-    step_continue_retained_summary,
+    encode_stored_step_continue, inspect_step_continue_point, prepare_step_continue,
+    prepare_stored_step_continue, step_continue_response_matches, step_continue_retained_summary,
 };
 
 pub(super) use fresh::{decide_independent, value_effects_budget};

@@ -17,3 +17,4 @@ mod replay;
 mod snapshot;
 mod step_continue;
 mod stored;
+mod stored_step;

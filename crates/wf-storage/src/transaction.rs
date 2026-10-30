@@ -21,6 +21,7 @@ mod load;
 mod observations;
 mod record_batch;
 mod value_batch;
+pub use value_batch::apply_stored_step_continue_transaction;
 pub(crate) use value_batch::{ValuePublicationPlan, ValueStep};
 
 pub use value_batch::{

@@ -42,6 +42,19 @@ impl StepRecoveryProfile {
 }
 
 impl CommittedRecoveryLimits {
+    /// Selects stored-payload Step recovery and its value ceilings.
+    /// # Errors
+    /// Refuses unsupported selections, invalid ceilings or overflow.
+    pub fn with_stored_step_continue_limits(
+        self,
+        _rows: usize,
+        _bytes: usize,
+        _work: usize,
+        _temporary: usize,
+    ) -> Result<Self, CommittedRecoveryError> {
+        Err(CommittedRecoveryError::UnsupportedEntry)
+    }
+
     /// Selects named Claim recovery with its actual query and value ceilings.
     /// # Errors
     /// Refuses unsupported selection, invalid ceilings or whole-call overflow.

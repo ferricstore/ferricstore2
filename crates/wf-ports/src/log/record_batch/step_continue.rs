@@ -11,6 +11,28 @@ mod input;
 mod response;
 mod wire;
 
+/// Prepares explicit stored-payload Step bytes.
+/// # Errors
+/// Refuses unsupported selection or malformed and over-limit input.
+pub fn encode_stored_step_continue(
+    _request: PreparedRequest,
+    _limits: CodecLimits,
+    _workspace_limit: usize,
+) -> Result<PreparedBytes, RecordBatchApplyError> {
+    Err(crate::log::CodecError::UnsupportedVersion.into())
+}
+
+/// Validates an explicit stored-payload Step before ownership.
+/// # Errors
+/// Refuses unsupported selection or malformed and over-limit input.
+pub fn prepare_stored_step_continue(
+    _encoded: &[u8],
+    _limits: CodecLimits,
+    _workspace_limit: usize,
+) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
+    Err(crate::log::CodecError::UnsupportedVersion.into())
+}
+
 pub use fresh::{decide_fresh_step_continue_touched, inspect_step_continue_point};
 
 pub use response::{
