@@ -57192,3 +57192,93 @@ tag or infer complete rewind snapshots. Rich/captured lifecycle and value contex
 also need explicit historical representation/disposition. No new schema/model
 is approved by this observation; select concrete ownership, fields and tariffs
 before those artifacts, preserving the wider full-product requirements.
+
+## M2-HISTORY-SNAPSHOT1 — source review and solo selection before artifacts
+
+Predecessor c62162f is adopted with12 gates/1294 cases. Correct the prior handoff
+assumption using pinned flow/codec.ex:291–374 and codec/support.ex:201–227:
+the original FSH2 event does NOT encode logical run_state. Its explicit state is
+the lifecycle state, and metadata adds refs/attributes/state-meta, not run_state.
+The Rust current-record codec already stores run_state. Do not add a public
+source-history field merely to repair an inferred omission. However FWSH1 is a
+reduced M1 event; it also lacks current priority/created/updated/inline values.
+An internal complete represented-core postimage can preserve those without
+changing the original FSH2 projection contract. Keep richer ActiveRecord carry,
+lineage, governance, captured lifecycle and actual value-binding provenance as
+explicit further requirements; never invent missing source context from a new
+current record. Source refs/metadata remain actual companion/context obligations.
+
+Select data-only FWHS1 envelope: magic FWHS/u16version1, RAW complete FWSR2 core
+postimage, RAW complete FWSH2 reduced event, exact EOF. RAW is u32BE length+bytes.
+FWSR2/FWSH2 retain the existing v1 field grammar and old tags0..12, adding only
+StepContinued tag13 under version2. Old v1 encode/scan/tag APIs remain closed.
+FWSR2 holds every represented WorkflowRecord field, all three optional values,
+actual tenant/partition and priority/u128 sequence. FWSH2 holds every existing
+HistoryEntry field including optional full RetryHistory. Cross-check namespace,
+ID/event version, kind/latest witness, occurrence/update time, fence/attempts,
+lifecycle state, due/deadline/worker and retry-kind consistency before copies.
+This captures internal logical state as part of the whole existing record; it
+does not relabel it as a source history field or establish full rich-source parity.
+
+Approve BEFORE creation neutral StoredWorkflowHistorySnapshot in existing
+wf-ports/state/history.rs, reexported by state.rs: public event:HistoryEntry and
+postimage:StoredWorkflowRecord, ordinary owned data without read/commit authority.
+Approve private storage value/history_snapshot.rs facade with rejecting APIs and
+history_snapshot/model.rs for HistorySnapshotLimits only. Its private fields are
+AdmissionLimits, positive max encoded/owned/workspace bytes, validated constructor
+and getters. BEFORE RED add rejecting encode_record_snapshot and
+scan_record_snapshot in existing record.rs and exports in value.rs. New snapshot
+encode(scope,postimage,event,limits)->Vec; decode(bytes,scope,partition,id,limits)
+->StoredWorkflowHistorySnapshot; all new codec APIs initially UnsupportedVersion.
+
+AFTER genuine saved RED approve private history_snapshot/write.rs and scan.rs.
+Functions share existing record/history measure/emit helpers to reserve only one
+complete envelope buffer, with no temporary encoded record/history owners.
+Borrowed scans validate the entire envelope, both bounded nested frames and
+their correspondence before any variable owned materialization. Encoder W is
+E+2048; decoder R is existing record-owned bound plus512 plus every actual
+variable history occurrence (event ID/state/worker/retry run-state/target), and
+decoder W is E+R+2048. All sums/caps are checked prospectively; these logical
+accounts certify no native RSS/CPU/allocator bound. Independent wire/owned/work
+caps remain separate; input donors and fixture owners are external.
+
+AFTER RED approve RecordHistoryView<'input> in existing record.rs with borrowed
+state, version/fence/attempts/updated/due, worker/deadline option and latest witness;
+its getter in record/scan.rs copies fixed descriptors only. Approve private
+BorrowedHistoryFields<'input>, BorrowedRetryFields<'input> and
+ScannedHistorySnapshot<'input> in the new snapshot scan child: exact parsed
+borrowed fields/policy, actual record scan and calculated R, no claimed origin.
+Generalize existing record measurement/emission and scanner only with fixed v1/v2
+data-format selection, proving the complete v1 specialization. Expose unchanged
+history size/time/retry helper bodies server-privately as needed; do not silently
+open old event tables or normal recovery/store modes. Existing validate_retry is
+already borrowed and returns unit; reuse it without new allocation/helper.
+
+Approve grouped tests/history_snapshot/main.rs and fixtures.rs,wire.rs,profiles.rs,
+refusals.rs,limits.rs,retry.rs. No new test model: actual Create/Claim/Step and
+retry plans or explicitly identified restoration-format controls supply fields.
+Six cases first reach new healthy encode against the shells, then verify complete
+golden/ownership, explicit v2/all event tags and v1 rejection, every truncation/
+context/correspondence refusal, exact wire/R/W boundaries, retry/value presence
+and original-source field disposition. Freeze independent Python bytes/SHA/offsets
+and actual compiled RED before bodies. Keep all old assertions and source evidence.
+
+Existing pure state::value namespace covers these children; add exact four-home
+effect probes and ADR007/handoff/source-disposition evidence. No new effect,
+dependency, runtime flag or module/size/lint exception. Keep400/600/100/4/25.
+This stage enables no storage publication, original-source history query, snapshot
+installation or recovery. Those are mandatory next integrations, including real
+companion preservation and rich/source field coverage. Root reviews solo; no
+agents, peer-review claim, push or original checkout modification is authorized.
+
+M2-HISTORY-SNAPSHOT1 genuine R0 SAVE: repair the missing RecordId import, unused
+test import and a one-byte transcription error in the Rust hex fixture BEFORE
+runtime; its complete303-byte vector now exactly equals the independent recipe.
+These technical findings are not runtime RED. Strict focused Clippy exits0.
+Actual compiled runtime exits101:0pass/6fail/0ignored. Five cases stop at healthy
+snapshot encoding UnsupportedVersion; the explicit-record case stops at healthy
+record encoding UnsupportedVersion. All later wire/ownership/source-disposition/
+retry/resource/context tails remain masked. The four new codec APIs reject all
+inputs; no v2 tag/grammar/scan/materialization body or borrowed view exists yet.
+Freeze13 sources and four complete old-file inverses before bodies. All existing
+v1 codecs/tag tables and physical store/recovery profiles remain unchanged.

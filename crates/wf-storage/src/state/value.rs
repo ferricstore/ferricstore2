@@ -6,6 +6,7 @@ use wf_ports::log::CodecError;
 
 mod control;
 mod history;
+mod history_snapshot;
 mod membership;
 mod outcome;
 mod record;
@@ -13,6 +14,9 @@ mod workflow_values;
 
 pub use control::{decode_control, encode_control};
 pub use history::{decode_history, encode_history};
+pub use history_snapshot::{
+    HistorySnapshotLimits, decode_history_snapshot, encode_history_snapshot,
+};
 pub(crate) use membership::inspect_membership;
 pub use membership::{
     decode_applied_membership, encode_applied_membership, measure_applied_membership,
@@ -23,8 +27,8 @@ pub use outcome::{
     outcome_policy_validation_bytes, scan_outcome, scan_outcome_profiled,
 };
 pub use record::{
-    ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields, scan_record_point,
-    scan_record_point_profiled,
+    ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields,
+    encode_record_snapshot, scan_record_point, scan_record_point_profiled, scan_record_snapshot,
 };
 pub(crate) use workflow_values::{
     ValueAlias, ValueBindingData, ValueSourceFields, binding_source_fields, decode_alias,

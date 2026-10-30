@@ -3,6 +3,7 @@
 use wf_domain::history::HistoryEntry;
 use wf_domain::workflow::control::ControlState;
 
+use super::StoredWorkflowRecord;
 use crate::blob::WorkflowValueBindingKnowledge;
 
 mod hydration;
@@ -10,6 +11,18 @@ pub use hydration::{
     WorkflowHistoryHydrationError, WorkflowHistoryHydrationLimits, WorkflowHistoryHydrationRequest,
     WorkflowHistoryValuePage,
 };
+
+/// Owned represented-core postimage and event, without read/commit authority.
+///
+/// Rich source extensions and actual value provenance remain separate companion
+/// obligations; this data does not invent their absence or source compatibility.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct StoredWorkflowHistorySnapshot {
+    /// Complete represented event, including resolved retry observations.
+    pub event: HistoryEntry,
+    /// Every represented core field and its exact scoped ordering metadata.
+    pub postimage: StoredWorkflowRecord,
+}
 
 /// Physical numeric-millisecond/original-ID traversal direction.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

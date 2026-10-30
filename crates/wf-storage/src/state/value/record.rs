@@ -6,12 +6,40 @@ use wf_domain::workflow::admission::{AdmissionLimits, record_bytes};
 use wf_domain::workflow::indexed::OrderingMetadata;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::StoredWorkflowRecord;
-use wf_types::identity::{GroupId, PartitionId, RecoveryId};
+use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId};
 
 use super::{StateValueError, add, allocate, put_raw, raw_size};
 
 mod scan;
 pub use scan::{ScannedWorkflowRecord, scan_record_point, scan_record_point_profiled};
+
+/// Encodes explicit v2 represented fields; selecting data grants no store upgrade.
+/// # Errors
+/// Currently refuses every input until the selected tests-first body exists.
+pub fn encode_record_snapshot(
+    _scope: &RequestScope,
+    _partition: &PartitionId,
+    _record: &WorkflowRecord,
+    _ordering: OrderingMetadata,
+    _limits: AdmissionLimits,
+    _maximum_bytes: usize,
+) -> Result<Vec<u8>, StateValueError> {
+    Err(StateValueError::UnsupportedVersion)
+}
+
+/// Scans explicit v2 bytes at one exact point without storage authority.
+/// # Errors
+/// Currently refuses every input until the selected tests-first body exists.
+pub fn scan_record_snapshot<'input>(
+    _bytes: &'input [u8],
+    _scope: &RequestScope,
+    _partition: &PartitionId,
+    _id: &RecordId,
+    _limits: AdmissionLimits,
+    _maximum_bytes: usize,
+) -> Result<ScannedWorkflowRecord<'input>, StateValueError> {
+    Err(StateValueError::UnsupportedVersion)
+}
 
 const EVENTS: [EventKind; 13] = [
     EventKind::Created,

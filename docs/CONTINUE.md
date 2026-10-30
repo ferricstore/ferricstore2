@@ -2,6 +2,16 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
+Work in progress on codex/history-core-snapshot: select private FWHS1 with full
+represented FWSR2 postimage and FWSH2 event; older v1 codecs remain closed. Six
+compiled cases genuinely reject healthy encoding after focused strict Clippy.
+Source review corrected a handoff assumption: pinned FSH2 history omits run_state;
+the internal complete core snapshot preserves it without adding a source field.
+Source refs/metadata/rich fields remain explicit companion/capture requirements.
+See M2-HISTORY-SNAPSHOT1 and
+`/private/tmp/ferricstore2-history-snapshot-{source-recipes,genuine-r0}.json`.
+Primary stays at the passing c62162f checkpoint; this feature is intentionally RED.
+
 The codex/step-continue-fresh checkpoint: six genuine runtime refusals were
 saved in e7a9291 before the bodies. All six unchanged complete cases, strict
 focused Clippy and exact purity probes pass. All12 final direct gates now pass
