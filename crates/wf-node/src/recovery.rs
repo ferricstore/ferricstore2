@@ -5,6 +5,7 @@
 
 use std::fmt;
 use wf_domain::claim::apply::ClaimWorkLimits;
+use wf_domain::governance::credit::CreditLimits;
 use wf_ports::consensus::{RaftMembershipError, RaftMembershipLimits};
 use wf_ports::log::{CodecError, RaftLogError, RaftLogStore};
 use wf_ports::state::StateTransactionError;
@@ -16,6 +17,7 @@ use wf_storage::transaction::{
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
+mod credit;
 mod join;
 mod original_policy;
 mod replay;
@@ -41,6 +43,7 @@ pub struct CommittedRecoveryLimits {
     workflow_values: Option<[usize; 4]>,
     stored_workflow_values: bool,
     step_continue: workflow_values::StepRecoveryProfile,
+    credit: Option<(u64, CreditLimits)>,
     work: (usize, usize),
     entry: usize,
     workspace: usize,
@@ -90,6 +93,7 @@ impl CommittedRecoveryLimits {
             workflow_values: None,
             stored_workflow_values: false,
             step_continue: workflow_values::StepRecoveryProfile::new(false),
+            credit: None,
             work,
             entry: maximum_owned_entry_bytes,
             workspace: workspace_bytes,
@@ -250,6 +254,8 @@ pub enum CommittedRecoveryError {
     OriginalPolicy(OriginalPolicyTransactionError),
     /// Existing consumed workflow-value transaction diagnosis.
     Value(WorkflowValueTransactionError),
+    /// Explicit identified governing-credit preparation/transaction diagnosis.
+    Credit(wf_storage::transaction::CreditTransactionError),
     /// Header-only parsing failure.
     Codec(CodecError),
     /// Closed Blank/Membership parsing failure.
@@ -277,6 +283,7 @@ impl fmt::Display for CommittedRecoveryError {
             Self::CorePolicy(error) => return fmt::Display::fmt(error, f),
             Self::OriginalPolicy(error) => return fmt::Display::fmt(error, f),
             Self::Value(error) => return fmt::Display::fmt(error, f),
+            Self::Credit(error) => return fmt::Display::fmt(error, f),
             Self::Codec(error) => return fmt::Display::fmt(error, f),
             Self::Membership(error) => return fmt::Display::fmt(error, f),
         })

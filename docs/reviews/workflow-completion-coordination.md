@@ -58849,3 +58849,47 @@ dependency, lint suppression, OS claim, push or main-checkout adoption. This is
 still WIP: Node explicit full-body audit/replay and received/purged recovery,
 remaining pinned source cases/dispositions and final full gates must finish
 before accepting M2-IDENTIFIED-CREDIT1. The broader full goal remains active.
+
+M2-IDENTIFIED-CREDIT1 Node selection before artifacts: approve NEW
+node/src/recovery/credit.rs and tests/snapshot_recovery/credit.rs with private
+test children credit/{fixtures,audit}.rs. No new model/type or dependency is
+needed. Extend existing CommittedRecoveryLimits with optional (actual expected
+shard count, CreditLimits), explicit with_identified_credit_limits selector and
+read-only getter; old constructors leave it absent. Add the existing
+CreditTransactionError as a distinct CommittedRecoveryError::Credit diagnosis.
+The initial selector only records that opt-in: keep the actual closed header
+and dispatch unchanged until all new healthy Node cases compile and genuinely
+fail, then save their exact bytes/logs before implementation.
+
+After that saved RED, add credit_recovery_header in existing ports credit files
+using the existing borrowed header scanner; this recognizes operation10/intent12
+only through explicit Node opt-in. Generic headers remain closed. Add
+RedbStateTransaction::require_identified_credit in the existing storage credit
+module: a checked actual manifest observation returns its immutable shard count,
+never infers capability from owner/ID rows. Initial/final Node observations must
+compare it to the selected server count even for empty cohorts. Historical
+audit fully prepares every body, checks selected immutable shard count, digest,
+scope, fields and EOF; it must not apply current owner/policy guards. Replay
+uses the same actual atomic credit driver, preserving whole original outcomes.
+
+Admit option metadata, simultaneous original log-entry owner, verified prepared
+owner, scope conversion and actual driver W. Bound whole-call pure work by
+checked points * selected max_work; audit prospectively admits a conservative
+32E+65536+16384*min(batch_limit,1000) work cohort before decoding, including
+bounded duplicate comparisons. This is a logical ceiling, not measured CPU or
+RSS. Preserve every legacy None path and keep400/600, function100, nesting4,
+cognitive25. Tests cover complete historical audit, actual sparse replay with
+opaque uncommitted tail, original retained replies, explicit opt-in/capability/
+resource refusal, real purge and received-snapshot suffix recovery. No public
+Claim/service or source-profile acceptance is inferred from these Node cases.
+
+Node genuine RED before implementation: the actual snapshot_recovery target
+compiles and runs all4 new credit cases,0pass/4fail/0ignored/80older filtered.
+Each healthy opted-in path stops at UnsupportedEntry (snapshot wraps Recovery);
+all later body/cap/budget/received/purged assertions are masked at R0. Strict
+focused Clippy and the actual-workspace architecture case pass. One pre-runtime
+Clippy similar-name correction renamed the test candidate; no behavioral body
+or limit was changed. Exact6 source/4 test-file bindings and logs are saved in
+/private/tmp/ferricstore2-identified-credit-node-genuine-r0.json. Save this RED
+before adding borrowed header selection, actual capability observation and
+credit audit/replay bodies. No new source parity or OS claim.

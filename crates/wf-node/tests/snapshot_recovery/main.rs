@@ -6,6 +6,7 @@ mod advance;
 mod atomic_start;
 mod claim;
 mod core_policy;
+mod credit;
 #[path = "../../../wf-storage/tests/state_store/faults/backend.rs"]
 mod disk_backend;
 mod faults;
