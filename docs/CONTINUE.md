@@ -2,6 +2,14 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
+Work in progress on codex/step-changes-solo: M2-STEP-CHANGES1 adds three actual
+transaction-coherence cases and exact pure-home effect probes. Strict focused
+Clippy passes; actual runtime is0pass/3fail at healthy GroupApplyChanges::new
+InvalidChanges. The architecture probe also genuinely fails at the new home's
+missing std::fs diagnosis. Constructor/classifier bodies are still unchanged and
+the proposed validator is absent. Later scenario tails remain masked. See
+`/private/tmp/ferricstore2-step-changes-genuine-r0.json`; primary stays at70a57f4.
+
 The codex/history-core-snapshot checkpoint implements private FWHS1 with the
 complete represented FWSR2 postimage and FWSH2 event; older v1 codecs stay closed.
 Six genuine compiled refusals were saved in9466fd1 before the bodies. All six

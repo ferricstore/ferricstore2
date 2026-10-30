@@ -57336,3 +57336,58 @@ modes1/5/6/7. GroupApplyChanges rejects Fresh intent10. These are real successor
 integration points, not reasons to relax old codecs or infer missing history.
 Actual captured companions, original attributes and independent native/profile/
 Linux coverage remain mandatory. No successor artifact is created by this review.
+
+## M2-STEP-CHANGES1 — solo selection before artifacts
+
+The locally adopted predecessor is70a57f4 with all12 gates/1300 cases and both
+clean frozen trees. Preserve the full product objective and old format closure.
+Select the missing pure coherence check at existing GroupApplyChanges::new
+before actual physical publication. This is a required guard in the eventual
+consumed writer, not a substitute for that writer or full source acceptance.
+
+BEFORE implementation approve new tests/step_continue_apply/coherence.rs and its
+single module declaration in the existing main.rs. Reuse actual existing
+Create/Claim/Step/retained fixtures and APIs, with no new model or public test
+constructor. Three saved cases must first reach a healthy existing constructor
+and then exercise accepted optional payload/record/history/order/outcome/control
+units plus crossed predecessor/scope refusal; actual stale/FIFO rejection with
+no business effects; and replay/conflict/expiry/exact-log classifications using
+the original outcome without current authority. Old six cases remain intact.
+The current constructor's InvalidChanges refusal is the intended behavioral RED.
+
+BEFORE classification add exact pure-home probes for
+state::transaction::step_continue and its nested namespace, and an effectful
+step_continue_backend neighbor probe, in existing state_values.rs. Save the
+actual failing effect probe separately; no unexecuted probe is called RED.
+
+AFTER saved compiled RED approve private wf-ports/src/state/transaction/
+step_continue.rs and a single intent10 Fresh branch plus module declaration in
+existing transaction.rs. Its validate function checks same scope, intent10/
+response9, full original log/time against the given ControlPlan, and Accepted1
+or IndexedRejected/no-count against the actual IndexedDecision. Reuse existing
+step_continue_retained_summary and step_continue_response_matches with hard
+structural AdmissionLimits ceilings; this grants no actual transaction-budget
+payment. Both scan/compare helpers borrow response data; no new variable owner,
+clone, capability flag, dependency or effect is added. Preserve the complete
+former constructor specialization by removing only the guarded new branch.
+Leave the existing atomic-start/independent validators entirely unchanged.
+
+AFTER saved architecture RED add only the exact pure namespace to existing
+source/purity.rs. It includes descendants; the backend neighbor remains effectful.
+Keep400/600/100/4/25. Update ADR007/handoff after real validation. Normal storage,
+FWSO intent10, manifest upgrade, value companions, queries, faults/reopen and
+recovery remain required successors, including captured rich/source metadata.
+Root reviews solo; no independent-review, native/Linux, source-credit or completed
+milestone claim. No agents, push or original-source modifications are authorized.
+
+M2-STEP-CHANGES1 genuine R0: strict focused Clippy actually exits0. Compiled
+runtime exits101 with0pass/3fail/0ignored/6filtered; all three stop at the first
+healthy GroupApplyChanges::new returning InvalidChanges. Later accepted/rejected/
+replay/guard tails are masked. The exact architecture case separately exits101
+with0pass/1fail/44filtered: wf-ports::state::transaction::step_continue does not
+reject std::fs before classification. Both old constructor and classifier are
+entirely hash-identical to70a57f4; the new production validator is absent. Save
+these tests/probes before any body or classification change. Receipt and full
+logs are /private/tmp/ferricstore2-step-changes-{genuine-r0,r0-tests,r0-architecture,
+r0-clippy}.{json,log} as appropriate. This establishes no store/publication,
+source-case, profile or platform acceptance.

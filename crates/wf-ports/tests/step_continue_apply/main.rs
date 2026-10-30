@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+mod coherence;
 mod fixtures;
 mod fresh;
 mod limits;
