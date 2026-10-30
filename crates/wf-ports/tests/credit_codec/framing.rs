@@ -90,3 +90,136 @@ fn credit_reply_independent_not_found_vector_has_explicit_absence_and_eof() -> T
     assert!(decode_credit_reply(&bytes, CreditLimits::default(), 1024, 1).is_err());
     Ok(())
 }
+
+fn independent_owner(leased: bool) -> Vec<u8> {
+    let mut bytes = b"FWGO\0\x01\0\0\0\x01x".to_vec();
+    for n in if leased {
+        [3_u64, 0, 1, 1]
+    } else {
+        [2, 2, 0, 1]
+    } {
+        bytes.extend_from_slice(&n.to_be_bytes());
+    }
+    bytes.push(0);
+    bytes.extend_from_slice(&1_u64.to_be_bytes());
+    bytes.extend_from_slice(&0_u64.to_be_bytes());
+    bytes.extend_from_slice(&u32::from(leased).to_be_bytes());
+    if leased {
+        for n in [0_u64, 1, 2000, 1, 2, 0, 0] {
+            bytes.extend_from_slice(&n.to_be_bytes());
+        }
+        bytes.push(1);
+        bytes.extend_from_slice(&1001_u64.to_be_bytes());
+        bytes.extend_from_slice(&1_u16.to_be_bytes());
+        bytes.extend_from_slice(&2_u16.to_be_bytes());
+    }
+    bytes
+}
+
+#[test]
+fn credit_owner_independent_empty_literal_preserves_capacity_and_refuses_tampering() -> TestResult {
+    let bytes = independent_owner(false);
+    assert_eq!(bytes.len(), 64);
+    let owner = wf_ports::log::decode_credit_owner(&bytes, CreditLimits::default(), 1024, 4096)?;
+    assert_eq!(
+        (
+            owner.view().scope.as_slice(),
+            owner.view().limit,
+            owner.view().free
+        ),
+        (b"x".as_slice(), 2, 2)
+    );
+    assert_eq!((owner.view().epoch, owner.view().config_version), (0, 1));
+    assert_eq!(
+        wf_ports::log::encode_credit_owner(&owner, 1024, 4096)?,
+        bytes
+    );
+    for end in 0..bytes.len() {
+        assert!(
+            wf_ports::log::decode_credit_owner(&bytes[..end], CreditLimits::default(), 1024, 4096)
+                .is_err()
+        );
+    }
+    let mut wrong = bytes.clone();
+    wrong[19..27].copy_from_slice(&1_u64.to_be_bytes());
+    assert!(
+        wf_ports::log::decode_credit_owner(&wrong, CreditLimits::default(), 1024, 4096).is_err()
+    );
+    let mut trailing = bytes.clone();
+    trailing.push(0);
+    assert!(
+        wf_ports::log::decode_credit_owner(&trailing, CreditLimits::default(), 1024, 4096).is_err()
+    );
+    assert!(wf_ports::log::decode_credit_owner(&bytes, CreditLimits::default(), 63, 4096).is_err());
+    assert!(wf_ports::log::decode_credit_owner(&bytes, CreditLimits::default(), 1024, 1).is_err());
+    Ok(())
+}
+
+#[test]
+fn credit_reply_independent_detached_lease_preserves_original_binary_id_order() -> TestResult {
+    let owner = independent_owner(true);
+    assert_eq!(owner.len(), 133);
+    let mut bytes = b"FWGR\0\x01\x02".to_vec();
+    bytes.extend_from_slice(&0_u64.to_be_bytes());
+    bytes.push(1);
+    bytes.extend_from_slice(&133_u32.to_be_bytes());
+    bytes.extend_from_slice(&owner);
+    bytes.extend_from_slice(&2_u32.to_be_bytes());
+    for id in [b"\0a", b"\xffb"] {
+        bytes.extend_from_slice(&2_u32.to_be_bytes());
+        bytes.extend_from_slice(id);
+    }
+    assert_eq!(bytes.len(), 169);
+    let reply = decode_credit_reply(&bytes, CreditLimits::default(), 1024, 16_384)?;
+    assert_eq!(
+        reply.decision,
+        IdentifiedCreditDecision::Spent { shard_id: 0 }
+    );
+    assert_eq!(
+        reply.reservation_ids,
+        vec![b"\0a".to_vec(), b"\xffb".to_vec()]
+    );
+    let lease = reply
+        .owner
+        .as_ref()
+        .ok_or("missing owner")?
+        .lease(0)
+        .ok_or("missing lease")?;
+    assert_eq!(
+        (
+            lease.epoch,
+            lease.expires_at_ms,
+            lease.available,
+            lease.in_use
+        ),
+        (1, 2000, 1, 2)
+    );
+    assert_eq!(
+        (
+            lease.last_spend_at_ms,
+            lease.reservation_page,
+            lease.reservation_page_fill
+        ),
+        (Some(1001), 1, 2)
+    );
+    assert_eq!(lease.reservations.len(), 0);
+    assert_eq!(
+        wf_ports::log::encode_credit_reply(&reply, 1024, 16_384)?,
+        bytes
+    );
+    for end in 0..bytes.len() {
+        assert!(decode_credit_reply(&bytes[..end], CreditLimits::default(), 1024, 16_384).is_err());
+    }
+    for (at, value) in [(72, 0_u64), (104, 2), (112, f64::MAX.to_bits())] {
+        let mut wrong = owner.clone();
+        wrong[at..at + 8].copy_from_slice(&value.to_be_bytes());
+        assert!(
+            wf_ports::log::decode_credit_owner(&wrong, CreditLimits::default(), 1024, 16_384)
+                .is_err()
+        );
+    }
+    let mut duplicate = bytes;
+    duplicate[167..169].copy_from_slice(b"\0a");
+    assert!(decode_credit_reply(&duplicate, CreditLimits::default(), 1024, 16_384).is_err());
+    Ok(())
+}

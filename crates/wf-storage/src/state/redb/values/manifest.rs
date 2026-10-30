@@ -20,6 +20,7 @@ pub(crate) struct ValueManifest {
     pub(in crate::state::redb) policy: CurrentPolicyManifest,
     pub(crate) defaults: WorkflowValueDefaults,
     pub(crate) alias_format: u16,
+    pub(crate) credit_shard_count: Option<u64>,
 }
 
 pub(crate) fn read(tx: &RedbStateTransaction<'_>) -> Result<ValueManifest, Error> {
@@ -87,6 +88,20 @@ pub(crate) fn parse(
         .try_into()
         .map_err(|_| Error::Corrupt)?;
     let defaults = WorkflowValueDefaults::from_bytes(raw).map_err(|_| Error::Corrupt)?;
+    let credit_shard_count = match bytes.len().checked_sub(at) {
+        Some(32) => None,
+        Some(42) if layout == 8 && alias_format == 2 => {
+            if value::read_u16(bytes, &mut at).map_err(value_error)? != 1 {
+                return Err(Error::UnsupportedPolicyProfile);
+            }
+            let count = value::read_u64(bytes, &mut at).map_err(value_error)?;
+            if count == 0 || count > wf_domain::workflow::MAX_EXACT_MILLIS {
+                return Err(Error::Corrupt);
+            }
+            Some(count)
+        }
+        _ => return Err(Error::Corrupt),
+    };
     let checksum = Sha256::digest(&bytes[..at]);
     if value::take(bytes, &mut at, 32).map_err(value_error)? != checksum.as_slice() {
         return Err(Error::Corrupt);
@@ -103,6 +118,7 @@ pub(crate) fn parse(
         },
         defaults,
         alias_format,
+        credit_shard_count,
     })
 }
 
@@ -112,7 +128,7 @@ pub(crate) fn encode(
     recovery: &RecoveryId,
     maximum: usize,
 ) -> Result<Vec<u8>, Error> {
-    let size = total(208, [group.as_bytes().len(), recovery.as_bytes().len()])?;
+    let size = encoded_size(manifest, group, recovery)?;
     if size > maximum {
         return Err(Error::Limit);
     }
@@ -148,6 +164,10 @@ pub(crate) fn encode(
     bytes.extend_from_slice(&u32::from(manifest.alias_format).to_be_bytes());
     bytes.extend_from_slice(&1_u32.to_be_bytes());
     bytes.extend_from_slice(&defaults);
+    if let Some(count) = manifest.credit_shard_count {
+        bytes.extend_from_slice(&1_u16.to_be_bytes());
+        bytes.extend_from_slice(&count.to_be_bytes());
+    }
     let checksum = Sha256::digest(&bytes);
     bytes.extend_from_slice(&checksum);
     if bytes.len() != size {
@@ -157,10 +177,7 @@ pub(crate) fn encode(
 }
 
 pub(crate) fn publish(tx: &RedbStateTransaction<'_>, manifest: ValueManifest) -> Result<(), Error> {
-    let size = total(
-        208,
-        [tx.group.as_bytes().len(), tx.recovery.as_bytes().len()],
-    )?;
+    let size = encoded_size(manifest, tx.group, tx.recovery)?;
     tx.temporary(size)?;
     let bytes = encode(manifest, tx.group, tx.recovery, size)?;
     super::super::admission::engine_pair(8, bytes.len())?;
@@ -174,4 +191,31 @@ pub(crate) fn publish(tx: &RedbStateTransaction<'_>, manifest: ValueManifest) ->
         .insert(b"manifest".as_slice(), bytes.as_slice())
         .map_err(|e| storage_error(&e))?;
     Ok(())
+}
+
+fn encoded_size(
+    manifest: ValueManifest,
+    group: &GroupId,
+    recovery: &RecoveryId,
+) -> Result<usize, Error> {
+    if manifest.credit_shard_count.is_some_and(|count| {
+        count == 0
+            || count > wf_domain::workflow::MAX_EXACT_MILLIS
+            || manifest.layout != 8
+            || manifest.alias_format != 2
+    }) {
+        return Err(Error::InvalidChanges);
+    }
+    total(
+        208,
+        [
+            group.as_bytes().len(),
+            recovery.as_bytes().len(),
+            if manifest.credit_shard_count.is_some() {
+                10
+            } else {
+                0
+            },
+        ],
+    )
 }

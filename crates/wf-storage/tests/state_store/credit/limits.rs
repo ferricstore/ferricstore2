@@ -203,3 +203,47 @@ fn credit_store_uncertain_commit_fences_and_reopens_a_complete_old_or_new_cohort
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn credit_store_actual_shard_count_mismatch_is_an_authority_error() -> TestResult {
+    let dir = common::directory("credit-actual-count")?;
+    let path = dir.join("state");
+    drop(f::create(&path)?);
+    let scope = common::scope()?;
+    let frame = encode_credit_request(
+        &scope,
+        &wf_types::identity::RequestId::new(b"mismatch".to_vec())?,
+        common::clock(1000)?,
+        IdentifiedCreditRequest {
+            scope: b"global",
+            shard_count: 8,
+            configuration: Some(f::config(1, 1)),
+            mutation: Mutation::Lease {
+                shard_id: 7,
+                amount: 1,
+                ttl_ms: 1000,
+            },
+        },
+        common::driver_limits().codec,
+        16 * common::MIB,
+    )?;
+    let before = f::cohort(&path)?;
+    let mut store = common::open(&path)?;
+    assert!(matches!(
+        apply_credit_transaction(
+            &mut store,
+            &scope,
+            frame.as_bytes(),
+            common::log(0),
+            common::driver_limits(),
+            CreditLimits::default()
+        ),
+        Err(CreditTransactionError::State(
+            StateTransactionError::InvalidChanges
+        ))
+    ));
+    drop(store);
+    assert_eq!(f::cohort(&path)?, before);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

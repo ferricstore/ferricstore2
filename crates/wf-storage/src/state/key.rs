@@ -5,9 +5,11 @@ use wf_types::version::TimestampMillis;
 
 use super::value::{StateValueError, add, allocate, read_u8, start};
 
+mod credit;
 mod ordered;
 mod physical;
 mod point;
+pub(crate) use credit::encode_credit_owner_key;
 mod workflow_values;
 
 pub(crate) use physical::{DecodedStateKey, decode_state_key};
@@ -120,7 +122,7 @@ pub(super) fn key_start(
     length: usize,
     maximum: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if family > 7 && ![8, 9, 10, 11].contains(&family) {
+    if family > 7 && ![8, 9, 10, 11, 12].contains(&family) {
         return Err(StateValueError::UnsupportedTag);
     }
     if length < 7 {

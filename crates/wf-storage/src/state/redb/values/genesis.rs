@@ -22,8 +22,33 @@ pub(super) fn create(
     limits: StateStoreLimits,
     alias_format: u16,
 ) -> Result<RedbStateStore, Error> {
-    if !matches!(alias_format, 1 | 2) {
+    create_profile(
+        database,
+        group,
+        recovery,
+        genesis,
+        defaults,
+        limits,
+        (alias_format, None),
+    )
+}
+
+pub(in crate::state::redb) fn create_profile(
+    database: redb::Database,
+    group: GroupId,
+    recovery: RecoveryId,
+    genesis: StateStoreGenesis<'_>,
+    defaults: WorkflowValueDefaults,
+    limits: StateStoreLimits,
+    capability: (u16, Option<u64>),
+) -> Result<RedbStateStore, Error> {
+    if !matches!(capability.0, 1 | 2) {
         return Err(Error::UnsupportedPolicyProfile);
+    }
+    if capability.1.is_some_and(|count| {
+        count == 0 || count > wf_domain::workflow::MAX_EXACT_MILLIS || capability.0 != 2
+    }) {
+        return Err(Error::InvalidChanges);
     }
     defaults.to_bytes().map_err(|_| Error::InvalidChanges)?;
     let scratch = bootstrap::admit(&group, &recovery, &genesis, limits)?;
@@ -31,10 +56,13 @@ pub(super) fn create(
         &group,
         &recovery,
         limits,
-        admission::total(scratch, [additional(&group, &recovery)?])?,
+        admission::total(
+            scratch,
+            [additional(&group, &recovery, capability.1.is_some())?],
+        )?,
     )?;
     let store = RedbStateStore::unvalidated(database, group, recovery, limits);
-    initialize(&store, &genesis, defaults, scratch, alias_format)?;
+    initialize(&store, &genesis, defaults, scratch, capability)?;
     Ok(store)
 }
 
@@ -43,7 +71,7 @@ fn initialize(
     genesis: &StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     scratch: usize,
-    alias_format: u16,
+    capability: (u16, Option<u64>),
 ) -> Result<(), Error> {
     let mut tx = store.transaction(
         false,
@@ -55,7 +83,11 @@ fn initialize(
     bootstrap::ensure_empty(&tx.write)?;
     tx.temporary(admission::total(
         scratch,
-        [additional(&store.group, &store.recovery)?],
+        [additional(
+            &store.group,
+            &store.recovery,
+            capability.1.is_some(),
+        )?],
     )?)?;
     let genesis_hash = bootstrap::write_genesis_rows(&tx, genesis)?;
     let origin_size = admission::total(
@@ -69,8 +101,9 @@ fn initialize(
     let origin = bootstrap::manifest(store, genesis, genesis_hash, origin_size)?;
     let current_hash = current_hash(&tx)?;
     let current = ValueManifest {
-        layout: 7,
-        alias_format,
+        layout: if capability.1.is_some() { 8 } else { 7 },
+        alias_format: capability.0,
+        credit_shard_count: capability.1,
         policy: CurrentPolicyManifest {
             initial_time: genesis.initial_time,
             placements: u64::try_from(genesis.placements.len()).map_err(|_| Error::Limit)?,
@@ -89,18 +122,18 @@ fn initialize(
     drop(table);
     manifest::publish(&tx, current)?;
     membership::write(&tx, None, None)?;
-    tx.layout = 7;
+    tx.layout = current.layout;
     snapshot::initialize(&tx)?;
     let saved_layout = tx.committed_layout;
     tx.write
         .set_durability(Durability::Immediate)
         .map_err(|_| Error::Unavailable)?;
     tx.write.commit().map_err(|_| Error::Uncertain)?;
-    saved_layout.set(7);
+    saved_layout.set(current.layout);
     Ok(())
 }
 
-fn additional(group: &GroupId, recovery: &RecoveryId) -> Result<usize, Error> {
+fn additional(group: &GroupId, recovery: &RecoveryId, credit: bool) -> Result<usize, Error> {
     admission::total(
         size_of::<ValueManifest>(),
         [
@@ -110,7 +143,14 @@ fn additional(group: &GroupId, recovery: &RecoveryId) -> Result<usize, Error> {
             60,
             32,
             admission::total(108, [group.as_bytes().len(), recovery.as_bytes().len()])?,
-            admission::total(208, [group.as_bytes().len(), recovery.as_bytes().len()])?,
+            admission::total(
+                208,
+                [
+                    group.as_bytes().len(),
+                    recovery.as_bytes().len(),
+                    if credit { 10 } else { 0 },
+                ],
+            )?,
         ],
     )
 }

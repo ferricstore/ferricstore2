@@ -14,7 +14,7 @@ use super::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
 
 pub(crate) mod binding;
 pub(crate) mod budget;
-mod genesis;
+pub(in crate::state::redb) mod genesis;
 pub(crate) mod manifest;
 pub(crate) mod read;
 pub(crate) mod validate;

@@ -1,8 +1,30 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
+Updated: 2026-10-31. The user resumed the unfinished full-completion goal.
 
-Current worktree: codex/identified-credit-solo, starting M2-IDENTIFIED-CREDIT1.
+Current worktree: codex/identified-credit-solo, M2-IDENTIFIED-CREDIT1 in progress.
+Rejecting contracts and 14 actual behavior failures were saved in f5bbfbe before
+bodies. The branch now implements fresh credit-capable layout8/alias2 genesis,
+checksummed capability/shard-count metadata, neutral bounded request/owner/reply
+carriers and an exact scoped point reader. Four codec controls pass; the two
+extra owner literals are post-implementation correctness evidence. An extra
+empty-capable reopen/read control passes without mutating tables. Current credit
+storage tests are 2 pass / 12 fail: the actual transaction driver still returns
+UnsupportedLayout. One passing negative case overlaps that refusal; it does not
+prove actual shard-count validation. A separate typed actual-count regression
+genuinely fails before driver implementation and has its own saved RED receipt.
+
+Strict focused Clippy and all 54 architecture cases pass. The 7 existing stored
+publication and 6 stored Step cases also pass after the manifest change. All
+eight saved R0 test sources preserve their original bodies; five stay whole-file
+exact and three append additional controls. No full workspace acceptance, new
+source-parity credit or durable owner success is claimed. The main checkout
+stays at the prior adopted green db1c3c9; this unfinished branch is not adopted.
+See `/private/tmp/ferricstore2-identified-credit-` genuine-r0, authority-genuine-r0,
+current-* logs and body-progress JSON evidence. Continue the real stored path:
+full verified request preparation, staged pure identified decisions, actual
+owner/ID/page/cleanup publication, retained outcomes and Node replay/snapshots.
+
 The completed code checkpoint is 728650f, M1-CREDIT-OWNER1. The pure governing
 credit reducer now executes configuration, partial grants, identified/anonymous
 compatibility spends, renewal, sibling-safe release and expiry without cloning
@@ -49,10 +71,10 @@ after full release, and compares a spend's expected epoch after retirement.
 Serializing the pure helper's live-ID map as an owner blob would lose those
 semantics and require loading historical IDs for a bounded spend. The concrete
 source review and batch exits are recorded under M2-IDENTIFIED-CREDIT1 in the
-coordination document. No new production artifact/type has been created for
-that batch yet. Select its exact port/entry/storage/recovery contracts and
-tests before creation, then implement the real atomic stored path; a codec or
-pure helper alone does not complete it.
+coordination document. Concrete initial and refined artifact selections precede
+the current code. Select further port/storage/recovery artifacts and types
+before creation; the real atomic stored path is still required. Codec or pure
+helper success alone does not complete this batch.
 
 Previous checkpoint: codex/stored-step-solo, M2-STORED-STEP1. Explicit stored Step
 intent 11 now shares the existing Step reducer, response 9 and consumed format 8

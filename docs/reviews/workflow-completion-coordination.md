@@ -58592,3 +58592,103 @@ fault, snapshot and malformed-vector tails are masked, not certified. Strict
 focused Clippy and all54 architecture cases pass. Two fixture type-coercion
 repairs and byte/assert/pattern style repairs preceded this runtime; none are
 behavioral bug RED. Save these exact tests/rejecting contracts before bodies.
+
+M2-IDENTIFIED-CREDIT1 genesis body refinement before edits: extend the existing
+ValueManifest with credit_shard_count:Option<u64>, validated only for layout8 /
+alias2. Its encoder/publisher must prospectively include the optional10 bytes;
+None preserves original wire bytes. Extend existing values/genesis.rs through
+one shared initialization function taking (alias_format,credit_shard_count),
+called by the new credit constructor and the unchanged old constructor. Compare
+credit capability/count in existing snapshot/validate.rs. Reuse existing
+provenance struct updates so policy publication retains the capability. No new
+file/type/dependency is needed. Existing struct-size-based ownership accounting
+must include the actual extended manifest; later full gates must verify the
+unchanged original profiles. This only opens a correctly empty capable genesis;
+all14 behavior cases and the full atomic owner batch remain mandatory.
+
+M2-IDENTIFIED-CREDIT1 request encoder refinement before artifacts: approve NEW
+ports/log/credit/{encode,admission}.rs, with no new type. Reuse the existing
+checked Writer and PreparedBytes. Validate bounded scalars, deadlines, exact
+ID count/nonempty/256-byte/uniqueness and actual shard range before emitting.
+Measure first, allocate one final frame, hash its exact body into the reserved
+intent field and then hash the full prepared bytes. A fallibly reserved vector
+of borrowed ID slices is sorted only for duplicate detection; original ID/payload
+owners and wire order stay untouched. Admit descriptor and final-frame peaks
+before allocation. The hard1000/256 bounds keep comparison work finite.
+Rust's primary slice documentation confirms sort_unstable sorts in place with
+no sorting allocation and worst-case n log n comparisons:
+https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable.
+The current docs are1.99.1, workspace toolchain1.99.0; no native timing/RSS or
+relative-speed claim is made. The decoder, semantic owner protocol and real
+consumed writer remain required; encoder GREEN cannot complete this batch.
+
+M2-IDENTIFIED-CREDIT1 response refinement before artifacts: approve NEW
+ports/log/credit/{owner,response,status}.rs and private ScannedCreditOwner /
+ScannedCreditReply types. They perform borrowed full-grammar/EOF inspection
+before materializing actual owner/ID payloads. Export encode_credit_owner,
+decode_credit_owner and encode_credit_reply as neutral bounded private carriers
+for the storage adapter, not public API/state authority. FWGO1 stores scope,
+limit/free/epoch/config_version, optional32-byte fingerprint, cleanup head/tail,
+counted ascending leases; lease fields are shard/epoch/expiry/available/in_use/
+pending/drain bits, optional last spend and u16 page/fill. Embedded IDs are
+forbidden. Enforce the900000-byte metadata cap and complete canonical scalars/
+capacity/page invariants. Allocate descriptor buffers and final owners fallibly,
+with complete logical peaks admitted before ownership; preserve original ID order.
+
+FWGR1 decisions1/2/3 carry shard u64;4/5 carry no extra scalar;6 carries deleted
+u16 and pending boolean. Rejection255 carries1 NotFound/2 ConfigurationRequired/
+3 ConfigurationVersionRequired/4 LeaseGenerationChanged/5 ReservationHistoryFull/
+6 CleanupBacklogFull/0 existing credit rejection. Credit rejection tags1 exhausted
+(requested/free/limit u64),2 generation exhausted,3 config conflict,4 IDs mismatch,
+5 overlap,6 backward time,7 expired. Then owner presence plus u32-length FWGO1,
+followed by u32-counted u32-length IDs. Spend requires1..1000 unique IDs and a
+matching actual lease; other decisions require no IDs. Successful owner-bearing
+decisions require a canonical owner; NotFound requires absence. No new dependency,
+storage success, typed public result or completed-batch claim follows.
+
+M2-IDENTIFIED-CREDIT1 exact point-reader refinement before artifacts: approve NEW
+storage/state/key/credit.rs and state/redb/credit/read.rs; no new type. Add only
+family12 key emission now, using existing escaped group/recovery/tenant/scope
+components, with a crate-private encoder. Implement the already selected public
+read_credit_owner on one actual guard, requiring manifest credit capability,
+exact namespace/scope and all lease shards below its captured actual count.
+Pre-admit owner restoration with the conservative bound
+2048+wire_bytes+(wire_bytes/61)*size_of(CreditLeaseData), before decoding;61 is
+the minimum encoded lease footprint. Metadata and key work debit the same guard.
+Narrow resource failures remain Limit; malformed stored data fences as Corrupt.
+An absent point is observed None, never a synthetic owner. This does not write
+an owner, recognize new entry receipts or complete the stored protocol. Add one
+post-implementation empty-capable read control in existing credit/recovery.rs;
+it is extra correctness evidence, not original TDD/source credit.
+
+M2-IDENTIFIED-CREDIT1 current body evidence: request bytes match the independent
+full frame/digest; both original codec controls now pass. Two post-implementation
+controls independently specify64-byte empty /133-byte detached owner and169-byte
+binary-ID response recipes, every truncation, malformed counters/rate, limits
+and duplicate IDs. They pass as additional correctness evidence, not TDD/source
+credit. The point reader also proves empty capable reopen/observed absence with
+the complete cohort unchanged. Strict focused Clippy and all54 architecture
+cases pass. Seven original stored-publication and six stored-Step cases pass
+after the manifest change; full workspace gates await the actual stored path.
+
+The original broad wrong-count negative case currently passes because the
+driver is still unavailable; it proves no actual-count validation. Added a
+separate exact InvalidChanges control before driver implementation. It genuinely
+fails against UnsupportedLayout, with its pre-driver bytes and whole test hash
+saved in authority-genuine-r0.json. Current storage target:2 pass/12 fail, none
+ignored; all original204 cases are filtered from that focused run. The eleven
+stored protocol/recovery cases still stop at the rejecting driver. Five whole
+R0 test sources remain exact; framing/recovery/limits preserve complete R0
+prefixes and append only controls. Source ledger/reference/registration and all
+ceilings remain unchanged. The batch is unfinished and must not be adopted.
+
+Next semantic implementation must use staged pure read/decision phases under
+the same real guard and continuous accounts. Prepare configuration/expiry and
+generation retirement before the spend membership query; all-known IDs precede
+changed TTL/backward-time logic. Check a full history before reading an append
+page (the pinned storage cap regression deliberately supplies only the full
+owner header). Cleanup may consume a newly derived queued task not yet stored;
+distinguish it from an actually missing existing head. Avoid eager page reads
+that would replace a reached source denial with an unrelated missing-page
+failure. Complete canonical recovery and explicit source migration dispositions
+remain required. No new next-phase file/type is approved implicitly here.

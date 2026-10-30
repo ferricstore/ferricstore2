@@ -157,3 +157,26 @@ fn credit_store_capability_downgrade_refuses_rows_and_receipt_only_owners() -> T
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn credit_store_empty_capable_reopen_observes_absence_without_mutating_any_table() -> TestResult {
+    let dir = common::directory("credit-empty-owner")?;
+    let path = dir.join("state");
+    drop(f::create(&path)?);
+    let before = f::cohort(&path)?;
+    let store = common::open(&path)?;
+    assert_eq!(
+        store.read_credit_owner(
+            &common::scope()?,
+            b"global",
+            CreditLimits::default(),
+            1000,
+            64 * common::MIB
+        )?,
+        None
+    );
+    drop(store);
+    assert_eq!(f::cohort(&path)?, before);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

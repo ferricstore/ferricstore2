@@ -23,7 +23,10 @@ pub use record_batch::{encode_stored_step_continue, prepare_stored_step_continue
 mod complete_policy;
 mod control;
 mod credit;
-pub use credit::{decode_credit_reply, encode_credit_request};
+pub use credit::{
+    decode_credit_owner, decode_credit_reply, encode_credit_owner, encode_credit_reply,
+    encode_credit_request,
+};
 mod decode;
 mod encode;
 mod keys;

@@ -7,20 +7,30 @@ use wf_ports::consensus::WorkflowValueDefaults;
 use wf_ports::state::StateTransactionError;
 use wf_types::identity::{GroupId, RecoveryId};
 
+mod read;
+
 impl RedbStateStore {
     /// Creates one atomic empty credit-capable authority with actual shard count.
     /// # Errors
     /// Refuses unsupported capability, input, profile or unproved durability.
     pub fn create_credit_database(
-        _database: redb::Database,
-        _group: GroupId,
-        _recovery: RecoveryId,
-        _genesis: StateStoreGenesis<'_>,
-        _defaults: WorkflowValueDefaults,
-        _shard_count: u64,
-        _limits: StateStoreLimits,
+        database: redb::Database,
+        group: GroupId,
+        recovery: RecoveryId,
+        genesis: StateStoreGenesis<'_>,
+        defaults: WorkflowValueDefaults,
+        shard_count: u64,
+        limits: StateStoreLimits,
     ) -> Result<Self, StateTransactionError> {
-        Err(StateTransactionError::UnsupportedLayout)
+        super::values::genesis::create_profile(
+            database,
+            group,
+            recovery,
+            genesis,
+            defaults,
+            limits,
+            (2, Some(shard_count)),
+        )
     }
 
     /// Reads an exact owner under its own bounded coherent revision.
@@ -29,12 +39,20 @@ impl RedbStateStore {
     /// Refuses unsupported capability, corruption or operational admission.
     pub fn read_credit_owner(
         &self,
-        _scope: &RequestScope,
-        _credit_scope: &[u8],
-        _credit: CreditLimits,
-        _maximum_steps: usize,
-        _maximum_bytes: usize,
+        scope: &RequestScope,
+        credit_scope: &[u8],
+        credit: CreditLimits,
+        maximum_steps: usize,
+        maximum_bytes: usize,
     ) -> Result<Option<CreditOwner>, StateTransactionError> {
-        Err(StateTransactionError::UnsupportedLayout)
+        self.ready()?;
+        let tx = self.transaction(
+            false,
+            self.limits.admission(),
+            maximum_steps,
+            maximum_bytes,
+            self.limits.maximum_temporary_bytes(),
+        )?;
+        tx.checked(|| read::owner(&tx, scope, credit_scope, credit))
     }
 }

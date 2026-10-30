@@ -247,7 +247,10 @@ pub(super) fn value_defaults_compatible(
             .map_err(SnapshotError::State)?;
         let b = super::super::values::manifest::parse(new, tx.group, tx.recovery)
             .map_err(SnapshotError::Stage)?;
-        if a.defaults != b.defaults || a.alias_format != b.alias_format {
+        if a.defaults != b.defaults
+            || a.alias_format != b.alias_format
+            || a.credit_shard_count != b.credit_shard_count
+        {
             return Err(SnapshotError::GenesisMismatch);
         }
     }
