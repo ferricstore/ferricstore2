@@ -949,3 +949,37 @@ This check supplies coherent proposed changes, not consumed storage authority or
 proof of durable success. FWSO intent10 admission, schema negotiation, actual
 record/index/history/value/outcome/control publication, historical rich/source
 companions, inquiry/fault/reopen behavior and recovery remain required.
+
+## Explicit Step retained data
+
+`encode_step_continue_outcome` and `scan_step_continue_outcome` select the
+intent10/response9 data profile through explicit APIs. They reuse unchanged
+FWSO1 framing/emission and the existing borrowed/owned retained types. Generic
+outcome encoders, scanners, policy restoration and normal store/recovery routing
+stay closed to Step; an encoded data value grants no publication capability.
+
+Complete framing/EOF, exact namespace/request, expiry, original full log/time,
+reply status/count and the whole Step response are validated before any variable
+owner. The encoder compares the derived status with the supplied typed receipt.
+The caller's actual AdmissionLimits constrain reply fields/bytes independently
+of the full wire ceiling. Wire exhaustion remains Limit; legitimate narrower
+reply admission remains ProfileLimit. Materialization separately admits512 plus
+each actual tenant/group/recovery/request/response byte through the existing
+fallible owner conversion. Scanning borrows its encoded donor without retaining
+the expected query or allocating response/policy scratch. Encoding reserves one
+output buffer through the unchanged shared emitter.
+
+The three compiled refusals were saved in5d59712 before bodies: two healthy
+encoder calls and one independent-literal scanner call reject UnsupportedVersion.
+Independent accepted266/rejected147-byte vectors frame the already verified
+FWST response and a pure rejected-decision control. Their respective owner bounds
+are676/557. A pre-runtime transcription correction removes one extra digest byte;
+it changes no frozen runtime oracle. Unchanged tails cover complete original
+metadata, owned lifetime, every truncation, context/flag corruption, old-profile
+closure and exact wire/owner/field limits. This is restoration-format evidence,
+not source business-case execution or native/OS acceptance.
+
+Actual negotiated physical schema, full historical context/value companions,
+atomic record/index/history/outcome/control publication, inquiry/fault/reopen and
+recovery remain required. Do not open the generic formats merely because these
+data functions pass; all source/profile/Linux/macOS milestone exits remain open.

@@ -1,31 +1,109 @@
 //! Explicit Step retained data; generic store profiles remain closed.
 
 use wf_domain::workflow::admission::AdmissionLimits;
-use wf_domain::workflow::request::{RequestScope, RetainedOutcome};
+use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedOutcome, RetainedStatus};
+use wf_ports::log::step_continue_retained_summary;
 use wf_types::identity::RequestId;
 
-use super::{ScannedRetainedOutcome, StateValueError};
+use super::{ScannedRetainedOutcome, StateValueError, add, claim_error, encode_fields, with_frame};
 
 /// Encodes one explicitly selected Step receipt under actual captured field caps.
 /// # Errors
-/// Currently refuses every input until the selected tests-first body exists.
+/// Rejects other profiles, inconsistent responses, limits or allocation failure.
 pub fn encode_step_continue_outcome(
-    _outcome: &RetainedOutcome,
-    _maximum_wire_bytes: usize,
-    _admission: AdmissionLimits,
+    outcome: &RetainedOutcome,
+    maximum_wire_bytes: usize,
+    admission: AdmissionLimits,
 ) -> Result<Vec<u8>, StateValueError> {
-    Err(StateValueError::UnsupportedVersion)
+    if maximum_wire_bytes == 0 {
+        return Err(StateValueError::InvalidValue);
+    }
+    let (status, count) = step_continue_retained_summary(
+        outcome.intent(),
+        outcome.response_version(),
+        outcome.response(),
+        outcome.original_position(),
+        outcome.original_time(),
+        admission,
+    )
+    .map_err(claim_error)?;
+    validate_count(status, count)?;
+    if status != outcome.status() {
+        return Err(StateValueError::InvalidValue);
+    }
+    encode_fields(outcome, maximum_wire_bytes)
 }
 
 /// Scans the entire selected receipt before admitting any materialized owner.
 /// # Errors
-/// Currently refuses every input until the selected tests-first body exists.
+/// Rejects malformed/foreign data, unsupported profiles and captured field limits.
 pub fn scan_step_continue_outcome<'input>(
-    _bytes: &'input [u8],
-    _expected_scope: &RequestScope,
-    _expected_request: &RequestId,
-    _admission: AdmissionLimits,
-    _maximum_wire_bytes: usize,
+    bytes: &'input [u8],
+    expected_scope: &RequestScope,
+    expected_request: &RequestId,
+    admission: AdmissionLimits,
+    maximum_wire_bytes: usize,
 ) -> Result<ScannedRetainedOutcome<'input>, StateValueError> {
-    Err(StateValueError::UnsupportedVersion)
+    with_frame(
+        bytes,
+        maximum_wire_bytes,
+        |fields,
+         intent_version,
+         digest,
+         original_position,
+         original_time,
+         expires_at,
+         response_version| {
+            if intent_version != 10 || response_version != 9 {
+                return Err(StateValueError::UnsupportedVersion);
+            }
+            let [tenant, group, recovery, request, response] = fields;
+            if tenant != expected_scope.tenant().as_bytes()
+                || group != expected_scope.group().as_bytes()
+                || recovery != expected_scope.recovery().as_bytes()
+                || request != expected_request.as_bytes()
+                || expires_at <= original_time
+            {
+                return Err(StateValueError::InvalidValue);
+            }
+            let intent = ClientIntent::step_continue(digest);
+            let (status, response_count) = step_continue_retained_summary(
+                intent,
+                response_version,
+                response,
+                original_position,
+                original_time,
+                admission,
+            )
+            .map_err(claim_error)?;
+            validate_count(status, response_count)?;
+            let mut owned_bytes = 512;
+            for field in fields {
+                add(&mut owned_bytes, field.len())?;
+            }
+            Ok(ScannedRetainedOutcome {
+                tenant,
+                group,
+                recovery,
+                request,
+                response,
+                intent,
+                original_position,
+                original_time,
+                expires_at,
+                response_version,
+                status,
+                limits: admission,
+                owned_bytes,
+                response_count,
+            })
+        },
+    )
+}
+
+fn validate_count(status: RetainedStatus, count: Option<usize>) -> Result<(), StateValueError> {
+    match (status, count) {
+        (RetainedStatus::Accepted, Some(1)) | (RetainedStatus::IndexedRejected(_), None) => Ok(()),
+        _ => Err(StateValueError::InvalidValue),
+    }
 }

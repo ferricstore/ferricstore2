@@ -2,16 +2,27 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Work in progress on codex/step-outcome-solo: M2-STEP-OUTCOME1 selects explicit
-Step-only FWSO data APIs while keeping every generic reader/encoder closed.
-Strict focused Clippy passes. Genuine compiled runtime is0pass/3fail: two first
-healthy encodes and one first healthy independent-literal scan return
-UnsupportedVersion; later tails are masked. Both APIs still reject all inputs.
-Independent266/147-byte recipes are exact after correcting one extra transcribed
-digest byte in each Rust constant before runtime. Four complete old-file inverses
-and1,772 other exact inputs preserve prior bodies. See
-`/private/tmp/ferricstore2-step-outcome-{source-recipes,genuine-r0,inverses}.json`.
-Primary remains at the passing5af060d checkpoint; this feature is intentionally RED.
+The codex/step-outcome-solo checkpoint implements explicit Step-only FWSO data
+APIs while keeping every generic reader/encoder closed. Three genuine compiled
+refusals were saved in5d59712 before bodies: two healthy encodes and one healthy
+independent-literal scan. All three unchanged tails, all21 value cases and all53
+architecture cases pass with strict Clippy. All12 final direct gates pass on
+1,778 frozen inputs/1,189 Rust files, with1,306 cases/113 executable targets.
+Complete Counters preserve every prior1,303 case and every original1,294 identity/
+status/multiplicity, adding12 cases across these three continuation increments.
+Python7 and6 doctests/15 targets pass. Four complete old-file inverses and1,772
+other exact inputs preserve all prior behavior. Five whole R0 sources, including
+the complete test file, remain unchanged. The independent266/147-byte recipes
+are exact; their pre-runtime digest transcription correction changed no saved
+runtime oracle. No threshold, assertion or source credit changed. See
+M2-STEP-OUTCOME1 and
+`/private/tmp/ferricstore2-step-outcome-{source-recipes,genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json`.
+The adopted receipt binds both clean local trees and exact commit; no push.
+Full parity actually exits1. Next select the coupled physical schema/consuming
+upgrade, complete current/history/value/outcome publication, inquiry/fault/reopen
+and snapshot/recovery integration. Do not enable Step by widening old event or
+layout matches alone. Rich source context/attributes, required original profiles
+and independent native/Linux/macOS acceptance remain open; full goal stays active.
 
 The codex/step-changes-solo checkpoint adds pure Step transaction coherence.
 Three genuine constructor refusals and the separate effect-probe failure were
@@ -28,8 +39,8 @@ coherent proposed changes, not durable publication or actual transaction-budget
 payment. See M2-STEP-CHANGES1 and
 `/private/tmp/ferricstore2-step-changes-{genuine-r0,inverses,pipeline,full-identity,full-parity,adopted}.json`.
 The adopted receipt binds both local trees and exact commit. Full parity actually
-exits1; the full goal remains active. Next selected M2-STEP-OUTCOME1 adds explicit
-Step retained data APIs while preserving closed generic storage front doors;
+exits1; the full goal remains active. Its M2-STEP-OUTCOME1 successor now implements
+explicit Step retained data APIs while preserving closed generic storage front doors;
 physical schema, atomic companions/publication, inquiry/fault/reopen and recovery
 remain required. Source/profile/native/Linux requirements are unchanged.
 

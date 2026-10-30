@@ -57474,3 +57474,58 @@ other old inputs are exact. Freeze all six selected sources before bodies. No
 old outcome helper/owner/policy parser or generic store profile changed. Receipt
 and logs: /private/tmp/ferricstore2-step-outcome-{genuine-r0,inverses,r0-tests,
 r0-clippy}.{json,log} as appropriate. No source/native/Linux credit is granted.
+
+M2-STEP-OUTCOME1 solo implementation review: the109-line new child reuses only
+unchanged parent framing/emission and existing Step summary/retained owner.
+Namespace, expiry, original context, count/status and actual captured field caps
+are checked while borrowing, before any owned materialization. The encoder
+compares typed status, then reserves one shared output owner. No temporary
+encoded response, receipt/policy clone, dynamic parser scratch, dependency,
+effect, origin flag or physical profile was added. Generic old front doors stay
+closed. All21 state-value cases, strict focused Clippy and all53 architecture
+cases actually pass. The three saved tests have unchanged complete tails; the
+five whole R0 sources outside the new child remain exact. Full frozen gates,
+identity accounting and final local adoption remain required.
+
+M2-STEP-OUTCOME1 final solo checkpoint: all12 direct gates pass against one frozen
+1,778-input/1,189-Rust tree. All1,306 cases/113 executable targets pass (111 result
+targets plus two unchanged correctness smokes). Complete Counter comparison
+preserves every prior1,303 identity/status/multiplicity, adding exactly the three
+saved cases; a direct cumulative comparison also preserves all original1,294
+cases, adding12 across this continuation. All53 architecture cases, Python7 and
+6 doctests/15 targets pass. Full compiler/strict lint/docs/reference/progress and
+offline audit pass. Four complete old-file inverses recover5af060d, with1,772
+other old inputs exact. Five whole R0 sources remain unchanged, including the
+entire new test file; no saved oracle/assertion/threshold changed. Generic codecs
+and all existing policy/framing/owner bodies remain exact. Full parity actually
+exits1; ledger129/143/589 and runtime5903/4222/1681/1655 stay unchanged with no
+source/native/Linux credit. Receipts: /private/tmp/ferricstore2-step-outcome-
+{inverses,pipeline,full-identity,full-parity,adopted}.json. Adoption rechecks both
+clean local trees and every frozen input; no push or completed-goal claim.
+
+Next coupled storage review, observations only: redb publication, version checks,
+point reads, policy reindex and recovery rows still use the explicit v1 record
+scanner/emitter. History capture/recovery still use FWSH1, and binding_source_fields
+cannot inspect a complete historical postimage. ValueManifest currently publishes
+FWSS7 with immutable defaults/origin and alias format; genesis sets layout only
+after proved Immediate commit. Snapshot custody validates both cohorts, metadata
+inventory, origin, descriptor and complete value closure under that exact layout.
+
+The next schema selection must cover an explicit consuming upgrade, both current
+and historical record dispatch, original value/lifecycle companions, retained
+Step receipt routing, complete snapshot/reopen/recovery closure and exact logical
+read/temporary budgets together. Preserve real legacy unavailability instead of
+backfilling old history from current records. Reduced history queries should
+borrow/validate the full encoded postimage without allocating a discarded core
+owner. Existing old validators/profile modes must retain their specialization.
+Actual accepted/rejected/replayed Step publication and uncertain/fault/reopen,
+snapshot and original Step→Retry→FIFO scenarios need compiled tests-first evidence
+before bodies. Rich original attributes/captured context remain required; the
+current data codecs do not establish them. No new physical layout, capability,
+model, file or module is approved by these observations. Select the complete
+concrete artifact batch/contracts before creation; do not just widen layout tests.
+
+Connected-tool inventory exposes no suitable remote Linux execution surface for
+the unpublished local code; GitHub capabilities here only inspect/retry existing
+runs. No external action was taken. This changes no platform or native-source
+acceptance claim and does not block the meaningful local implementation work.
