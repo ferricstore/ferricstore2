@@ -279,7 +279,7 @@ impl<'scope, 'view> GroupApplyChanges<'scope, 'view> {
                 atomic_start::validate(scope, control, operation, outcome)?;
             }
             RecordBatchApplyDecision::Fresh { operation, outcome }
-                if outcome.intent().version() == 10 =>
+                if matches!(outcome.intent().version(), 10 | 11) =>
             {
                 step_continue::validate(scope, control, operation, outcome)?;
             }

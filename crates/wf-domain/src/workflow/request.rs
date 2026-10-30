@@ -155,6 +155,15 @@ impl ClientIntent {
         }
     }
 
+    /// Selects stored-payload Step identity without verification or authority.
+    #[must_use]
+    pub const fn stored_step_continue(digest: [u8; 32]) -> Self {
+        Self {
+            version: 11,
+            digest,
+        }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

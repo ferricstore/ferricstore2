@@ -2,7 +2,33 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
-Current checkpoint: codex/value-claim-solo, M2-VALUE-CLAIM1. The explicit
+Current worktree: codex/stored-step-solo, M2-STORED-STEP1. Explicit stored Step
+intent 11 now shares the existing Step reducer, response 9 and consumed format 8
+writer, requiring actual alias 2. Plain intent 10 stays binary. All 5 storage,
+2 new codec and 3 Node cases pass; the 8 existing codec cases also pass. A sixth
+storage case verifies that an empty-value stored Step receipt still prevents an
+alias-capability downgrade on reopen. It failed before the guard correction and
+now passes. The original five storage case bodies remain unchanged. The
+durable source trace fb8106cb0cee10e6 preserves typed maps, fresh lease guards,
+history and Retry to the continued logical state. Node audits and replays full
+bodies through snapshots and received/purged suffixes. Rejecting runtime was
+saved in 19b4570 before bodies. All 5 storage tests remain unchanged; 2 of the
+14 saved test files have the explicitly recorded codec-cap / Node setup and
+completed-prefix oracle repairs; the recovery file only appends the supplemental
+regression. All 12 final gates pass after the guard correction on 1,813 frozen
+inputs / 1,224 Rust files, with 1,351 cases / 113 executable targets. Every prior
+1,340 identity, status and multiplicity and all original 1,294 cases are retained.
+All 53 architecture cases, Python 7 and 6 doctests / 15 targets pass. The source
+audit reviews 31 existing inputs, preserves 1,775 others, verifies 11 whole saved
+test files and accounts explicitly for the two corrected files and append-only
+supplement. No production file/model/dependency/layout is added. See the
+M2-STORED-STEP1 record and `/private/tmp/ferricstore2-stored-step-` genuine-r0,
+guard-genuine-r0, source-audit, final-pipeline, full-identity, full-parity and
+adopted JSON receipts. Local adoption checks both clean trees against the tested
+inputs; no push. Full parity actually exits 1 with unchanged source/runtime
+counts. No native/Linux performance or full source-case credit is claimed.
+
+Previous checkpoint: codex/value-claim-solo, M2-VALUE-CLAIM1. The explicit
 format 8 named Claim path now preserves captured values and complete history.
 The durable Create→named Claim→Step→typed Retry→FIFO trace uses original policy
 activation. All 8 storage and 3 Node regressions pass with every saved test file
@@ -20,8 +46,8 @@ checks both trees against the tested inputs; no push.
 
 Product status: still incomplete. The new Claim driver is a trusted-parent
 leaf; the old Claim API still refuses layouts 7/8. Public Claim parent migration,
-governance and automatic reclaim orchestration remain required. Typed Step maps,
-rich captured context/attributes, remaining source operations, accepted consensus
+governance and automatic reclaim orchestration remain required. Public logical
+ingress, rich captured context/attributes, remaining source operations, accepted consensus
 and read barriers, application authorization/submission, HTTP/TCP listeners and
 required native/profile/Linux/macOS validation also remain open. Full parity
 actually exits 1, with unchanged 129/143/589 source and 5903/4222/1681/1655

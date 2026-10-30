@@ -56,7 +56,7 @@ pub(super) fn value_effect(
         Operation::Retry(_) | Operation::RetryWithPolicy(_) => EventKind::Retry,
         Operation::ExtendLease(_) => EventKind::LeaseExtended,
         Operation::Cancel(_) => EventKind::Cancelled,
-        Operation::StepContinue(_) if decoded.request().intent.version() == 10 => {
+        Operation::StepContinue(_) if matches!(decoded.request().intent.version(), 10 | 11) => {
             EventKind::StepContinued
         }
         _ => return Err(E::UnsupportedProfile),
@@ -177,7 +177,7 @@ pub(super) fn validate_effect_entry(
     }
     charge.spend(1)?;
     let version = profile(decoded, charge)?;
-    if !matches!(version, 1 | 5..=7 | 10) {
+    if !matches!(version, 1 | 5..=7 | 10 | 11) {
         return Err(E::UnsupportedProfile);
     }
     charge.spend(1)?;
@@ -186,7 +186,7 @@ pub(super) fn validate_effect_entry(
         .operation
         .mutation_items()
         .ok_or(E::UnsupportedProfile)?;
-    if items.is_empty() || (matches!(version, 1 | 7 | 10) && items.len() != 1) {
+    if items.is_empty() || (matches!(version, 1 | 7 | 10 | 11) && items.len() != 1) {
         return Err(E::UnsupportedProfile);
     }
     charge.spend(1)?;
@@ -198,7 +198,7 @@ pub(super) fn validate_effect_entry(
     {
         return Err(E::UnsupportedProfile);
     }
-    if version == 10 {
+    if matches!(version, 10 | 11) {
         charge.spend(1)?;
         if !matches!(decoded.request().operation, PreparedOperation::Batch(_))
             || !matches!(items[0].command.operation, Operation::StepContinue(_))

@@ -44,10 +44,11 @@ pub(super) fn validate(
     if !matches!(tx.layout, 7 | 8) {
         return Err(Error::UnsupportedLayout);
     }
-    if publication.intent_version == 9 && tx.value_manifest()?.alias_format != 2 {
+    if matches!(publication.intent_version, 9 | 11) && tx.value_manifest()?.alias_format != 2 {
         return Err(Error::UnsupportedPolicyProfile);
     }
-    let step = tx.layout == 8 && publication.intent_version == 10 && publication.mode == 10;
+    let step =
+        tx.layout == 8 && matches!(publication.intent_version, 10 | 11) && publication.mode == 10;
     if !matches!(publication.intent_version, 8 | 9) && !step {
         return Err(Error::InvalidChanges);
     }
@@ -133,7 +134,7 @@ pub(super) fn publish(
                     (
                         index,
                         field.ok_or(Error::InvalidChanges)?,
-                        publication.intent_version == 9,
+                        matches!(publication.intent_version, 9 | 11),
                     ),
                     &mut publication.charge,
                     live,

@@ -109,3 +109,67 @@ fn stored_step_uncertain_sync_fences_and_reopens_complete_old_or_new_cohort() ->
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn stored_step_recovery_requires_stored_capability_without_any_value_rows() -> TestResult {
+    let dir = f::directory("stored-step-empty-capability")?;
+    let path = dir.join("state");
+    let mut store = c::fresh(&path, true)?;
+    c::create(&mut store, b"i", b"queued", (0, 1000, 1000), None)?;
+    let claim = c::phase(b"claim", 1000, b"queued", b"contract-step-worker", 1)?;
+    c::apply(&mut store, &claim, 1)?;
+    let frame = s::frame(None)?;
+    assert_eq!(
+        s::apply(&mut store, &frame, 2)?.status(),
+        RetainedStatus::Accepted
+    );
+    drop(store);
+    let rows = f::raw_rows(&path)?;
+    assert_eq!(
+        rows.keys()
+            .filter(|key| matches!(key.get(6), Some(8 | 9)))
+            .count(),
+        0
+    );
+    downgrade_alias(&path)?;
+    let before = c::cohort(&path)?;
+    let scope = f::scope()?;
+    let opened = RedbStateStore::open(
+        &path,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreLimits::default(),
+    );
+    assert!(
+        matches!(opened, Err(StateTransactionError::Corrupt)),
+        "stored Step receipt requires alias 2 even with no values"
+    );
+    assert_eq!(c::cohort(&path)?, before);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+fn downgrade_alias(path: &std::path::Path) -> TestResult {
+    use sha2::{Digest, Sha256};
+    let scope = f::scope()?;
+    let mut manifest = v::raw_manifest(path)?;
+    let at = 108 + scope.group().as_bytes().len() + scope.recovery().as_bytes().len();
+    assert_eq!(&manifest[at..at + 4], 2_u32.to_be_bytes());
+    manifest[at..at + 4].copy_from_slice(&1_u32.to_be_bytes());
+    let end = manifest.len().checked_sub(32).ok_or("manifest checksum")?;
+    let checksum = Sha256::digest(&manifest[..end]);
+    manifest[end..].copy_from_slice(&checksum);
+    let db = redb::Builder::new().open(path)?;
+    let mut write = db.begin_write()?;
+    write.set_durability(redb::Durability::Immediate)?;
+    {
+        let mut table = write.open_table(f::META)?;
+        assert!(
+            table
+                .insert(b"manifest".as_slice(), manifest.as_slice())?
+                .is_some()
+        );
+    }
+    write.commit()?;
+    Ok(())
+}

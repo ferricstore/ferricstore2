@@ -1765,3 +1765,21 @@ hydration/routing remain required. The coordination record binds the selected
 files/models and genuine saved RED before BODY; the handoff records current
 execution status. The original source mappings, native/Linux/macOS evidence and
 ordered milestone exits remain separate and unfinished.
+
+## Stored-payload Step identity
+
+Intent 11 selects the same singleton Step operation 12 and complete fields as
+intent 10, with stored payload bytes instead of logical binary. Its caller hash
+uses `WF-STEP-CONTINUE\0V11\0`; request identity, leader stamp and item time keep
+the established caller/prepared identity separation. The same borrowed wire
+scan validates all fields, derived keys and EOF before ownership. Independent
+literal vectors verify both the full frame and derived digests. Old Step and
+generic preparation do not select this profile.
+
+The explicit Step response 9, retained inspection, Fresh touched decision and
+provenance validation accept the two distinguished Step intents. Stored-byte
+preparation supplies no successful typed decoding or public submission promise;
+the existing typed decoder retains invalid/context/limit distinctions. There
+is no new payload owner, operation, event, dependency or codec wrapper. This
+selection enables the coupled durable/recovery batch in ADR-007; it is not a
+claim of complete application or original runtime acceptance.

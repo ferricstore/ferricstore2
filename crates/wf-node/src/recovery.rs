@@ -185,7 +185,7 @@ impl CommittedRecoveryLimits {
     }
     fn admit(&self, parts: &[usize]) -> Result<(), CommittedRecoveryError> {
         let mut owned = total(parts)?;
-        if self.step_continue.enabled() {
+        if self.step_continue.enabled() || self.step_continue.stored() {
             owned = total(&[
                 owned,
                 std::mem::size_of::<workflow_values::StepRecoveryProfile>(),

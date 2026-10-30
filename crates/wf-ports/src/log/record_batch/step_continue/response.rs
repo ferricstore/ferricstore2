@@ -1,4 +1,4 @@
-//! Explicit intent10/response9 data grammar, without publication authority.
+//! Explicit binary/stored Step response9 data, without publication authority.
 
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::indexed::IndexedDecision;
@@ -49,7 +49,7 @@ pub(super) fn encode_measured(
     Ok((output.finish()?, status))
 }
 
-/// Scans the complete selected intent10/response9 reply and original context.
+/// Scans the complete selected Step reply and original context.
 /// # Errors
 /// Rejects unsupported association, context mismatch, malformed bytes and caps.
 pub fn step_continue_retained_summary(
@@ -60,7 +60,7 @@ pub fn step_continue_retained_summary(
     time: TimestampMillis,
     limits: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), CodecError> {
-    if intent.version() != 10 || response_version != 9 {
+    if !matches!(intent.version(), 10 | 11) || response_version != 9 {
         return Err(CodecError::UnsupportedVersion);
     }
     scan::summary(response, position, time, limits)

@@ -1108,3 +1108,37 @@ recovery. This advances durable source-sequence conformance; public Claim parent
 orchestration/governance, typed Step maps, rich source context, full original
 profile/native/Linux/macOS and service acceptance remain mandatory. It does not
 certify full source-case execution, native performance or product completion.
+
+## Stored Step publication and recovery
+
+`apply_stored_step_continue_transaction` explicitly selects intent 11 under
+actual format 8 and alias 2. It shares plain Step's retained gate, same-guard
+record/policy/binding/index reads, pure decision and consumed transaction. The
+existing stored emitter writes supplied payload bytes exactly once; omitted
+payload retains its prior reference. Full history, current/history bindings,
+original response and applied control remain one Immediate publication. Plain
+Step continues to wrap wrapper-looking logical binaries. No physical format,
+new owner, key family, record or payload clone is introduced by the selector.
+
+`with_stored_step_continue_limits` selects stored Step independently of plain
+Step and generic stored-value recovery. The existing Step profile enum records
+disabled/plain/stored/both selection. Full-body startup audit, actual writer
+dispatch, prospective profile/workspace admission and whole-call point/body
+budgets carry through snapshot, trusted received and purged-suffix recovery.
+Earlier successful entries remain committed when a later entry is refused.
+
+Actual rejecting runtime 19b4570 precedes bodies. Five unchanged storage cases
+now execute the pinned typed Create/named Claim/Step/stale Complete/Retry trace,
+typed value hydration, exact presence, capability/limit refusal, complete
+snapshots and delegated uncertain commits. Two codec and three Node cases pass
+after the documented two-file fixture/oracle corrections; all eight older codec
+cases pass. This is durable component evidence for source fb8106cb0cee10e6,
+not original native/profile execution or an accepted public workflow service.
+Full workspace and adoption results belong in M2-STORED-STEP1 and the handoff.
+
+Startup cohort validation also requires alias 2 for intent-11 outcomes when no
+value or alias row exists. A supplemental real payload-free Create/Claim/Step
+regression reproduced acceptance of a checksummed alias-only downgrade before
+the existing outcome capability check was extended. It now rejects Corrupt,
+preserving every table. The same manifest/owner admission covers this check in
+live and retained snapshot cohorts; it does not infer capability from row count.

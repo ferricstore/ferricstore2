@@ -100,7 +100,7 @@ fn outcome(
         layout,
     )
     .map_err(value_error)?;
-    if scanned.intent_version() == 9 {
+    if matches!(scanned.intent_version(), 9 | 11) {
         tx.temporary(total(
             scanned.owned_bytes(),
             [

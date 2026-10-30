@@ -17,8 +17,8 @@ pub use claim::{
     inspect_claim_phase_point, prepare_claim_phase,
 };
 mod common;
-pub use common::step_continue_recovery_header;
 pub use common::{CodecError, normal_recovery_header, stored_value_recovery_header};
+pub use common::{step_continue_recovery_header, stored_step_continue_recovery_header};
 pub use record_batch::{encode_stored_step_continue, prepare_stored_step_continue};
 mod complete_policy;
 mod control;
@@ -229,7 +229,7 @@ impl DecodedRequest<'_> {
             {
                 [value.payload.as_deref(), None]
             }
-            Operation::StepContinue(value) if self.request.intent.version() == 10 => {
+            Operation::StepContinue(value) if matches!(self.request.intent.version(), 10 | 11) => {
                 [value.payload.as_deref(), None]
             }
             Operation::StartAndClaim(_) | Operation::StepContinue(_) => return None,

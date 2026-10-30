@@ -103,7 +103,11 @@ fn check_step(
     limits: CodecLimits,
     workspace: usize,
 ) -> Result<(), RecordBatchApplyError> {
-    check_decoded(decoded, limits, workspace, 10)?;
+    let version = decoded.request.intent.version();
+    if !matches!(version, 10 | 11) {
+        return Err(CodecError::UnsupportedVersion.into());
+    }
+    check_decoded(decoded, limits, workspace, version)?;
     let PreparedOperation::Batch(items) = &decoded.request.operation else {
         return Err(CodecError::UnsupportedTag.into());
     };

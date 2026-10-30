@@ -36,7 +36,7 @@ pub(super) fn write(
         writer.raw(bytes, maximum)?;
     }
     writer.raw(input.request, 256)?;
-    writer.u16(10)?;
+    writer.u16(intent.version())?;
     writer.write(intent.digest())?;
     writer.u64(input.stamp.hlc().physical().get())?;
     writer.u16(input.stamp.hlc().logical())?;
@@ -57,12 +57,16 @@ pub(super) fn write(
     writer.optional(input.payload, |writer, bytes| writer.raw(bytes, maximum))
 }
 
-pub(super) fn scan(encoded: &[u8], limits: CodecLimits) -> Result<StepInput<'_>, CodecError> {
+pub(super) fn scan(
+    encoded: &[u8],
+    limits: CodecLimits,
+    version: u16,
+) -> Result<StepInput<'_>, CodecError> {
     if encoded.len() > limits.admission.decision_bytes() {
         return Err(CodecError::ByteLimit);
     }
     let mut reader = Reader::new(encoded, limits);
-    let header = common::singleton_header(&mut reader, 10)?;
+    let header = common::singleton_header(&mut reader, version)?;
     let scope_length = keys::scope_length(header.scope())?;
     if common::count(&mut reader)? != 1 {
         return Err(CodecError::ItemLimit);

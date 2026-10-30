@@ -82,9 +82,13 @@ pub(super) fn variable_bytes(input: &StepInput<'_>) -> Result<usize, CodecError>
     })
 }
 
-pub(super) fn derive(input: &StepInput<'_>) -> Result<ClientIntent, CodecError> {
+pub(super) fn derive(input: &StepInput<'_>, version: u16) -> Result<ClientIntent, CodecError> {
     let mut hash = Sha256::new();
-    hash.update(b"WF-STEP-CONTINUE\0V10\0");
+    hash.update(match version {
+        10 => b"WF-STEP-CONTINUE\0V10\0",
+        11 => b"WF-STEP-CONTINUE\0V11\0",
+        _ => return Err(CodecError::UnsupportedVersion),
+    });
     for bytes in [
         input.scope[0],
         input.scope[1],
@@ -101,7 +105,12 @@ pub(super) fn derive(input: &StepInput<'_>) -> Result<ClientIntent, CodecError> 
     optional(&mut hash, input.worker)?;
     hash.update(input.lease_ms.to_be_bytes());
     optional(&mut hash, input.payload)?;
-    Ok(ClientIntent::step_continue(hash.finalize().into()))
+    let digest = hash.finalize().into();
+    Ok(if version == 11 {
+        ClientIntent::stored_step_continue(digest)
+    } else {
+        ClientIntent::step_continue(digest)
+    })
 }
 
 fn raw(hash: &mut Sha256, bytes: &[u8]) -> Result<(), CodecError> {

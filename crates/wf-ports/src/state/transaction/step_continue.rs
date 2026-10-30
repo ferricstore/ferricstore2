@@ -24,7 +24,7 @@ pub(super) fn validate(
         .ok_or(StateTransactionError::InvalidChanges)?
         .log();
     let time = control.execution_time();
-    if outcome.intent().version() != 10
+    if !matches!(outcome.intent().version(), 10 | 11)
         || outcome.response_version() != 9
         || outcome.scope() != scope
         || outcome.status() != expected_status

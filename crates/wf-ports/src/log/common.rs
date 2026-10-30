@@ -7,7 +7,7 @@ use wf_types::version::{CommittedTime, HlcTimestamp, TimestampMillis};
 
 use super::{CodecLimits, reader::Reader};
 
-// Only the two explicit singleton codecs use this header. Recovery and legacy
+// Only the explicit atomic-start and Step codecs use this header. Recovery and legacy
 // generic preparation retain their independent closed profile allowlists.
 pub(super) fn singleton_header<'input>(
     reader: &mut Reader<'input>,
@@ -32,6 +32,7 @@ pub(super) fn singleton_header<'input>(
     let intent = match expected_intent {
         7 => ClientIntent::atomic_start(reader.fixed()?),
         10 => ClientIntent::step_continue(reader.fixed()?),
+        11 => ClientIntent::stored_step_continue(reader.fixed()?),
         _ => return Err(CodecError::UnsupportedVersion),
     };
     let hlc = HlcTimestamp::new(reader.u64()?, reader.u16()?).map_err(|_| CodecError::Malformed)?;
@@ -55,7 +56,7 @@ pub fn normal_recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
-    recovery_header(encoded, limits, false, false)
+    recovery_header(encoded, limits, false, (false, false))
 }
 
 /// Borrows Normal header facts with explicit stored-value intent9 recognition.
@@ -66,7 +67,7 @@ pub fn stored_value_recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
-    recovery_header(encoded, limits, true, false)
+    recovery_header(encoded, limits, true, (false, false))
 }
 
 /// Borrows header facts with explicit Step and optional stored-value recognition.
@@ -78,14 +79,27 @@ pub fn step_continue_recovery_header(
     limits: CodecLimits,
     stored: bool,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
-    recovery_header(encoded, limits, stored, true)
+    recovery_header(encoded, limits, stored, (true, false))
+}
+
+/// Borrows explicit stored Step headers with separately selected older profiles.
+/// Complete body validation and persistent capability remain mandatory.
+/// # Errors
+/// Refuses unsupported headers, framing and the configured encoded byte cap.
+pub fn stored_step_continue_recovery_header(
+    encoded: &[u8],
+    limits: CodecLimits,
+    stored_values: bool,
+    plain_step: bool,
+) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
+    recovery_header(encoded, limits, stored_values, (plain_step, true))
 }
 
 fn recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
     stored: bool,
-    step: bool,
+    step: (bool, bool),
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
     if encoded.len() > limits.admission().decision_bytes() {
         return Err(CodecError::ByteLimit);
@@ -113,7 +127,8 @@ fn recovery_header(
     let allowed = matches!((version, operation_tag), (1, _) | (5..=7, 1) | (2, 5))
         || (version, operation_tag) == (8, 1)
         || (stored && (version, operation_tag) == (9, 1))
-        || (step && (version, operation_tag) == (10, 1));
+        || (step.0 && (version, operation_tag) == (10, 1))
+        || (step.1 && (version, operation_tag) == (11, 1));
     if !allowed {
         return Err(CodecError::UnsupportedVersion);
     }
@@ -126,6 +141,7 @@ fn recovery_header(
         (1, 8) => 8,
         (1, 9) => 9,
         (1, 10) => 10,
+        (1, 11) => 11,
         (4, 1) => 1,
         (3, 1) => 3,
         (5, 2) => 2,

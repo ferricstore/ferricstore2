@@ -94,13 +94,16 @@ fn stored_step_node_old_opt_ins_and_narrow_caps_preserve_whole_cohort() -> TestR
     let cohort = claim::cohort(&dir)?;
     let rows = f::log_rows(&dir)?;
     let scope = f::scope()?;
+    let expected = claim_prefix(&dir.join("control"))?;
     let old = base()?.with_step_continue_limits(1024, 64 * f::MIB, 64 * f::MIB, 64 * f::MIB)?;
     let (log, state) = f::open_pair(&dir)?;
     assert_eq!(
         recover_committed(log, state, scope.group(), scope.recovery(), old).err(),
         Some(Error::Codec(wf_ports::log::CodecError::UnsupportedVersion))
     );
-    assert_eq!(claim::cohort(&dir)?, cohort);
+    let applied_prefix = claim::cohort(&dir)?;
+    assert_ne!(applied_prefix, cohort);
+    assert_eq!(applied_prefix, expected);
     assert_eq!(f::log_rows(&dir)?, rows);
     for caps in [
         [0, 64 * f::MIB, 64 * f::MIB, 64 * f::MIB],
@@ -118,7 +121,7 @@ fn stored_step_node_old_opt_ins_and_narrow_caps_preserve_whole_cohort() -> TestR
     let narrow = base()?.with_stored_step_continue_limits(1024, 64 * f::MIB, 1, 64 * f::MIB)?;
     let (log, state) = f::open_pair(&dir)?;
     assert!(recover_committed(log, state, scope.group(), scope.recovery(), narrow).is_err());
-    assert_eq!(claim::cohort(&dir)?, cohort);
+    assert_eq!(claim::cohort(&dir)?, applied_prefix);
     assert_eq!(f::log_rows(&dir)?, rows);
     let (log, state) = f::open_pair(&dir)?;
     let (log, mut state) = recover_committed(log, state, scope.group(), scope.recovery(), healthy)?;
@@ -126,6 +129,28 @@ fn stored_step_node_old_opt_ins_and_narrow_caps_preserve_whole_cohort() -> TestR
     drop((log, state));
     std::fs::remove_dir_all(dir)?;
     Ok(())
+}
+
+fn claim_prefix(dir: &Path) -> TestResult<[f::Rows; 6]> {
+    std::fs::create_dir(dir)?;
+    let (log, mut state, frames) = input(dir)?;
+    let scope = f::scope()?;
+    let outcome = wf_storage::transaction::apply_workflow_value_claim_transaction(
+        &mut state,
+        &scope,
+        frames[2].as_bytes(),
+        f::at(2),
+        v::driver(&v::limits()?),
+        ClaimWorkLimits::default(),
+    )?;
+    let wf_storage::transaction::ClaimTransactionOutcome::Retained { control, outcome } = outcome
+    else {
+        return Err("independent Claim prefix".into());
+    };
+    assert_eq!(control.position(), f::at(2).index());
+    assert_eq!(outcome.status(), RetainedStatus::Accepted);
+    drop((log, state));
+    claim::cohort(dir)
 }
 
 #[test]
@@ -222,7 +247,18 @@ fn input(dir: &Path) -> TestResult<(RedbLogStore, RedbStateStore, Vec<PreparedBy
         f::at(1),
         v::driver(&v::limits()?),
     )?;
-    v::accepted(result, 1, 100, 5)?;
+    let wf_storage::transaction::RecordBatchTransactionOutcome::Retained { control, outcome } =
+        result
+    else {
+        return Err("stored Create acceptance".into());
+    };
+    assert_eq!(control.position(), f::at(1).index());
+    assert_eq!(outcome.status(), RetainedStatus::Accepted);
+    assert_eq!(outcome.intent().version(), 9);
+    assert_eq!(outcome.response_version(), 5);
+    assert_eq!(outcome.original_position(), f::at(1));
+    assert_eq!(outcome.original_time().get(), 100);
+    assert_eq!(outcome.response(), [0]);
     let claim = encode_prepared(
         &PreparedRequest {
             scope: f::scope()?,

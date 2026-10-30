@@ -1,4 +1,4 @@
-//! Plain Step joins the actual retained gate and same consumed value/core writer.
+//! Explicit binary/stored Step shares the retained gate and consumed value writer.
 
 use std::mem::size_of;
 use wf_domain::policy::complete::PolicySchemaCharge;
@@ -7,6 +7,7 @@ use wf_domain::workflow::request::gate::PointGateView;
 use wf_ports::consensus::{WorkflowValueItemInput, WorkflowValueTargetGuard};
 use wf_ports::log::{
     FreshRecordBatch, RecordBatchInspection, inspect_step_continue_point, prepare_step_continue,
+    prepare_stored_step_continue,
 };
 use wf_ports::state::{GroupApplyStore, GroupApplyTransaction, StateTransactionError};
 use wf_types::version::LogIdentity;
@@ -26,6 +27,7 @@ pub(super) fn apply(
     encoded: &[u8],
     log: LogIdentity,
     limits: WorkflowValueTransactionLimits,
+    version: u16,
 ) -> Result<RecordBatchTransactionOutcome, Error> {
     let mut charge = ValueCharge::new(
         limits.maximum_value_rows,
@@ -56,7 +58,12 @@ pub(super) fn apply(
             .map_err(storage_error)?,
         )
         .map_err(storage_error)?;
-    let decoded = prepare_step_continue(encoded, limits.record_batch.codec, available)
+    let prepare = if version == 11 {
+        prepare_stored_step_continue
+    } else {
+        prepare_step_continue
+    };
+    let decoded = prepare(encoded, limits.record_batch.codec, available)
         .map_err(|error| record_error(error.into()))?;
     if decoded.request().scope != *scope {
         return Err(Error::InvalidInput);
@@ -79,7 +86,7 @@ pub(super) fn apply(
             storage_error(error)
         }
     })?;
-    if manifest.layout != 8 {
+    if manifest.layout != 8 || (version == 11 && manifest.alias_format != 2) {
         return Err(Error::UnsupportedProfile);
     }
     charge.helper().map_err(storage_error)?;
@@ -105,8 +112,15 @@ pub(super) fn apply(
     .map_err(|error| record_error(error.into()))?;
     match inspection {
         RecordBatchInspection::Complete(result) => {
-            let (control, kind) =
-                commit_complete(tx, scope, predecessor, result, (prepared, 10), 10, charge)?;
+            let (control, kind) = commit_complete(
+                tx,
+                scope,
+                predecessor,
+                result,
+                (prepared, version),
+                10,
+                charge,
+            )?;
             record_batch::complete_reply(control, kind, original).map_err(record_error)
         }
         RecordBatchInspection::Fresh(fresh) => {
@@ -179,7 +193,7 @@ pub(super) fn prepare_fresh(
     let selected = ValueInputs {
         prepared: fresh.decoded().digest(),
         mode: 10,
-        intent_version: 10,
+        intent_version: fresh.decoded().request().intent.version(),
         defaults: tx.value_manifest().map_err(storage_error)?.defaults,
         inputs,
         policies: Vec::new(),

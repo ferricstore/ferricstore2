@@ -33,13 +33,13 @@ pub(crate) use plan::{ValuePublicationPlan, ValueStep};
 /// # Errors
 /// Refuses unsupported capabilities, invalid authority and operational failures.
 pub fn apply_stored_step_continue_transaction(
-    _store: &mut RedbStateStore,
-    _scope: &RequestScope,
-    _encoded: &[u8],
-    _log: LogIdentity,
-    _limits: WorkflowValueTransactionLimits,
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: WorkflowValueTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
-    Err(WorkflowValueTransactionError::UnsupportedProfile)
+    step_continue::apply(store, scope, encoded, log, limits, 11)
 }
 
 /// Applies an explicitly selected Step through the complete-history/value writer.
@@ -52,7 +52,7 @@ pub fn apply_step_continue_transaction(
     log: LogIdentity,
     limits: WorkflowValueTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
-    step_continue::apply(store, scope, encoded, log, limits)
+    step_continue::apply(store, scope, encoded, log, limits, 10)
 }
 
 /// Additional publication ceilings, carried with the existing driver profile.
@@ -203,7 +203,7 @@ fn apply_fresh(
         staging_used,
     };
     admit_decision_work(policy_types, inputs.inputs.len(), &mut charge)?;
-    let (result, ordering) = if fresh.decoded().request().intent.version() == 10 {
+    let (result, ordering) = if matches!(fresh.decoded().request().intent.version(), 10 | 11) {
         (
             observations::decide(fresh, scope, view, limits.record_batch, live)
                 .map_err(record_error)?,
@@ -246,7 +246,7 @@ fn prepare_fresh(
     WorkflowValueTransactionError,
 > {
     charge.helper().map_err(storage_error)?;
-    if fresh.decoded().request().intent.version() == 10 {
+    if matches!(fresh.decoded().request().intent.version(), 10 | 11) {
         return step_continue::prepare_fresh(tx, scope, fresh, limits, schema, charge);
     }
     let mut loaded =

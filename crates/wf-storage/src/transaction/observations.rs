@@ -118,7 +118,7 @@ fn decide_profile<'current>(
             live_bytes,
             limits.outcome_ttl_ms,
         )
-    } else if fresh.decoded().request().intent.version() == 10 {
+    } else if matches!(fresh.decoded().request().intent.version(), 10 | 11) {
         decide_fresh_step_continue_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
     } else if fresh.decoded().request().intent.version() == 7 {
         decide_fresh_atomic_start_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)

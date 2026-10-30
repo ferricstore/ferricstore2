@@ -1,4 +1,4 @@
-//! Explicit singleton intent10 preparation; no apply or durability authority.
+//! Explicit singleton binary/stored Step preparation; no durability authority.
 
 use crate::consensus::PreparedRequest;
 use crate::log::{CodecLimits, DecodedRequest, PreparedBytes, digest, writer::Writer};
@@ -15,22 +15,22 @@ mod wire;
 /// # Errors
 /// Refuses unsupported selection or malformed and over-limit input.
 pub fn encode_stored_step_continue(
-    _request: PreparedRequest,
-    _limits: CodecLimits,
-    _workspace_limit: usize,
+    request: PreparedRequest,
+    limits: CodecLimits,
+    workspace_limit: usize,
 ) -> Result<PreparedBytes, RecordBatchApplyError> {
-    Err(crate::log::CodecError::UnsupportedVersion.into())
+    encode_profile(request, limits, workspace_limit, 11)
 }
 
 /// Validates an explicit stored-payload Step before ownership.
 /// # Errors
 /// Refuses unsupported selection or malformed and over-limit input.
 pub fn prepare_stored_step_continue(
-    _encoded: &[u8],
-    _limits: CodecLimits,
-    _workspace_limit: usize,
+    encoded: &[u8],
+    limits: CodecLimits,
+    workspace_limit: usize,
 ) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
-    Err(crate::log::CodecError::UnsupportedVersion.into())
+    prepare_profile(encoded, limits, workspace_limit, 11)
 }
 
 pub use fresh::{decide_fresh_step_continue_touched, inspect_step_continue_point};
@@ -51,19 +51,28 @@ pub fn encode_step_continue(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<PreparedBytes, RecordBatchApplyError> {
+    encode_profile(request, limits, workspace_limit, 10)
+}
+
+fn encode_profile(
+    request: PreparedRequest,
+    limits: CodecLimits,
+    workspace_limit: usize,
+    version: u16,
+) -> Result<PreparedBytes, RecordBatchApplyError> {
     let input = input::borrow(&request)?;
     let mut measured = Writer::measure(limits.admission.decision_bytes());
-    wire::write(
-        &input,
-        ClientIntent::step_continue([0; 32]),
-        &mut measured,
-        limits,
-    )?;
+    let identity = if version == 11 {
+        ClientIntent::stored_step_continue([0; 32])
+    } else {
+        ClientIntent::step_continue([0; 32])
+    };
+    wire::write(&input, identity, &mut measured, limits)?;
     admit(
         sum(&[input::variable_bytes(&input)?, 2048, measured.len()])?,
         workspace_limit,
     )?;
-    let intent = input::derive(&input)?;
+    let intent = input::derive(&input, version)?;
     let mut output = Writer::allocate(measured.len(), limits.admission.decision_bytes())?;
     wire::write(&input, intent, &mut output, limits)?;
     let bytes = output.finish()?;
@@ -85,9 +94,18 @@ pub fn prepare_step_continue(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
-    let input = wire::scan(encoded, limits)?;
+    prepare_profile(encoded, limits, workspace_limit, 10)
+}
+
+fn prepare_profile(
+    encoded: &[u8],
+    limits: CodecLimits,
+    workspace_limit: usize,
+    version: u16,
+) -> Result<DecodedRequest<'_>, RecordBatchApplyError> {
+    let input = wire::scan(encoded, limits, version)?;
     admit_decoded_request(encoded.len(), 1, limits, workspace_limit)?;
-    let intent = input::derive(&input)?;
+    let intent = input::derive(&input, version)?;
     if input.intent != intent {
         return Err(RecordBatchApplyError::IntentMismatch);
     }

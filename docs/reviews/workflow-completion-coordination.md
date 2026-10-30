@@ -58178,3 +58178,114 @@ repairs corrected error-variant names, explicit non-Error conversions, unsupport
 page equality, unused import, similar names and a 26/25 test helper split. These
 are not behavioral RED. Logs preserve the attempts. Save this rejecting runtime
 checkpoint before bodies; all new APIs still refuse every input.
+
+M2-STORED-STEP1 first body run: all five complete storage cases pass unchanged,
+including actual typed map decoding, source lease/Retry behavior, exact stored
+presence, plain-wrapper binary control, old profiles/caps, snapshot receipt and
+delegated uncertainty. Strict focused Clippy passes. Two saved test files need
+explicit fixture correction, with first-run logs preserved: the 33-byte map
+literal uses the old codec fixture's 32-byte inline ceiling, and new Node setup
+calls a binary-intent-8-only acceptance helper for its actual stored-intent-9
+Create. Select a local 64-byte profile only in the new codec test, with an exact
+32-byte refusal control; replace only the new Node helper call with complete
+actual intent-9 acceptance assertions. Production limits and old helpers stay
+unchanged. Preserve the saved test versions; do not claim all 14 files unchanged
+or characterize these fixture errors as missing implementation behavior.
+
+M2-STORED-STEP1 second body run: both codec cases and all eight original codec
+cases pass. Two Node cases pass through committed audit/replay and received/
+purged snapshots. The remaining new Node test incorrectly expects whole-call
+rollback when plain-only recovery applies supported Claim entry 2 and then
+refuses stored Step entry 3. Recovery's existing contract preserves completed
+entry prefixes. Correct only this new oracle: independently execute the same
+actual Claim driver on a second real database, compare the complete six-table
+cohort with that exact prefix, preserve unchanged log bytes, and require narrow
+subsequent audit to leave that prefix exact. This is the second correction in
+the same new Node file; preserve its saved RED version and second-run log.
+No production rollback protocol, assertion weakening or older test edit is
+selected. Per-entry atomicity and complete old-or-new fault cohorts still apply.
+
+M2-STORED-STEP1 recovery review found an additional acceptance edge before
+handoff: the existing recovery/rows.rs outcome guard requires alias 2 only for
+intent 9. Intent 11 must carry that capability even when payload is omitted and
+the database contains zero immutable value/alias rows. Select a supplemental
+test in the already approved stored_step/recovery.rs: real alias-2 format-8
+Create via binary intent 8 with no payload, named Claim, stored Step with omitted
+payload, then a checksummed alias-only manifest downgrade. Require open to
+reject Corrupt without modifying any table. Preserve this test's actual runtime
+failure before changing the existing guard to intents 9 or 11, with its same
+prospective manifest/owner accounting. This adds no file/model/layout. Wait for
+the current frozen pipeline to finish before changing source, then rerun the
+required final gates on the corrected tree. This targeted correction follows
+an observed validation omission, not speculative extra verification.
+
+M2-STORED-STEP1 first frozen full pipeline passes all 12 direct gates on
+1,813 inputs / 1,224 Rust files. Before the additional guard edit, the supplemental
+test actually fails 0/1 after real payload-free Create/Claim/Step publication:
+the checksummed alias downgrade incorrectly reopens. Its complete test hash,
+old recovery/rows.rs bytes and runtime log were saved in the guard-genuine-r0
+receipt. Extending that existing outcome capability check to intents 9 or 11
+preserves its exact prospective manifest/owner accounting. All six storage
+cases now pass; the original five test bodies remain unchanged. Final full
+validation runs separately under /private/tmp/ferricstore2-stored-step-final-
+so the first frozen run and supplemental RED evidence remain intact.
+
+Solo architecture/performance review: this batch introduces no production
+file/model/dependency/layout. Explicit identity and codec selection reuse the
+same borrowed fields, bounded materialization, reducer, provenance and response.
+The writer's supplied-value path reuses existing exact stored emission rather
+than adding a second value or payload owner. Both old binary and new stored
+semantics have actual reader assertions. Historical outcomes, empty payload
+cohorts and snapshot manifests enforce the selected actual capabilities. Node
+profile selection and its descriptor charges remain independent; one continuous
+point/body/work account spans each call. This supports allocation-structure and
+logical-resource conclusions only, with no measured RSS, throughput or Linux
+claim. Remaining public logical ingress, Claim parent/governance and full
+service/source/native/profile/Linux/macOS acceptance are not certified.
+
+The durable source trace follows pinned declaration fb8106cb0cee10e6 and its
+registered runtime identity
+d72a372f2e76df3ccfc29f40571c077bbcdc40fbf71f7771dcfd23b5122b762a.
+Its progress-ledger assertion list is still empty; do not silently treat this
+component trace as an executed original public/profile case. The concrete
+assertion correspondence for the eventual complete harness is:
+
+| Pinned flow_write_contract_test.exs | Executed stored_step component |
+| --- | --- |
+| 1264–1271: typed queued Create | fixtures::seed / mutation with real intent 9 and decoded queued map |
+| 1273–1283: named Claim, running/queued | fixtures::seed via real Claim driver; source.rs running/run_state assertions |
+| 1285–1301: typed Step, identity/state/rotated lease/fence/deadline | source.rs + assert_rotated, decoded charge_card map at actual version 3 |
+| 1303–1308: old completion guard rejects stale | source.rs actual stored Complete, exact StaleLease rejection and unchanged record |
+| 1310–1316: Retry with continued guard and typed reason | source.rs actual intent 9 Retry, exact typed try-again bytes and accepted result |
+| 1318–1321: charge_card, cleared run_state, original deadline + 3000 | source.rs authoritative record read and exact 4000 deadline for normalized start 1000 |
+
+Opaque IDs/type/partition and the initial wall timestamp are normalized. No
+fence, ordering, payload type, rejection, result cardinality or atomicity
+assertion is normalized away. Public API preparation/authorization/submission,
+original FlowCase setup and required native profiles remain separate evidence.
+
+M2-STORED-STEP1 final corrected pipeline passes all 12 direct gates on the same
+1,813 inputs / 1,224 Rust files. All 1,351 cases / 113 executable targets pass,
+including all 53 architecture cases and both unchanged benchmark correctness
+smokes. Complete Counters preserve every prior 1,340 and original 1,294 identity,
+status and multiplicity, adding exactly 11 cases. Python 7 and 6 doctests / 15
+targets pass. All size/function/nesting/complexity limits remain enforced.
+
+Final source audit: 31 reviewed existing inputs, 1,775 other baseline inputs
+exact, seven new test files and zero new production files/models/dependencies/
+layouts. Eleven whole R0 test sources remain byte-exact; two new test files have
+the recorded corrections, and the third changed file preserves its complete
+R0 prefix and appends only the independently failing supplemental regression.
+That supplemental file remains byte-exact since its own genuine RED. Main
+ledgers stay at 129/143/589 and 5903/4222/1681/1655; actual full parity exits 1.
+
+Receipts under /private/tmp/ferricstore2-stored-step-: genuine-r0,
+guard-genuine-r0, source-audit, final-pipeline, full-identity, full-parity and
+adopted.json. The earlier pipeline is separately preserved before the recovery
+guard correction. Local adoption verifies both clean trees and every final
+frozen input. No push, native/Linux execution, independent peer review, complete
+source-case credit or completed-product claim. The full goal remains active and
+solo; public Claim parent/governance/reclaim orchestration, rich source captures,
+public logical ingress and all later milestone/source/profile/native/Linux/macOS
+exits remain mandatory. Next selection must address an actual functional gap
+from these contracts, with no data-only codec substitute for the complete path.

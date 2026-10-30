@@ -211,7 +211,7 @@ fn validate_response_profile(
     response_version: u16,
     status: RetainedStatus,
 ) -> Result<(), RequestValueError> {
-    if intent.version() == 10 {
+    if matches!(intent.version(), 10 | 11) {
         return if response_version == 9
             && matches!(
                 status,

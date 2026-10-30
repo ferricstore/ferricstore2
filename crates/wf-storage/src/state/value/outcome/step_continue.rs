@@ -17,7 +17,11 @@ pub(crate) fn scan_outcome_in_layout<'a>(
     profile: (PolicySchemaLimits, &mut PolicySchemaCharge, usize),
     layout: u16,
 ) -> Result<ScannedRetainedOutcome<'a>, StateValueError> {
-    if layout == 8 && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| Ok(intent == 10))? {
+    if layout == 8
+        && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| {
+            Ok(matches!(intent, 10 | 11))
+        })?
+    {
         return scan_step_continue_outcome(bytes, scope, request, admission, maximum);
     }
     let (schema, charge, validation) = profile;
@@ -38,7 +42,7 @@ pub(crate) fn encode_outcome_in_layout(
     admission: AdmissionLimits,
     layout: u16,
 ) -> Result<Vec<u8>, StateValueError> {
-    if layout == 8 && outcome.intent().version() == 10 {
+    if layout == 8 && matches!(outcome.intent().version(), 10 | 11) {
         return encode_step_continue_outcome(outcome, maximum, admission);
     }
     super::encode_outcome(outcome, maximum)
@@ -91,7 +95,7 @@ pub fn scan_step_continue_outcome<'input>(
          original_time,
          expires_at,
          response_version| {
-            if intent_version != 10 || response_version != 9 {
+            if !matches!(intent_version, 10 | 11) || response_version != 9 {
                 return Err(StateValueError::UnsupportedVersion);
             }
             let [tenant, group, recovery, request, response] = fields;
@@ -103,7 +107,11 @@ pub fn scan_step_continue_outcome<'input>(
             {
                 return Err(StateValueError::InvalidValue);
             }
-            let intent = ClientIntent::step_continue(digest);
+            let intent = if intent_version == 11 {
+                ClientIntent::stored_step_continue(digest)
+            } else {
+                ClientIntent::step_continue(digest)
+            };
             let (status, response_count) = step_continue_retained_summary(
                 intent,
                 response_version,
