@@ -57752,3 +57752,80 @@ retaining closed old opt-ins, whole-call owner/work accounting, complete snapsho
 and uncertainty/reopen closure. Actual original Create→Claim→Step→Retry→FIFO,
 rich captured source attributes/context, all native/profile/Linux/macOS and
 M1–M8 milestone exits remain mandatory. Full goal stays active and solo.
+
+## M2-STEP-NODE1 — solo successor selection before artifacts
+
+Predecessor822be44 is now adopted in both clean local trees; its receipt checks
+every1,789 frozen input and exact commit. Continue on codex/step-node-solo in the
+same isolated checkout. This successor closes actual committed-prefix audit/
+replay for intent10; it neither starts consensus/service nor replaces the full
+original-source/profile/native/Linux/macOS requirements. No agents or peer-review
+claim. Existing architecture/dependency boundaries and400/600/100/4/25 apply.
+
+Approve BEFORE RED a rejecting public
+step_continue_recovery_header(encoded,CodecLimits,stored:bool) in existing
+wf-ports/src/log/common.rs and its log.rs reexport. It returns the existing
+(u16,[borrowed namespace;3],CommittedTime) shape, initially UnsupportedVersion.
+AFTER saved genuine RED extend only the existing private recovery_header with
+an explicit Step selector. Old public Normal/stored header calls select false,
+retaining their exact allowlists; the new explicit helper admits intent10 only
+with Normal operation tag1 and admits9 only when stored=true. It validates only
+the bounded header; complete framing/digest/operation/keys/EOF remains mandatory.
+Reuse the shared parser, not a second ad-hoc byte-offset parser or new model.
+
+Approve existing CommittedRecoveryLimits private field step_continue:bool,
+constructor false, public with_step_continue_limits(rows,bytes,work,temporary)
+->Result<Self,CommittedRecoveryError> and step_continue_limits()->Option<existing
+WorkflowValueTransactionLimits>. BEFORE RED the selector rejects UnsupportedEntry
+and the getter reads the false field; no selected recovery succeeds. AFTER RED
+reuse the existing positive/overflow-checked shared value ceilings, set only the
+explicit Step flag and return its actual optional profile. Stored9 remains a
+separate opt-in; neither selects Step implicitly. No new public capability type,
+stored-format proof flag, dependency or source acceptance credit is selected.
+
+AFTER RED modify only existing node recovery/{workflow_values,join,replay}.rs
+and recovery.rs. join chooses the explicit new header only with Step opt-in,
+passing the separate actual stored-value flag. Audit/profile dispatch adds10
+only under that selected profile. Complete Step audit uses prepare_step_continue,
+not a wrapped value-batch body or partial header success. Before preparation,
+admit actual copied entry/body, profile descriptors, remaining workspace and
+checked preparation work65536+4096+16*body.len, consistent with the storage
+driver's initial helper/preparation fees. Continue using the existing whole-call
+point/body/work upper bounds; no point/work reset or structural budget credit.
+Step decode errors preserve their existing typed origin within recovery's
+existing error variants. Shared value/stored audit bodies remain exact outside10.
+
+Apply uses the real apply_step_continue_transaction with the actual full log
+identity, scope and selected limits, discards bounded receipts after extracting
+control and verifies expected full control exactly as other real drivers do.
+The storage owner must already be explicitly8; startup never upgrades7. Existing
+snapshot replay shares this route, with the same prefix audit, membership,
+checkpoint and purge/received-boundary rules. No synthetic current/binding or
+policy witness is allowed. Keep original receipts across lost reply and later
+Retry, and preserve accepted/rejected/replay/conflict/expiry/exact-log controls.
+
+Approve BEFORE tests NEW node integration facade
+crates/wf-node/tests/snapshot_recovery/workflow_values/step_continue.rs and children
+step_continue/{fixtures,replay,audit,limits,faults,snapshot}.rs, declared only by
+existing workflow_values.rs. Reuse actual value/stored genesis, installed policy,
+StartAndClaim, full state/log/control/cohort, existing delegated fault backend,
+snapshot transition and received/purge helpers. No new test type or mock service.
+Fixtures explicitly upgrade state7→8 and preserve an old7 anchor where exercised;
+StartAndClaim is component setup and not the missing original named Claim chain.
+Plain Step remains logical binary with profile2 aliases; all payload presence
+variants and original binding/lifecycle facts must survive reopen.
+
+Cases must first reach a healthy selected limit/header refusal before masked
+tails. Cover explicit opt-ins/actual unupgraded refusal; actual pending committed
+Step plus uncommitted opaque tail; historical full-body audit despite an already
+applied checkpoint (corrupt digest/footer/trailing/wrong namespace); actual
+retained original result after current Retry with conflict/expiry/exact-log;
+zero/narrow caps and unchanged state/log; actual nonzero prefixes on later
+deterministic refusal; delegated commit uncertainty/reopen with complete old/new
+cohorts; complete snapshot/receive/purge/replay closure retaining old7 anchor
+compatibility. Preserve exact source/raw cohorts and original log identity.
+Approve an appended healthy explicit-header/golden/old-header-closure/byte-cap
+case in existing ports tests/step_continue_codec/wire.rs; no new Cargo target.
+Record separately compiled real runtime failures and exact source hashes, then
+save a local rejection-only commit before any dispatch/parser/selector bodies.
+Consult another concrete solo selection if further files/types/models are needed.

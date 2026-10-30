@@ -2,6 +2,13 @@
 
 Updated: 2026-10-30. The user resumed the unfinished full-completion goal.
 
+Next worktree branch: codex/step-node-solo. M2-STEP-NODE1 has a concrete solo
+architecture selection in the coordination record before artifacts. No Node
+Step APIs/tests/bodies exist yet. Save genuinely compiled rejecting opt-in and
+header scenarios before implementing committed-prefix audit/replay; keep old
+opt-ins closed and actual format8 mandatory. Primary remains at the verified
+822be44 storage checkpoint described below. The full goal remains active.
+
 The codex/step-storage-solo checkpoint implements consuming
 format7→8 upgrade, full new history captures and real Step value/core publication,
 preserving legacy rows and retained snapshot cohorts. Genuine rejecting runtime
