@@ -36,17 +36,27 @@ cases and awaits the final full checks. Strict focused Clippy and all54
 architecture checks pass. Only one Node R0 test fixture needed the explicit
 drop-before-cohort-open setup repair; three saved test files remain exact.
 
-This is still an unfinished batch. A boundary review found that both the pinned
-source and Rust can reject Cleanup before draining an existing full task queue
-when another lease expires. Resolve and test that cleanup-progress finding,
-remaining pinned stored-protocol cases/dispositions, final workspace gates and
-adoption. Native
+The full-queue cleanup stall is now corrected after a genuine stored failure
+saved in4787d8c. Cleanup may drain one existing page while deferring expiry that
+cannot fit; its expired lease stays intact until a later safe enqueue/reclaim.
+All20 focused credit storage cases,20 domain cases,6 codecs,4 Node credit cases
+and54 architecture checks pass with strict focused Clippy. The original saved
+regression remains byte-exact. The matching Elixir correction/regression is
+saved on the isolated pending-reclaim branch at24e5aa028; exact inverses preserve
+all earlier source/test bodies. Native execution/formatter remain unverified.
+See /private/tmp/ferricstore2-credit-cleanup-progress-{genuine-r0,elixir} receipts
+and storage/domain-ports/node/architecture/clippy logs.
+
+This is still an unfinished batch. More than256 newly expired page generations
+with no existing queue still needs a bounded-expiry/progress correction; do not
+narrow the supported shard profile to hide it. Remaining pinned stored-protocol
+cases/dispositions, final workspace gates and adoption also remain open. Native
 Elixir/Linux acceptance remains unexecuted. The main checkout stays at the prior
 adopted green db1c3c9; do not adopt this branch yet. See
 `/private/tmp/ferricstore2-identified-credit-atomic-` focused, architecture,
 clippy-verified, old-tests and progress evidence, plus identified-credit-node-*
-and identified-credit-boundaries-* logs. Continue with a real failing cleanup
-progress control before its correction; preserve shared retained namespace,
+and identified-credit-boundaries-* logs. Continue with a real failing bounded
+expiry-burst control before its correction; preserve shared retained namespace,
 actual immutable shard authority and the same complete atomic writer.
 
 The completed code checkpoint is 728650f, M1-CREDIT-OWNER1. The pure governing

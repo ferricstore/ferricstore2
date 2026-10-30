@@ -1148,8 +1148,9 @@ live and retained snapshot cohorts; it does not infer capability from row count.
 M2-IDENTIFIED-CREDIT1 selects a real stored owner protocol under the existing
 exclusive group/recovery transaction. The storage leaf is implemented and its
 restart/snapshot/fault controls pass. Explicit Node historical audit/replay,
-received/purged suffixes and all112 Node cases now pass; cleanup progress and
-full batch acceptance remain unfinished. Initial rejecting contracts alone established no
+received/purged suffixes and all112 Node cases now pass. The queued-backlog
+cleanup stall is corrected; wider expiry bursts and full batch acceptance
+remain unfinished. Initial rejecting contracts alone established no
 durability or public Claim authority.
 The exact artifact selection is in the coordination record. Keep the domain
 effect-free and its existing types-only dependency.
@@ -1203,6 +1204,17 @@ canonical private response can carry original internal owner fields; public
 View mapping must still omit cleanup/fingerprint internals and reservation/page
 fields. Known rejection may carry source expiry/reclaim effects; operational
 failure creates no retained business response.
+
+One deliberate source safety correction prevents a full queue from blocking
+its own cleanup: only Cleanup with existing queued work may defer an expiry
+preparation that cannot fit. It deletes at most one existing page and keeps
+the expired lease/capacity intact until a later command can enqueue its exact
+detached reference. Normal commands retain BacklogFull denial and no prefix
+effects. The real regression failed before correction, then proved one-page
+drain, safe subsequent expiry enqueue/reclaim and continued canonical recovery.
+The matching isolated Elixir change is not natively verified. Bursts exceeding
+256 new page generations with no existing queued task remain a separate open
+bounded-expiry requirement; this correction does not reduce supported shards.
 
 Use one consumed writer for owner, reservation/page/cleanup changes, original
 response, control and checkpoint. Unknown commit fences the owner and returns no

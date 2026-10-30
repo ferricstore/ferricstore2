@@ -22,11 +22,18 @@ pub(super) fn expire(prepared: &mut PreparedIdentifiedCredit<'_>) -> Result<bool
         .iter()
         .filter(|lease| lease.expires_at_ms <= prepared.now.get() && lease.reservation_page != 0)
         .count();
-    if pending(data.cleanup_head, data.cleanup_tail)?
-        .checked_add(count)
-        .ok_or(E::Limit)?
-        > 256
-    {
+    let queued = pending(data.cleanup_head, data.cleanup_tail)?;
+    if queued.checked_add(count).ok_or(E::Limit)? > 256 {
+        if queued != 0
+            && matches!(
+                prepared.request.mutation,
+                super::IdentifiedCreditMutation::Cleanup
+            )
+        {
+            // Drain existing work before admitting another generation; its lease
+            // stays intact until the detached reference can be queued safely.
+            return Ok(true);
+        }
         prepare::abort(prepared, R::CleanupBacklogFull);
         return Ok(false);
     }

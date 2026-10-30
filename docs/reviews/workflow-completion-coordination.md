@@ -58982,3 +58982,21 @@ and next-page assertions are masked. Strict focused Clippy passes. Exact source
 and log bindings are in /private/tmp/ferricstore2-credit-cleanup-progress-genuine-r0.json.
 Save before changing either reducer or coupled Elixir behavior. No native
 Elixir execution or native TDD evidence is claimed.
+
+Queued-backlog correction verified: unchanged saved regression now passes, and
+all20 focused storage credit cases,20 domain,6 ports codecs,4 Node credit and54
+architecture cases pass. Strict focused Clippy passes. Logs use
+/private/tmp/ferricstore2-credit-cleanup-progress-{storage,domain-ports,node,
+architecture,clippy}.log. The one-phase deferral retains the expired current
+lease and capacity, drains one actual existing page, then safely enqueues and
+reclaims that generation on the next Get. A later Cleanup continues; no ID or
+page becomes orphaned. Normal BacklogFull and every old denial assertion remain.
+
+The isolated Elixir counterpart is saved at24e5aa0281fedcfd36caf298dd3d2fb70a523cbf
+on top of the previous pending-reclaim fix. Its twelve-line preparation clause
+and complete257-generation donor regression have exact full production/test
+inverses to2e47c0c, recorded in credit-cleanup-progress-elixir.json. Native
+execution/formatter remain unexecuted; no native TDD/passing or merge/push claim.
+More than256 newly expired page generations with no queued work is still an
+open progress case and the next concrete boundary task. Full goal stays active;
+no final acceptance, source-case credit or main-checkout adoption yet.
