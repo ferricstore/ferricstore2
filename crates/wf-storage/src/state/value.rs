@@ -5,6 +5,7 @@ use std::fmt;
 use wf_ports::log::CodecError;
 
 mod control;
+pub(crate) mod credit;
 mod history;
 mod history_snapshot;
 mod membership;

@@ -3,27 +3,36 @@
 Updated: 2026-10-31. The user resumed the unfinished full-completion goal.
 
 Current worktree: codex/identified-credit-solo, M2-IDENTIFIED-CREDIT1 in progress.
-Rejecting contracts and 14 actual behavior failures were saved in f5bbfbe before
-bodies. The branch now implements fresh credit-capable layout8/alias2 genesis,
-checksummed capability/shard-count metadata, neutral bounded request/owner/reply
-carriers and an exact scoped point reader. Four codec controls pass; the two
-extra owner literals are post-implementation correctness evidence. An extra
-empty-capable reopen/read control passes without mutating tables. Current credit
-storage tests are 2 pass / 12 fail: the actual transaction driver still returns
-UnsupportedLayout. One passing negative case overlaps that refusal; it does not
-prove actual shard-count validation. A separate typed actual-count regression
-genuinely fails before driver implementation and has its own saved RED receipt.
+The actual atomic storage leaf now works: verified request preparation, staged
+pure identified decisions, detached owner/ID/page/cleanup publication, immutable
+retained replies, restart closure and real snapshot capture/receive/install.
+One Immediate transaction publishes the complete cohort; delegated commit
+failure fences and reopens a whole old or new revision. Recovery uses exact page
+backreferences and an injective page/ID census instead of repeated reverse
+history scans. No owner or ID history map is cloned per command.
 
-Strict focused Clippy and all 54 architecture cases pass. The 7 existing stored
-publication and 6 stored Step cases also pass after the manifest change. All
-eight saved R0 test sources preserve their original bodies; five stay whole-file
-exact and three append additional controls. No full workspace acceptance, new
-source-parity credit or durable owner success is claimed. The main checkout
-stays at the prior adopted green db1c3c9; this unfinished branch is not adopted.
-See `/private/tmp/ferricstore2-identified-credit-` genuine-r0, authority-genuine-r0,
-current-* logs and body-progress JSON evidence. Continue the real stored path:
-full verified request preparation, staged pure identified decisions, actual
-owner/ID/page/cleanup publication, retained outcomes and Node replay/snapshots.
+Validation: all219 state-store cases pass, including15 credit controls and every
+prior204 case;20 domain credit cases and6 codec cases pass; all54 architecture
+checks and strict focused Clippy pass. Six malformed graph variants are rejected
+without changing a table. All611 earlier test files are preserved:609 whole
+files plus two exact module-registration inverses. The genuine stored RED was
+saved in f5bbfbe before bodies; the separate actual-count authority RED also now
+passes. Added direct protocol/codec/corruption controls are post-body correctness
+evidence, not additional original TDD or source-parity credit. Two previously
+masked R0 setup repairs are explicit in the coordination record: read the actual
+four-row credit manifest instead of the legacy three-row helper; use the existing
+growth-skipping delegated publication-sync fault mode, preserving and extending
+the exact Uncertain/fenced/whole-cohort assertions.
+
+This is still an unfinished batch. Explicit Node full-body audit/replay,
+received/purged suffix recovery, remaining pinned stored-protocol source cases
+and dispositions, full workspace gates and adoption remain required. Native
+Elixir/Linux acceptance remains unexecuted. The main checkout stays at the prior
+adopted green db1c3c9; do not adopt this branch yet. See
+`/private/tmp/ferricstore2-identified-credit-atomic-` focused, architecture,
+clippy-verified, old-tests and progress evidence. Continue with explicit Node
+integration and its real failing controls; preserve shared retained namespace,
+actual immutable shard authority and the same complete atomic writer.
 
 The completed code checkpoint is 728650f, M1-CREDIT-OWNER1. The pure governing
 credit reducer now executes configuration, partial grants, identified/anonymous
@@ -73,8 +82,9 @@ semantics and require loading historical IDs for a bounded spend. The concrete
 source review and batch exits are recorded under M2-IDENTIFIED-CREDIT1 in the
 coordination document. Concrete initial and refined artifact selections precede
 the current code. Select further port/storage/recovery artifacts and types
-before creation; the real atomic stored path is still required. Codec or pure
-helper success alone does not complete this batch.
+before creation; the atomic stored leaf is now implemented, while Node recovery
+and the remaining batch exits above still apply. Codec or pure helper success
+alone does not complete this batch.
 
 Previous checkpoint: codex/stored-step-solo, M2-STORED-STEP1. Explicit stored Step
 intent 11 now shares the existing Step reducer, response 9 and consumed format 8

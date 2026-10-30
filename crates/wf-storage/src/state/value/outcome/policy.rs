@@ -110,6 +110,9 @@ fn validation_bytes(
         maximum_wire_bytes,
         |fields, intent, _, _, _, _, response_version| {
             let response = fields[4];
+            if intent == 12 && layout == Some(8) {
+                return Ok(18_432);
+            }
             if matches!(intent, 8 | 9) && layout.is_some_and(|layout| !matches!(layout, 7 | 8)) {
                 return Err(StateValueError::Malformed);
             }

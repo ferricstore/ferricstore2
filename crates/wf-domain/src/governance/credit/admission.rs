@@ -7,7 +7,7 @@ use super::{
 use crate::workflow::MAX_EXACT_MILLIS as MAX;
 use std::mem::size_of;
 
-pub(super) struct CreditCharge {
+pub(in crate::governance) struct CreditCharge {
     limits: CreditLimits,
     work: u64,
     owned: usize,
@@ -15,7 +15,7 @@ pub(super) struct CreditCharge {
 }
 
 impl CreditCharge {
-    pub(super) fn inspect(data: &CreditOwnerData, limits: CreditLimits) -> Result<Self, E> {
+    pub(in crate::governance) fn empty(limits: CreditLimits) -> Result<Self, E> {
         let mut charge = Self {
             limits,
             work: 0,
@@ -30,6 +30,14 @@ impl CreditCharge {
                 .and_then(|n| n.checked_add(size_of::<CreditOperation<'_>>()))
                 .ok_or(E::Limit)?,
         )?;
+        Ok(charge)
+    }
+
+    pub(in crate::governance) fn inspect(
+        data: &CreditOwnerData,
+        limits: CreditLimits,
+    ) -> Result<Self, E> {
+        let mut charge = Self::empty(limits)?;
         charge.own(data.scope.capacity())?;
         charge.own(product(
             data.leases.capacity(),
@@ -73,7 +81,7 @@ impl CreditCharge {
         Ok(charge)
     }
 
-    pub(super) fn work(&mut self, bytes: usize) -> Result<(), E> {
+    pub(in crate::governance) fn work(&mut self, bytes: usize) -> Result<(), E> {
         self.work = self
             .work
             .checked_add(u64::try_from(bytes).map_err(|_| E::Limit)?)
@@ -82,13 +90,13 @@ impl CreditCharge {
         Ok(())
     }
 
-    pub(super) fn own(&mut self, bytes: usize) -> Result<(), E> {
+    pub(in crate::governance) fn own(&mut self, bytes: usize) -> Result<(), E> {
         self.temporary(bytes)?;
         self.owned = self.owned.checked_add(bytes).ok_or(E::Limit)?;
         Ok(())
     }
 
-    pub(super) fn temporary(&self, bytes: usize) -> Result<(), E> {
+    pub(in crate::governance) fn temporary(&self, bytes: usize) -> Result<(), E> {
         self.owned
             .checked_add(bytes)
             .filter(|n| *n <= self.limits.max_owned_bytes())
@@ -113,7 +121,7 @@ impl CreditCharge {
         Ok(())
     }
 
-    pub(super) fn input_ids(&self, count: usize) -> Result<(), E> {
+    pub(in crate::governance) fn input_ids(&self, count: usize) -> Result<(), E> {
         if count > self.limits.max_reservations() {
             Err(E::Limit)
         } else {
@@ -177,11 +185,11 @@ fn inspect_lease(lease: &CreditLeaseData, epoch: u64, charge: &mut CreditCharge)
     Ok(())
 }
 
-pub(super) fn product(left: usize, right: usize) -> Result<usize, E> {
+pub(in crate::governance) fn product(left: usize, right: usize) -> Result<usize, E> {
     left.checked_mul(right).ok_or(E::Limit)
 }
 
-pub(super) fn reserve<T>(
+pub(in crate::governance) fn reserve<T>(
     values: &mut Vec<T>,
     count: usize,
     charge: &mut CreditCharge,

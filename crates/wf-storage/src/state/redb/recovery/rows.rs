@@ -100,7 +100,7 @@ fn outcome(
         layout,
     )
     .map_err(value_error)?;
-    if matches!(scanned.intent_version(), 9 | 11) {
+    if matches!(scanned.intent_version(), 9 | 11 | 12) {
         tx.temporary(total(
             scanned.owned_bytes(),
             [
@@ -109,7 +109,9 @@ fn outcome(
             ],
         )?)?;
         let facts = super::super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
-        if facts.alias_format != 2 {
+        if facts.alias_format != 2
+            || (scanned.intent_version() == 12 && facts.credit_shard_count.is_none())
+        {
             return Err(StateTransactionError::Corrupt);
         }
     }

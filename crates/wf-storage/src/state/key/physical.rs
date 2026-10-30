@@ -42,7 +42,9 @@ pub(crate) fn decode_state_key(
     let (before, after) = match family {
         0 | 7 => (2, 0),
         1 | 10 => (5, 0),
-        2 | 6 | 8 | 9 => (4, 0),
+        2 | 6 | 8 | 9 | 12 | 15 => (4, 0),
+        13 => (7, 0),
+        14 => (6, 0),
         3 => (3, 4),
         4 => (6, 1),
         5 | 11 => (5, 1),
@@ -61,7 +63,7 @@ pub(crate) fn decode_state_key(
         0
     };
     let number = match family {
-        3 | 5 | 11 => u128::from(read_u64(bytes, &mut offset)?),
+        3 | 5 | 11 | 14 | 15 => u128::from(read_u64(bytes, &mut offset)?),
         4 | 8 => read_u128(bytes, &mut offset)?,
         _ => 0,
     };
@@ -99,6 +101,9 @@ pub(crate) fn decode_state_key(
         bytes: owned,
         ranges,
     };
+    if matches!(family, 12..=15) {
+        super::credit::validate_decoded(&decoded)?;
+    }
     if matches!(family, 5 | 11)
         && u128::from(canonical_history_position(decoded.part(5))?.0) != number
     {

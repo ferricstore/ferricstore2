@@ -11,6 +11,7 @@ use crate::log::{
     writer::Writer,
 };
 use wf_domain::governance::credit::CreditLimits;
+use wf_domain::governance::credit::CreditOwner;
 use wf_domain::governance::identified::{
     IdentifiedCreditDecision as D, IdentifiedCreditRejection as R, IdentifiedCreditReply,
 };
@@ -25,6 +26,10 @@ pub(super) struct ScannedCreditReply<'a> {
 }
 
 impl ScannedCreditReply<'_> {
+    pub(super) const fn summary(&self) -> (D, usize) {
+        (self.decision, self.count)
+    }
+
     pub(super) fn into_owned(self, maximum_owned: usize) -> Result<IdentifiedCreditReply, E> {
         if self.owned > maximum_owned {
             return Err(E::OwnedLimit);
@@ -169,20 +174,53 @@ pub(super) fn encode(
     maximum_wire: usize,
     maximum_owned: usize,
 ) -> Result<Vec<u8>, E> {
-    validate_owned(reply, maximum_owned)?;
+    encode_parts(
+        reply.decision,
+        reply.owner.as_ref(),
+        &reply.reservation_ids,
+        maximum_wire,
+        maximum_owned,
+    )
+}
+
+pub(super) fn encode_parts(
+    decision: D,
+    owner: Option<&CreditOwner>,
+    ids: &[Vec<u8>],
+    maximum_wire: usize,
+    maximum_owned: usize,
+) -> Result<Vec<u8>, E> {
+    validate_owned(decision, owner, ids, maximum_owned)?;
     let mut measure = Writer::measure(maximum_wire);
-    write(&mut measure, reply)?;
+    write(&mut measure, decision, owner, ids)?;
     if measure.len().checked_add(2048).ok_or(E::LengthOverflow)? > maximum_owned {
         return Err(E::OwnedLimit);
     }
     let mut output = Writer::allocate(measure.len(), maximum_wire)?;
-    write(&mut output, reply)?;
+    write(&mut output, decision, owner, ids)?;
     output.finish()
 }
 
-fn validate_owned(reply: &IdentifiedCreditReply, maximum_owned: usize) -> Result<(), E> {
-    let ids = &reply.reservation_ids;
-    if matches!(reply.decision, D::Spent { .. }) {
+pub(super) fn verify_parts(
+    decision: D,
+    owner: Option<&CreditOwner>,
+    ids: &[Vec<u8>],
+    encoded: &[u8],
+    maximum_owned: usize,
+) -> Result<(), E> {
+    validate_owned(decision, owner, ids, maximum_owned)?;
+    let mut writer = Writer::verify(encoded, encoded.len())?;
+    write(&mut writer, decision, owner, ids)?;
+    writer.finish_verification()
+}
+
+fn validate_owned(
+    decision: D,
+    owner: Option<&CreditOwner>,
+    ids: &[Vec<u8>],
+    maximum_owned: usize,
+) -> Result<(), E> {
+    if matches!(decision, D::Spent { .. }) {
         admission::ids(
             ids,
             u64::try_from(ids.len()).map_err(|_| E::LengthOverflow)?,
@@ -192,41 +230,44 @@ fn validate_owned(reply: &IdentifiedCreditReply, maximum_owned: usize) -> Result
     } else if !ids.is_empty() {
         return Err(E::Malformed);
     }
-    match reply.decision {
+    match decision {
         D::Granted { shard_id } | D::Spent { shard_id } | D::Renewed { shard_id } => {
-            reply
-                .owner
-                .as_ref()
+            owner
                 .ok_or(E::Malformed)?
                 .lease(shard_id)
                 .ok_or(E::Malformed)?;
         }
         D::Released | D::Owner => {
-            reply.owner.as_ref().ok_or(E::Malformed)?;
+            owner.ok_or(E::Malformed)?;
         }
         D::Cleaned { pending, .. } => {
-            let owner = reply.owner.as_ref().ok_or(E::Malformed)?.view();
+            let owner = owner.ok_or(E::Malformed)?.view();
             if (owner.cleanup_head <= owner.cleanup_tail) != pending {
                 return Err(E::Malformed);
             }
         }
-        D::Rejected(R::NotFound) if reply.owner.is_some() => return Err(E::Malformed),
+        D::Rejected(R::NotFound) if owner.is_some() => return Err(E::Malformed),
         D::Rejected(_) => {}
     }
     Ok(())
 }
 
-fn write(out: &mut Writer<'_>, reply: &IdentifiedCreditReply) -> Result<(), E> {
+fn write(
+    out: &mut Writer<'_>,
+    decision: D,
+    owner: Option<&CreditOwner>,
+    ids: &[Vec<u8>],
+) -> Result<(), E> {
     out.write(b"FWGR\0\x01")?;
-    status::write(out, reply.decision)?;
-    out.optional(reply.owner.as_ref(), |out, owner| {
+    status::write(out, decision)?;
+    out.optional(owner, |out, owner| {
         let mut measure = Writer::measure(900_000);
         owner::write(&mut measure, owner)?;
         out.u32(u32::try_from(measure.len()).map_err(|_| E::LengthOverflow)?)?;
         owner::write(out, owner)
     })?;
-    out.u32(u32::try_from(reply.reservation_ids.len()).map_err(|_| E::LengthOverflow)?)?;
-    for id in &reply.reservation_ids {
+    out.u32(u32::try_from(ids.len()).map_err(|_| E::LengthOverflow)?)?;
+    for id in ids {
         out.raw(id, 256)?;
     }
     Ok(())

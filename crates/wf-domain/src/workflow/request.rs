@@ -164,6 +164,16 @@ impl ClientIntent {
         }
     }
 
+    /// Selects private identified-credit identity without verification/authority.
+    /// The explicit codec must bind the complete actual frame before apply.
+    #[must_use]
+    pub const fn governance_credit(digest: [u8; 32]) -> Self {
+        Self {
+            version: 12,
+            digest,
+        }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

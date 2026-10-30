@@ -1146,8 +1146,10 @@ live and retained snapshot cohorts; it does not infer capability from row count.
 ## Selected identified governing-credit integration
 
 M2-IDENTIFIED-CREDIT1 selects a real stored owner protocol under the existing
-exclusive group/recovery transaction. This is still unimplemented; initial
-rejecting contracts and tests establish no durability or public Claim authority.
+exclusive group/recovery transaction. The storage leaf is implemented and its
+restart/snapshot/fault controls pass; explicit Node audit/replay and full batch
+acceptance remain unfinished. Initial rejecting contracts alone established no
+durability or public Claim authority.
 The exact artifact selection is in the coordination record. Keep the domain
 effect-free and its existing types-only dependency.
 
@@ -1171,6 +1173,23 @@ the source 1000-ID mutation,256-ID page,256-page history and256-task backlog
 ceilings. One cleanup command deletes one real page and advances its cursor.
 Canonical reopen must validate the complete owner/page/ID/cleanup closure under
 bounded recovery accounts. A later failure publishes no prefix effects.
+
+FWGO1 stores the bounded detached owner. FWGI1 stores original ID, page
+backreference and Active/Released status. FWGP1 stores shard, epoch, page and
+ordered unique IDs; FWGQ1 stores sequence, shard, epoch and remaining page range.
+The reservation key adds big-endian shard/epoch components and original ID to
+the four owner components. Page keys add shard/epoch and a numeric page suffix;
+cleanup keys add a numeric sequence suffix. Full framing/EOF validation precedes
+payload ownership. All old key and absent-extension manifest bytes remain exact.
+
+Recovery proves forward closure from each owner through current lease pages and
+contiguous retired tasks to exact ID rows with page backreferences. Page IDs are
+unique, so this mapping is injective; every physical page independently needs
+current-lease or retired-task coverage. Checked equality of total ID rows and
+covered page members excludes orphan IDs without rescanning page membership for
+every reverse ID row. Current-generation active counts must equal in_use and
+owner-wide live/retired generations are unique. The same existing open recovery
+table serves these reads; nested redb table reopening is forbidden.
 
 Reserve FWCP1 operation10 / client-intent12 for this explicit private protocol,
 with retained response_version10. Preserve the shared request namespace and

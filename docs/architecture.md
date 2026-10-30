@@ -1527,3 +1527,15 @@ file, module or block; lexical blocks inherit metadata bindings and inline modul
 isolate them, without general type or qualified module resolution, following the
 [Rust item rules](https://doc.rust-lang.org/reference/items.html) and
 [item scopes](https://doc.rust-lang.org/reference/names/scopes.html#item-scopes).
+
+The explicit identified governing-credit storage leaf keeps its phased reducer
+in the types-only domain, verified private framing in ports, and all authority,
+atomic publication and recovery in storage. Sparse requested-ID observations and
+page backreferences avoid loading or cloning complete reservation history. The
+consumed writer commits owner, IDs, ordered pages, cleanup, original response and
+checkpoint together; uncertainty fences. Capability is explicit and immutable,
+including snapshot comparisons and receipt-only downgrade checks. Canonical
+recovery proves complete closure using forward membership and a checked census.
+[ADR007](adr/007-durable-log-storage.md#selected-identified-governing-credit-integration)
+specifies the formats and invariants. Node opt-in/replay, public governed Claim,
+outbox/catalog/service behavior and full source/platform acceptance remain open.

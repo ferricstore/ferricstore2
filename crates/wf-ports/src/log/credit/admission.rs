@@ -10,6 +10,24 @@ pub(super) fn validate(
     limits: CodecLimits,
     maximum_owned: usize,
 ) -> Result<(), E> {
+    metadata(command, now)?;
+    if let Op::Spend {
+        amount,
+        reservation_ids,
+        ..
+    }
+    | Op::Release {
+        amount,
+        reservation_ids,
+        ..
+    } = command.mutation
+    {
+        ids(reservation_ids, amount, limits, maximum_owned)?;
+    }
+    Ok(())
+}
+
+pub(super) fn metadata(command: IdentifiedCreditRequest<'_>, now: u64) -> Result<(), E> {
     if command.scope.is_empty()
         || command.scope.len() > 65_535
         || now > MAX
@@ -40,7 +58,7 @@ pub(super) fn validate(
             lease_epoch,
             amount,
             ttl_ms,
-            reservation_ids,
+            ..
         } => {
             shard(shard_id, command.shard_count)?;
             if lease_epoch > MAX {
@@ -49,15 +67,13 @@ pub(super) fn validate(
             if let Some(ttl) = ttl_ms {
                 deadline(now, ttl)?;
             }
-            ids(reservation_ids, amount, limits, maximum_owned)?;
+            amount_bound(amount)?;
         }
         Op::Release {
-            shard_id,
-            amount,
-            reservation_ids,
+            shard_id, amount, ..
         } => {
             shard(shard_id, command.shard_count)?;
-            ids(reservation_ids, amount, limits, maximum_owned)?;
+            amount_bound(amount)?;
         }
         Op::Renew { shard_id, ttl_ms } => {
             shard(shard_id, command.shard_count)?;
@@ -97,6 +113,20 @@ pub(super) fn ids(
     limits: CodecLimits,
     maximum_owned: usize,
 ) -> Result<(), E> {
+    borrowed_ids(
+        values.iter().map(Vec::as_slice),
+        amount,
+        limits,
+        maximum_owned,
+    )
+}
+
+pub(super) fn borrowed_ids<'a>(
+    values: impl ExactSizeIterator<Item = &'a [u8]>,
+    amount: u64,
+    limits: CodecLimits,
+    maximum_owned: usize,
+) -> Result<(), E> {
     amount_bound(amount)?;
     if values.len() > limits.admission().batch_items()
         || u64::try_from(values.len()).map_err(|_| E::LengthOverflow)? != amount
@@ -119,7 +149,7 @@ pub(super) fn ids(
         if value.is_empty() || value.len() > 256 {
             return Err(E::Malformed);
         }
-        ordered.push(value.as_slice());
+        ordered.push(value);
     }
     ordered.sort_unstable();
     if ordered.windows(2).any(|pair| pair[0] == pair[1]) {

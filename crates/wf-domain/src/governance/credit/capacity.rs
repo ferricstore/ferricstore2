@@ -3,7 +3,7 @@
 use super::admission::{CreditCharge, product};
 use super::{CreditError as E, CreditOwnerData};
 
-pub(super) fn expire(
+pub(in crate::governance) fn expire(
     owner: &mut CreditOwnerData,
     now: u64,
     charge: &mut CreditCharge,

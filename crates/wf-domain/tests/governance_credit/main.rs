@@ -11,6 +11,7 @@ use wf_types::version::TimestampMillis;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 mod fixtures;
+mod identified;
 mod limits;
 mod protocol;
 mod source;

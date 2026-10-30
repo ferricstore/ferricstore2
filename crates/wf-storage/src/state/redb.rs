@@ -13,7 +13,7 @@ mod bootstrap;
 mod claim;
 mod commit;
 pub(crate) mod core_policy;
-mod credit;
+pub(crate) mod credit;
 mod cursor;
 mod history;
 mod history_snapshot;

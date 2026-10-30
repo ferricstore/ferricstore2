@@ -241,6 +241,12 @@ fn validate_rows(
     tx.step()?;
     let mut entries = table.iter().map_err(|e| storage_error(&e))?;
     let mut counts = [0_u64; 2];
+    let credit_shards = if layout == 8 {
+        super::values::manifest::parse(manifest, tx.group, tx.recovery)?.credit_shard_count
+    } else {
+        None
+    };
+    let mut credit_counts = [0_u64; 2];
     let mut hash = Sha256::new();
     hash.update(if matches!(layout, 6..=8) {
         super::snapshot::original::CATALOG_DOMAIN
@@ -266,23 +272,38 @@ fn validate_rows(
             maximum,
         )
         .map_err(value_error)?;
-        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=11) {
+        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=15) {
             return Err(StateTransactionError::Corrupt);
         }
-        rows::validate(
-            tx,
-            &table,
-            &decoded,
-            value.value(),
-            charge,
-            (layout, manifest),
-        )?;
+        if matches!(decoded.family(), 12..=15) {
+            let shards = credit_shards.ok_or(StateTransactionError::Corrupt)?;
+            let (ids, members) =
+                super::credit::recovery::row(tx, &table, &decoded, value.value(), shards)?;
+            credit_counts[0] = credit_counts[0]
+                .checked_add(ids)
+                .ok_or(StateTransactionError::Limit)?;
+            credit_counts[1] = credit_counts[1]
+                .checked_add(members)
+                .ok_or(StateTransactionError::Limit)?;
+        } else {
+            rows::validate(
+                tx,
+                &table,
+                &decoded,
+                value.value(),
+                charge,
+                (layout, manifest),
+            )?;
+        }
         if matches!(decoded.family(), 6 | 7) {
             counts[usize::from(decoded.family() - 6)] = counts[usize::from(decoded.family() - 6)]
                 .checked_add(1)
                 .ok_or(StateTransactionError::Limit)?;
             hash_row(&mut hash, physical.value(), value.value())?;
         }
+    }
+    if credit_counts[0] != credit_counts[1] {
+        return Err(StateTransactionError::Corrupt);
     }
     Ok((counts[1], counts[0], hash.finalize().into()))
 }

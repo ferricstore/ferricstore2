@@ -2,9 +2,9 @@
 
 use crate::workflow::control::PreparedDigest;
 
-mod admission;
-mod capacity;
-mod decision;
+pub(in crate::governance) mod admission;
+pub(in crate::governance) mod capacity;
+pub(in crate::governance) mod decision;
 mod model;
 mod reservation;
 pub use model::{

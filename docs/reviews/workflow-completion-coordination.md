@@ -58692,3 +58692,160 @@ distinguish it from an actually missing existing head. Avoid eager page reads
 that would replace a reached source denial with an unrelated missing-page
 failure. Complete canonical recovery and explicit source migration dispositions
 remain required. No new next-phase file/type is approved implicitly here.
+
+M2-IDENTIFIED-CREDIT1 verified preparation selection before artifacts: approve
+NEW ports/log/credit/{model,scan,decode}.rs. Public PreparedCreditRequest owns
+only bounded scoped IDs/configuration/mutation data and FWSC isolation bytes,
+borrows the original frame, and exposes a verified CommittedHeader plus a
+borrowed IdentifiedCreditRequest. Private OwnedCreditMutation and
+ScannedCreditRequest carry owned operation fields and prepaid borrowed scan
+descriptors respectively. No current owner, authorization or durable outcome
+is inferred. Add ClientIntent::governance_credit as the mathematical intent12
+selector in the existing request module; ClientIntent::new stays version1 only.
+
+Use one full borrowed structural/EOF scan and exact body-hash comparison before
+payload materialization. Prepay D=4E+4096+64N, including simultaneous borrowed
+descriptors, owned IDs and duplicate-check scratch; enforce the existing scope,
+field/count, scalar and deadline limits. Reuse existing keys::scope and Writer
+verification. Split existing credit/admission metadata and ID checks so borrowed
+scan IDs can be validated without copying their payloads. Verify the complete
+re-emitted body against its original bytes. Existing generic preparation and
+recovery selectors remain closed. This is part of the saved f5bbfbe failing
+stored feature; extra codec controls added after these bodies confer no new
+original TDD/source credit. The atomic writer remains the required batch exit.
+
+M2-IDENTIFIED-CREDIT1 staged semantic selection before artifacts: approve NEW
+domain/governance/identified/{state,protocol,prepare,decision,pages,cleanup,
+admission}.rs. Named values: CreditReservationStatus/Observation/Change,
+CreditPageData/Change, CreditCleanupTask/Change, CreditProtocolQuery/Observation,
+PreparedIdentifiedCredit, IdentifiedCreditPlan and private CreditPhase.
+prepare_identified_credit and resume_identified_credit consume one owner and
+carry one continuous CreditCharge through exact read phases. query returns only
+required IDs/page/task; finish rejects an incomplete phase. The sealed final
+plan exposes borrowed original response IDs, moved owner data and exact sparse
+changes, never an authority certificate. Known capacity denial can publish its
+source owner effects; prefix-aborting configuration/history/backlog failures
+must expose no owner/page/ID/task publication. No whole reservation history is
+loaded or cloned. Bound actual descriptor/ID capacities, all comparisons/moves
+and pages before mutation/allocation. Reuse existing credit helper decisions
+within governance-only visibility; add CreditCharge::empty for genuine missing
+owner input rather than construct a synthetic owner. Keep old credit accounting
+unchanged. No runtime dependency or public service is added.
+
+Approve NEW tests/governance_credit/identified.rs under the existing domain
+integration target, with malformed observation, sparse replay and retirement/
+cleanup controls; the saved full stored-feature RED remains the batch oracle.
+Additional direct controls after bodies are not original TDD/source credit.
+The actual adapter, retained registry, atomic writer and recovery remain required.
+
+Before producing cleanup effects, refine CreditReservationChange.id to standard
+Cow<'a,[u8]>: spend/release borrow original frame IDs, while cleanup moves actual
+page-owned ID buffers into deletion effects. This prevents dangling page borrows
+and avoids copying retired ID payloads. Never call Cow::to_mut/to_owned in this
+path; all newly needed payloads still use explicit fallible reservation.
+
+M2-IDENTIFIED-CREDIT1 retained integration selection before edits: extend the
+existing RetainedStatus with GovernanceRejected(IdentifiedCreditRejection),
+admitted only for intent12/response10; explicitly reject that status in every
+older profile. Add credit_retained_summary and borrowed response-parts encoding
+to existing ports credit files so final plans never clone an owner/ID map just
+to encode their original reply. Approve NEW storage/state/value/outcome/credit.rs
+for explicit FWSO1 credit inspection/emission, reused by layout8-only dispatch.
+Generic public value codecs remain closed. Scan full response framing before
+retained ownership; prepay18432 bytes of bounded validation scratch (at most1000
+borrowed ID descriptors plus fixed inspection state), independent of returned
+response bytes. Actual point and recovery readers must additionally require the
+credit capability even for receipt-only rows. No dependency or source ceiling
+changes. Registration alone does not complete persistence or this batch.
+
+M2-IDENTIFIED-CREDIT1 atomic storage selection before artifacts: approve NEW
+storage/state/value/credit.rs for FWGI1/FWGP1/FWGQ1 exact bounded value codecs;
+private CreditReservationRow carries borrowed ID, page backreference and status.
+FWGI1 = magic/version + raw ID + u16 page + u8 status. FWGP1 = magic/version +
+u64 shard/epoch + u16 page + u32 count + raw IDs. FWGQ1 = magic/version + u64
+sequence/shard/epoch + u16 next/last. Full framing/uniqueness/scalar validation
+precedes payload copying. Reuse neutral FWGO1 for the owner; no embedded ID map.
+Physical families13/14/15 bind reservation/page/cleanup to the exact four owner
+components;13 adds big-endian shard/epoch components and ID,14 adds shard/epoch
+and numeric page suffix,15 numeric sequence suffix. Add their closed decoder
+rules and preserve all legacy key bytes.
+
+Approve NEW storage/state/redb/credit/{context,write,recovery}.rs and
+credit/write/rows.rs, plus transaction/credit/driver.rs. CreditReadContext borrows
+one actual exclusive transaction, server namespace and credit scope, captures
+actual manifest shard count once, and performs sparse exact observations under
+the same cumulative R/C/step accounts. Private CreditPageBinding is a fallibly
+allocated borrowed sorted (shard,epoch,ID,page) lookup for new ID backreferences;
+release preserves the actual old page pointer. No new public authority token.
+The private writer consumes the real transaction, compares captured control,
+validates response/plan binding, emits all sparse rows plus immutable outcome
+and control, and commits once with Immediate durability. Precommit errors abort
+the complete writer; uncertain commit fences and never acknowledges success.
+Configured R/S/C and the mathematical owner's maximum cohort are reserved from
+W before decoding; actual observation descriptors are admitted before reserve.
+Cleanup moves page-owned ID buffers and sparse writes do not clone the owner.
+
+Recovery validates only credit-capable cohorts additionally: every page/ID/task
+must have its exact owner and lease or retired-task coverage; IDs carry the
+exact unique page backreference; active generation count equals in_use; queue
+head..tail is contiguous and at most256. Reject credit rows and receipts when
+the capability is absent, including receipt-only downgrade. Snapshot validation
+uses the same cohort path. This is solo design review, not independent review;
+the stored f5bbfbe RED and separate authority RED remain the behavioral oracles.
+
+Resource refinement before driver bodies: the domain cohort is included in S,
+not added again outside the already reserved R/S/C sum. Reserve actual captured
+response ceiling plus4096 from S, cap the continuous pure CreditLimits owner
+allowance to the remaining S, and retain its original lease/ID/work ceilings.
+Observed query owners remain on R; serialized adapter keys/values stay on C.
+Add verify_credit_reply_parts beside borrowed encoding: Writer::verify binds a
+sealed plan to the exact retained response without allocating a second response.
+
+Recovery implementation refinement before its body: reuse the already-open
+recovery table, never reopen that same redb table from nested callbacks. Pass
+the parsed actual shard count into a private recovered CreditReadContext; it
+only emits scoped keys and decodes actual values, and confers no new authority.
+Use a checked two-counter census, reservation-row count and covered page-member
+count, instead of scanning up to256 page IDs for every reverse ID row. Owner
+forward closure proves each covered page member has an exact ID row pointing
+back to that page; per-page uniqueness and exact backreferences make this map
+injective. Every page must independently have owner/current-or-task coverage;
+equal global counts then prove there are no orphan ID rows. This preserves full
+closure with linear ID point probes. Counter overflow refuses recovery. No new
+index family or recovered collection is introduced.
+
+First actual stored run after integration:12/14 pass, including full real
+snapshot capture/pin/receive/install and retained replay. The previously masked
+downgrade setup incorrectly called the legacy three-metadata-row helper on the
+four-row explicit value inventory; replace only that helper read with the full
+existing cohort's actual manifest bytes. Keep the capability-byte assertion,
+checksum surgery, Corrupt diagnosis and every unchanged-cohort assertion.
+Second run13/14: delegated fault1 reaches an engine growth sync during row
+staging and correctly returns Unavailable before commit, so it never exercises
+the intended uncertain-publication assertion. Select existing backend mode4,
+which skips acknowledged growth syncs and fails after delegated publication
+sync; retain the exact Uncertain/fenced/whole-old-or-new assertions and add the
+fault-consumed assertion. No older204 test body is changed. These are explicit
+masked R0 fixture repairs, not new TDD evidence or source parity credit.
+
+Atomic storage leaf progress: all219 state-store cases pass (15 credit, all204
+previous identities),20 domain credit and6 codec cases pass,54 architecture
+checks pass and focused strict Clippy exits0. Logs use
+/private/tmp/ferricstore2-identified-credit-atomic-{focused,architecture,
+clippy-verified}.log. The extra graph control, written after bodies, checks six
+actual byte corruptions: missing ID, orphan ID, wrong page backreference,
+missing page, a self-consistent orphan page/ID pair and an orphan cleanup task.
+Each reaches Corrupt and preserves all tables. This is correctness evidence,
+not another genuine RED or source-derived declaration. Source preservation
+receipt atomic-old-tests.json checks all611 old test files against728650f:
+609 whole exact files and two exact additive module-registration inverses.
+
+Verified preparation and the staged reducer no longer stop at refusing facades.
+All actual-count, sparse replay, release retirement, expiry cleanup, retained
+precedence, configuration, real snapshot and delegated sync/fencing assertions
+now execute. The two original masked fixture repairs above remain explicit;
+all old204 case bodies stay unchanged. No new source/ledger ceiling credit,
+dependency, lint suppression, OS claim, push or main-checkout adoption. This is
+still WIP: Node explicit full-body audit/replay and received/purged recovery,
+remaining pinned source cases/dispositions and final full gates must finish
+before accepting M2-IDENTIFIED-CREDIT1. The broader full goal remains active.

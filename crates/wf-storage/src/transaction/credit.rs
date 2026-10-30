@@ -10,6 +10,8 @@ use wf_ports::log::CodecError;
 use wf_ports::state::StateTransactionError;
 use wf_types::version::LogIdentity;
 
+mod driver;
+
 /// Operational failure; never a retained business rejection.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CreditTransactionError {
@@ -36,19 +38,37 @@ impl fmt::Display for CreditTransactionError {
     }
 }
 impl std::error::Error for CreditTransactionError {}
+impl From<CodecError> for CreditTransactionError {
+    fn from(error: CodecError) -> Self {
+        Self::Codec(error)
+    }
+}
+impl From<CreditError> for CreditTransactionError {
+    fn from(error: CreditError) -> Self {
+        Self::Credit(error)
+    }
+}
+impl From<ApplyError> for CreditTransactionError {
+    fn from(error: ApplyError) -> Self {
+        Self::Apply(error)
+    }
+}
+impl From<StateTransactionError> for CreditTransactionError {
+    fn from(error: StateTransactionError) -> Self {
+        Self::State(error)
+    }
+}
 
 /// Applies one complete identified request under the real exclusive authority.
 /// # Errors
 /// Refuses unavailable/input/profile/authority failures; uncertainty fences.
 pub fn apply_credit_transaction(
-    _store: &mut RedbStateStore,
-    _scope: &RequestScope,
-    _encoded: &[u8],
-    _log: LogIdentity,
-    _limits: RecordBatchTransactionLimits,
-    _credit: CreditLimits,
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: RecordBatchTransactionLimits,
+    credit: CreditLimits,
 ) -> Result<RecordBatchTransactionOutcome, CreditTransactionError> {
-    Err(CreditTransactionError::State(
-        StateTransactionError::UnsupportedLayout,
-    ))
+    driver::apply(store, scope, encoded, log, limits, credit)
 }

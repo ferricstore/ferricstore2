@@ -19,6 +19,11 @@ pub(super) fn request(
     limits: CodecLimits,
     maximum_owned: usize,
 ) -> Result<PreparedBytes, E> {
+    crate::log::keys::scope_length([
+        scope.tenant().as_bytes(),
+        scope.group().as_bytes(),
+        scope.recovery().as_bytes(),
+    ])?;
     admission::validate(command, stamp.wall().get(), limits, maximum_owned)?;
     let maximum = limits.admission().decision_bytes();
     let mut measure = Writer::measure(maximum);

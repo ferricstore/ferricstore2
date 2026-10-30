@@ -7,7 +7,12 @@ use wf_ports::consensus::WorkflowValueDefaults;
 use wf_ports::state::StateTransactionError;
 use wf_types::identity::{GroupId, RecoveryId};
 
+mod context;
 mod read;
+pub(super) mod recovery;
+mod write;
+pub(crate) use context::CreditReadContext;
+pub(crate) use write::apply as commit;
 
 impl RedbStateStore {
     /// Creates one atomic empty credit-capable authority with actual shard count.

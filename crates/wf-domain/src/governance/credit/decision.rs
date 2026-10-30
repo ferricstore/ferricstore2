@@ -7,7 +7,7 @@ use super::{
 };
 use crate::workflow::MAX_EXACT_MILLIS as MAX;
 
-pub(super) fn apply(
+pub(in crate::governance) fn apply(
     owner: &mut CreditOwnerData,
     operation: Op<'_>,
     charge: &mut CreditCharge,

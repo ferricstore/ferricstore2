@@ -223,3 +223,196 @@ fn credit_reply_independent_detached_lease_preserves_original_binary_id_order() 
     assert!(decode_credit_reply(&duplicate, CreditLimits::default(), 1024, 16_384).is_err());
     Ok(())
 }
+
+fn check_prepared_case(mutation: IdentifiedCreditMutation<'_>) -> TestResult {
+    let scope = RequestScope::new(
+        TenantId::new(b"t".to_vec())?,
+        GroupId::new(b"g".to_vec())?,
+        RecoveryId::new(b"z".to_vec())?,
+    );
+    let request = RequestId::new(b"r".to_vec())?;
+    let stamp = CommittedTime::new(HlcTimestamp::new(1000, 0)?, 1000)?;
+    let configuration = matches!(
+        mutation,
+        IdentifiedCreditMutation::Lease { .. } | IdentifiedCreditMutation::Spend { .. }
+    )
+    .then_some(CreditConfiguration {
+        limit: 3,
+        config_version: Some(1),
+        policy_fingerprint: None,
+    });
+    let command = IdentifiedCreditRequest {
+        scope: b"x",
+        shard_count: 4,
+        configuration,
+        mutation,
+    };
+    let encoded = encode_credit_request(
+        &scope,
+        &request,
+        stamp,
+        command,
+        CodecLimits::default(),
+        1_048_576,
+    )?;
+    let decoded = wf_ports::log::prepare_credit_request(
+        encoded.as_bytes(),
+        CodecLimits::default(),
+        1_048_576,
+    )?;
+    assert_eq!(decoded.command(), command);
+    assert_eq!(decoded.as_bytes(), encoded.as_bytes());
+    let log = wf_types::version::LogIdentity::new(1, 2, wf_types::version::AppliedPosition::new(7));
+    let header = decoded.header(log);
+    assert_eq!(header.scope, &scope);
+    assert_eq!(header.request, &request);
+    assert_eq!(header.stamp, stamp);
+    assert_eq!(header.identity.log(), log);
+    assert_eq!(header.identity.prepared(), encoded.digest());
+    assert_eq!(header.intent.version(), 12);
+    assert_eq!(header.encoded_entry, encoded.as_bytes());
+    assert_eq!(
+        header.encoded_isolation_scope,
+        b"FWSC\0\x01\0\0\0\x01t\0\0\0\x01g\0\0\0\x01z"
+    );
+    let newer = encode_credit_request(
+        &scope,
+        &request,
+        CommittedTime::new(HlcTimestamp::new(1001, 0)?, 1001)?,
+        command,
+        CodecLimits::default(),
+        1_048_576,
+    )?;
+    let newer =
+        wf_ports::log::prepare_credit_request(newer.as_bytes(), CodecLimits::default(), 1_048_576)?;
+    assert_eq!(newer.header(log).intent, header.intent);
+    assert_ne!(
+        newer.header(log).identity.prepared(),
+        header.identity.prepared()
+    );
+    assert!(
+        wf_ports::log::prepare_credit_request(
+            encoded.as_bytes(),
+            CodecLimits::default(),
+            decoded.owned_bytes() - 1
+        )
+        .is_err()
+    );
+    Ok(())
+}
+
+#[test]
+fn credit_preparation_binds_all_mutations_original_ids_scope_and_clock() -> TestResult {
+    let ids = vec![vec![0, 1], vec![255, 1]];
+    for mutation in [
+        IdentifiedCreditMutation::Lease {
+            shard_id: 0,
+            amount: 2,
+            ttl_ms: 1000,
+        },
+        IdentifiedCreditMutation::Spend {
+            shard_id: 0,
+            lease_epoch: 1,
+            amount: 2,
+            ttl_ms: Some(1000),
+            reservation_ids: &ids,
+        },
+        IdentifiedCreditMutation::Release {
+            shard_id: 0,
+            amount: 2,
+            reservation_ids: &ids,
+        },
+        IdentifiedCreditMutation::Renew {
+            shard_id: 0,
+            ttl_ms: 1000,
+        },
+        IdentifiedCreditMutation::Get,
+        IdentifiedCreditMutation::Cleanup,
+    ] {
+        check_prepared_case(mutation)?;
+    }
+    Ok(())
+}
+
+#[test]
+fn credit_preparation_rejects_truncation_changed_digest_duplicates_and_tight_profiles() -> TestResult
+{
+    let scope = RequestScope::new(
+        TenantId::new(b"t".to_vec())?,
+        GroupId::new(b"g".to_vec())?,
+        RecoveryId::new(b"z".to_vec())?,
+    );
+    let ids = vec![vec![0, 1], vec![255, 1]];
+    let frame = encode_credit_request(
+        &scope,
+        &RequestId::new(b"r".to_vec())?,
+        CommittedTime::new(HlcTimestamp::new(1000, 0)?, 1000)?,
+        IdentifiedCreditRequest {
+            scope: b"x",
+            shard_count: 4,
+            configuration: None,
+            mutation: IdentifiedCreditMutation::Spend {
+                shard_id: 0,
+                lease_epoch: 1,
+                amount: 2,
+                ttl_ms: None,
+                reservation_ids: &ids,
+            },
+        },
+        CodecLimits::default(),
+        1_048_576,
+    )?;
+    assert!(
+        wf_ports::log::prepare_credit_request(frame.as_bytes(), CodecLimits::default(), 1_048_576)
+            .is_ok()
+    );
+    for end in 0..frame.as_bytes().len() {
+        assert!(
+            wf_ports::log::prepare_credit_request(
+                &frame.as_bytes()[..end],
+                CodecLimits::default(),
+                1_048_576
+            )
+            .is_err()
+        );
+    }
+    let mut wrong = frame.as_bytes().to_vec();
+    wrong[29] ^= 1;
+    assert!(
+        wf_ports::log::prepare_credit_request(&wrong, CodecLimits::default(), 1_048_576).is_err()
+    );
+    let mut duplicate = frame.as_bytes().to_vec();
+    let end = duplicate.len();
+    duplicate[end - 2..].copy_from_slice(&[0, 1]);
+    let mut hash = Sha256::new();
+    hash.update(b"wf-governing-credit-intent-v1\0");
+    hash.update(&duplicate[79..]);
+    duplicate[29..61].copy_from_slice(&hash.finalize());
+    assert!(
+        wf_ports::log::prepare_credit_request(&duplicate, CodecLimits::default(), 1_048_576)
+            .is_err()
+    );
+    let mut extra = frame.as_bytes().to_vec();
+    extra.push(0);
+    assert!(
+        wf_ports::log::prepare_credit_request(&extra, CodecLimits::default(), 1_048_576).is_err()
+    );
+    assert!(
+        wf_ports::log::prepare_credit_request(frame.as_bytes(), CodecLimits::default(), 1).is_err()
+    );
+    let defaults = CodecLimits::default().admission();
+    let narrow = wf_domain::workflow::admission::AdmissionLimits::new(
+        defaults.inline_bytes(),
+        defaults.decision_bytes(),
+        1,
+    )?;
+    assert!(
+        wf_ports::log::prepare_credit_request(
+            frame.as_bytes(),
+            CodecLimits::new(narrow),
+            1_048_576
+        )
+        .is_err()
+    );
+    Ok(())
+}

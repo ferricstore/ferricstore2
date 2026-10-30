@@ -133,7 +133,7 @@ fn write_records(
     Ok(())
 }
 
-fn write_control(
+pub(super) fn write_control(
     tx: &RedbStateTransaction<'_>,
     control: ControlState,
 ) -> Result<(), StateTransactionError> {
@@ -160,11 +160,14 @@ fn write_control(
     publication::put(tx, &key, &encoded)
 }
 
-fn write_outcome(
+pub(super) fn write_outcome(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
     outcome: &RetainedOutcome,
 ) -> Result<(), StateTransactionError> {
+    if outcome.intent().version() == 12 {
+        tx.temporary(18_432)?;
+    }
     if outcome.response().len() > tx.admission.decision_bytes() {
         return Err(StateTransactionError::Limit);
     }

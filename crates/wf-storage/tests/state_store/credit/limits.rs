@@ -169,20 +169,30 @@ fn credit_store_uncertain_commit_fences_and_reopens_a_complete_old_or_new_cohort
     assert_ne!(before, after);
     let fault = Arc::new(AtomicU8::new(0));
     let mut store = crate::faults::wrapped(&path, Arc::clone(&fault))?;
-    fault.store(1, Ordering::SeqCst);
-    assert!(matches!(
-        apply_credit_transaction(
-            &mut store,
-            &common::scope()?,
-            frame.as_bytes(),
-            common::log(2),
-            common::driver_limits(),
-            CreditLimits::default()
+    // Skip the engine's growth sync and fail after the publication sync.
+    fault.store(4, Ordering::SeqCst);
+    let result = apply_credit_transaction(
+        &mut store,
+        &common::scope()?,
+        frame.as_bytes(),
+        common::log(2),
+        common::driver_limits(),
+        CreditLimits::default(),
+    );
+    assert!(
+        matches!(
+            result,
+            Err(CreditTransactionError::State(
+                StateTransactionError::Uncertain
+            ))
         ),
-        Err(CreditTransactionError::State(
-            StateTransactionError::Uncertain
-        ))
-    ));
+        "{result:?}"
+    );
+    assert_eq!(
+        fault.load(Ordering::SeqCst),
+        0,
+        "reached delegated publication sync"
+    );
     assert!(matches!(
         store.read_credit_owner(
             &common::scope()?,

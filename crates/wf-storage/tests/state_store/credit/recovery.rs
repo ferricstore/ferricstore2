@@ -108,7 +108,11 @@ fn credit_store_snapshot_restore_preserves_owner_pages_tombstones_and_retained_o
 }
 
 fn remove_capability(path: &std::path::Path) -> TestResult {
-    let mut bytes = common::raw_manifest(path)?;
+    let mut bytes = f::cohort(path)?
+        .get("wf_state_meta_v1")
+        .and_then(|metadata| metadata.get(b"manifest".as_slice()))
+        .ok_or("missing credit manifest")?
+        .clone();
     let end = bytes.len().checked_sub(32).ok_or("short manifest")?;
     assert_eq!(&bytes[end - 10..end], &[0, 1, 0, 0, 0, 0, 0, 0, 0, 4]);
     bytes.drain(end - 10..end);
@@ -179,4 +183,114 @@ fn credit_store_empty_capable_reopen_observes_absence_without_mutating_any_table
     assert_eq!(f::cohort(&path)?, before);
     std::fs::remove_dir_all(dir)?;
     Ok(())
+}
+
+#[test]
+fn credit_store_recovery_rejects_missing_or_orphaned_detached_graph_rows() -> TestResult {
+    let dir = common::directory("credit-graph-corruption")?;
+    for variant in 0..6 {
+        let path = dir.join(variant.to_string());
+        f::seed(&path)?;
+        corrupt_graph(&path, variant)?;
+        let before = f::cohort(&path)?;
+        let scope = common::scope()?;
+        assert!(
+            matches!(
+                RedbStateStore::open(
+                    &path,
+                    scope.group().clone(),
+                    scope.recovery().clone(),
+                    wf_storage::state::StateStoreLimits::default()
+                ),
+                Err(StateTransactionError::Corrupt)
+            ),
+            "graph variant {variant}"
+        );
+        assert_eq!(
+            f::cohort(&path)?,
+            before,
+            "recovery changed variant {variant}"
+        );
+    }
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+fn corrupt_graph(path: &std::path::Path, variant: u8) -> TestResult {
+    let rows = common::raw_rows(path)?;
+    let (id_key, id_value) = rows
+        .iter()
+        .find(|(key, _)| key.get(6) == Some(&13) && key.ends_with(b"a\0\0"))
+        .ok_or("missing a reservation")?;
+    let (page_key, page_value) = rows
+        .iter()
+        .find(|(key, _)| key.get(6) == Some(&14))
+        .ok_or("missing reservation page")?;
+    let (owner_key, _) = rows
+        .iter()
+        .find(|(key, _)| key.get(6) == Some(&12))
+        .ok_or("missing credit owner")?;
+    let database = redb::Builder::new().open(path)?;
+    let mut tx = database.begin_write()?;
+    tx.set_durability(Durability::Immediate)?;
+    {
+        let mut table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
+        match variant {
+            0 => {
+                table.remove(id_key.as_slice())?;
+            }
+            1 => {
+                let (key, value) = orphan_id(id_key, id_value, 1);
+                table.insert(key.as_slice(), value.as_slice())?;
+            }
+            2 => {
+                let mut value = id_value.clone();
+                let end = value.len();
+                value[end - 3..end - 1].copy_from_slice(&2_u16.to_be_bytes());
+                table.insert(id_key.as_slice(), value.as_slice())?;
+            }
+            3 => {
+                table.remove(page_key.as_slice())?;
+            }
+            4 => {
+                let (key, value) = orphan_id(id_key, id_value, 2);
+                table.insert(key.as_slice(), value.as_slice())?;
+                let mut key = page_key.clone();
+                let end = key.len();
+                key[end - 8..].copy_from_slice(&2_u64.to_be_bytes());
+                let mut value = page_value[..28].to_vec();
+                value[22..24].copy_from_slice(&2_u16.to_be_bytes());
+                value[24..28].copy_from_slice(&1_u32.to_be_bytes());
+                value.extend_from_slice(&1_u32.to_be_bytes());
+                value.push(b'x');
+                table.insert(key.as_slice(), value.as_slice())?;
+            }
+            5 => {
+                let mut key = owner_key.clone();
+                key[6] = 15;
+                key.extend_from_slice(&1_u64.to_be_bytes());
+                let mut value = b"FWGQ\0\x01".to_vec();
+                for scalar in [1_u64, 0, 1] {
+                    value.extend_from_slice(&scalar.to_be_bytes());
+                }
+                value.extend_from_slice(&1_u16.to_be_bytes());
+                value.extend_from_slice(&1_u16.to_be_bytes());
+                table.insert(key.as_slice(), value.as_slice())?;
+            }
+            _ => return Err("unknown graph corruption".into()),
+        }
+    }
+    tx.commit()?;
+    Ok(())
+}
+
+fn orphan_id(key: &[u8], value: &[u8], page: u16) -> (Vec<u8>, Vec<u8>) {
+    let mut key = key.to_vec();
+    let end = key.len();
+    key[end - 3] = b'x';
+    let mut value = value.to_vec();
+    value[10] = b'x';
+    let end = value.len();
+    value[end - 3..end - 1].copy_from_slice(&page.to_be_bytes());
+    (key, value)
 }

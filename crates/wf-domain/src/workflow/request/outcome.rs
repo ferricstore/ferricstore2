@@ -34,6 +34,8 @@ pub enum RetainedStatus {
     IndexedRejected(IndexRejection),
     /// Original business-only claim rejection, without operational authority errors.
     ClaimRejected(ClaimRejection),
+    /// Original identified governing-credit business refusal.
+    GovernanceRejected(crate::governance::identified::IdentifiedCreditRejection),
 }
 
 /// Policy error admitted for retention only when it is a business decision.
@@ -211,6 +213,20 @@ fn validate_response_profile(
     response_version: u16,
     status: RetainedStatus,
 ) -> Result<(), RequestValueError> {
+    if intent.version() == 12 {
+        return if response_version == 10
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::GovernanceRejected(_)
+            ) {
+            Ok(())
+        } else {
+            Err(RequestValueError::UnsupportedVersion)
+        };
+    }
+    if matches!(status, RetainedStatus::GovernanceRejected(_)) {
+        return Err(RequestValueError::UnsupportedVersion);
+    }
     if matches!(intent.version(), 10 | 11) {
         return if response_version == 9
             && matches!(
