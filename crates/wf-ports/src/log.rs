@@ -22,6 +22,8 @@ pub use common::{step_continue_recovery_header, stored_step_continue_recovery_he
 pub use record_batch::{encode_stored_step_continue, prepare_stored_step_continue};
 mod complete_policy;
 mod control;
+mod credit;
+pub use credit::{decode_credit_reply, encode_credit_request};
 mod decode;
 mod encode;
 mod keys;

@@ -29,6 +29,7 @@ mod bootstrap;
 mod claim;
 mod control;
 mod core_policy;
+mod credit;
 mod cursor;
 mod faults;
 mod fixtures;

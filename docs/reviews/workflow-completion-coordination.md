@@ -58526,3 +58526,69 @@ claiming any counterpart. Catalog repair/publication has its own source
 obligations and cannot disappear into registration metadata. The public Claim
 parent, governing policy authority and release outbox remain coupled successors;
 this batch is not complete when a codec or pure helper alone passes.
+
+M2-IDENTIFIED-CREDIT1 initial concrete artifact selection (solo, before creation):
+approve domain governance/identified.rs and identified/model.rs for the bounded
+identified request/response values. Named types: CreditConfiguration,
+IdentifiedCreditMutation, IdentifiedCreditRequest, IdentifiedCreditDecision,
+IdentifiedCreditRejection and IdentifiedCreditReply. They depend only on existing
+credit values and wf-types; no I/O or authority is introduced. Spend/release
+borrow the caller's bounded Vec<u8> ID owners, preserving order. Responses are
+private canonical carriers; later public mapping must omit the source's private
+owner/lease fields. Define no public success stub.
+
+Approve ports log/credit.rs and storage transaction/credit.rs for initial
+rejecting encode_credit_request/decode_credit_reply and apply_credit_transaction
+contracts. The driver returns the existing RecordBatchTransactionOutcome;
+CreditTransactionError separates codec/capacity/apply/storage operational errors.
+Use existing RecordBatchTransactionLimits plus CreditLimits; no new dependency.
+Approve the existing RedbStateStore's rejecting create_credit_database and
+read_credit_owner methods in NEW state/redb/credit.rs. The constructor takes
+an existing neutral genesis, defaults, actual shard count and immutable limits;
+its final implementation must publish one atomic genesis, not two upgrades.
+The point reader owns its own bounded coherent read; it cannot certify authority
+for another command. Rejecting contracts must return operational errors.
+
+Approve NEW storage tests/credit_store/{main,fixtures,sequence,recovery,limits}.rs
+and ports tests/credit_codec/{main,framing}.rs. Tests cover actual durable IDs,
+retained replay after changed inputs, generation retirement, sibling-safe
+release, one-page cleanup, reopen, narrow profiles and capability refusal.
+Use no copied full-group production model or fabricated native evidence. Add
+independent healthy codec controls, then save actual compiled RED before bodies.
+Further private implementation files/types require a concrete refinement.
+
+Persistent selection: add an explicit credit capability to fresh layout8/alias2
+genesis rather than widen every layout8 operation to another layout. The exact
+manifest extension and private entry/response registry are selected in ADR-007.
+Both original no-capability encodings and old constructor behavior stay exact.
+This selects real owner/reservation/page/cleanup publication, complete startup
+validation, snapshots and Node replay as the batch exits, not merely these
+initial rejecting declarations. No full source-case/native/Linux credit yet.
+
+Before test creation, refine the selected storage paths to existing-target
+tests/state_store/credit.rs plus credit/{fixtures,sequence,recovery,limits}.rs.
+Append only `mod credit` to the existing target root. Reuse its real disk-fault
+backend and shared scope/clock/profile/directory helpers; do not duplicate a
+backend or introduce another executable target. The new fixture-only Cohort
+alias represents complete observed table bytes. Ports tests use the usual
+TestResult alias. No other new file/type is selected by this refinement.
+
+Freeze the private request body for independent vectors: u32-length scope,
+u64 shard count, configuration presence (limit, optional version, optional32-byte
+fingerprint), then mutation tags1 lease/2 spend/3 release/4 renew/5 get/6 cleanup.
+Integers are big endian; IDs are a u32 count followed by u32-length byte fields,
+and TTL uses explicit optionality. Header follows the existing FWCP scoped
+fields, intent12 and HLC/wall fields. Intent is SHA256 of the exact body prefixed
+by `wf-governing-credit-intent-v1\0`, excluding the header clock. Retained FWGR1
+uses decision1 grant/2 spend/3 renew/4 release/5 owner/6 cleanup/255 rejection,
+with rejection1 NotFound, explicit owner optionality and a final counted ID list.
+Complete owner/rejection encodings need a concrete refinement before bodies.
+
+M2-IDENTIFIED-CREDIT1 genuine compiled RED: storage0 pass/12 fail, ports0 pass/
+2 fail, none ignored. Eleven storage cases stop at healthy credit-capable
+creation (UnsupportedLayout); the old-capability case and two codec controls
+stop at healthy encoding/decoding (UnsupportedVersion). All subsequent protocol,
+fault, snapshot and malformed-vector tails are masked, not certified. Strict
+focused Clippy and all54 architecture cases pass. Two fixture type-coercion
+repairs and byte/assert/pattern style repairs preceded this runtime; none are
+behavioral bug RED. Save these exact tests/rejecting contracts before bodies.

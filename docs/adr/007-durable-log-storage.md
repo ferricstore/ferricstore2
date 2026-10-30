@@ -1142,3 +1142,53 @@ regression reproduced acceptance of a checksummed alias-only downgrade before
 the existing outcome capability check was extended. It now rejects Corrupt,
 preserving every table. The same manifest/owner admission covers this check in
 live and retained snapshot cohorts; it does not infer capability from row count.
+
+## Selected identified governing-credit integration
+
+M2-IDENTIFIED-CREDIT1 selects a real stored owner protocol under the existing
+exclusive group/recovery transaction. This is still unimplemented; initial
+rejecting contracts and tests establish no durability or public Claim authority.
+The exact artifact selection is in the coordination record. Keep the domain
+effect-free and its existing types-only dependency.
+
+Fresh credit-capable genesis uses existing layout8 and alias2 plus a checksummed
+manifest extension: after the 60 defaults bytes and before the final SHA256,
+append u16 credit_format=1 and u64 actual shard_count in 1..=MAX_EXACT. Absence
+retains every previous manifest byte. Unknown extension/format refuses. Older
+readers fail their checksum/EOF checks. Existing constructors never silently
+enable this capability; new creation publishes it with all genesis facts in one
+Immediate transaction. Credit rows or retained credit outcomes without this
+capability are corrupt, including empty-owner/no-ID downgrade cases. Snapshot
+capture/restore and received cohorts preserve and compare the extension.
+
+Reserve physical families12 owner,13 identified reservation status,14 ordered
+reservation page and15 cleanup task. Bind every key/value to actual group,
+recovery, tenant, credit scope and applicable shard/epoch/page/sequence/ID.
+Owner values detach IDs. Point-read only requested IDs; retained active/released
+records prevent recharging while a sibling remains active. Full release retires
+the generation and queues its old pages; expiry also queues cleanup. Preserve
+the source 1000-ID mutation,256-ID page,256-page history and256-task backlog
+ceilings. One cleanup command deletes one real page and advances its cursor.
+Canonical reopen must validate the complete owner/page/ID/cleanup closure under
+bounded recovery accounts. A later failure publishes no prefix effects.
+
+Reserve FWCP1 operation10 / client-intent12 for this explicit private protocol,
+with retained response_version10. Preserve the shared request namespace and
+retained point gate before changed current owner/configuration/time. Reuse of a
+request across another operation must conflict rather than create a second
+request namespace. All encoded optionality, IDs/order, scalar/configuration and
+EOF facts require full validation and a verified prepared digest. The decoder
+owns only bounded request fields/IDs, never historical reservation maps. Its
+canonical private response can carry original internal owner fields; public
+View mapping must still omit cleanup/fingerprint internals and reservation/page
+fields. Known rejection may carry source expiry/reclaim effects; operational
+failure creates no retained business response.
+
+Use one consumed writer for owner, reservation/page/cleanup changes, original
+response, control and checkpoint. Unknown commit fences the owner and returns no
+success. Retried/unknown operations keep exact original IDs and request identity.
+Node recognition must be explicitly opted in and audit full bodies; old generic
+paths remain closed. Exercise actual persistence faults, restart, snapshot and
+received/purged replay before batch acceptance. Authoritative current governance,
+workflow-bound release outbox, the atomic public Claim parent, catalog/service
+semantics and every required source/profile/Linux/macOS gate remain mandatory.
