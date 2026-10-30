@@ -16,7 +16,7 @@ fn uncertain_history_upgrade_reopens_one_complete_format_and_preserves_rows() ->
     let original = common::raw_rows(&path)?;
     let fault = Arc::new(AtomicU8::new(0));
     let wrapped = crate::faults::wrapped(&path, Arc::clone(&fault))?;
-    fault.store(1, Ordering::SeqCst);
+    fault.store(4, Ordering::SeqCst);
     assert!(matches!(
         wrapped.upgrade_history_snapshot_layout(),
         Err(StateTransactionError::Uncertain)
@@ -77,7 +77,28 @@ fn durable_step_uncertain_sync_fences_and_reopens_one_complete_publication() -> 
         f::history(&reopened)?.entries.len(),
         usize::try_from(version)?
     );
-    let acknowledged = f::retained(f::apply(&mut reopened, &frame, 1)?)?;
+    let observed = reopened
+        .begin_apply(
+            scope.group(),
+            scope.recovery(),
+            f::limits().record_batch.codec.admission(),
+            1000,
+            common::MIB,
+            common::MIB,
+        )?
+        .control()?;
+    assert_eq!(observed.position().get(), version - 1);
+    assert_eq!(
+        observed.last_entry().ok_or("reopened entry")?.log(),
+        common::log(version - 1)
+    );
+    if version == 2 {
+        assert!(matches!(
+            f::apply(&mut reopened, &frame, 1)?,
+            RecordBatchTransactionOutcome::LogReplay(_)
+        ));
+    }
+    let acknowledged = f::retained(f::apply(&mut reopened, &frame, version)?)?;
     assert_eq!(acknowledged.status(), RetainedStatus::Accepted);
     assert_eq!(f::record(&mut reopened)?.record.version(), 2);
     assert_eq!(f::history(&reopened)?.entries.len(), 2);

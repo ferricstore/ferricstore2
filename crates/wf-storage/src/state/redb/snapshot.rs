@@ -89,7 +89,7 @@ pub(super) fn initialize(tx: &RedbStateTransaction<'_>) -> Result<(), StateTrans
                 .map_err(admission::table_error)?,
         );
     }
-    if tx.layout == 7 {
+    if matches!(tx.layout, 7 | 8) {
         for definition in [ALT_META, ALT_ROWS] {
             tx.step()?;
             drop(
@@ -267,7 +267,7 @@ pub(super) fn copy(
             .map_err(SnapshotError::State)?;
         let normalized = if key.value() == b"manifest" && to.name() != super::META.name() {
             if value.value().get(4..6) == Some([0, 3].as_slice())
-                || matches!(value.value().get(4..6), Some([0, 5..=7]))
+                || matches!(value.value().get(4..6), Some([0, 5..=8]))
             {
                 None
             } else {

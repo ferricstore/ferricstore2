@@ -10,6 +10,7 @@ pub(super) fn apply(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
     business: &IndependentIndexedPlan<'_>,
+    values: Option<&crate::transaction::ValuePublicationPlan<'_>>,
 ) -> Result<(), StateTransactionError> {
     for (index, original) in business.final_indices().zip(business.originals()) {
         let item = final_item(business, index)?;
@@ -50,16 +51,24 @@ pub(super) fn apply(
             .ok_or(StateTransactionError::InvalidChanges)?;
         publication::write_record(tx, scope, item.partition(), &write.record, ordering)?;
     }
-    for item in business.history_plans() {
-        let write = item
-            .plan()
-            .write()
-            .ok_or(StateTransactionError::InvalidChanges)?;
-        let history = item
-            .plan()
-            .history()
-            .ok_or(StateTransactionError::InvalidChanges)?;
-        publication::write_history(tx, scope, item.partition(), write.record.id(), history)?;
+    if tx.layout == 8 {
+        super::super::history_snapshot::write_steps(
+            tx,
+            scope,
+            values.ok_or(StateTransactionError::InvalidChanges)?,
+        )?;
+    } else {
+        for item in business.history_plans() {
+            let write = item
+                .plan()
+                .write()
+                .ok_or(StateTransactionError::InvalidChanges)?;
+            let history = item
+                .plan()
+                .history()
+                .ok_or(StateTransactionError::InvalidChanges)?;
+            publication::write_history(tx, scope, item.partition(), write.record.id(), history)?;
+        }
     }
     for lane in lanes {
         publication::head_due(tx, scope, lane, true)?;

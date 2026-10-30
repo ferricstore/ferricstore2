@@ -110,11 +110,11 @@ fn validation_bytes(
         maximum_wire_bytes,
         |fields, intent, _, _, _, _, response_version| {
             let response = fields[4];
-            if matches!(intent, 8 | 9) && layout.is_some_and(|layout| layout != 7) {
+            if matches!(intent, 8 | 9) && layout.is_some_and(|layout| !matches!(layout, 7 | 8)) {
                 return Err(StateValueError::Malformed);
             }
             let core_original = layout.is_some() && intent == 2 && response_version == 2;
-            if core_original && !matches!(layout, Some(6 | 7)) {
+            if core_original && !matches!(layout, Some(6..=8)) {
                 return Err(StateValueError::Malformed);
             }
             if (intent == 4 || core_original) && response.first() == Some(&131) {

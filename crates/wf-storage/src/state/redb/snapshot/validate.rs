@@ -70,7 +70,7 @@ pub(in crate::state::redb) fn retained(
     profile: SnapshotLimits,
     layout: u16,
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
-    if matches!(layout, 4..=7) {
+    if matches!(layout, 4..=8) {
         let supported = tx.limits.snapshot_limits();
         return super::catalog::retained(tx, charge, supported);
     }
@@ -96,7 +96,7 @@ fn retained_inner(
     expected: ([u8; 32], usize, usize),
 ) -> Result<(), Error> {
     let (layout, saved) = recovery::cohort(tx, charge)?;
-    if !matches!(layout, 3 | 5..=7) || format::facts(tx, profile)? != expected {
+    if !matches!(layout, 3 | 5..=8) || format::facts(tx, profile)? != expected {
         return Err(Error::Corrupt);
     }
     tx.step()?;
@@ -237,8 +237,8 @@ pub(super) fn value_defaults_compatible(
     old: &[u8],
     new: &[u8],
 ) -> Result<(), SnapshotError> {
-    let old_value = old.get(4..6) == Some([0, 7].as_slice());
-    let new_value = new.get(4..6) == Some([0, 7].as_slice());
+    let old_value = matches!(old.get(4..6), Some([0, 7 | 8]));
+    let new_value = matches!(new.get(4..6), Some([0, 7 | 8]));
     if old_value != new_value {
         return Err(SnapshotError::GenesisMismatch);
     }
@@ -254,7 +254,7 @@ pub(super) fn value_defaults_compatible(
     Ok(())
 }
 
-pub(super) fn complete(
+pub(in crate::state::redb) fn complete(
     tx: &mut RedbStateTransaction<'_>,
     charge: &mut PolicySchemaCharge,
     profile: SnapshotLimits,
@@ -264,7 +264,7 @@ pub(super) fn complete(
     if layout < 3 {
         return Err(Error::UnsupportedLayout);
     }
-    if tables != if matches!(layout, 4..=7) { 6 } else { 4 } {
+    if tables != if matches!(layout, 4..=8) { 6 } else { 4 } {
         return Err(Error::Corrupt);
     }
     retained(tx, charge, profile, layout)

@@ -109,7 +109,7 @@ pub(super) fn read<C: WorkflowValueReadClock>(
             slots,
         });
     }
-    if store.layout.get() != 7 {
+    if !matches!(store.layout.get(), 7 | 8) {
         return Err(Error::UnsupportedLayout);
     }
     let mut context = open(store, charge).map_err(|e| store.failed(e))?;

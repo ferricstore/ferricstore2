@@ -18,6 +18,10 @@ pub use history_snapshot::{
     HistorySnapshotLimits, decode_history_snapshot, encode_history_snapshot,
     encode_history_snapshot_fields,
 };
+pub(crate) use history_snapshot::{
+    binding_source_fields_in_layout, encode_record_in_layout, history_snapshot_encoded_size,
+    inspect_history_snapshot, scan_record_in_layout,
+};
 pub(crate) use membership::inspect_membership;
 pub use membership::{
     decode_applied_membership, encode_applied_membership, measure_applied_membership,
@@ -28,6 +32,7 @@ pub use outcome::{
     encode_step_continue_outcome, outcome_policy_validation_bytes, scan_outcome,
     scan_outcome_profiled, scan_step_continue_outcome,
 };
+pub(crate) use outcome::{encode_outcome_in_layout, scan_outcome_in_layout};
 pub use record::{
     ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields,
     encode_record_snapshot, scan_record_point, scan_record_point_profiled, scan_record_snapshot,

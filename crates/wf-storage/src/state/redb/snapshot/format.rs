@@ -323,7 +323,7 @@ fn snapshot_version(key: &[u8], value: &[u8], previous: u16) -> u16 {
         return previous;
     }
     match value.get(4..6) {
-        Some([0, 7]) => 4,
+        Some([0, 7 | 8]) => 4,
         Some([0, 5]) => 2,
         Some([0, 6]) => 3,
         _ => previous,

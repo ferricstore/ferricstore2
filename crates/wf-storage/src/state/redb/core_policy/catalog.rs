@@ -39,7 +39,7 @@ pub(in crate::state::redb) fn read(
         .map_err(|e| storage_error(&e))?
         .ok_or(Error::Corrupt)?;
     let version = version(bytes.value())?;
-    let facts = if matches!(version, 5..=7) {
+    let facts = if matches!(version, 5..=8) {
         parse5(tx, bytes.value())?
     } else {
         let mut layout = 0;
@@ -58,7 +58,7 @@ pub(in crate::state::redb) fn read(
     };
     tx.step()?;
     let origin = table.get(ORIGIN_KEY).map_err(|e| storage_error(&e))?;
-    if matches!(version, 5..=7) {
+    if matches!(version, 5..=8) {
         bind_origin(tx, facts, origin.ok_or(Error::Corrupt)?.value())?;
     } else if origin.is_some() {
         return Err(Error::Corrupt);
@@ -82,7 +82,7 @@ pub(in crate::state::redb) fn parse5(
     bytes: &[u8],
 ) -> Result<CurrentPolicyManifest, Error> {
     let layout = version(bytes)?;
-    if layout == 7 {
+    if matches!(layout, 7 | 8) {
         return Ok(super::super::values::manifest::parse(bytes, tx.group, tx.recovery)?.policy);
     }
     if !matches!(layout, 5 | 6) {
@@ -181,7 +181,7 @@ pub(in crate::state::redb) fn census(
     layout: u16,
 ) -> Result<(u64, u64, [u8; 32]), Error> {
     let mut hash = Sha256::new();
-    hash.update(if matches!(layout, 6 | 7) {
+    hash.update(if matches!(layout, 6..=8) {
         super::super::snapshot::original::CATALOG_DOMAIN
     } else if layout == POLICY_LAYOUT {
         CURRENT_CATALOG_DOMAIN
@@ -252,7 +252,11 @@ pub(in crate::state::redb) fn publish_original(
         old_layout,
         manifest,
         catalog,
-        if old_layout == 7 { 7 } else { 6 },
+        if matches!(old_layout, 7 | 8) {
+            old_layout
+        } else {
+            6
+        },
     )
 }
 
@@ -294,7 +298,7 @@ fn publish_target(
     manifest.placements = placements;
     manifest.policies = policies;
     manifest.catalog_hash = hash;
-    if target == 7 {
+    if matches!(target, 7 | 8) {
         let provenance = super::super::values::manifest::read(tx)?;
         return super::super::values::manifest::publish(
             tx,

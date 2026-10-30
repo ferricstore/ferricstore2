@@ -112,14 +112,14 @@ impl RedbStateTransaction<'_> {
             value::outcome_policy_validation_bytes_in_layout(guard.value(), maximum, self.layout)
                 .map_err(value_error)?;
         self.admit_read(validation)?;
-        let scanned = value::scan_outcome_profiled(
+        let scanned = value::scan_outcome_in_layout(
             guard.value(),
             &scope,
             request,
             self.admission,
             maximum,
-            (schema, charge),
-            validation,
+            (schema, charge, validation),
+            self.layout,
         )
         .map_err(value_error)?;
         if scanned
@@ -195,13 +195,14 @@ impl RedbStateTransaction<'_> {
             return Ok(None);
         };
         self.recovery_row(&key, guard.value())?;
-        let scanned = value::scan_record_point_profiled(
+        let scanned = value::scan_record_in_layout(
             guard.value(),
             &scope,
             partition,
             id,
             self.admission,
             wire_record_limit(self.admission)?,
+            self.layout,
         )
         .map_err(value_error)?;
         let bytes = scanned.owned_bytes();

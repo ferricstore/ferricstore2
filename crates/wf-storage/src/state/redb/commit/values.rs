@@ -41,16 +41,17 @@ pub(super) fn validate(
     publication: &mut ValuePublicationPlan<'_>,
 ) -> Result<(), Error> {
     publication.charge.helper()?;
-    if tx.layout != 7 {
+    if !matches!(tx.layout, 7 | 8) {
         return Err(Error::UnsupportedLayout);
     }
     if publication.intent_version == 9 && tx.value_manifest()?.alias_format != 2 {
         return Err(Error::UnsupportedPolicyProfile);
     }
-    if !matches!(publication.intent_version, 8 | 9) {
+    let step = tx.layout == 8 && publication.intent_version == 10 && publication.mode == 10;
+    if !matches!(publication.intent_version, 8 | 9) && !step {
         return Err(Error::InvalidChanges);
     }
-    if !matches!(publication.mode, 1 | 5 | 6 | 7)
+    if (!matches!(publication.mode, 1 | 5 | 6 | 7) && !step)
         || changes
             .plan()
             .control()
@@ -66,6 +67,7 @@ pub(super) fn validate(
             5 => 5,
             6 => 6,
             7 => 7,
+            10 if step => 9,
             _ => return Err(Error::InvalidChanges),
         };
         if outcome.intent().version() != publication.intent_version

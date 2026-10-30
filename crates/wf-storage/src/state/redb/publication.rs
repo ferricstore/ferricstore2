@@ -32,13 +32,14 @@ pub(super) fn validate_version(
     let current = guard
         .as_ref()
         .map(|guard| {
-            value::scan_record_point_profiled(
+            value::scan_record_in_layout(
                 guard.value(),
                 scope,
                 partition,
                 id,
                 tx.admission,
                 wire_record_limit(tx.admission)?,
+                tx.layout,
             )
             .map(|record| record.version())
             .map_err(value_error)
@@ -119,9 +120,16 @@ pub(super) fn write_record(
     )?;
     engine_pair(key.len(), size)?;
     tx.temporary(size)?;
-    let encoded =
-        value::encode_record_fields(scope, partition, record, ordering, tx.admission, size)
-            .map_err(value_error)?;
+    let encoded = value::encode_record_in_layout(
+        scope,
+        partition,
+        record,
+        ordering,
+        tx.admission,
+        size,
+        tx.layout,
+    )
+    .map_err(value_error)?;
     put(tx, &key, &encoded)
 }
 

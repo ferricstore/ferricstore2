@@ -33,7 +33,7 @@ pub(super) fn observe(
 ) -> Result<WorkflowValueBindingKnowledge, Error> {
     store.ready()?;
     read::check_scope(store, scope)?;
-    if store.layout.get() != 7 {
+    if !matches!(store.layout.get(), 7 | 8) {
         return Ok(WorkflowValueBindingKnowledge::LegacyUnavailable);
     }
     if limits.maximum_references == 0 {

@@ -220,7 +220,7 @@ fn validate(
                 || outcome.original_time() != control.execution_time()
                 || (outcome.intent().version() == 2
                     && outcome.response_version() == 2
-                    && !matches!(tx.layout, 6 | 7))
+                    && !matches!(tx.layout, 6..=8))
             {
                 return Err(Error::InvalidChanges);
             }
@@ -237,7 +237,7 @@ fn validate(
             if outcome.scope() != changes.scope()
                 || (outcome.intent().version() == 2
                     && outcome.response_version() == 2
-                    && !matches!(tx.layout, 6 | 7))
+                    && !matches!(tx.layout, 6..=8))
             {
                 return Err(Error::InvalidChanges);
             }

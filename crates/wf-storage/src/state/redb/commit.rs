@@ -37,7 +37,7 @@ fn publish(
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
     match values.as_deref_mut() {
-        None if tx.layout == 7 => return Err(StateTransactionError::UnsupportedLayout),
+        None if matches!(tx.layout, 7 | 8) => return Err(StateTransactionError::UnsupportedLayout),
         Some(publication) => values::validate(&tx, changes, publication)?,
         None => {}
     }
@@ -67,7 +67,7 @@ fn publish(
         }
     }
     if let Some(business) = changes.independent_business() {
-        independent::apply(&tx, scope, business)?;
+        independent::apply(&tx, scope, business, values.as_deref())?;
     }
     if let Some(publication) = values {
         values::publish(&tx, scope, publication)?;
@@ -110,17 +110,24 @@ fn write_records(
     business: &IndexedBatchPlan<'_>,
 ) -> Result<(), StateTransactionError> {
     for (item, ordering) in business.batch().items().iter().zip(business.metadata()) {
-        if let Some(write) = item.plan().write() {
-            publication::write_record(tx, scope, item.partition(), &write.record, ordering)?;
-            if let Some(history) = item.plan().history() {
-                publication::write_history(
-                    tx,
-                    scope,
-                    item.partition(),
-                    write.record.id(),
-                    history,
-                )?;
-            }
+        let Some(write) = item.plan().write() else {
+            continue;
+        };
+        publication::write_record(tx, scope, item.partition(), &write.record, ordering)?;
+        let Some(history) = item.plan().history() else {
+            continue;
+        };
+        if tx.layout == 8 {
+            super::history_snapshot::write(
+                tx,
+                scope,
+                item.partition(),
+                &write.record,
+                ordering,
+                history,
+            )?;
+        } else {
+            publication::write_history(tx, scope, item.partition(), write.record.id(), history)?;
         }
     }
     Ok(())
@@ -238,6 +245,7 @@ fn write_outcome(
     )?;
     engine_pair(key.len(), size)?;
     tx.temporary(size)?;
-    let encoded = value::encode_outcome(outcome, size).map_err(value_error)?;
+    let encoded = value::encode_outcome_in_layout(outcome, size, tx.admission, tx.layout)
+        .map_err(value_error)?;
     publication::put(tx, &key, &encoded)
 }

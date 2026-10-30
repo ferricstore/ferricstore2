@@ -22,6 +22,7 @@ mod policy;
 mod step_continue;
 pub(crate) use policy::outcome_policy_validation_bytes_in_layout;
 pub use policy::{encode_outcome_profiled, outcome_policy_validation_bytes, scan_outcome_profiled};
+pub(crate) use step_continue::{encode_outcome_in_layout, scan_outcome_in_layout};
 pub use step_continue::{encode_step_continue_outcome, scan_step_continue_outcome};
 
 /// Validated borrowed metadata and response, without transaction authority.

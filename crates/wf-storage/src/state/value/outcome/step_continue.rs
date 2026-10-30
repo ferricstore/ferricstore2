@@ -1,11 +1,48 @@
 //! Explicit Step retained data; generic store profiles remain closed.
 
+use wf_domain::policy::complete::{PolicySchemaCharge, PolicySchemaLimits};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedOutcome, RetainedStatus};
 use wf_ports::log::step_continue_retained_summary;
 use wf_types::identity::RequestId;
 
 use super::{ScannedRetainedOutcome, StateValueError, add, claim_error, encode_fields, with_frame};
+
+pub(crate) fn scan_outcome_in_layout<'a>(
+    bytes: &'a [u8],
+    scope: &RequestScope,
+    request: &RequestId,
+    admission: AdmissionLimits,
+    maximum: usize,
+    profile: (PolicySchemaLimits, &mut PolicySchemaCharge, usize),
+    layout: u16,
+) -> Result<ScannedRetainedOutcome<'a>, StateValueError> {
+    if layout == 8 && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| Ok(intent == 10))? {
+        return scan_step_continue_outcome(bytes, scope, request, admission, maximum);
+    }
+    let (schema, charge, validation) = profile;
+    super::scan_outcome_profiled(
+        bytes,
+        scope,
+        request,
+        admission,
+        maximum,
+        (schema, charge),
+        validation,
+    )
+}
+
+pub(crate) fn encode_outcome_in_layout(
+    outcome: &RetainedOutcome,
+    maximum: usize,
+    admission: AdmissionLimits,
+    layout: u16,
+) -> Result<Vec<u8>, StateValueError> {
+    if layout == 8 && outcome.intent().version() == 10 {
+        return encode_step_continue_outcome(outcome, maximum, admission);
+    }
+    super::encode_outcome(outcome, maximum)
+}
 
 /// Encodes one explicitly selected Step receipt under actual captured field caps.
 /// # Errors

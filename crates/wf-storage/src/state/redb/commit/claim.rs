@@ -23,7 +23,7 @@ fn publish(
     changes: &GroupClaimChanges<'_, '_>,
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
-    if tx.layout == 7 {
+    if matches!(tx.layout, 7 | 8) {
         return Err(StateTransactionError::UnsupportedLayout);
     }
     let scope = changes.scope();

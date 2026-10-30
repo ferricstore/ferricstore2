@@ -55,7 +55,10 @@ fn state_value_codecs_and_response_parser_reject_effects() -> CheckResult<()> {
         ("wf-storage", "state::value::history_snapshot::scan"),
         ("wf-storage", "state::value::history_snapshot::write"),
         ("wf-storage", "state::value::history_snapshot::stored"),
-        ("wf-storage", "state::value::history_snapshot::stored::nested"),
+        (
+            "wf-storage",
+            "state::value::history_snapshot::stored::nested",
+        ),
         ("wf-storage", "state::value::membership"),
         ("wf-storage", "state::value::membership::nested"),
         ("wf-storage", "state::key"),

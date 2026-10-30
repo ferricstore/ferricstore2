@@ -14,11 +14,33 @@ use super::super::{
     StateValueError, add, canonical_history_position, copy, finish, flag, raw, read_u8, read_u64,
     scan_record_snapshot, start, start_versioned,
 };
-use super::{HistorySnapshotLimits, admit};
+use super::admit;
 
-pub(super) struct ScannedHistorySnapshot<'a> {
+pub(crate) struct ScannedHistorySnapshot<'a> {
     pub(super) record: ScannedWorkflowRecord<'a>,
     pub(super) history: BorrowedHistoryFields<'a>,
+}
+
+impl<'a> ScannedHistorySnapshot<'a> {
+    pub(crate) const fn core(&self) -> &ScannedWorkflowRecord<'a> {
+        &self.record
+    }
+    pub(crate) const fn event_id(&self) -> &'a [u8] {
+        self.history.event_id
+    }
+    pub(crate) const fn version(&self) -> u64 {
+        self.history.version
+    }
+    pub(crate) fn event_owned_bytes(&self) -> Result<usize, StateValueError> {
+        self.history.owned_bytes()
+    }
+    pub(crate) fn into_event(self, maximum: usize) -> Result<HistoryEntry, StateValueError> {
+        if maximum == 0 {
+            return Err(StateValueError::InvalidValue);
+        }
+        admit(self.history.owned_bytes()?, maximum)?;
+        self.history.into_owned()
+    }
 }
 
 pub(super) struct BorrowedHistoryFields<'a> {
@@ -163,9 +185,10 @@ pub(super) fn scan<'a>(
     scope: &RequestScope,
     partition: &PartitionId,
     id: &RecordId,
-    limits: HistorySnapshotLimits,
+    admission: AdmissionLimits,
+    maximum_wire_bytes: usize,
 ) -> Result<ScannedHistorySnapshot<'a>, StateValueError> {
-    let mut offset = start(bytes, *b"FWHS", limits.encoded)?;
+    let mut offset = start(bytes, *b"FWHS", maximum_wire_bytes)?;
     let record_bytes = raw(bytes, &mut offset)?;
     let history_bytes = raw(bytes, &mut offset)?;
     finish(bytes, offset)?;
@@ -174,11 +197,11 @@ pub(super) fn scan<'a>(
         scope,
         partition,
         id,
-        limits.admission,
-        limits.encoded,
+        admission,
+        maximum_wire_bytes,
     )?;
-    let history = scan_history(history_bytes, scope, partition, id, limits.encoded)?;
-    history.validate(&record.history_view(), limits.admission)?;
+    let history = scan_history(history_bytes, scope, partition, id, maximum_wire_bytes)?;
+    history.validate(&record.history_view(), admission)?;
     Ok(ScannedHistorySnapshot { record, history })
 }
 

@@ -88,7 +88,7 @@ impl RedbStateTransaction<'_> {
 impl GroupOriginalPolicyTransaction for RedbStateTransaction<'_> {
     fn original_policy_profile(&self) -> Result<u32, Error> {
         self.ready()?;
-        if self.recovering || self.snapshot_cohort || !(3..=7).contains(&self.layout) {
+        if self.recovering || self.snapshot_cohort || !(3..=8).contains(&self.layout) {
             return Err(Error::UnsupportedLayout);
         }
         Ok(super::snapshot::original::PROFILE)
@@ -155,7 +155,7 @@ fn decode_stored_with_generation(
         let generation = value.generation();
         return Ok((StoredPolicyValue::Complete(Box::new(value)), generation));
     }
-    if raw.first() != Some(&131) || !matches!(layout, 6 | 7) {
+    if raw.first() != Some(&131) || !matches!(layout, 6..=8) {
         return Err(Error::Corrupt);
     }
     if raw.len() > wf_domain::policy::installation::MAX_ENCODED_POLICY_BYTES {

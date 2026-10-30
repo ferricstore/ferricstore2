@@ -15,7 +15,7 @@ use wf_ports::{
 
 fn mode(store: &RedbStateStore, limits: SnapshotLimits, extra: usize) -> Result<(), SnapshotError> {
     store.ready().map_err(SnapshotError::State)?;
-    if !matches!(store.layout.get(), 4..=7) {
+    if !matches!(store.layout.get(), 4..=8) {
         return Err(SnapshotError::State(Error::UnsupportedLayout));
     }
     admit(&store.group, &store.recovery, store.limits, limits, extra)
@@ -139,7 +139,7 @@ fn finish(
 impl StateSnapshotTransitionStore for RedbStateStore {
     fn supports_snapshot_transitions(&self) -> Result<bool, SnapshotError> {
         self.ready().map_err(SnapshotError::State)?;
-        Ok(matches!(self.layout.get(), 4..=7))
+        Ok(matches!(self.layout.get(), 4..=8))
     }
     fn snapshot_by_id<W: std::io::Write>(
         &mut self,
@@ -172,7 +172,7 @@ impl StateSnapshotTransitionStore for RedbStateStore {
         limits: SnapshotLimits,
     ) -> Result<(), SnapshotError> {
         self.ready().map_err(SnapshotError::State)?;
-        if !matches!(self.layout.get(), 4..=7) {
+        if !matches!(self.layout.get(), 4..=8) {
             return Err(SnapshotError::State(Error::UnsupportedLayout));
         }
         let extra = super::admission::total(

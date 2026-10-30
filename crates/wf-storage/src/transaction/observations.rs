@@ -11,7 +11,7 @@ use wf_ports::log::{
     FreshRecordBatch, RecordBatchApplyPlan, WorkflowValueDecision,
     decide_fresh_atomic_start_touched, decide_fresh_independent_record_batch_touched,
     decide_fresh_public_mutation_touched, decide_fresh_record_batch_touched,
-    decide_fresh_workflow_value_batch_touched,
+    decide_fresh_step_continue_touched, decide_fresh_workflow_value_batch_touched,
 };
 use wf_ports::state::{GroupApplyTransaction, StateTransactionError, StoredWorkflowRecord};
 use wf_types::identity::{PartitionId, RecordId};
@@ -118,6 +118,8 @@ fn decide_profile<'current>(
             live_bytes,
             limits.outcome_ttl_ms,
         )
+    } else if fresh.decoded().request().intent.version() == 10 {
+        decide_fresh_step_continue_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
     } else if fresh.decoded().request().intent.version() == 7 {
         decide_fresh_atomic_start_touched(fresh, view, live_bytes, limits.outcome_ttl_ms)
     } else {

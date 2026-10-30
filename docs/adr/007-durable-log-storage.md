@@ -983,3 +983,49 @@ Actual negotiated physical schema, full historical context/value companions,
 atomic record/index/history/outcome/control publication, inquiry/fault/reopen and
 recovery remain required. Do not open the generic formats merely because these
 data functions pass; all source/profile/Linux/macOS milestone exits remain open.
+
+## Explicit complete-history storage and Step publication
+
+The consuming `upgrade_history_snapshot_layout` selects FWSS8 from a ready FWSS7
+value store. It preserves the entire defaults/origin/alias/binding grammar and
+validates the complete current and retained cohorts before and after changing
+only the current manifest in one Immediate transaction. Other formats refuse;
+format8 is idempotent. Unproved commit consumes the owner and requires reopen.
+Construction and snapshot installation never silently select this format.
+
+Under8, newly written current records use FWSR2 and each new historical row uses
+FWHS1 at the existing history key, with the actual intermediate postimage and
+ordering. Independent batches use the existing value publication's individual
+steps, not final-record ordering. Old FWSR1/FWSH1 rows remain explicit legacy
+data; no historical postimage is reconstructed from a current record. Every
+retained snapshot cohort is checked using its own parsed layout. FWSP4 transports
+either manifest7 or8, so receive retains the actual manifest format. An incoming8
+snapshot needs an explicitly8 target, and incoming7 cannot downgrade an8 target.
+
+`apply_step_continue_transaction` uses the actual consumed value/core writer.
+Full log/prepared identity and retained replay/conflict/expiry/exact-log decisions
+precede Fresh-only current/policy/binding reads. Only layout8 accepts this path.
+An accepted Step publishes the rotated lease/fence, logical state/order, actual
+values/references and lifecycle, complete history, original response and control
+together. It retains captured birth metadata and clears effective TTL/deadline.
+Plain Step payloads are logical binary even with stored-value aliases enabled.
+The one nonbirth input carries no invented policy/birth witness.
+
+Full history emission uses borrowed fields and one admitted output buffer.
+Reduced history/recovery validates the complete borrowed postimage and copies
+only the requested event; fixed descriptor workspace2048 and actual encoded/
+returned fields are admitted prospectively. These are logical accounting claims,
+not native RSS, allocator, throughput or Linux measurements. Generic public data
+codecs retain their closed profiles; only explicit store-format dispatch uses
+the complete snapshot and Step retained data APIs.
+
+Genuine rejecting tests were saved in10be665 before bodies. Two masked fixture/
+inquiry assumptions and the growth-aware fault boundary required documented
+post-RED corrections; they do not count as unchanged tests or additional source
+credit. All11 focused physical cases and7 history-codec cases pass; strict
+focused Clippy passes after flattening the new writer branch. Whole-workspace
+verification and adoption evidence belongs in M2-STEP-STORAGE1 and the handoff.
+Node operation10 startup replay, rich original context/attributes, the actual
+original Create→Claim→Step→Retry→FIFO chain, native/profile execution, and
+independent Linux/macOS milestone exits remain required. This component is not
+a completed live service or full workflow parity.

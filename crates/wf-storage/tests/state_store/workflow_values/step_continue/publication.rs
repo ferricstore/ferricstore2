@@ -6,6 +6,27 @@ use wf_domain::workflow::indexed::IndexRejection;
 use wf_ports::blob::WorkflowValueBindingKnowledge;
 
 #[test]
+fn start_and_claim_fixture_has_one_attempt_before_history_upgrade() -> TestResult {
+    let directory = common::directory("step-start-attempt-control")?;
+    let path = directory.join("state");
+    let mut store = values::fresh(&path)??;
+    f::seed(&mut store)?;
+    let current = f::record(&mut store)?;
+    assert_eq!(
+        (
+            current.record.version(),
+            current.record.fence().get(),
+            current.record.attempts()
+        ),
+        (1, 1, 1)
+    );
+    drop(store);
+    assert!(values::raw_manifest(&path)?.starts_with(b"FWSS\0\x07"));
+    std::fs::remove_dir_all(directory)?;
+    Ok(())
+}
+
+#[test]
 fn durable_step_publishes_rotated_core_full_history_refs_and_original_reply() -> TestResult {
     let directory = common::directory("step-durable")?;
     let path = directory.join("state");
@@ -42,7 +63,7 @@ fn durable_step_publishes_rotated_core_full_history_refs_and_original_reply() ->
             current.record.fence().get(),
             current.record.attempts()
         ),
-        (2, 2, 0)
+        (2, 2, 1)
     );
     assert_eq!(current.record.run_state(), Some(b"charge".as_slice()));
     assert_eq!(current.record.payload(), Some(b"\0\xff".as_slice()));

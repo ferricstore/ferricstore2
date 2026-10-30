@@ -26,19 +26,20 @@ mod driver;
 mod plan;
 mod prepare;
 mod step;
+mod step_continue;
 pub(crate) use plan::{ValuePublicationPlan, ValueStep};
 
 /// Applies an explicitly selected Step through the complete-history/value writer.
 /// # Errors
-/// Currently rejects every input until the selected tests-first body exists.
+/// Refuses unsupported format, invalid authority, budgets or unproved commit.
 pub fn apply_step_continue_transaction(
-    _store: &mut RedbStateStore,
-    _scope: &RequestScope,
-    _encoded: &[u8],
-    _log: LogIdentity,
-    _limits: WorkflowValueTransactionLimits,
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: WorkflowValueTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
-    Err(WorkflowValueTransactionError::UnsupportedProfile)
+    step_continue::apply(store, scope, encoded, log, limits)
 }
 
 /// Additional publication ceilings, carried with the existing driver profile.
@@ -189,9 +190,16 @@ fn apply_fresh(
         staging_used,
     };
     admit_decision_work(policy_types, inputs.inputs.len(), &mut charge)?;
-    let (result, ordering) =
+    let (result, ordering) = if fresh.decoded().request().intent.version() == 10 {
+        (
+            observations::decide(fresh, scope, view, limits.record_batch, live)
+                .map_err(record_error)?,
+            Vec::new(),
+        )
+    } else {
         observations::decide_values(fresh, scope, view, limits.record_batch, live)
-            .map_err(record_error)?;
+            .map_err(record_error)?
+    };
     let changes = GroupApplyChanges::new(scope, predecessor, result).map_err(storage_error)?;
     let mut publication = plan::build(
         &changes,
@@ -225,6 +233,9 @@ fn prepare_fresh(
     WorkflowValueTransactionError,
 > {
     charge.helper().map_err(storage_error)?;
+    if fresh.decoded().request().intent.version() == 10 {
+        return step_continue::prepare_fresh(tx, scope, fresh, limits, schema, charge);
+    }
     let mut loaded =
         LoadedRecordBatch::load_points_only(tx, scope, fresh.decoded(), limits.record_batch)
             .map_err(record_error)?;

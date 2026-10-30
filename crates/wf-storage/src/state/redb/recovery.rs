@@ -32,7 +32,7 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<u16, StateTransactionEr
         }
         return Err(StateTransactionError::UnsupportedLayout);
     }
-    if tables != if matches!(layout, 4..=7) { 6 } else { 4 } {
+    if tables != if matches!(layout, 4..=8) { 6 } else { 4 } {
         return Err(StateTransactionError::Corrupt);
     }
     let _ = super::snapshot::validate::retained(
@@ -83,7 +83,7 @@ pub(super) fn cohort(
     } else {
         None
     };
-    if matches!(layout, 5..=7) {
+    if matches!(layout, 5..=8) {
         tx.step()?;
         let (key, origin) = meta_rows
             .next()
@@ -108,7 +108,7 @@ pub(super) fn cohort(
         if key.value() != super::snapshot::KEY {
             return Err(StateTransactionError::Corrupt);
         }
-        if (matches!(layout, 4..=7)) != bytes.value().starts_with(b"FWSD\0\x03") {
+        if (matches!(layout, 4..=8)) != bytes.value().starts_with(b"FWSD\0\x03") {
             return Err(StateTransactionError::Corrupt);
         }
         super::snapshot::check_descriptor(tx, bytes.value())?;
@@ -141,9 +141,9 @@ pub(super) fn cohort(
     if placements != actual_placements || policies != actual_policies || expected != hash {
         return Err(StateTransactionError::Corrupt);
     }
-    if layout == 7 {
+    if matches!(layout, 7 | 8) {
         let values = super::values::manifest::parse(manifest.value(), tx.group, tx.recovery)?;
-        super::values::validate::cohort(tx, values.defaults, values.alias_format)?;
+        super::values::validate::cohort(tx, values.defaults, values.alias_format, layout)?;
     }
     Ok((layout, control))
 }
@@ -191,7 +191,7 @@ pub(super) fn check_manifest(
         return Err(StateTransactionError::Corrupt);
     }
     *layout = value::read_u16(bytes, &mut at).map_err(value_error)?;
-    if matches!(*layout, 5..=7) {
+    if matches!(*layout, 5..=8) {
         return super::core_policy::catalog::parse5(tx, bytes)
             .map(super::core_policy::catalog::facts);
     }
@@ -242,7 +242,7 @@ fn validate_rows(
     let mut entries = table.iter().map_err(|e| storage_error(&e))?;
     let mut counts = [0_u64; 2];
     let mut hash = Sha256::new();
-    hash.update(if matches!(layout, 6 | 7) {
+    hash.update(if matches!(layout, 6..=8) {
         super::snapshot::original::CATALOG_DOMAIN
     } else if layout == 5 {
         super::core_policy::catalog::CURRENT_CATALOG_DOMAIN

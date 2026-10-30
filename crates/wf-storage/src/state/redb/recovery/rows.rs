@@ -24,12 +24,12 @@ pub(super) fn validate(
             value::decode_control(bytes, tx.group, tx.recovery, 1_024).map_err(value_error)?;
         }
         1 => {
-            let owner = record(tx, key, bytes)?;
+            let owner = record(tx, key, bytes, layout)?;
             index::canonical(tx, table, &owner, charge, layout)?;
         }
         2 => outcome(tx, key, bytes, charge, (layout, manifest))?,
         3 | 4 => index::reverse(tx, table, key, bytes, charge, layout)?,
-        5 => history(tx, key, bytes)?,
+        5 => history(tx, key, bytes, layout)?,
         6 => {
             let _scope = tx.scope_bytes(key.part(2))?;
             decode_policy(tx, bytes, key.part(3), charge, layout)?;
@@ -43,7 +43,7 @@ pub(super) fn validate(
                 return Err(StateTransactionError::Corrupt);
             }
         }
-        8..=11 if layout == 7 => {}
+        8..=11 if matches!(layout, 7 | 8) => {}
         _ => return Err(StateTransactionError::Corrupt),
     }
     Ok(())
@@ -53,19 +53,21 @@ pub(super) fn record(
     tx: &RedbStateTransaction<'_>,
     key: &DecodedStateKey,
     bytes: &[u8],
+    layout: u16,
 ) -> Result<StoredWorkflowRecord, StateTransactionError> {
     let scope = tx.scope_bytes(key.part(2))?;
     tx.temporary(total(key.part(3).len(), [key.part(4).len()])?)?;
     let partition =
         PartitionId::new(copy_bytes(key.part(3))?).map_err(|_| StateTransactionError::Corrupt)?;
     let id = RecordId::new(copy_bytes(key.part(4))?).map_err(|_| StateTransactionError::Corrupt)?;
-    let scanned = value::scan_record_point_profiled(
+    let scanned = value::scan_record_in_layout(
         bytes,
         &scope,
         &partition,
         &id,
         tx.admission,
         wire_record_limit(tx.admission)?,
+        layout,
     )
     .map_err(value_error)?;
     let owner = scanned.owned_bytes();
@@ -88,14 +90,14 @@ fn outcome(
     let validation = value::outcome_policy_validation_bytes_in_layout(bytes, maximum, layout)
         .map_err(value_error)?;
     tx.temporary(validation)?;
-    let scanned = value::scan_outcome_profiled(
+    let scanned = value::scan_outcome_in_layout(
         bytes,
         &scope,
         &request,
         tx.admission,
         maximum,
-        (tx.limits.schema(), charge),
-        validation,
+        (tx.limits.schema(), charge, validation),
+        layout,
     )
     .map_err(value_error)?;
     if scanned.intent_version() == 9 {
@@ -127,15 +129,36 @@ fn history(
     tx: &RedbStateTransaction<'_>,
     key: &DecodedStateKey,
     bytes: &[u8],
+    layout: u16,
 ) -> Result<(), StateTransactionError> {
     let scope = tx.scope_bytes(key.part(2))?;
+    let full = layout == 8 && bytes.starts_with(b"FWHS");
     tx.temporary(total(
         key.part(3).len(),
-        [key.part(4).len(), 512, bytes.len()],
+        [
+            key.part(4).len(),
+            if full { 2048 } else { 512 },
+            bytes.len(),
+        ],
     )?)?;
     let partition =
         PartitionId::new(copy_bytes(key.part(3))?).map_err(|_| StateTransactionError::Corrupt)?;
     let id = RecordId::new(copy_bytes(key.part(4))?).map_err(|_| StateTransactionError::Corrupt)?;
+    if full {
+        let scanned = value::inspect_history_snapshot(
+            bytes,
+            &scope,
+            &partition,
+            &id,
+            tx.admission,
+            bytes.len(),
+        )
+        .map_err(value_error)?;
+        if scanned.event_id() != key.part(5) {
+            return Err(StateTransactionError::Corrupt);
+        }
+        return Ok(());
+    }
     let history =
         value::decode_history(bytes, &scope, &partition, &id, bytes.len()).map_err(value_error)?;
     if history.event_id.as_bytes() != key.part(5) {
@@ -168,6 +191,7 @@ pub(super) fn lookup_record(
     tenant: &[u8],
     partition: &[u8],
     id: &[u8],
+    layout: u16,
 ) -> Result<Option<StoredWorkflowRecord>, StateTransactionError> {
     let scope = tx.scope_bytes(tenant)?;
     tx.temporary(total(partition.len(), [id.len()])?)?;
@@ -181,13 +205,14 @@ pub(super) fn lookup_record(
         return Ok(None);
     };
     tx.recovery_row(&key, guard.value())?;
-    let scanned = value::scan_record_point_profiled(
+    let scanned = value::scan_record_in_layout(
         guard.value(),
         &scope,
         &partition,
         &id,
         tx.admission,
         wire_record_limit(tx.admission)?,
+        layout,
     )
     .map_err(value_error)?;
     let owner = scanned.owned_bytes();

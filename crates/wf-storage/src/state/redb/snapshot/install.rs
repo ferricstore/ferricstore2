@@ -13,12 +13,17 @@ pub(super) fn install(
     stage: RedbSnapshotStage,
     limits: SnapshotLimits,
 ) -> Result<SnapshotMetadata, SnapshotError> {
+    if stage.store.layout.get() == 8 && store.layout.get() != 8 {
+        return Err(SnapshotError::State(
+            StateTransactionError::UnsupportedLayout,
+        ));
+    }
     if store.layout.get() >= 5 && stage.store.layout.get() < store.layout.get() {
         return Err(SnapshotError::State(
             StateTransactionError::UnsupportedLayout,
         ));
     }
-    if matches!(store.layout.get(), 4..=7) || stage.store.layout.get() >= 5 {
+    if matches!(store.layout.get(), 4..=8) || stage.store.layout.get() >= 5 {
         return advance(store, stage, limits, None)?
             .ok_or(SnapshotError::State(StateTransactionError::Corrupt));
     }

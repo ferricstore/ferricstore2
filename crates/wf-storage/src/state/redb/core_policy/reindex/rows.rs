@@ -65,13 +65,14 @@ pub(super) fn next(
         .map_err(|_| StateTransactionError::Corrupt)?;
     let id =
         RecordId::new(copy_bytes(decoded.part(4))?).map_err(|_| StateTransactionError::Corrupt)?;
-    let scanned = value::scan_record_point_profiled(
+    let scanned = value::scan_record_in_layout(
         bytes.value(),
         scope,
         &partition,
         &id,
         tx.admission,
         wire_record_limit(tx.admission)?,
+        tx.layout,
     )
     .map_err(value_error)?;
     let n = scanned.owned_bytes();

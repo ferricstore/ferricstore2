@@ -24,6 +24,7 @@ pub(crate) fn cohort(
     tx: &RedbStateTransaction<'_>,
     defaults: WorkflowValueDefaults,
     alias_format: u16,
+    layout: u16,
 ) -> Result<(), Error> {
     let maximum_work = total(
         product(tx.maximum_steps, 65_536)?,
@@ -89,7 +90,7 @@ pub(crate) fn cohort(
                 &scope,
                 defaults,
                 &mut charge,
-                alias_format,
+                (alias_format, layout),
             )?,
             8 => immutable(
                 tx,
@@ -122,7 +123,7 @@ fn companion(
     scope: &RequestScope,
     defaults: WorkflowValueDefaults,
     charge: &mut ValueCharge,
-    alias_format: u16,
+    (alias_format, layout): (u16, u16),
 ) -> Result<(), Error> {
     charge.helper()?;
     charge.work(8_192)?;
@@ -171,13 +172,17 @@ fn companion(
     } else {
         admission::wire_record_limit(tx.admission)?
     };
-    let (version, fields) = value::binding_source_fields(
+    if layout == 8 && source.starts_with(b"FWHS") {
+        charge.temporary(total(live, [2048, source.len()])?)?;
+    }
+    let (version, fields) = value::binding_source_fields_in_layout(
         source,
         scope,
         (&partition, &id),
         history,
         tx.admission,
         maximum_wire,
+        layout,
     )
     .map_err(admission::value_error)?;
     if data.versions.iter().flatten().any(|value| *value > version) {

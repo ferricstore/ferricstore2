@@ -123,7 +123,7 @@ impl super::RedbStateTransaction<'_> {
     }
 
     pub(crate) fn value_manifest(&self) -> Result<manifest::ValueManifest, StateTransactionError> {
-        if self.layout != 7 {
+        if !matches!(self.layout, 7 | 8) {
             return Err(StateTransactionError::UnsupportedLayout);
         }
         manifest::read(self)

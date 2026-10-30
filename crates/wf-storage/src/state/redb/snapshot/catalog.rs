@@ -142,7 +142,7 @@ pub(super) fn retained(
             continue;
         };
         let (layout, saved) = recovery::cohort(tx, charge)?;
-        if !matches!(layout, 3 | 5..=7) || super::format::facts(tx, limits)? != expected {
+        if !matches!(layout, 3 | 5..=8) || super::format::facts(tx, limits)? != expected {
             return Err(Error::Corrupt);
         }
         compatible(tx, saved, live)?;

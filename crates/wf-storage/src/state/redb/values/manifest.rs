@@ -16,6 +16,7 @@ use crate::state::value;
 
 #[derive(Clone, Copy)]
 pub(crate) struct ValueManifest {
+    pub(crate) layout: u16,
     pub(in crate::state::redb) policy: CurrentPolicyManifest,
     pub(crate) defaults: WorkflowValueDefaults,
     pub(crate) alias_format: u16,
@@ -42,7 +43,11 @@ pub(crate) fn parse(
     recovery: &RecoveryId,
 ) -> Result<ValueManifest, Error> {
     let mut at = 0;
-    if value::take(bytes, &mut at, 6).map_err(value_error)? != b"FWSS\0\x07" {
+    if value::take(bytes, &mut at, 4).map_err(value_error)? != b"FWSS" {
+        return Err(Error::Corrupt);
+    }
+    let layout = value::read_u16(bytes, &mut at).map_err(value_error)?;
+    if !matches!(layout, 7 | 8) {
         return Err(Error::Corrupt);
     }
     for expected in [group.as_bytes(), recovery.as_bytes()] {
@@ -88,6 +93,7 @@ pub(crate) fn parse(
     }
     value::finish(bytes, at).map_err(value_error)?;
     Ok(ValueManifest {
+        layout,
         policy: CurrentPolicyManifest {
             initial_time,
             placements,
@@ -110,7 +116,7 @@ pub(crate) fn encode(
     if size > maximum {
         return Err(Error::Limit);
     }
-    if !matches!(manifest.alias_format, 1 | 2) {
+    if !matches!(manifest.alias_format, 1 | 2) || !matches!(manifest.layout, 7 | 8) {
         return Err(Error::UnsupportedPolicyProfile);
     }
     let defaults = manifest
@@ -121,7 +127,8 @@ pub(crate) fn encode(
     bytes
         .try_reserve_exact(size)
         .map_err(|_| Error::Allocation)?;
-    bytes.extend_from_slice(b"FWSS\0\x07");
+    bytes.extend_from_slice(b"FWSS");
+    bytes.extend_from_slice(&manifest.layout.to_be_bytes());
     for part in [group.as_bytes(), recovery.as_bytes()] {
         bytes.extend_from_slice(
             &u16::try_from(part.len())

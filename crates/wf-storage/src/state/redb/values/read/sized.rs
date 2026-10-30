@@ -56,7 +56,7 @@ pub(in super::super) fn read_sized<C: WorkflowValueReadClock>(
         slots.resize(references.len(), Ok(None));
         return Ok(WorkflowValueSizedReadBatch { values, slots });
     }
-    if store.layout.get() != 7 {
+    if !matches!(store.layout.get(), 7 | 8) {
         return Err(Error::UnsupportedLayout);
     }
     let mut context = super::open(store, charge).map_err(|e| store.failed(e))?;

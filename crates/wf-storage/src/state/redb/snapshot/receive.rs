@@ -11,7 +11,7 @@ fn piece(
     tx: &RedbStateTransaction<'_>,
     input: &mut impl std::io::Read,
     limits: SnapshotLimits,
-    state: &mut (Sha256, usize),
+    state: &mut (Sha256, usize, u16),
     bytes: &mut [u8],
 ) -> Result<(), SnapshotError> {
     io::read(tx, input, bytes, limits)?;
@@ -27,7 +27,7 @@ fn header(
     tx: &RedbStateTransaction<'_>,
     input: &mut impl std::io::Read,
     limits: SnapshotLimits,
-    state: &mut (Sha256, usize),
+    state: &mut (Sha256, usize, u16),
 ) -> Result<(usize, usize, u16), SnapshotError> {
     let mut magic = [0; 6];
     piece(tx, input, limits, state, &mut magic)?;
@@ -82,7 +82,7 @@ fn row(
     tx: &RedbStateTransaction<'_>,
     input: &mut impl std::io::Read,
     limits: SnapshotLimits,
-    state: &mut (Sha256, usize),
+    state: &mut (Sha256, usize, u16),
     buffer: &mut (Vec<u8>, usize),
     wire: usize,
     position: (bool, usize, u16),
@@ -137,15 +137,14 @@ fn row(
         b"origin"
     };
     if position.0 && position.1 == 0 {
-        let wanted = match position.2 {
-            4 => [0, 7],
-            3 => [0, 6],
-            2 => [0, 5],
-            _ => [0, 3],
+        let layout = match value.get(4..6) {
+            Some([high, low]) => u16::from_be_bytes([*high, *low]),
+            _ => return Err(SnapshotError::Malformed),
         };
-        if value.get(4..6) != Some(wanted.as_slice()) {
+        if !matches!((position.2, layout), (4, 7 | 8) | (3, 6) | (2, 5) | (1, 3)) {
             return Err(SnapshotError::Malformed);
         }
+        state.2 = layout;
     }
     if position.0 && key != expected {
         return Err(SnapshotError::Malformed);
@@ -228,7 +227,7 @@ pub(super) fn receive(
 ) -> Result<([u8; 32], usize, usize, u16), SnapshotError> {
     let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::Stage)?;
     fresh(&tx).map_err(SnapshotError::Stage)?;
-    let mut state = (Sha256::new(), 0);
+    let mut state = (Sha256::new(), 0, 0);
     let (rows, wire, version) = header(&tx, input, limits, &mut state)?;
     for definition in [
         super::super::META,
@@ -296,15 +295,5 @@ pub(super) fn receive(
         return Err(SnapshotError::Stage(Error::Corrupt));
     }
     super::commit(tx).map_err(SnapshotError::Stage)?;
-    Ok((
-        facts.0,
-        facts.1,
-        facts.2,
-        match version {
-            4 => 7,
-            3 => 6,
-            2 => 5,
-            _ => 3,
-        },
-    ))
+    Ok((facts.0, facts.1, facts.2, state.2))
 }

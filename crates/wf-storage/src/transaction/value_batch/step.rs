@@ -125,6 +125,10 @@ pub(super) fn advance(
             binding.versions[index] = None;
         }
     }
+    if history.kind == EventKind::StepContinued {
+        binding.lifecycle.effective_ttl_ms = None;
+        binding.lifecycle.terminal_deadline = None;
+    }
     if matches!(record.state(), b"completed" | b"failed" | b"cancelled") {
         if let Some(ttl) = input.terminal_ttl_ms
             && matches!(

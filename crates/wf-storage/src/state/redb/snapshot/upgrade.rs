@@ -24,7 +24,7 @@ fn upgrade(store: &RedbStateStore, limits: SnapshotLimits) -> Result<(), Snapsho
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
     let facts = validate::complete(&mut tx, &mut charge, store.limits.snapshot_limits())
         .map_err(SnapshotError::State)?;
-    if matches!(store.layout.get(), 4..=7) {
+    if matches!(store.layout.get(), 4..=8) {
         return Ok(());
     }
     let pin = validate::pin(&tx).map_err(SnapshotError::State)?;

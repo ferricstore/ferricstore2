@@ -139,7 +139,7 @@ pub(super) fn open(
         returned: size_of::<WorkflowHistoryPage>(),
         maximum_returned: limits.maximum_returned_bytes,
     };
-    if store.layout.get() == 7 {
+    if matches!(store.layout.get(), 7 | 8) {
         load_manifest(&mut context, store)?;
     }
     Ok(context)

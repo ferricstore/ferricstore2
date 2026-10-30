@@ -57642,3 +57642,113 @@ r0-fields,r0-architecture,r0-clippy,r0-clippy-first}.{json,log} as appropriate.
 No ignored test, suppression, weakened assertion, source credit, native/Linux
 acceptance or completed-goal claim is introduced. Save this real rejecting state
 in a local commit before the approved implementation bodies.
+
+M2-STEP-STORAGE1 implementation clarification before shared contract changes:
+IndependentIndexedPlan retains ordering only for final records; reconstructing
+an intermediate history's ordering from its final record would be incorrect.
+The existing ValuePublicationPlan already retains each actual accepted step and
+its source-index ordering. Under8 pass that borrowed publication to private
+commit/independent::apply and emit every full history from those verified steps.
+Keep the complete old history_plans loop for layouts≤7. No new model, inferred
+metadata or cloned record is selected. Recovery/index/value helpers must receive
+the actual cohort layout, including retained7 slots under a live8 owner.
+
+M2-STEP-STORAGE1 receiver clarification before contract edit: FWSP4 transports
+either actual manifest7 or8; its envelope version cannot stand in for the
+manifest's format. Extend only the existing private receive accumulator tuple
+with the parsed u16 layout, set it from the validated first metadata row, and
+return it as the existing stage fact. Older envelope/manifest pairs remain exact;
+no new file, model, inferred capability or additional allocation is selected.
+
+Post-RED oracle audit: the original publication case expected attempts0 after
+an atomic StartAndClaim fixture. The supplemental old-layout7 control actually
+passes with version1/fence1/attempts1 before any history upgrade or Step body;
+see step-storage-start-attempt-control.log. Correct only the later exact tuple
+to version2/fence2/attempts1. The control is post-body evidence, not TDD/source
+credit. The uncertainty test's strict Uncertain and fencing assertions already
+pass, but a durable replay of the identical log1 returns the existing LogReplay
+variant. Correct its inquiry to inspect actual committed control, assert its
+correspondence to the reopened version, then retry at the next log position to
+obtain the retained receipt. Preserve the original frame/time and all complete
+publication assertions. These reversible test corrections are separate from
+the saved genuine rejecting state10be665; do not claim its whole tests unchanged.
+
+Upgrade fault-boundary audit: the mode1 diagnostic reaches manifest publication
+and returns Unavailable before new validation/durability/commit; this is an
+engine growth synchronization, not a proved commit failure. Archive
+step-storage-upgrade-stage-diagnostic.log. Select the existing growth-aware
+mode4 hook, which rearms across successful growth sync and fails after the next
+delegated non-growth sync. Preserve the exact Uncertain oracle and record actual
+stage evidence before removing temporary diagnostics. No accepted-error widening
+or new fault backend is selected.
+
+Actual second body run: all11 physical cases pass, including the supplemental
+old7 attempt control. Growth-aware mode4 reaches validate-new/durability/commit
+and returns the strictly expected Uncertain; its complete row/reopen tail passes.
+The Step uncertainty inquiry/control/log-replay/next-log receipt tail passes.
+Both snapshot profile-change refusals and complete receive/install/reopen now
+pass with actual manifest routing; the retained7 anchor remains validated.
+Log: /private/tmp/ferricstore2-step-storage-second-body-storage.log. Remove all
+temporary stage/error diagnostics before strict verification. Seven history
+codec cases passed the first body run. These focused results do not yet prove
+full regression gates, native execution, source-profile coverage or completion.
+
+M2-STEP-STORAGE1 solo architecture/performance review: the consumed writer keeps
+the existing scoped control, version validation, lane/index deltas, value plan,
+outcome and final Immediate commit boundaries. Explicit8 dispatch adds no key
+family or default capability. Complete legacy write loops remain for≤7;
+shared read/recovery wrappers delegate to the exact old scanners outside8.
+The full current/retained census passes each actual cohort's format through
+record lookup, head/reverse indexes and value companion checks. Upgrade modifies
+only current manifest bytes; policy publication retains the actual8 header.
+Incoming snapshot envelope4 records actual7/8, and install keeps both explicit
+upgrade/downgrade refusals. No retained cohort format is inferred from live8.
+
+The borrowed encoder measures before one output reservation and emits nested
+record/history directly. Recovery validates full snapshots without materializing
+discarded core owners; reduced queries copy only the event and retain actual
+captured value bindings. Fixed2048 descriptor workspace and actual encoded/owned
+fields are charged before these operations. Plain Step payload stays binary,
+nonbirth input has no invented witness and Step alone clears TTL/deadline while
+retaining immutable birth metadata. This is reviewed allocation structure/logical
+admission, not a measured allocator/throughput/RSS improvement or Linux evidence.
+
+Strict focused Clippy first exposed a new nested history branch and tuple
+forwarding; preserve focused-clippy.log. Flatten guarded writer exits and
+destructure the borrowed policy tuple, with no allowance or changed behavior;
+focused-clippy-second.log exits0. All274 storage cases/all53 architecture cases
+pass, including every prior case and seven complete history data cases.
+The full12-gate pipeline freezes1,789 inputs/1,200 Rust files before validation.
+
+Source audit: all1,729 other baseline non-Markdown inputs remain exact;49 existing
+sources change only in the selected contracts. Eighteen complete old sources
+remain byte-exact after explicit format-guard canonicalization. Exhaustive u16
+guard truth tables change only selected8. This is not a general equivalence
+proof; complex branches require the source review and actual regression checks.
+Ten whole R0 sources are exact. The architecture probe changes only rustfmt's
+multiline row/trailing comma. Exact inverse corrections recover both entire
+saved publication/fault test files; the supplemental control is post-body
+evidence. Four R0 body/seam sources change as selected. No original mapping,
+ledger, toolchain, dependency, root lint/size policy or source credit changes.
+Receipt: /private/tmp/ferricstore2-step-storage-source-audit.json. Review is solo;
+no independent peer review, original native/profile or full-goal success claimed.
+
+M2-STEP-STORAGE1 final solo checkpoint: all12 sequential direct gates pass with
+1,318 cases/113 executable targets (111 result targets and two unchanged
+benchmark correctness smokes). Exact full Counter comparison preserves every
+prior1,306 identity/status/multiplicity and all original1,294 cases, adding12.
+All53 architecture cases, Python7 and6 doctests/15 targets pass. All1,789 frozen
+inputs/1,200 Rust files match the tested tree. Strict workspace lint, compiler,
+docs, reference/progress and offline dependency audit pass without exemptions.
+Full parity actually exits1; main ledger129/143/589 and runtime5903/4222/1681/1655
+remain unchanged. No source-counterpart/native/Linux credit or completed-goal
+claim follows. Source audit scope is explicit; its hash/guard/correction checks
+do not claim a general proof of equivalence. Receipts:
+/private/tmp/ferricstore2-step-storage-{source-audit,pipeline,full-identity,full-parity}.json.
+Save the verified local checkpoint and adopt only by clean local fast-forward,
+then recheck both trees and every frozen input in the adopted receipt. No push.
+Next required successor is explicit Node operation10 committed audit/replay,
+retaining closed old opt-ins, whole-call owner/work accounting, complete snapshot
+and uncertainty/reopen closure. Actual original Create→Claim→Step→Retry→FIFO,
+rich captured source attributes/context, all native/profile/Linux/macOS and
+M1–M8 milestone exits remain mandatory. Full goal stays active and solo.

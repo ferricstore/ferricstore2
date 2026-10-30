@@ -69,6 +69,7 @@ fn initialize(
     let origin = bootstrap::manifest(store, genesis, genesis_hash, origin_size)?;
     let current_hash = current_hash(&tx)?;
     let current = ValueManifest {
+        layout: 7,
         alias_format,
         policy: CurrentPolicyManifest {
             initial_time: genesis.initial_time,

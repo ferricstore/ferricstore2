@@ -35,13 +35,14 @@ pub(super) fn current(
     let found = raw
         .as_ref()
         .map(|raw| {
-            value::binding_source_fields(
+            value::binding_source_fields_in_layout(
                 raw.value(),
                 scope,
                 (partition, id),
                 None,
                 context.limits.admission(),
                 context.limits.maximum_recovery_bytes(),
+                context.facts.map_or(3, |facts| facts.layout),
             )
             .map(|(version, fields)| {
                 (
@@ -138,15 +139,35 @@ pub(super) fn capture(
     )
     .map_err(admission::value_error)?;
     let (_, original_id) = decoded.history_position().ok_or(Error::Corrupt)?;
-    context.returned(event_bytes(bytes).map_err(admission::value_error)?)?;
-    let event = value::decode_history(
-        bytes,
-        scope,
-        partition,
-        id,
-        context.limits.maximum_recovery_bytes(),
-    )
-    .map_err(admission::value_error)?;
+    let event =
+        if context.facts.is_some_and(|facts| facts.layout == 8) && bytes.starts_with(b"FWHS") {
+            context.working = total(context.working, [2048])?;
+            context.temporary(0)?;
+            let scanned = value::inspect_history_snapshot(
+                bytes,
+                scope,
+                partition,
+                id,
+                context.limits.admission(),
+                context.limits.maximum_recovery_bytes(),
+            )
+            .map_err(admission::value_error)?;
+            let owned = scanned
+                .event_owned_bytes()
+                .map_err(admission::value_error)?;
+            context.returned(owned)?;
+            scanned.into_event(owned).map_err(admission::value_error)?
+        } else {
+            context.returned(event_bytes(bytes).map_err(admission::value_error)?)?;
+            value::decode_history(
+                bytes,
+                scope,
+                partition,
+                id,
+                context.limits.maximum_recovery_bytes(),
+            )
+            .map_err(admission::value_error)?
+        };
     if event.event_id != original_id || event.version > current.0 {
         return Err(Error::Corrupt);
     }

@@ -104,7 +104,7 @@ pub(super) fn canonical(
     exact(tx, table, &member, if fifo { Some(&[]) } else { None })?;
     if let Some(due) = DueOrder::for_record(&row) {
         let first = if fifo {
-            head(tx, table, &scope, lane)?.as_ref() == Some(owner)
+            head(tx, table, &scope, lane, layout)?.as_ref() == Some(owner)
         } else {
             false
         };
@@ -147,6 +147,7 @@ fn head(
     table: &impl ReadableTable<&'static [u8], &'static [u8]>,
     scope: &RequestScope,
     lane: LaneKey<'_>,
+    layout: u16,
 ) -> Result<Option<StoredWorkflowRecord>, StateTransactionError> {
     let prefix = tx.key(
         &[
@@ -188,8 +189,15 @@ fn head(
     )
     .map_err(value_error)?;
     let (member_score, sequence, id) = decoded.member().ok_or(StateTransactionError::Corrupt)?;
-    let owner = lookup_record(tx, table, scope.tenant().as_bytes(), lane.partition_key, id)?
-        .ok_or(StateTransactionError::Corrupt)?;
+    let owner = lookup_record(
+        tx,
+        table,
+        scope.tenant().as_bytes(),
+        lane.partition_key,
+        id,
+        layout,
+    )?
+    .ok_or(StateTransactionError::Corrupt)?;
     let row = entry(&owner);
     let member = LaneOrder::for_record(&row);
     if LaneKey::for_record(&row) != Some(lane)
@@ -214,7 +222,7 @@ pub(super) fn reverse(
     } else {
         (key.part(5), key.part(6))
     };
-    let owner = lookup_record(tx, table, scope.tenant().as_bytes(), partition, id)?
+    let owner = lookup_record(tx, table, scope.tenant().as_bytes(), partition, id, layout)?
         .ok_or(StateTransactionError::Corrupt)?;
     let row = entry(&owner);
     let lane = LaneKey::for_record(&row).ok_or(StateTransactionError::Corrupt)?;
@@ -233,7 +241,7 @@ pub(super) fn reverse(
         if DueOrder::for_record(&row) != Some(due) || bytes != if fifo { &[1] } else { &[0] } {
             return Err(StateTransactionError::Corrupt);
         }
-        if fifo && head(tx, table, &scope, lane)?.as_ref() != Some(&owner) {
+        if fifo && head(tx, table, &scope, lane, layout)?.as_ref() != Some(&owner) {
             return Err(StateTransactionError::Corrupt);
         }
     } else {

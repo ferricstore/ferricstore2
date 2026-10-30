@@ -11,21 +11,48 @@ use super::{StateValueError, add};
 
 mod model;
 mod scan;
+mod stored;
 mod write;
 pub use model::HistorySnapshotLimits;
+pub(crate) use scan::ScannedHistorySnapshot;
+pub(crate) use stored::{
+    binding_source_fields_in_layout, encode_record_in_layout, scan_record_in_layout,
+};
 
 /// Encodes borrowed represented fields without cloning a temporary record owner.
 /// # Errors
-/// Currently rejects every input until the selected tests-first body exists.
+/// Rejects inconsistent fields, explicit limits, checked sizes or allocation failure.
 pub fn encode_history_snapshot_fields(
-    _scope: &RequestScope,
-    _partition: &PartitionId,
-    _record: &WorkflowRecord,
-    _ordering: OrderingMetadata,
-    _event: &HistoryEntry,
-    _limits: HistorySnapshotLimits,
+    scope: &RequestScope,
+    partition: &PartitionId,
+    record: &WorkflowRecord,
+    ordering: OrderingMetadata,
+    event: &HistoryEntry,
+    limits: HistorySnapshotLimits,
 ) -> Result<Vec<u8>, StateValueError> {
-    Err(StateValueError::UnsupportedVersion)
+    write::encode_fields(scope, partition, record, ordering, event, limits)
+}
+
+pub(crate) fn history_snapshot_encoded_size(
+    scope: &RequestScope,
+    partition: &PartitionId,
+    record: &WorkflowRecord,
+    ordering: OrderingMetadata,
+    event: &HistoryEntry,
+    limits: HistorySnapshotLimits,
+) -> Result<usize, StateValueError> {
+    write::measure(scope, partition, record, ordering, event, limits).map(|sizes| sizes.2)
+}
+
+pub(crate) fn inspect_history_snapshot<'a>(
+    bytes: &'a [u8],
+    scope: &RequestScope,
+    partition: &PartitionId,
+    id: &RecordId,
+    admission: wf_domain::workflow::admission::AdmissionLimits,
+    maximum_wire_bytes: usize,
+) -> Result<ScannedHistorySnapshot<'a>, StateValueError> {
+    scan::scan(bytes, scope, partition, id, admission, maximum_wire_bytes)
 }
 
 /// Encodes the exact represented postimage and matching event into one owner.
@@ -50,7 +77,14 @@ pub fn decode_history_snapshot(
     id: &RecordId,
     limits: HistorySnapshotLimits,
 ) -> Result<StoredWorkflowHistorySnapshot, StateValueError> {
-    let scanned = scan::scan(bytes, scope, partition, id, limits)?;
+    let scanned = scan::scan(
+        bytes,
+        scope,
+        partition,
+        id,
+        limits.admission,
+        limits.encoded,
+    )?;
     let mut owned = scanned.record.owned_bytes();
     add(&mut owned, scanned.history.owned_bytes()?)?;
     admit(owned, limits.owned)?;
