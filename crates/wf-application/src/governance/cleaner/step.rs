@@ -50,26 +50,8 @@ where
             streak_pages,
         },
     };
-    match port.governance_catalog_progress(request.target, request.catalog, plan::read(limits)) {
-        Ok(GovernanceCatalogProgress::Missing) => (),
-        Ok(GovernanceCatalogProgress::Cursor(cursor)) => {
-            if cursor.len() > 65535
-                || cursor
-                    .len()
-                    .checked_add(152)
-                    .is_none_or(|n| n > limits.read.maximum_bytes)
-            {
-                return fail(state.step, F::InvalidObservation);
-            }
-            state.cursor = Some(cursor);
-        }
-        Ok(GovernanceCatalogProgress::Invalid) => {
-            state.step.commands += 1;
-            if !dispatch::progress(port, request, None, limits) {
-                return fail(state.step, F::ProgressUnconfirmed);
-            }
-        }
-        Err(error) => return fail(state.step, F::Read(error)),
+    if let Err(error) = load_progress(port, request, limits, &mut state) {
+        return fail(state.step, error);
     }
     if state.step.commands == budget {
         return state.step;
@@ -130,6 +112,35 @@ where
     };
     let wrapped = target.is_none();
     finish(port, request, limits, budget, state, target, wrapped)
+}
+fn load_progress<P: CreditCatalogPublicationPort + GovernanceCatalogProgressPort>(
+    port: &mut P,
+    request: R<'_>,
+    limits: L,
+    state: &mut CleanupTraversal,
+) -> Result<(), F> {
+    match port.governance_catalog_progress(request.target, request.catalog, plan::read(limits)) {
+        Ok(GovernanceCatalogProgress::Missing) => (),
+        Ok(GovernanceCatalogProgress::Cursor(cursor)) => {
+            if cursor.len() > 65535
+                || cursor
+                    .len()
+                    .checked_add(152)
+                    .is_none_or(|n| n > limits.read.maximum_bytes)
+            {
+                return Err(F::InvalidObservation);
+            }
+            state.cursor = Some(cursor);
+        }
+        Ok(GovernanceCatalogProgress::Invalid) => {
+            state.step.commands += 1;
+            if !dispatch::progress(port, request, None, limits) {
+                return Err(F::ProgressUnconfirmed);
+            }
+        }
+        Err(error) => return Err(F::Read(error)),
+    }
+    Ok(())
 }
 fn work<P>(
     port: &mut P,

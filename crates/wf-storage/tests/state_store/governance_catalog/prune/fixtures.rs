@@ -78,7 +78,6 @@ impl PruneFixture {
         Ok(identity)
     }
     pub(super) fn frame(
-        &self,
         id: &[u8],
         member: &[u8],
         expected: EntryIdentity,

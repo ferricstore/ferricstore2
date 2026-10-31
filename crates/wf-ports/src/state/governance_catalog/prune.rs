@@ -28,11 +28,11 @@ pub fn encode_catalog_member_revision(revision: EntryIdentity) -> [u8; 62] {
     let mut bytes = [0; 62];
     bytes[..6].copy_from_slice(b"FWGM\0\x02");
     let log = revision.log();
-    for (chunk, n) in
-        bytes[6..30]
-            .chunks_exact_mut(8)
-            .zip([log.term(), log.leader_node(), log.index().get()])
-    {
+    for (chunk, n) in bytes[6..30].as_chunks_mut::<8>().0.iter_mut().zip([
+        log.term(),
+        log.leader_node(),
+        log.index().get(),
+    ]) {
         chunk.copy_from_slice(&n.to_be_bytes());
     }
     bytes[30..].copy_from_slice(revision.prepared().as_bytes());
@@ -48,8 +48,11 @@ pub fn inspect_catalog_member_revision(encoded: &[u8]) -> Result<EntryIdentity, 
         return Err(CodecError::Malformed);
     }
     let mut numbers = [0; 3];
-    for (n, chunk) in numbers.iter_mut().zip(encoded[6..30].chunks_exact(8)) {
-        *n = u64::from_be_bytes(chunk.try_into().map_err(|_| CodecError::Malformed)?);
+    for (n, chunk) in numbers
+        .iter_mut()
+        .zip(encoded[6..30].as_chunks::<8>().0.iter())
+    {
+        *n = u64::from_be_bytes(*chunk);
     }
     let digest = PreparedDigest::new(
         encoded[30..]

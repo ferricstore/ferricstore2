@@ -37,9 +37,8 @@ impl RedbStateStore {
                 alias_format: 2,
                 credit_shard_count,
                 credit_catalog: credit_shard_count.is_some(),
-                governance_catalog: true,
-                catalog_progress: true,
-                catalog_prune: false,
+                governance_catalog:
+                    super::super::values::manifest::GovernanceCatalogProfile::Progress,
             },
         )
     }
@@ -54,7 +53,7 @@ impl RedbStateTransaction<'_> {
         }
         Ok(())
     }
-    /// Reads actual immutable governance capability0/1/2, without enabling it.
+    /// Reads actual immutable governance capability0/1/2/3, without enabling it.
     /// # Errors
     /// Refuses unsupported layouts, corruption or resource exhaustion.
     pub fn governance_catalog_profile(&self) -> Result<u16, E> {
@@ -64,13 +63,7 @@ impl RedbStateTransaction<'_> {
             }
             self.admit_read(512)?;
             let manifest = self.value_manifest()?;
-            Ok(if manifest.catalog_prune {
-                3
-            } else if manifest.catalog_progress {
-                2
-            } else {
-                u16::from(manifest.governance_catalog)
-            })
+            Ok(manifest.governance_catalog.version())
         })
     }
 }

@@ -69,22 +69,31 @@ pub(super) fn valid_page(page: &GovernanceCatalogPage, cursor: Option<&[u8]>, li
     if page.members.len() > 1 || page.full != (page.members.len() == 1) {
         return false;
     }
-    let owned = page.members.iter().try_fold(128_usize, |n, member| {
-        n.checked_add(std::mem::size_of::<Vec<u8>>())?
-            .checked_add(member.len())
-    });
-    owned.is_some_and(|n| n <= limits.read.maximum_bytes)
+
+    page_owned(page).is_some_and(|n| n <= limits.read.maximum_bytes)
         && page.members.first().is_none_or(|member| {
             member.len() <= 65535 && cursor.is_none_or(|cursor| member.as_slice() > cursor)
         })
+}
+fn page_owned(page: &GovernanceCatalogPage) -> Option<usize> {
+    page.members.iter().try_fold(128_usize, |n, member| {
+        n.checked_add(std::mem::size_of::<Vec<u8>>())?
+            .checked_add(member.len())
+    })
 }
 pub(super) fn valid_candidate(
     candidate: &wf_ports::state::GovernanceCatalogPrunePage,
     cursor: Option<&[u8]>,
     limits: L,
 ) -> bool {
-    candidate.revision.is_some() == !candidate.page.members.is_empty()
-        && limits.read.maximum_bytes >= 192
+    candidate.revision.is_some() != candidate.page.members.is_empty()
+        && page_owned(&candidate.page)
+            .and_then(|n| {
+                n.checked_add(std::mem::size_of::<
+                    Option<wf_domain::workflow::control::EntryIdentity>,
+                >())
+            })
+            .is_some_and(|n| n <= limits.read.maximum_bytes)
         && valid_page(&candidate.page, cursor, limits)
 }
 pub(super) fn source<'a, 'm>(

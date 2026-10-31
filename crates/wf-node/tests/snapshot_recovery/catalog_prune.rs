@@ -96,7 +96,7 @@ fn received(
     }
     f::append(&mut log, 9, b"opaque uncommitted guarded prune suffix")?;
     let scope = f::scope()?;
-    let stage = RedbSnapshotStage::receive(
+    let candidate = RedbSnapshotStage::receive(
         &dir.join("state.redb"),
         scope.group().clone(),
         scope.recovery().clone(),
@@ -106,7 +106,7 @@ fn received(
     )?;
     let (mut log, state) = restore_received_snapshot(
         log,
-        stage,
+        candidate,
         scope.group(),
         scope.recovery(),
         p::selected()?,

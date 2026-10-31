@@ -252,8 +252,6 @@ pub(super) fn value_defaults_compatible(
             || a.credit_shard_count != b.credit_shard_count
             || a.credit_catalog != b.credit_catalog
             || a.governance_catalog != b.governance_catalog
-            || a.catalog_progress != b.catalog_progress
-            || a.catalog_prune != b.catalog_prune
         {
             return Err(SnapshotError::GenesisMismatch);
         }

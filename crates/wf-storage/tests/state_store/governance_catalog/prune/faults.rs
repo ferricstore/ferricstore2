@@ -10,7 +10,7 @@ use wf_storage::transaction::{CatalogPruneTransactionError as E, apply_catalog_p
 fn catalog_prune_every_step_cut_preserves_the_entire_previous_cohort() -> TestResult {
     let mut fixture = PruneFixture::new(None, true)?;
     let revision = fixture.register(b"add", b"a", 0)?;
-    let frame = fixture.frame(b"cut", b"a", revision)?;
+    let frame = PruneFixture::frame(b"cut", b"a", revision)?;
     let PruneFixture { dir, path, store } = fixture;
     drop(store);
     let before = f::cohort(&path)?;
@@ -48,7 +48,7 @@ fn catalog_prune_actual_commit_uncertainty_fences_then_recovers_complete_old_or_
 {
     let mut fixture = PruneFixture::new(None, true)?;
     let revision = fixture.register(b"add", b"a", 0)?;
-    let frame = fixture.frame(b"unknown", b"a", revision)?;
+    let frame = PruneFixture::frame(b"unknown", b"a", revision)?;
     let mut target = PruneFixture::new(None, true)?;
     assert_eq!(target.register(b"add", b"a", 0)?, revision);
     assert_eq!(reply(&*target.apply(&frame, 1)?)?, P::Removed);
@@ -127,13 +127,13 @@ fn catalog_prune_receipt_only_missing_and_removed_refuse_healthy_gc2_downgrade()
                 wf_domain::workflow::control::PreparedDigest::new([7; 32]),
             )
         };
-        let frame = fixture.frame(b"prune", b"a", revision)?;
+        let frame = PruneFixture::frame(b"prune", b"a", revision)?;
         let result = fixture.apply(&frame, u64::from(removed))?;
         assert_eq!(
             reply(&result)?,
             if removed { P::Removed } else { P::Missing }
         );
-        assert!(fixture.page()?.page.members.is_empty());
+        assert_eq!(fixture.page()?.page.members, Vec::<Vec<u8>>::new());
         let PruneFixture { dir, path, store } = fixture;
         drop(store);
         fixtures::downgrade(&path)?;
@@ -168,5 +168,60 @@ fn catalog_prune_malformed_ahead_and_equal_position_wrong_identity_rows_fence() 
         assert_eq!(f::cohort(&path)?, before);
         std::fs::remove_dir_all(dir)?;
     }
+    Ok(())
+}
+
+#[test]
+fn catalog_prune_candidate_read_admission_has_exact_byte_cutoff_without_mutation() -> TestResult {
+    let mut fixture = PruneFixture::new(None, true)?;
+    let revision = fixture.register(b"add", b"a", 0)?;
+    let scope = common::scope()?;
+    let mut low = 1;
+    let mut high = L::default().maximum_bytes;
+    while low < high {
+        let mid = low + (high - low) / 2;
+        let result = fixture.store.governance_catalog_prune_page(
+            GovernanceCatalogRead {
+                scope: &scope,
+                catalog: b"limit",
+                cursor: None,
+                limit: 1,
+            },
+            L {
+                maximum_bytes: mid,
+                ..L::default()
+            },
+        );
+        match result {
+            Ok(page) => {
+                assert_eq!(page.revision, Some(revision));
+                high = mid;
+            }
+            Err(S::Limit) => low = mid + 1,
+            other => return Err(format!("unexpected candidate admission {other:?}").into()),
+        }
+    }
+    let read = |bytes| {
+        fixture.store.governance_catalog_prune_page(
+            GovernanceCatalogRead {
+                scope: &scope,
+                catalog: b"limit",
+                cursor: None,
+                limit: 1,
+            },
+            L {
+                maximum_bytes: bytes,
+                ..L::default()
+            },
+        )
+    };
+    assert_eq!(read(low)?.revision, Some(revision));
+    assert_eq!(read(low - 1).err(), Some(S::Limit));
+    let PruneFixture { dir, path, store } = fixture;
+    drop(store);
+    let before = f::cohort(&path)?;
+    drop(common::open(&path)?);
+    assert_eq!(f::cohort(&path)?, before);
+    std::fs::remove_dir_all(dir)?;
     Ok(())
 }

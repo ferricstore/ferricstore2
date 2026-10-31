@@ -1383,3 +1383,10 @@ capability and canonical member revisions. This is a deliberate safety migration
 from the pinned cleaner, whose plain unregister reproduced permanent membership
 loss after publication ACK. Concrete artifacts, resource ownership and tests are
 approved in the solo coordination review; no full parity/service claim follows.
+
+GC3 private representation refinement: the immutable governance capability in
+ValueManifest and ValueGenesisCapabilities is one GovernanceCatalogProfile enum
+(Disabled, Membership, Progress, Prune). Dependent membership/progress/prune flags
+are queries, preventing invalid combinations. Wire absence and four-byte GC1/2/3
+markers, public construction, exact snapshots and validated profile0..3 caching
+remain unchanged. This replaces the provisional three governance booleans.

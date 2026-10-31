@@ -100,7 +100,7 @@ fn outcome(
         layout,
     )
     .map_err(value_error)?;
-    if matches!(scanned.intent_version(), 9 | 11 | 12 | 13 | 14 | 15) {
+    if matches!(scanned.intent_version(), 9 | 11 | 12 | 13 | 14 | 15 | 16) {
         tx.temporary(total(
             scanned.owned_bytes(),
             [
@@ -112,9 +112,9 @@ fn outcome(
         if facts.alias_format != 2
             || (matches!(scanned.intent_version(), 12 | 13) && facts.credit_shard_count.is_none())
             || (scanned.credit_catalog_required() && !facts.credit_catalog)
-            || (scanned.intent_version() == 14 && !facts.governance_catalog)
-            || (scanned.intent_version() == 15 && !facts.catalog_progress)
-            || (scanned.intent_version() == 16 && !facts.catalog_prune)
+            || (scanned.intent_version() == 14 && !facts.governance_catalog.enabled())
+            || (scanned.intent_version() == 15 && !facts.governance_catalog.progress())
+            || (scanned.intent_version() == 16 && !facts.governance_catalog.prune())
         {
             return Err(StateTransactionError::Corrupt);
         }
@@ -224,4 +224,24 @@ pub(super) fn lookup_record(
     let owner = scanned.owned_bytes();
     tx.temporary(owner)?;
     scanned.into_owned(owner).map(Some).map_err(value_error)
+}
+
+pub(super) fn governance(
+    family: u8,
+    bytes: &[u8],
+    profile: super::super::values::manifest::GovernanceCatalogProfile,
+    control: wf_domain::workflow::control::ControlState,
+) -> Result<(), StateTransactionError> {
+    if family == 19 {
+        if !profile.progress() {
+            return Err(StateTransactionError::Corrupt);
+        }
+        // Derived hint payloads remain available for a later committed reset.
+    } else {
+        if !profile.enabled() {
+            return Err(StateTransactionError::Corrupt);
+        }
+        super::super::governance_catalog::validate_row(bytes, profile.prune().then_some(control))?;
+    }
+    Ok(())
 }

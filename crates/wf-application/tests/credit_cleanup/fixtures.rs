@@ -113,10 +113,16 @@ impl CreditOwnerReadPort for BudgetFixture {
 impl GovernanceCatalogReadPort for BudgetFixture {
     fn governance_catalog_page(
         &self,
-        _request: GovernanceCatalogRead<'_>,
+        request: GovernanceCatalogRead<'_>,
         _limits: GovernanceCatalogReadLimits,
     ) -> Result<GovernanceCatalogPage, S> {
         self.calls.borrow_mut().push(BudgetCall::Page);
+        if request.cursor.is_some() {
+            return Ok(GovernanceCatalogPage {
+                members: Vec::new(),
+                full: false,
+            });
+        }
         Ok(GovernanceCatalogPage {
             members: if self.fault == BudgetFault::MalformedPage {
                 vec![b"a".to_vec(), b"b".to_vec()]

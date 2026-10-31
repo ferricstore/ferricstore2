@@ -27,7 +27,7 @@ fn reply(outcome: &wf_domain::workflow::request::RetainedOutcome) -> TestResult<
 fn catalog_prune_gc3_genesis_reopen_and_empty_capability_are_explicit() -> TestResult {
     for count in [None, Some(4)] {
         let mut fixture = PruneFixture::new(count, true)?;
-        assert!(fixture.page()?.page.members.is_empty());
+        assert_eq!(fixture.page()?.page.members, Vec::<Vec<u8>>::new());
         assert_eq!(fixture.page()?.revision, None);
         let scope = common::scope()?;
         let tx = fixture.store.begin_apply(
@@ -87,21 +87,21 @@ fn catalog_prune_matches_member_revision_and_replay_never_removes_reregistered_m
     let mut fixture = PruneFixture::new(None, true)?;
     let first = fixture.register(b"add-a", b"a", 0)?;
     assert_eq!(fixture.page()?.revision, Some(first));
-    let frame = fixture.frame(b"prune-a", b"a", first)?;
+    let frame = PruneFixture::frame(b"prune-a", b"a", first)?;
     let original = fixture.apply(&frame, 1)?;
     assert_eq!(reply(&original)?, P::Removed);
-    assert!(fixture.page()?.page.members.is_empty());
+    assert_eq!(fixture.page()?.page.members, Vec::<Vec<u8>>::new());
     let next = fixture.register(b"new-a", b"a", 2)?;
     assert_ne!(next, first);
     assert_eq!(fixture.apply(&frame, 3)?, original);
     assert_eq!(fixture.page()?.revision, Some(next));
-    let stale = fixture.frame(b"stale-a", b"a", first)?;
+    let stale = PruneFixture::frame(b"stale-a", b"a", first)?;
     assert_eq!(reply(&*fixture.apply(&stale, 4)?)?, P::Changed);
     assert_eq!(fixture.page()?.revision, Some(next));
     fixture.register(b"add-b", b"b", 5)?;
-    let exact = fixture.frame(b"exact-a", b"a", next)?;
+    let exact = PruneFixture::frame(b"exact-a", b"a", next)?;
     assert_eq!(reply(&*fixture.apply(&exact, 6)?)?, P::Removed);
-    let missing = fixture.frame(b"missing-a", b"a", next)?;
+    let missing = PruneFixture::frame(b"missing-a", b"a", next)?;
     assert_eq!(reply(&*fixture.apply(&missing, 7)?)?, P::Missing);
     assert_eq!(fixture.page()?.page.members, vec![b"b".to_vec()]);
     fixture.cleanup()
@@ -117,7 +117,7 @@ fn catalog_prune_duplicate_registration_rotates_revision_and_unrelated_member_do
     let repeated = fixture.register(b"a-again", b"a", 2)?;
     assert_ne!(repeated, original);
     assert_eq!(fixture.page()?.revision, Some(repeated));
-    let old = fixture.frame(b"old-a", b"a", original)?;
+    let old = PruneFixture::frame(b"old-a", b"a", original)?;
     assert_eq!(reply(&*fixture.apply(&old, 3)?)?, P::Changed);
     assert_eq!(fixture.page()?.revision, Some(repeated));
     fixture.cleanup()

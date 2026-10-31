@@ -14,6 +14,33 @@ use super::super::{
 };
 use crate::state::value;
 
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub(crate) enum GovernanceCatalogProfile {
+    Disabled,
+    Membership,
+    Progress,
+    Prune,
+}
+impl GovernanceCatalogProfile {
+    pub(crate) const fn enabled(self) -> bool {
+        !matches!(self, Self::Disabled)
+    }
+    pub(crate) const fn progress(self) -> bool {
+        matches!(self, Self::Progress | Self::Prune)
+    }
+    pub(crate) const fn prune(self) -> bool {
+        matches!(self, Self::Prune)
+    }
+    pub(crate) const fn version(self) -> u16 {
+        match self {
+            Self::Disabled => 0,
+            Self::Membership => 1,
+            Self::Progress => 2,
+            Self::Prune => 3,
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub(crate) struct ValueManifest {
     pub(crate) layout: u16,
@@ -22,9 +49,7 @@ pub(crate) struct ValueManifest {
     pub(crate) alias_format: u16,
     pub(crate) credit_shard_count: Option<u64>,
     pub(crate) credit_catalog: bool,
-    pub(crate) governance_catalog: bool,
-    pub(crate) catalog_progress: bool,
-    pub(crate) catalog_prune: bool,
+    pub(crate) governance_catalog: GovernanceCatalogProfile,
 }
 
 pub(crate) fn read(tx: &RedbStateTransaction<'_>) -> Result<ValueManifest, Error> {
@@ -108,20 +133,19 @@ pub(crate) fn parse(
         }
         _ => return Err(Error::Corrupt),
     };
-    let (governance_catalog, catalog_progress, catalog_prune) =
-        if bytes.len().checked_sub(at) == Some(36) {
-            if layout != 8 || alias_format != 2 {
-                return Err(Error::Corrupt);
-            }
-            match value::take(bytes, &mut at, 4).map_err(value_error)? {
-                b"GC\0\x01" => (true, false, false),
-                b"GC\0\x02" => (true, true, false),
-                b"GC\0\x03" => (true, true, true),
-                _ => return Err(Error::Corrupt),
-            }
-        } else {
-            (false, false, false)
-        };
+    let governance_catalog = if bytes.len().checked_sub(at) == Some(36) {
+        if layout != 8 || alias_format != 2 {
+            return Err(Error::Corrupt);
+        }
+        match value::take(bytes, &mut at, 4).map_err(value_error)? {
+            b"GC\0\x01" => GovernanceCatalogProfile::Membership,
+            b"GC\0\x02" => GovernanceCatalogProfile::Progress,
+            b"GC\0\x03" => GovernanceCatalogProfile::Prune,
+            _ => return Err(Error::Corrupt),
+        }
+    } else {
+        GovernanceCatalogProfile::Disabled
+    };
     let checksum = Sha256::digest(&bytes[..at]);
     if value::take(bytes, &mut at, 32).map_err(value_error)? != checksum.as_slice() {
         return Err(Error::Corrupt);
@@ -141,8 +165,6 @@ pub(crate) fn parse(
         credit_shard_count,
         credit_catalog,
         governance_catalog,
-        catalog_progress,
-        catalog_prune,
     })
 }
 
@@ -192,10 +214,10 @@ pub(crate) fn encode(
         bytes.extend_from_slice(&(if manifest.credit_catalog { 2_u16 } else { 1 }).to_be_bytes());
         bytes.extend_from_slice(&count.to_be_bytes());
     }
-    if manifest.governance_catalog {
-        bytes.extend_from_slice(if manifest.catalog_prune {
+    if manifest.governance_catalog.enabled() {
+        bytes.extend_from_slice(if manifest.governance_catalog.prune() {
             b"GC\0\x03"
-        } else if manifest.catalog_progress {
+        } else if manifest.governance_catalog.progress() {
             b"GC\0\x02"
         } else {
             b"GC\0\x01"
@@ -231,16 +253,11 @@ fn encoded_size(
     group: &GroupId,
     recovery: &RecoveryId,
 ) -> Result<usize, Error> {
-    if manifest.catalog_prune && !manifest.catalog_progress {
-        return Err(Error::InvalidChanges);
-    }
-    if manifest.catalog_progress && !manifest.governance_catalog {
-        return Err(Error::InvalidChanges);
-    }
     if manifest.credit_catalog && manifest.credit_shard_count.is_none() {
         return Err(Error::InvalidChanges);
     }
-    if manifest.governance_catalog && (manifest.layout != 8 || manifest.alias_format != 2) {
+    if manifest.governance_catalog.enabled() && (manifest.layout != 8 || manifest.alias_format != 2)
+    {
         return Err(Error::InvalidChanges);
     }
     if manifest.credit_shard_count.is_some_and(|count| {
@@ -261,7 +278,11 @@ fn encoded_size(
             } else {
                 0
             },
-            if manifest.governance_catalog { 4 } else { 0 },
+            if manifest.governance_catalog.enabled() {
+                4
+            } else {
+                0
+            },
         ],
     )
 }

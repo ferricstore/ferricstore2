@@ -89,6 +89,11 @@ pub(super) fn page_revision(
         .range::<&[u8]>((lower, Bound::Unbounded))
         .map_err(|e| storage_error(&e))?;
     let count = usize::from(request.limit);
+    if revisions {
+        tx.admit_read(std::mem::size_of::<
+            Option<wf_domain::workflow::control::EntryIdentity>,
+        >())?;
+    }
     tx.admit_read(total(
         128,
         [count
@@ -109,6 +114,9 @@ pub(super) fn page_revision(
             break;
         }
         tx.recovery_row(physical.value(), value.value())?;
+        if revisions {
+            tx.admit_read(total(64, [value.value().len()])?)?;
+        }
         revision = validate_row(value.value(), control)?;
         let cap = total(256, [physical.value().len()])?;
         tx.temporary(cap)?;

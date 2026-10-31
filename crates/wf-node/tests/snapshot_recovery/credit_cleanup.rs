@@ -359,11 +359,11 @@ fn credit_cleaner_stale_missing_owner_prune_preserves_concurrent_published_and_a
             )?
             .is_some()
     );
-    assert!(
+    assert_eq!(
         state
             .read_credit_catalog(&fixture.scope, 256, 10000, 64 * f::MIB)?
-            .entries
-            .is_empty()
+            .entries,
+        Vec::<wf_ports::state::CreditCatalogEntry>::new(),
     );
     assert!(
         wf_ports::state::GovernanceCatalogReadPort::governance_catalog_contains(

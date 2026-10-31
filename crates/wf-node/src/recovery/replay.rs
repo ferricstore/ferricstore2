@@ -85,20 +85,8 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
-    if profile == 16 {
-        return super::catalog_prune::apply(state, entry, fields, limits, base);
-    }
-    if profile == 15 {
-        return super::catalog_progress::apply(state, entry, fields, limits, base);
-    }
-    if profile == 14 {
-        return super::catalog_membership::apply(state, entry, fields, limits, base);
-    }
-    if profile == 13 {
-        return super::catalog_ack::apply(state, entry, fields, limits, base);
-    }
-    if profile == 12 {
-        return super::credit::apply(state, entry, fields, limits, base);
+    if matches!(profile, 12..=16) {
+        return governance(state, entry, fields, limits, base, profile);
     }
     if matches!(profile, 8..=11) || (profile == 3 && limits.value_claim_work.is_some()) {
         return super::workflow_values::apply(state, entry, fields, (limits, base, profile));
@@ -194,4 +182,22 @@ pub(super) fn copy(bytes: &[u8]) -> Result<Vec<u8>, Error> {
         .map_err(|_| Error::State(wf_ports::state::StateTransactionError::Allocation))?;
     output.extend_from_slice(bytes);
     Ok(output)
+}
+
+fn governance(
+    state: &mut RedbStateStore,
+    entry: &RaftLogEntry,
+    fields: [&[u8]; 3],
+    limits: &CommittedRecoveryLimits,
+    base: usize,
+    profile: u16,
+) -> Result<ControlState, Error> {
+    match profile {
+        12 => super::credit::apply(state, entry, fields, limits, base),
+        13 => super::catalog_ack::apply(state, entry, fields, limits, base),
+        14 => super::catalog_membership::apply(state, entry, fields, limits, base),
+        15 => super::catalog_progress::apply(state, entry, fields, limits, base),
+        16 => super::catalog_prune::apply(state, entry, fields, limits, base),
+        _ => Err(Error::UnsupportedEntry),
+    }
 }

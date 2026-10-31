@@ -158,13 +158,7 @@ fn validate_values_profile(
     }
     let values = super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
     super::values::validate::cohort(tx, values.defaults, values.alias_format, layout)?;
-    Ok(if values.catalog_prune {
-        3
-    } else if values.catalog_progress {
-        2
-    } else {
-        u16::from(values.governance_catalog)
-    })
+    Ok(values.governance_catalog.version())
 }
 
 pub(super) fn inventory(tx: &RedbStateTransaction<'_>) -> Result<usize, StateTransactionError> {
@@ -260,21 +254,23 @@ fn validate_rows(
     tx.step()?;
     let mut entries = table.iter().map_err(|e| storage_error(&e))?;
     let mut counts = [0_u64; 2];
-    let credit_shards = if layout == 8 {
-        super::values::manifest::parse(manifest, tx.group, tx.recovery)?.credit_shard_count
+    let values = if layout == 8 {
+        Some(super::values::manifest::parse(
+            manifest,
+            tx.group,
+            tx.recovery,
+        )?)
     } else {
         None
     };
+    let credit_shards = values.and_then(|facts| facts.credit_shard_count);
     let mut credit_counts = [0_u64; 2];
-    let credit_catalog = layout == 8
-        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.credit_catalog;
-    let governance_catalog = layout == 8
-        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.governance_catalog;
+    let credit_catalog = values.is_some_and(|facts| facts.credit_catalog);
+    let governance_catalog = values.map_or(
+        super::values::manifest::GovernanceCatalogProfile::Disabled,
+        |facts| facts.governance_catalog,
+    );
     let applied = control.last_entry().is_some();
-    let catalog_prune = layout == 8
-        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.catalog_prune;
-    let catalog_progress = layout == 8
-        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.catalog_progress;
     let mut hash = Sha256::new();
     hash.update(if matches!(layout, 6..=8) {
         super::snapshot::original::CATALOG_DOMAIN
@@ -303,20 +299,8 @@ fn validate_rows(
         if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=19) {
             return Err(StateTransactionError::Corrupt);
         }
-        if decoded.family() == 19 {
-            if !catalog_progress {
-                return Err(StateTransactionError::Corrupt);
-            }
-            // The payload is a derived hint. Preserve invalid bytes for a
-            // later committed reset; keys/control/outcomes remain strict.
-        } else if decoded.family() == 18 {
-            if !governance_catalog {
-                return Err(StateTransactionError::Corrupt);
-            }
-            super::governance_catalog::validate_row(
-                value.value(),
-                catalog_prune.then_some(control),
-            )?;
+        if matches!(decoded.family(), 18 | 19) {
+            rows::governance(decoded.family(), value.value(), governance_catalog, control)?;
         } else if matches!(decoded.family(), 16 | 17) {
             if !credit_catalog {
                 return Err(StateTransactionError::Corrupt);

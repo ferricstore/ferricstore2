@@ -54,9 +54,7 @@ impl RedbStateStore {
                 alias_format: 2,
                 credit_shard_count,
                 credit_catalog: credit_shard_count.is_some(),
-                governance_catalog: true,
-                catalog_progress: true,
-                catalog_prune: true,
+                governance_catalog: super::super::values::manifest::GovernanceCatalogProfile::Prune,
             },
         )
     }

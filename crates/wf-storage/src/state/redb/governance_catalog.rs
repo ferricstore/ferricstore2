@@ -41,10 +41,10 @@ impl RedbStateTransaction<'_> {
             }
             self.admit_read(512)?;
             let manifest = self.value_manifest()?;
-            if !manifest.governance_catalog {
+            if !manifest.governance_catalog.enabled() {
                 return Err(E::UnsupportedPolicyProfile);
             }
-            Ok(manifest.catalog_prune)
+            Ok(manifest.governance_catalog.prune())
         })
     }
 }

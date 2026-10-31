@@ -294,11 +294,11 @@ impl CleanupFixture {
         )?;
         self.commit(&request, frame)?;
         let (_, state) = self.open()?;
-        assert!(
+        assert_eq!(
             state
                 .read_credit_catalog(&self.scope, 256, 10000, 64 * f::MIB)?
-                .entries
-                .is_empty()
+                .entries,
+            Vec::<wf_ports::state::CreditCatalogEntry>::new(),
         );
         assert!(
             wf_ports::state::GovernanceCatalogReadPort::governance_catalog_contains(

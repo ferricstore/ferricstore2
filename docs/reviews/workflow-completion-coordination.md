@@ -60533,3 +60533,45 @@ Save the exact failing test/source cohort and log receipt before closing this
 classification gap. No new product capability or independent peer review claim.
 New stale ordinary-read/fresh actual-owner and generic-last received capability
 controls are supplemental after the corresponding bodies, not original RED.
+
+GC3 maintainability refinement before type creation (solo design review): strict
+Clippy rejects fourth boolean in ValueManifest/ValueGenesisCapabilities. Approve
+private GovernanceCatalogProfile in existing values/manifest.rs, variants
+Disabled/Membership/Progress/Prune, with enabled/progress/prune/version queries.
+Replace the three dependent governance booleans in both existing owners with
+this single exact capability. Original absent/GC1/GC2/GC3 wire markers, public
+constructors, cache0..3, admission and snapshot equality remain exact. This
+makes impossible capability combinations unrepresentable; it is not a lint
+suppression, new runtime abstraction or extra allocation. Existing Redb consumers
+use the exact enum; Node's separate recovery selection remains independent.
+
+Guarded-prune candidate now passes9 storage cases,4 pure codec cases,all58
+architecture cases,8 application boundary cases and strict workspace/all-target
+Clippy. The selected Node3 plus appended generic-last received refusal and stale
+ordinary-absence/fresh actual-owner case have passed; final integration repeats
+all current Node cleaner/recovery cases together. All8 prior application controls
+now include coherent member/revision checks and default freshness refusal. The
+controlled fixture's nonempty semantic page has empty lookahead; it never fakes
+an accepted write. Receipt16 is included in the startup capability match, closing
+the saved32cb7d7 semantic downgrade failure. Removed iteration now also executes.
+
+Review refinements: startup rows parse one exact borrowed manifest once rather
+than repeatedly; governance row validation stays in existing recovery/rows.rs.
+Node profile dispatch stays in its existing replay module. Fixed8-byte codec
+chunks use typed arrays. GC3 scan prepays its fixed optional revision and each
+bounded original row; the exact admitted-byte boundary executes without writes.
+No map clone/new dependency/suppression or measured performance claim. Three
+storage empty assertions and the saved race's queue-empty assertion use equivalent
+assert_eq! forms for Clippy; the frame helper is static and the received snapshot
+binding renamed. Exact inverses preserve saved protocol and race assertions.
+
+Source audit preserves all671 previous test/benchmark inputs:662 whole-file exact,
+three exact additive registrations,three exact original prefixes,three reviewed
+fixture inverses. Ports R0 whole source stays exact; storage R0 whole source and
+Node R0 prefix have only named equivalent lint/helper inverses. Original7da2b8d
+race prefix stays exact after its one empty-assertion inverse. Refresh exactly
+four counterpart whole-file hashes and GC3 explicit safety-migration notes;
+all source/runtime IDs, named assertions, lines, links and remaining ledger fields
+remain exact. Accounting stays141/155/671, with no new source-case credit.
+Freeze this coherent candidate for the single all12 integration checkpoint;
+full product/source/native/Linux acceptance remains incomplete.
