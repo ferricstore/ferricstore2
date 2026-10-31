@@ -41,6 +41,7 @@ pub(super) fn observe(
         limits.admit(&[base, limits.state.1, limits.state.3])?;
     }
     let admission = AdmissionLimits::new(1, 1, 1).map_err(|_| Error::InvalidLimits)?;
+    let catalog_profile = state.governance_catalog_profile();
     let tx = state
         .begin_apply(
             namespace.0,
@@ -62,7 +63,7 @@ pub(super) fn observe(
             })?;
     }
     super::credit::require(&tx, limits)?;
-    super::catalog_membership::require(&tx, limits)?;
+    super::catalog_membership::require(&tx, limits, catalog_profile)?;
     let (control, value) =
         read_applied_state(&tx, limits.membership, limits.workspace).map_err(Error::State)?;
     *membership = match (value.entry(), value.stamp()) {
@@ -134,7 +135,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if body.get(6) == Some(&12) && super::catalog_membership::enabled(limits) {
+    let header = if body.get(6) == Some(&13) && super::catalog_progress::enabled(limits) {
+        wf_ports::log::catalog_progress_recovery_header(body, limits.normal.codec)
+    } else if body.get(6) == Some(&12) && super::catalog_membership::enabled(limits) {
         wf_ports::log::catalog_membership_recovery_header(body, limits.normal.codec)
     } else if body.get(6) == Some(&11) && super::catalog_ack::enabled(limits) {
         wf_ports::log::catalog_ack_recovery_header(body, limits.normal.codec)
@@ -222,6 +225,9 @@ fn audit_normal(
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if profile == 15 {
+        return super::catalog_progress::audit(body, limits, base, stamp);
+    }
     if profile == 14 {
         return super::catalog_membership::audit(body, limits, base, stamp);
     }

@@ -265,13 +265,23 @@ pub(in crate::state::redb) fn complete(
     charge: &mut PolicySchemaCharge,
     profile: SnapshotLimits,
 ) -> Result<Option<([u8; 32], usize, usize)>, Error> {
+    complete_profiled(tx, charge, profile).map(|(facts, _)| facts)
+}
+
+pub(super) type SnapshotFacts = ([u8; 32], usize, usize);
+
+pub(super) fn complete_profiled(
+    tx: &mut RedbStateTransaction<'_>,
+    charge: &mut PolicySchemaCharge,
+    profile: SnapshotLimits,
+) -> Result<(Option<SnapshotFacts>, u16), Error> {
     let tables = recovery::inventory(tx)?;
-    let layout = recovery::cohort(tx, charge)?.0;
+    let (layout, _, catalog_profile) = recovery::cohort_profiled(tx, charge)?;
     if layout < 3 {
         return Err(Error::UnsupportedLayout);
     }
     if tables != if matches!(layout, 4..=8) { 6 } else { 4 } {
         return Err(Error::Corrupt);
     }
-    retained(tx, charge, profile, layout)
+    retained(tx, charge, profile, layout).map(|facts| (facts, catalog_profile))
 }

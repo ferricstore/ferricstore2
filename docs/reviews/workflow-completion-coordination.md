@@ -60151,3 +60151,40 @@ RED. The historical assertion receives that refusal instead of TrailingBytes.
 Stored set/clear/retry and all five post-body fault controls already pass8/8;
 the latter are regression controls without original TDD credit. Save this cohort
 before implementing the selected cache/Node bodies. See catalog-progress-node-r0.log.
+
+Approve private recovery::validate_values_profile in the existing storage
+recovery module: extract its current complete workflow-value cohort validation
+and return the immutable catalog profile from those already borrowed manifest
+bytes. This keeps cohort_profiled below the function-size ceiling without
+changing probes, step counts or validation order. Approve enabled/audit/apply
+helpers in the already selected Node catalog_progress module; only Progress
+enables15/13, and membership remains enabled under Progress.
+
+Received-store refinement: the fresh stage also uses unvalidated construction,
+so approve snapshot::validate::complete_profiled returning the same validated
+facts plus immutable profile; preserve complete as a facts-only wrapper. Expose
+cohort_profiled within redb only. receive carries that scalar with its existing
+return tuple; stage initializes its own cache only after receive's full validation
+and Immediate commit. No extra database probe or active-store mutation follows.
+Approve catalog_membership::require_profile, a cached schema selection gate reused
+by observe's guarded require and received restore before any state/log transition.
+Keep the selected same-transaction manifest checks in require. Add the concrete
+received-GC2/generic-Blank-last-entry refusal case to the approved existing test
+module; compare whole log metadata/rows before and after older-mode refusal.
+
+Approve fixture damage_hint in the existing ProgressFixture child: test-only
+family19 payload corruption, with actual key discovery and no production raw
+mutation API. Add a real received-invalid-hint/committed-clear control in the
+existing progress test module. These additional two tests follow the Node body
+and receive no original TDD claim. The earlier received suffix fixture needed
+its committed5 marker moved after prefix restoration, matching the real snapshot
+contract; this setup correction changes no semantic expected assertion. All five
+original Node cases now pass, including prefix/checkpoint received recovery.
+
+Strict Clippy rejects the nested scalar tuple signatures. Approve a private
+snapshot::validate::SnapshotFacts alias for the existing (id,row-count,wire-count)
+tuple, reused by complete_profiled and receive. Receive returns those facts with
+the layout/profile pair; stage moves them directly. This names existing scalar
+data, adds no owner/allocation/schema and suppresses no lint. The received-refusal
+test observes the closed source cohort before stage creation, avoiding a second
+open of a live exclusive database; its unchanged expected whole cohort matches.

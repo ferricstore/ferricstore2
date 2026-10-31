@@ -118,7 +118,10 @@ fn received(
 ) -> TestResult {
     std::fs::create_dir(dir)?;
     let mut log = p::log(dir)?;
-    p::append(&mut log, frames, p::ProgressFault::Healthy)?;
+    for (index, frame) in frames.iter().enumerate() {
+        f::append(&mut log, u64::try_from(index)?, frame.as_bytes())?;
+    }
+    f::append(&mut log, 6, b"opaque uncommitted progress suffix")?;
     let scope = f::scope()?;
     let candidate = RedbSnapshotStage::receive(
         &dir.join("state.redb"),
@@ -128,7 +131,7 @@ fn received(
         wf_storage::state::StateStoreLimits::default(),
         SnapshotLimits::default(),
     )?;
-    let (log, state) = restore_received_snapshot(
+    let (mut log, state) = restore_received_snapshot(
         log,
         candidate,
         scope.group(),
@@ -136,6 +139,7 @@ fn received(
         p::selected()?,
         SnapshotLimits::default(),
     )?;
+    log.save_committed(f::at(5))?;
     let (log, mut state) = recover_snapshotted(
         log,
         state,
@@ -194,6 +198,146 @@ fn catalog_progress_node_purged_and_received_snapshots_keep_receipt_only_prefix_
     let expected = f::state_rows(&source)?;
     received(&dir.join("suffix"), &prefix, &frames, &expected)?;
     received(&dir.join("checkpoint"), &complete, &frames, &expected)?;
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn catalog_progress_node_older_modes_refuse_received_gc2_with_generic_last_entry_before_log_write()
+-> TestResult {
+    let dir = f::directory("progress-node-received-old")?;
+    let source = dir.join("source");
+    std::fs::create_dir(&source)?;
+    let (log, mut state) = p::pair(&source, true)?;
+    let blank = f::blank(wf_domain::workflow::control::EntryStamp::Unstamped)?;
+    f::apply_control(&mut state, 0, blank.as_bytes())?;
+    let mut wire = Vec::new();
+    state.capture_snapshot(&mut wire, SnapshotLimits::default())?;
+    drop((log, state));
+    let state_before = p::cohort(&source)?;
+    let scope = f::scope()?;
+    for (index, limits) in [caps()?, caps()?.with_governance_catalogs()]
+        .into_iter()
+        .enumerate()
+    {
+        let child = dir.join(index.to_string());
+        std::fs::create_dir(&child)?;
+        let mut log = p::log(&child)?;
+        let before = log.state()?;
+        let candidate = RedbSnapshotStage::receive(
+            &child.join("state.redb"),
+            scope.group().clone(),
+            scope.recovery().clone(),
+            &mut std::io::Cursor::new(&wire),
+            wf_storage::state::StateStoreLimits::default(),
+            SnapshotLimits::default(),
+        )?;
+        assert_eq!(
+            restore_received_snapshot(
+                log,
+                candidate,
+                scope.group(),
+                scope.recovery(),
+                limits,
+                SnapshotLimits::default()
+            )
+            .err(),
+            Some(wf_node::recovery::SnapshotRecoveryError::Recovery(
+                E::State(StateTransactionError::UnsupportedPolicyProfile)
+            ))
+        );
+        let (mut log, state) = f::open_pair(&child)?;
+        assert_eq!(log.state()?, before);
+        drop((log, state));
+        assert_eq!(p::cohort(&child)?, state_before);
+        assert!(f::log_rows(&child)?.is_empty());
+    }
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn catalog_progress_node_received_invalid_hint_is_preserved_until_committed_clear() -> TestResult {
+    let dir = f::directory("progress-node-invalid-hint")?;
+    let source = dir.join("source");
+    std::fs::create_dir(&source)?;
+    let (mut log, mut state) = p::pair(&source, true)?;
+    let frames = p::frames()?;
+    f::append(&mut log, 0, frames[0].as_bytes())?;
+    log.save_committed(f::at(0))?;
+    p::apply(&mut state, &frames, 1)?;
+    drop((log, state));
+    p::damage_hint(&source)?;
+    let scope = f::scope()?;
+    let (log, mut state) = f::open_pair(&source)?;
+    assert_eq!(
+        state.governance_catalog_progress(
+            &scope,
+            b"limit",
+            GovernanceCatalogReadLimits::default()
+        )?,
+        GovernanceCatalogProgress::Invalid
+    );
+    let mut wire = Vec::new();
+    state.capture_snapshot(&mut wire, SnapshotLimits::default())?;
+    drop((log, state));
+    let target = dir.join("target");
+    std::fs::create_dir(&target)?;
+    let log = p::log(&target)?;
+    let candidate = RedbSnapshotStage::receive(
+        &target.join("state.redb"),
+        scope.group().clone(),
+        scope.recovery().clone(),
+        &mut std::io::Cursor::new(&wire),
+        wf_storage::state::StateStoreLimits::default(),
+        SnapshotLimits::default(),
+    )?;
+    let (mut log, state) = restore_received_snapshot(
+        log,
+        candidate,
+        scope.group(),
+        scope.recovery(),
+        p::selected()?,
+        SnapshotLimits::default(),
+    )?;
+    assert_eq!(state.governance_catalog_profile(), 2);
+    assert_eq!(
+        state.governance_catalog_progress(
+            &scope,
+            b"limit",
+            GovernanceCatalogReadLimits::default()
+        )?,
+        GovernanceCatalogProgress::Invalid
+    );
+    f::append(&mut log, 1, frames[2].as_bytes())?;
+    log.save_committed(f::at(1))?;
+    let (log, state) = recover_snapshotted(
+        log,
+        state,
+        scope.group(),
+        scope.recovery(),
+        p::selected()?,
+        SnapshotLimits::default(),
+    )?;
+    assert_eq!(
+        state.governance_catalog_progress(
+            &scope,
+            b"limit",
+            GovernanceCatalogReadLimits::default()
+        )?,
+        GovernanceCatalogProgress::Missing
+    );
+    drop((log, state));
+    let (log, state) = f::open_pair(&target)?;
+    assert_eq!(
+        state.governance_catalog_progress(
+            &scope,
+            b"limit",
+            GovernanceCatalogReadLimits::default()
+        )?,
+        GovernanceCatalogProgress::Missing
+    );
+    drop((log, state));
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }

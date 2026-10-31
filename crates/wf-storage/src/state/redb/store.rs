@@ -13,6 +13,7 @@ pub struct RedbStateStore {
     pub(super) recovery: RecoveryId,
     pub(super) limits: StateStoreLimits,
     pub(super) layout: Cell<u16>,
+    pub(super) catalog_profile: Cell<u16>,
     fenced: Cell<bool>,
 }
 
@@ -56,6 +57,7 @@ impl RedbStateStore {
             recovery,
             limits,
             layout: Cell::new(3),
+            catalog_profile: Cell::new(0),
             fenced: Cell::new(false),
         }
     }
@@ -139,6 +141,7 @@ impl RedbStateStore {
             recovery,
             limits,
             layout: Cell::new(3),
+            catalog_profile: Cell::new(0),
             fenced: Cell::new(false),
         };
         bootstrap::initialize(&store, genesis, scratch)?;
@@ -161,9 +164,12 @@ impl RedbStateStore {
             recovery,
             limits,
             layout: Cell::new(3),
+            catalog_profile: Cell::new(0),
             fenced: Cell::new(false),
         };
-        store.layout.set(recovery::validate(&store)?);
+        let (layout, catalog_profile) = recovery::validate(&store)?;
+        store.layout.set(layout);
+        store.catalog_profile.set(catalog_profile);
         Ok(store)
     }
     /// Fixed authoritative group; available even after a fatal error.
@@ -175,6 +181,12 @@ impl RedbStateStore {
     #[must_use]
     pub const fn recovery(&self) -> &RecoveryId {
         &self.recovery
+    }
+    /// Immutable manifest capability0/1/2, validated at genesis or complete open.
+    /// This schema observation grants no authorization or workflow authority.
+    #[must_use]
+    pub fn governance_catalog_profile(&self) -> u16 {
+        self.catalog_profile.get()
     }
 
     pub(crate) fn committed_core_policy_layout(&mut self, layout: u16) {

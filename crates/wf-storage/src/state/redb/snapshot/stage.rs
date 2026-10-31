@@ -47,9 +47,9 @@ impl RedbSnapshotStage {
     ) -> Result<Self, SnapshotError> {
         super::admit(&group, &recovery, target, limits, 0)?;
         let store = RedbStateStore::unvalidated(database, group, recovery, target);
-        let (id, rows, wire, layout) = receive::receive(&store, input, limits)?;
-        let facts = (id, rows, wire);
+        let (facts, (layout, catalog_profile)) = receive::receive(&store, input, limits)?;
         store.layout.set(layout);
+        store.catalog_profile.set(catalog_profile);
         Ok(Self { store, facts })
     }
 

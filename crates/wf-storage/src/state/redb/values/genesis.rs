@@ -113,6 +113,11 @@ pub(in crate::state::redb) fn create_selected_profile(
     )?;
     let store = RedbStateStore::unvalidated(database, group, recovery, limits);
     initialize(&store, &genesis, defaults, scratch, capability)?;
+    store.catalog_profile.set(if capability.catalog_progress {
+        2
+    } else {
+        u16::from(capability.governance_catalog)
+    });
     Ok(store)
 }
 

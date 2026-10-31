@@ -224,7 +224,7 @@ pub(super) fn receive(
     store: &RedbStateStore,
     input: &mut impl std::io::Read,
     limits: SnapshotLimits,
-) -> Result<([u8; 32], usize, usize, u16), SnapshotError> {
+) -> Result<(validate::SnapshotFacts, (u16, u16)), SnapshotError> {
     let mut tx = super::transaction(store, limits, store.limits).map_err(SnapshotError::Stage)?;
     fresh(&tx).map_err(SnapshotError::Stage)?;
     let mut state = (Sha256::new(), 0, 0);
@@ -289,11 +289,11 @@ pub(super) fn receive(
         super::put_descriptor(&tx, Some(facts)).map_err(SnapshotError::Stage)?;
     }
     let mut charge = PolicySchemaCharge::new(store.limits.schema());
-    if validate::complete(&mut tx, &mut charge, limits).map_err(SnapshotError::Stage)?
-        != Some(facts)
-    {
+    let (validated, catalog_profile) =
+        validate::complete_profiled(&mut tx, &mut charge, limits).map_err(SnapshotError::Stage)?;
+    if validated != Some(facts) {
         return Err(SnapshotError::Stage(Error::Corrupt));
     }
     super::commit(tx).map_err(SnapshotError::Stage)?;
-    Ok((facts.0, facts.1, facts.2, state.2))
+    Ok((facts, (state.2, catalog_profile)))
 }

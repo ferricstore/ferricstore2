@@ -15,7 +15,7 @@ use wf_types::version::{CommittedTime, HlcTimestamp};
 mod index;
 mod rows;
 
-pub(super) fn validate(store: &RedbStateStore) -> Result<u16, StateTransactionError> {
+pub(super) fn validate(store: &RedbStateStore) -> Result<(u16, u16), StateTransactionError> {
     let mut tx = store.transaction(
         true,
         store.limits.admission(),
@@ -25,7 +25,7 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<u16, StateTransactionEr
     )?;
     let tables = inventory(&tx)?;
     let mut charge = PolicySchemaCharge::new(tx.limits.schema());
-    let (layout, _) = cohort(&tx, &mut charge)?;
+    let (layout, _, catalog_profile) = cohort_profiled(&tx, &mut charge)?;
     if layout < 3 {
         if tables != 2 {
             return Err(StateTransactionError::Corrupt);
@@ -41,13 +41,20 @@ pub(super) fn validate(store: &RedbStateStore) -> Result<u16, StateTransactionEr
         store.limits.snapshot_limits(),
         layout,
     )?;
-    Ok(layout)
+    Ok((layout, catalog_profile))
 }
 
 pub(super) fn cohort(
     tx: &RedbStateTransaction<'_>,
     charge: &mut PolicySchemaCharge,
 ) -> Result<(u16, wf_domain::workflow::control::ControlState), StateTransactionError> {
+    cohort_profiled(tx, charge).map(|(layout, control, _)| (layout, control))
+}
+
+pub(super) fn cohort_profiled(
+    tx: &RedbStateTransaction<'_>,
+    charge: &mut PolicySchemaCharge,
+) -> Result<(u16, wf_domain::workflow::control::ControlState, u16), StateTransactionError> {
     tx.step()?;
     let metadata = tx
         .write
@@ -141,11 +148,25 @@ pub(super) fn cohort(
     if placements != actual_placements || policies != actual_policies || expected != hash {
         return Err(StateTransactionError::Corrupt);
     }
-    if matches!(layout, 7 | 8) {
-        let values = super::values::manifest::parse(manifest.value(), tx.group, tx.recovery)?;
-        super::values::validate::cohort(tx, values.defaults, values.alias_format, layout)?;
+    let catalog_profile = validate_values_profile(tx, manifest.value(), layout)?;
+    Ok((layout, control, catalog_profile))
+}
+
+fn validate_values_profile(
+    tx: &RedbStateTransaction<'_>,
+    manifest: &[u8],
+    layout: u16,
+) -> Result<u16, StateTransactionError> {
+    if !matches!(layout, 7 | 8) {
+        return Ok(0);
     }
-    Ok((layout, control))
+    let values = super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
+    super::values::validate::cohort(tx, values.defaults, values.alias_format, layout)?;
+    Ok(if values.catalog_progress {
+        2
+    } else {
+        u16::from(values.governance_catalog)
+    })
 }
 
 pub(super) fn inventory(tx: &RedbStateTransaction<'_>) -> Result<usize, StateTransactionError> {

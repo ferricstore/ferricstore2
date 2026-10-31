@@ -44,19 +44,28 @@ pub(super) const fn enabled(limits: &CommittedRecoveryLimits) -> bool {
 pub(super) fn require(
     tx: &wf_storage::state::RedbStateTransaction<'_>,
     limits: &CommittedRecoveryLimits,
+    actual: u16,
 ) -> Result<(), E> {
-    if matches!(
-        limits.governance_catalog,
-        GovernanceCatalogRecoveryProfile::Progress
-    ) {
-        return Err(E::State(
+    require_profile(limits, actual)?;
+    match limits.governance_catalog {
+        GovernanceCatalogRecoveryProfile::Disabled => Ok(()),
+        GovernanceCatalogRecoveryProfile::Enabled => {
+            tx.require_governance_catalog().map_err(E::State)
+        }
+        GovernanceCatalogRecoveryProfile::Progress => {
+            tx.require_catalog_progress().map_err(E::State)
+        }
+    }
+}
+pub(super) fn require_profile(limits: &CommittedRecoveryLimits, actual: u16) -> Result<(), E> {
+    match (limits.governance_catalog, actual) {
+        (GovernanceCatalogRecoveryProfile::Disabled, 0 | 1)
+        | (GovernanceCatalogRecoveryProfile::Enabled, 1)
+        | (GovernanceCatalogRecoveryProfile::Progress, 2) => Ok(()),
+        _ => Err(E::State(
             wf_ports::state::StateTransactionError::UnsupportedPolicyProfile,
-        ));
+        )),
     }
-    if enabled(limits) {
-        tx.require_governance_catalog().map_err(E::State)?;
-    }
-    Ok(())
 }
 pub(super) fn audit(
     body: &[u8],

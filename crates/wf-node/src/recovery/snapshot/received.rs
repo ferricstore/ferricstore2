@@ -223,6 +223,7 @@ pub fn restore_received_snapshot(
     let mut work = [0, limits.work.1];
     matching(&mut log, namespace, limits, base, saved, before, &mut work)?;
     let state = candidate.into_store()?;
+    super::super::catalog_membership::require_profile(limits, state.governance_catalog_profile())?;
     phase(limits, snapshot, base)?;
     let mut state = state.upgrade_snapshot_layout(snapshot)?;
     phase(limits, snapshot, base)?;

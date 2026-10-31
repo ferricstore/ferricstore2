@@ -14,6 +14,7 @@ use wf_storage::{
 };
 
 pub(super) type ProgressFixture = BTreeMap<String, f::Rows>;
+#[derive(Clone, Copy)]
 pub(super) enum ProgressFault {
     Healthy,
     TrailingHistoricalBody,
@@ -189,4 +190,28 @@ pub(super) fn cohort(dir: &Path) -> TestResult<ProgressFixture> {
     }
     assert_eq!(result.len(), 6);
     Ok(result)
+}
+
+pub(super) fn damage_hint(dir: &Path) -> TestResult {
+    let db = redb::Builder::new().open(dir.join("state.redb"))?;
+    let tx = db.begin_write()?;
+    {
+        let mut table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
+        let mut selected = None;
+        for row in table.iter()? {
+            let (key, _) = row?;
+            if key.value().get(6) == Some(&19) {
+                selected = Some(key.value().to_vec());
+                break;
+            }
+        }
+        let key = selected.ok_or("missing progress hint")?;
+        assert!(
+            table
+                .insert(key.as_slice(), b"invalid-hint".as_slice())?
+                .is_some()
+        );
+    }
+    tx.commit()?;
+    Ok(())
 }
