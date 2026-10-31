@@ -60188,3 +60188,33 @@ the layout/profile pair; stage moves them directly. This names existing scalar
 data, adds no owner/allocation/schema and suppresses no lint. The received-refusal
 test observes the closed source cohort before stage creation, avoiding a second
 open of a live exclusive database; its unchanged expected whole cohort matches.
+
+Solo implementation/performance review of208f253: the progress decoder borrows
+the original cursor/catalog and moves original header owners into retention;
+the same command body is not reserialized for apply. Invalid hint inspection
+borrows engine bytes and returns a unit classification without copying their
+payload, after charging actual wire/read limits. The cached immutable schema
+scalar avoids unconditional new manifest probes in old Disabled profiles;
+selected modes still consult actual same-guard authority. Valid returned cursor
+bytes keep the existing fallible exact-reservation Vec ownership contract. A
+Box conversion here has no measured benefit and could introduce another
+allocation/shrink path; no speculative representation swap or speedup is claimed.
+Atomic publication, retry preservation, every-step rollback, real sync-failure
+uncertainty/fencing, complete historical audit and received/purged snapshots
+have focused executed controls. Full integration remains running at this record;
+the frozen non-Markdown cohort must remain unchanged. No independent review,
+accepted consensus, native or Linux result is asserted.
+
+Durable progress integration checkpoint: all12 local gates pass on1963 frozen
+non-Markdown inputs/1374 Rust files without drift. All1522 cases/116 targets
+preserve1500 predecessor and1294 original identities/statuses/multiplicities,
+both benchmark correctness smokes,57 architecture cases,Python7 and11 doctests
+/15 targets. All657 older test/benchmark files remain651 whole,5 exact additive
+registration inverses and1 appended architecture prefix. Saved-source audit
+records complete helper/style inverses and additive post-body controls honestly.
+Actual full parity still exits1;137/151/653 accounting and5903/4222/1681/1655
+runtime reconciliation leave5858 frozen textual declarations unported. No full
+source/native/Linux/performance credit, feature adoption or push. Next complete
+the real bounded cleaner with cursor/failed-command accounting and fairness,
+then remaining public parents and ordered milestone obligations. The original
+dirty Elixir checkout remains untouched and native fixes unexecuted.

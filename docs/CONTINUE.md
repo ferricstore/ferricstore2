@@ -4,23 +4,62 @@ Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
 Current batch: M2-CREDIT-CATALOG1, still unfinished.
 
-Active continuation: source scenarios are committed at69c5821. Three actual
-stored cases pass (original300-member top5, actual earlier insertion, deleted
-cursor), with strict Node Clippy/Python7/progress checks. Checked accounting is
-137/151/653, retaining all older links/runtime IDs; these are after-body
-counterparts without native/profile/full-case credit. The last complete all12
-workspace checkpoint below remains0cdca94.
+Latest integrated code checkpoint:208f253, durable cleaner progress storage and
+complete historical/replay/snapshot recovery. Explicit GC2 supports family19
+cursor set/clear with original retained reply and identical applied control in
+one Immediate commit. Original retries preserve newer progress. Missing, empty
+cursor and invalid hint remain distinct. Invalid derived hints survive canonical
+open/snapshot/receive unchanged until an actual committed clear; authoritative
+owner/control/outcome corruption still fences.
 
-A durable cleaner progress protocol is now concretely selected in ADR007 and
-the coordination review: explicit GC2, derived family19 hint, private operation13/
-intent15/response13, atomic retained/control publication, complete recovery and
-snapshot binding. The current rejecting predecessor has genuine RED (ports3,
-storage2 with old-capability control passing, architecture1). Implement its
-selected domain/codec/genesis/read bodies, expose/save real writer RED, then the
-consumed writer and Node historical/snapshot integration. Preserve the derived
-invalid-hint reset policy and strict authoritative-owner fencing. Full cleaner
-scheduling/public parents remain successors. Do not report this unfinished
-candidate as the complete all12 passing tree.
+Recovery requires the explicit GC2 selector and actual capability, including
+empty and receipt-only state. Older selection refuses empty GC2 and received
+GC2 with a generic last entry before any state/log transition. The store caches
+only its completely validated immutable schema identity; selected same-guard
+manifest checks remain. Fresh received stages initialize that identity only
+following full validation and durable publication. Old profiles incur no new
+unconditional manifest probes or allocation. No accepted Raft service is implied.
+
+All12 local gates pass on1963 frozen non-Markdown inputs/1374 Rust files with
+zero drift:1522 cases/116 executable targets,57 architecture cases,Python7 and
+11 doctests/15 targets. All1500 predecessor and1294 original case identities,
+statuses/multiplicities and both benchmark correctness smokes remain. All657
+older test/benchmark files remain651 whole,5 exact registration inverses and1
+exact appended architecture prefix. Saved-source checks preserve original
+assertions with explicitly recorded helper/style inverses; post-body fault
+controls are not original TDD. Genuine rejecting predecessors are8321720
+(domain/ports/storage/architecture),08da98a (actual stored writer), andffd1210
+(actual Node selection/recovery). The received-suffix helper correction moves
+its commit marker after snapshot restore, matching the existing contract.
+
+Three real committed source scenarios at69c5821 cover the original300-member
+catalog/top5, actual earlier concurrent insertion and deleted anchor. Checked
+accounting is137 source-derived declarations/151 counterparts/653 assertion
+links. Runtime reconciliation remains5903/4222/1681/1655. Actual full parity still
+exits1 with5858 unported frozen textual declarations and no full source-case,
+native, Linux or performance credit. These local macOS checks do not prove
+required production/macOS/Linux/native profiles. See /private/tmp/ferricstore2-
+catalog-progress-{r0,driver-r0,node-r0,final-pipeline,source-audit,full-identity,
+full-parity,checkpoint}.json and phase logs.
+
+Next implement the complete bounded cleaner orchestration over the real catalog,
+owner, cleanup and progress ports: default16/max64 attempted commands, maximum2
+consecutive pages per owner and4N+4 attempts. Count failed cleanup, unregister,
+reset and cursor writes; exhausted cursor budget retains the actual old cursor,
+and caught-up/wrapped state must follow the effective persisted cursor. Preserve
+600-ID/budget2 results512 then88 and300-ID busy-owner fairness. An empty catalog
+must not issue an absent cursor delete. Native malformed-authoritative-owner
+fairness remains an explicit unresolved migration/design obligation; derived
+hint tolerance must not weaken authoritative-owner fencing.
+
+Complete public credit/Claim/policy/release-outbox parents, accepted consensus,
+production routing/authorization, HTTP/TCP/worker integration, full required
+source/profile coverage and native Linux/macOS acceptance remain open. Keep the
+full goal active; do not adopt the unfinished feature branch, push or report
+product completion. The primary checkout only points here; its last adopted
+code remains728650f. Preserve the dirty original Elixir checkout and unverified
+isolated native fix checkpointce3dce444. Concrete architecture reviews remain
+solo; do not claim independent review or start agents.
 
 Previous collection/repair checkpoint:  Bounded global collection
 now traverses every original anchored page, propagates loader errors, preserves
