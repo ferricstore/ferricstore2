@@ -149,6 +149,8 @@ pub struct CreditCatalogObservation<'a> {
 
 impl CreditCatalogObservation<'_> {
     /// Proposes an append, or reuse of an identical pending tail owner.
+    /// This neutral reuse candidate cannot suppress a new owner's publication:
+    /// a publisher may already have observed the old tail owner as missing.
     /// # Errors
     /// Refuses missing/invalid tail observations or append business ceilings.
     pub fn publication(
@@ -157,6 +159,31 @@ impl CreditCatalogObservation<'_> {
         maximum_key_bytes: usize,
     ) -> Result<Option<CreditCatalogMeta>, CreditCatalogError> {
         valid_owner(owner, maximum_key_bytes)?;
+        self.validate_tail(maximum_key_bytes)?;
+        if self.meta.head <= self.meta.tail && self.tail_scope == Some(owner) {
+            return Ok(None);
+        }
+        self.meta
+            .append(owner, maximum_key_bytes)
+            .map(|(meta, _)| Some(meta))
+    }
+
+    /// Gives every actual new-owner creation its own monotone publication entry.
+    /// # Errors
+    /// Refuses invalid exact tail observations, backlog or sequence exhaustion.
+    pub fn new_owner_publication(
+        self,
+        owner: &[u8],
+        maximum_key_bytes: usize,
+    ) -> Result<CreditCatalogMeta, CreditCatalogError> {
+        valid_owner(owner, maximum_key_bytes)?;
+        self.validate_tail(maximum_key_bytes)?;
+        self.meta
+            .append(owner, maximum_key_bytes)
+            .map(|(meta, _)| meta)
+    }
+
+    fn validate_tail(self, maximum_key_bytes: usize) -> Result<(), CreditCatalogError> {
         if self.meta.head > self.meta.tail {
             if self.tail_scope.is_some() {
                 return Err(CreditCatalogError::CorruptEntry);
@@ -164,13 +191,8 @@ impl CreditCatalogObservation<'_> {
         } else {
             let tail = self.tail_scope.ok_or(CreditCatalogError::CorruptEntry)?;
             valid_owner(tail, maximum_key_bytes).map_err(|_| CreditCatalogError::CorruptEntry)?;
-            if tail == owner {
-                return Ok(None);
-            }
         }
-        self.meta
-            .append(owner, maximum_key_bytes)
-            .map(|(meta, _)| Some(meta))
+        Ok(())
     }
 }
 

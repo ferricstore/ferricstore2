@@ -64,7 +64,7 @@ fn credit_catalog_owner_batch_preserves_original_order_missing_intents_and_real_
                 && wf_ports::log::decode_credit_owner(
                     value,
                     CreditLimits::default(),
-                    900000,
+                    900_000,
                     32 * common::MIB,
                 )
                 .is_ok_and(|owner| owner.view().scope == b"b")
@@ -83,8 +83,10 @@ fn credit_catalog_owner_batch_preserves_original_order_missing_intents_and_real_
         )?,
         vec![O::Present, O::Missing, O::Present]
     );
-    let mut small = CreditCatalogReadLimits::default();
-    small.maximum_steps = 1;
+    let small = CreditCatalogReadLimits {
+        maximum_steps: 1,
+        ..CreditCatalogReadLimits::default()
+    };
     assert_eq!(
         store
             .credit_catalog_owners(&common::scope()?, &page.entries, small)

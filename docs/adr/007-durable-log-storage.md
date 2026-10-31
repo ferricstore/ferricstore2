@@ -1294,3 +1294,13 @@ Combined explicit owner/target genesis uses existing independent manifest fields
 in one Immediate commit, without an unlogged runtime upgrade or new family.
 Application orchestration depends only on neutral ports. An accepted consensus
 adapter remains required; committed-prefix test fixtures do not supply one.
+
+Actual new-owner creation always appends a fresh publication sequence after
+validating the exact tail observation. Reusing a matching active tail is unsafe:
+a publisher may already have observed it as missing and then ACK that prefix
+after creation. A separate fresh sequence survives that ACK. Existing-owner and
+retained retries still append nothing. The prior neutral reuse algebra is not
+authority to suppress creation publication. The interleaving regression uses a
+real committed creation between the coherent owner batch and the old ACK; it
+fails before the correction and then publishes the surviving new intent. The
+matching pinned Elixir defect is corrected on an isolated unverified branch.

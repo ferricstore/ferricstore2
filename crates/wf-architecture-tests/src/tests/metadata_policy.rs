@@ -4,6 +4,94 @@ use super::{CheckResult, graph, metadata, package_mut, policy, root, source_chec
 use serde_json::json;
 
 #[test]
+fn catalog_publication_boundaries_remain_configured_and_pure() -> CheckResult<()> {
+    assert_eq!(
+        policy()?.packages["wf-application"]
+            .modules
+            .get("governance"),
+        Some(&true)
+    );
+    for module in [
+        "governance",
+        "governance::publication",
+        "governance::publication::dispatch",
+        "governance::publication::plan",
+    ] {
+        assert!(
+            source_check(
+                "wf-application",
+                module,
+                "use wf_ports::consensus::CreditCatalogPublicationPort;"
+            )?
+            .is_empty()
+        );
+    }
+    for module in [
+        "state::credit_catalog",
+        "state::credit_catalog::member",
+        "state::credit_catalog::read",
+        "consensus::catalog_publication",
+    ] {
+        assert!(
+            source_check(
+                "wf-ports",
+                module,
+                "use std::vec::Vec; use wf_domain::workflow::request::RequestScope;"
+            )?
+            .is_empty()
+        );
+        for (source, diagnosis) in [
+            ("use std::fs;", "standard-library module"),
+            ("use std::env;", "standard-library module"),
+            ("pub async fn hidden_effect() {}", "declares async behavior"),
+            ("static GLOBAL: u64 = 0;", "declares global state"),
+        ] {
+            assert!(
+                source_check("wf-ports", module, source)?
+                    .iter()
+                    .any(|failure| failure.contains(diagnosis)),
+                "{module}: {source}"
+            );
+        }
+    }
+    let original = metadata()?;
+    let rules = policy()?;
+    let workspace = root()?;
+    for target in [
+        "wf-storage",
+        "wf-consensus",
+        "wf-node",
+        "wf-api-http",
+        "wf-api-tcp",
+    ] {
+        let mut changed = original.clone();
+        package_mut(&mut changed, "wf-application")?["dependencies"]
+            .as_array_mut()
+            .ok_or("missing dependencies")?
+            .push(json!({
+                "name": target,
+                "rename": null,
+                "kind": null,
+                "optional": false,
+                "target": null,
+                "source": null,
+                "path": workspace.join("crates").join(target),
+                "features": [],
+                "req": "*",
+                "uses_default_features": true
+            }));
+        assert!(
+            graph::check(&changed, &rules, &workspace)?
+                .iter()
+                .any(|failure| failure.contains(&format!(
+                    "forbidden declared edge wf-application -> {target}"
+                )))
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn governance_credit_classification_preserves_pure_decisions() -> CheckResult<()> {
     assert_eq!(
         policy()?.packages["wf-domain"].modules.get("governance"),

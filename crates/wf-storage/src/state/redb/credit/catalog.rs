@@ -69,18 +69,15 @@ pub(super) fn publish(
         };
     }
     let (meta, tail) = observation(context)?;
-    let expected = CreditCatalogObservation {
+    let next = CreditCatalogObservation {
         meta,
         tail_scope: tail.as_deref(),
     }
-    .publication(plan.scope(), 65_535)
+    .new_owner_publication(plan.scope(), 65_535)
     .map_err(|_| E::InvalidChanges)?;
-    if expected != plan.catalog_publication() {
+    if Some(next) != plan.catalog_publication() {
         return Err(E::InvalidChanges);
     }
-    let Some(next) = expected else {
-        return Ok(());
-    };
     let tx = context.tx;
     let key = catalog_key(tx, context.scope, Some(next.tail()))?;
     let old = context.read(&key, |bytes| {

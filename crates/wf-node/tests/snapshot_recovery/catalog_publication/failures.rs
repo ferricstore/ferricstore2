@@ -143,8 +143,10 @@ fn catalog_publisher_preflights_workspace_and_advances_only_one_source_after_rea
 -> TestResult {
     let mut fixture = PublicationFixture::separate()?;
     let before = fixture.cohort(1)?;
-    let mut limits = Limits::default();
-    limits.workspace_bytes = 1;
+    let limits = Limits {
+        workspace_bytes: 1,
+        ..Limits::default()
+    };
     assert!(fixture.run(1, limits).is_err());
     assert_eq!(fixture.calls.len(), 0);
     assert_eq!(fixture.cohort(1)?, before);

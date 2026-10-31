@@ -14,23 +14,7 @@ impl PublicationFixture {
         {
             let mut table =
                 tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
-            let mut selected = None;
-            for row in table.iter()? {
-                let (key, value) = row?;
-                if key.value().get(6) == Some(&12)
-                    && wf_ports::log::decode_credit_owner(
-                        value.value(),
-                        CreditLimits::default(),
-                        900000,
-                        32 * f::MIB,
-                    )
-                    .is_ok_and(|owner| owner.view().scope == name)
-                {
-                    selected = Some(key.value().to_vec());
-                    break;
-                }
-            }
-            let key = selected.ok_or("missing test owner")?;
+            let key = owner_key(&table, name)?;
             assert!(table.remove(key.as_slice())?.is_some());
         }
         tx.commit()?;
@@ -48,26 +32,7 @@ impl PublicationFixture {
             assert_eq!(tx.list_multimap_tables()?.count(), 0);
             for handle in tx.list_tables()? {
                 let name = handle.name();
-                let mut rows = f::Rows::new();
-                if name == "wf_raft_log_v1" {
-                    let table = tx.open_table(TableDefinition::<u64, &[u8]>::new(name))?;
-                    for row in table.iter()? {
-                        let (k, v) = row?;
-                        assert!(
-                            rows.insert(k.value().to_be_bytes().to_vec(), v.value().to_vec())
-                                .is_none()
-                        );
-                    }
-                } else {
-                    let table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new(name))?;
-                    for row in table.iter()? {
-                        let (k, v) = row?;
-                        assert!(
-                            rows.insert(k.value().to_vec(), v.value().to_vec())
-                                .is_none()
-                        );
-                    }
-                }
+                let rows = table_rows(&tx, name)?;
                 result.push((format!("{prefix}/{name}"), rows));
             }
         }
@@ -140,4 +105,48 @@ impl PublicationFixture {
         std::fs::remove_dir_all(self.root)?;
         Ok(())
     }
+}
+
+fn owner_key(
+    table: &impl ReadableTable<&'static [u8], &'static [u8]>,
+    name: &[u8],
+) -> TestResult<Vec<u8>> {
+    for row in table.iter()? {
+        let (key, value) = row?;
+        if key.value().get(6) == Some(&12)
+            && wf_ports::log::decode_credit_owner(
+                value.value(),
+                CreditLimits::default(),
+                900_000,
+                32 * f::MIB,
+            )
+            .is_ok_and(|owner| owner.view().scope == name)
+        {
+            return Ok(key.value().to_vec());
+        }
+    }
+    Err("missing test owner".into())
+}
+fn table_rows(tx: &redb::ReadTransaction, name: &str) -> TestResult<f::Rows> {
+    let mut rows = f::Rows::new();
+    if name == "wf_raft_log_v1" {
+        let table = tx.open_table(TableDefinition::<u64, &[u8]>::new(name))?;
+        for row in table.iter()? {
+            let (k, v) = row?;
+            assert!(
+                rows.insert(k.value().to_be_bytes().to_vec(), v.value().to_vec())
+                    .is_none()
+            );
+        }
+    } else {
+        let table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new(name))?;
+        for row in table.iter()? {
+            let (k, v) = row?;
+            assert!(
+                rows.insert(k.value().to_vec(), v.value().to_vec())
+                    .is_none()
+            );
+        }
+    }
+    Ok(rows)
 }

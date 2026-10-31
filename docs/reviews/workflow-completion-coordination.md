@@ -59778,3 +59778,34 @@ changing new-owner preparation or writer binding. The seven earlier publisher
 cases pass. One masked snapshot fixture completion was corrected to use the
 existing recover_snapshotted entrypoint after purge, preserving its assertions;
 recover_committed correctly refuses a purged log. No old case was weakened.
+
+The creation race now passes unchanged: new-owner pure preparation and consumed
+writer both require a fresh sequence after exact tail validation. Existing-owner
+and retained retries still append nothing; the original neutral reuse algebra
+and its tests remain intact. Eight publisher cases and strict all-target Clippy
+for domain/ports/storage/application/Node pass. Read presence projection consumes
+and explicitly drops each decoded owner; helper extraction keeps nesting within4.
+Prepared test frame owners are dropped after their real durable log commit.
+
+Test-style corrections are explicit: 900000 becomes900_000; two Default-plus-
+field assignments become equivalent struct initializers. Whole-table readers
+and owner-key selection move to shallow helpers with the same exact assertions.
+These receive no new RED/source credit; retain complete inverses/record helper
+changes instead of claiming every whole fixture is byte-identical.
+The isolated Elixir branch saves the matching fix/regression atce3dce444 on top
+ofe67bd276c. Removing the added test restores the complete older test file
+exactly; only the intended source function/test file changed. Native execution,
+formatter and native TDD remain unverified; no original-checkout mutation or push.
+See /private/tmp/ferricstore2-catalog-publisher-elixir.json. Full Rust validation
+now freezes the integrated source once for all workspace gates.
+
+The first whole-workspace run correctly refuses unclassified application
+governance modules before the broad runtime suite. Approve the narrow
+architecture/policy.toml governance=true application root entry, retaining the
+unchanged package dependency allowlist. Approve pure-source classification for
+ports state::credit_catalog and consensus::catalog_publication, which contain
+only neutral values/codecs and capability declarations. Add the negative/positive
+catalog_publication_boundaries_remain_configured_and_pure test in existing
+architecture metadata_policy.rs: actual allowed module references, prohibited
+direct effect imports/global/async in neutral ports, and forbidden application
+backend/consensus/node/API dependency edges. No broad policy bypass or exemption.

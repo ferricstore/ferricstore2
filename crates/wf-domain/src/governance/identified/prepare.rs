@@ -104,9 +104,9 @@ fn publication(
             .and_then(|n| n.checked_add(observed.tail_scope.map_or(0, <[u8]>::len)))
             .ok_or(E::Limit)?,
     )?;
-    match observed.publication(prepared.request.scope, 65_535) {
+    match observed.new_owner_publication(prepared.request.scope, 65_535) {
         Ok(meta) => {
-            prepared.catalog_publication = meta;
+            prepared.catalog_publication = Some(meta);
             Ok(true)
         }
         Err(CreditCatalogError::BacklogFull) => {

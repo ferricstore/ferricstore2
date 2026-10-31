@@ -199,8 +199,12 @@ impl PublicationFixture {
             16 * f::MIB,
         )?;
         self.commit(source, &request, frame)?;
-        let (_,state,_)=self.open(source)?;
-        assert!(state.read_credit_owner(source,b"c",CreditLimits::default(),10000,64*f::MIB)?.is_some());
+        let (_, state, _) = self.open(source)?;
+        assert!(
+            state
+                .read_credit_owner(source, b"c", CreditLimits::default(), 10000, 64 * f::MIB)?
+                .is_some()
+        );
         Ok(())
     }
     pub(super) fn separate() -> TestResult<Self> {
@@ -324,6 +328,7 @@ impl PublicationFixture {
         let index = log.state()?.last_log().map_or(0, |id| id.index().get() + 1);
         f::append(&mut log, index, frame.as_bytes())?;
         log.save_committed(f::at(index))?;
+        drop(frame);
         let (log, mut state) =
             recover_committed(log, state, scope.group(), scope.recovery(), caps(profile)?)?;
         let tx = state.begin_apply(

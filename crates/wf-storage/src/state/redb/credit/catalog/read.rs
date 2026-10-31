@@ -55,16 +55,21 @@ impl CreditCatalogReadPort for RedbStateStore {
             for entry in entries {
                 let owner =
                     super::super::read::owner(&tx, scope, &entry.credit_scope, limits.credit)?;
-                let state = if owner.is_some() {
-                    CreditCatalogOwnerState::Present
-                } else {
-                    CreditCatalogOwnerState::Missing
-                };
-                drop(owner);
+                let state = presence(owner);
                 states.push(state);
             }
             Ok(states)
         })
+    }
+}
+
+fn presence(owner: Option<wf_domain::governance::credit::CreditOwner>) -> CreditCatalogOwnerState {
+    let exists = owner.is_some();
+    drop(owner);
+    if exists {
+        CreditCatalogOwnerState::Present
+    } else {
+        CreditCatalogOwnerState::Missing
     }
 }
 
