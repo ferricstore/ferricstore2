@@ -60575,3 +60575,18 @@ all source/runtime IDs, named assertions, lines, links and remaining ledger fiel
 remain exact. Accounting stays141/155/671, with no new source-case credit.
 Freeze this coherent candidate for the single all12 integration checkpoint;
 full product/source/native/Linux acceptance remains incomplete.
+
+Guarded-prune integrated checkpoint8850e33: all12 local gates pass on1991 frozen
+non-Markdown inputs/1402 Rust files, zero drift. All1570 cases/117 targets pass,
+with every1548 predecessor/1294 original identity/status/multiplicity and both
+benchmark correctness smokes preserved. Architecture58,Python7 and11 doctests/15
+targets pass. All671 older test/benchmark inputs stay662 whole plus9 exact reviewed
+inverses/prefixes. Current19 cleaner,4 prune Node,9 storage,4 ports and8 application
+cases execute together. No failed/ignored cases receive credit. Source accounting
+stays141/155/671; four hash/explicit safety-migration notes refresh, with all prior
+assertions/runtime IDs exact. Full parity actually exits1 with5858 unported
+frozen declarations and unchanged5903/4222/1681/1655 reconciliation. Host is
+Darwin/arm64; no native Elixir, Linux or performance acceptance. Concrete public
+credit/Claim/policy/release-outbox parents, malformed-owner migration, accepted
+consensus/services/maintenance lifecycle and required full profiles remain open.
+Keep the full goal active and continue solo. No feature adoption or push.

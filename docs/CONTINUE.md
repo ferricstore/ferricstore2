@@ -4,6 +4,67 @@ Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
 Current batch: M2-CREDIT-CATALOG1, still unfinished.
 
+Latest integrated code checkpoint:8850e33, revision-checked catalog pruning.
+The real stale Missing -> new owner/publish/ACK -> prune race is reproduced in
+7da2b8d and corrected. Explicit GC3 stores each member's complete registration
+EntryIdentity; every fresh Register rotates it, including an existing member.
+A consumed Immediate transaction removes only the original matching revision.
+Unrelated member writes do not invalidate it. Missing/Changed are accepted
+no-ops; retained replay returns its original result without deleting a newer
+registration. Members, original fixed reply and applied control commit together.
+Receipt-only GC3->GC2 downgrade refusal closes the additional32cb7d7 saved failure.
+
+GC3 is an explicit capability and safety migration, with original GC1/GC2
+constructors/bytes preserved. One private capability enum prevents invalid flag
+combinations. Complete historical audit, explicit older-mode refusals (including
+received snapshots with a generic last entry), purged/received suffix replay and
+original retained results execute. Coherent limit1 scans return member/revision
+from the same original guard. Ordinary Missing owner reads require a fresh
+source confirmation; unsupported freshness adapters refuse. The standalone Redb
+adapter supplies only its current local applied guard. Production still needs
+accepted leader/read-barrier lifecycle; no consensus authority is invented.
+
+The bounded cleaner uses guarded prune and counts only actual Removed as pruned.
+Existing default16/max64 attempted commands, two-page fairness and4N+4 attempts
+remain; current tests preserve600-ID/budget2,300+1 fairness and5000-ID conservation.
+Actual stale ordinary absence/fresh owner, duplicate/ABA revisions, unrelated
+writes, every-step whole-cohort rollback, sync/Uncertain fencing and complete
+old-or-new recovery pass. Fixed revision bytes and borrowed scope/member fields
+avoid map/payload clones; startup row validation parses its manifest once.
+No measured speedup, production timer or native concurrency equivalence is claimed.
+
+All12 local gates pass on1991 frozen non-Markdown inputs/1402 Rust files with
+zero drift:1570 cases/117 executable targets,58 architecture cases,Python7 and
+11 doctests/15 targets. All1548 predecessor and1294 original identities/statuses/
+multiplicities plus both benchmark correctness smokes remain. All671 previous
+test/benchmark files are662 whole plus9 exact reviewed registration/prefix/fixture
+inverses. Saved protocol/race assertions retain explicit equivalent lint/helper
+inverses. Genuine protocol rejection, atomic writer rejection and receipt-only
+downgrade failures were saved before their fixes. Later fault/freshness/admission
+controls are supplemental evidence, without retroactive RED credit.
+
+Checked source accounting stays141 declarations/155 counterparts/671 assertion
+links. Exactly four counterpart whole-file hashes and explicit GC3 migration
+notes refresh; all source/runtime identities, named observations and bindings
+remain. Runtime reconciliation stays5903/4222/1681/1655; actual full parity still
+exits1 with5858 unported frozen declarations. These component passes do not meet
+full source-case, native/Linux/macOS or product acceptance. See
+/private/tmp/ferricstore2-guarded-prune-{r0,protocol-r0,writer-r0,downgrade-r0,
+source-audit,final-pipeline,full-identity,full-parity,checkpoint}.json and phase logs.
+
+Next finish public credit normalization/preparation/retained/submission parents
+with registered-before-dependent-mutation ordering, then coupled public Claim,
+policy and release-outbox work. Resolve required native malformed-authoritative-
+owner fairness without weakening canonical fencing. Accepted consensus and
+leader reads, production routing/authorization, HTTP/TCP/worker and maintenance
+lifecycle, full required Elixir scenarios/profiles and native Linux/macOS
+acceptance remain open. Preserve the original dirty Elixir checkout and isolated
+unexecuted native fixce3dce444. Continue all M1-M8 obligations solo. No independent
+review claim, feature adoption or push; primary adopted code remains728650f.
+
+Previous checkpoint: bounded cleaner. Its next-work statements are superseded
+by the current status above.
+
 Latest integrated code checkpoint:7515fc9, bounded cleaner maintenance runner.
 Actual catalog/progress/owner observations feed supervised original private
 Cleanup, prune and progress frames. Default16/max64 attempted commands, at most2
