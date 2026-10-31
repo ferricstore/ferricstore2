@@ -17,7 +17,11 @@ pub(crate) fn scan_outcome_in_layout<'a>(
     profile: (PolicySchemaLimits, &mut PolicySchemaCharge, usize),
     layout: u16,
 ) -> Result<ScannedRetainedOutcome<'a>, StateValueError> {
-    if layout == 8 && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| Ok(intent == 12))? {
+    if layout == 8
+        && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| {
+            Ok(matches!(intent, 12 | 13))
+        })?
+    {
         return super::credit::scan(bytes, scope, request, admission, maximum);
     }
     if layout == 8
@@ -45,7 +49,7 @@ pub(crate) fn encode_outcome_in_layout(
     admission: AdmissionLimits,
     layout: u16,
 ) -> Result<Vec<u8>, StateValueError> {
-    if layout == 8 && outcome.intent().version() == 12 {
+    if layout == 8 && matches!(outcome.intent().version(), 12 | 13) {
         return super::credit::encode(outcome, maximum, admission);
     }
     if layout == 8 && matches!(outcome.intent().version(), 10 | 11) {

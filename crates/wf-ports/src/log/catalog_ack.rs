@@ -13,6 +13,15 @@ mod request;
 mod response;
 pub use model::PreparedCatalogAckRequest;
 
+/// Derives canonical mathematical ACK identity; supplies no admission/authority.
+/// # Errors
+/// Refuses invalid source command scalar/order/page controls.
+pub fn catalog_ack_request_intent(
+    command: CreditCatalogAckRequest,
+) -> Result<ClientIntent, CodecError> {
+    request::intent(command)
+}
+
 /// Encodes exact original ACK controls and their canonical intent.
 /// # Errors
 /// Refuses invalid fields, byte/owner limits or allocation failure.
@@ -50,7 +59,11 @@ pub fn catalog_ack_recovery_header(
         return Err(CodecError::ByteLimit);
     }
     let header = request::header(&mut super::reader::Reader::new(encoded, limits))?;
-    Ok((13, [header.tenant,header.group,header.recovery], header.stamp))
+    Ok((
+        13,
+        [header.tenant, header.group, header.recovery],
+        header.stamp,
+    ))
 }
 
 /// Encodes one canonical25-byte private ACK response.

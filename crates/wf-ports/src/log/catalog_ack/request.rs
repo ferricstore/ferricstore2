@@ -23,6 +23,15 @@ use wf_types::{
 
 const INTENT: &[u8] = b"wf-credit-catalog-ack-intent-v1\0";
 
+pub(super) fn intent(command: CreditCatalogAckRequest) -> Result<ClientIntent, E> {
+    command.validate().map_err(|_| E::Malformed)?;
+    let mut hash = Sha256::new();
+    hash.update(INTENT);
+    hash.update(command.expected_head.to_be_bytes());
+    hash.update(command.up_to.to_be_bytes());
+    Ok(ClientIntent::credit_catalog_ack(hash.finalize().into()))
+}
+
 pub(super) fn encode(
     scope: &RequestScope,
     request: &RequestId,

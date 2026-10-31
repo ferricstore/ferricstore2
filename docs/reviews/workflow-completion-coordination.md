@@ -59441,3 +59441,25 @@ after the real fresh gate. Drop its remaining decoder staging then; do not clone
 these header payloads into the retained outcome. The tuple is neutral data, not
 paid/commit authority. S prospectively reserves decision_bytes+4096, covering
 the original header owners/metadata and fixed response before materialization.
+
+Writer binding refinement: approve catalog_ack_request_intent in the existing
+ports ACK facade/request child. It recomputes the exact16-byte canonical command
+identity (neutral data, no admission or apply authority). The consumed writer
+compares it to the retained intent as well as checking current metadata/control
+and exact reply bytes, so a plan for different ACK controls cannot be joined.
+
+Stored ACK integration now passes all eight saved cases, including actual
+published-sync uncertainty, fencing and full old-or-new reopen, every step cut,
+namespace conflicts, retained stale/invalid originals and256 deletions under a
+workflow batch limit of1. The old-capability control also passes. Clippy required
+one equivalent empty assertion repair in ack/limits.rs: entries.is_empty() became
+entries.len()==0 with diagnostics. Record its exact inverse rather than claiming
+that entire file remains byte-identical; predicates/scenarios are preserved.
+
+Node genuine RED before its dispatch body: all three new cases compile and
+fail at healthy UnsupportedEntry (snapshot wraps Recovery(UnsupportedEntry)).
+The historical case first directly applies all nine genuine frames, checks the
+retained ACK and later entry, then gets UnsupportedEntry instead of expected
+TrailingBytes. Generic-profile refusal passes before the selected replay fails.
+Later snapshot custody/replay assertions remain masked. See
+/private/tmp/ferricstore2-catalog-ack-node-r0.{json,log}. Save before Node bodies.

@@ -15,6 +15,7 @@ use wf_domain::governance::{
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::{CreditCatalogEntry, CreditCatalogPage, StateTransactionError as E};
 
+pub(super) mod ack;
 pub(in crate::state::redb) mod recovery;
 
 pub(crate) fn observation(

@@ -13,9 +13,9 @@ use crate::consensus::{PreparedOperation, PreparedRequest};
 mod catalog_ack;
 mod claim;
 pub use catalog_ack::{
-    PreparedCatalogAckRequest, catalog_ack_recovery_header, catalog_ack_retained_summary,
-    decode_catalog_ack_reply, encode_catalog_ack_reply, encode_catalog_ack_request,
-    prepare_catalog_ack_request, verify_catalog_ack_reply,
+    PreparedCatalogAckRequest, catalog_ack_recovery_header, catalog_ack_request_intent,
+    catalog_ack_retained_summary, decode_catalog_ack_reply, encode_catalog_ack_reply,
+    encode_catalog_ack_request, prepare_catalog_ack_request, verify_catalog_ack_reply,
 };
 pub use claim::{
     ClaimApplyDecision, ClaimApplyPlan, ClaimPhaseInspection, FreshClaimPhase,

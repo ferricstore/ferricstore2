@@ -12,6 +12,7 @@ mod context;
 mod read;
 pub(super) mod recovery;
 mod write;
+pub(crate) use catalog::ack::{apply as commit_catalog_ack, current as catalog_ack_meta};
 pub(crate) use catalog::observation as publication_observation;
 pub(crate) use context::CreditReadContext;
 pub(crate) use write::apply as commit;

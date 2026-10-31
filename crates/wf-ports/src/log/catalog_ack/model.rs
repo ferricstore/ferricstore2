@@ -24,6 +24,20 @@ pub struct PreparedCatalogAckRequest<'a> {
 }
 
 impl PreparedCatalogAckRequest<'_> {
+    /// Moves original neutral fields after the fresh gate, without payload clones.
+    /// This transfer supplies no admission, current-state or commit authority.
+    #[must_use]
+    pub fn into_retained_parts(
+        self,
+    ) -> (
+        RequestScope,
+        RequestId,
+        ClientIntent,
+        CreditCatalogAckRequest,
+    ) {
+        (self.scope, self.request, self.intent, self.command)
+    }
+
     /// Borrows the exact verified original bytes.
     #[must_use]
     pub const fn as_bytes(&self) -> &[u8] {

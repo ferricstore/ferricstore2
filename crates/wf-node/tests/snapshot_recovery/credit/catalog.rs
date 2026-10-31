@@ -1,6 +1,7 @@
 //! Explicit immutable publication capability across real log/state recovery.
 
 use super::*;
+mod ack;
 use std::path::Path;
 use wf_storage::{
     log::RedbLogStore,

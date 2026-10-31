@@ -91,7 +91,7 @@ fn catalog_ack_every_step_cut_aborts_deletions_metadata_and_original_outcome_tog
         reached,
         "must reach actual complete ACK within bounded steps"
     );
-    assert!(catalog::page(&path, 256)?.entries.is_empty());
+    assert_eq!(catalog::page(&path, 256)?.entries.len(), 0);
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
