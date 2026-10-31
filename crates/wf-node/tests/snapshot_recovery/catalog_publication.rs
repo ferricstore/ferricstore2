@@ -9,6 +9,7 @@ use wf_ports::state::decode_credit_catalog_member;
 mod collection;
 mod failures;
 mod fixtures;
+mod source;
 use fixtures::{PublicationCall as Call, PublicationFixture};
 
 #[test]

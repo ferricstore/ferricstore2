@@ -1,6 +1,7 @@
 use super::*;
 mod collection;
 mod observations;
+mod source;
 use redb::{ReadableDatabase, ReadableTable, TableDefinition, TableHandle};
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};

@@ -59985,3 +59985,46 @@ with unchanged135/149/646 accounting and5903/4222/1681/1655 reconciliation;5858
 frozen textual declarations remain unported. No full source-case/native/Linux/
 performance credit. Public parents and durable cleaner progress remain required;
 full goal remains active, with no feature adoption or push.
+
+
+### M2-CREDIT-CATALOG1 source counterparts and cleaner successor (solo)
+
+Prior turn made progress: collection/repair and actual guards are committed at
+0cdca94 with all12 local gates/1500 cases. Work remains solo. Review pinned
+flow_governance_catalog_test.exs78..105 and173..206, existing membership codec,
+actual committed-prefix fixture and the source assertion-link verifier.
+
+Before artifacts, approve Node snapshot_recovery/catalog_publication/source.rs
+and fixtures/source.rs, with existing PublicationFixture extensions only:
+change_catalog_members, collect_raw_catalog and catalog_stamp. Use actual op12
+committed membership commands in <=256 chunks, original retained status checks,
+existing bounded catalog reads and a fallible identity/filter loader. Derive
+stamps from actual stored control; no fake completion boolean or direct table
+mutation. Preserve300 matching members, original prefix/padded ordering, top5
+descending and inserted-before-anchor exclusion. Additional noise, exact deleted
+anchor refusal and snapshot readback are supplemental controls. Setup chunking
+is a bounded semantic replacement for direct source ZADD setup, not a claim of
+one300-member atomic command or accepted Raft service. No production dependency,
+model, schema or public method changes are selected by these counterparts.
+
+Approve existing generate-progress.py LINKS/LIMITATIONS entries and regenerated
+workflow-progress.json plus its progress note only after actual passing Rust
+execution. Bind original identities and direct assertions; preserve all old
+links/runtime IDs and immutable source statuses. Describe real stored/recovery
+semantics separately from omitted native FlowCase/WARaft/profile execution.
+These are post-body tests of already implemented collection, not invented RED.
+The durable cleaner remains a separate required protocol; inspect/select its
+actual progress representation, command budgets, stored/recovery ownership and
+fault cases before creating any production artifact for it.
+
+The three actual source/storage cases pass, as do strict Node all-target Clippy,
+Python7 and cargo progress. Both original catalog identities now have checked
+links: b43dccc831566cd3 (registration/success/order at89/94/104) and
+ff09a262ca76bbd1 (registration/traversal/insertion/order at186/193/198/205).
+Accounting is137/151/653; all old ledger entries/runtime bindings remain exact
+outside these two additions. Setup uses real committed <=256-member commands,
+actual stored control stamps and original retained statuses. Snapshot/nonmutation
+and deleted-anchor controls are additional. A missing mut binding was corrected
+before first execution; no original RED or native/profile/full-case claim.
+See /private/tmp/ferricstore2-catalog-source-focused.json. Save this source stage
+before creating the separately reviewed cleaner progress protocol.

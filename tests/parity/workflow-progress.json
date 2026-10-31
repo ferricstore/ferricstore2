@@ -18916,7 +18916,39 @@
       "runtime_case_ids": [
         "7e4e6704153aa7339295dd1f631c8c8ddd78a8d069a4281108709da7aab15f96"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-b43dccc831566cd3",
+          "rust_file": "crates/wf-node/tests/snapshot_recovery/catalog_publication/source.rs",
+          "rust_file_sha256": "bf17a4dfcbadfb0e978e5660df75c53f683a4e9ca54c770ebb241c4aac831d09",
+          "rust_module": "",
+          "rust_function": "source_catalog_collection_keeps_global_top_results_across_real_committed_pages",
+          "assertions": [
+            {
+              "source_line": 89,
+              "source_text": "assert {:ok, _added} =",
+              "rust_line": 18,
+              "rust_text": "assert_eq!(registration, vec![RetainedStatus::Accepted; 2]);"
+            },
+            {
+              "source_line": 94,
+              "source_text": "assert {:ok, top_five} =",
+              "rust_line": 25,
+              "rust_text": "assert_eq!(result.len(), 5);"
+            },
+            {
+              "source_line": 104,
+              "source_text": "assert top_five == members |> Enum.reverse() |> Enum.take(5)",
+              "rust_line": 27,
+              "rust_text": "assert_eq!(result.into_records().collect::<Vec<_>>(), expected);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed stored counterpart preserves all300 catalog-page-test prefix/padded000..299 members, budget catalog, prefix filter, global descending top5, and exact expected last-five equality. Two bounded actual committed membership commands replace the direct source300-member ZADD setup; no single300-member atomic-command guarantee is claimed. Typed accepted retained statuses/successful Result and count/equality checks represent the source successful registration/collection observations. Noise skipping, whole-table/log nonmutation and purged/received snapshot readback are supplemental controls. Fixed suffix rust replaces only an opaque positive unique suffix. Actual Node committed-prefix recovery and the real catalog writer/reader are exercised, without an accepted Raft submission service, public Elixir tuple/wire compatibility, FlowCase live-shard/FLUSHDB/MemoryGuard setup, original native profiles or independent Linux acceptance. This is post-implementation conformance, not original tests-first RED or full source-case/workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "8a1f406491faa0eb",
@@ -18930,7 +18962,45 @@
       "runtime_case_ids": [
         "868c7b3140fe74a5260d1b00b48d33797163c95fa5b33970e102a767662b8b8f"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-ff09a262ca76bbd1",
+          "rust_file": "crates/wf-node/tests/snapshot_recovery/catalog_publication/source.rs",
+          "rust_file_sha256": "bf17a4dfcbadfb0e978e5660df75c53f683a4e9ca54c770ebb241c4aac831d09",
+          "rust_module": "",
+          "rust_function": "source_catalog_paging_anchors_on_the_real_last_member_during_committed_insertion",
+          "assertions": [
+            {
+              "source_line": 186,
+              "source_text": "assert {:ok, _added} =",
+              "rust_line": 47,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 193,
+              "source_text": "assert {:ok, seen} =",
+              "rust_line": 62,
+              "rust_text": "assert_eq!(seen.len(), 300);"
+            },
+            {
+              "source_line": 198,
+              "source_text": "assert {:ok, 1} = FerricStore.Impl.zadd(ctx, catalog_key, [{0, inserted}])",
+              "rust_line": 57,
+              "rust_text": "assert_eq!(reply, vec![RetainedStatus::Accepted]);"
+            },
+            {
+              "source_line": 205,
+              "source_text": "assert seen == members",
+              "rust_line": 63,
+              "rust_text": "assert_eq!(seen.into_records().rev().collect::<Vec<_>>(), members);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed stored counterpart preserves300 catalog-anchor-test padded001..300 members, approval catalog, inserted000-before, actual commit during traversal, exactly300 original observed members and full ordered equality excluding the new earlier member. Bounded two-command setup replaces direct source ZADD; one actual retained membership command inserts the new member. The existing anchored collector with all300 results/reverse presentation supplies the traversal observation in place of the source arbitrary reducer callback; this does not claim the whole reduce_pages API. Fixed rust suffix replaces only a generated opaque suffix. Insertion-success and typed Result/cardinality/equality link the source observations; the did-insert control is supplemental. Real stored namespace/cursor checks and complete committed recovery execute, while accepted Raft service, public/native response encoding, original FlowCase setup/cleanup and mandatory profiles/independent Linux acceptance remain open. This is after-body conformance without retroactive tests-first RED or full source-case/workflow parity."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "c2cb424301a24338",

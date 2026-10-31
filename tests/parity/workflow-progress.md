@@ -6,6 +6,20 @@ assertion links and optionally references actual coordinator-owned ExUnit
 registration. It has no pass/status or execution-proof fields. The full
 `require-parity` gate remains fail-closed.
 
+Two new executed stored catalog counterparts now preserve the original300-member
+budget top-five query and approval traversal during an actual earlier insertion.
+The real consumed membership writer, committed-prefix Node recovery and anchored
+reader execute; exact ordered outputs are checked. Noise/nonmutation/snapshot
+readback and actual cursor deletion are supplemental controls. Fixed opaque
+suffixes and bounded setup chunks are explicit semantic replacements. The checked
+ledger now has137 source-derived declarations,151 counterparts and653 assertion
+links; every earlier link and runtime identity is preserved. These are tests of
+existing code with no original TDD claim. Native FlowCase/WARaft/mandatory profile
+execution, accepted Raft service, the general reducer API and independent platform
+acceptance remain open; these links do not certify full source-case/workflow parity.
+
+The paragraphs below retain earlier checkpoints.
+
 Three new pure FSH2 counterparts preserve FlowCodecTest357/380/424, with 18
 checked source assertion links. Independent 95/51/249-byte recipes and complete
 decoded expectations replace the source's native implementation comparison in
