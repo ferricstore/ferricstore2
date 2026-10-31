@@ -7,3 +7,6 @@ pub mod view;
 
 /// Public credit caller normalization, separate from private mutation preparation.
 pub mod caller;
+
+/// Durable-release value planning; external effects remain in adapters.
+pub mod release;

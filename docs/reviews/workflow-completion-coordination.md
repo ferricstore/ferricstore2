@@ -60951,3 +60951,71 @@ lifecycle, routing/authorization, shared services/transports/worker/maintenance,
 all required original scenarios/profiles, native Linux/macOS and measured
 performance acceptance. Preserve the original dirty Elixir tree and unexecuted
 isolated native fix; continue solo. Do not label this checkpoint full completion.
+
+
+### M2 coupled Claim/policy/release batch: concrete protocol selection (solo, before artifacts)
+
+Previous goal turn is PROGRESS: code9220c17/feature275a967 and primary52f5a6f are
+clean; ONE frozen all12 checkpoint proves1607/117 cases,60 architecture cases and
+11 doctests/15 targets. Full parity still fails. Continue the entire goal solo.
+Current durable Claim intentionally rejects governed policy. Preserve that guard
+until reservation metadata plus terminal release enqueue are atomic and audited.
+Do not claim protocol helpers, a projection, or a fake successful port completes
+this successor. Full target remains actual governed Claim -> workflow mutation ->
+durable release -> reconciler -> credit release, with replay/snapshot/uncertainty.
+
+Pinned evidence66586c5: claim_due_api.ex500..692 spends first, binds original IDs,
+refunds only known unused/no-commit IDs and holds Unknown. flow_claim_state_writes
+.ex555/641 enqueues releases inside the record-write transaction. The release
+section validates <=256 ACK/completion commands, persists sparse completion and
+removes intent+completion together. release_outbox.ex28..116/140..258/310..338
+owns finite meta, exact intent fields, optional nil/empty partition and v1 cursor.
+limit_reconciler.ex423..434 retains a running record based on matching reservation
+ID alone; missing releases and unavailable/malformed statuses error. Do not add
+scope/shard comparison that changes that source decision. Cursor decoding accepts
+Integer.parse signs/leading zeros and unsorted unique positions; encoding sorts.
+
+Approve exactly these protocol artifacts before creation:
+* domain governance/release.rs and release/{model,queue}.rs. Move the FIVE existing
+  GovernanceReservation/LimitEnforcement/ReleaseOutboxState/ReleaseIntent/ReleaseAppend
+  definitions verbatim from workflow/active/releases.rs into model and re-export
+  through the old active facade. No existing field/API/semantic change. Active
+  append delegates the same shared arithmetic after its RED, keeping its original
+  count0/no-op, backlog-business and corrupt/exhausted-authority distinctions.
+  New ReleaseIntentRef borrows full source fields with optional partition,
+  ReleaseOutboxError supplies source diagnoses, ReleaseAckPlan owns only state+
+  optional inclusive range, ReleaseCompletionPlan borrows the original <=256
+  sequences and filters old entries in original order. ReleaseRecordObservation
+  and ReleaseDisposition describe supplied decoded-map/missing/error facts only;
+  they grant no freshness, authorization or credit-release permission. Functions
+  validate_release_intent, append_release_outbox, acknowledge_release_outbox,
+  prepare_release_completion and classify_release implement these source decisions.
+  ACK checks stale only after idempotent up_to<head. Fixed stack sort detects
+  duplicate completion IDs; no heap list/map is needed for ACK or completion.
+* ports log/release.rs and release/{intent,meta,cursor}.rs. Private canonical
+  FWRI1 intent: raw flow ID, optional raw partition, raw scope,u64 shard,raw
+  reservation ID,enforcement1/2,u64 created time. FWRO1 meta: u64 head/tail.
+  Closed native formats, not claimed ETF compatibility. Completely inspect EOF,
+  tags/fields/finite values and bounds before ownership. Borrow intent bytes.
+  ReleaseReconcileCursor owns sorted flat (u64,u64) descriptors, exact next shard
+  and shard count, with bounded fallible construction/decoding. Preserve the
+  source v1:<next>|<shard>=<sequence>,... grammar including accepted signs/zeros,
+  uniqueness and numeric constraints. Expose bounded from_parts/accessors and
+  exact sorted encoding. Decimal rendering uses a stack buffer; no format/String
+  payload intermediates. Independent cursor encoded/owned budgets precede Vec
+  allocation. Nil cursor is source empty at next0. No durable op/profile selected
+  by these codecs; that requires the next concrete storage/record review.
+* tests/governance_release/main.rs in domain and tests/credit_codec/release.rs in
+  ports, additive existing codec registration. Source arithmetic boundaries,
+  error order/idempotency, original completion order, sibling/unknown classification,
+  nil versus empty partition, full framing/EOF and source cursor cases. Save
+  compiled rejecting APIs with healthy vectors before implementation. Existing
+  active/public cases/assertions remain intact. Extend parsed purity fixtures
+  for exact log::release prefix; keep effect/thread/lock imports closed.
+
+No new dependencies, legacy format reinterpretation, authority flag or unsafe.
+400/600,fn100,depth4/complexity25 remain. Logical size/per-operation admission is
+separate from native allocator/RSS. Complete current custody, source read batching,
+flow binding, transaction/snapshot capability and production lifecycle before
+claiming the coupled batch or any new complete original-source case. Focused
+checks during development; no repeated full pipeline until that coherent batch.

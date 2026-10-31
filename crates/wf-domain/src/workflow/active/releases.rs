@@ -1,64 +1,9 @@
 //! Ordered local release intents; remote credit/acknowledgment stays outside.
 
-use super::{ActiveTimeoutRejection, ActiveValueError};
+use super::{ActiveTimeoutRejection, ActiveValueError, GovernanceReservation, ReleaseOutboxState};
 use crate::workflow::MAX_EXACT_MILLIS;
 use crate::workflow::batch::ApplyError;
 use wf_types::bounds::MAX_RECORD_ID_BYTES;
-use wf_types::identity::{PartitionId, RecordId};
-use wf_types::version::TimestampMillis;
-
-/// Captured distributed-limit enforcement mode.
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub enum LimitEnforcement {
-    /// Strict global reservation.
-    StrictGlobal,
-    /// Approximate global reservation.
-    ApproximateGlobal,
-}
-/// Actual locally stored reservation, not remote ownership proof.
-#[derive(Clone, Eq, PartialEq)]
-pub struct GovernanceReservation {
-    /// Actual opaque scope.
-    pub scope: Vec<u8>,
-    /// Actual numeric reservation shard.
-    pub shard_id: u64,
-    /// Source reservation identity, at most256 bytes.
-    pub reservation_id: Vec<u8>,
-    /// Captured enforcement mode.
-    pub enforcement: LimitEnforcement,
-}
-/// Complete local outbox scalar authority; empty is head1/tail0.
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub struct ReleaseOutboxState {
-    /// First pending sequence, possibly `MAX_EXACT+1` after acknowledgment.
-    pub head: u64,
-    /// Last allocated sequence.
-    pub tail: u64,
-}
-/// Owned same-entry local release intent for later atomic persistence.
-pub struct ReleaseIntent {
-    /// Actual flow component.
-    pub flow_id: RecordId,
-    /// Actual partition component.
-    pub partition: PartitionId,
-    /// Captured scope bytes.
-    pub scope: Vec<u8>,
-    /// Captured shard.
-    pub shard_id: u64,
-    /// Actual reservation identity.
-    pub reservation_id: Vec<u8>,
-    /// Captured enforcement.
-    pub enforcement: LimitEnforcement,
-    /// Trusted source write time.
-    pub created_at: TimestampMillis,
-}
-/// One appended local row, preserving each source write occurrence.
-pub struct ReleaseAppend {
-    /// Checked local sequence.
-    pub sequence: u64,
-    /// Actual owned intent.
-    pub intent: ReleaseIntent,
-}
 
 pub(super) fn validate_reservation(
     reservation: &GovernanceReservation,

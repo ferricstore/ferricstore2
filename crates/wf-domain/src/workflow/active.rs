@@ -23,6 +23,9 @@ mod releases;
 mod trace;
 mod values;
 
+pub use crate::governance::release::{
+    GovernanceReservation, LimitEnforcement, ReleaseAppend, ReleaseIntent, ReleaseOutboxState,
+};
 pub(crate) use capture::capture_lifecycle_layers;
 pub use capture::{
     ActiveValueError, CapturedLifecycle, LifecycleDefaults, LifecycleOverrides, MaxActiveOverride,
@@ -32,9 +35,6 @@ pub use history::{ActiveHistory, HistoryKey, HistoryTrim};
 pub use indexes::{ActiveIndexDelta, ActiveIndexKey, ActiveIndexRows, active_rows, index_deltas};
 pub use plan::{ActiveRecordWrite, ActiveTimeoutPlan};
 pub use record::{ActiveCarry, ActiveRecord, ActiveRecordData, restore_active};
-pub use releases::{
-    GovernanceReservation, LimitEnforcement, ReleaseAppend, ReleaseIntent, ReleaseOutboxState,
-};
 pub(crate) use values::value_ref_bytes;
 pub use values::{
     ActiveValueKind, ActiveValueRef, ActiveValueRefs, TimeoutError, TimeoutValueWrite,

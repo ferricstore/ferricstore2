@@ -40,9 +40,14 @@ pub use claim::{
     inspect_claim_phase_point, prepare_claim_phase,
 };
 mod common;
+mod release;
 pub use common::{CodecError, normal_recovery_header, stored_value_recovery_header};
 pub use common::{step_continue_recovery_header, stored_step_continue_recovery_header};
 pub use record_batch::{encode_stored_step_continue, prepare_stored_step_continue};
+pub use release::{
+    ReleaseReconcileCursor, decode_release_cursor, encode_release_cursor, encode_release_intent,
+    encode_release_meta, inspect_release_intent, inspect_release_meta,
+};
 mod complete_policy;
 mod control;
 mod credit;
