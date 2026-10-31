@@ -60387,3 +60387,28 @@ parity exit1 with5858 frozen declarations unported. No full source/native/Linux/
 performance credit. Public credit/Claim/policy/release-outbox, malformed-owner
 migration, accepted consensus/services/timers and full profiles remain required.
 No feature adoption or push; continue the full goal solo.
+
+### M2-CREDIT-CATALOG1 stale prune reproduction (solo, before artifacts)
+
+Previous goal turn is progress:7515fc9/0e89211 implement and verify the bounded
+cleaner,1548 cases/all12 gates,141/155/671 checked source accounting. Work remains
+solo and the full M1-M8/native/platform objective stays active.
+
+Approve additive CleanupFault::PublishOwnerBeforePrune in existing Node cleanup
+fixtures.rs, create_and_ack_before_prune helper there, and an injection branch in
+existing cleanup ports.rs immediately before actual prune submission. It creates
+one ghost credit owner using real Lease/Spend, publishes its exact existing member
+through actual membership, then commits actual source ACK and verifies an empty
+pending source queue. The original encoded prune then commits through real log/
+recovery. Add one regression to existing credit_cleanup.rs requiring that the
+newly published member survive while owner/reservation remain and source intent
+is already ACKed. No simulated business write/raw table mutation/new file/type,
+no strengthened production implementation before observed failure. Save the real
+counterexample before selecting a protocol fix. Keep original case bodies intact.
+
+Actual counterexample confirmed: the single real Node test compiles; its helper
+confirms actual owner creation, successful membership registration, accepted ACK
+and an empty pending source queue. Original prune commits afterward; owner remains
+but governance_catalog_contains is false. The final member-survival assertion
+fails, without any raw state mutation or simulated business success. Save this
+cohort before selecting/implementing a fix. See guarded-prune-r0.log.

@@ -131,6 +131,13 @@ impl CreditCatalogPublicationPort for CleanupFixture {
         }
         self.calls.borrow_mut().push(kind);
         let fault = self.fault.get();
+        if kind == CleanupCall::Prune && fault == CleanupFault::PublishOwnerBeforePrune {
+            self.fault.set(CleanupFault::None);
+            if let Err(error) = self.create_and_ack_before_prune() {
+                self.last_error = Some(error.to_string());
+                return MutationSubmission::Unknown(MutationUnknown::Unavailable);
+            }
+        }
         if matches!(
             (kind, fault),
             (CleanupCall::Cleanup, CleanupFault::RefuseCleanup)

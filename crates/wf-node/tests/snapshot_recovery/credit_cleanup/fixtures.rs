@@ -46,6 +46,7 @@ pub(super) enum CleanupCall {
 pub(super) enum CleanupFault {
     None,
     ReadProgress,
+    PublishOwnerBeforePrune,
     RefuseCleanup,
     LoseCleanup,
     ForeignCleanup,
@@ -267,6 +268,46 @@ impl CleanupFixture {
                 16 * f::MIB,
             )?,
         )?;
+        Ok(())
+    }
+    pub(super) fn create_and_ack_before_prune(&mut self) -> TestResult {
+        let ids = self.seed(b"ghost", 1)?;
+        assert_eq!(ids.len(), 1);
+        let (log, state) = self.open()?;
+        let page = state.read_credit_catalog(&self.scope, 256, 10000, 64 * f::MIB)?;
+        assert_eq!(page.entries.len(), 1);
+        assert_eq!(page.entries[0].credit_scope, b"ghost");
+        let command = wf_domain::governance::catalog::CreditCatalogAckRequest {
+            expected_head: page.meta.head(),
+            up_to: page.meta.tail(),
+        };
+        drop((log, state));
+        let request = self.identity()?;
+        let frame = wf_ports::log::encode_catalog_ack_request(
+            &self.scope,
+            &request,
+            f::clock(1003, 0, 1003)?,
+            command,
+            f::driver_limits().codec,
+            16 * f::MIB,
+        )?;
+        self.commit(&request, frame)?;
+        let (_, state) = self.open()?;
+        assert!(
+            state
+                .read_credit_catalog(&self.scope, 256, 10000, 64 * f::MIB)?
+                .entries
+                .is_empty()
+        );
+        assert!(
+            wf_ports::state::GovernanceCatalogReadPort::governance_catalog_contains(
+                &state,
+                &self.scope,
+                b"limit",
+                &self.member(b"ghost")?,
+                GovernanceCatalogReadLimits::default(),
+            )?
+        );
         Ok(())
     }
     pub(super) fn progress(&self) -> TestResult<GovernanceCatalogProgress> {

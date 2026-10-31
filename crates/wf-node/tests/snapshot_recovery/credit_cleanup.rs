@@ -325,3 +325,56 @@ fn credit_cleaner_actual_default_sixteen_command_budget_and_maximum_sixty_four_p
     }
     fixture.cleanup()
 }
+
+#[test]
+fn credit_cleaner_stale_missing_owner_prune_preserves_concurrent_published_and_acked_owner()
+-> TestResult {
+    let mut fixture = CleanupFixture::new()?;
+    fixture.register(b"ghost")?;
+    let (log, state) = fixture.open()?;
+    assert!(
+        state
+            .read_credit_owner(
+                &fixture.scope,
+                b"ghost",
+                wf_domain::governance::credit::CreditLimits::default(),
+                10000,
+                64 * f::MIB
+            )?
+            .is_none()
+    );
+    drop((log, state));
+    fixture.fault.set(CleanupFault::PublishOwnerBeforePrune);
+    let result = fixture.run(1)?;
+    assert_eq!(result.commands, 1);
+    let (_, state) = fixture.open()?;
+    assert!(
+        state
+            .read_credit_owner(
+                &fixture.scope,
+                b"ghost",
+                wf_domain::governance::credit::CreditLimits::default(),
+                10000,
+                64 * f::MIB
+            )?
+            .is_some()
+    );
+    assert!(
+        state
+            .read_credit_catalog(&fixture.scope, 256, 10000, 64 * f::MIB)?
+            .entries
+            .is_empty()
+    );
+    assert!(
+        wf_ports::state::GovernanceCatalogReadPort::governance_catalog_contains(
+            &state,
+            &fixture.scope,
+            b"limit",
+            &fixture.member(b"ghost")?,
+            GovernanceCatalogReadLimits::default(),
+        )?
+    );
+    drop(state);
+    assert_eq!(fixture.remaining(b"ghost")?.len(), 1);
+    fixture.cleanup()
+}
