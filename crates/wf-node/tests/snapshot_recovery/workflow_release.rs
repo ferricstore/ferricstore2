@@ -6,6 +6,7 @@ mod fixtures;
 mod frames;
 mod history;
 mod limits;
+mod reconcile;
 mod snapshot;
 
 fn stored() -> TestResult<CommittedRecoveryLimits> {

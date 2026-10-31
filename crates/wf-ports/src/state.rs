@@ -12,7 +12,9 @@ mod original_policy;
 mod policy;
 mod transaction;
 mod workflow_release;
-pub use workflow_release::{WorkflowReleaseEntry, WorkflowReleasePage};
+pub use workflow_release::{
+    WorkflowReleaseEntry, WorkflowReleasePage, WorkflowReleaseReadPort, WorkflowReleaseRecord,
+};
 
 pub use claim::{
     ClaimDueKind, ClaimDueStep, ClaimLaneStep, GroupClaimChanges, GroupClaimDueCursor,

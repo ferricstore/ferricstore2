@@ -2,6 +2,42 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
+Current automatic release-page composition now executes actual configured queue
+reads -> partition batches -> grouped original-ID public credit Release -> sparse
+completion -> contiguous ACK. Source v1 inclusive cursors rotate after a retained
+head, restart after unconfirmed progress and preserve other shard positions.
+The existing exclusive storage reader and all original outcome grammars remain.
+
+Seventeen new Node cases and two domain cursor cases pass. Real paid work,
+terminal/restart/received snapshot and automatic release preserve the exact NUL
+reservation ID and running sibling. Original Unknown contexts survive snapshot
+restore and same-Arc retry; unknown release/mark/ACK and wrong retained receipts
+never certify progress. Actual corrupt source cohorts remain byte-identical as
+healthy later sources progress.257 duplicate intents use256/1 pages, one record
+batch per page and deduplicated original IDs in first occurrence order. Completed
+markers need no new record read or credit release. Strict Clippy passes.
+
+Affected-crate validation passes1623 tests/doctests in103 groups, including186
+Node snapshot cases,332 storage and all60 architecture cases. Strict workspace/
+all-target Clippy, progress, fmt and diff pass. The2089 non-Markdown inputs/1500
+Rust files stay frozen. All706 prior Rust test/bench inputs remain704 whole plus
+two exact additive registrations; seven original outcome codec files and six
+source/runtime ledgers remain byte-identical. Evidence: /private/tmp/ferricstore2-
+release-reconcile-{regression,final-clippy,progress}.log plus proof.json,
+source-audit.json and inputs.json. This is no new all12 run or source-case credit.
+
+This is the selected semantic release-page parent, not the complete background
+process: integrate catalog-publication tick ownership and accepted strong-read,
+scheduler/worker and authorization lifecycles. Original nil/present-empty
+partition identities stay distinct; the native local router refuses unresolved
+routes, and the public Claim parent still needs original optional capture.
+NEXT public Claim policy/NoDemand/unused/refund/Unknown composition and original
+partition capture, followed by the remaining raw ID/write-call/map-order/fairness,
+all required source scenarios/profiles, consensus/service and both-platform/
+performance acceptance. Full goal remains active; no new full source-case credit,
+production Raft service, timer, Linux result or measured speedup is claimed.
+
+
 Current Node GC4/5 integration now selects actual release and paid-Claim recovery
 profiles with explicit stored-value/catalog-credit/Claim limits. All earlier
 profiles remain closed, including empty stores and generic snapshot boundaries.

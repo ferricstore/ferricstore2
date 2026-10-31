@@ -1,5 +1,6 @@
 //! Pinned release queue, completion and read-status observations.
 #![forbid(unsafe_code)]
+mod cursor;
 use wf_domain::{governance::release::*, workflow::MAX_EXACT_MILLIS as MAX};
 use wf_types::version::TimestampMillis;
 type TestResult = Result<(), Box<dyn std::error::Error>>;

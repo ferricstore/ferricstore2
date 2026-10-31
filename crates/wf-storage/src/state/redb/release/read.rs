@@ -109,11 +109,39 @@ pub(super) fn page(
     {
         return Err(E::InvalidChanges);
     }
+    page_selected(tx, scope, limit, |meta| {
+        after.map_or(meta.head, |n| (n + 1).max(meta.head))
+    })
+}
+pub(super) fn reconcile_page(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    start: Option<u64>,
+    limit: u16,
+) -> Result<WorkflowReleasePage, E> {
+    if start.is_some_and(|n| n == 0 || n > wf_domain::workflow::MAX_EXACT_MILLIS) {
+        return Err(E::InvalidChanges);
+    }
+    page_selected(tx, scope, limit, |meta| {
+        start
+            .filter(|n| *n >= meta.head && *n <= meta.tail)
+            .unwrap_or(meta.head)
+    })
+}
+fn page_selected(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    limit: u16,
+    start: impl FnOnce(ReleaseOutboxState) -> u64,
+) -> Result<WorkflowReleasePage, E> {
+    if !(1..=256).contains(&limit) {
+        return Err(E::InvalidChanges);
+    }
     let context = require(tx, scope)?;
     tx.step()?;
     let table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
     let meta = meta(tx, &table, scope)?.unwrap_or(ReleaseOutboxState { head: 1, tail: 0 });
-    let start = after.map_or(meta.head, |n| (n + 1).max(meta.head));
+    let start = start(meta);
     let count = usize::try_from((meta.tail + 1).saturating_sub(start).min(u64::from(limit)))
         .map_err(|_| E::Limit)?;
     tx.admit_read(total(

@@ -69,6 +69,26 @@ pub struct PreparedPublicCreditCall {
     pub(super) frame: Arc<PreparedBytes>,
 }
 impl PreparedPublicCreditCall {
+    pub(in crate::governance) fn ownership_bytes(&self) -> Option<usize> {
+        let fields = [
+            self.source.tenant().as_bytes(),
+            self.source.group().as_bytes(),
+            self.source.recovery().as_bytes(),
+            self.target.tenant().as_bytes(),
+            self.target.group().as_bytes(),
+            self.target.recovery().as_bytes(),
+            self.request.as_bytes(),
+            &self.catalog,
+            &self.credit_scope,
+            self.frame(),
+        ];
+        let base = fields
+            .into_iter()
+            .try_fold(4096_usize, |n, b| n.checked_add(b.len()))?;
+        self.ids.iter().try_fold(base, |n, id| {
+            n.checked_add(size_of::<Vec<u8>>())?.checked_add(id.len())
+        })
+    }
     /// Original caller request identity.
     #[must_use]
     pub const fn request(&self) -> &RequestId {

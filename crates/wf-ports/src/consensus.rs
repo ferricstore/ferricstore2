@@ -15,7 +15,9 @@ pub use catalog_publication::CreditCatalogPublicationPort;
 mod membership;
 mod mutation;
 mod public_credit;
+mod workflow_release;
 pub use public_credit::{CreditRequestLookup, PublicCreditSubmitPort};
+pub use workflow_release::{WorkflowReleaseCreditRoute, WorkflowReleaseSubmitPort};
 mod value;
 pub use membership::{
     AppliedRaftMembership, RaftMembership, RaftMembershipError, RaftMembershipLimits,

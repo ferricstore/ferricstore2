@@ -61769,3 +61769,148 @@ this run. Strict workspace/all-target Clippy, progress, fmt and diff pass.
 No tests are failed or ignored in these groups. Full source parity remains
 incomplete; no all12-current claim follows from these five selected crates.
 Evidence: /private/tmp/ferricstore2-node-gc45-regression.log and proof.json.
+
+Solo architecture decision RELEASE-RECONCILE1 (2026-10-31), before creation.
+Previous goal turn was progress: verified Node GC4/5 codea7d27d9 and docs pointer
+2e2abf0 are committed; no full-goal completion is inferred. Continue solo.
+
+Pinned observations: release_outbox.ex normalizes inclusive cursor positions to
+head when before head or beyond tail, distinguishes nil from present-empty
+partition and encodes sorted v1 cursors. limit_reconciler.ex:279-587 scans all
+configured shards until one nonempty page, counts failed scans, batches reads by
+original optional partition, groups release by exact scope/shard and deduplicates
+IDs preserving first occurrence. Only confirmed release/completed statuses may
+form ACK prefixes; later successful releases get sparse marks first. Unconfirmed
+progress retries from head and rotates shard; a retained head never starves a
+later page or shard. The original tests explicitly seed replay/retained fixtures.
+
+Approve domain governance/release/cursor.rs with ReleaseReconcileCursor and
+ReleaseCursorError for bounded source v1 parse, sorted encode and pure traversal
+updates; release_outbox/cursor.rs tests under its existing integration target.
+No runtime effect, new dependency or source-case credit. Preserve source sign/
+leading-zero integer acceptance, unique shard positions and exact byte bounds.
+
+Approve ports state/workflow_release.rs extensions WorkflowReleaseRecord and
+WorkflowReleaseReadPort. Own only bounded state/reservation facts; preserve
+Missing/Unavailable/Corrupt and normalize wrong cardinality to unavailable.
+The release-authorizing record method defaults to UnsupportedPolicyProfile;
+production must establish accepted current reads. Approve consensus/
+workflow_release.rs with WorkflowReleaseSubmitPort and WorkflowReleaseCreditRoute
+for configured credit routing, trusted identity/time and supervised maintenance
+submission. Reuse PublicCreditSubmitPort and the real public credit caller.
+No bool success/current-authority parameter, native handle or fake service.
+
+Approve storage state/redb/release/reconcile.rs for local inclusive page and
+same-guard record+binding facts. Share existing private page materialization via
+a mathematical start selector; do not alter the existing exclusive API. Local
+reads alone do not implement release-authorizing distributed freshness: keep the
+strong trait default closed. Nil/present-empty unresolved native partitions must
+refuse, never fabricate Missing. A configured outer router remains required.
+
+Approve application governance/reconcile.rs and private children model.rs,
+plan.rs, observe.rs, dispatch.rs, progress.rs. Models: ReleaseReconcileRequest,
+ReleaseReconcileLimits, ReleaseReconcileStats, ReleaseReconcileError and private
+ReleaseStatus. Use fixed256 index/status/ref scratch, sort indices rather than
+clone payloads, process one partition/group at a time and fallibly reserve every
+owned spine. Preserve original IDs and optional partition. Returned stats retain
+all original Unknown public-credit contexts for explicit resolution; extend the
+existing PreparedPublicCreditCall with a crate-private ownership measurement.
+Charge accumulated pending contexts before each subsequent call, including room
+for its maximum possible context before proposal. Validate full maintenance
+scope/request/intent/response/status and progress math before advancing a cursor.
+No uncertain release or marker/ACK result is called complete.
+
+Approve Node snapshot_recovery/workflow_release/reconcile.rs and private children
+fixtures.rs, credit.rs, ports.rs, faults.rs and fairness.rs, with fixture
+ReleaseReconcileFixture, ReleaseReconcileFault and ReleaseReconcileTrace. Actual
+log commit/recovery and native state observations prove the paid Claim ->
+terminal -> automatic exact release -> completion/ACK loop, lost replies,
+restart/snapshots, dedup/sparse holes, grouping/cardinality failures, nil/empty
+identity and cursor/shard fairness. Any manually seeded queue remains explicitly
+a source-style fixture, not production binding creation. Standalone serial Node
+execution is not accepted distributed Raft/read-barrier or timer supervision.
+All400/600 file,100 function,4 nesting and25 complexity limits stay unchanged.
+Concrete path correction before creation: the existing domain integration target
+is governance_release/main.rs; approve its private governance_release/cursor.rs
+child instead of the nonexistent release_outbox target named above.
+
+RELEASE-RECONCILE1 self-review and focused result:17 Node integration cases and
+2 domain cursor cases pass. The initial cursor R0 is missing-API compilation in
+/private/tmp/ferricstore2-release-reconcile-r0.log. The original complete paid
+Node loop then failed behaviorally with InvalidOptions against a rejecting
+application shell in release-reconcile-app-r0.log, before its body was written.
+All later fault/fairness/bound cases are supplemental, not retrospective TDD.
+Missing enum documentation and an incorrect helper extraction were local compile
+mistakes, not product RED. A refusal fixture initially compared against the
+pre-repair cohort even though public credit correctly commits earlier catalog
+repair; pre-confirm that repair before measuring the actual no-proposal refusal.
+No old assertion, threshold or outcome grammar is weakened.
+
+Actual paid work -> terminal -> automatic public original-ID release -> ACK runs
+through real Node logs/recovery. The original NUL ID retires while the running
+sibling's consumed marker/credit survives. Unknown delivery preserves the exact
+shared original credit frame and retry context across received snapshot restore;
+retry uses the same Arc and original bytes. Unknown credit never authorizes
+completion. Lost mark/ACK replies reload persisted progress; wrong retained
+Claim authority cannot masquerade as a maintenance reply. Completed markers are
+ACKed without record reads or another release. Sparse holes preserve the running
+head.257 duplicate intents execute one partition batch and one deduplicated
+release per256/1 page, ACKing only the bounded prefix; first-original ID order is
+preserved. A retained head rotates to the next source. Actual canonical corruption
+in one source leaves its whole cohort/log unchanged while a healthy source makes
+progress. Missing stays distinct from unavailable/corrupt/wrong-cardinality data.
+
+Resource review: prepare both success/retry cursor owners before any credit
+proposal, so later cursor allocation cannot discard an Unknown context. Reserve
+the complete pending-context spine before effects. Measure accumulated original
+contexts before the next public call, including their shared frame and namespace
+owners; no payload clone is introduced. Charge original configured scopes, four
+cursor cohorts, page/record/route owners, temporary staging and enclosing public/
+maintenance execution caps. Native local record/binding facts share one actual
+transaction and cumulative admission; nil/present-empty routing stays distinct
+and refuses when this local adapter cannot resolve it. The strong record port's
+default remains closed. Standalone serial Node execution supplies no production
+leader/read barrier, scheduler/timer, authorization service or accepted Raft call.
+
+Performance review uses the official Rust1.99 documentation checked online:
+[allocation-free unstable slice sorting](https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable_by_key)
+and [fallible exact reservation](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.try_reserve_exact).
+Fixed256 descriptor/index/status scratch groups original borrowed payloads.
+Sorting bounded indices permits dedup without quadratic ID scans; sorting the
+selected original indices again preserves first occurrence order. Process one
+partition's small record facts at a time instead of retaining complete payload/
+history batches. Dynamic cursor/pending owners retain fallible Vec reservation;
+no unmeasured Vec-to-Box conversion is added. Actual17-case traces verify batching
+and exact IDs, not latency/throughput gains. No speedup is claimed.
+
+Native grouped submission order is explicitly canonical by optional partition
+and scope/shard. Source runtime map-order profiles above the small-map boundary,
+raw caller/source error order, original optional-partition capture in the Claim
+parent and cross-generation ID recipes remain full-source obligations; these
+component results earn no automatic source-case credit. Integrating the existing
+catalog-publication tick and accepted read/worker lifecycles remains required for
+the original complete background process. Strict Clippy already passes without
+suppression; full affected-crate regression is still running at this note.
+
+
+RELEASE-RECONCILE1 final affected-crate regression:1623 tests/doctests pass in103
+completed groups, zero failed/ignored. This includes186 Node snapshot cases,332
+storage and all60 architecture cases. Strict workspace/all-target Clippy,
+progress, fmt and diff pass on2089 unchanged non-Markdown inputs/1500 Rust files.
+Source audit preserves706 old Rust test/bench inputs:704 whole and two exact
+additive registrations. All seven original outcome codec files and six selected
+source/runtime ledgers are byte-identical. No whole all12-current, independent
+review, full-source, Linux, native Elixir, service or speedup claim follows.
+Evidence: /private/tmp/ferricstore2-release-reconcile-{regression,final-clippy,
+progress}.log plus proof.json/source-audit.json/inputs.json.
+
+Producer review checked a possible running-to-running replacement concern
+against pinned flow_governance_release_outbox.ex:28-55. The source explicitly
+produces release intents only for non-running postimages. Do not invent an extra
+reclaim enqueue as a speculative fix; original ID recipes/generation cleanup and
+public phase settlement still need their own source-complete review. Next use
+claim_due_api.ex:493-655 and existing pure claim/coordination credit/schedule/
+running models to compose actual original public-credit and paid-Claim outcomes.
+Their pure Proceed/Confirmed values are not external spend certificates; policy,
+NoDemand, optional partition identity, unused/refund and Unknown parent ownership
+must be established by the real configured protocol before source credit.

@@ -23,8 +23,13 @@ pub use publication::{
 pub use repair::{CreditCatalogRepairError, CreditCatalogRepairStatus, repair_credit_catalog};
 
 mod credit;
+mod reconcile;
 pub use credit::{
     PreparedPublicCreditCall, PublicCreditCallError, PublicCreditCallLimits,
     PublicCreditCallRequest, PublicCreditCallResult, PublicCreditRetryError,
     retry_public_credit_call, submit_public_credit_call,
+};
+pub use reconcile::{
+    ReleaseReconcileError, ReleaseReconcileLimits, ReleaseReconcileRequest, ReleaseReconcileStats,
+    run_workflow_release_reconcile_once,
 };

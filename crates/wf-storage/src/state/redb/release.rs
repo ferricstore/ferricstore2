@@ -7,6 +7,7 @@ pub(super) mod claimed;
 pub(crate) mod maintenance;
 mod plan;
 mod read;
+mod reconcile;
 mod write;
 pub(crate) use plan::{ReleasePreparation, ReleasePublicationPlan};
 pub(super) use write::{VerifiedReleaseWrites, publish, validate};

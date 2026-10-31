@@ -1,6 +1,8 @@
 //! Bounded release-outbox decisions, independent from actual persisted authority.
+mod cursor;
 mod maintenance;
 mod model;
+pub use cursor::{ReleaseCursorError, ReleaseReconcileCursor};
 mod queue;
 pub use maintenance::{
     ReleaseMaintenancePlan, ReleaseMaintenanceRejection, ReleaseMaintenanceReply,
