@@ -1458,3 +1458,41 @@ for earlier stores; positive4 reads the actual manifest and binding under the
 writer. The temporary fence is not a queue-full business result. The governed
 Claim refusal remains. Data/schema fixtures and snapshot roundtrips do not prove
 Claim, append, ACK, reconciliation, source-case parity or platform acceptance.
+
+The explicit apply_workflow_release_transaction successor now accepts actual
+GC4 intent9 workflow mutations. It reuses the retained-first stored-value driver;
+legacy entrypoints keep their binding fence. Current final postimages and their
+same-guard bindings determine pending releases. Private ReleasePublicationPlan
+owns only native intent buffers and bounded index descriptors. Independent
+final indices are sorted into original input order. Reservation-ID membership
+uses indices into those original buffers, without cloned ID owners. Admission
+precedes immutable GroupApplyChanges and value companions. Queue capacity refusal
+becomes one retained native-command business rejection; resource/corrupt/exhausted/
+engine/uncertain failures remain operational.
+
+The consumed writer repeats actual capability, prepared-entry, binding, original
+queue-state, append arithmetic and complete intent/postimage/order checks. Its
+sealed VerifiedReleaseWrites borrows the exact live postimages, using sorted
+borrowed partition/record references and pointer equality for membership. Only
+those postimages bypass the legacy fence. Queue entries/meta, records/indexes,
+every successful history/value companion, retained outcome and control commit
+together with Immediate durability. A bound Claim remains unsupported; a stored
+value frame cannot invent paid authority. Intents use actual postimage update
+time, retain source reservation-ID order within this native command, and may
+duplicate a previously pending ID from an earlier command. Retained processing
+never appends again.
+
+Kind8/code0 is the new whole-command backlog rejection; kind7 remains the old
+AtomicStart DirectRunningFifoEntry. Only intent9/response5,6,8 may retain the new
+reason. It is forbidden in independent item rows and older response associations.
+Its persisted receipt requires actual GC4 even without binding/outbox rows. A
+real older GC3 store refuses an injected actual new receipt, and opens after
+that incompatible receipt alone is removed. Actual commit uncertainty keeps a
+complete old or complete new cohort and fences further use; actual committed
+queue/receipt data survives snapshot receive and original retained replay.
+
+This is the selected native storage command contract. Raw public batch command/
+write-call granularity and intermediate release counts still need their parent
+source audit. Paid governed Claim/binding creation, ACK/mark/drain, Node historical/
+received/purged release execution, policy/refund/reconciliation/service wiring,
+full source scenarios and native platform/performance acceptance remain open.

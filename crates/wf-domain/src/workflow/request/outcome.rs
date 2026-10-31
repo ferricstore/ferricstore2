@@ -183,6 +183,23 @@ impl RetainedOutcome {
     pub const fn status(&self) -> RetainedStatus {
         self.status
     }
+    /// Moves the original metadata and byte owner without granting persistence.
+    #[must_use]
+    pub fn into_parts(self) -> (RetainedMetadata, u16, Vec<u8>) {
+        (
+            RetainedMetadata {
+                scope: self.scope,
+                request: self.request,
+                intent: self.intent,
+                original_position: self.original_position,
+                original_time: self.original_time,
+                expires_at: self.expires_at,
+                status: self.status,
+            },
+            self.response_version,
+            self.response,
+        )
+    }
 }
 
 /// Primitive retained/intent construction error; no outcome persistence occurs.
@@ -211,6 +228,21 @@ impl fmt::Display for RequestValueError {
 impl std::error::Error for RequestValueError {}
 
 fn validate_response_profile(
+    intent: ClientIntent,
+    response_version: u16,
+    status: RetainedStatus,
+) -> Result<(), RequestValueError> {
+    if matches!(
+        status,
+        RetainedStatus::IndexedRejected(IndexRejection::ReleaseBacklogFull)
+    ) && (intent.version() != 9 || !matches!(response_version, 5 | 6 | 8))
+    {
+        return Err(RequestValueError::UnsupportedVersion);
+    }
+    validate_legacy_response_profile(intent, response_version, status)
+}
+
+fn validate_legacy_response_profile(
     intent: ClientIntent,
     response_version: u16,
     status: RetainedStatus,

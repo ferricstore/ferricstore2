@@ -27,13 +27,14 @@ pub(super) fn apply(
     changes: &GroupApplyChanges<'_, '_>,
 ) -> Result<(), StateTransactionError> {
     let fenced = tx.fenced;
-    publish(tx, changes, None).inspect_err(|error| fence(fenced, *error))
+    publish(tx, changes, None, None).inspect_err(|error| fence(fenced, *error))
 }
 
 fn publish(
     mut tx: RedbStateTransaction<'_>,
     changes: &GroupApplyChanges<'_, '_>,
     mut values: Option<&mut crate::transaction::ValuePublicationPlan<'_>>,
+    release: Option<&super::release::ReleasePublicationPlan>,
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
     match values.as_deref_mut() {
@@ -51,6 +52,12 @@ fn publish(
     let Some(control) = changes.control() else {
         return tx.write.abort().map_err(|e| storage_error(&e));
     };
+    let verified = release
+        .map(|plan| super::release::validate(&tx, changes, plan))
+        .transpose()?;
+    if let Some(release) = release {
+        super::release::publish(&tx, scope, release)?;
+    }
     if let Some(business) = changes.business() {
         validate_versions(&tx, scope, business)?;
         let lanes =
@@ -61,13 +68,13 @@ fn publish(
         for delta in business.deltas() {
             publication::index_delta(&tx, scope, &delta)?;
         }
-        write_records(&tx, scope, business)?;
+        write_records(&tx, scope, business, verified.as_ref())?;
         for lane in lanes {
             publication::head_due(&tx, scope, lane, true)?;
         }
     }
     if let Some(business) = changes.independent_business() {
-        independent::apply(&tx, scope, business, values.as_deref())?;
+        independent::apply(&tx, scope, business, values.as_deref(), verified.as_ref())?;
     }
     if let Some(publication) = values {
         values::publish(&tx, scope, publication)?;
@@ -108,12 +115,20 @@ fn write_records(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
     business: &IndexedBatchPlan<'_>,
+    release: Option<&super::release::VerifiedReleaseWrites<'_>>,
 ) -> Result<(), StateTransactionError> {
     for (item, ordering) in business.batch().items().iter().zip(business.metadata()) {
         let Some(write) = item.plan().write() else {
             continue;
         };
-        publication::write_record(tx, scope, item.partition(), &write.record, ordering)?;
+        publication::write_record_with_release(
+            tx,
+            scope,
+            item.partition(),
+            &write.record,
+            ordering,
+            release,
+        )?;
         let Some(history) = item.plan().history() else {
             continue;
         };
@@ -165,6 +180,14 @@ pub(super) fn write_outcome(
     scope: &RequestScope,
     outcome: &RetainedOutcome,
 ) -> Result<(), StateTransactionError> {
+    if matches!(
+        outcome.status(),
+        RetainedStatus::IndexedRejected(
+            wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull
+        )
+    ) {
+        tx.require_workflow_release()?;
+    }
     if outcome.intent().version() == 12 {
         tx.temporary(18_432)?;
     }

@@ -350,6 +350,7 @@ fn public_credit_callers_and_prepared_codecs_remain_pure() -> CheckResult<()> {
         "log::release::meta",
         "log::release::cursor",
         "log::release::binding",
+        "log::release::mutation",
         "state::workflow_release",
     ] {
         assert_eq!(

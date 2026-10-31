@@ -1783,3 +1783,13 @@ the existing typed decoder retains invalid/context/limit distinctions. There
 is no new payload owner, operation, event, dependency or codec wrapper. This
 selection enables the coupled durable/recovery batch in ADR-007; it is not a
 claim of complete application or original runtime acceptance.
+
+The GC4 stored mutation successor retains intent9 and the existing contained
+response5/6/8 grammars. Common rejection kind8/code0 denotes whole-command release
+backlog only for those associations. It is not an independent row error, and
+older intent1/5/6/8 outcomes cannot acquire it. AtomicStart kind7 remains unchanged.
+No new mutation opcode or successful reply format is allocated. Actual write,
+point reads and canonical recovery require GC4 for this new receipt, including
+receipt-only cohorts. Private retained metadata moves without cloning old response
+bytes when the selected driver substitutes that deterministic rejection. This
+codec value grants no queue-full or durable-commit authority by construction.

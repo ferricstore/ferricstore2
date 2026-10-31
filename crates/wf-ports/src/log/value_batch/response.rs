@@ -80,6 +80,14 @@ pub fn workflow_value_retained_summary(
         8 => (public::body_status(response)?, None),
         _ => return Err(CodecError::UnsupportedVersion),
     };
+    if summary.0
+        == RetainedStatus::IndexedRejected(
+            wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull,
+        )
+        && (intent.version() != 9 || !matches!(response_version, 5 | 6 | 8))
+    {
+        return Err(CodecError::UnsupportedTag);
+    }
     if summary
         .1
         .is_some_and(|count| count > admission.batch_items())

@@ -11,9 +11,15 @@ use wf_types::version::LogIdentity;
 
 use super::{
     RecordBatchTransactionOutcome, RedbStateStore, ValueCharge, WorkflowValueTransactionError,
-    WorkflowValueTransactionLimits, apply_fresh, codec_error, commit_complete, record_batch,
-    record_error, storage_error, total,
+    WorkflowValueTransactionLimits, apply_fresh_selected, codec_error, commit_complete,
+    record_batch, record_error, storage_error, total,
 };
+
+#[derive(Clone, Copy)]
+pub(in crate::transaction) enum ValueApplyProfile {
+    Legacy,
+    WorkflowRelease,
+}
 
 pub(super) fn apply(
     store: &mut RedbStateStore,
@@ -22,6 +28,41 @@ pub(super) fn apply(
     log: LogIdentity,
     limits: WorkflowValueTransactionLimits,
     version: u16,
+) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
+    apply_selected(
+        store,
+        scope,
+        encoded,
+        log,
+        limits,
+        (version, ValueApplyProfile::Legacy),
+    )
+}
+
+pub(in crate::transaction) fn apply_release(
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: WorkflowValueTransactionLimits,
+) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
+    apply_selected(
+        store,
+        scope,
+        encoded,
+        log,
+        limits,
+        (9, ValueApplyProfile::WorkflowRelease),
+    )
+}
+
+fn apply_selected(
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: WorkflowValueTransactionLimits,
+    (version, profile): (u16, ValueApplyProfile),
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
     let mut charge = ValueCharge::new(
         limits.maximum_value_rows,
@@ -59,6 +100,9 @@ pub(super) fn apply(
     if version == 9 && manifest.alias_format != 2 {
         return Err(WorkflowValueTransactionError::UnsupportedProfile);
     }
+    if matches!(profile, ValueApplyProfile::WorkflowRelease) {
+        tx.require_workflow_release().map_err(storage_error)?;
+    }
     charge.helper().map_err(storage_error)?;
     let predecessor = tx.control().map_err(storage_error)?;
     let retained_nonempty = tx
@@ -95,7 +139,15 @@ pub(super) fn apply(
         }
         RecordBatchInspection::Fresh(fresh) => {
             drop(original);
-            apply_fresh(tx, scope, fresh, predecessor, &limits, live, charge)
+            apply_fresh_selected(
+                tx,
+                scope,
+                fresh,
+                predecessor,
+                &limits,
+                (live, profile),
+                charge,
+            )
         }
     }
 }

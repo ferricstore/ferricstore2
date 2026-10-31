@@ -16,6 +16,7 @@ fn allowed(root: u8, reason: IndexRejection) -> bool {
         1 => matches!(
             reason,
             IndexRejection::Batch(BatchRejection::Admission(_) | BatchRejection::CrossGroup)
+                | IndexRejection::ReleaseBacklogFull
         ),
         2 => matches!(
             reason,
@@ -59,7 +60,11 @@ pub fn public_mutation_retained_status(
     if intent.version() != 1 || response_version != 2 {
         return Err(CodecError::UnsupportedVersion);
     }
-    body_status(response)
+    let status = body_status(response)?;
+    if status == RetainedStatus::IndexedRejected(IndexRejection::ReleaseBacklogFull) {
+        return Err(CodecError::UnsupportedTag);
+    }
+    Ok(status)
 }
 
 pub(in crate::log) fn body_status(response: &[u8]) -> Result<RetainedStatus, CodecError> {

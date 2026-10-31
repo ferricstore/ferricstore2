@@ -23,7 +23,7 @@ pub(crate) mod original_policy;
 mod publication;
 mod read;
 mod recovery;
-mod release;
+pub(crate) mod release;
 pub(crate) mod snapshot;
 mod store;
 pub(crate) mod values;

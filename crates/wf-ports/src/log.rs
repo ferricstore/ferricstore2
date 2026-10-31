@@ -47,7 +47,7 @@ pub use record_batch::{encode_stored_step_continue, prepare_stored_step_continue
 pub use release::{
     ReleaseBindingRef, ReleaseReconcileCursor, decode_release_cursor, encode_release_binding,
     encode_release_cursor, encode_release_intent, encode_release_meta, inspect_release_binding,
-    inspect_release_intent, inspect_release_meta,
+    inspect_release_intent, inspect_release_meta, reject_workflow_release_backlog,
 };
 mod complete_policy;
 mod control;

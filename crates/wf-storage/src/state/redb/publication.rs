@@ -105,6 +105,33 @@ pub(super) fn write_record(
     ordering: OrderingMetadata,
 ) -> Result<(), StateTransactionError> {
     tx.refuse_legacy_governance_write(scope, partition, record.id())?;
+    write_record_inner(tx, scope, partition, record, ordering)
+}
+
+pub(super) fn write_record_with_release(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    partition: &PartitionId,
+    record: &WorkflowRecord,
+    ordering: OrderingMetadata,
+    release: Option<&super::release::VerifiedReleaseWrites<'_>>,
+) -> Result<(), StateTransactionError> {
+    let Some(release) = release else {
+        return write_record(tx, scope, partition, record, ordering);
+    };
+    if !release.permits(partition, record) {
+        return Err(StateTransactionError::InvalidChanges);
+    }
+    write_record_inner(tx, scope, partition, record, ordering)
+}
+
+fn write_record_inner(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    partition: &PartitionId,
+    record: &WorkflowRecord,
+    ordering: OrderingMetadata,
+) -> Result<(), StateTransactionError> {
     record_bytes(record, tx.admission).map_err(|_| StateTransactionError::Limit)?;
     let size = record_size(scope, partition, record)?;
     let key = tx.output_key(

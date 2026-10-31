@@ -36,6 +36,7 @@ pub(in crate::log) fn push_rejection(
         IndexRejection::InvalidPriority => bytes.extend_from_slice(&[4, 0]),
         IndexRejection::FifoPriority => bytes.extend_from_slice(&[5, 0]),
         IndexRejection::NotFifoHead => bytes.extend_from_slice(&[6, 0]),
+        IndexRejection::ReleaseBacklogFull => bytes.extend_from_slice(&[8, 0]),
         IndexRejection::Batch(reason) => match reason {
             BatchRejection::DuplicateId => bytes.extend_from_slice(&[2, 0]),
             BatchRejection::CrossGroup => bytes.extend_from_slice(&[3, 0]),
@@ -160,7 +161,11 @@ pub fn record_batch_retained_summary(
     if !matches!(intent.version(), 5 | 6) || response_version != 1 {
         return Err(CodecError::UnsupportedVersion);
     }
-    body_summary(intent.version(), response)
+    let summary = body_summary(intent.version(), response)?;
+    if summary.0 == RetainedStatus::IndexedRejected(IndexRejection::ReleaseBacklogFull) {
+        return Err(CodecError::UnsupportedTag);
+    }
+    Ok(summary)
 }
 
 pub(in crate::log) fn body_summary(
@@ -238,6 +243,7 @@ pub(in crate::log) fn rejection(response: &[u8]) -> Result<(IndexRejection, usiz
             };
             IndexRejection::Batch(BatchRejection::Admission(error))
         }
+        8 if code == 0 => IndexRejection::ReleaseBacklogFull,
         2..=6 if code == 0 => match kind {
             2 => IndexRejection::Batch(BatchRejection::DuplicateId),
             3 => IndexRejection::Batch(BatchRejection::CrossGroup),

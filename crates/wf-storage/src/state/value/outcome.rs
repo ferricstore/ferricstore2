@@ -48,6 +48,14 @@ pub struct ScannedRetainedOutcome<'input> {
 }
 
 impl ScannedRetainedOutcome<'_> {
+    pub(crate) const fn workflow_release_required(&self) -> bool {
+        matches!(
+            self.status,
+            RetainedStatus::IndexedRejected(
+                wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull
+            )
+        )
+    }
     pub(crate) const fn credit_catalog_required(&self) -> bool {
         use wf_domain::governance::identified::IdentifiedCreditRejection as R;
         matches!(self.intent.version(), 13 | 17)

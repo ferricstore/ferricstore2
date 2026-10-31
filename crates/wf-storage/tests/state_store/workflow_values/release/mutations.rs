@@ -9,6 +9,7 @@ use wf_storage::transaction::{
     RecordBatchTransactionOutcome as O, apply_workflow_release_transaction,
 };
 use wf_types::{identity::RecordId, version::Fence};
+mod custody;
 
 fn frame(request: &[u8], profile: u8, ids: &[&[u8]]) -> TestResult<PreparedBytes> {
     let mut items = Vec::new();
@@ -26,14 +27,30 @@ fn frame(request: &[u8], profile: u8, ids: &[&[u8]]) -> TestResult<PreparedBytes
         )?);
     }
     let inputs = (0..ids.len())
-        .map(|n| Ok(f::input(u32::try_from(n)?, 0)))
+        .map(|n| {
+            let mut input = f::input(u32::try_from(n)?, 0);
+            input.requested_at = (profile == 1).then_some(TimestampMillis::new(200));
+            Ok(input)
+        })
         .collect::<TestResult<Vec<_>>>()?;
+    let operation = if profile == 1 {
+        PreparedOperation::PublicMutation {
+            item: Box::new(items.pop().ok_or("public item")?),
+            evidence: wf_domain::workflow::caller::PublicMutationEvidence {
+                requested_now_ms: Some(200),
+                auto_partition: false,
+                retry_override_present: false,
+            },
+        }
+    } else {
+        PreparedOperation::Batch(items)
+    };
     Ok(encode_workflow_stored_value_batch(
         &f::batch(
             profile,
             request,
             200,
-            PreparedOperation::Batch(items),
+            operation,
             inputs,
             vec![f::witness(b"r", None)?],
         )?,
@@ -44,7 +61,7 @@ fn frame(request: &[u8], profile: u8, ids: &[&[u8]]) -> TestResult<PreparedBytes
 #[test]
 fn workflow_release_terminal_write_commits_intent_and_replays_without_duplicate_append()
 -> TestResult {
-    for profile in [5, 6] {
+    for profile in [5, 6, 1] {
         let dir = crate::fixtures::directory("release-atomic-terminal")?;
         let path = dir.join("state");
         fixture(&path)?;
@@ -198,7 +215,7 @@ fn workflow_release_full_queue_retains_business_rejection_without_workflow_prefi
     let O::Retained { outcome, .. } = applied else {
         return Err("queue full must retain a business reply".into());
     };
-    assert_eq!(outcome.response(), [1, 7, 0]);
+    assert_eq!(outcome.response(), [1, 8, 0]);
     assert!(matches!(
         outcome.status(),
         RetainedStatus::IndexedRejected(_)
@@ -218,6 +235,136 @@ fn workflow_release_full_queue_retains_business_rejection_without_workflow_prefi
     assert_eq!(added.len(), 1);
     assert_eq!(added[0][6], 2);
     assert_eq!(after.len(), before.len() + 1);
+    custody::full_queue_controls(&path)?;
+    drop(open(&path)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn workflow_release_append_preserves_pending_prefix_and_sparse_completion() -> TestResult {
+    let dir = crate::fixtures::directory("release-atomic-prefix")?;
+    let path = dir.join("state");
+    fixture(&path)?;
+    queue(&path)?;
+    let scope = crate::fixtures::scope()?;
+    let mut store = open(&path)?;
+    let prepared = frame(b"cancel", 5, &[b"i"])?;
+    apply_workflow_release_transaction(
+        &mut store,
+        &scope,
+        prepared.as_bytes(),
+        crate::fixtures::log(1),
+        f::limits(),
+    )?;
+    let page = store.read_workflow_release_outbox(&scope, None, 256, 1000, 65536)?;
+    assert_eq!(
+        (page.meta.head, page.meta.tail, page.entries.len()),
+        (1, 3, 3)
+    );
+    assert_eq!(page.entries[0].encoded(), intent(b"i", b"paid\0id")?);
+    assert!(page.entries[1].completed);
+    assert_eq!(page.entries[2].sequence, 3);
+    assert_eq!(page.entries[2].intent()?.reservation_id, b"paid\0id");
+    assert_eq!(page.entries[2].intent()?.created_at.get(), 200);
+    drop(store);
+    drop(open(&path)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn workflow_release_independent_item_refusal_does_not_hide_a_successful_release() -> TestResult {
+    let dir = crate::fixtures::directory("release-atomic-holes")?;
+    let path = dir.join("state");
+    fixture(&path)?;
+    edit(&path, &[(key(20, None, b"i")?, binding(b"i")?)], &[])?;
+    let scope = crate::fixtures::scope()?;
+    let mut store = open(&path)?;
+    let prepared = frame(b"cancel", 6, &[b"missing", b"i"])?;
+    let applied = apply_workflow_release_transaction(
+        &mut store,
+        &scope,
+        prepared.as_bytes(),
+        crate::fixtures::log(1),
+        f::limits(),
+    )?;
+    let O::Retained { outcome, .. } = applied else {
+        return Err("missing independent reply".into());
+    };
+    assert_eq!(outcome.status(), RetainedStatus::Accepted);
+    assert_eq!(outcome.response(), [2, 0, 0, 0, 2, 1, 0, 0, 0]);
+    let page = store.read_workflow_release_outbox(&scope, None, 256, 1000, 65536)?;
+    assert_eq!((page.meta.tail, page.entries.len()), (1, 1));
+    assert_eq!(page.entries[0].intent()?.flow_id, b"i");
+    drop(store);
+    drop(open(&path)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn workflow_release_independent_repeated_identity_keeps_every_history_and_one_final_intent()
+-> TestResult {
+    use crate::workflow_values::claim::fixtures as c;
+    let dir = crate::fixtures::directory("release-atomic-final")?;
+    let path = dir.join("state");
+    fixture(&path)?;
+    edit(&path, &[(key(20, None, b"i")?, binding(b"i")?)], &[])?;
+    let scope = crate::fixtures::scope()?;
+    let mut store = open(&path)?;
+    let first = f::item(
+        b"i",
+        200,
+        Operation::Transition(wf_domain::workflow::Transition {
+            from: b"q".to_vec(),
+            to: b"middle".to_vec(),
+            fence: Fence::new(0),
+            lease_token: None,
+            run_at: None,
+            payload: None,
+        }),
+    )?;
+    let last = f::item(
+        b"i",
+        200,
+        Operation::Cancel(Cancel {
+            fence: Fence::new(0),
+            lease_token: None,
+            expected_state: Some(b"middle".to_vec()),
+            expected_version: Some(2),
+            error: None,
+        }),
+    )?;
+    let batch = f::batch(
+        6,
+        b"two-writes",
+        200,
+        PreparedOperation::Batch(vec![first, last]),
+        vec![f::input(0, 0), f::input(1, 0)],
+        vec![f::witness(b"r", None)?],
+    )?;
+    let prepared = encode_workflow_stored_value_batch(&batch, f::limits().record_batch.codec)?;
+    let applied = apply_workflow_release_transaction(
+        &mut store,
+        &scope,
+        prepared.as_bytes(),
+        crate::fixtures::log(1),
+        f::limits(),
+    )?;
+    let O::Retained { outcome, .. } = applied else {
+        return Err("missing final reply".into());
+    };
+    assert_eq!(outcome.response(), [2, 0, 0, 0, 2, 0, 0]);
+    let record = c::record(&mut store, b"i")?;
+    assert_eq!(
+        (record.record.state(), record.record.version()),
+        (b"cancelled".as_slice(), 3)
+    );
+    assert_eq!(c::history(&store, b"i")?.entries.len(), 3);
+    let page = store.read_workflow_release_outbox(&scope, None, 256, 1000, 65536)?;
+    assert_eq!((page.meta.tail, page.entries.len()), (1, 1));
+    drop(store);
     drop(open(&path)?);
     std::fs::remove_dir_all(dir)?;
     Ok(())

@@ -22,7 +22,7 @@ use super::{
     RecordBatchTransactionError, RecordBatchTransactionLimits, RecordBatchTransactionOutcome,
 };
 
-mod driver;
+pub(super) mod driver;
 mod plan;
 mod prepare;
 mod step;
@@ -167,6 +167,26 @@ fn apply_fresh(
     predecessor: ControlState,
     limits: &WorkflowValueTransactionLimits,
     live: usize,
+    charge: ValueCharge,
+) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
+    apply_fresh_selected(
+        tx,
+        scope,
+        fresh,
+        predecessor,
+        limits,
+        (live, driver::ValueApplyProfile::Legacy),
+        charge,
+    )
+}
+
+fn apply_fresh_selected(
+    tx: RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    fresh: FreshRecordBatch<'_>,
+    predecessor: ControlState,
+    limits: &WorkflowValueTransactionLimits,
+    (live, profile): (usize, driver::ValueApplyProfile),
     mut charge: ValueCharge,
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
     charge.helper().map_err(storage_error)?;
@@ -213,6 +233,13 @@ fn apply_fresh(
         observations::decide_values(fresh, scope, view, limits.record_batch, live)
             .map_err(record_error)?
     };
+    let (result, release) = super::workflow_release::prepare(
+        profile,
+        &tx,
+        scope,
+        result,
+        limits.record_batch.codec.admission(),
+    )?;
     let changes = GroupApplyChanges::new(scope, predecessor, result).map_err(storage_error)?;
     let mut publication = plan::build(
         &changes,
@@ -223,8 +250,13 @@ fn apply_fresh(
         limits,
         charge,
     )?;
-    tx.commit_values(&changes, &mut publication)
-        .map_err(storage_error)?;
+    if let Some(release) = &release {
+        tx.commit_workflow_release_values(&changes, &mut publication, release)
+            .map_err(storage_error)?;
+    } else {
+        tx.commit_values(&changes, &mut publication)
+            .map_err(storage_error)?;
+    }
     drop(publication);
     drop((ordering, inputs, bindings, schema));
     record_batch::fresh_reply(changes.into_plan()).map_err(record_error)

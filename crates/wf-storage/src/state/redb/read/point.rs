@@ -122,6 +122,11 @@ impl RedbStateTransaction<'_> {
             self.layout,
         )
         .map_err(value_error)?;
+        if scanned.workflow_release_required()
+            && !self.value_manifest()?.governance_catalog.workflow_release()
+        {
+            return Err(StateTransactionError::Corrupt);
+        }
         if matches!(scanned.intent_version(), 12 | 13 | 17) {
             let facts = self.value_manifest()?;
             if facts.credit_shard_count.is_none()

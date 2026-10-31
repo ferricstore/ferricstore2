@@ -11,6 +11,7 @@ pub(super) fn apply(
     scope: &RequestScope,
     business: &IndependentIndexedPlan<'_>,
     values: Option<&crate::transaction::ValuePublicationPlan<'_>>,
+    release: Option<&super::super::release::VerifiedReleaseWrites<'_>>,
 ) -> Result<(), StateTransactionError> {
     for (index, original) in business.final_indices().zip(business.originals()) {
         let item = final_item(business, index)?;
@@ -49,7 +50,14 @@ pub(super) fn apply(
             .plan()
             .write()
             .ok_or(StateTransactionError::InvalidChanges)?;
-        publication::write_record(tx, scope, item.partition(), &write.record, ordering)?;
+        publication::write_record_with_release(
+            tx,
+            scope,
+            item.partition(),
+            &write.record,
+            ordering,
+            release,
+        )?;
     }
     if tx.layout == 8 {
         super::super::history_snapshot::write_steps(

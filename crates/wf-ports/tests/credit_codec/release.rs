@@ -185,3 +185,91 @@ fn release_binding_matches_independent_frame_and_borrows_complete_original_inten
     }
     Ok(())
 }
+
+#[test]
+fn release_backlog_rejection_is_whole_command_and_closed_to_selected_retained_profile() -> TestResult
+{
+    use wf_domain::workflow::{
+        admission::AdmissionLimits,
+        indexed::IndexRejection,
+        request::{ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus},
+    };
+    use wf_ports::log::{
+        public_mutation_retained_status, record_batch_retained_summary,
+        workflow_value_retained_summary,
+    };
+    use wf_types::{
+        identity::{GroupId, RecoveryId, RequestId, TenantId},
+        version::{AppliedPosition, LogIdentity},
+    };
+    let admission = AdmissionLimits::default();
+    let intent = ClientIntent::workflow_stored_value_batch([7; 32]);
+    let log = LogIdentity::new(1, 7, AppliedPosition::new(0));
+    let time = TimestampMillis::new(100);
+    let status = RetainedStatus::IndexedRejected(IndexRejection::ReleaseBacklogFull);
+    for version in [5, 6, 8] {
+        assert_eq!(
+            workflow_value_retained_summary(intent, version, &[1, 8, 0], log, time, admission)?,
+            (status, None)
+        );
+        for malformed in [b"".as_slice(), &[1], &[1, 8], &[1, 8, 1], &[1, 8, 0, 0]] {
+            assert!(
+                workflow_value_retained_summary(intent, version, malformed, log, time, admission)
+                    .is_err()
+            );
+        }
+        assert!(
+            workflow_value_retained_summary(
+                ClientIntent::workflow_value_batch([7; 32]),
+                version,
+                &[1, 8, 0],
+                log,
+                time,
+                admission
+            )
+            .is_err()
+        );
+    }
+    assert!(
+        workflow_value_retained_summary(intent, 6, &[2, 0, 0, 0, 1, 1, 8, 0], log, time, admission)
+            .is_err()
+    );
+    assert!(workflow_value_retained_summary(intent, 8, &[2, 8, 0], log, time, admission).is_err());
+    for intent in [
+        ClientIntent::record_batch([7; 32]),
+        ClientIntent::independent_record_batch([7; 32]),
+    ] {
+        assert!(record_batch_retained_summary(intent, 1, &[1, 8, 0]).is_err());
+    }
+    assert!(
+        public_mutation_retained_status(ClientIntent::new(1, [7; 32])?, 2, &[1, 8, 0]).is_err()
+    );
+    for (intent, response) in [
+        (intent, 5),
+        (intent, 6),
+        (intent, 8),
+        (intent, 7),
+        (ClientIntent::workflow_value_batch([7; 32]), 5),
+        (ClientIntent::record_batch([7; 32]), 1),
+        (ClientIntent::new(1, [7; 32])?, 2),
+    ] {
+        let metadata = RetainedMetadata {
+            scope: RequestScope::new(
+                TenantId::new(b"t".to_vec())?,
+                GroupId::new(b"g".to_vec())?,
+                RecoveryId::new(b"r".to_vec())?,
+            ),
+            request: RequestId::new(b"q".to_vec())?,
+            intent,
+            original_position: log,
+            original_time: time,
+            expires_at: TimestampMillis::new(200),
+            status,
+        };
+        assert_eq!(
+            RetainedOutcome::new(metadata, response, vec![1, 8, 0], admission).is_ok(),
+            intent.version() == 9 && matches!(response, 5 | 6 | 8)
+        );
+    }
+    Ok(())
+}

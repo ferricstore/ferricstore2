@@ -32,7 +32,18 @@ pub(crate) fn apply(
     publication: &mut ValuePublicationPlan<'_>,
 ) -> Result<(), Error> {
     let fenced = tx.fenced;
-    super::publish(tx, changes, Some(publication)).inspect_err(|error| fence(fenced, *error))
+    super::publish(tx, changes, Some(publication), None).inspect_err(|error| fence(fenced, *error))
+}
+
+pub(crate) fn apply_release(
+    tx: RedbStateTransaction<'_>,
+    changes: &GroupApplyChanges<'_, '_>,
+    publication: &mut ValuePublicationPlan<'_>,
+    release: &super::super::release::ReleasePublicationPlan,
+) -> Result<(), Error> {
+    let fenced = tx.fenced;
+    super::publish(tx, changes, Some(publication), Some(release))
+        .inspect_err(|error| fence(fenced, *error))
 }
 
 pub(super) fn validate(

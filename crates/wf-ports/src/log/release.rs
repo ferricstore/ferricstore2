@@ -5,8 +5,10 @@ mod binding;
 mod cursor;
 mod intent;
 mod meta;
+mod mutation;
 pub use binding::{ReleaseBindingRef, encode_release_binding, inspect_release_binding};
 pub use cursor::ReleaseReconcileCursor;
+pub use mutation::reject_workflow_release_backlog;
 /// Encodes a completely validated native intent, with exact wire admission.
 /// # Errors
 /// Refuses malformed fields, wire bounds or allocation failure.

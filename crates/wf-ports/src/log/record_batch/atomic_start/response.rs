@@ -262,6 +262,7 @@ pub(in crate::log::record_batch) fn write_rejection(
 ) -> Result<(), CodecError> {
     writer.byte(1)?;
     match reason {
+        IndexRejection::ReleaseBacklogFull => Err(CodecError::UnsupportedTag),
         IndexRejection::DirectRunningFifoEntry => writer.write(&[7, 0]),
         IndexRejection::InvalidPriority => writer.write(&[4, 0]),
         IndexRejection::FifoPriority => writer.write(&[5, 0]),

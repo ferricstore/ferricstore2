@@ -2,7 +2,19 @@
 use super::{RedbStateStore, RedbStateTransaction, StateStoreGenesis, StateStoreLimits};
 use wf_ports::{consensus::WorkflowValueDefaults, state::StateTransactionError as E};
 use wf_types::identity::{GroupId, RecoveryId};
+mod plan;
 mod read;
+mod write;
+pub(crate) use plan::{ReleasePreparation, ReleasePublicationPlan};
+pub(super) use write::{VerifiedReleaseWrites, publish, validate};
+
+pub(crate) fn prepare(
+    tx: &RedbStateTransaction<'_>,
+    scope: &wf_domain::workflow::request::RequestScope,
+    changes: &wf_ports::log::RecordBatchApplyPlan<'_>,
+) -> Result<ReleasePreparation, E> {
+    tx.checked(|| plan::prepare(tx, scope, changes))
+}
 pub(in crate::state::redb) mod recovery;
 impl RedbStateStore {
     /// Observes at most256 original queue entries under one coherent local guard.
@@ -58,6 +70,14 @@ impl RedbStateStore {
     }
 }
 impl RedbStateTransaction<'_> {
+    pub(crate) fn commit_workflow_release_values(
+        self,
+        changes: &wf_ports::state::GroupApplyChanges<'_, '_>,
+        values: &mut crate::transaction::ValuePublicationPlan<'_>,
+        release: &ReleasePublicationPlan,
+    ) -> Result<(), E> {
+        super::commit::values::apply_release(self, changes, values, release)
+    }
     pub(super) fn refuse_legacy_governance_write(
         &self,
         scope: &wf_domain::workflow::request::RequestScope,

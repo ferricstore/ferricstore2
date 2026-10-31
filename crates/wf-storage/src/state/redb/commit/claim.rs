@@ -65,7 +65,7 @@ fn publish(
         for delta in business.deltas() {
             publication::index_delta(&tx, scope, &delta)?;
         }
-        write_records(&tx, scope, business)?;
+        write_records(&tx, scope, business, None)?;
         for lane in lanes {
             publication::head_due(&tx, scope, lane, true)?;
         }

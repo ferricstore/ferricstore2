@@ -225,6 +225,8 @@ pub enum IndexedDecision<'a> {
 /// Additional represented index guards, distinct from corrupt authority.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IndexRejection {
+    /// The complete workflow write batch cannot append its release intents.
+    ReleaseBacklogFull,
     /// Original atomic-record input/domain guard failed.
     Batch(BatchRejection),
     /// Creation priority is outside the source bands zero through two.

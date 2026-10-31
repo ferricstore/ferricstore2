@@ -1564,6 +1564,11 @@ meta/intents/sparse completions share its group/recovery/tenant namespace. The
 canonical recovery walker proves binding-to-record, complete contiguous queue
 and completion-to-intent closure, including received snapshots. Bounded reads
 return original intent byte owners with borrowed field inspection. Existing
-record publishers refuse bound records until atomic release admission/append
-is integrated; current governed Claim remains unsupported. See ADR-007 for the
-native formats and the distinction between these observations and authority.
+legacy record publishers refuse bound records. An explicitly selected GC4 stored
+mutation driver now admits release capacity before reply/value companions and
+publishes intents with actual record/index/history/outcome/control in one consumed
+writer. Its sealed exact-postimage companion supplies the only internal bypass
+of the legacy fence. Backlog is retained business rejection; operational failure
+and unproved commit remain errors. Current governed Claim remains unsupported.
+See ADR-007 for native formats, the per-native-command scope, remaining raw public
+batch granularity audit, and the distinction between observations and authority.

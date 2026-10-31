@@ -61301,3 +61301,86 @@ rejecting entrypoint, returning UnsupportedProfile (exit101). The actual65536-ro
 backlog fixture opens under default finite recovery limits before that refusal.
 Saved /private/tmp/ferricstore2-release-atomic-r0.log. Later mode6/replay assertions
 in the first test are masked until the body; no retrospective RED credit.
+
+Protocol review correction before the new tag is implemented: kind7 already
+represents DirectRunningFifoEntry in the separate AtomicStart grammar. Use free
+common kind8/code0 for ReleaseBacklogFull instead. Correct the masked R0 byte
+oracle from[1,7,0] to[1,8,0]; its UnsupportedProfile failure and all reached RED
+observations remain unchanged. Retained construction admits this new reason
+only for intent9/response5,6,8. Old scalar batch/public profiles and AtomicStart/
+Step encoders stay closed to it. This avoids a cross-profile reinterpretation.
+Bound Claim histories remain refused by the release-aware path: only the future
+actual paid-Claim parent may establish or replace their binding.
+
+Self-review before finalizing the companion: use a fallibly reserved, sorted
+vector of borrowed (partition, exact postimage) references in VerifiedReleaseWrites.
+This replaces repeated full-plan membership scans with binary lookup, without
+cloning identifiers/payloads or storing raw pointers. Debit its descriptors before
+allocation; the immutable references keep the actual plan alive. Compare the
+found postimage by safe ptr::eq. Also wrap the private preflight in tx.checked so
+Corrupt/Unavailable/Uncertain latch the same backend fence. No speedup claim.
+
+Pinned source re-read: flow_governance_release_outbox.ex lines12..52 preserves
+key_records order, deduplicates by reservation_id alone, and takes created_at_ms
+from the actual record.updated_at_ms. Use that exact postimage time rather than
+assuming it equals control execution time. Source claim_state_writes remains the
+atomic write owner; no independent outbox seed API is introduced.
+Approve test child workflow_values/release/mutations/custody.rs for actual sync
+uncertainty, snapshot/replay and receipt-only downgrade, plus additive mode1,
+independent holes/final-history and full-queue no-demand controls in mutations.rs.
+Extend the existing ports credit_codec/release.rs for closed kind8 grammar and
+retained-profile association. These later tests are supplemental, not R0 claims.
+
+Resource review correction: AdmissionLimits::MAX_BATCH_ITEMS is100000, not the
+1000 default. Do not introduce a1000 cap or100k-byte stack array. Replace the
+proposed fixed source-order mask with a prospectively paid Vec<usize> containing
+only actual final indices, sorted numerically and visited in source order. The
+verification seen vector is fallibly reserved to the actual unique-intent count.
+Charge both before ownership; no allocation uses the global maximum. Keep the
+actual configured batch limit. Preserve the original Step driver body by an
+existing-signature Legacy wrapper around the new selected Fresh helper.
+
+Supplemental fixture corrections: public ClientIntent::new admits only version1;
+the protocol test must use the existing named private factories. The first
+combined run therefore stopped in the new fixture before storage. The later
+storage run passes307 cases but a supplemental typed-Claim fixture stops at the
+already closed stored codec (UnsupportedTag); do not expand that codec to make
+the test reach a hypothetical guard. Assert its existing refusal and separately
+submit an actual op3 Claim frame to the selected entrypoint, then verify the whole
+cohort remains unchanged. These are fixture/oracle errors, not product RED.
+
+Raw batching remains an acceptance obligation: the pinned enqueue helper
+preserves its supplied key_records order and deduplicates within that call;
+single-record source writes invoke it separately. This selected native mutation
+command publishes its reviewed final write set atomically. Do not map an entire
+raw public batch onto native profile6, or award that source-case parity, without
+proving the original command/write-call boundaries, intermediate enqueue counts
+and partial-error behavior in the public parent. No such mapping is claimed here.
+
+Ownership review: keep proposed native intent buffers directly in the private
+ReleasePublicationPlan (Vec<Vec<u8>>), rather than reusing WorkflowReleaseEntry
+observations with unused sequence/completion fields. Actual sequence assignment
+belongs to the consumed writer. The descriptor budget follows size_of<Vec<u8>>;
+sorted indices borrow complete inspected reservation IDs from those same buffers.
+This removes redundant observation metadata and its extra constructor scan while
+retaining full validation at lookup/publication. No measured speedup is claimed.
+
+Acquisition-boundary review: the shared driver also accepts contained profile7
+StartAndClaim, whose frame cannot carry paid binding proof. The release-aware
+mutation entrypoint must not become an alternative Claim parent. Approve its
+explicit profile7 refusal and a concrete counterexample in mutations/custody.rs;
+after refusal, the unchanged legacy entrypoint remains the positive non-governed
+Start control. This narrows this new mutation capability, not the product goal or
+the existing non-governed feature. Real governed acquisition remains required in
+its dedicated parent. The current record-policy projection omits governance;
+before routing legacy/combined acquisition in the future service, audit and
+enforce its actual current type/state governance and capture paid bindings. Do
+not assert that every historical trusted leaf already enforces that parent.
+
+The acquisition-boundary counterexample compiles and fails: selected profile7
+returns success instead of UnsupportedProfile (exit101). Save it with the actual
+atomic body before adding the guard: /private/tmp/ferricstore2-release-atomic-
+acquisition-r0.log. The unchanged legacy positive-control tail is masked until
+the fix. The preceding broad run passed40 codec+308 storage cases, strict
+workspace/all-target Clippy and60 architecture cases. Those do not include this
+new rejecting case and do not certify full product acceptance.
