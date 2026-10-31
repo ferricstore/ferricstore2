@@ -17,7 +17,17 @@ pub(in crate::state::redb) fn row(
     bytes: &[u8],
     shards: u64,
     control: ControlState,
+    profile: super::super::values::manifest::GovernanceCatalogProfile,
 ) -> Result<(), E> {
+    if !profile.workflow_release() {
+        return Err(E::Corrupt);
+    }
+    if key.family() == 24 {
+        if profile != super::super::values::manifest::GovernanceCatalogProfile::GovernedClaim {
+            return Err(E::Corrupt);
+        }
+        return super::claimed::row(tx, table, key, bytes);
+    }
     let scope = tx.scope_bytes(key.part(2))?;
     let context = (shards, control.time().hlc().physical());
     match key.family() {
@@ -27,6 +37,9 @@ pub(in crate::state::redb) fn row(
             let partition = PartitionId::new(copy_bytes(key.part(3))?).map_err(|_| E::Corrupt)?;
             let id = RecordId::new(copy_bytes(key.part(4))?).map_err(|_| E::Corrupt)?;
             read::check_binding(tx, table, &scope, (&partition, &id), binding, context)?;
+            if profile == super::super::values::manifest::GovernanceCatalogProfile::GovernedClaim {
+                super::claimed::check_binding(tx, table, &scope, binding)?;
+            }
         }
         21 => {
             let meta = read::inspect_meta(bytes)?;

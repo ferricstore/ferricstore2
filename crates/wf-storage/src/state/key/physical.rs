@@ -43,7 +43,7 @@ pub(crate) fn decode_state_key(
         0 | 7 => (2, 0),
         1 | 10 | 18 | 20 => (5, 0),
         2 | 6 | 8 | 9 | 12 | 15 | 19 => (4, 0),
-        13 => (7, 0),
+        13 | 24 => (7, 0),
         14 => (6, 0),
         16 | 17 | 21..=23 => (3, 0),
         3 => (3, 4),
@@ -102,7 +102,7 @@ pub(crate) fn decode_state_key(
         bytes: owned,
         ranges,
     };
-    if matches!(family, 12..=15) {
+    if matches!(family, 12..=15 | 24) {
         super::credit::validate_decoded(&decoded)?;
     }
     if matches!(family, 16 | 17) {

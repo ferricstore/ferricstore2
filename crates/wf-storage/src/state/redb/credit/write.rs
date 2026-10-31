@@ -62,6 +62,7 @@ fn publish(
         validate(&tx, scope, control, plan, outcome)?;
         let context = CreditReadContext::new(&tx, scope, plan.scope(), credit)?;
         super::catalog::publish(&context, plan)?;
+        super::super::release::claimed::retire(&tx, scope, plan)?;
         rows::publish(&context, plan)?;
         commit::write_outcome(&tx, scope, outcome)?;
     } else if outcome.is_some() {

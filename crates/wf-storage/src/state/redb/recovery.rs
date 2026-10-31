@@ -300,13 +300,10 @@ fn validate_rows(
             maximum,
         )
         .map_err(value_error)?;
-        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=23) {
+        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=24) {
             return Err(StateTransactionError::Corrupt);
         }
-        if matches!(decoded.family(), 20..=23) {
-            if !governance_catalog.workflow_release() {
-                return Err(StateTransactionError::Corrupt);
-            }
+        if matches!(decoded.family(), 20..=24) {
             super::release::recovery::row(
                 tx,
                 &table,
@@ -314,6 +311,7 @@ fn validate_rows(
                 value.value(),
                 credit_shards.ok_or(StateTransactionError::Corrupt)?,
                 control,
+                governance_catalog,
             )?;
         } else if matches!(decoded.family(), 18 | 19) {
             rows::governance(decoded.family(), value.value(), governance_catalog, control)?;

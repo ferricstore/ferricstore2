@@ -8,6 +8,7 @@ use wf_ports::log::{encode_release_intent, encode_release_meta};
 use wf_ports::state::StateTransactionError as E;
 use wf_storage::state::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
 use wf_types::{identity::PartitionId, version::TimestampMillis};
+mod claimed;
 mod custody;
 mod mutations;
 

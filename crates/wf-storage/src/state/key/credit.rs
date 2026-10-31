@@ -127,13 +127,13 @@ pub(super) fn validate_decoded(key: &super::DecodedStateKey) -> Result<(), State
     if key.part(2).is_empty() || key.part(2).len() > 256 {
         return Err(StateValueError::InvalidValue);
     }
-    let (shard, epoch) = if matches!(family, 13 | 14) {
+    let (shard, epoch) = if matches!(family, 13 | 14 | 24) {
         (scalar(key.part(4))?, scalar(key.part(5))?)
     } else {
         (0, 1)
     };
     validate(key.part(3), shard, epoch)?;
-    if (family == 13 && (key.part(6).is_empty() || key.part(6).len() > 256))
+    if (matches!(family, 13 | 24) && (key.part(6).is_empty() || key.part(6).len() > 256))
         || (family == 14 && !(1..=256).contains(&key.number()))
         || (family == 15 && !(1..=u128::from(MAX)).contains(&key.number()))
     {

@@ -11,7 +11,7 @@ impl super::RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses older or corrupt capabilities and admission failure.
     pub fn require_catalog_prune(&self) -> Result<(), E> {
-        if !matches!(self.governance_catalog_profile()?, 3 | 4) {
+        if !matches!(self.governance_catalog_profile()?, 3..=5) {
             return Err(E::UnsupportedPolicyProfile);
         }
         Ok(())

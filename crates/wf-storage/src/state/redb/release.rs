@@ -2,6 +2,7 @@
 use super::{RedbStateStore, RedbStateTransaction, StateStoreGenesis, StateStoreLimits};
 use wf_ports::{consensus::WorkflowValueDefaults, state::StateTransactionError as E};
 use wf_types::identity::{GroupId, RecoveryId};
+pub(super) mod claimed;
 mod plan;
 mod read;
 mod write;
@@ -17,6 +18,35 @@ pub(crate) fn prepare(
 }
 pub(in crate::state::redb) mod recovery;
 impl RedbStateStore {
+    /// Creates GC5 custody for consumed paid IDs, including GC4 release support.
+    /// The capability supplies no caller authorization or Claim execution by itself.
+    /// # Errors
+    /// Refuses invalid genesis, dependencies, resource limits or unproved durability.
+    pub fn create_governed_claim_database(
+        database: redb::Database,
+        group: GroupId,
+        recovery: RecoveryId,
+        genesis: StateStoreGenesis<'_>,
+        defaults: WorkflowValueDefaults,
+        credit_shard_count: u64,
+        limits: StateStoreLimits,
+    ) -> Result<Self, E> {
+        super::values::genesis::create_selected_profile(
+            database,
+            group,
+            recovery,
+            genesis,
+            defaults,
+            limits,
+            super::values::genesis::ValueGenesisCapabilities {
+                alias_format: 2,
+                credit_shard_count: Some(credit_shard_count),
+                credit_catalog: true,
+                governance_catalog:
+                    super::values::manifest::GovernanceCatalogProfile::GovernedClaim,
+            },
+        )
+    }
     /// Observes at most256 original queue entries under one coherent local guard.
     /// A production caller must establish its required leader/read-barrier lifecycle.
     /// # Errors
@@ -70,6 +100,12 @@ impl RedbStateStore {
     }
 }
 impl RedbStateTransaction<'_> {
+    pub(crate) fn require_governed_claim(&self) -> Result<(), E> {
+        if self.governance_catalog_profile()? != 5 {
+            return Err(E::UnsupportedPolicyProfile);
+        }
+        Ok(())
+    }
     pub(crate) fn commit_workflow_release_values(
         self,
         changes: &wf_ports::state::GroupApplyChanges<'_, '_>,
@@ -84,7 +120,7 @@ impl RedbStateTransaction<'_> {
         partition: &wf_types::identity::PartitionId,
         id: &wf_types::identity::RecordId,
     ) -> Result<(), E> {
-        if self.catalog_profile != 4 {
+        if !matches!(self.catalog_profile, 4 | 5) {
             return Ok(());
         }
         read::refuse_legacy_write(self, scope, partition, id)
@@ -105,7 +141,7 @@ impl RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses absent/older/corrupt capability or current admission failure.
     pub fn require_workflow_release(&self) -> Result<(), E> {
-        if self.governance_catalog_profile()? != 4 {
+        if !matches!(self.governance_catalog_profile()?, 4 | 5) {
             return Err(E::UnsupportedPolicyProfile);
         }
         Ok(())

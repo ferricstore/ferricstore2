@@ -48,7 +48,7 @@ impl RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses unsupported profiles, resources or corrupt authority.
     pub fn require_catalog_progress(&self) -> Result<(), E> {
-        if !matches!(self.governance_catalog_profile()?, 2..=4) {
+        if !matches!(self.governance_catalog_profile()?, 2..=5) {
             return Err(E::UnsupportedPolicyProfile);
         }
         Ok(())

@@ -61419,3 +61419,48 @@ GovClaim -> terminal -> restart/snapshot -> reconcile -> exact release loop with
 siblings preserved. Audit raw public batch/write boundaries before mapping them
 to native profile6. Native malformed-owner fairness and all remaining source,
 consensus/read-barrier, service, platform and performance acceptance stay open.
+
+2026-10-31 solo paid-Claim architecture review (GC5 predecessor): approve the
+existing private GovernanceCatalogProfile::GovernedClaim variant and explicit
+create_governed_claim_database constructor, inheriting GC4 release custody and
+requiring identified credit2/catalog. Older capability bytes remain unchanged.
+Approve state/redb/release/claimed.rs for family24 consumed-reservation markers
+and workflow_values/release/claimed.rs for canonical recovery/lifecycle cases.
+Family24 has the exact seven-component family13 reservation identity and the
+fixed value FWGU\\0\\x01; it is not a client authority flag or an independent
+mutation API. A marker must join an Active reservation. GC5 bindings with an
+Active reservation must join its marker; Released/missing reservations may
+outlive their old binding. Keep used markers across record replacement/deletion,
+and remove them atomically with actual reservation release/cleanup. No legacy
+capability may admit this family. Point access and canonical recovery/snapshot
+validation use the same actual transaction and admission accounting. Keep old
+credit profiles on their existing negative fast path. This is concrete solo
+review, not independent review or a paid Claim/source-parity completion claim.
+The following stage must create these markers only with a real paid Claim in
+the same consumed writer as record/value/history/outcome/control publication.
+
+GC5 predecessor result: six actual storage cases pass. The first test has a
+corrected compile RED (missing constructor only) and then an actual body RED
+(Corrupt at reopen of a consumed marker); the other five are supplemental
+postimplementation checks, not retrospective TDD. The initial trial's wrong
+import and LogIdentity arity were fixture errors and are not product RED.
+The broad storage run passes315 cases and architecture passes60. A subsequent
+positive-capability review requires actual GC5 again under the same point-read
+guard; cached profile values only select the negative fast path. The final
+focused six-case run and strict workspace/all-target Clippy cover that last
+change. The architecture change moves the existing release-capability check
+into the shared release recovery walker to keep validate_rows below100 lines;
+no lint threshold or scenario was weakened. Production files stay below400 and
+the new test child below600. No independent-review or measured-speedup claim.
+
+Source audit against e855461 preserves692 selected existing Rust test/benchmark
+inputs:691 whole and one exact additive child-registration inverse. The frozen
+mapping/progress ledgers are byte-identical. Logs are /private/tmp/ferricstore2-
+paid-claim-marker-{compile-r0,body-r0,regression,storage,arch,final,final-clippy}.log
+and paid-claim-marker-source-audit.json. These physical schema fixtures deliberately
+inject consumed entries; they do not pretend to execute a paid Claim. Original
+credit Release and actual expiry-page Cleanup execute through the real driver.
+Claim frame/retention/public-parent/policy/refund/Unknown and release draining
+remain inside the same unfinished coupled batch. Do not run another full all12
+checkpoint merely for this predecessor, adopt primary code, award source credit
+or mark the full goal complete. Continue solo with actual paid Claim publication.

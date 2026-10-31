@@ -225,6 +225,10 @@ pub(super) fn binding(
     read(tx, &table, &key, |bytes| {
         let binding = inspect_release_binding(bytes, bytes.len()).map_err(codec_error)?;
         check_binding(tx, &table, scope, (partition, id), binding, context)?;
+        if tx.catalog_profile == 5 {
+            tx.require_governed_claim()?;
+            super::claimed::check_binding(tx, &table, scope, binding)?;
+        }
         let original = binding.intent;
         tx.admit_read(total(
             128,

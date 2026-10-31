@@ -2,6 +2,26 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
+Latest solo addition after d1434d2: GC5 consumed-reservation custody. Family24
+joins an exact Active identified-credit reservation. Active GC5 record bindings
+require its consumed marker; that evidence persists across record replacement
+and deletion for the future Claim reuse check. Actual Release/Cleanup retires the matching marker in the existing
+consumed credit writer, preserving siblings. Expiry alone keeps it until actual
+page cleanup. Canonical reopen and received snapshots share these checks; GC4
+refuses marker rows. This adds no paid Claim execution or source-case credit:
+only a future actual Claim transaction may create markers in production.
+
+Six new storage cases pass, including exact release/sibling preservation, expiry
+cleanup, snapshot receive, active binding joins, malformed/orphan markers and
+checksum-valid capability downgrade. The broader315-case storage suite and60
+architecture cases pass. The final positive-capability recheck is additionally
+covered by a focused six-case rerun and strict workspace/all-target Clippy.
+Evidence: /private/tmp/ferricstore2-paid-claim-marker-{compile-r0,body-r0,
+regression,storage,arch,final,final-clippy}.log and source-audit.json. No full
+pipeline rerun, independent review, native Linux/Elixir or speedup claim.
+NEXT connect the actual paid Claim frame, original retained response and consumed
+writer to these markers; then policy/refund/Unknown settlement and release drain.
+
 Open coupled-release candidate: code d1434d2 after atomic eeab912 and data22da47e
 (atomic R0 2ae7af2; acquisition-boundary R0 eeab912). Explicit GC4 intent9 mutation
 now admits release capacity before reply/value companions and commits intents,

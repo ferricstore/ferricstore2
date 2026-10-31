@@ -21,19 +21,26 @@ pub(crate) enum GovernanceCatalogProfile {
     Progress,
     Prune,
     WorkflowRelease,
+    GovernedClaim,
 }
 impl GovernanceCatalogProfile {
     pub(crate) const fn enabled(self) -> bool {
         !matches!(self, Self::Disabled)
     }
     pub(crate) const fn progress(self) -> bool {
-        matches!(self, Self::Progress | Self::Prune | Self::WorkflowRelease)
+        matches!(
+            self,
+            Self::Progress | Self::Prune | Self::WorkflowRelease | Self::GovernedClaim
+        )
     }
     pub(crate) const fn prune(self) -> bool {
-        matches!(self, Self::Prune | Self::WorkflowRelease)
+        matches!(
+            self,
+            Self::Prune | Self::WorkflowRelease | Self::GovernedClaim
+        )
     }
     pub(crate) const fn workflow_release(self) -> bool {
-        matches!(self, Self::WorkflowRelease)
+        matches!(self, Self::WorkflowRelease | Self::GovernedClaim)
     }
     pub(crate) const fn version(self) -> u16 {
         match self {
@@ -42,6 +49,7 @@ impl GovernanceCatalogProfile {
             Self::Progress => 2,
             Self::Prune => 3,
             Self::WorkflowRelease => 4,
+            Self::GovernedClaim => 5,
         }
     }
 }
@@ -147,6 +155,7 @@ pub(crate) fn parse(
             b"GC\0\x02" => GovernanceCatalogProfile::Progress,
             b"GC\0\x03" => GovernanceCatalogProfile::Prune,
             b"GC\0\x04" => GovernanceCatalogProfile::WorkflowRelease,
+            b"GC\0\x05" => GovernanceCatalogProfile::GovernedClaim,
             _ => return Err(Error::Corrupt),
         }
     } else {
@@ -224,15 +233,19 @@ pub(crate) fn encode(
         bytes.extend_from_slice(&count.to_be_bytes());
     }
     if manifest.governance_catalog.enabled() {
-        bytes.extend_from_slice(if manifest.governance_catalog.workflow_release() {
-            b"GC\0\x04"
-        } else if manifest.governance_catalog.prune() {
-            b"GC\0\x03"
-        } else if manifest.governance_catalog.progress() {
-            b"GC\0\x02"
-        } else {
-            b"GC\0\x01"
-        });
+        bytes.extend_from_slice(
+            if manifest.governance_catalog == GovernanceCatalogProfile::GovernedClaim {
+                b"GC\0\x05"
+            } else if manifest.governance_catalog.workflow_release() {
+                b"GC\0\x04"
+            } else if manifest.governance_catalog.prune() {
+                b"GC\0\x03"
+            } else if manifest.governance_catalog.progress() {
+                b"GC\0\x02"
+            } else {
+                b"GC\0\x01"
+            },
+        );
     }
     let checksum = Sha256::digest(&bytes);
     bytes.extend_from_slice(&checksum);
