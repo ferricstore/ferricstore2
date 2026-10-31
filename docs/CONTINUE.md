@@ -2,6 +2,35 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
+Latest CLAIM-CURRENT-POLICY1 adds actual Complete V2/Original ETF running-rule
+resolution and connects it to original Claim demand planning. Full backing/type
+verification precedes policy-derived results; valid explicit pairs skip unused
+policy. Source deep-merge masking, zero/minimum/strict rules, generation-zero
+configuration and original borrowed labels are covered. No projection is used
+as a complete-policy certificate, and no freshness or external ownership proof
+is invented. This is a functional prerequisite, not the atomic public parent.
+
+Eighteen new controls pass. The full domain run passed618 tests/doctests in57
+groups; the later512-state bounded-work control adds one distinct case (619
+total). After lint refactoring, both affected targets pass170 tests, including
+all153 complete-policy and17 coordination cases. All60 architecture cases,
+strict workspace/all-target Clippy, progress, fmt and diff pass. All2099 current
+non-Markdown inputs/1510 Rust files are frozen in the evidence manifest. Of713
+prior Rust test/bench inputs,711 stay whole and two differ only by an exact
+additive module registration. Eight existing outcome modules and six selected
+source/runtime ledgers remain byte-identical. Evidence: /private/tmp/ferricstore2-
+claim-current-policy-{domain,final-writer,final-clippy,arch,progress}.log and
+proof.json/source-audit.json/inputs.json. This is no new whole-all12 result,
+source-case credit, Linux execution or measured speedup.
+
+NEXT implement the actual one-gate, one-outcome atomic Claim parent over bounded
+coherent phase effects; call the new stored-content resolver only with the real
+current policy observation after retained replay and current authorization.
+Credit funding/NoDemand/settlement/Unknown, monotone bind attempts, original
+optional partition capture and pipeline caller identity remain required.
+Consensus/services/workers, complete source profiles and both-platform/performance
+acceptance remain unfinished. The full goal stays active.
+
 Current automatic release-page composition now executes actual configured queue
 reads -> partition batches -> grouped original-ID public credit Release -> sparse
 completion -> contiguous ACK. Source v1 inclusive cursors rotate after a retained

@@ -9,7 +9,9 @@ use crate::workflow::MAX_EXACT_MILLIS;
 use crate::workflow::active::LimitEnforcement;
 use std::collections::BTreeMap;
 
+mod current;
 mod resolve;
+pub use current::{CurrentRunningCreditError, resolve_current_running_credit};
 pub use resolve::resolve_running_credit;
 
 /// Structurally coherent borrowed catalogue, not authoritative governance bytes.

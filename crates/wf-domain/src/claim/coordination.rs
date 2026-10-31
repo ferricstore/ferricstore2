@@ -5,7 +5,7 @@
 //! governance bytes nor remote ownership. The atomic parent remains separate.
 
 use super::caller::NormalizedClaimDue;
-use crate::policy::definition::PolicyVersion;
+use crate::policy::complete::RunningClaimPolicyVersion;
 use crate::workflow::active::LimitEnforcement;
 use wf_types::version::TimestampMillis;
 
@@ -21,8 +21,8 @@ pub use credit::{
     plan_claim_credit_settlement,
 };
 pub use running::{
-    RunningPolicyProjection, admit_running_projection, resolve_running_credit,
-    running_config_version,
+    CurrentRunningCreditError, RunningPolicyProjection, admit_running_projection,
+    resolve_current_running_credit, resolve_running_credit, running_config_version,
 };
 pub use schedule::{
     ClaimSchedule, advance_claim_schedule, plan_claim_schedule, plan_coalesced_claim_schedule,
@@ -178,7 +178,7 @@ pub struct RunningCreditDemand<'v, 'a> {
     ttl_ms: u64,
     trusted_now: TimestampMillis,
     config_version: Option<u64>,
-    policy_version: Option<&'v PolicyVersion>,
+    policy_version: Option<RunningClaimPolicyVersion<'v>>,
 }
 impl<'v, 'a> RunningCreditDemand<'v, 'a> {
     /// Original scope meaning, without hash or routing authority.
@@ -228,7 +228,7 @@ impl<'v, 'a> RunningCreditDemand<'v, 'a> {
     }
     /// Original installed version owner, not a short projection borrow.
     #[must_use]
-    pub const fn policy_version(&self) -> Option<&'v PolicyVersion> {
+    pub const fn policy_version(&self) -> Option<RunningClaimPolicyVersion<'v>> {
         self.policy_version
     }
 }

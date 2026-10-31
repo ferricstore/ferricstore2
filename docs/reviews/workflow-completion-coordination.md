@@ -61914,3 +61914,115 @@ running models to compose actual original public-credit and paid-Claim outcomes.
 Their pure Proceed/Confirmed values are not external spend certificates; policy,
 NoDemand, optional partition identity, unused/refund and Unknown parent ownership
 must be established by the real configured protocol before source credit.
+
+### CLAIM-CURRENT-POLICY1 — solo architecture decision (2026-10-31)
+
+Previous goal turn: no progress (status inspection only). Revalidated clean
+feature HEAD c5de084. Work continues solo under the user's override; this is a
+self-review, not independent peer review. ADR-004 A-CM1 still requires one atomic
+local Claim parent. Its current-policy predecessor must resolve actual complete
+stored content, rather than treating RunningPolicyProjection as proof.
+
+Approved concrete batch before artifact creation:
+
+* wf-domain policy/complete/running_claim.rs, running_claim/typed.rs,
+  running_claim/original.rs and running_claim/lookup.rs: bounded functional
+  running-limit resolution from StoredPolicyValue, preserving Complete V2
+  byte/content correspondence and the entire Original ETF owner. New immutable
+  ResolvedRunningClaimPolicy and borrowed RunningClaimPolicyVersion represent
+  content only; they grant no freshness, authorization or remote owner proof.
+* claim/coordination/running/current.rs and CurrentRunningCreditError: compose
+  normalized original caller, trusted time, valid explicit pair and the actual
+  stored-content resolver. Explicit pairs skip unused policy only. The existing
+  demand carries borrowed numeric/binary policy version content, including raw
+  generation-zero handling, without copying a label or inventing a policy.
+* tests/complete_policy/running_claim.rs and running_claim/{fixtures,original,
+  refusals}.rs; tests/claim_coordination/current.rs: real V2/ETF input tests,
+  inherited/masked rule fields, original type/generation/version, work continuity,
+  malformed backing, explicit-pair ordering and owner identity. Existing test
+  assertions and reference/runtime ledgers stay intact.
+
+Dependencies remain domain -> types only; no I/O, new crate, serialization
+profile or durable authority is introduced. One caller-owned PolicySchemaCharge
+continues through full decode/verification and all queries. Typed policies are
+verified once, then queried by borrowed maps. Original policies are decoded and
+indexed once, then use metered searches over borrowed term positions; no whole
+policy/state/rule clone, per-state full decode or extra copied label. Own nil or
+scalar raw map fields must preserve source deep-merge masking, rather than
+silently falling back to a type rule. Unknown/unsupported reached source values
+refuse explicitly. Portable bounded work is not a native speedup claim.
+
+Sources: pinned66586c5 flow/claim_due_api.ex:802-940 and
+flow/governance/policy.ex:61-72,516-554. The Claim wrapper uses the top-level
+customer version; it must not substitute Governance.Policy's nested-version
+fallback. The full atomic parent, original partition capture, credit funding,
+NoDemand, settlement, unknown recovery, pipeline and both-platform acceptance
+remain required after this functional predecessor. No source-case credit follows
+from these supplemental controls alone.
+
+CLAIM-CURRENT-POLICY1 implementation/self-review: the real rejecting interface
+shell compiled and produced9 stored-policy failures and4 original-demand
+failures before their bodies were implemented. The initial local missing Debug
+derive was a compile mistake, not product RED. The9-case body then passed; the
+huge generation-zero numeric fixture was corrected to require an explicit
+portable-profile refusal rather than silently omitting a source configuration.
+Positive original generation takes precedence and can ignore an unrepresentable
+customer version. The Claim wrapper reads only the top-level customer version;
+the separate Governance.Policy nested fallback is not substituted.
+
+Mixed-map testing caught my incorrect assumption that the private ETF identity
+index uses OTP iteration order. Its actual comparator orders atom/integer/float/
+binary before list/tuple/map/runtime classes. The original atom lookup was
+correct and its body is restored byte-for-byte; only sibling-private visibility
+changes. New binary searches follow the actual index, including partial
+bitstring peers. Canonical/private lookup order is not a native OTP map-order
+acceptance result. Another saved actual runtime RED proves effective scalar
+limits cannot silently become ungoverned. Nil can mask a group; a scalar reached
+by source Access instead refuses, while an actual local map can override it.
+
+The functional parent now admits the original caller/time/pair first and threads
+one caller-owned schema account through full stored-owner verification and every
+rule lookup. Valid explicit pairs skip unused policy. Complete V2 encoding is
+checked against content; Original keeps its entire verified ETF backing and
+borrowed customer label. Zero limits, minimum lease quantities, strictest
+enforcement, requested-state fallback and raw presence survive. The credit
+1000-ID cap is reached only after actual governed demand exists. No external
+spend, freshness flag, synthetic retained gate or current-owner certificate is
+invented. At this note17 new controls pass; full domain regression is running.
+
+Performance self-review consulted official Rust1.99.1 documentation online for
+[borrowed BTreeMap lookup](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html#method.get)
+and [binary-search ordering requirements](https://doc.rust-lang.org/std/primitive.slice.html#method.binary_search_by).
+Typed lookups borrow byte slices; Original searches use metered descriptors and
+the actual auxiliary comparator, preserving arbitrary unrelated map keys. No
+new label/state/rule owner is copied. A supplemental512-state real V2 case fits
+one16MiB represented account while retaining zero/strict/minimum outcomes. This
+is a bounded-work control, not a native timing or throughput benchmark. The
+original full domain run passed618 tests/doctests in57 groups; the later new
+catalog test adds one distinct case. Strict lint caught and removed a new depth
+violation, merged identical branches and added a missing unit-expression
+semicolon, without suppressions. Final validation is pending at this note.
+
+CLAIM-CURRENT-POLICY1 final: all18 new controls pass. Full domain execution
+passed618 cases/doctests in57 groups before the additional catalog case; the
+supplemental13-case target and final170-case affected-target run cover the new
+case and final lint refactor. Distinct domain coverage is619. Strict workspace/
+all-target Clippy, all60 architecture cases, progress, fmt and diff pass.
+Final input manifest freezes2099 non-Markdown inputs/1510 Rust files. The source
+audit preserves713 old Rust test/bench inputs as711 whole plus two exact additive
+registrations, all eight existing domain/storage outcome modules and six selected
+source/runtime ledgers. Source accounting stays5858 frozen declarations,
+141 derived declarations/155 mappings/671 assertion links; runtime reconciliation
+stays5903/4222/1681/1655 and explicitly incomplete. No new full source-case,
+all12-current, Linux/native Elixir, independent review, service or speedup claim.
+Evidence: /private/tmp/ferricstore2-claim-current-policy-{domain,final-focused,
+final-writer,final-clippy,arch,progress}.log and proof/source-audit/inputs.json.
+
+Next atomic-parent investigation inspected the actual pinned redb dependency at
+git/checkouts/redb-0aaddfafb2dcb04c/7061f7e/src/transactions.rs:1310-1375.
+Ephemeral savepoint creation requires an unmodified transaction; restore is
+database-bound, and partial restore poisons the transaction against commit.
+Do not assume a savepoint can be created after staged phase writes, reset
+resource counters, commit leaf outcomes or manufacture a Fresh child capture.
+This observation approves no new artifact or serialization profile. The actual
+combined parent and all A-CM1 acceptance controls remain the next batch.

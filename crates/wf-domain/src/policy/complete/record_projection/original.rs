@@ -108,7 +108,7 @@ pub fn project_original_record_batch_policy(
     Ok((mode, retry))
 }
 
-pub(super) fn read<'raw>(
+pub(in crate::policy::complete) fn read<'raw>(
     raw: &'raw [u8],
     kind: &[u8],
     schema: PolicySchemaLimits,
@@ -233,7 +233,7 @@ fn number(index: &Index<'_, '_>, p: TermPosition, maximum: u64) -> Result<u64, E
         .filter(|&n| n <= maximum)
         .ok_or(Error::UnsupportedPolicyProfile)
 }
-pub(super) fn field(
+pub(in crate::policy::complete) fn field(
     index: &Index<'_, '_>,
     map: TermPosition,
     name: &[u8],

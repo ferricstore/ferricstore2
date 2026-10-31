@@ -35,6 +35,7 @@ mod restoration;
 mod retention_input;
 mod retry_input;
 mod rules;
+mod running_claim;
 mod stored_lifecycle;
 mod validation;
 
@@ -158,6 +159,9 @@ pub use retry_input::{
     normalize_complete_policy_retry_override_input,
 };
 pub use rules::{ResolvedBudget, ResolvedCircuit};
+pub use running_claim::{
+    ResolvedRunningClaimPolicy, RunningClaimPolicyVersion, resolve_stored_running_claim_policy,
+};
 pub use stored_lifecycle::{
     StoredLifecycleCaptureError, StoredLifecycleCaptureInput, capture_stored_creation_lifecycle,
 };

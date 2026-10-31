@@ -11,6 +11,7 @@ use super::{
 };
 use crate::claim::caller::NormalizedClaimDue;
 use crate::policy::installation::PolicyLimits;
+use crate::policy::{complete::RunningClaimPolicyVersion, definition::PolicyVersion};
 use crate::workflow::MAX_EXACT_MILLIS;
 use crate::workflow::active::LimitEnforcement;
 use wf_types::version::TimestampMillis;
@@ -31,18 +32,7 @@ pub fn resolve_running_credit<'v, 'a>(
     limits: ClaimCoordinationLimits,
 ) -> Result<Option<RunningCreditDemand<'v, 'a>>, ClaimCoordinationError> {
     let mut work = 0;
-    admit_schedule_calls(&ScheduleCalls::Ordinary(call), limits, &mut work)?;
-    if trusted_now.get() > MAX_EXACT_MILLIS {
-        return Err(ClaimCoordinationError::InvalidClock);
-    }
-    if trusted_now
-        .get()
-        .checked_add(call.lease_ms())
-        .is_none_or(|deadline| deadline > MAX_EXACT_MILLIS)
-    {
-        return Err(ClaimCoordinationError::DeadlineOverflow);
-    }
-    let explicit = admit_explicit_credit_pair(call, shard_count)?;
+    let explicit = admit_running_call(call, trusted_now, shard_count, limits, &mut work)?;
     let (kind, resolved, auto_lease, config_version, policy_version) =
         if let Some((scope, shard_id)) = explicit {
             (
@@ -74,7 +64,15 @@ pub fn resolve_running_credit<'v, 'a>(
                 result,
                 true,
                 running_config_version(projection.installed.generation(), policy.version()),
-                policy.version(),
+                policy.version().and_then(|version| match version {
+                    PolicyVersion::Number(n) if *n <= MAX_EXACT_MILLIS => {
+                        Some(RunningClaimPolicyVersion::Number(*n))
+                    }
+                    PolicyVersion::Bytes(bytes) if !bytes.is_empty() => {
+                        Some(RunningClaimPolicyVersion::Bytes(bytes))
+                    }
+                    _ => None,
+                }),
             )
         };
     if call.limit() > 1000 || call.limit().max(resolved.lease_size) > 1000 {
@@ -92,6 +90,27 @@ pub fn resolve_running_credit<'v, 'a>(
         config_version,
         policy_version,
     }))
+}
+
+pub(super) fn admit_running_call<'a>(
+    call: &NormalizedClaimDue<'a>,
+    trusted_now: TimestampMillis,
+    shard_count: u64,
+    limits: ClaimCoordinationLimits,
+    work: &mut u64,
+) -> Result<Option<(&'a [u8], u64)>, ClaimCoordinationError> {
+    admit_schedule_calls(&ScheduleCalls::Ordinary(call), limits, work)?;
+    if trusted_now.get() > MAX_EXACT_MILLIS {
+        return Err(ClaimCoordinationError::InvalidClock);
+    }
+    if trusted_now
+        .get()
+        .checked_add(call.lease_ms())
+        .is_none_or(|deadline| deadline > MAX_EXACT_MILLIS)
+    {
+        return Err(ClaimCoordinationError::DeadlineOverflow);
+    }
+    admit_explicit_credit_pair(call, shard_count)
 }
 
 fn resolve_projected_rule(

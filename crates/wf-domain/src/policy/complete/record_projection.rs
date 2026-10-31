@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-mod original;
+pub(in crate::policy::complete) mod original;
 pub use original::{
     original_policy_indexed_fields_equal, original_record_batch_policy_projection_bytes,
     project_original_record_batch_policy,
