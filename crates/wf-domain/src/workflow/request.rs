@@ -71,6 +71,14 @@ pub struct ClientIntent {
 }
 
 impl ClientIntent {
+    /// Canonical public credit caller identity, without prepared inputs or authority.
+    #[must_use]
+    pub const fn public_credit(digest: [u8; 32]) -> Self {
+        Self {
+            version: 17,
+            digest,
+        }
+    }
     /// Canonical conditional prune identity; no verification or authority.
     #[must_use]
     pub const fn governance_catalog_prune(digest: [u8; 32]) -> Self {

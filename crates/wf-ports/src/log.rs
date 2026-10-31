@@ -393,3 +393,10 @@ pub fn decode_prepared(
 fn digest(bytes: &[u8]) -> PreparedDigest {
     PreparedDigest::new(Sha256::digest(bytes).into())
 }
+
+mod public_credit;
+pub use public_credit::{
+    CreditSpendPreparation, encode_public_credit_request, fingerprint_credit_policy,
+    generate_public_credit_ids, prepare_public_credit_request, public_credit_intent,
+    public_credit_recovery_header,
+};

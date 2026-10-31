@@ -60694,3 +60694,18 @@ For bounded release uniqueness, select one fallible Vec of borrowed ID reference
 prepaid in raw ID descriptor accounting, and sort it O(n log n); preserve original
 ID order and payload pointers. Add Allocation to the existing CreditCallerError
 resource variants. No full payload copy or fixed1000-slot stack buffer is needed.
+
+Public caller validation grouping before creation: approve private
+caller/validate.rs for typed field/configuration/deadline/ID validation and
+fallible borrowed-ID uniqueness. normalize.rs retains raw keyword measurement,
+first-key selection and source option conversion. Both remain pure, no new types,
+dependencies or public API; from_parts delegates to the same validation rules.
+
+All six saved caller cases now pass. Three test functions drop unnecessary
+Result/Ok wrappers and the module doc adds code quoting for strict Clippy;
+assertion expressions/scenarios remain literal. Release uniqueness uses a single
+borrowed reference sort per normalization, preserving all original payloads/order.
+Public codec baseline now compiles: four tests fail at rejecting fingerprint,
+ID-generation and public-frame APIs (UnsupportedVersion), before later decoder/
+identity predicates. Save before those semantic bodies. Do not count these pure
+checks as full public submission, source-case or native execution acceptance.

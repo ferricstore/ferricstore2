@@ -9,6 +9,7 @@ mod catalog_progress;
 mod catalog_prune;
 mod cleanup;
 mod framing;
+mod public_credit;
 mod view;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

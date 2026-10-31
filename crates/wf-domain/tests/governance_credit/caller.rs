@@ -1,4 +1,4 @@
-//! Public credit option recipes from pinned LimitStore callers.
+//! Public credit option recipes from pinned `LimitStore` callers.
 use super::TestResult;
 use wf_domain::governance::caller::{
     CreditCallAction as A, CreditCallKind as K, CreditCallerError as E, CreditIdList as Ids,
@@ -113,7 +113,7 @@ fn public_credit_caller_numeric_policy_falls_back_and_binary_policy_requires_ver
     Ok(())
 }
 #[test]
-fn public_credit_caller_enforces_source_shard_time_and_version_bounds() -> TestResult {
+fn public_credit_caller_enforces_source_shard_time_and_version_bounds() {
     for shard in 0..4 {
         let opts = [
             ("shard_id", V::Integer(shard)),
@@ -145,11 +145,9 @@ fn public_credit_caller_enforces_source_shard_time_and_version_bounds() -> TestR
         normalize(K::Lease, b"scope", 4, &opts, 65535).err(),
         Some(E::InvalidField("limit"))
     );
-    Ok(())
 }
 #[test]
-fn public_credit_caller_forbids_supplied_spend_ids_and_requires_exact_release_cardinality()
--> TestResult {
+fn public_credit_caller_forbids_supplied_spend_ids_and_requires_exact_release_cardinality() {
     let ids = vec![b"a".to_vec(), b"b".to_vec()];
     let opts = [
         ("shard_id", V::Integer(0)),
@@ -170,10 +168,9 @@ fn public_credit_caller_forbids_supplied_spend_ids_and_requires_exact_release_ca
         normalize(K::Release, b"scope", 4, &opts, 65535).err(),
         Some(E::ReservationIds)
     );
-    Ok(())
 }
 #[test]
-fn public_credit_caller_first_keyword_wins_but_shadowed_values_still_pay_raw_bytes() -> TestResult {
+fn public_credit_caller_first_keyword_wins_but_shadowed_values_still_pay_raw_bytes() {
     let bytes = vec![0; 100];
     let opts = [
         ("shard_id", V::Integer(0)),
@@ -192,7 +189,6 @@ fn public_credit_caller_first_keyword_wins_but_shadowed_values_still_pay_raw_byt
         normalize(K::Lease, b"s", 4, &[("shard_id", V::Nil)], 1000).err(),
         Some(E::Shard { maximum: 3 })
     );
-    Ok(())
 }
 #[test]
 fn public_credit_caller_typed_restore_cannot_bypass_configuration_or_deadline_validation()

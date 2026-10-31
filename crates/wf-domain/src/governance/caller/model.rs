@@ -157,8 +157,13 @@ impl<'a> NormalizedCreditCall<'a> {
         now: Option<u64>,
         action: CreditCallAction<'a>,
     ) -> Result<Self, CreditCallerError> {
-        let _ = (scope, count, now, action);
-        Err(CreditCallerError::InvalidOptions)
+        super::validate::parts(scope, count, now, action)?;
+        Ok(Self {
+            scope,
+            shard_count: count,
+            now_ms: now,
+            action,
+        })
     }
     /// Original opaque scope bytes.
     #[must_use]
@@ -209,6 +214,8 @@ pub enum CreditCallerError {
     PolicyVersionRequiresConfig,
     /// Caller raw admission ceiling is zero.
     InvalidLimits,
+    /// Fallible bounded reference-owner reservation failed.
+    Allocation,
     /// Bounded raw input or metadata admission refused.
     Limit,
 }
@@ -216,7 +223,12 @@ impl fmt::Display for CreditCallerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidOptions => f.write_str("ERR flow limit opts must be a keyword list"),
-            Self::InvalidField(name) => write!(f, "invalid public credit field {name}"),
+            Self::InvalidField("ttl_ms") => {
+                f.write_str("ERR flow limit ttl_ms must be a positive integer")
+            }
+            Self::InvalidField(name) => {
+                write!(f, "ERR flow limit {name} must be a non-negative integer")
+            }
             Self::Shard { maximum } => {
                 write!(f, "ERR flow limit shard_id must be between 0 and {maximum}")
             }
@@ -240,6 +252,7 @@ impl fmt::Display for CreditCallerError {
                 f.write_str("ERR flow limit config_version is required with binary policy_version")
             }
             Self::InvalidLimits => f.write_str("invalid credit caller limits"),
+            Self::Allocation => f.write_str("credit caller allocation failed"),
             Self::Limit => f.write_str("credit caller resource limit"),
         }
     }
