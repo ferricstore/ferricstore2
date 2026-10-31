@@ -13,6 +13,15 @@ use super::super::{
 };
 use super::manifest::{self, ValueManifest};
 
+/// Explicit immutable genesis capabilities; constructing them grants no authority.
+pub(in crate::state::redb) struct ValueGenesisCapabilities {
+    pub(in crate::state::redb) alias_format: u16,
+    pub(in crate::state::redb) credit_shard_count: Option<u64>,
+    pub(in crate::state::redb) credit_catalog: bool,
+    pub(in crate::state::redb) governance_catalog: bool,
+    pub(in crate::state::redb) catalog_progress: bool,
+}
+
 pub(super) fn create(
     database: redb::Database,
     group: GroupId,
@@ -42,17 +51,46 @@ pub(in crate::state::redb) fn create_profile(
     limits: StateStoreLimits,
     capability: (u16, Option<u64>, bool, bool),
 ) -> Result<RedbStateStore, Error> {
-    if !matches!(capability.0, 1 | 2) {
+    create_selected_profile(
+        database,
+        group,
+        recovery,
+        genesis,
+        defaults,
+        limits,
+        ValueGenesisCapabilities {
+            alias_format: capability.0,
+            credit_shard_count: capability.1,
+            credit_catalog: capability.2,
+            governance_catalog: capability.3,
+            catalog_progress: false,
+        },
+    )
+}
+
+pub(in crate::state::redb) fn create_selected_profile(
+    database: redb::Database,
+    group: GroupId,
+    recovery: RecoveryId,
+    genesis: StateStoreGenesis<'_>,
+    defaults: WorkflowValueDefaults,
+    limits: StateStoreLimits,
+    capability: ValueGenesisCapabilities,
+) -> Result<RedbStateStore, Error> {
+    if capability.catalog_progress && !capability.governance_catalog {
+        return Err(Error::InvalidChanges);
+    }
+    if !matches!(capability.alias_format, 1 | 2) {
         return Err(Error::UnsupportedPolicyProfile);
     }
-    if capability.2 && capability.1.is_none() {
+    if capability.credit_catalog && capability.credit_shard_count.is_none() {
         return Err(Error::InvalidChanges);
     }
-    if capability.3 && capability.0 != 2 {
+    if capability.governance_catalog && capability.alias_format != 2 {
         return Err(Error::InvalidChanges);
     }
-    if capability.1.is_some_and(|count| {
-        count == 0 || count > wf_domain::workflow::MAX_EXACT_MILLIS || capability.0 != 2
+    if capability.credit_shard_count.is_some_and(|count| {
+        count == 0 || count > wf_domain::workflow::MAX_EXACT_MILLIS || capability.alias_format != 2
     }) {
         return Err(Error::InvalidChanges);
     }
@@ -67,8 +105,8 @@ pub(in crate::state::redb) fn create_profile(
             [additional(
                 &group,
                 &recovery,
-                capability.1.is_some(),
-                capability.3,
+                capability.credit_shard_count.is_some(),
+                capability.governance_catalog,
             )?],
         )?,
     )?;
@@ -82,7 +120,7 @@ fn initialize(
     genesis: &StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     scratch: usize,
-    capability: (u16, Option<u64>, bool, bool),
+    capability: ValueGenesisCapabilities,
 ) -> Result<(), Error> {
     let mut tx = store.transaction(
         false,
@@ -97,8 +135,8 @@ fn initialize(
         [additional(
             &store.group,
             &store.recovery,
-            capability.1.is_some(),
-            capability.3,
+            capability.credit_shard_count.is_some(),
+            capability.governance_catalog,
         )?],
     )?)?;
     let genesis_hash = bootstrap::write_genesis_rows(&tx, genesis)?;
@@ -113,15 +151,16 @@ fn initialize(
     let origin = bootstrap::manifest(store, genesis, genesis_hash, origin_size)?;
     let current_hash = current_hash(&tx)?;
     let current = ValueManifest {
-        layout: if capability.1.is_some() || capability.3 {
+        layout: if capability.credit_shard_count.is_some() || capability.governance_catalog {
             8
         } else {
             7
         },
-        alias_format: capability.0,
-        credit_shard_count: capability.1,
-        credit_catalog: capability.2,
-        governance_catalog: capability.3,
+        alias_format: capability.alias_format,
+        credit_shard_count: capability.credit_shard_count,
+        credit_catalog: capability.credit_catalog,
+        governance_catalog: capability.governance_catalog,
+        catalog_progress: capability.catalog_progress,
         policy: CurrentPolicyManifest {
             initial_time: genesis.initial_time,
             placements: u64::try_from(genesis.placements.len()).map_err(|_| Error::Limit)?,

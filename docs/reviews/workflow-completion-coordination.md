@@ -60111,3 +60111,12 @@ and mixed-width defaults hashing compile issues were corrected before semantic
 storage execution; use each field's actual byte width. Save this exact cohort
 before domain/codec/genesis bodies. See catalog-progress-r0-{ports,storage,
 architecture}.log. No full/native/Linux/source parity claim follows.
+
+Progress domain and both codecs now pass all3 unchanged cases. GC2 target-only
+and combined genesis/read/reopen plus the old-GC1 refusal now pass; the remaining
+actual stored case reaches healthy apply_catalog_progress_transaction and fails
+State(UnsupportedPolicyProfile) at the rejecting driver after Missing was read.
+Save this genuine driver RED before writer/retained bodies. The family allocator's
+closed upper bound also needed19, matching its newly selected physical decoder;
+its earlier UnsupportedTag/Corrupt was an incomplete adapter, not driver RED.
+No test body was weakened. See catalog-progress-{codec,driver-r0}.log.

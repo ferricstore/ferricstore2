@@ -23,6 +23,7 @@ pub(crate) struct ValueManifest {
     pub(crate) credit_shard_count: Option<u64>,
     pub(crate) credit_catalog: bool,
     pub(crate) governance_catalog: bool,
+    pub(crate) catalog_progress: bool,
 }
 
 pub(crate) fn read(tx: &RedbStateTransaction<'_>) -> Result<ValueManifest, Error> {
@@ -106,16 +107,17 @@ pub(crate) fn parse(
         }
         _ => return Err(Error::Corrupt),
     };
-    let governance_catalog = if bytes.len().checked_sub(at) == Some(36) {
-        if layout != 8
-            || alias_format != 2
-            || value::take(bytes, &mut at, 4).map_err(value_error)? != b"GC\0\x01"
-        {
+    let (governance_catalog, catalog_progress) = if bytes.len().checked_sub(at) == Some(36) {
+        if layout != 8 || alias_format != 2 {
             return Err(Error::Corrupt);
         }
-        true
+        match value::take(bytes, &mut at, 4).map_err(value_error)? {
+            b"GC\0\x01" => (true, false),
+            b"GC\0\x02" => (true, true),
+            _ => return Err(Error::Corrupt),
+        }
     } else {
-        false
+        (false, false)
     };
     let checksum = Sha256::digest(&bytes[..at]);
     if value::take(bytes, &mut at, 32).map_err(value_error)? != checksum.as_slice() {
@@ -136,6 +138,7 @@ pub(crate) fn parse(
         credit_shard_count,
         credit_catalog,
         governance_catalog,
+        catalog_progress,
     })
 }
 
@@ -186,7 +189,11 @@ pub(crate) fn encode(
         bytes.extend_from_slice(&count.to_be_bytes());
     }
     if manifest.governance_catalog {
-        bytes.extend_from_slice(b"GC\0\x01");
+        bytes.extend_from_slice(if manifest.catalog_progress {
+            b"GC\0\x02"
+        } else {
+            b"GC\0\x01"
+        });
     }
     let checksum = Sha256::digest(&bytes);
     bytes.extend_from_slice(&checksum);
@@ -218,6 +225,9 @@ fn encoded_size(
     group: &GroupId,
     recovery: &RecoveryId,
 ) -> Result<usize, Error> {
+    if manifest.catalog_progress && !manifest.governance_catalog {
+        return Err(Error::InvalidChanges);
+    }
     if manifest.credit_catalog && manifest.credit_shard_count.is_none() {
         return Err(Error::InvalidChanges);
     }

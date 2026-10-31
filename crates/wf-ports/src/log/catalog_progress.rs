@@ -9,6 +9,7 @@ use wf_domain::{
 };
 use wf_types::{identity::RequestId, version::CommittedTime};
 mod model;
+mod request;
 pub use model::PreparedCatalogProgressRequest;
 
 /// Derives original mathematical intent without admission or commit authority.
@@ -17,8 +18,7 @@ pub use model::PreparedCatalogProgressRequest;
 pub fn catalog_progress_request_intent(
     command: CatalogProgressChange<'_>,
 ) -> Result<ClientIntent, E> {
-    let _ = command;
-    Err(E::UnsupportedVersion)
+    request::intent(command)
 }
 /// Encodes the complete original private request.
 /// # Errors
@@ -31,8 +31,7 @@ pub fn encode_catalog_progress_request(
     limits: CodecLimits,
     maximum_owned: usize,
 ) -> Result<PreparedBytes, E> {
-    let _ = (scope, request, stamp, command, limits, maximum_owned);
-    Err(E::UnsupportedVersion)
+    request::encode(scope, request, stamp, command, limits, maximum_owned)
 }
 /// Validates complete framing/digest/EOF before creating header owners.
 /// # Errors
@@ -42,8 +41,7 @@ pub fn prepare_catalog_progress_request(
     limits: CodecLimits,
     maximum_owned: usize,
 ) -> Result<PreparedCatalogProgressRequest<'_>, E> {
-    let _ = (encoded, limits, maximum_owned);
-    Err(E::UnsupportedVersion)
+    request::prepare(encoded, limits, maximum_owned)
 }
 /// Borrows an explicit header; complete body audit is still mandatory.
 /// # Errors
@@ -52,8 +50,15 @@ pub fn catalog_progress_recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), E> {
-    let _ = (encoded, limits);
-    Err(E::UnsupportedVersion)
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    let header = request::header(&mut super::reader::Reader::new(encoded, limits))?;
+    Ok((
+        15,
+        [header.tenant, header.group, header.recovery],
+        header.stamp,
+    ))
 }
 /// Verifies the exact complete private retained success response.
 /// # Errors
@@ -64,6 +69,14 @@ pub fn catalog_progress_retained_summary(
     response: &[u8],
     admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), E> {
-    let _ = (intent, version, response, admission);
-    Err(E::UnsupportedVersion)
+    if intent.version() != 15 || version != 13 {
+        return Err(E::UnsupportedVersion);
+    }
+    if response.len() > admission.decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    if response != b"FWPR\0\x01" {
+        return Err(E::Malformed);
+    }
+    Ok((RetainedStatus::Accepted, None))
 }

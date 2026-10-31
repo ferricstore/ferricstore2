@@ -50,3 +50,25 @@ pub(super) fn validate(key: &super::DecodedStateKey) -> Result<(), E> {
     }
     Ok(())
 }
+
+pub(crate) fn progress(scope: &RequestScope, catalog: &[u8], maximum: usize) -> Result<Vec<u8>, E> {
+    if catalog.len() > 65_535 {
+        return Err(E::InvalidValue);
+    }
+    encode_components(
+        19,
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            catalog,
+        ],
+        maximum,
+    )
+}
+pub(super) fn validate_progress(key: &super::DecodedStateKey) -> Result<(), E> {
+    if key.part(2).is_empty() || key.part(2).len() > 256 || key.part(3).len() > 65_535 {
+        return Err(E::InvalidValue);
+    }
+    Ok(())
+}

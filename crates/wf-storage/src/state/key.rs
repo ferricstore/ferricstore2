@@ -127,7 +127,7 @@ pub(super) fn key_start(
     length: usize,
     maximum: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if family > 18 {
+    if family > 19 {
         return Err(StateValueError::UnsupportedTag);
     }
     if length < 7 {

@@ -14,8 +14,15 @@ impl CatalogProgressChange<'_> {
     /// # Errors
     /// Refuses invalid caps and oversized fields.
     pub fn validate(self, maximum_key_bytes: usize) -> Result<(), CatalogProgressError> {
-        let _ = (self, maximum_key_bytes);
-        Err(CatalogProgressError)
+        if maximum_key_bytes == 0
+            || self.catalog.len() > maximum_key_bytes
+            || self
+                .cursor
+                .is_some_and(|cursor| cursor.len() > maximum_key_bytes)
+        {
+            return Err(CatalogProgressError);
+        }
+        Ok(())
     }
 }
 /// Invalid progress fields, distinct from an operational backend failure.

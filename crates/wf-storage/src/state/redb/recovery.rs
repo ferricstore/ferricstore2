@@ -251,6 +251,8 @@ fn validate_rows(
         && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.credit_catalog;
     let governance_catalog = layout == 8
         && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.governance_catalog;
+    let catalog_progress = layout == 8
+        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.catalog_progress;
     let mut hash = Sha256::new();
     hash.update(if matches!(layout, 6..=8) {
         super::snapshot::original::CATALOG_DOMAIN
@@ -276,10 +278,16 @@ fn validate_rows(
             maximum,
         )
         .map_err(value_error)?;
-        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=18) {
+        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=19) {
             return Err(StateTransactionError::Corrupt);
         }
-        if decoded.family() == 18 {
+        if decoded.family() == 19 {
+            if !catalog_progress {
+                return Err(StateTransactionError::Corrupt);
+            }
+            // The payload is a derived hint. Preserve invalid bytes for a
+            // later committed reset; keys/control/outcomes remain strict.
+        } else if decoded.family() == 18 {
             if !governance_catalog {
                 return Err(StateTransactionError::Corrupt);
             }
