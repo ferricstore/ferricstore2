@@ -14,6 +14,7 @@ mod catalog;
 mod fixtures;
 mod identified;
 mod limits;
+mod membership;
 mod protocol;
 mod source;
 mod view;

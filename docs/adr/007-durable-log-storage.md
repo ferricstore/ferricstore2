@@ -1265,3 +1265,18 @@ Original profile/generic readers remain closed; success and rejection receipts
 alone require format2 on reopen. Existing Catalog Node opt-in audits complete
 bodies and uses that same writer through startup and snapshot suffixes. The
 cross-group publisher must still publish membership successfully before ACK.
+
+Target governance membership is selected as an independent explicit FWSS8
+capability, with optional `GC\0\x01` before the manifest checksum (after the
+optional credit extension). It does not require an owner shard count. Older
+constructors preserve their exact bytes. Physical family18 stores zero-score
+binary set membership as group/recovery/tenant/catalog/member components with
+fixed `FWGM\0\x01` values. No routing authority is derived from member bytes.
+FWCP1 operation12/intent14 and fixed response12 `FWGR\0\x01` use the existing
+retained namespace/control gate and one consumed Immediate writer. Reopen and
+snapshot compatibility require the explicit capability even when only a receipt
+remains. Batches validate every raw member before allocation/deduplication and
+permit at most256 members. Reads page only the selected catalog and require the
+actual last member to remain present before continuing; a full page supplies a
+cursor even if the next read is empty. These selected contracts do not by
+themselves implement the publisher, accepted consensus or source parity.

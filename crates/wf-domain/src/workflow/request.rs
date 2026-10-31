@@ -71,6 +71,14 @@ pub struct ClientIntent {
 }
 
 impl ClientIntent {
+    /// Canonical neutral catalog membership identity; supplies no authority.
+    #[must_use]
+    pub const fn governance_catalog(digest: [u8; 32]) -> Self {
+        Self {
+            version: 14,
+            digest,
+        }
+    }
     /// Admits the selected canonical intent version and explicit verified digest.
     ///
     /// # Errors

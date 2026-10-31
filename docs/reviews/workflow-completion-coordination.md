@@ -59506,3 +59506,52 @@ declarations unported and unchanged checked/runtime accounting. This leaf adds
 no full source-case or Linux/native performance credit. The catalog publication,
 repair/cleaner and public-parent batch remains unfinished; no primary code
 adoption, full-goal completion or independent review is claimed.
+
+### M2-CREDIT-CATALOG1 target membership selection (solo, before artifacts)
+
+Continue the existing full batch; this is its target-side durable prerequisite,
+not a replacement success criterion. Reviewed pinned governance/catalog.ex and
+governance/limit_reconciler.ex: register/unregister at most256 raw members,
+deduplicate without dropping validation, allow empty unregister members but not
+registrations, preserve binary lexical order, require an actual continuation
+anchor and return a cursor on every full page. Publication registers one valid
+contiguous owner prefix before ACK; missing owners count as processed, corrupt
+owners stop the prefix, and either write failure reports zero published.
+
+Approve these concrete artifacts and neutral contracts: domain
+governance/catalog/membership.rs (CatalogMembershipAction, CatalogMembershipChange,
+CatalogMembershipError; borrowed validation and allocation-free deduplication),
+ports log/catalog_membership.rs and its request.rs/model.rs children
+(PreparedCatalogMembershipRequest; explicit FWCP1 operation12/intent14/response12,
+fixed FWGR1 success), state/governance_catalog.rs (GovernanceCatalogRead and
+GovernanceCatalogPage, borrowing the last owned member for the next cursor),
+storage state/key/governance_catalog.rs (family18 group/recovery/tenant/catalog/
+member), state/redb/governance_catalog.rs and read.rs/write.rs children, and
+transaction/catalog_membership.rs with driver.rs. Approve CatalogChanged on the
+existing neutral StateTransactionError with the exact source traversal message.
+Each module keeps its existing inward dependency boundary. No new dependency.
+
+Select an independent explicit governance-catalog capability in the existing
+FWSS8 manifest: optional four-byte GC/version1 suffix before the checksum,
+orthogonal to the existing credit extension. Legacy constructors/bytes remain
+exact. Genesis may select this target capability without credit-owner shards;
+membership never infers placement from member bytes or lease shard IDs.
+Strict reopen, point outcomes and snapshots must reject missing/mismatched
+capability, including receipt-only state after unregistering the final member.
+Use the same retained namespace, bounded control gate and consumed Immediate
+writer as the other commands; no direct unlogged mutation API. The original
+header owners move into retained metadata; frame/catalog/member payloads remain
+borrowed while deciding/applying. Charge decoder/read/staging/adapter/workspace
+before ownership and bound deduplication by256 squared comparisons. Vec remains
+appropriate for variable-length page/member references; no full catalog copy.
+
+Approve tests in the existing targets: domain governance_credit/membership.rs,
+ports credit_codec/catalog_membership.rs and storage state_store/
+governance_catalog.rs with fixtures.rs/limits.rs children. Save real compiled
+RED before semantic bodies and actual writer RED after codecs expose it. Node
+catalog_membership.rs and its snapshot_recovery/governance_catalog.rs tests are
+selected for the subsequent integration phase, with explicit opt-in and complete
+historical audit. Publisher ports/application artifacts require a further
+concrete selection once these target/source contracts exist. No accepted Raft,
+service, full source-case parity or native performance claim follows from this
+selection. Linux and macOS keep identical byte/resource semantics.

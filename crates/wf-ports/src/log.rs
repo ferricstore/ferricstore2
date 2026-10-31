@@ -11,6 +11,12 @@ use wf_types::version::LogIdentity;
 use crate::consensus::{PreparedOperation, PreparedRequest};
 
 mod catalog_ack;
+mod catalog_membership;
+pub use catalog_membership::{
+    PreparedCatalogMembershipRequest, catalog_membership_recovery_header,
+    catalog_membership_request_intent, catalog_membership_retained_summary,
+    encode_catalog_membership_request, prepare_catalog_membership_request,
+};
 mod claim;
 pub use catalog_ack::{
     PreparedCatalogAckRequest, catalog_ack_recovery_header, catalog_ack_request_intent,

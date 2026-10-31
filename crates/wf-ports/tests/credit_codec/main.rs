@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod catalog_ack;
+mod catalog_membership;
 mod framing;
 mod view;
 
