@@ -13,6 +13,7 @@ mod logical_codec;
 mod publication;
 mod reads;
 mod recovery;
+mod release;
 mod sized_reads;
 mod step_continue;
 mod stored_codec;

@@ -61124,3 +61124,53 @@ and explicit demands, retained-first retries, unused refunds, Unknown holding,
 read batching/fairness, raw caller/source error order, native malformed-owner
 migration and all M3-M8/source/platform acceptance remain. The goal stays active,
 solo; original dirty Elixir and isolated unexecuted native fix remain preserved.
+
+### Solo review 2026-10-31: recoverable release data before the atomic writer
+
+The previous goal turn was status only (no progress). Current code is16a2d4b;
+GC4 custody exists, but no release data family is yet accepted by recovery.
+The queue-full diagnosis must become a retained business rejection BEFORE
+GroupApplyChanges and value companions are built; an operational failure from
+the consumed writer would obstruct committed-log progress. Keep that integration
+open. Do not silently change existing retained reply versions or claim a full
+governed Claim from storage fixtures.
+
+Approve this concrete predecessor inside the SAME unfinished coupled batch:
+state/key/release.rs (families20 record binding,21 tenant meta,22 sequenced intent,
+23 sequenced completion); ports/log/release/binding.rs (ReleaseBindingRef with
+finite positive epoch plus the existing complete native ReleaseIntentRef);
+ports/state/workflow_release.rs (WorkflowReleaseEntry owning one inspected native
+intent byte buffer and WorkflowReleasePage); state/redb/release/{read,recovery}.rs
+(coherent bounded observations and complete canonical joins). Edit the existing
+release root, key decoder, recovery dispatcher and port exports. No dependency,
+layout, background task, standalone enqueue/seed API or execution-authority flag.
+Record binding key includes exact group/recovery/tenant/partition/record; queue
+keys include exact group/recovery/tenant and positive finite sequence. All four
+families require actual GC4 and applied control. Meta proves every sequence in
+its bounded contiguous pending range exists; intents prove range membership;
+completion proves an existing in-range intent. Binding proves its exact live core
+record, complete ID/partition equality, finite original time and valid shard.
+An intent need not have a live workflow: retention can delete it before release.
+Completion is a six-byte versioned marker. Missing meta means empty ONLY when
+there are no queue rows. Recovery and snapshot validation share this one walker.
+Scan complete borrowed values before copying; pre-admit vector descriptors,
+variable payload ownership, physical probes and key scratch cumulatively. Read
+at most256 entries; a limit+1 proof comes from the same finite meta, not a second
+revision. Store the inspected intent once, exposing a borrowed view of that owner.
+
+Approve tests/state_store/workflow_values/release.rs and additive registration.
+Use real GC4 genesis and an actually committed workflow before adding explicit
+physical schema fixtures through redb. Test valid reopened data plus missing,
+orphan, cross-key and capability-tampered rows. These are recovery/schema fixtures,
+NOT evidence of a successful governed Claim, append, ACK or source-case parity.
+Save the compiled valid-data rejection before the body. Snapshot/read checks
+added after the body are supplemental. Actual atomic mutation/release admission,
+GovClaim/policy/refund/ACK/reconciliation/replay and platform acceptance remain.
+
+Release-data R0: cargo test -p wf-storage --test state_store
+workflow_values::release compiled and exited101: both valid reopen cases fail
+with Corrupt; the seven-case malformed-row control passes. Full output is
+/private/tmp/ferricstore2-release-data-r0.log. Unused import warning was removed
+after capture; no test assertion was changed. No missing-API compile failure is
+counted as product RED. The exhausted-empty branch after the first binding-only
+failure is masked until implementation; do not count it as a reached RED.
