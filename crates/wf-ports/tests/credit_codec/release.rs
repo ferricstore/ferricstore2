@@ -56,8 +56,8 @@ fn release_intent_matches_independent_bytes_nil_empty_partition_and_borrowed_fie
     raw(&mut expected, b"\0\xff")?;
     expected.push(1);
     expected.extend_from_slice(&1000_u64.to_be_bytes());
-    assert_eq!(encode_release_intent(intent, 65535)?, expected);
-    let view = inspect_release_intent(&expected, 65535)?;
+    assert_eq!(encode_release_intent(intent, 65_535)?, expected);
+    let view = inspect_release_intent(&expected, 65_535)?;
     assert_eq!(view.flow_id, b"flow");
     assert_eq!(view.partition, None);
     assert_eq!(view.scope, b"scope");
@@ -69,24 +69,24 @@ fn release_intent_matches_independent_bytes_nil_empty_partition_and_borrowed_fie
             partition: Some(b""),
             ..intent
         },
-        65535,
+        65_535,
     )?;
     assert_eq!(
-        inspect_release_intent(&empty, 65535)?.partition,
+        inspect_release_intent(&empty, 65_535)?.partition,
         Some(b"".as_slice())
     );
     assert_ne!(empty, expected);
     for end in 0..expected.len() {
-        assert!(inspect_release_intent(&expected[..end], 65535).is_err());
+        assert!(inspect_release_intent(&expected[..end], 65_535).is_err());
     }
     let mut trailing = expected.clone();
     trailing.push(0);
-    assert!(inspect_release_intent(&trailing, 65535).is_err());
+    assert!(inspect_release_intent(&trailing, 65_535).is_err());
     assert_eq!(
         inspect_release_intent(&expected, expected.len() - 1).err(),
         Some(E::ByteLimit)
     );
-    assert!(inspect_release_intent(&[131, 80, 0, 0, 0, 1, 0], 65535).is_err());
+    assert!(inspect_release_intent(&[131, 80, 0, 0, 0, 1, 0], 65_535).is_err());
     Ok(())
 }
 #[test]

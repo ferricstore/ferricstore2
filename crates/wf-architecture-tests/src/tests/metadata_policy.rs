@@ -345,6 +345,10 @@ fn public_credit_callers_and_prepared_codecs_remain_pure() -> CheckResult<()> {
         "log::public_credit::decode",
         "log::public_credit::ids",
         "log::public_credit::policy",
+        "log::release",
+        "log::release::intent",
+        "log::release::meta",
+        "log::release::cursor",
     ] {
         assert_eq!(
             source_check(

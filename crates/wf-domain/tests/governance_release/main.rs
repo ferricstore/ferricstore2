@@ -6,8 +6,8 @@ type TestResult = Result<(), Box<dyn std::error::Error>>;
 #[test]
 fn release_append_checks_complete_backlog_and_sequence_exhaustion() -> TestResult {
     let state = ReleaseOutboxState { head: 1, tail: 0 };
-    let next = append_release_outbox(state, 65536)?;
-    assert_eq!((next.head, next.tail), (1, 65536));
+    let next = append_release_outbox(state, 65_536)?;
+    assert_eq!((next.head, next.tail), (1, 65_536));
     assert_eq!(
         append_release_outbox(next, 1).err(),
         Some(ReleaseOutboxError::BacklogFull)
@@ -157,7 +157,7 @@ fn release_intent_fields_preserve_nil_empty_partition_and_binary_ids() -> TestRe
             Err(ReleaseOutboxError::InvalidIntent)
         );
     }
-    let large = vec![0; 65536];
+    let large = vec![0; 65_536];
     assert!(
         validate_release_intent(ReleaseIntentRef {
             partition: Some(&large),

@@ -23,32 +23,18 @@ pub(super) fn plan_release_append(
     state: ReleaseOutboxState,
     count: u64,
 ) -> Result<Result<ReleaseOutboxState, ActiveTimeoutRejection>, ApplyError> {
-    if state.head == 0
-        || state.tail > MAX_EXACT_MILLIS
-        || state.head
-            > state
-                .tail
-                .checked_add(1)
-                .ok_or(ApplyError::InvalidAuthority)?
-    {
-        return Err(ApplyError::InvalidAuthority);
-    }
+    use crate::governance::release::{
+        ReleaseOutboxError, append_release_outbox, validate_release_state,
+    };
+    validate_release_state(state).map_err(|_| ApplyError::InvalidAuthority)?;
     if count == 0 {
         return Ok(Ok(state));
     }
-    let next = state
-        .tail
-        .checked_add(count)
-        .filter(|n| *n <= MAX_EXACT_MILLIS)
-        .ok_or(ApplyError::InvalidAuthority)?;
-    let pending = state.tail.saturating_add(1).saturating_sub(state.head);
-    if pending.checked_add(count).is_none_or(|n| n > 65_536) {
-        return Ok(Err(ActiveTimeoutRejection::ReleaseBacklog));
+    match append_release_outbox(state, count) {
+        Ok(next) => Ok(Ok(next)),
+        Err(ReleaseOutboxError::BacklogFull) => Ok(Err(ActiveTimeoutRejection::ReleaseBacklog)),
+        Err(_) => Err(ApplyError::InvalidAuthority),
     }
-    Ok(Ok(ReleaseOutboxState {
-        head: state.head,
-        tail: next,
-    }))
 }
 
 pub(super) fn release_occurrences<'v>(

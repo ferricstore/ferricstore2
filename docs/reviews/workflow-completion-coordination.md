@@ -61019,3 +61019,18 @@ separate from native allocator/RSS. Complete current custody, source read batchi
 flow binding, transaction/snapshot capability and production lifecycle before
 claiming the coupled batch or any new complete original-source case. Focused
 checks during development; no repeated full pipeline until that coherent batch.
+
+Protocol body now passes115 distinct focused cases: domain new5+unchanged active12,
+ports38, architecture60; strict domain/ports all-target Clippy and formatting pass.
+Compiled R0 commit922b7ba captured5+4 genuine rejecting-API failures; later tails
+were masked there. A masked test tail's wire cap15->14 was corrected before the
+final R0 because the independently specified cursor is15 bytes, not a product
+bug. Existing active append delegates shared arithmetic while preserving count0,
+backlog business rejection and exhausted/corrupt authority failure. ACK/completion
+use fixed/range/borrowed spines; cursor ownership is128+16N descriptors, validated
+syntax before reservation and duplicate validation after one bounded sort. Source
+accepted signs/zeros and nil/empty partition distinctions remain. Private native
+FWRI/FWRO framing is not ETF compatibility. Current receipt:
+/private/tmp/ferricstore2-release-protocol-focused.json. This is protocol progress,
+NOT persisted release/Claim integration, source parity or a new all12 checkpoint.
+Continue the coupled batch; last all12 still belongs to9220c17.
