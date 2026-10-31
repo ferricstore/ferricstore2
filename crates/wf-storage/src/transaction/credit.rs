@@ -1,4 +1,4 @@
-//! Identified-owner driver contract; unavailable until atomic integration.
+//! Atomic identified-owner driver and original uncertain-spend context.
 
 use super::{RecordBatchTransactionLimits, RecordBatchTransactionOutcome};
 use crate::state::RedbStateStore;
@@ -18,9 +18,30 @@ impl CreditTransactionError {
     #[must_use]
     pub fn unknown_spend<'a>(
         self,
-        _original: &'a wf_ports::log::PreparedCreditRequest<'_>,
+        original: &'a wf_ports::log::PreparedCreditRequest<'_>,
     ) -> Option<wf_domain::governance::view::CreditSpendUnknownView<'a>> {
-        None
+        use wf_domain::governance::identified::IdentifiedCreditMutation;
+        use wf_domain::governance::view::CreditSpendUnknownView;
+
+        if self != Self::State(StateTransactionError::Uncertain) {
+            return None;
+        }
+        let command = original.command();
+        let IdentifiedCreditMutation::Spend {
+            shard_id,
+            reservation_ids,
+            ..
+        } = command.mutation
+        else {
+            return None;
+        };
+        Some(CreditSpendUnknownView {
+            code: "FLOW_LIMIT_SPEND_UNKNOWN_OUTCOME",
+            scope: command.scope,
+            shard_id,
+            reservation_ids,
+            message: "Flow limit spend outcome is unknown; release these reservation_ids before retrying",
+        })
     }
 }
 

@@ -59154,3 +59154,37 @@ sync fault; its later fencing/recovery assertions are still masked. Other later
 shape/corruption/profile/replay assertions remain masked too. Existing targets
 are only filtered, not claimed rerun. Exact source/log SHA bindings are saved in
 /private/tmp/ferricstore2-credit-view-r0.json. Save this checkpoint before bodies.
+
+Implementation after f696afb: all eight saved tests pass with exact original
+test-file bytes. Public shapes hide raw policy, cleanup and reservation page
+data. Owner scope/leases and spent IDs are borrowed, the policy hash is inline,
+and only actual Uncertain Spend diagnoses map to the original compensation
+context. The real fault test now reaches fencing and complete old-or-new reopen;
+retained original public Spend remains unchanged after Release and actual reopen.
+All affected target cases pass:23 domain,8 ports,230 storage; all54 architecture
+cases, affected doctests, strict all-target Clippy for the three crates,fmt and
+diff pass. This is focused validation, not a new full workspace acceptance run.
+
+Post-body controls in the same approved test files add exact one-unit-below /
+exact-limit prepaid view ownership/work boundaries and explicit KnownAborted
+exclusion. A compile-fail callback test also prevents borrowed reply escape.
+These are additional correctness evidence, not original RED/source credit.
+
+Both post-body controls pass. The final focused union executes263 distinct
+affected cases (23 domain/9 ports/231 storage), all54 architecture cases and8
+affected doctests, with strict all-target Clippy for the three changed crates,
+fmt anddiff passing. Storage230 ran together; the appended known-abort case ran
+separately against the same production input. All eight R0 test bodies stay
+exact, with two whole files preserved as exact prefixes plus appended controls.
+No complete workspace rerun or source-case credit is claimed for this increment.
+
+Next source observations: pinned LimitStore.register_committed_limit checks the
+actual stored owner and ensures catalog membership; failed registration replaces
+an otherwise successful result, while an existing business failure is preserved.
+Existing owners repair membership before mutation. The state-machine creation
+path also requires durable per-shard publication outbox enqueue. Outbox reads
+require exact batches/order, not missing-as-empty fallback. Cleanup has bounded
+ticks, persistent traversal progress and fairness across scopes. These remain
+required distributed/public integration work; a local owner scan or standalone
+metadata reducer cannot substitute for catalog publication, acknowledgement,
+repair and cleaner behavior. No catalog artifact/contract has been selected yet.

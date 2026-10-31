@@ -144,3 +144,32 @@ fn credit_public_reply_never_visits_incomplete_corrupt_or_limited_frames() -> Te
     }
     Ok(())
 }
+
+#[test]
+fn credit_public_reply_prepays_projection_at_exact_owned_and_work_boundaries() -> TestResult {
+    let raw = encoded(D::Rejected(R::NotFound))?;
+    // The independent13-byte reply needs2048 logical decode bytes and4200
+    // work units. The public view additionally reserves1024 of each first.
+    let decoder = CreditLimits::new(1, 1, 2048, 4200)?;
+    assert!(wf_ports::log::decode_credit_reply(&raw, decoder, 1024, 2048).is_ok());
+    for (owned, work, expected) in [
+        (3071, 5224, Some(CodecError::OwnedLimit)),
+        (3072, 5223, Some(CodecError::WorkLimit)),
+        (3072, 5224, None),
+    ] {
+        let mut visits = 0;
+        let result = with_public_credit_reply(
+            &raw,
+            CreditLimits::new(1, 1, owned, work)?,
+            1024,
+            16_384,
+            |view| {
+                assert!(matches!(view, CreditReplyView::Rejected(R::NotFound)));
+                visits += 1;
+            },
+        );
+        assert_eq!(result.err(), expected);
+        assert_eq!(visits, usize::from(expected.is_none()));
+    }
+    Ok(())
+}

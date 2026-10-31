@@ -1,4 +1,4 @@
-//! Explicit credit protocol contracts; rejecting until complete implementation.
+//! Canonical private identified-credit requests, replies and public projections.
 
 use super::{CodecError, CodecLimits, PreparedBytes};
 use wf_domain::governance::credit::{CreditLimits, CreditOwner};
@@ -22,6 +22,17 @@ mod view;
 /// Restores one complete original reply and visits only its public fields.
 /// The visitor's iteration, copies and allocation are external work. Borrowed
 /// reply data cannot escape the callback; no current owner read is performed.
+///
+/// ```compile_fail
+/// use wf_domain::governance::{credit::CreditLimits, view::CreditReplyView};
+/// use wf_ports::log::with_public_credit_reply;
+/// let escaped = with_public_credit_reply(&[], CreditLimits::default(), 1024, 8192, |view| {
+///     match view {
+///         CreditReplyView::Owner(owner) => Some(owner.scope),
+///         _ => None,
+///     }
+/// });
+/// ```
 /// # Errors
 /// Refuses malformed, unsupported or limited replies before calling the visitor.
 pub fn with_public_credit_reply<R>(

@@ -231,3 +231,31 @@ fn credit_unknown_mapping_excludes_known_failures_and_non_spend_operations() -> 
     }
     Ok(())
 }
+
+#[test]
+fn credit_unknown_known_abort_does_not_request_reservation_compensation() -> TestResult {
+    let ids = vec![b"original:1".to_vec(), b"original:2".to_vec()];
+    let frame = f::frame(
+        b"known-abort",
+        1001,
+        None,
+        Mutation::Spend {
+            shard_id: 2,
+            lease_epoch: 1,
+            amount: 2,
+            ttl_ms: None,
+            reservation_ids: &ids,
+        },
+    )?;
+    let original = prepare_credit_request(
+        frame.as_bytes(),
+        common::driver_limits().codec,
+        16 * common::MIB,
+    )?;
+    assert!(
+        CreditTransactionError::State(StateTransactionError::KnownAborted)
+            .unknown_spend(&original)
+            .is_none()
+    );
+    Ok(())
+}

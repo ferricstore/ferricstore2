@@ -1,7 +1,10 @@
 //! Borrowed public credit data; views establish no durable or current authority.
 
-use super::credit::{CreditError, CreditLeaseData};
-use super::identified::{IdentifiedCreditRejection, IdentifiedCreditReply};
+use super::credit::{CreditError, CreditLeaseData, CreditOwner};
+use super::identified::{
+    IdentifiedCreditDecision as D, IdentifiedCreditRejection, IdentifiedCreditReply,
+};
+use crate::workflow::control::PreparedDigest;
 use std::fmt::{self, Write};
 
 /// Unpadded base64url representation of one captured 32-byte fingerprint.
@@ -9,6 +12,28 @@ use std::fmt::{self, Write};
 pub struct CreditPolicyVersionHash([u8; 43]);
 
 impl CreditPolicyVersionHash {
+    fn from_digest(digest: PreparedDigest) -> Self {
+        const ALPHABET: &[u8; 64] =
+            b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        let input = digest.as_bytes();
+        let mut output = [0; 43];
+        for (chunk, encoded) in input[..30]
+            .as_chunks::<3>()
+            .0
+            .iter()
+            .zip(output[..40].as_chunks_mut::<4>().0)
+        {
+            encoded[0] = ALPHABET[usize::from(chunk[0] >> 2)];
+            encoded[1] = ALPHABET[usize::from(((chunk[0] & 3) << 4) | (chunk[1] >> 4))];
+            encoded[2] = ALPHABET[usize::from(((chunk[1] & 15) << 2) | (chunk[2] >> 6))];
+            encoded[3] = ALPHABET[usize::from(chunk[2] & 63)];
+        }
+        output[40] = ALPHABET[usize::from(input[30] >> 2)];
+        output[41] = ALPHABET[usize::from(((input[30] & 3) << 4) | (input[31] >> 4))];
+        output[42] = ALPHABET[usize::from((input[31] & 15) << 2)];
+        Self(output)
+    }
+
     /// Borrows the exact43 ASCII bytes, without allocating a string.
     #[must_use]
     pub const fn as_bytes(&self) -> &[u8; 43] {
@@ -110,6 +135,21 @@ impl CreditOwnerView<'_> {
     }
 }
 
+fn owner_view(owner: &CreditOwner) -> CreditOwnerView<'_> {
+    let data = owner.view();
+    CreditOwnerView {
+        scope: &data.scope,
+        limit: data.limit,
+        free: data.free,
+        epoch: data.epoch,
+        config_version: data.config_version,
+        policy_version_hash: data
+            .policy_fingerprint
+            .map(CreditPolicyVersionHash::from_digest),
+        leases: &data.leases,
+    }
+}
+
 /// Public source reply shapes, borrowing only the decoded original reply.
 pub enum CreditReplyView<'a> {
     /// Successful lease or renewal, with public owner and selected lease.
@@ -146,9 +186,49 @@ pub enum CreditReplyView<'a> {
 /// # Errors
 /// Refuses inconsistent decision/owner/ID response shapes.
 pub fn project_credit_reply(
-    _reply: &IdentifiedCreditReply,
+    reply: &IdentifiedCreditReply,
 ) -> Result<CreditReplyView<'_>, CreditError> {
-    Err(CreditError::InvalidState)
+    if matches!(reply.decision, D::Spent { .. }) == reply.reservation_ids.is_empty()
+        || reply.reservation_ids.len() > 1000
+    {
+        return Err(CreditError::InvalidState);
+    }
+    match reply.decision {
+        D::Granted { shard_id } | D::Spent { shard_id } | D::Renewed { shard_id } => {
+            let owner = reply.owner.as_ref().ok_or(CreditError::InvalidState)?;
+            let lease = CreditLeaseView::from_lease(
+                owner.lease(shard_id).ok_or(CreditError::InvalidState)?,
+            );
+            let owner = owner_view(owner);
+            Ok(if matches!(reply.decision, D::Spent { .. }) {
+                CreditReplyView::Spent {
+                    owner,
+                    lease,
+                    reservation_ids: &reply.reservation_ids,
+                }
+            } else {
+                CreditReplyView::Lease { owner, lease }
+            })
+        }
+        D::Owner | D::Released => Ok(CreditReplyView::Owner(owner_view(
+            reply.owner.as_ref().ok_or(CreditError::InvalidState)?,
+        ))),
+        D::Cleaned { deleted, pending } => {
+            let owner = reply
+                .owner
+                .as_ref()
+                .ok_or(CreditError::InvalidState)?
+                .view();
+            if deleted > 256 || (owner.cleanup_head <= owner.cleanup_tail) != pending {
+                return Err(CreditError::InvalidState);
+            }
+            Ok(CreditReplyView::Cleaned { deleted, pending })
+        }
+        D::Rejected(IdentifiedCreditRejection::NotFound) if reply.owner.is_some() => {
+            Err(CreditError::InvalidState)
+        }
+        D::Rejected(reason) => Ok(CreditReplyView::Rejected(reason)),
+    }
 }
 
 /// Original context for compensating an uncertain spend, without commit proof.

@@ -2,6 +2,28 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
+Current increment: M2-CREDIT-VIEW1. Public credit reply projections now hide raw
+policy/cleanup/reservation metadata, preserve every source public owner/lease
+value, and borrow original scope/leases/IDs without another payload clone. The
+optional policy hash uses43 inline unpadded base64url bytes. A bounded callback
+fully restores the original private reply under fresh limits before projection;
+borrowed data cannot escape. Actual Uncertain Spend errors map to the verified
+original scope/shard/IDs and source compensation code/message. KnownAborted and
+all non-Spend/other error diagnoses are excluded. This is response mapping, not
+the public retained-gate/ID-generation parent or cache/catalog service.
+
+Eight genuine compiled failures were saved at f696afb before implementation;
+their test bodies remain exact (two files only append post-body controls).
+Focused validation passes263 distinct affected cases:23 domain,9 ports and231
+storage (230 in the complete target run plus one appended known-abort case),54
+architecture cases,8 affected doctests and strict all-target Clippy for the
+three crates,fmt anddiff. Exact prepaid byte/work boundaries, no-escape/hidden
+field compile failures, real uncertain-commit fencing and complete old-or-new
+reopen, plus original public replies after release/replay are exercised. See
+/private/tmp/ferricstore2-credit-view-{r0,focused,supplement,source-audit}.json.
+No new source-case/native/Linux credit or main-checkout adoption. Continue the
+catalog publication/repair/cleaner and full public Claim/policy/outbox obligations.
+
 Current worktree: codex/identified-credit-solo, M2-IDENTIFIED-CREDIT1. The private
 stored credit path now implements complete verified requests, phased pure
 identified decisions, one atomic owner/ID/page/cleanup/outcome/control writer,
@@ -9,7 +31,8 @@ strict canonical reopen and real snapshots. Node explicitly selects immutable
 shard authority, audits full historical bodies and replays received/purged
 suffixes through that same writer. Generic old paths remain closed.
 
-All12 local gates pass on1868 frozen non-Markdown inputs/1279 Rust files:
+The last full all12 checkpoint, before M2-CREDIT-VIEW1, passed on1868 frozen
+non-Markdown inputs/1279 Rust files:
 1405 cases/115 executable targets (113 result targets plus2 benchmark correctness
 smokes),54 architecture cases,Python7 and6 doctests/15 targets. Every prior1368
 case and original1294 identity/status/multiplicity remains exact, with all114
