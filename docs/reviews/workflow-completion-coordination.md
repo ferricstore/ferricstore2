@@ -60028,3 +60028,86 @@ and deleted-anchor controls are additional. A missing mut binding was corrected
 before first execution; no original RED or native/profile/full-case claim.
 See /private/tmp/ferricstore2-catalog-source-focused.json. Save this source stage
 before creating the separately reviewed cleaner progress protocol.
+
+
+### M2-CREDIT-CATALOG1 durable progress selection (solo, before artifacts)
+
+Approve domain governance/catalog/progress.rs (CatalogProgressChange and
+CatalogProgressError), reexported by catalog.rs, plus explicit
+ClientIntent::governance_catalog_progress version15 in request.rs. The borrowed
+catalog and optional cursor each retain arbitrary binary content <=65535;
+None clears progress, Some(empty) remains distinct. No clock/I/O authority.
+
+Approve ports log/catalog_progress.rs with model.rs/request.rs children
+(PreparedCatalogProgressRequest and complete encode/prepare/intent/header/
+retained-summary functions), and state/governance_catalog/progress.rs
+(GovernanceCatalogProgress Missing/Cursor/Invalid, GovernanceCatalogProgressPort,
+encode_catalog_progress_cursor and borrowed inspect_catalog_progress_cursor).
+Select closed FWCP1 operation13/intent15 and fixed response13 FWPR1. Use SHA over
+original framed body, complete EOF/digest validation before ownership allocation,
+moved original header owners and borrowed cursor/catalog payloads. Metadata and
+one original donor cohort are prepaid; no per-cursor clone during preparation.
+Generic decoders remain closed and all older formats stay byte-identical.
+
+Select explicit GC2 instead of GC1 in the existing FWSS8 governance capability
+marker. GC2 includes membership and derived cleaner progress; old readers refuse
+it even when empty. Add catalog_progress to private ValueManifest and exact
+snapshot compatibility. Approve private ValueGenesisCapabilities and
+create_selected_profile in existing values/genesis.rs, preserving the old tuple
+wrapper/constructors and bytes. Approve RedbStateStore::create_governance_progress_database
+in governance_catalog/progress.rs: explicit optional credit shard count selects
+target-only or combined credit2+GC2 genesis in one Immediate commit. No upgrade
+of an existing authority or new physical table.
+
+Approve family19 progress key functions in existing key/governance_catalog.rs
+and physical decoder, binding group/recovery/tenant/catalog. Approve storage
+state/redb/governance_catalog/progress.rs with read.rs/write.rs children,
+require_catalog_progress/governance_catalog_profile, actual read port and one
+consumed Immediate writer; transaction/catalog_progress.rs with driver.rs
+(CatalogProgressTransactionError/apply_catalog_progress_transaction). Join set/
+clear, original response and identical control. Retained retry cannot reset a
+subsequently advanced cursor. Fresh, replay, conflict, expiry and log replay use
+the existing exact retained/control gate. Capability is mandatory for receipt-
+only state after clear. Every-step rollback, uncertainty/fencing, canonical
+reopen, bounded reads and snapshot binding remain required.
+
+Progress is a DERIVED traversal hint, never lease/eligibility/workflow truth.
+Select stored FWPC1+u32 cursor length+original cursor for valid rows. Malformed
+hint payloads classify Invalid without allocating their payload or deleting
+anything; current read/resource bounds still apply to actual bytes. Canonical
+recovery/snapshots preserve such hint bytes, while malformed keys/scopes and
+all authoritative owner/control/outcome corruption still fence as before.
+Only a later committed clear resets an invalid hint and must consume cleaner
+budget. This explicit recoverable-hint policy preserves native corrupt-progress
+reset semantics without unlogged repair or weakening authoritative credit data.
+The separate native malformed-owner fairness migration remains unresolved.
+
+Approve Node recovery/catalog_progress.rs and private Progress variant/explicit
+with_governance_catalog_progress selector in existing catalog_membership.rs;
+require actual GC2 and reject GC2 under older selection, including empty state.
+Audit complete historical bodies and replay through normal/snapshot paths using
+the same writer. Extend join/replay and retained validation narrowly for15/13.
+No accepted Raft/production service is manufactured by these adapters.
+
+Approve tests ports credit_codec/catalog_progress.rs; storage state_store/
+governance_catalog/progress.rs with fixtures.rs/faults.rs children; Node
+snapshot_recovery/catalog_progress.rs with fixtures.rs child (ProgressFixture,
+ProgressFault). Named tests cover exact codecs, capability/refusal/empty profiles,
+actual set/clear/retry/conflict, invalid-hint retention and committed reset,
+rollback/uncertainty, historical corruption and purged/received snapshot suffixes.
+Add narrow pure-codec port classification/negative fixtures in existing
+architecture tests. Save actual rejecting phases before semantic bodies; source
+scenario additions already executed at69c5821 have no new RED claim. All source
+files obey400/600, functions100, nesting4 and complexity25, with no exemptions.
+The full cleaner scheduler/public parents remain required successors.
+
+Progress predecessor RED is genuine: three ports cases compile/fail at domain
+validation or healthy UnsupportedVersion; two actual storage cases compile/fail
+at new GC2 genesis UnsupportedPolicyProfile while the existing GC1 refusal/
+whole-table nonmutation control passes. The new neutral log-codec classification
+case fails at std::fs acceptance. Later writer/retry/snapshot assertions remain
+masked and receive no original execution/TDD claim. Fixture visibility/mutability
+and mixed-width defaults hashing compile issues were corrected before semantic
+storage execution; use each field's actual byte width. Save this exact cohort
+before domain/codec/genesis bodies. See catalog-progress-r0-{ports,storage,
+architecture}.log. No full/native/Linux/source parity claim follows.

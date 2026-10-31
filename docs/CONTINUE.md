@@ -2,7 +2,27 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current batch: M2-CREDIT-CATALOG1, still unfinished. Bounded global collection
+Current batch: M2-CREDIT-CATALOG1, still unfinished.
+
+Active continuation: source scenarios are committed at69c5821. Three actual
+stored cases pass (original300-member top5, actual earlier insertion, deleted
+cursor), with strict Node Clippy/Python7/progress checks. Checked accounting is
+137/151/653, retaining all older links/runtime IDs; these are after-body
+counterparts without native/profile/full-case credit. The last complete all12
+workspace checkpoint below remains0cdca94.
+
+A durable cleaner progress protocol is now concretely selected in ADR007 and
+the coordination review: explicit GC2, derived family19 hint, private operation13/
+intent15/response13, atomic retained/control publication, complete recovery and
+snapshot binding. The current rejecting predecessor has genuine RED (ports3,
+storage2 with old-capability control passing, architecture1). Implement its
+selected domain/codec/genesis/read bodies, expose/save real writer RED, then the
+consumed writer and Node historical/snapshot integration. Preserve the derived
+invalid-hint reset policy and strict authoritative-owner fencing. Full cleaner
+scheduling/public parents remain successors. Do not report this unfinished
+candidate as the complete all12 passing tree.
+
+Previous collection/repair checkpoint:  Bounded global collection
 now traverses every original anchored page, propagates loader errors, preserves
 source tie order and moves only the top results plus one candidate. Explicit
 keys bypass catalog traversal. The result exposes original values through

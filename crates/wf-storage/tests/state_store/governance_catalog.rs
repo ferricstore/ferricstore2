@@ -10,6 +10,7 @@ use wf_storage::transaction::{
 
 mod fixtures;
 mod limits;
+mod progress;
 use fixtures as f;
 
 #[test]

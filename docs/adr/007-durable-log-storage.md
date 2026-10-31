@@ -1324,3 +1324,22 @@ must stop a dependent public mutation. The same single encoded member owner is
 borrowed for point lookup and any registration. No schema upgrade, direct write
 API or accepted-consensus claim follows. Complete public credit parents and the
 durable cleaner progress/fairness protocol remain successors.
+
+
+Selected cleaner progress is an explicit GC2 capability in the existing FWSS8
+marker, retaining GC1 bytes/constructors. Family19 binds one derived cursor to
+its group/recovery/tenant/catalog. None clears its row; empty binary cursors are
+valid distinct values. Closed private operation13/intent15/response13 joins the
+set/clear, original retained outcome and applied control in one Immediate commit.
+Original retries do not overwrite newer progress. Actual capability and snapshot
+compatibility are required even for empty and receipt-only authorities.
+
+Cursor payloads are nonauthoritative hints. Valid rows use FWPC1 and a bounded
+length-prefixed cursor. Invalid hint bodies remain stored/snapshotted unchanged
+and read as Invalid within real R/C/step bounds; only a committed reset may
+remove them. This preserves restartable native progress and command accounting.
+Malformed keys/namespaces and authoritative owner/control/outcome data retain
+the existing strict fencing policy. Cursor hints never authorize credit deletion:
+cleanup must revalidate actual owner/epoch/ID state through committed apply.
+The native malformed-owner fairness disposition, full cleaner/public scheduler,
+accepted consensus and platform/source acceptance remain separate requirements.

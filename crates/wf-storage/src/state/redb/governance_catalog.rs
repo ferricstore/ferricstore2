@@ -9,6 +9,7 @@ use wf_ports::{
 use wf_types::identity::{GroupId, RecoveryId};
 
 mod port;
+pub(in crate::state::redb) mod progress;
 mod read;
 mod write;
 pub(crate) use write::apply as commit;

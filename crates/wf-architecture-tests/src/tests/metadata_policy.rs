@@ -274,3 +274,34 @@ fn catalog_collection_read_contracts_stay_pure_and_application_uses_only_ports()
     }
     Ok(())
 }
+
+#[test]
+fn catalog_progress_codec_and_observations_remain_pure() -> CheckResult<()> {
+    for module in [
+        "log::catalog_progress",
+        "log::catalog_progress::model",
+        "log::catalog_progress::request",
+        "state::governance_catalog::progress",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                module,
+                "use std::vec::Vec; use wf_domain::governance::catalog::CatalogProgressChange;"
+            )?,
+            Vec::<String>::new()
+        );
+        for source in [
+            "use std::fs;",
+            "use std::env;",
+            "pub async fn hidden() {}",
+            "static GLOBAL: u64 = 0;",
+        ] {
+            assert!(
+                !source_check("wf-ports", module, source)?.is_empty(),
+                "{module}: {source}"
+            );
+        }
+    }
+    Ok(())
+}

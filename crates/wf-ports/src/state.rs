@@ -24,8 +24,9 @@ pub use credit_catalog::{
     EncodedCreditCatalogMembers, decode_credit_catalog_member, encode_credit_catalog_members,
 };
 pub use governance_catalog::{
-    GovernanceCatalogPage, GovernanceCatalogRead, GovernanceCatalogReadLimits,
-    GovernanceCatalogReadPort, LoadedGovernanceRecord,
+    GovernanceCatalogPage, GovernanceCatalogProgress, GovernanceCatalogProgressPort,
+    GovernanceCatalogRead, GovernanceCatalogReadLimits, GovernanceCatalogReadPort,
+    LoadedGovernanceRecord, encode_catalog_progress_cursor, inspect_catalog_progress_cursor,
 };
 pub use history::{
     StoredWorkflowHistoryRow, StoredWorkflowHistorySnapshot, WorkflowHistoryDirection,

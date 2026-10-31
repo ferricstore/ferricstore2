@@ -2,7 +2,12 @@
 
 use wf_domain::workflow::request::RequestScope;
 
+mod progress;
 mod reader;
+pub use progress::{
+    GovernanceCatalogProgress, GovernanceCatalogProgressPort, encode_catalog_progress_cursor,
+    inspect_catalog_progress_cursor,
+};
 pub use reader::{GovernanceCatalogReadLimits, GovernanceCatalogReadPort, LoadedGovernanceRecord};
 
 /// One exact namespace/catalog traversal request.

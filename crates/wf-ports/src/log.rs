@@ -12,10 +12,16 @@ use crate::consensus::{PreparedOperation, PreparedRequest};
 
 mod catalog_ack;
 mod catalog_membership;
+mod catalog_progress;
 pub use catalog_membership::{
     PreparedCatalogMembershipRequest, catalog_membership_recovery_header,
     catalog_membership_request_intent, catalog_membership_retained_summary,
     encode_catalog_membership_request, prepare_catalog_membership_request,
+};
+pub use catalog_progress::{
+    PreparedCatalogProgressRequest, catalog_progress_recovery_header,
+    catalog_progress_request_intent, catalog_progress_retained_summary,
+    encode_catalog_progress_request, prepare_catalog_progress_request,
 };
 mod claim;
 pub use catalog_ack::{
