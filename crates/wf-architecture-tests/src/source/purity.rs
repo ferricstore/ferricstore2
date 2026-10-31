@@ -222,6 +222,7 @@ impl Inspector<'_, '_> {
             "log::control",
             "log::common",
             "log::catalog_progress",
+            "log::catalog_prune",
             "state::control",
             "state::credit_catalog",
             "state::governance_catalog",

@@ -47,14 +47,25 @@ pub fn catalog_prune_recovery_header(
     encoded: &[u8],
     limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), E> {
-    let _ = (encoded, limits);
-    Err(E::UnsupportedVersion)
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    let header = request::header(&mut super::reader::Reader::new(encoded, limits))?;
+    Ok((
+        16,
+        [header.tenant, header.group, header.recovery],
+        header.stamp,
+    ))
 }
 /// Encodes the fixed original conditional-prune result without allocation.
 #[must_use]
 pub fn encode_catalog_prune_reply(reply: CatalogPruneReply) -> [u8; 7] {
-    let _ = reply;
-    [0; 7]
+    let tag = match reply {
+        CatalogPruneReply::Removed => 0,
+        CatalogPruneReply::Missing => 1,
+        CatalogPruneReply::Changed => 2,
+    };
+    [b'F', b'W', b'X', b'R', 0, 1, tag]
 }
 /// Fully verifies the selected original private reply.
 /// # Errors
@@ -65,6 +76,19 @@ pub fn catalog_prune_retained_summary(
     response: &[u8],
     admission: AdmissionLimits,
 ) -> Result<CatalogPruneReply, E> {
-    let _ = (intent, version, response, admission);
-    Err(E::UnsupportedVersion)
+    if intent.version() != 16 || version != 14 {
+        return Err(E::UnsupportedVersion);
+    }
+    if response.len() > admission.decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    if response.len() != 7 || response.get(..6) != Some(b"FWXR\0\x01") {
+        return Err(E::Malformed);
+    }
+    match response[6] {
+        0 => Ok(CatalogPruneReply::Removed),
+        1 => Ok(CatalogPruneReply::Missing),
+        2 => Ok(CatalogPruneReply::Changed),
+        _ => Err(E::UnsupportedTag),
+    }
 }

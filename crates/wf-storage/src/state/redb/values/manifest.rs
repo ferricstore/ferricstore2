@@ -24,6 +24,7 @@ pub(crate) struct ValueManifest {
     pub(crate) credit_catalog: bool,
     pub(crate) governance_catalog: bool,
     pub(crate) catalog_progress: bool,
+    pub(crate) catalog_prune: bool,
 }
 
 pub(crate) fn read(tx: &RedbStateTransaction<'_>) -> Result<ValueManifest, Error> {
@@ -107,18 +108,20 @@ pub(crate) fn parse(
         }
         _ => return Err(Error::Corrupt),
     };
-    let (governance_catalog, catalog_progress) = if bytes.len().checked_sub(at) == Some(36) {
-        if layout != 8 || alias_format != 2 {
-            return Err(Error::Corrupt);
-        }
-        match value::take(bytes, &mut at, 4).map_err(value_error)? {
-            b"GC\0\x01" => (true, false),
-            b"GC\0\x02" => (true, true),
-            _ => return Err(Error::Corrupt),
-        }
-    } else {
-        (false, false)
-    };
+    let (governance_catalog, catalog_progress, catalog_prune) =
+        if bytes.len().checked_sub(at) == Some(36) {
+            if layout != 8 || alias_format != 2 {
+                return Err(Error::Corrupt);
+            }
+            match value::take(bytes, &mut at, 4).map_err(value_error)? {
+                b"GC\0\x01" => (true, false, false),
+                b"GC\0\x02" => (true, true, false),
+                b"GC\0\x03" => (true, true, true),
+                _ => return Err(Error::Corrupt),
+            }
+        } else {
+            (false, false, false)
+        };
     let checksum = Sha256::digest(&bytes[..at]);
     if value::take(bytes, &mut at, 32).map_err(value_error)? != checksum.as_slice() {
         return Err(Error::Corrupt);
@@ -139,6 +142,7 @@ pub(crate) fn parse(
         credit_catalog,
         governance_catalog,
         catalog_progress,
+        catalog_prune,
     })
 }
 
@@ -189,7 +193,9 @@ pub(crate) fn encode(
         bytes.extend_from_slice(&count.to_be_bytes());
     }
     if manifest.governance_catalog {
-        bytes.extend_from_slice(if manifest.catalog_progress {
+        bytes.extend_from_slice(if manifest.catalog_prune {
+            b"GC\0\x03"
+        } else if manifest.catalog_progress {
             b"GC\0\x02"
         } else {
             b"GC\0\x01"
@@ -225,6 +231,9 @@ fn encoded_size(
     group: &GroupId,
     recovery: &RecoveryId,
 ) -> Result<usize, Error> {
+    if manifest.catalog_prune && !manifest.catalog_progress {
+        return Err(Error::InvalidChanges);
+    }
     if manifest.catalog_progress && !manifest.governance_catalog {
         return Err(Error::InvalidChanges);
     }

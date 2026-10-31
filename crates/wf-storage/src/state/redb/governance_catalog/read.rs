@@ -8,7 +8,8 @@ use super::{E, require, validate_row};
 use crate::state::key;
 use redb::ReadableTable;
 use std::ops::Bound;
-use wf_domain::workflow::request::RequestScope;
+use wf_domain::workflow::{control::ControlState, request::RequestScope};
+use wf_ports::state::GroupApplyTransaction;
 use wf_ports::state::{GovernanceCatalogPage, GovernanceCatalogRead};
 
 pub(super) fn key(
@@ -35,6 +36,7 @@ pub(super) fn contains(
     tx: &RedbStateTransaction<'_>,
     table: &impl ReadableTable<&'static [u8], &'static [u8]>,
     key: &[u8],
+    control: Option<ControlState>,
 ) -> Result<bool, E> {
     tx.step()?;
     let Some(value) = table.get(key).map_err(|e| storage_error(&e))? else {
@@ -42,17 +44,29 @@ pub(super) fn contains(
     };
     tx.recovery_row(key, value.value())?;
     tx.admit_read(total(64, [value.value().len()])?)?;
-    validate_row(value.value())?;
+    validate_row(value.value(), control)?;
     Ok(true)
 }
 pub(super) fn page(
     tx: &RedbStateTransaction<'_>,
     request: GovernanceCatalogRead<'_>,
 ) -> Result<GovernanceCatalogPage, E> {
+    page_revision(tx, request, false).map(|observed| observed.page)
+}
+pub(super) fn page_revision(
+    tx: &RedbStateTransaction<'_>,
+    request: GovernanceCatalogRead<'_>,
+    prune: bool,
+) -> Result<wf_ports::state::GovernanceCatalogPrunePage, E> {
     if !(1..=256).contains(&request.limit) {
         return Err(E::InvalidChanges);
     }
-    require(tx, request.scope)?;
+    let revisions = require(tx, request.scope)?;
+    if prune && !revisions {
+        return Err(E::UnsupportedPolicyProfile);
+    }
+    let control = if revisions { Some(tx.control()?) } else { None };
+    let mut revision = None;
     let prefix = key(tx, request.scope, request.catalog, None)?;
     let cursor = request
         .cursor
@@ -61,7 +75,7 @@ pub(super) fn page(
     tx.step()?;
     let table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
     if let Some(cursor) = &cursor
-        && !contains(tx, &table, cursor)?
+        && !contains(tx, &table, cursor, control)?
     {
         return Err(E::CatalogChanged);
     }
@@ -95,7 +109,7 @@ pub(super) fn page(
             break;
         }
         tx.recovery_row(physical.value(), value.value())?;
-        validate_row(value.value())?;
+        revision = validate_row(value.value(), control)?;
         let cap = total(256, [physical.value().len()])?;
         tx.temporary(cap)?;
         let decoded = key::decode_state_key(
@@ -115,8 +129,11 @@ pub(super) fn page(
         tx.admit_read(total(24, [decoded.part(4).len()])?)?;
         members.push(copy_bytes(decoded.part(4))?);
     }
-    Ok(GovernanceCatalogPage {
-        full: members.len() == count,
-        members,
+    Ok(wf_ports::state::GovernanceCatalogPrunePage {
+        page: GovernanceCatalogPage {
+            full: members.len() == count,
+            members,
+        },
+        revision,
     })
 }

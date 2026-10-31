@@ -21,6 +21,7 @@ pub(in crate::state::redb) struct ValueGenesisCapabilities {
     pub(in crate::state::redb) credit_catalog: bool,
     pub(in crate::state::redb) governance_catalog: bool,
     pub(in crate::state::redb) catalog_progress: bool,
+    pub(in crate::state::redb) catalog_prune: bool,
 }
 
 pub(super) fn create(
@@ -65,6 +66,7 @@ pub(in crate::state::redb) fn create_profile(
             credit_catalog: capability.2,
             governance_catalog: capability.3,
             catalog_progress: false,
+            catalog_prune: false,
         },
     )
 }
@@ -78,6 +80,9 @@ pub(in crate::state::redb) fn create_selected_profile(
     limits: StateStoreLimits,
     capability: ValueGenesisCapabilities,
 ) -> Result<RedbStateStore, Error> {
+    if capability.catalog_prune && !capability.catalog_progress {
+        return Err(Error::InvalidChanges);
+    }
     if capability.catalog_progress && !capability.governance_catalog {
         return Err(Error::InvalidChanges);
     }
@@ -113,7 +118,9 @@ pub(in crate::state::redb) fn create_selected_profile(
     )?;
     let store = RedbStateStore::unvalidated(database, group, recovery, limits);
     initialize(&store, &genesis, defaults, scratch, capability)?;
-    store.catalog_profile.set(if capability.catalog_progress {
+    store.catalog_profile.set(if capability.catalog_prune {
+        3
+    } else if capability.catalog_progress {
         2
     } else {
         u16::from(capability.governance_catalog)
@@ -167,6 +174,7 @@ fn initialize(
         credit_catalog: capability.credit_catalog,
         governance_catalog: capability.governance_catalog,
         catalog_progress: capability.catalog_progress,
+        catalog_prune: capability.catalog_prune,
         policy: CurrentPolicyManifest {
             initial_time: genesis.initial_time,
             placements: u64::try_from(genesis.placements.len()).map_err(|_| Error::Limit)?,

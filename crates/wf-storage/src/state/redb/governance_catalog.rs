@@ -2,10 +2,13 @@
 
 use super::{RedbStateStore, RedbStateTransaction, StateStoreGenesis, StateStoreLimits};
 use wf_domain::workflow::request::RequestScope;
-mod prune;
+pub(in crate::state::redb) mod prune;
 use wf_ports::{
     consensus::WorkflowValueDefaults,
-    state::{GovernanceCatalogPage, GovernanceCatalogRead, StateTransactionError as E},
+    state::{
+        GovernanceCatalogPage, GovernanceCatalogRead, GroupApplyTransaction,
+        StateTransactionError as E,
+    },
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
@@ -16,11 +19,11 @@ mod read;
 mod write;
 pub(crate) use write::apply as commit;
 
-pub(crate) fn require(tx: &RedbStateTransaction<'_>, scope: &RequestScope) -> Result<(), E> {
+pub(crate) fn require(tx: &RedbStateTransaction<'_>, scope: &RequestScope) -> Result<bool, E> {
     if scope.group() != tx.group || scope.recovery() != tx.recovery {
         return Err(E::NamespaceConflict);
     }
-    tx.require_governance_catalog()
+    tx.catalog_revisions()
 }
 
 impl RedbStateTransaction<'_> {
@@ -28,22 +31,39 @@ impl RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses unsupported profiles, corruption or continuous admission.
     pub fn require_governance_catalog(&self) -> Result<(), E> {
+        self.catalog_revisions().map(|_| ())
+    }
+    fn catalog_revisions(&self) -> Result<bool, E> {
         self.checked(|| {
             if self.layout != 8 {
                 return Err(E::UnsupportedPolicyProfile);
             }
             self.admit_read(512)?;
-            if !self.value_manifest()?.governance_catalog {
+            let manifest = self.value_manifest()?;
+            if !manifest.governance_catalog {
                 return Err(E::UnsupportedPolicyProfile);
             }
-            Ok(())
+            Ok(manifest.catalog_prune)
         })
     }
 }
 
-pub(crate) fn validate_row(value: &[u8]) -> Result<(), E> {
-    if value == b"FWGM\0\x01" {
-        Ok(())
+pub(crate) fn validate_row(
+    value: &[u8],
+    control: Option<wf_domain::workflow::control::ControlState>,
+) -> Result<Option<wf_domain::workflow::control::EntryIdentity>, E> {
+    if let Some(control) = control {
+        let revision =
+            wf_ports::state::inspect_catalog_member_revision(value).map_err(|_| E::Corrupt)?;
+        let current = control.last_entry().ok_or(E::Corrupt)?;
+        if revision.log().index() > current.log().index()
+            || (revision.log().index() == current.log().index() && revision != current)
+        {
+            return Err(E::Corrupt);
+        }
+        Ok(Some(revision))
+    } else if value == b"FWGM\0\x01" {
+        Ok(None)
     } else {
         Err(E::Corrupt)
     }
@@ -132,14 +152,15 @@ impl RedbStateStore {
             self.limits.maximum_temporary_bytes(),
         )?;
         tx.checked(|| {
-            require(&tx, scope)?;
+            let revisions = require(&tx, scope)?;
+            let control = if revisions { Some(tx.control()?) } else { None };
             let key = read::key(&tx, scope, catalog, Some(member))?;
             tx.step()?;
             let table = tx
                 .write
                 .open_table(tx.rows_table)
                 .map_err(super::admission::table_error)?;
-            read::contains(&tx, &table, &key)
+            read::contains(&tx, &table, &key, control)
         })
     }
 }

@@ -37,7 +37,7 @@ fn publish(
     outcome: Option<&RetainedOutcome>,
 ) -> Result<(), E> {
     tx.ready()?;
-    require(&tx, scope)?;
+    let revisions = require(&tx, scope)?;
     if tx.control()? != expected {
         return Err(E::KnownAborted);
     }
@@ -50,7 +50,13 @@ fn publish(
     if let Some(command) = command {
         let outcome = outcome.ok_or(E::InvalidChanges)?;
         validate(scope, control, command, outcome)?;
-        effects(&tx, scope, command)?;
+        effects(
+            &tx,
+            scope,
+            command,
+            control.next().last_entry().ok_or(E::InvalidChanges)?,
+            revisions.then_some(expected),
+        )?;
         commit::write_outcome(&tx, scope, outcome)?;
     } else if outcome.is_some() {
         return Err(E::InvalidChanges);
@@ -81,16 +87,30 @@ fn validate(
     }
     Ok(())
 }
-fn effects(tx: &RedbStateTransaction<'_>, scope: &RequestScope, command: C<'_>) -> Result<(), E> {
+fn effects(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    command: C<'_>,
+    identity: EntryIdentity,
+    revision_control: Option<ControlState>,
+) -> Result<(), E> {
     for member in command.unique_members() {
         let key = read::key(tx, scope, command.catalog, Some(member))?;
         tx.step()?;
         let mut table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
-        let exists = read::contains(tx, &table, &key)?;
+        let exists = read::contains(tx, &table, &key, revision_control)?;
         match command.action {
-            A::Register if !exists => {
+            A::Register if !exists || revision_control.is_some() => {
                 drop(table);
-                publication::put(tx, &key, b"FWGM\0\x01")?;
+                if revision_control.is_some() {
+                    publication::put(
+                        tx,
+                        &key,
+                        &wf_ports::state::encode_catalog_member_revision(identity),
+                    )?;
+                } else {
+                    publication::put(tx, &key, b"FWGM\0\x01")?;
+                }
             }
             A::Unregister if exists => {
                 tx.step()?;

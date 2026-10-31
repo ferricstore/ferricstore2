@@ -139,12 +139,8 @@ pub(super) fn cohort_profiled(
     if let Some(bytes) = member {
         super::membership::validate_value(tx, bytes.value(), control)?;
     }
-    let (actual_placements, actual_policies, hash) = validate_rows(
-        tx,
-        control.last_entry().is_some(),
-        (layout, manifest.value()),
-        charge,
-    )?;
+    let (actual_placements, actual_policies, hash) =
+        validate_rows(tx, control, (layout, manifest.value()), charge)?;
     if placements != actual_placements || policies != actual_policies || expected != hash {
         return Err(StateTransactionError::Corrupt);
     }
@@ -162,7 +158,9 @@ fn validate_values_profile(
     }
     let values = super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
     super::values::validate::cohort(tx, values.defaults, values.alias_format, layout)?;
-    Ok(if values.catalog_progress {
+    Ok(if values.catalog_prune {
+        3
+    } else if values.catalog_progress {
         2
     } else {
         u16::from(values.governance_catalog)
@@ -253,7 +251,7 @@ pub(super) fn check_manifest(
 
 fn validate_rows(
     tx: &RedbStateTransaction<'_>,
-    applied: bool,
+    control: wf_domain::workflow::control::ControlState,
     (layout, manifest): (u16, &[u8]),
     charge: &mut PolicySchemaCharge,
 ) -> Result<(u64, u64, [u8; 32]), StateTransactionError> {
@@ -272,6 +270,9 @@ fn validate_rows(
         && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.credit_catalog;
     let governance_catalog = layout == 8
         && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.governance_catalog;
+    let applied = control.last_entry().is_some();
+    let catalog_prune = layout == 8
+        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.catalog_prune;
     let catalog_progress = layout == 8
         && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.catalog_progress;
     let mut hash = Sha256::new();
@@ -312,7 +313,10 @@ fn validate_rows(
             if !governance_catalog {
                 return Err(StateTransactionError::Corrupt);
             }
-            super::governance_catalog::validate_row(value.value())?;
+            super::governance_catalog::validate_row(
+                value.value(),
+                catalog_prune.then_some(control),
+            )?;
         } else if matches!(decoded.family(), 16 | 17) {
             if !credit_catalog {
                 return Err(StateTransactionError::Corrupt);

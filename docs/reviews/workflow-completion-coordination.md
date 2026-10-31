@@ -60510,3 +60510,11 @@ fails because std::fs is still accepted for the new log path. Storage Box
 borrowing compile errors were corrected before this real semantic run. Later
 writer/replay/snapshot assertions remain masked and receive no independent RED
 credit. Save this exact interface/test cohort before selected semantic bodies.
+
+Selected domain/row/request/reply codec bodies pass all4 unchanged ports cases.
+Actual target-only/combined GC3 construction, coherent empty candidate, profile3
+and canonical reopen now pass; GC2 refusal/no-mutation remains passing. Actual
+membership creates FWGM2 revisions and rotates them on fresh duplicate register;
+those direct assertions pass before the two storage cases reach the deliberate
+State(UnsupportedPolicyProfile) prune driver. Save this genuine writer RED before
+consumed writer/outcome registries. No later no-op/retry assertion credit yet.

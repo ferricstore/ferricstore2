@@ -3,7 +3,7 @@ use super::{RedbStateStore, RedbStateTransaction};
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::{
     GovernanceCatalogPage, GovernanceCatalogRead, GovernanceCatalogReadLimits,
-    GovernanceCatalogReadPort, StateTransactionError as E,
+    GovernanceCatalogReadPort, GroupApplyTransaction, StateTransactionError as E,
 };
 
 impl GovernanceCatalogReadPort for RedbStateStore {
@@ -24,18 +24,19 @@ impl GovernanceCatalogReadPort for RedbStateStore {
     ) -> Result<bool, E> {
         let tx = guard(self, limits)?;
         tx.checked(|| {
-            super::require(&tx, scope)?;
+            let revisions = super::require(&tx, scope)?;
+            let control = if revisions { Some(tx.control()?) } else { None };
             let key = super::read::key(&tx, scope, catalog, Some(member))?;
             tx.step()?;
             let table = tx
                 .write
                 .open_table(tx.rows_table)
                 .map_err(super::super::admission::table_error)?;
-            super::read::contains(&tx, &table, &key)
+            super::read::contains(&tx, &table, &key, control)
         })
     }
 }
-fn guard(
+pub(super) fn guard(
     store: &RedbStateStore,
     limits: GovernanceCatalogReadLimits,
 ) -> Result<RedbStateTransaction<'_>, E> {

@@ -17,8 +17,11 @@ impl CatalogPruneRequest<'_> {
     /// # Errors
     /// Refuses oversized fields and an empty member.
     pub fn validate(self) -> Result<(), CatalogPruneError> {
-        let _ = self;
-        Err(CatalogPruneError)
+        if self.catalog.len() > 65535 || self.member.is_empty() || self.member.len() > 65535 {
+            Err(CatalogPruneError)
+        } else {
+            Ok(())
+        }
     }
 }
 /// Original accepted conditional-prune result, including known no-ops.

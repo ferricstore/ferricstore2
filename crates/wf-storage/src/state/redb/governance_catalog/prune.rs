@@ -7,7 +7,10 @@ impl super::RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses older or corrupt capabilities and admission failure.
     pub fn require_catalog_prune(&self) -> Result<(), E> {
-        Err(E::UnsupportedPolicyProfile)
+        if self.governance_catalog_profile()? != 3 {
+            return Err(E::UnsupportedPolicyProfile);
+        }
+        Ok(())
     }
 }
 impl wf_ports::state::GovernanceCatalogPruneReadPort for RedbStateStore {
@@ -16,8 +19,11 @@ impl wf_ports::state::GovernanceCatalogPruneReadPort for RedbStateStore {
         request: wf_ports::state::GovernanceCatalogRead<'_>,
         limits: wf_ports::state::GovernanceCatalogReadLimits,
     ) -> Result<wf_ports::state::GovernanceCatalogPrunePage, E> {
-        let _ = (request, limits);
-        Err(E::UnsupportedPolicyProfile)
+        if request.limit != 1 {
+            return Err(E::InvalidChanges);
+        }
+        let tx = super::port::guard(self, limits)?;
+        tx.checked(|| super::read::page_revision(&tx, request, true))
     }
 }
 impl RedbStateStore {
@@ -33,15 +39,21 @@ impl RedbStateStore {
         credit_shard_count: Option<u64>,
         limits: StateStoreLimits,
     ) -> Result<Self, E> {
-        let _ = (
+        super::super::values::genesis::create_selected_profile(
             database,
             group,
             recovery,
             genesis,
             defaults,
-            credit_shard_count,
             limits,
-        );
-        Err(E::UnsupportedPolicyProfile)
+            super::super::values::genesis::ValueGenesisCapabilities {
+                alias_format: 2,
+                credit_shard_count,
+                credit_catalog: credit_shard_count.is_some(),
+                governance_catalog: true,
+                catalog_progress: true,
+                catalog_prune: true,
+            },
+        )
     }
 }

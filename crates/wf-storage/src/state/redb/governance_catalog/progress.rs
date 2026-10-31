@@ -39,6 +39,7 @@ impl RedbStateStore {
                 credit_catalog: credit_shard_count.is_some(),
                 governance_catalog: true,
                 catalog_progress: true,
+                catalog_prune: false,
             },
         )
     }
@@ -48,7 +49,7 @@ impl RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses unsupported profiles, resources or corrupt authority.
     pub fn require_catalog_progress(&self) -> Result<(), E> {
-        if self.governance_catalog_profile()? != 2 {
+        if !matches!(self.governance_catalog_profile()?, 2 | 3) {
             return Err(E::UnsupportedPolicyProfile);
         }
         Ok(())
@@ -63,7 +64,9 @@ impl RedbStateTransaction<'_> {
             }
             self.admit_read(512)?;
             let manifest = self.value_manifest()?;
-            Ok(if manifest.catalog_progress {
+            Ok(if manifest.catalog_prune {
+                3
+            } else if manifest.catalog_progress {
                 2
             } else {
                 u16::from(manifest.governance_catalog)
