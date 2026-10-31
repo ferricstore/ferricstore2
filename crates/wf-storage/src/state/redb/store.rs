@@ -21,6 +21,8 @@ pub struct RedbStateStore {
 pub struct RedbStateTransaction<'s> {
     pub(super) write: redb::WriteTransaction,
     pub(super) layout: u16,
+    // Negative dispatch only; a positive capability still reads the manifest.
+    pub(super) catalog_profile: u16,
     pub(super) committed_layout: &'s Cell<u16>,
     pub(super) group: &'s GroupId,
     pub(super) recovery: &'s RecoveryId,
@@ -215,6 +217,7 @@ impl RedbStateStore {
         Ok(RedbStateTransaction {
             write,
             layout: self.layout.get(),
+            catalog_profile: self.catalog_profile.get(),
             committed_layout: &self.layout,
             group: &self.group,
             recovery: &self.recovery,

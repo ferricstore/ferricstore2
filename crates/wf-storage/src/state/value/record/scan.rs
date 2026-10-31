@@ -1,21 +1,18 @@
 //! One borrowed record pass shared by point inspection and legacy ownership.
 
 use wf_domain::history::EventKind;
-use wf_domain::lease::{Lease, LeaseToken};
 use wf_domain::workflow::MAX_EXACT_MILLIS;
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::indexed::OrderingMetadata;
 use wf_domain::workflow::request::RequestScope;
-use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
-use wf_ports::state::StoredWorkflowRecord;
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId, TenantId};
-use wf_types::version::{Fence, TimestampMillis};
+use wf_types::version::TimestampMillis;
 
 use super::super::{
-    StateValueError, add, copy, finish, flag, raw, read_u8, read_u64, read_u128, start,
-    start_versioned,
+    StateValueError, add, finish, flag, raw, read_u8, read_u64, read_u128, start, start_versioned,
 };
 use super::{RecordHistoryView, event_version};
+mod owned;
 
 /// Validated borrowed wire fields, without allocation or transaction authority.
 ///
@@ -85,69 +82,6 @@ impl<'input> ScannedWorkflowRecord<'input> {
     #[must_use]
     pub const fn owned_bytes(&self) -> usize {
         self.owned_bytes
-    }
-
-    /// Consumes parsed fields after admitting their complete logical owner size.
-    ///
-    /// # Errors
-    /// Rejects a zero/short owner cap, failed field allocation or typed restoration.
-    pub fn into_owned(
-        self,
-        maximum_owned_bytes: usize,
-    ) -> Result<StoredWorkflowRecord, StateValueError> {
-        if maximum_owned_bytes == 0 {
-            return Err(StateValueError::InvalidValue);
-        }
-        if self.owned_bytes > maximum_owned_bytes {
-            return Err(StateValueError::Limit {
-                bytes: self.owned_bytes,
-                maximum: maximum_owned_bytes,
-            });
-        }
-        let tenant =
-            TenantId::new(copy(self.tenant)?).map_err(|_| StateValueError::InvalidValue)?;
-        let partition =
-            PartitionId::new(copy(self.partition)?).map_err(|_| StateValueError::InvalidValue)?;
-        let lease = self
-            .lease
-            .map(|(worker, token, deadline)| {
-                Ok::<_, StateValueError>(Lease {
-                    worker: copy(worker)?,
-                    token: LeaseToken::new(copy(token)?)
-                        .map_err(|_| StateValueError::InvalidValue)?,
-                    deadline: TimestampMillis::new(deadline),
-                })
-            })
-            .transpose()?;
-        let record = restore_record(
-            WorkflowRecordData {
-                id: RecordId::new(copy(self.id)?).map_err(|_| StateValueError::InvalidValue)?,
-                workflow_type: copy(self.workflow_type)?,
-                state: copy(self.state)?,
-                version: self.version,
-                fence: Fence::new(self.fence),
-                attempts: self.attempts,
-                created_at: TimestampMillis::new(self.created),
-                updated_at: TimestampMillis::new(self.updated),
-                next_run_at: self.next.map(TimestampMillis::new),
-                run_state: self.run_state.map(copy).transpose()?,
-                lease,
-                payload: self.payload.map(copy).transpose()?,
-                result: self.result.map(copy).transpose()?,
-                error: self.error.map(copy).transpose()?,
-                latest_kind: self.latest.0,
-                latest_version: self.latest.1,
-                latest_fence: Fence::new(self.latest.2),
-            },
-            self.limits,
-        )
-        .map_err(|_| StateValueError::InvalidValue)?;
-        Ok(StoredWorkflowRecord {
-            tenant,
-            partition,
-            record,
-            ordering: self.ordering,
-        })
     }
 
     fn validate(&self, profiled: bool) -> Result<usize, StateValueError> {

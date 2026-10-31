@@ -1557,3 +1557,13 @@ claiming the production authorization or leader/read-barrier lifecycle.
 The immutable shared-frame type classification is scoped to this port; locks,
 atomic APIs and threads remain excluded from pure modules. Coupled governed
 Claim/policy/release outbox, runtime services and full acceptance remain open.
+
+The selected GC4 data extension keeps workflow reservation bindings outside the
+core WorkflowRecord and keys them by the full physical record identity. Queue
+meta/intents/sparse completions share its group/recovery/tenant namespace. The
+canonical recovery walker proves binding-to-record, complete contiguous queue
+and completion-to-intent closure, including received snapshots. Bounded reads
+return original intent byte owners with borrowed field inspection. Existing
+record publishers refuse bound records until atomic release admission/append
+is integrated; current governed Claim remains unsupported. See ADR-007 for the
+native formats and the distinction between these observations and authority.

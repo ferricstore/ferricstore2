@@ -252,3 +252,35 @@ pub(super) fn codec_error(error: wf_ports::log::CodecError) -> E {
         _ => E::Corrupt,
     }
 }
+
+pub(super) fn refuse_legacy_write(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    partition: &PartitionId,
+    id: &RecordId,
+) -> Result<(), E> {
+    require(tx, scope)?;
+    let key = tx.key(
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            partition.as_bytes(),
+            id.as_bytes(),
+        ],
+        0,
+        |cap| key::release::binding(scope, partition.as_bytes(), id.as_bytes(), cap),
+    )?;
+    tx.step()?;
+    let table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
+    if read(tx, &table, &key, |bytes| {
+        inspect_release_binding(bytes, bytes.len())
+            .map_err(codec_error)
+            .map(|_| ())
+    })?
+    .is_some()
+    {
+        return Err(E::UnsupportedPolicyProfile);
+    }
+    Ok(())
+}

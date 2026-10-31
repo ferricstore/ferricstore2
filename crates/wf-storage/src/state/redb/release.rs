@@ -58,6 +58,17 @@ impl RedbStateStore {
     }
 }
 impl RedbStateTransaction<'_> {
+    pub(super) fn refuse_legacy_governance_write(
+        &self,
+        scope: &wf_domain::workflow::request::RequestScope,
+        partition: &wf_types::identity::PartitionId,
+        id: &wf_types::identity::RecordId,
+    ) -> Result<(), E> {
+        if self.catalog_profile != 4 {
+            return Ok(());
+        }
+        read::refuse_legacy_write(self, scope, partition, id)
+    }
     /// Reads the original paid generation and record reservation under this guard.
     /// The observation grants no current spend or mutation authority.
     /// # Errors

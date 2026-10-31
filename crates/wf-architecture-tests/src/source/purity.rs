@@ -238,6 +238,7 @@ impl Inspector<'_, '_> {
             "state::control",
             "state::credit_catalog",
             "state::governance_catalog",
+            "state::workflow_release",
             "snapshot::metadata",
         ]
         .into_iter()

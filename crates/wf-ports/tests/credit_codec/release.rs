@@ -136,3 +136,52 @@ fn release_cursor_admits_wire_and_original_flat_owner_before_allocation() -> Tes
     assert_eq!(encode_release_cursor(&exact, 14).err(), Some(E::ByteLimit));
     Ok(())
 }
+
+#[test]
+fn release_binding_matches_independent_frame_and_borrows_complete_original_intent() -> TestResult {
+    use wf_ports::log::{ReleaseBindingRef, encode_release_binding, inspect_release_binding};
+    let intent = ReleaseIntentRef {
+        flow_id: b"flow\0id",
+        partition: Some(b"p\0"),
+        scope: b"scope",
+        shard_id: 3,
+        reservation_id: b"paid\0id",
+        enforcement: LimitEnforcement::ApproximateGlobal,
+        created_at: TimestampMillis::new(100),
+    };
+    let mut expected = b"FWGB\0\x01".to_vec();
+    expected.extend_from_slice(&7_u64.to_be_bytes());
+    expected.extend_from_slice(&encode_release_intent(intent, 65536)?);
+    assert_eq!(
+        encode_release_binding(ReleaseBindingRef { epoch: 7, intent }, expected.len())?,
+        expected
+    );
+    let view = inspect_release_binding(&expected, expected.len())?;
+    assert_eq!(view.epoch, 7);
+    assert_eq!(view.intent.flow_id, b"flow\0id");
+    assert_eq!(view.intent.partition, Some(b"p\0".as_slice()));
+    assert_eq!(view.intent.reservation_id, b"paid\0id");
+    assert!(view.intent.enforcement == LimitEnforcement::ApproximateGlobal);
+    assert_eq!(view.intent.flow_id.as_ptr(), expected[24..].as_ptr());
+    for end in 0..expected.len() {
+        assert!(inspect_release_binding(&expected[..end], expected.len()).is_err());
+    }
+    let mut trailing = expected.clone();
+    trailing.push(0);
+    assert!(inspect_release_binding(&trailing, trailing.len()).is_err());
+    assert_eq!(
+        inspect_release_binding(&expected, expected.len() - 1).err(),
+        Some(E::ByteLimit)
+    );
+    assert_eq!(
+        encode_release_binding(ReleaseBindingRef { epoch: 7, intent }, expected.len() - 1).err(),
+        Some(E::ByteLimit)
+    );
+    for epoch in [0, wf_domain::workflow::MAX_EXACT_MILLIS + 1, u64::MAX] {
+        let mut bad = expected.clone();
+        bad[6..14].copy_from_slice(&epoch.to_be_bytes());
+        assert!(inspect_release_binding(&bad, bad.len()).is_err());
+        assert!(encode_release_binding(ReleaseBindingRef { epoch, intent }, 65536).is_err());
+    }
+    Ok(())
+}

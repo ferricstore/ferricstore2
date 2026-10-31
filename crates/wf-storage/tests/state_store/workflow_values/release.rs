@@ -8,6 +8,7 @@ use wf_ports::log::{encode_release_intent, encode_release_meta};
 use wf_ports::state::StateTransactionError as E;
 use wf_storage::state::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
 use wf_types::{identity::PartitionId, version::TimestampMillis};
+mod custody;
 
 fn fixture(path: &Path) -> TestResult {
     let scope = crate::fixtures::scope()?;
@@ -288,6 +289,16 @@ fn workflow_release_legacy_mutations_cannot_write_bound_records_without_releases
             applied.is_err(),
             "legacy mode {profile} silently modified a bound record"
         );
+        assert!(matches!(
+            applied,
+            Err(
+                wf_storage::transaction::WorkflowValueTransactionError::Record(
+                    wf_storage::transaction::RecordBatchTransactionError::Transaction(
+                        E::UnsupportedPolicyProfile
+                    )
+                )
+            )
+        ));
         drop(store);
         assert_eq!(super::claim::fixtures::cohort(&path)?, before);
         drop(open(&path)?);
@@ -317,9 +328,192 @@ fn workflow_release_legacy_claim_cannot_overwrite_a_bound_record() -> TestResult
         applied.is_err(),
         "legacy Claim silently replaced a bound record"
     );
+    assert!(matches!(
+        applied,
+        Err(wf_storage::transaction::ClaimTransactionError::Transaction(
+            E::UnsupportedPolicyProfile
+        ))
+    ));
     drop(store);
     assert_eq!(super::claim::fixtures::cohort(&path)?, before);
     drop(open(&path)?);
     std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn workflow_release_page_preserves_original_bytes_sparse_completion_and_scope() -> TestResult {
+    use wf_ports::state::GroupApplyStore;
+    use wf_types::identity::{RecordId, TenantId};
+    let dir = crate::fixtures::directory("release-read-page")?;
+    let path = dir.join("state");
+    fixture(&path)?;
+    queue(&path)?;
+    let mut store = open(&path)?;
+    let scope = crate::fixtures::scope()?;
+    let first = store.read_workflow_release_outbox(&scope, None, 1, 1000, 65536)?;
+    assert_eq!((first.meta.head, first.meta.tail, first.more), (1, 2, true));
+    assert_eq!(first.entries.len(), 1);
+    assert_eq!(
+        (first.entries[0].sequence, first.entries[0].completed),
+        (1, false)
+    );
+    assert_eq!(first.entries[0].encoded(), intent(b"i", b"paid\0id")?);
+    assert_eq!(first.entries[0].intent()?.reservation_id, b"paid\0id");
+    let next = store.read_workflow_release_outbox(&scope, Some(1), 256, 1000, 65536)?;
+    assert_eq!(next.entries.len(), 1);
+    assert_eq!(
+        (
+            next.entries[0].sequence,
+            next.entries[0].completed,
+            next.more
+        ),
+        (2, true, false)
+    );
+    assert_eq!(next.entries[0].intent()?.flow_id, b"already-retained-away");
+    let end = store.read_workflow_release_outbox(&scope, Some(2), 1, 1000, 65536)?;
+    assert_eq!(end.entries.len(), 0);
+    assert!(!end.more);
+    for limit in [0, 257] {
+        assert_eq!(
+            store
+                .read_workflow_release_outbox(&scope, None, limit, 1000, 65536)
+                .err(),
+            Some(E::InvalidChanges)
+        );
+    }
+    assert_eq!(
+        store
+            .read_workflow_release_outbox(&scope, None, 2, 1, 65536)
+            .err(),
+        Some(E::Limit)
+    );
+    assert_eq!(
+        store
+            .read_workflow_release_outbox(&scope, None, 2, 1000, 1)
+            .err(),
+        Some(E::Limit)
+    );
+    let other = wf_domain::workflow::request::RequestScope::new(
+        TenantId::new(b"other".to_vec())?,
+        scope.group().clone(),
+        scope.recovery().clone(),
+    );
+    let absent = store.read_workflow_release_outbox(&other, None, 1, 1000, 65536)?;
+    assert_eq!(
+        (absent.meta.head, absent.meta.tail, absent.more),
+        (1, 0, false)
+    );
+    assert_eq!(absent.entries.len(), 0);
+    let tx = store.begin_apply(
+        scope.group(),
+        scope.recovery(),
+        f::limits().record_batch.codec.admission(),
+        1000,
+        65536,
+        65536,
+    )?;
+    let partition = PartitionId::new(b"p".to_vec())?;
+    let id = RecordId::new(b"i".to_vec())?;
+    let (epoch, reservation) = tx
+        .workflow_governance_binding(&scope, &partition, &id)?
+        .ok_or("missing binding")?;
+    assert_eq!(epoch, 7);
+    assert_eq!(reservation.scope, b"limit\0scope");
+    assert_eq!(reservation.reservation_id, b"paid\0id");
+    assert_eq!(reservation.shard_id, 3);
+    assert!(reservation.enforcement == LimitEnforcement::StrictGlobal);
+    assert!(
+        tx.workflow_governance_binding(&other, &partition, &id)?
+            .is_none()
+    );
+    drop(tx);
+    drop(store);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn workflow_release_snapshot_roundtrip_carries_actual_rows_and_original_owners() -> TestResult {
+    use std::io::Cursor;
+    use wf_ports::snapshot::{SnapshotLimits, StateSnapshotStore};
+    use wf_storage::snapshot::RedbSnapshotStage;
+    let dir = crate::fixtures::directory("release-data-snapshot")?;
+    let source = dir.join("source");
+    let target = dir.join("target");
+    fixture(&source)?;
+    queue(&source)?;
+    let mut store = open(&source)?;
+    let mut wire = Vec::new();
+    let original = store.capture_snapshot(&mut wire, SnapshotLimits::default())?;
+    drop(store);
+    let rows = crate::fixtures::raw_rows(&source)?;
+    let scope = crate::fixtures::scope()?;
+    let stage = RedbSnapshotStage::receive(
+        &target,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        &mut Cursor::new(&wire),
+        StateStoreLimits::default(),
+        SnapshotLimits::default(),
+    )?;
+    let mut restored = stage.into_store()?;
+    assert_eq!(restored.governance_catalog_profile(), 4);
+    let page = restored.read_workflow_release_outbox(&scope, None, 256, 1000, 65536)?;
+    assert_eq!(page.entries.len(), 2);
+    assert_eq!(page.entries[0].encoded(), intent(b"i", b"paid\0id")?);
+    assert!(page.entries[1].completed);
+    let mut reproduced = Vec::new();
+    assert_eq!(
+        restored
+            .current_snapshot(&mut reproduced, SnapshotLimits::default())?
+            .ok_or("missing snapshot")?
+            .id(),
+        original.id()
+    );
+    assert_eq!(reproduced, wire);
+    drop(restored);
+    assert_eq!(crate::fixtures::raw_rows(&target)?, rows);
+    drop(open(&target)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn workflow_release_binding_fences_generation_partition_shard_and_time_corruption() -> TestResult {
+    for case in 0..6 {
+        let dir = crate::fixtures::directory("release-binding-corrupt")?;
+        let path = dir.join("state");
+        fixture(&path)?;
+        let mut encoded = binding(b"i")?;
+        match case {
+            0 => encoded[6..14].copy_from_slice(&0_u64.to_be_bytes()),
+            1 => encoded[6..14]
+                .copy_from_slice(&(wf_domain::workflow::MAX_EXACT_MILLIS + 1).to_be_bytes()),
+            2 => encoded.push(0),
+            _ => {
+                let original = wf_ports::log::inspect_release_binding(&encoded, encoded.len())?;
+                let intent = ReleaseIntentRef {
+                    partition: if case == 3 {
+                        None
+                    } else {
+                        original.intent.partition
+                    },
+                    shard_id: if case == 4 { 4 } else { 3 },
+                    created_at: TimestampMillis::new(if case == 5 { 101 } else { 100 }),
+                    ..original.intent
+                };
+                encoded = wf_ports::log::encode_release_binding(
+                    wf_ports::log::ReleaseBindingRef { epoch: 7, intent },
+                    65536,
+                )?;
+            }
+        }
+        edit(&path, &[(key(20, None, b"i")?, encoded)], &[])?;
+        let before = super::claim::fixtures::cohort(&path)?;
+        assert_eq!(open(&path).err(), Some(E::Corrupt), "case {case}");
+        assert_eq!(super::claim::fixtures::cohort(&path)?, before);
+        std::fs::remove_dir_all(dir)?;
+    }
     Ok(())
 }

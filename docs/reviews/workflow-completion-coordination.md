@@ -61198,3 +61198,55 @@ captured from its validated immutable store profile, only for the negative fast
 path that preserves older profiles' exact admission costs. A positive4 still
 checks the actual same-guard manifest and inspects any binding before refusing;
 the cache grants no capability or mutation permission. No independent bool.
+
+Approve the concrete child test file workflow_values/release/custody.rs for
+supplemental checksum-valid capability downgrade, unapplied data and inherited
+older-profile read refusal. Register it additively under release.rs and reuse
+the parent's physical fixture helpers. This keeps the feature grouping and the
+600-line test-file limit. No new production types/modules are needed. Add the
+selected data schema and temporary writer fence to existing ADR-007 and the
+architecture document; do not describe the data fixture as atomic append proof.
+
+Architecture check caught the existing record scanner growing from398 to403
+physical lines with the borrowed updated_at getter. Approve the concrete
+state/value/record/scan/owned.rs child: move the EXISTING into_owned method body
+and its ownership-only imports verbatim, preserving its public API and complete
+admission/restore checks. Keep borrowed scanning/validation in scan.rs. This
+separates ownership materialization by responsibility; no size limit is raised.
+Also classify the new neutral ports state::workflow_release module as pure and
+extend the existing forbidden-effects fixture list for it and log::release::binding.
+
+Release-data verification: all saved valid-data and legacy-writer failures now
+pass their complete tails. The real storage/codec regression run passes294+39
+cases. After the exact owned-method move and the three additional custody cases,
+the current workflow-value run passes110 cases (including all11 new storage
+cases); strict workspace/all-target Clippy, all60 architecture cases, fmt, diff
+and cargo progress pass. One new binding-codec case is included in39. The original
+architecture attempt correctly rejected403 lines; the reviewed ownership split
+now leaves337/73 lines and its original into_owned body is byte-exact. The newer
+assert_eq! Debug fixture compile errors and assert_is_empty lint fixes are not RED.
+Two exact added error matches strengthen the saved legacy guards. The independent
+mode6 and whole-cohort assertions, exhausted-empty queue and later snapshot/read/
+binding-malformation/downgrade/unapplied checks execute; masked or post-body
+branches are supplemental, not retroactive failure evidence.
+
+Audit /private/tmp/ferricstore2-release-data-source-audit.json preserves all696
+selected prior Rust test/benchmark inputs:693 whole, three exact additive inverses
+(registration, appended codec test, purity fixture array). The old owned method
+moves verbatim. Source progress/mapping stay byte-identical; no source-case credit.
+Logs: /private/tmp/ferricstore2-release-data-{r0,guard-r0,regression,workflows,
+clippy,architecture,progress}.log. No new full pipeline run, native Elixir/Linux,
+production service or measured speedup evidence. Self-review only; no agents.
+
+NEXT replace the temporary fence ONLY through actual release-aware transaction
+composition. Admit release capacity from the real same-guard bindings and final
+workflow writes BEFORE constructing retained reply/GroupApplyChanges/value
+companions, retain queue-full as a deterministic business rejection, and recheck/
+publish exact intents with records/index/history/outcome/control in the consumed
+Immediate writer. Preserve source final-record order and reservation-ID batch
+deduplication. Do not put a backlog operational error in committed-log apply.
+Keep old paths fenced until that selected successor exists. Then populate binding
+through genuine governed Claim with actual paid owner/epoch/ID checks and no ID
+reuse, implement ACK/sparse completion and historical/received/purged replay, and
+finish the Claim/policy/refund/reconciliation parents. Exact next artifacts still
+require concrete solo review. The coupled batch and full goal remain unfinished.

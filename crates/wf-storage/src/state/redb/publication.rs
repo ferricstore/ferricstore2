@@ -104,6 +104,7 @@ pub(super) fn write_record(
     record: &WorkflowRecord,
     ordering: OrderingMetadata,
 ) -> Result<(), StateTransactionError> {
+    tx.refuse_legacy_governance_write(scope, partition, record.id())?;
     record_bytes(record, tx.admission).map_err(|_| StateTransactionError::Limit)?;
     let size = record_size(scope, partition, record)?;
     let key = tx.output_key(

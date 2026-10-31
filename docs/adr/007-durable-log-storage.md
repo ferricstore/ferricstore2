@@ -1429,3 +1429,32 @@ Backend capability inspection is not authorization or a proof of remote credit
 spend. The old governed-Claim refusal remains until workflow reservation binding
 and release enqueue are atomic, audited and recoverable. Custody selection alone
 does not implement those writes or the full public Claim/reconciliation parent.
+
+GC4 release data uses four closed physical key families:20 record reservation
+binding,21 tenant queue meta,22 sequenced release intent and23 sparse completion.
+The binding point includes group/recovery/tenant/partition/record; queue points
+include group/recovery/tenant and the exact positive finite sequence. Native
+FWGB1 contains a finite positive original reservation epoch and one complete
+FWRI1 intent. It is an original record extension, not proof of a current paid
+lease. No core WorkflowRecord field is duplicated. Completion is exactly FWRC1.
+These are native formats; no ETF byte compatibility is promised.
+
+Canonical recovery requires applied control and actual GC4 for all four families.
+Each binding must match the exact live core record and physical partition, with
+a valid shard and original time no later than that record's update and control.
+Meta proves the complete bounded contiguous pending range exists. Every intent
+must be in that range; every completion must refer to an existing in-range intent.
+An intent may outlive its workflow record, allowing eventual release after
+retention. Missing meta denotes empty only in the absence of queue rows. These
+joins run in the shared snapshot/recovery walker; snapshot data has no weaker
+parallel validator. Bounded page reads own each native intent once and expose a
+borrowed view. Their observed completion and local guard grant no leader barrier
+or permission to release remote credit.
+
+Until actual pre-reply release admission and same-writer append exist, legacy
+record publishers explicitly refuse bound records and abort the complete cohort.
+A validated immutable cached profile supplies only a negative dispatch fast path
+for earlier stores; positive4 reads the actual manifest and binding under the
+writer. The temporary fence is not a queue-full business result. The governed
+Claim refusal remains. Data/schema fixtures and snapshot roundtrips do not prove
+Claim, append, ACK, reconciliation, source-case parity or platform acceptance.
