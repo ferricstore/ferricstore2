@@ -5,6 +5,7 @@
 mod claim;
 mod control;
 mod core_policy;
+mod credit_catalog;
 mod history;
 mod original_policy;
 mod policy;
@@ -16,6 +17,7 @@ pub use claim::{
 };
 pub use control::{GroupControlChanges, GroupControlTransaction};
 pub use core_policy::{GroupCorePolicyChanges, GroupCorePolicyTransaction};
+pub use credit_catalog::{CreditCatalogEntry, CreditCatalogPage};
 pub use history::{
     StoredWorkflowHistoryRow, StoredWorkflowHistorySnapshot, WorkflowHistoryDirection,
     WorkflowHistoryHydrationError, WorkflowHistoryHydrationLimits, WorkflowHistoryHydrationRequest,

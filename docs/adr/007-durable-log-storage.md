@@ -1233,3 +1233,23 @@ paths remain closed. Exercise actual persistence faults, restart, snapshot and
 received/purged replay before batch acceptance. Authoritative current governance,
 workflow-bound release outbox, the atomic public Claim parent, catalog/service
 semantics and every required source/profile/Linux/macOS gate remain mandatory.
+
+### Selected credit catalog publication successor
+
+M2-CREDIT-CATALOG1 selects explicit credit_format2 with the same checked actual
+shard count in layout8/alias2. Format1 remains the private predecessor. Format2
+adds a publication outbox per actual group/recovery/tenant, separate from lease
+shard IDs. Family16 stores head/tail (FWCM1);17 stores a monotone sequence and
+original credit scope (FWCI1). New owners and their publication intents must
+commit with the original retained reply/control through the existing consumed
+writer. No observation, counter or plan certifies commit/current authority.
+
+Preserve source65536 pending,256 ack/read page and MAX_EXACT sequence bounds;
+head may reach MAX_EXACT+1. Acknowledged retries precede stale cursor refusal.
+No metadata/intent map is cloned on mutation. Reopen validates active contiguous
+entries, reverse range coverage and owner-to-meta presence with the same open
+table and bounded accounts. Missing owners on well-formed intents are preserved
+for publisher discard, not promoted to committed owners. Snapshot custody and
+Node opt-in compare the exact capability even for an empty cohort. Native ETF,
+full durable ack, distributed catalog publication/repair/cleaner and source/
+Linux/macOS acceptance remain required; selection alone implements none of them.

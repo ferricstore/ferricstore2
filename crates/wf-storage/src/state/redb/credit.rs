@@ -30,6 +30,35 @@ impl RedbStateTransaction<'_> {
 }
 
 impl RedbStateStore {
+    /// Creates an explicit credit-format2 authority with atomic publication intents.
+    /// # Errors
+    /// Refuses unsupported capability, invalid genesis or unproved durability.
+    pub fn create_credit_catalog_database(
+        _database: redb::Database,
+        _group: GroupId,
+        _recovery: RecoveryId,
+        _genesis: StateStoreGenesis<'_>,
+        _defaults: WorkflowValueDefaults,
+        _shard_count: u64,
+        _limits: StateStoreLimits,
+    ) -> Result<Self, StateTransactionError> {
+        Err(StateTransactionError::UnsupportedPolicyProfile)
+    }
+
+    /// Reads at most256 consecutive publication entries under one coherent guard.
+    /// Missing/corrupt active entries never become an empty successful page.
+    /// # Errors
+    /// Refuses old capabilities, invalid bounds, corruption or read admission.
+    pub fn read_credit_catalog(
+        &self,
+        _scope: &RequestScope,
+        _limit: u16,
+        _maximum_steps: usize,
+        _maximum_bytes: usize,
+    ) -> Result<wf_ports::state::CreditCatalogPage, StateTransactionError> {
+        Err(StateTransactionError::UnsupportedPolicyProfile)
+    }
+
     /// Creates one atomic empty credit-capable authority with actual shard count.
     /// # Errors
     /// Refuses unsupported capability, input, profile or unproved durability.

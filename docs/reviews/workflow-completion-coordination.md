@@ -59188,3 +59188,78 @@ ticks, persistent traversal progress and fairness across scopes. These remain
 required distributed/public integration work; a local owner scan or standalone
 metadata reducer cannot substitute for catalog publication, acknowledgement,
 repair and cleaner behavior. No catalog artifact/contract has been selected yet.
+
+## M2-CREDIT-CATALOG1: concrete solo selection before artifacts
+
+Previous goal turn: progress; c6b589f implements verified borrowed public reply
+projection and exact uncertain-Spend compensation context. Both trees are clean.
+Continue solo; this selection is not independent review. Full catalog/public
+parent/source/native/platform exits remain required throughout this batch.
+
+Select an explicit credit_format2 successor in the existing layout8/alias2
+manifest extension. Format1 bytes and constructors remain exact. Add the
+credit_catalog boolean to ValueManifest and its capture/snapshot comparisons;
+create_credit_catalog_database alone selects2. The actual configured group,
+recovery and tenant bind the publication queue; lease shard_count remains its
+separate existing immutable value. Native KV shard routing is not inferred from
+lease shard IDs. New Node opt-in with_identified_credit_catalog_limits must bind
+the exact actual format/count even for empty/receipt-only state; old selection
+must refuse2. Direct creation and all later publication remain real Immediate
+transactions, not synthetic acknowledgements.
+
+Approve NEW domain governance/catalog.rs: CreditCatalogMeta, CreditCatalogError,
+CreditCatalogAcknowledgement and CreditCatalogObservation. Checked head/tail
+math preserves source MAX_EXACT+1 head,65536 pending,256 acknowledgement page,
+already-acked-before-stale ordering, and pending-tail owner deduplication. Plans
+are neutral data, not current authority. A bounded acknowledgement range replaces
+an allocated vector. Add prepare_catalog_credit to existing identified/prepare.rs
+for an actually absent owner; observe catalog before dispatch, after successful
+configuration/expiry. Existing prepare_identified_credit is unchanged in policy.
+Sealed prepared/plan values carry optional proposed catalog metadata. Queue-full
+and exhausted-sequence refusals discard new owner effects and retain original
+business responses; add CatalogBacklogFull/CatalogSequenceExhausted rejections
+and explicit private response tags7/8. These new tags do not open generic request
+profiles. Existing response/retained encoders must still verify complete shapes.
+
+Approve NEW ports state/credit_catalog.rs with neutral CreditCatalogEntry and
+CreditCatalogPage (owned bounded results, no paid/current-authority flag).
+Approve NEW storage state/key/catalog.rs and state/value/catalog.rs. Physical
+family16 binds group/recovery/tenant metadata;17 adds a positive BE u64 sequence.
+FWCM1 encodes head/tail, FWCI1 the original credit scope. Values require exact
+EOF/canonical fields. This is a typed private migration profile, not an ETF
+interoperability claim. Pinned noncanonical/oversized external-term source cases
+and their migration dispositions remain mandatory and uncredited.
+
+Approve NEW storage state/redb/credit/catalog.rs plus private catalog/recovery.rs.
+Use the actual exclusive writer, same captured capability and continuous R/S/C
+accounts. New-owner creation joins one checked publication append, owner/ID/page/
+cleanup changes, original outcome and control in the same commit. No owner means
+no ghost intent. Existing owner mutation does not append duplicates. Tail reuse
+and next-slot collision handling must read exact current points. Bounded coherent
+page reads never turn missing/corrupt active entries into empty success. Reopen
+checks every active sequence, reverse range coverage, owner-to-meta presence,
+capability and exact values with the already-open table. A shape-valid intent
+whose owner is absent is preserved for the required later publisher discard;
+it is not mistaken for proof that its owner committed. No global owner scan.
+
+Approve NEW domain tests/governance_credit/catalog.rs and storage tests/state_store/
+credit/catalog.rs with private catalog/fixtures.rs, catalog/sequence.rs and
+catalog/recovery.rs. Existing targets only gain registrations; all older case
+bodies remain. Save compiled rejecting failures before bodies. Cover metadata
+and ack boundaries, atomic creation/rejection/no-ghost/retained replay, exact
+bounded pages, corruption/reopen/capability/snapshot checks and real uncertain
+publication old-or-new cohorts. Select further Node test artifacts concretely
+before creation. Source inputs are pinned limit_catalog_outbox.ex, LimitStore
+registration, flow_governance_limit.ex creation/ack, and limit_storage tests.
+Full durable ack command, cross-group publication/repair and cleaner fairness
+are batch exits, not optional replacements by this predecessor. Their request
+codec/artifacts require the next concrete selection before creation.
+
+Catalog predecessor genuine RED: six domain cases compile and fail on missing
+append/restore/publication behavior. The seven stored cases compile: one actual
+format1 closed-capability/cohort control passes, six format2 cases fail at the
+healthy UnsupportedPolicyProfile constructor. All their later writer, page,
+corruption and fault assertions remain masked, not claimed executed. Source/log
+SHA bindings are /private/tmp/ferricstore2-credit-catalog-r0.json. The rows-table
+fixture uses the actual wf_state_rows_v1 name before this capture. Save the
+rejecting checkpoint before semantic bodies; full catalog batch stays open.
