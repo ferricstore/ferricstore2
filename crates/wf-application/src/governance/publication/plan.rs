@@ -7,7 +7,10 @@ use super::{
 use wf_domain::workflow::{MAX_EXACT_MILLIS as MAX, request::RequestScope};
 use wf_ports::state::{CreditCatalogEntry, CreditCatalogOwnerState, CreditCatalogPage};
 
-pub(super) fn select(request: Request<'_>, limits: Limits) -> Result<(&RequestScope, u64), E> {
+pub(in crate::governance) fn select(
+    request: Request<'_>,
+    limits: Limits,
+) -> Result<(&RequestScope, u64), E> {
     if request.sources.is_empty()
         || request.source_cursor > MAX
         || request.catalog.len() > 65535

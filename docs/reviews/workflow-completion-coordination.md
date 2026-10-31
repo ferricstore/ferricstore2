@@ -59936,3 +59936,52 @@ compile errors were corrected before these semantic runs and receive no TDD
 credit. Later assertions remain masked. Save this exact cohort before bodies;
 see /private/tmp/ferricstore2-catalog-collection-{r0,storage-r0,node-r0,
 architecture-r0}.log. No native/full source-case credit is assigned.
+
+Refine the selected dispatch reuse before bodies: approve encoded_members in the
+existing publication/dispatch.rs, taking a borrowed EncodedCreditCatalogMembers.
+The publisher's old members helper delegates after encoding; repair encodes
+once, uses that member for the exact point read, then registers the same original
+cohort. This avoids encoding/copying the identity twice. Expose only dispatch and
+plan/select within crate::governance; no new public/backend dependency or type.
+
+All16 genuine regressions now pass: application8, actual storage2, Node5 and
+architecture1. The existing eight publisher cases also pass after the private
+dispatch refactor. The callback fixture now honors complete load bytes and uses
+fallible reservation, rather than an infallible always-Ok wrapper; original
+case bodies stay intact. Strict all-target Clippy passes for application/storage/
+Node/architecture and their dependencies. Two post-body controls add56 independent
+comparisons with the original page-reverse/stable-sort/take algorithm, count
+zero/overflow, loader admission and full drop after error. These receive no
+original TDD credit. The live non-Clone ownership control proves top5 plus one
+candidate (peak6), with zero records left after dropping the result. No native
+throughput/RSS or full source-case improvement is claimed.
+
+The one full integrated pipeline now freezes the complete collection/repair
+source cohort. Keep source unchanged until it terminates. The public read/query
+adapter still needs real authorization/routing/strong-read lifecycle; committed
+prefix fixtures do not provide a Raft service. Full required source/native/Linux
+acceptance, public credit parents and durable cleaner progress remain unfinished.
+
+Read-only source coverage audit for the successor: the frozen
+flow_governance_catalog_test.exs78..105 case b43dccc831566cd3 "catalog collection keeps global top
+results across pages" inserts300 actual budget-catalog members and checks the
+last five in descending order through the real collector. Current generic
+application600/differential controls and actual three-owner Node cases do not
+by themselves establish that complete source scenario. Add an actual committed
+300-member catalog/collector counterpart before claiming its checked source
+assertion links; do not certify native/profile execution from a unit fixture.
+The immutable manifest and full source statuses remain untouched in this batch.
+This concrete source gap is next alongside the public-parent/cleaner successors.
+
+Collection/repair integration checkpoint: all12 local gates pass on1944 frozen
+non-Markdown inputs/1355 Rust files with zero drift. All1500 cases/116 executable
+targets preserve all1482 predecessor and1294 original identities/statuses/
+multiplicities, both benchmark correctness smokes,56 architecture cases,Python7
+and11 doctests/15 targets. Runtime suite: 490.16 seconds. All652 old test/bench
+files remain647 whole,2 registration inverses and3 exact additive prefixes.
+Saved-source audit matches the tested cohort and records the bounded/fallible
+loader helper change plus post-body controls. Actual full parity still exits1
+with unchanged135/149/646 accounting and5903/4222/1681/1655 reconciliation;5858
+frozen textual declarations remain unported. No full source-case/native/Linux/
+performance credit. Public parents and durable cleaner progress remain required;
+full goal remains active, with no feature adoption or push.

@@ -40,10 +40,21 @@ impl CatalogFixture {
             limit,
         }
     }
-    pub(super) fn load(key: &[u8], _: ReadLimits) -> Result<Option<Loaded<Vec<u8>>>, S> {
+    pub(super) fn load(key: &[u8], limits: ReadLimits) -> Result<Option<Loaded<Vec<u8>>>, S> {
+        let owned_bytes = std::mem::size_of::<Vec<u8>>()
+            .checked_add(key.len())
+            .ok_or(S::Limit)?;
+        if owned_bytes > limits.maximum_bytes {
+            return Err(S::Limit);
+        }
+        let mut record = Vec::new();
+        record
+            .try_reserve_exact(key.len())
+            .map_err(|_| S::Allocation)?;
+        record.extend_from_slice(key);
         Ok(Some(Loaded {
-            record: key.to_vec(),
-            owned_bytes: std::mem::size_of::<Vec<u8>>() + key.len(),
+            record,
+            owned_bytes,
         }))
     }
 }

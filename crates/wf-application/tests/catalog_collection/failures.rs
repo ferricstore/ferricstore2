@@ -90,3 +90,44 @@ fn catalog_collection_admits_before_reads_and_checks_complete_loader_result_owne
     assert!(matches!(result, Err(E::Limit)));
     Ok(())
 }
+
+#[test]
+fn catalog_collection_rejects_count_overflow_and_drops_the_complete_result_after_loader_failure()
+-> TestResult {
+    let fixture = CatalogFixture::new(10)?;
+    for (limit, expected) in [(0, E::InvalidOptions), (usize::MAX, E::Limit)] {
+        let result = collect_governance_catalog(
+            &fixture,
+            fixture.request(limit),
+            CatalogFixture::load,
+            Ord::cmp,
+            Limits::default(),
+        );
+        assert!(matches!(result, Err(actual) if actual == expected));
+    }
+    assert_eq!(fixture.calls.borrow().len(), 0);
+    let live = std::rc::Rc::new(std::cell::Cell::new(0));
+    let peak = std::cell::Cell::new(0);
+    let mut loaded = 0;
+    let result = collect_governance_catalog(
+        &fixture,
+        fixture.request(5),
+        |key, _| {
+            loaded += 1;
+            if loaded == 4 {
+                return Err(S::Unavailable);
+            }
+            Ok(Some(TrackedRecord::load(key, &live, &peak)))
+        },
+        |a, b| a.key.cmp(&b.key),
+        Limits::default(),
+    );
+    assert!(matches!(result, Err(E::Source(S::Unavailable))));
+    assert_eq!(live.get(), 0);
+    assert_eq!(peak.get(), 3);
+    let mut limits = Limits::default();
+    limits.load.maximum_bytes = std::mem::size_of::<Vec<u8>>();
+    let result = collect_governance_keys(&[b"a"], 1, CatalogFixture::load, Ord::cmp, limits);
+    assert!(matches!(result, Err(E::Source(S::Limit))));
+    Ok(())
+}

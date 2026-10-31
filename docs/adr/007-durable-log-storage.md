@@ -1304,3 +1304,23 @@ authority to suppress creation publication. The interleaving regression uses a
 real committed creation between the coherent owner batch and the old ACK; it
 fails before the correction and then publishes the surviving new intent. The
 matching pinned Elixir defect is corrected on an isolated unverified branch.
+
+
+The selected governance collection traverses original fixed256 anchored pages,
+loading each configured record separately and preserving only globally ranked
+bounded results plus one candidate. A full result never ends traversal. New
+comparator-equal records precede retained equals, matching the source's reversed
+page/prepended accumulator stable sort. Explicit keys bypass catalog paging.
+The result owns the original values and exposes iterators without a second
+payload allocation. Read/loader guards and logical result/slot/candidate/page
+budgets are explicit; per-read coherence does not imply a Raft strong-read barrier.
+No fixed scan-count cap silently changes the source collection semantics.
+
+Existing-owner catalog repair uses the same configured owner/member reads and
+supervised complete retained membership validation as publication. Missing
+owners create no ghosts. An already present member skips submission. Otherwise
+only a complete accepted original reply confirms repair; uncertainty/refusal
+must stop a dependent public mutation. The same single encoded member owner is
+borrowed for point lookup and any registration. No schema upgrade, direct write
+API or accepted-consensus claim follows. Complete public credit parents and the
+durable cleaner progress/fairness protocol remain successors.

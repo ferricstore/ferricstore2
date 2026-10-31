@@ -54,6 +54,60 @@ pub fn repair_credit_catalog<P>(
 where
     P: CreditCatalogPublicationPort + CreditOwnerReadPort + GovernanceCatalogReadPort,
 {
-    let _ = (port, source, target, catalog, credit_scope, limits);
-    Err(CreditCatalogRepairError::Unconfirmed)
+    use CreditCatalogRepairError as E;
+    use CreditCatalogRepairStatus as Status;
+    use wf_ports::state::{GovernanceCatalogReadLimits, encode_credit_catalog_members};
+    if credit_scope.is_empty() || credit_scope.len() > 65535 {
+        return Err(E::Preflight(CreditCatalogPublicationError::InvalidOptions));
+    }
+    super::publication::plan::select(
+        super::CreditCatalogPublicationRequest {
+            sources: std::slice::from_ref(source),
+            source_cursor: 0,
+            target,
+            catalog,
+        },
+        limits,
+    )
+    .map_err(E::Preflight)?;
+    let owner = port
+        .credit_catalog_owner(source, credit_scope, limits.read)
+        .map_err(E::Read)?;
+    let exists = owner.is_some();
+    drop(owner);
+    if !exists {
+        return Ok(Status::Missing);
+    }
+    let encoded = encode_credit_catalog_members(
+        source,
+        &[credit_scope],
+        limits.codec.admission().decision_bytes(),
+        limits.maximum_members_bytes,
+    )
+    .map_err(|error| {
+        E::Preflight(match error {
+            wf_ports::log::CodecError::Allocation => CreditCatalogPublicationError::Allocation,
+            _ => CreditCatalogPublicationError::Limit,
+        })
+    })?;
+    let contains = port
+        .governance_catalog_contains(
+            target,
+            catalog,
+            encoded.members().next().ok_or(E::Unconfirmed)?,
+            GovernanceCatalogReadLimits {
+                maximum_steps: limits.read.maximum_steps,
+                maximum_bytes: limits.read.maximum_bytes,
+                maximum_temporary_bytes: limits.read.maximum_temporary_bytes,
+            },
+        )
+        .map_err(E::Read)?;
+    if contains {
+        return Ok(Status::Present);
+    }
+    if super::publication::dispatch::encoded_members(port, target, catalog, &encoded, limits) {
+        Ok(Status::Registered)
+    } else {
+        Err(E::Unconfirmed)
+    }
 }

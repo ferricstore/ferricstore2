@@ -15,7 +15,7 @@ use wf_ports::{
         catalog_membership_request_intent, catalog_membership_retained_summary,
         decode_catalog_ack_reply, encode_catalog_ack_request, encode_catalog_membership_request,
     },
-    state::encode_credit_catalog_members,
+    state::{EncodedCreditCatalogMembers, encode_credit_catalog_members},
 };
 use wf_types::identity::RequestId;
 
@@ -35,6 +35,16 @@ pub(super) fn members<P: CreditCatalogPublicationPort>(
     ) else {
         return false;
     };
+    encoded_members(port, target, catalog, &encoded, limits)
+}
+
+pub(in crate::governance) fn encoded_members<P: CreditCatalogPublicationPort>(
+    port: &mut P,
+    target: &RequestScope,
+    catalog: &[u8],
+    encoded: &EncodedCreditCatalogMembers,
+    limits: Limits,
+) -> bool {
     let mut members = Vec::new();
     if members.try_reserve_exact(encoded.members().len()).is_err() {
         return false;

@@ -2,7 +2,54 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current batch: M2-CREDIT-CATALOG1, still unfinished. The application publisher
+Current batch: M2-CREDIT-CATALOG1, still unfinished. Bounded global collection
+now traverses every original anchored page, propagates loader errors, preserves
+source tie order and moves only the top results plus one candidate. Explicit
+keys bypass catalog traversal. The result exposes original values through
+borrowed/consuming iterators without a payload conversion allocation. Actual
+Redb page, exact membership and owner ports enforce explicit R/C/steps and
+configured namespaces under coherent guards. No new schema or dependency.
+
+Existing-owner repair now skips missing owners without creating ghost members,
+skips already present membership, and otherwise confirms a complete accepted
+original retained registration before permitting dependent work. The exact same
+encoded member owner is borrowed for point lookup and registration. Refusal,
+uncertainty or foreign replies stop repair. Complete public credit parent
+normalization/retained/submission integration remains required; this helper does
+not imply all public parents already use it. Accepted consensus, production
+routing/authorization and a real strong-read lifecycle remain open.
+
+All 12 local gates pass on 1,944 frozen non-Markdown inputs / 1,355 Rust files,
+with zero drift: 1,500 cases / 116 executable targets, 56 architecture cases,
+Python 7 and 11 doctests / 15 targets. All previous 1,482 and original 1,294 case
+identities/statuses/multiplicities and both benchmark correctness smokes remain.
+Sixteen genuine compiled failures precede bodies at 4145b5c: application 8,
+actual storage 2, Node 5 and architecture 1. Two post-body controls add 56
+independent comparisons with the original page-reverse/stable-sort/take model,
+count overflow, admission and complete drop after error; no original TDD credit.
+The non-Clone live-owner control proves peak 6 for top 5 and complete drop.
+No throughput/RSS improvement is claimed. All 652 older test/benchmark files
+remain as 647 whole files, two exact registration inverses and three exact
+additive prefixes. Saved sources preserve five whole files, two exact prefixes
+and one complete bounded/fallible loader-helper inverse. See
+/private/tmp/ferricstore2-catalog-collection-{r0,final-pipeline,source-audit,
+full-identity,full-parity,checkpoint}.json and phase logs.
+
+Actual full parity still exits 1 with unchanged 135/149/646 checked accounting,
+5903/4222/1681/1655 runtime reconciliation and 5858 unported frozen textual
+declarations. No new full source-case credit. Next: complete real catalog/source
+scenario counterparts, durable cleaner progress/fairness and public credit/
+Claim/policy/release-outbox parents. Preserve exact cursor/budget semantics and
+registered-before-mutation ordering. Select concrete artifacts through solo
+architecture review before creation. Accepted consensus, HTTP/TCP/worker
+integration, complete required source/native/Linux/macOS acceptance and M1-M8
+exits remain unfinished. Do not adopt this unfinished feature branch or claim
+full product/source/platform completion. The primary checkout only points here;
+its last adopted code remains 728650f. Keep the dirty original Elixir checkout
+unchanged; its isolated unverified fix branch remains at ce3dce444.
+
+Previous checkpoint: catalog publisher.
+The application publisher
 now reads one configured source and its coherent ordered owner batch, encodes
 borrowed member identities into one bounded byte owner, confirms an idempotent
 target membership reply, then ACKs only the processed source prefix. Unknown,

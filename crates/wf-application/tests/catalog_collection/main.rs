@@ -124,3 +124,46 @@ fn catalog_collection_moves_records_and_holds_only_top_n_plus_one_candidate() ->
     assert_eq!(live.get(), 0);
     Ok(())
 }
+
+#[test]
+fn catalog_collection_ranking_matches_original_page_reverse_stable_sort_and_take() -> TestResult {
+    for count in [0, 1, 255, 256, 257, 512, 600] {
+        for limit in [1, 5, 64, 1000] {
+            check_reference_ranking(count, limit, false)?;
+            check_reference_ranking(count, limit, true)?;
+        }
+    }
+    Ok(())
+}
+
+fn check_reference_ranking(count: u32, limit: usize, descending: bool) -> TestResult {
+    let fixture = CatalogFixture::new(count)?;
+    let compare = |a: &Vec<u8>, b: &Vec<u8>| {
+        let order = (a[3] % 7).cmp(&(b[3] % 7));
+        if descending { order.reverse() } else { order }
+    };
+    let actual = collect_governance_catalog(
+        &fixture,
+        fixture.request(limit),
+        CatalogFixture::load,
+        compare,
+        Limits::default(),
+    )?;
+    let mut expected = Vec::new();
+    for start in (0..count).step_by(256) {
+        let mut page = (start..(start + 256).min(count))
+            .rev()
+            .map(|n| n.to_be_bytes().to_vec())
+            .collect::<Vec<_>>();
+        page.append(&mut expected);
+        page.sort_by(compare);
+        page.truncate(limit);
+        expected = page;
+    }
+    assert_eq!(
+        actual.into_records().collect::<Vec<_>>(),
+        expected,
+        "count={count}, limit={limit}, descending={descending}"
+    );
+    Ok(())
+}

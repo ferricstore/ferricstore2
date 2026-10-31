@@ -15,8 +15,8 @@ impl wf_ports::state::CreditOwnerReadPort for RedbStateStore {
         credit_scope: &[u8],
         limits: CreditCatalogReadLimits,
     ) -> Result<Option<wf_domain::governance::credit::CreditOwner>, E> {
-        let _ = (scope, credit_scope, limits);
-        Err(E::UnsupportedPolicyProfile)
+        let tx = guard(self, limits)?;
+        tx.checked(|| super::super::read::owner(&tx, scope, credit_scope, limits.credit))
     }
 }
 

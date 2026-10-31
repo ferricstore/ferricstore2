@@ -7,8 +7,8 @@ use wf_ports::{
     consensus::CreditCatalogPublicationPort, log::CodecLimits, state::CreditCatalogReadLimits,
 };
 
-mod dispatch;
-mod plan;
+pub(super) mod dispatch;
+pub(super) mod plan;
 
 /// Immutable configured namespaces; none of these values grants routing authority.
 #[derive(Clone, Copy)]
