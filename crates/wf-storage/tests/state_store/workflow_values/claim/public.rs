@@ -5,3 +5,4 @@ mod failures;
 mod fixtures;
 mod flow;
 mod recovery;
+mod source;

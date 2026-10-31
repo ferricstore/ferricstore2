@@ -1,6 +1,54 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-31. Full-completion goal remains active; continue solo.
+Updated: 2026-11-01. Full-completion goal remains active; continue solo.
+
+PUBLIC-CLAIM-SOURCE1 follows a3184a7 in the isolated implementation worktree.
+The public bind cursor now skips source failures proved from actual core and
+generated fields: run IDs above65483, signed64 attempt overflow, binary primitive
+ceilings and generated metadata whose lower bound exceeds32629 bytes. It uses
+the actual worker, trusted time and preserved logical run state for reclaim.
+Filtering precedes binding; a supported late skip consumes its original ID and
+accepted siblings retain their exact non-prefix bindings and refunds.
+
+This allocation-free helper is a necessary bound, not complete QueryRow/key
+validation. Original partition/scope/attributes/state metadata/history capture
+is still required. Passing the bound proves no missing field absent. The private
+intent20/op18 and u64/u128 native contracts retain their selected semantics.
+
+Six native tests use actual created records, current policy, funding, storage,
+sidecars, exact Active/Released reservation rows and consumed markers, refunds,
+retained replay/reopen, filtered candidates and three-phase reclaim. Three have
+genuine preimplementation behavior RED; three later cases and five arithmetic/
+ID-boundary unit tests are supplemental. No original-case parity credit is added.
+
+Final frozen verification passes1815 Rust tests in120 groups plus11 doctests
+in15 groups, zero failed/ignored. Strict workspace/all-target Clippy, strict docs,
+all60 architecture checks, Python7, reference integrity, progress, fmt and diff
+pass. All2185 non-Markdown inputs/1596 Rust files stay exact. Against a3184a7,
+1289 of1290 prior test/bench/reference inputs are byte-identical; one has an exact
+additive module registration. The Rust subset is753 whole of754 plus that same
+registration. Original assertions, reference snapshots and ledgers stay intact.
+Evidence: /private/tmp/ferricstore2-claim-source-{red,native,domain,workspace,
+doctests,clippy,doc,arch,python,reference,progress,parity,fmt}.log and
+proof/source-audit/inputs.json. Cargo retains the same isolated target, offline
+CARGO_HOME and Rust1.99.0 below. A missing redb cache was restored through the
+connected GitHub API;131 blobs/all166 Git objects, exact pinned commit/tree and
+git fsck were verified before rebuilding. No dependency/lockfile selection changed.
+
+Full parity still actually exits1. NEXT review and implement actual original
+partition/scope/rich-metadata capture through ingress, durable records and
+snapshots, then exact query-row/key validation. Do not infer original nil/empty
+or absent metadata from opaque physical partitions/core points. Complete Auto/
+Global routing, projections, blocking/per-caller pipeline identity, the ordered
+actual consensus/leader/read-barrier/current-auth/supervisor owners, transports
+and workers; remaining lifecycle/catalog work; all source scenarios/profiles and
+native Linux/macOS/performance acceptance. No independent review, measured
+speedup, new native Linux/Elixir execution, production runtime or full-goal
+completion is claimed. Primary code adoption and push remain unperformed.
+
+## Preceding a3184a7 binding checkpoint (historical)
+
+The following saved results/next steps describe that predecessor only.
 
 
 PUBLIC-CLAIM-BIND1 follows c2d67b9 on the isolated implementation branch.

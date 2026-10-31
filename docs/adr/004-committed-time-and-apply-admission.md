@@ -418,6 +418,37 @@ partitions, Auto/Global routing, projections, blocking/pipeline identities and
 all source/profile/platform and production-runtime gates remain incomplete.
 Supplemental restored-record controls gain no source-case parity credit.
 
+### Known public Claim postimage failures
+
+PUBLIC-CLAIM-SOURCE1 extends the existing sealed bind cursor using actual core
+fields, query worker and committed time. After eligibility and binding, it skips
+source run IDs above65483, signed64 attempt overflow, primitive binaries over
+32768 bytes and generated postimages whose metadata has a proved lower bound
+above32629 bytes. QueryRowCodec reserves35 maximum row-header and104 locator
+bytes out of32768; Query.Limits reserves52 partitioned state-key bytes out of
+65535 for IDs. These are the inspected pinned-source ceilings, not configurable
+native allocation limits or a changed private canonical record format.
+
+The metadata lower bound counts the11-byte metadata header, builtin bitmap,
+internal flags, minimum projection/attribute/state-meta sections, the mandatory
+logical partition primitive and actual generated type/running state/logical
+run state/lease owner/update/due/deadline primitive lengths. Reclaim uses the
+preserved logical run state; filtering happens before binding. Original scope,
+partition, attributes, state metadata and history fields can only increase the
+encoded size. Passing this necessary bound certifies NO complete source row or
+key validity. Capturing and validating the missing original fields remains a
+required predecessor to service acceptance; no absent-field proof is invented.
+
+The helper borrows all inputs and performs only checked bounded length/varint
+arithmetic. It allocates no owner and copies no key, worker or postimage bytes.
+Existing query/consumed-fact/scan guards pay the input and fixed work. Actual
+native controls create legitimate large-state predecessors, check non-prefix
+sidecars plus exact active/released reservation rows and consumed markers,
+refunds, retained replay/reopen and three-phase reclaim. Private intent20/op18,
+full u128 native state-entry ordering and existing counter-overflow safety
+dispositions remain as selected. This adds no wire version, measured speedup,
+independent review, complete source-case parity or platform/service acceptance.
+
 ### Pure governing-credit predecessor
 
 M1-CREDIT-OWNER1 adds a functional `governance::credit` boundary to wf-domain,

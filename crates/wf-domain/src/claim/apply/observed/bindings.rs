@@ -1,6 +1,9 @@
 //! A bounded original-batch cursor; no paid-credit or completeness authority.
 use super::{AdmissionLimits, ApplyError, ClaimPreflightError, ClaimRejection, ClaimWorkLimits};
+use crate::claim::apply::ClaimQuery;
 use crate::workflow::WorkflowRecord;
+use wf_types::version::TimestampMillis;
+mod source;
 
 pub(super) struct ClaimBindingCursor {
     maximum: usize,
@@ -44,7 +47,12 @@ impl ClaimBindingCursor {
             positions,
         })
     }
-    pub(super) fn bind(&mut self, record: &WorkflowRecord) -> Result<bool, ClaimPreflightError> {
+    pub(super) fn bind(
+        &mut self,
+        record: &WorkflowRecord,
+        query: ClaimQuery<'_>,
+        now: TimestampMillis,
+    ) -> Result<bool, ClaimPreflightError> {
         if self.attempts >= self.maximum {
             return Err(ClaimPreflightError::Business(
                 ClaimRejection::GoverningReservationUnavailable,
@@ -57,9 +65,8 @@ impl ClaimBindingCursor {
             .ok_or(ClaimPreflightError::Business(
                 ClaimRejection::LengthOverflow,
             ))?;
-        // The source binds first, then QueryRowPrimitives rejects this integer.
-        // Ordinary Claim/Reclaim preserve attempts; private u64 admission remains valid.
-        if i64::try_from(record.attempts()).is_err() {
+        // The source binds before postimage key/query-row validation can skip.
+        if source::known_rejection(record, query, now) {
             return Ok(false);
         }
         self.positions.push(position);

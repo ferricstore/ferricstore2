@@ -257,9 +257,9 @@ fn select<'query, 'current: 'query>(
             Ok(())
         },
         |entry| {
-            bindings
-                .as_mut()
-                .map_or(Ok(true), |cursor| cursor.bind(entry.record))
+            bindings.as_mut().map_or(Ok(true), |cursor| {
+                cursor.bind(entry.record, envelope.query, now)
+            })
         },
     )
     .map_err(|error| failure(&error))?;

@@ -62768,3 +62768,129 @@ The source-audit.json file records the exact comparison.
 All jobs are terminal. Review remains solo. The implementation stays isolated;
 only docs-only primary pointers are authorized, with no code adoption/push.
 The full goal remains active with the complete remaining handoff obligations.
+
+
+## PUBLIC-CLAIM-SOURCE1: concrete solo architecture decision, 2026-10-31
+
+Previous turn is PROGRESS: verified implementation a3184a73a3b4c6b5c1a217df914c95c32ed49577
+and docs-only primary pointer ca08e42. The complete goal remains active and solo.
+
+Approved before artifact creation: private domain helper
+`claim/apply/observed/bindings/source.rs::known_rejection`, existing
+ClaimBindingCursor::bind gains actual ClaimQuery and committed time, and the
+existing observed selector passes those actual values. New native test module
+`tests/state_store/workflow_values/claim/public/source.rs` and its private
+fresh/frame/owner/assert_binding helpers exercise actual committed creation,
+policy, funding, selection, sidecars, refunds and replay. Parent public.rs gains
+only an additive module registration. No new value/model/type is selected.
+
+The helper rejects only source failures proved from known actual core/generated
+fields: source run-ID ceiling, signed64 attempts, per-binary query-row ceiling,
+and a checked LOWER BOUND on encoded postimage metadata. Pinned source paths are
+flow/query/limits.ex, query_row_codec.ex:29-48,392-535,605-737,740-785 and
+flow_retention_values.ex:458-610. Public projection always installs logical
+partition; the minimal one-byte primitive is used until original partition
+capture exists. Fixed metadata envelope/sections and guaranteed generated state,
+run_state, type, updated time, due/deadline and lease-owner bytes establish the
+bound. Unknown original scope/attributes/state-meta/history fields cannot reduce
+that bound. Passing it certifies NO complete QueryRow/key validity. Full source
+metadata/partition capture and exact validation remain required; do not fabricate
+absence or map physical partitions to original logical nil/empty.
+
+Cursor consumption precedes these supported late skips and preserves the sealed
+non-prefix ledger, actual paid ceiling and atomic whole-parent exhaustion policy.
+Private intent20/op18, full u128 native state-entry order and counter-overflow
+migration behavior stay unchanged. Time and lease admission precede this helper.
+The validator borrows all inputs, uses checked O(1) length arithmetic, performs
+no allocation/hash/byte copies and retains no owner. Existing query and actual
+consumed-fact guards pay the represented input/work; added fixed arithmetic fits
+existing fixed per-candidate scan charge. No performance benchmark claim.
+
+Tests must obtain genuine runtime RED before bodies. Use legitimate created
+large-state records whose initial row can fit but whose generated worker makes
+the postimage exceed the source metadata limit, alongside a valid sibling, so
+this is not only synthetic restored state. Source assertions/ledgers remain
+immutable; new controls receive no original-case credit without exact mapping.
+Native Linux/Elixir/full profiles and production runtime gates remain open.
+
+
+PUBLIC-CLAIM-SOURCE1 amendment before creation: approve a private cfg(test)
+`source.rs::tests` module for independent primitive varint/integer/binary and
+aggregate lower-bound boundary vectors. It uses no runtime dependency and is
+supplemental after the three native preimplementation RED cases. The dependency
+cache was missing actual redb files/objects. A normal Cargo fetch failed DNS;
+the connected GitHub API supplied the exact pinned commit/tree and131 UTF-8
+blobs. All166 Git objects, including a reconstructed commit with exact SHA and
+original -0700 timestamps, were hash-verified; git fsck passed before Cargo
+recreated its checkout. Evidence: /private/tmp/ferricstore2-claim-source-redb/
+proof.json. No source/dependency/lockfile selection was changed. The restored
+cache then produced three compiled behavioral failures in claim-source-red.log.
+
+
+### PUBLIC-CLAIM-SOURCE1 final solo review and verified checkpoint, 2026-11-01
+
+The source lower bound is monotone: mandatory metadata header/bitmap/flags and
+minimum projection/attribute/state-meta sections contribute18 bytes; public
+projection always installs a logical partition primitive, at least1 more. Actual
+type, generated running state, preserved logical state, lease owner, update time
+and the two deadline/due primitives cannot disappear in the pinned successful
+encoding. Uncaptured scope and rich metadata can only add bytes or invalidate
+the row. No positive result establishes a complete source row. Reclaim inspects
+run_state with queued fallback, not the short physical running label. Source
+max_run_id_bytes is65535 minus52, including the SHA routing-tag overhead. The
+private u64 format and native u128 state-entry migration remain unaffected.
+
+No source payload is copied to determine a rejection: only borrowed lengths,
+checked additions and at most10 iterations per u64 varint are used. The existing
+query and consumed-fact guards pay the actual bytes, and the1024 logical-byte
+per-scan charge covers fixed scalar accounting. No new heap owner, wire version,
+dependency or measured performance claim. This is solo review, not peer review.
+
+Three native controls have genuine runtime RED before bodies: admitted worker
+32769 claimed2 instead of0; worker32768 with real funding claimed2 instead of0;
+a legitimate created32000-byte state plus1024-byte generated worker claimed2
+instead of skipping first and claiming only its valid sibling. Additional worker
+lengths32768/32600 in the first test run after the first loop assertion are later
+supplemental branches, not separately demonstrated RED. The final6 native tests
+also cover a large32500-byte worker below known bounds, filter-before-binding
+with original index0 and three-phase reclaim using preserved logical run state.
+Five later arithmetic/ID-boundary unit tests are supplemental, not pre-body RED.
+
+The new test harness initially inferred detached IDs from read_credit_owner,
+which intentionally omits those rows, and then assumed a literal key suffix
+although private keys escape components. Those were harness errors after primary
+behavior assertions passed. The final controls inspect exact FWGI row identities,
+page/status bytes and matching FWGU consumed markers in the actual backend:
+all4 IDs Released/no markers for all-skipped, or only original ID1 Active with
+its marker and other original IDs Released for a non-prefix accepted sibling.
+They also assert original sidecars, unchanged skipped records, credit totals,
+retained replay and actual reopen. No existing assertion was removed or weakened.
+
+Final frozen workspace:1815 Rust tests/120 groups plus11 doctests/15 groups,
+zero failed/ignored. Strict all-target workspace Clippy, strict docs,60
+architecture checks/5 groups, Python7, reference integrity, progress, fmt and
+diff all pass. Real full parity exits1 for complete5858-declaration scenario/
+profile/setup/fixture/adapter execution gaps. No native Linux/Elixir or full
+wrapper/platform/performance/service acceptance is claimed or reprobed.
+
+Evidence: /private/tmp/ferricstore2-claim-source-{red,native,domain,workspace,
+doctests,clippy,doc,arch,python,reference,progress,parity,fmt}.log;
+claim-source-proof.json binds terminal commands/results/SHA256, and
+claim-source-inputs.json freezes2185 non-Markdown inputs/1596 Rust files, all
+unchanged through final checks. Against a3184a7,1289 of1290 prior test/bench/
+reference inputs remain byte-identical, with one exact additive source-module
+registration;753 of754 Rust inputs are whole plus that registration. Original
+source snapshots, runtime/source ledgers and assertion mappings are unchanged;
+the11 new controls receive no original-case parity credit. Source-audit.json
+records the comparison. All execution handles are terminal.
+
+The next architecture work is actual original partition/scope/rich-metadata
+capture through mutation ingress, durable points and complete snapshots, then
+exact query-row and generated-key validation. The current opaque native physical
+partition is not original nil/present-empty evidence, and metadata absence cannot
+be inferred from a core point. Review those owners/profiles before creating any
+new capture artifact; preserve private fixtures and explicit migration rules.
+Auto/Global routing, projections, blocking/per-caller pipelines, actual consensus/
+leader/read-barrier/current-auth/supervisor, transports/workers, remaining
+lifecycle/catalog behavior and complete source/platform/performance gates remain
+required. The full goal stays active and solo; no primary code adoption or push.
