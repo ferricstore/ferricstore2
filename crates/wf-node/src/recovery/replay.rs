@@ -85,6 +85,9 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
+    if profile == 20 {
+        return super::atomic_claim::apply(state, entry, fields, limits, base);
+    }
     if matches!(profile, 18 | 19) {
         return super::workflow_release::apply(state, entry, fields, limits, base, profile);
     }

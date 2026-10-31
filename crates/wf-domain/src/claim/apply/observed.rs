@@ -138,6 +138,7 @@ fn attempt<'current>(
         selection.head_reads(),
         selection.stop(),
         resume,
+        g,
     ))
 }
 

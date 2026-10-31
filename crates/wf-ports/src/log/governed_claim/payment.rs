@@ -3,7 +3,7 @@ use super::{E, GovernedClaimPayment as P, GovernedClaimPaymentRef as R};
 use crate::log::{reader::Reader, writer::Writer};
 use wf_domain::{governance::release::LimitEnforcement as F, workflow::MAX_EXACT_MILLIS as MAX};
 
-pub(super) fn write(out: &mut Writer<'_>, payment: P<'_>) -> Result<(), E> {
+pub(in crate::log) fn write(out: &mut Writer<'_>, payment: P<'_>) -> Result<(), E> {
     metadata(
         payment.scope,
         payment.shard_id,
@@ -26,7 +26,7 @@ pub(super) fn write(out: &mut Writer<'_>, payment: P<'_>) -> Result<(), E> {
     }
     Ok(())
 }
-pub(super) fn read<'a>(reader: &mut Reader<'a>, encoded: &'a [u8]) -> Result<R<'a>, E> {
+pub(in crate::log) fn read<'a>(reader: &mut Reader<'a>, encoded: &'a [u8]) -> Result<R<'a>, E> {
     let start = encoded.len() - reader.remaining();
     let scope = reader.nonempty(65535)?;
     let shard = reader.u64()?;
@@ -64,7 +64,7 @@ fn metadata(scope: &[u8], shard: u64, epoch: u64, count: usize) -> Result<(), E>
     }
     Ok(())
 }
-pub(super) fn validate(payment: R<'_>, maximum_owned: usize) -> Result<(), E> {
+pub(in crate::log) fn validate(payment: R<'_>, maximum_owned: usize) -> Result<(), E> {
     let bound = payment
         .count
         .checked_mul(std::mem::size_of::<&[u8]>())

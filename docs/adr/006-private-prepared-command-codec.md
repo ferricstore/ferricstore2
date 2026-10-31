@@ -1793,3 +1793,43 @@ point reads and canonical recovery require GC4 for this new receipt, including
 receipt-only cohorts. Private retained metadata moves without cloning old response
 bytes when the selected driver substitutes that deterministic rejection. This
 codec value grants no queue-full or durable-commit authority by construction.
+
+## Selected atomic Claim parent framing
+
+ATOMIC-CLAIM-PARENT1 reserves op18/intent20/response17 for the actual atomic
+ordinary Claim parent required by ADR-004 A-CM1. Its immutable frame contains all
+normalized original caller fields except block-attempt duration, plus separate
+trusted time, operational token/scan/head inputs and optional original paid IDs.
+Intent20 binds tenant and canonical original caller content; generated IDs/epoch,
+time and operational budgets affect the prepared digest without changing caller
+intent. The decoder normalizes and stream-verifies the complete actual caller
+bytes before retaining reference spines; no supplied digest certifies arbitrary
+unparsed caller content. Existing leaf and generic codecs stay closed to op18.
+
+The real driver must inspect retained replay once and stage every phase under
+one actual transaction, then publish one original response/control. Complete
+current governance, original-ID monotonicity, explicit route authority and full
+receipt validation remain required; mathematical codec/Fresh values prove no
+durability or external ownership. Fresh unresolved Auto/Global scope refuses
+until its real source route is implemented. Original optional partition capture,
+pipeline identity, fault/recovery and both-host acceptance remain open. This
+selection allocates a contract; implementation evidence must be recorded apart.
+
+The implemented selected native parent now keeps one actual Fresh gate and one
+writer across the original schedule. Exact borrowed nested response bodies
+preserve accepted order, original time, one worker/type/deadline and unique
+partition/record identities across phases. Original payment is retained whole;
+used positions are monotone, may be non-prefix in the grammar and are checked
+against the original payment. A rejected receipt contains no accepted prefix.
+Only the actual writer proves rollback and publication; response grammar alone
+provides neither. Current native canonical binding consumes one original cursor
+across all accepted phases; source bind-before-skip capture is still required.
+
+Policy-derived native payment uses the complete current stored policy under
+that writer, exact source scope/shard and actual current credit configuration,
+fingerprint, lease generation and original active IDs. Explicit pairs skip unused
+governance. One PolicySchemaCharge spans initialization, phases and replacement
+rejection guards. No scalar projection, client confirmation flag or reconstructed
+leaf Fresh value supplies this authority. Public funding/NoDemand/Unknown,
+compensation, original optional partition capture and pipeline identities remain
+separate required integration work; this native entrypoint is not that service.

@@ -20,7 +20,11 @@ pub(crate) fn scan_outcome_in_layout<'a>(
     if layout == 8 && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| Ok(intent == 18))? {
         return super::release_maintenance::scan(bytes, scope, request, admission, maximum);
     }
-    if layout == 8 && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| Ok(intent == 19))? {
+    if layout == 8
+        && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| {
+            Ok(matches!(intent, 19 | 20))
+        })?
+    {
         return super::governed_claim::scan(bytes, scope, request, admission, maximum);
     }
     if layout == 8
@@ -58,7 +62,7 @@ pub(crate) fn encode_outcome_in_layout(
     if layout == 8 && outcome.intent().version() == 18 {
         return super::release_maintenance::encode(outcome, maximum, admission);
     }
-    if layout == 8 && outcome.intent().version() == 19 {
+    if layout == 8 && matches!(outcome.intent().version(), 19 | 20) {
         return super::governed_claim::encode(outcome, maximum, admission);
     }
     if layout == 8 && matches!(outcome.intent().version(), 12..=17) {

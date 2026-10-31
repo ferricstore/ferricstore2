@@ -15,6 +15,7 @@ use wf_storage::transaction::{
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
+mod atomic_claim;
 mod catalog_ack;
 mod catalog_membership;
 mod catalog_progress;
@@ -43,6 +44,10 @@ pub struct CommittedRecoveryLimits {
     normal: RecordBatchTransactionLimits,
     claim_work: Option<ClaimWorkLimits>,
     value_claim_work: Option<ClaimWorkLimits>,
+    atomic_claim: Option<(
+        wf_domain::claim::caller::ClaimCallerLimits,
+        wf_domain::claim::coordination::ClaimCoordinationLimits,
+    )>,
     core_policy: bool,
     original_policy: bool,
     workflow_values: Option<[usize; 4]>,
@@ -94,6 +99,7 @@ impl CommittedRecoveryLimits {
             normal,
             claim_work: None,
             value_claim_work: None,
+            atomic_claim: None,
             core_policy: false,
             original_policy: false,
             workflow_values: None,
@@ -196,6 +202,9 @@ impl CommittedRecoveryLimits {
     }
     fn additional_profile_bytes(&self) -> Result<usize, CommittedRecoveryError> {
         let mut owned = 0;
+        if self.atomic_claim.is_some() {
+            owned = total(&[owned, std::mem::size_of_val(&self.atomic_claim)])?;
+        }
         if self.step_continue.enabled() || self.step_continue.stored() {
             owned = total(&[
                 owned,

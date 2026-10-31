@@ -38,6 +38,55 @@ pub(super) fn decide<'current>(
         cap,
     )?;
     let kind = copy(envelope.query.workflow_type)?;
+    with_window(scope, loaded, limits, (kind, selected, scans), |window| {
+        decide_fresh_claim_phase_observed(fresh, Some(window), live, limits.base.outcome_ttl_ms)
+    })
+}
+
+pub(in crate::transaction) fn decide_atomic<'current>(
+    scope: &RequestScope,
+    loaded: &'current mut LoadedClaim,
+    envelope: &wf_domain::claim::apply::ClaimEnvelope<'_>,
+    now: wf_types::version::TimestampMillis,
+    limits: ClaimTransactionLimits,
+    prior: u64,
+) -> Result<wf_domain::claim::apply::ClaimDecision<'current>, ClaimTransactionError> {
+    let cap = limits.base.maximum_staging_bytes;
+    debit(
+        &mut loaded.staging_used,
+        envelope.query.workflow_type.len(),
+        cap,
+    )?;
+    let kind = copy(envelope.query.workflow_type)?;
+    with_window(
+        scope,
+        loaded,
+        limits,
+        (kind, envelope.query.limit, envelope.scan_budget),
+        |window| {
+            wf_domain::claim::apply::decide_observed_claim(
+                window,
+                envelope,
+                now,
+                limits.base.codec.admission(),
+                limits.work,
+                prior,
+            )
+            .map_err(wf_ports::log::RecordBatchApplyError::Apply)
+        },
+    )
+}
+
+fn with_window<'current, T>(
+    scope: &RequestScope,
+    loaded: &'current mut LoadedClaim,
+    limits: ClaimTransactionLimits,
+    (kind, selected, scans): (Vec<u8>, usize, usize),
+    reduce: impl for<'query> FnOnce(
+        ClaimObservedWindow<'query, 'current>,
+    ) -> Result<T, wf_ports::log::RecordBatchApplyError>,
+) -> Result<T, ClaimTransactionError> {
+    let cap = limits.base.maximum_staging_bytes;
     let LoadedClaim {
         queries,
         records,
@@ -100,12 +149,7 @@ pub(super) fn decide<'current>(
         head_lanes: &lanes,
         heads_complete: *heads_complete,
     };
-    Ok(decide_fresh_claim_phase_observed(
-        fresh,
-        Some(window),
-        live,
-        limits.base.outcome_ttl_ms,
-    )?)
+    Ok(reduce(window)?)
 }
 
 fn current_facts<'query, 'current>(

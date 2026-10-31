@@ -28,7 +28,15 @@ pub use catalog_prune::{
     catalog_prune_retained_summary, encode_catalog_prune_reply, encode_catalog_prune_request,
     prepare_catalog_prune_request,
 };
+mod atomic_claim;
 mod claim;
+pub use atomic_claim::AtomicClaimReplyBuilder;
+pub use atomic_claim::{AtomicClaimInspection, FreshAtomicClaim, inspect_atomic_claim_point};
+pub use atomic_claim::{
+    AtomicClaimOptions, AtomicClaimReplyRef, PreparedAtomicClaim, atomic_claim_recovery_header,
+    atomic_claim_retained_summary, encode_atomic_claim_request, inspect_atomic_claim_reply,
+    prepare_atomic_claim_request, running_claim_scope,
+};
 mod governed_claim;
 pub use catalog_ack::{
     PreparedCatalogAckRequest, catalog_ack_recovery_header, catalog_ack_request_intent,

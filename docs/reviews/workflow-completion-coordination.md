@@ -62026,3 +62026,243 @@ Do not assume a savepoint can be created after staged phase writes, reset
 resource counters, commit leaf outcomes or manufacture a Fresh child capture.
 This observation approves no new artifact or serialization profile. The actual
 combined parent and all A-CM1 acceptance controls remain the next batch.
+
+### ATOMIC-CLAIM-PARENT1 — concrete solo architecture decision (2026-10-31)
+
+Previous goal turn is progress:8a8686f plus primary docs55f5677. Both worktrees
+revalidated clean. Continue solo; no independent review is claimed. A-CM1 needs
+one actual parent, never sequential leaf commits or fake child Fresh identities.
+
+Approved concrete artifacts before creation:
+
+* wf-ports/src/log/atomic_claim.rs and atomic_claim/{caller,frame,model,response,
+  phase}.rs: PreparedAtomicClaim, AtomicClaimOptions, AtomicClaimCaller,
+  FreshAtomicClaim, AtomicClaimInspection, AtomicClaimReplyBuilder and
+  AtomicClaimReplyRef. Explicit op18/intent20/response17 captures the complete
+  normalized original caller, trusted stamp, token/scan/head parameters and
+  optional original identified payment. Intent hashes tenant/canonical caller;
+  generated payment/time and operational budgets stay prepared identity only.
+  Re-normalize and stream-compare actual caller bytes; no opaque synthetic intent.
+* wf-storage/src/transaction/atomic_claim.rs and atomic_claim/{execute,policy,
+  reply}.rs: AtomicClaimTransactionLimits and actual one-gate driver. Existing
+  claim/{load,observations,values}.rs share query loading/reduction/value helpers
+  using actual FreshAtomicClaim input. Never manufacture old DecodedRequest,
+  FreshClaimPhase or GroupClaimChanges to reuse leaf publication.
+* wf-storage/src/state/redb/commit/atomic_claim.rs and atomic_claim/{stage,
+  values,payment}.rs: StagedAtomicClaim owns one writer; stages checked records,
+  history, correctness indexes, values and original-ID bindings; consumes it for
+  one retained outcome/control commit. Late refusal aborts all prefix effects.
+  Retaining a rejection after abort requires a new guard verifying the SAME
+  actual predecessor and absent outcome, not a second Fresh gate. Operational
+  abort and uncertain commit retain their existing different meanings.
+* wf-ports/tests/atomic_claim/{main,caller,framing,response}.rs;
+  wf-storage/tests/state_store/workflow_values/claim/atomic.rs and
+  atomic/{fixtures,phases,replay,rollback,payment}.rs. Add only the exact existing
+  integration registration. Cover multi-phase visibility/order, no failed prefix,
+  one receipt, changed-input replay, exact IDs, reopen and actual resource refusal.
+
+Existing request/outcome association may add intent20/response17; existing
+publication/recovery helpers may add isolated routes only after complete body/
+receipt verification. Legacy profiles stay closed. Amend this decision for any
+additional new file/type. Original partition meaning remains exact; native
+explicit keys must match, and fresh unresolved Auto/Global routing must refuse
+until its real source route exists. That boundary is not full public acceptance.
+
+Borrow caller leaves and paid IDs from the immutable original frame. Bound full
+syntax/EOF before namespace/reference ownership; admit temporary normalization
+spines and stream-verify without another canonical buffer. Carry cumulative work,
+schema, value and read budgets across phases. Root replies contain actual phase
+postimages; one original reservation cursor cannot reset. Current complete policy
+and actual credit ownership remain required for governed effects. No fake flow ID,
+projection certificate, caller freshness flag or external compensation proof.
+Original bind-before-skip, optional partition capture, per-pipeline-caller batches
+and both-platform/source-profile acceptance remain mandatory beyond these steps.
+
+ATOMIC-CLAIM-PARENT1 amendment before creation: approve private ports children
+atomic_claim/response/{scan,builder}.rs under the named response facade, keeping
+full receipt scanning separate from bounded original-postimage construction.
+The existing requested FreshAtomicClaim/AtomicClaimInspection live in phase.rs;
+the opaque Fresh value borrows the actual prepared parent and one real point
+gate control. Phase envelopes retain intent20 and the actual root prepared
+identity. Source schedule values never manufacture an old leaf header or gate.
+
+ATOMIC-CLAIM-PARENT1 loader amendment before creation: approve existing Claim
+private children load/{atomic,policy}.rs. Move the original policy projection
+body verbatim into policy.rs to keep the shared loader below400 lines; atomic.rs
+loads the actual root-derived envelope under its real FreshAtomicClaim and the
+same guard. Share observations through a borrowed-window callback and value
+construction through explicit scope/root digest/business inputs. No fake leaf
+outcome/control is an argument to shared helpers. ClaimPlan exposes actual
+cumulative represented work; state-entry ordinals remain separate from accepted
+records and reservation bind attempts (current Claim consumes zero ordinals).
+
+ATOMIC-CLAIM-PARENT1 size amendment (solo review before creation): approve
+wf-domain/src/workflow/request/intent.rs as a private child containing the
+existing ClientIntent implementation, moved unchanged from request.rs. The
+public type stays at its existing path; version constructors and getters keep
+their exact bodies. The actual architecture run found request.rs at408 lines
+after intent20 was added. This responsibility split adds no type, allocation,
+dependency, serialization change or exemption and restores the400-line limit.
+
+ATOMIC-CLAIM-PARENT1 current solo self-review: one actual writer now stages the
+source three-phase schedule, original record/history/value/index postimages and
+identified bindings. One original gate precedes current reads; complete replay
+returns its original retained owner without cloning it. Query/work/schema/value,
+read and staging accounts continue across phases. Late business refusal aborts
+the real writer; a replacement guard verifies the same predecessor and absent
+request, using remaining read/adapter budgets, before retaining only rejection.
+Operational no-commit and actual uncertain commit remain distinct; uncertainty
+fences subsequent writes and reopens only the whole old or new cohort.
+
+Six new native parent controls cover these paths, including paid rollback of
+all bindings/consumed markers and real sync uncertainty. Five passed in the
+337-case state_store run; the later uncertainty case separately passes. Parent
+codec13 cases pass. Two additional actual runtime REDs in crossphase-r0 proved
+duplicate workflow identity across phases and differing workers were accepted;
+the complete parent scanner now compares borrowed identity spans and original
+type/worker/deadline without copying postimages. Distinct partitions preserve
+equal record IDs. The final total-count cap is checked before cross-phase
+comparisons, bounding comparison work to the admitted parent size. No timing
+or throughput claim is made. The original core summary body stays unchanged;
+only explicit additional parent helpers call the existing row/identity scanner.
+
+Strict all-target workspace Clippy passes on the latest code. Early strict runs
+found and fixed wildcard imports, a missing semicolon, naming collisions and
+an unnecessarily complex return type; no suppression was added. Architecture
+found request.rs at408 lines; its unchanged intent implementation now lives in
+the approved intent.rs child. Evidence is /private/tmp/ferricstore2-atomic-claim-
+{workspace,final-affected,uncertain,clippy-final,crossphase-r0,crossphase-green,
+source-audit,inputs}.*. Full compiled sweep/final checks are still in progress.
+All718 prior Rust test/bench inputs remain717 whole plus one exact registration;
+six source/runtime ledgers remain identical. Explicit new guarded outcome routes
+were changed and are not claimed byte-identical. This is an uncommitted native
+parent increment; derived governance/public compensation/pipeline identities,
+Node op18 recovery and all remaining completion gates are still open.
+
+### ATOMIC-CLAIM-POLICY1 — solo contract before the derived-route batch
+
+Previous goal turn is progress: actual parent staging, paid rollback, real sync
+uncertainty and cross-phase receipt fixes changed code and produced executed
+evidence. Existing whole-workspace session62441 is confirmed live; do not restart
+it for an observation timeout. Continue solo, preserving the full goal.
+
+Approve ports/log/atomic_claim/policy.rs (new pure private child) and its public
+running_claim_scope helper: the exact pinned SHA256 + unpadded base64url scope
+uses one56-byte fixed result and the existing ports sha2 dependency. Approve
+ports/tests/atomic_claim/policy.rs and domain/tests/source_binary_hash.rs for
+independent mathematical controls. Add source_binary_hash to existing domain
+retry/source.rs and re-export from retry.rs; reuse its already tested OTP block
+mixing with seed zero and the full32-bit result, never the retry tuple or its
+default27-bit range. No new domain dependency, runtime effect or hash exemption.
+
+Approve storage/tests/state_store/workflow_values/claim/atomic/policy.rs for
+actual stored-policy/credit-owner scenarios. The existing backend payment.rs
+must read complete current policy under the actual Fresh parent writer, resolve
+the original caller, verify exact derived scope/shard/enforcement and current
+credit configuration/fingerprint when configuration exists, and verify original
+active IDs. A projection or caller boolean grants no authority. Valid explicit
+pairs skip unused governance only; mode/retry still uses actual stored policy.
+The atomic loader gets a separate projection function in its existing policy.rs;
+the old leaf governance refusal remains intact. No synthetic paid leaf capture.
+
+Thread the SAME PolicySchemaCharge from actual parent initialization through
+every phase and replacement rejection guard, including any repeated credit
+check. Pass it by mutable borrow; no clone/reset or new resource-owner type.
+Current governance without a paid batch refuses with the original payment
+business diagnosis. Unexpected/stale paid configuration cannot mutate workflows.
+This batch adds no external funding, Unknown resolution or compensation proof.
+Before creating any further path/type, amend this concrete decision.
+
+Pinned source inspected: claim_due_api.ex:493-577,802-942 at66586c596e271408d9184af32eb31cd7218c126e.
+Both spend and lease carry current configuration. Scope is flow-running plus
+SHA256/base64url; shard uses standalone phash2(worker, shard_count). Primary
+references: [OTP29 binary hashing](https://github.com/erlang/otp/blob/OTP-29.0.5/erts/emulator/beam/erl_term_hashing.c#L1193-L1220)
+and [explicit phash2 range](https://www.erlang.org/doc/apps/erts/erlang.html#phash2/2).
+These justify the portable recipe, not a native Elixir execution claim.
+
+ATOMIC-CLAIM-POLICY1 runtime amendment before creation: approve private
+wf-node/src/recovery/atomic_claim.rs and
+wf-node/tests/snapshot_recovery/workflow_release/atomic_claim.rs, with its named
+children atomic_claim/{fixtures,replay,snapshot}.rs if the600-line test cap needs
+the split. No new type/model is selected. CommittedRecoveryLimits gains only
+an optional (ClaimCallerLimits, ClaimCoordinationLimits) selection, disabled by
+default, plus with_atomic_claim_recovery(caller, coordination). Require the
+actual existing GC5/stored-value/catalog-credit/value-Claim dependencies at
+selection and use, including after later builder weakening. Account its profile
+owner bytes. Explicit op18 maps to semantic20; all earlier header profiles stay
+closed. The borrowed header grants no full-body authority: historical audits
+must run complete original preparation and replay invokes the real atomic writer
+with the same explicitly supplied limits. Startup, retained replay, malformed
+historical suffix, actual older profile, received and purged snapshots must use
+real logs/state and preserve original IDs and the existing uncommitted suffix.
+Reuse existing exact fixtures without changing their assertions. This is local
+committed-prefix recovery, not an accepted Raft callback, leader/auth or service.
+
+ATOMIC-CLAIM-POLICY1 implementation self-review: the actual initialized writer
+now resolves complete current stored content, checks exact source scope and
+standalone worker hash modulo immutable shard count, checks current owner limit/
+generation/fingerprint when source configuration exists, then validates original
+active IDs under the same guard. Original generation-zero omissions retain their
+functional resolver meaning. Explicit pairs skip unused governance while the
+atomic loader separately validates/projects actual policy modes/retry. The old
+leaf refusal is unchanged. One mutable schema account reaches initialization,
+all phase loads, replacement rejection guard and repeated payment checks.
+
+Actual runtime REDs are hashes-r0, scope-r0, storage-r0 (four real installed-policy
+setups refusing closed branches) and atomic-node-r0 (UnsupportedEntry with the
+older-profile negative control passing). Hash literals are independent Python
+integer/standard-library recipes, not native OTP captures. The original retry
+hash body stays unchanged; the new binary helper calls its existing block mixer
+with seed zero/full32-bit output. Scope output uses fixed56-byte stack ownership.
+No BTreeMap label, reservation ID or complete postimage is cloned for these checks.
+This is ownership/work reasoning, not measured CPU/RSS or throughput evidence.
+
+All seven current-policy native controls pass: real three-phase paid routing,
+retained replay after changed policy/IDs, missing payment, unused explicit rule,
+unrelated governance, three independent configuration mismatches, three route/
+enforcement mismatches and continuous schema budget. A real budget accepting one
+phase refuses three phases with the entire original cohort intact; a high-budget
+positive control succeeds. Additional controls after the four REDs are explicitly
+supplemental. Six Node controls pass actual startup/re-audit, older selection,
+complete malformed historical EOF behind a later valid control, dependency
+weakening, purged/received suffix replay and explicit value-work ceilings.
+
+A proposed32KiB value-work fixture failed in the native writer because the real
+ValueCharge constructor and publication helpers debit65536 each. That was a bad
+test assumption, not evidence of an invented recovery fee or a product RED.
+The corrected supplemental test uses a valid512KiB native profile, independently
+refuses32KiB during historical recovery, and checks no cohort changes. The Cargo
+two-filter invocation error was likewise tooling, not a behavioral RED.
+
+Current strict workspace/all-target Clippy passes with no suppression. All60
+architecture cases pass. The atomic regression subset passes35 cases across
+Node/storage. Full frozen current-input workspace/doctype execution is running;
+do not claim its terminal result before polling the live78257/37869 handles.
+Source audit against8a8686f preserves718 prior Rust test/bench inputs as716 whole
+plus two exact additive registrations and preserves all six selected source/
+runtime ledgers.2130 non-Markdown inputs/1541 Rust files are frozen. Explicit new
+outcome/profile routes are changed; those files are not byte-identical claims.
+
+ATOMIC-CLAIM-PARENT1/POLICY1 final coupled verification: live78257 and37869 are
+terminal exit0. The frozen final input set passes1759 workspace tests in118
+groups and11 doctests in15 groups, with zero failures/ignored cases. Both native
+smoke benches execute. All60 architecture cases, strict all-target workspace
+Clippy, strict docs, Python7, reference integrity, progress, fmt and diff pass.
+All2130 non-Markdown inputs/1541 Rust files hash-match after execution;718 old
+test/bench inputs remain716 whole plus two exact additive registrations. The34
+new cases are additional Rust coverage, not full source-case parity credit.
+
+The actual full parity command exits1 with incomplete behavior/profile scope.
+Frozen source/runtime accounting remains5858 textual declarations,
+141 derived/155 mappings/671 assertion links and5903 registered/4222 linked/
+1681 unmatched/1655 unresolved. No Linux/native Elixir, measured speedup,
+independent peer review, accepted Raft callback or production service is claimed.
+The original dirty Elixir tree and isolated unexecuted native fix stay preserved.
+
+Final evidence: /private/tmp/ferricstore2-atomic-coupled-{workspace,doctests,
+clippy,arch,doc,python,reference,progress,parity}.log, plus proof.json,
+source-audit.json and inputs.json. Next is real public original-caller intent/
+retained inquiry, authorized current policy, funding/NoDemand/original-ID
+settlement/Unknown, source bind-before-skip/partition/pipeline/projection and
+actual pinned scenario/profile execution, then the remaining ordered milestones.
+This checkpoint leaves the full completion goal active; it does not redefine it.

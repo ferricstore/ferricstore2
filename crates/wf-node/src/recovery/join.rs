@@ -30,7 +30,7 @@ pub(super) fn observe(
     base: usize,
     membership: &mut Option<(EntryIdentity, EntryStamp)>,
 ) -> Result<ControlState, Error> {
-    if super::workflow_release::enabled(limits) {
+    if super::workflow_release::enabled(limits) || limits.atomic_claim.is_some() {
         super::workflow_release::require_dependencies(limits)?;
     }
     if limits.stored_workflow_values {
@@ -138,7 +138,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if matches!(body.get(6), Some(16 | 17)) {
+    let header = if body.get(6) == Some(&18) {
+        super::atomic_claim::header(body, limits)
+    } else if matches!(body.get(6), Some(16 | 17)) {
         super::workflow_release::header(body, limits)
     } else if body.get(6) == Some(&15) && super::credit::public(limits) {
         wf_ports::log::public_credit_recovery_header(body, limits.normal.codec)
@@ -234,6 +236,9 @@ fn audit_normal(
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if profile == 20 {
+        return super::atomic_claim::audit(body, limits, base, stamp);
+    }
     if matches!(profile, 18 | 19) {
         return super::workflow_release::audit(body, limits, base, stamp, profile);
     }

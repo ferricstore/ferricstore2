@@ -13,13 +13,13 @@ use wf_domain::workflow::control::PreparedDigest;
 use wf_domain::workflow::indexed::OrderingMetadata;
 use wf_ports::state::{GroupClaimChanges, GroupClaimTransaction, StateTransactionError as Error};
 
-pub(super) struct ClaimValueResources {
-    pub(super) limits: WorkflowValueTransactionLimits,
+pub(in crate::transaction) struct ClaimValueResources {
+    pub(in crate::transaction) limits: WorkflowValueTransactionLimits,
     charge: ValueCharge,
 }
 
 impl ClaimValueResources {
-    pub(super) fn new(
+    pub(in crate::transaction) fn new(
         limits: WorkflowValueTransactionLimits,
         encoded: usize,
     ) -> Result<Self, ClaimTransactionError> {
@@ -54,6 +54,15 @@ pub(crate) struct ClaimValuePublicationPlan<'plan> {
 }
 
 impl ClaimValuePublicationPlan<'_> {
+    pub(in crate::transaction) fn into_resources(
+        self,
+        limits: WorkflowValueTransactionLimits,
+    ) -> ClaimValueResources {
+        ClaimValueResources {
+            limits,
+            charge: self.charge,
+        }
+    }
     pub(crate) const fn prepared(&self) -> PreparedDigest {
         self.prepared
     }
@@ -90,12 +99,27 @@ pub(super) fn commit_governed(
 fn build<'plan>(
     tx: &RedbStateTransaction<'_>,
     changes: &'plan GroupClaimChanges<'_, '_>,
+    resources: ClaimValueResources,
+) -> Result<ClaimValuePublicationPlan<'plan>, ClaimTransactionError> {
+    let prepared = changes
+        .plan()
+        .control()
+        .next()
+        .last_entry()
+        .ok_or(Error::InvalidChanges)?
+        .prepared();
+    build_phase(tx, changes.scope(), prepared, changes.business(), resources)
+}
+
+pub(in crate::transaction) fn build_phase<'plan>(
+    tx: &RedbStateTransaction<'_>,
+    scope: &wf_domain::workflow::request::RequestScope,
+    prepared: PreparedDigest,
+    business: Option<&'plan wf_domain::workflow::indexed::IndexedBatchPlan<'_>>,
     mut resources: ClaimValueResources,
 ) -> Result<ClaimValuePublicationPlan<'plan>, ClaimTransactionError> {
     resources.charge.helper()?;
-    let count = changes
-        .business()
-        .map_or(0, |business| business.batch().items().len());
+    let count = business.map_or(0, |business| business.batch().items().len());
     let fixed = total(
         size_of::<ClaimValuePublicationPlan<'_>>(),
         [
@@ -106,14 +130,7 @@ fn build<'plan>(
     )?;
     let mut steps = resources.charge.reserve(count, fixed)?;
     let live = total(fixed, [product(count, size_of::<ClaimValueStep<'_>>())?])?;
-    let prepared = changes
-        .plan()
-        .control()
-        .next()
-        .last_entry()
-        .ok_or(Error::InvalidChanges)?
-        .prepared();
-    if let Some(business) = changes.business() {
+    if let Some(business) = business {
         let defaults = tx.value_manifest()?.defaults;
         for (scoped, ordering) in business.batch().items().iter().zip(business.metadata()) {
             resources.charge.candidate()?;
@@ -121,7 +138,7 @@ fn build<'plan>(
             let expected = write.expected_version.ok_or(Error::InvalidChanges)?;
             let mut binding = binding::load_at_version(
                 tx,
-                changes.scope(),
+                scope,
                 (scoped.partition(), write.record.id()),
                 expected,
                 defaults,

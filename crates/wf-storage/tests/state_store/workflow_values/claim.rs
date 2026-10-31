@@ -10,6 +10,7 @@ use wf_storage::transaction::{
     ClaimTransactionOutcome, WorkflowValueTransactionLimits, apply_workflow_value_claim_transaction,
 };
 
+mod atomic;
 mod chain;
 mod faults;
 pub(super) mod fixtures;

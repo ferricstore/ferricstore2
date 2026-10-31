@@ -6,7 +6,7 @@ use wf_domain::workflow::{
     admission::AdmissionLimits,
     request::{ClientIntent, RequestScope, RetainedOutcome},
 };
-use wf_ports::log::governed_claim_retained_summary;
+use wf_ports::log::{atomic_claim_retained_summary, governed_claim_retained_summary};
 use wf_types::identity::RequestId;
 
 pub(super) fn encode(
@@ -14,7 +14,12 @@ pub(super) fn encode(
     maximum: usize,
     admission: AdmissionLimits,
 ) -> Result<Vec<u8>, E> {
-    let (status, _) = governed_claim_retained_summary(
+    let summary = if outcome.intent().version() == 20 {
+        atomic_claim_retained_summary
+    } else {
+        governed_claim_retained_summary
+    };
+    let (status, _) = summary(
         outcome.intent(),
         outcome.response_version(),
         outcome.response(),
@@ -45,7 +50,7 @@ pub(super) fn scan<'a>(
          original_time,
          expires_at,
          response_version| {
-            if version != 19 || response_version != 16 {
+            if !matches!((version, response_version), (19, 16) | (20, 17)) {
                 return Err(E::UnsupportedVersion);
             }
             let [tenant, group, recovery, original_request, response] = fields;
@@ -57,15 +62,19 @@ pub(super) fn scan<'a>(
             {
                 return Err(E::InvalidValue);
             }
-            let intent = ClientIntent::governed_claim(digest);
-            let (status, response_count) = governed_claim_retained_summary(
-                intent,
-                response_version,
-                response,
-                original_time,
-                admission,
-            )
-            .map_err(claim_error)?;
+            let intent = if version == 20 {
+                ClientIntent::atomic_claim(digest)
+            } else {
+                ClientIntent::governed_claim(digest)
+            };
+            let summary = if version == 20 {
+                atomic_claim_retained_summary
+            } else {
+                governed_claim_retained_summary
+            };
+            let (status, response_count) =
+                summary(intent, response_version, response, original_time, admission)
+                    .map_err(claim_error)?;
             let mut owned_bytes = 512;
             for field in fields {
                 add(&mut owned_bytes, field.len())?;

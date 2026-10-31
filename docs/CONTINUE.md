@@ -2,7 +2,55 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Latest CLAIM-CURRENT-POLICY1 adds actual Complete V2/Original ETF running-rule
+The coupled ATOMIC-CLAIM-PARENT1/POLICY1 native implementation now executes
+op18/intent20/response17 over one original retained gate and one coherent writer.
+Running/Normal/Running phases see prior staged leases and publish one final
+record/history/index/value/payment/receipt/control transaction. Late business
+refusal actually aborts all prefix effects. Original paid IDs bind monotonically
+across phases; retained replay precedes current policy and changed payment.
+
+Current complete policy is read under that writer. Derived scope/shard, actual
+credit limit/generation/fingerprint, lease and original IDs are checked without
+projection authority. Explicit pairs skip unused governance. One schema account
+spans initialization, phases and replacement rejection guards. Original op18
+startup, historical re-audit and received/purged suffix replay use an explicit
+Node selection with caller/schedule limits and actual GC5/value/catalog-credit
+dependencies; older header profiles remain closed. Complete historical bodies
+are decoded, and opaque uncommitted suffixes stay unexecuted.
+
+All1759 workspace tests pass in118 groups, plus11 doctests in15 groups, with no
+failures or ignored cases. All60 architecture cases, strict all-target workspace
+Clippy, strict docs, Python7, reference integrity, progress, fmt and diff pass.
+The34 new Rust cases include actual paid/unpaid rollback, sync uncertainty,
+current configuration/route refusal, budget continuity and snapshot recovery.
+All2130 frozen non-Markdown inputs/1541 Rust files remain unchanged through the
+final verification. Of718 old test/bench inputs,716 stay whole and two have exact
+additive module registrations. Six source/runtime ledgers stay byte-identical;
+new explicit guarded outcome routes were changed and are not byte-identity
+claims. Evidence: /private/tmp/ferricstore2-atomic-coupled-{workspace,doctests,
+clippy,arch,doc,python,reference,progress,parity}.log and proof/source-audit/inputs.json.
+
+The full parity command actually exits1: full required source behavior/profiles
+remain incomplete. No Linux/native Elixir execution, independent review, live
+consensus/service or measured speedup is claimed. This verified native parent
+and recovery increment does not finish the public Claim service or full goal.
+
+NEXT finish the actual public canonical intent/retained inquiry before policy
+or entropy, current authorized complete-policy demand, original credit funding,
+failed-Spend plus physical-presence NoDemand, unused original-ID refund and
+Unknown inquiry/compensation before fresh spend. Preserve original bind-before-
+skip positions, nil/present-empty partition capture, original caller identity
+through pipelines and exact response projections. Fresh unresolved Auto/Global
+routes still refuse. Execute/map the pinned Claim scenarios with their original
+assertions and required profiles; do not substitute only new safety controls.
+Then close remaining read-barrier/consensus/services/transports/workers/catalog
+lifecycle, source scenarios and Linux/macOS/performance gates. Keep the full goal
+active and solo. Primary code is unchanged; only its handoff pointer is updated.
+
+Historical checkpoints below retain their own evidence and do not override the
+current next steps.
+
+Predecessor CLAIM-CURRENT-POLICY1 adds actual Complete V2/Original ETF running-rule
 resolution and connects it to original Claim demand planning. Full backing/type
 verification precedes policy-derived results; valid explicit pairs skip unused
 policy. Source deep-merge masking, zero/minimum/strict rules, generation-zero
@@ -23,7 +71,7 @@ claim-current-policy-{domain,final-writer,final-clippy,arch,progress}.log and
 proof.json/source-audit.json/inputs.json. This is no new whole-all12 result,
 source-case credit, Linux execution or measured speedup.
 
-NEXT implement the actual one-gate, one-outcome atomic Claim parent over bounded
+That checkpoint identified the next one-gate/one-outcome atomic parent over bounded
 coherent phase effects; call the new stored-content resolver only with the real
 current policy observation after retained replay and current authorization.
 Credit funding/NoDemand/settlement/Unknown, monotone bind attempts, original

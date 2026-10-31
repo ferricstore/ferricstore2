@@ -8,7 +8,9 @@ use wf_domain::workflow::request::RetainedOutcome;
 use wf_ports::log::{CodecLimits, RecordBatchApplyError};
 use wf_ports::state::StateTransactionError;
 
+mod atomic_claim;
 mod claim;
+pub use atomic_claim::{AtomicClaimTransactionLimits, apply_atomic_claim_transaction};
 pub(crate) use claim::values::ClaimValuePublicationPlan;
 mod catalog_ack;
 mod catalog_membership;

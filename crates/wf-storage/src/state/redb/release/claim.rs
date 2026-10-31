@@ -28,21 +28,35 @@ pub(crate) fn available(
     minimum: usize,
     credit: CreditLimits,
 ) -> Result<bool, E> {
-    tx.checked(|| observe(tx, scope, capture, time, minimum, credit))
+    available_at(tx, scope, capture.payment(), time, minimum, 0, credit)
+}
+
+pub(in crate::state::redb) fn available_at(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    paid: wf_ports::log::GovernedClaimPaymentRef<'_>,
+    time: TimestampMillis,
+    minimum: usize,
+    start: usize,
+    credit: CreditLimits,
+) -> Result<bool, E> {
+    tx.checked(|| observe(tx, scope, paid, time, minimum, start, credit))
 }
 
 fn observe(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
-    capture: C<'_>,
+    paid: wf_ports::log::GovernedClaimPaymentRef<'_>,
     time: TimestampMillis,
     minimum: usize,
+    start: usize,
     credit: CreditLimits,
 ) -> Result<bool, E> {
     tx.require_governed_claim()?;
-    let paid = capture.payment();
     let context = CreditReadContext::new(tx, scope, paid.scope(), credit)?;
-    if paid.shard_id() >= context.shards || paid.count() < minimum {
+    if paid.shard_id() >= context.shards
+        || paid.count().checked_sub(start).is_none_or(|n| n < minimum)
+    {
         return Ok(false);
     }
     let Some(owner) = context.owner()? else {
@@ -58,8 +72,11 @@ fn observe(
     }
     tx.step()?;
     let table = tx.write.open_table(tx.rows_table).map_err(table_error)?;
-    for id in paid.reservation_ids() {
+    for (ordinal, id) in paid.reservation_ids().enumerate() {
         let id = id.map_err(read::codec_error)?;
+        if ordinal < start {
+            continue;
+        }
         let mut key =
             claimed::reservation_key(tx, scope, paid.scope(), paid.shard_id(), paid.epoch(), id)?;
         if !claimed::active(tx, &table, &key, id)? {
@@ -118,6 +135,30 @@ pub(in crate::state::redb) fn witness<'a>(
     let count = changes
         .business()
         .map_or(0, |business| business.batch().items().len());
+    records(tx, changes.business(), count)
+}
+
+pub(in crate::state::redb) fn witness_atomic<'a>(
+    tx: &RedbStateTransaction<'_>,
+    prepared: &wf_ports::log::PreparedAtomicClaim<'_>,
+    time: TimestampMillis,
+    business: Option<&'a wf_domain::workflow::indexed::IndexedBatchPlan<'_>>,
+    start: usize,
+    credit: CreditLimits,
+) -> Result<VerifiedGovernedClaimWrites<'a>, E> {
+    let paid = prepared.payment().ok_or(E::InvalidChanges)?;
+    let count = business.map_or(0, |batch| batch.batch().items().len());
+    if !available_at(tx, prepared.scope(), paid, time, count, start, credit)? {
+        return Err(E::KnownAborted);
+    }
+    records(tx, business, count)
+}
+
+fn records<'a>(
+    tx: &RedbStateTransaction<'_>,
+    business: Option<&'a wf_domain::workflow::indexed::IndexedBatchPlan<'_>>,
+    count: usize,
+) -> Result<VerifiedGovernedClaimWrites<'a>, E> {
     tx.temporary(total(
         std::mem::size_of::<VerifiedGovernedClaimWrites<'_>>(),
         [count
@@ -128,7 +169,7 @@ pub(in crate::state::redb) fn witness<'a>(
     records
         .try_reserve_exact(count)
         .map_err(|_| E::Allocation)?;
-    if let Some(business) = changes.business() {
+    if let Some(business) = business {
         for item in business.batch().items() {
             records.push((
                 item.partition(),
@@ -155,9 +196,17 @@ pub(in crate::state::redb) fn publish(
     let Some(business) = changes.business() else {
         return Ok(());
     };
-    let scope = changes.scope();
-    let paid = capture.payment();
-    let mut ids = paid.reservation_ids();
+    publish_at(tx, changes.scope(), business, capture.payment(), 0)
+}
+
+pub(in crate::state::redb) fn publish_at(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    business: &wf_domain::workflow::indexed::IndexedBatchPlan<'_>,
+    paid: wf_ports::log::GovernedClaimPaymentRef<'_>,
+    start: usize,
+) -> Result<(), E> {
+    let mut ids = paid.reservation_ids().skip(start);
     for item in business.batch().items() {
         let id = ids
             .next()

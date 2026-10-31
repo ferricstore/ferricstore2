@@ -234,6 +234,17 @@ fn validate_response_profile(
     response_version: u16,
     status: RetainedStatus,
 ) -> Result<(), RequestValueError> {
+    if intent.version() == 20 {
+        return if response_version == 17
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::ClaimRejected(_)
+            ) {
+            Ok(())
+        } else {
+            Err(RequestValueError::UnsupportedVersion)
+        };
+    }
     if intent.version() == 18 {
         return if response_version == 15
             && matches!(

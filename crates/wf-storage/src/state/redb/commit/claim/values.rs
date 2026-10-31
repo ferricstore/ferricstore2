@@ -23,15 +23,25 @@ pub(super) fn validate(
     {
         return Err(Error::InvalidChanges);
     }
+    validate_phase(tx, publication.prepared(), changes.business(), publication)
+}
+
+pub(in crate::state::redb::commit) fn validate_phase(
+    tx: &RedbStateTransaction<'_>,
+    prepared: wf_domain::workflow::control::PreparedDigest,
+    business: Option<&wf_domain::workflow::indexed::IndexedBatchPlan<'_>>,
+    publication: &mut ClaimValuePublicationPlan<'_>,
+) -> Result<(), Error> {
+    if tx.layout != 8 || publication.prepared() != prepared {
+        return Err(Error::InvalidChanges);
+    }
     let (steps, charge) = publication.split();
     charge.helper()?;
-    let count = changes
-        .business()
-        .map_or(0, |business| business.batch().items().len());
+    let count = business.map_or(0, |business| business.batch().items().len());
     if steps.len() != count {
         return Err(Error::InvalidChanges);
     }
-    if let Some(business) = changes.business() {
+    if let Some(business) = business {
         for (step, (scoped, ordering)) in steps
             .iter()
             .zip(business.batch().items().iter().zip(business.metadata()))
@@ -61,7 +71,7 @@ pub(super) fn validate(
     Ok(())
 }
 
-pub(super) fn publish(
+pub(in crate::state::redb::commit) fn publish(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
     publication: &mut ClaimValuePublicationPlan<'_>,

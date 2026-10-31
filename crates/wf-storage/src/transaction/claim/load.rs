@@ -22,9 +22,12 @@ use wf_ports::state::{
 use wf_types::identity::{GroupId, PartitionId, RecordId};
 use wf_types::version::TimestampMillis;
 
+mod atomic;
 mod lanes;
+mod policy;
+use policy::policy_projection;
 
-pub(super) struct LoadedClaim {
+pub(in crate::transaction) struct LoadedClaim {
     pub(super) queries: Vec<(PartitionId, RecordId)>,
     pub(super) records: Vec<StoredWorkflowRecord>,
     pub(super) placements: BTreeMap<PartitionId, GroupId>,
@@ -101,21 +104,35 @@ impl LoadedClaim {
         capture: Option<wf_ports::log::CapturedGovernedClaimPayment<'_>>,
     ) -> Result<(), ClaimTransactionError> {
         let mut charge = PolicySchemaCharge::new(limits.base.schema);
-        self.policy =
-            tx.stored_policy_value(scope.tenant(), kind, limits.base.schema, &mut charge)?;
+        self.load_policy_with_charge(tx, scope, kind, limits, capture, &mut charge)
+    }
+
+    fn load_policy_with_charge<T: GroupClaimTransaction>(
+        &mut self,
+        tx: &T,
+        scope: &RequestScope,
+        kind: &[u8],
+        limits: ClaimTransactionLimits,
+        capture: Option<wf_ports::log::CapturedGovernedClaimPayment<'_>>,
+        charge: &mut PolicySchemaCharge,
+    ) -> Result<(), ClaimTransactionError> {
+        self.policy = tx.stored_policy_value(scope.tenant(), kind, limits.base.schema, charge)?;
         if let Some(policy) = &self.policy {
             let cap = limits.base.maximum_staging_bytes;
             self.projection = Some(policy_projection(
                 policy,
                 kind,
                 limits,
-                &mut charge,
+                charge,
                 &mut self.staging_used,
                 cap,
                 capture,
             )?);
         }
         Ok(())
+    }
+    pub(in crate::transaction) const fn staging_bytes(&self) -> usize {
+        self.staging_used
     }
 
     fn load_due<T: GroupClaimTransaction>(
@@ -303,70 +320,4 @@ pub(super) fn physical_matches(query: ClaimQuery<'_>, row: ClaimRecord<'_>) -> b
         ClaimStates::Any => true,
         ClaimStates::Only(states) => states.contains(&row.record.state()),
     }) && !query.exclude_states.contains(&row.record.state())
-}
-
-fn policy_projection(
-    policy: &StoredPolicyValue,
-    kind: &[u8],
-    limits: ClaimTransactionLimits,
-    charge: &mut PolicySchemaCharge,
-    staging_used: &mut usize,
-    cap: usize,
-    capture: Option<wf_ports::log::CapturedGovernedClaimPayment<'_>>,
-) -> Result<(PolicySnapshot, InstalledRetryPolicy), ClaimTransactionError> {
-    Ok(match policy {
-        StoredPolicyValue::Complete(policy) => {
-            if policy.data().workflow_type != kind {
-                return Err(StateTransactionError::Corrupt.into());
-            }
-            if capture.is_none()
-                && (policy.data().governance.is_some()
-                    || policy
-                        .data()
-                        .states
-                        .values()
-                        .any(|s| s.governance.is_some()))
-            {
-                return Err(ClaimTransactionError::UnsupportedGovernance);
-            }
-            let bytes = record_batch_policy_projection_bytes(policy)?;
-            debit(staging_used, bytes, cap)?;
-            let (mode, retry) =
-                project_record_batch_policy(policy, limits.base.schema, charge, bytes)?;
-            (mode.into_policy(), retry)
-        }
-        StoredPolicyValue::Original(raw) => {
-            let owner = raw
-                .len()
-                .checked_mul(256)
-                .and_then(|n| n.checked_add(65_536))
-                .ok_or(StateTransactionError::Limit)?;
-            debit(staging_used, owner, cap)?;
-            if capture.is_none()
-                && original_record_batch_policy_has_governance(
-                    raw,
-                    kind,
-                    limits.base.schema,
-                    charge,
-                )?
-            {
-                return Err(ClaimTransactionError::UnsupportedGovernance);
-            }
-            debit(staging_used, owner, cap)?;
-            let bytes = original_record_batch_policy_projection_bytes(
-                raw,
-                kind,
-                limits.base.schema,
-                charge,
-            )?;
-            debit(
-                staging_used,
-                owner
-                    .checked_add(bytes)
-                    .ok_or(StateTransactionError::Limit)?,
-                cap,
-            )?;
-            project_original_record_batch_policy(raw, kind, limits.base.schema, charge, bytes)?
-        }
-    })
 }

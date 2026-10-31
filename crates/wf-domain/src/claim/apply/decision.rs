@@ -71,6 +71,7 @@ pub(crate) fn decide<'a>(
             selection.head_reads(),
             selection.stop(),
             resume,
+            g,
         ))
     })();
     match attempt {

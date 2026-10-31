@@ -231,3 +231,4 @@ impl Default for StateStoreLimits {
         }
     }
 }
+pub(crate) use commit::atomic_claim::{StagedAtomicClaim, complete as complete_atomic_claim};

@@ -6,7 +6,7 @@ use crate::lease::LeaseGuard;
 use crate::policy::RetryOverride;
 
 mod source;
-pub use source::source_retry_jitter;
+pub use source::{source_binary_hash, source_retry_jitter};
 
 /// Source retry audit decision.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

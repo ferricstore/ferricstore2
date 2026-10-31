@@ -15,6 +15,7 @@ use wf_ports::log::{
 };
 use wf_ports::state::{GroupApplyChanges, GroupApplyTransaction, StateTransactionError};
 
+pub(super) mod atomic_claim;
 pub(super) mod claim;
 pub(super) mod control;
 pub(super) mod core_policy;
@@ -274,7 +275,7 @@ fn admit_outcome_profile(
         tx.require_workflow_release()?;
         tx.temporary(1024)?;
     }
-    if outcome.intent().version() == 19 {
+    if matches!(outcome.intent().version(), 19 | 20) {
         tx.require_governed_claim()?;
     }
     if matches!(

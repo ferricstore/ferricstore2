@@ -1,7 +1,7 @@
 //! Private paid Claim framing; actual eligibility belongs to the consumed writer.
 use super::{CodecError as E, CodecLimits, DecodedRequest, PreparedBytes};
 use wf_domain::{governance::release::LimitEnforcement, workflow::control::PreparedDigest};
-mod payment;
+pub(in crate::log) mod payment;
 mod request;
 /// Borrows selected paid-Claim recovery facts; full preparation remains mandatory.
 /// # Errors
@@ -54,6 +54,9 @@ pub struct GovernedClaimPaymentRef<'a> {
     ids: &'a [u8],
 }
 impl<'a> GovernedClaimPaymentRef<'a> {
+    pub(in crate::log) const fn encoded(self) -> &'a [u8] {
+        self.body
+    }
     /// Original opaque scope.
     #[must_use]
     pub const fn scope(self) -> &'a [u8] {

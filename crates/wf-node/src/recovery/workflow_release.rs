@@ -59,6 +59,7 @@ pub(super) fn require_dependencies(limits: &Limits) -> Result<(), E> {
         || limits.workflow_stored_value_limits().is_none()
         || !matches!(limits.credit, Some(C::Catalog(..) | C::Public(..)))
         || (paid(limits) && limits.workflow_value_claim_limits().is_none())
+        || (limits.atomic_claim.is_some() && !paid(limits))
     {
         return Err(E::InvalidLimits);
     }

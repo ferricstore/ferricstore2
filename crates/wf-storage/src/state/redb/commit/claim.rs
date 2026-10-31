@@ -12,7 +12,7 @@ use wf_ports::log::{
 use wf_ports::state::{GroupApplyTransaction, GroupClaimChanges, StateTransactionError};
 
 mod governed;
-mod values;
+pub(super) mod values;
 
 pub(in super::super) fn apply(
     tx: RedbStateTransaction<'_>,

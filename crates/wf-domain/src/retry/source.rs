@@ -9,6 +9,12 @@ use super::JitterSample;
 
 const GOLDEN: u32 = 0x9e37_79b9;
 
+/// Computes the full source binary hash before the caller's explicit range.
+#[must_use]
+pub fn source_binary_hash(bytes: &[u8]) -> u32 {
+    binary(bytes, 0)
+}
+
 /// Computes source `phash2({binary_id, next_attempt, now})` in its default range.
 ///
 /// This mathematical helper allocates nothing and uses wrapping 32-bit mixing

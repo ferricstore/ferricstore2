@@ -1502,3 +1502,22 @@ profile7 before state access. It does not replace the acquisition parent. The
 unchanged legacy entrypoint still supplies the non-governed Start positive
 control. Actual policy-governed acquisition and binding capture remain required;
 no absence of a binding or captured client flag supplies paid authority.
+
+## Selected atomic Claim parent recovery
+
+The explicit with_atomic_claim_recovery(caller, coordination) selection adds
+op18/semantic20 original-parent recovery on actual GC5. It requires stored-value,
+catalog-credit and value-Claim profiles, revalidates them after builder changes
+and accounts the additional profile owner. Earlier configurations remain closed
+to the new body. Header borrowing selects a route only; complete historical
+preparation verifies original normalized caller/payment bytes, intent and EOF.
+The actual transaction driver handles fresh replay, all phases and one retained
+outcome/control. No leaf frame or synthetic original request is submitted.
+
+The same route is used by committed startup, historical re-audit, purged suffix
+replay and received-snapshot suffix replay. Original paid IDs, terminal release,
+completion and ACK continue through existing actual drivers. The opaque
+uncommitted suffix stays unexecuted. This is recovery over a durable committed
+prefix; accepted Raft callbacks, leader/strong-read/auth lifecycles and public
+funding/compensation remain unfinished. No new consensus compatibility or Linux
+execution result follows from this local route selection.

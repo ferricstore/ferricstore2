@@ -2,6 +2,7 @@
 use super::{TestResult, caps, f};
 use wf_domain::{claim::apply::ClaimWorkLimits, governance::credit::CreditLimits};
 use wf_node::recovery::{CommittedRecoveryError as E, CommittedRecoveryLimits};
+mod atomic_claim;
 mod fixtures;
 mod frames;
 mod history;

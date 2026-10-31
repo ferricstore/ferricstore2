@@ -180,3 +180,37 @@ fn identity_and_skip<'a>(reader: &mut Reader<'a>) -> Result<[&'a [u8]; 2], Codec
     }
     Ok(identity)
 }
+
+// Both complete bodies must already have passed summary. Borrow identity spans
+// and skip value bytes; never copy postimages to compare parent phases.
+pub(in crate::log) fn disjoint(
+    left: &[u8],
+    right: &[u8],
+    admission: AdmissionLimits,
+) -> Result<(), CodecError> {
+    let limits = CodecLimits::new(admission);
+    let mut outer = Reader::new(left.get(21..).ok_or(CodecError::Malformed)?, limits);
+    while outer.remaining() != 0 {
+        let identity = identity_and_skip(&mut outer)?;
+        let mut inner = Reader::new(right.get(21..).ok_or(CodecError::Malformed)?, limits);
+        while inner.remaining() != 0 {
+            if identity_and_skip(&mut inner)? == identity {
+                return Err(CodecError::Malformed);
+            }
+        }
+    }
+    Ok(())
+}
+
+// Full nonempty-body verification precedes this first-postimage comparison.
+pub(in crate::log) fn same_phase(
+    left: &[u8],
+    right: &[u8],
+    time: TimestampMillis,
+    admission: AdmissionLimits,
+) -> Result<bool, CodecError> {
+    let limits = CodecLimits::new(admission);
+    let mut left = Reader::new(left.get(21..).ok_or(CodecError::Malformed)?, limits);
+    let mut right = Reader::new(right.get(21..).ok_or(CodecError::Malformed)?, limits);
+    Ok(row(&mut left, time)? == row(&mut right, time)?)
+}

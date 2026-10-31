@@ -28,6 +28,7 @@ pub struct ClaimPlan<'a> {
     head_reads: usize,
     stop: SelectionStop,
     resume: ClaimResume<'a>,
+    work_bytes: u64,
 }
 impl<'a> ClaimPlan<'a> {
     /// Borrows the complete record/history/index plan; empty acceptance has none.
@@ -45,6 +46,11 @@ impl<'a> ClaimPlan<'a> {
     pub const fn head_reads(&self) -> usize {
         self.head_reads
     }
+    /// Actual cumulative represented work, including the supplied prior account.
+    #[must_use]
+    pub const fn work_bytes(&self) -> u64 {
+        self.work_bytes
+    }
     /// Distinguishes completed empty selection from bounded partial selection.
     #[must_use]
     pub const fn stop(&self) -> SelectionStop {
@@ -61,6 +67,7 @@ impl<'a> ClaimPlan<'a> {
         head_reads: usize,
         stop: SelectionStop,
         resume: ClaimResume<'a>,
+        work_bytes: u64,
     ) -> Self {
         Self {
             batch,
@@ -68,6 +75,7 @@ impl<'a> ClaimPlan<'a> {
             head_reads,
             stop,
             resume,
+            work_bytes,
         }
     }
 }

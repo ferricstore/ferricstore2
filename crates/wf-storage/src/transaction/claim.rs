@@ -19,8 +19,8 @@ use wf_ports::state::{
 use wf_types::version::LogIdentity;
 
 mod governed;
-mod load;
-mod observations;
+pub(in crate::transaction) mod load;
+pub(in crate::transaction) mod observations;
 pub use governed::{
     apply_governed_claim_transaction, apply_governed_claim_transaction_with_credit_limits,
 };
