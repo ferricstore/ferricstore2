@@ -16,5 +16,6 @@ mod faults;
 pub(super) mod fixtures;
 mod governed;
 mod limits;
+mod public;
 mod replay;
 mod retention;

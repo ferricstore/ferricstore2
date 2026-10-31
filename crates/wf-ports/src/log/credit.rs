@@ -16,7 +16,7 @@ mod scan;
 pub use model::PreparedCreditRequest;
 mod owner;
 pub(super) mod response;
-mod status;
+pub(in crate::log) mod status;
 mod view;
 
 /// Canonical private Cleanup identity without a temporary body allocation.

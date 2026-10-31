@@ -141,12 +141,12 @@ pub(in crate::state::redb) fn witness<'a>(
 pub(in crate::state::redb) fn witness_atomic<'a>(
     tx: &RedbStateTransaction<'_>,
     prepared: &wf_ports::log::PreparedAtomicClaim<'_>,
+    paid: wf_ports::log::GovernedClaimPaymentRef<'_>,
     time: TimestampMillis,
     business: Option<&'a wf_domain::workflow::indexed::IndexedBatchPlan<'_>>,
     start: usize,
     credit: CreditLimits,
 ) -> Result<VerifiedGovernedClaimWrites<'a>, E> {
-    let paid = prepared.payment().ok_or(E::InvalidChanges)?;
     let count = business.map_or(0, |batch| batch.batch().items().len());
     if !available_at(tx, prepared.scope(), paid, time, count, start, credit)? {
         return Err(E::KnownAborted);

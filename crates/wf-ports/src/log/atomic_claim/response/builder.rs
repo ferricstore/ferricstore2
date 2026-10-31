@@ -4,6 +4,7 @@ use super::{
     AdmissionLimits, CodecError as E, GovernedClaimPaymentRef as Payment, RetainedStatus as Status,
 };
 use crate::log::{claim::response as core, writer::Writer};
+use std::borrow::Cow;
 use wf_domain::claim::{
     apply::{ClaimDecision, ClaimRejection},
     coordination::ClaimPhase,
@@ -11,7 +12,8 @@ use wf_domain::claim::{
 
 /// Original payment and complete ordered phase receipts, without publication authority.
 pub struct AtomicClaimReplyBuilder<'a> {
-    payment: Option<Payment<'a>>,
+    payment: Option<Cow<'a, [u8]>>,
+    payment_count: usize,
     admission: AdmissionLimits,
     maximum_owned: usize,
     phases: Vec<u8>,
@@ -31,9 +33,45 @@ impl<'a> AtomicClaimReplyBuilder<'a> {
         admission: AdmissionLimits,
         maximum_owned: usize,
     ) -> Result<Self, E> {
-        let count = payment.map_or(0, Payment::count);
+        Self::build(
+            payment.map(|paid| Cow::Borrowed(paid.encoded())),
+            payment.map_or(0, Payment::count),
+            admission,
+            maximum_owned,
+        )
+    }
+
+    /// Admits complete immutable original payment ownership without ID copies.
+    /// Encoding alone never certifies spend or current ownership.
+    /// # Errors
+    /// Refuses malformed payment or configured byte/scratch/owner limits.
+    pub fn new_owned_payment(
+        encoded: Vec<u8>,
+        admission: AdmissionLimits,
+        maximum_owned: usize,
+    ) -> Result<Self, E> {
+        let remaining = maximum_owned
+            .checked_sub(encoded.len())
+            .and_then(|n| n.checked_sub(4096))
+            .ok_or(E::OwnedLimit)?;
+        let count = crate::log::inspect_claim_payment(
+            &encoded,
+            crate::log::CodecLimits::new(admission),
+            remaining,
+        )?
+        .count();
+        Self::build(Some(Cow::Owned(encoded)), count, admission, maximum_owned)
+    }
+
+    fn build(
+        payment: Option<Cow<'a, [u8]>>,
+        count: usize,
+        admission: AdmissionLimits,
+        maximum_owned: usize,
+    ) -> Result<Self, E> {
         let fixed = payment
-            .map_or(0, |paid| paid.encoded().len())
+            .as_ref()
+            .map_or(0, |paid| paid.len())
             .checked_add(4096)
             .and_then(|n| count.checked_mul(2).and_then(|m| n.checked_add(m)))
             .ok_or(E::LengthOverflow)?;
@@ -44,6 +82,7 @@ impl<'a> AtomicClaimReplyBuilder<'a> {
         used.try_reserve_exact(count).map_err(|_| E::Allocation)?;
         Ok(Self {
             payment,
+            payment_count: count,
             admission,
             maximum_owned,
             phases: Vec::new(),
@@ -56,10 +95,33 @@ impl<'a> AtomicClaimReplyBuilder<'a> {
         })
     }
 
+    /// Borrows the immutable original payment without producing a live witness.
+    /// # Errors
+    /// Refuses inconsistent internal bytes; original full uniqueness is immutable.
+    pub fn payment(&self) -> Result<Option<Payment<'_>>, E> {
+        let Some(bytes) = self.payment.as_deref() else {
+            return Ok(None);
+        };
+        let mut reader =
+            crate::log::reader::Reader::new(bytes, crate::log::CodecLimits::new(self.admission));
+        let paid = crate::log::governed_claim::payment::read(&mut reader, bytes)?;
+        reader.finish()?;
+        if paid.count() != self.payment_count {
+            return Err(E::Malformed);
+        }
+        Ok(Some(paid))
+    }
+
     /// Reads accumulated actual candidate/head and accepted-write counts.
     #[must_use]
     pub const fn progress(&self) -> (usize, usize, usize) {
         (self.scanned, self.heads, self.count)
+    }
+
+    /// Exact original positions actually attached to accepted record postimages.
+    #[must_use]
+    pub fn used_indices(&self) -> &[u16] {
+        &self.used
     }
 
     /// Appends complete accepted postimages with actual original used positions.
@@ -89,9 +151,7 @@ impl<'a> AtomicClaimReplyBuilder<'a> {
         }
         let mut previous = self.used.last().copied();
         for &at in used {
-            if usize::from(at) >= self.payment.map_or(0, Payment::count)
-                || previous.is_some_and(|old| old >= at)
-            {
+            if usize::from(at) >= self.payment_count || previous.is_some_and(|old| old >= at) {
                 return Err(E::Malformed);
             }
             previous = Some(at);
@@ -168,7 +228,7 @@ impl<'a> AtomicClaimReplyBuilder<'a> {
         let bound = phase_bytes
             .checked_mul(3)
             .and_then(|n| n.checked_add(extra))
-            .and_then(|n| n.checked_add(self.payment.map_or(0, |paid| paid.encoded().len())))
+            .and_then(|n| n.checked_add(self.payment.as_ref().map_or(0, |paid| paid.len())))
             .and_then(|n| n.checked_add(4096))
             .ok_or(E::LengthOverflow)?;
         if bound > self.maximum_owned {
@@ -178,7 +238,7 @@ impl<'a> AtomicClaimReplyBuilder<'a> {
     }
     fn write(&self, out: &mut Writer<'_>, reason: Option<ClaimRejection>) -> Result<(), E> {
         out.write(b"FWAR\0\x01")?;
-        out.optional(self.payment.as_ref(), |out, paid| out.write(paid.encoded()))?;
+        out.optional(self.payment.as_deref(), Writer::write)?;
         if let Some(reason) = reason {
             if reason == ClaimRejection::GoverningReservationUnavailable {
                 return out.byte(2);

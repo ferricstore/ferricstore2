@@ -37,7 +37,7 @@ impl Limits {
     }
 }
 
-fn driver(limits: &Limits) -> Result<AtomicClaimTransactionLimits, E> {
+pub(super) fn driver(limits: &Limits) -> Result<AtomicClaimTransactionLimits, E> {
     super::workflow_release::require_dependencies(limits)?;
     if !super::workflow_release::paid(limits) {
         return Err(E::InvalidLimits);

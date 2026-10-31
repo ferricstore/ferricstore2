@@ -62266,3 +62266,258 @@ retained inquiry, authorized current policy, funding/NoDemand/original-ID
 settlement/Unknown, source bind-before-skip/partition/pipeline/projection and
 actual pinned scenario/profile execution, then the remaining ordered milestones.
 This checkpoint leaves the full completion goal active; it does not redefine it.
+
+### PUBLIC-CLAIM-CALL1 — canonical preflight and funding-boundary review
+
+Previous goal turn is progress: featurea483981 and primary docs-onlycbd78d4
+are clean, with the frozen1770-test/doctest full workspace result. Continue solo.
+Do not promote native intent20's private caller hash to the public V1 digest:
+ADR-005 and transports/intent-digest.md already freeze the complete typed V1
+workflow.claim_due mapping in the pure application encoder. The public mapping
+must remain byte-identical and independent of generated funding/time inputs.
+
+Concrete approval before creation: wf-ports/src/log/public_claim.rs,
+public_claim/intent.rs and public_claim/intent/{fields,compound}.rs; private
+IntentSink alias only if needed. They implement the exact existing public V1
+registry over NormalizedClaimDue, measuring then streaming SHA256 with no caller
+buffer or field-owner copy. Reuse header/scalar/map/optional-number/bytes helpers
+from public_mutation/intent.rs by narrowing visibility only within crate::log;
+their bodies and existing caller bytes stay unchanged. No generic V1 admission,
+new dependency, hash exemption, client-port export or successful execution stub.
+The result is mathematical ClientIntent version1, with no current authority.
+
+Approve wf-ports/tests/public_claim/{main,intent}.rs and
+wf-application/tests/claim_due_intent/ports.rs, plus exact module registration.
+Freeze independent existing golden bytes before body; compare all normalized
+fields/optional presence, aliases and excluded block/time preparation across the
+existing application and new streaming encoder. The latter must bound component
+descriptors before traversing or hashing leaves, without a canonical Vec owner.
+
+Funding design review identified a real integration constraint: original Claim
+lookup absence is not proof that an earlier independent credit spend did not
+apply. Merely wrapping separate spends/refunds with a Fresh lookup would violate
+A-CM1. The reviewed architecture permits one initial Raft group and requires
+cross-group fanout to refuse until an explicit saga exists. Investigate a new
+separately selected co-located funded parent which stages actual credit state,
+Claim and unused-ID release under that same writer and one final outcome/control.
+It must retain source-visible configuration/lease/refund postconditions even on
+Claim business rejection, not silently roll back source credit effects. Exact
+failed-Spend/physical-presence NoDemand, original IDs/Unknown and resource/fault
+semantics still require concrete protocol/storage decisions before those new
+artifacts are created. The public service and cross-group source profiles remain
+required; this preflight approval does not close or reduce that scope.
+
+PUBLIC-CLAIM-CALL1 concrete funded-frame amendment before creation: approve
+wf-ports/src/log/public_claim/{frame,model}.rs and tests/public_claim/frame.rs.
+Types PublicClaimPreparation and PreparedPublicClaim contain only the actual
+original caller/stamp, token/scan/head settings and16-byte original server batch.
+Reserve op19/intent21; its digest EXACTLY matches the existing public V1 registry.
+21 is an internal committed-profile selector, not a new public normalization
+version. Add ClientIntent::public_claim in its existing intent child. Old op18/
+intent20 bytes, hash meaning, decoder routes and response associations stay exact.
+
+The existing atomic frame helper may share encode/scan/ownership logic through
+an explicit private FrameProfile enum (Prepaid/PublicFunded). Parse the ACTUAL
+op19 header/body, normalize its original caller and compute the actual whole-byte
+prepared digest; never wrap/mutate it into a synthetic op18/Fresh/paid capture.
+PreparedAtomicClaim may internally hold that actual root and original nonce as
+data. Preparation grants no paid IDs or current credit certificate. Full EOF and
+descriptor limits precede ownership. The old preparer/header stay closed to19.
+
+This approves real serialization, not a successful funding shell. Storage still
+must stage actual current credit plans under the same writer: spend first,
+source-allowed lease/retry, physical-presence NoDemand after known failure and
+exact unused-ID release. Late Claim failure must preserve source-visible credit
+configuration/lease/refund postconditions. Actual prefix abort followed by only
+deterministic funding/refund under the same predecessor is a candidate, with
+one original gate and cumulative budgets. Exact storage artifacts need their own
+concrete amendment before creation. Cross-group credit execution remains closed
+until its required saga/read lifecycle and source-profile acceptance exist.
+
+PUBLIC-CLAIM-CALL1 co-located execution decision, before storage artifacts:
+select actual same-group credit/Claim/refund staging for the initial single-group
+architecture. The current actual tenant/group/recovery writer owns BOTH credit
+and workflow rows; no caller-provided credit scope certifies a remote owner.
+Cross-group execution remains explicit unsupported work, not an alleged saga.
+Native op18 prepaid execution remains separate and byte-compatible. Public op19
+is selected separately, with exact V1 caller hash under internal intent21 and a
+new response18. This does not silently promote private intent20 to public V1.
+
+Approve concrete artifacts/types:
+* ports/log/public_claim/response.rs and response/{encode,decode}.rs if needed;
+  PublicClaimReplyRef and PublicClaimReplyKind. FWFR1 distinguishes a complete
+  actual FWAR1 Claim result, actual NoDemand after known spend failure, and the
+  exact funding rejection. Borrow all original paid IDs; rejected Claim records
+  no used IDs. Share existing credit rejection encoding, never fake an old
+  retained Credit outcome/owner merely to reuse it. Add only explicit21/18
+  retained associations; old summary/response routes remain closed.
+* Existing governed_claim/payment.rs gains pure full payment encode/inspect
+  helpers. Existing AtomicClaimReplyBuilder may own immutable payment bytes via
+  Cow<[u8]> for actual apply-generated IDs; no Clone-derived owner or synthetic
+  CapturedGovernedClaimPayment. It exposes only borrowed data, never authority.
+* storage/transaction/public_claim.rs and public_claim/{funding,execute,reply}.rs;
+  PublicClaimTransactionLimits (actual AtomicClaimTransactionLimits plus whole
+  credit-work/temporary ceilings) and the real public apply entrypoint. Existing
+  atomic/shared loaders/reducers may share actual-root helpers, without synthetic
+  leaf headers, Fresh or GroupClaimChanges.
+* storage/state/redb/commit/public_claim.rs and public_claim/{funding,presence,
+  settlement,receipt}.rs; StagedPublicClaim with one real writer/original gate.
+  Source order is spend -> optional lease -> spend, exact physical-presence
+  NoDemand only after known failure, and exact unused original-ID release.
+  Original nonce plus actual epoch produces real source IDs under this writer.
+* storage/state/redb/credit/stage.rs; stage_claim_credit shares actual scoped
+  context/query/publish helpers and full pure plans. Never commits a child
+  outcome/control. Existing CreditCharge and IdentifiedCreditPlan expose actual
+  represented work so each subsequent plan uses only the remaining whole-parent
+  credit budget. No generic public credit publication bypass is exported.
+* storage/tests/state_store/workflow_values/claim/public.rs and
+  public/{fixtures,flow,failures,refund,recovery}.rs. Existing atomic fixture
+  module visibility alone may widen to its parent; original assertions stay exact.
+  Cover actual funding, partial unused refund, source credit postconditions on
+  late Claim rejection, known-failure physical presence, whole-budget/fault
+  rollback, original IDs and replay before changed policy/nonce.
+
+On late Claim rejection, actually abort the entire staged writer. A replacement
+guard must verify the SAME predecessor and absent request without a second Fresh
+gate. It may redo only deterministic funding and refund ALL original paid IDs,
+preserving source-visible owner/lease/released-ID results, then retain one Claim
+error. Thread cumulative schema/read/adapter/credit work across that path. Unknown
+commit releases nothing; preserve the exact full original frame for inquiry or
+same-frame retry. One local atomic commit supplies no external no-spend proof.
+
+Pinned claim_due_api.ex:493-669 actually spends first, auto-leases only after
+known failure, performs physical-presence NoDemand with a strict ratio-zero
+fallback, and refunds original IDs absent from returned bindings. Existing pure
+identified credit plans preserve configuration/expiry/publication effects even
+when their decision rejects; use those actual plans, not an invented clean owner.
+Server-maximum prospective ownership includes credit plan/encoding owners before
+funding effects. No resource reset, parser/size/lint exemption, live service or
+full source/profile acceptance is selected by these implementation contracts.
+
+PUBLIC-CLAIM-CALL1 response-control amendment before creation: approve
+ports/tests/public_claim/response.rs for independent literal FWFR1 branches,
+complete nested FWAR/rejection validation, profile closure and EOF/limit tests.
+Credit status module/rejection helper visibility may widen only within crate::log;
+their bodies remain unchanged. CreditCharge.used_work and
+IdentifiedCreditPlan.work_units expose the actual existing represented counter
+without resetting it; this changes no original response or state serialization.
+
+PUBLIC-CLAIM-CALL1 execution amendment (solo design review before edits): reuse
+the actual StagedAtomicClaim and actual phase executor, rather than introducing
+a second engine or a simulated prepaid request. Its narrowly scoped constructor
+accepts an already admitted owned payment only for the real selector21/root19
+frame after funding in the same writer. Parent-only field visibility supports
+the already selected commit/public_claim.rs finalizer. The real writer, root
+digest and single Fresh control remain unchanged. Extend witness_atomic with an
+explicit immutable payment argument; it still rereads actual active/consumed
+state. Private execute/reply helper visibility may widen within transaction.
+Select selector21/response18 explicitly in layout8 retained encode/scan and
+replay; older layouts and selector20/response17 remain closed. Credit staging
+uses the real pure plans including rejected-owner effects; no child retained
+request, synthetic owner, or public publication bypass is introduced. New
+public_claim/funding.rs may use private owned FundedClaimPayment (bounded scope,
+original generated IDs, scalar source configuration) and FundingResult enum
+(unpaid, paid, known rejection). These are temporary data owners, never proof of
+external spend. All simultaneous credit/ID/response owners must fit the original
+parent reservation. Same predecessor, remaining resources and original nonce
+are mandatory when replacing an actually aborted guard for a Claim rejection.
+
+PUBLIC-CLAIM-CALL1 retained-profile size review: before creating
+domain/workflow/request/outcome/profile.rs, select it as a private child holding
+the existing retained version/status checks plus the explicit21/18 association.
+Move existing check bodies verbatim; this prevents outcome.rs exceeding400
+physical lines after formatting. No wire format or legacy association changes.
+The actual current missing-lease epoch0 sentinel follows
+application/governance/credit.rs:57-60; unlike an invented owner, it derives only
+from a real existing owner whose selected shard lease is absent. A missing owner
+still returns NotFound before ID generation. No native source execution is claimed.
+
+PUBLIC-CLAIM-RECOVERY1 concrete solo design review before creation: select
+node/src/recovery/public_claim.rs and
+node/tests/snapshot_recovery/workflow_release/public_claim.rs. The recovery
+limits gain only an explicit optional (whole credit work, simultaneous credit
+temporary bytes) profile, selected after the real atomic/GC5 dependencies.
+No new model or service is introduced. Header routing borrows root19/intent21
+through the same private typed frame scanner; complete historical audit must
+still prepare all original bytes. Startup invokes the actual new storage driver
+with the original nonce, uses existing strong control/time checks and meters the
+extra profile and original whole workspace. Old profiles reject root19, including
+historical entries; opaque uncommitted suffixes remain opaque. Existing private
+atomic driver-limit construction may widen to its recovery siblings. New tests
+cover actual identified spend recovery/reopen, old profile refusal, malformed
+historical body and prospective whole-workspace admission; never fake leaf
+requests or claim consensus/listener/Elixir parity acceptance.
+
+PUBLIC-CLAIM-CALL1/RECOVERY1 implementation self-review (solo; no independent
+review claim): the real op19 parent now funds and settles under the actual GC5
+writer, reusing the existing atomic phase engine. It preserves complete current
+policy, real source worker hash/scope, current epoch, original nonce/IDs and
+owner/configuration effects of rejected credit decisions. No child retained
+credit requests or replayed leaf commands are created. Temporary credit/ID owners
+are reserved inside the original workspace; each pure plan sees only remaining
+whole-parent credit work. Original full paid bytes are owned once by the reply
+builder, and settlement reuses/moves its separate original ID vector in order.
+No speedup or benchmark result is claimed. The public V1 hash is streamed via
+the pinned [sha2 incremental API](https://docs.rs/sha2/0.11.0/sha2/); this avoids
+materializing a second canonical caller buffer without changing V1 bytes.
+
+Review caught and fixed physical-presence misclassification: due.state is the
+logical lane label, so it cannot certify running/queued physical membership.
+Presence now reads the actual record, verifies the complete due identity against
+its current metadata, filters physical record.state, and refuses BudgetEnd.
+Pinned claim_due_api.ex:1189-1195,1239-1243 confirms scalar and deduplicated
+singleton running filters normalize alike. The source reclaim=true/ratio0
+fallback remains false, except the direct-running branch. No accepted-count or
+FIFO-blocking result is used as emptiness proof.
+
+Actual runtime RED for the public storage shell is in
+/private/tmp/ferricstore2-public-claim-storage-r0.log (three UnsupportedPolicyProfile
+failures). Presence has its own actual runtime RED in
+public-claim-failures-r0.log and a second reached branch failure in
+public-claim-integrated.log; the unchanged six-scenario assertion now passes.
+The late-rejection/credit-owner and work/fault tests were added after related
+bodies and are supplemental checks, not retrospective TDD. The fault test first
+incorrectly expected a retained reply at an already applied exact log; it now
+asserts the actual exclusive old->Retained/new->LogReplay classification, exact
+control and full final cohort. This is a corrected new expectation, not a change
+to an original acceptance input. Funding/replay/nonce and partial refund checks
+all pass in public-claim-storage-final.log (37 existing/new Claim cases).
+
+Ports intent/frame controls have runtime RED logs; response literals initially
+failed compilation on missing variant docs, so their first passing execution is
+supplemental grammar evidence. Do not label that response body behavior-TDD.
+All12 frozen public V1 vectors, existing application intent cases and older atomic
+grammar controls pass. Native Node startup first failed UnsupportedEntry in
+public-claim-node-r0.log before routing/application bodies; node-final.log now
+passes four startup/reopen/profile/history/owner-admission controls. Opaque
+uncommitted suffixes stay unexecuted. The full workspace and strict quality
+checks are being run against the frozen input manifest, with final totals below
+only after actual terminal success.
+
+This does not implement the application original-intent inquiry/submission owner,
+blocking/projection/pipeline surfaces, source bind-before-skip capture, optional
+partition distinction, live consensus/listeners/workers, complete original-case
+mapping/profiles, Linux acceptance or measured performance. Those remain full
+goal work; no source ledger or frozen assertion is relabeled complete.
+
+PUBLIC-CLAIM-CALL1/RECOVERY1 final frozen verification: the full workspace
+command actually exited0 with1779 passed/119 groups; doctests exited0 with
+11 passed/15 groups. All60 architecture cases, strict workspace/all-target
+Clippy, warnings-denied docs, Python7, reference, progress, fmt and diff pass.
+There are zero failed/ignored cases. Twenty added Rust cases are application1,
+ports7, storage8 and Node4; the six presence branches count as one test, not six
+new source-case credits. Full parity actually exits1 with the unchanged required
+source/profile/setup/fixture/adapter gaps. No native Elixir/Linux/performance or
+live service acceptance was obtained or inferred.
+
+The frozen manifest has2159 non-Markdown inputs/1570 Rust files, all unchanged
+after checks. Audit against a483981 preserves1270 old test/bench/reference
+inputs:1265 whole and five exact registrations/visibility amendments; the Rust
+subset is731 inputs,726 whole plus those same five. Original test bodies and
+assertions remain exact. Domain retained version/status checks moved to the
+approved private profile child to keep the parent below400 physical lines;
+the new21/18 association is explicit. See /private/tmp/ferricstore2-public-claim-
+{workspace,doctests,clippy,doc,arch,python,reference,progress,parity}.log and
+proof.json, source-audit.json, inputs.json. The proof hashes the actual logs and
+the input audit; parity failure is recorded separately. This is progress toward
+the unchanged active full goal, not its completion or a reason to mark it blocked.

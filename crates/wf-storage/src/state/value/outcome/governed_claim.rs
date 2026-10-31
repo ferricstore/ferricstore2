@@ -6,7 +6,9 @@ use wf_domain::workflow::{
     admission::AdmissionLimits,
     request::{ClientIntent, RequestScope, RetainedOutcome},
 };
-use wf_ports::log::{atomic_claim_retained_summary, governed_claim_retained_summary};
+use wf_ports::log::{
+    atomic_claim_retained_summary, governed_claim_retained_summary, public_claim_retained_summary,
+};
 use wf_types::identity::RequestId;
 
 pub(super) fn encode(
@@ -14,7 +16,9 @@ pub(super) fn encode(
     maximum: usize,
     admission: AdmissionLimits,
 ) -> Result<Vec<u8>, E> {
-    let summary = if outcome.intent().version() == 20 {
+    let summary = if outcome.intent().version() == 21 {
+        public_claim_retained_summary
+    } else if outcome.intent().version() == 20 {
         atomic_claim_retained_summary
     } else {
         governed_claim_retained_summary
@@ -50,7 +54,7 @@ pub(super) fn scan<'a>(
          original_time,
          expires_at,
          response_version| {
-            if !matches!((version, response_version), (19, 16) | (20, 17)) {
+            if !matches!((version, response_version), (19, 16) | (20, 17) | (21, 18)) {
                 return Err(E::UnsupportedVersion);
             }
             let [tenant, group, recovery, original_request, response] = fields;
@@ -62,12 +66,16 @@ pub(super) fn scan<'a>(
             {
                 return Err(E::InvalidValue);
             }
-            let intent = if version == 20 {
+            let intent = if version == 21 {
+                ClientIntent::public_claim(digest)
+            } else if version == 20 {
                 ClientIntent::atomic_claim(digest)
             } else {
                 ClientIntent::governed_claim(digest)
             };
-            let summary = if version == 20 {
+            let summary = if version == 21 {
+                public_claim_retained_summary
+            } else if version == 20 {
                 atomic_claim_retained_summary
             } else {
                 governed_claim_retained_summary

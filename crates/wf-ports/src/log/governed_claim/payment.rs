@@ -3,6 +3,51 @@ use super::{E, GovernedClaimPayment as P, GovernedClaimPaymentRef as R};
 use crate::log::{reader::Reader, writer::Writer};
 use wf_domain::{governance::release::LimitEnforcement as F, workflow::MAX_EXACT_MILLIS as MAX};
 
+/// Encodes complete original payment data; it proves no spend or live ownership.
+/// # Errors
+/// Refuses malformed data, duplicate original IDs or prospective byte/owner limits.
+pub fn encode_claim_payment(
+    payment: P<'_>,
+    limits: crate::log::CodecLimits,
+    maximum_owned: usize,
+) -> Result<Vec<u8>, E> {
+    let mut measured = Writer::measure(limits.admission().decision_bytes());
+    write(&mut measured, payment)?;
+    let required = measured.len().checked_add(4096).ok_or(E::LengthOverflow)?;
+    let scratch = payment
+        .reservation_ids
+        .len()
+        .checked_mul(size_of::<&[u8]>())
+        .and_then(|n| n.checked_add(256))
+        .ok_or(E::LengthOverflow)?;
+    if required.checked_add(scratch).ok_or(E::LengthOverflow)? > maximum_owned {
+        return Err(E::OwnedLimit);
+    }
+    let mut out = Writer::allocate(measured.len(), limits.admission().decision_bytes())?;
+    write(&mut out, payment)?;
+    let encoded = out.finish()?;
+    inspect_claim_payment(&encoded, limits, scratch)?;
+    Ok(encoded)
+}
+
+/// Completely scans payment data and EOF before bounded duplicate inspection.
+/// # Errors
+/// Refuses malformed/duplicate IDs, unbounded scope, trailing bytes or scratch limits.
+pub fn inspect_claim_payment(
+    encoded: &[u8],
+    limits: crate::log::CodecLimits,
+    maximum_scratch: usize,
+) -> Result<R<'_>, E> {
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    let mut reader = Reader::new(encoded, limits);
+    let payment = read(&mut reader, encoded)?;
+    reader.finish()?;
+    validate(payment, maximum_scratch)?;
+    Ok(payment)
+}
+
 pub(in crate::log) fn write(out: &mut Writer<'_>, payment: P<'_>) -> Result<(), E> {
     metadata(
         payment.scope,

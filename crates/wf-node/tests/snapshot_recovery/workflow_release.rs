@@ -7,6 +7,7 @@ mod fixtures;
 mod frames;
 mod history;
 mod limits;
+mod public_claim;
 mod reconcile;
 mod snapshot;
 

@@ -9,6 +9,8 @@ use wf_ports::log::{CodecLimits, RecordBatchApplyError};
 use wf_ports::state::StateTransactionError;
 
 mod atomic_claim;
+mod public_claim;
+pub use public_claim::{PublicClaimTransactionLimits, apply_public_claim_transaction};
 mod claim;
 pub use atomic_claim::{AtomicClaimTransactionLimits, apply_atomic_claim_transaction};
 pub(crate) use claim::values::ClaimValuePublicationPlan;

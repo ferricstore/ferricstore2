@@ -18,7 +18,7 @@ use super::RecordBatchApplyError;
 
 mod apply;
 mod codec;
-mod intent;
+pub(in crate::log) mod intent;
 pub(in crate::log) mod response;
 
 pub use apply::{

@@ -1796,6 +1796,24 @@ codec value grants no queue-full or durable-commit authority by construction.
 
 ## Selected atomic Claim parent framing
 
+PUBLIC-CLAIM-CALL1 additionally selects **op19/intent21/response18** for the
+public funded parent. Intent21 stores the exact existing public V1 canonical
+caller digest; the internal selector is not a new public normalization version.
+The incremental encoder matches all12 preserved V1 vectors and excludes only
+the already excluded block attempt. Trusted time and the original16-byte credit
+nonce belong to the prepared body/digest, never caller comparison. Whole frame,
+EOF, canonical caller and digest checks precede current state. Older preparers
+continue to reject op19.
+
+The FWFR1 response contains either the complete actual FWAR1 Claim result, or
+a typed known credit rejection with separate FundingRejected/NoDemand branches.
+Only actual physical-presence exhaustion after known failed funding permits
+NoDemand. Data encoders provide no spend, emptiness or durability authority.
+The real GC5 driver stages current-policy funding, all Claim phases and unused
+original-ID release under one original retained gate and writer. It publishes
+one public receipt/control. Cross-group funding, public ingress/authorization,
+blocking/projection/pipeline completeness and source/profile parity remain open.
+
 ATOMIC-CLAIM-PARENT1 reserves op18/intent20/response17 for the actual atomic
 ordinary Claim parent required by ADR-004 A-CM1. Its immutable frame contains all
 normalized original caller fields except block-attempt duration, plus separate

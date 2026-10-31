@@ -51,7 +51,7 @@ pub struct ScannedRetainedOutcome<'input> {
 
 impl ScannedRetainedOutcome<'_> {
     pub(crate) const fn governed_claim_required(&self) -> bool {
-        matches!(self.intent.version(), 19 | 20)
+        matches!(self.intent.version(), 19..=21)
     }
     pub(crate) const fn workflow_release_required(&self) -> bool {
         self.intent.version() == 18

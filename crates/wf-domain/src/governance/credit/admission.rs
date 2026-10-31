@@ -15,6 +15,9 @@ pub(in crate::governance) struct CreditCharge {
 }
 
 impl CreditCharge {
+    pub(in crate::governance) const fn used_work(&self) -> u64 {
+        self.work
+    }
     pub(in crate::governance) fn empty(limits: CreditLimits) -> Result<Self, E> {
         let mut charge = Self {
             limits,

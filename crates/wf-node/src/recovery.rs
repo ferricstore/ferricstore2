@@ -21,6 +21,7 @@ mod catalog_membership;
 mod catalog_progress;
 mod catalog_prune;
 mod error;
+mod public_claim;
 pub use error::CommittedRecoveryError;
 mod credit;
 mod join;
@@ -48,6 +49,7 @@ pub struct CommittedRecoveryLimits {
         wf_domain::claim::caller::ClaimCallerLimits,
         wf_domain::claim::coordination::ClaimCoordinationLimits,
     )>,
+    public_claim: Option<(u64, usize)>,
     core_policy: bool,
     original_policy: bool,
     workflow_values: Option<[usize; 4]>,
@@ -100,6 +102,7 @@ impl CommittedRecoveryLimits {
             claim_work: None,
             value_claim_work: None,
             atomic_claim: None,
+            public_claim: None,
             core_policy: false,
             original_policy: false,
             workflow_values: None,
@@ -202,6 +205,9 @@ impl CommittedRecoveryLimits {
     }
     fn additional_profile_bytes(&self) -> Result<usize, CommittedRecoveryError> {
         let mut owned = 0;
+        if self.public_claim.is_some() {
+            owned = total(&[owned, std::mem::size_of_val(&self.public_claim)])?;
+        }
         if self.atomic_claim.is_some() {
             owned = total(&[owned, std::mem::size_of_val(&self.atomic_claim)])?;
         }

@@ -138,7 +138,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if body.get(6) == Some(&18) {
+    let header = if body.get(6) == Some(&19) {
+        super::public_claim::header(body, limits)
+    } else if body.get(6) == Some(&18) {
         super::atomic_claim::header(body, limits)
     } else if matches!(body.get(6), Some(16 | 17)) {
         super::workflow_release::header(body, limits)
@@ -236,6 +238,9 @@ fn audit_normal(
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if profile == 21 {
+        return super::public_claim::audit(body, limits, base, stamp);
+    }
     if profile == 20 {
         return super::atomic_claim::audit(body, limits, base, stamp);
     }

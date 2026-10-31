@@ -18,7 +18,7 @@ use wf_storage::{
 };
 use wf_types::identity::{PartitionId, RequestId};
 
-pub(super) fn limits() -> AtomicClaimTransactionLimits {
+pub(in crate::workflow_values::claim) fn limits() -> AtomicClaimTransactionLimits {
     AtomicClaimTransactionLimits {
         values: v::limits(),
         work: ClaimWorkLimits::default(),
@@ -28,7 +28,7 @@ pub(super) fn limits() -> AtomicClaimTransactionLimits {
     }
 }
 
-pub(super) fn filled(path: &Path) -> TestResult<RedbStateStore> {
+pub(in crate::workflow_values::claim) fn filled(path: &Path) -> TestResult<RedbStateStore> {
     let scope = f::scope()?;
     let placements = [(PartitionId::new(b"p".to_vec())?, scope.group().clone())];
     let mut store = RedbStateStore::create_governed_claim_database(

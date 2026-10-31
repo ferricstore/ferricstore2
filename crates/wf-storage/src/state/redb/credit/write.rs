@@ -13,7 +13,7 @@ use wf_domain::workflow::request::{RequestScope, RetainedOutcome, RetainedStatus
 use wf_ports::log::verify_credit_reply_parts;
 use wf_ports::state::{GroupApplyTransaction, StateTransactionError as E};
 
-mod rows;
+pub(in crate::state::redb::credit) mod rows;
 
 pub(crate) fn apply(
     tx: RedbStateTransaction<'_>,

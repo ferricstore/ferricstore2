@@ -1,6 +1,67 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-31. The full-completion goal remains active; work solo.
+Updated: 2026-10-31. Full-completion goal remains active; continue solo.
+
+The coupled PUBLIC-CLAIM-CALL1/RECOVERY1 native implementation now executes
+op19/intent21/response18 under one original retained gate and writer. The exact
+public canonical V1 digest is streamed and matches all12 preserved vectors.
+Trusted time and the original16-byte funding nonce affect only prepared identity.
+Old op18 and generic profiles remain closed to the public parent.
+
+Current complete-policy funding follows real Spend, optional Lease after known
+failure, then Spend. Claim phases reuse the actual atomic engine. Settlement
+releases only original IDs absent from accepted bindings, in original order.
+Late Claim refusal aborts staged workflow changes, verifies the same predecessor
+under a replacement guard, then repeats deterministic funding/refunds all IDs.
+It preserves source-visible owner/configuration/lease effects. Schema/read/
+adapter budgets and represented credit work remain cumulative. Known failed
+funding permits NoDemand only after actual physical-record presence checks;
+logical lane labels and accepted-count zero are not emptiness proofs. The source
+reclaim=true/ratio0 fallback is preserved. Unknown commit fences and triggers no
+additional refund; complete old/new cohort and same-frame recovery are tested.
+
+Explicit Node selection requires the actual atomic/GC5/value/catalog-credit
+profiles plus whole credit work/temporary-owner ceilings. Startup/reopen,
+malformed historical bodies behind later control and older-profile refusal use
+the actual new driver. Complete original caller/nonce bodies are audited; opaque
+uncommitted suffixes remain unexecuted. This establishes no external no-spend
+proof or cross-group funding protocol.
+
+All1779 workspace tests pass in119 groups, plus11 doctests in15 groups, with
+zero failures or ignored tests. Strict all-target workspace Clippy, strict docs,
+all60 architecture checks, Python7, reference integrity, progress, fmt and diff
+pass. Twenty new cases comprise application1, ports7, storage8 and Node4; the
+presence case additionally asserts six source branches. Runtime RED and later
+supplemental checks are distinguished in the coordination record. No claim of
+independent peer review or measured speedup is made.
+
+All2159 frozen non-Markdown inputs/1570 Rust files remain unchanged through
+verification. Of1270 prior test/bench/reference inputs,1265 stay byte-identical;
+five have exact additive registrations or helper visibility-only amendments.
+Of731 prior Rust test/bench inputs,726 stay whole plus those five amendments.
+Original assertions, source snapshots and source/runtime ledgers are preserved.
+Evidence: /private/tmp/ferricstore2-public-claim-{workspace,doctests,clippy,doc,
+arch,python,reference,progress,parity}.log and proof/source-audit/inputs.json.
+
+Full parity still actually exits1: required original scenarios, setup/fixtures,
+adapters and mandatory profiles are incomplete. No Linux/native Elixir result,
+live consensus/service, full public API or production readiness is claimed.
+Primary code remains unchanged; its handoff carries the isolated feature pointer.
+
+NEXT implement the application entrypoint: original public V1 retained inquiry
+(selected intent21) before current policy, clock or entropy; one supervised
+immutable original frame across redirects/Unknown/same-frame retry; actual
+caller-bound routing/authorization and response projections. Finish source
+bind-before-skip positions, nil/present-empty partition capture, Auto/Global
+routing, blocking and pipeline identity. Execute/map the pinned Claim scenarios
+with original assertions and required profiles. Continue remaining read-barrier/
+consensus, services/transports/workers, catalog lifecycle and original-case
+coverage, then Linux/macOS and measured-performance acceptance. Keep the full
+goal active; this verified native increment does not finish the product.
+
+## Preceding a483981 prepaid native checkpoint (historical)
+
+The following saved results/next steps describe that predecessor only.
 
 The coupled ATOMIC-CLAIM-PARENT1/POLICY1 native implementation now executes
 op18/intent20/response17 over one original retained gate and one coherent writer.

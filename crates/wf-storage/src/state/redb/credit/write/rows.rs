@@ -19,7 +19,7 @@ struct CreditPageBinding<'a> {
     page: u16,
 }
 
-pub(super) fn publish(
+pub(in crate::state::redb::credit) fn publish(
     context: &CreditReadContext<'_, '_>,
     plan: &IdentifiedCreditPlan<'_>,
 ) -> Result<(), E> {

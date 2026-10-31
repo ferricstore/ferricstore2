@@ -125,6 +125,7 @@ impl<'a> PreparedIdentifiedCredit<'a> {
             &[]
         };
         Ok(IdentifiedCreditPlan {
+            work_units: self.charge.used_work(),
             scope: self.request.scope,
             owner,
             decision: self.decision,
@@ -140,6 +141,7 @@ impl<'a> PreparedIdentifiedCredit<'a> {
 
 /// Complete mathematical effects; only a real adapter can publish them.
 pub struct IdentifiedCreditPlan<'a> {
+    work_units: u64,
     scope: &'a [u8],
     owner: Option<CreditOwner>,
     decision: D,
@@ -152,6 +154,11 @@ pub struct IdentifiedCreditPlan<'a> {
 }
 
 impl IdentifiedCreditPlan<'_> {
+    /// Actual represented work consumed by this complete original phased plan.
+    #[must_use]
+    pub const fn work_units(&self) -> u64 {
+        self.work_units
+    }
     /// Proposed publication header; neither current-state nor commit authority.
     #[must_use]
     pub const fn catalog_publication(&self) -> Option<CreditCatalogMeta> {

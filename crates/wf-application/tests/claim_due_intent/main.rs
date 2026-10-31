@@ -12,6 +12,7 @@ use wf_domain::workflow::request::ClientIntent;
 use wf_types::identity::TenantId;
 
 mod fields;
+mod ports;
 mod vectors;
 
 type TestError = Box<dyn Error>;

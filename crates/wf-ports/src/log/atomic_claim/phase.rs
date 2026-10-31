@@ -131,7 +131,12 @@ pub fn inspect_atomic_claim_point<'p, 'input, 'retained>(
 ) -> Result<AtomicClaimInspection<'p, 'input, 'retained>, super::super::RecordBatchApplyError> {
     let gate = inspect_point_request(view, prepared.header(log), limits.admission())?;
     if let GateDecision::Replay(outcome) = gate.decision() {
-        let (status, _) = atomic_claim_retained_summary(
+        let summary = if outcome.intent().version() == 21 {
+            crate::log::public_claim_retained_summary
+        } else {
+            atomic_claim_retained_summary
+        };
+        let (status, _) = summary(
             outcome.intent(),
             outcome.response_version(),
             outcome.response(),

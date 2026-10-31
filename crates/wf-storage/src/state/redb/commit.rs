@@ -21,6 +21,7 @@ pub(super) mod control;
 pub(super) mod core_policy;
 mod independent;
 pub(super) mod original_policy;
+pub(super) mod public_claim;
 pub(super) mod values;
 
 pub(super) fn apply(
@@ -275,7 +276,7 @@ fn admit_outcome_profile(
         tx.require_workflow_release()?;
         tx.temporary(1024)?;
     }
-    if matches!(outcome.intent().version(), 19 | 20) {
+    if matches!(outcome.intent().version(), 19..=21) {
         tx.require_governed_claim()?;
     }
     if matches!(

@@ -232,3 +232,6 @@ impl Default for StateStoreLimits {
     }
 }
 pub(crate) use commit::atomic_claim::{StagedAtomicClaim, complete as complete_atomic_claim};
+pub(crate) use commit::public_claim::{
+    FundingResult, finish as finish_public_claim, start as start_public_claim,
+};

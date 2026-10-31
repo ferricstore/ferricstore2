@@ -35,7 +35,7 @@ pub(super) fn write(out: &mut Writer<'_>, decision: D) -> Result<(), E> {
     Ok(())
 }
 
-fn rejection(out: &mut Writer<'_>, reason: R) -> Result<(), E> {
+pub(in crate::log) fn rejection(out: &mut Writer<'_>, reason: R) -> Result<(), E> {
     out.byte(match reason {
         R::Credit(_) => 0,
         R::NotFound => 1,
@@ -107,7 +107,7 @@ pub(super) fn read(reader: &mut Reader<'_>) -> Result<D, E> {
     })
 }
 
-fn read_rejection(reader: &mut Reader<'_>) -> Result<R, E> {
+pub(in crate::log) fn read_rejection(reader: &mut Reader<'_>) -> Result<R, E> {
     Ok(match reader.byte()? {
         0 => R::Credit(match reader.byte()? {
             1 => {

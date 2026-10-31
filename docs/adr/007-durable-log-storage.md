@@ -1505,6 +1505,31 @@ no absence of a binding or captured client flag supplies paid authority.
 
 ## Selected atomic Claim parent recovery
 
+PUBLIC-CLAIM-RECOVERY1 adds explicit `with_public_claim_recovery` selection after
+the atomic/GC5/value/catalog-credit dependencies. It adds only the original
+whole-parent credit work and temporary-owner ceilings. Header root19/semantic21
+has a distinct borrowed route. Historical audit fully prepares the actual public
+caller/nonce body; replay invokes the same real op19 transaction. Original
+nonce/IDs, metadata and retained bytes survive reopen. Older selections refuse
+op19, malformed historical suffix bytes remain errors even behind later control,
+and uncommitted opaque entries remain unexecuted. No live consensus or listener
+is established by startup replay.
+
+Funding uses actual sparse identified-credit plans, including owner/configuration
+effects from rejected decisions. The source order is Spend, optional Lease after
+known failure, then Spend. Missing owner returns NotFound before IDs; the actual
+existing-owner/missing-lease epoch0 follows the existing public credit sentinel.
+Physical NoDemand checks actual record state, not the logical lane label, and
+preserves the strict reclaim-ratio-zero fallback. Used positions come only from
+accepted postimage bindings; settlement releases unused original IDs in order.
+A late Claim rejection aborts the entire staged writer, then verifies the same
+predecessor and absence of the original receipt under a replacement guard before
+redoing deterministic funding/refunding all IDs. Schema, reads, adapter owners
+and represented credit work remain cumulative. Unknown final commit fences the
+owner; it triggers no further release. Native fault testing requires complete
+old/new cohorts and same-frame recovery. This is group-local atomicity, not an
+external no-spend proof or cross-group compensation protocol.
+
 The explicit with_atomic_claim_recovery(caller, coordination) selection adds
 op18/semantic20 original-parent recovery on actual GC5. It requires stored-value,
 catalog-credit and value-Claim profiles, revalidates them after builder changes

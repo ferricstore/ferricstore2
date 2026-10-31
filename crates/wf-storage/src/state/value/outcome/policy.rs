@@ -110,7 +110,7 @@ fn validation_bytes(
         maximum_wire_bytes,
         |fields, intent, _, _, _, _, response_version| {
             let response = fields[4];
-            if matches!(intent, 19 | 20) && layout == Some(8) {
+            if matches!(intent, 19..=21) && layout == Some(8) {
                 return (response.len() / 5)
                     .min(1000)
                     .checked_mul(std::mem::size_of::<&[u8]>())

@@ -32,6 +32,7 @@ pub struct PreparedAtomicClaim<'a> {
     pub(super) scan_budget: usize,
     pub(super) head_budget: usize,
     pub(super) payment: Option<GovernedClaimPaymentRef<'a>>,
+    pub(super) funding_batch: Option<[u8; 16]>,
 }
 impl<'a> PreparedAtomicClaim<'a> {
     /// Original actual committed bytes.
@@ -74,6 +75,11 @@ impl<'a> PreparedAtomicClaim<'a> {
     #[must_use]
     pub const fn payment(&self) -> Option<GovernedClaimPaymentRef<'a>> {
         self.payment
+    }
+    /// Original public funding nonce, without paid-credit or execution authority.
+    #[must_use]
+    pub const fn funding_batch(&self) -> Option<[u8; 16]> {
+        self.funding_batch
     }
     /// Committed token algorithm and first ordinal.
     #[must_use]

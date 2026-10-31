@@ -19,7 +19,7 @@ use wf_domain::{
 };
 use wf_ports::log::FreshAtomicClaim;
 
-pub(super) fn run<'s, 'p, 'input>(
+pub(in crate::transaction) fn run<'s, 'p, 'input>(
     fresh: &FreshAtomicClaim<'p, 'input>,
     mut staged: StagedAtomicClaim<'s, 'p, 'input>,
     limits: AtomicClaimTransactionLimits,

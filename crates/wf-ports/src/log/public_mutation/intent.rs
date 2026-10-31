@@ -61,7 +61,7 @@ pub(super) fn prepare(
     ClientIntent::new(1, hash.finalize().into()).map_err(|_| CodecError::UnsupportedVersion)
 }
 
-fn header(
+pub(in crate::log) fn header(
     tag: u8,
     length: usize,
     out: &mut dyn FnMut(&[u8]) -> Result<(), CodecError>,
@@ -72,7 +72,7 @@ fn header(
         .to_be_bytes())
 }
 
-fn scalar(
+pub(in crate::log) fn scalar(
     tag: u8,
     value: &[u8],
     out: &mut dyn FnMut(&[u8]) -> Result<(), CodecError>,
@@ -81,7 +81,7 @@ fn scalar(
     out(value)
 }
 
-fn map(
+pub(in crate::log) fn map(
     count: usize,
     out: &mut dyn FnMut(&[u8]) -> Result<(), CodecError>,
     body: impl Fn(&mut dyn FnMut(&[u8]) -> Result<(), CodecError>) -> Result<(), CodecError>,
@@ -143,7 +143,7 @@ pub(in crate::log) fn canonical(
     })
 }
 
-fn bytes(
+pub(in crate::log) fn bytes(
     key: &str,
     value: Option<&[u8]>,
     out: &mut dyn FnMut(&[u8]) -> Result<(), CodecError>,
@@ -157,7 +157,7 @@ fn bytes(
     }
 }
 
-fn number(
+pub(in crate::log) fn number(
     key: &str,
     value: Option<u64>,
     out: &mut dyn FnMut(&[u8]) -> Result<(), CodecError>,

@@ -18,8 +18,8 @@ use wf_ports::{
     state::{GroupApplyStore, GroupApplyTransaction, StateTransactionError as S},
 };
 use wf_types::version::LogIdentity;
-mod execute;
-mod reply;
+pub(super) mod execute;
+pub(super) mod reply;
 
 /// Immutable server profiles carried across every phase of one actual parent.
 #[derive(Clone, Copy)]
@@ -131,7 +131,7 @@ pub fn apply_atomic_claim_transaction(
     Ok(ClaimTransactionOutcome::Retained { control, outcome })
 }
 
-fn begin<'s>(
+pub(super) fn begin<'s>(
     store: &'s mut RedbStateStore,
     scope: &'s RequestScope,
     base: super::RecordBatchTransactionLimits,

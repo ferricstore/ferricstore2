@@ -29,15 +29,15 @@ use wf_types::version::TimestampMillis;
 mod payment;
 
 pub(crate) struct StagedAtomicClaim<'s, 'p, 'input> {
-    tx: RedbStateTransaction<'s>,
-    prepared: &'p PreparedAtomicClaim<'input>,
-    expected: ControlState,
-    control: ControlPlan,
-    reply: AtomicClaimReplyBuilder<'input>,
-    changed: usize,
-    reservation_cursor: usize,
-    initial_rejection: Option<ClaimRejection>,
-    limits: crate::transaction::AtomicClaimTransactionLimits,
+    pub(super) tx: RedbStateTransaction<'s>,
+    pub(super) prepared: &'p PreparedAtomicClaim<'input>,
+    pub(super) expected: ControlState,
+    pub(super) control: ControlPlan,
+    pub(super) reply: AtomicClaimReplyBuilder<'input>,
+    pub(super) changed: usize,
+    pub(super) reservation_cursor: usize,
+    pub(super) initial_rejection: Option<ClaimRejection>,
+    pub(super) limits: crate::transaction::AtomicClaimTransactionLimits,
 }
 impl<'s, 'p, 'input> StagedAtomicClaim<'s, 'p, 'input> {
     pub(crate) fn new(
@@ -110,10 +110,11 @@ impl<'s, 'p, 'input> StagedAtomicClaim<'s, 'p, 'input> {
         let business = plan.batch();
         super::claim::values::validate_phase(&self.tx, self.prepared.digest(), business, values)?;
         let count = business.map_or(0, |batch| batch.batch().items().len());
-        let verified = if self.prepared.payment().is_some() {
+        let verified = if let Some(paid) = self.reply.payment().map_err(codec)? {
             Some(super::super::release::claim::witness_atomic(
                 &self.tx,
                 self.prepared,
+                paid,
                 self.control.execution_time(),
                 business,
                 self.reservation_cursor,
@@ -168,7 +169,7 @@ impl<'s, 'p, 'input> StagedAtomicClaim<'s, 'p, 'input> {
                 .changed
                 .checked_add(business.batch().items().len())
                 .ok_or(E::Limit)?;
-            if let Some(paid) = self.prepared.payment() {
+            if let Some(paid) = self.reply.payment().map_err(codec)? {
                 super::super::release::claim::publish_at(
                     &self.tx,
                     self.prepared.scope(),
@@ -276,7 +277,7 @@ pub(crate) fn complete(
     Ok(gate.control().next())
 }
 
-fn validate_guard(
+pub(super) fn validate_guard(
     tx: &RedbStateTransaction<'_>,
     expected: ControlState,
     prepared: &PreparedAtomicClaim<'_>,
@@ -301,7 +302,7 @@ fn validate_guard(
     Ok(())
 }
 
-fn publish(
+pub(super) fn publish(
     mut tx: RedbStateTransaction<'_>,
     prepared: &PreparedAtomicClaim<'_>,
     control: ControlState,
@@ -316,7 +317,7 @@ fn publish(
         .map_err(|_| E::Unavailable)?;
     tx.write.commit().map_err(|_| E::Uncertain)
 }
-fn codec(error: wf_ports::log::CodecError) -> E {
+pub(super) fn codec(error: wf_ports::log::CodecError) -> E {
     match error {
         wf_ports::log::CodecError::OwnedLimit
         | wf_ports::log::CodecError::ByteLimit

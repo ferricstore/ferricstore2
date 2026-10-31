@@ -2,6 +2,7 @@
 use super::{CodecError as E, CodecLimits, DecodedRequest, PreparedBytes};
 use wf_domain::{governance::release::LimitEnforcement, workflow::control::PreparedDigest};
 pub(in crate::log) mod payment;
+pub use payment::{encode_claim_payment, inspect_claim_payment};
 mod request;
 /// Borrows selected paid-Claim recovery facts; full preparation remains mandatory.
 /// # Errors

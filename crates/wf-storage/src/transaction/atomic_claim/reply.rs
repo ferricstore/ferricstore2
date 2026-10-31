@@ -14,7 +14,7 @@ use wf_domain::workflow::{
 };
 use wf_ports::log::{FreshAtomicClaim, PreparedAtomicClaim};
 
-pub(super) fn complete(
+pub(in crate::transaction) fn complete(
     tx: RedbStateTransaction<'_>,
     expected: ControlState,
     prepared: &PreparedAtomicClaim<'_>,
@@ -31,7 +31,7 @@ pub(super) fn complete(
     Ok((control, kind))
 }
 
-pub(super) fn classify(
+pub(in crate::transaction) fn classify(
     control: ControlState,
     kind: u8,
     original: Option<RetainedOutcome>,

@@ -3,6 +3,14 @@
 use super::{ClientIntent, RequestValueError};
 
 impl ClientIntent {
+    /// Public V1 Claim digest with a separate internal funded-parent profile.
+    #[must_use]
+    pub const fn public_claim(digest: [u8; 32]) -> Self {
+        Self {
+            version: 21,
+            digest,
+        }
+    }
     /// Atomic Claim original-caller identity, independent of generated payment inputs.
     #[must_use]
     pub const fn atomic_claim(digest: [u8; 32]) -> Self {

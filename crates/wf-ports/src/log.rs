@@ -55,6 +55,7 @@ pub use governed_claim::{
     governed_claim_retained_summary, inspect_governed_claim_point, inspect_governed_claim_reply,
     prepare_governed_claim_request, reject_unavailable_governed_claim,
 };
+pub use governed_claim::{encode_claim_payment, inspect_claim_payment};
 mod common;
 mod release;
 mod release_maintenance;
@@ -366,7 +367,14 @@ fn digest(bytes: &[u8]) -> PreparedDigest {
     PreparedDigest::new(Sha256::digest(bytes).into())
 }
 
+mod public_claim;
 mod public_credit;
+pub use public_claim::{
+    PreparedPublicClaim, PublicClaimPreparation, PublicClaimReplyKind, PublicClaimReplyRef,
+    encode_public_claim_funding_reply, encode_public_claim_reply, encode_public_claim_request,
+    inspect_public_claim_reply, prepare_public_claim_intent, prepare_public_claim_request,
+    public_claim_recovery_header, public_claim_retained_summary,
+};
 pub use public_credit::{
     CreditSpendPreparation, PublicCreditReplyExpectation, encode_public_credit_request,
     fingerprint_credit_policy, generate_public_credit_ids, inspect_public_credit_reply,

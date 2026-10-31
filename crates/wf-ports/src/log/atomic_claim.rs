@@ -6,7 +6,7 @@ use wf_domain::workflow::request::RequestScope;
 use wf_types::{identity::RequestId, version::CommittedTime};
 
 mod caller;
-mod frame;
+pub(in crate::log) mod frame;
 mod model;
 mod phase;
 mod policy;
