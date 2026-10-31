@@ -256,3 +256,166 @@ fn public_credit_application_unknown_lookup_and_bad_workspace_stop_before_owner_
     assert!(port.trace.borrow().is_empty());
     port.cleanup()
 }
+
+#[test]
+fn public_credit_application_retry_refusals_keep_original_and_exact_id_budget_is_sufficient()
+-> TestResult {
+    let mut port = Fixture::new()?;
+    port.seed()?;
+    port.now = 1001;
+    port.fault.set(Fault::LosePublic);
+    let R::Unknown { original, .. } = port.call(
+        K::Spend,
+        b"spend",
+        &[("shard_id", V::Integer(0)), ("amount", V::Integer(2))],
+    )??
+    else {
+        return Err("no original context".into());
+    };
+    let frame = original.frame().as_ptr();
+    let ids = original.spend_ids().to_vec();
+    port.trace.borrow_mut().clear();
+    let refusal = match retry_public_credit_call(
+        original,
+        &mut port,
+        Limits {
+            workspace_bytes: 1,
+            ..Limits::default()
+        },
+    ) {
+        Err(error) => error,
+        Ok(_) => return Err("bad workspace admitted".into()),
+    };
+    assert_eq!(refusal.error(), E::Limit);
+    assert_eq!(port.trace.borrow().len(), 0);
+    let original = refusal.into_original();
+    assert_eq!(original.frame().as_ptr(), frame);
+    assert_eq!(original.spend_ids(), ids);
+    port.fault.set(Fault::RefusePublic);
+    let refusal = match retry_public_credit_call(original, &mut port, Limits::default()) {
+        Err(error) => error,
+        Ok(_) => return Err("retry proposal refusal lost".into()),
+    };
+    assert_eq!(
+        refusal.error(),
+        E::Preparation(wf_ports::consensus::MutationNotSubmitted::Unavailable)
+    );
+    let original = refusal.into_original();
+    assert_eq!(original.frame().as_ptr(), frame);
+    assert_eq!(original.spend_ids(), ids);
+    let maximum_ids_bytes = 128
+        + ids
+            .iter()
+            .map(|id| id.len() + std::mem::size_of::<Vec<u8>>())
+            .sum::<usize>();
+    let R::Retained(outcome) = retry_public_credit_call(
+        original,
+        &mut port,
+        Limits {
+            maximum_ids_bytes,
+            ..Limits::default()
+        },
+    )?
+    else {
+        return Err("exact original ID budget refused".into());
+    };
+    assert_eq!(fixtures::decoded(&outcome)?.reservation_ids, ids);
+    assert_eq!(port.in_use()?, 2);
+    port.cleanup()
+}
+
+#[test]
+fn public_credit_application_repairs_before_existing_get_renew_release_and_cleanup() -> TestResult {
+    use wf_domain::governance::caller::CreditIdList;
+    for kind in [K::Get, K::Renew, K::Release, K::Cleanup] {
+        let mut port = Fixture::new()?;
+        port.seed()?;
+        let frames = super::fixtures::frames()?;
+        let outcome = port.commit(
+            &wf_types::identity::RequestId::new(b"spend".to_vec())?,
+            &frames[1],
+        )?;
+        let ids = fixtures::decoded(&outcome)?.reservation_ids;
+        port.now = 1002;
+        assert!(!port.member()?);
+        let opts = match kind {
+            K::Renew => vec![("shard_id", V::Integer(0)), ("ttl_ms", V::Integer(2000))],
+            K::Release => vec![
+                ("shard_id", V::Integer(0)),
+                ("amount", V::Integer(1)),
+                ("reservation_ids", V::Ids(CreditIdList::Owned(&ids[..1]))),
+            ],
+            _ => Vec::new(),
+        };
+        let R::Retained(outcome) = port.call(kind, b"dependent", &opts)?? else {
+            return Err("no original dependent response".into());
+        };
+        assert_eq!(
+            outcome.status(),
+            wf_domain::workflow::request::RetainedStatus::Accepted
+        );
+        assert!(port.member()?);
+        assert_eq!(port.in_use()?, if kind == K::Release { 1 } else { 2 });
+        let trace = port.trace.borrow();
+        let registration = trace
+            .iter()
+            .position(|v| *v == Trace::Register(true))
+            .ok_or("no registration")?;
+        let submitted = trace
+            .iter()
+            .position(|v| *v == Trace::Submit)
+            .ok_or("no submission")?;
+        assert!(registration < submitted);
+        assert!(!trace.contains(&Trace::Entropy));
+        assert_eq!(trace.iter().filter(|v| **v == Trace::Owner).count(), 1);
+        drop(trace);
+        port.cleanup()?;
+    }
+    Ok(())
+}
+
+#[test]
+fn public_credit_application_unknown_spend_compensation_preserves_sibling_reservations()
+-> TestResult {
+    use wf_domain::governance::caller::CreditIdList;
+    let mut port = Fixture::new()?;
+    port.seed()?;
+    port.now = 1001;
+    port.fault.set(Fault::LosePublic);
+    let opts = [("shard_id", V::Integer(0)), ("amount", V::Integer(1))];
+    let R::Unknown { original, .. } = port.call(K::Spend, b"unknown", &opts)?? else {
+        return Err("no uncertain spend".into());
+    };
+    let ids = original
+        .unknown_spend()
+        .ok_or("no original IDs")?
+        .reservation_ids
+        .to_vec();
+    let R::Retained(sibling) = port.call(K::Spend, b"sibling", &opts)?? else {
+        return Err("no sibling".into());
+    };
+    let sibling_ids = fixtures::decoded(&sibling)?.reservation_ids;
+    assert_ne!(ids, sibling_ids);
+    assert_eq!(port.in_use()?, 2);
+    let release = [
+        ("shard_id", V::Integer(0)),
+        ("amount", V::Integer(1)),
+        ("reservation_ids", V::Ids(CreditIdList::Owned(&ids))),
+    ];
+    for request in [b"compensate".as_slice(), b"repeat-compensation"] {
+        let R::Retained(outcome) = port.call(K::Release, request, &release)?? else {
+            return Err("no compensation outcome".into());
+        };
+        assert_eq!(
+            outcome.status(),
+            wf_domain::workflow::request::RetainedStatus::Accepted
+        );
+        assert_eq!(port.in_use()?, 1);
+    }
+    let R::Retained(retained) = port.call(K::Spend, b"sibling", &opts)?? else {
+        return Err("no original sibling".into());
+    };
+    assert_eq!(fixtures::decoded(&retained)?.reservation_ids, sibling_ids);
+    assert_eq!(port.in_use()?, 1);
+    port.cleanup()
+}

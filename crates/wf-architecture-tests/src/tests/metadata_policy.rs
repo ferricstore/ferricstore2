@@ -338,6 +338,8 @@ fn catalog_prune_codec_and_revision_observations_remain_pure() -> CheckResult<()
 fn public_credit_callers_and_prepared_codecs_remain_pure() -> CheckResult<()> {
     for module in [
         "log::public_credit",
+        "consensus::public_credit",
+        "log::public_credit::reply",
         "log::model",
         "log::public_credit::encode",
         "log::public_credit::decode",

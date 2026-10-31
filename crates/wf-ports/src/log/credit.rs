@@ -15,7 +15,7 @@ pub(super) mod model;
 mod scan;
 pub use model::PreparedCreditRequest;
 mod owner;
-mod response;
+pub(super) mod response;
 mod status;
 mod view;
 

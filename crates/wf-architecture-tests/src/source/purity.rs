@@ -207,6 +207,7 @@ impl Inspector<'_, '_> {
             "clock",
             "consensus::value",
             "consensus::catalog_publication",
+            "consensus::public_credit",
             "log::value_batch",
             "log::record_batch::phase",
             "log::record_batch::fresh",

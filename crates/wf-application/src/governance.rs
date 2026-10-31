@@ -25,6 +25,6 @@ pub use repair::{CreditCatalogRepairError, CreditCatalogRepairStatus, repair_cre
 mod credit;
 pub use credit::{
     PreparedPublicCreditCall, PublicCreditCallError, PublicCreditCallLimits,
-    PublicCreditCallRequest, PublicCreditCallResult, retry_public_credit_call,
-    submit_public_credit_call,
+    PublicCreditCallRequest, PublicCreditCallResult, PublicCreditRetryError,
+    retry_public_credit_call, submit_public_credit_call,
 };

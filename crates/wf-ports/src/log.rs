@@ -338,8 +338,7 @@ fn digest(bytes: &[u8]) -> PreparedDigest {
 
 mod public_credit;
 pub use public_credit::{
-    CreditSpendPreparation, PublicCreditReplyExpectation, inspect_public_credit_reply,
-    encode_public_credit_request, fingerprint_credit_policy,
-    generate_public_credit_ids, prepare_public_credit_request, public_credit_intent,
-    public_credit_recovery_header,
+    CreditSpendPreparation, PublicCreditReplyExpectation, encode_public_credit_request,
+    fingerprint_credit_policy, generate_public_credit_ids, inspect_public_credit_reply,
+    prepare_public_credit_request, public_credit_intent, public_credit_recovery_header,
 };

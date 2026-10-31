@@ -216,6 +216,10 @@ impl PublicCreditSubmitPort for PublicCreditFixture {
         if scope != &self.scope {
             return M::NotSubmitted(N::InvalidScope);
         }
+        if self.fault.get() == PublicCreditFault::RefusePublic {
+            self.fault.set(PublicCreditFault::None);
+            return M::NotSubmitted(N::Unavailable);
+        }
         match self.commit(id, &frame) {
             Ok(outcome) => match self.fault.replace(PublicCreditFault::None) {
                 PublicCreditFault::LosePublic => M::Unknown(U::Unavailable),

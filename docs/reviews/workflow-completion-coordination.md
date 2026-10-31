@@ -60867,3 +60867,6 @@ unknown-outcome compensation context. Dispatch likewise retains the same box.
 Approve private repair_existing_credit_catalog in the existing repair.rs: only
 the application path after its actual owner read may call it, avoiding a second
 full owner restore. No public existence flag or reusable authority is introduced.
+Execution refusal on a retry also returns PublicCreditRetryError with the original
+box: no-proposal proof for the retry cannot prove the preceding unknown attempt
+did not commit. Fresh call conversion may expose that preparation refusal directly.

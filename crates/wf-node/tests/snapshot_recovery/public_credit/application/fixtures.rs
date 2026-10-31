@@ -35,6 +35,7 @@ pub(super) enum PublicCreditFault {
     WrongPublicIds,
     OwnerRead,
     LookupUnknown,
+    RefusePublic,
 }
 pub(super) struct PublicCreditFixture {
     pub(super) root: PathBuf,

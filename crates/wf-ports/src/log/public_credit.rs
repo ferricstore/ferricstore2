@@ -12,6 +12,7 @@ mod decode;
 mod encode;
 mod ids;
 mod policy;
+mod reply;
 /// Original response operands; generated IDs may be unknown during retained lookup.
 #[derive(Clone, Copy)]
 pub struct PublicCreditReplyExpectation<'a> {
@@ -38,8 +39,7 @@ pub fn inspect_public_credit_reply(
     credit: wf_domain::governance::credit::CreditLimits,
     admission: wf_domain::workflow::admission::AdmissionLimits,
 ) -> Result<wf_domain::workflow::request::RetainedStatus, E> {
-    let _ = (intent, version, response, expected, credit, admission);
-    Err(E::UnsupportedTag)
+    reply::inspect(intent, version, response, expected, credit, admission)
 }
 /// Explicit spend generation and entropy captured by the authorized preparer.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

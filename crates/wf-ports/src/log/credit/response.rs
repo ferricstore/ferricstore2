@@ -16,7 +16,7 @@ use wf_domain::governance::identified::{
     IdentifiedCreditDecision as D, IdentifiedCreditRejection as R, IdentifiedCreditReply,
 };
 
-pub(super) struct ScannedCreditReply<'a> {
+pub(in crate::log) struct ScannedCreditReply<'a> {
     encoded: &'a [u8],
     decision: D,
     owner: Option<ScannedCreditOwner<'a>>,
@@ -26,11 +26,28 @@ pub(super) struct ScannedCreditReply<'a> {
 }
 
 impl ScannedCreditReply<'_> {
-    pub(super) fn owner_scope(&self) -> Option<&[u8]> {
+    pub(in crate::log) fn owner_scope(&self) -> Option<&[u8]> {
         self.owner.as_ref().map(ScannedCreditOwner::scope)
     }
-    pub(super) const fn summary(&self) -> (D, usize) {
+    pub(in crate::log) const fn summary(&self) -> (D, usize) {
         (self.decision, self.count)
+    }
+
+    pub(in crate::log) fn matches_ids(
+        &self,
+        expected: wf_domain::governance::caller::CreditIdList<'_>,
+    ) -> Result<bool, E> {
+        if expected.len() != self.count {
+            return Ok(false);
+        }
+        let mut reader = Reader::new(&self.encoded[self.ids_at..], CodecLimits::default());
+        for id in expected.iter() {
+            if reader.nonempty(256)? != id {
+                return Ok(false);
+            }
+        }
+        reader.finish()?;
+        Ok(true)
     }
 
     pub(super) fn into_owned(self, maximum_owned: usize) -> Result<IdentifiedCreditReply, E> {
@@ -57,7 +74,7 @@ impl ScannedCreditReply<'_> {
     }
 }
 
-pub(super) fn inspect(
+pub(in crate::log) fn inspect(
     encoded: &[u8],
     credit: CreditLimits,
     maximum_wire: usize,

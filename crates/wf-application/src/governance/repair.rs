@@ -56,7 +56,6 @@ where
 {
     use CreditCatalogRepairError as E;
     use CreditCatalogRepairStatus as Status;
-    use wf_ports::state::{GovernanceCatalogReadLimits, encode_credit_catalog_members};
     if credit_scope.is_empty() || credit_scope.len() > 65535 {
         return Err(E::Preflight(CreditCatalogPublicationError::InvalidOptions));
     }
@@ -78,6 +77,24 @@ where
     if !exists {
         return Ok(Status::Missing);
     }
+    repair_existing_credit_catalog(port, source, target, catalog, credit_scope, limits)
+}
+
+// The caller has just read the actual existing owner; this is not public proof.
+pub(super) fn repair_existing_credit_catalog<P>(
+    port: &mut P,
+    source: &RequestScope,
+    target: &RequestScope,
+    catalog: &[u8],
+    credit_scope: &[u8],
+    limits: CreditCatalogPublicationLimits,
+) -> Result<CreditCatalogRepairStatus, CreditCatalogRepairError>
+where
+    P: CreditCatalogPublicationPort + GovernanceCatalogReadPort,
+{
+    use CreditCatalogRepairError as E;
+    use CreditCatalogRepairStatus as Status;
+    use wf_ports::state::{GovernanceCatalogReadLimits, encode_credit_catalog_members};
     let encoded = encode_credit_catalog_members(
         source,
         &[credit_scope],
