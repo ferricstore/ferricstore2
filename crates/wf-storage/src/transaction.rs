@@ -35,8 +35,10 @@ mod load;
 mod observations;
 mod record_batch;
 mod value_batch;
+mod workflow_release;
 pub use value_batch::apply_stored_step_continue_transaction;
 pub(crate) use value_batch::{ValuePublicationPlan, ValueStep};
+pub use workflow_release::apply_workflow_release_transaction;
 
 pub use value_batch::{
     WorkflowValueTransactionError, WorkflowValueTransactionLimits, apply_step_continue_transaction,

@@ -61250,3 +61250,54 @@ through genuine governed Claim with actual paid owner/epoch/ID checks and no ID
 reuse, implement ACK/sparse completion and historical/received/purged replay, and
 finish the Claim/policy/refund/reconciliation parents. Exact next artifacts still
 require concrete solo review. The coupled batch and full goal remain unfinished.
+
+### Solo review 2026-10-31: actual release-aware workflow publication
+
+Previous turn is progress:22da47e/f0aa695 implements canonical data custody and
+the real legacy-write safety fence. Continue the same coupled batch, solo.
+Approve transaction/workflow_release.rs with apply_workflow_release_transaction:
+an explicitly selected intent9/full-history GC4 driver, retaining all legacy APIs
+and their fence. It must inspect actual GC4 under its writer before any execution.
+Approve private ValueApplyProfile in existing value_batch/driver.rs (Legacy versus
+WorkflowRelease selection); this selects a path and grants no capability.
+New test child workflow_values/release/mutations.rs reuses actual committed core
+fixtures and explicitly installed original binding data. Save compiled rejecting
+tests for atomic terminal publication, source-order final-write deduplication and
+the real65536-entry backlog before implementing the body. These component
+fixtures do not establish governed Claim or source-case coverage.
+
+Approve domain IndexRejection::ReleaseBacklogFull and the next closed rejection
+kind7/code0 in existing response grammars. It is whole-command, never an
+independent item rejection. Public scalar whole-root1 may represent it. Add pure
+ports/log/release/mutation.rs with reject_workflow_release_backlog; move original
+RetainedOutcome metadata via a new into_parts method instead of cloning response
+or payload owners. The selected driver converts capacity refusal before immutable
+GroupApplyChanges/value companions. No new mutation intent/response version and
+no reinterpretation of successful replies; the unique new rejection requires
+actual GC4 on write, point read and complete recovery, even with no data rows.
+
+Approve state/redb/release/{plan,write}.rs with private ReleasePublicationPlan,
+ReleasePreparation (Publish/BacklogFull), and VerifiedReleaseWrites. Preparation
+walks actual final writes in original source order (fixed1000-slot stack mask for
+independent finals), reads same-guard bindings, and deduplicates reservation IDs.
+Own one encoded native intent per unique qualifying non-running final write;
+bounded sorted indices avoid ID clones and preserve original append order.
+Prospectively debit descriptors, keys, complete reads and encoded owners before
+fallible reservation/encoding. No whole namespace copy or standalone enqueue.
+The writer rechecks the actual GC4, prepared entry, complete final-write/intents
+association, unique-ID order, original queue state and append arithmetic before
+publishing. VerifiedReleaseWrites borrows that exact immutable plan, with private
+construction; only its actual record postimages may bypass the legacy fence.
+It is not a boolean authority flag. Extend existing commit/values and publication
+internals to carry this sealed companion; legacy paths carry none. Queue entries,
+records/indexes/every history/value companions/original outcome/control share one
+consumed Immediate transaction. Retained inquiry stays ahead of current record/
+binding/queue reads; no append on replay/conflict/expiry/exact log replay. Queue
+full is durable business rejection; corrupt/exhausted arithmetic and resource/
+engine/uncertain failures stay operational. Keep governed Claim unsupported.
+
+Atomic-writer R0: the three tests compile and each reaches the deliberately
+rejecting entrypoint, returning UnsupportedProfile (exit101). The actual65536-row
+backlog fixture opens under default finite recovery limits before that refusal.
+Saved /private/tmp/ferricstore2-release-atomic-r0.log. Later mode6/replay assertions
+in the first test are masked until the body; no retrospective RED credit.

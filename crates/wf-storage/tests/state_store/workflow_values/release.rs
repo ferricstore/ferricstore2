@@ -9,6 +9,7 @@ use wf_ports::state::StateTransactionError as E;
 use wf_storage::state::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
 use wf_types::{identity::PartitionId, version::TimestampMillis};
 mod custody;
+mod mutations;
 
 fn fixture(path: &Path) -> TestResult {
     let scope = crate::fixtures::scope()?;
