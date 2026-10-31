@@ -2,6 +2,56 @@
 
 Updated: 2026-10-31. Full-completion goal remains active; continue solo.
 
+
+PUBLIC-CLAIM-BIND1 follows c2d67b9 on the isolated implementation branch.
+Public intent21 now records actual eligible bind attempts before the supported
+source query-row integer refusal. A skipped candidate consumes its original
+position; accepted later candidates bind the exact non-prefix IDs. One cursor
+continues across phases, including phases with no accepted postimages. Exhaustion
+on another eligible bind rejects the entire parent, aborts prior workflow effects
+and refunds the original batch. Actual stream-end emptiness consumes no extra ID.
+Private intent20/op18 and canonical u64 restoration retain their contracts.
+
+The sealed domain ledger is not credit authority: native staging derives the
+ceiling from the actual owned payment, rechecks active IDs and publishes matching
+sidecars/consumed markers/reply positions. Existing settlement releases only the
+original complement. One bounded fallible position spine is charged before
+allocation; publication borrows original IDs. No performance gain is claimed.
+
+Eight supplemental native controls cover source signed64 refusal/boundary,
+private u64 compatibility, non-prefix binding/refund/replay/reopen, exact batch
+end, exhaustion after a skip, cross-phase rollback and an all-skipped phase.
+Two controls have genuine preimplementation runtime RED; six are later first-pass
+supplemental checks. These synthetic restored-core cases gain no source-ledger
+credit and establish no complete QueryRow compatibility.
+
+The frozen final workspace passes1804 Rust tests in120 groups plus11 doctests
+in15 groups, zero failures/ignored. Strict workspace/all-target Clippy, strict
+docs, all60 architecture cases, Python7, reference integrity, progress, fmt and
+diff pass. All2183 non-Markdown inputs/1594 Rust files stay exact through final
+verification. Against c2d67b9,1288 of1289 prior test/bench/reference inputs remain
+byte-identical; one has an exact additive test-module registration. The Rust
+subset is752 whole of753 plus that registration. Source assertions, reference
+snapshots and ledgers remain unchanged. Evidence: /private/tmp/ferricstore2-
+claim-bind-{red,green,supplemental,focused,workspace,doctests,clippy,doc,arch,
+python,reference,progress,parity,fmt}.log and proof/source-audit/inputs.json.
+Cargo retains the isolated target/CARGO_HOME/Rust1.99.0 profiles below.
+
+Full parity still actually exits1: complete5858-declaration scenario/profile/
+setup/fixture execution is missing. NEXT complete the rest of source QueryRow
+metadata/key validation, original nil/present-empty partitions, Auto/Global
+routing, exact projections, blocking and per-caller pipeline identity. Complete
+the ordered actual accepted Raft/leader/read-barrier/current-auth/supervisor,
+shared transport and worker owners; remaining lifecycle/catalog behavior; all
+source counterparts/profiles and native Linux/macOS/performance acceptance.
+No original Elixir/native Linux, production runtime, independent peer review or
+measured speedup is claimed. Primary implementation adoption and push remain
+unperformed; the primary receives only a reviewed handoff pointer.
+
+## Preceding c2d67b9 application checkpoint (historical)
+
+The following saved results/next steps describe that predecessor only.
+
 PUBLIC-CLAIM-APP1 implements original-first application submission/retry over the
 explicit PublicClaimSubmitPort. Public V1 comparison is selected as intent21 and
 looked up before clock/nonce/current funding. One shared immutable original frame

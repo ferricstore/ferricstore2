@@ -29,6 +29,7 @@ pub struct ClaimPlan<'a> {
     stop: SelectionStop,
     resume: ClaimResume<'a>,
     work_bytes: u64,
+    source_bindings: Option<(usize, Vec<usize>)>,
 }
 impl<'a> ClaimPlan<'a> {
     /// Borrows the complete record/history/index plan; empty acceptance has none.
@@ -50,6 +51,18 @@ impl<'a> ClaimPlan<'a> {
     #[must_use]
     pub const fn work_bytes(&self) -> u64 {
         self.work_bytes
+    }
+    /// Actual public-source bind attempts and accepted relative positions.
+    /// Skipped postimages consume positions; this ledger proves no external spend.
+    #[must_use]
+    pub fn source_bindings(&self) -> Option<(usize, &[usize])> {
+        self.source_bindings
+            .as_ref()
+            .map(|(attempts, positions)| (*attempts, positions.as_slice()))
+    }
+    pub(super) fn with_source_bindings(mut self, bindings: Option<(usize, Vec<usize>)>) -> Self {
+        self.source_bindings = bindings;
+        self
     }
     /// Distinguishes completed empty selection from bounded partial selection.
     #[must_use]
@@ -76,6 +89,7 @@ impl<'a> ClaimPlan<'a> {
             stop,
             resume,
             work_bytes,
+            source_bindings: None,
         }
     }
 }

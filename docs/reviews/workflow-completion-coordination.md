@@ -62641,3 +62641,130 @@ complete production authorization/accepted read barriers/supervision, live
 consensus/listeners/workers, source bind-before-skip/optional partition/routing,
 blocking/projection/pipeline integration, complete Elixir/profile coverage,
 Linux or performance acceptance. Keep the unchanged full goal active and solo.
+
+
+## PUBLIC-CLAIM-BIND1: concrete solo architecture decision, 2026-10-31
+
+Approved before artifact creation under the current solo override; this is a
+self-review, not independent peer review. The full completion goal stays active.
+
+Approved artifacts: domain `claim/apply/observed/bindings.rs` and its private
+`ClaimBindingCursor`; the existing `ClaimPlan` gains a private optional sealed
+(attempt count, accepted relative positions) ledger and borrowed getter. Existing
+`observed.rs` exposes `decide_observed_public_claim` and the private selection
+merge gains an eligibility callback. Native `commit/atomic_claim/bindings.rs`
+formats/validates positions on the stack; existing transaction observations,
+executor, stager and release publication integrate them. Test artifact
+`tests/state_store/workflow_values/claim/public/bindings.rs` owns synthetic
+restored-record controls, with one additive parent module registration.
+
+Authority: only real eligible, physically matching, state/due-admitted candidates
+advance the ledger, before source-proven postimage rejection. The first supported
+late refusal is `attempts > i64::MAX`: pinned QueryRowPrimitives.encode/3 rejects
+that integer, QueryRowCodec builtins include attempts, and pinned
+flow_retention_values.ex:458-523 binds before query-row validation. Claim leaves
+attempts unchanged. A private canonical u64 record is still valid; do not change
+private op18/intent20 or general restoration admission. No caller boolean or
+projection proves spend/emptiness. Public intent21 selects this source path.
+
+The native cursor derives its maximum from actual owned paid IDs minus preceding
+attempts. Exhaustion on another eligible bind rejects the whole parent under the
+selected A-CM1 migration: no reset, unpaid record, fabricated empty stream or
+prefix publication. Accepted positions may have gaps; actual sidecars, consumed
+markers, reply positions and settlement must agree. An all-skipped phase still
+advances the cursor. Empty actual streams consume no IDs.
+
+Ownership/resources: one fallibly reserved usize position spine bounded by the
+admitted phase limit; pay its capacity prospectively against decision/work and
+native staging budgets. Charge skipped candidates through the existing consumed
+read/scan guards. No postimage/payload/ID clones, dependency, OS-specific behavior
+or wire version change. Strict file/function/nesting/complexity limits apply.
+
+This bounded prerequisite does not certify full source QueryRow metadata/key
+validation, nil/present-empty partition capture, routing, pipelines, production
+runtime, native Linux or full source-case/profile parity. Synthetic controls gain
+no source-ledger credit. Obtain genuine compiled runtime RED before bodies, then
+native RED/GREEN, complete regression/lint/architecture verification and explicit
+input-preservation audit before the next saved checkpoint.
+
+
+### PUBLIC-CLAIM-BIND1 solo source, architecture and allocation review
+
+Pinned source read directly with `git show` in the preserved Elixir checkout:
+flow_retention_values.ex:458-523 (early exclusions, binding, late validation),
+flow/query/query_row_primitives.ex:34-78 (signed64 integer encoding) and
+flow/query/run_record_fields.ex (attempts builtin). The native Claim/Reclaim
+reducer preserves attempts. No source checkout or reference input was edited.
+
+Selection calls the binding cursor only after physical matching and actual
+state/due eligibility. A skipped FIFO head does not expose a follower. Invalid
+observed authority still refuses the whole call. The source profile is selected
+only for public intent21 in the native executor; private intent20 plans have no
+source ledger and retain their u64 contract. The source cursor's no-payment
+ceiling is the admitted scan budget; only actual paid ownership establishes a
+credit ceiling. Public stage validation requires the private sealed ledger,
+matching batch cardinality, strictly increasing positions and a sufficient real
+owned payment. Empty batches still advance actual attempts. Native witness
+validation rechecks current active IDs through that prospective cursor.
+
+Release publication walks original IDs once per phase and binds only accepted
+positions; its prior contiguous wrapper preserves the private leaf path. The
+unchanged settlement algorithm retains the original complement in original
+order. One bounded fallible Vec spine supports incremental accepted positions;
+converting it to Box would require filling or shrinking and provides no needed
+ownership improvement here. The usize spine is at most8000 logical bytes on the
+required64-bit macOS/Linux targets at limit1000. Its capacity is prospectively
+charged against query decision/work and native staging. Actual observations,
+including skips, retain existing scan/consumed guards. The existing2000-byte
+stack output remains bounded. No payload/ID clones, new dependency or measured
+speedup is claimed; platform/performance acceptance stays open.
+
+Two genuine compiled runtime RED controls are preserved in
+/private/tmp/ferricstore2-claim-bind-red.log: an actual eligible restored record
+was claimed (1 instead of0); with a later valid record both were claimed (2
+instead of1). A first harness attempt created a record after a policy change
+without its generation; that harness failure was corrected before the saved
+behavior RED. The two RED controls then passed after the implementation. Six
+later supplemental controls cover the inclusive source integer boundary,
+private u64 compatibility, exact batch-end emptiness/refund, another eligible
+bind after exhaustion, cross-phase exhaustion after effects and an all-skipped
+phase. They are first-pass supplemental controls, not preimplementation RED.
+The non-prefix case checks original response index1, actual q2 sidecar bound to
+original ID1, no q1 sidecar, actual credit amounts, same-frame replay and reopen.
+These synthetic restored-core controls receive no source-case parity credit.
+
+The focused Claim run passed44 cases before the final all-skipped-phase control
+was added. A complete run including all8 new cases passed1804 Rust tests in120
+groups before final lint-only syntax cleanup. Final strict workspace/all-target
+Clippy passes without suppression. Compiler/private-test-helper and Clippy
+style diagnostics are not counted as runtime RED. A final complete workspace run
+uses the frozen final sources; final results are recorded below when terminal.
+Full QueryRow validation and original partition/routing/projection/blocking/
+pipeline semantics, runtime/service composition, full source profiles, native
+Linux/Elixir and measured-performance gates remain open. Solo review is not
+independent peer review and the full goal remains active.
+
+
+### PUBLIC-CLAIM-BIND1 final verified checkpoint
+
+Final frozen-source workspace run exited0 with1804 Rust tests in120 groups;
+all11 doctests/15 groups and60 architecture tests/5 groups pass, zero failed or
+ignored. Strict workspace/all-target Clippy, warnings-denied docs, Python7,
+reference integrity, progress, fmt and diff pass. Real full parity exits1 with
+complete5858-declaration scenario/profile/setup/fixture/adapter execution gaps.
+The full wrapper's native Elixir/tooling and Linux requirements are not claimed
+passed or probed again. No dependencies changed.
+
+/private/tmp/ferricstore2-claim-bind-{workspace,doctests,clippy,doc,arch,python,
+reference,progress,parity,fmt}.log contain actual terminal results. proof.json
+binds their SHA256 values and results. inputs.json freezes2183 non-Markdown
+inputs/1594 Rust files; all remain exact through final verification. Against
+c2d67b94d83904f6130aaac7895832940b554f99,1289 prior test/bench/reference inputs
+comprise1288 byte-identical and one exact additive public/bindings module
+registration;753 Rust inputs comprise752 whole plus that registration. No
+original assertion/reference/source/runtime ledger is changed or credited.
+The source-audit.json file records the exact comparison.
+
+All jobs are terminal. Review remains solo. The implementation stays isolated;
+only docs-only primary pointers are authorized, with no code adoption/push.
+The full goal remains active with the complete remaining handoff obligations.

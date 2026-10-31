@@ -79,6 +79,7 @@ pub(in crate::transaction) fn run<'s, 'p, 'input>(
             fresh.control().execution_time(),
             phase_limits,
             prior,
+            staged.remaining_bindings()?,
         )?;
         let ClaimDecision::Accepted(plan) = &decision else {
             let ClaimDecision::Rejected(reason) = decision else {

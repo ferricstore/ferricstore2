@@ -144,11 +144,11 @@ pub(in crate::state::redb) fn witness_atomic<'a>(
     paid: wf_ports::log::GovernedClaimPaymentRef<'_>,
     time: TimestampMillis,
     business: Option<&'a wf_domain::workflow::indexed::IndexedBatchPlan<'_>>,
-    start: usize,
+    (start, attempts): (usize, usize),
     credit: CreditLimits,
 ) -> Result<VerifiedGovernedClaimWrites<'a>, E> {
     let count = business.map_or(0, |batch| batch.batch().items().len());
-    if !available_at(tx, prepared.scope(), paid, time, count, start, credit)? {
+    if !available_at(tx, prepared.scope(), paid, time, attempts, start, credit)? {
         return Err(E::KnownAborted);
     }
     records(tx, business, count)
@@ -206,12 +206,27 @@ pub(in crate::state::redb) fn publish_at(
     paid: wf_ports::log::GovernedClaimPaymentRef<'_>,
     start: usize,
 ) -> Result<(), E> {
-    let mut ids = paid.reservation_ids().skip(start);
+    let end = start
+        .checked_add(business.batch().items().len())
+        .ok_or(E::Limit)?;
+    publish_positions(tx, scope, business, paid, start..end)
+}
+
+pub(in crate::state::redb) fn publish_positions(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    business: &wf_domain::workflow::indexed::IndexedBatchPlan<'_>,
+    paid: wf_ports::log::GovernedClaimPaymentRef<'_>,
+    positions: impl IntoIterator<Item = usize>,
+) -> Result<(), E> {
+    let mut positions = positions.into_iter();
+    let mut ids = paid.reservation_ids().enumerate();
     for item in business.batch().items() {
-        let id = ids
-            .next()
-            .ok_or(E::InvalidChanges)?
-            .map_err(read::codec_error)?;
+        let position = positions.next().ok_or(E::InvalidChanges)?;
+        let (_, id) = ids
+            .find(|(ordinal, _)| *ordinal == position)
+            .ok_or(E::InvalidChanges)?;
+        let id = id.map_err(read::codec_error)?;
         let record = &item.plan().write().ok_or(E::InvalidChanges)?.record;
         let intent = ReleaseIntentRef {
             flow_id: record.id().as_bytes(),
@@ -263,6 +278,9 @@ pub(in crate::state::redb) fn publish_at(
             claimed::reservation_key(tx, scope, paid.scope(), paid.shard_id(), paid.epoch(), id)?;
         key[6] = 24;
         publication::put(tx, &key, b"FWGU\0\x01")?;
+    }
+    if positions.next().is_some() {
+        return Err(E::InvalidChanges);
     }
     Ok(())
 }

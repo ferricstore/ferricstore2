@@ -50,8 +50,20 @@ pub(in crate::transaction) fn decide_atomic<'current>(
     now: wf_types::version::TimestampMillis,
     limits: ClaimTransactionLimits,
     prior: u64,
+    maximum_bindings: Option<usize>,
 ) -> Result<wf_domain::claim::apply::ClaimDecision<'current>, ClaimTransactionError> {
     let cap = limits.base.maximum_staging_bytes;
+    if envelope.header.intent.version() == 21 {
+        debit(
+            &mut loaded.staging_used,
+            envelope
+                .query
+                .limit
+                .checked_mul(std::mem::size_of::<usize>())
+                .ok_or(StateTransactionError::Limit)?,
+            cap,
+        )?;
+    }
     debit(
         &mut loaded.staging_used,
         envelope.query.workflow_type.len(),
@@ -64,14 +76,26 @@ pub(in crate::transaction) fn decide_atomic<'current>(
         limits,
         (kind, envelope.query.limit, envelope.scan_budget),
         |window| {
-            wf_domain::claim::apply::decide_observed_claim(
-                window,
-                envelope,
-                now,
-                limits.base.codec.admission(),
-                limits.work,
-                prior,
-            )
+            if envelope.header.intent.version() == 21 {
+                wf_domain::claim::apply::decide_observed_public_claim(
+                    window,
+                    envelope,
+                    now,
+                    limits.base.codec.admission(),
+                    limits.work,
+                    prior,
+                    maximum_bindings,
+                )
+            } else {
+                wf_domain::claim::apply::decide_observed_claim(
+                    window,
+                    envelope,
+                    now,
+                    limits.base.codec.admission(),
+                    limits.work,
+                    prior,
+                )
+            }
             .map_err(wf_ports::log::RecordBatchApplyError::Apply)
         },
     )

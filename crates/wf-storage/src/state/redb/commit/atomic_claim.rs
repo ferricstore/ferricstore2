@@ -26,6 +26,7 @@ use wf_ports::{
     state::{GroupApplyTransaction, StateTransactionError as E},
 };
 use wf_types::version::TimestampMillis;
+mod bindings;
 mod payment;
 
 pub(crate) struct StagedAtomicClaim<'s, 'p, 'input> {
@@ -80,6 +81,17 @@ impl<'s, 'p, 'input> StagedAtomicClaim<'s, 'p, 'input> {
     pub(crate) const fn initial_rejection(&self) -> Option<ClaimRejection> {
         self.initial_rejection
     }
+    pub(crate) fn remaining_bindings(&self) -> Result<Option<usize>, E> {
+        self.reply
+            .payment()
+            .map_err(codec)?
+            .map(|paid| {
+                paid.count()
+                    .checked_sub(self.reservation_cursor)
+                    .ok_or(E::InvalidChanges)
+            })
+            .transpose()
+    }
     pub(crate) fn usage(&self) -> (usize, usize, usize) {
         (
             self.tx.steps.get(),
@@ -109,7 +121,9 @@ impl<'s, 'p, 'input> StagedAtomicClaim<'s, 'p, 'input> {
         };
         let business = plan.batch();
         super::claim::values::validate_phase(&self.tx, self.prepared.digest(), business, values)?;
-        let count = business.map_or(0, |batch| batch.batch().items().len());
+        let mut positions = [0_u16; 1000];
+        let (next_cursor, used_count) = bindings::positions(self, plan, &mut positions)?;
+        let used = positions.get(..used_count).ok_or(E::Limit)?;
         let verified = if let Some(paid) = self.reply.payment().map_err(codec)? {
             Some(super::super::release::claim::witness_atomic(
                 &self.tx,
@@ -117,30 +131,16 @@ impl<'s, 'p, 'input> StagedAtomicClaim<'s, 'p, 'input> {
                 paid,
                 self.control.execution_time(),
                 business,
-                self.reservation_cursor,
+                (
+                    self.reservation_cursor,
+                    next_cursor
+                        .checked_sub(self.reservation_cursor)
+                        .ok_or(E::InvalidChanges)?,
+                ),
                 self.limits.credit,
             )?)
         } else {
             None
-        };
-        let mut positions = [0_u16; 1000];
-        let used = if verified.is_some() {
-            for (offset, position) in positions
-                .get_mut(..count)
-                .ok_or(E::Limit)?
-                .iter_mut()
-                .enumerate()
-            {
-                *position = u16::try_from(
-                    self.reservation_cursor
-                        .checked_add(offset)
-                        .ok_or(E::Limit)?,
-                )
-                .map_err(|_| E::Limit)?;
-            }
-            positions.get(..count).ok_or(E::Limit)?
-        } else {
-            &[]
         };
         self.reply.push(kind, decision, used).map_err(codec)?;
         if let Some(business) = business {
@@ -170,17 +170,16 @@ impl<'s, 'p, 'input> StagedAtomicClaim<'s, 'p, 'input> {
                 .checked_add(business.batch().items().len())
                 .ok_or(E::Limit)?;
             if let Some(paid) = self.reply.payment().map_err(codec)? {
-                super::super::release::claim::publish_at(
+                super::super::release::claim::publish_positions(
                     &self.tx,
                     self.prepared.scope(),
                     business,
                     paid,
-                    self.reservation_cursor,
+                    used.iter().copied().map(usize::from),
                 )?;
-                self.reservation_cursor =
-                    self.reservation_cursor.checked_add(count).ok_or(E::Limit)?;
             }
         }
+        self.reservation_cursor = next_cursor;
         super::claim::values::publish(&self.tx, self.prepared.scope(), values)
     }
     pub(crate) fn abort(self) -> Result<(), E> {

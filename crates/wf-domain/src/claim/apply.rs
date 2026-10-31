@@ -21,7 +21,8 @@ mod result;
 mod token;
 
 pub use observed::{
-    ClaimObservedWindow, ClaimWindowEnd, decide_observed_claim, preflight_observed_claim_query,
+    ClaimObservedWindow, ClaimWindowEnd, decide_observed_claim, decide_observed_public_claim,
+    preflight_observed_claim_query,
 };
 pub use result::{ClaimDecision, ClaimPlan, ClaimRejection, ClaimResume};
 

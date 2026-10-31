@@ -20,6 +20,8 @@ use crate::workflow::batch::ApplyError;
 use crate::workflow::indexed::{IndexedAuthority, TouchedIndexedGroupView};
 use std::collections::{BTreeMap, BTreeSet};
 use wf_types::version::TimestampMillis;
+mod bindings;
+use bindings::ClaimBindingCursor;
 
 /// Observed eligible parallel frontier, independent of operational exhaustion.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -84,7 +86,36 @@ pub fn decide_observed_claim<'current>(
     work: ClaimWorkLimits,
     prior_work: u64,
 ) -> Result<ClaimDecision<'current>, ApplyError> {
-    match attempt(window, envelope, now, admission, work, prior_work) {
+    match attempt(window, envelope, now, admission, work, prior_work, None) {
+        Ok(plan) => Ok(ClaimDecision::Accepted(plan)),
+        Err(ClaimPreflightError::Business(error)) => Ok(ClaimDecision::Rejected(error)),
+        Err(ClaimPreflightError::Apply(error)) => Err(error),
+    }
+}
+
+/// Reduces the public source profile with bind-before-skip accounting.
+/// `maximum_bindings` bounds remaining original IDs; it grants no credit authority.
+/// Only the public source profile applies its query-row integer restriction.
+/// # Errors
+/// Refuses incoherent facts and allocation separately from sealed business refusal.
+pub fn decide_observed_public_claim<'current>(
+    window: ClaimObservedWindow<'_, 'current>,
+    envelope: &ClaimEnvelope<'_>,
+    now: TimestampMillis,
+    admission: AdmissionLimits,
+    work: ClaimWorkLimits,
+    prior_work: u64,
+    maximum_bindings: Option<usize>,
+) -> Result<ClaimDecision<'current>, ApplyError> {
+    match attempt(
+        window,
+        envelope,
+        now,
+        admission,
+        work,
+        prior_work,
+        Some(maximum_bindings.unwrap_or(envelope.scan_budget)),
+    ) {
         Ok(plan) => Ok(ClaimDecision::Accepted(plan)),
         Err(ClaimPreflightError::Business(error)) => Ok(ClaimDecision::Rejected(error)),
         Err(ClaimPreflightError::Apply(error)) => Err(error),
@@ -98,6 +129,7 @@ fn attempt<'current>(
     limits: AdmissionLimits,
     work: ClaimWorkLimits,
     prior_work: u64,
+    source_maximum: Option<usize>,
 ) -> Result<ClaimPlan<'current>, ClaimPreflightError> {
     if window.indexed.group != envelope.header.scope.group()
         || envelope.token_version != 1
@@ -105,11 +137,24 @@ fn attempt<'current>(
     {
         return Err(ClaimPreflightError::Apply(ApplyError::InvalidAuthority));
     }
-    let (q, mut g) = admit_query_with_prior(envelope, now, limits, work, prior_work)?;
+    let (mut q, mut g) = admit_query_with_prior(envelope, now, limits, work, prior_work)?;
     if !window.heads_complete || window.head_lanes.len() > envelope.head_budget {
         return Err(ClaimPreflightError::Business(ClaimRejection::HeadBudget));
     }
-    let selection = select(window, envelope, now, limits, work, &mut g)?;
+    let mut bindings = source_maximum
+        .map(|maximum| {
+            ClaimBindingCursor::new(maximum, envelope.query.limit, &mut q, &mut g, limits, work)
+        })
+        .transpose()?;
+    let selection = select(
+        window,
+        envelope,
+        now,
+        limits,
+        work,
+        &mut g,
+        bindings.as_mut(),
+    )?;
     let authority = (IndexedAuthority::Touched(window.indexed), window.encodings);
     preflight_selected_with(
         authority,
@@ -139,7 +184,8 @@ fn attempt<'current>(
         selection.stop(),
         resume,
         g,
-    ))
+    )
+    .with_source_bindings(bindings.map(ClaimBindingCursor::into_ledger)))
 }
 
 fn select<'query, 'current: 'query>(
@@ -149,6 +195,7 @@ fn select<'query, 'current: 'query>(
     limits: AdmissionLimits,
     work: ClaimWorkLimits,
     g: &mut u64,
+    mut bindings: Option<&mut ClaimBindingCursor>,
 ) -> Result<ClaimSelection<'current>, ClaimPreflightError> {
     let invalid = ClaimPreflightError::Apply(ApplyError::InvalidAuthority);
     if window.parallel.len() > envelope.scan_budget + 1
@@ -208,6 +255,11 @@ fn select<'query, 'current: 'query>(
                 return Err(SelectionError::InvalidIndex);
             }
             Ok(())
+        },
+        |entry| {
+            bindings
+                .as_mut()
+                .map_or(Ok(true), |cursor| cursor.bind(entry.record))
         },
     )
     .map_err(|error| failure(&error))?;

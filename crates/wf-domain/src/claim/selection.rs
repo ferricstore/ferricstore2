@@ -80,6 +80,7 @@ pub(super) fn select_checked<'a, E>(
         &mut guard,
         physical,
         |order, entry| validate_parallel(view, order, entry),
+        |_| Ok(true),
     )?;
     Ok(ClaimSelection {
         records,
@@ -101,6 +102,7 @@ pub(super) fn merge<'query, 'current: 'query, E>(
     ) -> Result<(), E>,
     physical: impl Fn(ClaimRecord<'current>) -> bool,
     mut validate: impl FnMut(DueOrder<'current>, ClaimRecord<'current>) -> Result<(), SelectionError>,
+    mut bind: impl FnMut(ClaimRecord<'current>) -> Result<bool, E>,
 ) -> Result<(Vec<SelectedClaim<'current>>, usize, SelectionStop), SelectionFailure<E>> {
     let mut parallel = parallel.peekable();
     let mut fifo = fifo.peekable();
@@ -145,6 +147,7 @@ pub(super) fn merge<'query, 'current: 'query, E>(
         }
         if physical(entry)
             && let Some(action) = action_for(cursor.request, entry)
+            && bind(entry).map_err(SelectionFailure::Guard)?
         {
             records.push(SelectedClaim {
                 record: entry.record,

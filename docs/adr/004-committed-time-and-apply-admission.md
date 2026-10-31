@@ -388,6 +388,36 @@ controls remain distinct. Execute the required counterparts and profiles on
 BOTH Linux AND macOS; documented requirements and planner GREEN confer no
 5858-case coverage or service acceptance.
 
+### Public bind-before-skip integration checkpoint
+
+PUBLIC-CLAIM-BIND1 implements a bounded sealed attempt ledger in the existing
+public intent21 reducer. Actual physically matching, state/due-eligible
+candidates consume positions before the source-proven `attempts > i64::MAX`
+query-row failure skips the postimage. Pinned QueryRowPrimitives.encode/3 accepts
+only signed64 integers; RunRecordFields includes attempts, and
+flow_retention_values.ex:458-523 binds before its next-record validation. Both
+Claim and Reclaim preserve this field. The general private canonical u64 format,
+private intent20 and op18 remain unchanged. This pre-service checkpoint adds no
+wire version or claim of deployed profile compatibility.
+
+The actual native owned payment determines remaining positions across phases.
+Exhausting the batch and reaching another eligible bind rejects the entire
+parent under A-CM1, aborts staged workflow effects and refunds all original IDs.
+A phase with only skipped candidates still advances; actual empty streams need
+no ID. Accepted gaps drive the exact native sidecar/consumed marker and response;
+settlement refunds the original complement. No new spend authority is inferred
+from the mathematical ledger. Without payment, the admitted scan budget is the
+finite attempt ceiling and provides no governance authority.
+
+One fallibly reserved position spine is bounded by the phase limit and charged
+before allocation against decision/work and native staging budgets. Existing
+consumed-fact/scan guards charge skipped observations. Publication walks original
+IDs monotonically without copying ID or postimage bytes. No measured performance
+gain is claimed. Full QueryRow metadata/key validation, original optional
+partitions, Auto/Global routing, projections, blocking/pipeline identities and
+all source/profile/platform and production-runtime gates remain incomplete.
+Supplemental restored-record controls gain no source-case parity credit.
+
 ### Pure governing-credit predecessor
 
 M1-CREDIT-OWNER1 adds a functional `governance::credit` boundary to wf-domain,
