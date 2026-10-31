@@ -232,6 +232,24 @@ fn validate_response_profile(
     response_version: u16,
     status: RetainedStatus,
 ) -> Result<(), RequestValueError> {
+    if intent.version() == 19 {
+        return if response_version == 16
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::ClaimRejected(_)
+            ) {
+            Ok(())
+        } else {
+            Err(RequestValueError::UnsupportedVersion)
+        };
+    }
+    if status
+        == RetainedStatus::ClaimRejected(
+            crate::claim::apply::ClaimRejection::GoverningReservationUnavailable,
+        )
+    {
+        return Err(RequestValueError::UnsupportedVersion);
+    }
     if matches!(
         status,
         RetainedStatus::IndexedRejected(IndexRejection::ReleaseBacklogFull)

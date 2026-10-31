@@ -10,7 +10,7 @@ use wf_types::version::TimestampMillis;
 
 use crate::log::{CodecError, reader::Reader, writer::Writer};
 
-mod scan;
+pub(in crate::log) mod scan;
 
 /// Fully validates a Claim receipt against its original stored metadata/profile.
 /// A narrower-profile refusal establishes no health proof for unread content.
@@ -52,7 +52,7 @@ pub fn claim_response_matches(
     }
 }
 
-pub(super) fn measure(
+pub(in crate::log) fn measure(
     decision: &ClaimDecision<'_>,
     admission: AdmissionLimits,
 ) -> Result<usize, CodecError> {
@@ -77,7 +77,7 @@ pub(super) fn encode(
     Ok((writer.finish()?, status))
 }
 
-fn write(
+pub(in crate::log) fn write(
     decision: &ClaimDecision<'_>,
     writer: &mut Writer<'_>,
     admission: AdmissionLimits,
@@ -188,6 +188,9 @@ fn write_record(
 
 fn write_rejection(reason: ClaimRejection, writer: &mut Writer<'_>) -> Result<(), CodecError> {
     let tag = match reason {
+        ClaimRejection::GoverningReservationUnavailable => {
+            return Err(CodecError::UnsupportedVersion);
+        }
         ClaimRejection::InvalidScope => 0,
         ClaimRejection::InvalidPriority => 1,
         ClaimRejection::InvalidBudget => 2,

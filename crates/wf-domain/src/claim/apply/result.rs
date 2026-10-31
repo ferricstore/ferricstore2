@@ -140,6 +140,8 @@ impl<'a> ClaimResume<'a> {
 /// Business-only retained claim status; index/canonical/host failures are excluded.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ClaimRejection {
+    /// Original paid IDs are absent, expired, already consumed or insufficient.
+    GoverningReservationUnavailable,
     /// Invalid or duplicated query scope/filter.
     InvalidScope,
     /// Caller priority is outside zero through two.
@@ -195,6 +197,7 @@ impl fmt::Display for ClaimRejection {
                 "claim represented work exceeds immutable budget ({bytes} bytes, max {maximum} bytes)"
             ),
             _ => formatter.write_str(match self {
+                Self::GoverningReservationUnavailable => "governing reservation unavailable",
                 Self::InvalidScope => "invalid claim selection scope",
                 Self::InvalidPriority => "claim priority must be between 0 and 2",
                 Self::InvalidBudget => "claim selection budget exceeds supported bounds",

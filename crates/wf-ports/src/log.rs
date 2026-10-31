@@ -29,6 +29,7 @@ pub use catalog_prune::{
     prepare_catalog_prune_request,
 };
 mod claim;
+mod governed_claim;
 pub use catalog_ack::{
     PreparedCatalogAckRequest, catalog_ack_recovery_header, catalog_ack_request_intent,
     catalog_ack_retained_summary, decode_catalog_ack_reply, encode_catalog_ack_reply,
@@ -38,6 +39,13 @@ pub use claim::{
     ClaimApplyDecision, ClaimApplyPlan, ClaimPhaseInspection, FreshClaimPhase,
     claim_response_matches, claim_retained_summary, decide_fresh_claim_phase_observed,
     inspect_claim_phase_point, prepare_claim_phase,
+};
+pub use governed_claim::{
+    CapturedGovernedClaimPayment, GovernedClaimPayment, GovernedClaimPaymentRef,
+    GovernedClaimReplyRef, PreparedGovernedClaim, encode_governed_claim_request,
+    governed_claim_response_matches, governed_claim_retained_summary, inspect_governed_claim_point,
+    inspect_governed_claim_reply, prepare_governed_claim_request,
+    reject_unavailable_governed_claim,
 };
 mod common;
 mod release;

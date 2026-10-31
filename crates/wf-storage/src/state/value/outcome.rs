@@ -19,6 +19,7 @@ use super::{
 
 mod atomic_start;
 mod credit;
+mod governed_claim;
 mod policy;
 mod step_continue;
 pub(crate) use policy::outcome_policy_validation_bytes_in_layout;
@@ -48,6 +49,9 @@ pub struct ScannedRetainedOutcome<'input> {
 }
 
 impl ScannedRetainedOutcome<'_> {
+    pub(crate) const fn governed_claim_required(&self) -> bool {
+        self.intent.version() == 19
+    }
     pub(crate) const fn workflow_release_required(&self) -> bool {
         matches!(
             self.status,

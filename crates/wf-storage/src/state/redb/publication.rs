@@ -125,6 +125,20 @@ pub(super) fn write_record_with_release(
     write_record_inner(tx, scope, partition, record, ordering)
 }
 
+pub(super) fn write_governed_claim_record(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    partition: &PartitionId,
+    record: &WorkflowRecord,
+    ordering: OrderingMetadata,
+    verified: &super::release::claim::VerifiedGovernedClaimWrites<'_>,
+) -> Result<(), StateTransactionError> {
+    if !verified.permits(partition, record) {
+        return Err(StateTransactionError::InvalidChanges);
+    }
+    write_record_inner(tx, scope, partition, record, ordering)
+}
+
 fn write_record_inner(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,

@@ -74,6 +74,16 @@ pub(super) fn commit(
     Ok(tx.commit_claim_values(changes, &mut publication)?)
 }
 
+pub(super) fn commit_governed(
+    tx: RedbStateTransaction<'_>,
+    changes: &GroupClaimChanges<'_, '_>,
+    resources: ClaimValueResources,
+    capture: wf_ports::log::CapturedGovernedClaimPayment<'_>,
+) -> Result<(), ClaimTransactionError> {
+    let mut publication = build(&tx, changes, resources)?;
+    Ok(tx.commit_governed_claim_values(changes, &mut publication, capture)?)
+}
+
 fn build<'plan>(
     tx: &RedbStateTransaction<'_>,
     changes: &'plan GroupClaimChanges<'_, '_>,

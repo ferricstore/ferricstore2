@@ -122,6 +122,9 @@ impl RedbStateTransaction<'_> {
             self.layout,
         )
         .map_err(value_error)?;
+        if scanned.governed_claim_required() && self.governance_catalog_profile()? != 5 {
+            return Err(StateTransactionError::Corrupt);
+        }
         if scanned.workflow_release_required()
             && !self.value_manifest()?.governance_catalog.workflow_release()
         {

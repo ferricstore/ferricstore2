@@ -11,6 +11,7 @@ use wf_ports::log::{
 };
 use wf_ports::state::{GroupApplyTransaction, GroupClaimChanges, StateTransactionError};
 
+mod governed;
 mod values;
 
 pub(in super::super) fn apply(
@@ -18,7 +19,7 @@ pub(in super::super) fn apply(
     changes: &GroupClaimChanges<'_, '_>,
 ) -> Result<(), StateTransactionError> {
     let fenced = tx.fenced;
-    publish(tx, changes, None).inspect_err(|error| fence(fenced, *error))
+    publish(tx, changes, None, None).inspect_err(|error| fence(fenced, *error))
 }
 
 pub(in super::super) fn apply_values(
@@ -27,13 +28,25 @@ pub(in super::super) fn apply_values(
     publication: &mut ClaimValuePublicationPlan<'_>,
 ) -> Result<(), StateTransactionError> {
     let fenced = tx.fenced;
-    publish(tx, changes, Some(publication)).inspect_err(|error| fence(fenced, *error))
+    publish(tx, changes, Some(publication), None).inspect_err(|error| fence(fenced, *error))
+}
+
+pub(in super::super) fn apply_governed(
+    tx: RedbStateTransaction<'_>,
+    changes: &GroupClaimChanges<'_, '_>,
+    publication: &mut ClaimValuePublicationPlan<'_>,
+    capture: wf_ports::log::CapturedGovernedClaimPayment<'_>,
+) -> Result<(), StateTransactionError> {
+    let fenced = tx.fenced;
+    publish(tx, changes, Some(publication), Some(capture))
+        .inspect_err(|error| fence(fenced, *error))
 }
 
 fn publish(
     mut tx: RedbStateTransaction<'_>,
     changes: &GroupClaimChanges<'_, '_>,
     mut publication: Option<&mut ClaimValuePublicationPlan<'_>>,
+    capture: Option<wf_ports::log::CapturedGovernedClaimPayment<'_>>,
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
     match publication.as_deref_mut() {
@@ -49,6 +62,7 @@ fn publish(
         return Err(StateTransactionError::KnownAborted);
     }
     validate(&tx, changes)?;
+    let verified = governed::validate(&tx, changes, capture)?;
     let Some(control) = changes.control() else {
         return tx
             .write
@@ -65,13 +79,19 @@ fn publish(
         for delta in business.deltas() {
             publication::index_delta(&tx, scope, &delta)?;
         }
-        write_records(&tx, scope, business, None)?;
+        match verified.as_ref() {
+            Some(verified) => governed::write_records(&tx, changes, verified)?,
+            None => write_records(&tx, scope, business, None)?,
+        }
         for lane in lanes {
             publication::head_due(&tx, scope, lane, true)?;
         }
     }
     if let Some(values) = publication {
         values::publish(&tx, scope, values)?;
+    }
+    if let Some(capture) = capture {
+        super::super::release::claim::publish(&tx, changes, capture)?;
     }
     if let Some(outcome) = changes.outcome() {
         write_outcome(&tx, scope, outcome)?;
@@ -110,7 +130,11 @@ fn validate(
             validate_outcome(tx, changes.scope(), outcome)?;
             if outcome.original_position() != identity.log()
                 || outcome.original_time() != control.execution_time()
-                || !claim_response_matches(
+                || !if outcome.intent().version() == 19 {
+                    wf_ports::log::governed_claim_response_matches
+                } else {
+                    claim_response_matches
+                }(
                     operation,
                     outcome.response(),
                     outcome.original_time(),
@@ -135,7 +159,11 @@ fn validate_outcome(
     if outcome.scope() != scope {
         return Err(StateTransactionError::InvalidChanges);
     }
-    let (status, _) = claim_retained_summary(
+    let (status, _) = if outcome.intent().version() == 19 {
+        wf_ports::log::governed_claim_retained_summary
+    } else {
+        claim_retained_summary
+    }(
         outcome.intent(),
         outcome.response_version(),
         outcome.response(),

@@ -6,8 +6,9 @@ use super::{CodecError, CodecLimits, reader::Reader, writer::Writer};
 
 const MAX_FILTER_ITEMS: usize = 100_000;
 
-mod apply;
-mod response;
+pub(in crate::log) mod apply;
+pub(in crate::log) mod response;
+mod retention;
 
 pub use apply::{
     ClaimApplyDecision, ClaimApplyPlan, ClaimPhaseInspection, FreshClaimPhase,

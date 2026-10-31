@@ -70,7 +70,13 @@ impl LoadedClaim {
             staging_used: 0,
         };
         debit(&mut loaded.staging_used, 1024, cap)?;
-        loaded.load_policy(tx, scope, envelope.query.workflow_type, limits)?;
+        loaded.load_policy(
+            tx,
+            scope,
+            envelope.query.workflow_type,
+            limits,
+            fresh.governed_payment(),
+        )?;
         loaded.load_lanes(tx, scope, envelope.query, envelope.head_budget, cap)?;
         if loaded.heads_complete {
             loaded.load_due(
@@ -92,6 +98,7 @@ impl LoadedClaim {
         scope: &RequestScope,
         kind: &[u8],
         limits: ClaimTransactionLimits,
+        capture: Option<wf_ports::log::CapturedGovernedClaimPayment<'_>>,
     ) -> Result<(), ClaimTransactionError> {
         let mut charge = PolicySchemaCharge::new(limits.base.schema);
         self.policy =
@@ -105,6 +112,7 @@ impl LoadedClaim {
                 &mut charge,
                 &mut self.staging_used,
                 cap,
+                capture,
             )?);
         }
         Ok(())
@@ -304,18 +312,20 @@ fn policy_projection(
     charge: &mut PolicySchemaCharge,
     staging_used: &mut usize,
     cap: usize,
+    capture: Option<wf_ports::log::CapturedGovernedClaimPayment<'_>>,
 ) -> Result<(PolicySnapshot, InstalledRetryPolicy), ClaimTransactionError> {
     Ok(match policy {
         StoredPolicyValue::Complete(policy) => {
             if policy.data().workflow_type != kind {
                 return Err(StateTransactionError::Corrupt.into());
             }
-            if policy.data().governance.is_some()
-                || policy
-                    .data()
-                    .states
-                    .values()
-                    .any(|s| s.governance.is_some())
+            if capture.is_none()
+                && (policy.data().governance.is_some()
+                    || policy
+                        .data()
+                        .states
+                        .values()
+                        .any(|s| s.governance.is_some()))
             {
                 return Err(ClaimTransactionError::UnsupportedGovernance);
             }
@@ -332,7 +342,14 @@ fn policy_projection(
                 .and_then(|n| n.checked_add(65_536))
                 .ok_or(StateTransactionError::Limit)?;
             debit(staging_used, owner, cap)?;
-            if original_record_batch_policy_has_governance(raw, kind, limits.base.schema, charge)? {
+            if capture.is_none()
+                && original_record_batch_policy_has_governance(
+                    raw,
+                    kind,
+                    limits.base.schema,
+                    charge,
+                )?
+            {
                 return Err(ClaimTransactionError::UnsupportedGovernance);
             }
             debit(staging_used, owner, cap)?;

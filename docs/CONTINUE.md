@@ -2,14 +2,53 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Latest solo addition after d1434d2: GC5 consumed-reservation custody. Family24
+Latest native paid-Claim increment after1af0a64: op17/intent19/response16 now
+executes on actual GC5. It validates the live paid generation and every original
+ID under the same writer, binds only the used prefix to actual accepted records,
+and atomically publishes consumed markers, records/indexes/history/value
+companions/original response/control. Retained replay precedes current payment,
+policy and record reads. Complete original paid IDs survive the reply and retry.
+The unpaid leaf still refuses installed governance; the paid leaf uses the
+existing Claim query, reducer, policy projection and value/history machinery.
+Scalar/old Claim codecs stay closed. Receipt-only custody also requires GC5.
+
+Eight new storage cases pass: real Lease/Spend -> Claim -> terminal pending
+release, original replay with different prepared IDs, used-ID refusal and unused
+sibling acquisition, expired/missing/wrong-epoch/insufficient payment, query-first
+rejection, installed running governance, actual sync uncertainty, operational
+rollback, received snapshot and receipt-only downgrade. Three new codec cases
+pass; all43 credit codec cases pass. Broader domain/ports/storage regression
+passed1288 tests/doctests, including322 storage cases; final constructor
+hardening and the additional installed-policy case pass the focused8-case run.
+Strict workspace/all-target Clippy, all60 architecture cases, progress, fmt and
+diff pass. Source audit preserves693 selected old test/bench inputs:691 whole
+and two exact additive registrations. Scalar serialization and legacy response
+dispatch remain verbatim; frozen mapping/progress ledgers are byte-identical.
+
+Evidence: /private/tmp/ferricstore2-governed-claim-{r0,body-r0,scalar-r0,
+core-regression,codec-final,final-writer,complete-clippy,complete-arch,progress}.log,
+source-audit.json and final-inputs.json. The real REDs and supplemental cases are
+distinguished in the coordination review. No full all12 rerun, source-case credit,
+independent review, native Linux/Elixir, service or measured-speedup claim.
+
+NEXT finish the public Claim policy/NoDemand/refund/unused/Unknown composition,
+including original optional partition identity. Finish release ACK/sparse
+completion/drain, explicit GC5 Node historical/received/purged execution, and
+the complete restart/snapshot -> reconciliation -> exact credit release loop
+with siblings preserved. Audit raw public batch/write boundaries and original
+ID recipes before assigning native behavior full source parity. Consensus/read
+barriers, application/transports, remaining scenarios/profiles, Linux/macOS and
+performance acceptance remain unfinished. Keep the full goal active and solo.
+
+Prior solo addition after d1434d2: GC5 consumed-reservation custody. Family24
 joins an exact Active identified-credit reservation. Active GC5 record bindings
 require its consumed marker; that evidence persists across record replacement
-and deletion for the future Claim reuse check. Actual Release/Cleanup retires the matching marker in the existing
+and deletion for the Claim reuse check. Actual Release/Cleanup retires the
+matching marker in the existing
 consumed credit writer, preserving siblings. Expiry alone keeps it until actual
 page cleanup. Canonical reopen and received snapshots share these checks; GC4
-refuses marker rows. This adds no paid Claim execution or source-case credit:
-only a future actual Claim transaction may create markers in production.
+refuses marker rows. That predecessor added no paid Claim execution or source
+credit; the actual paid Claim transaction above now creates production markers.
 
 Six new storage cases pass, including exact release/sibling preservation, expiry
 cleanup, snapshot receive, active binding joins, malformed/orphan markers and
@@ -30,8 +69,8 @@ Immediate writer. Actual same-guard binding/queue/postimage/order revalidation
 precedes publication. Kind8/code0 is retained backlog only for intent9 response5,
 6,8; older receipt-only custody refuses it. Legacy paths retain their fence.
 The release-aware mutation entrypoint refuses profile7; unchanged non-governed
-Start remains available in its original entrypoint. Actual paid Claim remains
-unimplemented and cannot be inferred from a binding or a trusted legacy leaf.
+Start remains available in its original entrypoint. That checkpoint did not
+implement paid Claim; the later selected native increment above adds its leaf.
 
 All309 storage+40 codec cases pass, including the12 new storage cases and one
 new codec case. All60 architecture cases, strict workspace/all-target Clippy,

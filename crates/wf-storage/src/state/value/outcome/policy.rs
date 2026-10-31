@@ -110,6 +110,13 @@ fn validation_bytes(
         maximum_wire_bytes,
         |fields, intent, _, _, _, _, response_version| {
             let response = fields[4];
+            if intent == 19 && layout == Some(8) {
+                return (response.len() / 5)
+                    .min(1000)
+                    .checked_mul(std::mem::size_of::<&[u8]>())
+                    .and_then(|n| n.checked_add(256))
+                    .ok_or(StateValueError::LengthOverflow);
+            }
             if matches!(intent, 13 | 14) && layout == Some(8) {
                 return Ok(1024);
             }

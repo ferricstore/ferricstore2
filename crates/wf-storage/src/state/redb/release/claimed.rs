@@ -17,7 +17,7 @@ use wf_domain::{
 };
 use wf_ports::{log::ReleaseBindingRef, state::StateTransactionError as E};
 
-fn reservation_key(
+pub(super) fn reservation_key(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
     credit_scope: &[u8],
@@ -40,7 +40,7 @@ fn reservation_key(
     )
 }
 
-fn active(
+pub(super) fn active(
     tx: &RedbStateTransaction<'_>,
     table: &impl ReadableTable<&'static [u8], &'static [u8]>,
     key: &[u8],
@@ -95,7 +95,7 @@ pub(super) fn check_binding(
     Ok(())
 }
 
-fn marker(bytes: &[u8]) -> Result<(), E> {
+pub(super) fn marker(bytes: &[u8]) -> Result<(), E> {
     if bytes != b"FWGU\0\x01" {
         return Err(E::Corrupt);
     }

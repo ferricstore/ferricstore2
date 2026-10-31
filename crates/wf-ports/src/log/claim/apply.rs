@@ -8,8 +8,8 @@ use wf_domain::claim::apply::{
 };
 use wf_domain::workflow::batch::ApplyError;
 use wf_domain::workflow::control::ControlPlan;
+use wf_domain::workflow::request::RetainedOutcome;
 use wf_domain::workflow::request::gate::{GateDecision, PointGateView, inspect_point_request};
-use wf_domain::workflow::request::{RequestValueError, RetainedMetadata, RetainedOutcome};
 use wf_types::version::LogIdentity;
 
 use crate::consensus::PreparedOperation;
@@ -17,7 +17,8 @@ use crate::log::record_batch::{admit, sum};
 use crate::log::{CodecError, CodecLimits, DecodedRequest, RecordBatchApplyError};
 
 use super::super::{common, decode, keys, reader::Reader};
-use super::response;
+use super::retention::retain;
+use crate::log::governed_claim::{CapturedGovernedClaimPayment, PreparedGovernedClaim};
 
 /// An existing retained classification or the same decoded owner after its gate.
 pub enum ClaimPhaseInspection<'input, 'retained> {
@@ -35,9 +36,15 @@ pub struct FreshClaimPhase<'input> {
     workspace_limit: usize,
     work: ClaimWorkLimits,
     preflight: Result<(usize, u64), ClaimRejection>,
+    capture: Option<CapturedGovernedClaimPayment<'input>>,
 }
 
 impl<'input> FreshClaimPhase<'input> {
+    /// Actual complete paid frame capture, without fresh eligibility authority.
+    #[must_use]
+    pub const fn governed_payment(&self) -> Option<CapturedGovernedClaimPayment<'input>> {
+        self.capture
+    }
     /// Borrows the exact actual query and namespace for current authority reads.
     #[must_use]
     pub fn decoded(&self) -> &DecodedRequest<'input> {
@@ -59,8 +66,8 @@ impl<'input> FreshClaimPhase<'input> {
 /// Mathematical control and Claim changes; no durable publication is implied.
 #[derive(Debug)]
 pub struct ClaimApplyPlan<'current> {
-    control: ControlPlan,
-    decision: ClaimApplyDecision<'current>,
+    pub(super) control: ControlPlan,
+    pub(super) decision: ClaimApplyDecision<'current>,
 }
 
 impl<'current> ClaimApplyPlan<'current> {
@@ -131,7 +138,7 @@ pub fn prepare_claim_phase(
         workspace_limit,
     )?;
     let decoded = decode::read(encoded, limits)?;
-    check_decoded(&decoded, limits, workspace_limit)?;
+    check_decoded(&decoded, limits, workspace_limit, 1)?;
     Ok(decoded)
 }
 
@@ -147,7 +154,50 @@ pub fn inspect_claim_phase_point<'input, 'retained>(
     workspace_limit: usize,
     work: ClaimWorkLimits,
 ) -> Result<ClaimPhaseInspection<'input, 'retained>, RecordBatchApplyError> {
-    check_decoded(&decoded, limits, workspace_limit)?;
+    inspect(decoded, None, log, view, limits, workspace_limit, work)
+}
+
+/// Uses the original paid header and the same single retained gate.
+/// # Errors
+/// Refuses inconsistent capture, complete input, authority or prospective limits.
+pub fn inspect_governed_claim_point<'input, 'retained>(
+    prepared: PreparedGovernedClaim<'input>,
+    log: LogIdentity,
+    view: PointGateView<'_, 'retained>,
+    limits: CodecLimits,
+    workspace_limit: usize,
+    work: ClaimWorkLimits,
+) -> Result<ClaimPhaseInspection<'input, 'retained>, RecordBatchApplyError> {
+    let (decoded, capture) = prepared.into_parts();
+    if capture.prepared() != decoded.digest {
+        return Err(ApplyError::InvalidAuthority.into());
+    }
+    inspect(
+        decoded,
+        Some(capture),
+        log,
+        view,
+        limits,
+        workspace_limit,
+        work,
+    )
+}
+
+fn inspect<'input, 'retained>(
+    decoded: DecodedRequest<'input>,
+    capture: Option<CapturedGovernedClaimPayment<'input>>,
+    log: LogIdentity,
+    view: PointGateView<'_, 'retained>,
+    limits: CodecLimits,
+    workspace_limit: usize,
+    work: ClaimWorkLimits,
+) -> Result<ClaimPhaseInspection<'input, 'retained>, RecordBatchApplyError> {
+    check_decoded(
+        &decoded,
+        limits,
+        workspace_limit,
+        if capture.is_some() { 19 } else { 1 },
+    )?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission())?;
     let control = gate.control();
     let decision = match gate.decision() {
@@ -168,6 +218,7 @@ pub fn inspect_claim_phase_point<'input, 'retained>(
                 workspace_limit,
                 work,
                 preflight,
+                capture,
             }));
         }
         GateDecision::Replay(original) => ClaimApplyDecision::Replay(original),
@@ -200,10 +251,16 @@ pub fn decide_fresh_claim_phase_observed<'current>(
         workspace_limit,
         work,
         preflight,
+        capture,
     } = fresh;
     let decoded = *decoded;
     let base = sum(&[
-        check_decoded(&decoded, decoded.limits, workspace_limit)?,
+        check_decoded(
+            &decoded,
+            decoded.limits,
+            workspace_limit,
+            if capture.is_some() { 19 } else { 1 },
+        )?,
         additional_live_bytes,
     ])?;
     admit(base, workspace_limit)?;
@@ -238,7 +295,7 @@ pub fn decide_fresh_claim_phase_observed<'current>(
         _ => return Err(ApplyError::InvalidAuthority.into()),
     };
     retain(
-        decoded,
+        (decoded, capture),
         log,
         control,
         operation,
@@ -248,85 +305,16 @@ pub fn decide_fresh_claim_phase_observed<'current>(
     )
 }
 
-fn retain<'current>(
-    decoded: DecodedRequest<'_>,
-    log: LogIdentity,
-    control: ControlPlan,
-    operation: ClaimDecision<'current>,
-    additional_live_bytes: usize,
-    workspace_limit: usize,
-    outcome_ttl_ms: u64,
-) -> Result<ClaimApplyPlan<'current>, RecordBatchApplyError> {
-    let encoded_len = decoded.encoded.len();
-    let DecodedRequest {
-        request,
-        isolation,
-        state_keys,
-        claim_filters,
-        value_metadata,
-        limits,
-        ..
-    } = decoded;
-    drop(request.operation);
-    drop(isolation);
-    drop(state_keys);
-    drop(claim_filters);
-    drop(value_metadata);
-    let header_bytes = sum(&[
-        request.scope.tenant().as_bytes().len(),
-        request.scope.group().as_bytes().len(),
-        request.scope.recovery().as_bytes().len(),
-        request.request.as_bytes().len(),
-    ])?;
-    let output_len = response::measure(&operation, limits.admission())?;
-    admit(
-        sum(&[
-            encoded_len,
-            limits.admission().decision_bytes(),
-            output_len,
-            header_bytes,
-            1_024,
-            additional_live_bytes,
-        ])?,
-        workspace_limit,
-    )?;
-    let (response, status) = response::encode(&operation, limits.admission(), output_len)?;
-    let expires_at = control
-        .execution_time()
-        .checked_add(outcome_ttl_ms)
-        .ok_or(RequestValueError::InvalidExpiry)?;
-    let outcome = RetainedOutcome::new(
-        RetainedMetadata {
-            scope: request.scope,
-            request: request.request,
-            intent: request.intent,
-            original_position: log,
-            original_time: control.execution_time(),
-            expires_at,
-            status,
-        },
-        3,
-        response,
-        limits.admission(),
-    )?;
-    Ok(ClaimApplyPlan {
-        control,
-        decision: ClaimApplyDecision::Fresh {
-            operation,
-            outcome: Box::new(outcome),
-        },
-    })
-}
-
 fn check_decoded(
     decoded: &DecodedRequest<'_>,
     limits: CodecLimits,
     workspace: usize,
+    version: u16,
 ) -> Result<usize, RecordBatchApplyError> {
     if !matches!(decoded.request.operation, PreparedOperation::ClaimPhase(_)) {
         return Err(CodecError::UnsupportedTag.into());
     }
-    if decoded.request.intent.version() != 1 {
+    if decoded.request.intent.version() != version {
         return Err(CodecError::UnsupportedVersion.into());
     }
     if decoded.limits != limits {
@@ -346,10 +334,41 @@ fn check_decoded(
     Ok(bound)
 }
 
-fn decoder_bound(encoded: usize, count: usize) -> Result<usize, CodecError> {
+pub(in crate::log) fn decoder_bound(encoded: usize, count: usize) -> Result<usize, CodecError> {
     sum(&[
         encoded.checked_mul(4).ok_or(CodecError::LengthOverflow)?,
         2_048,
         count.checked_mul(576).ok_or(CodecError::LengthOverflow)?,
     ])
+}
+
+/// Retains a fresh deterministic paid-ID refusal, preserving the original spend.
+/// # Errors
+/// Refuses an unpaid/invalid-query phase or prospective retained ownership.
+pub fn reject_unavailable_governed_claim<'current>(
+    fresh: FreshClaimPhase<'_>,
+    additional_live_bytes: usize,
+    outcome_ttl_ms: u64,
+) -> Result<ClaimApplyPlan<'current>, RecordBatchApplyError> {
+    let FreshClaimPhase {
+        decoded,
+        capture,
+        log,
+        control,
+        workspace_limit,
+        preflight,
+        ..
+    } = fresh;
+    if capture.is_none() || preflight.is_err() {
+        return Err(ApplyError::InvalidAuthority.into());
+    }
+    retain(
+        (*decoded, capture),
+        log,
+        control,
+        ClaimDecision::Rejected(ClaimRejection::GoverningReservationUnavailable),
+        additional_live_bytes,
+        workspace_limit,
+        outcome_ttl_ms,
+    )
 }

@@ -2,6 +2,7 @@
 use super::{RedbStateStore, RedbStateTransaction, StateStoreGenesis, StateStoreLimits};
 use wf_ports::{consensus::WorkflowValueDefaults, state::StateTransactionError as E};
 use wf_types::identity::{GroupId, RecoveryId};
+pub(crate) mod claim;
 pub(super) mod claimed;
 mod plan;
 mod read;

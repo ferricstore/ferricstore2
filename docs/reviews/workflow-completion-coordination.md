@@ -61464,3 +61464,121 @@ Claim frame/retention/public-parent/policy/refund/Unknown and release draining
 remain inside the same unfinished coupled batch. Do not run another full all12
 checkpoint merely for this predecessor, adopt primary code, award source credit
 or mark the full goal complete. Continue solo with actual paid Claim publication.
+
+2026-10-31 solo paid-Claim execution review: approve log/governed_claim.rs and
+its payment.rs, request.rs, response.rs children. GovernedClaimPayment borrows
+the original spent ID owners; GovernedClaimPaymentRef borrows complete inspected
+wire fields, including original order and paid epoch. PreparedGovernedClaim owns
+the existing DecodedRequest plus that capture, never a second query/model. Use
+op17/intent19/response16; leave op16/intent18/response15 free for release ACK.
+The request intent covers the query plus scope/shard/enforcement, excluding
+generated IDs/epoch/stamp; the complete prepared digest binds every actual byte.
+Scan complete input and admit borrowed uniqueness descriptors before allocation.
+Retain the complete original paid IDs plus streamed FWCR1 response in FWGC1;
+old decoders remain closed. A private FreshClaimPhase capture selects the paid
+retainer while preserving the original request header and gate. Approve only
+ClaimRejection::GoverningReservationUnavailable as the additional business result;
+operational/corruption/resource errors never become that result.
+
+Approve transaction/claim/governed.rs for actual GC5 orchestration and
+state/redb/release/claim.rs for same-guard paid validation, used-ID binding and
+markers. Approve private VerifiedGovernedClaimWrites as an exact accepted-record
+borrow witness, used by publication::write_governed_claim_record; no caller
+boolean grants authority. Approve state/redb/commit/claim/governed.rs to validate
+the original captured response against current input and repeat fresh payment
+eligibility before consumed publication. Current owner must have the live exact
+shard/epoch; all IDs must be Active and unconsumed, with count >= valid limit.
+Invalid query rejection precedes payment reads. Replay precedes policies, credit
+or record reads and returns the original retained IDs without binding again.
+Used prefix IDs correspond to actual accepted postimages in order; no cloned
+ID/payload ownership or whole-binding scan. Unused IDs remain in the response
+for the later parent to settle. Reclaimed records retain old consumed tombstones
+until actual credit cleanup. Existing value/history publication remains shared.
+Approve workflow_values/claim/governed.rs for real Lease/Spend -> paid Claim ->
+terminal pending release, reuse/replay/refusal and snapshot cases, and
+credit_codec/governed_claim.rs for malformed/full-EOF/original-ID contract cases.
+This is solo architecture review. No public policy/authorization/refund worker,
+optional raw partition identity, full source parity or full-product claim is
+inferred from the trusted paid leaf. Keep the complete goal and remaining gates.
+Capture refinement before creation: approve CapturedGovernedClaimPayment as the
+private-field pair of the actual complete prepared digest and borrowed payment.
+Only the complete request decoder constructs it; a reply's payment observation
+cannot masquerade as that captured request. Approve GovernedClaimReplyRef for
+the borrowed original payment/core response/used count, without a fake digest.
+Approve claim/retention.rs as the shared original/paid response retainer,
+extracted from claim/apply.rs to preserve the400-line production limit. Only
+that private Claim subtree may construct ClaimApplyPlan's existing fields.
+Approve workflow_values/claim/governed/custody.rs as the child for actual sync
+uncertainty, operational refusal and receipt-only capability downgrade. It shares
+the same real paid setup, keeping the parent below600 physical lines.
+Receipt isolation review: approve state/value/outcome/governed_claim.rs for the
+explicit layout8 selected paid receipt codec. Keep scalar encode/scan and the
+legacy Claim codec closed; only the selected route and actual GC5 point/recovery
+guards may admit intent19. Canonical scanning prospectively pays the bounded ID
+descriptor scratch separately from receipt wire length, including short rejects.
+
+Native paid-Claim result: eight storage cases and all43 credit codec cases pass,
+including three new codec cases. Real Lease/Spend is followed by original paid
+Claim, used-prefix binding, refusal of consumed IDs, successful unused sibling
+Claim and terminal queue publication with both held credits still in use. Actual
+received snapshot/replay returns the original reply despite different prepared
+IDs. Installed running governance still refuses the old unpaid leaf and admits
+the real paid capture. Expired/missing/wrong-epoch/insufficient payment and query
+error precedence execute. Actual sync failure leaves a whole old/new cohort and
+fences; operational refusal leaves the whole old cohort. Receipt-only downgrade
+fails, and removing only that receipt restores a valid GC4 namespace.
+
+Real RED evidence is /private/tmp/ferricstore2-governed-claim-r0.log (two missing
+new API groups), body-r0.log (InvalidChanges) and scalar-r0.log (legacy scalar
+encoder wrongly admits paid receipt). The backend caught an actual driver bug:
+Claim preflight's first tuple member is ownership bytes, not selected count.
+Use the exact requested limit captured with the complete digest after successful
+query validation. Later refusal/sibling cases exposed an independent wire/scratch
+conflation in short rejected receipts; prospective descriptor scratch now derives
+from bounded original wire, separately from the wire ceiling. The new short-reply
+codec case covers that boundary and duplicate IDs. Initial missing fixture
+imports were expected new APIs; a later boxed fixture error-type comparison and
+one new receipt-struct field typo were compilation mistakes, not product RED.
+Other new cases are supplemental, not retrospective TDD. Masked tails now pass.
+
+Final constructor review: VerifiedGovernedClaimWrites can only be constructed
+after it independently checks the same complete capture digest and actual paid
+eligibility. Move that check into the witness constructor instead of relying on
+an earlier caller-side check. Private exact postimage borrows still guard record
+publication; no freshness/authority boolean is introduced. Point availability is
+wrapped in the actual checked transaction so corrupt reads fence consistently.
+Canonical selected receipt scanning and real point readers independently require
+GC5 even when no marker or binding remains. Scalar serialization and the legacy
+response-profile dispatcher are verbatim, verified against1af0a64.
+
+The broader domain/ports/storage run passed1288 tests/doctests (including322
+storage cases) before that final constructor hardening and the extra installed-
+policy case. The final eight-case run covers those changes. Strict workspace/
+all-target Clippy, all60 architecture cases, cargo progress, fmt and diff pass.
+Current non-Markdown input manifest has2054 files/1465 Rust files. Audit preserves
+693 selected predecessor Rust test/bench inputs:691 whole plus two exact additive
+registrations. Frozen mapping/progress ledgers are byte-identical:141 derived
+declarations/155 counterparts/671 links; runtime5903/4222/1681/1655. None of these
+native component cases is silently promoted to a complete source scenario.
+
+Performance review retains borrowed paid-ID spans and sorts only admitted slice
+descriptors, with linear exact reservation probes rather than a whole binding
+scan. The response streams the existing FWCR body into its one retained owner.
+Keep fallibly reserved Vec builders: the primary Rust documentation says
+[try_reserve_exact](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.try_reserve_exact)
+may receive excess allocator capacity, and
+[into_boxed_slice](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.into_boxed_slice)
+discards that excess like shrinking. A conversion of these short-lived builders
+is not an automatic optimization; no measured speedup is claimed. No new runtime
+dependency, unsafe, suppressed lint, source credit, independent review, native
+Elixir/Linux, primary code adoption or push occurred. No full all12 rerun: the
+last such checkpoint remains9220c17. Keep the same full-completion goal active.
+
+NEXT public policy/NoDemand/refund/unused/Unknown composition and original raw
+partition identity; ACK/sparse completion/drain and actual GC5 Node execution;
+then restart/snapshot -> reconcile -> exact release with siblings preserved.
+Audit source public ID recipes and cross-generation redelivery before treating
+any original ID as reusable. Raw batch write-call boundaries, malformed-owner
+fairness, complete source coverage, consensus/read barriers, services, platforms
+and measured performance remain open. Continue solo; do not infer a full product
+or original public API from this explicit trusted native paid leaf.

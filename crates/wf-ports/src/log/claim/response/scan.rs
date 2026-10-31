@@ -7,7 +7,7 @@ use wf_types::version::TimestampMillis;
 
 use crate::log::{CodecError, CodecLimits, reader::Reader, writer::Writer};
 
-pub(super) fn summary(
+pub(in crate::log) fn summary(
     response: &[u8],
     original_time: TimestampMillis,
     admission: AdmissionLimits,

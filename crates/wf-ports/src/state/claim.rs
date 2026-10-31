@@ -158,7 +158,11 @@ impl<'scope, 'current> GroupClaimChanges<'scope, 'current> {
                 if outcome.status() != status
                     || outcome.original_position() != identity.log()
                     || outcome.original_time() != control.execution_time()
-                    || !claim_response_matches(
+                    || !if outcome.intent().version() == 19 {
+                        crate::log::governed_claim_response_matches
+                    } else {
+                        claim_response_matches
+                    }(
                         operation,
                         outcome.response(),
                         outcome.original_time(),
@@ -232,7 +236,11 @@ fn validate_outcome(
     if outcome.scope() != scope {
         return Err(StateTransactionError::InvalidChanges);
     }
-    let (status, _) = claim_retained_summary(
+    let (status, _) = if outcome.intent().version() == 19 {
+        crate::log::governed_claim_retained_summary
+    } else {
+        claim_retained_summary
+    }(
         outcome.intent(),
         outcome.response_version(),
         outcome.response(),

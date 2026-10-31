@@ -180,6 +180,9 @@ pub(super) fn write_outcome(
     scope: &RequestScope,
     outcome: &RetainedOutcome,
 ) -> Result<(), StateTransactionError> {
+    if outcome.intent().version() == 19 {
+        tx.require_governed_claim()?;
+    }
     if matches!(
         outcome.status(),
         RetainedStatus::IndexedRejected(

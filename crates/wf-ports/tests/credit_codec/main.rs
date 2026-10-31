@@ -9,6 +9,7 @@ mod catalog_progress;
 mod catalog_prune;
 mod cleanup;
 mod framing;
+mod governed_claim;
 mod public_credit;
 mod release;
 mod view;
