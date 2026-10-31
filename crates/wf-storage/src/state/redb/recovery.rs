@@ -249,6 +249,8 @@ fn validate_rows(
     let mut credit_counts = [0_u64; 2];
     let credit_catalog = layout == 8
         && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.credit_catalog;
+    let governance_catalog = layout == 8
+        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.governance_catalog;
     let mut hash = Sha256::new();
     hash.update(if matches!(layout, 6..=8) {
         super::snapshot::original::CATALOG_DOMAIN
@@ -274,10 +276,15 @@ fn validate_rows(
             maximum,
         )
         .map_err(value_error)?;
-        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=17) {
+        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=18) {
             return Err(StateTransactionError::Corrupt);
         }
-        if matches!(decoded.family(), 16 | 17) {
+        if decoded.family() == 18 {
+            if !governance_catalog {
+                return Err(StateTransactionError::Corrupt);
+            }
+            super::governance_catalog::validate_row(value.value())?;
+        } else if matches!(decoded.family(), 16 | 17) {
             if !credit_catalog {
                 return Err(StateTransactionError::Corrupt);
             }

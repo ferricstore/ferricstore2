@@ -130,6 +130,9 @@ impl RedbStateTransaction<'_> {
                 return Err(StateTransactionError::Corrupt);
             }
         }
+        if scanned.intent_version() == 14 && !self.value_manifest()?.governance_catalog {
+            return Err(StateTransactionError::Corrupt);
+        }
         if scanned
             .response_count()
             .is_some_and(|n| n > self.admission.batch_items())

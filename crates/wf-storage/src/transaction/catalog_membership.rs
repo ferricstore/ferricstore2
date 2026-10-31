@@ -7,6 +7,8 @@ use wf_domain::workflow::{batch::ApplyError, request::RequestScope};
 use wf_ports::{log::CodecError, state::StateTransactionError};
 use wf_types::version::LogIdentity;
 
+mod driver;
+
 /// Operational failures never become a retained catalog business outcome.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CatalogMembershipTransactionError {
@@ -50,11 +52,11 @@ impl From<StateTransactionError> for CatalogMembershipTransactionError {
 /// # Errors
 /// Refuses framing/authority/resources; uncertain commit fences the live owner.
 pub fn apply_catalog_membership_transaction(
-    _store: &mut RedbStateStore,
-    _scope: &RequestScope,
-    _encoded: &[u8],
-    _log: LogIdentity,
-    _limits: RecordBatchTransactionLimits,
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: RecordBatchTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, CatalogMembershipTransactionError> {
-    Err(StateTransactionError::UnsupportedPolicyProfile.into())
+    driver::apply(store, scope, encoded, log, limits)
 }

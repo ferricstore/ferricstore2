@@ -13,6 +13,7 @@ mod faults;
 #[path = "../recovery/fixtures/shared.rs"]
 mod fixture_data;
 mod fixtures;
+mod governance_catalog;
 mod limits;
 mod original_policy;
 mod provenance;

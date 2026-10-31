@@ -3,7 +3,9 @@
 use super::{ScannedRetainedOutcome, StateValueError, add, claim_error, encode_fields, with_frame};
 use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedOutcome, RetainedStatus};
-use wf_ports::log::{catalog_ack_retained_summary, credit_retained_summary};
+use wf_ports::log::{
+    catalog_ack_retained_summary, catalog_membership_retained_summary, credit_retained_summary,
+};
 use wf_types::identity::RequestId;
 
 pub(super) fn encode(
@@ -41,7 +43,7 @@ pub(super) fn scan<'a>(
          original_time,
          expires_at,
          response_version| {
-            if !matches!((version, response_version), (12, 10) | (13, 11)) {
+            if !matches!((version, response_version), (12, 10) | (13, 11) | (14, 12)) {
                 return Err(StateValueError::UnsupportedVersion);
             }
             let [tenant, group, recovery, request, response] = fields;
@@ -53,7 +55,9 @@ pub(super) fn scan<'a>(
             {
                 return Err(StateValueError::InvalidValue);
             }
-            let intent = if version == 13 {
+            let intent = if version == 14 {
+                ClientIntent::governance_catalog(digest)
+            } else if version == 13 {
                 ClientIntent::credit_catalog_ack(digest)
             } else {
                 ClientIntent::governance_credit(digest)
@@ -90,7 +94,9 @@ fn summary(
     response: &[u8],
     admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), wf_ports::log::CodecError> {
-    if intent.version() == 13 {
+    if intent.version() == 14 {
+        catalog_membership_retained_summary(intent, version, response, admission)
+    } else if intent.version() == 13 {
         catalog_ack_retained_summary(intent, version, response, admission)
     } else {
         credit_retained_summary(intent, version, response, admission)

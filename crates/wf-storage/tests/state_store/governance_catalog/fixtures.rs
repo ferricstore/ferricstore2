@@ -3,8 +3,8 @@ use redb::{ReadableDatabase, ReadableTable, TableDefinition, TableHandle};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, path::Path};
 use wf_domain::workflow::{
-    control::PreparedDigest,
     active::LifecycleDefaults,
+    control::PreparedDigest,
     request::{RequestScope, RetainedOutcome},
 };
 use wf_ports::{

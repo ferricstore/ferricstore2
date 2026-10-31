@@ -59579,3 +59579,43 @@ One old-capability control passes; six fail at actual driver
 State(UnsupportedPolicyProfile), including the cut loop. No stored test body
 changed. Save this driver RED before member writes, retained integration or read
 bodies; later assertions remain masked. See catalog-membership-driver-r0.log.
+
+Actual target membership now passes all seven stored cases. The same writer
+validates current capability and original command/outcome binding, checks each
+reached existing membership value, and joins distinct member effects, retained
+reply and control in one Immediate commit. Every step cut rolls the complete
+cohort back; real delegated sync uncertainty fences and reopens whole old/new
+state. Exact cursor removal and receipt-only downgrade regressions pass. Clippy
+requires one equivalent test-expression repair: the retry position conditional
+`if reopened == before {0} else {1}` becomes `u64::from(reopened != before)`.
+Retain its exact inverse; do not claim whole-file identity for limits.rs.
+The other saved stored and all four domain/codec case bodies stay exact.
+Node recovery, publisher, public repair/cleaner and broader source/native/Linux
+acceptance remain unfinished. The independent target creator deliberately has
+no owner shard count; a combined explicit creator/upgrade is still needed before
+same-group owner and target membership composition is claimed. Preserve the
+orthogonal manifest fields and never infer either capability from row counts.
+
+Node refinement before artifacts: approve GovernanceCatalogRecoveryProfile
+(Disabled/Enabled) in selected recovery/catalog_membership.rs and explicit
+with_governance_catalogs selection. Require actual capability on each initial/
+final coherent observation even for an empty log. Approve same-guard
+RedbStateTransaction::require_governance_catalog. Move the existing unchanged
+CommittedRecoveryError definition/Display into recovery/error.rs before adding
+its CatalogMembership diagnosis; recovery.rs is already393 lines and must stay
+within400. Approve CatalogCohort as a test-only all-table observation alias in
+the selected flat snapshot_recovery/governance_catalog.rs. That file owns actual
+target genesis, original frames, assertions and received/purged snapshot cases;
+no fake durability/consensus fixture. Save compiled Node RED before dispatch.
+
+Target membership focused gates pass:35 domain,15 codec,seven stored and54
+architecture cases, strict all-target Clippy for the three affected crates,fmt
+anddiff. This is not a full workspace/native/Linux result. Rustfmt also reorders
+the corrected active/control fixture imports; its complete two-line inverse
+preserves that saved fixture, separate from the equivalent limits expression.
+Node RED now compiles and all three saved cases fail at UnsupportedEntry:
+generic refusal and direct full historical stored application already pass;
+the historical diagnosis expects TrailingBytes and gets UnsupportedEntry.
+Snapshot refusal is Recovery(UnsupportedEntry). Save these actual failures
+before dispatch/audit bodies; later received/purged assertions remain masked.
+See catalog-membership-node-r0.log. No saved Node test source was repaired.

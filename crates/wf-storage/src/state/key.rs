@@ -7,6 +7,7 @@ use super::value::{StateValueError, add, allocate, read_u8, start};
 
 pub(crate) mod catalog;
 mod credit;
+pub(crate) mod governance_catalog;
 mod ordered;
 mod physical;
 mod point;
@@ -126,7 +127,7 @@ pub(super) fn key_start(
     length: usize,
     maximum: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if family > 17 {
+    if family > 18 {
         return Err(StateValueError::UnsupportedTag);
     }
     if length < 7 {

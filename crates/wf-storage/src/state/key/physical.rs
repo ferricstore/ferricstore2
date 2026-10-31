@@ -41,7 +41,7 @@ pub(crate) fn decode_state_key(
     let mut length = 0_usize;
     let (before, after) = match family {
         0 | 7 => (2, 0),
-        1 | 10 => (5, 0),
+        1 | 10 | 18 => (5, 0),
         2 | 6 | 8 | 9 | 12 | 15 => (4, 0),
         13 => (7, 0),
         14 => (6, 0),
@@ -107,6 +107,9 @@ pub(crate) fn decode_state_key(
     }
     if matches!(family, 16 | 17) {
         super::catalog::validate(&decoded)?;
+    }
+    if family == 18 {
+        super::governance_catalog::validate(&decoded)?;
     }
     if matches!(family, 5 | 11)
         && u128::from(canonical_history_position(decoded.part(5))?.0) != number

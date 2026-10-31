@@ -110,7 +110,7 @@ fn validation_bytes(
         maximum_wire_bytes,
         |fields, intent, _, _, _, _, response_version| {
             let response = fields[4];
-            if intent == 13 && layout == Some(8) {
+            if matches!(intent, 13 | 14) && layout == Some(8) {
                 return Ok(1024);
             }
             if intent == 12 && layout == Some(8) {

@@ -107,7 +107,7 @@ fn governance_catalog_actual_uncertain_commit_fences_and_reopens_complete_old_or
     drop(common::open(&path)?);
     let reopened = f::cohort(&path)?;
     assert!(reopened == before || reopened == after);
-    f::retained(&path, &frame, if reopened == before { 0 } else { 1 })?;
+    f::retained(&path, &frame, u64::from(reopened != before))?;
     assert_eq!(
         f::page(&path, None, 256)?.members,
         vec![b"a".to_vec(), b"b".to_vec()]
