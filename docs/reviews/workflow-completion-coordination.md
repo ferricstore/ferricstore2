@@ -61034,3 +61034,31 @@ FWRI/FWRO framing is not ETF compatibility. Current receipt:
 /private/tmp/ferricstore2-release-protocol-focused.json. This is protocol progress,
 NOT persisted release/Claim integration, source parity or a new all12 checkpoint.
 Continue the coupled batch; last all12 still belongs to9220c17.
+
+
+Storage capability selection before artifacts: extend the EXISTING private
+GovernanceCatalogProfile enum with WorkflowRelease, encoded GC4 in the same
+four-byte capability slot. It inherits Membership/Progress/Prune, and is valid
+ONLY with actual layout8/alias2/credit2/catalog plus a finite positive credit
+shard count. No new independent bool or physical layout is introduced. GC1/2/3
+bytes/constructors stay unchanged. Manifest parse/encode/genesis reject invalid
+combinations; snapshot manifest equality remains exact. Backend inherited prune/
+progress guards may accept4; older Node modes remain closed until their explicit
+successor selection. GC4 currently selects schema custody, not Claim authority.
+
+Approve new crates/wf-storage/src/state/redb/release.rs: existing
+RedbStateStore::create_workflow_release_database and
+RedbStateTransaction::require_workflow_release, using the real immutable manifest
+under the same guard. Add its private module registration. This is the release
+backend root for the selected atomic successor; future children still need
+concrete review before creation. No public standalone enqueue/seed capability.
+
+Approve tests/state_store/governance_catalog/prune/release.rs and additive parent
+registration. Private fixture helper release_fixture reuses actual genesis and
+PruneFixture ownership; existing fixtures::defaults becomes pub(super), with body
+unchanged, to avoid duplicating its default digest recipe. Test actual GC4 create/
+reopen/credit capabilities, inherited real conditional registration+prune, older
+GC3 refusal and invalid-count preflight with empty engine table inventory.
+This advances actual custody but cannot certify binding/outbox rows, full snapshot
+or Node replay, governed Claim, remote release or the whole coupled batch. Those
+remain required successors before a new full integration claim.

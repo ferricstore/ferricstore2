@@ -13,6 +13,7 @@ use wf_ports::{
 };
 mod faults;
 mod fixtures;
+mod release;
 use fixtures::PruneFixture;
 fn reply(outcome: &wf_domain::workflow::request::RetainedOutcome) -> TestResult<P> {
     Ok(catalog_prune_retained_summary(

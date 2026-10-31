@@ -1418,3 +1418,14 @@ submission port module for this immutable prepared-frame owner. This does not
 permit std::sync modules, locks, atomic primitives, threads or effects in pure
 code. The architecture checker must retain negative coverage for these paths
 and refuse Arc in the remaining pure modules.
+
+
+Selected workflow release custody extends the existing immutable governance
+capability to GC4. The private enum variant WorkflowRelease inherits GC3 and
+requires actual layout8, alias2 and identified credit2/catalog with a finite
+positive shard count. The four-byte capability position and all GC1/2/3 formats
+remain unchanged. Manifest and snapshot comparisons bind the exact version.
+Backend capability inspection is not authorization or a proof of remote credit
+spend. The old governed-Claim refusal remains until workflow reservation binding
+and release enqueue are atomic, audited and recoverable. Custody selection alone
+does not implement those writes or the full public Claim/reconciliation parent.

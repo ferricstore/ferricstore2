@@ -114,7 +114,7 @@ impl PruneFixture {
         Ok(outcome)
     }
 }
-fn defaults() -> WorkflowValueDefaults {
+pub(super) fn defaults() -> WorkflowValueDefaults {
     let lifecycle = LifecycleDefaults {
         ttl_ms: 7000,
         history_hot_max_events: 2,
