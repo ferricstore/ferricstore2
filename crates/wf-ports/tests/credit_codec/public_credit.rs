@@ -276,3 +276,109 @@ fn public_credit_reply_inspection_accepts_canonical_rejection_and_checks_full_fr
     );
     Ok(())
 }
+
+#[test]
+fn public_credit_reply_inspection_binds_scope_operation_shard_count_and_original_ids() -> TestResult
+{
+    use wf_domain::{
+        governance::{
+            caller::CreditIdList,
+            credit::CreditLimits,
+            identified::{IdentifiedCreditDecision as D, IdentifiedCreditReply},
+        },
+        workflow::{
+            admission::AdmissionLimits,
+            request::{ClientIntent, RetainedStatus},
+        },
+    };
+    use wf_ports::log::{
+        PublicCreditReplyExpectation as Expected, decode_credit_owner, encode_credit_reply,
+        inspect_public_credit_reply as inspect,
+    };
+    let owner = decode_credit_owner(
+        &super::framing::independent_owner(true),
+        CreditLimits::default(),
+        16384,
+        32768,
+    )?;
+    let ids = vec![b"a".to_vec(), b"b".to_vec()];
+    let bytes = encode_credit_reply(
+        &IdentifiedCreditReply {
+            decision: D::Spent { shard_id: 0 },
+            owner: Some(owner),
+            reservation_ids: ids.clone(),
+        },
+        16384,
+        32768,
+    )?;
+    let intent = ClientIntent::public_credit([5; 32]);
+    let expected = Expected {
+        scope: b"x",
+        kind: K::Spend,
+        shard: Some(0),
+        amount: Some(2),
+        ids: Some(CreditIdList::Owned(&ids)),
+    };
+    let check = |bytes: &[u8], expected: Expected<'_>| {
+        inspect(
+            intent,
+            10,
+            bytes,
+            expected,
+            CreditLimits::default(),
+            AdmissionLimits::default(),
+        )
+    };
+    assert_eq!(check(&bytes, expected)?, RetainedStatus::Accepted);
+    assert_eq!(
+        check(
+            &bytes,
+            Expected {
+                ids: None,
+                ..expected
+            }
+        )?,
+        RetainedStatus::Accepted
+    );
+    let reversed = vec![b"b".to_vec(), b"a".to_vec()];
+    for altered in [
+        Expected {
+            scope: b"other",
+            ..expected
+        },
+        Expected {
+            kind: K::Get,
+            ..expected
+        },
+        Expected {
+            shard: Some(1),
+            ..expected
+        },
+        Expected {
+            amount: Some(1),
+            ..expected
+        },
+        Expected {
+            ids: Some(CreditIdList::Owned(&reversed)),
+            ..expected
+        },
+    ] {
+        assert!(check(&bytes, altered).is_err());
+    }
+    for end in 0..bytes.len() {
+        assert!(check(&bytes[..end], expected).is_err());
+    }
+    let limits = AdmissionLimits::new(64, bytes.len() - 1, 100000)?;
+    assert_eq!(
+        inspect(
+            intent,
+            10,
+            &bytes,
+            expected,
+            CreditLimits::default(),
+            limits
+        ),
+        Err(E::ByteLimit)
+    );
+    Ok(())
+}

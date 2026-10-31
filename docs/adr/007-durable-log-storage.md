@@ -1412,3 +1412,9 @@ and known IDs. Catalog repair can commit before credit proposal; accepted new
 owner credit can commit before synchronous publication. Represent those boundaries
 explicitly, preserving the atomic core outcome and durable publication outbox;
 do not invent a whole-call rollback or fresh spend after uncertainty.
+
+The exact std::sync::Arc type path is permitted only in the neutral public credit
+submission port module for this immutable prepared-frame owner. This does not
+permit std::sync modules, locks, atomic primitives, threads or effects in pure
+code. The architecture checker must retain negative coverage for these paths
+and refuse Arc in the remaining pure modules.

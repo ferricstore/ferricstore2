@@ -110,7 +110,7 @@ pub fn retry_public_credit_call<P: PublicCreditSubmitPort>(
         || original
             .ids
             .iter()
-            .try_fold(2048_usize, |n, id| {
+            .try_fold(128_usize, |n, id| {
                 n.checked_add(id.len() + std::mem::size_of::<Vec<u8>>())
             })
             .is_none_or(|n| n > limits.maximum_ids_bytes)

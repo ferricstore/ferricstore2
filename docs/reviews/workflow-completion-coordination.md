@@ -60870,3 +60870,15 @@ full owner restore. No public existence flag or reusable authority is introduced
 Execution refusal on a retry also returns PublicCreditRetryError with the original
 box: no-proposal proof for the retry cannot prove the preceding unknown attempt
 did not commit. Fresh call conversion may expose that preparation refusal directly.
+
+Shared-frame architecture review: cargo arch correctly rejects the previously
+unclassified std::sync::Arc import after the new port was classified pure. The
+approved immutable frame is a data owner; no mutex, atomics API, thread, wait or
+runtime implementation is introduced into this port. Refine standard_path to
+recognize ONLY the exact std::sync::Arc type path in wf-ports module
+consensus::public_credit. Keep every other sync path and all other pure modules
+closed. Add positive alias/type-path fixtures and negative Mutex/RwLock/atomic/
+thread/namespace/wildcard fixtures, including a nested Arc<Mutex<_>>. This is a
+concrete classification of the already approved data type, not a sync-module
+allowlist or a lint suppression. The actual pre-refinement workspace failure is
+/private/tmp/ferricstore2-public-credit-application-arch.log. Solo review only.
