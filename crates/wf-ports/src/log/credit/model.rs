@@ -13,7 +13,7 @@ use wf_types::{
     version::{CommittedTime, LogIdentity},
 };
 
-pub(super) enum OwnedCreditMutation {
+pub(in crate::log) enum OwnedCreditMutation {
     Lease {
         shard_id: u64,
         amount: u64,
@@ -40,7 +40,7 @@ pub(super) enum OwnedCreditMutation {
 }
 
 impl OwnedCreditMutation {
-    pub(super) fn borrowed(&self) -> Op<'_> {
+    pub(in crate::log) fn borrowed(&self) -> Op<'_> {
         match self {
             Self::Lease {
                 shard_id,
@@ -82,14 +82,14 @@ impl OwnedCreditMutation {
         }
     }
 
-    pub(super) const fn amount(&self) -> Option<u64> {
+    pub(in crate::log) const fn amount(&self) -> Option<u64> {
         match self {
             Self::Spend { amount, .. } | Self::Release { amount, .. } => Some(*amount),
             _ => None,
         }
     }
 
-    pub(super) fn install_ids(&mut self, values: Vec<Vec<u8>>) {
+    pub(in crate::log) fn install_ids(&mut self, values: Vec<Vec<u8>>) {
         match self {
             Self::Spend { ids, .. } | Self::Release { ids, .. } => *ids = values,
             _ => {}
@@ -97,31 +97,31 @@ impl OwnedCreditMutation {
     }
 }
 
-pub(super) struct ScannedCreditRequest<'a> {
-    pub(super) header: RawHeader<'a>,
-    pub(super) scope: &'a [u8],
-    pub(super) shard_count: u64,
-    pub(super) configuration: Option<CreditConfiguration>,
-    pub(super) mutation: OwnedCreditMutation,
-    pub(super) ids: Vec<&'a [u8]>,
-    pub(super) body_at: usize,
-    pub(super) owned_bytes: usize,
+pub(in crate::log) struct ScannedCreditRequest<'a> {
+    pub(in crate::log) header: RawHeader<'a>,
+    pub(in crate::log) scope: &'a [u8],
+    pub(in crate::log) shard_count: u64,
+    pub(in crate::log) configuration: Option<CreditConfiguration>,
+    pub(in crate::log) mutation: OwnedCreditMutation,
+    pub(in crate::log) ids: Vec<&'a [u8]>,
+    pub(in crate::log) body_at: usize,
+    pub(in crate::log) owned_bytes: usize,
 }
 
 /// Complete prepared byte binding; no storage, routing or spend authority.
 pub struct PreparedCreditRequest<'input> {
-    pub(super) encoded: &'input [u8],
-    pub(super) scope: RequestScope,
-    pub(super) request: RequestId,
-    pub(super) stamp: CommittedTime,
-    pub(super) intent: ClientIntent,
-    pub(super) digest: PreparedDigest,
-    pub(super) isolation: Vec<u8>,
-    pub(super) credit_scope: Vec<u8>,
-    pub(super) shard_count: u64,
-    pub(super) configuration: Option<CreditConfiguration>,
-    pub(super) mutation: OwnedCreditMutation,
-    pub(super) owned_bytes: usize,
+    pub(in crate::log) encoded: &'input [u8],
+    pub(in crate::log) scope: RequestScope,
+    pub(in crate::log) request: RequestId,
+    pub(in crate::log) stamp: CommittedTime,
+    pub(in crate::log) intent: ClientIntent,
+    pub(in crate::log) digest: PreparedDigest,
+    pub(in crate::log) isolation: Vec<u8>,
+    pub(in crate::log) credit_scope: Vec<u8>,
+    pub(in crate::log) shard_count: u64,
+    pub(in crate::log) configuration: Option<CreditConfiguration>,
+    pub(in crate::log) mutation: OwnedCreditMutation,
+    pub(in crate::log) owned_bytes: usize,
 }
 
 impl PreparedCreditRequest<'_> {

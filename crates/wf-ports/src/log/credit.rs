@@ -11,7 +11,7 @@ use wf_types::version::CommittedTime;
 mod admission;
 mod decode;
 mod encode;
-mod model;
+pub(super) mod model;
 mod scan;
 pub use model::PreparedCreditRequest;
 mod owner;

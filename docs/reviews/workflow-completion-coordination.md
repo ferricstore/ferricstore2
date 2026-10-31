@@ -60709,3 +60709,11 @@ Public codec baseline now compiles: four tests fail at rejecting fingerprint,
 ID-generation and public-frame APIs (UnsupportedVersion), before later decoder/
 identity predicates. Save before those semantic bodies. Do not count these pure
 checks as full public submission, source-case or native execution acceptance.
+
+Public codec bodies now pass the original four cases: independent ETF/hash,
+source ID recipe, complete Get frame and caller identity excluding prepared
+clock/epoch/batch. One local helper-name shadowing compile failure was corrected
+before the semantic run, with no RED credit. A new genuine resource control finds
+the public decoder accepts an otherwise healthy complete frame one byte above
+its selected wire cap. Four controls pass, one fails at actual unexpected
+acceptance; save this exact cohort before closing the missing upfront wire gate.

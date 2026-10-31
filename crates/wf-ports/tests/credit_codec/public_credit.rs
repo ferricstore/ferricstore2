@@ -190,3 +190,27 @@ fn public_credit_spend_intent_excludes_trusted_time_epoch_and_batch_but_frame_bi
     assert_eq!(reservation_ids[0], b"flr1:7:AAAAAAAAAAAAAAAAAAAAAA:1");
     Ok(())
 }
+
+#[test]
+fn public_credit_decoder_enforces_total_wire_cap_before_prepared_ownership() -> TestResult {
+    let call = normalize_credit_call(K::Get, b"scope", 4, &[], 65535)?;
+    let frame = encode_public_credit_request(
+        &scope()?,
+        &RequestId::new(b"id".to_vec())?,
+        call,
+        clock(1000)?,
+        None,
+        CodecLimits::default(),
+        65535,
+    )?;
+    let limits = CodecLimits::new(wf_domain::workflow::admission::AdmissionLimits::new(
+        64,
+        frame.as_bytes().len() - 1,
+        1000,
+    )?);
+    assert_eq!(
+        prepare_public_credit_request(frame.as_bytes(), limits, 65535).err(),
+        Some(E::ByteLimit)
+    );
+    Ok(())
+}
