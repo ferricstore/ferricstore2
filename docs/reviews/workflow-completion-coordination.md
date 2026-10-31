@@ -59809,3 +59809,54 @@ catalog_publication_boundaries_remain_configured_and_pure test in existing
 architecture metadata_policy.rs: actual allowed module references, prohibited
 direct effect imports/global/async in neutral ports, and forbidden application
 backend/consensus/node/API dependency edges. No broad policy bypass or exemption.
+
+
+The architecture regression is genuinely saved before its policy/classification
+body at8950c2f: governance is absent from the explicit application root map.
+The narrow root/pure-port rules now pass all55 architecture cases. Strict
+architecture Clippy also passes after two equivalent empty-check assertions
+become assert_eq with an empty String vector, improving failure diagnostics.
+The earlier whole-workspace run stopped at this lint before broad runtime tests;
+it is not a passing full-run receipt. The current integrated run freezes1933
+non-Markdown inputs/1344 Rust files. No source input changes during that run.
+
+Source audit preserves all646 previous test/benchmark files:642 whole files,
+three exact module-registration inverses and one exact additive architecture
+regression inverse. Seven saved sources retain complete inverses, explicitly
+accounting for the numeric/initializer/empty-assertion changes, race additions,
+whitespace-only positive owner readback, shallow helpers and the snapshot-aware
+fixture correction. These formatting/helper changes receive no original TDD or
+full source-case credit. The isolated native fix at
+ce3dce44492554f83f2673cbf9cb9cb5b42a8c11 is clean; its source hashes and complete
+old-test inverse still match. Native execution/formatting remains unverified.
+
+Read-only successor review uses the pinned governance/catalog.ex collect and
+collect_keys_page bodies, limit_store.ex list/load_list_limit and registration
+helpers, and limit_storage_cleaner.ex run_once_accounted/finish_catalog_step.
+Collection must traverse all pages even after retaining the result limit, keep
+global sorted top results, skip only explicit missing/filtered records, propagate
+loader errors and require the surviving member anchor. Exact-scope lists derive
+the requested keys without scanning membership. Equal sort keys require an
+explicit source-compatible tie decision: each source page prepends its reversed
+loaded records to the old accumulator before stable sorting. A bounded heap or
+insertion strategy must not silently change that order. This is source review,
+not a selected generic reader implementation or a performance result.
+
+Public repair must precede an existing-owner mutation. A new creation commits
+before its post-commit registration; registration failure replaces success but
+preserves an original business error. Missing Get must not create an owner.
+Cleaner cursor reset, cleanup/unregister and cursor persistence all consume its
+command budget, including failures. An exhausted cursor budget retains the old
+cursor; wrapping/caught-up must follow the effective persisted cursor. These
+parents remain unfinished and require concrete artifact selection before code.
+
+Publisher integration checkpoint: all12 local gates pass on1933 frozen inputs/
+1344 Rust files with zero drift. All1482 cases/115 executable targets preserve
+all1469 predecessor and1294 original identities/statuses/multiplicities, both
+benchmark correctness smokes,55 architecture cases,Python7 and11 doctests/15
+targets. The runtime suite took448.88 seconds. Actual full parity exits1
+with unchanged135/149/646 accounting and5903/4222/1681/1655 reconciliation;5858
+frozen textual declarations remain unported. No full source-case, native or
+Linux/performance credit. Source/audit hashes match this exact tested cohort.
+The publisher predecessor is locally validated; the wider catalog batch and
+full product goal remain unfinished. No feature code adoption or push.

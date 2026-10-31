@@ -17,13 +17,13 @@ fn catalog_publication_boundaries_remain_configured_and_pure() -> CheckResult<()
         "governance::publication::dispatch",
         "governance::publication::plan",
     ] {
-        assert!(
+        assert_eq!(
             source_check(
                 "wf-application",
                 module,
                 "use wf_ports::consensus::CreditCatalogPublicationPort;"
-            )?
-            .is_empty()
+            )?,
+            Vec::<String>::new()
         );
     }
     for module in [
@@ -32,13 +32,13 @@ fn catalog_publication_boundaries_remain_configured_and_pure() -> CheckResult<()
         "state::credit_catalog::read",
         "consensus::catalog_publication",
     ] {
-        assert!(
+        assert_eq!(
             source_check(
                 "wf-ports",
                 module,
                 "use std::vec::Vec; use wf_domain::workflow::request::RequestScope;"
-            )?
-            .is_empty()
+            )?,
+            Vec::<String>::new()
         );
         for (source, diagnosis) in [
             ("use std::fs;", "standard-library module"),

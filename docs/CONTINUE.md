@@ -2,7 +2,53 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current batch: M2-CREDIT-CATALOG1, still unfinished. Target governance catalog
+Current batch: M2-CREDIT-CATALOG1, still unfinished. The application publisher
+now reads one configured source and its coherent ordered owner batch, encodes
+borrowed member identities into one bounded byte owner, confirms an idempotent
+target membership reply, then ACKs only the processed source prefix. Unknown,
+refused, foreign or malformed membership replies preserve pending publication.
+Missing-only prefixes skip the membership write. Explicit combined credit2/GC1
+genesis supports same-group composition without a runtime capability upgrade.
+Accepted consensus and production routing/authorization adapters remain required.
+
+Fixed a real creation race: after a publisher observes an old intent as missing,
+a new owner must append a fresh sequence. Reusing that old tail allowed the
+publisher's ACK to erase the new owner's only publication intent. The regression
+uses actual committed creation and verifies the surviving intent and later
+membership. Existing-owner and retained retries still append nothing. The same
+Elixir fix/regression is saved separately at ce3dce444 on the isolated native
+branch; native execution and formatting remain unverified.
+
+All 12 local gates pass on 1,933 frozen non-Markdown inputs / 1,344 Rust files
+with zero drift: 1,482 cases / 115 executable targets, 55 architecture cases,
+Python 7 and 11 doctests / 15 targets. All previous 1,469 and original 1,294 case
+identities/statuses/multiplicities and both benchmark correctness smokes remain.
+The 13 added cases are two member codec, two actual storage, eight Node publisher
+and one architecture regression. Genuine failures precede bodies at 08e8a2b
+(predecessors), 328a39e (publisher), 36786f2 (creation race) and 8950c2f
+(architecture classification). The 646 old test/benchmark files remain as 642
+whole files, three exact registration inverses and one additive test inverse.
+Saved-source audits explicitly record equivalent test-style changes and the
+snapshot-aware fixture correction; no masked assertion receives original TDD
+credit. See /private/tmp/ferricstore2-catalog-publisher-{r0,predecessor,
+final-pipeline,source-audit,full-identity,full-parity,elixir,checkpoint}.json and
+phase logs. These local results run on Darwin/arm64; no Linux/native performance
+or full source-case credit is claimed.
+
+Actual full parity still exits 1 with unchanged 135/149/646 checked accounting,
+5903/4222/1681/1655 runtime reconciliation and 5858 unported frozen textual
+declarations. Next: bounded catalog collection with globally ordered loaded
+results and direct exact-scope lists, public existing-owner repair, and cleaner
+progress/fairness. Preserve source loader errors, real cursor anchors, command
+budgets and publication-before-ACK. Select concrete new artifacts through solo
+architecture review before creation. Public Claim/policy/release-outbox parents,
+accepted consensus, HTTP/TCP/worker integration, complete required source/native/
+Linux/macOS acceptance and M1-M8 exits remain unfinished. The primary checkout
+only points here; its last adopted code remains 728650f. Do not adopt this
+unfinished feature branch or treat this checkpoint as full product completion.
+
+Previous checkpoint: target catalog membership.
+Target governance catalog
 membership now has an independent explicit FWSS8 capability, family18 binary
 set rows and closed operation12/intent14/response12 framing. One consumed
 Immediate writer joins bounded deduplicated set changes, original retained

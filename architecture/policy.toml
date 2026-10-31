@@ -29,7 +29,7 @@ external_normal = [
 kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-ports"]
 dev = ["wf-test-support"]
-modules = { commands = true, queries = true, error = true, authorization = false, admission = false, intent = false, routing = false, reconciliation = false }
+modules = { commands = true, queries = true, error = true, governance = true, authorization = false, admission = false, intent = false, routing = false, reconciliation = false }
 external_normal = [
   { name = "sha2", version = "=0.11.0", features = [], default_features = false },
 ]

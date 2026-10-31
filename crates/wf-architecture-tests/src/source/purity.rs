@@ -206,6 +206,7 @@ impl Inspector<'_, '_> {
             "blob",
             "clock",
             "consensus::value",
+            "consensus::catalog_publication",
             "log::value_batch",
             "log::record_batch::phase",
             "log::record_batch::fresh",
@@ -221,6 +222,7 @@ impl Inspector<'_, '_> {
             "log::control",
             "log::common",
             "state::control",
+            "state::credit_catalog",
             "snapshot::metadata",
         ]
         .into_iter()
