@@ -2,60 +2,63 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current batch: M2-CREDIT-CATALOG1, still unfinished.
+Current batch: M2-CREDIT-CATALOG1 remains unfinished. Latest integrated local
+public credit checkpoint: code9220c17. The selected normalized caller path is now
+implemented and verified; the full product goal is NOT complete.
 
+Public callers now cover all six credit operations through retained-first
+inquiry, exact existing-owner catalog repair, original preparation/submission
+and explicit post-commit publication. Unknown outcomes retain the same shared
+frame and original reservation IDs. Resource/no-proposal retry refusal returns
+the original context intact. Complete borrowed reply binding checks scope,
+operation/shard/count, semantic status and known exact ID order. An earlier
+concurrent original response remains valid. Accepted Lease plus unconfirmed
+publication stays explicit, with its durable pending intent repairable later.
+No whole-call rollback or production read/authorization lifecycle is invented.
 
-Ongoing public caller work after the last integrated checkpoint: candidate
-code4cfec23. This public batch is STILL UNFINISHED; application sequencing is next.
-The previous all12/1570 result below remains evidence for8850e33 only.
+The public frame/intent17 path uses the existing atomic credit2/catalog driver
+and complete response10. Explicit Node recovery audits historical public bodies
+and received/purged replay. Old profiles and receipt-only capability downgrade
+refuse without writes. Scalar normalization, ETF policy fingerprints and source
+ID recipes remain as previously reviewed; complete raw API/error-order parity
+still requires its remaining source obligations.
 
-Public scalar option normalization now covers all six credit operations,
-first-key keyword selection with every capture charged, source finite/count/
-ID/configuration/deadline rules and source scalar error order. Release IDs remain
-borrowed/in order; one bounded reference sort verifies uniqueness. Public Spend
-forbids caller IDs. Streaming ETF policy fingerprints and exact flr1 epoch/batch/
-ordinal IDs have independent byte recipes. FWCP1 operation15/intent17 compares
-canonical public callers while excluding trusted stamp/observed epoch/batch;
-complete frame SHA still binds preparation. Decoder wire/admission bounds apply
-before private payload ownership, with a saved oversized-frame counterexample.
+ONE full frozen local integration run passes all12 gates on2015 non-Markdown
+inputs/1426 Rust files:1607 tests/117 executable targets,60 architecture cases,
+Python7,11 doctests/15 targets, warnings-denied docs and offline dependency audits.
+All1570 preceding and1294 original case identities remain. Both benchmark smokes
+pass. The13 actual Node application tests cover all operation sequencing, no
+ghosts, refused/unknown registration, committed-but-unpublished owner, original
+lookup, lost/reordered replies, compensation preserving siblings, retry refusal
+ownership, exact ID admission, no-ID retries and earlier concurrent originals.
+The original8 application RED cases and first5 codec cases retain exact prefixes.
 
-Public frames join the existing sparse atomic credit driver, complete response10
-and actual credit2/catalog capability, including receipt-only state. Changed
-preparation returns original spend/time/IDs; changed caller intent conflicts.
-All six operations, original metadata, old-profile no-write refusal and validly
-rehashed capability downgrade refusal execute on real storage. Explicit Node
-public selection audits complete historical bodies and replays purged/received
-suffixes without regenerating another spend. Older modes refuse public bodies.
-No new dependency, physical row/schema or runtime service is introduced.
+All677 older test/benchmark inputs remain672 whole plus four exact registration
+inverses and one exact architecture prefix. Source ledgers are byte-identical:
+141 derived declarations/155 counterparts/671 assertion links. Runtime accounting
+stays5903/4222/1681/1655. Full parity actually exits1 with5858 unported textual
+declarations; registration and partial assertions do not certify full scenarios.
+No full native Elixir, Linux, production service or speedup claim is made.
 
-Current focused verification:141 distinct cases (domain43,ports32,storage4,Node3,
-architecture59), strict workspace/all-target Clippy,fmt,diff and cargo progress
-pass. No current full-wrapper run or full source-case/native/Linux/performance
-acceptance is claimed. All677 older test/benchmark files stay672 whole plus five
-exact additive registration/prefix inverses. Existing framing types move verbatim
-to private log/model.rs with unchanged public names and log-only field visibility;
-root facade now344 lines. Source accounting remains141/155/671 and runtime
-reconciliation5903/4222/1681/1655. Receipts/logs are
-/private/tmp/ferricstore2-public-credit-{caller-r0,codec-r0,codec-wire-r0,
-storage-r0,node-r0,order-r0,focused}.json and corresponding phase logs.
+Evidence: /private/tmp/ferricstore2-public-credit-{application-r0,
+application-review-r0,concurrent-r0,final-pipeline,full-identity,source-audit,
+checkpoint}.json; phase logs include helper/Arc RED and full-parity failure.
+The coordination review distinguishes genuine failures, masked later assertions,
+supplemental first-pass cases and the corrected initial clock-fixture oracle.
+Arc's exact immutable type classification is scoped to one neutral port module;
+locks, atomic APIs, threads and broad synchronization imports remain rejected.
+All400/600 file,100 function,depth4 and complexity25 limits stay enforced.
 
-NEXT finish the approved application caller over PublicCreditSubmitPort:
-retained inquiry before current owner/repair/entropy; exact existing-owner repair
-before dependent mutation; new-owner commit before publication; complete original
-reply binding; preserve request/intent/exact IDs on Unknown and retry original
-prepared bytes without a fresh spend. Treat committed mutation plus unconfirmed
-publication explicitly; no invented rollback. Pure normalized schema checks do
-not by themselves prove original late-input/read/registration error ordering.
-Add actual Node application-path scenarios (uncataloged existing owners, missing
-spend/no ghost, publication after creation, failed/unknown registration and exact
-compensation IDs), plus real unknown/lookup boundaries and caller resource
-preflight. Concrete named paths/types were selected in the latest coordination
-entry before artifacts; refine their ownership/error contract before creation.
-Run ONE full frozen integration pipeline after this whole public batch is ready.
-Then continue coupled Claim/policy/release-outbox and all broader goal work.
+NEXT finish coupled Claim/policy/release-outbox composition and raw caller/source
+error-order obligations. Preserve the separate native malformed-authoritative-
+owner fairness requirement without weakening canonical fencing. Accepted Raft
+callbacks and leader/read barriers, routing/authorization, shared services,
+HTTP/TCP/worker and maintenance lifecycle, full required source scenarios/profiles,
+native Linux/macOS and measured performance acceptance remain open. Continue
+solo; preserve the original dirty Elixir checkout and unexecuted isolated native
+fixce3dce444. Keep the full goal active. No primary code adoption or push occurred.
 
-
-Latest integrated code checkpoint:8850e33, revision-checked catalog pruning.
+Previous integrated code checkpoint:8850e33, revision-checked catalog pruning.
 The real stale Missing -> new owner/publish/ACK -> prune race is reproduced in
 7da2b8d and corrected. Explicit GC3 stores each member's complete registration
 EntryIdentity; every fresh Register rotates it, including an existing member.
