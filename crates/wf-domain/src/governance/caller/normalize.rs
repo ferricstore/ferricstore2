@@ -38,15 +38,12 @@ pub fn normalize_credit_call<'a>(
     } else {
         0
     };
-    let ttl = match kind {
-        K::Lease | K::Renew => Some(positive(options, "ttl_ms")?),
-        K::Spend => match field(options, "ttl_ms") {
-            None | Some(V::Nil) => None,
-            _ => Some(positive(options, "ttl_ms")?),
-        },
-        _ => None,
+    let released = if kind == K::Release {
+        Some(release(options, shard)?)
+    } else {
+        None
     };
-    let now = number(options, "now_ms")?;
+    let (now, ttl) = times(kind, options)?;
     if let Some(ttl) = ttl {
         validate::deadline(now, ttl)?;
     }
@@ -72,11 +69,32 @@ pub fn normalize_credit_call<'a>(
             shard_id: shard,
             ttl_ms: ttl.ok_or(E::InvalidField("ttl_ms"))?,
         },
-        K::Release => release(options, shard)?,
+        K::Release => released.ok_or(E::ReservationIds)?,
         K::Get => A::Get,
         K::Cleanup => A::Cleanup,
     };
-    NormalizedCreditCall::from_parts(scope, count, now, action)
+    Ok(NormalizedCreditCall {
+        scope,
+        shard_count: count,
+        now_ms: now,
+        action,
+    })
+}
+fn times(kind: K, options: &[(&str, V<'_>)]) -> Result<(Option<u64>, Option<u64>), E> {
+    if matches!(kind, K::Lease | K::Renew) {
+        let ttl = positive(options, "ttl_ms")?;
+        return Ok((number(options, "now_ms")?, Some(ttl)));
+    }
+    let now = number(options, "now_ms")?;
+    let ttl = if kind == K::Spend {
+        match field(options, "ttl_ms") {
+            None | Some(V::Nil) => None,
+            _ => Some(positive(options, "ttl_ms")?),
+        }
+    } else {
+        None
+    };
+    Ok((now, ttl))
 }
 fn measure(scope: &[u8], options: &[(&str, V<'_>)], maximum: usize) -> Result<(), E> {
     if maximum == 0 {
@@ -174,6 +192,7 @@ fn release<'a>(options: &[(&str, V<'a>)], shard_id: u64) -> Result<A<'a>, E> {
     let Some(V::Ids(reservation_ids)) = field(options, "reservation_ids") else {
         return Err(E::ReservationIds);
     };
+    validate::ids(reservation_ids)?;
     let amount = match number(options, "amount") {
         Ok(Some(n)) if usize::try_from(n).ok() == Some(reservation_ids.len()) => n,
         Ok(None) => u64::try_from(reservation_ids.len()).map_err(|_| E::ReservationIds)?,

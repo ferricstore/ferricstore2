@@ -338,6 +338,7 @@ fn catalog_prune_codec_and_revision_observations_remain_pure() -> CheckResult<()
 fn public_credit_callers_and_prepared_codecs_remain_pure() -> CheckResult<()> {
     for module in [
         "log::public_credit",
+        "log::model",
         "log::public_credit::encode",
         "log::public_credit::decode",
         "log::public_credit::ids",
@@ -351,8 +352,14 @@ fn public_credit_callers_and_prepared_codecs_remain_pure() -> CheckResult<()> {
             )?,
             Vec::<String>::new()
         );
-        assert!(!source_check("wf-ports", module, "use std::fs;")?.is_empty());
-        assert!(!source_check("wf-ports", module, "pub async fn hidden() {}")?.is_empty());
+        assert_ne!(
+            source_check("wf-ports", module, "use std::fs;")?,
+            Vec::<String>::new()
+        );
+        assert_ne!(
+            source_check("wf-ports", module, "pub async fn hidden() {}")?,
+            Vec::<String>::new()
+        );
     }
     Ok(())
 }

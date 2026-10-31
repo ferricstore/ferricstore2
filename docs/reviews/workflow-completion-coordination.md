@@ -60747,3 +60747,35 @@ but new invalid Spend now_ms plus invalid optional TTL returns TTL first, contra
 to pinned limit_store.ex61..65. The later invalid Release IDs versus now predicate
 is masked. Save this actual semantic failure before stage ordering correction.
 No new source mappings/full native/profile acceptance from these components.
+
+File-size gate refinement before creation: actual architecture checker rejects
+wf-ports/src/log.rs at402 physical lines. Approve new private log/model.rs,
+moving the EXISTING CodecLimits and PreparedBytes definitions/impls verbatim
+except explicit pub(super) fields preserving their old log-only visibility.
+Keep public log::{CodecLimits,PreparedBytes} via reexports; no API/layout/behavior,
+serialization, allocation or dependency changes. Root retains codec registry and
+dispatch. Classify log::model pure and include it in the new negative fixture.
+This grouping creates space by responsibility, not whitespace deletion or a
+larger budget. The 400-line production limit remains enforced.
+
+Public credit foundation focused verification: all43 governing-credit domain,
+32 codec,59 architecture,4 public storage and3 public Node cases pass (141 distinct
+cases). Strict workspace/all-target Clippy, formatting and diff checks pass.
+The all-operation storage test extracts only repeated full response decoding into
+a helper to remain below100 function lines; all assertions and decoder caps remain.
+Current source audit preserves all677 older test/benchmark files:672 whole plus
+four exact additive module registrations and one entire old architecture-test
+prefix. The framing model transfer is byte-exact after reversing field visibility;
+old public names remain unchanged. The original public codec four-test R0 prefix
+and complete saved Node R0 test file remain literal. New scalar-order and duplicate
+release-ID controls now pass; no retroactive RED claim for the latter.
+
+No all12/full-suite checkpoint is claimed for this unfinished public caller batch.
+The previous1570/all12 result still belongs to8850e33. Current focused receipt:
+/private/tmp/ferricstore2-public-credit-focused.json. Source accounting141/155/671
+and reference/runtime identities are untouched; no new source-case/full-profile/
+native/Linux/performance credit. NEXT complete the approved application parent,
+with real lookup before current source/repair/entropy, pre-mutation catalog repair,
+new-owner post-commit publication and exact original-ID uncertainty/retry handling.
+Then run one full frozen integration checkpoint for the coherent public batch.
+The full product objective remains active and all work remains solo.

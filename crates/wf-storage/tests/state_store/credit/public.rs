@@ -68,6 +68,16 @@ fn retained(outcome: O) -> TestResult<Box<wf_domain::workflow::request::Retained
     );
     Ok(outcome)
 }
+fn decode_public_outcome(
+    outcome: &wf_domain::workflow::request::RetainedOutcome,
+) -> TestResult<super::IdentifiedCreditReply> {
+    Ok(super::decode_credit_reply(
+        outcome.response(),
+        CreditLimits::default(),
+        16 * common::MIB,
+        32 * common::MIB,
+    )?)
+}
 #[test]
 fn public_credit_transaction_retains_original_spend_before_new_epoch_or_changed_preparation()
 -> TestResult {
@@ -97,12 +107,7 @@ fn public_credit_transaction_retains_original_spend_before_new_epoch_or_changed_
         }),
     )?;
     let original = retained(apply(&mut store, &first, 1)?)?;
-    let decoded = super::decode_credit_reply(
-        original.response(),
-        CreditLimits::default(),
-        16 * common::MIB,
-        32 * common::MIB,
-    )?;
+    let decoded = decode_public_outcome(&original)?;
     assert_eq!(decoded.decision, D::Spent { shard_id: 0 });
     assert_eq!(decoded.reservation_ids.len(), 2);
     let changed = frame(
@@ -196,12 +201,7 @@ fn public_credit_transaction_executes_renew_get_release_and_cleanup_from_public_
         &frame(b"renew", K::Renew, 1001, &renew, None)?,
         1,
     )?)?;
-    let reply = super::decode_credit_reply(
-        renewed.response(),
-        CreditLimits::default(),
-        16 * common::MIB,
-        32 * common::MIB,
-    )?;
+    let reply = decode_public_outcome(&renewed)?;
     assert_eq!(reply.decision, D::Renewed { shard_id: 0 });
     assert_eq!(
         reply
@@ -226,27 +226,13 @@ fn public_credit_transaction_executes_renew_get_release_and_cleanup_from_public_
         )?,
         2,
     )?)?;
-    let reply = super::decode_credit_reply(
-        spent.response(),
-        CreditLimits::default(),
-        16 * common::MIB,
-        32 * common::MIB,
-    )?;
+    let reply = decode_public_outcome(&spent)?;
     let get = retained(apply(
         &mut store,
         &frame(b"get", K::Get, 1003, &[], None)?,
         3,
     )?)?;
-    assert_eq!(
-        super::decode_credit_reply(
-            get.response(),
-            CreditLimits::default(),
-            16 * common::MIB,
-            32 * common::MIB
-        )?
-        .decision,
-        D::Owner
-    );
+    assert_eq!(decode_public_outcome(&get)?.decision, D::Owner);
     let release = [
         ("shard_id", V::Integer(0)),
         (
@@ -259,12 +245,7 @@ fn public_credit_transaction_executes_renew_get_release_and_cleanup_from_public_
         &frame(b"release", K::Release, 1004, &release, None)?,
         4,
     )?)?;
-    let reply = super::decode_credit_reply(
-        released.response(),
-        CreditLimits::default(),
-        16 * common::MIB,
-        32 * common::MIB,
-    )?;
+    let reply = decode_public_outcome(&released)?;
     assert_eq!(reply.decision, D::Released);
     assert_eq!(
         reply
@@ -281,13 +262,7 @@ fn public_credit_transaction_executes_renew_get_release_and_cleanup_from_public_
         5,
     )?)?;
     assert_eq!(
-        super::decode_credit_reply(
-            cleaned.response(),
-            CreditLimits::default(),
-            16 * common::MIB,
-            32 * common::MIB
-        )?
-        .decision,
+        decode_public_outcome(&cleaned)?.decision,
         D::Cleaned {
             deleted: 2,
             pending: false
@@ -312,13 +287,7 @@ fn public_credit_receipt_only_state_still_requires_actual_catalog_capability() -
         0,
     )?)?;
     assert_eq!(
-        super::decode_credit_reply(
-            result.response(),
-            CreditLimits::default(),
-            16 * common::MIB,
-            32 * common::MIB
-        )?
-        .decision,
+        decode_public_outcome(&result)?.decision,
         D::Rejected(super::Rejection::NotFound)
     );
     drop(store);

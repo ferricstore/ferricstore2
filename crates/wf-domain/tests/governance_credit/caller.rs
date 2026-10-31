@@ -221,8 +221,37 @@ fn public_credit_caller_typed_restore_cannot_bypass_configuration_or_deadline_va
 
 #[test]
 fn public_credit_caller_preserves_source_scalar_and_release_error_order() {
-    let spend=[("shard_id",V::Integer(0)),("amount",V::Integer(1)),("now_ms",V::Integer(-1)),("ttl_ms",V::Integer(-1))];
-    assert_eq!(normalize(K::Spend,b"scope",4,&spend,65535).err(),Some(E::InvalidField("now_ms")));
-    let release=[("shard_id",V::Integer(0)),("reservation_ids",V::Nil),("now_ms",V::Integer(-1))];
-    assert_eq!(normalize(K::Release,b"scope",4,&release,65535).err(),Some(E::ReservationIds));
+    let spend = [
+        ("shard_id", V::Integer(0)),
+        ("amount", V::Integer(1)),
+        ("now_ms", V::Integer(-1)),
+        ("ttl_ms", V::Integer(-1)),
+    ];
+    assert_eq!(
+        normalize(K::Spend, b"scope", 4, &spend, 65535).err(),
+        Some(E::InvalidField("now_ms"))
+    );
+    let release = [
+        ("shard_id", V::Integer(0)),
+        ("reservation_ids", V::Nil),
+        ("now_ms", V::Integer(-1)),
+    ];
+    assert_eq!(
+        normalize(K::Release, b"scope", 4, &release, 65535).err(),
+        Some(E::ReservationIds)
+    );
+}
+
+#[test]
+fn public_credit_caller_duplicate_release_ids_precede_invalid_clock() {
+    let ids = vec![b"a".to_vec(), b"a".to_vec()];
+    let release = [
+        ("shard_id", V::Integer(0)),
+        ("reservation_ids", V::Ids(Ids::Owned(&ids))),
+        ("now_ms", V::Integer(-1)),
+    ];
+    assert_eq!(
+        normalize(K::Release, b"scope", 4, &release, 65535).err(),
+        Some(E::ReservationIds)
+    );
 }
