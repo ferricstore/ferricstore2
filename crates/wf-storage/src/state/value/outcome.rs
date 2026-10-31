@@ -21,6 +21,7 @@ mod atomic_start;
 mod credit;
 mod governed_claim;
 mod policy;
+mod release_maintenance;
 mod step_continue;
 pub(crate) use policy::outcome_policy_validation_bytes_in_layout;
 pub use policy::{encode_outcome_profiled, outcome_policy_validation_bytes, scan_outcome_profiled};
@@ -53,12 +54,13 @@ impl ScannedRetainedOutcome<'_> {
         self.intent.version() == 19
     }
     pub(crate) const fn workflow_release_required(&self) -> bool {
-        matches!(
-            self.status,
-            RetainedStatus::IndexedRejected(
-                wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull
+        self.intent.version() == 18
+            || matches!(
+                self.status,
+                RetainedStatus::IndexedRejected(
+                    wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull
+                )
             )
-        )
     }
     pub(crate) const fn credit_catalog_required(&self) -> bool {
         use wf_domain::governance::identified::IdentifiedCreditRejection as R;

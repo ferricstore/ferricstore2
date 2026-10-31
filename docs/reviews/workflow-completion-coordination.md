@@ -61582,3 +61582,113 @@ any original ID as reusable. Raw batch write-call boundaries, malformed-owner
 fairness, complete source coverage, consensus/read barriers, services, platforms
 and measured performance remain open. Continue solo; do not infer a full product
 or original public API from this explicit trusted native paid leaf.
+
+2026-10-31 solo release-maintenance review: source reread at66586c596e271408d9184af32eb31cd7218c126e,
+raft/state_machine/sections/flow_governance_release_outbox.ex96..195 and
+flow/governance/release_outbox.ex43..78. Source completion validates the complete
+unique cohort before filtering acknowledged IDs; it does not advance the head.
+ACK deletes the bounded prefix and optional completion markers without requiring
+them. Its source argument guard precedes meta read, while the mathematical ACK
+checks already-removed prefix before stale cursor. Do not invent a completion-
+marker prerequisite or claim that ACK proves a remote credit release occurred.
+The future reconciler must derive ACK only from actual released/completed status.
+
+Approve domain governance/release/maintenance.rs: ReleaseMaintenanceRequest owns
+only its at-most256 original u64 completion sequence spine (or two ACK scalars),
+ReleaseMaintenanceRejection has only stale cursor/invalid ACK/invalid completion,
+ReleaseMaintenanceReply owns original meta/count, and ReleaseMaintenancePlan
+borrows the immutable command and existing pure ACK/completion effects. Corrupt
+meta is operational, never a retained business reason. Add only the corresponding
+WorkflowReleaseRejected retained status and ClientIntent::workflow_release_maintenance.
+Approve ports log/release_maintenance.rs with request.rs/model.rs/response.rs,
+PreparedReleaseMaintenanceRequest, explicit op16/intent18/response15 and fixed
+FWRM1 reply. Scan the whole command/EOF/digest before ownership; move original
+header owners and the small command spine apart before planning, avoiding header
+or ID clones. The canonical intent covers the complete original command order.
+Private frame scalar/cohort admission is explicit; this is not raw argument-
+error parity. Old/scalar codecs remain closed; selected receipt custody requires
+actual GC4 or GC5 even when the queue has already drained.
+
+Approve transaction/release_maintenance.rs and state/redb/release/maintenance.rs
+for retained-first execution and one consumed Immediate commit of exact marks/
+deletions/meta/original outcome/control. Recheck actual namespace/capability,
+predecessor, full mathematical controls and current meta. Pending intents must
+exist and fully decode; existing optional markers must validate before deletion
+or replacement. Scope/read/output/temporary budgets stay cumulative. No separate
+seed/delete API, success stub or caller freshness/authority boolean. Approve
+state/value/outcome/release_maintenance.rs for explicit layout8 receipt grammar.
+Approve workflow_values/release/maintenance.rs and its custody.rs/flow.rs children,
+plus credit_codec/release_maintenance.rs, for bounded sparse/prefix behavior,
+original replay, old receipt-only downgrade, failure atomicity/snapshots and a
+real paid Claim -> terminal -> restart -> exact credit Release -> mark -> ACK
+loop preserving a running sibling. New files stay under400/600 and fn100/depth4/
+complexity25. This is solo review, not independent review or full source credit;
+no new dependency, crate edge, live service or consensus acceptance is inferred.
+Approve private ReleaseMaintenanceEffect as the single ACK/completion alternative
+inside the sealed plan, avoiding mutually inconsistent optional effect fields.
+Publication-frame review: carry the original encoded bytes and immutable command
+borrow into the consumed backend. Add verify_release_maintenance_request to
+compare the complete canonical frame without allocation and return its actual
+request/intent/digest. The backend joins these bytes to the recorded stamp and
+prepared identity, rather than trusting a mathematically matching reply alone.
+This adds no caller authority flag, second query owner or new model.
+
+Release-maintenance result: all1302 domain/ports/storage tests/doctests pass,
+including332 storage and47 credit codec cases. The nine new storage cases cover
+unmarked ACK, bounded256-prefix deletion, sparse holes, full tail refusal,
+idempotent old-prefix ordering, exhausted monotone sequence space, retained
+original replies, received snapshot, operational rollback and real sync
+uncertainty/fencing. Receipt-only GC4 -> GC3 downgrade fails with zero queue rows;
+removing only that receipt restores a valid cohort. Scalar encoding remains
+closed. Four new codec cases compare independent original request/reply bytes,
+every request truncation and complete EOF, scalar/cohort/owner caps, original
+sequence validation, corrupt-meta operational failure and full-frame mismatch.
+
+The actual composed loop uses real Lease/Spend and a two-record paid Claim,
+queues the terminal record's original NUL-containing ID, restarts, receives its
+snapshot, classifies the actual same-guard record/binding, releases that exact
+credit ID, marks completion and ACKs. Retained credit/ACK retries return their
+original outcomes. After canonical reopen, exact family13 and24 identities prove
+the released ID is Released without a consumed mark and the still-running
+sibling is Active with its mark. Owner in-use stays1. No ID is regenerated and
+no manual queue fixture is presented as paid Claim in this real-loop case.
+
+R0 /private/tmp/ferricstore2-release-maintenance-r0.log is an actual missing-API
+compile failure. The initial storage case passes after implementation; all later
+cases are supplemental, not retrospective behavior RED. A recovery-header local
+borrow and temporary Box dereference were compilation mistakes, not product
+RED. Self-review closed simultaneous redb table reopening before write by
+dropping scoped read handles within the same exclusive transaction. Full-frame
+verification now reconstructs exact canonical bytes without ownership, verifies
+the prepared digest and recorded stamp, and compares the fresh original request
+and intent. Metadata/control checks repeat under the same guard before effects.
+No caller authority/freshness boolean is introduced.
+
+Keep the preexisting ReleaseOutboxState type unchanged: adding Debug made old
+tests trigger new equality lints. Instead, only the new reply has a complete
+manual Debug representation. No old assertion or threshold is altered. The
+outcome profile/scratch preflight is extracted coherently to preserve fn100;
+test helpers retain every original scenario assertion and keep fn100. All400/
+600 file, depth4 and complexity25 rules remain. Fixed256 numeric validation
+scratch follows the actual source bound; one fallible command spine moves apart
+from original header owners, avoiding clones. No measured speedup is claimed.
+
+Strict workspace/all-target Clippy, all60 architecture cases, cargo progress,
+fmt and diff pass. The broad regression used the same production tree; only a
+new test's final assertion block was extracted afterward, and the final nine-
+case rerun passes. The final input manifest contains2066 non-Markdown inputs/
+1477 Rust files. Source audit againstcdc3b30 preserves696 selected old test/bench
+inputs:694 whole and two exact additive module registrations. Scalar encoding
+and the legacy response dispatcher are verbatim. Frozen mapping/progress ledgers
+stay byte-identical:141/155/671; runtime5903/4222/1681/1655. No source-case credit,
+all12-current, independent review, native Elixir/Linux, service, speedup, primary
+code adoption or push is claimed. Evidence is /private/tmp/ferricstore2-release-
+maintenance-{r0,first,verified-frame,final-writer,core-regression,complete-clippy,
+final-arch,progress}.log plus source-audit.json and inputs.json.
+
+NEXT actual GC4/5 Node body/execution selection, including historical/received/
+purged replay; automatic known-result reconciliation/cursor progression; and
+public policy/NoDemand/refund/unused/Unknown ownership plus raw optional partition
+identity. Source write-call/ID/cross-generation/fairness obligations, all original
+scenarios/profiles, consensus/read barriers, services and both platform/performance
+acceptance remain required. Keep the full goal active and continue solo.

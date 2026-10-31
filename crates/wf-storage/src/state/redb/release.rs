@@ -4,6 +4,7 @@ use wf_ports::{consensus::WorkflowValueDefaults, state::StateTransactionError as
 use wf_types::identity::{GroupId, RecoveryId};
 pub(crate) mod claim;
 pub(super) mod claimed;
+pub(crate) mod maintenance;
 mod plan;
 mod read;
 mod write;

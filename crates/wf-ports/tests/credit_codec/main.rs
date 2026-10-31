@@ -12,6 +12,7 @@ mod framing;
 mod governed_claim;
 mod public_credit;
 mod release;
+mod release_maintenance;
 mod view;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

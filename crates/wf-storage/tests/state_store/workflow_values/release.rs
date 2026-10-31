@@ -10,6 +10,7 @@ use wf_storage::state::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
 use wf_types::{identity::PartitionId, version::TimestampMillis};
 mod claimed;
 mod custody;
+mod maintenance;
 mod mutations;
 
 fn fixture(path: &Path) -> TestResult {

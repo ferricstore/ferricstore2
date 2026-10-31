@@ -71,6 +71,14 @@ pub struct ClientIntent {
 }
 
 impl ClientIntent {
+    /// Canonical private release maintenance; supplies no remote-release authority.
+    #[must_use]
+    pub const fn workflow_release_maintenance(digest: [u8; 32]) -> Self {
+        Self {
+            version: 18,
+            digest,
+        }
+    }
     /// Private paid Claim identity, excluding generated payment IDs and epoch.
     #[must_use]
     pub const fn governed_claim(digest: [u8; 32]) -> Self {

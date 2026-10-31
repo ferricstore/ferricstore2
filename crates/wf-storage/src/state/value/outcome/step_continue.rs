@@ -17,6 +17,9 @@ pub(crate) fn scan_outcome_in_layout<'a>(
     profile: (PolicySchemaLimits, &mut PolicySchemaCharge, usize),
     layout: u16,
 ) -> Result<ScannedRetainedOutcome<'a>, StateValueError> {
+    if layout == 8 && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| Ok(intent == 18))? {
+        return super::release_maintenance::scan(bytes, scope, request, admission, maximum);
+    }
     if layout == 8 && with_frame(bytes, maximum, |_, intent, _, _, _, _, _| Ok(intent == 19))? {
         return super::governed_claim::scan(bytes, scope, request, admission, maximum);
     }
@@ -52,6 +55,9 @@ pub(crate) fn encode_outcome_in_layout(
     admission: AdmissionLimits,
     layout: u16,
 ) -> Result<Vec<u8>, StateValueError> {
+    if layout == 8 && outcome.intent().version() == 18 {
+        return super::release_maintenance::encode(outcome, maximum, admission);
+    }
     if layout == 8 && outcome.intent().version() == 19 {
         return super::governed_claim::encode(outcome, maximum, admission);
     }

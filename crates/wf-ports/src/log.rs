@@ -49,6 +49,7 @@ pub use governed_claim::{
 };
 mod common;
 mod release;
+mod release_maintenance;
 pub use common::{CodecError, normal_recovery_header, stored_value_recovery_header};
 pub use common::{step_continue_recovery_header, stored_step_continue_recovery_header};
 pub use record_batch::{encode_stored_step_continue, prepare_stored_step_continue};
@@ -56,6 +57,13 @@ pub use release::{
     ReleaseBindingRef, ReleaseReconcileCursor, decode_release_cursor, encode_release_binding,
     encode_release_cursor, encode_release_intent, encode_release_meta, inspect_release_binding,
     inspect_release_intent, inspect_release_meta, reject_workflow_release_backlog,
+};
+pub use release_maintenance::{
+    PreparedReleaseMaintenanceRequest, decode_release_maintenance_reply,
+    encode_release_maintenance_reply, encode_release_maintenance_request,
+    prepare_release_maintenance_request, release_maintenance_recovery_header,
+    release_maintenance_request_intent, release_maintenance_retained_summary,
+    verify_release_maintenance_reply, verify_release_maintenance_request,
 };
 mod complete_policy;
 mod control;

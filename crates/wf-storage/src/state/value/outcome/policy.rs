@@ -117,7 +117,7 @@ fn validation_bytes(
                     .and_then(|n| n.checked_add(256))
                     .ok_or(StateValueError::LengthOverflow);
             }
-            if matches!(intent, 13 | 14) && layout == Some(8) {
+            if matches!(intent, 13 | 14 | 18) && layout == Some(8) {
                 return Ok(1024);
             }
             if intent == 12 && layout == Some(8) {

@@ -1,6 +1,11 @@
 //! Bounded release-outbox decisions, independent from actual persisted authority.
+mod maintenance;
 mod model;
 mod queue;
+pub use maintenance::{
+    ReleaseMaintenancePlan, ReleaseMaintenanceRejection, ReleaseMaintenanceReply,
+    ReleaseMaintenanceRequest, prepare_release_maintenance, validate_release_completion_sequences,
+};
 pub use model::{
     GovernanceReservation, LimitEnforcement, ReleaseAckPlan, ReleaseAppend, ReleaseCompletionPlan,
     ReleaseDisposition, ReleaseIntent, ReleaseIntentRef, ReleaseOutboxError, ReleaseOutboxState,

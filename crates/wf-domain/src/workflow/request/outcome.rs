@@ -38,6 +38,8 @@ pub enum RetainedStatus {
     GovernanceRejected(crate::governance::identified::IdentifiedCreditRejection),
     /// Original business-only catalog acknowledgement refusal.
     CreditCatalogRejected(crate::governance::catalog::CreditCatalogAckRejection),
+    /// Original bounded workflow-release maintenance business refusal.
+    WorkflowReleaseRejected(crate::governance::release::ReleaseMaintenanceRejection),
 }
 
 /// Policy error admitted for retention only when it is a business decision.
@@ -232,6 +234,20 @@ fn validate_response_profile(
     response_version: u16,
     status: RetainedStatus,
 ) -> Result<(), RequestValueError> {
+    if intent.version() == 18 {
+        return if response_version == 15
+            && matches!(
+                status,
+                RetainedStatus::Accepted | RetainedStatus::WorkflowReleaseRejected(_)
+            ) {
+            Ok(())
+        } else {
+            Err(RequestValueError::UnsupportedVersion)
+        };
+    }
+    if matches!(status, RetainedStatus::WorkflowReleaseRejected(_)) {
+        return Err(RequestValueError::UnsupportedVersion);
+    }
     if intent.version() == 19 {
         return if response_version == 16
             && matches!(

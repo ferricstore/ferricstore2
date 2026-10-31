@@ -180,20 +180,7 @@ pub(super) fn write_outcome(
     scope: &RequestScope,
     outcome: &RetainedOutcome,
 ) -> Result<(), StateTransactionError> {
-    if outcome.intent().version() == 19 {
-        tx.require_governed_claim()?;
-    }
-    if matches!(
-        outcome.status(),
-        RetainedStatus::IndexedRejected(
-            wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull
-        )
-    ) {
-        tx.require_workflow_release()?;
-    }
-    if outcome.intent().version() == 12 {
-        tx.temporary(18_432)?;
-    }
+    admit_outcome_profile(tx, outcome)?;
     if outcome.response().len() > tx.admission.decision_bytes() {
         return Err(StateTransactionError::Limit);
     }
@@ -277,4 +264,29 @@ pub(super) fn write_outcome(
     let encoded = value::encode_outcome_in_layout(outcome, size, tx.admission, tx.layout)
         .map_err(value_error)?;
     publication::put(tx, &key, &encoded)
+}
+
+fn admit_outcome_profile(
+    tx: &RedbStateTransaction<'_>,
+    outcome: &RetainedOutcome,
+) -> Result<(), StateTransactionError> {
+    if outcome.intent().version() == 18 {
+        tx.require_workflow_release()?;
+        tx.temporary(1024)?;
+    }
+    if outcome.intent().version() == 19 {
+        tx.require_governed_claim()?;
+    }
+    if matches!(
+        outcome.status(),
+        RetainedStatus::IndexedRejected(
+            wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull
+        )
+    ) {
+        tx.require_workflow_release()?;
+    }
+    if outcome.intent().version() == 12 {
+        tx.temporary(18_432)?;
+    }
+    Ok(())
 }

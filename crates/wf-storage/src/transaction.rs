@@ -34,8 +34,10 @@ pub use original_policy::{
 mod load;
 mod observations;
 mod record_batch;
+mod release_maintenance;
 mod value_batch;
 mod workflow_release;
+pub use release_maintenance::apply_release_maintenance_transaction;
 pub use value_batch::apply_stored_step_continue_transaction;
 pub(crate) use value_batch::{ValuePublicationPlan, ValueStep};
 pub use workflow_release::apply_workflow_release_transaction;

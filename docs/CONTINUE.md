@@ -2,7 +2,49 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Latest native paid-Claim increment after1af0a64: op17/intent19/response16 now
+Latest release-maintenance increment aftercdc3b30: explicit op16/intent18/
+response15 implements bounded sparse completion and prefix ACK on actual GC4/5.
+Completion preserves the head; ACK removes exact intents and optional markers,
+including a source-compatible unmarked prefix and idempotent already-removed
+prefix. Whole original command validation precedes filtering old completion IDs.
+The backend independently verifies the complete original frame, recorded stamp,
+prepared digest, current meta and original reply before one consumed Immediate
+commit. Scalar/old codecs remain closed; receipt-only custody also requires GC4/5.
+
+The real paid flow now executes Lease/Spend -> Claim -> terminal -> restart ->
+received snapshot -> exact original-ID credit Release -> completion -> ACK.
+The released NUL-containing ID is Released with no consumed marker; the running
+sibling's exact ID is Active with its marker. Original credit and ACK replies
+replay unchanged. This is an executed storage composition, not an automatic
+worker, public API, leader/read-barrier or accepted Raft callback implementation.
+
+All1302 domain/ports/storage tests/doctests pass, including332 storage and47
+credit codec cases. Nine new storage and four new codec cases execute sparse
+holes, stale cursor/tail refusal,256-prefix bound, exhausted sequence space,
+snapshot/original replay, real uncertainty/fencing, resource refusal, empty-queue
+receipt-only downgrade and the real paid release loop. Final nine-case rerun
+covers a test-helper extraction; production inputs did not change afterward.
+Strict workspace/all-target Clippy, all60 architecture cases, progress, fmt and
+diff pass. Source audit preserves696 selected old test/bench inputs:694 whole
+and two exact additive registrations. Scalar serialization and legacy response
+dispatch remain verbatim. Source ledgers stay byte-identical; no source credit.
+Final input manifest:2066 non-Markdown files/1477 Rust files.
+
+Evidence: /private/tmp/ferricstore2-release-maintenance-{r0,first,verified-frame,
+final-writer,core-regression,complete-clippy,final-arch,progress}.log plus
+source-audit.json and inputs.json. The initial RED is missing API compilation;
+later cases are supplemental, not retrospective behavior TDD. No all12 rerun,
+independent review, native Linux/Elixir, live service or measured-speedup claim.
+
+NEXT integrate actual GC4/5 Node execution and historical/received/purged body
+audits, and build the real reconciler/cursor lifecycle using known results.
+Finish public Claim policy/NoDemand/unused/refund/Unknown composition and original
+optional partition identity. Raw public batch/write-call/ID recipes, source
+fairness and complete scenarios/profiles, consensus/read barriers, application/
+transports, Linux/macOS and performance acceptance remain open. Keep the full
+goal active and solo; do not mistake manual storage composition for a live worker.
+
+Prior native paid-Claim increment after1af0a64: op17/intent19/response16 now
 executes on actual GC5. It validates the live paid generation and every original
 ID under the same writer, binds only the used prefix to actual accepted records,
 and atomically publishes consumed markers, records/indexes/history/value
