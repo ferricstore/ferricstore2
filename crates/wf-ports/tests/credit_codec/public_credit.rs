@@ -281,36 +281,17 @@ fn public_credit_reply_inspection_accepts_canonical_rejection_and_checks_full_fr
 fn public_credit_reply_inspection_binds_scope_operation_shard_count_and_original_ids() -> TestResult
 {
     use wf_domain::{
-        governance::{
-            caller::CreditIdList,
-            credit::CreditLimits,
-            identified::{IdentifiedCreditDecision as D, IdentifiedCreditReply},
-        },
+        governance::{caller::CreditIdList, credit::CreditLimits},
         workflow::{
             admission::AdmissionLimits,
             request::{ClientIntent, RetainedStatus},
         },
     };
     use wf_ports::log::{
-        PublicCreditReplyExpectation as Expected, decode_credit_owner, encode_credit_reply,
-        inspect_public_credit_reply as inspect,
+        PublicCreditReplyExpectation as Expected, inspect_public_credit_reply as inspect,
     };
-    let owner = decode_credit_owner(
-        &super::framing::independent_owner(true),
-        CreditLimits::default(),
-        16384,
-        32768,
-    )?;
     let ids = vec![b"a".to_vec(), b"b".to_vec()];
-    let bytes = encode_credit_reply(
-        &IdentifiedCreditReply {
-            decision: D::Spent { shard_id: 0 },
-            owner: Some(owner),
-            reservation_ids: ids.clone(),
-        },
-        16384,
-        32768,
-    )?;
+    let bytes = spent_reply_fixture()?;
     let intent = ClientIntent::public_credit([5; 32]);
     let expected = Expected {
         scope: b"x",
@@ -368,7 +349,7 @@ fn public_credit_reply_inspection_binds_scope_operation_shard_count_and_original
     for end in 0..bytes.len() {
         assert!(check(&bytes[..end], expected).is_err());
     }
-    let limits = AdmissionLimits::new(64, bytes.len() - 1, 100000)?;
+    let limits = AdmissionLimits::new(64, bytes.len() - 1, 100_000)?;
     assert_eq!(
         inspect(
             intent,
@@ -381,4 +362,28 @@ fn public_credit_reply_inspection_binds_scope_operation_shard_count_and_original
         Err(E::ByteLimit)
     );
     Ok(())
+}
+
+// Independent healthy owner recipe; expected ID bindings remain in the test.
+fn spent_reply_fixture() -> TestResult<Vec<u8>> {
+    use wf_domain::governance::{
+        credit::CreditLimits,
+        identified::{IdentifiedCreditDecision as D, IdentifiedCreditReply},
+    };
+    use wf_ports::log::{decode_credit_owner, encode_credit_reply};
+    let owner = decode_credit_owner(
+        &super::framing::independent_owner(true),
+        CreditLimits::default(),
+        16384,
+        32768,
+    )?;
+    Ok(encode_credit_reply(
+        &IdentifiedCreditReply {
+            decision: D::Spent { shard_id: 0 },
+            owner: Some(owner),
+            reservation_ids: vec![b"a".to_vec(), b"b".to_vec()],
+        },
+        16384,
+        32768,
+    )?)
 }

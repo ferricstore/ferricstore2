@@ -220,6 +220,28 @@ impl PublicCreditSubmitPort for PublicCreditFixture {
             self.fault.set(PublicCreditFault::None);
             return M::NotSubmitted(N::Unavailable);
         }
+        if self.fault.get() == PublicCreditFault::ConcurrentGet {
+            self.fault.set(PublicCreditFault::None);
+            // Another actual proposal of the same caller wins with an earlier stamp.
+            let concurrent = (|| -> TestResult {
+                let caller = normalize_credit_call(K::Get, b"global", 4, &[], 65535)?;
+                let earlier = wf_ports::log::encode_public_credit_request(
+                    scope,
+                    id,
+                    caller,
+                    f::clock(1001, 0, 1001)?,
+                    None,
+                    f::driver_limits().codec,
+                    16 * f::MIB,
+                )?;
+                self.commit(id, &earlier)?;
+                Ok(())
+            })();
+            if let Err(error) = concurrent {
+                self.last_error = Some(error.to_string());
+                return M::Unknown(U::CommitUncertain);
+            }
+        }
         match self.commit(id, &frame) {
             Ok(outcome) => match self.fault.replace(PublicCreditFault::None) {
                 PublicCreditFault::LosePublic => M::Unknown(U::Unavailable),

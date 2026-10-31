@@ -374,17 +374,34 @@ fn public_credit_shared_frame_type_does_not_allow_synchronization_effects() -> C
         "pub struct Frame(std::sync::Arc<crate::log::PreparedBytes>);",
         "use std::sync::Arc as Shared; pub struct Frame(Shared<crate::log::PreparedBytes>);",
     ] {
-        assert_eq!(source_check("wf-ports", module, source)?, Vec::<String>::new());
+        assert_eq!(
+            source_check("wf-ports", module, source)?,
+            Vec::<String>::new()
+        );
     }
     for source in [
-        "use std::sync;", "use std::sync::*;", "use std::sync::Mutex;",
-        "use std::sync::RwLock;", "use std::sync::atomic::AtomicBool;",
-        "use std::thread;", "use std::sync::Arc; use std::sync::Mutex; pub struct Frame(Arc<Mutex<u8>>);",
+        "use std::sync;",
+        "use std::sync::*;",
+        "use std::sync::Mutex;",
+        "use std::sync::RwLock;",
+        "use std::sync::atomic::AtomicBool;",
+        "use std::thread;",
+        "use std::sync::Arc; use std::sync::Mutex; pub struct Frame(Arc<Mutex<u8>>);",
     ] {
-        assert_ne!(source_check("wf-ports", module, source)?, Vec::<String>::new());
+        assert_ne!(
+            source_check("wf-ports", module, source)?,
+            Vec::<String>::new()
+        );
     }
-    for module in ["log::public_credit", "log::model", "consensus::catalog_publication"] {
-        assert_ne!(source_check("wf-ports", module, "use std::sync::Arc;")?, Vec::<String>::new());
+    for module in [
+        "log::public_credit",
+        "log::model",
+        "consensus::catalog_publication",
+    ] {
+        assert_ne!(
+            source_check("wf-ports", module, "use std::sync::Arc;")?,
+            Vec::<String>::new()
+        );
     }
     Ok(())
 }

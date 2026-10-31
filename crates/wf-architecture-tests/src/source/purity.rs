@@ -179,6 +179,14 @@ impl Inspector<'_, '_> {
         if exact_metadata && Self::metadata_iterator(path) {
             return;
         }
+        // Only the approved immutable frame owner in this neutral port signature.
+        if self.context.package == "wf-ports"
+            && self.module == "consensus::public_credit"
+            && matches!(path, [namespace, module, item]
+                if namespace == "std" && module == "sync" && item == "Arc")
+        {
+            return;
+        }
         if path
             .get(1)
             .is_none_or(|module| !PURE_MODULES.contains(&module.as_str()))

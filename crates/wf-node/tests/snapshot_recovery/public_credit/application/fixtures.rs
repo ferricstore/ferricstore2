@@ -36,6 +36,7 @@ pub(super) enum PublicCreditFault {
     OwnerRead,
     LookupUnknown,
     RefusePublic,
+    ConcurrentGet,
 }
 pub(super) struct PublicCreditFixture {
     pub(super) root: PathBuf,

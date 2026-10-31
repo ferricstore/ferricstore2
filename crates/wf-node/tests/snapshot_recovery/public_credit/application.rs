@@ -419,3 +419,20 @@ fn public_credit_application_unknown_spend_compensation_preserves_sibling_reserv
     assert_eq!(port.in_use()?, 1);
     port.cleanup()
 }
+
+#[test]
+fn public_credit_application_concurrent_same_caller_returns_earlier_original_time() -> TestResult {
+    let mut port = Fixture::new()?;
+    port.seed()?;
+    assert!(matches!(port.call(K::Get, b"register-before-race", &[])??, R::Retained(_)));
+    port.now = 1002;
+    port.fault.set(Fault::ConcurrentGet);
+    let result = port.call(K::Get, b"concurrent-get", &[])??;
+    let R::Retained(outcome) = result else {
+        return Err("valid earlier original was not returned".into());
+    };
+    assert_eq!(outcome.original_time().get(), 1001);
+    assert_eq!(outcome.original_position().index().get(), 3);
+    assert_eq!(outcome.request().as_bytes(), b"concurrent-get");
+    port.cleanup()
+}
