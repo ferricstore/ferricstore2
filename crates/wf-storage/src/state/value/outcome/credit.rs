@@ -46,7 +46,7 @@ pub(super) fn scan<'a>(
          response_version| {
             if !matches!(
                 (version, response_version),
-                (12, 10) | (13, 11) | (14, 12) | (15, 13) | (16, 14)
+                (12 | 17, 10) | (13, 11) | (14, 12) | (15, 13) | (16, 14)
             ) {
                 return Err(StateValueError::UnsupportedVersion);
             }
@@ -59,7 +59,9 @@ pub(super) fn scan<'a>(
             {
                 return Err(StateValueError::InvalidValue);
             }
-            let intent = if version == 16 {
+            let intent = if version == 17 {
+                ClientIntent::public_credit(digest)
+            } else if version == 16 {
                 ClientIntent::governance_catalog_prune(digest)
             } else if version == 15 {
                 ClientIntent::governance_catalog_progress(digest)

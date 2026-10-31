@@ -18,7 +18,10 @@ use wf_domain::workflow::request::{
     RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus,
     gate::{GateDecision, PointGateView, inspect_point_request},
 };
-use wf_ports::log::{PreparedCreditRequest, encode_credit_reply_parts, prepare_credit_request};
+use wf_ports::log::{
+    PreparedCreditRequest, encode_credit_reply_parts, prepare_credit_request,
+    prepare_public_credit_request,
+};
 use wf_ports::state::{GroupApplyStore, GroupApplyTransaction, StateTransactionError as S};
 use wf_types::{
     identity::{GroupId, RecoveryId, RequestId, TenantId},
@@ -33,8 +36,24 @@ pub(super) fn apply(
     limits: Limits,
     credit: CreditLimits,
 ) -> Result<Outcome, E> {
+    apply_profile(store, scope, encoded, log, limits, credit, false)
+}
+
+pub(super) fn apply_profile(
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: Limits,
+    credit: CreditLimits,
+    public: bool,
+) -> Result<Outcome, E> {
     let (available, credit) = workspace(limits, credit)?;
-    let prepared = prepare_credit_request(encoded, limits.codec, available)?;
+    let prepared = if public {
+        prepare_public_credit_request(encoded, limits.codec, available)?
+    } else {
+        prepare_credit_request(encoded, limits.codec, available)?
+    };
     let header = prepared.header(log);
     if header.scope != scope {
         return Err(S::InvalidChanges.into());
@@ -47,6 +66,15 @@ pub(super) fn apply(
         limits.maximum_read_bytes,
         limits.maximum_adapter_bytes,
     )?;
+    if public {
+        let (format, count) = tx.require_identified_credit_profile()?;
+        if format != 2 {
+            return Err(S::UnsupportedPolicyProfile.into());
+        }
+        if count != prepared.command().shard_count {
+            return Err(S::InvalidChanges.into());
+        }
+    }
     let expected = tx.control()?;
     let nonempty = tx.retained_nonempty(scope.tenant())?;
     let original = tx.outcome(scope.tenant(), header.request)?;

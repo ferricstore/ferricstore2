@@ -86,7 +86,7 @@ fn validate(
         _ => RetainedStatus::Accepted,
     };
     if outcome.scope() != scope
-        || outcome.intent().version() != 12
+        || !matches!(outcome.intent().version(), 12 | 17)
         || outcome.response_version() != 10
         || outcome.status() != status
         || Some(outcome.original_position()) != control.next().last_entry().map(EntryIdentity::log)

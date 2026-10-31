@@ -100,7 +100,7 @@ fn outcome(
         layout,
     )
     .map_err(value_error)?;
-    if matches!(scanned.intent_version(), 9 | 11 | 12 | 13 | 14 | 15 | 16) {
+    if matches!(scanned.intent_version(), 9 | 11..=17) {
         tx.temporary(total(
             scanned.owned_bytes(),
             [
@@ -110,7 +110,8 @@ fn outcome(
         )?)?;
         let facts = super::super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
         if facts.alias_format != 2
-            || (matches!(scanned.intent_version(), 12 | 13) && facts.credit_shard_count.is_none())
+            || (matches!(scanned.intent_version(), 12 | 13 | 17)
+                && facts.credit_shard_count.is_none())
             || (scanned.credit_catalog_required() && !facts.credit_catalog)
             || (scanned.intent_version() == 14 && !facts.governance_catalog.enabled())
             || (scanned.intent_version() == 15 && !facts.governance_catalog.progress())

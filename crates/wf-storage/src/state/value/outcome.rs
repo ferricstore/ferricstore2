@@ -50,7 +50,7 @@ pub struct ScannedRetainedOutcome<'input> {
 impl ScannedRetainedOutcome<'_> {
     pub(crate) const fn credit_catalog_required(&self) -> bool {
         use wf_domain::governance::identified::IdentifiedCreditRejection as R;
-        self.intent.version() == 13
+        matches!(self.intent.version(), 13 | 17)
             || matches!(
                 self.status,
                 RetainedStatus::GovernanceRejected(

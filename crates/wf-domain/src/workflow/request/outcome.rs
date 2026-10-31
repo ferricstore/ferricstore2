@@ -250,7 +250,7 @@ fn validate_response_profile(
     if matches!(status, RetainedStatus::CreditCatalogRejected(_)) {
         return Err(RequestValueError::UnsupportedVersion);
     }
-    if intent.version() == 12 {
+    if matches!(intent.version(), 12 | 17) {
         return if response_version == 10
             && matches!(
                 status,

@@ -333,3 +333,26 @@ fn catalog_prune_codec_and_revision_observations_remain_pure() -> CheckResult<()
     }
     Ok(())
 }
+
+#[test]
+fn public_credit_callers_and_prepared_codecs_remain_pure() -> CheckResult<()> {
+    for module in [
+        "log::public_credit",
+        "log::public_credit::encode",
+        "log::public_credit::decode",
+        "log::public_credit::ids",
+        "log::public_credit::policy",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                module,
+                "use wf_domain::governance::caller::NormalizedCreditCall;"
+            )?,
+            Vec::<String>::new()
+        );
+        assert!(!source_check("wf-ports", module, "use std::fs;")?.is_empty());
+        assert!(!source_check("wf-ports", module, "pub async fn hidden() {}")?.is_empty());
+    }
+    Ok(())
+}

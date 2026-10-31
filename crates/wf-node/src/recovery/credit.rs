@@ -35,6 +35,14 @@ impl CreditRecoveryProfile {
 }
 
 impl CommittedRecoveryLimits {
+    /// Selects public credit callers plus existing catalog-capable private frames.
+    /// # Errors
+    /// Refuses invalid count, limits or unsupported recovery selection.
+    pub fn with_public_credit_limits(self, shards: u64, credit: CreditLimits) -> Result<Self, E> {
+        let _ = (self, shards, credit);
+        Err(E::UnsupportedEntry)
+    }
+
     /// Selects actual credit-format2 catalog replay and its immutable shard count.
     /// # Errors
     /// Refuses unsupported profile, invalid count or whole-call work overflow.

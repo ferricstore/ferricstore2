@@ -117,8 +117,5 @@ pub fn apply_public_credit_transaction(
     limits: RecordBatchTransactionLimits,
     credit: CreditLimits,
 ) -> Result<RecordBatchTransactionOutcome, CreditTransactionError> {
-    let _ = (store, scope, encoded, log, limits, credit);
-    Err(CreditTransactionError::State(
-        StateTransactionError::UnsupportedPolicyProfile,
-    ))
+    driver::apply_profile(store, scope, encoded, log, limits, credit, true)
 }

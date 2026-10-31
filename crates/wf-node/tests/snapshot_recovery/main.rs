@@ -21,6 +21,7 @@ mod governance_catalog;
 mod limits;
 mod original_policy;
 mod provenance;
+mod public_credit;
 mod replay;
 mod workflow_values;
 

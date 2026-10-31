@@ -60723,3 +60723,15 @@ the deliberate public-driver UnsupportedPolicyProfile, while old-credit profile
 refusal preserves the whole actual cohort. Later original receipt replay versus
 changed prepared epoch/entropy and changed-caller conflict remain masked. Save
 before joining shared driver/outcome registries; no constructor/setup RED claim.
+
+Shared public storage now passes all four selected cases, including all six
+operations, unchanged original spend despite new epoch/entropy, changed caller
+conflict and receipt-only capability downgrade refusal. Two later all-operation/
+downgrade controls are supplemental, not original RED. Node predecessor now
+compiles and all three cases fail at the deliberate unsupported public recovery
+selection. Actual preapplied state and older-mode exact UnsupportedEntry refusal
+pass; later replay/audit/snapshot assertions remain masked. Corrected an initial
+older-mode expected error from Codec(UnsupportedTag) to the actual UnsupportedEntry
+before saving; do not count that oracle mistake as a product bug. Save before
+Node public-profile/audit/replay bodies. Pure-path negative checks are additional
+architecture coverage after codecs, without an original RED claim.

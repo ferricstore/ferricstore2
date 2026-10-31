@@ -244,7 +244,7 @@ pub fn credit_retained_summary(
     admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), CodecError> {
     use wf_domain::governance::identified::IdentifiedCreditDecision as D;
-    if intent.version() != 12 || response_version != 10 {
+    if !matches!(intent.version(), 12 | 17) || response_version != 10 {
         return Err(CodecError::UnsupportedVersion);
     }
     let (decision, count) = response::inspect(
