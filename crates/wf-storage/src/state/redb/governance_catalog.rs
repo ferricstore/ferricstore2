@@ -2,6 +2,7 @@
 
 use super::{RedbStateStore, RedbStateTransaction, StateStoreGenesis, StateStoreLimits};
 use wf_domain::workflow::request::RequestScope;
+mod prune;
 use wf_ports::{
     consensus::WorkflowValueDefaults,
     state::{GovernanceCatalogPage, GovernanceCatalogRead, StateTransactionError as E},

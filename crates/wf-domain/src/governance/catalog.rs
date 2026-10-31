@@ -5,12 +5,14 @@ use crate::workflow::MAX_EXACT_MILLIS as MAX;
 mod ack;
 mod membership;
 mod progress;
+mod prune;
 pub use ack::{
     CreditCatalogAckPlan, CreditCatalogAckRejection, CreditCatalogAckReply,
     CreditCatalogAckRequest, prepare_catalog_ack,
 };
 pub use membership::{CatalogMembershipAction, CatalogMembershipChange, CatalogMembershipError};
 pub use progress::{CatalogProgressChange, CatalogProgressError};
+pub use prune::{CatalogPruneError, CatalogPruneReply, CatalogPruneRequest};
 use std::fmt;
 
 /// Canonical monotone publication queue header, independent of stored origin.

@@ -305,3 +305,31 @@ fn catalog_progress_codec_and_observations_remain_pure() -> CheckResult<()> {
     }
     Ok(())
 }
+
+#[test]
+fn catalog_prune_codec_and_revision_observations_remain_pure() -> CheckResult<()> {
+    for module in [
+        "log::catalog_prune",
+        "log::catalog_prune::model",
+        "log::catalog_prune::request",
+        "state::governance_catalog::prune",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                module,
+                "use wf_domain::governance::catalog::CatalogPruneRequest;"
+            )?,
+            Vec::<String>::new()
+        );
+        assert!(
+            !source_check("wf-ports", module, "use std::fs;")?.is_empty(),
+            "{module}"
+        );
+        assert!(
+            !source_check("wf-ports", module, "pub async fn hidden() {}")?.is_empty(),
+            "{module}"
+        );
+    }
+    Ok(())
+}

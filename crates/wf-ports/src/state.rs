@@ -25,8 +25,10 @@ pub use credit_catalog::{
 };
 pub use governance_catalog::{
     GovernanceCatalogPage, GovernanceCatalogProgress, GovernanceCatalogProgressPort,
-    GovernanceCatalogRead, GovernanceCatalogReadLimits, GovernanceCatalogReadPort,
-    LoadedGovernanceRecord, encode_catalog_progress_cursor, inspect_catalog_progress_cursor,
+    GovernanceCatalogPrunePage, GovernanceCatalogPruneReadPort, GovernanceCatalogRead,
+    GovernanceCatalogReadLimits, GovernanceCatalogReadPort, LoadedGovernanceRecord,
+    encode_catalog_member_revision, encode_catalog_progress_cursor,
+    inspect_catalog_member_revision, inspect_catalog_progress_cursor,
 };
 pub use history::{
     StoredWorkflowHistoryRow, StoredWorkflowHistorySnapshot, WorkflowHistoryDirection,

@@ -1362,3 +1362,24 @@ Trusted preparation must meet the explicit tick time floor; apply revalidates
 actual current owner and committed time. No timer, consensus acknowledgment or
 same-group malformed-owner migration is implied by this runner. See the concrete
 solo artifact/ownership review in workflow-completion-coordination.md.
+
+
+Selected revision-checked catalog pruning fixes the executed Missing-read ->
+new-owner create/register/ACK -> stale-unregister loss at7da2b8d. Explicit GC3
+stores each family18 member with its complete committed registration EntryIdentity
+(FWGM2). Fresh registrations rotate that identity even if membership already
+exists. A private operation14/intent16/response14 atomically removes only an exact
+matching member revision; Missing/Changed retain an accepted no-op reply. Retained
+retry cannot remove a later registration, and unrelated member/control changes
+do not invalidate this member. GC1/GC2 constructors remain byte-identical and no
+runtime upgrade or new table is selected. Older recovery modes refuse GC3.
+
+Candidate member and revision come from one coherent bounded guard. Missing owner
+observations must be reconfirmed after that candidate through a freshness-capable
+source read; default adapters refuse without it. Production implementations need
+the accepted leader/read-barrier lifecycle; current Redb guards establish actual
+applied state, not consensus acknowledgment. Existing snapshots bind the exact
+capability and canonical member revisions. This is a deliberate safety migration
+from the pinned cleaner, whose plain unregister reproduced permanent membership
+loss after publication ACK. Concrete artifacts, resource ownership and tests are
+approved in the solo coordination review; no full parity/service claim follows.

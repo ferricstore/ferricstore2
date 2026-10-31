@@ -11,6 +11,7 @@ use wf_storage::transaction::{
 mod fixtures;
 mod limits;
 mod progress;
+mod prune;
 use fixtures as f;
 
 #[test]

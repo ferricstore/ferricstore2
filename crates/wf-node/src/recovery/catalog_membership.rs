@@ -20,8 +20,15 @@ pub(super) enum GovernanceCatalogRecoveryProfile {
     Disabled,
     Enabled,
     Progress,
+    Prune,
 }
 impl CommittedRecoveryLimits {
+    /// Explicitly selects GC3 registration revisions and conditional pruning.
+    #[must_use]
+    pub const fn with_governance_catalog_pruning(mut self) -> Self {
+        self.governance_catalog = GovernanceCatalogRecoveryProfile::Prune;
+        self
+    }
     /// Explicitly enables target catalog bodies on the normal apply profile.
     #[must_use]
     pub const fn with_governance_catalogs(mut self) -> Self {
@@ -38,7 +45,9 @@ impl CommittedRecoveryLimits {
 pub(super) const fn enabled(limits: &CommittedRecoveryLimits) -> bool {
     matches!(
         limits.governance_catalog,
-        GovernanceCatalogRecoveryProfile::Enabled | GovernanceCatalogRecoveryProfile::Progress
+        GovernanceCatalogRecoveryProfile::Enabled
+            | GovernanceCatalogRecoveryProfile::Progress
+            | GovernanceCatalogRecoveryProfile::Prune
     )
 }
 pub(super) fn require(
@@ -55,13 +64,17 @@ pub(super) fn require(
         GovernanceCatalogRecoveryProfile::Progress => {
             tx.require_catalog_progress().map_err(E::State)
         }
+        GovernanceCatalogRecoveryProfile::Prune => Err(E::State(
+            wf_ports::state::StateTransactionError::UnsupportedPolicyProfile,
+        )),
     }
 }
 pub(super) fn require_profile(limits: &CommittedRecoveryLimits, actual: u16) -> Result<(), E> {
     match (limits.governance_catalog, actual) {
         (GovernanceCatalogRecoveryProfile::Disabled, 0 | 1)
         | (GovernanceCatalogRecoveryProfile::Enabled, 1)
-        | (GovernanceCatalogRecoveryProfile::Progress, 2) => Ok(()),
+        | (GovernanceCatalogRecoveryProfile::Progress, 2)
+        | (GovernanceCatalogRecoveryProfile::Prune, 3) => Ok(()),
         _ => Err(E::State(
             wf_ports::state::StateTransactionError::UnsupportedPolicyProfile,
         )),

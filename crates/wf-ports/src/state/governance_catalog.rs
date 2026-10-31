@@ -3,6 +3,11 @@
 use wf_domain::workflow::request::RequestScope;
 
 mod progress;
+mod prune;
+pub use prune::{
+    GovernanceCatalogPrunePage, GovernanceCatalogPruneReadPort, encode_catalog_member_revision,
+    inspect_catalog_member_revision,
+};
 mod reader;
 pub use progress::{
     GovernanceCatalogProgress, GovernanceCatalogProgressPort, encode_catalog_progress_cursor,

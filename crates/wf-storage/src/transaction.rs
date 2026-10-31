@@ -13,10 +13,12 @@ pub(crate) use claim::values::ClaimValuePublicationPlan;
 mod catalog_ack;
 mod catalog_membership;
 mod catalog_progress;
+mod catalog_prune;
 pub use catalog_membership::{
     CatalogMembershipTransactionError, apply_catalog_membership_transaction,
 };
 pub use catalog_progress::{CatalogProgressTransactionError, apply_catalog_progress_transaction};
+pub use catalog_prune::{CatalogPruneTransactionError, apply_catalog_prune_transaction};
 mod core_policy;
 mod credit;
 pub use catalog_ack::apply_catalog_ack_transaction;

@@ -60412,3 +60412,101 @@ and an empty pending source queue. Original prune commits afterward; owner remai
 but governance_catalog_contains is false. The final member-survival assertion
 fails, without any raw state mutation or simulated business success. Save this
 cohort before selecting/implementing a fix. See guarded-prune-r0.log.
+
+### M2-CREDIT-CATALOG1 revision-checked prune selection (solo, before artifacts)
+
+Select per-member registration revision rather than a whole-target checkpoint:
+unrelated target commits must not prevent a valid prune. A fresh registration
+of an already present member must still rotate its revision; otherwise create/
+publish/ACK can leave old bytes indistinguishable and the reproduced race stays.
+Only a fresh guarded attempt whose original member revision still matches may
+remove it. Missing/Changed are accepted no-ops, distinguishable in the reply.
+Retained replay always returns the original reply without reapplying deletion.
+
+Approve domain governance/catalog/prune.rs: CatalogPruneRequest(borrowed catalog,
+member, full EntryIdentity expected revision) and CatalogPruneReply(Removed,
+Missing,Changed), with bounded validation. Approve ports log/catalog_prune.rs
+and model.rs/request.rs children: PreparedCatalogPruneRequest, complete intent/
+encode/prepare/recovery-header/retained-summary and fixed reply codecs. Closed
+FWCP1 operation14/intent16/response14 uses FWXR1 plus result byte0/1/2; SHA covers
+all original body fields. Borrow catalog/member and move original header owners.
+No unverified frame/caller data becomes authority.
+
+Select explicit GC3 in the same4-byte FWSS8 governance marker, including GC1/GC2
+capabilities plus revision-checked pruning. Add catalog_prune boolean to private
+ValueManifest/ValueGenesisCapabilities and exact snapshot compatibility; old
+constructors/GC1/GC2 bytes stay unchanged. No runtime upgrade/new physical table.
+New family18 member values use FWGM2 plus full56-byte EntryIdentity. Every fresh
+Register writes its actual committed registration identity, including existing
+members. Canonical validation requires the revision not ahead of actual control
+(and exact identity at equal position); malformed/wrong-profile rows still fence.
+Generic explicit Unregister remains supported; cleaner uses guarded prune only.
+
+Approve ports state/governance_catalog/prune.rs: GovernanceCatalogPrunePage(page,
+optional member revision), GovernanceCatalogPruneReadPort for limit1 coherent
+candidate observations, and fixed encode/inspect_catalog_member_revision. Capture
+member bytes/revision in the existing scan guard with no extra payload clone or
+second point probe. Add credit_catalog_owner_for_prune to CreditOwnerReadPort,
+defaulting to UnsupportedPolicyProfile. Invoke it after the candidate when an
+ordinary owner observation is Missing. This path must establish current source
+absence after invocation; production adapters need accepted leader/read-barrier
+lifecycle, otherwise refuse. A standalone concrete Redb implementation supplies
+its actual current applied guard only; it does not manufacture consensus proof.
+Fresh Some suppresses stale-absence pruning and may run normal guarded Cleanup.
+
+Approve storage state/redb/governance_catalog/prune.rs with read.rs/write.rs
+children: create_governance_prune_database(optional actual credit shards),
+require_catalog_prune, coherent candidate port, consumed Immediate plan/commit.
+Refactor existing read scan into page_revision, retaining old page facade and
+old-profile R/C/probe behavior. Expose existing port::guard within its feature.
+Row validation receives the actual GC3 control only when needed. Writer compares
+the exact observed member revision under its consumed guard and atomically joins
+remove/no-op, original fixed reply and next control. No stale cursor or owner
+cache decides eligibility. Approve transaction/catalog_prune.rs with driver.rs
+(CatalogPruneTransactionError/apply_catalog_prune_transaction) and narrow16/14
+retained registries/capability checks. Both active and receipt-only states bind GC3.
+
+Approve Node recovery/catalog_prune.rs, private Prune recovery profile plus
+with_governance_catalog_pruning in existing catalog_membership.rs, typed error,
+join/audit/replay. Explicit older recovery modes must refuse actual GC3 even
+empty/received state. Prune enables existing membership/progress frames, with
+old defaults closed. Genesis/open/received-stage immutable profile observation
+extends to3 only after complete validation/commit. Snapshot capability is exact.
+
+Approve tests credit_codec/catalog_prune.rs; storage governance_catalog/prune.rs
+with fixtures.rs/faults.rs(PruneFixture); Node snapshot_recovery/catalog_prune.rs
+with fixtures.rs(PruneHistoryFixture,PruneHistoryFault). Cover independent bytes,
+explicit empty capability, stale/ABA revision, unrelated writes, duplicate
+registration rotation, atomic rollback/uncertainty, retained originals, full
+historical corruption and purged/received replay. Add pure-port classification
+and negative fixture for log::catalog_prune in existing architecture tests.
+Migrate only cleaner fixtures/capability to GC3, preserve original case bodies,
+and add weak-Missing/fresh-Some and stale publication injection controls there.
+Application cleaner requires GovernanceCatalogPruneReadPort; validate a single
+member/revision pair and use accepted no-op replies correctly. Update controlled
+BudgetFixture with explicit semantic candidate data; no production simulation.
+
+One fixed registration token and reply replace a whole owner copy or global
+map clone. Original captured bytes/one member owner move through the step;
+prepay fixed revision metadata and codec/inspection cohorts. Actual step/R/C and
+allocation failures remain typed;400/600-line,100-function,depth4/complexity25
+standards hold. No suppressions, unsafe, dependencies, public service, native,
+Linux or measured speedup claim. Save genuine rejecting APIs/tests before bodies.
+The source's unsafe prune behavior is an explicit safety migration, not silent
+full source equivalence. Full product/platform/profile goal remains active.
+
+Additional named validation artifact before creation: CatalogPruneError in the
+approved domain prune.rs. It is a fixed unit bounded-input error, not a business
+refusal or operational status. The member revision codec returns fixed62-byte
+FWGM2 records; the private command includes that complete canonical record as its
+expected revision. GovernanceCatalogPrunePage holds only one candidate revision
+(limit1), with None exactly when the page is empty. Fresh absence defaults to
+UnsupportedPolicyProfile; unsupported/older adapters never silently prune.
+
+Selected protocol predecessor compiled: ports4 fail at rejecting bounded/codec/
+row APIs; storage3 fail at explicit GC3 construction while GC2 no-mutation refusal
+control passes; Node3 fail at explicit construction; pure-log classification
+fails because std::fs is still accepted for the new log path. Storage Box
+borrowing compile errors were corrected before this real semantic run. Later
+writer/replay/snapshot assertions remain masked and receive no independent RED
+credit. Save this exact interface/test cohort before selected semantic bodies.

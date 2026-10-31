@@ -6,6 +6,20 @@ use wf_domain::{governance::credit::CreditLimits, workflow::request::RequestScop
 
 /// One configured owner observation; it grants no later mutation authority.
 pub trait CreditOwnerReadPort {
+    /// Reconfirms current source state after the captured prune candidate.
+    /// Production adapters need an accepted leader/read-barrier lifecycle;
+    /// ordinary stale observations cannot prove absence for pruning.
+    /// # Errors
+    /// Refuses when current source freshness cannot be established.
+    fn credit_catalog_owner_for_prune(
+        &self,
+        scope: &RequestScope,
+        credit_scope: &[u8],
+        limits: CreditCatalogReadLimits,
+    ) -> Result<Option<wf_domain::governance::credit::CreditOwner>, StateTransactionError> {
+        let _ = (scope, credit_scope, limits);
+        Err(StateTransactionError::UnsupportedPolicyProfile)
+    }
     /// Loads and validates the exact owner with a complete explicit guard profile.
     /// # Errors
     /// Refuses namespace/capability, corruption or cumulative resource limits.
