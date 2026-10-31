@@ -59573,3 +59573,9 @@ saved storage RED: the cohort still inventories every actual table and requires
 the actual rows/metadata tables. No passing/TDD credit for either compile/setup
 failure. Save before target genesis and writer bodies. Receipts/logs use
 /private/tmp/ferricstore2-catalog-membership-{r0,first,clippy,storage-r0}.
+
+The saved580d75f storage cases now reach healthy explicit target genesis/reopen.
+One old-capability control passes; six fail at actual driver
+State(UnsupportedPolicyProfile), including the cut loop. No stored test body
+changed. Save this driver RED before member writes, retained integration or read
+bodies; later assertions remain masked. See catalog-membership-driver-r0.log.

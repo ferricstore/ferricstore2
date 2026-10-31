@@ -22,6 +22,7 @@ pub(crate) struct ValueManifest {
     pub(crate) alias_format: u16,
     pub(crate) credit_shard_count: Option<u64>,
     pub(crate) credit_catalog: bool,
+    pub(crate) governance_catalog: bool,
 }
 
 pub(crate) fn read(tx: &RedbStateTransaction<'_>) -> Result<ValueManifest, Error> {
@@ -90,8 +91,8 @@ pub(crate) fn parse(
         .map_err(|_| Error::Corrupt)?;
     let defaults = WorkflowValueDefaults::from_bytes(raw).map_err(|_| Error::Corrupt)?;
     let (credit_shard_count, credit_catalog) = match bytes.len().checked_sub(at) {
-        Some(32) => (None, false),
-        Some(42) if layout == 8 && alias_format == 2 => {
+        Some(32 | 36) => (None, false),
+        Some(42 | 46) if layout == 8 && alias_format == 2 => {
             let catalog = match value::read_u16(bytes, &mut at).map_err(value_error)? {
                 1 => false,
                 2 => true,
@@ -104,6 +105,17 @@ pub(crate) fn parse(
             (Some(count), catalog)
         }
         _ => return Err(Error::Corrupt),
+    };
+    let governance_catalog = if bytes.len().checked_sub(at) == Some(36) {
+        if layout != 8
+            || alias_format != 2
+            || value::take(bytes, &mut at, 4).map_err(value_error)? != b"GC\0\x01"
+        {
+            return Err(Error::Corrupt);
+        }
+        true
+    } else {
+        false
     };
     let checksum = Sha256::digest(&bytes[..at]);
     if value::take(bytes, &mut at, 32).map_err(value_error)? != checksum.as_slice() {
@@ -123,6 +135,7 @@ pub(crate) fn parse(
         alias_format,
         credit_shard_count,
         credit_catalog,
+        governance_catalog,
     })
 }
 
@@ -172,6 +185,9 @@ pub(crate) fn encode(
         bytes.extend_from_slice(&(if manifest.credit_catalog { 2_u16 } else { 1 }).to_be_bytes());
         bytes.extend_from_slice(&count.to_be_bytes());
     }
+    if manifest.governance_catalog {
+        bytes.extend_from_slice(b"GC\0\x01");
+    }
     let checksum = Sha256::digest(&bytes);
     bytes.extend_from_slice(&checksum);
     if bytes.len() != size {
@@ -205,6 +221,9 @@ fn encoded_size(
     if manifest.credit_catalog && manifest.credit_shard_count.is_none() {
         return Err(Error::InvalidChanges);
     }
+    if manifest.governance_catalog && (manifest.layout != 8 || manifest.alias_format != 2) {
+        return Err(Error::InvalidChanges);
+    }
     if manifest.credit_shard_count.is_some_and(|count| {
         count == 0
             || count > wf_domain::workflow::MAX_EXACT_MILLIS
@@ -223,6 +242,7 @@ fn encoded_size(
             } else {
                 0
             },
+            if manifest.governance_catalog { 4 } else { 0 },
         ],
     )
 }

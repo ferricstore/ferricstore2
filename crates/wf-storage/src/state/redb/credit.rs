@@ -66,7 +66,7 @@ impl RedbStateStore {
             genesis,
             defaults,
             limits,
-            (2, Some(shard_count), true),
+            (2, Some(shard_count), true, false),
         )
     }
 
@@ -111,7 +111,7 @@ impl RedbStateStore {
             genesis,
             defaults,
             limits,
-            (2, Some(shard_count), false),
+            (2, Some(shard_count), false, false),
         )
     }
 

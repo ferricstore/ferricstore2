@@ -13,14 +13,22 @@ impl RedbStateStore {
     /// # Errors
     /// Refuses invalid genesis, unsupported capability or unproved durability.
     pub fn create_governance_catalog_database(
-        _database: redb::Database,
-        _group: GroupId,
-        _recovery: RecoveryId,
-        _genesis: StateStoreGenesis<'_>,
-        _defaults: WorkflowValueDefaults,
-        _limits: StateStoreLimits,
+        database: redb::Database,
+        group: GroupId,
+        recovery: RecoveryId,
+        genesis: StateStoreGenesis<'_>,
+        defaults: WorkflowValueDefaults,
+        limits: StateStoreLimits,
     ) -> Result<Self, E> {
-        Err(E::UnsupportedPolicyProfile)
+        super::values::genesis::create_profile(
+            database,
+            group,
+            recovery,
+            genesis,
+            defaults,
+            limits,
+            (2, None, false, true),
+        )
     }
     /// Reads one coherent page, requiring an actual surviving cursor member.
     /// # Errors

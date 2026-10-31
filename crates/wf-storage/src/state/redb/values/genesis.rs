@@ -29,7 +29,7 @@ pub(super) fn create(
         genesis,
         defaults,
         limits,
-        (alias_format, None, false),
+        (alias_format, None, false, false),
     )
 }
 
@@ -40,12 +40,15 @@ pub(in crate::state::redb) fn create_profile(
     genesis: StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     limits: StateStoreLimits,
-    capability: (u16, Option<u64>, bool),
+    capability: (u16, Option<u64>, bool, bool),
 ) -> Result<RedbStateStore, Error> {
     if !matches!(capability.0, 1 | 2) {
         return Err(Error::UnsupportedPolicyProfile);
     }
     if capability.2 && capability.1.is_none() {
+        return Err(Error::InvalidChanges);
+    }
+    if capability.3 && capability.0 != 2 {
         return Err(Error::InvalidChanges);
     }
     if capability.1.is_some_and(|count| {
@@ -61,7 +64,12 @@ pub(in crate::state::redb) fn create_profile(
         limits,
         admission::total(
             scratch,
-            [additional(&group, &recovery, capability.1.is_some())?],
+            [additional(
+                &group,
+                &recovery,
+                capability.1.is_some(),
+                capability.3,
+            )?],
         )?,
     )?;
     let store = RedbStateStore::unvalidated(database, group, recovery, limits);
@@ -74,7 +82,7 @@ fn initialize(
     genesis: &StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     scratch: usize,
-    capability: (u16, Option<u64>, bool),
+    capability: (u16, Option<u64>, bool, bool),
 ) -> Result<(), Error> {
     let mut tx = store.transaction(
         false,
@@ -90,6 +98,7 @@ fn initialize(
             &store.group,
             &store.recovery,
             capability.1.is_some(),
+            capability.3,
         )?],
     )?)?;
     let genesis_hash = bootstrap::write_genesis_rows(&tx, genesis)?;
@@ -104,10 +113,15 @@ fn initialize(
     let origin = bootstrap::manifest(store, genesis, genesis_hash, origin_size)?;
     let current_hash = current_hash(&tx)?;
     let current = ValueManifest {
-        layout: if capability.1.is_some() { 8 } else { 7 },
+        layout: if capability.1.is_some() || capability.3 {
+            8
+        } else {
+            7
+        },
         alias_format: capability.0,
         credit_shard_count: capability.1,
         credit_catalog: capability.2,
+        governance_catalog: capability.3,
         policy: CurrentPolicyManifest {
             initial_time: genesis.initial_time,
             placements: u64::try_from(genesis.placements.len()).map_err(|_| Error::Limit)?,
@@ -137,7 +151,12 @@ fn initialize(
     Ok(())
 }
 
-fn additional(group: &GroupId, recovery: &RecoveryId, credit: bool) -> Result<usize, Error> {
+fn additional(
+    group: &GroupId,
+    recovery: &RecoveryId,
+    credit: bool,
+    governance_catalog: bool,
+) -> Result<usize, Error> {
     admission::total(
         size_of::<ValueManifest>(),
         [
@@ -153,6 +172,7 @@ fn additional(group: &GroupId, recovery: &RecoveryId, credit: bool) -> Result<us
                     group.as_bytes().len(),
                     recovery.as_bytes().len(),
                     if credit { 10 } else { 0 },
+                    if governance_catalog { 4 } else { 0 },
                 ],
             )?,
         ],
