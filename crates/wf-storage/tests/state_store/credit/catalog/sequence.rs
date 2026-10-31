@@ -205,3 +205,91 @@ fn catalog_uncertain_creation_fences_and_recovers_a_complete_owner_intent_receip
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn catalog_capacity_refusals_are_retained_before_quota_without_new_owner_or_queue_effects()
+-> TestResult {
+    use std::collections::BTreeMap;
+    use wf_domain::workflow::MAX_EXACT_MILLIS as MAX;
+    use wf_domain::workflow::request::RetainedStatus;
+    let dir = common::directory("catalog-capacity")?;
+    for (suffix, expected) in [
+        ("full", Rejection::CatalogBacklogFull),
+        ("exhausted", Rejection::CatalogSequenceExhausted),
+    ] {
+        let path = dir.join(suffix);
+        drop(f::create(&path)?);
+        f::lease(&path, b"global", 0)?;
+        if suffix == "full" {
+            f::full_queue(&path)?;
+        } else {
+            let (key, _) = f::row(&path, 17)?;
+            f::replace(&path, &key, None)?;
+            let (key, _) = f::row(&path, 16)?;
+            f::replace(&path, &key, Some(&f::meta(MAX + 1, MAX)))?;
+        }
+        drop(common::open(&path)?);
+        let business = |path: &std::path::Path| -> TestResult<BTreeMap<Vec<u8>, Vec<u8>>> {
+            Ok(common::raw_rows(path)?
+                .into_iter()
+                .filter(|(key, _)| key.get(6).is_some_and(|family| *family >= 12))
+                .collect())
+        };
+        let before = business(&path)?;
+        let outcome = f::apply(
+            &path,
+            b"never-created",
+            b"refused",
+            1,
+            Some(0),
+            Mutation::Lease {
+                shard_id: 0,
+                amount: 1,
+                ttl_ms: 1000,
+            },
+        )?;
+        assert_eq!(
+            credit::reply(&outcome)?.decision,
+            Decision::Rejected(expected)
+        );
+        assert_eq!(
+            outcome.status(),
+            RetainedStatus::GovernanceRejected(expected)
+        );
+        assert!(credit::reply(&outcome)?.owner.is_none());
+        assert_eq!(business(&path)?, before);
+        let replay = f::apply(
+            &path,
+            b"never-created",
+            b"refused",
+            2,
+            Some(0),
+            Mutation::Lease {
+                shard_id: 0,
+                amount: 1,
+                ttl_ms: 1000,
+            },
+        )?;
+        assert_eq!(replay.response(), outcome.response());
+        assert_eq!(replay.original_position(), common::log(1));
+        assert_eq!(business(&path)?, before);
+        let store = common::open(&path)?;
+        assert!(
+            store
+                .read_credit_owner(
+                    &common::scope()?,
+                    b"never-created",
+                    CreditLimits::default(),
+                    10_000,
+                    64 * common::MIB
+                )?
+                .is_none()
+        );
+        drop(store);
+        let existing = f::apply(&path, b"global", b"existing", 3, None, Mutation::Get)?;
+        assert_eq!(credit::reply(&existing)?.decision, Decision::Owner);
+        assert_eq!(business(&path)?, before);
+    }
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

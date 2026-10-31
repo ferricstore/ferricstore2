@@ -111,6 +111,7 @@ fn outcome(
         let facts = super::super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
         if facts.alias_format != 2
             || (scanned.intent_version() == 12 && facts.credit_shard_count.is_none())
+            || (scanned.credit_catalog_required() && !facts.credit_catalog)
         {
             return Err(StateTransactionError::Corrupt);
         }

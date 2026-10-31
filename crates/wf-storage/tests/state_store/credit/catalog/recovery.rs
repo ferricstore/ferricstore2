@@ -74,3 +74,78 @@ fn catalog_shape_valid_intent_with_missing_owner_is_preserved_for_publisher_disc
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn catalog_only_retained_refusal_cannot_be_reinterpreted_as_an_older_profile() -> TestResult {
+    use wf_domain::workflow::MAX_EXACT_MILLIS as MAX;
+    let dir = common::directory("catalog-retained-profile")?;
+    let path = dir.join("state");
+    drop(f::create(&path)?);
+    f::lease(&path, b"global", 0)?;
+    let (key, _) = f::row(&path, 17)?;
+    f::replace(&path, &key, None)?;
+    let (meta, _) = f::row(&path, 16)?;
+    f::replace(&path, &meta, Some(&f::meta(MAX + 1, MAX)))?;
+    let outcome = f::apply(
+        &path,
+        b"new",
+        b"refused",
+        1,
+        Some(3),
+        Mutation::Lease {
+            shard_id: 0,
+            amount: 1,
+            ttl_ms: 1000,
+        },
+    )?;
+    assert_eq!(
+        credit::reply(&outcome)?.decision,
+        Decision::Rejected(Rejection::CatalogSequenceExhausted)
+    );
+    f::replace(&path, &meta, None)?;
+    f::downgrade_catalog(&path)?;
+    // No format2 key remains: the retained response itself requires format2.
+    assert_eq!(credit::family_count(&path, 16)?, 0);
+    assert_eq!(credit::family_count(&path, 17)?, 0);
+    assert!(
+        matches!(common::open(&path), Err(error) if error.downcast_ref::<StateTransactionError>() == Some(&StateTransactionError::Corrupt))
+    );
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
+
+#[test]
+fn catalog_snapshot_cannot_replace_an_older_capability_with_the_same_shard_count() -> TestResult {
+    use wf_ports::snapshot::{SnapshotError, SnapshotLimits, StateSnapshotStore};
+    use wf_storage::{snapshot::RedbSnapshotStage, state::StateStoreLimits};
+    let dir = common::directory("catalog-snapshot-capability")?;
+    let path = dir.join("source");
+    drop(f::create(&path)?);
+    f::lease(&path, b"global", 0)?;
+    let mut source = common::open(&path)?;
+    let mut wire = Vec::new();
+    source.capture_snapshot(&mut wire, SnapshotLimits::default())?;
+    drop(source);
+    let scope = common::scope()?;
+    let stage = RedbSnapshotStage::receive(
+        &dir.join("stage"),
+        scope.group().clone(),
+        scope.recovery().clone(),
+        &mut std::io::Cursor::new(&wire),
+        StateStoreLimits::default(),
+        SnapshotLimits::default(),
+    )?;
+    let old_path = dir.join("old");
+    drop(credit::create(&old_path)?);
+    let before = credit::cohort(&old_path)?;
+    let mut old = common::open(&old_path)?;
+    assert!(matches!(
+        old.install_snapshot(stage, SnapshotLimits::default()),
+        Err(SnapshotError::GenesisMismatch)
+    ));
+    drop(old);
+    assert_eq!(credit::cohort(&old_path)?, before);
+    assert_eq!(f::page(&path, 1)?.entries[0].credit_scope, b"global");
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

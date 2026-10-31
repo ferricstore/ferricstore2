@@ -48,6 +48,14 @@ pub struct ScannedRetainedOutcome<'input> {
 }
 
 impl ScannedRetainedOutcome<'_> {
+    pub(crate) const fn credit_catalog_required(&self) -> bool {
+        use wf_domain::governance::identified::IdentifiedCreditRejection as R;
+        matches!(
+            self.status,
+            RetainedStatus::GovernanceRejected(R::CatalogBacklogFull | R::CatalogSequenceExhausted)
+        )
+    }
+
     pub(crate) const fn intent_version(&self) -> u16 {
         self.intent.version()
     }

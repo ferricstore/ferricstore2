@@ -45,7 +45,14 @@ pub(super) fn publish(
     plan: &IdentifiedCreditPlan<'_>,
 ) -> Result<(), E> {
     if !context.catalog {
-        return if plan.catalog_publication().is_none() {
+        use wf_domain::governance::identified::{
+            IdentifiedCreditDecision as D, IdentifiedCreditRejection as R,
+        };
+        return if plan.catalog_publication().is_none()
+            && !matches!(
+                plan.decision(),
+                D::Rejected(R::CatalogBacklogFull | R::CatalogSequenceExhausted)
+            ) {
             Ok(())
         } else {
             Err(E::InvalidChanges)
@@ -79,10 +86,11 @@ pub(super) fn publish(
         tx.admit_read(total(scope.len(), [24])?)?;
         copy_bytes(scope)
     })?;
-    if let Some(old) = old {
-        if old != plan.scope() && owner_exists(tx, context.scope, &old)? {
-            return Err(E::Corrupt);
-        }
+    if let Some(old) = old
+        && old != plan.scope()
+        && owner_exists(tx, context.scope, &old)?
+    {
+        return Err(E::Corrupt);
     }
     tx.temporary(total(32, [plan.scope().len()])?)?;
     let bytes = value::catalog::encode_intent(plan.scope()).map_err(value_error)?;

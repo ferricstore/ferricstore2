@@ -111,3 +111,49 @@ pub(super) fn meta(head: u64, tail: u64) -> Vec<u8> {
     bytes.extend_from_slice(&tail.to_be_bytes());
     bytes
 }
+
+pub(super) fn full_queue(path: &Path) -> TestResult {
+    let (meta_key, _) = row(path, 16)?;
+    let (mut key, _) = row(path, 17)?;
+    let at = key.len() - 8;
+    let mut value = b"FWCI\0\x01\0\0\0\x0eorphan".to_vec();
+    value.extend_from_slice(&0_u64.to_be_bytes());
+    let end = value.len() - 8;
+    let database = redb::Builder::new().open(path)?;
+    let tx = database.begin_write()?;
+    {
+        let mut table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
+        for sequence in 1_u64..=65_536 {
+            key[at..].copy_from_slice(&sequence.to_be_bytes());
+            value[end..].copy_from_slice(&sequence.to_be_bytes());
+            table.insert(key.as_slice(), value.as_slice())?;
+        }
+        table.insert(meta_key.as_slice(), meta(1, 65_536).as_slice())?;
+    }
+    tx.commit()?;
+    Ok(())
+}
+
+pub(super) fn downgrade_catalog(path: &Path) -> TestResult {
+    use redb::ReadableTable;
+    use sha2::{Digest, Sha256};
+    let database = redb::Builder::new().open(path)?;
+    let tx = database.begin_write()?;
+    {
+        let mut table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_meta_v1"))?;
+        let mut bytes = table
+            .get(b"manifest".as_slice())?
+            .ok_or("missing manifest")?
+            .value()
+            .to_vec();
+        let extension = bytes.len() - 42;
+        assert_eq!(&bytes[extension..extension + 2], &[0, 2]);
+        bytes[extension..extension + 2].copy_from_slice(&1_u16.to_be_bytes());
+        let end = bytes.len() - 32;
+        let checksum = Sha256::digest(&bytes[..end]);
+        bytes[end..].copy_from_slice(&checksum);
+        table.insert(b"manifest".as_slice(), bytes.as_slice())?;
+    }
+    tx.commit()?;
+    Ok(())
+}

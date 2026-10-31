@@ -5,7 +5,6 @@
 
 use std::fmt;
 use wf_domain::claim::apply::ClaimWorkLimits;
-use wf_domain::governance::credit::CreditLimits;
 use wf_ports::consensus::{RaftMembershipError, RaftMembershipLimits};
 use wf_ports::log::{CodecError, RaftLogError, RaftLogStore};
 use wf_ports::state::StateTransactionError;
@@ -43,7 +42,7 @@ pub struct CommittedRecoveryLimits {
     workflow_values: Option<[usize; 4]>,
     stored_workflow_values: bool,
     step_continue: workflow_values::StepRecoveryProfile,
-    credit: Option<(u64, CreditLimits)>,
+    credit: Option<credit::CreditRecoveryProfile>,
     work: (usize, usize),
     entry: usize,
     workspace: usize,
@@ -199,7 +198,10 @@ impl CommittedRecoveryLimits {
             owned = total(&[owned, std::mem::size_of::<Option<ClaimWorkLimits>>()])?;
         }
         if self.credit.is_some() {
-            owned = total(&[owned, std::mem::size_of::<Option<(u64, CreditLimits)>>()])?;
+            owned = total(&[
+                owned,
+                std::mem::size_of::<Option<credit::CreditRecoveryProfile>>(),
+            ])?;
         }
         Ok(owned)
     }

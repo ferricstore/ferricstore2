@@ -59287,3 +59287,65 @@ Save this before the configured-format field/builder and guard bodies. See
 and seven stored catalog cases pass, without modifying any saved test body;
 two first Clippy style findings were corrected without suppressions. Full batch
 remains open for durable ack, distributed publisher/repair and cleaner semantics.
+
+Additional concrete profile review: tags7/8 denote only format2 catalog refusals.
+Approve credit_catalog_required on existing ScannedRetainedOutcome (neutral
+decoded metadata property), used by existing recovery/rows.rs and read/point.rs
+to refuse them against an actual format1 manifest. The consumed credit catalog
+writer also refuses these decisions on1. No raw-public or generic request
+allowlist is widened by recognizing the additional private business tags.
+
+Clippy rejects the provisional fourth boolean on CommittedRecoveryLimits. Do
+not relax that policy: approve CreditRecoveryProfile in existing Node recovery/
+credit.rs, with Identified/Catalog variants containing the count and CreditLimits.
+Replace the separate boolean and old tuple with this single optional configured
+profile. Its private fields() projection supplies format/count/limits to the
+same current guards and budgets. Builders/getters preserve their public contracts;
+the enum expresses configuration, not observed state or paid authority. Saved
+Node tests stay unchanged. This is the concrete solo architecture resolution.
+
+The Node correction passes all four saved cases: exact format/count refusal on
+empty cohorts, full historical audit, replay without duplicate publication, and
+purged/received snapshot suffixes. The complete Node test targets execute116
+cases (6 checkpoint,22 committed,88 snapshot); original fixtures/bodies remain.
+Post-body stored controls cover a complete65536-entry queue and exhausted exact
+sequence header, retained refusals before quota without any business prefix,
+retry originals, and continued existing-owner operations. Another control removes
+all catalog rows and downgrades the manifest: a catalog-only retained refusal
+still forces corruption. A same-shard-count snapshot format1/2 mismatch control
+is included in the final validation. These controls are added correctness
+evidence, not original RED or full pinned source-case credit.
+
+Performance/ownership review: ack effects iterate a bounded range without an
+allocated vector; metadata encoding uses an inline22-byte array. New-owner
+publication checks actual presence without decoding/cloning a second owner.
+Mutation reads only metadata/tail/next-slot points; page reads allocate only their
+admitted bounded output. Recovery reuses the existing open table and validates
+both range directions with linear point work. No latency/RSS or native benchmark
+claim follows from these structural choices.
+
+Next source obligations were inspected in pinned LimitReconciler106..246:
+one selected partition page, one exact-length batch of owner observations,
+only the valid contiguous prefix, one idempotent membership batch, and ACK only
+after that write succeeds. A missing owner is processed/discarded and counts as
+published progress without a membership write; corruption stops the prefix.
+Failed membership or ACK reports zero published progress and another error.
+Native catalog_published counts processed prefix entries, not unique inserted
+members. Preserve those counters and actual read/write batch semantics. The
+durable ACK codec/driver, target catalog authority, public repair/parent and
+cleaner traversal/fairness remain required; this predecessor is not that service.
+
+Final local checkpoint for this predecessor: all12 gates pass with every frozen
+input exact (1885 non-Markdown/1296 Rust),1435 cases/115 executable targets,
+54 architecture cases,Python7 and11 doctests/15 targets. Every previous1405 and
+original1294 identity/status/multiplicity and executable target remains exact;
+both benchmark correctness smokes run once. All626 prior test files remain as
+623 whole exact plus3 complete registration inverses. Saved catalog RED sources
+have three whole exact and three exact-prefix files, with no masked fixture
+repair. Actual full parity exits1 with unchanged135/149/646 derived coverage and
+5903/4222/1681/1655 runtime counts; no new source-case credit. Receipts are under
+/private/tmp/ferricstore2-credit-catalog-: final-pipeline,source-audit,
+full-identity,full-parity JSON and their logs. Host is Darwin/arm64; native Elixir,
+Linux and M8 performance validation are unverified. Full catalog batch/product
+remain incomplete. Continue the actual durable ACK command before publisher,
+repair and cleaner integration; no code adoption/push or goal completion.

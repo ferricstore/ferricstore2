@@ -19,16 +19,33 @@ use wf_types::{
     version::CommittedTime,
 };
 
+#[derive(Clone, Copy)]
+pub(super) enum CreditRecoveryProfile {
+    Identified(u64, CreditLimits),
+    Catalog(u64, CreditLimits),
+}
+
+impl CreditRecoveryProfile {
+    const fn fields(self) -> (u16, u64, CreditLimits) {
+        match self {
+            Self::Identified(shards, credit) => (1, shards, credit),
+            Self::Catalog(shards, credit) => (2, shards, credit),
+        }
+    }
+}
+
 impl CommittedRecoveryLimits {
     /// Selects actual credit-format2 catalog replay and its immutable shard count.
     /// # Errors
     /// Refuses unsupported profile, invalid count or whole-call work overflow.
     pub fn with_identified_credit_catalog_limits(
         self,
-        _shard_count: u64,
-        _credit: CreditLimits,
+        shard_count: u64,
+        credit: CreditLimits,
     ) -> Result<Self, E> {
-        Err(E::UnsupportedEntry)
+        let mut selected = self.with_identified_credit_limits(shard_count, credit)?;
+        selected.credit = Some(CreditRecoveryProfile::Catalog(shard_count, credit));
+        Ok(selected)
     }
 
     /// Selects credit replay with the actual configured immutable shard count.
@@ -46,14 +63,20 @@ impl CommittedRecoveryLimits {
             .ok()
             .and_then(|n| n.checked_mul(credit.max_work()))
             .ok_or(E::Limit)?;
-        self.credit = Some((shard_count, credit));
+        self.credit = Some(CreditRecoveryProfile::Identified(shard_count, credit));
         Ok(self)
     }
 
     /// Reads only the explicitly selected immutable credit profile.
     #[must_use]
     pub const fn identified_credit_limits(self) -> Option<(u64, CreditLimits)> {
-        self.credit
+        match self.credit {
+            Some(profile) => {
+                let (_, shards, credit) = profile.fields();
+                Some((shards, credit))
+            }
+            None => None,
+        }
     }
 }
 
@@ -61,13 +84,14 @@ pub(super) fn require(
     tx: &RedbStateTransaction<'_>,
     limits: &CommittedRecoveryLimits,
 ) -> Result<(), E> {
-    let Some((expected, _)) = limits.credit else {
+    let Some(selected) = limits.credit else {
         return Ok(());
     };
+    let (format, expected, _) = selected.fields();
     let actual = tx
-        .require_identified_credit()
+        .require_identified_credit_profile()
         .map_err(|error| E::Credit(CreditTransactionError::State(error)))?;
-    if actual != expected {
+    if actual != (format, expected) {
         return Err(E::Credit(CreditTransactionError::State(
             StateTransactionError::InvalidChanges,
         )));
@@ -81,7 +105,7 @@ pub(super) fn audit(
     base: usize,
     stamp: CommittedTime,
 ) -> Result<EntryStamp, E> {
-    let (shards, credit) = limits.credit.ok_or(E::UnsupportedEntry)?;
+    let (_, shards, credit) = limits.credit.ok_or(E::UnsupportedEntry)?.fields();
     let entry = total(&[512, body.len()])?;
     limits.admit(&[base, entry])?;
     let available = limits
@@ -124,7 +148,7 @@ pub(super) fn apply(
     limits: &CommittedRecoveryLimits,
     base: usize,
 ) -> Result<ControlState, E> {
-    let (_, credit) = limits.credit.ok_or(E::UnsupportedEntry)?;
+    let (_, _, credit) = limits.credit.ok_or(E::UnsupportedEntry)?.fields();
     let original = total(&[512, entry.body().len()])?;
     let scope_owner = total(&[512, fields[0].len(), fields[1].len(), fields[2].len()])?;
     let conversion = total(&[

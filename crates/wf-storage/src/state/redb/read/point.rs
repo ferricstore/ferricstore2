@@ -122,8 +122,13 @@ impl RedbStateTransaction<'_> {
             self.layout,
         )
         .map_err(value_error)?;
-        if scanned.intent_version() == 12 && self.value_manifest()?.credit_shard_count.is_none() {
-            return Err(StateTransactionError::Corrupt);
+        if scanned.intent_version() == 12 {
+            let facts = self.value_manifest()?;
+            if facts.credit_shard_count.is_none()
+                || (scanned.credit_catalog_required() && !facts.credit_catalog)
+            {
+                return Err(StateTransactionError::Corrupt);
+            }
         }
         if scanned
             .response_count()

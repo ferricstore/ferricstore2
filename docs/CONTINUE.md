@@ -2,7 +2,43 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current increment: M2-CREDIT-VIEW1. Public credit reply projections now hide raw
+Current batch: M2-CREDIT-CATALOG1, still unfinished. Explicit credit_format2 now
+joins each new owner and its bounded publication intent with the actual retained
+reply/control in one Immediate commit. Format1 bytes/constructors remain intact.
+Typed FWCM1/FWCI1 metadata/intent rows bind group/recovery/tenant and monotone
+sequence; bounded coherent reads preserve order and refuse missing/corrupt active
+entries. Canonical reopen checks both queue directions and owner-to-meta presence,
+while preserving well-formed missing-owner intents for the later publisher.
+Actual Node selection binds exact format/count even when empty, audits complete
+historical bodies, and preserves publication through replay and purged/received
+snapshot suffixes. Configured profiles use an enum, with no lint exemption.
+
+All12 local gates pass on1885 frozen non-Markdown inputs/1296 Rust files, with
+zero drift:1435 cases/115 executable targets,54 architecture cases,Python7 and11
+doctests/15 targets. Every previous1405 and original1294 identity/status/
+multiplicity remains exact, including both benchmark correctness smokes. No
+native performance claim. The catalog increment has6 domain,10 storage and4
+Node cases. Genuine failures precede bodies at0868a9f (six pure failures,one old
+capability control passes/six new storage failures) ande0d78a4 (four Node failures).
+All saved test bodies remain: three whole files and three exact prefixes with
+post-body controls. Those controls include a complete65536-entry backlog,
+exhaustion/retained refusal priority, no business prefix, catalog-only receipt
+downgrade refusal and same-count snapshot capability mismatch. All626 prior test
+files are preserved as623 whole exact plus3 exact module-registration inverses.
+See /private/tmp/ferricstore2-credit-catalog-{r0,node-r0,final-pipeline,
+source-audit,full-identity,full-parity}.json.
+
+Actual full parity exits1: unchanged135/149/646 checked derived accounting and
+5903/4222/1681/1655 runtime reconciliation counts;5858 textual declarations stay
+unported in the immutable M0 accounting. No new full source-case credit. Durable
+ACK codec/transaction/replay is next, followed by cross-group idempotent catalog
+publication, existing-owner public repair, cleaner progress/fairness and the
+coupled public Claim/policy/release-outbox work. All required source scenarios,
+native reference and Linux/macOS acceptance remain mandatory. Do not adopt this
+unfinished feature branch or mark the full goal complete. The primary handoff
+points here; its last adopted code remains728650f.
+
+Previous increment: M2-CREDIT-VIEW1. Public credit reply projections now hide raw
 policy/cleanup/reservation metadata, preserve every source public owner/lease
 value, and borrow original scope/leases/IDs without another payload clone. The
 optional policy hash uses43 inline unpadded base64url bytes. A bounded callback
@@ -73,7 +109,7 @@ source-case credit is claimed. Required pinned stored-protocol source cases and
 migration dispositions, public View/LimitStore behavior, catalog publication/
 repair/cleaner obligations and coupled public Claim/policy/release-outbox work
 remain mandatory. Full M1-M8, native reference and Linux/macOS acceptance are
-not achieved. The main checkout remains clean at db1c3c9; do not adopt this
+not achieved. The main checkout keeps the adopted code; do not adopt this
 unfinished branch yet. Continue the remaining source/design obligations in
 functional batches; preserve architecture, all source cases and the atomic
 stored/Node path rather than treating local green checks as full completion.
