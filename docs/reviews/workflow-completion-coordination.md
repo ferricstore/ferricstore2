@@ -59349,3 +59349,80 @@ full-identity,full-parity JSON and their logs. Host is Darwin/arm64; native Elix
 Linux and M8 performance validation are unverified. Full catalog batch/product
 remain incomplete. Continue the actual durable ACK command before publisher,
 repair and cleaner integration; no code adoption/push or goal completion.
+
+## M2-CREDIT-CATALOG1 durable ACK: concrete solo selection before artifacts
+
+Previous turn: progress. Revalidated clean1adc8a0 and the pinned source ACK
+clauses (flow_governance_limit.ex787..844 / limit_catalog_outbox.ex). Work solo;
+this is a concrete architecture review, not independent peer review. Preserve
+the full catalog/public-parent/source/platform exits after this increment.
+
+Approve NEW domain governance/catalog/ack.rs, reexported by catalog.rs, with
+CreditCatalogAckRequest, CreditCatalogAckRejection (only StaleCursor/InvalidRange),
+CreditCatalogAckReply, CreditCatalogAckPlan and prepare_catalog_ack. Plans are
+sealed mathematical data, not current/durable authority. Request controls must
+be positive exact integers, expected_head<=up_to and up_to-expected_head<256.
+Then preserve the existing pure acknowledgement's already-acked-before-stale
+ordering, original metadata and bounded allocation-free deletion range. Add
+RetainedStatus::CreditCatalogRejected only for these two business diagnoses;
+operational/corrupt failures remain unrepresentable. Other response profiles
+must explicitly refuse this status.
+
+Approve NEW ports log/catalog_ack.rs with private catalog_ack/{model,request,
+response}.rs. Select explicit FWCP1 operation11/client-intent13 and response11
+(FWCA1). The16-byte body holds expected_head/up_to. Its intent hash uses
+wf-credit-catalog-ack-intent-v1 plus a zero terminator and exact body bytes;
+generated stamp is excluded, while PreparedDigest hashes the exact full frame.
+PreparedCatalogAckRequest owns bounded typed scope/request/isolation values,
+borrows the complete original frame, and establishes no admission/authority.
+Inspect full framing/EOF, scalar guards and intent before payload ownership;
+reserve decoder D=4E+4096 before allocation. Replies use25 fixed bytes: status,
+head,tail,deleted (zero for rejected), with1024 logical projection/codec bytes.
+Retained summary fully checks the reply, returns no workflow batch item count,
+and is admitted only for13/11. Old generic preparation/recovery stays closed.
+
+Approve NEW storage transaction/catalog_ack.rs plus private catalog_ack/driver.rs,
+using the existing operational CreditTransactionError and transaction outcome.
+Reserve actual R/S/C before decoder D within W. The same shared retained point
+gate precedes current catalog reads; exact retry returns original bytes and
+advances only control. Fresh ACK requires actual credit_format2, reads exact
+current metadata under the same writer, and runs the pure plan. Approve NEW
+state/redb/credit/catalog/ack.rs: one consumed writer checks captured control,
+actual capability/metadata and complete reply, deletes only the bounded exact
+range, and commits metadata/outcome/control together with Immediate durability.
+No full queue/owner materialization, new authority flag or fake acknowledgement.
+Known precommit failure rolls back everything; uncertain commit fences/no ack.
+
+Extend existing value/outcome/credit.rs to share its exact private framing and
+scope validation for12/10 and13/11, with separate strict retained summaries.
+Only explicit layout8 selectors recognize13. Recovery/point-read guards require
+actual catalog capability even for success/rejection receipts with no owners or
+catalog rows. No new state layout, manifest byte or physical family. Node uses
+the existing explicit Catalog recovery profile for operation11; Identified and
+generic profiles remain closed. Approve NEW Node recovery/catalog_ack.rs for full
+historical body audit and the same real atomic replay; existing join/replay
+dispatches select it only from the Catalog variant. Full body audit still runs
+behind an already-applied last entry, with actual whole-call work/W accounting.
+
+Approve NEW tests: domain governance_credit/catalog/ack.rs; ports credit_codec/
+catalog_ack.rs; storage state_store/credit/catalog/ack.rs with private ack/
+{fixtures,limits}.rs; Node snapshot_recovery/credit/catalog/ack.rs. Only existing
+targets gain module registrations. Save compiled rejecting failures before
+semantic bodies. Cover exact frames/digests/EOF/limits and closed old paths;
+prefix deletion, stale/invalid retained originals, namespace conflicts,256 bound,
+receipt-only downgrade, step cuts and actual commit uncertainty; then full Node
+audit/replay and purged/received snapshot suffixes. Native shard routing maps to
+the actual Rust group/recovery/tenant, never a lease shard ID. A private ACK can
+only supply the durable mechanism: the later real publisher must issue it after
+successful idempotent catalog membership publication. Do not claim that service,
+full source-case parity, Linux or native benchmark acceptance from this leaf.
+
+Initial ACK genuine RED: all14 cases compile and fail (3 pure,3 codec,8 stored).
+The pure facade returns InvalidRange for healthy ACKs; codecs reject healthy
+frames/replies as UnsupportedVersion. Stored cases currently stop at that
+encoder, so later namespace/retained/deletion/cut/fault assertions are masked,
+not passing/TDD execution claims. Source/log bindings are saved in
+/private/tmp/ferricstore2-catalog-ack-r0.json. Mathematical intent/status registry
+contracts already exist; generic ClientIntent::new remains version1 only and
+the new retained business status is excluded from all other response profiles.
+Save this checkpoint before semantic bodies. The full catalog goal stays open.

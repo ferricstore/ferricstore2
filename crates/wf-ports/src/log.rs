@@ -10,7 +10,13 @@ use wf_types::version::LogIdentity;
 
 use crate::consensus::{PreparedOperation, PreparedRequest};
 
+mod catalog_ack;
 mod claim;
+pub use catalog_ack::{
+    PreparedCatalogAckRequest, catalog_ack_recovery_header, catalog_ack_retained_summary,
+    decode_catalog_ack_reply, encode_catalog_ack_reply, encode_catalog_ack_request,
+    prepare_catalog_ack_request, verify_catalog_ack_reply,
+};
 pub use claim::{
     ClaimApplyDecision, ClaimApplyPlan, ClaimPhaseInspection, FreshClaimPhase,
     claim_response_matches, claim_retained_summary, decide_fresh_claim_phase_observed,

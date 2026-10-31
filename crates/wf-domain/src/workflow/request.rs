@@ -174,6 +174,16 @@ impl ClientIntent {
         }
     }
 
+    /// Selects private catalog-ACK identity without verification or authority.
+    /// Only its explicit codec may bind/admit the complete represented frame.
+    #[must_use]
+    pub const fn credit_catalog_ack(digest: [u8; 32]) -> Self {
+        Self {
+            version: 13,
+            digest,
+        }
+    }
+
     /// Reads canonical intent normalization version.
     #[must_use]
     pub const fn version(self) -> u16 {

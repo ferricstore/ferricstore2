@@ -10,8 +10,10 @@ use wf_ports::state::StateTransactionError;
 
 mod claim;
 pub(crate) use claim::values::ClaimValuePublicationPlan;
+mod catalog_ack;
 mod core_policy;
 mod credit;
+pub use catalog_ack::apply_catalog_ack_transaction;
 pub use credit::{CreditTransactionError, apply_credit_transaction};
 mod original_policy;
 pub use core_policy::{CorePolicyTransactionError, apply_complete_core_policy_patch_transaction};

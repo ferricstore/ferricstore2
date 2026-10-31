@@ -1253,3 +1253,15 @@ for publisher discard, not promoted to committed owners. Snapshot custody and
 Node opt-in compare the exact capability even for an empty cohort. Native ETF,
 full durable ack, distributed catalog publication/repair/cleaner and source/
 Linux/macOS acceptance remain required; selection alone implements none of them.
+
+The durable catalog ACK successor uses explicit FWCP1 operation11/intent13,
+response11 FWCA1, behind actual credit_format2. Its fixed body carries the source
+expected_head/up_to controls (positive exact, ordered, at most256 entries).
+Retained original response, shared request namespace, control and actual queue
+deletions use the same exclusive Immediate writer. Fresh metadata guards never
+precede the retained gate. Only StaleCursor/InvalidRange can be retained; corrupt
+or operational failures abort, and uncertainty fences without acknowledgement.
+Original profile/generic readers remain closed; success and rejection receipts
+alone require format2 on reopen. Existing Catalog Node opt-in audits complete
+bodies and uses that same writer through startup and snapshot suffixes. The
+cross-group publisher must still publish membership successfully before ACK.

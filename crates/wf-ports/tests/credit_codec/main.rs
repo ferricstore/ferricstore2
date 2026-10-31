@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+mod catalog_ack;
 mod framing;
 mod view;
 

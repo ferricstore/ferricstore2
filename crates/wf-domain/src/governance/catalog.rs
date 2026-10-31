@@ -1,6 +1,12 @@
 //! Mathematical publication queue values; none establish commit or authority.
 
 use crate::workflow::MAX_EXACT_MILLIS as MAX;
+
+mod ack;
+pub use ack::{
+    CreditCatalogAckPlan, CreditCatalogAckRejection, CreditCatalogAckReply,
+    CreditCatalogAckRequest, prepare_catalog_ack,
+};
 use std::fmt;
 
 /// Canonical monotone publication queue header, independent of stored origin.

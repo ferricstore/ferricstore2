@@ -1,4 +1,5 @@
 use super::TestResult;
+mod ack;
 use wf_domain::governance::catalog::{
     CreditCatalogError as E, CreditCatalogMeta as Meta, CreditCatalogObservation as Observation,
 };
