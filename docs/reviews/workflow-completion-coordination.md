@@ -60735,3 +60735,15 @@ older-mode expected error from Codec(UnsupportedTag) to the actual UnsupportedEn
 before saving; do not count that oracle mistake as a product bug. Save before
 Node public-profile/audit/replay bodies. Pure-path negative checks are additional
 architecture coverage after codecs, without an original RED claim.
+
+Public Node3 now pass: old explicit modes refuse before mutation, complete older
+body corruption is found behind healthy last-applied state, and purged/received
+suffixes preserve original public request position/time/IDs despite changed
+prepared epoch/batch. Strict workspace Clippy currently reaches two supplemental
+architecture assertions needing equivalent assert_ne forms; no suppression.
+
+Additional source-order control (before its fix): original caller six pass,
+but new invalid Spend now_ms plus invalid optional TTL returns TTL first, contrary
+to pinned limit_store.ex61..65. The later invalid Release IDs versus now predicate
+is masked. Save this actual semantic failure before stage ordering correction.
+No new source mappings/full native/profile acceptance from these components.

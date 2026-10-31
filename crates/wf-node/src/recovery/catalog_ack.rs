@@ -22,12 +22,17 @@ use wf_types::{
 };
 
 pub(super) const fn enabled(limits: &CommittedRecoveryLimits) -> bool {
-    matches!(limits.credit, Some(CreditRecoveryProfile::Catalog(..)))
+    matches!(
+        limits.credit,
+        Some(CreditRecoveryProfile::Catalog(..) | CreditRecoveryProfile::Public(..))
+    )
 }
 
 fn selected(limits: &CommittedRecoveryLimits) -> Result<CreditLimits, E> {
     match limits.credit {
-        Some(CreditRecoveryProfile::Catalog(_, credit)) => Ok(credit),
+        Some(
+            CreditRecoveryProfile::Catalog(_, credit) | CreditRecoveryProfile::Public(_, credit),
+        ) => Ok(credit),
         _ => Err(E::UnsupportedEntry),
     }
 }

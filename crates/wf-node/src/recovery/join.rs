@@ -135,7 +135,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if body.get(6) == Some(&14) && super::catalog_prune::enabled(limits) {
+    let header = if body.get(6) == Some(&15) && super::credit::public(limits) {
+        wf_ports::log::public_credit_recovery_header(body, limits.normal.codec)
+    } else if body.get(6) == Some(&14) && super::catalog_prune::enabled(limits) {
         wf_ports::log::catalog_prune_recovery_header(body, limits.normal.codec)
     } else if body.get(6) == Some(&13) && super::catalog_progress::enabled(limits) {
         wf_ports::log::catalog_progress_recovery_header(body, limits.normal.codec)
@@ -239,7 +241,7 @@ fn audit_normal(
     if profile == 13 {
         return super::catalog_ack::audit(body, limits, base, stamp);
     }
-    if profile == 12 {
+    if matches!(profile, 12 | 17) {
         return super::credit::audit(body, limits, base, stamp);
     }
     if profile == 2 {

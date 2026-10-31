@@ -85,7 +85,7 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
-    if matches!(profile, 12..=16) {
+    if matches!(profile, 12..=17) {
         return governance(state, entry, fields, limits, base, profile);
     }
     if matches!(profile, 8..=11) || (profile == 3 && limits.value_claim_work.is_some()) {
@@ -193,7 +193,7 @@ fn governance(
     profile: u16,
 ) -> Result<ControlState, Error> {
     match profile {
-        12 => super::credit::apply(state, entry, fields, limits, base),
+        12 | 17 => super::credit::apply(state, entry, fields, limits, base),
         13 => super::catalog_ack::apply(state, entry, fields, limits, base),
         14 => super::catalog_membership::apply(state, entry, fields, limits, base),
         15 => super::catalog_progress::apply(state, entry, fields, limits, base),

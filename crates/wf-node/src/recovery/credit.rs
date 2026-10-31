@@ -8,11 +8,12 @@ use wf_domain::workflow::{
     control::{ControlState, EntryStamp},
     request::RequestScope,
 };
-use wf_ports::log::{RaftLogEntry, prepare_credit_request};
+use wf_ports::log::{RaftLogEntry, prepare_credit_request, prepare_public_credit_request};
 use wf_ports::state::StateTransactionError;
 use wf_storage::state::{RedbStateStore, RedbStateTransaction};
 use wf_storage::transaction::{
     CreditTransactionError, RecordBatchTransactionOutcome, apply_credit_transaction,
+    apply_public_credit_transaction,
 };
 use wf_types::{
     identity::{GroupId, RecoveryId, TenantId},
@@ -23,15 +24,20 @@ use wf_types::{
 pub(super) enum CreditRecoveryProfile {
     Identified(u64, CreditLimits),
     Catalog(u64, CreditLimits),
+    Public(u64, CreditLimits),
 }
 
 impl CreditRecoveryProfile {
     const fn fields(self) -> (u16, u64, CreditLimits) {
         match self {
             Self::Identified(shards, credit) => (1, shards, credit),
-            Self::Catalog(shards, credit) => (2, shards, credit),
+            Self::Catalog(shards, credit) | Self::Public(shards, credit) => (2, shards, credit),
         }
     }
+}
+
+pub(super) const fn public(limits: &CommittedRecoveryLimits) -> bool {
+    matches!(limits.credit, Some(CreditRecoveryProfile::Public(..)))
 }
 
 impl CommittedRecoveryLimits {
@@ -39,8 +45,9 @@ impl CommittedRecoveryLimits {
     /// # Errors
     /// Refuses invalid count, limits or unsupported recovery selection.
     pub fn with_public_credit_limits(self, shards: u64, credit: CreditLimits) -> Result<Self, E> {
-        let _ = (self, shards, credit);
-        Err(E::UnsupportedEntry)
+        let mut selected = self.with_identified_credit_catalog_limits(shards, credit)?;
+        selected.credit = Some(CreditRecoveryProfile::Public(shards, credit));
+        Ok(selected)
     }
 
     /// Selects actual credit-format2 catalog replay and its immutable shard count.
@@ -138,8 +145,12 @@ pub(super) fn audit(
     if u64::try_from(cost).map_err(|_| E::Limit)? > credit.max_work() {
         return Err(E::Limit);
     }
-    let prepared =
-        prepare_credit_request(body, limits.normal.codec, available).map_err(E::Codec)?;
+    let prepared = if body.get(6) == Some(&15) && public(limits) {
+        prepare_public_credit_request(body, limits.normal.codec, available)
+    } else {
+        prepare_credit_request(body, limits.normal.codec, available)
+    }
+    .map_err(E::Codec)?;
     if prepared.command().shard_count != shards {
         return Err(E::Credit(CreditTransactionError::State(
             StateTransactionError::InvalidChanges,
@@ -174,14 +185,25 @@ pub(super) fn apply(
         GroupId::new(replay::copy(fields[1])?).map_err(|_| E::NamespaceMismatch)?,
         RecoveryId::new(replay::copy(fields[2])?).map_err(|_| E::NamespaceMismatch)?,
     );
-    let outcome = apply_credit_transaction(
-        state,
-        &scope,
-        entry.body(),
-        entry.id(),
-        limits.normal,
-        credit,
-    )
+    let outcome = if entry.body().get(6) == Some(&15) && public(limits) {
+        apply_public_credit_transaction(
+            state,
+            &scope,
+            entry.body(),
+            entry.id(),
+            limits.normal,
+            credit,
+        )
+    } else {
+        apply_credit_transaction(
+            state,
+            &scope,
+            entry.body(),
+            entry.id(),
+            limits.normal,
+            credit,
+        )
+    }
     .map_err(E::Credit)?;
     let control = match outcome {
         RecordBatchTransactionOutcome::Retained { control, outcome } => {
