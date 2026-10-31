@@ -16,16 +16,21 @@ impl RedbStateStore {
         credit_shard_count: u64,
         limits: StateStoreLimits,
     ) -> Result<Self, E> {
-        let _ = (
+        super::values::genesis::create_selected_profile(
             database,
             group,
             recovery,
             genesis,
             defaults,
-            credit_shard_count,
             limits,
-        );
-        Err(E::UnsupportedPolicyProfile)
+            super::values::genesis::ValueGenesisCapabilities {
+                alias_format: 2,
+                credit_shard_count: Some(credit_shard_count),
+                credit_catalog: true,
+                governance_catalog:
+                    super::values::manifest::GovernanceCatalogProfile::WorkflowRelease,
+            },
+        )
     }
 }
 impl RedbStateTransaction<'_> {
@@ -33,6 +38,9 @@ impl RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses absent/older/corrupt capability or current admission failure.
     pub fn require_workflow_release(&self) -> Result<(), E> {
-        Err(E::UnsupportedPolicyProfile)
+        if self.governance_catalog_profile()? != 4 {
+            return Err(E::UnsupportedPolicyProfile);
+        }
+        Ok(())
     }
 }

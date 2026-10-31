@@ -136,3 +136,44 @@ fn public_credit_node_purged_and_received_suffixes_retain_original_ids_before_ne
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn public_credit_node_older_modes_refuse_empty_workflow_release_capability_without_writes()
+-> TestResult {
+    use wf_ports::state::StateTransactionError;
+    use wf_storage::state::{StateStoreGenesis, StateStoreLimits};
+    let dir = f::directory("gc4-closed-node")?;
+    let scope = f::scope()?;
+    let log = p::log(&dir)?;
+    let state = RedbStateStore::create_workflow_release_database(
+        redb::Builder::new().create(dir.join("state.redb"))?,
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreGenesis {
+            initial_time: f::clock(0, 0, 0)?,
+            placements: &[],
+            policies: &[],
+        },
+        p::defaults(),
+        4,
+        StateStoreLimits::default(),
+    )?;
+    drop((log, state));
+    let before = p::cohort(&dir)?;
+    let logs = f::log_rows(&dir)?;
+    for selected in [
+        p::selected()?.with_governance_catalogs(),
+        p::selected()?.with_governance_catalog_progress(),
+        p::selected()?,
+    ] {
+        let (log, state) = f::open_pair(&dir)?;
+        assert_eq!(
+            recover_committed(log, state, scope.group(), scope.recovery(), selected).err(),
+            Some(E::State(StateTransactionError::UnsupportedPolicyProfile))
+        );
+        assert_eq!(p::cohort(&dir)?, before);
+        assert_eq!(f::log_rows(&dir)?, logs);
+    }
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

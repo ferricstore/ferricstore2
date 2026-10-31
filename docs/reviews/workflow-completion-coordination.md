@@ -61062,3 +61062,65 @@ GC3 refusal and invalid-count preflight with empty engine table inventory.
 This advances actual custody but cannot certify binding/outbox rows, full snapshot
 or Node replay, governed Claim, remote release or the whole coupled batch. Those
 remain required successors before a new full integration claim.
+
+GC4 custody body now passes all28 real catalog-store cases, including the3 new
+cases; strict storage/all-target Clippy passes. Extend the already approved
+storage release test file with actual capture/receive/current snapshot and GC3
+install-refusal/cohort preservation, using existing StateSnapshotStore and
+RedbSnapshotStage plus Vec/Cursor, no new fixture type. Extend existing Node
+snapshot_recovery/public_credit.rs with one actual GC4 database case proving
+old membership/progress/prune public recovery modes refuse it before state/log
+mutation. Reuse p::defaults/log/cohort and actual engines. These are supplemental
+capability-boundary checks, not original RED, full release-row/Claim acceptance
+or Node GC4 execution. Keep new binding/intent/completion data, receipts and full
+received/purged replay requirements outstanding until their selected body exists.
+
+
+GC4 custody is implemented and verified, still inside the UNFINISHED coupled
+batch. Actual genesis/reopen preserves4 plus credit2/catalog; inherited real
+registration/revision-checked prune runs; GC3 guarded operations do not acquire4.
+Actual capture/receive/current snapshot preserves its exact capability and stream;
+GC3 install refuses with the whole cohort unchanged. Checksum-valid GC4 manifests
+without credit or without catalog2 fence as Corrupt without modifying tables.
+All older Node public membership/progress/prune recovery modes refuse an empty
+GC4 store before state/log writes. No new Node execution mode was enabled.
+
+Current focused proof:162 distinct cases (domain17,ports38,storage30,Node17,
+architecture60), strict workspace/all-target Clippy,fmt,diff and cargo progress0.
+No full pipeline rerun: the whole coupled batch is not ready. Last all12 evidence
+remains9220c17/1607. Existing685 test/benchmark files remain679 whole plus six exact
+additive/defaults-visibility/purity-fixture inverses. All five prior release value
+definitions moved verbatim, with old active paths re-exported. Frozen progress/
+mapping remain byte-identical;141/155/671 and5903/4222/1681/1655 stay partial.
+Receipts: /private/tmp/ferricstore2-release-{protocol-r0,protocol-focused,
+custody-r0,source-audit,focused}.json. Custody R0 be241ab has three compiled
+rejecting failures. Its earlier missing ReadableDatabase import and wrong fixed3
+metadata-row helper were fixture/compile errors, not product RED. Existing helper
+assertions stayed unchanged; the layout8-aware cohort helper is now used. Node
+fixture defaults gains only parent-visible access; its recipe is unchanged.
+Supplemental snapshot, dependency-tampering and Node refusal checks passed after
+the body; the boxed-error type fix in the tamper test is not a product failure.
+No independent-peer, new source-case, native Elixir/Linux or speedup claim.
+
+NEXT complete persistent workflow reservation binding and release enqueue in the
+same consumed record/index/history/outcome/control transaction, then real release
+ACK/sparse completion and whole recovery/snapshot/received replay. Preserve the
+current governed-Claim refusal until this exists. Proposed next schema (requires
+concrete artifact/API review before creation): families20 binding,21 meta,22 intent,
+23 completion under full group/recovery/tenant with exact record/sequence points;
+GC4 must guard every row and receipt, including receipt-only downgrade. Existing
+max family19 and latest internal response14 leave private op16/intent18/response15
+available for one typed ACK/mark command family; do not collide with existing
+response11/catalog ACK. Append is internal to actual workflow writes, never a
+public standalone enqueue/seed command. Bind existing GovernanceReservation as a
+separate rich record extension; avoid duplicating or widening the core record
+model without review. Canonical recovery must prove binding-to-record, contiguous
+queue meta/intents and completion-to-intent closure. Older writer paths must not
+silently mutate bound records without enqueue; deterministic backlog refusal and
+unknown outcomes keep their distinctions. Required real loop remains lease/spend
+-> governed Claim -> terminal write -> durable pending intent -> restart/snapshot
+-> reconciliation -> exact credit release while siblings survive. Policy-derived
+and explicit demands, retained-first retries, unused refunds, Unknown holding,
+read batching/fairness, raw caller/source error order, native malformed-owner
+migration and all M3-M8/source/platform acceptance remain. The goal stays active,
+solo; original dirty Elixir and isolated unexecuted native fix remain preserved.

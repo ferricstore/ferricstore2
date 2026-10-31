@@ -86,6 +86,11 @@ pub(in crate::state::redb) fn create_selected_profile(
     if capability.credit_catalog && capability.credit_shard_count.is_none() {
         return Err(Error::InvalidChanges);
     }
+    if capability.governance_catalog.workflow_release()
+        && (!capability.credit_catalog || capability.credit_shard_count.is_none())
+    {
+        return Err(Error::InvalidChanges);
+    }
     if capability.governance_catalog.enabled() && capability.alias_format != 2 {
         return Err(Error::InvalidChanges);
     }

@@ -182,7 +182,7 @@ impl RedbStateStore {
     pub const fn recovery(&self) -> &RecoveryId {
         &self.recovery
     }
-    /// Immutable manifest capability0/1/2, validated at genesis or complete open.
+    /// Immutable manifest capability0..4, validated at genesis or complete open.
     /// This schema observation grants no authorization or workflow authority.
     #[must_use]
     pub fn governance_catalog_profile(&self) -> u16 {

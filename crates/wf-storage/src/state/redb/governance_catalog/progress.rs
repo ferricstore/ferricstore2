@@ -48,12 +48,12 @@ impl RedbStateTransaction<'_> {
     /// # Errors
     /// Refuses unsupported profiles, resources or corrupt authority.
     pub fn require_catalog_progress(&self) -> Result<(), E> {
-        if !matches!(self.governance_catalog_profile()?, 2 | 3) {
+        if !matches!(self.governance_catalog_profile()?, 2..=4) {
             return Err(E::UnsupportedPolicyProfile);
         }
         Ok(())
     }
-    /// Reads actual immutable governance capability0/1/2/3, without enabling it.
+    /// Reads actual immutable governance capability0..4, without enabling it.
     /// # Errors
     /// Refuses unsupported layouts, corruption or resource exhaustion.
     pub fn governance_catalog_profile(&self) -> Result<u16, E> {

@@ -21,7 +21,7 @@ pub(super) fn selected() -> TestResult<CommittedRecoveryLimits> {
         .with_governance_catalog_pruning()
         .with_public_credit_limits(4, CreditLimits::default())?)
 }
-fn defaults() -> WorkflowValueDefaults {
+pub(super) fn defaults() -> WorkflowValueDefaults {
     let lifecycle = LifecycleDefaults {
         ttl_ms: 7000,
         history_hot_max_events: 2,
