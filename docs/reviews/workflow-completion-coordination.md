@@ -59463,3 +59463,46 @@ retained ACK and later entry, then gets UnsupportedEntry instead of expected
 TrailingBytes. Generic-profile refusal passes before the selected replay fails.
 Later snapshot custody/replay assertions remain masked. See
 /private/tmp/ferricstore2-catalog-ack-node-r0.{json,log}. Save before Node bodies.
+
+The three saved Node cases now pass unchanged, including received snapshots
+both before ACK (real suffix replay) and after ACK (the captured receipt itself
+must decode), plus purged replay, retained originals and complete historical
+audit behind an applied last entry. Strict all-target Clippy passes for domain,
+ports,storage andNode after the single equivalent assertion-style repair.
+Node charges fresh body decoding and a conservative fixed256-entry work bound;
+the configured owned/work profile and actual whole-call W remain enforced.
+
+Two post-body controls in the already selected domain/codec test files add
+exact retained-status profile quarantine and a correctly rehashed invalid ACK
+body, with explicit generic-header/constructor refusal. They are added
+correctness evidence, not original RED/source credit. Full workspace validation
+will cover these and all predecessor tests together before checkpointing.
+
+Next target-catalog source review: pinned governance/catalog.ex registers at
+most256 nonempty binary members with deduplication; empty registration performs
+no write. Unregistration permits binary members (including empty) and deduplicates
+the bounded batch. Page/reduce traversal anchors on an actual last member:
+zrank miss returns "catalog changed during traversal". An absent cursor must not
+silently become an arbitrary lexical continuation. A full page returns its last
+member as the next cursor even when a following read will be empty. Preserve
+global collection ordering/limits across pages, loader failures, membership
+repair and exact batch counters. The future catalog membership storage/command,
+authoritative routing/read ports and publisher artifacts are not yet selected;
+the current ACK leaf does not implement any of them or accepted consensus.
+
+ACK integration checkpoint: all12 workspace gates pass on1900 frozen non-Markdown
+inputs/1311 Rust files with no drift;1454 cases/115 executable targets preserve
+all1435 predecessor and1294 original identities/statuses/multiplicities. Both
+benchmark correctness smokes,54 architecture cases,Python7 and11 doctests pass.
+The full runtime suite took479.74 seconds; repeated whole-suite runs between
+small changes are unnecessary once focused checks have established the change.
+The initial full attempt stopped at Clippy before runtime tests because a new
+post-body codec control unnecessarily returned TestResult; removing that wrapper
+preserves the saved initial RED prefix. The corrected source passed all12 gates.
+Source audit preserves632 older test files (628 whole,4 exact registration
+inverses) and all six saved ACK sources as the explicitly recorded whole/prefix/
+equivalent-assertion forms. Actual cargo parity exits1 with5858 textual
+declarations unported and unchanged checked/runtime accounting. This leaf adds
+no full source-case or Linux/native performance credit. The catalog publication,
+repair/cleaner and public-parent batch remains unfinished; no primary code
+adoption, full-goal completion or independent review is claimed.

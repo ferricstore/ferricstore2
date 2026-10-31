@@ -209,3 +209,22 @@ fn catalog_ack_reply_has_fixed_complete_bytes_business_status_and_closed_old_pro
     );
     Ok(())
 }
+
+#[test]
+fn catalog_ack_consistently_hashed_invalid_body_and_generic_header_profiles_stay_closed() {
+    let valid = independent();
+    assert!(prepare_catalog_ack_request(&valid, CodecLimits::default(), 8192).is_ok());
+    assert!(wf_ports::log::normal_recovery_header(&valid, CodecLimits::default()).is_err());
+    assert!(wf_ports::log::stored_value_recovery_header(&valid, CodecLimits::default()).is_err());
+    assert!(ClientIntent::new(13, [0; 32]).is_err());
+    let mut bad = valid;
+    bad[79..87].copy_from_slice(&0_u64.to_be_bytes());
+    let mut hash = Sha256::new();
+    hash.update(b"wf-credit-catalog-ack-intent-v1\0");
+    hash.update(&bad[79..]);
+    bad[29..61].copy_from_slice(&hash.finalize());
+    assert_eq!(
+        prepare_catalog_ack_request(&bad, CodecLimits::default(), 8192).err(),
+        Some(CodecError::Malformed)
+    );
+}

@@ -2,7 +2,43 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current batch: M2-CREDIT-CATALOG1, still unfinished. Explicit credit_format2 now
+Current batch: M2-CREDIT-CATALOG1, still unfinished. Durable catalog ACK now joins
+bounded queue deletion, metadata, retained reply and applied control in one
+Immediate commit. The fixed operation11/intent13/response11 profile remains
+closed to generic callers. Retained retries preserve the original reply after
+later publication; actual capability2 is required even for receipt-only state.
+Explicit Catalog Node selection audits complete historical bodies and replays
+the same atomic driver through purged and received-snapshot suffixes.
+
+All12 local gates pass on1900 frozen non-Markdown inputs/1311 Rust files, with
+zero drift:1454 cases/115 executable targets,54 architecture cases,Python7 and11
+doctests/15 targets. Every previous1435 and original1294 identity/status/
+multiplicity remains exact, including both benchmark correctness smokes. The19
+new ACK cases include real sync uncertainty/fencing, every-step rollback,
+namespace collisions, stale/already-acked priority,256 deletions under a workflow
+batch limit of1, receipt-only downgrade refusal and historical/snapshot recovery.
+Genuine failures precede bodies at8325acf (14 initial cases),f856f5e (seven
+actual driver failures; old-capability control passes) andb7768e3 (three Node
+failures). Two controls were appended after bodies and receive no original TDD
+credit. All632 prior test files remain as628 whole files and4 exact module-
+registration inverses. Of six saved ACK test files,three remain whole exact,two
+only append controls andone has a complete equivalent empty-assertion inverse.
+See /private/tmp/ferricstore2-catalog-ack-{r0,driver-r0,node-r0,final-pipeline,
+source-audit,full-identity,full-parity}.json. No native performance claim.
+
+Actual full parity exits1: unchanged135/149/646 checked derived accounting and
+5903/4222/1681/1655 runtime reconciliation counts;5858 textual declarations stay
+unported in the immutable M0 accounting. No new full source-case credit. Target
+catalog membership and idempotent publication are next, followed by existing-
+owner public repair, cleaner progress/fairness and coupled public Claim/policy/
+release-outbox work. Accepted consensus, application and HTTP/TCP integration,
+all required source scenarios, native reference and Linux/macOS acceptance
+remain mandatory. Do not adopt this unfinished feature branch or mark the full
+goal complete. The primary handoff points here; its last adopted code remains
+728650f. Continue in functional batches with focused development checks and one
+full validation at the integration checkpoint.
+
+Previous catalog increment: explicit credit_format2 now
 joins each new owner and its bounded publication intent with the actual retained
 reply/control in one Immediate commit. Format1 bytes/constructors remain intact.
 Typed FWCM1/FWCI1 metadata/intent rows bind group/recovery/tenant and monotone
@@ -13,7 +49,7 @@ Actual Node selection binds exact format/count even when empty, audits complete
 historical bodies, and preserves publication through replay and purged/received
 snapshot suffixes. Configured profiles use an enum, with no lint exemption.
 
-All12 local gates pass on1885 frozen non-Markdown inputs/1296 Rust files, with
+Its all12 local gates pass on1885 frozen non-Markdown inputs/1296 Rust files, with
 zero drift:1435 cases/115 executable targets,54 architecture cases,Python7 and11
 doctests/15 targets. Every previous1405 and original1294 identity/status/
 multiplicity remains exact, including both benchmark correctness smokes. No
@@ -31,8 +67,8 @@ source-audit,full-identity,full-parity}.json.
 Actual full parity exits1: unchanged135/149/646 checked derived accounting and
 5903/4222/1681/1655 runtime reconciliation counts;5858 textual declarations stay
 unported in the immutable M0 accounting. No new full source-case credit. Durable
-ACK codec/transaction/replay is next, followed by cross-group idempotent catalog
-publication, existing-owner public repair, cleaner progress/fairness and the
+ACK codec/transaction/replay was next (now implemented above), followed by
+idempotent catalog publication, existing-owner public repair, cleaner progress/fairness and the
 coupled public Claim/policy/release-outbox work. All required source scenarios,
 native reference and Linux/macOS acceptance remain mandatory. Do not adopt this
 unfinished feature branch or mark the full goal complete. The primary handoff

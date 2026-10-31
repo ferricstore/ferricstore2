@@ -133,7 +133,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if body.get(6) == Some(&10) && limits.credit.is_some() {
+    let header = if body.get(6) == Some(&11) && super::catalog_ack::enabled(limits) {
+        wf_ports::log::catalog_ack_recovery_header(body, limits.normal.codec)
+    } else if body.get(6) == Some(&10) && limits.credit.is_some() {
         credit_recovery_header(body, limits.normal.codec)
     } else if limits.step_continue.stored() {
         stored_step_continue_recovery_header(
@@ -217,6 +219,9 @@ fn audit_normal(
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if profile == 13 {
+        return super::catalog_ack::audit(body, limits, base, stamp);
+    }
     if profile == 12 {
         return super::credit::audit(body, limits, base, stamp);
     }

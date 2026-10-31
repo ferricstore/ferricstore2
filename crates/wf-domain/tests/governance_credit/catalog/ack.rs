@@ -167,3 +167,68 @@ fn catalog_ack_plan_preserves_last_exact_head_and_rejects_invalid_original_contr
     }
     Ok(())
 }
+
+#[test]
+fn catalog_ack_retained_business_status_cannot_escape_the_exact_intent_response_profile()
+-> TestResult {
+    use wf_domain::workflow::{
+        admission::AdmissionLimits,
+        request::{ClientIntent, RequestScope, RetainedMetadata, RetainedOutcome, RetainedStatus},
+    };
+    use wf_types::{
+        identity::{GroupId, RecoveryId, RequestId, TenantId},
+        version::{AppliedPosition, LogIdentity, TimestampMillis},
+    };
+    let scope = RequestScope::new(
+        TenantId::new(b"t".to_vec())?,
+        GroupId::new(b"g".to_vec())?,
+        RecoveryId::new(b"r".to_vec())?,
+    );
+    let mut metadata = RetainedMetadata {
+        scope,
+        request: RequestId::new(b"ack".to_vec())?,
+        intent: ClientIntent::credit_catalog_ack([0; 32]),
+        original_position: LogIdentity::new(1, 2, AppliedPosition::new(0)),
+        original_time: TimestampMillis::new(1000),
+        expires_at: TimestampMillis::new(2000),
+        status: RetainedStatus::CreditCatalogRejected(R::InvalidRange),
+    };
+    let mut bytes = b"FWCA\0\x01\x02".to_vec();
+    bytes.extend_from_slice(&1_u64.to_be_bytes());
+    bytes.extend_from_slice(&0_u64.to_be_bytes());
+    bytes.extend_from_slice(&0_u16.to_be_bytes());
+    assert!(
+        RetainedOutcome::new(
+            metadata.clone(),
+            11,
+            bytes.clone(),
+            AdmissionLimits::default()
+        )
+        .is_ok()
+    );
+    assert!(
+        RetainedOutcome::new(
+            metadata.clone(),
+            10,
+            bytes.clone(),
+            AdmissionLimits::default()
+        )
+        .is_err()
+    );
+    metadata.intent = ClientIntent::governance_credit([0; 32]);
+    assert!(
+        RetainedOutcome::new(
+            metadata.clone(),
+            10,
+            bytes.clone(),
+            AdmissionLimits::default()
+        )
+        .is_err()
+    );
+    metadata.intent = ClientIntent::credit_catalog_ack([0; 32]);
+    metadata.status = RetainedStatus::GovernanceRejected(
+        wf_domain::governance::identified::IdentifiedCreditRejection::CatalogBacklogFull,
+    );
+    assert!(RetainedOutcome::new(metadata, 11, bytes, AdmissionLimits::default()).is_err());
+    Ok(())
+}

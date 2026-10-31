@@ -85,6 +85,9 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
+    if profile == 13 {
+        return super::catalog_ack::apply(state, entry, fields, limits, base);
+    }
     if profile == 12 {
         return super::credit::apply(state, entry, fields, limits, base);
     }

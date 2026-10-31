@@ -16,6 +16,7 @@ use wf_storage::transaction::{
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
+mod catalog_ack;
 mod credit;
 mod join;
 mod original_policy;
