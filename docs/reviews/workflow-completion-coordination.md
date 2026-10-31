@@ -59059,3 +59059,44 @@ prepare clause, its empty-queue backlog branch uses that pair and the existing
 bounded enqueue; nonempty queues retain the prior drain-first fix. No new file,
 module/model or production API authority. Preserve all existing source/test
 bodies and no native execution/formatter/TDD claim without actual native tools.
+
+After the two saved burst cases turn green, add one post-body atomicity control
+in the same approved burst.rs: cap actual adapter C during a256-task cleanup,
+require Limit, verify the same owner remains readable and every table remains
+the complete predecessor, then retry the exact request under its normal profile
+and require one-page progress. This is added correctness evidence, not original
+TDD or source credit; no new artifact, authority hook or production change.
+
+M2-IDENTIFIED-CREDIT1 local code verification: the two saved expiry-burst cases
+now pass with their entire original test-file prefix intact; the additional
+C-budget cut preserves all6 tables and same-owner readability, then the exact
+request succeeds under its normal profile. The bounded helper retains the
+already sorted detached lease vector in place and does not change the old
+expiry body/tariff (only its previously selected governance visibility differs).
+All23 focused storage credit cases and strict focused Clippy pass.
+
+The matching isolated Elixir bounded helper/state fallback/model regression is
+saved at e67bd276cbf2b4bced4578859bd4e715c8b6a3bc. Three complete narrow inverses
+preserve the old two-argument helper, state behavior and existing test bodies
+against24e5aa028. Native execution/formatter remain unverified; no native TDD,
+merge or push. See /private/tmp/ferricstore2-credit-expiry-burst-elixir.json.
+
+All12 full local gates now pass on1868 frozen inputs/1279 Rust files, with zero
+drift: Python,bash,fmt,all-target check,strict all-target Clippy,all-target tests,
+doctests,docs,reference,progress,offline dependency audit,diff. Actual1405 cases
+run in115 executable targets (113 results plus2 correctness smokes), with54
+architecture cases and6 doctests/15 targets. Every previous1368 and original1294
+identity/status/multiplicity and all114 prior executable identities are exact.
+Source audit:1795 old inputs unchanged,30 reviewed,43 new; all611 old test files
+preserved as608 whole exact and3 exact registration inverses. Initial stored R0
+sources now have4 whole exact,1 append-only,1 exact bounds registration inverse
+and2 explicit masked setup repairs; do not claim all eight are whole exact.
+
+Authoritative receipts under /private/tmp/ferricstore2-identified-credit-:
+final-pipeline.json,source-audit.json,full-identity.json,full-parity.json.
+Actual cargo parity exits1, with5858 textual declarations unported and unchanged
+135/149/646 derived accounting plus5903/4222/1681/1655 runtime counts. No source
+case or native/Linux acceptance is earned by local code gates. Main remains
+db1c3c9 clean and unmodified; no adoption or full batch/product completion claim.
+Continue the source/View/catalog/public-parent/outbox obligations and the ordered
+plan. The full goal is active and solo, not complete or blocked.

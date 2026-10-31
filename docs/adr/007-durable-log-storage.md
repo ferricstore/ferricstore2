@@ -1148,9 +1148,9 @@ live and retained snapshot cohorts; it does not infer capability from row count.
 M2-IDENTIFIED-CREDIT1 selects a real stored owner protocol under the existing
 exclusive group/recovery transaction. The storage leaf is implemented and its
 restart/snapshot/fault controls pass. Explicit Node historical audit/replay,
-received/purged suffixes and all112 Node cases now pass. The queued-backlog
-cleanup stall is corrected; wider expiry bursts and full batch acceptance
-remain unfinished. Initial rejecting contracts alone established no
+received/purged suffixes and all112 Node cases now pass. Queued-backlog and
+wider expiry-burst progress are corrected and all12 local gates pass; full
+source/public/platform batch acceptance remains unfinished. Initial rejecting contracts alone established no
 durability or public Claim authority.
 The exact artifact selection is in the coordination record. Keep the domain
 effect-free and its existing types-only dependency.
@@ -1213,8 +1213,17 @@ detached reference. Normal commands retain BacklogFull denial and no prefix
 effects. The real regression failed before correction, then proved one-page
 drain, safe subsequent expiry enqueue/reclaim and continued canonical recovery.
 The matching isolated Elixir change is not natively verified. Bursts exceeding
-256 new page generations with no existing queued task remain a separate open
-bounded-expiry requirement; this correction does not reduce supported shards.
+256 new page generations with no existing queued task use bounded expiry:
+Cleanup admits the first256 expired references in existing shard order, retires
+only those exact detached generations plus page-free expired leases, and keeps
+the remaining expired/live leases intact. Existing normal expiry is unchanged;
+normal commands still refuse excess backlog. One cleanup deletes one page.
+The two real512-shard failures precede the correction; complete reopen,
+mixed-capacity and budget-abort/exact-retry controls now pass. The sorted lease
+vector is retained in place using the [documented retain contract](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.retain),
+without a second map/vector or sort. No shard ceiling is reduced, and no native
+performance or source-profile result is inferred. All12 local gates pass; full
+source/public-service/platform acceptance remains unfinished.
 
 Use one consumed writer for owner, reservation/page/cleanup changes, original
 response, control and checkpoint. Unknown commit fences the owner and returns no

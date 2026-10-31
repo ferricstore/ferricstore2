@@ -23,23 +23,29 @@ pub(super) fn expire(prepared: &mut PreparedIdentifiedCredit<'_>) -> Result<bool
         .filter(|lease| lease.expires_at_ms <= prepared.now.get() && lease.reservation_page != 0)
         .count();
     let queued = pending(data.cleanup_head, data.cleanup_tail)?;
+    let mut selected = count;
     if queued.checked_add(count).ok_or(E::Limit)? > 256 {
-        if queued != 0
-            && matches!(
-                prepared.request.mutation,
-                super::IdentifiedCreditMutation::Cleanup
-            )
-        {
+        if !matches!(
+            prepared.request.mutation,
+            super::IdentifiedCreditMutation::Cleanup
+        ) {
+            prepare::abort(prepared, R::CleanupBacklogFull);
+            return Ok(false);
+        }
+        if queued != 0 {
             // Drain existing work before admitting another generation; its lease
             // stays intact until the detached reference can be queued safely.
             return Ok(true);
         }
-        prepare::abort(prepared, R::CleanupBacklogFull);
-        return Ok(false);
+        selected = 256;
     }
-    reserve(&mut prepared.cleanup, count, &mut prepared.charge)?;
-    let length = data.leases.len();
+    reserve(&mut prepared.cleanup, selected, &mut prepared.charge)?;
+    let length = prepared.data.as_ref().ok_or(E::InvalidState)?.leases.len();
+    let mut admitted = 0;
     for index in 0..length {
+        if admitted == selected {
+            break;
+        }
         let lease = &prepared.data.as_ref().ok_or(E::InvalidState)?.leases[index];
         if lease.expires_at_ms <= prepared.now.get() && lease.reservation_page != 0 {
             let task = CreditCleanupTask {
@@ -49,13 +55,23 @@ pub(super) fn expire(prepared: &mut PreparedIdentifiedCredit<'_>) -> Result<bool
                 last_page: lease.reservation_page,
             };
             enqueue(prepared, task)?;
+            admitted += 1;
         }
     }
-    capacity::expire(
-        prepared.data.as_mut().ok_or(E::InvalidState)?,
-        prepared.now.get(),
-        &mut prepared.charge,
-    )?;
+    if admitted != selected {
+        return Err(E::InvalidState);
+    }
+    let data = prepared.data.as_mut().ok_or(E::InvalidState)?;
+    if selected == count {
+        capacity::expire(data, prepared.now.get(), &mut prepared.charge)?;
+    } else {
+        capacity::expire_detached_bounded(
+            data,
+            prepared.now.get(),
+            selected,
+            &mut prepared.charge,
+        )?;
+    }
     Ok(true)
 }
 

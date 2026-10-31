@@ -21,6 +21,38 @@ pub(in crate::governance) fn expire(
     rebalance(owner, charge)
 }
 
+/// Retires only detached expired generations whose page references were queued.
+pub(in crate::governance) fn expire_detached_bounded(
+    owner: &mut CreditOwnerData,
+    now: u64,
+    maximum_paged: usize,
+    charge: &mut CreditCharge,
+) -> Result<(), E> {
+    charge.work(product(owner.leases.len(), 256)?)?;
+    if owner
+        .leases
+        .iter()
+        .any(|lease| !lease.reservations.is_empty())
+    {
+        return Err(E::InvalidState);
+    }
+    let mut retired = 0;
+    owner.leases.retain(|lease| {
+        if lease.expires_at_ms > now {
+            return true;
+        }
+        if lease.reservation_page == 0 {
+            return false;
+        }
+        if retired == maximum_paged {
+            return true;
+        }
+        retired += 1;
+        false
+    });
+    rebalance(owner, charge)
+}
+
 pub(super) fn rebalance(owner: &mut CreditOwnerData, charge: &mut CreditCharge) -> Result<(), E> {
     charge.work(product(owner.leases.len(), 256)?)?;
     let allocated = owner.leases.iter().try_fold(0_u64, |sum, lease| {

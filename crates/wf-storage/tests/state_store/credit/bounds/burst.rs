@@ -282,3 +282,64 @@ fn physical(scope: &RequestScope, family: u8, lease: &CreditLeaseData) -> Vec<u8
     }
     out
 }
+
+#[test]
+fn credit_store_burst_admission_failure_preserves_every_table_before_exact_retry() -> TestResult {
+    let dir = common::directory("credit-burst-abort")?;
+    let path = dir.join("state");
+    setup(&path, false)?;
+    let before = f::cohort(&path)?;
+    let owner = f::owner(&path)?;
+    let scope = common::scope()?;
+    let frame = encode_credit_request(
+        &scope,
+        &RequestId::new(b"budget-cut".to_vec())?,
+        common::clock(2000)?,
+        IdentifiedCreditRequest {
+            scope: b"global",
+            shard_count: 512,
+            configuration: None,
+            mutation: Mutation::Cleanup,
+        },
+        common::driver_limits().codec,
+        16 * common::MIB,
+    )?;
+    let mut limits = common::driver_limits();
+    limits.maximum_adapter_bytes = 30_000;
+    let mut store = common::open(&path)?;
+    assert!(matches!(
+        apply_credit_transaction(
+            &mut store,
+            &scope,
+            frame.as_bytes(),
+            common::log(1),
+            limits,
+            CreditLimits::default()
+        ),
+        Err(CreditTransactionError::State(
+            wf_ports::state::StateTransactionError::Limit
+        ))
+    ));
+    let observed = store.read_credit_owner(
+        &scope,
+        b"global",
+        CreditLimits::default(),
+        10_000,
+        64 * common::MIB,
+    )?;
+    assert_eq!(observed.as_ref(), Some(&owner));
+    drop(store);
+    assert_eq!(f::cohort(&path)?, before);
+    let retried = execute(&path, b"budget-cut", 1, Mutation::Cleanup)?;
+    assert_eq!(
+        retried.decision,
+        Decision::Cleaned {
+            deleted: 1,
+            pending: true
+        }
+    );
+    assert_eq!(f::owner(&path)?.view().free, 512);
+    drop(common::open(&path)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

@@ -1,65 +1,61 @@
 # ferricstore2: implementation handoff
 
-Updated: 2026-10-31. The user resumed the unfinished full-completion goal.
+Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current worktree: codex/identified-credit-solo, M2-IDENTIFIED-CREDIT1 in progress.
-The actual atomic storage leaf now works: verified request preparation, staged
-pure identified decisions, detached owner/ID/page/cleanup publication, immutable
-retained replies, restart closure and real snapshot capture/receive/install.
-One Immediate transaction publishes the complete cohort; delegated commit
-failure fences and reopens a whole old or new revision. Recovery uses exact page
-backreferences and an injective page/ID census instead of repeated reverse
-history scans. No owner or ID history map is cloned per command.
+Current worktree: codex/identified-credit-solo, M2-IDENTIFIED-CREDIT1. The private
+stored credit path now implements complete verified requests, phased pure
+identified decisions, one atomic owner/ID/page/cleanup/outcome/control writer,
+strict canonical reopen and real snapshots. Node explicitly selects immutable
+shard authority, audits full historical bodies and replays received/purged
+suffixes through that same writer. Generic old paths remain closed.
 
-Validation: all219 state-store cases pass, including15 credit controls and every
-prior204 case;20 domain credit cases and6 codec cases pass; all54 architecture
-checks and strict focused Clippy pass. Six malformed graph variants are rejected
-without changing a table. All611 earlier test files are preserved:609 whole
-files plus two exact module-registration inverses. The genuine stored RED was
-saved in f5bbfbe before bodies; the separate actual-count authority RED also now
-passes. Added direct protocol/codec/corruption controls are post-body correctness
-evidence, not additional original TDD or source-parity credit. Two previously
-masked R0 setup repairs are explicit in the coordination record: read the actual
-four-row credit manifest instead of the legacy three-row helper; use the existing
-growth-skipping delegated publication-sync fault mode, preserving and extending
-the exact Uncertain/fenced/whole-cohort assertions.
+All12 local gates pass on1868 frozen non-Markdown inputs/1279 Rust files:
+1405 cases/115 executable targets (113 result targets plus2 benchmark correctness
+smokes),54 architecture cases,Python7 and6 doctests/15 targets. Every prior1368
+case and original1294 identity/status/multiplicity remains exact, with all114
+previous executable identities preserved. All611 older test files are preserved:
+608 whole files and3 exact additive module-registration inverses. The source
+audit preserves1795 inputs, reviews30 existing changes and accounts for43 new
+files; no input drift occurred during any gate. See identified-credit-final-
+pipeline, source-audit and full-identity JSON receipts under /private/tmp.
 
-Node full-body audit and actual committed replay now work under an explicit
-immutable shard-count/credit profile. All112 existing/new Node cases and its
-doctest pass, including the four genuine RED controls saved in be1d2c4. Real
-received and purged snapshot suffixes preserve original IDs/outcomes; legacy
-opt-ins stay closed and changed actual capability fails before replay. Current
-focused storage credit coverage is19 passing cases, adding every-step rollback
-and complete canonical 65536-ID,256-task and MAX_EXACT boundary donors. The full
-prior219 state-store run remains recorded above; the new whole target has223
-cases and awaits the final full checks. Strict focused Clippy and all54
-architecture checks pass. Only one Node R0 test fixture needed the explicit
-drop-before-cohort-open setup repair; three saved test files remain exact.
+The23 credit storage cases include exact sparse/tombstone replay, retirement,
+expiry, retained originals, fault fencing, snapshots, every-step rollback,
+65536-ID history, MAX_EXACT and256-task boundaries. Two safety corrections now
+keep cleanup progressing at a full queue and through more than256 newly expired
+page generations. The latter uses an actual512-shard donor, admits the first256
+references in existing shard order, reclaims only safely referenced/page-free
+expired capacity, preserves live/unqueued leases in place and deletes one page.
+A real C-budget failure preserves every table and permits an exact retry.
 
-The full-queue cleanup stall is now corrected after a genuine stored failure
-saved in4787d8c. Cleanup may drain one existing page while deferring expiry that
-cannot fit; its expired lease stays intact until a later safe enqueue/reclaim.
-All20 focused credit storage cases,20 domain cases,6 codecs,4 Node credit cases
-and54 architecture checks pass with strict focused Clippy. The original saved
-regression remains byte-exact. The matching Elixir correction/regression is
-saved on the isolated pending-reclaim branch at24e5aa028; exact inverses preserve
-all earlier source/test bodies. Native execution/formatter remain unverified.
-See /private/tmp/ferricstore2-credit-cleanup-progress-{genuine-r0,elixir} receipts
-and storage/domain-ports/node/architecture/clippy logs.
+Genuine failures were saved before bodies: f5bbfbe (stored feature), the separate
+actual-count authority receipt,be1d2c4 (Node),4787d8c (queued stall),b6a59b1
+(expiry burst). Additional post-body controls receive no original TDD/source
+credit. Two initial masked storage fixture repairs and one Node donor-lifetime
+repair are explicit in the coordination record; original predicates remain.
 
-This is still an unfinished batch. More than256 newly expired page generations
-with no existing queue still needs a bounded-expiry/progress correction; do not
-narrow the supported shard profile to hide it. Remaining pinned stored-protocol
-cases/dispositions, final workspace gates and adoption also remain open. Native
-Elixir/Linux acceptance remains unexecuted. The main checkout stays at the prior
-adopted green db1c3c9; do not adopt this branch yet. See
-`/private/tmp/ferricstore2-identified-credit-atomic-` focused, architecture,
-clippy-verified, old-tests and progress evidence, plus identified-credit-node-*
-and identified-credit-boundaries-* logs. Continue with a real failing bounded
-expiry-burst control before its correction; preserve shared retained namespace,
-actual immutable shard authority and the same complete atomic writer.
+The isolated Elixir branch at
+/Users/yoavgea/repos/ferricstore-credit-pending-reclaim-solo now ends at e67bd276c.
+It contains the earlier pending-reclaim clamp, queued-stall correction and
+bounded-expiry correction with regressions. Complete file inverses preserve
+older bodies. Native execution/formatter remain unverified; no native passing
+or TDD claim, original-checkout mutation, merge or push. See credit-expiry-burst-
+elixir.json and the earlier cleanup/owner receipts under /private/tmp.
 
-The completed code checkpoint is 728650f, M1-CREDIT-OWNER1. The pure governing
+This is still an unfinished product and source-parity batch. The actual full
+parity command exits1:5858 textual declarations remain unported in the immutable
+M0 accounting. Checked progress stays135 source-derived declarations/149
+counterparts/646 links, with unchanged5903/4222/1681/1655 runtime counts. No new
+source-case credit is claimed. Required pinned stored-protocol source cases and
+migration dispositions, public View/LimitStore behavior, catalog publication/
+repair/cleaner obligations and coupled public Claim/policy/release-outbox work
+remain mandatory. Full M1-M8, native reference and Linux/macOS acceptance are
+not achieved. The main checkout remains clean at db1c3c9; do not adopt this
+unfinished branch yet. Continue the remaining source/design obligations in
+functional batches; preserve architecture, all source cases and the atomic
+stored/Node path rather than treating local green checks as full completion.
+
+The last adopted code checkpoint is 728650f, M1-CREDIT-OWNER1. The pure governing
 credit reducer now executes configuration, partial grants, identified/anonymous
 compatibility spends, renewal, sibling-safe release and expiry without cloning
 an owner map. All 16 focused cases and strict Clippy pass. Twelve rejecting

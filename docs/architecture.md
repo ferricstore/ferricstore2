@@ -1540,5 +1540,6 @@ recovery proves complete closure using forward membership and a checked census.
 specifies the formats and invariants. Node explicitly selects the immutable
 shard count, verifies actual capability, audits complete historical bodies and
 replays through that same consumed writer, including received/purged snapshots.
-Cleanup-progress findings, public governed Claim, outbox/catalog/service behavior
-and full source/platform acceptance remain open.
+Cleanup drains a full queue first and batches newly expired detached generations
+without reclaiming unqueued capacity. Public governed Claim, outbox/catalog/
+service behavior and full source/platform acceptance remain open.
