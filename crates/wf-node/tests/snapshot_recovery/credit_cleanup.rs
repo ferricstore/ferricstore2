@@ -51,12 +51,14 @@ fn credit_cleaner_actual_busy_300_then_later_owner_respects_fairness_and_cursor_
 #[test]
 fn credit_cleaner_actual_empty_catalog_issues_no_command_and_changes_neither_store() -> TestResult {
     let mut fixture = CleanupFixture::new()?;
+    assert_eq!(fixture.progress()?, GovernanceCatalogProgress::Missing);
     let before = fixture.cohort()?;
     let result = fixture.run(1)?;
     assert_eq!((result.commands, result.deleted, result.errors), (0, 0, 0));
     assert!(result.caught_up);
     assert!(fixture.calls.borrow().is_empty());
     assert_eq!(fixture.cohort()?, before);
+    assert_eq!(fixture.progress()?, GovernanceCatalogProgress::Missing);
     fixture.cleanup()
 }
 #[test]
@@ -209,5 +211,117 @@ fn credit_cleaner_actual_invalid_budget_refuses_before_either_store_changes() ->
     }
     assert!(fixture.calls.borrow().is_empty());
     assert_eq!(fixture.cohort()?, before);
+    fixture.cleanup()
+}
+
+#[test]
+fn credit_cleaner_actual_cleanup_accepts_monotone_execution_time_above_prepared_floor() -> TestResult
+{
+    let mut fixture = CleanupFixture::new()?;
+    fixture.seed(b"a", 1)?;
+    let request = wf_types::identity::RequestId::new(b"clock-advance".to_vec())?;
+    let frame = wf_ports::log::encode_catalog_progress_request(
+        &fixture.scope,
+        &request,
+        f::clock(1007, 0, 1007)?,
+        wf_domain::governance::catalog::CatalogProgressChange {
+            catalog: b"limit",
+            cursor: None,
+        },
+        f::driver_limits().codec,
+        16 * f::MIB,
+    )?;
+    fixture.commit(&request, frame)?;
+    let result = fixture.run(1)?;
+    assert_eq!((result.commands, result.deleted, result.errors), (1, 1, 0));
+    assert!(fixture.remaining(b"a")?.is_empty());
+    fixture.cleanup()
+}
+#[test]
+fn credit_cleaner_actual_unknown_cleanup_reply_never_invents_confirmed_deletion_credit()
+-> TestResult {
+    let mut fixture = CleanupFixture::new()?;
+    fixture.seed(b"a", 1)?;
+    fixture.seed(b"b", 1)?;
+    fixture.fault.set(CleanupFault::LoseCleanup);
+    let result = fixture.run(2)?;
+    assert_eq!((result.commands, result.deleted, result.errors), (2, 0, 1));
+    assert!(fixture.remaining(b"a")?.is_empty());
+    assert_eq!(fixture.remaining(b"b")?.len(), 1);
+    assert_eq!(
+        fixture.progress()?,
+        GovernanceCatalogProgress::Cursor(fixture.member(b"a")?)
+    );
+    assert_eq!(fixture.run(2)?.deleted, 1);
+    fixture.cleanup()
+}
+#[test]
+fn credit_cleaner_actual_foreign_cleanup_receipt_is_not_counted_as_accepted_cleanup() -> TestResult
+{
+    let mut fixture = CleanupFixture::new()?;
+    fixture.seed(b"a", 1)?;
+    fixture.seed(b"b", 1)?;
+    fixture.fault.set(CleanupFault::ForeignCleanup);
+    let result = fixture.run(2)?;
+    assert_eq!((result.commands, result.deleted, result.errors), (2, 0, 1));
+    assert!(fixture.remaining(b"a")?.is_empty());
+    assert_eq!(fixture.remaining(b"b")?.len(), 1);
+    fixture.cleanup()
+}
+#[test]
+fn credit_cleaner_actual_foreign_progress_receipt_cannot_claim_a_confirmed_cursor_wrap()
+-> TestResult {
+    let mut fixture = CleanupFixture::new()?;
+    fixture.seed(b"a", 1)?;
+    fixture.seed(b"b", 1)?;
+    fixture.fault.set(CleanupFault::ForeignProgress);
+    let result = fixture.run(2)?;
+    assert_eq!((result.commands, result.deleted, result.errors), (2, 1, 1));
+    assert!(!result.wrapped);
+    assert!(!result.caught_up);
+    assert_eq!(
+        fixture.progress()?,
+        GovernanceCatalogProgress::Cursor(fixture.member(b"a")?)
+    );
+    fixture.cleanup()
+}
+
+#[test]
+fn credit_cleaner_actual_default_sixteen_command_budget_and_maximum_sixty_four_preserve_all_ids()
+-> TestResult {
+    let mut fixture = CleanupFixture::new()?;
+    for name in [b"a", b"b", b"c", b"d", b"e"] {
+        assert_eq!(fixture.seed(name, 1000)?.len(), 1000);
+    }
+    let scope = fixture.scope.clone();
+    let sources = [CreditCleanupSource {
+        scope: &scope,
+        shard_count: 4,
+    }];
+    let result = run_credit_cleanup_tick(
+        CreditCleanupRequest {
+            target: &scope,
+            sources: &sources,
+            catalog: b"limit",
+            now_ms: 1006,
+        },
+        &mut fixture,
+        None,
+        fixtures::limits(),
+    )?;
+    assert_eq!((result.commands, result.errors), (16, 0));
+    assert!(!result.caught_up);
+    let mut remaining = 0;
+    for name in [b"a", b"b", b"c", b"d", b"e"] {
+        remaining += fixture.remaining(name)?.len();
+    }
+    assert_eq!(remaining + usize::try_from(result.deleted)?, 5000);
+    let final_tick = fixture.run(64)?;
+    assert!(final_tick.commands <= 64);
+    assert_eq!(final_tick.errors, 0);
+    assert!(final_tick.caught_up);
+    for name in [b"a", b"b", b"c", b"d", b"e"] {
+        assert!(fixture.remaining(name)?.is_empty());
+    }
     fixture.cleanup()
 }

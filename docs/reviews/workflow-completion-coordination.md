@@ -60294,3 +60294,64 @@ bounded budget/desired cursor/wrap inputs and only publishes a confirmed cursor
 into a successful reply. This avoids cloning a cursor and keeps helper arity
 within the standard limit. Helpers remain in the already approved plan/step/
 dispatch modules; no additional file, dependency or authority is introduced.
+
+First body run: ports/helpers and application controls pass; the actual600-ID
+case, empty/prune/invalid reset/stale-time/attempt controls pass. Multi-owner
+fixtures revealed the synthetic registration stamp1002 raised global monotone
+execution time, so the second lease expired1007 and was correctly not due1006.
+Use registration1001, matching the already committed spend clock, with unchanged
+original case assertions/commands. Record this complete fixture-helper inverse;
+no later masked multi-owner assertion is retroactively credited as earlier RED.
+
+Retained time refinement: actual original execution time is the maximum of prior
+control and the committed command stamp. Require original_time>=prepared wall,
+not strict equality: a concurrent earlier commit may legitimately advance it.
+Exact scope/request/intent/status/complete response checks still apply. The
+trusted prepared wall itself must meet the tick floor before submission. This
+follows the selected existing monotone-time contract, with no schema/API widening.
+
+All12 original Node cases, all4 application cases and ports2 now pass. Before
+integration, approve additive post-body controls in the same test modules:
+CleanupFault LoseCleanup/ForeignCleanup/ForeignProgress variants, actual commit
+followed by controlled lost or foreign retained reply, and a bounded helper
+foreign_outcome in the existing test ports child. Test monotone prior-control
+advance beyond a prepared floor, unknown cleanup without fabricated deletion
+credit, foreign cleanup/progress scope rejection, and exact inclusive enclosing
+workspace cutoff with zero preflight effects below it. Confirm actual seed
+commits Accepted. These new checks have no original TDD claim. No production
+representation, dependency or source assertion is weakened.
+
+The additional real5000-ID case exhausts default16 commands, conserves every
+remaining ID and drains within max64, with no original tests-first/performance
+claim. All17 actual cases pass. Strict lint requires flattening fixture branches:
+approve free physical_table_rows helper in existing fixtures.rs, preserving both
+log-key forms and whole-table observations, and use early family guards/explicit
+drop(table) instead of deeper scopes. Borrow the original retained outcome in
+foreign_outcome rather than accepting an unnecessary Box. Add before/after
+Missing hint assertions to the existing empty case so all original source empty
+cursor observations have direct macros; these are stronger post-body controls.
+
+Solo final review found two additional contract gaps before full integration:
+Cleanup reply summary must bind its canonical owner's credit scope to the exact
+original requested scope, not only the retained tenant/group/request/intent.
+Approve expected_scope parameter on the new cleanup-only summary plus private
+ScannedCreditReply::owner_scope and ScannedCreditOwner::scope borrowed getters in
+their existing pure modules. Keep complete inspection and compare borrowed bytes,
+with no owner allocation. Add a dedicated ports mismatch control; first save its
+actual failure with expected_scope temporarily ignored. Existing new callers
+supply their original scope; update earlier test call arguments without changing
+their expected assertions.
+
+Likewise valid_page must check even an empty returned page's fixed128-byte owner
+fee. Add an application controlled-port underpayment case(read.maximum_bytes1)
+that must fail each bounded step rather than claim caught-up. Save the actual
+counterexample before this minimum-fee body. Both are supplements without
+retroactive claims about the earlier runner RED. Source links141/155/671 pass,
+retain every previous mapping/runtime identity and do not imply full parity.
+
+Both additional counterexamples are genuine: ports runs2 original positives and
+fails the wrong-credit-scope assertion; application runs5 positives and fails
+underpaid-empty-page accounting with observed(commands0,errors0) instead of
+(0,8). Save this integrated body plus exact new failing sources before borrowed
+scope binding and fixed-fee validation. No original source/runtime mapping or
+prior expected assertion was removed; the full all12 checkpoint is stillf7543c2.

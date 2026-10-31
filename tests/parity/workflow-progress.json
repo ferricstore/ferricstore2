@@ -19661,21 +19661,153 @@
       "runtime_case_ids": [
         "34c73a7f8da313fd95406abea8bcc7093bd3520cf158f3d37c88cf138e1b5071"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-f251fb1f83025582",
+          "rust_file": "crates/wf-node/tests/snapshot_recovery/credit_cleanup.rs",
+          "rust_file_sha256": "2afe56431c2f9caaff4adfd2cfba1d9a94fcb2b0c88dfc4ffe122e59acda37c2",
+          "rust_module": "",
+          "rust_function": "credit_cleaner_actual_busy_300_then_later_owner_respects_fairness_and_cursor_budget",
+          "assertions": [
+            {
+              "source_line": 30,
+              "source_text": "assert %{commands: 2, deleted: 300, errors: 0} =",
+              "rust_line": 41,
+              "rust_text": "assert_eq!((first.commands, first.deleted, first.errors), (2, 300, 0));"
+            },
+            {
+              "source_line": 33,
+              "source_text": "assert Enum.all?(busy_ids, fn id -> reservation(ctx, busy_scope, id) == nil end)",
+              "rust_line": 42,
+              "rust_text": "assert!(fixture.remaining(b\"a\")?.is_empty());"
+            },
+            {
+              "source_line": 34,
+              "source_text": "assert reservation(ctx, later_scope, later_id) != nil",
+              "rust_line": 44,
+              "rust_text": "assert_eq!(fixture.remaining(b\"b\")?, later.into_iter().collect());"
+            },
+            {
+              "source_line": 37,
+              "source_text": "assert Router.get(ctx, Keys.governance_limit_cleanup_progress_key()) == nil",
+              "rust_line": 45,
+              "rust_text": "assert_eq!(fixture.progress()?, GovernanceCatalogProgress::Missing);"
+            },
+            {
+              "source_line": 39,
+              "source_text": "assert %{commands: 2, deleted: 1, errors: 0} =",
+              "rust_line": 47,
+              "rust_text": "assert_eq!((second.commands, second.deleted, second.errors), (2, 1, 0));"
+            },
+            {
+              "source_line": 42,
+              "source_text": "assert reservation(ctx, later_scope, later_id) == nil",
+              "rust_line": 48,
+              "rust_text": "assert!(fixture.remaining(b\"b\")?.is_empty());"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed exact busy300/later1 two-owner scenario preserves lexical traversal rank, first commands2/deleted300/errors0, every busy reservation absent, the later original ID still present and missing persisted cursor after exhausted budget; the second tick preserves commands2/deleted1/errors0 and absent later reservation. Raw scoped reservation identities and actual progress reads supply the six original observations. Selected monotone execution may give the second lease deadline1006 rather than1005; both remain expired at the preserved1006 observation, with no earlier-deadline equivalence claimed. Actual combined GC2/credit2 Redb stores receive complete original private frames through appended/committed logs and the real recovery drivers. Shard0/profile4 and fixed opaque a/b/ID suffixes replace native instance allocation and unique names. Source time inputs1000/1001/1006 and TTL5 remain; synthetic registration uses1001 so monotone apply does not incorrectly leave later owners live at the cleanup tick. Successful seed commits are checked in the fixture; direct public Lease/Spend reply assertions inside original cases remain unlinked where not represented by a named direct macro. Controlled lost/foreign replies, exact workspace/default16/max64/attempt bounds and purged/received snapshots are additional Rust safety tests. Rejecting interfaces were saved atafdfed8 before runner bodies; two additional empty-hint macros and later fault/default controls are post-body evidence without retroactive RED. Accepted Raft service, periodic GenServer/timer lifecycle, native FlowCase shard/FLUSHDB/MemoryGuard setup and all original execution profiles/independent Linux acceptance remain open. No full source-case, workflow, native or performance credit is claimed."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "429a5809355b7a23",
       "runtime_case_ids": [
         "735712710b928b0f34d675bdad7354015cbd808a83db8644fd82083415de877f"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-429a5809355b7a23",
+          "rust_file": "crates/wf-node/tests/snapshot_recovery/credit_cleanup.rs",
+          "rust_file_sha256": "2afe56431c2f9caaff4adfd2cfba1d9a94fcb2b0c88dfc4ffe122e59acda37c2",
+          "rust_module": "",
+          "rust_function": "credit_cleaner_actual_empty_catalog_issues_no_command_and_changes_neither_store",
+          "assertions": [
+            {
+              "source_line": 49,
+              "source_text": "assert Router.get(ctx, progress_key) == nil",
+              "rust_line": 54,
+              "rust_text": "assert_eq!(fixture.progress()?, GovernanceCatalogProgress::Missing);"
+            },
+            {
+              "source_line": 52,
+              "source_text": "assert %{commands: 0, deleted: 0, errors: 0} =",
+              "rust_line": 57,
+              "rust_text": "assert_eq!((result.commands, result.deleted, result.errors), (0, 0, 0));"
+            },
+            {
+              "source_line": 55,
+              "source_text": "assert applied_index(shard_index) == before_index",
+              "rust_line": 60,
+              "rust_text": "assert_eq!(fixture.cohort()?, before);"
+            },
+            {
+              "source_line": 56,
+              "source_text": "assert Router.get(ctx, progress_key) == nil",
+              "rust_line": 61,
+              "rust_text": "assert_eq!(fixture.progress()?, GovernanceCatalogProgress::Missing);"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed empty-catalog/budget1 scenario directly observes missing progress before/after and commands0/deleted0/errors0. Complete equality of all six state and both log tables is stronger than unchanged applied index; no preparation/submission occurs. The original native applied_index/WARaft tuple encoding is not implemented by the whole-cohort equality. Actual combined GC2/credit2 Redb stores receive complete original private frames through appended/committed logs and the real recovery drivers. Shard0/profile4 and fixed opaque a/b/ID suffixes replace native instance allocation and unique names. Source time inputs1000/1001/1006 and TTL5 remain; synthetic registration uses1001 so monotone apply does not incorrectly leave later owners live at the cleanup tick. Successful seed commits are checked in the fixture; direct public Lease/Spend reply assertions inside original cases remain unlinked where not represented by a named direct macro. Controlled lost/foreign replies, exact workspace/default16/max64/attempt bounds and purged/received snapshots are additional Rust safety tests. Rejecting interfaces were saved atafdfed8 before runner bodies; two additional empty-hint macros and later fault/default controls are post-body evidence without retroactive RED. Accepted Raft service, periodic GenServer/timer lifecycle, native FlowCase shard/FLUSHDB/MemoryGuard setup and all original execution profiles/independent Linux acceptance remain open. No full source-case, workflow, native or performance credit is claimed."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f60d6ed55eeda186",
       "runtime_case_ids": [
         "e1f65a371e9febd5b49225771a313b8fe0bd7982b0ed592451b6943bf1873ed6"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-f60d6ed55eeda186",
+          "rust_file": "crates/wf-node/tests/snapshot_recovery/credit_cleanup.rs",
+          "rust_file_sha256": "2afe56431c2f9caaff4adfd2cfba1d9a94fcb2b0c88dfc4ffe122e59acda37c2",
+          "rust_module": "",
+          "rust_function": "credit_cleaner_actual_invalid_hint_reset_uses_whole_tick_budget_before_cleanup",
+          "assertions": [
+            {
+              "source_line": 67,
+              "source_text": "assert :ok = Router.put(ctx, progress_key, encoded, 0)",
+              "rust_line": 70,
+              "rust_text": "assert_eq!(fixture.progress()?, GovernanceCatalogProgress::Invalid);"
+            },
+            {
+              "source_line": 69,
+              "source_text": "assert %{commands: 1, deleted: 0, errors: 0} =",
+              "rust_line": 72,
+              "rust_text": "assert_eq!((first.commands, first.deleted, first.errors), (1, 0, 0));"
+            },
+            {
+              "source_line": 72,
+              "source_text": "assert Router.get(ctx, progress_key) == nil",
+              "rust_line": 73,
+              "rust_text": "assert_eq!(fixture.progress()?, GovernanceCatalogProgress::Missing);"
+            },
+            {
+              "source_line": 73,
+              "source_text": "assert reservation(ctx, scope, reservation_id) != nil",
+              "rust_line": 74,
+              "rust_text": "assert_eq!(fixture.remaining(b\"a\")?, ids.into_iter().collect());"
+            },
+            {
+              "source_line": 75,
+              "source_text": "assert %{commands: 1, deleted: 1, errors: 0} =",
+              "rust_line": 76,
+              "rust_text": "assert_eq!((second.commands, second.deleted, second.errors), (1, 1, 0));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed malformed derived-progress setup is observed Invalid after test-only durable raw injection. The first budget1 tick confirms exactly one committed reset with no cleanup, missing progress and the original reservation still present; the next budget1 tick confirms one deletion with no errors. Invalid FWPC1 bytes replace the noncanonical native ETF progress payload as the explicitly selected derived-hint migration; no native TermCodec format or general KV API compatibility is claimed. Actual Invalid classification after successful injection represents original setup success67. Actual combined GC2/credit2 Redb stores receive complete original private frames through appended/committed logs and the real recovery drivers. Shard0/profile4 and fixed opaque a/b/ID suffixes replace native instance allocation and unique names. Source time inputs1000/1001/1006 and TTL5 remain; synthetic registration uses1001 so monotone apply does not incorrectly leave later owners live at the cleanup tick. Successful seed commits are checked in the fixture; direct public Lease/Spend reply assertions inside original cases remain unlinked where not represented by a named direct macro. Controlled lost/foreign replies, exact workspace/default16/max64/attempt bounds and purged/received snapshots are additional Rust safety tests. Rejecting interfaces were saved atafdfed8 before runner bodies; two additional empty-hint macros and later fault/default controls are post-body evidence without retroactive RED. Accepted Raft service, periodic GenServer/timer lifecycle, native FlowCase shard/FLUSHDB/MemoryGuard setup and all original execution profiles/independent Linux acceptance remain open. No full source-case, workflow, native or performance credit is claimed."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "eb3e62a381239495",
@@ -20011,7 +20143,39 @@
       "runtime_case_ids": [
         "5c7a27f2b8f0c251fe0db3e34729bb4c4dffb0fc8e16acead3253c6c86e2085d"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "m1-8cafee0df511d738",
+          "rust_file": "crates/wf-node/tests/snapshot_recovery/credit_cleanup.rs",
+          "rust_file_sha256": "2afe56431c2f9caaff4adfd2cfba1d9a94fcb2b0c88dfc4ffe122e59acda37c2",
+          "rust_module": "",
+          "rust_function": "credit_cleaner_actual_600_ids_obey_two_command_budget_then_delete_remaining_88",
+          "assertions": [
+            {
+              "source_line": 461,
+              "source_text": "assert length(ids) == 600",
+              "rust_line": 19,
+              "rust_text": "assert_eq!(ids.len(), 600);"
+            },
+            {
+              "source_line": 463,
+              "source_text": "assert %{commands: 2, deleted: 512, errors: 0} =",
+              "rust_line": 21,
+              "rust_text": "assert_eq!((first.commands, first.deleted, first.errors), (2, 512, 0));"
+            },
+            {
+              "source_line": 466,
+              "source_text": "assert %{commands: 1, deleted: 88, errors: 0} =",
+              "rust_line": 28,
+              "rust_text": "assert_eq!((second.commands, second.deleted, second.errors), (1, 88, 0));"
+            }
+          ],
+          "limitations": [
+            "Source-derived assertion mapping; registration and command execution are separate evidence.",
+            "Executed exact600-ID/budget2 scenario preserves ID count600, first confirmed commands2/deleted512/errors0 and second commands1/deleted88/errors0. Actual remaining row identities equal the last88 IDs, then become empty; no progress write exceeds the two-command budget. The direct source Lease/Spend success assertions449/458 remain separate from these three links. Actual combined GC2/credit2 Redb stores receive complete original private frames through appended/committed logs and the real recovery drivers. Shard0/profile4 and fixed opaque a/b/ID suffixes replace native instance allocation and unique names. Source time inputs1000/1001/1006 and TTL5 remain; synthetic registration uses1001 so monotone apply does not incorrectly leave later owners live at the cleanup tick. Successful seed commits are checked in the fixture; direct public Lease/Spend reply assertions inside original cases remain unlinked where not represented by a named direct macro. Controlled lost/foreign replies, exact workspace/default16/max64/attempt bounds and purged/received snapshots are additional Rust safety tests. Rejecting interfaces were saved atafdfed8 before runner bodies; two additional empty-hint macros and later fault/default controls are post-body evidence without retroactive RED. Accepted Raft service, periodic GenServer/timer lifecycle, native FlowCase shard/FLUSHDB/MemoryGuard setup and all original execution profiles/independent Linux acceptance remain open. No full source-case, workflow, native or performance credit is claimed."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "522b4782da9f0eb6",

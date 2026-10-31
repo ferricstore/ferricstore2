@@ -23,8 +23,25 @@ mod view;
 /// # Errors
 /// Refuses malformed scope or shard-count bounds.
 pub fn credit_cleanup_intent(scope: &[u8], shard_count: u64) -> Result<ClientIntent, CodecError> {
-    let _ = (scope, shard_count);
-    Err(CodecError::UnsupportedVersion)
+    use sha2::{Digest, Sha256};
+    if scope.is_empty()
+        || scope.len() > 65535
+        || shard_count == 0
+        || shard_count > wf_domain::workflow::MAX_EXACT_MILLIS
+    {
+        return Err(CodecError::Malformed);
+    }
+    let mut hash = Sha256::new();
+    hash.update(b"wf-governing-credit-intent-v1\0");
+    hash.update(
+        u32::try_from(scope.len())
+            .map_err(|_| CodecError::LengthOverflow)?
+            .to_be_bytes(),
+    );
+    hash.update(scope);
+    hash.update(shard_count.to_be_bytes());
+    hash.update([0, 6]);
+    Ok(ClientIntent::governance_credit(hash.finalize().into()))
 }
 
 /// Completely inspects an accepted Cleanup reply, borrowing its original owner.
@@ -35,11 +52,26 @@ pub fn credit_cleanup_retained_summary(
     intent: ClientIntent,
     version: u16,
     response: &[u8],
+    expected_scope: &[u8],
     credit: CreditLimits,
     admission: AdmissionLimits,
 ) -> Result<(u16, bool), CodecError> {
-    let _ = (intent, version, response, credit, admission);
-    Err(CodecError::UnsupportedVersion)
+    let _ = expected_scope;
+    use wf_domain::governance::identified::IdentifiedCreditDecision as D;
+    if intent.version() != 12 || version != 10 {
+        return Err(CodecError::UnsupportedVersion);
+    }
+    let (decision, count) = response::inspect(
+        response,
+        credit,
+        admission.decision_bytes(),
+        credit.max_owned_bytes(),
+    )?
+    .summary();
+    match decision {
+        D::Cleaned { deleted, pending } if count == 0 => Ok((deleted, pending)),
+        _ => Err(CodecError::UnsupportedTag),
+    }
 }
 
 /// Restores one complete original reply and visits only its public fields.

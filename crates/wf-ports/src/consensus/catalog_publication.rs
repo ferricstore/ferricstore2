@@ -18,8 +18,14 @@ pub trait CreditCatalogPublicationPort: CreditCatalogReadPort {
         scope: &RequestScope,
         not_before_ms: u64,
     ) -> Result<(RequestId, CommittedTime), MutationNotSubmitted> {
-        let _ = (scope, not_before_ms);
-        Err(MutationNotSubmitted::Preparation)
+        if not_before_ms > wf_domain::workflow::MAX_EXACT_MILLIS {
+            return Err(MutationNotSubmitted::Preparation);
+        }
+        let prepared = self.prepare_catalog_command(scope)?;
+        if prepared.1.wall().get() < not_before_ms {
+            return Err(MutationNotSubmitted::Preparation);
+        }
+        Ok(prepared)
     }
     /// Prepares a fresh internal identity/stamp to avoid expired-attempt deadlock.
     /// # Errors

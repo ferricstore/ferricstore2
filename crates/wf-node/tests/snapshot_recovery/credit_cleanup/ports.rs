@@ -141,6 +141,22 @@ impl CreditCatalogPublicationPort for CleanupFixture {
         }
         match self.commit(request, frame) {
             Ok(outcome) => {
+                if matches!(
+                    (kind, fault),
+                    (CleanupCall::Cleanup, CleanupFault::LoseCleanup)
+                ) {
+                    self.fault.set(CleanupFault::None);
+                    return MutationSubmission::Unknown(MutationUnknown::Unavailable);
+                }
+                if matches!(
+                    (kind, fault),
+                    (CleanupCall::Cleanup, CleanupFault::ForeignCleanup)
+                        | (CleanupCall::Progress, CleanupFault::ForeignProgress)
+                ) {
+                    self.fault.set(CleanupFault::None);
+                    return foreign_outcome(&outcome)
+                        .unwrap_or(MutationSubmission::Unknown(MutationUnknown::InvalidReply));
+                }
                 if kind == CleanupCall::Progress && fault == CleanupFault::LoseProgress {
                     self.fault.set(CleanupFault::None);
                     MutationSubmission::Unknown(MutationUnknown::Unavailable)
@@ -154,4 +170,32 @@ impl CreditCatalogPublicationPort for CleanupFixture {
             }
         }
     }
+}
+
+fn foreign_outcome(
+    outcome: &wf_domain::workflow::request::RetainedOutcome,
+) -> TestResult<MutationSubmission> {
+    use wf_domain::workflow::request::{RetainedMetadata, RetainedOutcome};
+    let scope = RequestScope::new(
+        wf_types::identity::TenantId::new(b"foreign".to_vec())?,
+        outcome.scope().group().clone(),
+        outcome.scope().recovery().clone(),
+    );
+    let metadata = RetainedMetadata {
+        scope,
+        request: outcome.request().clone(),
+        intent: outcome.intent(),
+        original_position: outcome.original_position(),
+        original_time: outcome.original_time(),
+        expires_at: outcome.expires_at(),
+        status: outcome.status(),
+    };
+    Ok(MutationSubmission::Retained(Box::new(
+        RetainedOutcome::new(
+            metadata,
+            outcome.response_version(),
+            outcome.response().to_vec(),
+            f::driver_limits().codec.admission(),
+        )?,
+    )))
 }

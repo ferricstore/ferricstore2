@@ -109,19 +109,107 @@ fn cleanup_workspace_has_an_exact_pre_effect_boundary_and_checked_overflow() -> 
         catalog: b"limit",
         now_ms: 1006,
     };
-    let mut limits = Limits::default();
-    limits.workspace_bytes = 1;
+    let limits = Limits {
+        workspace_bytes: 1,
+        ..Limits::default()
+    };
     assert_eq!(
         run_credit_cleanup_tick(request, &mut port, Some(1), limits).err(),
         Some(E::Limit)
     );
     assert!(port.calls.borrow().is_empty());
-    limits = Limits::default();
-    limits.execution_workspace_bytes = usize::MAX;
+    let limits = Limits {
+        execution_workspace_bytes: usize::MAX,
+        ..Limits::default()
+    };
     assert_eq!(
         run_credit_cleanup_tick(request, &mut port, Some(1), limits).err(),
         Some(E::Limit)
     );
     assert!(port.calls.borrow().is_empty());
+    Ok(())
+}
+
+#[test]
+fn cleanup_workspace_cutoff_is_inclusive_and_refuses_before_effects_one_byte_below() -> TestResult {
+    let mut port = BudgetFixture::new()?;
+    let scope = port.scope.clone();
+    let sources = [Source {
+        scope: &scope,
+        shard_count: 4,
+    }];
+    let request = Request {
+        target: &scope,
+        sources: &sources,
+        catalog: b"limit",
+        now_ms: 1006,
+    };
+    let mut low = 1;
+    let mut high = Limits::default().workspace_bytes;
+    while low < high {
+        let mid = low + (high - low) / 2;
+        port.calls.borrow_mut().clear();
+        let limits = Limits {
+            workspace_bytes: mid,
+            ..Limits::default()
+        };
+        match run_credit_cleanup_tick(request, &mut port, Some(1), limits) {
+            Ok(result) => {
+                assert!(result.caught_up);
+                high = mid;
+            }
+            Err(E::Limit) => {
+                assert!(port.calls.borrow().is_empty());
+                low = mid + 1;
+            }
+            Err(other) => return Err(other.into()),
+        }
+    }
+    let limits = Limits {
+        workspace_bytes: low,
+        ..Limits::default()
+    };
+    assert!(run_credit_cleanup_tick(request, &mut port, Some(1), limits)?.caught_up);
+    port.calls.borrow_mut().clear();
+    let limits = Limits {
+        workspace_bytes: low - 1,
+        ..limits
+    };
+    assert_eq!(
+        run_credit_cleanup_tick(request, &mut port, Some(1), limits).err(),
+        Some(E::Limit)
+    );
+    assert!(port.calls.borrow().is_empty());
+    Ok(())
+}
+
+#[test]
+fn cleanup_empty_page_underpaid_owner_fee_cannot_claim_caught_up() -> TestResult {
+    let mut port = BudgetFixture::new()?;
+    let scope = port.scope.clone();
+    let sources = [Source {
+        scope: &scope,
+        shard_count: 4,
+    }];
+    let limits = Limits {
+        read: wf_ports::state::CreditCatalogReadLimits {
+            maximum_bytes: 1,
+            ..Limits::default().read
+        },
+        ..Limits::default()
+    };
+    let result = run_credit_cleanup_tick(
+        Request {
+            target: &scope,
+            sources: &sources,
+            catalog: b"limit",
+            now_ms: 1006,
+        },
+        &mut port,
+        Some(1),
+        limits,
+    )?;
+    assert_eq!((result.commands, result.errors), (0, 8));
+    assert!(!result.caught_up);
     Ok(())
 }

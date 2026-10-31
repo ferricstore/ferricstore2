@@ -47,6 +47,9 @@ pub(super) enum CleanupFault {
     None,
     ReadProgress,
     RefuseCleanup,
+    LoseCleanup,
+    ForeignCleanup,
+    ForeignProgress,
     LoseProgress,
     RefuseProgress,
     StaleTime,
@@ -148,6 +151,10 @@ impl CleanupFixture {
         let outcome = tx
             .outcome(self.scope.tenant(), request)?
             .ok_or("missing actual cleaner receipt")?;
+        assert_eq!(
+            outcome.status(),
+            wf_domain::workflow::request::RetainedStatus::Accepted
+        );
         drop(tx);
         drop((log, state));
         Ok(Box::new(outcome))
@@ -216,7 +223,7 @@ impl CleanupFixture {
     }
     pub(super) fn member(&self, name: &[u8]) -> TestResult<Vec<u8>> {
         let encoded =
-            wf_ports::state::encode_credit_catalog_members(&self.scope, &[name], 65535, 131072)?;
+            wf_ports::state::encode_credit_catalog_members(&self.scope, &[name], 65535, 131_072)?;
         Ok(encoded
             .members()
             .next()
@@ -232,7 +239,7 @@ impl CleanupFixture {
             encode_catalog_membership_request(
                 &self.scope,
                 &request,
-                f::clock(1002, 0, 1002)?,
+                f::clock(1001, 0, 1001)?,
                 CatalogMembershipChange {
                     catalog: b"limit",
                     action: CatalogMembershipAction::Register,
@@ -299,12 +306,13 @@ impl CleanupFixture {
         let mut result = BTreeSet::new();
         for row in table.iter()? {
             let (key, _) = row?;
-            if key.value().get(6) == Some(&13) {
-                let mut parts = physical_components(key.value())?;
-                assert_eq!(parts.len(), 7);
-                if parts[3] == name {
-                    assert!(result.insert(parts.pop().ok_or("missing reservation ID")?));
-                }
+            if key.value().get(6) != Some(&13) {
+                continue;
+            }
+            let mut parts = physical_components(key.value())?;
+            assert_eq!(parts.len(), 7);
+            if parts[3] == name {
+                assert!(result.insert(parts.pop().ok_or("missing reservation ID")?));
             }
         }
         Ok(result)
@@ -316,20 +324,7 @@ impl CleanupFixture {
             let tx = db.begin_read()?;
             for handle in tx.list_tables()? {
                 let name = handle.name();
-                let mut rows = f::Rows::new();
-                if name == "wf_raft_log_v1" {
-                    let table = tx.open_table(TableDefinition::<u64, &[u8]>::new(name))?;
-                    for row in table.iter()? {
-                        let (k, v) = row?;
-                        rows.insert(k.value().to_be_bytes().to_vec(), v.value().to_vec());
-                    }
-                } else {
-                    let table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new(name))?;
-                    for row in table.iter()? {
-                        let (k, v) = row?;
-                        rows.insert(k.value().to_vec(), v.value().to_vec());
-                    }
-                }
+                let rows = physical_table_rows(&tx, name)?;
                 assert!(result.insert(format!("{prefix}/{name}"), rows).is_none());
             }
         }
@@ -339,20 +334,18 @@ impl CleanupFixture {
     pub(super) fn damage_hint(&self) -> TestResult {
         let db = redb::Builder::new().open(self.root.join("state.redb"))?;
         let tx = db.begin_write()?;
-        {
-            let mut table =
-                tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
-            let mut key = None;
-            for row in table.iter()? {
-                let (k, _) = row?;
-                if k.value().get(6) == Some(&19) {
-                    key = Some(k.value().to_vec());
-                    break;
-                }
+        let mut table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
+        let mut key = None;
+        for row in table.iter()? {
+            let (k, _) = row?;
+            if k.value().get(6) == Some(&19) {
+                key = Some(k.value().to_vec());
+                break;
             }
-            let key = key.ok_or("missing hint")?;
-            table.insert(key.as_slice(), b"invalid-hint".as_slice())?;
         }
+        let key = key.ok_or("missing hint")?;
+        table.insert(key.as_slice(), b"invalid-hint".as_slice())?;
+        drop(table);
         tx.commit()?;
         Ok(())
     }
@@ -448,4 +441,28 @@ fn physical_components(bytes: &[u8]) -> TestResult<Vec<Vec<u8>>> {
     }
     assert_eq!(at, bytes.len());
     Ok(parts)
+}
+
+fn physical_table_rows(tx: &redb::ReadTransaction, name: &str) -> TestResult<f::Rows> {
+    let mut rows = f::Rows::new();
+    if name == "wf_raft_log_v1" {
+        let table = tx.open_table(TableDefinition::<u64, &[u8]>::new(name))?;
+        for row in table.iter()? {
+            let (k, v) = row?;
+            assert!(
+                rows.insert(k.value().to_be_bytes().to_vec(), v.value().to_vec())
+                    .is_none()
+            );
+        }
+    } else {
+        let table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new(name))?;
+        for row in table.iter()? {
+            let (k, v) = row?;
+            assert!(
+                rows.insert(k.value().to_vec(), v.value().to_vec())
+                    .is_none()
+            );
+        }
+    }
+    Ok(rows)
 }

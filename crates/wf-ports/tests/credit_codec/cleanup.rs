@@ -51,6 +51,7 @@ fn cleanup_summary_validates_complete_original_owner_and_only_cleanup_decisions(
             intent,
             10,
             bytes,
+            b"x",
             CreditLimits::default(),
             AdmissionLimits::default(),
         )
@@ -67,6 +68,7 @@ fn cleanup_summary_validates_complete_original_owner_and_only_cleanup_decisions(
             intent,
             9,
             &encoded,
+            b"x",
             CreditLimits::default(),
             AdmissionLimits::default()
         )
@@ -77,6 +79,37 @@ fn cleanup_summary_validates_complete_original_owner_and_only_cleanup_decisions(
     assert_eq!(
         summarize(&encode_credit_reply(&other, 1024, 16384)?),
         Err(CodecError::UnsupportedTag)
+    );
+    Ok(())
+}
+
+#[test]
+fn cleanup_summary_rejects_a_different_credit_owner_scope() -> TestResult {
+    let owner = decode_credit_owner(
+        &framing::independent_owner(false),
+        CreditLimits::default(),
+        1024,
+        16384,
+    )?;
+    let reply = IdentifiedCreditReply {
+        decision: D::Cleaned {
+            deleted: 0,
+            pending: false,
+        },
+        owner: Some(owner),
+        reservation_ids: Vec::new(),
+    };
+    let raw = encode_credit_reply(&reply, 1024, 16384)?;
+    assert!(
+        credit_cleanup_retained_summary(
+            ClientIntent::governance_credit([1; 32]),
+            10,
+            &raw,
+            b"foreign",
+            CreditLimits::default(),
+            AdmissionLimits::default()
+        )
+        .is_err()
     );
     Ok(())
 }
