@@ -2,32 +2,39 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Open coupled-release candidate: code22da47e after data320e7a8 and custody16a2d4b
-(data R0 efd5bc0; legacy-writer R0 320e7a8). GC4 now accepts and canonically
-validates actual reservation binding, queue meta, intent and sparse completion
-rows. Recovery proves exact binding-to-record, complete contiguous queue and
-completion-to-intent closure. Coherent bounded reads retain original intent
-bytes once; actual capture/receive/current snapshot preserves the complete data.
-Legacy mutation and Claim writers now refuse bound records without changing any
-part of the cohort. This temporary safety fence is NOT atomic release append.
+Open coupled-release candidate: code d1434d2 after atomic eeab912 and data22da47e
+(atomic R0 2ae7af2; acquisition-boundary R0 eeab912). Explicit GC4 intent9 mutation
+now admits release capacity before reply/value companions and commits intents,
+records/indexes/every history/value companion/outcome/control in one consumed
+Immediate writer. Actual same-guard binding/queue/postimage/order revalidation
+precedes publication. Kind8/code0 is retained backlog only for intent9 response5,
+6,8; older receipt-only custody refuses it. Legacy paths retain their fence.
+The release-aware mutation entrypoint refuses profile7; unchanged non-governed
+Start remains available in its original entrypoint. Actual paid Claim remains
+unimplemented and cannot be inferred from a binding or a trusted legacy leaf.
 
-All11 new storage cases and the new binding-codec case pass:333 storage/codec
-regression cases plus the later110-case workflow-value run, strict workspace/
-all-target Clippy, all60 architecture cases,fmt,diff and cargo progress. The
-original owned-record materializer moved verbatim into scan/owned.rs to keep
-production files within400 lines; all696 selected old test/bench inputs remain
-693 whole plus three exact additive inverses. No new full pipeline run: the last
-all12/1607 checkpoint below remains9220c17. Source ledgers are byte-identical.
+All309 storage+40 codec cases pass, including the12 new storage cases and one
+new codec case. All60 architecture cases, strict workspace/all-target Clippy,
+fmt,diff and cargo progress pass on2040 frozen non-Markdown inputs/1451 Rust
+files with zero drift. All698 selected predecessor test/bench inputs remain695
+whole plus three exact additive inverses. Original serialization/legacy response
+dispatch bodies remain verbatim; the Step driver is byte-identical. Real sync
+uncertainty preserves a complete old/new cohort; actual committed releases and
+original replies survive snapshot receive/replay. No new full pipeline run:
+last all12/1607 below remains9220c17. Source ledgers are byte-identical.
 
-NEXT actual pre-reply release admission and same-writer record/index/history/
-intent/outcome/control publication, with durable queue-full business rejection
-and source reservation-ID deduplication. Keep legacy paths fenced and governed
-Claim unsupported until its actual selected writer/paid-reservation binding is
-implemented. ACK/completion, historical/received/purged data replay and complete
-Claim/policy/refund/reconciliation remain. No source-case, native/Linux, service
-or speedup credit. Proof: /private/tmp/ferricstore2-release-data-source-audit.json
-and release-data-{r0,guard-r0,regression,workflows,clippy,architecture,progress}.log.
-Follow the latest coordination review; next artifacts need concrete solo review.
+NEXT actual paid Claim/binding creation, policy/refund/unused/Unknown settlement,
+reservation reuse prevention and original optional partition identity. Audit actual
+governance before routing any legacy/combined acquisition in the future parent.
+Finish ACK/sparse completion/drain and explicit GC4 historical/received/purged
+Node execution. Prove the complete lease/spend -> Claim -> terminal -> snapshot/
+restart -> reconcile -> exact release loop with siblings preserved. Audit raw
+public batch/write-call granularity before mapping it to native profile6; these
+component tests earn no source-case credit. Full native/Linux/macOS, service and
+measured-performance acceptance remain. Proof: /private/tmp/ferricstore2-release-
+atomic-source-audit.json and release-atomic-{r0,acquisition-r0,final-regression,
+final-clippy,final-architecture,final-progress}.log. Continue solo from the latest
+coordination review; new artifacts require concrete self-review before creation.
 
 Current batch: M2-CREDIT-CATALOG1 remains unfinished. Latest integrated local
 public credit checkpoint: code9220c17. The selected normalized caller path is now
