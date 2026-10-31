@@ -19,6 +19,7 @@ use wf_types::{
 pub(super) enum GovernanceCatalogRecoveryProfile {
     Disabled,
     Enabled,
+    Progress,
 }
 impl CommittedRecoveryLimits {
     /// Explicitly enables target catalog bodies on the normal apply profile.
@@ -27,17 +28,31 @@ impl CommittedRecoveryLimits {
         self.governance_catalog = GovernanceCatalogRecoveryProfile::Enabled;
         self
     }
+    /// Explicitly enables GC2 membership and durable cleaner progress bodies.
+    #[must_use]
+    pub const fn with_governance_catalog_progress(mut self) -> Self {
+        self.governance_catalog = GovernanceCatalogRecoveryProfile::Progress;
+        self
+    }
 }
 pub(super) const fn enabled(limits: &CommittedRecoveryLimits) -> bool {
     matches!(
         limits.governance_catalog,
-        GovernanceCatalogRecoveryProfile::Enabled
+        GovernanceCatalogRecoveryProfile::Enabled | GovernanceCatalogRecoveryProfile::Progress
     )
 }
 pub(super) fn require(
     tx: &wf_storage::state::RedbStateTransaction<'_>,
     limits: &CommittedRecoveryLimits,
 ) -> Result<(), E> {
+    if matches!(
+        limits.governance_catalog,
+        GovernanceCatalogRecoveryProfile::Progress
+    ) {
+        return Err(E::State(
+            wf_ports::state::StateTransactionError::UnsupportedPolicyProfile,
+        ));
+    }
     if enabled(limits) {
         tx.require_governance_catalog().map_err(E::State)?;
     }

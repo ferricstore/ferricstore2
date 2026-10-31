@@ -71,3 +71,47 @@ fn defaults() -> wf_ports::consensus::WorkflowValueDefaults {
         lifecycle,
     }
 }
+
+pub(super) fn damage_hint(path: &Path) -> TestResult {
+    use redb::{ReadableTable, TableDefinition};
+    let db = redb::Builder::new().open(path)?;
+    let tx = db.begin_write()?;
+    {
+        let mut table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
+        let mut selected = None;
+        for row in table.iter()? {
+            let (key, _) = row?;
+            if key.value().get(6) == Some(&19) {
+                selected = Some(key.value().to_vec());
+                break;
+            }
+        }
+        let key = selected.ok_or("missing progress hint")?;
+        table.insert(key.as_slice(), b"invalid-hint".as_slice())?;
+    }
+    tx.commit()?;
+    Ok(())
+}
+pub(super) fn downgrade(path: &Path) -> TestResult {
+    use redb::ReadableTable;
+    use sha2::{Digest, Sha256};
+    let db = redb::Builder::new().open(path)?;
+    let tx = db.begin_write()?;
+    {
+        let mut table = tx.open_table(common::META)?;
+        let mut bytes = table
+            .get(b"manifest".as_slice())?
+            .ok_or("missing manifest")?
+            .value()
+            .to_vec();
+        let at = bytes.len() - 36;
+        assert_eq!(&bytes[at..at + 4], b"GC\0\x02");
+        bytes[at + 3] = 1;
+        let end = bytes.len() - 32;
+        let checksum = Sha256::digest(&bytes[..end]);
+        bytes[end..].copy_from_slice(&checksum);
+        table.insert(b"manifest".as_slice(), bytes.as_slice())?;
+    }
+    tx.commit()?;
+    Ok(())
+}

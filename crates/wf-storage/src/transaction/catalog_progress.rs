@@ -6,6 +6,8 @@ use wf_domain::workflow::{batch::ApplyError, request::RequestScope};
 use wf_ports::{log::CodecError, state::StateTransactionError};
 use wf_types::version::LogIdentity;
 
+mod driver;
+
 /// Operational failures; none is a retained success or business rejection.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CatalogProgressTransactionError {
@@ -39,8 +41,21 @@ pub fn apply_catalog_progress_transaction(
     log: LogIdentity,
     limits: RecordBatchTransactionLimits,
 ) -> Result<RecordBatchTransactionOutcome, CatalogProgressTransactionError> {
-    let _ = (store, scope, encoded, log, limits);
-    Err(CatalogProgressTransactionError::State(
-        StateTransactionError::UnsupportedPolicyProfile,
-    ))
+    driver::apply(store, scope, encoded, log, limits)
+}
+
+impl From<CodecError> for CatalogProgressTransactionError {
+    fn from(error: CodecError) -> Self {
+        Self::Codec(error)
+    }
+}
+impl From<ApplyError> for CatalogProgressTransactionError {
+    fn from(error: ApplyError) -> Self {
+        Self::Apply(error)
+    }
+}
+impl From<StateTransactionError> for CatalogProgressTransactionError {
+    fn from(error: StateTransactionError) -> Self {
+        Self::State(error)
+    }
 }

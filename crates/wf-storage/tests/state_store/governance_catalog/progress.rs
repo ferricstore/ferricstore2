@@ -6,6 +6,7 @@ use wf_ports::state::{
     GovernanceCatalogReadLimits as L, GroupApplyStore,
 };
 use wf_storage::transaction::apply_catalog_progress_transaction;
+mod faults;
 mod fixtures;
 use fixtures as p;
 

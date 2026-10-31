@@ -130,6 +130,9 @@ impl RedbStateTransaction<'_> {
                 return Err(StateTransactionError::Corrupt);
             }
         }
+        if scanned.intent_version() == 15 && !self.value_manifest()?.catalog_progress {
+            return Err(StateTransactionError::Corrupt);
+        }
         if scanned.intent_version() == 14 && !self.value_manifest()?.governance_catalog {
             return Err(StateTransactionError::Corrupt);
         }

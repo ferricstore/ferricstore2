@@ -1326,6 +1326,14 @@ API or accepted-consensus claim follows. Complete public credit parents and the
 durable cleaner progress/fairness protocol remain successors.
 
 
+The immutable governance capability0/1/2 is observed from the manifest already
+validated at genesis/open and retained on the exclusive store owner. Node uses
+this scalar to reject GC2 under older recovery selection, including empty state,
+without adding manifest reads to old tight profiles. Selected GC1/GC2 still
+requires the actual manifest under the same transaction. Candidate snapshot
+validation cannot mutate this cached identity; exact manifest compatibility
+prevents changing it through installation. This scalar grants no authorization.
+
 Selected cleaner progress is an explicit GC2 capability in the existing FWSS8
 marker, retaining GC1 bytes/constructors. Family19 binds one derived cursor to
 its group/recovery/tenant/catalog. None clears its row; empty binary cursors are

@@ -60120,3 +60120,34 @@ Save this genuine driver RED before writer/retained bodies. The family allocator
 closed upper bound also needed19, matching its newly selected physical decoder;
 its earlier UnsupportedTag/Corrupt was an incomplete adapter, not driver RED.
 No test body was weakened. See catalog-progress-{codec,driver-r0}.log.
+
+Solo Node refinement before artifacts: approve immutable validated
+RedbStateStore.catalog_profile: Cell<u16> and public governance_catalog_profile()
+observation, with 0/1/2 assigned only after successful genesis or complete open
+validation. This is cached schema identity, never authorization or workflow
+truth. Approve private recovery::cohort_profiled returning layout/control/profile;
+retain cohort's existing pair wrapper for snapshot callers and return layout/
+profile from validate only after all checks. Derive profile from the manifest
+already held under validation without another probe/allocation. Failed candidate
+snapshot validation must never alter the active cache. Snapshot compatibility
+already prohibits changing this capability; existing 7-to-8 upgrades preserve0.
+Node observe captures the scalar before borrowing its apply transaction and
+catalog_membership::require enforces exact selection: Disabled refuses GC2 with
+no extra reads for older state, Enabled requires GC1, Progress requires GC2.
+Selected modes still check the actual same-transaction manifest. Preserve older
+exact step/read budgets; no unconditional additional512-byte manifest read.
+Approve the narrow CatalogProgress transaction-error variant in existing Node
+recovery/error.rs and original-driver dispatch in the approved progress module.
+Existing approved ProgressFixture/ProgressFault tests use real database/log
+cohorts, healthy/trailing-historical-body variants, prefix/checkpoint receipt
+snapshots, old-mode refusal and original retained/control observations. Save
+their genuine rejecting Node run before implementing routing/cache semantics.
+
+Actual Node predecessor compiles and all five new cases fail. Older default
+selection wrongly accepts the actual empty GC2 authority; explicit Progress
+selection reaches its deliberate UnsupportedPolicyProfile refusal. Replay and
+snapshot assertions beyond that refusal remain masked, not separately proven
+RED. The historical assertion receives that refusal instead of TrailingBytes.
+Stored set/clear/retry and all five post-body fault controls already pass8/8;
+the latter are regression controls without original TDD credit. Save this cohort
+before implementing the selected cache/Node bodies. See catalog-progress-node-r0.log.

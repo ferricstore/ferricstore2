@@ -4,6 +4,7 @@
 
 mod advance;
 mod atomic_start;
+mod catalog_progress;
 mod catalog_publication;
 mod claim;
 mod core_policy;

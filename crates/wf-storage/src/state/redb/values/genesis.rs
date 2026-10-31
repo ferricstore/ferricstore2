@@ -14,6 +14,7 @@ use super::super::{
 use super::manifest::{self, ValueManifest};
 
 /// Explicit immutable genesis capabilities; constructing them grants no authority.
+#[derive(Clone, Copy)]
 pub(in crate::state::redb) struct ValueGenesisCapabilities {
     pub(in crate::state::redb) alias_format: u16,
     pub(in crate::state::redb) credit_shard_count: Option<u64>,

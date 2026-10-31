@@ -10,6 +10,8 @@ use wf_ports::{
 };
 use wf_types::identity::{GroupId, RecoveryId};
 mod read;
+mod write;
+pub(crate) use write::apply as commit;
 
 impl RedbStateStore {
     /// Creates explicit GC2, optionally combined with identified credit2 owners.
@@ -63,10 +65,8 @@ impl RedbStateTransaction<'_> {
             let manifest = self.value_manifest()?;
             Ok(if manifest.catalog_progress {
                 2
-            } else if manifest.governance_catalog {
-                1
             } else {
-                0
+                u16::from(manifest.governance_catalog)
             })
         })
     }

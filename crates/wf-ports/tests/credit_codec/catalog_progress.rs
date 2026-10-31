@@ -30,7 +30,7 @@ fn vector() -> Vec<u8> {
     hash.update(b"wf-governance-catalog-progress-intent-v1\0");
     hash.update(&body);
     let mut frame = b"FWCP\0\x01\x0d".to_vec();
-    for value in [b't', b'g', b'r', b'i'] {
+    for value in *b"tgri" {
         frame.extend_from_slice(&1_u32.to_be_bytes());
         frame.push(value);
     }
