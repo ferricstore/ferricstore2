@@ -1,5 +1,9 @@
 //! Complete caller/EOF/digest validation precedes private ID payload ownership.
-use super::*;
+use super::{
+    ClientIntent, CodecLimits, CommittedTime, CreditPolicyInput, CreditSpendPreparation, E,
+    NormalizedCreditCall, PreparedCreditRequest, PreparedDigest, RequestId, RequestScope, encode,
+    ids, policy,
+};
 use crate::log::{
     common::RawHeader,
     credit::model::OwnedCreditMutation as M,
@@ -20,6 +24,9 @@ pub(super) fn prepare(
     limits: CodecLimits,
     maximum_owned: usize,
 ) -> Result<PreparedCreditRequest<'_>, E> {
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(E::ByteLimit);
+    }
     let base = encoded.len().checked_add(4096).ok_or(E::LengthOverflow)?;
     if base > maximum_owned {
         return Err(E::OwnedLimit);

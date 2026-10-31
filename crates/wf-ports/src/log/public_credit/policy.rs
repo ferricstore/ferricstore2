@@ -1,5 +1,5 @@
 //! Source ETF metadata streams into SHA256 without an intermediate payload owner.
-use super::*;
+use super::{CreditPolicyInput, E, PreparedDigest};
 use sha2::{Digest, Sha256};
 use wf_domain::workflow::MAX_EXACT_MILLIS as MAX;
 pub(super) fn fingerprint(value: CreditPolicyInput<'_>) -> Result<PreparedDigest, E> {

@@ -1,5 +1,5 @@
 //! One exact source batch, with prospective admission before the first allocation.
-use super::*;
+use super::{CreditSpendPreparation, E};
 pub(super) fn generate(
     amount: u64,
     spend: CreditSpendPreparation,

@@ -105,3 +105,20 @@ pub fn apply_credit_transaction(
 ) -> Result<RecordBatchTransactionOutcome, CreditTransactionError> {
     driver::apply(store, scope, encoded, log, limits, credit)
 }
+
+/// Applies a complete public caller frame under the actual exclusive authority.
+/// # Errors
+/// Refuses unsupported capability, preparation, scope or durability failures.
+pub fn apply_public_credit_transaction(
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: RecordBatchTransactionLimits,
+    credit: CreditLimits,
+) -> Result<RecordBatchTransactionOutcome, CreditTransactionError> {
+    let _ = (store, scope, encoded, log, limits, credit);
+    Err(CreditTransactionError::State(
+        StateTransactionError::UnsupportedPolicyProfile,
+    ))
+}

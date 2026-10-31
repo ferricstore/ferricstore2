@@ -14,6 +14,7 @@ mod bounds;
 mod catalog;
 mod fixtures;
 mod limits;
+mod public;
 mod recovery;
 mod sequence;
 mod view;

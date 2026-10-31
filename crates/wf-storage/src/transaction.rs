@@ -22,7 +22,9 @@ pub use catalog_prune::{CatalogPruneTransactionError, apply_catalog_prune_transa
 mod core_policy;
 mod credit;
 pub use catalog_ack::apply_catalog_ack_transaction;
-pub use credit::{CreditTransactionError, apply_credit_transaction};
+pub use credit::{
+    CreditTransactionError, apply_credit_transaction, apply_public_credit_transaction,
+};
 mod original_policy;
 pub use core_policy::{CorePolicyTransactionError, apply_complete_core_policy_patch_transaction};
 pub use original_policy::{

@@ -60717,3 +60717,9 @@ before the semantic run, with no RED credit. A new genuine resource control find
 the public decoder accepts an otherwise healthy complete frame one byte above
 its selected wire cap. Four controls pass, one fails at actual unexpected
 acceptance; save this exact cohort before closing the missing upfront wire gate.
+
+Public storage predecessor compiles: the real credit2/catalog happy path reaches
+the deliberate public-driver UnsupportedPolicyProfile, while old-credit profile
+refusal preserves the whole actual cohort. Later original receipt replay versus
+changed prepared epoch/entropy and changed-caller conflict remain masked. Save
+before joining shared driver/outcome registries; no constructor/setup RED claim.
