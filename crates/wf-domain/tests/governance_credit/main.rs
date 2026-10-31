@@ -10,6 +10,7 @@ use wf_domain::workflow::control::PreparedDigest;
 use wf_types::version::TimestampMillis;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
+mod caller;
 mod catalog;
 mod fixtures;
 mod identified;

@@ -60590,3 +60590,107 @@ Darwin/arm64; no native Elixir, Linux or performance acceptance. Concrete public
 credit/Claim/policy/release-outbox parents, malformed-owner migration, accepted
 consensus/services/maintenance lifecycle and required full profiles remain open.
 Keep the full goal active and continue solo. No feature adoption or push.
+
+### M2-CREDIT-CATALOG1 public credit caller selection (solo, before artifacts)
+
+Previous turn is progress:8850e33/daef8f4, primary160887d, fixes the actual
+publication/ACK prune race and receipt-only downgrade gap; all12 local gates,
+1570 cases,141/155/671 source accounting. Full goal stays active, solo.
+
+Read pinned66586c5 limit_store.ex1..685, credit_lease.ex policy fingerprint,
+limit_storage_test.exs274/470/525/558/636/662/717/761/811/833 scenarios and current
+private owner/canonical request/reply/repair drivers. Next complete the PUBLIC
+caller path, not another private protocol success criterion. The full path must
+normalize scalar options, bind caller intent independently of trusted generated
+inputs, look up retained requests before current owner/registration/entropy,
+repair existing membership before dependent mutation, commit a new owner before
+publication, retain exact spend IDs on unknown and support original reply views.
+Public raw-option precedence and source setup limitations must stay explicit.
+
+Approve domain governance/caller.rs with private caller/model.rs and normalize.rs.
+Named values: CreditCallKind(Lease,Spend,Release,Renew,Get,Cleanup),
+CreditOptionValue(Nil,Integer(i128),Bytes,Ids,Unsupported), CreditIdList(Owned
+Vec payload slice/Borrowed byte-slice references; no payload copies),
+CreditPolicyInput(Number/Bytes), CreditCallConfiguration(limit,optional version,
+optional raw policy), CreditCallAction(typed six-operation operands),
+NormalizedCreditCall(private borrowed scope/count/optional caller time/action),
+CreditCallerError(typed static errors, finite shard bound, resource refusals).
+Expose normalize_credit_call and validated typed restore via from_parts; accessors
+and allocation-free ID iteration do not confer authority. Raw input has at most16
+keyword captures, first exact key wins, unknown options ignored but measured;
+all occurrences count toward a caller raw cap. Preserve absent versus explicit
+nil where source fetch distinguishes them, amount1..1000, shard/count/exact integer
+bounds, TTL/deadline, release cardinality/uniqueness/256-byte ID bound, numeric
+policy fallback config version, binary policy requiring explicit config version,
+limit required with versions and public Spend forbidding caller IDs. Source
+parent stages (not just normalization) retain their read/registration/error
+ordering; do not silently claim full native API equivalence from pure preflight.
+
+Approve pure ports log/public_credit.rs and public_credit/{policy,ids,encode,
+decode}.rs. Named CreditSpendPreparation(epoch,16-byte batch) carries only trusted
+prepared data. Extend existing private log/credit/model.rs visibility only within
+log so complete prepared public requests reuse PreparedCreditRequest, its header
+owner and existing consumed driver. New closed FWCP1 operation15/intent17, response10
+uses the existing complete canonical credit reply. Body contains canonical public
+caller fields plus the Spend preparation. Its intent hashes the public caller
+prefix (including explicit optional caller time), excluding generated epoch,
+batch and trusted stamp. SHA of full frame still binds everything. No clock/
+entropy becomes caller data and no caller digest is trusted. Release IDs keep
+original order; public Spend IDs derive exactly flr1:<epoch>:<base64url16>:<ordinal>.
+Fingerprint uses SHA256 over source external-term integer/binary bytes, streaming
+bounded fields with fixed metadata instead of an intermediate payload Vec.
+Official primary reference checked: https://www.erlang.org/doc/apps/erts/erl_ext_dist.html
+(version131, integer tags97/98/110, binary109; big digits little-endian).
+Independent byte/hash recipes are required; no native VM capture claim.
+
+Select shared credit driver dispatch for public preparation and unchanged
+private preparation, then the same retained-first gate, sparse domain decision,
+Immediate writer and canonical response. Public frames require actual credit2
+with pending-publication capability, even on receipt-only replay; add explicit
+intent17/response10 outcome registries and capability validation. No new physical
+row/layout/genesis format is needed because public commands use the existing
+identified2/catalog owner schema. Add explicit public Node recovery selection in
+existing credit.rs profile enum; old modes reject operation15. Join/header/audit/
+replay and original complete snapshots must execute. Approve existing transaction/
+credit.rs facade apply_public_credit_transaction; helper changes remain inside
+its existing driver. No duplicate reducer or adapter-specific domain rule.
+
+Approve ports consensus/public_credit.rs: PublicCreditSubmitPort and
+CreditRequestLookup(Fresh/Resolved(MutationSubmission)). Actual owner supplies
+current authorization/routing, lookup/read lifecycle, trusted time/entropy and
+supervised submission. Fresh lookup is only a preparation observation; applied
+gate rechecks it. Unknown or invalid lookup stops before dependent work.
+Application governance/credit.rs with credit/{model,prepare,dispatch}.rs owns
+PublicCreditCallRequest,PublicCreditCallLimits,PublicCreditCallResult,
+PublicCreditCallError and PreparedPublicCreditCall. Normalize/capture caller
+identity, retained-first lookup, actual repair/read, source epoch and generated
+IDs, public encoding, real submission/complete original response binding and
+new-owner publication compose one path. Exact original request/intent/IDs survive
+unknown/retry; callbacks/views cannot leak internal detached fields. Resource
+preflight covers simultaneous frame/ID/response/registration owners and inspection
+scratch. No preparation/submission after predecessor unknown, no invented rollback
+of a committed new owner, no post-unknown fresh spend. Source malformed owner
+fairness and accepted production read-barrier lifecycle remain separate open gates.
+
+Approve tests in existing targets governance_credit/caller.rs, credit_codec/
+public_credit.rs, state_store/credit/public.rs and snapshot_recovery/public_credit.rs
+with its fixtures.rs, and new application target tests/public_credit/main.rs with
+fixtures.rs (PublicCreditFixture/PublicCreditFault). Real Node tests use actual
+GC3/credit2 logs, canonical state and the current recovery drivers; no fake
+business success. Cover all six operations, bounds/fingerprints, generated IDs,
+existing repair before spend/get/renew/release, missing/no ghost, new owner then
+publication, unknown original-ID compensation, stable retained replay before
+owner/entropy, changed caller conflict, complete historical corruption and
+purged/received snapshots. Add pure path classification/negative checks in current
+architecture files. Save genuine rejecting interfaces and behavior failures
+before bodies; supplemental controls get no retroactive RED/source credit.
+No dependencies, unsafe, suppression, full product/native/Linux/performance
+claim.400/600 files,100 function lines,depth4/complexity25 remain mandatory.
+
+Public caller baseline: missing public API docs were fixed before execution and
+receive no RED credit. All six caller tests now compile and fail at the deliberately
+rejecting APIs; later predicates are masked. Save this exact cohort before bodies.
+For bounded release uniqueness, select one fallible Vec of borrowed ID references,
+prepaid in raw ID descriptor accounting, and sort it O(n log n); preserve original
+ID order and payload pointers. Add Allocation to the existing CreditCallerError
+resource variants. No full payload copy or fixed1000-slot stack buffer is needed.

@@ -1390,3 +1390,15 @@ ValueManifest and ValueGenesisCapabilities is one GovernanceCatalogProfile enum
 are queries, preventing invalid combinations. Wire absence and four-byte GC1/2/3
 markers, public construction, exact snapshots and validated profile0..3 caching
 remain unchanged. This replaces the provisional three governance booleans.
+
+Public credit caller selection: reuse identified2/catalog state and the existing
+atomic credit reducer/writer. Explicit FWCP1 operation15/intent17 retains the
+existing response10 shape while comparing canonical normalized caller fields,
+separately from trusted stamp, observed epoch and generated batch/IDs. Complete
+frame SHA binds preparation; fresh apply revalidates current authority. Existing
+private operation10 remains closed. Explicit Node selection audits/replays the
+public profile. Intent17 receipts require actual credit2/catalog capability even
+without owner rows. Full caller orchestration must resolve original outcomes
+before fresh source reads/registration/entropy, repair existing membership before
+dependent mutations and preserve exact spend IDs on uncertainty. New owners
+commit with the existing pending publication before synchronous publication.
