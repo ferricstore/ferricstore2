@@ -23,6 +23,7 @@ mod original_policy;
 mod provenance;
 mod public_credit;
 mod replay;
+mod workflow_release;
 mod workflow_values;
 
 use fixture_data as f;

@@ -3,6 +3,23 @@ use super::{CodecError as E, CodecLimits, DecodedRequest, PreparedBytes};
 use wf_domain::{governance::release::LimitEnforcement, workflow::control::PreparedDigest};
 mod payment;
 mod request;
+/// Borrows selected paid-Claim recovery facts; full preparation remains mandatory.
+/// # Errors
+/// Refuses other profiles, invalid headers or encoded-byte admission.
+pub fn governed_claim_recovery_header(
+    encoded: &[u8],
+    limits: CodecLimits,
+) -> Result<(u16, [&[u8]; 3], wf_types::version::CommittedTime), E> {
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    let header = request::header(&mut super::reader::Reader::new(encoded, limits))?;
+    Ok((
+        19,
+        [header.tenant, header.group, header.recovery],
+        header.stamp,
+    ))
+}
 pub(super) mod response;
 pub use super::claim::apply::{inspect_governed_claim_point, reject_unavailable_governed_claim};
 pub use request::{encode_governed_claim_request, prepare_governed_claim_request};

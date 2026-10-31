@@ -85,6 +85,9 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
+    if matches!(profile, 18 | 19) {
+        return super::workflow_release::apply(state, entry, fields, limits, base, profile);
+    }
     if matches!(profile, 12..=17) {
         return governance(state, entry, fields, limits, base, profile);
     }

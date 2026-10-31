@@ -30,6 +30,9 @@ pub(super) fn observe(
     base: usize,
     membership: &mut Option<(EntryIdentity, EntryStamp)>,
 ) -> Result<ControlState, Error> {
+    if super::workflow_release::enabled(limits) {
+        super::workflow_release::require_dependencies(limits)?;
+    }
     if limits.stored_workflow_values {
         limits.admit(&[
             base,
@@ -135,7 +138,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if body.get(6) == Some(&15) && super::credit::public(limits) {
+    let header = if matches!(body.get(6), Some(16 | 17)) {
+        super::workflow_release::header(body, limits)
+    } else if body.get(6) == Some(&15) && super::credit::public(limits) {
         wf_ports::log::public_credit_recovery_header(body, limits.normal.codec)
     } else if body.get(6) == Some(&14) && super::catalog_prune::enabled(limits) {
         wf_ports::log::catalog_prune_recovery_header(body, limits.normal.codec)
@@ -229,6 +234,9 @@ fn audit_normal(
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if matches!(profile, 18 | 19) {
+        return super::workflow_release::audit(body, limits, base, stamp, profile);
+    }
     if profile == 16 {
         return super::catalog_prune::audit(body, limits, base, stamp);
     }

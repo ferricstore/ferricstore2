@@ -26,8 +26,9 @@ pub(crate) fn available(
     capture: C<'_>,
     time: TimestampMillis,
     minimum: usize,
+    credit: CreditLimits,
 ) -> Result<bool, E> {
-    tx.checked(|| observe(tx, scope, capture, time, minimum))
+    tx.checked(|| observe(tx, scope, capture, time, minimum, credit))
 }
 
 fn observe(
@@ -36,10 +37,11 @@ fn observe(
     capture: C<'_>,
     time: TimestampMillis,
     minimum: usize,
+    credit: CreditLimits,
 ) -> Result<bool, E> {
     tx.require_governed_claim()?;
     let paid = capture.payment();
-    let context = CreditReadContext::new(tx, scope, paid.scope(), CreditLimits::default())?;
+    let context = CreditReadContext::new(tx, scope, paid.scope(), credit)?;
     if paid.shard_id() >= context.shards || paid.count() < minimum {
         return Ok(false);
     }
@@ -92,6 +94,7 @@ pub(in crate::state::redb) fn witness<'a>(
     tx: &RedbStateTransaction<'_>,
     changes: &'a GroupClaimChanges<'_, '_>,
     capture: C<'_>,
+    credit: CreditLimits,
 ) -> Result<VerifiedGovernedClaimWrites<'a>, E> {
     if changes
         .plan()
@@ -108,6 +111,7 @@ pub(in crate::state::redb) fn witness<'a>(
         capture,
         changes.plan().control().execution_time(),
         capture.requested_limit(),
+        credit,
     )? {
         return Err(E::KnownAborted);
     }

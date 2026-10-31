@@ -148,8 +148,11 @@ impl super::RedbStateTransaction<'_> {
         self,
         changes: &wf_ports::state::GroupClaimChanges<'_, '_>,
         publication: &mut crate::transaction::ClaimValuePublicationPlan<'_>,
-        capture: wf_ports::log::CapturedGovernedClaimPayment<'_>,
+        paid: (
+            wf_ports::log::CapturedGovernedClaimPayment<'_>,
+            wf_domain::governance::credit::CreditLimits,
+        ),
     ) -> Result<(), StateTransactionError> {
-        super::commit::claim::apply_governed(self, changes, publication, capture)
+        super::commit::claim::apply_governed(self, changes, publication, paid)
     }
 }

@@ -20,6 +20,8 @@ pub(super) const fn enabled(limits: &CommittedRecoveryLimits) -> bool {
         limits.governance_catalog,
         super::catalog_membership::GovernanceCatalogRecoveryProfile::Progress
             | super::catalog_membership::GovernanceCatalogRecoveryProfile::Prune
+            | super::catalog_membership::GovernanceCatalogRecoveryProfile::WorkflowRelease
+            | super::catalog_membership::GovernanceCatalogRecoveryProfile::GovernedClaim
     )
 }
 

@@ -2,6 +2,43 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
+Current Node GC4/5 integration now selects actual release and paid-Claim recovery
+profiles with explicit stored-value/catalog-credit/Claim limits. All earlier
+profiles remain closed, including empty stores and generic snapshot boundaries.
+Both fresh and historical stored combined acquisition refuse unpaid profile7.
+Historical native bodies are completely decoded before acceptance; raw op16 is
+routed as semantic18 so it cannot collide with semantic16 catalog pruning.
+
+The actual Lease/Spend -> paid Claim -> terminal -> exact original-ID Release ->
+completion -> ACK timeline passes startup replay, historical re-audit, purged
+snapshot replay and received snapshot replay. Eleven new cases cover these,
+corrupt historical paid/maintenance bodies, GC4 mutation/maintenance, wrong actual
+profile, weakened dependencies and received-shard mismatch before log boundary
+publication. Explicit caller credit limits reach the same-guard native payment
+observation and publication witness; a too-small owner budget refuses with no
+mutation and the default positive control succeeds. The original default paid
+Claim entrypoint remains available as an exact wrapper.
+
+Validation on this candidate:1560 tests/doctests pass across domain, ports,
+storage, Node and architecture, including169 Node snapshot cases,332 storage
+cases and all60 architecture cases. Strict workspace/all-target Clippy, progress,
+fmt and diff pass. Frozen2073 non-Markdown inputs/1484 Rust files do not drift.
+All700 old Rust test/bench inputs remain699 whole plus one exact additive
+registration. All seven original outcome codec files and six source/runtime
+ledgers are unchanged. Evidence: /private/tmp/ferricstore2-node-gc45-{regression,
+final-clippy,progress}.log and proof.json/source-audit.json/inputs.json.
+This is an affected-crate regression, not a new full all12 run or source credit.
+
+This closes the selected Node body/replay wiring increment, not the complete
+product. NEXT automatic known-result reconciliation/cursor lifecycle and the
+public Claim policy/NoDemand/unused/refund/Unknown composition, retaining original
+optional partition identity. Raw public write-call/ID/cross-generation/fairness
+obligations, complete Elixir scenarios/profiles, consensus/read barriers,
+application/transports and Linux/macOS/performance acceptance remain required.
+No automatic worker, live service, independent review, full source-case parity,
+Linux execution or measured speedup is claimed. Older checkpoint notes below
+record their own historical NEXT items and do not override this current status.
+
 Latest release-maintenance increment aftercdc3b30: explicit op16/intent18/
 response15 implements bounded sparse completion and prefix ACK on actual GC4/5.
 Completion preserves the head; ACK removes exact intents and optional markers,

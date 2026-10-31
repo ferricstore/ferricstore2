@@ -102,7 +102,10 @@ impl RedbStateStore {
     }
 }
 impl RedbStateTransaction<'_> {
-    pub(crate) fn require_governed_claim(&self) -> Result<(), E> {
+    /// Requires the actual coherent GC5 capability under this transaction guard.
+    /// # Errors
+    /// Refuses unsupported or corrupt stored capabilities.
+    pub fn require_governed_claim(&self) -> Result<(), E> {
         if self.governance_catalog_profile()? != 5 {
             return Err(E::UnsupportedPolicyProfile);
         }

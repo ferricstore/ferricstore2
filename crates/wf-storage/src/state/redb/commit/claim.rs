@@ -35,18 +35,23 @@ pub(in super::super) fn apply_governed(
     tx: RedbStateTransaction<'_>,
     changes: &GroupClaimChanges<'_, '_>,
     publication: &mut ClaimValuePublicationPlan<'_>,
-    capture: wf_ports::log::CapturedGovernedClaimPayment<'_>,
+    paid: (
+        wf_ports::log::CapturedGovernedClaimPayment<'_>,
+        wf_domain::governance::credit::CreditLimits,
+    ),
 ) -> Result<(), StateTransactionError> {
     let fenced = tx.fenced;
-    publish(tx, changes, Some(publication), Some(capture))
-        .inspect_err(|error| fence(fenced, *error))
+    publish(tx, changes, Some(publication), Some(paid)).inspect_err(|error| fence(fenced, *error))
 }
 
 fn publish(
     mut tx: RedbStateTransaction<'_>,
     changes: &GroupClaimChanges<'_, '_>,
     mut publication: Option<&mut ClaimValuePublicationPlan<'_>>,
-    capture: Option<wf_ports::log::CapturedGovernedClaimPayment<'_>>,
+    capture: Option<(
+        wf_ports::log::CapturedGovernedClaimPayment<'_>,
+        wf_domain::governance::credit::CreditLimits,
+    )>,
 ) -> Result<(), StateTransactionError> {
     tx.ready()?;
     match publication.as_deref_mut() {
@@ -90,7 +95,7 @@ fn publish(
     if let Some(values) = publication {
         values::publish(&tx, scope, values)?;
     }
-    if let Some(capture) = capture {
+    if let Some((capture, _)) = capture {
         super::super::release::claim::publish(&tx, changes, capture)?;
     }
     if let Some(outcome) = changes.outcome() {

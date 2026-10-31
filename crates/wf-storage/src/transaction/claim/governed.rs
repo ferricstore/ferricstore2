@@ -38,6 +38,29 @@ pub fn apply_governed_claim_transaction(
     limits: WorkflowValueTransactionLimits,
     work: ClaimWorkLimits,
 ) -> Result<O, E> {
+    apply_governed_claim_transaction_with_credit_limits(
+        store,
+        scope,
+        encoded,
+        log,
+        limits,
+        work,
+        wf_domain::governance::credit::CreditLimits::default(),
+    )
+}
+
+/// Applies paid Claim with the caller's explicit governing-credit owner/work bounds.
+/// # Errors
+/// Refuses the same conditions as the default entrypoint and exceeded credit limits.
+pub fn apply_governed_claim_transaction_with_credit_limits(
+    store: &mut RedbStateStore,
+    scope: &RequestScope,
+    encoded: &[u8],
+    log: LogIdentity,
+    limits: WorkflowValueTransactionLimits,
+    work: ClaimWorkLimits,
+    credit: wf_domain::governance::credit::CreditLimits,
+) -> Result<O, E> {
     let resources = values::ClaimValueResources::new(limits, encoded.len())?;
     let base = limits.record_batch;
     let live = super::super::load::sum(&[live_bytes(base)?, limits.maximum_value_temporary_bytes])?;
@@ -84,7 +107,7 @@ pub fn apply_governed_claim_transaction(
             return Err(S::Corrupt.into());
         };
         let changes = GroupClaimChanges::new(scope, predecessor, plan, base.codec.admission())?;
-        values::commit_governed(tx, &changes, resources, capture)?;
+        values::commit_governed(tx, &changes, resources, (capture, credit))?;
         let (control, kind) = complete_kind(changes.into_plan())?;
         return Ok(match kind {
             0 => O::Retained {
@@ -99,7 +122,7 @@ pub fn apply_governed_claim_transaction(
     let limits = ClaimTransactionLimits { base, work };
     if fresh.query_preflight().is_err() {
         let plan = decide_fresh_claim_phase_observed(fresh, None, live, base.outcome_ttl_ms)?;
-        return commit_fresh(tx, scope, predecessor, plan, resources, capture);
+        return commit_fresh(tx, scope, predecessor, plan, resources, (capture, credit));
     }
     if !crate::state::redb::release::claim::available(
         &tx,
@@ -107,13 +130,14 @@ pub fn apply_governed_claim_transaction(
         capture,
         fresh.control().execution_time(),
         capture.requested_limit(),
+        credit,
     )? {
         let plan = reject_unavailable_governed_claim(fresh, live, base.outcome_ttl_ms)?;
-        return commit_fresh(tx, scope, predecessor, plan, resources, capture);
+        return commit_fresh(tx, scope, predecessor, plan, resources, (capture, credit));
     }
     let mut loaded = load::LoadedClaim::load(&tx, scope, &fresh, limits)?;
     let plan = observations::decide(fresh, scope, &mut loaded, limits, live)?;
-    commit_fresh(tx, scope, predecessor, plan, resources, capture)
+    commit_fresh(tx, scope, predecessor, plan, resources, (capture, credit))
 }
 fn commit_fresh(
     tx: RedbStateTransaction<'_>,
@@ -121,7 +145,7 @@ fn commit_fresh(
     predecessor: ControlState,
     plan: ClaimApplyPlan<'_>,
     resources: values::ClaimValueResources,
-    capture: C<'_>,
+    paid: (C<'_>, wf_domain::governance::credit::CreditLimits),
 ) -> Result<O, E> {
     let changes = GroupClaimChanges::new(
         scope,
@@ -129,6 +153,6 @@ fn commit_fresh(
         plan,
         resources.limits.record_batch.codec.admission(),
     )?;
-    values::commit_governed(tx, &changes, resources, capture)?;
+    values::commit_governed(tx, &changes, resources, paid)?;
     fresh_reply(changes.into_plan())
 }

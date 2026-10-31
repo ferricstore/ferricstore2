@@ -257,6 +257,13 @@ pub(super) fn audit(
         profile.maximum_value_work,
     )
     .map_err(CommittedRecoveryError::Codec)?;
+    if super::workflow_release::enabled(limits)
+        && decoded
+            .workflow_value_metadata()
+            .is_some_and(|metadata| metadata.profile == 7)
+    {
+        return Err(CommittedRecoveryError::UnsupportedEntry);
+    }
     drop(decoded);
     Ok(EntryStamp::Stamped(stamp))
 }
@@ -317,7 +324,9 @@ pub(super) fn apply(
         drop(scope);
         return Ok(control);
     }
-    let driver = if version == 9 {
+    let driver = if version == 9 && super::workflow_release::enabled(limits) {
+        wf_storage::transaction::apply_workflow_release_transaction
+    } else if version == 9 {
         apply_workflow_stored_value_batch_transaction
     } else if version == 11 {
         apply_stored_step_continue_transaction

@@ -50,7 +50,7 @@ pub use value_batch::{
 pub use claim::{
     ClaimTransactionError, ClaimTransactionLimits, ClaimTransactionOutcome,
     apply_claim_transaction, apply_governed_claim_transaction,
-    apply_workflow_value_claim_transaction,
+    apply_governed_claim_transaction_with_credit_limits, apply_workflow_value_claim_transaction,
 };
 
 pub use record_batch::{

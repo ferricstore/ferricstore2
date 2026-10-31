@@ -61692,3 +61692,80 @@ public policy/NoDemand/refund/unused/Unknown ownership plus raw optional partiti
 identity. Source write-call/ID/cross-generation/fairness obligations, all original
 scenarios/profiles, consensus/read barriers, services and both platform/performance
 acceptance remain required. Keep the full goal active and continue solo.
+
+Solo architecture decision NODE-GC45 (2026-10-31), before creation: approve
+recovery/workflow_release.rs in wf-node for explicit GC4/5 dependency selection,
+complete historical op16/17 body audits and original consumed native drivers.
+Extend the existing private catalog profile enum; require actual layout8,
+catalog-format2 credit and stored-value limits, and Claim work for GC5. Recheck
+dependencies at use so a subsequent builder cannot weaken the selection. Earlier
+profiles remain closed. Inherit membership/progress/prune under both new modes.
+Keep raw op16 distinct from existing semantic16 pruning: Node dispatches release
+maintenance as semantic18 and paid Claim as19. Add the borrowed paid-Claim header
+to its existing codec module; full frame preparation remains mandatory.
+
+Route stored mutations on GC4/5 to the existing release-aware writer. Both
+historical audit and fresh application must refuse unpaid combined acquisition.
+No current payment observations are used when auditing an already-applied body.
+Preserve whole-call entry, scope, temporary and native-driver workspace charging.
+Use existing Normal/Claim errors; introduce no authority/freshness boolean.
+
+Approve snapshot_recovery/workflow_release.rs and private children fixtures.rs,
+frames.rs, history.rs, snapshot.rs and limits.rs for real credit Lease/Spend,
+paid Claim, terminal release, mark/ACK, old-profile and resource refusals,
+historical corruption behind a valid boundary and received/purged replay. Use
+independent whole-table observations, original NUL IDs and an opaque uncommitted
+suffix. Preserve existing tests except one additive module registration.
+
+Approve an explicit-credit-limit variant of the existing paid Claim native
+entrypoint, preserving its default wrapper. Thread the selected CreditLimits
+alongside the concrete captured payment through same-guard availability and
+publication witness checks. This uses a tuple in existing private signatures,
+not a new model. Expose the actual read-only GC5 guard for Node composition.
+Test a small owner budget after real Lease/Spend with zero durable mutation and
+a positive default-budget control. No format, dependency, source-parity, live
+worker, consensus acceptance, independent review or speedup claim is implied.
+
+
+NODE-GC45 result: the original missing recovery APIs produced actual compilation
+RED in /private/tmp/ferricstore2-node-gc45-r0.log; the added dependency case passed
+after implementation. Later body/snapshot/budget cases are supplemental; do not
+claim retrospective behavior TDD. The first snapshot failures were fixture
+sequencing mistakes: receiving a snapshot ahead of its matching committed
+boundary requires installing that boundary before advancing the remaining
+commit. The unchanged existing snapshot tests documented this ordering. A later
+incorrect edit to the source fixture was corrected; no product bug RED is
+claimed for either fixture failure.
+
+Self-review found received GC4/5 capability selection alone was insufficient:
+validate actual stored-value/credit/shard capabilities through the coherent
+observation before any boundary publication. Wrong selected shard count now
+refuses with all state tables preserved and an empty durable log. Recheck builder
+dependencies before observing actual credit. Older modes retain their original
+error paths. Eleven new cases pass; the matching filter also executes one old
+empty-GC4 refusal case. Native paid Claim uses original payment bytes without
+cloning identifiers, and selected CreditLimits travel with the concrete capture
+through publication; no fresh authority boolean or synthetic response is added.
+
+
+Strict workspace/all-target Clippy and formatting pass with unchanged400/600
+file,100 function,4 nesting and25 complexity ceilings. Frozen implementation
+manifest:2073 non-Markdown inputs/1484 Rust files. The source audit preserves700
+existing Rust test/bench inputs:699 whole files and one exact additive Node
+registration inverse. All seven original outcome codec files and six selected
+source/runtime ledger inputs remain byte-identical. Source mapping stays
+141 declarations/155 counterparts/671 links; runtime reconciliation stays
+5903/4222/1681/1655 and incomplete. Existing original assertions are preserved;
+these native integration checks assign no new source-case credit. Evidence:
+/private/tmp/ferricstore2-node-gc45-{r0,flow-final,final-clippy,progress}.log,
+source-audit.json and inputs.json. Whole coupled all12, original native Elixir,
+Linux, live service and measured-performance acceptance remain open.
+
+
+NODE-GC45 final affected-crate regression:1560 tests/doctests pass in95 groups,
+including169 Node snapshot cases,332 storage and all60 architecture cases.
+The frozen2073 non-Markdown inputs/1484 Rust files remain unchanged throughout
+this run. Strict workspace/all-target Clippy, progress, fmt and diff pass.
+No tests are failed or ignored in these groups. Full source parity remains
+incomplete; no all12-current claim follows from these five selected crates.
+Evidence: /private/tmp/ferricstore2-node-gc45-regression.log and proof.json.

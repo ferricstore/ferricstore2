@@ -18,9 +18,9 @@ use wf_ports::{
 pub(super) fn validate<'a>(
     tx: &RedbStateTransaction<'_>,
     changes: &'a GroupClaimChanges<'_, '_>,
-    capture: Option<C<'_>>,
+    capture: Option<(C<'_>, wf_domain::governance::credit::CreditLimits)>,
 ) -> Result<Option<VerifiedGovernedClaimWrites<'a>>, E> {
-    let Some(capture) = capture else {
+    let Some((capture, credit)) = capture else {
         let outcome = match changes.plan().decision() {
             A::Fresh { outcome, .. } => Some(outcome.as_ref()),
             A::Replay(outcome) => Some(*outcome),
@@ -66,7 +66,7 @@ pub(super) fn validate<'a>(
             if reply.status() != RetainedStatus::Accepted {
                 return Err(E::InvalidChanges);
             }
-            Ok(Some(claim::witness(tx, changes, capture)?))
+            Ok(Some(claim::witness(tx, changes, capture, credit)?))
         }
         D::Rejected(R::GoverningReservationUnavailable) => {
             if claim::available(
@@ -75,6 +75,7 @@ pub(super) fn validate<'a>(
                 capture,
                 changes.plan().control().execution_time(),
                 capture.requested_limit(),
+                credit,
             )? {
                 return Err(E::InvalidChanges);
             }

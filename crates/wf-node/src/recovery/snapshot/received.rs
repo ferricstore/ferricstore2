@@ -222,8 +222,15 @@ pub fn restore_received_snapshot(
     let transition = SnapshotTransition::received(before, entry.log(), id)?;
     let mut work = [0, limits.work.1];
     matching(&mut log, namespace, limits, base, saved, before, &mut work)?;
-    let state = candidate.into_store()?;
+    let mut state = candidate.into_store()?;
     super::super::catalog_membership::require_profile(limits, state.governance_catalog_profile())?;
+    if super::super::workflow_release::enabled(limits) {
+        let mut membership = None;
+        let observed = join::observe(&mut state, namespace, limits, base, &mut membership)?;
+        if observed != saved {
+            return Err(CommittedRecoveryError::ProgressMismatch.into());
+        }
+    }
     phase(limits, snapshot, base)?;
     let mut state = state.upgrade_snapshot_layout(snapshot)?;
     phase(limits, snapshot, base)?;

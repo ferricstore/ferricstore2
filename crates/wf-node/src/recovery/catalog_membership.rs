@@ -21,6 +21,8 @@ pub(super) enum GovernanceCatalogRecoveryProfile {
     Enabled,
     Progress,
     Prune,
+    WorkflowRelease,
+    GovernedClaim,
 }
 impl CommittedRecoveryLimits {
     /// Explicitly selects GC3 registration revisions and conditional pruning.
@@ -48,6 +50,8 @@ pub(super) const fn enabled(limits: &CommittedRecoveryLimits) -> bool {
         GovernanceCatalogRecoveryProfile::Enabled
             | GovernanceCatalogRecoveryProfile::Progress
             | GovernanceCatalogRecoveryProfile::Prune
+            | GovernanceCatalogRecoveryProfile::WorkflowRelease
+            | GovernanceCatalogRecoveryProfile::GovernedClaim
     )
 }
 pub(super) fn require(
@@ -65,6 +69,14 @@ pub(super) fn require(
             tx.require_catalog_progress().map_err(E::State)
         }
         GovernanceCatalogRecoveryProfile::Prune => tx.require_catalog_prune().map_err(E::State),
+        GovernanceCatalogRecoveryProfile::WorkflowRelease => {
+            super::workflow_release::require_dependencies(limits)?;
+            tx.require_workflow_release().map_err(E::State)
+        }
+        GovernanceCatalogRecoveryProfile::GovernedClaim => {
+            super::workflow_release::require_dependencies(limits)?;
+            tx.require_governed_claim().map_err(E::State)
+        }
     }
 }
 pub(super) fn require_profile(limits: &CommittedRecoveryLimits, actual: u16) -> Result<(), E> {
@@ -73,6 +85,10 @@ pub(super) fn require_profile(limits: &CommittedRecoveryLimits, actual: u16) -> 
         | (GovernanceCatalogRecoveryProfile::Enabled, 1)
         | (GovernanceCatalogRecoveryProfile::Progress, 2)
         | (GovernanceCatalogRecoveryProfile::Prune, 3) => Ok(()),
+        (GovernanceCatalogRecoveryProfile::WorkflowRelease, 4)
+        | (GovernanceCatalogRecoveryProfile::GovernedClaim, 5) => {
+            super::workflow_release::require_dependencies(limits)
+        }
         _ => Err(E::State(
             wf_ports::state::StateTransactionError::UnsupportedPolicyProfile,
         )),

@@ -90,7 +90,7 @@ fn write_header(
     out.u64(stamp.wall().get())?;
     Ok(at)
 }
-fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, E> {
+pub(super) fn header<'a>(reader: &mut Reader<'a>) -> Result<RawHeader<'a>, E> {
     if reader.take(4)? != b"FWCP" {
         return Err(E::Malformed);
     }

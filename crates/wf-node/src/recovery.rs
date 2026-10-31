@@ -26,6 +26,7 @@ mod join;
 mod original_policy;
 mod replay;
 mod snapshot;
+mod workflow_release;
 mod workflow_values;
 
 pub use snapshot::{

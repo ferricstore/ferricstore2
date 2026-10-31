@@ -43,9 +43,9 @@ pub use claim::{
 pub use governed_claim::{
     CapturedGovernedClaimPayment, GovernedClaimPayment, GovernedClaimPaymentRef,
     GovernedClaimReplyRef, PreparedGovernedClaim, encode_governed_claim_request,
-    governed_claim_response_matches, governed_claim_retained_summary, inspect_governed_claim_point,
-    inspect_governed_claim_reply, prepare_governed_claim_request,
-    reject_unavailable_governed_claim,
+    governed_claim_recovery_header, governed_claim_response_matches,
+    governed_claim_retained_summary, inspect_governed_claim_point, inspect_governed_claim_reply,
+    prepare_governed_claim_request, reject_unavailable_governed_claim,
 };
 mod common;
 mod release;
