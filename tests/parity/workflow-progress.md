@@ -6,6 +6,21 @@ assertion links and optionally references actual coordinator-owned ExUnit
 registration. It has no pass/status or execution-proof fields. The full
 `require-parity` gate remains fail-closed.
 
+Four new real stored cleaner counterparts preserve the original600-ID command
+budget,300+1 busy-owner fairness, empty-catalog/no-delete and malformed derived
+progress reset scenarios. The actual private writers and committed-prefix Node
+recovery supply the observations. Eighteen checked links bring accounting to141
+source-derived declarations/155 counterparts/671 assertion links; all older
+records and runtime identities remain exact. Native clock/codec/helper and
+scope/profile limitations are explicit per counterpart. The bounded runner has
+focused executed tests, while the full integration checkpoint is recorded in
+CONTINUE.md only after its gates finish. Accepted Raft/timer services, native
+FlowCase execution, all required profiles, same-group malformed-owner migration
+and independent Linux acceptance remain open. No full source-case/workflow
+parity or performance credit follows from these links.
+
+Previous checkpoint: stored catalog collection.
+
 Two new executed stored catalog counterparts now preserve the original300-member
 budget top-five query and approval traversal during an actual earlier insertion.
 The real consumed membership writer, committed-prefix Node recovery and anchored

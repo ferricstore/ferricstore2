@@ -60363,3 +60363,27 @@ frozen integration will exercise them again. Borrowed cleanup owner scope is now
 compared with the exact original requested credit scope after complete inspection;
 empty pages pay their fixed128-byte observation owner fee. No suppression or
 allocation was added. Freeze the complete candidate for one all12 checkpoint.
+
+Next concurrency acceptance item (review inference, not an executed bug claim):
+prune currently follows an independent Missing owner observation and an ordinary
+unregister, as the pinned cleaner does. Reproduce the interleaving Missing read ->
+new-owner create/publication/ACK -> stale prune. A target registration advancing
+between the catalog observation and prune must not be lost permanently after its
+source intent was ACKed. Current ports expose no expected target revision in the
+prune command, so source scenarios and whole-store rollback do not prove this
+race safe. Check actual current producer/storage contracts and execute a real
+counterexample before selecting conditional pruning or another reviewed fix.
+Cross-group source freshness and production strong-read lifecycle remain part of
+that acceptance. Do not claim full catalog concurrency safety from this batch.
+
+Bounded cleaner integration checkpoint: all12 local gates pass on1974 frozen
+non-Markdown inputs/1385 Rust files with zero drift. All1548 cases/117 targets
+preserve1522 predecessor/1294 original identities/statuses/multiplicities, both
+benchmark correctness smokes,57 architecture cases,Python7 and11 doctests/15
+targets. All665 old test/benchmark files remain663 whole plus2 registrations;
+six savedR1 sources are whole-file exact. Four source counterparts add18 links:
+141/155/671 accounting, unchanged5903/4222/1681/1655 reconciliation and actual full
+parity exit1 with5858 frozen declarations unported. No full source/native/Linux/
+performance credit. Public credit/Claim/policy/release-outbox, malformed-owner
+migration, accepted consensus/services/timers and full profiles remain required.
+No feature adoption or push; continue the full goal solo.

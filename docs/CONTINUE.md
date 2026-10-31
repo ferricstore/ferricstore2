@@ -4,6 +4,67 @@ Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
 Current batch: M2-CREDIT-CATALOG1, still unfinished.
 
+Latest integrated code checkpoint:7515fc9, bounded cleaner maintenance runner.
+Actual catalog/progress/owner observations feed supervised original private
+Cleanup, prune and progress frames. Default16/max64 attempted commands, at most2
+consecutive pending pages and4N+4 attempts preserve the pinned accounting.
+Failed preparation/submission, unknown replies, prune and cursor reset/write
+attempts all share the command budget. Exhausted cursor budget retains actual
+old progress; unconfirmed progress never claims wrapped/caught-up. Fresh steps
+reload durable hints. Missing owners are pruned; invalid derived hints reset by
+a real committed command. Source malformed-authoritative-owner fairness remains
+an explicit unresolved migration obligation; canonical fencing stays strict.
+
+Actual source cases preserve600 IDs/budget2 (512 then88),300+1 busy fairness,
+empty/no absent cursor delete and invalid-hint reset before cleanup. Real5000-ID
+control exhausts default16 commands, conserves every ID and drains within max64.
+Lost/foreign replies, older prepared wall versus newer monotone execution,
+failed writes, exact workspace/attempt bounds and continued cleanup following
+purged/received snapshots execute. Cleanup replies bind exact original retained
+scope/request/intent/status and credit-owner scope after complete borrowed
+inspection. Trusted prepared wall must meet the tick floor; original execution
+may exceed it according to existing monotone apply. No full owner map/reply clone
+or body allocation is used merely to derive Cleanup intent/summary. No measured
+speedup/RSS, accepted Raft service or periodic timer lifecycle is implied.
+
+All12 local gates pass on1974 frozen non-Markdown inputs/1385 Rust files with
+zero drift:1548 cases/117 executable targets,57 architecture cases,Python7 and
+11 doctests/15 targets. All1522 predecessor and1294 original identities/statuses/
+multiplicities and both benchmark correctness smokes remain. All665 older test/
+benchmark files stay663 whole plus2 exact additive registration inverses. All6
+savedR1 test sources are whole-file exact; original R0 main case prefixes retain
+explicit additive assertion/style/API argument inverses. Fixture clock/accepted
+status/raw parser/helper refinements are recorded honestly. Rejecting predecessor
+afdfed8 has17 compiled failures and1 invalid-budget control pass; b671a66 saves
+wrong-owner-scope and underpaid-empty-page counterexamples, both now corrected.
+Later fault/default/cutoff controls are not original TDD.
+
+Checked source accounting is141 declarations/155 counterparts/671 assertion
+links, retaining every older declaration record/runtime identity. Four real
+cleaner counterparts add18 links; the broader native/public setup and exact
+clock/codec migration limitations are explicit. Runtime reconciliation remains
+5903/4222/1681/1655 and actual full parity still exits1 with5858 unported frozen
+textual declarations. No full source-case/native/Linux/performance credit.
+See /private/tmp/ferricstore2-credit-cleaner-{r0,r1,final-pipeline,source-audit,
+full-identity,full-parity,checkpoint}.json and phase logs.
+
+Next reproduce stale missing-owner prune racing new-owner publication/ACK and
+select a reviewed conditional-prune/freshness solution if needed. Then finish
+public credit normalization/preparation/retained/submission parents
+using registered-before-dependent-mutation ordering, then coupled public Claim,
+policy and release-outbox operations. Resolve the required native malformed-owner
+fairness migration explicitly without weakening authoritative corruption checks.
+Accepted consensus, production routing/authorization, HTTP/TCP/worker integration,
+periodic maintenance lifecycle, complete source/profile coverage and native
+Linux/macOS acceptance remain open. Keep all M1-M8/full-goal obligations active.
+Do not adopt the unfinished feature branch, push or declare product completion.
+The primary checkout only points here; last adopted code remains728650f. Preserve
+the dirty original Elixir checkout and unexecuted native fix checkpointce3dce444.
+Concrete reviews are solo; do not start agents or claim independent review.
+
+Previous checkpoint: durable progress storage/recovery. The current head above
+supersedes its next-work statements.
+
 Latest integrated code checkpoint:208f253, durable cleaner progress storage and
 complete historical/replay/snapshot recovery. Explicit GC2 supports family19
 cursor set/clear with original retained reply and identical applied control in
