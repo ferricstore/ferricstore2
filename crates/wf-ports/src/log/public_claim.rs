@@ -2,14 +2,16 @@
 use super::CodecError;
 use wf_domain::{claim::caller::NormalizedClaimDue, workflow::request::ClientIntent};
 use wf_types::identity::TenantId;
+mod binding;
 mod frame;
 pub(in crate::log) mod intent;
 mod model;
 mod response;
+pub use binding::inspect_public_claim_reply_for_call;
 pub use frame::{
     encode_public_claim_request, prepare_public_claim_request, public_claim_recovery_header,
 };
-pub use model::{PreparedPublicClaim, PublicClaimPreparation};
+pub use model::{PreparedPublicClaim, PublicClaimPreparation, PublicClaimReplyLimits};
 pub use response::{
     PublicClaimReplyKind, PublicClaimReplyRef, encode_public_claim_funding_reply,
     encode_public_claim_reply, inspect_public_claim_reply, public_claim_retained_summary,

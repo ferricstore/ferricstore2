@@ -2,6 +2,66 @@
 
 Updated: 2026-10-31. Full-completion goal remains active; continue solo.
 
+PUBLIC-CLAIM-APP1 implements original-first application submission/retry over the
+explicit PublicClaimSubmitPort. Public V1 comparison is selected as intent21 and
+looked up before clock/nonce/current funding. One shared immutable original frame
+and bounded scope/request metadata survive Unknown, denied/unresolved inquiry,
+redirect, invalid replies and narrower retry admission. Retry inquires first,
+then resubmits the same Arc after an absent observation; no independent credit
+spend/refund or external no-spend proof is introduced.
+
+Original responses are fully scanned and bound to scope/request/intent/status,
+worker/type, lease duration, partition/state/priority, phase schedule/quota/count,
+and explicit/derived credit scope/shard. Source IDs encode one canonical epoch/
+batch and ordered1-based ordinals. A concurrent earlier original may have another
+nonce and earlier time; neither this attempt's generated inputs nor caller
+requested now override it. Borrowed response spans and stack ID formatting avoid
+postimage/ID payload copies. Actual shared-pointer equality is tested; no measured
+speedup is claimed.
+
+Seven native integration controls use actual log/state/funding/refund/recovery:
+pending commit, lost delivery, refusal/denial/redirect, earlier different-nonce
+winner, three phases, original conflict, committed expiry and reopen. These are
+test fixtures, not a production accepted-leader/read-barrier/auth/supervisor.
+The port interface explicitly requires those actual capabilities. Production
+service composition, blocking/projection/pipeline and unresolved routing remain
+unfinished; this is one original mutation attempt, not a full client listener.
+
+All1796 workspace Rust tests pass in120 groups, plus11 doctests in15 groups,
+zero failures/ignored. Strict all-target workspace Clippy, strict docs, all60
+architecture checks, Python7, reference integrity, progress, fmt and diff pass.
+Seventeen new cases comprise application10 and native integration7; supplemental
+first-pass checks and genuine runtime RED are distinguished in the coordination
+record. Initial shared-target compile artifact failures are not runtime RED;
+current Cargo evidence uses CARGO_TARGET_DIR=/private/tmp/ferricstore2-public-
+claim-app-target with the usual offline CARGO_HOME and Rust1.99.0.
+
+All2180 frozen non-Markdown inputs/1591 Rust files stay exact through checks.
+Of1281 prior test/bench/reference inputs,1280 stay byte-identical; the sole change
+is an exact additive Native application module registration. The Rust subset is
+742 inputs,741 whole plus that registration. Original assertions, reference
+snapshots and source/runtime ledgers are preserved. Evidence:
+/private/tmp/ferricstore2-claim-app-{workspace,doctests,clippy,doc,arch,python,
+reference,progress,parity,fmt}.log and proof/source-audit/inputs.json.
+
+Full parity still actually exits1. Full source cases/profiles/setup/fixtures and
+adapters remain incomplete; no native Elixir/Linux, independent review, measured
+performance or production runtime/service acceptance is claimed. Primary code is
+unchanged; only its handoff points to this isolated verified implementation.
+
+NEXT close remaining source semantics before enabling the service: original
+bind-before-skip reservation positions, nil/present-empty partition capture,
+Auto/Global routing, exact projections, blocking and original pipeline identities.
+Complete the ordered accepted-Raft/leader/read-barrier/current-auth/supervisor
+owners behind the port and shared transport/worker service. Execute/map all
+required pinned Elixir scenarios/assertions/profiles, remaining lifecycle/catalog
+work, and native Linux/macOS/performance acceptance. Preserve all full-goal gates;
+this application checkpoint does not complete or shrink the objective.
+
+## Preceding 39f54f5 native funded parent checkpoint (historical)
+
+The following saved results/next steps describe that predecessor only.
+
 The coupled PUBLIC-CLAIM-CALL1/RECOVERY1 native implementation now executes
 op19/intent21/response18 under one original retained gate and writer. The exact
 public canonical V1 digest is streamed and matches all12 preserved vectors.

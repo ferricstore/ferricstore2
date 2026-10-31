@@ -18,6 +18,7 @@ use wf_ports::{
     },
     state::{GroupApplyStore, GroupApplyTransaction},
 };
+mod application;
 
 fn limits() -> TestResult<CommittedRecoveryLimits> {
     Ok(p::selected(true)?

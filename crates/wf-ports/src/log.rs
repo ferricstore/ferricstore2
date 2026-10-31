@@ -370,10 +370,11 @@ fn digest(bytes: &[u8]) -> PreparedDigest {
 mod public_claim;
 mod public_credit;
 pub use public_claim::{
-    PreparedPublicClaim, PublicClaimPreparation, PublicClaimReplyKind, PublicClaimReplyRef,
-    encode_public_claim_funding_reply, encode_public_claim_reply, encode_public_claim_request,
-    inspect_public_claim_reply, prepare_public_claim_intent, prepare_public_claim_request,
-    public_claim_recovery_header, public_claim_retained_summary,
+    PreparedPublicClaim, PublicClaimPreparation, PublicClaimReplyKind, PublicClaimReplyLimits,
+    PublicClaimReplyRef, encode_public_claim_funding_reply, encode_public_claim_reply,
+    encode_public_claim_request, inspect_public_claim_reply, inspect_public_claim_reply_for_call,
+    prepare_public_claim_intent, prepare_public_claim_request, public_claim_recovery_header,
+    public_claim_retained_summary,
 };
 pub use public_credit::{
     CreditSpendPreparation, PublicCreditReplyExpectation, encode_public_credit_request,

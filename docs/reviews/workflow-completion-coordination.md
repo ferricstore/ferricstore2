@@ -62521,3 +62521,123 @@ the new21/18 association is explicit. See /private/tmp/ferricstore2-public-claim
 proof.json, source-audit.json, inputs.json. The proof hashes the actual logs and
 the input audit; parity failure is recorded separately. This is progress toward
 the unchanged active full goal, not its completion or a reason to mark it blocked.
+
+PUBLIC-CLAIM-APP1 concrete solo architecture/source review before creation:
+continue the unchanged full goal without agents. Approve these named artifacts:
+ports/consensus/public_claim.rs with PublicClaimReadLimits,
+PublicClaimRequestLookup and PublicClaimSubmitPort: original authorized retained
+inquiry, trusted time/nonce preparation, and supervised Arc<PreparedBytes>
+submission. Fresh observation is not an applied Fresh or no-spend certificate.
+Each effect must recheck current authorization and original bound namespace;
+implementing this trait alone does not establish a production read barrier or
+supervisor. Reuse MutationSubmission/NotSubmitted/Unknown, never credit leaf
+submissions. Selected group-local root19 supplies actual funding/settlement.
+
+Approve ports/log/public_claim/binding.rs and binding/{records,payment}.rs,
+PublicClaimReplyLimits in the existing model child and
+inspect_public_claim_reply_for_call. Fully scan before comparing original
+caller-bound type, worker, lease duration, partition/priority/state, phase quota
+and original whole limit. Use the existing pure schedule and borrowed readers;
+no postimage/ID payload copies. Validate payment scope/shard/enforcement against
+explicit or actual configured source shard count. All source IDs must encode
+one canonical epoch/batch and original ordered1-based ordinals. Do NOT require
+an earlier retained winner's nonce/time to equal this attempt's preparation:
+canonical caller identity deliberately excludes both. Request scope/ID/intent,
+full stored response/status and current authorized original authority remain
+mandatory, including after snapshot purge where the old log may be absent.
+
+Approve application/commands/claim.rs and claim/{model,prepare,dispatch}.rs,
+model/{limits,error}.rs for PublicClaimCallRequest, PublicClaimCallLimits,
+PreparedPublicClaimCall, PublicClaimCallResult, PublicClaimCallError and
+PublicClaimRetryError. Own one original Arc plus bounded scope/request metadata;
+reparse borrowed caller descriptors when needed instead of cloning caller trees.
+Reserve original frame, concurrent descriptor owner, response inspection,
+read/adapter and execution owners before any port call. Original lookup precedes
+clock/entropy/current policy; retry looks up the same identity, preserves the
+context on refused/narrower admission and resubmits the SAME Arc only after a
+Fresh observation. Unknown lookup/submission cannot trigger new preparation or
+independent refunds. Block/projection/pipeline and unresolved routing remain
+separate explicit work, not silently counted as a full service.
+
+Approve application/tests/public_claim/{main,fixtures,admission,original,retry,
+binding}.rs with ClaimSubmitFixture, ClaimPortMode and ClaimTrace. Approve
+node/tests/snapshot_recovery/workflow_release/public_claim/application.rs and
+application/{fixtures,ports,flow,faults}.rs with ClaimApplicationFixture,
+ClaimApplicationFault and ClaimApplicationTrace. The latter executes actual
+log/state/Claim drivers, original point reads, reopen and delayed/lost delivery;
+it is test support, not a fake production Raft/service adapter. No production
+dependency edges or new crate are selected. Existing source assertions remain
+unchanged; only exact module registrations may be added. Whole local/Linux/
+Elixir/profile/performance gates and actual production authorization/read-barrier/
+supervision remain open. This turn follows a PROGRESS turn (39f54f5 integrated
+native parent plus full frozen verification), not a blocked/no-progress turn.
+
+PUBLIC-CLAIM-APP1 implementation self-review: the application now computes the
+existing public V1 digest under internal selector21, inquires before generating
+time/nonce, and returns only fully inspected original scope/request/intent/status
+and caller-bound reply data. Its owned original contains bounded namespace data
+and one Arc frame. Refused/narrower retry, denied/unknown original inquiry,
+redirect and invalid submitted reply preserve that owner. No separate credit
+read/spend/refund capability exists on this port. Fresh lookup is not an applied
+gate or proof that some external spend did not happen.
+
+Complete response binding uses original worker/type/lease duration, partition,
+state/priority and the actual pure phase schedule/quotas/count. Full grammar is
+checked before borrowed span comparisons. Payment scope/shard/enforcement and
+all source IDs are checked, including canonical epoch decimal, canonical22-byte
+nonce spelling and every original1-based ordinal. Original earlier-winner
+time/nonce remain independent of this attempt: a real concurrent winner at103
+with batch33 is accepted after preparation at104 with batch7a. Caller requested
+now is comparison data, not a clock floor. No current policy/clock/entropy is
+read to return an original. Production auth/read-barrier/supervision remains an
+actual adapter requirement; tests do not convert a trait into that capability.
+
+Performance/ownership review consulted the official
+[Rust Arc documentation](https://doc.rust-lang.org/std/sync/struct.Arc.html):
+cloning an Arc shares its allocation. Actual pointer-equality and pending/log/
+credit tests verify this implementation resubmits the same owner without payload
+or ID regeneration. Caller descriptors and response rows borrow original bytes;
+canonical ID checks use stack decimal buffers and borrowed nonce spans. No new
+dependency, partition snapshot clone, blanket lint exception or measured speedup
+is introduced. Retain variable encoder Vec ownership rather than speculatively
+changing shared storage representations without a benchmark.
+
+The first shared-target attempts failed before test execution on missing rmeta/
+rlib artifacts; they are compile failures, not runtime RED. The isolated target
+/private/tmp/ferricstore2-public-claim-app-target produced actual compiled RED in
+/private/tmp/ferricstore2-claim-app-isolated-r0.log (seven failing controls).
+The original eight application controls then passed in app-first.log. The later
+canonical-payment and invalid-reply cases are supplemental first-pass controls.
+Actual Native integration first failed four cases with Preparation(Unavailable)
+in native-r0.log; the remaining pending-refusal case has its own actual RED in
+native-refusals-r0.log before the fixture body. Native-complete.log now passes
+seven controls over real log/state/credit/Claim/recovery operations. Conflict,
+committed expiry and three-phase binding were added after related bodies and
+are supplemental evidence, not retrospective TDD. Full frozen verification is
+in progress; record only actual terminal totals below.
+
+Current remaining work includes actual production leader/read-barrier/auth and
+supervisor owners, transport/projection/blocking/pipeline integration, source
+bind-before-skip/optional partition/routing semantics, all pinned source cases
+and required profiles, native Linux/Elixir and measured performance. No source
+case ledger, original assertion or full-goal disposition is silently changed.
+
+PUBLIC-CLAIM-APP1 final frozen verification: full workspace actually exited0,
+1796 Rust cases/120 groups, plus11 doctests/15 groups, zero failures/ignored.
+Strict workspace/all-target Clippy, strict docs, all60 architecture cases,
+Python7, reference integrity, progress, fmt and diff pass. Seventeen added cases
+are application10 and Native Node integration7; branch loops are not counted as
+additional source-case credits. Existing suite/assertions remain exact: of1281
+old test/bench/reference inputs,1280 are byte-identical and one has the exact
+additive application module registration. The Rust subset is742 inputs,741 whole
+plus that registration. All2180 frozen non-Markdown inputs/1591 Rust files remain
+unchanged after verification. Actual logs/proof/input audit are
+/private/tmp/ferricstore2-claim-app-{workspace,doctests,clippy,doc,arch,python,
+reference,progress,parity,fmt}.log and proof/source-audit/inputs.json.
+
+Full parity actually exits1 with the existing full source/profile/execution gaps.
+Neither this application implementation nor its real native log/state fixtures
+complete production authorization/accepted read barriers/supervision, live
+consensus/listeners/workers, source bind-before-skip/optional partition/routing,
+blocking/projection/pipeline integration, complete Elixir/profile coverage,
+Linux or performance acceptance. Keep the unchanged full goal active and solo.

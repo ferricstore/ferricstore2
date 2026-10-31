@@ -1,8 +1,8 @@
 //! Application boundaries and pure canonical caller-intent preparation.
 //!
-//! The commands facade prepares bounded identities from explicit typed inputs.
-//! Service authorization, operation registries and durable submission retain
-//! their reviewed implementation gates.
+//! The commands facade prepares bounded identities and delegates original-first
+//! Claim inquiry/retry through explicit capabilities. Production authorization,
+//! operation registries and supervised service adapters retain their gates.
 
 #![forbid(unsafe_code)]
 

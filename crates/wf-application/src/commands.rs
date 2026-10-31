@@ -1,4 +1,5 @@
-//! Pure preparation values; shared service authorization/submission is pending.
+//! Caller preparation and command orchestration through explicit capabilities.
+//! Production authorization, read-barrier and supervision adapters remain gated.
 
 use wf_domain::claim::caller::NormalizedClaimDue;
 use wf_domain::policy::installation::InstallCommand;
@@ -7,6 +8,7 @@ use wf_types::identity::TenantId;
 
 use crate::error::PreparationError;
 
+pub mod claim;
 pub mod independent;
 
 /// Explicit typed comparison value chosen by a versioned operation schema.

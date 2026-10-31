@@ -1,6 +1,17 @@
 //! Actual server preparation, with no paid-credit or execution authority.
 use crate::log::PreparedAtomicClaim;
 
+/// Server-owned original caller binding and immutable credit capability.
+#[derive(Clone, Copy)]
+pub struct PublicClaimReplyLimits {
+    /// Captured response byte/count/inline limits.
+    pub admission: wf_domain::workflow::admission::AdmissionLimits,
+    /// Original schedule/whole-caller work profile.
+    pub coordination: wf_domain::claim::coordination::ClaimCoordinationLimits,
+    /// Actual configured immutable shard count, rechecked by the adapter.
+    pub credit_shard_count: u64,
+}
+
 /// Generated committed inputs, independent of the original public V1 caller.
 #[derive(Clone, Copy)]
 pub struct PublicClaimPreparation {

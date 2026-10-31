@@ -1796,6 +1796,27 @@ codec value grants no queue-full or durable-commit authority by construction.
 
 ## Selected atomic Claim parent framing
 
+PUBLIC-CLAIM-APP1 adds original-first application orchestration over an explicit
+authorized inquiry/preparation/supervised-submission capability. Canonical public
+V1 is selected as internal intent21 before lookup; no current policy, clock,
+nonce or independent credit call precedes that lookup. An unresolved submission
+owns the original scope/request and one shared immutable frame. Retry preserves
+that frame, re-admits current profiles, inquires first and submits the same owner
+only after an absent observation; absence is no external no-spend proof.
+Denial, redirect, invalid reply and unresolved inquiry preserve the original
+context. Current production authorization/read-barrier/supervision implementations
+remain separate gates; the port interface alone does not implement them.
+
+The complete returned receipt is bound to the original caller's worker, type,
+lease duration, partition/state/priority filters, exact scheduled phases/quotas,
+count and explicit/derived credit scope/shard. Source payment IDs encode one
+canonical epoch/batch and original ordered1-based ordinals. A concurrent earlier
+original may use another nonce and earlier time; do not compare it with this
+attempt's generated inputs or the caller's identity-only requested now. This
+works without an old log after retained snapshot custody. Native integration
+tests execute actual log/state funding, refund, pending/lost delivery, original
+lookup and historical recovery; they establish no production Raft/service.
+
 PUBLIC-CLAIM-CALL1 additionally selects **op19/intent21/response18** for the
 public funded parent. Intent21 stores the exact existing public V1 canonical
 caller digest; the internal selector is not a new public normalization version.
