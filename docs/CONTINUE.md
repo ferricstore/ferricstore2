@@ -2,6 +2,21 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
+Open coupled-release candidate: code16a2d4b after protocol0a36f4a (R0s922b7ba,
+be241ab). Shared source queue/intent/cursor decisions and explicit GC4 custody
+now pass162 focused cases (domain17,ports38,storage30,Node17,architecture60),
+strict workspace/all-target Clippy,fmt,diff and cargo progress. No new full
+pipeline run: the last all12/1607 checkpoint below remains9220c17 only.
+GC4 preserves actual credit2/catalog, inherited pruning, snapshot capture/receive
+and old-mode/install refusal. It rejects checksum-valid missing dependencies.
+The current governed-Claim refusal remains: record reservation bindings, atomic
+release enqueue, ACK/sparse completion, complete data recovery/replay and actual
+Claim/policy/refund/reconciliation parents still need implementation. Do not
+claim protocol/custody completes the coupled batch. Source ledgers are unchanged.
+Proof: /private/tmp/ferricstore2-release-{focused,source-audit,protocol-r0,
+custody-r0}.json. Continue from the latest coordination review; exact next data
+schema/API artifacts require the recorded solo review before creation.
+
 Current batch: M2-CREDIT-CATALOG1 remains unfinished. Latest integrated local
 public credit checkpoint: code9220c17. The selected normalized caller path is now
 implemented and verified; the full product goal is NOT complete.
