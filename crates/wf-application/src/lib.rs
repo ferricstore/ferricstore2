@@ -10,6 +10,7 @@ mod admission;
 mod authorization;
 pub mod commands;
 pub mod error;
+pub mod governance;
 mod intent;
 pub mod queries;
 mod reconciliation;

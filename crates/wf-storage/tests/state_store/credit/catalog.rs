@@ -6,5 +6,6 @@ use wf_ports::state::{CreditCatalogPage, StateTransactionError};
 
 mod ack;
 mod fixtures;
+mod publication;
 mod recovery;
 mod sequence;

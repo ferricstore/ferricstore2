@@ -46,6 +46,20 @@ pub(crate) fn validate_row(value: &[u8]) -> Result<(), E> {
 }
 
 impl RedbStateStore {
+    /// Creates explicit credit2 and target GC1 capabilities in one genesis commit.
+    /// # Errors
+    /// Refuses invalid genesis/count/profile or unproved durability.
+    pub fn create_credit_and_governance_catalog_database(
+        _database: redb::Database,
+        _group: GroupId,
+        _recovery: RecoveryId,
+        _genesis: StateStoreGenesis<'_>,
+        _defaults: WorkflowValueDefaults,
+        _shard_count: u64,
+        _limits: StateStoreLimits,
+    ) -> Result<Self, E> {
+        Err(E::UnsupportedPolicyProfile)
+    }
     /// Creates a target catalog authority without credit-owner shard assumptions.
     /// # Errors
     /// Refuses invalid genesis, unsupported capability or unproved durability.

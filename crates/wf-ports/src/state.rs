@@ -18,7 +18,11 @@ pub use claim::{
 };
 pub use control::{GroupControlChanges, GroupControlTransaction};
 pub use core_policy::{GroupCorePolicyChanges, GroupCorePolicyTransaction};
-pub use credit_catalog::{CreditCatalogEntry, CreditCatalogPage};
+pub use credit_catalog::{
+    CreditCatalogEntry, CreditCatalogMemberRef, CreditCatalogOwnerState, CreditCatalogPage,
+    CreditCatalogReadLimits, CreditCatalogReadPort, EncodedCreditCatalogMembers,
+    decode_credit_catalog_member, encode_credit_catalog_members,
+};
 pub use governance_catalog::{GovernanceCatalogPage, GovernanceCatalogRead};
 pub use history::{
     StoredWorkflowHistoryRow, StoredWorkflowHistorySnapshot, WorkflowHistoryDirection,

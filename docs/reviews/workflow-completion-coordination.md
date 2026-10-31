@@ -59664,3 +59664,73 @@ The capability is independent of credit-owner shard configuration; the combined
 creator, coherent owner-batch/publisher, repair/cleaner and public parents remain
 required. Preserve the accepted-consensus boundary and all mandatory source
 scenarios rather than marking the catalog/product goal complete.
+
+### M2-CREDIT-CATALOG1 publisher selection (solo, before artifacts)
+
+Continue the full batch from cf9bc50. Review uses pinned governance/catalog.ex,
+governance/limit_reconciler.ex and limit_store.ex, plus the mandatory publication
+scenarios in flow_governance_limit_storage_test.exs925..1085. Preserve one source
+per round-robin call, exact-length owner batches, missing-owner discard, valid
+prefix stopping at corruption, two reported reads for a nonempty page and one
+idempotent membership write. Only a verified complete accepted membership reply
+permits ACK; uncertainty/conflicts/expiry/refusal preserve pending work and report
+zero published. Published counts processed entries, including missing/duplicates.
+
+Approve ports state/credit_catalog/read.rs (CreditCatalogReadLimits,
+CreditCatalogOwnerState and CreditCatalogReadPort), member.rs
+(CreditCatalogMemberRef and EncodedCreditCatalogMembers; one flat fallible byte
+owner plus ranges, complete borrowed FWGL1 decoding), and consensus/
+catalog_publication.rs (CreditCatalogPublicationPort extending the narrow read
+port, internal preparation of fresh RequestId/time and supervised submission).
+Reuse the existing MutationSubmission/NotSubmitted/Unknown diagnoses rather than
+inventing commit booleans. Full original retained scope/request/intent/status/
+response validation occurs in application before dependent submission.
+
+The neutral member contains original credit scope and group/recovery, with
+length-prefixed complete bytes and no implicit physical-storage key format.
+Tenant comes from the separately checked source/target namespaces and must
+match. These member fields remain observations/routing hints; the actual read
+owner and supervised submission capability must verify their configured store
+namespaces and authorization. No member bytes or lease-shard ID grants authority.
+Catalog byte order is internal; public collection must still sort loaded views
+globally according to the source contract. No old wire compatibility is claimed.
+
+Approve application governance.rs and governance/publication.rs with plan.rs
+and dispatch.rs children. Types: CreditCatalogPublicationRequest,
+CreditCatalogPublicationLimits, CreditCatalogPublicationStats and
+CreditCatalogPublicationError. Inputs borrow the immutable configured source
+list/target/catalog; outputs are scalar counters and next source. Preflight
+reserves two cumulative read cohorts, adapter C, bounded member staging, fixed
+16384 metadata/reference bytes, prepared wire and the supplied execution W.
+Each port must respect its explicit read/adapter or supervised execution cap.
+Drop the complete retained membership reply before preparing ACK. An empty
+member prefix skips membership submission but still ACKs processed missing rows.
+
+Approve storage credit/catalog/read.rs for actual same-guard page/owner batches,
+validating capability2 and exact owner scope/shards while retaining only presence
+states and dropping each decoded owner before the next. Strict corruption may
+fence/refuse the whole read; native malformed-KV prefix migration remains open.
+Approve create_credit_and_governance_catalog_database in existing target catalog
+facade, using immutable explicit (alias2,credit2+count,GC1) genesis in one commit.
+Old constructors/bytes remain exact; no unlogged capability upgrade is added.
+
+Approve tests in existing targets: ports credit_codec/catalog_member.rs,
+storage state_store/credit/catalog/publication.rs, and Node snapshot_recovery/
+catalog_publication.rs with fixtures.rs/failures.rs children. Test-only types:
+PublicationFixture, PublicationStoreProfile, PublicationFault, PublicationCall
+and PublicationStore. Actual Node fixtures use real durable logs, explicitly
+committed test prefixes and the same recovery/writers; lost-response injection
+occurs after actual durable completion. They do not claim accepted Raft/service
+availability. Contract corruption/read-shape injections receive no full native
+source-case credit. Save compiled RED before semantic bodies and another phase
+after source/member predecessors expose the publisher. No new dependency,
+production test-support edge, physical family or lint exemption. Linux/macOS use
+the same bytes/limits; native platform acceptance remains separately required.
+
+Publisher predecessor RED: two member codec cases compile/fail at healthy
+UnsupportedVersion; two stored cases compile/fail at combined genesis and source
+page UnsupportedPolicyProfile. Later owner-batch/publisher assertions remain
+masked. A test array-element coercion compile error was corrected before these
+genuine failures; it is not semantic RED. Save before predecessor bodies.
+See /private/tmp/ferricstore2-catalog-publisher-r0{,-ports,-storage} JSON/logs.
+The application facade is still rejecting and has no passing behavior claim.

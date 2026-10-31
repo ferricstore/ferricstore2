@@ -9,7 +9,9 @@ use wf_domain::workflow::request::{ClientIntent, RequestScope};
 use wf_types::identity::{PartitionId, RequestId};
 use wf_types::version::CommittedTime;
 
+mod catalog_publication;
 mod claim;
+pub use catalog_publication::CreditCatalogPublicationPort;
 mod membership;
 mod mutation;
 mod value;

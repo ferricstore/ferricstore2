@@ -1280,3 +1280,17 @@ permit at most256 members. Reads page only the selected catalog and require the
 actual last member to remain present before continuing; a full page supplies a
 cursor even if the next read is empty. These selected contracts do not by
 themselves implement the publisher, accepted consensus or source parity.
+
+The selected catalog publisher uses a neutral FWGL1 member identity containing
+original group/recovery and credit scope; tenant is bound by matching source and
+target request scopes. Membership bytes confer no placement authority. The
+actual source read owner verifies its namespace, and the supervised submission
+capability verifies target/source namespace and authorization. Publication uses
+complete retained operation12/intent14/response12 validation before submitting
+operation11 ACK. Lost/uncertain/foreign replies never authorize ACK. One selected
+source advances round-robin even after operational refusal; counts preserve the
+source distinction between processed entries and unique membership inserts.
+Combined explicit owner/target genesis uses existing independent manifest fields
+in one Immediate commit, without an unlogged runtime upgrade or new family.
+Application orchestration depends only on neutral ports. An accepted consensus
+adapter remains required; committed-prefix test fixtures do not supply one.
