@@ -1,4 +1,5 @@
 use super::*;
+mod collection;
 mod observations;
 use redb::{ReadableDatabase, ReadableTable, TableDefinition, TableHandle};
 use sha2::{Digest, Sha256};

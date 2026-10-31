@@ -115,3 +115,56 @@ fn governance_catalog_actual_uncertain_commit_fences_and_reopens_complete_old_or
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn governance_catalog_read_port_uses_actual_capability_namespace_and_complete_guard_limits()
+-> TestResult {
+    use wf_ports::state::{GovernanceCatalogReadLimits as L, GovernanceCatalogReadPort};
+    let dir = common::directory("governance-read-port")?;
+    let path = dir.join("state");
+    let store = f::create(&path)?;
+    let scope = common::scope()?;
+    assert_eq!(
+        store
+            .read_governance_catalog(f::read(&scope, None, 256), 10000, 64 * common::MIB)?
+            .members
+            .len(),
+        0
+    );
+    assert_eq!(
+        store
+            .governance_catalog_page(f::read(&scope, None, 256), L::default())?
+            .members
+            .len(),
+        0
+    );
+    assert!(!store.governance_catalog_contains(&scope, b"limit", b"a", L::default())?);
+    let tiny = L {
+        maximum_temporary_bytes: 1,
+        ..L::default()
+    };
+    assert_eq!(
+        store.governance_catalog_contains(&scope, b"limit", b"a", tiny),
+        Err(S::Limit)
+    );
+    let zero = L {
+        maximum_steps: 0,
+        ..L::default()
+    };
+    assert_eq!(
+        store.governance_catalog_page(f::read(&scope, None, 256), zero),
+        Err(S::InvalidLimits)
+    );
+    let foreign = wf_domain::workflow::request::RequestScope::new(
+        scope.tenant().clone(),
+        wf_types::identity::GroupId::new(b"foreign".to_vec())?,
+        scope.recovery().clone(),
+    );
+    assert_eq!(
+        store.governance_catalog_contains(&foreign, b"limit", b"a", L::default()),
+        Err(S::NamespaceConflict)
+    );
+    drop(store);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

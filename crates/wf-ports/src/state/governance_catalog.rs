@@ -2,6 +2,9 @@
 
 use wf_domain::workflow::request::RequestScope;
 
+mod reader;
+pub use reader::{GovernanceCatalogReadLimits, GovernanceCatalogReadPort, LoadedGovernanceRecord};
+
 /// One exact namespace/catalog traversal request.
 #[derive(Clone, Copy)]
 pub struct GovernanceCatalogRead<'a> {

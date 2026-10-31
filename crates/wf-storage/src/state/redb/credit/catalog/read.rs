@@ -8,6 +8,18 @@ use wf_ports::state::{
     CreditCatalogReadPort, StateTransactionError as E,
 };
 
+impl wf_ports::state::CreditOwnerReadPort for RedbStateStore {
+    fn credit_catalog_owner(
+        &self,
+        scope: &RequestScope,
+        credit_scope: &[u8],
+        limits: CreditCatalogReadLimits,
+    ) -> Result<Option<wf_domain::governance::credit::CreditOwner>, E> {
+        let _ = (scope, credit_scope, limits);
+        Err(E::UnsupportedPolicyProfile)
+    }
+}
+
 impl CreditCatalogReadPort for RedbStateStore {
     fn credit_catalog_page(
         &mut self,

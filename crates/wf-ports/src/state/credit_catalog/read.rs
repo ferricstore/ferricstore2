@@ -4,6 +4,19 @@ use super::{CreditCatalogEntry, CreditCatalogPage};
 use crate::state::StateTransactionError;
 use wf_domain::{governance::credit::CreditLimits, workflow::request::RequestScope};
 
+/// One configured owner observation; it grants no later mutation authority.
+pub trait CreditOwnerReadPort {
+    /// Loads and validates the exact owner with a complete explicit guard profile.
+    /// # Errors
+    /// Refuses namespace/capability, corruption or cumulative resource limits.
+    fn credit_catalog_owner(
+        &self,
+        scope: &RequestScope,
+        credit_scope: &[u8],
+        limits: CreditCatalogReadLimits,
+    ) -> Result<Option<wf_domain::governance::credit::CreditOwner>, StateTransactionError>;
+}
+
 /// Positive cumulative bounds for one coherent source guard.
 #[derive(Clone, Copy, Debug)]
 pub struct CreditCatalogReadLimits {

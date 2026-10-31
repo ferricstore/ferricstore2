@@ -6,6 +6,7 @@ use wf_application::governance::{
 };
 use wf_ports::state::decode_credit_catalog_member;
 
+mod collection;
 mod failures;
 mod fixtures;
 use fixtures::{PublicationCall as Call, PublicationFixture};

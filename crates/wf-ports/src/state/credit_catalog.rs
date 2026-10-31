@@ -8,7 +8,9 @@ pub use member::{
     CreditCatalogMemberRef, EncodedCreditCatalogMembers, decode_credit_catalog_member,
     encode_credit_catalog_members,
 };
-pub use read::{CreditCatalogOwnerState, CreditCatalogReadLimits, CreditCatalogReadPort};
+pub use read::{
+    CreditCatalogOwnerState, CreditCatalogReadLimits, CreditCatalogReadPort, CreditOwnerReadPort,
+};
 
 /// One original pending publication identity in sequence order.
 #[derive(Clone, Debug, Eq, PartialEq)]

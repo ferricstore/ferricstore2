@@ -229,3 +229,48 @@ fn metadata_module_classification_preserves_purity_and_forbidden_edges() -> Chec
     );
     Ok(())
 }
+
+#[test]
+fn catalog_collection_read_contracts_stay_pure_and_application_uses_only_ports() -> CheckResult<()>
+{
+    for module in [
+        "state::governance_catalog",
+        "state::governance_catalog::reader",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-ports",
+                module,
+                "use std::vec::Vec; use wf_domain::workflow::request::RequestScope;"
+            )?,
+            Vec::<String>::new()
+        );
+        for source in [
+            "use std::fs;",
+            "use std::env;",
+            "pub async fn effect() {}",
+            "static GLOBAL: u64 = 0;",
+        ] {
+            assert!(
+                !source_check("wf-ports", module, source)?.is_empty(),
+                "{module}: {source}"
+            );
+        }
+    }
+    for module in [
+        "governance::collection",
+        "governance::collection::model",
+        "governance::collection::rank",
+        "governance::repair",
+    ] {
+        assert_eq!(
+            source_check(
+                "wf-application",
+                module,
+                "use wf_ports::state::GovernanceCatalogReadPort;"
+            )?,
+            Vec::<String>::new()
+        );
+    }
+    Ok(())
+}

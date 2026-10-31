@@ -8,6 +8,7 @@ use wf_ports::{
 };
 use wf_types::identity::{GroupId, RecoveryId};
 
+mod port;
 mod read;
 mod write;
 pub(crate) use write::apply as commit;

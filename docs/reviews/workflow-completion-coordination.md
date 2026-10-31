@@ -59860,3 +59860,79 @@ frozen textual declarations remain unported. No full source-case, native or
 Linux/performance credit. Source/audit hashes match this exact tested cohort.
 The publisher predecessor is locally validated; the wider catalog batch and
 full product goal remain unfinished. No feature code adoption or push.
+
+
+### M2-CREDIT-CATALOG1 collection and repair selection (solo, before artifacts)
+
+Continue from ea1e17b. Prior goal turn made progress: the publisher/race and its
+narrow architecture gate are committed with all12 local gates passing; full
+product/source/platform acceptance remains incomplete. Work remains solo.
+Pinned governance/catalog.ex requires all-page global ordering, explicit skips,
+loader-error propagation, real anchors and reverse arrival order for equal sort
+keys. Pinned limit_store.ex and limit storage tests717..832 require exact-scope
+reads to bypass scans, existing-owner repair before mutations and missing-owner
+reads without ghost membership. This batch supplies the connected collection/
+repair capabilities; public command normalization/retained parents remain next.
+
+Approve ports state/governance_catalog/reader.rs with
+GovernanceCatalogReadLimits, GovernanceCatalogReadPort (bounded page and exact
+membership reads), and LoadedGovernanceRecord<T> (moved value plus complete
+logical charge, an adapter contract rather than a payment certificate). Export
+through existing governance_catalog.rs/state.rs. Approve CreditOwnerReadPort in
+existing credit_catalog/read.rs, returning one validated owner under explicit
+R/C/steps. Add actual Redb implementations in governance_catalog/port.rs and
+existing credit/catalog/read.rs; require configured namespace/capabilities under
+the same coherent guard, with no mutation API or schema/dependency change.
+
+Approve application governance/collection.rs with collection/model.rs and
+collection/rank.rs children. Types: GovernanceCatalogCollectionRequest,
+GovernanceCatalogCollectionLimits, GovernanceCatalogCollection<T>,
+GovernanceCatalogCollectionError. collect_governance_catalog uses fixed256
+member pages and a configured fallible loader/comparator; collect_governance_keys
+loads original explicit keys without catalog I/O. The sealed result exposes
+borrowed/consuming iterators without copying result payloads. Reserve the bounded
+result slots fallibly once, retain only topN plus one candidate, reject invalid
+page/charge contracts and never stop scanning merely because N is full. New equal
+keys precede retained equals, preserving the source reversed-page tie behavior.
+Budget result ownership, two page cohorts, one loader cohort and both adapters
+before reads. No fixed scan-count cap replaces source traversal semantics.
+
+Approve application governance/repair.rs with CreditCatalogRepairStatus and
+CreditCatalogRepairError plus repair_credit_catalog, borrowing existing source,
+target/catalog/scope and publisher limits. A missing owner returns Missing with
+no membership write; an actual existing member returns Present; otherwise only
+a complete verified retained registration yields Registered. Drop the owner
+before membership work. Reuse the existing publication preflight/dispatch through
+visibility limited to crate::governance, rather than duplicating framing/reply
+logic. Refusal/uncertainty is an error and cannot authorize a later public mutation.
+This helper alone does not claim that every public parent is integrated.
+
+Approve tests in application tests/catalog_collection/main.rs with private
+fixtures.rs/failures.rs children (CatalogFixture, CatalogFault, TrackedRecord),
+and Node snapshot_recovery/catalog_publication/collection.rs plus
+fixtures/collection.rs (existing PublicationFixture extensions only). Add genuine
+actual-store predecessor cases in existing storage governance_catalog/limits.rs
+and credit/catalog/publication.rs. Add the narrow neutral-port classification
+and negative test in existing architecture purity.rs/metadata_policy.rs. Preserve
+all old test bodies; no new production test-support edge or new dependency.
+
+Performance review selects a pre-reserved Vec for changing bounded top results;
+owned records never need Clone and discarded candidates drop immediately. A
+Box conversion can discard spare capacity/reallocate and is not presumed faster.
+Verify bounded live record count, complete byte preflight, move-only values and
+cross-page ordering; report no throughput/RSS improvement without measurements.
+Primary APIs reviewed: https://doc.rust-lang.org/std/vec/struct.Vec.html
+(try_reserve_exact, insert, into_boxed_slice). Core/encoding uses no OS-specific
+behavior; native Linux/macOS acceptance remains separately required.
+
+Collection/repair RED is genuine before bodies: eight application cases fail
+at the rejecting collection shell; two actual storage cases first prove healthy
+old reads, then fail UnsupportedPolicyProfile at the new capability. Five Node
+cases use actual committed owners/target setup and fail InvalidOptions,
+Unconfirmed, or the missing Membership/preflight behavior. The neutral-port
+architecture regression fails because std::fs is currently accepted in the
+unclassified source path. Initial test import and consuming transition-accessor
+compile errors were corrected before these semantic runs and receive no TDD
+credit. Later assertions remain masked. Save this exact cohort before bodies;
+see /private/tmp/ferricstore2-catalog-collection-{r0,storage-r0,node-r0,
+architecture-r0}.log. No native/full source-case credit is assigned.

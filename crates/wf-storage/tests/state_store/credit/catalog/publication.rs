@@ -109,3 +109,41 @@ fn credit_catalog_owner_batch_preserves_original_order_missing_intents_and_real_
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn credit_catalog_single_owner_port_uses_actual_owner_and_explicit_temporary_guard_limits()
+-> TestResult {
+    use wf_ports::state::{CreditOwnerReadPort, StateTransactionError as S};
+    let dir = common::directory("catalog-single-owner")?;
+    let path = dir.join("state");
+    catalog::create(&path)?;
+    let store = common::open(&path)?;
+    let scope = common::scope()?;
+    assert!(
+        store
+            .read_credit_owner(
+                &scope,
+                b"a",
+                CreditLimits::default(),
+                10000,
+                64 * common::MIB
+            )?
+            .is_none()
+    );
+    assert!(
+        store
+            .credit_catalog_owner(&scope, b"a", CreditCatalogReadLimits::default())?
+            .is_none()
+    );
+    let tiny = CreditCatalogReadLimits {
+        maximum_temporary_bytes: 1,
+        ..CreditCatalogReadLimits::default()
+    };
+    assert_eq!(
+        store.credit_catalog_owner(&scope, b"a", tiny),
+        Err(S::Limit)
+    );
+    drop(store);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}
