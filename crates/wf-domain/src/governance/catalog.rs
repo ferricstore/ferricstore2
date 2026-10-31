@@ -1,5 +1,6 @@
 //! Mathematical publication queue values; none establish commit or authority.
 
+use crate::workflow::MAX_EXACT_MILLIS as MAX;
 use std::fmt;
 
 /// Canonical monotone publication queue header, independent of stored origin.
@@ -19,11 +20,14 @@ impl CreditCatalogMeta {
     /// Restores a canonical header; does not verify any stored queue entries.
     /// # Errors
     /// Refuses noncanonical or unsupported exact-integer ranges.
-    pub fn restore(_head: u64, _tail: u64) -> Result<Self, CreditCatalogError> {
-        Err(CreditCatalogError::CorruptMetadata)
+    pub fn restore(head: u64, tail: u64) -> Result<Self, CreditCatalogError> {
+        if head == 0 || tail > MAX || head > MAX + 1 || head > tail + 1 {
+            return Err(CreditCatalogError::CorruptMetadata);
+        }
+        Ok(Self { head, tail })
     }
 
-    /// First pending sequence, possibly MAX_EXACT+1 after the last ack.
+    /// First pending sequence, possibly `MAX_EXACT+1` after the last ack.
     #[must_use]
     pub const fn head(self) -> u64 {
         self.head
@@ -40,10 +44,24 @@ impl CreditCatalogMeta {
     /// Refuses invalid owner bytes, full backlog or exhausted sequence space.
     pub fn append(
         self,
-        _owner: &[u8],
-        _maximum_key_bytes: usize,
+        owner: &[u8],
+        maximum_key_bytes: usize,
     ) -> Result<(Self, u64), CreditCatalogError> {
-        Err(CreditCatalogError::CorruptMetadata)
+        valid_owner(owner, maximum_key_bytes)?;
+        if self.tail + 1 - self.head >= 65_536 {
+            return Err(CreditCatalogError::BacklogFull);
+        }
+        if self.tail == MAX {
+            return Err(CreditCatalogError::SequenceExhausted);
+        }
+        let sequence = self.tail + 1;
+        Ok((
+            Self {
+                head: self.head,
+                tail: sequence,
+            },
+            sequence,
+        ))
     }
 
     /// Proposes a bounded acknowledgement, preserving already-acked retries.
@@ -51,10 +69,34 @@ impl CreditCatalogMeta {
     /// Refuses invalid scalar controls, stale cursors or oversized ranges.
     pub fn acknowledge(
         self,
-        _expected_head: u64,
-        _up_to: u64,
+        expected_head: u64,
+        up_to: u64,
     ) -> Result<CreditCatalogAcknowledgement, CreditCatalogError> {
-        Err(CreditCatalogError::CorruptMetadata)
+        if !(1..=MAX + 1).contains(&expected_head) || !(1..=MAX).contains(&up_to) {
+            return Err(CreditCatalogError::CorruptMetadata);
+        }
+        if up_to < self.head {
+            return Ok(CreditCatalogAcknowledgement {
+                next: self,
+                first: self.head,
+                count: 0,
+            });
+        }
+        if expected_head != self.head {
+            return Err(CreditCatalogError::StaleCursor);
+        }
+        if up_to > self.tail || up_to + 1 - self.head > 256 {
+            return Err(CreditCatalogError::InvalidAcknowledgement);
+        }
+        Ok(CreditCatalogAcknowledgement {
+            next: Self {
+                head: up_to + 1,
+                tail: self.tail,
+            },
+            first: self.head,
+            count: u16::try_from(up_to + 1 - self.head)
+                .map_err(|_| CreditCatalogError::InvalidAcknowledgement)?,
+        })
     }
 }
 
@@ -103,10 +145,32 @@ impl CreditCatalogObservation<'_> {
     /// Refuses missing/invalid tail observations or append business ceilings.
     pub fn publication(
         self,
-        _owner: &[u8],
-        _maximum_key_bytes: usize,
+        owner: &[u8],
+        maximum_key_bytes: usize,
     ) -> Result<Option<CreditCatalogMeta>, CreditCatalogError> {
+        valid_owner(owner, maximum_key_bytes)?;
+        if self.meta.head > self.meta.tail {
+            if self.tail_scope.is_some() {
+                return Err(CreditCatalogError::CorruptEntry);
+            }
+        } else {
+            let tail = self.tail_scope.ok_or(CreditCatalogError::CorruptEntry)?;
+            valid_owner(tail, maximum_key_bytes).map_err(|_| CreditCatalogError::CorruptEntry)?;
+            if tail == owner {
+                return Ok(None);
+            }
+        }
+        self.meta
+            .append(owner, maximum_key_bytes)
+            .map(|(meta, _)| Some(meta))
+    }
+}
+
+fn valid_owner(owner: &[u8], maximum: usize) -> Result<(), CreditCatalogError> {
+    if owner.is_empty() || owner.len() > maximum {
         Err(CreditCatalogError::CorruptMetadata)
+    } else {
+        Ok(())
     }
 }
 

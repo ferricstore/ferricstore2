@@ -91,6 +91,10 @@ pub enum IdentifiedCreditRejection {
     ReservationHistoryFull,
     /// Expiry cannot enqueue all required tasks within the256-task bound.
     CleanupBacklogFull,
+    /// New-owner publication cannot append another pending catalog entry.
+    CatalogBacklogFull,
+    /// New-owner publication cannot allocate another exact source sequence.
+    CatalogSequenceExhausted,
 }
 
 /// Private business classification, without a durable-success certificate.

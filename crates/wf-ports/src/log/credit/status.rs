@@ -44,6 +44,8 @@ fn rejection(out: &mut Writer<'_>, reason: R) -> Result<(), E> {
         R::LeaseGenerationChanged => 4,
         R::ReservationHistoryFull => 5,
         R::CleanupBacklogFull => 6,
+        R::CatalogBacklogFull => 7,
+        R::CatalogSequenceExhausted => 8,
     })?;
     let R::Credit(reason) = reason else {
         return Ok(());
@@ -133,6 +135,8 @@ fn read_rejection(reader: &mut Reader<'_>) -> Result<R, E> {
         4 => R::LeaseGenerationChanged,
         5 => R::ReservationHistoryFull,
         6 => R::CleanupBacklogFull,
+        7 => R::CatalogBacklogFull,
+        8 => R::CatalogSequenceExhausted,
         _ => return Err(E::UnsupportedTag),
     })
 }

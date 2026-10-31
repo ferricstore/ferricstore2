@@ -250,6 +250,7 @@ pub(super) fn value_defaults_compatible(
         if a.defaults != b.defaults
             || a.alias_format != b.alias_format
             || a.credit_shard_count != b.credit_shard_count
+            || a.credit_catalog != b.credit_catalog
         {
             return Err(SnapshotError::GenesisMismatch);
         }

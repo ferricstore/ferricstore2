@@ -19,6 +19,7 @@ pub(crate) struct CreditReadContext<'a, 's> {
     pub(super) scope: &'a RequestScope,
     pub(super) credit_scope: &'a [u8],
     pub(crate) shards: u64,
+    pub(crate) catalog: bool,
     credit: CreditLimits,
 }
 
@@ -35,8 +36,8 @@ impl<'a, 's> CreditReadContext<'a, 's> {
         if credit_scope.is_empty() || credit_scope.len() > 65_535 {
             return Err(E::InvalidChanges);
         }
-        let shards = tx
-            .checked(|| tx.value_manifest())?
+        let manifest = tx.checked(|| tx.value_manifest())?;
+        let shards = manifest
             .credit_shard_count
             .ok_or(E::UnsupportedPolicyProfile)?;
         Ok(Self {
@@ -44,6 +45,7 @@ impl<'a, 's> CreditReadContext<'a, 's> {
             scope,
             credit_scope,
             shards,
+            catalog: manifest.credit_catalog,
             credit,
         })
     }
@@ -65,6 +67,7 @@ impl<'a, 's> CreditReadContext<'a, 's> {
             scope,
             credit_scope,
             shards,
+            catalog: false,
             credit: CreditLimits::default(),
         }
     }

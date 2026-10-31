@@ -21,6 +21,7 @@ pub(crate) struct ValueManifest {
     pub(crate) defaults: WorkflowValueDefaults,
     pub(crate) alias_format: u16,
     pub(crate) credit_shard_count: Option<u64>,
+    pub(crate) credit_catalog: bool,
 }
 
 pub(crate) fn read(tx: &RedbStateTransaction<'_>) -> Result<ValueManifest, Error> {
@@ -88,17 +89,19 @@ pub(crate) fn parse(
         .try_into()
         .map_err(|_| Error::Corrupt)?;
     let defaults = WorkflowValueDefaults::from_bytes(raw).map_err(|_| Error::Corrupt)?;
-    let credit_shard_count = match bytes.len().checked_sub(at) {
-        Some(32) => None,
+    let (credit_shard_count, credit_catalog) = match bytes.len().checked_sub(at) {
+        Some(32) => (None, false),
         Some(42) if layout == 8 && alias_format == 2 => {
-            if value::read_u16(bytes, &mut at).map_err(value_error)? != 1 {
-                return Err(Error::UnsupportedPolicyProfile);
-            }
+            let catalog = match value::read_u16(bytes, &mut at).map_err(value_error)? {
+                1 => false,
+                2 => true,
+                _ => return Err(Error::UnsupportedPolicyProfile),
+            };
             let count = value::read_u64(bytes, &mut at).map_err(value_error)?;
             if count == 0 || count > wf_domain::workflow::MAX_EXACT_MILLIS {
                 return Err(Error::Corrupt);
             }
-            Some(count)
+            (Some(count), catalog)
         }
         _ => return Err(Error::Corrupt),
     };
@@ -119,6 +122,7 @@ pub(crate) fn parse(
         defaults,
         alias_format,
         credit_shard_count,
+        credit_catalog,
     })
 }
 
@@ -165,7 +169,7 @@ pub(crate) fn encode(
     bytes.extend_from_slice(&1_u32.to_be_bytes());
     bytes.extend_from_slice(&defaults);
     if let Some(count) = manifest.credit_shard_count {
-        bytes.extend_from_slice(&1_u16.to_be_bytes());
+        bytes.extend_from_slice(&(if manifest.credit_catalog { 2_u16 } else { 1 }).to_be_bytes());
         bytes.extend_from_slice(&count.to_be_bytes());
     }
     let checksum = Sha256::digest(&bytes);
@@ -198,6 +202,9 @@ fn encoded_size(
     group: &GroupId,
     recovery: &RecoveryId,
 ) -> Result<usize, Error> {
+    if manifest.credit_catalog && manifest.credit_shard_count.is_none() {
+        return Err(Error::InvalidChanges);
+    }
     if manifest.credit_shard_count.is_some_and(|count| {
         count == 0
             || count > wf_domain::workflow::MAX_EXACT_MILLIS

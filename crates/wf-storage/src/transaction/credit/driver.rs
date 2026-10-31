@@ -10,7 +10,8 @@ use crate::state::{
 };
 use wf_domain::governance::credit::CreditLimits;
 use wf_domain::governance::identified::{
-    IdentifiedCreditDecision as D, prepare_identified_credit, resume_identified_credit,
+    IdentifiedCreditDecision as D, IdentifiedCreditMutation, prepare_catalog_credit,
+    prepare_identified_credit, resume_identified_credit,
 };
 use wf_domain::workflow::control::{ControlPlan, ControlState};
 use wf_domain::workflow::request::{
@@ -98,7 +99,24 @@ fn fresh(
         return Err(S::InvalidChanges.into());
     }
     let owner = context.owner()?;
-    let mut pending = prepare_identified_credit(owner, command, control.execution_time(), credit)?;
+    let mut pending = if owner.is_none()
+        && context.catalog
+        && command.configuration.is_some()
+        && matches!(command.mutation, IdentifiedCreditMutation::Lease { .. })
+    {
+        let (meta, tail) = credit::publication_observation(&context)?;
+        prepare_catalog_credit(
+            command,
+            control.execution_time(),
+            credit,
+            wf_domain::governance::catalog::CreditCatalogObservation {
+                meta,
+                tail_scope: tail.as_deref(),
+            },
+        )?
+    } else {
+        prepare_identified_credit(owner, command, control.execution_time(), credit)?
+    };
     while let Some(query) = pending.query() {
         let observed = context.observe(query)?;
         pending = resume_identified_credit(pending, observed)?;

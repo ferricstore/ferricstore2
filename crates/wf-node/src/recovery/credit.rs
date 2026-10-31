@@ -20,6 +20,17 @@ use wf_types::{
 };
 
 impl CommittedRecoveryLimits {
+    /// Selects actual credit-format2 catalog replay and its immutable shard count.
+    /// # Errors
+    /// Refuses unsupported profile, invalid count or whole-call work overflow.
+    pub fn with_identified_credit_catalog_limits(
+        self,
+        _shard_count: u64,
+        _credit: CreditLimits,
+    ) -> Result<Self, E> {
+        Err(E::UnsupportedEntry)
+    }
+
     /// Selects credit replay with the actual configured immutable shard count.
     /// # Errors
     /// Refuses invalid shard counts or a whole-call work ceiling overflow.

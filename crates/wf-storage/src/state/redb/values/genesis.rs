@@ -29,7 +29,7 @@ pub(super) fn create(
         genesis,
         defaults,
         limits,
-        (alias_format, None),
+        (alias_format, None, false),
     )
 }
 
@@ -40,10 +40,13 @@ pub(in crate::state::redb) fn create_profile(
     genesis: StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     limits: StateStoreLimits,
-    capability: (u16, Option<u64>),
+    capability: (u16, Option<u64>, bool),
 ) -> Result<RedbStateStore, Error> {
     if !matches!(capability.0, 1 | 2) {
         return Err(Error::UnsupportedPolicyProfile);
+    }
+    if capability.2 && capability.1.is_none() {
+        return Err(Error::InvalidChanges);
     }
     if capability.1.is_some_and(|count| {
         count == 0 || count > wf_domain::workflow::MAX_EXACT_MILLIS || capability.0 != 2
@@ -71,7 +74,7 @@ fn initialize(
     genesis: &StateStoreGenesis<'_>,
     defaults: WorkflowValueDefaults,
     scratch: usize,
-    capability: (u16, Option<u64>),
+    capability: (u16, Option<u64>, bool),
 ) -> Result<(), Error> {
     let mut tx = store.transaction(
         false,
@@ -104,6 +107,7 @@ fn initialize(
         layout: if capability.1.is_some() { 8 } else { 7 },
         alias_format: capability.0,
         credit_shard_count: capability.1,
+        credit_catalog: capability.2,
         policy: CurrentPolicyManifest {
             initial_time: genesis.initial_time,
             placements: u64::try_from(genesis.placements.len()).map_err(|_| Error::Limit)?,

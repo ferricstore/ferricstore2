@@ -61,6 +61,7 @@ fn publish(
         let outcome = outcome.ok_or(E::InvalidChanges)?;
         validate(&tx, scope, control, plan, outcome)?;
         let context = CreditReadContext::new(&tx, scope, plan.scope(), credit)?;
+        super::catalog::publish(&context, plan)?;
         rows::publish(&context, plan)?;
         commit::write_outcome(&tx, scope, outcome)?;
     } else if outcome.is_some() {

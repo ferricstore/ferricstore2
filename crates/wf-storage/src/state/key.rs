@@ -5,6 +5,7 @@ use wf_types::version::TimestampMillis;
 
 use super::value::{StateValueError, add, allocate, read_u8, start};
 
+pub(crate) mod catalog;
 mod credit;
 mod ordered;
 mod physical;
@@ -125,7 +126,7 @@ pub(super) fn key_start(
     length: usize,
     maximum: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if family > 15 {
+    if family > 17 {
         return Err(StateValueError::UnsupportedTag);
     }
     if length < 7 {

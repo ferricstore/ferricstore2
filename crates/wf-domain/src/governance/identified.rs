@@ -9,7 +9,7 @@ mod prepare;
 mod protocol;
 mod state;
 
-pub use prepare::prepare_identified_credit;
+pub use prepare::{prepare_catalog_credit, prepare_identified_credit};
 pub use protocol::{IdentifiedCreditPlan, PreparedIdentifiedCredit, resume_identified_credit};
 pub use state::{
     CreditCleanupChange, CreditCleanupTask, CreditPageChange, CreditPageData,

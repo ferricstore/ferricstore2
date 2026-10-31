@@ -5,6 +5,7 @@ use super::{
     IdentifiedCreditRejection as R, IdentifiedCreditRequest, admission, cleanup,
     protocol::{CreditPhase, PreparedIdentifiedCredit},
 };
+use crate::governance::catalog::{CreditCatalogError, CreditCatalogObservation};
 use crate::governance::credit::{
     CreditDecision as C, CreditError as E, CreditLimits, CreditOperation, CreditOwner,
     CreditOwnerData, admission::CreditCharge, decision,
@@ -20,6 +21,29 @@ pub fn prepare_identified_credit(
     now: TimestampMillis,
     limits: CreditLimits,
 ) -> Result<PreparedIdentifiedCredit<'_>, E> {
+    prepare(owner, request, now, limits, None)
+}
+
+/// Prepares an absent-owner operation with an exact publication observation.
+/// This mathematical entry point establishes no stored absence or authority.
+/// # Errors
+/// Refuses invalid inputs, corrupt observations or continuous resource limits.
+pub fn prepare_catalog_credit<'a>(
+    request: IdentifiedCreditRequest<'a>,
+    now: TimestampMillis,
+    limits: CreditLimits,
+    catalog: CreditCatalogObservation<'_>,
+) -> Result<PreparedIdentifiedCredit<'a>, E> {
+    prepare(None, request, now, limits, Some(catalog))
+}
+
+fn prepare<'a>(
+    owner: Option<CreditOwner>,
+    request: IdentifiedCreditRequest<'a>,
+    now: TimestampMillis,
+    limits: CreditLimits,
+    catalog: Option<CreditCatalogObservation<'_>>,
+) -> Result<PreparedIdentifiedCredit<'a>, E> {
     let data = owner.map(CreditOwner::into_data);
     let mut charge = if let Some(data) = &data {
         CreditCharge::inspect(data, limits)?
@@ -39,6 +63,7 @@ pub fn prepare_identified_credit(
         phase: CreditPhase::Complete,
         decision: D::Rejected(R::NotFound),
         publish_owner: false,
+        catalog_publication: None,
         reservations: Vec::new(),
         pages: Vec::new(),
         cleanup: Vec::new(),
@@ -60,8 +85,40 @@ pub fn prepare_identified_credit(
     if !matches!(request.mutation, Op::Release { .. }) && !cleanup::expire(&mut prepared)? {
         return Ok(prepared);
     }
+    if let Some(catalog) = catalog
+        && !publication(&mut prepared, catalog)?
+    {
+        return Ok(prepared);
+    }
     dispatch(&mut prepared)?;
     Ok(prepared)
+}
+
+fn publication(
+    prepared: &mut PreparedIdentifiedCredit<'_>,
+    observed: CreditCatalogObservation<'_>,
+) -> Result<bool, E> {
+    prepared.charge.work(
+        1024_usize
+            .checked_add(prepared.request.scope.len())
+            .and_then(|n| n.checked_add(observed.tail_scope.map_or(0, <[u8]>::len)))
+            .ok_or(E::Limit)?,
+    )?;
+    match observed.publication(prepared.request.scope, 65_535) {
+        Ok(meta) => {
+            prepared.catalog_publication = meta;
+            Ok(true)
+        }
+        Err(CreditCatalogError::BacklogFull) => {
+            abort(prepared, R::CatalogBacklogFull);
+            Ok(false)
+        }
+        Err(CreditCatalogError::SequenceExhausted) => {
+            abort(prepared, R::CatalogSequenceExhausted);
+            Ok(false)
+        }
+        Err(_) => Err(E::InvalidState),
+    }
 }
 
 fn new_owner(
@@ -204,6 +261,7 @@ pub(super) fn classify(prepared: &mut PreparedIdentifiedCredit<'_>, result: C, a
 pub(super) fn abort(prepared: &mut PreparedIdentifiedCredit<'_>, reason: R) {
     prepared.data = None;
     prepared.publish_owner = false;
+    prepared.catalog_publication = None;
     prepared.reservations.clear();
     prepared.pages.clear();
     prepared.cleanup.clear();

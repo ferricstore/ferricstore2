@@ -247,6 +247,8 @@ fn validate_rows(
         None
     };
     let mut credit_counts = [0_u64; 2];
+    let credit_catalog = layout == 8
+        && super::values::manifest::parse(manifest, tx.group, tx.recovery)?.credit_catalog;
     let mut hash = Sha256::new();
     hash.update(if matches!(layout, 6..=8) {
         super::snapshot::original::CATALOG_DOMAIN
@@ -272,10 +274,19 @@ fn validate_rows(
             maximum,
         )
         .map_err(value_error)?;
-        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=15) {
+        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=17) {
             return Err(StateTransactionError::Corrupt);
         }
-        if matches!(decoded.family(), 12..=15) {
+        if matches!(decoded.family(), 16 | 17) {
+            if !credit_catalog {
+                return Err(StateTransactionError::Corrupt);
+            }
+            super::credit::catalog::recovery::row(tx, &table, &decoded, value.value())?;
+        } else if matches!(decoded.family(), 12..=15) {
+            if credit_catalog && decoded.family() == 12 {
+                let scope = tx.scope_bytes(decoded.part(2))?;
+                super::credit::catalog::recovery::require_meta(tx, &table, &scope)?;
+            }
             let shards = credit_shards.ok_or(StateTransactionError::Corrupt)?;
             let (ids, members) =
                 super::credit::recovery::row(tx, &table, &decoded, value.value(), shards)?;

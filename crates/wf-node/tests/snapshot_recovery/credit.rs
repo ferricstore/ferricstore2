@@ -16,6 +16,7 @@ use wf_storage::{
 };
 
 mod audit;
+mod catalog;
 mod fixtures;
 use fixtures as c;
 

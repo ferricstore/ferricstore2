@@ -59263,3 +59263,27 @@ corruption and fault assertions remain masked, not claimed executed. Source/log
 SHA bindings are /private/tmp/ferricstore2-credit-catalog-r0.json. The rows-table
 fixture uses the actual wf_state_rows_v1 name before this capture. Save the
 rejecting checkpoint before semantic bodies; full catalog batch stays open.
+
+Concrete Node selection before artifacts: approve NEW tests/snapshot_recovery/
+credit/catalog.rs under the existing credit target module, reusing unchanged
+real credit fixtures, frames, outcome checks and complete-cohort readers. Cover
+exact format2 selection and old-format refusal for empty state, whole replay
+and re-audit, a malformed historical body behind an already-applied last entry,
+and snapshot purge/received suffix replay preserving one publication entry.
+Add only with_identified_credit_catalog_limits to existing recovery/credit.rs
+as an initially rejecting builder, then save compiled failures before its body
+and the exact-format recovery guard. The selected CommittedRecoveryLimits gains
+one private configured-format boolean (defaultfalse/reset by the old builder),
+never a current authority certificate. require_identified_credit_profile on the
+existing actual writer reports exact format/count; snapshot comparisons already
+bind the stored format. No new dependency, log variant or public service gate.
+
+Node genuine RED: all four cases compile and fail0/4. The actual old configured
+format1 recovery wrongly accepts an empty format2 state (None error versus
+InvalidChanges). The other three reach the deliberately rejecting new builder
+and fail UnsupportedEntry; later replay/audit/snapshot assertions are masked.
+Save this before the configured-format field/builder and guard bodies. See
+/private/tmp/ferricstore2-credit-catalog-node-r0.{json,log}. Meanwhile all six pure
+and seven stored catalog cases pass, without modifying any saved test body;
+two first Clippy style findings were corrected without suppressions. Full batch
+remains open for durable ack, distributed publisher/repair and cleaner semantics.

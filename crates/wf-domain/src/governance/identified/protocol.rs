@@ -5,6 +5,7 @@ use super::{
     CreditProtocolQuery, CreditReservationChange, IdentifiedCreditDecision as D,
     IdentifiedCreditMutation as Op, IdentifiedCreditRequest,
 };
+use crate::governance::catalog::CreditCatalogMeta;
 use crate::governance::credit::{
     CreditError as E, CreditLimits, CreditOwner, CreditOwnerData,
     admission::{CreditCharge, product},
@@ -42,6 +43,7 @@ pub struct PreparedIdentifiedCredit<'a> {
     pub(super) phase: CreditPhase,
     pub(super) decision: D,
     pub(super) publish_owner: bool,
+    pub(super) catalog_publication: Option<CreditCatalogMeta>,
     pub(super) reservations: Vec<CreditReservationChange<'a>>,
     pub(super) pages: Vec<CreditPageChange>,
     pub(super) cleanup: Vec<CreditCleanupChange>,
@@ -127,6 +129,7 @@ impl<'a> PreparedIdentifiedCredit<'a> {
             owner,
             decision: self.decision,
             publish_owner: self.publish_owner,
+            catalog_publication: self.catalog_publication,
             response_ids,
             reservations: self.reservations,
             pages: self.pages,
@@ -141,6 +144,7 @@ pub struct IdentifiedCreditPlan<'a> {
     owner: Option<CreditOwner>,
     decision: D,
     publish_owner: bool,
+    catalog_publication: Option<CreditCatalogMeta>,
     response_ids: &'a [Vec<u8>],
     reservations: Vec<CreditReservationChange<'a>>,
     pages: Vec<CreditPageChange>,
@@ -148,6 +152,12 @@ pub struct IdentifiedCreditPlan<'a> {
 }
 
 impl IdentifiedCreditPlan<'_> {
+    /// Proposed publication header; neither current-state nor commit authority.
+    #[must_use]
+    pub const fn catalog_publication(&self) -> Option<CreditCatalogMeta> {
+        self.catalog_publication
+    }
+
     /// Exact original governance scope.
     #[must_use]
     pub const fn scope(&self) -> &[u8] {
