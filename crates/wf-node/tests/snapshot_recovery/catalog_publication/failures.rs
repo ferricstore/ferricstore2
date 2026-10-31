@@ -1,4 +1,38 @@
 use super::fixtures::PublicationFault as Fault;
+
+#[test]
+fn catalog_publisher_creation_after_missing_observation_keeps_a_fresh_publication_intent()
+-> TestResult {
+    let mut fixture = PublicationFixture::combined()?;
+    fixture.remove_owner(0, b"c")?;
+    fixture.fault = Fault::CreateTailOwnerAfterRead;
+    let result = fixture.run(0, Limits::default())?;
+    assert_eq!(
+        (result.published, result.errors),
+        (3, 0),
+        "{:?}",
+        fixture.last_error
+    );
+    assert_eq!(fixture.members()?.len(), 2);
+    let pending = fixture.pending(0)?;
+    assert_eq!(
+        (
+            pending.meta.head(),
+            pending.meta.tail(),
+            pending.entries.len()
+        ),
+        (4, 4, 1)
+    );
+    assert_eq!(pending.entries[0].credit_scope, b"c");
+    assert_eq!(pending.entries[0].sequence, 4);
+    let retry = fixture.run(0, Limits::default())?;
+    assert_eq!((retry.published, retry.errors), (1, 0));
+    assert_eq!(fixture.members()?.len(), 3);
+    assert_eq!(fixture.pending(0)?.entries.len(), 0);
+    fixture.verify_all()?;
+    fixture.cleanup()?;
+    Ok(())
+}
 use super::*;
 
 #[test]

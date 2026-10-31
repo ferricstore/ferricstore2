@@ -2,9 +2,13 @@
 
 use std::fmt;
 use wf_domain::workflow::request::RequestScope;
+use wf_ports::state::CreditCatalogOwnerState;
 use wf_ports::{
     consensus::CreditCatalogPublicationPort, log::CodecLimits, state::CreditCatalogReadLimits,
 };
+
+mod dispatch;
+mod plan;
 
 /// Immutable configured namespaces; none of these values grants routing authority.
 #[derive(Clone, Copy)]
@@ -90,9 +94,87 @@ impl std::error::Error for CreditCatalogPublicationError {}
 /// # Errors
 /// Refuses whole-call options/resources before source reads or preparation.
 pub fn publish_credit_catalog<P: CreditCatalogPublicationPort>(
-    _request: CreditCatalogPublicationRequest<'_>,
-    _port: &mut P,
-    _limits: CreditCatalogPublicationLimits,
+    request: CreditCatalogPublicationRequest<'_>,
+    port: &mut P,
+    limits: CreditCatalogPublicationLimits,
 ) -> Result<CreditCatalogPublicationStats, CreditCatalogPublicationError> {
-    Err(CreditCatalogPublicationError::InvalidOptions)
+    let (source, next_source) = plan::select(request, limits)?;
+    let mut scopes = Vec::new();
+    scopes
+        .try_reserve_exact(usize::from(limits.page_size))
+        .map_err(|_| CreditCatalogPublicationError::Allocation)?;
+    let mut stats = CreditCatalogPublicationStats {
+        published: 0,
+        errors: 0,
+        read_batches: 0,
+        write_batches: 0,
+        sources_scanned: 1,
+        next_source,
+    };
+    let page = match port.credit_catalog_page(source, limits.page_size, limits.read) {
+        Ok(page) if plan::valid_page(&page, limits) => page,
+        _ => {
+            stats.errors = 1;
+            return Ok(stats);
+        }
+    };
+    if page.entries.is_empty() {
+        return Ok(stats);
+    }
+    stats.read_batches = 2;
+    let owners = match port.credit_catalog_owners(source, &page.entries, limits.read) {
+        Ok(owners) if plan::valid_owners(&owners, page.entries.len(), limits) => owners,
+        _ => {
+            stats.errors = 1;
+            return Ok(stats);
+        }
+    };
+    let mut processed = 0_u16;
+    let mut up_to = None;
+    for (entry, state) in page.entries.iter().zip(&owners) {
+        match state {
+            CreditCatalogOwnerState::Corrupt => {
+                stats.errors = 1;
+                break;
+            }
+            CreditCatalogOwnerState::Missing => (),
+            CreditCatalogOwnerState::Present => {
+                let scope = entry.credit_scope.as_slice();
+                if !scopes.contains(&scope) {
+                    scopes.push(scope);
+                }
+            }
+        }
+        processed += 1;
+        up_to = Some(entry.sequence);
+    }
+    drop(owners);
+    let Some(up_to) = up_to else {
+        return Ok(stats);
+    };
+    if !scopes.is_empty() {
+        stats.write_batches = 1;
+        if !dispatch::members(
+            port,
+            source,
+            request.target,
+            request.catalog,
+            &scopes,
+            limits,
+        ) {
+            stats.errors += 1;
+            return Ok(stats);
+        }
+    }
+    drop(scopes);
+    let command = wf_domain::governance::catalog::CreditCatalogAckRequest {
+        expected_head: page.meta.head(),
+        up_to,
+    };
+    if dispatch::ack(port, source, command, limits) {
+        stats.published = processed;
+    } else {
+        stats.errors += 1;
+    }
+    Ok(stats)
 }

@@ -59751,3 +59751,30 @@ ACK/snapshot assertions remain masked. Save before application bodies; see
 catalog-publisher-parent-r0.log and predecessor JSON/logs. Lost response is
 injected after an actual commit; CorruptMiddle is an explicit read-contract
 diagnosis, not a claim of native malformed-KV storage acceptance.
+
+Publisher inspection found a creation race inherited from pinned
+state_machine/sections/flow_governance_limit.ex668..724: a new owner reuses a
+matching pending tail. If the publisher observed that old intent's owner as
+missing, creation can reuse its sequence before the publisher ACKs the missing
+prefix. The new committed owner then has neither membership nor another intent.
+Approve PublicationFault::CreateTailOwnerAfterRead, the actual committed
+recreate_tail_owner fixture helper and its interleaving regression before a fix.
+
+Approve CreditCatalogObservation::new_owner_publication in the existing domain
+catalog module: validate the exact tail observation, but always append a new
+sequence for actual new-owner creation. Use it in pure preparation and the
+consumed writer's independent binding. The old publication algebra remains a
+neutral reuse candidate for compatibility, with an explicit warning that it
+cannot authorize suppressing a new owner's append. Existing-owner/replay paths
+remain no-append. An isolated Elixir correction/test is authorized by the earlier
+bug-fix request; preserve the dirty original and all old native test bodies.
+Its execution remains unverified unless an actual native runner is available.
+
+Race RED is genuine: actual creation is independently read back before returning
+the earlier Missing batch. The publisher successfully processes/ACKs the old
+three-entry prefix, but the queue is (head4,tail3,empty) instead of required
+(head4,tail4,one new c intent). See catalog-publisher-race-r0.log. Save before
+changing new-owner preparation or writer binding. The seven earlier publisher
+cases pass. One masked snapshot fixture completion was corrected to use the
+existing recover_snapshotted entrypoint after purge, preserving its assertions;
+recover_committed correctly refuses a purged log. No old case was weakened.

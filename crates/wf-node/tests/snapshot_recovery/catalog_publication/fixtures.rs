@@ -63,6 +63,7 @@ pub(super) enum PublicationFault {
     ShortOwners,
     CorruptMiddle,
     UnavailablePage,
+    CreateTailOwnerAfterRead,
 }
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(super) enum PublicationCall {
@@ -174,6 +175,34 @@ fn create(path: &Path, scope: &RequestScope, profile: PublicationStoreProfile) -
     Ok(())
 }
 impl PublicationFixture {
+    fn recreate_tail_owner(&self, source: &RequestScope) -> TestResult {
+        let request = RequestId::new(b"tail-recreation".to_vec())?;
+        let frame = encode_credit_request(
+            source,
+            &request,
+            f::clock(1500, 0, 1500)?,
+            IdentifiedCreditRequest {
+                scope: b"c",
+                shard_count: 4,
+                configuration: Some(CreditConfiguration {
+                    limit: 1,
+                    config_version: Some(1),
+                    policy_fingerprint: None,
+                }),
+                mutation: Op::Lease {
+                    shard_id: 0,
+                    amount: 1,
+                    ttl_ms: 1000,
+                },
+            },
+            f::driver_limits().codec,
+            16 * f::MIB,
+        )?;
+        self.commit(source, &request, frame)?;
+        let (_,state,_)=self.open(source)?;
+        assert!(state.read_credit_owner(source,b"c",CreditLimits::default(),10000,64*f::MIB)?.is_some());
+        Ok(())
+    }
     pub(super) fn separate() -> TestResult<Self> {
         let root = f::directory("catalog-publisher-separate")?;
         let sources = vec![scope(b"g0")?, scope(b"g1")?];
@@ -372,6 +401,14 @@ impl CreditCatalogReadPort for PublicationFixture {
         self.calls.push(PublicationCall::Owners);
         let (_, mut state, _) = self.open(scope).map_err(|_| S::Unavailable)?;
         let mut result = state.credit_catalog_owners(scope, entries, limits)?;
+        drop(state);
+        if self.fault == PublicationFault::CreateTailOwnerAfterRead {
+            self.fault = PublicationFault::None;
+            if let Err(error) = self.recreate_tail_owner(scope) {
+                self.last_error = Some(error.to_string());
+                return Err(S::Unavailable);
+            }
+        }
         if self.fault == PublicationFault::ShortOwners {
             self.fault = PublicationFault::None;
             result.pop();

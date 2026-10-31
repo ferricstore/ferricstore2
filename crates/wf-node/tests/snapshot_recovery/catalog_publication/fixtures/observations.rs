@@ -78,12 +78,13 @@ impl PublicationFixture {
     pub(in crate::catalog_publication) fn verify_all(&self) -> TestResult {
         for store in &self.stores {
             let (log, state, profile) = self.open(&store.scope)?;
-            drop(recover_committed(
+            drop(recover_snapshotted(
                 log,
                 state,
                 store.scope.group(),
                 store.scope.recovery(),
                 caps(profile)?,
+                SnapshotLimits::default(),
             )?);
         }
         Ok(())
