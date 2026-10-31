@@ -2,20 +2,32 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Open coupled-release candidate: code16a2d4b after protocol0a36f4a (R0s922b7ba,
-be241ab). Shared source queue/intent/cursor decisions and explicit GC4 custody
-now pass162 focused cases (domain17,ports38,storage30,Node17,architecture60),
-strict workspace/all-target Clippy,fmt,diff and cargo progress. No new full
-pipeline run: the last all12/1607 checkpoint below remains9220c17 only.
-GC4 preserves actual credit2/catalog, inherited pruning, snapshot capture/receive
-and old-mode/install refusal. It rejects checksum-valid missing dependencies.
-The current governed-Claim refusal remains: record reservation bindings, atomic
-release enqueue, ACK/sparse completion, complete data recovery/replay and actual
-Claim/policy/refund/reconciliation parents still need implementation. Do not
-claim protocol/custody completes the coupled batch. Source ledgers are unchanged.
-Proof: /private/tmp/ferricstore2-release-{focused,source-audit,protocol-r0,
-custody-r0}.json. Continue from the latest coordination review; exact next data
-schema/API artifacts require the recorded solo review before creation.
+Open coupled-release candidate: code22da47e after data320e7a8 and custody16a2d4b
+(data R0 efd5bc0; legacy-writer R0 320e7a8). GC4 now accepts and canonically
+validates actual reservation binding, queue meta, intent and sparse completion
+rows. Recovery proves exact binding-to-record, complete contiguous queue and
+completion-to-intent closure. Coherent bounded reads retain original intent
+bytes once; actual capture/receive/current snapshot preserves the complete data.
+Legacy mutation and Claim writers now refuse bound records without changing any
+part of the cohort. This temporary safety fence is NOT atomic release append.
+
+All11 new storage cases and the new binding-codec case pass:333 storage/codec
+regression cases plus the later110-case workflow-value run, strict workspace/
+all-target Clippy, all60 architecture cases,fmt,diff and cargo progress. The
+original owned-record materializer moved verbatim into scan/owned.rs to keep
+production files within400 lines; all696 selected old test/bench inputs remain
+693 whole plus three exact additive inverses. No new full pipeline run: the last
+all12/1607 checkpoint below remains9220c17. Source ledgers are byte-identical.
+
+NEXT actual pre-reply release admission and same-writer record/index/history/
+intent/outcome/control publication, with durable queue-full business rejection
+and source reservation-ID deduplication. Keep legacy paths fenced and governed
+Claim unsupported until its actual selected writer/paid-reservation binding is
+implemented. ACK/completion, historical/received/purged data replay and complete
+Claim/policy/refund/reconciliation remain. No source-case, native/Linux, service
+or speedup credit. Proof: /private/tmp/ferricstore2-release-data-source-audit.json
+and release-data-{r0,guard-r0,regression,workflows,clippy,architecture,progress}.log.
+Follow the latest coordination review; next artifacts need concrete solo review.
 
 Current batch: M2-CREDIT-CATALOG1 remains unfinished. Latest integrated local
 public credit checkpoint: code9220c17. The selected normalized caller path is now
