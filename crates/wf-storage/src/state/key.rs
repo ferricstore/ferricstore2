@@ -11,6 +11,7 @@ pub(crate) mod governance_catalog;
 mod ordered;
 mod physical;
 mod point;
+pub(crate) mod release;
 pub(crate) use credit::{
     encode_credit_cleanup_key, encode_credit_owner_key, encode_credit_page_key,
     encode_credit_reservation_key,
@@ -127,7 +128,7 @@ pub(super) fn key_start(
     length: usize,
     maximum: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if family > 19 {
+    if family > 23 {
         return Err(StateValueError::UnsupportedTag);
     }
     if length < 7 {

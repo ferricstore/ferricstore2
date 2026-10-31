@@ -61174,3 +61174,27 @@ with Corrupt; the seven-case malformed-row control passes. Full output is
 after capture; no test assertion was changed. No missing-API compile failure is
 counted as product RED. The exhausted-empty branch after the first binding-only
 failure is masked until implementation; do not count it as a reached RED.
+
+The data body now passes all three saved cases, including their complete tails.
+Review found a required safety boundary before enabling these canonical rows:
+every current record publisher is still a legacy writer. Approve edits to the
+EXISTING publication::write_record and release root/read helpers to refuse a
+write to an actually bound record until the coupled writer exists. This is an
+explicit temporary unsupported-profile fence, not a durable queue-full outcome
+or an implementation of release admission. Put the check before encoding/put;
+transaction rollback must preserve all records/indexes/history/outcomes/control.
+Unbound writes and earlier layouts must preserve their existing behavior and
+budgets. Add separate real atomic/independent and Claim guard counterexamples to
+the already approved release test module before the fence body. Snapshot/read,
+binding codec and malformed-field checks are supplemental to the saved data R0.
+
+The additional legacy-writer R0 compiled and exited101 with both cases failing:
+atomic mode5 and legacy Claim silently committed changes to a bound record.
+The mode6 tail and unchanged-cohort assertions were masked until the fence body.
+Saved output: /private/tmp/ferricstore2-release-data-guard-r0.log. The earlier
+data body had one temporary ValueManifest lifetime compile error; it is not RED.
+Approve one scalar cached catalog_profile field on the EXISTING transaction,
+captured from its validated immutable store profile, only for the negative fast
+path that preserves older profiles' exact admission costs. A positive4 still
+checks the actual same-guard manifest and inspects any binding before refusing;
+the cache grants no capability or mutation permission. No independent bool.

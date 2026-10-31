@@ -46,7 +46,7 @@ pub(super) fn inspect(encoded: &[u8], maximum: usize) -> Result<ReleaseIntentRef
     validate_release_intent(intent).map_err(|_| E::Malformed)?;
     Ok(intent)
 }
-fn write(intent: ReleaseIntentRef<'_>, output: &mut Writer<'_>) -> Result<(), E> {
+pub(super) fn write(intent: ReleaseIntentRef<'_>, output: &mut Writer<'_>) -> Result<(), E> {
     output.write(b"FWRI\0\x01")?;
     output.raw(intent.flow_id, MAX_KEY)?;
     output.optional(intent.partition, |output, p| output.raw(p, MAX_KEY))?;

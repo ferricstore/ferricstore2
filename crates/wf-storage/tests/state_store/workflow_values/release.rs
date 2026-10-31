@@ -244,3 +244,82 @@ fn workflow_release_recovery_fences_missing_and_orphan_rows_without_mutating_coh
     }
     Ok(())
 }
+
+#[test]
+fn workflow_release_legacy_mutations_cannot_write_bound_records_without_releases() -> TestResult {
+    use wf_domain::workflow::Cancel;
+    use wf_ports::log::encode_workflow_value_batch;
+    use wf_storage::transaction::apply_workflow_value_batch_transaction;
+    for profile in [5, 6] {
+        let dir = crate::fixtures::directory("release-legacy-mutation")?;
+        let path = dir.join("state");
+        fixture(&path)?;
+        edit(&path, &[(key(20, None, b"i")?, binding(b"i")?)], &[])?;
+        let before = super::claim::fixtures::cohort(&path)?;
+        let mut store = open(&path)?;
+        let item = f::item(
+            b"i",
+            200,
+            Operation::Cancel(Cancel {
+                fence: wf_types::version::Fence::new(0),
+                lease_token: None,
+                expected_state: Some(b"q".to_vec()),
+                expected_version: Some(1),
+                error: None,
+            }),
+        )?;
+        let batch = f::batch(
+            profile,
+            b"cancel",
+            200,
+            PreparedOperation::Batch(vec![item]),
+            vec![f::input(0, 0)],
+            vec![f::witness(b"r", None)?],
+        )?;
+        let frame = encode_workflow_value_batch(&batch, f::limits().record_batch.codec)?;
+        let applied = apply_workflow_value_batch_transaction(
+            &mut store,
+            &crate::fixtures::scope()?,
+            frame.as_bytes(),
+            crate::fixtures::log(1),
+            f::limits(),
+        );
+        assert!(
+            applied.is_err(),
+            "legacy mode {profile} silently modified a bound record"
+        );
+        drop(store);
+        assert_eq!(super::claim::fixtures::cohort(&path)?, before);
+        drop(open(&path)?);
+        std::fs::remove_dir_all(dir)?;
+    }
+    Ok(())
+}
+
+#[test]
+fn workflow_release_legacy_claim_cannot_overwrite_a_bound_record() -> TestResult {
+    let dir = crate::fixtures::directory("release-legacy-claim")?;
+    let path = dir.join("state");
+    fixture(&path)?;
+    edit(&path, &[(key(20, None, b"i")?, binding(b"i")?)], &[])?;
+    let before = super::claim::fixtures::cohort(&path)?;
+    let mut store = open(&path)?;
+    let frame = super::claim::fixtures::phase(b"claim", 200, b"q", b"worker", 1)?;
+    let applied = wf_storage::transaction::apply_workflow_value_claim_transaction(
+        &mut store,
+        &crate::fixtures::scope()?,
+        frame.as_bytes(),
+        crate::fixtures::log(1),
+        f::limits(),
+        wf_domain::claim::apply::ClaimWorkLimits::default(),
+    );
+    assert!(
+        applied.is_err(),
+        "legacy Claim silently replaced a bound record"
+    );
+    drop(store);
+    assert_eq!(super::claim::fixtures::cohort(&path)?, before);
+    drop(open(&path)?);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

@@ -1,9 +1,11 @@
 //! Canonical release values and source cursors; none grants durable authority.
 use super::CodecError as E;
 use wf_domain::governance::release::{ReleaseIntentRef, ReleaseOutboxState};
+mod binding;
 mod cursor;
 mod intent;
 mod meta;
+pub use binding::{ReleaseBindingRef, encode_release_binding, inspect_release_binding};
 pub use cursor::ReleaseReconcileCursor;
 /// Encodes a completely validated native intent, with exact wire admission.
 /// # Errors

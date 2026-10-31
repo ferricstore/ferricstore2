@@ -243,6 +243,18 @@ pub(super) fn check_manifest(
     Ok((initial, placements, policies, hash))
 }
 
+fn manifest_values(
+    tx: &RedbStateTransaction<'_>,
+    layout: u16,
+    manifest: &[u8],
+) -> Result<Option<super::values::manifest::ValueManifest>, StateTransactionError> {
+    if layout == 8 {
+        super::values::manifest::parse(manifest, tx.group, tx.recovery).map(Some)
+    } else {
+        Ok(None)
+    }
+}
+
 fn validate_rows(
     tx: &RedbStateTransaction<'_>,
     control: wf_domain::workflow::control::ControlState,
@@ -254,15 +266,7 @@ fn validate_rows(
     tx.step()?;
     let mut entries = table.iter().map_err(|e| storage_error(&e))?;
     let mut counts = [0_u64; 2];
-    let values = if layout == 8 {
-        Some(super::values::manifest::parse(
-            manifest,
-            tx.group,
-            tx.recovery,
-        )?)
-    } else {
-        None
-    };
+    let values = manifest_values(tx, layout, manifest)?;
     let credit_shards = values.and_then(|facts| facts.credit_shard_count);
     let mut credit_counts = [0_u64; 2];
     let credit_catalog = values.is_some_and(|facts| facts.credit_catalog);
@@ -296,10 +300,22 @@ fn validate_rows(
             maximum,
         )
         .map_err(value_error)?;
-        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=19) {
+        if !applied && matches!(decoded.family(), 1 | 2 | 5 | 8..=23) {
             return Err(StateTransactionError::Corrupt);
         }
-        if matches!(decoded.family(), 18 | 19) {
+        if matches!(decoded.family(), 20..=23) {
+            if !governance_catalog.workflow_release() {
+                return Err(StateTransactionError::Corrupt);
+            }
+            super::release::recovery::row(
+                tx,
+                &table,
+                &decoded,
+                value.value(),
+                credit_shards.ok_or(StateTransactionError::Corrupt)?,
+                control,
+            )?;
+        } else if matches!(decoded.family(), 18 | 19) {
             rows::governance(decoded.family(), value.value(), governance_catalog, control)?;
         } else if matches!(decoded.family(), 16 | 17) {
             if !credit_catalog {

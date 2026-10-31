@@ -69,6 +69,11 @@ impl<'input> ScannedWorkflowRecord<'input> {
     pub const fn version(&self) -> u64 {
         self.version
     }
+    /// Reads the validated last mutation time without copying record payloads.
+    #[must_use]
+    pub const fn updated_at(&self) -> TimestampMillis {
+        TimestampMillis::new(self.updated)
+    }
 
     /// Borrows validated value leaves for the encoded donor's full lifetime.
     #[must_use]
