@@ -50,15 +50,23 @@ impl RedbStateStore {
     /// # Errors
     /// Refuses invalid genesis/count/profile or unproved durability.
     pub fn create_credit_and_governance_catalog_database(
-        _database: redb::Database,
-        _group: GroupId,
-        _recovery: RecoveryId,
-        _genesis: StateStoreGenesis<'_>,
-        _defaults: WorkflowValueDefaults,
-        _shard_count: u64,
-        _limits: StateStoreLimits,
+        database: redb::Database,
+        group: GroupId,
+        recovery: RecoveryId,
+        genesis: StateStoreGenesis<'_>,
+        defaults: WorkflowValueDefaults,
+        shard_count: u64,
+        limits: StateStoreLimits,
     ) -> Result<Self, E> {
-        Err(E::UnsupportedPolicyProfile)
+        super::values::genesis::create_profile(
+            database,
+            group,
+            recovery,
+            genesis,
+            defaults,
+            limits,
+            (2, Some(shard_count), true, true),
+        )
     }
     /// Creates a target catalog authority without credit-owner shard assumptions.
     /// # Errors

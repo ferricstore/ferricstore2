@@ -59734,3 +59734,20 @@ masked. A test array-element coercion compile error was corrected before these
 genuine failures; it is not semantic RED. Save before predecessor bodies.
 See /private/tmp/ferricstore2-catalog-publisher-r0{,-ports,-storage} JSON/logs.
 The application facade is still rejecting and has no passing behavior claim.
+
+Before fixture growth, approve catalog_publication/fixtures/observations.rs for
+raw cohort observations, missing-owner donor edits and snapshot helpers. Keep
+fixtures.rs focused on configured stores, preparation/submission and read ports;
+its first formatted size is597 lines. The log cohort must read the actual u64
+log-table keys, rather than opening every table as byte-keyed. The initial
+TableTypeMismatch setup failure receives no semantic RED credit. The moved
+helpers retain narrow integration-target visibility; no production API changes.
+
+All four predecessor cases now pass unchanged. Seven publisher scenarios compile
+and fail at the rejecting application facade's InvalidOptions after actual
+source genesis, real committed owner replay and valid target setup. The corrected
+typed whole-cohort control also reaches the facade. Later publication/lost-reply/
+ACK/snapshot assertions remain masked. Save before application bodies; see
+catalog-publisher-parent-r0.log and predecessor JSON/logs. Lost response is
+injected after an actual commit; CorruptMiddle is an explicit read-contract
+diagnosis, not a claim of native malformed-KV storage acceptance.
