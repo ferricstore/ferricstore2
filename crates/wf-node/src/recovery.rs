@@ -18,6 +18,7 @@ use wf_types::identity::{GroupId, RecoveryId};
 mod catalog_ack;
 mod catalog_membership;
 mod catalog_progress;
+mod catalog_prune;
 mod error;
 pub use error::CommittedRecoveryError;
 mod credit;

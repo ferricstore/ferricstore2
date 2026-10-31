@@ -85,6 +85,9 @@ fn normal(
     base: usize,
 ) -> Result<ControlState, Error> {
     let (profile, fields, _) = join::normal_header(entry.body(), namespace, limits)?;
+    if profile == 16 {
+        return super::catalog_prune::apply(state, entry, fields, limits, base);
+    }
     if profile == 15 {
         return super::catalog_progress::apply(state, entry, fields, limits, base);
     }

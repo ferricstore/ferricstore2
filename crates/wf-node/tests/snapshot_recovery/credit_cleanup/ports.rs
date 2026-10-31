@@ -35,12 +35,24 @@ impl CreditCatalogReadPort for CleanupFixture {
     }
 }
 impl CreditOwnerReadPort for CleanupFixture {
+    fn credit_catalog_owner_for_prune(
+        &self,
+        scope: &RequestScope,
+        name: &[u8],
+        limits: CreditCatalogReadLimits,
+    ) -> Result<Option<CreditOwner>, S> {
+        let (_, state) = self.open().map_err(|_| S::Unavailable)?;
+        state.credit_catalog_owner_for_prune(scope, name, limits)
+    }
     fn credit_catalog_owner(
         &self,
         scope: &RequestScope,
         name: &[u8],
         limits: CreditCatalogReadLimits,
     ) -> Result<Option<CreditOwner>, S> {
+        if self.fault.get() == CleanupFault::StaleOwnerRead {
+            return Ok(None);
+        }
         let (_, state) = self.open().map_err(|_| S::Unavailable)?;
         state.credit_catalog_owner(scope, name, limits)
     }
@@ -119,7 +131,7 @@ impl CreditCatalogPublicationPort for CleanupFixture {
         }
         let kind = match frame.as_bytes().get(6) {
             Some(10) => CleanupCall::Cleanup,
-            Some(12) => CleanupCall::Prune,
+            Some(14) => CleanupCall::Prune,
             Some(13) => CleanupCall::Progress,
             _ => return MutationSubmission::NotSubmitted(MutationNotSubmitted::Preparation),
         };
@@ -205,4 +217,15 @@ fn foreign_outcome(
             f::driver_limits().codec.admission(),
         )?,
     )))
+}
+
+impl wf_ports::state::GovernanceCatalogPruneReadPort for CleanupFixture {
+    fn governance_catalog_prune_page(
+        &self,
+        request: GovernanceCatalogRead<'_>,
+        limits: GovernanceCatalogReadLimits,
+    ) -> Result<wf_ports::state::GovernanceCatalogPrunePage, S> {
+        let (_, state) = self.open().map_err(|_| S::Unavailable)?;
+        state.governance_catalog_prune_page(request, limits)
+    }
 }

@@ -1,4 +1,4 @@
-//! Real combined GC2/credit2 state and committed private commands.
+//! Real combined GC3/credit2 state and committed private commands.
 use super::*;
 use redb::{ReadableDatabase, ReadableTable, TableDefinition, TableHandle};
 use sha2::{Digest, Sha256};
@@ -46,6 +46,7 @@ pub(super) enum CleanupCall {
 pub(super) enum CleanupFault {
     None,
     ReadProgress,
+    StaleOwnerRead,
     PublishOwnerBeforePrune,
     RefuseCleanup,
     LoseCleanup,
@@ -66,7 +67,7 @@ pub(super) struct CleanupFixture {
 pub(super) fn caps() -> TestResult<CommittedRecoveryLimits> {
     Ok(super::super::caps()?
         .with_identified_credit_catalog_limits(4, CreditLimits::default())?
-        .with_governance_catalog_progress())
+        .with_governance_catalog_pruning())
 }
 fn defaults() -> WorkflowValueDefaults {
     let lifecycle = LifecycleDefaults {
@@ -98,7 +99,7 @@ impl CleanupFixture {
             scope.recovery().clone(),
             RaftLogLimits::default(),
         )?);
-        drop(RedbStateStore::create_governance_progress_database(
+        drop(RedbStateStore::create_governance_prune_database(
             redb::Builder::new().create(root.join("state.redb"))?,
             scope.group().clone(),
             scope.recovery().clone(),

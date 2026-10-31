@@ -11,6 +11,7 @@ use wf_ports::{
         GroupApplyStore,
     },
 };
+mod faults;
 mod fixtures;
 use fixtures::PruneFixture;
 fn reply(outcome: &wf_domain::workflow::request::RetainedOutcome) -> TestResult<P> {

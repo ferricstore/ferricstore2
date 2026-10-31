@@ -114,6 +114,7 @@ fn outcome(
             || (scanned.credit_catalog_required() && !facts.credit_catalog)
             || (scanned.intent_version() == 14 && !facts.governance_catalog)
             || (scanned.intent_version() == 15 && !facts.catalog_progress)
+            || (scanned.intent_version() == 16 && !facts.catalog_prune)
         {
             return Err(StateTransactionError::Corrupt);
         }

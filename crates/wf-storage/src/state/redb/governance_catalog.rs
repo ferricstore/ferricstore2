@@ -3,6 +3,7 @@
 use super::{RedbStateStore, RedbStateTransaction, StateStoreGenesis, StateStoreLimits};
 use wf_domain::workflow::request::RequestScope;
 pub(in crate::state::redb) mod prune;
+pub(crate) use prune::{commit as commit_prune, decide as decide_prune};
 use wf_ports::{
     consensus::WorkflowValueDefaults,
     state::{

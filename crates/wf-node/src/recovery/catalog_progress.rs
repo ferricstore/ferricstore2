@@ -19,6 +19,7 @@ pub(super) const fn enabled(limits: &CommittedRecoveryLimits) -> bool {
     matches!(
         limits.governance_catalog,
         super::catalog_membership::GovernanceCatalogRecoveryProfile::Progress
+            | super::catalog_membership::GovernanceCatalogRecoveryProfile::Prune
     )
 }
 

@@ -9,6 +9,16 @@ use wf_ports::state::{
 };
 
 impl wf_ports::state::CreditOwnerReadPort for RedbStateStore {
+    fn credit_catalog_owner_for_prune(
+        &self,
+        scope: &RequestScope,
+        credit_scope: &[u8],
+        limits: CreditCatalogReadLimits,
+    ) -> Result<Option<wf_domain::governance::credit::CreditOwner>, E> {
+        // Actual current local guard; production wiring still requires the
+        // accepted leader/read-barrier lifecycle before invoking this adapter.
+        self.credit_catalog_owner(scope, credit_scope, limits)
+    }
     fn credit_catalog_owner(
         &self,
         scope: &RequestScope,

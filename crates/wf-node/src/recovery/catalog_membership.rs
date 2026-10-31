@@ -64,9 +64,7 @@ pub(super) fn require(
         GovernanceCatalogRecoveryProfile::Progress => {
             tx.require_catalog_progress().map_err(E::State)
         }
-        GovernanceCatalogRecoveryProfile::Prune => Err(E::State(
-            wf_ports::state::StateTransactionError::UnsupportedPolicyProfile,
-        )),
+        GovernanceCatalogRecoveryProfile::Prune => tx.require_catalog_prune().map_err(E::State),
     }
 }
 pub(super) fn require_profile(limits: &CommittedRecoveryLimits, actual: u16) -> Result<(), E> {

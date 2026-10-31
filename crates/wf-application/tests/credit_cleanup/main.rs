@@ -213,3 +213,72 @@ fn cleanup_empty_page_underpaid_owner_fee_cannot_claim_caught_up() -> TestResult
     assert!(!result.caught_up);
     Ok(())
 }
+
+#[test]
+fn cleanup_missing_owner_default_freshness_refusal_never_prepares_prune() -> TestResult {
+    let mut port = BudgetFixture::new()?;
+    port.fault = BudgetFault::MissingOwner;
+    let scope = port.scope.clone();
+    let sources = [Source {
+        scope: &scope,
+        shard_count: 4,
+    }];
+    let step = run_credit_cleanup_once(
+        Request {
+            target: &scope,
+            sources: &sources,
+            catalog: b"limit",
+            now_ms: 1006,
+        },
+        &mut port,
+        Limits::default(),
+    )?;
+    assert_eq!(step.commands, 0);
+    assert_eq!(
+        step.reply.err(),
+        Some(wf_application::governance::CreditCleanupFailure::Read(
+            wf_ports::state::StateTransactionError::UnsupportedPolicyProfile,
+        ))
+    );
+    assert!(
+        !port
+            .calls
+            .borrow()
+            .iter()
+            .any(|call| matches!(call, BudgetCall::Prepare | BudgetCall::Submit))
+    );
+    Ok(())
+}
+
+#[test]
+fn cleanup_member_revision_pair_must_be_coherent_before_owner_or_submit() -> TestResult {
+    for fault in [BudgetFault::MissingRevision, BudgetFault::EmptyWithRevision] {
+        let mut port = BudgetFixture::new()?;
+        port.fault = fault;
+        let scope = port.scope.clone();
+        let sources = [Source {
+            scope: &scope,
+            shard_count: 4,
+        }];
+        let step = run_credit_cleanup_once(
+            Request {
+                target: &scope,
+                sources: &sources,
+                catalog: b"limit",
+                now_ms: 1006,
+            },
+            &mut port,
+            Limits::default(),
+        )?;
+        assert_eq!(step.commands, 0);
+        assert_eq!(
+            step.reply.err(),
+            Some(wf_application::governance::CreditCleanupFailure::InvalidObservation)
+        );
+        assert_eq!(
+            *port.calls.borrow(),
+            vec![BudgetCall::ReadProgress, BudgetCall::Page]
+        );
+    }
+    Ok(())
+}

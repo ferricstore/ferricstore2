@@ -29,6 +29,9 @@ pub(super) enum BudgetFault {
     None,
     UnavailableProgress,
     MalformedPage,
+    MissingOwner,
+    MissingRevision,
+    EmptyWithRevision,
 }
 pub(super) struct BudgetFixture {
     pub(super) scope: RequestScope,
@@ -117,10 +120,27 @@ impl GovernanceCatalogReadPort for BudgetFixture {
         Ok(GovernanceCatalogPage {
             members: if self.fault == BudgetFault::MalformedPage {
                 vec![b"a".to_vec(), b"b".to_vec()]
+            } else if matches!(
+                self.fault,
+                BudgetFault::MissingOwner | BudgetFault::MissingRevision
+            ) {
+                let encoded = wf_ports::state::encode_credit_catalog_members(
+                    &self.scope,
+                    &[b"a"],
+                    65535,
+                    65535,
+                )
+                .map_err(|_| S::InvalidChanges)?;
+                vec![encoded.members().next().ok_or(S::InvalidChanges)?.to_vec()]
             } else {
                 Vec::new()
             },
-            full: self.fault == BudgetFault::MalformedPage,
+            full: matches!(
+                self.fault,
+                BudgetFault::MalformedPage
+                    | BudgetFault::MissingOwner
+                    | BudgetFault::MissingRevision
+            ),
         })
     }
     fn governance_catalog_contains(
@@ -146,5 +166,31 @@ impl GovernanceCatalogProgressPort for BudgetFixture {
         } else {
             Ok(GovernanceCatalogProgress::Missing)
         }
+    }
+}
+
+impl wf_ports::state::GovernanceCatalogPruneReadPort for BudgetFixture {
+    fn governance_catalog_prune_page(
+        &self,
+        request: GovernanceCatalogRead<'_>,
+        limits: GovernanceCatalogReadLimits,
+    ) -> Result<wf_ports::state::GovernanceCatalogPrunePage, S> {
+        Ok(wf_ports::state::GovernanceCatalogPrunePage {
+            page: self.governance_catalog_page(request, limits)?,
+            revision: matches!(
+                self.fault,
+                BudgetFault::MissingOwner | BudgetFault::EmptyWithRevision
+            )
+            .then(|| {
+                wf_domain::workflow::control::EntryIdentity::new(
+                    wf_types::version::LogIdentity::new(
+                        1,
+                        1,
+                        wf_types::version::AppliedPosition::new(0),
+                    ),
+                    wf_domain::workflow::control::PreparedDigest::new([1; 32]),
+                )
+            }),
+        })
     }
 }

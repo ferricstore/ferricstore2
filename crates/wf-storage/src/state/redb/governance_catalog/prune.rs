@@ -1,7 +1,11 @@
 //! Explicit GC3 construction; ordinary observers cannot prune legacy members.
+mod read;
+mod write;
 use super::{RedbStateStore, StateStoreGenesis, StateStoreLimits};
+pub(crate) use read::decide;
 use wf_ports::{consensus::WorkflowValueDefaults, state::StateTransactionError as E};
 use wf_types::identity::{GroupId, RecoveryId};
+pub(crate) use write::apply as commit;
 impl super::RedbStateTransaction<'_> {
     /// Requires actual GC3 under the same coherent guard.
     /// # Errors

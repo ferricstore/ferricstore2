@@ -9,7 +9,10 @@ pub use model::{
 };
 use wf_ports::{
     consensus::CreditCatalogPublicationPort,
-    state::{CreditOwnerReadPort, GovernanceCatalogProgressPort, GovernanceCatalogReadPort},
+    state::{
+        CreditOwnerReadPort, GovernanceCatalogProgressPort, GovernanceCatalogPruneReadPort,
+        GovernanceCatalogReadPort,
+    },
 };
 
 /// Runs one source-compatible step with at most three attempted commands.
@@ -24,6 +27,7 @@ where
     P: CreditCatalogPublicationPort
         + CreditOwnerReadPort
         + GovernanceCatalogReadPort
+        + GovernanceCatalogPruneReadPort
         + GovernanceCatalogProgressPort,
 {
     plan::preflight(request, Some(3), limits)?;
@@ -43,6 +47,7 @@ where
     P: CreditCatalogPublicationPort
         + CreditOwnerReadPort
         + GovernanceCatalogReadPort
+        + GovernanceCatalogPruneReadPort
         + GovernanceCatalogProgressPort,
 {
     let budget = plan::preflight(request, command_budget, limits)?;

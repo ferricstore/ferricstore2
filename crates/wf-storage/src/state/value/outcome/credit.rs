@@ -5,7 +5,7 @@ use wf_domain::workflow::admission::AdmissionLimits;
 use wf_domain::workflow::request::{ClientIntent, RequestScope, RetainedOutcome, RetainedStatus};
 use wf_ports::log::{
     catalog_ack_retained_summary, catalog_membership_retained_summary,
-    catalog_progress_retained_summary, credit_retained_summary,
+    catalog_progress_retained_summary, catalog_prune_retained_summary, credit_retained_summary,
 };
 use wf_types::identity::RequestId;
 
@@ -46,7 +46,7 @@ pub(super) fn scan<'a>(
          response_version| {
             if !matches!(
                 (version, response_version),
-                (12, 10) | (13, 11) | (14, 12) | (15, 13)
+                (12, 10) | (13, 11) | (14, 12) | (15, 13) | (16, 14)
             ) {
                 return Err(StateValueError::UnsupportedVersion);
             }
@@ -59,7 +59,9 @@ pub(super) fn scan<'a>(
             {
                 return Err(StateValueError::InvalidValue);
             }
-            let intent = if version == 15 {
+            let intent = if version == 16 {
+                ClientIntent::governance_catalog_prune(digest)
+            } else if version == 15 {
                 ClientIntent::governance_catalog_progress(digest)
             } else if version == 14 {
                 ClientIntent::governance_catalog(digest)
@@ -100,7 +102,10 @@ fn summary(
     response: &[u8],
     admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), wf_ports::log::CodecError> {
-    if intent.version() == 15 {
+    if intent.version() == 16 {
+        catalog_prune_retained_summary(intent, version, response, admission)
+            .map(|_| (RetainedStatus::Accepted, None))
+    } else if intent.version() == 15 {
         catalog_progress_retained_summary(intent, version, response, admission)
     } else if intent.version() == 14 {
         catalog_membership_retained_summary(intent, version, response, admission)

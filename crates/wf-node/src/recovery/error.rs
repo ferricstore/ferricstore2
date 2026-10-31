@@ -54,6 +54,8 @@ pub enum CommittedRecoveryError {
     CatalogMembership(wf_storage::transaction::CatalogMembershipTransactionError),
     /// Explicit durable cleaner progress preparation/transaction diagnosis.
     CatalogProgress(wf_storage::transaction::CatalogProgressTransactionError),
+    /// Explicit member-revision pruning preparation/transaction diagnosis.
+    CatalogPrune(wf_storage::transaction::CatalogPruneTransactionError),
     /// Header-only parsing failure.
     Codec(CodecError),
     /// Closed Blank/Membership parsing failure.
@@ -84,6 +86,7 @@ impl fmt::Display for CommittedRecoveryError {
             Self::Credit(error) => return fmt::Display::fmt(error, f),
             Self::CatalogMembership(error) => return fmt::Display::fmt(error, f),
             Self::CatalogProgress(error) => return fmt::Display::fmt(error, f),
+            Self::CatalogPrune(error) => return fmt::Display::fmt(error, f),
             Self::Codec(error) => return fmt::Display::fmt(error, f),
             Self::Membership(error) => return fmt::Display::fmt(error, f),
         })

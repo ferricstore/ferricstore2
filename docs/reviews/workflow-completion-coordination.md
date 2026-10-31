@@ -60518,3 +60518,18 @@ membership creates FWGM2 revisions and rotates them on fresh duplicate register;
 those direct assertions pass before the two storage cases reach the deliberate
 State(UnsupportedPolicyProfile) prune driver. Save this genuine writer RED before
 consumed writer/outcome registries. No later no-op/retry assertion credit yet.
+
+GC3 integrated writer reaches real storage4/ports4 and Node3 passing. All18
+selected cleaner cases pass including the original saved publication/ACK race;
+that original terminal membership assertion is preserved. This is a focused
+component result, not the full checkpoint. Additional actual fault controls
+prove whole-cohort step rollback, delegated sync/Uncertain fencing and
+old-or-new recovery, plus malformed/ahead/equal-position wrong-identity refusal.
+The receipt-only downgrade control finds a new real failure: after accepted
+Missing and healthy rehashed GC3->GC2 manifest migration, reopen wrongly accepts
+intent16 because the startup receipt classification omits16 from its outer
+profile match. Seven other storage tests pass; the Removed iteration is masked.
+Save the exact failing test/source cohort and log receipt before closing this
+classification gap. No new product capability or independent peer review claim.
+New stale ordinary-read/fresh actual-owner and generic-last received capability
+controls are supplemental after the corresponding bodies, not original RED.

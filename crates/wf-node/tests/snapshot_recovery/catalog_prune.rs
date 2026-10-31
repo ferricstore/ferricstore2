@@ -166,3 +166,61 @@ fn catalog_prune_node_purged_and_received_snapshots_preserve_changed_and_origina
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn catalog_prune_node_older_modes_refuse_received_gc3_with_generic_last_entry_before_log_write()
+-> TestResult {
+    let dir = f::directory("prune-node-received-old")?;
+    let source = dir.join("source");
+    std::fs::create_dir(&source)?;
+    let (log, mut state) = p::pair(&source, true)?;
+    let blank = f::blank(wf_domain::workflow::control::EntryStamp::Unstamped)?;
+    f::apply_control(&mut state, 0, blank.as_bytes())?;
+    let mut wire = Vec::new();
+    state.capture_snapshot(&mut wire, SnapshotLimits::default())?;
+    drop((log, state));
+    let state_before = p::cohort(&source)?;
+    let scope = f::scope()?;
+    for (index, limits) in [
+        caps()?,
+        caps()?.with_governance_catalogs(),
+        caps()?.with_governance_catalog_progress(),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let child = dir.join(index.to_string());
+        std::fs::create_dir(&child)?;
+        let mut log = p::log(&child)?;
+        let before = log.state()?;
+        let candidate = RedbSnapshotStage::receive(
+            &child.join("state.redb"),
+            scope.group().clone(),
+            scope.recovery().clone(),
+            &mut std::io::Cursor::new(&wire),
+            wf_storage::state::StateStoreLimits::default(),
+            SnapshotLimits::default(),
+        )?;
+        assert_eq!(
+            restore_received_snapshot(
+                log,
+                candidate,
+                scope.group(),
+                scope.recovery(),
+                limits,
+                SnapshotLimits::default()
+            )
+            .err(),
+            Some(wf_node::recovery::SnapshotRecoveryError::Recovery(
+                E::State(StateTransactionError::UnsupportedPolicyProfile)
+            ))
+        );
+        let (mut log, state) = f::open_pair(&child)?;
+        assert_eq!(log.state()?, before);
+        drop((log, state));
+        assert_eq!(p::cohort(&child)?, state_before);
+        assert!(f::log_rows(&child)?.is_empty());
+    }
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

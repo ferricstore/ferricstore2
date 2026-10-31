@@ -78,6 +78,15 @@ pub(super) fn valid_page(page: &GovernanceCatalogPage, cursor: Option<&[u8]>, li
             member.len() <= 65535 && cursor.is_none_or(|cursor| member.as_slice() > cursor)
         })
 }
+pub(super) fn valid_candidate(
+    candidate: &wf_ports::state::GovernanceCatalogPrunePage,
+    cursor: Option<&[u8]>,
+    limits: L,
+) -> bool {
+    candidate.revision.is_some() == !candidate.page.members.is_empty()
+        && limits.read.maximum_bytes >= 192
+        && valid_page(&candidate.page, cursor, limits)
+}
 pub(super) fn source<'a, 'm>(
     request: R<'a>,
     member: &'m [u8],

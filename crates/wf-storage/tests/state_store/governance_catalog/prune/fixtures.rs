@@ -135,3 +135,46 @@ fn defaults() -> WorkflowValueDefaults {
         lifecycle,
     }
 }
+
+pub(super) fn downgrade(path: &std::path::Path) -> TestResult {
+    use redb::ReadableTable;
+    use sha2::{Digest, Sha256};
+    let db = redb::Builder::new().open(path)?;
+    let tx = db.begin_write()?;
+    {
+        let mut table = tx.open_table(common::META)?;
+        let mut bytes = table
+            .get(b"manifest".as_slice())?
+            .ok_or("missing manifest")?
+            .value()
+            .to_vec();
+        let at = bytes.len() - 36;
+        assert_eq!(&bytes[at..at + 4], b"GC\0\x03");
+        bytes[at + 3] = 2;
+        let end = bytes.len() - 32;
+        let checksum = Sha256::digest(&bytes[..end]);
+        bytes[end..].copy_from_slice(&checksum);
+        table.insert(b"manifest".as_slice(), bytes.as_slice())?;
+    }
+    tx.commit()?;
+    Ok(())
+}
+
+pub(super) fn damage_member(path: &std::path::Path, bytes: &[u8]) -> TestResult {
+    use redb::{ReadableTable, TableDefinition};
+    let db = redb::Builder::new().open(path)?;
+    let tx = db.begin_write()?;
+    {
+        let mut table = tx.open_table(TableDefinition::<&[u8], &[u8]>::new("wf_state_rows_v1"))?;
+        let key = table
+            .iter()?
+            .find_map(|row| {
+                let (key, _) = row.ok()?;
+                (key.value().get(6) == Some(&18)).then(|| key.value().to_vec())
+            })
+            .ok_or("missing member revision")?;
+        table.insert(key.as_slice(), bytes)?;
+    }
+    tx.commit()?;
+    Ok(())
+}

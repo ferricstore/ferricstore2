@@ -7,7 +7,8 @@ use wf_ports::{
     consensus::CreditCatalogPublicationPort,
     state::{
         CreditOwnerReadPort, GovernanceCatalogProgress, GovernanceCatalogProgressPort,
-        GovernanceCatalogRead, GovernanceCatalogReadPort, StateTransactionError as S,
+        GovernanceCatalogPruneReadPort, GovernanceCatalogRead, GovernanceCatalogReadPort,
+        StateTransactionError as S,
     },
 };
 
@@ -29,6 +30,7 @@ where
     P: CreditCatalogPublicationPort
         + CreditOwnerReadPort
         + GovernanceCatalogReadPort
+        + GovernanceCatalogPruneReadPort
         + GovernanceCatalogProgressPort,
 {
     let mut state = CleanupTraversal {
@@ -72,7 +74,7 @@ where
     if state.step.commands == budget {
         return state.step;
     }
-    let mut page = match port.governance_catalog_page(
+    let candidate = match port.governance_catalog_prune_page(
         GovernanceCatalogRead {
             scope: request.target,
             catalog: request.catalog,
@@ -81,15 +83,26 @@ where
         },
         plan::read(limits),
     ) {
-        Ok(page) if plan::valid_page(&page, state.cursor.as_deref(), limits) => page,
+        Ok(page) if plan::valid_candidate(&page, state.cursor.as_deref(), limits) => page,
         Ok(_) => return fail(state.step, F::InvalidObservation),
         Err(S::CatalogChanged) => return finish(port, request, limits, budget, state, None, true),
         Err(error) => return fail(state.step, F::Read(error)),
     };
+    let mut page = candidate.page;
     let Some(member) = page.members.pop() else {
         return finish(port, request, limits, budget, state, None, true);
     };
-    state.step.reply = work(port, request, limits, &member, &mut state.step.commands);
+    let Some(revision) = candidate.revision else {
+        return fail(state.step, F::InvalidObservation);
+    };
+    state.step.reply = work(
+        port,
+        request,
+        limits,
+        &member,
+        revision,
+        &mut state.step.commands,
+    );
     state.step.errors = u16::from(state.step.reply.is_err());
     if let Ok(reply) = &state.step.reply {
         state.step.deleted = reply.deleted;
@@ -123,6 +136,7 @@ fn work<P>(
     request: R<'_>,
     limits: L,
     member: &[u8],
+    revision: wf_domain::workflow::control::EntryIdentity,
     commands: &mut u16,
 ) -> Result<Reply, F>
 where
@@ -132,18 +146,22 @@ where
     let owner = port
         .credit_catalog_owner(source.scope, name, limits.read)
         .map_err(F::Read)?;
+    let owner = match owner {
+        Some(owner) => Some(owner),
+        None => port
+            .credit_catalog_owner_for_prune(source.scope, name, limits.read)
+            .map_err(F::Read)?,
+    };
     let Some(owner) = owner else {
         *commands += 1;
-        return if dispatch::prune(port, request, member, limits) {
-            Ok(Reply {
-                deleted: 0,
-                pending: false,
-                pruned: true,
-                next_cursor: None,
-            })
-        } else {
-            Err(F::PruneUnconfirmed)
-        };
+        let pruned =
+            dispatch::prune(port, request, member, revision, limits).ok_or(F::PruneUnconfirmed)?;
+        return Ok(Reply {
+            deleted: 0,
+            pending: false,
+            pruned,
+            next_cursor: None,
+        });
     };
     let view = owner.view();
     if view.scope != name || view.leases.len() > limits.read.credit.max_leases() {
