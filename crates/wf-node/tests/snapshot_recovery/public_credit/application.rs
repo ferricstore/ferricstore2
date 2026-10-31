@@ -275,16 +275,15 @@ fn public_credit_application_retry_refusals_keep_original_and_exact_id_budget_is
     let frame = original.frame().as_ptr();
     let ids = original.spend_ids().to_vec();
     port.trace.borrow_mut().clear();
-    let refusal = match retry_public_credit_call(
+    let Err(refusal) = retry_public_credit_call(
         original,
         &mut port,
         Limits {
             workspace_bytes: 1,
             ..Limits::default()
         },
-    ) {
-        Err(error) => error,
-        Ok(_) => return Err("bad workspace admitted".into()),
+    ) else {
+        return Err("bad workspace admitted".into());
     };
     assert_eq!(refusal.error(), E::Limit);
     assert_eq!(port.trace.borrow().len(), 0);
@@ -292,9 +291,8 @@ fn public_credit_application_retry_refusals_keep_original_and_exact_id_budget_is
     assert_eq!(original.frame().as_ptr(), frame);
     assert_eq!(original.spend_ids(), ids);
     port.fault.set(Fault::RefusePublic);
-    let refusal = match retry_public_credit_call(original, &mut port, Limits::default()) {
-        Err(error) => error,
-        Ok(_) => return Err("retry proposal refusal lost".into()),
+    let Err(refusal) = retry_public_credit_call(original, &mut port, Limits::default()) else {
+        return Err("retry proposal refusal lost".into());
     };
     assert_eq!(
         refusal.error(),
@@ -424,7 +422,10 @@ fn public_credit_application_unknown_spend_compensation_preserves_sibling_reserv
 fn public_credit_application_concurrent_same_caller_returns_earlier_original_time() -> TestResult {
     let mut port = Fixture::new()?;
     port.seed()?;
-    assert!(matches!(port.call(K::Get, b"register-before-race", &[])??, R::Retained(_)));
+    assert!(matches!(
+        port.call(K::Get, b"register-before-race", &[])??,
+        R::Retained(_)
+    ));
     port.now = 1002;
     port.fault.set(Fault::ConcurrentGet);
     let result = port.call(K::Get, b"concurrent-get", &[])??;
@@ -434,5 +435,31 @@ fn public_credit_application_concurrent_same_caller_returns_earlier_original_tim
     assert_eq!(outcome.original_time().get(), 1001);
     assert_eq!(outcome.original_position().index().get(), 3);
     assert_eq!(outcome.request().as_bytes(), b"concurrent-get");
+    port.cleanup()
+}
+
+#[test]
+fn public_credit_application_nonspend_retry_requires_no_generated_id_staging() -> TestResult {
+    let mut port = Fixture::new()?;
+    port.seed()?;
+    port.fault.set(Fault::LosePublic);
+    let R::Unknown { original, .. } = port.call(K::Get, b"unknown-get", &[])?? else {
+        return Err("no original Get context".into());
+    };
+    assert_eq!(original.spend_ids().len(), 0);
+    assert!(original.unknown_spend().is_none());
+    port.trace.borrow_mut().clear();
+    assert!(matches!(
+        retry_public_credit_call(
+            original,
+            &mut port,
+            Limits {
+                maximum_ids_bytes: 1,
+                ..Limits::default()
+            }
+        )?,
+        R::Retained(_)
+    ));
+    assert_eq!(*port.trace.borrow(), vec![Trace::Submit]);
     port.cleanup()
 }

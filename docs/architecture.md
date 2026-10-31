@@ -1543,3 +1543,17 @@ replays through that same consumed writer, including received/purged snapshots.
 Cleanup drains a full queue first and batches newly expired detached generations
 without reclaiming unqueued capacity. Public governed Claim, outbox/catalog/
 service behavior and full source/platform acceptance remain open.
+
+
+The selected public credit caller parent now lives in wf-application governance,
+with a neutral PublicCreditSubmitPort in ports. It resolves retained callers
+before fresh owner/registration/entropy, repairs actual existing membership,
+preserves one immutable prepared frame and exact spend IDs on uncertainty, and
+reports committed credit separately from unconfirmed auxiliary publication.
+Retry refusal retains the original context; an earlier concurrent original
+response remains valid. Borrowed reply inspection checks complete original
+bytes and operands. Tests use actual local Node/log/state execution, without
+claiming the production authorization or leader/read-barrier lifecycle.
+The immutable shared-frame type classification is scoped to this port; locks,
+atomic APIs and threads remain excluded from pure modules. Coupled governed
+Claim/policy/release outbox, runtime services and full acceptance remain open.

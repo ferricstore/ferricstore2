@@ -145,7 +145,7 @@ pub(super) fn original<P: PublicCreditSubmitPort>(
         shard,
         amount,
         intent,
-        stamp,
+        minimum_time: request.caller.now_ms(),
         ids,
         frame: Arc::new(frame),
     }))

@@ -92,7 +92,7 @@ fn retained<P: PublicCreditSubmitPort>(
             &original.source,
             &original.request,
             original.intent,
-            Some(original.stamp.hlc().physical().get()),
+            original.minimum_time,
         ),
         expected,
         limits,

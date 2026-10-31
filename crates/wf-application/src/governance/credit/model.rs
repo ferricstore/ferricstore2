@@ -13,7 +13,7 @@ use wf_ports::{
     log::{CodecError, PreparedBytes},
     state::StateTransactionError,
 };
-use wf_types::{identity::RequestId, version::CommittedTime};
+use wf_types::identity::RequestId;
 /// Server-configured namespaces and one completely validated public caller.
 #[derive(Clone, Copy)]
 pub struct PublicCreditCallRequest<'a> {
@@ -64,7 +64,7 @@ pub struct PreparedPublicCreditCall {
     pub(super) shard: Option<u64>,
     pub(super) amount: Option<u64>,
     pub(super) intent: ClientIntent,
-    pub(super) stamp: CommittedTime,
+    pub(super) minimum_time: Option<u64>,
     pub(super) ids: Vec<Vec<u8>>,
     pub(super) frame: Arc<PreparedBytes>,
 }

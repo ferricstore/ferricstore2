@@ -107,13 +107,14 @@ pub fn retry_public_credit_call<P: PublicCreditSubmitPort>(
         .len()
         .checked_add(4096)
         .is_none_or(|n| n > limits.maximum_prepared_bytes)
-        || original
-            .ids
-            .iter()
-            .try_fold(128_usize, |n, id| {
-                n.checked_add(id.len() + std::mem::size_of::<Vec<u8>>())
-            })
-            .is_none_or(|n| n > limits.maximum_ids_bytes)
+        || (original.kind == wf_domain::governance::caller::CreditCallKind::Spend
+            && original
+                .ids
+                .iter()
+                .try_fold(128_usize, |n, id| {
+                    n.checked_add(id.len() + std::mem::size_of::<Vec<u8>>())
+                })
+                .is_none_or(|n| n > limits.maximum_ids_bytes))
     {
         return Err(PublicCreditRetryError {
             error: PublicCreditCallError::Limit,

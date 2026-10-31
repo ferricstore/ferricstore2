@@ -60882,3 +60882,72 @@ thread/namespace/wildcard fixtures, including a nested Arc<Mutex<_>>. This is a
 concrete classification of the already approved data type, not a sync-module
 allowlist or a lint suppression. The actual pre-refinement workspace failure is
 /private/tmp/ferricstore2-public-credit-application-arch.log. Solo review only.
+
+Retained concurrency refinement: a real same-caller Get proposal can commit after
+lookup but before submission, with an earlier trusted stamp. The valid original
+response must survive; public intent deliberately excludes preparation time.
+Replace the redundant saved stamp field with minimum_time:Option<u64>, taken
+only from the caller's explicit now_ms. The original trusted stamp remains bound
+in the immutable frame. Namespace/request/intent/profile/status, full response and
+exact submitted Spend IDs still bind. Submitted metadata uses the caller floor,
+never the later preparer's stamp. Saved genuine corrected fixture failure:
+/private/tmp/ferricstore2-public-credit-concurrent-r0-final.log; the initial test
+expected an earlier time below already committed registration and was a fixture
+oracle error, not product RED. No duplicate restoration or new type is needed.
+
+
+### Public credit caller batch: integrated local checkpoint (solo, 2026-10-31)
+
+The whole frozen public batch passes all12 gates on2015 non-Markdown inputs,
+1426 Rust files:1607 cases/117 executable targets,60 architecture cases,Python7,
+11 doctests/15 targets, warnings-denied docs and offline dependency audits.
+All1570 preceding cases and1294 original cases retain exact target/name/status
+identities; both benchmark smokes pass. No non-Markdown inputs changed during
+any gate. This is one full run after the coherent caller batch; failed focused
+lint attempts were corrected without changing limits or suppressing diagnostics.
+
+PublicCreditSubmitPort now composes retained inquiry before owner/repair/entropy,
+exact existing-owner repair before every dependent operation, original spend
+preparation and submission, and new Lease commit before synchronous publication.
+The actual source owner is dropped before subsequent preparation; repair reuses
+that observation rather than restoring a second owner. Original frame sharing
+uses Arc and retains one immutable payload through uncertain execution/retry.
+Complete borrowed response inspection binds namespace/request/intent/profile/
+status, scope/kind/shard/count and known original ID order without cloning owners.
+A concurrent same caller may return its earlier original time. Retry re-admits
+actual original ownership, never creates another spend, and returns the same
+boxed context on resource or no-proposal refusal. Non-Spend retries do not need
+generated-ID staging. Committed credit plus unconfirmed publication remains an
+explicit result with durable pending publication; no rollback is invented.
+
+All13 Node application cases pass through actual log commit/recovery/state paths,
+including uncataloged Spend/Get/Renew/Release/Cleanup, no ghosts, failed/unknown
+registration, lost replies, exact compensation preserving sibling reservations,
+original retained lookup before faulted owner reads, shared-frame retry, refused
+retry ownership and earlier concurrent originals. The saved first8 application
+R0 tests remain an exact whole-file prefix. Existing first5 public codec tests
+also retain their exact prefix. The canonical-rejection helper has its separate
+UnsupportedTag RED; later binding/EOF assertions were masked there. Additional
+binding, non-Spend and source scenarios are supplemental first-pass checks, not
+retroactive RED. Exact-ID retry admission and corrected concurrent-original
+regressions have their own actual failures. The initial concurrent fixture's
+clock expectation was corrected honestly before recording product RED.
+
+All677 earlier test/benchmark inputs remain672 whole plus four exact module
+registration inverses and one exact architecture-file prefix. Frozen mapping
+and progress ledger remain byte-identical; no new source-case credit is claimed.
+Source accounting141/155/671 and runtime5903/4222/1681/1655 remain partial. No
+full native Elixir, Linux, production consensus/service or performance claim.
+The Arc type classification is exact to one neutral port module; mutexes, atomic
+APIs, threads, namespace/glob imports and Arc in other pure modules still fail.
+All reviews here were performed solo, without an independent-peer claim.
+
+Receipts: /private/tmp/ferricstore2-public-credit-{application-r0,
+application-review-r0,concurrent-r0,final-pipeline,full-identity,source-audit}.json;
+reply and Arc actual RED logs use the same prefix. The full product objective
+remains active. NEXT coupled Claim/policy/release-outbox integration, source error
+ordering/raw API obligations, native malformed-owner fairness, accepted Raft/read
+lifecycle, routing/authorization, shared services/transports/worker/maintenance,
+all required original scenarios/profiles, native Linux/macOS and measured
+performance acceptance. Preserve the original dirty Elixir tree and unexecuted
+isolated native fix; continue solo. Do not label this checkpoint full completion.
