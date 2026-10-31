@@ -4,6 +4,57 @@ Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
 Current batch: M2-CREDIT-CATALOG1, still unfinished.
 
+
+Ongoing public caller work after the last integrated checkpoint: candidate
+code4cfec23. This public batch is STILL UNFINISHED; application sequencing is next.
+The previous all12/1570 result below remains evidence for8850e33 only.
+
+Public scalar option normalization now covers all six credit operations,
+first-key keyword selection with every capture charged, source finite/count/
+ID/configuration/deadline rules and source scalar error order. Release IDs remain
+borrowed/in order; one bounded reference sort verifies uniqueness. Public Spend
+forbids caller IDs. Streaming ETF policy fingerprints and exact flr1 epoch/batch/
+ordinal IDs have independent byte recipes. FWCP1 operation15/intent17 compares
+canonical public callers while excluding trusted stamp/observed epoch/batch;
+complete frame SHA still binds preparation. Decoder wire/admission bounds apply
+before private payload ownership, with a saved oversized-frame counterexample.
+
+Public frames join the existing sparse atomic credit driver, complete response10
+and actual credit2/catalog capability, including receipt-only state. Changed
+preparation returns original spend/time/IDs; changed caller intent conflicts.
+All six operations, original metadata, old-profile no-write refusal and validly
+rehashed capability downgrade refusal execute on real storage. Explicit Node
+public selection audits complete historical bodies and replays purged/received
+suffixes without regenerating another spend. Older modes refuse public bodies.
+No new dependency, physical row/schema or runtime service is introduced.
+
+Current focused verification:141 distinct cases (domain43,ports32,storage4,Node3,
+architecture59), strict workspace/all-target Clippy,fmt,diff and cargo progress
+pass. No current full-wrapper run or full source-case/native/Linux/performance
+acceptance is claimed. All677 older test/benchmark files stay672 whole plus five
+exact additive registration/prefix inverses. Existing framing types move verbatim
+to private log/model.rs with unchanged public names and log-only field visibility;
+root facade now344 lines. Source accounting remains141/155/671 and runtime
+reconciliation5903/4222/1681/1655. Receipts/logs are
+/private/tmp/ferricstore2-public-credit-{caller-r0,codec-r0,codec-wire-r0,
+storage-r0,node-r0,order-r0,focused}.json and corresponding phase logs.
+
+NEXT finish the approved application caller over PublicCreditSubmitPort:
+retained inquiry before current owner/repair/entropy; exact existing-owner repair
+before dependent mutation; new-owner commit before publication; complete original
+reply binding; preserve request/intent/exact IDs on Unknown and retry original
+prepared bytes without a fresh spend. Treat committed mutation plus unconfirmed
+publication explicitly; no invented rollback. Pure normalized schema checks do
+not by themselves prove original late-input/read/registration error ordering.
+Add actual Node application-path scenarios (uncataloged existing owners, missing
+spend/no ghost, publication after creation, failed/unknown registration and exact
+compensation IDs), plus real unknown/lookup boundaries and caller resource
+preflight. Concrete named paths/types were selected in the latest coordination
+entry before artifacts; refine their ownership/error contract before creation.
+Run ONE full frozen integration pipeline after this whole public batch is ready.
+Then continue coupled Claim/policy/release-outbox and all broader goal work.
+
+
 Latest integrated code checkpoint:8850e33, revision-checked catalog pruning.
 The real stale Missing -> new owner/publish/ACK -> prune race is reproduced in
 7da2b8d and corrected. Explicit GC3 stores each member's complete registration
