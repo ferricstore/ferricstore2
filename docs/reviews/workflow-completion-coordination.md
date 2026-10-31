@@ -59100,3 +59100,57 @@ case or native/Linux acceptance is earned by local code gates. Main remains
 db1c3c9 clean and unmodified; no adoption or full batch/product completion claim.
 Continue the source/View/catalog/public-parent/outbox obligations and the ordered
 plan. The full goal is active and solo, not complete or blocked.
+
+## M2-CREDIT-VIEW1: concrete solo selection, before artifacts
+
+Previous goal turn: no progress (status response only). Revalidated the clean
+4aa3617 worktree and pinned source before selecting this functional batch. Work
+remains solo under the current user override; this is not independent review.
+
+Approve NEW domain governance/view.rs with CreditOwnerView, CreditLeaseView,
+CreditPolicyVersionHash, CreditReplyView and CreditSpendUnknownView. Owner views
+expose exactly scope/limit/free/epoch/config_version/policy_version_hash plus a
+projected lease iterator. The backing lease slice is private and has no raw
+getter, Deref or derived Debug. Lease views contain only the eight source public
+fields. A fixed inline43-byte unpadded base64url hash represents an optional
+32-byte fingerprint, without heap allocation. Views are neutral borrowed data,
+not current ownership, admission, commit or release authority.
+
+Approve NEW ports log/credit/view.rs and with_public_credit_reply, reexported
+through the existing log facade. Fully inspect/decode the existing FWGR1 reply
+under fresh caps before projection. Reserve an additional1024 logical bytes and
+1024 work units before decoding; the same remaining profile governs restoration.
+The higher-ranked callback borrows that one decoded owner/ID cohort; its own
+iteration, copies and allocations are external work. No second owner/ID clone,
+public request format, cached paid flag, frame version or dependency is added.
+Shapes follow pinned raft/state_machine/sections/flow_governance_limit.ex:
+Lease(owner,lease), Spent(owner,lease,original IDs), Owner for Get/Release,
+Cleaned(deleted,pending) without its internal owner, and business rejection.
+
+Approve CreditTransactionError::unknown_spend in existing transaction/credit.rs,
+using only State(Uncertain) and the borrowed, fully prepared original Spend.
+Return exact scope/shard/IDs plus source code/message. Known aborts, unavailable,
+limits and non-Spend operations remain unclassified. The helper maps a diagnosis;
+it cannot prove a commit or authorize a retry/release. Public request identity
+and ID-generation/retained-gate ordering remain separate required parent work.
+
+Approve NEW domain tests/governance_credit/view.rs, ports tests/credit_codec/
+view.rs and storage tests/state_store/credit/view.rs, registered only in their
+existing targets. The ports donor independent_owner may gain pub(super) only;
+existing bodies remain exact. Save compiled rejecting-facade failures before
+semantic bodies. Exercise policy hash vectors, complete public field values,
+callback refusal on corrupt/limited frames, retained originals after owner
+changes/reopen, and actual post-publication uncertain Spend with original binary
+IDs, fencing and complete old-or-new recovery. Include compile-fail public-field
+omission controls. Source View/LimitStore/cache observations are pinned at
+66586c5; isolated mapping does not credit the larger all-shards/catalog/public
+service scenario. No native, Linux, performance or full-parity claim follows.
+
+Genuine rejecting-runtime evidence: all eight new tests compile and fail at the
+selected missing behavior: domain0/3 InvalidState, ports0/2 UnsupportedVersion,
+storage0/3 missing public visit/original compensation context. The actual Spend
+case first proves State(Uncertain) and consumption of the delegated publication
+sync fault; its later fencing/recovery assertions are still masked. Other later
+shape/corruption/profile/replay assertions remain masked too. Existing targets
+are only filtered, not claimed rerun. Exact source/log SHA bindings are saved in
+/private/tmp/ferricstore2-credit-view-r0.json. Save this checkpoint before bodies.

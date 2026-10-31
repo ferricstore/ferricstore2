@@ -91,7 +91,7 @@ fn credit_reply_independent_not_found_vector_has_explicit_absence_and_eof() -> T
     Ok(())
 }
 
-fn independent_owner(leased: bool) -> Vec<u8> {
+pub(super) fn independent_owner(leased: bool) -> Vec<u8> {
     let mut bytes = b"FWGO\0\x01\0\0\0\x01x".to_vec();
     for n in if leased {
         [3_u64, 0, 1, 1]

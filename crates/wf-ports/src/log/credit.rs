@@ -17,6 +17,28 @@ pub use model::PreparedCreditRequest;
 mod owner;
 mod response;
 mod status;
+mod view;
+
+/// Restores one complete original reply and visits only its public fields.
+/// The visitor's iteration, copies and allocation are external work. Borrowed
+/// reply data cannot escape the callback; no current owner read is performed.
+/// # Errors
+/// Refuses malformed, unsupported or limited replies before calling the visitor.
+pub fn with_public_credit_reply<R>(
+    encoded: &[u8],
+    credit: CreditLimits,
+    maximum_wire_bytes: usize,
+    maximum_owned_bytes: usize,
+    visit: impl for<'reply> FnOnce(wf_domain::governance::view::CreditReplyView<'reply>) -> R,
+) -> Result<R, CodecError> {
+    view::visit(
+        encoded,
+        credit,
+        maximum_wire_bytes,
+        maximum_owned_bytes,
+        visit,
+    )
+}
 
 /// Encodes the exact private identified request, preserving original ID order.
 /// # Errors

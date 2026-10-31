@@ -2,3 +2,4 @@
 
 pub mod credit;
 pub mod identified;
+pub mod view;

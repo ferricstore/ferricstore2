@@ -15,3 +15,4 @@ mod fixtures;
 mod limits;
 mod recovery;
 mod sequence;
+mod view;

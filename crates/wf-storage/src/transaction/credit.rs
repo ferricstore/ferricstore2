@@ -12,6 +12,18 @@ use wf_types::version::LogIdentity;
 
 mod driver;
 
+impl CreditTransactionError {
+    /// Maps only an uncertain original Spend to its exact compensation context.
+    /// This projection establishes no commit, release or safe-retry authority.
+    #[must_use]
+    pub fn unknown_spend<'a>(
+        self,
+        _original: &'a wf_ports::log::PreparedCreditRequest<'_>,
+    ) -> Option<wf_domain::governance::view::CreditSpendUnknownView<'a>> {
+        None
+    }
+}
+
 /// Operational failure; never a retained business rejection.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CreditTransactionError {
