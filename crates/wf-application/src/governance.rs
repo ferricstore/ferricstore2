@@ -21,3 +21,10 @@ pub use publication::{
     CreditCatalogPublicationStats, publish_credit_catalog,
 };
 pub use repair::{CreditCatalogRepairError, CreditCatalogRepairStatus, repair_credit_catalog};
+
+mod credit;
+pub use credit::{
+    PreparedPublicCreditCall, PublicCreditCallError, PublicCreditCallLimits,
+    PublicCreditCallRequest, PublicCreditCallResult, retry_public_credit_call,
+    submit_public_credit_call,
+};

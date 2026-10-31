@@ -60785,3 +60785,85 @@ unchanged141/155/671 checked links and5903/4222/1681/1655 reconciliation; full
 parity remains incomplete. Update the handoff as unfinished candidate work.
 Last full integration remains8850e33; finish application parent before next full
 pipeline. Preserve all remaining scope and continue the active goal solo.
+
+### M2-CREDIT-CATALOG1 application credit parent refinement (solo, before artifacts)
+
+Previous goal turn is progress:4cfec23/78a3e63, primary7746d2f, public caller/frame/
+atomic retained driver/Node snapshot path.141 focused cases and strict Clippy;
+last complete frozen all12 checkpoint remains8850e33. Continue full scope solo.
+
+Refine approved PublicCreditSubmitPort in consensus/public_credit.rs: extends
+existing publication/owner/member semantic ports. lookup_public_credit accepts
+server-bound scope,stable request,actual caller intent and read limits, returning
+CreditRequestLookup::Fresh or Resolved(MutationSubmission). The actual owner must
+check current authorization/routing/read lifecycle/retention; Fresh is not apply
+authority. prepare_public_credit takes the normalized caller and supplies trusted
+CommittedTime plus optional16-byte batch ONLY for Spend. submit_public_credit
+accepts Arc<PreparedBytes> and an execution budget: shared immutable data lets the
+caller retain original bytes while the supervised execution owner holds its own
+reference through completion/Unknown/cancellation. No domain shared state, payload
+clone, cached permit or authority flag. One fixed control block is prospectively
+budgeted; no claim of complete native allocator/OOM or RSS coverage.
+
+Approve PublicCreditReplyExpectation(scope,kind,optional shard,optional amount,
+optional borrowed expected IDs) in existing log/public_credit.rs and private
+public_credit/reply.rs. inspect_public_credit_reply completely inspects the
+existing original response, matches intent17/response10/status, owner scope,
+operation/shard/count and (when known) exact original ID order, without restoring
+or cloning an owner. Add ScannedCreditReply::matches_ids and widen its existing
+inspection visibility only within log. Lookup responses may supply authoritative
+original IDs that were previously unknown; submitted/retried spends require the
+actual originally prepared IDs. Negative binding/EOF tests must execute.
+
+Approve application governance/credit.rs and credit/{model,prepare,dispatch}.rs.
+PublicCreditCallRequest borrows configured source/target/catalog,stable request
+and the validated normalized caller. PublicCreditCallLimits holds existing
+publication/read/codec/execution caps plus maximum prepared/ID/response bytes and
+whole workspace. PublicCreditCallError distinguishes options/limits/allocation,
+source reads/repair/preparation and missing owner/configuration; these errors
+precede CREDIT proposal but may follow actual catalog repair. No whole-call
+rollback claim. PublicCreditCallResult distinguishes Retained, missing Get,
+empty Cleanup, intent conflict/expiry/not-submitted, unresolved lookup, Unknown
+with boxed original PreparedPublicCreditCall, and PublicationUnconfirmed carrying
+the actual committed outcome. Original core result stays immutable; publication
+is an auxiliary durable outbox responsibility, not a fabricated rejected credit.
+
+PreparedPublicCreditCall owns source/target/request/catalog/credit scope, caller
+kind/shard/amount/intent,original stamp,exact generated spend IDs and shared final
+frame. Accessors expose immutable data and the existing CreditSpendUnknownView.
+submit_public_credit_call preflights all owners BEFORE lookup, resolves originals
+before owner/repair/entropy, reads exact source, repairs existing membership before
+mutation, derives current spend epoch, drops owner before preparation, encodes
+exact public bytes and submits. Missing Spend refuses without ghost/entropy;
+missing Lease requires limit; missing Get/Cleanup has no mutation. Successful new
+Lease commits owner/pending intent before post-commit repair/publication. Failed
+publication after accepted credit is explicit; a business rejection is not replaced
+by an operational publication error. Lookup-retained requests return the original
+core without fresh preparation; pending creation publication remains repairable
+through the durable outbox. retry_public_credit_call consumes the saved immutable
+context and submits original shared bytes/IDs/stamp, never a fresh spend. It must
+re-admit current budgets and execution authorization. Invalid retained replies
+become Unknown with that exact original context. No regeneration after unknown.
+
+Add Node public_credit/application.rs with application/{fixtures,ports}.rs
+before creation: PublicCreditFixture(root/scope,controlled clock,next maintenance
+ID,trace,selected fault), PublicCreditFault and PublicCreditTrace. Use existing
+GC3/credit2 pair/defaults plus actual appended committed logs and snapshot recovery
+for ALL successful writes/inquiries. Trace reads and submissions; no mock business
+success. Cover repaired uncataloged spend/get/renew/release, missing/no ghost,
+new owner before publication, registration refusal/unknown stopping dependency,
+retained-before-entropy, exact lost-reply retry/compensation and invalid response
+binding. Pure application tests/public_credit/{main,fixtures}.rs may test only
+preflight/no-effect boundaries, not fake durable successes. Existing target
+registrations are coordinator-owned additive edits. Add pure-port/module negative
+checks without weakening architecture policy. All400/600,fn100,depth4/complexity25
+limits hold. No new dependencies, public service, native/Linux or speedup claim.
+
+Retry ownership refinement before implementation: approve PublicCreditRetryError
+in credit/model.rs, owning the unchanged boxed original plus its preflight error.
+retry_public_credit_call takes Box<PreparedPublicCreditCall> and returns this
+error on refusal; a tighter current budget must never destroy the caller's only
+unknown-outcome compensation context. Dispatch likewise retains the same box.
+Approve private repair_existing_credit_catalog in the existing repair.rs: only
+the application path after its actual owner read may call it, avoiding a second
+full owner restore. No public existence flag or reusable authority is introduced.

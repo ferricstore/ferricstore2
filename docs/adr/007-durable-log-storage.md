@@ -1402,3 +1402,13 @@ without owner rows. Full caller orchestration must resolve original outcomes
 before fresh source reads/registration/entropy, repair existing membership before
 dependent mutations and preserve exact spend IDs on uncertainty. New owners
 commit with the existing pending publication before synchronous publication.
+
+Public credit application ownership: a shared immutable Arc<PreparedBytes> joins
+caller retry context and supervised execution lifetime without copying payloads.
+Original public17 identity and prepared bytes/IDs/stamp survive Unknown; retry
+re-admits and re-submits the same frame. Retained inquiry precedes fresh source,
+repair and entropy. Original response inspection binds operation/scope/shard/count
+and known IDs. Catalog repair can commit before credit proposal; accepted new
+owner credit can commit before synchronous publication. Represent those boundaries
+explicitly, preserving the atomic core outcome and durable publication outbox;
+do not invent a whole-call rollback or fresh spend after uncertainty.

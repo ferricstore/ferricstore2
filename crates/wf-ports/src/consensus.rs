@@ -14,6 +14,8 @@ mod claim;
 pub use catalog_publication::CreditCatalogPublicationPort;
 mod membership;
 mod mutation;
+mod public_credit;
+pub use public_credit::{CreditRequestLookup, PublicCreditSubmitPort};
 mod value;
 pub use membership::{
     AppliedRaftMembership, RaftMembership, RaftMembershipError, RaftMembershipLimits,

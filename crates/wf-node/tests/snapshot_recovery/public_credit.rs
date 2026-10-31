@@ -11,6 +11,7 @@ use wf_ports::{
     state::{GroupApplyStore, GroupApplyTransaction},
 };
 use wf_storage::{log::RedbLogStore, snapshot::RedbSnapshotStage, state::RedbStateStore};
+mod application;
 mod fixtures;
 use fixtures as p;
 #[test]
