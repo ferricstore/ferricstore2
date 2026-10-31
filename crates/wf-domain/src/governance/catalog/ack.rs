@@ -17,7 +17,15 @@ impl CreditCatalogAckRequest {
     /// # Errors
     /// Refuses nonpositive/nonexact, reversed or oversized ranges.
     pub const fn validate(self) -> Result<(), CreditCatalogAckRejection> {
-        Err(CreditCatalogAckRejection::InvalidRange)
+        if self.expected_head == 0
+            || self.up_to > crate::workflow::MAX_EXACT_MILLIS
+            || self.up_to < self.expected_head
+            || self.up_to - self.expected_head >= 256
+        {
+            Err(CreditCatalogAckRejection::InvalidRange)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -111,9 +119,16 @@ pub fn prepare_catalog_ack(
     meta: CreditCatalogMeta,
     request: CreditCatalogAckRequest,
 ) -> CreditCatalogAckPlan {
+    let decision = request.validate().and_then(|()| {
+        meta.acknowledge(request.expected_head, request.up_to)
+            .map_err(|error| match error {
+                CreditCatalogError::StaleCursor => CreditCatalogAckRejection::StaleCursor,
+                _ => CreditCatalogAckRejection::InvalidRange,
+            })
+    });
     CreditCatalogAckPlan {
         original: meta,
         request,
-        decision: Err(CreditCatalogAckRejection::InvalidRange),
+        decision,
     }
 }

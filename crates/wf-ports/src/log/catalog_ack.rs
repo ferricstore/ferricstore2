@@ -9,31 +9,33 @@ use wf_domain::workflow::{
 use wf_types::{identity::RequestId, version::CommittedTime};
 
 mod model;
+mod request;
+mod response;
 pub use model::PreparedCatalogAckRequest;
 
 /// Encodes exact original ACK controls and their canonical intent.
 /// # Errors
 /// Refuses invalid fields, byte/owner limits or allocation failure.
 pub fn encode_catalog_ack_request(
-    _scope: &RequestScope,
-    _request: &RequestId,
-    _stamp: CommittedTime,
-    _command: CreditCatalogAckRequest,
-    _limits: CodecLimits,
-    _maximum_owned_bytes: usize,
+    scope: &RequestScope,
+    request: &RequestId,
+    stamp: CommittedTime,
+    command: CreditCatalogAckRequest,
+    limits: CodecLimits,
+    maximum_owned_bytes: usize,
 ) -> Result<PreparedBytes, CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    request::encode(scope, request, stamp, command, limits, maximum_owned_bytes)
 }
 
 /// Fully inspects the frame and digest before creating any payload owners.
 /// # Errors
 /// Refuses malformed/unsupported frames, limits or allocation failure.
 pub fn prepare_catalog_ack_request(
-    _encoded: &[u8],
-    _limits: CodecLimits,
-    _maximum_owned_bytes: usize,
+    encoded: &[u8],
+    limits: CodecLimits,
+    maximum_owned_bytes: usize,
 ) -> Result<PreparedCatalogAckRequest<'_>, CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    request::prepare(encoded, limits, maximum_owned_bytes)
 }
 
 /// Borrows only header facts for explicitly selected catalog recovery.
@@ -41,42 +43,49 @@ pub fn prepare_catalog_ack_request(
 /// # Errors
 /// Refuses other profiles, bad headers or byte ceilings.
 pub fn catalog_ack_recovery_header(
-    _encoded: &[u8],
-    _limits: CodecLimits,
+    encoded: &[u8],
+    limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(CodecError::ByteLimit);
+    }
+    let header = request::header(&mut super::reader::Reader::new(encoded, limits))?;
+    Ok((13, [header.tenant,header.group,header.recovery], header.stamp))
 }
 
 /// Encodes one canonical25-byte private ACK response.
 /// # Errors
 /// Refuses inconsistent reply fields, limits or allocation failure.
 pub fn encode_catalog_ack_reply(
-    _reply: CreditCatalogAckReply,
-    _maximum_wire_bytes: usize,
-    _maximum_owned_bytes: usize,
+    reply: CreditCatalogAckReply,
+    maximum_wire_bytes: usize,
+    maximum_owned_bytes: usize,
 ) -> Result<Vec<u8>, CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    response::encode(reply, maximum_wire_bytes, maximum_owned_bytes)
 }
 
 /// Decodes one complete fixed-size reply under fresh explicit limits.
 /// # Errors
 /// Refuses bad framing/EOF/scalars or byte/owner ceilings.
 pub fn decode_catalog_ack_reply(
-    _encoded: &[u8],
-    _maximum_wire_bytes: usize,
-    _maximum_owned_bytes: usize,
+    encoded: &[u8],
+    maximum_wire_bytes: usize,
+    maximum_owned_bytes: usize,
 ) -> Result<CreditCatalogAckReply, CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    response::decode(encoded, maximum_wire_bytes, maximum_owned_bytes)
 }
 
 /// Checks exact response bytes against the complete neutral reply, without clones.
 /// # Errors
 /// Refuses inconsistent fields or any byte mismatch.
 pub fn verify_catalog_ack_reply(
-    _reply: CreditCatalogAckReply,
-    _encoded: &[u8],
+    reply: CreditCatalogAckReply,
+    encoded: &[u8],
 ) -> Result<(), CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    if response::bytes(reply)? != encoded {
+        return Err(CodecError::Malformed);
+    }
+    Ok(())
 }
 
 /// Fully inspects the original13/11 response; no workflow item count is inferred.
@@ -84,10 +93,19 @@ pub fn verify_catalog_ack_reply(
 /// # Errors
 /// Refuses other profiles, malformed replies or actual wire limits.
 pub fn catalog_ack_retained_summary(
-    _intent: ClientIntent,
-    _response_version: u16,
-    _response: &[u8],
-    _admission: AdmissionLimits,
+    intent: ClientIntent,
+    response_version: u16,
+    response: &[u8],
+    admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), CodecError> {
-    Err(CodecError::UnsupportedVersion)
+    if intent.version() != 13 || response_version != 11 {
+        return Err(CodecError::UnsupportedVersion);
+    }
+    let status = match response::decode(response, admission.decision_bytes(), 1024)? {
+        CreditCatalogAckReply::Accepted { .. } => RetainedStatus::Accepted,
+        CreditCatalogAckReply::Rejected { reason, .. } => {
+            RetainedStatus::CreditCatalogRejected(reason)
+        }
+    };
+    Ok((status, None))
 }

@@ -59426,3 +59426,18 @@ not passing/TDD execution claims. Source/log bindings are saved in
 contracts already exist; generic ClientIntent::new remains version1 only and
 the new retained business status is excluded from all other response profiles.
 Save this checkpoint before semantic bodies. The full catalog goal stays open.
+
+ACK phase-two RED: the three pure and three codec cases now pass unchanged.
+All eight stored tests compile and reach the driver: the old-capability control
+passes and seven fail at healthy State(UnsupportedPolicyProfile). Later deletion,
+namespace/cut/uncertainty assertions remain masked. Save before driver/writer
+bodies. See catalog-ack-driver-r0 JSON/logs. An earlier header-return lifetime
+compile error was fixed by returning the original input field slices directly;
+that compile failure is not semantic RED and no test source was changed.
+
+Ownership refinement before API creation: approve into_retained_parts on
+PreparedCatalogAckRequest, moving its owned scope/request/intent/command tuple
+after the real fresh gate. Drop its remaining decoder staging then; do not clone
+these header payloads into the retained outcome. The tuple is neutral data, not
+paid/commit authority. S prospectively reserves decision_bytes+4096, covering
+the original header owners/metadata and fixed response before materialization.
