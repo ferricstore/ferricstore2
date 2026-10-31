@@ -12,6 +12,35 @@ mod decode;
 mod encode;
 mod ids;
 mod policy;
+/// Original response operands; generated IDs may be unknown during retained lookup.
+#[derive(Clone, Copy)]
+pub struct PublicCreditReplyExpectation<'a> {
+    /// Exact original credit owner identity.
+    pub scope: &'a [u8],
+    /// Original public operation.
+    pub kind: wf_domain::governance::caller::CreditCallKind,
+    /// Original selected shard, when applicable.
+    pub shard: Option<u64>,
+    /// Original requested spend count, when applicable.
+    pub amount: Option<u64>,
+    /// Exact generated IDs for submitted/retried spends, in original order.
+    pub ids: Option<wf_domain::governance::caller::CreditIdList<'a>>,
+}
+/// Inspects complete original bytes without restoring or cloning an owner.
+/// Caller must admit18432 bytes of inspection scratch in its enclosing budget.
+/// # Errors
+/// Refuses other profiles, malformed bytes or original operand mismatches.
+pub fn inspect_public_credit_reply(
+    intent: ClientIntent,
+    version: u16,
+    response: &[u8],
+    expected: PublicCreditReplyExpectation<'_>,
+    credit: wf_domain::governance::credit::CreditLimits,
+    admission: wf_domain::workflow::admission::AdmissionLimits,
+) -> Result<wf_domain::workflow::request::RetainedStatus, E> {
+    let _ = (intent, version, response, expected, credit, admission);
+    Err(E::UnsupportedTag)
+}
 /// Explicit spend generation and entropy captured by the authorized preparer.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct CreditSpendPreparation {

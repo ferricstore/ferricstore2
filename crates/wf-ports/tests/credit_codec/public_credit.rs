@@ -214,3 +214,20 @@ fn public_credit_decoder_enforces_total_wire_cap_before_prepared_ownership() -> 
     );
     Ok(())
 }
+
+#[test]
+fn public_credit_reply_inspection_accepts_canonical_rejection_and_checks_full_frame() -> TestResult {
+    use wf_domain::{governance::credit::CreditLimits, governance::identified::IdentifiedCreditRejection as R,
+        workflow::{admission::AdmissionLimits, request::{ClientIntent, RetainedStatus}}};
+    use wf_ports::log::{PublicCreditReplyExpectation as Expected, inspect_public_credit_reply as inspect};
+    // Independent wire recipe: FWGR1, Rejected, NotFound, absent owner, zero IDs.
+    let bytes = b"FWGR\0\x01\xff\x01\0\0\0\0\0";
+    let expected = Expected {scope:b"scope",kind:K::Spend,shard:Some(0),amount:Some(2),ids:None};
+    let intent = ClientIntent::public_credit([3;32]);
+    assert_eq!(inspect(intent,10,bytes,expected,CreditLimits::default(),AdmissionLimits::default())?,
+        RetainedStatus::GovernanceRejected(R::NotFound));
+    let mut trailing = bytes.to_vec(); trailing.push(0);
+    assert!(inspect(intent,10,&trailing,expected,CreditLimits::default(),AdmissionLimits::default()).is_err());
+    assert_eq!(inspect(intent,9,bytes,expected,CreditLimits::default(),AdmissionLimits::default()),Err(E::UnsupportedVersion));
+    Ok(())
+}
