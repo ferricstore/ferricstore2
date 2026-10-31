@@ -16,14 +16,25 @@ pub(crate) fn require(tx: &RedbStateTransaction<'_>, scope: &RequestScope) -> Re
     if scope.group() != tx.group || scope.recovery() != tx.recovery {
         return Err(E::NamespaceConflict);
     }
-    if tx.layout != 8 {
-        return Err(E::UnsupportedPolicyProfile);
+    tx.require_governance_catalog()
+}
+
+impl RedbStateTransaction<'_> {
+    /// Requires the actual immutable target capability under this same guard.
+    /// # Errors
+    /// Refuses unsupported profiles, corruption or continuous admission.
+    pub fn require_governance_catalog(&self) -> Result<(), E> {
+        self.checked(|| {
+            if self.layout != 8 {
+                return Err(E::UnsupportedPolicyProfile);
+            }
+            self.admit_read(512)?;
+            if !self.value_manifest()?.governance_catalog {
+                return Err(E::UnsupportedPolicyProfile);
+            }
+            Ok(())
+        })
     }
-    tx.admit_read(512)?;
-    if !tx.value_manifest()?.governance_catalog {
-        return Err(E::UnsupportedPolicyProfile);
-    }
-    Ok(())
 }
 
 pub(crate) fn validate_row(value: &[u8]) -> Result<(), E> {

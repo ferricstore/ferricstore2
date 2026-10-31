@@ -2,7 +2,47 @@
 
 Updated: 2026-10-31. The full-completion goal remains active; work solo.
 
-Current batch: M2-CREDIT-CATALOG1, still unfinished. Durable catalog ACK now joins
+Current batch: M2-CREDIT-CATALOG1, still unfinished. Target governance catalog
+membership now has an independent explicit FWSS8 capability, family18 binary
+set rows and closed operation12/intent14/response12 framing. One consumed
+Immediate writer joins bounded deduplicated set changes, original retained
+reply and applied control. Retries cannot resurrect subsequently removed
+members; exact request collisions share the existing retained namespace.
+Coherent prefix pages require a surviving cursor anchor and borrow the last
+member for the next cursor. Canonical reopen and snapshot compatibility require
+the capability even for receipt-only state after an empty command/removal.
+Explicit Node selection audits full historical bodies and replays the same
+writer through purged and received-snapshot suffixes.
+
+All12 local gates pass on1919 frozen non-Markdown inputs/1330 Rust files with
+zero drift:1469 cases/115 executable targets,54 architecture cases,Python7 and11
+doctests/15 targets. Every previous1454 and original1294 case identity/status/
+multiplicity and both benchmark correctness smokes remain. The15 new cases are
+two domain,two codec,seven actual storage andfour Node. Genuine failures precede
+bodies at077c57f (four domain/codec),580d75f (six genesis failures,one old-
+capability control passes),0f765aa (six actual driver failures) and176a6a6
+(three Node failures). The fourth Node control is post-body evidence. All640
+old test/benchmark files are preserved as636 whole files andfour exact module-
+registration inverses. Six saved sources remain as three whole files,one exact
+Node prefix,two complete import-order/equivalent-conditional inverses. See
+/private/tmp/ferricstore2-catalog-membership-{r0,storage-r0,driver-r0,node-r0,
+focused-checks,final-pipeline,source-audit,full-identity,full-parity}.json andlogs.
+No native performance claim or new full source-case credit.
+
+Actual full parity still exits1 with unchanged135/149/646 checked accounting,
+5903/4222/1681/1655 runtime reconciliation and5858 unported frozen textual
+declarations. Next: coherent owner-batch observations and idempotent publisher
+ports/orchestration, verifying actual placement and publishing before ACK;
+explicit combined owner/target genesis for same-group composition; bounded
+collection, public existing-owner repair and cleaner progress/fairness. Select
+concrete new artifacts through solo architecture review before creation. Public
+Claim/policy/release-outbox parents, accepted consensus, application and HTTP/TCP
+integration, complete required source/native/Linux/macOS acceptance and M1-M8
+exits remain unfinished. The primary checkout only points here; its last adopted
+code remains728650f. Keep the full goal active; do not adopt the unfinished
+feature branch or treat these local gates as full product completion.
+
+Previous checkpoint: durable catalog ACK joins
 bounded queue deletion, metadata, retained reply and applied control in one
 Immediate commit. The fixed operation11/intent13/response11 profile remains
 closed to generic callers. Retained retries preserve the original reply after

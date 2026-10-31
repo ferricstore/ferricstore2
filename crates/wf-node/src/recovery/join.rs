@@ -62,6 +62,7 @@ pub(super) fn observe(
             })?;
     }
     super::credit::require(&tx, limits)?;
+    super::catalog_membership::require(&tx, limits)?;
     let (control, value) =
         read_applied_state(&tx, limits.membership, limits.workspace).map_err(Error::State)?;
     *membership = match (value.entry(), value.stamp()) {
@@ -133,7 +134,9 @@ pub(super) fn normal_header<'a>(
     namespace: (&GroupId, &RecoveryId),
     limits: &CommittedRecoveryLimits,
 ) -> Result<(u16, [&'a [u8]; 3], CommittedTime), Error> {
-    let header = if body.get(6) == Some(&11) && super::catalog_ack::enabled(limits) {
+    let header = if body.get(6) == Some(&12) && super::catalog_membership::enabled(limits) {
+        wf_ports::log::catalog_membership_recovery_header(body, limits.normal.codec)
+    } else if body.get(6) == Some(&11) && super::catalog_ack::enabled(limits) {
         wf_ports::log::catalog_ack_recovery_header(body, limits.normal.codec)
     } else if body.get(6) == Some(&10) && limits.credit.is_some() {
         credit_recovery_header(body, limits.normal.codec)
@@ -219,6 +222,9 @@ fn audit_normal(
     base: usize,
 ) -> Result<EntryStamp, Error> {
     let (profile, _, stamp) = normal_header(body, namespace, limits)?;
+    if profile == 14 {
+        return super::catalog_membership::audit(body, limits, base, stamp);
+    }
     if profile == 13 {
         return super::catalog_ack::audit(body, limits, base, stamp);
     }

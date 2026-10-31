@@ -1,6 +1,10 @@
 //! Fixed startup diagnoses shared by committed and snapshot recovery.
 
-use super::*;
+use super::{
+    ClaimTransactionError, CodecError, CorePolicyTransactionError, OriginalPolicyTransactionError,
+    RaftLogError, RaftMembershipError, RecordBatchTransactionError, StateTransactionError,
+    WorkflowValueTransactionError,
+};
 use std::fmt;
 
 /// Fixed startup failures; every recovery error drops both database handles.
@@ -46,6 +50,8 @@ pub enum CommittedRecoveryError {
     Value(WorkflowValueTransactionError),
     /// Explicit identified governing-credit preparation/transaction diagnosis.
     Credit(wf_storage::transaction::CreditTransactionError),
+    /// Explicit target catalog membership preparation/transaction diagnosis.
+    CatalogMembership(wf_storage::transaction::CatalogMembershipTransactionError),
     /// Header-only parsing failure.
     Codec(CodecError),
     /// Closed Blank/Membership parsing failure.
@@ -74,6 +80,7 @@ impl fmt::Display for CommittedRecoveryError {
             Self::OriginalPolicy(error) => return fmt::Display::fmt(error, f),
             Self::Value(error) => return fmt::Display::fmt(error, f),
             Self::Credit(error) => return fmt::Display::fmt(error, f),
+            Self::CatalogMembership(error) => return fmt::Display::fmt(error, f),
             Self::Codec(error) => return fmt::Display::fmt(error, f),
             Self::Membership(error) => return fmt::Display::fmt(error, f),
         })

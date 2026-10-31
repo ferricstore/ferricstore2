@@ -320,3 +320,77 @@ fn governance_catalog_node_purged_and_received_snapshots_preserve_suffix_and_rec
     std::fs::remove_dir_all(dir)?;
     Ok(())
 }
+
+#[test]
+fn governance_catalog_node_requires_actual_empty_capability_and_prepays_decoder_workspace()
+-> TestResult {
+    let dir = f::directory("governance-node-profiles")?;
+    let scope = f::scope()?;
+    let empty = dir.join("empty");
+    std::fs::create_dir(&empty)?;
+    let (log, state) = pair(&empty)?;
+    drop(recover_committed(
+        log,
+        state,
+        scope.group(),
+        scope.recovery(),
+        selected()?,
+    )?);
+    let old = dir.join("old");
+    std::fs::create_dir(&old)?;
+    let log = self::log(&old)?;
+    let state = RedbStateStore::create(
+        &old.join("state.redb"),
+        scope.group().clone(),
+        scope.recovery().clone(),
+        StateStoreGenesis {
+            initial_time: f::clock(0, 0, 0)?,
+            placements: &[],
+            policies: &[],
+        },
+        StateStoreLimits::default(),
+    )?;
+    drop((log, state));
+    let before = super::fixtures::cohort(&old)?;
+    let logs = f::log_rows(&old)?;
+    let (log, state) = f::open_pair(&old)?;
+    assert_eq!(
+        recover_committed(log, state, scope.group(), scope.recovery(), selected()?).err(),
+        Some(E::State(
+            wf_ports::state::StateTransactionError::UnsupportedPolicyProfile
+        ))
+    );
+    assert_eq!(super::fixtures::cohort(&old)?, before);
+    assert_eq!(f::log_rows(&old)?, logs);
+    let actual = dir.join("actual");
+    std::fs::create_dir(&actual)?;
+    let (mut log, state) = pair(&actual)?;
+    append(&mut log, &frames()?, false)?;
+    drop((log, state));
+    let before = cohort(&actual)?;
+    let logs = f::log_rows(&actual)?;
+    let mut normal = f::driver_limits();
+    normal.workspace_bytes = 1;
+    let limits = CommittedRecoveryLimits::new(
+        wf_ports::consensus::RaftMembershipLimits::default(),
+        (10000, 64 * f::MIB, 64 * f::MIB, 32 * f::MIB),
+        normal,
+        (1000, 64 * f::MIB),
+        16 * f::MIB,
+        512 * f::MIB,
+    )?
+    .with_governance_catalogs();
+    let (log, state) = f::open_pair(&actual)?;
+    assert_eq!(
+        recover_committed(log, state, scope.group(), scope.recovery(), limits).err(),
+        Some(E::CatalogMembership(
+            wf_storage::transaction::CatalogMembershipTransactionError::State(
+                wf_ports::state::StateTransactionError::Limit
+            )
+        ))
+    );
+    assert_eq!(cohort(&actual)?, before);
+    assert_eq!(f::log_rows(&actual)?, logs);
+    std::fs::remove_dir_all(dir)?;
+    Ok(())
+}

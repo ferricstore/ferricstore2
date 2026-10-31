@@ -59619,3 +59619,48 @@ the historical diagnosis expects TrailingBytes and gets UnsupportedEntry.
 Snapshot refusal is Recovery(UnsupportedEntry). Save these actual failures
 before dispatch/audit bodies; later received/purged assertions remain masked.
 See catalog-membership-node-r0.log. No saved Node test source was repaired.
+
+The three saved Node cases now pass unchanged. Target opt-in requires actual
+capability during both initial/final observations, including empty cohorts;
+complete historical bodies are decoded before accepting an applied checkpoint.
+Replay uses the same consumed writer and original retained namespace. Moving
+the error definition keeps recovery.rs below400 lines; explicit imports replace
+the initial wildcard Clippy refusal. No lint exemption was added.
+
+One appended post-body control checks actual capability on empty old/new stores
+and refuses a one-byte Normal workspace without changing any table/log. Its
+initial expected top-level Limit diagnosis was corrected to the exact reached
+CatalogMembership(State(Limit)): this is an unapplied suffix, so the real driver
+does the prepaid refusal. It is supplemental evidence, not original RED credit.
+The original three cases remain an exact prefix. Source audit preserves640 old
+test/benchmark files:636 whole andfour exact registration inverses. Six saved
+test sources remain as three whole files,one Node prefix,one complete fixture
+import-order inverse andone complete equivalent conditional inverse.
+
+Further pinned source review: LimitStore repairs existing catalog membership
+before the original mutation; newly created owners commit before publication.
+Post-commit registration failure replaces success but preserves an original
+business error. Missing Get returns nil without creating authority. The cleaner
+counts cursor reset/persistence and cleanup/unregistration commands in its
+budget, uses at mosttwo consecutive pages per scope during a tick and resets
+when an actual cursor member disappears. These remain unimplemented parents.
+Mandatory publication cases in flow_governance_limit_storage_test.exs925..1085
+require one selected source partition, two read batches, one membership write,
+valid-prefix ACK and discarding missing-owner intents. Strict Rust canonical
+reopen versus native malformed-KV injection still needs an explicit supported
+migration disposition; do not silently credit that full source scenario.
+Publisher routing must verify actual placement rather than treating catalog
+member bytes or lease shard IDs as authority. Accepted consensus remains open.
+
+Membership integration checkpoint: all12 workspace gates pass on1919 frozen
+non-Markdown inputs/1330 Rust files with no drift. All1469 cases/115 executable
+targets preserve all1454 predecessor and1294 original case identities/statuses/
+multiplicities; both benchmark correctness smokes,54 architecture cases,Python7
+and11 doctests/15 targets pass. The full runtime suite took484.62 seconds.
+Actual cargo parity exits1 with unchanged135/149/646 checked accounting and
+5903/4222/1681/1655 runtime reconciliation;5858 frozen textual declarations
+remain unported. No full source-case, Linux or native performance credit.
+The capability is independent of credit-owner shard configuration; the combined
+creator, coherent owner-batch/publisher, repair/cleaner and public parents remain
+required. Preserve the accepted-consensus boundary and all mandatory source
+scenarios rather than marking the catalog/product goal complete.
