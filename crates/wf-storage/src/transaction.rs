@@ -11,6 +11,10 @@ use wf_ports::state::StateTransactionError;
 mod claim;
 pub(crate) use claim::values::ClaimValuePublicationPlan;
 mod catalog_ack;
+mod catalog_membership;
+pub use catalog_membership::{
+    CatalogMembershipTransactionError, apply_catalog_membership_transaction,
+};
 mod core_policy;
 mod credit;
 pub use catalog_ack::apply_catalog_ack_transaction;

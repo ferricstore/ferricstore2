@@ -26,14 +26,28 @@ impl<'a> CatalogMembershipChange<'a> {
     /// Validates every original member before deduplication.
     /// # Errors
     /// Refuses oversized fields/batches and empty registrations.
-    pub fn validate(self, _maximum_key_bytes: usize) -> Result<(), CatalogMembershipError> {
-        Err(CatalogMembershipError(self.action))
+    pub fn validate(self, maximum_key_bytes: usize) -> Result<(), CatalogMembershipError> {
+        if maximum_key_bytes == 0
+            || self.catalog.len() > maximum_key_bytes
+            || self.members.len() > 256
+            || self.members.iter().any(|member| {
+                member.len() > maximum_key_bytes
+                    || (self.action == CatalogMembershipAction::Register && member.is_empty())
+            })
+        {
+            return Err(CatalogMembershipError(self.action));
+        }
+        Ok(())
     }
 
     /// Visits first occurrences without allocating another member container.
-    #[must_use]
     pub fn unique_members(self) -> impl Iterator<Item = &'a [u8]> {
-        self.members.iter().copied().take(0)
+        self.members
+            .iter()
+            .enumerate()
+            .filter_map(move |(index, member)| {
+                (!self.members[..index].contains(member)).then_some(*member)
+            })
     }
 }
 

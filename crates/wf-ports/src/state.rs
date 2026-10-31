@@ -6,6 +6,7 @@ mod claim;
 mod control;
 mod core_policy;
 mod credit_catalog;
+mod governance_catalog;
 mod history;
 mod original_policy;
 mod policy;
@@ -18,6 +19,7 @@ pub use claim::{
 pub use control::{GroupControlChanges, GroupControlTransaction};
 pub use core_policy::{GroupCorePolicyChanges, GroupCorePolicyTransaction};
 pub use credit_catalog::{CreditCatalogEntry, CreditCatalogPage};
+pub use governance_catalog::{GovernanceCatalogPage, GovernanceCatalogRead};
 pub use history::{
     StoredWorkflowHistoryRow, StoredWorkflowHistorySnapshot, WorkflowHistoryDirection,
     WorkflowHistoryHydrationError, WorkflowHistoryHydrationLimits, WorkflowHistoryHydrationRequest,
@@ -63,6 +65,8 @@ pub enum StateTransactionError {
     Allocation,
     /// The supplied mathematical change container is incoherent.
     InvalidChanges,
+    /// The original continuation member disappeared between coherent reads.
+    CatalogChanged,
 }
 
 impl fmt::Display for StateTransactionError {
@@ -82,6 +86,7 @@ impl fmt::Display for StateTransactionError {
             Self::Limit => "state transaction read limit",
             Self::Allocation => "state transaction allocation failed",
             Self::InvalidChanges => "invalid state transaction changes",
+            Self::CatalogChanged => "ERR flow governance catalog changed during traversal",
         })
     }
 }

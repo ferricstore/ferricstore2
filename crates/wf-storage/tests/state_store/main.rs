@@ -33,6 +33,7 @@ mod credit;
 mod cursor;
 mod faults;
 mod fixtures;
+mod governance_catalog;
 mod recovery;
 mod snapshot;
 mod workflow_values;

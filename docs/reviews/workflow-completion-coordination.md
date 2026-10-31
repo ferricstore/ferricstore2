@@ -59555,3 +59555,21 @@ historical audit. Publisher ports/application artifacts require a further
 concrete selection once these target/source contracts exist. No accepted Raft,
 service, full source-case parity or native performance claim follows from this
 selection. Linux and macOS keep identical byte/resource semantics.
+
+Refinement before storage artifacts: approve CatalogMembershipTransactionError
+in the selected transaction facade, separating invalid limits, codec, ordered
+apply and actual state failures without reusing a credit-specific error. Approve
+the test-only Cohort alias in the selected storage fixtures for exact comparison
+of all six actual tables; it never enters production dependencies.
+
+Membership RED evidence:077c57f saves four genuine compiled domain/codec
+failures before bodies. All35 domain and15 codec cases now pass; strict
+all-target Clippy passes for both crates after removing redundant must_use on an
+Iterator. The seven stored cases compile: the old-capability control passes and
+six stop at target genesis UnsupportedPolicyProfile. Later writer/rollback/
+uncertainty predicates are masked. An initial test-only import correction and
+the old four-table donor's fixed-six count assertion were repaired before this
+saved storage RED: the cohort still inventories every actual table and requires
+the actual rows/metadata tables. No passing/TDD credit for either compile/setup
+failure. Save before target genesis and writer bodies. Receipts/logs use
+/private/tmp/ferricstore2-catalog-membership-{r0,first,clippy,storage-r0}.

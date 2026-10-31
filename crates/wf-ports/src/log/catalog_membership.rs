@@ -11,60 +11,78 @@ use wf_domain::{
 use wf_types::{identity::RequestId, version::CommittedTime};
 
 mod model;
+mod request;
 pub use model::PreparedCatalogMembershipRequest;
 
 /// Derives neutral canonical original command identity, without commit authority.
 /// # Errors
 /// Refuses invalid original fields and batch ceilings.
 pub fn catalog_membership_request_intent(
-    _command: CatalogMembershipChange<'_>,
+    command: CatalogMembershipChange<'_>,
 ) -> Result<ClientIntent, E> {
-    Err(E::UnsupportedVersion)
+    request::intent(command)
 }
 
 /// Encodes the complete original private command and intent.
 /// # Errors
 /// Refuses malformed fields, byte/owner limits or allocation failure.
 pub fn encode_catalog_membership_request(
-    _scope: &RequestScope,
-    _request: &RequestId,
-    _stamp: CommittedTime,
-    _command: CatalogMembershipChange<'_>,
-    _limits: CodecLimits,
-    _maximum_owned: usize,
+    scope: &RequestScope,
+    request: &RequestId,
+    stamp: CommittedTime,
+    command: CatalogMembershipChange<'_>,
+    limits: CodecLimits,
+    maximum_owned: usize,
 ) -> Result<PreparedBytes, E> {
-    Err(E::UnsupportedVersion)
+    request::encode(scope, request, stamp, command, limits, maximum_owned)
 }
 
 /// Completely validates body, digest and EOF before allocating payload owners.
 /// # Errors
 /// Refuses unsupported frames, invalid content or admission failures.
 pub fn prepare_catalog_membership_request(
-    _encoded: &[u8],
-    _limits: CodecLimits,
-    _maximum_owned: usize,
+    encoded: &[u8],
+    limits: CodecLimits,
+    maximum_owned: usize,
 ) -> Result<PreparedCatalogMembershipRequest<'_>, E> {
-    Err(E::UnsupportedVersion)
+    request::prepare(encoded, limits, maximum_owned)
 }
 
 /// Borrows only the explicitly selected header; full body audit remains required.
 /// # Errors
 /// Refuses malformed headers, other profiles or byte limits.
 pub fn catalog_membership_recovery_header(
-    _encoded: &[u8],
-    _limits: CodecLimits,
+    encoded: &[u8],
+    limits: CodecLimits,
 ) -> Result<(u16, [&[u8]; 3], CommittedTime), E> {
-    Err(E::UnsupportedVersion)
+    if encoded.len() > limits.admission().decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    let header = request::header(&mut super::reader::Reader::new(encoded, limits))?;
+    Ok((
+        14,
+        [header.tenant, header.group, header.recovery],
+        header.stamp,
+    ))
 }
 
 /// Checks the complete fixed success reply under its exact intent/response pair.
 /// # Errors
 /// Refuses unsupported profiles, altered bytes or wire limits.
 pub fn catalog_membership_retained_summary(
-    _intent: ClientIntent,
-    _version: u16,
-    _response: &[u8],
-    _admission: AdmissionLimits,
+    intent: ClientIntent,
+    version: u16,
+    response: &[u8],
+    admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), E> {
-    Err(E::UnsupportedVersion)
+    if intent.version() != 14 || version != 12 {
+        return Err(E::UnsupportedVersion);
+    }
+    if response.len() > admission.decision_bytes() {
+        return Err(E::ByteLimit);
+    }
+    if response != b"FWGR\0\x01" {
+        return Err(E::Malformed);
+    }
+    Ok((RetainedStatus::Accepted, None))
 }
