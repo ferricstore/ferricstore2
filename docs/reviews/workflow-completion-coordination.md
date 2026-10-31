@@ -60218,3 +60218,79 @@ source/native/Linux/performance credit, feature adoption or push. Next complete
 the real bounded cleaner with cursor/failed-command accounting and fairness,
 then remaining public parents and ordered milestone obligations. The original
 dirty Elixir checkout remains untouched and native fixes unexecuted.
+
+### M2-CREDIT-CATALOG1 bounded cleaner runner (solo, before artifacts)
+
+Previous goal turn is progress:208f253 implements consumed durable progress and
+Node historical/replay/snapshot integration;f7543c2/01485fb preserve the verified
+1522-case checkpoint and open scope. Continue solo; no independent review claim.
+
+Source recheck: pinned limit_storage_cleaner.ex run_tick/run_once_accounted,
+finish_catalog_step/persist_cursor and CreditLease.expired_lease_refs select16
+commands by default,max64,two consecutive pending pages and4N+4 attempts. Count
+failed cleanup/prune/progress attempts; exhausted cursor budget retains old
+progress. Catch-up requires a wrapped step with no deletions in that cycle.
+An expired lease needs cleanup when reservation_page>0 or queued cleanup exists.
+The600-ID/budget2 source case requires512 then88;300-ID busy fairness requires300
+then1 without exceeding either tick budget. Preserve empty/no-delete and corrupt
+hint reset budget. The same-group malformed authoritative-owner migration remains
+unresolved; do not soften canonical Redb fencing or claim that source case passes.
+
+Approve application governance/cleaner.rs with model.rs,plan.rs,step.rs and
+ dispatch.rs children. Public types CreditCleanupSource(borrowed configured scope
+and actual shard count),CreditCleanupRequest(target,sources,catalog,now_ms),
+CreditCleanupLimits(codec/read/source-count/execution/enclosing bounds),
+CreditCleanupStats,CreditCleanupStep,CreditCleanupReply,CreditCleanupFailure and
+CreditCleanupError; functions run_credit_cleanup_tick(optional command budget,
+default16) and run_credit_cleanup_once(maximum3 commands,burst1). Private traversal
+state holds the actual previous cursor and one exact streak member; move member
+owners rather than clone maps/payloads. Each step reloads committed progress.
+Lookup1 member plus bounded lookahead; resolve its borrowed identity only against
+configured same-tenant source scopes. Observation grants no later cleanup truth.
+Use actual private cleanup/membership/progress frames and complete retained scope,
+request,intent,status/response verification. Failed or unknown attempts count;
+only confirmed progress changes can establish wrapped/caught-up state. This is
+bounded maintenance orchestration, not a fabricated timer/accepted Raft service.
+
+Approve prepare_catalog_command_at(scope,not_before_ms) default method in existing
+CreditCatalogPublicationPort. Default may use its trusted preparer only when its
+returned wall meets the floor; refuse earlier stamps. Production overrides still
+own clock/routing/authorization. Committed cleanup uses that original trusted
+stamp and revalidates current owner; the tick's time is only a due hint.
+Approve pure credit_cleanup_intent(scope,shard_count) and
+credit_cleanup_retained_summary(intent,version,response,credit,admission) in
+existing log/credit.rs and its facade exports. Hash exact canonical Cleanup body
+without allocating/redecoding it. Fully inspect the complete reply, borrow its
+owner and expose only(deleted,pending); no full-owner response clone. Reject any
+other operation/profile and trailing/corrupt bytes. Prepay bounded inspection
+scratch18432 plus current/next/streak cursor owners, read/adapter/encoded frame,
+retained response and supervised execution; no speculative Box conversion.
+
+Approve ports tests credit_codec/cleanup.rs; application integration target
+ tests/credit_cleanup/main.rs with fixtures.rs (BudgetFixture,BudgetCall,
+BudgetFault); Node snapshot_recovery/credit_cleanup.rs with fixtures.rs/ports.rs
+(CleanupFixture,CleanupCall,CleanupFault,CleanupStore). Test the actual600-ID and
+300+1 cases, empty catalog, invalid hint reset, persisted cursor after budget
+exhaustion, missing-owner prune, original retained replies, reopen/snapshots,
+malformed/foreign/unknown replies, failures and attempt/workspace ceilings.
+Use genuine rejecting interfaces and save compiled failures before bodies.
+Controlled semantic ports supplement actual Redb/log tests and are never labeled
+as a production service. Add no dependencies or physical schema. All existing
+assertions stay intact;400/600-line,100-function,depth4/complexity25 policies hold.
+
+Actual rejecting predecessor: ports2 and application4 compile/fail; Node compiles
+with11 failures at the selected InvalidOptions entry after actual seeding, while
+invalid-budget/no-mutation control passes. Later deletion, cursor, snapshot and
+retained assertions remain masked and receive no independent original RED credit.
+Initial fixture trait imports/mutability and a private key-decoder access were
+compile errors, corrected before this semantic run. Observe actual reservation
+rows with an independent complete escaped-component parser; expose no private
+production decoder. Store commit fixtures use the real snapshot-aware recovery
+path so later purged-prefix commands are supported. Save this exact cohort.
+
+Approve private CleanupTraversal(cursor,step) in cleaner/step.rs to keep actual
+previous progress separate from a possibly failed cleanup reply; finish takes
+bounded budget/desired cursor/wrap inputs and only publishes a confirmed cursor
+into a successful reply. This avoids cloning a cursor and keeps helper arity
+within the standard limit. Helpers remain in the already approved plan/step/
+dispatch modules; no additional file, dependency or authority is introduced.

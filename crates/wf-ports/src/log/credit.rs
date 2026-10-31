@@ -19,6 +19,29 @@ mod response;
 mod status;
 mod view;
 
+/// Canonical private Cleanup identity without a temporary body allocation.
+/// # Errors
+/// Refuses malformed scope or shard-count bounds.
+pub fn credit_cleanup_intent(scope: &[u8], shard_count: u64) -> Result<ClientIntent, CodecError> {
+    let _ = (scope, shard_count);
+    Err(CodecError::UnsupportedVersion)
+}
+
+/// Completely inspects an accepted Cleanup reply, borrowing its original owner.
+/// Callers prospectively admit18432 bytes of inspection scratch.
+/// # Errors
+/// Refuses any other profile/decision, corruption, EOF or admission failure.
+pub fn credit_cleanup_retained_summary(
+    intent: ClientIntent,
+    version: u16,
+    response: &[u8],
+    credit: CreditLimits,
+    admission: AdmissionLimits,
+) -> Result<(u16, bool), CodecError> {
+    let _ = (intent, version, response, credit, admission);
+    Err(CodecError::UnsupportedVersion)
+}
+
 /// Restores one complete original reply and visits only its public fields.
 /// The visitor's iteration, copies and allocation are external work. Borrowed
 /// reply data cannot escape the callback; no current owner read is performed.

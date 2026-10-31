@@ -1,5 +1,12 @@
 //! Governance maintenance orchestration through configured semantic capabilities.
 
+mod cleaner;
+pub use cleaner::{
+    CreditCleanupError, CreditCleanupFailure, CreditCleanupLimits, CreditCleanupReply,
+    CreditCleanupRequest, CreditCleanupSource, CreditCleanupStats, CreditCleanupStep,
+    run_credit_cleanup_once, run_credit_cleanup_tick,
+};
+
 mod collection;
 pub use collection::{
     GovernanceCatalogCollection, GovernanceCatalogCollectionError,

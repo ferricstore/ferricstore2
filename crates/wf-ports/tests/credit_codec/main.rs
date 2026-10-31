@@ -6,6 +6,7 @@ mod catalog_ack;
 mod catalog_member;
 mod catalog_membership;
 mod catalog_progress;
+mod cleanup;
 mod framing;
 mod view;
 

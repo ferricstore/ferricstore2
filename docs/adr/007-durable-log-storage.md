@@ -1351,3 +1351,14 @@ the existing strict fencing policy. Cursor hints never authorize credit deletion
 cleanup must revalidate actual owner/epoch/ID state through committed apply.
 The native malformed-owner fairness disposition, full cleaner/public scheduler,
 accepted consensus and platform/source acceptance remain separate requirements.
+
+
+Selected bounded credit cleaner runner uses actual catalog/progress/owner reads
+and supervised private Cleanup/membership/progress commands. Default16/max64
+attempted commands, two-page pending-owner bursts and4N+4 attempts preserve the
+pinned scheduler accounting. Cursor reset/write attempts share that budget; only
+confirmed effective progress can wrap. Fresh steps reload committed hints.
+Trusted preparation must meet the explicit tick time floor; apply revalidates
+actual current owner and committed time. No timer, consensus acknowledgment or
+same-group malformed-owner migration is implied by this runner. See the concrete
+solo artifact/ownership review in workflow-completion-coordination.md.

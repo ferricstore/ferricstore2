@@ -42,10 +42,10 @@ mod complete_policy;
 mod control;
 mod credit;
 pub use credit::{
-    PreparedCreditRequest, credit_recovery_header, credit_retained_summary, decode_credit_owner,
-    decode_credit_reply, encode_credit_owner, encode_credit_reply, encode_credit_reply_parts,
-    encode_credit_request, prepare_credit_request, verify_credit_reply_parts,
-    with_public_credit_reply,
+    PreparedCreditRequest, credit_cleanup_intent, credit_cleanup_retained_summary,
+    credit_recovery_header, credit_retained_summary, decode_credit_owner, decode_credit_reply,
+    encode_credit_owner, encode_credit_reply, encode_credit_reply_parts, encode_credit_request,
+    prepare_credit_request, verify_credit_reply_parts, with_public_credit_reply,
 };
 mod decode;
 mod encode;

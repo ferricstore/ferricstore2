@@ -9,6 +9,7 @@ mod catalog_publication;
 mod claim;
 mod core_policy;
 mod credit;
+mod credit_cleanup;
 #[path = "../../../wf-storage/tests/state_store/faults/backend.rs"]
 mod disk_backend;
 mod faults;

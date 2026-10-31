@@ -10,6 +10,17 @@ use wf_types::{identity::RequestId, version::CommittedTime};
 /// stages. Retain bytes and admission through completion after handoff, even on
 /// Unknown/cancellation. No-proposal proof is distinct from physical abort.
 pub trait CreditCatalogPublicationPort: CreditCatalogReadPort {
+    /// Prepares a trusted maintenance stamp at or after the explicit tick floor.
+    /// # Errors
+    /// Refuses before proposal when trusted time cannot meet that floor.
+    fn prepare_catalog_command_at(
+        &mut self,
+        scope: &RequestScope,
+        not_before_ms: u64,
+    ) -> Result<(RequestId, CommittedTime), MutationNotSubmitted> {
+        let _ = (scope, not_before_ms);
+        Err(MutationNotSubmitted::Preparation)
+    }
     /// Prepares a fresh internal identity/stamp to avoid expired-attempt deadlock.
     /// # Errors
     /// Refuses before this attempt is proposed.
