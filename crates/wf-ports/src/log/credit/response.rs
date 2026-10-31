@@ -26,6 +26,9 @@ pub(super) struct ScannedCreditReply<'a> {
 }
 
 impl ScannedCreditReply<'_> {
+    pub(super) fn owner_scope(&self) -> Option<&[u8]> {
+        self.owner.as_ref().map(ScannedCreditOwner::scope)
+    }
     pub(super) const fn summary(&self) -> (D, usize) {
         (self.decision, self.count)
     }

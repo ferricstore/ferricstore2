@@ -60355,3 +60355,11 @@ underpaid-empty-page accounting with observed(commands0,errors0) instead of
 (0,8). Save this integrated body plus exact new failing sources before borrowed
 scope binding and fixed-fee validation. No original source/runtime mapping or
 prior expected assertion was removed; the full all12 checkpoint is stillf7543c2.
+
+Both savedR1 regressions now pass with their complete source files unchanged.
+All6 application and3 ports cases pass; strict all-target application/Node/ports
+Clippy passes. The17 actual Node cases passed before the two narrow fixes; full
+frozen integration will exercise them again. Borrowed cleanup owner scope is now
+compared with the exact original requested credit scope after complete inspection;
+empty pages pay their fixed128-byte observation owner fee. No suppression or
+allocation was added. Freeze the complete candidate for one all12 checkpoint.

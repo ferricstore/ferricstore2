@@ -66,15 +66,16 @@ pub(super) fn read(limits: L) -> GovernanceCatalogReadLimits {
     }
 }
 pub(super) fn valid_page(page: &GovernanceCatalogPage, cursor: Option<&[u8]>, limits: L) -> bool {
-    page.members.len() <= 1
-        && page.full == (page.members.len() == 1)
+    if page.members.len() > 1 || page.full != (page.members.len() == 1) {
+        return false;
+    }
+    let owned = page.members.iter().try_fold(128_usize, |n, member| {
+        n.checked_add(std::mem::size_of::<Vec<u8>>())?
+            .checked_add(member.len())
+    });
+    owned.is_some_and(|n| n <= limits.read.maximum_bytes)
         && page.members.first().is_none_or(|member| {
-            member.len() <= 65535
-                && cursor.is_none_or(|cursor| member.as_slice() > cursor)
-                && member
-                    .len()
-                    .checked_add(128 + std::mem::size_of::<Vec<u8>>())
-                    .is_some_and(|n| n <= limits.read.maximum_bytes)
+            member.len() <= 65535 && cursor.is_none_or(|cursor| member.as_slice() > cursor)
         })
 }
 pub(super) fn source<'a, 'm>(

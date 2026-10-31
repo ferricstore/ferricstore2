@@ -22,6 +22,9 @@ pub(super) struct ScannedCreditOwner<'a> {
 }
 
 impl ScannedCreditOwner<'_> {
+    pub(super) const fn scope(&self) -> &[u8] {
+        self.scope
+    }
     pub(super) const fn owned_bytes(&self) -> usize {
         self.owned
     }

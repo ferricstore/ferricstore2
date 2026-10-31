@@ -56,18 +56,20 @@ pub fn credit_cleanup_retained_summary(
     credit: CreditLimits,
     admission: AdmissionLimits,
 ) -> Result<(u16, bool), CodecError> {
-    let _ = expected_scope;
     use wf_domain::governance::identified::IdentifiedCreditDecision as D;
     if intent.version() != 12 || version != 10 {
         return Err(CodecError::UnsupportedVersion);
     }
-    let (decision, count) = response::inspect(
+    let inspected = response::inspect(
         response,
         credit,
         admission.decision_bytes(),
         credit.max_owned_bytes(),
-    )?
-    .summary();
+    )?;
+    if inspected.owner_scope() != Some(expected_scope) {
+        return Err(CodecError::Malformed);
+    }
+    let (decision, count) = inspected.summary();
     match decision {
         D::Cleaned { deleted, pending } if count == 0 => Ok((deleted, pending)),
         _ => Err(CodecError::UnsupportedTag),
