@@ -79,6 +79,9 @@ fn apply_selected(
         .workflow_value_metadata()
         .ok_or(WorkflowValueTransactionError::UnsupportedProfile)?
         .profile;
+    if matches!(profile, ValueApplyProfile::WorkflowRelease) && mode == 7 {
+        return Err(WorkflowValueTransactionError::UnsupportedProfile);
+    }
     let prepared = decoded.digest();
     let tx = store
         .begin_apply(

@@ -7,6 +7,7 @@ use wf_domain::workflow::request::RequestScope;
 use wf_types::version::LogIdentity;
 
 /// Applies workflow final writes together with their original release intents.
+/// Acquisition stays in the separate Claim parent; profile7 is unsupported here.
 /// # Errors
 /// Refuses unsupported capabilities, authority, resources or unproved commit.
 pub fn apply_workflow_release_transaction(

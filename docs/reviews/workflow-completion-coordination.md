@@ -61384,3 +61384,38 @@ acquisition-r0.log. The unchanged legacy positive-control tail is masked until
 the fix. The preceding broad run passed40 codec+308 storage cases, strict
 workspace/all-target Clippy and60 architecture cases. Those do not include this
 new rejecting case and do not certify full product acceptance.
+
+Final atomic mutation proof: all309 storage+40 codec cases pass, including all12
+new storage cases and one new codec case. All60 architecture cases, strict
+workspace/all-target Clippy, cargo progress, fmt and diff pass. The complete
+selected input set is frozen:2040 non-Markdown inputs/1451 Rust files, zero drift.
+The acquisition counterexample's complete tail now passes, including the actual
+unchanged legacy Start positive control. Actual mode1/5/6 terminal writes, original
+replay, independent holes/final-history/order/dedup, pending-prefix/completion
+preservation,65536 backlog across all three modes, no-demand success despite a
+full queue, operational exhaustion, actual sync uncertainty and snapshot/replay
+all execute. Actual older GC3 custody rejects the new receipt without any release
+rows; removing only that receipt restores a valid compatible cohort.
+
+Audit /private/tmp/ferricstore2-release-atomic-source-audit.json preserves all698
+selected predecessor Rust test/benchmark inputs:695 whole and three exact additive
+inverses (child registration, appended codec case, purity fixture). The original
+record serialization body and retained-profile dispatcher are verbatim; the old
+Step driver file is byte-identical. Progress/mapping ledgers stay byte-identical;
+no source-case credit. R0s2ae7af2 andeeab912 plus logs
+/private/tmp/ferricstore2-release-atomic-{r0,acquisition-r0,final-regression,
+final-clippy,final-architecture,final-progress}.log retain real failure/pass
+evidence. The source audit also records the307-pass supplemental fixture failure
+and its correction. No independent-peer, all12-current, native Elixir/Linux,
+production service or measured-speedup claim. This is progress inside the same
+unfinished coupled batch; the full goal remains active and solo.
+
+NEXT finish actual paid Claim/binding creation and policy/refund/Unknown settlement,
+including original optional partition identity and prevention of reservation reuse.
+Do not treat the current physical binding observation or a legacy acquisition
+leaf as paid authority. Finish ACK/sparse completion/drain and historical/received/
+purged Node execution with explicit GC4 selection, then the real lease/spend ->
+GovClaim -> terminal -> restart/snapshot -> reconcile -> exact release loop with
+siblings preserved. Audit raw public batch/write boundaries before mapping them
+to native profile6. Native malformed-owner fairness and all remaining source,
+consensus/read-barrier, service, platform and performance acceptance stay open.

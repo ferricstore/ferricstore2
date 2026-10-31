@@ -1496,3 +1496,9 @@ write-call granularity and intermediate release counts still need their parent
 source audit. Paid governed Claim/binding creation, ACK/mark/drain, Node historical/
 received/purged release execution, policy/refund/reconciliation/service wiring,
 full source scenarios and native platform/performance acceptance remain open.
+
+The selected release-aware mutation entrypoint explicitly refuses contained
+profile7 before state access. It does not replace the acquisition parent. The
+unchanged legacy entrypoint still supplies the non-governed Start positive
+control. Actual policy-governed acquisition and binding capture remain required;
+no absence of a binding or captured client flag supplies paid authority.

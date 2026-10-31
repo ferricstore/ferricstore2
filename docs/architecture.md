@@ -1567,8 +1567,13 @@ return original intent byte owners with borrowed field inspection. Existing
 legacy record publishers refuse bound records. An explicitly selected GC4 stored
 mutation driver now admits release capacity before reply/value companions and
 publishes intents with actual record/index/history/outcome/control in one consumed
-writer. Its sealed exact-postimage companion supplies the only internal bypass
+writer. Its sealed companion borrows the actual postimages and supplies the only internal bypass
 of the legacy fence. Backlog is retained business rejection; operational failure
 and unproved commit remain errors. Current governed Claim remains unsupported.
 See ADR-007 for native formats, the per-native-command scope, remaining raw public
 batch granularity audit, and the distinction between observations and authority.
+
+The release-aware mutation entrypoint refuses acquiring profile7. Existing
+non-governed Start remains in its original entrypoint; a real governing Claim
+parent must resolve current policy and commit paid reservation bindings. Legacy
+trusted acquisition must not be exposed as policy enforcement by inference.
