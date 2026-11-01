@@ -2,6 +2,56 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+STRONG-RECORD-QUERY1 follows ee81964 in the isolated implementation worktree.
+Application current-record queries now call the explicit StrongWorkflowRecordReadPort
+capability, then compose actual native preparation and terminal visibility. Its owner
+must reauthorize tenant/query scope, validate placement/recovery, establish a current
+leader/quorum barrier, wait for application and the scoped client minimum, and
+sample trusted server visibility time. No physical-store implementation or accepted
+quorum adapter is introduced. The integration provider is explicitly controlled;
+interface implementation and ordinary observations are not production quorum proof.
+
+The application refuses cross-recovery/group client positions before acquisition,
+distinguishes empty genesis from applied entry0, checks full barrier identity at
+equal indexes, applied/client floors, returned physical point and expected captured
+logical scope. Already physical caller aliases cannot masquerade as logical data.
+Terminal retention is hidden at <= server now; elapsed active deadlines do not
+invent transitions or absence. Failure never becomes missing. Returned positions
+come from actual applied control. Core/metadata/value owners move; only bounded
+result scope and routing bytes copy. Whole-call input/output/work/temporary and
+independent native read limits retain continuous admission, including conservative
+intermediate native preparation before terminal filtering. No measured speedup.
+
+Thirteen controls pass: three have compiled pre-body runtime RED and10 later
+controls are supplemental. Actual native create/cancel, scoped write/read/reopen,
+authorization changes, missing records versus unavailable/context failures,
+barrier identity/applied floors, entry0, client recovery and independent inclusive
+resource controls execute. This is typed application contract evidence; original
+Flow.get options/public return projection, hydration and accepted runtime remain.
+No source-case credit: the ledger stays170 declarations/184 mappings/801 links;
+full parity actually exits1. All1339 old test/bench/reference inputs stay whole.
+
+Final frozen verification passes2014 Rust tests/128 groups and11 doctests/15 groups,
+zero failed/ignored, including all60 architecture controls. Strict workspace/all-
+target Clippy, warning-denied docs, Python7, reference/progress/fmt/diff pass.
+All2311 non-Markdown/1722 Rust inputs stay exact. Evidence prefix
+/private/tmp/ferricstore2-strong-record-query- contains logs/checks/inputs/source-
+audit/proof JSON. All jobs terminal. No new Linux/Elixir, independent review,
+primary code adoption, push, accepted quorum runtime or full completion is claimed.
+
+NEXT connect original get option/return normalization and actual value hydration
+over this application contract, preserving omission/nil/size/ref distinctions.
+Accepted quorum/clock/deadline/admission lifecycle and transport integration remain
+required. Rich original/native ingress and writer-derived metadata/index adoption,
+mutation/many/child breadth, accepted public/Claim/Node/Raft/runtime, projected query
+compilation/history/lineage/barriers, blocking/pipeline/lifecycle/catalog and every
+remaining original scenario/profile/platform/performance gate stay open. Full goal
+active; continue solo. Do not convert component counts into full product readiness.
+
+## Preceding ee81964 native typed query checkpoint (historical)
+
+The following describes the predecessor only.
+
 NATIVE-QUERY-DATA1 follows 3442ac0 in the isolated implementation worktree.
 Coherent native record/current-policy observations now feed typed query data.
 Actual core/u128 ordering and immutable lifecycle/value binding stay separate

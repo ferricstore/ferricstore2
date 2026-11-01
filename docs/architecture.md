@@ -38,6 +38,26 @@ names must not enter that identity. See SOURCE-CREATE1 and SOURCE-START1 in the
 
 ## Coherent native record queries
 
+`wf-application::queries::query_strong_workflow_record` now connects typed native
+preparation to the explicit `StrongWorkflowRecordReadPort` capability. The owner
+must reauthorize tenant/query scope, validate actual placement and recovery,
+establish a current leader/quorum barrier, wait for its application and the
+requested scoped client position, and sample trusted server visibility time.
+The application rejects incompatible recovery/group positions before acquisition,
+checks the observed full barrier identity when indexes match, and distinguishes
+empty genesis from genuinely applied entry zero. It validates the exact returned
+physical point and expected captured logical scope before exposure. Terminal
+retention hides records at <= server now; an elapsed active deadline does not
+invent a transition or absence. Failures remain distinct from a missing record.
+Returned positions come from actual applied control, with no projection-generation
+substitution. Resource accounting covers request/routing/result-scope owners and
+the complete native read/preparation without another metadata/core/policy clone.
+This capability has no physical-store implementation: accepted quorum adapters,
+public caller/return normalization, hydration and transport DTOs remain required.
+The integration provider exercises the contract over actual storage and is
+explicitly controlled, without claiming production quorum evidence. See
+STRONG-RECORD-QUERY1 in the [coordination review](reviews/workflow-completion-coordination.md).
+
 `prepare_native_query_snapshot` composes this coherent observation into typed
 native query data. It retains the actual core, complete u128 ordering and immutable
 value/lifecycle binding. The original metadata allocation moves into its existing

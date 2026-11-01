@@ -64362,3 +64362,136 @@ inputs/source-audit/proof; all jobs terminal. No new native Linux/Elixir, indepe
 review, primary implementation adoption, push or full completion is claimed.
 The accepted public/runtime, writer/index, visibility/barrier, mutation breadth
 and full source/platform/performance gates remain open. Continue the goal solo.
+
+### STRONG-RECORD-QUERY1 concrete solo architecture decision
+
+Previous goal turn was progress: ee81964 implements typed native query data and
+132089b updates the docs-only pointer. Continue solo under the user override.
+The application queries facade and consensus read module remain empty. Design
+architecture.md:371-375 requires leader/quorum barrier, applied-position wait,
+tenant admission and scoped write positions; a redb snapshot is insufficient.
+Pinned flow.ex:488-560 binds read scope before hydration/public projection, and
+store/router/part_06.ex:495-530,799-814 hides terminal retention at <= server now.
+These are observations, not full original get parity or runtime acceptance.
+
+Approve `crates/wf-ports/src/state/record_query.rs`, private under existing state,
+and state.rs exports for concrete semantic capabilities: WorkflowReadPosition<'a>
+(borrowed group/recovery/index, ordinary client data), StrongWorkflowRecordRead
+(snapshot, optional full LogIdentity barrier, trusted server visibility time),
+StrongWorkflowRecordReadError and StrongWorkflowRecordReadPort. Its single operation
+must reauthorize tenant, validate placement/recovery, establish current quorum/
+leader authority, wait for applied position, sample server time and acquire the
+coherent existing policy/record snapshot within the bounded call. No implementation
+for the physical store: the future accepted consensus lifecycle owns this contract.
+An implementation alone is no quorum/runtime proof. Empty barrier is distinct
+from applied entry0. Equal barrier/applied positions must agree on full log identity;
+minimum position0 requires a genuinely applied entry. Cross-group/recovery positions
+refuse without numerical comparison, including on absent records.
+
+Approve existing application queries.rs facade registration and
+`queries/record.rs` with private `record/{model,budget,dispatch}.rs`. Export
+StrongWorkflowRecordRequest<'a>, StrongWorkflowRecordLimits,
+StrongWorkflowRecordResult, StrongWorkflowRecordError and
+query_strong_workflow_record. Typed explicit logical partition/scope derives its
+physical point through existing routing. The capability owns current authorization
+and strong barrier; application validates returned point, barrier/applied/minimum
+floors, expected captured scope, then uses existing typed native preparation.
+Only terminal retention is hidden at <= supplied trusted server time; elapsed
+active/lease deadlines do not invent completed transitions or missing records.
+Operational/authority failures are never absence. Return scoped actual applied
+position, typed optional record and continuous logical resource accounting.
+NativeQuerySnapshot::into_record consumes its existing owner for moving visible
+records and dropping hidden data; no new wire DTO, public payload hydration,
+projection guarantee, accepted service or production quorum is implied.
+
+The application budget admits bounded request/position fields and fixed control,
+physical routing and copied result scope before allocation. Clip native read and
+preparation ceilings to remaining whole-parent work/temporary ownership. Preserve
+final output owner admission and intermediate native preparation ownership; output
+caps conservatively cover intermediate preparation before terminal filtering.
+No whole record/policy/metadata clone, added dependency or allowlist widening.
+
+Approve node integration target `tests/workflow_query/main.rs`, private siblings
+`{fixtures,ports,resources,validation}.rs`, existing path-imported recovery shared
+fixture_data.rs, plus QueryFixture and QueryFault test types. Tests use real
+metadata-capable redb creation and consumed metadata writer calls. Their explicit
+controlled barrier provider exercises the capability contract; it does not claim
+real quorum evidence. Three compiled pre-body runtime RED cases precede behavior;
+additional authority/scope/expiry/limits/error/reopen tests are supplemental.
+No source-case credit; preserve every older assertion and ledger. Keep all
+production/src-test files400, integration600, fn100/depth4/complexity25; no unsafe,
+OS-specific assumptions or production dependency changes. This is a concrete solo
+architecture/resource review, not independent peer review. M3 and all original
+source/platform/runtime acceptance gates remain required.
+
+STRONG-RECORD-QUERY1 concrete resource-type refinement before creation: approve
+private `queries/record/budget.rs::Budget` with immutable whole-query limits and
+work/live/peak scalars. It owns no backend or asynchronous execution. All caller,
+position, routing, copied result-scope and intermediate native owners are admitted
+continuously, with remaining caps passed to the actual reader and producer.
+This is conservative logical accounting, not an allocator/RSS bound. Return
+scope uses bounded fallible byte copies; whole metadata/core/policy owners move.
+
+STRONG-RECORD-QUERY1 fixture refinement: the broad recovery helper import leaves
+unused helpers under strict linting. Keep the approved query target self-contained
+by copying only its existing scope/clock/log/driver/directory helper bodies into
+approved fixtures.rs and aliasing that module as f. No new file/type/dependency
+or source credit. Use the same512MiB metadata-driver workspace as existing native
+metadata tests so RED reaches application behavior, not fixture admission.
+
+### STRONG-RECORD-QUERY1 final source/architecture/resource self-review
+
+The application facade now calls an explicit authorized strong-read capability,
+validates scoped minimums, actual native point and barrier/applied observations,
+then composes the existing native producer and terminal visibility. There is no
+implementation for the physical store and no local-read downgrade. The accepted
+owner must supply current authorization, placement, quorum/barrier/applied waiting,
+trusted clock and the bounded request/attempt lifecycle. Its implementation alone
+and ordinary returned fields cannot prove quorum. The integration provider is
+controlled and labeled accordingly; M3/M4 runtime acceptance stays open.
+
+Cross-group/recovery client positions refuse before acquisition, with no numeric
+comparison across namespaces. Empty genesis cannot satisfy client applied entry0.
+Absent records do not bypass barrier/minimum validation. Equal barrier/applied
+indexes must match full term/leader/index identity. The accepted owner must prove
+incorporation when applied state is later; the application does not describe an
+index floor as a history/quorum certificate. Returned scoped positions use actual
+last-entry control, not fabricated zero or projection generation. Native physical
+point and captured logical scope must match the request, including idempotent
+physical-routing aliases. Terminal retention hides at <= trusted server time;
+elapsed active deadlines do not invent a missing/terminal record or state mutation.
+Read/auth/context/unavailable/resource failures remain distinct from absence.
+Pinned flow.ex:488-560 and store/router/part_06.ex:495-530,799-814 informed scope and
+terminal visibility. Full original get options, return projection and payload/
+named hydration are not claimed by these typed native contract tests.
+
+A single application account admits bounded borrowed point/namespace/position,
+fixed control, physical routing and fallible result-scope copies. Independent native
+read caps are clipped by remaining whole-call work/temporary budgets; the native
+producer includes acquisition work/owners under the same remaining ceilings.
+Final scope plus typed data is admitted before return. Intermediate native output
+admission remains conservative even for an eventually hidden terminal record.
+Existing core/metadata/binding owners move; full policy backing already drops in
+the reused producer. No dependency/format/intent/unsafe or OS-specific mechanism is
+added. No allocation-count, allocator/RSS, latency or throughput gain is claimed.
+All files/functions remain within400/600,100,depth4 and complexity25 without waivers.
+
+Three compiled pre-body runtime RED cases reach actual accepted create/cancel
+fixtures and fail on the missing application behavior; their full tails now pass.
+Ten later controls are supplemental. Thirteen controls pass, including actual
+scoped native publication/read/reopen, authority changes, barrier/full identity,
+empty versus applied0, missing-record minimums, context failure, expired active
+visibility and whole/independent resource boundaries. All1339 predecessor test/
+bench/reference inputs stay whole and every earlier assertion remains intact.
+The170-declaration/184-mapping/801-link source ledger is byte-exact; no source credit
+is added and full parity actually exits1. The fixture-admission and lint preflights
+are structural fixes and are not behavioral RED evidence.
+
+Final frozen workspace2014/128 groups, doctests11/15 groups, all60 architecture
+controls, strict all-target Clippy, warning-denied docs, Python7 and reference/
+progress/fmt/diff pass, zero failed/ignored. All2311 frozen non-Markdown inputs/
+1722 Rust files remain exact. Prefix `/private/tmp/ferricstore2-strong-record-query-`
+holds logs/checks/inputs/source-audit/proof; all jobs terminal. No new native Linux/
+Elixir, accepted quorum/service runtime, independent review, primary implementation
+adoption, push or full completion. Continue original get/hydration and all remaining
+source/runtime/platform/performance gates solo under the unchanged full goal.

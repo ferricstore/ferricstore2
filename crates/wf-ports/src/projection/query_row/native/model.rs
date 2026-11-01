@@ -90,6 +90,11 @@ pub struct NativeQuerySnapshot {
     pub(super) owned: usize,
 }
 impl NativeQuerySnapshot {
+    /// Move the existing record owner without copying metadata, core or references.
+    #[must_use]
+    pub fn into_record(self) -> Option<NativeQueryRecord> {
+        self.record
+    }
     /// Control observed on the same native read revision.
     #[must_use]
     pub const fn control(&self) -> ControlState {

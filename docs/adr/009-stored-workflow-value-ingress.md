@@ -1,5 +1,45 @@
 # ADR-009: explicit stored workflow value ingress
 
+## Strong current-record application query contract
+
+STRONG-RECORD-QUERY1 connects the typed native producer to application queries
+through `StrongWorkflowRecordReadPort`. A single authorized read lifecycle must
+bind actual scope/placement/recovery, establish a current leader/quorum barrier,
+wait for its application and the requested scoped minimum, sample trusted server
+visibility time and acquire the coherent existing policy/record observation.
+There is deliberately no implementation for a physical store alone. Interface
+implementation and ordinary observation fields do not independently prove quorum
+or production readiness; accepted consensus integration retains its existing gate.
+
+Client positions borrow explicit group/recovery/index components. Cross-namespace
+positions are incompatible, without comparing their numeric index. Empty genesis
+is not applied entry zero: a minimum index zero requires an actual last entry.
+The application checks the applied floor against full observed barrier identity
+and the client minimum, including for absent records. Equal barrier/applied indexes
+must match the complete term/leader/index identity. Later applied snapshots rely
+on the accepted capability to prove incorporation of the barrier; no numeric
+comparison is described as a quorum or history proof.
+
+Typed logical partition/scope uses existing physical routing, then the returned
+native point and captured logical scope must match the request. Already physical
+caller aliases cannot bypass logical-scope checks. Only terminal retention hides
+records at <= trusted server time; active timeout/lease expiry does not invent a
+committed transition. Read, authorization, clock, barrier and decoding refusals
+never become missing records. Scoped freshness comes from actual applied control.
+The existing native result owner moves into application output; hidden records
+drop without exposing their body. Fallible bounded scope copies and routing plus
+native acquisition/preparation share whole-call work/temporary ceilings. The
+output cap conservatively also covers intermediate native preparation before
+terminal filtering. These are logical estimates, without allocator/RSS or speed
+claims. No new dependency, intent, wire, storage or snapshot format is introduced.
+
+Real metadata-capable native creates/cancellation and scoped reopen execute under
+an explicitly controlled capability provider. This exercises the application-to-
+storage contract, not a real quorum. Original Flow.get option/return normalization,
+payload/named hydration, accepted quorum runtime, transports, projected queries
+and complete source/platform/performance acceptance remain required. No source-case
+credit follows from these supplemental native controls.
+
 ## Native typed query preparation
 
 NATIVE-QUERY-DATA1 composes the coherent record/policy read with explicit-context

@@ -12,6 +12,7 @@ mod original_policy;
 mod policy;
 mod record;
 mod record_policy;
+mod record_query;
 mod transaction;
 mod workflow_release;
 pub use workflow_release::{
@@ -50,6 +51,10 @@ pub use record::{
 pub use record_policy::{
     WorkflowRecordPolicyObservation, WorkflowRecordPolicyReadLimits, WorkflowRecordPolicyReadPort,
     WorkflowRecordPolicyReadSnapshot,
+};
+pub use record_query::{
+    StrongWorkflowRecordRead, StrongWorkflowRecordReadError, StrongWorkflowRecordReadPort,
+    WorkflowReadPosition,
 };
 pub use transaction::{
     DueCursorStep, GroupApplyChanges, GroupApplyStore, GroupApplyTransaction, GroupDueCursor,

@@ -1,3 +1,6 @@
-//! Queries boundary for `wf-application`.
-//!
-//! Reserved for the reviewed contract; no workflow behavior is implemented here.
+//! Scoped workflow queries through explicit authorized consistency capabilities.
+mod record;
+pub use record::{
+    StrongWorkflowRecordError, StrongWorkflowRecordLimits, StrongWorkflowRecordRequest,
+    StrongWorkflowRecordResult, query_strong_workflow_record,
+};
