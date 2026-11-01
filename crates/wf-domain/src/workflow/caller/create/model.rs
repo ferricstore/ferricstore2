@@ -76,7 +76,7 @@ pub struct OriginalCreateScheduleMetadata<'a> {
     pub timezone: Option<&'a [u8]>,
 }
 
-pub(super) const NAMES: [&str; 21] = [
+pub(super) const NAMES: [&str; 24] = [
     "id",
     "type",
     "state",
@@ -98,11 +98,14 @@ pub(super) const NAMES: [&str; 21] = [
     "drop_values",
     "override_values",
     "partition_key_explicit",
+    "run_state",
+    "worker",
+    "lease_ms",
 ];
 
-/// Normalized original caller; automatic partition resolution belongs to ports.
+/// Original create or atomic-start caller; automatic partition resolution belongs to ports.
 pub struct OriginalCreateCaller<'r, 'a> {
-    pub(super) fields: [Option<I<'r, 'a>>; 21],
+    pub(super) fields: [Option<I<'r, 'a>>; 24],
     pub(super) partition: Option<&'a [u8]>,
     pub(super) attributes: OriginalAttributes<'a>,
     pub(super) state_update: Vec<(&'a str, OriginalMetadataScalar<'a>)>,
@@ -114,7 +117,7 @@ impl<'r, 'a> OriginalCreateCaller<'r, 'a> {
     #[must_use]
     pub fn field(&self, name: &str) -> Option<I<'r, 'a>> {
         if name == "state_meta_state" && !self.state_update.is_empty() {
-            return self.fields[2];
+            return self.fields[21].or(self.fields[2]);
         }
         NAMES
             .iter()

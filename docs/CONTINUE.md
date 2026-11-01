@@ -2,6 +2,50 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+SOURCE-START1 follows e7ad537 in the isolated implementation worktree.
+Original atomic start now has explicit domain normalization and ports admission,
+sharing create's validators, budgets, metadata spines and routing writers.
+It preserves keyword/error order, create-only option presence refusals, required
+worker, exact lease/deadline bounds, physical running/logical run_state and the
+logical state-update target. Return and unrelated helper options retain original
+behavior. Query admission keeps the original zero lease placeholder and reserves
+index names only for admission. All four explicit arguments and ignored/shadowed
+input share continuous accounting. Binary leaves borrow; no intermediate keyword
+list or discarded encoded query is allocated. No measured speedup is claimed.
+
+The complete pinned MutationAttrs lease-ceiling/deadline scenario preserves both
+source assertions, fixtures and observation order. Three controls have compiled
+pre-body runtime RED; eight later controls are supplemental. The combined target
+has28 passing controls. Earlier source cases/assertions remain unchanged. Native
+public execution, VM capability acquisition and full parity are not certified.
+
+Final frozen verification passes1978 Rust tests/127 groups and11 doctests/15 groups,
+zero failed/ignored, including all60 architecture controls. Strict workspace/all-
+target Clippy, warning-denied docs, Python7, reference integrity, progress, fmt and
+diff pass. All2286 frozen non-Markdown inputs/1697 Rust files remain exact. Of1331
+old test/bench/reference inputs,1329 stay whole; the existing target gains only
+two module registrations and progress gains one counterpart/two links. Earlier
+assertions and source/runtime identities stay exact. The ledger is170 source-
+derived declarations/184 mappings/801 links; full parity actually exits1.
+Evidence prefix /private/tmp/ferricstore2-original-start- holds logs and checks/
+inputs/source-audit/proof JSON. All jobs are terminal. No primary code adoption,
+push, new Linux/Elixir execution or independent review is claimed.
+
+Source correction: original create_attrs explicitly carries payload_ref and named
+operands. Public reference refusals belong to their actual selected operation
+boundaries; do not introduce a blanket create rejection from the prior shorthand.
+NEXT serialization and a reviewed rich native ingress preserving original caller
+data separately from actual server time/policy/scope/default postimages. Derive
+and revalidate metadata/indexes under the actual writer. Intent22 stays original
+caller DATA. Native submission, trusted extension captures, many/child/mutation
+breadth, accepted public/Claim/Node/Raft/runtime, query/read-barrier/visibility,
+blocking/pipeline/lifecycle/catalog, all remaining source scenarios/profiles and
+Linux/macOS/measured-performance acceptance remain open. Continue solo.
+
+## Preceding e7ad537 original create checkpoint (historical)
+
+The following describes the predecessor only.
+
 SOURCE-CREATE1 follows a9a1b05 in the isolated implementation worktree.
 An explicit original create helper now composes domain keyword/scalar/dynamic
 normalization with original auto-partition, state-key and query-size admission.

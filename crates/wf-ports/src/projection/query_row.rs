@@ -11,7 +11,10 @@ mod read;
 mod record;
 mod row;
 mod writer;
-pub use create::{OriginalCreatePreparationError, PreparedOriginalCreate, prepare_original_create};
+pub use create::{
+    OriginalCreatePreparationError, PreparedOriginalCreate, prepare_original_create,
+    prepare_original_start_and_claim,
+};
 pub use model::{
     OriginalQueryLocator, OriginalQueryRecordError, OriginalQueryRecordLimits,
     PreparedOriginalQueryMetadata, PreparedOriginalQueryRow,

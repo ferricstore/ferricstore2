@@ -13,13 +13,39 @@ use crate::blob::{
 pub use model::{OriginalCreatePreparationError, PreparedOriginalCreate};
 use std::{borrow::Cow, mem::size_of};
 use wf_domain::workflow::caller::create::{
+    OriginalCreateCaller, normalize_original_start_and_claim,
+};
+use wf_domain::workflow::caller::create::{
     OriginalCreateContext, OriginalCreateLimits, OriginalCreateOutcome,
 };
 use wf_domain::workflow::caller::create::{OriginalCreateError, normalize_original_create};
 
+/// Prepare the original atomic start attributes and their reserved query row.
+/// # Errors
+/// Operational failures remain separate from measured source refusals and raises.
+pub fn prepare_original_start_and_claim<'r, 'a>(
+    id: I<'r, 'a>,
+    workflow_type: I<'r, 'a>,
+    initial_state: I<'r, 'a>,
+    options: I<'r, 'a>,
+    context: OriginalCreateContext<'r, 'a>,
+    limits: OriginalCreateLimits,
+) -> Result<OriginalCreateOutcome<PreparedOriginalCreate<'r, 'a>>, OriginalCreatePreparationError> {
+    let outcome = normalize_original_start_and_claim(
+        id,
+        workflow_type,
+        initial_state,
+        options,
+        context,
+        limits,
+    )
+    .map_err(OriginalCreatePreparationError::Create)?;
+    admit_normalized(outcome, limits)
+}
+
 /// Prepares original create attributes and validates their reserved query row.
-/// This is source-helper data. Public reference rejection, value serialization,
-/// trusted extension captures and native submission remain separate requirements.
+/// This is source-helper data. Value/reference handling at its actual operation
+/// boundary, trusted extension captures and native submission remain required.
 /// # Errors
 /// Source failures retain their measured work; operational failures abort preparation.
 pub fn prepare_original_create<'r, 'a>(
@@ -28,37 +54,43 @@ pub fn prepare_original_create<'r, 'a>(
     context: OriginalCreateContext<'r, 'a>,
     limits: OriginalCreateLimits,
 ) -> Result<OriginalCreateOutcome<PreparedOriginalCreate<'r, 'a>>, OriginalCreatePreparationError> {
+    let outcome = normalize_original_create(id, options, context, limits)
+        .map_err(OriginalCreatePreparationError::Create)?;
+    admit_normalized(outcome, limits)
+}
+
+fn admit_normalized<'r, 'a>(
+    outcome: OriginalCreateOutcome<OriginalCreateCaller<'r, 'a>>,
+    limits: OriginalCreateLimits,
+) -> Result<OriginalCreateOutcome<PreparedOriginalCreate<'r, 'a>>, OriginalCreatePreparationError> {
     use OriginalCreateOutcome::{Accepted, RaisedArgumentError, Rejected};
-    let (caller, prior_work, prior_peak) =
-        match normalize_original_create(id, options, context, limits)
-            .map_err(OriginalCreatePreparationError::Create)?
-        {
-            Accepted {
-                value,
-                work_units,
-                temporary_bytes,
-            } => (value, work_units, temporary_bytes),
-            Rejected {
+    let (caller, prior_work, prior_peak) = match outcome {
+        Accepted {
+            value,
+            work_units,
+            temporary_bytes,
+        } => (value, work_units, temporary_bytes),
+        Rejected {
+            message,
+            work_units,
+            temporary_bytes,
+        } => {
+            return Ok(Rejected {
                 message,
                 work_units,
                 temporary_bytes,
-            } => {
-                return Ok(Rejected {
-                    message,
-                    work_units,
-                    temporary_bytes,
-                });
-            }
-            RaisedArgumentError {
+            });
+        }
+        RaisedArgumentError {
+            work_units,
+            temporary_bytes,
+        } => {
+            return Ok(RaisedArgumentError {
                 work_units,
                 temporary_bytes,
-            } => {
-                return Ok(RaisedArgumentError {
-                    work_units,
-                    temporary_bytes,
-                });
-            }
-        };
+            });
+        }
+    };
     let mut b = Budget::new(OriginalQueryRecordLimits {
         maximum_output_bytes: limits.maximum_output_bytes,
         maximum_work_units: limits

@@ -13,6 +13,36 @@ pub use model::{
 
 use crate::metadata::OriginalMetadataInput as I;
 
+/// Normalize the original atomic start caller without runtime effects.
+/// # Errors
+/// Operational limits remain distinct from measured source observations.
+pub fn normalize_original_start_and_claim<'r, 'a>(
+    id: I<'r, 'a>,
+    workflow_type: I<'r, 'a>,
+    initial_state: I<'r, 'a>,
+    options: I<'r, 'a>,
+    context: OriginalCreateContext<'r, 'a>,
+    limits: OriginalCreateLimits,
+) -> Result<OriginalCreateOutcome<OriginalCreateCaller<'r, 'a>>, OriginalCreateError> {
+    let mut budget = budget::Budget::new(limits)?;
+    budget.input(&[
+        id,
+        workflow_type,
+        initial_state,
+        options,
+        context.history_hot_maximum,
+        context.history_maximum,
+    ])?;
+    let result = normalize::run(
+        id,
+        options,
+        Some((workflow_type, initial_state)),
+        context,
+        &mut budget,
+    );
+    observe(result, &budget)
+}
+
 /// Normalizes original keyword options without clocks, routing or authorization.
 /// # Errors
 /// Operational refusals remain distinct from measured source errors and raises.
@@ -29,7 +59,14 @@ pub fn normalize_original_create<'r, 'a>(
         context.history_hot_maximum,
         context.history_maximum,
     ])?;
-    let result = normalize::run(id, options, context, &mut budget);
+    let result = normalize::run(id, options, None, context, &mut budget);
+    observe(result, &budget)
+}
+
+fn observe<'r, 'a>(
+    result: Result<OriginalCreateCaller<'r, 'a>, budget::Failure>,
+    budget: &budget::Budget,
+) -> Result<OriginalCreateOutcome<OriginalCreateCaller<'r, 'a>>, OriginalCreateError> {
     let work_units = budget.work;
     let temporary_bytes = budget.peak;
     match result {

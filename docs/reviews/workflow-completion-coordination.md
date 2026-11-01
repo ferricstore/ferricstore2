@@ -64072,3 +64072,82 @@ Evidence prefix `/private/tmp/ferricstore2-original-create-` contains final logs
 and checks/input/source-audit/proof JSON. All jobs are terminal. No accepted native
 service, new Linux/Elixir, measured performance, independent review, primary code
 adoption, push or full-goal completion is claimed. Continue solo.
+
+### SOURCE-START1 concrete solo architecture decision
+
+Continue the full goal solo. The previous status-only turn made no implementation
+progress. Pinned MutationAttrs.start_and_claim_attrs:179-240 and
+reject_start_and_claim_create_opts:243-254 require a separate birth preparation
+entry before native adoption. Share create normalization, mathematical integer
+checks, ownership accounting and complete query admission rather than translating
+start into create keyword options and changing error precedence.
+
+Approve domain normalize_original_start_and_claim in caller/create.rs and private
+create/normalize/start.rs for start-specific option refusal, lease and deadline
+checks. Extend the existing OriginalCreateCaller field array with run_state,
+worker and lease_ms; the ordinary-create shape stays identical. State-update
+target uses the initial logical run state. No new command/wire/intent profile,
+dependency, capability or storage migration. Caller binary leaves continue to
+borrow; only the existing bounded metadata spines and final routing bytes own.
+Charge every input occurrence, including ignored options and all four explicit
+arguments, continuously before normalization. Reuse existing numeric comparisons
+and measured outcomes, preserving operational/source failure distinctions.
+
+Approve ports prepare_original_start_and_claim in query_row/create.rs, exported
+through query_row.rs, sharing the existing result admission and key preparation.
+The prototype is physically running with the logical run_state, while lease
+deadline remains the original admission placeholder zero. Never synthesize a
+physical location, grant, actual server clock, policy postimage or default into
+caller intent22. Native writer/index adoption remains required.
+
+Approve integration children tests/original_create/start.rs and start_validation.rs
+and their registration in the existing main.rs. Preserve the complete original
+lease-ceiling/deadline scenario and add error order, omission, aliases, dynamic
+metadata, context, routing and independent resource controls. Obtain compiled
+runtime RED before behavior. Production400/test600, functions100, nesting4 and
+complexity25 remain enforced. This is self-review, not independent review.
+
+Source correction: create_attrs:149-150 explicitly carries payload_ref and named
+value options; source public reference refusals at44-50 are used by selected
+terminal/retry helpers. The prior handoff's generic public-reference refusal must
+not become a blanket create rejection. Preserve accepted input and separately
+validate serialization/trust at its actual operation boundary.
+
+### SOURCE-START1 final source, architecture and performance self-review
+
+The explicit start entry shares the existing create normalization and complete
+query admission. Source option presence/error order, default30000ms lease, exact
+timestamp/deadline boundaries, running/run_state separation, logical state-update
+target, omission/root compaction and opaque value/ref preservation are covered.
+The original admission prototype deliberately keeps lease deadline zero; actual
+writer time/lease/policy postimages remain separate. No wire/intent/storage profile,
+capability, dependency or native command semantics changed. All new code is safe
+pure Rust without OS-specific behavior. Native Linux evidence remains required.
+
+Borrowed worker/type/state/value leaves and existing bounded metadata spines avoid
+another caller tree. Shared normalization/admission avoids an intermediate keyword
+list and discarded encoded query output. Prospective input/work/output/temporary
+accounts cover all explicit arguments and ignored/shadowed input; inclusive and
+one-below endpoints execute. Large worker backing remains borrowed. This verifies
+logical ownership behavior, not measured throughput, latency, allocation count or
+RSS improvement. File/function/depth/complexity limits stay unchanged.
+
+Three compiled pre-body controls fail in original-start-red.log and pass after
+implementation. Eight later controls are supplemental. All28 combined controls
+pass. The one complete original lease-ceiling/deadline scenario retains both
+assertions, exact fixtures/boundary expressions and order. Captured internal
+observations earn no VM capability source credit. Earlier tests and mappings stay
+exact: of1331 prior non-Markdown test/bench/reference inputs,1329 remain whole;
+only two module registrations and one additive counterpart/two links change the
+other two inputs. All2286 frozen inputs/1697 Rust files remain exact.
+
+Final workspace1978/127 groups, doctests11/15 groups, all60 architecture controls,
+strict all-target/workspace Clippy, warning-denied docs, Python7, reference,
+progress, fmt and diff pass with zero failed/ignored tests. The ledger is170
+source-derived declarations/184 mappings/801 links. Full parity actually exits1;
+runtime reconciliation remains incomplete. Evidence prefix
+`/private/tmp/ferricstore2-original-start-` contains logs/checks/input/source-audit/
+proof JSON. All jobs terminal. No native public service, new Linux/Elixir,
+independent review, primary implementation adoption, push or full completion is
+claimed. Native rich ingress, actual metadata/index effects and all remaining
+handoff/ordered-plan obligations remain active. Continue solo.

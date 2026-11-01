@@ -14,6 +14,12 @@ pub(super) fn nil(value: I<'_, '_>) -> bool {
     matches!(value, I::Nil | I::Atom("nil"))
 }
 pub(super) fn rows<'r, 'a>(value: I<'r, 'a>) -> Result<&'r [I<'r, 'a>], Failure> {
+    rows_with_return(value, false)
+}
+pub(super) fn rows_with_return<'r, 'a>(
+    value: I<'r, 'a>,
+    allow_return: bool,
+) -> Result<&'r [I<'r, 'a>], Failure> {
     let I::List(rows) = value else {
         return Err(source("ERR flow opts must be a keyword list"));
     };
@@ -22,7 +28,7 @@ pub(super) fn rows<'r, 'a>(value: I<'r, 'a>) -> Result<&'r [I<'r, 'a>], Failure>
             return Err(source("ERR flow opts must be a keyword list"));
         }
     }
-    if get(rows, "return").is_some() {
+    if !allow_return && get(rows, "return").is_some() {
         return Err(source("ERR flow return option is not supported"));
     }
     Ok(rows)

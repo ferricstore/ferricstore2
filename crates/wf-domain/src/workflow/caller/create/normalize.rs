@@ -9,42 +9,39 @@ use crate::metadata::{
     normalize_original_state_metadata_update,
 };
 use std::{cmp::Ordering, mem::size_of};
+mod start;
 
 pub(super) fn run<'r, 'a>(
     id: I<'r, 'a>,
     options: I<'r, 'a>,
+    initial: Option<(I<'r, 'a>, I<'r, 'a>)>,
     context: Context<'r, 'a>,
     b: &mut Budget,
 ) -> Result<Caller<'r, 'a>, Failure> {
-    let rows = o::rows(options)?;
-    b.spend(mul(rows.len(), 128)?)?;
-    let I::Binary(id) = id else {
-        return Err(source("ERR flow id must be a non-empty string"));
+    let rows = if initial.is_some() {
+        o::rows_with_return(options, true)?
+    } else {
+        o::rows(options)?
     };
-    if id.is_empty() {
-        return Err(source("ERR flow id must be a non-empty string"));
+    b.spend(mul(rows.len(), 128)?)?;
+    if initial.is_some() {
+        start::reject_create_options(rows)?;
     }
-    if id.starts_with(b"__ferricstore_schedule__:") && !context.internal_allowed {
-        return Err(source("ERR flow id is reserved for internal use"));
-    }
-    let workflow_type = o::binary(o::get(rows, "type"), "type", true)?;
-    if workflow_type == b"__ferricstore_schedule" && !context.internal_allowed {
-        return Err(source("ERR flow type is reserved for internal use"));
-    }
-    let state = o::binary(
-        o::get(rows, "state").or(Some(I::Binary(b"queued"))),
-        "state",
-        false,
-    )?;
-    if state == b"running" {
-        return Err(source(
-            "ERR flow running state is only entered by FLOW.CLAIM_DUE",
-        ));
-    }
-    let mut fields = [None; 21];
+    let [id, workflow_type, state] = identity(id, rows, initial, context.internal_allowed)?;
+    let mut fields = [None; 24];
     fields[0] = Some(I::Binary(id));
     fields[1] = Some(I::Binary(workflow_type));
     fields[2] = Some(I::Binary(state));
+    if initial.is_some() {
+        fields[2] = Some(I::Binary(b"running"));
+        fields[21] = Some(I::Binary(state));
+        fields[22] = Some(I::Binary(o::binary(
+            o::get(rows, "worker"),
+            "worker",
+            true,
+        )?));
+        fields[23] = Some(start::lease(rows)?);
+    }
     fields[3] = o::reference(rows, "parent_flow_id")?;
     let root = o::reference(rows, "root_flow_id")?;
     fields[4] = match root {
@@ -52,7 +49,7 @@ pub(super) fn run<'r, 'a>(
         other => other,
     };
     fields[5] = o::reference(rows, "correlation_id")?;
-    times_and_limits(rows, context, &mut fields, b)?;
+    times_and_limits(rows, context, &mut fields, b, initial.is_some())?;
     let partition = partition(rows)?;
     let attributes_value = o::get(rows, "attributes").unwrap_or(I::Map(&[]));
     b.admit(attribute_bound(attributes_value)?)?;
@@ -67,7 +64,11 @@ pub(super) fn run<'r, 'a>(
         size_of::<(&str, OriginalMetadataScalar<'_>)>(),
     )?)?;
     let state_update = normalize_original_state_metadata_update(state_value)?;
-    let schedule = schedule::optional(rows, workflow_type, context.internal_allowed)?;
+    let schedule = if initial.is_none() {
+        schedule::optional(rows, workflow_type, context.internal_allowed)?
+    } else {
+        None
+    };
     for (index, name) in super::model::NAMES.iter().enumerate().take(20).skip(14) {
         fields[index] = o::get(rows, name);
     }
@@ -104,19 +105,58 @@ pub(super) fn run<'r, 'a>(
         owned,
     })
 }
+fn identity<'a>(
+    id: I<'_, 'a>,
+    rows: &[I<'_, 'a>],
+    initial: Option<(I<'_, 'a>, I<'_, 'a>)>,
+    internal_allowed: bool,
+) -> Result<[&'a [u8]; 3], Failure> {
+    let I::Binary(id) = id else {
+        return Err(source("ERR flow id must be a non-empty string"));
+    };
+    if id.is_empty() {
+        return Err(source("ERR flow id must be a non-empty string"));
+    }
+    if id.starts_with(b"__ferricstore_schedule__:") && !internal_allowed {
+        return Err(source("ERR flow id is reserved for internal use"));
+    }
+    let kind = initial.map_or_else(|| o::get(rows, "type"), |(kind, _)| Some(kind));
+    let kind = o::binary(kind, "type", initial.is_none())?;
+    if kind == b"__ferricstore_schedule" && !internal_allowed {
+        return Err(source("ERR flow type is reserved for internal use"));
+    }
+    let state = initial.map_or_else(
+        || o::get(rows, "state").or(Some(I::Binary(b"queued"))),
+        |(_, state)| Some(state),
+    );
+    let state = o::binary(state, "state", false)?;
+    if state == b"running" {
+        return Err(source(
+            "ERR flow running state is only entered by FLOW.CLAIM_DUE",
+        ));
+    }
+    Ok([id, kind, state])
+}
 fn times_and_limits<'r, 'a>(
     rows: &[I<'r, 'a>],
     context: Context<'r, 'a>,
-    fields: &mut [Option<I<'r, 'a>>; 21],
+    fields: &mut [Option<I<'r, 'a>>; 24],
     b: &mut Budget,
+    starting: bool,
 ) -> Result<(), Failure> {
-    fields[6] = match o::get(rows, "idempotent").unwrap_or(I::Boolean(false)) {
-        I::Boolean(true) | I::Atom("true") => Some(I::Boolean(true)),
-        I::Boolean(false) | I::Atom("false") => None,
-        _ => return Err(source("ERR flow idempotent must be a boolean")),
-    };
+    if !starting {
+        fields[6] = match o::get(rows, "idempotent").unwrap_or(I::Boolean(false)) {
+            I::Boolean(true) | I::Atom("true") => Some(I::Boolean(true)),
+            I::Boolean(false) | I::Atom("false") => None,
+            _ => return Err(source("ERR flow idempotent must be a boolean")),
+        };
+    }
     fields[7] = n::time(rows, "now_ms", None)?;
-    fields[8] = n::time(rows, "run_at_ms", fields[7])?;
+    if starting {
+        start::deadline(fields[7], fields[23])?;
+    } else {
+        fields[8] = n::time(rows, "run_at_ms", fields[7])?;
+    }
     fields[9] = retention(rows)?;
     fields[10] = active(rows)?;
     let hot = if n::positive(context.history_hot_maximum) {

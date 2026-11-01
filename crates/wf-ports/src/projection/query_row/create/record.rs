@@ -56,7 +56,7 @@ pub(super) fn validate(
     for (slot, (name, value)) in entries.iter_mut().zip(caller.state_metadata_update()) {
         *slot = (I::Binary(name.as_bytes()), scalar(*value));
     }
-    let state = caller.field("state").ok_or(E::Limit)?;
+    let state = caller.field("state_meta_state").unwrap_or(I::Nil);
     let meta = [(
         state,
         I::Map(
@@ -138,7 +138,7 @@ fn base_fields<'r, 'a>(
         ("next_run_at_ms", caller.field("run_at_ms").unwrap_or(now)),
         ("lease_deadline_ms", I::Integer(0)),
         ("attempts", I::Integer(0)),
-        ("run_state", I::Nil),
+        ("run_state", caller.field("run_state").unwrap_or(I::Nil)),
         ("max_active_ms", max_active),
         ("state_enter_seq", I::Integer(0)),
         ("history_max_events", I::Integer(0)),

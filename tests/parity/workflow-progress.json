@@ -8354,7 +8354,34 @@
       "runtime_case_ids": [
         "2778df9fbf2a1eba337462da1e1de65edc5f5e90740fd14dd331103be3f0c65b"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-start1-e43b0471a640f40d",
+          "rust_file": "crates/wf-ports/tests/original_create/start.rs",
+          "rust_file_sha256": "844ff545535fc73762ef0602d644f7ffa61344c3d9e8129dbc942362b2447f66",
+          "rust_module": "",
+          "rust_function": "source_lease_mutations_reject_deadlines_outside_exact_timestamp_range",
+          "assertions": [
+            {
+              "source_line": 119,
+              "source_text": "assert {:error, \"ERR flow lease_ms exceeds maximum 9007199254740991\"} =",
+              "rust_line": 86,
+              "rust_text": "assert!(matches!(outcome, Outcome::Rejected {message, ..} if message == expected));"
+            },
+            {
+              "source_line": 126,
+              "source_text": "assert {:error, \"ERR flow lease_ms deadline exceeds maximum 9007199254740991\"} =",
+              "rust_line": 86,
+              "rust_text": "assert!(matches!(outcome, Outcome::Rejected {message, ..} if message == expected));"
+            }
+          ],
+          "limitations": [
+            "Complete pinned standalone MutationAttrs lease ceiling/deadline scenario: both original assertions, exact id/type/state/worker fixtures, timestamp boundary expressions and observation order execute. The original async:true/flow case has no local setup.",
+            "This executes original source-helper normalization and query admission through the Rust domain/ports path. Captured configuration/internal observations are ordinary data; native public service, VM capability acquisition, writer/index adoption and all remaining runtime/platform profiles are not certified.",
+            "The source case has compiled pre-body runtime RED followed by GREEN. Other new shape, error-order, alias, ownership and resource controls are supplemental; no measured performance improvement is claimed."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "65c3497d7edaac81",

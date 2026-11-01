@@ -8,6 +8,8 @@ use wf_ports::projection::query_row::{PreparedOriginalCreate, prepare_original_c
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 mod resources;
 mod source;
+mod start;
+mod start_validation;
 mod validation;
 fn limits() -> OriginalCreateLimits {
     OriginalCreateLimits {
