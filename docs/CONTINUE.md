@@ -2,6 +2,58 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+STRONG-RECORD-VALUES1 follows f41fa02 in the isolated implementation worktree.
+Current-record queries now compose regular payload/result/error hydration with the
+existing history collector/projector. Actual native refs render once or borrow;
+scoped core/metadata/binding owners move unchanged, and exact ordered field writes
+move into output. No second decoder, record tree or fabricated reference is added.
+Disabled/missing/expired/reference-free paths skip unused value stages. A separate
+authorized value batch rechecks tenant/placement and samples one server expiry
+clock. Stored-size omission, empty decoded bytes, missing flags and sanitized read
+errors stay distinct; malformed batches/unsafe drift remain operational failures.
+Record position does not certify the independently observed value availability.
+
+Payload/history return normalization reuses existing option validators: full then
+payload, or history values, first occurrence, max validation when disabled, zero,
+exact-integer ceiling, and bounded explicit requests under huge configured maxima.
+Actual public/internal configuration and raw-input/capability admission stay outer.
+Whole-call logical ceilings retain record/ref owners and prepay configured reached
+read/conversion/projector work/temporary cohorts. Skipped bounds are not consumed.
+Final output counts actual write spines and decoded buffer capacities through an
+O(1) getter. Conservative counters are not CPU, allocator/RSS or speed measurements.
+
+Six controls have compiled pre-body runtime RED (three options, three native);
+15 later controls are supplemental. All21 new controls pass. Actual create/cancel,
+atomic start/complete, scoped read/reopen, empty bytes, independent error expiry,
+authorization revocation, captured read/shape errors and resource endpoints execute.
+The two fixture fixes (correct later batch clock; supported mode7 atomic start
+rather than an unsupported mode5 standalone Claim tag) earn no behavioral RED.
+No source-case credit: ledger170 declarations/184 mappings/801 links is byte-exact;
+full parity actually exits1. Of1344 prior test/bench/reference inputs,1342 stay
+whole; one gains only module registration and one has an exact profile5 helper
+inverse. Every old assertion and source/runtime identity remains unchanged.
+
+Final frozen verification passes2035 Rust tests/129 groups and11 doctests/15 groups,
+zero failed/ignored, including all60 architecture controls. Strict all-target
+Clippy, warning-denied docs, Python7, reference/progress/fmt/diff pass. All2325
+non-Markdown/1736 Rust inputs stay exact. Prefix /private/tmp/ferricstore2-record-
+values- holds logs/checks/inputs/source-audit/proof. All jobs terminal. No new Linux/
+Elixir, independent review, primary implementation adoption, push, accepted runtime
+or full completion is claimed. The original Elixir checkout/fix remain preserved.
+
+NEXT complete original get argument/option/scope normalization and public return
+projection; add actual native named-reference capture and hydration instead of
+inferring empty metadata. Public/internal authority/configuration, quorum/clock/
+deadline/shared admission and HTTP/TCP remain required integrations. Rich native
+original write ingress and writer-derived metadata/indexes, full mutation/many/
+child breadth, projected query/history/lineage, lifecycle/catalog/blocking/pipeline
+and all remaining original source/profile/platform/performance gates stay open.
+Continue the unchanged full goal solo; component counts do not establish readiness.
+
+## Preceding f41fa02 strong record application checkpoint (historical)
+
+The following describes the predecessor only.
+
 STRONG-RECORD-QUERY1 follows ee81964 in the isolated implementation worktree.
 Application current-record queries now call the explicit StrongWorkflowRecordReadPort
 capability, then compose actual native preparation and terminal visibility. Its owner

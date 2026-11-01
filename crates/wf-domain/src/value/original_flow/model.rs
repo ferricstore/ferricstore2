@@ -14,6 +14,20 @@ pub struct OriginalValueDocument {
 }
 
 impl OriginalValueDocument {
+    /// Owned buffer capacities, excluding the enclosing static document descriptor.
+    /// This is logical buffer ownership, without allocator metadata or RSS.
+    #[must_use]
+    pub fn owned_buffer_bytes(&self) -> Option<usize> {
+        self.nodes
+            .capacity()
+            .checked_mul(std::mem::size_of::<OriginalValueNode>())?
+            .checked_add(
+                self.edges
+                    .capacity()
+                    .checked_mul(std::mem::size_of::<usize>())?,
+            )?
+            .checked_add(self.encoded.capacity())
+    }
     pub(crate) fn as_input(&self) -> crate::value::OriginalValueInput<'_> {
         crate::value::OriginalValueInput {
             bytes: &self.encoded,

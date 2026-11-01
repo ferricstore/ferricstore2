@@ -1,5 +1,52 @@
 # ADR-009: explicit stored workflow value ingress
 
+## Regular value hydration over a strong native record
+
+STRONG-RECORD-VALUES1 reuses the existing history value collector/projector over a
+single borrowed current native record. It retains original missing/nil/omitted/
+stored-size/decoded/error field behavior without a second parser, reconstructed
+record or self-referential result. Exact ordered writes move into owned output
+beside the unchanged typed base. Public DTO mapping must apply the selected writes;
+the native base is internal data and is not itself a public return projection.
+
+Actual opaque refs borrow and actual Versioned refs render once through the
+existing canonical source constructor. A separate authorized value-read capability
+must recheck current tenant/placement/expiry lifecycle after the record read.
+Reference bytes are not read authority. Record and values intentionally need not
+share a DB revision: the source performs a separate batch, values have immutable
+version identities and independent expiry, and later expiry can produce a missing
+value beside a still-returned record. One actual server clock is sampled per batch.
+No current authorization, storage/profile/drift or slot-shape failure is silently
+converted to absence. Existing conversion preserves source sanitized per-field
+read failures and refuses observations that cannot honestly be projected.
+
+Payload/history return normalization shares the existing option validators.
+It preserves first occurrence, full->payload ordering, values selection for
+history, maximum validation even when disabled, zero and exact-integer ceilings.
+The input configured maximum is the actual selected public/internal capture.
+A huge positive configured maximum may admit an explicit bounded request while
+an omitted requested maximum still reaches the source exact-integer refusal.
+The normalizer allocates no option list and introduces no second integer parser.
+It confers no environment/internal authority or raw-input admission; accepted
+service ingress must supply those bindings and configured semantic policy.
+
+Whole-call work/temporary ceilings retain the record observation and prospectively
+fund bounded rendered refs. The existing value reader and consuming converter do
+not return work telemetry, so their configured work/temporary ceilings are
+nonrefundable reached-stage cohorts. Reserve the existing projector's work and
+cumulative requested-byte ceilings once before its continuous prepare/apply
+account. Skipped stages do not validate or consume unused bounds. Final output
+admission counts the actual write spine and decoded encoded/node/edge buffer
+capacities through an O(1) document accessor. These are conservative logical
+liabilities, not allocator/RSS/latency/throughput evidence or production quotas.
+
+Actual create/cancel, atomic start/complete, sized reads, independent error expiry,
+scoped read/reopen, empty bytes, authorization revocation and resource boundaries
+execute under controlled authority providers. Named reference capture/hydration,
+complete original Flow.get input/public projection, accepted quorum/clock/deadline/
+admission/runtime and all source/profile/platform acceptance gates remain open.
+No format/intent/dependency change or source-case credit is introduced.
+
 ## Strong current-record application query contract
 
 STRONG-RECORD-QUERY1 connects the typed native producer to application queries

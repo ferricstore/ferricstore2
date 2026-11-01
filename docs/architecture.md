@@ -38,6 +38,30 @@ names must not enter that identity. See SOURCE-CREATE1 and SOURCE-START1 in the
 
 ## Coherent native record queries
 
+`query_strong_workflow_record_with_values` composes the same current-record query
+with regular payload/result/error hydration. The existing history collector and
+projector implement the source field rules over one unchanged native base, so no
+second decoder or record tree is introduced. Actual opaque refs borrow; native
+Versioned refs render once through the existing canonical constructor. A separate
+`AuthorizedWorkflowValueReadPort` must reauthorize the current tenant/placement and
+sample one server expiry clock for its batch. This follows the source's separate
+record/value lifecycle, without claiming one physical revision across both reads.
+Disabled, missing, expired or reference-free records skip unused stages. Stored-size
+omission, missing flags, exact decoded values and sanitized errors stay distinct.
+Unsafe drift or malformed captured batches remain operational failures.
+
+Selected payload/history return flags normalize through the existing option
+validators, preserving full/payload/values order, first occurrences, zero, exact
+integer ceilings and explicit bounded requests under large configured maxima.
+Actual environment/internal capability capture and raw input admission remain
+outer requirements. Whole-call logical resource admission retains record owners
+and prepays configured read/conversion/projector ceilings before reached stages;
+these conservative cohorts do not measure CPU or RSS. Final owned data is measured
+from write spines and decoded buffer capacities. Scope/core/metadata owners move.
+Named reference capture/hydration, complete original get normalization and public
+DTO projection remain required, alongside the accepted quorum/runtime gate. See
+STRONG-RECORD-VALUES1 in the [coordination review](reviews/workflow-completion-coordination.md).
+
 `wf-application::queries::query_strong_workflow_record` now connects typed native
 preparation to the explicit `StrongWorkflowRecordReadPort` capability. The owner
 must reauthorize tenant/query scope, validate actual placement and recovery,

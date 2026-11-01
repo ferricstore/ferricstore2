@@ -7,7 +7,9 @@ mod catalog;
 mod encoding;
 mod history;
 mod publication;
+mod read;
 mod reference;
+pub use read::AuthorizedWorkflowValueReadPort;
 
 pub use catalog::{
     WorkflowValueBinding, WorkflowValueBindingKnowledge, WorkflowValueLifecycle,

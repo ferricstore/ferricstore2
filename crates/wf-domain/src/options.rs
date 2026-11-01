@@ -7,8 +7,13 @@ use std::fmt;
 
 use crate::policy::complete::RawFlowPolicyValue as Raw;
 
+mod payload_return;
 mod put;
 mod score_bound;
+pub use payload_return::{
+    OriginalPayloadReturn, OriginalPayloadReturnError, normalize_original_history_payload_return,
+    normalize_original_payload_return,
+};
 
 pub use put::{maybe_put_attr, maybe_put_default_attr, maybe_put_keyword};
 pub use score_bound::{OriginalScoreBound, OriginalScoreBoundError, parse_original_score_bound};

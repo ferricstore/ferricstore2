@@ -64495,3 +64495,152 @@ holds logs/checks/inputs/source-audit/proof; all jobs terminal. No new native Li
 Elixir, accepted quorum/service runtime, independent review, primary implementation
 adoption, push or full completion. Continue original get/hydration and all remaining
 source/runtime/platform/performance gates solo under the unchanged full goal.
+
+### STRONG-RECORD-VALUES1 concrete solo architecture decision
+
+Previous goal turn was progress: f41fa02 implements scoped application queries and
+c5ac5a2 updates the docs-only pointer. Continue solo. Pinned payload_return.ex:1-64
+selects full->payload then the bounded max, including validation when disabled;
+flow.ex:488-560,1791-1845 places named/partition processing afterward. Pinned
+value_hydration.ex:8-53,159-275 performs the same payload/result/error rules as the
+already implemented history value collector/projector. Reuse it, including stable
+unique refs, stored-size threshold, exact ordered writes and decoder semantics.
+Native metadata has no actual named-reference capture yet: named hydration and
+complete original Flow.get normalization/public projection remain required, not
+silently treated as an empty capture. This increment completes the regular value
+composition contract; it is not full original get or accepted quorum/runtime.
+
+Approve `wf-domain/src/options/payload_return.rs`, private under existing options,
+and options.rs exports: OriginalPayloadReturn, OriginalPayloadReturnError,
+normalize_original_payload_return and normalize_original_history_payload_return.
+Input is the existing captured proper option slice and the actually selected raw
+public/internal configured maximum; this helper does not grant internal authority
+or read environment. Reuse existing boolean/integer option validators. Preserve
+first occurrence/error order, exact-integer ceiling and arbitrary positive large
+configured maxima when an explicit bounded request is supplied. The opaque result
+contains enabled/max bytes; its getter converts to existing HistoryValueReturn.
+No second integer parser or option-list allocation. Add integration target
+`wf-domain/tests/payload_return/main.rs` with private `validation.rs`.
+
+Approve `wf-ports/src/blob/read.rs` and blob.rs export of
+AuthorizedWorkflowValueReadPort. Each batch must reauthorize current tenant/scope/
+placement, read exact immutable refs under supported provenance, honor its bounds,
+and sample one actual server clock for expiry. Return existing sized value slots;
+keep unavailable/unsafe-drift/profile/read failures distinct from absence. No
+physical store implementation grants authorization. This separate batch follows
+the source get lifecycle; it does not claim the record and values share one DB
+revision or collapse independent value expiry into record expiry.
+
+Approve `wf-application/src/queries/record_values.rs` plus private
+`record_values/{model,budget,reference,hydrate}.rs`, exported by queries.rs:
+StrongWorkflowRecordValueRequest, StrongWorkflowRecordValueLimits,
+StrongWorkflowRecordValueResult, StrongWorkflowRecordValueError,
+query_strong_workflow_record_with_values and private budget::Budget. Compose the
+existing record query, skip acquisition on disabled/missing/expired/no eligible
+refs, render actual Versioned refs with the existing canonical constructor and
+borrow Opaque refs, then prepare/apply the existing history projector over one
+borrowed entry. Move its writes into owned output beside the unchanged native
+record. No self-referential result, fabricated locator/reference, duplicated parser,
+record/metadata clone or implicit public DTO/inline-value exposure is introduced.
+
+Whole-call limits clip record-stage work/temporary bounds, retain its owners and
+fund routing/ref buffers prospectively. Value-reader and conversion stages have
+no returned work telemetry; reserve their configured work/temporary ceilings
+nonrefundably before each reached call, as existing history composition does.
+Reserve the unchanged projector's configured work/requested-byte ceilings for its
+continuous prepare/apply account. Reached limits must be positive; skipped stages
+do not validate or consume unused bounds. Independently validate incoming sized
+batch cardinality/owners through the existing converter. Measure final result
+scope/core plus write/descriptors/decoded document backing for output admission.
+These are conservative logical bounds, not allocator/RSS or measured speedups.
+
+Approve tests under existing node workflow_query target: hydration.rs with private
+hydration/{fixtures,ports,values,resources}.rs; HydrationFixture, HydrationFault
+and HydrationClock helper types. Reuse the actual existing create/cancel writer
+by making QueryFixture::apply pub(super) within this test target only, leaving its
+body and every old assertion intact. Controlled authorization/value diagnoses are
+labeled; actual storage/clock/size/decoder paths execute. Three compiled pre-body
+runtime RED cases precede behavior; later resource/shape/expiry/scoped/reopen/error
+controls are supplemental. No source-case credit without full source scenarios/
+VM/internal capture requirements. Keep400/600, fn100/depth4/complexity25, no unsafe,
+new dependency, format/layout/intent or OS-specific mechanism. This is concrete
+solo architecture/resource review, not independent review. Full goal stays active.
+
+STRONG-RECORD-VALUES1 output-sizing refinement: approve the existing
+value/original_flow/model.rs OriginalValueDocument::owned_buffer_bytes accessor
+returning checked encoded/node/edge buffer capacities times element sizes. Its
+O(1) count excludes the enclosing static document descriptor already counted in
+the write spine. This avoids exposing its internal arenas or cloning/traversing
+them for application output admission. No parsing/representation/fee changes.
+
+STRONG-RECORD-VALUES1 fixture refinement before factoring: the existing metadata
+writer contains atomic-start mode7, while its mode5 intentionally rejects standalone
+Claim. Use actual mode7 StartAndClaim followed by mode5 Complete for the supplemental
+result-read path; do not enable another codec tag or seed a leased record. Approve
+QueryFixture::apply_profile in the existing fixture: factor the exact old apply
+body with only profile5 replaced by the argument; keep apply as its profile5
+wrapper. Existing fixture behavior/assertions remain exact under that inverse.
+The expiry fixture initially still passed base.now because its clock replacement
+did not match formatted code; correct it to the explicit later batch clock before
+claiming independently expired-error coverage. No storage behavior change or
+behavioral RED credit follows from either fixture correction.
+
+### STRONG-RECORD-VALUES1 final source/architecture/resource self-review
+
+The current-record application path now renders actual Versioned refs with the
+existing canonical constructor and borrows actual Opaque refs. The existing
+history collector/projector runs over one borrowed native base; exact ordered
+payload/result/error writes move into owned output, without a second decoder,
+record/metadata/policy clone or self-referential owner. Public DTO mapping still
+must select the base and apply writes. Named refs are not captured yet; do not
+replace that unknown with an empty map or claim complete original get support.
+
+The selected payload/history return helper reuses existing boolean/integer option
+validation, first occurrence/error order and the exact-integer ceiling. A bounded
+explicit request under a huge positive configured maximum remains valid, while
+an absent request reaches the original ceiling refusal. Zero and maximum checks
+when disabled execute. Captured configuration, proper rows, raw-input accounting,
+environment fallback and internal grant acquisition remain outer requirements;
+ordinary normalized data confers no internal or read authority. This helper is
+not a public ingress/admission or whole original test acceptance certificate.
+
+A separate AuthorizedWorkflowValueReadPort rechecks current scope/placement and
+samples one server expiry clock for its batch. Immutable exact refs do not grant
+read authority. Record and value availability need not share a DB revision: the
+actual cancelled-error case is read before terminal expiry and its value batch
+runs after the error's independent deadline. Core applied position is not a
+freshness certificate for those independently observed value availability flags.
+Actual empty bytes decode at max0; stored-size omission, known missing, sanitized
+per-field read errors and operational malformed/unsafe-drift refusals stay distinct.
+Controlled faults are explicitly captured diagnoses, not claims of engine faults
+or production authorization/quorum. The accepted runtime gate remains open.
+
+The parent retains the record and rendered-ref owners. Because existing value
+acquisition/conversion APIs return no work telemetry, configured reached work/
+temporary caps are nonrefundable cohorts. The unchanged projector is funded once
+for its continuous prepare/apply work/requested-owner account. Skipped stages do
+not validate or consume unused limits. O(1) decoded buffer capacity measurement
+and actual write-spine capacity fund final output. Conservative logical cohorts
+are not allocator/RSS, CPU, latency, throughput or measured resource-protection
+quotas. No new dependency/format/intent/unsafe/OS-specific path is added; unchanged
+400/600, fn100, depth4 and complexity25 pass without lint waivers.
+
+Six compiled pre-body runtime controls (options3/native3) fail on the missing
+behavior and pass after it. Fifteen later controls are supplemental. All21 new
+controls pass. Actual create/cancel, mode7 atomic start/mode5 completion, canonical
+scoped refs/reopen, independent error expiry, byte0, authorization revocation and
+inclusive whole/independent resource boundaries execute. Fixture clock correction
+and contained-profile correction are structural fixes, not behavioral RED evidence.
+All1344 prior test/bench/reference inputs retain1342 whole and two exact structural
+inverses (module registration; profile5 helper factoring), with every earlier
+assertion/source/runtime identity intact. Ledger170/184/801 stays byte-exact and
+no source-case credit is added. Full parity actually exits1 as required.
+
+Final frozen workspace2035/129 groups, doctests11/15 groups, all60 architecture
+controls, strict all-target Clippy, warning-denied docs, Python7 and reference/
+progress/fmt/diff pass, zero failed/ignored. All2325 non-Markdown/1736 Rust inputs
+stay exact. Prefix `/private/tmp/ferricstore2-record-values-` holds final logs/
+checks/inputs/source-audit/proof; all jobs terminal. No new native Linux/Elixir,
+independent review, primary code adoption, push, accepted runtime or full completion.
+Continue original get/public projection/named capture and every remaining source/
+platform/runtime/performance gate solo under the unchanged full objective.

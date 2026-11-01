@@ -128,7 +128,16 @@ impl QueryFixture {
             110,
         )
     }
-    fn apply(&mut self, operation: Operation, at: u64, now: u64) -> TestResult {
+    pub(super) fn apply(&mut self, operation: Operation, at: u64, now: u64) -> TestResult {
+        self.apply_profile(operation, 5, at, now)
+    }
+    pub(super) fn apply_profile(
+        &mut self,
+        operation: Operation,
+        profile: u8,
+        at: u64,
+        now: u64,
+    ) -> TestResult {
         let scope = f::scope()?;
         let target = if at == 0 {
             WorkflowValueTargetGuard::Absent
@@ -154,7 +163,7 @@ impl QueryFixture {
             scope: scope.clone(),
             request: RequestId::new(format!("query-{at}").into_bytes())?,
             stamp: f::clock(now, 0, now)?,
-            profile: 5,
+            profile,
             policy_references_captured: Some(true),
             defaults: defaults(),
             policies: vec![witness()?],

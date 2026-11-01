@@ -1,6 +1,7 @@
 //! Application query contract over real consumed storage and a controlled barrier.
 #![forbid(unsafe_code)]
 mod fixtures;
+mod hydration;
 mod ports;
 mod resources;
 mod validation;
