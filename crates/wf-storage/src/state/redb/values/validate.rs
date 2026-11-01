@@ -25,6 +25,7 @@ pub(crate) fn cohort(
     defaults: WorkflowValueDefaults,
     alias_format: u16,
     layout: u16,
+    binding_format: u16,
 ) -> Result<(), Error> {
     let maximum_work = total(
         product(tx.maximum_steps, 65_536)?,
@@ -90,7 +91,7 @@ pub(crate) fn cohort(
                 &scope,
                 defaults,
                 &mut charge,
-                (alias_format, layout),
+                (alias_format, layout, binding_format),
             )?,
             8 => immutable(
                 tx,
@@ -123,7 +124,7 @@ fn companion(
     scope: &RequestScope,
     defaults: WorkflowValueDefaults,
     charge: &mut ValueCharge,
-    (alias_format, layout): (u16, u16),
+    (alias_format, layout, binding_format): (u16, u16, u16),
 ) -> Result<(), Error> {
     charge.helper()?;
     charge.work(8_192)?;
@@ -167,6 +168,20 @@ fn companion(
     };
     let data = value::decode_binding(binding, defaults).map_err(admission::value_error)?;
     let history = matches!(decoded.family(), 5 | 11).then_some(decoded.part(5));
+    if binding_format == 2 {
+        charge.work(total(
+            4096,
+            [product(total(binding.len(), [source.len()])?, 4)?],
+        )?)?;
+    }
+    super::metadata::recovery::companion(
+        tx,
+        scope,
+        (&partition, &id),
+        history,
+        (binding, source),
+        (defaults, binding_format),
+    )?;
     let maximum_wire = if history.is_some() {
         source.len()
     } else {

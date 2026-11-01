@@ -31,6 +31,7 @@ pub(crate) struct ValueStep<'plan> {
 }
 
 pub(crate) struct ValuePublicationPlan<'plan> {
+    pub(crate) metadata: Option<super::metadata::MetadataPublication>,
     pub(crate) steps: Vec<ValueStep<'plan>>,
     pub(crate) prepared: PreparedDigest,
     pub(crate) mode: u8,
@@ -90,6 +91,7 @@ pub(super) fn build<'plan>(
         steps.push(next);
     }
     Ok(ValuePublicationPlan {
+        metadata: None,
         steps,
         prepared: inputs.prepared,
         mode: inputs.mode,
@@ -164,6 +166,7 @@ pub(super) fn empty(
     charge: ValueCharge,
 ) -> ValuePublicationPlan<'static> {
     ValuePublicationPlan {
+        metadata: None,
         steps: Vec::new(),
         prepared,
         mode,

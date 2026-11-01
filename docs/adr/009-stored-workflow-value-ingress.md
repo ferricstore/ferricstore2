@@ -64,6 +64,56 @@ atomic publication, metadata-aware history/index updates and complete snapshot
 installation/recovery are still required coupled integrations. No standalone
 metadata attachment API is introduced; missing legacy capture remains unknown.
 
+## Native captured-metadata data profile
+
+SOURCE-METADATA-NATIVE1 adds explicit intent22 over one verified stored9 batch
+and ordered optional metadata caller operands. The FWMD1 codec derives actual
+caller identity from verified inner caller identity and every metadata operand's
+presence/length/bytes. Generated time, target guards, policy witnesses and
+configured defaults remain outside caller identity through the existing inner
+codec. Producers must supply original caller data here, never generated record
+postimages. An absent operand carries actual prior data; a successful birth
+requires an explicit capture. Failed/no-op items cannot attach metadata alone.
+The four contained reducer profiles keep their declared response grammars5..8.
+
+Fresh `create_metadata_value_database` selects alias2, full-history layout8 and
+binding-format2. Existing manifests and encoded binding-format1 data retain their
+meaning. Metadata commands refuse legacy authority before retained inspection.
+Legacy value mutations and Claims in metadata authority preserve actual captured
+bytes. This is a private native data extension; it does not implement original
+public field normalization, logical partition/scope routing or typed ETF/source
+validity. Those adapters and their actual compatibility captures remain required.
+
+FWMB1 wraps the unchanged FWVB1 lifecycle/reference bytes, exact core version,
+SHA256 of the actual existing FWSR2 core, opaque metadata bytes and checksum.
+Current/history keys already select the native point; the core digest covers
+its complete namespace, ID, version and ordering without duplicating the core.
+Created incarnation must match state-entry sequence. Same-guard readers validate
+companions before mutation, while reopen and snapshot validation reject crossed
+core digests, missing captures or scalar-only bindings in this profile. A checksum
+and native association establish no original logical routing or source origin.
+FWMC remains the complete data exchange/inspection format; persistent bindings
+use the compact digest representation to avoid another complete stored core.
+
+Existing core indexes, core rows, complete native history, immutable values,
+aliases, metadata bindings, retained outcomes and control use one consumed Immediate
+transaction. Output/admission failure aborts the whole publication; an uncertain
+sync fences the owner and requires reopen/reconciliation. Snapshot export, receive,
+install and reopen share complete companion validation and require equal binding
+formats; a snapshot cannot implicitly upgrade a scalar-profile target. Scoped
+metadata reads use one coherent read snapshot, independent copied-byte/work/
+temporary limits and return owned opaque bytes. Legacy capture is unavailable.
+
+The outer frame and nested preparation share one work/owned account. Metadata
+selection uses an admitted per-query cache and moves/shares Arc<Vec<u8>> owners
+across repeated successful targets. Failed items never update that cache. A bulk
+publication reads its immutable manifest format once. Large temporary value
+wrappers are borrowed; no measured speedup, allocator/RSS or native Linux result
+is claimed. Original metadata-derived indexes, exact QueryRow validation and
+public caller/context/routing integration remain open. Accepted Node/Raft/runtime
+profile22 dispatch is also required; retained request replay here is native M2
+transaction evidence, not accepted consensus startup or production service proof.
+
 ## Existing stored-value integration
 
 Status: private codec, explicit physical capability, consumed stored9 publication/

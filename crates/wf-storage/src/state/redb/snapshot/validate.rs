@@ -248,6 +248,7 @@ pub(super) fn value_defaults_compatible(
         let b = super::super::values::manifest::parse(new, tx.group, tx.recovery)
             .map_err(SnapshotError::Stage)?;
         if a.defaults != b.defaults
+            || a.binding_format != b.binding_format
             || a.alias_format != b.alias_format
             || a.credit_shard_count != b.credit_shard_count
             || a.credit_catalog != b.credit_catalog

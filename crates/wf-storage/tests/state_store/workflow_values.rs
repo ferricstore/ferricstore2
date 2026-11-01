@@ -10,6 +10,7 @@ mod history_hydration;
 mod history_page;
 mod logical_binding;
 mod logical_codec;
+mod metadata;
 mod publication;
 mod reads;
 mod recovery;

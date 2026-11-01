@@ -3,6 +3,55 @@
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
 
+SOURCE-METADATA-NATIVE1 follows a28be7a in the isolated worktree. Explicit
+intent22 now binds ordered opaque original metadata caller operands to an
+actually verified stored9 batch. Generated time/guard/policy/default preparation
+stays outside caller intent. The opted-in fresh alias2/layout8/binding-format2
+store publishes metadata with existing core indexes, core rows, full native
+history, values/aliases, retained outcomes and control in one consumed transaction.
+Births require explicit captures; failed/no-op items cannot attach metadata alone.
+Legacy value mutations and Claims preserve actual captured bytes.
+
+Compact FWMB1 wrappers retain exact old scalar binding bytes plus core version,
+a digest of the actual native core and opaque metadata. Native point/ordering/
+incarnation associations are validated before mutation and at reopen/snapshot
+boundaries. Complete snapshots restore current/history metadata and original
+receipts; scalar-profile targets cannot implicitly upgrade. Metadata reads use
+one coherent snapshot and independent byte/work/temp caps. A bounded per-query
+Arc<Vec<u8>> cache shares buffers across repeated accepted targets without an
+extra full core image or metadata payload conversion. No measured gain is claimed.
+
+Twenty codec/native controls pass, including all four reducer modes, original
+retry/conflict, legacy mutation/Claim carry, repeated targets with an intervening
+failed operand, late-output/missing-birth rollback, large data limits, actual
+snapshot transfer/reopen, resealed corruption and delegated uncertain-sync
+reconciliation/fencing. Four have compiled preimplementation RED; sixteen are
+supplemental. Existing tests/helpers/assertions are preserved. Of1,300 prior
+test/bench/reference inputs,1,299 are whole plus one exact module registration;
+the Rust subset is763 whole of764 plus that registration. No source-case credit.
+
+Final frozen verification passes 1,873 Rust tests plus11 doctests, zero failed/
+ignored, including all60 architecture cases. Strict workspace/all-target Clippy,
+strict docs, Python7, reference integrity, progress, fmt and diff pass. All2,214
+non-Markdown inputs /1,625 Rust files match. Evidence: /private/tmp/ferricstore2-
+metadata-native-*.log and proof/inputs/source-audit.json. Cargo retains the same
+isolated target, CARGO_HOME, offline cache and Rust1.99.0 below.
+
+Full parity still actually exits1. NEXT original public field normalization,
+separately validated server-derived metadata captures, actual compatibility
+context, logical scope/partition routing and exact QueryRow/key/projection
+integration. Intent22 metadata is original caller DATA; never insert generated
+postimages/defaults into its caller identity to simulate that integration. Native
+checksums/point association establish no original source/routing/typed validity.
+Original metadata-derived indexes, public/Claim and accepted Node/Raft/runtime
+profile integration remain required, alongside blocking/pipeline/lifecycle/catalog,
+all source scenarios/profiles and native Linux/macOS/performance gates. Continue
+solo. No production readiness, primary implementation adoption or push occurs.
+
+## Preceding a28be7a record representation checkpoint (historical)
+
+The following describes the predecessor only.
+
 SOURCE-METADATA-BINDING1 follows 2dff4aa in the isolated worktree. The new
 `state::value::record_capture` data codec places the existing FWSR2 core, original
 metadata operand and explicit u128 birth in one versioned, checksummed envelope.

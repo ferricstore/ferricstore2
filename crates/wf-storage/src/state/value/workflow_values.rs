@@ -138,6 +138,9 @@ pub(crate) fn decode_binding(
     bytes: &[u8],
     defaults: WorkflowValueDefaults,
 ) -> Result<ValueBindingData, Error> {
+    if bytes.starts_with(b"FWMB") {
+        return super::decode_metadata_binding(bytes, defaults).map(|capture| capture.binding);
+    }
     let mut at = start(bytes, *b"FWVB", bytes.len())?;
     let mut versions = [None; 3];
     for version in &mut versions {

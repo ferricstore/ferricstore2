@@ -3,6 +3,14 @@
 use super::{ClientIntent, RequestValueError};
 
 impl ClientIntent {
+    /// Explicit original metadata caller operands beside verified stored9 intent.
+    #[must_use]
+    pub const fn workflow_metadata_batch(digest: [u8; 32]) -> Self {
+        Self {
+            version: 22,
+            digest,
+        }
+    }
     /// Public V1 Claim digest with a separate internal funded-parent profile.
     #[must_use]
     pub const fn public_claim(digest: [u8; 32]) -> Self {

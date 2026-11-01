@@ -24,7 +24,7 @@ use crate::state::{
 use crate::transaction::{ValuePublicationPlan, ValueStep};
 
 mod immutable;
-use immutable::{immutable_value, key_bound, put, write_exact};
+use immutable::{immutable_value, key_bound, put, write_alias, write_exact};
 
 pub(crate) fn apply(
     tx: RedbStateTransaction<'_>,
@@ -55,12 +55,22 @@ pub(super) fn validate(
     if !matches!(tx.layout, 7 | 8) {
         return Err(Error::UnsupportedLayout);
     }
-    if matches!(publication.intent_version, 9 | 11) && tx.value_manifest()?.alias_format != 2 {
+    if matches!(publication.intent_version, 9 | 11 | 22) && tx.value_manifest()?.alias_format != 2 {
         return Err(Error::UnsupportedPolicyProfile);
     }
     let step =
         tx.layout == 8 && matches!(publication.intent_version, 10 | 11) && publication.mode == 10;
-    if !matches!(publication.intent_version, 8 | 9) && !step {
+    if !matches!(publication.intent_version, 8 | 9 | 22) && !step {
+        return Err(Error::InvalidChanges);
+    }
+    if publication.intent_version == 22 && tx.value_manifest()?.binding_format != 2 {
+        return Err(Error::UnsupportedPolicyProfile);
+    }
+    if publication
+        .metadata
+        .as_ref()
+        .is_some_and(|metadata| metadata.steps.len() != publication.steps.len())
+    {
         return Err(Error::InvalidChanges);
     }
     if (!matches!(publication.mode, 1 | 5 | 6 | 7) && !step)
@@ -122,11 +132,12 @@ pub(super) fn publish(
     publication: &mut ValuePublicationPlan<'_>,
 ) -> Result<(), Error> {
     publication.charge.helper()?;
+    let binding_format = tx.value_manifest()?.binding_format;
     let live = publication.charge.peak();
     publication
         .charge
         .work(product(publication.steps.len(), 128)?)?;
-    for step in &publication.steps {
+    for (position, step) in publication.steps.iter().enumerate() {
         publication.charge.candidate()?;
         let record = &step
             .plan
@@ -145,16 +156,37 @@ pub(super) fn publish(
                     (
                         index,
                         field.ok_or(Error::InvalidChanges)?,
-                        matches!(publication.intent_version, 9 | 11),
+                        matches!(publication.intent_version, 9 | 11 | 22),
                     ),
                     &mut publication.charge,
                     live,
                 )?;
             }
         }
-        publish_binding(tx, scope, step, false, &mut publication.charge, live)?;
+        let metadata = publication
+            .metadata
+            .as_ref()
+            .and_then(|metadata| metadata.steps.get(position))
+            .map(|bytes| bytes.as_slice());
+        publish_binding(
+            tx,
+            scope,
+            step,
+            false,
+            &mut publication.charge,
+            live,
+            (metadata, binding_format),
+        )?;
         if step.final_write {
-            publish_binding(tx, scope, step, true, &mut publication.charge, live)?;
+            publish_binding(
+                tx,
+                scope,
+                step,
+                true,
+                &mut publication.charge,
+                live,
+                (metadata, binding_format),
+            )?;
         }
     }
     Ok(())
@@ -260,30 +292,6 @@ fn publish_value(
     write_alias(tx, scope, &reference, alias, charge, live)
 }
 
-fn write_alias(
-    tx: &RedbStateTransaction<'_>,
-    scope: &RequestScope,
-    reference: &[u8],
-    alias: ValueAlias<'_>,
-    charge: &mut ValueCharge,
-    live: usize,
-) -> Result<(), Error> {
-    let alias_key = tx.key(
-        &[
-            scope.group().as_bytes(),
-            scope.recovery().as_bytes(),
-            scope.tenant().as_bytes(),
-            reference,
-        ],
-        0,
-        |maximum| key::encode_alias_key(scope, reference, maximum),
-    )?;
-    let alias_len = total(119, [alias.partition.len(), alias.id.len()])?;
-    charge.work(product(alias_len, 2)?)?;
-    let encoded = value::encode_alias(alias, alias_len).map_err(admission::value_error)?;
-    write_exact(tx, &alias_key, &encoded, charge, live)
-}
-
 fn publish_binding(
     tx: &RedbStateTransaction<'_>,
     scope: &RequestScope,
@@ -291,8 +299,17 @@ fn publish_binding(
     current: bool,
     charge: &mut ValueCharge,
     live: usize,
+    (metadata, binding_format): (Option<&[u8]>, u16),
 ) -> Result<(), Error> {
-    publish_binding_fields(tx, scope, step.plan, step.binding, current, charge, live)
+    publish_binding_selected(
+        tx,
+        scope,
+        step.plan,
+        (step.binding, metadata, binding_format),
+        current,
+        charge,
+        live,
+    )
 }
 
 pub(super) fn publish_binding_fields(
@@ -304,6 +321,41 @@ pub(super) fn publish_binding_fields(
     charge: &mut ValueCharge,
     live: usize,
 ) -> Result<(), Error> {
+    let binding_format = tx.value_manifest()?.binding_format;
+    publish_binding_selected(
+        tx,
+        scope,
+        scoped,
+        (binding, None, binding_format),
+        current,
+        charge,
+        live,
+    )
+}
+
+fn publish_binding_selected(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    scoped: &wf_domain::workflow::batch::ScopedPlan,
+    (binding, metadata, binding_format): (value::ValueBindingData, Option<&[u8]>, u16),
+    current: bool,
+    charge: &mut ValueCharge,
+    live: usize,
+) -> Result<(), Error> {
+    if binding_format == 2 {
+        return super::super::values::metadata::publication::publish(
+            tx,
+            scope,
+            scoped,
+            (binding, metadata),
+            current,
+            charge,
+            live,
+        );
+    }
+    if metadata.is_some() {
+        return Err(Error::InvalidChanges);
+    }
     charge.helper()?;
     let record = &scoped.plan().write().ok_or(Error::InvalidChanges)?.record;
     let event = scoped.plan().history().ok_or(Error::InvalidChanges)?;

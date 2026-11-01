@@ -100,7 +100,9 @@ fn outcome(
         layout,
     )
     .map_err(value_error)?;
-    if scanned.workflow_release_required() || matches!(scanned.intent_version(), 9 | 11..=17 | 19) {
+    if scanned.workflow_release_required()
+        || matches!(scanned.intent_version(), 9 | 11..=17 | 19 | 22)
+    {
         tx.temporary(total(
             scanned.owned_bytes(),
             [
@@ -110,6 +112,7 @@ fn outcome(
         )?)?;
         let facts = super::super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
         if facts.alias_format != 2
+            || (scanned.intent_version() == 22 && facts.binding_format != 2)
             || (scanned.governed_claim_required() && facts.governance_catalog.version() != 5)
             || (scanned.workflow_release_required() && !facts.governance_catalog.workflow_release())
             || (matches!(scanned.intent_version(), 12 | 13 | 17)

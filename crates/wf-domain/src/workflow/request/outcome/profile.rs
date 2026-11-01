@@ -66,7 +66,7 @@ pub(super) fn validate_response_profile(
     if matches!(
         status,
         RetainedStatus::IndexedRejected(IndexRejection::ReleaseBacklogFull)
-    ) && (intent.version() != 9 || !matches!(response_version, 5 | 6 | 8))
+    ) && (!matches!(intent.version(), 9 | 22) || !matches!(response_version, 5 | 6 | 8))
     {
         return Err(RequestValueError::UnsupportedVersion);
     }
@@ -138,7 +138,7 @@ fn validate_legacy_response_profile(
             Err(RequestValueError::UnsupportedVersion)
         };
     }
-    if matches!(intent.version(), 8 | 9)
+    if matches!(intent.version(), 8 | 9 | 22)
         && (!matches!(response_version, 5..=8)
             || !matches!(
                 status,
@@ -147,7 +147,7 @@ fn validate_legacy_response_profile(
     {
         return Err(RequestValueError::UnsupportedVersion);
     }
-    if !matches!(intent.version(), 8 | 9)
+    if !matches!(intent.version(), 8 | 9 | 22)
         && response_version != 1
         && !(response_version == 2 && intent.version() == 2 && status == RetainedStatus::Accepted)
         && !(response_version == 2

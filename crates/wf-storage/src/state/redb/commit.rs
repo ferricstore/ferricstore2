@@ -272,6 +272,9 @@ fn admit_outcome_profile(
     tx: &RedbStateTransaction<'_>,
     outcome: &RetainedOutcome,
 ) -> Result<(), StateTransactionError> {
+    if outcome.intent().version() == 22 && tx.value_manifest()?.binding_format != 2 {
+        return Err(StateTransactionError::UnsupportedPolicyProfile);
+    }
     if outcome.intent().version() == 18 {
         tx.require_workflow_release()?;
         tx.temporary(1024)?;

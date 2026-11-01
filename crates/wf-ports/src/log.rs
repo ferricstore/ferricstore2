@@ -86,6 +86,7 @@ pub use credit::{
 mod decode;
 mod encode;
 mod keys;
+mod metadata_batch;
 mod policy;
 mod public_mutation;
 mod reader;
@@ -95,6 +96,10 @@ mod storage;
 mod value_batch;
 pub use control::{
     decode_raft_membership_body, encode_raft_blank, encode_raft_membership, measure_control_entry,
+};
+pub use metadata_batch::{
+    MetadataBatchInput, MetadataBatchLimits, encode_workflow_metadata_batch,
+    prepare_workflow_metadata_batch,
 };
 pub(crate) use value_batch::response::validate_changes as validate_workflow_value_changes;
 pub use value_batch::{
@@ -226,7 +231,7 @@ impl DecodedRequest<'_> {
             Operation::Transition(value) => [value.payload.as_deref(), None],
             Operation::StartAndClaim(value)
                 if self.request.intent.version() == 7
-                    || (matches!(self.request.intent.version(), 8 | 9)
+                    || (matches!(self.request.intent.version(), 8 | 9 | 22)
                         && self
                             .workflow_value_metadata()
                             .is_some_and(|metadata| metadata.profile == 7)) =>

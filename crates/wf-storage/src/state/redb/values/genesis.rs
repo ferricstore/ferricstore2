@@ -16,6 +16,7 @@ use super::manifest::{self, GovernanceCatalogProfile, ValueManifest};
 /// Explicit immutable genesis capabilities; constructing them grants no authority.
 #[derive(Clone, Copy)]
 pub(in crate::state::redb) struct ValueGenesisCapabilities {
+    pub(in crate::state::redb) binding_format: u16,
     pub(in crate::state::redb) alias_format: u16,
     pub(in crate::state::redb) credit_shard_count: Option<u64>,
     pub(in crate::state::redb) credit_catalog: bool,
@@ -59,6 +60,7 @@ pub(in crate::state::redb) fn create_profile(
         defaults,
         limits,
         ValueGenesisCapabilities {
+            binding_format: 1,
             alias_format: capability.0,
             credit_shard_count: capability.1,
             credit_catalog: capability.2,
@@ -81,6 +83,11 @@ pub(in crate::state::redb) fn create_selected_profile(
     capability: ValueGenesisCapabilities,
 ) -> Result<RedbStateStore, Error> {
     if !matches!(capability.alias_format, 1 | 2) {
+        return Err(Error::UnsupportedPolicyProfile);
+    }
+    if !matches!(capability.binding_format, 1 | 2)
+        || (capability.binding_format == 2 && capability.alias_format != 2)
+    {
         return Err(Error::UnsupportedPolicyProfile);
     }
     if capability.credit_catalog && capability.credit_shard_count.is_none() {
@@ -159,8 +166,10 @@ fn initialize(
     let origin = bootstrap::manifest(store, genesis, genesis_hash, origin_size)?;
     let current_hash = current_hash(&tx)?;
     let current = ValueManifest {
+        binding_format: capability.binding_format,
         layout: if capability.credit_shard_count.is_some()
             || capability.governance_catalog.enabled()
+            || capability.binding_format == 2
         {
             8
         } else {

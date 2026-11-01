@@ -13,6 +13,11 @@ mod membership;
 mod outcome;
 mod record;
 mod record_capture;
+mod record_metadata;
+pub(crate) use record_metadata::{
+    RecordMetadataBinding, decode_metadata_binding, encode_metadata_binding,
+    encoded_metadata_binding_size, metadata_source_core, validate_metadata_source,
+};
 mod workflow_values;
 
 pub use control::{decode_control, encode_control};

@@ -27,13 +27,13 @@ pub fn encode_outcome_profiled(
     charge: &mut PolicySchemaCharge,
     maximum_policy_owner_bytes: usize,
 ) -> Result<Vec<u8>, StateValueError> {
-    if !matches!(outcome.intent().version(), 2 | 4 | 8 | 9) {
+    if !matches!(outcome.intent().version(), 2 | 4 | 8 | 9 | 22) {
         return encode_outcome(outcome, maximum_wire_bytes);
     }
     if maximum_wire_bytes == 0 {
         return Err(StateValueError::InvalidValue);
     }
-    let status = if matches!(outcome.intent().version(), 8 | 9) {
+    let status = if matches!(outcome.intent().version(), 8 | 9 | 22) {
         workflow_value_status(outcome, admission)?
     } else {
         retained_status(
@@ -123,7 +123,8 @@ fn validation_bytes(
             if intent == 12 && layout == Some(8) {
                 return Ok(18_432);
             }
-            if matches!(intent, 8 | 9) && layout.is_some_and(|layout| !matches!(layout, 7 | 8)) {
+            if matches!(intent, 8 | 9 | 22) && layout.is_some_and(|layout| !matches!(layout, 7 | 8))
+            {
                 return Err(StateValueError::Malformed);
             }
             let core_original = layout.is_some() && intent == 2 && response_version == 2;
@@ -166,6 +167,7 @@ pub(super) fn restore_intent(
         7 => ClientIntent::atomic_start(digest),
         8 => ClientIntent::workflow_value_batch(digest),
         9 => ClientIntent::workflow_stored_value_batch(digest),
+        22 => ClientIntent::workflow_metadata_batch(digest),
         _ => return Err(StateValueError::UnsupportedVersion),
     })
 }
@@ -207,7 +209,7 @@ pub(super) fn response_summary(
             admission,
         );
     }
-    if matches!(intent.version(), 8 | 9) {
+    if matches!(intent.version(), 8 | 9 | 22) {
         return workflow_value_retained_summary(
             intent,
             response_version,

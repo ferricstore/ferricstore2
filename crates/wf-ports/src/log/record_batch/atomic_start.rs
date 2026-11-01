@@ -41,7 +41,7 @@ pub fn inspect_atomic_start_point<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace_limit, 7)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
-    if !matches!(decoded.request.intent.version(), 8 | 9)
+    if !matches!(decoded.request.intent.version(), 8 | 9 | 22)
         && let GateDecision::Replay(original) = gate.decision()
     {
         let (status, count) = atomic_start_retained_summary(

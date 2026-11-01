@@ -14,7 +14,7 @@ use crate::log::public_mutation::response as public;
 use crate::log::record_batch::{atomic_start::response as atomic, response as batch};
 
 pub(in crate::log) fn effective_profile(decoded: &DecodedRequest<'_>) -> Result<u16, CodecError> {
-    if !matches!(decoded.request.intent.version(), 8 | 9) {
+    if !matches!(decoded.request.intent.version(), 8 | 9 | 22) {
         return Ok(decoded.request.intent.version());
     }
     let mode = u16::from(
@@ -46,7 +46,7 @@ pub(in crate::log) fn response_version(
     decoded: &DecodedRequest<'_>,
     legacy_version: u16,
 ) -> Result<u16, CodecError> {
-    if !matches!(decoded.request.intent.version(), 8 | 9) {
+    if !matches!(decoded.request.intent.version(), 8 | 9 | 22) {
         return Ok(legacy_version);
     }
     match effective_profile(decoded)? {
@@ -68,7 +68,7 @@ pub fn workflow_value_retained_summary(
     time: TimestampMillis,
     admission: AdmissionLimits,
 ) -> Result<(RetainedStatus, Option<usize>), CodecError> {
-    if !matches!(intent.version(), 8 | 9) {
+    if !matches!(intent.version(), 8 | 9 | 22) {
         return Err(CodecError::UnsupportedVersion);
     }
     if response.len() > admission.decision_bytes() {
@@ -84,7 +84,7 @@ pub fn workflow_value_retained_summary(
         == RetainedStatus::IndexedRejected(
             wf_domain::workflow::indexed::IndexRejection::ReleaseBacklogFull,
         )
-        && (intent.version() != 9 || !matches!(response_version, 5 | 6 | 8))
+        && (!matches!(intent.version(), 9 | 22) || !matches!(response_version, 5 | 6 | 8))
     {
         return Err(CodecError::UnsupportedTag);
     }
@@ -102,7 +102,7 @@ pub(in crate::log) fn check_replay(
     original: &RetainedOutcome,
 ) -> Result<(), crate::log::RecordBatchApplyError> {
     let mode = effective_profile(decoded)?;
-    if !matches!(decoded.request.intent.version(), 8 | 9)
+    if !matches!(decoded.request.intent.version(), 8 | 9 | 22)
         || original.intent() != decoded.request.intent
         || original.response_version() != response_version(decoded, 0)?
     {
@@ -150,7 +150,7 @@ pub(crate) fn validate_changes(
         .ok_or(StateTransactionError::InvalidChanges)?
         .log();
     let time = control.execution_time();
-    if !matches!(outcome.intent().version(), 8 | 9)
+    if !matches!(outcome.intent().version(), 8 | 9 | 22)
         || outcome.scope() != scope
         || outcome.original_position() != position
         || outcome.original_time() != time

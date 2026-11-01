@@ -79,6 +79,7 @@ pub struct WorkflowValueMetadata<'a> {
 }
 
 pub(super) struct ValueBatchMetadata {
+    pub(in crate::log) captures: Option<Vec<Option<Vec<u8>>>>,
     profile: u8,
     marker: Option<bool>,
     defaults: WorkflowValueDefaults,
@@ -360,6 +361,7 @@ fn prepare_charged<'input>(
         limits,
         record_batch_intent: Ok(expected),
         value_metadata: Some(ValueBatchMetadata {
+            captures: None,
             profile,
             marker: policy_references_captured,
             defaults,

@@ -100,7 +100,10 @@ fn apply_selected(
             storage_error(error)
         }
     })?;
-    if version == 9 && manifest.alias_format != 2 {
+    if matches!(version, 9 | 22) && manifest.alias_format != 2 {
+        return Err(WorkflowValueTransactionError::UnsupportedProfile);
+    }
+    if version == 22 && manifest.binding_format != 2 {
         return Err(WorkflowValueTransactionError::UnsupportedProfile);
     }
     if matches!(profile, ValueApplyProfile::WorkflowRelease) {
@@ -148,7 +151,7 @@ fn apply_selected(
                 fresh,
                 predecessor,
                 &limits,
-                (live, profile),
+                (live, profile, manifest.binding_format),
                 charge,
             )
         }
@@ -171,6 +174,19 @@ fn decode<'input>(
         .workspace_bytes
         .checked_sub(live)
         .ok_or_else(|| storage_error(StateTransactionError::Limit))?;
+    if version == 22 {
+        let (decoded, spent) = wf_ports::log::prepare_workflow_metadata_batch(
+            encoded,
+            wf_ports::log::MetadataBatchLimits {
+                codec: limits.record_batch.codec,
+                maximum_owned_bytes: available,
+                maximum_work_units: charge.remaining_work(),
+            },
+        )
+        .map_err(codec_error)?;
+        charge.work(spent).map_err(storage_error)?;
+        return Ok((decoded, live));
+    }
     let prepare = match version {
         8 => prepare_workflow_value_batch,
         9 => prepare_workflow_stored_value_batch,

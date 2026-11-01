@@ -136,6 +136,16 @@ committed original ingress, atomic publication and metadata-aware snapshot
 recovery remain required before activation. Opaque metadata still needs typed
 decoding with its explicit compatibility context.
 
+The native metadata extension uses explicit intent22 and a fresh binding-format2
+capability. Its original metadata caller operands are opaque data; source
+normalization and logical routing remain separate required adapters. The same
+consumed state writer publishes core/index/history/value/metadata/outcome/control
+changes, with native companion digests validated at mutation, reopen and snapshot
+boundaries. It reuses existing binding key families and shares immutable metadata
+owners across successful repeated targets. No separate metadata attachment API,
+implicit store upgrade or accepted Node/Raft/runtime profile is introduced. See
+[the native data profile](adr/009-stored-workflow-value-ingress.md#native-captured-metadata-data-profile).
+
 Application code performs effects through ports. The same domain validation and state rules serve HTTP, dedicated TCP, embedded access and workers. The UI receives stable enums, structured field errors and allowed actions computed by domain rules. Allowed actions are advisory: committed state must revalidate every mutation.
 
 The implemented `workflow::caller` capture normalizes bounded borrowed scalar

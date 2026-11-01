@@ -1,5 +1,9 @@
 //! Existing exact immutable/row writes, without additional stored-value owners.
 
+use crate::state::{
+    key,
+    value::{self, ValueAlias},
+};
 use redb::ReadableTable;
 use wf_domain::workflow::request::RequestScope;
 use wf_ports::state::StateTransactionError as Error;
@@ -106,4 +110,28 @@ pub(super) fn key_bound(
         32,
         [product(total(scope_bytes(scope), [reference])?, 2)?, scalar],
     )
+}
+
+pub(super) fn write_alias(
+    tx: &RedbStateTransaction<'_>,
+    scope: &RequestScope,
+    reference: &[u8],
+    alias: ValueAlias<'_>,
+    charge: &mut ValueCharge,
+    live: usize,
+) -> Result<(), Error> {
+    let alias_key = tx.key(
+        &[
+            scope.group().as_bytes(),
+            scope.recovery().as_bytes(),
+            scope.tenant().as_bytes(),
+            reference,
+        ],
+        0,
+        |maximum| key::encode_alias_key(scope, reference, maximum),
+    )?;
+    let alias_len = total(119, [alias.partition.len(), alias.id.len()])?;
+    charge.work(product(alias_len, 2)?)?;
+    let encoded = value::encode_alias(alias, alias_len).map_err(admission::value_error)?;
+    write_exact(tx, &alias_key, &encoded, charge, live)
 }

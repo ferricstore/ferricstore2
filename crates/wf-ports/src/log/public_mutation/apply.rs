@@ -55,7 +55,7 @@ pub fn inspect_public_mutation_point<'input, 'retained>(
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
     check_decoded(&decoded, limits, workspace, 1)?;
     let gate = inspect_point_request(view, decoded.header(log), limits.admission)?;
-    if !matches!(decoded.request.intent.version(), 8 | 9)
+    if !matches!(decoded.request.intent.version(), 8 | 9 | 22)
         && let GateDecision::Replay(original) = gate.decision()
         && super::response::public_mutation_retained_status(
             original.intent(),

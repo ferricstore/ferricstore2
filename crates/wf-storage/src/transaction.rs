@@ -48,7 +48,8 @@ pub use workflow_release::apply_workflow_release_transaction;
 
 pub use value_batch::{
     WorkflowValueTransactionError, WorkflowValueTransactionLimits, apply_step_continue_transaction,
-    apply_workflow_stored_value_batch_transaction, apply_workflow_value_batch_transaction,
+    apply_workflow_metadata_batch_transaction, apply_workflow_stored_value_batch_transaction,
+    apply_workflow_value_batch_transaction,
 };
 
 pub use claim::{

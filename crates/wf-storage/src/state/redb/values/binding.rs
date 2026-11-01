@@ -92,7 +92,8 @@ pub(crate) fn load(
         128,
         [208, tx.group.as_bytes().len(), tx.recovery.as_bytes().len()],
     )?)?;
-    let defaults = manifest::read(tx)?.defaults;
+    let facts = manifest::read(tx)?;
+    let defaults = facts.defaults;
     let fixed = total(
         size_of::<ValueCharge>(),
         [
@@ -142,7 +143,14 @@ pub(crate) fn load(
             Some(raw) => {
                 tx.recovery_row(&key, raw.value())?;
                 charge.work(total(128, [raw.value().len()])?)?;
-                Some(value::decode_binding(raw.value(), defaults).map_err(admission::value_error)?)
+                Some(super::metadata::recovery::current(
+                    tx,
+                    &table,
+                    (&key, raw.value()),
+                    (scope, partition, id),
+                    (defaults, facts.binding_format),
+                    (charge, live),
+                )?)
             }
             None => None,
         };
@@ -207,7 +215,18 @@ pub(crate) fn load_at_version(
         live,
         [key.len(), raw.value().len(), size_of::<ValueBindingData>()],
     )?)?;
-    let binding = value::decode_binding(raw.value(), defaults).map_err(admission::value_error)?;
+    let binding = if raw.value().starts_with(b"FWMB") {
+        super::metadata::recovery::current(
+            tx,
+            &table,
+            (&key, raw.value()),
+            (scope, partition, id),
+            (defaults, tx.value_manifest()?.binding_format),
+            (charge, live),
+        )?
+    } else {
+        value::decode_binding(raw.value(), defaults).map_err(admission::value_error)?
+    };
     if binding
         .versions
         .iter()

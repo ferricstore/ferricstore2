@@ -25,6 +25,7 @@ pub(in crate::state::redb) use sized::read_captured;
 pub(super) use sized::read_sized;
 
 pub(crate) struct ValueReadContext {
+    pub(super) binding_format: u16,
     read: redb::ReadTransaction,
     pub(super) rows: redb::ReadOnlyTable<&'static [u8], &'static [u8]>,
     metadata: redb::ReadOnlyTable<&'static [u8], &'static [u8]>,
@@ -62,6 +63,7 @@ pub(super) fn open(
     let facts = manifest::parse(raw.value(), &store.group, &store.recovery)?;
     drop(raw);
     Ok(ValueReadContext {
+        binding_format: facts.binding_format,
         read,
         rows,
         metadata,

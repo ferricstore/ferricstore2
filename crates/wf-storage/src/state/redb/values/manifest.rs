@@ -56,6 +56,7 @@ impl GovernanceCatalogProfile {
 
 #[derive(Clone, Copy)]
 pub(crate) struct ValueManifest {
+    pub(crate) binding_format: u16,
     pub(crate) layout: u16,
     pub(in crate::state::redb) policy: CurrentPolicyManifest,
     pub(crate) defaults: WorkflowValueDefaults,
@@ -122,9 +123,7 @@ pub(crate) fn parse(
         2 => 2,
         _ => return Err(Error::UnsupportedPolicyProfile),
     };
-    if value::read_u32(bytes, &mut at).map_err(value_error)? != 1 {
-        return Err(Error::UnsupportedPolicyProfile);
-    }
+    let binding_format = read_binding_format(bytes, &mut at, layout, alias_format)?;
     let raw = value::take(bytes, &mut at, 60)
         .map_err(value_error)?
         .try_into()
@@ -170,6 +169,7 @@ pub(crate) fn parse(
     }
     value::finish(bytes, at).map_err(value_error)?;
     Ok(ValueManifest {
+        binding_format,
         layout,
         policy: CurrentPolicyManifest {
             initial_time,
@@ -199,6 +199,11 @@ pub(crate) fn encode(
     if !matches!(manifest.alias_format, 1 | 2) || !matches!(manifest.layout, 7 | 8) {
         return Err(Error::UnsupportedPolicyProfile);
     }
+    if !matches!(manifest.binding_format, 1 | 2)
+        || (manifest.binding_format == 2 && (manifest.layout != 8 || manifest.alias_format != 2))
+    {
+        return Err(Error::UnsupportedPolicyProfile);
+    }
     let defaults = manifest
         .defaults
         .to_bytes()
@@ -226,7 +231,7 @@ pub(crate) fn encode(
     bytes.extend_from_slice(&policy.catalog_hash);
     bytes.extend_from_slice(&policy.origin_hash);
     bytes.extend_from_slice(&u32::from(manifest.alias_format).to_be_bytes());
-    bytes.extend_from_slice(&1_u32.to_be_bytes());
+    bytes.extend_from_slice(&u32::from(manifest.binding_format).to_be_bytes());
     bytes.extend_from_slice(&defaults);
     if let Some(count) = manifest.credit_shard_count {
         bytes.extend_from_slice(&(if manifest.credit_catalog { 2_u16 } else { 1 }).to_be_bytes());
@@ -314,4 +319,17 @@ fn encoded_size(
             },
         ],
     )
+}
+
+fn read_binding_format(
+    bytes: &[u8],
+    at: &mut usize,
+    layout: u16,
+    alias: u16,
+) -> Result<u16, Error> {
+    match value::read_u32(bytes, at).map_err(value_error)? {
+        1 => Ok(1),
+        2 if layout == 8 && alias == 2 => Ok(2),
+        _ => Err(Error::UnsupportedPolicyProfile),
+    }
 }

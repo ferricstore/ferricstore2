@@ -63191,3 +63191,184 @@ remaining QueryRow/routing/projection/blocking/pipeline, consensus/service,
 lifecycle/catalog, source-case/profile and native Linux/macOS/performance gates.
 Goal remains active and solo. No independent review, production acceptance,
 primary implementation adoption, push or measured speedup is claimed.
+
+
+## SOURCE-METADATA-NATIVE1: concrete solo architecture decision, 2026-11-01
+
+Previous goal turn is PROGRESS: a28be7a and primary docs-only 7353e31 saved the
+verified complete record-capture representation. Continue solo toward full scope.
+
+Approve an explicit native captured-metadata request extension, intent22, wrapping
+one actually verified stored9 batch and ordered optional metadata operands. The
+metadata operands are ORIGINAL CALLER DATA in this profile; generated policy,
+configuration, time, guards and lifecycle preparation remain in the inner frame
+and outside caller intent. Derive the actual new caller digest from verified
+inner caller intent plus presence/length/bytes of every original metadata operand.
+Never relabel an unchecked supplied digest or reinterpret an existing profile.
+Metadata replacement applies only to successful core writes; omission carries the
+actual prior captured data. A birth needs an explicit present capture. A no-op or
+failed item cannot acquire a standalone metadata write. Per-item source positions
+and independent-batch ordering remain unchanged. Reuse the explicitly declared
+contained response grammars5..8 with intent22 and exact mode replay validation.
+
+This native profile preserves opaque captured FSV2 data like stored9 values; it
+is not the original public metadata normalizer or original-source acceptance.
+The public original caller adapter must still normalize/validate actual source
+fields and supply actual compatibility context, routing and captured policy
+facts. Do not put derived postimages into the intent22 caller-data operand.
+The metadata scanner/codec grants no source origin, typed ETF, auth, routing or
+caller business-validity proof. No empty fallback for unknown legacy data.
+
+Approve binding-format2 in the existing value manifest, alias2/layout8 only,
+with fresh explicit genesis. Existing binding-format1 stays byte-identical.
+Use a new FWMB1 binding wrapper containing exact legacy FWVB1 scalar bytes,
+exact core version, SHA256 of the actual canonical FWSR2 core, raw metadata and
+checksum. No new database family or full core duplication: current/history
+binding keys already select the exact point; core digest includes all native
+scope/partition/ID/version/ordering fields and detects crossed births. Recovery
+must enforce the manifest format, actual companion digest/version/incarnation,
+complete current/history associations and snapshot compatibility. Actual core,
+indexes, history, aliases, metadata, outcome and control share the consumed writer.
+Legacy mutation/Claim writers in this profile must preserve real metadata, never
+replace it with absence. New-profile commands on legacy stores refuse before gate.
+
+Approved new files/types:
+- wf-ports/src/log/metadata_batch.rs and metadata_batch/{model,frame}.rs:
+  MetadataBatchInput, MetadataBatchLimits, encode/prepare_workflow_metadata_batch;
+  bounded opaque frame preflight and actual nested caller verification.
+- wf-storage/src/state/value/record_metadata.rs: RecordMetadataBinding borrowed
+  wrapper and encode/decode helpers, existing scalar grammar reused unchanged.
+- wf-storage/src/state/redb/values/metadata.rs and metadata/{publication,recovery,read}.rs:
+  explicit fresh genesis/read capability, bounded same-guard companion checks,
+  digest construction/publication and shared recovery, no separate attach API.
+- wf-storage/src/transaction/value_batch/metadata.rs: MetadataPublication owns
+  source-ordered Arc<Vec<u8>> handles, moving caller buffers and sharing prior
+  captured buffers across repeated accepted targets without payload clones.
+- wf-ports/tests/metadata_batch/{main,fixtures,cases}.rs and
+  wf-storage/tests/state_store/workflow_values/metadata.rs with
+  metadata/{fixtures,flow,recovery,limits}.rs: disjoint codec and actual native
+  transaction/rollback/replay/reopen/snapshot/limits controls. Preserve old cases.
+Paths above are relative to crates/. Existing owner facades, intent/response
+registries, value-batch plan/driver, genesis/manifest, same-writer publication,
+companion validation, shared history-core accessor and snapshot compatibility
+may be extended for these exact contracts. No dependency allowlist change.
+
+Admit complete frame, metadata/slot/Arc owners, simultaneous nested decoding,
+copying/hashing, companion probes and output rows/bytes before work/ownership.
+Continue the existing value charge across planning/publication; no per-item
+reset or unexplained old-profile fee changes. Old bodies/fixtures stay intact
+where additive dispatch suffices. Big-endian stable data and std Arc ownership
+are portable; native Linux/macOS acceptance remains separate. No measured gain
+or independent review is claimed. Record runtime RED before behavior bodies.
+
+SOURCE-METADATA-NATIVE1 amendment before creation: approve private borrowed
+MetadataFrame in metadata_batch/frame.rs for exact inner/option-region/count/
+caller-identity/metadata-byte preflight facts; no owner or authority is added.
+Four new native/codec controls now have compiled runtime RED against rejecting
+interfaces. An initial mistaken test enum name was corrected before that RED.
+
+SOURCE-METADATA-NATIVE1 size review: approve moving the existing write_alias
+function, with its unchanged body/signature and pub(super) visibility, from
+commit/values.rs to its existing immutable.rs child. This keeps the same owner
+and row helpers while retaining the 400-line production bound; no new artifact.
+The existing value-effect profile selector must also explicitly classify22.
+
+SOURCE-METADATA-NATIVE1 performance review: replace the initial reverse search
+with an admitted per-query Option<Arc<Vec<u8>>> cache bounded by the actual batch
+item cap. Successful repeated targets reuse immutable owners in O(1); failed
+items never enter the cache. Admit its full slot spine and initialization work
+before allocation. No payload conversion to Arc<[u8]> or measured speedup claim.
+
+
+### SOURCE-METADATA-NATIVE1 implementation, resource and design self-review
+
+Four compiled runtime RED controls preceded behavior bodies. The final focused
+suite now has 20 actual codec/native controls; sixteen later cases are supplemental.
+Tests exercise all four contained reducer modes, retained intent conflict/replay,
+legacy mutation/Claim preservation, successful repeated targets with a failed
+non-prefix metadata operand, actual complete snapshots/receive/install/reopen,
+scalar-profile snapshot refusal, wrong core digests/scalar-only bindings with
+resealed valid framing, missing-birth and late-output rollback, independent large
+metadata read caps, continuous nested work endpoints, corruption/truncation and
+an actual delegated publication-sync failure with fenced-read refusal and complete
+old/new reopen reconciliation. No original-source case credit is added.
+
+The first fault probe failed during engine growth and correctly reported
+Unavailable. Use existing backend mode4, which skips successful growth syncs and
+fails the delegated publication sync, to test the required Uncertain boundary.
+Do not broaden the expected error. Initial fixture enum/private-module/closure
+errors and a wrong legacy three-META-row fixture were corrected without changing
+any predecessor helper/assertion. The generic history/key internals stay private;
+new tests decode actual complete public history snapshots. Strict preflight
+also required smaller functions, shallow selection and borrowed 272-byte metadata
+views; all are fixed without lint suppressions or policy changes.
+
+Data ownership: original caller buffers move from the verified decoded owner
+before reducer donor destruction; native preparation charges their retained
+residency. Successful metadata steps hold immutable Arc<Vec<u8>> owners, with a
+fully admitted query-index cache and source-ordered output handles. A failed/no-op
+source operand never attaches data. Existing metadata is copied once per distinct
+queried target into the retained plan and shared across repeated successful
+steps. New payload buffers are moved, avoiding Vec-to-Arc-slice conversion copies.
+The outer work account pays fixed/item work before measuring or scanning, and
+complete bytes before hashing/copying. Its outer slots/metadata/output residency
+is reserved before nested preparation. The same ValueCharge continues through
+planning, hashing, native companion reads and publication, with separately
+admitted row/output/temp work. Temporary native wrapper arguments are borrowed.
+The fixed197-byte nested scalar owner and complete output are admitted before
+encoding. No full core image is duplicated; actual written current/history core
+bytes are borrowed to hash. A bulk writer probes its actual manifest format once
+for the whole consumed guard; no mutable provenance/capability cache is added.
+
+Native integrity review: the manifest requires binding-format2/alias2/layout8;
+new commands refuse old authority before the request gate. V1 scalar bytes are
+reused exactly inside FWMB1; ordinary format1 is not reinterpreted. Actual native
+scope/partition/ID/version/ordering are in the core digest; creation also checks
+incarnation against its actual sequence. Mutation readers validate current
+companions before decisions, including value/Claim binding loads, so a wrong
+current digest cannot be silently repaired while replacing metadata. Shared
+recovery validates both directions of current/history pairings and formats;
+snapshot compatibility compares the new immutable capability. Read guards are
+released before the consumed writer reopens row tables for output. Refusal before
+commit leaves no visible prefix; uncertain commit gives no successful response.
+
+Semantic limit review: intent22 metadata is ORIGINAL CALLER DATA, not generated
+source postimage/configuration. It remains opaque; a valid native association or
+checksum does not certify original scope, routing, field normalization, safe VM
+context or QueryRow. Existing core indexes are atomic here; original attribute/
+state-metadata projection indexes remain required. No original public/Claim,
+Node/Raft/service, platform or measured performance acceptance is implied. All
+full goal gates remain active. Review is solo, not an independent peer review.
+All1300 predecessor test/bench/reference inputs and764 Rust test/bench inputs
+are unchanged except one exactly additive `mod metadata` registration; no original
+assertion, source snapshot, scenario identity or parity ledger is modified.
+
+
+### SOURCE-METADATA-NATIVE1 final verified native-data checkpoint
+
+Final frozen checks pass 1873 Rust tests /122 groups and11 doctests /15 groups,
+zero failed/ignored. This includes all60 architecture cases. Strict workspace/
+all-target Clippy, warnings-denied docs, Python7, reference integrity, progress,
+fmt and diff pass. Full parity actually exits1. All2214 non-Markdown inputs /
+1625 Rust files remain exact. Of1300 predecessor test/bench/reference inputs,
+1299 are byte-identical plus one exact additive module registration; the Rust
+subset is763 whole of764 plus that same registration. Original assertions,
+source snapshots and parity/progress identities remain intact. Four genuine
+compiled RED and20 final focused controls are saved; all jobs are terminal.
+Evidence: /private/tmp/ferricstore2-metadata-native-{red,green,focused,workspace,
+doctests,clippy,doc,python,reference,progress,fmt,diff,parity}.log and
+proof/inputs/source-audit.json. Strict preflight logs are saved separately.
+
+The completed item is explicit native metadata data ingress/persistence,
+current/history integrity, consumed atomic publication and snapshot recovery.
+The native metadata operands are original caller DATA, not automatically derived
+original public record postimages. NEXT implement original public field
+normalization, separately validated server-derived captures, actual compatibility
+context, logical scope/partition routing and exact QueryRow/key/projection
+integration. Do not put generated metadata/default postimages into intent22
+caller operands or infer original absence from an empty/unknown capture. Original
+attribute/state-metadata indexes and accepted original public/Claim/Node/Raft/
+service profiles remain required. Preserve blocking/pipeline/lifecycle/catalog,
+all pinned source-case/profile and native Linux/macOS/performance acceptance.
+Goal stays active and solo; no independent review, measured speedup, native
+Linux/Elixir result, production readiness, primary adoption or push is claimed.

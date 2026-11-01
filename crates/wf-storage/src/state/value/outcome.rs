@@ -161,7 +161,7 @@ pub fn encode_outcome(
         .0
     } else if outcome.intent().version() == 7 && outcome.response_version() == 4 {
         atomic_start::wire_status(outcome, maximum_bytes)?
-    } else if matches!(outcome.intent().version(), 8 | 9) {
+    } else if matches!(outcome.intent().version(), 8 | 9 | 22) {
         // The profiled encoder and real reads repeat the captured admission.
         let ceiling = AdmissionLimits::new(
             wf_domain::workflow::admission::MAX_INLINE_BYTES,
@@ -263,7 +263,7 @@ fn scan_with_policy<'input>(
          response_version| {
             let [tenant, group, recovery, request, response] = fields;
             let extended_response = matches!((intent_version, response_version), (1, 3) | (7, 4))
-                || matches!(intent_version, 8 | 9)
+                || matches!(intent_version, 8 | 9 | 22)
                 || (matches!(intent_version, 2 | 4) && profile.is_some());
             if tenant != expected_scope.tenant().as_bytes()
                 || group != expected_scope.group().as_bytes()

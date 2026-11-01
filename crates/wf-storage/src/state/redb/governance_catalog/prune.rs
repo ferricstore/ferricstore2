@@ -51,6 +51,7 @@ impl RedbStateStore {
             defaults,
             limits,
             super::super::values::genesis::ValueGenesisCapabilities {
+                binding_format: 1,
                 alias_format: 2,
                 credit_shard_count,
                 credit_catalog: credit_shard_count.is_some(),

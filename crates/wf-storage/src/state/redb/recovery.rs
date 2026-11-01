@@ -157,7 +157,13 @@ fn validate_values_profile(
         return Ok(0);
     }
     let values = super::values::manifest::parse(manifest, tx.group, tx.recovery)?;
-    super::values::validate::cohort(tx, values.defaults, values.alias_format, layout)?;
+    super::values::validate::cohort(
+        tx,
+        values.defaults,
+        values.alias_format,
+        layout,
+        values.binding_format,
+    )?;
     Ok(values.governance_catalog.version())
 }
 

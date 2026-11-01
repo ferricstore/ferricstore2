@@ -23,7 +23,9 @@ use super::{
 };
 
 pub(super) mod driver;
+mod metadata;
 mod plan;
+pub use metadata::apply_workflow_metadata_batch_transaction;
 mod prepare;
 mod step;
 mod step_continue;
@@ -175,7 +177,7 @@ fn apply_fresh(
         fresh,
         predecessor,
         limits,
-        (live, driver::ValueApplyProfile::Legacy),
+        (live, driver::ValueApplyProfile::Legacy, 1),
         charge,
     )
 }
@@ -183,10 +185,10 @@ fn apply_fresh(
 fn apply_fresh_selected(
     tx: RedbStateTransaction<'_>,
     scope: &RequestScope,
-    fresh: FreshRecordBatch<'_>,
+    mut fresh: FreshRecordBatch<'_>,
     predecessor: ControlState,
     limits: &WorkflowValueTransactionLimits,
-    (live, profile): (usize, driver::ValueApplyProfile),
+    (live, profile, binding_format): (usize, driver::ValueApplyProfile, u16),
     mut charge: ValueCharge,
 ) -> Result<RecordBatchTransactionOutcome, WorkflowValueTransactionError> {
     charge.helper().map_err(storage_error)?;
@@ -199,6 +201,12 @@ fn apply_fresh_selected(
     let mut schema = PolicySchemaCharge::new(limits.record_batch.schema);
     let (mut loaded, bindings, inputs) =
         prepare_fresh(&tx, scope, &fresh, limits, &mut schema, &mut charge)?;
+    let updates = fresh.take_record_metadata_updates();
+    let metadata_live = metadata::held_bytes(updates.as_deref(), &mut charge)?;
+    if metadata_live != 0 {
+        charge.temporary(metadata_live).map_err(storage_error)?;
+    }
+    let live = total(live, [metadata_live]).map_err(storage_error)?;
     let LoadedRecordBatch {
         queries,
         records,
@@ -250,6 +258,15 @@ fn apply_fresh_selected(
         limits,
         charge,
     )?;
+    if binding_format == 2 {
+        metadata::prepare(
+            &tx,
+            scope,
+            &mut publication,
+            updates,
+            limits.record_batch.codec.admission().batch_items(),
+        )?;
+    }
     if let Some(release) = &release {
         tx.commit_workflow_release_values(&changes, &mut publication, release)
             .map_err(storage_error)?;

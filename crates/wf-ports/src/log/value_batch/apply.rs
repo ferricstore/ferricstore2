@@ -33,7 +33,7 @@ pub fn decide_fresh_workflow_value_batch_touched<'current>(
     additional_live_bytes: usize,
     outcome_ttl_ms: u64,
 ) -> Result<WorkflowValueDecision<'current>, RecordBatchApplyError> {
-    if !matches!(fresh.decoded.request.intent.version(), 8 | 9) {
+    if !matches!(fresh.decoded.request.intent.version(), 8 | 9 | 22) {
         return Err(CodecError::UnsupportedVersion.into());
     }
     let mode = effective_profile(&fresh.decoded)?;

@@ -16,6 +16,7 @@ pub(crate) mod binding;
 pub(crate) mod budget;
 pub(in crate::state::redb) mod genesis;
 pub(crate) mod manifest;
+pub(crate) mod metadata;
 pub(crate) mod read;
 pub(crate) mod validate;
 

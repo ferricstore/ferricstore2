@@ -46,6 +46,10 @@ pub struct FreshRecordBatch<'input> {
 }
 
 impl<'input> FreshRecordBatch<'input> {
+    /// Moves original metadata operands without cloning their byte allocations.
+    pub fn take_record_metadata_updates(&mut self) -> Option<Vec<Option<Vec<u8>>>> {
+        self.decoded.take_record_metadata_updates()
+    }
     /// Borrows actual scope, request and commands for current authority lookup.
     #[must_use]
     pub fn decoded(&self) -> &DecodedRequest<'input> {
@@ -74,7 +78,7 @@ pub fn inspect_record_batch<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    let profile = if matches!(decoded.request.intent.version(), 8 | 9) {
+    let profile = if matches!(decoded.request.intent.version(), 8 | 9 | 22) {
         super::super::value_batch::response::effective_profile(&decoded)?
     } else {
         5
@@ -99,7 +103,7 @@ pub fn inspect_record_batch_point<'input, 'retained>(
     limits: CodecLimits,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    let profile = if matches!(decoded.request.intent.version(), 8 | 9) {
+    let profile = if matches!(decoded.request.intent.version(), 8 | 9 | 22) {
         super::super::value_batch::response::effective_profile(&decoded)?
     } else {
         5
@@ -115,7 +119,7 @@ pub(in crate::log) fn finish_inspection<'input, 'retained>(
     gate: RequestGate<'retained>,
     workspace_limit: usize,
 ) -> Result<RecordBatchInspection<'input, 'retained>, RecordBatchApplyError> {
-    if matches!(decoded.request.intent.version(), 8 | 9)
+    if matches!(decoded.request.intent.version(), 8 | 9 | 22)
         && let GateDecision::Replay(original) = gate.decision()
     {
         super::super::value_batch::response::check_replay(&decoded, original)?;
