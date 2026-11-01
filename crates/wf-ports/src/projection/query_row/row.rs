@@ -58,7 +58,7 @@ fn header(
     out.u16(plan.metadata_bytes, budget)?;
     out.put(scope, budget)
 }
-fn checksum(key: &[u8], body: &[u8]) -> u32 {
+pub(super) fn checksum(key: &[u8], body: &[u8]) -> u32 {
     let mut crc = u32::MAX;
     for &byte in key.iter().chain(body) {
         crc ^= u32::from(byte);

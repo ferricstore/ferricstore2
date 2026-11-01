@@ -41,6 +41,13 @@ pub(super) struct Fields<'r, 'a> {
     values: [Option<I<'r, 'a>>; 25],
 }
 impl<'r, 'a> Fields<'r, 'a> {
+    pub(super) fn from_scalar_values(values: &[Option<I<'r, 'a>>; 20]) -> Self {
+        let mut result = Self { values: [None; 25] };
+        for (slot, value) in result.values.iter_mut().zip(values) {
+            *slot = *value;
+        }
+        result
+    }
     pub(super) fn get(&self, index: usize) -> Option<I<'r, 'a>> {
         self.values.get(index).copied().flatten()
     }
@@ -163,7 +170,7 @@ fn logical<'a>(
         _ => Err(E::InvalidRecord),
     }
 }
-fn bind(
+pub(super) fn bind(
     key: &[u8],
     id: &[u8],
     logical: Option<&[u8]>,

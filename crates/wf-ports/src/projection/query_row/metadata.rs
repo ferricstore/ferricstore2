@@ -74,7 +74,11 @@ fn value<'a>(plan: &RecordPlan<'_, 'a>, index: usize) -> Option<I<'a, 'a>> {
         _ => Some(I::Other),
     }
 }
-fn builtin(plan: &RecordPlan<'_, '_>, out: &mut Writer, budget: &mut Budget) -> Result<(), E> {
+pub(super) fn builtin(
+    plan: &RecordPlan<'_, '_>,
+    out: &mut Writer,
+    budget: &mut Budget,
+) -> Result<(), E> {
     let mut bitmap = 0_u16;
     for (bit, index) in BUILTINS.into_iter().enumerate() {
         if !(index == 14 && plan.root_is_id) && value(plan, index).is_some() {
@@ -117,7 +121,11 @@ fn internal(plan: &RecordPlan<'_, '_>, out: &mut Writer, budget: &mut Budget) ->
     Ok(())
 }
 
-fn validate_builtin(index: usize, value: I<'_, '_>, budget: &mut Budget) -> Result<(), E> {
+pub(super) fn validate_builtin(
+    index: usize,
+    value: I<'_, '_>,
+    budget: &mut Budget,
+) -> Result<(), E> {
     if primitive::nil(value) {
         return Ok(());
     }

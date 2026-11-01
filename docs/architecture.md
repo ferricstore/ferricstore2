@@ -12,6 +12,23 @@ Assumption: “functional like code to ease UI work” means a pure state-transi
 
 The pinned production backend selects WARaft (`raft/backend.ex`); its command clock carries leader HLC/wall inputs (`raft/command_clock.ex`). OpenRaft is a Rust migration candidate, with no existing log/wire compatibility promised. See [source provenance](source-provenance.md) for the targeted baseline read.
 
+## Original query-row reading and transformation
+
+`wf-ports::projection::query_row` also exposes borrowed full, selected and
+reference reads. Full/selected paths validate every metadata section before
+expiry; references verify framing/checksum/location without interpreting record
+metadata or scope. Scope omission is explicit through `OriginalQueryScope`.
+Borrowed binary leaves and bounded retained descriptor vectors avoid a duplicate
+record tree. Expired/skipped output is not allocated, while all semantic checks
+remain. Typed state-location relocation compares original generation/address
+rules, canonicalizes accepted encodings and emits one final row owner. Internal
+views restore physical partition and terminal retention without cloning the
+record. These data APIs grant no native availability/currentness/authorization
+proof. Native integration, query-plan construction, shared batch accounting and
+generic malformed VM relocation comparison remain required where selected.
+See SOURCE-QUERY-READ1 in the
+[coordination review](reviews/workflow-completion-coordination.md).
+
 ## Original query-row production
 
 `wf-ports::projection::query_row` prepares exact original query metadata and

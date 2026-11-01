@@ -3,6 +3,61 @@
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
 
+SOURCE-QUERY-READ1 follows413f3d8 in the isolated implementation worktree.
+Full, selected and hydration-reference query-row reads now compose exact framing,
+key-bound checksum, physical locator, all metadata sections and source identity.
+Typed state-location relocation preserves generation/CAS order and canonicalizes
+accepted redundant root/locator encodings. Internal views restore physical
+partition and terminal retention without cloning the whole record.
+
+Full/query paths validate skipped metadata before expiry; references intentionally
+skip record/scope interpretation. Scope omission is explicit NotRead rather than
+Unscoped. Borrowed payload leaves and bounded retained descriptors avoid another
+full tree; skipped and expired results allocate no discarded dynamic output.
+Source78-field/512-byte selection, covering-vs-reference version ceilings,
+nil/missing classes and all physical sources remain exact. No speedup is claimed.
+Typed relocation does not claim arbitrary malformed/foreign VM struct loose
+equality; that explicit compatibility profile remains required if selected.
+
+Eighteen complete original scenarios retain97 source assertions/fixtures/order.
+Four have compiled pre-body runtime RED;23 later controls are supplemental.
+All27 final controls pass, including every truncation/bit change, resealed skipped
+metadata/duplicates, reference semantics, expiry ordering, canonical relocation,
+60000-byte identities and independent input/work/temp/output boundaries. The
+ledger has165 source-derived declarations/179 mappings/787 assertion links.
+Full parity still actually exits1; these links do not certify native source or
+full product acceptance.
+
+Final frozen checks pass1934 Rust tests/126 groups plus11 doctests/15 groups,
+zero failed/ignored, including all60 architecture cases. Strict all-target/workspace
+Clippy, docs, Python7, reference integrity, progress, fmt and diff pass. All2260
+non-Markdown inputs/1671 Rust files remain exact. Of1316 old test/bench/reference
+inputs,1315 are whole; the sole changed progress JSON has18 additive records and
+no earlier assertion/source/mapping/runtime identity changes. Evidence prefix:
+/private/tmp/ferricstore2-query-read- (red/green/focused/workspace/doctests/clippy/
+doc/python/reference/progress/parity/fmt/diff logs and inputs/source-audit/proof.json).
+All jobs are terminal. Detailed concrete source/architecture/performance self
+review is recorded in workflow-completion-coordination.md.
+
+NEXT trusted original public field normalization and separately validated
+server-derived captures, coherent native query/projection persistence and read
+integration, query-plan construction and remaining original test observations.
+Select actual native location/record association before creating an adapter;
+never invent legacy physical file addresses to activate this compatibility codec.
+Keep shared accounting for source-invalid batch items and response admission;
+standalone limits must not reset per item. Intent22 remains original caller DATA,
+not generated postimages/defaults or currentness/authorization evidence. Native
+query/store/profile adoption, accepted public/Claim/Node/Raft/runtime, blocking/
+pipeline/lifecycle/catalog, all remaining source scenarios/profiles and native
+Linux/macOS/performance acceptance remain open. No new native Elixir/Linux,
+independent peer review, production service, primary code adoption or push is
+claimed. Full goal active; continue solo toward the unchanged objective.
+
+## Preceding413f3d8 query-row producer checkpoint (historical)
+
+The following describes the predecessor only.
+
+
 SOURCE-QUERY-ROW1 followsce85bf1 in the isolated implementation worktree.
 Original query metadata validation and physical QueryRowCodec four-argument
 production now compose scope/public partition projection, source key identity,

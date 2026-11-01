@@ -27,6 +27,10 @@ pub enum OriginalQueryRecordError {
     InvalidRecord,
     /// Original metadata exceeds32629 bytes.
     MetadataTooLarge,
+    /// Original relocation logical-generation mismatch.
+    LogicalGenerationMismatch,
+    /// Original relocation physical-locator comparison failed.
+    LocatorCompareFailed,
     /// An operational ceiling is zero.
     InvalidLimits,
     /// A checked operational ceiling is exceeded.

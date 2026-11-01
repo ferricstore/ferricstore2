@@ -26,6 +26,15 @@ pub(super) fn plan<'a>(
     expiry: u64,
     budget: &mut Budget,
 ) -> Result<LocatorPlan<'a>, E> {
+    plan_identity(input, record.id, record.version, expiry, budget)
+}
+pub(super) fn plan_identity<'a>(
+    input: OriginalQueryLocator<'_, 'a>,
+    expected_id: &[u8],
+    expected_version: u64,
+    expiry: u64,
+    budget: &mut Budget,
+) -> Result<LocatorPlan<'a>, E> {
     let I::Map(rows) = input.fields else {
         return Err(E::InvalidRecord);
     };
@@ -35,12 +44,12 @@ pub(super) fn plan<'a>(
     } else {
         return Err(E::InvalidRecord);
     }
-    if !matches!(flow_id, I::Binary(id) if id == record.id)
+    if !matches!(flow_id, I::Binary(id) if id == expected_id)
         || !matches!(field(rows, "kind", budget)?, I::Atom("state"))
     {
         return Err(E::InvalidRecord);
     }
-    if primitive::uint(field(rows, "version", budget)?, budget)? != record.version {
+    if primitive::uint(field(rows, "version", budget)?, budget)? != expected_version {
         return Err(E::InvalidRecord);
     }
     let raft = primitive::uint(field(rows, "raft_index", budget)?, budget)?;

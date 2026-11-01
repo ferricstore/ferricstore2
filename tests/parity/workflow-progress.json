@@ -14025,7 +14025,47 @@
       "runtime_case_ids": [
         "43d0140f787dce7ee19d13d81377a326466a55d7119a661d486d410638e3b5c2"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-6b709ff61ebc3662-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "round_trips_all_query_metadata_and_a_physical_locator",
+          "assertions": [
+            {
+              "source_line": 13,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record, locator, 9_000)",
+              "rust_line": 16,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 14,
+              "source_text": "assert byte_size(encoded) <= QueryRowCodec.max_encoded_bytes()",
+              "rust_line": 18,
+              "rust_text": "assert!(encoded.encoded().len() <= 32768);"
+            },
+            {
+              "source_line": 16,
+              "source_text": "assert {:ok,",
+              "rust_line": 22,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 24,
+              "source_text": "assert decoded == record",
+              "rust_line": 27,
+              "rust_text": "assert!(decoded.record().is_some_and(|r| record_eq(r, f::record())));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "b306a5d83a6944a4",
@@ -14039,35 +14079,277 @@
       "runtime_case_ids": [
         "32a424637b3b0a03b378c9ac891872ad3f2207bdaba4862b14509754cb007876"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-408209f7c0ab3494-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "preserves_missing_null_scalar_and_multivalue_metadata_distinctly",
+          "assertions": [
+            {
+              "source_line": 57,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record, locator(), 0)",
+              "rust_line": 79,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 58,
+              "source_text": "assert {:ok, %{record: decoded}} = QueryRowCodec.decode(encoded, @state_key)",
+              "rust_line": 82,
+              "rust_text": "assert!(decoded.is_ok());"
+            },
+            {
+              "source_line": 60,
+              "source_text": "assert decoded.attributes[\"nullable\"] == nil",
+              "rust_line": 85,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 61,
+              "source_text": "refute Map.has_key?(decoded.attributes, \"missing\")",
+              "rust_line": 90,
+              "rust_text": "assert!(record.attribute(b\"missing\").is_none());"
+            },
+            {
+              "source_line": 62,
+              "source_text": "assert decoded.attributes[\"labels\"] == [\"urgent\", \"finance\"]",
+              "rust_line": 91,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 63,
+              "source_text": "assert decoded.state_meta[\"queued\"][\"nullable\"] == nil",
+              "rust_line": 96,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "d639be0d6481ba80",
       "runtime_case_ids": [
         "7dcb722ee741d03ba4eb1205ead5f0912e893cb7d3d964deb272634e02f0ca85"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-d639be0d6481ba80-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "round_trips_an_unpartitioned_run_through_its_automatic_state_key",
+          "assertions": [
+            {
+              "source_line": 70,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(state_key, record, locator(), 0)",
+              "rust_line": 120,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 72,
+              "source_text": "assert {:ok, %{state_key: ^state_key, record: ^record}} =",
+              "rust_line": 123,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "409c7d2fd1426581",
       "runtime_case_ids": [
         "b99852a8eef476dc00a206fa60bd91e530ca755ac479f8af51137f7aefffb3fb"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-409c7d2fd1426581-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "does_not_persist_payload_references_or_internal_system_metadata",
+          "assertions": [
+            {
+              "source_line": 84,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record, locator(), 0)",
+              "rust_line": 147,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 85,
+              "source_text": "assert :nomatch = :binary.match(encoded, \"payload-secret\")",
+              "rust_line": 149,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 86,
+              "source_text": "assert :nomatch = :binary.match(encoded, \"result-secret\")",
+              "rust_line": 155,
+              "rust_text": "assert!(!encoded.encoded().windows(13).any(|v| v == b\"result-secret\"));"
+            },
+            {
+              "source_line": 87,
+              "source_text": "assert :nomatch = :binary.match(encoded, \"value-secret\")",
+              "rust_line": 156,
+              "rust_text": "assert!(!encoded.encoded().windows(12).any(|v| v == b\"value-secret\"));"
+            },
+            {
+              "source_line": 89,
+              "source_text": "assert {:ok, %{record: decoded}} = QueryRowCodec.decode(encoded, @state_key)",
+              "rust_line": 158,
+              "rust_text": "assert!(decoded.is_ok());"
+            },
+            {
+              "source_line": 90,
+              "source_text": "refute Map.has_key?(decoded, :payload_ref)",
+              "rust_line": 161,
+              "rust_text": "assert!(record.field(\"payload_ref\").is_none());"
+            },
+            {
+              "source_line": 91,
+              "source_text": "refute Map.has_key?(decoded, :result_ref)",
+              "rust_line": 162,
+              "rust_text": "assert!(record.field(\"result_ref\").is_none());"
+            },
+            {
+              "source_line": 92,
+              "source_text": "refute Map.has_key?(decoded, :value_refs)",
+              "rust_line": 163,
+              "rust_text": "assert!(record.field(\"value_refs\").is_none());"
+            },
+            {
+              "source_line": 93,
+              "source_text": "refute Map.has_key?(decoded, :system_metadata)",
+              "rust_line": 164,
+              "rust_text": "assert!(record.field(\"system_metadata\").is_none());"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e4131f14564cfc61",
       "runtime_case_ids": [
         "fb7eb837f65e5547a42e40ff3dace63705a4812877ee97c666659eb290621224"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-e4131f14564cfc61-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "binds_opaque_shared_scope_while_exposing_only_the_logical_partition",
+          "assertions": [
+            {
+              "source_line": 100,
+              "source_text": "assert {:ok, physical_partition} =",
+              "rust_line": 257,
+              "rust_text": "assert!(physical.is_ok());"
+            },
+            {
+              "source_line": 110,
+              "source_text": "assert {:ok, encoded} =",
+              "rust_line": 284,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 113,
+              "source_text": "assert {:ok,",
+              "rust_line": 287,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 120,
+              "source_text": "refute Map.has_key?(public, :system_metadata)",
+              "rust_line": 291,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 122,
+              "source_text": "assert {:ok, foreign_partition} =",
+              "rust_line": 303,
+              "rust_text": "assert!(foreign.is_ok());"
+            },
+            {
+              "source_line": 125,
+              "source_text": "assert :error =",
+              "rust_line": 311,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "3c1a24d79ff4ef1d",
       "runtime_case_ids": [
         "d3114582068440ebeebc38d76e7206e350581101d90307d0e08d6d8b61175e75"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-3c1a24d79ff4ef1d-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "restores_terminal_retention_from_an_expired_covering_row",
+          "assertions": [
+            {
+              "source_line": 141,
+              "source_text": "assert {:ok, encoded} =",
+              "rust_line": 184,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 149,
+              "source_text": "assert {:ok, %QueryRow{} = row} = QueryRowCodec.decode(encoded, @state_key, 0)",
+              "rust_line": 187,
+              "rust_text": "assert!(decoded.is_ok());"
+            },
+            {
+              "source_line": 150,
+              "source_text": "refute Map.has_key?(row.record, :terminal_retention_until_ms)",
+              "rust_line": 189,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 152,
+              "source_text": "assert {:ok, %{terminal_retention_until_ms: 2_000}} = QueryRow.internal_record(row)",
+              "rust_line": 200,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "b0cc11dd93c8b895",
@@ -14148,35 +14430,229 @@
       "runtime_case_ids": [
         "40ae004eb671647753a28b19e65ca98bccdd4175bb3b4f8deeeb7323fbae8c90"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-a19fcf7c945587c7-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/relocation.rs",
+          "rust_file_sha256": "c39e062f6f02015fe7d4f0178fe1a8f2044c6a99190ab395bcf6d1647ff45e61",
+          "rust_module": "",
+          "rust_function": "supports_every_authoritative_state_locator_source",
+          "assertions": [
+            {
+              "source_line": 202,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator, 0)",
+              "rust_line": 118,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 203,
+              "source_text": "assert {:ok, %{locator: ^locator}} = QueryRowCodec.decode(encoded, @state_key)",
+              "rust_line": 122,
+              "rust_text": "assert!(matches!(decoded,Read::Row{value,..} if *value.locator()==expected));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "21eddfa42e8dc854",
       "runtime_case_ids": [
         "0387eb0bdb2cd103a450e696980e3c73fc0575e4a064cb00803662857f9fe590"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-21eddfa42e8dc854-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/relocation.rs",
+          "rust_file_sha256": "c39e062f6f02015fe7d4f0178fe1a8f2044c6a99190ab395bcf6d1647ff45e61",
+          "rust_module": "",
+          "rust_function": "rejects_logical_waraft_locations_and_round_trips_complete_physical_frame_address",
+          "assertions": [
+            {
+              "source_line": 215,
+              "source_text": "assert :error = QueryRowCodec.encode(@state_key, record(), logical, 0)",
+              "rust_line": 134,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 218,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), physical, 0)",
+              "rust_line": 158,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 219,
+              "source_text": "assert {:ok, %{locator: ^physical}} = QueryRowCodec.decode(encoded, @state_key)",
+              "rust_line": 169,
+              "rust_text": "assert!(matches!(decoded,Read::Row{value,..} if *value.locator()==expected));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "06e1b47b9f6744ce",
       "runtime_case_ids": [
         "edd2f0cbd292f840030f3335f415fbca8aee170a2070ec2310ab4de66e2ac2aa"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-06e1b47b9f6744ce-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "derives_large_run_identity_from_the_state_key_instead_of_duplicating_it",
+          "assertions": [
+            {
+              "source_line": 228,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(state_key, record, locator, 0)",
+              "rust_line": 354,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 229,
+              "source_text": "assert byte_size(encoded) < 1_024",
+              "rust_line": 356,
+              "rust_text": "assert!(encoded.encoded().len() < 1024);"
+            },
+            {
+              "source_line": 231,
+              "source_text": "assert {:ok, %{record: %{id: ^id}, locator: %{flow_id: ^id}}} =",
+              "rust_line": 358,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "141f08b54522df40",
       "runtime_case_ids": [
         "2349aa20c78b5839190ac010c90a360e94c9f313830ec043ca7033856a3d2fc5"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-141f08b54522df40-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/relocation.rs",
+          "rust_file_sha256": "c39e062f6f02015fe7d4f0178fe1a8f2044c6a99190ab395bcf6d1647ff45e61",
+          "rust_module": "",
+          "rust_function": "binds_the_row_to_its_state_key_and_logical_generation",
+          "assertions": [
+            {
+              "source_line": 236,
+              "source_text": "assert :error =",
+              "rust_line": 177,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 244,
+              "source_text": "assert :error = QueryRowCodec.encode(@state_key, record(), locator(version: 8), 0)",
+              "rust_line": 190,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 246,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator(), 0)",
+              "rust_line": 209,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 247,
+              "source_text": "refute QueryRowCodec.decode(encoded, Keys.state_key(\"run-1\", \"tenant-b\")) == {:ok, encoded}",
+              "rust_line": 218,
+              "rust_text": "assert!(result.is_err());"
+            },
+            {
+              "source_line": 248,
+              "source_text": "assert :error = QueryRowCodec.decode(encoded, Keys.state_key(\"run-1\", \"tenant-b\"))",
+              "rust_line": 219,
+              "rust_text": "assert!(matches!(result, Err(E::InvalidRecord)));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "8173a62bae8bf76e",
       "runtime_case_ids": [
         "8d6220e8ae5c86464d42399a1c066e7a618f64d850e61ada5825695fffc1e39c"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-8173a62bae8bf76e-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/relocation.rs",
+          "rust_file_sha256": "c39e062f6f02015fe7d4f0178fe1a8f2044c6a99190ab395bcf6d1647ff45e61",
+          "rust_module": "",
+          "rust_function": "rejects_inconsistent_row_and_locator_expiry",
+          "assertions": [
+            {
+              "source_line": 252,
+              "source_text": "assert :error =",
+              "rust_line": 227,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 255,
+              "source_text": "assert :error = QueryRowCodec.encode(@state_key, record(), locator(expire_at_ms: 1), 0)",
+              "rust_line": 240,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 257,
+              "source_text": "assert {:ok, encoded} =",
+              "rust_line": 259,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 260,
+              "source_text": "assert {:ok, %{locator: %{expire_at_ms: nil}, expire_at_ms: 9_000}} =",
+              "rust_line": 262,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 263,
+              "source_text": "assert {:ok, encoded} =",
+              "rust_line": 275,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 266,
+              "source_text": "assert {:ok, %{locator: %{expire_at_ms: 10_000}, expire_at_ms: 9_000}} =",
+              "rust_line": 278,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e4cb7cea6f94a786",
@@ -14190,49 +14666,443 @@
       "runtime_case_ids": [
         "ffb7b684451c45e5ca1703c46764370e1a953ece3ad817f5929a1ddfd88e3d72"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-a51f72e8f0fe34ef-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/relocation.rs",
+          "rust_file_sha256": "c39e062f6f02015fe7d4f0178fe1a8f2044c6a99190ab395bcf6d1647ff45e61",
+          "rust_module": "",
+          "rust_function": "relocation_compare_and_swaps_only_the_physical_locator",
+          "assertions": [
+            {
+              "source_line": 291,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), old_locator, 9_000)",
+              "rust_line": 24,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 293,
+              "source_text": "assert {:ok, relocated} =",
+              "rust_line": 27,
+              "rust_text": "assert!(moved.is_ok());"
+            },
+            {
+              "source_line": 296,
+              "source_text": "assert {:ok, %{record: decoded, locator: ^new_locator, expire_at_ms: 9_000}} =",
+              "rust_line": 32,
+              "rust_text": "assert!(decoded.locator() == &new && decoded.expire_at_ms() == 9000);"
+            },
+            {
+              "source_line": 299,
+              "source_text": "assert decoded == record()",
+              "rust_line": 33,
+              "rust_text": "assert!(decoded.record().is_some_and(|r| record_eq(r, f::record())));"
+            },
+            {
+              "source_line": 303,
+              "source_text": "assert {:error, :locator_compare_failed} =",
+              "rust_line": 38,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 308,
+              "source_text": "assert {:error, :logical_generation_mismatch} =",
+              "rust_line": 46,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "2ce4871b4b17a993",
       "runtime_case_ids": [
         "7a49b5fa5105abff2a96ba238418e35ac8521a39aa9cc32bd34d1a073ac8e22b"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-2ce4871b4b17a993-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "applies_expiry_after_required_metadata_validation",
+          "assertions": [
+            {
+              "source_line": 313,
+              "source_text": "assert {:ok, encoded} =",
+              "rust_line": 44,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 316,
+              "source_text": "assert {:ok, %QueryRow{}} = QueryRowCodec.decode(encoded, @state_key, 1_999)",
+              "rust_line": 46,
+              "rust_text": "assert!(decode(encoded.encoded(), &key, Some(1999), limits()).is_ok_and(|r| !r.is_expired()));"
+            },
+            {
+              "source_line": 317,
+              "source_text": "assert :expired = QueryRowCodec.decode(encoded, @state_key, 2_000)",
+              "rust_line": 47,
+              "rust_text": "assert!(decode(encoded.encoded(), &key, Some(2000), limits()).is_ok_and(|r| r.is_expired()));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "5df9cb3a01f9385f",
       "runtime_case_ids": [
         "fbc2f59c34796f1131979e48419c65bcbf36158b30a53dc9c7f7052adbc38595"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-5df9cb3a01f9385f-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/source.rs",
+          "rust_file_sha256": "4dac51cf96366a3da69a69be6d17522654aed26457e0cf4687f2c2675babf971",
+          "rust_module": "",
+          "rust_function": "decodes_a_strict_hydration_reference_without_materializing_record_metadata",
+          "assertions": [
+            {
+              "source_line": 322,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator, 2_000)",
+              "rust_line": 220,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 324,
+              "source_text": "assert {:ok,",
+              "rust_line": 224,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 333,
+              "source_text": "refute Map.has_key?(reference, :record)",
+              "rust_line": 228,
+              "rust_text": "assert!(decoded.record().is_none());"
+            },
+            {
+              "source_line": 334,
+              "source_text": "assert :expired = QueryRowCodec.decode_reference(encoded, @state_key, 2_000)",
+              "rust_line": 229,
+              "rust_text": "assert!(reference(encoded.encoded(), &key, 2000, limits()).is_ok_and(|r| r.is_expired()));"
+            },
+            {
+              "source_line": 335,
+              "source_text": "assert :error = QueryRowCodec.decode_reference(encoded <> <<0>>, @state_key, 0)",
+              "rust_line": 232,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 340,
+              "source_text": "assert :error = QueryRowCodec.decode_reference(corrupted, @state_key, 0)",
+              "rust_line": 239,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "99195a4442647d47",
       "runtime_case_ids": [
         "146508f03e549dd20503aa452dc054366fe6968994e5b768fc8b4de06083eb42"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-99195a4442647d47-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/selectors.rs",
+          "rust_file_sha256": "c4f1ca523e342bffe5b4bf9272be2624f1812be5d2ca86444f8f9b188f00c8a1",
+          "rust_module": "",
+          "rust_function": "query_decoding_materializes_only_required_public_metadata_sections",
+          "assertions": [
+            {
+              "source_line": 345,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator(), 0)",
+              "rust_line": 13,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 347,
+              "source_text": "assert {:ok, %{record: lean}} =",
+              "rust_line": 25,
+              "rust_text": "assert!(lean.is_ok());"
+            },
+            {
+              "source_line": 355,
+              "source_text": "refute Map.has_key?(lean, :attributes)",
+              "rust_line": 28,
+              "rust_text": "assert!(lean.attributes().is_none());"
+            },
+            {
+              "source_line": 356,
+              "source_text": "refute Map.has_key?(lean, :state_meta)",
+              "rust_line": 29,
+              "rust_text": "assert!(lean.state_meta().is_none());"
+            },
+            {
+              "source_line": 357,
+              "source_text": "refute Map.has_key?(lean, :indexed_attributes)",
+              "rust_line": 30,
+              "rust_text": "assert!(lean.indexed_attributes().is_none());"
+            },
+            {
+              "source_line": 358,
+              "source_text": "refute Map.has_key?(lean, :indexed_state_meta)",
+              "rust_line": 31,
+              "rust_text": "assert!(lean.indexed_state_meta().is_none());"
+            },
+            {
+              "source_line": 359,
+              "source_text": "refute Map.has_key?(lean, :state_enter_seq)",
+              "rust_line": 32,
+              "rust_text": "assert!(lean.field(\"state_enter_seq\").is_none());"
+            },
+            {
+              "source_line": 361,
+              "source_text": "assert {:ok, %{record: attributes_only}} =",
+              "rust_line": 43,
+              "rust_text": "assert!(attrs.is_ok());"
+            },
+            {
+              "source_line": 369,
+              "source_text": "assert attributes_only.attributes == record().attributes",
+              "rust_line": 46,
+              "rust_text": "assert!(attributes_eq(attrs, expected_field(\"attributes\")));"
+            },
+            {
+              "source_line": 370,
+              "source_text": "refute Map.has_key?(attributes_only, :state_meta)",
+              "rust_line": 47,
+              "rust_text": "assert!(attrs.state_meta().is_none());"
+            },
+            {
+              "source_line": 372,
+              "source_text": "assert {:ok, %{record: complete}} =",
+              "rust_line": 58,
+              "rust_text": "assert!(complete.is_ok());"
+            },
+            {
+              "source_line": 380,
+              "source_text": "assert complete.attributes == record().attributes",
+              "rust_line": 61,
+              "rust_text": "assert!(attributes_eq(complete, expected_field(\"attributes\")));"
+            },
+            {
+              "source_line": 381,
+              "source_text": "assert complete.state_meta == record().state_meta",
+              "rust_line": 62,
+              "rust_text": "assert!(states_eq(complete, expected_field(\"state_meta\")));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "75b0a68923a28c35",
       "runtime_case_ids": [
         "61cdd9ca991852ae4abf8303cf48f8617c22ff1966bedda67df731d7199d4cab"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-75b0a68923a28c35-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/selectors.rs",
+          "rust_file_sha256": "c4f1ca523e342bffe5b4bf9272be2624f1812be5d2ca86444f8f9b188f00c8a1",
+          "rust_module": "",
+          "rust_function": "query_decoding_materializes_only_the_selected_dynamic_fields",
+          "assertions": [
+            {
+              "source_line": 385,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator(), 0)",
+              "rust_line": 76,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 395,
+              "source_text": "assert {:ok, %{record: selected}} =",
+              "rust_line": 95,
+              "rust_text": "assert!(value.is_ok());"
+            },
+            {
+              "source_line": 398,
+              "source_text": "refute Map.has_key?(selected, :attributes)",
+              "rust_line": 98,
+              "rust_text": "assert!(selected.attributes().is_none());"
+            },
+            {
+              "source_line": 399,
+              "source_text": "refute Map.has_key?(selected, :state_meta)",
+              "rust_line": 99,
+              "rust_text": "assert!(selected.state_meta().is_none());"
+            },
+            {
+              "source_line": 400,
+              "source_text": "assert Map.fetch(selected, {:attribute, \"tier\"}) == {:ok, \"gold\"}",
+              "rust_line": 100,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 401,
+              "source_text": "assert Map.fetch(selected, {:state_meta, \"queued\", \"worker\"}) == {:ok, \"worker-1\"}",
+              "rust_line": 105,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 402,
+              "source_text": "assert Field.fetch(selected, {:attribute, \"tier\"}) == {:ok, \"gold\"}",
+              "rust_line": 110,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 403,
+              "source_text": "assert Field.fetch(selected, {:attribute, \"missing\"}) == :missing",
+              "rust_line": 115,
+              "rust_text": "assert!(selected.attribute(b\"missing\").is_none());"
+            },
+            {
+              "source_line": 404,
+              "source_text": "assert Field.fetch(selected, {:state_meta, \"queued\", \"worker\"}) == {:ok, \"worker-1\"}",
+              "rust_line": 116,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 405,
+              "source_text": "assert Field.fetch(selected, {:state_meta, \"missing\", \"field\"}) == :missing",
+              "rust_line": 121,
+              "rust_text": "assert!(selected.state_field(b\"missing\", b\"field\").is_none());"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "1874bf9f07783a44",
       "runtime_case_ids": [
         "1b9e656144b4a2ba8dcfaa958e1cbb74a4ce472f86bc3d2f1ec1d9e81752f6e7"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-1874bf9f07783a44-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/adversarial.rs",
+          "rust_file_sha256": "ff2de15bc199873a3e5b5bbbc61c44b60c8124a3fdd19d952e7cc5ef1702d969",
+          "rust_module": "",
+          "rust_function": "query_decoding_validates_skipped_metadata_instead_of_trusting_checksum",
+          "assertions": [
+            {
+              "source_line": 409,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator(), 0)",
+              "rust_line": 45,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 413,
+              "source_text": "assert :error = QueryRowCodec.decode(invalid_attribute, @state_key)",
+              "rust_line": 48,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 414,
+              "source_text": "assert :error = QueryRowCodec.decode_for_query(invalid_attribute, @state_key, 0, decode_plan)",
+              "rust_line": 52,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 417,
+              "source_text": "assert :error = QueryRowCodec.decode(invalid_state_meta, @state_key)",
+              "rust_line": 57,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 418,
+              "source_text": "assert :error = QueryRowCodec.decode_for_query(invalid_state_meta, @state_key, 0, decode_plan)",
+              "rust_line": 61,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "cd54056cceb146ce",
       "runtime_case_ids": [
         "ed048e8ba25bbdcc71c589acb23910cc9a6d19fe290f4ca57a90b143a5047157"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-read1-cd54056cceb146ce-complete-scenario",
+          "rust_file": "crates/wf-ports/tests/original_query_read/adversarial.rs",
+          "rust_file_sha256": "ff2de15bc199873a3e5b5bbbc61c44b60c8124a3fdd19d952e7cc5ef1702d969",
+          "rust_module": "",
+          "rust_function": "query_decoding_rejects_duplicate_list_values_in_selected_and_skipped_attributes",
+          "assertions": [
+            {
+              "source_line": 423,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record, locator(), 0)",
+              "rust_line": 86,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 430,
+              "source_text": "assert :error = QueryRowCodec.decode(duplicate_list, @state_key)",
+              "rust_line": 99,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 432,
+              "source_text": "assert :error =",
+              "rust_line": 104,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 443,
+              "source_text": "assert :error =",
+              "rust_line": 117,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario, every source assertion, fixture values and observation order. Source async:true with no local setup/flow tag. Captured maps/sets are finite and unique under exact source key equality; fixture allocations are outside production caps.",
+            "Rust record views preserve present/nil/missing and nested/selected field shape through actual getters, and compare complete nested maps/lists. Hydration references have no record or interpreted scope. Full/query validation precedes expiry; reference mode intentionally validates only framing/checksum/locator. Returned addresses remain ordinary data without native availability/currentness/placement authority.",
+            "Relocation here uses typed u64/state-location data, matching these complete source fixtures; arbitrary malformed/foreign VM struct loose-equality comparison is an explicitly unclaimed compatibility profile. One source disjoint binary/row tuple refutation uses stronger wrong-key rejection plus its separately retained source error observation. Supplemental cases prove expiry omission in CAS and canonicalization of accepted redundant root/locator fields.",
+            "Executed Rust counterparts on native macOS. No new native Elixir execution, complete project setup/profiles, query-plan compiler, native projection/storage/public capture/runtime integration, independent peer review, Linux or measured speedup acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "f1e3ffd43d7b9a8d",

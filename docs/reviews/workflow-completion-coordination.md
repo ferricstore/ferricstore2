@@ -63657,3 +63657,169 @@ clippy,doc,python,reference,progress,parity,fmt,diff}.log and inputs/source-audi
 proof.json. All process handles are terminal. No full goal or Linux/performance/
 service/native source acceptance is claimed. Continue solo with actual query-row
 read paths and original public/native capture/projection integration.
+
+
+### SOURCE-QUERY-READ1 concrete solo architecture decision (before creation)
+
+Approve strict original query-row full/query/reference decoding, typed state-
+locator relocation and internal record partition/terminal-retention restoration.
+Pinned authority remains66586c596e271408d9184af32eb31cd7218c126e query_row_codec,
+query_row_primitives, query_row_decode_plan, QueryRow, Locator, Field and Limits.
+The full objective stays active; this is compatibility data without storage,
+currentness, placement or authorization authority. Continue solo.
+
+Approved new ports files under projection/query_row/: read.rs and private
+read/{model,cursor,frame,locator,metadata,dynamic,selection,relocate,internal}.rs.
+Public models: OriginalQueryReadLimits (positive combined frame/key input,
+relocation/transform output, work and temporary ceilings), OriginalQuerySelection
+(None/All/borrowed unique names), OriginalQueryStateSelection (None/All/borrowed
+unique state/name sets), OriginalQueryDecodePlan (both selections),
+OriginalQueryRead<T> (measured Row or Expired), OriginalQueryLocation (ordinary
+state-location scalar address/checksum/expiry), DecodedOriginalQueryRow (borrowed
+header/scope and optional record; reference has no record or exposed scope),
+OriginalQueryRecord (20 scalar slots plus bounded owned descriptor vectors for
+nested or selected attributes/state metadata and full-only config). Scalar slots
+reuse OriginalMetadataInput but are constructed only as scalar values. Dynamic
+values reuse OriginalAttributeValue/OriginalMetadataScalar. Private classes:
+Cursor, ParsedValue (scalar or fixed16 binary-list descriptors), Frame (borrowed
+complete verified framing/section slices). Any small named sorting/row aliases
+needed for these same approved bounded descriptors are approved in model.rs.
+
+Full/selective readers validate all five sections and identity before applying
+expiry; skipped dynamic values are checked without allocating result rows/lists.
+Reference mode intentionally verifies framing/checksum/locator only, matching
+source; it must not infer scope or metadata validity. Varints are canonical,
+names sorted/unique/UTF8, scalar and semantic bounds exact, skipped duplicates
+refuse. Query selection validity uses source78-field/512-byte name bounds and
+MapSet/map uniqueness acquisition contracts, without truncating valid selections.
+All descriptor reservations and peer calls share one Budget; borrowed payload
+bytes remain tied to both caller-owned donors. No full decoded byte clone or
+recursive value tree. Error/expiry accounting remains explicit.
+
+Relocation takes typed state-location data (u64 numeric fields/state kind),
+preserving complete required source relocation scenarios. This profile does not
+claim generic arbitrary malformed Elixir struct comparison; loose-equality/foreign
+capture compatibility must be explicitly extended if selected by remaining source
+profiles. Logical generation is compared before decoding. Physical CAS compares
+source address/checksum/frame/generation, intentionally excluding source expiry.
+New location hydration/lifetime is validated before one final row allocation.
+Re-encode canonical builtin/root compaction through existing encoder helpers,
+reuse only fully validated canonical other sections with encoder byte ceilings;
+do not blindly preserve accepted noncanonical root/locator representations.
+
+Existing helpers may gain crate-private measured raw scalar field construction,
+builtin emission and id/version-only locator preparation, reusing literal bodies
+and original checksum/Writer/Budget. Internal-view preparation returns original
+physical Cow partition and terminal retention through an ordinary borrowed record
+view; approve OriginalQueryInternalRecord for those two explicit overrides.
+No dependency/format/accepted native profile or root policy changes.
+
+Approved tests: wf-ports/tests/original_query_read/{main,fixtures,source,selectors,
+relocation,adversarial,resources}.rs and TestResult alias. Copy exact original
+fixture constants into this distinct target; do not change predecessor tests or
+add unreviewed shared helper paths. Preserve complete source scenarios/assertions,
+supplement with resealed malformed skipped metadata, reference-vs-full semantics,
+all truncations/corruption, expiry ordering, noncanonical accepted framing and
+relocation canonicalization, independent resource endpoints and source bounds.
+Save compiled runtime RED before bodies. Production<=400/test<=600, nesting4 and
+complexity25 still apply. Native query persistence, batch/shared error accounting,
+public/capture integration, query-plan compiler, runtime/source profiles and
+native Linux/performance acceptance remain open. This is solo self review.
+
+SOURCE-QUERY-READ1 implementation refinement: retain the complete borrowed encoded
+slice in DecodedOriginalQueryRow for exact transformation input admission. No new
+owner or authority is created. Relocation can validate all sections without
+allocating discarded dynamic output: skip-mode checks are equivalent for every
+wire scalar/name/list/semantic constraint, and source-specific encoder section
+ceilings still apply before re-emission. Rebuild canonical builtin/root metadata
+with the existing writer and reuse only other fully validated canonical sections.
+Public typed state-location relocation does not claim arbitrary malformed/foreign
+VM struct loose-equality comparison; that compatibility profile remains explicit
+remaining work, without altering the full goal or excluded source cases.
+
+SOURCE-QUERY-READ1 refinement approved before declaration: public
+OriginalQueryScope in existing read/model.rs explicitly represents NotRead,
+Unscoped and Scoped borrowed bytes. It replaces nested Option without collapsing
+reference omission into nil/global, satisfying strict Clippy without suppression.
+Expired full/query reads may validate through the nonmaterializing equivalent
+wire path, after validating the requested decode plan; no skipped semantic check
+or early expired success is permitted. Keep original expiry result/accounting,
+prove malformed expired metadata still refuses, and record allocation reduction
+as requested-owner evidence rather than measured speedup.
+
+
+### SOURCE-QUERY-READ1 source, architecture and performance self-review
+
+Four controls have compiled pre-body runtime RED;27 final controls pass. The23
+later controls are supplemental. Initial private-helper visibility and strict
+lint/model refinements are distinct from behavioral RED. Eighteen complete
+original QueryRowCodecTest scenarios retain97 source assertions and exact fixture
+values/order. Test equality now compares complete nested maps/entries/lists,
+not just counts or one scalar. Extra shape assertions remain supplemental.
+Rust reference record absence is an actual optional record view; source unknown
+scope is NotRead, distinct from validated Unscoped and Scoped bytes.
+
+Shared framing verifies key shape, complete checksum and exact payload lengths.
+Canonical u64 varints, builtin bitmap/types and covering version ceiling, internal
+u64/worker fields, indexed config, sorted UTF8 names, scalar/list/semantic caps,
+all physical source flags/addresses and identity are checked. Full/query paths
+validate every skipped section before expiry. Reference mode deliberately does
+not parse metadata/scope, matching the original; resealed malformed metadata
+succeeds only as a reference. Reference u64 version and full covering2^53-1
+ceilings remain distinct. Nil/missing/list classes, source scope projection,
+60000-byte IDs and terminal/internal restoration execute original observations.
+
+Selective records preserve nested-vs-tuple field shape through actual map-style
+and effective Field-style getters. Empty results allocate no dynamic descriptors;
+selected lists allocate only retained pointer spines. Borrowed key, ID, scope,
+checksum and payload slices remain tied to both caller-owned donors. Explicit
+78-field/512-byte plan-name bounds are preserved without incorrectly narrowing
+selection names to stored64-byte names. No requested byte payload is cloned into
+another full decoded tree. Fixed16-list scratch and bounded owned descriptors
+keep first-party code safe and portable, with no recursive parser or new dependency.
+
+Expired reads use the equivalent nonmaterializing validation path and still
+refuse malformed expired metadata. Resource controls prove lower conservative
+requested peaks for skipped and expired output, inclusive input/work/temp/output
+endpoints and retained expiry accounting. They do not measure allocator/RSS or
+claim speedup. Source/source-error refusals remain separate from operational
+errors; the standalone APIs bound one call. A future batch must share actual
+accounting across invalid items rather than reset public limits and call errors
+free. No native batch or response reservation acceptance is granted here.
+
+Typed state-location relocation compares logical generation before parsing,
+then current physical source/checksum/frame/generation, excluding source expiry
+exactly as original. Stale CAS precedes invalid replacement validation. New
+hydration/lifetime is checked before one final row allocation. Accepted redundant
+root and locator encodings are decoded then re-emitted canonically: source does
+not reject them, and blindly copying original metadata would be wrong. Existing
+builtin emitter, id/version-only locator validation, checksum and writer bodies
+are reused. Supplemental tests compare actual canonical bytes and source error
+order. Arbitrary malformed/foreign VM struct loose-equality comparisons remain
+an unclaimed compatibility profile; typed original scenarios here are complete.
+
+No predecessor test/helper/assertion is edited. Of1316 old non-Markdown test/
+bench/reference inputs,1315 stay whole; only18 additive progress records/97 links
+change the old ledger. Frozen mapping, runtime registration and source files stay
+exact. Full native projection persistence, query-plan compiler, public/capture/
+currentness/authorization integration, runtime, remaining source profiles and
+native Linux/performance acceptance remain open. Review is solo, not independent.
+
+
+### SOURCE-QUERY-READ1 final frozen verification
+
+1934 Rust tests/126 groups and11 doctests/15 groups pass with zero failed/ignored,
+including all60 architecture cases. Strict all-target/workspace Clippy, strict
+docs, Python7, reference integrity, progress, fmt and diff pass. Full parity
+actually exits1. All2260 frozen non-Markdown inputs/1671 Rust files are exact.
+Accounting is165 source-derived declarations/179 mappings/787 links;18 new
+complete scenarios/97 assertions are additive, not full-parity certification.
+All1316 old non-Markdown test/bench/reference inputs are whole except the exact
+progress addition. No earlier assertions, frozen sources/mappings or runtime
+identities are edited. Four compiled pre-body RED and27 final controls remain
+separate from later supplemental work. Evidence prefix is
+/private/tmp/ferricstore2-query-read- with red/green/focused/workspace/doctests/
+clippy/doc/python/reference/progress/parity/fmt/diff logs and inputs/source-audit/
+proof.json. All jobs are terminal. No full goal, native source/profile, Linux,
+performance or service acceptance is claimed. Continue solo with actual trusted
+public/native capture and coherent query/projection integration.

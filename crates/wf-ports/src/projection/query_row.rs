@@ -6,12 +6,20 @@ mod locator;
 mod metadata;
 mod model;
 mod primitive;
+mod read;
 mod record;
 mod row;
 mod writer;
 pub use model::{
     OriginalQueryLocator, OriginalQueryRecordError, OriginalQueryRecordLimits,
     PreparedOriginalQueryMetadata, PreparedOriginalQueryRow,
+};
+pub use read::{
+    DecodedOriginalQueryRow, OriginalQueryDecodePlan, OriginalQueryInternalRecord,
+    OriginalQueryLocation, OriginalQueryRead, OriginalQueryReadLimits, OriginalQueryRecord,
+    OriginalQueryScope, OriginalQuerySelection, OriginalQueryStateSelection,
+    decode_original_query_for_query, decode_original_query_reference, decode_original_query_row,
+    prepare_original_query_internal_record, relocate_original_query_row,
 };
 use wf_domain::metadata::OriginalMetadataInput as I;
 
