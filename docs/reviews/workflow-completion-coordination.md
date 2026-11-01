@@ -64236,3 +64236,129 @@ record-policy-` contains final logs/checks/input/source-audit/proof JSON; the
 structural preflight failure is retained separately. All jobs terminal. No new
 Linux/Elixir, independent review, primary implementation adoption, push or full
 completion is claimed. Continue the unchanged full goal solo.
+
+### NATIVE-QUERY-DATA1 concrete solo architecture decision
+
+Compose the actual coherent native capture with typed original metadata and actual
+policy configuration. Native ordering is u128, while original covering internals
+use u64; do not truncate native sequence values or fabricate a legacy Locator.
+Approve typed data preparation in ports query_row/native.rs with private
+native/{model,metadata,routing,fields}.rs, exported through query_row.rs:
+NativeQueryPreparationLimits, NativeQueryPreparationError, NativeQuerySnapshot,
+NativeQueryRecord and prepare_native_query_snapshot. Records retain actual native
+core/lifecycle and one moved metadata document, with validated captured optional
+metadata and owned small normalized actual-policy index names. Missing fields
+remain missing. Actual scope/logical partition observations must be explicit and
+match native physical routing in both directions; unknown routing is not unscoped.
+Actual lifecycle and policy configuration take precedence over raw captured hints.
+Drop complete policy backing after extracting its generation/profile/configuration;
+do not pin another full policy owner in the query result. No wire/layout/intent or
+service activation; authorisation, visibility, barriers and writer/index adoption
+remain separate required gates. Optional captured metadata has no source-origin
+or public execution authority.
+
+Approve domain metadata/record.rs bounded decode and model.rs field_input and
+descriptor_bytes accessors. Reuse the existing moved original-value parser.
+Add crate-private decode_original_flow_value_bounded and optional auxiliary-buffer
+ceiling/counter in original_flow/budget.rs, checking every existing central reserve
+before allocation. Sum requested buffers plus relocation conservatively, without
+claiming allocator/RSS measurement; existing entrypoints retain work/fees/profile
+semantics. Bounded metadata decode separately pays its fixed control, reports
+actual charged work and auxiliary-buffer liability, and preserves all errors.
+Input bytes move once; temporary descriptor views borrow all leaves.
+
+Approve policy/complete/record_projection/indexed.rs with BorrowedPolicyIndexedFields
+and with_stored_policy_indexed_fields, exported through complete.rs. Borrow verified
+Complete fields or the existing Original index/normalizers inside a callback;
+include actual backing profile/generation, source-owner size and shared schema
+work/temporary observations. Keep the complete donor unchanged. No second parser,
+production dependency or full encoded policy copy. The native parent accounts for
+read work/owners, bounded metadata decoding, policy inspection, descriptor views and
+final query owners continuously; final output drops full policy backing.
+
+Approve native controls under existing storage metadata/query target:
+query/prepared.rs and prepared/{fixtures,resources,validation}.rs, with fixture
+metadata ETF builders only. Compiled pre-body runtime RED precedes behavior.
+Cover real native writes/reads, u128 sequence, unchanged metadata owner, actual
+lifecycle/configuration despite forged hints, explicit routing, partial fields,
+malformed/foreign data and independent inclusive resource bounds. No supplemental
+native test earns source-case credit. All previous assertions/registries remain
+exact. Keep production and src tests<=400, integration tests<=600, fn100/depth4/
+complexity25; portable safe Rust. This is solo review, not independent review.
+
+NATIVE-QUERY-DATA1 resource/size refinement before implementation: approve
+PolicySchemaCharge::with_scratch_limit and a private maximum_scratch counter in
+complete/admission.rs. Check its existing prospective scratch tariff before
+allocation, using the existing WorkBytes lane with the tighter combined ceiling;
+zero remaining scratch permits allocation-free inspection. Unbounded new() keeps
+the same g/p fees; private parents using size_of reflect the added scalar control.
+This prevents policy inspection from exceeding the native parent's temporary cap
+before its callback. Approve private OwnedIndexedConfiguration in native/fields.rs
+to group the bounded configuration/result ownership and remove a complex tuple.
+Factor native parent initialization into a small function, preserving all checks.
+
+### NATIVE-QUERY-DATA1 scratch-account file organization decision
+
+Solo architecture review approves the concrete private file
+`crates/wf-domain/src/policy/complete/admission/charge.rs` before creation.
+Move the existing PolicySchemaCharge definition/impl and charge_schema body
+there, with the unchanged admission and complete public reexports. The added
+prospective scratch ceiling otherwise takes admission.rs above the 400-line
+production cap. This separates account mechanics from content metrics, adds no
+dependency/model/allocation, and preserves the existing g/p accounting API.
+This is a solo decision, not independent peer review.
+
+### NATIVE-QUERY-DATA1 final architecture/resource/performance self-review
+
+The ports producer composes one actual committed native capture with the shared
+explicit-context metadata parser and current policy normalizers. Typed output
+preserves actual core, full u128 ordering and immutable lifecycle/value binding.
+One original metadata allocation moves into the typed document; checked field
+roots and byte ranges borrow it. Optional fields remain missing. Exact original
+field validators run over bounded transient flat descriptor spines, without a
+second full metadata tree or encoded legacy query frame. Actual Complete/Original
+policy determines index names/profile/generation; raw capture hints stay data.
+Full policy backing drops after bounded small-name copies. No fabricated Locator,
+wire/layout/intent/dependency or service/source-origin grant is introduced.
+
+Explicit logical routing must round-trip through physical and logical conversion;
+unknown scope is not guessed unscoped. Full native u128 ordering cannot be placed
+in the legacy covering metadata's u64 integer slot; the typed model avoids that
+narrowing. Current policy remains separate from immutable birth capture. Actual
+Complete genesis and consumed Patch preserve indexes across generation1->2 while
+birth retains active5000; actual consumed Original SET supplies its own current
+configuration. Ordinary transformed scope/large-sequence inputs are labeled and
+prove only the typed-data contract, without persisted-wide/source-case claims.
+
+The parent admits prior read work/peak/returned owners, moved metadata, retained
+descriptors and final copied names. Central bounded decoder reserves prospectively
+sum auxiliary requests plus relocation, and report their liability separately
+from already retained input backing. Old decoding bodies/work semantics remain
+shared. Policy scratch uses the existing prospective tariff under an additional
+ceiling before inspection allocations/callback; new() retains its g/p semantics.
+The account moves privately beside admission metrics to preserve the400-line cap.
+Resource tests cover inclusive/one-below/zero output/work/temporary ceilings for
+absent, actual Complete and actual Original policy, exact decoder auxiliary/work
+compatibility and schema scratch refusal before callback. These are conservative
+logical ownership/work estimates, not allocator/RSS/latency/throughput evidence.
+
+Three compiled pre-body runtime controls in red.log fail before behavior; all
+three pass afterward. Eleven later controls are supplemental. Fourteen new controls
+pass, preserving1334 prior test/bench/reference inputs whole and allowing only
+one additive query-module registration in the1335th. Prior assertions, source and
+runtime identities, and the170-declaration/184-mapping/801-link ledger are exact.
+No source-case credit is added. Full parity actually exits1 as required.
+
+Whole workspace2001/127 groups, doctests11/15 groups, all60 architecture controls,
+strict all-target Clippy, warning-denied docs, Python7 and reference/progress/fmt/
+diff pass, with zero failed/ignored tests. The whole-workspace run was compiled
+before a single new-test numeric-separator correction (1048576->1_048_576 and
+65536->65_536); no behavior changed. Final exact-input focused14 and strict Clippy
+pass afterward. The pre-format workspace snapshot and final2301 non-Markdown/
+1712 Rust input hashes are separate, with literal-format.json recording that
+limitation rather than claiming one exact frozen whole-workspace input snapshot.
+Evidence prefix `/private/tmp/ferricstore2-native-query-data-` holds logs/checks/
+inputs/source-audit/proof; all jobs terminal. No new native Linux/Elixir, independent
+review, primary implementation adoption, push or full completion is claimed.
+The accepted public/runtime, writer/index, visibility/barrier, mutation breadth
+and full source/platform/performance gates remain open. Continue the goal solo.

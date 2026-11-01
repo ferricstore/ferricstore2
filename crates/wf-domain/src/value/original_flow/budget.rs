@@ -7,6 +7,8 @@ use crate::value::original_flow::{OriginalFlowValueError as E, OriginalValueLimi
 pub(in crate::value::original_flow) struct Budget {
     pub(in crate::value::original_flow) limits: L,
     work: usize,
+    auxiliary: usize,
+    maximum_auxiliary: usize,
 }
 
 impl Budget {
@@ -31,7 +33,36 @@ impl Budget {
         if input.0 > limits.max_encoded_bytes || input.1 > limits.max_encoded_bytes {
             return Err(E::Limit);
         }
-        Ok(Self { limits, work: 0 })
+        Ok(Self {
+            limits,
+            work: 0,
+            auxiliary: 0,
+            maximum_auxiliary: usize::MAX,
+        })
+    }
+
+    pub(in crate::value::original_flow) fn bounded(
+        limits: L,
+        input: (usize, usize),
+        maximum: usize,
+    ) -> Result<Self, E> {
+        if maximum == 0 {
+            return Err(E::InvalidLimits);
+        }
+        let mut budget = Self::new(limits, input)?;
+        budget.maximum_auxiliary = maximum;
+        Ok(budget)
+    }
+    pub(in crate::value::original_flow) const fn auxiliary_bytes(&self) -> usize {
+        self.auxiliary
+    }
+    fn auxiliary(&mut self, bytes: usize) -> Result<(), E> {
+        let next = self.auxiliary.checked_add(bytes).ok_or(E::Limit)?;
+        if next > self.maximum_auxiliary {
+            return Err(E::Limit);
+        }
+        self.auxiliary = next;
+        Ok(())
     }
 
     pub(in crate::value::original_flow) fn spend(&mut self, units: usize) -> Result<(), E> {
@@ -88,6 +119,7 @@ pub(in crate::value::original_flow) fn reserve_exact<T>(
         .capacity()
         .checked_mul(size_of::<T>())
         .ok_or(E::Limit)?;
+    budget.auxiliary(requested.checked_add(relocation).ok_or(E::Limit)?)?;
     budget.spend(
         requested
             .checked_add(relocation)

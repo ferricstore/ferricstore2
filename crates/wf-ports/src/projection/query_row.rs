@@ -6,6 +6,7 @@ mod dynamic;
 mod locator;
 mod metadata;
 mod model;
+mod native;
 mod primitive;
 mod read;
 mod record;
@@ -18,6 +19,10 @@ pub use create::{
 pub use model::{
     OriginalQueryLocator, OriginalQueryRecordError, OriginalQueryRecordLimits,
     PreparedOriginalQueryMetadata, PreparedOriginalQueryRow,
+};
+pub use native::{
+    NativeQueryPreparationError, NativeQueryPreparationLimits, NativeQueryRecord,
+    NativeQuerySnapshot, prepare_native_query_snapshot,
 };
 pub use read::{
     DecodedOriginalQueryRow, OriginalQueryDecodePlan, OriginalQueryInternalRecord,

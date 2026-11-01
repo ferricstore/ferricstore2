@@ -8,6 +8,7 @@ use wf_ports::state::{
 use wf_types::identity::{PartitionId, RecordId};
 
 mod corruption;
+mod prepared;
 mod resources;
 
 fn limits() -> WorkflowRecordReadLimits {

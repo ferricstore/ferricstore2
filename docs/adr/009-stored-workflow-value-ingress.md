@@ -1,5 +1,41 @@
 # ADR-009: explicit stored workflow value ingress
 
+## Native typed query preparation
+
+NATIVE-QUERY-DATA1 composes the coherent record/policy read with explicit-context
+original metadata decoding and the existing query field/scope validators. Preserve
+native u128 ordering in typed output: the original covering-row internals encode
+u64 sequences, so that frame cannot represent every native sequence. No legacy
+physical Locator is fabricated. Actual native core/value/lifecycle remains distinct
+from the unchanged caller metadata document and from current-policy configuration.
+Captured lifecycle and index hints do not replace either authoritative observation.
+Missing optional fields stay missing; unknown logical routing is not unscoped.
+Both physical and logical scope conversions must agree with the native partition.
+
+Metadata bytes move into one existing document allocation. Bounded transient flat
+descriptor vectors borrow binary leaves and reuse complete original field validators.
+Verified Complete fields and the existing Original policy index/normalizers supply
+at most three attribute names, one state metadata name and actual generation/profile.
+Only those small names are copied; full policy backing is dropped after projection.
+This is an ownership observation, with no measured speedup or RSS claim.
+
+Whole-parent work includes the completed native read and all later decoding,
+validation and policy inspection. Input owners, prospective decoder auxiliary
+buffers, descriptor spines, policy scratch and output names share temporary limits;
+final output excludes discarded policy backing. The metadata bounded entrypoint
+sums requested auxiliary buffers plus relocation conservatively before each central
+reserve. Existing parser bodies and old entrypoint work semantics remain shared.
+PolicySchemaCharge::with_scratch_limit checks the existing prospective scratch
+tariff before allocation, preserving default new() g/p semantics and allowing
+zero scratch for allocation-free inspection. Account mechanics move privately to
+admission/charge.rs; public paths and dependency boundaries stay unchanged.
+
+This is data preparation, without service authorization, expiry visibility, query
+plans/read barriers, native derived-index publication or source-origin proof.
+Intent22 remains original caller DATA. Those integrations and full source/platform/
+measured-performance acceptance remain required. Ordinary wide-sequence/scoped
+input controls are labeled as such and earn no source-case or persisted-wide credit.
+
 ## Coherent native current-policy record observation
 
 NATIVE-RECORD-POLICY1 adds `WorkflowRecordPolicyReadPort` over the existing native

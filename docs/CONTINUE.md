@@ -2,6 +2,55 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+NATIVE-QUERY-DATA1 follows 3442ac0 in the isolated implementation worktree.
+Coherent native record/current-policy observations now feed typed query data.
+Actual core/u128 ordering and immutable lifecycle/value binding stay separate
+from one moved original metadata document and current-policy index configuration.
+Unknown routing refuses; explicit scope must agree with native physical/logical
+routing in both directions. Missing optional user fields stay missing. Existing
+original field validators inspect bounded borrowed descriptor views. Raw lifecycle
+and index hints never override actual native/policy observations. Full policy
+backing is discarded after copying only its small normalized index configuration.
+No legacy Locator/frame, new intent/layout or service grant is introduced.
+
+Whole-parent work and ownership include the preceding read, decoder buffers,
+retained descriptors, policy inspection/scratch and final names. Prospective
+central decoder reserves and policy scratch checks refuse before allocation.
+Default entrypoints keep shared work semantics; private control-size accounting
+reflects added counters. No measured speedup/RSS improvement is claimed.
+
+Fourteen native controls pass: three have compiled pre-body runtime RED and11
+are supplemental. Actual Complete genesis/Patch and Original SET exercise current
+policy versus immutable birth capture; moved backing, missing fields/records,
+malformed/context failures, routing, u128 preservation and all three parent limit
+endpoints execute. Wide-sequence/scoped transformed-input controls are explicitly
+ordinary data, without native publication/source-origin credit. The ledger stays
+byte-exact at170 declarations/184 mappings/801 links; full parity actually exits1.
+
+Verification passes2001 Rust tests/127 groups and11 doctests/15 groups, zero
+failed/ignored, including all60 architecture controls. Strict workspace/all-target
+Clippy, warning-denied docs, Python7, reference/progress/fmt/diff pass. Of1335 prior
+test/bench/reference inputs,1334 remain whole and the old query root gains only
+its module registration. Final2301 non-Markdown/1712 Rust inputs are recorded;
+the whole-workspace run precedes only a numeric-separator style correction in
+one new test, with final focused14/Clippy execution afterward. Evidence prefix
+/private/tmp/ferricstore2-native-query-data- contains logs/checks/inputs/source-
+audit/literal-format/proof JSON. All verification jobs terminal. No new Linux/
+Elixir, independent review, primary code adoption, push or full completion.
+
+NEXT connect rich original/native ingress with actual writer-derived metadata/
+indexes and public query services, preserving original caller DATA separately
+from server time/policy/scope/default postimages. Typed query preparation does not
+supply visibility, authorization or consensus barriers. Full mutation/many/child
+breadth, accepted public/Claim/Node/Raft/runtime/transports, query compilation,
+blocking/pipeline/lifecycle/catalog, all remaining original scenarios/profiles
+and native Linux/macOS/measured-performance acceptance remain open. Full goal
+active; continue solo. Do not treat component test counts as product completion.
+
+## Preceding 3442ac0 native current-policy query checkpoint (historical)
+
+The following describes the predecessor only.
+
 NATIVE-RECORD-POLICY1 follows d9fe92e in the isolated implementation worktree.
 WorkflowRecordPolicyReadPort acquires the represented core, original opaque
 metadata, actual value/lifecycle binding, control and current type policy on one

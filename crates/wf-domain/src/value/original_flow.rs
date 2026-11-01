@@ -96,15 +96,39 @@ pub(crate) fn decode_original_flow_value_with_work(
     limits: OriginalValueLimits,
 ) -> Result<(OriginalValueDocument, usize), OriginalFlowValueError> {
     let mut budget = Budget::new(limits, (encoded.len(), encoded.capacity()))?;
-    let encoding = decode_wrapper(&encoded, &mut budget)?;
+    let document = decode_owned(encoded, context, &mut budget)?;
+    Ok((document, budget.work_units()))
+}
+
+pub(crate) fn decode_original_flow_value_bounded(
+    encoded: Vec<u8>,
+    context: &OriginalValueContext<'_>,
+    limits: OriginalValueLimits,
+    maximum_auxiliary: usize,
+) -> Result<(OriginalValueDocument, usize, usize), OriginalFlowValueError> {
+    let mut budget = Budget::bounded(
+        limits,
+        (encoded.len(), encoded.capacity()),
+        maximum_auxiliary,
+    )?;
+    let document = decode_owned(encoded, context, &mut budget)?;
+    Ok((document, budget.work_units(), budget.auxiliary_bytes()))
+}
+
+fn decode_owned(
+    encoded: Vec<u8>,
+    context: &OriginalValueContext<'_>,
+    budget: &mut Budget,
+) -> Result<OriginalValueDocument, OriginalFlowValueError> {
+    let encoding = decode_wrapper(&encoded, budget)?;
     let mut document = OriginalValueDocument {
         encoded,
         nodes: Vec::new(),
         edges: Vec::new(),
         root: 0,
     };
-    decode::parse(&mut document, &encoding, context, &mut budget)?;
-    Ok((document, budget.work_units()))
+    decode::parse(&mut document, &encoding, context, budget)?;
+    Ok(document)
 }
 
 /// Decode exactly one safe-table-checked bare external term, without FSV2 inference.

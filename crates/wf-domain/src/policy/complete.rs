@@ -117,10 +117,11 @@ pub use public_set::{
     original_policy_set_rejection_from_body, prepare_original_policy_set_request,
 };
 pub use record_projection::{
-    original_policy_indexed_fields_equal, original_record_batch_policy_has_governance,
-    original_record_batch_policy_projection_bytes, project_original_record_batch_policy,
-    project_record_batch_policy, record_batch_policy_projection_bytes,
-    stored_policy_indexed_fields_equal,
+    BorrowedPolicyIndexedFields, original_policy_indexed_fields_equal,
+    original_record_batch_policy_has_governance, original_record_batch_policy_projection_bytes,
+    project_original_record_batch_policy, project_record_batch_policy,
+    record_batch_policy_projection_bytes, stored_policy_indexed_fields_equal,
+    with_stored_policy_indexed_fields,
 };
 pub use replace_content::{
     CompletePolicyReplaceRejection, CompletePolicyReplaceRejectionKind,

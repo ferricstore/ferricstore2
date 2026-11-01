@@ -111,6 +111,31 @@ pub struct OriginalRecordMetadata {
     pub(super) work: usize,
 }
 impl OriginalRecordMetadata {
+    /// Borrow a field root in the same verified arena, without cloning its data.
+    #[must_use]
+    pub fn field_input(
+        &self,
+        field: OriginalRecordMetadataField,
+    ) -> Option<crate::value::OriginalValueInput<'_>> {
+        let mut input = self.document.as_input();
+        input.root = self.fields[field.index()]?;
+        Some(input)
+    }
+    /// Requested retained descriptor bytes, excluding the unchanged input backing.
+    #[must_use]
+    pub fn descriptor_bytes(&self) -> Option<usize> {
+        let input = self.document.as_input();
+        input
+            .nodes
+            .len()
+            .checked_mul(std::mem::size_of::<OriginalValueNode>())?
+            .checked_add(
+                input
+                    .edges
+                    .len()
+                    .checked_mul(std::mem::size_of::<usize>())?,
+            )
+    }
     /// Borrows a field node; missing differs from explicit atom nil or empty data.
     #[must_use]
     pub fn field(&self, field: OriginalRecordMetadataField) -> Option<&OriginalValueNode> {

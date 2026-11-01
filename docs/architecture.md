@@ -38,6 +38,22 @@ names must not enter that identity. See SOURCE-CREATE1 and SOURCE-START1 in the
 
 ## Coherent native record queries
 
+`prepare_native_query_snapshot` composes this coherent observation into typed
+native query data. It retains the actual core, complete u128 ordering and immutable
+value/lifecycle binding. The original metadata allocation moves into its existing
+explicit-context document decoder; optional user fields remain missing when absent.
+Logical partition/scope must be captured and match native routing in both directions.
+The existing query field validators inspect borrowed leaves through bounded flat
+descriptor spines. Actual current policy supplies normalized index configuration;
+raw captured lifecycle/index hints remain data. Full policy backing is discarded
+after its small configuration is copied. No legacy Locator or covering-row frame
+is synthesized. Read work/owners, prospective decoder buffers, policy scratch and
+final ownership share the parent resource ceilings. The private schema account now
+lives beside its metrics under admission/charge.rs to retain the 400-line cap.
+This data preparation still requires service authorization, lifecycle visibility,
+query compilation/read barriers and native writer/index adoption. See
+NATIVE-QUERY-DATA1 in the [coordination review](reviews/workflow-completion-coordination.md).
+
 `WorkflowRecordPolicyReadPort` additionally acquires the actual record type's
 current Complete/Original policy backing before releasing the same read snapshot.
 Policy observation is explicit NotRead for a missing record, Absent for a missing

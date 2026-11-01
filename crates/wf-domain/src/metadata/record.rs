@@ -72,3 +72,44 @@ pub fn decode_original_record_metadata(
         work: limits.max_work_units - remaining,
     })
 }
+
+/// Decode with an additional prospective auxiliary-buffer ceiling.
+/// The moved input backing is external; the returned peak includes fixed control
+/// and conservatively accumulated requested buffers plus relocation, not RSS.
+/// # Errors
+/// Preserve original schema/context/codec failures and independent resource refusal.
+pub fn decode_original_record_metadata_bounded(
+    encoded: Vec<u8>,
+    context: &OriginalValueContext<'_>,
+    limits: OriginalValueLimits,
+    maximum_temporary_bytes: usize,
+) -> Result<(OriginalRecordMetadata, usize), OriginalRecordMetadataError> {
+    budget::decode_limits(limits)?;
+    if maximum_temporary_bytes == 0 {
+        return Err(OriginalRecordMetadataError::InvalidLimits);
+    }
+    let auxiliary = maximum_temporary_bytes
+        .checked_sub(budget::CONTROL)
+        .filter(|n| *n > 0)
+        .ok_or(OriginalRecordMetadataError::Limit)?;
+    let mut remaining = limits.max_work_units;
+    budget::spend(&mut remaining, budget::CONTROL)?;
+    let mut selected = limits;
+    selected.max_work_units = budget::positive(remaining)?;
+    let (document, used, temporary) =
+        crate::value::decode_original_flow_value_bounded(encoded, context, selected, auxiliary)
+            .map_err(OriginalRecordMetadataError::Decoding)?;
+    budget::spend(&mut remaining, used)?;
+    let fields = schema::validate(document.as_input(), &mut remaining)?;
+    let temporary = budget::CONTROL
+        .checked_add(temporary)
+        .ok_or(OriginalRecordMetadataError::Limit)?;
+    Ok((
+        OriginalRecordMetadata {
+            document,
+            fields,
+            work: limits.max_work_units - remaining,
+        },
+        temporary,
+    ))
+}
