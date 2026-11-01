@@ -8173,14 +8173,98 @@
       "runtime_case_ids": [
         "8e095289111df75db33baca62a133de19174cae32912777305652d658d88b553"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-create1-421f0b4eb08e34d7",
+          "rust_file": "crates/wf-ports/tests/original_create/source.rs",
+          "rust_file_sha256": "3234facd83f6a1ec96971c4d9d2bd69933f3cbf00cb21a2c0a937bd48b26259c",
+          "rust_module": "",
+          "rust_function": "create_attrs_preserves_default_state_auto_partition_and_named_value_options",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert {:ok, attrs} =",
+              "rust_line": 14,
+              "rust_text": "assert!(result.is_ok(), \"{result:?}\");"
+            },
+            {
+              "source_line": 15,
+              "source_text": "assert attrs.id == \"flow-1\"",
+              "rust_line": 16,
+              "rust_text": "assert!(matches!(attrs.field(\"id\"), Some(I::Binary(b\"flow-1\"))));"
+            },
+            {
+              "source_line": 16,
+              "source_text": "assert attrs.type == \"email\"",
+              "rust_line": 17,
+              "rust_text": "assert!(matches!(attrs.field(\"type\"), Some(I::Binary(b\"email\"))));"
+            },
+            {
+              "source_line": 17,
+              "source_text": "assert attrs.state == \"queued\"",
+              "rust_line": 18,
+              "rust_text": "assert!(matches!(attrs.field(\"state\"), Some(I::Binary(b\"queued\"))));"
+            },
+            {
+              "source_line": 18,
+              "source_text": "assert attrs.partition_key == Ferricstore.Flow.Keys.auto_partition_key(\"flow-1\")",
+              "rust_line": 19,
+              "rust_text": "assert!(matches!("
+            },
+            {
+              "source_line": 19,
+              "source_text": "assert attrs.values == [\"order\"]",
+              "rust_line": 23,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 20,
+              "source_text": "assert attrs.value_refs == %{reservation: \"ref-1\"}",
+              "rust_line": 26,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion and exact fixture/order in this pinned standalone MutationAttrs create case; async:true and flow tags, no local setup. The unleased-running loop executes both original option lists. Input values are existing finite original captured classes with unique actual map keys; keywords retain duplicates and first-occurrence lookup.",
+            "Source helper normalization/admission executes in Rust with ordinary captured context, not native public service or VM capability authority. Opaque named/value operands are preserved as captured data; their actual serialization/persistence and public value-reference refusal remain separate requirements.",
+            "The internal schedule scenario is intentionally not credited: its supplemental control consumes a captured allowed? observation, without native Internal.put capability setup. Remaining original mutation/many/child/lease scenarios, required source/runtime profiles, native Linux and measured performance acceptance remain open."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e31a07f95fefdb8f",
       "runtime_case_ids": [
         "13992725edd9c9d4b0ab03111955e6c73ec46fbe8756ba633adee83a21c42034"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-create1-e31a07f95fefdb8f",
+          "rust_file": "crates/wf-ports/tests/original_create/source.rs",
+          "rust_file_sha256": "3234facd83f6a1ec96971c4d9d2bd69933f3cbf00cb21a2c0a937bd48b26259c",
+          "rust_module": "",
+          "rust_function": "create_attrs_accepts_infinity_while_validating_compact_query_metadata",
+          "assertions": [
+            {
+              "source_line": 24,
+              "source_text": "assert {:ok, attrs} =",
+              "rust_line": 40,
+              "rust_text": "assert!(result.is_ok(), \"{result:?}\");"
+            },
+            {
+              "source_line": 30,
+              "source_text": "assert attrs.max_active_ms == :infinity",
+              "rust_line": 42,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion and exact fixture/order in this pinned standalone MutationAttrs create case; async:true and flow tags, no local setup. The unleased-running loop executes both original option lists. Input values are existing finite original captured classes with unique actual map keys; keywords retain duplicates and first-occurrence lookup.",
+            "Source helper normalization/admission executes in Rust with ordinary captured context, not native public service or VM capability authority. Opaque named/value operands are preserved as captured data; their actual serialization/persistence and public value-reference refusal remain separate requirements.",
+            "The internal schedule scenario is intentionally not credited: its supplemental control consumes a captured allowed? observation, without native Internal.put capability setup. Remaining original mutation/many/child/lease scenarios, required source/runtime profiles, native Linux and measured performance acceptance remain open."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "c3184c7d16dee228",
@@ -8201,7 +8285,28 @@
       "runtime_case_ids": [
         "80f505ca4e9ee56294f655ba93c6f48488b572233d0304e0ea3cbd60021e7073"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-create1-2fae663ea6105a5e",
+          "rust_file": "crates/wf-ports/tests/original_create/source.rs",
+          "rust_file_sha256": "3234facd83f6a1ec96971c4d9d2bd69933f3cbf00cb21a2c0a937bd48b26259c",
+          "rust_module": "",
+          "rust_function": "create_attrs_rejects_unleased_running_state_before_replicated_mutation_preparation",
+          "assertions": [
+            {
+              "source_line": 76,
+              "source_text": "assert {:error, \"ERR flow running state is only entered by FLOW.CLAIM_DUE\"} =",
+              "rust_line": 60,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion and exact fixture/order in this pinned standalone MutationAttrs create case; async:true and flow tags, no local setup. The unleased-running loop executes both original option lists. Input values are existing finite original captured classes with unique actual map keys; keywords retain duplicates and first-occurrence lookup.",
+            "Source helper normalization/admission executes in Rust with ordinary captured context, not native public service or VM capability authority. Opaque named/value operands are preserved as captured data; their actual serialization/persistence and public value-reference refusal remain separate requirements.",
+            "The internal schedule scenario is intentionally not credited: its supplemental control consumes a captured allowed? observation, without native Internal.put capability setup. Remaining original mutation/many/child/lease scenarios, required source/runtime profiles, native Linux and measured performance acceptance remain open."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "6179f9497f4abcc6",
@@ -8215,7 +8320,34 @@
       "runtime_case_ids": [
         "3f337b0368f7c2e011cd0ec9141f55016050fe6a59e3a94ee73608b9416f00af"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-create1-c95cdabca3ea33a7",
+          "rust_file": "crates/wf-ports/tests/original_create/source.rs",
+          "rust_file_sha256": "3234facd83f6a1ec96971c4d9d2bd69933f3cbf00cb21a2c0a937bd48b26259c",
+          "rust_module": "",
+          "rust_function": "create_attrs_rejects_timestamps_that_cannot_be_represented_exactly_by_flow_indexes",
+          "assertions": [
+            {
+              "source_line": 102,
+              "source_text": "assert {:error, \"ERR flow now_ms exceeds maximum 9007199254740991\"} =",
+              "rust_line": 76,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 108,
+              "source_text": "assert {:error, \"ERR flow run_at_ms exceeds maximum 9007199254740991\"} =",
+              "rust_line": 86,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion and exact fixture/order in this pinned standalone MutationAttrs create case; async:true and flow tags, no local setup. The unleased-running loop executes both original option lists. Input values are existing finite original captured classes with unique actual map keys; keywords retain duplicates and first-occurrence lookup.",
+            "Source helper normalization/admission executes in Rust with ordinary captured context, not native public service or VM capability authority. Opaque named/value operands are preserved as captured data; their actual serialization/persistence and public value-reference refusal remain separate requirements.",
+            "The internal schedule scenario is intentionally not credited: its supplemental control consumes a captured allowed? observation, without native Internal.put capability setup. Remaining original mutation/many/child/lease scenarios, required source/runtime profiles, native Linux and measured performance acceptance remain open."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "e43b0471a640f40d",

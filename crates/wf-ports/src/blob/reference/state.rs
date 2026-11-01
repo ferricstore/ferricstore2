@@ -27,17 +27,57 @@ pub fn render_original_state_key(
     let remaining = maximum.checked_sub(fixed).ok_or(B::Limit)?;
     let mut tag_bytes = [0; 49];
     let size = tag::render_tag(partition, id, remaining, &mut tag_bytes)?;
-    let length = fixed.checked_add(size).ok_or(B::Limit)?;
+    render_state_key_with_prefix(id, tag_bytes.get(..size).ok_or(B::Limit)?, maximum)
+}
+
+pub(crate) fn original_state_key_prefix(
+    id: &[u8],
+    partition: P<'_>,
+) -> Result<([u8; 49], usize), B> {
+    let mut bytes = [0; 49];
+    let size = tag::render_tag(partition, id, 49, &mut bytes)?;
+    Ok((bytes, size))
+}
+
+pub(crate) fn render_state_key_with_prefix(
+    id: &[u8],
+    prefix: &[u8],
+    maximum: usize,
+) -> Result<Vec<u8>, B> {
+    let length = id
+        .len()
+        .checked_add(3)
+        .and_then(|n| n.checked_add(prefix.len()))
+        .ok_or(B::Limit)?;
+    if length > maximum.min(MAX_KEY_BYTES) {
+        return Err(B::Limit);
+    }
     let mut bytes = reserve_key(length)?;
     let mut cursor = 0;
-    put(
-        &mut bytes,
-        &mut cursor,
-        tag_bytes.get(..size).ok_or(B::Limit)?,
-    )?;
+    put(&mut bytes, &mut cursor, prefix)?;
     put(&mut bytes, &mut cursor, b":s:")?;
     put(&mut bytes, &mut cursor, id)?;
     Ok(bytes)
+}
+
+/// Renders the original CRC32 automatic partition, without a second hash pass.
+/// # Errors
+/// Refuses prospective output ceilings and actual reservations.
+pub fn render_original_auto_partition(id: &[u8], maximum: usize) -> Result<Vec<u8>, B> {
+    let (bytes, cursor) = original_auto_partition_bytes(id)?;
+    if cursor > maximum {
+        return Err(B::Limit);
+    }
+    let mut output = reserve_key(cursor)?;
+    output.copy_from_slice(bytes.get(..cursor).ok_or(B::Limit)?);
+    Ok(output)
+}
+pub(crate) fn original_auto_partition_bytes(id: &[u8]) -> Result<([u8; 17], usize), B> {
+    let mut bytes = [0; 17];
+    let mut cursor = 0;
+    put(&mut bytes, &mut cursor, b"__flow_auto__:")?;
+    super::put_version(&mut bytes, &mut cursor, u64::from(tag::crc_bucket(id)))?;
+    Ok((bytes, cursor))
 }
 
 /// Test exact original state-key ownership from captured record fields.

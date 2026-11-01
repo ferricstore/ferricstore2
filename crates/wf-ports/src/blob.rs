@@ -25,9 +25,13 @@ pub use publication::{
 pub(crate) use publication::{
     build_atomic_value_effects, build_independent_value_effects, value_effects_bounds,
 };
+pub(crate) use reference::{
+    original_auto_partition_bytes, original_state_key_prefix, render_state_key_with_prefix,
+};
 pub use reference::{
     owns_original_state_key, parse_original_state_key, parse_original_value_ref,
-    render_original_named_value_ref, render_original_state_key, render_original_value_ref,
+    render_original_auto_partition, render_original_named_value_ref, render_original_state_key,
+    render_original_value_ref,
 };
 
 /// A regular source value-reference family.

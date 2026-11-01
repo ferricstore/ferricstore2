@@ -12,6 +12,22 @@ Assumption: “functional like code to ease UI work” means a pure state-transi
 
 The pinned production backend selects WARaft (`raft/backend.ex`); its command clock carries leader HLC/wall inputs (`raft/command_clock.ex`). OpenRaft is a Rust migration candidate, with no existing log/wire compatibility promised. See [source provenance](source-provenance.md) for the targeted baseline read.
 
+## Original create normalization and admission
+
+The explicit original create helper normalizes captured keyword/scalar/dynamic
+caller data in the domain and composes original auto-partition/state-key/query
+admission in ports. It preserves first-occurrence options, source omission/error
+order and unbounded mathematical retention/hot-history values. Binary leaves
+borrow their donors; only bounded descriptor spines and final routing bytes own
+data. Query metadata is measured through the existing complete validator without
+a discarded encoded output. Source errors/raises retain continuous accounting.
+Captured internal-check observations are ordinary data, not runtime grants.
+Public reference refusal, value serialization, trusted server-derived captures
+and native writer/index adoption remain required. Intent22 still binds original
+caller DATA; generated postimages/defaults and admission-only reserved policy
+names must not enter that identity. See SOURCE-CREATE1 in the
+[coordination review](reviews/workflow-completion-coordination.md).
+
 ## Coherent native record queries
 
 `WorkflowRecordReadPort` acquires current or exact historical represented core,

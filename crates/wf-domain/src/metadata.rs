@@ -17,7 +17,7 @@ pub use attributes::{
 };
 pub use state_meta::{
     normalize_original_state_meta, normalize_original_state_metadata_name,
-    valid_original_state_meta,
+    normalize_original_state_metadata_update, valid_original_state_meta,
 };
 
 /// A complete captured class for the selected original metadata helpers.

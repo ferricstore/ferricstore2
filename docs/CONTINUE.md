@@ -2,6 +2,57 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+SOURCE-CREATE1 follows a9a1b05 in the isolated implementation worktree.
+An explicit original create helper now composes domain keyword/scalar/dynamic
+normalization with original auto-partition, state-key and query-size admission.
+First-occurrence options, ignored unknowns, source omission/error order, root
+compaction, nil/missing/empty values, scalar state updates, infinite active timeout
+and arbitrary mathematical retention/configured hot-history values are preserved.
+
+Binary leaves borrow their donors; only bounded dynamic spines and final routing
+bytes own data. Reused CRC/SHA prefix/writer helpers avoid another hash pass.
+Query metadata is validated/measured without a discarded encoded output. Reserved
+maximum indexed names are admission-only, never installed policy. Source rejects
+and argument raises retain continuous accounting; input/output/work/temporary
+ceilings cover shadowed/ignored data and prospective final ownership. No measured
+speedup is claimed. The restricted scalar profile and intent22 stay unchanged.
+
+Four complete pinned MutationAttrs scenarios retain all12 source assertions and
+exact fixtures/order; both original running-state option lists execute. Four
+controls have compiled pre-body runtime RED;13 later controls and stronger shape
+assertions are supplemental. The target has17 passing controls. The internal
+schedule control earns no source-case credit: it consumes a captured allowed?
+observation, without native Internal.put capability acquisition. The progress
+ledger is169 source-derived declarations/183 mappings/799 links; full parity
+still actually exits1. Source-helper data is not a public/native execution grant.
+
+Final frozen checks pass1967 Rust tests/127 groups and11 doctests/15 groups, zero
+failed/ignored, including all60 architecture controls. Strict workspace/all-target
+Clippy, docs, Python7, reference integrity, progress, fmt and diff pass. All2283
+non-Markdown inputs/1694 Rust files remain exact. Of1327 old test/bench/reference
+inputs,1326 stay whole and one progress JSON has only4 additive counterparts/12
+links. Earlier assertions/source/mappings/runtime identities stay exact. Evidence
+prefix /private/tmp/ferricstore2-original-create- (logs, checks/inputs/source-audit/
+proof JSON); detailed source/architecture/performance self-review is recorded in
+the coordination review. All jobs terminal; no primary code adoption or push.
+
+NEXT public value-reference refusal/value serialization and a reviewed prepared
+native ingress path retaining original rich caller data (including idempotence,
+retention/history/timeout presence) separately from actual server time, policy,
+scope/default postimages. Derive/revalidate final metadata and indexes under the
+actual writer; do not put generated postimages, defaults or admission-only reserved
+names into intent22 caller DATA. MetadataExtension/SystemMetadata trust and final
+postimage admission remain required. Extend the original many/child/start-and-
+claim/mutation breadth, then integrate accepted public/Claim/Node/Raft/runtime,
+query compilation/visibility/admission/read barriers and blocking/pipeline/lifecycle/
+catalog behavior. All remaining original scenarios/profiles and native Linux/macOS/
+measured-performance acceptance remain open. No new native Elixir/Linux, independent
+peer review or full completion is claimed. Full goal active; continue solo.
+
+## Preceding a9a1b05 native record-reader checkpoint (historical)
+
+The following describes the predecessor only.
+
 NATIVE-RECORD-READ1 follows ccb18e6 in the isolated implementation worktree.
 WorkflowRecordReadPort now returns the complete current or exact historical native
 core, actual value/lifecycle binding and opaque original metadata from one committed

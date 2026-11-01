@@ -1,6 +1,7 @@
 //! Original query metadata and physical-row production without storage authority.
 mod budget;
 mod config;
+mod create;
 mod dynamic;
 mod locator;
 mod metadata;
@@ -10,6 +11,7 @@ mod read;
 mod record;
 mod row;
 mod writer;
+pub use create::{OriginalCreatePreparationError, PreparedOriginalCreate, prepare_original_create};
 pub use model::{
     OriginalQueryLocator, OriginalQueryRecordError, OriginalQueryRecordLimits,
     PreparedOriginalQueryMetadata, PreparedOriginalQueryRow,

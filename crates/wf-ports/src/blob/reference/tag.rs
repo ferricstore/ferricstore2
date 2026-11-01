@@ -78,7 +78,7 @@ pub(in crate::blob::reference) fn render_tag(
     Ok(cursor)
 }
 
-fn crc_bucket(input: &[u8]) -> u8 {
+pub(in crate::blob::reference) fn crc_bucket(input: &[u8]) -> u8 {
     let mut crc = u32::MAX;
     for byte in input {
         crc ^= u32::from(*byte);

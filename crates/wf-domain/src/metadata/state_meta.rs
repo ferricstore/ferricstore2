@@ -16,6 +16,15 @@ pub fn normalize_original_state_metadata_name<'a>(
     normalize_name(value, NameKind::StateKey)
 }
 
+/// Normalizes the original scalar-only `update_from_opts` entry map.
+/// # Errors
+/// Preserves the existing entry-count/name/scalar diagnoses and reservation failure.
+pub fn normalize_original_state_metadata_update<'a>(
+    value: OriginalMetadataInput<'_, 'a>,
+) -> Result<Vec<(&'a str, super::OriginalMetadataScalar<'a>)>, OriginalMetadataError> {
+    build_entry_map(value)
+}
+
 /// Checks canonical scalar-only state metadata without rebuilding maps.
 #[must_use]
 pub fn valid_original_state_meta(value: OriginalMetadataInput<'_, '_>) -> bool {

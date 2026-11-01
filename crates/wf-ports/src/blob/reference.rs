@@ -9,7 +9,13 @@ mod base64;
 mod state;
 mod tag;
 
-pub use state::{owns_original_state_key, parse_original_state_key, render_original_state_key};
+pub(crate) use state::{
+    original_auto_partition_bytes, original_state_key_prefix, render_state_key_with_prefix,
+};
+pub use state::{
+    owns_original_state_key, parse_original_state_key, render_original_auto_partition,
+    render_original_state_key,
+};
 
 const MAX_KEY_BYTES: usize = 65_535;
 const MAX_VALUE_VERSION: u64 = 9_007_199_254_740_991;

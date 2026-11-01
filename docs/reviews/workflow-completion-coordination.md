@@ -63941,3 +63941,134 @@ coverage. Evidence prefix `/private/tmp/ferricstore2-native-record-read-` contai
 logs and input/check/source-audit/proof JSON. All verification jobs are terminal.
 No full goal, accepted native service, Linux, measured performance, independent
 review, primary implementation adoption or push is claimed. Continue solo.
+
+
+### SOURCE-CREATE1 concrete solo architecture decision
+
+Approved before creation: domain caller feature `caller/create.rs` with private
+`create/{model,budget,options,number,normalize,schedule}.rs`. Public ordinary data:
+OriginalCreateContext (captured Internal.allowed? observation and original history
+configuration values; no authorization grant), OriginalCreateLimits (positive
+input/output/work/temporary ceilings), OriginalCreateCaller (borrowed scalar/opaque
+caller fields plus bounded normalized attribute and state-entry spines),
+OriginalCreateScheduleMetadata, OriginalCreateOutcome<T> (measured accepted, source
+rejected or raised observations), OriginalCreateError (operational only). Approve
+private Budget and Failure (source/raised/operational distinctions). Keyword
+options preserve first occurrence, unknown options, missing/nil and source order.
+All captured original classes use existing OriginalMetadataInput. Do not alter
+the existing restricted scalar caller profile or its unsupported-feature checks.
+
+Expose existing state-metadata entry-map normalization as one domain function
+reusing its current literal body; no alternate normalization implementation.
+Reuse existing attributes normalization and original history numeric rendering
+for unbounded integer diagnostics. Retention integers and configured hot-history
+caps must retain arbitrary mathematical integer semantics. No invented u64 cap.
+Internal schedule normalization interprets an explicitly captured allowed? result;
+a supplied internal-looking caller option never grants that result.
+
+Ports feature `projection/query_row/create.rs` and private
+`create/{model,record}.rs` compose the domain caller with real automatic partition
+and state-key construction plus original query admission. Public PreparedOriginalCreate
+and OriginalCreatePreparationError are data, not submission authority. Approve
+small private scalar/list/row descriptor aliases in record.rs where necessary.
+Reuse existing tag/CRC, state-key writer and query record plan/measure bodies.
+Extend existing blob/reference/state.rs with bounded automatic-partition rendering
+and crate-private fixed-prefix preparation/emission helpers; no new format.
+Measure/admit query metadata without allocating a discarded encoded metadata Vec.
+Reserve original maximum indexed configuration only for admission, never as an
+actual installed policy. Keep all source-invalid observations in the same work
+account so a future independent batch cannot refund them.
+
+Approved integration target `wf-ports/tests/original_create/{main,source,validation,
+resources}.rs`, TestResult alias and small fixture helper functions in main.rs.
+Preserve complete pinned MutationAttrsTest source fixtures, assertions, ordering
+and captured context; later adversarial controls remain supplemental. Record
+compiled pre-body runtime RED before behavior. New tests may compare all fields
+and dynamic entries; predecessor tests/assertions stay exact. No test-only
+production dependency or new root policy.
+
+Before native writer adoption, separately represent original caller DATA versus
+server-derived postimages/defaults and revalidate derivation at actual application.
+Intent22 must not silently change meaning. This increment supplies the missing
+source normalization and query-admission dependency; native ingress/index wiring,
+all mutation breadth and accepted public/runtime profiles remain required. Portable
+safe pure Rust, existing dependencies, production400/test600 and strict nesting/
+complexity limits apply. Review is solo, not independent.
+
+
+### SOURCE-CREATE1 source/architecture/performance self-review
+
+The new explicit original helper composes domain create normalization and the
+existing query plan/measure body. It leaves the restricted scalar caller and
+intent22 untouched. Pinned MutationAttrs.create_attrs:100-160, helper rules
+1046-1233 and validation1250-1314 provide the authority; Internal:22-50,
+Schedule.Metadata:33-44/93-127 and Router.Part05:223-228 close the dependent
+reserved-context, schedule and fixed65535-byte key observations.
+
+Keyword lists retain duplicate first-occurrence lookup and ignored unknown
+options, including shadowed data in the explicit input account. Source scalar
+validation/omission order, root-ID compaction, nil/empty/missing opaque fields,
+automatic/global partition normalization, alias normalization, surviving-last
+attribute list order and scalar-only state updates remain exact. Existing
+normalizers and numeric rendering bodies are reused, without imposing u64 bounds
+on source retention or configured hot-history integers. The >u64 diagnostic
+uses the existing bounded numeric renderer; allocation failures retain their lane.
+
+Dynamic output owns only bounded descriptor spines and borrows binary leaves.
+A fixed original auto-partition buffer and fixed key prefix reuse the existing
+CRC/SHA logic, then emit one final key without hashing it again. Existing state
+key emission delegates to the extracted identical writer body. Query admission
+validates and measures the same plan without allocating discarded encoded
+metadata. Original maximum index-name reservations are admission-only; they are
+never advertised as installed policy. Empty state updates reserve no dynamic
+spine. All first-party code remains safe, portable and within file/nesting/
+complexity policy; no measured throughput/latency/RSS gain is claimed.
+
+Source-invalid and raised observations retain continuous work/temporary usage.
+Prospective aggregate input/output/work/temporary controls cover ignored/shadowed
+input, final key/auto bytes, borrowed record views and delegated validation.
+Inclusive endpoints and one-below refusals execute; operational failure does not
+become a business error. Future independent batches must debit these measured
+source observations instead of resetting per-item accounts.
+
+Four complete pinned MutationAttrs cases preserve all12 source assertions and
+exact fixtures/order (including both running-state option lists). Four controls
+have compiled pre-body runtime RED followed by GREEN; later strengthened shape
+assertions and controls are supplemental. The new target now has17 controls.
+The internal schedule test intentionally earns no source-case credit: it consumes
+a captured Internal.allowed? observation, without executing native Internal.put
+capability acquisition. False client-looking internal flags never supply that
+observation. Full source/native mandatory profiles remain unproven.
+
+No earlier test/assertion is edited. Of1327 old non-Markdown test/bench/reference
+inputs,1326 remain whole; only four additive counterpart records/12 links change
+the old progress JSON. Previous runtime IDs, mappings and assertion records stay
+exact. The prepared object is source-helper data, not a native command or grant.
+
+NEXT actual public value-reference refusal/value serialization and a reviewed
+prepared ingress path that retains original rich caller data (including
+idempotence/retention/history/timeout presence) separately from actual server
+time/policy/scope/default postimages. Derive and revalidate final metadata and
+indexes under the authoritative writer; do not place generated postimages or
+admission-only reserved names into intent22 caller DATA. MetadataExtension/
+SystemMetadata trust, complete public/many/child/start-and-claim/mutation breadth,
+accepted Node/Raft/service profiles and native Linux/performance gates remain
+required. Review is solo, not independent.
+
+
+### SOURCE-CREATE1 final frozen verification
+
+1967 Rust tests/127 groups and11 doctests/15 groups pass, zero failed/ignored,
+including all60 architecture controls. Strict workspace/all-target Clippy, docs,
+Python7, reference integrity, progress, fmt and diff pass. Full parity actually
+exits1. All2283 frozen non-Markdown inputs/1694 Rust files match; old1327 test/
+bench/reference inputs retain1326 whole plus exactly4 additive counterparts/12
+links in the progress JSON. Earlier assertions and source/runtime identities stay
+exact. The ledger is169 source-derived declarations/183 mappings/799 links. Four
+compiled pre-body RED and17 passing controls are retained separately from later
+strengthened/supplemental assertions. Internal schedule acquisition earns no new
+source-case credit. Initial scaffolding/lint/header fixes are not behavioral RED.
+Evidence prefix `/private/tmp/ferricstore2-original-create-` contains final logs
+and checks/input/source-audit/proof JSON. All jobs are terminal. No accepted native
+service, new Linux/Elixir, measured performance, independent review, primary code
+adoption, push or full-goal completion is claimed. Continue solo.
