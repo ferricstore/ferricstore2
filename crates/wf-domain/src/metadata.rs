@@ -8,6 +8,7 @@
 
 mod attributes;
 pub mod record;
+pub mod scope;
 mod state_meta;
 
 pub use attributes::{
@@ -46,6 +47,8 @@ pub enum OriginalMetadataInput<'rows, 'leaf> {
     Map(&'rows [(Self, Self)]),
     /// A flattened proper list.
     List(&'rows [Self]),
+    /// Ordered tuple elements, including sealed system-metadata descriptors.
+    Tuple(&'rows [Self]),
     /// A nonempty cons prefix with an actual non-list terminal tail.
     ImproperList {
         /// Borrowed, nonempty prefix descriptors.

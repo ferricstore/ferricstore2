@@ -6,7 +6,10 @@ use crate::blob::{
 };
 
 mod base64;
+mod state;
 mod tag;
+
+pub use state::{owns_original_state_key, parse_original_state_key, render_original_state_key};
 
 const MAX_KEY_BYTES: usize = 65_535;
 const MAX_VALUE_VERSION: u64 = 9_007_199_254_740_991;
@@ -16,7 +19,7 @@ const MAX_VALUE_VERSION: u64 = 9_007_199_254_740_991;
 /// Named components remain encoded views. Success grants no stored availability.
 #[must_use]
 pub fn parse_original_value_ref(input: &[u8]) -> Option<OriginalValueRef<'_>> {
-    let (tag_prefix, rest) = split_tag(input)?;
+    let (tag_prefix, rest) = split_tag(input, *b"}:v:")?;
     let (kind, rest) = rest.split_first()?;
     let rest = rest.strip_prefix(b":")?;
     if *kind == b'n' {
@@ -168,12 +171,12 @@ pub fn render_original_named_value_ref(
     Ok(output)
 }
 
-fn split_tag(input: &[u8]) -> Option<(&[u8], &[u8])> {
+fn split_tag(input: &[u8], marker: [u8; 4]) -> Option<(&[u8], &[u8])> {
     let rest = input.strip_prefix(b"f:{")?;
     let position = rest
         .get(..rest.len().min(49))?
         .windows(4)
-        .position(|bytes| bytes == b"}:v:")?;
+        .position(|bytes| bytes == marker)?;
     if !tag::valid_tag(rest.get(..position)?) {
         return None;
     }

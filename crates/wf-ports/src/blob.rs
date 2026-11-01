@@ -26,7 +26,8 @@ pub(crate) use publication::{
     build_atomic_value_effects, build_independent_value_effects, value_effects_bounds,
 };
 pub use reference::{
-    parse_original_value_ref, render_original_named_value_ref, render_original_value_ref,
+    owns_original_state_key, parse_original_state_key, parse_original_value_ref,
+    render_original_named_value_ref, render_original_state_key, render_original_value_ref,
 };
 
 /// A regular source value-reference family.

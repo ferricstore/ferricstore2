@@ -15810,14 +15810,92 @@
       "runtime_case_ids": [
         "c71547a640b6fd46ae558ad9f5f9c4d72e5bb8a71bd71ffdc4f10b309e0fbd68"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-scope1-9589f7a84bac8e16-complete-identity",
+          "rust_file": "crates/wf-ports/tests/record_identity/main.rs",
+          "rust_file_sha256": "ccb52a098fc084bc62208e36894b49acde3a2880ddc6f2c3926f6f0359ef3873",
+          "rust_module": "",
+          "rust_function": "accepts_unscoped_and_sealed_shared_state_ownership",
+          "assertions": [
+            {
+              "source_line": 8,
+              "source_text": "assert RecordIdentity.owns_state_key?(unscoped, Keys.state_key(\"plain\", \"tenant-a\"))",
+              "rust_line": 25,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 11,
+              "source_text": "assert {:ok, physical_partition} = StorageScope.physical_partition_key(\"tenant-a\", scope)",
+              "rust_line": 38,
+              "rust_text": "assert!(physical.is_ok());"
+            },
+            {
+              "source_line": 19,
+              "source_text": "assert RecordIdentity.owns_state_key?(",
+              "rust_line": 49,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this complete pinned RecordIdentityTest scenario, in source order, using the original fixture IDs, partition, scope42 and forged scope99. Source async:true with no local setup or flow tag.",
+            "Pure captured source fields are finite/acyclic and map keys unique under exact Erlang equality. Scope and state-key derivation execute the actual Rust compatibility helpers; captures grant no native record, placement, authorization or service authority.",
+            "Executed Rust counterpart on native macOS. No new native Elixir execution, complete original project setup/profile acceptance, independent peer review, Linux result or measured performance acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "05cd1ba469691b9f",
       "runtime_case_ids": [
         "e7a27956379c77617f0d3c2463ef3b654180a6078813b5acdfda342210f44c6f"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-scope1-05cd1ba469691b9f-complete-identity",
+          "rust_file": "crates/wf-ports/tests/record_identity/main.rs",
+          "rust_file_sha256": "ccb52a098fc084bc62208e36894b49acde3a2880ddc6f2c3926f6f0359ef3873",
+          "rust_module": "",
+          "rust_function": "rejects_foreign_sealed_scope_and_malformed_identity_without_raising",
+          "assertions": [
+            {
+              "source_line": 27,
+              "source_text": "assert {:ok, physical_partition} = StorageScope.physical_partition_key(\"tenant-a\", scope)",
+              "rust_line": 67,
+              "rust_text": "assert!(physical.is_ok());"
+            },
+            {
+              "source_line": 36,
+              "source_text": "refute RecordIdentity.owns_state_key?(forged, state_key)",
+              "rust_line": 79,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 37,
+              "source_text": "refute RecordIdentity.owns_state_key?(%{id: \"shared\", partition_key: %{}}, state_key)",
+              "rust_line": 90,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 38,
+              "source_text": "refute RecordIdentity.owns_state_key?(%{partition_key: \"tenant-a\"}, state_key)",
+              "rust_line": 101,
+              "rust_text": "assert!("
+            },
+            {
+              "source_line": 39,
+              "source_text": "refute RecordIdentity.owns_state_key?(forged, :not_a_key)",
+              "rust_line": 112,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves every assertion in this complete pinned RecordIdentityTest scenario, in source order, using the original fixture IDs, partition, scope42 and forged scope99. Source async:true with no local setup or flow tag.",
+            "Pure captured source fields are finite/acyclic and map keys unique under exact Erlang equality. Scope and state-key derivation execute the actual Rust compatibility helpers; captures grant no native record, placement, authorization or service authority.",
+            "Executed Rust counterpart on native macOS. No new native Elixir execution, complete original project setup/profile acceptance, independent peer review, Linux result or measured performance acceptance is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a113ed4a4f4b529a",

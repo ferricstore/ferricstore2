@@ -3,6 +3,53 @@
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
 
+SOURCE-SCOPE1 follows3d29615 in the isolated implementation worktree. Original
+sealed SystemMetadata validation/scope derivation, StorageScope physical/logical
+partition rules and RecordIdentity ownership now execute as pure compatibility
+helpers. Two complete pinned original RecordIdentityTest scenarios retain all8
+assertions, fixtures and source order. The ledger has143 source-derived
+declarations/157 counterparts/679 assertion links; the full parity gate still
+actually exits1. These links certify neither full native source execution nor
+public/runtime integration.
+
+The implementation preserves arbitrary positive versions, all source scalar
+bounds, full8192-byte metadata validation, sorted compound ETF scopes, the
+single-uint64 scope, nil/empty/missing distinctions, idempotent same-scope and
+wrapped foreign-scope partitions, empty logical tails, exact automatic sets and
+nil-to-CRC routing. It reuses the existing ETF layout/encoder and tag codec.
+Empty metadata allocates no arena; nonempty arenas scale with<=16 fields.
+Unchanged partitions borrow; ownership compares one49-byte tag without another
+full state-key allocation. Measured source-invalid observations preserve work;
+operational refusals never become false. No speedup is claimed.
+
+Final checks pass1891 Rust tests/124 groups and11 doctests/15 groups, zero failed/
+ignored, including all60 architecture cases. Strict workspace/all-target Clippy,
+docs, Python7, reference integrity, progress, fmt and diff pass. All2226 frozen
+non-Markdown inputs/1637 Rust files stay exact. All1305 predecessor non-Markdown
+test/bench/reference inputs remain whole except the exactly two additive source
+counterpart records; all original assertions, frozen mappings and runtime
+identities are preserved. Five compiled runtime RED controls precede behavior;
+13 additional controls are supplemental. Final new coverage totals18 controls.
+Evidence: /private/tmp/ferricstore2-source-scope-*.log, inputs/source-audit/proof.json
+and /private/tmp/ferricstore2-source-identity-red.log. Detailed concrete architecture,
+source and performance self-review is in workflow-completion-coordination.md.
+
+NEXT integrate original public field normalization and separately validated
+server-derived captures, actual compatibility context and exact QueryRow/key/
+projection validation. New scope helpers consume ordinary captured data; they
+grant no original record, currentness, placement or authorization authority.
+Intent22 remains original caller DATA; generated postimages/defaults must never
+enter its caller identity. Native original metadata-derived indexes, accepted
+public/Claim/Node/Raft/runtime integration, blocking/pipeline/lifecycle/catalog,
+all source scenarios/profiles and native Linux/macOS/performance acceptance remain
+required. No new native Elixir/Linux, independent peer review, production-ready
+service, primary code adoption or push is claimed. Continue solo; full goal active.
+
+## Preceding3d29615 native metadata checkpoint (historical)
+
+The following describes the predecessor only.
+
+
 SOURCE-METADATA-NATIVE1 follows a28be7a in the isolated worktree. Explicit
 intent22 now binds ordered opaque original metadata caller operands to an
 actually verified stored9 batch. Generated time/guard/policy/default preparation

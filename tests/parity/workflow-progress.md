@@ -6,6 +6,19 @@ assertion links and optionally references actual coordinator-owned ExUnit
 registration. It has no pass/status or execution-proof fields. The full
 `require-parity` gate remains fail-closed.
 
+Two complete pinned `RecordIdentityTest` scenarios now have executed pure Rust
+counterparts, retaining all8 original assertions and exact source fixtures/order.
+Their scope preparation validates original sealed metadata, applies original
+physical partition rules and reuses the original SHA/base64/CRC tag codec.
+Accounting is now143 source-derived declarations/157 counterparts/679 assertion
+links. All prior records, runtime identities, frozen mapping and source inputs
+remain exact. Captured fields grant no native record/routing authority; original
+project setup, required profiles, public/runtime integration and Linux acceptance
+remain open. Registration and these links do not certify full workflow parity.
+See SOURCE-SCOPE1 in the coordination record for test-first evidence and limits.
+
+Previous checkpoint: stored credit cleaner.
+
 Four new real stored cleaner counterparts preserve the original600-ID command
 budget,300+1 busy-owner fairness, empty-catalog/no-delete and malformed derived
 progress reset scenarios. The actual private writers and committed-prefix Node

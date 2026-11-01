@@ -63372,3 +63372,140 @@ service profiles remain required. Preserve blocking/pipeline/lifecycle/catalog,
 all pinned source-case/profile and native Linux/macOS/performance acceptance.
 Goal stays active and solo; no independent review, measured speedup, native
 Linux/Elixir result, production readiness, primary adoption or push is claimed.
+
+
+### SOURCE-SCOPE1 concrete solo architecture decision (before creation)
+
+Approved responsibility: implement the pinned SystemMetadata.validate/scope_prefix,
+StorageScope physical/logical partition behavior and RecordIdentity ownership
+observations. Source authority is original commit66586c596e271408d9184af32eb31cd7218c126e,
+not the newer dirty checkout. This is pure compatibility data preparation; no
+routing authority, service readiness or native profile22 activation is granted.
+
+Approved new domain artifacts: metadata/scope.rs and private scope/{budget,
+arena,system,record,auto}.rs. Public ordinary data are OriginalScopeLimits
+(positive output/work/temporary caps), OriginalScopeError (source invalid metadata,
+invalid limits, operational limit, allocation/encoding failures) and generic
+OriginalScopeResult<T> (value plus actual charged work and conservative requested
+peak). Existing OriginalMetadataInput gains Tuple for the captured sealed shape;
+it remains finite/acyclic with unique exact map keys. No parallel value grammar.
+The arena builder copies only validated scalar leaves into a bounded synthetic
+TermCodec tuple/list, using the existing original ETF layout/encoder. Add a
+crate-private measured external-term size helper in its existing prepare owner;
+measure the full metadata before the8192 semantic ceiling without allocating its
+serialized output, then encode only selected sorted isolation rows. Positive
+arbitrary versions, uint64 and UTF8 keyword semantics remain exact. Fixed row
+count16 and bounded synthetic descriptors avoid unbounded recursive ownership.
+
+Record helpers take captured optional partition and system metadata values,
+preserving missing/nil/empty and record-vs-direct overload differences. Physical
+outputs borrow unchanged inputs; wrapping has one fallible exact allocation.
+Same scope is idempotent; a foreign scope is wrapped, never silently reused.
+Auto recognition checks all256 exact ordered entries, borrowing the scope and
+using a fixed decimal buffer. Work and retained builder/codec/output ownership
+are admitted before scanning, copying, hashing or allocating. Cross-helper work
+is continuous; operational refusal cannot become sourcefalse.
+
+Approved ports artifact: blob/reference/state.rs, reexported by existing blob
+owner. State-key parsing/rendering and owns_original_state_key reuse the existing
+private tag/SHA/base64/CRC helpers. The parser shares the existing marker splitter;
+nil record partitions choose Automatic, never Global. Ownership compares borrowed
+key parts and a49-byte rendered tag, avoiding a duplicate full key allocation.
+No new crate dependencies, filesystem, clock, OS calls or architecture edges.
+
+Approved tests: wf-domain/tests/storage_scope/{main,system,bounds}.rs and
+wf-ports/tests/record_identity/{main,bounds}.rs. Port both complete preserved
+RecordIdentityTest scenarios including every assertion; additional controls cover
+source edge rules, sorted compound scope bytes, mathematical integer boundaries,
+source size ceilings, malformed metadata and independent inclusive resource caps.
+Record compiled runtime RED before behavior. Review production<=400/test<=600,
+nesting4, complexity25, Rust portable Linux/macOS code. Full source-profile,
+QueryRow, public/native ingress and platform/performance acceptance remain open.
+This is self review under the solo override, not independent peer review.
+
+
+SOURCE-SCOPE1 contract refinement before addition: approve
+original_record_physical_partition_observation in the existing scope.rs owner.
+It returns the measured Result<Option<Cow<[u8]>>, ()> as ordinary business data,
+while operational failures remain the outer error. Ports ownership needs the
+actual charged work/peak even for source-invalid records; discarding an error's
+accounting or charging an invented zero would understate work. The existing
+source-error API remains unchanged and both call the same private implementation.
+No new type/module/file or dependency is introduced by this refinement.
+
+SOURCE-SCOPE1 strict-lint refinement approved before declaration: a public
+OriginalRecordPartitionObservation<'a> type alias in existing scope.rs names the
+measured source Result<Option<Cow<[u8]>>, ()>. This is the same reviewed ordinary
+observation, without another owner/model or changed semantics; it removes Clippy
+nested-type complexity without suppressing the lint.
+
+
+### SOURCE-SCOPE1 source, architecture and performance self-review
+
+Pinned authority: original flow/{system_metadata,storage_scope,record_identity,
+keys}.ex at66586c596e271408d9184af32eb31cd7218c126e and the preserved complete
+record_identity_test.exs. Both original cases retain all8 assertions, original
+fixtures and order. Five compiled pre-body runtime failures are saved in
+/private/tmp/ferricstore2-source-{scope,identity}-red.log;13 later controls are
+supplemental. Test-only compiler/lint corrections are not behavior RED.
+
+Source review preserves: positive arbitrary mathematical versions; exact uint64/
+signed64/datetime/UTF8 keyword/boolean checks; all metadata roles participate in
+full8192-byte validation; sorted compound ETF scopes; the single-uint64 fast
+encoding; absent/empty/nil record semantics; direct-vs-record empty partition
+rules; same-scope idempotence; foreign-scope wrapping; empty logical tails;
+direct logical scope's original lack of the8192 guard; exact256 ordered automatic
+partitions; nil-to-CRC routing and canonical SHA/base64 tags. The source seal/2
+helper is not ported or claimed: its descriptor-ID behavior differs from validate.
+
+The existing ETF layout now exposes private canonical measurement without an
+encoded result allocation. Full metadata is measured before its source byte
+ceiling, then only selected isolation entries are emitted. There is no parallel
+ETF encoder or full original-document clone. Shared encoder bodies are unchanged.
+The existing tag splitter gains a fixed four-byte marker; old value-reference
+parsing keeps its exact marker. All predecessor assertions/fixtures stay intact.
+
+Review found an accounting loss when ownership caught source-invalid metadata.
+The measured physical observation retains source errors as inner data, so the
+actual schema work/peak survives a false ownership result. Operational refusal
+never becomes false, including failure of the same-scope decode probe. Inclusive
+work/temporary/output controls test successful and source-rejected observations.
+Sorting/comparison work is charged before execution. Caps cover requested logical
+owners, not allocator capacity/RSS; the encoder receives only remaining work and
+temporary admission. A nested malformed-source refusal is still distinct from an
+operational error. Strict lint corrections preserve unwrap/expect/panic prohibitions.
+
+Performance review consulted primary Rust documentation:
+https://doc.rust-lang.org/std/borrow/enum.Cow.html and
+https://doc.rust-lang.org/std/vec/struct.Vec.html#method.try_reserve_exact .
+Unchanged physical partitions borrow through Cow; new wrapping owns one final
+buffer. Empty metadata needs no arena allocation. Nonempty metadata reserves
+only7*n+4 nodes and7*n+2 edges for actual n<=16. Source fields/selection indices
+use bounded arrays; copied scalar leaf bytes are admitted once. The automatic
+set recognizer uses a17-byte decimal buffer; ownership hashes once and compares
+a49-byte tag without constructing another full state key. Vec builders preserve
+fallible reservation and append semantics; no blind Box conversion or measured
+speedup claim. Portable Rust only; macOS execution is not Linux acceptance.
+
+Progress ledger changes are restricted to two additive counterpart records with
+8 source assertion links. Frozen mapping, source snapshots, runtime registrations,
+all prior counterpart records and original test/bench assertions remain unchanged.
+Full QueryRow/projection, public/native capture integration, lifecycle/catalog,
+Node/Raft/runtime, full source/profile and native platform/performance acceptance
+remain open. Review is solo, not independent peer review.
+
+
+### SOURCE-SCOPE1 final frozen verification
+
+All1891 Rust tests/124 groups plus11 doctests/15 groups pass, with zero failed or
+ignored, including60 architecture controls. Strict all-target/workspace Clippy,
+warnings-denied docs, Python7, reference integrity, progress, fmt and diff pass.
+Full parity actually exits1. All2226 frozen non-Markdown inputs/1637 Rust files
+are exact. Against3d29615,1304 of1305 old non-Markdown test/bench/reference inputs
+are whole; the sole changed input is workflow-progress.json, with exactly two
+additive records and all older records/assertions/runtime identities unchanged.
+Five compiled RED and18 final controls are distinguished above. Evidence prefix
+/private/tmp/ferricstore2-source-scope- contains workspace/doctests/clippy/doc/
+python/reference/progress/parity/fmt/diff logs and inputs/source-audit/proof.json.
+All execution handles are terminal. No full goal or platform/service/performance
+acceptance is claimed; continue solo with the original public capture/query work.

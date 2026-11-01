@@ -6,6 +6,7 @@ mod original_flow;
 
 pub(crate) use original_flow::decode_fixed_bytes;
 pub(crate) use original_flow::decode_original_flow_value_with_work;
+pub(crate) use original_flow::measure_original_external_term;
 
 pub use original_flow::{
     OriginalFlowValueError, OriginalValueContext, OriginalValueDocument, OriginalValueEncodeError,

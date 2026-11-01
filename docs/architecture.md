@@ -12,6 +12,20 @@ Assumption: “functional like code to ease UI work” means a pure state-transi
 
 The pinned production backend selects WARaft (`raft/backend.ex`); its command clock carries leader HLC/wall inputs (`raft/command_clock.ex`). OpenRaft is a Rust migration candidate, with no existing log/wire compatibility promised. See [source provenance](source-provenance.md) for the targeted baseline read.
 
+## Original sealed scope preparation
+
+The pure `wf-domain::metadata::scope` owner validates captured original sealed
+metadata and derives logical/physical partition bytes. It reuses the original
+ETF layout for source sizing and encoding, with continuous work and temporary
+limits. Missing, nil and empty source fields retain their distinct semantics.
+Unchanged partitions borrow their backing; foreign scopes wrap again. The ports
+blob reference owner reuses its existing tag codec for state-key ownership.
+Measured source-invalid observations retain accounting; operational limits remain
+errors. These are ordinary compatibility data, without current record, placement,
+authorization or native ingress authority. Exact QueryRow/projection and accepted
+public/runtime integration remain required. See SOURCE-SCOPE1 in the
+[coordination review](reviews/workflow-completion-coordination.md).
+
 ## Fundamental model
 
 Use Rust structs, enums and traits rather than inheritance or classes with mutable hidden state. Newtypes make TenantId, WorkflowId, PartitionId, GroupId, RecoveryId, RequestId, LeaseToken, Fence, Revision and AppliedPosition distinct. Public fields are allowed for validated immutable read models; constructors validate command input. Internal mutable state remains private.

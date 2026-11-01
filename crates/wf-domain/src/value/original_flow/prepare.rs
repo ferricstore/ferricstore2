@@ -12,6 +12,20 @@ pub use model::{
     PreparedOriginalExternalTerm, PreparedOriginalFlowValue,
 };
 
+/// Shared canonical sizing without an encoded output allocation.
+pub(crate) fn measure_original_external_term(
+    input: OriginalValueInput<'_>,
+    limits: OriginalValueEncodeLimits,
+) -> Result<(usize, usize, usize), OriginalValueEncodeError> {
+    let mut budget = budget::Budget::new(limits)?;
+    let fixed = fixed_bytes()?;
+    budget.spend(fixed)?;
+    budget.admit(fixed)?;
+    let layout = layout::build(input, None, &mut budget)?;
+    let size = budget::add(1, layout.view().plan(input.root)?.size)?;
+    Ok((size, budget.work, budget.peak))
+}
+
 /// Prepare a logical value as complete source-compatible stored bytes.
 ///
 /// The input borrows a flat postorder arena rather than encoded ETF. Successful

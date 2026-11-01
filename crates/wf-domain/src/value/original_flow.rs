@@ -7,6 +7,7 @@ mod decode;
 mod equality;
 mod model;
 mod prepare;
+pub(crate) use prepare::measure_original_external_term;
 mod scan;
 
 use crate::value::original_flow::budget::Budget;
