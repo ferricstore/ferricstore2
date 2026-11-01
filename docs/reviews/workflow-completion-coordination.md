@@ -63059,3 +63059,135 @@ Keep all scope/routing/QueryRow/projection/blocking/pipeline, consensus/service,
 remaining lifecycle/catalog, source-case/profile and platform/performance gates.
 The goal stays active and solo; review is not independent. Only docs-only primary
 pointers are authorized; no primary implementation adoption or push occurs.
+
+
+## SOURCE-METADATA-BINDING1: concrete solo architecture decision, 2026-11-01
+
+Previous goal turn is PROGRESS: feature 2dff4aa committed the verified original
+metadata operand; primary e413752 is documentation only. Continue solo.
+
+The actual writer currently carries no rich original-metadata operand, and its
+intent8/9 caller stream cannot silently acquire one. Do not add an unbound
+attachment API or change those contracts. The next necessary native artifact is
+a complete versioned record-capture envelope, before the new committed ingress
+profile and consumed transaction publication. Approval is for this representation
+and exact association only; it does not close native ingestion or snapshot gates.
+
+Approved named artifacts:
+- crates/wf-storage/src/state/value/record_capture.rs: encode/scan_record_capture,
+  measuring and emitting the existing FWSR2 core directly into one final owner.
+- crates/wf-storage/src/state/value/record_capture/model.rs:
+  RecordCaptureInput, RecordCapturePoint, RecordCaptureLimits,
+  ScannedRecordCapture. All are explicit data/borrowed views, no capability.
+- crates/wf-storage/tests/record_capture/{main,fixtures,cases,resources}.rs:
+  one integration target, independent frame construction, genuine runtime RED,
+  exact identity/version/incarnation/corruption/limit and borrowing controls.
+Existing state/value.rs may reexport these exact artifacts. Existing record
+measurement/emission/parser implementations are reused without changing their
+bodies; if needed, add one crate-private read-only ordering getter to the scanned
+record. No new dependency, database family, layout, manifest capability, live
+writer, standalone attachment or source authority is approved in this batch.
+
+FWMC1 holds an exact u128 incarnation, one length-delimited existing FWSR2 core,
+one length-delimited original metadata operand and SHA256 of the complete prefix.
+The core binds group/recovery/tenant/physical partition/record ID/version; the
+reader additionally checks expected incarnation and exact version. Full u128 and
+binary identities remain portable big-endian data. A checksum detects corruption;
+it is not origin/authentication proof. The encoder accepts the existing prepared
+metadata owner. A borrowed scanner exposes opaque original metadata bytes, not a
+claim of typed ETF/safe-table/source validation: consumers must still use the
+existing original-metadata decoder with explicit captured compatibility context.
+No missing operand becomes an empty capture. Legacy formats remain unchanged and
+live recovery must refuse this new record format until its reviewed profile lands.
+
+Prospective limits are separate total encoded bytes, metadata bytes, logical work
+and logical temporary bytes. Work is a documented conservative 4096+128*complete
+encoded bytes account, admitted before hashing/scanning/copying. One encoded owner
+plus fixed control is admitted before reservation; the scanner is borrowed and
+allocates no record/metadata tree. This is a logical resource contract, not a
+measured speedup, RSS/allocator bound or full source-case credit. Concrete
+implementation review and tests must validate the association and exact endpoints.
+
+SOURCE-METADATA-BINDING1 amendment before creation: also approve the named
+RecordCaptureError in record_capture/model.rs so byte, work, temporary and
+invalid-limit failures retain distinct units without reusing unrelated errors.
+
+
+SOURCE-METADATA-BINDING1 architecture preflight finding: the first complete run
+stopped after 114 passes when the source checker interpreted the local variable
+`core` as the standard-library crate root. Its purity guard rejects that bare
+path as unclassified. Rename the local parsed view to `record`; no policy,
+negative test, codec behavior, source identity or public contract changes.
+The failing workspace log is preserved separately as record-capture-workspace-
+arch-rejection.log, and only that one new file's freeze hash is refreshed.
+This is an architecture preflight failure, separate from the five genuine
+compiled behavior RED controls. Re-run corrected checks before claiming GREEN.
+
+
+### SOURCE-METADATA-BINDING1 solo implementation/resource review
+
+Implementation remains within the approved two production and four integration
+files, with additive facade exports and one read-only record getter. The existing
+core measurement/emission/parser bodies are untouched. There is no intermediate
+encoded-core Vec: the original writer appends into the final pre-admitted FWMC
+owner. Both raw lengths fit u32 before reservation. The borrowed scan retains
+original core/metadata slices from the same donor, validates checksum, exact
+namespace/point/version/incarnation, and preserves the original birth after a
+real reducer transition changes the current ordering. Created incarnation/order
+agreement is checked by encoder and scanner, including a resealed counterexample.
+No caller data tree, policy default, logical partition, original scope or original
+source validity is inferred from native physical identity.
+
+The metadata scanner deliberately exposes opaque data. A supplemental control
+reseals an unsupported logical metadata schema: the storage envelope scanner can
+borrow it, while the actual typed metadata decoder refuses it. This demonstrates
+why the upcoming committed-ingress/recovery profile must carry and validate the
+actual original decoding/context evidence before publication. Neither checksum
+nor this borrowed view is a source-validity/caller-identity capability. Legacy
+readers explicitly reject the new format, so no current live profile is enabled.
+
+Five genuine compiled pre-body RED controls passed after implementation; thirteen
+later controls are supplemental. The independent core/metadata/frame fixture was
+packed before the bodies. Added checks cover every point component, stale/exact
+version and birth, every single-byte alteration and truncation, EOF, resealed
+format/length/priority/birth failures, explicit typed decoding, redaction,
+independent inclusive byte/work/temp/core limits, a 131072-byte metadata field,
+and a real transition retaining its original incarnation. One test fixture's
+invalid-priority offset was corrected during review so it reaches that actual
+field rather than failing an earlier partition comparison. These data tests add
+no original Elixir case or native durable-publication acceptance.
+
+Resource review: positive independent limits precede processing; total byte and
+work/temporary admission precede hashing, copying, scanning or final reservation.
+Core measurement only reads its bounded field descriptors; u32 field widths and
+checked totals precede output ownership. The input record and prepared metadata
+are borrowed donors outside this codec's ownership account; outer integration
+must continue to account for them. The 4096 fixed logical control plus complete
+requested output is not allocator capacity, stack/RSS or a measured speed theorem.
+Metadata and core caps remain separate. The source audit proves all 1296 prior
+test/bench/reference inputs and all 760 Rust test/bench inputs remain exact;
+stripping only the approved getter recovers the old core scanner byte-for-byte.
+Review is solo, not independent. No policy or assertion has been weakened.
+
+
+### SOURCE-METADATA-BINDING1 final verified representation checkpoint
+
+The corrected frozen run passes 1853 Rust tests in 122 groups and 11 doctests
+in 15 groups, zero failed or ignored. All 60 architecture cases pass within
+that workspace run. Strict workspace/all-target Clippy, warnings-denied docs,
+format and diff checks pass. All 2200 non-Markdown inputs / 1611 Rust files
+match the final run. Full parity actually exits 1 with the required full source
+execution/profile scope incomplete. No old test or reference input changed.
+Evidence: /private/tmp/ferricstore2-record-capture-{red,green,focused,workspace,
+doctests,clippy,doc,fmt,diff,parity}.log plus proof/inputs/source-audit.json;
+the initial architecture failure is preserved separately. All jobs are terminal.
+
+Next is the coupled committed original caller/capture ingress and atomic native
+publication/profile integration, including source decoding/context evidence,
+physical point/incarnation checks against actual value bindings, current/history
+association and complete snapshot export/import/recovery. Do not activate the
+format from its opaque scanner or retrofit unknown legacy captures. Keep all
+remaining QueryRow/routing/projection/blocking/pipeline, consensus/service,
+lifecycle/catalog, source-case/profile and native Linux/macOS/performance gates.
+Goal remains active and solo. No independent review, production acceptance,
+primary implementation adoption, push or measured speedup is claimed.

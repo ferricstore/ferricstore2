@@ -128,6 +128,14 @@ source validation remain required. An absent native capture is unknown, and an
 empty data envelope grants no origin or storage authority. See
 [the data operand decision](adr/009-stored-workflow-value-ingress.md#original-record-metadata-data-operand).
 
+The storage-owned `state::value::record_capture` data codec binds an existing
+core snapshot and original metadata operand to explicit native point, exact
+version and original incarnation. It emits one complete output and provides a
+borrowed scanner. This reserves no new database family or live capability:
+committed original ingress, atomic publication and metadata-aware snapshot
+recovery remain required before activation. Opaque metadata still needs typed
+decoding with its explicit compatibility context.
+
 Application code performs effects through ports. The same domain validation and state rules serve HTTP, dedicated TCP, embedded access and workers. The UI receives stable enums, structured field errors and allowed actions computed by domain rules. Allowed actions are advisory: committed state must revalidate every mutation.
 
 The implemented `workflow::caller` capture normalizes bounded borrowed scalar

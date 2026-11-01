@@ -35,6 +35,35 @@ cannot be replaced with an empty capture. A present empty map is only captured
 data and establishes no original source origin. Do not enable a service from
 this codec or claim complete original-source capture/parity/platform acceptance.
 
+## Complete record-capture representation
+
+SOURCE-METADATA-BINDING1 selects `state::value::record_capture` for the complete
+native data envelope. `FWMC1` contains an explicit big-endian u128 incarnation,
+a length-delimited existing FWSR2 core snapshot, a length-delimited original
+metadata operand and SHA256 of the complete prefix. The core carries the exact
+group/recovery/tenant/physical partition/record ID and version. Scanning requires
+all five point components, the exact incarnation and exact core version. A
+Created core must agree with its original state-entry sequence; subsequent
+versions retain their original birth even when current ordering changes.
+
+Encoding measures and appends the existing core directly into one final output
+allocation. It borrows the prepared original metadata owner. Scanning borrows
+both slices from one donor without materializing another core or metadata tree.
+Separate total-byte, metadata-byte, work and temporary limits apply prospectively;
+work charges a conservative 4096 plus 128 times complete wire bytes. Encoding
+admits 4096 plus final requested bytes; borrowed scanning admits fixed 4096.
+These are logical resource contracts, with no measured speedup or RSS claim.
+
+The metadata slice remains opaque. Its stored discriminator and checksum are
+checked, but typed ETF/schema/source validation still requires the original
+metadata decoder and explicit compatibility context. A checksum proves no origin
+or authorization. This representation does not add a database family or enable
+a live profile. Existing manifests, writers, record codecs and recovery continue
+to refuse the new format. Native original caller identity, committed ingress,
+atomic publication, metadata-aware history/index updates and complete snapshot
+installation/recovery are still required coupled integrations. No standalone
+metadata attachment API is introduced; missing legacy capture remains unknown.
+
 ## Existing stored-value integration
 
 Status: private codec, explicit physical capability, consumed stored9 publication/

@@ -12,6 +12,7 @@ mod history_snapshot;
 mod membership;
 mod outcome;
 mod record;
+mod record_capture;
 mod workflow_values;
 
 pub use control::{decode_control, encode_control};
@@ -38,6 +39,10 @@ pub(crate) use outcome::{encode_outcome_in_layout, scan_outcome_in_layout};
 pub use record::{
     ScannedWorkflowRecord, decode_record, encode_record, encode_record_fields,
     encode_record_snapshot, scan_record_point, scan_record_point_profiled, scan_record_snapshot,
+};
+pub use record_capture::{
+    RecordCaptureError, RecordCaptureInput, RecordCaptureLimits, RecordCapturePoint,
+    ScannedRecordCapture, encode_record_capture, scan_record_capture,
 };
 pub(crate) use workflow_values::{
     ValueAlias, ValueBindingData, ValueSourceFields, binding_source_fields, decode_alias,

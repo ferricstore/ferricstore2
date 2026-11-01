@@ -3,6 +3,43 @@
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
 
+SOURCE-METADATA-BINDING1 follows 2dff4aa in the isolated worktree. The new
+`state::value::record_capture` data codec places the existing FWSR2 core, original
+metadata operand and explicit u128 birth in one versioned, checksummed envelope.
+It validates exact native scope/partition/ID, core version and incarnation.
+Created birth/order must agree; later real transitions retain their original
+birth across changed current ordering. Encoding writes the existing core directly
+into one final allocation; scanning borrows both slices from the same donor.
+Metadata stays opaque until decoded with explicit original compatibility context.
+
+Eighteen controls cover an independent wire fixture, every point component,
+version/birth, corruption/truncation/EOF, resealed malformed data, real transition,
+large metadata, redaction and independent inclusive resource caps. Five have
+compiled pre-body RED; thirteen are supplemental. The source checker initially
+interpreted a local `core` name as the std crate; renaming it to `record` passes
+without any policy or assertion change. Legacy readers refuse the new format.
+
+Final verification passes 1,853 Rust tests plus 11 doctests, zero failed/ignored,
+including all 60 architecture cases. Strict workspace/all-target Clippy, strict
+docs, fmt and diff pass. All 2,200 frozen non-Markdown inputs / 1,611 Rust files
+match; all 1,296 prior test/bench/reference inputs and 760 Rust test/bench inputs
+remain byte-identical. Evidence: /private/tmp/ferricstore2-record-capture-*.log
+and proof/inputs/source-audit.json. No source-case parity credit is added.
+
+Full parity actually exits 1. NEXT implement the coupled committed original
+caller/capture ingress and native publication profile. Validate actual decoding/
+context, caller identity, physical point and original incarnation against the
+real value bindings; atomically publish core/metadata/index/history/outcome/control
+state and preserve associations through complete snapshot export/import/recovery.
+This data format enables no live capability; missing legacy capture remains
+unknown. All broader workflow/query/routing/runtime, source-test/profile and
+native Linux/macOS/performance gates below remain open. Continue solo. No primary
+implementation adoption or push occurs.
+
+## Preceding 2dff4aa metadata operand checkpoint (historical)
+
+The following describes the predecessor only.
+
 SOURCE-METADATA-CAPTURE1 follows f19d26c in the isolated worktree. The complete
 explicit data operand for original partition/scope, lineage, rich metadata,
 projection configuration and lifecycle/history fields now reuses the original

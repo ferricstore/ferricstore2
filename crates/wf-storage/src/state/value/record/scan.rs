@@ -42,6 +42,9 @@ pub struct ScannedWorkflowRecord<'input> {
 }
 
 impl<'input> ScannedWorkflowRecord<'input> {
+    pub(in crate::state::value) const fn capture_birth_fields(&self) -> (EventKind, u128) {
+        (self.latest.0, self.ordering.state_enter_seq)
+    }
     pub(in crate::state::value) const fn history_view(&self) -> RecordHistoryView<'input> {
         RecordHistoryView {
             state: self.state,
