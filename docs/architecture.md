@@ -12,6 +12,22 @@ Assumption: “functional like code to ease UI work” means a pure state-transi
 
 The pinned production backend selects WARaft (`raft/backend.ex`); its command clock carries leader HLC/wall inputs (`raft/command_clock.ex`). OpenRaft is a Rust migration candidate, with no existing log/wire compatibility promised. See [source provenance](source-provenance.md) for the targeted baseline read.
 
+## Coherent native record queries
+
+`WorkflowRecordReadPort` acquires current or exact historical represented core,
+actual value/lifecycle binding and opaque original metadata on one committed
+redb revision. The same snapshot supplies the manifest and group control; an
+explicit control mismatch refuses before record materialization. Both source
+and companion must agree on exact native point, digest, version, birth and
+represented value presence. Physical probes, inspected bytes, returned owners,
+work and temporary ownership have independent continuous ceilings. The adapter
+validates borrowed guards and copies only final core fields and metadata; it
+does not re-encode another complete core image. No legacy file address is
+synthesized. Original metadata still needs its explicit compatibility context
+and source normalization; authorization, lifecycle visibility and consensus
+read barriers remain separate required query-service work. See
+NATIVE-RECORD-READ1 in the [coordination review](reviews/workflow-completion-coordination.md).
+
 ## Original query-row reading and transformation
 
 `wf-ports::projection::query_row` also exposes borrowed full, selected and

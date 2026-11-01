@@ -10,6 +10,7 @@ mod governance_catalog;
 mod history;
 mod original_policy;
 mod policy;
+mod record;
 mod transaction;
 mod workflow_release;
 pub use workflow_release::{
@@ -41,6 +42,10 @@ pub use history::{
 };
 pub use original_policy::{GroupOriginalPolicyChanges, GroupOriginalPolicyTransaction};
 pub use policy::{OriginalPolicyGetReader, StoredPolicyValue, read_original_policy_get_reply};
+pub use record::{
+    StoredWorkflowRecordCapture, WorkflowRecordReadLimits, WorkflowRecordReadPort,
+    WorkflowRecordReadQuery, WorkflowRecordReadSnapshot,
+};
 pub use transaction::{
     DueCursorStep, GroupApplyChanges, GroupApplyStore, GroupApplyTransaction, GroupDueCursor,
     StoredWorkflowRecord,

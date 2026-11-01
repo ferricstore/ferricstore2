@@ -105,6 +105,10 @@ impl ValueCharge {
     pub(crate) fn peak(&self) -> usize {
         self.peak
     }
+
+    pub(crate) fn usage(&self) -> (usize, usize, usize) {
+        (self.rows, self.bytes, self.work)
+    }
 }
 
 pub(crate) fn total(base: usize, parts: impl IntoIterator<Item = usize>) -> Result<usize, Error> {

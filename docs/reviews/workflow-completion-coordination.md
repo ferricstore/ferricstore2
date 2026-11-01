@@ -63823,3 +63823,121 @@ clippy/doc/python/reference/progress/parity/fmt/diff logs and inputs/source-audi
 proof.json. All jobs are terminal. No full goal, native source/profile, Linux,
 performance or service acceptance is claimed. Continue solo with actual trusted
 public/native capture and coherent query/projection integration.
+
+
+### NATIVE-RECORD-READ1 concrete solo architecture decision
+
+Approved before creation: ports `state/record.rs` with
+WorkflowRecordReadQuery (optional exact history ID and expected control),
+WorkflowRecordReadLimits (independent physical row/inspected-byte/returned-byte/
+work/temporary ceilings), StoredWorkflowRecordCapture (existing represented core,
+actual boxed value/lifecycle binding, unchanged opaque metadata),
+WorkflowRecordReadSnapshot (same-snapshot control and optional capture, measured
+usage), and WorkflowRecordReadPort. This is a physical read capability, not an
+authorization/strong-read/visibility grant. Unknown legacy metadata remains an
+unsupported profile, never empty metadata. No legacy file location is invented.
+
+Storage owner: `state/redb/values/metadata/record.rs`, private
+`record/read.rs` and `record/row.rs`. Approve private RecordReadContext for one
+redb ReadTransaction, its rows and manifest tables, validated actual manifest,
+continuous existing ValueCharge, physical key bound and returned-owner account.
+Read manifest, control, core and companion on that single revision; exact control
+disagreement returns KnownAborted. Current/history companions must both exist or
+both be absent; verify checksum, exact point, core digest/version, original birth,
+and represented value reference presence/versions before materialization. History
+postimages validate the complete event association. Expiry/visibility and live
+read barriers remain callers' work, not inferred by a physical reader.
+
+Reuse the existing compact companion decoder, core scanner/materializer, key
+codec, manifest parser, control decoder and binding materializer. Extract a
+measured borrowed scanner from existing validate_metadata_source without weakening
+its existing wrapper contract; do not add a format or clone/re-encode whole core
+bytes. Native guard bytes are validated in place; allocate only final core field
+owners, one unchanged metadata owner and the existing boxed reference binding.
+All physical probes, including absent probes and manifest/control, share one
+account; limits are checked prospectively before any returned copies. Small
+ValueCharge observation getters expose existing usage without changing charges.
+
+Approved tests: existing metadata target gains only `mod query;`; create
+`tests/state_store/workflow_values/metadata/query.rs` and private
+`query/{resources,corruption}.rs`. Reuse the exact existing metadata fixtures and
+consumed real transactions; no predecessor assertion/fixture edits. Backend unit
+controls, if needed for a pinned-revision interleave, may live at approved
+`metadata/record/tests.rs` with private `tests/fixtures.rs`; approve their local
+TestResult alias. Save compiled behavioral RED before implementation. Cover
+actual current/history association, retained retries, owner drop/reopen, missing
+versus unsupported/corrupt, scoped/control refusal, each independent inclusive
+resource boundary and resealed corrupt companions. No source-case credit is
+claimed for newly invented integration controls.
+
+Dependencies remain types/domain/ports only; no projection-to-storage edge, new
+service, dependency, backend layout or root policy. Safe Rust and portable redb
+primitives serve Linux/macOS; local execution counts only for the actual host.
+Production400/test600-line and nesting/complexity limits remain. The native full
+original public normalization/capture, query-plan and service/runtime gates are
+not bypassed. This is solo review, not independent peer review.
+
+
+### NATIVE-RECORD-READ1 implementation/source/performance self-review
+
+The new read port now uses the actual native manifest, control, exact current or
+historical core and FWMB companion on one owned redb revision. A real consumed
+transition between snapshot opening and record acquisition leaves the older core,
+metadata and control coherent; a new snapshot observes the new trio. Query data
+uses actual native point/version/incarnation and no invented legacy Locator.
+
+Borrowed core and companion guards are validated in place. The existing source
+association validator delegates to its unchanged borrowed scan/check body, then
+discards that view for previous callers; the new path materializes it directly.
+This avoids another full encoded core image and an otherwise redundant core scan.
+Only final represented core fields, unchanged metadata and the existing boxed
+binding are copied. The metadata Vec moves into the existing explicit-context
+decoder with the same backing pointer, preserving unknown/missing/source-invalid
+data rather than mislabeling schema decode as original normalization. No allocator,
+RSS, throughput or latency improvement is claimed without a benchmark.
+
+Manifest/control/absent probes count in one account. Independent physical reads,
+inspected bytes, returned ownership, work and temporary limits execute exact
+inclusive endpoints; one below and zero refuse without fencing. All final owners
+and key reservations are admitted prospectively. Corrupt missing/foreign/resealed
+companions and missing manifest/control refuse and fence; stale control refuses
+before record materialization without inventing a missing result. Legacy scalar
+metadata capability remains unsupported. History binds the complete original
+event ID, postimage and actual historical companion, without substituting current
+metadata. Reopen and complete received-snapshot transfer retain these observations.
+
+Four controls have genuine compiled pre-body runtime RED, followed by GREEN.
+Twelve later controls are supplemental: sixteen new controls now pass. Among1323
+prior non-Markdown test/bench/reference inputs,1322 remain whole and one gains only
+the exact new module registration. No prior assertion, source, mapping or runtime
+identity changes, and no newly invented source-case credit is claimed.
+
+Original public field normalization and separately validated server captures,
+metadata-derived native indexes, public query compilation/visibility/admission,
+consensus read barriers and accepted runtime/service profiles remain required.
+Physical historical capture does not apply current-incarnation visibility; that
+query policy remains explicit future work. Portable safe redb APIs are used; local
+results do not establish native Linux acceptance. Review is solo, not independent.
+
+NATIVE-RECORD-READ1 refinement approved before declaration: wrap the approved
+backend `record/tests/fixtures.rs` helpers in the explicit cfg(test) private
+`fixture_data` module. The architecture walker scans each file independently and
+correctly requires a local test boundary for assertion macros; inherited parent
+cfg alone is insufficient for that static check. This changes no runtime surface,
+fixture values or assertions and does not suppress or weaken the checker.
+
+
+### NATIVE-RECORD-READ1 final verification
+
+Final frozen workspace run passes1950 Rust tests/126 groups and11 doctests/15
+groups, zero failed/ignored, including all60 architecture controls. Strict
+workspace/all-target Clippy, docs, Python7, reference integrity, progress, fmt and
+diff pass. All2269 non-Markdown inputs/1680 Rust files match the final input
+manifest. Prior1323 test/bench/reference inputs retain1322 whole plus one exact
+new module registration; no older assertion/source/mapping/runtime identity edits.
+Full parity actually exits1; no new source-case credit. Four compiled pre-body
+RED and sixteen passing final controls remain separate from later supplemental
+coverage. Evidence prefix `/private/tmp/ferricstore2-native-record-read-` contains
+logs and input/check/source-audit/proof JSON. All verification jobs are terminal.
+No full goal, accepted native service, Linux, measured performance, independent
+review, primary implementation adoption or push is claimed. Continue solo.

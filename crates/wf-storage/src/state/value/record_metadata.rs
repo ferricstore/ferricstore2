@@ -125,6 +125,19 @@ pub(crate) fn validate_metadata_source(
     admission: AdmissionLimits,
     maximum: usize,
 ) -> Result<(), E> {
+    scan_metadata_source(data, source, scope, identity, history, admission, maximum).map(|_| ())
+}
+
+/// Validates the same association while retaining the already scanned core view.
+pub(crate) fn scan_metadata_source<'a>(
+    data: &RecordMetadataBinding<'_>,
+    source: &'a [u8],
+    scope: &RequestScope,
+    identity: (&PartitionId, &RecordId),
+    history: Option<&[u8]>,
+    admission: AdmissionLimits,
+    maximum: usize,
+) -> Result<super::ScannedWorkflowRecord<'a>, E> {
     let bytes = metadata_source_core(source, history.is_some())?;
     let record = super::record::scan_record_snapshot(
         bytes, scope, identity.0, identity.1, admission, maximum,
@@ -146,5 +159,5 @@ pub(crate) fn validate_metadata_source(
     {
         return Err(E::InvalidValue);
     }
-    Ok(())
+    Ok(record)
 }

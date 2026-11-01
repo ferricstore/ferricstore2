@@ -7,6 +7,7 @@ use wf_ports::state::StateTransactionError as Error;
 use wf_types::identity::{GroupId, PartitionId, RecordId, RecoveryId};
 pub(crate) mod publication;
 mod read;
+mod record;
 pub(crate) mod recovery;
 pub(crate) use read::load_current;
 

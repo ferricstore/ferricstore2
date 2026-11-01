@@ -2,6 +2,50 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+NATIVE-RECORD-READ1 follows ccb18e6 in the isolated implementation worktree.
+WorkflowRecordReadPort now returns the complete current or exact historical native
+core, actual value/lifecycle binding and opaque original metadata from one committed
+redb revision. Manifest and control share that revision; an explicit control
+mismatch refuses before record materialization. Exact point/digest/version/birth
+and represented value presence are checked without inventing legacy file addresses.
+
+A real consumed transition while a snapshot remains open proves old core, metadata
+and control stay coherent; a new read sees the new trio. Borrowed guards are scanned
+in place and only final fields/metadata are copied. Metadata moves to its existing
+explicit-context decoder without another byte-buffer copy. Sixteen controls cover
+current/history, retained retry, ownership/reopen, real snapshot transfer, live and
+resealed corruption, scope/control and five independent inclusive resource limits.
+Four controls have compiled pre-body runtime RED; twelve later cases are supplemental.
+No new source-case credit, original normalization or measured speedup is claimed.
+
+Final frozen checks pass 1950 Rust tests/126 groups and 11 doctests/15 groups with
+zero failed/ignored, including all 60 architecture controls. Strict workspace/all-
+target Clippy, docs, Python7, reference integrity, progress, fmt and diff pass.
+All 2269 non-Markdown inputs/1680 Rust files remain exact. Of 1323 predecessor
+non-Markdown test/bench/reference inputs, 1322 stay whole and one gains only the
+exact module registration; earlier assertions and source/runtime identities stay
+unchanged. Full parity actually exits1. Evidence prefix:
+/private/tmp/ferricstore2-native-record-read- (logs, checks/input/source-audit/proof
+JSON); detailed source/architecture/performance self-review is in the coordination
+record. All verification jobs are terminal. No primary code adoption or push.
+
+NEXT use this coherent native read capability when integrating trusted original
+public normalization and separately validated server-derived metadata captures.
+Pinned MutationAttrs.create_attrs:100-160 and validate_create_query_row:1250-1314
+show the required normalization/admission order, default/root compaction, original
+state key and indexed-config reservation. Generated postimages/defaults must stay
+outside intent22 original caller DATA. Preserve atomic native metadata-derived
+indexes and shared batch/error/response accounting. Native query compilation,
+visibility/current-incarnation filtering, admission/authorization and consensus
+read barriers remain required; physical historical capture deliberately makes no
+visibility decision. Accepted public/Claim/Node/Raft/runtime, blocking/pipeline/
+lifecycle/catalog, all original scenarios/profiles, native Linux/macOS and measured
+performance acceptance remain open. No new native Elixir/Linux or independent
+peer review is claimed. Full goal stays active; continue solo.
+
+## Preceding ccb18e6 query-row reader checkpoint (historical)
+
+The following describes the predecessor only.
 
 SOURCE-QUERY-READ1 follows413f3d8 in the isolated implementation worktree.
 Full, selected and hydration-reference query-row reads now compose exact framing,

@@ -3,4 +3,5 @@ use super::{TestResult, fixtures as f};
 mod fixtures;
 mod flow;
 mod limits;
+mod query;
 mod recovery;
