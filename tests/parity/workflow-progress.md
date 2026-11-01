@@ -6,6 +6,19 @@ assertion links and optionally references actual coordinator-owned ExUnit
 registration. It has no pass/status or execution-proof fields. The full
 `require-parity` gate remains fail-closed.
 
+Four complete pinned `QueryRowCodecTest` scenarios now preserve11 source
+assertions: bounded prelocator validation, largest-locator fit, nested insertion
+order and the independent268-byte/SHA256 stable-byte fixture. Rust executes exact
+metadata/public-partition projection and full physical-row production; raw
+captured data and Locator fields grant no native availability/placement authority.
+Accounting is147 source-derived declarations/161 counterparts/690 assertion links.
+All previous records, source snapshots, frozen mapping and runtime identities
+remain intact. Full decoding/relocation/selective query paths, trusted native
+capture/integration, mandatory profiles and Linux/performance acceptance remain
+open. See SOURCE-QUERY-ROW1 for compiled test-first and final evidence.
+
+Previous checkpoint: original record identity.
+
 Two complete pinned `RecordIdentityTest` scenarios now have executed pure Rust
 counterparts, retaining all8 original assertions and exact source fixtures/order.
 Their scope preparation validates original sealed metadata, applies original

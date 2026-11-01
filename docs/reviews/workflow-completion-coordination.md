@@ -63509,3 +63509,151 @@ Five compiled RED and18 final controls are distinguished above. Evidence prefix
 python/reference/progress/parity/fmt/diff logs and inputs/source-audit/proof.json.
 All execution handles are terminal. No full goal or platform/service/performance
 acceptance is claimed; continue solo with the original public capture/query work.
+
+
+### SOURCE-QUERY-ROW1 concrete solo architecture decision (before creation)
+
+Approve exact original QueryRowCodec.validate_record and encode(state_key,
+record, Locator, expiry), including original public projection, metadata framing,
+physical state-key association and complete physical locator emission. Pinned
+source is66586c596e271408d9184af32eb31cd7218c126e: flow/query/{query_row_codec,
+query_row_primitives,covering_codec,run_record_fields,field,limits}.ex plus
+flow/{record_projection,attributes,state_meta,system_metadata,storage_scope,
+locator,keys}.ex. Preserve source error distinctions/order, exact version ceiling
+in CoveringCodec, original defaults/nil/empty, metadata scope and config semantics.
+No live projection/database/service capability or decoding acceptance is implied.
+
+Approved ports artifacts: projection/query_row.rs with private query_row/{model,
+budget,writer,record,primitive,config,dynamic,metadata,locator,row}.rs. Public
+ordinary data: OriginalQueryRecordLimits (positive output/work/temporary ceilings),
+OriginalQueryRecordError (source invalid/too-large and operational errors),
+OriginalQueryLocator (explicit captured Locator-class field map),
+PreparedOriginalQueryMetadata (owned metadata/scope and borrowed original identity/
+logical partition), PreparedOriginalQueryRow (one complete owned encoded row).
+Private models: Budget, Writer (measure or one owned output), Fields (25 fixed
+known-field slots), RecordPlan (same immutable captured fields, normalized logical
+partition/scope and five section sizes), LocatorPlan (validated scalar physical
+address and fixed104-byte encoded scratch). No new crate dependencies.
+
+Existing domain metadata owner gains two shared name-normalization wrappers in
+attributes.rs/state_meta.rs, reexported in metadata.rs. Query config calls these
+rather than inventing another trim/name policy. All existing metadata validators,
+SystemMetadata scope and physical/logical/key helpers are reused. Original value
+primitives are implemented in the query owner for this exact different protocol;
+this is not another ETF grammar. Arbitrary integer captures remain mathematical.
+
+One bounded borrowed plan measures all sections before source size error and
+output allocation. The complete row writes metadata directly into its final Vec,
+avoiding an intermediate complete metadata buffer. Preparing metadata separately
+is an explicit alternative API. Sorted fixed arrays cover up to16 attributes and
+64 states/16 entries. Indexed attributes permit3 unique normalized names;
+indexed_state_meta may contain arbitrary nested lists, handled iteratively with
+fallible bounded stack ownership and continuous work. Captured maps are finite,
+acyclic and unique under exact Erlang equality; acquisition is caller-owned.
+
+Scope is derived once from immutable input, then existing logical/physical helpers
+perform projection and state-key binding. Scope alone grants no native record or
+routing authority. Omitted fields and explicit nil remain distinct in the bitmap.
+Unknown/payload/internal fields follow source projection/omission, not new policy.
+All validation, scans, sorting, hashing/checksumming and allocations pay work and
+prospective ownership first. Fixed plan/control admission16384 covers bounded
+borrowed descriptors; codecs use remaining account without reset. Operational
+failure cannot be returned as source invalid/false. Requested logical peaks do
+not claim allocator capacity/RSS or measured speedup. Rust stays portable.
+
+Approved tests: wf-ports/tests/original_query_row/{main,fixtures,source,validation,
+resources,wire}.rs, with an ordinary TestResult alias. Port complete original
+bounded-prelocator validation, largest-locator fit, deterministic nested insertion
+and268-byte/SHA256 byte-stability scenarios; preserve every assertion/fixture and
+order. Add malformed fields, max source sizes, projection defaults/aliases,
+physical locator sources/expiry, identity/scope, corruption-independent wire and
+inclusive operational limits. Save compiled runtime RED before implementation.
+Production<=400/test<=600, nesting4/complexity25 and strict lint remain enforced.
+Full decode/relocate/query selectors, public/native capture integration, runtime,
+all remaining source profiles and platform/performance acceptance remain open.
+This is concrete self review under the solo override, not independent peer review.
+
+SOURCE-QUERY-ROW1 strict-lint refinement approved before declaration: private
+DynamicRows<'r,'a,const N> in existing dynamic.rs names the reviewed fixed array
+of optional borrowed (name,value) rows, without a new owner or semantic model.
+Move fallible stack growth into the existing Budget helper and flatten field/
+builtin guards to meet nesting4 without lint suppression. LocatorPlan keeps
+validated borrowed scalar fields and measured length instead of storing104 scratch
+bytes; the complete row emits them directly into its sole final buffer. This
+reduces copying and preserves the approved physical locator protocol and caps.
+
+
+### SOURCE-QUERY-ROW1 source, architecture and performance self-review
+
+Four complete source scenarios have4 compiled runtime RED before behavior and16
+final controls. Initial SHA formatter/compiler and later temporary-fixture borrow
+errors are not behavior RED. A supplemental malformed lease_owner probe exposed
+that the test put-helper did not insert missing fields; fix that helper to mirror
+Map.put, retaining the failing source-invalid expectation. Strict nesting/type/
+large-stack-array findings were fixed without suppressions or weaker assertions.
+
+Exact behavior: derive SystemMetadata scope once from immutable captured input,
+apply original public logical projection and bind its reconstructed physical key.
+Nil/missing/empty partitions stay distinct. Query identity checks source65483-byte
+ID and the hidden CoveringCodec version ceiling2^53-1, not only the outer u64
+limit. Builtin signed64/nil/binary types, internal u64/lease_owner fields and root
+identity compaction follow the pinned code. Unknown/payload fields are ignored
+without copying their bodies. Explicit nil attributes/state_meta are invalid;
+missing maps default empty. Validated sorted dynamic entries preserve scalar and
+list classes; query Field rejects reserved state-meta keys even though the
+underlying StateMeta validator accepts them. Indexed names reuse original name
+normalization:3 unique attributes, one recursively nested state key, correct nil/
+empty/bool/atom aliases and duplicate handling. The recursive source state-key
+list is walked iteratively, with bounded fallible stack growth, no Rust recursion.
+
+All five sections are validated/measured before the combined32629-byte source
+error, so later malformed metadata still precedes oversized-total refusal.
+The metadata-only API exposes exact bytes/derived scope and borrowed identity as
+ordinary data. Full-row production writes metadata directly into one final row
+Vec, without intermediate complete metadata/subsection buffers. Typed Locator
+capture is explicit data, not a storage/provenance certificate. All4 physical
+source tags, state kind, exact32-byte checksum, positive size, identity/generation,
+frame and lifetime flags follow the pinned original. Noninteger captures remain
+mathematical integers. Exact104-byte locator+32629-byte metadata still fits.
+The independent original268-byte/SHA256 fixture passes, proving exact bytes for
+that complete fixture rather than just self round-tripping.
+
+The row uses the existing scope/name/metadata/tag helpers and source-specific
+query primitives; there is no new ETF encoder or production crypto dependency.
+Private CRC32 binds the actual source state key and complete body. Prospective
+work/ownership admission precedes scanning, sorting, wrapping, output and CRC;
+peers receive only remaining caps. Used sorting prefixes avoid needless sorting
+of empty array slots. Fixed control16384 covers bounded borrowed descriptors;
+requested owner peaks exclude caller input and make no allocator/RSS promise.
+Borrowed IDs/partitions, million-byte ignored payload controls, exact independent
+work/temp/output endpoints and redacted prepared Debug are tested. No blind Box
+conversion or measured speedup is claimed; portable Rust only.
+
+The public standalone producer bounds one operation. Before integrating it into
+an independent batch, expose/compose shared accounting that retains work for
+source-invalid items; do not reset this public profile per item or call errors
+free. No batch/native/Raft/runtime acceptance is granted here. Full decode,
+relocate, selected-query materialization, trusted original capture provenance,
+public/native projection persistence, source profiles and native Linux/performance
+acceptance remain required. This is solo self review, not independent peer review.
+All1310 predecessor non-Markdown test/bench/reference inputs remain whole except
+exactly four additive progress records/11 links. No earlier assertion, mapping,
+source snapshot or runtime identity is changed. Full goal stays active.
+
+
+### SOURCE-QUERY-ROW1 final frozen verification
+
+1907 Rust tests/125 groups and11 doctests/15 groups pass, zero failed/ignored,
+including all60 architecture cases. Strict all-target/workspace Clippy, strict
+docs, Python7, reference integrity, progress, fmt and diff pass. The full parity
+gate actually exits1. All2243 frozen non-Markdown inputs/1654 Rust files remain
+exact. Actual progress accounting is147 source-derived declarations/161 mappings/
+690 links;4 new complete cases/11 assertions are additive, not full-parity credit.
+All1310 old non-Markdown test/bench/reference inputs are whole except this exact
+progress addition. Frozen mapping/registrations and every earlier assertion stay
+unchanged. Four compiled pre-body RED and16 final controls remain distinguished.
+Evidence: /private/tmp/ferricstore2-query-row-{red,green,focused,workspace,doctests,
+clippy,doc,python,reference,progress,parity,fmt,diff}.log and inputs/source-audit/
+proof.json. All process handles are terminal. No full goal or Linux/performance/
+service/native source acceptance is claimed. Continue solo with actual query-row
+read paths and original public/native capture/projection integration.

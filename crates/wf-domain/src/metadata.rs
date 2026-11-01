@@ -12,10 +12,13 @@ pub mod scope;
 mod state_meta;
 
 pub use attributes::{
-    normalize_original_attributes, valid_original_attribute_list, valid_original_attribute_scalar,
-    valid_original_attributes,
+    normalize_original_attribute_name, normalize_original_attributes,
+    valid_original_attribute_list, valid_original_attribute_scalar, valid_original_attributes,
 };
-pub use state_meta::{normalize_original_state_meta, valid_original_state_meta};
+pub use state_meta::{
+    normalize_original_state_meta, normalize_original_state_metadata_name,
+    valid_original_state_meta,
+};
 
 /// A complete captured class for the selected original metadata helpers.
 ///

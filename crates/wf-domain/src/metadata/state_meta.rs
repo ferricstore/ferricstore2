@@ -6,6 +6,16 @@ use super::{
     canonical_scalar, is_last_name, normalize_name, normalize_scalar, scalar_size,
 };
 
+/// Normalizes one original state-metadata key, borrowing its UTF8 slice.
+///
+/// # Errors
+/// This separate name entry preserves original state-key normalization errors.
+pub fn normalize_original_state_metadata_name<'a>(
+    value: OriginalMetadataInput<'_, 'a>,
+) -> Result<&'a str, OriginalMetadataError> {
+    normalize_name(value, NameKind::StateKey)
+}
+
 /// Checks canonical scalar-only state metadata without rebuilding maps.
 #[must_use]
 pub fn valid_original_state_meta(value: OriginalMetadataInput<'_, '_>) -> bool {

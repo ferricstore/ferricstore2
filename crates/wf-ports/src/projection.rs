@@ -1,3 +1,5 @@
 //! Projection boundary for `wf-ports`.
 //!
-//! Reserved for the reviewed contract; no workflow behavior is implemented here.
+//! Pure original query-row compatibility data; runtime projections remain open.
+
+pub mod query_row;

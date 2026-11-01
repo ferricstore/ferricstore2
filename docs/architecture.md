@@ -12,6 +12,22 @@ Assumption: “functional like code to ease UI work” means a pure state-transi
 
 The pinned production backend selects WARaft (`raft/backend.ex`); its command clock carries leader HLC/wall inputs (`raft/command_clock.ex`). OpenRaft is a Rust migration candidate, with no existing log/wire compatibility promised. See [source provenance](source-provenance.md) for the targeted baseline read.
 
+## Original query-row production
+
+`wf-ports::projection::query_row` prepares exact original query metadata and
+physical-row bytes from ordinary captured record and Locator-class fields.
+It composes existing domain scope/name/metadata checks and the source state-key
+tag codec, with continuous positive byte/work/temporary ceilings. A bounded
+borrowed plan measures all five metadata sections before source-size refusal;
+row production emits directly into one final owned frame. Exact original header,
+locator flags, metadata, key-bound CRC32 and independent source SHA fixture are
+covered. This does not establish native availability or projection authority.
+Full decoding, relocation, selected query materialization, trusted public/native
+capture and storage/runtime integration remain required. An independent batch
+must carry shared accounting through source-invalid items before adoption.
+See SOURCE-QUERY-ROW1 in the
+[coordination review](reviews/workflow-completion-coordination.md).
+
 ## Original sealed scope preparation
 
 The pure `wf-domain::metadata::scope` owner validates captured original sealed

@@ -7,6 +7,16 @@ use super::{
     normalize_scalar, scalar_size,
 };
 
+/// Normalizes one original attribute name, borrowing the surviving UTF8 slice.
+///
+/// # Errors
+/// This separate name entry preserves original name-normalization errors.
+pub fn normalize_original_attribute_name<'a>(
+    value: OriginalMetadataInput<'_, 'a>,
+) -> Result<&'a str, OriginalMetadataError> {
+    normalize_name(value, NameKind::Attribute)
+}
+
 /// Checks canonical original attributes without rebuilding their map.
 #[must_use]
 pub fn valid_original_attributes(value: OriginalMetadataInput<'_, '_>) -> bool {

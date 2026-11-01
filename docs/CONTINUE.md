@@ -3,6 +3,55 @@
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
 
+SOURCE-QUERY-ROW1 followsce85bf1 in the isolated implementation worktree.
+Original query metadata validation and physical QueryRowCodec four-argument
+production now compose scope/public partition projection, source key identity,
+CoveringCodec field validation, normalized indexed config, dynamic metadata and
+complete physical Locator encoding. Four complete pinned source scenarios retain
+all11 assertions, fixtures and observation order. The independent original268-byte/
+SHA256 wire fixture matches exactly. No full decoding/runtime parity is claimed.
+
+A bounded borrowed plan measures all five sections before the exact32629-byte
+source error and writes a complete row directly into one final Vec. The existing
+scope/name/metadata/tag helpers are reused. The hidden2^53-1 covering version cap,
+root-ID compaction, missing/nil distinctions, all4 locator sources, frame/lifetime/
+checksum rules, exact104-byte locator boundary and source error precedence are
+preserved. Nested indexed-state lists use a fallible iterative stack. Independent
+work/temp/output caps and redacted prepared output are tested; no speedup claim.
+
+Final frozen checks pass1907 Rust tests/125 groups and11 doctests/15 groups,
+zero failed/ignored, including all60 architecture cases. Strict workspace/all-target
+Clippy, docs, Python7, reference integrity, progress, fmt and diff pass. Full parity
+still actually exits1. The ledger has147 source-derived declarations/161 mappings/
+690 assertion links. All2243 non-Markdown inputs/1654 Rust files stay exact. Of1310
+predecessor test/bench/reference inputs,1309 remain whole and one progress JSON
+has exactly4 additive counterpart records; no previous assertion/source/mapping/
+runtime identity changes. Four compiled pre-body runtime RED and16 final controls
+are saved;12 later cases are supplemental. Evidence prefix:
+/private/tmp/ferricstore2-query-row- (red/green/focused/workspace/doctests/clippy/doc/
+python/reference/progress/parity/fmt/diff logs and inputs/source-audit/proof.json).
+Detailed concrete architecture/source/performance review is in the coordination
+record. All jobs are terminal; the full goal stays active and solo.
+
+NEXT finish strict query-row decoding/relocation/selected query materialization,
+trusted original public/captured postimage integration and native projection
+persistence, preserving source identity and actual source/compatibility context.
+An independent batch must retain shared accounting for source-invalid items before
+adopting this standalone producer. Original field normalization and separately
+validated server-derived captures remain required; never put generated postimages/
+defaults into intent22 original caller DATA. Existing native metadata remains
+opaque and these ordinary captured fields grant no currentness, physical
+availability, placement or authorization authority. Accepted public/Claim/Node/
+Raft/runtime, blocking/pipeline/lifecycle/catalog, all remaining source scenarios/
+profiles and native Linux/macOS/performance acceptance remain open. No new native
+Elixir/Linux, independent peer review, production service, primary code adoption
+or push is claimed. Continue toward the unchanged full objective.
+
+## Precedingce85bf1 original scope checkpoint (historical)
+
+The following describes the predecessor only.
+
+
 SOURCE-SCOPE1 follows3d29615 in the isolated implementation worktree. Original
 sealed SystemMetadata validation/scope derivation, StorageScope physical/logical
 partition rules and RecordIdentity ownership now execute as pure compatibility

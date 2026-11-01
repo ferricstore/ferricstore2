@@ -14074,14 +14074,74 @@
       "runtime_case_ids": [
         "308de0486a89bface5f6983989c5c797cf28ace1de8d7192b25db214a1042cf8"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-row1-b0cc11dd93c8b895-complete-production",
+          "rust_file": "crates/wf-ports/tests/original_query_row/source.rs",
+          "rust_file_sha256": "3cd1648d79d2b3cb3090d2492f83dc17af9e0b0ba5a5ec1e5591646442cf7551",
+          "rust_module": "",
+          "rust_function": "encoding_is_deterministic_across_nested_map_insertion_order",
+          "assertions": [
+            {
+              "source_line": 170,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, first, locator, 9_000)",
+              "rust_line": 86,
+              "rust_text": "assert!(first.is_ok());"
+            },
+            {
+              "source_line": 171,
+              "source_text": "assert {:ok, ^encoded} = QueryRowCodec.encode(@state_key, second, locator, 9_000)",
+              "rust_line": 119,
+              "rust_text": "assert!(matches!((first, second), (Ok(a), Ok(b)) if a.encoded() == b.encoded()));"
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario and every source assertion, original record/locator fixtures and observation order. Source async:true, no local setup or flow tag. Test fixtures allocate outside production caps.",
+            "Captured inputs are finite/acyclic with unique exact map keys; Locator-class capture is explicit ordinary data. Production reuses original scope/name/metadata/key helpers and emits the exact original row, including the independent268-byte/SHA256 fixture. It grants no native availability or placement authority.",
+            "Executed Rust counterpart on native macOS. No new native Elixir execution, complete original application setup/profiles, decoder/relocation/query-selection acceptance, native storage/runtime adoption, Linux or measured performance result is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "d6923153ff84b1b6",
       "runtime_case_ids": [
         "a289be6a5595bed063e7d9305af34e4318ca17d938c0c49ddc2ee7135743461c"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-row1-d6923153ff84b1b6-complete-production",
+          "rust_file": "crates/wf-ports/tests/original_query_row/source.rs",
+          "rust_file_sha256": "3cd1648d79d2b3cb3090d2492f83dc17af9e0b0ba5a5ec1e5591646442cf7551",
+          "rust_module": "",
+          "rust_function": "keeps_the_persisted_query_row_bytes_stable_while_optimizing_construction",
+          "assertions": [
+            {
+              "source_line": 175,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator(), 0)",
+              "rust_line": 63,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 177,
+              "source_text": "assert byte_size(encoded) == 268",
+              "rust_line": 65,
+              "rust_text": "assert_eq!(encoded.encoded().len(), 268);"
+            },
+            {
+              "source_line": 179,
+              "source_text": "assert Base.encode16(:crypto.hash(:sha256, encoded), case: :lower) ==",
+              "rust_line": 66,
+              "rust_text": "assert_eq!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario and every source assertion, original record/locator fixtures and observation order. Source async:true, no local setup or flow tag. Test fixtures allocate outside production caps.",
+            "Captured inputs are finite/acyclic with unique exact map keys; Locator-class capture is explicit ordinary data. Production reuses original scope/name/metadata/key helpers and emits the exact original row, including the independent268-byte/SHA256 fixture. It grants no native availability or placement authority.",
+            "Executed Rust counterpart on native macOS. No new native Elixir execution, complete original application setup/profiles, decoder/relocation/query-selection acceptance, native storage/runtime adoption, Linux or measured performance result is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a19fcf7c945587c7",
@@ -14186,14 +14246,80 @@
       "runtime_case_ids": [
         "8cbd2ea490510146d59e968ccd582fe5b61d73a680e20e0623c64ac8755d1f53"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-row1-ea8f825a3e153721-complete-production",
+          "rust_file": "crates/wf-ports/tests/original_query_row/source.rs",
+          "rust_file_sha256": "3cd1648d79d2b3cb3090d2492f83dc17af9e0b0ba5a5ec1e5591646442cf7551",
+          "rust_module": "",
+          "rust_function": "validates_the_bounded_record_before_a_physical_locator_exists",
+          "assertions": [
+            {
+              "source_line": 515,
+              "source_text": "assert :ok = QueryRowCodec.validate_record(@state_key, record())",
+              "rust_line": 10,
+              "rust_text": "assert!(prepare(I::Binary(&key), f::record(), f::limits()).is_ok());"
+            },
+            {
+              "source_line": 519,
+              "source_text": "assert {:error, ^expected_error} =",
+              "rust_line": 14,
+              "rust_text": "assert_eq!("
+            },
+            {
+              "source_line": 522,
+              "source_text": "assert :error = QueryRowCodec.encode(@state_key, oversized, locator(), 0)",
+              "rust_line": 18,
+              "rust_text": "assert!(matches!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario and every source assertion, original record/locator fixtures and observation order. Source async:true, no local setup or flow tag. Test fixtures allocate outside production caps.",
+            "Captured inputs are finite/acyclic with unique exact map keys; Locator-class capture is explicit ordinary data. Production reuses original scope/name/metadata/key helpers and emits the exact original row, including the independent268-byte/SHA256 fixture. It grants no native availability or placement authority.",
+            "Executed Rust counterpart on native macOS. No new native Elixir execution, complete original application setup/profiles, decoder/relocation/query-selection acceptance, native storage/runtime adoption, Linux or measured performance result is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "7d68296b137453a2",
       "runtime_case_ids": [
         "432720a2aa31bcd5d78aa65d11e4fbd59bc2191caa1ec8284e5ee9865b8ffed8"
       ],
-      "rust_assertions": []
+      "rust_assertions": [
+        {
+          "scenario_id": "source-query-row1-7d68296b137453a2-complete-production",
+          "rust_file": "crates/wf-ports/tests/original_query_row/source.rs",
+          "rust_file_sha256": "3cd1648d79d2b3cb3090d2492f83dc17af9e0b0ba5a5ec1e5591646442cf7551",
+          "rust_module": "",
+          "rust_function": "every_admitted_record_fits_with_the_largest_valid_locator",
+          "assertions": [
+            {
+              "source_line": 528,
+              "source_text": "assert :ok = QueryRowCodec.validate_record(@state_key, record())",
+              "rust_line": 34,
+              "rust_text": "assert!(prepare(I::Binary(&key), f::record(), f::limits()).is_ok());"
+            },
+            {
+              "source_line": 529,
+              "source_text": "assert {:ok, encoded} = QueryRowCodec.encode(@state_key, record(), locator, 0)",
+              "rust_line": 42,
+              "rust_text": "assert!(encoded.is_ok());"
+            },
+            {
+              "source_line": 530,
+              "source_text": "assert byte_size(encoded) <= QueryRowCodec.max_encoded_bytes()",
+              "rust_line": 43,
+              "rust_text": "assert!("
+            }
+          ],
+          "limitations": [
+            "Preserves the complete pinned QueryRowCodecTest scenario and every source assertion, original record/locator fixtures and observation order. Source async:true, no local setup or flow tag. Test fixtures allocate outside production caps.",
+            "Captured inputs are finite/acyclic with unique exact map keys; Locator-class capture is explicit ordinary data. Production reuses original scope/name/metadata/key helpers and emits the exact original row, including the independent268-byte/SHA256 fixture. It grants no native availability or placement authority.",
+            "Executed Rust counterpart on native macOS. No new native Elixir execution, complete original application setup/profiles, decoder/relocation/query-selection acceptance, native storage/runtime adoption, Linux or measured performance result is claimed. Full workflow parity remains incomplete."
+          ]
+        }
+      ]
     },
     {
       "source_declaration_id": "a3b4bc7af252d451",
