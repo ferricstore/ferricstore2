@@ -1,5 +1,42 @@
 # ADR-009: explicit stored workflow value ingress
 
+## Original record metadata data operand
+
+SOURCE-METADATA-CAPTURE1 selects `metadata::record` as the data operand for the
+remaining native original-record integration. It reuses the existing FSV2/ETF
+encoder and parser. The private envelope is a3-tuple: binary
+`wf.record.metadata`, integer1, and a map with at most12 closed binary field
+names. Original logical partition/scope, parent/root/correlation, attributes,
+state metadata, projection configuration and original lifecycle/history values
+retain missing, nil, empty and arbitrary captured value distinctions. Field
+contents are opaque data; no business normalization or source validity is
+inferred. This is not the original Elixir record wire or a publication proof.
+
+Preparation borrows the existing flat arenas and optional captured initialization
+PID. One admitted byte owner moves into a document;12 fixed node-ID slots address
+its actual fields without another value tree or field-payload clone. Encoding
+and decoding retain original foreign-context distinctions; foreign identities
+never execute. Debug output redacts captured values. The decoder requires its
+explicit actual compatibility context and never synthesizes source VM tables.
+
+Schema work precedes the shared encoder using its remaining account. The new
+crate-private measured decoder returns actual consumed work from the same parser,
+then schema inspection continues the same account. Existing public decode bodies,
+profiles and fees remain untouched. Preparation separately reserves4096 logical
+control/temporary bytes in addition to the shared encoder peak. Decoding retains
+the shared moved-input capacity, node, edge, depth and work ceilings plus paid
+fixed control. These are logical resource contracts, not allocator/RSS/stack
+or measured-performance claims.
+
+Native captured creation/mutation ingress, incarnation/point binding, snapshot
+publication/import/recovery, actual scope/routing and exact QueryRow validation
+remain required coupled integrations. An absent native sidecar is unknown; it
+cannot be replaced with an empty capture. A present empty map is only captured
+data and establishes no original source origin. Do not enable a service from
+this codec or claim complete original-source capture/parity/platform acceptance.
+
+## Existing stored-value integration
+
 Status: private codec, explicit physical capability, consumed stored9 publication/
 outcome recovery and opted-in Node9 startup audit/replay implemented and locally
 verified. Bounded physical history capture and coherent value hydration are

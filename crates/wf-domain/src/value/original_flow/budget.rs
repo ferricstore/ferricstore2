@@ -10,6 +10,9 @@ pub(in crate::value::original_flow) struct Budget {
 }
 
 impl Budget {
+    pub(in crate::value::original_flow) const fn work_units(&self) -> usize {
+        self.work
+    }
     pub(in crate::value::original_flow) fn new(
         limits: L,
         input: (usize, usize),

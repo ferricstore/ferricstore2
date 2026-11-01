@@ -14,6 +14,17 @@ pub struct OriginalValueDocument {
 }
 
 impl OriginalValueDocument {
+    pub(crate) fn as_input(&self) -> crate::value::OriginalValueInput<'_> {
+        crate::value::OriginalValueInput {
+            bytes: &self.encoded,
+            nodes: &self.nodes,
+            edges: &self.edges,
+            root: self.root,
+        }
+    }
+    pub(crate) fn into_encoded(self) -> Vec<u8> {
+        self.encoded
+    }
     /// Borrow the complete selected decoder input, including any stored wrapper.
     #[must_use]
     pub fn encoded(&self) -> &[u8] {

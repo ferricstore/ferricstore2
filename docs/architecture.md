@@ -117,6 +117,17 @@ gates:
 
 No async, Tokio, threads, wall clocks, randomness, environment, networking, filesystem, caches or logging effects in `wf-domain`. Time, generated IDs and randomness needed for a transition are explicit committed inputs. Do not clone a whole partition for every command: use bounded read views and write sets. Determinism covers serialization versions, sorted iteration when producing output, overflow, retry rounding and tie-breaks.
 
+The data-only `metadata::record` envelope reuses the existing original FSV2/ETF
+codec for optional original partition/scope, lineage, rich metadata and captured
+lifecycle/history fields. It preserves missing/nil/empty values and explicit
+foreign compatibility contexts without business normalization or execution.
+One moved document and twelve fixed field slots avoid another metadata tree;
+continuous schema/codec work stays in the supplied resource account. Native
+ingress, record/incarnation association, complete snapshot recovery and exact
+source validation remain required. An absent native capture is unknown, and an
+empty data envelope grants no origin or storage authority. See
+[the data operand decision](adr/009-stored-workflow-value-ingress.md#original-record-metadata-data-operand).
+
 Application code performs effects through ports. The same domain validation and state rules serve HTTP, dedicated TCP, embedded access and workers. The UI receives stable enums, structured field errors and allowed actions computed by domain rules. Allowed actions are advisory: committed state must revalidate every mutation.
 
 The implemented `workflow::caller` capture normalizes bounded borrowed scalar

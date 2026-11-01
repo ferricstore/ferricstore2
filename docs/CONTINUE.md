@@ -2,6 +2,60 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+
+SOURCE-METADATA-CAPTURE1 follows f19d26c in the isolated worktree. The complete
+explicit data operand for original partition/scope, lineage, rich metadata,
+projection configuration and lifecycle/history fields now reuses the original
+FSV2/ETF codec. Its private versioned envelope preserves missing, nil, empty and
+arbitrary captured values. Foreign identities remain data and require explicit
+context/init-PID captures. It performs no business normalization or source,
+routing, currentness, authorization or durability validation.
+
+One admitted byte allocation moves through preparation, decode and extraction;
+12 fixed node-ID slots borrow fields from the same owned document. Schema work
+and shared-codec work stay in one continuous account. Separate input/output/
+spine/depth/work and preparation temporary ceilings remain explicit. A private
+measured decoder reuses the same parser; existing public decoder/model/budget
+bodies, fees and profiles are literal predecessors after exact additive helpers.
+Debug output redacts fields. No performance gain is claimed.
+
+Twenty new data controls cover presence, rich/large values, every field, ownership,
+version, malformed/duplicate/unknown/graph/EOF/profile refusals, context/foreign
+identities, redaction and inclusive independent resource boundaries. Five have
+genuine compiled preimplementation RED;15 later cases are supplemental. Initial
+compiler errors and a workspace architecture rejection are distinguished from
+behavior RED and final GREEN. The relative value path was corrected to the
+existing crate::value contract without weakening policy or negative tests.
+
+Final frozen checks pass1835 Rust tests/121 groups plus11 doctests/15 groups,
+zero failed/ignored. Strict workspace/all-target Clippy, strict docs, all60
+architecture cases, Python7, reference integrity, progress, fmt and diff pass.
+All2194 non-Markdown inputs/1605 Rust files stay exact. ALL1291 old test/bench/
+reference inputs and ALL755 old Rust test/bench inputs remain byte-identical
+against f19d26c. Original source snapshots, assertions and ledgers are intact;
+these20 additional data tests receive no source-case credit. Evidence:
+/private/tmp/ferricstore2-record-metadata-{red,green,focused,workspace,doctests,
+clippy,doc,arch,python,reference,progress,parity,fmt}.log and proof/source-audit/
+inputs.json. Cargo retains the same isolated target/CARGO_HOME/Rust1.99.0 below.
+
+Full parity still actually exits1. NEXT implement actual native original create/
+mutation ingress, scope/physical-record/incarnation association and atomic
+metadata/core/index/history/outcome/control publication; complete snapshot
+export/import/recovery must validate the same associations. Review the concrete
+profiles/intent/response/routing artifacts before creation. An absent native
+capture is unknown and cannot become an empty envelope. This data codec is not
+durable source capture and must not enable a service. Then close exact QueryRow/
+key validation, Auto/Global routing, projections, blocking/per-caller pipelines,
+actual consensus/leader/read-barrier/current-auth/supervisor, transports/workers,
+remaining lifecycle/catalog, all source cases/profiles and native Linux/macOS/
+performance acceptance. No full-goal, runtime, independent-review, new native
+Elixir/Linux or measured-speedup acceptance is claimed. No primary code adoption
+or push occurs.
+
+## Preceding f19d26c source-size checkpoint (historical)
+
+The following saved results/next steps describe that predecessor only.
+
 PUBLIC-CLAIM-SOURCE1 follows a3184a7 in the isolated implementation worktree.
 The public bind cursor now skips source failures proved from actual core and
 generated fields: run IDs above65483, signed64 attempt overflow, binary primitive

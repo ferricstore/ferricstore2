@@ -7,6 +7,7 @@
 //! Normalized outputs are ordinary editable values, not proof tokens.
 
 mod attributes;
+pub mod record;
 mod state_meta;
 
 pub use attributes::{

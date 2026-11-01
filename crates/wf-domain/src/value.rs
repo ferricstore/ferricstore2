@@ -5,6 +5,7 @@ use std::fmt;
 mod original_flow;
 
 pub(crate) use original_flow::decode_fixed_bytes;
+pub(crate) use original_flow::decode_original_flow_value_with_work;
 
 pub use original_flow::{
     OriginalFlowValueError, OriginalValueContext, OriginalValueDocument, OriginalValueEncodeError,

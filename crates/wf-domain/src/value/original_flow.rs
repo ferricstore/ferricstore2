@@ -87,6 +87,25 @@ pub fn decode_original_flow_value(
     Ok(document)
 }
 
+// The data-capture wrapper pays its extra control/result metadata separately.
+// Parsing and all existing value admissions remain the same implementation.
+pub(crate) fn decode_original_flow_value_with_work(
+    encoded: Vec<u8>,
+    context: &OriginalValueContext<'_>,
+    limits: OriginalValueLimits,
+) -> Result<(OriginalValueDocument, usize), OriginalFlowValueError> {
+    let mut budget = Budget::new(limits, (encoded.len(), encoded.capacity()))?;
+    let encoding = decode_wrapper(&encoded, &mut budget)?;
+    let mut document = OriginalValueDocument {
+        encoded,
+        nodes: Vec::new(),
+        edges: Vec::new(),
+        root: 0,
+    };
+    decode::parse(&mut document, &encoding, context, &mut budget)?;
+    Ok((document, budget.work_units()))
+}
+
 /// Decode exactly one safe-table-checked bare external term, without FSV2 inference.
 /// # Errors
 /// Malformed/compressed/trailing bytes use the existing invalid-value lane.

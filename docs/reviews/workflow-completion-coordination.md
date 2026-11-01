@@ -62894,3 +62894,168 @@ Auto/Global routing, projections, blocking/per-caller pipelines, actual consensu
 leader/read-barrier/current-auth/supervisor, transports/workers, remaining
 lifecycle/catalog behavior and complete source/platform/performance gates remain
 required. The full goal stays active and solo; no primary code adoption or push.
+
+
+## SOURCE-METADATA-CAPTURE1: concrete solo architecture decision, 2026-11-01
+
+Previous turn is PROGRESS: f19d26c5840bd821a78873b9310ce49781d52ab0 plus docs-only
+primary24aacc6. Full goal stays active; the current user override requires solo.
+
+Inspection: current public mutation schema explicitly refuses attributes,
+state_meta, lineage and lifecycle extensions; StoredWorkflowRecord contains only
+core/physical partition/order. ValueBindingData already captures lifecycle and
+incarnation but not original optional partition/scope/rich fields. Actual native
+publication/snapshot owners therefore need an explicit complete capture operand.
+No field may be inferred absent from a core point. Native ingestion, snapshot,
+exact QueryRow and public routing remain coupled follow-up gates.
+
+Select a data-only capture envelope FIRST, reusing the existing complete FSV2/ETF
+codec rather than adding another value encoder. Approve new domain artifacts:
+`metadata/record.rs`, private `record/model.rs`, `record/schema.rs`,
+`record/budget.rs`; types PreparedOriginalRecordMetadata, OriginalRecordMetadata,
+OriginalRecordMetadataField, OriginalRecordMetadataError. Existing metadata.rs
+exports the record module. Existing OriginalValueDocument gets crate-private
+as_input/into_encoded views; original_flow.rs gets crate-private
+`decode_original_flow_value_with_work`, reusing decode_wrapper/decode::parse and
+returning actual consumed work. Budget gains a read-only work getter. Existing
+public decode body, limits, fees and profiles stay unchanged; no parser copy.
+
+Envelope is a logical3-tuple: binary `wf.record.metadata`, integer1, map. Map
+keys are closed binary field names for partition_key, scope_prefix, parent/root/
+correlation IDs, attributes, state_meta, indexed_attributes, indexed_state_meta,
+max_active_ms, history_max_events and history_hot_max_events. Every field is
+optional, preserving Missing vs explicit nil vs empty binary/map/list. Values
+retain the COMPLETE existing logical-value grammar; this envelope validates no
+source business metadata, routing, row size, current policy or origin. Encoding
+accepts an explicit optional initialization PID; decoding requires the actual
+explicit OriginalValueContext. No synthetic VM tables/capability are supplied.
+Unknown fields, repeated fields, bad envelope/version and malformed graphs refuse;
+foreign values retain existing unsupported-context/resource distinctions and are
+never executed. A typed private envelope is not the original source-record wire.
+
+Ownership: preparation borrows existing flat arenas; one prepared byte owner
+moves into decoding; decoded fields are stable node IDs addressing the same
+owned document. No field payload clone or extra metadata value tree. Schema
+inspection is bounded to12 fields and charged before each read/byte comparison.
+Continuous work crosses schema+shared encoder and shared decoder+schema without
+reset. Preparation reserves4096 logical control/temporary bytes in addition to
+the shared encoder's admitted peak; decode retains existing moved-input capacity,
+node/edge/depth/work ceilings and pays fixed control work. These are logical
+bounds, not native allocator/RSS/stack/speed claims.
+
+Approve test target `tests/original_record_metadata/{main,fixtures,structure,
+resources,values}.rs`, private fixture type CaptureInput and its arena helpers.
+A rejecting interface shell must compile and produce genuine valid-envelope RED
+before bodies. Test missing/nil/empty partition/scope, every field including rich
+nested metadata, large root IDs, foreign data/context, exact ownership moves,
+malformed/version/duplicate/unknown/graph/EOF, and independent work/bytes/nodes/
+edges/depth/temporary limits. Existing tests/assertions/ledgers stay unchanged.
+
+This is a necessary complete data operand for native ingress, not a replacement
+for it. Do not claim durable capture, original-source acceptance, native VM
+execution, platform parity or production readiness until those integrations and
+all full-goal gates actually execute. Do not enable a service from this codec.
+
+SOURCE-METADATA-CAPTURE1 amendment: original_flow is private. Use its existing
+public value re-exports; approve an existing value.rs crate-private re-export
+for the new measured decoder only. Do not expose the implementation module.
+Initial private-module import diagnostics are compile failures, not behavior RED.
+
+
+SOURCE-METADATA-CAPTURE1 architecture correction: the full workspace correctly
+rejected a super::OriginalValueInput path in the wire-approved value facade.
+source.rs::facade_path forbids relative super paths there. Use the actual existing
+crate::value::OriginalValueInput contract for both return type and construction;
+no module, dependency, rule, fixture, suppression or policy exception is changed.
+The stopped full run is not claimed GREEN. Preserve it as the architecture
+rejection log and rerun the actual checks on the corrected frozen tree.
+
+
+### SOURCE-METADATA-CAPTURE1 solo implementation/resource review
+
+The new data envelope is deliberately private. Binary field keys and the binary
+format tag prevent accidental reinterpretation of an original source record.
+All12 field values retain the complete shared data grammar; no attribute, scope,
+lineage or lifecycle normalization occurs here. Missing is only the absence of
+an actual key in the decoded capture. Nil, empty binary/list/map and wide scalar
+values stay distinct. Unknown native capture, unsupported context, malformed
+bytes and resource errors cannot become a missing field or fabricated empty
+metadata. Native origin/currentness still requires the actual consumed writer.
+
+Preparation inspects at most12 named slots and pays work before node/edge/byte
+reads and name comparisons. It passes only remaining work and remaining temporary
+capacity to the original encoder. Decode charges fixed control, obtains actual
+shared-parser work and pays the remaining schema reads in that SAME account.
+Inclusive-boundary tests fail at one unit below actual total, and a profile that
+admits only the shared encoder cannot admit the combined call. Moved Vec capacity
+and separate input/output/node/edge/depth limits keep their original meanings.
+4096 is conservative logical fixed control, not a native memory/stack theorem.
+
+Only one shared prepared byte owner and one moved document are retained. Twelve
+fixed optional node IDs avoid another metadata map/tree or field payload clones.
+The tests verify the same byte allocation moves through decode and extraction,
+and prepared bytes survive donor arena destruction. No Box conversion, field
+reconstruction, dependency or measured speedup is introduced. Foreign exports
+and local-fun identities remain data; exact supplied context/init-PID behavior
+and unknown/known-absent distinctions reuse the existing codec. No VM table or
+executable function is invented. Debug output redacts fields.
+
+Five genuine compiled pre-body RED controls were saved in record-metadata-red.log
+against the rejecting interface: missing/nil/empty, ownership, rich/large values,
+version distinction and continuous control work. Earlier private-module imports
+and a Display diagnostic were compiler errors, not runtime RED. All5 now pass;
+15 later cases are supplemental, including every field, foreign data, cycles,
+malformed/unknown/repeated/EOF/profile inputs, redaction and independent resource
+ceilings. Clippy style findings are not behavior RED. Existing inputs/assertions
+and source/runtime/parity ledgers remain untouched and receive no new case credit.
+
+The first full run exposed the relative super path in the wire-approved value
+facade and stopped. The path now names crate::value::OriginalValueInput, already
+an approved public value contract. Existing policy, checks and negative fixtures
+stay exact. The corrected standalone architecture check and strict workspace/
+all-target Clippy pass; final full frozen results are recorded below only after
+the runner is terminal. All three inverse-addition audits recover the exact old
+decoder/model/budget files; existing public decode bodies, fees and profiles are
+literal predecessors. Review is solo, with no independent peer-review claim.
+
+Next is the actual coupled native path: original source create/mutation ingress
+must bind these captured values to the real scope/physical record/incarnation;
+persistence must publish metadata atomically with core/index/history/outcome/
+control; complete snapshot export/import/recovery must validate exact associations.
+Review those concrete artifacts and explicit profile/intent/response/routing
+choices before creation. A standalone attachment or core-point default cannot
+supply origin; absent native capture is unknown. Preserve actual original
+partition presence rather than inventing a global sentinel from opaque IDs.
+Exact source QueryRow and projections/blocking/pipeline semantics, runtime and
+all source/platform/performance gates remain required. This data operand enables
+that integration; it neither replaces it nor completes the full active goal.
+
+
+### SOURCE-METADATA-CAPTURE1 final verified data checkpoint
+
+Final corrected frozen workspace exited0:1835 Rust tests in121 groups plus11
+passing doctests in15 groups, zero failed/ignored. Strict workspace/all-target
+Clippy, warnings-denied docs,60 architecture checks/5 groups, Python7, reference
+integrity, progress, fmt and diff pass. Actual full parity exits1 for complete
+5858-declaration scenario/profile/setup/fixture/adapter execution gaps. The full
+native Elixir/Linux wrapper and platform/performance acceptance were not claimed
+passed or reprobed. No dependency/lockfile changed.
+
+Evidence: /private/tmp/ferricstore2-record-metadata-{red,green,focused,workspace,
+doctests,clippy,doc,arch,python,reference,progress,parity,fmt}.log; the earlier
+workspace-arch-rejection.log remains distinct from the final pass. proof.json
+binds terminal results/commands/SHA256; inputs.json freezes2194 non-Markdown
+inputs/1605 Rust files, all exact through final checks. Against f19d26c, ALL1291
+old test/bench/reference inputs and ALL755 old Rust test/bench inputs are byte-
+identical. The old decoder/model/budget files are exactly recovered after
+removing only the approved literal additions. source-audit.json records this.
+Original source/runtime/progress/assertion ledgers are unchanged. The20 new
+Rust-only data controls add no original-source case credit. All jobs are terminal.
+
+The completed item is the complete explicit DATA operand, not durable source
+capture. Next implement the already-required native ingress/point/incarnation/
+snapshot association with concrete architecture review before new artifacts.
+Keep all scope/routing/QueryRow/projection/blocking/pipeline, consensus/service,
+remaining lifecycle/catalog, source-case/profile and platform/performance gates.
+The goal stays active and solo; review is not independent. Only docs-only primary
+pointers are authorized; no primary implementation adoption or push occurs.
