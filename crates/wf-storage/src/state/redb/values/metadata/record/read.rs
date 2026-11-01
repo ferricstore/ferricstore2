@@ -4,8 +4,8 @@ use redb::ReadableDatabase;
 use std::mem::size_of;
 use wf_domain::workflow::{control::ControlState, request::RequestScope};
 use wf_ports::state::{
-    StateTransactionError as Error, WorkflowRecordReadLimits, WorkflowRecordReadQuery,
-    WorkflowRecordReadSnapshot,
+    StateTransactionError as Error, StoredWorkflowRecordCapture, WorkflowRecordReadLimits,
+    WorkflowRecordReadQuery, WorkflowRecordReadSnapshot,
 };
 use wf_types::identity::{PartitionId, RecordId};
 
@@ -36,6 +36,25 @@ pub(super) fn observe(
     query: WorkflowRecordReadQuery<'_>,
     limits: WorkflowRecordReadLimits,
 ) -> Result<WorkflowRecordReadSnapshot, Error> {
+    let (context, control, capture) = begin(store, scope, partition, id, query, limits)?;
+    Ok(finish(context, control, capture))
+}
+
+pub(super) fn begin(
+    store: &RedbStateStore,
+    scope: &RequestScope,
+    partition: &PartitionId,
+    id: &RecordId,
+    query: WorkflowRecordReadQuery<'_>,
+    limits: WorkflowRecordReadLimits,
+) -> Result<
+    (
+        RecordReadContext,
+        ControlState,
+        Option<StoredWorkflowRecordCapture>,
+    ),
+    Error,
+> {
     let mut context = open(store, scope, partition, id, query, limits)?;
     let control = context.control(scope)?;
     if query
@@ -45,6 +64,14 @@ pub(super) fn observe(
         return Err(Error::KnownAborted);
     }
     let capture = super::row::capture(&mut context, scope, partition, id, query.history)?;
+    Ok((context, control, capture))
+}
+
+pub(super) fn finish(
+    context: RecordReadContext,
+    control: ControlState,
+    capture: Option<StoredWorkflowRecordCapture>,
+) -> WorkflowRecordReadSnapshot {
     let (row_reads, inspected_bytes, work_units) = context.charge.usage();
     let snapshot = WorkflowRecordReadSnapshot {
         control,
@@ -58,7 +85,7 @@ pub(super) fn observe(
     drop(context.rows);
     drop(context.metadata);
     drop(context.read);
-    Ok(snapshot)
+    snapshot
 }
 
 pub(super) fn open(

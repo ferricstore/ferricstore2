@@ -141,13 +141,26 @@ fn decode_stored_with_generation(
     normal_read: bool,
     layout: u16,
 ) -> Result<(StoredPolicyValue, u64), Error> {
+    decode_stored_admitted(raw, kind, schema, charge, layout, |owner| {
+        admit(tx, owner, normal_read)
+    })
+}
+
+pub(in crate::state::redb) fn decode_stored_admitted(
+    raw: &[u8],
+    kind: &[u8],
+    schema: PolicySchemaLimits,
+    charge: &mut PolicySchemaCharge,
+    layout: u16,
+    mut admit_owner: impl FnMut(usize) -> Result<(), Error>,
+) -> Result<(StoredPolicyValue, u64), Error> {
     if raw.starts_with(b"FWPV") {
         let owner = raw
             .len()
             .checked_mul(216)
             .and_then(|n| n.checked_add(2048))
             .ok_or(Error::Limit)?;
-        admit(tx, owner, normal_read)?;
+        admit_owner(owner)?;
         let value = decode_complete_policy_value_v2(raw, schema, charge).map_err(policy_error)?;
         if value.data().workflow_type != kind {
             return Err(Error::Corrupt);
@@ -161,14 +174,14 @@ fn decode_stored_with_generation(
     if raw.len() > wf_domain::policy::installation::MAX_ENCODED_POLICY_BYTES {
         return Err(Error::Corrupt);
     }
-    admit(tx, original_owner(raw.len())?, normal_read)?;
+    admit_owner(original_owner(raw.len())?)?;
     let value = decode_original_complete_policy_entry_portable(raw, schema, charge)
         .map_err(original_error)?
         .ok_or(Error::Corrupt)?;
     if value.workflow_type() != Some(kind) {
         return Err(Error::Corrupt);
     }
-    admit(tx, total(512, [raw.len()])?, normal_read)?;
+    admit_owner(total(512, [raw.len()])?)?;
     Ok((
         StoredPolicyValue::Original(copy_bytes(raw)?),
         value.generation(),

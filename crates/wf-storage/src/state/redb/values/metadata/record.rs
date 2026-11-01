@@ -7,6 +7,7 @@ use wf_ports::state::{
 };
 use wf_types::identity::{PartitionId, RecordId};
 
+mod policy;
 mod read;
 mod row;
 

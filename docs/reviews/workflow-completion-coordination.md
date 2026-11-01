@@ -64151,3 +64151,88 @@ proof JSON. All jobs terminal. No native public service, new Linux/Elixir,
 independent review, primary implementation adoption, push or full completion is
 claimed. Native rich ingress, actual metadata/index effects and all remaining
 handoff/ordered-plan obligations remain active. Continue solo.
+
+### NATIVE-RECORD-POLICY1 concrete solo architecture decision
+
+Add actual current-policy acquisition to the existing native committed record
+snapshot, preserving the old four-probe reader. Approve ports state/record_policy.rs
+with WorkflowRecordPolicyObservation (NotRead/Absent/Present actual StoredPolicyValue),
+WorkflowRecordPolicyReadSnapshot and WorkflowRecordPolicyReadPort. Export through
+state.rs. The policy is current on the same snapshot/control, including when an
+exact historical core is requested; it is never advertised as the policy at that
+historical write or as the immutable birth witness. Missing records produce NotRead.
+
+Approve storage values/metadata/record/policy.rs and its trait implementation in
+record.rs. Reuse the existing read context/guards, core/companion binder and one
+read transaction; factor read.rs begin/finish helpers without changing old output,
+fees or probes. Read the policy key in the actual group/recovery/tenant/type scope.
+Reuse original_policy.rs's exact Complete/Original decoder and type checks through
+an admitted private helper; do not make another parser. Full selected backing is
+requested output: original bytes copy once, complete typed output moves without
+another complete-policy clone. Explicit schema work is capped by the remaining
+whole-read work, with prospective temporary/physical limits and separately measured
+returned ownership. All original bytes and foreign/source profile errors retain
+their existing distinctions. The original record reader stays unchanged.
+
+Approve record/tests/policy.rs and policy/fixtures.rs, registered in tests.rs, for
+compiled pre-body RED, actual policy publication while a snapshot is pinned,
+complete/original/absent/missing observations, type/corruption refusal, exact scope,
+current policy versus birth/history, and all independent resource boundaries.
+Fixtures use actual consumed policy writers; fault writes are explicitly separate.
+No source-case credit from supplemental native controls. No new wire/layout/intent,
+dependency, source origin, authorization, visibility or consensus barrier. This is
+needed native query integration; rich writer-derived metadata/index adoption and
+all full-goal gates remain open. Production400/test600, fn100/depth4/complexity25
+and safe portable Rust remain enforced. This is solo review, not independent.
+
+NATIVE-RECORD-POLICY1 API sizing refinement before creation: approve
+WorkflowRecordPolicyReadLimits in state/record_policy.rs to group the existing
+record limits and explicit schema limits, keeping the port below the seven-argument
+lint without weakening it. The schema's represented total (work plus scratch)
+is paid into the remaining whole-read work account, preserving inclusive endpoints.
+
+NATIVE-RECORD-POLICY1 source-layout correction: the checker applies the400-line
+runtime-source cap to unit-test files under src as well. Move the Complete-policy
+assertion helper into the already approved local cfg(test) fixture_data module;
+keep all assertions and controls unchanged and the policy test file below400.
+This fixes test scoping and grouping, without an exemption or behavioral RED claim.
+
+### NATIVE-RECORD-POLICY1 final source/architecture/performance self-review
+
+The native policy/record port retains one actual redb revision for core, caller
+metadata, value/lifecycle binding, control and exact group/recovery/tenant/type
+policy. NotRead, Absent and Present are explicit. Current policy stays separate
+from immutable birth capture and from historical policy-at-write. Actual consumed
+Complete Patch and Original SET publications, snapshot interleaving and both
+reopens execute. Corrupt/wrong-type policy refuses and fences; stale control
+refuses before core/policy materialization. No new format/intent, dependency,
+generated caller postimage or source/service grant is introduced. ADR009 and the
+architecture document record this contract; rich writer/index adoption remains.
+
+Shared admitted decoding preserves old decoder/type/error bodies and old reader
+fees/probes. The new reached probe and all five limits cover both observations.
+Schema total shares remaining whole-read work under actual store ceilings;
+prospective guard/key/decoder/output ownership stays charged. Inclusive, one-below
+and zero boundaries execute without table mutation. Full selected policy backing
+is output: original bytes copy once; typed Complete output moves without another
+whole-policy clone. This is an ownership/accounting observation, not measured
+throughput, latency, allocation-count or RSS improvement. Code remains safe,
+portable and within unchanged file/function/depth/complexity rules.
+
+Three compiled pre-body runtime controls fail in red.log and pass after behavior;
+six later controls are supplemental. Nine new controls pass, plus old native
+controls. Structural compile/test-scope fixes are not behavioral RED. All1333 prior
+non-Markdown test/bench/reference inputs stay whole; the old unit-test root gains
+only module registration, preserving every earlier assertion. The parity ledger
+stays byte-exact at170 source-derived declarations/184 mappings/801 links. Native
+supplemental controls earn no source-case credit.
+
+Final frozen workspace1987/127 groups, doctests11/15 groups, all60 architecture
+controls, strict workspace/all-target Clippy, warning-denied docs, Python7,
+reference/progress/fmt/diff pass, zero failed/ignored tests. All2290 frozen inputs/
+1701 Rust files remain exact; full parity actually exits1 with runtime/source
+acceptance still incomplete. Evidence prefix `/private/tmp/ferricstore2-native-
+record-policy-` contains final logs/checks/input/source-audit/proof JSON; the
+structural preflight failure is retained separately. All jobs terminal. No new
+Linux/Elixir, independent review, primary implementation adoption, push or full
+completion is claimed. Continue the unchanged full goal solo.

@@ -14,6 +14,7 @@ use crate::state::value;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 mod fixtures;
+mod policy;
 use fixtures::fixture_data::*;
 
 #[test]

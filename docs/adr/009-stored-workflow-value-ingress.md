@@ -1,5 +1,29 @@
 # ADR-009: explicit stored workflow value ingress
 
+## Coherent native current-policy record observation
+
+NATIVE-RECORD-POLICY1 adds `WorkflowRecordPolicyReadPort` over the existing native
+record-capture capability. Core, caller metadata, lifecycle/value binding, control
+and the actual type's current policy use one committed read transaction. NotRead,
+Absent and Present remain distinct. Historical core selection returns current
+policy on this revision; it does not reconstruct historical policy backing or
+replace the immutable birth witness. Actual group/recovery/tenant/type select the
+policy key. Reuse the existing Complete/Original decoder, type binding and error
+lanes through private admitted decoding; no second parser or format is introduced.
+
+The old reader retains its four probes. The extended reader pays one reached
+policy probe, aggregate physical/returned/work/temporary owners and schema total
+within remaining whole-read work. Actual configured schema ceilings cannot be
+raised by this API. Full backing is selected output, with one original-byte copy
+and moved typed Complete output, without another whole-policy clone. Current
+policy and birth capture may intentionally differ after a policy update.
+
+This is physical data acquisition for native query integration, not original
+logical routing/source origin, native derived-index publication, visibility,
+authorization or a consensus read barrier. Intent22 caller operands, binding and
+snapshot formats remain unchanged. Rich original public/native write preparation
+and authoritative metadata/index derivation remain required coupled work.
+
 ## Original record metadata data operand
 
 SOURCE-METADATA-CAPTURE1 selects `metadata::record` as the data operand for the

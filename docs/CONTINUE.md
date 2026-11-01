@@ -2,6 +2,50 @@
 
 Updated: 2026-11-01. Full-completion goal remains active; continue solo.
 
+NATIVE-RECORD-POLICY1 follows d9fe92e in the isolated implementation worktree.
+WorkflowRecordPolicyReadPort acquires the represented core, original opaque
+metadata, actual value/lifecycle binding, control and current type policy on one
+committed revision. Explicit NotRead/Absent/Present distinguish missing records
+from missing policies. Full Complete/Original backing uses the existing decoder
+and exact native namespace/type key. A reached policy adds one probe; the original
+reader keeps four. All physical/returned/work/temporary ceilings cover the whole
+observation, and policy schema total consumes remaining whole-read work under
+the actual store ceiling. Original bytes copy once; typed output moves without
+another full policy clone. No measured speedup is claimed.
+
+A pinned snapshot retains policy generation1 while an actual consumed update
+publishes generation2; fresh reads see generation2, with immutable birth capture
+unchanged. Historical record queries explicitly return current policy, without
+claiming historical policy reconstruction. Complete/Original actual publication
+and reopen, exact scope/type, corruption/fencing, control checks and all five
+inclusive/one-below/zero limits execute. Three controls have compiled pre-body
+runtime RED; six later controls are supplemental. No source-case credit is added;
+the original parity ledger and every previous scenario/assertion stay unchanged.
+
+Final frozen verification passes1987 Rust tests/127 groups and11 doctests/15 groups,
+zero failed/ignored, including all60 architecture controls. Strict workspace/all-
+target Clippy, warning-denied docs, Python7, reference integrity, progress, fmt and
+diff pass. All2290 non-Markdown inputs/1701 Rust files remain exact. All1333 prior
+test/bench/reference inputs stay whole; the existing unit-test root gains only its
+module registration. The ledger remains170 declarations/184 mappings/801 links;
+full parity actually exits1. Evidence prefix /private/tmp/ferricstore2-native-record-
+policy- contains logs/checks/inputs/source-audit/proof JSON. All jobs terminal.
+No primary code adoption, push, new Linux/Elixir or independent review is claimed.
+
+NEXT combine coherent native policy/record observations with trusted original
+normalization and separately derived metadata/indexes. Rich original caller data
+must remain separate from actual server time/policy/scope/default postimages;
+intent22 stays original caller DATA. Current policy is not a historical/birth
+policy witness. Native writer/index adoption, serialization, trusted extension
+captures, complete mutation/many/child breadth, accepted public/Claim/Node/Raft/
+runtime, query visibility/read barriers, blocking/pipeline/lifecycle/catalog, all
+remaining original scenarios/profiles and native Linux/macOS/measured-performance
+acceptance remain open. Full goal active; continue solo.
+
+## Preceding d9fe92e original atomic-start checkpoint (historical)
+
+The following describes the predecessor only.
+
 SOURCE-START1 follows e7ad537 in the isolated implementation worktree.
 Original atomic start now has explicit domain normalization and ports admission,
 sharing create's validators, budgets, metadata spines and routing writers.

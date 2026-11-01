@@ -38,6 +38,20 @@ names must not enter that identity. See SOURCE-CREATE1 and SOURCE-START1 in the
 
 ## Coherent native record queries
 
+`WorkflowRecordPolicyReadPort` additionally acquires the actual record type's
+current Complete/Original policy backing before releasing the same read snapshot.
+Policy observation is explicit NotRead for a missing record, Absent for a missing
+type policy, or Present with verified full backing. Historical record selection
+still returns the policy current on this revision, separately from the immutable
+birth witness. The existing four-probe record reader stays intact; policy reads
+add one reached probe and share physical/returned/work/temporary ceilings. Policy
+schema work is capped by the actual store profile and remaining whole-read work.
+Existing decoder/admission bodies are reused. Full selected output moves without
+another policy clone; original bytes copy once. This enables coherent native
+query composition, without service authorization, visibility or read-barrier
+authority. See NATIVE-RECORD-POLICY1 in the
+[coordination review](reviews/workflow-completion-coordination.md).
+
 `WorkflowRecordReadPort` acquires current or exact historical represented core,
 actual value/lifecycle binding and opaque original metadata on one committed
 redb revision. The same snapshot supplies the manifest and group control; an
