@@ -230,13 +230,28 @@ pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
             expires_at: reader.optional_u64().ok()?,
         });
     }
-    reader.0.is_empty().then_some(Image { records, shared })
+    let policy_count = reader.u64().ok()?;
+    let mut policies = Vec::new();
+    for _ in 0..policy_count {
+        policies.push((
+            reader.bin().ok()?.to_vec(),
+            reader.u64().ok()?,
+            reader.bin().ok()?.to_vec(),
+        ));
+    }
+    reader.0.is_empty().then_some(Image {
+        records,
+        shared,
+        policies,
+    })
 }
 
-/// A decoded shard image: its records, then its shared values (ADR-014).
+/// A decoded shard image: its records, its shared values, then the Flow
+/// type policies it held: type, generation and encoded policy (ADR-014).
 pub(crate) struct Image {
     pub(crate) records: Vec<Restored>,
     pub(crate) shared: Vec<SharedValue>,
+    pub(crate) policies: Vec<(Vec<u8>, u64, Vec<u8>)>,
 }
 
 /// A shared value in a shard image.
@@ -258,6 +273,17 @@ pub(crate) fn encode_shared(out: &mut Vec<u8>, values: &[SharedEntry<'_>]) -> Op
         bin(out, reference)?;
         bin(out, bytes)?;
         optional_u64(out, *expires_at);
+    }
+    Some(())
+}
+
+/// Writes the policy section: type, generation and encoded policy each.
+pub(crate) fn encode_policies(out: &mut Vec<u8>, policies: &[(&[u8], u64, Vec<u8>)]) -> Option<()> {
+    out.extend_from_slice(&u64::try_from(policies.len()).ok()?.to_be_bytes());
+    for (flow_type, generation, policy) in policies {
+        bin(out, flow_type)?;
+        out.extend_from_slice(&generation.to_be_bytes());
+        bin(out, policy)?;
     }
     Some(())
 }

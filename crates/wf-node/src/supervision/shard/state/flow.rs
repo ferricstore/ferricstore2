@@ -8,9 +8,11 @@
 use std::collections::BTreeMap;
 
 use wf_application::commands::flow::create::CreateFlow;
+use wf_application::commands::flow::create::MaxActive;
 use wf_application::commands::flow::get::GetFlow;
 use wf_application::commands::flow::history::{self, HistoryQuery};
 use wf_application::commands::flow::meta::{self, StateMeta};
+use wf_application::commands::flow::policy;
 use wf_application::commands::flow::record::{FlowMeta, Include, NamedValue, View};
 use wf_application::commands::flow::{FlowCommand, Term};
 use wf_application::commands::queue::{Partition, ServiceError};
@@ -51,10 +53,12 @@ impl ShardState {
             FlowCommand::Signal(signal) => self.signal(now, &signal, partition),
             FlowCommand::SpawnChildren(spawn) => self.spawn_children(now, &spawn, partition),
             // Batches and reads by reference are split over shards before
-            // they reach one.
-            FlowCommand::Many(_) | FlowCommand::ValueMget(_) | FlowCommand::RunSteps(_) => {
-                (Err(ServiceError::Unavailable), None)
-            }
+            // they reach one; policies have requests of their own.
+            FlowCommand::Many(_)
+            | FlowCommand::ValueMget(_)
+            | FlowCommand::RunSteps(_)
+            | FlowCommand::PolicySet(_)
+            | FlowCommand::PolicyGet(_) => (Err(ServiceError::Unavailable), None),
         }
     }
 
@@ -202,6 +206,29 @@ impl ShardState {
             })
             .collect();
         let defaults = self.defaults();
+        // Elixir's `flow_lifecycle_for_create/2`: the type's policy for the
+        // create state, under the create's own options.
+        let policy = self
+            .policy(&create.flow_type)
+            .map(|installed| &installed.policy);
+        let limits = policy::lifecycle(
+            policy,
+            Some(&create.state),
+            self.lifecycle_defaults(),
+            [
+                create.retention_ttl_ms,
+                create.history_hot_max_events,
+                create.history_max_events,
+            ],
+        );
+        // `resolve_max_active_ms/2`: `infinity` opts out of any limit.
+        let max_active_ms = match create.max_active_ms {
+            Some(MaxActive::Infinity) => None,
+            Some(limit) => Some(limit),
+            None => policy
+                .and_then(|policy| policy.max_active_ms)
+                .map(MaxActive::Ms),
+        };
         Ok(FlowMeta {
             parent_flow_id: create.parent_flow_id.clone(),
             root_flow_id: create
@@ -209,14 +236,10 @@ impl ShardState {
                 .clone()
                 .filter(|root| *root != create.id),
             correlation_id: create.correlation_id.clone(),
-            retention_ttl_ms: create.retention_ttl_ms.unwrap_or(defaults.retention_ttl_ms),
-            max_active_ms: create.max_active_ms,
-            history_hot_max_events: create
-                .history_hot_max_events
-                .unwrap_or(defaults.history_hot_max_events),
-            history_max_events: create
-                .history_max_events
-                .unwrap_or(defaults.history_max_events),
+            retention_ttl_ms: limits.ttl_ms,
+            max_active_ms,
+            history_hot_max_events: limits.history_hot_max_events,
+            history_max_events: limits.history_max_events,
             attributes: create.attributes.clone(),
             state_meta,
             values,

@@ -225,10 +225,14 @@ impl ShardState {
             now: TimestampMillis::new(now),
             operation: operation(mutation)?,
         };
-        let (outcome, write, history) =
-            workflow::reduce_public(Some(&entry.record), &command, None)
-                .map_err(ServiceError::Domain)?
-                .into_parts();
+        let (outcome, write, history) = workflow::reduce_public(
+            Some(&entry.record),
+            &command,
+            self.policy(entry.record.workflow_type())
+                .map(|installed| &installed.retry),
+        )
+        .map_err(ServiceError::Domain)?
+        .into_parts();
         let logged = match (outcome, write) {
             (Outcome::Changed, Some(write)) => {
                 let current = entry.meta.as_deref().unwrap_or(&defaults);

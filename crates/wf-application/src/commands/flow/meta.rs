@@ -54,6 +54,14 @@ pub fn attribute_key(raw: &[u8]) -> Result<String, FlowError> {
     key("attribute", raw)
 }
 
+/// A `state_meta` key, normalized as `StateMeta.normalize_name/1` does.
+///
+/// # Errors
+/// The Elixir server's refusal text for an invalid key.
+pub fn state_meta_key(raw: &[u8]) -> Result<String, FlowError> {
+    key("state_meta", raw)
+}
+
 /// Applies a merge and a delete to attributes, checking the totals again.
 ///
 /// # Errors

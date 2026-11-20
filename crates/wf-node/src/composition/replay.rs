@@ -6,6 +6,8 @@
 //! snapshot must have logged its marker, or the log does not match the
 //! snapshot and the node refuses to open.
 
+use std::sync::Arc;
+
 use wf_application::commands::queue::Partition;
 use wf_domain::workflow::Outcome;
 
@@ -84,8 +86,16 @@ pub(crate) fn replay(
             shard: u16::try_from(shard).unwrap_or(u16::MAX),
         });
     }
-    // Replay is done: later changes are live.
+    // Replay is done: every shard holds shard 0's policies, and later
+    // changes are live.
+    let policies: Vec<_> = states
+        .first()
+        .map(|owner| owner.policies().cloned().collect())
+        .unwrap_or_default();
     for state in states.iter_mut() {
+        for installed in &policies {
+            state.install_policy(Arc::clone(installed));
+        }
         state.go_live();
     }
     Ok(newest_marker)
@@ -134,6 +144,10 @@ fn by_shard(logged: Logged, shards: u16) -> Option<Vec<(usize, Logged)>> {
                 .map(|(index, part)| (index, Logged::Group(part)))
                 .collect(),
         );
+    }
+    // Policies are shard 0's, whichever log holds them.
+    if matches!(logged, Logged::Policy { .. }) {
+        return Some(vec![(0, logged)]);
     }
     let Logged::Expire { now, keys } = logged else {
         let index = shard_index(logged.partition()?, shards)?;

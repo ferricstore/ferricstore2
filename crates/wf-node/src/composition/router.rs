@@ -44,6 +44,7 @@ fn refuse(request: Request) {
             done(Err(ServiceError::Unavailable));
         }
         Request::ValueRead { done, .. } => done(Err(ServiceError::Unavailable)),
+        Request::Policy { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Peek { done, .. } => done(Peeked::default()),
     }
 }

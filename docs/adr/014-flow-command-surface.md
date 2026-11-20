@@ -190,3 +190,25 @@ Each step is one commit with its tests.
   Elixir except the opaque `request_hash` (Elixir hashes its own term
   encoding); the SDK suite passes 30 of 60, including all six child-group
   tests and all thirteen durable-step recovery tests.
+- Step 9a: `FLOW.POLICY.SET` and `FLOW.POLICY.GET` (opcodes 0x021E/0x021F),
+  as `Ferricstore.Flow.Policy`, `PolicyPatch` and `RetryPolicy`. Shard 0
+  owns every type's policy, as in Elixir: a set checks the expected
+  generation, deep-merges its patch into the stored normalized form (a nil
+  state deletes it) or replaces it, normalizes the result with Elixir's
+  checks and texts, raises the generation and logs the policy as one
+  `Policy` record (tag 10). Once that record is durable the node installs a
+  copy on every other shard, then replies; a shard keeps the newest
+  generation it has seen. Replay sends `Policy` records to shard 0 whatever
+  log holds them, snapshot images (version 5) carry each shard's table and
+  load it into shard 0, and the node copies shard 0's table to every shard
+  at open. The policy applies where Elixir applies it: a create resolves its
+  retention (create options over the state's retention over node defaults)
+  and its `max_active_ms` (a create's `infinity` opts out, which also fixes
+  a step 1 departure that stored and showed `"infinity"`), and a retry hands
+  the type's retry view to the domain reducer. The typed protocol has no
+  top-level `retention`, `version`, `mode` or `governance` option, so those
+  are refused as unknown; state-level governance is refused until the
+  governance step. The policy scenario matches Elixir except those refusals
+  and the unknown-option text. FIFO claim lanes (step 9b) and FLOW commands
+  sent as text through COMMAND_EXEC (step 9c, which the SDK uses whenever a
+  call carries `indexed_state_meta` or a non-create `state_meta`) follow.

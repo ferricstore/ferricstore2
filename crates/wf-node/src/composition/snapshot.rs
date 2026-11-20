@@ -22,9 +22,9 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 4 images carry each Flow's fields beyond its record, its history
-/// and the shard's shared values (ADR-014).
-const VERSION: u8 = 4;
+/// Version 5 images carry each Flow's fields beyond its record, its history,
+/// the shard's shared values and its Flow type policies (ADR-014).
+const VERSION: u8 = 5;
 
 struct Progress {
     next: u64,
@@ -77,6 +77,14 @@ pub(crate) fn load(
                 value.bytes,
                 value.expires_at,
             );
+        }
+        // Policies belong to shard 0 whichever image held them.
+        for (flow_type, generation, policy) in decoded.policies {
+            states
+                .first_mut()
+                .ok_or(NodeError::SnapshotImage)?
+                .restore_policy(&flow_type, generation, &policy)
+                .map_err(|_| NodeError::SnapshotImage)?;
         }
         for restored in decoded.records {
             let state = shard_index(&restored.partition, shards)

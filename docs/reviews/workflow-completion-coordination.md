@@ -65135,3 +65135,44 @@ tests and the TCP adapter tests pass; the SDK suite passes 30 of 60 (was
 26). `children.rs` reached 502 lines and `composition.rs` 401; the group
 moved to `children/group.rs` and going live moved into replay. Clippy, the
 ratchet, lint tests, docs and architecture pass.
+
+### ADR014-POLICY1 Flow type policies
+
+New artifacts (solo design review): `wf_application::commands::flow::policy`
+(`FlowPolicy`, `StatePolicy`, `Retention`, `Mode`, `Installed`,
+`PolicySet`, `PolicyGet`, `parse_set`, `parse_get`, `check_size`,
+`next_generation`) with private children `policy::{merge, normalize,
+resolve}` (`merge`, `normalize`, `Lifecycle`, `lifecycle`, `reply`);
+`meta::state_meta_key`; `FlowCommand::{PolicySet, PolicyGet}`. In
+`wf-node`: `supervision::shard::state::policy` (`PolicyCommand`,
+`PolicyReply`, the table, set/get/install/restore), `Request::Policy`,
+`Logged::Policy` (tag 10) with `command::stored` (stored-record codec moved
+out of `command.rs`), the image policy section (snapshot version 5),
+`composition::policy` (shard 0 routing and the install fan-out). The
+retry view reuses `wf_domain::policy::InstalledRetryPolicy` and the domain
+reducer's `reduce_public` policy argument; the ETF-level
+`wf_domain::policy::complete` port is not used by this path. No dependency
+or policy change.
+
+Decision: shard 0 is the only authority and the only shard that logs a
+policy; the others hold in-memory copies installed after shard 0's durable
+reply and again at open. Elixir logs a copy on every shard instead; one
+authority needs no mirror repair after a crash between shard writes, and
+records never need the policy at replay because changes are logged as
+after-images.
+
+Evidence: before this step the SDK suite refused opcode 0x021E in five tests
+(two policy round trips among them) and the node had no policy table (retry
+used `RetryOverride::default()`). The Elixir scenario (set, get, per-state
+get, patch with nil-state deletion and nested backoff merge, stale CAS,
+replace, 30 invalid inputs, retry backoff and exhaustion, create-time
+retention and `max_active_ms`) was captured first; the node diff then
+showed the `infinity` departure, fixed before the tests were written. The
+two node tests (`flow_policy`: merge/patch/replace/CAS, every shard applying
+a set at once, retry by policy then exhaustion, restart from 4 to 3 shards;
+snapshot restore from 4 to 7 shards after the log holding the set is gone)
+were written after the code, so this step does not claim TDD; a mutation
+that skips loading image policies makes the snapshot test fail. All 50 node
+tests, the TCP adapter and application tests pass; the SDK suite passes 32
+of 60 (was 30), both policy round trips included. Clippy, the ratchet, lint
+tests, docs and architecture pass.

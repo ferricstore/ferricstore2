@@ -21,6 +21,11 @@ const MARKER: u8 = 6;
 const PUT: u8 = 7;
 const SHARED: u8 = 8;
 const GROUP: u8 = 9;
+const POLICY: u8 = 10;
+
+mod stored;
+
+use stored::decode_stored;
 
 /// One logged change to one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -70,6 +75,13 @@ pub(crate) enum Logged {
     /// Changes logged as one record so they are all or nothing (a spawn:
     /// the parent and its children; ADR-014 step 8).
     Group(Vec<Logged>),
+    /// A Flow type's policy as set on shard 0 (ADR-014 step 9): its
+    /// generation and its normalized form as an encoded term.
+    Policy {
+        flow_type: Vec<u8>,
+        generation: u64,
+        policy: Vec<u8>,
+    },
     /// A shared value stored under its reference (ADR-014 step 5).
     Shared {
         partition: Partition,
@@ -89,7 +101,7 @@ impl Logged {
             | Self::Put { partition, .. }
             | Self::Shared { partition, .. } => Some(partition),
             Self::Group(changes) => changes.first().and_then(Self::partition),
-            Self::Expire { .. } | Self::Marker { .. } => None,
+            Self::Expire { .. } | Self::Marker { .. } | Self::Policy { .. } => None,
         }
     }
 
@@ -146,29 +158,8 @@ impl Logged {
                 out.extend_from_slice(&fence.to_be_bytes());
                 optional_bin(&mut out, result.as_deref())?;
             }
-            Self::Put { partition, image } => {
-                out.push(PUT);
-                bin(&mut out, &partition.name())?;
-                bin(&mut out, image)?;
-            }
-            Self::Group(changes) => {
-                out.push(GROUP);
-                out.extend_from_slice(&u32::try_from(changes.len()).ok()?.to_be_bytes());
-                for change in changes {
-                    bin(&mut out, &change.encode()?)?;
-                }
-            }
-            Self::Shared {
-                partition,
-                reference,
-                bytes,
-                expires_at,
-            } => {
-                out.push(SHARED);
-                bin(&mut out, &partition.name())?;
-                bin(&mut out, reference)?;
-                bin(&mut out, bytes)?;
-                optional_u64(&mut out, *expires_at);
+            Self::Put { .. } | Self::Group(_) | Self::Shared { .. } | Self::Policy { .. } => {
+                stored::encode(self, &mut out)?;
             }
             Self::Marker { snapshot, shard } => {
                 out.push(MARKER);
@@ -342,39 +333,5 @@ impl<'a> Reader<'a> {
             1 => self.u64().map(Some),
             _ => Err(Malformed),
         }
-    }
-}
-
-/// Records that store state as logged: a group, a shared value or an
-/// after-image; `None` for any other tag.
-fn decode_stored(tag: u8, reader: &mut Reader<'_>) -> Result<Option<Logged>, Malformed> {
-    let logged = match tag {
-        GROUP => {
-            let count = u32::from_be_bytes(reader.array()?);
-            let mut changes = Vec::new();
-            for _ in 0..count {
-                changes.push(decode(reader.bin()?)?);
-            }
-            if changes.is_empty() {
-                return Err(Malformed);
-            }
-            Logged::Group(changes)
-        }
-        SHARED => Logged::Shared {
-            partition: Partition::parse(reader.bin()?),
-            reference: reader.bin()?.to_vec(),
-            bytes: reader.bin()?.to_vec(),
-            expires_at: reader.optional_u64()?,
-        },
-        PUT => Logged::Put {
-            partition: Partition::parse(reader.bin()?),
-            image: reader.bin()?.to_vec(),
-        },
-        _ => return Ok(None),
-    };
-    if reader.0.is_empty() {
-        Ok(Some(logged))
-    } else {
-        Err(Malformed)
     }
 }

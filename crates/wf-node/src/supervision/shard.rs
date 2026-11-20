@@ -90,6 +90,12 @@ pub(crate) enum Request {
         max_bytes: u64,
         done: Done<Vec<(usize, Term)>>,
     },
+    /// A policy command (ADR-014 step 9): a set or get on shard 0, or a
+    /// copy of shard 0's durable set on another shard.
+    Policy {
+        command: state::PolicyCommand,
+        done: Done<state::PolicyReply>,
+    },
     /// Any other Flow command, for the Flow in `partition` (ADR-014).
     Flow {
         command: Box<FlowCommand>,
@@ -122,6 +128,24 @@ fn committed_now(previous: u64) -> u64 {
 
 /// Applies one request; returns what to call after the round is durable, or
 /// `None` when it was answered already.
+/// Creates fast-path Flows of one shape; outcomes keep their positions.
+fn create(
+    state: &mut ShardState,
+    now: u64,
+    shape: (&[u8], &[u8], Option<u64>, u8),
+    items: Vec<(usize, NewFlow, Partition)>,
+    logged: &mut Vec<Logged>,
+) -> Vec<(usize, ItemOutcome)> {
+    items
+        .into_iter()
+        .map(|(position, flow, partition)| {
+            let (outcome, change) = state.create(now, shape, flow, partition);
+            logged.extend(change);
+            (position, outcome)
+        })
+        .collect()
+}
+
 fn handle(
     state: &mut ShardState,
     (index, now): (u16, u64),
@@ -153,14 +177,7 @@ fn handle(
                 run_at_ms,
                 priority,
             );
-            let outcomes: Vec<(usize, ItemOutcome)> = items
-                .into_iter()
-                .map(|(position, flow, partition)| {
-                    let (outcome, change) = state.create(now, shape, flow, partition);
-                    logged.extend(change);
-                    (position, outcome)
-                })
-                .collect();
+            let outcomes = create(state, now, shape, items, logged);
             Box::new(move |durable| done(durable.map(|()| outcomes)))
         }
         Request::Claim {
@@ -189,6 +206,11 @@ fn handle(
             done,
         } => {
             let (result, change) = state.execute(now, *command, partition);
+            logged.extend(change);
+            Box::new(move |durable| done(durable.and(result)))
+        }
+        Request::Policy { command, done } => {
+            let (result, change) = state.policy_command(command);
             logged.extend(change);
             Box::new(move |durable| done(durable.and(result)))
         }

@@ -15,6 +15,7 @@ mod claim;
 pub(crate) mod events;
 mod flow;
 mod mutate;
+mod policy;
 mod retention;
 mod signal;
 mod steps;
@@ -23,10 +24,13 @@ mod value;
 
 pub(crate) use claim::Peeked;
 pub(crate) use mutate::{BatchItems, BatchReplies};
+pub(crate) use policy::{PolicyCommand, PolicyReply};
 
 use std::collections::{BTreeMap, HashMap};
+use std::sync::Arc;
 
 use events::History;
+use wf_application::commands::flow::policy::Installed;
 use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::queue::{
     CompleteFlow, ItemOutcome, MAX_FLOW_ID_BYTES, NewFlow, Partition, ServiceError,
@@ -87,6 +91,8 @@ pub(crate) struct ShardState {
     live: bool,
     /// Child events waiting for this round to settle them.
     child_events: Vec<children::ChildEvent>,
+    /// Flow type policies by type (ADR-014 step 9).
+    policies: HashMap<Vec<u8>, Arc<Installed>>,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -117,6 +123,7 @@ impl ShardState {
             tags_at: 0,
             live: false,
             child_events: Vec::new(),
+            policies: HashMap::new(),
         }
     }
 
@@ -171,6 +178,13 @@ impl ShardState {
                 }
                 None => Err(ServiceError::Unavailable),
             },
+            Logged::Policy {
+                flow_type,
+                generation,
+                policy,
+            } => self
+                .restore_policy(flow_type, *generation, policy)
+                .map(|()| Outcome::Changed),
             // A marker changes no record; replay handles it before apply.
             Logged::Marker { .. } => Ok(Outcome::NotEligible),
             Logged::Group(changes) => changes
@@ -192,6 +206,7 @@ impl ShardState {
             | Logged::Shared { .. }
             | Logged::Put { .. }
             | Logged::Group(_)
+            | Logged::Policy { .. }
             | Logged::Marker { .. } => return Ok(Outcome::NotEligible),
             Logged::Create {
                 now,

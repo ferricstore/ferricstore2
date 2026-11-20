@@ -41,6 +41,17 @@ impl ShardState {
             })
             .collect();
         image::encode_shared(&mut out, &shared)?;
+        let mut policies = Vec::new();
+        for installed in self.policies() {
+            let mut encoded = Vec::new();
+            installed.policy.term().encode(&mut encoded)?;
+            policies.push((
+                installed.flow_type.as_slice(),
+                installed.generation,
+                encoded,
+            ));
+        }
+        image::encode_policies(&mut out, &policies)?;
         Some(out)
     }
 

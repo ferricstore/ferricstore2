@@ -17,6 +17,7 @@ pub mod many;
 pub mod meta;
 pub mod mutate;
 mod opts;
+pub mod policy;
 pub mod record;
 pub mod signal;
 pub mod start;
@@ -57,6 +58,10 @@ pub enum FlowCommand {
     Signal(Box<signal::Signal>),
     /// `FLOW.SPAWN_CHILDREN`.
     SpawnChildren(Box<children::SpawnChildren>),
+    /// `FLOW.POLICY.SET`.
+    PolicySet(Box<policy::PolicySet>),
+    /// `FLOW.POLICY.GET`.
+    PolicyGet(policy::PolicyGet),
 }
 
 impl FlowCommand {
@@ -78,7 +83,11 @@ impl FlowCommand {
             Self::StartAndClaim(start) => {
                 Some((&start.create.id, start.create.partition_key.as_deref()))
             }
-            Self::Many(_) | Self::ValueMget(_) | Self::RunSteps(_) => None,
+            Self::Many(_)
+            | Self::ValueMget(_)
+            | Self::RunSteps(_)
+            | Self::PolicySet(_)
+            | Self::PolicyGet(_) => None,
         }
     }
 }
@@ -99,6 +108,10 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.SPAWN_CHILDREN" => {
             children::parse(args).map(|spawn| FlowCommand::SpawnChildren(Box::new(spawn)))
         }
+        "FLOW.POLICY.SET" => {
+            policy::parse_set(args).map(|set| FlowCommand::PolicySet(Box::new(set)))
+        }
+        "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
         "FLOW.START_AND_CLAIM" => {
             start::parse_start(args).map(|start| FlowCommand::StartAndClaim(Box::new(start)))
         }
