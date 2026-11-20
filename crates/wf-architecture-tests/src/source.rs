@@ -84,6 +84,18 @@ pub(crate) fn check(source: &str, context: &Context<'_>) -> CheckResult<Vec<Stri
     Ok(visitor.violations)
 }
 
+/// ADR-012: a crate's combined test root `tests/main.rs` may load each of its
+/// own top-level modules from `<module>.rs` or `<module>/main.rs`.
+fn combined_root_path(module: &str, meta: &Meta) -> bool {
+    let Some(name) = module.strip_prefix("tests::main::") else {
+        return false;
+    };
+    !name.contains("::")
+        && matches!(meta, Meta::NameValue(value) if matches!(&value.value,
+            Expr::Lit(literal) if matches!(&literal.lit, Lit::Str(text)
+                if text.value() == format!("{name}.rs") || text.value() == format!("{name}/main.rs"))))
+}
+
 fn declared_module(item: &syn::Item) -> Option<String> {
     if let syn::Item::Mod(module) = item {
         Some(module.ident.to_string())
@@ -278,7 +290,12 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
             && matches!((&attribute.meta, approved),
             (Meta::NameValue(value), Some(path)) if matches!(&value.value,
                 Expr::Lit(literal) if matches!(&literal.lit, Lit::Str(text) if text.value() == path)));
-        if attribute.path().is_ident("path") && self.context.classification.runtime && !audited {
+        let combined = self.context.test_file && combined_root_path(&self.module, &attribute.meta);
+        if attribute.path().is_ident("path")
+            && self.context.classification.runtime
+            && !audited
+            && !combined
+        {
             self.report("module path redirection requires an audit gate");
         }
         syn::visit::visit_attribute(self, attribute);

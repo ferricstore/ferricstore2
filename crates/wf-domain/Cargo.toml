@@ -5,6 +5,8 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 repository.workspace = true
+# ADR-012: integration tests share one binary per crate (tests/main.rs).
+autotests = false
 
 [lints]
 workspace = true
@@ -19,3 +21,27 @@ harness = false
 [[bench]]
 name = "terminal_clone"
 harness = false
+
+[[test]]
+name = "wf_domain_tests"
+path = "tests/main.rs"
+
+[[test]]
+name = "fencing_retry"
+path = "tests/fencing_retry.rs"
+
+[[test]]
+name = "lease_and_guards"
+path = "tests/lease_and_guards.rs"
+
+[[test]]
+name = "lease_lifecycle"
+path = "tests/lease_lifecycle.rs"
+
+[[test]]
+name = "legacy_retry_guards"
+path = "tests/legacy_retry_guards.rs"
+
+[[test]]
+name = "retry_policy_transitions"
+path = "tests/retry_policy_transitions.rs"

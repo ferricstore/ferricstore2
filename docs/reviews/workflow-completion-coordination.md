@@ -64732,3 +64732,21 @@ size and on request, tail truncation, partial removal), 4 rotation tests,
 SIGKILL run with 1 KiB segments; both SIGKILL tests passed three repeated
 runs. Clippy, the ratchet and all 66 architecture tests pass.
 
+### ADR012-TEST-BINARIES1 compile-speed decision
+
+User request 2026-11-20: compile speed after the group-log gaps. Decision and
+measurements in ADR-012: combined `tests/main.rs` roots in five crates
+(134 -> 47 test binaries), explicit `[[test]]` entries for the targets kept
+separate, and line-tables-only dev debug info. New artifacts: the five
+`tests/main.rs` roots, `docs/adr/012-one-test-binary-per-crate.md` and
+`crates/wf-architecture-tests/src/tests/test_roots.rs`. No test file moved or
+changed.
+
+RED: `a_combined_test_root_loads_each_target_from_its_own_file` failed (every
+path attribute in a combined root was refused). GREEN after the narrow
+checker rule; its refusal cases (other file, other module, escaping or nested
+paths, production code, other roots) pass. Test lists for the five crates match
+by name before and after (1,667 tests). A first attempt also combined the five
+`wf-domain` targets that include the shared support modules; Clippy's
+`duplicate_mod` refused it and they stay separate.
+

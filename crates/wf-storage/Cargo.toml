@@ -5,6 +5,8 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 repository.workspace = true
+# ADR-012: integration tests share one binary per crate (tests/main.rs).
+autotests = false
 
 [lints]
 workspace = true
@@ -15,3 +17,19 @@ wf-domain.workspace = true
 wf-ports.workspace = true
 redb.workspace = true
 sha2.workspace = true
+
+[[test]]
+name = "wf_storage_tests"
+path = "tests/main.rs"
+
+[[test]]
+name = "durable_log"
+path = "tests/durable_log/main.rs"
+
+[[test]]
+name = "group_log"
+path = "tests/group_log/main.rs"
+
+[[test]]
+name = "state_store"
+path = "tests/state_store/main.rs"

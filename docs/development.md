@@ -63,7 +63,10 @@ Rust `src` file and 600 per tooling/integration-test file, as recorded in
 
 Group related code by responsibility. A module with private children uses
 `feature.rs` and `feature/child.rs`; a multi-file Cargo integration target uses
-`tests/<target>/main.rs` with child modules beside it. Small cohesive modules
+`tests/<target>/main.rs` with child modules beside it. In crates with a
+combined `tests/main.rs` ([ADR-012](adr/012-one-test-binary-per-crate.md)), add
+the new target there with `#[path = "<target>/main.rs"] mod <target>;` so the
+suite stays one binary. Small cohesive modules
 can stay in one file; Rust does not require one file per type. This follows the
 [Rust Book's module layout](https://doc.rust-lang.org/book/ch07-05-separating-modules-into-different-files.html).
 Size limits include comments and blank lines. Before creating or moving files,

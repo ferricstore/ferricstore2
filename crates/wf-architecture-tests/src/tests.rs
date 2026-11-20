@@ -19,6 +19,7 @@ mod options;
 mod runtime_rules;
 mod source_pins;
 mod state_values;
+mod test_roots;
 
 fn root() -> CheckResult<PathBuf> {
     Ok(Path::new(env!("CARGO_MANIFEST_DIR"))

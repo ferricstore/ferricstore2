@@ -81,5 +81,13 @@ fallible_impl_from = "deny"
 stage = "m0-infrastructure"
 supported-feature-profiles = ["default"]
 
+[profile.dev]
+# Line tables keep panic and backtrace locations while cutting link time and
+# target size; dependencies carry no debug info (ADR-012).
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
 [profile.release]
 overflow-checks = true
