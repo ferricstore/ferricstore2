@@ -213,6 +213,20 @@ pub fn reduce_with_policy(
     reduce_profile(record, command, installed_policy, false)
 }
 
+/// Decides a command as the source's public mutation path does: a fresh
+/// policy retry derives its jitter from the source hash of the command
+/// instead of taking the supplied sample.
+///
+/// # Errors
+/// Returns source input/ownership errors or deterministic policy rejection.
+pub fn reduce_public(
+    record: Option<&WorkflowRecord>,
+    command: &CommittedCommand,
+    installed_policy: Option<&InstalledRetryPolicy>,
+) -> Result<TransitionPlan, DomainError> {
+    reduce_profile(record, command, installed_policy, true)
+}
+
 fn reduce_profile(
     record: Option<&WorkflowRecord>,
     command: &CommittedCommand,

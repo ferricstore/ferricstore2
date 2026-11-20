@@ -71,6 +71,12 @@ pub(crate) enum Request {
         items: Vec<(usize, CompleteFlow, Partition)>,
         done: Done<Vec<(usize, ItemOutcome)>>,
     },
+    /// A batch's mutations on this shard; all or nothing when `atomic`.
+    FlowBatch {
+        items: state::BatchItems,
+        atomic: bool,
+        done: Done<state::BatchReplies>,
+    },
     /// Any other Flow command, for the Flow in `partition` (ADR-014).
     Flow {
         command: Box<FlowCommand>,
@@ -172,6 +178,15 @@ fn handle(
             let (result, change) = state.execute(now, *command, partition);
             logged.extend(change);
             Box::new(move |durable| done(durable.and(result)))
+        }
+        Request::FlowBatch {
+            items,
+            atomic,
+            done,
+        } => {
+            let (replies, changes) = state.mutate_batch(now, items, atomic);
+            logged.extend(changes);
+            Box::new(move |durable| done(durable.map(|()| replies)))
         }
         Request::Complete { items, done } => {
             let outcomes: Vec<(usize, ItemOutcome)> = items

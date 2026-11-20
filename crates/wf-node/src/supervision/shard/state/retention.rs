@@ -18,6 +18,9 @@ fn terminal(entry: &Entry) -> bool {
 
 impl ShardState {
     fn removal_slot(&self, entry: &Entry) -> Option<(u64, u64)> {
+        if let Some(until) = entry.meta.as_ref().and_then(|meta| meta.terminal_until) {
+            return terminal(entry).then_some((until, entry.sequence));
+        }
         terminal(entry).then(|| {
             (
                 entry.record.updated_at().get().saturating_add(

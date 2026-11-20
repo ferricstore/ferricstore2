@@ -72,14 +72,6 @@ fn batch_reply(
     reply.send(0, &response::item_outcomes(&items).unwrap_or_default());
 }
 
-fn single_reply(reply: ReplyTo, result: Result<Vec<ItemOutcome>, ServiceError>) {
-    match result.map(|outcomes| outcomes.into_iter().next()) {
-        Ok(Some(Ok(()))) => reply.send(0, &response::ok_text(b"OK").unwrap_or_default()),
-        Ok(Some(Err(error))) | Err(error) => refuse(reply, &error.to_string()),
-        Ok(None) => refuse(reply, &ServiceError::Unavailable.to_string()),
-    }
-}
-
 pub(super) fn create_many(
     context: &Context,
     negotiated: Negotiated,
@@ -286,24 +278,5 @@ pub(super) fn complete_many(
     context.service.complete(
         completions,
         Box::new(move |result| batch_reply(reply, result, single_ok, compact)),
-    );
-}
-
-pub(super) fn complete(context: &Context, body: &[u8], reply: ReplyTo) {
-    let parsed = match request::complete(body) {
-        Ok(parsed) => parsed,
-        Err(error) => return refuse(reply, error.message()),
-    };
-    let Some(completion) = completion(
-        parsed.id,
-        parsed.partition_key,
-        parsed.lease_token,
-        parsed.fencing_token,
-    ) else {
-        return refuse(reply, "ERR flow fencing_token must not be negative");
-    };
-    context.service.complete(
-        vec![completion],
-        Box::new(move |result| single_reply(reply, result)),
     );
 }

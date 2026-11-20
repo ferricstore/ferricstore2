@@ -118,8 +118,7 @@ pub(super) fn handle(
         Some(Opcode::FlowCreateMany) => {
             translate::create_many(context, *negotiated, header, body, reply);
         }
-        Some(Opcode::FlowCreate) => generic::flow(context, "FLOW.CREATE", body, reply),
-        Some(Opcode::FlowGet) => generic::flow(context, "FLOW.GET", body, reply),
+        Some(Opcode::Flow(name)) => generic::flow(context, name, header.flags, body, reply),
         Some(Opcode::FlowClaimDue) if header.flags & FLAG_CUSTOM_PAYLOAD == 0 => {
             generic::claim(context, "FLOW.CLAIM_DUE", body, reply);
         }
@@ -127,10 +126,12 @@ pub(super) fn handle(
             translate::claim_due(context, *negotiated, header, body, reply);
         }
         Some(Opcode::FlowReclaim) => generic::claim(context, "FLOW.RECLAIM", body, reply),
+        Some(Opcode::FlowCompleteMany) if header.flags & FLAG_CUSTOM_PAYLOAD == 0 => {
+            generic::flow(context, "FLOW.COMPLETE_MANY", header.flags, body, reply);
+        }
         Some(Opcode::FlowCompleteMany) => {
             translate::complete_many(context, *negotiated, header, body, reply);
         }
-        Some(Opcode::FlowComplete) => translate::complete(context, body, reply),
         None => refuse(
             reply,
             &format!(

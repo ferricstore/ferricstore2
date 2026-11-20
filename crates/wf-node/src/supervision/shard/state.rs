@@ -12,9 +12,11 @@
 mod capture;
 mod claim;
 mod flow;
+mod mutate;
 mod retention;
 
 pub(crate) use claim::Peeked;
+pub(crate) use mutate::{BatchItems, BatchReplies};
 
 use std::collections::{BTreeMap, HashMap};
 

@@ -46,6 +46,36 @@ fn key(kind: &str, raw: &[u8]) -> Result<String, FlowError> {
     }
 }
 
+/// An attribute name to delete, normalized as a key.
+///
+/// # Errors
+/// The Elixir server's refusal text for an invalid key.
+pub fn attribute_key(raw: &[u8]) -> Result<String, FlowError> {
+    key("attribute", raw)
+}
+
+/// Applies a merge and a delete to attributes, checking the totals again.
+///
+/// # Errors
+/// The Elixir server's refusal text when the result is too large.
+pub fn update_attributes(
+    current: &Attributes,
+    merge: &Attributes,
+    delete: &[String],
+) -> Result<Attributes, FlowError> {
+    let mut updated = current.clone();
+    updated.extend(
+        merge
+            .iter()
+            .map(|(name, value)| (name.clone(), value.clone())),
+    );
+    for name in delete {
+        updated.remove(name);
+    }
+    let as_term = attributes_term(&updated);
+    attributes(Some(&as_term))
+}
+
 fn scalar(kind: &str, value: &Term) -> Result<Term, FlowError> {
     match value {
         Term::Bin(bytes) if bytes.len() > MAX_VALUE_BYTES => {

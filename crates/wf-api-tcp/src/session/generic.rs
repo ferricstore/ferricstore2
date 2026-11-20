@@ -42,9 +42,15 @@ fn send(reply: ReplyTo, term: &flow::Term) {
     }
 }
 
-/// Runs command `name` with a typed-map `body`.
-pub(super) fn flow(context: &Context, name: &str, body: &[u8], reply: ReplyTo) {
-    let args = match request::options(name, body) {
+/// Runs command `name` with a typed-map body, or a compact batch body when
+/// `flags` say so.
+pub(super) fn flow(context: &Context, name: &str, flags: u8, body: &[u8], reply: ReplyTo) {
+    let decoded = if request::is_compact(flags) {
+        request::many_options(name, body)
+    } else {
+        request::options(name, body)
+    };
+    let args = match decoded {
         Ok(args) => args,
         Err(error) => return refuse(reply, error.message()),
     };

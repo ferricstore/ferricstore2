@@ -83,3 +83,41 @@ fn reclaim_claims_running_flows_as_records() -> TestResult {
     assert_eq!(reply.body, ok(&Typed::List(vec![record]))?);
     Ok(())
 }
+
+#[test]
+fn every_single_flow_mutation_opcode_reaches_the_service() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let guard = [
+        ("lease_token", bin("w:1:1")),
+        ("fencing_token", Typed::Int(1)),
+    ];
+    let states = [("from_state", bin("a")), ("to_state", bin("b"))];
+    for (opcode, id, extra) in [
+        (0x0204_u16, "complete", &[][..]),
+        (0x0205, "transition", &states[..]),
+        (0x0206, "retry", &[][..]),
+        (0x0207, "fail", &[][..]),
+        (0x0208, "cancel", &[][..]),
+        (0x0209, "extend", &[][..]),
+        (0x0222, "step", &states[..]),
+    ] {
+        let mut entries = vec![("id", bin(id))];
+        entries.extend(guard.iter().cloned());
+        entries.extend(extra.iter().cloned());
+        let reply = client.call(opcode, 1, 0, &encode(&map(&entries))?)?;
+        // The scripted service answers a mutation with its Flow id.
+        assert_eq!(reply.body, ok(&bin(id))?, "opcode {opcode:#06x}");
+    }
+    let stale = encode(&map(&[
+        ("id", bin("stale1")),
+        ("lease_token", bin("w:1:1")),
+        ("fencing_token", Typed::Int(1)),
+    ]))?;
+    let refused = client.call(0x0206, 1, 0, &stale)?;
+    assert_eq!(
+        refused.body,
+        wf_api_tcp::response::error(wf_api_tcp::response::STATUS_ERROR, "ERR stale flow lease")?
+    );
+    Ok(())
+}

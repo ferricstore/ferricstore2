@@ -3,7 +3,8 @@
 //! Layout: lineage ids as optional binaries, retention, the active-time
 //! limit (`0` none, `1` milliseconds, `2` infinity), history caps,
 //! attributes and state metadata as [`Term`] maps, named values (count, then
-//! name, version and bytes), then the payload, result and error versions.
+//! name, version and bytes), the payload, result and error versions, then
+//! the terminal retention override and removal time as optional integers.
 
 use std::collections::BTreeMap;
 
@@ -12,7 +13,7 @@ use wf_application::commands::flow::create::MaxActive;
 use wf_application::commands::flow::meta::{Attributes, StateMeta};
 use wf_application::commands::flow::record::{FlowMeta, NamedValue};
 
-use super::super::command::{Malformed, Reader, bin, optional_bin};
+use super::super::command::{Malformed, Reader, bin, optional_bin, optional_u64};
 
 fn term(out: &mut Vec<u8>, value: &Term) -> Option<()> {
     value.encode(out)
@@ -69,6 +70,8 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
     ] {
         out.extend_from_slice(&version.to_be_bytes());
     }
+    optional_u64(out, meta.ttl_ms);
+    optional_u64(out, meta.terminal_until);
     Some(())
 }
 
@@ -130,5 +133,7 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
         payload_version: reader.u64()?,
         result_version: reader.u64()?,
         error_version: reader.u64()?,
+        ttl_ms: reader.optional_u64()?,
+        terminal_until: reader.optional_u64()?,
     })
 }

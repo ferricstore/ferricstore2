@@ -10,7 +10,9 @@ pub mod claim;
 pub mod create;
 pub mod get;
 pub mod keys;
+pub mod many;
 pub mod meta;
+pub mod mutate;
 mod opts;
 pub mod record;
 pub mod term;
@@ -31,15 +33,22 @@ pub enum FlowCommand {
     Create(Box<create::CreateFlow>),
     /// `FLOW.GET`.
     Get(get::GetFlow),
+    /// A single-Flow lifecycle mutation.
+    Mutate(Box<mutate::Mutation>),
+    /// A batch of lifecycle mutations.
+    Many(Box<many::ManyMutation>),
 }
 
 impl FlowCommand {
-    /// The Flow the command addresses: its id and explicit partition.
+    /// The one Flow the command addresses, its id and explicit partition;
+    /// `None` for a command over several Flows.
     #[must_use]
-    pub fn target(&self) -> (&[u8], Option<&[u8]>) {
+    pub fn target(&self) -> Option<(&[u8], Option<&[u8]>)> {
         match self {
-            Self::Create(create) => (&create.id, create.partition_key.as_deref()),
-            Self::Get(get) => (&get.id, get.partition_key.as_deref()),
+            Self::Create(create) => Some((&create.id, create.partition_key.as_deref())),
+            Self::Get(get) => Some((&get.id, get.partition_key.as_deref())),
+            Self::Mutate(mutation) => Some((&mutation.id, mutation.partition_key.as_deref())),
+            Self::Many(_) => None,
         }
     }
 }
@@ -53,6 +62,12 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
     match name {
         "FLOW.CREATE" => create::parse(args).map(|create| FlowCommand::Create(Box::new(create))),
         "FLOW.GET" => get::parse(args).map(FlowCommand::Get),
+        name if many::single(name).is_some() => {
+            many::parse(name, args).map(|batch| FlowCommand::Many(Box::new(batch)))
+        }
+        name if mutate::is_mutation(name) => {
+            mutate::parse(name, args).map(|mutation| FlowCommand::Mutate(Box::new(mutation)))
+        }
         _ => Err(FlowError::rejected(format!(
             "ERR {name} is not supported by this server"
         ))),

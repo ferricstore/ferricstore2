@@ -37,32 +37,42 @@ pub enum Opcode {
     Options,
     /// Connection start.
     Startup,
-    /// `FLOW.CREATE` with a typed-map body.
-    FlowCreate,
     /// `FLOW.CLAIM_DUE` with a compact or typed-map body.
     FlowClaimDue,
-    /// `FLOW.COMPLETE` with a typed-map body.
-    FlowComplete,
     /// `FLOW.CREATE_MANY` with a typed-map body.
     FlowCreateMany,
     /// `FLOW.COMPLETE_MANY` with a compact body.
     FlowCompleteMany,
-    /// `FLOW.GET` with a typed-map body.
-    FlowGet,
     /// `FLOW.RECLAIM` with a typed-map body.
     FlowReclaim,
+    /// Any other Flow command with a typed-map body, by name (ADR-014).
+    Flow(&'static str),
 }
 
-const OPCODES: [(Opcode, u16); 12] = [
+/// Flow commands whose typed-map body the application reads (ADR-014).
+const FLOW_COMMANDS: [(&str, u16); 13] = [
+    ("FLOW.CREATE", 0x0201),
+    ("FLOW.GET", 0x0202),
+    ("FLOW.COMPLETE", 0x0204),
+    ("FLOW.TRANSITION", 0x0205),
+    ("FLOW.RETRY", 0x0206),
+    ("FLOW.FAIL", 0x0207),
+    ("FLOW.CANCEL", 0x0208),
+    ("FLOW.EXTEND_LEASE", 0x0209),
+    ("FLOW.TRANSITION_MANY", 0x0211),
+    ("FLOW.RETRY_MANY", 0x0212),
+    ("FLOW.FAIL_MANY", 0x0213),
+    ("FLOW.CANCEL_MANY", 0x0214),
+    ("FLOW.STEP_CONTINUE", 0x0222),
+];
+
+const OPCODES: [(Opcode, u16); 9] = [
     (Opcode::Hello, 0x0001),
     (Opcode::Ping, 0x0003),
     (Opcode::Quit, 0x0009),
     (Opcode::Options, 0x000B),
     (Opcode::Startup, 0x000C),
-    (Opcode::FlowCreate, 0x0201),
-    (Opcode::FlowGet, 0x0202),
     (Opcode::FlowClaimDue, 0x0203),
-    (Opcode::FlowComplete, 0x0204),
     (Opcode::FlowCreateMany, 0x020F),
     (Opcode::FlowCompleteMany, 0x0210),
     (Opcode::FlowReclaim, 0x0215),
@@ -72,6 +82,12 @@ impl Opcode {
     /// The native protocol code.
     #[must_use]
     pub fn code(self) -> u16 {
+        if let Self::Flow(name) = self {
+            return FLOW_COMMANDS
+                .iter()
+                .find(|(known, _)| *known == name)
+                .map_or(0, |(_, code)| *code);
+        }
         OPCODES
             .iter()
             .find(|(opcode, _)| *opcode == self)
@@ -85,6 +101,12 @@ impl Opcode {
             .iter()
             .find(|(_, known)| *known == code)
             .map(|(opcode, _)| *opcode)
+            .or_else(|| {
+                FLOW_COMMANDS
+                    .iter()
+                    .find(|(_, known)| *known == code)
+                    .map(|(name, _)| Self::Flow(name))
+            })
     }
 }
 

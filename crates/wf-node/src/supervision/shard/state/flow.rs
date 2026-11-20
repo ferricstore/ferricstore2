@@ -43,6 +43,9 @@ impl ShardState {
                 self.create_flow(now, *create, partition)
             }
             FlowCommand::Get(get) => (Ok(self.get_flow(&get, partition)), None),
+            FlowCommand::Mutate(mutation) => self.mutate(now, &mutation, partition),
+            // Batches are split over shards before they reach one.
+            FlowCommand::Many(_) => (Err(ServiceError::Unavailable), None),
         }
     }
 
@@ -56,7 +59,7 @@ impl ShardState {
     }
 
     /// The default fields of a Flow made by the queue fast path.
-    fn defaults(&self) -> FlowMeta {
+    pub(super) fn defaults(&self) -> FlowMeta {
         FlowMeta {
             retention_ttl_ms: self.retention_ms,
             ..FlowMeta::default()
@@ -81,7 +84,7 @@ impl ShardState {
     }
 
     /// Logs the stored Flow under `key` as its after-image.
-    fn after_image(&self, key: &Key) -> Result<Logged, ServiceError> {
+    pub(super) fn after_image(&self, key: &Key) -> Result<Logged, ServiceError> {
         let entry = self.records.get(key).ok_or(ServiceError::Unavailable)?;
         let image = image::encode_one(
             &key.0,

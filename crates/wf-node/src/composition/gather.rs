@@ -2,17 +2,17 @@
 
 use std::sync::{Mutex, PoisonError};
 
-use wf_application::commands::queue::{ItemOutcome, Reply, ServiceError};
+use wf_application::commands::queue::{Reply, ServiceError};
 
-struct Items {
+struct Items<T> {
     remaining: usize,
-    outcomes: Vec<Option<ItemOutcome>>,
+    outcomes: Vec<Option<T>>,
     failure: Option<ServiceError>,
-    reply: Option<Reply<Vec<ItemOutcome>>>,
+    reply: Option<Reply<Vec<T>>>,
 }
 
-impl Items {
-    fn place(&mut self, position: usize, outcome: ItemOutcome) {
+impl<T> Items<T> {
+    fn place(&mut self, position: usize, outcome: T) {
         if let Some(slot) = self.outcomes.get_mut(position) {
             *slot = Some(outcome);
         }
@@ -20,20 +20,20 @@ impl Items {
 }
 
 /// Per-item outcomes from several shards, put back in request order.
-pub(crate) struct ItemGather(Mutex<Items>);
+pub(crate) struct ItemGather<T>(Mutex<Items<T>>);
 
-impl ItemGather {
-    pub(crate) fn new(items: usize, parts: usize, reply: Reply<Vec<ItemOutcome>>) -> Self {
+impl<T> ItemGather<T> {
+    pub(crate) fn new(items: usize, parts: usize, reply: Reply<Vec<T>>) -> Self {
         Self(Mutex::new(Items {
             remaining: parts,
-            outcomes: vec![None; items],
+            outcomes: (0..items).map(|_| None).collect(),
             failure: None,
             reply: Some(reply),
         }))
     }
 
     /// Records one shard's part; the last part sends the reply.
-    pub(crate) fn part(&self, result: Result<Vec<(usize, ItemOutcome)>, ServiceError>) {
+    pub(crate) fn part(&self, result: Result<Vec<(usize, T)>, ServiceError>) {
         let mut items = self.0.lock().unwrap_or_else(PoisonError::into_inner);
         match result {
             Ok(outcomes) => {

@@ -101,3 +101,20 @@ Each step is one commit with its tests.
   Elixir. The differential probe matched Elixir on 16 of 16 commands; the
   SDK integration suite went from 7 to 11 passing, including both
   claim-record contract tests.
+- Step 3: `FLOW.TRANSITION`, `STEP_CONTINUE`, `RETRY`, `COMPLETE` (typed),
+  `FAIL`, `CANCEL` and `EXTEND_LEASE`, and `FLOW.COMPLETE_MANY` (typed),
+  `TRANSITION_MANY`, `RETRY_MANY`, `FAIL_MANY` and `CANCEL_MANY` in typed and
+  compact forms. The domain reducer decides each change (`reduce_public`, so
+  a retry without `run_at_ms` gets Elixir's policy timing and jitter); the
+  node applies attribute and state-metadata updates, named values, value
+  reference versions (the record version that wrote each value) and the
+  removal time of a Flow that became terminal (the shard's clock plus its
+  retention, as Elixir uses its own clock there). A batch in one named
+  partition that is not independent is all or nothing: the shard puts back
+  the Flows it changed when an item fails and logs nothing. Independent and
+  `MIXED` batches decide each item. The single-mutation probe matched Elixir
+  on 33 of 38 commands (the rest: removal times taken at different moments,
+  and two internal counters Elixir's `EXTEND_LEASE` reply leaks); the batch
+  scenario, run through the SDK's own `_many` methods, matched exactly. The
+  SDK suite passes 19 (was 11). Mutations that carry `state_meta` are sent
+  by the SDK through the command-exec opcode, which comes later.

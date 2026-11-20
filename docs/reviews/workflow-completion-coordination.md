@@ -64980,3 +64980,36 @@ named-partition Flows and claimed without a partition; it now claims with
 `ANY`, as an Elixir client must. The probe matched 16 of 16; the SDK suite
 passes 11 (was 7). Clippy, the ratchet, lint tests, docs and architecture
 pass.
+
+### ADR014-MUTATE1 lifecycle mutations and their batches
+
+New artifacts (solo design review): `wf_application::commands::flow::
+{mutate, many}` (`Mutation`, `Change`, `ManyMutation`, `parse`, `reply`,
+`single`, `is_mutation`), `meta::{attribute_key, update_attributes}`,
+`FlowMeta::{ttl_ms, terminal_until}`, `FlowCommand::{Mutate, Many}`
+(`target` now optional); `wf_domain::workflow::reduce_public` (the
+public-profile reducer that derives Elixir's retry jitter, previously only
+reachable through the indexed batch API). In `wf-node`:
+`supervision::shard::state::mutate` (single mutations, atomic batches with
+rollback), `Request::FlowBatch`, generic `composition::gather::ItemGather`,
+batch routing in `composition::flow`. In `wf-api-tcp`:
+`request::compact_many` (compact batch bodies read into the typed options
+map), table-driven `Opcode::Flow(name)` for every generic command (0x0201,
+0x0202, 0x0204 to 0x0209, 0x0211 to 0x0214, 0x0222); typed
+`FLOW.COMPLETE_MANY` takes the generic path, compact stays on the fast path.
+No dependency or policy change.
+
+RED: the single-mutation probe matched Elixir on 6 of 38 commands (every
+mutation opcode refused); the session test
+`every_single_flow_mutation_opcode_reaches_the_service` failed (0x0205 to
+0x0209 and 0x0222 refused); the SDK suite failed 17 times on 0x0212 and twice
+on 0x0211. The node tests in `flow_mutate` were written after the node code
+and are not claimed as TDD. GREEN: 3 node tests (every lifecycle mutation
+with attributes, priority, the cancel reason's reference version and the
+removal time; step-continue tokens and explicit retry timing; an atomic batch
+changing nothing on a stale item, an independent one changing the good item,
+kept across a restart with 2 shards), all 41 node tests, the TCP adapter and
+application tests pass. The probe matched 33 of 38 (the other 5 explained in
+ADR-014), the batch scenario through the SDK matched exactly, and the SDK
+suite passes 19 of 60 (was 11). Clippy, the ratchet, lint tests, docs and
+architecture pass.

@@ -119,6 +119,17 @@ impl FlowService for Scripted {
                 ServiceError::rejected("ERR flow already exists".to_owned()),
             )),
             FlowCommand::Create(_) => reply(Ok(Term::text("OK"))),
+            FlowCommand::Mutate(mutation) if mutation.id.starts_with(b"stale") => {
+                reply(Err(ServiceError::Domain(DomainError::StaleLease)));
+            }
+            FlowCommand::Mutate(mutation) => reply(Ok(Term::Bin(mutation.id))),
+            FlowCommand::Many(batch) => reply(Ok(Term::List(
+                batch
+                    .items
+                    .into_iter()
+                    .map(|mutation| Term::Bin(mutation.id))
+                    .collect(),
+            ))),
             FlowCommand::Get(get) if get.id.starts_with(b"none") => reply(Ok(Term::Nil)),
             FlowCommand::Get(get) => reply(Ok(Term::Map(vec![
                 (b"id".to_vec(), Term::Bin(get.id)),

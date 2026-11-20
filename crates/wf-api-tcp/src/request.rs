@@ -6,12 +6,14 @@
 //! application.
 
 mod compact;
+mod compact_many;
 mod term;
 mod typed;
 
 use std::fmt;
 
 pub use compact::{claim_due, complete_many};
+pub use compact_many::{is_compact, many_options};
 pub use term::options;
 pub use typed::{complete, create, create_many, startup};
 

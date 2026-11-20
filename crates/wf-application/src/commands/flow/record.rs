@@ -57,6 +57,10 @@ pub struct FlowMeta {
     pub result_version: u64,
     /// Version of the error reference.
     pub error_version: u64,
+    /// Retention set by the terminal command, if any.
+    pub ttl_ms: Option<u64>,
+    /// When a terminal Flow is removed, set when it became terminal.
+    pub terminal_until: Option<u64>,
 }
 
 impl Default for FlowMeta {
@@ -76,6 +80,8 @@ impl Default for FlowMeta {
             payload_version: 1,
             result_version: 1,
             error_version: 1,
+            ttl_ms: None,
+            terminal_until: None,
         }
     }
 }
@@ -196,11 +202,17 @@ impl View<'_> {
     /// When a terminal Flow is removed.
     #[must_use]
     pub fn terminal_retention_until(&self) -> Option<u64> {
-        matches!(
+        let terminal = matches!(
             self.record.status(),
             WorkflowStatus::Completed | WorkflowStatus::Failed | WorkflowStatus::Cancelled
-        )
-        .then(|| {
+        );
+        if !terminal {
+            return None;
+        }
+        if let Some(until) = self.meta.terminal_until {
+            return Some(until);
+        }
+        Some({
             self.record
                 .updated_at()
                 .get()
@@ -324,7 +336,7 @@ impl View<'_> {
                 Term::int(meta.history_hot_max_events),
             ),
             ("history_max_events", Term::int(meta.history_max_events)),
-            ("ttl_ms", Term::Nil),
+            ("ttl_ms", Term::optional_int(meta.ttl_ms)),
         ]);
     }
 

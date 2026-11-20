@@ -154,7 +154,7 @@ fn unsupported_commands_and_flags_are_refused_explicitly() -> TestResult {
     let running = start()?;
     let mut client = Client::connect(&running)?;
     let (status, value) =
-        super::typed::reply(&client.call(0x0205, 1, 0, &encode(&map(&[]))?)?.body)?;
+        super::typed::reply(&client.call(0x0100, 1, 0, &encode(&map(&[]))?)?.body)?;
     assert_eq!(status, STATUS_ERROR);
     let message = super::typed::at(&value, &["message"])?;
     assert!(
