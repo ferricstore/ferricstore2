@@ -17,6 +17,7 @@ use wf_node::composition::{QueueNode, QueueNodeConfig};
 
 mod blocking;
 mod crash;
+mod flow_claim;
 mod flow_record;
 mod lifecycle;
 mod reclaim;
@@ -85,15 +86,18 @@ fn create(node: &QueueNode, ids: &[&str]) -> TestResult<Vec<ItemOutcome>> {
 fn claim_request(limit: usize) -> ClaimFlows {
     ClaimFlows {
         flow_type: b"jobs".to_vec(),
-        state: Some(b"queued".to_vec()),
+        states: vec![b"queued".to_vec()],
         worker: b"w1".to_vec(),
         lease_ms: 30_000,
         limit,
         priority: None,
         partitions: None,
+        any_partition: false,
         reclaim: None,
         block_ms: None,
         cancellation: None,
+        now_ms: None,
+        records: None,
     }
 }
 

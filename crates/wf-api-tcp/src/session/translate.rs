@@ -6,6 +6,7 @@
 //! item failed, a list of `ok` or `[error, message]` per item. Options the
 //! service does not implement are refused by name.
 
+use wf_application::commands::flow::claim;
 use wf_application::commands::queue::{
     ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, NewFlow, ServiceError,
 };
@@ -211,22 +212,25 @@ pub(super) fn claim_due(
             "ERR FLOW.CLAIM_DUE needs a limit of 1 to 10000, a positive lease_ms and a priority of 0 to 2",
         );
     };
-    let partitions = match parsed.partitions {
-        Partitions::Any => None,
-        Partitions::One(partition) => Some(vec![partition]),
-        Partitions::Many(partitions) => Some(partitions),
+    let (partitions, any_partition) = match parsed.partitions {
+        Partitions::Any => (None, false),
+        Partitions::One(partition) => claim::scope(Some(&partition)),
+        Partitions::Many(partitions) => (Some(partitions), false),
     };
     let request = ClaimFlows {
         flow_type: parsed.flow_type,
-        state: parsed.state,
+        states: parsed.state.into_iter().collect(),
         worker: parsed.worker,
         lease_ms,
         limit,
         priority,
         partitions,
+        any_partition,
         reclaim: parsed.reclaim_expired.then_some(ratio),
         block_ms,
         cancellation: block_ms.map(|_| context.closed.clone()),
+        now_ms: None,
+        records: None,
     };
     let (shape, compact) = (parsed.shape, negotiated.claim_jobs);
     context.service.claim(

@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 use wf_application::commands::flow::create::CreateFlow;
 use wf_application::commands::flow::get::GetFlow;
 use wf_application::commands::flow::meta::{self, StateMeta};
-use wf_application::commands::flow::record::{FlowMeta, NamedValue, View};
+use wf_application::commands::flow::record::{FlowMeta, Include, NamedValue, View};
 use wf_application::commands::flow::{FlowCommand, Term};
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::workflow::{self, CommittedCommand, Create, Operation};
@@ -61,6 +61,13 @@ impl ShardState {
             retention_ttl_ms: self.retention_ms,
             ..FlowMeta::default()
         }
+    }
+
+    /// The reply map of the Flow under `key`, if stored.
+    pub(super) fn record_term(&self, key: &Key, include: &Include) -> Option<Term> {
+        let defaults = self.defaults();
+        let (key, entry) = self.records.get_key_value(key)?;
+        Some(Self::view(key, entry, &defaults).term(include))
     }
 
     fn get_flow(&self, get: &GetFlow, partition: Partition) -> Term {

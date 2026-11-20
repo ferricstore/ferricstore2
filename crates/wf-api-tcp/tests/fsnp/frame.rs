@@ -76,6 +76,7 @@ fn opcode_codes_match_the_native_protocol() {
         (Opcode::FlowComplete, 0x0204),
         (Opcode::FlowCreateMany, 0x020F),
         (Opcode::FlowCompleteMany, 0x0210),
+        (Opcode::FlowReclaim, 0x0215),
     ] {
         assert_eq!(opcode.code(), code);
         assert_eq!(Opcode::from_code(code), Some(opcode));

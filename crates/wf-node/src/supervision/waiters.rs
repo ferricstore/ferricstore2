@@ -39,8 +39,8 @@ pub(crate) enum Wake {
 /// A blocking claim that found nothing.
 pub(crate) struct Parked {
     pub(crate) flow_type: Vec<u8>,
-    /// Required state; any state when absent.
-    pub(crate) state: Option<Vec<u8>>,
+    /// Allowed states; any state when empty.
+    pub(crate) states: Vec<Vec<u8>>,
     /// Required priority; any priority when absent.
     pub(crate) priority: Option<u8>,
     /// The epoch read before the attempt that found nothing.
@@ -63,10 +63,7 @@ impl Parked {
 
     fn matches(&self, arrival: &Arrival) -> bool {
         self.flow_type == arrival.flow_type
-            && self
-                .state
-                .as_ref()
-                .is_none_or(|state| *state == arrival.state)
+            && (self.states.is_empty() || self.states.contains(&arrival.state))
             && self
                 .priority
                 .is_none_or(|priority| priority == arrival.priority)

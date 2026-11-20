@@ -87,3 +87,17 @@ Each step is one commit with its tests.
   every option, idempotent retries and conflicts, reads with values, missing
   Flows, 8 invalid options) gave identical replies for 20; the 21st differs
   only in the wall-clock time of a create sent without `now_ms`.
+- Step 2: typed-map `FLOW.CLAIM_DUE` (a body without the custom-payload
+  flag) and `FLOW.RECLAIM` read Elixir's options (states, worker, lease,
+  limit, priority, `now_ms`, return shape, payload and named values,
+  reclaim, partitions, `block_ms`) and reply in all six Elixir shapes:
+  records (with payload, result and error up to `payload_max_bytes` and
+  their sizes, named values, attributes, state metadata), jobs, and the four
+  compact job lists. They use the multi-shard claim of ADR-013; claims are
+  decided at the client's `now_ms` when sent. Found while comparing: a claim
+  without a partition takes only auto-partition Flows in Elixir (`ANY` takes
+  every partition, `GLOBAL` the unpartitioned Flows the node never has). The
+  node had claimed from every partition on both paths; both now follow
+  Elixir. The differential probe matched Elixir on 16 of 16 commands; the
+  SDK integration suite went from 7 to 11 passing, including both
+  claim-record contract tests.

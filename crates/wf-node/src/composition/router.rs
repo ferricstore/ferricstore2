@@ -84,7 +84,7 @@ impl Router {
     /// Per shard, the indexed Flows the claim may take: due-indexed Flows,
     /// plus leased ones when it reclaims. Shards with none are left out.
     fn weights(&self, request: &ClaimFlows) -> Vec<(usize, u64)> {
-        let running = request.state.as_deref() == Some(b"running".as_slice());
+        let running = request.running_only();
         self.shards
             .iter()
             .enumerate()

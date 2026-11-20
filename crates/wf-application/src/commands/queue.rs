@@ -12,6 +12,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use wf_domain::value::DomainError;
 
+use super::flow::Term;
+use super::flow::record::Include;
+
 pub use crate::routing::{Partition, SLOTS, shard_for_slot};
 
 /// One Flow to create.
@@ -45,8 +48,9 @@ pub struct CreateFlows {
 pub struct ClaimFlows {
     /// Flow type.
     pub flow_type: Vec<u8>,
-    /// Required state; any state when absent.
-    pub state: Option<Vec<u8>>,
+    /// Allowed states; any state but `running` when empty. A claim for
+    /// `running` alone takes only expired leases.
+    pub states: Vec<Vec<u8>>,
     /// Claiming worker.
     pub worker: Vec<u8>,
     /// Lease length.
@@ -55,8 +59,12 @@ pub struct ClaimFlows {
     pub limit: usize,
     /// Only this priority; higher priorities first when absent.
     pub priority: Option<u8>,
-    /// Only these partitions; any partition when absent.
+    /// Only these partitions. When absent, auto partitions only (the
+    /// buckets of Flows created without one), unless `any_partition`.
     pub partitions: Option<Vec<Vec<u8>>>,
+    /// Without listed partitions, claim from every partition (Elixir's
+    /// `ANY`) instead of auto partitions only.
+    pub any_partition: bool,
     /// Also take Flows whose lease expired, with Elixir's `reclaim_ratio`
     /// (0 to 100): the percentage of the limit reclaimed before due Flows.
     /// No reclaim when absent. A claim for state `running` takes only
@@ -69,6 +77,29 @@ pub struct ClaimFlows {
     /// Set when the requester is gone; a waiting claim then replies with no
     /// Flows and takes nothing.
     pub cancellation: Option<Cancellation>,
+    /// The client's clock; claims are decided at it when sent, as in Elixir.
+    pub now_ms: Option<u64>,
+    /// Reply with each claimed Flow's record, including these extras
+    /// (ADR-014); jobs only when absent.
+    pub records: Option<Include>,
+}
+
+impl ClaimFlows {
+    /// Whether a Flow in `partition` is in the claim's scope; `listed` is
+    /// the parsed form of [`Self::partitions`].
+    #[must_use]
+    pub fn allows(&self, listed: Option<&[Partition]>, partition: &Partition) -> bool {
+        match listed {
+            Some(listed) => listed.contains(partition),
+            None => self.any_partition || matches!(partition, Partition::Auto(_)),
+        }
+    }
+
+    /// Whether the claim takes only expired leases.
+    #[must_use]
+    pub fn running_only(&self) -> bool {
+        matches!(self.states.as_slice(), [state] if state.as_slice() == b"running")
+    }
 }
 
 /// Cancels a waiting claim; clones share one flag.
@@ -103,7 +134,7 @@ impl PartialEq for Cancellation {
 impl Eq for Cancellation {}
 
 /// A claimed Flow as the client sees it.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ClaimedFlow {
     /// Flow id.
     pub id: Vec<u8>,
@@ -115,6 +146,8 @@ pub struct ClaimedFlow {
     pub fence: u64,
     /// Logical state the Flow was claimed from.
     pub run_state: Vec<u8>,
+    /// The claimed Flow's record, when the claim asked for records.
+    pub record: Option<Term>,
 }
 
 /// One completion.

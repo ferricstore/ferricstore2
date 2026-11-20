@@ -3,7 +3,7 @@
 use super::FlowError;
 use super::create::partition_key;
 use super::opts::Opts;
-use super::record::Include;
+use super::record::{Include, Values};
 use super::term::Term;
 
 const ALLOWED: &[&str] = &[
@@ -47,7 +47,8 @@ pub fn parse(args: &Term) -> Result<GetFlow, FlowError> {
             // Elixir accepts the flag on FLOW.GET and still returns only the
             // payload reference.
             payload: false,
-            values: opts.binary_list("values")?,
+            values: Values::Names(opts.binary_list("values")?),
+            ..Include::default()
         },
     })
 }

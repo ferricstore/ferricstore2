@@ -5,7 +5,7 @@ use std::sync::Arc;
 use wf_application::commands::flow::NodeService;
 use wf_application::commands::queue::Cancellation;
 
-use crate::frame::{FLAG_COMPRESSED, FLAG_MORE_CHUNKS, Header, Opcode};
+use crate::frame::{FLAG_COMPRESSED, FLAG_CUSTOM_PAYLOAD, FLAG_MORE_CHUNKS, Header, Opcode};
 use crate::request::{self, Startup};
 use crate::response::{self, COMPACT_CODECS, Handshake, STATUS_ERROR};
 
@@ -120,9 +120,13 @@ pub(super) fn handle(
         }
         Some(Opcode::FlowCreate) => generic::flow(context, "FLOW.CREATE", body, reply),
         Some(Opcode::FlowGet) => generic::flow(context, "FLOW.GET", body, reply),
+        Some(Opcode::FlowClaimDue) if header.flags & FLAG_CUSTOM_PAYLOAD == 0 => {
+            generic::claim(context, "FLOW.CLAIM_DUE", body, reply);
+        }
         Some(Opcode::FlowClaimDue) => {
             translate::claim_due(context, *negotiated, header, body, reply);
         }
+        Some(Opcode::FlowReclaim) => generic::claim(context, "FLOW.RECLAIM", body, reply),
         Some(Opcode::FlowCompleteMany) => {
             translate::complete_many(context, *negotiated, header, body, reply);
         }

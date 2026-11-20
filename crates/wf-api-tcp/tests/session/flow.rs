@@ -6,6 +6,8 @@ use super::typed::{Typed, bin, encode, map};
 use super::{Client, TestResult, start};
 
 const GET: u16 = 0x0202;
+const CLAIM_DUE: u16 = 0x0203;
+const RECLAIM: u16 = 0x0215;
 
 fn ok(value: &Typed) -> TestResult<Vec<u8>> {
     let mut body = 0_u16.to_be_bytes().to_vec();
@@ -41,5 +43,43 @@ fn flow_get_options_are_read_by_the_application() -> TestResult {
             "ERR FLOW.GET option bogus is not supported by this server"
         )?
     );
+    Ok(())
+}
+
+#[test]
+fn a_typed_map_claim_replies_in_the_requested_shape() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let request = encode(&map(&[
+        ("type", bin("jobs")),
+        ("worker", bin("w")),
+        ("return", bin("jobs_compact")),
+    ]))?;
+    let reply = client.call(CLAIM_DUE, 1, 0, &request)?;
+    let job = Typed::List(vec![
+        bin("f1"),
+        bin("__flow_auto__:7"),
+        bin("w:1:1"),
+        Typed::Int(1),
+    ]);
+    assert_eq!(reply.body, ok(&Typed::List(vec![job]))?);
+    Ok(())
+}
+
+#[test]
+fn reclaim_claims_running_flows_as_records() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let request = encode(&map(&[("type", bin("jobs")), ("worker", bin("w"))]))?;
+    let reply = client.call(RECLAIM, 1, 0, &request)?;
+    let record = map(&[
+        ("fencing_token", Typed::Int(1)),
+        ("id", bin("f1")),
+        ("lease_token", bin("w:1:1")),
+        ("partition_key", bin("__flow_auto__:7")),
+        ("state", bin("running")),
+    ]);
+    // The scripted service echoes the claimed states as the record's state.
+    assert_eq!(reply.body, ok(&Typed::List(vec![record]))?);
     Ok(())
 }

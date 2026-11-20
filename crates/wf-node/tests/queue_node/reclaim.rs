@@ -93,7 +93,7 @@ fn one_flow_prefers_a_due_flow_and_running_state_takes_only_expired() -> TestRes
     assert!(create(&node, &["b"])?.iter().all(Result::is_ok));
     wait_for_expiry();
     let running = ClaimFlows {
-        state: Some(b"running".to_vec()),
+        states: vec![b"running".to_vec()],
         ..claim_request(5)
     };
     let preferred = call(|reply| node.claim(reclaiming(1, 25), reply))??;

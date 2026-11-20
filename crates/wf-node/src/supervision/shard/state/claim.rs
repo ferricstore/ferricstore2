@@ -38,7 +38,7 @@ const DUE_SCAN: usize = 64;
 
 /// Index entries a request may take, in the order it takes them.
 fn modes(request: &ClaimFlows) -> &'static [Mode] {
-    if request.state.as_deref() == Some(RUNNING) {
+    if request.running_only() {
         &[Mode::Expired]
     } else if request.reclaim.is_some() {
         &[Mode::Due, Mode::Expired]
@@ -51,13 +51,18 @@ type Due = std::collections::BTreeMap<(u64, u64), Key>;
 
 /// The earliest due time after `now` in one queue, preferring an entry in
 /// an allowed partition among the first [`DUE_SCAN`].
-fn next_due(due: &Due, now: u64, partitions: Option<&[Partition]>) -> Option<u64> {
+fn next_due(
+    due: &Due,
+    now: u64,
+    request: &ClaimFlows,
+    partitions: Option<&[Partition]>,
+) -> Option<u64> {
     let mut later = due.range((now.saturating_add(1), 0)..);
     let first = later.clone().next().map(|((at, _), _)| *at)?;
     let allowed = later
         .by_ref()
         .take(DUE_SCAN)
-        .find(|(_, key)| partitions.is_none_or(|allowed| allowed.contains(&key.0)))
+        .find(|(_, key)| request.allows(partitions, &key.0))
         .map(|((at, _), _)| *at);
     Some(allowed.unwrap_or(first))
 }
@@ -83,6 +88,7 @@ impl ShardState {
         limit: usize,
         partitions: Option<&[Partition]>,
     ) -> Taken {
+        let now = request.now_ms.unwrap_or(now);
         let mut taken = Taken::default();
         let mut step = |state: &mut Self, mode: Mode, wanted: usize| {
             let room = limit.saturating_sub(taken.claimed.len()).min(wanted);
@@ -90,7 +96,7 @@ impl ShardState {
                 state.take(now, request, mode, room, partitions, &mut taken);
             }
         };
-        if request.state.as_deref() == Some(RUNNING) {
+        if request.running_only() {
             step(self, Mode::Expired, limit);
         } else {
             match request.reclaim {
@@ -118,6 +124,7 @@ impl ShardState {
         limit: usize,
         partitions: Option<&[Partition]>,
     ) -> Peeked {
+        let now = request.now_ms.unwrap_or(now);
         let mut available = 0_usize;
         let mut next: Option<u64> = None;
         for mode in modes(request) {
@@ -127,7 +134,7 @@ impl ShardState {
             );
             let earliest = self
                 .matching(request, *mode)
-                .filter_map(|(_, due)| next_due(due, now, partitions))
+                .filter_map(|(_, due)| next_due(due, now, request, partitions))
                 .min();
             next = match (next, earliest) {
                 (Some(earlier), Some(at)) => Some(earlier.min(at)),
@@ -153,10 +160,7 @@ impl ShardState {
                     Mode::Expired => running,
                     Mode::Due => {
                         !running
-                            && request
-                                .state
-                                .as_ref()
-                                .is_none_or(|state| *state == queue.state)
+                            && (request.states.is_empty() || request.states.contains(&queue.state))
                     }
                 }
                 && request
@@ -190,6 +194,10 @@ impl ShardState {
             if self.apply(&change) != Ok(Outcome::Changed) {
                 continue;
             }
+            let record = request
+                .records
+                .as_ref()
+                .and_then(|include| self.record_term(&key, include));
             if let Some(entry) = self.records.get(&key) {
                 taken.claimed.push(ClaimedFlow {
                     id: key.1.clone(),
@@ -205,6 +213,7 @@ impl ShardState {
                         .run_state()
                         .map(<[u8]>::to_vec)
                         .unwrap_or_default(),
+                    record,
                 });
                 taken.logged.push(change);
             }
@@ -226,7 +235,7 @@ impl ShardState {
         for (queue, due) in self.matching(request, mode) {
             let eligible = due
                 .range(..=(now, u64::MAX))
-                .filter(|(_, key)| partitions.is_none_or(|allowed| allowed.contains(&key.0)))
+                .filter(|(_, key)| request.allows(partitions, &key.0))
                 .take(limit)
                 .map(|(slot, key)| (Reverse(queue.priority), *slot, key));
             found.extend(eligible);

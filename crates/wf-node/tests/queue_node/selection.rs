@@ -4,8 +4,9 @@
 use std::collections::BTreeSet;
 
 use wf_application::commands::queue::{
-    CreateFlows, NewFlow, Partition, QueueService, shard_for_slot,
+    ClaimedFlow, CreateFlows, NewFlow, Partition, QueueService, shard_for_slot,
 };
+use wf_node::composition::QueueNode;
 
 use super::{TestResult, call, claim, claim_request, create, directory, open};
 
@@ -63,7 +64,7 @@ fn future_flows_other_states_and_lower_priorities_wait() -> TestResult {
         };
         assert_eq!(call(|reply| node.create(request, reply))??, vec![Ok(())]);
     }
-    let first = claim(&node, 1)?;
+    let first = claim_any(&node, 1)?;
     assert_eq!(
         first
             .iter()
@@ -75,13 +76,14 @@ fn future_flows_other_states_and_lower_priorities_wait() -> TestResult {
         first.first().map(|job| job.partition.as_slice()),
         Some(b"p".as_slice())
     );
-    let rest = claim(&node, 10)?;
+    let rest = claim_any(&node, 10)?;
     assert_eq!(
         rest.iter().map(|job| job.id.as_slice()).collect::<Vec<_>>(),
         vec![b"low".as_slice()]
     );
     let mut waiting = claim_request(10);
-    waiting.state = Some(b"waiting".to_vec());
+    waiting.any_partition = true;
+    waiting.states = vec![b"waiting".to_vec()];
     let other = call(|reply| node.claim(waiting, reply))??;
     assert_eq!(
         other
@@ -176,4 +178,12 @@ fn a_one_flow_claim_finds_a_due_flow_behind_later_flows() -> TestResult {
     drop(node);
     std::fs::remove_dir_all(directory)?;
     Ok(())
+}
+
+/// A claim across every partition, as Elixir's `ANY` (named partitions are
+/// outside a claim's default auto scope).
+fn claim_any(node: &QueueNode, limit: usize) -> TestResult<Vec<ClaimedFlow>> {
+    let mut request = claim_request(limit);
+    request.any_partition = true;
+    Ok(call(|reply| node.claim(request, reply))??)
 }

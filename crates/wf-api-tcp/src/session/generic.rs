@@ -2,13 +2,45 @@
 //! becomes the command's options, the application reads them, and the reply
 //! is the term the node answers with.
 
-use wf_application::commands::flow;
+use wf_application::commands::flow::{self, claim};
 
 use crate::request;
 use crate::response;
 
 use super::connection::ReplyTo;
 use super::dispatch::{Context, refuse};
+
+/// Runs a typed-map `FLOW.CLAIM_DUE` or `FLOW.RECLAIM`: claims of every
+/// shape go through the multi-shard claim, and the reply is built from the
+/// claimed records.
+pub(super) fn claim(context: &Context, name: &str, body: &[u8], reply: ReplyTo) {
+    let args = match request::options(name, body) {
+        Ok(args) => args,
+        Err(error) => return refuse(reply, error.message()),
+    };
+    let mut parsed = match claim::parse(name, &args) {
+        Ok(parsed) => parsed,
+        Err(error) => return refuse(reply, &error.to_string()),
+    };
+    if parsed.request.block_ms.is_some() {
+        parsed.request.cancellation = Some(context.closed.clone());
+    }
+    let shape = parsed.shape;
+    context.service.claim(
+        parsed.request,
+        Box::new(move |result| match result {
+            Ok(claimed) => send(reply, &claim::reply(shape, claimed)),
+            Err(error) => refuse(reply, &error.to_string()),
+        }),
+    );
+}
+
+fn send(reply: ReplyTo, term: &flow::Term) {
+    match response::term(term) {
+        Ok(body) => reply.send(0, &body),
+        Err(_) => refuse(reply, "ERR reply exceeds the frame limit"),
+    }
+}
 
 /// Runs command `name` with a typed-map `body`.
 pub(super) fn flow(context: &Context, name: &str, body: &[u8], reply: ReplyTo) {
@@ -23,10 +55,7 @@ pub(super) fn flow(context: &Context, name: &str, body: &[u8], reply: ReplyTo) {
     context.service.execute(
         command,
         Box::new(move |result| match result {
-            Ok(term) => match response::term(&term) {
-                Ok(body) => reply.send(0, &body),
-                Err(_) => refuse(reply, "ERR reply exceeds the frame limit"),
-            },
+            Ok(term) => send(reply, &term),
             Err(error) => refuse(reply, &error.to_string()),
         }),
     );

@@ -89,6 +89,15 @@ impl QueueService for Scripted {
             } else {
                 b"queued".to_vec()
             },
+            record: request.records.as_ref().map(|_| {
+                Term::Map(vec![
+                    (b"fencing_token".to_vec(), Term::Int(1)),
+                    (b"id".to_vec(), Term::text("f1")),
+                    (b"lease_token".to_vec(), Term::text("w:1:1")),
+                    (b"partition_key".to_vec(), Term::text("__flow_auto__:7")),
+                    (b"state".to_vec(), Term::Bin(request.states.concat())),
+                ])
+            }),
         };
         reply(Ok(vec![job].into_iter().take(request.limit).collect()));
     }

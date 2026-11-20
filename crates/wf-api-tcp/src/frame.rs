@@ -39,7 +39,7 @@ pub enum Opcode {
     Startup,
     /// `FLOW.CREATE` with a typed-map body.
     FlowCreate,
-    /// `FLOW.CLAIM_DUE` with a compact body.
+    /// `FLOW.CLAIM_DUE` with a compact or typed-map body.
     FlowClaimDue,
     /// `FLOW.COMPLETE` with a typed-map body.
     FlowComplete,
@@ -49,9 +49,11 @@ pub enum Opcode {
     FlowCompleteMany,
     /// `FLOW.GET` with a typed-map body.
     FlowGet,
+    /// `FLOW.RECLAIM` with a typed-map body.
+    FlowReclaim,
 }
 
-const OPCODES: [(Opcode, u16); 11] = [
+const OPCODES: [(Opcode, u16); 12] = [
     (Opcode::Hello, 0x0001),
     (Opcode::Ping, 0x0003),
     (Opcode::Quit, 0x0009),
@@ -63,6 +65,7 @@ const OPCODES: [(Opcode, u16); 11] = [
     (Opcode::FlowComplete, 0x0204),
     (Opcode::FlowCreateMany, 0x020F),
     (Opcode::FlowCompleteMany, 0x0210),
+    (Opcode::FlowReclaim, 0x0215),
 ];
 
 impl Opcode {

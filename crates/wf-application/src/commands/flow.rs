@@ -6,6 +6,7 @@
 //! shard that owns the Flow and replies with the [`Term`] the Elixir server
 //! would send.
 
+pub mod claim;
 pub mod create;
 pub mod get;
 pub mod keys;

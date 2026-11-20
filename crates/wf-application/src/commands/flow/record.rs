@@ -80,13 +80,41 @@ impl Default for FlowMeta {
     }
 }
 
-/// What a read asks to include besides the record.
+/// Elixir's default `payload_max_bytes`: 64 KiB.
+pub const DEFAULT_PAYLOAD_MAX_BYTES: u64 = 65_536;
+
+/// Which named values a read includes.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub enum Values {
+    /// None.
+    #[default]
+    None,
+    /// These names, where the Flow has them.
+    Names(Vec<Vec<u8>>),
+    /// Every named value.
+    All,
+}
+
+/// What a read asks to include besides the record.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Include {
-    /// The payload bytes, as `payload`.
+    /// The payload, result and error bytes with their sizes; a value above
+    /// `max_bytes` is reported as omitted with its size.
     pub payload: bool,
-    /// These named values, as `values`.
-    pub values: Vec<Vec<u8>>,
+    /// Largest value returned inline.
+    pub max_bytes: u64,
+    /// Named values, as `values`.
+    pub values: Values,
+}
+
+impl Default for Include {
+    fn default() -> Self {
+        Self {
+            payload: false,
+            max_bytes: DEFAULT_PAYLOAD_MAX_BYTES,
+            values: Values::None,
+        }
+    }
 }
 
 /// A stored Flow as one reply map.
@@ -99,6 +127,26 @@ pub struct View<'a> {
     pub priority: u8,
     /// Extra fields.
     pub meta: &'a FlowMeta,
+}
+
+/// Elixir's `ValueHydration.apply_value_result`: the value and its size, or
+/// its size and an omitted flag when it is above `max_bytes`.
+fn hydrate(entries: &mut Vec<(&str, Term)>, kind: &str, value: Option<&[u8]>, max_bytes: u64) {
+    let Some(value) = value else {
+        return;
+    };
+    let size = u64::try_from(value.len()).unwrap_or(u64::MAX);
+    let (field, size_field, omitted_field) = match kind {
+        "payload" => ("payload", "payload_size", "payload_omitted"),
+        "result" => ("result", "result_size", "result_omitted"),
+        _ => ("error", "error_size", "error_omitted"),
+    };
+    if size > max_bytes {
+        entries.push((omitted_field, Term::Bool(true)));
+    } else {
+        entries.push((field, Term::Bin(value.to_vec())));
+    }
+    entries.push((size_field, Term::int(size)));
 }
 
 fn ms(value: Option<TimestampMillis>) -> Term {
@@ -175,15 +223,22 @@ impl View<'_> {
             ("type", Term::Bin(record.workflow_type().to_vec())),
             ("version", Term::int(record.version())),
         ]);
-        if !include.values.is_empty() {
-            let values = include
+        let values: Vec<(Vec<u8>, Term)> = match &include.values {
+            Values::None => Vec::new(),
+            Values::All => meta
                 .values
+                .iter()
+                .map(|(name, value)| (name.clone(), Term::Bin(value.bytes.clone())))
+                .collect(),
+            Values::Names(names) => names
                 .iter()
                 .filter_map(|name| {
                     let value = meta.values.get(name)?;
                     Some((name.clone(), Term::Bin(value.bytes.clone())))
                 })
-                .collect();
+                .collect(),
+        };
+        if !values.is_empty() {
             entries.push(("values", Term::Map(values)));
         }
         self.lineage(&mut entries);
@@ -221,7 +276,13 @@ impl View<'_> {
             ),
         ]);
         if include.payload {
-            entries.push(("payload", Term::optional_bin(record.payload())));
+            for (kind, value) in [
+                ("payload", record.payload()),
+                ("result", record.result()),
+                ("error", record.error()),
+            ] {
+                hydrate(&mut entries, kind, value, include.max_bytes);
+            }
         }
         map(entries)
     }

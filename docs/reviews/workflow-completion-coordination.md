@@ -64952,3 +64952,31 @@ adapter tests pass; the differential probe matched Elixir on 20 of 21
 commands, the other differing only in wall-clock time. Clippy, the ratchet,
 lint tests, docs, architecture, reference and progress pass. From step 2 on,
 tests are written and seen failing first.
+
+### ADR014-CLAIM1 typed claims, FLOW.RECLAIM and claim partition scope
+
+New artifacts (solo design review): `wf_application::commands::flow::claim`
+(`parse`, `ParsedClaim`, `ClaimReturn`, `reply`, `scope`, `Scope`);
+`record::{Values, DEFAULT_PAYLOAD_MAX_BYTES}` and payload, result and error
+hydration in `record::View`. Contract changes: `ClaimFlows.state` became
+`states` (empty for any), and `ClaimFlows` gained `now_ms`, `records` and
+`any_partition` with `allows` and `running_only`; `ClaimedFlow` gained
+`record`; parked claims match a state list. In `wf-api-tcp`: a claim body
+without the custom-payload flag takes `session::generic::claim`; opcode
+`FlowReclaim` (0x0215). No dependency or policy change.
+
+RED: `tests/queue_node` did not compile (no `flow::claim`); the session
+tests `a_typed_map_claim_replies_in_the_requested_shape` and
+`reclaim_claims_running_flows_as_records` failed (typed claims refused as
+needing the compact payload, 0x0215 refused); the differential probe matched
+4 of 16 commands. With claims working,
+`a_claim_without_a_partition_takes_only_auto_partitions` failed (the node
+claimed a named-partition Flow that Elixir does not). GREEN: 5 claim tests
+(records at the client clock with payload, size, values, attributes and state
+metadata; reclaim of an expired lease only; six return shapes; six refusals
+with Elixir's text; partition scope), all 38 node tests and the TCP adapter
+tests pass. `future_flows_other_states_and_lower_priorities_wait` created
+named-partition Flows and claimed without a partition; it now claims with
+`ANY`, as an Elixir client must. The probe matched 16 of 16; the SDK suite
+passes 11 (was 7). Clippy, the ratchet, lint tests, docs and architecture
+pass.

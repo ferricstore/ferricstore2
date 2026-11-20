@@ -276,7 +276,7 @@ fn settle(router: &Router, run: Box<ClaimRun>) {
         .and_then(|ms| Instant::now().checked_add(Duration::from_millis(ms)));
     let parked = Parked {
         flow_type: run.request.flow_type.clone(),
-        state: run.request.state.clone(),
+        states: run.request.states.clone(),
         priority: run.request.priority,
         epoch: run.epoch,
         deadline,
