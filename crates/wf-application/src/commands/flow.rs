@@ -10,12 +10,14 @@ pub mod claim;
 pub mod create;
 pub mod get;
 pub mod history;
+pub mod json;
 pub mod keys;
 pub mod many;
 pub mod meta;
 pub mod mutate;
 mod opts;
 pub mod record;
+pub mod start;
 pub mod term;
 pub mod value;
 
@@ -45,6 +47,10 @@ pub enum FlowCommand {
     ValuePut(Box<value::ValuePut>),
     /// `FLOW.VALUE.MGET`.
     ValueMget(value::ValueMget),
+    /// `FLOW.START_AND_CLAIM`.
+    StartAndClaim(Box<start::StartAndClaim>),
+    /// `FLOW.RUN_STEPS_MANY`.
+    RunSteps(Box<start::RunSteps>),
 }
 
 impl FlowCommand {
@@ -61,7 +67,10 @@ impl FlowCommand {
                 .named
                 .as_ref()
                 .map(|(owner, _)| (owner.as_slice(), put.partition_key.as_deref())),
-            Self::Many(_) | Self::ValueMget(_) => None,
+            Self::StartAndClaim(start) => {
+                Some((&start.create.id, start.create.partition_key.as_deref()))
+            }
+            Self::Many(_) | Self::ValueMget(_) | Self::RunSteps(_) => None,
         }
     }
 }
@@ -78,6 +87,12 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.HISTORY" => history::parse(args).map(FlowCommand::History),
         "FLOW.VALUE.PUT" => value::parse_put(args).map(|put| FlowCommand::ValuePut(Box::new(put))),
         "FLOW.VALUE.MGET" => value::parse_mget(args).map(FlowCommand::ValueMget),
+        "FLOW.START_AND_CLAIM" => {
+            start::parse_start(args).map(|start| FlowCommand::StartAndClaim(Box::new(start)))
+        }
+        "FLOW.RUN_STEPS_MANY" => {
+            start::parse_run_steps(args).map(|steps| FlowCommand::RunSteps(Box::new(steps)))
+        }
         name if many::single(name).is_some() => {
             many::parse(name, args).map(|batch| FlowCommand::Many(Box::new(batch)))
         }

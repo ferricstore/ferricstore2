@@ -161,12 +161,12 @@ impl ShardState {
         }
         let priority = entry.priority;
         let record = touched(&entry.record, now).ok_or(ServiceError::Unavailable)?;
-        let mut event = HistoryEvent::of(&record, priority, &meta);
+        let mut event = HistoryEvent::of(&record, priority, &meta, &key.0);
         event.kind = HistoryKind::ValuePut;
         self.put(
             key.clone(),
             (record, priority, Some(Box::new(meta))),
-            Some(event),
+            Some(&event),
         );
         let logged = self.after_image(&key)?;
         Ok((reply(&key.0), Some(logged)))

@@ -6,7 +6,8 @@
 //! state, fence, attempts, optional lease (owner, deadline), optional next
 //! run time, priority, three optional reference versions, and the optional
 //! retry audit (decision, run state, next run time, retry limit, backoff
-//! kind, base, cap and jitter, exhaustion target).
+//! kind, base, cap and jitter, exhaustion target), then the optional JSON of
+//! the value references, attributes and state metadata.
 
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_domain::history::RetryHistory;
@@ -14,7 +15,7 @@ use wf_domain::policy::{Backoff, BackoffKind, RetryPolicy};
 use wf_domain::retry::RetryDecision;
 use wf_types::version::TimestampMillis;
 
-use super::super::command::{Malformed, Reader, bin, optional_u64};
+use super::super::command::{Malformed, Reader, bin, optional_bin, optional_u64};
 use super::super::state::events::{kind_code, kind_of};
 
 pub(super) fn encode(out: &mut Vec<u8>, events: &[HistoryEvent]) -> Option<()> {
@@ -47,6 +48,9 @@ pub(super) fn encode(out: &mut Vec<u8>, events: &[HistoryEvent]) -> Option<()> {
                 out.push(1);
                 encode_retry(out, retry)?;
             }
+        }
+        for extra in &event.extras {
+            optional_bin(out, extra.as_deref())?;
         }
     }
     Some(())
@@ -148,6 +152,11 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<Vec<HistoryEvent>, Malfo
                 1 => Some(decode_retry(reader)?),
                 _ => return Err(Malformed),
             },
+            extras: [
+                reader.optional_bin()?,
+                reader.optional_bin()?,
+                reader.optional_bin()?,
+            ],
         });
     }
     Ok(events)

@@ -16,7 +16,7 @@ impl ShardState {
             .as_ref()
             .map_or(new_priority.unwrap_or(0), |previous| previous.priority);
         let meta = previous.as_ref().and_then(|previous| previous.meta.clone());
-        self.write(key, (record, priority, meta), previous, None);
+        self.write(key, (record, priority, meta), previous, &[]);
     }
 
     /// Stores a whole Flow, replacing any record under its key; `event` is
@@ -26,10 +26,28 @@ impl ShardState {
         &mut self,
         key: Key,
         flow: (WorkflowRecord, u8, Option<Box<FlowMeta>>),
-        event: Option<HistoryEvent>,
+        event: Option<&HistoryEvent>,
     ) {
         let previous = self.take_entry(&key);
-        self.write(key, flow, previous, event);
+        self.write(
+            key,
+            flow,
+            previous,
+            event.map(std::slice::from_ref).unwrap_or_default(),
+        );
+    }
+
+    /// Stores a whole Flow with the events its change appended, in order;
+    /// a change that went through several versions at once (a step chain,
+    /// or its replay) appends each.
+    pub(super) fn put_events(
+        &mut self,
+        key: Key,
+        flow: (WorkflowRecord, u8, Option<Box<FlowMeta>>),
+        events: &[HistoryEvent],
+    ) {
+        let previous = self.take_entry(&key);
+        self.write(key, flow, previous, events);
     }
 
     /// Inserts the new state of a Flow; a new version appends its history
@@ -39,7 +57,7 @@ impl ShardState {
         key: Key,
         (record, priority, meta): (WorkflowRecord, u8, Option<Box<FlowMeta>>),
         previous: Option<Entry>,
-        event: Option<HistoryEvent>,
+        appended: &[HistoryEvent],
     ) {
         let (sequence, mut events, before) = match previous {
             Some(previous) => (
@@ -55,8 +73,13 @@ impl ShardState {
                 ..FlowMeta::default()
             };
             let flow_meta = meta.as_deref().unwrap_or(&defaults);
-            let event = event.unwrap_or_else(|| HistoryEvent::of(&record, priority, flow_meta));
-            events.push(&event, flow_meta.history_max_events);
+            if appended.is_empty() {
+                let event = HistoryEvent::of(&record, priority, flow_meta, &key.0);
+                events.push(&event, flow_meta.history_max_events);
+            }
+            for event in appended {
+                events.push(event, flow_meta.history_max_events);
+            }
         }
         self.insert(
             key,

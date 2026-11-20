@@ -2,12 +2,14 @@
 //! (ADR-014): a single-Flow command to its owner, a batch split by owner and
 //! joined back in request order.
 
+use std::collections::HashSet;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::keys;
 use wf_application::commands::flow::many::{self, ManyMutation};
+use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::value::{self, ValueMget};
 use wf_application::commands::flow::{FlowCommand, FlowService, Term};
 use wf_application::commands::queue::{
@@ -29,6 +31,7 @@ impl FlowService for QueueNode {
         let command = match command {
             FlowCommand::Many(batch) => return batch_mutation(router, *batch, reply),
             FlowCommand::ValueMget(read) => return value_read(router, read, reply),
+            FlowCommand::RunSteps(spec) => return run_steps(router, *spec, reply),
             FlowCommand::ValuePut(mut put) if put.named.is_none() => {
                 // A shared value's reference is chosen here, so its auto
                 // bucket is known before routing.
@@ -152,6 +155,75 @@ fn value_read(router: &Router, read: ValueMget, reply: Reply<Term>) {
             Request::ValueRead {
                 refs,
                 max_bytes: read.max_bytes,
+                done: Box::new(move |result| part.part(result)),
+            },
+        );
+    }
+}
+
+/// Runs step chains, each on the shard owning its Flow; the reply is `OK`
+/// when every item succeeded, otherwise one `ok` or `[error, message]` per
+/// item.
+fn run_steps(router: &Router, mut spec: RunSteps, reply: Reply<Term>) {
+    let items = std::mem::take(&mut spec.items);
+    let total = items.len();
+    let mut seen: HashSet<(&[u8], Option<&[u8]>)> = HashSet::with_capacity(total);
+    let duplicate = !items
+        .iter()
+        .all(|(id, partition)| seen.insert((id.as_slice(), partition.as_deref())));
+    if duplicate {
+        let error = Term::List(vec![
+            Term::text("error"),
+            Term::text("ERR flow duplicate id in batch"),
+        ]);
+        return reply(Ok(Term::List(vec![error; total])));
+    }
+    let mut per_shard: Vec<Vec<(usize, Vec<u8>, Partition)>> =
+        (0..router.shards.len()).map(|_| Vec::new()).collect();
+    for (position, (id, explicit)) in items.into_iter().enumerate() {
+        let partition = Partition::for_new_flow(&id, explicit.as_deref());
+        if let Some(items) = per_shard.get_mut(router.route(&partition)) {
+            items.push((position, id, partition));
+        }
+    }
+    let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
+    let gather = Arc::new(ItemGather::new(
+        total,
+        parts,
+        Box::new(
+            move |outcomes: Result<Vec<Result<Term, ServiceError>>, ServiceError>| {
+                reply(outcomes.map(|outcomes| {
+                    if outcomes.iter().all(Result::is_ok) {
+                        return Term::text("OK");
+                    }
+                    Term::List(
+                        outcomes
+                            .into_iter()
+                            .map(|outcome| match outcome {
+                                Ok(_) => Term::text("ok"),
+                                Err(error) => Term::List(vec![
+                                    Term::text("error"),
+                                    Term::Bin(error.to_string().into_bytes()),
+                                ]),
+                            })
+                            .collect(),
+                    )
+                }));
+            },
+        ),
+    ));
+    let spec = Arc::new(spec);
+    for (index, items) in per_shard
+        .into_iter()
+        .enumerate()
+        .filter(|(_, items)| !items.is_empty())
+    {
+        let part = Arc::clone(&gather);
+        router.send(
+            index,
+            Request::RunSteps {
+                spec: Arc::clone(&spec),
+                items,
                 done: Box::new(move |result| part.part(result)),
             },
         );

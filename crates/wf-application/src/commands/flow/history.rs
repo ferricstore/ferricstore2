@@ -6,19 +6,17 @@
 //! in Elixir's history streams, with an empty string for nil. Event ids are
 //! `<at>-<version>`.
 
+mod query;
+
+pub use query::{HistoryQuery, parse};
+
 use wf_domain::history::{EventKind, RetryHistory};
 use wf_domain::workflow::WorkflowRecord;
 
-use super::FlowError;
-use super::create::partition_key;
-use super::keys;
-use super::opts::Opts;
 use super::record::{DEFAULT_HISTORY_MAX_EVENTS, FlowMeta};
 use super::term::{Term, map};
+use super::{json, keys, meta};
 use crate::routing::Partition;
-
-/// Most events one read returns.
-const MAX_COUNT: u64 = 10_000;
 
 /// What a history event records: a lifecycle change the domain decided, or
 /// a named value replaced (`value_put`).
@@ -66,12 +64,50 @@ pub struct HistoryEvent {
     pub refs: [Option<u64>; 3],
     /// The retry audit of a retry event.
     pub retry: Option<RetryHistory>,
+    /// JSON of the Flow's value references, attributes and state metadata
+    /// after the event, each when not empty.
+    pub extras: [Option<Vec<u8>>; 3],
+}
+
+/// Names of [`HistoryEvent::extras`], in order.
+const EXTRAS: [&str; 3] = ["value_refs", "attributes", "state_meta"];
+
+/// The JSON extras of a Flow's fields, as Elixir adds them to each event.
+fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 3] {
+    let value_refs = (!meta.values.is_empty()).then(|| {
+        let refs = meta
+            .values
+            .iter()
+            .map(|(name, value)| {
+                let entry = map(vec![
+                    ("digest", Term::Bin(keys::digest(&value.bytes))),
+                    (
+                        "ref",
+                        Term::Bin(keys::named_value_ref(partition, id, name, value.version)),
+                    ),
+                    ("version", Term::int(value.version)),
+                ]);
+                (name.clone(), entry)
+            })
+            .collect();
+        json::encode(&Term::Map(refs))
+    });
+    let attributes = (!meta.attributes.is_empty())
+        .then(|| json::encode(&meta::attributes_term(&meta.attributes)));
+    let state_meta = (!meta.state_meta.is_empty())
+        .then(|| json::encode(&meta::state_meta_term(&meta.state_meta)));
+    [value_refs, attributes, state_meta]
 }
 
 impl HistoryEvent {
     /// The event for a record's latest version.
     #[must_use]
-    pub fn of(record: &WorkflowRecord, priority: u8, meta: &FlowMeta) -> Self {
+    pub fn of(
+        record: &WorkflowRecord,
+        priority: u8,
+        meta: &FlowMeta,
+        partition: &Partition,
+    ) -> Self {
         let (kind, _, _) = record.latest_event_witness();
         Self {
             kind: HistoryKind::Event(kind),
@@ -93,6 +129,7 @@ impl HistoryEvent {
                 record.error().map(|_| meta.error_version),
             ],
             retry: None,
+            extras: extras(meta, partition, record.id().as_bytes()),
         }
     }
 
@@ -110,164 +147,6 @@ pub fn append(history: &mut Vec<HistoryEvent>, event: HistoryEvent, meta: &FlowM
     if history.len() > cap {
         let excess = history.len().saturating_sub(cap);
         history.drain(..excess);
-    }
-}
-
-/// Which events a read returns.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct HistoryQuery {
-    /// Flow id.
-    pub id: Vec<u8>,
-    /// Partition, if sent.
-    pub partition_key: Option<Vec<u8>>,
-    /// Most events.
-    pub count: usize,
-    /// Event id bounds, inclusive.
-    pub from_event: Option<(u64, u64)>,
-    /// Upper event id bound.
-    pub to_event: Option<(u64, u64)>,
-    /// Time bounds, inclusive.
-    pub from_ms: Option<u64>,
-    /// Upper time bound.
-    pub to_ms: Option<u64>,
-    /// Version bounds, inclusive.
-    pub from_version: Option<u64>,
-    /// Upper version bound.
-    pub to_version: Option<u64>,
-    /// Newest first.
-    pub rev: bool,
-    /// Only this event kind.
-    pub event: Option<Vec<u8>>,
-    /// Only events whose lease owner is this worker.
-    pub worker: Option<Vec<u8>>,
-}
-
-const ALLOWED: &[&str] = &[
-    "id",
-    "partition_key",
-    "count",
-    "from_event",
-    "to_event",
-    "from_ms",
-    "to_ms",
-    "from_version",
-    "to_version",
-    "rev",
-    "event",
-    "worker",
-    "include_cold",
-    "consistent_projection",
-    "values",
-    "max_bytes",
-];
-
-fn event_id(opts: &Opts<'_>, key: &str) -> Result<Option<(u64, u64)>, FlowError> {
-    let Some(text) = opts.binary_or_nil(key)? else {
-        return Ok(None);
-    };
-    let invalid = || FlowError::flow(key, "must be a history event id");
-    let text = std::str::from_utf8(&text).map_err(|_| invalid())?;
-    let (ms, version) = text.split_once('-').ok_or_else(invalid)?;
-    let canonical = |part: &str| {
-        (!part.is_empty()
-            && (part == "0" || !part.starts_with('0'))
-            && part.bytes().all(|b| b.is_ascii_digit()))
-        .then(|| part.parse::<u64>().ok())
-        .flatten()
-    };
-    Ok(Some((
-        canonical(ms).ok_or_else(invalid)?,
-        canonical(version).ok_or_else(invalid)?,
-    )))
-}
-
-/// Reads `FLOW.HISTORY`.
-///
-/// # Errors
-/// The Elixir server's refusal text for an invalid option.
-pub fn parse(args: &Term) -> Result<HistoryQuery, FlowError> {
-    let opts = Opts::new("FLOW.HISTORY", args, ALLOWED)?;
-    let id = match opts.get("id") {
-        Some(Term::Bin(id)) if !id.is_empty() => id.clone(),
-        _ => return Err(FlowError::flow("id", "must be a non-empty string")),
-    };
-    let count = match opts.positive_integer("count")? {
-        None => MAX_COUNT,
-        Some(count) if count > MAX_COUNT => {
-            return Err(FlowError::flow(
-                "count",
-                &format!("exceeds maximum {MAX_COUNT}"),
-            ));
-        }
-        Some(count) => count,
-    };
-    let query = HistoryQuery {
-        id,
-        partition_key: partition_key(&opts)?,
-        count: usize::try_from(count).unwrap_or(usize::MAX),
-        from_event: event_id(&opts, "from_event")?,
-        to_event: event_id(&opts, "to_event")?,
-        from_ms: opts.non_neg_integer("from_ms")?,
-        to_ms: opts.non_neg_integer("to_ms")?,
-        from_version: opts.non_neg_integer("from_version")?,
-        to_version: opts.non_neg_integer("to_version")?,
-        rev: opts.boolean("rev", false)?,
-        event: opts.binary_or_nil("event")?,
-        worker: opts.binary_or_nil("worker")?,
-    };
-    let ordered =
-        |low: Option<u64>, high: Option<u64>| low.zip(high).is_none_or(|(low, high)| low <= high);
-    if !ordered(query.from_ms, query.to_ms) {
-        return Err(FlowError::flow("from_ms", "must be <= to_ms"));
-    }
-    if !ordered(query.from_version, query.to_version) {
-        return Err(FlowError::flow("from_version", "must be <= to_version"));
-    }
-    if query
-        .from_event
-        .zip(query.to_event)
-        .is_some_and(|(from, to)| from > to)
-    {
-        return Err(FlowError::flow("from_event", "must be <= to_event"));
-    }
-    opts.boolean("include_cold", true)?;
-    opts.boolean("consistent_projection", true)?;
-    Ok(query)
-}
-
-impl HistoryQuery {
-    fn matches(&self, event: &HistoryEvent) -> bool {
-        let key = (event.at, event.version);
-        self.from_event.is_none_or(|from| key >= from)
-            && self.to_event.is_none_or(|to| key <= to)
-            && self.from_ms.is_none_or(|from| event.at >= from)
-            && self.to_ms.is_none_or(|to| event.at <= to)
-            && self.from_version.is_none_or(|from| event.version >= from)
-            && self.to_version.is_none_or(|to| event.version <= to)
-            && self
-                .event
-                .as_ref()
-                .is_none_or(|name| name.as_slice() == event.kind.as_str().as_bytes())
-            && self.worker.as_ref().is_none_or(|worker| {
-                event
-                    .lease
-                    .as_ref()
-                    .is_some_and(|(owner, _)| owner == worker)
-            })
-    }
-
-    /// The selected events: newest first up to the count when `rev`,
-    /// otherwise the newest `count` in order.
-    #[must_use]
-    pub fn select<'a>(&self, history: &'a [HistoryEvent]) -> Vec<&'a HistoryEvent> {
-        let matching: Vec<&HistoryEvent> =
-            history.iter().filter(|event| self.matches(event)).collect();
-        if self.rev {
-            matching.into_iter().rev().take(self.count).collect()
-        } else {
-            let skip = matching.len().saturating_sub(self.count);
-            matching.into_iter().skip(skip).collect()
-        }
     }
 }
 
@@ -340,6 +219,17 @@ pub fn event_term(
         ("updated_at_ms", text(event.at)),
         ("version", text(event.version)),
     ]);
+    let fields = match fields {
+        Term::Map(mut entries) => {
+            for (name, json) in EXTRAS.iter().zip(&event.extras) {
+                if let Some(json) = json {
+                    entries.push((name.as_bytes().to_vec(), Term::Bin(json.clone())));
+                }
+            }
+            Term::Map(entries)
+        }
+        other => other,
+    };
     let fields = match (&event.retry, fields) {
         (Some(retry), Term::Map(mut entries)) => {
             let policy = &retry.policy;

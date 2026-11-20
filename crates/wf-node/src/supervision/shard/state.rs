@@ -15,6 +15,7 @@ pub(crate) mod events;
 mod flow;
 mod mutate;
 mod retention;
+mod steps;
 mod store;
 mod value;
 
@@ -142,16 +143,15 @@ impl ShardState {
             }
             Logged::Put { image: bytes, .. } => match image::decode_one(bytes) {
                 Some(restored) => {
-                    // An after-image carries the event its change appended.
-                    let event = restored.history.and_then(|mut events| events.pop());
-                    self.put(
+                    // An after-image carries the events its change appended.
+                    self.put_events(
                         (restored.partition, restored.id),
                         (
                             restored.record,
                             restored.priority,
                             restored.meta.map(Box::new),
                         ),
-                        event,
+                        &restored.history.unwrap_or_default(),
                     );
                     Ok(Outcome::Changed)
                 }

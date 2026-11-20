@@ -47,9 +47,10 @@ impl ShardState {
             FlowCommand::History(query) => (Ok(self.history_term(&query, partition)), None),
             FlowCommand::Mutate(mutation) => self.mutate(now, &mutation, partition),
             FlowCommand::ValuePut(put) => self.value_put(now, &put, partition),
+            FlowCommand::StartAndClaim(start) => self.start_and_claim(now, &start, partition),
             // Batches and reads by reference are split over shards before
             // they reach one.
-            FlowCommand::Many(_) | FlowCommand::ValueMget(_) => {
+            FlowCommand::Many(_) | FlowCommand::ValueMget(_) | FlowCommand::RunSteps(_) => {
                 (Err(ServiceError::Unavailable), None)
             }
         }
@@ -109,10 +110,22 @@ impl ShardState {
 
     /// Logs the stored Flow under `key` as its after-image.
     pub(super) fn after_image(&self, key: &Key) -> Result<Logged, ServiceError> {
+        self.after_image_events(key, 1)
+    }
+
+    /// The after-image of `key` carrying the `count` events its change
+    /// appended, so replay keeps what the record alone does not show.
+    pub(super) fn after_image_events(
+        &self,
+        key: &Key,
+        count: usize,
+    ) -> Result<Logged, ServiceError> {
         let entry = self.records.get(key).ok_or(ServiceError::Unavailable)?;
-        // The after-image carries the event this change appended, so replay
-        // keeps what the record alone does not show.
-        let latest = entry.history.last();
+        let latest = if count == 1 {
+            entry.history.last().into_iter().collect()
+        } else {
+            entry.history.last_n(count)
+        };
         let image = image::encode_one(
             &key.0,
             &key.1,
@@ -120,7 +133,7 @@ impl ShardState {
             (
                 &entry.record,
                 entry.meta.as_deref(),
-                latest.as_ref().map(std::slice::from_ref),
+                Some(latest.as_slice()),
             ),
         )
         .ok_or(ServiceError::Unavailable)?;
@@ -170,7 +183,7 @@ impl ShardState {
         }
     }
 
-    fn new_meta(&self, create: &CreateFlow) -> Result<FlowMeta, ServiceError> {
+    pub(super) fn new_meta(&self, create: &CreateFlow) -> Result<FlowMeta, ServiceError> {
         let state_meta =
             meta::merge_state_meta(&StateMeta::new(), &create.state, &create.state_meta)?;
         let values: BTreeMap<Vec<u8>, NamedValue> = create

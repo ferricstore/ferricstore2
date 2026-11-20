@@ -65065,3 +65065,27 @@ pass. Found while writing them: named values had taken the record version;
 they now count on their own, as in Elixir. The value scenario matched
 Elixir exactly; the SDK suite passes 22 (was 19). Clippy, the ratchet, lint
 tests, docs and architecture pass.
+
+### ADR014-STEPS1 start-and-claim, step chains, history extras
+
+New artifacts (solo design review): `wf_application::commands::flow::
+{start, json}` (`StartAndClaim`, `RunSteps`, their parsers; a JSON writer
+for history fields), `FlowCommand::{StartAndClaim, RunSteps}`,
+`HistoryEvent::extras` (value references, attributes and state metadata
+JSON), `history::query` (split out of `history.rs`, which had reached 426
+lines). In `wf-node`: `supervision::shard::state::steps`,
+`Request::RunSteps`, `ShardState::{put_events, after_image_events}` and
+multi-event after-images, run-step routing with the duplicate check in
+`composition::flow`; opcodes 0x0223 and 0x0224. No dependency or policy
+change.
+
+RED: `tests/queue_node` did not compile without the shard handling for the
+two new commands; the scenario through the SDK found two differences after
+the first version: history events lacked the attribute JSON, and a run-steps
+batch with one existing id created the other ids where Elixir created none.
+GREEN: 2 tests (start-and-claim record, duplicate refusal and its single
+event; a three-step chain with its four events, the first lease deadline
+kept, the result reference version, a failed second batch, all across a
+restart with 2 shards), all 46 node tests, the TCP adapter and application
+tests pass; the start/run-steps, value and batch scenarios match Elixir
+exactly. Clippy, the ratchet, lint tests, docs and architecture pass.

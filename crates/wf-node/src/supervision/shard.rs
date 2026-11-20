@@ -17,6 +17,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::{FlowCommand, Term};
 use wf_application::commands::queue::{
     ClaimFlows, ClaimedFlow, CompleteFlow, ItemOutcome, NewFlow, Partition, ServiceError,
@@ -76,6 +77,12 @@ pub(crate) enum Request {
         items: state::BatchItems,
         atomic: bool,
         done: Done<state::BatchReplies>,
+    },
+    /// Step chains for new Flows; outcomes are by request position.
+    RunSteps {
+        spec: Arc<RunSteps>,
+        items: Vec<(usize, Vec<u8>, Partition)>,
+        done: Done<Vec<(usize, Result<Term, ServiceError>)>>,
     },
     /// Values by reference; replies are by request position.
     ValueRead {
@@ -184,6 +191,11 @@ fn handle(
             let (result, change) = state.execute(now, *command, partition);
             logged.extend(change);
             Box::new(move |durable| done(durable.and(result)))
+        }
+        Request::RunSteps { spec, items, done } => {
+            let (outcomes, changes) = state.run_steps(now, &spec, items);
+            logged.extend(changes);
+            Box::new(move |durable| done(durable.map(|()| outcomes)))
         }
         Request::ValueRead {
             refs,

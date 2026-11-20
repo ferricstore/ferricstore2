@@ -148,3 +148,15 @@ Each step is one commit with its tests.
   of its SHA-256 instead of all 32; logs and snapshots name partitions, so
   existing data replays onto the new placement. The value scenario run
   through the SDK matched Elixir exactly; the SDK suite passes 22 of 60.
+- Step 6: `FLOW.START_AND_CLAIM` (the domain's start-and-claim: token
+  `worker:now:1`, attempts 1; the reply always names `max_active_ms` and
+  `value_refs`) and `FLOW.RUN_STEPS_MANY` (each item started claimed,
+  continued through its states one millisecond apart on the first lease
+  deadline, then completed; all or nothing per shard, so one existing id
+  fails every item of its shard, and a repeated id fails the whole batch).
+  A change that goes through several versions logs all its events in its
+  after-image. History events now also carry the Flow's value references,
+  attributes and state metadata as JSON when present, as Elixir's do. The
+  start/run-steps scenario, the value scenario and the batch scenario match
+  Elixir exactly (the Elixir reference server was restarted first: after
+  about an hour its history reads timed out with projector flush timeouts).

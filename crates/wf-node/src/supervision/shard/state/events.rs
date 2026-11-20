@@ -137,6 +137,18 @@ fn encode(out: &mut Vec<u8>, event: &HistoryEvent) -> Option<()> {
             encode_retry(out, retry)?;
         }
     }
+    // A bit per present extra (value references, attributes, state
+    // metadata), then each one's JSON.
+    let mut present = 0_u8;
+    for (bit, extra) in event.extras.iter().enumerate() {
+        if extra.is_some() {
+            present |= 1_u8.checked_shl(u32::try_from(bit).ok()?)?;
+        }
+    }
+    out.push(present);
+    for extra in event.extras.iter().flatten() {
+        bytes(out, extra);
+    }
     Some(())
 }
 
@@ -223,6 +235,13 @@ fn decode(cursor: &mut Cursor<'_>) -> Option<HistoryEvent> {
         1 => Some(decode_retry(cursor)?),
         _ => return None,
     };
+    let present = cursor.u8()?;
+    let mut extras: [Option<Vec<u8>>; 3] = [None, None, None];
+    for (bit, extra) in extras.iter_mut().enumerate() {
+        if present & 1_u8.checked_shl(u32::try_from(bit).ok()?)? != 0 {
+            *extra = Some(cursor.bytes()?.to_vec());
+        }
+    }
     Some(HistoryEvent {
         kind,
         at,
@@ -235,6 +254,7 @@ fn decode(cursor: &mut Cursor<'_>) -> Option<HistoryEvent> {
         priority,
         refs,
         retry,
+        extras,
     })
 }
 
@@ -278,6 +298,14 @@ impl History {
                 None => break,
             }
         }
+        events
+    }
+
+    /// The newest `count` events, oldest first.
+    pub(crate) fn last_n(&self, count: usize) -> Vec<HistoryEvent> {
+        let mut events = self.events();
+        let skip = events.len().saturating_sub(count);
+        events.drain(..skip);
         events
     }
 

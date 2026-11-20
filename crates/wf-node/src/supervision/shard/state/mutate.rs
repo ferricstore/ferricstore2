@@ -240,12 +240,12 @@ impl ShardState {
                     } => *priority,
                     _ => entry.priority,
                 };
-                let mut event = HistoryEvent::of(&write.record, priority, &meta);
+                let mut event = HistoryEvent::of(&write.record, priority, &meta, &key.0);
                 event.retry = history.and_then(|entry| entry.retry);
                 self.put(
                     key.clone(),
                     (write.record, priority, Some(Box::new(meta))),
-                    Some(event),
+                    Some(&event),
                 );
                 Some(self.after_image(&key)?)
             }

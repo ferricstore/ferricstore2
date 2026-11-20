@@ -20,6 +20,7 @@ mod crash;
 mod flow_claim;
 mod flow_mutate;
 mod flow_record;
+mod flow_steps;
 mod flow_value;
 mod lifecycle;
 mod reclaim;

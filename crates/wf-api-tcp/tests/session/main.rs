@@ -118,7 +118,7 @@ impl FlowService for Scripted {
             FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
                 ServiceError::rejected("ERR flow already exists".to_owned()),
             )),
-            FlowCommand::Create(_) => reply(Ok(Term::text("OK"))),
+            FlowCommand::Create(_) | FlowCommand::RunSteps(_) => reply(Ok(Term::text("OK"))),
             FlowCommand::Mutate(mutation) if mutation.id.starts_with(b"stale") => {
                 reply(Err(ServiceError::Domain(DomainError::StaleLease)));
             }
@@ -132,6 +132,7 @@ impl FlowService for Scripted {
             ))),
             FlowCommand::History(query) => reply(Ok(Term::List(vec![Term::Bin(query.id)]))),
             FlowCommand::ValuePut(put) => reply(Ok(Term::Bin(put.value))),
+            FlowCommand::StartAndClaim(start) => reply(Ok(Term::Bin(start.create.id))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),
