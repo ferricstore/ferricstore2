@@ -66,3 +66,60 @@ fn any_other_redirection_from_a_combined_root_is_refused() -> CheckResult<()> {
     }
     Ok(())
 }
+
+fn root_check(
+    policy: &crate::policy::Policy,
+    package: &str,
+    module: &str,
+    root_file: bool,
+) -> CheckResult<Vec<String>> {
+    let names = std::collections::BTreeMap::new();
+    let classification = policy
+        .packages
+        .get(package)
+        .ok_or("missing classification")?;
+    crate::source::check(
+        "#![forbid(unsafe_code)]\nfn main() {}",
+        &crate::source::Context {
+            package,
+            module,
+            root_file,
+            test_file: false,
+            classification,
+            policy,
+            dependency_names: &names,
+        },
+    )
+}
+
+#[test]
+fn only_a_declared_binary_root_is_a_classified_production_module() -> CheckResult<()> {
+    let text = std::fs::read_to_string(super::root()?.join("architecture/policy.toml"))?;
+    let policy = crate::policy::Policy::parse(&text)?;
+    let unclassified = "unclassified production module";
+    assert_eq!(
+        policy
+            .packages
+            .get("wf-node")
+            .map(|package| package.binaries.clone()),
+        Some(vec!["main".to_owned()])
+    );
+    assert!(
+        !root_check(&policy, "wf-node", "main", true)?
+            .iter()
+            .any(|f| f == unclassified)
+    );
+    for (package, root_file) in [
+        ("wf-node", false),
+        ("wf-domain", true),
+        ("wf-api-tcp", true),
+    ] {
+        assert!(
+            root_check(&policy, package, "main", root_file)?
+                .iter()
+                .any(|f| f == unclassified),
+            "{package} main (root {root_file}) escaped classification"
+        );
+    }
+    Ok(())
+}

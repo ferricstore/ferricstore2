@@ -96,6 +96,8 @@ kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-ports", "wf-application", "wf-storage", "wf-consensus", "wf-projection", "wf-wire", "wf-api-http", "wf-api-tcp", "wf-worker"]
 dev = ["wf-test-support"]
 modules = { configuration = true, composition = true, supervision = true, shutdown = true, recovery = true }
+# ADR-011: src/main.rs is the node binary.
+binaries = ["main"]
 external_normal = [
   { name = "sha2", version = "=0.11.0", features = [], default_features = false },
   { name = "tokio", version = "=1.54.1", features = ["io-util", "net", "rt-multi-thread", "sync"], default_features = false },

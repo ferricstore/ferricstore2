@@ -64802,3 +64802,18 @@ negotiation, per-item and error-map failures, per-lane order with a delayed
 reply, explicit refusal of unknown opcodes and compressed frames). Clippy, the
 ratchet and all architecture tests pass, including the async blocking rule.
 
+### ADR011-NODE-BINARY1 node binary
+
+`crates/wf-node/src/main.rs` is the `ferricstore2` binary (`--data-dir`,
+`--host`, `--port`, `--shards`, `--threads`; prints `READY port=.. shards=..`).
+The architecture policy gains an optional per-package `binaries` list; a
+listed module is a classified production module only as a binary target
+root. `wf-node` declares `binaries = ["main"]`.
+
+RED: `only_a_declared_binary_root_is_a_classified_production_module` failed
+to compile (no `binaries` field). GREEN: it passes, including refusals for a
+non-root `main` and for packages without the declaration; the real workspace
+check accepts the binary. A smoke run of the Python SDK queue benchmark
+(10,000 flows) against the release binary created, claimed and completed
+every flow.
+

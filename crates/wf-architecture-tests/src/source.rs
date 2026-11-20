@@ -76,12 +76,23 @@ pub(crate) fn check(source: &str, context: &Context<'_>) -> CheckResult<Vec<Stri
                 .classification
                 .modules
                 .contains_key(context.module.split("::").next().unwrap_or(""))
+            && !binary_root(context)
         {
             visitor.report("unclassified production module");
         }
     }
     visitor.visit_file(&syntax);
     Ok(visitor.violations)
+}
+
+/// ADR-011: a binary target root the package policy declares.
+fn binary_root(context: &Context<'_>) -> bool {
+    context.root_file
+        && context
+            .classification
+            .binaries
+            .iter()
+            .any(|binary| binary == context.module)
 }
 
 /// ADR-012: a crate's combined test root `tests/main.rs` may load each of its

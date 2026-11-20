@@ -19,6 +19,8 @@ pub(crate) struct Package {
     pub(crate) modules: BTreeMap<String, bool>,
     pub(crate) external_normal: Vec<External>,
     pub(crate) external_dev: Vec<External>,
+    /// Production modules that are binary target roots (ADR-011).
+    pub(crate) binaries: Vec<String>,
 }
 
 pub(crate) struct External {
@@ -63,6 +65,10 @@ impl Policy {
                     modules,
                     external_normal: externals(value, "external_normal")?,
                     external_dev: externals(value, "external_dev")?,
+                    binaries: match value.get("binaries") {
+                        None => Vec::new(),
+                        Some(_) => strings(value, "binaries")?,
+                    },
                 },
             );
         }
