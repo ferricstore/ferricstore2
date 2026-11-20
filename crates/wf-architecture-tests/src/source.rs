@@ -10,6 +10,7 @@ use syn::{
 use crate::CheckResult;
 use crate::policy::{Package, Policy};
 
+mod effects;
 mod purity;
 
 pub(crate) struct Context<'a> {
@@ -45,6 +46,8 @@ pub(crate) fn check(source: &str, context: &Context<'_>) -> CheckResult<Vec<Stri
         violations: Vec::new(),
         test: context.test_file,
         in_function: false,
+        in_async: false,
+        awaited: BTreeSet::new(),
     };
     if let Some(finding) =
         crate::size::check(source, context.classification.runtime, context.test_file)
@@ -103,6 +106,8 @@ struct Inspector<'a, 'b> {
     violations: Vec<String>,
     test: bool,
     in_function: bool,
+    in_async: bool,
+    awaited: BTreeSet<usize>,
 }
 
 impl Inspector<'_, '_> {
@@ -112,6 +117,7 @@ impl Inspector<'_, '_> {
 
     fn path(&mut self, written: &[String], exact_metadata: bool) {
         let path = self.resolved_path(written);
+        self.effect_path(&path);
         let Some(first) = path.first() else { return };
         let canonical = self
             .context
@@ -373,9 +379,30 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
             .iter()
             .any(|attribute| attribute.path().is_ident("test"));
         self.in_function = true;
-        syn::visit::visit_item_fn(self, item);
+        self.visit_visibility(&item.vis);
+        self.visit_function(&item.attrs, &item.sig, Some(&item.block));
         self.test = previous_test;
         self.in_function = previous_function;
+    }
+
+    fn visit_impl_item_fn(&mut self, item: &'ast syn::ImplItemFn) {
+        self.visit_visibility(&item.vis);
+        self.visit_function(&item.attrs, &item.sig, Some(&item.block));
+    }
+
+    fn visit_trait_item_fn(&mut self, item: &'ast syn::TraitItemFn) {
+        self.visit_function(&item.attrs, &item.sig, item.default.as_ref());
+    }
+
+    fn visit_expr_closure(&mut self, closure: &'ast syn::ExprClosure) {
+        let previous = std::mem::replace(&mut self.in_async, closure.asyncness.is_some());
+        syn::visit::visit_expr_closure(self, closure);
+        self.in_async = previous;
+    }
+
+    fn visit_expr_method_call(&mut self, call: &'ast syn::ExprMethodCall) {
+        self.effect_method(call);
+        syn::visit::visit_expr_method_call(self, call);
     }
 
     fn visit_signature(&mut self, signature: &'ast syn::Signature) {
@@ -418,12 +445,15 @@ impl<'ast> Visit<'ast> for Inspector<'_, '_> {
         if self.pure() {
             self.report("pure values/domain source contains async behavior");
         }
+        let previous = std::mem::replace(&mut self.in_async, true);
         syn::visit::visit_expr_async(self, expression);
+        self.in_async = previous;
     }
     fn visit_expr_await(&mut self, expression: &'ast syn::ExprAwait) {
         if self.pure() {
             self.report("pure values/domain source awaits effects");
         }
+        self.mark_awaited(expression);
         syn::visit::visit_expr_await(self, expression);
     }
     fn visit_item_static(&mut self, item: &'ast syn::ItemStatic) {

@@ -120,8 +120,8 @@ fn bytes(hex: &str) -> TestResult<Vec<u8>> {
     if !hex.len().is_multiple_of(2) {
         return Err("odd fixture hex".into());
     }
-    (0..hex.len())
-        .step_by(2)
-        .map(|index| u8::from_str_radix(&hex[index..index + 2], 16).map_err(Into::into))
+    hex.as_bytes()
+        .chunks(2)
+        .map(|pair| -> TestResult<u8> { Ok(u8::from_str_radix(std::str::from_utf8(pair)?, 16)?) })
         .collect()
 }

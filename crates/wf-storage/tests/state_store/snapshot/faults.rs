@@ -493,7 +493,8 @@ fn kill(path: &Path, image: &Path, install: bool, after: bool) -> TestResult {
             return;
         }
         if ready {
-            let _ = sender.send(signal(
+            // A receiver that already timed out has nothing left to observe.
+            let _unobserved = sender.send(signal(
                 &mut stdout,
                 format!("WFSTATE WAIT {phase}\n").as_bytes(),
             ));

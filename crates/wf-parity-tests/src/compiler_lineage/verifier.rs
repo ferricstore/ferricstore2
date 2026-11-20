@@ -78,20 +78,18 @@ fn run(
         });
         if excess || started.elapsed() > Duration::from_millis(capture.limits.verifier_deadline_ms)
         {
-            let _ = child.kill();
-            let _ = child.wait();
-            return Err(CheckError::new(
-                "compiler pure verifier output/deadline limit exceeded",
-            ));
+            let cleanup = stop_child(&mut child);
+            return Err(CheckError::new(format!(
+                "compiler pure verifier output/deadline limit exceeded{cleanup}"
+            )));
         }
         match child.try_wait() {
             Ok(Some(status)) => break status,
             Ok(None) => thread::sleep(Duration::from_millis(10)),
             Err(error) => {
-                let _ = child.kill();
-                let _ = child.wait();
+                let cleanup = stop_child(&mut child);
                 return Err(CheckError::new(format!(
-                    "compiler pure verifier polling failed: {error}"
+                    "compiler pure verifier polling failed: {error}{cleanup}"
                 )));
             }
         }
@@ -319,4 +317,15 @@ fn actual_trusted_verifier_nonzero_exit_is_an_operational_failure()
         }));
     }
     Ok(())
+}
+
+/// Stops a verifier child after a failed check; cleanup failures join the reason.
+fn stop_child(child: &mut std::process::Child) -> String {
+    let killed = child.kill().err();
+    let waited = child.wait().err();
+    if killed.is_none() && waited.is_none() {
+        String::new()
+    } else {
+        format!(" (cleanup: kill {killed:?}, wait {waited:?})")
+    }
 }

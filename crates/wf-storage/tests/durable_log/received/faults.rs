@@ -152,10 +152,10 @@ fn kill_ack(child: &mut Child, after: bool) -> TestResult {
         joined.map_err(|_| "received ACK reader panicked")??;
         Ok(())
     })();
-    if result.is_err() {
-        let _ = crate::disk_backend::terminate(child);
-    }
-    result
+    result.map_err(|error| match crate::disk_backend::terminate(child) {
+        Ok(_) => error,
+        Err(cleanup) => format!("{error}; child cleanup failed: {cleanup}").into(),
+    })
 }
 
 #[test]

@@ -365,10 +365,10 @@ fn acknowledged_kill(child: &mut Child) -> TestResult {
         joined.map_err(|_| "policy snapshot reader panicked")??;
         Ok(())
     })();
-    if result.is_err() {
-        let _ = disk_backend::terminate(child);
-    }
-    result
+    result.map_err(|error| match disk_backend::terminate(child) {
+        Ok(_) => error,
+        Err(cleanup) => format!("{error}; child cleanup failed: {cleanup}").into(),
+    })
 }
 
 #[test]

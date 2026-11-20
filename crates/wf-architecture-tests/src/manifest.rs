@@ -24,6 +24,14 @@ pub(crate) fn check_root(root: &Path) -> CheckResult<Vec<String>> {
         ("clippy", "unimplemented", "deny"),
         ("clippy", "dbg_macro", "deny"),
         ("clippy", "await_holding_lock", "deny"),
+        ("clippy", "unreachable", "deny"),
+        ("clippy", "string_slice", "deny"),
+        ("clippy", "get_unwrap", "deny"),
+        ("clippy", "unwrap_in_result", "deny"),
+        ("clippy", "let_underscore_must_use", "deny"),
+        ("clippy", "mem_forget", "deny"),
+        ("clippy", "exit", "deny"),
+        ("clippy", "fallible_impl_from", "deny"),
     ] {
         let value = manifest
             .get("workspace")

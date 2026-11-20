@@ -156,13 +156,19 @@ fn assert_effectful_transaction_neighbors() -> CheckResult<()> {
         ("wf-ports", "snapshot"),
         ("wf-ports", "snapshot::metadata_backend"),
     ] {
+        // ADR-010: only storage packages may touch the filesystem.
+        let expected: Vec<String> = if package == "wf-storage" {
+            Vec::new()
+        } else {
+            vec!["filesystem effects belong to an approved storage package".to_owned()]
+        };
         assert_eq!(
             source_check(
                 package,
                 module,
                 "use std::fs; pub async fn acquire() {} static COUNTER: u64 = 0;"
             )?,
-            Vec::<String>::new()
+            expected
         );
     }
     Ok(())

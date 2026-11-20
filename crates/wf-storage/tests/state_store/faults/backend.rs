@@ -49,9 +49,10 @@ impl StorageBackend for DiskFaultBackend {
         };
         self.inner.set_len(length)?;
         if before.is_some_and(|before| length > before) {
-            let _ = self
-                .fault
-                .compare_exchange(mode, mode + 1, Ordering::SeqCst, Ordering::SeqCst);
+            // Only the first growth advances the mode; a lost race keeps the newer mode.
+            let _advanced =
+                self.fault
+                    .compare_exchange(mode, mode + 1, Ordering::SeqCst, Ordering::SeqCst);
         }
         Ok(())
     }

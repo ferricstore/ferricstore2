@@ -7,6 +7,9 @@ pub(crate) struct Policy {
     pub(crate) wire_domain_module: String,
     pub(crate) worker_port_module: String,
     pub(crate) worker_wire_modules: Vec<String>,
+    pub(crate) filesystem_packages: Vec<String>,
+    pub(crate) durable_sync_modules: Vec<String>,
+    pub(crate) thread_owner_modules: Vec<String>,
 }
 
 pub(crate) struct Package {
@@ -71,6 +74,9 @@ impl Policy {
             wire_domain_module: string(&document, "wire_domain_module")?.into(),
             worker_port_module: string(&document, "worker_port_module")?.into(),
             worker_wire_modules: strings(&document, "worker_wire_modules")?,
+            filesystem_packages: strings(&document, "filesystem_packages")?,
+            durable_sync_modules: strings(&document, "durable_sync_modules")?,
+            thread_owner_modules: strings(&document, "thread_owner_modules")?,
         })
     }
 }

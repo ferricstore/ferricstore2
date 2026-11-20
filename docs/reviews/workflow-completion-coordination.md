@@ -64644,3 +64644,29 @@ checks/inputs/source-audit/proof; all jobs terminal. No new native Linux/Elixir,
 independent review, primary code adoption, push, accepted runtime or full completion.
 Continue original get/public projection/named capture and every remaining source/
 platform/runtime/performance gate solo under the unchanged full objective.
+
+### ADR010-PANIC-RUNTIME1 concrete solo architecture decision
+
+User request 2026-11-20: check lint and architecture-test quality, then add the
+missing panic lints and runtime rules before bringing the fsnp-slice runtime
+shape into the product. Branch `claude/fast-runtime` from e29a5f3. Decision
+recorded in ADR-010. New artifacts: `docs/adr/010-panic-lints-and-runtime-effect-rules.md`,
+`architecture/panic-baseline.json`, `tests/lint/panic-ratchet.py`,
+`tests/lint/test_panic_ratchet.py`, `crates/wf-architecture-tests/src/source/effects.rs`,
+`crates/wf-architecture-tests/src/tests/runtime_rules.rs`. Policy gains three
+required owner lists. No dependency, crate or public module changes.
+
+RED before implementation: all six `runtime_rules` tests failed (missing rules,
+missing policy keys, missing manifest lints); all six ratchet unit tests failed
+(module missing). The ratchet negative control (one `bytes[0]` added to
+`wf-api-tcp::frame`) failed with "rose from 0 to 1" and was reverted.
+
+Final verification (macOS, Rust 1.99.0): `bash scripts/check.sh` ran fmt,
+Python 7 + 6 unit tests, check, Clippy with warnings denied, the panic ratchet
+(1,791 baseline sites in 331 files, none added), 2,118 Rust tests in 149 groups
+with none failed or ignored, doctests, docs, all 66 architecture tests,
+reference and progress. cargo-deny failed only on RUSTSEC-2026-0486 (rustix
+1.1.5 via tempfile in test tooling), published after e29a5f3; the separate
+lock bump c949b04 to 1.1.6 makes advisories, bans, licenses and sources pass.
+No Linux evidence is claimed.
+

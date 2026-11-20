@@ -144,7 +144,8 @@ fn assert_record_batch_effect_boundary() -> CheckResult<()> {
                 neighbor,
                 "use std::fs; pub async fn effect() {} static GLOBAL: u64 = 0;"
             )?,
-            Vec::<String>::new()
+            // ADR-010: only storage packages may touch the filesystem.
+            vec!["filesystem effects belong to an approved storage package".to_owned()]
         );
     }
     Ok(())
@@ -358,7 +359,8 @@ fn atomic_start_retained_profile_stays_pure_and_server_side() -> CheckResult<()>
                 &format!("{module}_backend"),
                 "use std::fs; pub async fn effect() {} static GLOBAL: u64 = 0;"
             )?,
-            Vec::<String>::new()
+            // ADR-010: only storage packages may touch the filesystem.
+            vec!["filesystem effects belong to an approved storage package".to_owned()]
         );
     }
     for name in [

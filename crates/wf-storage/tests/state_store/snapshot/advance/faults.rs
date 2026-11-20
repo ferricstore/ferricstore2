@@ -327,8 +327,8 @@ fn kill(path: &Path, operation: u8, after: bool) -> TestResult {
         joined.map_err(|_| "catalog child reader panicked")??;
         Ok(())
     })();
-    if result.is_err() {
-        let _ = terminate(&mut child);
-    }
-    result
+    result.map_err(|error| match terminate(&mut child) {
+        Ok(_) => error,
+        Err(cleanup) => format!("{error}; child cleanup failed: {cleanup}").into(),
+    })
 }

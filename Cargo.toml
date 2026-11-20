@@ -67,6 +67,15 @@ todo = "deny"
 unimplemented = "deny"
 dbg_macro = "deny"
 await_holding_lock = "deny"
+# ADR-010: panic and silent-drop restrictions with no workspace exceptions.
+unreachable = "deny"
+string_slice = "deny"
+get_unwrap = "deny"
+unwrap_in_result = "deny"
+let_underscore_must_use = "deny"
+mem_forget = "deny"
+exit = "deny"
+fallible_impl_from = "deny"
 
 [workspace.metadata.ferricstore]
 stage = "m0-infrastructure"

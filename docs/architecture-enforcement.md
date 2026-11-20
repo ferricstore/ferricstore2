@@ -83,6 +83,26 @@ must name one specific Clippy lint on a test function and provide a meaningful
 `reason`; whole-group, module-wide, unreasoned and production suppressions fail.
 Review still decides whether a syntactically accepted reason is appropriate.
 
+## Panic lints and runtime effects (ADR-010)
+
+The root lint table also denies `unreachable`, `string_slice`, `get_unwrap`,
+`unwrap_in_result`, `let_underscore_must_use`, `mem_forget`, `exit` and
+`fallible_impl_from`; the manifest check refuses a weaker table.
+
+`tests/lint/panic-ratchet.py` (run by `scripts/check.sh`) holds production
+code to `indexing_slicing`, `arithmetic_side_effects` and `panic_in_result_fn`
+with per-file counts in `architecture/panic-baseline.json`. Counts may not
+rise, new files start at zero, and a fall requires `--update` so the baseline
+stays exact.
+
+For runtime production sources, the syntax checker allows `std::fs` only in
+`filesystem_packages`, `sync_all`/`sync_data` only in `durable_sync_modules`,
+and `std::thread::{spawn, Builder, scope}` only in `thread_owner_modules`, all
+in `architecture/policy.toml`. Async code may not call `std::fs`, `std::net`,
+`std::thread::sleep` or a non-awaited `sync_all`/`sync_data`/`recv`/
+`recv_timeout`; synchronous closures and nested functions are outside async
+context. Negative and positive controls live in `src/tests/runtime_rules.rs`.
+
 ## Source size
 
 [ADR-003](adr/003-source-size-limits.md) limits every production Rust `src`

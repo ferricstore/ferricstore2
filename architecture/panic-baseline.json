@@ -1,0 +1,1135 @@
+{
+  "schema": 1,
+  "lints": [
+    "clippy::arithmetic_side_effects",
+    "clippy::indexing_slicing",
+    "clippy::panic_in_result_fn"
+  ],
+  "files": {
+    "crates/wf-application/src/commands/independent/dispatch.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-application/src/governance/cleaner.rs": {
+      "clippy::arithmetic_side_effects": 6
+    },
+    "crates/wf-application/src/governance/cleaner/step.rs": {
+      "clippy::arithmetic_side_effects": 5
+    },
+    "crates/wf-application/src/governance/collection.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-application/src/governance/credit.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-application/src/governance/publication.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-application/src/governance/publication/dispatch.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-application/src/governance/publication/plan.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-application/src/governance/reconcile.rs": {
+      "clippy::arithmetic_side_effects": 7,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-application/src/governance/reconcile/dispatch.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 26
+    },
+    "crates/wf-application/src/governance/reconcile/observe.rs": {
+      "clippy::arithmetic_side_effects": 5,
+      "clippy::indexing_slicing": 15
+    },
+    "crates/wf-application/src/governance/reconcile/plan.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-application/src/governance/reconcile/progress.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-application/src/intent.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-application/src/intent/claim.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-application/src/intent/policy.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-application/src/queries/record_values/hydrate.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-architecture-tests/src/lib.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-architecture-tests/src/manifest.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-architecture-tests/src/source.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-architecture-tests/src/source/purity.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/claim/apply/admission.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/claim/apply/observed.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/claim/apply/observed/bindings/source.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/claim/apply/token.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/claim/coordination/admission.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/claim/coordination/credit.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/claim/coordination/schedule.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 8
+    },
+    "crates/wf-domain/src/claim/index.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/claim/request.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/claim/selection.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/governance/caller/model.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/governance/caller/normalize.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/governance/caller/validate.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/governance/catalog.rs": {
+      "clippy::arithmetic_side_effects": 7
+    },
+    "crates/wf-domain/src/governance/catalog/ack.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/governance/catalog/membership.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/governance/credit/admission.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/governance/credit/capacity.rs": {
+      "clippy::arithmetic_side_effects": 8
+    },
+    "crates/wf-domain/src/governance/credit/decision.rs": {
+      "clippy::arithmetic_side_effects": 8,
+      "clippy::indexing_slicing": 7
+    },
+    "crates/wf-domain/src/governance/credit/model.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/governance/credit/reservation.rs": {
+      "clippy::arithmetic_side_effects": 9,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/governance/identified/admission.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/governance/identified/cleanup.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-domain/src/governance/identified/decision.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/governance/identified/pages.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 6
+    },
+    "crates/wf-domain/src/governance/identified/prepare.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/governance/release/cursor.rs": {
+      "clippy::arithmetic_side_effects": 10,
+      "clippy::indexing_slicing": 12
+    },
+    "crates/wf-domain/src/governance/release/maintenance.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/governance/release/queue.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/governance/view.rs": {
+      "clippy::indexing_slicing": 7
+    },
+    "crates/wf-domain/src/history/compact/decode.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/history/compact/encode.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/history/compact/number.rs": {
+      "clippy::arithmetic_side_effects": 10,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/history/compact/primitives.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/history/compact/project.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/history/metadata/numeric.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/history/metadata/numeric/float.rs": {
+      "clippy::arithmetic_side_effects": 15,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/history/metadata/text.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/history/original.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/lineage/group.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/metadata.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/metadata/attributes.rs": {
+      "clippy::arithmetic_side_effects": 7,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/metadata/record.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-domain/src/metadata/record/model.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/metadata/record/schema.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/metadata/scope.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/metadata/scope/arena.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/metadata/scope/auto.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/metadata/scope/system.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/metadata/state_meta.rs": {
+      "clippy::arithmetic_side_effects": 6
+    },
+    "crates/wf-domain/src/options.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/options/put.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/options/score_bound.rs": {
+      "clippy::arithmetic_side_effects": 8,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/policy/complete/admission.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/policy/complete/admission/charge.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/policy/complete/encoding/reader.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/core.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/etf.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/etf/envelope.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/governance.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/governance/groups.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/governance/lists.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/governance/rules.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/interop.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/interop/patch.rs": {
+      "clippy::arithmetic_side_effects": 20,
+      "clippy::indexing_slicing": 13
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/interop/patch/retry.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/interop/patch/states.rs": {
+      "clippy::arithmetic_side_effects": 13
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/interop/v2.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/interop/v2/governance.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/layout.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/order.rs": {
+      "clippy::arithmetic_side_effects": 19
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/order/hash.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/preflight.rs": {
+      "clippy::arithmetic_side_effects": 8
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/rejection/retained.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/states.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/value.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/flow_input/value/map.rs": {
+      "clippy::arithmetic_side_effects": 11,
+      "clippy::indexing_slicing": 10
+    },
+    "crates/wf-domain/src/policy/complete/indexed_input.rs": {
+      "clippy::arithmetic_side_effects": 6,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/original_entry.rs": {
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/callsite.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/compound.rs": {
+      "clippy::arithmetic_side_effects": 5,
+      "clippy::indexing_slicing": 10
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/identity.rs": {
+      "clippy::arithmetic_side_effects": 26,
+      "clippy::indexing_slicing": 43
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/indexed.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/indexed/value.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/runtime.rs": {
+      "clippy::arithmetic_side_effects": 19,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/safety.rs": {
+      "clippy::arithmetic_side_effects": 8,
+      "clippy::indexing_slicing": 10
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/scalar.rs": {
+      "clippy::arithmetic_side_effects": 15,
+      "clippy::indexing_slicing": 13
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/scan.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/original_entry/visit.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 15
+    },
+    "crates/wf-domain/src/policy/complete/original_reply.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/policy/complete/original_reply/maps.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/policy/complete/original_reply/source.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/original_reply/states.rs": {
+      "clippy::arithmetic_side_effects": 8,
+      "clippy::indexing_slicing": 12
+    },
+    "crates/wf-domain/src/policy/complete/original_retry_keys/map.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/outer/core_patch_frame/scan.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/outer/flow_frame.rs": {
+      "clippy::arithmetic_side_effects": 5
+    },
+    "crates/wf-domain/src/policy/complete/outer/flow_frame/canonical.rs": {
+      "clippy::arithmetic_side_effects": 17,
+      "clippy::indexing_slicing": 10
+    },
+    "crates/wf-domain/src/policy/complete/outer/flow_frame/codec.rs": {
+      "clippy::arithmetic_side_effects": 16,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/policy/complete/outer/flow_frame/raw.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/outer/flow_frame/scan.rs": {
+      "clippy::arithmetic_side_effects": 10,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/outer/public_set_frame.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/policy/complete/outer/public_set_frame/canonical.rs": {
+      "clippy::arithmetic_side_effects": 17,
+      "clippy::indexing_slicing": 10
+    },
+    "crates/wf-domain/src/policy/complete/outer/public_set_frame/codec.rs": {
+      "clippy::arithmetic_side_effects": 13,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/outer/public_set_frame/scan.rs": {
+      "clippy::arithmetic_side_effects": 10,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/outer/public_set_frame/value.rs": {
+      "clippy::arithmetic_side_effects": 5,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/outer/replace_frame/scan.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/public_get.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/public_set.rs": {
+      "clippy::arithmetic_side_effects": 13,
+      "clippy::indexing_slicing": 7
+    },
+    "crates/wf-domain/src/policy/complete/public_set/merge/equality.rs": {
+      "clippy::arithmetic_side_effects": 8,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/public_set/merge/rows.rs": {
+      "clippy::arithmetic_side_effects": 18
+    },
+    "crates/wf-domain/src/policy/complete/public_set/metric.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-domain/src/policy/complete/public_set/model.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/public_set/native_order.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/policy/complete/public_set/order.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/policy/complete/public_set/patch.rs": {
+      "clippy::arithmetic_side_effects": 11,
+      "clippy::indexing_slicing": 11
+    },
+    "crates/wf-domain/src/policy/complete/public_set/patch/rows.rs": {
+      "clippy::arithmetic_side_effects": 24,
+      "clippy::indexing_slicing": 9
+    },
+    "crates/wf-domain/src/policy/complete/record_projection/original.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-domain/src/policy/complete/replace_content/rejection.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/replace_request/public_set/point.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/policy/complete/retention_input.rs": {
+      "clippy::arithmetic_side_effects": 7,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/policy/complete/retry_input.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/policy/complete/retry_input/value.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/policy/complete/running_claim/lookup.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/policy/complete/running_claim/typed.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/policy/preview.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/retry/source.rs": {
+      "clippy::indexing_slicing": 6
+    },
+    "crates/wf-domain/src/value/original_flow/compat.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/value/original_flow/context.rs": {
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/value/original_flow/equality.rs": {
+      "clippy::arithmetic_side_effects": 7,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/value/original_flow/equality/scalar.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/value/original_flow/prepare/order.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 6
+    },
+    "crates/wf-domain/src/value/original_flow/prepare/order/scalar.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/value/original_flow/prepare/scalar.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/value/original_flow/prepare/write.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/value/original_flow/prepare/write/scalar.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/value/original_flow/scan/foreign.rs": {
+      "clippy::arithmetic_side_effects": 10
+    },
+    "crates/wf-domain/src/value/original_flow/scan/foreign/identity.rs": {
+      "clippy::arithmetic_side_effects": 6
+    },
+    "crates/wf-domain/src/value/original_flow/scan/scalar.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/value/original_flow/scan/sequence.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-domain/src/workflow/active/admission.rs": {
+      "clippy::arithmetic_side_effects": 11,
+      "clippy::indexing_slicing": 10
+    },
+    "crates/wf-domain/src/workflow/active/authority.rs": {
+      "clippy::arithmetic_side_effects": 5
+    },
+    "crates/wf-domain/src/workflow/active/history.rs": {
+      "clippy::arithmetic_side_effects": 7,
+      "clippy::indexing_slicing": 20
+    },
+    "crates/wf-domain/src/workflow/active/indexes.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/workflow/active/indexes/heads.rs": {
+      "clippy::arithmetic_side_effects": 6,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-domain/src/workflow/active/plan.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 21
+    },
+    "crates/wf-domain/src/workflow/active/releases.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/workflow/active/trace.rs": {
+      "clippy::arithmetic_side_effects": 5,
+      "clippy::indexing_slicing": 26
+    },
+    "crates/wf-domain/src/workflow/active/trace/closure.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 6
+    },
+    "crates/wf-domain/src/workflow/active/trace/parent.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 20
+    },
+    "crates/wf-domain/src/workflow/active/trace/state.rs": {
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-domain/src/workflow/caller/create/model.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/workflow/caller/create/normalize.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/workflow/caller/create/normalize/start.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/workflow/caller/create/number.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/workflow/caller/create/options.rs": {
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-domain/src/workflow/caller/input.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-domain/src/workflow/caller/logical.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/workflow/caller/many.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-domain/src/workflow/caller/many/map.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-domain/src/workflow/caller/many/shape.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-domain/src/workflow/indexed/decision.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-node/src/recovery.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-node/src/recovery/join.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-node/src/recovery/snapshot/provenance.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-node/src/recovery/snapshot/replay.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-parity-tests/src/artifact.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-parity-tests/src/compiler_lineage/refs.rs": {
+      "clippy::indexing_slicing": 15
+    },
+    "crates/wf-parity-tests/src/compiler_lineage/relations.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-parity-tests/src/macro_origin.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-parity-tests/src/progress.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-parity-tests/src/reference.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-parity-tests/src/runtime_evidence.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-parity-tests/src/rust_source.rs": {
+      "clippy::arithmetic_side_effects": 31,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-parity-tests/src/rust_tokens.rs": {
+      "clippy::arithmetic_side_effects": 15
+    },
+    "crates/wf-ports/src/blob/publication/step.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/blob/reference.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/blob/reference/base64.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-ports/src/blob/reference/tag.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/consensus/membership/value.rs": {
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-ports/src/log/atomic_claim/frame.rs": {
+      "clippy::arithmetic_side_effects": 5
+    },
+    "crates/wf-ports/src/log/atomic_claim/policy.rs": {
+      "clippy::indexing_slicing": 12
+    },
+    "crates/wf-ports/src/log/atomic_claim/response/builder.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/atomic_claim/response/scan.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-ports/src/log/catalog_ack/request.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/catalog_ack/response.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/log/catalog_membership/request.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/catalog_progress/request.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/catalog_prune.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/catalog_prune/request.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/claim/response/scan.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/complete_policy/core_patch/response.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/log/control/scan.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/log/credit/admission.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/credit/decode.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/credit/encode.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/log/credit/owner.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/credit/response.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-ports/src/log/credit/scan.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/governed_claim.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/log/governed_claim/payment.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-ports/src/log/governed_claim/request.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-ports/src/log/metadata_batch.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/metadata_batch/frame.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/policy/scan.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/log/public_claim/binding/payment.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-ports/src/log/public_claim/intent.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/log/public_credit/decode.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/log/public_credit/ids.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 8
+    },
+    "crates/wf-ports/src/log/public_credit/policy.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/public_mutation.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/public_mutation/codec.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/public_mutation/intent.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/log/public_mutation/response.rs": {
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-ports/src/log/reader.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/log/record_batch/atomic_start/response.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/record_batch/atomic_start/response/scan.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/record_batch/fresh.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/record_batch/response.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/log/record_batch/response/independent.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/log/record_batch/step_continue/response/write.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-ports/src/log/release/binding.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/release/cursor.rs": {
+      "clippy::arithmetic_side_effects": 5,
+      "clippy::indexing_slicing": 10
+    },
+    "crates/wf-ports/src/log/release_maintenance/request.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-ports/src/log/release_maintenance/response.rs": {
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-ports/src/log/value_batch/frame.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/value_batch/intent.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/value_batch/logical.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/log/value_batch/metadata.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-ports/src/projection/query_row/config.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/projection/query_row/create/model.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/projection/query_row/create/record.rs": {
+      "clippy::arithmetic_side_effects": 5,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-ports/src/projection/query_row/dynamic.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-ports/src/projection/query_row/metadata.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-ports/src/projection/query_row/native/metadata.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 6
+    },
+    "crates/wf-ports/src/projection/query_row/primitive.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/projection/query_row/read/cursor.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-ports/src/projection/query_row/read/metadata.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/projection/query_row/read/model.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/projection/query_row/writer.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-ports/src/state/credit_catalog/member.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-ports/src/state/governance_catalog/prune.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/log/format.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 9
+    },
+    "crates/wf-storage/src/log/recovery.rs": {
+      "clippy::arithmetic_side_effects": 2
+    },
+    "crates/wf-storage/src/log/write.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/key.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-storage/src/state/key/ordered.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/key/ordered/history.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/key/physical.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-storage/src/state/redb/admission.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/bootstrap.rs": {
+      "clippy::indexing_slicing": 6
+    },
+    "crates/wf-storage/src/state/redb/commit/atomic_claim/bindings.rs": {
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-storage/src/state/redb/commit/atomic_claim/payment.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/commit/public_claim/funding.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/commit/public_claim/settlement.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/commit/values.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/commit/values/immutable.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/core_policy/catalog.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 6
+    },
+    "crates/wf-storage/src/state/redb/credit/catalog.rs": {
+      "clippy::arithmetic_side_effects": 4
+    },
+    "crates/wf-storage/src/state/redb/credit/catalog/recovery.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/credit/context.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/credit/recovery.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/credit/write/rows.rs": {
+      "clippy::indexing_slicing": 7
+    },
+    "crates/wf-storage/src/state/redb/cursor.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/governance_catalog/read.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/history/hydrate/references.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/recovery.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-storage/src/state/redb/recovery/index.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/release/claim.rs": {
+      "clippy::indexing_slicing": 8
+    },
+    "crates/wf-storage/src/state/redb/release/claimed.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/release/plan.rs": {
+      "clippy::arithmetic_side_effects": 3
+    },
+    "crates/wf-storage/src/state/redb/release/read.rs": {
+      "clippy::arithmetic_side_effects": 5
+    },
+    "crates/wf-storage/src/state/redb/release/write.rs": {
+      "clippy::arithmetic_side_effects": 3,
+      "clippy::indexing_slicing": 8
+    },
+    "crates/wf-storage/src/state/redb/snapshot.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/snapshot/capture.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/snapshot/catalog.rs": {
+      "clippy::indexing_slicing": 9
+    },
+    "crates/wf-storage/src/state/redb/snapshot/catalog/format.rs": {
+      "clippy::arithmetic_side_effects": 4,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-storage/src/state/redb/snapshot/format.rs": {
+      "clippy::arithmetic_side_effects": 5,
+      "clippy::indexing_slicing": 11
+    },
+    "crates/wf-storage/src/state/redb/snapshot/install.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/snapshot/io.rs": {
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-storage/src/state/redb/snapshot/read.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/snapshot/receive.rs": {
+      "clippy::arithmetic_side_effects": 1,
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/snapshot/transition.rs": {
+      "clippy::indexing_slicing": 3
+    },
+    "crates/wf-storage/src/state/redb/snapshot/validate.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/values/binding.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/values/budget.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/values/genesis.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/values/manifest.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/values/metadata/publication.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/values/metadata/read.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/values/metadata/record/policy.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/state/redb/values/metadata/record/row.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/values/metadata/recovery.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/values/read.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/redb/values/read/sized.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/values/read/sized/captured.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/redb/values/validate.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/state/value.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 4
+    },
+    "crates/wf-storage/src/state/value/credit.rs": {
+      "clippy::indexing_slicing": 5
+    },
+    "crates/wf-storage/src/state/value/membership.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/value/record.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/value/record_capture.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/value/record_metadata.rs": {
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/state/value/workflow_values.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/transaction/claim/load.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 1
+    },
+    "crates/wf-storage/src/transaction/core_policy.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/transaction/value_batch/metadata.rs": {
+      "clippy::arithmetic_side_effects": 1
+    },
+    "crates/wf-storage/src/transaction/value_batch/prepare.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-storage/src/transaction/value_batch/step.rs": {
+      "clippy::indexing_slicing": 2
+    },
+    "crates/wf-types/src/identity.rs": {
+      "clippy::arithmetic_side_effects": 2,
+      "clippy::indexing_slicing": 3
+    }
+  }
+}

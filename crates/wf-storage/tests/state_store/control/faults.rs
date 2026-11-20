@@ -322,7 +322,8 @@ fn kill(path: &Path, member: bool, after: bool) -> TestResult {
             return;
         }
         if ok {
-            let _ = sender.send(read_signal(
+            // A receiver that already timed out has nothing left to observe.
+            let _unobserved = sender.send(read_signal(
                 &mut stdout,
                 format!("WFSTATE WAIT {stage}\n").as_bytes(),
             ));
