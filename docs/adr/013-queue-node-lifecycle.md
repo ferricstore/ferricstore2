@@ -118,3 +118,4 @@ forever on that.
   (ADR013-BLOCKING1). Parked claims are woken by creates whose type, state and
   priority match; a claim with a partition filter may wake for a create in
   another partition, try, and park again.
+- Decision 4 done: retention of terminal Flows (ADR013-RETENTION1).

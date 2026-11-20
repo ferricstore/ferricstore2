@@ -64871,3 +64871,21 @@ lease expires for a reclaiming claim, `block_ms` 0 waits, cancellation takes
 nothing, stopping the node fails a parked claim as unavailable) and 3 session
 tests (options reach the service, bounds refused, closing cancels). Clippy,
 the ratchet and the architecture tests pass.
+
+### ADR013-RETENTION1 removal of terminal Flows
+
+`QueueNodeConfig.retention_ms` (default `ResolvedRetention::default().ttl_ms`,
+7 days) and the binary's `--retention-ms`. Shard state keeps a removal index
+of terminal records (last change plus retention) in private
+`supervision::shard::state::retention`; shards sweep up to 4,096 removals at
+the start of a round and after a 250 ms idle tick, and log them as one
+`Logged::Expire` (tag 5) per sweep. Replay splits a sweep by owning shard,
+so a shard-count change still replays it. A sweep removes all named records
+or none. No dependency or policy change.
+
+RED: `tests/queue_node` did not compile (`QueueNodeConfig` had no
+`retention_ms`). GREEN: 3 retention tests pass twice (a completed Flow is
+refused as existing, then removed and created again; removals and the second
+Flows survive a restart with 3 shards; an open Flow is never removed and a
+completed Flow within the default retention stays across a restart), with
+all 23 node tests. Clippy, the ratchet and the architecture tests pass.

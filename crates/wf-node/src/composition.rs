@@ -20,6 +20,7 @@ use wf_application::commands::queue::{
     ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, Partition, QueueService,
     Reply, SLOTS, ServiceError,
 };
+use wf_domain::retention::ResolvedRetention;
 use wf_domain::workflow::Outcome;
 use wf_storage::log::{GroupLog, GroupLogError, GroupLogLimits};
 
@@ -38,6 +39,8 @@ pub struct QueueNodeConfig {
     pub shards: u16,
     /// Group log limits; a record must hold the largest protocol body.
     pub log: GroupLogLimits,
+    /// How long completed Flows are kept before removal (ADR-013).
+    pub retention_ms: u64,
 }
 
 impl Default for QueueNodeConfig {
@@ -48,6 +51,7 @@ impl Default for QueueNodeConfig {
                 max_record_bytes: 32 * 1024 * 1024,
                 ..GroupLogLimits::default()
             },
+            retention_ms: ResolvedRetention::default().ttl_ms,
         }
     }
 }
@@ -101,13 +105,38 @@ fn replay(states: &mut [ShardState], records: &[Vec<u8>], shards: u16) -> Result
     for (position, record) in records.iter().enumerate() {
         let failed = NodeError::Replay { record: position };
         let logged = Logged::decode(record).ok_or(failed)?;
-        let index = shard_index(logged.partition(), shards).ok_or(failed)?;
-        let state = states.get_mut(index).ok_or(failed)?;
-        if state.apply(&logged) != Ok(Outcome::Changed) {
-            return Err(failed);
+        for (index, change) in by_shard(logged, shards).ok_or(failed)? {
+            let state = states.get_mut(index).ok_or(failed)?;
+            if state.apply(&change) != Ok(Outcome::Changed) {
+                return Err(failed);
+            }
         }
     }
     Ok(())
+}
+
+/// Routes a logged change to the shards owning its Flows; a sweep is split
+/// into one sweep per shard.
+fn by_shard(logged: Logged, shards: u16) -> Option<Vec<(usize, Logged)>> {
+    let Logged::Expire { now, keys } = logged else {
+        let index = shard_index(logged.partition()?, shards)?;
+        return Some(vec![(index, logged)]);
+    };
+    let mut parts: Vec<(usize, Logged)> = Vec::new();
+    for key in keys {
+        let index = shard_index(&key.0, shards)?;
+        match parts.iter_mut().find(|(owner, _)| *owner == index) {
+            Some((_, Logged::Expire { keys, .. })) => keys.push(key),
+            _ => parts.push((
+                index,
+                Logged::Expire {
+                    now,
+                    keys: vec![key],
+                },
+            )),
+        }
+    }
+    Some(parts)
 }
 
 impl QueueNode {
@@ -122,8 +151,9 @@ impl QueueNode {
         }
         let (log, recovered) = GroupLog::open(directory, config.log)?;
         let log = Arc::new(log);
-        let mut states: Vec<ShardState> =
-            (0..config.shards).map(|_| ShardState::default()).collect();
+        let mut states: Vec<ShardState> = (0..config.shards)
+            .map(|_| ShardState::new(config.retention_ms))
+            .collect();
         replay(&mut states, &recovered.records, config.shards)?;
         let (waiter_sender, waiter_receiver) = mpsc::channel();
         let waiters = Waiters::new(waiter_sender);

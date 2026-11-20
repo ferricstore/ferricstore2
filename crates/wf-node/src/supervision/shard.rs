@@ -13,8 +13,8 @@ pub(crate) mod state;
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::mpsc::{Receiver, Sender};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::queue::{
     ClaimFlows, ClaimedFlow, CompleteFlow, ItemOutcome, NewFlow, Partition, ServiceError,
@@ -28,6 +28,10 @@ use state::{Peeked, ShardState};
 
 /// Most requests one shard applies before appending.
 const MAX_REQUESTS_PER_ROUND: usize = 256;
+/// Most terminal records one round removes.
+const MAX_REMOVALS_PER_ROUND: usize = 4_096;
+/// How long an idle shard waits before it sweeps removals.
+const IDLE_TICK: Duration = Duration::from_millis(250);
 
 /// Called once with the request's result after it is durable.
 pub(crate) type Done<T> = Box<dyn FnOnce(Result<T, ServiceError>) + Send>;
@@ -203,9 +207,13 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
     let mut now = 0;
     let mut sequence = 0;
     let mut failed = false;
-    while let Ok(first) = requests.recv() {
-        let mut round = vec![first];
-        while round.len() < MAX_REQUESTS_PER_ROUND {
+    loop {
+        let mut round = match requests.recv_timeout(IDLE_TICK) {
+            Ok(first) => vec![first],
+            Err(RecvTimeoutError::Timeout) => Vec::new(),
+            Err(RecvTimeoutError::Disconnected) => break,
+        };
+        while !round.is_empty() && round.len() < MAX_REQUESTS_PER_ROUND {
             match requests.try_recv() {
                 Ok(request) => round.push(request),
                 Err(_) => break,
@@ -213,6 +221,12 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         }
         now = committed_now(now);
         let mut logged = Vec::new();
+        if !failed {
+            logged.extend(state.sweep(now, MAX_REMOVALS_PER_ROUND));
+        }
+        if round.is_empty() && logged.is_empty() {
+            continue;
+        }
         let finishes: Vec<Finish> = round
             .into_iter()
             .filter_map(|request| handle(&mut state, now, request, &mut logged))
@@ -235,7 +249,9 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
             for finish in finishes {
                 finish(Err(ServiceError::Unavailable));
             }
-        } else if let Err(returned) = links.completions.send(Completion { sequence, finishes }) {
+        } else if !finishes.is_empty()
+            && let Err(returned) = links.completions.send(Completion { sequence, finishes })
+        {
             for finish in returned.0.finishes {
                 finish(Err(ServiceError::Unavailable));
             }

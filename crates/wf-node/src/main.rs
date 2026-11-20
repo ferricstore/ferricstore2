@@ -2,8 +2,8 @@
 //! serves the FSNP queue commands on one TCP port.
 //!
 //! Usage: `ferricstore2 --data-dir PATH [--host 127.0.0.1] [--port 6388]
-//! [--shards 16] [--threads N]`. Port 0 picks a free port. Once listening it
-//! prints `READY port=<port> shards=<n>`.
+//! [--shards 16] [--threads N] [--retention-ms 604800000]`. Port 0 picks a
+//! free port. Once listening it prints `READY port=<port> shards=<n>`.
 
 #![forbid(unsafe_code)]
 
@@ -21,6 +21,7 @@ struct Options {
     port: u16,
     shards: u16,
     threads: Option<usize>,
+    retention_ms: u64,
 }
 
 fn parse(arguments: &[String]) -> Result<Options, String> {
@@ -30,6 +31,7 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
         port: 6388,
         shards: QueueNodeConfig::default().shards,
         threads: None,
+        retention_ms: QueueNodeConfig::default().retention_ms,
     };
     let mut pairs = arguments.iter();
     while let Some(flag) = pairs.next() {
@@ -57,6 +59,7 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
                     usize::try_from(number()?).map_err(|_| "--threads is too large".to_owned())?,
                 );
             }
+            "--retention-ms" => options.retention_ms = number()?,
             other => return Err(format!("unknown flag {other}")),
         }
     }
@@ -69,6 +72,7 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
 fn run(options: Options) -> Result<(), String> {
     let config = QueueNodeConfig {
         shards: options.shards,
+        retention_ms: options.retention_ms,
         ..QueueNodeConfig::default()
     };
     let node = QueueNode::open(&options.data_dir, config).map_err(|error| error.to_string())?;

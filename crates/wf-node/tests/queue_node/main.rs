@@ -20,6 +20,7 @@ mod crash;
 mod lifecycle;
 mod reclaim;
 mod restart;
+mod retention;
 mod selection;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
@@ -37,13 +38,17 @@ fn directory(tag: &str) -> TestResult<PathBuf> {
 }
 
 fn open(path: &Path, shards: u16) -> TestResult<QueueNode> {
-    Ok(QueueNode::open(
-        &path.join("log"),
+    open_with(
+        path,
         QueueNodeConfig {
             shards,
             ..QueueNodeConfig::default()
         },
-    )?)
+    )
+}
+
+fn open_with(path: &Path, config: QueueNodeConfig) -> TestResult<QueueNode> {
+    Ok(QueueNode::open(&path.join("log"), config)?)
 }
 
 /// Calls a service method and waits for its single reply.

@@ -6,10 +6,11 @@
 //! uses this shard's own due index; the reducer then decides each named
 //! claim. Records that are scheduled, unleased and not terminal are in the
 //! due index by due time; leased running records are in it under state
-//! `running` by lease deadline, for reclaim (ADR-013). Completed records stay
-//! in memory: retention is not implemented yet.
+//! `running` by lease deadline, for reclaim (ADR-013). Terminal records are
+//! kept until their retention ends, then removed by a logged sweep.
 
 mod claim;
+mod retention;
 
 pub(crate) use claim::Peeked;
 
@@ -47,11 +48,13 @@ struct Queue {
 }
 
 /// Records of one shard and their due index.
-#[derive(Default)]
 pub(crate) struct ShardState {
     records: HashMap<Key, Entry>,
     /// Due time and creation sequence to record key, per queue.
     queues: HashMap<Queue, BTreeMap<(u64, u64), Key>>,
+    /// Removal time and creation sequence to key, for terminal records.
+    expiries: BTreeMap<(u64, u64), Key>,
+    retention_ms: u64,
     next_sequence: u64,
     ready: u64,
     leased: u64,
@@ -70,6 +73,19 @@ fn token(bytes: &[u8]) -> Result<LeaseToken, ServiceError> {
 }
 
 impl ShardState {
+    /// An empty shard that keeps terminal records for `retention_ms`.
+    pub(crate) fn new(retention_ms: u64) -> Self {
+        Self {
+            records: HashMap::new(),
+            queues: HashMap::new(),
+            expiries: BTreeMap::new(),
+            retention_ms,
+            next_sequence: 0,
+            ready: 0,
+            leased: 0,
+        }
+    }
+
     /// Records in the due index, claimable now or later.
     pub(crate) const fn ready(&self) -> u64 {
         self.ready
@@ -83,6 +99,7 @@ impl ShardState {
     /// Applies one change through the reducer and stores its write.
     pub(crate) fn apply(&mut self, logged: &Logged) -> Result<Outcome, ServiceError> {
         let (now, partition, id, operation, priority) = match logged {
+            Logged::Expire { keys, .. } => return Ok(self.expire(keys)),
             Logged::Create {
                 now,
                 partition,
@@ -169,6 +186,7 @@ impl ShardState {
     fn store(&mut self, key: Key, record: WorkflowRecord, new_priority: Option<u8>) {
         let (priority, sequence) = if let Some(previous) = self.records.remove(&key) {
             self.unindex(&key, &previous);
+            self.unschedule_removal(&previous);
             (previous.priority, previous.sequence)
         } else {
             let sequence = self.next_sequence;
@@ -181,6 +199,7 @@ impl ShardState {
             sequence,
         };
         self.index(&key, &entry);
+        self.schedule_removal(&key, &entry);
         self.records.insert(key, entry);
     }
 

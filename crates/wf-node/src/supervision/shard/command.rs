@@ -2,8 +2,9 @@
 //!
 //! Each change the domain accepted is logged as one record for one Flow, with
 //! its committed time and every input the reducer used, so replay decides it
-//! again identically. Records name their partition, so replay can route them
-//! even when the shard count changed. Layout: a tag byte, then fields; a
+//! again identically. A retention sweep is logged as one record naming every
+//! Flow it removed (ADR-013). Records name partitions, so replay can route
+//! them even when the shard count changed. Layout: a tag byte, then fields; a
 //! binary is a `u32` length and bytes, an option a `0`/`1` byte then the
 //! value, and integers are big-endian.
 
@@ -13,6 +14,7 @@ const CREATE: u8 = 1;
 const CLAIM: u8 = 2;
 const COMPLETE: u8 = 3;
 const RECLAIM: u8 = 4;
+const EXPIRE: u8 = 5;
 
 /// One logged change to one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -46,15 +48,21 @@ pub(crate) enum Logged {
         fence: u64,
         result: Option<Vec<u8>>,
     },
+    /// Completed Flows removed after their retention.
+    Expire {
+        now: u64,
+        keys: Vec<(Partition, Vec<u8>)>,
+    },
 }
 
 impl Logged {
-    /// The partition this change belongs to.
-    pub(crate) const fn partition(&self) -> &Partition {
+    /// The partition of a single-Flow change; `None` for a sweep.
+    pub(crate) const fn partition(&self) -> Option<&Partition> {
         match self {
             Self::Create { partition, .. }
             | Self::Claim { partition, .. }
-            | Self::Complete { partition, .. } => partition,
+            | Self::Complete { partition, .. } => Some(partition),
+            Self::Expire { .. } => None,
         }
     }
 
@@ -111,6 +119,15 @@ impl Logged {
                 out.extend_from_slice(&fence.to_be_bytes());
                 optional_bin(&mut out, result.as_deref())?;
             }
+            Self::Expire { now, keys } => {
+                out.push(EXPIRE);
+                out.extend_from_slice(&now.to_be_bytes());
+                out.extend_from_slice(&u32::try_from(keys.len()).ok()?.to_be_bytes());
+                for (partition, id) in keys {
+                    bin(&mut out, &partition.name())?;
+                    bin(&mut out, id)?;
+                }
+            }
         }
         Some(out)
     }
@@ -128,6 +145,19 @@ fn decode(bytes: &[u8]) -> Result<Logged, Malformed> {
     let mut reader = Reader(bytes);
     let tag = reader.u8()?;
     let now = reader.u64()?;
+    if tag == EXPIRE {
+        let count = u32::from_be_bytes(reader.array()?);
+        let mut keys = Vec::new();
+        for _ in 0..count {
+            let partition = Partition::parse(reader.bin()?);
+            keys.push((partition, reader.bin()?.to_vec()));
+        }
+        return if reader.0.is_empty() && !keys.is_empty() {
+            Ok(Logged::Expire { now, keys })
+        } else {
+            Err(Malformed)
+        };
+    }
     let partition = Partition::parse(reader.bin()?);
     let id = reader.bin()?.to_vec();
     let logged = match tag {
