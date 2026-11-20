@@ -64750,3 +64750,20 @@ by name before and after (1,667 tests). A first attempt also combined the five
 `wf-domain` targets that include the shared support modules; Clippy's
 `duplicate_mod` refused it and they stay separate.
 
+### ADR011-QUEUE-CONTRACT1 queue service contract and partition routing
+
+ADR-011 step 3 starts (user, 2026-11-20: "yes do it" to the shard threads and
+listener). `wf-application` fills its private `routing` module with the Elixir
+partition rules (auto bucket `crc32(id) & 0xFF`, slot `crc32(input) & 1023`,
+contiguous slot ranges) and adds public `commands::queue`: the `QueueService`
+trait (create, claim, complete with a reply called once after the outcome is
+durable), its request and result types, and routing re-exports. New files:
+`src/commands/queue.rs`, `src/routing/tests.rs`, `tests/queue_routing.rs`
+(loaded by the combined test root). No dependency or policy change.
+
+RED: the routing integration tests did not compile (no `commands::queue`).
+GREEN: 4 integration and 2 unit tests pass against Python zlib, hashlib and
+base64 vectors, including the SDK fixture flow id's bucket 131. Every routing
+operation uses checked or wrapping methods; the ratchet holds the new files at
+zero.
+

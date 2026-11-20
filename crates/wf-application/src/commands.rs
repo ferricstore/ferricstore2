@@ -10,6 +10,7 @@ use crate::error::PreparationError;
 
 pub mod claim;
 pub mod independent;
+pub mod queue;
 
 /// Explicit typed comparison value chosen by a versioned operation schema.
 ///

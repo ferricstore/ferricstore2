@@ -18,3 +18,5 @@ mod intent_comparison;
 mod policy_intent;
 #[path = "public_claim/main.rs"]
 mod public_claim;
+#[path = "queue_routing.rs"]
+mod queue_routing;
