@@ -64826,3 +64826,22 @@ Every run created and completed all flows. Final gate on b364939: 2,190 tests
 in 67 groups, none failed or ignored; fmt, Clippy, ratchet, docs, architecture,
 reference, progress and cargo-deny pass (344 s).
 
+
+### ADR013-RECLAIM1 expired-lease reclaim in Elixir's order
+
+ADR-013 accepted (reclaim, shortfall rounds, blocking claims, retention,
+snapshots). This entry covers reclaim. `ClaimFlows.reclaim: Option<u8>`
+(Elixir's `reclaim_ratio`); shard state indexes leased running records by
+lease deadline under state `running` and publishes a leased count; claim
+selection moved to `supervision::shard::state::claim`. Reclaims go through
+`Operation::Reclaim` and are logged with tag 4, so older logs still decode.
+The TCP adapter passes `reclaim_expired` and its ratio, and refuses a ratio
+outside 0 to 100 with Elixir's text. No dependency or policy change.
+
+RED: `tests/queue_node` did not compile (`ClaimFlows` had no `reclaim`); the
+new session tests against the previous translation failed (reclaim refused as
+not supported). GREEN: 4 node tests (next fence, new token, run state kept,
+old lease stale; Elixir order a, c, d, b for limit 4 ratio 25; limit 1
+prefers a due Flow; state `running` takes only expired leases; reclaim
+replayed after a restart with another shard count) and 2 session tests pass.
+Clippy, the ratchet and the architecture tests pass.

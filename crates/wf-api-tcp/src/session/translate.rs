@@ -210,12 +210,15 @@ pub(super) fn claim_due(
         Ok(parsed) => parsed,
         Err(error) => return refuse(reply, error.message()),
     };
-    if parsed.reclaim_expired {
+    let Some(ratio) = u8::try_from(parsed.reclaim_ratio)
+        .ok()
+        .filter(|ratio| *ratio <= 100)
+    else {
         return refuse(
             reply,
-            "ERR FLOW.CLAIM_DUE reclaim of expired leases is not supported by this server",
+            "ERR flow reclaim_ratio must be an integer between 0 and 100",
         );
-    }
+    };
     if parsed.block_ms.is_some() {
         return refuse(
             reply,
@@ -248,6 +251,7 @@ pub(super) fn claim_due(
         limit,
         priority,
         partitions,
+        reclaim: parsed.reclaim_expired.then_some(ratio),
     };
     let (shape, compact) = (parsed.shape, negotiated.claim_jobs);
     context.service.claim(

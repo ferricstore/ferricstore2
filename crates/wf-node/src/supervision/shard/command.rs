@@ -12,6 +12,7 @@ use wf_application::commands::queue::Partition;
 const CREATE: u8 = 1;
 const CLAIM: u8 = 2;
 const COMPLETE: u8 = 3;
+const RECLAIM: u8 = 4;
 
 /// One logged change to one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -34,6 +35,8 @@ pub(crate) enum Logged {
         worker: Vec<u8>,
         token: Vec<u8>,
         lease_ms: u64,
+        /// Taken from an expired lease; logged with its own tag.
+        reclaim: bool,
     },
     Complete {
         now: u64,
@@ -85,8 +88,9 @@ impl Logged {
                 worker,
                 token,
                 lease_ms,
+                reclaim,
             } => {
-                out.push(CLAIM);
+                out.push(if *reclaim { RECLAIM } else { CLAIM });
                 head(&mut out, *now, partition, id)?;
                 bin(&mut out, expected_state)?;
                 bin(&mut out, worker)?;
@@ -137,7 +141,7 @@ fn decode(bytes: &[u8]) -> Result<Logged, Malformed> {
             payload: reader.optional_bin()?,
             priority: reader.u8()?,
         },
-        CLAIM => Logged::Claim {
+        CLAIM | RECLAIM => Logged::Claim {
             now,
             partition,
             id,
@@ -145,6 +149,7 @@ fn decode(bytes: &[u8]) -> Result<Logged, Malformed> {
             worker: reader.bin()?.to_vec(),
             token: reader.bin()?.to_vec(),
             lease_ms: reader.u64()?,
+            reclaim: tag == RECLAIM,
         },
         COMPLETE => Logged::Complete {
             now,

@@ -17,6 +17,7 @@ use wf_node::composition::{QueueNode, QueueNodeConfig};
 
 mod crash;
 mod lifecycle;
+mod reclaim;
 mod restart;
 mod selection;
 
@@ -82,6 +83,7 @@ fn claim_request(limit: usize) -> ClaimFlows {
         limit,
         priority: None,
         partitions: None,
+        reclaim: None,
     }
 }
 

@@ -61,6 +61,7 @@ pub(crate) struct Links {
     pub(crate) log: Arc<GroupLog>,
     pub(crate) completions: Sender<Completion>,
     pub(crate) ready: Arc<AtomicU64>,
+    pub(crate) leased: Arc<AtomicU64>,
     pub(crate) max_append_bytes: usize,
 }
 
@@ -106,8 +107,9 @@ fn handle(state: &mut ShardState, now: u64, request: Request, logged: &mut Vec<L
             partitions,
             done,
         } => {
-            let (claimed, changes) = state.claim(now, &request, limit, partitions.as_deref());
-            logged.extend(changes);
+            let taken = state.claim(now, &request, limit, partitions.as_deref());
+            logged.extend(taken.logged);
+            let claimed = taken.claimed;
             Box::new(move |durable| done(durable.map(|()| claimed)))
         }
         Request::Complete { items, done } => {
@@ -172,6 +174,7 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
             }
         }
         links.ready.store(state.ready(), Ordering::Relaxed);
+        links.leased.store(state.leased(), Ordering::Relaxed);
         if failed {
             for finish in finishes {
                 finish(Err(ServiceError::Unavailable));

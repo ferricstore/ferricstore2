@@ -55,6 +55,11 @@ pub struct ClaimFlows {
     pub priority: Option<u8>,
     /// Only these partitions; any partition when absent.
     pub partitions: Option<Vec<Vec<u8>>>,
+    /// Also take Flows whose lease expired, with Elixir's `reclaim_ratio`
+    /// (0 to 100): the percentage of the limit reclaimed before due Flows.
+    /// No reclaim when absent. A claim for state `running` takes only
+    /// expired leases either way.
+    pub reclaim: Option<u8>,
 }
 
 /// A claimed Flow as the client sees it.

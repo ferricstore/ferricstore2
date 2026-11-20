@@ -17,6 +17,7 @@ use wf_application::commands::queue::{
 use wf_domain::value::DomainError;
 
 mod handshake;
+mod options;
 mod queue;
 mod typed;
 
@@ -24,6 +25,7 @@ type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
 /// Ids starting with `dup` already exist, `stale` completions have a stale
 /// lease, and ids starting with `slow` reply after 150 ms from another thread.
+/// A claim by worker `probe` echoes its options as the run state.
 struct Scripted;
 
 fn outcome(id: &[u8], refused: &[u8], error: DomainError) -> ItemOutcome {
@@ -61,7 +63,11 @@ impl QueueService for Scripted {
             partition: b"__flow_auto__:7".to_vec(),
             lease_token: request.worker.iter().chain(b":1:1").copied().collect(),
             fence: 1,
-            run_state: b"queued".to_vec(),
+            run_state: if request.worker == b"probe" {
+                format!("reclaim={:?}", request.reclaim).into_bytes()
+            } else {
+                b"queued".to_vec()
+            },
         };
         reply(Ok(vec![job].into_iter().take(request.limit).collect()));
     }

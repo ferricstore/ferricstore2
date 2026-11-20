@@ -4,16 +4,17 @@
 //! the only mutation path, used both live and when replaying the log, so the
 //! rebuilt state matches the state that was acknowledged. Claim selection
 //! uses this shard's own due index; the reducer then decides each named
-//! claim. Only records that are scheduled, unleased and not terminal are in
-//! the due index. Completed records stay in memory: retention is not
-//! implemented yet.
+//! claim. Records that are scheduled, unleased and not terminal are in the
+//! due index by due time; leased running records are in it under state
+//! `running` by lease deadline, for reclaim (ADR-013). Completed records stay
+//! in memory: retention is not implemented yet.
 
-use std::cmp::Reverse;
+mod claim;
+
 use std::collections::{BTreeMap, HashMap};
 
 use wf_application::commands::queue::{
-    ClaimFlows, ClaimedFlow, CompleteFlow, ItemOutcome, MAX_FLOW_ID_BYTES, NewFlow, Partition,
-    ServiceError,
+    CompleteFlow, ItemOutcome, MAX_FLOW_ID_BYTES, NewFlow, Partition, ServiceError,
 };
 use wf_domain::claim::Claim;
 use wf_domain::lease::{LeaseGuard, LeaseToken};
@@ -26,6 +27,9 @@ use wf_types::version::{Fence, TimestampMillis};
 use super::command::Logged;
 
 type Key = (Partition, Vec<u8>);
+
+/// The physical state of leased records.
+const RUNNING: &[u8] = b"running";
 
 struct Entry {
     record: WorkflowRecord,
@@ -48,6 +52,7 @@ pub(crate) struct ShardState {
     queues: HashMap<Queue, BTreeMap<(u64, u64), Key>>,
     next_sequence: u64,
     ready: u64,
+    leased: u64,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -66,6 +71,11 @@ impl ShardState {
     /// Records in the due index, claimable now or later.
     pub(crate) const fn ready(&self) -> u64 {
         self.ready
+    }
+
+    /// Leased running records, reclaimable once their lease expires.
+    pub(crate) const fn leased(&self) -> u64 {
+        self.leased
     }
 
     /// Applies one change through the reducer and stores its write.
@@ -103,6 +113,7 @@ impl ShardState {
                 worker,
                 token: lease,
                 lease_ms,
+                reclaim,
             } => {
                 let claim = Claim {
                     expected_state: expected_state.clone(),
@@ -110,7 +121,12 @@ impl ShardState {
                     token: token(lease)?,
                     lease_ms: *lease_ms,
                 };
-                (now, partition, id, Operation::Claim(claim), None)
+                let operation = if *reclaim {
+                    Operation::Reclaim(claim)
+                } else {
+                    Operation::Claim(claim)
+                };
+                (now, partition, id, operation, None)
             }
             Logged::Complete {
                 now,
@@ -166,27 +182,43 @@ impl ShardState {
         self.records.insert(key, entry);
     }
 
+    /// The index entry of a record: due time for a scheduled unleased record,
+    /// lease deadline for a leased running one.
     fn queue_slot(entry: &Entry) -> Option<(Queue, (u64, u64))> {
-        let due = entry.record.next_run_at()?;
-        let claimable =
-            entry.record.status() == WorkflowStatus::Scheduled && entry.record.lease().is_none();
-        claimable.then(|| {
-            let queue = Queue {
-                flow_type: entry.record.workflow_type().to_vec(),
-                state: entry.record.state().to_vec(),
-                priority: entry.priority,
-            };
-            (queue, (due.get(), entry.sequence))
-        })
+        let record = &entry.record;
+        let due = match (record.status(), record.lease()) {
+            (WorkflowStatus::Scheduled, None) => record.next_run_at()?,
+            (_, Some(lease)) if record.state() == RUNNING => lease.deadline,
+            _ => return None,
+        };
+        let queue = Queue {
+            flow_type: record.workflow_type().to_vec(),
+            state: record.state().to_vec(),
+            priority: entry.priority,
+        };
+        Some((queue, (due.get(), entry.sequence)))
+    }
+
+    fn count(&mut self, queue: &Queue, added: bool) {
+        let counter = if queue.state == RUNNING {
+            &mut self.leased
+        } else {
+            &mut self.ready
+        };
+        *counter = if added {
+            counter.saturating_add(1)
+        } else {
+            counter.saturating_sub(1)
+        };
     }
 
     fn index(&mut self, key: &Key, entry: &Entry) {
         if let Some((queue, slot)) = Self::queue_slot(entry) {
+            self.count(&queue, true);
             self.queues
                 .entry(queue)
                 .or_default()
                 .insert(slot, key.clone());
-            self.ready = self.ready.saturating_add(1);
         }
     }
 
@@ -194,11 +226,13 @@ impl ShardState {
         let Some((queue, slot)) = Self::queue_slot(entry) else {
             return;
         };
-        if let Some(due) = self.queues.get_mut(&queue)
-            && due.remove(&slot).is_some_and(|indexed| indexed == *key)
-        {
-            self.ready = self.ready.saturating_sub(1);
-            if due.is_empty() {
+        let removed = self
+            .queues
+            .get_mut(&queue)
+            .is_some_and(|due| due.remove(&slot).is_some_and(|indexed| indexed == *key));
+        if removed {
+            self.count(&queue, false);
+            if self.queues.get(&queue).is_some_and(BTreeMap::is_empty) {
                 self.queues.remove(&queue);
             }
         }
@@ -242,92 +276,6 @@ impl ShardState {
             result: completion.result,
         };
         settle(self.apply(&logged), logged)
-    }
-
-    /// Claims up to `limit` due Flows; returns them and the changes to log.
-    pub(crate) fn claim(
-        &mut self,
-        now: u64,
-        request: &ClaimFlows,
-        limit: usize,
-        partitions: Option<&[Partition]>,
-    ) -> (Vec<ClaimedFlow>, Vec<Logged>) {
-        let mut claimed = Vec::new();
-        let mut logged = Vec::new();
-        for (key, expected_state, fence) in self.candidates(now, request, limit, partitions) {
-            let lease_fence = fence.saturating_add(1);
-            let worker = String::from_utf8_lossy(&request.worker);
-            let change = Logged::Claim {
-                now,
-                partition: key.0.clone(),
-                id: key.1.clone(),
-                expected_state,
-                worker: request.worker.clone(),
-                token: format!("{worker}:{now}:{lease_fence}").into_bytes(),
-                lease_ms: request.lease_ms,
-            };
-            if self.apply(&change) != Ok(Outcome::Changed) {
-                continue;
-            }
-            if let Some(entry) = self.records.get(&key) {
-                claimed.push(ClaimedFlow {
-                    id: key.1.clone(),
-                    partition: key.0.name(),
-                    lease_token: entry
-                        .record
-                        .lease()
-                        .map(|lease| lease.token.as_bytes().to_vec())
-                        .unwrap_or_default(),
-                    fence: entry.record.fence().get(),
-                    run_state: entry
-                        .record
-                        .run_state()
-                        .map(<[u8]>::to_vec)
-                        .unwrap_or_default(),
-                });
-                logged.push(change);
-            }
-        }
-        (claimed, logged)
-    }
-
-    /// Due, unleased records matching the request: higher priority first,
-    /// then due time, then creation order.
-    fn candidates(
-        &self,
-        now: u64,
-        request: &ClaimFlows,
-        limit: usize,
-        partitions: Option<&[Partition]>,
-    ) -> Vec<(Key, Vec<u8>, u64)> {
-        let mut found: Vec<(Reverse<u8>, (u64, u64), &Key)> = Vec::new();
-        let queues = self.queues.iter().filter(|(queue, _)| {
-            queue.flow_type == request.flow_type
-                && request
-                    .state
-                    .as_ref()
-                    .is_none_or(|state| *state == queue.state)
-                && request
-                    .priority
-                    .is_none_or(|priority| priority == queue.priority)
-        });
-        for (queue, due) in queues {
-            let eligible = due
-                .range(..=(now, u64::MAX))
-                .filter(|(_, key)| partitions.is_none_or(|allowed| allowed.contains(&key.0)))
-                .take(limit)
-                .map(|(slot, key)| (Reverse(queue.priority), *slot, key));
-            found.extend(eligible);
-        }
-        found.sort_unstable_by_key(|(priority, slot, _)| (*priority, *slot));
-        found.truncate(limit);
-        found
-            .into_iter()
-            .filter_map(|(_, _, key)| {
-                let record = &self.records.get(key)?.record;
-                Some((key.clone(), record.state().to_vec(), record.fence().get()))
-            })
-            .collect()
     }
 }
 

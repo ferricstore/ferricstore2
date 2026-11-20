@@ -87,6 +87,7 @@ struct Shard {
     requests: Option<mpsc::Sender<Request>>,
     thread: Option<JoinHandle<()>>,
     ready: Arc<AtomicU64>,
+    leased: Arc<AtomicU64>,
 }
 
 /// The running queue node. Dropping it stops the shards, releases their
@@ -149,10 +150,12 @@ impl QueueNode {
         for (index, state) in states.into_iter().enumerate() {
             let (sender, receiver) = mpsc::channel();
             let ready = Arc::new(AtomicU64::new(state.ready()));
+            let leased = Arc::new(AtomicU64::new(state.leased()));
             let links = Links {
                 log: Arc::clone(&log),
                 completions: completion_sender.clone(),
                 ready: Arc::clone(&ready),
+                leased: Arc::clone(&leased),
                 max_append_bytes: config.log.max_block_bytes.checked_div(2).unwrap_or(0),
             };
             let thread = supervision::spawn(format!("wf-shard-{index}"), move || {
@@ -163,6 +166,7 @@ impl QueueNode {
                 requests: Some(sender),
                 thread: Some(thread),
                 ready,
+                leased,
             });
         }
         Ok(Self {
@@ -242,7 +246,7 @@ impl QueueService for QueueNode {
             .map(|names| names.iter().map(|name| Partition::parse(name)).collect());
         let shares = match &partitions {
             Some(partitions) => self.partition_shares(partitions, request.limit),
-            None => self.ready_shares(request.limit),
+            None => self.ready_shares(&request),
         };
         if shares.is_empty() {
             reply(Ok(Vec::new()));
@@ -316,17 +320,31 @@ impl QueueNode {
         )
     }
 
-    /// Shards with due-indexed Flows, each asked for a share of `limit`
-    /// proportional to its count.
-    fn ready_shares(&self, limit: usize) -> Vec<(usize, usize)> {
+    /// Shards with indexed Flows the claim may take, each asked for a share
+    /// of the limit proportional to its count: due-indexed Flows, plus leased
+    /// ones when the claim reclaims.
+    fn ready_shares(&self, request: &ClaimFlows) -> Vec<(usize, usize)> {
+        let running = request.state.as_deref() == Some(b"running".as_slice());
         let weights: Vec<(usize, u64)> = self
             .shards
             .iter()
             .enumerate()
-            .map(|(index, shard)| (index, shard.ready.load(Ordering::Relaxed)))
-            .filter(|(_, ready)| *ready > 0)
+            .map(|(index, shard)| {
+                let ready = if running {
+                    0
+                } else {
+                    shard.ready.load(Ordering::Relaxed)
+                };
+                let leased = if running || request.reclaim.is_some() {
+                    shard.leased.load(Ordering::Relaxed)
+                } else {
+                    0
+                };
+                (index, ready.saturating_add(leased))
+            })
+            .filter(|(_, weight)| *weight > 0)
             .collect();
-        split(limit, &weights)
+        split(request.limit, &weights)
     }
 }
 
