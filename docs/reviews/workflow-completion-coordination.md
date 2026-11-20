@@ -64690,3 +64690,24 @@ panic-prone site; every codec read is bounded) and all 66 architecture tests
 pass. Replies for complete OK, stale lease, not found, already exists, compact
 ok-list, per-item partial and compact claim jobs are byte-identical to Elixir.
 
+### ADR011-GROUP-LOG1 concrete solo architecture decision
+
+Step 2 of ADR-011: `wf_storage::log::GroupLog` in new private module
+`log::group` (`group.rs`, `group/block.rs`, `group/writer.rs`), exported from
+`wf_storage::log` with `GroupLogLimits`, `GroupLogError` and `Recovered`.
+Policy: `wf-storage::log::group` joins `durable_sync_modules` and
+`wf-storage::log::group::writer` becomes the first `thread_owner_modules`
+entry; the ADR-010 thread test now builds both policy variants from the real
+file instead of assuming an empty owner list. No dependency change (std mpsc,
+Mutex/Condvar and the existing sha2).
+
+RED: the `group_log` integration target failed to compile (unresolved
+`GroupLog`, `GroupLogLimits`, `GroupLogError`). GREEN: all 10 tests pass
+(order and reopen, record limit, drain on drop, batch atomicity, torn cut at
+three points, trailing garbage, mid-log corruption refused without
+truncation, 8x250 concurrent waited appends with fewer syncs than appends and
+exact replay, SIGKILL with 2,000 acknowledged records and none lost).
+Clippy, the ratchet (new files at zero) and all 66 architecture tests pass.
+Throughput is in ADR-011. Open: rotation/truncation, injected write/sync
+failure tests, Linux.
+

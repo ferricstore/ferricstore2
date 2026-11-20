@@ -136,13 +136,21 @@ fn durable_sync_calls_stay_in_approved_storage_modules() -> CheckResult<()> {
 #[test]
 fn threads_are_spawned_only_by_approved_owner_modules() -> CheckResult<()> {
     let text = real_policy_text()?;
-    let policy = Policy::parse(&text)?;
-    let approved_text = text.replace(
-        "thread_owner_modules = []",
-        "thread_owner_modules = [\"wf-node::supervision\"]",
-    );
-    assert_ne!(approved_text, text, "policy must declare thread owners");
-    let approved = Policy::parse(&approved_text)?;
+    let with_owners = |owners: &str| -> String {
+        text.lines()
+            .map(|line| {
+                if line.starts_with("thread_owner_modules") {
+                    format!("thread_owner_modules = {owners}")
+                } else {
+                    line.to_owned()
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    };
+    let policy = Policy::parse(&with_owners("[]"))?;
+    let approved = Policy::parse(&with_owners("[\"wf-node::supervision\"]"))?;
+    assert_eq!(policy.thread_owner_modules, Vec::<String>::new());
     let diagnosis = "threads are spawned only by approved runtime owner modules";
     for source_text in [
         "fn start() { let _handle = std::thread::spawn(|| ()); }",

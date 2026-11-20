@@ -74,3 +74,26 @@ line: no indexing, slicing or unchecked arithmetic on untrusted bytes.
 
 Consensus (OpenRaft) integration, replication and the remaining workflow
 commands follow their existing milestones.
+
+## Progress
+
+- Step 1 done: `wf-api-tcp` codecs, byte-identical to Elixir for the captured
+  replies (0358bc1).
+- Step 2 done on macOS: `wf_storage::log::GroupLog`. Blocks carry a SHA-256
+  over a domain prefix, header and payload; a batch never spans blocks;
+  recovery cuts only a torn last block and refuses a damaged block that
+  precedes a valid one. A SIGKILL test lost none of 2,000 acknowledged
+  records. Durable records per second with every append waited on, M4 Max,
+  F_FULLFSYNC (about 4-5 ms per sync):
+
+  | appending threads x records per batch | records/s | records per sync |
+  |---|---|---|
+  | 1 x 1 | 239 | 1.0 |
+  | 16 x 1 | 2,063 | 8.4 |
+  | 16 x 32 | 64,721 | 278 |
+  | 64 x 32 | 243,359 | 1,056 |
+  | 16 x 500 | 793,197 | 4,211 |
+
+  Not done: segment rotation and checkpoint truncation (the file grows),
+  fault injection for a failed write or sync, and Linux runs.
+- Step 3 (shard executor, listener, wiring) is next.

@@ -5,8 +5,9 @@ worker_port_module = "client"
 worker_wire_modules = ["client::http", "client::tcp"]
 # ADR-010: runtime effect owners. Test sources and tooling packages are exempt.
 filesystem_packages = ["wf-storage"]
-durable_sync_modules = ["wf-storage::log::store", "wf-storage::state::redb::store", "wf-storage::state::redb::snapshot::stage"]
-thread_owner_modules = []
+durable_sync_modules = ["wf-storage::log::store", "wf-storage::log::group", "wf-storage::state::redb::store", "wf-storage::state::redb::snapshot::stage"]
+# ADR-011: the group log writer thread.
+thread_owner_modules = ["wf-storage::log::group::writer"]
 
 [packages.wf-types]
 kind = "runtime"
