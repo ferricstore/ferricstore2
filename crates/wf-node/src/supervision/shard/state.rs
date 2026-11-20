@@ -15,6 +15,7 @@ pub(crate) mod events;
 mod flow;
 mod mutate;
 mod retention;
+mod signal;
 mod steps;
 mod store;
 mod value;

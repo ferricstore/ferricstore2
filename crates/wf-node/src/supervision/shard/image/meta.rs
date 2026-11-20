@@ -4,7 +4,8 @@
 //! limit (`0` none, `1` milliseconds, `2` infinity), history caps,
 //! attributes and state metadata as [`Term`] maps, named values (count, then
 //! name, version and bytes), the payload, result and error versions, then
-//! the terminal retention override and removal time as optional integers.
+//! the terminal retention override and removal time as optional integers,
+//! then the signal idempotency keys (count, then key and digest).
 
 use std::collections::BTreeMap;
 
@@ -72,6 +73,11 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
     }
     optional_u64(out, meta.ttl_ms);
     optional_u64(out, meta.terminal_until);
+    out.extend_from_slice(&u32::try_from(meta.signal_keys.len()).ok()?.to_be_bytes());
+    for (key, digest) in &meta.signal_keys {
+        bin(out, key)?;
+        bin(out, digest)?;
+    }
     Some(())
 }
 
@@ -135,5 +141,14 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
         error_version: reader.u64()?,
         ttl_ms: reader.optional_u64()?,
         terminal_until: reader.optional_u64()?,
+        signal_keys: {
+            let count = u32::from_be_bytes(reader.array()?);
+            let mut keys = BTreeMap::new();
+            for _ in 0..count {
+                let key = reader.bin()?.to_vec();
+                keys.insert(key, reader.bin()?.to_vec());
+            }
+            keys
+        },
     })
 }

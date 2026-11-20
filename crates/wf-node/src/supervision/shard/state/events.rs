@@ -98,12 +98,14 @@ pub(crate) fn kind_code(kind: HistoryKind) -> Option<u8> {
             u8::try_from(KINDS.iter().position(|known| *known == kind)?).ok()
         }
         HistoryKind::ValuePut => Some(14),
+        HistoryKind::Signaled => Some(15),
     }
 }
 
 pub(crate) fn kind_of(code: u8) -> Option<HistoryKind> {
     match code {
         14 => Some(HistoryKind::ValuePut),
+        15 => Some(HistoryKind::Signaled),
         code => KINDS
             .get(usize::from(code))
             .copied()
@@ -236,7 +238,7 @@ fn decode(cursor: &mut Cursor<'_>) -> Option<HistoryEvent> {
         _ => return None,
     };
     let present = cursor.u8()?;
-    let mut extras: [Option<Vec<u8>>; 3] = [None, None, None];
+    let mut extras: [Option<Vec<u8>>; 4] = [None, None, None, None];
     for (bit, extra) in extras.iter_mut().enumerate() {
         if present & 1_u8.checked_shl(u32::try_from(bit).ok()?)? != 0 {
             *extra = Some(cursor.bytes()?.to_vec());

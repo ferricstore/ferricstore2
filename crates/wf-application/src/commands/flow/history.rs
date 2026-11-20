@@ -26,6 +26,8 @@ pub enum HistoryKind {
     Event(EventKind),
     /// A named value written by `FLOW.VALUE.PUT`.
     ValuePut,
+    /// A `FLOW.SIGNAL`.
+    Signaled,
 }
 
 impl HistoryKind {
@@ -35,6 +37,7 @@ impl HistoryKind {
         match self {
             Self::Event(kind) => kind.as_str(),
             Self::ValuePut => "value_put",
+            Self::Signaled => "signaled",
         }
     }
 }
@@ -65,15 +68,15 @@ pub struct HistoryEvent {
     /// The retry audit of a retry event.
     pub retry: Option<RetryHistory>,
     /// JSON of the Flow's value references, attributes and state metadata
-    /// after the event, each when not empty.
-    pub extras: [Option<Vec<u8>>; 3],
+    /// after the event, each when not empty, then a signal's name.
+    pub extras: [Option<Vec<u8>>; 4],
 }
 
 /// Names of [`HistoryEvent::extras`], in order.
-const EXTRAS: [&str; 3] = ["value_refs", "attributes", "state_meta"];
+const EXTRAS: [&str; 4] = ["value_refs", "attributes", "state_meta", "signal"];
 
 /// The JSON extras of a Flow's fields, as Elixir adds them to each event.
-fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 3] {
+fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 4] {
     let value_refs = (!meta.values.is_empty()).then(|| {
         let refs = meta
             .values
@@ -96,7 +99,7 @@ fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>
         .then(|| json::encode(&meta::attributes_term(&meta.attributes)));
     let state_meta = (!meta.state_meta.is_empty())
         .then(|| json::encode(&meta::state_meta_term(&meta.state_meta)));
-    [value_refs, attributes, state_meta]
+    [value_refs, attributes, state_meta, None]
 }
 
 impl HistoryEvent {

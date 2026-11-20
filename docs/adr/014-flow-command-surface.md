@@ -160,3 +160,11 @@ Each step is one commit with its tests.
   start/run-steps scenario, the value scenario and the batch scenario match
   Elixir exactly (the Elixir reference server was restarted first: after
   about an hour its history reads timed out with projector flush timeouts).
+- Step 7: `FLOW.SIGNAL`. The version rises; `transition_to` (allowed only
+  from an `if_state`, never from a terminal state or into one) moves the
+  Flow, releases its lease and makes it due at `run_at_ms` or now, keeping
+  its run state; named values are written; a `signaled` event carries the
+  signal's name. An idempotency key keeps the digest of what it applied: the
+  same content again changes nothing, as Elixir does from feature level 5
+  (the reference node runs below level 5 and applies it again), different
+  content is refused. The signal scenario matches Elixir exactly.

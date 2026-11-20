@@ -65089,3 +65089,21 @@ kept, the result reference version, a failed second batch, all across a
 restart with 2 shards), all 46 node tests, the TCP adapter and application
 tests pass; the start/run-steps, value and batch scenarios match Elixir
 exactly. Clippy, the ratchet, lint tests, docs and architecture pass.
+
+### ADR014-SIGNAL1 signals
+
+New artifacts (solo design review): `wf_application::commands::flow::signal`
+(`Signal`, `parse`, `digest`), `FlowCommand::Signal`,
+`HistoryKind::Signaled` and a fourth history extra (the signal name),
+`FlowMeta::signal_keys` (kept in images); in `wf-node`:
+`supervision::shard::state::signal`; opcode 0x020D. No dependency or policy
+change.
+
+RED: `signals_move_flows_and_repeat_only_with_the_same_content` failed
+("ERR FLOW.SIGNAL is not supported by this server"). GREEN: it passes
+(plain signal, the three transition refusals, a move with a value and an
+idempotency key, the same content repeated as a no-op, a conflict, the
+state, run state, lease and due time after a restart with 3 shards, two
+`signaled` events naming the signal, a missing Flow); all 47 node tests and
+the TCP adapter tests pass; the signal scenario matches Elixir exactly.
+Clippy, the ratchet, lint tests, docs and architecture pass.

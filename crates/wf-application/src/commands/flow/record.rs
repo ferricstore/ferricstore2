@@ -61,6 +61,8 @@ pub struct FlowMeta {
     pub ttl_ms: Option<u64>,
     /// When a terminal Flow is removed, set when it became terminal.
     pub terminal_until: Option<u64>,
+    /// Signal idempotency keys and the digest of the content each applied.
+    pub signal_keys: BTreeMap<Vec<u8>, Vec<u8>>,
 }
 
 impl Default for FlowMeta {
@@ -82,6 +84,7 @@ impl Default for FlowMeta {
             error_version: 1,
             ttl_ms: None,
             terminal_until: None,
+            signal_keys: BTreeMap::new(),
         }
     }
 }
