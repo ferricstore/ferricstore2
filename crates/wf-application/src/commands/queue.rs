@@ -87,14 +87,19 @@ pub struct CompleteFlow {
     pub result: Option<Vec<u8>>,
 }
 
-/// One item's outcome; the error renders as the Elixir reply text.
-pub type ItemOutcome = Result<(), DomainError>;
+/// Longest accepted Flow id, as in the Elixir server.
+pub const MAX_FLOW_ID_BYTES: usize = 256;
 
-/// Why a whole request failed.
+/// One item's outcome; the error renders as the Elixir reply text.
+pub type ItemOutcome = Result<(), ServiceError>;
+
+/// Why an item or a whole request failed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ServiceError {
-    /// A rule refused the request.
+    /// A domain rule refused it.
     Domain(DomainError),
+    /// The Flow id is empty or longer than [`MAX_FLOW_ID_BYTES`].
+    InvalidId,
     /// The node could not make the decision durable or is shutting down.
     Unavailable,
 }
@@ -103,6 +108,7 @@ impl fmt::Display for ServiceError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Domain(error) => error.fmt(formatter),
+            Self::InvalidId => formatter.write_str("ERR flow id must be 1 to 256 bytes"),
             Self::Unavailable => formatter.write_str("ERR flow store unavailable"),
         }
     }

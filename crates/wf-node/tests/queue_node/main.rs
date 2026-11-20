@@ -1,0 +1,104 @@
+//! The queue node (ADR-011): shard threads decide each record with the domain
+//! reducer, log every change to the group-committed log, release replies only
+//! after the sync, and rebuild their state from the log on restart.
+
+#![forbid(unsafe_code)]
+
+use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::mpsc;
+use std::time::Duration;
+
+use wf_application::commands::queue::{
+    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, NewFlow, QueueService, Reply,
+    ServiceError,
+};
+use wf_node::composition::{QueueNode, QueueNodeConfig};
+
+mod crash;
+mod lifecycle;
+mod restart;
+mod selection;
+
+type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
+
+static NEXT_PATH: AtomicU64 = AtomicU64::new(0);
+
+fn directory(tag: &str) -> TestResult<PathBuf> {
+    let suffix = NEXT_PATH.fetch_add(1, Ordering::SeqCst);
+    let path = std::env::temp_dir().join(format!(
+        "wf-queue-node-{}-{suffix}-{tag}",
+        std::process::id()
+    ));
+    std::fs::create_dir(&path)?;
+    Ok(path)
+}
+
+fn open(path: &Path, shards: u16) -> TestResult<QueueNode> {
+    Ok(QueueNode::open(
+        &path.join("log"),
+        QueueNodeConfig {
+            shards,
+            ..QueueNodeConfig::default()
+        },
+    )?)
+}
+
+/// Calls a service method and waits for its single reply.
+fn call<T: Send + 'static>(start: impl FnOnce(Reply<T>)) -> TestResult<Result<T, ServiceError>> {
+    let (sender, receiver) = mpsc::channel();
+    start(Box::new(move |result| {
+        // The test may have timed out and dropped the receiver.
+        let _delivered = sender.send(result);
+    }));
+    Ok(receiver.recv_timeout(Duration::from_secs(20))?)
+}
+
+fn flow(id: &str) -> NewFlow {
+    NewFlow {
+        id: id.as_bytes().to_vec(),
+        partition: None,
+        payload: Some(Vec::new()),
+    }
+}
+
+fn create(node: &QueueNode, ids: &[&str]) -> TestResult<Vec<ItemOutcome>> {
+    let request = CreateFlows {
+        flow_type: b"jobs".to_vec(),
+        state: b"queued".to_vec(),
+        run_at_ms: None,
+        priority: 0,
+        flows: ids.iter().map(|id| flow(id)).collect(),
+    };
+    Ok(call(|reply| node.create(request, reply))??)
+}
+
+fn claim_request(limit: usize) -> ClaimFlows {
+    ClaimFlows {
+        flow_type: b"jobs".to_vec(),
+        state: Some(b"queued".to_vec()),
+        worker: b"w1".to_vec(),
+        lease_ms: 30_000,
+        limit,
+        priority: None,
+        partitions: None,
+    }
+}
+
+fn claim(node: &QueueNode, limit: usize) -> TestResult<Vec<ClaimedFlow>> {
+    Ok(call(|reply| node.claim(claim_request(limit), reply))??)
+}
+
+fn completion(job: &ClaimedFlow) -> CompleteFlow {
+    CompleteFlow {
+        id: job.id.clone(),
+        partition: Some(job.partition.clone()),
+        lease_token: job.lease_token.clone(),
+        fence: job.fence,
+        result: None,
+    }
+}
+
+fn complete(node: &QueueNode, completions: Vec<CompleteFlow>) -> TestResult<Vec<ItemOutcome>> {
+    Ok(call(|reply| node.complete(completions, reply))??)
+}

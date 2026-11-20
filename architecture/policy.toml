@@ -7,7 +7,7 @@ worker_wire_modules = ["client::http", "client::tcp"]
 filesystem_packages = ["wf-storage"]
 durable_sync_modules = ["wf-storage::log::store", "wf-storage::log::group", "wf-storage::state::redb::store", "wf-storage::state::redb::snapshot::stage"]
 # ADR-011: the group log writer thread.
-thread_owner_modules = ["wf-storage::log::group::writer"]
+thread_owner_modules = ["wf-storage::log::group::writer", "wf-node::supervision"]
 
 [packages.wf-types]
 kind = "runtime"

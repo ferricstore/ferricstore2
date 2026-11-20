@@ -64767,3 +64767,18 @@ base64 vectors, including the SDK fixture flow id's bucket 131. Every routing
 operation uses checked or wrapping methods; the ratchet holds the new files at
 zero.
 
+### ADR011-QUEUE-NODE1 shard threads behind the queue service
+
+`wf_node::composition::QueueNode` (open, replay, `QueueService`), with
+private `composition::gather`, and `supervision::{shard, shard::state,
+shard::command, completer}`. `wf-node::supervision` joins
+`thread_owner_modules`. `ItemOutcome` became `Result<(), ServiceError>` with
+`ServiceError::InvalidId` (ids of 1 to 256 bytes) because the domain has no id
+error. No dependency change.
+
+RED: `tests/queue_node` did not compile (no `QueueNode`). GREEN: 8 tests pass
+(lifecycle with Elixir tokens and errors, per-item refusals, 1,000 Flows over
+16 shards claimed exactly once, due time/state/priority/partition filters,
+restart replay with 4 and 7 shards including a pre-restart lease, and a
+SIGKILL run three times). Clippy, the ratchet and all architecture tests pass.
+

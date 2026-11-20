@@ -113,4 +113,20 @@ commands follow their existing milestones.
   Not done: Linux runs, and the policy that decides when the node rotates
   and which checkpoint lets it remove segments (it belongs with the shard
   executor's snapshots).
-- Step 3 (shard executor, listener, wiring) is next.
+- Step 3, first half: `wf_application::commands::queue` defines the queue
+  service and the Elixir partition routing (4911d6a). `wf_node::composition::
+  QueueNode` implements it: one thread per shard owns its records (keyed by
+  partition and id) and a due index per type, state and priority; every
+  create, named claim and complete goes through `wf_domain::workflow::reduce`.
+  Each accepted change is logged as one single-Flow record, so replay routes
+  by partition and survives a shard-count change. A completion thread
+  releases a shard's replies, refusals included, only after that shard's
+  latest append is durable; shard threads never wait for a sync. A failed
+  append stops the shard until restart. Claims without a partition filter
+  are split over shards by their due-indexed counts. A SIGKILL test (3,000
+  acknowledged creates, three runs) lost none.
+
+  Not done in the node: blocking claims, expired-lease reclaim, FIFO and
+  policies, retention of completed Flows, and snapshots (so `remove_before`
+  is never called and replay reads the whole log).
+- Step 3, second half (TCP listener and SDK benchmark) is next.
