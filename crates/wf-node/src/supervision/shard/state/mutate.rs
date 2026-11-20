@@ -6,6 +6,7 @@
 //! that wrote it), priority, and the removal time of a Flow that became
 //! terminal (the shard's clock plus its retention, not the client's clock).
 
+use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::meta;
 use wf_application::commands::flow::mutate::{Change, Mutation};
 use wf_application::commands::flow::record::{FlowMeta, Include, NamedValue};
@@ -13,7 +14,7 @@ use wf_application::commands::flow::{Term, term};
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
 use wf_domain::policy::RetryOverride;
-use wf_domain::retry::{JitterSample, PolicyRetry, Retry, RetryTime};
+use wf_domain::retry::{JitterSample, PolicyRetry};
 use wf_domain::workflow::{
     self, Cancel, CommittedCommand, Operation, Outcome, StepContinue, Terminal, Transition,
     WorkflowRecord, WorkflowStatus,
@@ -74,23 +75,15 @@ fn operation(mutation: &Mutation) -> Result<Operation, ServiceError> {
             lease_ms: *lease_ms,
             payload: payload.clone(),
         }),
+        // Elixir always resolves the retry policy: an explicit time replaces
+        // the computed one, and the retry limit still applies.
         Change::Retry {
-            run_at_ms: Some(run_at),
-            payload,
-            error,
-        } => Operation::Retry(Retry {
-            guard: guard(mutation)?,
-            run_at: RetryTime::Explicit(TimestampMillis::new(*run_at)),
-            payload: payload.clone(),
-            error: error.clone(),
-        }),
-        Change::Retry {
-            run_at_ms: None,
+            run_at_ms,
             payload,
             error,
         } => Operation::RetryWithPolicy(PolicyRetry {
             guard: guard(mutation)?,
-            run_at: None,
+            run_at: at(*run_at_ms),
             policy_override: RetryOverride::default(),
             jitter: JitterSample::new(0),
             payload: payload.clone(),
@@ -240,7 +233,7 @@ impl ShardState {
             now: TimestampMillis::new(now),
             operation: operation(mutation)?,
         };
-        let (outcome, write, _history) =
+        let (outcome, write, history) =
             workflow::reduce_public(Some(&entry.record), &command, None)
                 .map_err(ServiceError::Domain)?
                 .into_parts();
@@ -255,7 +248,13 @@ impl ShardState {
                     } => *priority,
                     _ => entry.priority,
                 };
-                self.put(key.clone(), write.record, priority, Some(Box::new(meta)));
+                let mut event = HistoryEvent::of(&write.record, priority, &meta);
+                event.retry = history.and_then(|entry| entry.retry);
+                self.put(
+                    key.clone(),
+                    (write.record, priority, Some(Box::new(meta))),
+                    Some(event),
+                );
                 Some(self.after_image(&key)?)
             }
             _ => None,
@@ -340,12 +339,18 @@ impl ShardState {
             record: entry.record.clone(),
             priority: entry.priority,
             meta: entry.meta.clone(),
+            history: entry.history.clone(),
         })
     }
 
     fn restore_saved(&mut self, key: Key, saved: Option<Saved>) {
         match saved {
-            Some(saved) => self.put(key, saved.record, saved.priority, saved.meta),
+            Some(saved) => {
+                self.reinstate(
+                    key,
+                    (saved.record, saved.priority, saved.meta, saved.history),
+                );
+            }
             None => {
                 self.take_entry(&key);
             }
@@ -358,4 +363,5 @@ struct Saved {
     record: WorkflowRecord,
     priority: u8,
     meta: Option<Box<FlowMeta>>,
+    history: super::events::History,
 }

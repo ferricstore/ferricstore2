@@ -1,6 +1,9 @@
 //! Snapshot capture and restore of one shard's records (ADR-013).
 
+use wf_application::commands::flow::history;
+
 use super::super::image::{self, Restored};
+use super::events::History;
 use super::{Entry, Key, ShardState};
 
 impl ShardState {
@@ -12,12 +15,17 @@ impl ShardState {
         let mut out = Vec::new();
         out.extend_from_slice(&u64::try_from(entries.len()).ok()?.to_be_bytes());
         for (key, entry) in entries {
+            let events = entry.history.events();
             image::encode_record(
                 &mut out,
                 &key.0,
                 &key.1,
                 entry.priority,
-                (&entry.record, entry.meta.as_deref()),
+                (
+                    &entry.record,
+                    entry.meta.as_deref(),
+                    Some(events.as_slice()),
+                ),
             )?;
         }
         Some(out)
@@ -25,11 +33,17 @@ impl ShardState {
 
     /// Stores a record from a snapshot image, indexed like any other.
     pub(crate) fn restore(&mut self, restored: Restored) {
-        self.put(
-            (restored.partition, restored.id),
-            restored.record,
-            restored.priority,
-            restored.meta.map(Box::new),
-        );
+        let key = (restored.partition, restored.id);
+        let meta = restored.meta.map(Box::new);
+        match restored.history {
+            Some(events) => {
+                let cap = meta
+                    .as_ref()
+                    .map_or(history::default_cap(), |meta| meta.history_max_events);
+                let events = History::of(&events, cap);
+                self.reinstate(key, (restored.record, restored.priority, meta, events));
+            }
+            None => self.put(key, (restored.record, restored.priority, meta), None),
+        }
     }
 }

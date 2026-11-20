@@ -193,3 +193,86 @@ fn a_dependent_batch_is_all_or_nothing_and_an_independent_one_is_not() -> TestRe
     assert_eq!(field(&get(&node, "a")?, "attempts"), Term::Int(1));
     Ok(())
 }
+
+fn history(node: &QueueNode, extra: &[(&str, Term)]) -> TestResult<Vec<(Term, Term)>> {
+    let mut entries = vec![("id", text("a")), ("partition_key", text("p"))];
+    entries.extend(extra.iter().cloned());
+    let Term::List(events) = run(node, "FLOW.HISTORY", &entries)?? else {
+        return Err("history is not a list".into());
+    };
+    Ok(events
+        .into_iter()
+        .filter_map(|event| match event {
+            Term::List(mut parts) if parts.len() == 2 => {
+                let fields = parts.pop()?;
+                Some((parts.pop()?, fields))
+            }
+            _ => None,
+        })
+        .collect())
+}
+
+#[test]
+fn history_keeps_one_event_per_version_across_replay_and_snapshots() -> TestResult {
+    let path = directory("flow-history")?;
+    {
+        let node = open(&path, 4)?;
+        claimed(&node, &["a"])?;
+        let mut retry = guard("a", "w1:1001:1", 1, 1_005);
+        retry.push(("run_at_ms", Term::Int(1_006)));
+        run(&node, "FLOW.RETRY", &retry)??;
+        node.snapshot()?;
+        let mut cancel = guard("a", "w1:1001:1", 1, 1_010);
+        cancel.retain(|(key, _)| *key != "lease_token");
+        run(&node, "FLOW.CANCEL", &cancel)??;
+    }
+    let node = open(&path, 3)?;
+    let events = history(&node, &[])?;
+    let ids: Vec<Term> = events.iter().map(|(id, _)| id.clone()).collect();
+    assert_eq!(
+        ids,
+        vec![
+            text("1000-1"),
+            text("1001-2"),
+            text("1005-3"),
+            text("1010-4")
+        ]
+    );
+    let names: Vec<Term> = events
+        .iter()
+        .map(|(_, fields)| field(fields, "event"))
+        .collect();
+    assert_eq!(
+        names,
+        vec![
+            text("created"),
+            text("claimed"),
+            text("retry"),
+            text("cancelled")
+        ]
+    );
+    let (_, retry) = &events[2];
+    assert_eq!(field(retry, "retry_decision"), text("scheduled"));
+    assert_eq!(field(retry, "retry_next_run_at_ms"), text("1006"));
+    assert_eq!(field(retry, "retry_backoff_kind"), text("exponential"));
+    assert_eq!(field(retry, "lease_owner"), text(""));
+    // The newest two, in order; newest first with rev; filters by event and
+    // worker.
+    let last_two = history(&node, &[("count", Term::Int(2))])?;
+    assert_eq!(
+        last_two.first().map(|(id, _)| id.clone()),
+        Some(text("1005-3"))
+    );
+    let reversed = history(&node, &[("rev", Term::Bool(true)), ("count", Term::Int(1))])?;
+    assert_eq!(
+        reversed.first().map(|(id, _)| id.clone()),
+        Some(text("1010-4"))
+    );
+    assert_eq!(history(&node, &[("event", text("claimed"))])?.len(), 1);
+    assert_eq!(history(&node, &[("worker", text("w1"))])?.len(), 1);
+    assert_eq!(
+        run(&node, "FLOW.HISTORY", &[("id", text("missing"))])??,
+        Term::List(Vec::new())
+    );
+    Ok(())
+}

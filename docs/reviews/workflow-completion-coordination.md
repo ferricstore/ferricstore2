@@ -65013,3 +65013,27 @@ application tests pass. The probe matched 33 of 38 (the other 5 explained in
 ADR-014), the batch scenario through the SDK matched exactly, and the SDK
 suite passes 19 of 60 (was 11). Clippy, the ratchet, lint tests, docs and
 architecture pass.
+
+### ADR014-HISTORY1 Flow history
+
+New artifacts (solo design review): `wf_application::commands::flow::
+history` (`HistoryEvent` with the domain retry audit, `HistoryQuery`,
+`parse`, `select`, `event_term`), `FlowCommand::History`; in `wf-node`:
+`supervision::shard::state::events::History` (the packed per-Flow stream),
+`supervision::shard::state::store` (entry storage moved out of `state.rs`,
+which had reached 425 lines; every write keeps the indexes and history in
+step), `supervision::shard::image::history` (events in snapshot images,
+version 3), `ShardState::reinstate` (rollback and snapshot restore keep
+history as it was); opcode 0x020A. Retries always use
+`Operation::RetryWithPolicy`, removing the explicit-time `Retry` path. No
+dependency or policy change.
+
+RED: the history probe matched Elixir on 7 of 20 commands (0x020A refused);
+the SDK suite failed twice on 0x020A. The node test was written after the
+code and is not claimed as TDD. GREEN:
+`history_keeps_one_event_per_version_across_replay_and_snapshots` (four
+events across a snapshot, a later change and a restart with 3 shards, the
+retry audit kept, count, rev, event and worker filters, an empty list for a
+missing Flow) and all 42 node tests pass; the probe matched 19 of 20.
+Clippy, the ratchet, lint tests, docs and architecture pass. The fast-path
+cost is in ADR-014's progress section.

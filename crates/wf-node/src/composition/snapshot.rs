@@ -22,8 +22,9 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 2 images carry each Flow's fields beyond its record (ADR-014).
-const VERSION: u8 = 2;
+/// Version 3 images carry each Flow's fields beyond its record and its
+/// history (ADR-014).
+const VERSION: u8 = 3;
 
 struct Progress {
     next: u64,

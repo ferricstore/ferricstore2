@@ -11,15 +11,18 @@
 
 mod capture;
 mod claim;
+mod events;
 mod flow;
 mod mutate;
 mod retention;
+mod store;
 
 pub(crate) use claim::Peeked;
 pub(crate) use mutate::{BatchItems, BatchReplies};
 
 use std::collections::{BTreeMap, HashMap};
 
+use events::History;
 use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::queue::{
     CompleteFlow, ItemOutcome, MAX_FLOW_ID_BYTES, NewFlow, Partition, ServiceError,
@@ -47,6 +50,8 @@ struct Entry {
     /// Fields beyond the lifecycle record; `None` for a Flow made by the
     /// queue fast path, which has the defaults (ADR-014).
     meta: Option<Box<FlowMeta>>,
+    /// One event per record version, oldest first (ADR-014).
+    history: History,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -111,11 +116,16 @@ impl ShardState {
             Logged::Expire { keys, .. } => return Ok(self.expire(keys)),
             Logged::Put { image: bytes, .. } => {
                 let restored = image::decode_one(bytes).ok_or(ServiceError::Unavailable)?;
+                // An after-image carries the event its change appended.
+                let event = restored.history.and_then(|mut events| events.pop());
                 self.put(
                     (restored.partition, restored.id),
-                    restored.record,
-                    restored.priority,
-                    restored.meta.map(Box::new),
+                    (
+                        restored.record,
+                        restored.priority,
+                        restored.meta.map(Box::new),
+                    ),
+                    event,
                 );
                 return Ok(Outcome::Changed);
             }
@@ -202,66 +212,6 @@ impl ShardState {
             self.store(key, write.record, priority);
         }
         Ok(outcome)
-    }
-
-    /// Stores a reducer write, keeping the record's priority and fields.
-    fn store(&mut self, key: Key, record: WorkflowRecord, new_priority: Option<u8>) {
-        let (priority, sequence, meta) = match self.take_entry(&key) {
-            Some(previous) => (previous.priority, previous.sequence, previous.meta),
-            None => (new_priority.unwrap_or(0), self.sequence(), None),
-        };
-        self.insert(
-            key,
-            Entry {
-                record,
-                priority,
-                sequence,
-                meta,
-            },
-        );
-    }
-
-    /// Stores a whole Flow, replacing any record under its key.
-    pub(super) fn put(
-        &mut self,
-        key: Key,
-        record: WorkflowRecord,
-        priority: u8,
-        meta: Option<Box<FlowMeta>>,
-    ) {
-        let sequence = match self.take_entry(&key) {
-            Some(previous) => previous.sequence,
-            None => self.sequence(),
-        };
-        self.insert(
-            key,
-            Entry {
-                record,
-                priority,
-                sequence,
-                meta,
-            },
-        );
-    }
-
-    fn sequence(&mut self) -> u64 {
-        let sequence = self.next_sequence;
-        self.next_sequence = self.next_sequence.saturating_add(1);
-        sequence
-    }
-
-    /// Removes a record and its index entries.
-    fn take_entry(&mut self, key: &Key) -> Option<Entry> {
-        let previous = self.records.remove(key)?;
-        self.unindex(key, &previous);
-        self.unschedule_removal(&previous);
-        Some(previous)
-    }
-
-    fn insert(&mut self, key: Key, entry: Entry) {
-        self.index(&key, &entry);
-        self.schedule_removal(&key, &entry);
-        self.records.insert(key, entry);
     }
 
     /// The index entry of a record: due time for a scheduled unleased record,

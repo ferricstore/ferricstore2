@@ -118,3 +118,20 @@ Each step is one commit with its tests.
   scenario, run through the SDK's own `_many` methods, matched exactly. The
   SDK suite passes 19 (was 11). Mutations that carry `state_meta` are sent
   by the SDK through the command-exec opcode, which comes later.
+- Step 4: `FLOW.HISTORY`. Every Flow, fast-path ones included, gets one
+  event per record version (Elixir's `created`, `claimed`, `transitioned`,
+  `retry`, ... with its record snapshot and, for a retry, the retry audit:
+  decision, backoff, limit, next run). Events are kept per Flow as one
+  LEB128-packed byte stream and decoded only when read. A logged after-image
+  carries the event its change appended (so replay keeps the retry audit);
+  the fast path's logical records re-derive theirs on replay; snapshot images
+  (version 3) carry the whole history. Reads follow Elixir: event-id, time,
+  version, event-name and worker filters, `rev`, and the newest `count` in
+  order. Retries now always take the domain's policy path, as Elixir does:
+  an explicit `run_at_ms` replaces the computed time and the retry limit
+  still applies. Probe: 19 of 20 identical (the other is `EXTEND_LEASE`'s
+  internal counters). Cost on the queue fast path, SDK benchmark, 100k Flows,
+  1 client, three alternating runs against b6c292b: throughput unchanged
+  (client-bound), server CPU 9.4 to 9.8 ms per 1k Flows (+4%), RSS 186 to
+  223 MB (about 370 bytes per Flow for its three events). A first version
+  with one struct per event cost +17% CPU and +170 MB; packing fixed that.

@@ -6,10 +6,13 @@
 //! not accept fails the decode instead of entering a shard. Layout follows the
 //! log records: binaries are a `u32` length and bytes, options a `0`/`1` byte
 //! then the value, integers big-endian. A record ends with `0`, or `1` and
-//! its fields beyond the lifecycle record (ADR-014, [`meta`]).
+//! its fields beyond the lifecycle record (ADR-014, [`meta`]), then `0`, or
+//! `1` and its history events ([`history`]).
 
+mod history;
 mod meta;
 
+use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::queue::Partition;
 use wf_domain::history::EventKind;
@@ -23,7 +26,7 @@ use wf_types::version::{Fence, TimestampMillis};
 use super::command::{Malformed, Reader, bin, optional_bin, optional_u64};
 
 /// Event kinds by their byte code; a kind missing here cannot be imaged.
-const KINDS: [EventKind; 14] = [
+pub(super) const KINDS: [EventKind; 14] = [
     EventKind::Created,
     EventKind::Claimed,
     EventKind::Transitioned,
@@ -47,6 +50,8 @@ pub(crate) struct Restored {
     pub(crate) priority: u8,
     pub(crate) record: WorkflowRecord,
     pub(crate) meta: Option<FlowMeta>,
+    /// History events, carried by snapshot images only.
+    pub(crate) history: Option<Vec<HistoryEvent>>,
 }
 
 /// Appends one record; `None` when a field is longer than `u32::MAX` or its
@@ -56,7 +61,7 @@ pub(crate) fn encode_record(
     partition: &Partition,
     id: &[u8],
     priority: u8,
-    (record, flow_meta): (&WorkflowRecord, Option<&FlowMeta>),
+    (record, flow_meta, events): Parts<'_>,
 ) -> Option<()> {
     bin(out, &partition.name())?;
     bin(out, id)?;
@@ -97,8 +102,23 @@ pub(crate) fn encode_record(
             meta::encode(out, flow_meta)?;
         }
     }
+    match events {
+        None => out.push(0),
+        Some(events) => {
+            out.push(1);
+            history::encode(out, events)?;
+        }
+    }
     Some(())
 }
+
+/// A record, its fields beyond the lifecycle record, and its history when
+/// the image carries it.
+pub(crate) type Parts<'a> = (
+    &'a WorkflowRecord,
+    Option<&'a FlowMeta>,
+    Option<&'a [HistoryEvent]>,
+);
 
 fn decode_record(reader: &mut Reader<'_>, limits: AdmissionLimits) -> Result<Restored, Malformed> {
     let partition = Partition::parse(reader.bin()?);
@@ -155,12 +175,18 @@ fn decode_record(reader: &mut Reader<'_>, limits: AdmissionLimits) -> Result<Res
         1 => Some(meta::decode(reader)?),
         _ => return Err(Malformed),
     };
+    let history = match reader.u8()? {
+        0 => None,
+        1 => Some(history::decode(reader)?),
+        _ => return Err(Malformed),
+    };
     Ok(Restored {
         partition,
         id,
         priority,
         record,
         meta,
+        history,
     })
 }
 
@@ -169,7 +195,7 @@ pub(crate) fn encode_one(
     partition: &Partition,
     id: &[u8],
     priority: u8,
-    record: (&WorkflowRecord, Option<&FlowMeta>),
+    record: Parts<'_>,
 ) -> Option<Vec<u8>> {
     let mut out = Vec::new();
     encode_record(&mut out, partition, id, priority, record)?;

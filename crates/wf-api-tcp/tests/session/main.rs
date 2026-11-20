@@ -130,6 +130,7 @@ impl FlowService for Scripted {
                     .map(|mutation| Term::Bin(mutation.id))
                     .collect(),
             ))),
+            FlowCommand::History(query) => reply(Ok(Term::List(vec![Term::Bin(query.id)]))),
             FlowCommand::Get(get) if get.id.starts_with(b"none") => reply(Ok(Term::Nil)),
             FlowCommand::Get(get) => reply(Ok(Term::Map(vec![
                 (b"id".to_vec(), Term::Bin(get.id)),

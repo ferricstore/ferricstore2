@@ -9,6 +9,7 @@
 pub mod claim;
 pub mod create;
 pub mod get;
+pub mod history;
 pub mod keys;
 pub mod many;
 pub mod meta;
@@ -33,6 +34,8 @@ pub enum FlowCommand {
     Create(Box<create::CreateFlow>),
     /// `FLOW.GET`.
     Get(get::GetFlow),
+    /// `FLOW.HISTORY`.
+    History(history::HistoryQuery),
     /// A single-Flow lifecycle mutation.
     Mutate(Box<mutate::Mutation>),
     /// A batch of lifecycle mutations.
@@ -47,6 +50,7 @@ impl FlowCommand {
         match self {
             Self::Create(create) => Some((&create.id, create.partition_key.as_deref())),
             Self::Get(get) => Some((&get.id, get.partition_key.as_deref())),
+            Self::History(query) => Some((&query.id, query.partition_key.as_deref())),
             Self::Mutate(mutation) => Some((&mutation.id, mutation.partition_key.as_deref())),
             Self::Many(_) => None,
         }
@@ -62,6 +66,7 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
     match name {
         "FLOW.CREATE" => create::parse(args).map(|create| FlowCommand::Create(Box::new(create))),
         "FLOW.GET" => get::parse(args).map(FlowCommand::Get),
+        "FLOW.HISTORY" => history::parse(args).map(FlowCommand::History),
         name if many::single(name).is_some() => {
             many::parse(name, args).map(|batch| FlowCommand::Many(Box::new(batch)))
         }

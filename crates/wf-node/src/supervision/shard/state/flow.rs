@@ -9,6 +9,7 @@ use std::collections::BTreeMap;
 
 use wf_application::commands::flow::create::CreateFlow;
 use wf_application::commands::flow::get::GetFlow;
+use wf_application::commands::flow::history::{self, HistoryQuery};
 use wf_application::commands::flow::meta::{self, StateMeta};
 use wf_application::commands::flow::record::{FlowMeta, Include, NamedValue, View};
 use wf_application::commands::flow::{FlowCommand, Term};
@@ -43,6 +44,7 @@ impl ShardState {
                 self.create_flow(now, *create, partition)
             }
             FlowCommand::Get(get) => (Ok(self.get_flow(&get, partition)), None),
+            FlowCommand::History(query) => (Ok(self.history_term(&query, partition)), None),
             FlowCommand::Mutate(mutation) => self.mutate(now, &mutation, partition),
             // Batches are split over shards before they reach one.
             FlowCommand::Many(_) => (Err(ServiceError::Unavailable), None),
@@ -73,6 +75,24 @@ impl ShardState {
         Some(Self::view(key, entry, &defaults).term(include))
     }
 
+    /// `FLOW.HISTORY`: the selected events, or none for a missing Flow.
+    fn history_term(&self, query: &HistoryQuery, partition: Partition) -> Term {
+        let key = (partition, query.id.clone());
+        let defaults = self.defaults();
+        let Some((key, entry)) = self.records.get_key_value(&key) else {
+            return Term::List(Vec::new());
+        };
+        let meta = entry.meta.as_deref().unwrap_or(&defaults);
+        let events = entry.history.events();
+        Term::List(
+            query
+                .select(&events)
+                .into_iter()
+                .map(|event| history::event_term(event, &entry.record, &key.0, meta))
+                .collect(),
+        )
+    }
+
     fn get_flow(&self, get: &GetFlow, partition: Partition) -> Term {
         let key = (partition, get.id.clone());
         let defaults = self.defaults();
@@ -86,11 +106,18 @@ impl ShardState {
     /// Logs the stored Flow under `key` as its after-image.
     pub(super) fn after_image(&self, key: &Key) -> Result<Logged, ServiceError> {
         let entry = self.records.get(key).ok_or(ServiceError::Unavailable)?;
+        // The after-image carries the event this change appended, so replay
+        // keeps what the record alone does not show.
+        let latest = entry.history.last();
         let image = image::encode_one(
             &key.0,
             &key.1,
             entry.priority,
-            (&entry.record, entry.meta.as_deref()),
+            (
+                &entry.record,
+                entry.meta.as_deref(),
+                latest.as_ref().map(std::slice::from_ref),
+            ),
         )
         .ok_or(ServiceError::Unavailable)?;
         Ok(Logged::Put {
@@ -130,9 +157,8 @@ impl ShardState {
         };
         self.put(
             key.clone(),
-            write.record,
-            create.priority,
-            Some(Box::new(meta)),
+            (write.record, create.priority, Some(Box::new(meta))),
+            None,
         );
         match self.after_image(&key) {
             Ok(logged) => (Ok(ok()), Some(logged)),
