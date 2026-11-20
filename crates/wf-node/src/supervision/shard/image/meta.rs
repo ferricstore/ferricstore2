@@ -87,6 +87,7 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         .collect();
     term(out, &Term::Map(groups))?;
     out.push(u8::from(meta.error_term));
+    optional_bin(out, meta.rewound_to.as_deref())?;
     Some(())
 }
 
@@ -171,5 +172,6 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
             1 => true,
             _ => return Err(Malformed),
         },
+        rewound_to: reader.optional_bin()?,
     })
 }

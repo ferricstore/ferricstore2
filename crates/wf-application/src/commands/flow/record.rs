@@ -69,6 +69,8 @@ pub struct FlowMeta {
     /// The error is an encoded term, not bytes: an active-time timeout's
     /// `{reason, max_active_ms}` (ADR-014 step 9).
     pub error_term: bool,
+    /// The history event the Flow was last rewound to (ADR-014 step 10).
+    pub rewound_to: Option<Vec<u8>>,
 }
 
 impl Default for FlowMeta {
@@ -93,6 +95,7 @@ impl Default for FlowMeta {
             signal_keys: BTreeMap::new(),
             child_groups: BTreeMap::new(),
             error_term: false,
+            rewound_to: None,
         }
     }
 }
@@ -347,6 +350,9 @@ impl View<'_> {
             ("partition_key", Term::Bin(self.partition.name())),
             ("retention_ttl_ms", Term::int(meta.retention_ttl_ms)),
         ]);
+        if let Some(event) = &meta.rewound_to {
+            entries.push(("rewound_to_event_id", Term::Bin(event.clone())));
+        }
         match meta.max_active_ms {
             Some(MaxActive::Ms(value)) => entries.push(("max_active_ms", Term::int(value))),
             Some(MaxActive::Infinity) => entries.push(("max_active_ms", Term::text("infinity"))),

@@ -279,3 +279,19 @@ Each step is one commit with its tests.
   wider extras); after-images logged by earlier development builds of this
   branch no longer decode. Not built: cancelling children when a parent
   times out (as for any parent closing).
+- Step 10: `FLOW.REWIND` (0x0216, and its text form), as Elixir's
+  `do_flow_rewind/2`. A rewind restores what one history event recorded:
+  state, attempts, due time (or `run_at_ms`), priority, payload, result
+  and error, named values, attributes and state metadata (read back from
+  the event's JSON with a small reader, `json::decode`). Version and fence
+  rise, the lease is cleared, the run state stays, a `reason` becomes the
+  error, terminal retention restarts for a terminal target, and the Flow
+  keeps `rewound_to_event_id` (on the record and on every later event; the
+  event itself is `rewound`). Refusals follow Elixir: a leased Flow, a
+  parent or child, a wrong `expect_state`, an event not held (including a
+  claim event, which Elixir also answers as not found), `reason_ref`. This
+  node keeps only the current bytes of each value, so an event whose
+  payload, result, error or named value version was replaced since is
+  refused as not found where Elixir may still hold the older version.
+  Snapshot images are version 7. The rewind scenario matches Elixir; the
+  SDK suite passes 37 of 60, both rewind round trips included.

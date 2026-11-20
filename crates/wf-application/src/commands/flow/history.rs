@@ -28,6 +28,8 @@ pub enum HistoryKind {
     ValuePut,
     /// A `FLOW.SIGNAL`.
     Signaled,
+    /// A `FLOW.REWIND`.
+    Rewound,
 }
 
 impl HistoryKind {
@@ -38,6 +40,7 @@ impl HistoryKind {
             Self::Event(kind) => kind.as_str(),
             Self::ValuePut => "value_put",
             Self::Signaled => "signaled",
+            Self::Rewound => "rewound",
         }
     }
 }
@@ -69,8 +72,9 @@ pub struct HistoryEvent {
     pub retry: Option<RetryHistory>,
     /// JSON of the Flow's value references, attributes and state metadata
     /// after the event, each when not empty, then a signal's name, then the
-    /// reason and limit of an active-time timeout.
-    pub extras: [Option<Vec<u8>>; 6],
+    /// reason and limit of an active-time timeout, then the event the Flow
+    /// was last rewound to.
+    pub extras: [Option<Vec<u8>>; 7],
 }
 
 /// Names of [`HistoryEvent::extras`], in order.
@@ -84,7 +88,7 @@ const EXTRAS: [&str; 6] = [
 ];
 
 /// The JSON extras of a Flow's fields, as Elixir adds them to each event.
-fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 6] {
+fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 7] {
     let value_refs = (!meta.values.is_empty()).then(|| {
         let refs = meta
             .values
@@ -107,7 +111,15 @@ fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>
         .then(|| json::encode(&meta::attributes_term(&meta.attributes)));
     let state_meta = (!meta.state_meta.is_empty())
         .then(|| json::encode(&meta::state_meta_term(&meta.state_meta)));
-    [value_refs, attributes, state_meta, None, None, None]
+    [
+        value_refs,
+        attributes,
+        state_meta,
+        None,
+        None,
+        None,
+        meta.rewound_to.clone(),
+    ]
 }
 
 impl HistoryEvent {
@@ -220,7 +232,10 @@ pub fn event_term(
         ("payload_ref", reference('p', payload)),
         ("priority", text(event.priority)),
         ("result_ref", reference('r', result)),
-        ("rewound_to_event_id", text("")),
+        (
+            "rewound_to_event_id",
+            Term::Bin(event.extras[6].clone().unwrap_or_default()),
+        ),
         (
             "root_flow_id",
             Term::Bin(meta.root_flow_id.clone().unwrap_or_else(|| id.to_vec())),

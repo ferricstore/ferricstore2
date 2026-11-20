@@ -19,6 +19,7 @@ mod index;
 mod mutate;
 mod policy;
 mod retention;
+mod rewind;
 mod signal;
 mod steps;
 mod store;

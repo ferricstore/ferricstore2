@@ -52,6 +52,7 @@ impl ShardState {
             FlowCommand::StartAndClaim(start) => self.start_and_claim(now, &start, partition),
             FlowCommand::Signal(signal) => self.signal(now, &signal, partition),
             FlowCommand::SpawnChildren(spawn) => self.spawn_children(now, &spawn, partition),
+            FlowCommand::Rewind(rewind) => self.rewind(now, &rewind, partition),
             // Batches and reads by reference are split over shards before
             // they reach one; policies have requests of their own.
             FlowCommand::Many(_)

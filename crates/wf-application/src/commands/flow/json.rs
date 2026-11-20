@@ -4,6 +4,10 @@
 
 use std::fmt::Write as _;
 
+mod decode;
+
+pub use decode::decode;
+
 use super::term::Term;
 
 fn string(out: &mut String, bytes: &[u8]) {

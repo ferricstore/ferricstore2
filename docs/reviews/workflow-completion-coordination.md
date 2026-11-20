@@ -65259,3 +65259,30 @@ with a 50 ms retention before the explicit cleanup did, which is correct
 behaviour; the test now uses an hour. All 55 node tests, the TCP adapter
 and application tests pass; the SDK suite stays at 35 of 60. Clippy, the
 ratchet, lint tests, docs and architecture pass.
+
+### ADR014-REWIND1 FLOW.REWIND
+
+New artifacts (solo design review): `wf_application::commands::flow::
+rewind` (`Rewind`, `parse`, `event_version`), `FlowCommand::Rewind`,
+`json::decode` (private child `json::decode`), `HistoryKind::Rewound`
+(packed code 16), history extras slot 7 (`rewound_to_event_id`),
+`FlowMeta::rewound_to`; `wf-node` `supervision::shard::state::rewind`,
+snapshot version 7, opcode 0x0216. No dependency or policy change.
+
+Decision: values are restored only from the versions this node still
+holds (the current ones). Elixir keeps superseded payload, result and
+error versions until a release; keeping them here would add per-Flow
+memory for every replaced value. A rewind whose target needs a replaced
+version is refused with Elixir's not-found text, so a client retries or
+picks another event; revisit if a workload needs it.
+
+Evidence: before this step the two SDK rewind round trips failed on opcode
+0x0216. The Elixir rewind scenario (leased refusal, transition, wrong
+state, missing and claim events, missing `to_event`, rewind with reason,
+GET, history, a second rewind with `run_at_ms`, a missing Flow) was
+captured first; the node matches it except a value read whose reply
+Elixir sends compact to a client that did not negotiate it. The node test
+`flow_rewind` was written after the code, so this step does not claim TDD;
+dropping the stored `rewound_to` makes it fail. All 56 node tests, the TCP
+adapter and application tests pass; the SDK suite passes 37 of 60 (was
+35). Clippy, the ratchet, lint tests, docs and architecture pass.

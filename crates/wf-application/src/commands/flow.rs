@@ -20,6 +20,7 @@ pub mod mutate;
 mod opts;
 pub mod policy;
 pub mod record;
+pub mod rewind;
 pub mod signal;
 pub mod start;
 pub mod term;
@@ -66,6 +67,8 @@ pub enum FlowCommand {
     PolicyGet(policy::PolicyGet),
     /// `FLOW.RETENTION_CLEANUP`.
     RetentionCleanup(cleanup::RetentionCleanup),
+    /// `FLOW.REWIND`.
+    Rewind(Box<rewind::Rewind>),
 }
 
 impl FlowCommand {
@@ -83,6 +86,7 @@ impl FlowCommand {
                 .as_ref()
                 .map(|(owner, _)| (owner.as_slice(), put.partition_key.as_deref())),
             Self::Signal(signal) => Some((&signal.id, signal.partition_key.as_deref())),
+            Self::Rewind(rewind) => Some((&rewind.id, rewind.partition_key.as_deref())),
             Self::SpawnChildren(spawn) => Some((&spawn.parent_id, Some(&spawn.partition_key))),
             Self::StartAndClaim(start) => {
                 Some((&start.create.id, start.create.partition_key.as_deref()))
@@ -118,6 +122,7 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         }
         "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
         "FLOW.RETENTION_CLEANUP" => cleanup::parse(args).map(FlowCommand::RetentionCleanup),
+        "FLOW.REWIND" => rewind::parse(args).map(|rewind| FlowCommand::Rewind(Box::new(rewind))),
         "FLOW.START_AND_CLAIM" => {
             start::parse_start(args).map(|start| FlowCommand::StartAndClaim(Box::new(start)))
         }
