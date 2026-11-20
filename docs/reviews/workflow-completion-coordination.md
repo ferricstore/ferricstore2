@@ -65176,3 +65176,31 @@ that skips loading image policies makes the snapshot test fail. All 50 node
 tests, the TCP adapter and application tests pass; the SDK suite passes 32
 of 60 (was 30), both policy round trips included. Clippy, the ratchet, lint
 tests, docs and architecture pass.
+
+### ADR014-FIFO1 FIFO lanes
+
+New artifacts (solo design review): `wf-node`
+`supervision::shard::state::fifo` (`Lanes`, `logical_state`, `fifo`,
+`fifo_entry`, `fifo_guard`, lane insert/remove/rebuild, `lane_heads`,
+`take_freed`) and `state::index` (the claim-index functions moved out of
+`state.rs`, now also keeping lanes); `ShardState::{lanes, freed}`;
+`wf_application::commands::flow::policy::Mode` reused. No dependency or
+policy change.
+
+Decision: lanes only for types whose policy has a FIFO state, rebuilt from
+the records on install. Elixir indexes every live Flow's lane; here a type
+without FIFO states costs nothing, and the rebuild runs only on a policy
+install. `Entry::sequence` doubles as the lane order: it is re-stamped on a
+change of logical state, which also changes the due-index tie order for
+such Flows (no reply depends on it).
+
+Evidence: before this step the two SDK FIFO tests failed (a second Flow of
+a partition was claimed while the first ran). The Elixir FIFO scenario was
+captured first and the node matched it with no differences. Node tests
+`flow_fifo` (guards, heads per partition, retry and completion, entry at
+the tail, a late policy, order across a 4 to 3 shard restart; a parked
+claim woken when a head finishes) were written after the code, so this step
+does not claim TDD; disabling the re-stamp or the freed-lane arrivals makes
+one of them fail. All 52 node tests and the TCP adapter tests pass; the SDK
+suite passes 34 of 60 (was 32). Clippy, the ratchet, lint tests, docs and
+architecture pass.

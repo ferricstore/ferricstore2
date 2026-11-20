@@ -200,6 +200,12 @@ impl ShardState {
             if self.records.contains_key(&key) {
                 return Err(rejected("ERR flow already exists"));
             }
+            self.fifo_guard(
+                (child.flow_type.as_slice(), child.state.as_slice()),
+                false,
+                child.priority,
+                Some(child.partition_key.is_some()),
+            )?;
             let mut meta = self.new_meta(child)?;
             meta.parent_flow_id = Some(parent.1.clone());
             meta.parent_partition_key = Some(parent.0.name());

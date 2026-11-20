@@ -54,7 +54,9 @@ impl ShardState {
             .get(&installed.flow_type)
             .is_none_or(|held| held.generation <= installed.generation);
         if newer {
-            self.policies.insert(installed.flow_type.clone(), installed);
+            let flow_type = installed.flow_type.clone();
+            self.policies.insert(flow_type.clone(), installed);
+            self.rebuild_lanes(&flow_type);
         }
     }
 

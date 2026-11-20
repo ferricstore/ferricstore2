@@ -344,11 +344,18 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         }
         links.ready.store(state.ready(), Ordering::Relaxed);
         links.leased.store(state.leased(), Ordering::Relaxed);
-        if logged
-            .iter()
-            .any(|change| matches!(change, Logged::Create { .. } | Logged::Put { .. }))
+        // A FIFO lane whose head left it has a new head to claim.
+        let freed = state.take_freed();
+        if !freed.is_empty()
+            || logged
+                .iter()
+                .any(|change| matches!(change, Logged::Create { .. } | Logged::Put { .. }))
         {
-            links.waiters.arrived(|| arrivals(&logged));
+            links.waiters.arrived(|| {
+                let mut arrived = arrivals(&logged);
+                arrived.extend(freed);
+                arrived
+            });
         }
         if failed {
             for finish in finishes {

@@ -233,6 +233,16 @@ impl ShardState {
     ) -> Vec<(Key, Vec<u8>, u64)> {
         let mut found: Vec<(Reverse<u8>, (u64, u64), &Key)> = Vec::new();
         for (queue, due) in self.matching(request, mode) {
+            if mode == Mode::Due
+                && let Some(heads) = self.lane_heads(queue, now, request, partitions)
+            {
+                found.extend(
+                    heads
+                        .into_iter()
+                        .map(|(slot, key)| (Reverse(queue.priority), slot, key)),
+                );
+                continue;
+            }
             let eligible = due
                 .range(..=(now, u64::MAX))
                 .filter(|(_, key)| request.allows(partitions, &key.0))

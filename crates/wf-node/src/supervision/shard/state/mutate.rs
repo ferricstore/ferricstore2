@@ -244,6 +244,20 @@ impl ShardState {
                     } => *priority,
                     _ => entry.priority,
                 };
+                // Elixir's FIFO entry check: a transition or step must name
+                // the partition; a retry need not.
+                let explicit = match &mutation.change {
+                    Change::Transition { .. } | Change::StepContinue { .. } => {
+                        Some(mutation.partition_key.is_some())
+                    }
+                    _ => None,
+                };
+                if matches!(
+                    mutation.change,
+                    Change::Transition { .. } | Change::StepContinue { .. } | Change::Retry { .. }
+                ) {
+                    self.fifo_entry(&write.record, priority, explicit)?;
+                }
                 let mut event = HistoryEvent::of(&write.record, priority, &meta, &key.0);
                 event.retry = history.and_then(|entry| entry.retry);
                 self.put(

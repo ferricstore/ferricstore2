@@ -154,7 +154,12 @@ impl ShardState {
         if let Some(existing) = self.records.get(&key) {
             return (self.duplicate(&key, existing, &create), None);
         }
-        let meta = match self.new_meta(&create) {
+        let explicit = Some(create.partition_key.is_some());
+        let entry = (create.flow_type.as_slice(), create.state.as_slice());
+        let meta = match self
+            .fifo_guard(entry, false, create.priority, explicit)
+            .and_then(|()| self.new_meta(&create))
+        {
             Ok(meta) => meta,
             Err(error) => return (Err(error), None),
         };

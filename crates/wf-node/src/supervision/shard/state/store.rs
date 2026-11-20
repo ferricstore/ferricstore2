@@ -6,6 +6,7 @@ use wf_application::commands::flow::record::FlowMeta;
 use wf_domain::workflow::WorkflowRecord;
 
 use super::events::History;
+use super::fifo;
 use super::{Entry, Key, ShardState};
 
 fn terminal(state: &[u8]) -> bool {
@@ -69,12 +70,19 @@ impl ShardState {
         if !was_terminal && terminal(record.state()) {
             self.note_child(&key, &record, meta.as_deref());
         }
+        // A Flow that enters another logical state takes a new place in
+        // its FIFO lane, as Elixir stamps `state_enter_seq`.
         let (sequence, mut events, before) = match previous {
-            Some(previous) => (
-                previous.sequence,
-                previous.history,
-                Some(previous.record.version()),
-            ),
+            Some(previous) => {
+                let entered = fifo::logical_state(&previous.record) != fifo::logical_state(&record)
+                    && !terminal(record.state());
+                let sequence = if entered {
+                    self.sequence()
+                } else {
+                    previous.sequence
+                };
+                (sequence, previous.history, Some(previous.record.version()))
+            }
             None => (self.sequence(), History::default(), None),
         };
         if before.is_none_or(|version| record.version() > version) {

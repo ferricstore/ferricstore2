@@ -13,7 +13,9 @@ mod capture;
 mod children;
 mod claim;
 pub(crate) mod events;
+mod fifo;
 mod flow;
+mod index;
 mod mutate;
 mod policy;
 mod retention;
@@ -38,7 +40,7 @@ use wf_application::commands::queue::{
 use wf_domain::claim::Claim;
 use wf_domain::lease::{LeaseGuard, LeaseToken};
 use wf_domain::workflow::{
-    self, CommittedCommand, Create, Operation, Outcome, Terminal, WorkflowRecord, WorkflowStatus,
+    self, CommittedCommand, Create, Operation, Outcome, Terminal, WorkflowRecord,
 };
 use wf_types::identity::RecordId;
 use wf_types::version::{Fence, TimestampMillis};
@@ -93,6 +95,9 @@ pub(crate) struct ShardState {
     child_events: Vec<children::ChildEvent>,
     /// Flow type policies by type (ADR-014 step 9).
     policies: HashMap<Vec<u8>, Arc<Installed>>,
+    /// FIFO lanes, and the queues of lanes freed this round (step 9b).
+    lanes: fifo::Lanes,
+    freed: Vec<super::super::waiters::Arrival>,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -124,6 +129,8 @@ impl ShardState {
             live: false,
             child_events: Vec::new(),
             policies: HashMap::new(),
+            lanes: HashMap::new(),
+            freed: Vec::new(),
         }
     }
 
@@ -291,62 +298,6 @@ impl ShardState {
         Ok(outcome)
     }
 
-    /// The index entry of a record: due time for a scheduled unleased record,
-    /// lease deadline for a leased running one.
-    fn queue_slot(entry: &Entry) -> Option<(Queue, (u64, u64))> {
-        let record = &entry.record;
-        let due = match (record.status(), record.lease()) {
-            (WorkflowStatus::Scheduled, None) => record.next_run_at()?,
-            (_, Some(lease)) if record.state() == RUNNING => lease.deadline,
-            _ => return None,
-        };
-        let queue = Queue {
-            flow_type: record.workflow_type().to_vec(),
-            state: record.state().to_vec(),
-            priority: entry.priority,
-        };
-        Some((queue, (due.get(), entry.sequence)))
-    }
-
-    fn count(&mut self, queue: &Queue, added: bool) {
-        let counter = if queue.state == RUNNING {
-            &mut self.leased
-        } else {
-            &mut self.ready
-        };
-        *counter = if added {
-            counter.saturating_add(1)
-        } else {
-            counter.saturating_sub(1)
-        };
-    }
-
-    fn index(&mut self, key: &Key, entry: &Entry) {
-        if let Some((queue, slot)) = Self::queue_slot(entry) {
-            self.count(&queue, true);
-            self.queues
-                .entry(queue)
-                .or_default()
-                .insert(slot, key.clone());
-        }
-    }
-
-    fn unindex(&mut self, key: &Key, entry: &Entry) {
-        let Some((queue, slot)) = Self::queue_slot(entry) else {
-            return;
-        };
-        let removed = self
-            .queues
-            .get_mut(&queue)
-            .is_some_and(|due| due.remove(&slot).is_some_and(|indexed| indexed == *key));
-        if removed {
-            self.count(&queue, false);
-            if self.queues.get(&queue).is_some_and(BTreeMap::is_empty) {
-                self.queues.remove(&queue);
-            }
-        }
-    }
-
     /// Creates one Flow; returns its outcome and the change to log.
     pub(crate) fn create(
         &mut self,
@@ -356,6 +307,10 @@ impl ShardState {
         partition: Partition,
     ) -> (ItemOutcome, Option<Logged>) {
         let (flow_type, state, run_at, priority) = shape;
+        let explicit = matches!(partition, Partition::Named(_));
+        if let Err(error) = self.fifo_guard((flow_type, state), false, priority, Some(explicit)) {
+            return (Err(error), None);
+        }
         let logged = Logged::Create {
             now,
             partition,

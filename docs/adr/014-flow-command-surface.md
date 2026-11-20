@@ -212,3 +212,22 @@ Each step is one commit with its tests.
   and the unknown-option text. FIFO claim lanes (step 9b) and FLOW commands
   sent as text through COMMAND_EXEC (step 9c, which the SDK uses whenever a
   call carries `indexed_state_meta` or a non-create `state_meta`) follow.
+- Step 9b: FIFO states, as Elixir's `FifoLane`. A lane is a type, a logical
+  state (a running Flow's is the state it was claimed from) and a partition;
+  its Flows are ordered by `Entry::sequence`, which is now stamped again
+  whenever a Flow's logical state changes (Elixir's `state_enter_seq`), so a
+  Flow entering a state joins the tail and images keep lane order. Lanes are
+  kept only for types whose policy has a FIFO state (an index beside the
+  due index, rebuilt when such a policy is installed, so other types pay
+  nothing). A claim of a FIFO state takes only lane heads that wait and are
+  due: a running head or one not due yet (a retry's backoff) blocks its
+  partition. A head leaving its lane reports the lane's queue as an arrival,
+  so parked claims wake. Entering a FIFO state follows
+  `flow_require_fifo_entry/4`: creates (fast path, generic and children),
+  transitions and step-continues need an explicit partition, priority must
+  be 0, a Flow cannot enter running, and a retry checks priority only. The
+  FIFO scenario (guards, heads per partition, retry and running blocking,
+  completion and transition freeing a lane, entry at the tail, an
+  auto-partition Flow entering FIFO, a policy set after its Flows exist)
+  matches Elixir exactly. Not covered: `FLOW.START_AND_CLAIM` and
+  `FLOW.RUN_STEPS_MANY` into a FIFO state are not refused.
