@@ -64845,3 +64845,29 @@ old lease stale; Elixir order a, c, d, b for limit 4 ratio 25; limit 1
 prefers a due Flow; state `running` takes only expired leases; reclaim
 replayed after a restart with another shard count) and 2 session tests pass.
 Clippy, the ratchet and the architecture tests pass.
+
+### ADR013-BLOCKING1 shortfall rounds and blocking claims
+
+`ClaimFlows.block_ms` and `ClaimFlows.cancellation` (`Cancellation`, a
+shared flag) and `ServiceError::TooManyWaiting`. The node's routing moved to
+private `composition::router`; claims run in private `composition::claim`
+(weighted first round, then rounds sized by per-shard counts from the new
+`Request::Peek`, at most four claim rounds, then parking). The waiter thread is
+`supervision::waiters` (already covered by `wf-node::supervision` in
+`thread_owner_modules`). Shards bump a node-wide epoch after rounds with
+creates and notify parked claims of matching type, state and priority. The TCP
+adapter passes `block_ms` (refusing values above 4,294,967,295 with Elixir's
+text) and cancels a connection's waiting claims when its reader stops. No
+dependency change.
+
+RED: `tests/queue_node` did not compile (no `block_ms`, `cancellation`,
+`Cancellation`); with the fields added and the old routing,
+`a_one_flow_claim_finds_a_due_flow_behind_later_flows` failed (the claim asked
+only the first shard holding Flows scheduled an hour later) and six blocking
+tests failed; the session tests failed (blocking refused as unsupported, no
+cancellation). GREEN: 20 node tests pass three runs in a row (wake on create,
+empty reply at the deadline, wake when a scheduled Flow falls due, wake when a
+lease expires for a reclaiming claim, `block_ms` 0 waits, cancellation takes
+nothing, stopping the node fails a parked claim as unavailable) and 3 session
+tests (options reach the service, bounds refused, closing cancels). Clippy,
+the ratchet and the architecture tests pass.

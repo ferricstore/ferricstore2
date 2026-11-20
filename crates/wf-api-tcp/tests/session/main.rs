@@ -6,13 +6,13 @@
 
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpStream};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use wf_api_tcp::session::{ServerInfo, serve};
 use wf_application::commands::queue::{
-    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService, Reply,
-    ServiceError,
+    Cancellation, ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService,
+    Reply, ServiceError,
 };
 use wf_domain::value::DomainError;
 
@@ -25,8 +25,12 @@ type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
 /// Ids starting with `dup` already exist, `stale` completions have a stale
 /// lease, and ids starting with `slow` reply after 150 ms from another thread.
-/// A claim by worker `probe` echoes its options as the run state.
+/// A claim by worker `probe` echoes its options as the run state; a claim by
+/// worker `park` keeps its cancellation in [`PARKED`] and never replies.
 struct Scripted;
+
+/// Cancellations of claims by worker `park`.
+static PARKED: Mutex<Vec<Cancellation>> = Mutex::new(Vec::new());
 
 fn outcome(id: &[u8], refused: &[u8], error: DomainError) -> ItemOutcome {
     if id.starts_with(refused) {
@@ -58,13 +62,28 @@ impl QueueService for Scripted {
     }
 
     fn claim(&self, request: ClaimFlows, reply: Reply<Vec<ClaimedFlow>>) {
+        if request.worker == b"park" {
+            if let Some(cancellation) = request.cancellation {
+                PARKED
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .push(cancellation);
+            }
+            return;
+        }
         let job = ClaimedFlow {
             id: b"f1".to_vec(),
             partition: b"__flow_auto__:7".to_vec(),
             lease_token: request.worker.iter().chain(b":1:1").copied().collect(),
             fence: 1,
             run_state: if request.worker == b"probe" {
-                format!("reclaim={:?}", request.reclaim).into_bytes()
+                format!(
+                    "reclaim={:?};block={:?};cancel={}",
+                    request.reclaim,
+                    request.block_ms,
+                    request.cancellation.is_some()
+                )
+                .into_bytes()
             } else {
                 b"queued".to_vec()
             },

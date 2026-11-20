@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use wf_application::commands::queue::QueueService;
+use wf_application::commands::queue::{Cancellation, QueueService};
 
 use crate::frame::{FLAG_COMPRESSED, FLAG_MORE_CHUNKS, Header, Opcode};
 use crate::request::{self, Startup};
@@ -17,6 +17,8 @@ pub(super) struct Context {
     pub(super) service: Arc<dyn QueueService>,
     pub(super) info: Arc<ServerInfo>,
     pub(super) client_id: u64,
+    /// Set when the connection stops reading; cancels its waiting claims.
+    pub(super) closed: Cancellation,
 }
 
 /// Compact reply codecs the client accepted in `STARTUP`.

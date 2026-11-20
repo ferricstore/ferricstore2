@@ -3,7 +3,9 @@
 
 use std::collections::BTreeSet;
 
-use wf_application::commands::queue::{CreateFlows, NewFlow, QueueService};
+use wf_application::commands::queue::{
+    CreateFlows, NewFlow, Partition, QueueService, shard_for_slot,
+};
 
 use super::{TestResult, call, claim, claim_request, create, directory, open};
 
@@ -123,6 +125,54 @@ fn a_partition_filter_claims_only_that_partition() -> TestResult {
     let mut ids: Vec<&[u8]> = jobs.iter().map(|job| job.id.as_slice()).collect();
     ids.sort_unstable();
     assert_eq!(ids, vec![b"a".as_slice(), b"c".as_slice()]);
+    drop(node);
+    std::fs::remove_dir_all(directory)?;
+    Ok(())
+}
+
+/// A claim for one Flow finds a due Flow on any shard, even when the shard
+/// the weighted split asks first holds only Flows scheduled later (ADR-013).
+#[test]
+fn a_one_flow_claim_finds_a_due_flow_behind_later_flows() -> TestResult {
+    let directory = directory("shortfall")?;
+    let node = open(&directory, 16)?;
+    let later = u64::try_from(
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)?
+            .as_millis(),
+    )? + 3_600_000;
+    let flows: Vec<NewFlow> = (0..200)
+        .map(|index| NewFlow {
+            id: format!("later-{index}").into_bytes(),
+            partition: None,
+            payload: None,
+        })
+        .collect();
+    let request = CreateFlows {
+        flow_type: b"jobs".to_vec(),
+        state: b"queued".to_vec(),
+        run_at_ms: Some(later),
+        priority: 0,
+        flows,
+    };
+    assert!(
+        call(|reply| node.create(request, reply))??
+            .iter()
+            .all(Result::is_ok)
+    );
+    let due = (0..100)
+        .map(|index| format!("due-{index}"))
+        .find(|id| {
+            let partition = Partition::for_new_flow(id.as_bytes(), None);
+            shard_for_slot(partition.slot(), 16) != Some(0)
+        })
+        .ok_or("every candidate id is on shard 0")?;
+    assert!(create(&node, &[due.as_str()])?.iter().all(Result::is_ok));
+    let jobs = claim(&node, 1)?;
+    assert_eq!(
+        jobs.iter().map(|job| job.id.as_slice()).collect::<Vec<_>>(),
+        vec![due.as_bytes()]
+    );
     drop(node);
     std::fs::remove_dir_all(directory)?;
     Ok(())

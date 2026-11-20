@@ -125,7 +125,9 @@ pub(super) async fn run(stream: TcpStream, context: Context) {
             break;
         }
     }
+    context.closed.cancel();
     drop(outgoing);
-    // The writer finishes once every pending reply has been sent or dropped.
+    // The writer finishes once every pending reply has been sent or dropped;
+    // waiting claims give theirs up once they see the cancellation.
     let _finished = writer.await;
 }

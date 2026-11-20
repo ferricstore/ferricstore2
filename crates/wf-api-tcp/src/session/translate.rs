@@ -19,6 +19,8 @@ use super::dispatch::{Context, Negotiated, refuse};
 
 /// Most Flows one claim may return, as the handshake declares.
 const MAX_CLAIM: usize = 10_000;
+/// Longest blocking claim, as in Elixir.
+const MAX_BLOCK_MS: u64 = 0xFFFF_FFFF;
 
 fn priority(value: i64) -> Result<u8, String> {
     u8::try_from(value)
@@ -219,12 +221,18 @@ pub(super) fn claim_due(
             "ERR flow reclaim_ratio must be an integer between 0 and 100",
         );
     };
-    if parsed.block_ms.is_some() {
-        return refuse(
-            reply,
-            "ERR blocking FLOW.CLAIM_DUE is not supported by this server",
-        );
-    }
+    let Ok(block_ms) = parsed
+        .block_ms
+        .map(|ms| {
+            u64::try_from(ms)
+                .ok()
+                .filter(|ms| *ms <= MAX_BLOCK_MS)
+                .ok_or(())
+        })
+        .transpose()
+    else {
+        return refuse(reply, "ERR flow block_ms exceeds maximum 4294967295");
+    };
     let limit = usize::try_from(parsed.limit)
         .ok()
         .filter(|limit| (1..=MAX_CLAIM).contains(limit));
@@ -252,6 +260,8 @@ pub(super) fn claim_due(
         priority,
         partitions,
         reclaim: parsed.reclaim_expired.then_some(ratio),
+        block_ms,
+        cancellation: block_ms.map(|_| context.closed.clone()),
     };
     let (shape, compact) = (parsed.shape, negotiated.claim_jobs);
     context.service.claim(

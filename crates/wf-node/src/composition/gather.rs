@@ -2,7 +2,7 @@
 
 use std::sync::{Mutex, PoisonError};
 
-use wf_application::commands::queue::{ClaimedFlow, ItemOutcome, Reply, ServiceError};
+use wf_application::commands::queue::{ItemOutcome, Reply, ServiceError};
 
 struct Items {
     remaining: usize,
@@ -59,51 +59,6 @@ impl ItemGather {
                 .collect::<Result<Vec<_>, _>>(),
         };
         drop(items);
-        reply(result);
-    }
-}
-
-struct Claims {
-    remaining: usize,
-    claimed: Vec<ClaimedFlow>,
-    failure: Option<ServiceError>,
-    reply: Option<Reply<Vec<ClaimedFlow>>>,
-}
-
-/// Claimed Flows from several shards. A failed shard fails the reply only
-/// when no other shard claimed anything, so durable claims are never hidden.
-pub(crate) struct ClaimGather(Mutex<Claims>);
-
-impl ClaimGather {
-    pub(crate) fn new(parts: usize, reply: Reply<Vec<ClaimedFlow>>) -> Self {
-        Self(Mutex::new(Claims {
-            remaining: parts,
-            claimed: Vec::new(),
-            failure: None,
-            reply: Some(reply),
-        }))
-    }
-
-    /// Records one shard's part; the last part sends the reply.
-    pub(crate) fn part(&self, result: Result<Vec<ClaimedFlow>, ServiceError>) {
-        let mut claims = self.0.lock().unwrap_or_else(PoisonError::into_inner);
-        match result {
-            Ok(claimed) => claims.claimed.extend(claimed),
-            Err(error) => claims.failure = Some(error),
-        }
-        claims.remaining = claims.remaining.saturating_sub(1);
-        if claims.remaining > 0 {
-            return;
-        }
-        let Some(reply) = claims.reply.take() else {
-            return;
-        };
-        let claimed = std::mem::take(&mut claims.claimed);
-        let result = match claims.failure {
-            Some(error) if claimed.is_empty() => Err(error),
-            _ => Ok(claimed),
-        };
-        drop(claims);
         reply(result);
     }
 }

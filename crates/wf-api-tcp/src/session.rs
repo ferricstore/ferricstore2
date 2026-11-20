@@ -14,7 +14,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use tokio::net::TcpListener;
-use wf_application::commands::queue::QueueService;
+use wf_application::commands::queue::{Cancellation, QueueService};
 
 /// What the handshake tells clients about this server.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -43,6 +43,7 @@ pub async fn serve(listener: TcpListener, service: Arc<dyn QueueService>, info: 
             service: Arc::clone(&service),
             info: Arc::clone(&info),
             client_id,
+            closed: Cancellation::new(),
         };
         tokio::spawn(connection::run(stream, context));
     }

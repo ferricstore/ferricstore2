@@ -1,8 +1,10 @@
-//! Supervised runtime threads (ADR-011): one thread per shard and one
-//! completion thread that releases replies after the log sync.
+//! Supervised runtime threads (ADR-011, ADR-013): one thread per shard, one
+//! completion thread that releases replies after the log sync, and the waiter
+//! thread for blocking claims.
 
 pub(crate) mod completer;
 pub(crate) mod shard;
+pub(crate) mod waiters;
 
 use std::thread::JoinHandle;
 

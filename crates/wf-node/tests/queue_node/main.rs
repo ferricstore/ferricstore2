@@ -15,6 +15,7 @@ use wf_application::commands::queue::{
 };
 use wf_node::composition::{QueueNode, QueueNodeConfig};
 
+mod blocking;
 mod crash;
 mod lifecycle;
 mod reclaim;
@@ -84,6 +85,8 @@ fn claim_request(limit: usize) -> ClaimFlows {
         priority: None,
         partitions: None,
         reclaim: None,
+        block_ms: None,
+        cancellation: None,
     }
 }
 

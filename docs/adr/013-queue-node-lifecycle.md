@@ -114,3 +114,7 @@ forever on that.
 ## Progress
 
 - Decision 1 done: expired-lease reclaim (ADR013-RECLAIM1).
+- Decisions 2 and 3 done: shortfall rounds and blocking claims
+  (ADR013-BLOCKING1). Parked claims are woken by creates whose type, state and
+  priority match; a claim with a partition filter may wake for a create in
+  another partition, try, and park again.

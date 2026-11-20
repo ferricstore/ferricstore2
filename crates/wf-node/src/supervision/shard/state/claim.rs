@@ -24,6 +24,44 @@ pub(crate) struct Taken {
     pub(crate) logged: Vec<Logged>,
 }
 
+/// What a shard could claim now for a request, and how long until a
+/// matching Flow falls due or a matching lease expires.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub(crate) struct Peeked {
+    pub(crate) available: usize,
+    pub(crate) wait_ms: Option<u64>,
+}
+
+/// Entries scanned for a partition match before the earliest due time of
+/// the whole queue is reported instead.
+const DUE_SCAN: usize = 64;
+
+/// Index entries a request may take, in the order it takes them.
+fn modes(request: &ClaimFlows) -> &'static [Mode] {
+    if request.state.as_deref() == Some(RUNNING) {
+        &[Mode::Expired]
+    } else if request.reclaim.is_some() {
+        &[Mode::Due, Mode::Expired]
+    } else {
+        &[Mode::Due]
+    }
+}
+
+type Due = std::collections::BTreeMap<(u64, u64), Key>;
+
+/// The earliest due time after `now` in one queue, preferring an entry in
+/// an allowed partition among the first [`DUE_SCAN`].
+fn next_due(due: &Due, now: u64, partitions: Option<&[Partition]>) -> Option<u64> {
+    let mut later = due.range((now.saturating_add(1), 0)..);
+    let first = later.clone().next().map(|((at, _), _)| *at)?;
+    let allowed = later
+        .by_ref()
+        .take(DUE_SCAN)
+        .find(|(_, key)| partitions.is_none_or(|allowed| allowed.contains(&key.0)))
+        .map(|((at, _), _)| *at);
+    Some(allowed.unwrap_or(first))
+}
+
 /// Reclaimed before due Flows: `ceil(limit * ratio / 100)`, at least one.
 fn first_reclaim(limit: usize, ratio: u8) -> usize {
     limit
@@ -69,6 +107,62 @@ impl ShardState {
             }
         }
         taken
+    }
+
+    /// Counts what [`Self::claim`] could take now, up to `limit`, without
+    /// changing anything.
+    pub(crate) fn peek(
+        &self,
+        now: u64,
+        request: &ClaimFlows,
+        limit: usize,
+        partitions: Option<&[Partition]>,
+    ) -> Peeked {
+        let mut available = 0_usize;
+        let mut next: Option<u64> = None;
+        for mode in modes(request) {
+            available = available.saturating_add(
+                self.candidates(now, request, *mode, limit, partitions)
+                    .len(),
+            );
+            let earliest = self
+                .matching(request, *mode)
+                .filter_map(|(_, due)| next_due(due, now, partitions))
+                .min();
+            next = match (next, earliest) {
+                (Some(earlier), Some(at)) => Some(earlier.min(at)),
+                (earlier, at) => earlier.or(at),
+            };
+        }
+        Peeked {
+            available: available.min(limit),
+            wait_ms: next.map(|at| at.saturating_sub(now)),
+        }
+    }
+
+    /// Queues of `mode` whose type, state and priority match the request.
+    fn matching<'a>(
+        &'a self,
+        request: &'a ClaimFlows,
+        mode: Mode,
+    ) -> impl Iterator<Item = (&'a super::Queue, &'a Due)> {
+        self.queues.iter().filter(move |(queue, _)| {
+            let running = queue.state == RUNNING;
+            queue.flow_type == request.flow_type
+                && match mode {
+                    Mode::Expired => running,
+                    Mode::Due => {
+                        !running
+                            && request
+                                .state
+                                .as_ref()
+                                .is_none_or(|state| *state == queue.state)
+                    }
+                }
+                && request
+                    .priority
+                    .is_none_or(|priority| priority == queue.priority)
+        })
     }
 
     fn take(
@@ -129,24 +223,7 @@ impl ShardState {
         partitions: Option<&[Partition]>,
     ) -> Vec<(Key, Vec<u8>, u64)> {
         let mut found: Vec<(Reverse<u8>, (u64, u64), &Key)> = Vec::new();
-        let queues = self.queues.iter().filter(|(queue, _)| {
-            let running = queue.state == RUNNING;
-            queue.flow_type == request.flow_type
-                && match mode {
-                    Mode::Expired => running,
-                    Mode::Due => {
-                        !running
-                            && request
-                                .state
-                                .as_ref()
-                                .is_none_or(|state| *state == queue.state)
-                    }
-                }
-                && request
-                    .priority
-                    .is_none_or(|priority| priority == queue.priority)
-        });
-        for (queue, due) in queues {
+        for (queue, due) in self.matching(request, mode) {
             let eligible = due
                 .range(..=(now, u64::MAX))
                 .filter(|(_, key)| partitions.is_none_or(|allowed| allowed.contains(&key.0)))

@@ -22,8 +22,9 @@ use wf_application::commands::queue::{
 use wf_storage::log::GroupLog;
 
 use super::completer::{Completion, Finish};
+use super::waiters::{Arrival, Waiters};
 use command::Logged;
-use state::ShardState;
+use state::{Peeked, ShardState};
 
 /// Most requests one shard applies before appending.
 const MAX_REQUESTS_PER_ROUND: usize = 256;
@@ -49,6 +50,13 @@ pub(crate) enum Request {
         partitions: Option<Arc<[Partition]>>,
         done: Done<Vec<ClaimedFlow>>,
     },
+    /// Count what a claim could take now; answered at once, not after a sync.
+    Peek {
+        request: Arc<ClaimFlows>,
+        limit: usize,
+        partitions: Option<Arc<[Partition]>>,
+        done: Box<dyn FnOnce(Peeked) + Send>,
+    },
     /// Complete Flows; items keep their request position.
     Complete {
         items: Vec<(usize, CompleteFlow, Partition)>,
@@ -62,6 +70,7 @@ pub(crate) struct Links {
     pub(crate) completions: Sender<Completion>,
     pub(crate) ready: Arc<AtomicU64>,
     pub(crate) leased: Arc<AtomicU64>,
+    pub(crate) waiters: Waiters,
     pub(crate) max_append_bytes: usize,
 }
 
@@ -75,8 +84,15 @@ fn committed_now(previous: u64) -> u64 {
     wall.max(previous)
 }
 
-fn handle(state: &mut ShardState, now: u64, request: Request, logged: &mut Vec<Logged>) -> Finish {
-    match request {
+/// Applies one request; returns what to call after the round is durable, or
+/// `None` when it was answered already.
+fn handle(
+    state: &mut ShardState,
+    now: u64,
+    request: Request,
+    logged: &mut Vec<Logged>,
+) -> Option<Finish> {
+    let finish: Finish = match request {
         Request::Create {
             flow_type,
             state: initial,
@@ -112,6 +128,15 @@ fn handle(state: &mut ShardState, now: u64, request: Request, logged: &mut Vec<L
             let claimed = taken.claimed;
             Box::new(move |durable| done(durable.map(|()| claimed)))
         }
+        Request::Peek {
+            request,
+            limit,
+            partitions,
+            done,
+        } => {
+            done(state.peek(now, &request, limit, partitions.as_deref()));
+            return None;
+        }
         Request::Complete { items, done } => {
             let outcomes: Vec<(usize, ItemOutcome)> = items
                 .into_iter()
@@ -123,7 +148,32 @@ fn handle(state: &mut ShardState, now: u64, request: Request, logged: &mut Vec<L
                 .collect();
             Box::new(move |durable| done(durable.map(|()| outcomes)))
         }
+    };
+    Some(finish)
+}
+
+/// The queues that gained Flows in a round, for parked claims.
+fn arrivals(logged: &[Logged]) -> Vec<Arrival> {
+    let mut arrivals: Vec<Arrival> = Vec::new();
+    for change in logged {
+        if let Logged::Create {
+            flow_type,
+            state,
+            priority,
+            ..
+        } = change
+        {
+            let arrival = Arrival {
+                flow_type: flow_type.clone(),
+                state: state.clone(),
+                priority: *priority,
+            };
+            if !arrivals.contains(&arrival) {
+                arrivals.push(arrival);
+            }
+        }
     }
+    arrivals
 }
 
 /// Appends the round's changes in chunks that fit one log block; returns the
@@ -165,7 +215,7 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         let mut logged = Vec::new();
         let finishes: Vec<Finish> = round
             .into_iter()
-            .map(|request| handle(&mut state, now, request, &mut logged))
+            .filter_map(|request| handle(&mut state, now, request, &mut logged))
             .collect();
         if !failed {
             match append(&links.log, &logged, links.max_append_bytes, sequence) {
@@ -175,6 +225,12 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         }
         links.ready.store(state.ready(), Ordering::Relaxed);
         links.leased.store(state.leased(), Ordering::Relaxed);
+        if logged
+            .iter()
+            .any(|change| matches!(change, Logged::Create { .. }))
+        {
+            links.waiters.arrived(|| arrivals(&logged));
+        }
         if failed {
             for finish in finishes {
                 finish(Err(ServiceError::Unavailable));

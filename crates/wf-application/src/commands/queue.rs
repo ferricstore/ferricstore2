@@ -7,6 +7,8 @@
 //! shard state. Partition routing matches the Elixir server.
 
 use std::fmt;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use wf_domain::value::DomainError;
 
@@ -60,7 +62,45 @@ pub struct ClaimFlows {
     /// No reclaim when absent. A claim for state `running` takes only
     /// expired leases either way.
     pub reclaim: Option<u8>,
+    /// Wait for a Flow when none can be claimed: `Some(0)` waits until one
+    /// arrives, `Some(ms)` at most that long, then replies with no Flows.
+    /// No wait when absent.
+    pub block_ms: Option<u64>,
+    /// Set when the requester is gone; a waiting claim then replies with no
+    /// Flows and takes nothing.
+    pub cancellation: Option<Cancellation>,
 }
+
+/// Cancels a waiting claim; clones share one flag.
+#[derive(Clone, Debug, Default)]
+pub struct Cancellation(Arc<AtomicBool>);
+
+impl Cancellation {
+    /// A flag that is not set.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets the flag for every clone.
+    pub fn cancel(&self) {
+        self.0.store(true, Ordering::SeqCst);
+    }
+
+    /// Whether any clone was cancelled.
+    #[must_use]
+    pub fn is_cancelled(&self) -> bool {
+        self.0.load(Ordering::SeqCst)
+    }
+}
+
+impl PartialEq for Cancellation {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+impl Eq for Cancellation {}
 
 /// A claimed Flow as the client sees it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -107,6 +147,8 @@ pub enum ServiceError {
     InvalidId,
     /// The node could not make the decision durable or is shutting down.
     Unavailable,
+    /// Too many claims are already waiting for Flows.
+    TooManyWaiting,
 }
 
 impl fmt::Display for ServiceError {
@@ -115,6 +157,9 @@ impl fmt::Display for ServiceError {
             Self::Domain(error) => error.fmt(formatter),
             Self::InvalidId => formatter.write_str("ERR flow id must be 1 to 256 bytes"),
             Self::Unavailable => formatter.write_str("ERR flow store unavailable"),
+            Self::TooManyWaiting => {
+                formatter.write_str("ERR too many blocked FLOW.CLAIM_DUE requests are waiting")
+            }
         }
     }
 }

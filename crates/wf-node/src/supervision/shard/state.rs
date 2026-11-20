@@ -11,6 +11,8 @@
 
 mod claim;
 
+pub(crate) use claim::Peeked;
+
 use std::collections::{BTreeMap, HashMap};
 
 use wf_application::commands::queue::{
