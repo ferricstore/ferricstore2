@@ -157,6 +157,8 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<Vec<HistoryEvent>, Malfo
                 reader.optional_bin()?,
                 reader.optional_bin()?,
                 reader.optional_bin()?,
+                reader.optional_bin()?,
+                reader.optional_bin()?,
             ],
         });
     }

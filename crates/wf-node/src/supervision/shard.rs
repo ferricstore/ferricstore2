@@ -9,6 +9,7 @@
 //! the shard refuses everything until the node restarts and replays the log.
 
 pub(crate) mod command;
+mod handle;
 pub(crate) mod image;
 pub(crate) mod state;
 
@@ -17,6 +18,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use wf_application::commands::flow::cleanup::Cleaned;
 use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::{FlowCommand, Term};
 use wf_application::commands::queue::{
@@ -27,6 +29,7 @@ use wf_storage::log::GroupLog;
 use super::completer::{Completion, Finish};
 use super::waiters::{Arrival, Waiters};
 use command::Logged;
+use handle::handle;
 use state::{Peeked, ShardState};
 
 /// Most requests one shard applies before appending.
@@ -90,6 +93,12 @@ pub(crate) enum Request {
         max_bytes: u64,
         done: Done<Vec<(usize, Term)>>,
     },
+    /// `FLOW.RETENTION_CLEANUP` on this shard, up to `limit` Flows.
+    Cleanup {
+        now_ms: Option<u64>,
+        limit: u64,
+        done: Done<Cleaned>,
+    },
     /// A policy command (ADR-014 step 9): a set or get on shard 0, or a
     /// copy of shard 0's durable set on another shard.
     Policy {
@@ -124,131 +133,6 @@ fn committed_now(previous: u64) -> u64 {
         .and_then(|elapsed| u64::try_from(elapsed.as_millis()).ok())
         .unwrap_or(previous);
     wall.max(previous)
-}
-
-/// Applies one request; returns what to call after the round is durable, or
-/// `None` when it was answered already.
-/// Creates fast-path Flows of one shape; outcomes keep their positions.
-fn create(
-    state: &mut ShardState,
-    now: u64,
-    shape: (&[u8], &[u8], Option<u64>, u8),
-    items: Vec<(usize, NewFlow, Partition)>,
-    logged: &mut Vec<Logged>,
-) -> Vec<(usize, ItemOutcome)> {
-    items
-        .into_iter()
-        .map(|(position, flow, partition)| {
-            let (outcome, change) = state.create(now, shape, flow, partition);
-            logged.extend(change);
-            (position, outcome)
-        })
-        .collect()
-}
-
-fn handle(
-    state: &mut ShardState,
-    (index, now): (u16, u64),
-    request: Request,
-    logged: &mut Vec<Logged>,
-) -> Option<Finish> {
-    let finish: Finish = match request {
-        Request::Capture { snapshot, done } => {
-            let image = state.image(now);
-            logged.push(Logged::Marker {
-                snapshot,
-                shard: index,
-            });
-            Box::new(move |durable| {
-                done(durable.and_then(|()| image.ok_or(ServiceError::Unavailable)));
-            })
-        }
-        Request::Create {
-            flow_type,
-            state: initial,
-            run_at_ms,
-            priority,
-            items,
-            done,
-        } => {
-            let shape = (
-                flow_type.as_slice(),
-                initial.as_slice(),
-                run_at_ms,
-                priority,
-            );
-            let outcomes = create(state, now, shape, items, logged);
-            Box::new(move |durable| done(durable.map(|()| outcomes)))
-        }
-        Request::Claim {
-            request,
-            limit,
-            partitions,
-            done,
-        } => {
-            let taken = state.claim(now, &request, limit, partitions.as_deref());
-            logged.extend(taken.logged);
-            let claimed = taken.claimed;
-            Box::new(move |durable| done(durable.map(|()| claimed)))
-        }
-        Request::Peek {
-            request,
-            limit,
-            partitions,
-            done,
-        } => {
-            done(state.peek(now, &request, limit, partitions.as_deref()));
-            return None;
-        }
-        Request::Flow {
-            command,
-            partition,
-            done,
-        } => {
-            let (result, change) = state.execute(now, *command, partition);
-            logged.extend(change);
-            Box::new(move |durable| done(durable.and(result)))
-        }
-        Request::Policy { command, done } => {
-            let (result, change) = state.policy_command(command);
-            logged.extend(change);
-            Box::new(move |durable| done(durable.and(result)))
-        }
-        Request::RunSteps { spec, items, done } => {
-            let (outcomes, changes) = state.run_steps(now, &spec, items);
-            logged.extend(changes);
-            Box::new(move |durable| done(durable.map(|()| outcomes)))
-        }
-        Request::ValueRead {
-            refs,
-            max_bytes,
-            done,
-        } => {
-            let values = state.read_values(now, refs, max_bytes);
-            Box::new(move |durable| done(durable.map(|()| values)))
-        }
-        Request::FlowBatch {
-            items,
-            atomic,
-            done,
-        } => {
-            let (replies, changes) = state.mutate_batch(now, items, atomic);
-            logged.extend(changes);
-            Box::new(move |durable| done(durable.map(|()| replies)))
-        }
-        Request::Complete { items, done } => {
-            let outcomes: Vec<(usize, ItemOutcome)> = items
-                .into_iter()
-                .map(|(position, completion, partition)| {
-                    let (outcome, change) = state.complete(now, completion, partition);
-                    logged.extend(change);
-                    (position, outcome)
-                })
-                .collect();
-            Box::new(move |durable| done(durable.map(|()| outcomes)))
-        }
-    };
-    Some(finish)
 }
 
 /// The queues that gained Flows in a round, for parked claims.
@@ -325,6 +209,7 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         now = committed_now(now);
         let mut logged = Vec::new();
         if !failed {
+            logged.extend(state.sweep_timeouts(now, MAX_REMOVALS_PER_ROUND));
             logged.extend(state.sweep(now, MAX_REMOVALS_PER_ROUND));
         }
         if round.is_empty() && logged.is_empty() {

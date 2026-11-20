@@ -8,6 +8,7 @@
 //! `claim` module.
 
 mod claim;
+mod cleanup;
 mod flow;
 mod gather;
 mod policy;

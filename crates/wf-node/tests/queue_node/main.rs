@@ -19,6 +19,7 @@ mod blocking;
 mod crash;
 mod flow_children;
 mod flow_claim;
+mod flow_cleanup;
 mod flow_fifo;
 mod flow_mutate;
 mod flow_policy;

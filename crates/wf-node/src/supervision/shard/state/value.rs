@@ -303,6 +303,29 @@ impl ShardState {
         }
     }
 
+    /// An error stored as a term (an active-time timeout's), decoded.
+    fn term_value(&mut self, reference: &[u8]) -> Option<Term> {
+        let parsed = value::parse_ref(reference)?;
+        let ValueRef::Flow {
+            kind: b'e',
+            id,
+            version,
+        } = parsed.target
+        else {
+            return None;
+        };
+        let partition = self.partition_for_tag(&parsed.tag)?;
+        let entry = self.records.get(&(partition, id))?;
+        let meta = entry.meta.as_deref()?;
+        if !meta.error_term || meta.error_version != version {
+            return None;
+        }
+        match Term::decode(entry.record.error()?) {
+            Some((term, [])) => Some(term),
+            _ => None,
+        }
+    }
+
     /// `FLOW.VALUE.MGET` for the references this shard owns.
     pub(crate) fn read_values(
         &mut self,
@@ -312,6 +335,9 @@ impl ShardState {
     ) -> Vec<(usize, Term)> {
         refs.into_iter()
             .map(|(position, reference)| {
+                if let Some(term) = self.term_value(&reference) {
+                    return (position, term);
+                }
                 let bytes = self.value_bytes(now, &reference);
                 (
                     position,

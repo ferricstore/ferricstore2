@@ -54,7 +54,7 @@ pub enum Opcode {
 }
 
 /// Flow commands whose typed-map body the application reads (ADR-014).
-const FLOW_COMMANDS: [(&str, u16); 22] = [
+const FLOW_COMMANDS: [(&str, u16); 23] = [
     ("FLOW.CREATE", 0x0201),
     ("FLOW.GET", 0x0202),
     ("FLOW.COMPLETE", 0x0204),
@@ -74,6 +74,7 @@ const FLOW_COMMANDS: [(&str, u16); 22] = [
     ("FLOW.POLICY.SET", 0x021E),
     ("FLOW.POLICY.GET", 0x021F),
     ("FLOW.SPAWN_CHILDREN", 0x0220),
+    ("FLOW.RETENTION_CLEANUP", 0x0221),
     ("FLOW.STEP_CONTINUE", 0x0222),
     ("FLOW.START_AND_CLAIM", 0x0223),
     ("FLOW.RUN_STEPS_MANY", 0x0224),

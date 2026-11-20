@@ -137,6 +137,7 @@ impl FlowService for Scripted {
             FlowCommand::SpawnChildren(spawn) => reply(Ok(Term::Bin(spawn.parent_id))),
             FlowCommand::PolicySet(set) => reply(Ok(Term::Bin(set.flow_type))),
             FlowCommand::PolicyGet(get) => reply(Ok(Term::Bin(get.flow_type))),
+            FlowCommand::RetentionCleanup(cleanup) => reply(Ok(Term::int(cleanup.limit))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),

@@ -75,6 +75,7 @@ impl ShardState {
             if let Some(entry) = self.records.remove(key) {
                 self.unindex(key, &entry);
                 self.unschedule_removal(&entry);
+                self.unschedule_deadline(&entry);
             }
         }
         Outcome::Changed

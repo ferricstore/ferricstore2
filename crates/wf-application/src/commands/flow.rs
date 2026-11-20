@@ -8,6 +8,7 @@
 
 pub mod children;
 pub mod claim;
+pub mod cleanup;
 pub mod create;
 pub mod get;
 pub mod history;
@@ -63,6 +64,8 @@ pub enum FlowCommand {
     PolicySet(Box<policy::PolicySet>),
     /// `FLOW.POLICY.GET`.
     PolicyGet(policy::PolicyGet),
+    /// `FLOW.RETENTION_CLEANUP`.
+    RetentionCleanup(cleanup::RetentionCleanup),
 }
 
 impl FlowCommand {
@@ -88,7 +91,8 @@ impl FlowCommand {
             | Self::ValueMget(_)
             | Self::RunSteps(_)
             | Self::PolicySet(_)
-            | Self::PolicyGet(_) => None,
+            | Self::PolicyGet(_)
+            | Self::RetentionCleanup(_) => None,
         }
     }
 }
@@ -113,6 +117,7 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
             policy::parse_set(args).map(|set| FlowCommand::PolicySet(Box::new(set)))
         }
         "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
+        "FLOW.RETENTION_CLEANUP" => cleanup::parse(args).map(FlowCommand::RetentionCleanup),
         "FLOW.START_AND_CLAIM" => {
             start::parse_start(args).map(|start| FlowCommand::StartAndClaim(Box::new(start)))
         }

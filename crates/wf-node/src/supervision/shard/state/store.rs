@@ -144,12 +144,14 @@ impl ShardState {
         let previous = self.records.remove(key)?;
         self.unindex(key, &previous);
         self.unschedule_removal(&previous);
+        self.unschedule_deadline(&previous);
         Some(previous)
     }
 
     fn insert(&mut self, key: Key, entry: Entry) {
         self.index(&key, &entry);
         self.schedule_removal(&key, &entry);
+        self.schedule_deadline(&key, &entry);
         self.records.insert(key, entry);
     }
 }

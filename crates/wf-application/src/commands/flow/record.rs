@@ -66,6 +66,9 @@ pub struct FlowMeta {
     pub signal_keys: BTreeMap<Vec<u8>, Vec<u8>>,
     /// Child groups by id.
     pub child_groups: BTreeMap<Vec<u8>, ChildGroup>,
+    /// The error is an encoded term, not bytes: an active-time timeout's
+    /// `{reason, max_active_ms}` (ADR-014 step 9).
+    pub error_term: bool,
 }
 
 impl Default for FlowMeta {
@@ -89,6 +92,7 @@ impl Default for FlowMeta {
             terminal_until: None,
             signal_keys: BTreeMap::new(),
             child_groups: BTreeMap::new(),
+            error_term: false,
         }
     }
 }

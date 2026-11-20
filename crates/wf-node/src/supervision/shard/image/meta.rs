@@ -86,6 +86,7 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         .map(|(id, group)| (id.clone(), group.term()))
         .collect();
     term(out, &Term::Map(groups))?;
+    out.push(u8::from(meta.error_term));
     Some(())
 }
 
@@ -163,6 +164,11 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
                 .into_iter()
                 .map(|(id, group)| Ok((id, ChildGroup::from_term(&group).ok_or(Malformed)?)))
                 .collect::<Result<BTreeMap<_, _>, Malformed>>()?,
+            _ => return Err(Malformed),
+        },
+        error_term: match reader.u8()? {
+            0 => false,
+            1 => true,
             _ => return Err(Malformed),
         },
     })

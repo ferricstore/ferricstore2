@@ -238,7 +238,7 @@ fn decode(cursor: &mut Cursor<'_>) -> Option<HistoryEvent> {
         _ => return None,
     };
     let present = cursor.u8()?;
-    let mut extras: [Option<Vec<u8>>; 4] = [None, None, None, None];
+    let mut extras: [Option<Vec<u8>>; 6] = Default::default();
     for (bit, extra) in extras.iter_mut().enumerate() {
         if present & 1_u8.checked_shl(u32::try_from(bit).ok()?)? != 0 {
             *extra = Some(cursor.bytes()?.to_vec());
@@ -288,6 +288,11 @@ impl History {
             .last_start
             .saturating_sub(u32::try_from(length).unwrap_or(u32::MAX));
         true
+    }
+
+    /// How many events are kept.
+    pub(crate) const fn len(&self) -> u32 {
+        self.count
     }
 
     /// Every event, oldest first; stops at the first undecodable one.

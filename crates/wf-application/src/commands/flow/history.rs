@@ -68,15 +68,23 @@ pub struct HistoryEvent {
     /// The retry audit of a retry event.
     pub retry: Option<RetryHistory>,
     /// JSON of the Flow's value references, attributes and state metadata
-    /// after the event, each when not empty, then a signal's name.
-    pub extras: [Option<Vec<u8>>; 4],
+    /// after the event, each when not empty, then a signal's name, then the
+    /// reason and limit of an active-time timeout.
+    pub extras: [Option<Vec<u8>>; 6],
 }
 
 /// Names of [`HistoryEvent::extras`], in order.
-const EXTRAS: [&str; 4] = ["value_refs", "attributes", "state_meta", "signal"];
+const EXTRAS: [&str; 6] = [
+    "value_refs",
+    "attributes",
+    "state_meta",
+    "signal",
+    "reason",
+    "max_active_ms",
+];
 
 /// The JSON extras of a Flow's fields, as Elixir adds them to each event.
-fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 4] {
+fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 6] {
     let value_refs = (!meta.values.is_empty()).then(|| {
         let refs = meta
             .values
@@ -99,7 +107,7 @@ fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>
         .then(|| json::encode(&meta::attributes_term(&meta.attributes)));
     let state_meta = (!meta.state_meta.is_empty())
         .then(|| json::encode(&meta::state_meta_term(&meta.state_meta)));
-    [value_refs, attributes, state_meta, None]
+    [value_refs, attributes, state_meta, None, None, None]
 }
 
 impl HistoryEvent {

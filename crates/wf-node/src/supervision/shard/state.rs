@@ -22,6 +22,7 @@ mod retention;
 mod signal;
 mod steps;
 mod store;
+mod timeout;
 mod value;
 
 pub(crate) use claim::Peeked;
@@ -98,6 +99,10 @@ pub(crate) struct ShardState {
     /// FIFO lanes, and the queues of lanes freed this round (step 9b).
     lanes: fifo::Lanes,
     freed: Vec<super::super::waiters::Arrival>,
+    /// Deadlines of live Flows with an active-time limit, and when the
+    /// periodic timeout sweep runs next (0 until the first round).
+    deadlines: BTreeMap<(u64, u64), Key>,
+    timeouts_due: u64,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -131,6 +136,8 @@ impl ShardState {
             policies: HashMap::new(),
             lanes: HashMap::new(),
             freed: Vec::new(),
+            deadlines: BTreeMap::new(),
+            timeouts_due: 0,
         }
     }
 

@@ -257,3 +257,25 @@ Each step is one commit with its tests.
   commands are refused, as this server keeps no key-value store. The text
   scenario matches Elixir except the unknown-command status (`error`, not
   `bad_request`) and key-value commands.
+- Step 9 (end): `FLOW.RETENTION_CLEANUP` (0x0221) and active-time limits.
+  A live Flow with `max_active_ms` gets a deadline (creation time plus the
+  limit) in a per-shard index that holds only such Flows. Past it, a
+  timeout fails the Flow as Elixir's `flow_active_timeout_record/4` does:
+  state `failed`, lease and due time cleared, run state kept, the error
+  the term `{reason: "max_active_ms", max_active_ms}` (a new
+  `FlowMeta::error_term` flag makes value reads return it as a term), a
+  `failed` event carrying `reason` and `max_active_ms` (history extras grew
+  from four to six), and terminal retention started from the later of
+  command and wall time. Shards time Flows out at Elixir's sweeper cadence
+  (ten minutes after start, then every ten minutes), so a client clock far
+  behind the wall clock is not failed sooner than Elixir would fail it;
+  terminal removal keeps running every round (ADR-013).
+  `FLOW.RETENTION_CLEANUP` times out, then removes expired terminal Flows,
+  shard by shard against one `limit`, sums Elixir's counts (`flows`,
+  `history`, `values`, `active_timeouts`) and, when the limit runs out,
+  answers `more?` with an opaque continuation naming the shard to resume.
+  The counts of history and values follow this node's storage, not
+  Elixir's key counts. Snapshot images are version 6 (meta flag and the
+  wider extras); after-images logged by earlier development builds of this
+  branch no longer decode. Not built: cancelling children when a parent
+  times out (as for any parent closing).

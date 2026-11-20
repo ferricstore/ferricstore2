@@ -65233,3 +65233,29 @@ All 54 node tests, the TCP adapter and application tests pass; the SDK
 suite passes 35 of 60 (was 34), the policy CAS test included. The policy
 and FIFO scenarios still match Elixir as before. Clippy, the ratchet, lint
 tests, docs and architecture pass.
+
+### ADR014-CLEANUP1 retention cleanup and active-time limits
+
+New artifacts (solo design review): `wf_application::commands::flow::
+cleanup` (`RetentionCleanup`, `Cleaned`, `parse`, `reply`),
+`FlowCommand::RetentionCleanup`, `FlowMeta::error_term`, history extras
+`reason` and `max_active_ms`. In `wf-node`:
+`supervision::shard::state::timeout` (deadline index, periodic and
+requested timeouts, cleanup counts), `ShardState::{deadlines,
+timeouts_due}`, `Request::Cleanup`, `supervision::shard::handle` (request
+handling moved out of `shard.rs` at 408 lines), `composition::cleanup`
+(shard-by-shard limit and continuation), `History::len`, snapshot version
+6. No dependency or policy change.
+
+Evidence: the Elixir timeout scenario (claim, cleanup before and after the
+deadline, GET, the error value read by reference, history) was captured
+first and the node matches it except the wall-clock retention deadline;
+the cleanup scenario's removals, limit, continuation and refusals match in
+behaviour (Elixir's totals include other data on its shared instance). The
+node test `flow_cleanup` was written after the code, so this step does not
+claim TDD; a mutation that drops the stored `error_term` flag fails it. Its
+first version flaked because the node's own retention sweep removed Flows
+with a 50 ms retention before the explicit cleanup did, which is correct
+behaviour; the test now uses an hour. All 55 node tests, the TCP adapter
+and application tests pass; the SDK suite stays at 35 of 60. Clippy, the
+ratchet, lint tests, docs and architecture pass.
