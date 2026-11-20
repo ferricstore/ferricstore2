@@ -98,23 +98,19 @@ fn digest(fields: &[u8], payload: &[u8]) -> [u8; DIGEST_BYTES] {
 /// length of the valid prefix; bytes after it are a torn tail.
 ///
 /// # Errors
-/// [`GroupLogError::Corrupt`] when a damaged block precedes a valid one.
-pub(super) fn scan(
-    bytes: &[u8],
-    max_block_bytes: usize,
-) -> Result<(Vec<Vec<u8>>, usize), GroupLogError> {
+/// The offset of a damaged block that precedes a valid one.
+pub(super) fn scan(bytes: &[u8], max_block_bytes: usize) -> Result<(Vec<Vec<u8>>, usize), usize> {
     let mut records = Vec::new();
-    let mut offset = 0;
+    let mut offset = 0_usize;
     while let Some(rest) = bytes.get(offset..).filter(|rest| !rest.is_empty()) {
         let Some((block_records, size)) = parse(rest, max_block_bytes) else {
             if later_block(rest, max_block_bytes) {
-                let offset = u64::try_from(offset).map_err(|_| GroupLogError::Unavailable)?;
-                return Err(GroupLogError::Corrupt { offset });
+                return Err(offset);
             }
             return Ok((records, offset));
         };
         records.extend(block_records);
-        offset = offset.checked_add(size).ok_or(GroupLogError::Unavailable)?;
+        offset = offset.checked_add(size).ok_or(offset)?;
     }
     Ok((records, offset))
 }

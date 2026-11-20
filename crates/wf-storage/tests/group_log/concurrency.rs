@@ -26,7 +26,7 @@ fn worker(log: &GroupLog, thread_index: usize) -> TestResult<Vec<Vec<u8>>> {
 #[test]
 fn concurrent_appends_share_syncs_and_all_survive_reopen() -> TestResult {
     let directory = directory("concurrent")?;
-    let path = directory.join("node.log");
+    let path = directory.join("log");
     let mut acknowledged = BTreeSet::new();
     let syncs = {
         let (log, _) = GroupLog::open(&path, GroupLogLimits::default())?;

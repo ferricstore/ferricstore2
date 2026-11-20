@@ -1,36 +1,46 @@
 //! Node-local group-committed log (ADR-011).
 //!
-//! Every shard group appends to one file. A single writer thread takes all
-//! queued batches, writes them as blocks with one write and one `sync_data`,
-//! and only then publishes them as durable, so one device flush covers every
-//! group's appends. A batch is never split across blocks, so recovery replays
-//! it whole or not at all.
+//! Every shard group appends to one log. A single writer thread takes all
+//! queued batches, writes them as blocks with one write and one sync, and only
+//! then publishes them as durable, so one device flush covers every group's
+//! appends. A batch is never split across blocks, so recovery replays it whole
+//! or not at all.
 //!
-//! Recovery keeps every complete block. A bad last block is a torn tail from
-//! the final unsynced write and is cut; a bad block followed by a valid one
-//! means synced data was damaged, so the log refuses to open instead of
-//! dropping acknowledged records. Segment rotation and checkpoint truncation
-//! are not implemented yet: the file grows until they are.
+//! The log is a run of numbered segments. The writer starts a new segment when
+//! the next write would pass the size limit, or when asked to rotate. After a
+//! checkpoint covers everything before a rotation, [`GroupLog::remove_before`]
+//! deletes the older segments, oldest first, so a crash leaves only a missing
+//! prefix.
+//!
+//! Recovery keeps every complete block. A bad end of the last segment is a
+//! torn tail from the final unsynced write and is cut. Damage anywhere else, or
+//! a missing middle segment, refuses to open instead of dropping acknowledged
+//! records. A failed write, sync or segment creation fences the log until it
+//! is reopened.
 
 mod block;
+mod recovery;
+mod storage;
 mod writer;
 
 use std::fmt;
-use std::fs::{File, OpenOptions};
-use std::io::{ErrorKind, Read};
 use std::path::Path;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
-use writer::Shared;
+pub use storage::{DirectoryStorage, SegmentStorage, SegmentWriter};
+use writer::{Item, Shared, Writer};
 
-/// Size limits for one record and one block.
+/// Size limits for records, blocks and segments.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct GroupLogLimits {
     /// Largest accepted record.
     pub max_record_bytes: usize,
     /// Largest block, header included; one batch must fit in one block.
     pub max_block_bytes: usize,
+    /// Segment size that starts a new segment; one write is never split, so a
+    /// segment can exceed it by one write.
+    pub max_segment_bytes: u64,
 }
 
 impl Default for GroupLogLimits {
@@ -38,6 +48,7 @@ impl Default for GroupLogLimits {
         Self {
             max_record_bytes: 16 * 1024 * 1024,
             max_block_bytes: 64 * 1024 * 1024,
+            max_segment_bytes: 128 * 1024 * 1024,
         }
     }
 }
@@ -47,27 +58,39 @@ impl Default for GroupLogLimits {
 pub struct Recovered {
     /// Every record of every complete block, in append order.
     pub records: Vec<Vec<u8>>,
-    /// Bytes of torn tail cut from the end of the file.
+    /// Bytes of torn tail cut from the end of the last segment.
     pub truncated_bytes: u64,
+    /// The segments present, oldest first.
+    pub segments: Vec<u64>,
 }
 
-/// A refused open, append or wait.
+/// A refused open, append, wait, rotation or removal.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum GroupLogError {
-    /// The file could not be opened, read or created.
+    /// Storage could not be listed, read or opened, or a removal failed.
     Unavailable,
-    /// A write or sync failed; later appends are refused and earlier ones
-    /// that were not yet durable may or may not survive a restart.
+    /// A write, sync, truncation or segment creation failed; later appends
+    /// are refused, and earlier appends that were not yet durable may or may
+    /// not survive a reopen.
     Uncertain,
-    /// A damaged block precedes a valid one at this byte offset.
+    /// A damaged block in a segment that recovery may not cut.
     Corrupt {
-        /// Offset of the first damaged block.
+        /// The damaged segment.
+        segment: u64,
+        /// Offset of the first damaged block in it.
         offset: u64,
+    },
+    /// A segment between two present segments is missing.
+    MissingSegment {
+        /// The first missing segment.
+        segment: u64,
     },
     /// A record or batch exceeds the limits, or the limits are unusable.
     TooLarge,
     /// A batch has no records.
     EmptyBatch,
+    /// A removal named a segment after the current one.
+    InvalidCheckpoint,
     /// The log is shutting down.
     Closed,
 }
@@ -77,9 +100,20 @@ impl fmt::Display for GroupLogError {
         match self {
             Self::Unavailable => formatter.write_str("group log unavailable"),
             Self::Uncertain => formatter.write_str("group log write or sync failed"),
-            Self::Corrupt { offset } => write!(formatter, "group log corrupt at byte {offset}"),
+            Self::Corrupt { segment, offset } => {
+                write!(
+                    formatter,
+                    "group log segment {segment} corrupt at byte {offset}"
+                )
+            }
+            Self::MissingSegment { segment } => {
+                write!(formatter, "group log segment {segment} is missing")
+            }
             Self::TooLarge => formatter.write_str("record or batch exceeds the group log limits"),
             Self::EmptyBatch => formatter.write_str("group log batch has no records"),
+            Self::InvalidCheckpoint => {
+                formatter.write_str("group log checkpoint is after the current segment")
+            }
             Self::Closed => formatter.write_str("group log is closed"),
         }
     }
@@ -96,56 +130,68 @@ pub struct GroupLog {
 }
 
 impl GroupLog {
-    /// Opens or creates the log at `path`, recovers it and starts the writer.
+    /// Opens or creates the log in `directory`, recovers it and starts the
+    /// writer.
     ///
     /// # Errors
-    /// Refuses unusable limits, an unreadable file, mid-log corruption and a
-    /// failed truncation or directory sync.
-    pub fn open(path: &Path, limits: GroupLogLimits) -> Result<(Self, Recovered), GroupLogError> {
-        if limits.max_record_bytes == 0
-            || block::batch_fits(&[limits.max_record_bytes], limits.max_block_bytes) != Some(true)
-        {
+    /// As [`Self::open_with`], and [`GroupLogError::Unavailable`] when the
+    /// directory cannot be created.
+    pub fn open(
+        directory: &Path,
+        limits: GroupLogLimits,
+    ) -> Result<(Self, Recovered), GroupLogError> {
+        let storage = DirectoryStorage::open(directory).map_err(|_| GroupLogError::Unavailable)?;
+        Self::open_with(Arc::new(storage), limits)
+    }
+
+    /// Opens the log kept in `storage`, recovers it and starts the writer.
+    ///
+    /// # Errors
+    /// Refuses unusable limits, unreadable storage, damaged or missing
+    /// segments, and a failed truncation or segment creation.
+    pub fn open_with(
+        storage: Arc<dyn SegmentStorage>,
+        limits: GroupLogLimits,
+    ) -> Result<(Self, Recovered), GroupLogError> {
+        let usable = limits.max_record_bytes > 0
+            && limits.max_segment_bytes > 0
+            && block::batch_fits(&[limits.max_record_bytes], limits.max_block_bytes) == Some(true);
+        if !usable {
             return Err(GroupLogError::TooLarge);
         }
-        let (mut file, created) = open_file(path)?;
-        let mut bytes = Vec::new();
-        file.read_to_end(&mut bytes)
-            .map_err(|_| GroupLogError::Unavailable)?;
-        let (records, good) = block::scan(&bytes, limits.max_block_bytes)?;
-        let cut = bytes
-            .len()
-            .checked_sub(good)
-            .ok_or(GroupLogError::Unavailable)?;
-        let truncated_bytes = u64::try_from(cut).map_err(|_| GroupLogError::Unavailable)?;
-        if truncated_bytes > 0 {
-            let length = u64::try_from(good).map_err(|_| GroupLogError::Unavailable)?;
-            file.set_len(length)
-                .and_then(|()| file.sync_data())
-                .map_err(|_| GroupLogError::Uncertain)?;
-        }
-        if created {
-            sync_parent(path)?;
-        }
-        let shared = Arc::new(Shared::new(limits.max_block_bytes));
-        let writer = writer::spawn(Arc::clone(&shared), file)?;
+        let opened = recovery::recover(storage.as_ref(), limits.max_block_bytes)?;
+        let (Some(&oldest), Some(&segment)) = (opened.segments.first(), opened.segments.last())
+        else {
+            return Err(GroupLogError::Unavailable);
+        };
+        let writer = Writer {
+            storage,
+            current: opened.current,
+            segment,
+            length: opened.current_length,
+            oldest,
+            max_block_bytes: limits.max_block_bytes,
+            max_segment_bytes: limits.max_segment_bytes,
+        };
+        let shared = Arc::new(Shared::new());
+        let handle = writer::spawn(Arc::clone(&shared), writer)?;
         let log = Self {
             shared,
             limits,
-            writer: Some(writer),
+            writer: Some(handle),
         };
-        Ok((
-            log,
-            Recovered {
-                records,
-                truncated_bytes,
-            },
-        ))
+        let recovered = Recovered {
+            records: opened.records,
+            truncated_bytes: opened.truncated_bytes,
+            segments: opened.segments,
+        };
+        Ok((log, recovered))
     }
 
     /// Queues one record and returns its sequence for [`Self::wait_durable`].
     ///
     /// # Errors
-    /// Refuses an oversized record, a closed log and a log whose writer failed.
+    /// Refuses an oversized record, a closed log and a fenced log.
     pub fn append(&self, record: Vec<u8>) -> Result<u64, GroupLogError> {
         self.append_batch(vec![record])
     }
@@ -154,8 +200,7 @@ impl GroupLog {
     /// the batch's sequence for [`Self::wait_durable`].
     ///
     /// # Errors
-    /// Refuses an empty or oversized batch, a closed log and a log whose
-    /// writer failed.
+    /// Refuses an empty or oversized batch, a closed log and a fenced log.
     pub fn append_batch(&self, records: Vec<Vec<u8>>) -> Result<u64, GroupLogError> {
         if records.is_empty() {
             return Err(GroupLogError::EmptyBatch);
@@ -167,15 +212,40 @@ impl GroupLog {
         if !records_fit || block::batch_fits(&lengths, self.limits.max_block_bytes) != Some(true) {
             return Err(GroupLogError::TooLarge);
         }
-        self.shared.enqueue(records)
+        self.shared.enqueue(Item::Batch(records))
     }
 
-    /// Blocks until the batch with `sequence` and every earlier one is synced.
+    /// Blocks until the item with `sequence` and every earlier one is handled.
     ///
     /// # Errors
     /// Returns the writer's failure if it failed before reaching `sequence`.
     pub fn wait_durable(&self, sequence: u64) -> Result<(), GroupLogError> {
         self.shared.wait(sequence)
+    }
+
+    /// Starts a new segment after every earlier append is durable, and returns
+    /// its number. Everything appended before this call lives in lower
+    /// segments; pass the number to [`Self::remove_before`] once a checkpoint
+    /// covers those appends.
+    ///
+    /// # Errors
+    /// Refuses a closed or fenced log; a failed creation fences the log.
+    pub fn rotate(&self) -> Result<u64, GroupLogError> {
+        let sequence = self.shared.enqueue(Item::Rotate)?;
+        self.shared.outcome(sequence)
+    }
+
+    /// Removes every segment numbered below `segment`, oldest first, after
+    /// every earlier append is durable.
+    ///
+    /// # Errors
+    /// [`GroupLogError::InvalidCheckpoint`] for a segment after the current
+    /// one, [`GroupLogError::Unavailable`] when a removal fails (the remaining
+    /// segments stay valid and a retry continues), and the refusals of a closed
+    /// or fenced log.
+    pub fn remove_before(&self, segment: u64) -> Result<(), GroupLogError> {
+        let sequence = self.shared.enqueue(Item::RemoveBefore(segment))?;
+        self.shared.outcome(sequence).map(drop)
     }
 
     /// Syncs performed since open; fewer syncs than waited appends shows that
@@ -195,28 +265,4 @@ impl Drop for GroupLog {
             let _joined = writer.join();
         }
     }
-}
-
-fn open_file(path: &Path) -> Result<(File, bool), GroupLogError> {
-    let mut options = OpenOptions::new();
-    options.read(true).append(true);
-    match options.clone().create_new(true).open(path) {
-        Ok(file) => Ok((file, true)),
-        Err(error) if error.kind() == ErrorKind::AlreadyExists => options
-            .open(path)
-            .map(|file| (file, false))
-            .map_err(|_| GroupLogError::Unavailable),
-        Err(_) => Err(GroupLogError::Unavailable),
-    }
-}
-
-/// Makes a new file's directory entry durable.
-fn sync_parent(path: &Path) -> Result<(), GroupLogError> {
-    let parent = path
-        .parent()
-        .filter(|parent| !parent.as_os_str().is_empty())
-        .unwrap_or_else(|| Path::new("."));
-    File::open(parent)
-        .and_then(|directory| directory.sync_all())
-        .map_err(|_| GroupLogError::Uncertain)
 }

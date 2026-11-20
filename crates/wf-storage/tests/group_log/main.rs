@@ -1,17 +1,22 @@
 //! The node-local group-committed log (ADR-011): appends from many threads
-//! share one write and one sync, acknowledgements follow the sync, and
-//! recovery keeps every complete block while cutting only a torn tail.
+//! share one write and one sync, acknowledgements follow the sync, recovery
+//! keeps every complete block while cutting only a torn tail, segments rotate
+//! and are removed after a checkpoint, and injected write, sync, create,
+//! truncate and remove failures fence or report without losing acknowledged
+//! records.
 
 #![forbid(unsafe_code)]
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use wf_storage::log::{GroupLog, GroupLogLimits};
+use wf_storage::log::{DirectoryStorage, GroupLog, GroupLogLimits};
 
 mod concurrency;
 mod crash;
+mod faults;
 mod recovery;
+mod rotation;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
@@ -28,6 +33,11 @@ fn directory(tag: &str) -> TestResult<PathBuf> {
     Ok(path)
 }
 
+/// The file holding `segment` of the log at `path`.
+fn segment(path: &Path, segment: u64) -> TestResult<PathBuf> {
+    Ok(DirectoryStorage::open(path)?.segment_path(segment))
+}
+
 fn record(index: usize) -> Vec<u8> {
     format!("record-{index:06}").into_bytes()
 }
@@ -35,7 +45,7 @@ fn record(index: usize) -> Vec<u8> {
 #[test]
 fn appended_records_are_durable_and_replayed_in_order() -> TestResult {
     let directory = directory("order")?;
-    let path = directory.join("node.log");
+    let path = directory.join("log");
     {
         let (log, recovered) = GroupLog::open(&path, GroupLogLimits::default())?;
         assert_eq!(recovered.records, Vec::<Vec<u8>>::new());
@@ -60,7 +70,7 @@ fn appended_records_are_durable_and_replayed_in_order() -> TestResult {
 #[test]
 fn records_above_the_limit_are_refused_without_writing() -> TestResult {
     let directory = directory("limit")?;
-    let path = directory.join("node.log");
+    let path = directory.join("log");
     let limits = GroupLogLimits {
         max_record_bytes: 8,
         ..GroupLogLimits::default()
@@ -80,7 +90,7 @@ fn records_above_the_limit_are_refused_without_writing() -> TestResult {
 #[test]
 fn records_still_queued_at_drop_are_written_before_the_writer_stops() -> TestResult {
     let directory = directory("drain")?;
-    let path = directory.join("node.log");
+    let path = directory.join("log");
     {
         let (log, _) = GroupLog::open(&path, GroupLogLimits::default())?;
         for index in 0..100 {
@@ -96,7 +106,7 @@ fn records_still_queued_at_drop_are_written_before_the_writer_stops() -> TestRes
 #[test]
 fn a_batch_is_replayed_whole_or_not_at_all() -> TestResult {
     let directory = directory("batch")?;
-    let path = directory.join("node.log");
+    let path = directory.join("log");
     {
         let (log, _) = GroupLog::open(&path, GroupLogLimits::default())?;
         let sequence = log.append_batch((0..5).map(record).collect())?;
@@ -106,10 +116,11 @@ fn a_batch_is_replayed_whole_or_not_at_all() -> TestResult {
             "an empty batch was accepted"
         );
     }
-    let full = std::fs::metadata(&path)?.len();
+    let file = segment(&path, 0)?;
+    let full = std::fs::metadata(&file)?.len();
     std::fs::OpenOptions::new()
         .write(true)
-        .open(&path)?
+        .open(&file)?
         .set_len(full - 1)?;
     let (_log, recovered) = GroupLog::open(&path, GroupLogLimits::default())?;
     assert_eq!(recovered.records, Vec::<Vec<u8>>::new());

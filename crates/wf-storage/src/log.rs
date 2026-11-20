@@ -11,5 +11,8 @@ mod recovery;
 mod store;
 mod write;
 
-pub use group::{GroupLog, GroupLogError, GroupLogLimits, Recovered};
+pub use group::{
+    DirectoryStorage, GroupLog, GroupLogError, GroupLogLimits, Recovered, SegmentStorage,
+    SegmentWriter,
+};
 pub use store::RedbLogStore;

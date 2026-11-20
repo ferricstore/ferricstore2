@@ -94,6 +94,23 @@ commands follow their existing milestones.
   | 64 x 32 | 243,359 | 1,056 |
   | 16 x 500 | 793,197 | 4,211 |
 
-  Not done: segment rotation and checkpoint truncation (the file grows),
-  fault injection for a failed write or sync, and Linux runs.
+  Segments and failures (added after the first log commit): the log is a
+  run of numbered segment files. The writer starts a new segment at the size
+  limit (default 128 MiB) or on `rotate()`, which returns the new segment
+  number once every earlier append is durable; `remove_before(n)` deletes
+  older segments oldest first, so a crash leaves only a missing prefix.
+  Only the last segment may lose a torn tail; damage in an earlier segment or
+  a missing middle segment refuses to open. Storage sits behind the
+  `SegmentStorage` trait (`DirectoryStorage` in production), which tests wrap
+  to fail the Nth write (after half the bytes land), sync, segment creation,
+  truncation or removal. A failed write, sync or creation fences the log
+  until reopen and loses no acknowledged record; a failed truncation refuses
+  to open without changing the file; a failed removal is reported, the log
+  keeps working and a retry finishes it. A second SIGKILL test uses 1 KiB
+  segments so kills land during rotations. Re-measured after the change:
+  the same records per sync (8.4, 259, 1,024, 4,000).
+
+  Not done: Linux runs, and the policy that decides when the node rotates
+  and which checkpoint lets it remove segments (it belongs with the shard
+  executor's snapshots).
 - Step 3 (shard executor, listener, wiring) is next.

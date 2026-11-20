@@ -64711,3 +64711,24 @@ Clippy, the ratchet (new files at zero) and all 66 architecture tests pass.
 Throughput is in ADR-011. Open: rotation/truncation, injected write/sync
 failure tests, Linux.
 
+### ADR011-GROUP-LOG2 segments, checkpoint removal and injected failures
+
+User request 2026-11-20: close the two group-log gaps (unbounded file growth,
+no failure tests) before compile speed. New private modules
+`log::group::{storage,recovery}`; `wf_storage::log` also exports
+`DirectoryStorage`, `SegmentStorage` and `SegmentWriter`. `GroupLog::open`
+now takes a directory; `open_with` takes any `SegmentStorage`. New API:
+`rotate`, `remove_before`, `GroupLogLimits::max_segment_bytes`,
+`Recovered::segments`, and errors `Corrupt { segment, offset }`,
+`MissingSegment`, `InvalidCheckpoint`. Policy unchanged: the existing
+`wf-storage::log::group` durable-sync and writer thread-owner entries cover
+the new modules.
+
+RED: the updated `group_log` target failed to compile (unresolved
+`DirectoryStorage`, `SegmentStorage`, `SegmentWriter`). GREEN: 22 tests pass,
+including 5 injected-failure tests (sync, torn write, segment creation by
+size and on request, tail truncation, partial removal), 4 rotation tests,
+2 new recovery tests (damaged earlier segment, missing middle segment) and a
+SIGKILL run with 1 KiB segments; both SIGKILL tests passed three repeated
+runs. Clippy, the ratchet and all 66 architecture tests pass.
+
