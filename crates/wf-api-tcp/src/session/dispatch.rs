@@ -11,7 +11,7 @@ use crate::response::{self, COMPACT_CODECS, Handshake, STATUS_ERROR};
 
 use super::ServerInfo;
 use super::connection::ReplyTo;
-use super::{generic, pipeline, translate};
+use super::{exec, generic, pipeline, translate};
 
 /// What every request of a connection shares.
 pub(super) struct Context {
@@ -127,6 +127,7 @@ pub(super) fn handle(
         }
         Some(Opcode::FlowReclaim) => generic::claim(context, "FLOW.RECLAIM", body, reply),
         Some(Opcode::Pipeline) => pipeline::pipeline(context, header.flags, body, reply),
+        Some(Opcode::CommandExec) => exec::exec(context, body, reply),
         Some(Opcode::FlowCompleteMany) if header.flags & FLAG_CUSTOM_PAYLOAD == 0 => {
             generic::flow(context, "FLOW.COMPLETE_MANY", header.flags, body, reply);
         }

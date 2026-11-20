@@ -101,6 +101,7 @@ fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcom
                 Err(error) => done(Err(failed(error))),
             }
         }
+        Some(Opcode::CommandExec) => super::exec::run(context, &command.body, done),
         _ => done(Err(format!(
             "ERR FSNP opcode {:#06x} is not supported in a pipeline by this server",
             command.opcode

@@ -87,7 +87,10 @@ fn kind_error() -> FlowError {
 }
 
 /// `normalize_override/1`: only the given fields; a given backoff is full.
-fn retry(value: &Term) -> Result<Option<RetryOverride>, FlowError> {
+///
+/// # Errors
+/// The Elixir server's refusal text for an invalid field.
+pub(crate) fn retry_override(value: &Term) -> Result<Option<RetryOverride>, FlowError> {
     if matches!(value, Term::Nil) {
         return Ok(None);
     }
@@ -245,7 +248,10 @@ fn state_policy(entries: &Entries) -> Result<StatePolicy, FlowError> {
         },
         Some(_) => return Err(rejected("ERR flow state mode must be parallel or fifo")),
     };
-    let retry = get(entries, "retry").map(retry).transpose()?.flatten();
+    let retry = get(entries, "retry")
+        .map(retry_override)
+        .transpose()?
+        .flatten();
     let retention = get(entries, "retention")
         .map(retention)
         .transpose()?
@@ -304,11 +310,21 @@ fn states(value: Option<&Term>) -> Result<BTreeMap<Vec<u8>, StatePolicy>, FlowEr
 /// # Errors
 /// The Elixir server's refusal text for the first invalid field.
 pub fn normalize(attrs: &Entries) -> Result<FlowPolicy, FlowError> {
+    if get(attrs, "mode").is_some() {
+        return Err(rejected("ERR flow state mode is state-level only"));
+    }
     let max_active_ms = get(attrs, "max_active_ms")
         .map(max_active_ms)
         .transpose()?
         .flatten();
-    let retry = get(attrs, "retry").map(retry).transpose()?.flatten();
+    let retry = get(attrs, "retry")
+        .map(retry_override)
+        .transpose()?
+        .flatten();
+    let retention = get(attrs, "retention")
+        .map(retention)
+        .transpose()?
+        .flatten();
     let indexed_attributes = get(attrs, "indexed_attributes")
         .map(indexed_attributes)
         .transpose()?;
@@ -319,6 +335,7 @@ pub fn normalize(attrs: &Entries) -> Result<FlowPolicy, FlowError> {
     let states = states(get(attrs, "states"))?;
     let policy = FlowPolicy {
         max_active_ms,
+        retention,
         retry,
         states,
         indexed_attributes,

@@ -22,6 +22,7 @@ pub mod record;
 pub mod signal;
 pub mod start;
 pub mod term;
+pub mod text;
 pub mod value;
 
 pub use opts::MAX_EXACT;

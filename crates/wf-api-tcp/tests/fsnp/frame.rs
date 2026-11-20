@@ -79,10 +79,12 @@ fn opcode_codes_match_the_native_protocol() {
         (Opcode::FlowCreateMany, 0x020F),
         (Opcode::FlowCompleteMany, 0x0210),
         (Opcode::FlowReclaim, 0x0215),
+        (Opcode::CommandExec, 0x0100),
     ] {
         assert_eq!(opcode.code(), code);
         assert_eq!(Opcode::from_code(code), Some(opcode));
     }
-    // Key-value commands are not part of this workflow-only server.
-    assert_eq!(Opcode::from_code(0x0100), None);
+    // Key-value commands are not part of this workflow-only server;
+    // COMMAND_EXEC carries FLOW text commands only (ADR-014 step 9c).
+    assert_eq!(Opcode::from_code(0x0101), None);
 }

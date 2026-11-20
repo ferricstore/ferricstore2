@@ -165,7 +165,7 @@ fn a_typed_pipeline_reports_each_command_in_order() -> TestResult {
                 0x0100,
                 3,
                 "error",
-                bin("ERR FSNP opcode 0x0100 is not supported in a pipeline by this server")
+                bin("ERR native field command must be binary")
             ),
         ]))?
     );

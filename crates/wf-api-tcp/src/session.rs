@@ -8,6 +8,7 @@
 
 mod connection;
 mod dispatch;
+mod exec;
 mod generic;
 mod pipeline;
 mod translate;

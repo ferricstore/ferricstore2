@@ -47,6 +47,8 @@ pub enum Opcode {
     FlowReclaim,
     /// Several commands in one typed frame.
     Pipeline,
+    /// A command sent as text: its name and arguments.
+    CommandExec,
     /// Any other Flow command with a typed-map body, by name (ADR-014).
     Flow(&'static str),
 }
@@ -77,13 +79,14 @@ const FLOW_COMMANDS: [(&str, u16); 22] = [
     ("FLOW.RUN_STEPS_MANY", 0x0224),
 ];
 
-const OPCODES: [(Opcode, u16); 10] = [
+const OPCODES: [(Opcode, u16); 11] = [
     (Opcode::Hello, 0x0001),
     (Opcode::Ping, 0x0003),
     (Opcode::Quit, 0x0009),
     (Opcode::Options, 0x000B),
     (Opcode::Startup, 0x000C),
     (Opcode::Pipeline, 0x000E),
+    (Opcode::CommandExec, 0x0100),
     (Opcode::FlowClaimDue, 0x0203),
     (Opcode::FlowCreateMany, 0x020F),
     (Opcode::FlowCompleteMany, 0x0210),

@@ -12,7 +12,14 @@ const ALLOWED: &[&str] = &[
     "values",
     "value_max_bytes",
     "payload",
+    "full",
+    "payload_max_bytes",
+    "include_cold",
+    "consistent_projection",
 ];
+
+/// Elixir's `flow_payload_return_max_bytes`: 64 KiB.
+const PAYLOAD_MAX_BYTES: u64 = 65_536;
 
 /// Read one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -40,6 +47,19 @@ pub fn parse(args: &Term) -> Result<GetFlow, FlowError> {
         }
     };
     opts.non_neg_integer("value_max_bytes")?;
+    // Read hints a single-node store has no use for, checked as Elixir
+    // checks them.
+    for flag in ["full", "payload", "include_cold", "consistent_projection"] {
+        opts.boolean(flag, false)?;
+    }
+    if opts
+        .non_neg_integer("payload_max_bytes")?
+        .is_some_and(|max| max > PAYLOAD_MAX_BYTES)
+    {
+        return Err(FlowError::rejected(format!(
+            "ERR flow payload_max_bytes exceeds maximum {PAYLOAD_MAX_BYTES}"
+        )));
+    }
     Ok(GetFlow {
         id,
         partition_key: partition_key(&opts)?,

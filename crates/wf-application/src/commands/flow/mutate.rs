@@ -7,6 +7,8 @@ use std::collections::BTreeMap;
 use super::FlowError;
 use super::create::{partition_key, values};
 use super::meta::{self, Attributes};
+use wf_domain::policy::RetryOverride;
+
 use super::opts::Opts;
 use super::term::Term;
 
@@ -66,6 +68,8 @@ pub enum Change {
         payload: Option<Vec<u8>>,
         /// Error of this attempt.
         error: Option<Vec<u8>>,
+        /// This command's retry fields, over the type's and state's.
+        policy: RetryOverride,
     },
     /// Finish successfully.
     Complete {
@@ -258,6 +262,12 @@ fn change(name: &str, opts: &Opts<'_>) -> Result<Change, FlowError> {
             run_at_ms: opts.non_neg_integer("run_at_ms")?,
             payload: binary(opts, "payload")?,
             error: binary(opts, "error")?,
+            policy: opts
+                .get("retry")
+                .map(super::policy::retry_override)
+                .transpose()?
+                .flatten()
+                .unwrap_or_default(),
         },
         "FLOW.COMPLETE" => Change::Complete {
             payload: binary(opts, "payload")?,

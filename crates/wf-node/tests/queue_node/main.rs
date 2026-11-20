@@ -25,6 +25,7 @@ mod flow_policy;
 mod flow_record;
 mod flow_signal;
 mod flow_steps;
+mod flow_text;
 mod flow_value;
 mod lifecycle;
 mod reclaim;

@@ -4,31 +4,31 @@
 //!
 //! A policy is stored in its normalized form; a set merges its patch into
 //! that form (or replaces it), normalizes the result again and raises the
-//! type's generation. Top-level `retention`, `version`, `mode` and
-//! `governance` are not options of the typed protocol, so they never reach a
-//! policy; state-level governance is refused until governance is built.
+//! type's generation. The typed protocol has no top-level `retention`,
+//! `version`, `mode` or `governance`; the text form may set a type-level
+//! retention. State-level governance is refused until governance is built.
 
 use std::collections::BTreeMap;
 
 use wf_domain::policy::{Backoff, BackoffKind, InstalledRetryPolicy, RetryOverride};
 
 use super::FlowError;
-use super::opts::{MAX_EXACT, Opts};
+use super::opts::MAX_EXACT;
 use super::term::Term;
 
 mod merge;
 mod normalize;
+mod request;
 mod resolve;
 
 pub use merge::merge;
 pub use normalize::normalize;
+pub(crate) use normalize::retry_override;
+pub use request::{PolicyGet, PolicySet, parse_get, parse_set, parse_set_text};
 pub use resolve::{Lifecycle, lifecycle, reply};
 
 /// Largest serialized policy, as Elixir's 256 KiB snapshot bound.
 const MAX_SNAPSHOT_BYTES: usize = 262_144;
-/// Elixir's largest key; a policy key is `f:{f}:policy:` and the type.
-const MAX_KEY_BYTES: usize = 65_535;
-const POLICY_KEY_PREFIX_BYTES: usize = 13;
 /// The keys of a set that belong to the policy itself.
 const POLICY_KEYS: [&str; 5] = [
     "retry",
@@ -36,6 +36,17 @@ const POLICY_KEYS: [&str; 5] = [
     "max_active_ms",
     "indexed_attributes",
     "indexed_state_meta",
+];
+
+/// The policy keys a text set may also carry.
+const TEXT_POLICY_KEYS: [&str; 7] = [
+    "retry",
+    "states",
+    "max_active_ms",
+    "indexed_attributes",
+    "indexed_state_meta",
+    "retention",
+    "mode",
 ];
 
 /// How Flows in one state are claimed.
@@ -83,6 +94,8 @@ pub struct StatePolicy {
 pub struct FlowPolicy {
     /// Type-wide active-time limit.
     pub max_active_ms: Option<u64>,
+    /// Type-wide retention, set only through the text form.
+    pub retention: Option<Retention>,
     /// Type-wide retry override.
     pub retry: Option<RetryOverride>,
     /// Per-state policies.
@@ -113,6 +126,9 @@ impl FlowPolicy {
         if let Some(retry) = &self.retry {
             entries.push((b"retry".to_vec(), override_term(retry)));
         }
+        if let Some(retention) = &self.retention {
+            entries.push((b"retention".to_vec(), retention_term(retention)));
+        }
         let states = self
             .states
             .iter()
@@ -140,16 +156,21 @@ fn state_term(policy: &StatePolicy) -> Term {
         fields.push((b"retry".to_vec(), override_term(retry)));
     }
     if let Some(retention) = &policy.retention {
-        let mut kept = Vec::new();
-        if let Some(ttl) = retention.ttl_ms {
-            kept.push((b"ttl_ms".to_vec(), Term::int(ttl)));
-        }
-        if let Some(max) = retention.history_max_events {
-            kept.push((b"history_max_events".to_vec(), Term::int(max)));
-        }
-        fields.push((b"retention".to_vec(), Term::Map(kept)));
+        fields.push((b"retention".to_vec(), retention_term(retention)));
     }
     Term::Map(fields)
+}
+
+/// A retention override with only its given fields.
+fn retention_term(retention: &Retention) -> Term {
+    let mut kept = Vec::new();
+    if let Some(ttl) = retention.ttl_ms {
+        kept.push((b"ttl_ms".to_vec(), Term::int(ttl)));
+    }
+    if let Some(max) = retention.history_max_events {
+        kept.push((b"history_max_events".to_vec(), Term::int(max)));
+    }
+    Term::Map(kept)
 }
 
 /// A full backoff as a map.
@@ -219,112 +240,8 @@ impl Installed {
     }
 }
 
-/// `FLOW.POLICY.SET`.
-#[derive(Clone, Debug, PartialEq)]
-pub struct PolicySet {
-    /// The type.
-    pub flow_type: Vec<u8>,
-    /// The policy keys given.
-    pub patch: Vec<(Vec<u8>, Term)>,
-    /// Replace the stored policy instead of merging into it.
-    pub replace: bool,
-    /// The generation the stored policy must have.
-    pub expected_generation: Option<u64>,
-    /// Reply for this state only.
-    pub state: Option<Vec<u8>>,
-}
-
-/// `FLOW.POLICY.GET`.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PolicyGet {
-    /// The type.
-    pub flow_type: Vec<u8>,
-    /// Reply for this state only.
-    pub state: Option<Vec<u8>>,
-}
-
 fn rejected(text: &str) -> FlowError {
     FlowError::rejected(text.to_owned())
-}
-
-/// The type and reply state every policy command names.
-fn target(opts: &Opts<'_>) -> Result<(Vec<u8>, Option<Vec<u8>>), FlowError> {
-    let flow_type = match opts.get("type") {
-        Some(Term::Bin(flow_type)) => flow_type.clone(),
-        _ => return Err(rejected("ERR native field type must be binary")),
-    };
-    if flow_type.is_empty() {
-        return Err(rejected("ERR flow type must be a non-empty string"));
-    }
-    if flow_type.len().saturating_add(POLICY_KEY_PREFIX_BYTES) > MAX_KEY_BYTES {
-        return Err(rejected(&format!(
-            "ERR key too large (max {MAX_KEY_BYTES} bytes)"
-        )));
-    }
-    let state = match opts.get("state") {
-        None | Some(Term::Nil) => None,
-        Some(Term::Bin(state)) => Some(state.clone()),
-        Some(_) => return Err(rejected("ERR flow state must be a string")),
-    };
-    Ok((flow_type, state))
-}
-
-/// Reads `FLOW.POLICY.SET`.
-///
-/// # Errors
-/// The Elixir server's refusal text for an invalid option.
-pub fn parse_set(args: &Term) -> Result<PolicySet, FlowError> {
-    let mut allowed = vec!["type", "state", "expected_generation", "replace"];
-    allowed.extend(POLICY_KEYS);
-    let opts = Opts::new("FLOW.POLICY.SET", args, &allowed)?;
-    let (flow_type, state) = target(&opts)?;
-    let expected_generation = match opts.get("expected_generation") {
-        None | Some(Term::Nil) => None,
-        Some(Term::Int(value)) => match u64::try_from(*value) {
-            Ok(value) if value <= MAX_EXACT => Some(value),
-            _ => {
-                return Err(rejected(
-                    "ERR flow expected_generation must be a non-negative integer",
-                ));
-            }
-        },
-        Some(_) => {
-            return Err(rejected(
-                "ERR flow expected_generation must be a non-negative integer",
-            ));
-        }
-    };
-    let replace = match opts.get("replace") {
-        None => false,
-        Some(Term::Bool(replace)) => *replace,
-        Some(_) => return Err(rejected("ERR flow replace must be boolean")),
-    };
-    let patch: Vec<(Vec<u8>, Term)> = match args {
-        Term::Map(entries) => entries
-            .iter()
-            .filter(|(key, _)| POLICY_KEYS.iter().any(|name| name.as_bytes() == key))
-            .cloned()
-            .collect(),
-        _ => Vec::new(),
-    };
-    check_size(&Term::Map(patch.clone()))?;
-    Ok(PolicySet {
-        flow_type,
-        patch,
-        replace,
-        expected_generation,
-        state,
-    })
-}
-
-/// Reads `FLOW.POLICY.GET`.
-///
-/// # Errors
-/// The Elixir server's refusal text for an invalid option.
-pub fn parse_get(args: &Term) -> Result<PolicyGet, FlowError> {
-    let opts = Opts::new("FLOW.POLICY.GET", args, &["type", "state"])?;
-    let (flow_type, state) = target(&opts)?;
-    Ok(PolicyGet { flow_type, state })
 }
 
 /// Refuses a policy larger than the snapshot bound.

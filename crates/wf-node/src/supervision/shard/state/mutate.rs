@@ -13,7 +13,6 @@ use wf_application::commands::flow::record::{FlowMeta, Include};
 use wf_application::commands::flow::{Term, term};
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
-use wf_domain::policy::RetryOverride;
 use wf_domain::retry::{JitterSample, PolicyRetry};
 use wf_domain::workflow::{
     self, Cancel, CommittedCommand, Operation, Outcome, StepContinue, Terminal, Transition,
@@ -81,10 +80,11 @@ fn operation(mutation: &Mutation) -> Result<Operation, ServiceError> {
             run_at_ms,
             payload,
             error,
+            policy,
         } => Operation::RetryWithPolicy(PolicyRetry {
             guard: guard(mutation)?,
             run_at: at(*run_at_ms),
-            policy_override: RetryOverride::default(),
+            policy_override: policy.clone(),
             jitter: JitterSample::new(0),
             payload: payload.clone(),
             error: error.clone(),

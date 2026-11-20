@@ -231,3 +231,29 @@ Each step is one commit with its tests.
   auto-partition Flow entering FIFO, a policy set after its Flows exist)
   matches Elixir exactly. Not covered: `FLOW.START_AND_CLAIM` and
   `FLOW.RUN_STEPS_MANY` into a FIFO state are not refused.
+- Step 9c: FLOW commands sent as text through `COMMAND_EXEC` (0x0100), as
+  `NativeAstParser` reads them, also inside a typed `PIPELINE`. The SDK
+  sends this form whenever a call carries `indexed_state_meta` or a
+  non-create `state_meta`. A table of forms (positional keys, then
+  options) covers CREATE, VALUE.PUT, SIGNAL, GET, POLICY.SET, POLICY.GET,
+  CLAIM_DUE, RECLAIM, EXTEND_LEASE, COMPLETE, TRANSITION, RETRY, FAIL,
+  CANCEL, REWIND, HISTORY, ATTRIBUTES, ATTRIBUTE_VALUES, STATS, INFO and
+  RETENTION_CLEANUP; options follow `@flow_option_specs` (names in any
+  case, values coerced per kind, `ATTRIBUTE`/`STATE_META` pairs, read
+  options such as `FULL`, `PAYLOAD MAXBYTES`, `VALUE`, `PARTITIONS`, signal
+  value pairs, POLICY.SET's scoped retry/backoff/retention options and
+  `STATE` sections). Numbers and booleans among the arguments count as their
+  text, as Elixir stringifies them. Each text command becomes the typed map
+  its opcode would carry and goes through the same parser, so both forms
+  decide and answer alike; commands whose typed form is not built yet are
+  refused by that parser. Two departures it exposed are fixed: FLOW.RETRY's
+  own `retry` override (`max_retries`, `exhausted_to`, backoff) was accepted
+  but ignored and now layers over the type and state policy, and FLOW.GET
+  now checks and ignores `full`, `payload_max_bytes`, `include_cold` and
+  `consistent_projection` as Elixir does. A policy may now hold a type-level
+  retention (only the text form can set one), layered under state
+  retention. Item-list text forms (`*_MANY`, `SPAWN_CHILDREN`) and
+  `FLOW.QUERY` are refused until step 9d and the query step; other
+  commands are refused, as this server keeps no key-value store. The text
+  scenario matches Elixir except the unknown-command status (`error`, not
+  `bad_request`) and key-value commands.

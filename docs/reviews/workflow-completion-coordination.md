@@ -65204,3 +65204,32 @@ does not claim TDD; disabling the re-stamp or the freed-lane arrivals makes
 one of them fail. All 52 node tests and the TCP adapter tests pass; the SDK
 suite passes 34 of 60 (was 32). Clippy, the ratchet, lint tests, docs and
 architecture pass.
+
+### ADR014-TEXT1 FLOW text commands over COMMAND_EXEC
+
+New artifacts (solo design review): `wf_application::commands::flow::text`
+(`Parsed`, `parse`, the form table) with private children `text::{options,
+specs, policy}`; `policy::{parse_set_text, retry_override}` and
+`policy::request` (request parsing moved out of `policy.rs` at 404 lines);
+`FlowPolicy::retention`; `mutate::Change::Retry::policy`. In `wf-api-tcp`:
+`Opcode::CommandExec` (0x0100) and `session::exec` (frame and pipeline
+use). No dependency or policy change.
+
+The earlier frame test asserted 0x0100 undecoded, because it meant only
+key-value commands; it now decodes and serves FLOW text commands only, so
+that assertion moved to 0x0101 (key-value GET), and the pipeline and
+unsupported-command session tests now see Elixir's
+`ERR native field command must be binary` for an empty `COMMAND_EXEC`.
+
+Evidence: before this step the SDK's policy CAS test failed on opcode
+0x0100 (`install_policy(indexed_state_meta=...)` uses the text form). The
+Elixir text scenario (int arguments, `STATE_META` on create and transition,
+POLICY.SET with `INDEXED_STATE_META`, per-state options, GET `FULL`,
+HISTORY, syntax/integer/arity/unknown refusals) was captured first; the
+node diff then showed GET `FULL` refused and the ignored retry override.
+Node tests `flow_text` were written after the code, so this step does not
+claim TDD; restoring the default retry override makes the retry test fail.
+All 54 node tests, the TCP adapter and application tests pass; the SDK
+suite passes 35 of 60 (was 34), the policy CAS test included. The policy
+and FIFO scenarios still match Elixir as before. Clippy, the ratchet, lint
+tests, docs and architecture pass.

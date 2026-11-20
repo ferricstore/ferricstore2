@@ -5,7 +5,7 @@
 use wf_domain::policy::{RetryOverride, RetryPolicy, resolve as resolve_retry};
 
 use super::super::term::{Term, map};
-use super::{FlowPolicy, Installed, Mode, backoff_term};
+use super::{FlowPolicy, Installed, Mode, Retention, backoff_term};
 
 /// Retention limits: the node's defaults, or what a Flow stores.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -29,16 +29,21 @@ pub fn lifecycle(
     overrides: [Option<u64>; 3],
 ) -> Lifecycle {
     let [ttl_ms, hot, total] = overrides;
-    let retention = policy
+    let typed = policy.and_then(|policy| policy.retention.as_ref());
+    let stated = policy
         .zip(state)
         .and_then(|(policy, state)| policy.states.get(state))
         .and_then(|policy| policy.retention.as_ref());
+    // The state's field over the type's.
+    let pick = |field: fn(&Retention) -> Option<u64>| {
+        stated.and_then(field).or_else(|| typed.and_then(field))
+    };
     let history_max_events = total
-        .or_else(|| retention.and_then(|retention| retention.history_max_events))
+        .or_else(|| pick(|retention| retention.history_max_events))
         .unwrap_or(defaults.history_max_events);
     Lifecycle {
         ttl_ms: ttl_ms
-            .or_else(|| retention.and_then(|retention| retention.ttl_ms))
+            .or_else(|| pick(|retention| retention.ttl_ms))
             .unwrap_or(defaults.ttl_ms),
         history_hot_max_events: hot
             .unwrap_or(defaults.history_hot_max_events)
