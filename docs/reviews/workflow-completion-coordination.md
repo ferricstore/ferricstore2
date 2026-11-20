@@ -65107,3 +65107,31 @@ state, run state, lease and due time after a restart with 3 shards, two
 `signaled` events naming the signal, a missing Flow); all 47 node tests and
 the TCP adapter tests pass; the signal scenario matches Elixir exactly.
 Clippy, the ratchet, lint tests, docs and architecture pass.
+
+### ADR014-CHILDREN1 child groups and the typed pipeline
+
+New artifacts (solo design review): `wf_application::commands::flow::
+children` (`SpawnChildren`, `parse`) with `children::group` (`ChildGroup`,
+`Wait`, `ChildResult`, Elixir's resolution rules, reply form and
+`from_term`), `FlowMeta::child_groups`, `FlowCommand::SpawnChildren`. In
+`wf-node`: `supervision::shard::state::children` (spawn, child events,
+settling), `Logged::Group` (tag 9, split by shard on replay),
+`ShardState::{go_live, note_child, settle_children}` (the write path queues
+child events only when live; replay ends by going live), the cross-shard
+spawn refusal in `composition::flow`, `command::decode_stored`. In
+`wf-api-tcp`: `request::{pipeline, PipelineCommand}`, `session::pipeline`,
+`Opcode::Pipeline`, opcode 0x0220. No dependency or policy change.
+
+RED: `a_parent_waits_for_its_children_and_resumes_when_they_finish` failed
+("ERR FLOW.SPAWN_CHILDREN is not supported by this server"); after the spawn
+worked, the SDK suite showed the remaining child-group failures: opcode
+0x000E refused in three tests, and spawn-wide values missing from children in
+the fourth. The pipeline session test was written after the pipeline code.
+GREEN: the child test (spawn, idempotent retry, parent state, lease and due
+time, child links, group counts as each child completes, resolution to the
+success state with the parent due, result references, six history events,
+all across a restart with 3 shards), the pipeline session test, all 48 node
+tests and the TCP adapter tests pass; the SDK suite passes 30 of 60 (was
+26). `children.rs` reached 502 lines and `composition.rs` 401; the group
+moved to `children/group.rs` and going live moved into replay. Clippy, the
+ratchet, lint tests, docs and architecture pass.

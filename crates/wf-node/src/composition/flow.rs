@@ -32,6 +32,23 @@ impl FlowService for QueueNode {
             FlowCommand::Many(batch) => return batch_mutation(router, *batch, reply),
             FlowCommand::ValueMget(read) => return value_read(router, read, reply),
             FlowCommand::RunSteps(spec) => return run_steps(router, *spec, reply),
+            FlowCommand::SpawnChildren(spawn) => {
+                // A spawn is decided on the parent's shard; children placed
+                // on other shards need a cross-shard spawn, not built yet.
+                let parent = router.route(&Partition::parse(&spawn.partition_key));
+                let elsewhere = spawn.children.iter().any(|child| {
+                    let partition =
+                        Partition::for_new_flow(&child.id, child.partition_key.as_deref());
+                    router.route(&partition) != parent
+                });
+                if elsewhere {
+                    return reply(Err(ServiceError::rejected(
+                        "ERR flow children on another shard than their parent are not supported by this server yet"
+                            .to_owned(),
+                    )));
+                }
+                FlowCommand::SpawnChildren(spawn)
+            }
             FlowCommand::ValuePut(mut put) if put.named.is_none() => {
                 // A shared value's reference is chosen here, so its auto
                 // bucket is known before routing.

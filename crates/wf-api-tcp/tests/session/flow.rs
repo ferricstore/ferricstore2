@@ -121,3 +121,53 @@ fn every_single_flow_mutation_opcode_reaches_the_service() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn a_typed_pipeline_reports_each_command_in_order() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let command = |opcode: i64, request: i64, body: Typed| {
+        map(&[
+            ("opcode", Typed::Int(opcode)),
+            ("lane_id", Typed::Int(1)),
+            ("request_id", Typed::Int(request)),
+            ("body", body),
+        ])
+    };
+    let request = encode(&map(&[
+        ("atomicity", bin("none")),
+        ("return", bin("compact")),
+        (
+            "commands",
+            Typed::List(vec![
+                command(0x0202, 1, map(&[("id", bin("none1"))])),
+                command(0x0201, 2, map(&[("id", bin("dup1")), ("type", bin("t"))])),
+                command(0x0100, 3, map(&[])),
+            ]),
+        ),
+    ]))?;
+    let reply = client.call(0x000E, 1, 0, &request)?;
+    let outcome = |opcode: i64, request: i64, status: &str, value: Typed| {
+        map(&[
+            ("lane_id", Typed::Int(1)),
+            ("opcode", Typed::Int(opcode)),
+            ("request_id", Typed::Int(request)),
+            ("status", bin(status)),
+            ("value", value),
+        ])
+    };
+    assert_eq!(
+        reply.body,
+        ok(&Typed::List(vec![
+            outcome(0x0202, 1, "ok", Typed::Nil),
+            outcome(0x0201, 2, "error", bin("ERR flow already exists")),
+            outcome(
+                0x0100,
+                3,
+                "error",
+                bin("ERR FSNP opcode 0x0100 is not supported in a pipeline by this server")
+            ),
+        ]))?
+    );
+    Ok(())
+}

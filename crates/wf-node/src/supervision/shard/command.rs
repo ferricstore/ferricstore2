@@ -20,6 +20,7 @@ const EXPIRE: u8 = 5;
 const MARKER: u8 = 6;
 const PUT: u8 = 7;
 const SHARED: u8 = 8;
+const GROUP: u8 = 9;
 
 /// One logged change to one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -66,6 +67,9 @@ pub(crate) enum Logged {
         partition: Partition,
         image: Vec<u8>,
     },
+    /// Changes logged as one record so they are all or nothing (a spawn:
+    /// the parent and its children; ADR-014 step 8).
+    Group(Vec<Logged>),
     /// A shared value stored under its reference (ADR-014 step 5).
     Shared {
         partition: Partition,
@@ -77,13 +81,14 @@ pub(crate) enum Logged {
 
 impl Logged {
     /// The partition of a single-Flow change; `None` for a sweep.
-    pub(crate) const fn partition(&self) -> Option<&Partition> {
+    pub(crate) fn partition(&self) -> Option<&Partition> {
         match self {
             Self::Create { partition, .. }
             | Self::Claim { partition, .. }
             | Self::Complete { partition, .. }
             | Self::Put { partition, .. }
             | Self::Shared { partition, .. } => Some(partition),
+            Self::Group(changes) => changes.first().and_then(Self::partition),
             Self::Expire { .. } | Self::Marker { .. } => None,
         }
     }
@@ -146,6 +151,13 @@ impl Logged {
                 bin(&mut out, &partition.name())?;
                 bin(&mut out, image)?;
             }
+            Self::Group(changes) => {
+                out.push(GROUP);
+                out.extend_from_slice(&u32::try_from(changes.len()).ok()?.to_be_bytes());
+                for change in changes {
+                    bin(&mut out, &change.encode()?)?;
+                }
+            }
             Self::Shared {
                 partition,
                 reference,
@@ -188,30 +200,8 @@ pub(super) struct Malformed;
 fn decode(bytes: &[u8]) -> Result<Logged, Malformed> {
     let mut reader = Reader(bytes);
     let tag = reader.u8()?;
-    if tag == SHARED {
-        let partition = Partition::parse(reader.bin()?);
-        let reference = reader.bin()?.to_vec();
-        let bytes = reader.bin()?.to_vec();
-        let expires_at = reader.optional_u64()?;
-        return if reader.0.is_empty() {
-            Ok(Logged::Shared {
-                partition,
-                reference,
-                bytes,
-                expires_at,
-            })
-        } else {
-            Err(Malformed)
-        };
-    }
-    if tag == PUT {
-        let partition = Partition::parse(reader.bin()?);
-        let image = reader.bin()?.to_vec();
-        return if reader.0.is_empty() {
-            Ok(Logged::Put { partition, image })
-        } else {
-            Err(Malformed)
-        };
+    if let Some(logged) = decode_stored(tag, &mut reader)? {
+        return Ok(logged);
     }
     let now = reader.u64()?;
     if tag == MARKER {
@@ -352,5 +342,39 @@ impl<'a> Reader<'a> {
             1 => self.u64().map(Some),
             _ => Err(Malformed),
         }
+    }
+}
+
+/// Records that store state as logged: a group, a shared value or an
+/// after-image; `None` for any other tag.
+fn decode_stored(tag: u8, reader: &mut Reader<'_>) -> Result<Option<Logged>, Malformed> {
+    let logged = match tag {
+        GROUP => {
+            let count = u32::from_be_bytes(reader.array()?);
+            let mut changes = Vec::new();
+            for _ in 0..count {
+                changes.push(decode(reader.bin()?)?);
+            }
+            if changes.is_empty() {
+                return Err(Malformed);
+            }
+            Logged::Group(changes)
+        }
+        SHARED => Logged::Shared {
+            partition: Partition::parse(reader.bin()?),
+            reference: reader.bin()?.to_vec(),
+            bytes: reader.bin()?.to_vec(),
+            expires_at: reader.optional_u64()?,
+        },
+        PUT => Logged::Put {
+            partition: Partition::parse(reader.bin()?),
+            image: reader.bin()?.to_vec(),
+        },
+        _ => return Ok(None),
+    };
+    if reader.0.is_empty() {
+        Ok(Some(logged))
+    } else {
+        Err(Malformed)
     }
 }

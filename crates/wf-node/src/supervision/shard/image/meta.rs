@@ -5,11 +5,13 @@
 //! attributes and state metadata as [`Term`] maps, named values (count, then
 //! name, version and bytes), the payload, result and error versions, then
 //! the terminal retention override and removal time as optional integers,
-//! then the signal idempotency keys (count, then key and digest).
+//! then the signal idempotency keys (count, then key and digest), then the
+//! child groups as a [`Term`] map of each group's reply form.
 
 use std::collections::BTreeMap;
 
 use wf_application::commands::flow::Term;
+use wf_application::commands::flow::children::ChildGroup;
 use wf_application::commands::flow::create::MaxActive;
 use wf_application::commands::flow::meta::{Attributes, StateMeta};
 use wf_application::commands::flow::record::{FlowMeta, NamedValue};
@@ -78,6 +80,12 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         bin(out, key)?;
         bin(out, digest)?;
     }
+    let groups = meta
+        .child_groups
+        .iter()
+        .map(|(id, group)| (id.clone(), group.term()))
+        .collect();
+    term(out, &Term::Map(groups))?;
     Some(())
 }
 
@@ -149,6 +157,13 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
                 keys.insert(key, reader.bin()?.to_vec());
             }
             keys
+        },
+        child_groups: match read_term(reader)? {
+            Term::Map(entries) => entries
+                .into_iter()
+                .map(|(id, group)| Ok((id, ChildGroup::from_term(&group).ok_or(Malformed)?)))
+                .collect::<Result<BTreeMap<_, _>, Malformed>>()?,
+            _ => return Err(Malformed),
         },
     })
 }

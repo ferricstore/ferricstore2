@@ -84,6 +84,10 @@ pub(crate) fn replay(
             shard: u16::try_from(shard).unwrap_or(u16::MAX),
         });
     }
+    // Replay is done: later changes are live.
+    for state in states.iter_mut() {
+        state.go_live();
+    }
     Ok(newest_marker)
 }
 
@@ -97,6 +101,13 @@ fn unheld(logged: Logged, cut: &Cut) -> Option<Logged> {
                 .collect();
             (!keys.is_empty()).then_some(Logged::Expire { now, keys })
         }
+        Logged::Group(changes) => {
+            let changes: Vec<Logged> = changes
+                .into_iter()
+                .filter_map(|change| unheld(change, cut))
+                .collect();
+            (!changes.is_empty()).then_some(Logged::Group(changes))
+        }
         other => match other.partition() {
             Some(partition) if cut.holds(partition) => None,
             _ => Some(other),
@@ -107,6 +118,23 @@ fn unheld(logged: Logged, cut: &Cut) -> Option<Logged> {
 /// Routes a logged change to the shards owning its Flows; a sweep is split
 /// into one sweep per shard.
 fn by_shard(logged: Logged, shards: u16) -> Option<Vec<(usize, Logged)>> {
+    if let Logged::Group(changes) = logged {
+        // Each shard's part of a group stays one change.
+        let mut parts: Vec<(usize, Vec<Logged>)> = Vec::new();
+        for change in changes {
+            let index = shard_index(change.partition()?, shards)?;
+            match parts.iter_mut().find(|(owner, _)| *owner == index) {
+                Some((_, part)) => part.push(change),
+                None => parts.push((index, vec![change])),
+            }
+        }
+        return Some(
+            parts
+                .into_iter()
+                .map(|(index, part)| (index, Logged::Group(part)))
+                .collect(),
+        );
+    }
     let Logged::Expire { now, keys } = logged else {
         let index = shard_index(logged.partition()?, shards)?;
         return Some(vec![(index, logged)]);

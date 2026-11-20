@@ -9,6 +9,7 @@
 mod connection;
 mod dispatch;
 mod generic;
+mod pipeline;
 mod translate;
 
 use std::sync::Arc;

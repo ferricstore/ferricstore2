@@ -10,6 +10,7 @@
 //! kept until their retention ends, then removed by a logged sweep.
 
 mod capture;
+mod children;
 mod claim;
 pub(crate) mod events;
 mod flow;
@@ -81,6 +82,11 @@ pub(crate) struct ShardState {
     /// rebuilt on a miss when Flows were added since (`tags_at`).
     tags: HashMap<String, Partition>,
     tags_at: u64,
+    /// Whether changes are live; replay re-applies logged parent changes
+    /// instead of queueing child events.
+    live: bool,
+    /// Child events waiting for this round to settle them.
+    child_events: Vec<children::ChildEvent>,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -109,7 +115,14 @@ impl ShardState {
             shared: HashMap::new(),
             tags: HashMap::new(),
             tags_at: 0,
+            live: false,
+            child_events: Vec::new(),
         }
+    }
+
+    /// Starts live operation once replay is done.
+    pub(crate) fn go_live(&mut self) {
+        self.live = true;
     }
 
     /// Records in the due index, claimable now or later.
@@ -160,6 +173,11 @@ impl ShardState {
             },
             // A marker changes no record; replay handles it before apply.
             Logged::Marker { .. } => Ok(Outcome::NotEligible),
+            Logged::Group(changes) => changes
+                .iter()
+                .map(|change| self.apply(change))
+                .find(Result::is_err)
+                .unwrap_or(Ok(Outcome::Changed)),
             Logged::Create { .. } | Logged::Claim { .. } | Logged::Complete { .. } => return None,
         })
     }
@@ -173,6 +191,7 @@ impl ShardState {
             Logged::Expire { .. }
             | Logged::Shared { .. }
             | Logged::Put { .. }
+            | Logged::Group(_)
             | Logged::Marker { .. } => return Ok(Outcome::NotEligible),
             Logged::Create {
                 now,

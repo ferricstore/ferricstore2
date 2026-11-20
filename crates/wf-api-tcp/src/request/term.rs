@@ -42,3 +42,50 @@ pub fn options(name: &str, body: &[u8]) -> Result<Term, RequestError> {
     };
     term(value)
 }
+
+/// One command of a typed `PIPELINE` body.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PipelineCommand {
+    /// The command's opcode.
+    pub opcode: u16,
+    /// Lane named by the client, echoed in the reply.
+    pub lane_id: i64,
+    /// Request id named by the client, echoed in the reply.
+    pub request_id: i64,
+    /// The command's typed-map body.
+    pub body: Term,
+}
+
+/// Decodes a typed `PIPELINE` body: `{atomicity, commands, return}` where
+/// each command is `{opcode, lane_id, request_id, body}`.
+///
+/// # Errors
+/// Refuses a body that is not that shape.
+pub fn pipeline(body: &[u8]) -> Result<Vec<PipelineCommand>, RequestError> {
+    let invalid = || RequestError::new("ERR native PIPELINE payload is invalid");
+    let Term::Map(entries) = options("PIPELINE", body)? else {
+        return Err(invalid());
+    };
+    let Some((_, Term::List(commands))) = entries.iter().find(|(key, _)| key == b"commands") else {
+        return Err(invalid());
+    };
+    commands
+        .iter()
+        .map(|command| {
+            let number = |key: &[u8]| match command.get(key) {
+                Some(Term::Int(value)) => Some(*value),
+                _ => None,
+            };
+            Some(PipelineCommand {
+                opcode: u16::try_from(number(b"opcode")?).ok()?,
+                lane_id: number(b"lane_id").unwrap_or(0),
+                request_id: number(b"request_id").unwrap_or(0),
+                body: command
+                    .get(b"body")
+                    .cloned()
+                    .unwrap_or(Term::Map(Vec::new())),
+            })
+        })
+        .collect::<Option<Vec<_>>>()
+        .ok_or_else(invalid)
+}

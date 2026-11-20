@@ -8,6 +8,10 @@ use wf_domain::workflow::WorkflowRecord;
 use super::events::History;
 use super::{Entry, Key, ShardState};
 
+fn terminal(state: &[u8]) -> bool {
+    matches!(state, b"completed" | b"failed" | b"cancelled")
+}
+
 impl ShardState {
     /// Stores a reducer write, keeping the record's priority and fields.
     pub(super) fn store(&mut self, key: Key, record: WorkflowRecord, new_priority: Option<u8>) {
@@ -59,6 +63,12 @@ impl ShardState {
         previous: Option<Entry>,
         appended: &[HistoryEvent],
     ) {
+        let was_terminal = previous
+            .as_ref()
+            .is_some_and(|previous| terminal(previous.record.state()));
+        if !was_terminal && terminal(record.state()) {
+            self.note_child(&key, &record, meta.as_deref());
+        }
         let (sequence, mut events, before) = match previous {
             Some(previous) => (
                 previous.sequence,

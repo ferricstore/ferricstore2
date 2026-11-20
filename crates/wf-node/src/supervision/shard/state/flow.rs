@@ -49,6 +49,7 @@ impl ShardState {
             FlowCommand::ValuePut(put) => self.value_put(now, &put, partition),
             FlowCommand::StartAndClaim(start) => self.start_and_claim(now, &start, partition),
             FlowCommand::Signal(signal) => self.signal(now, &signal, partition),
+            FlowCommand::SpawnChildren(spawn) => self.spawn_children(now, &spawn, partition),
             // Batches and reads by reference are split over shards before
             // they reach one.
             FlowCommand::Many(_) | FlowCommand::ValueMget(_) | FlowCommand::RunSteps(_) => {

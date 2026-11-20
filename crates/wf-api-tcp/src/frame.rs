@@ -45,12 +45,14 @@ pub enum Opcode {
     FlowCompleteMany,
     /// `FLOW.RECLAIM` with a typed-map body.
     FlowReclaim,
+    /// Several commands in one typed frame.
+    Pipeline,
     /// Any other Flow command with a typed-map body, by name (ADR-014).
     Flow(&'static str),
 }
 
 /// Flow commands whose typed-map body the application reads (ADR-014).
-const FLOW_COMMANDS: [(&str, u16); 19] = [
+const FLOW_COMMANDS: [(&str, u16); 20] = [
     ("FLOW.CREATE", 0x0201),
     ("FLOW.GET", 0x0202),
     ("FLOW.COMPLETE", 0x0204),
@@ -67,17 +69,19 @@ const FLOW_COMMANDS: [(&str, u16); 19] = [
     ("FLOW.RETRY_MANY", 0x0212),
     ("FLOW.FAIL_MANY", 0x0213),
     ("FLOW.CANCEL_MANY", 0x0214),
+    ("FLOW.SPAWN_CHILDREN", 0x0220),
     ("FLOW.STEP_CONTINUE", 0x0222),
     ("FLOW.START_AND_CLAIM", 0x0223),
     ("FLOW.RUN_STEPS_MANY", 0x0224),
 ];
 
-const OPCODES: [(Opcode, u16); 9] = [
+const OPCODES: [(Opcode, u16); 10] = [
     (Opcode::Hello, 0x0001),
     (Opcode::Ping, 0x0003),
     (Opcode::Quit, 0x0009),
     (Opcode::Options, 0x000B),
     (Opcode::Startup, 0x000C),
+    (Opcode::Pipeline, 0x000E),
     (Opcode::FlowClaimDue, 0x0203),
     (Opcode::FlowCreateMany, 0x020F),
     (Opcode::FlowCompleteMany, 0x0210),

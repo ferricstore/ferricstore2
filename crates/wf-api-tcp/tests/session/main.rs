@@ -134,6 +134,7 @@ impl FlowService for Scripted {
             FlowCommand::ValuePut(put) => reply(Ok(Term::Bin(put.value))),
             FlowCommand::StartAndClaim(start) => reply(Ok(Term::Bin(start.create.id))),
             FlowCommand::Signal(signal) => reply(Ok(Term::Bin(signal.signal))),
+            FlowCommand::SpawnChildren(spawn) => reply(Ok(Term::Bin(spawn.parent_id))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),

@@ -168,3 +168,25 @@ Each step is one commit with its tests.
   same content again changes nothing, as Elixir does from feature level 5
   (the reference node runs below level 5 and applies it again), different
   content is refused. The signal scenario matches Elixir exactly.
+- Step 8: `FLOW.SPAWN_CHILDREN` and child groups, plus the typed `PIPELINE`
+  frame (0x000E) the SDK reads child results through. A spawn checks the
+  parent's guards (group idempotency by request hash, `from_state`, fence,
+  lease, not terminal, `wait_state` when waiting), creates every child
+  (parent, root and partition linked; spawn-wide values merged under each
+  child's own) and moves the parent to its wait state without a lease or due
+  time; the parent and children are logged as one `Group` record, so the
+  spawn is all or nothing and replay splits it by shard. A live change that
+  makes a child terminal queues an event; the shard settles the queue before
+  it appends: the open group records the child's status and references and,
+  once resolved, moves the parent to its success or failure state and makes
+  it due (a terminal parent cascades to its own parent). Replay re-applies
+  the logged parent changes, so events are queued only after replay. Not yet:
+  children on another shard than their parent (refused with an explicit
+  error; the SDK places children in the parent's partition unless told
+  otherwise), and cancelling running children when a parent closes. The
+  pipeline runs each Flow command as it would alone and replies with Elixir's
+  typed list of `{lane_id, opcode, request_id, status, value}`; compact
+  pipeline bodies (key-value modes) are refused. The child scenario matches
+  Elixir except the opaque `request_hash` (Elixir hashes its own term
+  encoding); the SDK suite passes 30 of 60, including all six child-group
+  tests and all thirteen durable-step recovery tests.

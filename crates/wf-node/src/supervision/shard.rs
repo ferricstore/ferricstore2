@@ -312,6 +312,8 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
             .into_iter()
             .filter_map(|request| handle(&mut state, (links.index, now), request, &mut logged))
             .collect();
+        // Parents of children that finished this round, on this shard.
+        logged.extend(state.settle_children(now));
         if !failed {
             match append(&links.log, &logged, links.max_append_bytes, sequence) {
                 Some(covered) => sequence = covered,

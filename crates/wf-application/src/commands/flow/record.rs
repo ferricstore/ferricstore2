@@ -6,6 +6,7 @@ use std::collections::BTreeMap;
 use wf_domain::workflow::{WorkflowRecord, WorkflowStatus};
 use wf_types::version::TimestampMillis;
 
+use super::children::ChildGroup;
 use super::create::MaxActive;
 use super::keys;
 use super::meta::{self, Attributes, StateMeta};
@@ -63,6 +64,8 @@ pub struct FlowMeta {
     pub terminal_until: Option<u64>,
     /// Signal idempotency keys and the digest of the content each applied.
     pub signal_keys: BTreeMap<Vec<u8>, Vec<u8>>,
+    /// Child groups by id.
+    pub child_groups: BTreeMap<Vec<u8>, ChildGroup>,
 }
 
 impl Default for FlowMeta {
@@ -85,6 +88,7 @@ impl Default for FlowMeta {
             ttl_ms: None,
             terminal_until: None,
             signal_keys: BTreeMap::new(),
+            child_groups: BTreeMap::new(),
         }
     }
 }
@@ -279,7 +283,15 @@ impl View<'_> {
             entries.push(("value_refs", self.value_refs()));
         }
         entries.extend([
-            ("child_groups", Term::Map(Vec::new())),
+            (
+                "child_groups",
+                Term::Map(
+                    meta.child_groups
+                        .iter()
+                        .map(|(id, group)| (id.clone(), group.term()))
+                        .collect(),
+                ),
+            ),
             (
                 "parent_partition_key",
                 Term::optional_bin(meta.parent_partition_key.as_deref()),

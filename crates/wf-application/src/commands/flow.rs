@@ -6,6 +6,7 @@
 //! shard that owns the Flow and replies with the [`Term`] the Elixir server
 //! would send.
 
+pub mod children;
 pub mod claim;
 pub mod create;
 pub mod get;
@@ -54,6 +55,8 @@ pub enum FlowCommand {
     RunSteps(Box<start::RunSteps>),
     /// `FLOW.SIGNAL`.
     Signal(Box<signal::Signal>),
+    /// `FLOW.SPAWN_CHILDREN`.
+    SpawnChildren(Box<children::SpawnChildren>),
 }
 
 impl FlowCommand {
@@ -71,6 +74,7 @@ impl FlowCommand {
                 .as_ref()
                 .map(|(owner, _)| (owner.as_slice(), put.partition_key.as_deref())),
             Self::Signal(signal) => Some((&signal.id, signal.partition_key.as_deref())),
+            Self::SpawnChildren(spawn) => Some((&spawn.parent_id, Some(&spawn.partition_key))),
             Self::StartAndClaim(start) => {
                 Some((&start.create.id, start.create.partition_key.as_deref()))
             }
@@ -92,6 +96,9 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.VALUE.PUT" => value::parse_put(args).map(|put| FlowCommand::ValuePut(Box::new(put))),
         "FLOW.VALUE.MGET" => value::parse_mget(args).map(FlowCommand::ValueMget),
         "FLOW.SIGNAL" => signal::parse(args).map(|signal| FlowCommand::Signal(Box::new(signal))),
+        "FLOW.SPAWN_CHILDREN" => {
+            children::parse(args).map(|spawn| FlowCommand::SpawnChildren(Box::new(spawn)))
+        }
         "FLOW.START_AND_CLAIM" => {
             start::parse_start(args).map(|start| FlowCommand::StartAndClaim(Box::new(start)))
         }
