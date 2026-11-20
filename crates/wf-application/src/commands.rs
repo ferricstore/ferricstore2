@@ -9,6 +9,7 @@ use wf_types::identity::TenantId;
 use crate::error::PreparationError;
 
 pub mod claim;
+pub mod flow;
 pub mod independent;
 pub mod queue;
 

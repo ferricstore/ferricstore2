@@ -58,7 +58,7 @@ fn batch_reply(
     }
     let messages: Vec<Option<String>> = outcomes
         .iter()
-        .map(|outcome| outcome.err().map(|error| error.to_string()))
+        .map(|outcome| outcome.as_ref().err().map(ToString::to_string))
         .collect();
     let items: Vec<response::ItemOutcome<'_>> = messages
         .iter()
@@ -131,41 +131,6 @@ pub(super) fn create_many(
         request,
         Box::new(move |result| batch_reply(reply, result, single_ok, compact)),
     );
-}
-
-pub(super) fn create(context: &Context, body: &[u8], reply: ReplyTo) {
-    let parsed = match request::create(body) {
-        Ok(parsed) => parsed,
-        Err(error) => return refuse(reply, error.message()),
-    };
-    let shape = priority(parsed.priority).and_then(|priority| {
-        Ok((
-            priority,
-            parsed
-                .run_at_ms
-                .map(|at| millis(at, "run_at_ms"))
-                .transpose()?,
-        ))
-    });
-    let (priority, run_at_ms) = match shape {
-        Ok(shape) => shape,
-        Err(message) => return refuse(reply, &message),
-    };
-    let flows = vec![NewFlow {
-        id: parsed.id,
-        partition: parsed.partition_key,
-        payload: parsed.payload,
-    }];
-    let request = CreateFlows {
-        flow_type: parsed.flow_type,
-        state: parsed.state,
-        run_at_ms,
-        priority,
-        flows,
-    };
-    context
-        .service
-        .create(request, Box::new(move |result| single_reply(reply, result)));
 }
 
 fn claim_reply(

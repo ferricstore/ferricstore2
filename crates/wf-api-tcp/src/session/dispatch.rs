@@ -2,7 +2,8 @@
 
 use std::sync::Arc;
 
-use wf_application::commands::queue::{Cancellation, QueueService};
+use wf_application::commands::flow::NodeService;
+use wf_application::commands::queue::Cancellation;
 
 use crate::frame::{FLAG_COMPRESSED, FLAG_MORE_CHUNKS, Header, Opcode};
 use crate::request::{self, Startup};
@@ -10,11 +11,11 @@ use crate::response::{self, COMPACT_CODECS, Handshake, STATUS_ERROR};
 
 use super::ServerInfo;
 use super::connection::ReplyTo;
-use super::translate;
+use super::{generic, translate};
 
 /// What every request of a connection shares.
 pub(super) struct Context {
-    pub(super) service: Arc<dyn QueueService>,
+    pub(super) service: Arc<dyn NodeService>,
     pub(super) info: Arc<ServerInfo>,
     pub(super) client_id: u64,
     /// Set when the connection stops reading; cancels its waiting claims.
@@ -117,7 +118,8 @@ pub(super) fn handle(
         Some(Opcode::FlowCreateMany) => {
             translate::create_many(context, *negotiated, header, body, reply);
         }
-        Some(Opcode::FlowCreate) => translate::create(context, body, reply),
+        Some(Opcode::FlowCreate) => generic::flow(context, "FLOW.CREATE", body, reply),
+        Some(Opcode::FlowGet) => generic::flow(context, "FLOW.GET", body, reply),
         Some(Opcode::FlowClaimDue) => {
             translate::claim_due(context, *negotiated, header, body, reply);
         }

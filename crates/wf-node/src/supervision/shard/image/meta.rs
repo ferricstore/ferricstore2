@@ -1,0 +1,134 @@
+//! The image of a Flow's fields beyond its lifecycle record (ADR-014).
+//!
+//! Layout: lineage ids as optional binaries, retention, the active-time
+//! limit (`0` none, `1` milliseconds, `2` infinity), history caps,
+//! attributes and state metadata as [`Term`] maps, named values (count, then
+//! name, version and bytes), then the payload, result and error versions.
+
+use std::collections::BTreeMap;
+
+use wf_application::commands::flow::Term;
+use wf_application::commands::flow::create::MaxActive;
+use wf_application::commands::flow::meta::{Attributes, StateMeta};
+use wf_application::commands::flow::record::{FlowMeta, NamedValue};
+
+use super::super::command::{Malformed, Reader, bin, optional_bin};
+
+fn term(out: &mut Vec<u8>, value: &Term) -> Option<()> {
+    value.encode(out)
+}
+
+pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
+    for lineage in [
+        &meta.parent_flow_id,
+        &meta.parent_partition_key,
+        &meta.root_flow_id,
+        &meta.correlation_id,
+    ] {
+        optional_bin(out, lineage.as_deref())?;
+    }
+    out.extend_from_slice(&meta.retention_ttl_ms.to_be_bytes());
+    match meta.max_active_ms {
+        None => out.push(0),
+        Some(MaxActive::Ms(value)) => {
+            out.push(1);
+            out.extend_from_slice(&value.to_be_bytes());
+        }
+        Some(MaxActive::Infinity) => out.push(2),
+    }
+    out.extend_from_slice(&meta.history_hot_max_events.to_be_bytes());
+    out.extend_from_slice(&meta.history_max_events.to_be_bytes());
+    let attributes = meta
+        .attributes
+        .iter()
+        .map(|(name, value)| (name.as_bytes().to_vec(), value.clone()))
+        .collect();
+    term(out, &Term::Map(attributes))?;
+    let state_meta = meta
+        .state_meta
+        .iter()
+        .map(|(state, entries)| {
+            let entries = entries
+                .iter()
+                .map(|(name, value)| (name.as_bytes().to_vec(), value.clone()))
+                .collect();
+            (state.as_bytes().to_vec(), Term::Map(entries))
+        })
+        .collect();
+    term(out, &Term::Map(state_meta))?;
+    out.extend_from_slice(&u32::try_from(meta.values.len()).ok()?.to_be_bytes());
+    for (name, value) in &meta.values {
+        bin(out, name)?;
+        out.extend_from_slice(&value.version.to_be_bytes());
+        bin(out, &value.bytes)?;
+    }
+    for version in [
+        meta.payload_version,
+        meta.result_version,
+        meta.error_version,
+    ] {
+        out.extend_from_slice(&version.to_be_bytes());
+    }
+    Some(())
+}
+
+fn read_term(reader: &mut Reader<'_>) -> Result<Term, Malformed> {
+    let (value, rest) = Term::decode(reader.0).ok_or(Malformed)?;
+    reader.0 = rest;
+    Ok(value)
+}
+
+fn text_map(value: Term) -> Result<Vec<(String, Term)>, Malformed> {
+    let Term::Map(entries) = value else {
+        return Err(Malformed);
+    };
+    entries
+        .into_iter()
+        .map(|(key, value)| Ok((String::from_utf8(key).map_err(|_| Malformed)?, value)))
+        .collect()
+}
+
+pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
+    let parent_flow_id = reader.optional_bin()?;
+    let parent_partition_key = reader.optional_bin()?;
+    let root_flow_id = reader.optional_bin()?;
+    let correlation_id = reader.optional_bin()?;
+    let retention_ttl_ms = reader.u64()?;
+    let max_active_ms = match reader.u8()? {
+        0 => None,
+        1 => Some(MaxActive::Ms(reader.u64()?)),
+        2 => Some(MaxActive::Infinity),
+        _ => return Err(Malformed),
+    };
+    let history_hot_max_events = reader.u64()?;
+    let history_max_events = reader.u64()?;
+    let attributes: Attributes = text_map(read_term(reader)?)?.into_iter().collect();
+    let mut state_meta = StateMeta::new();
+    for (state, entries) in text_map(read_term(reader)?)? {
+        state_meta.insert(state, text_map(entries)?.into_iter().collect());
+    }
+    let count = u32::from_be_bytes(reader.array()?);
+    let mut values = BTreeMap::new();
+    for _ in 0..count {
+        let name = reader.bin()?.to_vec();
+        let version = reader.u64()?;
+        let bytes = reader.bin()?.to_vec();
+        values.insert(name, NamedValue { version, bytes });
+    }
+    Ok(FlowMeta {
+        parent_flow_id,
+        parent_partition_key,
+        root_flow_id,
+        correlation_id,
+        retention_ttl_ms,
+        max_active_ms,
+        history_hot_max_events,
+        history_max_events,
+        attributes,
+        state_meta,
+        values,
+        payload_version: reader.u64()?,
+        result_version: reader.u64()?,
+        error_version: reader.u64()?,
+    })
+}

@@ -6,11 +6,13 @@
 //! application.
 
 mod compact;
+mod term;
 mod typed;
 
 use std::fmt;
 
 pub use compact::{claim_due, complete_many};
+pub use term::options;
 pub use typed::{complete, create, create_many, startup};
 
 /// A refused request body. The message is the reply text.

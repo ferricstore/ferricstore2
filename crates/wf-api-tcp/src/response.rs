@@ -6,6 +6,8 @@ mod handshake;
 
 use std::fmt;
 
+use wf_application::commands::flow::Term;
+
 use crate::codec::{TooLong, Value, put_bin, put_len};
 use crate::request::ClaimShape;
 
@@ -48,6 +50,31 @@ fn typed(status: u16, value: &Value) -> Result<Vec<u8>, ReplyTooLong> {
 
 fn text(bytes: &[u8]) -> Value {
     Value::Bin(bytes.to_vec())
+}
+
+fn value(term: &Term) -> Value {
+    match term {
+        Term::Nil => Value::Nil,
+        Term::Bool(value) => Value::Bool(*value),
+        Term::Int(value) => Value::Int(*value),
+        Term::Float(value) => Value::Float(*value),
+        Term::Bin(bytes) => Value::Bin(bytes.clone()),
+        Term::List(items) => Value::Arr(items.iter().map(value).collect()),
+        Term::Map(entries) => Value::Map(
+            entries
+                .iter()
+                .map(|(key, entry)| (key.clone(), value(entry)))
+                .collect(),
+        ),
+    }
+}
+
+/// A success reply carrying an application [`Term`] (ADR-014).
+///
+/// # Errors
+/// Refuses a part longer than `u32::MAX` bytes.
+pub fn term(term: &Term) -> Result<Vec<u8>, ReplyTooLong> {
+    typed(STATUS_OK, &value(term))
 }
 
 /// A success reply carrying `text`, such as `OK`.

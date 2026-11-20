@@ -8,13 +8,15 @@
 
 mod connection;
 mod dispatch;
+mod generic;
 mod translate;
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use tokio::net::TcpListener;
-use wf_application::commands::queue::{Cancellation, QueueService};
+use wf_application::commands::flow::NodeService;
+use wf_application::commands::queue::Cancellation;
 
 /// What the handshake tells clients about this server.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -31,7 +33,7 @@ pub struct ServerInfo {
 
 /// Accepts connections on `listener` until it fails; each connection runs
 /// as its own task on the current Tokio runtime.
-pub async fn serve(listener: TcpListener, service: Arc<dyn QueueService>, info: Arc<ServerInfo>) {
+pub async fn serve(listener: TcpListener, service: Arc<dyn NodeService>, info: Arc<ServerInfo>) {
     let clients = AtomicU64::new(0);
     while let Ok((stream, _peer)) = listener.accept().await {
         // Small request and reply frames should leave at once.

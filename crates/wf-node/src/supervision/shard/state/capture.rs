@@ -12,17 +12,24 @@ impl ShardState {
         let mut out = Vec::new();
         out.extend_from_slice(&u64::try_from(entries.len()).ok()?.to_be_bytes());
         for (key, entry) in entries {
-            image::encode_record(&mut out, &key.0, &key.1, entry.priority, &entry.record)?;
+            image::encode_record(
+                &mut out,
+                &key.0,
+                &key.1,
+                entry.priority,
+                (&entry.record, entry.meta.as_deref()),
+            )?;
         }
         Some(out)
     }
 
     /// Stores a record from a snapshot image, indexed like any other.
     pub(crate) fn restore(&mut self, restored: Restored) {
-        self.store(
+        self.put(
             (restored.partition, restored.id),
             restored.record,
-            Some(restored.priority),
+            restored.priority,
+            restored.meta.map(Box::new),
         );
     }
 }

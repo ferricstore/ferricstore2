@@ -47,15 +47,18 @@ pub enum Opcode {
     FlowCreateMany,
     /// `FLOW.COMPLETE_MANY` with a compact body.
     FlowCompleteMany,
+    /// `FLOW.GET` with a typed-map body.
+    FlowGet,
 }
 
-const OPCODES: [(Opcode, u16); 10] = [
+const OPCODES: [(Opcode, u16); 11] = [
     (Opcode::Hello, 0x0001),
     (Opcode::Ping, 0x0003),
     (Opcode::Quit, 0x0009),
     (Opcode::Options, 0x000B),
     (Opcode::Startup, 0x000C),
     (Opcode::FlowCreate, 0x0201),
+    (Opcode::FlowGet, 0x0202),
     (Opcode::FlowClaimDue, 0x0203),
     (Opcode::FlowComplete, 0x0204),
     (Opcode::FlowCreateMany, 0x020F),

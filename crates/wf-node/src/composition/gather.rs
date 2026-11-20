@@ -50,11 +50,10 @@ impl ItemGather {
         let Some(reply) = items.reply.take() else {
             return;
         };
-        let result = match items.failure {
+        let result = match items.failure.take() {
             Some(error) => Err(error),
-            None => items
-                .outcomes
-                .iter()
+            None => std::mem::take(&mut items.outcomes)
+                .into_iter()
                 .map(|outcome| outcome.ok_or(ServiceError::Unavailable))
                 .collect::<Result<Vec<_>, _>>(),
         };

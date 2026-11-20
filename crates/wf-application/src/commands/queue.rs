@@ -139,7 +139,7 @@ pub const MAX_FLOW_ID_BYTES: usize = 256;
 pub type ItemOutcome = Result<(), ServiceError>;
 
 /// Why an item or a whole request failed.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ServiceError {
     /// A domain rule refused it.
     Domain(DomainError),
@@ -149,6 +149,22 @@ pub enum ServiceError {
     Unavailable,
     /// Too many claims are already waiting for Flows.
     TooManyWaiting,
+    /// Refused with the Elixir server's reply text.
+    Rejected(String),
+}
+
+impl ServiceError {
+    /// A refusal with this reply text.
+    #[must_use]
+    pub const fn rejected(text: String) -> Self {
+        Self::Rejected(text)
+    }
+
+    /// `ERR flow <key> <problem>`.
+    #[must_use]
+    pub fn flow(key: &str, problem: &str) -> Self {
+        Self::Rejected(format!("ERR flow {key} {problem}"))
+    }
 }
 
 impl fmt::Display for ServiceError {
@@ -160,6 +176,7 @@ impl fmt::Display for ServiceError {
             Self::TooManyWaiting => {
                 formatter.write_str("ERR too many blocked FLOW.CLAIM_DUE requests are waiting")
             }
+            Self::Rejected(text) => formatter.write_str(text),
         }
     }
 }

@@ -39,6 +39,7 @@ fn refuse(request: Request) {
         }
         Request::Claim { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Capture { done, .. } => done(Err(ServiceError::Unavailable)),
+        Request::Flow { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Peek { done, .. } => done(Peeked::default()),
     }
 }

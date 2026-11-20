@@ -8,6 +8,7 @@
 //! `claim` module.
 
 mod claim;
+mod flow;
 mod gather;
 mod replay;
 mod router;

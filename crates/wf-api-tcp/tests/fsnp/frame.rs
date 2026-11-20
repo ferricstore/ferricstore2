@@ -71,6 +71,7 @@ fn opcode_codes_match_the_native_protocol() {
         (Opcode::Options, 0x000B),
         (Opcode::Startup, 0x000C),
         (Opcode::FlowCreate, 0x0201),
+        (Opcode::FlowGet, 0x0202),
         (Opcode::FlowClaimDue, 0x0203),
         (Opcode::FlowComplete, 0x0204),
         (Opcode::FlowCreateMany, 0x020F),
@@ -79,5 +80,6 @@ fn opcode_codes_match_the_native_protocol() {
         assert_eq!(opcode.code(), code);
         assert_eq!(Opcode::from_code(code), Some(opcode));
     }
-    assert_eq!(Opcode::from_code(0x0202), None);
+    // Key-value commands are not part of this workflow-only server.
+    assert_eq!(Opcode::from_code(0x0100), None);
 }

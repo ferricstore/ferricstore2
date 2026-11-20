@@ -118,7 +118,7 @@ fn crc32(bytes: &[u8]) -> u32 {
 }
 
 /// Base64 with the URL-safe alphabet and no padding.
-fn base64url_nopad(bytes: &[u8]) -> String {
+pub(crate) fn base64url_nopad(bytes: &[u8]) -> String {
     let mut out = String::new();
     for chunk in bytes.chunks(3) {
         let (first, second, third) = match *chunk {

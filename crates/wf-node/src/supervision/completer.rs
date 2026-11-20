@@ -23,7 +23,7 @@ pub(crate) fn run(log: &GroupLog, completions: &Receiver<Completion>) {
             .wait_durable(completion.sequence)
             .map_err(|_| ServiceError::Unavailable);
         for finish in completion.finishes {
-            finish(durable);
+            finish(durable.clone());
         }
     }
 }

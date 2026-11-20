@@ -5,8 +5,12 @@
 //! rebuilds each record through `restore_record`, so a value the domain would
 //! not accept fails the decode instead of entering a shard. Layout follows the
 //! log records: binaries are a `u32` length and bytes, options a `0`/`1` byte
-//! then the value, integers big-endian.
+//! then the value, integers big-endian. A record ends with `0`, or `1` and
+//! its fields beyond the lifecycle record (ADR-014, [`meta`]).
 
+mod meta;
+
+use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::queue::Partition;
 use wf_domain::history::EventKind;
 use wf_domain::lease::{Lease, LeaseToken};
@@ -42,6 +46,7 @@ pub(crate) struct Restored {
     pub(crate) id: Vec<u8>,
     pub(crate) priority: u8,
     pub(crate) record: WorkflowRecord,
+    pub(crate) meta: Option<FlowMeta>,
 }
 
 /// Appends one record; `None` when a field is longer than `u32::MAX` or its
@@ -51,7 +56,7 @@ pub(crate) fn encode_record(
     partition: &Partition,
     id: &[u8],
     priority: u8,
-    record: &WorkflowRecord,
+    (record, flow_meta): (&WorkflowRecord, Option<&FlowMeta>),
 ) -> Option<()> {
     bin(out, &partition.name())?;
     bin(out, id)?;
@@ -85,6 +90,13 @@ pub(crate) fn encode_record(
     out.push(u8::try_from(KINDS.iter().position(|known| *known == kind)?).ok()?);
     out.extend_from_slice(&version.to_be_bytes());
     out.extend_from_slice(&fence.get().to_be_bytes());
+    match flow_meta {
+        None => out.push(0),
+        Some(flow_meta) => {
+            out.push(1);
+            meta::encode(out, flow_meta)?;
+        }
+    }
     Some(())
 }
 
@@ -138,12 +150,38 @@ fn decode_record(reader: &mut Reader<'_>, limits: AdmissionLimits) -> Result<Res
         latest_fence,
     };
     let record = restore_record(data, limits).map_err(|_| Malformed)?;
+    let meta = match reader.u8()? {
+        0 => None,
+        1 => Some(meta::decode(reader)?),
+        _ => return Err(Malformed),
+    };
     Ok(Restored {
         partition,
         id,
         priority,
         record,
+        meta,
     })
+}
+
+/// Encodes one record alone, as a logged after-image.
+pub(crate) fn encode_one(
+    partition: &Partition,
+    id: &[u8],
+    priority: u8,
+    record: (&WorkflowRecord, Option<&FlowMeta>),
+) -> Option<Vec<u8>> {
+    let mut out = Vec::new();
+    encode_record(&mut out, partition, id, priority, record)?;
+    Some(out)
+}
+
+/// Decodes a record encoded by [`encode_one`].
+pub(crate) fn decode_one(bytes: &[u8]) -> Option<Restored> {
+    let limits = AdmissionLimits::new(MAX_INLINE_BYTES, usize::MAX, 1).ok()?;
+    let mut reader = Reader(bytes);
+    let restored = decode_record(&mut reader, limits).ok()?;
+    reader.0.is_empty().then_some(restored)
 }
 
 /// Decodes a whole image; `None` when it is not exactly a count and that

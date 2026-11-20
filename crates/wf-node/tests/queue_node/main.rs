@@ -17,6 +17,7 @@ use wf_node::composition::{QueueNode, QueueNodeConfig};
 
 mod blocking;
 mod crash;
+mod flow_record;
 mod lifecycle;
 mod reclaim;
 mod restart;

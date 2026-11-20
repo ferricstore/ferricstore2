@@ -4,7 +4,9 @@
 //! its committed time and every input the reducer used, so replay decides it
 //! again identically. A retention sweep is logged as one record naming every
 //! Flow it removed (ADR-013). Records name partitions, so replay can route
-//! them even when the shard count changed. Layout: a tag byte, then fields; a
+//! them even when the shard count changed. A command beyond the queue fast
+//! path logs the Flow's whole after-image instead (`Put`, ADR-014), so replay
+//! stores it without deciding anything. Layout: a tag byte, then fields; a
 //! binary is a `u32` length and bytes, an option a `0`/`1` byte then the
 //! value, and integers are big-endian.
 
@@ -16,6 +18,7 @@ const COMPLETE: u8 = 3;
 const RECLAIM: u8 = 4;
 const EXPIRE: u8 = 5;
 const MARKER: u8 = 6;
+const PUT: u8 = 7;
 
 /// One logged change to one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -57,6 +60,11 @@ pub(crate) enum Logged {
     /// Where a shard captured its state for a snapshot: its records logged
     /// before this are in the snapshot, those after it are not.
     Marker { snapshot: u64, shard: u16 },
+    /// A Flow's state after a command, as a shard image record.
+    Put {
+        partition: Partition,
+        image: Vec<u8>,
+    },
 }
 
 impl Logged {
@@ -65,7 +73,8 @@ impl Logged {
         match self {
             Self::Create { partition, .. }
             | Self::Claim { partition, .. }
-            | Self::Complete { partition, .. } => Some(partition),
+            | Self::Complete { partition, .. }
+            | Self::Put { partition, .. } => Some(partition),
             Self::Expire { .. } | Self::Marker { .. } => None,
         }
     }
@@ -123,6 +132,11 @@ impl Logged {
                 out.extend_from_slice(&fence.to_be_bytes());
                 optional_bin(&mut out, result.as_deref())?;
             }
+            Self::Put { partition, image } => {
+                out.push(PUT);
+                bin(&mut out, &partition.name())?;
+                bin(&mut out, image)?;
+            }
             Self::Marker { snapshot, shard } => {
                 out.push(MARKER);
                 out.extend_from_slice(&snapshot.to_be_bytes());
@@ -153,6 +167,15 @@ pub(super) struct Malformed;
 fn decode(bytes: &[u8]) -> Result<Logged, Malformed> {
     let mut reader = Reader(bytes);
     let tag = reader.u8()?;
+    if tag == PUT {
+        let partition = Partition::parse(reader.bin()?);
+        let image = reader.bin()?.to_vec();
+        return if reader.0.is_empty() {
+            Ok(Logged::Put { partition, image })
+        } else {
+            Err(Malformed)
+        };
+    }
     let now = reader.u64()?;
     if tag == MARKER {
         let shard = u16::from_be_bytes(reader.array()?);

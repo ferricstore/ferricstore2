@@ -20,11 +20,12 @@ impl ShardState {
     fn removal_slot(&self, entry: &Entry) -> Option<(u64, u64)> {
         terminal(entry).then(|| {
             (
-                entry
-                    .record
-                    .updated_at()
-                    .get()
-                    .saturating_add(self.retention_ms),
+                entry.record.updated_at().get().saturating_add(
+                    entry
+                        .meta
+                        .as_ref()
+                        .map_or(self.retention_ms, |meta| meta.retention_ttl_ms),
+                ),
                 entry.sequence,
             )
         })

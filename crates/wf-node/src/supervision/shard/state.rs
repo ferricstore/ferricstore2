@@ -11,12 +11,14 @@
 
 mod capture;
 mod claim;
+mod flow;
 mod retention;
 
 pub(crate) use claim::Peeked;
 
 use std::collections::{BTreeMap, HashMap};
 
+use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::queue::{
     CompleteFlow, ItemOutcome, MAX_FLOW_ID_BYTES, NewFlow, Partition, ServiceError,
 };
@@ -29,6 +31,7 @@ use wf_types::identity::RecordId;
 use wf_types::version::{Fence, TimestampMillis};
 
 use super::command::Logged;
+use super::image;
 
 type Key = (Partition, Vec<u8>);
 
@@ -39,6 +42,9 @@ struct Entry {
     record: WorkflowRecord,
     priority: u8,
     sequence: u64,
+    /// Fields beyond the lifecycle record; `None` for a Flow made by the
+    /// queue fast path, which has the defaults (ADR-014).
+    meta: Option<Box<FlowMeta>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -101,6 +107,16 @@ impl ShardState {
     pub(crate) fn apply(&mut self, logged: &Logged) -> Result<Outcome, ServiceError> {
         let (now, partition, id, operation, priority) = match logged {
             Logged::Expire { keys, .. } => return Ok(self.expire(keys)),
+            Logged::Put { image: bytes, .. } => {
+                let restored = image::decode_one(bytes).ok_or(ServiceError::Unavailable)?;
+                self.put(
+                    (restored.partition, restored.id),
+                    restored.record,
+                    restored.priority,
+                    restored.meta.map(Box::new),
+                );
+                return Ok(Outcome::Changed);
+            }
             // A marker changes no record; replay handles it before apply.
             Logged::Marker { .. } => return Ok(Outcome::NotEligible),
             Logged::Create {
@@ -186,21 +202,61 @@ impl ShardState {
         Ok(outcome)
     }
 
+    /// Stores a reducer write, keeping the record's priority and fields.
     fn store(&mut self, key: Key, record: WorkflowRecord, new_priority: Option<u8>) {
-        let (priority, sequence) = if let Some(previous) = self.records.remove(&key) {
-            self.unindex(&key, &previous);
-            self.unschedule_removal(&previous);
-            (previous.priority, previous.sequence)
-        } else {
-            let sequence = self.next_sequence;
-            self.next_sequence = self.next_sequence.saturating_add(1);
-            (new_priority.unwrap_or(0), sequence)
+        let (priority, sequence, meta) = match self.take_entry(&key) {
+            Some(previous) => (previous.priority, previous.sequence, previous.meta),
+            None => (new_priority.unwrap_or(0), self.sequence(), None),
         };
-        let entry = Entry {
-            record,
-            priority,
-            sequence,
+        self.insert(
+            key,
+            Entry {
+                record,
+                priority,
+                sequence,
+                meta,
+            },
+        );
+    }
+
+    /// Stores a whole Flow, replacing any record under its key.
+    pub(super) fn put(
+        &mut self,
+        key: Key,
+        record: WorkflowRecord,
+        priority: u8,
+        meta: Option<Box<FlowMeta>>,
+    ) {
+        let sequence = match self.take_entry(&key) {
+            Some(previous) => previous.sequence,
+            None => self.sequence(),
         };
+        self.insert(
+            key,
+            Entry {
+                record,
+                priority,
+                sequence,
+                meta,
+            },
+        );
+    }
+
+    fn sequence(&mut self) -> u64 {
+        let sequence = self.next_sequence;
+        self.next_sequence = self.next_sequence.saturating_add(1);
+        sequence
+    }
+
+    /// Removes a record and its index entries.
+    fn take_entry(&mut self, key: &Key) -> Option<Entry> {
+        let previous = self.records.remove(key)?;
+        self.unindex(key, &previous);
+        self.unschedule_removal(&previous);
+        Some(previous)
+    }
+
+    fn insert(&mut self, key: Key, entry: Entry) {
         self.index(&key, &entry);
         self.schedule_removal(&key, &entry);
         self.records.insert(key, entry);

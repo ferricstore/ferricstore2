@@ -64924,3 +64924,31 @@ ignored; fmt, Clippy, ratchet, architecture, reference, progress and
 cargo-deny pass. `cargo doc` first failed on a private intra-doc link added
 with ADR013-BLOCKING1 (`composition` linked to the private `claim` module);
 it now names the module in plain text, and the docs build.
+
+### ADR014-RECORD1 Flow record fields, FLOW.CREATE options and FLOW.GET
+
+New artifacts (solo design review, recorded here): `wf_application::commands::
+flow` with `term` (`Term`, its binary codec), private `opts` (the Elixir
+option readers), `meta` (attributes and state metadata), `keys` (value
+reference names, data format 2 digests), `create`, `get`, `record`
+(`FlowMeta`, `View`), `FlowCommand`, `parse`, `FlowService` and
+`NodeService`; `ServiceError::Rejected` (the error type is no longer `Copy`).
+In `wf-node`: `composition::flow` (routing), `supervision::shard::state::flow`
+(create and get on the shard), `supervision::shard::image::meta`,
+`Logged::Put` (tag 7, an after-image), `Request::Flow`, snapshot images
+version 2. In `wf-api-tcp`: `request::options` (typed map to `Term`),
+`response::term`, `session::generic`, opcode `FlowGet` (0x0202); `FLOW.CREATE`
+now takes the generic path. No dependency or policy change.
+
+Not TDD: the Rust tests were written after the code. The failing evidence
+before it is the SDK integration run against 0a5d105 (FLOW.GET refused as an
+unsupported opcode; `FLOW.CREATE option idempotent is not supported` in 8
+tests, `values` in 2) and the reference replies captured from Elixir
+6a5f2bc34. After it: 4 node tests (every field read back, idempotent retry,
+conflict and duplicate answers, fields kept across replay, a snapshot and a
+shard-count change, 7 invalid options refused with Elixir's text), 2 session
+tests (FLOW.GET replies and option refusal), all 33 node tests and the TCP
+adapter tests pass; the differential probe matched Elixir on 20 of 21
+commands, the other differing only in wall-clock time. Clippy, the ratchet,
+lint tests, docs, architecture, reference and progress pass. From step 2 on,
+tests are written and seen failing first.

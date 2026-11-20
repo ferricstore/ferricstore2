@@ -17,6 +17,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use wf_application::commands::flow::{FlowCommand, Term};
 use wf_application::commands::queue::{
     ClaimFlows, ClaimedFlow, CompleteFlow, ItemOutcome, NewFlow, Partition, ServiceError,
 };
@@ -69,6 +70,12 @@ pub(crate) enum Request {
     Complete {
         items: Vec<(usize, CompleteFlow, Partition)>,
         done: Done<Vec<(usize, ItemOutcome)>>,
+    },
+    /// Any other Flow command, for the Flow in `partition` (ADR-014).
+    Flow {
+        command: Box<FlowCommand>,
+        partition: Partition,
+        done: Done<Term>,
     },
 }
 
@@ -157,6 +164,15 @@ fn handle(
             done(state.peek(now, &request, limit, partitions.as_deref()));
             return None;
         }
+        Request::Flow {
+            command,
+            partition,
+            done,
+        } => {
+            let (result, change) = state.execute(now, *command, partition);
+            logged.extend(change);
+            Box::new(move |durable| done(durable.and(result)))
+        }
         Request::Complete { items, done } => {
             let outcomes: Vec<(usize, ItemOutcome)> = items
                 .into_iter()
@@ -176,21 +192,29 @@ fn handle(
 fn arrivals(logged: &[Logged]) -> Vec<Arrival> {
     let mut arrivals: Vec<Arrival> = Vec::new();
     for change in logged {
-        if let Logged::Create {
-            flow_type,
-            state,
-            priority,
-            ..
-        } = change
-        {
-            let arrival = Arrival {
+        let arrival = match change {
+            Logged::Create {
+                flow_type,
+                state,
+                priority,
+                ..
+            } => Arrival {
                 flow_type: flow_type.clone(),
                 state: state.clone(),
                 priority: *priority,
-            };
-            if !arrivals.contains(&arrival) {
-                arrivals.push(arrival);
-            }
+            },
+            Logged::Put { image: bytes, .. } => match image::decode_one(bytes) {
+                Some(restored) => Arrival {
+                    flow_type: restored.record.workflow_type().to_vec(),
+                    state: restored.record.state().to_vec(),
+                    priority: restored.priority,
+                },
+                None => continue,
+            },
+            _ => continue,
+        };
+        if !arrivals.contains(&arrival) {
+            arrivals.push(arrival);
         }
     }
     arrivals
@@ -257,7 +281,7 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         links.leased.store(state.leased(), Ordering::Relaxed);
         if logged
             .iter()
-            .any(|change| matches!(change, Logged::Create { .. }))
+            .any(|change| matches!(change, Logged::Create { .. } | Logged::Put { .. }))
         {
             links.waiters.arrived(|| arrivals(&logged));
         }

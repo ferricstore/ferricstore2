@@ -10,12 +10,14 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use wf_api_tcp::session::{ServerInfo, serve};
+use wf_application::commands::flow::{FlowCommand, FlowService, Term};
 use wf_application::commands::queue::{
     Cancellation, ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService,
     Reply, ServiceError,
 };
 use wf_domain::value::DomainError;
 
+mod flow;
 mod handshake;
 mod options;
 mod queue;
@@ -96,6 +98,27 @@ impl QueueService for Scripted {
             .iter()
             .map(|completion| outcome(&completion.id, b"stale", DomainError::StaleLease))
             .collect()));
+    }
+}
+
+/// Creates of ids starting with `dup` are refused; a get answers the id and
+/// partition it was asked for, or nil for ids starting with `none`.
+impl FlowService for Scripted {
+    fn execute(&self, command: FlowCommand, reply: Reply<Term>) {
+        match command {
+            FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
+                ServiceError::rejected("ERR flow already exists".to_owned()),
+            )),
+            FlowCommand::Create(_) => reply(Ok(Term::text("OK"))),
+            FlowCommand::Get(get) if get.id.starts_with(b"none") => reply(Ok(Term::Nil)),
+            FlowCommand::Get(get) => reply(Ok(Term::Map(vec![
+                (b"id".to_vec(), Term::Bin(get.id)),
+                (
+                    b"partition_key".to_vec(),
+                    Term::optional_bin(get.partition_key.as_deref()),
+                ),
+            ]))),
+        }
     }
 }
 
