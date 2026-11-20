@@ -131,6 +131,10 @@ impl FlowService for Scripted {
                     .collect(),
             ))),
             FlowCommand::History(query) => reply(Ok(Term::List(vec![Term::Bin(query.id)]))),
+            FlowCommand::ValuePut(put) => reply(Ok(Term::Bin(put.value))),
+            FlowCommand::ValueMget(read) => reply(Ok(Term::List(
+                read.refs.into_iter().map(Term::Bin).collect(),
+            ))),
             FlowCommand::Get(get) if get.id.starts_with(b"none") => reply(Ok(Term::Nil)),
             FlowCommand::Get(get) => reply(Ok(Term::Map(vec![
                 (b"id".to_vec(), Term::Bin(get.id)),

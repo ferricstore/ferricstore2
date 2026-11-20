@@ -235,7 +235,7 @@ impl View<'_> {
             ("type", Term::Bin(record.workflow_type().to_vec())),
             ("version", Term::int(record.version())),
         ]);
-        let values: Vec<(Vec<u8>, Term)> = match &include.values {
+        let mut values: Vec<(Vec<u8>, Term)> = match &include.values {
             Values::None => Vec::new(),
             Values::All => meta
                 .values
@@ -251,6 +251,9 @@ impl View<'_> {
                 .collect(),
         };
         if !values.is_empty() {
+            // Elixir's small maps list their keys in order.
+            values.sort_by(|left, right| left.0.cmp(&right.0));
+            values.dedup_by(|left, right| left.0 == right.0);
             entries.push(("values", Term::Map(values)));
         }
         self.lineage(&mut entries);

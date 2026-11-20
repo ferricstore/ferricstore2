@@ -22,6 +22,7 @@ const COMMON: &[&str] = &[
     "state_meta",
     "values",
     "drop_values",
+    "override_values",
 ];
 
 const DEFAULT_LEASE_MS: u64 = 30_000;
@@ -126,6 +127,8 @@ pub struct Mutation {
     pub values: BTreeMap<Vec<u8>, Vec<u8>>,
     /// Named values to drop.
     pub drop_values: Vec<Vec<u8>>,
+    /// Named values whose different bytes may replace the stored ones.
+    pub override_values: Vec<Vec<u8>>,
     /// The change.
     pub change: Change,
 }
@@ -312,6 +315,7 @@ pub fn parse(name: &str, args: &Term) -> Result<Mutation, FlowError> {
         state_meta: meta::state_meta_update(opts.get("state_meta"))?,
         values: values(&opts)?,
         drop_values: names(&opts, "drop_values")?,
+        override_values: names(&opts, "override_values")?,
         change,
     })
 }

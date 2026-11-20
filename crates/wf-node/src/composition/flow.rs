@@ -3,10 +3,16 @@
 //! joined back in request order.
 
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH};
 
+use wf_application::commands::flow::keys;
 use wf_application::commands::flow::many::{self, ManyMutation};
+use wf_application::commands::flow::value::{self, ValueMget};
 use wf_application::commands::flow::{FlowCommand, FlowService, Term};
-use wf_application::commands::queue::{Partition, Reply, ServiceError};
+use wf_application::commands::queue::{
+    Partition, Reply, ServiceError, shard_for_slot, slot_for_tag,
+};
 
 use crate::supervision::shard::Request;
 use crate::supervision::shard::state::BatchItems;
@@ -20,9 +26,27 @@ impl FlowService for QueueNode {
         let Some(router) = self.router.as_ref() else {
             return reply(Err(ServiceError::Unavailable));
         };
-        if let FlowCommand::Many(batch) = command {
-            return batch_mutation(router, *batch, reply);
-        }
+        let command = match command {
+            FlowCommand::Many(batch) => return batch_mutation(router, *batch, reply),
+            FlowCommand::ValueMget(read) => return value_read(router, read, reply),
+            FlowCommand::ValuePut(mut put) if put.named.is_none() => {
+                // A shared value's reference is chosen here, so its auto
+                // bucket is known before routing.
+                let id = value::shared_id(&entropy());
+                let partition = Partition::for_new_flow(&id, put.partition_key.as_deref());
+                put.shared_ref = Some(keys::value_ref(&partition, 's', &id, 1));
+                let index = router.route(&partition);
+                return router.send(
+                    index,
+                    Request::Flow {
+                        command: Box::new(FlowCommand::ValuePut(put)),
+                        partition,
+                        done: reply,
+                    },
+                );
+            }
+            command => command,
+        };
         let Some((id, explicit)) = command.target() else {
             return reply(Err(ServiceError::Unavailable));
         };
@@ -75,6 +99,59 @@ fn batch_mutation(router: &Router, mut batch: ManyMutation, reply: Reply<Term>) 
             Request::FlowBatch {
                 items,
                 atomic,
+                done: Box::new(move |result| part.part(result)),
+            },
+        );
+    }
+}
+
+/// Seed of a shared value id: process id, wall-clock nanoseconds and a
+/// process-wide counter, so ids never repeat within a node.
+fn entropy() -> Vec<u8> {
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_nanos());
+    let mut seed = std::process::id().to_be_bytes().to_vec();
+    seed.extend_from_slice(&nanos.to_be_bytes());
+    seed.extend_from_slice(&NEXT.fetch_add(1, Ordering::Relaxed).to_be_bytes());
+    seed
+}
+
+/// Reads values by reference: each reference goes to the shard its hash tag
+/// routes to; one that is not a value reference reads as nil.
+fn value_read(router: &Router, read: ValueMget, reply: Reply<Term>) {
+    let total = read.refs.len();
+    let mut per_shard: Vec<Vec<(usize, Vec<u8>)>> =
+        (0..router.shards.len()).map(|_| Vec::new()).collect();
+    let mut misses = Vec::new();
+    for (position, reference) in read.refs.into_iter().enumerate() {
+        let shard = value::parse_ref(&reference)
+            .and_then(|parsed| shard_for_slot(slot_for_tag(&parsed.tag), router.shard_count))
+            .map(usize::from);
+        match shard.and_then(|index| per_shard.get_mut(index)) {
+            Some(items) => items.push((position, reference)),
+            None => misses.push((position, Term::Nil)),
+        }
+    }
+    let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
+    let gather = Arc::new(ItemGather::new(
+        total,
+        parts.saturating_add(1),
+        Box::new(move |values: Result<Vec<Term>, ServiceError>| reply(values.map(Term::List))),
+    ));
+    gather.part(Ok(misses));
+    for (index, refs) in per_shard
+        .into_iter()
+        .enumerate()
+        .filter(|(_, refs)| !refs.is_empty())
+    {
+        let part = Arc::clone(&gather);
+        router.send(
+            index,
+            Request::ValueRead {
+                refs,
+                max_bytes: read.max_bytes,
                 done: Box::new(move |result| part.part(result)),
             },
         );

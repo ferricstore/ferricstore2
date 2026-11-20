@@ -20,11 +20,32 @@ use crate::routing::Partition;
 /// Most events one read returns.
 const MAX_COUNT: u64 = 10_000;
 
+/// What a history event records: a lifecycle change the domain decided, or
+/// a named value replaced (`value_put`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HistoryKind {
+    /// A lifecycle change.
+    Event(EventKind),
+    /// A named value written by `FLOW.VALUE.PUT`.
+    ValuePut,
+}
+
+impl HistoryKind {
+    /// Elixir's event name.
+    #[must_use]
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Event(kind) => kind.as_str(),
+            Self::ValuePut => "value_put",
+        }
+    }
+}
+
 /// One history event.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HistoryEvent {
     /// What happened.
-    pub kind: EventKind,
+    pub kind: HistoryKind,
     /// When: the record's update time.
     pub at: u64,
     /// Record version after the event.
@@ -53,7 +74,7 @@ impl HistoryEvent {
     pub fn of(record: &WorkflowRecord, priority: u8, meta: &FlowMeta) -> Self {
         let (kind, _, _) = record.latest_event_witness();
         Self {
-            kind,
+            kind: HistoryKind::Event(kind),
             at: record.updated_at().get(),
             version: record.version(),
             state: record.state().to_vec(),

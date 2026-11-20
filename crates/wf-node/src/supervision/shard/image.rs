@@ -212,7 +212,7 @@ pub(crate) fn decode_one(bytes: &[u8]) -> Option<Restored> {
 
 /// Decodes a whole image; `None` when it is not exactly a count and that
 /// many records the domain accepts.
-pub(crate) fn decode(bytes: &[u8]) -> Option<Vec<Restored>> {
+pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
     let limits = AdmissionLimits::new(MAX_INLINE_BYTES, usize::MAX, 1).ok()?;
     let mut reader = Reader(bytes);
     let count = reader.u64().ok()?;
@@ -220,5 +220,44 @@ pub(crate) fn decode(bytes: &[u8]) -> Option<Vec<Restored>> {
     for _ in 0..count {
         records.push(decode_record(&mut reader, limits).ok()?);
     }
-    reader.0.is_empty().then_some(records)
+    let shared_count = reader.u64().ok()?;
+    let mut shared = Vec::new();
+    for _ in 0..shared_count {
+        shared.push(SharedValue {
+            partition: Partition::parse(reader.bin().ok()?),
+            reference: reader.bin().ok()?.to_vec(),
+            bytes: reader.bin().ok()?.to_vec(),
+            expires_at: reader.optional_u64().ok()?,
+        });
+    }
+    reader.0.is_empty().then_some(Image { records, shared })
+}
+
+/// A decoded shard image: its records, then its shared values (ADR-014).
+pub(crate) struct Image {
+    pub(crate) records: Vec<Restored>,
+    pub(crate) shared: Vec<SharedValue>,
+}
+
+/// A shared value in a shard image.
+pub(crate) struct SharedValue {
+    pub(crate) partition: Partition,
+    pub(crate) reference: Vec<u8>,
+    pub(crate) bytes: Vec<u8>,
+    pub(crate) expires_at: Option<u64>,
+}
+
+/// A shared value to image: partition, reference, bytes, deadline.
+pub(crate) type SharedEntry<'a> = (&'a Partition, &'a [u8], &'a [u8], Option<u64>);
+
+/// Appends the shared-value section after the records.
+pub(crate) fn encode_shared(out: &mut Vec<u8>, values: &[SharedEntry<'_>]) -> Option<()> {
+    out.extend_from_slice(&u64::try_from(values.len()).ok()?.to_be_bytes());
+    for (partition, reference, bytes, expires_at) in values {
+        bin(out, &partition.name())?;
+        bin(out, reference)?;
+        bin(out, bytes)?;
+        optional_u64(out, *expires_at);
+    }
+    Some(())
 }

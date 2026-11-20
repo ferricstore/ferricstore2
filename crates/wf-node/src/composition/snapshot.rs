@@ -22,9 +22,9 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 3 images carry each Flow's fields beyond its record and its
-/// history (ADR-014).
-const VERSION: u8 = 3;
+/// Version 4 images carry each Flow's fields beyond its record, its history
+/// and the shard's shared values (ADR-014).
+const VERSION: u8 = 4;
 
 struct Progress {
     next: u64,
@@ -66,7 +66,19 @@ pub(crate) fn load(
 ) -> Result<Cut, NodeError> {
     let (count, base, images) = parse(body).ok_or(NodeError::SnapshotImage)?;
     for bytes in images {
-        for restored in image::decode(bytes).ok_or(NodeError::SnapshotImage)? {
+        let decoded = image::decode(bytes).ok_or(NodeError::SnapshotImage)?;
+        for value in decoded.shared {
+            let state = shard_index(&value.partition, shards)
+                .and_then(|index| states.get_mut(index))
+                .ok_or(NodeError::SnapshotImage)?;
+            state.store_shared(
+                value.partition,
+                value.reference,
+                value.bytes,
+                value.expires_at,
+            );
+        }
+        for restored in decoded.records {
             let state = shard_index(&restored.partition, shards)
                 .and_then(|index| states.get_mut(index))
                 .ok_or(NodeError::SnapshotImage)?;

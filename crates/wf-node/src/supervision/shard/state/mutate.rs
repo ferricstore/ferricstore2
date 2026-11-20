@@ -9,7 +9,7 @@
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::meta;
 use wf_application::commands::flow::mutate::{Change, Mutation};
-use wf_application::commands::flow::record::{FlowMeta, Include, NamedValue};
+use wf_application::commands::flow::record::{FlowMeta, Include};
 use wf_application::commands::flow::{Term, term};
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
@@ -152,15 +152,7 @@ fn updated_meta(
         meta_state(mutation, record),
         &mutation.state_meta,
     )?;
-    for (name, bytes) in &mutation.values {
-        next.values.insert(
-            name.clone(),
-            NamedValue {
-                version,
-                bytes: bytes.clone(),
-            },
-        );
-    }
+    super::value::write_values(&mut next, &mutation.values, &mutation.override_values)?;
     for name in &mutation.drop_values {
         next.values.remove(name);
     }

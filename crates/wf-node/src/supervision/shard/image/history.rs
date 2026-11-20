@@ -15,12 +15,12 @@ use wf_domain::retry::RetryDecision;
 use wf_types::version::TimestampMillis;
 
 use super::super::command::{Malformed, Reader, bin, optional_u64};
-use super::KINDS;
+use super::super::state::events::{kind_code, kind_of};
 
 pub(super) fn encode(out: &mut Vec<u8>, events: &[HistoryEvent]) -> Option<()> {
     out.extend_from_slice(&u32::try_from(events.len()).ok()?.to_be_bytes());
     for event in events {
-        out.push(u8::try_from(KINDS.iter().position(|known| *known == event.kind)?).ok()?);
+        out.push(kind_code(event.kind)?);
         for number in [event.at, event.version] {
             out.extend_from_slice(&number.to_be_bytes());
         }
@@ -117,7 +117,7 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<Vec<HistoryEvent>, Malfo
     let count = u32::from_be_bytes(reader.array()?);
     let mut events = Vec::new();
     for _ in 0..count {
-        let kind = *KINDS.get(usize::from(reader.u8()?)).ok_or(Malformed)?;
+        let kind = kind_of(reader.u8()?).ok_or(Malformed)?;
         let at = reader.u64()?;
         let version = reader.u64()?;
         let state = reader.bin()?.to_vec();

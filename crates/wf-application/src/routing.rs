@@ -2,10 +2,12 @@
 //! (ADR-011).
 //!
 //! A Flow created without a partition gets the auto bucket `crc32(id) & 0xFF`,
-//! named `__flow_auto__:<bucket>`. A partition's routing input is
-//! `fa:<bucket>` for an auto bucket and `f:<base64url(sha256(name))>`
-//! otherwise; its slot is `crc32(input) & 1023`. Slots map to shards in
-//! contiguous ranges, the first `1024 % shards` shards taking one extra slot.
+//! named `__flow_auto__:<bucket>`. A partition's hash tag is `fa:<bucket>`
+//! for an auto bucket and `f:` plus the URL-safe base64 of the first 16 bytes
+//! of `sha256(name)` otherwise (the data format 2 of a fresh Elixir node,
+//! ADR-014); its slot is `crc32(tag) & 1023`, as for any key carrying that
+//! tag between braces. Slots map to shards in contiguous ranges, the first
+//! `1024 % shards` shards taking one extra slot.
 
 use sha2::{Digest, Sha256};
 
@@ -58,20 +60,33 @@ impl Partition {
         }
     }
 
+    /// The hash tag of the partition's keys, without the braces.
+    #[must_use]
+    pub fn tag(&self) -> String {
+        match self {
+            Self::Auto(bucket) => format!("fa:{bucket}"),
+            Self::Named(name) => {
+                let digest = Sha256::digest(name);
+                format!(
+                    "f:{}",
+                    base64url_nopad(digest.get(..16).unwrap_or_default())
+                )
+            }
+        }
+    }
+
     /// The routing slot, 0 through 1023.
     #[must_use]
     pub fn slot(&self) -> u16 {
-        let input = match self {
-            Self::Auto(bucket) => format!("fa:{bucket}").into_bytes(),
-            Self::Named(name) => {
-                let mut input = b"f:".to_vec();
-                input.extend_from_slice(base64url_nopad(&Sha256::digest(name)).as_bytes());
-                input
-            }
-        };
-        let [low, high, _, _] = (crc32(&input) & 0x3FF).to_le_bytes();
-        u16::from_le_bytes([low, high])
+        slot_for_tag(self.tag().as_bytes())
     }
+}
+
+/// The slot of a key whose hash tag is `tag`.
+#[must_use]
+pub fn slot_for_tag(tag: &[u8]) -> u16 {
+    let [low, high, _, _] = (crc32(tag) & 0x3FF).to_le_bytes();
+    u16::from_le_bytes([low, high])
 }
 
 /// The shard owning `slot` when the slots are split over `shards` shards;
@@ -115,6 +130,25 @@ fn crc32(bytes: &[u8]) -> u32 {
         }
     }
     !crc
+}
+
+/// Decodes base64 with the URL-safe alphabet and no padding; `None` for
+/// other characters or a dangling sextet.
+pub(crate) fn base64url_decode(text: &[u8]) -> Option<Vec<u8>> {
+    let mut out = Vec::with_capacity(text.len().saturating_mul(3) / 4);
+    let mut buffer = 0_u32;
+    let mut bits = 0_u32;
+    for character in text {
+        let value = BASE64URL.iter().position(|known| known == character)?;
+        buffer = buffer.wrapping_shl(6) | u32::try_from(value).ok()?;
+        bits = bits.saturating_add(6);
+        if bits >= 8 {
+            bits = bits.saturating_sub(8);
+            let [byte, ..] = buffer.wrapping_shr(bits).to_le_bytes();
+            out.push(byte);
+        }
+    }
+    (bits < 6).then_some(out)
 }
 
 /// Base64 with the URL-safe alphabet and no padding.

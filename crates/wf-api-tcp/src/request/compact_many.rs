@@ -111,11 +111,36 @@ pub fn is_compact(flags: u8) -> bool {
     flags & FLAG_CUSTOM_PAYLOAD != 0
 }
 
-/// Reads a compact batch mutation body of command `name`.
+/// A compact `FLOW.VALUE.MGET` body (tag `0x9D`): `max_bytes` as `i64`
+/// (`i64::MIN` for none), the reference count, then each reference.
+fn mget(body: &[u8]) -> Option<Term> {
+    let mut reader = Reader::new(body);
+    if reader.u8()? != 0x9D {
+        return None;
+    }
+    let max_bytes = reader.i64()?;
+    let count = reader.count(4)?;
+    let mut refs = Vec::with_capacity(count);
+    for _ in 0..count {
+        refs.push(bin(reader.bin()?));
+    }
+    let mut options = vec![entry("refs", Term::List(refs))];
+    if max_bytes != i64::MIN {
+        options.push(entry("max_bytes", Term::Int(max_bytes)));
+    }
+    reader.is_empty().then_some(Term::Map(options))
+}
+
+/// Reads a compact body of command `name`: a batch mutation or a value read.
 ///
 /// # Errors
 /// Refuses an unknown tag for the command and a truncated or over-long body.
 pub fn many_options(name: &str, body: &[u8]) -> Result<Term, RequestError> {
-    read(name, body)
+    let decoded = if name == "FLOW.VALUE.MGET" {
+        mget(body)
+    } else {
+        read(name, body)
+    };
+    decoded
         .ok_or_else(|| RequestError::new(format!("ERR native compact {name} payload is invalid")))
 }

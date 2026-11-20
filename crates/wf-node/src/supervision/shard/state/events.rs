@@ -11,7 +11,7 @@
 //! next run time plus one (0 for none); priority; the payload, result and
 //! error reference versions (0 for none); a retry flag with the audit.
 
-use wf_application::commands::flow::history::HistoryEvent;
+use wf_application::commands::flow::history::{HistoryEvent, HistoryKind};
 use wf_domain::history::RetryHistory;
 use wf_domain::policy::{Backoff, BackoffKind, RetryPolicy};
 use wf_domain::retry::RetryDecision;
@@ -91,8 +91,28 @@ impl<'a> Cursor<'a> {
     }
 }
 
+/// The domain event kinds by their index, then 14 for `value_put`.
+pub(crate) fn kind_code(kind: HistoryKind) -> Option<u8> {
+    match kind {
+        HistoryKind::Event(kind) => {
+            u8::try_from(KINDS.iter().position(|known| *known == kind)?).ok()
+        }
+        HistoryKind::ValuePut => Some(14),
+    }
+}
+
+pub(crate) fn kind_of(code: u8) -> Option<HistoryKind> {
+    match code {
+        14 => Some(HistoryKind::ValuePut),
+        code => KINDS
+            .get(usize::from(code))
+            .copied()
+            .map(HistoryKind::Event),
+    }
+}
+
 fn encode(out: &mut Vec<u8>, event: &HistoryEvent) -> Option<()> {
-    out.push(u8::try_from(KINDS.iter().position(|kind| *kind == event.kind)?).ok()?);
+    out.push(kind_code(event.kind)?);
     for number in [event.at, event.version, event.fence, event.attempts] {
         varint(out, number);
     }
@@ -179,7 +199,7 @@ fn decode_retry(cursor: &mut Cursor<'_>) -> Option<RetryHistory> {
 }
 
 fn decode(cursor: &mut Cursor<'_>) -> Option<HistoryEvent> {
-    let kind = *KINDS.get(usize::from(cursor.u8()?))?;
+    let kind = kind_of(cursor.u8()?)?;
     let at = cursor.varint()?;
     let version = cursor.varint()?;
     let fence = cursor.varint()?;

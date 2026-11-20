@@ -7,10 +7,10 @@
 //! payload, result or error (`p`, `r`, `e`), a named value (`n`) or a shared
 //! value (`s`). The hash tag between braces routes each reference.
 
+use super::FlowError;
 use super::opts::Opts;
 use super::record::DEFAULT_PAYLOAD_MAX_BYTES;
 use super::term::Term;
-use super::FlowError;
 use crate::routing::base64url_decode;
 
 /// A value write.
@@ -28,6 +28,9 @@ pub struct ValuePut {
     pub now_ms: Option<u64>,
     /// Lifetime of a shared value.
     pub ttl_ms: Option<u64>,
+    /// The new reference of a shared value, chosen by the node before
+    /// routing.
+    pub shared_ref: Option<Vec<u8>>,
 }
 
 /// A value read.
@@ -165,7 +168,17 @@ pub fn parse_put(args: &Term) -> Result<ValuePut, FlowError> {
         override_value,
         now_ms,
         ttl_ms,
+        shared_ref: None,
     })
+}
+
+/// A shared value's reference id from node-local entropy: the URL-safe
+/// base64 of the first 18 bytes of its SHA-256, 24 characters as in Elixir.
+#[must_use]
+pub fn shared_id(seed: &[u8]) -> Vec<u8> {
+    use sha2::{Digest, Sha256};
+    let digest = Sha256::digest(seed);
+    crate::routing::base64url_nopad(digest.get(..18).unwrap_or_default()).into_bytes()
 }
 
 /// Reads `FLOW.VALUE.MGET`.
@@ -179,16 +192,25 @@ pub fn parse_mget(args: &Term) -> Result<ValueMget, FlowError> {
             .iter()
             .map(|item| match item {
                 Term::Bin(reference) => Ok(reference.clone()),
-                _ => Err(FlowError::rejected("ERR flow refs must be a list".to_owned())),
+                _ => Err(FlowError::rejected(
+                    "ERR flow refs must be a list".to_owned(),
+                )),
             })
             .collect::<Result<Vec<_>, _>>()?,
-        _ => return Err(FlowError::rejected("ERR flow refs must be a list".to_owned())),
+        _ => {
+            return Err(FlowError::rejected(
+                "ERR flow refs must be a list".to_owned(),
+            ));
+        }
     };
     let max_bytes = match opts.get("max_bytes") {
         None | Some(Term::Nil) => DEFAULT_PAYLOAD_MAX_BYTES,
         Some(Term::Int(value)) if *value >= 0 => u64::try_from(*value).unwrap_or(0),
         Some(_) => {
-            return Err(FlowError::flow("max_bytes", "must be a non-negative integer"));
+            return Err(FlowError::flow(
+                "max_bytes",
+                "must be a non-negative integer",
+            ));
         }
     };
     Ok(ValueMget { refs, max_bytes })
@@ -200,11 +222,16 @@ pub fn parse_mget(args: &Term) -> Result<ValueMget, FlowError> {
 pub fn read_term(reference: &[u8], value: Option<&[u8]>, max_bytes: u64) -> Term {
     match value {
         None => Term::Nil,
-        Some(bytes) if u64::try_from(bytes.len()).unwrap_or(u64::MAX) > max_bytes => Term::Map(vec![
-            (b"ref".to_vec(), Term::Bin(reference.to_vec())),
-            (b"value_size".to_vec(), Term::int(u64::try_from(bytes.len()).unwrap_or(u64::MAX))),
-            (b"value_omitted".to_vec(), Term::Bool(true)),
-        ]),
+        Some(bytes) if u64::try_from(bytes.len()).unwrap_or(u64::MAX) > max_bytes => {
+            Term::Map(vec![
+                (b"ref".to_vec(), Term::Bin(reference.to_vec())),
+                (
+                    b"value_size".to_vec(),
+                    Term::int(u64::try_from(bytes.len()).unwrap_or(u64::MAX)),
+                ),
+                (b"value_omitted".to_vec(), Term::Bool(true)),
+            ])
+        }
         Some(bytes) => Term::Bin(bytes.to_vec()),
     }
 }

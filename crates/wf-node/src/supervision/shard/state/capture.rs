@@ -9,7 +9,7 @@ use super::{Entry, Key, ShardState};
 impl ShardState {
     /// Encodes every record in creation order; `None` when one cannot be
     /// imaged.
-    pub(crate) fn image(&self) -> Option<Vec<u8>> {
+    pub(crate) fn image(&self, now: u64) -> Option<Vec<u8>> {
         let mut entries: Vec<(&Key, &Entry)> = self.records.iter().collect();
         entries.sort_unstable_by_key(|(_, entry)| entry.sequence);
         let mut out = Vec::new();
@@ -28,6 +28,19 @@ impl ShardState {
                 ),
             )?;
         }
+        let shared: Vec<image::SharedEntry<'_>> = self
+            .shared_values(now)
+            .into_iter()
+            .map(|(reference, value)| {
+                (
+                    &value.partition,
+                    reference.as_slice(),
+                    value.bytes.as_slice(),
+                    value.expires_at,
+                )
+            })
+            .collect();
+        image::encode_shared(&mut out, &shared)?;
         Some(out)
     }
 

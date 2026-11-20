@@ -135,3 +135,16 @@ Each step is one commit with its tests.
   (client-bound), server CPU 9.4 to 9.8 ms per 1k Flows (+4%), RSS 186 to
   223 MB (about 370 bytes per Flow for its three events). A first version
   with one struct per event cost +17% CPU and +170 MB; packing fixed that.
+- Step 5: `FLOW.VALUE.PUT` and `FLOW.VALUE.MGET` (typed, and the SDK's
+  compact read). A named value has its own version: the same bytes change
+  nothing, different bytes need `OVERRIDE` (or `OVERRIDE_VALUE` on a
+  mutation), raise the value's version, the record's version and update
+  time, and add a `value_put` history event. A shared value gets a new
+  24-character reference from node-local entropy, so its auto bucket is
+  known before routing, and an optional deadline; it is logged as its own
+  record and carried in snapshot images (version 4). A read routes each
+  reference by its hash tag. Routing now uses data format 2, a fresh Elixir
+  node's: a named partition's tag (and so its slot) uses the first 16 bytes
+  of its SHA-256 instead of all 32; logs and snapshots name partitions, so
+  existing data replays onto the new placement. The value scenario run
+  through the SDK matched Elixir exactly; the SDK suite passes 22 of 60.

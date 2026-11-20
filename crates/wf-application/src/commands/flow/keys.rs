@@ -10,14 +10,7 @@ use sha2::{Digest, Sha256};
 use crate::routing::{Partition, base64url_nopad};
 
 fn tag(partition: &Partition) -> String {
-    match partition {
-        Partition::Auto(bucket) => format!("{{fa:{bucket}}}"),
-        Partition::Named(name) => {
-            let digest = Sha256::digest(name);
-            let prefix = digest.get(..16).unwrap_or_default();
-            format!("{{f:{}}}", base64url_nopad(prefix))
-        }
-    }
+    format!("{{{}}}", partition.tag())
 }
 
 /// The reference of a Flow's payload, result or error: `kind` is `p`, `r`

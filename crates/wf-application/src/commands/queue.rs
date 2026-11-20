@@ -15,7 +15,7 @@ use wf_domain::value::DomainError;
 use super::flow::Term;
 use super::flow::record::Include;
 
-pub use crate::routing::{Partition, SLOTS, shard_for_slot};
+pub use crate::routing::{Partition, SLOTS, shard_for_slot, slot_for_tag};
 
 /// One Flow to create.
 #[derive(Clone, Debug, PartialEq, Eq)]

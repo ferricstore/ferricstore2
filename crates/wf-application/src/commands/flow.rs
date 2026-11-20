@@ -17,6 +17,7 @@ pub mod mutate;
 mod opts;
 pub mod record;
 pub mod term;
+pub mod value;
 
 pub use opts::MAX_EXACT;
 pub use term::Term;
@@ -40,6 +41,10 @@ pub enum FlowCommand {
     Mutate(Box<mutate::Mutation>),
     /// A batch of lifecycle mutations.
     Many(Box<many::ManyMutation>),
+    /// `FLOW.VALUE.PUT`.
+    ValuePut(Box<value::ValuePut>),
+    /// `FLOW.VALUE.MGET`.
+    ValueMget(value::ValueMget),
 }
 
 impl FlowCommand {
@@ -52,7 +57,11 @@ impl FlowCommand {
             Self::Get(get) => Some((&get.id, get.partition_key.as_deref())),
             Self::History(query) => Some((&query.id, query.partition_key.as_deref())),
             Self::Mutate(mutation) => Some((&mutation.id, mutation.partition_key.as_deref())),
-            Self::Many(_) => None,
+            Self::ValuePut(put) => put
+                .named
+                .as_ref()
+                .map(|(owner, _)| (owner.as_slice(), put.partition_key.as_deref())),
+            Self::Many(_) | Self::ValueMget(_) => None,
         }
     }
 }
@@ -67,6 +76,8 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.CREATE" => create::parse(args).map(|create| FlowCommand::Create(Box::new(create))),
         "FLOW.GET" => get::parse(args).map(FlowCommand::Get),
         "FLOW.HISTORY" => history::parse(args).map(FlowCommand::History),
+        "FLOW.VALUE.PUT" => value::parse_put(args).map(|put| FlowCommand::ValuePut(Box::new(put))),
+        "FLOW.VALUE.MGET" => value::parse_mget(args).map(FlowCommand::ValueMget),
         name if many::single(name).is_some() => {
             many::parse(name, args).map(|batch| FlowCommand::Many(Box::new(batch)))
         }

@@ -46,8 +46,10 @@ fn slots_match_elixir_for_auto_and_named_partitions() {
         (Partition::Auto(1), 151),
         (Partition::Auto(131), 369),
         (Partition::Auto(255), 183),
-        (Partition::Named(b"tenant-a".to_vec()), 914),
-        (Partition::Named(b"orders/eu".to_vec()), 878),
+        // Data format 2, a fresh Elixir node's: the hash tag is the first
+        // 16 bytes of the SHA-256.
+        (Partition::Named(b"tenant-a".to_vec()), 861),
+        (Partition::Named(b"orders/eu".to_vec()), 766),
     ] {
         assert_eq!(partition.slot(), slot, "{partition:?}");
     }

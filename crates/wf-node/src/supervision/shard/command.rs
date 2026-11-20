@@ -19,6 +19,7 @@ const RECLAIM: u8 = 4;
 const EXPIRE: u8 = 5;
 const MARKER: u8 = 6;
 const PUT: u8 = 7;
+const SHARED: u8 = 8;
 
 /// One logged change to one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -65,6 +66,13 @@ pub(crate) enum Logged {
         partition: Partition,
         image: Vec<u8>,
     },
+    /// A shared value stored under its reference (ADR-014 step 5).
+    Shared {
+        partition: Partition,
+        reference: Vec<u8>,
+        bytes: Vec<u8>,
+        expires_at: Option<u64>,
+    },
 }
 
 impl Logged {
@@ -74,7 +82,8 @@ impl Logged {
             Self::Create { partition, .. }
             | Self::Claim { partition, .. }
             | Self::Complete { partition, .. }
-            | Self::Put { partition, .. } => Some(partition),
+            | Self::Put { partition, .. }
+            | Self::Shared { partition, .. } => Some(partition),
             Self::Expire { .. } | Self::Marker { .. } => None,
         }
     }
@@ -137,6 +146,18 @@ impl Logged {
                 bin(&mut out, &partition.name())?;
                 bin(&mut out, image)?;
             }
+            Self::Shared {
+                partition,
+                reference,
+                bytes,
+                expires_at,
+            } => {
+                out.push(SHARED);
+                bin(&mut out, &partition.name())?;
+                bin(&mut out, reference)?;
+                bin(&mut out, bytes)?;
+                optional_u64(&mut out, *expires_at);
+            }
             Self::Marker { snapshot, shard } => {
                 out.push(MARKER);
                 out.extend_from_slice(&snapshot.to_be_bytes());
@@ -167,6 +188,22 @@ pub(super) struct Malformed;
 fn decode(bytes: &[u8]) -> Result<Logged, Malformed> {
     let mut reader = Reader(bytes);
     let tag = reader.u8()?;
+    if tag == SHARED {
+        let partition = Partition::parse(reader.bin()?);
+        let reference = reader.bin()?.to_vec();
+        let bytes = reader.bin()?.to_vec();
+        let expires_at = reader.optional_u64()?;
+        return if reader.0.is_empty() {
+            Ok(Logged::Shared {
+                partition,
+                reference,
+                bytes,
+                expires_at,
+            })
+        } else {
+            Err(Malformed)
+        };
+    }
     if tag == PUT {
         let partition = Partition::parse(reader.bin()?);
         let image = reader.bin()?.to_vec();

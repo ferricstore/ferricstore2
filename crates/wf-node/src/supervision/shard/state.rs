@@ -11,11 +11,12 @@
 
 mod capture;
 mod claim;
-mod events;
+pub(crate) mod events;
 mod flow;
 mod mutate;
 mod retention;
 mod store;
+mod value;
 
 pub(crate) use claim::Peeked;
 pub(crate) use mutate::{BatchItems, BatchReplies};
@@ -72,6 +73,12 @@ pub(crate) struct ShardState {
     next_sequence: u64,
     ready: u64,
     leased: u64,
+    /// Shared values by reference (ADR-014 step 5).
+    shared: HashMap<Vec<u8>, value::Shared>,
+    /// Named partitions by hash tag, to find a Flow from a value reference;
+    /// rebuilt on a miss when Flows were added since (`tags_at`).
+    tags: HashMap<String, Partition>,
+    tags_at: u64,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -97,6 +104,9 @@ impl ShardState {
             next_sequence: 0,
             ready: 0,
             leased: 0,
+            shared: HashMap::new(),
+            tags: HashMap::new(),
+            tags_at: 0,
         }
     }
 
@@ -110,27 +120,59 @@ impl ShardState {
         self.leased
     }
 
+    /// Applies a change that stores state as logged instead of deciding it:
+    /// a sweep, a marker, a shared value or an after-image. `None` for a
+    /// change the reducer decides.
+    fn apply_stored(&mut self, logged: &Logged) -> Option<Result<Outcome, ServiceError>> {
+        Some(match logged {
+            Logged::Expire { keys, .. } => Ok(self.expire(keys)),
+            Logged::Shared {
+                partition,
+                reference,
+                bytes,
+                expires_at,
+            } => {
+                self.store_shared(
+                    partition.clone(),
+                    reference.clone(),
+                    bytes.clone(),
+                    *expires_at,
+                );
+                Ok(Outcome::Changed)
+            }
+            Logged::Put { image: bytes, .. } => match image::decode_one(bytes) {
+                Some(restored) => {
+                    // An after-image carries the event its change appended.
+                    let event = restored.history.and_then(|mut events| events.pop());
+                    self.put(
+                        (restored.partition, restored.id),
+                        (
+                            restored.record,
+                            restored.priority,
+                            restored.meta.map(Box::new),
+                        ),
+                        event,
+                    );
+                    Ok(Outcome::Changed)
+                }
+                None => Err(ServiceError::Unavailable),
+            },
+            // A marker changes no record; replay handles it before apply.
+            Logged::Marker { .. } => Ok(Outcome::NotEligible),
+            Logged::Create { .. } | Logged::Claim { .. } | Logged::Complete { .. } => return None,
+        })
+    }
+
     /// Applies one change through the reducer and stores its write.
     pub(crate) fn apply(&mut self, logged: &Logged) -> Result<Outcome, ServiceError> {
+        if let Some(applied) = self.apply_stored(logged) {
+            return applied;
+        }
         let (now, partition, id, operation, priority) = match logged {
-            Logged::Expire { keys, .. } => return Ok(self.expire(keys)),
-            Logged::Put { image: bytes, .. } => {
-                let restored = image::decode_one(bytes).ok_or(ServiceError::Unavailable)?;
-                // An after-image carries the event its change appended.
-                let event = restored.history.and_then(|mut events| events.pop());
-                self.put(
-                    (restored.partition, restored.id),
-                    (
-                        restored.record,
-                        restored.priority,
-                        restored.meta.map(Box::new),
-                    ),
-                    event,
-                );
-                return Ok(Outcome::Changed);
-            }
-            // A marker changes no record; replay handles it before apply.
-            Logged::Marker { .. } => return Ok(Outcome::NotEligible),
+            Logged::Expire { .. }
+            | Logged::Shared { .. }
+            | Logged::Put { .. }
+            | Logged::Marker { .. } => return Ok(Outcome::NotEligible),
             Logged::Create {
                 now,
                 partition,

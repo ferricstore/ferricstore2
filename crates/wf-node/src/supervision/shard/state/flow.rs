@@ -46,8 +46,12 @@ impl ShardState {
             FlowCommand::Get(get) => (Ok(self.get_flow(&get, partition)), None),
             FlowCommand::History(query) => (Ok(self.history_term(&query, partition)), None),
             FlowCommand::Mutate(mutation) => self.mutate(now, &mutation, partition),
-            // Batches are split over shards before they reach one.
-            FlowCommand::Many(_) => (Err(ServiceError::Unavailable), None),
+            FlowCommand::ValuePut(put) => self.value_put(now, &put, partition),
+            // Batches and reads by reference are split over shards before
+            // they reach one.
+            FlowCommand::Many(_) | FlowCommand::ValueMget(_) => {
+                (Err(ServiceError::Unavailable), None)
+            }
         }
     }
 

@@ -65037,3 +65037,31 @@ retry audit kept, count, rev, event and worker filters, an empty list for a
 missing Flow) and all 42 node tests pass; the probe matched 19 of 20.
 Clippy, the ratchet, lint tests, docs and architecture pass. The fast-path
 cost is in ADR-014's progress section.
+
+### ADR014-VALUES1 named and shared values
+
+New artifacts (solo design review): `wf_application::commands::flow::value`
+(`ValuePut`, `ValueMget`, `ValueRef`, `parse_ref`, `parse_put`,
+`parse_mget`, `read_term`, `shared_id`; the file was committed unregistered
+with ADR014-HISTORY1 and is registered now), `FlowCommand::{ValuePut,
+ValueMget}`, `Mutation::override_values`, `history::HistoryKind`
+(`value_put` beside the domain kinds), `routing::{Partition::tag,
+slot_for_tag, base64url_decode}` with data format 2 tags. In `wf-node`:
+`supervision::shard::state::value` (named and shared values, reads, the lazy
+tag-to-partition map), `Logged::Shared` (tag 8), `Request::ValueRead`,
+shared values in shard images (snapshot version 4), value routing in
+`composition::flow`. In `wf-api-tcp`: opcodes 0x020B and 0x020C and the
+compact read body (tag `0x9D`). No dependency or policy change.
+
+RED: `tests/queue_node` value tests failed (the commands were not parsed;
+`override_values` was refused), and `slots_match_elixir_for_auto_and_named_
+partitions`, updated to format 2 vectors computed with Python's hashlib,
+zlib and base64, failed (914 for format 1 against 861). GREEN: 2 value tests
+(same bytes, conflict, override, record version and time, `value_put`
+history, shared references, reads of every reference kind with `max_bytes`,
+all across a restart with 3 shards; a mutation needing `override_values`),
+the routing tests, all 44 node tests, the TCP adapter and application tests
+pass. Found while writing them: named values had taken the record version;
+they now count on their own, as in Elixir. The value scenario matched
+Elixir exactly; the SDK suite passes 22 (was 19). Clippy, the ratchet, lint
+tests, docs and architecture pass.

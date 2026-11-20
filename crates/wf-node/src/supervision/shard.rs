@@ -77,6 +77,12 @@ pub(crate) enum Request {
         atomic: bool,
         done: Done<state::BatchReplies>,
     },
+    /// Values by reference; replies are by request position.
+    ValueRead {
+        refs: Vec<(usize, Vec<u8>)>,
+        max_bytes: u64,
+        done: Done<Vec<(usize, Term)>>,
+    },
     /// Any other Flow command, for the Flow in `partition` (ADR-014).
     Flow {
         command: Box<FlowCommand>,
@@ -117,7 +123,7 @@ fn handle(
 ) -> Option<Finish> {
     let finish: Finish = match request {
         Request::Capture { snapshot, done } => {
-            let image = state.image();
+            let image = state.image(now);
             logged.push(Logged::Marker {
                 snapshot,
                 shard: index,
@@ -178,6 +184,14 @@ fn handle(
             let (result, change) = state.execute(now, *command, partition);
             logged.extend(change);
             Box::new(move |durable| done(durable.and(result)))
+        }
+        Request::ValueRead {
+            refs,
+            max_bytes,
+            done,
+        } => {
+            let values = state.read_values(now, refs, max_bytes);
+            Box::new(move |durable| done(durable.map(|()| values)))
         }
         Request::FlowBatch {
             items,
