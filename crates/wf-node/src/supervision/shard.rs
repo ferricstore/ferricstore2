@@ -9,6 +9,7 @@
 //! the shard refuses everything until the node restarts and replays the log.
 
 pub(crate) mod command;
+pub(crate) mod image;
 pub(crate) mod state;
 
 use std::sync::Arc;
@@ -61,6 +62,9 @@ pub(crate) enum Request {
         partitions: Option<Arc<[Partition]>>,
         done: Box<dyn FnOnce(Peeked) + Send>,
     },
+    /// Encode this shard's records for snapshot `snapshot` and log its
+    /// marker; the image is handed over once the marker is durable.
+    Capture { snapshot: u64, done: Done<Vec<u8>> },
     /// Complete Flows; items keep their request position.
     Complete {
         items: Vec<(usize, CompleteFlow, Partition)>,
@@ -70,6 +74,8 @@ pub(crate) enum Request {
 
 /// The thread's connections to the rest of the node.
 pub(crate) struct Links {
+    /// This shard's index, named in its snapshot markers.
+    pub(crate) index: u16,
     pub(crate) log: Arc<GroupLog>,
     pub(crate) completions: Sender<Completion>,
     pub(crate) ready: Arc<AtomicU64>,
@@ -92,11 +98,21 @@ fn committed_now(previous: u64) -> u64 {
 /// `None` when it was answered already.
 fn handle(
     state: &mut ShardState,
-    now: u64,
+    (index, now): (u16, u64),
     request: Request,
     logged: &mut Vec<Logged>,
 ) -> Option<Finish> {
     let finish: Finish = match request {
+        Request::Capture { snapshot, done } => {
+            let image = state.image();
+            logged.push(Logged::Marker {
+                snapshot,
+                shard: index,
+            });
+            Box::new(move |durable| {
+                done(durable.and_then(|()| image.ok_or(ServiceError::Unavailable)));
+            })
+        }
         Request::Create {
             flow_type,
             state: initial,
@@ -229,7 +245,7 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         }
         let finishes: Vec<Finish> = round
             .into_iter()
-            .filter_map(|request| handle(&mut state, now, request, &mut logged))
+            .filter_map(|request| handle(&mut state, (links.index, now), request, &mut logged))
             .collect();
         if !failed {
             match append(&links.log, &logged, links.max_append_bytes, sequence) {

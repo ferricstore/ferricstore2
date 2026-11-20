@@ -109,3 +109,31 @@ fn a_checkpoint_past_the_current_segment_is_refused() -> TestResult {
     std::fs::remove_dir_all(directory)?;
     Ok(())
 }
+
+#[test]
+fn the_current_segment_follows_rotations() -> TestResult {
+    let directory = directory("current")?;
+    let path = directory.join("log");
+    let limits = GroupLogLimits {
+        max_segment_bytes: 200,
+        ..GroupLogLimits::default()
+    };
+    {
+        let (log, _) = GroupLog::open(&path, limits)?;
+        assert_eq!(log.current_segment(), 0);
+        let rotated = log.rotate()?;
+        assert_eq!(log.current_segment(), rotated);
+        append_waited(&log, 0..20)?;
+        let newest = segments(&path)?.last().copied().ok_or("no segment")?;
+        assert!(newest > rotated);
+        assert_eq!(log.current_segment(), newest);
+    }
+    let (log, recovered) = GroupLog::open(&path, limits)?;
+    assert_eq!(
+        Some(log.current_segment()),
+        recovered.segments.last().copied()
+    );
+    drop(log);
+    std::fs::remove_dir_all(directory)?;
+    Ok(())
+}

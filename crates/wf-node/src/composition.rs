@@ -1,36 +1,44 @@
 //! The queue node (ADR-011, ADR-013).
 //!
-//! Opening the node opens the group log, replays every logged change into
-//! the shards, then starts one thread per shard, the completion thread and
-//! the waiter thread. The node implements the queue service by routing each
-//! Flow to the shard that owns its partition; claims run in
-//! [`claim`](self::claim).
+//! The data directory holds `log/` and `snapshots/`. Opening the node loads
+//! the newest snapshot, replays the log changes it does not hold, then starts
+//! one thread per shard, the completion thread, the waiter thread and the
+//! snapshot thread. The node implements the queue service by routing each
+//! Flow to the shard that owns its partition; claims run in the private
+//! `claim` module.
 
 mod claim;
 mod gather;
+mod replay;
 mod router;
+mod snapshot;
 
 use std::fmt;
 use std::path::Path;
 use std::sync::atomic::AtomicU64;
 use std::sync::{Arc, mpsc};
 use std::thread::JoinHandle;
+use std::time::Duration;
 
 use wf_application::commands::queue::{
     ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, Partition, QueueService,
     Reply, SLOTS, ServiceError,
 };
 use wf_domain::retention::ResolvedRetention;
-use wf_domain::workflow::Outcome;
 use wf_storage::log::{GroupLog, GroupLogError, GroupLogLimits};
+use wf_storage::snapshot::files::{SnapshotError, SnapshotFiles};
 
-use crate::supervision::shard::command::Logged;
 use crate::supervision::shard::state::ShardState;
 use crate::supervision::shard::{self, Links, Request};
 use crate::supervision::waiters::Waiters;
-use crate::supervision::{self, completer};
+use crate::supervision::{self, completer, snapshots};
 use gather::ItemGather;
-use router::{Router, ShardLink, shard_index};
+use replay::replay;
+use router::{Router, ShardLink};
+use snapshot::Snapshots;
+
+/// How often the snapshot thread checks whether a snapshot is due.
+const SNAPSHOT_CHECK: Duration = Duration::from_millis(250);
 
 /// Node settings.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -41,6 +49,8 @@ pub struct QueueNodeConfig {
     pub log: GroupLogLimits,
     /// How long completed Flows are kept before removal (ADR-013).
     pub retention_ms: u64,
+    /// Log segments between automatic snapshots; 0 takes none (ADR-013).
+    pub snapshot_segments: u64,
 }
 
 impl Default for QueueNodeConfig {
@@ -52,6 +62,7 @@ impl Default for QueueNodeConfig {
                 ..GroupLogLimits::default()
             },
             retention_ms: ResolvedRetention::default().ttl_ms,
+            snapshot_segments: 2,
         }
     }
 }
@@ -70,6 +81,20 @@ pub enum NodeError {
     },
     /// A runtime thread did not start.
     Thread,
+    /// Snapshot storage refused a read, write or removal.
+    Snapshot(SnapshotError),
+    /// A snapshot body or shard image does not decode.
+    SnapshotImage,
+    /// A shard of the loaded snapshot never logged its marker, so the log
+    /// does not match the snapshot.
+    MissingMarker {
+        /// The shard, under the snapshot's shard count.
+        shard: u16,
+    },
+    /// A shard did not capture its records for a snapshot.
+    Capture,
+    /// The node is stopping.
+    Stopped,
 }
 
 impl fmt::Display for NodeError {
@@ -79,6 +104,13 @@ impl fmt::Display for NodeError {
             Self::Log(error) => write!(formatter, "group log: {error}"),
             Self::Replay { record } => write!(formatter, "logged change {record} does not replay"),
             Self::Thread => formatter.write_str("a runtime thread did not start"),
+            Self::Snapshot(error) => write!(formatter, "snapshot: {error}"),
+            Self::SnapshotImage => formatter.write_str("a snapshot does not decode"),
+            Self::MissingMarker { shard } => {
+                write!(formatter, "the log lacks shard {shard}'s snapshot marker")
+            }
+            Self::Capture => formatter.write_str("a shard did not capture its snapshot"),
+            Self::Stopped => formatter.write_str("the node is stopping"),
         }
     }
 }
@@ -91,6 +123,12 @@ impl From<GroupLogError> for NodeError {
     }
 }
 
+impl From<SnapshotError> for NodeError {
+    fn from(error: SnapshotError) -> Self {
+        Self::Snapshot(error)
+    }
+}
+
 /// The running queue node. Dropping it stops the shards, releases their
 /// pending replies, fails waiting claims and closes the log.
 pub struct QueueNode {
@@ -99,62 +137,66 @@ pub struct QueueNode {
     shards: Vec<JoinHandle<()>>,
     completer: Option<JoinHandle<()>>,
     waiter: Option<JoinHandle<()>>,
+    snapshots: Arc<Snapshots>,
+    snapshot_stop: Option<mpsc::Sender<()>>,
+    snapshotter: Option<JoinHandle<()>>,
 }
 
-fn replay(states: &mut [ShardState], records: &[Vec<u8>], shards: u16) -> Result<(), NodeError> {
-    for (position, record) in records.iter().enumerate() {
-        let failed = NodeError::Replay { record: position };
-        let logged = Logged::decode(record).ok_or(failed)?;
-        for (index, change) in by_shard(logged, shards).ok_or(failed)? {
-            let state = states.get_mut(index).ok_or(failed)?;
-            if state.apply(&change) != Ok(Outcome::Changed) {
-                return Err(failed);
-            }
-        }
-    }
-    Ok(())
-}
-
-/// Routes a logged change to the shards owning its Flows; a sweep is split
-/// into one sweep per shard.
-fn by_shard(logged: Logged, shards: u16) -> Option<Vec<(usize, Logged)>> {
-    let Logged::Expire { now, keys } = logged else {
-        let index = shard_index(logged.partition()?, shards)?;
-        return Some(vec![(index, logged)]);
-    };
-    let mut parts: Vec<(usize, Logged)> = Vec::new();
-    for key in keys {
-        let index = shard_index(&key.0, shards)?;
-        match parts.iter_mut().find(|(owner, _)| *owner == index) {
-            Some((_, Logged::Expire { keys, .. })) => keys.push(key),
-            _ => parts.push((
-                index,
-                Logged::Expire {
-                    now,
-                    keys: vec![key],
-                },
-            )),
-        }
-    }
-    Some(parts)
+/// Starts the snapshot thread; dropping the returned sender stops it.
+fn start_snapshots(
+    snapshots: &Arc<Snapshots>,
+    router: &Arc<Router>,
+) -> Result<(mpsc::Sender<()>, JoinHandle<()>), NodeError> {
+    let (stop_sender, stop) = mpsc::channel();
+    let snapshots = Arc::clone(snapshots);
+    let router = Arc::downgrade(router);
+    let thread = supervision::spawn("wf-snapshots".into(), move || {
+        snapshots::run(&stop, SNAPSHOT_CHECK, || snapshots.check(&router));
+    })
+    .ok_or(NodeError::Thread)?;
+    Ok((stop_sender, thread))
 }
 
 impl QueueNode {
-    /// Opens the log in `directory`, replays it and starts the threads.
+    /// Opens the node in `directory`: loads the newest snapshot, replays the
+    /// log after it and starts the threads.
     ///
     /// # Errors
-    /// Refuses an invalid shard count, a log that does not open, a logged
-    /// change that does not replay and a thread that does not start.
+    /// Refuses an invalid shard count, a log or snapshot that does not open
+    /// or decode, a logged change that does not replay, a missing snapshot
+    /// marker and a thread that does not start.
     pub fn open(directory: &Path, config: QueueNodeConfig) -> Result<Self, NodeError> {
         if config.shards == 0 || config.shards > SLOTS {
             return Err(NodeError::InvalidShards);
         }
-        let (log, recovered) = GroupLog::open(directory, config.log)?;
-        let log = Arc::new(log);
+        let files = SnapshotFiles::open(&directory.join("snapshots"))?;
         let mut states: Vec<ShardState> = (0..config.shards)
             .map(|_| ShardState::new(config.retention_ms))
             .collect();
-        replay(&mut states, &recovered.records, config.shards)?;
+        let mut cut = match files.newest()? {
+            Some((id, body)) => Some(snapshot::load(&mut states, id, &body, config.shards)?),
+            None => None,
+        };
+        let (log, recovered) = GroupLog::open(&directory.join("log"), config.log)?;
+        let log = Arc::new(log);
+        let newest_marker = replay(&mut states, &recovered.records, config.shards, cut.as_mut())?;
+        let (next, base) = match &cut {
+            Some(cut) => (cut.id.max(newest_marker), cut.base),
+            None => (
+                newest_marker,
+                recovered.segments.first().copied().unwrap_or(0),
+            ),
+        };
+        let snapshots = Arc::new(Snapshots::new(
+            files,
+            Arc::clone(&log),
+            config.snapshot_segments,
+            next.saturating_add(1),
+            base,
+        ));
+        if let Some(cut) = &cut {
+            snapshots.tidy(cut)?;
+        }
         let (waiter_sender, waiter_receiver) = mpsc::channel();
         let waiters = Waiters::new(waiter_sender);
         let waiter_handle = waiters.clone();
@@ -175,6 +217,7 @@ impl QueueNode {
             let ready = Arc::new(AtomicU64::new(state.ready()));
             let leased = Arc::new(AtomicU64::new(state.leased()));
             let shard_links = Links {
+                index: u16::try_from(index).map_err(|_| NodeError::InvalidShards)?,
                 log: Arc::clone(&log),
                 completions: completion_sender.clone(),
                 ready: Arc::clone(&ready),
@@ -199,13 +242,28 @@ impl QueueNode {
             shard_count: config.shards,
             waiters: waiters.clone(),
         };
+        let router = Arc::new(router);
+        let (snapshot_stop, snapshotter) = start_snapshots(&snapshots, &router)?;
         Ok(Self {
-            router: Some(Arc::new(router)),
+            router: Some(router),
             waiters,
             shards: threads,
             completer: Some(completer),
             waiter: Some(waiter),
+            snapshots,
+            snapshot_stop: Some(snapshot_stop),
+            snapshotter: Some(snapshotter),
         })
+    }
+
+    /// Takes a snapshot now and removes the log before it; returns its id.
+    ///
+    /// # Errors
+    /// Refuses when the log cannot rotate or remove segments, a shard does
+    /// not capture, or snapshot storage fails; the log then stays as it was.
+    pub fn snapshot(&self) -> Result<u64, NodeError> {
+        let router = self.router.as_ref().ok_or(NodeError::Stopped)?;
+        self.snapshots.take(router)
     }
 
     fn per_shard<T>(
@@ -318,6 +376,11 @@ impl Drop for QueueNode {
     /// Closes the shards' channels, waits for the shards and the completion
     /// thread, then stops the waiter thread, which fails what still waits.
     fn drop(&mut self) {
+        self.snapshot_stop = None;
+        if let Some(snapshotter) = self.snapshotter.take() {
+            // A runtime thread only returns; a join error has nothing to report.
+            let _joined = snapshotter.join();
+        }
         self.router = None;
         for thread in self.shards.drain(..) {
             // A runtime thread only returns; a join error has nothing to report.

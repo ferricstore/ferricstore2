@@ -9,6 +9,7 @@
 //! `running` by lease deadline, for reclaim (ADR-013). Terminal records are
 //! kept until their retention ends, then removed by a logged sweep.
 
+mod capture;
 mod claim;
 mod retention;
 
@@ -100,6 +101,8 @@ impl ShardState {
     pub(crate) fn apply(&mut self, logged: &Logged) -> Result<Outcome, ServiceError> {
         let (now, partition, id, operation, priority) = match logged {
             Logged::Expire { keys, .. } => return Ok(self.expire(keys)),
+            // A marker changes no record; replay handles it before apply.
+            Logged::Marker { .. } => return Ok(Outcome::NotEligible),
             Logged::Create {
                 now,
                 partition,

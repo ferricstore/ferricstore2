@@ -173,7 +173,7 @@ impl GroupLog {
             max_block_bytes: limits.max_block_bytes,
             max_segment_bytes: limits.max_segment_bytes,
         };
-        let shared = Arc::new(Shared::new());
+        let shared = Arc::new(Shared::new(segment));
         let handle = writer::spawn(Arc::clone(&shared), writer)?;
         let log = Self {
             shared,
@@ -246,6 +246,12 @@ impl GroupLog {
     pub fn remove_before(&self, segment: u64) -> Result<(), GroupLogError> {
         let sequence = self.shared.enqueue(Item::RemoveBefore(segment))?;
         self.shared.outcome(sequence).map(drop)
+    }
+
+    /// The segment new appends go to: the newest present segment.
+    #[must_use]
+    pub fn current_segment(&self) -> u64 {
+        self.shared.segment()
     }
 
     /// Syncs performed since open; fewer syncs than waited appends shows that

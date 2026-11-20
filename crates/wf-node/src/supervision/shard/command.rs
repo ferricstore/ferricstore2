@@ -15,6 +15,7 @@ const CLAIM: u8 = 2;
 const COMPLETE: u8 = 3;
 const RECLAIM: u8 = 4;
 const EXPIRE: u8 = 5;
+const MARKER: u8 = 6;
 
 /// One logged change to one Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -53,6 +54,9 @@ pub(crate) enum Logged {
         now: u64,
         keys: Vec<(Partition, Vec<u8>)>,
     },
+    /// Where a shard captured its state for a snapshot: its records logged
+    /// before this are in the snapshot, those after it are not.
+    Marker { snapshot: u64, shard: u16 },
 }
 
 impl Logged {
@@ -62,7 +66,7 @@ impl Logged {
             Self::Create { partition, .. }
             | Self::Claim { partition, .. }
             | Self::Complete { partition, .. } => Some(partition),
-            Self::Expire { .. } => None,
+            Self::Expire { .. } | Self::Marker { .. } => None,
         }
     }
 
@@ -119,6 +123,11 @@ impl Logged {
                 out.extend_from_slice(&fence.to_be_bytes());
                 optional_bin(&mut out, result.as_deref())?;
             }
+            Self::Marker { snapshot, shard } => {
+                out.push(MARKER);
+                out.extend_from_slice(&snapshot.to_be_bytes());
+                out.extend_from_slice(&shard.to_be_bytes());
+            }
             Self::Expire { now, keys } => {
                 out.push(EXPIRE);
                 out.extend_from_slice(&now.to_be_bytes());
@@ -139,12 +148,23 @@ impl Logged {
 }
 
 /// A record that is not exactly one valid change.
-struct Malformed;
+pub(super) struct Malformed;
 
 fn decode(bytes: &[u8]) -> Result<Logged, Malformed> {
     let mut reader = Reader(bytes);
     let tag = reader.u8()?;
     let now = reader.u64()?;
+    if tag == MARKER {
+        let shard = u16::from_be_bytes(reader.array()?);
+        return if reader.0.is_empty() {
+            Ok(Logged::Marker {
+                snapshot: now,
+                shard,
+            })
+        } else {
+            Err(Malformed)
+        };
+    }
     if tag == EXPIRE {
         let count = u32::from_be_bytes(reader.array()?);
         let mut keys = Vec::new();
@@ -204,13 +224,13 @@ fn head(out: &mut Vec<u8>, now: u64, partition: &Partition, id: &[u8]) -> Option
     bin(out, id)
 }
 
-fn bin(out: &mut Vec<u8>, bytes: &[u8]) -> Option<()> {
+pub(super) fn bin(out: &mut Vec<u8>, bytes: &[u8]) -> Option<()> {
     out.extend_from_slice(&u32::try_from(bytes.len()).ok()?.to_be_bytes());
     out.extend_from_slice(bytes);
     Some(())
 }
 
-fn optional_bin(out: &mut Vec<u8>, bytes: Option<&[u8]>) -> Option<()> {
+pub(super) fn optional_bin(out: &mut Vec<u8>, bytes: Option<&[u8]>) -> Option<()> {
     match bytes {
         None => out.push(0),
         Some(bytes) => {
@@ -221,7 +241,7 @@ fn optional_bin(out: &mut Vec<u8>, bytes: Option<&[u8]>) -> Option<()> {
     Some(())
 }
 
-fn optional_u64(out: &mut Vec<u8>, value: Option<u64>) {
+pub(super) fn optional_u64(out: &mut Vec<u8>, value: Option<u64>) {
     match value {
         None => out.push(0),
         Some(value) => {
@@ -231,34 +251,34 @@ fn optional_u64(out: &mut Vec<u8>, value: Option<u64>) {
     }
 }
 
-struct Reader<'a>(&'a [u8]);
+pub(super) struct Reader<'a>(pub(super) &'a [u8]);
 
 impl<'a> Reader<'a> {
-    fn take(&mut self, length: usize) -> Result<&'a [u8], Malformed> {
+    pub(super) fn take(&mut self, length: usize) -> Result<&'a [u8], Malformed> {
         let (head, rest) = self.0.split_at_checked(length).ok_or(Malformed)?;
         self.0 = rest;
         Ok(head)
     }
 
-    fn array<const N: usize>(&mut self) -> Result<[u8; N], Malformed> {
+    pub(super) fn array<const N: usize>(&mut self) -> Result<[u8; N], Malformed> {
         self.take(N)?.try_into().map_err(|_| Malformed)
     }
 
-    fn u8(&mut self) -> Result<u8, Malformed> {
+    pub(super) fn u8(&mut self) -> Result<u8, Malformed> {
         let [byte] = self.array()?;
         Ok(byte)
     }
 
-    fn u64(&mut self) -> Result<u64, Malformed> {
+    pub(super) fn u64(&mut self) -> Result<u64, Malformed> {
         self.array().map(u64::from_be_bytes)
     }
 
-    fn bin(&mut self) -> Result<&'a [u8], Malformed> {
+    pub(super) fn bin(&mut self) -> Result<&'a [u8], Malformed> {
         let length = u32::from_be_bytes(self.array()?);
         self.take(usize::try_from(length).map_err(|_| Malformed)?)
     }
 
-    fn optional_bin(&mut self) -> Result<Option<Vec<u8>>, Malformed> {
+    pub(super) fn optional_bin(&mut self) -> Result<Option<Vec<u8>>, Malformed> {
         match self.u8()? {
             0 => Ok(None),
             1 => Ok(Some(self.bin()?.to_vec())),
@@ -266,7 +286,7 @@ impl<'a> Reader<'a> {
         }
     }
 
-    fn optional_u64(&mut self) -> Result<Option<u64>, Malformed> {
+    pub(super) fn optional_u64(&mut self) -> Result<Option<u64>, Malformed> {
         match self.u8()? {
             0 => Ok(None),
             1 => self.u64().map(Some),

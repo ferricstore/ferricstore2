@@ -128,7 +128,8 @@ commands follow their existing milestones.
 
   Not done in the node: blocking claims, expired-lease reclaim, FIFO and
   policies, retention of completed Flows, and snapshots (so `remove_before`
-  is never called and replay reads the whole log).
+  is never called and replay reads the whole log). Since done, except FIFO
+  and policies, in ADR-013.
 - Step 3, TCP listener: `wf_api_tcp::session::serve` runs FSNP sessions on
   Tokio 1.54.1 (`io-util`, `net`, `rt-multi-thread`, `sync`; no macros),
   newly allowed for `wf-api-tcp` and `wf-node`. A reader loop dispatches each

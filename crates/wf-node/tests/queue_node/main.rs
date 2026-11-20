@@ -22,6 +22,7 @@ mod reclaim;
 mod restart;
 mod retention;
 mod selection;
+mod snapshot;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
@@ -48,7 +49,7 @@ fn open(path: &Path, shards: u16) -> TestResult<QueueNode> {
 }
 
 fn open_with(path: &Path, config: QueueNodeConfig) -> TestResult<QueueNode> {
-    Ok(QueueNode::open(&path.join("log"), config)?)
+    Ok(QueueNode::open(path, config)?)
 }
 
 /// Calls a service method and waits for its single reply.

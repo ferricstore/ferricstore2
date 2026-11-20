@@ -64889,3 +64889,38 @@ refused as existing, then removed and created again; removals and the second
 Flows survive a restart with 3 shards; an open Flow is never removed and a
 completed Flow within the default retention stays across a restart), with
 all 23 node tests. Clippy, the ratchet and the architecture tests pass.
+
+### ADR013-SNAPSHOT1 node snapshots and log removal
+
+`wf_storage::snapshot::files::{SnapshotFiles, SnapshotError}` (temp file,
+SHA-256 trailer, sync, rename, directory sync; missing directories created
+durably; leftover temp files removed on open); `wf-storage::snapshot::files`
+joins `durable_sync_modules`. `GroupLog::current_segment`. In `wf-node`:
+`Logged::Marker` (tag 6), `Request::Capture`, private
+`supervision::shard::image` (records restored through `restore_record`),
+`supervision::shard::state::capture`, `supervision::snapshots` (the thread,
+covered by `wf-node::supervision`), `composition::{replay, snapshot}`;
+`QueueNode::snapshot`, `QueueNodeConfig.snapshot_segments` (default 2) and
+new `NodeError` variants. The data directory now holds `log/` and
+`snapshots/`. Snapshot ids never repeat: the id advances before markers are
+logged, and on open the next id starts above every marker in the log. No
+dependency change.
+
+RED: the new storage tests did not compile (no `current_segment`, no
+`snapshot::files`); `tests/queue_node` did not compile (no
+`snapshot_segments`, no `QueueNode::snapshot`); after the module existed,
+`missing_parent_directories_are_created` failed. GREEN: 5 snapshot-file
+tests and the rotation test pass; 29 node tests pass three runs in a row,
+including a restart from a snapshot with 4 and 7 shards, records the
+snapshot holds skipped when removed segments are put back (as after a crash
+between writing a snapshot and removing segments), a damaged snapshot and a
+missing marker refused, automatic snapshots removing segments, and a SIGKILL
+run that takes a snapshot every fifth batch losing none of 3,000
+acknowledged creates. Clippy, the ratchet and the architecture tests pass.
+Measurements are in ADR-013's progress section.
+
+The full gate on this change: 2,151 tests in 62 groups, none failed or
+ignored; fmt, Clippy, ratchet, architecture, reference, progress and
+cargo-deny pass. `cargo doc` first failed on a private intra-doc link added
+with ADR013-BLOCKING1 (`composition` linked to the private `claim` module);
+it now names the module in plain text, and the docs build.

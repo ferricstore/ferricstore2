@@ -44,6 +44,8 @@ pub(super) struct Shared {
     durable: Mutex<Durable>,
     durable_changed: Condvar,
     syncs: AtomicU64,
+    /// The segment appends go to.
+    segment: AtomicU64,
 }
 
 /// Critical sections only move values, so a poisoned lock still holds
@@ -53,7 +55,7 @@ fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 }
 
 impl Shared {
-    pub(super) fn new() -> Self {
+    pub(super) fn new(segment: u64) -> Self {
         Self {
             queue: Mutex::new(Queue {
                 items: Vec::new(),
@@ -68,6 +70,7 @@ impl Shared {
             }),
             durable_changed: Condvar::new(),
             syncs: AtomicU64::new(0),
+            segment: AtomicU64::new(segment),
         }
     }
 
@@ -128,6 +131,10 @@ impl Shared {
         self.syncs.load(Ordering::Relaxed)
     }
 
+    pub(super) fn segment(&self) -> u64 {
+        self.segment.load(Ordering::Relaxed)
+    }
+
     /// Waits for queued items; returns them and whether the log is closing.
     fn take(&self) -> (Vec<(u64, Item)>, bool) {
         let mut queue = lock(&self.queue);
@@ -168,7 +175,7 @@ pub(super) struct Writer {
 }
 
 impl Writer {
-    fn rotate(&mut self) -> Result<u64, GroupLogError> {
+    fn rotate(&mut self, shared: &Shared) -> Result<u64, GroupLogError> {
         let next = self
             .segment
             .checked_add(1)
@@ -179,6 +186,7 @@ impl Writer {
             .map_err(|_| GroupLogError::Uncertain)?;
         self.segment = next;
         self.length = 0;
+        shared.segment.store(next, Ordering::Relaxed);
         Ok(next)
     }
 
@@ -190,7 +198,7 @@ impl Writer {
             .checked_add(added)
             .ok_or(GroupLogError::TooLarge)?;
         if self.length > 0 && grown > self.max_segment_bytes {
-            self.rotate()?;
+            self.rotate(shared)?;
         }
         self.current
             .append(&bytes)
@@ -249,7 +257,7 @@ impl Writer {
                 }
                 Item::Rotate => {
                     self.flush(shared, &mut pending, last)?;
-                    Ok(self.rotate()?)
+                    Ok(self.rotate(shared)?)
                 }
                 Item::RemoveBefore(before) => {
                     self.flush(shared, &mut pending, last)?;

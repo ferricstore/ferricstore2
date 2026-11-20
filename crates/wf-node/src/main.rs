@@ -2,8 +2,9 @@
 //! serves the FSNP queue commands on one TCP port.
 //!
 //! Usage: `ferricstore2 --data-dir PATH [--host 127.0.0.1] [--port 6388]
-//! [--shards 16] [--threads N] [--retention-ms 604800000]`. Port 0 picks a
-//! free port. Once listening it prints `READY port=<port> shards=<n>`.
+//! [--shards 16] [--threads N] [--retention-ms 604800000]`. The data
+//! directory holds `log/` and `snapshots/`. Port 0 picks a free port. Once
+//! listening it prints `READY port=<port> shards=<n>`.
 
 #![forbid(unsafe_code)]
 

@@ -14,3 +14,5 @@ mod record_capture;
 mod state_keys;
 #[path = "state_values/main.rs"]
 mod state_values;
+
+mod snapshot_files;

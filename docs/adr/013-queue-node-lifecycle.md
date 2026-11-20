@@ -103,8 +103,7 @@ forever on that.
 
 - SDK workers with default options (reclaim on) work against the node.
 - A snapshot briefly holds every shard's encoded records in memory, and a
-  shard pauses while it encodes its own (about 10 ms per 60,000 Flows,
-  measured in the progress notes).
+  shard pauses while it encodes its own. Measured in the progress notes.
 - Retained terminal Flows stay in memory until they expire. With the 7-day
   default, memory is bounded by throughput times 7 days. Spilling them to
   disk is not part of this ADR.
@@ -119,3 +118,17 @@ forever on that.
   priority match; a claim with a partition filter may wake for a create in
   another partition, try, and park again.
 - Decision 4 done: retention of terminal Flows (ADR013-RETENTION1).
+- Decision 5 done: snapshots (ADR013-SNAPSHOT1). Release build, M4 Max,
+  16 shards, 1,000,000 created Flows: a snapshot took 330-390 ms end to end
+  (126 MB, about 126 bytes per Flow, written and synced), and reopening the
+  node from it took 0.66 s. Shards capture in parallel; each pauses only
+  for its own encoding, a part of that time.
+- SDK queue benchmark after all five decisions, alternating with the
+  previous commit (7dc4c42) on the same busy machine (load average 8 to 10):
+  one client, 100,000 Flows, five runs each: median 62,978 flows/s against
+  58,182, CPU 9.9 against 9.8 ms per 1,000 Flows, RSS 185 against 162 MB
+  (the removal index and leased index). Four clients, 400,000 Flows, two
+  runs each: 238,674 and 233,543 against 234,955 and 236,162 flows/s, CPU
+  8.8 against 8.0 ms per 1,000 Flows (shortfall rounds when clients race).
+  This morning's 75,763 flows/s ran on a quieter machine and is not
+  comparable.
