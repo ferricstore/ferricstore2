@@ -64817,3 +64817,12 @@ check accepts the binary. A smoke run of the Python SDK queue benchmark
 (10,000 flows) against the release binary created, claimed and completed
 every flow.
 
+### ADR011-SDK-BENCHMARK1 product against the SDK queue benchmark
+
+Recorded in ADR-011 with raw rows on `claude/fsnp-slice` (7ff46e2). Same
+machine and session: product 75,763 flows/s median (1 client, client-bound),
+spike 71,714/s, Elixir 11,077/s; 4 clients: product 272,056/s, spike 296,369/s.
+Every run created and completed all flows. Final gate on b364939: 2,190 tests
+in 67 groups, none failed or ignored; fmt, Clippy, ratchet, docs, architecture,
+reference, progress and cargo-deny pass (344 s).
+

@@ -140,4 +140,25 @@ commands follow their existing milestones.
   an explicit error. Compact codecs are declared only for claim jobs and the
   batch ok-list. Non-independent `FLOW.CREATE_MANY`, blocking claims and
   expired-lease reclaim are refused by name.
-- Step 3, node binary and SDK benchmark: next.
+- Step 3, node binary and SDK benchmark (b364939): `ferricstore2` serves the
+  queue over FSNP. The Python SDK's canonical queue benchmark (`--transport
+  many --partition-mode auto --claim-job-only`, 16 workers, 32 producers,
+  batches of 500, 16 shards), unchanged, against the release build on the M4
+  Max, 2026-11-20 (driver and raw rows: `claude/fsnp-slice` 7ff46e2,
+  `results/2026-11-20-macos`):
+
+  | | product | spike, shared WAL | Elixir 6a5f2bc34 |
+  |---|---|---|---|
+  | flows/s, 1 client, 100k flows | 75,763 (72,805-79,929, 3 rounds) | 71,714 (71,632-75,481) | 11,077 (1 round) |
+  | server CPU per 1k flows | 8.6-9.1 ms | 3.7-4.3 ms | 1,077 ms, plus 189 s after the run |
+  | RSS | 161-170 MB | 109-115 MB | 1.77 GB |
+  | queue p99 | 255-366 ms | 335-403 ms | 3.7 s |
+  | flows/s, 4 clients, 400k flows | 272,056 (588 MB) | 296,369 (310 MB) | not rerun (timed out on 2026-11-15) |
+
+  One Python client sits at 85-88% CPU against either Rust server, so the
+  1-client rows are client-bound. The product spends about twice the spike's
+  CPU per Flow and 1.5-2x its memory: every decision goes through the domain
+  reducer, which clones whole records and builds history entries the node
+  does not keep yet.
+- Next: snapshots so checkpoints can remove log segments, retention of
+  completed Flows, blocking claims and reclaim, and the remaining commands.
