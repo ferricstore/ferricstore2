@@ -64670,3 +64670,23 @@ reference and progress. cargo-deny failed only on RUSTSEC-2026-0486 (rustix
 lock bump c949b04 to 1.1.6 makes advisories, bans, licenses and sources pass.
 No Linux evidence is claimed.
 
+### ADR011-FSNP-CODEC1 concrete solo architecture decision
+
+ADR-011 records the runtime shape measured by the fsnp-slice spike (FSNP v1 on
+the TCP adapter, one group-committed node log, shard-owned apply threads, no
+fixed small batch cap) and supersedes the FWTP/1 compatibility decision. First
+step: the FSNP v1 codec in `wf-api-tcp`, filling the existing `frame`,
+`request`, `response` and private `codec` modules. New files:
+`src/codec/{reader,value,tests}.rs`, `src/request/{typed,compact}.rs`,
+`tests/fsnp/{main,frame,requests,responses,robustness}.rs` and 12 captured
+fixtures (SDK request bodies and Elixir reply bodies from the 2026-11-15 spike
+runs; HELLO/STARTUP captures are left out until those frames are implemented).
+No dependency, policy or public root-module change.
+
+RED: the 18 integration tests did not compile (32 errors: the request and
+response functions did not exist). GREEN: 5 unit, 18 integration and 1 doc
+test pass; Clippy with warnings denied, the ADR-010 ratchet (no new
+panic-prone site; every codec read is bounded) and all 66 architecture tests
+pass. Replies for complete OK, stale lease, not found, already exists, compact
+ok-list, per-item partial and compact claim jobs are byte-identical to Elixir.
+

@@ -10,6 +10,9 @@ Use a dedicated client listener. Raft replication, membership administration, ge
 
 ## Compatibility decision
 
+Superseded by [ADR-011](../adr/011-fast-runtime-shape.md) on 2026-11-20: the adapter speaks FSNP v1 so the existing SDKs connect unchanged. The proposal below is kept as the record of the earlier decision.
+
+
 Propose a new workflow-only protocol, `FWTP/1`, deliberately incompatible with legacy `FSNP` bytes, native opcodes and native SDK negotiation. Use a different magic and listener; never sniff and fall back to FSNP/RESP/HTTP. There is no legacy native SDK binary-compatibility claim. The existing workflow semantics and [source-test acceptance obligation](../workflow-test-parity.md) remain mandatory. Native parser/framing cases receive explicit public-byte exclusions only where the parity decision selects the new protocol; preserve their workflow authorization, size, ordering and fault guarantees through corresponding new adapter cases. Mixed native suites are reviewed case by case.
 
 The pinned legacy native document describes 24-byte FSNP framing, lane-local ordering, chunk/compression flags and a connection-local request number. It is evidence for requirements, not the proposed format. New `call_id` replaces that correlation number; new durable `request_id` has a separate application contract. Preserve legacy lease/fence retry tests without manufacturing reused request IDs: a distinct compatibility/application surface must exercise their original no-ID inputs and history/guard assertions. New public mutations require explicit request IDs.

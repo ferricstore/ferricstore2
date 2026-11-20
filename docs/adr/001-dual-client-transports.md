@@ -2,6 +2,8 @@
 
 Status: accepted design decision after three-agent reciprocal review; implementation remains unstarted. Date: 2026-10-09. Design only.
 
+Superseded in part by [ADR-011](011-fast-runtime-shape.md) (2026-11-20): the TCP adapter speaks FSNP v1 instead of `FWTP/1`. The crate split and shared application service stand.
+
 ## Problem
 
 The initial `wf-api` proposal covered HTTP only. The user now requires a dedicated TCP workflow API as well. Both must preserve workflow test parity, durable outcomes, tenancy and bounded resource use without duplicating Raft/business logic or giving one tenant two independent admission budgets.

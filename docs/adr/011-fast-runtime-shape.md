@@ -1,0 +1,76 @@
+# ADR-011: runtime shape from the fsnp-slice measurements
+
+Status: accepted, 2026-11-20, as the target for M3/M4 runtime work. Solo
+decision on the user's request; no independent review is claimed. Each part
+still needs its own implementation gate and disk/fault evidence.
+
+## Evidence
+
+The `claude/fsnp-slice` spike (branch `claude/fsnp-slice`,
+`spikes/fsnp-slice/README.md`) served the Python SDK's canonical queue
+benchmark over the existing native protocol, byte-identical to Elixir for every
+frame it used, with replies released only after `fdatasync` (F_FULLFSYNC on
+macOS). On an Apple M4 Max, one node, 16 shards, against Elixir `main`
+6a5f2bc34 with the same client:
+
+| | Elixir | Spike, log per shard | Spike, one shared log |
+|---|---|---|---|
+| flows/s, 1 client, 100k flows | 10,307 | 63,020 | 67,530 (client-bound) |
+| flows/s, 4 clients, 400k flows | timed out (100k) | 219,954 | 265,654 |
+| server CPU per 1k flows | 1,026 ms | 7.1 ms | 4.0 ms |
+| RSS | 1.7 GB | 115 MB | 113 MB |
+
+A SIGKILL check lost none of 212,500 acknowledged creates and 53,000
+completions. The spike omits projections, history, policies and governance, so
+its CPU per flow is a lower bound. Linux and multi-node runs are not measured.
+
+## Decision
+
+1. **The dedicated TCP adapter speaks FSNP v1.** All five existing SDKs speak it
+   and the user's goal is a drop-in replacement for the Elixir server. This
+   replaces the `FWTP/1` proposal in ADR-001 and `docs/transports/tcp.md` for
+   the TCP adapter; HTTP is unchanged. Version 1 accepts only the workflow
+   opcodes and control frames that are implemented, refuses every other opcode
+   with an explicit error, and never sniffs or falls back to another protocol.
+   Byte layouts follow the pinned native document and captured Elixir frames;
+   every implemented frame is tested against a captured Elixir byte fixture.
+2. **One group-committed log per node.** All shard groups append to one
+   node-local log. A writer thread coalesces queued appends, writes them once
+   and calls `sync_data`; acknowledgements are released only after that sync.
+   On macOS a sync flushes the whole device, so one shared log costs one flush
+   where per-group logs cost one each (measured: about 5x more acknowledged
+   creates in the same window). Records carry length and checksum; recovery
+   stops at the first torn or corrupt record. This replaces per-append
+   `Immediate` redb commits (ADR-007) on the write path; the Raft adapter will
+   store each group's entries in this log. ADR-007's framing and recovery
+   invariants (exact tail, committed prefix, corruption fencing) carry over.
+3. **One thread per shard owns that shard's state.** It applies committed
+   commands in log order, deterministically, so replay rebuilds state.
+   Connection tasks never touch shard state; they send commands and wait for
+   the post-sync reply. A claim without a partition plans across shards from
+   per-shard ready counts.
+4. **No fixed small batch cap.** Batches are bounded by admitted bytes and item
+   counts, not by an eight-mutation encoder limit.
+
+## Placement
+
+| Part | Crate and module | Policy change when the code lands |
+|---|---|---|
+| FSNP header, typed values, workflow request and reply codecs | `wf-api-tcp` (`frame`, private `codec`, `request`, `response`) | none |
+| TCP listener and sessions | `wf-api-tcp` (`listener`, `session`) | Tokio as a reviewed external dependency of `wf-api-tcp` and `wf-node` |
+| Group-committed log and its writer thread | `wf-storage::log` | writer module added to `thread_owner_modules` and `durable_sync_modules` |
+| Shard executor threads | `wf-node::supervision` | added to `thread_owner_modules` |
+
+All new production code is held to the ADR-010 panic ratchet from its first
+line: no indexing, slicing or unchecked arithmetic on untrusted bytes.
+
+## Order
+
+1. FSNP codecs, tested against captured Elixir frames.
+2. Group-committed log with crash tests (SIGKILL child, torn tail, corrupt
+   record) on macOS, then Linux.
+3. Shard executor and TCP listener, wired to the application create, claim and
+   complete commands, measured with the same SDK benchmark.
+
+Consensus (OpenRaft) integration, replication and the remaining workflow
+commands follow their existing milestones.
