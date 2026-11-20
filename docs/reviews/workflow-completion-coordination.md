@@ -64782,3 +64782,23 @@ RED: `tests/queue_node` did not compile (no `QueueNode`). GREEN: 8 tests pass
 restart replay with 4 and 7 shards including a pre-restart lease, and a
 SIGKILL run three times). Clippy, the ratchet and all architecture tests pass.
 
+### ADR011-TCP-SESSION1 FSNP listener on Tokio
+
+`wf_api_tcp::session::{ServerInfo, serve}` with private `session::{connection,
+dispatch, translate}`; `request::startup`; `response::{ok_text_list,
+handshake, Handshake, COMPACT_CODECS}` (handshake in `response/handshake.rs`).
+Policy: Tokio 1.54.1 with `io-util`, `net`, `rt-multi-thread`, `sync`, default
+features off, for `wf-api-tcp` and `wf-node`; cargo-deny advisories, bans,
+licenses and sources pass. The handshake declares the SDK's required query and
+policy schema entries although those commands are refused; recorded in
+ADR-011 as a known mismatch until they exist or the SDK treats them as
+optional.
+
+RED: `tests/session` did not compile (no `session::serve`). GREEN: 7 tests
+against a scripted service (handshake fields the SDK checks, STARTUP codec
+selection and PING, the captured SDK create/claim/complete frames with
+byte-identical Elixir-shaped compact replies, typed replies without
+negotiation, per-item and error-map failures, per-lane order with a delayed
+reply, explicit refusal of unknown opcodes and compressed frames). Clippy, the
+ratchet and all architecture tests pass, including the async blocking rule.
+

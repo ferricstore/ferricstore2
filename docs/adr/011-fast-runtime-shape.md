@@ -129,4 +129,15 @@ commands follow their existing milestones.
   Not done in the node: blocking claims, expired-lease reclaim, FIFO and
   policies, retention of completed Flows, and snapshots (so `remove_before`
   is never called and replay reads the whole log).
-- Step 3, second half (TCP listener and SDK benchmark) is next.
+- Step 3, TCP listener: `wf_api_tcp::session::serve` runs FSNP sessions on
+  Tokio 1.54.1 (`io-util`, `net`, `rt-multi-thread`, `sync`; no macros),
+  newly allowed for `wf-api-tcp` and `wf-node`. A reader loop dispatches each
+  frame to the queue service without waiting; a writer task keeps each lane's
+  replies in request order. The handshake declares the 0.11.4 contract the
+  Python SDK checks before it connects, including the `FLOW.QUERY` and
+  `FLOW.POLICY.SET` schemas and the query manifest, so the SDK connects; this
+  server refuses those commands, and every other unimplemented opcode, with
+  an explicit error. Compact codecs are declared only for claim jobs and the
+  batch ok-list. Non-independent `FLOW.CREATE_MANY`, blocking claims and
+  expired-lease reclaim are refused by name.
+- Step 3, node binary and SDK benchmark: next.

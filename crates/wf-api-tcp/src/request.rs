@@ -11,7 +11,7 @@ mod typed;
 use std::fmt;
 
 pub use compact::{claim_due, complete_many};
-pub use typed::{complete, create, create_many};
+pub use typed::{complete, create, create_many, startup};
 
 /// A refused request body. The message is the reply text.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -190,4 +190,13 @@ pub struct CompleteItem {
     pub lease_token: Vec<u8>,
     /// Fencing token from the claim.
     pub fencing_token: i64,
+}
+
+/// What a client asked for in `STARTUP`. Other keys are accepted and unused.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Startup {
+    /// The client accepts compact Flow replies.
+    pub compact_flow_responses: bool,
+    /// Compact reply codecs the client can read, by name.
+    pub codecs: Vec<Vec<u8>>,
 }

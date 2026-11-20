@@ -10,6 +10,7 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+tokio.workspace = true
 wf-types.workspace = true
 wf-domain.workspace = true
 wf-wire.workspace = true

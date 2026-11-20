@@ -81,6 +81,9 @@ kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-wire", "wf-application"]
 dev = ["wf-test-support"]
 modules = { frame = true, request = true, response = true, session = true, codec = false, listener = false }
+external_normal = [
+  { name = "tokio", version = "=1.54.1", features = ["io-util", "net", "rt-multi-thread", "sync"], default_features = false },
+]
 
 [packages.wf-worker]
 kind = "runtime"
@@ -95,6 +98,7 @@ dev = ["wf-test-support"]
 modules = { configuration = true, composition = true, supervision = true, shutdown = true, recovery = true }
 external_normal = [
   { name = "sha2", version = "=0.11.0", features = [], default_features = false },
+  { name = "tokio", version = "=1.54.1", features = ["io-util", "net", "rt-multi-thread", "sync"], default_features = false },
 ]
 external_dev = [
   { name = "redb", version = "=4.4.0", features = ["std"], default_features = false, source = "git+https://github.com/cberner/redb?rev=7061f7e60d4573311c0636e161d417b93e9fd2b1" },

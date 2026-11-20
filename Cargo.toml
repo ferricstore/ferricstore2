@@ -42,6 +42,7 @@ wf-architecture-tests = { path = "crates/wf-architecture-tests" }
 wf-test-support = { path = "crates/wf-test-support" }
 wf-parity-tests = { path = "crates/wf-parity-tests" }
 sha2 = { version = "=0.11.0", default-features = false }
+tokio = { version = "=1.54.1", default-features = false, features = ["io-util", "net", "rt-multi-thread", "sync"] }
 redb = { version = "=4.4.0", git = "https://github.com/cberner/redb", rev = "7061f7e60d4573311c0636e161d417b93e9fd2b1", default-features = false, features = ["std"] }
 
 [workspace.lints.rust]

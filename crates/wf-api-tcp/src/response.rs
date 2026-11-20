@@ -2,10 +2,14 @@
 //! typed value or a compact payload. Every shape here is byte-identical to
 //! the Elixir server for the replies captured in this crate's fixtures.
 
+mod handshake;
+
 use std::fmt;
 
 use crate::codec::{TooLong, Value, put_bin, put_len};
 use crate::request::ClaimShape;
+
+pub use handshake::{COMPACT_CODECS, Handshake, handshake};
 
 /// Success status.
 pub const STATUS_OK: u16 = 0;
@@ -68,6 +72,14 @@ pub fn error(status: u16, message: &str) -> Result<Vec<u8>, ReplyTooLong> {
         (b"safe_to_retry".to_vec(), Value::Bool(false)),
     ]);
     typed(status, &map)
+}
+
+/// The typed all-succeeded reply for `count` batch items: a list of `OK`.
+///
+/// # Errors
+/// Refuses a count above `u32::MAX`.
+pub fn ok_text_list(count: usize) -> Result<Vec<u8>, ReplyTooLong> {
+    typed(STATUS_OK, &Value::Arr(vec![text(b"OK"); count]))
 }
 
 /// The compact all-succeeded reply for `count` batch items.
