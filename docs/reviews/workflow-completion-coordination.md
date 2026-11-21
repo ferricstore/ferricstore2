@@ -66293,3 +66293,39 @@ remaining majority (1 and 3) still served all 20. Half a second after the
 first kill a read failed with connection refused (the election timeout had
 not passed, so the survivors still named the dead leader); the SDK reports
 that as a retryable error, as Elixir's failover does.
+
+### ADR-018 phase 3: group snapshots
+
+New artifacts (solo design review): `wf_ports::consensus::log::{Captured,
+SnapshotStore}` and `ReplicatedMachine::{snapshot, install}`;
+`SnapshotStore for SnapshotFiles`; `wf_consensus::group::snapshot`
+(`Capture`, metadata codec), `Bridge::{restore, install, capture}`,
+`MemberConfig::{snapshot_every, keep_logs}`, the peer snapshot request
+(kind 4) and answer (kind 5), `Peers`/`Link` with byte snapshots;
+`ShardState::{export, install, encode_tail}` (`state::export`),
+`Cold::handles`, requests `Export` and `Install`,
+`composition::replica::machine` (the machine moved out of `replica.rs`),
+`Replica::{snapshot_every, keep_logs}`, binary flags `--snapshot-every`
+and `--keep-logs`.
+
+Decisions: a leader's shards apply rounds before they commit, so a leader
+snapshot could not name one applied position; followers alone take
+snapshots, triggered by the member every `snapshot_every` applied entries
+(`OpenRaft`'s own policy stays off), and the bridge declines while the
+machine serves (`try_create_snapshot_builder` returning `None`, which
+`OpenRaft` treats as deferred). The capture starts inside the state machine
+worker, in order with applies, so every shard exports exactly the applied
+position before any later replay reaches it. A shard's portable image
+reads its finished Flows back from cold files (no stubs), and installing it
+builds a fresh shard on the same cold store. Snapshot bytes: the shard
+count, then each shard's image; the store keeps the newest by applied
+index with its metadata (applied id, membership).
+
+Evidence: `OpenRaft`'s storage suite still passes with byte snapshots in the
+test machine. `queue_node::replica::a_member_the_leader_s_log_no_longer_
+reaches_installs_a_snapshot`: a follower snapshots and drops its log while
+another member is down; that member returns under the snapshotting leader
+(the only up-to-date member), gets the snapshot, takes a second batch and
+then leads with both batches; the snapshotting member restarts from its
+snapshot and log, takes a third batch and leads with all three. Passes
+three times in a row (7 s); with the shard install made a no-op it fails.

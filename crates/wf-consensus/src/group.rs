@@ -9,6 +9,7 @@ mod machine;
 mod member;
 mod peer;
 mod proposer;
+mod snapshot;
 mod wire;
 
 use std::fmt;

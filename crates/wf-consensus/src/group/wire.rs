@@ -1,20 +1,25 @@
 //! Raft messages between members (ADR-018), as bytes.
 //!
 //! A request starts with its kind (`1` append entries, `2` vote, `3`
-//! pre-vote); a response with its outcome (`0` an append accepted up to an
-//! optional log id, `1` an append conflict at a log id, `2` a higher vote, `3`
-//! a vote response, `4` a failure with its text). A vote is its term, node
+//! pre-vote, `4` a full snapshot: the leader's vote, the snapshot's metadata
+//! and its bytes); a response with its outcome (`0` an append accepted up to
+//! an optional log id, `1` an append conflict at a log id, `2` a higher vote,
+//! `3` a vote response, `4` a failure with its text, `5` a snapshot taken,
+//! with the receiver's vote). A vote is its term, node
 //! and committed byte; an optional log id is a presence byte and the id's
 //! term, node and index; an entry is its id, its payload length and payload
 //! (`codec::encode`). Conflict hints are not sent; they are optional.
 
 use std::io;
 
-use openraft::raft::{AppendEntriesRequest, AppendError, AppendResult, VoteRequest, VoteResponse};
-use openraft::type_config::alias::{LogIdOf, VoteOf};
+use openraft::Snapshot;
+use openraft::raft::{
+    AppendEntriesRequest, AppendError, AppendResult, SnapshotResponse, VoteRequest, VoteResponse,
+};
+use openraft::type_config::alias::{LogIdOf, SnapshotOf, VoteOf};
 use wf_ports::consensus::log::EntryId;
 
-use super::{Config, codec};
+use super::{Config, codec, snapshot};
 
 /// A request from one member to another.
 pub(crate) enum Request {
@@ -24,6 +29,8 @@ pub(crate) enum Request {
     Vote(VoteRequest<Config>),
     /// A pre-vote probe.
     PreVote(VoteRequest<Config>),
+    /// A snapshot for a member the log no longer reaches.
+    Snapshot(VoteOf<Config>, SnapshotOf<Config, Vec<u8>>),
 }
 
 /// The answer to a [`Request`].
@@ -34,6 +41,8 @@ pub(crate) enum Response {
     Vote(VoteResponse<Config>),
     /// The member could not handle the request.
     Failed(String),
+    /// To a snapshot.
+    Snapshot(SnapshotResponse<Config>),
 }
 
 fn invalid() -> io::Error {
@@ -89,6 +98,12 @@ pub(crate) fn encode_request(request: &Request) -> io::Result<Vec<u8>> {
                 put_bytes(&mut out, &codec::encode(entry)?)?;
             }
         }
+        Request::Snapshot(vote, snapshot) => {
+            out.push(4);
+            put_vote(&mut out, vote);
+            put_bytes(&mut out, &snapshot::meta_bytes(&snapshot.meta)?)?;
+            put_bytes(&mut out, &snapshot.snapshot)?;
+        }
         Request::Vote(vote) | Request::PreVote(vote) => {
             out.push(if matches!(request, Request::Vote(_)) {
                 2
@@ -130,6 +145,10 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
         Response::Failed(text) => {
             out.push(4);
             put_bytes(&mut out, text.as_bytes())?;
+        }
+        Response::Snapshot(taken) => {
+            out.push(5);
+            put_vote(&mut out, &taken.vote);
         }
     }
     Ok(out)
@@ -221,6 +240,18 @@ pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<Request> {
                 leader_commit,
             })
         }
+        4 => {
+            let vote = reader.vote()?;
+            let meta = snapshot::parse_meta(reader.bytes()?)?;
+            let data = reader.bytes()?.to_vec();
+            Request::Snapshot(
+                vote,
+                Snapshot {
+                    meta,
+                    snapshot: data,
+                },
+            )
+        }
         kind @ (2 | 3) => {
             let vote = VoteRequest::new(reader.vote()?, reader.log_id()?);
             if kind == 2 {
@@ -253,6 +284,7 @@ pub(crate) fn decode_response(bytes: &[u8]) -> io::Result<Response> {
             Response::Vote(VoteResponse::new(vote, reader.log_id()?, granted))
         }
         4 => Response::Failed(String::from_utf8_lossy(reader.bytes()?).into_owned()),
+        5 => Response::Snapshot(SnapshotResponse::new(reader.vote()?)),
         _ => return Err(invalid()),
     };
     reader.done(response)

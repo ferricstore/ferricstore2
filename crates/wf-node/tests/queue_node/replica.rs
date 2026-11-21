@@ -26,11 +26,24 @@ fn config() -> QueueNodeConfig {
 }
 
 fn open(path: &Path, id: u64, peers: &BTreeMap<u64, SocketAddr>) -> TestResult<QueueNode> {
+    open_with(path, id, peers, 0)
+}
+
+/// Opens member `id`; a follower snapshots every `snapshot_every` entries
+/// and keeps no log behind its snapshot.
+fn open_with(
+    path: &Path,
+    id: u64,
+    peers: &BTreeMap<u64, SocketAddr>,
+    snapshot_every: u64,
+) -> TestResult<QueueNode> {
     let address = peers.get(&id).ok_or("unknown member")?;
     let replica = Replica {
         id,
         peers: peers.clone(),
         listener: TcpListener::bind(address)?,
+        snapshot_every,
+        keep_logs: 0,
     };
     Ok(QueueNode::open_replicated(
         &path.join(format!("n{id}")),
@@ -135,5 +148,108 @@ fn a_group_keeps_its_flows_through_leader_loss_and_a_member_s_return() -> TestRe
     drop(nodes.remove(&second));
     let third = serving(&nodes, "probe-3")?;
     assert_replicated(nodes.get(&third).ok_or("leader missing")?, &completed)?;
+    Ok(())
+}
+
+fn peers() -> TestResult<BTreeMap<u64, SocketAddr>> {
+    let mut peers = BTreeMap::new();
+    for id in MEMBERS {
+        // Bound once to pick a free port; each member binds it again.
+        peers.insert(id, TcpListener::bind("127.0.0.1:0")?.local_addr()?);
+    }
+    Ok(peers)
+}
+
+/// Waits until member `id` has taken a snapshot.
+fn snapshotted(path: &Path, id: u64) -> TestResult {
+    let directory = path.join(format!("n{id}")).join("group-snapshots");
+    let until = Instant::now() + Duration::from_secs(20);
+    while Instant::now() < until {
+        if std::fs::read_dir(&directory)?.next().is_some() {
+            return Ok(());
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    Err(format!("member {id} took no snapshot").into())
+}
+
+/// Creates `prefix0..` through `node` and completes the Flows it claims.
+fn batch(node: &QueueNode, prefix: &str, count: usize, done: usize) -> TestResult<Vec<String>> {
+    for chunk in ids(prefix, count).chunks(5) {
+        create(node, chunk)??;
+    }
+    if done == 0 {
+        return Ok(Vec::new());
+    }
+    let claimed = call(|reply| node.claim(claim_request(done), reply))??;
+    let completions: Vec<_> = claimed.iter().map(completion).collect();
+    call(|reply| node.complete(completions, reply))??;
+    Ok(claimed
+        .iter()
+        .map(|job| String::from_utf8_lossy(&job.id).into_owned())
+        .collect())
+}
+
+fn assert_states(node: &QueueNode, prefix: &str, count: usize, completed: &[String]) -> TestResult {
+    for id in ids(prefix, count) {
+        let expected = if completed.contains(&id) {
+            "completed"
+        } else {
+            "queued"
+        };
+        assert_eq!(state_of(node, &id)?, Term::text(expected), "{id}");
+    }
+    Ok(())
+}
+
+#[test]
+fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResult {
+    let path = directory("replica-snapshot")?;
+    let peers = peers()?;
+    let mut nodes = BTreeMap::new();
+    for id in MEMBERS {
+        nodes.insert(id, open_with(&path, id, &peers, 20)?);
+    }
+    let a = serving(&nodes, "probe-a")?;
+    let mut followers = MEMBERS.iter().copied().filter(|id| *id != a);
+    let (b, c) = (
+        followers.next().ok_or("no b")?,
+        followers.next().ok_or("no c")?,
+    );
+    // C misses the first batch; B snapshots it and drops its log.
+    drop(nodes.remove(&c));
+    let first = batch(nodes.get(&a).ok_or("no a")?, "w1-", 40, 10)?;
+    snapshotted(&path, b)?;
+    // Without A, only B is up to date, so it leads, and C needs B's snapshot.
+    drop(nodes.remove(&a));
+    nodes.insert(c, open_with(&path, c, &peers, 20)?);
+    let led = serving(&nodes, "probe-b")?;
+    assert_eq!(led, b);
+    let second = batch(nodes.get(&b).ok_or("no b")?, "w2-", 10, 2)?;
+    // Without B, A lacks the second batch, so C leads with all of it.
+    drop(nodes.remove(&b));
+    nodes.insert(a, open_with(&path, a, &peers, 20)?);
+    let led = serving(&nodes, "probe-c")?;
+    assert_eq!(led, c);
+    let leader = nodes.get(&c).ok_or("no c")?;
+    // The second batch's claims may take Flows of the first.
+    let completed: Vec<String> = first.into_iter().chain(second).collect();
+    assert_eq!(completed.len(), 12);
+    assert_states(leader, "w1-", 40, &completed)?;
+    assert_states(leader, "w2-", 10, &completed)?;
+    // B restarts from its snapshot and log and takes a third batch; without
+    // C, only B has it, so B leads with everything.
+    drop(nodes.remove(&a));
+    nodes.insert(b, open_with(&path, b, &peers, 20)?);
+    let third = batch(nodes.get(&c).ok_or("no c")?, "w3-", 10, 0)?;
+    assert_eq!(third, Vec::<String>::new());
+    drop(nodes.remove(&c));
+    nodes.insert(a, open_with(&path, a, &peers, 20)?);
+    let led = serving(&nodes, "probe-d")?;
+    assert_eq!(led, b);
+    let leader = nodes.get(&b).ok_or("no b")?;
+    assert_states(leader, "w1-", 40, &completed)?;
+    assert_states(leader, "w2-", 10, &completed)?;
+    assert_states(leader, "w3-", 10, &completed)?;
     Ok(())
 }

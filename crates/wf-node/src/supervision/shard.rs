@@ -155,6 +155,10 @@ pub(crate) enum Request {
     Quiet { done: Done<()> },
     /// The policies this shard holds.
     Policies { done: Done<Vec<Arc<Installed>>> },
+    /// This shard as a portable image, for a group snapshot (phase 3).
+    Export { done: Done<Vec<u8>> },
+    /// Replace this shard with an installed snapshot's image.
+    Install { image: Vec<u8>, done: Done<()> },
 }
 
 /// The thread's connections to the rest of the node.

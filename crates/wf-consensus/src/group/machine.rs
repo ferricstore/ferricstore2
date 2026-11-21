@@ -7,8 +7,9 @@
 //! this process's epoch only advance the applied position. Other proposals
 //! go to the machine in commit order. The blank entry a new leader commits
 //! promotes the machine once it is this member's, in the term it leads, so
-//! every earlier entry was applied first. Snapshots are refused until
-//! phase 3.
+//! every earlier entry was applied first. A follower's machine is captured
+//! for snapshots (phase 3); a leader's is not, since its shards hold rounds
+//! not yet committed.
 
 use std::future::{Future, ready};
 use std::io;
@@ -16,16 +17,17 @@ use std::sync::{Arc, Mutex, OnceLock, PoisonError};
 
 use futures_util::TryStreamExt;
 use futures_util::stream::Stream;
-use openraft::storage::{EntryResponder, RaftSnapshotBuilder, RaftStateMachine};
+use openraft::storage::{EntryResponder, RaftStateMachine};
 use openraft::type_config::alias::{
     EntryOf, LogIdOf, SnapshotMetaOf, SnapshotOf, StoredMembershipOf, WatchReceiverOf,
 };
 use openraft::type_config::async_runtime::watch::WatchReceiver;
-use openraft::{EntryPayload, OptionalSend, RaftMetrics, StoredMembership};
+use openraft::{EntryPayload, OptionalSend, RaftMetrics, Snapshot, SnapshotMeta, StoredMembership};
 use tokio::sync::oneshot;
-use wf_ports::consensus::log::{Applied, ReplicatedMachine};
+use wf_ports::consensus::log::{Applied, ReplicatedMachine, SnapshotStore};
 
 use super::Config;
+use super::snapshot::{self, Capture, Current};
 
 /// Bytes before a proposal's body: the proposing process's epoch.
 const EPOCH_BYTES: usize = 8;
@@ -56,6 +58,8 @@ pub(crate) struct Bridge {
     id: u64,
     epoch: u64,
     position: Arc<Mutex<Position>>,
+    store: Arc<dyn SnapshotStore>,
+    current: Current,
     /// The member's metrics, once its Raft runs.
     pub(super) metrics: Arc<OnceLock<WatchReceiverOf<Config, RaftMetrics<Config>>>>,
 }
@@ -74,14 +78,66 @@ async fn machine_call(call: impl FnOnce(Applied)) -> io::Result<()> {
 }
 
 impl Bridge {
-    pub(crate) fn new(machine: Arc<dyn ReplicatedMachine>, id: u64, epoch: u64) -> Self {
+    pub(crate) fn new(
+        machine: Arc<dyn ReplicatedMachine>,
+        (id, epoch): (u64, u64),
+        store: Arc<dyn SnapshotStore>,
+    ) -> Self {
         Self {
             machine,
             id,
             epoch,
             position: Arc::new(Mutex::new((None, StoredMembership::default()))),
+            store,
+            current: Arc::default(),
             metrics: Arc::new(OnceLock::new()),
         }
+    }
+
+    /// Installs the newest stored snapshot, if any, before the member
+    /// starts: the machine and the applied position become its.
+    pub(super) async fn restore(&self) -> io::Result<()> {
+        let Some((meta, data)) = snapshot::newest(self.store.as_ref())? else {
+            return Ok(());
+        };
+        self.install(meta, data, false).await
+    }
+
+    async fn install(
+        &self,
+        meta: SnapshotMetaOf<Config>,
+        data: Vec<u8>,
+        keep: bool,
+    ) -> io::Result<()> {
+        let bytes = data.clone();
+        machine_call(|done| self.machine.install(bytes, done)).await?;
+        if keep {
+            snapshot::save(self.store.as_ref(), &meta, &data)?;
+        }
+        *self.position.lock().unwrap_or_else(PoisonError::into_inner) =
+            (meta.last_log_id, meta.last_membership.clone());
+        *self.current.lock().unwrap_or_else(PoisonError::into_inner) = Some((meta, Arc::new(data)));
+        Ok(())
+    }
+
+    /// A builder of a snapshot at the applied position, or `None` while
+    /// the machine serves as the leader's.
+    fn capture(&self) -> Option<Capture> {
+        let (sender, receiver) = oneshot::channel();
+        let started = self.machine.snapshot(Box::new(move |captured| {
+            // The builder may have been dropped; nothing waits then.
+            let _sent = sender.send(captured);
+        }));
+        let (last_log_id, last_membership) = self.position();
+        started.then(|| Capture {
+            meta: SnapshotMeta {
+                last_log_id,
+                last_membership,
+            },
+            bytes: Some(receiver),
+            store: Arc::clone(&self.store),
+            current: Arc::clone(&self.current),
+        })
     }
 
     pub(super) const fn epoch(&self) -> u64 {
@@ -146,19 +202,9 @@ impl Bridge {
     }
 }
 
-impl RaftSnapshotBuilder<Config> for Bridge {
-    type SnapshotData = Vec<u8>;
-
-    fn build_snapshot(
-        &mut self,
-    ) -> impl Future<Output = Result<SnapshotOf<Config, Vec<u8>>, io::Error>> + Send {
-        ready(Err(failed(&"group snapshots are not built yet")))
-    }
-}
-
 impl RaftStateMachine<Config> for Bridge {
     type SnapshotData = Vec<u8>;
-    type SnapshotBuilder = Self;
+    type SnapshotBuilder = Capture;
 
     fn applied_state(&mut self) -> impl Future<Output = io::Result<Position>> + Send {
         ready(Ok(self.position()))
@@ -178,21 +224,44 @@ impl RaftStateMachine<Config> for Bridge {
         self.flush(&mut pending).await
     }
 
-    fn get_snapshot_builder(&mut self) -> impl Future<Output = Self> + Send {
-        ready(self.clone())
+    fn try_create_snapshot_builder(
+        &mut self,
+        _force: bool,
+    ) -> impl Future<Output = Option<Capture>> + Send {
+        ready(self.capture())
     }
 
-    fn install_snapshot(
+    fn get_snapshot_builder(&mut self) -> impl Future<Output = Capture> + Send {
+        // `OpenRaft` asks through `try_create_snapshot_builder`; this one has
+        // no way to decline, so a leader's builder fails instead.
+        let capture = self.capture().unwrap_or_else(|| Capture {
+            meta: SnapshotMeta::default(),
+            bytes: None,
+            store: Arc::clone(&self.store),
+            current: Arc::clone(&self.current),
+        });
+        ready(capture)
+    }
+
+    async fn install_snapshot(
         &mut self,
-        _meta: &SnapshotMetaOf<Config>,
-        _snapshot: Vec<u8>,
-    ) -> impl Future<Output = io::Result<()>> + Send {
-        ready(Err(failed(&"group snapshots are not installed yet")))
+        meta: &SnapshotMetaOf<Config>,
+        snapshot: Vec<u8>,
+    ) -> io::Result<()> {
+        self.install(meta.clone(), snapshot, true).await
     }
 
     fn get_current_snapshot(
         &mut self,
     ) -> impl Future<Output = io::Result<Option<SnapshotOf<Config, Vec<u8>>>>> + Send {
-        ready(Ok(None))
+        let current = self
+            .current
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone();
+        ready(Ok(current.map(|(meta, data)| Snapshot {
+            meta,
+            snapshot: data.as_ref().clone(),
+        })))
     }
 }

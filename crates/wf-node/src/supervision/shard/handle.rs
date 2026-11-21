@@ -140,9 +140,9 @@ fn capture(
 }
 
 /// A replicated group's requests (ADR-018), answered at once: a follower's
-/// replay of committed changes, promotion and demotion, and the policies to
-/// promote with.
-fn role_change(state: &mut ShardState, request: Request) {
+/// replay of committed changes, promotion and demotion, the policies to
+/// promote with, and a snapshot's export and installation.
+fn role_change(state: &mut ShardState, now: u64, request: Request) {
     match request {
         Request::Replay { changes, done } => {
             let applied = changes
@@ -166,6 +166,10 @@ fn role_change(state: &mut ShardState, request: Request) {
             done(Ok(()));
         }
         Request::Policies { done } => done(Ok(state.policies().cloned().collect())),
+        Request::Export { done } => done(state.export(now).ok_or(ServiceError::Unavailable)),
+        Request::Install { image, done } => {
+            done(state.install(&image).ok_or(ServiceError::Unavailable));
+        }
         other => other.fail(ServiceError::Unavailable),
     }
 }
@@ -267,8 +271,10 @@ pub(super) fn handle(
         request @ (Request::Replay { .. }
         | Request::Live { .. }
         | Request::Quiet { .. }
-        | Request::Policies { .. }) => {
-            role_change(state, request);
+        | Request::Policies { .. }
+        | Request::Export { .. }
+        | Request::Install { .. }) => {
+            role_change(state, now, request);
             return None;
         }
     };

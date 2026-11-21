@@ -72,6 +72,16 @@ leaders do.
    stops the process (status 75) for its supervisor to restart it.
 3. **Snapshots:** log compaction at snapshots and snapshot install (shard
    images and cold files) for a member that fell behind or is new.
+   Landed 21 Nov with one constraint: a leader's shards are ahead of the
+   log (they apply a round when they decide it), so only followers take
+   snapshots, at an exact applied position: the export requests reach every
+   shard before any later replay. A snapshot holds each shard's portable
+   image (finished Flows read back from cold files and inlined), the group
+   keeps the newest on disk, sends it in one peer frame (at most the frame
+   limit; chunking later) to a member the leader's log no longer reaches,
+   and a restarted member starts from it. Members must share the shard
+   count. Not yet: compacting a leader's log while it leads (handing
+   leadership to a caught-up follower when its log grows too long).
 4. **Several groups per node** and the SDK's three-node failover test.
 
 ## Consequences

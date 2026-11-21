@@ -90,6 +90,11 @@ pub(super) struct Cold {
 }
 
 impl Cold {
+    /// The store and writer queue, for a fresh shard on the same files.
+    pub(super) fn handles(&self) -> (Arc<ColdStore>, Arc<ColdQueue>) {
+        (Arc::clone(&self.store), Arc::clone(&self.queue))
+    }
+
     pub(super) fn new(store: Arc<ColdStore>, queue: Arc<ColdQueue>) -> Self {
         Self {
             store,
@@ -206,7 +211,7 @@ impl ShardState {
         Some((stored, seen))
     }
 
-    fn load(&self, stub: &Stub) -> Result<Box<Entry>, ServiceError> {
+    pub(super) fn load(&self, stub: &Stub) -> Result<Box<Entry>, ServiceError> {
         let bytes = self
             .cold
             .store

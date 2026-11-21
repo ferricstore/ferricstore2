@@ -8,7 +8,8 @@
 //! `--node-id` the node is that member of a replicated group (ADR-018):
 //! `--member` names every member's client and Raft addresses, this one's
 //! included, and the node exits (status 75) once a lost round stops it, for
-//! its supervisor to restart it.
+//! its supervisor to restart it. `--snapshot-every N` (100000) entries
+//! applied, a follower snapshots; `--keep-logs N` (1000) stay behind it.
 //! With `--client-clock true` clients' `now_ms` decides due times and leases
 //! (tests and parity probes only; ADR-015). The backlog flags are the
 //! per-shard admission limits in items (ADR-017). The data
@@ -43,6 +44,8 @@ struct Options {
     client_clock: bool,
     admission: Admission,
     node_id: Option<u64>,
+    snapshot_every: u64,
+    keep_logs: u64,
     /// Members by id: client host and port, and Raft address.
     members: BTreeMap<u64, (String, u16, SocketAddr)>,
 }
@@ -75,6 +78,8 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
         client_clock: false,
         admission: Admission::default(),
         node_id: None,
+        snapshot_every: 100_000,
+        keep_logs: 1_000,
         members: BTreeMap::new(),
     };
     let mut pairs = arguments.iter();
@@ -120,6 +125,8 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
                     .map_err(|_| "--max-backlog is too large".to_owned())?;
             }
             "--node-id" => options.node_id = Some(number()?),
+            "--snapshot-every" => options.snapshot_every = number()?,
+            "--keep-logs" => options.keep_logs = number()?,
             "--member" => {
                 let (id, addresses) = member(value)?;
                 options.members.insert(id, addresses);
@@ -216,6 +223,8 @@ fn open(options: &Options, config: QueueNodeConfig) -> Result<QueueNode, String>
             .map(|(id, (_, _, peer))| (*id, *peer))
             .collect(),
         listener,
+        snapshot_every: options.snapshot_every,
+        keep_logs: options.keep_logs,
     };
     QueueNode::open_replicated(&options.data_dir, config, replica)
         .map_err(|error| error.to_string())

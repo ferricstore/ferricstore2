@@ -14,7 +14,7 @@ use openraft::raft::{
 use openraft::type_config::alias::{SnapshotOf, VoteOf};
 use openraft::{AnyError, OptionalSend, Raft};
 
-use super::machine::{Image, Machine};
+use super::machine::Machine;
 use wf_consensus::group::Config;
 
 pub(super) type Member = Raft<Config, Machine>;
@@ -129,7 +129,7 @@ pub(super) struct Link {
 }
 
 impl RaftNetworkV2<Config> for Link {
-    type SnapshotData = Image;
+    type SnapshotData = Vec<u8>;
 
     async fn append_entries(
         &mut self,
@@ -170,7 +170,7 @@ impl RaftNetworkV2<Config> for Link {
     async fn full_snapshot(
         &mut self,
         vote: VoteOf<Config>,
-        snapshot: SnapshotOf<Config, Image>,
+        snapshot: SnapshotOf<Config, Vec<u8>>,
         _cancel: impl Future<Output = ReplicationClosed> + OptionalSend + 'static,
         _option: RPCOption,
     ) -> Result<SnapshotResponse<Config>, StreamingError<Config>> {

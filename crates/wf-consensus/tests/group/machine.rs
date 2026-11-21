@@ -1,17 +1,22 @@
 //! A state machine for the gate: it records applied proposals in memory and
-//! snapshots by copying them.
+//! snapshots them as bytes (the applied id, the membership and each
+//! proposal), as the peer network carries snapshots.
 
+use std::collections::BTreeSet;
 use std::future::{Future, ready};
 use std::io;
 use std::sync::{Arc, Mutex, PoisonError};
 
 use futures_util::TryStreamExt;
 use futures_util::stream::Stream;
+use openraft::impls::leader_id_adv::LeaderId;
 use openraft::storage::{EntryResponder, RaftSnapshotBuilder, RaftStateMachine};
 use openraft::type_config::alias::{
     EntryOf, LogIdOf, SnapshotMetaOf, SnapshotOf, StoredMembershipOf,
 };
-use openraft::{EntryPayload, OptionalSend, Snapshot, SnapshotMeta, StoredMembership};
+use openraft::{
+    EntryPayload, LogId, Membership, OptionalSend, Snapshot, SnapshotMeta, StoredMembership,
+};
 
 use wf_consensus::group::Config;
 
@@ -25,7 +30,113 @@ pub(super) struct Image {
 }
 
 /// The last snapshot, with its metadata.
-type Current = Option<(SnapshotMetaOf<Config>, Image)>;
+type Current = Option<(SnapshotMetaOf<Config>, Vec<u8>)>;
+
+fn put_u64(out: &mut Vec<u8>, value: u64) {
+    out.extend_from_slice(&value.to_be_bytes());
+}
+
+fn put_log_id(out: &mut Vec<u8>, log_id: Option<&LogIdOf<Config>>) {
+    match log_id {
+        Some(log_id) => {
+            out.push(1);
+            put_u64(out, log_id.leader_id.term);
+            put_u64(out, log_id.leader_id.node_id);
+            put_u64(out, log_id.index);
+        }
+        None => out.push(0),
+    }
+}
+
+fn put_ids(out: &mut Vec<u8>, ids: &BTreeSet<u64>) {
+    put_u64(out, u64::try_from(ids.len()).unwrap_or(u64::MAX));
+    for id in ids {
+        put_u64(out, *id);
+    }
+}
+
+/// An image as snapshot bytes.
+fn encode(image: &Image) -> Vec<u8> {
+    let mut out = Vec::new();
+    put_log_id(&mut out, image.applied.as_ref());
+    put_log_id(&mut out, image.membership.log_id().as_ref());
+    let configs = image.membership.membership().get_joint_config();
+    put_u64(&mut out, u64::try_from(configs.len()).unwrap_or(u64::MAX));
+    for config in configs {
+        put_ids(&mut out, config);
+    }
+    let members: BTreeSet<u64> = image
+        .membership
+        .membership()
+        .nodes()
+        .map(|(id, ())| *id)
+        .collect();
+    put_ids(&mut out, &members);
+    put_u64(
+        &mut out,
+        u64::try_from(image.proposals.len()).unwrap_or(u64::MAX),
+    );
+    for (index, bytes) in &image.proposals {
+        put_u64(&mut out, *index);
+        put_u64(&mut out, u64::try_from(bytes.len()).unwrap_or(u64::MAX));
+        out.extend_from_slice(bytes);
+    }
+    out
+}
+
+struct Reader<'a>(&'a [u8]);
+
+/// Bytes the test machine did not write.
+struct Malformed;
+
+impl Reader<'_> {
+    fn u64(&mut self) -> Option<u64> {
+        let (value, rest) = self.0.split_first_chunk::<8>()?;
+        self.0 = rest;
+        Some(u64::from_be_bytes(*value))
+    }
+
+    /// A presence byte, then the id when present.
+    fn log_id(&mut self) -> Result<Option<LogIdOf<Config>>, Malformed> {
+        let (&present, rest) = self.0.split_first().ok_or(Malformed)?;
+        self.0 = rest;
+        if present == 0 {
+            return Ok(None);
+        }
+        let mut part = || self.u64().ok_or(Malformed);
+        let (term, node_id, index) = (part()?, part()?, part()?);
+        Ok(Some(LogId::new(LeaderId { term, node_id }, index)))
+    }
+
+    fn ids(&mut self) -> Option<BTreeSet<u64>> {
+        (0..self.u64()?).map(|_| self.u64()).collect()
+    }
+}
+
+/// An image from its snapshot bytes.
+fn decode(bytes: &[u8]) -> Option<Image> {
+    let mut reader = Reader(bytes);
+    let applied = reader.log_id().ok()?;
+    let membership_log_id = reader.log_id().ok()?;
+    let configs = (0..reader.u64()?)
+        .map(|_| reader.ids())
+        .collect::<Option<Vec<_>>>()?;
+    let members = reader.ids()?;
+    let membership = Membership::new(configs, members).ok()?;
+    let mut proposals = Vec::new();
+    for _ in 0..reader.u64()? {
+        let index = reader.u64()?;
+        let length = usize::try_from(reader.u64()?).ok()?;
+        let (proposal, rest) = reader.0.split_at_checked(length)?;
+        reader.0 = rest;
+        proposals.push((index, proposal.to_vec()));
+    }
+    Some(Image {
+        applied,
+        membership: StoredMembership::new(membership_log_id, membership),
+        proposals,
+    })
+}
 
 #[derive(Clone, Default)]
 pub(super) struct Machine {
@@ -60,26 +171,27 @@ impl Machine {
 
 // The machine answers synchronously, so most methods return ready futures.
 impl RaftSnapshotBuilder<Config> for Machine {
-    type SnapshotData = Image;
+    type SnapshotData = Vec<u8>;
 
     fn build_snapshot(
         &mut self,
-    ) -> impl Future<Output = Result<SnapshotOf<Config, Image>, io::Error>> + Send {
+    ) -> impl Future<Output = Result<SnapshotOf<Config, Vec<u8>>, io::Error>> + Send {
         let image = self.image();
         let meta = SnapshotMeta {
             last_log_id: image.applied,
             last_membership: image.membership.clone(),
         };
-        self.keep(Some((meta.clone(), image.clone())));
+        let bytes = encode(&image);
+        self.keep(Some((meta.clone(), bytes.clone())));
         ready(Ok(Snapshot {
             meta,
-            snapshot: image,
+            snapshot: bytes,
         }))
     }
 }
 
 impl RaftStateMachine<Config> for Machine {
-    type SnapshotData = Image;
+    type SnapshotData = Vec<u8>;
     type SnapshotBuilder = Self;
 
     fn applied_state(
@@ -114,24 +226,27 @@ impl RaftStateMachine<Config> for Machine {
     fn install_snapshot(
         &mut self,
         meta: &SnapshotMetaOf<Config>,
-        snapshot: Image,
+        snapshot: Vec<u8>,
     ) -> impl Future<Output = Result<(), io::Error>> + Send {
-        *self.state.lock().unwrap_or_else(PoisonError::into_inner) = snapshot.clone();
+        let Some(image) = decode(&snapshot) else {
+            return ready(Err(io::Error::other("malformed test snapshot")));
+        };
+        *self.state.lock().unwrap_or_else(PoisonError::into_inner) = image;
         self.keep(Some((meta.clone(), snapshot)));
         ready(Ok(()))
     }
 
     fn get_current_snapshot(
         &mut self,
-    ) -> impl Future<Output = Result<Option<SnapshotOf<Config, Image>>, io::Error>> + Send {
+    ) -> impl Future<Output = Result<Option<SnapshotOf<Config, Vec<u8>>>, io::Error>> + Send {
         let current = self
             .snapshot
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
             .clone();
-        ready(Ok(current.map(|(meta, image)| Snapshot {
+        ready(Ok(current.map(|(meta, bytes)| Snapshot {
             meta,
-            snapshot: image,
+            snapshot: bytes,
         })))
     }
 }

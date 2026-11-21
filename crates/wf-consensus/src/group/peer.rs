@@ -5,13 +5,13 @@
 //! client and calls it one request at a time, so a client keeps one
 //! connection and waits for each answer: a frame is a `u32` length and a
 //! [`wire`] body. A member serves each connection's requests in order. A
-//! failed connection is dropped and the next request reconnects; snapshots
-//! are not sent yet (phase 3).
+//! failed connection is dropped and the next request reconnects. A snapshot
+//! for a member the log no longer reaches goes in one frame (phase 3; at
+//! most the frame limit), with a longer deadline.
 
 use std::collections::BTreeMap;
 use std::future::{Future, ready};
 use std::io;
-use std::marker::PhantomData;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
@@ -34,6 +34,8 @@ use super::wire::{self, Request, Response};
 const MAX_FRAME_BYTES: u32 = 256 * 1024 * 1024;
 /// How long a connection attempt may take.
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(1);
+/// How long sending and installing a snapshot may take.
+const SNAPSHOT_TIMEOUT: Duration = Duration::from_secs(120);
 
 fn unreachable(error: &impl std::fmt::Display) -> Unreachable<Config> {
     Unreachable::new(&AnyError::error(error.to_string()))
@@ -64,7 +66,7 @@ async fn write_frame(stream: &mut TcpStream, body: &[u8]) -> io::Result<()> {
 /// fails.
 pub async fn serve<SM>(listener: TcpListener, raft: Raft<Config, SM>)
 where
-    SM: RaftStateMachine<Config>,
+    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
     while let Ok((stream, _peer)) = listener.accept().await {
         if stream.set_nodelay(true).is_err() {
@@ -76,7 +78,7 @@ where
 
 async fn connection<SM>(mut stream: TcpStream, raft: Raft<Config, SM>)
 where
-    SM: RaftStateMachine<Config>,
+    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
     while let Ok(body) = read_frame(&mut stream).await {
         let response = match wire::decode_request(&body) {
@@ -94,7 +96,7 @@ where
 
 async fn handle<SM>(raft: &Raft<Config, SM>, request: Request) -> Response
 where
-    SM: RaftStateMachine<Config>,
+    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
     let failed = |error: &dyn std::fmt::Display| Response::Failed(error.to_string());
     match request {
@@ -110,47 +112,46 @@ where
             .pre_vote(vote)
             .await
             .map_or_else(|error| failed(&error), Response::Vote),
+        Request::Snapshot(vote, snapshot) => raft
+            .install_full_snapshot(vote, snapshot)
+            .await
+            .map_or_else(|error| failed(&error), Response::Snapshot),
     }
 }
 
-/// The members' Raft addresses: `OpenRaft`'s network factory. `SD` is the
-/// state machine's snapshot data.
-pub struct Peers<SD> {
+/// The members' Raft addresses: `OpenRaft`'s network factory.
+pub struct Peers {
     addresses: Arc<BTreeMap<u64, SocketAddr>>,
-    snapshot: PhantomData<fn() -> SD>,
 }
 
-impl<SD> Peers<SD> {
+impl Peers {
     /// The network to `addresses`, by member id.
     #[must_use]
     pub fn new(addresses: BTreeMap<u64, SocketAddr>) -> Self {
         Self {
             addresses: Arc::new(addresses),
-            snapshot: PhantomData,
         }
     }
 }
 
-impl<SD: OptionalSend + 'static> RaftNetworkFactory<Config> for Peers<SD> {
-    type Network = Link<SD>;
+impl RaftNetworkFactory<Config> for Peers {
+    type Network = Link;
 
-    fn new_client(&mut self, target: u64, (): &()) -> impl Future<Output = Link<SD>> + Send {
+    fn new_client(&mut self, target: u64, (): &()) -> impl Future<Output = Link> + Send {
         ready(Link {
             address: self.addresses.get(&target).copied(),
             stream: None,
-            snapshot: PhantomData,
         })
     }
 }
 
 /// One client's connection to a member.
-pub struct Link<SD> {
+pub struct Link {
     address: Option<SocketAddr>,
     stream: Option<TcpStream>,
-    snapshot: PhantomData<fn() -> SD>,
 }
 
-impl<SD> Link<SD> {
+impl Link {
     async fn connect(&self) -> io::Result<TcpStream> {
         let address = self
             .address
@@ -180,9 +181,9 @@ impl<SD> Link<SD> {
     async fn call(
         &mut self,
         request: Request,
-        option: &RPCOption,
+        deadline: Duration,
     ) -> Result<Response, RPCError<Config>> {
-        match tokio::time::timeout(option.hard_ttl(), self.exchange(&request)).await {
+        match tokio::time::timeout(deadline, self.exchange(&request)).await {
             Ok(Ok(Response::Failed(text))) => Err(RPCError::Unreachable(unreachable(&text))),
             Ok(Ok(response)) => Ok(response),
             Ok(Err(error)) => {
@@ -201,15 +202,15 @@ fn mismatched() -> RPCError<Config> {
     RPCError::Unreachable(unreachable(&"mismatched peer response"))
 }
 
-impl<SD: OptionalSend + 'static> RaftNetworkV2<Config> for Link<SD> {
-    type SnapshotData = SD;
+impl RaftNetworkV2<Config> for Link {
+    type SnapshotData = Vec<u8>;
 
     async fn append_entries(
         &mut self,
         rpc: AppendEntriesRequest<Config>,
         option: RPCOption,
     ) -> Result<AppendResult<Config>, RPCError<Config>> {
-        match self.call(Request::Append(rpc), &option).await? {
+        match self.call(Request::Append(rpc), option.hard_ttl()).await? {
             Response::Append(result) => Ok(result),
             _ => Err(mismatched()),
         }
@@ -220,7 +221,7 @@ impl<SD: OptionalSend + 'static> RaftNetworkV2<Config> for Link<SD> {
         rpc: VoteRequest<Config>,
         option: RPCOption,
     ) -> Result<VoteResponse<Config>, RPCError<Config>> {
-        match self.call(Request::Vote(rpc), &option).await? {
+        match self.call(Request::Vote(rpc), option.hard_ttl()).await? {
             Response::Vote(vote) => Ok(vote),
             _ => Err(mismatched()),
         }
@@ -231,21 +232,27 @@ impl<SD: OptionalSend + 'static> RaftNetworkV2<Config> for Link<SD> {
         rpc: VoteRequest<Config>,
         option: RPCOption,
     ) -> Result<VoteResponse<Config>, RPCError<Config>> {
-        match self.call(Request::PreVote(rpc), &option).await? {
+        match self.call(Request::PreVote(rpc), option.hard_ttl()).await? {
             Response::Vote(vote) => Ok(vote),
             _ => Err(mismatched()),
         }
     }
 
-    fn full_snapshot(
+    async fn full_snapshot(
         &mut self,
-        _vote: VoteOf<Config>,
-        _snapshot: SnapshotOf<Config, SD>,
+        vote: VoteOf<Config>,
+        snapshot: SnapshotOf<Config, Vec<u8>>,
         _cancel: impl Future<Output = ReplicationClosed> + OptionalSend + 'static,
-        _option: RPCOption,
-    ) -> impl Future<Output = Result<SnapshotResponse<Config>, StreamingError<Config>>> + Send {
-        ready(Err(StreamingError::Unreachable(unreachable(
-            &"snapshots are not sent between members yet",
-        ))))
+        option: RPCOption,
+    ) -> Result<SnapshotResponse<Config>, StreamingError<Config>> {
+        let deadline = option.hard_ttl().max(SNAPSHOT_TIMEOUT);
+        match self.call(Request::Snapshot(vote, snapshot), deadline).await {
+            Ok(Response::Snapshot(taken)) => Ok(taken),
+            Ok(_) => Err(StreamingError::Unreachable(unreachable(
+                &"mismatched peer response",
+            ))),
+            Err(RPCError::Unreachable(error)) => Err(StreamingError::Unreachable(error)),
+            Err(error) => Err(StreamingError::Unreachable(unreachable(&error))),
+        }
     }
 }

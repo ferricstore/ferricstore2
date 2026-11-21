@@ -107,4 +107,33 @@ pub trait ReplicatedMachine: Send + Sync {
 
     /// This member no longer leads.
     fn demote(&self);
+
+    /// Starts capturing the machine as it is now, every proposal handed to
+    /// [`Self::apply`] included, and calls `done` with its bytes; `false`,
+    /// without calling `done`, while the machine serves as the leader's
+    /// (its state may hold rounds not yet committed).
+    fn snapshot(&self, done: Captured) -> bool;
+
+    /// Replaces the machine's state with a captured one; `done` once it
+    /// holds it.
+    fn install(&self, snapshot: Vec<u8>, done: Applied);
+}
+
+/// Called once with a machine's captured bytes, or why it failed.
+pub type Captured = Box<dyn FnOnce(Result<Vec<u8>, ConsensusLogError>) + Send>;
+
+/// Durable snapshots of a group's machine, newest kept.
+pub trait SnapshotStore: Send + Sync {
+    /// Saves `parts`, joined, as snapshot `id` (ids grow), durably, and
+    /// removes earlier ones.
+    ///
+    /// # Errors
+    /// The storage's refusal or failure.
+    fn save(&self, id: u64, parts: &[&[u8]]) -> Result<(), ConsensusLogError>;
+
+    /// The newest snapshot and its id, if any.
+    ///
+    /// # Errors
+    /// The storage's refusal or failure.
+    fn newest(&self) -> Result<Option<(u64, Vec<u8>)>, ConsensusLogError>;
 }

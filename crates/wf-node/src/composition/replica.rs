@@ -3,27 +3,28 @@
 //! committed round through [`Replicas`], so a restarted member rebuilds its
 //! state from the log. The leader's shards decide rounds and propose them;
 //! a follower's shards apply the leader's committed rounds and refuse client
-//! requests as not led here. Snapshots wait for phase 3.
+//! requests as not led here. A follower takes snapshots of its shards'
+//! portable images; a member the leader's log no longer reaches installs
+//! one, and a restarted member starts from its newest.
+
+mod machine;
 
 use std::collections::BTreeMap;
 use std::net::SocketAddr;
 use std::path::Path;
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::sync::{Arc, Mutex, OnceLock, PoisonError, Weak};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, OnceLock};
 
-use wf_application::commands::queue::{Route, SLOTS, ServiceError};
+use wf_application::commands::queue::{Route, SLOTS};
 use wf_consensus::group::{Member, MemberConfig};
-use wf_ports::consensus::log::{Applied, ConsensusLogError, ReplicatedMachine};
+use wf_ports::consensus::log::{ConsensusLog, SnapshotStore};
 use wf_storage::log::EntryLog;
+use wf_storage::snapshot::files::SnapshotFiles;
 
 use crate::supervision;
-use crate::supervision::shard::Request;
-use crate::supervision::shard::command::Logged;
 use crate::supervision::shard::role::Role;
-use crate::supervision::shard::sink::{self, Sink};
+use crate::supervision::shard::sink::Sink;
 
-use super::replay::by_shard;
-use super::router::Router;
 use super::{NodeError, QueueNode, QueueNodeConfig, Started, cold, credit, start_schedules};
 
 /// This node's place in its group.
@@ -34,6 +35,11 @@ pub struct Replica {
     pub peers: BTreeMap<u64, SocketAddr>,
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
+    /// Entries applied since the last snapshot at which a follower takes
+    /// the next; 0 takes none.
+    pub snapshot_every: u64,
+    /// Entries kept in the log behind a snapshot.
+    pub keep_logs: u64,
 }
 
 /// The group member and the runtime it runs on.
@@ -93,7 +99,7 @@ impl QueueNode {
             poisoned: Arc::new(AtomicBool::new(false)),
         };
         let started = Started::new(states, &config, sink, role.clone())?;
-        let machine = Arc::new(Replicas {
+        let machine = Arc::new(machine::Replicas {
             router: Arc::downgrade(&started.router),
             role,
         });
@@ -102,10 +108,17 @@ impl QueueNode {
             id: replica.id,
             peers: replica.peers,
             listener: replica.listener,
+            snapshot_every: replica.snapshot_every,
+            keep_logs: replica.keep_logs,
         };
-        let (member, proposing) =
-            Member::start(runtime.handle(), member, Arc::new(log), machine)
-                .map_err(|_| NodeError::Group("the group member did not start"))?;
+        let snapshots = SnapshotFiles::open(&directory.join("group-snapshots"))
+            .map_err(|_| NodeError::Group("the group's snapshot files did not open"))?;
+        let stores = (
+            Arc::new(log) as Arc<dyn ConsensusLog>,
+            Arc::new(snapshots) as Arc<dyn SnapshotStore>,
+        );
+        let (member, proposing) = Member::start(runtime.handle(), member, stores, machine)
+            .map_err(|_| NodeError::Group("the group member did not start"))?;
         let _set = proposer.set(proposing);
         let (schedule_jobs, scheduling) = start_schedules(&started.router, config.schedule_poll)?;
         Ok(Self {
@@ -141,152 +154,5 @@ impl QueueNode {
         self.router
             .as_ref()
             .is_some_and(|router| router.poisoned.load(Ordering::Acquire))
-    }
-}
-
-fn machine_error(problem: &str) -> ConsensusLogError {
-    ConsensusLogError::new(problem.to_owned())
-}
-
-/// What a countdown waits on: the answers left, the first failure and the
-/// call to make.
-struct Waiting {
-    left: AtomicUsize,
-    failure: Mutex<Option<ConsensusLogError>>,
-    done: Mutex<Option<Applied>>,
-}
-
-/// Joins the shards' answers to one machine call.
-#[derive(Clone)]
-struct Countdown(Arc<Waiting>);
-
-impl Countdown {
-    /// Waits for `parts` answers; with none, `done` is called at once.
-    fn new(parts: usize, done: Applied) -> Option<Self> {
-        if parts == 0 {
-            done(Ok(()));
-            return None;
-        }
-        Some(Self(Arc::new(Waiting {
-            left: AtomicUsize::new(parts),
-            failure: Mutex::new(None),
-            done: Mutex::new(Some(done)),
-        })))
-    }
-
-    fn part(&self, outcome: Result<(), ServiceError>) {
-        let Waiting {
-            left,
-            failure,
-            done,
-        } = &*self.0;
-        if let Err(error) = outcome {
-            *failure.lock().unwrap_or_else(PoisonError::into_inner) =
-                Some(machine_error(&error.to_string()));
-        }
-        if left.fetch_sub(1, Ordering::AcqRel) != 1 {
-            return;
-        }
-        let finished = done.lock().unwrap_or_else(PoisonError::into_inner).take();
-        let failure = failure
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .take();
-        if let Some(done) = finished {
-            done(failure.map_or(Ok(()), Err));
-        }
-    }
-}
-
-/// Leads once every shard serves, then reports.
-fn promoted(role: Role, done: Applied) -> Applied {
-    Box::new(move |outcome| {
-        if outcome.is_ok() {
-            role.lead();
-        }
-        done(outcome);
-    })
-}
-
-/// The node as its group's machine.
-struct Replicas {
-    router: Weak<Router>,
-    role: Role,
-}
-
-/// A committed round's changes, by shard.
-fn changes(router: &Router, proposals: &[Arc<[u8]>]) -> Option<Vec<Vec<Logged>>> {
-    let mut per_shard: Vec<Vec<Logged>> = (0..router.shards.len()).map(|_| Vec::new()).collect();
-    for proposal in proposals {
-        for record in sink::records(proposal)? {
-            for (index, change) in by_shard(Logged::decode(&record)?, router.shard_count)? {
-                per_shard.get_mut(index)?.push(change);
-            }
-        }
-    }
-    Some(per_shard)
-}
-
-impl ReplicatedMachine for Replicas {
-    fn apply(&self, proposals: Vec<Arc<[u8]>>, done: Applied) {
-        let Some(router) = self.router.upgrade() else {
-            return done(Err(machine_error("the node is stopping")));
-        };
-        let Some(per_shard) = changes(&router, &proposals) else {
-            return done(Err(machine_error("a committed round does not decode")));
-        };
-        let parts = per_shard
-            .iter()
-            .filter(|changes| !changes.is_empty())
-            .count();
-        let Some(countdown) = Countdown::new(parts, done) else {
-            return;
-        };
-        for (index, changes) in per_shard.into_iter().enumerate() {
-            if changes.is_empty() {
-                continue;
-            }
-            let part = countdown.clone();
-            let done = Box::new(move |outcome| part.part(outcome));
-            router.send(index, Request::Replay { changes, done });
-        }
-    }
-
-    fn promote(&self, done: Applied) {
-        let Some(router) = self.router.upgrade() else {
-            return done(Err(machine_error("the node is stopping")));
-        };
-        let weak = Weak::clone(&self.router);
-        let role = self.role.clone();
-        let policies = Box::new(move |policies: Result<Vec<_>, ServiceError>| {
-            let (Ok(policies), Some(router)) = (policies, weak.upgrade()) else {
-                return done(Err(machine_error("shard 0 did not hand over its policies")));
-            };
-            let promoted = promoted(role, done);
-            let Some(countdown) = Countdown::new(router.shards.len(), promoted) else {
-                return;
-            };
-            for index in 0..router.shards.len() {
-                let part = countdown.clone();
-                let done = Box::new(move |outcome| part.part(outcome));
-                let policies = policies.clone();
-                router.send(index, Request::Live { policies, done });
-            }
-        });
-        router.send(0, Request::Policies { done: policies });
-    }
-
-    fn demote(&self) {
-        self.role.follow();
-        if let Some(router) = self.router.upgrade() {
-            for index in 0..router.shards.len() {
-                router.send(
-                    index,
-                    Request::Quiet {
-                        done: Box::new(drop),
-                    },
-                );
-            }
-        }
     }
 }

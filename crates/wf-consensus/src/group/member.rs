@@ -13,7 +13,7 @@ use openraft::type_config::async_runtime::watch::WatchReceiver;
 use openraft::{Raft, SnapshotPolicy};
 use tokio::runtime::Handle;
 use tokio::task::JoinHandle;
-use wf_ports::consensus::log::{ConsensusLog, ReplicatedMachine};
+use wf_ports::consensus::log::{ConsensusLog, ReplicatedMachine, SnapshotStore};
 
 use super::machine::Bridge;
 use super::proposer::{self, Proposer};
@@ -27,6 +27,12 @@ pub struct MemberConfig {
     pub peers: BTreeMap<u64, SocketAddr>,
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
+    /// Entries applied since the last snapshot at which a follower takes
+    /// the next (phase 3); 0 takes none.
+    pub snapshot_every: u64,
+    /// Entries kept in the log behind a snapshot, so a slightly late member
+    /// catches up from the log instead of a snapshot.
+    pub keep_logs: u64,
 }
 
 /// A member that could not start.
@@ -78,6 +84,27 @@ async fn watch(raft: Raft<Config, Bridge>, id: u64, machine: Arc<dyn ReplicatedM
     }
 }
 
+/// Takes a snapshot on this member while it follows, once `every` entries
+/// were applied since the last one; a leader's shards are ahead of the log.
+async fn snapshots(raft: Raft<Config, Bridge>, id: u64, every: u64) {
+    if every == 0 {
+        return;
+    }
+    loop {
+        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+        let due = {
+            let metrics = raft.metrics();
+            let metrics = metrics.borrow_watched();
+            let applied = metrics.last_applied.map_or(0, |log_id| log_id.index);
+            let taken = metrics.snapshot.map_or(0, |log_id| log_id.index);
+            metrics.current_leader != Some(id) && applied.saturating_sub(taken) >= every
+        };
+        if due && raft.trigger().snapshot().await.is_err() {
+            return;
+        }
+    }
+}
+
 impl Member {
     /// Starts the member on `runtime` over `log`, applying to `machine`;
     /// returns it with its proposer.
@@ -88,30 +115,37 @@ impl Member {
     pub fn start(
         runtime: &Handle,
         config: MemberConfig,
-        log: Arc<dyn ConsensusLog>,
+        (log, store): (Arc<dyn ConsensusLog>, Arc<dyn SnapshotStore>),
         machine: Arc<dyn ReplicatedMachine>,
     ) -> Result<(Self, Proposer), MemberError> {
         let MemberConfig {
             id,
             peers,
             listener,
+            snapshot_every,
+            keep_logs,
         } = config;
         let raft_config = openraft::Config {
             heartbeat_interval: 100,
             election_timeout_min: 500,
             election_timeout_max: 1_000,
+            // Followers take snapshots themselves (`snapshots`).
             snapshot_policy: SnapshotPolicy::Never,
+            max_in_snapshot_log_to_keep: keep_logs,
             ..openraft::Config::default()
         }
         .validate()
         .map_err(|error| failed(&error))?;
         let fresh = log.bounds() == (None, None);
-        let bridge = Bridge::new(Arc::clone(&machine), id, epoch());
+        let bridge = Bridge::new(Arc::clone(&machine), (id, epoch()), store);
+        runtime
+            .block_on(bridge.restore())
+            .map_err(|error| failed(&error))?;
         let raft = runtime
             .block_on(Raft::new(
                 id,
                 Arc::new(raft_config),
-                Peers::<Vec<u8>>::new(peers.clone()),
+                Peers::new(peers.clone()),
                 LogStore::new(log),
                 bridge.clone(),
             ))
@@ -130,6 +164,7 @@ impl Member {
             runtime.spawn(serve(listener, raft.clone())),
             runtime.spawn(proposing),
             runtime.spawn(watch(raft.clone(), id, machine)),
+            runtime.spawn(snapshots(raft.clone(), id, snapshot_every)),
         ];
         if fresh && peers.keys().next() == Some(&id) {
             let members: BTreeSet<u64> = peers.keys().copied().collect();

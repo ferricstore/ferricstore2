@@ -64,20 +64,29 @@ pub(super) fn encode(entry: &EntryOf<Config>) -> io::Result<Vec<u8>> {
         }
         EntryPayload::Membership(membership) => {
             out.push(MEMBERSHIP);
-            let configs = membership.get_joint_config();
-            out.extend_from_slice(
-                &u32::try_from(configs.len())
-                    .map_err(|_| invalid("membership"))?
-                    .to_be_bytes(),
-            );
-            for config in configs {
-                put_ids(&mut out, config).ok_or_else(|| invalid("membership"))?;
-            }
-            let members: BTreeSet<u64> = membership.nodes().map(|(id, ())| *id).collect();
-            put_ids(&mut out, &members).ok_or_else(|| invalid("membership"))?;
+            put_membership(&mut out, membership)?;
         }
     }
     Ok(out)
+}
+
+/// A membership: its joint configurations, each a count and its voters,
+/// then every member.
+pub(super) fn put_membership(
+    out: &mut Vec<u8>,
+    membership: &MembershipOf<Config>,
+) -> io::Result<()> {
+    let configs = membership.get_joint_config();
+    out.extend_from_slice(
+        &u32::try_from(configs.len())
+            .map_err(|_| invalid("membership"))?
+            .to_be_bytes(),
+    );
+    for config in configs {
+        put_ids(out, config).ok_or_else(|| invalid("membership"))?;
+    }
+    let members: BTreeSet<u64> = membership.nodes().map(|(id, ())| *id).collect();
+    put_ids(out, &members).ok_or_else(|| invalid("membership"))
 }
 
 struct Reader<'a>(&'a [u8]);
@@ -97,7 +106,7 @@ impl Reader<'_> {
     }
 }
 
-fn membership(bytes: &[u8]) -> Option<MembershipOf<Config>> {
+pub(super) fn membership(bytes: &[u8]) -> Option<MembershipOf<Config>> {
     let mut reader = Reader(bytes);
     let count = u32::from_be_bytes(reader.take()?);
     let configs = (0..count)

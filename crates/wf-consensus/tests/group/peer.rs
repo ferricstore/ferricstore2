@@ -15,7 +15,7 @@ use wf_consensus::group::{Config, LogStore, Peers, Proposal, serve};
 use wf_storage::log::{EntryLog, GroupLogLimits};
 use wf_test_support::resources::TestResources;
 
-use super::machine::{Image, Machine};
+use super::machine::Machine;
 use super::{TestResult, runtime};
 
 struct Member {
@@ -44,7 +44,7 @@ async fn start(
     let raft = Raft::new(
         id,
         Arc::new(config.validate()?),
-        Peers::<Image>::new(addresses.clone()),
+        Peers::new(addresses.clone()),
         LogStore::new(Arc::new(log)),
         machine.clone(),
     )

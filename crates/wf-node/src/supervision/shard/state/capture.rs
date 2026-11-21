@@ -36,32 +36,7 @@ impl ShardState {
                 ),
             )?;
         }
-        let shared: Vec<image::SharedEntry<'_>> = self
-            .shared_values(now)
-            .into_iter()
-            .map(|(reference, value)| {
-                (
-                    &value.partition,
-                    reference.as_slice(),
-                    value.bytes.as_slice(),
-                    value.expires_at,
-                )
-            })
-            .collect();
-        image::encode_shared(&mut out, &shared)?;
-        let mut policies = Vec::new();
-        for installed in self.policies() {
-            let mut encoded = Vec::new();
-            installed.policy.term().encode(&mut encoded)?;
-            policies.push((
-                installed.flow_type.as_slice(),
-                installed.generation,
-                encoded,
-            ));
-        }
-        image::encode_policies(&mut out, &policies)?;
-        let records: Vec<(u8, &[u8], &[u8])> = self.governance_records().collect();
-        image::encode_governance(&mut out, records.into_iter())?;
+        self.encode_tail(now, &mut out)?;
         let mut stubs: Vec<(&Key, &Stub)> = self
             .records
             .iter()
@@ -85,6 +60,38 @@ impl ShardState {
             .collect();
         image::encode_stubs(&mut out, &stubs)?;
         Some(out)
+    }
+
+    /// The parts of an image after its records: shared values, policies and
+    /// governance records.
+    pub(super) fn encode_tail(&self, now: u64, out: &mut Vec<u8>) -> Option<()> {
+        let shared: Vec<image::SharedEntry<'_>> = self
+            .shared_values(now)
+            .into_iter()
+            .map(|(reference, value)| {
+                (
+                    &value.partition,
+                    reference.as_slice(),
+                    value.bytes.as_slice(),
+                    value.expires_at,
+                )
+            })
+            .collect();
+        image::encode_shared(out, &shared)?;
+        let mut policies = Vec::new();
+        for installed in self.policies() {
+            let mut encoded = Vec::new();
+            installed.policy.term().encode(&mut encoded)?;
+            policies.push((
+                installed.flow_type.as_slice(),
+                installed.generation,
+                encoded,
+            ));
+        }
+        image::encode_policies(out, &policies)?;
+        let records: Vec<(u8, &[u8], &[u8])> = self.governance_records().collect();
+        image::encode_governance(out, records.into_iter())?;
+        Some(())
     }
 
     /// Restores a finished Flow on disk from a snapshot image (ADR-016).
