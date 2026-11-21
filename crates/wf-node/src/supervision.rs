@@ -3,6 +3,7 @@
 //! thread for blocking claims and the snapshot thread.
 
 pub(crate) mod completer;
+pub mod health;
 pub(crate) mod scheduler;
 pub(crate) mod shard;
 pub(crate) mod snapshots;

@@ -1,0 +1,86 @@
+# A three-member ferricstore2 group on Kubernetes (ADR-019): a StatefulSet
+# whose pods find each other through a headless service. Apply with
+#   kubectl apply -f deploy/kubernetes/ferricstore2.yaml
+# Clients connect to the `ferricstore2` service; SHARDS sends them on to the
+# leading pod by its stable name.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ferricstore2-headless
+  labels: {app: ferricstore2}
+spec:
+  clusterIP: None
+  # Members must resolve each other before any of them is ready.
+  publishNotReadyAddresses: true
+  selector: {app: ferricstore2}
+  ports:
+    - {name: native, port: 6388}
+    - {name: peer, port: 7388}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ferricstore2
+  labels: {app: ferricstore2}
+spec:
+  selector: {app: ferricstore2}
+  ports:
+    - {name: native, port: 6388}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ferricstore2
+spec:
+  serviceName: ferricstore2-headless
+  replicas: 3
+  # Members start together: the group forms only once all of them answer.
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels: {app: ferricstore2}
+  template:
+    metadata:
+      labels: {app: ferricstore2}
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: ferricstore2
+          image: ghcr.io/ferricstore/ferricstore2:latest
+          ports:
+            - {name: native, containerPort: 6388}
+            - {name: peer, containerPort: 7388}
+            - {name: health, containerPort: 6380}
+          env:
+            - name: POD_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+            - name: FERRICSTORE_NODE_NAME
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+            - {name: FERRICSTORE_DISCOVERY, value: dns}
+            - {name: FERRICSTORE_DNS_NAME, value: "ferricstore2-headless.$(POD_NAMESPACE).svc.cluster.local"}
+            # Keep equal to `replicas`; changing the size of a running group
+            # is not supported yet.
+            - {name: FERRICSTORE_CLUSTER_SIZE, value: "3"}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: health}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /health/live, port: health}
+            periodSeconds: 10
+          volumeMounts:
+            - {name: data, mountPath: /data}
+  volumeClaimTemplates:
+    - metadata: {name: data}
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests: {storage: 10Gi}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ferricstore2
+spec:
+  # A three-member group keeps serving with one member down.
+  maxUnavailable: 1
+  selector:
+    matchLabels: {app: ferricstore2}

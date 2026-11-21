@@ -5,7 +5,8 @@
 //! and its bytes); a response with its outcome (`0` an append accepted up to
 //! an optional log id, `1` an append conflict at a log id, `2` a higher vote,
 //! `3` a vote response, `4` a failure with its text, `5` a snapshot taken,
-//! with the receiver's vote). A vote is its term, node
+//! with the receiver's vote). Kind `6` asks whether a member holds any log
+//! (ADR-019); its answer is `6` and a byte. A vote is its term, node
 //! and committed byte; an optional log id is a presence byte and the id's
 //! term, node and index; an entry is its id, its payload length and payload
 //! (`codec::encode`). Conflict hints are not sent; they are optional.
@@ -31,6 +32,8 @@ pub(crate) enum Request {
     PreVote(VoteRequest<Config>),
     /// A snapshot for a member the log no longer reaches.
     Snapshot(VoteOf<Config>, SnapshotOf<Config, Vec<u8>>),
+    /// Whether the member holds any log, before a group is formed.
+    Status,
 }
 
 /// The answer to a [`Request`].
@@ -43,6 +46,8 @@ pub(crate) enum Response {
     Failed(String),
     /// To a snapshot.
     Snapshot(SnapshotResponse<Config>),
+    /// To a status request: whether the member holds any log.
+    Status(bool),
 }
 
 fn invalid() -> io::Error {
@@ -104,6 +109,7 @@ pub(crate) fn encode_request(request: &Request) -> io::Result<Vec<u8>> {
             put_bytes(&mut out, &snapshot::meta_bytes(&snapshot.meta)?)?;
             put_bytes(&mut out, &snapshot.snapshot)?;
         }
+        Request::Status => out.push(6),
         Request::Vote(vote) | Request::PreVote(vote) => {
             out.push(if matches!(request, Request::Vote(_)) {
                 2
@@ -149,6 +155,10 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
         Response::Snapshot(taken) => {
             out.push(5);
             put_vote(&mut out, &taken.vote);
+        }
+        Response::Status(held) => {
+            out.push(6);
+            out.push(u8::from(*held));
         }
     }
     Ok(out)
@@ -252,6 +262,7 @@ pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<Request> {
                 },
             )
         }
+        6 => Request::Status,
         kind @ (2 | 3) => {
             let vote = VoteRequest::new(reader.vote()?, reader.log_id()?);
             if kind == 2 {
@@ -285,6 +296,7 @@ pub(crate) fn decode_response(bytes: &[u8]) -> io::Result<Response> {
         }
         4 => Response::Failed(String::from_utf8_lossy(reader.bytes()?).into_owned()),
         5 => Response::Snapshot(SnapshotResponse::new(reader.vote()?)),
+        6 => Response::Status(reader.u8()? == 1),
         _ => return Err(invalid()),
     };
     reader.done(response)

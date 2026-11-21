@@ -1,11 +1,11 @@
 //! One member of a replicated group (ADR-018), on the node's Tokio runtime:
 //! its Raft over the consensus log, the peer listener, the proposer and a
 //! watcher that demotes the machine when this member stops leading. A fresh
-//! group is formed by its lowest-numbered member.
+//! group is formed by its lowest-numbered member once every other member
+//! reports an empty log.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
-use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -17,14 +17,15 @@ use wf_ports::consensus::log::{ConsensusLog, ReplicatedMachine, SnapshotStore};
 
 use super::machine::Bridge;
 use super::proposer::{self, Proposer};
-use super::{Config, LogStore, Peers, serve};
+use super::{Config, LogStore, Peers, peer, serve};
 
 /// How a member reaches the others.
 pub struct MemberConfig {
     /// This member's id.
     pub id: u64,
-    /// Every member's Raft address, this one's included.
-    pub peers: BTreeMap<u64, SocketAddr>,
+    /// Every member's Raft address (`host:port`, resolved on each
+    /// connection), this one's included.
+    pub peers: BTreeMap<u64, String>,
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
     /// Entries applied since the last snapshot at which a follower takes
@@ -82,6 +83,44 @@ async fn watch(raft: Raft<Config, Bridge>, id: u64, machine: Arc<dyn ReplicatedM
             return;
         }
     }
+}
+
+/// Forms the group from this member, its lowest, once every other member
+/// answers that it holds no log; while one is unreachable it waits, and once
+/// one holds a log (the group exists; this member lost its own) it leaves
+/// forming to that group, which replicates to it (ADR-019).
+async fn form(raft: Raft<Config, Bridge>, peers: BTreeMap<u64, String>, id: u64) {
+    loop {
+        if raft.metrics().borrow_watched().current_leader.is_some() {
+            return;
+        }
+        match others_empty(&peers, id).await {
+            Some(true) => {
+                let members: BTreeSet<u64> = peers.keys().copied().collect();
+                // Another start of the same member may have formed it.
+                let _formed = raft.initialize(members).await;
+                return;
+            }
+            Some(false) => return,
+            None => tokio::time::sleep(std::time::Duration::from_millis(500)).await,
+        }
+    }
+}
+
+/// Whether every other member holds no log; `None` while one cannot be
+/// asked.
+async fn others_empty(peers: &BTreeMap<u64, String>, id: u64) -> Option<bool> {
+    for (member, address) in peers {
+        if *member == id {
+            continue;
+        }
+        match peer::status(address).await {
+            Ok(true) => return Some(false),
+            Ok(false) => {}
+            Err(_) => return None,
+        }
+    }
+    Some(true)
 }
 
 /// Takes a snapshot on this member while it follows, once `every` entries
@@ -160,16 +199,14 @@ impl Member {
             tokio::net::TcpListener::from_std(listener).map_err(|error| failed(&error))?
         };
         let (proposer, proposing) = proposer::start(raft.clone(), bridge.epoch());
-        let tasks = vec![
+        let mut tasks = vec![
             runtime.spawn(serve(listener, raft.clone())),
             runtime.spawn(proposing),
             runtime.spawn(watch(raft.clone(), id, machine)),
             runtime.spawn(snapshots(raft.clone(), id, snapshot_every)),
         ];
         if fresh && peers.keys().next() == Some(&id) {
-            let members: BTreeSet<u64> = peers.keys().copied().collect();
-            // Another start of the same group may have formed it already.
-            let _formed = runtime.block_on(raft.initialize(members));
+            tasks.push(runtime.spawn(form(raft.clone(), peers, id)));
         }
         Ok((
             Self {

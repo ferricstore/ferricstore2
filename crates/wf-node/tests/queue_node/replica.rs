@@ -40,7 +40,10 @@ fn open_with(
     let address = peers.get(&id).ok_or("unknown member")?;
     let replica = Replica {
         id,
-        peers: peers.clone(),
+        peers: peers
+            .iter()
+            .map(|(id, address)| (*id, address.to_string()))
+            .collect(),
         listener: TcpListener::bind(address)?,
         snapshot_every,
         keep_logs: 0,
@@ -251,5 +254,36 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     assert_states(leader, "w1-", 40, &completed)?;
     assert_states(leader, "w2-", 10, &completed)?;
     assert_states(leader, "w3-", 10, &completed)?;
+    Ok(())
+}
+
+#[test]
+fn the_lowest_member_that_lost_its_data_rejoins_instead_of_forming_a_group() -> TestResult {
+    let path = directory("replica-wiped")?;
+    let peers = peers()?;
+    let mut nodes = BTreeMap::new();
+    for id in MEMBERS {
+        nodes.insert(id, open(&path, id, &peers)?);
+    }
+    let first = serving(&nodes, "probe-1")?;
+    create(nodes.get(&first).ok_or("no leader")?, &ids("k", 10))??;
+    // Member 1 loses its data while the others keep the group.
+    drop(nodes.remove(&1));
+    std::fs::remove_dir_all(path.join("n1"))?;
+    nodes.insert(1, open(&path, 1, &peers)?);
+    let leader = serving(&nodes, "probe-2")?;
+    std::thread::sleep(Duration::from_secs(1));
+    // The next majority needs member 1: every Flow must still be there.
+    let other = MEMBERS
+        .iter()
+        .copied()
+        .find(|id| *id != 1 && *id != leader)
+        .ok_or("no third member")?;
+    drop(nodes.remove(&other));
+    let next = serving(&nodes, "probe-3")?;
+    let node = nodes.get(&next).ok_or("no leader")?;
+    for id in ids("k", 10) {
+        assert_eq!(state_of(node, &id)?, Term::text("queued"), "{id}");
+    }
     Ok(())
 }

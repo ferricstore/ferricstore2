@@ -10,7 +10,6 @@
 mod machine;
 
 use std::collections::BTreeMap;
-use std::net::SocketAddr;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -31,8 +30,9 @@ use super::{NodeError, QueueNode, QueueNodeConfig, Started, cold, credit, start_
 pub struct Replica {
     /// This member's id.
     pub id: u64,
-    /// Every member's Raft address, this one's included.
-    pub peers: BTreeMap<u64, SocketAddr>,
+    /// Every member's Raft address (`host:port`, resolved on each
+    /// connection), this one's included.
+    pub peers: BTreeMap<u64, String>,
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
     /// Entries applied since the last snapshot at which a follower takes
@@ -145,6 +145,14 @@ impl QueueNode {
     #[must_use]
     pub fn leader(&self) -> Option<u64> {
         self.group.as_ref().and_then(Group::leader)
+    }
+
+    /// Whether the node is ready for clients (ADR-019): not stopped by a
+    /// lost round, and, in a group, knowing its leader (a follower then
+    /// reroutes clients there).
+    #[must_use]
+    pub fn ready(&self) -> bool {
+        !self.poisoned() && (self.group.is_none() || self.leader().is_some())
     }
 
     /// Whether a lost round stopped this node: it serves nothing more and

@@ -44,7 +44,12 @@ async fn start(
     let raft = Raft::new(
         id,
         Arc::new(config.validate()?),
-        Peers::new(addresses.clone()),
+        Peers::new(
+            addresses
+                .iter()
+                .map(|(id, address)| (*id, address.to_string()))
+                .collect(),
+        ),
         LogStore::new(Arc::new(log)),
         machine.clone(),
     )

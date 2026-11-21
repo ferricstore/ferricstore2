@@ -66347,3 +66347,39 @@ against a single node on the same machine:
 Next for this cost: fewer copies of a round's bytes on the replication
 path (proposal, entry log, per-follower encoding), no Tokio task per round
 in the proposer, and measuring with members on separate machines.
+
+### ADR-019: cluster setup and discovery (21 Nov)
+
+Decisions: every setting is a `FERRICSTORE_*` environment variable with a
+flag that overrides it, so one image serves Docker, Compose and Kubernetes.
+Discovery is `none`, `static` (one list on every node, ids by position) or
+`dns` (a `StatefulSet` behind a headless service: ids are ordinal plus 1,
+members are `<base>-<ordinal>.<service>`). Members keep peers as names and
+resolve them on each connection, so a pod back with a new address is found
+again. Formation is safe without an init job: the lowest member forms the
+group only after every other member answers a status request with an empty
+log. If any other member already holds a log, a group exists and the
+lowest member does not form one (the group's leader reaches it); while one
+cannot be reached, it asks again every 500 ms. Health endpoints:
+`/health/live` (the process answers) and `/health/ready` (not stopped by a
+lost round, and either a single node or a member that knows a leader).
+
+Evidence: `configuration` unit tests (static lists by position, explicit
+node id, `StatefulSet` pod names, sizes, bad and missing settings) and the
+health reply test. The replica tests pass with string peers. A process
+check: three nodes from environment variables only (`static`, node ids,
+health ports), all three live and ready, the SDK phase script writes 20
+Flows and completes 5 through the leader, the leader is killed with
+SIGKILL, and after failover the script reads all 20 with no mismatch and
+writes again; the killed node's port stops answering and the other two
+stay ready.
+
+Honest note: `the_lowest_member_that_lost_its_data_rejoins_instead_of_
+forming_a_group` passes with the formation guard removed too. `OpenRaft`
+treats an identical initial membership on a wiped member as benign, so the
+test covers the outcome, not the guard. The guard stays for the case the
+test cannot reach that way: a wiped lowest member whose configured members
+differ from the group's, which would form a second group with its own
+leader. The Kubernetes manifest and the Compose file were not run here (no
+cluster on this machine); the Compose file uses the same settings the
+process check used.

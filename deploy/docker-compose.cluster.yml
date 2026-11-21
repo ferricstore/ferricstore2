@@ -1,0 +1,33 @@
+# A three-member ferricstore2 group on one Docker host (ADR-019):
+#   docker compose -f deploy/docker-compose.cluster.yml up --build
+# Members list each other by service name (static discovery). SHARDS names
+# those hosts, so clients run on the same Docker network (or use
+# network_mode: host on Linux).
+x-member: &member
+  build: ..
+  environment: &environment
+    FERRICSTORE_DISCOVERY: static
+    FERRICSTORE_CLUSTER_NODES: fs1,fs2,fs3
+  restart: unless-stopped
+
+services:
+  fs1:
+    <<: *member
+    hostname: fs1
+    environment: {<<: *environment, FERRICSTORE_NODE_NAME: fs1}
+    volumes: [fs1:/data]
+    ports: ["6391:6388"]
+  fs2:
+    <<: *member
+    hostname: fs2
+    environment: {<<: *environment, FERRICSTORE_NODE_NAME: fs2}
+    volumes: [fs2:/data]
+    ports: ["6392:6388"]
+  fs3:
+    <<: *member
+    hostname: fs3
+    environment: {<<: *environment, FERRICSTORE_NODE_NAME: fs3}
+    volumes: [fs3:/data]
+    ports: ["6393:6388"]
+
+volumes: {fs1: {}, fs2: {}, fs3: {}}

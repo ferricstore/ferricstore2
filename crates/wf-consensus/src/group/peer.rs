@@ -12,7 +12,6 @@
 use std::collections::BTreeMap;
 use std::future::{Future, ready};
 use std::io;
-use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -23,6 +22,7 @@ use openraft::raft::{
 };
 use openraft::storage::RaftStateMachine;
 use openraft::type_config::alias::{SnapshotOf, VoteOf};
+use openraft::type_config::async_runtime::watch::WatchReceiver;
 use openraft::{AnyError, OptionalSend, Raft};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
@@ -112,6 +112,9 @@ where
             .pre_vote(vote)
             .await
             .map_or_else(|error| failed(&error), Response::Vote),
+        Request::Status => {
+            Response::Status(raft.metrics().borrow_watched().last_log_index.is_some())
+        }
         Request::Snapshot(vote, snapshot) => raft
             .install_full_snapshot(vote, snapshot)
             .await
@@ -121,13 +124,14 @@ where
 
 /// The members' Raft addresses: `OpenRaft`'s network factory.
 pub struct Peers {
-    addresses: Arc<BTreeMap<u64, SocketAddr>>,
+    addresses: Arc<BTreeMap<u64, String>>,
 }
 
 impl Peers {
-    /// The network to `addresses`, by member id.
+    /// The network to `addresses` (`host:port`, resolved on each
+    /// connection), by member id.
     #[must_use]
-    pub fn new(addresses: BTreeMap<u64, SocketAddr>) -> Self {
+    pub fn new(addresses: BTreeMap<u64, String>) -> Self {
         Self {
             addresses: Arc::new(addresses),
         }
@@ -139,7 +143,7 @@ impl RaftNetworkFactory<Config> for Peers {
 
     fn new_client(&mut self, target: u64, (): &()) -> impl Future<Output = Link> + Send {
         ready(Link {
-            address: self.addresses.get(&target).copied(),
+            address: self.addresses.get(&target).cloned(),
             stream: None,
         })
     }
@@ -147,7 +151,7 @@ impl RaftNetworkFactory<Config> for Peers {
 
 /// One client's connection to a member.
 pub struct Link {
-    address: Option<SocketAddr>,
+    address: Option<String>,
     stream: Option<TcpStream>,
 }
 
@@ -155,6 +159,7 @@ impl Link {
     async fn connect(&self) -> io::Result<TcpStream> {
         let address = self
             .address
+            .as_deref()
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "unknown member"))?;
         let stream = tokio::time::timeout(CONNECT_TIMEOUT, TcpStream::connect(address))
             .await
@@ -195,6 +200,24 @@ impl Link {
                 Err(RPCError::Unreachable(unreachable(&elapsed)))
             }
         }
+    }
+}
+
+/// Whether the member at `address` holds any log (ADR-019).
+///
+/// # Errors
+/// The member cannot be reached or answers something else.
+pub(super) async fn status(address: &str) -> io::Result<bool> {
+    let mut link = Link {
+        address: Some(address.to_owned()),
+        stream: None,
+    };
+    let answer = tokio::time::timeout(CONNECT_TIMEOUT, link.exchange(&Request::Status))
+        .await
+        .map_err(io::Error::other)??;
+    match answer {
+        Response::Status(held) => Ok(held),
+        _ => Err(io::Error::other("mismatched peer response")),
     }
 }
 

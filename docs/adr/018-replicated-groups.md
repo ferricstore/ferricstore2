@@ -65,8 +65,8 @@ leaders do.
    entries survive and stay identical on every member.
 2. **Node integration:** a replica set from configuration, a peer listener,
    commit-released replies, follower apply, `SHARDS` leaders and `reroute`.
-   Landed 21 Nov: `ferricstore2 --node-id ID --member
-   ID=HOST:PORT/PEER_HOST:PEER_PORT ...` runs a member; the leader's shards
+   Landed 21 Nov (members configured as ADR-019 describes; the first
+   `--member` flags are gone); the leader's shards
    propose rounds and reply at commit, followers replay committed rounds,
    `SHARDS` names the leader with the term as route epoch, and a lost round
    stops the process (status 75) for its supervisor to restart it.
