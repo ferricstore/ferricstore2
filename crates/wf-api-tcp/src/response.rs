@@ -87,6 +87,7 @@ pub fn term(term: &Term) -> Result<Vec<u8>, ReplyTooLong> {
 pub fn service_error(failure: &ServiceError) -> Result<Vec<u8>, ReplyTooLong> {
     match failure {
         ServiceError::Query(failure) => typed(failure.status(), &value(&failure.payload())),
+        ServiceError::Governance(denial) => typed(STATUS_ERROR, &value(&denial.payload())),
         ServiceError::BadRequest(message) => {
             let map = Value::Map(vec![
                 (b"code".to_vec(), text(b"bad_request")),

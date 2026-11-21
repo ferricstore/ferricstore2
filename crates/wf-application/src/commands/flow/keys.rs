@@ -35,6 +35,13 @@ pub fn named_value_ref(partition: &Partition, owner: &[u8], name: &[u8], version
     .into_bytes()
 }
 
+/// The prefix of the keys Elixir writes a Flow's governance records under:
+/// `f:{<tag>}:gov:<kind>:` (`e` effects, `li` the ledger index).
+#[must_use]
+pub fn governance_prefix(partition: &Partition, kind: &str) -> Vec<u8> {
+    format!("f:{}:gov:{kind}:", tag(partition)).into_bytes()
+}
+
 /// The lowercase hex SHA-256 of a stored value.
 #[must_use]
 pub fn digest(bytes: &[u8]) -> Vec<u8> {

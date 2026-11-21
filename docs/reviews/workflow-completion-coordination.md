@@ -65403,3 +65403,48 @@ the overlap read, the backoff doubling, the ownership check, wall-clock
 retention or the active-state claim guard each makes one fail. All 68 node
 tests, the TCP adapter and application tests pass; the SDK suite passes
 40 of 60. Clippy, the ratchet, lint tests, docs and architecture pass.
+
+### ADR014-EFFECT1 FLOW.EFFECT.* and FLOW.GOVERNANCE.LEDGER
+
+New artifacts (solo design review): `wf_application::commands::flow::
+effect` (`Command`, `Status`, `parse`, `is_effect`, limits; children
+`request` with `ledger`, `store` (`Governance`, `Effect`, `Event`, `Kind`,
+`Owner`), `decide` (`Flow`, `read`, `write`), `denial` (`Denial`,
+`decision_id`, `default_policy`, `policy_hash`), `tests`),
+`FlowCommand::Effect`, `ServiceError::Governance`, `FlowMeta::governance`,
+`keys::governance_prefix`; `wf-node` `supervision::shard::state::effect`;
+snapshot version 10; opcodes 0x0240 to 0x0245. No new dependency.
+
+Decisions: keep effects and the ledger in the owning Flow's stored fields
+rather than separate keyed records, so the shard decides an effect and its
+ledger event in one step (Elixir's applied-side-effect bookkeeping and
+retry completion have nothing to repair), and logging, snapshots and
+retention follow the Flow; decide in `wf-application` from a borrowed view
+of the Flow, the shard only storing and logging; send a refusal's code
+once rather than Elixir's duplicate key; build the effect path for the
+default policy only, since no reachable policy can differ (circuits and
+approvals stay in step 15).
+
+Evidence: the Elixir scenario (reserve, replay, conflict, idempotency
+refusals, confirm, already-applied, terminal conflict, compensate, fail,
+earlier time, 30 argument and lease errors, ledger windows and options,
+auto partitions, a state-governed type, completion) was captured first;
+the node matches it apart from the opaque policy hash, the duplicate code
+and option handling, with every decision and ledger id equal. Ported from
+`flow_governance_test.exs` and the store review tests: idempotent reserve
+and conflict, confirm record and ledger kinds and windows, retries
+answered from the stored decision, terminal updates without duplicate
+events, invalid terminal metadata and older timestamps leaving the effect
+unchanged, the lease requirement, auto partitions, retention removal, the
+ledger byte budget, record corruption, Elixir's decision ids; added
+restart and snapshot survival. Not ported: policy-version, approval and
+denied-list policies (unreachable over the typed protocol), circuit
+recording, NX races, side-effect retry repair and separate-key corruption
+cases (no such storage). The tests were written after the code, so this
+step does not claim TDD; breaking the digest comparison, the fence check,
+the refusal record, the already-applied check, the time check, the empty
+key check, the image field, the refusal count restore, the ledger order,
+reversal or window, or the change log each makes one fail. All 76 node
+tests, the TCP adapter (whose decoder now refuses duplicate keys) and
+application tests pass; the SDK suite passes 40 of 60. Clippy, the
+ratchet, lint tests, docs, architecture and cargo-deny pass.

@@ -82,6 +82,8 @@ pub struct FlowMeta {
     pub indexed_attributes: Vec<String>,
     /// The state metadata key its type's policy indexed then.
     pub indexed_state_meta: Option<String>,
+    /// Effects and governance ledger (ADR-014 step 14).
+    pub governance: Option<Box<super::effect::Governance>>,
 }
 
 impl Default for FlowMeta {
@@ -110,6 +112,7 @@ impl Default for FlowMeta {
             rewound_to: None,
             indexed_attributes: Vec::new(),
             indexed_state_meta: None,
+            governance: None,
         }
     }
 }

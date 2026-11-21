@@ -13,6 +13,7 @@ mod capture;
 mod catalog;
 mod children;
 mod claim;
+mod effect;
 pub(crate) mod events;
 mod fifo;
 mod flow;

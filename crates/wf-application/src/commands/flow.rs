@@ -10,6 +10,7 @@ pub mod children;
 pub mod claim;
 pub mod cleanup;
 pub mod create;
+pub mod effect;
 pub mod get;
 pub mod history;
 pub mod info;
@@ -81,6 +82,8 @@ pub enum FlowCommand {
     QueryIndexes(query::indexes::Indexes),
     /// A `FLOW.SCHEDULE.*` command.
     Schedule(Box<schedule::Command>),
+    /// A `FLOW.EFFECT.*` command or `FLOW.GOVERNANCE.LEDGER`.
+    Effect(Box<effect::Command>),
 }
 
 impl FlowCommand {
@@ -106,6 +109,7 @@ impl FlowCommand {
             Self::StartAndClaim(start) => {
                 Some((&start.create.id, start.create.partition_key.as_deref()))
             }
+            Self::Effect(command) => Some(command.target()),
             Self::Many(_)
             | Self::ValueMget(_)
             | Self::RunSteps(_)
@@ -141,6 +145,9 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
         "FLOW.RETENTION_CLEANUP" => cleanup::parse(args).map(FlowCommand::RetentionCleanup),
         "FLOW.REWIND" => rewind::parse(args).map(|rewind| FlowCommand::Rewind(Box::new(rewind))),
+        name if effect::is_effect(name) => {
+            effect::parse(name, args).map(|command| FlowCommand::Effect(Box::new(command)))
+        }
         name if name.starts_with("FLOW.SCHEDULE.") => {
             schedule::parse(name, args).map(|command| FlowCommand::Schedule(Box::new(command)))
         }

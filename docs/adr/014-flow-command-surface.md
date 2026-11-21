@@ -392,3 +392,32 @@ Each step is one commit with its tests.
   matches Elixir except lines shaped by Elixir's own background scheduler
   and the unknown-option wording; the SDK suite passes 40 of 60, its
   native schedule test now failing on a governance opcode.
+- Step 14: `FLOW.EFFECT.*` (0x0240 to 0x0244) and `FLOW.GOVERNANCE.LEDGER`
+  (0x0245), as `Governance.Effect` and `Governance.Ledger`. A reservation
+  needs the Flow's current lease token and fence; a retry with the same
+  `operation_digest` is answered from the stored effect (`already_reserved`,
+  before any policy check), another digest is a `GOVERNANCE_CONFLICT`. A
+  reserved effect moves once to confirmed, failed or compensated (the same
+  status again is `already_applied`, another a conflict, an earlier
+  `now_ms` refused), keeping the external id, error, reason and latency
+  given. Reservations and moves append ledger events with Elixir's
+  decision ids; the ledger lists by time window, newest first on `rev`,
+  keeping the newest 1,000 events within 900,000 bytes. Effects are
+  decided under the state's resolved governance policy, and a leased Flow
+  is `running`, a state no policy may name, while the typed protocol has
+  no type-level governance: every effect is decided under Elixir's default
+  policy, which refuses a reservation without an idempotency key
+  (`GOVERNANCE_EFFECT_DENIED`, recorded in the ledger). Refusals reply
+  with status 1 and the decision's fields; Elixir also sends the
+  transport's `code: "error"` under the same key, which the SDK decoders
+  refuse as a duplicate, so this node sends the decision's code once.
+  Effects and the ledger are stored with the Flow (logged as its
+  after-image, imaged in snapshots, version 10), so replay restores them
+  and retention removes them with it, as Elixir's retention owner does.
+  Differences: the policy hash covers this node's encoding of the default
+  policy (Elixir hashes its own term encoding with the type's stored
+  policy merged in), refusal event ids are numbered per Flow instead of
+  random, a non-string `governance_scope` is refused, and options a command
+  does not read are refused (Elixir accepts any known Flow option). The
+  scenario matches Elixir apart from those; the SDK suite passes 40 of 60,
+  its native test now past the effects and failing on approvals.

@@ -114,7 +114,10 @@ fn read(input: &mut &[u8]) -> TestResult<Typed> {
             for _ in 0..count {
                 let key_length = read_length(input)?;
                 let key = String::from_utf8(take(input, key_length)?.to_vec())?;
-                entries.insert(key, read(input)?);
+                // Clients refuse a map that repeats a key, as the SDKs do.
+                if entries.insert(key, read(input)?).is_some() {
+                    return Err("duplicate map key".into());
+                }
             }
             Typed::Map(entries)
         }

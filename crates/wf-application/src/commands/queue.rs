@@ -188,6 +188,8 @@ pub enum ServiceError {
     BadRequest(String),
     /// A failed Flow query, with its diagnostic (ADR-014 step 12).
     Query(Box<super::flow::query::Failure>),
+    /// A structured governance refusal (ADR-014 step 14).
+    Governance(Box<super::flow::effect::denial::Denial>),
 }
 
 impl ServiceError {
@@ -215,6 +217,9 @@ impl fmt::Display for ServiceError {
             }
             Self::Rejected(text) | Self::BadRequest(text) => formatter.write_str(text),
             Self::Query(failure) => formatter.write_str(failure.message()),
+            Self::Governance(denial) => {
+                formatter.write_str(&String::from_utf8_lossy(denial.message()))
+            }
         }
     }
 }

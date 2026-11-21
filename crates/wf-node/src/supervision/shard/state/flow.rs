@@ -54,6 +54,7 @@ impl ShardState {
             FlowCommand::SpawnChildren(spawn) => self.spawn_children(now, &spawn, partition),
             FlowCommand::Rewind(rewind) => self.rewind(now, &rewind, partition),
             FlowCommand::Query(query) => (self.query(&query, &partition, now), None),
+            FlowCommand::Effect(command) => self.effect(now, &command, partition),
             // Batches and reads by reference are split over shards before
             // they reach one; policies have requests of their own.
             FlowCommand::Many(_)

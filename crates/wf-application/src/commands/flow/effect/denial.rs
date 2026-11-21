@@ -1,0 +1,147 @@
+//! Governance refusals as `Ferricstore.Flow.Governance.Decision` builds
+//! them, their decision ids, and the hash of the policy effects are
+//! decided under.
+//!
+//! A refusal is an error whose reply is a map: the decision's fields with
+//! its `GOVERNANCE_*` code, and `retryable` and `safe_to_retry` false.
+//! Elixir also sends the transport's `code: "error"` under the same key,
+//! which clients refuse as a duplicate; this node sends the code once.
+
+use sha2::{Digest, Sha256};
+
+use super::super::term::{Term, map};
+use crate::routing::base64url_nopad;
+
+/// A structured governance refusal.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Denial {
+    /// Its fields in reply order; `None` is nil.
+    pub fields: Vec<(&'static str, Option<Vec<u8>>)>,
+}
+
+/// `decision_id/2`: the URL-safe base64 SHA-256 of `reason:subject`.
+#[must_use]
+pub fn decision_id(reason: &str, subject: &[u8]) -> Vec<u8> {
+    let mut hasher = Sha256::new();
+    hasher.update(reason.as_bytes());
+    hasher.update(b":");
+    hasher.update(subject);
+    base64url_nopad(&hasher.finalize()).into_bytes()
+}
+
+/// `Decision.error/2`'s reason for a code.
+const fn reason(code: &str) -> &'static str {
+    match code.as_bytes() {
+        b"GOVERNANCE_EFFECT_DENIED" => "effect_denied",
+        b"GOVERNANCE_CONFLICT" => "governance_conflict",
+        _ => "governance_denied",
+    }
+}
+
+impl Denial {
+    /// A decision with `code`, `message` and `policy`, then `rest`.
+    #[must_use]
+    pub fn new(
+        code: &'static str,
+        message: Vec<u8>,
+        policy: &'static str,
+        rest: Vec<(&'static str, Option<Vec<u8>>)>,
+    ) -> Self {
+        let mut fields = vec![
+            ("code", Some(code.as_bytes().to_vec())),
+            ("message", Some(message)),
+            ("reason", Some(reason(code).as_bytes().to_vec())),
+            ("policy", Some(policy.as_bytes().to_vec())),
+        ];
+        fields.extend(rest);
+        Self { fields }
+    }
+
+    fn field(&self, name: &str) -> &[u8] {
+        self.fields
+            .iter()
+            .find(|(key, _)| *key == name)
+            .and_then(|(_, value)| value.as_deref())
+            .unwrap_or_default()
+    }
+
+    /// Its code.
+    #[must_use]
+    pub fn code(&self) -> &[u8] {
+        self.field("code")
+    }
+
+    /// Its message.
+    #[must_use]
+    pub fn message(&self) -> &[u8] {
+        self.field("message")
+    }
+
+    /// Its policy name.
+    #[must_use]
+    pub fn policy(&self) -> &[u8] {
+        self.field("policy")
+    }
+
+    /// The reply map.
+    #[must_use]
+    pub fn payload(&self) -> Term {
+        let mut entries: Vec<(&str, Term)> = self
+            .fields
+            .iter()
+            .map(|(key, value)| (*key, Term::optional_bin(value.as_deref())))
+            .collect();
+        entries.extend([
+            ("retryable", Term::Bool(false)),
+            ("safe_to_retry", Term::Bool(false)),
+        ]);
+        map(entries)
+    }
+}
+
+/// Elixir's default governance policy (`Governance.Policy.default/0`), the
+/// one every effect is decided under, in canonical key order.
+#[must_use]
+pub fn default_policy() -> Term {
+    let empty = || Term::List(Vec::new());
+    map(vec![
+        (
+            "approvals",
+            map(vec![
+                ("assignees", empty()),
+                ("effects", empty()),
+                ("states", empty()),
+            ]),
+        ),
+        (
+            "audit",
+            map(vec![
+                ("denials", Term::text("sampled")),
+                ("effect_events", Term::Bool(true)),
+            ]),
+        ),
+        ("budgets", map(Vec::new())),
+        ("circuits", map(Vec::new())),
+        (
+            "effects",
+            map(vec![
+                ("allowed", empty()),
+                ("denied", empty()),
+                ("require_idempotency_key", Term::Bool(true)),
+            ]),
+        ),
+        ("limits", map(Vec::new())),
+        ("mode", Term::text("minimal")),
+    ])
+}
+
+/// The default policy's hash: the URL-safe base64 SHA-256 of its encoding.
+/// Elixir hashes its own term encoding (with the type's stored policy
+/// merged in), so the value differs; clients compare it, not decode it.
+#[must_use]
+pub fn policy_hash() -> Vec<u8> {
+    let mut encoded = Vec::new();
+    // The default policy is small; its encoding cannot fail.
+    let _encoded = default_policy().encode(&mut encoded);
+    base64url_nopad(&Sha256::digest(&encoded)).into_bytes()
+}

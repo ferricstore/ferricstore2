@@ -7,14 +7,16 @@
 //! the terminal retention override and removal time as optional integers,
 //! then the signal idempotency keys (count, then key and digest), then the
 //! child groups as a [`Term`] map of each group's reply form, the error
-//! kind, the rewind target, and the policy-indexed attribute names (count,
-//! then names) and state metadata key.
+//! kind, the rewind target, the policy-indexed attribute names (count,
+//! then names) and state metadata key, and the effects and governance
+//! ledger as an optional binary of their own encoding.
 
 use std::collections::BTreeMap;
 
 use wf_application::commands::flow::Term;
 use wf_application::commands::flow::children::ChildGroup;
 use wf_application::commands::flow::create::MaxActive;
+use wf_application::commands::flow::effect::Governance;
 use wf_application::commands::flow::meta::{Attributes, StateMeta};
 use wf_application::commands::flow::record::{FlowMeta, NamedValue};
 
@@ -100,6 +102,11 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         bin(out, name.as_bytes())?;
     }
     optional_bin(out, meta.indexed_state_meta.as_deref().map(str::as_bytes))?;
+    let governance = match meta.governance.as_deref() {
+        Some(governance) => Some(governance.encode()?),
+        None => None,
+    };
+    optional_bin(out, governance.as_deref())?;
     Some(())
 }
 
@@ -199,6 +206,10 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
         indexed_state_meta: reader
             .optional_bin()?
             .map(|key| String::from_utf8(key).map_err(|_| Malformed))
+            .transpose()?,
+        governance: reader
+            .optional_bin()?
+            .map(|bytes| Governance::decode(&bytes).map(Box::new).ok_or(Malformed))
             .transpose()?,
     })
 }

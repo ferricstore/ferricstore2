@@ -20,6 +20,7 @@ mod crash;
 mod flow_children;
 mod flow_claim;
 mod flow_cleanup;
+mod flow_effect;
 mod flow_fifo;
 mod flow_info;
 mod flow_mutate;

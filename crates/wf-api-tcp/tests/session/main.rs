@@ -10,6 +10,7 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use wf_api_tcp::session::{ServerInfo, serve};
+use wf_application::commands::flow::effect::denial::Denial;
 use wf_application::commands::flow::{FlowCommand, FlowService, Term};
 use wf_application::commands::queue::{
     Cancellation, ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService,
@@ -143,6 +144,15 @@ impl FlowService for Scripted {
             FlowCommand::Query(query) => reply(Ok(Term::Bin(query.text))),
             FlowCommand::QueryIndexes(_) => reply(Ok(Term::text("indexes"))),
             FlowCommand::Schedule(_) => reply(Ok(Term::text("schedule"))),
+            FlowCommand::Effect(effect) if effect.target().0 == b"denied" => {
+                reply(Err(ServiceError::Governance(Box::new(Denial::new(
+                    "GOVERNANCE_CONFLICT",
+                    b"Effect is already terminal".to_vec(),
+                    "effect_lifecycle",
+                    vec![("current_status", Some(b"confirmed".to_vec()))],
+                )))));
+            }
+            FlowCommand::Effect(_) => reply(Ok(Term::text("effect"))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),

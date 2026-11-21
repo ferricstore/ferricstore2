@@ -246,3 +246,45 @@ fn schedule_opcodes_reach_the_service() -> TestResult {
     }
     Ok(())
 }
+
+#[test]
+fn effect_opcodes_reach_the_service_and_refusals_are_maps() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let lease = |id: &str| {
+        map(&[
+            ("id", bin(id)),
+            ("effect_key", bin("k")),
+            ("effect_type", bin("t")),
+        ])
+    };
+    let read = map(&[("id", bin("f")), ("effect_key", bin("k"))]);
+    for (opcode, body) in [
+        (0x0240_u16, lease("f")),
+        (0x0241, read.clone()),
+        (0x0242, read.clone()),
+        (0x0243, read.clone()),
+        (0x0244, read),
+        (0x0245, map(&[("id", bin("f"))])),
+    ] {
+        let reply = client.call(opcode, 1, 0, &encode(&body)?)?;
+        assert_eq!(reply.body, ok(&bin("effect"))?, "opcode {opcode:#06x}");
+    }
+    let refused = client.call(0x0240, 1, 0, &encode(&lease("denied"))?)?;
+    let (status, value) = super::typed::reply(&refused.body)?;
+    assert_eq!(status, 1);
+    // The decision's code once, with its fields; no retry hint.
+    assert_eq!(
+        value,
+        map(&[
+            ("code", bin("GOVERNANCE_CONFLICT")),
+            ("message", bin("Effect is already terminal")),
+            ("reason", bin("governance_conflict")),
+            ("policy", bin("effect_lifecycle")),
+            ("current_status", bin("confirmed")),
+            ("retryable", Typed::Bool(false)),
+            ("safe_to_retry", Typed::Bool(false)),
+        ])
+    );
+    Ok(())
+}
