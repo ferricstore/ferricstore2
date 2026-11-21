@@ -8,6 +8,7 @@
 //! with the Flow.
 
 use wf_application::commands::flow::effect::decide::{self, Flow};
+use wf_application::commands::flow::effect::denial::default_policy_hash;
 use wf_application::commands::flow::effect::{Command, Governance};
 use wf_application::commands::queue::Partition;
 
@@ -39,6 +40,9 @@ impl ShardState {
             state: record.state(),
             lease_token: record.lease().map(|lease| lease.token.as_bytes()),
             fence: record.fence().get(),
+            policy_hash: self
+                .policy(record.workflow_type())
+                .map_or(default_policy_hash(), |installed| &installed.policy_hash),
         };
         let stored = entry
             .meta

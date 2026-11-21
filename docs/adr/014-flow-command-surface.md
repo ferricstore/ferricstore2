@@ -414,9 +414,8 @@ Each step is one commit with its tests.
   Effects and the ledger are stored with the Flow (logged as its
   after-image, imaged in snapshots, version 10), so replay restores them
   and retention removes them with it, as Elixir's retention owner does.
-  Differences: the policy hash covers this node's encoding of the default
-  policy (Elixir hashes its own term encoding with the type's stored
-  policy merged in), refusal event ids are numbered per Flow instead of
+  Differences: the policy hash is this node's own (see below), refusal
+  event ids are numbered per Flow instead of
   random, a non-string `governance_scope` is refused, and options a command
   does not read are refused (Elixir accepts any known Flow option). The
   scenario matches Elixir apart from those; the SDK suite passes 40 of 60,
@@ -548,3 +547,24 @@ Each step is one commit with its tests.
   worker's routing slot, so that id differs. Mutations accept the two
   governance options, as Elixir does. The governed-claim scenario matches
   Elixir apart from that shard id.
+- Policy hash (after step 15): an effect's `policy_hash` names the policy
+  of the Flow's type, as Elixir's does, but in this node's encoding:
+  the URL-safe base64 SHA-256 of the default governance policy followed
+  by the type's normalized policy, or of the default alone for a type
+  without one. Normalization orders state and rule names and builds every
+  other map in a fixed order, so equal policies share a hash however
+  their maps were given; Elixir's also covers the type's name, so equal
+  policies of two types differ there, and its values differ from this
+  node's. No SDK or Elixir test compares values (they pass the field
+  through, and check that a refusal and its ledger event agree), and this
+  node imports no Elixir data, so matching Elixir's bytes buys nothing.
+  The hash is computed once per policy, when a shard installs it (about
+  2 µs on a set or restore), and the default's once per process, so a
+  reservation copies 43 bytes (18 ns) instead of encoding and hashing the
+  policy (at least 886 ns before). A reserved effect keeps the hash it
+  was decided under. Decisions are unchanged: both servers refuse
+  governance on `running` and at a policy's top level, so effects are
+  always decided under the default rules. The lease shard id stays the
+  routing slot: it only spreads workers over a limit's leases, both
+  hashes are stable and spread evenly, neither is secret, and a client
+  can name the shard directly.

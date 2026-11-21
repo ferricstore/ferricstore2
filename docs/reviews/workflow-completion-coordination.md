@@ -65666,3 +65666,35 @@ the release hook, the cache chunk, the unused release, the release
 delivery or the credit stamp each makes one fail. All 100 node tests, the
 TCP adapter and application tests pass; the SDK suite passes 41 of 60.
 Clippy, the ratchet, lint tests, docs, architecture and cargo-deny pass.
+
+### ADR014-POLICYHASH Effects hash their type's policy
+
+New artifacts (solo design review): `effect::denial::default_policy_hash`
+(computed once per process), `effect::denial::policy_hash(&Term)`,
+`Installed::policy_hash`, `effect::decide::Flow::policy_hash`. No new
+dependency.
+
+Finding: Rust hashed only the default policy, on every reservation, so
+every effect carried the same hash; Elixir's changes with the type's
+stored policy. Decisions were already equal (both servers refuse
+governance on `running` and at a policy's top level), so only the audit
+field was wrong. Probes against the Elixir reference found that a refused
+policy set leaves the default hash and that `version` is refused, so
+`policy_version` stays nil on both servers.
+
+Decisions: hash in this node's encoding instead of Elixir's (no SDK, test
+or import compares values); hash the normalized policy, which is already
+canonical, so no extra sort (an added sort survived its mutation and was
+removed); compute it when a shard installs the policy, so a reservation
+copies it; keep the routing-slot lease shard id.
+
+Evidence: `flow_effect::policy_hash` was written first and failed (a
+stored policy gave the default's hash), then passed: policy-less types
+share the default hash; two types with the same limits given in either
+order share one that differs from the default; a refusal and its ledger
+event carry it; a new policy changes new decisions only; the hash
+survives a restart. Using the default for every type makes it fail.
+Timing (release, this machine): 886 ns per reservation before (digest
+without base64), 18 ns after, 2 µs once per policy set. All 101 node
+tests, the TCP adapter and application tests pass; clippy, the ratchet,
+lint tests, docs, architecture and cargo-deny pass.

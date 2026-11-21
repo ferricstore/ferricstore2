@@ -13,6 +13,7 @@ use wf_node::composition::QueueNode;
 use super::{TestResult, call, directory, open};
 
 mod lease;
+mod policy_hash;
 
 pub(super) fn options(entries: &[(&str, Term)]) -> Term {
     Term::Map(

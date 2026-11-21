@@ -228,6 +228,8 @@ pub struct Installed {
     pub policy: FlowPolicy,
     /// Its retry view, as the domain reducer reads it.
     pub retry: InstalledRetryPolicy,
+    /// The hash effects of the type are decided under, computed here once.
+    pub policy_hash: Vec<u8>,
 }
 
 impl Installed {
@@ -247,11 +249,13 @@ impl Installed {
             states,
         )
         .map_err(FlowError::Domain)?;
+        let policy_hash = super::effect::denial::policy_hash(&policy.term());
         Ok(Self {
             flow_type,
             generation,
             policy,
             retry,
+            policy_hash,
         })
     }
 }

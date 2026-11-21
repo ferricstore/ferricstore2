@@ -6,7 +6,7 @@
 
 use super::super::FlowError;
 use super::super::term::Term;
-use super::denial::{Denial, decision_id, policy_hash};
+use super::denial::{Denial, decision_id};
 use super::request::{Lease, LedgerList, Reserve, Update, storage_key};
 use super::store::{Effect, Event, Governance, Kind, Owner};
 use super::{Command, Status};
@@ -26,6 +26,8 @@ pub struct Flow<'a> {
     pub lease_token: Option<&'a [u8]>,
     /// Its fencing token.
     pub fence: u64,
+    /// The hash of its type's policy.
+    pub policy_hash: &'a [u8],
 }
 
 impl Flow<'_> {
@@ -168,7 +170,7 @@ fn reserve(reserve: &Reserve, flow: &Flow<'_>, governance: &mut Governance, wall
         );
         return (Err(refused(denial)), false);
     }
-    let hash = policy_hash();
+    let hash = flow.policy_hash.to_vec();
     if fields.idempotency_key.as_ref().is_none_or(Vec::is_empty) {
         return deny(reserve, flow, governance, (now, hash));
     }

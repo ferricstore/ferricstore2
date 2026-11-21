@@ -7,6 +7,8 @@
 //! Elixir also sends the transport's `code: "error"` under the same key,
 //! which clients refuse as a duplicate; this node sends the code once.
 
+use std::sync::LazyLock;
+
 use sha2::{Digest, Sha256};
 
 use super::super::term::{Term, map};
@@ -171,13 +173,33 @@ pub fn default_policy() -> Term {
     ])
 }
 
-/// The default policy's hash: the URL-safe base64 SHA-256 of its encoding.
-/// Elixir hashes its own term encoding (with the type's stored policy
-/// merged in), so the value differs; clients compare it, not decode it.
+/// The default policy's hash, computed once.
+static DEFAULT_HASH: LazyLock<Vec<u8>> = LazyLock::new(|| digest(&default_policy()));
+
+/// The hash effects of a type without a policy are decided under: the
+/// URL-safe base64 SHA-256 of the default policy's encoding.
 #[must_use]
-pub fn policy_hash() -> Vec<u8> {
+pub fn default_policy_hash() -> &'static [u8] {
+    &DEFAULT_HASH
+}
+
+/// The hash effects of a type with `policy` stored are decided under: the
+/// default policy and `policy` in its normalized form, which orders state
+/// and rule names and builds every other map in a fixed order, so equal
+/// policies share a hash however their maps were given. A shard computes
+/// it once, when it installs the policy.
+///
+/// Elixir hashes its own term encoding of the type's whole stored record,
+/// its name included, so the value differs; clients compare it, not
+/// decode it.
+#[must_use]
+pub fn policy_hash(policy: &Term) -> Vec<u8> {
+    digest(&Term::List(vec![default_policy(), policy.clone()]))
+}
+
+fn digest(term: &Term) -> Vec<u8> {
     let mut encoded = Vec::new();
-    // The default policy is small; its encoding cannot fail.
-    let _encoded = default_policy().encode(&mut encoded);
+    // A policy that reaches here was stored, so it encodes.
+    let _encoded = term.encode(&mut encoded);
     base64url_nopad(&Sha256::digest(&encoded)).into_bytes()
 }
