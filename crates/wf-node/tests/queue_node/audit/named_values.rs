@@ -394,3 +394,120 @@ fn transition_many_stores_named_value_blobs_for_every_transitioned_flow() -> Tes
     }
     Ok(())
 }
+
+#[test]
+fn rewind_restores_named_value_refs_from_the_target_history_snapshot() -> TestResult {
+    let node = node("audit-named-rewind")?;
+    create(
+        &node,
+        "nw",
+        "named-rewind",
+        &[("values", map(&[("order", text("order-v1"))]))],
+    )?;
+    let history = super::events(&node, "nw", &[("count", int(10))])?;
+    let created = history.first().cloned().unwrap_or(Term::Nil);
+    assert_eq!(field(&created, "event"), text("created"));
+    let event_id = ok(
+        &node,
+        "FLOW.HISTORY",
+        &[("id", text("nw")), ("count", int(10))],
+    )?;
+    let Term::List(entries) = event_id else {
+        return Err("history is not a list".into());
+    };
+    let Some(Term::List(first)) = entries.first() else {
+        return Err("no first event".into());
+    };
+    let created_id = first.first().cloned().unwrap_or(Term::Nil);
+    let mut transition = vec![
+        ("id", text("nw")),
+        ("from_state", text("running")),
+        ("to_state", text("waiting")),
+        ("values", map(&[("order", text("order-v2"))])),
+        ("override_values", texts(&["order"])),
+        ("run_at_ms", int(2_000)),
+        ("now_ms", int(1_100)),
+    ];
+    transition.extend(lease(&claim_one(&node, "named-rewind", None)?));
+    ok(&node, "FLOW.TRANSITION", &transition)?;
+    let after = get(&node, "nw", &[("values", texts(&["order"]))])?;
+    assert_eq!(field(&after, "values"), map(&[("order", text("order-v2"))]));
+    ok(
+        &node,
+        "FLOW.REWIND",
+        &[
+            ("id", text("nw")),
+            ("to_event", created_id),
+            ("expect_state", text("waiting")),
+            ("run_at_ms", int(3_000)),
+            ("now_ms", int(1_200)),
+        ],
+    )?;
+    let rewound = get(&node, "nw", &[("values", texts(&["order"]))])?;
+    assert_eq!(field(&rewound, "state"), text("queued"));
+    assert_eq!(
+        field(&rewound, "values"),
+        map(&[("order", text("order-v1"))])
+    );
+    Ok(())
+}
+
+#[test]
+fn retention_cleanup_removes_overridden_named_value_versions_from_history() -> TestResult {
+    let node = node("audit-named-retention-override")?;
+    create(
+        &node,
+        "no",
+        "named-retention-override",
+        &with(
+            R,
+            &[
+                ("values", map(&[("order", text("order-v1"))])),
+                ("retention_ttl_ms", int(60_000)),
+            ],
+        ),
+    )?;
+    let old = value_ref(&get(&node, "no", &with(R, &[]))?, "order");
+    let replaced = ok(
+        &node,
+        "FLOW.VALUE.PUT",
+        &with(
+            R,
+            &[
+                ("value", text("order-v2")),
+                ("owner_flow_id", text("no")),
+                ("name", text("order")),
+                ("override", Term::Bool(true)),
+                ("now_ms", int(1_050)),
+            ],
+        ),
+    )?;
+    let new = field(&replaced, "ref");
+    assert_ne!(new, old);
+    assert_eq!(
+        mget(&node, vec![old.clone(), new.clone()])?,
+        Term::List(vec![text("order-v1"), text("order-v2")])
+    );
+    let mut entries = with(R, &[("id", text("no")), ("now_ms", int(1_100))]);
+    entries.extend(lease(&claim_one(
+        &node,
+        "named-retention-override",
+        Some(R),
+    )?));
+    ok(&node, "FLOW.COMPLETE", &entries)?;
+    let completed = get(&node, "no", &with(R, &[]))?;
+    let cleaned = ok(
+        &node,
+        "FLOW.RETENTION_CLEANUP",
+        &[
+            ("limit", int(10)),
+            ("now_ms", int(retention_until(&completed)? + 1)),
+        ],
+    )?;
+    assert!(at_least(&cleaned, "values", 2), "{cleaned:?}");
+    assert_eq!(
+        mget(&node, vec![old, new])?,
+        Term::List(vec![Term::Nil, Term::Nil])
+    );
+    Ok(())
+}

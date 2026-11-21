@@ -158,7 +158,10 @@ fn decode(bytes: &[u8], sequence: u64) -> Option<Box<Entry>> {
 /// The stored values of a Flow: payload, result, error and named values.
 pub(super) fn values(entry: &Entry) -> u32 {
     let record = &entry.record;
-    let named = entry.meta.as_ref().map_or(0, |meta| meta.values.len());
+    // Named values and every kept version count (ADR-016 phase C).
+    let named = entry.meta.as_ref().map_or(0, |meta| {
+        meta.values.len().saturating_add(meta.retained.len())
+    });
     let count = [record.payload(), record.result(), record.error()]
         .iter()
         .flatten()

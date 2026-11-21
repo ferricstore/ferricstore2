@@ -23,12 +23,13 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 11 images carry each Flow's fields beyond its record (with the
-/// policy-indexed names it was written under, term payloads, effects and
-/// the governance ledger) and each shard's governance records, its history (with timeout
-/// and rewind extras), the shard's shared values and its Flow type policies
-/// (ADR-014).
-const VERSION: u8 = 11;
+/// Version 12 images carry each Flow's fields beyond its record (with the
+/// policy-indexed names it was written under, term payloads, effects, the
+/// governance ledger and kept value versions) and each shard's governance
+/// records, its history (with timeout and rewind extras), the shard's
+/// shared values, its Flow type policies (ADR-014) and the stubs of its
+/// finished Flows on disk (ADR-016).
+const VERSION: u8 = 12;
 
 struct Progress {
     next: u64,

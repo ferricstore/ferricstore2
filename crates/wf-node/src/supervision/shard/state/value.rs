@@ -8,7 +8,7 @@
 
 use wf_application::commands::flow::history::{HistoryEvent, HistoryKind};
 use wf_application::commands::flow::keys;
-use wf_application::commands::flow::record::{FlowMeta, NamedValue};
+use wf_application::commands::flow::record::{FlowMeta, NamedValue, RETAINED_NAMED};
 use wf_application::commands::flow::term::{Term, map};
 use wf_application::commands::flow::value::{self, ValuePut, ValueRef};
 use wf_application::commands::queue::{Partition, ServiceError};
@@ -17,6 +17,10 @@ use wf_domain::workflow::WorkflowRecord;
 use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_types::version::TimestampMillis;
+
+mod versions;
+
+pub(super) use versions::with_values;
 
 use super::super::command::Logged;
 use super::flow::Executed;
@@ -77,18 +81,34 @@ fn conflict(name: &[u8]) -> ServiceError {
 
 /// Writes named values into `meta` with Elixir's rules; `version` of a new
 /// or replaced value is its previous version plus one.
+/// Drops named values, keeping their last versions readable.
+pub(super) fn drop_values(meta: &mut FlowMeta, names: &[Vec<u8>]) {
+    for name in names {
+        if let Some(value) = meta.values.remove(name) {
+            meta.retain((RETAINED_NAMED, name, value.version), &value.bytes, false);
+        }
+    }
+}
+
 pub(super) fn write_values<'a>(
     meta: &mut FlowMeta,
     values: impl IntoIterator<Item = (&'a Vec<u8>, &'a Vec<u8>)>,
     overrides: &[Vec<u8>],
 ) -> Result<(), ServiceError> {
     for (name, bytes) in values {
-        let version = match meta.values.get(name) {
+        match meta.values.get(name) {
             Some(existing) if existing.bytes == *bytes => continue,
             Some(_) if !overrides.contains(name) => return Err(conflict(name)),
-            Some(existing) => existing.version.saturating_add(1),
-            None => 1,
-        };
+            // The replaced version stays readable (ADR-016 phase C).
+            Some(existing) => {
+                let (kept, bytes) = (existing.version, existing.bytes.clone());
+                meta.retain((RETAINED_NAMED, name, kept), &bytes, false);
+            }
+            None => {}
+        }
+        // Above every version the name has had, so a reference never
+        // names two values.
+        let version = meta.newest_named_version(name).saturating_add(1);
         meta.values.insert(
             name.clone(),
             NamedValue {
@@ -285,9 +305,13 @@ impl ShardState {
                     b'r' => (record.result(), meta.result_version),
                     _ => (record.error(), meta.error_version),
                 };
-                (stored == version)
-                    .then(|| bytes.map(<[u8]>::to_vec))
-                    .flatten()
+                if stored == version {
+                    bytes.map(<[u8]>::to_vec)
+                } else {
+                    // A replaced version (ADR-016 phase C).
+                    meta.retained(kind, b"", version)
+                        .map(|kept| kept.bytes.clone())
+                }
             }
             ValueRef::Named {
                 owner,
@@ -295,8 +319,13 @@ impl ShardState {
                 version,
             } => {
                 let entry = self.seen(&(partition, owner))?;
-                let value = entry.meta.as_deref()?.values.get(&name)?;
-                (value.version == version).then(|| value.bytes.clone())
+                let meta = entry.meta.as_deref()?;
+                match meta.values.get(&name) {
+                    Some(value) if value.version == version => Some(value.bytes.clone()),
+                    _ => meta
+                        .retained(RETAINED_NAMED, &name, version)
+                        .map(|kept| kept.bytes.clone()),
+                }
             }
             ValueRef::Shared => None,
         }
@@ -316,6 +345,14 @@ impl ShardState {
             b'e' if meta.error_term && meta.error_version == version => entry.record.error()?,
             b'p' if meta.payload_term && meta.payload_version == version => {
                 entry.record.payload()?
+            }
+            // A replaced version stored as a term (ADR-016 phase C).
+            b'e' | b'p' => {
+                let kept = meta.retained(kind, b"", version)?;
+                if !kept.term {
+                    return None;
+                }
+                kept.bytes.as_slice()
             }
             _ => return None,
         };

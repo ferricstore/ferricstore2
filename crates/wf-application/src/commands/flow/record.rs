@@ -14,8 +14,12 @@ use super::term::{Term, map};
 use crate::routing::Partition;
 
 mod include;
+pub mod retained;
 
 pub use include::{DEFAULT_PAYLOAD_MAX_BYTES, Include, Values};
+pub use retained::{
+    RETAINED_ERROR, RETAINED_NAMED, RETAINED_PAYLOAD, RETAINED_RESULT, Retained, RetainedMap,
+};
 
 /// Elixir's default terminal retention: 7 days.
 pub const DEFAULT_RETENTION_TTL_MS: u64 = 604_800_000;
@@ -70,8 +74,7 @@ pub struct FlowMeta {
     pub signal_keys: BTreeMap<Vec<u8>, Vec<u8>>,
     /// Child groups by id.
     pub child_groups: BTreeMap<Vec<u8>, ChildGroup>,
-    /// The error is an encoded term, not bytes: an active-time timeout's
-    /// `{reason, max_active_ms}` (ADR-014 step 9).
+    /// The error is an encoded term (a timeout's; ADR-014 step 9).
     pub error_term: bool,
     /// The payload is an encoded term, not bytes (ADR-014 step 13).
     pub payload_term: bool,
@@ -84,6 +87,8 @@ pub struct FlowMeta {
     pub indexed_state_meta: Option<String>,
     /// Effects and governance ledger (ADR-014 step 14).
     pub governance: Option<Box<super::effect::Governance>>,
+    /// Replaced value versions (ADR-016 phase C; see [`retained`]).
+    pub retained: RetainedMap,
 }
 
 impl Default for FlowMeta {
@@ -113,6 +118,7 @@ impl Default for FlowMeta {
             indexed_attributes: Vec::new(),
             indexed_state_meta: None,
             governance: None,
+            retained: BTreeMap::new(),
         }
     }
 }

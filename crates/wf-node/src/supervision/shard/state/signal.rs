@@ -127,9 +127,7 @@ impl ShardState {
             self.fifo_entry(&record, priority, Some(signal.partition_key.is_some()))?;
         }
         write_values(&mut meta, &signal.values, &signal.override_values)?;
-        for name in &signal.drop_values {
-            meta.values.remove(name);
-        }
+        super::value::drop_values(&mut meta, &signal.drop_values);
         if let Some(key) = &signal.idempotency_key {
             meta.signal_keys.insert(key.clone(), digest);
         }

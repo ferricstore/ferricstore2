@@ -37,9 +37,9 @@ Gaps found so far:
   `[id, fence]` or `[id, partition, fence]`.
 - G5: structured values (maps, lists) only on create; transition,
   complete, fail, retry, cancel and value put take bytes only.
-- G6: replacing a value drops its old version, so a rewind or history
-  cannot bring it back.
-- G7: `FLOW.HISTORY` ignores `values: true`.
+- G6 (closed by ADR-016 phase C): replacing a value dropped its old
+  version, so a rewind or history could not bring it back.
+- G7 (closed by ADR-016 phase C): `FLOW.HISTORY` ignored `values: true`.
 - G8: retention cleanup reports `more?` until an extra empty pass.
 - G9: `value_refs` (attach an existing value by reference) is not read.
 
@@ -527,7 +527,7 @@ Gaps found so far:
 | 523 | retention sweeper runs cleanup through Flow command path | covered: `retention::a_completed_flow_is_removed_after_retention` |
 | 610 | rewind from terminal back to active clears value ref expiration | ported |
 | 675 | batch APIs also persist full value fields | gap G2, G3, G5 |
-| 787 | history only hydrates stored values when values option is requested | gap G5, G7 |
+| 787 | history only hydrates stored values when values option is requested | gap G5 (history values done: G7 closed; the test's map result needs G5) |
 
 ## `flow_test/sections/flow_native_due_index_mirrors_create_claim_due.exs`
 
@@ -694,9 +694,9 @@ Gaps found so far:
 | 193 | transition can add and drop named values without hydrating bytes | ported |
 | 235 | terminal commands can attach named values | ported |
 | 270 | retention cleanup removes owned named value blobs | ported |
-| 324 | retention cleanup removes overridden named value versions from history | gap G6 |
+| 324 | retention cleanup removes overridden named value versions from history | fixed (G6, ADR-016 phase C) |
 | 386 | transition_many stores named value blobs for every transitioned flow | ported |
-| 438 | rewind restores named value refs from the target history snapshot | gap G6 |
+| 438 | rewind restores named value refs from the target history snapshot | fixed (G6, ADR-016 phase C) |
 | 486 | create_many and spawn_children support per-item named values | gap G2, G9 |
 
 ## `flow/pipeline_history_read_test.exs`

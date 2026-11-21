@@ -53,14 +53,36 @@ and a Flow becomes a stub only once its image is durable. Idle after 1.6M
 Flows: physical footprint 1.45 GB (was 2.1), RSS 1.9 GB (was 3.5), 822 MB
 of cold files; CPU per 1k Flows +22% (8.8 to 9.0 ms against 7.2 to 7.4).
 
+Memory, measured idle after 1.6M Flows with c2b1016: physical footprint
+1.57 GB with mimalloc, 745 MB with the system allocator; with
+`MIMALLOC_PURGE_DELAY=0`, 885 MB at 7 to 9% more CPU. Mimalloc keeps the
+pages a burst freed until their thread allocates again (v3 waits 1 s), so
+the idle figure shows the burst's peak, reused by later allocations; live
+data is about 465 bytes per finished Flow (key, table slot with stub,
+catalog member, removal entry). The default stays; deployments that want
+memory back at once can set the variable.
+
 **Phase B: checkpoints of the hot state.** Snapshot images hold hot Flows
 and stubs, are written shard by shard without one whole-node buffer, and
 are checked by CRC instead of a full decode.
+
+Phase B after phase A: images now hold only hot Flows and small stubs, so
+capture stalls, snapshot size and restart time follow the hot state. The
+full decode of each image before the log behind it is removed stays: it is
+cheap now, and it is what stops an undecodable snapshot from replacing the
+log.
 
 **Phase C: value versions.** A replaced named value, payload, result or
 error keeps its old version in a value file while history or a rewind can
 name it, so a rewind restores it and `FLOW.HISTORY values: true` reads it
 (audit gaps G6, G7).
+
+Phase C landed on 21 Nov: `FlowMeta::retained` keeps replaced and dropped
+named values and replaced payloads, results and errors (with their term
+flag) by version, bounded by the history cap; reads by reference, rewind
+and `FLOW.HISTORY values: true` use them, and they travel with the Flow's
+image to disk. Named value versions now rise above every version the name
+has had, so a reference never names two values.
 
 **Phase D: large values of hot Flows on disk** above a size threshold, with
 a small cache.

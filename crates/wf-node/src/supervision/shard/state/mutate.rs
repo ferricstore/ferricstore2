@@ -9,7 +9,9 @@
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::meta;
 use wf_application::commands::flow::mutate::{Change, Mutation};
-use wf_application::commands::flow::record::{FlowMeta, Include};
+use wf_application::commands::flow::record::{
+    FlowMeta, Include, RETAINED_ERROR, RETAINED_PAYLOAD, RETAINED_RESULT,
+};
 use wf_application::commands::flow::{Term, term};
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
@@ -137,7 +139,7 @@ fn meta_state<'a>(mutation: &'a Mutation, record: &'a WorkflowRecord) -> &'a [u8
 fn updated_meta(
     mutation: &Mutation,
     current: &FlowMeta,
-    record: &WorkflowRecord,
+    (previous, record): (&WorkflowRecord, &WorkflowRecord),
     wall: u64,
 ) -> Result<FlowMeta, ServiceError> {
     let mut next = current.clone();
@@ -153,9 +155,7 @@ fn updated_meta(
         &mutation.state_meta,
     )?;
     super::value::write_values(&mut next, &mutation.values, &mutation.override_values)?;
-    for name in &mutation.drop_values {
-        next.values.remove(name);
-    }
+    super::value::drop_values(&mut next, &mutation.drop_values);
     let (payload, result, error, ttl) = match &mutation.change {
         Change::Transition { payload, .. } | Change::StepContinue { payload, .. } => {
             (payload.is_some(), false, false, None)
@@ -174,14 +174,33 @@ fn updated_meta(
         Change::Cancel { reason, ttl_ms, .. } => (false, false, reason.is_some(), *ttl_ms),
         Change::ExtendLease { .. } => (false, false, false, None),
     };
+    // Replaced values stay readable under their versions (ADR-016 phase
+    // C).
     if payload {
+        if let Some(old) = previous.payload() {
+            next.retain(
+                (RETAINED_PAYLOAD, b"", current.payload_version),
+                old,
+                current.payload_term,
+            );
+        }
         next.payload_version = version;
         next.payload_term = false;
     }
     if result {
+        if let Some(old) = previous.result() {
+            next.retain((RETAINED_RESULT, b"", current.result_version), old, false);
+        }
         next.result_version = version;
     }
     if error {
+        if let Some(old) = previous.error() {
+            next.retain(
+                (RETAINED_ERROR, b"", current.error_version),
+                old,
+                current.error_term,
+            );
+        }
         next.error_version = version;
     }
     if matches!(
@@ -237,7 +256,7 @@ impl ShardState {
         let logged = match (outcome, write) {
             (Outcome::Changed, Some(write)) => {
                 let current = entry.meta.as_deref().unwrap_or(&defaults);
-                let meta = updated_meta(mutation, current, &write.record, wall)?;
+                let meta = updated_meta(mutation, current, (&entry.record, &write.record), wall)?;
                 let priority = match &mutation.change {
                     Change::Transition {
                         priority: Some(priority),

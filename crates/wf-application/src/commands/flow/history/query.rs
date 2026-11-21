@@ -37,6 +37,9 @@ pub struct HistoryQuery {
     pub event: Option<Vec<u8>>,
     /// Only events whose lease owner is this worker.
     pub worker: Option<Vec<u8>>,
+    /// Each event also shows the payload, result and error it named
+    /// (ADR-016 phase C).
+    pub values: bool,
 }
 
 const ALLOWED: &[&str] = &[
@@ -109,6 +112,7 @@ pub fn parse(args: &Term) -> Result<HistoryQuery, FlowError> {
         from_version: opts.non_neg_integer("from_version")?,
         to_version: opts.non_neg_integer("to_version")?,
         rev: opts.boolean("rev", false)?,
+        values: opts.boolean("values", false)?,
         event: opts.binary_or_nil("event")?,
         worker: opts.binary_or_nil("worker")?,
     };

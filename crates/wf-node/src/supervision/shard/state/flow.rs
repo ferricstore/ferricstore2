@@ -114,7 +114,14 @@ impl ShardState {
             query
                 .select(&events)
                 .into_iter()
-                .map(|event| history::event_term(event, &entry.record, &key.0, meta))
+                .map(|event| {
+                    let term = history::event_term(event, &entry.record, &key.0, meta);
+                    if query.values {
+                        super::value::with_values(term, &entry.record, meta, event.refs)
+                    } else {
+                        term
+                    }
+                })
                 .collect(),
         )
     }

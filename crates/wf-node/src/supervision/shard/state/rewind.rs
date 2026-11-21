@@ -7,21 +7,22 @@
 //! version and fence rise, the lease is cleared, the run state stays, a
 //! `reason` becomes the error, and the Flow remembers the event in
 //! `rewound_to_event_id`. A leased Flow, a parent or child, a wrong state
-//! or an event no longer held is refused. This node keeps only the current
-//! bytes of each value, so an event whose payload, result, error or named
-//! value version has been replaced since is refused as not found, where
-//! Elixir may still hold the older version.
+//! or an event no longer held is refused. Replaced value versions are kept
+//! (ADR-016 phase C), so an event's values come back as it named them.
 
 use std::collections::BTreeMap;
 
 use wf_application::commands::flow::history::{HistoryEvent, HistoryKind};
 use wf_application::commands::flow::json;
 use wf_application::commands::flow::meta::{self, Attributes, StateMeta};
-use wf_application::commands::flow::record::NamedValue;
+use wf_application::commands::flow::record::{
+    FlowMeta, NamedValue, RETAINED_ERROR, RETAINED_NAMED, RETAINED_PAYLOAD, RETAINED_RESULT,
+};
 use wf_application::commands::flow::rewind::{self, Rewind};
 use wf_application::commands::flow::term::Term;
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::history::EventKind;
+use wf_domain::workflow::WorkflowRecord;
 use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_types::version::{Fence, TimestampMillis};
@@ -47,24 +48,110 @@ fn terminal_kind(state: &[u8]) -> EventKind {
     }
 }
 
-/// The current bytes of a value when they are the version the event named.
-fn held(
-    named: Option<u64>,
-    bytes: Option<&[u8]>,
-    stored: u64,
-) -> Result<Option<Vec<u8>>, ServiceError> {
-    match (named, bytes) {
-        (None, _) => Ok(None),
-        (Some(version), Some(bytes)) if version == stored => Ok(Some(bytes.to_vec())),
-        _ => Err(not_found()),
+/// A payload, result or error's version and term flag in `meta`.
+fn slot(meta: &mut FlowMeta, kind: u8) -> (&mut u64, Option<&mut bool>) {
+    match kind {
+        RETAINED_PAYLOAD => (&mut meta.payload_version, Some(&mut meta.payload_term)),
+        RETAINED_RESULT => (&mut meta.result_version, None),
+        _ => (&mut meta.error_version, Some(&mut meta.error_term)),
     }
 }
 
-/// The named values an event referenced, from the ones still held.
+/// The bytes of the version an event named of a payload, result or error:
+/// the current ones or a kept version (ADR-016 phase C). The value it
+/// replaces is kept, so its references still read.
+fn restore(
+    meta: &mut FlowMeta,
+    kind: u8,
+    named: Option<u64>,
+    current: Option<&[u8]>,
+) -> Result<Option<Vec<u8>>, ServiceError> {
+    let (version, term) = slot(meta, kind);
+    let (stored, stored_term) = (*version, term.as_deref().copied().unwrap_or(false));
+    if let (Some(wanted), Some(bytes)) = (named, current)
+        && wanted == stored
+    {
+        return Ok(Some(bytes.to_vec()));
+    }
+    let restored = match named {
+        None => None,
+        Some(wanted) => {
+            let kept = meta.retained(kind, b"", wanted).ok_or_else(not_found)?;
+            Some((wanted, kept.bytes.clone(), kept.term))
+        }
+    };
+    if let Some(bytes) = current {
+        meta.retain((kind, b"", stored), bytes, stored_term);
+    }
+    let Some((wanted, bytes, kept_term)) = restored else {
+        return Ok(None);
+    };
+    let (version, term) = slot(meta, kind);
+    *version = wanted;
+    if let Some(term) = term {
+        *term = kept_term;
+    }
+    Ok(Some(bytes))
+}
+
+/// The payload, result and error an event named; a `reason` replaces the
+/// error, keeping the one it replaces.
+fn restore_all(
+    meta: &mut FlowMeta,
+    record: &WorkflowRecord,
+    target: &HistoryEvent,
+    request: &Rewind,
+    next: u64,
+) -> Result<Restored, ServiceError> {
+    let payload = restore(meta, RETAINED_PAYLOAD, target.refs[0], record.payload())?;
+    let result = restore(meta, RETAINED_RESULT, target.refs[1], record.result())?;
+    let error = match &request.reason {
+        Some(reason) => {
+            if let Some(old) = record.error() {
+                let kept = (RETAINED_ERROR, &b""[..], meta.error_version);
+                let term = meta.error_term;
+                meta.retain(kept, old, term);
+            }
+            meta.error_version = next;
+            meta.error_term = false;
+            Some(reason.clone())
+        }
+        None => restore(meta, RETAINED_ERROR, target.refs[2], record.error())?,
+    };
+    Ok((payload, result, error))
+}
+
+/// A rewind's payload, result and error.
+type Restored = (Option<Vec<u8>>, Option<Vec<u8>>, Option<Vec<u8>>);
+
+/// The named values an event referenced, current or kept; the current
+/// ones it leaves out or replaces are kept.
 fn named_values(
     event: &HistoryEvent,
-    current: &BTreeMap<Vec<u8>, NamedValue>,
+    meta: &mut FlowMeta,
 ) -> Result<BTreeMap<Vec<u8>, NamedValue>, ServiceError> {
+    let restored = event_values(event, meta)?;
+    let replaced: Vec<(Vec<u8>, NamedValue)> = meta
+        .values
+        .iter()
+        .filter(|(name, value)| {
+            restored
+                .get(*name)
+                .is_none_or(|kept| kept.version != value.version)
+        })
+        .map(|(name, value)| (name.clone(), value.clone()))
+        .collect();
+    for (name, value) in replaced {
+        meta.retain((RETAINED_NAMED, &name, value.version), &value.bytes, false);
+    }
+    Ok(restored)
+}
+
+fn event_values(
+    event: &HistoryEvent,
+    meta: &FlowMeta,
+) -> Result<BTreeMap<Vec<u8>, NamedValue>, ServiceError> {
+    let current = &meta.values;
     let Some(text) = &event.extras[0] else {
         return Ok(BTreeMap::new());
     };
@@ -77,9 +164,23 @@ fn named_values(
                 Some(Term::Int(version)) => u64::try_from(*version).ok(),
                 _ => None,
             };
-            match current.get(name) {
-                Some(value) if Some(value.version) == version => Ok((name.clone(), value.clone())),
-                _ => Err(not_found()),
+            match (current.get(name), version) {
+                (Some(value), Some(version)) if value.version == version => {
+                    Ok((name.clone(), value.clone()))
+                }
+                (_, Some(version)) => meta
+                    .retained(RETAINED_NAMED, name, version)
+                    .map(|kept| {
+                        (
+                            name.clone(),
+                            NamedValue {
+                                version,
+                                bytes: kept.bytes.clone(),
+                            },
+                        )
+                    })
+                    .ok_or_else(not_found),
+                (_, None) => Err(not_found()),
             }
         })
         .collect()
@@ -157,20 +258,11 @@ impl ShardState {
             .version()
             .checked_add(1)
             .ok_or(ServiceError::Unavailable)?;
-        let payload = held(target.refs[0], record.payload(), meta.payload_version)?;
-        let result = held(target.refs[1], record.result(), meta.result_version)?;
-        let error = match &request.reason {
-            Some(reason) => {
-                meta.error_version = next;
-                meta.error_term = false;
-                Some(reason.clone())
-            }
-            None => held(target.refs[2], record.error(), meta.error_version)?,
-        };
+        let (payload, result, error) = restore_all(&mut meta, record, &target, request, next)?;
         if error.is_none() {
             meta.error_term = false;
         }
-        meta.values = named_values(&target, &meta.values)?;
+        meta.values = named_values(&target, &mut meta)?;
         (meta.attributes, meta.state_meta) = fields(&target)?;
         meta.rewound_to = Some(request.to_event.clone());
         let fence = Fence::new(record.fence().get().saturating_add(1));

@@ -18,7 +18,7 @@ use wf_application::commands::flow::children::ChildGroup;
 use wf_application::commands::flow::create::MaxActive;
 use wf_application::commands::flow::effect::Governance;
 use wf_application::commands::flow::meta::{Attributes, StateMeta};
-use wf_application::commands::flow::record::{FlowMeta, NamedValue};
+use wf_application::commands::flow::record::{FlowMeta, NamedValue, Retained, RetainedMap};
 
 use super::super::command::{Malformed, Reader, bin, optional_bin, optional_u64};
 
@@ -107,6 +107,16 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         None => None,
     };
     optional_bin(out, governance.as_deref())?;
+    // Kept value versions (ADR-016 phase C): kind, name, version, term
+    // flag and bytes each.
+    out.extend_from_slice(&u32::try_from(meta.retained.len()).ok()?.to_be_bytes());
+    for ((kind, name, version), kept) in &meta.retained {
+        out.push(*kind);
+        bin(out, name)?;
+        out.extend_from_slice(&version.to_be_bytes());
+        out.push(u8::from(kept.term));
+        bin(out, &kept.bytes)?;
+    }
     Some(())
 }
 
@@ -211,5 +221,25 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
             .optional_bin()?
             .map(|bytes| Governance::decode(&bytes).map(Box::new).ok_or(Malformed))
             .transpose()?,
+        retained: decode_retained(reader)?,
     })
+}
+
+/// Kept value versions (ADR-016 phase C).
+fn decode_retained(reader: &mut Reader<'_>) -> Result<RetainedMap, Malformed> {
+    let count = u32::from_be_bytes(reader.array()?);
+    let mut retained = BTreeMap::new();
+    for _ in 0..count {
+        let kind = reader.u8()?;
+        let name = reader.bin()?.to_vec();
+        let version = reader.u64()?;
+        let term = match reader.u8()? {
+            0 => false,
+            1 => true,
+            _ => return Err(Malformed),
+        };
+        let bytes = reader.bin()?.to_vec();
+        retained.insert((kind, name, version), Retained { bytes, term });
+    }
+    Ok(retained)
 }

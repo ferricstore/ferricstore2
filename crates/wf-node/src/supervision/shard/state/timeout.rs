@@ -13,6 +13,7 @@
 use wf_application::commands::flow::cleanup::Cleaned;
 use wf_application::commands::flow::create::MaxActive;
 use wf_application::commands::flow::history::HistoryEvent;
+use wf_application::commands::flow::record::RETAINED_ERROR;
 use wf_application::commands::flow::term::{Term, map};
 use wf_domain::history::EventKind;
 use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
@@ -118,6 +119,11 @@ impl ShardState {
         };
         let limits = AdmissionLimits::new(MAX_INLINE_BYTES, usize::MAX, 1).ok()?;
         let failed = restore_record(data, limits).ok()?;
+        if let Some(old) = record.error() {
+            let kept = (RETAINED_ERROR, &b""[..], meta.error_version);
+            let term = meta.error_term;
+            meta.retain(kept, old, term);
+        }
         meta.error_version = version;
         meta.error_term = true;
         meta.ttl_ms = None;

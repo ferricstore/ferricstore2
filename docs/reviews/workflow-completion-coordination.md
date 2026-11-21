@@ -65886,3 +65886,26 @@ without history (`u32` length and bytes) followed by the packed history
 and encoding its events again. All 133 node tests pass (the cold tests
 read every image back after restarts). Three alternating 400k runs against
 57dc8f0: 8.4 to 8.5 ms CPU per 1k Flows (was 8.7 to 9.4).
+
+### ADR016-C Value versions (audit gaps G6, G7)
+
+New artifacts (solo design review): `record::retained` (`Retained`,
+`RETAINED_PAYLOAD`, `RETAINED_RESULT`, `RETAINED_ERROR`, `RETAINED_NAMED`,
+`FlowMeta::{retain, retained, newest_named_version}`) and the field
+`FlowMeta::retained`; `HistoryQuery::values`; in `wf-node`
+`state::value::versions` (`version_bytes`, `with_values`),
+`value::drop_values`, `rewind::{restore, slot, event_values}`; image meta
+carries kept versions (snapshot version 12, which also names the stub
+section phase A added without a bump).
+
+Decisions: keep replaced versions in the Flow's own fields (they move to
+disk with it when it finishes), bounded by its history cap; a rewind
+restores an event's versions and keeps what it replaces; named value
+versions rise above every version the name had.
+
+Evidence: two ported Elixir tests that failed before (rewind to an
+overridden named value: "rewind target event not found"; the old version
+of an overridden value read back as nil) now pass, and a new test shows
+each history event's payload and result versions, read back from disk;
+dropping the payload retention makes it fail. All 136 node tests pass. The
+Elixir history-values test still waits for G5 (its result is a map).

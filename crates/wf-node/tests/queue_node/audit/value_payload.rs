@@ -276,3 +276,80 @@ fn rewind_from_terminal_back_to_active_clears_value_ref_expiration() -> TestResu
     );
     Ok(())
 }
+
+/// Not an Elixir test: audit gaps G6 and G7 with byte payloads. Each event
+/// shows the payload, result and error versions it named, the replaced
+/// ones included, also once the Flow is on disk (ADR-016 phase C).
+#[test]
+fn history_values_show_each_events_own_versions() -> TestResult {
+    let node = node("audit-payload-history-versions")?;
+    create(
+        &node,
+        "vv",
+        "value-versions",
+        &with(
+            P,
+            &[
+                ("payload", text("p1")),
+                ("run_at_ms", int(1_000)),
+                ("now_ms", int(1_000)),
+            ],
+        ),
+    )?;
+    let first = claim_all(&node, P, &[("type", text("value-versions"))])?;
+    let mut moved = with(
+        P,
+        &[
+            ("id", text("vv")),
+            ("from_state", text("running")),
+            ("to_state", text("waiting")),
+            ("payload", text("p2")),
+            ("run_at_ms", int(1_000)),
+            ("now_ms", int(1_100)),
+        ],
+    );
+    moved.extend(lease(first.first().unwrap_or(&Term::Nil)));
+    ok(&node, "FLOW.TRANSITION", &moved)?;
+    let second = claim_all(
+        &node,
+        P,
+        &[("type", text("value-versions")), ("state", text("waiting"))],
+    )?;
+    let mut done = with(
+        P,
+        &[
+            ("id", text("vv")),
+            ("result", text("r1")),
+            ("now_ms", int(1_200)),
+        ],
+    );
+    done.extend(lease(second.first().unwrap_or(&Term::Nil)));
+    ok(&node, "FLOW.COMPLETE", &done)?;
+    // A later round, so the finished Flow is read back from disk.
+    let hydrated = super::events(
+        &node,
+        "vv",
+        &with(P, &[("count", int(10)), ("values", Term::Bool(true))]),
+    )?;
+    let shown: Vec<(Term, Term, Term)> = hydrated
+        .iter()
+        .map(|fields| {
+            (
+                field(fields, "event"),
+                field(fields, "payload"),
+                field(fields, "result"),
+            )
+        })
+        .collect();
+    assert_eq!(
+        shown,
+        vec![
+            (text("created"), text("p1"), Term::Nil),
+            (text("claimed"), text("p1"), Term::Nil),
+            (text("transitioned"), text("p2"), Term::Nil),
+            (text("claimed"), text("p2"), Term::Nil),
+            (text("completed"), text("p2"), text("r1")),
+        ]
+    );
+    Ok(())
+}
