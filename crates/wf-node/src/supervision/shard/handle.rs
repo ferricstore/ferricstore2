@@ -9,7 +9,7 @@ use wf_application::commands::queue::{
 
 use super::super::completer::Finish;
 use super::command::Logged;
-use super::state::ShardState;
+use super::state::{self, ShardState};
 use super::{Done, Request};
 
 /// Completes fast-path Flows; outcomes keep their positions.
@@ -58,6 +58,18 @@ fn create(
             (position, outcome)
         })
         .collect()
+}
+
+/// A schedule request on this shard; replies once durable.
+fn schedule(
+    state: &mut ShardState,
+    (op, now): (state::ScheduleOp, u64),
+    logged: &mut Vec<Logged>,
+    done: Done<state::ScheduleReply>,
+) -> Finish {
+    let (result, changes) = state.schedule_op(op, now);
+    logged.extend(changes);
+    Box::new(move |durable| done(durable.and(result)))
 }
 
 /// Applies one request; returns what to call after the round is durable, or
@@ -130,6 +142,7 @@ pub(super) fn handle(
             limit,
             done,
         } => cleanup(state, (now, now_ms), limit, logged, done),
+        Request::Schedule { op, done } => schedule(state, (op, now), logged, done),
         Request::Read { read, done } => {
             let tally = state.tally(&read, now);
             Box::new(move |durable| done(durable.map(|()| tally)))

@@ -10,6 +10,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use wf_application::commands::flow::keys;
 use wf_application::commands::flow::many::{self, ManyMutation};
 use wf_application::commands::flow::query;
+use wf_application::commands::flow::schedule::Command as ScheduleCommand;
 use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::value::{self, ValueMget};
 use wf_application::commands::flow::{FlowCommand, FlowService, Term};
@@ -17,6 +18,7 @@ use wf_application::commands::queue::{
     Partition, Reply, ServiceError, shard_for_slot, slot_for_tag,
 };
 
+use crate::supervision::scheduler::Job;
 use crate::supervision::shard::Request;
 use crate::supervision::shard::state::BatchItems;
 
@@ -38,6 +40,7 @@ impl FlowService for QueueNode {
             FlowCommand::PolicyGet(get) => return policy::get(router, get, reply),
             FlowCommand::RetentionCleanup(request) => return cleanup::run(router, &request, reply),
             FlowCommand::Info(read) => return info::read(router, *read, reply),
+            FlowCommand::Schedule(command) => return self.schedule(router, *command, reply),
             FlowCommand::QueryIndexes(request) => {
                 let now_ms = SystemTime::now()
                     .duration_since(UNIX_EPOCH)
@@ -94,6 +97,28 @@ impl FlowService for QueueNode {
                 done: reply,
             },
         );
+    }
+}
+
+impl QueueNode {
+    /// Queues a schedule command for the schedule thread (ADR-014 step 13).
+    fn schedule(&self, router: &Arc<Router>, command: ScheduleCommand, reply: Reply<Term>) {
+        let router = Arc::downgrade(router);
+        let job: Job = Box::new(move || {
+            let result = router
+                .upgrade()
+                .map_or(Err(ServiceError::Unavailable), |router| {
+                    super::schedule::run(&router, command)
+                });
+            reply(result);
+        });
+        let Some(jobs) = &self.schedule_jobs else {
+            return job();
+        };
+        if let Err(returned) = jobs.send(job) {
+            // The thread has stopped; the job finds no node and refuses.
+            (returned.0)();
+        }
     }
 }
 

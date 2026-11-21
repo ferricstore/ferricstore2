@@ -65361,3 +65361,45 @@ parameter count or the wrong partition each makes one fail. All 62 node
 tests, the TCP adapter and application tests pass; the SDK suite passes
 40 of 60 (was 38). Clippy, the ratchet, lint tests, docs and architecture
 pass.
+
+### ADR014-SCHEDULE1 FLOW.SCHEDULE.*
+
+New artifacts (solo design review): `wf_application::commands::flow::
+schedule` (`Command`, `Request`, `FireDue`, `Target`, `parse`,
+`flow_id`, `partition`; children `create` with private `target_options`,
+`cron`, `definition`, `list`, `plan` with private `overlap`, `target`,
+`tests`), `FlowCommand::Schedule`, `query::cursor::hmac` (crate-wide);
+`wf-node` `supervision::scheduler` (the schedule thread),
+`supervision::shard::state::schedule` with `ops`, `Request::Schedule`,
+`composition::schedule` with `fire`, `QueueNodeConfig::schedule_poll`;
+`CreateFlow::payload_term`, `FlowMeta::payload_term`; snapshot version 9;
+opcodes 0x0225 to 0x022C. Dependency change: `jiff` 0.2.28 (MIT or
+Unlicense) in `wf-application` with `std`, `tz-system`, `tzdb-zoneinfo`,
+listed in the architecture policy; cargo-deny advisories, bans, licenses
+and sources pass offline.
+
+Decisions: store schedules as internal Flows, as Elixir does, so logging,
+replay, snapshots and retention come for free; run a fire's steps on a
+dedicated thread with blocking calls rather than chained callbacks, since
+schedules are few and a fire spans several shards; resolve zones with
+`jiff` and the system zoneinfo rather than writing a TZif reader (file
+access belongs to `wf-storage`) or bundling a database.
+
+Evidence: the Elixir scenario (every kind, fire_due, catch-up, manual
+fires, skip and fail overlaps, cron in New York, end_at, pause, resume,
+delete, duplicate and overwrite, listing filters, 20 creation errors) was
+captured first; the node matches it apart from lines Elixir's background
+scheduler changed during the run and the unknown-option wording. Ported:
+Elixir's one-shot, interval, catch-up, max_fires, end_at, manual fire,
+pause/resume, delete, overwrite-reactivation, duplicate-owner,
+queue_after_previous (exact due times and retries), skip, fail_schedule,
+listing, timing-field, ambiguous-start, fixed-id, overlap-retry, end
+condition, cron and backoff cases, as five node tests (`flow_schedule`),
+one payload test (`flow_payload`), four unit tests and three cron tests,
+plus a TCP test. Not ported: catalog, hibernation, projection, Raft and
+cluster cases (no such machinery). The tests were written after the code,
+so this step does not claim TDD; dropping the catch-up base, max_fires,
+the overlap read, the backoff doubling, the ownership check, wall-clock
+retention or the active-state claim guard each makes one fail. All 68 node
+tests, the TCP adapter and application tests pass; the SDK suite passes
+40 of 60. Clippy, the ratchet, lint tests, docs and architecture pass.

@@ -21,8 +21,8 @@ const BLOCK: usize = 64;
 /// The node's cursor key.
 pub type Key = [u8; 32];
 
-/// HMAC-SHA256 of `message` under `key`.
-fn hmac(key: &Key, message: &[u8]) -> [u8; 32] {
+/// HMAC-SHA256 of `message` under `key`, also keying schedule ownership digests.
+pub(crate) fn hmac(key: &Key, message: &[u8]) -> [u8; 32] {
     let mut inner = [0x36_u8; BLOCK];
     let mut outer = [0x5c_u8; BLOCK];
     for ((inner, outer), byte) in inner.iter_mut().zip(outer.iter_mut()).zip(key) {

@@ -62,6 +62,8 @@ pub struct CreateFlow {
     pub partition_key: Option<Vec<u8>>,
     /// Payload, if any.
     pub payload: Option<Vec<u8>>,
+    /// The payload is an encoded term, not bytes.
+    pub payload_term: bool,
     /// Parent Flow id.
     pub parent_flow_id: Option<Vec<u8>>,
     /// Root Flow id; the Flow itself when absent.
@@ -258,6 +260,17 @@ pub fn parse(args: &Term) -> Result<CreateFlow, FlowError> {
     bounded("id", Some(&id), MAX_FLOW_ID_BYTES)?;
     let flow_type = opts.required_binary("type")?;
     bounded("type", Some(&flow_type), MAX_TYPE_BYTES)?;
+    // The schedule namespace is internal (ADR-014 step 13).
+    if flow_type.as_slice() == super::schedule::SCHEDULE_TYPE.as_bytes() {
+        return Err(FlowError::rejected(
+            "ERR flow type is reserved for internal use".to_owned(),
+        ));
+    }
+    if id.starts_with(super::schedule::FLOW_ID_PREFIX.as_bytes()) {
+        return Err(FlowError::rejected(
+            "ERR flow id is reserved for internal use".to_owned(),
+        ));
+    }
     let state = opts.optional_binary("state", b"queued")?;
     bounded("state", Some(&state), MAX_STATE_BYTES)?;
     if state == b"running" {
@@ -291,10 +304,17 @@ pub fn parse(args: &Term) -> Result<CreateFlow, FlowError> {
     )?;
     let attributes = meta::attributes(opts.get("attributes"))?;
     let state_meta = meta::state_meta_update(opts.get("state_meta"))?;
-    let payload = match opts.get("payload") {
-        None | Some(Term::Nil) => None,
-        Some(Term::Bin(bytes)) => Some(bytes.clone()),
-        Some(_) => return Err(FlowError::flow("payload", "must be a binary")),
+    // Elixir stores any term; a non-binary one is kept as our term
+    // encoding and read back as the term (ADR-014 step 13).
+    let (payload, payload_term) = match opts.get("payload") {
+        None | Some(Term::Nil) => (None, false),
+        Some(Term::Bin(bytes)) => (Some(bytes.clone()), false),
+        Some(term) => {
+            let mut bytes = Vec::new();
+            term.encode(&mut bytes)
+                .ok_or_else(|| FlowError::flow("payload", "is too large"))?;
+            (Some(bytes), true)
+        }
     };
     Ok(CreateFlow {
         id,
@@ -302,6 +322,7 @@ pub fn parse(args: &Term) -> Result<CreateFlow, FlowError> {
         state,
         partition_key,
         payload,
+        payload_term,
         parent_flow_id,
         root_flow_id,
         correlation_id,

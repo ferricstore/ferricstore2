@@ -22,6 +22,7 @@ mod policy;
 mod query;
 mod retention;
 mod rewind;
+pub(crate) mod schedule;
 mod signal;
 mod steps;
 mod store;
@@ -31,6 +32,7 @@ mod value;
 pub(crate) use claim::Peeked;
 pub(crate) use mutate::{BatchItems, BatchReplies};
 pub(crate) use policy::{PolicyCommand, PolicyReply};
+pub(crate) use schedule::{ScheduleOp, ScheduleReply};
 
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;

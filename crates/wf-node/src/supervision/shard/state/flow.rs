@@ -63,7 +63,8 @@ impl ShardState {
             | FlowCommand::PolicyGet(_)
             | FlowCommand::RetentionCleanup(_)
             | FlowCommand::Info(_)
-            | FlowCommand::QueryIndexes(_) => (Err(ServiceError::Unavailable), None),
+            | FlowCommand::QueryIndexes(_)
+            | FlowCommand::Schedule(_) => (Err(ServiceError::Unavailable), None),
         }
     }
 
@@ -253,6 +254,7 @@ impl ShardState {
             attributes: create.attributes.clone(),
             state_meta,
             values,
+            payload_term: create.payload_term,
             ..defaults
         })
     }

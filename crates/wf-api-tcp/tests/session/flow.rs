@@ -223,3 +223,26 @@ fn flow_query_reaches_the_service_and_bad_requests_keep_their_status() -> TestRe
     assert_eq!(version.body.get(..2), Some(&6_u16.to_be_bytes()[..]));
     Ok(())
 }
+
+#[test]
+fn schedule_opcodes_reach_the_service() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let one = map(&[("id", bin("s"))]);
+    let created = map(&[("id", bin("s")), ("target", map(&[("type", bin("t"))]))]);
+    for (opcode, body) in [
+        (0x0225_u16, &created),
+        (0x0226, &one),
+        (0x0227, &one),
+        (0x0228, &map(&[])),
+        (0x0229, &map(&[])),
+        (0x022A, &one),
+        (0x022B, &one),
+        (0x022C, &one),
+    ] {
+        let reply = client.call(opcode, 1, 0, &encode(body)?)?;
+        // The scripted service answers every schedule command alike.
+        assert_eq!(reply.body, ok(&bin("schedule"))?, "opcode {opcode:#06x}");
+    }
+    Ok(())
+}

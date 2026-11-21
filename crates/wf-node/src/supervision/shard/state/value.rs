@@ -303,24 +303,24 @@ impl ShardState {
         }
     }
 
-    /// An error stored as a term (an active-time timeout's), decoded.
+    /// An error stored as a term (an active-time timeout's) or a payload
+    /// created as one, decoded.
     fn term_value(&mut self, reference: &[u8]) -> Option<Term> {
         let parsed = value::parse_ref(reference)?;
-        let ValueRef::Flow {
-            kind: b'e',
-            id,
-            version,
-        } = parsed.target
-        else {
+        let ValueRef::Flow { kind, id, version } = parsed.target else {
             return None;
         };
         let partition = self.partition_for_tag(&parsed.tag)?;
         let entry = self.records.get(&(partition, id))?;
         let meta = entry.meta.as_deref()?;
-        if !meta.error_term || meta.error_version != version {
-            return None;
-        }
-        match Term::decode(entry.record.error()?) {
+        let bytes = match kind {
+            b'e' if meta.error_term && meta.error_version == version => entry.record.error()?,
+            b'p' if meta.payload_term && meta.payload_version == version => {
+                entry.record.payload()?
+            }
+            _ => return None,
+        };
+        match Term::decode(bytes) {
             Some((term, [])) => Some(term),
             _ => None,
         }

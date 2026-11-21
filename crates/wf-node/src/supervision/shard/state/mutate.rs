@@ -176,6 +176,7 @@ fn updated_meta(
     };
     if payload {
         next.payload_version = version;
+        next.payload_term = false;
     }
     if result {
         next.result_version = version;

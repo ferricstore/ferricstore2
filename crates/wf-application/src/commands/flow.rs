@@ -23,6 +23,7 @@ pub mod policy;
 pub mod query;
 pub mod record;
 pub mod rewind;
+pub mod schedule;
 pub mod signal;
 pub mod start;
 pub mod term;
@@ -78,6 +79,8 @@ pub enum FlowCommand {
     Query(Box<query::Query>),
     /// `FLOW.QUERY.INDEXES`, a text command.
     QueryIndexes(query::indexes::Indexes),
+    /// A `FLOW.SCHEDULE.*` command.
+    Schedule(Box<schedule::Command>),
 }
 
 impl FlowCommand {
@@ -110,7 +113,8 @@ impl FlowCommand {
             | Self::PolicyGet(_)
             | Self::RetentionCleanup(_)
             | Self::Info(_)
-            | Self::QueryIndexes(_) => None,
+            | Self::QueryIndexes(_)
+            | Self::Schedule(_) => None,
         }
     }
 }
@@ -137,6 +141,9 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
         "FLOW.RETENTION_CLEANUP" => cleanup::parse(args).map(FlowCommand::RetentionCleanup),
         "FLOW.REWIND" => rewind::parse(args).map(|rewind| FlowCommand::Rewind(Box::new(rewind))),
+        name if name.starts_with("FLOW.SCHEDULE.") => {
+            schedule::parse(name, args).map(|command| FlowCommand::Schedule(Box::new(command)))
+        }
         "FLOW.QUERY" => query::parse(args).map(|query| FlowCommand::Query(Box::new(query))),
         "FLOW.INFO" => info::parse_info(args).map(|read| FlowCommand::Info(Box::new(read))),
         "FLOW.STATS" => info::parse_stats(args).map(|read| FlowCommand::Info(Box::new(read))),

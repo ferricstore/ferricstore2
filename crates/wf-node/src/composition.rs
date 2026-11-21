@@ -16,6 +16,7 @@ mod info;
 mod policy;
 mod replay;
 mod router;
+mod schedule;
 mod snapshot;
 
 use std::path::Path;
@@ -35,12 +36,16 @@ use wf_storage::snapshot::files::SnapshotFiles;
 use crate::supervision::shard::state::ShardState;
 use crate::supervision::shard::{self, Links, Request};
 use crate::supervision::waiters::Waiters;
-use crate::supervision::{self, completer, snapshots};
+use crate::supervision::{self, completer, scheduler, snapshots};
 pub use error::NodeError;
 use gather::ItemGather;
 use replay::replay;
 use router::{Router, ShardLink};
 use snapshot::Snapshots;
+
+/// How long the schedule thread waits idle before polling, as Elixir's
+/// scheduler sleeps between empty polls.
+const SCHEDULE_POLL: Duration = Duration::from_secs(1);
 
 /// How often the snapshot thread checks whether a snapshot is due.
 const SNAPSHOT_CHECK: Duration = Duration::from_millis(250);
@@ -56,6 +61,10 @@ pub struct QueueNodeConfig {
     pub retention_ms: u64,
     /// Log segments between automatic snapshots; 0 takes none (ADR-013).
     pub snapshot_segments: u64,
+    /// How long the schedule thread waits idle before firing due schedules
+    /// at wall time; `None` fires them only on `FLOW.SCHEDULE.FIRE_DUE`
+    /// (ADR-014 step 13).
+    pub schedule_poll: Option<Duration>,
 }
 
 impl Default for QueueNodeConfig {
@@ -68,6 +77,7 @@ impl Default for QueueNodeConfig {
             },
             retention_ms: ResolvedRetention::default().ttl_ms,
             snapshot_segments: 2,
+            schedule_poll: Some(SCHEDULE_POLL),
         }
     }
 }
@@ -83,6 +93,30 @@ pub struct QueueNode {
     snapshots: Arc<Snapshots>,
     snapshot_stop: Option<mpsc::Sender<()>>,
     snapshotter: Option<JoinHandle<()>>,
+    /// Schedule commands for the schedule thread (ADR-014 step 13).
+    schedule_jobs: Option<mpsc::Sender<scheduler::Job>>,
+    scheduling: Option<JoinHandle<()>>,
+}
+
+/// Starts the schedule thread; dropping the returned sender stops it.
+fn start_schedules(
+    router: &Arc<Router>,
+    poll: Option<Duration>,
+) -> Result<(mpsc::Sender<scheduler::Job>, JoinHandle<()>), NodeError> {
+    let (jobs_sender, jobs) = mpsc::channel();
+    let router = Arc::downgrade(router);
+    let thread = supervision::spawn("wf-schedules".into(), move || {
+        let tick = poll.map(|_| {
+            move || {
+                router
+                    .upgrade()
+                    .is_some_and(|router| schedule::poll(&router))
+            }
+        });
+        scheduler::run(&jobs, poll.unwrap_or(Duration::from_secs(3_600)), tick);
+    })
+    .ok_or(NodeError::Thread)?;
+    Ok((jobs_sender, thread))
 }
 
 /// Starts the snapshot thread; dropping the returned sender stops it.
@@ -187,6 +221,7 @@ impl QueueNode {
         };
         let router = Arc::new(router);
         let (snapshot_stop, snapshotter) = start_snapshots(&snapshots, &router)?;
+        let (schedule_jobs, scheduling) = start_schedules(&router, config.schedule_poll)?;
         Ok(Self {
             router: Some(router),
             waiters,
@@ -196,6 +231,8 @@ impl QueueNode {
             snapshots,
             snapshot_stop: Some(snapshot_stop),
             snapshotter: Some(snapshotter),
+            schedule_jobs: Some(schedule_jobs),
+            scheduling: Some(scheduling),
         })
     }
 
@@ -319,6 +356,11 @@ impl Drop for QueueNode {
     /// Closes the shards' channels, waits for the shards and the completion
     /// thread, then stops the waiter thread, which fails what still waits.
     fn drop(&mut self) {
+        self.schedule_jobs = None;
+        if let Some(scheduling) = self.scheduling.take() {
+            // A runtime thread only returns; a join error has nothing to report.
+            let _joined = scheduling.join();
+        }
         self.snapshot_stop = None;
         if let Some(snapshotter) = self.snapshotter.take() {
             // A runtime thread only returns; a join error has nothing to report.

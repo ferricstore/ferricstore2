@@ -47,15 +47,15 @@ pub fn parse(args: &Term) -> Result<GetFlow, FlowError> {
         }
     };
     opts.non_neg_integer("value_max_bytes")?;
-    // Read hints a single-node store has no use for, checked as Elixir
-    // checks them.
-    for flag in ["full", "payload", "include_cold", "consistent_projection"] {
+    // `PayloadReturn.options/2`: `payload` defaults to `full`; the cold and
+    // projection hints are checked and have no use on a single node.
+    let full = opts.boolean("full", false)?;
+    let payload = opts.boolean("payload", full)?;
+    for flag in ["include_cold", "consistent_projection"] {
         opts.boolean(flag, false)?;
     }
-    if opts
-        .non_neg_integer("payload_max_bytes")?
-        .is_some_and(|max| max > PAYLOAD_MAX_BYTES)
-    {
+    let max_bytes = opts.non_neg_integer("payload_max_bytes")?;
+    if max_bytes.is_some_and(|max| max > PAYLOAD_MAX_BYTES) {
         return Err(FlowError::rejected(format!(
             "ERR flow payload_max_bytes exceeds maximum {PAYLOAD_MAX_BYTES}"
         )));
@@ -64,11 +64,9 @@ pub fn parse(args: &Term) -> Result<GetFlow, FlowError> {
         id,
         partition_key: partition_key(&opts)?,
         include: Include {
-            // Elixir accepts the flag on FLOW.GET and still returns only the
-            // payload reference.
-            payload: false,
+            payload,
+            max_bytes: max_bytes.unwrap_or(PAYLOAD_MAX_BYTES),
             values: Values::Names(opts.binary_list("values")?),
-            ..Include::default()
         },
     })
 }

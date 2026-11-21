@@ -73,6 +73,8 @@ pub struct FlowMeta {
     /// The error is an encoded term, not bytes: an active-time timeout's
     /// `{reason, max_active_ms}` (ADR-014 step 9).
     pub error_term: bool,
+    /// The payload is an encoded term, not bytes (ADR-014 step 13).
+    pub payload_term: bool,
     /// The history event the Flow was last rewound to (ADR-014 step 10).
     pub rewound_to: Option<Vec<u8>>,
     /// The attribute names its type's policy indexed when the Flow was last
@@ -104,6 +106,7 @@ impl Default for FlowMeta {
             signal_keys: BTreeMap::new(),
             child_groups: BTreeMap::new(),
             error_term: false,
+            payload_term: false,
             rewound_to: None,
             indexed_attributes: Vec::new(),
             indexed_state_meta: None,
@@ -141,6 +144,18 @@ fn hydrate(entries: &mut Vec<(&str, Term)>, kind: &str, value: Option<&[u8]>, ma
         entries.push((field, Term::Bin(value.to_vec())));
     }
     entries.push((size_field, Term::int(size)));
+}
+
+/// Replaces a hydrated value stored as an encoded term with the term.
+fn decode_term(entries: &mut [(&str, Term)], field: &str) {
+    for (name, value) in entries.iter_mut() {
+        if *name == field
+            && let Term::Bin(bytes) = value
+            && let Some((term, [])) = Term::decode(bytes)
+        {
+            *value = term;
+        }
+    }
 }
 
 fn ms(value: Option<TimestampMillis>) -> Term {
@@ -293,6 +308,9 @@ impl View<'_> {
                 ("error", record.error()),
             ] {
                 hydrate(&mut entries, kind, value, include.max_bytes);
+            }
+            if meta.payload_term {
+                decode_term(&mut entries, "payload");
             }
         }
         map(entries)

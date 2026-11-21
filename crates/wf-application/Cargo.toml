@@ -16,6 +16,7 @@ wf-types.workspace = true
 wf-domain.workspace = true
 wf-ports.workspace = true
 sha2.workspace = true
+jiff.workspace = true
 
 [[test]]
 name = "wf_application_tests"

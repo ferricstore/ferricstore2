@@ -232,6 +232,11 @@ pub fn parse(name: &str, args: &Term) -> Result<ParsedClaim, FlowError> {
         Some(Term::Bin(value)) if !value.is_empty() => value.clone(),
         _ => return Err(FlowError::flow("type", "must be a non-empty string")),
     };
+    if flow_type.as_slice() == super::schedule::SCHEDULE_TYPE.as_bytes() {
+        return Err(FlowError::rejected(
+            "ERR flow type is reserved for internal use".to_owned(),
+        ));
+    }
     let states = if reclaim_only {
         vec![b"running".to_vec()]
     } else {

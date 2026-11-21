@@ -354,3 +354,41 @@ Each step is one commit with its tests.
   queries and errors matches Elixir apart from one quirk: on one Elixir
   claim path a `claimed` event omits `attributes`. The SDK suite passes 40
   of 60, both query planner tests included.
+- Step 13: `FLOW.SCHEDULE.*` (0x0225 to 0x022C), as
+  `Ferricstore.Flow.Schedule`. A schedule is an internal Flow of type
+  `__ferricstore_schedule`, id `__ferricstore_schedule__:<id>`, in one of
+  256 internal partitions, with its definition (Elixir's fields) as an
+  encoded payload; public creates and claims refuse that type and id
+  prefix. Kinds are one-shot, delay, interval and cron; creation checks
+  every option in Elixir's order and texts. A fire claims the schedule
+  under a lease, reads the previous target when the overlap policy needs
+  it, plans (catch-up `fire_once` coalescing for automatic interval fires,
+  `max_fires`, `end_at_ms`, the timestamp limit, `skip`,
+  `queue_after_previous` with a doubling retry up to 30 s, `fail_schedule`),
+  creates the target with an idempotent id and ownership attributes (an
+  HMAC-SHA256 digest keyed by a per-schedule secret; a target id another
+  Flow holds is refused), then applies the outcome under the lease; a
+  failure part-way releases the schedule, a refusal keeps the lease. The
+  node runs schedule commands and a background poll on one schedule thread
+  (in `supervision`, so a fire's cross-shard steps are sequential calls);
+  it polls every second, also between commands, and FIRE_DUE fires due
+  schedules across shards in due order. Schedule records are after-images,
+  so replay restores them; terminal schedules are kept from the later of
+  command and wall time. Cron expressions resolve wall-clock minutes in
+  IANA zones through `jiff` 0.2.28 (system zoneinfo, no bundled data): a
+  repeated DST minute gives both instants, a skipped one none, as Elixir's
+  `Tz` does. This adds `jiff` to `wf-application`'s reviewed external
+  dependencies (`architecture/policy.toml`); cargo-deny passes. Two gaps
+  the schedule tests exposed are fixed: FLOW.CREATE now takes a payload of
+  any term (kept as this node's term encoding, flagged in `FlowMeta`, read
+  back as the term by GET and value reads; its size is this encoding's),
+  and FLOW.GET returns the payload, result and error when `payload` or
+  `full` is set, up to `payload_max_bytes`, as Elixir's `PayloadReturn`
+  does. Snapshot images are version 9. Not built: waking a queued schedule
+  when its previous target ends (`wake_queued`; it retries on its backoff
+  instead), Elixir's schedule history events and catalog projections. The
+  ownership digest differs from Elixir's (another encoding), and schedule
+  partitions use this node's bucket hash, not `phash2`. The scenario
+  matches Elixir except lines shaped by Elixir's own background scheduler
+  and the unknown-option wording; the SDK suite passes 40 of 60, its
+  native schedule test now failing on a governance opcode.

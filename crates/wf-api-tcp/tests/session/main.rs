@@ -142,6 +142,7 @@ impl FlowService for Scripted {
             FlowCommand::Info(read) => reply(Ok(Term::Bin(read.flow_type))),
             FlowCommand::Query(query) => reply(Ok(Term::Bin(query.text))),
             FlowCommand::QueryIndexes(_) => reply(Ok(Term::text("indexes"))),
+            FlowCommand::Schedule(_) => reply(Ok(Term::text("schedule"))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),

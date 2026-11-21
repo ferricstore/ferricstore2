@@ -106,6 +106,11 @@ pub(crate) enum Request {
         command: state::PolicyCommand,
         done: Done<state::PolicyReply>,
     },
+    /// A schedule operation (ADR-014 step 13).
+    Schedule {
+        op: state::ScheduleOp,
+        done: Done<state::ScheduleReply>,
+    },
     /// This shard's part of a count or discovery read (ADR-014 step 11).
     Read { read: Arc<Read>, done: Done<Tally> },
     /// Any other Flow command, for the Flow in `partition` (ADR-014).
