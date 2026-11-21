@@ -159,8 +159,8 @@ fn reserve(reserve: &Reserve, flow: &Flow<'_>, governance: &mut Governance, wall
         let denial = Denial::new(
             "GOVERNANCE_CONFLICT",
             b"Effect key already exists with a different operation_digest".to_vec(),
-            "effect_idempotency",
             vec![
+                ("policy", Some(b"effect_idempotency".to_vec())),
                 ("effect_key", Some(reserve.effect_key.clone())),
                 ("status", Some(existing.status.name().as_bytes().to_vec())),
                 ("decision_id", Some(decision_id("effect_conflict", &key))),
@@ -219,8 +219,8 @@ fn deny(
     let denial = Denial::new(
         "GOVERNANCE_EFFECT_DENIED",
         message,
-        "idempotency_key_required",
         vec![
+            ("policy", Some(b"idempotency_key_required".to_vec())),
             ("scope", Some(scope)),
             ("type", Some(flow.flow_type.to_vec())),
             ("state", Some(flow.state.to_vec())),
@@ -277,8 +277,8 @@ fn update(update: &Update, flow: &Flow<'_>, governance: &mut Governance, wall: u
         let denial = Denial::new(
             "GOVERNANCE_CONFLICT",
             b"Effect is already terminal".to_vec(),
-            "effect_lifecycle",
             vec![
+                ("policy", Some(b"effect_lifecycle".to_vec())),
                 ("effect_key", Some(update.effect_key.clone())),
                 (
                     "current_status",

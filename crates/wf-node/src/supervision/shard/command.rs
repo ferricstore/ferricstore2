@@ -22,6 +22,7 @@ const PUT: u8 = 7;
 const SHARED: u8 = 8;
 const GROUP: u8 = 9;
 const POLICY: u8 = 10;
+const GOVERNANCE: u8 = 11;
 
 mod stored;
 
@@ -89,6 +90,15 @@ pub(crate) enum Logged {
         bytes: Vec<u8>,
         expires_at: Option<u64>,
     },
+    /// A governance record stored, or removed when `value` is `None`
+    /// (ADR-014 step 15): the partition its name routes as, its kind's
+    /// tag, its name and its stored form.
+    Governance {
+        partition: Partition,
+        kind: u8,
+        name: Vec<u8>,
+        value: Option<Vec<u8>>,
+    },
 }
 
 impl Logged {
@@ -99,7 +109,8 @@ impl Logged {
             | Self::Claim { partition, .. }
             | Self::Complete { partition, .. }
             | Self::Put { partition, .. }
-            | Self::Shared { partition, .. } => Some(partition),
+            | Self::Shared { partition, .. }
+            | Self::Governance { partition, .. } => Some(partition),
             Self::Group(changes) => changes.first().and_then(Self::partition),
             Self::Expire { .. } | Self::Marker { .. } | Self::Policy { .. } => None,
         }
@@ -158,7 +169,11 @@ impl Logged {
                 out.extend_from_slice(&fence.to_be_bytes());
                 optional_bin(&mut out, result.as_deref())?;
             }
-            Self::Put { .. } | Self::Group(_) | Self::Shared { .. } | Self::Policy { .. } => {
+            Self::Put { .. }
+            | Self::Group(_)
+            | Self::Shared { .. }
+            | Self::Policy { .. }
+            | Self::Governance { .. } => {
                 stored::encode(self, &mut out)?;
             }
             Self::Marker { snapshot, shard } => {

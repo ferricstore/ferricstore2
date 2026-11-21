@@ -3,10 +3,13 @@
 
 use wf_application::commands::queue::Partition;
 
-use super::{GROUP, Logged, Malformed, POLICY, PUT, Reader, SHARED, bin, decode, optional_u64};
+use super::{
+    GOVERNANCE, GROUP, Logged, Malformed, POLICY, PUT, Reader, SHARED, bin, decode, optional_bin,
+    optional_u64,
+};
 
 /// Records that store state as logged: a group, a shared value, an
-/// after-image or a policy; `None` for any other tag.
+/// after-image, a policy or a governance record; `None` for any other tag.
 pub(super) fn decode_stored(tag: u8, reader: &mut Reader<'_>) -> Result<Option<Logged>, Malformed> {
     let logged = match tag {
         GROUP => {
@@ -34,6 +37,12 @@ pub(super) fn decode_stored(tag: u8, reader: &mut Reader<'_>) -> Result<Option<L
             flow_type: reader.bin()?.to_vec(),
             generation: reader.u64()?,
             policy: reader.bin()?.to_vec(),
+        },
+        GOVERNANCE => Logged::Governance {
+            partition: Partition::parse(reader.bin()?),
+            kind: reader.u8()?,
+            name: reader.bin()?.to_vec(),
+            value: reader.optional_bin()?,
         },
         _ => return Ok(None),
     };
@@ -80,6 +89,18 @@ pub(super) fn encode(logged: &Logged, out: &mut Vec<u8>) -> Option<()> {
             bin(out, flow_type)?;
             out.extend_from_slice(&generation.to_be_bytes());
             bin(out, policy)?;
+        }
+        Logged::Governance {
+            partition,
+            kind,
+            name,
+            value,
+        } => {
+            out.push(GOVERNANCE);
+            bin(out, &partition.name())?;
+            out.push(*kind);
+            bin(out, name)?;
+            optional_bin(out, value.as_deref())?;
         }
         _ => {}
     }

@@ -11,6 +11,7 @@
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex, PoisonError, Weak};
 
+use wf_application::commands::queue::Partition;
 use wf_storage::log::GroupLog;
 use wf_storage::snapshot::files::SnapshotFiles;
 
@@ -22,12 +23,12 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 10 images carry each Flow's fields beyond its record (with the
+/// Version 11 images carry each Flow's fields beyond its record (with the
 /// policy-indexed names it was written under, term payloads, effects and
-/// the governance ledger), its history (with timeout
+/// the governance ledger) and each shard's governance records, its history (with timeout
 /// and rewind extras), the shard's shared values and its Flow type policies
 /// (ADR-014).
-const VERSION: u8 = 10;
+const VERSION: u8 = 11;
 
 struct Progress {
     next: u64,
@@ -87,6 +88,14 @@ pub(crate) fn load(
                 .first_mut()
                 .ok_or(NodeError::SnapshotImage)?
                 .restore_policy(&flow_type, generation, &policy)
+                .map_err(|_| NodeError::SnapshotImage)?;
+        }
+        for (kind, name, value) in decoded.governance {
+            let state = shard_index(&Partition::parse(&name), shards)
+                .and_then(|index| states.get_mut(index))
+                .ok_or(NodeError::SnapshotImage)?;
+            state
+                .restore_governance(kind, &name, Some(value))
                 .map_err(|_| NodeError::SnapshotImage)?;
         }
         for restored in decoded.records {

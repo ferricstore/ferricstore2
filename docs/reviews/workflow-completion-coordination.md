@@ -65448,3 +65448,42 @@ reversal or window, or the change log each makes one fail. All 76 node
 tests, the TCP adapter (whose decoder now refuses duplicate keys) and
 application tests pass; the SDK suite passes 40 of 60. Clippy, the
 ratchet, lint tests, docs, architecture and cargo-deny pass.
+
+### ADR014-GOVERNANCE1 Governance records and FLOW.APPROVAL.*
+
+New artifacts (solo design review): `wf_application::commands::flow::
+governance` (`Command`, `Kind`, `Change`, `Decided`, `Listed`, `parse`,
+`is_governance`; `approval` with `request` and `stored`; `tests`),
+`FlowCommand::Governance`; `wf-node` `Logged::Governance` (tag 11),
+`ShardState::governance` store with `state::governance`,
+`Request::GovernanceList`, `composition::governance`, image section and
+snapshot version 11; opcodes 0x0246 to 0x0249 and 0x0253.
+`effect::denial::Denial::new` now takes every field after the reason, so
+approval conflicts carry no policy. No new dependency.
+
+Decisions: one generic per-shard record store for all governance kinds,
+with decisions in `wf-application` over a record's stored form, rather
+than internal Flows (schedules needed leases and retention; these do
+not); route by the record name as a partition, matching Elixir's key tag;
+log the record's after-image with its partition so replay and snapshots
+re-route it under another shard count; answer listings after the round
+is durable, as count reads are.
+
+Evidence: the Elixir approval scenario (request with every field,
+duplicate, early and late decisions, terminal conflicts, timeout and
+absolute expiry, 24 argument errors, listings by status, scope,
+partition, Flow and limit) matches the node apart from the
+unknown-option wording. Ported from `flow_governance_test.exs`: one
+terminal decision with conflicts, metadata validation (including 1,001
+assignees), decisions validated before mutation, listings by status and
+scope with partition scopes, record corruption; added expiry recording,
+cross-shard listing order, restart under another shard count, and a
+snapshot that alone restores approvals. Not ported: catalog repair and
+telemetry (no separate catalogs) and the overview (15e). The tests were
+written after the code, so this step does not claim TDD; breaking the
+terminal check, the expiry boundary, the expired record, the early
+decision check, the duplicate check, the listing order, the partition
+scopes, assignee de-duplication, the log record, the snapshot section or
+its routing each makes one fail. All 81 node tests, the TCP adapter and
+application tests pass; the SDK suite passes 40 of 60. Clippy, the
+ratchet, lint tests, docs, architecture and cargo-deny pass.

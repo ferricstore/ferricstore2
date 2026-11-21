@@ -17,6 +17,7 @@ use wf_node::composition::{QueueNode, QueueNodeConfig};
 
 mod blocking;
 mod crash;
+mod flow_approval;
 mod flow_children;
 mod flow_claim;
 mod flow_cleanup;

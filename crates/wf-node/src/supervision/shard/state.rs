@@ -17,6 +17,7 @@ mod effect;
 pub(crate) mod events;
 mod fifo;
 mod flow;
+mod governance;
 mod index;
 mod mutate;
 mod policy;
@@ -39,6 +40,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 use events::History;
+use wf_application::commands::flow::governance::Kind;
 use wf_application::commands::flow::policy::Installed;
 use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::queue::{
@@ -91,6 +93,9 @@ pub(crate) struct ShardState {
     leased: u64,
     /// Shared values by reference (ADR-014 step 5).
     shared: HashMap<Vec<u8>, value::Shared>,
+    /// Governance records by kind and name, in stored form (ADR-014 step
+    /// 15).
+    governance: BTreeMap<(Kind, Vec<u8>), Vec<u8>>,
     /// Named partitions by hash tag, to find a Flow from a value reference;
     /// rebuilt on a miss when Flows were added since (`tags_at`).
     tags: HashMap<String, Partition>,
@@ -139,6 +144,7 @@ impl ShardState {
             ready: 0,
             leased: 0,
             shared: HashMap::new(),
+            governance: BTreeMap::new(),
             tags: HashMap::new(),
             tags_at: 0,
             live: false,
@@ -211,6 +217,9 @@ impl ShardState {
             } => self
                 .restore_policy(flow_type, *generation, policy)
                 .map(|()| Outcome::Changed),
+            Logged::Governance {
+                kind, name, value, ..
+            } => self.restore_governance(*kind, name, value.clone()),
             // A marker changes no record; replay handles it before apply.
             Logged::Marker { .. } => Ok(Outcome::NotEligible),
             Logged::Group(changes) => changes
@@ -233,6 +242,7 @@ impl ShardState {
             | Logged::Put { .. }
             | Logged::Group(_)
             | Logged::Policy { .. }
+            | Logged::Governance { .. }
             | Logged::Marker { .. } => return Ok(Outcome::NotEligible),
             Logged::Create {
                 now,

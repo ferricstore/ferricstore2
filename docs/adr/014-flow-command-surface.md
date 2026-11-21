@@ -421,3 +421,24 @@ Each step is one commit with its tests.
   does not read are refused (Elixir accepts any known Flow option). The
   scenario matches Elixir apart from those; the SDK suite passes 40 of 60,
   its native test now past the effects and failing on approvals.
+- Step 15a: governance records and `FLOW.APPROVAL.*` (0x0246 to 0x0249,
+  0x0253), as `Governance.ApprovalStore`. Governance records that belong
+  to no Flow (approvals now; circuits, budgets and limits next) live in a
+  per-shard store keyed by kind and name, on the shard their name routes
+  to as a partition (Elixir's key carries the name's hash tag). A command
+  on one record goes through the single-Flow path and is decided in
+  `wf-application` from the record's stored form; the shard stores or
+  removes the result and logs it as a `Governance` record carrying that
+  partition, so replay routes it under any shard count; snapshots carry
+  each shard's records in their own section (image version 11). A
+  listing asks every shard for its matching records once its round is
+  durable and joins the parts. An approval request names a Flow and a
+  scope, keeps assignees in order without repeats, and expires after
+  `timeout_ms` (which wins) or at `expires_at_ms`, both checked against
+  the request's time; it takes one decision, refused with
+  `GOVERNANCE_CONFLICT` once terminal, and a decision at or after the
+  expiry records the approval as expired and is refused. Listings filter
+  by status, scope (a `partition_key` also matches its `partition:`
+  scope) and Flow, newest request first, up to 1,000. The scenario
+  matches Elixir apart from the unknown-option wording; the SDK suite
+  passes 40 of 60, its native test now failing on circuits.

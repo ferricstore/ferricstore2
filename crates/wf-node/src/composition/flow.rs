@@ -25,7 +25,7 @@ use crate::supervision::shard::state::BatchItems;
 use super::QueueNode;
 use super::gather::ItemGather;
 use super::router::Router;
-use super::{cleanup, info, policy};
+use super::{cleanup, governance, info, policy};
 
 impl FlowService for QueueNode {
     fn execute(&self, command: FlowCommand, reply: Reply<Term>) {
@@ -40,6 +40,9 @@ impl FlowService for QueueNode {
             FlowCommand::PolicyGet(get) => return policy::get(router, get, reply),
             FlowCommand::RetentionCleanup(request) => return cleanup::run(router, &request, reply),
             FlowCommand::Info(read) => return info::read(router, *read, reply),
+            FlowCommand::Governance(command) if command.listed().is_some() => {
+                return governance::list(router, *command, reply);
+            }
             FlowCommand::Schedule(command) => return self.schedule(router, *command, reply),
             FlowCommand::QueryIndexes(request) => {
                 let now_ms = SystemTime::now()

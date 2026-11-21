@@ -12,6 +12,7 @@ pub mod cleanup;
 pub mod create;
 pub mod effect;
 pub mod get;
+pub mod governance;
 pub mod history;
 pub mod info;
 pub mod json;
@@ -84,6 +85,8 @@ pub enum FlowCommand {
     Schedule(Box<schedule::Command>),
     /// A `FLOW.EFFECT.*` command or `FLOW.GOVERNANCE.LEDGER`.
     Effect(Box<effect::Command>),
+    /// A governance record command (ADR-014 step 15).
+    Governance(Box<governance::Command>),
 }
 
 impl FlowCommand {
@@ -110,6 +113,8 @@ impl FlowCommand {
                 Some((&start.create.id, start.create.partition_key.as_deref()))
             }
             Self::Effect(command) => Some(command.target()),
+            // A record lives where its name, as a partition, routes.
+            Self::Governance(command) => command.record().map(|(_, name)| (name, Some(name))),
             Self::Many(_)
             | Self::ValueMget(_)
             | Self::RunSteps(_)
@@ -145,6 +150,9 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
         "FLOW.RETENTION_CLEANUP" => cleanup::parse(args).map(FlowCommand::RetentionCleanup),
         "FLOW.REWIND" => rewind::parse(args).map(|rewind| FlowCommand::Rewind(Box::new(rewind))),
+        name if governance::is_governance(name) => {
+            governance::parse(name, args).map(|command| FlowCommand::Governance(Box::new(command)))
+        }
         name if effect::is_effect(name) => {
             effect::parse(name, args).map(|command| FlowCommand::Effect(Box::new(command)))
         }

@@ -39,19 +39,17 @@ const fn reason(code: &str) -> &'static str {
 }
 
 impl Denial {
-    /// A decision with `code`, `message` and `policy`, then `rest`.
+    /// A decision with `code` and `message`, its reason, then `rest`.
     #[must_use]
     pub fn new(
         code: &'static str,
         message: Vec<u8>,
-        policy: &'static str,
         rest: Vec<(&'static str, Option<Vec<u8>>)>,
     ) -> Self {
         let mut fields = vec![
             ("code", Some(code.as_bytes().to_vec())),
             ("message", Some(message)),
             ("reason", Some(reason(code).as_bytes().to_vec())),
-            ("policy", Some(policy.as_bytes().to_vec())),
         ];
         fields.extend(rest);
         Self { fields }

@@ -3,6 +3,8 @@
 //! once the round is durable.
 
 use wf_application::commands::flow::cleanup::Cleaned;
+use wf_application::commands::flow::governance::{Command as GovernanceCommand, Listed};
+use wf_application::commands::flow::info::{Read, Tally};
 use wf_application::commands::queue::{
     CompleteFlow, ItemOutcome, NewFlow, Partition, ServiceError,
 };
@@ -70,6 +72,19 @@ fn schedule(
     let (result, changes) = state.schedule_op(op, now);
     logged.extend(changes);
     Box::new(move |durable| done(durable.and(result)))
+}
+
+/// This shard's part of a count or discovery read, once durable.
+fn tally(state: &ShardState, now: u64, read: &Read, done: Done<Tally>) -> Finish {
+    let tally = state.tally(read, now);
+    Box::new(move |durable| done(durable.map(|()| tally)))
+}
+
+/// This shard's part of a governance listing, answered once the round's
+/// writes are durable, as a count read is.
+fn governance_list(state: &ShardState, command: &GovernanceCommand, done: Done<Listed>) -> Finish {
+    let listed = state.governance_select(command);
+    Box::new(move |durable| done(durable.map(|()| listed)))
 }
 
 /// Applies one request; returns what to call after the round is durable, or
@@ -143,10 +158,8 @@ pub(super) fn handle(
             done,
         } => cleanup(state, (now, now_ms), limit, logged, done),
         Request::Schedule { op, done } => schedule(state, (op, now), logged, done),
-        Request::Read { read, done } => {
-            let tally = state.tally(&read, now);
-            Box::new(move |durable| done(durable.map(|()| tally)))
-        }
+        Request::Read { read, done } => tally(state, now, &read, done),
+        Request::GovernanceList { command, done } => governance_list(state, &command, done),
         Request::Policy { command, done } => {
             let (result, change) = state.policy_command(command);
             logged.extend(change);

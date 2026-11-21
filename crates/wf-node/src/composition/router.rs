@@ -47,6 +47,7 @@ fn refuse(request: Request) {
         Request::Policy { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Cleanup { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Read { done, .. } => done(Err(ServiceError::Unavailable)),
+        Request::GovernanceList { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Schedule { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Peek { done, .. } => done(Peeked::default()),
     }

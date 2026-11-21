@@ -148,11 +148,14 @@ impl FlowService for Scripted {
                 reply(Err(ServiceError::Governance(Box::new(Denial::new(
                     "GOVERNANCE_CONFLICT",
                     b"Effect is already terminal".to_vec(),
-                    "effect_lifecycle",
-                    vec![("current_status", Some(b"confirmed".to_vec()))],
+                    vec![
+                        ("policy", Some(b"effect_lifecycle".to_vec())),
+                        ("current_status", Some(b"confirmed".to_vec())),
+                    ],
                 )))));
             }
             FlowCommand::Effect(_) => reply(Ok(Term::text("effect"))),
+            FlowCommand::Governance(_) => reply(Ok(Term::text("governance"))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),

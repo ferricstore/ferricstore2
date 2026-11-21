@@ -52,6 +52,8 @@ impl ShardState {
             ));
         }
         image::encode_policies(&mut out, &policies)?;
+        let records: Vec<(u8, &[u8], &[u8])> = self.governance_records().collect();
+        image::encode_governance(&mut out, records.into_iter())?;
         Some(out)
     }
 

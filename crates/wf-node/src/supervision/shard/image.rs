@@ -239,19 +239,31 @@ pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
             reader.bin().ok()?.to_vec(),
         ));
     }
+    let governance_count = reader.u64().ok()?;
+    let mut governance = Vec::new();
+    for _ in 0..governance_count {
+        governance.push((
+            reader.u8().ok()?,
+            reader.bin().ok()?.to_vec(),
+            reader.bin().ok()?.to_vec(),
+        ));
+    }
     reader.0.is_empty().then_some(Image {
         records,
         shared,
         policies,
+        governance,
     })
 }
 
-/// A decoded shard image: its records, its shared values, then the Flow
-/// type policies it held: type, generation and encoded policy (ADR-014).
+/// A decoded shard image: its records, its shared values, the Flow type
+/// policies it held (type, generation and encoded policy), then its
+/// governance records (kind tag, name and stored form) (ADR-014).
 pub(crate) struct Image {
     pub(crate) records: Vec<Restored>,
     pub(crate) shared: Vec<SharedValue>,
     pub(crate) policies: Vec<(Vec<u8>, u64, Vec<u8>)>,
+    pub(crate) governance: Vec<(u8, Vec<u8>, Vec<u8>)>,
 }
 
 /// A shared value in a shard image.
@@ -273,6 +285,20 @@ pub(crate) fn encode_shared(out: &mut Vec<u8>, values: &[SharedEntry<'_>]) -> Op
         bin(out, reference)?;
         bin(out, bytes)?;
         optional_u64(out, *expires_at);
+    }
+    Some(())
+}
+
+/// Writes the governance section: kind tag, name and stored form each.
+pub(crate) fn encode_governance<'a>(
+    out: &mut Vec<u8>,
+    records: impl ExactSizeIterator<Item = (u8, &'a [u8], &'a [u8])>,
+) -> Option<()> {
+    out.extend_from_slice(&u64::try_from(records.len()).ok()?.to_be_bytes());
+    for (kind, name, value) in records {
+        out.push(kind);
+        bin(out, name)?;
+        bin(out, value)?;
     }
     Some(())
 }

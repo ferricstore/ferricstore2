@@ -19,6 +19,7 @@ use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::cleanup::Cleaned;
+use wf_application::commands::flow::governance::{Command as GovernanceCommand, Listed};
 use wf_application::commands::flow::info::{Read, Tally};
 use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::{FlowCommand, Term};
@@ -113,6 +114,11 @@ pub(crate) enum Request {
     },
     /// This shard's part of a count or discovery read (ADR-014 step 11).
     Read { read: Arc<Read>, done: Done<Tally> },
+    /// This shard's part of a governance listing (ADR-014 step 15).
+    GovernanceList {
+        command: Arc<GovernanceCommand>,
+        done: Done<Listed>,
+    },
     /// Any other Flow command, for the Flow in `partition` (ADR-014).
     Flow {
         command: Box<FlowCommand>,

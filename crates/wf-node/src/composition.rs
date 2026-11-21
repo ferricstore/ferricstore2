@@ -12,6 +12,7 @@ mod cleanup;
 mod error;
 mod flow;
 mod gather;
+mod governance;
 mod info;
 mod policy;
 mod replay;
