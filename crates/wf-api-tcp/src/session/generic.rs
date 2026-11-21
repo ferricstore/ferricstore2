@@ -61,10 +61,15 @@ pub(super) fn flow(context: &Context, name: &str, flags: u8, body: &[u8], reply:
     } else {
         request::options(name, body)
     };
-    let args = match decoded {
-        Ok(args) => context.clock(args),
-        Err(error) => return refuse(reply, error.message()),
-    };
+    match decoded {
+        Ok(args) => run(context, name, args, reply),
+        Err(error) => refuse(reply, error.message()),
+    }
+}
+
+/// Runs command `name` with its options.
+pub(super) fn run(context: &Context, name: &str, args: flow::Term, reply: ReplyTo) {
+    let args = context.clock(args);
     let command = match flow::parse(name, &args) {
         Ok(command) => command,
         Err(error) => return failed(reply, &error),

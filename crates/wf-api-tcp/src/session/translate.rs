@@ -83,8 +83,18 @@ pub(super) fn create_many(
     // The queue fast path takes independent batches of `[id, partition,
     // payload]` items; any other batch is the generic command (audit gap
     // G2).
-    let parsed = match request::create_many(body) {
+    let compact = request::is_compact(header.flags);
+    let decoded = if compact {
+        request::compact_create_many(body)
+    } else {
+        request::create_many(body)
+    };
+    let parsed = match decoded {
         Ok(parsed) if parsed.independent => parsed,
+        Ok(parsed) if compact => {
+            return super::generic::run(context, "FLOW.CREATE_MANY", parsed.options(), reply);
+        }
+        Err(error) if compact => return refuse(reply, error.message()),
         _ => {
             return super::generic::flow(context, "FLOW.CREATE_MANY", header.flags, body, reply);
         }

@@ -1,11 +1,12 @@
 //! FSNP v1 workflow request bodies (ADR-011): typed-map `FLOW.CREATE`,
-//! `FLOW.CREATE_MANY` and `FLOW.COMPLETE`, and the compact `FLOW.CLAIM_DUE`
-//! and `FLOW.COMPLETE_MANY` payloads. Options this server does not implement
+//! `FLOW.CREATE_MANY` and `FLOW.COMPLETE`, and the compact `FLOW.CLAIM_DUE`,
+//! `FLOW.CREATE_MANY` and `FLOW.COMPLETE_MANY` payloads. Options this server does not implement
 //! are refused by name instead of being ignored. Parsing checks shape only;
 //! size limits, authorization and partition placement belong to the
 //! application.
 
 mod compact;
+mod compact_create;
 mod compact_many;
 mod term;
 mod typed;
@@ -13,6 +14,7 @@ mod typed;
 use std::fmt;
 
 pub use compact::{claim_due, complete_many};
+pub use compact_create::compact_create_many;
 pub use compact_many::{is_compact, many_options};
 pub use term::{PipelineCommand, options, pipeline};
 pub use typed::{complete, create, create_many, startup};

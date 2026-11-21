@@ -65998,3 +65998,30 @@ all suites pass. No ported test is left waiting outside the repository.
 `state::value::attached` (new, same review) holds `requested_refs`,
 `attach` and `with_attached`, keeping `value.rs` under the line limit; the
 attached-reference test lives in `audit::value_refs`.
+
+### Compact FLOW.CREATE_MANY bodies
+
+New artifacts (solo design review): `wf_api_tcp::request::compact_create`
+(`compact_create_many`, `CreateMany::options`) and
+`session::generic::run`, which runs a command from options already decoded.
+
+Found by the Python SDK integration suite against the node
+(`test_real_ferricstore_flow_state_machine_and_repair_surface`): the SDK
+sends a batch whose options are only type, state, partition, `now_ms`,
+`run_at_ms`, independence and return as a compact body (tags `0x90`, `0x96`,
+`0x9E`), which the node refused as "payload is invalid". The layout is
+Elixir's codec's (`decode_custom_request_body(0x020F, ...)`). Independent
+batches take the queue fast path as their typed form does; the others are
+the generic command, so atomic and per-shard-group batches behave as typed
+ones. Unknown independence or return markers are refused instead of read as
+defaults.
+
+Evidence: `session::compact_create` failed three of four tests before (the
+refusal test passed because every compact batch was refused) and all four
+pass after: fast path with per-item outcomes and single `OK`, a partition
+batch as one atomic generic command with its items, `0x90` and `0x96`
+without a partition as auto-bucket items, truncated and unknown-tag bodies
+refused. The other SDK suite failures are KV, admin and topology commands
+outside the Flow surface (opcodes 0x0102-0x0107, 0x0004 `CLIENT.SETNAME`,
+`COMMAND`, `ECHO`, `XADD`, `ZREVRANGE`), and the LangChain agent Flows fail
+inside their KV checkpointer.

@@ -19,6 +19,7 @@ use wf_application::commands::queue::{
 use wf_domain::value::DomainError;
 
 mod clock;
+mod compact_create;
 mod flow;
 mod handshake;
 mod options;
@@ -142,9 +143,23 @@ impl FlowService for Scripted {
             FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
                 ServiceError::rejected("ERR flow already exists".to_owned()),
             )),
-            FlowCommand::Create(_) | FlowCommand::CreateMany(_) | FlowCommand::RunSteps(_) => {
-                reply(Ok(Term::text("OK")));
-            }
+            // Echoes each item's id, partition, payload and whether the
+            // batch is all or nothing.
+            FlowCommand::CreateMany(batch) => reply(Ok(Term::List(
+                batch
+                    .items
+                    .iter()
+                    .map(|create| {
+                        Term::List(vec![
+                            Term::Bin(create.id.clone()),
+                            Term::optional_bin(create.partition_key.as_deref()),
+                            Term::optional_bin(create.payload.as_deref()),
+                            Term::Bool(batch.atomic()),
+                        ])
+                    })
+                    .collect(),
+            ))),
+            FlowCommand::Create(_) | FlowCommand::RunSteps(_) => reply(Ok(Term::text("OK"))),
             FlowCommand::Mutate(mutation) if mutation.id.starts_with(b"stale") => {
                 reply(Err(ServiceError::Domain(DomainError::StaleLease)));
             }
