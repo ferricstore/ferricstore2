@@ -66122,3 +66122,17 @@ Evidence: `session::topology` failed before (opcode refused) and passes.
 Against a release build the SDK's topology client refreshed the table,
 routed a key to lane 3 and created, read and claimed a Flow through it;
 `get` leaves the payload out as Elixir's does.
+
+### ADR-018 Replicated groups (decision)
+
+Decision entry (solo): a replica set is one OpenRaft group over one group
+log, holding a set of slots and all their shards; leaders decide rounds and
+append them as one entry; commit (majority durable) releases replies;
+followers apply through replay; non-leaders answer `reroute`. Follows
+`docs/library-decisions.md` (OpenRaft behind `wf-consensus`, no homegrown
+Raft, adapter and fault-test gate). Version: openraft 0.10.1, the released
+0.10 line (minimum Rust 1.88, MIT or Apache-2.0); 0.9.25 is the frozen
+previous line. raft-rs was not reconsidered: its last release is 0.7.0
+(March 2023) on rust-protobuf 2 by default. Phases: bridge and fault gate,
+node integration, snapshots, several groups per node with the SDK's
+three-node failover test.
