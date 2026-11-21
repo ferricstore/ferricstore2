@@ -90,6 +90,10 @@ impl ShardState {
         let was_terminal = previous
             .as_ref()
             .is_some_and(|previous| terminal(previous.record.state()));
+        let was_running = previous
+            .as_ref()
+            .is_some_and(|previous| previous.record.state() == b"running");
+        self.note_credit(was_running, &record, meta.as_deref());
         if !was_terminal && terminal(record.state()) {
             self.note_child(&key, &record, meta.as_deref());
         }

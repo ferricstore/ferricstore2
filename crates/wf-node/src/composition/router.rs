@@ -25,6 +25,8 @@ pub(crate) struct Router {
     pub(crate) shards: Vec<ShardLink>,
     pub(crate) shard_count: u16,
     pub(crate) waiters: Waiters,
+    /// Every type's running-limit rules (ADR-014 step 15).
+    pub(crate) running: super::credit::running::Running,
 }
 
 pub(crate) fn shard_index(partition: &Partition, shards: u16) -> Option<usize> {

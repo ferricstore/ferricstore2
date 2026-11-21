@@ -6,6 +6,10 @@ use std::collections::BTreeMap;
 use super::super::term::{Term, map};
 use super::{LEDGER_MAX_BYTES, LEDGER_MAX_EVENTS, Status};
 
+mod credit;
+
+pub use credit::Credit;
+
 /// One effect of a Flow.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Effect {
@@ -83,8 +87,8 @@ pub struct Event {
     pub denial: Option<[Vec<u8>; 3]>,
 }
 
-/// A Flow's effects by key, its ledger in time order, and how many
-/// refusals it has recorded (numbering their event ids).
+/// A Flow's effects by key, its ledger in time order, how many refusals it
+/// has recorded (numbering their event ids), and the limit credit it holds.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Governance {
     /// Effects by key.
@@ -93,6 +97,8 @@ pub struct Governance {
     pub ledger: Vec<Event>,
     /// Refusals recorded so far.
     pub denials: u64,
+    /// The limit credit of its last governed claim.
+    pub credit: Option<Credit>,
 }
 
 /// The Flow fields every view carries.
@@ -283,7 +289,10 @@ impl Governance {
     /// Whether there is nothing to keep.
     #[must_use]
     pub fn is_empty(&self) -> bool {
-        self.effects.is_empty() && self.ledger.is_empty() && self.denials == 0
+        self.effects.is_empty()
+            && self.ledger.is_empty()
+            && self.denials == 0
+            && self.credit.is_none()
     }
 
     /// The stored form, an encoded term.
@@ -298,6 +307,7 @@ impl Governance {
             ),
             Term::List(self.ledger.iter().map(Event::term).collect()),
             Term::int(self.denials),
+            credit::term(self.credit.as_ref()),
         ]);
         let mut out = Vec::new();
         term.encode(&mut out)?;
@@ -310,9 +320,16 @@ impl Governance {
         let Some((Term::List(parts), [])) = Term::decode(bytes) else {
             return None;
         };
-        let [Term::List(effects), Term::List(ledger), Term::Int(denials)] = parts.as_slice() else {
+        let [
+            Term::List(effects),
+            Term::List(ledger),
+            Term::Int(denials),
+            credit,
+        ] = parts.as_slice()
+        else {
             return None;
         };
+        let credit = credit::decode(credit).ok()?;
         Some(Self {
             effects: effects
                 .iter()
@@ -320,6 +337,7 @@ impl Governance {
                 .collect::<Option<_>>()?,
             ledger: ledger.iter().map(Event::from_term).collect::<Option<_>>()?,
             denials: u64::try_from(*denials).ok()?,
+            credit,
         })
     }
 

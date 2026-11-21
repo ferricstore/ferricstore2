@@ -25,6 +25,10 @@ const COMMON: &[&str] = &[
     "values",
     "drop_values",
     "override_values",
+    // Elixir accepts a governed claim's options here; the Flow's credit is
+    // released when it leaves `running` either way (ADR-014 step 15).
+    "governance_limit_scope",
+    "governance_shard_id",
 ];
 
 const DEFAULT_LEASE_MS: u64 = 30_000;

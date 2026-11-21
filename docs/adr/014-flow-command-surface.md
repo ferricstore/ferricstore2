@@ -522,3 +522,29 @@ Each step is one commit with its tests.
   is `running`, a state no policy may name. The policy scenario (a full
   policy, merges, removal, empty forms, 24 invalid parts) matches Elixir
   exactly. The running-Flow limit claims take from these rules is next.
+- Step 15d (governed claims): a claim with `governance_limit_scope` and
+  `governance_shard_id`, or of a type whose policy gives a claimed state
+  `governance.limits.running`, is governed as `ClaimDueAPI` governs it. The
+  node spends one credit per Flow the claim may take from the limit's
+  lease (a policy limit's scope is `flow-running:` and the type's
+  SHA-256, leased on demand with the claimed states' lowest limit and
+  lease size and the policy generation as its configuration version),
+  claims with those credits, each claimed Flow stamped with one (the claim
+  logged as the Flow's after-image), and releases the credits no Flow
+  took. When no credit can be spent the claim answers with no Flows if
+  none could be claimed, and with `GOVERNANCE_LIMIT_EXCEEDED` otherwise. An
+  explicit limit is approximate: as `LimitCache` does, a miss spends a
+  chunk (four times the claim, at most 1000) and keeps the rest in a
+  node-local cache for later claims, falling back to the claim's own
+  amount; a policy limit's default `strict_global` spends directly. A Flow
+  holding a credit releases it when it leaves `running`, whatever command
+  moved it; the release is delivered once that round is durable, and
+  replay delivers the releases of the replayed log again (a release of a
+  credit already released changes nothing), so no outbox is kept; a
+  credit freed just before a snapshot and not yet delivered when the node
+  stops is reclaimed when its lease expires. Governed claims run on the
+  schedule thread and do not wait (`block_ms` is ignored). Elixir picks a
+  policy lease's shard id with `phash2(worker)`; this node with the
+  worker's routing slot, so that id differs. Mutations accept the two
+  governance options, as Elixir does. The governed-claim scenario matches
+  Elixir apart from that shard id.

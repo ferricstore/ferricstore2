@@ -6,6 +6,7 @@ use std::cmp::Reverse;
 use wf_application::commands::queue::{ClaimFlows, ClaimedFlow, Partition};
 use wf_domain::workflow::Outcome;
 
+use super::credit::CreditPool;
 use super::{Key, Logged, RUNNING, ShardState};
 
 /// Which index entries a claim step takes.
@@ -85,7 +86,7 @@ impl ShardState {
         &mut self,
         now: u64,
         request: &ClaimFlows,
-        limit: usize,
+        (limit, credits): (usize, Option<&CreditPool>),
         partitions: Option<&[Partition]>,
     ) -> Taken {
         let now = request.now_ms.unwrap_or(now);
@@ -93,7 +94,7 @@ impl ShardState {
         let mut step = |state: &mut Self, mode: Mode, wanted: usize| {
             let room = limit.saturating_sub(taken.claimed.len()).min(wanted);
             if room > 0 {
-                state.take(now, request, mode, room, partitions, &mut taken);
+                state.take(now, (request, credits), mode, room, partitions, &mut taken);
             }
         };
         if request.running_only() {
@@ -172,7 +173,7 @@ impl ShardState {
     fn take(
         &mut self,
         now: u64,
-        request: &ClaimFlows,
+        (request, credits): (&ClaimFlows, Option<&CreditPool>),
         mode: Mode,
         limit: usize,
         partitions: Option<&[Partition]>,
@@ -194,6 +195,16 @@ impl ShardState {
             if self.apply(&change) != Ok(Outcome::Changed) {
                 continue;
             }
+            // A governed claim stamps the Flow with its credit and logs the
+            // Flow's after-image instead.
+            let stamped = credits
+                .and_then(CreditPool::take)
+                .is_some_and(|credit| self.stamp_credit(&key, credit));
+            let change = if stamped {
+                self.after_image_events(&key, 1).unwrap_or(change)
+            } else {
+                change
+            };
             let record = request
                 .records
                 .as_ref()

@@ -41,7 +41,10 @@ pub(super) fn set(router: &Arc<Router>, set: Box<PolicySet>, reply: Reply<Term>)
             command: PolicyCommand::Set(set),
             done: Box::new(
                 move |result: Result<PolicyReply, ServiceError>| match result {
-                    Ok((term, Some(installed))) => copy(&shards, &installed, term, reply),
+                    Ok((term, Some(installed))) => {
+                        super::credit::running::install(&shards.running, &installed);
+                        copy(&shards, &installed, term, reply);
+                    }
                     Ok((term, None)) => reply(Ok(term)),
                     Err(error) => reply(Err(error)),
                 },

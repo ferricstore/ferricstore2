@@ -18,7 +18,7 @@ mod decide;
 mod request;
 mod stored;
 
-pub use request::{Command, List, parse, parse_list};
+pub use request::{Command, Configuration, Fields, List, Op, parse, parse_list};
 
 /// Most reservation ids one lease generation records.
 const MAX_RECORDED: u64 = 256 * 256;

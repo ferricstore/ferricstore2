@@ -9,7 +9,7 @@ use super::create::partition_key;
 use super::opts::Opts;
 use super::record::{DEFAULT_PAYLOAD_MAX_BYTES, Include, Values};
 use super::term::{Term, map};
-use crate::commands::queue::{ClaimFlows, ClaimedFlow};
+use crate::commands::queue::{ClaimFlows, ClaimGovernance, ClaimedFlow};
 
 const ALLOWED: &[&str] = &[
     "type",
@@ -21,6 +21,8 @@ const ALLOWED: &[&str] = &[
     "priority",
     "now_ms",
     "block_ms",
+    "governance_limit_scope",
+    "governance_shard_id",
     "return",
     "full",
     "payload",
@@ -308,8 +310,28 @@ pub fn parse(name: &str, args: &Term) -> Result<ParsedClaim, FlowError> {
         cancellation: None,
         now_ms,
         records,
+        governance: governance(&opts),
     };
     Ok(ParsedClaim { request, shape })
+}
+
+/// The governed-claim options as given; Elixir checks them when claiming.
+fn governance(opts: &Opts<'_>) -> ClaimGovernance {
+    let scope = opts.get("governance_limit_scope");
+    let shard = opts.get("governance_shard_id");
+    ClaimGovernance {
+        given: [scope, shard]
+            .iter()
+            .any(|value| value.is_some_and(|value| *value != Term::Nil)),
+        scope: match scope {
+            Some(Term::Bin(scope)) if !scope.is_empty() => Some(scope.clone()),
+            _ => None,
+        },
+        shard: match shard {
+            Some(Term::Int(shard)) => Some(*shard),
+            _ => None,
+        },
+    }
 }
 
 fn job(record: &Term, shape: ClaimReturn) -> Term {

@@ -9,6 +9,7 @@
 
 mod claim;
 mod cleanup;
+mod credit;
 mod error;
 mod flow;
 mod gather;
@@ -22,7 +23,7 @@ mod snapshot;
 
 use std::path::Path;
 use std::sync::atomic::AtomicU64;
-use std::sync::{Arc, mpsc};
+use std::sync::{Arc, OnceLock, mpsc};
 use std::thread::JoinHandle;
 use std::time::Duration;
 
@@ -87,6 +88,8 @@ impl Default for QueueNodeConfig {
 /// pending replies, fails waiting claims and closes the log.
 pub struct QueueNode {
     router: Option<Arc<Router>>,
+    /// Credits spent ahead for approximate limits (ADR-014 step 15).
+    credit_cache: credit::Cache,
     waiters: Waiters,
     shards: Vec<JoinHandle<()>>,
     completer: Option<JoinHandle<()>>,
@@ -190,6 +193,8 @@ impl QueueNode {
         .ok_or(NodeError::Thread)?;
         let mut links = Vec::with_capacity(states.len());
         let mut threads = Vec::with_capacity(states.len());
+        let release_router = Arc::new(OnceLock::new());
+        let running = credit::running::opened(states.first());
         for (index, state) in states.into_iter().enumerate() {
             let (sender, receiver) = mpsc::channel();
             let ready = Arc::new(AtomicU64::new(state.ready()));
@@ -202,6 +207,7 @@ impl QueueNode {
                 leased: Arc::clone(&leased),
                 waiters: waiters.clone(),
                 max_append_bytes: config.log.max_block_bytes.checked_div(2).unwrap_or(0),
+                release: credit::releaser(Arc::clone(&release_router)),
             };
             threads.push(
                 supervision::spawn(format!("wf-shard-{index}"), move || {
@@ -219,11 +225,14 @@ impl QueueNode {
             shards: links,
             shard_count: config.shards,
             waiters: waiters.clone(),
+            running,
         };
         let router = Arc::new(router);
+        let _set = release_router.set(Arc::downgrade(&router));
         let (snapshot_stop, snapshotter) = start_snapshots(&snapshots, &router)?;
         let (schedule_jobs, scheduling) = start_schedules(&router, config.schedule_poll)?;
         Ok(Self {
+            credit_cache: credit::Cache::default(),
             router: Some(router),
             waiters,
             shards: threads,
@@ -310,7 +319,7 @@ impl QueueService for QueueNode {
 
     fn claim(&self, request: ClaimFlows, reply: Reply<Vec<ClaimedFlow>>) {
         match self.router.as_ref() {
-            Some(router) => claim::start(router, request, reply),
+            Some(router) => self.governed_claim(router, request, reply),
             None => reply(Err(ServiceError::Unavailable)),
         }
     }

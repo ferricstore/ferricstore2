@@ -80,6 +80,26 @@ pub struct Command {
 }
 
 impl Command {
+    /// A command the node issues itself for a governed claim (a spend, a
+    /// lease or a release), its options already decided.
+    #[must_use]
+    pub const fn internal(
+        op: Op,
+        scope: Vec<u8>,
+        shard_id: u64,
+        fields: Fields,
+        late: Configuration,
+    ) -> Self {
+        Self {
+            op,
+            scope,
+            shard: None,
+            shard_id,
+            fields: Ok(fields),
+            late: Ok(late),
+        }
+    }
+
     /// Checks the shard id against the node's `shards`, then the options
     /// checked after it, as Elixir does before mutating.
     ///

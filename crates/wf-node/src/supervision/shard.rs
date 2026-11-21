@@ -19,6 +19,7 @@ use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::cleanup::Cleaned;
+use wf_application::commands::flow::effect::Credit;
 use wf_application::commands::flow::governance::{Command as GovernanceCommand, Listed};
 use wf_application::commands::flow::info::{Read, Tally};
 use wf_application::commands::flow::start::RunSteps;
@@ -32,6 +33,7 @@ use super::completer::{Completion, Finish};
 use super::waiters::{Arrival, Waiters};
 use command::Logged;
 use handle::handle;
+use state::credit::CreditPool;
 use state::{Peeked, ShardState};
 
 /// Most requests one shard applies before appending.
@@ -60,6 +62,8 @@ pub(crate) enum Request {
         request: Arc<ClaimFlows>,
         limit: usize,
         partitions: Option<Arc<[Partition]>>,
+        /// A governed claim's credits, one per Flow taken (ADR-014 step 15).
+        credits: Option<Arc<CreditPool>>,
         done: Done<Vec<ClaimedFlow>>,
     },
     /// Count what a claim could take now; answered at once, not after a sync.
@@ -137,7 +141,12 @@ pub(crate) struct Links {
     pub(crate) leased: Arc<AtomicU64>,
     pub(crate) waiters: Waiters,
     pub(crate) max_append_bytes: usize,
+    /// Delivers the credits of Flows that left `running` (ADR-014 step 15).
+    pub(crate) release: Releases,
 }
+
+/// Delivers limit credits for release.
+pub(crate) type Releases = Arc<dyn Fn(Vec<Credit>) + Send + Sync>;
 
 /// Committed time: the wall clock, never earlier than the previous round.
 fn committed_now(previous: u64) -> u64 {
@@ -203,6 +212,15 @@ fn append(log: &GroupLog, logged: &[Logged], max_bytes: usize, previous: u64) ->
     Some(sequence)
 }
 
+/// Releases `credits` once the round that freed them is durable.
+fn release_once_durable(release: Releases, credits: Vec<Credit>) -> Finish {
+    Box::new(move |durable: Result<(), ServiceError>| {
+        if durable.is_ok() {
+            release(credits);
+        }
+    })
+}
+
 /// The shard thread's loop; returns when every sender is gone.
 pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &Links) {
     let mut now = 0;
@@ -226,15 +244,20 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
             logged.extend(state.sweep_timeouts(now, MAX_REMOVALS_PER_ROUND));
             logged.extend(state.sweep(now, MAX_REMOVALS_PER_ROUND));
         }
-        if round.is_empty() && logged.is_empty() {
+        if round.is_empty() && logged.is_empty() && !state.has_credit_releases() {
             continue;
         }
-        let finishes: Vec<Finish> = round
+        let mut finishes: Vec<Finish> = round
             .into_iter()
             .filter_map(|request| handle(&mut state, (links.index, now), request, &mut logged))
             .collect();
         // Parents of children that finished this round, on this shard.
         logged.extend(state.settle_children(now));
+        // Credits of Flows that left `running` are released once durable.
+        let credits = state.take_credit_releases();
+        if !credits.is_empty() {
+            finishes.push(release_once_durable(Arc::clone(&links.release), credits));
+        }
         if !failed {
             match append(&links.log, &logged, links.max_append_bytes, sequence) {
                 Some(covered) => sequence = covered,

@@ -8,7 +8,8 @@
 
 use wf_application::commands::flow::claim;
 use wf_application::commands::queue::{
-    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, NewFlow, ServiceError,
+    ClaimFlows, ClaimGovernance, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, NewFlow,
+    ServiceError,
 };
 
 use crate::frame::{FLAG_CUSTOM_PAYLOAD, Header};
@@ -223,6 +224,7 @@ pub(super) fn claim_due(
         cancellation: block_ms.map(|_| context.closed.clone()),
         now_ms: None,
         records: None,
+        governance: ClaimGovernance::default(),
     };
     let (shape, compact) = (parsed.shape, negotiated.claim_jobs);
     context.service.claim(

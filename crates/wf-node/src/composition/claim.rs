@@ -14,6 +14,7 @@ use wf_application::commands::queue::{ClaimFlows, ClaimedFlow, Partition, Reply,
 
 use crate::supervision::shard::Request;
 use crate::supervision::shard::state::Peeked;
+use crate::supervision::shard::state::credit::CreditPool;
 use crate::supervision::waiters::{Parked, Wake};
 
 use super::router::{Router, split};
@@ -43,10 +44,18 @@ struct ClaimRun {
     /// Whether shards reported their next due times in this attempt.
     timed: bool,
     wait_ms: Option<u64>,
+    /// A governed claim's credits (ADR-014 step 15).
+    credits: Option<Arc<CreditPool>>,
 }
 
-/// Starts a claim; `reply` is called once.
-pub(crate) fn start(router: &Arc<Router>, request: ClaimFlows, reply: Reply<Vec<ClaimedFlow>>) {
+/// Starts a claim, stamping each Flow taken with one of `credits` when
+/// governed; `reply` is called once.
+pub(crate) fn start(
+    router: &Arc<Router>,
+    request: ClaimFlows,
+    credits: Option<Arc<CreditPool>>,
+    reply: Reply<Vec<ClaimedFlow>>,
+) {
     let partitions: Option<Arc<[Partition]>> = request
         .partitions
         .as_ref()
@@ -71,6 +80,7 @@ pub(crate) fn start(router: &Arc<Router>, request: ClaimFlows, reply: Reply<Vec<
         exhausted: Vec::new(),
         timed: false,
         wait_ms: None,
+        credits,
     });
     attempt(router, run);
 }
@@ -124,6 +134,7 @@ fn arrive<T>(round: &Gather<T>, part: Part<T>) -> Option<(Box<ClaimRun>, Vec<Par
 fn claim_round(router: &Router, run: Box<ClaimRun>, shares: Vec<(usize, usize)>) {
     let request = Arc::clone(&run.request);
     let partitions = run.partitions.clone();
+    let credits = run.credits.clone();
     let round: Gather<Result<Vec<ClaimedFlow>, ServiceError>> = gather(run, shares.len());
     for (index, limit) in shares {
         let part = Arc::clone(&round);
@@ -133,6 +144,7 @@ fn claim_round(router: &Router, run: Box<ClaimRun>, shares: Vec<(usize, usize)>)
                 request: Arc::clone(&request),
                 limit,
                 partitions: partitions.clone(),
+                credits: credits.clone(),
                 done: Box::new(move |result| {
                     if let Some((run, parts)) = arrive(&part, (index, limit, result)) {
                         claimed(run, parts);

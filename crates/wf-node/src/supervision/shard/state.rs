@@ -13,6 +13,7 @@ mod capture;
 mod catalog;
 mod children;
 mod claim;
+pub(crate) mod credit;
 mod effect;
 pub(crate) mod events;
 mod fifo;
@@ -96,6 +97,8 @@ pub(crate) struct ShardState {
     /// Governance records by kind and name, in stored form (ADR-014 step
     /// 15).
     governance: BTreeMap<(Kind, Vec<u8>), Vec<u8>>,
+    /// Credits of Flows that left `running`, to release (ADR-014 step 15).
+    credit_releases: Vec<wf_application::commands::flow::effect::Credit>,
     /// Named partitions by hash tag, to find a Flow from a value reference;
     /// rebuilt on a miss when Flows were added since (`tags_at`).
     tags: HashMap<String, Partition>,
@@ -145,6 +148,7 @@ impl ShardState {
             leased: 0,
             shared: HashMap::new(),
             governance: BTreeMap::new(),
+            credit_releases: Vec::new(),
             tags: HashMap::new(),
             tags_at: 0,
             live: false,

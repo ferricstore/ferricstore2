@@ -74,6 +74,34 @@ fn schedule(
     Box::new(move |durable| done(durable.and(result)))
 }
 
+/// A claim, governed or not; its Flows are answered once durable.
+fn claim(
+    state: &mut ShardState,
+    now: u64,
+    request: Request,
+    logged: &mut Vec<Logged>,
+) -> Option<Finish> {
+    let Request::Claim {
+        request,
+        limit,
+        partitions,
+        credits,
+        done,
+    } = request
+    else {
+        return None;
+    };
+    let taken = state.claim(
+        now,
+        &request,
+        (limit, credits.as_deref()),
+        partitions.as_deref(),
+    );
+    logged.extend(taken.logged);
+    let claimed = taken.claimed;
+    Some(Box::new(move |durable| done(durable.map(|()| claimed))))
+}
+
 /// This shard's part of a count or discovery read, once durable.
 fn tally(state: &ShardState, now: u64, read: &Read, done: Done<Tally>) -> Finish {
     let tally = state.tally(read, now);
@@ -128,17 +156,7 @@ pub(super) fn handle(
             let outcomes = create(state, now, shape, items, logged);
             Box::new(move |durable| done(durable.map(|()| outcomes)))
         }
-        Request::Claim {
-            request,
-            limit,
-            partitions,
-            done,
-        } => {
-            let taken = state.claim(now, &request, limit, partitions.as_deref());
-            logged.extend(taken.logged);
-            let claimed = taken.claimed;
-            Box::new(move |durable| done(durable.map(|()| claimed)))
-        }
+        request @ Request::Claim { .. } => claim(state, now, request, logged)?,
         Request::Peek {
             request,
             limit,

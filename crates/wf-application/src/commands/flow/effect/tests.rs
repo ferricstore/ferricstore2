@@ -48,6 +48,11 @@ fn governance() -> Governance {
     governance.ledger.push(event("a", 1, None));
     governance.ledger.push(event("b", 2, Some(b"m".to_vec())));
     governance.denials = 1;
+    governance.credit = Some(super::store::Credit {
+        scope: b"s".to_vec(),
+        shard_id: 2,
+        reservation_id: b"flr1:1:b:1".to_vec(),
+    });
     governance
 }
 
@@ -95,6 +100,7 @@ fn stored_records_round_trip_and_refuse_damage() -> Result<(), &'static str> {
             ("policy_hash", Term::text("h")),
         ])]),
         Term::Int(0),
+        Term::Nil,
     ])
     .encode(&mut bogus)
     .ok_or("encode")?;

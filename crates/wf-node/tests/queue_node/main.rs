@@ -25,6 +25,7 @@ mod flow_claim;
 mod flow_cleanup;
 mod flow_effect;
 mod flow_fifo;
+mod flow_governed_claim;
 mod flow_info;
 mod flow_limit;
 mod flow_mutate;
@@ -119,6 +120,7 @@ fn claim_request(limit: usize) -> ClaimFlows {
         cancellation: None,
         now_ms: None,
         records: None,
+        governance: wf_application::commands::queue::ClaimGovernance::default(),
     }
 }
 

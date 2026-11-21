@@ -82,6 +82,20 @@ pub struct ClaimFlows {
     /// Reply with each claimed Flow's record, including these extras
     /// (ADR-014); jobs only when absent.
     pub records: Option<Include>,
+    /// Elixir's governed-claim options as given (ADR-014 step 15).
+    pub governance: ClaimGovernance,
+}
+
+/// A claim's `governance_limit_scope` and `governance_shard_id`, checked
+/// against the node's shard count when the claim starts.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ClaimGovernance {
+    /// Either option was given.
+    pub given: bool,
+    /// The scope, when a non-empty string.
+    pub scope: Option<Vec<u8>>,
+    /// The shard id, when an integer.
+    pub shard: Option<i64>,
 }
 
 impl ClaimFlows {

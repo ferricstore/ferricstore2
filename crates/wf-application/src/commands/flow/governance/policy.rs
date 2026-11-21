@@ -318,3 +318,13 @@ pub fn running_limit(governance: &Term) -> Option<RunningLimit> {
         lease_size,
     })
 }
+
+/// The limit scope a type's running-Flow rules spend from, as Elixir names
+/// it: `flow-running:` and the URL-safe base64 SHA-256 of the type.
+#[must_use]
+pub fn running_scope(flow_type: &[u8]) -> Vec<u8> {
+    use sha2::{Digest, Sha256};
+    let mut scope = b"flow-running:".to_vec();
+    scope.extend_from_slice(crate::routing::base64url_nopad(&Sha256::digest(flow_type)).as_bytes());
+    scope
+}

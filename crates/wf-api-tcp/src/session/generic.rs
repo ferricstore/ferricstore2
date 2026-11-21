@@ -31,6 +31,8 @@ pub(super) fn claim(context: &Context, name: &str, body: &[u8], reply: ReplyTo) 
         parsed.request,
         Box::new(move |result| match result {
             Ok(claimed) => send(reply, &claim::reply(shape, claimed)),
+            // A governed claim's refusal is a map (ADR-014 step 15).
+            Err(error @ ServiceError::Governance(_)) => failed(reply, &error),
             Err(error) => refuse(reply, &error.to_string()),
         }),
     );

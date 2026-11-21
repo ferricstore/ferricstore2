@@ -65632,3 +65632,37 @@ removal, refusals and a restart under another shard count. The tests were
 written after the code, so this step does not claim TDD. All 96 node
 tests and application tests pass; clippy, the ratchet, docs and
 architecture pass.
+
+### ADR014-GOVERNANCE7 Governed claims
+
+New artifacts (solo design review): `ClaimGovernance` and
+`ClaimFlows::governance`; `effect::Credit` (child `store::credit`) and
+`Governance::credit`; `limit::Command::internal` and re-exported
+`Fields`, `Configuration`, `Op`; `governance::policy::running_scope`;
+`wf-node` `supervision::shard::state::credit` (`CreditPool`, credit
+stamping, release queue), `Links::release` with `Releases`,
+`Request::Claim::credits`, `composition::credit` (`Governed`,
+`AutoLease`, `Cache`, `run`, `releaser`; children `admit`, `running`),
+`Router::running`. No new dependency.
+
+Decisions: orchestrate governed claims on the schedule thread with
+blocking steps (spend, claim, release), keeping ordinary claims on the
+fast path; stamp credits on the Flow so release follows the Flow, not the
+command; deliver releases after durability through a router-backed
+closure and rely on replay plus idempotent release instead of an outbox;
+keep running-limit rules with the router, filled at open and on each
+policy set, so ordinary claims never ask shard 0.
+
+Evidence: the Elixir governed-claim scenario (cache chunk, cache reuse,
+release on completion with and without options, empty-claim release,
+option errors, exhaustion with work due, a policy running limit with
+auto-lease, generation retirement and lease extension) matches apart from
+the policy lease's shard id. Ported: Elixir's four governed-claim tests
+(spend and terminal release, pre-spent credits across batches, named
+credit released durably, empty claim spends nothing); added a policy
+running limit across a restart with the Flow's credit kept. The tests
+were written after the code, so this step does not claim TDD; breaking
+the release hook, the cache chunk, the unused release, the release
+delivery or the credit stamp each makes one fail. All 100 node tests, the
+TCP adapter and application tests pass; the SDK suite passes 41 of 60.
+Clippy, the ratchet, lint tests, docs, architecture and cargo-deny pass.

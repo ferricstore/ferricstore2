@@ -26,7 +26,7 @@ pub mod store;
 mod tests;
 
 pub use request::{Get, Lease, LedgerList, Reserve, ReserveFields, Update};
-pub use store::Governance;
+pub use store::{Credit, Governance};
 
 /// Longest operation digest, idempotency key, external id, error or reason.
 pub const MAX_FIELD_BYTES: usize = 262_144;
