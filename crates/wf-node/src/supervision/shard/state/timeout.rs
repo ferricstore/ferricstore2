@@ -144,7 +144,7 @@ impl ShardState {
             .expiries
             .range(..=(now, u64::MAX))
             .take(remaining)
-            .filter_map(|(_, key)| self.records.get(key))
+            .filter_map(|(_, key)| self.records.get(key).map(|entry| &**entry))
             .collect();
         let flows = removable.len();
         let history: u64 = removable

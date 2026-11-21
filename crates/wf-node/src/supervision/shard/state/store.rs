@@ -86,7 +86,7 @@ impl ShardState {
         &mut self,
         key: Key,
         (record, priority, meta): (WorkflowRecord, u8, Option<Box<FlowMeta>>),
-        previous: Option<Entry>,
+        previous: Option<Box<Entry>>,
         appended: &[HistoryEvent],
     ) {
         let was_terminal = previous
@@ -101,8 +101,8 @@ impl ShardState {
         }
         // A Flow that enters another logical state takes a new place in
         // its FIFO lane, as Elixir stamps `state_enter_seq`.
-        let (sequence, mut events, before) = match previous {
-            Some(previous) => {
+        let (sequence, mut events, before, slot) = match previous {
+            Some(mut previous) => {
                 let entered = fifo::logical_state(&previous.record) != fifo::logical_state(&record)
                     && !terminal(record.state());
                 let sequence = if entered {
@@ -110,9 +110,15 @@ impl ShardState {
                 } else {
                     previous.sequence
                 };
-                (sequence, previous.history, Some(previous.record.version()))
+                let history = std::mem::take(&mut previous.history);
+                (
+                    sequence,
+                    history,
+                    Some(previous.record.version()),
+                    Some(previous),
+                )
             }
-            None => (self.sequence(), History::default(), None),
+            None => (self.sequence(), History::default(), None, None),
         };
         if before.is_none_or(|version| record.version() > version) {
             let defaults = FlowMeta {
@@ -128,16 +134,22 @@ impl ShardState {
                 events.push(event, flow_meta.history_max_events);
             }
         }
-        self.insert(
-            key,
-            Entry {
-                record,
-                priority,
-                sequence,
-                meta,
-                history: events,
-            },
-        );
+        let entry = Entry {
+            record,
+            priority,
+            sequence,
+            meta,
+            history: events,
+        };
+        // The Flow keeps its box across changes.
+        let boxed = match slot {
+            Some(mut boxed) => {
+                *boxed = entry;
+                boxed
+            }
+            None => Box::new(entry),
+        };
+        self.insert(key, boxed);
     }
 
     /// Puts a Flow back exactly as it was, history included.
@@ -152,13 +164,13 @@ impl ShardState {
         };
         self.insert(
             key,
-            Entry {
+            Box::new(Entry {
                 record,
                 priority,
                 sequence,
                 meta,
                 history: events,
-            },
+            }),
         );
     }
 
@@ -169,7 +181,7 @@ impl ShardState {
     }
 
     /// Removes a record and its index entries.
-    pub(super) fn take_entry(&mut self, key: &Key) -> Option<Entry> {
+    pub(super) fn take_entry(&mut self, key: &Key) -> Option<Box<Entry>> {
         let previous = self.records.remove(key)?;
         self.unindex(key, &previous);
         self.unschedule_removal(&previous);
@@ -177,7 +189,7 @@ impl ShardState {
         Some(previous)
     }
 
-    fn insert(&mut self, key: Key, entry: Entry) {
+    fn insert(&mut self, key: Key, entry: Box<Entry>) {
         self.index(&key, &entry);
         self.schedule_removal(&key, &entry);
         self.schedule_deadline(&key, &entry);

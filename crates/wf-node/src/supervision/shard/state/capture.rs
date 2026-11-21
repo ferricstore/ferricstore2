@@ -10,7 +10,11 @@ impl ShardState {
     /// Encodes every record in creation order; `None` when one cannot be
     /// imaged.
     pub(crate) fn image(&self, now: u64) -> Option<Vec<u8>> {
-        let mut entries: Vec<(&Key, &Entry)> = self.records.iter().collect();
+        let mut entries: Vec<(&Key, &Entry)> = self
+            .records
+            .iter()
+            .map(|(key, entry)| (key, &**entry))
+            .collect();
         entries.sort_unstable_by_key(|(_, entry)| entry.sequence);
         let mut out = Vec::new();
         out.extend_from_slice(&u64::try_from(entries.len()).ok()?.to_be_bytes());

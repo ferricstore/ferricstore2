@@ -68,6 +68,14 @@ Flows/s and RSS after the run.
    unchanged (the routing tests pin Elixir's values). Against be04f39: 7.6
    to 7.9 ms (was 8.0 to 8.1).
 
+7. **Boxed shard entries.** A Flow's entry (about 370 bytes) sat inline in
+   the records table: every change moved it out and back, every resize
+   moved all of them, and a table after resize holds about as many empty
+   entry-sized slots as full ones. Entries are now boxed and keep their box
+   across changes. Against bc7ac2c: 7.3 to 7.5 ms (was 7.6 to 7.7), RSS
+   547 to 569 MB (was 711 to 771); at 1.6M Flows 10.1 ms and 3.7 GB (was
+   10.7 ms and 4.8 GB).
+
 ## Consequences
 
 The binary links mimalloc's C code, built by `cc`; cargo-deny passes. At

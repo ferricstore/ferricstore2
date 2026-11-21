@@ -67,7 +67,7 @@ impl ShardState {
         let removable = !keys.is_empty()
             && keys
                 .iter()
-                .all(|key| self.records.get(key).is_some_and(terminal));
+                .all(|key| self.records.get(key).is_some_and(|entry| terminal(entry)));
         if !removable {
             return Outcome::NotEligible;
         }

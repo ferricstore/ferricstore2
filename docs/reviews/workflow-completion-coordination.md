@@ -65809,3 +65809,13 @@ No new artifacts; `wf-application` takes the reviewed `crc32fast` 1.5.5.
 re-profile at be04f39. The routing tests (check value and Elixir's auto
 buckets) pass unchanged. Three alternating runs against be04f39: 7.6 to
 7.9 ms CPU per 1k Flows (was 8.0 to 8.1).
+
+### ADR015-BOXED Boxed shard entries
+
+No new artifacts; `ShardState::records` holds `Box<Entry>`, `take_entry`
+and `insert` pass the box, and `write` reuses the previous box for the new
+entry. The re-profile at be04f39 put the largest memory-copy share in the
+records table's inserts and growth. Three alternating runs against
+bc7ac2c: 7.3 to 7.5 ms CPU per 1k Flows (was 7.6 to 7.7) and RSS 547 to 569
+MB (was 711 to 771); one 1.6M-Flow run each: 10.1 ms and 3.7 GB (was 10.7
+ms and 4.8 GB). All 129 node tests and all suites pass.

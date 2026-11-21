@@ -87,7 +87,9 @@ struct Queue {
 
 /// Records of one shard and their due index.
 pub(crate) struct ShardState {
-    records: Map<Key, Entry>,
+    /// Boxed, so the table moves pointers, not whole Flows, when it grows
+    /// or a change takes a Flow out and puts it back (ADR-015).
+    records: Map<Key, Box<Entry>>,
     /// Due time and creation sequence to record key, per queue.
     queues: Map<Queue, BTreeMap<(u64, u64), Key>>,
     /// Removal time and creation sequence to key, for terminal records.
