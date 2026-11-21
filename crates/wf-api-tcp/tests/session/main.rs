@@ -140,6 +140,8 @@ impl FlowService for Scripted {
             FlowCommand::RetentionCleanup(cleanup) => reply(Ok(Term::int(cleanup.limit))),
             FlowCommand::Rewind(rewind) => reply(Ok(Term::Bin(rewind.to_event))),
             FlowCommand::Info(read) => reply(Ok(Term::Bin(read.flow_type))),
+            FlowCommand::Query(query) => reply(Ok(Term::Bin(query.text))),
+            FlowCommand::QueryIndexes(_) => reply(Ok(Term::text("indexes"))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),

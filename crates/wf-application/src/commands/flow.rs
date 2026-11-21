@@ -20,6 +20,7 @@ pub mod meta;
 pub mod mutate;
 mod opts;
 pub mod policy;
+pub mod query;
 pub mod record;
 pub mod rewind;
 pub mod signal;
@@ -73,6 +74,10 @@ pub enum FlowCommand {
     /// `FLOW.INFO`, `FLOW.STATS`, `FLOW.ATTRIBUTES` or
     /// `FLOW.ATTRIBUTE_VALUES`.
     Info(Box<info::Read>),
+    /// `FLOW.QUERY`.
+    Query(Box<query::Query>),
+    /// `FLOW.QUERY.INDEXES`, a text command.
+    QueryIndexes(query::indexes::Indexes),
 }
 
 impl FlowCommand {
@@ -91,6 +96,9 @@ impl FlowCommand {
                 .map(|(owner, _)| (owner.as_slice(), put.partition_key.as_deref())),
             Self::Signal(signal) => Some((&signal.id, signal.partition_key.as_deref())),
             Self::Rewind(rewind) => Some((&rewind.id, rewind.partition_key.as_deref())),
+            // A point read or history without a partition is in the run
+            // id's auto bucket; collections and counts name a partition.
+            Self::Query(query) => Some((query.run_id().unwrap_or_default(), query.partition_key())),
             Self::SpawnChildren(spawn) => Some((&spawn.parent_id, Some(&spawn.partition_key))),
             Self::StartAndClaim(start) => {
                 Some((&start.create.id, start.create.partition_key.as_deref()))
@@ -101,7 +109,8 @@ impl FlowCommand {
             | Self::PolicySet(_)
             | Self::PolicyGet(_)
             | Self::RetentionCleanup(_)
-            | Self::Info(_) => None,
+            | Self::Info(_)
+            | Self::QueryIndexes(_) => None,
         }
     }
 }
@@ -128,6 +137,7 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
         "FLOW.RETENTION_CLEANUP" => cleanup::parse(args).map(FlowCommand::RetentionCleanup),
         "FLOW.REWIND" => rewind::parse(args).map(|rewind| FlowCommand::Rewind(Box::new(rewind))),
+        "FLOW.QUERY" => query::parse(args).map(|query| FlowCommand::Query(Box::new(query))),
         "FLOW.INFO" => info::parse_info(args).map(|read| FlowCommand::Info(Box::new(read))),
         "FLOW.STATS" => info::parse_stats(args).map(|read| FlowCommand::Info(Box::new(read))),
         "FLOW.ATTRIBUTES" => {

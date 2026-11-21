@@ -324,3 +324,33 @@ Each step is one commit with its tests.
   there is no scan limit, no `approximate` flag and no `exceeds scan limit`
   refusal. The scenario matches Elixir apart from that and the
   unknown-option wording; the SDK suite passes 38 of 60.
+- Step 12: `FLOW.QUERY` (0x0231) and `FLOW.QUERY.INDEXES` (text). The FQL1
+  parser is a port of the Elixir server's production parser (the native
+  `fql.rs`): the same grammar, budgets (16 KiB, 256 tokens, 12 predicates,
+  20 `IN` values, 32 projected fields, `LIMIT` 1 to 100) and failure bytes,
+  rewritten without indexing for the panic ratchet. Binding and checks
+  follow `Binder.bind/2` and `Request.validate/2`; reasons Elixir has no
+  code for (a duplicate `IN` value, a reversed range, a repeated order
+  field) answer `invalid_syntax` as there. A query runs on the shard owning
+  its partition (a `run_id`-only read uses the run id's auto bucket):
+  candidates come from the step-11 catalog, narrowed by fixed types and
+  states, as rows of the GET map's 18 allowlisted fields; predicates,
+  ordering (nulls, then absent values, last; ties by the SHA-256 of the
+  id), paging and projection follow `ReferenceEvaluator`, `RecordOrder` and
+  `RecordProjection`. Event queries page the Flow's history by event id.
+  Cursors are `fqc1_` tokens bound to the query and expiring after five
+  minutes, as Elixir's, but authenticated with HMAC-SHA256 under a
+  per-shard key instead of encrypted, so they do not survive a restart.
+  Failures answer with status 6 and Elixir's map: code, message, and for
+  the seven parser reasons a position, detail, hint and context. Results
+  are authoritative and current (Elixir's come from an asynchronous
+  projection, so a new Flow appears there only after a lag); there are no
+  scan, memory or response budgets, and usage reports rows and checks but
+  zero bytes and time. EXPLAIN describes the catalog path, not Elixir's
+  cost model; `FLOW.QUERY.INDEXES` reports the catalog as one active index.
+  Not built: the compact `flow_query_result_v1` codec (the server declines
+  it, so clients get typed values), the text form of `FLOW.QUERY`, and
+  index lifecycle, statistics and mandatory scopes. The scenario of 90
+  queries and errors matches Elixir apart from one quirk: on one Elixir
+  claim path a `claimed` event omits `attributes`. The SDK suite passes 40
+  of 60, both query planner tests included.

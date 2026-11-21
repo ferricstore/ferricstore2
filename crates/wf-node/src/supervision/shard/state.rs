@@ -19,6 +19,7 @@ mod flow;
 mod index;
 mod mutate;
 mod policy;
+mod query;
 mod retention;
 mod rewind;
 mod signal;
@@ -107,6 +108,8 @@ pub(crate) struct ShardState {
     timeouts_due: u64,
     /// Every Flow by type, state and partition (ADR-014 step 11).
     catalog: catalog::Catalog,
+    /// The key of the query cursors this shard issues (step 12).
+    cursor_key: [u8; 32],
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -143,6 +146,7 @@ impl ShardState {
             deadlines: BTreeMap::new(),
             timeouts_due: 0,
             catalog: HashMap::new(),
+            cursor_key: query::cursor_key(),
         }
     }
 

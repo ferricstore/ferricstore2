@@ -65324,3 +65324,40 @@ loaded suite) was widened to 300 ms. All 59 node tests, the TCP adapter
 and application tests pass; the SDK suite passes 38 of 60 (was 37; the
 `state_meta` cycle now passes on GET's `indexed_state_meta`). Clippy, the
 ratchet, lint tests, docs and architecture pass.
+
+### ADR014-QUERY1 FLOW.QUERY and FLOW.QUERY.INDEXES
+
+New artifacts (solo design review): `wf_application::commands::flow::query`
+(`Query`, `parse`, `Failure`, `Position`, `Reason`; children `fql` with
+private `lex`, `clause`, `tail`, `project`; `field`, `bind`, `run`,
+`answer`, `cursor`, `indexes`; test modules), `FlowCommand::{Query,
+QueryIndexes}`, `ServiceError::{BadRequest, Query}`,
+`wf_api_tcp::response::service_error`; `wf-node`
+`supervision::shard::state::query` and a per-shard cursor key; opcode
+0x0231. No dependency or policy change (`sha2` was already used).
+
+Decisions: port the production Rust parser rather than re-derive the
+grammar from Elixir's reference parser, so failure bytes match; evaluate
+in memory on the shard from the catalog instead of building Elixir's
+composite indexes, since every candidate is already a record in RAM;
+authenticate cursors with HMAC instead of AES-GCM, which keeps them
+tamper-evident and bound to the query without a cipher dependency.
+
+Evidence: the Elixir scenario (90 queries: every predicate kind, metadata,
+lineage fields, ordering, paging, counts, point and event reads, EXPLAIN,
+errors and payload checks) was captured first; the node matches it except
+the Elixir claim-path quirk above. Ported tests: the native parser's 15
+tests, 13 business cases from `reference_evaluator_test.exs`,
+`binder_test.exs`, `request_test.exs` and `error_test.exs`, a cursor unit
+test, three node tests (`flow_query`: reads now and after a restart,
+paging, EXPLAIN, errors, indexes, partition scope) and a TCP test. Not
+ported: planner, composite index, backfill, statistics, budget and LMDB
+row tests (no such machinery here), mandatory scopes and the lineage
+executor (lineage queries run as collections). The tests were written
+after the code, so this step does not claim TDD; turning nulls first, an
+inclusive cursor or time window, null as missing, scalar-only attribute
+matching, auto-only routing, positions on every reason, a lenient
+parameter count or the wrong partition each makes one fail. All 62 node
+tests, the TCP adapter and application tests pass; the SDK suite passes
+40 of 60 (was 38). Clippy, the ratchet, lint tests, docs and architecture
+pass.

@@ -190,3 +190,36 @@ fn count_and_discovery_opcodes_reach_the_service() -> TestResult {
     }
     Ok(())
 }
+
+#[test]
+fn flow_query_reaches_the_service_and_bad_requests_keep_their_status() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let query = "FROM runs WHERE run_id = 'a' RETURN RECORD";
+    let request = encode(&map(&[("version", bin("FQL1")), ("query", bin(query))]))?;
+    let reply = client.call(0x0231, 1, 0, &request)?;
+    // The scripted service answers a query with its text.
+    assert_eq!(reply.body, ok(&bin(query))?);
+    let bogus = encode(&map(&[
+        ("version", bin("FQL1")),
+        ("query", bin(query)),
+        ("bogus", Typed::Int(1)),
+    ]))?;
+    let refused = client.call(0x0231, 1, 0, &bogus)?;
+    let mut expected = 6_u16.to_be_bytes().to_vec();
+    expected.extend(encode(&map(&[
+        ("code", bin("bad_request")),
+        (
+            "message",
+            bin("ERR native FLOW.QUERY contains unsupported fields"),
+        ),
+        ("retry_after_ms", Typed::Int(0)),
+        ("retryable", Typed::Bool(false)),
+        ("safe_to_retry", Typed::Bool(false)),
+    ]))?);
+    assert_eq!(refused.body, expected);
+    let unsupported = encode(&map(&[("version", bin("FQL2")), ("query", bin(query))]))?;
+    let version = client.call(0x0231, 1, 0, &unsupported)?;
+    assert_eq!(version.body.get(..2), Some(&6_u16.to_be_bytes()[..]));
+    Ok(())
+}

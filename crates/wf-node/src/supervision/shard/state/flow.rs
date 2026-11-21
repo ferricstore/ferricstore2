@@ -53,6 +53,7 @@ impl ShardState {
             FlowCommand::Signal(signal) => self.signal(now, &signal, partition),
             FlowCommand::SpawnChildren(spawn) => self.spawn_children(now, &spawn, partition),
             FlowCommand::Rewind(rewind) => self.rewind(now, &rewind, partition),
+            FlowCommand::Query(query) => (self.query(&query, &partition, now), None),
             // Batches and reads by reference are split over shards before
             // they reach one; policies have requests of their own.
             FlowCommand::Many(_)
@@ -61,7 +62,8 @@ impl ShardState {
             | FlowCommand::PolicySet(_)
             | FlowCommand::PolicyGet(_)
             | FlowCommand::RetentionCleanup(_)
-            | FlowCommand::Info(_) => (Err(ServiceError::Unavailable), None),
+            | FlowCommand::Info(_)
+            | FlowCommand::QueryIndexes(_) => (Err(ServiceError::Unavailable), None),
         }
     }
 

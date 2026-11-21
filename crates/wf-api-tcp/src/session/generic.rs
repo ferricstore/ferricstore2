@@ -3,6 +3,7 @@
 //! is the term the node answers with.
 
 use wf_application::commands::flow::{self, claim};
+use wf_application::commands::queue::ServiceError;
 
 use crate::request;
 use crate::response;
@@ -35,6 +36,14 @@ pub(super) fn claim(context: &Context, name: &str, body: &[u8], reply: ReplyTo) 
     );
 }
 
+/// Sends a service error with its status and map.
+fn failed(reply: ReplyTo, error: &ServiceError) {
+    match response::service_error(error) {
+        Ok(body) => reply.send(0, &body),
+        Err(_) => refuse(reply, "ERR reply exceeds the frame limit"),
+    }
+}
+
 fn send(reply: ReplyTo, term: &flow::Term) {
     match response::term(term) {
         Ok(body) => reply.send(0, &body),
@@ -56,13 +65,13 @@ pub(super) fn flow(context: &Context, name: &str, flags: u8, body: &[u8], reply:
     };
     let command = match flow::parse(name, &args) {
         Ok(command) => command,
-        Err(error) => return refuse(reply, &error.to_string()),
+        Err(error) => return failed(reply, &error),
     };
     context.service.execute(
         command,
         Box::new(move |result| match result {
             Ok(term) => send(reply, &term),
-            Err(error) => refuse(reply, &error.to_string()),
+            Err(error) => failed(reply, &error),
         }),
     );
 }

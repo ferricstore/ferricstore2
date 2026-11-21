@@ -7,6 +7,7 @@ mod handshake;
 use std::fmt;
 
 use wf_application::commands::flow::Term;
+use wf_application::commands::queue::ServiceError;
 
 use crate::codec::{TooLong, Value, put_bin, put_len};
 use crate::request::ClaimShape;
@@ -75,6 +76,29 @@ fn value(term: &Term) -> Value {
 /// Refuses a part longer than `u32::MAX` bytes.
 pub fn term(term: &Term) -> Result<Vec<u8>, ReplyTooLong> {
     typed(STATUS_OK, &value(term))
+}
+
+/// The reply to a failed service call: a query failure's diagnostic map
+/// and a malformed request's `bad_request` map with status 6 (ADR-014 step
+/// 12); any other error is the `ERR ...` map with status 1.
+///
+/// # Errors
+/// Refuses a part longer than `u32::MAX` bytes.
+pub fn service_error(failure: &ServiceError) -> Result<Vec<u8>, ReplyTooLong> {
+    match failure {
+        ServiceError::Query(failure) => typed(failure.status(), &value(&failure.payload())),
+        ServiceError::BadRequest(message) => {
+            let map = Value::Map(vec![
+                (b"code".to_vec(), text(b"bad_request")),
+                (b"message".to_vec(), text(message.as_bytes())),
+                (b"retry_after_ms".to_vec(), Value::Int(0)),
+                (b"retryable".to_vec(), Value::Bool(false)),
+                (b"safe_to_retry".to_vec(), Value::Bool(false)),
+            ]);
+            typed(STATUS_BAD_REQUEST, &map)
+        }
+        other => error(STATUS_ERROR, &other.to_string()),
+    }
 }
 
 /// A success reply carrying `text`, such as `OK`.

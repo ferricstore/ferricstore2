@@ -184,6 +184,10 @@ pub enum ServiceError {
     TooManyWaiting,
     /// Refused with the Elixir server's reply text.
     Rejected(String),
+    /// A malformed request, which Elixir answers with status `bad_request`.
+    BadRequest(String),
+    /// A failed Flow query, with its diagnostic (ADR-014 step 12).
+    Query(Box<super::flow::query::Failure>),
 }
 
 impl ServiceError {
@@ -209,7 +213,8 @@ impl fmt::Display for ServiceError {
             Self::TooManyWaiting => {
                 formatter.write_str("ERR too many blocked FLOW.CLAIM_DUE requests are waiting")
             }
-            Self::Rejected(text) => formatter.write_str(text),
+            Self::Rejected(text) | Self::BadRequest(text) => formatter.write_str(text),
+            Self::Query(failure) => formatter.write_str(failure.message()),
         }
     }
 }

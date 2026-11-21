@@ -9,6 +9,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::keys;
 use wf_application::commands::flow::many::{self, ManyMutation};
+use wf_application::commands::flow::query;
 use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::value::{self, ValueMget};
 use wf_application::commands::flow::{FlowCommand, FlowService, Term};
@@ -37,6 +38,14 @@ impl FlowService for QueueNode {
             FlowCommand::PolicyGet(get) => return policy::get(router, get, reply),
             FlowCommand::RetentionCleanup(request) => return cleanup::run(router, &request, reply),
             FlowCommand::Info(read) => return info::read(router, *read, reply),
+            FlowCommand::QueryIndexes(request) => {
+                let now_ms = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .map_or(0, |elapsed| {
+                        u64::try_from(elapsed.as_millis()).unwrap_or(u64::MAX)
+                    });
+                return reply(query::indexes::reply(&request, router.shards.len(), now_ms));
+            }
             FlowCommand::SpawnChildren(spawn) => {
                 // A spawn is decided on the parent's shard; children placed
                 // on other shards need a cross-shard spawn, not built yet.

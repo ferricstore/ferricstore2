@@ -24,6 +24,7 @@ mod flow_fifo;
 mod flow_info;
 mod flow_mutate;
 mod flow_policy;
+mod flow_query;
 mod flow_record;
 mod flow_rewind;
 mod flow_signal;

@@ -172,6 +172,11 @@ pub fn parse(name: &[u8], args: &[Term]) -> Result<Parsed, FlowError> {
             "ERR {name} as a text command is not supported by this server yet"
         )));
     }
+    if name == "FLOW.QUERY.INDEXES" {
+        let args: Vec<Term> = args.iter().map(word).collect();
+        return super::query::indexes::parse(&args)
+            .map(|request| Parsed::Command(FlowCommand::QueryIndexes(request)));
+    }
     let Some(form) = FORMS.iter().find(|form| form.name == name) else {
         return Err(FlowError::rejected(format!(
             "ERR unknown command '{}', with args beginning with: ",
