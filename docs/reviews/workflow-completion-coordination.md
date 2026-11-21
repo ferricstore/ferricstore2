@@ -65730,3 +65730,17 @@ continuation and `value_refs`. Except for the FIFO fix the ported tests
 were written against existing code, so no TDD is claimed for them. All node,
 TCP adapter, application, storage and domain tests pass; clippy, the
 ratchet, docs, architecture and cargo-deny pass.
+
+### ADR015-ALLOC mimalloc as the node binary's allocator
+
+New artifacts (solo design review): ADR-015; the reviewed external
+dependency `mimalloc` 0.1.52 (MIT, no default features) for `wf-node`
+(`architecture/policy.toml`, workspace pin); `#[global_allocator]` in the
+binary only. No production module changes.
+
+Evidence: the 21 Nov profile put 35.5% of the node's busy CPU in the
+system allocator. Three alternating SDK benchmark runs (400k Flows, 4
+clients) against a0cff0a: 9.0 to 9.4 ms CPU per 1k Flows (was 13.4 to
+14.0), 282k to 294k Flows/s (was 265k to 279k), RSS 774 to 788 MB (was 688
+to 790). Behaviour is unchanged, so no test was added; all suites, clippy,
+the ratchet, docs, architecture and cargo-deny pass.

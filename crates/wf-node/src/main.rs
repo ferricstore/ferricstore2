@@ -16,6 +16,11 @@ use std::sync::Arc;
 use wf_api_tcp::session::{ServerInfo, serve};
 use wf_node::composition::{QueueNode, QueueNodeConfig};
 
+/// The node allocates on every request; mimalloc's per-thread free lists
+/// cost far less than the system allocator (ADR-015).
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 struct Options {
     data_dir: PathBuf,
     host: String,
