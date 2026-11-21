@@ -97,3 +97,32 @@ fn the_id_is_checked_by_the_native_layer_then_the_store() {
         Ok(super::Command::Approval(Command::Get(_)))
     ));
 }
+
+#[test]
+fn stored_circuits_round_trip_and_refuse_damage() -> Result<(), FlowError> {
+    let command = parse(
+        "FLOW.CIRCUIT.OPEN",
+        &map(vec![
+            ("scope", Term::text("c")),
+            ("window_ms", Term::Int(10)),
+            ("now_ms", Term::Int(5)),
+        ]),
+    )?;
+    let (reply, change) = command.decide(None, 0);
+    let Some(Change::Put(bytes)) = change else {
+        return Err(FlowError::Unavailable);
+    };
+    let stored = super::circuit::Circuit::decode(&bytes).ok_or(FlowError::Unavailable)?;
+    assert_eq!(Ok(stored.view()), reply);
+    let mut trailing = bytes;
+    trailing.push(0);
+    assert_eq!(super::circuit::Circuit::decode(&trailing), None);
+    let get = parse("FLOW.CIRCUIT.GET", &map(vec![("scope", Term::text("c"))]))?;
+    assert_eq!(
+        get.decide(Some(&trailing), 0).0,
+        Err(FlowError::rejected(
+            "ERR flow circuit record is corrupt".to_owned()
+        ))
+    );
+    Ok(())
+}

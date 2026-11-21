@@ -442,3 +442,18 @@ Each step is one commit with its tests.
   scope) and Flow, newest request first, up to 1,000. The scenario
   matches Elixir apart from the unknown-option wording; the SDK suite
   passes 40 of 60, its native test now failing on circuits.
+- Step 15b: `FLOW.CIRCUIT.OPEN`, `CLOSE` and `GET` (0x024A to 0x024C), as
+  `Governance.CircuitStore`, stored in the governance record store by
+  scope. A manual open sets the rule options given (keeping configured
+  values for those left out; a new circuit starts from Elixir's defaults)
+  and opens the circuit; a close resets it, and closing an unknown scope
+  stores a closed circuit with a threshold of one. Each appends the state
+  change and the manual action to the event history, newest first, keeping
+  64 and, with `window_ms`, those within the window; a time before the
+  last change is refused. Rules are checked in Elixir's order with its
+  tracking bounds. Recording effect outcomes and half-open probes is not
+  built: only effects decided under a policy naming a circuit do that,
+  and no reachable policy can (step 14); `expected_review` is not a wire
+  option. The scenario matches Elixir apart from the unknown-option
+  wording; the SDK suite passes 40 of 60, its native test now failing on
+  budgets.

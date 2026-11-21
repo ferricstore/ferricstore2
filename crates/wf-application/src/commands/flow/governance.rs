@@ -1,15 +1,17 @@
 //! Governance records that are not a Flow's own (ADR-014 step 15):
-//! approvals, as `Ferricstore.Flow.Governance.ApprovalStore` keeps them.
+//! approvals and circuits, as `Ferricstore.Flow.Governance` keeps them.
 //!
-//! Each record lives on the shard that owns its name (an approval's id) as
-//! a partition, as Elixir's key carries the name's hash tag. A command on
-//! one record is decided there from the record's stored form; a listing
-//! asks every shard for its matching records and joins the parts.
+//! Each record lives on the shard that owns its name (an approval's id, a
+//! circuit's scope) as a partition, as Elixir's key carries the name's hash
+//! tag. A command on one record is decided there from the record's stored
+//! form; a listing asks every shard for its matching records and joins the
+//! parts.
 
 use super::FlowError;
 use super::term::Term;
 
 pub mod approval;
+pub mod circuit;
 #[cfg(test)]
 mod tests;
 
@@ -23,6 +25,8 @@ pub const MAX_FIELD_BYTES: usize = 262_144;
 pub enum Kind {
     /// An approval, by id.
     Approval,
+    /// A circuit, by scope.
+    Circuit,
 }
 
 impl Kind {
@@ -31,6 +35,7 @@ impl Kind {
     pub const fn tag(self) -> u8 {
         match self {
             Self::Approval => 1,
+            Self::Circuit => 2,
         }
     }
 
@@ -39,6 +44,7 @@ impl Kind {
     pub const fn from_tag(tag: u8) -> Option<Self> {
         match tag {
             1 => Some(Self::Approval),
+            2 => Some(Self::Circuit),
             _ => None,
         }
     }
@@ -67,6 +73,8 @@ pub enum Command {
     Approval(approval::Command),
     /// `FLOW.APPROVAL.LIST`.
     ApprovalList(approval::List),
+    /// A command on one circuit.
+    Circuit(circuit::Command),
 }
 
 impl Command {
@@ -75,6 +83,7 @@ impl Command {
     pub fn record(&self) -> Option<(Kind, &[u8])> {
         match self {
             Self::Approval(command) => Some((Kind::Approval, command.id())),
+            Self::Circuit(command) => Some((Kind::Circuit, command.scope())),
             Self::ApprovalList(_) => None,
         }
     }
@@ -83,6 +92,7 @@ impl Command {
     pub fn decide(&self, stored: Option<&[u8]>, wall: u64) -> Decided {
         match self {
             Self::Approval(command) => command.decide(stored, wall),
+            Self::Circuit(command) => command.decide(stored, wall),
             Self::ApprovalList(_) => (Err(FlowError::Unavailable), None),
         }
     }
@@ -92,7 +102,7 @@ impl Command {
     pub const fn listed(&self) -> Option<Kind> {
         match self {
             Self::ApprovalList(_) => Some(Kind::Approval),
-            Self::Approval(_) => None,
+            Self::Approval(_) | Self::Circuit(_) => None,
         }
     }
 
@@ -102,7 +112,7 @@ impl Command {
     pub fn select<'a>(&self, records: impl Iterator<Item = &'a [u8]>) -> Listed {
         match self {
             Self::ApprovalList(list) => list.select(records),
-            Self::Approval(_) => Vec::new(),
+            Self::Approval(_) | Self::Circuit(_) => Vec::new(),
         }
     }
 
@@ -111,7 +121,7 @@ impl Command {
     pub fn join(&self, parts: Listed) -> Term {
         match self {
             Self::ApprovalList(list) => list.join(parts),
-            Self::Approval(_) => Term::Nil,
+            Self::Approval(_) | Self::Circuit(_) => Term::Nil,
         }
     }
 }
@@ -119,7 +129,7 @@ impl Command {
 /// Whether `name` is a governance command handled here.
 #[must_use]
 pub fn is_governance(name: &str) -> bool {
-    name.starts_with("FLOW.APPROVAL.")
+    name.starts_with("FLOW.APPROVAL.") || name.starts_with("FLOW.CIRCUIT.")
 }
 
 /// Reads command `name` with options `args`.
@@ -129,6 +139,9 @@ pub fn is_governance(name: &str) -> bool {
 pub fn parse(name: &str, args: &Term) -> Result<Command, FlowError> {
     match name {
         "FLOW.APPROVAL.LIST" => approval::parse_list(args).map(Command::ApprovalList),
+        name if name.starts_with("FLOW.CIRCUIT.") => {
+            circuit::parse(name, args).map(Command::Circuit)
+        }
         _ => approval::parse(name, args).map(Command::Approval),
     }
 }

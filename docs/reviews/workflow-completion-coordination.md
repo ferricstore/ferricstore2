@@ -65487,3 +65487,32 @@ scopes, assignee de-duplication, the log record, the snapshot section or
 its routing each makes one fail. All 81 node tests, the TCP adapter and
 application tests pass; the SDK suite passes 40 of 60. Clippy, the
 ratchet, lint tests, docs, architecture and cargo-deny pass.
+
+### ADR014-GOVERNANCE2 FLOW.CIRCUIT.*
+
+New artifacts (solo design review): `governance::circuit` (`Circuit`,
+`Rule`, `Event`, `Command`, `parse`; `request`, `stored`),
+`governance::Kind::Circuit` (tag 2), `governance::Command::Circuit`;
+opcodes 0x024A to 0x024C. No new dependency.
+
+Decisions: build the manual surface only, since outcome recording and
+probes are reachable solely through effect policies the typed protocol
+cannot express; store the reply map as the record, as for approvals.
+
+Evidence: the Elixir circuit scenario (missing reads, open, reconfigure,
+early close, close, close of an unknown scope, a full rule with repeated
+error classes, a windowed history, 35 opens past the 64-event cap, 17
+argument errors) matches the node apart from the unknown-option wording.
+Ported: manual open and close, configured values kept when options omit
+them, older timestamps refused with the record unchanged, impossible
+tracking windows and oversized error-class lists refused before storage;
+added restart under another shard count, the event cap and window, and
+stored-form corruption. Not ported: outcome recording, probes, review
+fingerprints, circuit listing (no wire command) and effect integration.
+The tests were written after the code, so this step does not claim TDD;
+breaking the time check, the event cap or window, keeping omitted
+values, the close default, the threshold bound or error-class
+de-duplication each makes one fail; removing the close's failure reset
+survives, as nothing reachable counts failures. All 84 node tests, the
+TCP adapter and application tests pass; the SDK suite passes 40 of 60.
+Clippy, the ratchet, lint tests, docs, architecture and cargo-deny pass.
