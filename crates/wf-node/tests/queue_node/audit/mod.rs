@@ -11,6 +11,8 @@ use wf_node::composition::QueueNode;
 
 use super::{TestResult, call};
 
+mod active_timeout_children;
+mod active_timeouts;
 mod attribute_queries;
 mod attributes;
 mod batches;
@@ -21,6 +23,7 @@ mod history_limits;
 mod leases;
 mod named_values;
 mod payload_refs;
+mod policy_commands;
 mod policy_lifecycle;
 mod records_and_claims;
 mod shared_values;

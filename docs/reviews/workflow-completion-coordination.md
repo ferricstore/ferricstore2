@@ -66469,3 +66469,20 @@ groups to keep). The cross-slot child text is Elixir's ("same shard"),
 for clients that match it; the rule stays the slot. Mutation checks kill
 the child `max_active_ms` part, the children's ordering and the empty
 wait state filter. The Elixir Ra shard restart test ports as a reopen.
+
+### Flow test audit: active-time limits (22 Nov)
+
+`flow_test/sections/flow_max_active_ms_times_out_flows.exs` ported (12
+tests in `audit::active_timeouts` and `audit::active_timeout_children`;
+hibernation, retention budgets, backfill watermarks and race hooks are
+Elixir internals). G21 closed. RED: a claim of an overdue Flow claimed it
+(the reply held the Flow running), and `FLOW.COMPLETE` past the limit
+answered `OK`. Decision: as Elixir's `flow_maybe_timeout_active_record/3`,
+a claim scan times an overdue candidate out (logged before the claims, so
+replay repeats it) and takes the next match; `FLOW.COMPLETE`, `FLOW.FAIL`
+and the queue fast path's completion time the Flow out and answer `ERR
+flow max_active_ms exceeded`. Each check first looks at the shard's
+earliest deadline, so shards without due deadlines (the benchmark's) do no
+per-command lookup. Batched mutations keep their own path for now. A
+fast-path test covers the queue protocol's completion; mutation checks
+kill each of the three call sites.

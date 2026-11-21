@@ -131,6 +131,21 @@ impl ShardState {
         mutation: &Mutation,
         partition: Partition,
     ) -> Executed {
+        // A completion or failure past the active-time limit fails the Flow
+        // for it instead, as Elixir does (audit gap G21).
+        let now = mutation.now_ms.unwrap_or(wall);
+        if matches!(
+            mutation.change,
+            Change::Complete { .. } | Change::Fail { .. }
+        ) && self.any_overdue(now)
+        {
+            let key: Key = flow_key(partition.clone(), mutation.id.clone());
+            if self.warm(&key).is_ok() && self.overdue(&key, now) {
+                let logged = self.time_out_one(wall, now, &key);
+                let exceeded = ServiceError::rejected("ERR flow max_active_ms exceeded".to_owned());
+                return (Err(exceeded), logged);
+            }
+        }
         match self.try_mutate(wall, mutation, partition) {
             Ok((reply, logged)) => (Ok(reply), logged),
             Err(error) => (Err(error), None),

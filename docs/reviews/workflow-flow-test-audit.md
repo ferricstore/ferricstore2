@@ -84,6 +84,12 @@ Gaps found so far:
 - G20 (closed): a claim's state `any` (any case, alone) was read as a state
   of that name; it is every state, as Elixir reads it. A cross-slot child
   now answers Elixir's text (`...must hash to the same shard`).
+- G21 (closed): a Flow past its active-time limit failed only in the timeout
+  sweep and cleanup. A claim that meets one fails it and claims the next
+  match; a completion or failure of one (`FLOW.COMPLETE`, `FLOW.FAIL` and
+  the queue protocol's completion) fails it and answers `ERR flow
+  max_active_ms exceeded`, as Elixir's terminal and claim paths do. A shard
+  with no deadline due pays one map lookup.
 
 ## `flow_write_contract_test.exs`
 
@@ -322,85 +328,85 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | max_active_ms defaults to infinite and does not affect active flows when unset | open |
-| 28 | max_active_ms moves overdue non-terminal flows to failed and starts retention | open |
-| 87 | timeout cleanup also removes terminal flows already expired before the pass | open |
-| 144 | timeout cleanup applies one active candidate limit across shards | open |
-| 181 | timeout and terminal cleanup share one limit across shards | open |
-| 262 | a stale active candidate does not consume the terminal cleanup limit | open |
-| 351 | retention bounds shard-local cleanup commands globally | open |
-| 441 | terminal cleanup requires trusted backfill verification and the exact watermark | open |
-| 526 | create max_active_ms overrides the type policy for one flow | open |
-| 551 | create max_active_ms infinity opts one flow out of the type policy timeout | open |
-| 576 | claim_due fails a flow whose max active deadline has elapsed | open |
-| 603 | claim_due keeps a batch of unexpired max active candidates eligible | open |
-| 637 | claim_due skips an expired candidate and claims the next eligible flow | open |
-| 676 | spawn rejects max-active child dependencies across independent groups | open |
-| 724 | rejected cross-shard timeout dependencies do not starve an eligible claim | open |
-| 833 | claim_due applies an expired child to a same-shard parent in another partition | open |
-| 898 | complete fails a running flow whose max active deadline has elapsed | open |
-| 933 | complete enforces max_active_ms for a colocated child and parent | open |
-| 1004 | timeout cleanup reloads lineage records changed earlier in the same batch | open |
-| 1062 | timeout cleanup enforces max_active_ms for hibernated flows | open |
-| 1133 | timeout cleanup fails closed when a hibernated flow reverse index is missing | open |
-| 1182 | timeout cleanup propagates a child failure to a colocated parent | open |
-| 1244 | max active deadlines are projected into a bounded hot index | open |
+| 6 | max_active_ms defaults to infinite and does not affect active flows when unset | ported (`audit::active_timeouts::a_flow_without_a_limit_never_times_out`) |
+| 28 | max_active_ms moves overdue non-terminal flows to failed and starts retention | ported (`audit::active_timeouts::an_overdue_flow_fails_and_starts_its_retention`; the type's retention through the text form) |
+| 87 | timeout cleanup also removes terminal flows already expired before the pass | ported (`audit::active_timeouts::one_cleanup_limit_covers_timeouts_and_removals`) |
+| 144 | timeout cleanup applies one active candidate limit across shards | ported (same test) |
+| 181 | timeout and terminal cleanup share one limit across shards | covered (`flow_cleanup::a_flow_past_its_active_limit_fails_and_cleanup_removes_expired_flows`, the shared limit and continuation) |
+| 262 | a stale active candidate does not consume the terminal cleanup limit | internal: Elixir's after-plan hook racing a candidate |
+| 351 | retention bounds shard-local cleanup commands globally | internal: Elixir's retention command key and byte budgets |
+| 441 | terminal cleanup requires trusted backfill verification and the exact watermark | internal: Elixir's shared-ref backfill watermark |
+| 526 | create max_active_ms overrides the type policy for one flow | ported (`audit::active_timeouts::a_create_limit_overrides_or_opts_out_of_the_type_s`) |
+| 551 | create max_active_ms infinity opts one flow out of the type policy timeout | ported (same test) |
+| 576 | claim_due fails a flow whose max active deadline has elapsed | fixed (`audit::active_timeouts::a_claim_fails_overdue_flows_and_takes_the_next_eligible_one`; G21) |
+| 603 | claim_due keeps a batch of unexpired max active candidates eligible | ported (same test) |
+| 637 | claim_due skips an expired candidate and claims the next eligible flow | fixed (same test; G21) |
+| 676 | spawn rejects max-active child dependencies across independent groups | ported (`audit::active_timeout_children::a_refused_cross_slot_spawn_leaves_later_claims_alone`) |
+| 724 | rejected cross-shard timeout dependencies do not starve an eligible claim | ported (same test) |
+| 833 | claim_due applies an expired child to a same-shard parent in another partition | fixed (`audit::active_timeout_children::a_claim_that_meets_an_overdue_child_fails_its_parent_s_group`; G21; the child shares the parent's partition, as children share their parent's slot here) |
+| 898 | complete fails a running flow whose max active deadline has elapsed | fixed (`audit::active_timeouts::a_completion_past_the_limit_fails_the_flow`; G21) |
+| 933 | complete enforces max_active_ms for a colocated child and parent | fixed (`audit::active_timeout_children::a_late_child_completion_fails_its_parent_s_group`; G21) |
+| 1004 | timeout cleanup reloads lineage records changed earlier in the same batch | ported (`audit::active_timeout_children::a_parent_and_child_timing_out_together_agree`) |
+| 1062 | timeout cleanup enforces max_active_ms for hibernated flows | internal: Elixir hibernates active Flows; the node keeps live Flows in memory |
+| 1133 | timeout cleanup fails closed when a hibernated flow reverse index is missing | internal: Elixir's hibernated reverse index |
+| 1182 | timeout cleanup propagates a child failure to a colocated parent | ported (`audit::active_timeout_children::a_cleanup_timeout_of_a_child_fails_its_parent_s_group`) |
+| 1244 | max active deadlines are projected into a bounded hot index | internal: Elixir's bounded hot deadline index |
 
 ## `flow_codec_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 11 | record codec round trips small and nil fields | open |
-| 25 | record codec round trips fields that require multibyte length headers | open |
-| 40 | batch record decoding preserves order and matches single-record decoding | open |
-| 56 | batch record decoding rejects malformed input atomically and enforces its page bound | open |
-| 73 | record codec round trips private governance reservation identity | open |
-| 91 | record codec round trips sealed system metadata without exposing it | open |
-| 109 | record codec round trips private schedule metadata without exposing it | open |
-| 130 | private schedule metadata preserves opaque target type bytes | open |
-| 146 | empty system metadata keeps dedicated record bytes unchanged | open |
-| 153 | record codec rejects governance metadata outside the current exact shape | open |
-| 185 | record decoders reject semantically invalid required fields | open |
-| 210 | record decoders reject malformed reserved sidecar fields | open |
-| 245 | record encoders reject invalid query metadata instead of dropping it | open |
-| 259 | record codec omits redundant immutable defaults from every state version | open |
-| 291 | record meta codec matches full record projection | open |
-| 336 | terminal after noop batch NIF detects records without terminal side effects | open |
-| 357 | history codec keeps terminal metadata and refs | open |
-| 380 | history codec stores per-event data without repeated immutable flow metadata | open |
-| 424 | history codec round trips fields that require multibyte length headers | open |
-| 442 | history metadata normalization ignores unsupported compound values | open |
-| 451 | value codec stores normal binaries raw and escapes magic-prefixed binaries | open |
-| 469 | typed values reject non-canonical external terms without deserializing them | open |
-| 483 | child group decoding rejects the unsupported external-term format | open |
+| 11 | record codec round trips small and nil fields | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 25 | record codec round trips fields that require multibyte length headers | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 40 | batch record decoding preserves order and matches single-record decoding | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 56 | batch record decoding rejects malformed input atomically and enforces its page bound | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 73 | record codec round trips private governance reservation identity | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 91 | record codec round trips sealed system metadata without exposing it | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 109 | record codec round trips private schedule metadata without exposing it | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 130 | private schedule metadata preserves opaque target type bytes | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 146 | empty system metadata keeps dedicated record bytes unchanged | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 153 | record codec rejects governance metadata outside the current exact shape | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 185 | record decoders reject semantically invalid required fields | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 210 | record decoders reject malformed reserved sidecar fields | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 245 | record encoders reject invalid query metadata instead of dropping it | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 259 | record codec omits redundant immutable defaults from every state version | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 291 | record meta codec matches full record projection | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 336 | terminal after noop batch NIF detects records without terminal side effects | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 357 | history codec keeps terminal metadata and refs | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 380 | history codec stores per-event data without repeated immutable flow metadata | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 424 | history codec round trips fields that require multibyte length headers | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 442 | history metadata normalization ignores unsupported compound values | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 451 | value codec stores normal binaries raw and escapes magic-prefixed binaries | covered (`wf-application` `value_codec::tests::every_value_reads_back_as_sent` and `plain_binaries_are_stored_as_they_are`: plain binaries stay raw, marker-prefixed ones are escaped and read back as sent) |
+| 469 | typed values reject non-canonical external terms without deserializing them | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
+| 483 | child group decoding rejects the unsupported external-term format | internal: Elixir's record, history and term codecs (the node's own codecs are tested in `wf-node` image and log tests) |
 
 ## `flow/policy_command_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | ordinary KV commands bypass policy stamping unchanged | open |
-| 14 | signal transitions are policy-sensitive commands | open |
-| 23 | ordinary KV batches return the original list without consulting context | open |
-| 34 | ordered batches stamp later commands against an earlier Flow target | open |
-| 77 | an explicit type overrides an earlier target for the same batch key | open |
-| 110 | mixed policy batches preserve zero-arity opaque commands | open |
-| 132 | malformed policy-sensitive commands fail before policy reads | open |
-| 140 | malformed keyed command batches return errors instead of raising | open |
-| 148 | existing-flow policy stamping fails closed while the state shard is unavailable | open |
-| 170 | existing hot flows are stamped without a shard process round trip | open |
-| 223 | single commands fence their compact reference with the exact coordinator policy | open |
-| 260 | policy-sensitive commands carry a fixed-size reference and one exact fence | open |
-| 301 | existing-flow stamps fence the observed type and incarnation | open |
-| 356 | policy and migration codecs expose one canonical beta wire shape | open |
-| 388 | outer Flow batches replicate compact references instead of repeated policies | open |
-| 434 | obsolete cross-shard envelopes bypass policy traversal unchanged | open |
-| 442 | nested batches store each policy reference once | open |
-| 489 | policy snapshot size has a deterministic inclusive boundary | open |
-| 516 | oversized, compressed, and trailing stored policy envelopes are rejected before decode | open |
-| 539 | policy generations stop at the exact migration score boundary | open |
-| 557 | multi-type commands enforce one total snapshot bundle limit | open |
-| 626 | command tag dispatch does not allocate tag strings | open |
-| 634 | hot policy stamping does not call the shard process | open |
+| 6 | ordinary KV commands bypass policy stamping unchanged | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 14 | signal transitions are policy-sensitive commands | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 23 | ordinary KV batches return the original list without consulting context | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 34 | ordered batches stamp later commands against an earlier Flow target | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 77 | an explicit type overrides an earlier target for the same batch key | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 110 | mixed policy batches preserve zero-arity opaque commands | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 132 | malformed policy-sensitive commands fail before policy reads | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 140 | malformed keyed command batches return errors instead of raising | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 148 | existing-flow policy stamping fails closed while the state shard is unavailable | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 170 | existing hot flows are stamped without a shard process round trip | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 223 | single commands fence their compact reference with the exact coordinator policy | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 260 | policy-sensitive commands carry a fixed-size reference and one exact fence | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 301 | existing-flow stamps fence the observed type and incarnation | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 356 | policy and migration codecs expose one canonical beta wire shape | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 388 | outer Flow batches replicate compact references instead of repeated policies | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 434 | obsolete cross-shard envelopes bypass policy traversal unchanged | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 442 | nested batches store each policy reference once | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 489 | policy snapshot size has a deterministic inclusive boundary | ported (`audit::policy_commands::a_policy_past_the_size_limit_is_refused_and_one_under_it_is_kept`; the bound is on the node's own encoding) |
+| 516 | oversized, compressed, and trailing stored policy envelopes are rejected before decode | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 539 | policy generations stop at the exact migration score boundary | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 557 | multi-type commands enforce one total snapshot bundle limit | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 626 | command tag dispatch does not allocate tag strings | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
+| 634 | hot policy stamping does not call the shard process | internal: Elixir's policy stamping, fences, compact references and stored policy envelopes |
 
 ## `flow_test/sections/flow_spawn_children_wait_any_resolves_on_first_successful_child_across_s.exs`
 

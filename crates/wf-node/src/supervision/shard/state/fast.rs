@@ -45,6 +45,14 @@ impl ShardState {
         completion: CompleteFlow,
         partition: Partition,
     ) -> (ItemOutcome, Option<Logged>) {
+        // Past its active-time limit, the Flow fails for it (audit gap G21).
+        if self.any_overdue(now) {
+            let key = super::flow_key(partition.clone(), completion.id.clone());
+            if self.overdue(&key, now) {
+                let exceeded = ServiceError::rejected("ERR flow max_active_ms exceeded".to_owned());
+                return (Err(exceeded), self.time_out_one(now, now, &key));
+            }
+        }
         let logged = Logged::Complete {
             now,
             partition,

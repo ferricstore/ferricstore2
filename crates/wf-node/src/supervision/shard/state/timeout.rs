@@ -85,7 +85,28 @@ impl ShardState {
             .collect()
     }
 
-    fn time_out_one(&mut self, wall: u64, now: u64, key: &Key) -> Option<Logged> {
+    /// Whether any live Flow here is past its active-time deadline at
+    /// `now`: one look at the earliest deadline, so commands on shards with
+    /// none pay nothing more.
+    pub(super) fn any_overdue(&self, now: u64) -> bool {
+        self.deadlines
+            .first_key_value()
+            .is_some_and(|((deadline, _), _)| *deadline <= now)
+    }
+
+    /// Whether the live Flow under `key` is past its active-time deadline
+    /// at `now`.
+    pub(super) fn overdue(&self, key: &super::Parts, now: u64) -> bool {
+        self.any_overdue(now)
+            && self
+                .hot(key)
+                .and_then(Self::deadline_slot)
+                .is_some_and(|(deadline, _)| deadline <= now)
+    }
+
+    /// Fails the Flow under `key` for its active-time limit; the change to
+    /// log, or `None` when it has no limit.
+    pub(super) fn time_out_one(&mut self, wall: u64, now: u64, key: &Key) -> Option<Logged> {
         let entry = self.hot(key)?;
         let mut meta = entry.meta.as_deref()?.clone();
         let Some(MaxActive::Ms(limit)) = meta.max_active_ms else {

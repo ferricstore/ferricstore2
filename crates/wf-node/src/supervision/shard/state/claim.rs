@@ -170,7 +170,32 @@ impl ShardState {
         })
     }
 
+    /// Claims up to `limit` matching Flows; a Flow past its active-time
+    /// limit is failed instead, as Elixir's claim scan does (audit gap
+    /// G21), and the next matching Flow is claimed in its place.
     fn take(
+        &mut self,
+        now: u64,
+        claim: (&ClaimFlows, Option<&CreditPool>),
+        mode: Mode,
+        limit: usize,
+        partitions: Option<&[Partition]>,
+        taken: &mut Taken,
+    ) {
+        let mut wanted = limit;
+        loop {
+            let before = taken.claimed.len();
+            let timed_out = self.take_once(now, claim, mode, wanted, partitions, taken);
+            let got = taken.claimed.len().saturating_sub(before);
+            if timed_out == 0 || got >= wanted {
+                return;
+            }
+            wanted = wanted.saturating_sub(got);
+        }
+    }
+
+    /// One pass of [`Self::take`]; how many candidates it timed out.
+    fn take_once(
         &mut self,
         now: u64,
         (request, credits): (&ClaimFlows, Option<&CreditPool>),
@@ -178,8 +203,15 @@ impl ShardState {
         limit: usize,
         partitions: Option<&[Partition]>,
         taken: &mut Taken,
-    ) {
+    ) -> usize {
+        let mut timed_out = 0_usize;
         for (key, expected_state, fence) in self.candidates(now, request, mode, limit, partitions) {
+            if self.overdue(&key, now) {
+                let change = self.time_out_one(now, now, &key);
+                timed_out = timed_out.saturating_add(usize::from(change.is_some()));
+                taken.logged.extend(change);
+                continue;
+            }
             let lease_fence = fence.saturating_add(1);
             let worker = String::from_utf8_lossy(&request.worker);
             let change = Logged::Claim {
@@ -229,6 +261,7 @@ impl ShardState {
                 taken.logged.push(change);
             }
         }
+        timed_out
     }
 
     /// Index entries of `mode` matching the request whose time has come:
