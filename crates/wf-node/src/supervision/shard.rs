@@ -81,6 +81,13 @@ pub(crate) enum Request {
         items: Vec<(usize, CompleteFlow, Partition)>,
         done: Done<Vec<(usize, ItemOutcome)>>,
     },
+    /// A batch's creates on this shard; all or nothing when `atomic`
+    /// (audit gap G2).
+    CreateBatch {
+        items: state::CreateItems,
+        atomic: bool,
+        done: Done<state::BatchReplies>,
+    },
     /// A batch's mutations on this shard; all or nothing when `atomic`.
     FlowBatch {
         items: state::BatchItems,

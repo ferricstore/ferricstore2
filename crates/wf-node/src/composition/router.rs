@@ -42,7 +42,9 @@ fn refuse(request: Request) {
         Request::Claim { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Capture { done, .. } => done(Err(ServiceError::Unavailable)),
         Request::Flow { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::FlowBatch { done, .. } | Request::RunSteps { done, .. } => {
+        Request::FlowBatch { done, .. }
+        | Request::CreateBatch { done, .. }
+        | Request::RunSteps { done, .. } => {
             done(Err(ServiceError::Unavailable));
         }
         Request::ValueRead { done, .. } => done(Err(ServiceError::Unavailable)),

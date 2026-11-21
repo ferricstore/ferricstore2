@@ -65934,3 +65934,31 @@ cleanup of term values and history with values. The codec's unit tests
 round-trip binaries that begin like the marker. All audit (37), node,
 adapter and application tests pass. The ported tests were written before
 this change, so they are the failing-first evidence for it.
+
+### G2-G4 Batch creates and batch items
+
+New artifacts (solo design review): `wf_application::commands::flow::
+create_many` (`CreateMany`, `parse`, `reply`) and `FlowCommand::CreateMany`;
+in `wf-node` `state::create_many` (`CreateItems`, `create_batch`),
+`Request::CreateBatch` and `composition::flow::batch_create`;
+`many::item_entries` reads items per command. The TCP adapter sends a
+typed `FLOW.CREATE_MANY` the queue fast path cannot take (not independent,
+item maps, extra options) to the generic command instead of refusing it.
+
+Decisions, as Elixir decides them: a batch naming one partition is all or
+nothing; without one (`MIXED`) each shard group is, a failing group's items
+all failing with its error; independent batches decide each item; items
+override the batch's shared options; ids repeat only in independent
+batches. Batch item maps carry any option of the single command, and list
+items follow each command's order (transition: fence before token;
+cancel: fence only).
+
+Evidence: seven ported create-many tests (one partition, item overrides,
+auto partition and rollback of duplicates, independent, idempotent retry,
+idempotency conflict rollback, a MIXED batch across shards) failed before
+("FLOW.CREATE_MANY is not supported by this server") and pass; two new
+batch-item tests (from the 21 Nov probe) fail on the previous item reader
+and pass; the ported "batch APIs also persist full value fields" passes.
+All node, adapter and application tests pass.
+`state::fast` (new, same review) holds the queue fast path's `create` and
+`complete`, moved from `state.rs` to keep it under the line limit.

@@ -7,6 +7,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use wf_application::commands::flow::create_many::{self, CreateMany};
 use wf_application::commands::flow::keys;
 use wf_application::commands::flow::many::{self, ManyMutation};
 use wf_application::commands::flow::query;
@@ -21,6 +22,7 @@ use wf_application::commands::queue::{
 use crate::supervision::scheduler::Job;
 use crate::supervision::shard::Request;
 use crate::supervision::shard::state::BatchItems;
+use crate::supervision::shard::state::CreateItems;
 
 use super::QueueNode;
 use super::gather::ItemGather;
@@ -34,6 +36,7 @@ impl FlowService for QueueNode {
         };
         let command = match command {
             FlowCommand::Many(batch) => return batch_mutation(router, *batch, reply),
+            FlowCommand::CreateMany(batch) => return batch_create(router, *batch, reply),
             FlowCommand::ValueMget(read) => return value_read(router, read, reply),
             FlowCommand::RunSteps(spec) => return run_steps(router, *spec, reply),
             FlowCommand::PolicySet(set) => return policy::set(router, set, reply),
@@ -128,6 +131,46 @@ impl QueueNode {
             // The thread has stopped; the job finds no node and refuses.
             (returned.0)();
         }
+    }
+}
+
+/// `FLOW.CREATE_MANY` (audit gap G2): items grouped by shard, each group
+/// all or nothing unless the batch is independent; a batch naming one
+/// partition is one group.
+fn batch_create(router: &Router, mut batch: CreateMany, reply: Reply<Term>) {
+    let total = batch.items.len();
+    let mut per_shard: Vec<CreateItems> = (0..router.shards.len()).map(|_| Vec::new()).collect();
+    for (position, create) in std::mem::take(&mut batch.items).into_iter().enumerate() {
+        let partition = Partition::for_new_flow(&create.id, create.partition_key.as_deref());
+        if let Some(items) = per_shard.get_mut(router.route(&partition)) {
+            items.push((position, create, partition));
+        }
+    }
+    let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
+    let atomic = !batch.independent;
+    let gather = Arc::new(ItemGather::new(
+        total,
+        parts,
+        Box::new(
+            move |outcomes: Result<Vec<Result<Term, ServiceError>>, ServiceError>| {
+                reply(outcomes.and_then(|outcomes| create_many::reply(&batch, outcomes)));
+            },
+        ),
+    ));
+    for (index, items) in per_shard
+        .into_iter()
+        .enumerate()
+        .filter(|(_, items)| !items.is_empty())
+    {
+        let part = Arc::clone(&gather);
+        router.send(
+            index,
+            Request::CreateBatch {
+                items,
+                atomic,
+                done: Box::new(move |result| part.part(result)),
+            },
+        );
     }
 }
 

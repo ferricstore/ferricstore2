@@ -29,10 +29,11 @@ recorded instead of copied.
 
 Gaps found so far:
 
-- G2: a typed `FLOW.CREATE_MANY` takes only the queue fast path (no
-  all-or-nothing batches, item options, named values or `idempotent`).
-- G3: `_MANY` item maps keep only the id, partition, lease token and fence.
-- G4: `_MANY` list items are read in one order; Elixir reads
+- G2 (closed): a typed `FLOW.CREATE_MANY` took only the queue fast path
+  (no all-or-nothing batches, item options, named values or `idempotent`).
+- G3 (closed): `_MANY` item maps kept only the id, partition, lease token
+  and fence.
+- G4 (closed): `_MANY` list items were read in one order; Elixir reads
   `TRANSITION_MANY` as `[id, fence, token]` and `CANCEL_MANY` as
   `[id, fence]` or `[id, partition, fence]`.
 - G5 (closed by the value codec): structured values (maps, lists) were
@@ -368,7 +369,7 @@ Gaps found so far:
 | 8 | flow_spawn_children wait any resolves on first successful child in one Raft group | open |
 | 60 | flow_spawn_children wait any resolves failure when every local child fails | open |
 | 124 | flow_fail_many fail_parent policy closes parent and cancels local siblings | open |
-| 190 | flow_create_many spans shards and rolls back failing shard group | open |
+| 190 | flow_create_many spans shards and rolls back failing shard group | fixed (G2) |
 | 234 | flow_create emits telemetry without automatic worker pubsub wakeups | open |
 | 267 | flow APIs reject malformed inputs before raft apply | open |
 | 404 | flow_claim_due atomically leases due flows and removes them from due set | open |
@@ -423,16 +424,16 @@ Gaps found so far:
 | 226 | lineage before_id cursor paginates equal timestamps without duplicates | open |
 | 259 | cold lineage query seeks to filtered time window instead of sampling prefix head | open |
 | 334 | reverse cold lineage query samples from the newest side of a filtered window | open |
-| 396 | flow_create_many creates one-partition batch atomically | open |
+| 396 | flow_create_many creates one-partition batch atomically | fixed (G2) |
 | 428 | flow write APIs return ok and reject return option | open |
-| 495 | flow_create_many lets item attrs override common attrs | open |
-| 524 | flow_create_many auto-partitions missing partition and rolls back duplicate batches | open |
-| 566 | flow_create_many independent keeps successful items when one create fails | open |
+| 495 | flow_create_many lets item attrs override common attrs | fixed (G2) |
+| 524 | flow_create_many auto-partitions missing partition and rolls back duplicate batches | fixed (G2) |
+| 566 | flow_create_many independent keeps successful items when one create fails | fixed (G2) |
 | 592 | flow_create_many independent auto-partitions without client-side grouping | open |
 | 624 | flow_create_many independent auto-partitioned flows are claimable by partition keys | open |
 | 668 | flow_claim_due partition_keys tries later shards when an earlier stale candidate claims nothing | open |
-| 755 | flow_create_many idempotent retry returns existing records without duplicate writes | open |
-| 794 | flow_create_many idempotency conflict rolls back same shard group | open |
+| 755 | flow_create_many idempotent retry returns existing records without duplicate writes | fixed (G2) |
+| 794 | flow_create_many idempotency conflict rolls back same shard group | fixed (G2) |
 | 824 | flow_spawn_children wait none creates full child flows and advances parent | open |
 | 864 | flow_spawn_children wait all advances parent only after direct children finish | open |
 
@@ -527,7 +528,7 @@ Gaps found so far:
 | 441 | retention cleanup returns an exact continuation without a final empty pass | gap G8 |
 | 523 | retention sweeper runs cleanup through Flow command path | covered: `retention::a_completed_flow_is_removed_after_retention` |
 | 610 | rewind from terminal back to active clears value ref expiration | ported |
-| 675 | batch APIs also persist full value fields | gap G2, G3, G5 |
+| 675 | batch APIs also persist full value fields | fixed (G2, G3, G5) |
 | 787 | history only hydrates stored values when values option is requested | fixed (G5, value codec) |
 
 ## `flow_test/sections/flow_native_due_index_mirrors_create_claim_due.exs`

@@ -14,9 +14,11 @@ mod catalog;
 mod children;
 mod claim;
 mod cold;
+mod create_many;
 pub(crate) mod credit;
 mod effect;
 pub(crate) mod events;
+mod fast;
 mod fifo;
 mod flow;
 mod governance;
@@ -35,6 +37,7 @@ mod timeout;
 mod value;
 
 pub(crate) use claim::Peeked;
+pub(crate) use create_many::CreateItems;
 pub(crate) use key::{Key, Map, Parts, flow_key};
 pub(crate) use mutate::{BatchItems, BatchReplies};
 pub(crate) use policy::{PolicyCommand, PolicyReply};
@@ -44,12 +47,8 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use events::History;
-use wf_application::commands::flow::{
-    governance::Kind, policy::Installed, record::FlowMeta, value_codec,
-};
-use wf_application::commands::queue::{
-    CompleteFlow, ItemOutcome, MAX_FLOW_ID_BYTES, NewFlow, Partition, ServiceError,
-};
+use wf_application::commands::flow::{governance::Kind, policy::Installed, record::FlowMeta};
+use wf_application::commands::queue::{MAX_FLOW_ID_BYTES, Partition, ServiceError};
 use wf_domain::claim::Claim;
 use wf_domain::lease::{LeaseGuard, LeaseToken};
 use wf_domain::workflow::{
@@ -342,59 +341,5 @@ impl ShardState {
             self.store(key, write.record, priority);
         }
         Ok(outcome)
-    }
-
-    /// Creates one Flow; returns its outcome and the change to log.
-    pub(crate) fn create(
-        &mut self,
-        now: u64,
-        shape: (&[u8], &[u8], Option<u64>, u8),
-        flow: NewFlow,
-        partition: Partition,
-    ) -> (ItemOutcome, Option<Logged>) {
-        let (flow_type, state, run_at, priority) = shape;
-        let explicit = matches!(partition, Partition::Named(_));
-        if let Err(error) = self.fifo_guard((flow_type, state), false, priority, Some(explicit)) {
-            return (Err(error), None);
-        }
-        let logged = Logged::Create {
-            now,
-            partition,
-            id: flow.id,
-            flow_type: flow_type.to_vec(),
-            state: state.to_vec(),
-            run_at,
-            // Escaped like any stored value (audit gap G5).
-            payload: flow.payload.map(value_codec::escape),
-            priority,
-        };
-        settle(self.apply(&logged), logged)
-    }
-
-    /// Completes one claimed Flow; returns its outcome and the change to log.
-    pub(crate) fn complete(
-        &mut self,
-        now: u64,
-        completion: CompleteFlow,
-        partition: Partition,
-    ) -> (ItemOutcome, Option<Logged>) {
-        let logged = Logged::Complete {
-            now,
-            partition,
-            id: completion.id,
-            token: completion.lease_token,
-            fence: completion.fence,
-            result: completion.result.map(value_codec::escape),
-        };
-        settle(self.apply(&logged), logged)
-    }
-}
-
-/// An item outcome, and the change to log when the reducer changed the record.
-fn settle(applied: Result<Outcome, ServiceError>, logged: Logged) -> (ItemOutcome, Option<Logged>) {
-    match applied {
-        Ok(Outcome::Changed) => (Ok(()), Some(logged)),
-        Ok(_) => (Ok(()), None),
-        Err(error) => (Err(error), None),
     }
 }

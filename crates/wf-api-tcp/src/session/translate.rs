@@ -76,20 +76,19 @@ fn batch_reply(
 pub(super) fn create_many(
     context: &Context,
     negotiated: Negotiated,
-    _header: &Header,
+    header: &Header,
     body: &[u8],
     reply: ReplyTo,
 ) {
+    // The queue fast path takes independent batches of `[id, partition,
+    // payload]` items; any other batch is the generic command (audit gap
+    // G2).
     let parsed = match request::create_many(body) {
-        Ok(parsed) => parsed,
-        Err(error) => return refuse(reply, error.message()),
+        Ok(parsed) if parsed.independent => parsed,
+        _ => {
+            return super::generic::flow(context, "FLOW.CREATE_MANY", header.flags, body, reply);
+        }
     };
-    if !parsed.independent {
-        return refuse(
-            reply,
-            "ERR FLOW.CREATE_MANY without independent items is not supported by this server",
-        );
-    }
     let shape = priority(parsed.priority).and_then(|priority| {
         Ok((
             priority,

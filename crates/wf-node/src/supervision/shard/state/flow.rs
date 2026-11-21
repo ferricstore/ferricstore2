@@ -65,6 +65,7 @@ impl ShardState {
             // Batches and reads by reference are split over shards before
             // they reach one; policies have requests of their own.
             FlowCommand::Many(_)
+            | FlowCommand::CreateMany(_)
             | FlowCommand::ValueMget(_)
             | FlowCommand::RunSteps(_)
             | FlowCommand::PolicySet(_)
@@ -169,7 +170,12 @@ impl ShardState {
         })
     }
 
-    fn create_flow(&mut self, now: u64, create: CreateFlow, partition: Partition) -> Executed {
+    pub(super) fn create_flow(
+        &mut self,
+        now: u64,
+        create: CreateFlow,
+        partition: Partition,
+    ) -> Executed {
         let key = flow_key(partition, create.id.clone());
         if let Some(existing) = self.hot(&key) {
             return (self.duplicate(&key, existing, &create), None);

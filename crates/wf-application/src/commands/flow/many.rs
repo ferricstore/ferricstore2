@@ -51,36 +51,43 @@ fn rejected(text: &str) -> FlowError {
     FlowError::rejected(text.to_owned())
 }
 
-/// The item's own options: `[id, token, fence]`, `[id, partition, token,
-/// fence]`, or a map of `id`, `partition_key`, `lease_token` and
-/// `fencing_token`.
-fn item_entries(item: &Term) -> Result<Vec<(Vec<u8>, Term)>, FlowError> {
-    let named = |key: &str, value: &Term| (key.as_bytes().to_vec(), value.clone());
+/// The item's own options, as Elixir's native server reads them: a map of
+/// any options of the single command (audit gap G3), or a list whose order
+/// depends on the command (G4): `[id, token, fence]` or `[id, partition,
+/// token, fence]` for complete, retry and fail; `[id, fence, token]` or
+/// `[id, partition, fence, token]` for a transition; `[id, fence]` or
+/// `[id, partition, fence]` for a cancel.
+fn item_entries(single: &str, item: &Term) -> Result<Vec<(Vec<u8>, Term)>, FlowError> {
+    let order: (&[&str], &[&str]) = match single {
+        "FLOW.TRANSITION" => (
+            &["id", "fencing_token", "lease_token"],
+            &["id", "partition_key", "fencing_token", "lease_token"],
+        ),
+        "FLOW.CANCEL" => (
+            &["id", "fencing_token"],
+            &["id", "partition_key", "fencing_token"],
+        ),
+        _ => (
+            &["id", "lease_token", "fencing_token"],
+            &["id", "partition_key", "lease_token", "fencing_token"],
+        ),
+    };
     match item {
-        Term::List(fields) => match fields.as_slice() {
-            [id, token, fence] => Ok(vec![
-                named("id", id),
-                named("lease_token", token),
-                named("fencing_token", fence),
-            ]),
-            [id, partition, token, fence] => Ok(vec![
-                named("id", id),
-                named("partition_key", partition),
-                named("lease_token", token),
-                named("fencing_token", fence),
-            ]),
-            _ => Err(rejected("ERR flow many item has wrong width")),
-        },
-        Term::Map(entries) => Ok(entries
-            .iter()
-            .filter(|(key, _)| {
-                matches!(
-                    key.as_slice(),
-                    b"id" | b"partition_key" | b"lease_token" | b"fencing_token"
-                )
-            })
-            .cloned()
-            .collect()),
+        Term::List(fields) => {
+            let keys = if fields.len() == order.0.len() {
+                order.0
+            } else if fields.len() == order.1.len() {
+                order.1
+            } else {
+                return Err(rejected("ERR flow many item has wrong width"));
+            };
+            Ok(keys
+                .iter()
+                .zip(fields)
+                .map(|(key, value)| (key.as_bytes().to_vec(), value.clone()))
+                .collect())
+        }
+        Term::Map(entries) => Ok(entries.clone()),
         _ => Err(rejected("ERR flow many item must be a list or a map")),
     }
 }
@@ -135,7 +142,7 @@ pub fn parse(name: &str, args: &Term) -> Result<ManyMutation, FlowError> {
     let mut parsed = Vec::with_capacity(items.len());
     for item in items {
         let mut options = shared.clone();
-        for (key, value) in item_entries(item)? {
+        for (key, value) in item_entries(single, item)? {
             options.retain(|(existing, _)| *existing != key);
             options.push((key, value));
         }

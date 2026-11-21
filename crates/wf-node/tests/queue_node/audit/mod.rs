@@ -11,6 +11,8 @@ use wf_node::composition::QueueNode;
 
 use super::{TestResult, call};
 
+mod batches;
+mod create_many;
 mod named_values;
 mod signal;
 mod value_payload;

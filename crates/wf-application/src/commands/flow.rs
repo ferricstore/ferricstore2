@@ -10,6 +10,7 @@ pub mod children;
 pub mod claim;
 pub mod cleanup;
 pub mod create;
+pub mod create_many;
 pub mod effect;
 pub mod get;
 pub mod governance;
@@ -47,6 +48,8 @@ pub type FlowError = ServiceError;
 pub enum FlowCommand {
     /// `FLOW.CREATE`.
     Create(Box<create::CreateFlow>),
+    /// `FLOW.CREATE_MANY` beyond the queue fast path (audit gap G2).
+    CreateMany(Box<create_many::CreateMany>),
     /// `FLOW.GET`.
     Get(get::GetFlow),
     /// `FLOW.HISTORY`.
@@ -117,6 +120,7 @@ impl FlowCommand {
             // A record lives where its name, as a partition, routes.
             Self::Governance(command) => command.record().map(|(_, name)| (name, Some(name))),
             Self::Many(_)
+            | Self::CreateMany(_)
             | Self::ValueMget(_)
             | Self::RunSteps(_)
             | Self::PolicySet(_)
@@ -160,6 +164,9 @@ pub fn without_client_time(args: &Term) -> Term {
 pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
     match name {
         "FLOW.CREATE" => create::parse(args).map(|create| FlowCommand::Create(Box::new(create))),
+        "FLOW.CREATE_MANY" => {
+            create_many::parse(args).map(|batch| FlowCommand::CreateMany(Box::new(batch)))
+        }
         "FLOW.GET" => get::parse(args).map(FlowCommand::Get),
         "FLOW.HISTORY" => history::parse(args).map(FlowCommand::History),
         "FLOW.VALUE.PUT" => value::parse_put(args).map(|put| FlowCommand::ValuePut(Box::new(put))),

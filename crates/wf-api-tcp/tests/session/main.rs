@@ -142,7 +142,9 @@ impl FlowService for Scripted {
             FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
                 ServiceError::rejected("ERR flow already exists".to_owned()),
             )),
-            FlowCommand::Create(_) | FlowCommand::RunSteps(_) => reply(Ok(Term::text("OK"))),
+            FlowCommand::Create(_) | FlowCommand::CreateMany(_) | FlowCommand::RunSteps(_) => {
+                reply(Ok(Term::text("OK")));
+            }
             FlowCommand::Mutate(mutation) if mutation.id.starts_with(b"stale") => {
                 reply(Err(ServiceError::Domain(DomainError::StaleLease)));
             }

@@ -449,3 +449,109 @@ fn history_only_hydrates_stored_values_when_values_option_is_requested() -> Test
     );
     Ok(())
 }
+
+fn batch_item(record: &Term, extra: &[(&str, Term)]) -> Term {
+    let mut entries = vec![("id", field(record, "id"))];
+    entries.extend(lease(record));
+    entries.extend(extra.iter().cloned());
+    map(&entries)
+}
+
+#[test]
+fn batch_apis_also_persist_full_value_fields() -> TestResult {
+    let node = node("audit-payload-batch")?;
+    let partition = "tenant-b";
+    let kind = |value: &str| map(&[("kind", text(value))]);
+    ok(
+        &node,
+        "FLOW.CREATE_MANY",
+        &with(
+            partition,
+            &[
+                (
+                    "items",
+                    Term::List(vec![
+                        map(&[("id", text("bc")), ("payload", kind("complete"))]),
+                        map(&[("id", text("br")), ("payload", kind("retry"))]),
+                        map(&[("id", text("bf")), ("payload", kind("fail"))]),
+                    ]),
+                ),
+                ("type", text("value-batch")),
+                ("run_at_ms", int(1_000)),
+                ("now_ms", int(1_000)),
+            ],
+        ),
+    )?;
+    for id in ["bc", "br", "bf"] {
+        let created = get(&node, id, &with(partition, &[]))?;
+        assert!(matches!(field(&created, "payload_ref"), Term::Bin(_)));
+    }
+    let records = claim_all(
+        &node,
+        partition,
+        &[("type", text("value-batch")), ("limit", int(3))],
+    )?;
+    let find = |id: &str| {
+        records
+            .iter()
+            .find(|record| field(record, "id") == text(id))
+            .cloned()
+            .unwrap_or(Term::Nil)
+    };
+    let many = |name: &str, item: Term, extra: &[(&str, Term)]| {
+        let mut entries = with(
+            partition,
+            &[("items", Term::List(vec![item])), ("now_ms", int(1_100))],
+        );
+        entries.extend(extra.iter().cloned());
+        ok(&node, name, &entries)
+    };
+    many(
+        "FLOW.COMPLETE_MANY",
+        batch_item(&find("bc"), &[("result", Term::List(vec![text("done")]))]),
+        &[],
+    )?;
+    let retry_error = map(&[("retry", Term::Bool(true))]);
+    many(
+        "FLOW.RETRY_MANY",
+        batch_item(
+            &find("br"),
+            &[
+                ("error", retry_error.clone()),
+                ("payload", kind("retry-updated")),
+            ],
+        ),
+        &[("run_at_ms", int(2_000))],
+    )?;
+    let fail_error = Term::List(vec![text("bad"), text("input")]);
+    many(
+        "FLOW.FAIL_MANY",
+        batch_item(&find("bf"), &[("error", fail_error.clone())]),
+        &[],
+    )?;
+    let retried = get(&node, "br", &with(partition, &[]))?;
+    assert!(matches!(
+        field(&get(&node, "bc", &with(partition, &[]))?, "result_ref"),
+        Term::Bin(_)
+    ));
+    assert!(matches!(field(&retried, "error_ref"), Term::Bin(_)));
+    assert_ne!(
+        field(&retried, "payload_ref"),
+        field(&find("br"), "payload_ref")
+    );
+    assert!(matches!(
+        field(&get(&node, "bf", &with(partition, &[]))?, "error_ref"),
+        Term::Bin(_)
+    ));
+    assert_eq!(
+        field(&full(&node, "bc", partition)?, "result"),
+        Term::List(vec![text("done")])
+    );
+    let fetched = full(&node, "br", partition)?;
+    assert_eq!(field(&fetched, "payload"), kind("retry-updated"));
+    assert_eq!(field(&fetched, "error"), retry_error);
+    let failed = full(&node, "bf", partition)?;
+    assert_eq!(field(&failed, "payload"), kind("fail"));
+    assert_eq!(field(&failed, "error"), fail_error);
+    Ok(())
+}
