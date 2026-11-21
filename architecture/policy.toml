@@ -7,7 +7,8 @@ worker_wire_modules = ["client::http", "client::tcp"]
 filesystem_packages = ["wf-storage"]
 durable_sync_modules = ["wf-storage::cold", "wf-storage::log::store", "wf-storage::log::group", "wf-storage::state::redb::store", "wf-storage::state::redb::snapshot::stage", "wf-storage::snapshot::files"]
 # ADR-011: the group log writer thread.
-thread_owner_modules = ["wf-storage::log::group::writer", "wf-storage::cold::queue", "wf-node::supervision"]
+# ADR-018: the entry log's durability notifier.
+thread_owner_modules = ["wf-storage::log::group::writer", "wf-storage::log::entries::notifier", "wf-storage::cold::queue", "wf-node::supervision"]
 
 [packages.wf-types]
 kind = "runtime"

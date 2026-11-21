@@ -66,6 +66,9 @@ pub struct Recovered {
     pub truncated_bytes: u64,
     /// The segments present, oldest first.
     pub segments: Vec<u64>,
+    /// Where each segment's records start in `records`, by position in
+    /// `segments`.
+    pub starts: Vec<usize>,
 }
 
 /// A refused open, append, wait, rotation or removal.
@@ -188,6 +191,7 @@ impl GroupLog {
             records: opened.records,
             truncated_bytes: opened.truncated_bytes,
             segments: opened.segments,
+            starts: opened.starts,
         };
         Ok((log, recovered))
     }
@@ -250,6 +254,12 @@ impl GroupLog {
     pub fn remove_before(&self, segment: u64) -> Result<(), GroupLogError> {
         let sequence = self.shared.enqueue(Item::RemoveBefore(segment))?;
         self.shared.outcome(sequence).map(drop)
+    }
+
+    /// The limits the log was opened with.
+    #[must_use]
+    pub const fn limits(&self) -> GroupLogLimits {
+        self.limits
     }
 
     /// The segment new appends go to: the newest present segment.

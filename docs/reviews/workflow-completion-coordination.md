@@ -66136,3 +66136,28 @@ previous line. raft-rs was not reconsidered: its last release is 0.7.0
 (March 2023) on rust-protobuf 2 by default. Phases: bridge and fault gate,
 node integration, snapshots, several groups per node with the SDK's
 three-node failover test.
+
+### ADR-018 phase 1a: the entry log
+
+New artifacts (solo design review): `wf_storage::log::{EntryLog, EntryId,
+EntryLogError, Durable}` (`log::entries`, its record codec and notifier
+thread), `GroupLog::limits`, `Recovered::starts`; policy: the notifier is a
+thread owner.
+
+Decisions: the consensus log is the group log with four record kinds
+(entry with its id, truncation after an index, vote, purge up to an id), so
+a follower's suffix truncation is a durable record, not a file rewrite, and
+opening replays the records in order. Appends hand their completion to the
+notifier thread, which waits for the sequence and calls it, so the caller
+(OpenRaft's `IOFlushed`) never blocks on a sync; truncations, votes and
+purges return once durable. A purge writes the vote and purge again, then
+removes the segments before the oldest kept entry and those markers (each
+entry remembers a segment no later than its own). State changes only after
+the group log accepted a batch. Entries since the last purge stay in memory
+for readers; phase 3 (snapshots) bounds them.
+
+Evidence: `group_log::entries` (4 tests: entries, vote and a truncation
+survive a reopen; a gap is refused and an overwrite from a held index
+replaces the suffix; a purge removes segments and keeps the vote across a
+reopen; a reopened log continues after its last durable entry) and a codec
+unit test pass.

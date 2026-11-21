@@ -2,6 +2,7 @@
 //!
 //! Scoped synchronous durability, without consensus or state-machine apply.
 
+mod entries;
 mod format;
 mod group;
 mod install;
@@ -11,6 +12,7 @@ mod recovery;
 mod store;
 mod write;
 
+pub use entries::{Durable, EntryId, EntryLog, EntryLogError};
 pub use group::{
     DirectoryStorage, GroupLog, GroupLogError, GroupLogLimits, Recovered, SegmentStorage,
     SegmentWriter,

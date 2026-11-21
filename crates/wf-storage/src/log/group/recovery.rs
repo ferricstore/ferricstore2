@@ -11,6 +11,8 @@ pub(super) struct Opened {
     pub(super) records: Vec<Vec<u8>>,
     pub(super) truncated_bytes: u64,
     pub(super) segments: Vec<u64>,
+    /// Where each segment's records start in `records`.
+    pub(super) starts: Vec<usize>,
     pub(super) current: Box<dyn SegmentWriter>,
     pub(super) current_length: u64,
 }
@@ -39,12 +41,15 @@ pub(super) fn recover(
             records: Vec::new(),
             truncated_bytes: 0,
             segments: vec![0],
+            starts: vec![0],
             current,
             current_length: 0,
         });
     };
     let mut records = Vec::new();
+    let mut starts = Vec::with_capacity(segments.len());
     for &segment in earlier {
+        starts.push(records.len());
         let bytes = storage
             .read(segment)
             .map_err(|_| GroupLogError::Unavailable)?;
@@ -57,6 +62,7 @@ pub(super) fn recover(
     }
     let bytes = storage.read(last).map_err(|_| GroupLogError::Unavailable)?;
     let (last_records, good) = scan(&bytes, last, max_block_bytes)?;
+    starts.push(records.len());
     records.extend(last_records);
     let current_length = length(good)?;
     let cut = bytes
@@ -76,6 +82,7 @@ pub(super) fn recover(
         records,
         truncated_bytes,
         segments,
+        starts,
         current,
         current_length,
     })

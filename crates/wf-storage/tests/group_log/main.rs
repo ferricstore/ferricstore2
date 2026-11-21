@@ -15,6 +15,7 @@ use wf_storage::log::{DirectoryStorage, GroupLog, GroupLogLimits};
 mod backlog;
 mod concurrency;
 mod crash;
+mod entries;
 mod faults;
 mod recovery;
 mod rotation;
