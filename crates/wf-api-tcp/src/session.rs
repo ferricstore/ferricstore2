@@ -36,6 +36,29 @@ pub struct ServerInfo {
     /// client cannot claim a future Flow early or take a live lease by
     /// sending a later time (ADR-015). Tests and parity probes turn it on.
     pub client_clock: bool,
+    /// What one connection may have in flight (ADR-017).
+    pub in_flight: InFlight,
+}
+
+/// What one connection may have read and not yet answered before its reader
+/// waits for replies to be written (ADR-017). A client that sends faster than
+/// the node answers, or never reads its replies, is then held back by TCP.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct InFlight {
+    /// Requests.
+    pub requests: u32,
+    /// Request body bytes; a larger request waits until nothing else on the
+    /// connection is in flight.
+    pub bytes: u32,
+}
+
+impl Default for InFlight {
+    fn default() -> Self {
+        Self {
+            requests: 4_096,
+            bytes: 64 * 1024 * 1024,
+        }
+    }
 }
 
 /// Accepts connections on `listener` until it fails; each connection runs

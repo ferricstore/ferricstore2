@@ -1,7 +1,7 @@
 //! Routes requests to shard threads and splits claims over them.
 
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::mpsc;
 
 use wf_application::commands::queue::{ClaimFlows, Partition, ServiceError, shard_for_slot};
@@ -17,6 +17,8 @@ pub(crate) struct ShardLink {
     pub(crate) ready: Arc<AtomicU64>,
     /// Leased running Flows, published after each round.
     pub(crate) leased: Arc<AtomicU64>,
+    /// Items sent and not yet taken by the shard (ADR-017).
+    pub(crate) backlog: Arc<AtomicUsize>,
 }
 
 /// Every shard, and the waiter thread. Dropping the last reference closes the
@@ -27,6 +29,8 @@ pub(crate) struct Router {
     pub(crate) waiters: Waiters,
     /// Every type's running-limit rules (ADR-014 step 15).
     pub(crate) running: super::credit::running::Running,
+    /// Backlog limits for client requests (ADR-017).
+    pub(crate) admission: super::Admission,
 }
 
 pub(crate) fn shard_index(partition: &Partition, shards: u16) -> Option<usize> {
@@ -61,7 +65,12 @@ impl Router {
     pub(crate) fn send(&self, index: usize, request: Request) {
         match self.shards.get(index) {
             Some(shard) => {
+                // Counted before the shard can take it, so its taking never
+                // comes first.
+                let weight = request.weight();
+                shard.backlog.fetch_add(weight, Ordering::Relaxed);
                 if let Err(returned) = shard.requests.send(request) {
+                    shard.backlog.fetch_sub(weight, Ordering::Relaxed);
                     refuse(returned.0);
                 }
             }

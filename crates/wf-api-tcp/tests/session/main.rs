@@ -9,7 +9,7 @@ use std::net::{SocketAddr, TcpStream};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
-use wf_api_tcp::session::{ServerInfo, serve};
+use wf_api_tcp::session::{InFlight, ServerInfo, serve};
 use wf_application::commands::flow::effect::denial::Denial;
 use wf_application::commands::flow::{FlowCommand, FlowService, Term};
 use wf_application::commands::queue::{
@@ -18,6 +18,7 @@ use wf_application::commands::queue::{
 };
 use wf_domain::value::DomainError;
 
+mod backpressure;
 mod clock;
 mod compact_create;
 mod flow;
@@ -29,7 +30,9 @@ mod typed;
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
 /// Ids starting with `dup` already exist, `stale` completions have a stale
-/// lease, and ids starting with `slow` reply after 150 ms from another thread.
+/// lease, ids starting with `slow` reply after 150 ms from another thread,
+/// and creates of ids or claims by workers starting with `busy` are refused
+/// as busy.
 /// A claim by worker `probe` echoes its options as the run state; a claim by
 /// worker `park` keeps its cancellation in [`PARKED`] and never replies.
 struct Scripted;
@@ -47,6 +50,13 @@ fn outcome(id: &[u8], refused: &[u8], error: DomainError) -> ItemOutcome {
 
 impl QueueService for Scripted {
     fn create(&self, request: CreateFlows, reply: Reply<Vec<ItemOutcome>>) {
+        if request
+            .flows
+            .iter()
+            .any(|flow| flow.id.starts_with(b"busy"))
+        {
+            return reply(Err(ServiceError::Busy));
+        }
         let slow = request
             .flows
             .iter()
@@ -67,6 +77,9 @@ impl QueueService for Scripted {
     }
 
     fn claim(&self, request: ClaimFlows, reply: Reply<Vec<ClaimedFlow>>) {
+        if request.worker.starts_with(b"busy") {
+            return reply(Err(ServiceError::Busy));
+        }
         if request.worker == b"park" {
             if let Some(cancellation) = request.cancellation {
                 PARKED
@@ -140,6 +153,9 @@ impl FlowService for Scripted {
             FlowCommand::Signal(signal) if signal.id == b"clock" => reply(Ok(signal
                 .now_ms
                 .map_or(Term::Nil, |now| Term::Int(i64::try_from(now).unwrap_or(-1))))),
+            FlowCommand::Create(create) if create.id.starts_with(b"busy") => {
+                reply(Err(ServiceError::Busy));
+            }
             FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
                 ServiceError::rejected("ERR flow already exists".to_owned()),
             )),
@@ -218,15 +234,15 @@ struct Running {
 }
 
 fn start() -> TestResult<Running> {
-    serving(false)
+    serving(false, InFlight::default())
 }
 
 /// A listener that hands clients' `now_ms` to the service.
 fn start_trusting_client_clocks() -> TestResult<Running> {
-    serving(true)
+    serving(true, InFlight::default())
 }
 
-fn serving(client_clock: bool) -> TestResult<Running> {
+fn serving(client_clock: bool, in_flight: InFlight) -> TestResult<Running> {
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
         .enable_io()
@@ -239,6 +255,7 @@ fn serving(client_clock: bool) -> TestResult<Running> {
         port: address.port(),
         shard_count: 4,
         client_clock,
+        in_flight,
     };
     runtime.spawn(serve(listener, Arc::new(Scripted), Arc::new(info)));
     Ok(Running {

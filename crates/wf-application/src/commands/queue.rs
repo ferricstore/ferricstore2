@@ -196,6 +196,9 @@ pub enum ServiceError {
     Unavailable,
     /// Too many claims are already waiting for Flows.
     TooManyWaiting,
+    /// The shards the request needs have too much work waiting (ADR-017);
+    /// nothing of the request ran, so it is safe to retry.
+    Busy,
     /// Refused with the Elixir server's reply text.
     Rejected(String),
     /// A malformed request, which Elixir answers with status `bad_request`.
@@ -229,6 +232,7 @@ impl fmt::Display for ServiceError {
             Self::TooManyWaiting => {
                 formatter.write_str("ERR too many blocked FLOW.CLAIM_DUE requests are waiting")
             }
+            Self::Busy => formatter.write_str("BUSY flow shards are overloaded, retry later"),
             Self::Rejected(text) | Self::BadRequest(text) => formatter.write_str(text),
             Self::Query(failure) => formatter.write_str(failure.message()),
             Self::Governance(denial) => {

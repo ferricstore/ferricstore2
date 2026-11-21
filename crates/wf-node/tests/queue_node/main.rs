@@ -16,6 +16,7 @@ use wf_application::commands::queue::{
 use wf_node::composition::{QueueNode, QueueNodeConfig};
 
 mod audit;
+mod backpressure;
 mod blocking;
 mod cold;
 mod crash;

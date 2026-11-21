@@ -25,6 +25,7 @@ use crate::supervision::shard::state::BatchItems;
 use crate::supervision::shard::state::CreateItems;
 
 use super::QueueNode;
+use super::admission::{Class, occupied};
 use super::gather::ItemGather;
 use super::router::Router;
 use super::{cleanup, governance, info, policy};
@@ -85,6 +86,9 @@ impl FlowService for QueueNode {
                 let partition = Partition::for_new_flow(&id, put.partition_key.as_deref());
                 put.shared_ref = Some(keys::value_ref(&partition, 's', &id, 1));
                 let index = router.route(&partition);
+                if let Err(error) = router.admit([index], Class::Other) {
+                    return reply(Err(error));
+                }
                 return router.send(
                     index,
                     Request::Flow {
@@ -101,6 +105,9 @@ impl FlowService for QueueNode {
         };
         let partition = Partition::for_new_flow(id, explicit);
         let index = router.route(&partition);
+        if let Err(error) = router.admit([index], Class::of(&command)) {
+            return reply(Err(error));
+        }
         router.send(
             index,
             Request::Flow {
@@ -146,6 +153,9 @@ fn batch_create(router: &Router, mut batch: CreateMany, reply: Reply<Term>) {
             items.push((position, create, partition));
         }
     }
+    if let Err(error) = router.admit(occupied(&per_shard), Class::New) {
+        return reply(Err(error));
+    }
     let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
     let atomic = !batch.independent;
     let gather = Arc::new(ItemGather::new(
@@ -182,6 +192,9 @@ fn batch_mutation(router: &Router, mut batch: ManyMutation, reply: Reply<Term>) 
         if let Some(items) = per_shard.get_mut(router.route(&partition)) {
             items.push((position, mutation, partition));
         }
+    }
+    if let Err(error) = router.admit(occupied(&per_shard), Class::Other) {
+        return reply(Err(error));
     }
     let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
     let atomic = batch.atomic();
@@ -245,6 +258,9 @@ fn value_read(router: &Router, read: ValueMget, reply: Reply<Term>) {
             None => misses.push((position, Term::Nil)),
         }
     }
+    if let Err(error) = router.admit(occupied(&per_shard), Class::Other) {
+        return reply(Err(error));
+    }
     let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
     let gather = Arc::new(ItemGather::new(
         total,
@@ -293,6 +309,9 @@ fn run_steps(router: &Router, mut spec: RunSteps, reply: Reply<Term>) {
         if let Some(items) = per_shard.get_mut(router.route(&partition)) {
             items.push((position, id, partition));
         }
+    }
+    if let Err(error) = router.admit(occupied(&per_shard), Class::New) {
+        return reply(Err(error));
     }
     let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
     let gather = Arc::new(ItemGather::new(

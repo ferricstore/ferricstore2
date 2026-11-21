@@ -70,3 +70,11 @@ fn refusals_carry_the_elixir_errors_per_item() -> TestResult {
     std::fs::remove_dir_all(directory)?;
     Ok(())
 }
+
+#[test]
+fn a_node_opens_in_a_data_directory_that_does_not_exist_yet() -> TestResult {
+    let path = directory("lifecycle-fresh")?.join("data");
+    let node = open(&path, 2)?;
+    assert!(create(&node, &["f1"])?.iter().all(Result::is_ok));
+    Ok(())
+}

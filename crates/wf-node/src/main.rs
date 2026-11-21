@@ -3,8 +3,10 @@
 //!
 //! Usage: `ferricstore2 --data-dir PATH [--host 127.0.0.1] [--port 6388]
 //! [--shards 16] [--threads N] [--retention-ms 604800000]
-//! [--client-clock false]`. With `--client-clock true` clients' `now_ms`
-//! decides due times and leases (tests and parity probes only; ADR-015). The data
+//! [--client-clock false] [--max-new-backlog 16384] [--max-backlog 65536]`.
+//! With `--client-clock true` clients' `now_ms` decides due times and leases
+//! (tests and parity probes only; ADR-015). The backlog flags are the
+//! per-shard admission limits in items (ADR-017). The data
 //! directory holds `log/` and `snapshots/`. Port 0 picks a free port. Once
 //! listening it prints `READY port=<port> shards=<n>`.
 
@@ -15,8 +17,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
 
-use wf_api_tcp::session::{ServerInfo, serve};
-use wf_node::composition::{QueueNode, QueueNodeConfig};
+use wf_api_tcp::session::{InFlight, ServerInfo, serve};
+use wf_node::composition::{Admission, QueueNode, QueueNodeConfig};
 
 /// The node allocates on every request; mimalloc's per-thread free lists
 /// cost far less than the system allocator (ADR-015).
@@ -31,6 +33,7 @@ struct Options {
     threads: Option<usize>,
     retention_ms: u64,
     client_clock: bool,
+    admission: Admission,
 }
 
 fn parse(arguments: &[String]) -> Result<Options, String> {
@@ -42,6 +45,7 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
         threads: None,
         retention_ms: QueueNodeConfig::default().retention_ms,
         client_clock: false,
+        admission: Admission::default(),
     };
     let mut pairs = arguments.iter();
     while let Some(flag) = pairs.next() {
@@ -77,6 +81,14 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
                     _ => return Err("--client-clock needs true or false".into()),
                 };
             }
+            "--max-new-backlog" => {
+                options.admission.new_work = usize::try_from(number()?)
+                    .map_err(|_| "--max-new-backlog is too large".to_owned())?;
+            }
+            "--max-backlog" => {
+                options.admission.other = usize::try_from(number()?)
+                    .map_err(|_| "--max-backlog is too large".to_owned())?;
+            }
             other => return Err(format!("unknown flag {other}")),
         }
     }
@@ -90,6 +102,7 @@ fn run(options: Options) -> Result<(), String> {
     let config = QueueNodeConfig {
         shards: options.shards,
         retention_ms: options.retention_ms,
+        admission: options.admission,
         ..QueueNodeConfig::default()
     };
     let node = QueueNode::open(&options.data_dir, config).map_err(|error| error.to_string())?;
@@ -116,6 +129,7 @@ fn run(options: Options) -> Result<(), String> {
             port,
             shard_count: options.shards,
             client_clock: options.client_clock,
+            in_flight: InFlight::default(),
         };
         let mut stdout = std::io::stdout();
         write!(stdout, "READY port={port} shards={}", options.shards)

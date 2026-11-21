@@ -1,7 +1,9 @@
 //! The group log's single writer thread.
 //!
-//! Appenders queue items under one lock and wake the writer. The writer takes
-//! everything queued and handles it in order: consecutive batches are written
+//! Appenders queue items under one lock and wake the writer; while the queued
+//! records hold the byte limit or more, an appender waits for the writer to
+//! take them (ADR-017). The writer takes everything queued and handles it in
+//! order: consecutive batches are written
 //! with one write and one sync, a rotation starts a new segment after the
 //! earlier batches are durable, and a removal deletes segments before a
 //! checkpoint. After each step it publishes the last sequence handled; waiters
@@ -24,8 +26,22 @@ pub(super) enum Item {
     RemoveBefore(u64),
 }
 
+impl Item {
+    /// Record bytes it adds to the queue, with each record's length prefix.
+    fn bytes(&self) -> usize {
+        match self {
+            Self::Batch(records) => records.iter().fold(0_usize, |total, record| {
+                total.saturating_add(record.len()).saturating_add(4)
+            }),
+            Self::Rotate | Self::RemoveBefore(_) => 0,
+        }
+    }
+}
+
 struct Queue {
     items: Vec<(u64, Item)>,
+    /// Record bytes of the queued items.
+    bytes: usize,
     last: u64,
     closing: bool,
 }
@@ -41,6 +57,9 @@ struct Durable {
 pub(super) struct Shared {
     queue: Mutex<Queue>,
     queued: Condvar,
+    /// Signalled when the writer takes the queue, the log closes or fails.
+    drained: Condvar,
+    max_queued_bytes: usize,
     durable: Mutex<Durable>,
     durable_changed: Condvar,
     syncs: AtomicU64,
@@ -55,14 +74,17 @@ fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 }
 
 impl Shared {
-    pub(super) fn new(segment: u64) -> Self {
+    pub(super) fn new(segment: u64, max_queued_bytes: usize) -> Self {
         Self {
             queue: Mutex::new(Queue {
                 items: Vec::new(),
+                bytes: 0,
                 last: 0,
                 closing: false,
             }),
             queued: Condvar::new(),
+            drained: Condvar::new(),
+            max_queued_bytes,
             durable: Mutex::new(Durable {
                 through: 0,
                 failed: None,
@@ -75,13 +97,24 @@ impl Shared {
     }
 
     pub(super) fn enqueue(&self, item: Item) -> Result<u64, GroupLogError> {
+        let size = item.bytes();
         let mut queue = lock(&self.queue);
-        if queue.closing {
-            return Err(GroupLogError::Closed);
+        loop {
+            if queue.closing {
+                return Err(GroupLogError::Closed);
+            }
+            if let Some(failure) = lock(&self.durable).failed {
+                return Err(failure);
+            }
+            if size == 0 || queue.bytes < self.max_queued_bytes.max(1) {
+                break;
+            }
+            queue = self
+                .drained
+                .wait(queue)
+                .unwrap_or_else(PoisonError::into_inner);
         }
-        if let Some(failure) = lock(&self.durable).failed {
-            return Err(failure);
-        }
+        queue.bytes = queue.bytes.saturating_add(size);
         let sequence = queue
             .last
             .checked_add(1)
@@ -125,6 +158,7 @@ impl Shared {
     pub(super) fn close(&self) {
         lock(&self.queue).closing = true;
         self.queued.notify_one();
+        self.drained.notify_all();
     }
 
     pub(super) fn syncs(&self) -> u64 {
@@ -144,7 +178,11 @@ impl Shared {
                 .wait(queue)
                 .unwrap_or_else(PoisonError::into_inner);
         }
-        (std::mem::take(&mut queue.items), queue.closing)
+        queue.bytes = 0;
+        let taken = (std::mem::take(&mut queue.items), queue.closing);
+        drop(queue);
+        self.drained.notify_all();
+        taken
     }
 
     fn publish(&self, through: u64, outcome: Option<Result<u64, GroupLogError>>) {
@@ -160,6 +198,10 @@ impl Shared {
     fn fail(&self, failure: GroupLogError) {
         lock(&self.durable).failed = Some(failure);
         self.durable_changed.notify_all();
+        // Taking the queue lock orders this after any appender's check, so a
+        // waiting appender sees the failure.
+        drop(lock(&self.queue));
+        self.drained.notify_all();
     }
 }
 

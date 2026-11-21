@@ -14,7 +14,7 @@ pub(crate) mod image;
 pub(crate) mod state;
 
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -138,6 +138,23 @@ pub(crate) enum Request {
     },
 }
 
+impl Request {
+    /// The items it carries, at least one: its weight in the shard's
+    /// backlog (ADR-017).
+    pub(crate) fn weight(&self) -> usize {
+        let items = match self {
+            Self::Create { items, .. } => items.len(),
+            Self::CreateBatch { items, .. } => items.len(),
+            Self::Complete { items, .. } => items.len(),
+            Self::FlowBatch { items, .. } => items.len(),
+            Self::RunSteps { items, .. } => items.len(),
+            Self::ValueRead { refs, .. } => refs.len(),
+            _ => 1,
+        };
+        items.max(1)
+    }
+}
+
 /// The thread's connections to the rest of the node.
 pub(crate) struct Links {
     /// This shard's index, named in its snapshot markers.
@@ -150,6 +167,8 @@ pub(crate) struct Links {
     pub(crate) max_append_bytes: usize,
     /// Delivers the credits of Flows that left `running` (ADR-014 step 15).
     pub(crate) release: Releases,
+    /// Items sent to this shard and not yet taken (ADR-017).
+    pub(crate) backlog: Arc<AtomicUsize>,
 }
 
 /// Delivers limit credits for release.
@@ -244,6 +263,12 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
                 Ok(request) => round.push(request),
                 Err(_) => break,
             }
+        }
+        let taken = round.iter().fold(0_usize, |total, request| {
+            total.saturating_add(request.weight())
+        });
+        if taken > 0 {
+            links.backlog.fetch_sub(taken, Ordering::Relaxed);
         }
         now = committed_now(now);
         let mut logged = Vec::new();

@@ -17,6 +17,7 @@ use crate::supervision::shard::state::Peeked;
 use crate::supervision::shard::state::credit::CreditPool;
 use crate::supervision::waiters::{Parked, Wake};
 
+use super::admission::Class;
 use super::router::{Router, split};
 
 /// Most claim rounds in one attempt.
@@ -60,6 +61,11 @@ pub(crate) fn start(
         .partitions
         .as_ref()
         .map(|names| names.iter().map(|name| Partition::parse(name)).collect());
+    let holders = router.holders(&request, partitions.as_deref());
+    let shards = holders.iter().map(|(index, _)| *index);
+    if let Err(error) = router.admit(shards, Class::Other) {
+        return reply(Err(error));
+    }
     let blocking = match request.block_ms {
         None => Blocking::No,
         Some(0) => Blocking::Forever,

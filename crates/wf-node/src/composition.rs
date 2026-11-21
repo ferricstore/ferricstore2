@@ -7,6 +7,7 @@
 //! Flow to the shard that owns its partition; claims run in the private
 //! `claim` module.
 
+mod admission;
 mod claim;
 mod cleanup;
 mod cold;
@@ -17,30 +18,29 @@ mod gather;
 mod governance;
 mod info;
 mod policy;
+mod queue;
 mod replay;
 mod router;
 mod schedule;
 mod snapshot;
 
 use std::path::Path;
-use std::sync::atomic::AtomicU64;
+use std::sync::atomic::{AtomicU64, AtomicUsize};
 use std::sync::{Arc, OnceLock, mpsc};
 use std::thread::JoinHandle;
 use std::time::Duration;
 
-use wf_application::commands::queue::{
-    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, Partition, QueueService,
-    Reply, SLOTS, ServiceError,
-};
+use wf_application::commands::queue::{Partition, SLOTS};
 use wf_domain::retention::ResolvedRetention;
-use wf_storage::log::{GroupLog, GroupLogLimits};
+use wf_storage::log::{GroupLog, GroupLogLimits, SegmentStorage};
 use wf_storage::snapshot::files::SnapshotFiles;
 
-use crate::supervision::shard::{self, Links, Request};
+use crate::supervision::shard::state::ShardState;
+use crate::supervision::shard::{self, Links};
 use crate::supervision::waiters::Waiters;
 use crate::supervision::{self, completer, scheduler, snapshots};
+pub use admission::Admission;
 pub use error::NodeError;
-use gather::ItemGather;
 use replay::replay;
 use router::{Router, ShardLink};
 use snapshot::Snapshots;
@@ -67,6 +67,8 @@ pub struct QueueNodeConfig {
     /// at wall time; `None` fires them only on `FLOW.SCHEDULE.FIRE_DUE`
     /// (ADR-014 step 13).
     pub schedule_poll: Option<Duration>,
+    /// Per-shard backlog limits for client requests (ADR-017).
+    pub admission: Admission,
 }
 
 impl Default for QueueNodeConfig {
@@ -80,6 +82,7 @@ impl Default for QueueNodeConfig {
             retention_ms: ResolvedRetention::default().ttl_ms,
             snapshot_segments: 2,
             schedule_poll: Some(SCHEDULE_POLL),
+            admission: Admission::default(),
         }
     }
 }
@@ -147,6 +150,26 @@ impl QueueNode {
     /// or decode, a logged change that does not replay, a missing snapshot
     /// marker and a thread that does not start.
     pub fn open(directory: &Path, config: QueueNodeConfig) -> Result<Self, NodeError> {
+        Self::opened(directory, config, None)
+    }
+
+    /// Opens the node as [`Self::open`] does, with its log kept in `log`.
+    ///
+    /// # Errors
+    /// As [`Self::open`].
+    pub fn open_with_log(
+        directory: &Path,
+        config: QueueNodeConfig,
+        log: Arc<dyn SegmentStorage>,
+    ) -> Result<Self, NodeError> {
+        Self::opened(directory, config, Some(log))
+    }
+
+    fn opened(
+        directory: &Path,
+        config: QueueNodeConfig,
+        log: Option<Arc<dyn SegmentStorage>>,
+    ) -> Result<Self, NodeError> {
         if config.shards == 0 || config.shards > SLOTS {
             return Err(NodeError::InvalidShards);
         }
@@ -156,7 +179,11 @@ impl QueueNode {
             Some((id, body)) => Some(snapshot::load(&mut states, id, &body, config.shards)?),
             None => None,
         };
-        let (log, recovered) = GroupLog::open(&directory.join("log"), config.log)?;
+        // The snapshot files above created the data directory.
+        let (log, recovered) = match log {
+            Some(storage) => GroupLog::open_with(storage, config.log)?,
+            None => GroupLog::open(&directory.join("log"), config.log)?,
+        };
         let log = Arc::new(log);
         let newest_marker = replay(&mut states, &recovered.records, config.shards, cut.as_mut())?;
         cold::tidy(&cold, &mut states)?;
@@ -190,41 +217,28 @@ impl QueueNode {
             completer::run(&completer_log, &completion_receiver);
         })
         .ok_or(NodeError::Thread)?;
-        let mut links = Vec::with_capacity(states.len());
-        let mut threads = Vec::with_capacity(states.len());
         let release_router = Arc::new(OnceLock::new());
         let running = credit::running::opened(states.first());
-        for (index, state) in states.into_iter().enumerate() {
-            let (sender, receiver) = mpsc::channel();
-            let ready = Arc::new(AtomicU64::new(state.ready()));
-            let leased = Arc::new(AtomicU64::new(state.leased()));
-            let shard_links = Links {
-                index: u16::try_from(index).map_err(|_| NodeError::InvalidShards)?,
+        let (links, threads) = start_shards(
+            states,
+            &Links {
+                index: 0,
                 log: Arc::clone(&log),
-                completions: completion_sender.clone(),
-                ready: Arc::clone(&ready),
-                leased: Arc::clone(&leased),
+                completions: completion_sender,
+                ready: Arc::new(AtomicU64::new(0)),
+                leased: Arc::new(AtomicU64::new(0)),
                 waiters: waiters.clone(),
                 max_append_bytes: config.log.max_block_bytes.checked_div(2).unwrap_or(0),
                 release: credit::releaser(Arc::clone(&release_router)),
-            };
-            threads.push(
-                supervision::spawn(format!("wf-shard-{index}"), move || {
-                    shard::run(state, &receiver, &shard_links);
-                })
-                .ok_or(NodeError::Thread)?,
-            );
-            links.push(ShardLink {
-                requests: sender,
-                ready,
-                leased,
-            });
-        }
+                backlog: Arc::new(AtomicUsize::new(0)),
+            },
+        )?;
         let router = Router {
             shards: links,
             shard_count: config.shards,
             waiters: waiters.clone(),
             running,
+            admission: config.admission,
         };
         let router = Arc::new(router);
         let _set = release_router.set(Arc::downgrade(&router));
@@ -271,94 +285,44 @@ impl QueueNode {
     }
 }
 
-impl QueueService for QueueNode {
-    fn create(&self, request: CreateFlows, reply: Reply<Vec<ItemOutcome>>) {
-        let Some(router) = self.router.as_ref() else {
-            return reply(Err(ServiceError::Unavailable));
+/// Starts one thread per shard; each gets `shared`'s log, completions,
+/// waiters, append size and releases, and its own index and counters.
+fn start_shards(
+    states: Vec<ShardState>,
+    shared: &Links,
+) -> Result<(Vec<ShardLink>, Vec<JoinHandle<()>>), NodeError> {
+    let mut links = Vec::with_capacity(states.len());
+    let mut threads = Vec::with_capacity(states.len());
+    for (index, state) in states.into_iter().enumerate() {
+        let (sender, receiver) = mpsc::channel();
+        let ready = Arc::new(AtomicU64::new(state.ready()));
+        let leased = Arc::new(AtomicU64::new(state.leased()));
+        let backlog = Arc::new(AtomicUsize::new(0));
+        let shard_links = Links {
+            index: u16::try_from(index).map_err(|_| NodeError::InvalidShards)?,
+            log: Arc::clone(&shared.log),
+            completions: shared.completions.clone(),
+            ready: Arc::clone(&ready),
+            leased: Arc::clone(&leased),
+            waiters: shared.waiters.clone(),
+            max_append_bytes: shared.max_append_bytes,
+            release: Arc::clone(&shared.release),
+            backlog: Arc::clone(&backlog),
         };
-        let CreateFlows {
-            flow_type,
-            state,
-            run_at_ms,
-            priority,
-            flows,
-        } = request;
-        let total = flows.len();
-        let per_shard = Self::per_shard(
-            router,
-            flows
-                .into_iter()
-                .map(|flow| (flow.id.clone(), flow.partition.clone(), flow)),
+        threads.push(
+            supervision::spawn(format!("wf-shard-{index}"), move || {
+                shard::run(state, &receiver, &shard_links);
+            })
+            .ok_or(NodeError::Thread)?,
         );
-        let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
-        if parts == 0 {
-            reply(Ok(Vec::new()));
-            return;
-        }
-        let gather = Arc::new(ItemGather::new(total, parts, reply));
-        for (index, items) in per_shard
-            .into_iter()
-            .enumerate()
-            .filter(|(_, items)| !items.is_empty())
-        {
-            let part = Arc::clone(&gather);
-            router.send(
-                index,
-                Request::Create {
-                    flow_type: flow_type.clone(),
-                    state: state.clone(),
-                    run_at_ms,
-                    priority,
-                    items,
-                    done: Box::new(move |result| part.part(result)),
-                },
-            );
-        }
+        links.push(ShardLink {
+            requests: sender,
+            ready,
+            leased,
+            backlog,
+        });
     }
-
-    fn claim(&self, request: ClaimFlows, reply: Reply<Vec<ClaimedFlow>>) {
-        match self.router.as_ref() {
-            Some(router) => self.governed_claim(router, request, reply),
-            None => reply(Err(ServiceError::Unavailable)),
-        }
-    }
-
-    fn complete(&self, completions: Vec<CompleteFlow>, reply: Reply<Vec<ItemOutcome>>) {
-        let Some(router) = self.router.as_ref() else {
-            return reply(Err(ServiceError::Unavailable));
-        };
-        let total = completions.len();
-        let per_shard = Self::per_shard(
-            router,
-            completions.into_iter().map(|completion| {
-                (
-                    completion.id.clone(),
-                    completion.partition.clone(),
-                    completion,
-                )
-            }),
-        );
-        let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
-        if parts == 0 {
-            reply(Ok(Vec::new()));
-            return;
-        }
-        let gather = Arc::new(ItemGather::new(total, parts, reply));
-        for (index, items) in per_shard
-            .into_iter()
-            .enumerate()
-            .filter(|(_, items)| !items.is_empty())
-        {
-            let part = Arc::clone(&gather);
-            router.send(
-                index,
-                Request::Complete {
-                    items,
-                    done: Box::new(move |result| part.part(result)),
-                },
-            );
-        }
-    }
+    Ok((links, threads))
 }
 
 impl Drop for QueueNode {

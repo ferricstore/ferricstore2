@@ -41,6 +41,9 @@ pub struct GroupLogLimits {
     /// Segment size that starts a new segment; one write is never split, so a
     /// segment can exceed it by one write.
     pub max_segment_bytes: u64,
+    /// Record bytes queued for the writer at which appenders wait for it to
+    /// take them (ADR-017); one batch may take the queue past it.
+    pub max_queued_bytes: usize,
 }
 
 impl Default for GroupLogLimits {
@@ -49,6 +52,7 @@ impl Default for GroupLogLimits {
             max_record_bytes: 16 * 1024 * 1024,
             max_block_bytes: 64 * 1024 * 1024,
             max_segment_bytes: 128 * 1024 * 1024,
+            max_queued_bytes: 64 * 1024 * 1024,
         }
     }
 }
@@ -173,7 +177,7 @@ impl GroupLog {
             max_block_bytes: limits.max_block_bytes,
             max_segment_bytes: limits.max_segment_bytes,
         };
-        let shared = Arc::new(Shared::new(segment));
+        let shared = Arc::new(Shared::new(segment, limits.max_queued_bytes));
         let handle = writer::spawn(Arc::clone(&shared), writer)?;
         let log = Self {
             shared,

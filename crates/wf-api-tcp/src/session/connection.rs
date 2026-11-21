@@ -4,23 +4,36 @@
 //! the writer in any order; it holds each one until the replies before it on
 //! the same lane have gone, then writes everything ready in one call. A bad
 //! frame header closes the connection, since the stream cannot be resynced.
+//! Each request holds permits for itself and its body's bytes until its
+//! reply is written; with none left, the reader waits (ADR-017).
 
 use std::collections::{BTreeMap, HashMap};
+use std::sync::Arc;
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio::net::tcp::OwnedWriteHalf;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
+use tokio::sync::{OwnedSemaphorePermit, Semaphore};
 
 use crate::frame::{FLAG_NO_REPLY, HEADER_LEN, Header};
 
+use super::InFlight;
 use super::dispatch::{self, Context, Negotiated, Next};
+
+/// A request's share of its connection's in-flight limits, given back when
+/// its reply is written or dropped.
+pub(super) struct Permits {
+    _request: OwnedSemaphorePermit,
+    _bytes: OwnedSemaphorePermit,
+}
 
 /// A reply frame, or an empty frame for a request that wants no reply.
 pub(super) struct Outgoing {
     lane: u32,
     order: u64,
     frame: Vec<u8>,
+    permits: Permits,
 }
 
 /// Where one request's reply goes.
@@ -28,6 +41,7 @@ pub(super) struct ReplyTo {
     outgoing: UnboundedSender<Outgoing>,
     header: Header,
     order: u64,
+    permits: Permits,
 }
 
 impl ReplyTo {
@@ -55,6 +69,7 @@ impl ReplyTo {
             lane: self.header.lane,
             order: self.order,
             frame,
+            permits: self.permits,
         });
     }
 }
@@ -62,12 +77,13 @@ impl ReplyTo {
 #[derive(Default)]
 struct Lane {
     next: u64,
-    held: BTreeMap<u64, Vec<u8>>,
+    held: BTreeMap<u64, (Vec<u8>, Permits)>,
 }
 
 async fn write_loop(mut writer: OwnedWriteHalf, mut replies: UnboundedReceiver<Outgoing>) {
     let mut lanes: HashMap<u32, Lane> = HashMap::new();
     let mut buffer = Vec::new();
+    let mut written: Vec<Permits> = Vec::new();
     while let Some(first) = replies.recv().await {
         let mut ready = vec![first];
         while let Ok(more) = replies.try_recv() {
@@ -75,9 +91,11 @@ async fn write_loop(mut writer: OwnedWriteHalf, mut replies: UnboundedReceiver<O
         }
         for outgoing in ready {
             let lane = lanes.entry(outgoing.lane).or_default();
-            lane.held.insert(outgoing.order, outgoing.frame);
-            while let Some(frame) = lane.held.remove(&lane.next) {
+            lane.held
+                .insert(outgoing.order, (outgoing.frame, outgoing.permits));
+            while let Some((frame, permits)) = lane.held.remove(&lane.next) {
                 buffer.extend_from_slice(&frame);
+                written.push(permits);
                 lane.next = lane.next.saturating_add(1);
             }
         }
@@ -87,6 +105,44 @@ async fn write_loop(mut writer: OwnedWriteHalf, mut replies: UnboundedReceiver<O
             }
             buffer.clear();
         }
+        // The replies left: their requests' permits go back to the reader.
+        written.clear();
+    }
+}
+
+/// The connection's in-flight limits, as permits.
+struct Limits {
+    requests: Arc<Semaphore>,
+    bytes: Arc<Semaphore>,
+    max_bytes: u32,
+}
+
+impl Limits {
+    fn new(limit: InFlight) -> Self {
+        let permits =
+            |count: u32| Arc::new(Semaphore::new(usize::try_from(count.max(1)).unwrap_or(1)));
+        Self {
+            requests: permits(limit.requests),
+            bytes: permits(limit.bytes),
+            max_bytes: limit.bytes.max(1),
+        }
+    }
+
+    /// Waits for room for one request with a body of `length` bytes; a body
+    /// over the byte limit waits for all of it.
+    async fn admit(&self, length: usize) -> Option<Permits> {
+        let request = Arc::clone(&self.requests).acquire_owned().await.ok()?;
+        let cost = u32::try_from(length)
+            .unwrap_or(u32::MAX)
+            .clamp(1, self.max_bytes);
+        let bytes = Arc::clone(&self.bytes)
+            .acquire_many_owned(cost)
+            .await
+            .ok()?;
+        Some(Permits {
+            _request: request,
+            _bytes: bytes,
+        })
     }
 }
 
@@ -98,6 +154,7 @@ pub(super) async fn run(stream: TcpStream, context: Context) {
     let writer = tokio::spawn(write_loop(writer, replies));
     let mut orders: HashMap<u32, u64> = HashMap::new();
     let mut negotiated = Negotiated::default();
+    let limits = Limits::new(context.info.in_flight);
     loop {
         let mut header = [0_u8; HEADER_LEN];
         if reader.read_exact(&mut header).await.is_err() {
@@ -107,6 +164,9 @@ pub(super) async fn run(stream: TcpStream, context: Context) {
             break;
         };
         let Ok(length) = usize::try_from(header.body_len) else {
+            break;
+        };
+        let Some(permits) = limits.admit(length).await else {
             break;
         };
         let mut body = vec![0_u8; length];
@@ -120,6 +180,7 @@ pub(super) async fn run(stream: TcpStream, context: Context) {
             outgoing: outgoing.clone(),
             header,
             order,
+            permits,
         };
         if dispatch::handle(&context, &mut negotiated, &header, &body, reply) == Next::Quit {
             break;

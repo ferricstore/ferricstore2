@@ -31,15 +31,15 @@ pub(super) fn claim(context: &Context, name: &str, body: &[u8], reply: ReplyTo) 
         parsed.request,
         Box::new(move |result| match result {
             Ok(claimed) => send(reply, &claim::reply(shape, claimed)),
-            // A governed claim's refusal is a map (ADR-014 step 15).
-            Err(error @ ServiceError::Governance(_)) => failed(reply, &error),
-            Err(error) => refuse(reply, &error.to_string()),
+            // A governed claim's refusal is a map (ADR-014 step 15), and
+            // an overload is the busy reply (ADR-017).
+            Err(error) => failed(reply, &error),
         }),
     );
 }
 
 /// Sends a service error with its status and map.
-fn failed(reply: ReplyTo, error: &ServiceError) {
+pub(super) fn failed(reply: ReplyTo, error: &ServiceError) {
     match response::service_error(error) {
         Ok(body) => reply.send(0, &body),
         Err(_) => refuse(reply, "ERR reply exceeds the frame limit"),

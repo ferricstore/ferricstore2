@@ -43,7 +43,7 @@ fn batch_reply(
 ) {
     let outcomes = match result {
         Ok(outcomes) => outcomes,
-        Err(error) => return refuse(reply, &error.to_string()),
+        Err(error) => return super::generic::failed(reply, &error),
     };
     if outcomes.iter().all(Result::is_ok) {
         let (flags, body) = if single_ok {
@@ -144,7 +144,7 @@ fn claim_reply(
 ) {
     let flows = match result {
         Ok(flows) => flows,
-        Err(error) => return refuse(reply, &error.to_string()),
+        Err(error) => return super::generic::failed(reply, &error),
     };
     let jobs: Vec<ClaimedJob<'_>> = flows
         .iter()

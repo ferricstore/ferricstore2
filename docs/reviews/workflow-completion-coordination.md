@@ -66025,3 +66025,42 @@ refused. The other SDK suite failures are KV, admin and topology commands
 outside the Flow surface (opcodes 0x0102-0x0107, 0x0004 `CLIENT.SETNAME`,
 `COMMAND`, `ECHO`, `XADD`, `ZREVRANGE`), and the LangChain agent Flows fail
 inside their KV checkpointer.
+
+### ADR-017 Backpressure
+
+New artifacts (solo design review): `GroupLogLimits::max_queued_bytes` and
+the writer's `drained` wait; `wf_node::composition::Admission`,
+`composition::admission` (`Class`, `Router::admit`, `occupied`), the shard
+backlog counters (`ShardLink::backlog`, `Links::backlog`,
+`Request::weight`), `QueueNode::open_with_log`, `composition::queue` (the
+`QueueService` impl, moved out of `composition.rs` for the line limit);
+`ServiceError::Busy`, `response::STATUS_BUSY`; `session::InFlight` and the
+connection's permits.
+
+Decisions: see ADR-017. Admission checks every shard of a request before
+any part is sent, so a busy refusal is safe to retry; requests that start
+Flows are refused at a lower limit than others; the node's own requests are
+never refused. Service errors on the queue fast path and claims now go
+through `response::service_error`, so a busy refusal keeps its status and
+map (other errors encode exactly as before).
+
+Evidence: `group_log::backlog` failed both tests before (the third append
+did not wait) and passes after, including a waiting appender refused by a
+failed sync. `queue_node::backpressure` passes; with admission forced open
+both tests fail, and with the log queue unbounded the slow-log test fails
+(a paced client never fills a shard the log does not hold back), so the
+test needs both the log wait and admission. `session::backpressure` failed
+both tests before (status 1 instead of the busy map; the second lane's reply
+came first) and passes after, for the request and the byte limit.
+`lifecycle::a_node_opens_in_a_data_directory_that_does_not_exist_yet`
+failed on a first version of `open_with_log` that opened the log before the
+snapshot files created the directory (the benchmark's fresh data directory
+showed it) and passes after.
+
+Measured on the SDK queue benchmark (400k Flows, 4 clients, alternating
+runs against 33dbcb2): throughput 266-276k base against 263-284k head (one
+202k head run at load 5.9, not repeated), CPU 8.7-9.1 against 8.7-9.0 ms per
+1k Flows. With `--max-new-backlog 1` and 8 clients every one of 200k Flows
+was created and completed (185k Flows/s), the SDK retrying its busy creates;
+with `--max-new-backlog 0` the SDK raised `OverloadedError` (retry after
+100 ms) after its 30 s retry budget, created nothing, and reads still ran.

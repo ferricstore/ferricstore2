@@ -12,6 +12,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use wf_storage::log::{DirectoryStorage, GroupLog, GroupLogLimits};
 
+mod backlog;
 mod concurrency;
 mod crash;
 mod faults;
