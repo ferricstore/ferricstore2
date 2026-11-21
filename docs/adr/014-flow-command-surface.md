@@ -475,3 +475,27 @@ Each step is one commit with its tests.
   Listings filter by scope or partition and order by scope. The scenario
   matches Elixir apart from the unknown-option wording; the SDK suite
   passes 40 of 60, its native test now failing on limits.
+- Step 15d (direct limits): `FLOW.LIMIT.LEASE`, `SPEND`, `RELEASE`, `GET`
+  and `LIST` (0x024F to 0x0252, 0x0256), as `Governance.CreditLease` and
+  `LimitStore`, stored by scope. A limit is an owner of credits leased per
+  node shard; the shard id is checked against this node's shard count
+  before the command is routed. A lease grants up to the credits asked
+  for from those free (a new owner needs a `limit`), or is refused with
+  `GOVERNANCE_LIMIT_EXCEEDED` after marking credits on other leases for
+  reclaim; a spend moves available credits into use under generated
+  `flr1:<generation>:<batch>:<n>` reservation ids; a release by ids
+  returns those in use, and a lease with nothing left in use starts a new
+  generation. Expired leases are reclaimed on lease, spend and get (and in
+  listings' views); a lower limit drains available credits, lowest shard
+  first. A `config_version` guards limit changes (an older one is ignored,
+  the same one must agree); a numeric `policy_version` is its own
+  configuration version, and the policy fingerprint is SHA-256 of the
+  version's Erlang term, so `policy_version_hash` equals Elixir's.
+  Reservation ids live with their lease instead of Elixir's paged records
+  and cleanup tasks, and batch ids are digests instead of random. Elixir
+  answers a spend on a lease marked for reclaim with `ERR flow limit record
+  is corrupt`; this node applies the credit rules. The scenario matches
+  Elixir apart from the unknown-option wording; the SDK suite passes 40 of
+  60, its native test now failing on the overview. The running-Flow limit
+  that claims spend from (state governance `limits.running`) is the next
+  part.

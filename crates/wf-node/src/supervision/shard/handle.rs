@@ -82,8 +82,13 @@ fn tally(state: &ShardState, now: u64, read: &Read, done: Done<Tally>) -> Finish
 
 /// This shard's part of a governance listing, answered once the round's
 /// writes are durable, as a count read is.
-fn governance_list(state: &ShardState, command: &GovernanceCommand, done: Done<Listed>) -> Finish {
-    let listed = state.governance_select(command);
+fn governance_list(
+    state: &ShardState,
+    now: u64,
+    command: &GovernanceCommand,
+    done: Done<Listed>,
+) -> Finish {
+    let listed = state.governance_select(command, now);
     Box::new(move |durable| done(durable.map(|()| listed)))
 }
 
@@ -159,7 +164,7 @@ pub(super) fn handle(
         } => cleanup(state, (now, now_ms), limit, logged, done),
         Request::Schedule { op, done } => schedule(state, (op, now), logged, done),
         Request::Read { read, done } => tally(state, now, &read, done),
-        Request::GovernanceList { command, done } => governance_list(state, &command, done),
+        Request::GovernanceList { command, done } => governance_list(state, now, &command, done),
         Request::Policy { command, done } => {
             let (result, change) = state.policy_command(command);
             logged.extend(change);

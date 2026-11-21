@@ -43,6 +43,12 @@ impl FlowService for QueueNode {
             FlowCommand::Governance(command) if command.listed().is_some() => {
                 return governance::list(router, *command, reply);
             }
+            FlowCommand::Governance(mut command) => {
+                if let Err(error) = command.admit(router.shards.len()) {
+                    return reply(Err(error));
+                }
+                FlowCommand::Governance(command)
+            }
             FlowCommand::Schedule(command) => return self.schedule(router, *command, reply),
             FlowCommand::QueryIndexes(request) => {
                 let now_ms = SystemTime::now()

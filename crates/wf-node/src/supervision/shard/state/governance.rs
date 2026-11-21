@@ -36,7 +36,7 @@ impl ShardState {
     }
 
     /// This shard's part of a listing.
-    pub(crate) fn governance_select(&self, command: &Command) -> Listed {
+    pub(crate) fn governance_select(&self, command: &Command, wall: u64) -> Listed {
         let Some(kind) = command.listed() else {
             return Vec::new();
         };
@@ -45,6 +45,7 @@ impl ShardState {
                 .range((kind, Vec::new())..)
                 .take_while(|((held, _), _)| *held == kind)
                 .map(|(_, value)| value.as_slice()),
+            wall,
         )
     }
 

@@ -1,6 +1,6 @@
 //! Governance records that are not a Flow's own (ADR-014 step 15):
-//! approvals, circuits and budgets, as `Ferricstore.Flow.Governance` keeps
-//! them.
+//! approvals, circuits, budgets and limits, as `Ferricstore.Flow.Governance`
+//! keeps them.
 //!
 //! Each record lives on the shard that owns its name (an approval's id, a
 //! circuit's scope) as a partition, as Elixir's key carries the name's hash
@@ -14,6 +14,7 @@ use super::term::Term;
 pub mod approval;
 pub mod budget;
 pub mod circuit;
+pub mod limit;
 #[cfg(test)]
 mod tests;
 
@@ -31,6 +32,8 @@ pub enum Kind {
     Circuit,
     /// A budget, by scope.
     Budget,
+    /// A limit, by scope.
+    Limit,
 }
 
 impl Kind {
@@ -41,6 +44,7 @@ impl Kind {
             Self::Approval => 1,
             Self::Circuit => 2,
             Self::Budget => 3,
+            Self::Limit => 4,
         }
     }
 
@@ -51,6 +55,7 @@ impl Kind {
             1 => Some(Self::Approval),
             2 => Some(Self::Circuit),
             3 => Some(Self::Budget),
+            4 => Some(Self::Limit),
             _ => None,
         }
     }
@@ -85,6 +90,10 @@ pub enum Command {
     Budget(budget::Command),
     /// `FLOW.BUDGET.LIST`.
     BudgetList(budget::List),
+    /// A command on one limit.
+    Limit(limit::Command),
+    /// `FLOW.LIMIT.LIST`.
+    LimitList(limit::List),
 }
 
 impl Command {
@@ -95,7 +104,8 @@ impl Command {
             Self::Approval(command) => Some((Kind::Approval, command.id())),
             Self::Circuit(command) => Some((Kind::Circuit, command.scope())),
             Self::Budget(command) => Some((Kind::Budget, command.scope())),
-            Self::ApprovalList(_) | Self::BudgetList(_) => None,
+            Self::Limit(command) => Some((Kind::Limit, &command.scope)),
+            Self::ApprovalList(_) | Self::BudgetList(_) | Self::LimitList(_) => None,
         }
     }
 
@@ -105,7 +115,22 @@ impl Command {
             Self::Approval(command) => command.decide(stored, wall),
             Self::Circuit(command) => command.decide(stored, wall),
             Self::Budget(command) => command.decide(stored, wall),
-            Self::ApprovalList(_) | Self::BudgetList(_) => (Err(FlowError::Unavailable), None),
+            Self::Limit(command) => command.decide(stored, wall),
+            Self::ApprovalList(_) | Self::BudgetList(_) | Self::LimitList(_) => {
+                (Err(FlowError::Unavailable), None)
+            }
+        }
+    }
+
+    /// Checks what needs the node's shard count before the command is
+    /// routed: a limit command's shard id.
+    ///
+    /// # Errors
+    /// Elixir's text for a refused shard id or a later option.
+    pub fn admit(&mut self, shards: usize) -> Result<(), FlowError> {
+        match self {
+            Self::Limit(command) => command.admit(shards),
+            _ => Ok(()),
         }
     }
 
@@ -115,18 +140,20 @@ impl Command {
         match self {
             Self::ApprovalList(_) => Some(Kind::Approval),
             Self::BudgetList(_) => Some(Kind::Budget),
-            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) => None,
+            Self::LimitList(_) => Some(Kind::Limit),
+            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) | Self::Limit(_) => None,
         }
     }
 
     /// One shard's part of a listing: the matching records' replies, with
     /// the keys the join orders them by.
     #[must_use]
-    pub fn select<'a>(&self, records: impl Iterator<Item = &'a [u8]>) -> Listed {
+    pub fn select<'a>(&self, records: impl Iterator<Item = &'a [u8]>, wall: u64) -> Listed {
         match self {
             Self::ApprovalList(list) => list.select(records),
             Self::BudgetList(list) => list.select(records),
-            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) => Vec::new(),
+            Self::LimitList(list) => list.select(records, wall),
+            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) | Self::Limit(_) => Vec::new(),
         }
     }
 
@@ -136,7 +163,8 @@ impl Command {
         match self {
             Self::ApprovalList(list) => list.join(parts),
             Self::BudgetList(list) => list.join(parts),
-            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) => Term::Nil,
+            Self::LimitList(list) => list.join(parts),
+            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) | Self::Limit(_) => Term::Nil,
         }
     }
 }
@@ -144,9 +172,14 @@ impl Command {
 /// Whether `name` is a governance command handled here.
 #[must_use]
 pub fn is_governance(name: &str) -> bool {
-    ["FLOW.APPROVAL.", "FLOW.CIRCUIT.", "FLOW.BUDGET."]
-        .iter()
-        .any(|prefix| name.starts_with(prefix))
+    [
+        "FLOW.APPROVAL.",
+        "FLOW.CIRCUIT.",
+        "FLOW.BUDGET.",
+        "FLOW.LIMIT.",
+    ]
+    .iter()
+    .any(|prefix| name.starts_with(prefix))
 }
 
 /// Reads command `name` with options `args`.
@@ -161,6 +194,8 @@ pub fn parse(name: &str, args: &Term) -> Result<Command, FlowError> {
         }
         "FLOW.BUDGET.LIST" => budget::parse_list(args).map(Command::BudgetList),
         name if name.starts_with("FLOW.BUDGET.") => budget::parse(name, args).map(Command::Budget),
+        "FLOW.LIMIT.LIST" => limit::parse_list(args).map(Command::LimitList),
+        name if name.starts_with("FLOW.LIMIT.") => limit::parse(name, args).map(Command::Limit),
         _ => approval::parse(name, args).map(Command::Approval),
     }
 }

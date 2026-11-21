@@ -126,3 +126,38 @@ fn stored_circuits_round_trip_and_refuse_damage() -> Result<(), FlowError> {
     );
     Ok(())
 }
+
+#[test]
+fn policy_version_fingerprints_are_elixirs() {
+    use crate::routing::base64url_nopad;
+    // Captured from the Elixir server's `policy_version_hash`.
+    for (version, expected) in [
+        (
+            Term::text("pv1"),
+            "mvjJaFOrYFE14c6NPWj3-0MhidqTGTqRVR0_vDpP4vU",
+        ),
+        (Term::Int(7), "DkKNcZoMDC2l16Duf-rTdbJKU3ZmpNKz1IsFovkce6U"),
+        (
+            Term::Int(70_000),
+            "hUEWlrXw7heLoCLP_Bg5Pr0zvPQXAi4jv0xf3s5zpi0",
+        ),
+        (
+            Term::Int(9_000_000_000_000),
+            "eL4JmqkiVptXy5qN8dDtkAIDoOX3Oi4MLQhshTOPtUg",
+        ),
+    ] {
+        let digest = super::limit::fingerprint(&version).map(|digest| base64url_nopad(&digest));
+        assert_eq!(digest.as_deref(), Some(expected), "{version:?}");
+    }
+}
+
+#[test]
+fn stored_limits_round_trip_and_refuse_damage() -> Result<(), &'static str> {
+    let owner = super::limit::Owner::new(b"s", 5, 1, super::limit::fingerprint(&Term::Int(1)));
+    let bytes = owner.encode().ok_or("encode")?;
+    assert_eq!(super::limit::Owner::decode(&bytes), Some(owner));
+    let mut trailing = bytes;
+    trailing.push(0);
+    assert_eq!(super::limit::Owner::decode(&trailing), None);
+    Ok(())
+}

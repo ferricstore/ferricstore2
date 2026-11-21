@@ -26,6 +26,7 @@ mod flow_cleanup;
 mod flow_effect;
 mod flow_fifo;
 mod flow_info;
+mod flow_limit;
 mod flow_mutate;
 mod flow_payload;
 mod flow_policy;

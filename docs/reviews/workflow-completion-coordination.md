@@ -65549,3 +65549,42 @@ check, the usage check or the earlier-window overage each makes one
 fail. All 89 node tests, the TCP adapter and application tests pass; the
 SDK suite passes 40 of 60. Clippy, the ratchet, lint tests, docs,
 architecture and cargo-deny pass.
+
+### ADR014-GOVERNANCE4 FLOW.LIMIT.*
+
+New artifacts (solo design review): `governance::limit` (`Owner`, `Lease`,
+`fingerprint`; `request` with `Command`, `Op`, `Fields`, `Configuration`,
+`Command::admit`, and `list`; `decide`, `stored`), `Kind::Limit` (tag 4),
+`governance::Command::{Limit, LimitList, admit}`; listings now receive the
+shard's clock; the composition admits a governance command against the
+node's shard count before routing; opcodes 0x024F to 0x0252 and 0x0256.
+No new dependency.
+
+Decisions: keep Elixir's credit rules (grant, reclaim marks, spend,
+release, rebalance, generation retirement, configuration versions)
+exactly, with reservation ids stored per lease rather than in paged keys
+with cleanup tasks; reproduce the policy fingerprint by encoding the
+version as Erlang's external term (a binary or an integer), matching
+Elixir's hash; check the shard id in the composition, which alone knows
+the shard count, while keeping Elixir's error order.
+
+Evidence: the Elixir limit scenario (missing reads, new-owner validation,
+grants across shards, partial grants, exhaustion with reclaim marks,
+spends with and without ttl, spends without a lease, early spends,
+releases by real and unknown ids, release validation, expiry, generation
+after expiry, reconfiguration with conflicts and older versions, text and
+numeric policy versions including big integers, a zero limit, 12 argument
+errors, listings) matches the node apart from the unknown-option wording.
+Ported: grant, spend, release and reclaim of durable credits, expired
+in-use leases reclaimed; added the reclaim mark, generation retirement on
+release, idempotent release, restart, configuration-version guards, the
+expiry boundary, spending beyond a lease, draining on a lower limit, the
+shard bound, Elixir's policy fingerprints and the stored form. Not
+ported: limit caches, outboxes, reconcilers, cleanup and catalog
+publication (no such storage). The tests were written after the code, so
+this step does not claim TDD; breaking the grant cap, the reclaim mark,
+retirement on release, the expiry boundary, the rebalance drain, the
+configuration conflict or the spend availability check each makes one
+fail. All 93 node tests, the TCP adapter and application tests pass; the
+SDK suite passes 40 of 60. Clippy, the ratchet, lint tests, docs,
+architecture and cargo-deny pass.
