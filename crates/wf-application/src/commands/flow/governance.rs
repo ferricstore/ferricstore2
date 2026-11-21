@@ -1,5 +1,6 @@
 //! Governance records that are not a Flow's own (ADR-014 step 15):
-//! approvals and circuits, as `Ferricstore.Flow.Governance` keeps them.
+//! approvals, circuits and budgets, as `Ferricstore.Flow.Governance` keeps
+//! them.
 //!
 //! Each record lives on the shard that owns its name (an approval's id, a
 //! circuit's scope) as a partition, as Elixir's key carries the name's hash
@@ -11,6 +12,7 @@ use super::FlowError;
 use super::term::Term;
 
 pub mod approval;
+pub mod budget;
 pub mod circuit;
 #[cfg(test)]
 mod tests;
@@ -27,6 +29,8 @@ pub enum Kind {
     Approval,
     /// A circuit, by scope.
     Circuit,
+    /// A budget, by scope.
+    Budget,
 }
 
 impl Kind {
@@ -36,6 +40,7 @@ impl Kind {
         match self {
             Self::Approval => 1,
             Self::Circuit => 2,
+            Self::Budget => 3,
         }
     }
 
@@ -45,6 +50,7 @@ impl Kind {
         match tag {
             1 => Some(Self::Approval),
             2 => Some(Self::Circuit),
+            3 => Some(Self::Budget),
             _ => None,
         }
     }
@@ -75,6 +81,10 @@ pub enum Command {
     ApprovalList(approval::List),
     /// A command on one circuit.
     Circuit(circuit::Command),
+    /// A command on one budget.
+    Budget(budget::Command),
+    /// `FLOW.BUDGET.LIST`.
+    BudgetList(budget::List),
 }
 
 impl Command {
@@ -84,7 +94,8 @@ impl Command {
         match self {
             Self::Approval(command) => Some((Kind::Approval, command.id())),
             Self::Circuit(command) => Some((Kind::Circuit, command.scope())),
-            Self::ApprovalList(_) => None,
+            Self::Budget(command) => Some((Kind::Budget, command.scope())),
+            Self::ApprovalList(_) | Self::BudgetList(_) => None,
         }
     }
 
@@ -93,7 +104,8 @@ impl Command {
         match self {
             Self::Approval(command) => command.decide(stored, wall),
             Self::Circuit(command) => command.decide(stored, wall),
-            Self::ApprovalList(_) => (Err(FlowError::Unavailable), None),
+            Self::Budget(command) => command.decide(stored, wall),
+            Self::ApprovalList(_) | Self::BudgetList(_) => (Err(FlowError::Unavailable), None),
         }
     }
 
@@ -102,7 +114,8 @@ impl Command {
     pub const fn listed(&self) -> Option<Kind> {
         match self {
             Self::ApprovalList(_) => Some(Kind::Approval),
-            Self::Approval(_) | Self::Circuit(_) => None,
+            Self::BudgetList(_) => Some(Kind::Budget),
+            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) => None,
         }
     }
 
@@ -112,7 +125,8 @@ impl Command {
     pub fn select<'a>(&self, records: impl Iterator<Item = &'a [u8]>) -> Listed {
         match self {
             Self::ApprovalList(list) => list.select(records),
-            Self::Approval(_) | Self::Circuit(_) => Vec::new(),
+            Self::BudgetList(list) => list.select(records),
+            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) => Vec::new(),
         }
     }
 
@@ -121,7 +135,8 @@ impl Command {
     pub fn join(&self, parts: Listed) -> Term {
         match self {
             Self::ApprovalList(list) => list.join(parts),
-            Self::Approval(_) | Self::Circuit(_) => Term::Nil,
+            Self::BudgetList(list) => list.join(parts),
+            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) => Term::Nil,
         }
     }
 }
@@ -129,7 +144,9 @@ impl Command {
 /// Whether `name` is a governance command handled here.
 #[must_use]
 pub fn is_governance(name: &str) -> bool {
-    name.starts_with("FLOW.APPROVAL.") || name.starts_with("FLOW.CIRCUIT.")
+    ["FLOW.APPROVAL.", "FLOW.CIRCUIT.", "FLOW.BUDGET."]
+        .iter()
+        .any(|prefix| name.starts_with(prefix))
 }
 
 /// Reads command `name` with options `args`.
@@ -142,6 +159,8 @@ pub fn parse(name: &str, args: &Term) -> Result<Command, FlowError> {
         name if name.starts_with("FLOW.CIRCUIT.") => {
             circuit::parse(name, args).map(Command::Circuit)
         }
+        "FLOW.BUDGET.LIST" => budget::parse_list(args).map(Command::BudgetList),
+        name if name.starts_with("FLOW.BUDGET.") => budget::parse(name, args).map(Command::Budget),
         _ => approval::parse(name, args).map(Command::Approval),
     }
 }

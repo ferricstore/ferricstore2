@@ -457,3 +457,21 @@ Each step is one commit with its tests.
   option. The scenario matches Elixir apart from the unknown-option
   wording; the SDK suite passes 40 of 60, its native test now failing on
   budgets.
+- Step 15c: `FLOW.BUDGET.RESERVE`, `COMMIT`, `RELEASE`, `GET` and `LIST`
+  (0x024D, 0x024E, 0x0255, 0x0257, 0x0258), as `Governance.Budget` and
+  `BudgetStore`, stored by scope. A first reservation creates the budget
+  from its `limit` and `window_ms` (ignored afterwards). A reservation
+  holds part of the window's limit (a repeat with the same amount is
+  answered from it, another amount or a settled id refused) or is refused
+  with `GOVERNANCE_BUDGET_EXHAUSTED` and the time until the window ends. A
+  commit settles it with the amount used (moving the window's usage by the
+  difference and reporting any overage) and its usage term, bounded as
+  Elixir bounds it; a release returns the hold. A window that has passed
+  resets the usage and keeps unsettled reservations; settling one from an
+  earlier window leaves the usage. The newest 128 settled reservations
+  are kept for idempotent repeats. A refusal after a reset or on a new
+  budget still stores it. Generated reservation ids are 22 URL-safe
+  characters from a digest of the scope and a count instead of random.
+  Listings filter by scope or partition and order by scope. The scenario
+  matches Elixir apart from the unknown-option wording; the SDK suite
+  passes 40 of 60, its native test now failing on limits.

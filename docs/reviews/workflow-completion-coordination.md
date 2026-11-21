@@ -65516,3 +65516,36 @@ de-duplication each makes one fail; removing the close's failure reset
 survives, as nothing reachable counts failures. All 84 node tests, the
 TCP adapter and application tests pass; the SDK suite passes 40 of 60.
 Clippy, the ratchet, lint tests, docs, architecture and cargo-deny pass.
+
+### ADR014-GOVERNANCE3 FLOW.BUDGET.*
+
+New artifacts (solo design review): `governance::budget` (`Budget`,
+`Reservation`, `Status`, `Command`, `List`, `parse`, `parse_list`;
+`decide`, `request`, `stored`), `Kind::Budget` (tag 3),
+`governance::Command::{Budget, BudgetList}`; `effect::denial::Field` and
+`Denial::with` so refusals carry integers; opcodes 0x024D, 0x024E, 0x0255,
+0x0257, 0x0258. No new dependency.
+
+Decisions: keep Elixir's window, carry-over, overage and settled-history
+rules exactly, including storing the budget on a refusal after a reset;
+generate reservation ids deterministically from a stored count (replay
+re-applies the after-image, so no randomness is needed).
+
+Evidence: the Elixir budget scenario (new budget validation, reserve,
+replay, conflicting ids, generated ids, exhaustion, commit with a usage
+map, repeats, release, settled conflicts, missing ids and budgets, time
+checks, overage, window reset, earlier-window settlement, exhaustion of a
+new budget, 16 argument errors, listings) matches the node apart from the
+unknown-option wording. Ported: the fixed window and its reset, commit
+and release with usage, 129 settlements in one scope keeping 128, unsafe
+usage and out-of-range totals leaving the record, oversized amounts and
+ids refused before storage; added earlier-window settlement, refusals
+that still create a budget, the usage bounds, restart under another
+shard count and listing order. Not ported: telemetry and catalog
+publication (no separate catalog). The tests were written after the
+code, so this step does not claim TDD; breaking the window boundary, the
+limit check, the settled cap, storing on refusal, the release, the range
+check, the usage check or the earlier-window overage each makes one
+fail. All 89 node tests, the TCP adapter and application tests pass; the
+SDK suite passes 40 of 60. Clippy, the ratchet, lint tests, docs,
+architecture and cargo-deny pass.

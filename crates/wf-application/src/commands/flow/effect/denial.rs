@@ -12,11 +12,28 @@ use sha2::{Digest, Sha256};
 use super::super::term::{Term, map};
 use crate::routing::base64url_nopad;
 
+/// A refusal field's value.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Field {
+    /// Nil.
+    Nil,
+    /// A binary.
+    Bin(Vec<u8>),
+    /// A count or time.
+    Int(u64),
+}
+
+impl From<Option<Vec<u8>>> for Field {
+    fn from(value: Option<Vec<u8>>) -> Self {
+        value.map_or(Self::Nil, Self::Bin)
+    }
+}
+
 /// A structured governance refusal.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Denial {
-    /// Its fields in reply order; `None` is nil.
-    pub fields: Vec<(&'static str, Option<Vec<u8>>)>,
+    /// Its fields in reply order.
+    pub fields: Vec<(&'static str, Field)>,
 }
 
 /// `decision_id/2`: the URL-safe base64 SHA-256 of `reason:subject`.
@@ -34,6 +51,8 @@ const fn reason(code: &str) -> &'static str {
     match code.as_bytes() {
         b"GOVERNANCE_EFFECT_DENIED" => "effect_denied",
         b"GOVERNANCE_CONFLICT" => "governance_conflict",
+        b"GOVERNANCE_BUDGET_EXHAUSTED" => "budget_exhausted",
+        b"GOVERNANCE_LIMIT_EXCEEDED" => "limit_exhausted",
         _ => "governance_denied",
     }
 }
@@ -47,19 +66,31 @@ impl Denial {
         rest: Vec<(&'static str, Option<Vec<u8>>)>,
     ) -> Self {
         let mut fields = vec![
-            ("code", Some(code.as_bytes().to_vec())),
-            ("message", Some(message)),
-            ("reason", Some(reason(code).as_bytes().to_vec())),
+            ("code", Field::Bin(code.as_bytes().to_vec())),
+            ("message", Field::Bin(message)),
+            ("reason", Field::Bin(reason(code).as_bytes().to_vec())),
         ];
-        fields.extend(rest);
+        fields.extend(
+            rest.into_iter()
+                .map(|(key, value)| (key, Field::from(value))),
+        );
         Self { fields }
+    }
+
+    /// The decision with `key` set to `value` as well.
+    #[must_use]
+    pub fn with(mut self, key: &'static str, value: Field) -> Self {
+        self.fields.push((key, value));
+        self
     }
 
     fn field(&self, name: &str) -> &[u8] {
         self.fields
             .iter()
-            .find(|(key, _)| *key == name)
-            .and_then(|(_, value)| value.as_deref())
+            .find_map(|(key, value)| match value {
+                Field::Bin(bytes) if *key == name => Some(bytes.as_slice()),
+                _ => None,
+            })
             .unwrap_or_default()
     }
 
@@ -87,7 +118,14 @@ impl Denial {
         let mut entries: Vec<(&str, Term)> = self
             .fields
             .iter()
-            .map(|(key, value)| (*key, Term::optional_bin(value.as_deref())))
+            .map(|(key, value)| {
+                let value = match value {
+                    Field::Nil => Term::Nil,
+                    Field::Bin(bytes) => Term::Bin(bytes.clone()),
+                    Field::Int(number) => Term::int(*number),
+                };
+                (*key, value)
+            })
             .collect();
         entries.extend([
             ("retryable", Term::Bool(false)),
