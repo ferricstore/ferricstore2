@@ -21,6 +21,7 @@ mod flow_children;
 mod flow_claim;
 mod flow_cleanup;
 mod flow_fifo;
+mod flow_info;
 mod flow_mutate;
 mod flow_policy;
 mod flow_record;

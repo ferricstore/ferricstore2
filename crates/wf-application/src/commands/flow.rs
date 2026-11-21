@@ -12,6 +12,7 @@ pub mod cleanup;
 pub mod create;
 pub mod get;
 pub mod history;
+pub mod info;
 pub mod json;
 pub mod keys;
 pub mod many;
@@ -69,6 +70,9 @@ pub enum FlowCommand {
     RetentionCleanup(cleanup::RetentionCleanup),
     /// `FLOW.REWIND`.
     Rewind(Box<rewind::Rewind>),
+    /// `FLOW.INFO`, `FLOW.STATS`, `FLOW.ATTRIBUTES` or
+    /// `FLOW.ATTRIBUTE_VALUES`.
+    Info(Box<info::Read>),
 }
 
 impl FlowCommand {
@@ -96,7 +100,8 @@ impl FlowCommand {
             | Self::RunSteps(_)
             | Self::PolicySet(_)
             | Self::PolicyGet(_)
-            | Self::RetentionCleanup(_) => None,
+            | Self::RetentionCleanup(_)
+            | Self::Info(_) => None,
         }
     }
 }
@@ -123,6 +128,14 @@ pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
         "FLOW.POLICY.GET" => policy::parse_get(args).map(FlowCommand::PolicyGet),
         "FLOW.RETENTION_CLEANUP" => cleanup::parse(args).map(FlowCommand::RetentionCleanup),
         "FLOW.REWIND" => rewind::parse(args).map(|rewind| FlowCommand::Rewind(Box::new(rewind))),
+        "FLOW.INFO" => info::parse_info(args).map(|read| FlowCommand::Info(Box::new(read))),
+        "FLOW.STATS" => info::parse_stats(args).map(|read| FlowCommand::Info(Box::new(read))),
+        "FLOW.ATTRIBUTES" => {
+            info::parse_attributes(args).map(|read| FlowCommand::Info(Box::new(read)))
+        }
+        "FLOW.ATTRIBUTE_VALUES" => {
+            info::parse_attribute_values(args).map(|read| FlowCommand::Info(Box::new(read)))
+        }
         "FLOW.START_AND_CLAIM" => {
             start::parse_start(args).map(|start| FlowCommand::StartAndClaim(Box::new(start)))
         }

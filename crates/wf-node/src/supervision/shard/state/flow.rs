@@ -60,7 +60,8 @@ impl ShardState {
             | FlowCommand::RunSteps(_)
             | FlowCommand::PolicySet(_)
             | FlowCommand::PolicyGet(_)
-            | FlowCommand::RetentionCleanup(_) => (Err(ServiceError::Unavailable), None),
+            | FlowCommand::RetentionCleanup(_)
+            | FlowCommand::Info(_) => (Err(ServiceError::Unavailable), None),
         }
     }
 

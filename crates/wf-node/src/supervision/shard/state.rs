@@ -10,6 +10,7 @@
 //! kept until their retention ends, then removed by a logged sweep.
 
 mod capture;
+mod catalog;
 mod children;
 mod claim;
 pub(crate) mod events;
@@ -104,6 +105,8 @@ pub(crate) struct ShardState {
     /// periodic timeout sweep runs next (0 until the first round).
     deadlines: BTreeMap<(u64, u64), Key>,
     timeouts_due: u64,
+    /// Every Flow by type, state and partition (ADR-014 step 11).
+    catalog: catalog::Catalog,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -139,6 +142,7 @@ impl ShardState {
             freed: Vec::new(),
             deadlines: BTreeMap::new(),
             timeouts_due: 0,
+            catalog: HashMap::new(),
         }
     }
 

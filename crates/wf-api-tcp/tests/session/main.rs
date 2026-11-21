@@ -139,6 +139,7 @@ impl FlowService for Scripted {
             FlowCommand::PolicyGet(get) => reply(Ok(Term::Bin(get.flow_type))),
             FlowCommand::RetentionCleanup(cleanup) => reply(Ok(Term::int(cleanup.limit))),
             FlowCommand::Rewind(rewind) => reply(Ok(Term::Bin(rewind.to_event))),
+            FlowCommand::Info(read) => reply(Ok(Term::Bin(read.flow_type))),
             FlowCommand::ValueMget(read) => reply(Ok(Term::List(
                 read.refs.into_iter().map(Term::Bin).collect(),
             ))),

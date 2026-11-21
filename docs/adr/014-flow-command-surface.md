@@ -295,3 +295,32 @@ Each step is one commit with its tests.
   refused as not found where Elixir may still hold the older version.
   Snapshot images are version 7. The rewind scenario matches Elixir; the
   SDK suite passes 37 of 60, both rewind round trips included.
+- Step 11: `FLOW.INFO` (0x021C), `FLOW.STATS` (0x022D), `FLOW.ATTRIBUTES`
+  (0x022E) and `FLOW.ATTRIBUTE_VALUES` (0x022F), and their text forms, as
+  `InfoAPI.info/3` and `ReadAPI.stats/3`, `attributes/3` and
+  `attribute_values/4`. Each shard keeps a catalog of its Flows by type,
+  state and partition, ordered by update time, beside the claim index;
+  QUERY will read it too. A read of one partition goes to its shard; a
+  read without a partition covers the 256 auto buckets (Elixir's
+  `partition_key: :auto`), on every shard, and the parts are joined.
+  INFO counts queued, running, completed, failed and cancelled Flows and
+  the leased ones; STATS counts one state, or with `attributes` the Flows
+  matching them (a list filter needs all its values); ATTRIBUTES lists the
+  policy's `indexed_attributes` by values held (a list attribute counts
+  each value), ATTRIBUTE_VALUES one name's values by count, ties in
+  `inspect/1` order. State `any` reads Elixir's broad index: a Flow shows
+  an attribute there only if the type's policy indexed it when the Flow
+  was last written, and STATS counts through the candidate fewest Flows
+  hold, as `select_scored_candidate/1` picks. To give that, a Flow records
+  the policy's `indexed_attributes` and `indexed_state_meta` on every live
+  whole-Flow write (create, mutations, signals, rewinds); GET shows them as
+  Elixir does, and they are logged and in snapshot images (version 8).
+  Claims and fast-path completions keep the names the Flow had, since their
+  replay could not see the policy of the moment; Elixir also refreshes them
+  there. Attribute reads leave out terminal Flows past their retention;
+  state counts keep them until removal, which here happens within a round,
+  so a Flow with a tiny retention leaves INFO sooner than in Elixir, where
+  it stays until cleanup. Counts are exact: the catalog is in memory, so
+  there is no scan limit, no `approximate` flag and no `exceeds scan limit`
+  refusal. The scenario matches Elixir apart from that and the
+  unknown-option wording; the SDK suite passes 38 of 60.

@@ -1,5 +1,6 @@
 //! The claim index: due Flows by queue, leased ones by lease deadline, and
-//! the FIFO lanes beside them (ADR-011, ADR-013, ADR-014 step 9b).
+//! the FIFO lanes and catalog beside them (ADR-011, ADR-013, ADR-014 steps
+//! 9b and 11).
 
 use std::collections::BTreeMap;
 
@@ -39,6 +40,7 @@ impl ShardState {
     }
 
     pub(super) fn index(&mut self, key: &Key, entry: &Entry) {
+        self.catalog_insert(key, entry);
         self.lane_insert(key, entry);
         if let Some((queue, slot)) = Self::queue_slot(entry) {
             self.count(&queue, true);
@@ -50,6 +52,7 @@ impl ShardState {
     }
 
     pub(super) fn unindex(&mut self, key: &Key, entry: &Entry) {
+        self.catalog_remove(key, entry);
         self.lane_remove(key, entry);
         let Some((queue, slot)) = Self::queue_slot(entry) else {
             return;

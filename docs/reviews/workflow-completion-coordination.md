@@ -65286,3 +65286,41 @@ Elixir sends compact to a client that did not negotiate it. The node test
 dropping the stored `rewound_to` makes it fail. All 56 node tests, the TCP
 adapter and application tests pass; the SDK suite passes 37 of 60 (was
 35). Clippy, the ratchet, lint tests, docs and architecture pass.
+
+### ADR014-INFO1 FLOW.INFO, STATS, ATTRIBUTES, ATTRIBUTE_VALUES
+
+New artifacts (solo design review): `wf_application::commands::flow::info`
+(`Read`, `Scope`, `StateFilter`, `Kind`, the four parsers, `Counter`,
+`Seen`, `Tally`, `reply`; private children `tally`, `inspect`, `tests`),
+`FlowCommand::Info`, `FlowMeta::{indexed_attributes, indexed_state_meta}`,
+`record::include` (moved `Include`, `Values`); `wf-node`
+`supervision::shard::state::catalog`, `Request::Read`,
+`composition::{info, error}` (`NodeError` moved, path unchanged),
+snapshot version 8, opcodes 0x021C, 0x022D, 0x022E, 0x022F. No dependency
+or policy change.
+
+Decisions: counts come from an in-memory catalog (type, state, partition,
+then update time and id), so they are exact and need no scan limit; a
+state count is the size of its sets, attribute reads visit the Flows. The
+catalog costs one id copy and a tree entry per Flow; QUERY will reuse it.
+Policy-indexed names are recorded only by after-image writes, so replay
+reproduces them; reducer writes (claims, fast-path completions) keep the
+previous names.
+
+Evidence: the Elixir scenario (policy, nine Flows with list, integer,
+NUL and terminal attributes, a claim, INFO/STATS/ATTRIBUTES/VALUES across
+states, partitions, `any`, counts and option errors) was captured first;
+the node matches it except a tiny-retention cancelled Flow (removed within
+a round here) and the unknown-option wording. Elixir's
+`flow_stats_test.exs` and the discovery and broad-index cases of
+`flow_attributes_test.exs` were ported as `flow_info` (three node tests)
+and `info::tests` (three unit tests); not ported: the scan-limit and
+`approximate` cases (no scan limit here). The tests were written after the
+code, so this step does not claim TDD; dropping the stamp, the catalog
+removal, the `any` visibility rule, the persisted names, the in-flight
+count, the expired-Flow skip or the rarest-candidate choice each makes
+one fail. A timing flake in `reclaim` (50 ms lease seen expired under a
+loaded suite) was widened to 300 ms. All 59 node tests, the TCP adapter
+and application tests pass; the SDK suite passes 38 of 60 (was 37; the
+`state_meta` cycle now passes on GET's `indexed_state_meta`). Clippy, the
+ratchet, lint tests, docs and architecture pass.

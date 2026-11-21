@@ -6,7 +6,9 @@
 //! name, version and bytes), the payload, result and error versions, then
 //! the terminal retention override and removal time as optional integers,
 //! then the signal idempotency keys (count, then key and digest), then the
-//! child groups as a [`Term`] map of each group's reply form.
+//! child groups as a [`Term`] map of each group's reply form, the error
+//! kind, the rewind target, and the policy-indexed attribute names (count,
+//! then names) and state metadata key.
 
 use std::collections::BTreeMap;
 
@@ -88,6 +90,15 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
     term(out, &Term::Map(groups))?;
     out.push(u8::from(meta.error_term));
     optional_bin(out, meta.rewound_to.as_deref())?;
+    out.extend_from_slice(
+        &u32::try_from(meta.indexed_attributes.len())
+            .ok()?
+            .to_be_bytes(),
+    );
+    for name in &meta.indexed_attributes {
+        bin(out, name.as_bytes())?;
+    }
+    optional_bin(out, meta.indexed_state_meta.as_deref().map(str::as_bytes))?;
     Some(())
 }
 
@@ -173,5 +184,15 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
             _ => return Err(Malformed),
         },
         rewound_to: reader.optional_bin()?,
+        indexed_attributes: {
+            let count = u32::from_be_bytes(reader.array()?);
+            (0..count)
+                .map(|_| String::from_utf8(reader.bin()?.to_vec()).map_err(|_| Malformed))
+                .collect::<Result<Vec<_>, Malformed>>()?
+        },
+        indexed_state_meta: reader
+            .optional_bin()?
+            .map(|key| String::from_utf8(key).map_err(|_| Malformed))
+            .transpose()?,
     })
 }

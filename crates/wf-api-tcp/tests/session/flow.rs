@@ -171,3 +171,22 @@ fn a_typed_pipeline_reports_each_command_in_order() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn count_and_discovery_opcodes_reach_the_service() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    for (opcode, flow_type, extra) in [
+        (0x021C_u16, "info", None),
+        (0x022D, "stats", None),
+        (0x022E, "attributes", None),
+        (0x022F, "values", Some(("attribute", bin("tenant")))),
+    ] {
+        let mut entries = vec![("type", bin(flow_type))];
+        entries.extend(extra);
+        let reply = client.call(opcode, 1, 0, &encode(&map(&entries))?)?;
+        // The scripted service answers a read with its type.
+        assert_eq!(reply.body, ok(&bin(flow_type))?, "opcode {opcode:#06x}");
+    }
+    Ok(())
+}

@@ -33,6 +33,7 @@ impl ShardState {
         flow: (WorkflowRecord, u8, Option<Box<FlowMeta>>),
         event: Option<&HistoryEvent>,
     ) {
+        let flow = self.stamped(flow);
         let previous = self.take_entry(&key);
         self.write(
             key,
@@ -51,8 +52,30 @@ impl ShardState {
         flow: (WorkflowRecord, u8, Option<Box<FlowMeta>>),
         events: &[HistoryEvent],
     ) {
+        let flow = self.stamped(flow);
         let previous = self.take_entry(&key);
         self.write(key, flow, previous, events);
+    }
+
+    /// A live whole-Flow write records the attribute names and state
+    /// metadata key its type's policy indexes now, as Elixir refreshes them
+    /// on each write (ADR-014 step 11); replay keeps the logged ones.
+    /// Reducer writes (`store`) keep the names the Flow had, since their
+    /// replay could not see the policy of the moment.
+    fn stamped(
+        &self,
+        (record, priority, mut meta): (WorkflowRecord, u8, Option<Box<FlowMeta>>),
+    ) -> (WorkflowRecord, u8, Option<Box<FlowMeta>>) {
+        if let (true, Some(meta)) = (self.live, meta.as_mut()) {
+            let policy = self
+                .policy(record.workflow_type())
+                .map(|installed| &installed.policy);
+            meta.indexed_attributes = policy
+                .and_then(|policy| policy.indexed_attributes.clone())
+                .unwrap_or_default();
+            meta.indexed_state_meta = policy.and_then(|policy| policy.indexed_state_meta.clone());
+        }
+        (record, priority, meta)
     }
 
     /// Inserts the new state of a Flow; a new version appends its history

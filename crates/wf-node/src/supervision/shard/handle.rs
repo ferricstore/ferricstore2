@@ -130,6 +130,10 @@ pub(super) fn handle(
             limit,
             done,
         } => cleanup(state, (now, now_ms), limit, logged, done),
+        Request::Read { read, done } => {
+            let tally = state.tally(&read, now);
+            Box::new(move |durable| done(durable.map(|()| tally)))
+        }
         Request::Policy { command, done } => {
             let (result, change) = state.policy_command(command);
             logged.extend(change);

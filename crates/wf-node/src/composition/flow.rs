@@ -22,7 +22,7 @@ use crate::supervision::shard::state::BatchItems;
 use super::QueueNode;
 use super::gather::ItemGather;
 use super::router::Router;
-use super::{cleanup, policy};
+use super::{cleanup, info, policy};
 
 impl FlowService for QueueNode {
     fn execute(&self, command: FlowCommand, reply: Reply<Term>) {
@@ -36,6 +36,7 @@ impl FlowService for QueueNode {
             FlowCommand::PolicySet(set) => return policy::set(router, set, reply),
             FlowCommand::PolicyGet(get) => return policy::get(router, get, reply),
             FlowCommand::RetentionCleanup(request) => return cleanup::run(router, &request, reply),
+            FlowCommand::Info(read) => return info::read(router, *read, reply),
             FlowCommand::SpawnChildren(spawn) => {
                 // A spawn is decided on the parent's shard; children placed
                 // on other shards need a cross-shard spawn, not built yet.

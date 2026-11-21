@@ -22,10 +22,11 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 7 images carry each Flow's fields beyond its record, its history
-/// (with timeout and rewind extras), the shard's shared values and its Flow
-/// type policies (ADR-014).
-const VERSION: u8 = 7;
+/// Version 8 images carry each Flow's fields beyond its record (with the
+/// policy-indexed names it was written under), its history (with timeout
+/// and rewind extras), the shard's shared values and its Flow type policies
+/// (ADR-014).
+const VERSION: u8 = 8;
 
 struct Progress {
     next: u64,

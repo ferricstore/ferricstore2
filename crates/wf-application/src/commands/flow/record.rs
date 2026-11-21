@@ -13,6 +13,10 @@ use super::meta::{self, Attributes, StateMeta};
 use super::term::{Term, map};
 use crate::routing::Partition;
 
+mod include;
+
+pub use include::{DEFAULT_PAYLOAD_MAX_BYTES, Include, Values};
+
 /// Elixir's default terminal retention: 7 days.
 pub const DEFAULT_RETENTION_TTL_MS: u64 = 604_800_000;
 /// Elixir's default history cap.
@@ -71,6 +75,11 @@ pub struct FlowMeta {
     pub error_term: bool,
     /// The history event the Flow was last rewound to (ADR-014 step 10).
     pub rewound_to: Option<Vec<u8>>,
+    /// The attribute names its type's policy indexed when the Flow was last
+    /// written: the attributes broad reads see (ADR-014 step 11).
+    pub indexed_attributes: Vec<String>,
+    /// The state metadata key its type's policy indexed then.
+    pub indexed_state_meta: Option<String>,
 }
 
 impl Default for FlowMeta {
@@ -96,43 +105,8 @@ impl Default for FlowMeta {
             child_groups: BTreeMap::new(),
             error_term: false,
             rewound_to: None,
-        }
-    }
-}
-
-/// Elixir's default `payload_max_bytes`: 64 KiB.
-pub const DEFAULT_PAYLOAD_MAX_BYTES: u64 = 65_536;
-
-/// Which named values a read includes.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub enum Values {
-    /// None.
-    #[default]
-    None,
-    /// These names, where the Flow has them.
-    Names(Vec<Vec<u8>>),
-    /// Every named value.
-    All,
-}
-
-/// What a read asks to include besides the record.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Include {
-    /// The payload, result and error bytes with their sizes; a value above
-    /// `max_bytes` is reported as omitted with its size.
-    pub payload: bool,
-    /// Largest value returned inline.
-    pub max_bytes: u64,
-    /// Named values, as `values`.
-    pub values: Values,
-}
-
-impl Default for Include {
-    fn default() -> Self {
-        Self {
-            payload: false,
-            max_bytes: DEFAULT_PAYLOAD_MAX_BYTES,
-            values: Values::None,
+            indexed_attributes: Vec::new(),
+            indexed_state_meta: None,
         }
     }
 }
@@ -352,6 +326,13 @@ impl View<'_> {
         ]);
         if let Some(event) = &meta.rewound_to {
             entries.push(("rewound_to_event_id", Term::Bin(event.clone())));
+        }
+        if !meta.indexed_attributes.is_empty() {
+            let names = meta.indexed_attributes.iter().map(|name| Term::text(name));
+            entries.push(("indexed_attributes", Term::List(names.collect())));
+        }
+        if let Some(key) = &meta.indexed_state_meta {
+            entries.push(("indexed_state_meta", Term::text(key)));
         }
         match meta.max_active_ms {
             Some(MaxActive::Ms(value)) => entries.push(("max_active_ms", Term::int(value))),

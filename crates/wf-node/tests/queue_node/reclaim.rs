@@ -9,9 +9,11 @@ use super::{
     TestResult, call, claim, claim_request, complete, completion, create, directory, open,
 };
 
+/// Long enough that a loaded machine still sees the lease live right
+/// after the claim, short enough to wait out.
 fn short_lease(limit: usize) -> ClaimFlows {
     ClaimFlows {
-        lease_ms: 50,
+        lease_ms: 300,
         ..claim_request(limit)
     }
 }
@@ -28,7 +30,7 @@ fn ids(jobs: &[ClaimedFlow]) -> Vec<&[u8]> {
 }
 
 fn wait_for_expiry() {
-    std::thread::sleep(Duration::from_millis(150));
+    std::thread::sleep(Duration::from_millis(450));
 }
 
 #[test]
