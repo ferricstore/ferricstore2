@@ -9,7 +9,9 @@
 //! visits the Flows of its type and state and leaves out terminal Flows
 //! whose retention has ended.
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::BTreeSet;
+
+use super::Map;
 
 use wf_application::commands::flow::info::{Counter, Kind, Read, Seen, Tally};
 use wf_application::commands::flow::meta::Attributes;
@@ -20,7 +22,7 @@ use super::{Entry, Key, RUNNING, ShardState};
 /// One partition's Flows of a type and state, by update time and id.
 pub(super) type Members = BTreeSet<(u64, Vec<u8>)>;
 /// Type, then state, then partition, to the Flows there.
-pub(super) type Catalog = HashMap<Vec<u8>, HashMap<Vec<u8>, HashMap<Partition, Members>>>;
+pub(super) type Catalog = Map<Vec<u8>, Map<Vec<u8>, Map<Partition, Members>>>;
 
 static NO_ATTRIBUTES: Attributes = Attributes::new();
 

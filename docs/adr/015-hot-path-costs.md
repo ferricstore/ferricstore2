@@ -31,6 +31,13 @@ Flows/s and RSS after the run.
    14.0), 282k to 294k Flows/s (was 265k to 279k), RSS 774 to 788 MB (was
    688 to 790).
 
+2. **foldhash for the shard's hash maps** (`foldhash` 0.2.0, Zlib, `std`
+   only; `fast::RandomState`, randomly seeded per map, so a client choosing
+   ids cannot predict collisions). Records, queues, shared values, tags,
+   policies, FIFO lanes and the catalog use `state::Map`. Zlib joins the
+   allowed licences. Against 83cb0b4: 8.3 to 8.6 ms (was 8.9 to 9.3), RSS
+   750 to 778 MB (was 770 to 806).
+
 ## Consequences
 
 The binary links mimalloc's C code, built by `cc`; cargo-deny passes.

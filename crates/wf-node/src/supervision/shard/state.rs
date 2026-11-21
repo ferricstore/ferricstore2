@@ -38,6 +38,10 @@ pub(crate) use policy::{PolicyCommand, PolicyReply};
 pub(crate) use schedule::{ScheduleOp, ScheduleReply};
 
 use std::collections::{BTreeMap, HashMap};
+
+/// A hash map on the shard's hot paths: foldhash, randomly seeded per map,
+/// several times cheaper than `SipHash` on short keys (ADR-015).
+pub(super) type Map<K, V> = HashMap<K, V, foldhash::fast::RandomState>;
 use std::sync::Arc;
 
 use events::History;
@@ -83,9 +87,9 @@ struct Queue {
 
 /// Records of one shard and their due index.
 pub(crate) struct ShardState {
-    records: HashMap<Key, Entry>,
+    records: Map<Key, Entry>,
     /// Due time and creation sequence to record key, per queue.
-    queues: HashMap<Queue, BTreeMap<(u64, u64), Key>>,
+    queues: Map<Queue, BTreeMap<(u64, u64), Key>>,
     /// Removal time and creation sequence to key, for terminal records.
     expiries: BTreeMap<(u64, u64), Key>,
     retention_ms: u64,
@@ -93,7 +97,7 @@ pub(crate) struct ShardState {
     ready: u64,
     leased: u64,
     /// Shared values by reference (ADR-014 step 5).
-    shared: HashMap<Vec<u8>, value::Shared>,
+    shared: Map<Vec<u8>, value::Shared>,
     /// Governance records by kind and name, in stored form (ADR-014 step
     /// 15).
     governance: BTreeMap<(Kind, Vec<u8>), Vec<u8>>,
@@ -101,7 +105,7 @@ pub(crate) struct ShardState {
     credit_releases: Vec<wf_application::commands::flow::effect::Credit>,
     /// Named partitions by hash tag, to find a Flow from a value reference;
     /// rebuilt on a miss when Flows were added since (`tags_at`).
-    tags: HashMap<String, Partition>,
+    tags: Map<String, Partition>,
     tags_at: u64,
     /// Whether changes are live; replay re-applies logged parent changes
     /// instead of queueing child events.
@@ -109,7 +113,7 @@ pub(crate) struct ShardState {
     /// Child events waiting for this round to settle them.
     child_events: Vec<children::ChildEvent>,
     /// Flow type policies by type (ADR-014 step 9).
-    policies: HashMap<Vec<u8>, Arc<Installed>>,
+    policies: Map<Vec<u8>, Arc<Installed>>,
     /// FIFO lanes, and the queues of lanes freed this round (step 9b).
     lanes: fifo::Lanes,
     freed: Vec<super::super::waiters::Arrival>,
@@ -139,26 +143,26 @@ impl ShardState {
     /// An empty shard that keeps terminal records for `retention_ms`.
     pub(crate) fn new(retention_ms: u64) -> Self {
         Self {
-            records: HashMap::new(),
-            queues: HashMap::new(),
+            records: Map::default(),
+            queues: Map::default(),
             expiries: BTreeMap::new(),
             retention_ms,
             next_sequence: 0,
             ready: 0,
             leased: 0,
-            shared: HashMap::new(),
+            shared: Map::default(),
             governance: BTreeMap::new(),
             credit_releases: Vec::new(),
-            tags: HashMap::new(),
+            tags: Map::default(),
             tags_at: 0,
             live: false,
             child_events: Vec::new(),
-            policies: HashMap::new(),
-            lanes: HashMap::new(),
+            policies: Map::default(),
+            lanes: Map::default(),
             freed: Vec::new(),
             deadlines: BTreeMap::new(),
             timeouts_due: 0,
-            catalog: HashMap::new(),
+            catalog: Map::default(),
             cursor_key: query::cursor_key(),
         }
     }

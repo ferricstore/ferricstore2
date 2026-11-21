@@ -101,6 +101,8 @@ modules = { configuration = true, composition = true, supervision = true, shutdo
 # ADR-011: src/main.rs is the node binary.
 binaries = ["main"]
 external_normal = [
+  # ADR-015: randomly seeded hash maps on the shard's hot paths.
+  { name = "foldhash", version = "=0.2.0", features = ["std"], default_features = false },
   # ADR-015: the binary's global allocator.
   { name = "mimalloc", version = "=0.1.52", features = [], default_features = false },
   { name = "sha2", version = "=0.11.0", features = [], default_features = false },

@@ -18,7 +18,8 @@ include-build = true
 confidence-threshold = 0.93
 # Unicode-3.0 is required by unicode-ident's AND expression and the reviewed
 # archunit -> cargo_metadata -> URL/ICU dev-tool chain (see CI review CI-04).
-allow = ["Apache-2.0", "MIT", "Unicode-3.0"]
+# Zlib (permissive, OSI-approved) is foldhash's licence (ADR-015).
+allow = ["Apache-2.0", "MIT", "Unicode-3.0", "Zlib"]
 unused-allowed-license = "warn"
 
 [licenses.private]

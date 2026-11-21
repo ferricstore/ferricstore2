@@ -12,7 +12,9 @@
 //! Entering a FIFO state needs an explicit partition and priority 0, and a
 //! Flow cannot enter one already running.
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::BTreeSet;
+
+use super::Map;
 
 use wf_application::commands::flow::policy::Mode;
 use wf_application::commands::queue::{ClaimFlows, Partition, ServiceError};
@@ -22,7 +24,7 @@ use super::super::super::waiters::Arrival;
 use super::{Entry, Key, Queue, RUNNING, ShardState};
 
 /// Lanes by type and logical state, then partition: `(sequence, id)`.
-pub(super) type Lanes = HashMap<(Vec<u8>, Vec<u8>), HashMap<Partition, BTreeSet<(u64, Vec<u8>)>>>;
+pub(super) type Lanes = Map<(Vec<u8>, Vec<u8>), Map<Partition, BTreeSet<(u64, Vec<u8>)>>>;
 
 fn terminal(state: &[u8]) -> bool {
     matches!(state, b"completed" | b"failed" | b"cancelled")

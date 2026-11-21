@@ -65744,3 +65744,16 @@ clients) against a0cff0a: 9.0 to 9.4 ms CPU per 1k Flows (was 13.4 to
 14.0), 282k to 294k Flows/s (was 265k to 279k), RSS 774 to 788 MB (was 688
 to 790). Behaviour is unchanged, so no test was added; all suites, clippy,
 the ratchet, docs, architecture and cargo-deny pass.
+
+### ADR015-HASH foldhash for the shard's hash maps
+
+New artifacts (solo design review): `supervision::shard::state::Map`
+(a `HashMap` alias with `foldhash::fast::RandomState`); the reviewed
+external dependency `foldhash` 0.2.0 (`std` only) for `wf-node`; Zlib added
+to cargo-deny's allowed licences for it.
+
+Evidence: SipHash was 7.2% of busy CPU on 21 Nov. Three alternating runs
+against 83cb0b4: 8.3 to 8.6 ms CPU per 1k Flows (was 8.9 to 9.3), RSS 750
+to 778 MB (was 770 to 806). Maps stay randomly seeded per instance, so
+chosen ids cannot be aimed at one bucket. Behaviour is unchanged; all
+suites and checks pass.
