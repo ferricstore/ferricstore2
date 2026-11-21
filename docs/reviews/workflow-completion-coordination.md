@@ -65612,3 +65612,23 @@ circuit order, the pending count or the listed kinds each makes one fail.
 All 95 node tests, the TCP adapter and application tests pass; the SDK
 suite passes 41 of 60, its native workflow test included. Clippy, the
 ratchet, lint tests, docs, architecture and cargo-deny pass.
+
+### ADR014-GOVERNANCE6 State governance in Flow policies
+
+New artifacts (solo design review): `governance::policy` (`normalize`,
+`RunningLimit`, `running_limit`; child `rules`), `StatePolicy::governance`
+(the normalized policy, encoded) and `StatePolicy::governance_term`. The
+step-9 refusal of state governance is removed. No new dependency.
+
+Decisions: keep the normalized governance as an encoded term in the
+state policy, so the policy stays comparable and its stored and shown
+forms are the normalized term; expose the running limit as a typed rule
+for the claim path.
+
+Evidence: the scenario matches Elixir on all 36 lines. Ported: Elixir's
+"flow policy stores governance rules and exposes them" in its state-level
+form (the typed protocol has no type-level governance), with merge,
+removal, refusals and a restart under another shard count. The tests were
+written after the code, so this step does not claim TDD. All 96 node
+tests and application tests pass; clippy, the ratchet, docs and
+architecture pass.

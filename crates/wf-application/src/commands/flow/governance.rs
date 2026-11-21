@@ -16,6 +16,7 @@ pub mod budget;
 pub mod circuit;
 pub mod limit;
 pub mod overview;
+pub mod policy;
 #[cfg(test)]
 mod tests;
 

@@ -5,7 +5,7 @@
 use wf_domain::policy::{RetryOverride, RetryPolicy, resolve as resolve_retry};
 
 use super::super::term::{Term, map};
-use super::{FlowPolicy, Installed, Mode, Retention, backoff_term};
+use super::{FlowPolicy, Installed, Mode, Retention, StatePolicy, backoff_term};
 
 /// Retention limits: the node's defaults, or what a Flow stores.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -117,7 +117,14 @@ pub fn reply(
                                 "retention",
                                 retention_term(policy.into(), Some(name), defaults),
                             ),
-                            ("governance", Term::Nil),
+                            (
+                                "governance",
+                                policy
+                                    .states
+                                    .get(name)
+                                    .and_then(StatePolicy::governance_term)
+                                    .unwrap_or(Term::Nil),
+                            ),
                         ]);
                         (name.clone(), fields)
                     })
@@ -148,6 +155,12 @@ pub fn reply(
         ("retention", retention_term(policy, Some(state), defaults)),
         ("indexed_attributes", indexed_attributes),
         ("indexed_state_meta", indexed_state_meta),
-        ("governance", Term::Nil),
+        (
+            "governance",
+            policy
+                .and_then(|policy| policy.states.get(state))
+                .and_then(StatePolicy::governance_term)
+                .unwrap_or(Term::Nil),
+        ),
     ])
 }

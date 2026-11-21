@@ -6,7 +6,7 @@
 //! that form (or replaces it), normalizes the result again and raises the
 //! type's generation. The typed protocol has no top-level `retention`,
 //! `version`, `mode` or `governance`; the text form may set a type-level
-//! retention. State-level governance is refused until governance is built.
+//! retention. A state may carry a governance policy (ADR-014 step 15).
 
 use std::collections::BTreeMap;
 
@@ -87,6 +87,19 @@ pub struct StatePolicy {
     pub retry: Option<RetryOverride>,
     /// Retention for Flows created in this state.
     pub retention: Option<Retention>,
+    /// The state's normalized governance policy, encoded.
+    pub governance: Option<Vec<u8>>,
+}
+
+impl StatePolicy {
+    /// The state's governance policy as normalized.
+    #[must_use]
+    pub fn governance_term(&self) -> Option<Term> {
+        match Term::decode(self.governance.as_deref()?) {
+            Some((term, [])) => Some(term),
+            _ => None,
+        }
+    }
 }
 
 /// A Flow type's normalized policy.
@@ -157,6 +170,9 @@ fn state_term(policy: &StatePolicy) -> Term {
     }
     if let Some(retention) = &policy.retention {
         fields.push((b"retention".to_vec(), retention_term(retention)));
+    }
+    if let Some(governance) = policy.governance_term() {
+        fields.push((b"governance".to_vec(), governance));
     }
     Term::Map(fields)
 }

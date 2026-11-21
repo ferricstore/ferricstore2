@@ -256,18 +256,24 @@ fn state_policy(entries: &Entries) -> Result<StatePolicy, FlowError> {
         .map(retention)
         .transpose()?
         .flatten();
-    match get(entries, "governance") {
-        None | Some(Term::Nil) => {}
-        Some(_) => {
-            return Err(rejected(
-                "ERR flow policy governance is not supported by this server yet",
-            ));
-        }
-    }
+    let governance = match get(entries, "governance") {
+        None => None,
+        Some(term) => match super::super::governance::policy::normalize(term)? {
+            Some(normalized) => {
+                let mut encoded = Vec::new();
+                normalized
+                    .encode(&mut encoded)
+                    .ok_or_else(|| rejected("ERR flow governance policy is too large"))?;
+                Some(encoded)
+            }
+            None => None,
+        },
+    };
     Ok(StatePolicy {
         mode,
         retry,
         retention,
+        governance,
     })
 }
 

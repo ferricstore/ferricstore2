@@ -512,3 +512,13 @@ Each step is one commit with its tests.
   workflow test (schedules, effects and every governance command) passes;
   the rest are key-value commands, `CREATE_MANY`'s `idempotent` option, a
   LangChain flow test and a topology check.
+- Step 15d (state governance): a Flow policy's state may now carry a
+  `governance` policy, normalized as `Governance.Policy.normalize/1` does
+  (mode, effect rules, audit, named limit, budget and circuit rules,
+  approvals; text choices lowered, lists without repeats, rules checked in
+  name order, 1 MiB bound) and kept sparse; `nil` removes it, a later set
+  deep-merges into it, and `FLOW.POLICY.GET` shows it for the state.
+  Effects are still decided under the default policy, since a leased Flow
+  is `running`, a state no policy may name. The policy scenario (a full
+  policy, merges, removal, empty forms, 24 invalid parts) matches Elixir
+  exactly. The running-Flow limit claims take from these rules is next.

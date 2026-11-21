@@ -31,6 +31,7 @@ mod flow_mutate;
 mod flow_overview;
 mod flow_payload;
 mod flow_policy;
+mod flow_policy_governance;
 mod flow_query;
 mod flow_record;
 mod flow_rewind;
