@@ -76,7 +76,7 @@ impl FlowService for QueueNode {
                 });
                 if elsewhere {
                     return reply(Err(ServiceError::rejected(
-                        "CROSSSLOT Flow dependency keys must hash to the same slot".to_owned(),
+                        "CROSSSLOT Flow dependency keys must hash to the same shard".to_owned(),
                     )));
                 }
                 FlowCommand::SpawnChildren(spawn)

@@ -23,15 +23,16 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 15 images (values in the value codec's form, attached
-/// references and the references Flows hold; audit gaps G5, G9, G10)
+/// Version 16 images (values in the value codec's form, attached
+/// references, the references Flows hold and payload references; audit
+/// gaps G5, G9, G10, G16)
 /// carry each Flow's fields beyond its record (with the
 /// policy-indexed names it was written under, term payloads, effects, the
 /// governance ledger and kept value versions) and each shard's governance
 /// records, its history (with timeout and rewind extras), the shard's
 /// shared values, its Flow type policies (ADR-014) and the stubs of its
 /// finished Flows on disk (ADR-016).
-const VERSION: u8 = 15;
+const VERSION: u8 = 16;
 
 struct Progress {
     next: u64,

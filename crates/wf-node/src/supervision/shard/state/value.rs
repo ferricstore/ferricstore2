@@ -20,10 +20,12 @@ use wf_types::version::TimestampMillis;
 
 mod attached;
 mod held;
+mod payload_ref;
 mod versions;
 
 pub(super) use attached::{attach, requested_refs};
 pub(crate) use held::Held;
+pub(super) use held::check_slot;
 pub(super) use versions::with_values;
 
 use super::super::command::Logged;

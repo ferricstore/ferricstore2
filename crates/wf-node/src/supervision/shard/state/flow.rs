@@ -135,7 +135,8 @@ impl ShardState {
         };
         let term = Self::view(stored, entry, &defaults).term(&get.include);
         let attached = super::value::requested_refs(entry, &get.include.values);
-        self.with_attached(term, now, attached)
+        let term = self.with_attached(term, now, attached);
+        self.with_payload_ref(term, now, &key, &get.include)
     }
 
     /// Logs the stored Flow under `key` as its after-image.
@@ -282,6 +283,10 @@ impl ShardState {
         .and_then(|mut meta| {
             let partition = Partition::for_new_flow(&create.id, create.partition_key.as_deref());
             super::value::attach(&mut meta, &create.value_refs, &partition)?;
+            if let Some(reference) = &create.payload_ref {
+                super::value::check_slot(&partition, reference)?;
+                meta.payload_ref = Some(reference.clone());
+            }
             Ok(meta)
         })
     }

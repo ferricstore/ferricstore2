@@ -66429,3 +66429,43 @@ largest setting.
 
 Evidence: 24 new audit tests pass; mutation checks kill the G10 move, the
 G10 drop with the last holder, the G11 slot check and the G13 start time.
+
+### Flow test audit: compact keys section and payload references (22 Nov)
+
+`flow_test/sections/flow_internal_keys_use_compact_partition_tags.exs`:
+its key and codec tests are internal; its in-process pipeline tests port
+as each command's own answer (the adapter's order is the `wf-api-tcp`
+pipeline test); claims' reply shapes, payload reads, named values across a
+transition and repeated completions port as they are.
+
+G16 (payload references) closed. RED: `ERR FLOW.CREATE option payload_ref
+is not supported by this server` in all three new tests. Decision: the
+reference lives in the Flow's fields (`FlowMeta.payload_ref`, after the
+kept versions in the field image, so images are version 16); a payload
+given in the same or a later command wins and clears it, as Elixir's
+`flow_value_ref/6` prefers the payload; a read or claim that returns the
+payload resolves it on the Flow's shard; it must share the Flow's slot
+(G11, now with Elixir's text "...must hash to the Flow shard") and it
+holds the value it names (G10), so an owner's value used as another Flow's
+payload outlives the owner. History events still name the Flow's own
+payload reference only. Evidence: three `audit::payload_refs` tests,
+including a reopen under another shard count; mutation checks kill the
+slot check, the holding, the claim resolution and the mutation's
+reference.
+
+### Flow test audit: spawn-children section (22 Nov)
+
+`flow_test/sections/flow_spawn_children_rejects_missing_wait_state_
+waiting_children.exs` ported (23 tests, `audit::children_rules` and
+`audit::children_joins`). Gaps closed, failing runs first: G18 the spawn
+idempotency hash (RED: a different child `max_active_ms` answered `OK`
+instead of `child group idempotency conflict`); G19 an empty `wait_state`
+(RED: `ERR flow store unavailable`); G20 claim state `any` (RED: the
+cross-shard claim took nothing). Decision for G18: Elixir's field list
+(`@flow_child_group_child_fields` plus the payload) and its id and
+partition order; a group spawned before this change answers a retry as a
+conflict once, since its stored hash used the old fields (no release has
+groups to keep). The cross-slot child text is Elixir's ("same shard"),
+for clients that match it; the rule stays the slot. Mutation checks kill
+the child `max_active_ms` part, the children's ordering and the empty
+wait state filter. The Elixir Ra shard restart test ports as a reopen.

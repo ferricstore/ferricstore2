@@ -43,6 +43,15 @@ fn hydrate(entries: &mut Vec<(&str, Term)>, kind: &str, value: Option<&[u8]>, ma
     entries.push((size_field, Term::int(size)));
 }
 
+/// A read's payload fields for `value`, read from the stored value a Flow
+/// names as its payload (audit gap G16).
+#[must_use]
+pub fn payload_fields(value: &[u8], max_bytes: u64) -> Vec<(&'static str, Term)> {
+    let mut entries = Vec::new();
+    hydrate(&mut entries, "payload", Some(value), max_bytes);
+    entries
+}
+
 /// An attached reference as `value_refs` shows it: no digest or version
 /// (audit gap G9).
 #[must_use]
@@ -224,7 +233,10 @@ impl View<'_> {
             ("state", Term::Bin(record.state().to_vec())),
             (
                 "payload_ref",
-                self.reference('p', record.payload().is_some(), meta.payload_version),
+                match &meta.payload_ref {
+                    Some(reference) => Term::Bin(reference.clone()),
+                    None => self.reference('p', record.payload().is_some(), meta.payload_version),
+                },
             ),
             (
                 "parent_flow_id",

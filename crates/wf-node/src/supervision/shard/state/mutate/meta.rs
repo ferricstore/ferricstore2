@@ -45,6 +45,10 @@ pub(super) fn updated_meta(
     super::super::value::write_values(&mut next, &mutation.values, &mutation.override_values)?;
     super::super::value::drop_values(&mut next, &mutation.drop_values);
     super::super::value::attach(&mut next, &mutation.value_refs, partition)?;
+    if let Some(reference) = &mutation.payload_ref {
+        super::super::value::check_slot(partition, reference)?;
+        next.payload_ref = Some(reference.clone());
+    }
     let (payload, result, error, ttl) = match &mutation.change {
         Change::Transition { payload, .. } | Change::StepContinue { payload, .. } => {
             (payload.is_some(), false, false, None)
@@ -70,6 +74,8 @@ pub(super) fn updated_meta(
             next.retain((RETAINED_PAYLOAD, b"", current.payload_version), old);
         }
         next.payload_version = version;
+        // A payload given now replaces a stored value named as one (G16).
+        next.payload_ref = None;
     }
     if result {
         if let Some(old) = previous.result() {

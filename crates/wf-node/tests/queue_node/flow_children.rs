@@ -254,7 +254,7 @@ fn children_must_share_their_parents_slot_whatever_the_shard_count() -> TestResu
     assert_eq!(
         refused,
         Err(ServiceError::rejected(
-            "CROSSSLOT Flow dependency keys must hash to the same slot".to_owned()
+            "CROSSSLOT Flow dependency keys must hash to the same shard".to_owned()
         ))
     );
     let child = run(

@@ -64,7 +64,7 @@ pub(in crate::supervision::shard::state) fn check_slot(
     let slot = value::parse_ref(reference).map(|parsed| slot_for_tag(&parsed.tag));
     if slot.is_some_and(|slot| slot != partition.slot()) {
         return Err(ServiceError::rejected(
-            "CROSSSLOT Flow shared value refs must hash to the Flow slot".to_owned(),
+            "CROSSSLOT Flow shared value refs must hash to the Flow shard".to_owned(),
         ));
     }
     Ok(())

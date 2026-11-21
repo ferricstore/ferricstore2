@@ -15,7 +15,7 @@ pub use include::{DEFAULT_PAYLOAD_MAX_BYTES, Include, Values};
 pub use retained::{
     RETAINED_ERROR, RETAINED_NAMED, RETAINED_PAYLOAD, RETAINED_RESULT, Retained, RetainedMap,
 };
-pub use view::{View, attached};
+pub use view::{View, attached, payload_fields};
 
 /// Elixir's default terminal retention: 7 days.
 pub const DEFAULT_RETENTION_TTL_MS: u64 = 604_800_000;
@@ -84,6 +84,9 @@ pub struct FlowMeta {
     /// References attached by name (`value_refs`, audit gap G9): values
     /// this Flow names but does not own.
     pub value_refs: BTreeMap<Vec<u8>, Vec<u8>>,
+    /// A stored value given as the payload (`payload_ref`, audit gap G16);
+    /// it replaces the record's own payload until a command sets one.
+    pub payload_ref: Option<Vec<u8>>,
 }
 
 impl Default for FlowMeta {
@@ -113,6 +116,7 @@ impl Default for FlowMeta {
             governance: None,
             retained: BTreeMap::new(),
             value_refs: BTreeMap::new(),
+            payload_ref: None,
         }
     }
 }

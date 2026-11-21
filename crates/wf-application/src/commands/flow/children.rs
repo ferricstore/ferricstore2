@@ -11,7 +11,7 @@ mod group;
 
 pub use group::{ChildGroup, ChildResult, Wait};
 
-use super::create::{self, CreateFlow};
+use super::create::{self, CreateFlow, MaxActive};
 use super::opts::Opts;
 use super::term::Term;
 
@@ -106,24 +106,48 @@ fn child(item: &Term, opts: &Opts<'_>, parent_partition: &[u8]) -> Result<Create
     create::parse(&Term::Map(entries))
 }
 
-/// The request hash: SHA-256 of the group policy and every child's create
-/// fields, as lowercase hex.
-fn request_hash(group_id: &[u8], group: &ChildGroup, children: &[CreateFlow]) -> Vec<u8> {
+/// The request hash: SHA-256 of the group policy, its wait state and the
+/// create fields Elixir compares (`@flow_child_group_child_fields` and the
+/// payload), children in id and partition order, as lowercase hex.
+fn request_hash(
+    (group_id, wait_state): (&[u8], Option<&[u8]>),
+    group: &ChildGroup,
+    children: &[CreateFlow],
+) -> Vec<u8> {
     let mut hasher = Sha256::new();
     let mut part = |bytes: &[u8]| {
         hasher.update(u64::try_from(bytes.len()).unwrap_or(u64::MAX).to_be_bytes());
         hasher.update(bytes);
     };
+    let number =
+        |value: Option<u64>| value.map_or_else(Vec::new, |value| value.to_be_bytes().to_vec());
     part(group_id);
+    part(wait_state.unwrap_or_default());
     part(group.wait.as_str().as_bytes());
     part(&[u8::from(group.fail_parent), u8::from(group.cancel_children)]);
     part(&group.success);
     part(&group.failure);
-    for child in children {
+    let mut ordered: Vec<&CreateFlow> = children.iter().collect();
+    ordered.sort_by(|left, right| {
+        (&left.id, &left.partition_key).cmp(&(&right.id, &right.partition_key))
+    });
+    for child in ordered {
         part(&child.id);
         part(&child.flow_type);
         part(&child.state);
         part(child.partition_key.as_deref().unwrap_or_default());
+        part(&number(child.run_at_ms));
+        part(&[child.priority]);
+        part(&number(child.retention_ttl_ms));
+        part(&match child.max_active_ms {
+            None => Vec::new(),
+            Some(MaxActive::Infinity) => b"infinity".to_vec(),
+            Some(MaxActive::Ms(ms)) => ms.to_be_bytes().to_vec(),
+        });
+        part(&number(child.history_hot_max_events));
+        part(&number(child.history_max_events));
+        part(child.correlation_id.as_deref().unwrap_or_default());
+        part(child.payload_ref.as_deref().unwrap_or_default());
         part(child.payload.as_deref().unwrap_or_default());
     }
     super::keys::digest(&hasher.finalize())
@@ -213,7 +237,10 @@ pub fn parse(args: &Term) -> Result<SpawnChildren, FlowError> {
     }
     let group = empty_group(&opts)?;
     let from_state = opts.binary_or_nil("from_state")?;
-    let wait_state = opts.binary_or_nil("wait_state")?;
+    // An empty wait state is a missing one, as in Elixir (audit gap G19).
+    let wait_state = opts
+        .binary_or_nil("wait_state")?
+        .filter(|state| !state.is_empty());
     let lease_token = match opts.get("lease_token") {
         None | Some(Term::Nil) => None,
         Some(Term::Bin(token)) if !token.is_empty() => Some(token.clone()),
@@ -238,7 +265,7 @@ pub fn parse(args: &Term) -> Result<SpawnChildren, FlowError> {
         ));
     }
     let mut group = group;
-    group.request_hash = request_hash(&group_id, &group, &children);
+    group.request_hash = request_hash((&group_id, wait_state.as_deref()), &group, &children);
     for child in &children {
         group.children.insert(child.id.clone(), b"running".to_vec());
         group.child_partitions.insert(

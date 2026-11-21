@@ -136,9 +136,9 @@ impl ShardState {
             }
         }
         if let Some(meta) = meta.as_deref()
-            && !meta.value_refs.is_empty()
+            && (!meta.value_refs.is_empty() || meta.payload_ref.is_some())
         {
-            self.hold(&key, meta.value_refs.values());
+            self.hold(&key, meta.value_refs.values().chain(&meta.payload_ref));
         }
         let entry = Entry {
             record,

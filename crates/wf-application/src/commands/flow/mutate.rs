@@ -142,6 +142,8 @@ pub struct Mutation {
     pub drop_values: Vec<Vec<u8>>,
     /// Named values whose different bytes may replace the stored ones.
     pub override_values: Vec<Vec<u8>>,
+    /// A stored value as the payload (audit gap G16); a given payload wins.
+    pub payload_ref: Option<Vec<u8>>,
     /// The change.
     pub change: Change,
 }
@@ -216,16 +218,24 @@ fn lease_ms(opts: &Opts<'_>) -> Result<u64, FlowError> {
 /// Option names one command takes besides [`COMMON`].
 fn extra(name: &str) -> Option<&'static [&'static str]> {
     Some(match name {
-        "FLOW.TRANSITION" => &["from_state", "to_state", "run_at_ms", "priority", "payload"],
+        "FLOW.TRANSITION" => &[
+            "from_state",
+            "to_state",
+            "run_at_ms",
+            "priority",
+            "payload",
+            "payload_ref",
+        ],
         "FLOW.STEP_CONTINUE" => &[
             "from_state",
             "to_state",
             "lease_ms",
             "worker",
             "payload",
+            "payload_ref",
             "return",
         ],
-        "FLOW.RETRY" => &["run_at_ms", "payload", "error", "retry"],
+        "FLOW.RETRY" => &["run_at_ms", "payload", "payload_ref", "error", "retry"],
         "FLOW.COMPLETE" => &["payload", "result", "ttl_ms", "return"],
         "FLOW.FAIL" => &["payload", "error", "ttl_ms"],
         "FLOW.CANCEL" => &["expected_version", "expect_state", "reason", "ttl_ms"],
@@ -334,6 +344,7 @@ pub fn parse(name: &str, args: &Term) -> Result<Mutation, FlowError> {
         value_refs: super::create::value_refs(&opts)?,
         drop_values: names(&opts, "drop_values")?,
         override_values: names(&opts, "override_values")?,
+        payload_ref: super::create::payload_ref(&opts)?.filter(|_| !opts.has("payload")),
         change,
     })
 }

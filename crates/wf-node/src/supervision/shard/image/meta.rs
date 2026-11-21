@@ -8,8 +8,9 @@
 //! then the signal idempotency keys (count, then key and digest), then the
 //! child groups as a [`Term`] map of each group's reply form, the error
 //! kind, the rewind target, the policy-indexed attribute names (count,
-//! then names) and state metadata key, and the effects and governance
-//! ledger as an optional binary of their own encoding.
+//! then names) and state metadata key, the effects and governance
+//! ledger as an optional binary of their own encoding, the attached
+//! references, the kept value versions and the payload reference.
 
 use std::collections::BTreeMap;
 
@@ -120,6 +121,8 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         out.extend_from_slice(&version.to_be_bytes());
         bin(out, &kept.bytes)?;
     }
+    // A stored value as the payload (audit gap G16).
+    optional_bin(out, meta.payload_ref.as_deref())?;
     Some(())
 }
 
@@ -224,6 +227,7 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
             refs
         },
         retained: decode_retained(reader)?,
+        payload_ref: reader.optional_bin()?,
     })
 }
 

@@ -205,10 +205,10 @@ impl ShardState {
             } else {
                 change
             };
-            let record = request
-                .records
-                .as_ref()
-                .and_then(|include| self.record_term(&key, include));
+            let record = request.records.as_ref().and_then(|include| {
+                let term = self.record_term(&key, include)?;
+                Some(self.with_payload_ref(term, now, &key, include))
+            });
             if let Some(entry) = self.hot(&key) {
                 taken.claimed.push(ClaimedFlow {
                     id: key.1.clone(),

@@ -14,6 +14,7 @@ const ALLOWED: &[&str] = &[
     "state",
     "partition_key",
     "payload",
+    "payload_ref",
     "parent_flow_id",
     "root_flow_id",
     "correlation_id",
@@ -94,6 +95,8 @@ pub struct CreateFlow {
     pub values: BTreeMap<Vec<u8>, Vec<u8>>,
     /// References attached by name (audit gap G9).
     pub value_refs: BTreeMap<Vec<u8>, Vec<u8>>,
+    /// A stored value as the payload, when no payload is given (G16).
+    pub payload_ref: Option<Vec<u8>>,
 }
 
 fn too_long(key: &str, max: usize) -> FlowError {
@@ -244,6 +247,23 @@ pub fn values(opts: &Opts<'_>) -> Result<BTreeMap<Vec<u8>, Vec<u8>>, FlowError> 
     }
 }
 
+/// The `payload_ref` option: a stored value as the payload (audit gap
+/// G16).
+///
+/// # Errors
+/// Anything but a non-empty reference of at most 256 bytes.
+pub fn payload_ref(opts: &Opts<'_>) -> Result<Option<Vec<u8>>, FlowError> {
+    match opts.get("payload_ref") {
+        None | Some(Term::Nil) => Ok(None),
+        Some(Term::Bin(bytes)) if !bytes.is_empty() && bytes.len() <= MAX_REF_BYTES => {
+            Ok(Some(bytes.clone()))
+        }
+        Some(_) => Err(FlowError::rejected(format!(
+            "ERR flow payload_ref must be a reference of 1 to {MAX_REF_BYTES} bytes"
+        ))),
+    }
+}
+
 /// The `value_refs` option: names to references this Flow attaches but
 /// does not own (audit gap G9).
 ///
@@ -351,6 +371,8 @@ pub fn parse(args: &Term) -> Result<CreateFlow, FlowError> {
     // Elixir stores any term; it is kept in the value codec's form and read
     // back as sent (audit gap G5).
     let payload = stored(&opts, "payload")?;
+    // A given payload wins over a reference, as in Elixir.
+    let payload_ref = payload_ref(&opts)?.filter(|_| payload.is_none());
     Ok(CreateFlow {
         id,
         flow_type,
@@ -372,5 +394,6 @@ pub fn parse(args: &Term) -> Result<CreateFlow, FlowError> {
         state_meta,
         values: values(&opts)?,
         value_refs: value_refs(&opts)?,
+        payload_ref,
     })
 }

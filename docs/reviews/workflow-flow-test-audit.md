@@ -52,8 +52,8 @@ Gaps found so far:
   the shard's shared values when its owner goes and is removed with its
   last holder. Holdings are in shard images (snapshot version 15).
 - G11 (closed): an attached reference outside the Flow's slot was taken
-  and then read as nil; it is refused (`CROSSSLOT Flow shared value refs
-  must hash to the Flow slot`).
+  and then read as nil; it is refused with Elixir's text (`CROSSSLOT Flow
+  shared value refs must hash to the Flow shard`; the rule is the slot).
 - G12 (closed): `FLOW.GET` took `values` only as a list; it takes `true`,
   `false`, a name or a list, as claims do.
 - G13 (closed): terminal retention started at the server's clock; it
@@ -63,10 +63,27 @@ Gaps found so far:
   `running state is only entered by FLOW.CLAIM_DUE`.
 - G15 (closed): the batch cap's text was invented (`items exceeds
   maximum`); it is Elixir's `batch item count exceeds maximum 100000`.
-- G16 (open): `FLOW.CREATE` refuses `payload_ref` (a stored value as the
-  payload), which Elixir's native create takes.
+- G16 (closed): `payload_ref` (a stored value as the payload) was refused.
+  Create, start-and-claim, transition, step-continue and retry take it,
+  as Elixir's do; a given payload wins and a later payload replaces it.
+  Reads and claims resolve it on the Flow's shard (missing:
+  `payload_missing`), it must share the Flow's slot, and it holds the
+  value (G10). Snapshot version 16. History events keep showing the
+  Flow's own payload reference only.
 - G17 (closed): `FLOW.EXTEND_LEASE` refused `return: ok_on_success`, which
   Elixir's lease commands take; it replies `OK` instead of the record.
+- G18 (closed): a repeated `SPAWN_CHILDREN` compared only the group policy
+  and each child's id, type, state, partition and payload, in the order
+  sent. It compares what Elixir's request hash does: the wait state and
+  each child's due time, priority, retention, active-time limit, history
+  caps, correlation id and payload reference too, children in id and
+  partition order.
+- G19 (closed): an empty `wait_state` was taken as a state, and the
+  parent's move failed as `store unavailable`; it is a missing wait state,
+  refused as Elixir refuses it.
+- G20 (closed): a claim's state `any` (any case, alone) was read as a state
+  of that name; it is every state, as Elixir reads it. A cross-slot child
+  now answers Elixir's text (`...must hash to the same shard`).
 
 ## `flow_write_contract_test.exs`
 
@@ -207,8 +224,8 @@ Gaps found so far:
 | 650 | retention cleanup does not global-scan refs for private payload values | ported (`audit::shared_values::a_flow_s_own_payload_and_unreferenced_named_values_go_with_it`; the scan hook is Elixir's) |
 | 708 | retention cleanup reclaims unreferenced owner named shared values without scanning | ported (same test) |
 | 775 | retention cleanup preserves owner named values referenced by a live flow | fixed (`audit::shared_values::an_owner_s_named_value_stays_while_a_live_flow_attaches_it`; G10) |
-| 899 | retention cleanup preserves an owner shared value used as a payload ref | gap G16: FLOW.CREATE `payload_ref` |
-| 968 | retention tracks named payload result and error shared refs | gap G16 for `payload_ref`; `result_ref` and `error_ref` are Elixir's internal router inputs (public commands refuse them) |
+| 899 | retention cleanup preserves an owner shared value used as a payload ref | fixed (`audit::payload_refs::an_owner_s_value_used_as_a_payload_outlives_the_owner`; G16 with G10) |
+| 968 | retention tracks named payload result and error shared refs | fixed (same test for `payload_ref`; `result_ref` and `error_ref` are Elixir's internal router inputs, refused by its public commands) |
 | 1095 | bounded partial and full cleanup preserve a shared value with a live consumer | fixed (`audit::shared_values::an_owner_s_named_value_stays_while_a_live_flow_attaches_it`; G10) |
 | 1177 | retention cleanup rejects a racing cross-shard shared value consumer | fixed (`audit::shared_values::a_flow_on_another_shard_cannot_attach_a_value`; G11; the race hook is Elixir's) |
 | 1290 | same-shard child shared ref acquisition ordered before cleanup preserves the value | fixed (`audit::shared_values::a_child_s_attached_value_outlives_its_owner`; G10) |
@@ -248,58 +265,58 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow internal keys use compact partition tags | open |
-| 30 | flow state record encoding is compact | open |
-| 100 | flow state record encoding preserves zeroes nils and empty binaries | open |
-| 137 | flow history encoding is compact and includes metadata | open |
-| 242 | flow_create stores state and prevents duplicate ids | open |
-| 269 | flow_create and flow_transition accept payload_ref for shared payloads | open |
-| 298 | managed shared value refs must share the Flow hash slot | open |
-| 327 | flow_transition without value options preserves existing named value refs | open |
-| 356 | flow_get hydrates payload refs only when full or payload is requested | open |
-| 387 | flow_claim_due returns payload inline up to cap without rolling back missing payloads | open |
-| 437 | pipeline_read_batch preserves order across get, missing, and history reads | open |
-| 480 | pipeline_read_batch accepts Rust Flow AST reads directly | open |
-| 504 | pipeline_read_batch rejects removed Flow terminal query ASTs | open |
-| 518 | pipeline_write_batch_independent works in raft mode | open |
-| 552 | pipeline_write_batch_independent accepts Rust Flow AST writes directly | open |
-| 578 | pipeline_write_batch_independent terminal commands preserve per-command success | open |
-| 643 | pipeline_write_batch_independent terminal commands skip cross-terminal pre-read | open |
-| 690 | pipeline_write_batch_independent terminal commands preserve duplicate flow order | open |
-| 736 | pipeline_write_batch_independent transitions preserve duplicate flow order | open |
-| 772 | pipeline_claim_due_batch coalesces compatible claims and preserves worker boundaries | open |
-| 810 | pipeline_claim_due_batch coalesces job-only claim responses | open |
-| 868 | claim_due supports compact job responses | open |
-| 894 | claim_due compact state response includes the claimed run state | open |
-| 921 | claim_due multi-state precheck does not miss work after an empty route state | open |
+| 8 | flow internal keys use compact partition tags | internal: Elixir's key layout |
+| 30 | flow state record encoding is compact | internal: Elixir's state record codec |
+| 100 | flow state record encoding preserves zeroes nils and empty binaries | internal: Elixir's state record codec |
+| 137 | flow history encoding is compact and includes metadata | internal: Elixir's history codec |
+| 242 | flow_create stores state and prevents duplicate ids | ported (`audit::records_and_claims::a_create_stores_the_flow_once`) |
+| 269 | flow_create and flow_transition accept payload_ref for shared payloads | fixed (`audit::payload_refs::create_and_transition_take_a_payload_reference`; G16) |
+| 298 | managed shared value refs must share the Flow hash slot | fixed (`audit::payload_refs::a_shared_payload_reference_must_share_the_flow_s_slot_and_reads_as_the_payload`; G16, G11 wording) |
+| 327 | flow_transition without value options preserves existing named value refs | ported (`audit::records_and_claims::a_transition_without_value_options_keeps_named_values`) |
+| 356 | flow_get hydrates payload refs only when full or payload is requested | ported (`audit::records_and_claims::a_read_returns_the_payload_only_when_asked_and_within_its_cap`) |
+| 387 | flow_claim_due returns payload inline up to cap without rolling back missing payloads | ported (same test, the inline payload; a payload the store lost is Elixir's storage case) |
+| 437 | pipeline_read_batch preserves order across get, missing, and history reads | covered (order: `wf-api-tcp` `session::flow::a_typed_pipeline_reports_each_command_in_order`; each read's answer: the GET and HISTORY tests) |
+| 480 | pipeline_read_batch accepts Rust Flow AST reads directly | internal: Elixir's in-process Rust-AST pipeline form |
+| 504 | pipeline_read_batch rejects removed Flow terminal query ASTs | internal: removed Elixir terminal-query pipeline forms |
+| 518 | pipeline_write_batch_independent works in raft mode | ported (`audit::records_and_claims::each_command_of_an_independent_batch_answers_for_itself`; order: the `wf-api-tcp` pipeline test) |
+| 552 | pipeline_write_batch_independent accepts Rust Flow AST writes directly | internal: Elixir's in-process Rust-AST pipeline form |
+| 578 | pipeline_write_batch_independent terminal commands preserve per-command success | ported (`audit::records_and_claims::each_command_of_an_independent_batch_answers_for_itself`) |
+| 643 | pipeline_write_batch_independent terminal commands skip cross-terminal pre-read | internal: Elixir's terminal pre-read hook |
+| 690 | pipeline_write_batch_independent terminal commands preserve duplicate flow order | ported (same test, the repeated completion) |
+| 736 | pipeline_write_batch_independent transitions preserve duplicate flow order | ported (same test, two transitions in order) |
+| 772 | pipeline_claim_due_batch coalesces compatible claims and preserves worker boundaries | ported (`audit::records_and_claims::claims_one_after_another_keep_each_worker_s_leases`; coalescing is Elixir's) |
+| 810 | pipeline_claim_due_batch coalesces job-only claim responses | ported (`audit::records_and_claims::claims_answer_in_the_shape_they_ask_for`, the `jobs` shape) |
+| 868 | claim_due supports compact job responses | ported (same test) |
+| 894 | claim_due compact state response includes the claimed run state | ported (same test) |
+| 921 | claim_due multi-state precheck does not miss work after an empty route state | ported (same test) |
 
 ## `flow_test/sections/flow_spawn_children_rejects_missing_wait_state_waiting_children.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow_spawn_children rejects missing wait_state when waiting for children | open |
-| 41 | flow_spawn_children rejects empty wait_state for running parent | open |
-| 71 | stale child terminal command does not double count parent child group | open |
-| 128 | nested child completion resolves parent and propagates to grandparent | open |
-| 198 | flow_spawn_children can fail parent on child failure or ignore terminal failures | open |
-| 282 | flow_cancel parent cancels direct running children when configured | open |
-| 329 | flow_spawn_children is idempotent by group id and rejects conflicts | open |
-| 371 | flow_spawn_children idempotency includes child max_active_ms | open |
-| 413 | flow_spawn_children remains idempotent after child progress | open |
-| 465 | flow_spawn_children rejects new groups on terminal parents | open |
-| 501 | child group resolution cancels other open child groups when parent closes | open |
-| 566 | flow_spawn_children rejects child partition overrides across Raft groups | open |
-| 599 | colocated child completion survives Ra shard restart without duplicate parent summary | open |
-| 657 | terminal parent cancellation cancels colocated children | open |
-| 700 | flow_complete_many resolves colocated child groups | open |
-| 762 | Raft routing rejects child dependencies across independent groups | open |
-| 804 | colocated nested child completion resolves parent and grandparent | open |
-| 880 | resolved nonterminal child join schedules the parent for a due claim | open |
-| 975 | wait any keeps a parent blocked until an unresolved sibling closes | open |
-| 1085 | resolved nonterminal child join is included in a cross-shard due scan | open |
-| 1178 | resolved failed child join schedules a nonterminal failure successor | open |
-| 1188 | resolved successful child join leaves terminal success out of the due index | open |
-| 1192 | resolved failed child join leaves terminal failure out of the due index | open |
+| 8 | flow_spawn_children rejects missing wait_state when waiting for children | ported (`audit::children_rules::a_spawn_that_waits_needs_a_wait_state_and_changes_nothing_without_one`) |
+| 41 | flow_spawn_children rejects empty wait_state for running parent | fixed (same test; an empty wait state answered `store unavailable`: G19) |
+| 71 | stale child terminal command does not double count parent child group | ported (`audit::children_rules::a_repeated_child_completion_counts_once`) |
+| 128 | nested child completion resolves parent and propagates to grandparent | ported (`audit::children_rules::a_nested_completion_resolves_the_parent_and_the_grandparent`) |
+| 198 | flow_spawn_children can fail parent on child failure or ignore terminal failures | ported (`audit::children_rules::a_failed_child_fails_its_parent_or_is_ignored`) |
+| 282 | flow_cancel parent cancels direct running children when configured | ported (`audit::children_rules::cancelling_a_parent_cancels_its_children_and_records_them`) |
+| 329 | flow_spawn_children is idempotent by group id and rejects conflicts | ported (`audit::children_rules::a_group_spawn_is_idempotent_and_refuses_a_different_group`; children in another order are the same group) |
+| 371 | flow_spawn_children idempotency includes child max_active_ms | fixed (same test; the spawn hash left out child fields: G18) |
+| 413 | flow_spawn_children remains idempotent after child progress | ported (same test) |
+| 465 | flow_spawn_children rejects new groups on terminal parents | ported (`audit::children_rules::a_terminal_parent_spawns_no_new_group`) |
+| 501 | child group resolution cancels other open child groups when parent closes | ported (`audit::children_rules::a_parent_that_closes_cancels_its_other_open_groups`) |
+| 566 | flow_spawn_children rejects child partition overrides across Raft groups | ported (`audit::children_rules::a_child_outside_its_parent_s_slot_is_refused`; Elixir's text `...same shard`, the rule is the slot) |
+| 599 | colocated child completion survives Ra shard restart without duplicate parent summary | ported (`audit::children_rules::a_resolved_group_survives_a_restart_without_counting_twice`; a reopen replays the node's log) |
+| 657 | terminal parent cancellation cancels colocated children | ported (`audit::children_rules::cancelling_a_parent_cancels_its_children_and_records_them`) |
+| 700 | flow_complete_many resolves colocated child groups | ported (`audit::children_joins::complete_many_resolves_a_group_of_its_children`) |
+| 762 | Raft routing rejects child dependencies across independent groups | ported (`audit::children_rules::a_child_outside_its_parent_s_slot_is_refused`) |
+| 804 | colocated nested child completion resolves parent and grandparent | ported (`audit::children_rules::a_nested_completion_resolves_the_parent_and_the_grandparent`) |
+| 880 | resolved nonterminal child join schedules the parent for a due claim | ported (`audit::children_joins::a_resolved_join_makes_the_parent_due_in_its_next_state`) |
+| 975 | wait any keeps a parent blocked until an unresolved sibling closes | ported (`audit::children_joins::wait_any_keeps_the_parent_until_a_child_succeeds`) |
+| 1085 | resolved nonterminal child join is included in a cross-shard due scan | fixed (`audit::children_joins::a_joined_parent_is_found_by_a_claim_across_shards`; claim state `any` was read as a state name: G20) |
+| 1178 | resolved failed child join schedules a nonterminal failure successor | ported (`audit::children_joins::a_join_s_terminal_outcome_is_not_due_and_a_nonterminal_one_is`) |
+| 1188 | resolved successful child join leaves terminal success out of the due index | ported (same test) |
+| 1192 | resolved failed child join leaves terminal failure out of the due index | ported (same test) |
 
 ## `flow_test/sections/flow_max_active_ms_times_out_flows.exs`
 

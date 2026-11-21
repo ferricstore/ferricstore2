@@ -54,6 +54,7 @@ pub fn parse_start(args: &Term) -> Result<StartAndClaim, FlowError> {
             "now_ms",
             "partition_key",
             "payload",
+            "payload_ref",
             "parent_flow_id",
             "root_flow_id",
             "correlation_id",
