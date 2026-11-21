@@ -9,6 +9,8 @@ use wf_application::commands::queue::{
     CompleteFlow, ItemOutcome, NewFlow, Partition, ServiceError,
 };
 
+use wf_domain::workflow::Outcome;
+
 use super::super::completer::Finish;
 use super::command::Logged;
 use super::state::{self, ShardState};
@@ -120,6 +122,54 @@ fn governance_list(
     Box::new(move |durable| done(durable.map(|()| listed)))
 }
 
+/// A snapshot's capture: the shard's image, handed over once its marker is
+/// durable, so stubs name durable images only (ADR-016).
+fn capture(
+    state: &mut ShardState,
+    (index, now): (u16, u64),
+    snapshot: u64,
+    logged: &mut Vec<Logged>,
+    done: Done<Vec<u8>>,
+) -> Finish {
+    let image = state.image(now);
+    logged.push(Logged::Marker {
+        snapshot,
+        shard: index,
+    });
+    Box::new(move |durable| done(durable.and_then(|()| image.ok_or(ServiceError::Unavailable))))
+}
+
+/// A replicated group's requests (ADR-018), answered at once: a follower's
+/// replay of committed changes, promotion and demotion, and the policies to
+/// promote with.
+fn role_change(state: &mut ShardState, request: Request) {
+    match request {
+        Request::Replay { changes, done } => {
+            let applied = changes
+                .iter()
+                .all(|change| state.apply(change) == Ok(Outcome::Changed));
+            done(if applied {
+                Ok(())
+            } else {
+                Err(ServiceError::Unavailable)
+            });
+        }
+        Request::Live { policies, done } => {
+            for installed in policies {
+                state.install_policy(installed);
+            }
+            state.go_live();
+            done(Ok(()));
+        }
+        Request::Quiet { done } => {
+            state.go_quiet();
+            done(Ok(()));
+        }
+        Request::Policies { done } => done(Ok(state.policies().cloned().collect())),
+        other => other.fail(ServiceError::Unavailable),
+    }
+}
+
 /// Applies one request; returns what to call after the round is durable, or
 /// `None` when it was answered already.
 pub(super) fn handle(
@@ -129,17 +179,7 @@ pub(super) fn handle(
     logged: &mut Vec<Logged>,
 ) -> Option<Finish> {
     let finish: Finish = match request {
-        Request::Capture { snapshot, done } => {
-            // Stubs name durable images only (ADR-016).
-            let image = state.image(now);
-            logged.push(Logged::Marker {
-                snapshot,
-                shard: index,
-            });
-            Box::new(move |durable| {
-                done(durable.and_then(|()| image.ok_or(ServiceError::Unavailable)));
-            })
-        }
+        Request::Capture { snapshot, done } => capture(state, (index, now), snapshot, logged, done),
         Request::Create {
             flow_type,
             state: initial,
@@ -223,6 +263,13 @@ pub(super) fn handle(
         Request::Complete { items, done } => {
             let outcomes = complete(state, now, items, logged);
             Box::new(move |durable| done(durable.map(|()| outcomes)))
+        }
+        request @ (Request::Replay { .. }
+        | Request::Live { .. }
+        | Request::Quiet { .. }
+        | Request::Policies { .. }) => {
+            role_change(state, request);
+            return None;
         }
     };
     Some(finish)

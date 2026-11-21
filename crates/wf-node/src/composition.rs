@@ -20,13 +20,14 @@ mod info;
 mod policy;
 mod queue;
 mod replay;
+mod replica;
 mod router;
 mod schedule;
 mod snapshot;
+mod started;
 
 use std::path::Path;
-use std::sync::atomic::{AtomicU64, AtomicUsize};
-use std::sync::{Arc, OnceLock, mpsc};
+use std::sync::{Arc, mpsc};
 use std::thread::JoinHandle;
 use std::time::Duration;
 
@@ -35,15 +36,17 @@ use wf_domain::retention::ResolvedRetention;
 use wf_storage::log::{GroupLog, GroupLogLimits, SegmentStorage};
 use wf_storage::snapshot::files::SnapshotFiles;
 
-use crate::supervision::shard::state::ShardState;
-use crate::supervision::shard::{self, Links};
+use crate::supervision::shard::role::Role;
+use crate::supervision::shard::sink::Sink;
 use crate::supervision::waiters::Waiters;
 use crate::supervision::{self, completer, scheduler, snapshots};
 pub use admission::Admission;
 pub use error::NodeError;
 use replay::replay;
-use router::{Router, ShardLink};
+pub use replica::Replica;
+use router::Router;
 use snapshot::Snapshots;
+use started::Started;
 
 /// How long the schedule thread waits idle before polling, as Elixir's
 /// scheduler sleeps between empty polls.
@@ -97,12 +100,15 @@ pub struct QueueNode {
     shards: Vec<JoinHandle<()>>,
     completer: Option<JoinHandle<()>>,
     waiter: Option<JoinHandle<()>>,
-    snapshots: Arc<Snapshots>,
+    /// `None` for a replicated node (ADR-018 phase 3 adds its snapshots).
+    snapshots: Option<Arc<Snapshots>>,
     snapshot_stop: Option<mpsc::Sender<()>>,
     snapshotter: Option<JoinHandle<()>>,
     /// Schedule commands for the schedule thread (ADR-014 step 13).
     schedule_jobs: Option<mpsc::Sender<scheduler::Job>>,
     scheduling: Option<JoinHandle<()>>,
+    /// A replicated node's group member and its runtime (ADR-018).
+    group: Option<replica::Group>,
 }
 
 /// Starts the schedule thread; dropping the returned sender stops it.
@@ -204,58 +210,34 @@ impl QueueNode {
         if let Some(cut) = &cut {
             snapshots.tidy(cut)?;
         }
-        let (waiter_sender, waiter_receiver) = mpsc::channel();
-        let waiters = Waiters::new(waiter_sender);
-        let waiter_handle = waiters.clone();
-        let waiter = supervision::spawn("wf-waiters".into(), move || {
-            waiter_handle.run(&waiter_receiver);
-        })
-        .ok_or(NodeError::Thread)?;
         let (completion_sender, completion_receiver) = mpsc::channel();
         let completer_log = Arc::clone(&log);
         let completer = supervision::spawn("wf-completer".into(), move || {
             completer::run(&completer_log, &completion_receiver);
         })
         .ok_or(NodeError::Thread)?;
-        let release_router = Arc::new(OnceLock::new());
-        let running = credit::running::opened(states.first());
-        let (links, threads) = start_shards(
-            states,
-            &Links {
-                index: 0,
-                log: Arc::clone(&log),
-                completions: completion_sender,
-                ready: Arc::new(AtomicU64::new(0)),
-                leased: Arc::new(AtomicU64::new(0)),
-                waiters: waiters.clone(),
-                max_append_bytes: config.log.max_block_bytes.checked_div(2).unwrap_or(0),
-                release: credit::releaser(Arc::clone(&release_router)),
-                backlog: Arc::new(AtomicUsize::new(0)),
-            },
-        )?;
-        let router = Router {
-            shards: links,
-            shard_count: config.shards,
-            waiters: waiters.clone(),
-            running,
-            admission: config.admission,
+        let sink = Sink::Local {
+            log: Arc::clone(&log),
+            completions: completion_sender,
+            max_append_bytes: config.log.max_block_bytes.checked_div(2).unwrap_or(0),
         };
-        let router = Arc::new(router);
-        let _set = release_router.set(Arc::downgrade(&router));
+        let started = Started::new(states, &config, sink, Role::single())?;
+        let router = Arc::clone(&started.router);
         let (snapshot_stop, snapshotter) = start_snapshots(&snapshots, &router)?;
         let (schedule_jobs, scheduling) = start_schedules(&router, config.schedule_poll)?;
         Ok(Self {
             credit_cache: credit::Cache::default(),
-            router: Some(router),
-            waiters,
-            shards: threads,
+            router: Some(started.router),
+            waiters: started.waiters,
+            shards: started.shards,
             completer: Some(completer),
-            waiter: Some(waiter),
-            snapshots,
+            waiter: Some(started.waiter),
+            snapshots: Some(snapshots),
             snapshot_stop: Some(snapshot_stop),
             snapshotter: Some(snapshotter),
             schedule_jobs: Some(schedule_jobs),
             scheduling: Some(scheduling),
+            group: None,
         })
     }
 
@@ -266,7 +248,10 @@ impl QueueNode {
     /// not capture, or snapshot storage fails; the log then stays as it was.
     pub fn snapshot(&self) -> Result<u64, NodeError> {
         let router = self.router.as_ref().ok_or(NodeError::Stopped)?;
-        self.snapshots.take(router)
+        let snapshots = self.snapshots.as_ref().ok_or(NodeError::Group(
+            "a replicated node does not take snapshots yet",
+        ))?;
+        snapshots.take(router)
     }
 
     fn per_shard<T>(
@@ -285,50 +270,15 @@ impl QueueNode {
     }
 }
 
-/// Starts one thread per shard; each gets `shared`'s log, completions,
-/// waiters, append size and releases, and its own index and counters.
-fn start_shards(
-    states: Vec<ShardState>,
-    shared: &Links,
-) -> Result<(Vec<ShardLink>, Vec<JoinHandle<()>>), NodeError> {
-    let mut links = Vec::with_capacity(states.len());
-    let mut threads = Vec::with_capacity(states.len());
-    for (index, state) in states.into_iter().enumerate() {
-        let (sender, receiver) = mpsc::channel();
-        let ready = Arc::new(AtomicU64::new(state.ready()));
-        let leased = Arc::new(AtomicU64::new(state.leased()));
-        let backlog = Arc::new(AtomicUsize::new(0));
-        let shard_links = Links {
-            index: u16::try_from(index).map_err(|_| NodeError::InvalidShards)?,
-            log: Arc::clone(&shared.log),
-            completions: shared.completions.clone(),
-            ready: Arc::clone(&ready),
-            leased: Arc::clone(&leased),
-            waiters: shared.waiters.clone(),
-            max_append_bytes: shared.max_append_bytes,
-            release: Arc::clone(&shared.release),
-            backlog: Arc::clone(&backlog),
-        };
-        threads.push(
-            supervision::spawn(format!("wf-shard-{index}"), move || {
-                shard::run(state, &receiver, &shard_links);
-            })
-            .ok_or(NodeError::Thread)?,
-        );
-        links.push(ShardLink {
-            requests: sender,
-            ready,
-            leased,
-            backlog,
-        });
-    }
-    Ok((links, threads))
-}
-
 impl Drop for QueueNode {
     /// Closes the shards' channels, waits for the shards and the completion
     /// thread, then stops the waiter thread, which fails what still waits.
     fn drop(&mut self) {
+        // A replicated node stops its member first, so nothing applies to
+        // shards that are stopping.
+        if let Some(mut group) = self.group.take() {
+            group.stop();
+        }
         self.schedule_jobs = None;
         if let Some(scheduling) = self.scheduling.take() {
             // A runtime thread only returns; a join error has nothing to report.

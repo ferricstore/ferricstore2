@@ -47,6 +47,7 @@ mod flow_text;
 mod flow_value;
 mod lifecycle;
 mod reclaim;
+mod replica;
 mod restart;
 mod retention;
 mod selection;

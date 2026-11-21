@@ -1,13 +1,13 @@
 //! Routes requests to shard threads and splits claims over them.
 
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::sync::mpsc;
 
 use wf_application::commands::queue::{ClaimFlows, Partition, ServiceError, shard_for_slot};
 
 use crate::supervision::shard::Request;
-use crate::supervision::shard::state::Peeked;
+use crate::supervision::shard::role::Role;
 use crate::supervision::waiters::Waiters;
 
 /// The node's connection to one shard thread.
@@ -31,6 +31,11 @@ pub(crate) struct Router {
     pub(crate) running: super::credit::running::Running,
     /// Backlog limits for client requests (ADR-017).
     pub(crate) admission: super::Admission,
+    /// Whether the shards serve client requests (ADR-018).
+    pub(crate) role: Role,
+    /// Set once a replicated round was lost: the node serves nothing more
+    /// until it reopens (ADR-018).
+    pub(crate) poisoned: Arc<AtomicBool>,
 }
 
 pub(crate) fn shard_index(partition: &Partition, shards: u16) -> Option<usize> {
@@ -39,29 +44,25 @@ pub(crate) fn shard_index(partition: &Partition, shards: u16) -> Option<usize> {
 
 /// Fails a request that never reached its shard.
 fn refuse(request: Request) {
-    match request {
-        Request::Create { done, .. } | Request::Complete { done, .. } => {
-            done(Err(ServiceError::Unavailable));
-        }
-        Request::Claim { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::Capture { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::Flow { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::FlowBatch { done, .. }
-        | Request::CreateBatch { done, .. }
-        | Request::RunSteps { done, .. } => {
-            done(Err(ServiceError::Unavailable));
-        }
-        Request::ValueRead { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::Policy { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::Cleanup { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::Read { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::GovernanceList { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::Schedule { done, .. } => done(Err(ServiceError::Unavailable)),
-        Request::Peek { done, .. } => done(Peeked::default()),
-    }
+    request.fail(ServiceError::Unavailable);
 }
 
 impl Router {
+    /// Refuses client requests a member does not lead, and every request
+    /// once a lost round stopped the node (ADR-018).
+    ///
+    /// # Errors
+    /// [`ServiceError::Unavailable`] or [`ServiceError::Reroute`].
+    pub(crate) fn serving(&self) -> Result<(), ServiceError> {
+        if self.poisoned.load(Ordering::Acquire) {
+            Err(ServiceError::Unavailable)
+        } else if self.role.serves() {
+            Ok(())
+        } else {
+            Err(ServiceError::Reroute)
+        }
+    }
+
     pub(crate) fn send(&self, index: usize, request: Request) {
         match self.shards.get(index) {
             Some(shard) => {

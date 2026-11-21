@@ -183,6 +183,15 @@ impl ShardState {
         self.live = true;
     }
 
+    /// Stops deciding changes of its own: a follower applies its leader's
+    /// (ADR-018), so pending child events and credit releases are dropped.
+    pub(crate) fn go_quiet(&mut self) {
+        self.live = false;
+        self.child_events.clear();
+        self.closing.clear();
+        self.credit_releases.clear();
+    }
+
     /// Records in the due index, claimable now or later.
     pub(crate) const fn ready(&self) -> u64 {
         self.ready

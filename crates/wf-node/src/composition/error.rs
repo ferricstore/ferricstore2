@@ -36,6 +36,9 @@ pub enum NodeError {
     /// The cold files of finished Flows could not be opened or tidied
     /// (ADR-016).
     Cold,
+    /// A replicated group's log or member refused to start, or the request
+    /// is not one a replicated node serves yet (ADR-018).
+    Group(&'static str),
 }
 
 impl fmt::Display for NodeError {
@@ -53,6 +56,7 @@ impl fmt::Display for NodeError {
             Self::Capture => formatter.write_str("a shard did not capture its snapshot"),
             Self::Stopped => formatter.write_str("the node is stopping"),
             Self::Cold => formatter.write_str("cold files of finished Flows refused to open"),
+            Self::Group(problem) => write!(formatter, "replicated group: {problem}"),
         }
     }
 }

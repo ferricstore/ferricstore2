@@ -19,6 +19,9 @@ impl QueueService for QueueNode {
         let Some(router) = self.router.as_ref() else {
             return reply(Err(ServiceError::Unavailable));
         };
+        if let Err(error) = router.serving() {
+            return reply(Err(error));
+        }
         let CreateFlows {
             flow_type,
             state,
@@ -64,6 +67,9 @@ impl QueueService for QueueNode {
 
     fn claim(&self, request: ClaimFlows, reply: Reply<Vec<ClaimedFlow>>) {
         match self.router.as_ref() {
+            Some(router) if router.serving().is_err() => {
+                reply(router.serving().map(|()| Vec::new()));
+            }
             Some(router) => self.governed_claim(router, request, reply),
             None => reply(Err(ServiceError::Unavailable)),
         }
@@ -73,6 +79,9 @@ impl QueueService for QueueNode {
         let Some(router) = self.router.as_ref() else {
             return reply(Err(ServiceError::Unavailable));
         };
+        if let Err(error) = router.serving() {
+            return reply(Err(error));
+        }
         let total = completions.len();
         let per_shard = Self::per_shard(
             router,

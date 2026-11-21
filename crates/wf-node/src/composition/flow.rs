@@ -35,6 +35,9 @@ impl FlowService for QueueNode {
         let Some(router) = self.router.as_ref() else {
             return reply(Err(ServiceError::Unavailable));
         };
+        if let Err(error) = router.serving() {
+            return reply(Err(error));
+        }
         let command = match command {
             FlowCommand::Many(batch) => return batch_mutation(router, *batch, reply),
             FlowCommand::CreateMany(batch) => return batch_create(router, *batch, reply),

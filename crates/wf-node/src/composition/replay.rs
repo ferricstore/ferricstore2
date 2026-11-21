@@ -127,7 +127,7 @@ fn unheld(logged: Logged, cut: &Cut) -> Option<Logged> {
 
 /// Routes a logged change to the shards owning its Flows; a sweep is split
 /// into one sweep per shard.
-fn by_shard(logged: Logged, shards: u16) -> Option<Vec<(usize, Logged)>> {
+pub(crate) fn by_shard(logged: Logged, shards: u16) -> Option<Vec<(usize, Logged)>> {
     if let Logged::Group(changes) = logged {
         // Each shard's part of a group stays one change.
         let mut parts: Vec<(usize, Vec<Logged>)> = Vec::new();

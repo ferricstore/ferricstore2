@@ -10,6 +10,8 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+# ADR-018: the state machine reads OpenRaft's apply stream.
+futures-util.workspace = true
 openraft.workspace = true
 # ADR-018: Raft traffic between members.
 tokio = { workspace = true, features = ["time"] }
@@ -21,6 +23,5 @@ wf-ports.workspace = true
 [dev-dependencies]
 # ADR-018: the gate runs OpenRaft's suite and groups on the real entry log.
 wf-storage.workspace = true
-futures-util.workspace = true
 wf-test-support.workspace = true
 tokio = { workspace = true, features = ["rt-multi-thread", "time"] }

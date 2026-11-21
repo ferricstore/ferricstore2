@@ -90,3 +90,21 @@ pub trait ConsensusLog: Send + Sync {
     /// The storage's refusal or failure.
     fn purge(&self, upto: EntryId) -> Result<(), ConsensusLogError>;
 }
+
+/// Called once a machine applied what it was given, or failed to.
+pub type Applied = Box<dyn FnOnce(Result<(), ConsensusLogError>) + Send>;
+
+/// The replicated state a group's committed entries change (ADR-018): the
+/// consensus adapter hands it other members' proposals in commit order, and
+/// tells it when this member starts and stops leading.
+pub trait ReplicatedMachine: Send + Sync {
+    /// Applies committed proposals in order; `done` once applied.
+    fn apply(&self, proposals: Vec<Arc<[u8]>>, done: Applied);
+
+    /// This member leads from now on, with every earlier entry applied;
+    /// `done` once it serves.
+    fn promote(&self, done: Applied);
+
+    /// This member no longer leads.
+    fn demote(&self);
+}

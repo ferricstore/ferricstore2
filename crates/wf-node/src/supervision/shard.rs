@@ -11,28 +11,33 @@
 pub(crate) mod command;
 mod handle;
 pub(crate) mod image;
+mod request;
+pub(crate) mod role;
+pub(crate) mod sink;
 pub(crate) mod state;
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
-use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
+use std::sync::mpsc::{Receiver, RecvTimeoutError};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::cleanup::Cleaned;
 use wf_application::commands::flow::effect::Credit;
 use wf_application::commands::flow::governance::{Command as GovernanceCommand, Listed};
 use wf_application::commands::flow::info::{Read, Tally};
+use wf_application::commands::flow::policy::Installed;
 use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::{FlowCommand, Term};
 use wf_application::commands::queue::{
     ClaimFlows, ClaimedFlow, CompleteFlow, ItemOutcome, NewFlow, Partition, ServiceError,
 };
-use wf_storage::log::GroupLog;
 
-use super::completer::{Completion, Finish};
+use super::completer::Finish;
 use super::waiters::{Arrival, Waiters};
 use command::Logged;
 use handle::handle;
+use role::Role;
+use sink::{Pending, Sink};
 use state::credit::CreditPool;
 use state::{Peeked, ShardState};
 
@@ -136,35 +141,33 @@ pub(crate) enum Request {
         partition: Partition,
         done: Done<Term>,
     },
-}
-
-impl Request {
-    /// The items it carries, at least one: its weight in the shard's
-    /// backlog (ADR-017).
-    pub(crate) fn weight(&self) -> usize {
-        let items = match self {
-            Self::Create { items, .. } => items.len(),
-            Self::CreateBatch { items, .. } => items.len(),
-            Self::Complete { items, .. } => items.len(),
-            Self::FlowBatch { items, .. } => items.len(),
-            Self::RunSteps { items, .. } => items.len(),
-            Self::ValueRead { refs, .. } => refs.len(),
-            _ => 1,
-        };
-        items.max(1)
-    }
+    /// A follower applies the leader's committed changes (ADR-018).
+    Replay {
+        changes: Vec<Logged>,
+        done: Done<()>,
+    },
+    /// The shard serves as the leader's, with shard 0's policies.
+    Live {
+        policies: Vec<Arc<Installed>>,
+        done: Done<()>,
+    },
+    /// The shard follows again.
+    Quiet { done: Done<()> },
+    /// The policies this shard holds.
+    Policies { done: Done<Vec<Arc<Installed>>> },
 }
 
 /// The thread's connections to the rest of the node.
 pub(crate) struct Links {
     /// This shard's index, named in its snapshot markers.
     pub(crate) index: u16,
-    pub(crate) log: Arc<GroupLog>,
-    pub(crate) completions: Sender<Completion>,
+    /// Where the shard's rounds go (ADR-018).
+    pub(crate) sink: Sink,
+    /// Whether the shard decides client requests (ADR-018).
+    pub(crate) role: Role,
     pub(crate) ready: Arc<AtomicU64>,
     pub(crate) leased: Arc<AtomicU64>,
     pub(crate) waiters: Waiters,
-    pub(crate) max_append_bytes: usize,
     /// Delivers the credits of Flows that left `running` (ADR-014 step 15).
     pub(crate) release: Releases,
     /// Items sent to this shard and not yet taken (ADR-017).
@@ -216,28 +219,6 @@ fn arrivals(logged: &[Logged]) -> Vec<Arrival> {
     arrivals
 }
 
-/// Appends the round's changes in chunks that fit one log block; returns the
-/// sequence covering all of them, or `None` when an append failed.
-fn append(log: &GroupLog, logged: &[Logged], max_bytes: usize, previous: u64) -> Option<u64> {
-    let mut sequence = previous;
-    let mut chunk: Vec<Vec<u8>> = Vec::new();
-    let mut chunk_bytes = 0_usize;
-    for change in logged {
-        let record = change.encode()?;
-        let size = record.len().saturating_add(4);
-        if !chunk.is_empty() && chunk_bytes.saturating_add(size) > max_bytes {
-            sequence = log.append_batch(std::mem::take(&mut chunk)).ok()?;
-            chunk_bytes = 0;
-        }
-        chunk_bytes = chunk_bytes.saturating_add(size);
-        chunk.push(record);
-    }
-    if !chunk.is_empty() {
-        sequence = log.append_batch(chunk).ok()?;
-    }
-    Some(sequence)
-}
-
 /// Releases `credits` once the round that freed them is durable.
 fn release_once_durable(release: Releases, credits: Vec<Credit>) -> Finish {
     Box::new(move |durable: Result<(), ServiceError>| {
@@ -271,8 +252,10 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
             links.backlog.fetch_sub(taken, Ordering::Relaxed);
         }
         now = committed_now(now);
+        // A follower only applies its leader's rounds (ADR-018).
+        let serving = links.role.serves();
         let mut logged = Vec::new();
-        if !failed {
+        if !failed && serving {
             logged.extend(state.sweep_timeouts(now, MAX_REMOVALS_PER_ROUND));
             logged.extend(state.sweep(now, MAX_REMOVALS_PER_ROUND));
         }
@@ -283,20 +266,30 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         }
         let mut finishes: Vec<Finish> = round
             .into_iter()
-            .filter_map(|request| handle(&mut state, (links.index, now), request, &mut logged))
+            .filter_map(|request| {
+                if !serving && !request.internal() {
+                    request.fail(ServiceError::Reroute);
+                    return None;
+                }
+                handle(&mut state, (links.index, now), request, &mut logged)
+            })
             .collect();
         // Parents of children that finished this round, on this shard.
         logged.extend(state.settle_children(now));
         // Credits of Flows that left `running` are released once durable.
         let credits = state.take_credit_releases();
-        if !credits.is_empty() {
+        if !credits.is_empty() && serving {
             finishes.push(release_once_durable(Arc::clone(&links.release), credits));
         }
-        if !failed {
-            match append(&links.log, &logged, links.max_append_bytes, sequence) {
-                Some(covered) => sequence = covered,
-                None => failed = true,
-            }
+        let pending = if failed {
+            None
+        } else {
+            links.sink.take(&logged, sequence)
+        };
+        match &pending {
+            Some(Pending::Appended(covered)) => sequence = *covered,
+            Some(Pending::Proposed(_)) => {}
+            None => failed = true,
         }
         // Flows loaded for the round go back to disk; Flows that finished
         // move there (ADR-016).
@@ -316,15 +309,12 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
                 arrived
             });
         }
-        if failed {
-            for finish in finishes {
-                finish(Err(ServiceError::Unavailable));
-            }
-        } else if !finishes.is_empty()
-            && let Err(returned) = links.completions.send(Completion { sequence, finishes })
-        {
-            for finish in returned.0.finishes {
-                finish(Err(ServiceError::Unavailable));
+        match pending {
+            Some(pending) if !failed => links.sink.release(links.index, pending, finishes),
+            _ => {
+                for finish in finishes {
+                    finish(Err(ServiceError::Unavailable));
+                }
             }
         }
     }

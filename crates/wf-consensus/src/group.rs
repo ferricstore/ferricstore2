@@ -5,7 +5,10 @@
 
 mod codec;
 mod log_store;
+mod machine;
+mod member;
 mod peer;
+mod proposer;
 mod wire;
 
 use std::fmt;
@@ -14,7 +17,9 @@ use openraft::vote::RaftLeaderId;
 use openraft::{OptionalSend, impls};
 
 pub use log_store::LogStore;
+pub use member::{Member, MemberConfig, MemberError};
 pub use peer::{Link, Peers, serve};
+pub use proposer::{Committed, Proposer};
 
 /// An entry's application bytes: one shard round's changes.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

@@ -66226,3 +66226,44 @@ refuses it before it runs: status 5 (Elixir's `reroute`) with `code`
 (`_is_topology_refresh_error`) and replays the request because both flags
 are set (`_server_allows_retry`). Evidence: `session::topology` failed
 before (status 1, not retryable) and passes.
+
+### ADR-018 phase 2b-B/C: the replicated node
+
+New artifacts (solo design review): `wf_ports::consensus::log::{
+ReplicatedMachine, Applied}`; in `wf-consensus::group`: `machine` (the
+state machine bridge), `proposer` (`Proposer`, `Committed`), `member`
+(`Member`, `MemberConfig`, `MemberError`); in `wf-node`: `shard::{role,
+sink, request}` (`Role`, `Sink`, `Pending`, request helpers moved out of
+`shard.rs`), requests `Replay`, `Live`, `Quiet`, `Policies`,
+`ShardState::go_quiet`, `Router::serving`, `composition::{replica,
+started}` (`Replica`, `QueueNode::open_replicated`, `QueueNode::leader`,
+`Started` shared by both modes), `NodeError::Group`,
+`supervision::runtime`. Policy: `futures-util` moves to `wf-consensus`'s
+normal edges; `wf-node` uses Tokio timers.
+
+Decisions: `OpenRaft` stays in `wf-consensus`; the node implements the
+neutral machine port. The leader's shards decide rounds as before and hand
+them to the proposer, which writes them in order (`client_write_ff`) and
+releases each round's replies at its entry's commit, after the lane's
+earlier rounds; a round without changes waits for them too. Each proposal
+carries its process's epoch (the start time in nanoseconds): applying a
+committed entry skips this process's own rounds, which its shards applied
+when deciding them, and replays every other one into the follower's shards
+(not live: no child events, sweeps or credit releases of their own). The
+blank entry of this member's own current term promotes it (shard 0's
+policies installed everywhere, shards live, then the role serves); losing
+leadership demotes it. A round the group did not take stops the node
+(fail-stop: it serves nothing until reopened, since its shards hold
+changes the log lacks). A replicated node starts with empty shards and
+rebuilds from the log; snapshots and log compaction wait for phase 3.
+Followers, and members during an election, answer `reroute`.
+
+Evidence: `queue_node::replica` (three nodes over loopback TCP: the
+leader's creates, claims and completions; a follower answers `Reroute`; the
+leader stops and the new leader serves every Flow in its state; the old
+leader reopens and catches up; the second leader stops so the next majority
+needs the returned member, and every Flow is still there) passes five
+times in a row (4.4 to 4.8 s); with the follower apply made a no-op it
+fails (the new leader has no Flows). All 203 other node tests pass. Single
+node A/B against 620ad0c's binary: throughput 258-294k against 257-278k
+Flows/s, CPU 8.7-8.8 against 8.5-9.1 ms per 1k Flows.
