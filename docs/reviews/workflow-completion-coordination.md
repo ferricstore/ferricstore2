@@ -65801,3 +65801,11 @@ service saw `now_ms` 5), then passed for a typed command, a typed claim and
 a text command; pipelines use the same helper. Against the rebuilt node the
 probe's second worker takes nothing. All adapter, node, application,
 storage and domain tests pass.
+
+### ADR015-ROUTECRC Hardware CRC32 for routing
+
+No new artifacts; `wf-application` takes the reviewed `crc32fast` 1.5.5.
+`routing::crc32` was a bit-by-bit loop, 2.3% of busy CPU in the
+re-profile at be04f39. The routing tests (check value and Elixir's auto
+buckets) pass unchanged. Three alternating runs against be04f39: 7.6 to
+7.9 ms CPU per 1k Flows (was 8.0 to 8.1).

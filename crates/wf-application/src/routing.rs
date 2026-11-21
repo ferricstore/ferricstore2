@@ -119,17 +119,10 @@ fn parse_bucket(digits: &[u8]) -> Option<u8> {
     })
 }
 
-/// CRC-32 (IEEE, as zlib), computed bit by bit.
+/// CRC-32 (IEEE, as zlib and Erlang's `crc32/1`), hardware-accelerated
+/// (ADR-015; the bit-by-bit loop it replaces was 2% of busy CPU).
 fn crc32(bytes: &[u8]) -> u32 {
-    let mut crc = u32::MAX;
-    for byte in bytes {
-        crc ^= u32::from(*byte);
-        for _ in 0..8 {
-            let mask = (crc & 1).wrapping_neg();
-            crc = crc.wrapping_shr(1) ^ (0xEDB8_8320 & mask);
-        }
-    }
-    !crc
+    crc32fast::hash(bytes)
 }
 
 /// Decodes base64 with the URL-safe alphabet and no padding; `None` for

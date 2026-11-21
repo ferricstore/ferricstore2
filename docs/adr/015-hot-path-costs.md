@@ -62,9 +62,18 @@ Flows/s and RSS after the run.
    parity probes use. Node-level tests keep passing explicit times through
    the node API, which is not a client boundary.
 
+6. **Hardware CRC32 for routing** (`crc32fast` in `wf-application`):
+   auto buckets and slots were computed bit by bit (2.3% of busy CPU after
+   the steps above). Same IEEE CRC32, so every bucket and slot is
+   unchanged (the routing tests pin Elixir's values). Against be04f39: 7.6
+   to 7.9 ms (was 8.0 to 8.1).
+
 ## Consequences
 
-The binary links mimalloc's C code, built by `cc`; cargo-deny passes.
+The binary links mimalloc's C code, built by `cc`; cargo-deny passes. At
+1.6M Flows mimalloc holds 7 to 10% more memory (4.4 GB against 4.0 to 4.2
+GB) for about 25% less CPU (12.0 against 15.5 to 16.1 ms per 1k Flows);
+memory per Flow is the subject of the storage redesign.
 
 The SDK integration suite and the parity rig must start the node with
 `--client-clock true` where they depend on client times (the SDK's
