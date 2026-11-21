@@ -38,6 +38,17 @@ fn place(entry: &Entry) -> (&[u8], &[u8], u64) {
 impl ShardState {
     pub(super) fn catalog_insert(&mut self, key: &Key, entry: &Entry) {
         let (flow_type, state, updated) = place(entry);
+        // The usual case finds every level present, so nothing is copied
+        // but the member.
+        if let Some(members) = self
+            .catalog
+            .get_mut(flow_type)
+            .and_then(|states| states.get_mut(state))
+            .and_then(|partitions| partitions.get_mut(&key.0))
+        {
+            members.insert((updated, key.1.clone()));
+            return;
+        }
         self.catalog
             .entry(flow_type.to_vec())
             .or_default()

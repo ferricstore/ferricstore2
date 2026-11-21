@@ -48,6 +48,10 @@ Flows/s and RSS after the run.
    be discarded (benchmark data only). Against def0fc1: 8.1 to 8.3 ms (was
    8.4 to 8.8), RSS 743 to 759 MB (was 779 to 821).
 
+4. **No deep copy of a Flow's fields per write, fewer catalog
+   allocations.** Within noise on the queue path (its Flows have no fields):
+   7.9 to 8.3 ms against 8.1 to 8.5.
+
 ## Consequences
 
 The binary links mimalloc's C code, built by `cc`; cargo-deny passes.

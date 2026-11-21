@@ -16,11 +16,13 @@ fn terminal(state: &[u8]) -> bool {
 impl ShardState {
     /// Stores a reducer write, keeping the record's priority and fields.
     pub(super) fn store(&mut self, key: Key, record: WorkflowRecord, new_priority: Option<u8>) {
-        let previous = self.take_entry(&key);
+        let mut previous = self.take_entry(&key);
         let priority = previous
             .as_ref()
             .map_or(new_priority.unwrap_or(0), |previous| previous.priority);
-        let meta = previous.as_ref().and_then(|previous| previous.meta.clone());
+        // Moved, not copied: `write` reads only the previous record and
+        // history.
+        let meta = previous.as_mut().and_then(|previous| previous.meta.take());
         self.write(key, (record, priority, meta), previous, &[]);
     }
 

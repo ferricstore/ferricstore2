@@ -65774,3 +65774,14 @@ which before this change would have dropped a whole older log.
 60-byte segment limit, since its two one-record blocks shrank under the
 old 100. Three alternating runs against def0fc1: 8.1 to 8.3 ms CPU per 1k
 Flows (was 8.4 to 8.8). All 24 group log tests and all suites pass.
+
+### ADR015-COPIES Fewer copies per stored change
+
+No new artifacts. `ShardState::store` moves the Flow's fields out of the
+previous entry instead of deep-copying them (values, attributes, child
+groups) and dropping the original; `catalog_insert` finds the present
+type, state and partition levels before allocating, so the usual insert
+copies only the member. Queue-path Flows carry no fields, so three
+alternating runs against 8634e5c are within noise (7.9 to 8.3 ms CPU per 1k
+Flows, was 8.1 to 8.5); the generic path saves one deep copy per write.
+All 129 node tests and all suites pass.
