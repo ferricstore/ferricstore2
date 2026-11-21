@@ -9,9 +9,11 @@ use std::net::{SocketAddr, TcpStream};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
-use wf_api_tcp::session::{InFlight, ServerInfo, serve};
+use std::collections::BTreeMap;
+
+use wf_api_tcp::session::{Endpoint, InFlight, ServerInfo, serve};
 use wf_application::commands::flow::effect::denial::Denial;
-use wf_application::commands::flow::{FlowCommand, FlowService, Term};
+use wf_application::commands::flow::{FlowCommand, FlowService, NodeService, Term};
 use wf_application::commands::queue::{
     Cancellation, ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService,
     Reply, ServiceError,
@@ -247,6 +249,38 @@ fn start_trusting_client_clocks() -> TestResult<Running> {
 }
 
 fn serving(client_clock: bool, in_flight: InFlight) -> TestResult<Running> {
+    serving_with(client_clock, in_flight, Arc::new(Scripted), BTreeMap::new())
+}
+
+/// A listener for a replicated node's `service`, with two group members.
+fn serving_service(service: Arc<dyn NodeService>) -> TestResult<Running> {
+    let members = BTreeMap::from([
+        (
+            1,
+            Endpoint {
+                node: "ferricstore2-1".into(),
+                host: "127.0.0.1".into(),
+                port: 7001,
+            },
+        ),
+        (
+            2,
+            Endpoint {
+                node: "ferricstore2-2".into(),
+                host: "10.0.0.2".into(),
+                port: 7002,
+            },
+        ),
+    ]);
+    serving_with(false, InFlight::default(), service, members)
+}
+
+fn serving_with(
+    client_clock: bool,
+    in_flight: InFlight,
+    service: Arc<dyn NodeService>,
+    members: BTreeMap<u64, Endpoint>,
+) -> TestResult<Running> {
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
         .enable_io()
@@ -260,8 +294,9 @@ fn serving(client_clock: bool, in_flight: InFlight) -> TestResult<Running> {
         shard_count: 4,
         client_clock,
         in_flight,
+        members,
     };
-    runtime.spawn(serve(listener, Arc::new(Scripted), Arc::new(info)));
+    runtime.spawn(serve(listener, service, Arc::new(info)));
     Ok(Running {
         _runtime: runtime,
         address,

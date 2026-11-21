@@ -66267,3 +66267,29 @@ times in a row (4.4 to 4.8 s); with the follower apply made a no-op it
 fails (the new leader has no Flows). All 203 other node tests pass. Single
 node A/B against 620ad0c's binary: throughput 258-294k against 257-278k
 Flows/s, CPU 8.7-8.8 against 8.5-9.1 ms per 1k Flows.
+
+### ADR-018 phase 2b-D: running a group
+
+New artifacts (solo design review): `QueueService::route` and
+`queue::Route` (leadership as one member knows it; `None` off a group),
+`session::Endpoint` and `ServerInfo::members`, `response::Topology::{epoch,
+hint}`, `Member::term`, `QueueNode::poisoned`; binary flags `--node-id` and
+`--member ID=HOST:PORT/PEER_HOST:PEER_PORT`.
+
+Decisions: `SHARDS` on a group member names the leader's client endpoint
+(`ferricstore2-ID`), with the Raft term as `route_epoch`, so a new leader is
+a new table for the SDK; while no leader is known it says
+`leader_unknown`, which the SDK treats as a reason to try another seed. The
+binary serves until a lost round stops the node, then exits with status 75
+(clippy forbids `process::exit`; `run` returns and `main` maps it).
+
+Evidence: `session::topology` failed before (route epoch 1, no leader) and
+passes for a known and an unknown leader. Three release processes with the
+Python SDK's topology client (`FlowClient.from_urls`): 20 Flows written and
+5 completed through member 1 (term 1); member 1 killed with SIGKILL; a new
+client routed to member 2 (route epoch 2) and read all 20 in their states,
+then wrote again; member 1 restarted and rejoined, member 2 killed, and the
+remaining majority (1 and 3) still served all 20. Half a second after the
+first kill a read failed with connection refused (the election timeout had
+not passed, so the survivors still named the dead leader); the SDK reports
+that as a retryable error, as Elixir's failover does.

@@ -1,6 +1,8 @@
 //! The `SHARDS` reply (0x0007): the slot table the SDK's topology-aware
-//! client routes by, in Elixir's shape. This node leads every range: one
-//! range of contiguous slots per shard, on lane `shard + 1`.
+//! client routes by, in Elixir's shape: one range of contiguous slots per
+//! shard, on lane `shard + 1`, each naming the node that leads it. A
+//! replicated group's leader leads every range, and its term is the route
+//! epoch, so a new leader is a new table (ADR-018).
 
 use wf_application::commands::queue::{SLOTS, shard_for_slot};
 
@@ -20,6 +22,10 @@ pub struct Topology<'a> {
     pub port: u16,
     /// Number of shards.
     pub shard_count: u16,
+    /// The route epoch.
+    pub epoch: u64,
+    /// `leader`, or `leader_unknown` while a group elects one.
+    pub hint: &'a str,
 }
 
 /// Each shard's first and last slot.
@@ -54,7 +60,7 @@ pub fn shards(topology: &Topology<'_>) -> Result<Vec<u8>, ReplyTooLong> {
             map(vec![
                 ("endpoint", endpoint.clone()),
                 ("first_slot", int(u64::from(first))),
-                ("hint", text("leader")),
+                ("hint", text(topology.hint)),
                 ("lane_id", int(u64::from(shard).saturating_add(1))),
                 ("last_slot", int(u64::from(last))),
                 ("leader_node", text(topology.node)),
@@ -67,8 +73,7 @@ pub fn shards(topology: &Topology<'_>) -> Result<Vec<u8>, ReplyTooLong> {
         .collect();
     let reply = map(vec![
         ("ranges", Value::Arr(ranges)),
-        // The handshake's epoch: one node's table never changes while it runs.
-        ("route_epoch", int(1)),
+        ("route_epoch", int(topology.epoch)),
         ("shard_count", int(u64::from(topology.shard_count))),
         ("slots", int(u64::from(SLOTS))),
     ]);

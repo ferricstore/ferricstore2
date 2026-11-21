@@ -4,7 +4,7 @@
 use std::sync::Arc;
 
 use wf_application::commands::queue::{
-    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService, Reply,
+    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService, Reply, Route,
     ServiceError,
 };
 
@@ -116,5 +116,9 @@ impl QueueService for QueueNode {
                 },
             );
         }
+    }
+
+    fn route(&self) -> Option<Route> {
+        self.group.as_ref().and_then(super::replica::Group::route)
     }
 }

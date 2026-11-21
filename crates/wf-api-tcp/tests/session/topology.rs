@@ -72,3 +72,97 @@ fn a_member_that_does_not_lead_answers_reroute() -> TestResult {
     assert_eq!(reply(&refused.body)?, (5, expected));
     Ok(())
 }
+
+/// A group member's service: only its route matters here.
+struct Grouped(Option<u64>);
+
+impl wf_application::commands::queue::QueueService for Grouped {
+    fn create(
+        &self,
+        _request: wf_application::commands::queue::CreateFlows,
+        reply: wf_application::commands::queue::Reply<
+            Vec<wf_application::commands::queue::ItemOutcome>,
+        >,
+    ) {
+        reply(Err(wf_application::commands::queue::ServiceError::Reroute));
+    }
+
+    fn claim(
+        &self,
+        _request: wf_application::commands::queue::ClaimFlows,
+        reply: wf_application::commands::queue::Reply<
+            Vec<wf_application::commands::queue::ClaimedFlow>,
+        >,
+    ) {
+        reply(Err(wf_application::commands::queue::ServiceError::Reroute));
+    }
+
+    fn complete(
+        &self,
+        _completions: Vec<wf_application::commands::queue::CompleteFlow>,
+        reply: wf_application::commands::queue::Reply<
+            Vec<wf_application::commands::queue::ItemOutcome>,
+        >,
+    ) {
+        reply(Err(wf_application::commands::queue::ServiceError::Reroute));
+    }
+
+    fn route(&self) -> Option<wf_application::commands::queue::Route> {
+        Some(wf_application::commands::queue::Route {
+            leader: self.0,
+            term: 7,
+        })
+    }
+}
+
+impl wf_application::commands::flow::FlowService for Grouped {
+    fn execute(
+        &self,
+        _command: wf_application::commands::flow::FlowCommand,
+        reply: wf_application::commands::queue::Reply<wf_application::commands::flow::Term>,
+    ) {
+        reply(Err(wf_application::commands::queue::ServiceError::Reroute));
+    }
+}
+
+#[test]
+fn a_group_member_names_its_group_s_leader() -> TestResult {
+    for (leader, hint, host, port) in [
+        (Some(2), "leader", "10.0.0.2", 7002),
+        (None, "leader_unknown", "127.0.0.1", 0),
+    ] {
+        let running = super::serving_service(std::sync::Arc::new(Grouped(leader)))?;
+        let port = if port == 0 {
+            running.address.port()
+        } else {
+            port
+        };
+        let node = if leader.is_some() {
+            "ferricstore2-2"
+        } else {
+            "test-node"
+        };
+        let mut client = Client::connect(&running)?;
+        let shards = client.call(SHARDS, 1, 0, &[])?;
+        let (status, value) = reply(&shards.body)?;
+        assert_eq!(status, 0);
+        assert_eq!(super::typed::at(&value, &["route_epoch"])?, &Typed::Int(7));
+        let Typed::List(ranges) = super::typed::at(&value, &["ranges"])? else {
+            return Err("no ranges".into());
+        };
+        let first = ranges.first().ok_or("no range")?;
+        assert_eq!(
+            super::typed::at(first, &["hint"])?,
+            &bin(hint),
+            "{leader:?}"
+        );
+        assert_eq!(super::typed::at(first, &["leader_node"])?, &bin(node));
+        let endpoint = super::typed::at(first, &["endpoint"])?;
+        assert_eq!(super::typed::at(endpoint, &["host"])?, &bin(host));
+        assert_eq!(
+            super::typed::at(endpoint, &["native_port"])?,
+            &Typed::Int(i64::from(port))
+        );
+    }
+    Ok(())
+}

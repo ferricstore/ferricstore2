@@ -65,6 +65,11 @@ leaders do.
    entries survive and stay identical on every member.
 2. **Node integration:** a replica set from configuration, a peer listener,
    commit-released replies, follower apply, `SHARDS` leaders and `reroute`.
+   Landed 21 Nov: `ferricstore2 --node-id ID --member
+   ID=HOST:PORT/PEER_HOST:PEER_PORT ...` runs a member; the leader's shards
+   propose rounds and reply at commit, followers replay committed rounds,
+   `SHARDS` names the leader with the term as route epoch, and a lost round
+   stops the process (status 75) for its supervisor to restart it.
 3. **Snapshots:** log compaction at snapshots and snapshot install (shard
    images and cold files) for a member that fell behind or is new.
 4. **Several groups per node** and the SDK's three-node failover test.

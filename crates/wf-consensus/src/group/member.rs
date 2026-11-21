@@ -153,6 +153,12 @@ impl Member {
         self.raft.metrics().borrow_watched().current_leader
     }
 
+    /// The Raft term this member knows: it changes whenever leadership does.
+    #[must_use]
+    pub fn term(&self) -> u64 {
+        self.raft.metrics().borrow_watched().current_term
+    }
+
     /// Whether this member leads.
     #[must_use]
     pub fn leads(&self) -> bool {

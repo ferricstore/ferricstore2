@@ -11,7 +11,7 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, OnceLock, PoisonError, Weak};
 
-use wf_application::commands::queue::{SLOTS, ServiceError};
+use wf_application::commands::queue::{Route, SLOTS, ServiceError};
 use wf_consensus::group::{Member, MemberConfig};
 use wf_ports::consensus::log::{Applied, ConsensusLogError, ReplicatedMachine};
 use wf_storage::log::EntryLog;
@@ -45,6 +45,14 @@ pub(crate) struct Group {
 impl Group {
     fn leader(&self) -> Option<u64> {
         self.member.as_ref().and_then(Member::leader)
+    }
+
+    /// The group's leadership as this member knows it.
+    pub(crate) fn route(&self) -> Option<Route> {
+        self.member.as_ref().map(|member| Route {
+            leader: member.leader(),
+            term: member.term(),
+        })
     }
 
     /// Stops the member, then its runtime.
@@ -124,6 +132,15 @@ impl QueueNode {
     #[must_use]
     pub fn leader(&self) -> Option<u64> {
         self.group.as_ref().and_then(Group::leader)
+    }
+
+    /// Whether a lost round stopped this node: it serves nothing more and
+    /// must be reopened (ADR-018).
+    #[must_use]
+    pub fn poisoned(&self) -> bool {
+        self.router
+            .as_ref()
+            .is_some_and(|router| router.poisoned.load(Ordering::Acquire))
     }
 }
 

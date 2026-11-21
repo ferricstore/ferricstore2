@@ -263,4 +263,19 @@ pub trait QueueService: Send + Sync {
 
     /// Completes claimed Flows; one outcome per completion, in request order.
     fn complete(&self, completions: Vec<CompleteFlow>, reply: Reply<Vec<ItemOutcome>>);
+
+    /// Where a replicated node's group is led (ADR-018); `None` for a node
+    /// that is not replicated.
+    fn route(&self) -> Option<Route> {
+        None
+    }
+}
+
+/// A replicated group's leadership as one member knows it (ADR-018).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Route {
+    /// The leading member, if one is known.
+    pub leader: Option<u64>,
+    /// The Raft term: it changes whenever leadership does.
+    pub term: u64,
 }

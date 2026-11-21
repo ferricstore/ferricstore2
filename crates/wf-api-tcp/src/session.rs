@@ -13,6 +13,7 @@ mod generic;
 mod pipeline;
 mod translate;
 
+use std::collections::BTreeMap;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -38,6 +39,20 @@ pub struct ServerInfo {
     pub client_clock: bool,
     /// What one connection may have in flight (ADR-017).
     pub in_flight: InFlight,
+    /// A replicated node's group members by id, for `SHARDS` (ADR-018);
+    /// empty for a node that is not replicated.
+    pub members: BTreeMap<u64, Endpoint>,
+}
+
+/// Where clients reach one member (ADR-018).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Endpoint {
+    /// Node name.
+    pub node: String,
+    /// Advertised host.
+    pub host: String,
+    /// Native protocol port.
+    pub port: u16,
 }
 
 /// What one connection may have read and not yet answered before its reader

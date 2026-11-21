@@ -98,6 +98,45 @@ fn handshake_reply(context: &Context, negotiated: Negotiated, reply: ReplyTo) {
     }
 }
 
+/// The slot table: this node's own, or a replicated group's leader's
+/// (ADR-018).
+fn shards_reply(context: &Context, reply: ReplyTo) {
+    let info = &context.info;
+    let route = if info.members.is_empty() {
+        None
+    } else {
+        context.service.route()
+    };
+    let leader = route
+        .and_then(|route| route.leader)
+        .and_then(|id| info.members.get(&id));
+    let own = |epoch, hint| response::Topology {
+        node: &info.node,
+        host: &info.host,
+        port: info.port,
+        shard_count: info.shard_count,
+        epoch,
+        hint,
+    };
+    let topology = match (route, leader) {
+        (Some(route), Some(member)) => response::Topology {
+            node: &member.node,
+            host: &member.host,
+            port: member.port,
+            shard_count: info.shard_count,
+            epoch: route.term,
+            hint: "leader",
+        },
+        (Some(route), None) => own(route.term, "leader_unknown"),
+        // The handshake's epoch: one node's table never changes while it runs.
+        (None, _) => own(1, "leader"),
+    };
+    match response::shards(&topology) {
+        Ok(body) => reply.send(0, &body),
+        Err(_) => refuse(reply, "ERR SHARDS reply exceeds the frame limit"),
+    }
+}
+
 /// Handles one request; the reply may be sent later from another thread.
 pub(super) fn handle(
     context: &Context,
@@ -122,18 +161,7 @@ pub(super) fn handle(
             }
             Err(error) => refuse(reply, error.message()),
         },
-        Some(Opcode::Shards) => {
-            let topology = response::Topology {
-                node: &context.info.node,
-                host: &context.info.host,
-                port: context.info.port,
-                shard_count: context.info.shard_count,
-            };
-            match response::shards(&topology) {
-                Ok(body) => reply.send(0, &body),
-                Err(_) => refuse(reply, "ERR SHARDS reply exceeds the frame limit"),
-            }
-        }
+        Some(Opcode::Shards) => shards_reply(context, reply),
         Some(Opcode::Ping) => reply.send(0, &response::ok_text(b"PONG").unwrap_or_default()),
         Some(Opcode::Quit) => {
             reply.send(0, &response::ok_text(b"OK").unwrap_or_default());
