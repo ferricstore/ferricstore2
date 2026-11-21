@@ -16,7 +16,6 @@ use std::ops::Deref;
 use std::sync::Arc;
 use std::sync::mpsc::{Receiver, Sender, channel};
 
-use wf_application::commands::flow::history;
 use wf_application::commands::queue::ServiceError;
 use wf_storage::cold::{ColdQueue, ColdStore, Location};
 
@@ -113,6 +112,49 @@ impl Cold {
     }
 }
 
+/// A cold image: the record's after-image without history, as a `u32`
+/// length and bytes, then the packed history as it is in memory (event
+/// count and newest offset as `u32`, then its bytes), so a Flow goes to
+/// disk without decoding and encoding its events again.
+fn encode(key: &Key, entry: &Entry) -> Option<Vec<u8>> {
+    let record = image::encode_one(
+        &key.0,
+        &key.1,
+        entry.priority,
+        (&entry.record, entry.meta.as_deref(), None),
+    )?;
+    let (packed, count, last) = entry.history.packed();
+    let mut out = Vec::with_capacity(record.len().saturating_add(packed.len()).saturating_add(12));
+    out.extend_from_slice(&u32::try_from(record.len()).ok()?.to_be_bytes());
+    out.extend_from_slice(&record);
+    out.extend_from_slice(&count.to_be_bytes());
+    out.extend_from_slice(&last.to_be_bytes());
+    out.extend_from_slice(packed);
+    Some(out)
+}
+
+/// The Flow a cold image holds, with the creation `sequence` its stub kept.
+fn decode(bytes: &[u8], sequence: u64) -> Option<Box<Entry>> {
+    let (length, rest) = bytes.split_first_chunk::<4>()?;
+    let length = usize::try_from(u32::from_be_bytes(*length)).ok()?;
+    let (record, rest) = rest.split_at_checked(length)?;
+    let (count, rest) = rest.split_first_chunk::<4>()?;
+    let (last, packed) = rest.split_first_chunk::<4>()?;
+    let restored = image::decode_one(record)?;
+    let history = History::from_packed(
+        packed.to_vec(),
+        u32::from_be_bytes(*count),
+        u32::from_be_bytes(*last),
+    )?;
+    Some(Box::new(Entry {
+        record: restored.record,
+        priority: restored.priority,
+        sequence,
+        meta: restored.meta.map(Box::new),
+        history,
+    }))
+}
+
 /// The stored values of a Flow: payload, result, error and named values.
 pub(super) fn values(entry: &Entry) -> u32 {
     let record = &entry.record;
@@ -167,19 +209,7 @@ impl ShardState {
             .store
             .read(stub.location)
             .map_err(|_| ServiceError::Unavailable)?;
-        let restored = image::decode_one(&bytes).ok_or(ServiceError::Unavailable)?;
-        let cap = restored
-            .meta
-            .as_ref()
-            .map_or(history::default_cap(), |meta| meta.history_max_events);
-        let events = History::of(&restored.history.unwrap_or_default(), cap);
-        Ok(Box::new(Entry {
-            record: restored.record,
-            priority: restored.priority,
-            sequence: stub.sequence,
-            meta: restored.meta.map(Box::new),
-            history: events,
-        }))
+        decode(&bytes, stub.sequence).ok_or(ServiceError::Unavailable)
     }
 
     /// Loads the cold Flow under `key`, if any, for this round.

@@ -65875,3 +65875,14 @@ encoding each finished Flow and writing it), 277k to 287k Flows/s (was
 claimed. Open: the CPU cost (history is decoded and encoded again for
 each image), and memory per finished Flow (about 900 bytes left, against
 an estimated 330 for stub, key, catalog and removal entries).
+
+### ADR016-A2 Cold images carry packed history as it is
+
+New artifacts (solo design review): `History::packed` and
+`History::from_packed`; the cold image becomes the record's after-image
+without history (`u32` length and bytes) followed by the packed history
+(count and newest offset as `u32`, then its bytes), in
+`state::cold::{encode, decode}`. A Flow now goes to disk without decoding
+and encoding its events again. All 133 node tests pass (the cold tests
+read every image back after restarts). Three alternating 400k runs against
+57dc8f0: 8.4 to 8.5 ms CPU per 1k Flows (was 8.7 to 9.4).

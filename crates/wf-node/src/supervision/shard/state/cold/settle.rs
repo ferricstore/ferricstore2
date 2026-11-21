@@ -6,7 +6,6 @@ use std::time::Duration;
 use wf_application::commands::flow::schedule::SCHEDULE_TYPE;
 use wf_storage::cold::{ColdBatch, Location};
 
-use super::super::super::image;
 use super::super::{Key, ShardState};
 use super::{HOUR_MS, Slot, values};
 
@@ -98,17 +97,7 @@ impl ShardState {
             return None;
         }
         let (removal, _) = self.removal_slot(entry)?;
-        let events = entry.history.events();
-        let bytes = image::encode_one(
-            &key.0,
-            &key.1,
-            entry.priority,
-            (
-                &entry.record,
-                entry.meta.as_deref(),
-                Some(events.as_slice()),
-            ),
-        )?;
+        let bytes = super::encode(key, entry)?;
         Some(((removal / HOUR_MS, bytes), entry.record.version(), removal))
     }
 

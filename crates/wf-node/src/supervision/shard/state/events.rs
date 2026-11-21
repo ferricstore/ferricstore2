@@ -324,6 +324,24 @@ impl History {
         decode(&mut Cursor(self.bytes.get(start..)?))
     }
 
+    /// The packed form: bytes, event count and the newest event's offset,
+    /// written to a cold file as they are (ADR-016).
+    pub(crate) fn packed(&self) -> (&[u8], u32, u32) {
+        (&self.bytes, self.count, self.last_start)
+    }
+
+    /// A history from its packed form; `None` when the count or offset do
+    /// not fit the bytes.
+    pub(crate) fn from_packed(bytes: Vec<u8>, count: u32, last_start: u32) -> Option<Self> {
+        let fits = usize::try_from(last_start)
+            .is_ok_and(|start| start < bytes.len() || (bytes.is_empty() && start == 0));
+        (fits && (count > 0) != bytes.is_empty()).then_some(Self {
+            bytes,
+            count,
+            last_start,
+        })
+    }
+
     /// A history of these events, in order.
     pub(crate) fn of(events: &[HistoryEvent], cap: u64) -> Self {
         let mut history = Self::default();
