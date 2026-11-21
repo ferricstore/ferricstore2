@@ -35,6 +35,11 @@ wildcards = "deny"
 allow-wildcard-paths = true
 highlight = "all"
 skip = [
+    { crate = "sha2@0.10.9", reason = "ADR-018: openraft 0.10.1 -> quorum-set 0.6.2 requires sha2 0.10; the workspace uses sha2 0.11. Re-review on openraft updates." },
+    { crate = "digest@0.10.7", reason = "ADR-018: the sha2 0.10 chain of openraft 0.10.1 -> quorum-set 0.6.2. Re-review on openraft updates." },
+    { crate = "block-buffer@0.10.4", reason = "ADR-018: the sha2 0.10 chain of openraft 0.10.1 -> quorum-set 0.6.2. Re-review on openraft updates." },
+    { crate = "crypto-common@0.1.7", reason = "ADR-018: the sha2 0.10 chain of openraft 0.10.1 -> quorum-set 0.6.2. Re-review on openraft updates." },
+    { crate = "cpufeatures@0.2.17", reason = "ADR-018: the sha2 0.10 chain of openraft 0.10.1 -> quorum-set 0.6.2. Re-review on openraft updates." },
     { crate = "syn@2.0.119", reason = "M0 tooling: archunit 0.0.2 and thiserror-impl 1.0.69 require syn 2; reviewed current Serde/ICU/thiserror 2 derives require syn 3. Owner CI policy; re-review when any chain or lock version changes." },
     { crate = "thiserror@1.0.69", reason = "M0 archunit 0.0.2 -> cargo_metadata 0.20.0 -> cargo-util-schemas 0.2.0 requires thiserror ^1.0.56; archunit/cargo_metadata require ^2. Owner CI policy; re-review on tooling dependency updates." },
     { crate = "thiserror-impl@1.0.69", reason = "Exact derive companion required by thiserror 1.0.69 in the reviewed cargo-util-schemas tool chain; current thiserror 2.0.21 needs its own derive. Owner CI policy; re-review on tooling dependency updates." },

@@ -8,6 +8,7 @@
 
 pub mod adapter;
 pub mod apply;
+pub mod group;
 pub mod membership;
 pub mod read;
 pub mod recovery;

@@ -66161,3 +66161,34 @@ survive a reopen; a gap is refused and an overwrite from a held index
 replaces the suffix; a purge removes segments and keeps the vote across a
 reopen; a reopened log continues after its last durable entry) and a codec
 unit test pass.
+
+### ADR-018 phase 1b: the OpenRaft bridge and fault gate
+
+New artifacts (solo design review): `wf_ports::consensus::log`
+(`ConsensusLog`, `EntryId` moved here from `wf-storage`,
+`ConsensusLogError`, `Durable`, `Entry`) implemented by
+`wf_storage::log::EntryLog`; `wf_consensus::group` (`Config`, `Proposal`,
+`LogStore`, private `codec`); the `tests/group` target of `wf-consensus`
+(storage suite, test state machine, in-process network, cluster tests).
+Dependencies: `openraft =0.10.1` (no default features, `tokio-rt`) for
+`wf-consensus`; `futures-util =0.3.34` and Tokio with `time` for its tests;
+`wf-storage` as a test-only edge. `deny.toml` skips the `sha2` 0.10 chain
+(`openraft -> quorum-set 0.6.2`).
+
+Decisions: `wf-consensus` reaches storage only through the port
+(`docs/architecture.md`), so the log store holds `Arc<dyn ConsensusLog>`
+and `wf-node` will wire the entry log behind it. The type configuration is
+written out instead of `declare_raft_types!` (the architecture check allows
+no generated runtime code), with the macro's defaults except `D`, `R` and
+`Node = ()`. Port methods answer synchronously, so the `OpenRaft` methods
+return ready futures; appends report durability through `IOFlushed` from the
+entry log's notifier thread.
+
+Evidence: `OpenRaft`'s storage suite (`Suite::test_all`, about forty
+contract cases incl. truncation, purge and initial state after restarts)
+passes on the entry log; with truncation made a no-op it fails. Three
+members commit a leader's 50 writes identically; 20 writes survive the
+leader's loss, 20 more commit under a new leader, the old leader restarts on
+its log and catches up to all 40; three seeded runs with 10% message loss,
+cut links and member restarts apply every acknowledged write exactly once
+at its acknowledged index on every member (5 repeated runs green, 11-15 s).

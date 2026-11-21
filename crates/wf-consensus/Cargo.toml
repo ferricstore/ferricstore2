@@ -10,7 +10,15 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+openraft.workspace = true
 sha2.workspace = true
 wf-types.workspace = true
 wf-domain.workspace = true
 wf-ports.workspace = true
+
+[dev-dependencies]
+# ADR-018: the gate runs OpenRaft's suite and groups on the real entry log.
+wf-storage.workspace = true
+futures-util.workspace = true
+wf-test-support.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "time"] }

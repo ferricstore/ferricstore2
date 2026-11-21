@@ -11,6 +11,7 @@ use wf_types::version::CommittedTime;
 
 mod catalog_publication;
 mod claim;
+pub mod log;
 pub use catalog_publication::CreditCatalogPublicationPort;
 mod membership;
 mod mutation;

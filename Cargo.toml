@@ -53,6 +53,10 @@ foldhash = { version = "=0.2.0", default-features = false, features = ["std"] }
 # ADR-015: the node binary's global allocator (the system allocator was 35%
 # of busy CPU in the 21 Nov profile).
 mimalloc = { version = "=0.1.52", default-features = false }
+# ADR-018: consensus for replicated groups (the released 0.10 line).
+# ADR-018: the state machine reads OpenRaft's apply stream.
+futures-util = { version = "=0.3.34", default-features = false }
+openraft = { version = "=0.10.1", default-features = false, features = ["tokio-rt"] }
 tokio = { version = "=1.54.1", default-features = false, features = ["io-util", "net", "rt-multi-thread", "sync"] }
 redb = { version = "=4.4.0", git = "https://github.com/cberner/redb", rev = "7061f7e60d4573311c0636e161d417b93e9fd2b1", default-features = false, features = ["std"] }
 
