@@ -16,7 +16,7 @@ use wf_application::commands::flow::record::Include;
 use wf_application::commands::flow::term::Term;
 use wf_application::commands::queue::{Partition, ServiceError};
 
-use super::{Key, ShardState};
+use super::{Parts, ShardState};
 
 /// A fresh cursor key: cursors this shard issues open only here and only
 /// until it restarts.
@@ -58,7 +58,7 @@ impl ShardState {
         answered.map_err(|failure| ServiceError::Query(Box::new(failure)))
     }
 
-    fn row(&self, key: &Key) -> Option<Term> {
+    fn row(&self, key: &Parts) -> Option<Term> {
         self.record_term(key, &Include::default()).map(run::row)
     }
 
@@ -83,7 +83,7 @@ impl ShardState {
             .filter(|(state, _)| allowed(states.as_ref(), state))
             .filter_map(|(_, by_partition)| by_partition.get(partition))
             .flatten()
-            .filter_map(|(_, id)| self.row(&(partition.clone(), id.clone())))
+            .filter_map(|(_, key)| self.row(key))
             .collect()
     }
 

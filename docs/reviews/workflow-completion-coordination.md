@@ -65819,3 +65819,17 @@ records table's inserts and growth. Three alternating runs against
 bc7ac2c: 7.3 to 7.5 ms CPU per 1k Flows (was 7.6 to 7.7) and RSS 547 to 569
 MB (was 711 to 771); one 1.6M-Flow run each: 10.1 ms and 3.7 GB (was 10.7
 ms and 4.8 GB). All 129 node tests and all suites pass.
+
+### ADR015-KEYS One shared key per Flow
+
+New artifacts (solo design review): `state::Key` becomes
+`Arc<(Partition, Vec<u8>)>` with `state::flow_key` and the lookup pair
+`state::Parts`; catalog and FIFO lane members hold keys; `Partition`
+derives `PartialOrd` and `Ord` (one partition per set, so order within a
+set is by id as before). Index entries now share the Flow's key instead of
+copying its partition and id. Three alternating runs against 1708a9e: 7.1
+to 7.2 ms CPU per 1k Flows (was 7.4 to 7.5), RSS 469 to 485 MB (was 556 to
+561); one 1.6M-Flow run each: 3.5 GB (was 3.7). All 129 node tests and all
+suites pass.
+`state::key` (new, same review) holds `Key`, `Parts`, `flow_key` and the
+`Map` alias, keeping `state.rs` under the 400-line limit.

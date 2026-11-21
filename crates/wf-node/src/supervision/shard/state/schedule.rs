@@ -107,12 +107,8 @@ impl ShardState {
             .get(SCHEDULE_TYPE.as_bytes())
             .into_iter()
             .flat_map(|states| states.values())
-            .flat_map(|partitions| partitions.iter())
-            .flat_map(|(partition, members)| {
-                members
-                    .iter()
-                    .map(|(_, id)| (partition.clone(), id.clone()))
-            })
+            .flat_map(|partitions| partitions.values())
+            .flat_map(|members| members.iter().map(|(_, key)| key.clone()))
             .collect();
         keys.iter().filter_map(|key| self.stored(key)).collect()
     }

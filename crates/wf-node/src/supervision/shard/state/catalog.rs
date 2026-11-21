@@ -20,7 +20,9 @@ use wf_application::commands::queue::Partition;
 use super::{Entry, Key, RUNNING, ShardState};
 
 /// One partition's Flows of a type and state, by update time and id.
-pub(super) type Members = BTreeSet<(u64, Vec<u8>)>;
+/// Each member shares the Flow's key, so an insert copies no id
+/// (ADR-015); one set holds one partition, so it sorts by id.
+pub(super) type Members = BTreeSet<(u64, Key)>;
 /// Type, then state, then partition, to the Flows there.
 pub(super) type Catalog = Map<Vec<u8>, Map<Vec<u8>, Map<Partition, Members>>>;
 
@@ -46,7 +48,7 @@ impl ShardState {
             .and_then(|states| states.get_mut(state))
             .and_then(|partitions| partitions.get_mut(&key.0))
         {
-            members.insert((updated, key.1.clone()));
+            members.insert((updated, key.clone()));
             return;
         }
         self.catalog
@@ -56,7 +58,7 @@ impl ShardState {
             .or_default()
             .entry(key.0.clone())
             .or_default()
-            .insert((updated, key.1.clone()));
+            .insert((updated, key.clone()));
     }
 
     pub(super) fn catalog_remove(&mut self, key: &Key, entry: &Entry) {
@@ -66,7 +68,7 @@ impl ShardState {
         };
         if let Some(partitions) = states.get_mut(state) {
             let emptied = partitions.get_mut(&key.0).is_some_and(|members| {
-                members.remove(&(updated, key.1.clone()));
+                members.remove(&(updated, key.clone()));
                 members.is_empty()
             });
             if emptied {
@@ -116,28 +118,21 @@ impl ShardState {
             Kind::Stats { filters, .. } => filters.is_empty(),
             Kind::Names { .. } | Kind::Values { .. } => false,
         };
-        for (state, partition, members) in self.visited(read) {
+        for (state, _, members) in self.visited(read) {
             if counts_only {
-                let leased = self.leased_among(state, partition, members);
+                let leased = self.leased_among(state, members);
                 let flows = u64::try_from(members.len()).unwrap_or(u64::MAX);
                 counter.add_count(state, flows, leased);
             } else {
-                self.visit(&mut counter, (state, partition, members), now);
+                self.visit(&mut counter, (state, members), now);
             }
         }
         counter.finish()
     }
 
     /// Counts each Flow of one partition's members.
-    fn visit(
-        &self,
-        counter: &mut Counter<'_>,
-        (state, partition, members): (&[u8], &Partition, &Members),
-        now: u64,
-    ) {
-        let entries = members
-            .iter()
-            .filter_map(|(_, id)| self.records.get(&(partition.clone(), id.clone())));
+    fn visit(&self, counter: &mut Counter<'_>, (state, members): (&[u8], &Members), now: u64) {
+        let entries = members.iter().filter_map(|(_, key)| self.records.get(key));
         for entry in entries {
             let meta = entry.meta.as_deref();
             counter.add(&Seen {
@@ -153,15 +148,15 @@ impl ShardState {
     }
 
     /// Leased Flows among running members; only running Flows hold leases.
-    fn leased_among(&self, state: &[u8], partition: &Partition, members: &Members) -> u64 {
+    fn leased_among(&self, state: &[u8], members: &Members) -> u64 {
         if state != RUNNING {
             return 0;
         }
         let leased = members
             .iter()
-            .filter(|(_, id)| {
+            .filter(|(_, key)| {
                 self.records
-                    .get(&(partition.clone(), id.clone()))
+                    .get(key)
                     .is_some_and(|entry| entry.record.lease().is_some())
             })
             .count();

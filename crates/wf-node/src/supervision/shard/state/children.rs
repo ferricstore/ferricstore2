@@ -25,7 +25,7 @@ use wf_types::version::TimestampMillis;
 
 use super::super::command::Logged;
 use super::flow::Executed;
-use super::{Key, ShardState};
+use super::{Key, ShardState, flow_key};
 
 /// A child that became terminal, for its parent's group.
 pub(crate) struct ChildEvent {
@@ -140,7 +140,7 @@ impl ShardState {
         partition: Partition,
     ) -> Result<Option<Logged>, ServiceError> {
         let now = spawn.now_ms.unwrap_or(wall);
-        let key: Key = (partition, spawn.parent_id.clone());
+        let key: Key = flow_key(partition, spawn.parent_id.clone());
         if self.check_parent(spawn, &key)?.is_none() {
             return Ok(None);
         }
@@ -196,7 +196,7 @@ impl ShardState {
         let mut prepared = Vec::with_capacity(spawn.children.len());
         for child in &spawn.children {
             let partition = Partition::for_new_flow(&child.id, child.partition_key.as_deref());
-            let key: Key = (partition, child.id.clone());
+            let key: Key = flow_key(partition, child.id.clone());
             if self.records.contains_key(&key) {
                 return Err(rejected("ERR flow already exists"));
             }
@@ -251,7 +251,7 @@ impl ShardState {
             present.then(|| keys::value_ref(&key.0, kind, &key.1, version))
         };
         self.child_events.push(ChildEvent {
-            parent: (parent_partition, parent_id),
+            parent: flow_key(parent_partition, parent_id),
             child: key.1.clone(),
             status: record.state().to_vec(),
             refs: (

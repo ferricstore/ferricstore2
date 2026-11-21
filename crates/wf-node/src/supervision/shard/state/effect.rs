@@ -13,7 +13,7 @@ use wf_application::commands::flow::effect::{Command, Governance};
 use wf_application::commands::queue::Partition;
 
 use super::flow::Executed;
-use super::{Key, ShardState};
+use super::{Key, ShardState, flow_key};
 
 impl ShardState {
     /// Decides one effect or ledger command on the Flow in `partition`.
@@ -23,7 +23,7 @@ impl ShardState {
         command: &Command,
         partition: Partition,
     ) -> Executed {
-        let key: Key = (partition, command.target().0.to_vec());
+        let key: Key = flow_key(partition, command.target().0.to_vec());
         let name = key.0.name();
         let Some(entry) = self.records.get(&key) else {
             if command.reads() {

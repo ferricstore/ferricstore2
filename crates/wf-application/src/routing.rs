@@ -16,8 +16,8 @@ pub const SLOTS: u16 = 1024;
 const AUTO_PREFIX: &[u8] = b"__flow_auto__:";
 const BASE64URL: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
-/// Where a Flow lives.
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+/// Where a Flow lives. Ordered so per-partition sets can hold whole keys.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum Partition {
     /// A hidden auto bucket for Flows created without a partition.
     Auto(u8),

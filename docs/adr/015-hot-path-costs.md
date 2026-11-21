@@ -76,6 +76,16 @@ Flows/s and RSS after the run.
    547 to 569 MB (was 711 to 771); at 1.6M Flows 10.1 ms and 3.7 GB (was
    10.7 ms and 4.8 GB).
 
+8. **One shared key per Flow.** The records table and every index (due
+   queues, removal and timeout schedules, the catalog, FIFO lanes) held
+   their own copy of the Flow's partition and id. `Key` is now an
+   `Arc<(Partition, id)>` shared by all of them; lookups use the plain pair
+   (`Parts`), which the table finds without allocating. `Partition` gains
+   an ordering so catalog and lane sets can hold keys (one partition per
+   set, so they still sort by id). Against 1708a9e: 7.1 to 7.2 ms (was 7.4
+   to 7.5), RSS 469 to 485 MB (was 556 to 561); at 1.6M Flows 3.5 GB (was
+   3.7).
+
 ## Consequences
 
 The binary links mimalloc's C code, built by `cc`; cargo-deny passes. At

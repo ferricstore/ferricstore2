@@ -7,7 +7,7 @@
 
 use wf_domain::workflow::{Outcome, WorkflowStatus};
 
-use super::{Entry, Key, Logged, ShardState};
+use super::{Entry, Key, Logged, Parts, ShardState};
 
 fn terminal(entry: &Entry) -> bool {
     matches!(
@@ -49,11 +49,11 @@ impl ShardState {
     /// Removes up to `max` terminal records whose retention ended by `now`;
     /// returns the change to log, if any.
     pub(crate) fn sweep(&mut self, now: u64, max: usize) -> Option<Logged> {
-        let keys: Vec<Key> = self
+        let keys: Vec<Parts> = self
             .expiries
             .range(..=(now, u64::MAX))
             .take(max)
-            .map(|(_, key)| key.clone())
+            .map(|(_, key)| (**key).clone())
             .collect();
         if keys.is_empty() {
             return None;
@@ -63,7 +63,7 @@ impl ShardState {
 
     /// Removes every named record, or none when one is missing or not
     /// terminal.
-    pub(super) fn expire(&mut self, keys: &[Key]) -> Outcome {
+    pub(super) fn expire(&mut self, keys: &[Parts]) -> Outcome {
         let removable = !keys.is_empty()
             && keys
                 .iter()
@@ -72,8 +72,8 @@ impl ShardState {
             return Outcome::NotEligible;
         }
         for key in keys {
-            if let Some(entry) = self.records.remove(key) {
-                self.unindex(key, &entry);
+            if let Some((stored, entry)) = self.records.remove_entry(key) {
+                self.unindex(&stored, &entry);
                 self.unschedule_removal(&entry);
                 self.unschedule_deadline(&entry);
             }

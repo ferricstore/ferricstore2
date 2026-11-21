@@ -3,6 +3,7 @@
 //! record; a fire reads the previous target and creates the new one on the
 //! targets' shards in between, as `Schedule.fire_one/3` does.
 
+use crate::supervision::shard::state::{Key, flow_key};
 use std::sync::mpsc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -54,8 +55,8 @@ fn ask<T: Send + 'static>(
         .map_err(|_| ServiceError::Unavailable)?
 }
 
-fn key_of(id: &[u8]) -> (Partition, Vec<u8>) {
-    (schedules::partition(id), flow_id(id))
+fn key_of(id: &[u8]) -> Key {
+    flow_key(schedules::partition(id), flow_id(id))
 }
 
 fn op(

@@ -24,7 +24,7 @@ use super::super::super::waiters::Arrival;
 use super::{Entry, Key, Queue, RUNNING, ShardState};
 
 /// Lanes by type and logical state, then partition: `(sequence, id)`.
-pub(super) type Lanes = Map<(Vec<u8>, Vec<u8>), Map<Partition, BTreeSet<(u64, Vec<u8>)>>>;
+pub(super) type Lanes = Map<(Vec<u8>, Vec<u8>), Map<Partition, BTreeSet<(u64, Key)>>>;
 
 fn terminal(state: &[u8]) -> bool {
     matches!(state, b"completed" | b"failed" | b"cancelled")
@@ -124,7 +124,7 @@ impl ShardState {
             .or_default()
             .entry(key.0.clone())
             .or_default()
-            .insert((entry.sequence, key.1.clone()));
+            .insert((entry.sequence, key.clone()));
     }
 
     /// Removes a Flow from its lane; a removed head frees the lane.
@@ -140,7 +140,7 @@ impl ShardState {
         let Some(members) = partitions.get_mut(&key.0) else {
             return;
         };
-        let member = (entry.sequence, key.1.clone());
+        let member = (entry.sequence, key.clone());
         let head = members.first() == Some(&member);
         if !members.remove(&member) {
             return;
@@ -182,13 +182,13 @@ impl ShardState {
                 )
             })
             .collect();
-        for ((partition, id), (state, sequence)) in members {
+        for (key, (state, sequence)) in members {
             self.lanes
                 .entry((flow_type.to_vec(), state))
                 .or_default()
-                .entry(partition)
+                .entry(key.0.clone())
                 .or_default()
-                .insert((sequence, id));
+                .insert((sequence, key));
         }
     }
 
@@ -217,11 +217,10 @@ impl ShardState {
             if !request.allows(partitions, partition) {
                 continue;
             }
-            let Some((_, id)) = members.first() else {
+            let Some((_, head)) = members.first() else {
                 continue;
             };
-            let Some((key, entry)) = self.records.get_key_value(&(partition.clone(), id.clone()))
-            else {
+            let Some((key, entry)) = self.records.get_key_value(head) else {
                 continue;
             };
             let waiting = entry.record.state() == queue.state.as_slice()

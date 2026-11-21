@@ -22,7 +22,7 @@ use wf_types::version::TimestampMillis;
 
 use super::super::command::Logged;
 use super::super::image;
-use super::{Entry, Key, ShardState};
+use super::{Entry, Key, Parts, ShardState, flow_key};
 
 /// A command's reply and the change to log, if any.
 pub(crate) type Executed = (Result<Term, ServiceError>, Option<Logged>);
@@ -88,7 +88,7 @@ impl ShardState {
     }
 
     /// The reply map of the Flow under `key`, if stored.
-    pub(super) fn record_term(&self, key: &Key, include: &Include) -> Option<Term> {
+    pub(super) fn record_term(&self, key: &Parts, include: &Include) -> Option<Term> {
         let defaults = self.defaults();
         let (key, entry) = self.records.get_key_value(key)?;
         Some(Self::view(key, entry, &defaults).term(include))
@@ -158,7 +158,7 @@ impl ShardState {
     }
 
     fn create_flow(&mut self, now: u64, create: CreateFlow, partition: Partition) -> Executed {
-        let key = (partition, create.id.clone());
+        let key = flow_key(partition, create.id.clone());
         if let Some(existing) = self.records.get(&key) {
             return (self.duplicate(&key, existing, &create), None);
         }

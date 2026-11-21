@@ -20,6 +20,7 @@ mod fifo;
 mod flow;
 mod governance;
 mod index;
+mod key;
 mod mutate;
 mod policy;
 mod query;
@@ -33,15 +34,12 @@ mod timeout;
 mod value;
 
 pub(crate) use claim::Peeked;
+pub(crate) use key::{Key, Map, Parts, flow_key};
 pub(crate) use mutate::{BatchItems, BatchReplies};
 pub(crate) use policy::{PolicyCommand, PolicyReply};
 pub(crate) use schedule::{ScheduleOp, ScheduleReply};
 
-use std::collections::{BTreeMap, HashMap};
-
-/// A hash map on the shard's hot paths: foldhash, randomly seeded per map,
-/// several times cheaper than `SipHash` on short keys (ADR-015).
-pub(super) type Map<K, V> = HashMap<K, V, foldhash::fast::RandomState>;
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use events::History;
@@ -61,8 +59,6 @@ use wf_types::version::{Fence, TimestampMillis};
 
 use super::command::Logged;
 use super::image;
-
-type Key = (Partition, Vec<u8>);
 
 /// The physical state of leased records.
 const RUNNING: &[u8] = b"running";
@@ -208,7 +204,7 @@ impl ShardState {
                 Some(restored) => {
                     // An after-image carries the events its change appended.
                     self.put_events(
-                        (restored.partition, restored.id),
+                        flow_key(restored.partition, restored.id),
                         (
                             restored.record,
                             restored.priority,
@@ -326,7 +322,7 @@ impl ShardState {
             now: TimestampMillis::new(*now),
             operation,
         };
-        let key = (partition.clone(), id.clone());
+        let key = flow_key(partition.clone(), id.clone());
         let current = self.records.get(&key).map(|entry| &entry.record);
         let (outcome, write, _history) = workflow::reduce(current, &command)
             .map_err(ServiceError::Domain)?

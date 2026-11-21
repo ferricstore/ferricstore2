@@ -20,7 +20,7 @@ use wf_types::version::TimestampMillis;
 use super::super::command::Logged;
 use super::flow::Executed;
 use super::value::write_values;
-use super::{Key, ShardState};
+use super::{Key, ShardState, flow_key};
 
 fn rejected(text: &str) -> ServiceError {
     ServiceError::rejected(text.to_owned())
@@ -84,7 +84,7 @@ impl ShardState {
         partition: Partition,
     ) -> Result<Option<Logged>, ServiceError> {
         let now = signal.now_ms.unwrap_or(wall);
-        let key: Key = (partition, signal.id.clone());
+        let key: Key = flow_key(partition, signal.id.clone());
         let defaults = self.defaults();
         let entry = self
             .records

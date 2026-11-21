@@ -22,7 +22,7 @@ use wf_types::version::TimestampMillis;
 
 use super::super::command::Logged;
 use super::flow::Executed;
-use super::{Key, ShardState};
+use super::{Key, ShardState, flow_key};
 
 fn decide(
     record: Option<&WorkflowRecord>,
@@ -92,7 +92,7 @@ impl ShardState {
     ) -> Result<(Term, Logged), ServiceError> {
         let create = &start.create;
         let now = create.now_ms.unwrap_or(wall);
-        let key: Key = (partition, create.id.clone());
+        let key: Key = flow_key(partition, create.id.clone());
         if self.records.contains_key(&key) {
             return Err(ServiceError::rejected("ERR flow already exists".to_owned()));
         }
@@ -137,7 +137,7 @@ impl ShardState {
             match self.run_chain(wall, spec, id.clone(), partition.clone()) {
                 Ok(change) => {
                     logged.push(change);
-                    done.push((partition.clone(), id.clone()));
+                    done.push(flow_key(partition.clone(), id.clone()));
                 }
                 Err(error) => {
                     failure = Some(error);
@@ -170,7 +170,7 @@ impl ShardState {
         partition: Partition,
     ) -> Result<Logged, ServiceError> {
         let now = spec.now_ms.unwrap_or(wall);
-        let key: Key = (partition, id);
+        let key: Key = flow_key(partition, id);
         if self.records.contains_key(&key) {
             return Err(ServiceError::rejected("ERR flow already exists".to_owned()));
         }

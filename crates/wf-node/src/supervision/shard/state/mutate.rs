@@ -22,7 +22,7 @@ use wf_types::identity::RecordId;
 use wf_types::version::{Fence, TimestampMillis};
 
 use super::flow::Executed;
-use super::{Key, ShardState};
+use super::{Key, ShardState, flow_key};
 
 fn token(bytes: Option<&[u8]>) -> Result<Option<LeaseToken>, ServiceError> {
     bytes
@@ -215,7 +215,7 @@ impl ShardState {
         partition: Partition,
     ) -> Result<(Term, Option<super::Logged>), ServiceError> {
         let now = mutation.now_ms.unwrap_or(wall);
-        let key: Key = (partition, mutation.id.clone());
+        let key: Key = flow_key(partition, mutation.id.clone());
         let defaults = self.defaults();
         let entry = self
             .records
@@ -314,7 +314,7 @@ impl ShardState {
         let mut logged = Vec::new();
         let mut saved: Vec<(Key, Option<Saved>)> = Vec::new();
         for (position, mutation, partition) in items {
-            let key: Key = (partition.clone(), mutation.id.clone());
+            let key: Key = flow_key(partition.clone(), mutation.id.clone());
             if atomic {
                 saved.push((key.clone(), self.save(&key)));
             }

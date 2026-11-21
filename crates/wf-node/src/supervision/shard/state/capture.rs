@@ -4,7 +4,7 @@ use wf_application::commands::flow::history;
 
 use super::super::image::{self, Restored};
 use super::events::History;
-use super::{Entry, Key, ShardState};
+use super::{Entry, Key, ShardState, flow_key};
 
 impl ShardState {
     /// Encodes every record in creation order; `None` when one cannot be
@@ -63,7 +63,7 @@ impl ShardState {
 
     /// Stores a record from a snapshot image, indexed like any other.
     pub(crate) fn restore(&mut self, restored: Restored) {
-        let key = (restored.partition, restored.id);
+        let key = flow_key(restored.partition, restored.id);
         let meta = restored.meta.map(Box::new);
         match restored.history {
             Some(events) => {

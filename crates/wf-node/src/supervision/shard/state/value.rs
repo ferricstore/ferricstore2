@@ -20,7 +20,7 @@ use wf_types::version::TimestampMillis;
 
 use super::super::command::Logged;
 use super::flow::Executed;
-use super::{Key, ShardState};
+use super::{Key, ShardState, flow_key};
 
 /// A shared value.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -126,7 +126,7 @@ impl ShardState {
         partition: Partition,
     ) -> Result<(Term, Option<Logged>), ServiceError> {
         let now = put.now_ms.unwrap_or(wall);
-        let key: Key = (partition, owner.to_vec());
+        let key: Key = flow_key(partition, owner.to_vec());
         let defaults = self.defaults();
         let entry = self
             .records
@@ -256,7 +256,7 @@ impl ShardState {
         let named = self
             .records
             .keys()
-            .map(|(partition, _)| partition)
+            .map(|key| &key.0)
             .filter(|partition| matches!(partition, Partition::Named(_)));
         for partition in named {
             if !self.tags.values().any(|known| known == partition) {
