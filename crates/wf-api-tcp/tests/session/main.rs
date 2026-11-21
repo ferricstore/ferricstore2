@@ -32,8 +32,8 @@ type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
 /// Ids starting with `dup` already exist, `stale` completions have a stale
 /// lease, ids starting with `slow` reply after 150 ms from another thread,
-/// and creates of ids or claims by workers starting with `busy` are refused
-/// as busy.
+/// creates of ids or claims by workers starting with `busy` are refused as
+/// busy, and creates of ids starting with `reroute` as not led here.
 /// A claim by worker `probe` echoes its options as the run state; a claim by
 /// worker `park` keeps its cancellation in [`PARKED`] and never replies.
 struct Scripted;
@@ -156,6 +156,9 @@ impl FlowService for Scripted {
                 .map_or(Term::Nil, |now| Term::Int(i64::try_from(now).unwrap_or(-1))))),
             FlowCommand::Create(create) if create.id.starts_with(b"busy") => {
                 reply(Err(ServiceError::Busy));
+            }
+            FlowCommand::Create(create) if create.id.starts_with(b"reroute") => {
+                reply(Err(ServiceError::Reroute));
             }
             FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
                 ServiceError::rejected("ERR flow already exists".to_owned()),

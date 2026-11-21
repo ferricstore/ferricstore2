@@ -45,3 +45,30 @@ fn shards_lists_one_leader_range_per_shard() -> TestResult {
     assert_eq!(reply(&shards.body)?, (0, expected));
     Ok(())
 }
+
+const CREATE: u16 = 0x0201;
+
+#[test]
+fn a_member_that_does_not_lead_answers_reroute() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let body = super::typed::encode(&map(&[
+        ("id", bin("reroute1")),
+        ("type", bin("jobs")),
+        ("state", bin("queued")),
+    ]))?;
+    let refused = client.call(CREATE, 1, 0, &body)?;
+    let expected = map(&[
+        ("code", bin("reroute")),
+        (
+            "message",
+            bin("REROUTE this member does not lead the slot; refresh SHARDS"),
+        ),
+        ("reason", bin("not_leader")),
+        ("retry_after_ms", Typed::Int(0)),
+        ("retryable", Typed::Bool(true)),
+        ("safe_to_retry", Typed::Bool(true)),
+    ]);
+    assert_eq!(reply(&refused.body)?, (5, expected));
+    Ok(())
+}

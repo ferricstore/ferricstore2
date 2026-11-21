@@ -23,6 +23,9 @@ pub const STATUS_ERROR: u16 = 1;
 /// Overload status: nothing ran and the client may retry after
 /// `retry_after_ms` (ADR-017).
 pub const STATUS_BUSY: u16 = 4;
+/// Not led here: nothing ran; the client refreshes `SHARDS` and retries
+/// (ADR-018).
+pub const STATUS_REROUTE: u16 = 5;
 /// Malformed request status.
 pub const STATUS_BAD_REQUEST: u16 = 6;
 
@@ -87,9 +90,10 @@ pub fn term(term: &Term) -> Result<Vec<u8>, ReplyTooLong> {
 }
 
 /// The reply to a failed service call: a query failure's diagnostic map,
-/// a malformed request's `bad_request` map with status 6 (ADR-014 step 12)
-/// and an overload's retryable `busy` map with status 4 (ADR-017); any
-/// other error is the `ERR ...` map with status 1.
+/// a malformed request's `bad_request` map with status 6 (ADR-014 step 12),
+/// an overload's retryable `busy` map with status 4 (ADR-017) and a
+/// non-leader's `reroute` map with status 5 (ADR-018); any other error is
+/// the `ERR ...` map with status 1.
 ///
 /// # Errors
 /// Refuses a part longer than `u32::MAX` bytes.
@@ -116,6 +120,17 @@ pub fn service_error(failure: &ServiceError) -> Result<Vec<u8>, ReplyTooLong> {
                 (b"safe_to_retry".to_vec(), Value::Bool(true)),
             ]);
             typed(STATUS_BUSY, &map)
+        }
+        ServiceError::Reroute => {
+            let map = Value::Map(vec![
+                (b"code".to_vec(), text(b"reroute")),
+                (b"message".to_vec(), text(failure.to_string().as_bytes())),
+                (b"reason".to_vec(), text(b"not_leader")),
+                (b"retry_after_ms".to_vec(), Value::Int(0)),
+                (b"retryable".to_vec(), Value::Bool(true)),
+                (b"safe_to_retry".to_vec(), Value::Bool(true)),
+            ]);
+            typed(STATUS_REROUTE, &map)
         }
         other => error(STATUS_ERROR, &other.to_string()),
     }

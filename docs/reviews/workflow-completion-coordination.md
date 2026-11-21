@@ -66215,3 +66215,14 @@ blank, proposal and membership entries) pass; three members over loopback
 TCP elect, replicate 30 writes, lose their leader and commit 10 more under
 the new one, identical on both survivors (1.9 s; the whole `wf-consensus`
 suite green three times in a row).
+
+### ADR-018 phase 2b-A: reroute replies
+
+New artifacts (solo design review): `ServiceError::Reroute`,
+`response::STATUS_REROUTE`. A member that does not lead a request's slot
+refuses it before it runs: status 5 (Elixir's `reroute`) with `code`
+`reroute`, `reason` `not_leader`, `retryable` and `safe_to_retry` true and
+`retry_after_ms` 0. The Python SDK refreshes `SHARDS` on that reason
+(`_is_topology_refresh_error`) and replays the request because both flags
+are set (`_server_allows_retry`). Evidence: `session::topology` failed
+before (status 1, not retryable) and passes.

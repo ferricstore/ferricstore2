@@ -199,6 +199,9 @@ pub enum ServiceError {
     /// The shards the request needs have too much work waiting (ADR-017);
     /// nothing of the request ran, so it is safe to retry.
     Busy,
+    /// This member does not lead the request's slot (ADR-018); nothing ran,
+    /// and the client should refresh its routes and retry.
+    Reroute,
     /// Refused with the Elixir server's reply text.
     Rejected(String),
     /// A malformed request, which Elixir answers with status `bad_request`.
@@ -233,6 +236,9 @@ impl fmt::Display for ServiceError {
                 formatter.write_str("ERR too many blocked FLOW.CLAIM_DUE requests are waiting")
             }
             Self::Busy => formatter.write_str("BUSY flow shards are overloaded, retry later"),
+            Self::Reroute => {
+                formatter.write_str("REROUTE this member does not lead the slot; refresh SHARDS")
+            }
             Self::Rejected(text) | Self::BadRequest(text) => formatter.write_str(text),
             Self::Query(failure) => formatter.write_str(failure.message()),
             Self::Governance(denial) => {
