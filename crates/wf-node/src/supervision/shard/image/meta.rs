@@ -90,8 +90,6 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         .map(|(id, group)| (id.clone(), group.term()))
         .collect();
     term(out, &Term::Map(groups))?;
-    out.push(u8::from(meta.error_term));
-    out.push(u8::from(meta.payload_term));
     optional_bin(out, meta.rewound_to.as_deref())?;
     out.extend_from_slice(
         &u32::try_from(meta.indexed_attributes.len())
@@ -114,7 +112,6 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         out.push(*kind);
         bin(out, name)?;
         out.extend_from_slice(&version.to_be_bytes());
-        out.push(u8::from(kept.term));
         bin(out, &kept.bytes)?;
     }
     Some(())
@@ -196,16 +193,6 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
                 .collect::<Result<BTreeMap<_, _>, Malformed>>()?,
             _ => return Err(Malformed),
         },
-        error_term: match reader.u8()? {
-            0 => false,
-            1 => true,
-            _ => return Err(Malformed),
-        },
-        payload_term: match reader.u8()? {
-            0 => false,
-            1 => true,
-            _ => return Err(Malformed),
-        },
         rewound_to: reader.optional_bin()?,
         indexed_attributes: {
             let count = u32::from_be_bytes(reader.array()?);
@@ -233,13 +220,8 @@ fn decode_retained(reader: &mut Reader<'_>) -> Result<RetainedMap, Malformed> {
         let kind = reader.u8()?;
         let name = reader.bin()?.to_vec();
         let version = reader.u64()?;
-        let term = match reader.u8()? {
-            0 => false,
-            1 => true,
-            _ => return Err(Malformed),
-        };
         let bytes = reader.bin()?.to_vec();
-        retained.insert((kind, name, version), Retained { bytes, term });
+        retained.insert((kind, name, version), Retained { bytes });
     }
     Ok(retained)
 }

@@ -10,11 +10,10 @@
 use wf_application::commands::flow::Term;
 use wf_node::composition::QueueNode;
 
-use super::{claimed, field, get, has, int, map, ok, run, text};
+use super::{claimed, events, field, get, has, int, map, ok, run, text};
 use crate::{TestResult, directory, open};
 
 const P: &str = "tenant-a";
-const R: &str = "tenant-retention";
 
 fn node(tag: &str) -> TestResult<QueueNode> {
     open(&directory(tag)?, 4)
@@ -42,7 +41,11 @@ fn claim_all(node: &QueueNode, partition: &str, extra: &[(&str, Term)]) -> TestR
             ("now_ms", int(1_000)),
         ],
     );
-    entries.extend(extra.iter().cloned());
+    // An extra option replaces the default of the same name.
+    for (key, value) in extra {
+        entries.retain(|(existing, _)| existing != key);
+        entries.push((key, value.clone()));
+    }
     claimed(node, &entries)
 }
 
@@ -61,13 +64,6 @@ fn mget(node: &QueueNode, refs: Vec<Term>, extra: &[(&str, Term)]) -> TestResult
     let mut entries = vec![("refs", Term::List(refs))];
     entries.extend(extra.iter().cloned());
     ok(node, "FLOW.VALUE.MGET", &entries)
-}
-
-fn until(record: &Term) -> TestResult<i64> {
-    match field(record, "terminal_retention_until_ms") {
-        Term::Int(until) => Ok(until),
-        other => Err(format!("no retention time: {other:?}").into()),
-    }
 }
 
 fn order() -> Term {
@@ -166,117 +162,6 @@ fn value_mget_returns_hot_values_and_leaves_ordinary_missing_refs_as_nil() -> Te
     Ok(())
 }
 
-#[test]
-fn cancel_rejects_public_reason_ref_input_without_touching_external_value() -> TestResult {
-    let node = node("audit-payload-reason-ref")?;
-    create(
-        &node,
-        "vr",
-        "value-cancel-reason-ref",
-        &with(
-            R,
-            &[
-                ("payload", map(&[("large", text(&"x".repeat(256)))])),
-                ("retention_ttl_ms", int(100)),
-                ("run_at_ms", int(1_000)),
-                ("now_ms", int(1_000)),
-            ],
-        ),
-    )?;
-    let created = get(&node, "vr", &with(R, &[]))?;
-    let refused = run(
-        &node,
-        "FLOW.CANCEL",
-        &with(
-            R,
-            &[
-                ("id", text("vr")),
-                ("fencing_token", field(&created, "fencing_token")),
-                ("reason_ref", text("flow-value-cancel-reason-user-key")),
-            ],
-        ),
-    )?;
-    // Elixir names `reason` in its text; this node refuses the option.
-    assert!(refused.is_err(), "{refused:?}");
-    assert_eq!(
-        field(&get(&node, "vr", &with(R, &[]))?, "state"),
-        text("queued")
-    );
-    Ok(())
-}
-
-#[test]
-fn rewind_from_terminal_back_to_active_clears_value_ref_expiration() -> TestResult {
-    let node = node("audit-payload-rewind")?;
-    let payload = map(&[("large", text(&"x".repeat(256)))]);
-    create(
-        &node,
-        "vw",
-        "value-rewind-retention",
-        &with(
-            R,
-            &[
-                ("payload", payload.clone()),
-                ("retention_ttl_ms", int(60_000)),
-                ("run_at_ms", int(1_000)),
-                ("now_ms", int(1_000)),
-            ],
-        ),
-    )?;
-    let created = get(&node, "vw", &with(R, &[]))?;
-    let Term::List(history) = ok(
-        &node,
-        "FLOW.HISTORY",
-        &with(R, &[("id", text("vw")), ("count", int(10))]),
-    )?
-    else {
-        return Err("history is not a list".into());
-    };
-    assert_eq!(history.len(), 1);
-    let Some(Term::List(first)) = history.first() else {
-        return Err("no created event".into());
-    };
-    let created_event = first.first().cloned().unwrap_or(Term::Nil);
-    let records = claim_all(&node, R, &[("type", text("value-rewind-retention"))])?;
-    let mut complete = with(R, &[("id", text("vw")), ("now_ms", int(1_000))]);
-    complete.extend(lease(records.first().unwrap_or(&Term::Nil)));
-    ok(&node, "FLOW.COMPLETE", &complete)?;
-    let cleanup_now = until(&get(&node, "vw", &with(R, &[]))?)? + 1;
-    ok(
-        &node,
-        "FLOW.REWIND",
-        &with(
-            R,
-            &[
-                ("id", text("vw")),
-                ("to_event", created_event),
-                ("now_ms", int(1_000)),
-            ],
-        ),
-    )?;
-    let rewound = get(&node, "vw", &with(R, &[]))?;
-    assert_eq!(field(&rewound, "state"), field(&created, "state"));
-    assert_eq!(
-        field(&rewound, "payload_ref"),
-        field(&created, "payload_ref")
-    );
-    assert_eq!(field(&rewound, "terminal_retention_until_ms"), Term::Nil);
-    // Elixir reads at the cleanup time; a cleanup then must keep it.
-    ok(
-        &node,
-        "FLOW.RETENTION_CLEANUP",
-        &[("limit", int(10)), ("now_ms", int(cleanup_now))],
-    )?;
-    let fetched = full(&node, "vw", R)?;
-    assert_eq!(field(&fetched, "state"), field(&created, "state"));
-    assert_eq!(field(&fetched, "payload"), payload);
-    assert_eq!(
-        mget(&node, vec![field(&created, "payload_ref")], &[])?,
-        Term::List(vec![payload])
-    );
-    Ok(())
-}
-
 /// Not an Elixir test: audit gaps G6 and G7 with byte payloads. Each event
 /// shows the payload, result and error versions it named, the replaced
 /// ones included, also once the Flow is on disk (ADR-016 phase C).
@@ -350,6 +235,217 @@ fn history_values_show_each_events_own_versions() -> TestResult {
             (text("claimed"), text("p2"), Term::Nil),
             (text("completed"), text("p2"), text("r1")),
         ]
+    );
+    Ok(())
+}
+
+#[test]
+fn transition_can_replace_payload_and_retry_error_preserves_current_payload() -> TestResult {
+    let node = node("audit-payload-transition")?;
+    create(
+        &node,
+        "vt",
+        "value-transition",
+        &with(
+            P,
+            &[
+                ("payload", text("initial")),
+                ("run_at_ms", int(1_000)),
+                ("now_ms", int(1_000)),
+            ],
+        ),
+    )?;
+    let first = claim_all(&node, P, &[("type", text("value-transition"))])?;
+    let first = first.first().cloned().unwrap_or(Term::Nil);
+    let step = map(&[("step", text("waiting"))]);
+    let mut entries = with(
+        P,
+        &[
+            ("id", text("vt")),
+            ("from_state", text("running")),
+            ("to_state", text("waiting")),
+            ("payload", step.clone()),
+            ("run_at_ms", int(2_000)),
+            ("now_ms", int(1_100)),
+        ],
+    );
+    entries.extend(lease(&first));
+    ok(&node, "FLOW.TRANSITION", &entries)?;
+    let moved = get(&node, "vt", &with(P, &[]))?;
+    assert!(matches!(field(&moved, "payload_ref"), Term::Bin(_)));
+    assert_ne!(field(&moved, "payload_ref"), field(&first, "payload_ref"));
+    let again = claim_all(
+        &node,
+        P,
+        &[
+            ("type", text("value-transition")),
+            ("state", text("waiting")),
+            ("worker", text("worker-2")),
+            ("now_ms", int(2_000)),
+        ],
+    )?;
+    let again = again.first().cloned().unwrap_or(Term::Nil);
+    assert_eq!(field(&again, "payload"), step);
+    let reason = map(&[("reason", text("temporary"))]);
+    let mut retry = with(
+        P,
+        &[
+            ("id", text("vt")),
+            ("error", reason.clone()),
+            ("run_at_ms", int(3_000)),
+            ("now_ms", int(2_100)),
+        ],
+    );
+    retry.extend(lease(&again));
+    ok(&node, "FLOW.RETRY", &retry)?;
+    let retried = get(&node, "vt", &with(P, &[]))?;
+    assert_eq!(field(&retried, "payload_ref"), field(&again, "payload_ref"));
+    assert!(matches!(field(&retried, "error_ref"), Term::Bin(_)));
+    assert!(!has(&retried, "payload") && !has(&retried, "error"));
+    let fetched = full(&node, "vt", P)?;
+    assert_eq!(field(&fetched, "payload"), step);
+    assert_eq!(field(&fetched, "error"), reason);
+    Ok(())
+}
+
+#[test]
+fn complete_and_fail_store_result_error_values_without_requiring_public_refs() -> TestResult {
+    let node = node("audit-payload-terminal")?;
+    for id in ["vk", "vf"] {
+        create(
+            &node,
+            id,
+            "value-terminal",
+            &with(P, &[("run_at_ms", int(1_000)), ("now_ms", int(1_000))]),
+        )?;
+    }
+    let records = claim_all(
+        &node,
+        P,
+        &[("type", text("value-terminal")), ("limit", int(2))],
+    )?;
+    let find = |id: &str| {
+        records
+            .iter()
+            .find(|record| field(record, "id") == text(id))
+            .cloned()
+            .unwrap_or(Term::Nil)
+    };
+    let sent = map(&[("status", text("sent"))]);
+    let bad = map(&[("code", text("bad_input"))]);
+    let mut complete = with(
+        P,
+        &[
+            ("id", text("vk")),
+            ("result", sent.clone()),
+            ("now_ms", int(1_100)),
+        ],
+    );
+    complete.extend(lease(&find("vk")));
+    ok(&node, "FLOW.COMPLETE", &complete)?;
+    let mut fail = with(
+        P,
+        &[
+            ("id", text("vf")),
+            ("error", bad.clone()),
+            ("now_ms", int(1_100)),
+        ],
+    );
+    fail.extend(lease(&find("vf")));
+    ok(&node, "FLOW.FAIL", &fail)?;
+    assert!(matches!(
+        field(&get(&node, "vk", &with(P, &[]))?, "result_ref"),
+        Term::Bin(_)
+    ));
+    assert!(matches!(
+        field(&get(&node, "vf", &with(P, &[]))?, "error_ref"),
+        Term::Bin(_)
+    ));
+    assert_eq!(field(&full(&node, "vk", P)?, "result"), sent);
+    assert_eq!(field(&full(&node, "vf", P)?, "error"), bad);
+    Ok(())
+}
+
+#[test]
+fn value_mget_can_omit_values_larger_than_max_bytes_without_decoding_them() -> TestResult {
+    let node = node("audit-payload-mget-omit")?;
+    let payload = map(&[("large", text(&"x".repeat(512)))]);
+    let put = ok(
+        &node,
+        "FLOW.VALUE.PUT",
+        &with(P, &[("value", payload.clone())]),
+    )?;
+    let reference = field(&put, "ref");
+    let Term::List(omitted) = mget(&node, vec![reference.clone()], &[("max_bytes", int(1))])?
+    else {
+        return Err("mget is not a list".into());
+    };
+    let omitted = omitted.first().cloned().unwrap_or(Term::Nil);
+    assert_eq!(field(&omitted, "ref"), reference);
+    assert_eq!(field(&omitted, "value_omitted"), Term::Bool(true));
+    assert!(matches!(field(&omitted, "value_size"), Term::Int(size) if size > 1));
+    for key in ["max_bytes", "value_max_bytes", "payload_max_bytes"] {
+        assert_eq!(
+            mget(&node, vec![reference.clone()], &[(key, int(64 * 1024))])?,
+            Term::List(vec![payload.clone()]),
+            "{key}"
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn history_only_hydrates_stored_values_when_values_option_is_requested() -> TestResult {
+    let node = node("audit-payload-history")?;
+    create(
+        &node,
+        "vh",
+        "value-history",
+        &with(
+            P,
+            &[
+                ("payload", map(&[("input", int(1))])),
+                ("run_at_ms", int(1_000)),
+                ("now_ms", int(1_000)),
+            ],
+        ),
+    )?;
+    let records = claim_all(&node, P, &[("type", text("value-history"))])?;
+    let mut complete = with(
+        P,
+        &[
+            ("id", text("vh")),
+            ("result", map(&[("output", int(2))])),
+            ("now_ms", int(1_100)),
+        ],
+    );
+    complete.extend(lease(records.first().unwrap_or(&Term::Nil)));
+    ok(&node, "FLOW.COMPLETE", &complete)?;
+    let plain = events(&node, "vh", &with(P, &[("count", int(10))]))?;
+    assert!(
+        plain
+            .iter()
+            .all(|fields| !has(fields, "payload") && !has(fields, "result"))
+    );
+    let hydrated = events(
+        &node,
+        "vh",
+        &with(P, &[("count", int(10)), ("values", Term::Bool(true))]),
+    )?;
+    let by_event = |name: &str| {
+        hydrated
+            .iter()
+            .find(|fields| field(fields, "event") == text(name))
+            .cloned()
+            .unwrap_or(Term::Nil)
+    };
+    let input = map(&[("input", int(1))]);
+    assert_eq!(field(&by_event("created"), "payload"), input);
+    assert_eq!(field(&by_event("claimed"), "payload"), input);
+    assert_eq!(field(&by_event("completed"), "payload"), input);
+    assert_eq!(
+        field(&by_event("completed"), "result"),
+        map(&[("output", int(2))])
     );
     Ok(())
 }

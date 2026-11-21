@@ -48,12 +48,12 @@ fn terminal_kind(state: &[u8]) -> EventKind {
     }
 }
 
-/// A payload, result or error's version and term flag in `meta`.
-fn slot(meta: &mut FlowMeta, kind: u8) -> (&mut u64, Option<&mut bool>) {
+/// A payload, result or error's version in `meta`.
+fn slot(meta: &mut FlowMeta, kind: u8) -> &mut u64 {
     match kind {
-        RETAINED_PAYLOAD => (&mut meta.payload_version, Some(&mut meta.payload_term)),
-        RETAINED_RESULT => (&mut meta.result_version, None),
-        _ => (&mut meta.error_version, Some(&mut meta.error_term)),
+        RETAINED_PAYLOAD => &mut meta.payload_version,
+        RETAINED_RESULT => &mut meta.result_version,
+        _ => &mut meta.error_version,
     }
 }
 
@@ -66,8 +66,7 @@ fn restore(
     named: Option<u64>,
     current: Option<&[u8]>,
 ) -> Result<Option<Vec<u8>>, ServiceError> {
-    let (version, term) = slot(meta, kind);
-    let (stored, stored_term) = (*version, term.as_deref().copied().unwrap_or(false));
+    let stored = *slot(meta, kind);
     if let (Some(wanted), Some(bytes)) = (named, current)
         && wanted == stored
     {
@@ -77,20 +76,16 @@ fn restore(
         None => None,
         Some(wanted) => {
             let kept = meta.retained(kind, b"", wanted).ok_or_else(not_found)?;
-            Some((wanted, kept.bytes.clone(), kept.term))
+            Some((wanted, kept.bytes.clone()))
         }
     };
     if let Some(bytes) = current {
-        meta.retain((kind, b"", stored), bytes, stored_term);
+        meta.retain((kind, b"", stored), bytes);
     }
-    let Some((wanted, bytes, kept_term)) = restored else {
+    let Some((wanted, bytes)) = restored else {
         return Ok(None);
     };
-    let (version, term) = slot(meta, kind);
-    *version = wanted;
-    if let Some(term) = term {
-        *term = kept_term;
-    }
+    *slot(meta, kind) = wanted;
     Ok(Some(bytes))
 }
 
@@ -108,12 +103,9 @@ fn restore_all(
     let error = match &request.reason {
         Some(reason) => {
             if let Some(old) = record.error() {
-                let kept = (RETAINED_ERROR, &b""[..], meta.error_version);
-                let term = meta.error_term;
-                meta.retain(kept, old, term);
+                meta.retain((RETAINED_ERROR, &b""[..], meta.error_version), old);
             }
             meta.error_version = next;
-            meta.error_term = false;
             Some(reason.clone())
         }
         None => restore(meta, RETAINED_ERROR, target.refs[2], record.error())?,
@@ -142,7 +134,7 @@ fn named_values(
         .map(|(name, value)| (name.clone(), value.clone()))
         .collect();
     for (name, value) in replaced {
-        meta.retain((RETAINED_NAMED, &name, value.version), &value.bytes, false);
+        meta.retain((RETAINED_NAMED, &name, value.version), &value.bytes);
     }
     Ok(restored)
 }
@@ -259,9 +251,6 @@ impl ShardState {
             .checked_add(1)
             .ok_or(ServiceError::Unavailable)?;
         let (payload, result, error) = restore_all(&mut meta, record, &target, request, next)?;
-        if error.is_none() {
-            meta.error_term = false;
-        }
         meta.values = named_values(&target, &mut meta)?;
         (meta.attributes, meta.state_meta) = fields(&target)?;
         meta.rewound_to = Some(request.to_event.clone());

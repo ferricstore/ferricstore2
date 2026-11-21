@@ -15,6 +15,7 @@ use wf_application::commands::flow::create::MaxActive;
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::record::RETAINED_ERROR;
 use wf_application::commands::flow::term::{Term, map};
+use wf_application::commands::flow::value_codec;
 use wf_domain::history::EventKind;
 use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
@@ -92,12 +93,11 @@ impl ShardState {
         };
         let record = &entry.record;
         let version = record.version().checked_add(1)?;
-        let mut error = Vec::new();
-        map(vec![
+        // A term error, in the value codec's stored form (audit gap G5).
+        let error = value_codec::store(&map(vec![
             ("max_active_ms", Term::int(limit)),
             ("reason", Term::text("max_active_ms")),
-        ])
-        .encode(&mut error)?;
+        ]))?;
         let data = WorkflowRecordData {
             id: record.id().clone(),
             workflow_type: record.workflow_type().to_vec(),
@@ -120,12 +120,9 @@ impl ShardState {
         let limits = AdmissionLimits::new(MAX_INLINE_BYTES, usize::MAX, 1).ok()?;
         let failed = restore_record(data, limits).ok()?;
         if let Some(old) = record.error() {
-            let kept = (RETAINED_ERROR, &b""[..], meta.error_version);
-            let term = meta.error_term;
-            meta.retain(kept, old, term);
+            meta.retain((RETAINED_ERROR, &b""[..], meta.error_version), old);
         }
         meta.error_version = version;
-        meta.error_term = true;
         meta.ttl_ms = None;
         meta.terminal_until = Some(now.max(wall).saturating_add(meta.retention_ttl_ms));
         let priority = entry.priority;

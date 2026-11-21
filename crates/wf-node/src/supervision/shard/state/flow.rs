@@ -268,7 +268,6 @@ impl ShardState {
             attributes: create.attributes.clone(),
             state_meta,
             values,
-            payload_term: create.payload_term,
             ..defaults
         })
     }

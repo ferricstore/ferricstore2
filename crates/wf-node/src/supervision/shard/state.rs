@@ -44,9 +44,9 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use events::History;
-use wf_application::commands::flow::governance::Kind;
-use wf_application::commands::flow::policy::Installed;
-use wf_application::commands::flow::record::FlowMeta;
+use wf_application::commands::flow::{
+    governance::Kind, policy::Installed, record::FlowMeta, value_codec,
+};
 use wf_application::commands::queue::{
     CompleteFlow, ItemOutcome, MAX_FLOW_ID_BYTES, NewFlow, Partition, ServiceError,
 };
@@ -97,8 +97,7 @@ pub(crate) struct ShardState {
     leased: u64,
     /// Shared values by reference (ADR-014 step 5).
     shared: Map<Vec<u8>, value::Shared>,
-    /// Governance records by kind and name, in stored form (ADR-014 step
-    /// 15).
+    /// Governance records by kind and name, stored (ADR-014 step 15).
     governance: BTreeMap<(Kind, Vec<u8>), Vec<u8>>,
     /// Credits of Flows that left `running`, to release (ADR-014 step 15).
     credit_releases: Vec<wf_application::commands::flow::effect::Credit>,
@@ -365,7 +364,8 @@ impl ShardState {
             flow_type: flow_type.to_vec(),
             state: state.to_vec(),
             run_at,
-            payload: flow.payload,
+            // Escaped like any stored value (audit gap G5).
+            payload: flow.payload.map(value_codec::escape),
             priority,
         };
         settle(self.apply(&logged), logged)
@@ -384,7 +384,7 @@ impl ShardState {
             id: completion.id,
             token: completion.lease_token,
             fence: completion.fence,
-            result: completion.result,
+            result: completion.result.map(value_codec::escape),
         };
         settle(self.apply(&logged), logged)
     }

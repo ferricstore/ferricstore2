@@ -178,28 +178,19 @@ fn updated_meta(
     // C).
     if payload {
         if let Some(old) = previous.payload() {
-            next.retain(
-                (RETAINED_PAYLOAD, b"", current.payload_version),
-                old,
-                current.payload_term,
-            );
+            next.retain((RETAINED_PAYLOAD, b"", current.payload_version), old);
         }
         next.payload_version = version;
-        next.payload_term = false;
     }
     if result {
         if let Some(old) = previous.result() {
-            next.retain((RETAINED_RESULT, b"", current.result_version), old, false);
+            next.retain((RETAINED_RESULT, b"", current.result_version), old);
         }
         next.result_version = version;
     }
     if error {
         if let Some(old) = previous.error() {
-            next.retain(
-                (RETAINED_ERROR, b"", current.error_version),
-                old,
-                current.error_term,
-            );
+            next.retain((RETAINED_ERROR, b"", current.error_version), old);
         }
         next.error_version = version;
     }

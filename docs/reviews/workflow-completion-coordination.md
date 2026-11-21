@@ -65909,3 +65909,28 @@ of an overridden value read back as nil) now pass, and a new test shows
 each history event's payload and result versions, read back from disk;
 dropping the payload retention makes it fail. All 136 node tests pass. The
 Elixir history-values test still waits for G5 (its result is a map).
+
+### G5 Structured values on every command (value codec)
+
+New artifacts (solo design review): `wf_application::commands::flow::
+value_codec` (`store`, `escape`, `load`, with unit tests) and
+`create::stored`. Removed: `CreateFlow::payload_term`,
+`FlowMeta::{payload_term, error_term}`, `Retained::term` and the node's
+separate term-value read path. Snapshot version 13.
+
+Decision: one codec for every stored client value, as Elixir's value
+codec does: a binary stays as it is, any other term is this node's term
+encoding behind a 3-byte marker, and a binary that begins like the marker
+is escaped (queue fast-path payloads and results pass through `escape`).
+Every read decodes through it, so no flag travels beside a value. Payload,
+result, error, cancel reason, value put and named values all take any
+term. `FLOW.VALUE.MGET` also reads its limit as `value_max_bytes` or
+`payload_max_bytes`, as Elixir does.
+
+Evidence: six ported value-payload tests that failed before ("result must
+be a binary" and the like) pass: replacing a payload by transition, term
+results and errors, an omitted large term value, a term cancel reason,
+cleanup of term values and history with values. The codec's unit tests
+round-trip binaries that begin like the marker. All audit (37), node,
+adapter and application tests pass. The ported tests were written before
+this change, so they are the failing-first evidence for it.

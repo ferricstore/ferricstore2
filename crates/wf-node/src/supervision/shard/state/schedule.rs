@@ -9,6 +9,7 @@ use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::flow::schedule::definition::Definition;
 use wf_application::commands::flow::schedule::plan::Apply;
 use wf_application::commands::flow::schedule::{HISTORY_MAX_EVENTS, SCHEDULE_TYPE};
+use wf_application::commands::flow::value_codec;
 use wf_application::commands::queue::ServiceError;
 use wf_domain::history::EventKind;
 use wf_domain::lease::{Lease, LeaseToken};
@@ -300,9 +301,7 @@ impl ShardState {
                 data.state = b"completed".to_vec();
                 data.next_run_at = None;
                 data.payload = Some(definition.encode());
-                let mut bytes = Vec::new();
-                let _encoded = result.encode(&mut bytes);
-                data.result = Some(bytes);
+                data.result = value_codec::store(&result);
                 meta.terminal_until = Some(now.max(wall).saturating_add(meta.retention_ttl_ms));
                 EventKind::Completed
             }
@@ -310,10 +309,7 @@ impl ShardState {
                 data.state = b"failed".to_vec();
                 data.next_run_at = None;
                 data.payload = Some(definition.encode());
-                let mut bytes = Vec::new();
-                let _encoded = error.encode(&mut bytes);
-                data.error = Some(bytes);
-                meta.error_term = true;
+                data.error = value_codec::store(&error);
                 meta.terminal_until = Some(now.max(wall).saturating_add(meta.retention_ttl_ms));
                 EventKind::Failed
             }

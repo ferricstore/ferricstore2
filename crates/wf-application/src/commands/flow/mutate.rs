@@ -182,12 +182,9 @@ fn fence(opts: &Opts<'_>) -> Result<u64, FlowError> {
         .ok_or_else(|| FlowError::flow("fencing_token", "is required"))
 }
 
+/// A value of any term, stored (audit gap G5).
 fn binary(opts: &Opts<'_>, key: &str) -> Result<Option<Vec<u8>>, FlowError> {
-    match opts.get(key) {
-        None | Some(Term::Nil) => Ok(None),
-        Some(Term::Bin(bytes)) => Ok(Some(bytes.clone())),
-        Some(_) => Err(FlowError::flow(key, "must be a binary")),
-    }
+    super::create::stored(opts, key)
 }
 
 fn names(opts: &Opts<'_>, key: &str) -> Result<Vec<Vec<u8>>, FlowError> {

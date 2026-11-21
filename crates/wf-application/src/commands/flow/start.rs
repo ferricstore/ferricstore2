@@ -109,12 +109,9 @@ pub struct RunSteps {
     pub items: Vec<(Vec<u8>, Option<Vec<u8>>)>,
 }
 
+/// A value of any term, stored (audit gap G5).
 fn binary(opts: &Opts<'_>, key: &str) -> Result<Option<Vec<u8>>, FlowError> {
-    match opts.get(key) {
-        None | Some(Term::Nil) => Ok(None),
-        Some(Term::Bin(bytes)) => Ok(Some(bytes.clone())),
-        Some(_) => Err(FlowError::flow(key, "must be a binary")),
-    }
+    super::create::stored(opts, key)
 }
 
 fn steps(opts: &Opts<'_>) -> Result<Vec<Vec<u8>>, FlowError> {

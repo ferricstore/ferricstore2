@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 use super::meta::{self, Attributes};
 use super::opts::Opts;
 use super::term::Term;
+use super::value_codec;
 use super::{FlowError, MAX_FLOW_ID_BYTES};
 
 const ALLOWED: &[&str] = &[
@@ -62,8 +63,6 @@ pub struct CreateFlow {
     pub partition_key: Option<Vec<u8>>,
     /// Payload, if any.
     pub payload: Option<Vec<u8>>,
-    /// The payload is an encoded term, not bytes.
-    pub payload_term: bool,
     /// Parent Flow id.
     pub parent_flow_id: Option<Vec<u8>>,
     /// Root Flow id; the Flow itself when absent.
@@ -206,7 +205,21 @@ fn history_caps(opts: &Opts<'_>) -> Result<(Option<u64>, Option<u64>), FlowError
     Ok((hot, max))
 }
 
-/// The `values` option: names to binaries.
+/// A value option of any term, in the value codec's stored form (audit gap
+/// G5); `None` when absent.
+///
+/// # Errors
+/// The term cannot be encoded.
+pub fn stored(opts: &Opts<'_>, key: &str) -> Result<Option<Vec<u8>>, FlowError> {
+    match opts.get(key) {
+        None | Some(Term::Nil) => Ok(None),
+        Some(value) => value_codec::store(value)
+            .map(Some)
+            .ok_or_else(|| FlowError::flow(key, "is too large")),
+    }
+}
+
+/// The `values` option: names to values of any term, stored.
 ///
 /// # Errors
 /// The Elixir server's refusal text for an invalid value.
@@ -215,10 +228,10 @@ pub fn values(opts: &Opts<'_>) -> Result<BTreeMap<Vec<u8>, Vec<u8>>, FlowError> 
         None | Some(Term::Nil) => Ok(BTreeMap::new()),
         Some(Term::Map(entries)) => entries
             .iter()
-            .map(|(name, value)| match value {
-                Term::Bin(bytes) if !name.is_empty() => Ok((name.clone(), bytes.clone())),
+            .map(|(name, value)| match value_codec::store(value) {
+                Some(bytes) if !name.is_empty() => Ok((name.clone(), bytes)),
                 _ => Err(FlowError::rejected(
-                    "ERR flow values must map names to binaries".to_owned(),
+                    "ERR flow values must map names to values".to_owned(),
                 )),
             })
             .collect(),
@@ -304,25 +317,15 @@ pub fn parse(args: &Term) -> Result<CreateFlow, FlowError> {
     )?;
     let attributes = meta::attributes(opts.get("attributes"))?;
     let state_meta = meta::state_meta_update(opts.get("state_meta"))?;
-    // Elixir stores any term; a non-binary one is kept as our term
-    // encoding and read back as the term (ADR-014 step 13).
-    let (payload, payload_term) = match opts.get("payload") {
-        None | Some(Term::Nil) => (None, false),
-        Some(Term::Bin(bytes)) => (Some(bytes.clone()), false),
-        Some(term) => {
-            let mut bytes = Vec::new();
-            term.encode(&mut bytes)
-                .ok_or_else(|| FlowError::flow("payload", "is too large"))?;
-            (Some(bytes), true)
-        }
-    };
+    // Elixir stores any term; it is kept in the value codec's form and read
+    // back as sent (audit gap G5).
+    let payload = stored(&opts, "payload")?;
     Ok(CreateFlow {
         id,
         flow_type,
         state,
         partition_key,
         payload,
-        payload_term,
         parent_flow_id,
         root_flow_id,
         correlation_id,

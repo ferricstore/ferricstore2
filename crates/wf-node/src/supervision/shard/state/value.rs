@@ -85,7 +85,7 @@ fn conflict(name: &[u8]) -> ServiceError {
 pub(super) fn drop_values(meta: &mut FlowMeta, names: &[Vec<u8>]) {
     for name in names {
         if let Some(value) = meta.values.remove(name) {
-            meta.retain((RETAINED_NAMED, name, value.version), &value.bytes, false);
+            meta.retain((RETAINED_NAMED, name, value.version), &value.bytes);
         }
     }
 }
@@ -102,7 +102,7 @@ pub(super) fn write_values<'a>(
             // The replaced version stays readable (ADR-016 phase C).
             Some(existing) => {
                 let (kept, bytes) = (existing.version, existing.bytes.clone());
-                meta.retain((RETAINED_NAMED, name, kept), &bytes, false);
+                meta.retain((RETAINED_NAMED, name, kept), &bytes);
             }
             None => {}
         }
@@ -331,37 +331,6 @@ impl ShardState {
         }
     }
 
-    /// An error stored as a term (an active-time timeout's) or a payload
-    /// created as one, decoded.
-    fn term_value(&mut self, reference: &[u8]) -> Option<Term> {
-        let parsed = value::parse_ref(reference)?;
-        let ValueRef::Flow { kind, id, version } = parsed.target else {
-            return None;
-        };
-        let partition = self.partition_for_tag(&parsed.tag)?;
-        let entry = self.seen(&(partition, id))?;
-        let meta = entry.meta.as_deref()?;
-        let bytes = match kind {
-            b'e' if meta.error_term && meta.error_version == version => entry.record.error()?,
-            b'p' if meta.payload_term && meta.payload_version == version => {
-                entry.record.payload()?
-            }
-            // A replaced version stored as a term (ADR-016 phase C).
-            b'e' | b'p' => {
-                let kept = meta.retained(kind, b"", version)?;
-                if !kept.term {
-                    return None;
-                }
-                kept.bytes.as_slice()
-            }
-            _ => return None,
-        };
-        match Term::decode(bytes) {
-            Some((term, [])) => Some(term),
-            _ => None,
-        }
-    }
-
     /// `FLOW.VALUE.MGET` for the references this shard owns.
     pub(crate) fn read_values(
         &mut self,
@@ -371,9 +340,6 @@ impl ShardState {
     ) -> Vec<(usize, Term)> {
         refs.into_iter()
             .map(|(position, reference)| {
-                if let Some(term) = self.term_value(&reference) {
-                    return (position, term);
-                }
                 let bytes = self.value_bytes(now, &reference);
                 (
                     position,

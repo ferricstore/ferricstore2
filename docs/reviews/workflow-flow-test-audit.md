@@ -35,8 +35,9 @@ Gaps found so far:
 - G4: `_MANY` list items are read in one order; Elixir reads
   `TRANSITION_MANY` as `[id, fence, token]` and `CANCEL_MANY` as
   `[id, fence]` or `[id, partition, fence]`.
-- G5: structured values (maps, lists) only on create; transition,
-  complete, fail, retry, cancel and value put take bytes only.
+- G5 (closed by the value codec): structured values (maps, lists) were
+  taken only on create; transition, complete, fail, retry, cancel and value
+  put took bytes only.
 - G6 (closed by ADR-016 phase C): replacing a value dropped its old
   version, so a rewind or history could not bring it back.
 - G7 (closed by ADR-016 phase C): `FLOW.HISTORY` ignored `values: true`.
@@ -512,22 +513,22 @@ Gaps found so far:
 | Line | Test | Status |
 |---|---|---|
 | 19 | create stores a full payload value and claim/get hydrate it from internal storage | ported |
-| 55 | transition can replace payload and retry error preserves current payload | gap G5 |
-| 124 | complete and fail store result/error values without requiring public refs | gap G5 |
+| 55 | transition can replace payload and retry error preserves current payload | fixed (G5, value codec) |
+| 124 | complete and fail store result/error values without requiring public refs | fixed (G5, value codec) |
 | 182 | terminal retention does not materialize existing generated payload value refs | internal: Elixir copies no generated ref at terminal time; its read after cleanup contradicts the cleanup tests |
-| 223 | value_mget can omit values larger than max_bytes without decoding them | gap G5 |
+| 223 | value_mget can omit values larger than max_bytes without decoding them | fixed (G5, value codec) |
 | 240 | shared value TTL uses command time when now_ms is omitted | ported |
 | 247 | shared value expiry stays in the exact integer domain | ported (wording; an expiry past 2^53 - 1 is no limit with u64 times) |
 | 260 | value_mget returns hot values and leaves ordinary missing refs as nil | ported |
 | 269 | cancel terminal retention does not materialize existing generated payload value refs | internal: as line 182 |
 | 300 | cancel rejects public reason_ref input without touching external value | ported (refused as an unknown option) |
-| 331 | cancel stores inline reason payload as an owned terminal value | gap G5 |
-| 385 | retention cleanup removes expired terminal state, history, and owned values | gap G5 |
+| 331 | cancel stores inline reason payload as an owned terminal value | fixed (G5, value codec) |
+| 385 | retention cleanup removes expired terminal state, history, and owned values | fixed (G5, value codec) |
 | 441 | retention cleanup returns an exact continuation without a final empty pass | gap G8 |
 | 523 | retention sweeper runs cleanup through Flow command path | covered: `retention::a_completed_flow_is_removed_after_retention` |
 | 610 | rewind from terminal back to active clears value ref expiration | ported |
 | 675 | batch APIs also persist full value fields | gap G2, G3, G5 |
-| 787 | history only hydrates stored values when values option is requested | gap G5 (history values done: G7 closed; the test's map result needs G5) |
+| 787 | history only hydrates stored values when values option is requested | fixed (G5, value codec) |
 
 ## `flow_test/sections/flow_native_due_index_mirrors_create_claim_due.exs`
 

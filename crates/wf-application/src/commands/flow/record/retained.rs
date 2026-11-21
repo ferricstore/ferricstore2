@@ -15,19 +15,17 @@ pub const RETAINED_NAMED: u8 = b'n';
 /// Kept versions by kind, name and version.
 pub type RetainedMap = std::collections::BTreeMap<(u8, Vec<u8>, u64), Retained>;
 
-/// One kept value version.
+/// One kept value version, in the value codec's stored form.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Retained {
     /// The stored bytes.
     pub bytes: Vec<u8>,
-    /// Whether the bytes are this node's term encoding.
-    pub term: bool,
 }
 
 impl FlowMeta {
     /// Keeps a replaced version; the oldest go once more are kept than the
     /// history holds events, since no event can name them then.
-    pub fn retain(&mut self, (kind, name, version): (u8, &[u8], u64), bytes: &[u8], term: bool) {
+    pub fn retain(&mut self, (kind, name, version): (u8, &[u8], u64), bytes: &[u8]) {
         if version == 0 {
             return;
         }
@@ -35,7 +33,6 @@ impl FlowMeta {
             (kind, name.to_vec(), version),
             Retained {
                 bytes: bytes.to_vec(),
-                term,
             },
         );
         let cap = usize::try_from(self.history_max_events.max(1)).unwrap_or(usize::MAX);

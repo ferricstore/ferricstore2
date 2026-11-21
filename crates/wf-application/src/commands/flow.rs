@@ -31,6 +31,7 @@ pub mod start;
 pub mod term;
 pub mod text;
 pub mod value;
+pub mod value_codec;
 
 pub use opts::MAX_EXACT;
 pub use term::Term;

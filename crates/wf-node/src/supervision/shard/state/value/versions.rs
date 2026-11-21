@@ -5,26 +5,27 @@ use wf_application::commands::flow::record::{
     FlowMeta, RETAINED_ERROR, RETAINED_PAYLOAD, RETAINED_RESULT,
 };
 use wf_application::commands::flow::term::Term;
+use wf_application::commands::flow::value_codec;
 use wf_domain::workflow::WorkflowRecord;
 
-/// The bytes of a payload, result or error version, current or kept, and
-/// whether they are a term (ADR-016 phase C).
+/// The stored bytes of a payload, result or error version, current or kept
+/// (ADR-016 phase C).
 pub(in crate::supervision::shard::state) fn version_bytes<'a>(
     record: &'a WorkflowRecord,
     meta: &'a FlowMeta,
     kind: u8,
     version: u64,
-) -> Option<(&'a [u8], bool)> {
-    let (current, stored, term) = match kind {
-        RETAINED_PAYLOAD => (record.payload(), meta.payload_version, meta.payload_term),
-        RETAINED_RESULT => (record.result(), meta.result_version, false),
-        _ => (record.error(), meta.error_version, meta.error_term),
+) -> Option<&'a [u8]> {
+    let (current, stored) = match kind {
+        RETAINED_PAYLOAD => (record.payload(), meta.payload_version),
+        RETAINED_RESULT => (record.result(), meta.result_version),
+        _ => (record.error(), meta.error_version),
     };
     match current {
-        Some(bytes) if stored == version => Some((bytes, term)),
+        Some(bytes) if stored == version => Some(bytes),
         _ => meta
             .retained(kind, b"", version)
-            .map(|kept| (kept.bytes.as_slice(), kept.term)),
+            .map(|kept| kept.bytes.as_slice()),
     }
 }
 
@@ -46,15 +47,10 @@ pub(in crate::supervision::shard::state) fn with_values(
             ("error", RETAINED_ERROR),
         ];
         for ((name, kind), version) in kinds.into_iter().zip(refs) {
-            let Some((bytes, term)) = version.and_then(|v| version_bytes(record, meta, kind, v))
-            else {
+            let Some(bytes) = version.and_then(|v| version_bytes(record, meta, kind, v)) else {
                 continue;
             };
-            let value = match (term, Term::decode(bytes)) {
-                (true, Some((decoded, []))) => decoded,
-                _ => Term::Bin(bytes.to_vec()),
-            };
-            fields.push((name.as_bytes().to_vec(), value));
+            fields.push((name.as_bytes().to_vec(), value_codec::load(bytes)));
         }
     }
     Term::List(parts)

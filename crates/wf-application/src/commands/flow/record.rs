@@ -74,10 +74,6 @@ pub struct FlowMeta {
     pub signal_keys: BTreeMap<Vec<u8>, Vec<u8>>,
     /// Child groups by id.
     pub child_groups: BTreeMap<Vec<u8>, ChildGroup>,
-    /// The error is an encoded term (a timeout's; ADR-014 step 9).
-    pub error_term: bool,
-    /// The payload is an encoded term, not bytes (ADR-014 step 13).
-    pub payload_term: bool,
     /// The history event the Flow was last rewound to (ADR-014 step 10).
     pub rewound_to: Option<Vec<u8>>,
     /// The attribute names its type's policy indexed when the Flow was last
@@ -112,8 +108,6 @@ impl Default for FlowMeta {
             terminal_until: None,
             signal_keys: BTreeMap::new(),
             child_groups: BTreeMap::new(),
-            error_term: false,
-            payload_term: false,
             rewound_to: None,
             indexed_attributes: Vec::new(),
             indexed_state_meta: None,
@@ -150,21 +144,9 @@ fn hydrate(entries: &mut Vec<(&str, Term)>, kind: &str, value: Option<&[u8]>, ma
     if size > max_bytes {
         entries.push((omitted_field, Term::Bool(true)));
     } else {
-        entries.push((field, Term::Bin(value.to_vec())));
+        entries.push((field, super::value_codec::load(value)));
     }
     entries.push((size_field, Term::int(size)));
-}
-
-/// Replaces a hydrated value stored as an encoded term with the term.
-fn decode_term(entries: &mut [(&str, Term)], field: &str) {
-    for (name, value) in entries.iter_mut() {
-        if *name == field
-            && let Term::Bin(bytes) = value
-            && let Some((term, [])) = Term::decode(bytes)
-        {
-            *value = term;
-        }
-    }
 }
 
 fn ms(value: Option<TimestampMillis>) -> Term {
@@ -252,13 +234,13 @@ impl View<'_> {
             Values::All => meta
                 .values
                 .iter()
-                .map(|(name, value)| (name.clone(), Term::Bin(value.bytes.clone())))
+                .map(|(name, value)| (name.clone(), super::value_codec::load(&value.bytes)))
                 .collect(),
             Values::Names(names) => names
                 .iter()
                 .filter_map(|name| {
                     let value = meta.values.get(name)?;
-                    Some((name.clone(), Term::Bin(value.bytes.clone())))
+                    Some((name.clone(), super::value_codec::load(&value.bytes)))
                 })
                 .collect(),
         };
@@ -317,9 +299,6 @@ impl View<'_> {
                 ("error", record.error()),
             ] {
                 hydrate(&mut entries, kind, value, include.max_bytes);
-            }
-            if meta.payload_term {
-                decode_term(&mut entries, "payload");
             }
         }
         map(entries)

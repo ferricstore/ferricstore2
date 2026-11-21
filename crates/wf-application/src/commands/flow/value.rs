@@ -138,10 +138,9 @@ const PUT_ALLOWED: &[&str] = &[
 /// The Elixir server's refusal text for an invalid option.
 pub fn parse_put(args: &Term) -> Result<ValuePut, FlowError> {
     let opts = Opts::new("FLOW.VALUE.PUT", args, PUT_ALLOWED)?;
-    let value = match opts.get("value") {
-        Some(Term::Bin(value)) => value.clone(),
-        _ => return Err(FlowError::flow("value", "must be a binary")),
-    };
+    // Any term, stored (audit gap G5).
+    let value = super::create::stored(&opts, "value")?
+        .ok_or_else(|| FlowError::flow("value", "is required"))?;
     let partition_key = super::create::partition_key(&opts)?;
     let owner = opts.binary_or_nil("owner_flow_id")?;
     let name = opts.binary_or_nil("name")?;
@@ -186,7 +185,11 @@ pub fn shared_id(seed: &[u8]) -> Vec<u8> {
 /// # Errors
 /// The Elixir server's refusal text for an invalid option.
 pub fn parse_mget(args: &Term) -> Result<ValueMget, FlowError> {
-    let opts = Opts::new("FLOW.VALUE.MGET", args, &["refs", "max_bytes"])?;
+    let opts = Opts::new(
+        "FLOW.VALUE.MGET",
+        args,
+        &["refs", "max_bytes", "value_max_bytes", "payload_max_bytes"],
+    )?;
     let refs = match opts.get("refs") {
         Some(Term::List(items)) => items
             .iter()
@@ -203,7 +206,11 @@ pub fn parse_mget(args: &Term) -> Result<ValueMget, FlowError> {
             ));
         }
     };
-    let max_bytes = match opts.get("max_bytes") {
+    // Elixir reads the limit under any of its three names.
+    let limit = ["max_bytes", "value_max_bytes", "payload_max_bytes"]
+        .into_iter()
+        .find_map(|key| opts.get(key).filter(|value| **value != Term::Nil));
+    let max_bytes = match limit {
         None | Some(Term::Nil) => DEFAULT_PAYLOAD_MAX_BYTES,
         Some(Term::Int(value)) if *value >= 0 => u64::try_from(*value).unwrap_or(0),
         Some(_) => {
@@ -232,6 +239,6 @@ pub fn read_term(reference: &[u8], value: Option<&[u8]>, max_bytes: u64) -> Term
                 (b"value_omitted".to_vec(), Term::Bool(true)),
             ])
         }
-        Some(bytes) => Term::Bin(bytes.to_vec()),
+        Some(bytes) => super::value_codec::load(bytes),
     }
 }
