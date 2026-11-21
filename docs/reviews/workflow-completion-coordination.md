@@ -66486,3 +66486,15 @@ earliest deadline, so shards without due deadlines (the benchmark's) do no
 per-command lookup. Batched mutations keep their own path for now. A
 fast-path test covers the queue protocol's completion; mutation checks
 kill each of the three call sites.
+
+### Flow test audit: wait-any and claim section (22 Nov)
+
+`flow_test/sections/flow_spawn_children_wait_any_resolves_on_first_
+successful_child_across_s.exs` ported (`audit::wait_any`,
+`audit::claim_reads`; Elixir's write counting, hibernation, key layout and
+index tables are internal). G22 closed (RED: `partition_key must be a
+non-empty string` against Elixir's `... or :global`, and `option
+result_ref is not supported by this server` against Elixir's `result_ref
+input is not supported; use result`). A create batch without
+`independent` is all-or-none per partition here, where Elixir's unit is
+the shard; the port states the node's rule.

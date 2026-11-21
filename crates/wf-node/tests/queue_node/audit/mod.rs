@@ -18,6 +18,7 @@ mod attributes;
 mod batches;
 mod children_joins;
 mod children_rules;
+mod claim_reads;
 mod create_many;
 mod history_limits;
 mod leases;
@@ -32,6 +33,7 @@ mod steps_contract;
 mod value_payload;
 mod value_refs;
 mod value_retention;
+mod wait_any;
 mod write_contract;
 
 /// A reply from the node: the Elixir-shaped term or the refusal.

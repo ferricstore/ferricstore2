@@ -300,9 +300,10 @@ pub fn partition_key(opts: &Opts<'_>) -> Result<Option<Vec<u8>>, FlowError> {
     match opts.get("partition_key") {
         None | Some(Term::Nil) => Ok(None),
         Some(Term::Bin(value)) if !value.is_empty() => Ok(Some(value.clone())),
+        // Elixir's text; `FLOW.INFO` and `FLOW.STATS` keep its shorter one.
         Some(_) => Err(FlowError::flow(
             "partition_key",
-            "must be a non-empty string",
+            "must be a non-empty string or :global",
         )),
     }
 }

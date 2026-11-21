@@ -322,6 +322,19 @@ pub fn parse(name: &str, args: &Term) -> Result<Mutation, FlowError> {
     let extra = extra(name).ok_or_else(|| {
         FlowError::rejected(format!("ERR {name} is not supported by this server"))
     })?;
+    // Elixir names the option to use instead of a reference to a stored
+    // value (`reject_public_value_ref_input/3`).
+    for (key, instead) in [
+        ("result_ref", "result"),
+        ("error_ref", "error"),
+        ("reason_ref", "reason"),
+    ] {
+        if args.get(key.as_bytes()).is_some() {
+            return Err(FlowError::rejected(format!(
+                "ERR flow {key} input is not supported; use {instead}"
+            )));
+        }
+    }
     let allowed: Vec<&str> = COMMON.iter().chain(extra).copied().collect();
     let opts = Opts::new(name, args, &allowed)?;
     let id = id(&opts)?;

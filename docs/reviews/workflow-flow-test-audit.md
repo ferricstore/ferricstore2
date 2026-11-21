@@ -90,6 +90,12 @@ Gaps found so far:
   the queue protocol's completion) fails it and answers `ERR flow
   max_active_ms exceeded`, as Elixir's terminal and claim paths do. A shard
   with no deadline due pays one map lookup.
+- G22 (closed): two refusals had the node's own text: an empty
+  `partition_key` on commands and reads now says `...must be a non-empty
+  string or :global` (info and stats keep Elixir's read API's shorter
+  text), and `result_ref`, `error_ref` and `reason_ref` on a mutation say
+  `ERR flow <name> input is not supported; use <value>` instead of the
+  unknown-option refusal.
 
 ## `flow_write_contract_test.exs`
 
@@ -412,27 +418,27 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow_spawn_children wait any resolves on first successful child in one Raft group | open |
-| 60 | flow_spawn_children wait any resolves failure when every local child fails | open |
-| 124 | flow_fail_many fail_parent policy closes parent and cancels local siblings | open |
-| 190 | flow_create_many spans shards and rolls back failing shard group | fixed (G2) |
-| 234 | flow_create emits telemetry without automatic worker pubsub wakeups | open |
-| 267 | flow APIs reject malformed inputs before raft apply | open |
-| 404 | flow_claim_due atomically leases due flows and removes them from due set | open |
-| 441 | flow_claim_due skips Raft write when native due index proves selected partition is empty | open |
-| 487 | flow_claim_due empty precheck does not drop work due near unstamped apply time | open |
-| 522 | all-partition claims avoid Raft writes for an empty type without hiding newly due work | open |
-| 567 | all-partition empty precheck respects future deadlines and encoded type boundaries | open |
-| 602 | all-partition empty precheck falls back when its bounded catalog page is full | open |
-| 648 | all-partition empty precheck does not hide hibernated work | open |
-| 690 | flow_claim_due skips Raft writes when all selected partition keys are empty | open |
-| 720 | flow_claim_due leases large batches without duplicates and drains due members | open |
-| 760 | partition_key keeps related flow keys on one shard and can spread partitions | open |
-| 780 | flow lifecycle maintains state, inflight, and worker indexes | open |
-| 865 | flow_list, flow_info, and flow_stuck read lifecycle indexes | open |
-| 916 | flow_info counts pending terminal records before LMDB writer flush | open |
-| 967 | flow_info does not write zero LMDB terminal counters for active-only types | open |
-| 1004 | flow_info does not build empty terminal score indexes for active-only types | open |
+| 8 | flow_spawn_children wait any resolves on first successful child in one Raft group | ported (`audit::wait_any::wait_any_resolves_on_the_first_success_and_cancels_the_rest`) |
+| 60 | flow_spawn_children wait any resolves failure when every local child fails | ported (`audit::wait_any::wait_any_fails_when_every_child_fails`) |
+| 124 | flow_fail_many fail_parent policy closes parent and cancels local siblings | ported (`audit::wait_any::a_batch_failure_that_fails_the_parent_cancels_its_siblings`) |
+| 190 | flow_create_many spans shards and rolls back failing shard group | ported (`audit::wait_any::a_create_batch_refuses_a_partition_s_items_together`; the node's all-or-none unit is the partition, Elixir's the shard a client cannot see) |
+| 234 | flow_create emits telemetry without automatic worker pubsub wakeups | internal: Elixir's telemetry and pubsub |
+| 267 | flow APIs reject malformed inputs before raft apply | fixed (`audit::wait_any::malformed_creates_are_refused_with_elixir_s_texts`, `..._claims_...`, `..._mutations_and_reads_...`, `..._transitions_failures_and_cancels_...` and `value_reference_inputs_are_refused_naming_the_value_to_send`; G22; its keyword-list and key-size cases are its own API's) |
+| 404 | flow_claim_due atomically leases due flows and removes them from due set | ported (`audit::claim_reads::a_claim_leases_due_flows_once`) |
+| 441 | flow_claim_due skips Raft write when native due index proves selected partition is empty | internal: counts Elixir's Raft writes for an empty claim |
+| 487 | flow_claim_due empty precheck does not drop work due near unstamped apply time | internal: Elixir's unstamped apply time |
+| 522 | all-partition claims avoid Raft writes for an empty type without hiding newly due work | ported (`audit::claim_reads::claims_across_partitions_find_new_work_and_nothing_early`; the write count is Elixir's) |
+| 567 | all-partition empty precheck respects future deadlines and encoded type boundaries | ported (same test) |
+| 602 | all-partition empty precheck falls back when its bounded catalog page is full | ported (same test; the catalog page is Elixir's) |
+| 648 | all-partition empty precheck does not hide hibernated work | internal: Elixir hibernates active Flows |
+| 690 | flow_claim_due skips Raft writes when all selected partition keys are empty | internal: counts Elixir's Raft writes for empty partitions |
+| 720 | flow_claim_due leases large batches without duplicates and drains due members | ported (`audit::claim_reads::a_claim_leases_due_flows_once`) |
+| 760 | partition_key keeps related flow keys on one shard and can spread partitions | internal: Elixir's key layout |
+| 780 | flow lifecycle maintains state, inflight, and worker indexes | internal: Elixir's index tables (the lifecycle itself: the claim, retry and complete tests) |
+| 865 | flow_list, flow_info, and flow_stuck read lifecycle indexes | ported (`audit::claim_reads::lifecycle_reads_list_count_and_find_stuck_flows`; FLOW.LIST, FLOW.TERMINALS and FLOW.STUCK are retired, read as the SDK's FLOW.QUERY text) |
+| 916 | flow_info counts pending terminal records before LMDB writer flush | ported (same test) |
+| 967 | flow_info does not write zero LMDB terminal counters for active-only types | internal: Elixir's LMDB terminal counters |
+| 1004 | flow_info does not build empty terminal score indexes for active-only types | internal: Elixir's terminal score indexes |
 
 ## `flow_test/sections/flow_history_supports_range_reverse_event_worker_filters.exs`
 

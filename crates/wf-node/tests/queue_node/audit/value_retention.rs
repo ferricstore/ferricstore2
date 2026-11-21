@@ -285,8 +285,10 @@ fn cancel_rejects_public_reason_ref_input_without_touching_external_value() -> T
             ],
         ),
     )?;
-    // Elixir names `reason` in its text; this node refuses the option.
-    assert!(refused.is_err(), "{refused:?}");
+    assert_eq!(
+        refusal(refused)?,
+        "ERR flow reason_ref input is not supported; use reason"
+    );
     assert_eq!(
         field(&get(&node, "vr", &with(R, &[]))?, "state"),
         text("queued")
