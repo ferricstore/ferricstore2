@@ -39,11 +39,15 @@ fn step(
             limit: left,
             done: Box::new(move |result: Result<Cleaned, ServiceError>| match result {
                 Ok(cleaned) => {
+                    let more = cleaned.more;
                     let total = total.plus(cleaned);
                     let left = left.saturating_sub(cleaned.taken());
-                    if left == 0 {
+                    if left == 0 && more {
                         reply(Ok(cleanup::reply(total, Some(shard))));
                     } else {
+                        // With the limit used up, later shards are asked
+                        // with none left: the first with work due is where
+                        // the continuation resumes (audit gap G8).
                         step(
                             &next,
                             (shard.saturating_add(1), left),

@@ -35,6 +35,9 @@ pub struct Cleaned {
     pub values: u64,
     /// Flows failed for running past `max_active_ms`.
     pub active_timeouts: u64,
+    /// The shard still had due removals or timeouts after this pass, so a
+    /// continuation is exact (audit gap G8).
+    pub more: bool,
 }
 
 impl Cleaned {
@@ -52,6 +55,7 @@ impl Cleaned {
             history: self.history.saturating_add(other.history),
             values: self.values.saturating_add(other.values),
             active_timeouts: self.active_timeouts.saturating_add(other.active_timeouts),
+            more: other.more,
         }
     }
 }

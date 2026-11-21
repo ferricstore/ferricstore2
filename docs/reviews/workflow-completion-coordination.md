@@ -65962,3 +65962,13 @@ and pass; the ported "batch APIs also persist full value fields" passes.
 All node, adapter and application tests pass.
 `state::fast` (new, same review) holds the queue fast path's `create` and
 `complete`, moved from `state.rs` to keep it under the line limit.
+
+### G8 Exact retention-cleanup continuations
+
+`Cleaned::more` (new field) says a shard still has due removals or
+timeouts after its pass. When the limit runs out on a shard with nothing
+left, later shards are asked with a limit of 0, and the continuation names
+the first that has work due, or none. The ported "retention cleanup
+returns an exact continuation without a final empty pass" failed before
+(`more?` true after the last Flow) and passes. Its first refusal is checked
+as a refusal; Elixir's wording differs.

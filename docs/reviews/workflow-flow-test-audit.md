@@ -42,7 +42,7 @@ Gaps found so far:
 - G6 (closed by ADR-016 phase C): replacing a value dropped its old
   version, so a rewind or history could not bring it back.
 - G7 (closed by ADR-016 phase C): `FLOW.HISTORY` ignored `values: true`.
-- G8: retention cleanup reports `more?` until an extra empty pass.
+- G8 (closed): retention cleanup reported `more?` until an extra empty pass.
 - G9: `value_refs` (attach an existing value by reference) is not read.
 
 ## `flow_write_contract_test.exs`
@@ -525,7 +525,7 @@ Gaps found so far:
 | 300 | cancel rejects public reason_ref input without touching external value | ported (refused as an unknown option) |
 | 331 | cancel stores inline reason payload as an owned terminal value | fixed (G5, value codec) |
 | 385 | retention cleanup removes expired terminal state, history, and owned values | fixed (G5, value codec) |
-| 441 | retention cleanup returns an exact continuation without a final empty pass | gap G8 |
+| 441 | retention cleanup returns an exact continuation without a final empty pass | fixed (G8) |
 | 523 | retention sweeper runs cleanup through Flow command path | covered: `retention::a_completed_flow_is_removed_after_retention` |
 | 610 | rewind from terminal back to active clears value ref expiration | ported |
 | 675 | batch APIs also persist full value fields | fixed (G2, G3, G5) |

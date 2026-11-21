@@ -163,11 +163,16 @@ impl ShardState {
         let values: u64 = counts.iter().map(|(_, values)| values).sum();
         logged.extend(self.sweep(now, remaining));
         let count = |value: usize| u64::try_from(value).unwrap_or(u64::MAX);
+        // Whether this shard still has work due, so the reply's
+        // continuation is exact (audit gap G8).
+        let more = self.expiries.range(..=(now, u64::MAX)).next().is_some()
+            || self.deadlines.range(..=(now, u64::MAX)).next().is_some();
         let cleaned = Cleaned {
             flows: count(flows),
             history,
             values,
             active_timeouts: count(timeouts),
+            more,
         };
         (cleaned, logged)
     }

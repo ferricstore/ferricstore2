@@ -4,7 +4,7 @@
 use wf_application::commands::flow::Term;
 use wf_node::composition::QueueNode;
 
-use super::{claimed, events, field, get, int, map, ok, run, text};
+use super::{claimed, events, field, get, int, map, ok, refusal, run, text};
 use crate::{TestResult, directory, open};
 
 const R: &str = "tenant-retention";
@@ -290,6 +290,87 @@ fn cancel_rejects_public_reason_ref_input_without_touching_external_value() -> T
     assert_eq!(
         field(&get(&node, "vr", &with(R, &[]))?, "state"),
         text("queued")
+    );
+    Ok(())
+}
+
+#[test]
+fn retention_cleanup_returns_an_exact_continuation_without_a_final_empty_pass() -> TestResult {
+    let node = node("audit-payload-continuation")?;
+    let partition = "tenant-retention-continuation";
+    for id in ["ra", "rb"] {
+        create(
+            &node,
+            id,
+            "retention-continuation",
+            &with(
+                partition,
+                &[
+                    ("retention_ttl_ms", int(60_000)),
+                    ("run_at_ms", int(1_000)),
+                    ("now_ms", int(1_000)),
+                ],
+            ),
+        )?;
+    }
+    let records = claim_all(
+        &node,
+        partition,
+        &[("type", text("retention-continuation")), ("limit", int(2))],
+    )?;
+    assert_eq!(records.len(), 2);
+    for record in &records {
+        let mut complete = with(
+            partition,
+            &[("id", field(record, "id")), ("now_ms", int(1_100))],
+        );
+        complete.extend(lease(record));
+        ok(&node, "FLOW.COMPLETE", &complete)?;
+    }
+    let mut now = 0;
+    for id in ["ra", "rb"] {
+        now = now.max(until(&get(&node, id, &with(partition, &[]))?)? + 1);
+    }
+    let first = ok(
+        &node,
+        "FLOW.RETENTION_CLEANUP",
+        &[("limit", int(1)), ("now_ms", int(now))],
+    )?;
+    assert_eq!(field(&first, "flows"), int(1));
+    assert_eq!(field(&first, "more?"), Term::Bool(true));
+    let continuation = field(&first, "continuation");
+    assert!(matches!(continuation, Term::Bin(_)));
+    let second = ok(
+        &node,
+        "FLOW.RETENTION_CLEANUP",
+        &[
+            ("limit", int(1)),
+            ("now_ms", int(now)),
+            ("continuation", continuation),
+        ],
+    )?;
+    assert_eq!(field(&second, "flows"), int(1));
+    assert_eq!(field(&second, "more?"), Term::Bool(false));
+    assert_eq!(field(&second, "continuation"), Term::Nil);
+    for id in ["ra", "rb"] {
+        assert_eq!(get(&node, id, &with(partition, &[]))?, Term::Nil);
+    }
+    let cleanup = |continuation: Term| {
+        run(
+            &node,
+            "FLOW.RETENTION_CLEANUP",
+            &[
+                ("limit", int(1)),
+                ("now_ms", int(now)),
+                ("continuation", continuation),
+            ],
+        )
+    };
+    // Refused; Elixir's wording differs.
+    assert!(cleanup(Term::Bin(vec![1, 9, 0, 0, 0, 0]))?.is_err());
+    assert_eq!(
+        refusal(cleanup(map(&[("shard", int(0))]))?)?,
+        "ERR flow continuation must be a binary token"
     );
     Ok(())
 }
