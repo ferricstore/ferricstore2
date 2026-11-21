@@ -18,6 +18,7 @@ use wf_application::commands::queue::{
 };
 use wf_domain::value::DomainError;
 
+mod clock;
 mod flow;
 mod handshake;
 mod options;
@@ -74,6 +75,24 @@ impl QueueService for Scripted {
             }
             return;
         }
+        if request.worker == b"clock" {
+            // Echoes the client time the service was given as the token.
+            let now = format!("now={:?}", request.now_ms);
+            let job = ClaimedFlow {
+                id: b"f1".to_vec(),
+                partition: b"p".to_vec(),
+                lease_token: now.clone().into_bytes(),
+                fence: 1,
+                run_state: b"queued".to_vec(),
+                record: Some(Term::Map(vec![
+                    (b"fencing_token".to_vec(), Term::Int(1)),
+                    (b"id".to_vec(), Term::text("f1")),
+                    (b"lease_token".to_vec(), Term::text(&now)),
+                    (b"partition_key".to_vec(), Term::text("p")),
+                ])),
+            };
+            return reply(Ok(vec![job]));
+        }
         let job = ClaimedFlow {
             id: b"f1".to_vec(),
             partition: b"__flow_auto__:7".to_vec(),
@@ -116,6 +135,10 @@ impl QueueService for Scripted {
 impl FlowService for Scripted {
     fn execute(&self, command: FlowCommand, reply: Reply<Term>) {
         match command {
+            // Echoes the client time the service was given.
+            FlowCommand::Signal(signal) if signal.id == b"clock" => reply(Ok(signal
+                .now_ms
+                .map_or(Term::Nil, |now| Term::Int(i64::try_from(now).unwrap_or(-1))))),
             FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
                 ServiceError::rejected("ERR flow already exists".to_owned()),
             )),
@@ -178,6 +201,15 @@ struct Running {
 }
 
 fn start() -> TestResult<Running> {
+    serving(false)
+}
+
+/// A listener that hands clients' `now_ms` to the service.
+fn start_trusting_client_clocks() -> TestResult<Running> {
+    serving(true)
+}
+
+fn serving(client_clock: bool) -> TestResult<Running> {
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
         .enable_io()
@@ -189,6 +221,7 @@ fn start() -> TestResult<Running> {
         host: "127.0.0.1".into(),
         port: address.port(),
         shard_count: 4,
+        client_clock,
     };
     runtime.spawn(serve(listener, Arc::new(Scripted), Arc::new(info)));
     Ok(Running {

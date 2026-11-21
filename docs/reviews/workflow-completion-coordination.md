@@ -65785,3 +65785,19 @@ copies only the member. Queue-path Flows carry no fields, so three
 alternating runs against 8634e5c are within noise (7.9 to 8.3 ms CPU per 1k
 Flows, was 8.1 to 8.5); the generic path saves one deep copy per write.
 All 129 node tests and all suites pass.
+
+### ADR015-CLOCK The node's clock decides due times and leases
+
+New artifacts (solo design review): `wf_application::commands::flow::
+without_client_time`, `text::parse_with_clock`, `ServerInfo::client_clock`,
+`session::dispatch::Context::clock`, and the binary flag `--client-clock`
+(default false).
+
+Finding: with client clocks trusted, a client that sends `now_ms` two days
+ahead claims a Flow due the next day and takes another worker's live lease
+(probe `scenario_clock.py`, both servers). `clock::a_client_clock_is_
+ignored_unless_the_server_trusts_it` was written first and failed (the
+service saw `now_ms` 5), then passed for a typed command, a typed claim and
+a text command; pipelines use the same helper. Against the rebuilt node the
+probe's second worker takes nothing. All adapter, node, application,
+storage and domain tests pass.

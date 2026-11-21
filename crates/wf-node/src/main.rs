@@ -2,7 +2,9 @@
 //! serves the FSNP queue commands on one TCP port.
 //!
 //! Usage: `ferricstore2 --data-dir PATH [--host 127.0.0.1] [--port 6388]
-//! [--shards 16] [--threads N] [--retention-ms 604800000]`. The data
+//! [--shards 16] [--threads N] [--retention-ms 604800000]
+//! [--client-clock false]`. With `--client-clock true` clients' `now_ms`
+//! decides due times and leases (tests and parity probes only; ADR-015). The data
 //! directory holds `log/` and `snapshots/`. Port 0 picks a free port. Once
 //! listening it prints `READY port=<port> shards=<n>`.
 
@@ -28,6 +30,7 @@ struct Options {
     shards: u16,
     threads: Option<usize>,
     retention_ms: u64,
+    client_clock: bool,
 }
 
 fn parse(arguments: &[String]) -> Result<Options, String> {
@@ -38,6 +41,7 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
         shards: QueueNodeConfig::default().shards,
         threads: None,
         retention_ms: QueueNodeConfig::default().retention_ms,
+        client_clock: false,
     };
     let mut pairs = arguments.iter();
     while let Some(flag) = pairs.next() {
@@ -66,6 +70,13 @@ fn parse(arguments: &[String]) -> Result<Options, String> {
                 );
             }
             "--retention-ms" => options.retention_ms = number()?,
+            "--client-clock" => {
+                options.client_clock = match value.as_str() {
+                    "true" => true,
+                    "false" => false,
+                    _ => return Err("--client-clock needs true or false".into()),
+                };
+            }
             other => return Err(format!("unknown flag {other}")),
         }
     }
@@ -104,6 +115,7 @@ fn run(options: Options) -> Result<(), String> {
             host: options.host,
             port,
             shard_count: options.shards,
+            client_clock: options.client_clock,
         };
         let mut stdout = std::io::stdout();
         write!(stdout, "READY port={port} shards={}", options.shards)

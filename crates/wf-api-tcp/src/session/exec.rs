@@ -30,7 +30,7 @@ pub(super) fn run(context: &Context, payload: &Term, done: Done) {
             String::from_utf8_lossy(name)
         )));
     }
-    match text::parse(name, args) {
+    match text::parse_with_clock(name, args, context.info.client_clock) {
         Ok(Parsed::Command(command)) => context.service.execute(
             command,
             Box::new(move |result| done(result.map_err(|error| error.to_string()))),

@@ -166,6 +166,19 @@ const NOT_YET: [&str; 8] = [
 /// The Elixir server's refusal for an unknown command, a wrong argument
 /// count, an invalid option, or the typed command's own refusal.
 pub fn parse(name: &[u8], args: &[Term]) -> Result<Parsed, FlowError> {
+    parse_with_clock(name, args, true)
+}
+
+/// [`parse`], keeping the client's `NOW` only when `client_clock` is set
+/// (ADR-015).
+///
+/// # Errors
+/// As [`parse`].
+pub fn parse_with_clock(
+    name: &[u8],
+    args: &[Term],
+    client_clock: bool,
+) -> Result<Parsed, FlowError> {
     let name = String::from_utf8_lossy(name).to_ascii_uppercase();
     if NOT_YET.contains(&name.as_str()) {
         return Err(FlowError::rejected(format!(
@@ -196,6 +209,11 @@ pub fn parse(name: &[u8], args: &[Term]) -> Result<Parsed, FlowError> {
     };
     let named: Vec<(&str, &Term)> = form.positional.iter().copied().zip(positional).collect();
     let map = with(&named, options);
+    let map = if client_clock {
+        map
+    } else {
+        super::without_client_time(&map)
+    };
     match form.name {
         "FLOW.POLICY.SET" => super::policy::parse_set_text(&map)
             .map(|set| Parsed::Command(FlowCommand::PolicySet(Box::new(set)))),

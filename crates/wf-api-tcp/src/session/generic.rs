@@ -16,7 +16,7 @@ use super::dispatch::{Context, refuse};
 /// claimed records.
 pub(super) fn claim(context: &Context, name: &str, body: &[u8], reply: ReplyTo) {
     let args = match request::options(name, body) {
-        Ok(args) => args,
+        Ok(args) => context.clock(args),
         Err(error) => return refuse(reply, error.message()),
     };
     let mut parsed = match claim::parse(name, &args) {
@@ -62,7 +62,7 @@ pub(super) fn flow(context: &Context, name: &str, flags: u8, body: &[u8], reply:
         request::options(name, body)
     };
     let args = match decoded {
-        Ok(args) => args,
+        Ok(args) => context.clock(args),
         Err(error) => return refuse(reply, error.message()),
     };
     let command = match flow::parse(name, &args) {

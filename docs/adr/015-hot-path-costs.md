@@ -52,6 +52,20 @@ Flows/s and RSS after the run.
    allocations.** Within noise on the queue path (its Flows have no fields):
    7.9 to 8.3 ms against 8.1 to 8.5.
 
+5. **The node's clock decides, not the client's.** A client's `now_ms`
+   moved due times and leases: on 21 Nov a client sending `now_ms` two days
+   ahead took a Flow scheduled for the next day and another worker's live
+   10-minute lease, on Elixir 6a5f2bc34 and on this node alike. The TCP
+   adapter now drops `now_ms` (top level, batch items, children; text
+   `NOW` too) before the node reads a command, unless the server runs with
+   `--client-clock true` (`ServerInfo::client_clock`), which tests and
+   parity probes use. Node-level tests keep passing explicit times through
+   the node API, which is not a client boundary.
+
 ## Consequences
 
 The binary links mimalloc's C code, built by `cc`; cargo-deny passes.
+
+The SDK integration suite and the parity rig must start the node with
+`--client-clock true` where they depend on client times (the SDK's
+reclaim test claims 30 s ahead).

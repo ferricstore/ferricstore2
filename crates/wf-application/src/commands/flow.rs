@@ -128,6 +128,29 @@ impl FlowCommand {
     }
 }
 
+/// The options without the client's clock reading: `now_ms` at the top
+/// level and in batch items and children. A node that decides with its own
+/// clock drops it before reading a client's command (ADR-015).
+#[must_use]
+pub fn without_client_time(args: &Term) -> Term {
+    let Term::Map(entries) = args else {
+        return args.clone();
+    };
+    Term::Map(
+        entries
+            .iter()
+            .filter(|(key, _)| key.as_slice() != b"now_ms")
+            .map(|(key, value)| match (key.as_slice(), value) {
+                (b"items" | b"children", Term::List(items)) => (
+                    key.clone(),
+                    Term::List(items.iter().map(without_client_time).collect()),
+                ),
+                _ => (key.clone(), value.clone()),
+            })
+            .collect(),
+    )
+}
+
 /// Reads command `name` with options `args`.
 ///
 /// # Errors

@@ -71,7 +71,7 @@ fn settle(pending: &Mutex<Pending>, position: usize, outcome: Outcome) {
 fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcome) + Send>) {
     let failed = |error: flow::FlowError| error.to_string();
     match Opcode::from_code(command.opcode) {
-        Some(Opcode::Flow(name)) => match flow::parse(name, &command.body) {
+        Some(Opcode::Flow(name)) => match flow::parse(name, &context.clock(command.body.clone())) {
             Ok(parsed) => context.service.execute(
                 parsed,
                 Box::new(move |result| done(result.map_err(|error| error.to_string()))),
@@ -84,7 +84,7 @@ fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcom
             } else {
                 "FLOW.CLAIM_DUE"
             };
-            match claim::parse(name, &command.body) {
+            match claim::parse(name, &context.clock(command.body.clone())) {
                 Ok(parsed) => {
                     let shape = parsed.shape;
                     context.service.claim(

@@ -31,6 +31,11 @@ pub struct ServerInfo {
     pub port: u16,
     /// Number of shards.
     pub shard_count: u16,
+    /// Whether clients' `now_ms` reaches the node. Off in production: the
+    /// node then decides due times and leases with its own clock, so a
+    /// client cannot claim a future Flow early or take a live lease by
+    /// sending a later time (ADR-015). Tests and parity probes turn it on.
+    pub client_clock: bool,
 }
 
 /// Accepts connections on `listener` until it fails; each connection runs

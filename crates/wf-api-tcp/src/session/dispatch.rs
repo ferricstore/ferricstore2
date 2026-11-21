@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use wf_application::commands::flow::NodeService;
+use wf_application::commands::flow::{self, NodeService, Term};
 use wf_application::commands::queue::Cancellation;
 
 use crate::frame::{FLAG_COMPRESSED, FLAG_CUSTOM_PAYLOAD, FLAG_MORE_CHUNKS, Header, Opcode};
@@ -20,6 +20,18 @@ pub(super) struct Context {
     pub(super) client_id: u64,
     /// Set when the connection stops reading; cancels its waiting claims.
     pub(super) closed: Cancellation,
+}
+
+impl Context {
+    /// A command's options as the node may read them: without the client's
+    /// `now_ms` unless the server trusts client clocks (ADR-015).
+    pub(super) fn clock(&self, args: Term) -> Term {
+        if self.info.client_clock {
+            args
+        } else {
+            flow::without_client_time(&args)
+        }
+    }
 }
 
 /// Compact reply codecs the client accepted in `STARTUP`.
