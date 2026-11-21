@@ -63,18 +63,17 @@ impl FlowService for QueueNode {
                 return reply(query::indexes::reply(&request, router.shards.len(), now_ms));
             }
             FlowCommand::SpawnChildren(spawn) => {
-                // A spawn is decided on the parent's shard; children placed
-                // on other shards need a cross-shard spawn, not built yet.
-                let parent = router.route(&Partition::parse(&spawn.partition_key));
+                // A spawn is decided on the parent's shard, so its children
+                // share the parent's slot: then they stay together under
+                // any shard count and on any node that owns the slot.
+                let slot = Partition::parse(&spawn.partition_key).slot();
                 let elsewhere = spawn.children.iter().any(|child| {
-                    let partition =
-                        Partition::for_new_flow(&child.id, child.partition_key.as_deref());
-                    router.route(&partition) != parent
+                    Partition::for_new_flow(&child.id, child.partition_key.as_deref()).slot()
+                        != slot
                 });
                 if elsewhere {
                     return reply(Err(ServiceError::rejected(
-                        "ERR flow children on another shard than their parent are not supported by this server yet"
-                            .to_owned(),
+                        "CROSSSLOT Flow dependency keys must hash to the same slot".to_owned(),
                     )));
                 }
                 FlowCommand::SpawnChildren(spawn)

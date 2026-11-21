@@ -180,10 +180,14 @@ Each step is one commit with its tests.
   it appends: the open group records the child's status and references and,
   once resolved, moves the parent to its success or failure state and makes
   it due (a terminal parent cascades to its own parent). Replay re-applies
-  the logged parent changes, so events are queued only after replay. Not yet:
-  children on another shard than their parent (refused with an explicit
-  error; the SDK places children in the parent's partition unless told
-  otherwise), and cancelling running children when a parent closes. The
+  the logged parent changes, so events are queued only after replay.
+  Children must share their parent's slot (refused `CROSSSLOT`, as Elixir
+  refuses children on another shard; the SDK places children in the
+  parent's partition unless told otherwise), so a parent and its children
+  stay together under any shard count. A parent that closes, or whose
+  group resolves, cancels the running children of its groups that ask for
+  it (`on_parent_closed: cancel_children`, the default), in one logged group
+  with its `children_cancelled` event. The
   pipeline runs each Flow command as it would alone and replies with Elixir's
   typed list of `{lane_id, opcode, request_id, status, value}`; compact
   pipeline bodies (key-value modes) are refused. The child scenario matches

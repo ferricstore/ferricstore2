@@ -9,7 +9,7 @@ use wf_node::composition::QueueNode;
 
 use super::{TestResult, call, directory, open};
 
-fn options(entries: &[(&str, Term)]) -> Term {
+pub(super) fn options(entries: &[(&str, Term)]) -> Term {
     Term::Map(
         entries
             .iter()
@@ -18,11 +18,11 @@ fn options(entries: &[(&str, Term)]) -> Term {
     )
 }
 
-fn text(value: &str) -> Term {
+pub(super) fn text(value: &str) -> Term {
     Term::text(value)
 }
 
-fn run(
+pub(super) fn run(
     node: &QueueNode,
     name: &str,
     entries: &[(&str, Term)],
@@ -31,12 +31,12 @@ fn run(
     call(|reply| node.execute(command, reply))
 }
 
-fn field(record: &Term, key: &str) -> Term {
+pub(super) fn field(record: &Term, key: &str) -> Term {
     record.get(key.as_bytes()).cloned().unwrap_or(Term::Nil)
 }
 
 /// Claims Flows of `flow_type` in partition `p`; returns id, token, fence.
-fn claim(
+pub(super) fn claim(
     node: &QueueNode,
     flow_type: &str,
     now: i64,
@@ -208,5 +208,60 @@ fn a_parent_waits_for_its_children_and_resumes_when_they_finish() -> TestResult 
         ]
     );
     assert_eq!(claim(&node, "tp", 1_007, Some("done"))?.len(), 1);
+    Ok(())
+}
+
+#[test]
+fn children_must_share_their_parents_slot_whatever_the_shard_count() -> TestResult {
+    let path = directory("flow-children-slot")?;
+    // One shard holds every slot, so only the slot rule refuses here.
+    let node = open(&path, 1)?;
+    run(
+        &node,
+        "FLOW.CREATE",
+        &[
+            ("id", text("par")),
+            ("type", text("tp")),
+            ("state", text("dispatch")),
+            ("now_ms", Term::Int(1_000)),
+            ("partition_key", text("p")),
+        ],
+    )??;
+    let Some((_, token, fence)) = claim(&node, "tp", 1_001, None)?.pop() else {
+        return Err("parent not claimed".into());
+    };
+    let elsewhere = options(&[
+        ("id", text("k9")),
+        ("type", text("tc")),
+        ("partition_key", text("other")),
+    ]);
+    let refused = run(
+        &node,
+        "FLOW.SPAWN_CHILDREN",
+        &[
+            ("id", text("par")),
+            ("partition_key", text("p")),
+            ("lease_token", token),
+            ("fencing_token", fence),
+            ("group_id", text("g")),
+            ("wait", text("all")),
+            ("wait_state", text("waiting")),
+            ("success", text("done")),
+            ("failure", text("broken")),
+            ("children", Term::List(vec![elsewhere])),
+        ],
+    )?;
+    assert_eq!(
+        refused,
+        Err(ServiceError::rejected(
+            "CROSSSLOT Flow dependency keys must hash to the same slot".to_owned()
+        ))
+    );
+    let child = run(
+        &node,
+        "FLOW.GET",
+        &[("id", text("k9")), ("partition_key", text("other"))],
+    )??;
+    assert_eq!(child, Term::Nil);
     Ok(())
 }

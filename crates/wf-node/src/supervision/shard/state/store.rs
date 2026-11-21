@@ -98,6 +98,7 @@ impl ShardState {
         self.note_credit(was_running, &record, meta.as_deref());
         if !was_terminal && terminal(record.state()) {
             self.note_child(&key, &record, meta.as_deref());
+            self.note_closed(&key, meta.as_deref());
         }
         // A Flow that enters another logical state takes a new place in
         // its FIFO lane, as Elixir stamps `state_enter_seq`.

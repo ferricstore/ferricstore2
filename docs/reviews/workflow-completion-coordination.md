@@ -66064,3 +66064,42 @@ runs against 33dbcb2): throughput 266-276k base against 263-284k head (one
 was created and completed (185k Flows/s), the SDK retrying its busy creates;
 with `--max-new-backlog 0` the SDK raised `OverloadedError` (retry after
 100 ms) after its 30 s retry budget, created nothing, and reads still ran.
+
+### Children: same slot, cancelled when their parent closes
+
+New artifacts (solo design review): `ChildGroup::{cancels_children,
+cancel_running}`, the shard's `closing` queue,
+`state::children::close` (`note_closed`, `close_children`,
+`cancel_child`), and the slot check of `FLOW.SPAWN_CHILDREN` in
+`composition::flow`.
+
+Decisions. Children must share their parent's slot, refused `CROSSSLOT Flow
+dependency keys must hash to the same slot` otherwise. Elixir compares
+shards, so a child in another partition is accepted only when that
+partition happens to hash to the parent's shard (its tests build such
+partitions on purpose); a client cannot choose that without knowing the
+shard count and hash, and the Rust node may restart with another shard
+count, which would split such a pair and drop its child events. A slot
+keeps a parent and its children together under any shard count and on any
+node that owns it. Elixir's tests with "same-shard other partition"
+siblings are ported with the parent's partition.
+
+`on_parent_closed: cancel_children` (Elixir's default) was parsed and shown
+but never applied. Now, as `flow_maybe_cancel_children_on_parent_closed`:
+when a live Flow with child groups becomes terminal, or children change a
+parent, each group that asks for it and is closed or resolved cancels its
+running children (the group marks them cancelled and resolves as a failure
+if open), the parent records `children_cancelled` at its own time of change,
+and each child is cancelled without lease or due time and closes its own
+children. The parent and children are one logged group.
+
+Evidence: `flow_children::children_must_share_their_parents_slot...`
+failed before (a one-shard node accepted the spawn) and passes. The four
+`flow_children_close` tests (ported: cancel parent cancels running
+children; abandon keeps them; wait any cancels the sibling; a failed child
+that fails the parent cancels the sibling and logs `child_failed` and
+`children_cancelled`) failed three before (the abandon case already held)
+and pass, including after a restart with another shard count. Parity rig
+`scenario_close.py` (wait any; cancel parent) is byte-identical to the
+Elixir reference on 6400 for records and histories (request hash and
+retention time dropped).

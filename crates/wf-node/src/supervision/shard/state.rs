@@ -109,6 +109,9 @@ pub(crate) struct ShardState {
     live: bool,
     /// Child events waiting for this round to settle them.
     child_events: Vec<children::ChildEvent>,
+    /// Parents that closed or that children changed this round, whose
+    /// groups may cancel running children.
+    closing: Vec<Key>,
     /// Flow type policies by type (ADR-014 step 9).
     policies: Map<Vec<u8>, Arc<Installed>>,
     /// FIFO lanes, and the queues of lanes freed this round (step 9b).
@@ -163,6 +166,7 @@ impl ShardState {
             tags_at: 0,
             live: false,
             child_events: Vec::new(),
+            closing: Vec::new(),
             policies: Map::default(),
             lanes: Map::default(),
             freed: Vec::new(),

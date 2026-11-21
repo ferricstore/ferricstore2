@@ -7,8 +7,10 @@
 //! with a parent terminal, the write queues a child event; the round settles
 //! the queue before it appends: the parent's open group records the child's
 //! status and references, and a resolved group moves the parent to its
-//! success or failure state and makes it due. Replay re-applies the logged
-//! parent changes instead, so the queue only fills once the shard is live.
+//! success or failure state and makes it due. A parent that closed, or whose
+//! group resolved, cancels the running children its groups ask to cancel
+//! (`close`). Replay re-applies the logged parent changes instead, so the
+//! queues only fill once the shard is live.
 
 use wf_application::commands::flow::children::SpawnChildren;
 use wf_application::commands::flow::history::{HistoryEvent, HistoryKind};
@@ -22,6 +24,8 @@ use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_domain::workflow::{self, CommittedCommand, Create, Operation, WorkflowRecord};
 use wf_types::identity::RecordId;
 use wf_types::version::TimestampMillis;
+
+mod close;
 
 use super::super::command::Logged;
 use super::flow::Executed;
@@ -40,13 +44,13 @@ fn rejected(text: &str) -> ServiceError {
     ServiceError::rejected(text.to_owned())
 }
 
-fn terminal(state: &[u8]) -> bool {
+pub(super) fn terminal(state: &[u8]) -> bool {
     matches!(state, b"completed" | b"failed" | b"cancelled")
 }
 
 /// A parent record changed by its children: new state and version, no
 /// lease; `due` decides its next run time.
-fn parent_next(
+pub(super) fn parent_next(
     record: &WorkflowRecord,
     state: &[u8],
     now: u64,
@@ -261,19 +265,30 @@ impl ShardState {
         });
     }
 
-    /// Applies queued child events to parents on this shard, cascading when
-    /// a parent itself becomes terminal; returns the changes to log.
+    /// Applies queued child events to parents on this shard and cancels
+    /// the children closed parents give up, cascading through parents and
+    /// children that become terminal; returns the changes to log.
     pub(crate) fn settle_children(&mut self, wall: u64) -> Vec<Logged> {
         let mut logged = Vec::new();
-        while !self.child_events.is_empty() {
-            let events = std::mem::take(&mut self.child_events);
-            logged.extend(
-                events
-                    .iter()
-                    .filter_map(|event| self.child_finished(wall, event)),
-            );
+        loop {
+            if !self.child_events.is_empty() {
+                let events = std::mem::take(&mut self.child_events);
+                logged.extend(
+                    events
+                        .iter()
+                        .filter_map(|event| self.child_finished(wall, event)),
+                );
+            } else if !self.closing.is_empty() {
+                let parents = std::mem::take(&mut self.closing);
+                logged.extend(
+                    parents
+                        .iter()
+                        .filter_map(|parent| self.close_children(wall, parent)),
+                );
+            } else {
+                return logged;
+            }
         }
-        logged
     }
 
     fn child_finished(&mut self, wall: u64, event: &ChildEvent) -> Option<Logged> {
@@ -312,6 +327,8 @@ impl ShardState {
             (record, priority, Some(Box::new(meta))),
             Some(&history),
         );
+        // A resolved group may cancel the children still running.
+        self.closing.push(event.parent.clone());
         self.after_image(&event.parent).ok()
     }
 }

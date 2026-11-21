@@ -23,6 +23,7 @@ mod crash;
 mod flow_approval;
 mod flow_budget;
 mod flow_children;
+mod flow_children_close;
 mod flow_circuit;
 mod flow_claim;
 mod flow_cleanup;

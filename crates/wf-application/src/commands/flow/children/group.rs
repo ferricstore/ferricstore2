@@ -77,6 +77,46 @@ impl ChildGroup {
                 .is_some_and(|status| status == b"running")
     }
 
+    /// Whether closing the parent cancels children of this group now: it
+    /// asks for that and has running children.
+    #[must_use]
+    pub fn cancels_children(&self) -> bool {
+        self.cancel_children && self.children.values().any(|status| status == b"running")
+    }
+
+    /// Marks the running children cancelled, as Elixir's
+    /// `flow_group_mark_children_cancelled`: an unresolved group resolves as
+    /// a failure. Returns each child's id and partition, `parent_partition`
+    /// when the group holds none.
+    pub fn cancel_running(&mut self, parent_partition: &[u8]) -> Vec<(Vec<u8>, Vec<u8>)> {
+        let running: Vec<Vec<u8>> = self
+            .children
+            .iter()
+            .filter(|(_, status)| status.as_slice() == b"running")
+            .map(|(id, _)| id.clone())
+            .collect();
+        if running.is_empty() {
+            return Vec::new();
+        }
+        for id in &running {
+            self.children.insert(id.clone(), b"cancelled".to_vec());
+            self.results
+                .insert(id.clone(), (b"cancelled".to_vec(), None, None));
+        }
+        self.resolved.get_or_insert_with(|| b"failure".to_vec());
+        running
+            .into_iter()
+            .map(|id| {
+                let partition = self
+                    .child_partitions
+                    .get(&id)
+                    .cloned()
+                    .unwrap_or_else(|| parent_partition.to_vec());
+                (id, partition)
+            })
+            .collect()
+    }
+
     /// Records a finished child and resolves the group when it is done.
     pub fn finish(
         &mut self,
