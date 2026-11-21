@@ -19,9 +19,11 @@ use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_types::version::TimestampMillis;
 
 mod attached;
+mod held;
 mod versions;
 
 pub(super) use attached::{attach, requested_refs};
+pub(crate) use held::Held;
 pub(super) use versions::with_values;
 
 use super::super::command::Logged;
@@ -291,6 +293,19 @@ impl ShardState {
     }
 
     fn value_bytes(&mut self, now: u64, reference: &[u8]) -> Option<Vec<u8>> {
+        // A value its owner's removal moved here because others hold it
+        // (audit gap G10).
+        let found = self.owned_bytes(now, reference);
+        if found.is_some() {
+            return found;
+        }
+        match value::parse_ref(reference)?.target {
+            ValueRef::Shared => None,
+            _ => self.shared.get(reference).map(|moved| moved.bytes.clone()),
+        }
+    }
+
+    fn owned_bytes(&mut self, now: u64, reference: &[u8]) -> Option<Vec<u8>> {
         let parsed = value::parse_ref(reference)?;
         if let ValueRef::Shared = parsed.target {
             let shared = self.shared.get(reference)?;

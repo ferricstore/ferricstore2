@@ -66383,3 +66383,49 @@ differ from the group's, which would form a second group with its own
 leader. The Kubernetes manifest and the Compose file were not run here (no
 cluster on this machine); the Compose file uses the same settings the
 process check used.
+
+### Flow test audit, continued (22 Nov)
+
+The user asked whether the Rust tests cover the Elixir business tests at
+least; the answer was no (48 of 669 audited), and "Yes do it": the audit
+continues file by file in `docs/reviews/workflow-flow-test-audit.md`.
+Elixir's `FLOW.LIST` and `FLOW.SEARCH` are retired wire commands
+(`Ferricstore.Commands.Extension`), so their tests port as the `FLOW.QUERY`
+text the Python SDK's `list` and `search` build. Tests that assert Elixir
+source text (hot-path shapes) are internal.
+
+Files done: `flow_write_contract_test.exs` (13 behavioural tests ported, 67
+source-text tests internal), `flow_attributes_test.exs` (30),
+`flow_test/sections/flow_history_hot_max_rejects_values_above_configured_
+maximum.exs` (25) and `flow_test/sections/flow_policy_exposes_type_state_
+retry_retention_defaults.exs` (24; Elixir's recorded wire probe,
+`parity/policy-elixir.txt`, shows its typed protocol refuses a top-level
+`retention` and `version`, so those ports use the text form or drop the
+in-process `version`).
+
+Gaps found and closed (failing runs first, in this session): G10 a value
+another Flow attached went with its owner at retention (RED: the owner,
+child and history tests read `[nil]`; the restart test read `[nil]` before
+holdings were in images); G11 cross-slot attachments were taken (RED:
+`expected a refusal, got OK`); G12 `FLOW.GET values: true` was refused
+(RED: `ERR flow values must be a list of strings`); G13 terminal retention
+from the server clock (RED: `1795298937957` against the command time's
+`1795299007949`); G14 a rewind to a claim event answered not found (RED);
+G15 the batch cap's invented wording (RED); G17 `EXTEND_LEASE return:
+ok_on_success` was refused (RED: `option return is not supported`). Open:
+G16 `payload_ref` on create.
+
+Decisions: held values (G10) are counted per shard, a Flow holding every
+reference it has attached while it exists (kept history can name an
+earlier one), its own and shared values excluded; retention moves a held
+value to the shard's shared values inside the logged removal, so replay
+and replicas repeat it, and drops it with its last holder; holdings are a
+new image section, so images are version 15. Attachments must share the
+Flow's slot (G11), which keeps holder and value on one shard under any
+shard count. A step named after a terminal state stays refused in
+`RUN_STEPS_MANY`, as `START_AND_CLAIM` and `STEP_CONTINUE` refuse it (Elixir
+lets only `RUN_STEPS_MANY` through). The batch cap stays at 100000, Elixir's
+largest setting.
+
+Evidence: 24 new audit tests pass; mutation checks kill the G10 move, the
+G10 drop with the last holder, the G11 slot check and the G13 start time.

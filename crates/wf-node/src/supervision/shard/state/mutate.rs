@@ -7,24 +7,25 @@
 //! terminal (the shard's clock plus its retention, not the client's clock).
 
 use wf_application::commands::flow::history::HistoryEvent;
-use wf_application::commands::flow::meta;
 use wf_application::commands::flow::mutate::{Change, Mutation};
-use wf_application::commands::flow::record::{
-    FlowMeta, Include, RETAINED_ERROR, RETAINED_PAYLOAD, RETAINED_RESULT,
-};
+use wf_application::commands::flow::record::{FlowMeta, Include};
 use wf_application::commands::flow::{Term, term};
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
 use wf_domain::retry::{JitterSample, PolicyRetry};
 use wf_domain::workflow::{
     self, Cancel, CommittedCommand, Operation, Outcome, StepContinue, Terminal, Transition,
-    WorkflowRecord, WorkflowStatus,
+    WorkflowRecord,
 };
 use wf_types::identity::RecordId;
 use wf_types::version::{Fence, TimestampMillis};
 
 use super::flow::Executed;
 use super::{Key, ShardState, flow_key};
+
+mod meta;
+
+use meta::updated_meta;
 
 fn token(bytes: Option<&[u8]>) -> Result<Option<LeaseToken>, ServiceError> {
     bytes
@@ -115,94 +116,11 @@ fn operation(mutation: &Mutation) -> Result<Operation, ServiceError> {
             expected_version: *expected_version,
             error: reason.clone(),
         }),
-        Change::ExtendLease { lease_ms } => Operation::ExtendLease(ExtendLease {
+        Change::ExtendLease { lease_ms, .. } => Operation::ExtendLease(ExtendLease {
             guard: guard(mutation)?,
             lease_ms: *lease_ms,
         }),
     })
-}
-
-/// The state whose metadata a mutation updates.
-fn meta_state<'a>(mutation: &'a Mutation, record: &'a WorkflowRecord) -> &'a [u8] {
-    match &mutation.change {
-        Change::Transition { to, .. } | Change::StepContinue { to, .. } => to,
-        Change::Complete { .. } => b"completed",
-        Change::Fail { .. } => b"failed",
-        Change::Cancel { .. } => b"cancelled",
-        Change::Retry { .. } | Change::ExtendLease { .. } => {
-            record.run_state().unwrap_or(record.state())
-        }
-    }
-}
-
-/// The fields beyond the record after an accepted mutation.
-fn updated_meta(
-    mutation: &Mutation,
-    current: &FlowMeta,
-    (previous, record): (&WorkflowRecord, &WorkflowRecord),
-    wall: u64,
-) -> Result<FlowMeta, ServiceError> {
-    let mut next = current.clone();
-    let version = record.version();
-    next.attributes = meta::update_attributes(
-        &current.attributes,
-        &mutation.attributes_merge,
-        &mutation.attributes_delete,
-    )?;
-    next.state_meta = meta::merge_state_meta(
-        &current.state_meta,
-        meta_state(mutation, record),
-        &mutation.state_meta,
-    )?;
-    super::value::write_values(&mut next, &mutation.values, &mutation.override_values)?;
-    super::value::drop_values(&mut next, &mutation.drop_values);
-    super::value::attach(&mut next, &mutation.value_refs);
-    let (payload, result, error, ttl) = match &mutation.change {
-        Change::Transition { payload, .. } | Change::StepContinue { payload, .. } => {
-            (payload.is_some(), false, false, None)
-        }
-        Change::Retry { payload, error, .. } => (payload.is_some(), false, error.is_some(), None),
-        Change::Complete {
-            payload,
-            result,
-            ttl_ms,
-        } => (payload.is_some(), result.is_some(), false, *ttl_ms),
-        Change::Fail {
-            payload,
-            error,
-            ttl_ms,
-        } => (payload.is_some(), false, error.is_some(), *ttl_ms),
-        Change::Cancel { reason, ttl_ms, .. } => (false, false, reason.is_some(), *ttl_ms),
-        Change::ExtendLease { .. } => (false, false, false, None),
-    };
-    // Replaced values stay readable under their versions (ADR-016 phase
-    // C).
-    if payload {
-        if let Some(old) = previous.payload() {
-            next.retain((RETAINED_PAYLOAD, b"", current.payload_version), old);
-        }
-        next.payload_version = version;
-    }
-    if result {
-        if let Some(old) = previous.result() {
-            next.retain((RETAINED_RESULT, b"", current.result_version), old);
-        }
-        next.result_version = version;
-    }
-    if error {
-        if let Some(old) = previous.error() {
-            next.retain((RETAINED_ERROR, b"", current.error_version), old);
-        }
-        next.error_version = version;
-    }
-    if matches!(
-        record.status(),
-        WorkflowStatus::Completed | WorkflowStatus::Failed | WorkflowStatus::Cancelled
-    ) {
-        next.ttl_ms = ttl;
-        next.terminal_until = Some(wall.saturating_add(ttl.unwrap_or(current.retention_ttl_ms)));
-    }
-    Ok(next)
 }
 
 impl ShardState {
@@ -248,7 +166,12 @@ impl ShardState {
         let logged = match (outcome, write) {
             (Outcome::Changed, Some(write)) => {
                 let current = entry.meta.as_deref().unwrap_or(&defaults);
-                let meta = updated_meta(mutation, current, (&entry.record, &write.record), wall)?;
+                let meta = updated_meta(
+                    (mutation, &key.0),
+                    current,
+                    (&entry.record, &write.record),
+                    wall,
+                )?;
                 let priority = match &mutation.change {
                     Change::Transition {
                         priority: Some(priority),
@@ -300,7 +223,11 @@ impl ShardState {
                     get("fencing_token"),
                 ])
             }
-            Change::StepContinue { .. } | Change::ExtendLease { .. } => record(),
+            Change::StepContinue { .. }
+            | Change::ExtendLease {
+                ok_on_success: false,
+                ..
+            } => record(),
             _ => term::Term::text("OK"),
         }
     }

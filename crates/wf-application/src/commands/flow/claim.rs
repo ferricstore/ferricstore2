@@ -125,7 +125,8 @@ fn states(opts: &Opts<'_>) -> Result<Vec<Vec<u8>>, FlowError> {
     Ok(states)
 }
 
-fn values(opts: &Opts<'_>) -> Result<Values, FlowError> {
+/// A claim's or read's `values`: `true`, `false`, a name or a name list.
+pub(super) fn values(opts: &Opts<'_>) -> Result<Values, FlowError> {
     match opts.get("values") {
         None => Ok(Values::None),
         Some(Term::Bool(true)) => Ok(Values::All),

@@ -46,182 +46,203 @@ Gaps found so far:
 - G9 (closed): `value_refs` (attach an existing value by reference) was
   not read. Reads resolve attached references on the Flow's own shard;
   claim records do not resolve them yet.
+- G10 (closed, 22 Nov): a value another Flow attached went with its owner
+  at retention cleanup. Each shard now counts the Flows holding each
+  reference (attached now or named in kept history); a held value moves to
+  the shard's shared values when its owner goes and is removed with its
+  last holder. Holdings are in shard images (snapshot version 15).
+- G11 (closed): an attached reference outside the Flow's slot was taken
+  and then read as nil; it is refused (`CROSSSLOT Flow shared value refs
+  must hash to the Flow slot`).
+- G12 (closed): `FLOW.GET` took `values` only as a list; it takes `true`,
+  `false`, a name or a list, as claims do.
+- G13 (closed): terminal retention started at the server's clock; it
+  starts at the command's time, never before the server's clock, as Elixir
+  stamps it (mutations, step chains, child settles, cancel on close).
+- G14 (closed): a rewind to a claim event answered `not found`; it answers
+  `running state is only entered by FLOW.CLAIM_DUE`.
+- G15 (closed): the batch cap's text was invented (`items exceeds
+  maximum`); it is Elixir's `batch item count exceeds maximum 100000`.
+- G16 (open): `FLOW.CREATE` refuses `payload_ref` (a stored value as the
+  payload), which Elixir's native create takes.
+- G17 (closed): `FLOW.EXTEND_LEASE` refused `return: ok_on_success`, which
+  Elixir's lease commands take; it replies `OK` instead of the record.
 
 ## `flow_write_contract_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 18 | flow create has a no-values fast path for named value refs | open |
-| 25 | flow create rejects metadata that cannot fit its QueryRow before routing | open |
-| 42 | flow transition rejects an unencodable QueryRow atomically | open |
-| 83 | create admission reserves internal and policy projection bytes | open |
-| 102 | flow named value refs do not scan whole flow records on the no-value hot path | open |
-| 111 | flow no-value transition fast path avoids value_ref map lookup for normal records | open |
-| 124 | router flow many batches use fixed shard buckets | open |
-| 131 | router flow pipeline results use ordered tuples instead of index maps | open |
-| 148 | flow create fast apply inserts due lifecycle indexes once | open |
-| 155 | flow claim partition-key aggregation is not quadratic | open |
-| 162 | flow pipeline write result assembly is tuple based | open |
-| 172 | flow pipeline transitions avoid oversized transition batch apply | open |
-| 201 | flow claim_due adjacent pipeline prepends run results without list concatenation | open |
-| 213 | flow claim_due state normalization avoids generic Enum.uniq hot path | open |
-| 228 | Flow LMDB async enqueue guard avoids Process.info on apply hot path | open |
-| 249 | flow soak latency metrics are sampled without extra hot event counters | open |
-| 262 | flow query aggregators accumulate chunks without repeated list concatenation | open |
-| 271 | flow history projection avoids grouping when pending entries stay on the apply shard | open |
-| 280 | flow LMDB mirror enqueue stays async on the state-machine hot path | open |
-| 292 | flow history projection never sync-writes from state-machine apply | open |
-| 305 | flow history projection entries stay lazy on the state-machine hot path | open |
-| 332 | flow history projector pressure path stores overflow instead of sync-failing apply | open |
-| 353 | flow claim_due native planner owns history-ready planning without LMDB sync | open |
-| 369 | flow history hot path skips after-history pass when records need no trim or terminal mirror | open |
-| 377 | flow transition due-index moves cache repeated batch keys | open |
-| 394 | flow claim_due native multi-key path does not sort due keys before the NIF scan | open |
-| 408 | flow apply key-size validation does not call Router on the hot path | open |
-| 422 | flow small values skip blob externalization dispatch on apply hot path | open |
-| 440 | flow many router stamps per-shard batches so apply does not rehash each item | open |
-| 473 | flow many apply uses the command-level shard stamp before per-record rehash fallback | open |
-| 500 | flow claim_due validates due-index key size without building every due key | open |
-| 515 | flow claim_due AUTO skips empty shards before Raft writes | open |
-| 540 | flow claim_due AUTO encodes invariant due-key components once per precheck | open |
-| 562 | flow claim_due reclaim precheck does not scan cold due rows for running leases | open |
-| 576 | flow claim_due AUTO cold precheck uses broad shard prefix instead of per bucket partition scans | open |
-| 590 | flow claim_due AUTO cold precheck does not repeat the same LMDB probe per priority | open |
-| 616 | flow claim_due cold precheck avoids repeated directory syscalls for initialized shards | open |
-| 631 | flow claim_due fast index path avoids generic per-plan tuple dispatch | open |
-| 647 | flow terminal transition skips empty due and metadata index passes | open |
-| 656 | flow terminal transition caches repeated lifecycle index keys | open |
-| 679 | flow non-idempotent create fast path does not synchronously query LMDB for existence | open |
-| 706 | flow registry markers use segment-keydir storage instead of apply projection | open |
-| 731 | flow retry many history builds entries and next records in one traversal | open |
-| 738 | flow multi-row history queues async projection once per apply batch | open |
-| 761 | flow fast create history builds entries and records in one traversal | open |
-| 769 | flow secondary indexes are native-only on the replicated apply hot path | open |
-| 783 | fifo lane maintenance bypasses unrelated due-catalog bookkeeping | open |
-| 801 | flow secondary indexes are not backed by ETS tables at boot or rebuild | open |
-| 834 | native Flow index apply_batch does not flatten grouped ops on the hot path | open |
-| 847 | native Flow claim planning passes float candidates directly to the NIF | open |
-| 861 | flow native claim key construction validates generated keys in one fast path | open |
-| 873 | flow native claim hydration reuses precomputed state-key prefix | open |
-| 890 | flow history projector computes initial LFU once per published batch | open |
-| 902 | flow blob-ref writes compute initial LFU once per value | open |
-| 914 | flow state-record blob staging reuses LFU for the ETS row and cold write | open |
-| 925 | flow fast create state records use known-new pending originals without ETS lookups | open |
-| 932 | singular write commands return success only while claim/get return flow data | open |
-| 1113 | batch write commands return success only while claim/get return flow data | open |
-| 1201 | independent complete_many returns per-item success and completes valid jobs | open |
-| 1220 | independent complete_many can return single ok on full success | open |
-| 1239 | independent complete_many ok-on-success preserves per-item failures | open |
-| 1274 | flow step_continue atomically advances logical state and keeps a fresh running lease | open |
-| 1336 | flow start_and_claim creates the first logical step with a running lease | open |
-| 1384 | flow run_steps_many defaults persisted timestamps to the cluster clock | open |
-| 1410 | flow run_steps_many runs deterministic step chains in one public command | open |
-| 1442 | flow run_steps_many rejects duplicate ids without partial creation | open |
-| 1471 | retention apply consumes explicit versioned candidates without lagged projection reads | open |
-| 1526 | retention planning is bounded and executes shard-local commands | open |
-| 1560 | retention uses durable shared ref counts without global reference scans | open |
-| 1593 | replicated flow apply does not invoke node-local application callbacks | open |
-| 1600 | cold Flow state reads use QueryRows and authoritative hydration only | open |
-| 1616 | retention cleanup ownership planning uses the bounded durable member index | open |
-| 1633 | retention apply requires the durable flow identity guard | open |
-| 1663 | Flow mutations acquire shared refs in their owning shard apply | open |
-| 1677 | startup refreshes active file size after retention metadata backfill writes | open |
-| 1733 | state_meta policy reindex enqueues durable bounded migration work | open |
-| 1757 | Flow policy updates allocate once and install through each Raft group | open |
+| 18 | flow create has a no-values fast path for named value refs | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 25 | flow create rejects metadata that cannot fit its QueryRow before routing | ported (`audit::write_contract::public_limits_refuse_long_types_and_states_and_leave_the_flow_alone`; the QueryRow bound is Elixir's own) |
+| 42 | flow transition rejects an unencodable QueryRow atomically | ported (same test) |
+| 83 | create admission reserves internal and policy projection bytes | internal: reserves Elixir's QueryRow bytes in internal create attrs |
+| 102 | flow named value refs do not scan whole flow records on the no-value hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 111 | flow no-value transition fast path avoids value_ref map lookup for normal records | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 124 | router flow many batches use fixed shard buckets | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 131 | router flow pipeline results use ordered tuples instead of index maps | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 148 | flow create fast apply inserts due lifecycle indexes once | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 155 | flow claim partition-key aggregation is not quadratic | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 162 | flow pipeline write result assembly is tuple based | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 172 | flow pipeline transitions avoid oversized transition batch apply | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 201 | flow claim_due adjacent pipeline prepends run results without list concatenation | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 213 | flow claim_due state normalization avoids generic Enum.uniq hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 228 | Flow LMDB async enqueue guard avoids Process.info on apply hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 249 | flow soak latency metrics are sampled without extra hot event counters | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 262 | flow query aggregators accumulate chunks without repeated list concatenation | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 271 | flow history projection avoids grouping when pending entries stay on the apply shard | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 280 | flow LMDB mirror enqueue stays async on the state-machine hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 292 | flow history projection never sync-writes from state-machine apply | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 305 | flow history projection entries stay lazy on the state-machine hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 332 | flow history projector pressure path stores overflow instead of sync-failing apply | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 353 | flow claim_due native planner owns history-ready planning without LMDB sync | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 369 | flow history hot path skips after-history pass when records need no trim or terminal mirror | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 377 | flow transition due-index moves cache repeated batch keys | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 394 | flow claim_due native multi-key path does not sort due keys before the NIF scan | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 408 | flow apply key-size validation does not call Router on the hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 422 | flow small values skip blob externalization dispatch on apply hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 440 | flow many router stamps per-shard batches so apply does not rehash each item | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 473 | flow many apply uses the command-level shard stamp before per-record rehash fallback | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 500 | flow claim_due validates due-index key size without building every due key | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 515 | flow claim_due AUTO skips empty shards before Raft writes | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 540 | flow claim_due AUTO encodes invariant due-key components once per precheck | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 562 | flow claim_due reclaim precheck does not scan cold due rows for running leases | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 576 | flow claim_due AUTO cold precheck uses broad shard prefix instead of per bucket partition scans | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 590 | flow claim_due AUTO cold precheck does not repeat the same LMDB probe per priority | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 616 | flow claim_due cold precheck avoids repeated directory syscalls for initialized shards | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 631 | flow claim_due fast index path avoids generic per-plan tuple dispatch | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 647 | flow terminal transition skips empty due and metadata index passes | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 656 | flow terminal transition caches repeated lifecycle index keys | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 679 | flow non-idempotent create fast path does not synchronously query LMDB for existence | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 706 | flow registry markers use segment-keydir storage instead of apply projection | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 731 | flow retry many history builds entries and next records in one traversal | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 738 | flow multi-row history queues async projection once per apply batch | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 761 | flow fast create history builds entries and records in one traversal | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 769 | flow secondary indexes are native-only on the replicated apply hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 783 | fifo lane maintenance bypasses unrelated due-catalog bookkeeping | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 801 | flow secondary indexes are not backed by ETS tables at boot or rebuild | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 834 | native Flow index apply_batch does not flatten grouped ops on the hot path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 847 | native Flow claim planning passes float candidates directly to the NIF | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 861 | flow native claim key construction validates generated keys in one fast path | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 873 | flow native claim hydration reuses precomputed state-key prefix | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 890 | flow history projector computes initial LFU once per published batch | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 902 | flow blob-ref writes compute initial LFU once per value | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 914 | flow state-record blob staging reuses LFU for the ETS row and cold write | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 925 | flow fast create state records use known-new pending originals without ETS lookups | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 932 | singular write commands return success only while claim/get return flow data | ported (`audit::write_contract::singular_write_commands_return_success_only_while_claim_and_get_return_flow_data`) |
+| 1113 | batch write commands return success only while claim/get return flow data | ported (`audit::write_contract::batch_write_commands_return_success_only`) |
+| 1201 | independent complete_many returns per-item success and completes valid jobs | ported (`audit::write_contract::independent_complete_many_answers_each_item_or_one_ok`) |
+| 1220 | independent complete_many can return single ok on full success | ported (same test) |
+| 1239 | independent complete_many ok-on-success preserves per-item failures | ported (same test) |
+| 1274 | flow step_continue atomically advances logical state and keeps a fresh running lease | ported (`audit::write_contract::step_continue_advances_the_logical_state_under_a_fresh_running_lease`) |
+| 1336 | flow start_and_claim creates the first logical step with a running lease | ported (`audit::write_contract::start_and_claim_creates_the_first_step_under_a_running_lease`) |
+| 1384 | flow run_steps_many defaults persisted timestamps to the cluster clock | ported (wording: no hybrid clock, the server's wall clock; a step named `completed` is refused as START_AND_CLAIM refuses it, see the test) |
+| 1410 | flow run_steps_many runs deterministic step chains in one public command | ported (`audit::write_contract::run_steps_many_runs_step_chains_in_one_command`) |
+| 1442 | flow run_steps_many rejects duplicate ids without partial creation | ported (`audit::write_contract::run_steps_many_refuses_duplicate_ids_without_creating_any`) |
+| 1471 | retention apply consumes explicit versioned candidates without lagged projection reads | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1526 | retention planning is bounded and executes shard-local commands | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1560 | retention uses durable shared ref counts without global reference scans | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1593 | replicated flow apply does not invoke node-local application callbacks | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1600 | cold Flow state reads use QueryRows and authoritative hydration only | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1616 | retention cleanup ownership planning uses the bounded durable member index | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1633 | retention apply requires the durable flow identity guard | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1663 | Flow mutations acquire shared refs in their owning shard apply | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1677 | startup refreshes active file size after retention metadata backfill writes | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1733 | state_meta policy reindex enqueues durable bounded migration work | internal: asserts Elixir source text (hot-path shape), not behaviour |
+| 1757 | Flow policy updates allocate once and install through each Raft group | internal: asserts Elixir source text (hot-path shape), not behaviour |
 
 ## `flow_attributes_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | create stores attributes in durable Flow state and codec round trips them | open |
-| 41 | transition merges and deletes attributes without touching payload refs | open |
-| 83 | list and stats filter by projected attributes | open |
-| 132 | claim_due compact job return can include attributes | open |
-| 159 | claim_due records include attributes by default and compact mode omits them | open |
-| 209 | attributes persist through transition complete fail retry and rewind | open |
-| 322 | terminal records keep attributes queryable through async projection | open |
-| 382 | restart rebuild preserves attribute search correctness | open |
-| 465 | retention cleanup removes terminal attribute indexes | open |
-| 587 | rejects oversized attributes at command boundary | open |
-| 600 | rejects an attribute merge that would overflow the existing bounded record | open |
-| 640 | explicit null attributes round trip without matching missing attributes | open |
-| 681 | rejects oversized attribute keys values and invalid types | open |
-| 710 | rejects attribute numbers that cannot be represented by query and native codecs | open |
-| 742 | flow policy limits indexed attributes to three names | open |
-| 761 | indexed attributes support broad cross-state and cross-type search | open |
-| 847 | non-indexed attributes remain exact-queryable but broad search fails clearly | open |
-| 894 | broad search retains indexed policy knowledge when no rows exist | open |
-| 930 | broad search repairs missing and corrupt indexed-attribute refcounts | open |
-| 1015 | indexed-attribute repair is fenced by the membership revision | open |
-| 1057 | indexed attribute policy changes are future-only for broad indexes | open |
-| 1109 | indexed attributes added during transition become broad-searchable | open |
-| 1150 | indexed attributes support cross-type state search without partition-scope under-return | open |
-| 1193 | indexed attribute search honors time reverse and count windows | open |
-| 1259 | attribute discovery lists policy-indexed keys and top values | open |
-| 1304 | attribute discovery preserves string values containing NUL bytes | open |
-| 1330 | attribute discovery marks bounded counts as approximate when scan limit is reached | open |
-| 1374 | multi-attribute search plans from selective candidate before applying count | open |
-| 1416 | retention cleanup removes attribute discovery entries | open |
-| 1470 | auto partition attribute discovery excludes expired terminal projections | open |
+| 8 | create stores attributes in durable Flow state and codec round trips them | ported (`audit::attributes::attributes_are_stored_and_read_back_across_a_restart`; the codec round trip is a reopen) |
+| 41 | transition merges and deletes attributes without touching payload refs | ported (`audit::attributes::a_transition_merges_and_deletes_attributes`) |
+| 83 | list and stats filter by projected attributes | ported (`audit::attribute_queries::queries_and_stats_filter_by_attributes`; FLOW.LIST is retired in Elixir, the SDK lists with FLOW.QUERY) |
+| 132 | claim_due compact job return can include attributes | ported (`audit::attributes::claims_return_attributes_in_records_and_compact_attribute_jobs_only`) |
+| 159 | claim_due records include attributes by default and compact mode omits them | ported (same test) |
+| 209 | attributes persist through transition complete fail retry and rewind | ported (`audit::attributes::attributes_persist_through_retry_transition_complete_fail_and_rewind`) |
+| 322 | terminal records keep attributes queryable through async projection | ported (`audit::attribute_queries::completed_flows_stay_queryable_by_attribute_until_retention_cleanup`) |
+| 382 | restart rebuild preserves attribute search correctness | ported (`audit::attribute_queries::attribute_queries_and_discovery_survive_a_restart`) |
+| 465 | retention cleanup removes terminal attribute indexes | ported (`audit::attribute_queries::completed_flows_stay_queryable_by_attribute_until_retention_cleanup`) |
+| 587 | rejects oversized attributes at command boundary | ported (`audit::attributes::attribute_limits_refuse_at_the_command_and_leave_the_flow_alone`) |
+| 600 | rejects an attribute merge that would overflow the existing bounded record | ported (same test) |
+| 640 | explicit null attributes round trip without matching missing attributes | ported (`audit::attribute_queries::an_explicit_null_attribute_round_trips_and_differs_from_a_missing_one`; FQL `IS NULL`, the SDK cannot send a null parameter) |
+| 681 | rejects oversized attribute keys values and invalid types | ported (`audit::attributes::attribute_limits_refuse_at_the_command_and_leave_the_flow_alone`) |
+| 710 | rejects attribute numbers that cannot be represented by query and native codecs | ported (`audit::attributes::signed_64_bit_attribute_bounds_are_accepted`; the protocol's integers are signed 64-bit, so larger ones cannot be sent) |
+| 742 | flow policy limits indexed attributes to three names | ported (`audit::attributes::a_policy_indexes_at_most_three_attribute_names`) |
+| 761 | indexed attributes support broad cross-state and cross-type search | ported (`audit::attribute_queries::attribute_search_spans_states_and_types`) |
+| 847 | non-indexed attributes remain exact-queryable but broad search fails clearly | ported (same test, the exact query; the broad-search refusal belongs to the retired FLOW.SEARCH, and FLOW.QUERY filters any attribute) |
+| 894 | broad search retains indexed policy knowledge when no rows exist | internal: the retired FLOW.SEARCH's refusal rules for broad search |
+| 930 | broad search repairs missing and corrupt indexed-attribute refcounts | internal: repairs Elixir's LMDB refcount keys |
+| 1015 | indexed-attribute repair is fenced by the membership revision | internal: fences Elixir's LMDB refcount repair |
+| 1057 | indexed attribute policy changes are future-only for broad indexes | covered (`flow_info::state_any_sees_attributes_indexed_when_the_flow_was_written`: the broad index under FLOW.STATS state any; FLOW.SEARCH itself is retired) |
+| 1109 | indexed attributes added during transition become broad-searchable | covered (same test, the transition case) |
+| 1150 | indexed attributes support cross-type state search without partition-scope under-return | ported (`audit::attribute_queries::attribute_search_spans_states_and_types`) |
+| 1193 | indexed attribute search honors time reverse and count windows | ported (`audit::attribute_queries::attribute_search_honors_time_windows_order_and_count`) |
+| 1259 | attribute discovery lists policy-indexed keys and top values | covered (`flow_info::discovery_counts_policy_indexed_values_of_live_flows`) |
+| 1304 | attribute discovery preserves string values containing NUL bytes | covered (same test, value `acme\0north`) |
+| 1330 | attribute discovery marks bounded counts as approximate when scan limit is reached | internal: Elixir's discovery scan limit; the node counts exactly, so a count is never approximate |
+| 1374 | multi-attribute search plans from selective candidate before applying count | ported (`audit::attribute_queries::attribute_search_honors_time_windows_order_and_count`) |
+| 1416 | retention cleanup removes attribute discovery entries | covered (`flow_info::discovery_counts_policy_indexed_values_of_live_flows`, retention cleanup part) |
+| 1470 | auto partition attribute discovery excludes expired terminal projections | ported (`audit::attribute_queries::auto_bucket_discovery_leaves_out_expired_terminal_flows`) |
 
 ## `flow_test/sections/flow_history_hot_max_rejects_values_above_configured_maximum.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow history hot max rejects values above configured maximum | open |
-| 27 | flow create_many and transition_many reject oversized batches | open |
-| 55 | flow claim_due rejects oversized limit | open |
-| 80 | flow_rewind rejects trimmed target event with stale stream index | open |
-| 123 | flow_rewind restores a previous history state and reindexes atomically | open |
-| 185 | flow_rewind persists the supplied reason and its history reference | open |
-| 249 | flow_rewind reads back a large binary reason | open |
-| 268 | flow_rewind validates target, expected state, and active leases | open |
-| 303 | flow_rewind refuses an event recorded while the Flow was claimed | open |
-| 333 | flow_rewind rejects parent and child flows | open |
-| 386 | terminal retention from create expires flow state record | open |
-| 418 | terminal retention uses wall-valid command time | open |
-| 448 | retention cleanup revalidates stale LMDB terminal candidate after rewind | open |
-| 504 | retention cleanup skips while async history projection is still pending | open |
-| 579 | retention cleanup preserves shared value refs used by another flow | open |
-| 650 | retention cleanup does not global-scan refs for private payload values | open |
-| 708 | retention cleanup reclaims unreferenced owner named shared values without scanning | open |
-| 775 | retention cleanup preserves owner named values referenced by a live flow | open |
-| 899 | retention cleanup preserves an owner shared value used as a payload ref | open |
-| 968 | retention tracks named payload result and error shared refs | open |
-| 1095 | bounded partial and full cleanup preserve a shared value with a live consumer | open |
-| 1177 | retention cleanup rejects a racing cross-shard shared value consumer | open |
-| 1290 | same-shard child shared ref acquisition ordered before cleanup preserves the value | open |
-| 1413 | retention cleanup preserves owner named values referenced by retained history | open |
-| 1521 | retention cleanup does not delete generated values for colon-prefixed flow ids | open |
+| 8 | flow history hot max rejects values above configured maximum | ported (`audit::history_limits::requests_past_the_node_s_limits_are_refused`; the node's maximum is Elixir's default, 10000) |
+| 27 | flow create_many and transition_many reject oversized batches | fixed (same test; batches capped at Elixir's largest setting, 100000, with Elixir's wording: G15) |
+| 55 | flow claim_due rejects oversized limit | ported (same test; claim maximum 10000) |
+| 80 | flow_rewind rejects trimmed target event with stale stream index | ported (`audit::history_limits::a_rewind_to_an_event_trimmed_from_history_is_refused`) |
+| 123 | flow_rewind restores a previous history state and reindexes atomically | ported (`audit::history_limits::a_rewind_restores_an_earlier_state_and_its_counts`) |
+| 185 | flow_rewind persists the supplied reason and its history reference | ported (`audit::history_limits::a_rewind_keeps_its_reason_and_a_later_rewind_can_restore_it`) |
+| 249 | flow_rewind reads back a large binary reason | ported (same test) |
+| 268 | flow_rewind validates target, expected state, and active leases | ported (`audit::history_limits::a_rewind_checks_its_target_expected_state_and_lease`) |
+| 303 | flow_rewind refuses an event recorded while the Flow was claimed | fixed (same test; G14) |
+| 333 | flow_rewind rejects parent and child flows | ported (`audit::history_limits::parents_and_children_are_not_rewound`) |
+| 386 | terminal retention from create expires flow state record | ported (`audit::history_limits::terminal_retention_starts_at_the_terminal_command`) |
+| 418 | terminal retention uses wall-valid command time | fixed (same test; G13) |
+| 448 | retention cleanup revalidates stale LMDB terminal candidate after rewind | ported (same test) |
+| 504 | retention cleanup skips while async history projection is still pending | internal: waits on Elixir's async history projector |
+| 579 | retention cleanup preserves shared value refs used by another flow | ported (`audit::shared_values::a_shared_value_stays_while_another_flow_attaches_it`) |
+| 650 | retention cleanup does not global-scan refs for private payload values | ported (`audit::shared_values::a_flow_s_own_payload_and_unreferenced_named_values_go_with_it`; the scan hook is Elixir's) |
+| 708 | retention cleanup reclaims unreferenced owner named shared values without scanning | ported (same test) |
+| 775 | retention cleanup preserves owner named values referenced by a live flow | fixed (`audit::shared_values::an_owner_s_named_value_stays_while_a_live_flow_attaches_it`; G10) |
+| 899 | retention cleanup preserves an owner shared value used as a payload ref | gap G16: FLOW.CREATE `payload_ref` |
+| 968 | retention tracks named payload result and error shared refs | gap G16 for `payload_ref`; `result_ref` and `error_ref` are Elixir's internal router inputs (public commands refuse them) |
+| 1095 | bounded partial and full cleanup preserve a shared value with a live consumer | fixed (`audit::shared_values::an_owner_s_named_value_stays_while_a_live_flow_attaches_it`; G10) |
+| 1177 | retention cleanup rejects a racing cross-shard shared value consumer | fixed (`audit::shared_values::a_flow_on_another_shard_cannot_attach_a_value`; G11; the race hook is Elixir's) |
+| 1290 | same-shard child shared ref acquisition ordered before cleanup preserves the value | fixed (`audit::shared_values::a_child_s_attached_value_outlives_its_owner`; G10) |
+| 1413 | retention cleanup preserves owner named values referenced by retained history | fixed (`audit::shared_values::a_value_named_in_kept_history_outlives_its_owner`; G10) |
+| 1521 | retention cleanup does not delete generated values for colon-prefixed flow ids | fixed (`audit::shared_values::cleanup_of_a_flow_keeps_values_of_ids_it_prefixes`; GET `values: true`, G12) |
 
 ## `flow_test/sections/flow_policy_exposes_type_state_retry_retention_defaults.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow policy exposes type and state retry and retention defaults | open |
-| 57 | flow policy writes use one monotonic internal generation on every shard | open |
-| 137 | flow policy rejects hot history cap because it is internal | open |
-| 146 | flow policy rejects state-level max_active_ms because it is type-level only | open |
-| 157 | flow policy is mirrored to LMDB asynchronously | open |
-| 193 | standalone restart rebuilds stored policy and retry uses it | open |
-| 277 | native claim batch state write survives standalone restart | open |
-| 333 | standalone restart preserves spawned child group state | open |
-| 396 | stored state retry policy drives retry exhaustion without command override | open |
-| 429 | command retry policy overrides stored state policy | open |
-| 466 | flow retry policy accepts thirty day backoff cap | open |
-| 483 | flow retry policy computes standard backoff timing | open |
-| 533 | flow retry policy keeps generated backoff values bounded and deterministic | open |
-| 583 | flow retry policy rejects old max_attempts name | open |
-| 592 | flow retry policy decoder rejects old stored max_attempts key | open |
-| 618 | flow_retry_many atomically reschedules one-partition batch | open |
-| 671 | flow_retry_many rolls back when any item fails guard | open |
-| 715 | flow_retry_many rejects invalid retry policy before mutating records | open |
-| 757 | expired running lease can be reclaimed | open |
-| 798 | flow_reclaim exposes expired running lease reclaim | open |
-| 833 | flow_extend_lease extends running lease with fencing guards | open |
-| 877 | flow_extend_lease can return OK without materializing the updated record | open |
-| 904 | expired lease reclaim fences old worker and records takeover history | open |
-| 955 | flow_extend_lease rejects terminal flow | open |
+| 8 | flow policy exposes type and state retry and retention defaults | ported (`audit::policy_lifecycle::a_policy_resolves_type_defaults_under_state_overrides`; Elixir's typed protocol has no top-level retention, so the type's retention time goes through the text form and its history cap is not settable on the wire) |
+| 57 | flow policy writes use one monotonic internal generation on every shard | internal: Elixir's policy stamping and generation keys; `version` is refused on its wire (`unknown flow option version`) |
+| 137 | flow policy rejects hot history cap because it is internal | ported (`audit::policy_lifecycle::a_policy_refuses_internal_type_only_and_renamed_fields`, at state level as Elixir's wire takes it) |
+| 146 | flow policy rejects state-level max_active_ms because it is type-level only | ported (same test) |
+| 157 | flow policy is mirrored to LMDB asynchronously | internal: Elixir's LMDB mirror |
+| 193 | standalone restart rebuilds stored policy and retry uses it | ported (`audit::policy_lifecycle::a_restart_keeps_policies_leases_and_child_groups`; generation instead of the in-process `version`) |
+| 277 | native claim batch state write survives standalone restart | ported (same test) |
+| 333 | standalone restart preserves spawned child group state | ported (same test) |
+| 396 | stored state retry policy drives retry exhaustion without command override | ported (`audit::policy_lifecycle::a_retry_follows_the_state_policy_unless_the_command_overrides_it`; also `wf-domain` `retry_policy_transitions`) |
+| 429 | command retry policy overrides stored state policy | ported (same test; also `wf-domain` `retry_policy_transitions`) |
+| 466 | flow retry policy accepts thirty day backoff cap | covered (`wf-domain` `retry_policy::flow_retry_policy_accepts_thirty_day_backoff_cap`) |
+| 483 | flow retry policy computes standard backoff timing | covered (`wf-domain` `retry_policy::flow_retry_policy_computes_standard_backoff_timing`) |
+| 533 | flow retry policy keeps generated backoff values bounded and deterministic | covered (`wf-domain` `retry_policy::flow_retry_policy_keeps_generated_backoff_values_bounded_and_deterministic`) |
+| 583 | flow retry policy rejects old max_attempts name | ported (`audit::policy_lifecycle::a_policy_refuses_internal_type_only_and_renamed_fields`) |
+| 592 | flow retry policy decoder rejects old stored max_attempts key | internal: Elixir's stored policy term format |
+| 618 | flow_retry_many atomically reschedules one-partition batch | ported (`audit::policy_lifecycle::retry_many_reschedules_a_batch_or_none_of_it`) |
+| 671 | flow_retry_many rolls back when any item fails guard | ported (same test) |
+| 715 | flow_retry_many rejects invalid retry policy before mutating records | ported (same test) |
+| 757 | expired running lease can be reclaimed | ported (`audit::policy_lifecycle::an_expired_lease_is_reclaimed_by_a_running_claim_or_reclaim`) |
+| 798 | flow_reclaim exposes expired running lease reclaim | ported (same test) |
+| 833 | flow_extend_lease extends running lease with fencing guards | ported (`audit::policy_lifecycle::a_lease_extends_under_its_fence_and_not_once_finished`) |
+| 877 | flow_extend_lease can return OK without materializing the updated record | fixed (same test; G17) |
+| 904 | expired lease reclaim fences old worker and records takeover history | ported (`audit::policy_lifecycle::a_reclaim_fences_the_old_worker_and_records_the_takeover`) |
+| 955 | flow_extend_lease rejects terminal flow | ported (`audit::policy_lifecycle::a_lease_extends_under_its_fence_and_not_once_finished`) |
 
 ## `flow_test/sections/flow_internal_keys_use_compact_partition_tags.exs`
 

@@ -89,7 +89,7 @@ impl ShardState {
             .as_deref()
             .cloned()
             .unwrap_or_else(|| self.defaults());
-        meta.terminal_until = Some(wall.saturating_add(meta.retention_ttl_ms));
+        meta.terminal_until = Some(now.max(wall).saturating_add(meta.retention_ttl_ms));
         let record = parent_next(&entry.record, b"cancelled", now, None, EventKind::Cancelled)?;
         let priority = entry.priority;
         let mut history = HistoryEvent::of(&record, priority, &meta, &key.0);

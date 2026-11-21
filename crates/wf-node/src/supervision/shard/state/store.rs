@@ -135,6 +135,11 @@ impl ShardState {
                 events.push(event, flow_meta.history_max_events);
             }
         }
+        if let Some(meta) = meta.as_deref()
+            && !meta.value_refs.is_empty()
+        {
+            self.hold(&key, meta.value_refs.values());
+        }
         let entry = Entry {
             record,
             priority,

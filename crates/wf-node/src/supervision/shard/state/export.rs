@@ -54,6 +54,7 @@ impl ShardState {
         }
         self.encode_tail(now, &mut out)?;
         image::encode_stubs(&mut out, &[])?;
+        self.encode_holdings(&mut out)?;
         Some(out)
     }
 
@@ -81,6 +82,9 @@ impl ShardState {
         }
         for stub in decoded.stubs {
             fresh.restore_stub(stub);
+        }
+        for holding in decoded.holdings {
+            fresh.restore_holdings(holding.partition, holding.id, &holding.refs);
         }
         *self = fresh;
         Some(())

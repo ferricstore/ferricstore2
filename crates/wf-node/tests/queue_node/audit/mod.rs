@@ -11,13 +11,21 @@ use wf_node::composition::QueueNode;
 
 use super::{TestResult, call};
 
+mod attribute_queries;
+mod attributes;
 mod batches;
 mod create_many;
+mod history_limits;
+mod leases;
 mod named_values;
+mod policy_lifecycle;
+mod shared_values;
 mod signal;
+mod steps_contract;
 mod value_payload;
 mod value_refs;
 mod value_retention;
+mod write_contract;
 
 /// A reply from the node: the Elixir-shaped term or the refusal.
 type Reply = Result<Term, ServiceError>;
@@ -70,6 +78,23 @@ fn refusal(reply: Reply) -> TestResult<String> {
 /// A field of a map reply, nil when absent.
 fn field(term: &Term, key: &str) -> Term {
     term.get(key.as_bytes()).cloned().unwrap_or(Term::Nil)
+}
+
+/// `term` with every map's entries in key order, so maps compare as
+/// Elixir's do, without order.
+fn sorted(term: &Term) -> Term {
+    match term {
+        Term::Map(entries) => {
+            let mut entries: Vec<(Vec<u8>, Term)> = entries
+                .iter()
+                .map(|(key, value)| (key.clone(), sorted(value)))
+                .collect();
+            entries.sort_by(|a, b| a.0.cmp(&b.0));
+            Term::Map(entries)
+        }
+        Term::List(items) => Term::List(items.iter().map(sorted).collect()),
+        other => other.clone(),
+    }
 }
 
 /// Whether a map reply has `key` at all.

@@ -128,7 +128,7 @@ impl ShardState {
         }
         write_values(&mut meta, &signal.values, &signal.override_values)?;
         super::value::drop_values(&mut meta, &signal.drop_values);
-        super::value::attach(&mut meta, &signal.value_refs);
+        super::value::attach(&mut meta, &signal.value_refs, &key.0)?;
         if let Some(key) = &signal.idempotency_key {
             meta.signal_keys.insert(key.clone(), digest);
         }

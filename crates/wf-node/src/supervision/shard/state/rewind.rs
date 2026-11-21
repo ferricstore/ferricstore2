@@ -258,9 +258,12 @@ impl ShardState {
             .into_iter()
             .find(|event| version > 0 && event.version == version && event.at == at)
             .ok_or_else(not_found)?;
-        // Elixir answers a claim event (a running state) as not found too.
+        // A claim event records a running Flow under a lease; restoring it
+        // would make a running Flow without one, which only a claim makes.
         if target.state.as_slice() == b"running" {
-            return Err(not_found());
+            return Err(rejected(
+                "ERR flow running state is only entered by FLOW.CLAIM_DUE",
+            ));
         }
         let mut meta = current.clone();
         let next = record

@@ -97,6 +97,8 @@ pub(crate) struct ShardState {
     leased: u64,
     /// Shared values by reference (ADR-014 step 5).
     shared: Map<Vec<u8>, value::Shared>,
+    /// References Flows hold to values they do not own (audit gap G10).
+    held: value::Held,
     /// Governance records by kind and name, stored (ADR-014 step 15).
     governance: BTreeMap<(Kind, Vec<u8>), Vec<u8>>,
     /// Credits of Flows that left `running`, to release (ADR-014 step 15).
@@ -161,6 +163,7 @@ impl ShardState {
             ready: 0,
             leased: 0,
             shared: Map::default(),
+            held: value::Held::default(),
             governance: BTreeMap::new(),
             credit_releases: Vec::new(),
             tags: Map::default(),

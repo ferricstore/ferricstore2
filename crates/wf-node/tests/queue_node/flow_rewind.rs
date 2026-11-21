@@ -123,7 +123,11 @@ fn a_rewind_restores_an_event_and_remembers_it() -> TestResult {
             )?,
             refused("ERR flow wrong state")
         );
-        for missing in ["999-1", "1001-2", "x"] {
+        assert_eq!(
+            rewind(&node, &[("to_event", text("1001-2"))])?,
+            refused("ERR flow running state is only entered by FLOW.CLAIM_DUE")
+        );
+        for missing in ["999-1", "x"] {
             assert_eq!(
                 rewind(&node, &[("to_event", text(missing))])?,
                 refused("ERR flow rewind target event not found")

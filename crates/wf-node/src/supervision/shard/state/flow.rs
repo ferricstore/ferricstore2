@@ -279,9 +279,10 @@ impl ShardState {
             values,
             ..defaults
         })
-        .map(|mut meta| {
-            super::value::attach(&mut meta, &create.value_refs);
-            meta
+        .and_then(|mut meta| {
+            let partition = Partition::for_new_flow(&create.id, create.partition_key.as_deref());
+            super::value::attach(&mut meta, &create.value_refs, &partition)?;
+            Ok(meta)
         })
     }
 

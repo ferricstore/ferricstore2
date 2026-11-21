@@ -10,7 +10,10 @@
 //! `1` and its history events ([`history`]).
 
 mod history;
+mod holdings;
 mod meta;
+
+pub(crate) use holdings::{Holding, HoldingEntry, encode as encode_holdings};
 
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::record::FlowMeta;
@@ -254,12 +257,14 @@ pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
     for _ in 0..stub_count {
         stubs.push(decode_stub(&mut reader).ok()?);
     }
+    let holdings = holdings::decode(&mut reader).ok()?;
     reader.0.is_empty().then_some(Image {
         records,
         shared,
         policies,
         governance,
         stubs,
+        holdings,
     })
 }
 
@@ -273,6 +278,8 @@ pub(crate) struct Image {
     pub(crate) governance: Vec<(u8, Vec<u8>, Vec<u8>)>,
     /// Finished Flows on disk (ADR-016).
     pub(crate) stubs: Vec<StubImage>,
+    /// References Flows hold to values they do not own (audit gap G10).
+    pub(crate) holdings: Vec<Holding>,
 }
 
 /// A finished Flow on disk as a shard image keeps it (ADR-016): where its

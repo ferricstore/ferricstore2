@@ -132,7 +132,7 @@ pub fn parse(name: &str, args: &Term) -> Result<ManyMutation, FlowError> {
         _ => return Err(rejected("ERR flow items must be a non-empty list")),
     };
     if items.len() > 100_000 {
-        return Err(rejected("ERR flow items exceeds maximum 100000"));
+        return Err(rejected("ERR flow batch item count exceeds maximum 100000"));
     }
     let shared: Vec<(Vec<u8>, Term)> = entries
         .iter()

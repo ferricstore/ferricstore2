@@ -75,11 +75,15 @@ impl ShardState {
             return Outcome::NotEligible;
         }
         for key in keys {
+            // Values other Flows hold outlive their owner (audit gap G10);
+            // the time only matters to shared values, which are not held.
+            self.keep_held(0, key);
             if matches!(self.records.get(key), Some(Slot::Cold(_))) {
                 self.remove_cold(key);
             } else if let Some(entry) = self.take_entry_parts(key) {
                 drop(entry);
             }
+            self.release(key);
         }
         Outcome::Changed
     }

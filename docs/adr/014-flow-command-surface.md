@@ -292,8 +292,9 @@ Each step is one commit with its tests.
   error, terminal retention restarts for a terminal target, and the Flow
   keeps `rewound_to_event_id` (on the record and on every later event; the
   event itself is `rewound`). Refusals follow Elixir: a leased Flow, a
-  parent or child, a wrong `expect_state`, an event not held (including a
-  claim event, which Elixir also answers as not found), `reason_ref`. This
+  parent or child, a wrong `expect_state`, an event not held, a
+  claim event (`running state is only entered by FLOW.CLAIM_DUE`, as
+  Elixir's `flow_test` rewind tests expect; audit, 22 Nov), `reason_ref`. This
   node keeps only the current bytes of each value, so an event whose
   payload, result, error or named value version was replaced since is
   refused as not found where Elixir may still hold the older version.

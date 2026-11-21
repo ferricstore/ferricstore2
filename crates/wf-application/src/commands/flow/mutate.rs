@@ -109,6 +109,8 @@ pub enum Change {
     ExtendLease {
         /// New lease length from the command time.
         lease_ms: u64,
+        /// Reply `OK` instead of the record (`return: ok_on_success`).
+        ok_on_success: bool,
     },
 }
 
@@ -227,7 +229,7 @@ fn extra(name: &str) -> Option<&'static [&'static str]> {
         "FLOW.COMPLETE" => &["payload", "result", "ttl_ms", "return"],
         "FLOW.FAIL" => &["payload", "error", "ttl_ms"],
         "FLOW.CANCEL" => &["expected_version", "expect_state", "reason", "ttl_ms"],
-        "FLOW.EXTEND_LEASE" => &["lease_ms"],
+        "FLOW.EXTEND_LEASE" => &["lease_ms", "return"],
         _ => return None,
     })
 }
@@ -291,6 +293,7 @@ fn change(name: &str, opts: &Opts<'_>) -> Result<Change, FlowError> {
         },
         _ => Change::ExtendLease {
             lease_ms: lease_ms(opts)?,
+            ok_on_success: matches!(opts.get("return"), Some(Term::Bin(mode)) if mode.eq_ignore_ascii_case(b"ok_on_success")),
         },
     })
 }

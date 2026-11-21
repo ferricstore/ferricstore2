@@ -59,7 +59,18 @@ impl ShardState {
             })
             .collect();
         image::encode_stubs(&mut out, &stubs)?;
+        self.encode_holdings(&mut out)?;
         Some(out)
+    }
+
+    /// The holdings section (audit gap G10), after the stubs.
+    pub(super) fn encode_holdings(&self, out: &mut Vec<u8>) -> Option<()> {
+        let holdings: Vec<image::HoldingEntry<'_>> = self
+            .holdings()
+            .into_iter()
+            .map(|(key, refs)| ((&key.0, key.1.as_slice()), refs))
+            .collect();
+        image::encode_holdings(out, &holdings)
     }
 
     /// The parts of an image after its records: shared values, policies and

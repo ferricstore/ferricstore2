@@ -226,7 +226,7 @@ impl ShardState {
         if spec.result.is_some() {
             meta.result_version = record.version();
         }
-        meta.terminal_until = Some(wall.saturating_add(meta.retention_ttl_ms));
+        meta.terminal_until = Some(at.max(wall).saturating_add(meta.retention_ttl_ms));
         events.push(HistoryEvent::of(&record, 0, &meta, &key.0));
         let count = events.len();
         self.put_events(key.clone(), (record, 0, Some(Box::new(meta))), &events);

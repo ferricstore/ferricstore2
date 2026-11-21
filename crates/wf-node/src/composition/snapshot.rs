@@ -23,15 +23,15 @@ use super::NodeError;
 use super::replay::Cut;
 use super::router::{Router, shard_index};
 
-/// Version 14 images (values in the value codec's form, attached
-/// references; audit gaps G5, G9)
+/// Version 15 images (values in the value codec's form, attached
+/// references and the references Flows hold; audit gaps G5, G9, G10)
 /// carry each Flow's fields beyond its record (with the
 /// policy-indexed names it was written under, term payloads, effects, the
 /// governance ledger and kept value versions) and each shard's governance
 /// records, its history (with timeout and rewind extras), the shard's
 /// shared values, its Flow type policies (ADR-014) and the stubs of its
 /// finished Flows on disk (ADR-016).
-const VERSION: u8 = 14;
+const VERSION: u8 = 15;
 
 struct Progress {
     next: u64,
@@ -112,6 +112,12 @@ pub(crate) fn load(
                 .and_then(|index| states.get_mut(index))
                 .ok_or(NodeError::SnapshotImage)?;
             state.restore_stub(stub);
+        }
+        for holding in decoded.holdings {
+            let state = shard_index(&holding.partition, shards)
+                .and_then(|index| states.get_mut(index))
+                .ok_or(NodeError::SnapshotImage)?;
+            state.restore_holdings(holding.partition, holding.id, &holding.refs);
         }
     }
     Ok(Cut::new(id, base, count))

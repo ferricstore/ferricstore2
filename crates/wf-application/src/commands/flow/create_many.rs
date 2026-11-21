@@ -100,7 +100,7 @@ pub fn parse(args: &Term) -> Result<CreateMany, FlowError> {
         _ => return Err(rejected("ERR flow items must be a non-empty list")),
     };
     if items.len() > MAX_ITEMS {
-        return Err(rejected("ERR flow items exceeds maximum 100000"));
+        return Err(rejected("ERR flow batch item count exceeds maximum 100000"));
     }
     let shared: Vec<(Vec<u8>, Term)> = entries
         .iter()

@@ -3,7 +3,7 @@
 use super::FlowError;
 use super::create::partition_key;
 use super::opts::Opts;
-use super::record::{Include, Values};
+use super::record::Include;
 use super::term::Term;
 
 const ALLOWED: &[&str] = &[
@@ -66,7 +66,7 @@ pub fn parse(args: &Term) -> Result<GetFlow, FlowError> {
         include: Include {
             payload,
             max_bytes: max_bytes.unwrap_or(PAYLOAD_MAX_BYTES),
-            values: Values::Names(opts.binary_list("values")?),
+            values: super::claim::values(&opts)?,
         },
     })
 }

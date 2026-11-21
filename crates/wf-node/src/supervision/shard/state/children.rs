@@ -317,7 +317,7 @@ impl ShardState {
         };
         let record = parent_next(&entry.record, &state, event.now, due, kind)?;
         if terminal(record.state()) {
-            meta.terminal_until = Some(wall.saturating_add(meta.retention_ttl_ms));
+            meta.terminal_until = Some(event.now.max(wall).saturating_add(meta.retention_ttl_ms));
         }
         let priority = entry.priority;
         let mut history = HistoryEvent::of(&record, priority, &meta, &event.parent.0);
