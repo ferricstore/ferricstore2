@@ -15,4 +15,5 @@ mod state_keys;
 #[path = "state_values/main.rs"]
 mod state_values;
 
+mod cold_files;
 mod snapshot_files;

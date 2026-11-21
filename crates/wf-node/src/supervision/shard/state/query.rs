@@ -93,10 +93,7 @@ impl ShardState {
         let Some(id) = query.run_id() else {
             return Vec::new();
         };
-        let Some((key, entry)) = self
-            .records
-            .get_key_value(&(partition.clone(), id.to_vec()))
-        else {
+        let Some((key, entry)) = self.seen_kv(&(partition.clone(), id.to_vec())) else {
             return Vec::new();
         };
         let meta = entry.meta.as_deref().unwrap_or(&defaults);

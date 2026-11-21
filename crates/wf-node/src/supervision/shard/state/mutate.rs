@@ -216,10 +216,10 @@ impl ShardState {
     ) -> Result<(Term, Option<super::Logged>), ServiceError> {
         let now = mutation.now_ms.unwrap_or(wall);
         let key: Key = flow_key(partition, mutation.id.clone());
+        self.warm(&key)?;
         let defaults = self.defaults();
         let entry = self
-            .records
-            .get(&key)
+            .hot(&key)
             .ok_or_else(|| ServiceError::rejected("ERR flow not found".to_owned()))?;
         let command = CommittedCommand {
             id: RecordId::new(mutation.id.clone()).map_err(|_| ServiceError::InvalidId)?,
@@ -315,10 +315,13 @@ impl ShardState {
         let mut saved: Vec<(Key, Option<Saved>)> = Vec::new();
         for (position, mutation, partition) in items {
             let key: Key = flow_key(partition.clone(), mutation.id.clone());
-            if atomic {
+            // A finished Flow on disk is loaded first, so the save holds it
+            // (ADR-016); one that cannot be read fails like a refusal.
+            let loaded = self.warm(&key);
+            if atomic && loaded.is_ok() {
                 saved.push((key.clone(), self.save(&key)));
             }
-            match self.try_mutate(wall, &mutation, partition) {
+            match loaded.and_then(|()| self.try_mutate(wall, &mutation, partition)) {
                 Ok((reply, change)) => {
                     logged.extend(change);
                     replies.push((position, Ok(reply)));
@@ -346,7 +349,7 @@ impl ShardState {
     }
 
     fn save(&self, key: &Key) -> Option<Saved> {
-        self.records.get(key).map(|entry| Saved {
+        self.hot(key).map(|entry| Saved {
             record: entry.record.clone(),
             priority: entry.priority,
             meta: entry.meta.clone(),

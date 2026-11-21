@@ -25,7 +25,7 @@ impl ShardState {
     ) -> Executed {
         let key: Key = flow_key(partition, command.target().0.to_vec());
         let name = key.0.name();
-        let Some(entry) = self.records.get(&key) else {
+        let Some(entry) = self.hot(&key) else {
             if command.reads() {
                 return (Ok(decide::read(command, None, None)), None);
             }

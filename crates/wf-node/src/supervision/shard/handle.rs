@@ -130,6 +130,7 @@ pub(super) fn handle(
 ) -> Option<Finish> {
     let finish: Finish = match request {
         Request::Capture { snapshot, done } => {
+            // Stubs name durable images only (ADR-016).
             let image = state.image(now);
             logged.push(Logged::Marker {
                 snapshot,

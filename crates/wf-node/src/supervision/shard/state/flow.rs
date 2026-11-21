@@ -40,6 +40,12 @@ impl ShardState {
         command: FlowCommand,
         partition: Partition,
     ) -> Executed {
+        // A finished Flow on disk is loaded for the round (ADR-016).
+        if let Some((id, _)) = command.target()
+            && let Err(error) = self.warm(&(partition.clone(), id.to_vec()))
+        {
+            return (Err(error), None);
+        }
         match command {
             FlowCommand::Create(create) => {
                 let now = create.now_ms.unwrap_or(now);
@@ -90,15 +96,16 @@ impl ShardState {
     /// The reply map of the Flow under `key`, if stored.
     pub(super) fn record_term(&self, key: &Parts, include: &Include) -> Option<Term> {
         let defaults = self.defaults();
-        let (key, entry) = self.records.get_key_value(key)?;
-        Some(Self::view(key, entry, &defaults).term(include))
+        // A query row may name a finished Flow on disk (ADR-016).
+        let (key, entry) = self.seen_kv(key)?;
+        Some(Self::view(key, &entry, &defaults).term(include))
     }
 
     /// `FLOW.HISTORY`: the selected events, or none for a missing Flow.
     fn history_term(&self, query: &HistoryQuery, partition: Partition) -> Term {
         let key = (partition, query.id.clone());
         let defaults = self.defaults();
-        let Some((key, entry)) = self.records.get_key_value(&key) else {
+        let Some((key, entry)) = self.hot_kv(&key) else {
             return Term::List(Vec::new());
         };
         let meta = entry.meta.as_deref().unwrap_or(&defaults);
@@ -115,11 +122,9 @@ impl ShardState {
     fn get_flow(&self, get: &GetFlow, partition: Partition) -> Term {
         let key = (partition, get.id.clone());
         let defaults = self.defaults();
-        self.records
-            .get_key_value(&key)
-            .map_or(Term::Nil, |(key, entry)| {
-                Self::view(key, entry, &defaults).term(&get.include)
-            })
+        self.hot_kv(&key).map_or(Term::Nil, |(key, entry)| {
+            Self::view(key, entry, &defaults).term(&get.include)
+        })
     }
 
     /// Logs the stored Flow under `key` as its after-image.
@@ -134,7 +139,7 @@ impl ShardState {
         key: &Key,
         count: usize,
     ) -> Result<Logged, ServiceError> {
-        let entry = self.records.get(key).ok_or(ServiceError::Unavailable)?;
+        let entry = self.hot(key).ok_or(ServiceError::Unavailable)?;
         let latest = if count == 1 {
             entry.history.last().into_iter().collect()
         } else {
@@ -159,7 +164,7 @@ impl ShardState {
 
     fn create_flow(&mut self, now: u64, create: CreateFlow, partition: Partition) -> Executed {
         let key = flow_key(partition, create.id.clone());
-        if let Some(existing) = self.records.get(&key) {
+        if let Some(existing) = self.hot(&key) {
             return (self.duplicate(&key, existing, &create), None);
         }
         let explicit = Some(create.partition_key.is_some());

@@ -94,8 +94,7 @@ impl ShardState {
 
     fn check_parent(&self, spawn: &SpawnChildren, key: &Key) -> Result<Option<()>, ServiceError> {
         let entry = self
-            .records
-            .get(key)
+            .hot(key)
             .ok_or_else(|| rejected("ERR flow not found"))?;
         let record = &entry.record;
         if let Some(group) = entry
@@ -146,7 +145,7 @@ impl ShardState {
         }
         let children: Vec<(Key, WorkflowRecord, u8, FlowMeta)> =
             self.prepare_children(spawn, &key, now)?;
-        let entry = self.records.get(&key).ok_or(ServiceError::Unavailable)?;
+        let entry = self.hot(&key).ok_or(ServiceError::Unavailable)?;
         let mut meta = entry
             .meta
             .as_deref()
@@ -187,7 +186,7 @@ impl ShardState {
         parent: &Key,
         now: u64,
     ) -> Result<Vec<(Key, WorkflowRecord, u8, FlowMeta)>, ServiceError> {
-        let entry = self.records.get(parent).ok_or(ServiceError::Unavailable)?;
+        let entry = self.hot(parent).ok_or(ServiceError::Unavailable)?;
         let root = entry
             .meta
             .as_deref()
@@ -278,7 +277,9 @@ impl ShardState {
     }
 
     fn child_finished(&mut self, wall: u64, event: &ChildEvent) -> Option<Logged> {
-        let entry = self.records.get(&event.parent)?;
+        // A parent that finished first may be on disk (ADR-016).
+        self.warm(&event.parent).ok()?;
+        let entry = self.hot(&event.parent)?;
         let mut meta = entry.meta.as_deref()?.clone();
         let group = meta
             .child_groups

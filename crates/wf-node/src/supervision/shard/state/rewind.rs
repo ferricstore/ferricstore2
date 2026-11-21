@@ -124,8 +124,7 @@ impl ShardState {
         let key: Key = flow_key(partition, request.id.clone());
         let defaults = self.defaults();
         let entry = self
-            .records
-            .get(&key)
+            .hot(&key)
             .ok_or_else(|| rejected("ERR flow not found"))?;
         let record = &entry.record;
         let current = entry.meta.as_deref().unwrap_or(&defaults);

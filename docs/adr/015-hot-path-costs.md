@@ -86,6 +86,19 @@ Flows/s and RSS after the run.
    to 7.5), RSS 469 to 485 MB (was 556 to 561); at 1.6M Flows 3.5 GB (was
    3.7).
 
+## Measured and left for the storage redesign
+
+A re-profile at 4091647 (1.6M Flows, 4 clients) puts the node's busy time
+in the device flush (18%), memory copies (16%), allocation (11%), socket
+writes (7.6%), history packing (5.3%), B-tree updates (4.7%) and number
+formatting (3.1%), each now spread over many sites: growing buffers,
+history event building, cloning a record that turns terminal, snapshot
+image encoding. Interning type and state names would save mostly memory
+(two allocations per record); timing-wheel due queues would touch the 4.7%
+B-tree share, most of it the catalog. Both are left to ADR-016, which
+decides what a Flow keeps in memory at all: today every finished Flow
+stays in memory with its history for its whole retention.
+
 ## Consequences
 
 The binary links mimalloc's C code, built by `cc`; cargo-deny passes. At

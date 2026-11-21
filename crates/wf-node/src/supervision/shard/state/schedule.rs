@@ -80,7 +80,7 @@ fn terminal(state: &[u8]) -> bool {
 
 impl ShardState {
     fn stored(&self, key: &Key) -> Option<Stored> {
-        let entry = self.records.get(key)?;
+        let entry = self.hot(key)?;
         let record = &entry.record;
         if record.workflow_type() != SCHEDULE_TYPE.as_bytes() {
             return None;
@@ -134,14 +134,13 @@ impl ShardState {
             .map_err(|_| ServiceError::Unavailable)?;
         let record = restore_record(data, limits)
             .map_err(|_| rejected("ERR flow schedule definition too large"))?;
-        let priority = self.records.get(key).map_or(0, |entry| entry.priority);
+        let priority = self.hot(key).map_or(0, |entry| entry.priority);
         self.put(key.clone(), (record, priority, Some(Box::new(meta))), None);
         self.after_image(key)
     }
 
     fn meta_of(&self, key: &Key) -> FlowMeta {
-        self.records
-            .get(key)
+        self.hot(key)
             .and_then(|entry| entry.meta.as_deref().cloned())
             .unwrap_or_else(|| FlowMeta {
                 history_max_events: HISTORY_MAX_EVENTS,
@@ -159,7 +158,7 @@ impl ShardState {
     ) -> Result<(Stored, Logged), ServiceError> {
         definition.secret = query::cursor_key().to_vec();
         let next = definition.next_run_at_ms.map(TimestampMillis::new);
-        let data = match self.records.get(key) {
+        let data = match self.hot(key) {
             Some(_) if !overwrite => return Err(rejected("ERR flow already exists")),
             Some(entry) if entry.record.lease().is_some() => {
                 return Err(rejected(
@@ -218,7 +217,7 @@ impl ShardState {
         (now, worker, lease_ms): (u64, &[u8], u64),
     ) -> Result<(Claimed, Logged), ServiceError> {
         let stored = self.stored(key).ok_or_else(not_found)?;
-        let entry = self.records.get(key).ok_or_else(not_found)?;
+        let entry = self.hot(key).ok_or_else(not_found)?;
         let expired = entry
             .record
             .lease()
@@ -277,7 +276,7 @@ impl ShardState {
         apply: Apply,
         (now, wall): (u64, u64),
     ) -> Result<(Stored, Logged), ServiceError> {
-        let entry = self.records.get(key).ok_or_else(not_found)?;
+        let entry = self.hot(key).ok_or_else(not_found)?;
         let held = entry
             .record
             .lease()
@@ -332,7 +331,7 @@ impl ShardState {
         now: u64,
     ) -> Result<(Stored, Logged), ServiceError> {
         let stored = self.stored(key).ok_or_else(not_found)?;
-        let entry = self.records.get(key).ok_or_else(not_found)?;
+        let entry = self.hot(key).ok_or_else(not_found)?;
         let mut data = data_of(&entry.record);
         if pause {
             if stored.state.as_slice() != b"active" {
@@ -366,7 +365,7 @@ impl ShardState {
         if terminal(&stored.state) {
             return Err(rejected("ERR flow is terminal; use FLOW.REWIND"));
         }
-        let entry = self.records.get(key).ok_or_else(not_found)?;
+        let entry = self.hot(key).ok_or_else(not_found)?;
         let mut data = data_of(&entry.record);
         data.state = b"cancelled".to_vec();
         data.lease = None;

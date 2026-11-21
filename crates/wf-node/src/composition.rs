@@ -9,6 +9,7 @@
 
 mod claim;
 mod cleanup;
+mod cold;
 mod credit;
 mod error;
 mod flow;
@@ -35,7 +36,6 @@ use wf_domain::retention::ResolvedRetention;
 use wf_storage::log::{GroupLog, GroupLogLimits};
 use wf_storage::snapshot::files::SnapshotFiles;
 
-use crate::supervision::shard::state::ShardState;
 use crate::supervision::shard::{self, Links, Request};
 use crate::supervision::waiters::Waiters;
 use crate::supervision::{self, completer, scheduler, snapshots};
@@ -151,9 +151,7 @@ impl QueueNode {
             return Err(NodeError::InvalidShards);
         }
         let files = SnapshotFiles::open(&directory.join("snapshots"))?;
-        let mut states: Vec<ShardState> = (0..config.shards)
-            .map(|_| ShardState::new(config.retention_ms))
-            .collect();
+        let (cold, mut states) = cold::shards(directory, &config)?;
         let mut cut = match files.newest()? {
             Some((id, body)) => Some(snapshot::load(&mut states, id, &body, config.shards)?),
             None => None,
@@ -161,6 +159,7 @@ impl QueueNode {
         let (log, recovered) = GroupLog::open(&directory.join("log"), config.log)?;
         let log = Arc::new(log);
         let newest_marker = replay(&mut states, &recovered.records, config.shards, cut.as_mut())?;
+        cold::tidy(&cold, &mut states)?;
         let (next, base) = match &cut {
             Some(cut) => (cut.id.max(newest_marker), cut.base),
             None => (

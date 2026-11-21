@@ -7,6 +7,7 @@
 
 use wf_domain::workflow::{Outcome, WorkflowStatus};
 
+use super::cold::Slot;
 use super::{Entry, Key, Logged, Parts, ShardState};
 
 fn terminal(entry: &Entry) -> bool {
@@ -65,17 +66,19 @@ impl ShardState {
     /// terminal.
     pub(super) fn expire(&mut self, keys: &[Parts]) -> Outcome {
         let removable = !keys.is_empty()
-            && keys
-                .iter()
-                .all(|key| self.records.get(key).is_some_and(|entry| terminal(entry)));
+            && keys.iter().all(|key| match self.records.get(key) {
+                Some(Slot::Cold(_)) => true,
+                Some(Slot::Hot(entry) | Slot::Warm(entry, _)) => terminal(entry),
+                None => false,
+            });
         if !removable {
             return Outcome::NotEligible;
         }
         for key in keys {
-            if let Some((stored, entry)) = self.records.remove_entry(key) {
-                self.unindex(&stored, &entry);
-                self.unschedule_removal(&entry);
-                self.unschedule_deadline(&entry);
+            if matches!(self.records.get(key), Some(Slot::Cold(_))) {
+                self.remove_cold(key);
+            } else if let Some(entry) = self.take_entry_parts(key) {
+                drop(entry);
             }
         }
         Outcome::Changed

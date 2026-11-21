@@ -20,6 +20,7 @@ use wf_domain::lease::{Lease, LeaseToken};
 use wf_domain::workflow::WorkflowRecord;
 use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
+use wf_storage::cold::Location;
 use wf_types::identity::RecordId;
 use wf_types::version::{Fence, TimestampMillis};
 
@@ -248,11 +249,17 @@ pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
             reader.bin().ok()?.to_vec(),
         ));
     }
+    let stub_count = reader.u64().ok()?;
+    let mut stubs = Vec::new();
+    for _ in 0..stub_count {
+        stubs.push(decode_stub(&mut reader).ok()?);
+    }
     reader.0.is_empty().then_some(Image {
         records,
         shared,
         policies,
         governance,
+        stubs,
     })
 }
 
@@ -264,6 +271,77 @@ pub(crate) struct Image {
     pub(crate) shared: Vec<SharedValue>,
     pub(crate) policies: Vec<(Vec<u8>, u64, Vec<u8>)>,
     pub(crate) governance: Vec<(u8, Vec<u8>, Vec<u8>)>,
+    /// Finished Flows on disk (ADR-016).
+    pub(crate) stubs: Vec<StubImage>,
+}
+
+/// A finished Flow on disk as a shard image keeps it (ADR-016): where its
+/// image is, and what its catalog and removal entries need.
+pub(crate) struct StubImage {
+    pub(crate) partition: Partition,
+    pub(crate) id: Vec<u8>,
+    pub(crate) location: Location,
+    pub(crate) flow_type: Vec<u8>,
+    pub(crate) state: Vec<u8>,
+    pub(crate) updated_at: u64,
+    pub(crate) priority: u8,
+    pub(crate) removal: u64,
+    pub(crate) history: u64,
+    pub(crate) values: u64,
+}
+
+/// A stub to image: key, location, type, state, update time, priority,
+/// removal time, history and value counts.
+pub(crate) type StubEntry<'a> = (
+    (&'a Partition, &'a [u8]),
+    Location,
+    (&'a [u8], &'a [u8]),
+    (u64, u8, u64),
+    (u64, u64),
+);
+
+/// Writes the stub section, after the governance section.
+pub(crate) fn encode_stubs(out: &mut Vec<u8>, stubs: &[StubEntry<'_>]) -> Option<()> {
+    out.extend_from_slice(&u64::try_from(stubs.len()).ok()?.to_be_bytes());
+    for ((partition, id), location, (flow_type, state), (updated, priority, removal), counts) in
+        stubs
+    {
+        bin(out, &partition.name())?;
+        bin(out, id)?;
+        for number in [location.file, location.offset, u64::from(location.length)] {
+            out.extend_from_slice(&number.to_be_bytes());
+        }
+        bin(out, flow_type)?;
+        bin(out, state)?;
+        out.extend_from_slice(&updated.to_be_bytes());
+        out.push(*priority);
+        for number in [*removal, counts.0, counts.1] {
+            out.extend_from_slice(&number.to_be_bytes());
+        }
+    }
+    Some(())
+}
+
+fn decode_stub(reader: &mut Reader<'_>) -> Result<StubImage, Malformed> {
+    let partition = Partition::parse(reader.bin()?);
+    let id = reader.bin()?.to_vec();
+    let location = Location {
+        file: reader.u64()?,
+        offset: reader.u64()?,
+        length: u32::try_from(reader.u64()?).map_err(|_| Malformed)?,
+    };
+    Ok(StubImage {
+        partition,
+        id,
+        location,
+        flow_type: reader.bin()?.to_vec(),
+        state: reader.bin()?.to_vec(),
+        updated_at: reader.u64()?,
+        priority: reader.u8()?,
+        removal: reader.u64()?,
+        history: reader.u64()?,
+        values: reader.u64()?,
+    })
 }
 
 /// A shared value in a shard image.

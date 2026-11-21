@@ -245,6 +245,8 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
             logged.extend(state.sweep(now, MAX_REMOVALS_PER_ROUND));
         }
         if round.is_empty() && logged.is_empty() && !state.has_credit_releases() {
+            // Answers from the cold writer still turn Flows into stubs.
+            state.cool();
             continue;
         }
         let mut finishes: Vec<Finish> = round
@@ -264,6 +266,9 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
                 None => failed = true,
             }
         }
+        // Flows loaded for the round go back to disk; Flows that finished
+        // move there (ADR-016).
+        state.cool();
         links.ready.store(state.ready(), Ordering::Relaxed);
         links.leased.store(state.leased(), Ordering::Relaxed);
         // A FIFO lane whose head left it has a new head to claim.

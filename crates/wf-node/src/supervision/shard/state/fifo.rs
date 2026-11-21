@@ -21,6 +21,7 @@ use wf_application::commands::queue::{ClaimFlows, Partition, ServiceError};
 use wf_domain::workflow::WorkflowRecord;
 
 use super::super::super::waiters::Arrival;
+use super::cold::Slot;
 use super::{Entry, Key, Queue, RUNNING, ShardState};
 
 /// Lanes by type and logical state, then partition: `(sequence, id)`.
@@ -169,9 +170,14 @@ impl ShardState {
         if !self.laned(flow_type) {
             return;
         }
+        // Lanes hold live Flows, which are always in memory (ADR-016).
         let members: Vec<(Key, (Vec<u8>, u64))> = self
             .records
             .iter()
+            .filter_map(|(key, slot)| match slot {
+                Slot::Hot(entry) => Some((key, &**entry)),
+                Slot::Warm(..) | Slot::Cold(_) => None,
+            })
             .filter(|(_, entry)| {
                 entry.record.workflow_type() == flow_type && !terminal(entry.record.state())
             })
@@ -220,7 +226,7 @@ impl ShardState {
             let Some((_, head)) = members.first() else {
                 continue;
             };
-            let Some((key, entry)) = self.records.get_key_value(head) else {
+            let Some((key, entry)) = self.hot_kv(head) else {
                 continue;
             };
             let waiting = entry.record.state() == queue.state.as_slice()

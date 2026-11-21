@@ -129,8 +129,7 @@ impl ShardState {
         let key: Key = flow_key(partition, owner.to_vec());
         let defaults = self.defaults();
         let entry = self
-            .records
-            .get(&key)
+            .hot(&key)
             .ok_or_else(|| ServiceError::rejected("ERR flow not found".to_owned()))?;
         let mut meta = entry.meta.as_deref().cloned().unwrap_or(defaults);
         let before = meta.values.get(name).map(|value| value.version);
@@ -278,7 +277,7 @@ impl ShardState {
         let defaults = self.defaults();
         match parsed.target {
             ValueRef::Flow { kind, id, version } => {
-                let entry = self.records.get(&(partition, id))?;
+                let entry = self.seen(&(partition, id))?;
                 let meta = entry.meta.as_deref().unwrap_or(&defaults);
                 let record = &entry.record;
                 let (bytes, stored) = match kind {
@@ -295,7 +294,7 @@ impl ShardState {
                 name,
                 version,
             } => {
-                let entry = self.records.get(&(partition, owner))?;
+                let entry = self.seen(&(partition, owner))?;
                 let value = entry.meta.as_deref()?.values.get(&name)?;
                 (value.version == version).then(|| value.bytes.clone())
             }
@@ -311,7 +310,7 @@ impl ShardState {
             return None;
         };
         let partition = self.partition_for_tag(&parsed.tag)?;
-        let entry = self.records.get(&(partition, id))?;
+        let entry = self.seen(&(partition, id))?;
         let meta = entry.meta.as_deref()?;
         let bytes = match kind {
             b'e' if meta.error_term && meta.error_version == version => entry.record.error()?,

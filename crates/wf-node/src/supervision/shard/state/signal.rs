@@ -87,8 +87,7 @@ impl ShardState {
         let key: Key = flow_key(partition, signal.id.clone());
         let defaults = self.defaults();
         let entry = self
-            .records
-            .get(&key)
+            .hot(&key)
             .ok_or_else(|| rejected("ERR flow not found"))?;
         let mut meta = entry.meta.as_deref().cloned().unwrap_or(defaults);
         let digest = signal.digest();

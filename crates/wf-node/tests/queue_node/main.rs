@@ -17,6 +17,7 @@ use wf_node::composition::{QueueNode, QueueNodeConfig};
 
 mod audit;
 mod blocking;
+mod cold;
 mod crash;
 mod flow_approval;
 mod flow_budget;

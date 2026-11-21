@@ -209,7 +209,7 @@ impl ShardState {
                 .records
                 .as_ref()
                 .and_then(|include| self.record_term(&key, include));
-            if let Some(entry) = self.records.get(&key) {
+            if let Some(entry) = self.hot(&key) {
                 taken.claimed.push(ClaimedFlow {
                     id: key.1.clone(),
                     partition: key.0.name(),
@@ -266,7 +266,7 @@ impl ShardState {
         found
             .into_iter()
             .filter_map(|(_, _, key)| {
-                let record = &self.records.get(key)?.record;
+                let record = &self.hot(key)?.record;
                 Some((key.clone(), record.state().to_vec(), record.fence().get()))
             })
             .collect()

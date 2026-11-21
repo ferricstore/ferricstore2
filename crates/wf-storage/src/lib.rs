@@ -7,6 +7,7 @@
 #![forbid(unsafe_code)]
 
 pub mod blob;
+pub mod cold;
 pub mod log;
 pub mod snapshot;
 pub mod state;

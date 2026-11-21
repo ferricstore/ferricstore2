@@ -33,6 +33,9 @@ pub enum NodeError {
     Capture,
     /// The node is stopping.
     Stopped,
+    /// The cold files of finished Flows could not be opened or tidied
+    /// (ADR-016).
+    Cold,
 }
 
 impl fmt::Display for NodeError {
@@ -49,6 +52,7 @@ impl fmt::Display for NodeError {
             }
             Self::Capture => formatter.write_str("a shard did not capture its snapshot"),
             Self::Stopped => formatter.write_str("the node is stopping"),
+            Self::Cold => formatter.write_str("cold files of finished Flows refused to open"),
         }
     }
 }

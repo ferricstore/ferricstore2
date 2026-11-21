@@ -19,6 +19,7 @@ use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_types::version::TimestampMillis;
 
+use super::cold::{Slot, values};
 use super::{Entry, Key, Logged, ShardState};
 
 /// Elixir's `flow_retention_sweeper_interval_ms` and initial delay.
@@ -83,7 +84,7 @@ impl ShardState {
     }
 
     fn time_out_one(&mut self, wall: u64, now: u64, key: &Key) -> Option<Logged> {
-        let entry = self.records.get(key)?;
+        let entry = self.hot(key)?;
         let mut meta = entry.meta.as_deref()?.clone();
         let Some(MaxActive::Ms(limit)) = meta.max_active_ms else {
             return None;
@@ -140,35 +141,29 @@ impl ShardState {
         let mut logged = self.time_out(wall, now, max);
         let timeouts = logged.len();
         let remaining = max.saturating_sub(timeouts);
-        let removable: Vec<&Entry> = self
+        // Counted from memory: a finished Flow on disk keeps its counts in
+        // its stub (ADR-016).
+        let counts: Vec<(u64, u64)> = self
             .expiries
             .range(..=(now, u64::MAX))
             .take(remaining)
-            .filter_map(|(_, key)| self.records.get(key).map(|entry| &**entry))
-            .collect();
-        let flows = removable.len();
-        let history: u64 = removable
-            .iter()
-            .map(|entry| u64::from(entry.history.len()))
-            .sum();
-        let values: usize = removable
-            .iter()
-            .map(|entry| {
-                let record = &entry.record;
-                let named = entry.meta.as_ref().map_or(0, |meta| meta.values.len());
-                [record.payload(), record.result(), record.error()]
-                    .iter()
-                    .flatten()
-                    .count()
-                    .saturating_add(named)
+            .filter_map(|(_, key)| self.records.get(&**key))
+            .map(|slot| match slot {
+                Slot::Hot(entry) | Slot::Warm(entry, _) => {
+                    (u64::from(entry.history.len()), u64::from(values(entry)))
+                }
+                Slot::Cold(stub) => (u64::from(stub.history), u64::from(stub.values)),
             })
-            .sum();
+            .collect();
+        let flows = counts.len();
+        let history: u64 = counts.iter().map(|(history, _)| history).sum();
+        let values: u64 = counts.iter().map(|(_, values)| values).sum();
         logged.extend(self.sweep(now, remaining));
         let count = |value: usize| u64::try_from(value).unwrap_or(u64::MAX);
         let cleaned = Cleaned {
             flows: count(flows),
             history,
-            values: count(values),
+            values,
             active_timeouts: count(timeouts),
         };
         (cleaned, logged)

@@ -13,6 +13,7 @@ mod capture;
 mod catalog;
 mod children;
 mod claim;
+mod cold;
 pub(crate) mod credit;
 mod effect;
 pub(crate) mod events;
@@ -83,9 +84,9 @@ struct Queue {
 
 /// Records of one shard and their due index.
 pub(crate) struct ShardState {
-    /// Boxed, so the table moves pointers, not whole Flows, when it grows
-    /// or a change takes a Flow out and puts it back (ADR-015).
-    records: Map<Key, Box<Entry>>,
+    /// Hot Flows boxed, so the table moves pointers when it grows or a
+    /// change takes a Flow out (ADR-015); finished ones on disk (ADR-016).
+    records: Map<Key, cold::Slot>,
     /// Due time and creation sequence to record key, per queue.
     queues: Map<Queue, BTreeMap<(u64, u64), Key>>,
     /// Removal time and creation sequence to key, for terminal records.
@@ -123,6 +124,8 @@ pub(crate) struct ShardState {
     catalog: catalog::Catalog,
     /// The key of the query cursors this shard issues (step 12).
     cursor_key: [u8; 32],
+    /// Finished Flows' cold files (ADR-016).
+    cold: cold::Cold,
 }
 
 fn valid_id(id: &[u8]) -> Result<(), ServiceError> {
@@ -138,8 +141,15 @@ fn token(bytes: &[u8]) -> Result<LeaseToken, ServiceError> {
 }
 
 impl ShardState {
-    /// An empty shard that keeps terminal records for `retention_ms`.
-    pub(crate) fn new(retention_ms: u64) -> Self {
+    /// An empty shard that keeps terminal records for `retention_ms`, on
+    /// disk in `cold` (ADR-016).
+    pub(crate) fn new(
+        retention_ms: u64,
+        (cold, queue): (
+            Arc<wf_storage::cold::ColdStore>,
+            Arc<wf_storage::cold::ColdQueue>,
+        ),
+    ) -> Self {
         Self {
             records: Map::default(),
             queues: Map::default(),
@@ -162,6 +172,7 @@ impl ShardState {
             timeouts_due: 0,
             catalog: Map::default(),
             cursor_key: query::cursor_key(),
+            cold: cold::Cold::new(cold, queue),
         }
     }
 
@@ -323,7 +334,8 @@ impl ShardState {
             operation,
         };
         let key = flow_key(partition.clone(), id.clone());
-        let current = self.records.get(&key).map(|entry| &entry.record);
+        self.warm(&key)?;
+        let current = self.hot(&key).map(|entry| &entry.record);
         let (outcome, write, _history) = workflow::reduce(current, &command)
             .map_err(ServiceError::Domain)?
             .into_parts();

@@ -174,7 +174,7 @@ impl ShardState {
         );
     }
 
-    fn sequence(&mut self) -> u64 {
+    pub(super) fn sequence(&mut self) -> u64 {
         let sequence = self.next_sequence;
         self.next_sequence = self.next_sequence.saturating_add(1);
         sequence
@@ -182,17 +182,29 @@ impl ShardState {
 
     /// Removes a record and its index entries.
     pub(super) fn take_entry(&mut self, key: &Key) -> Option<Box<Entry>> {
-        let previous = self.records.remove(key)?;
+        let previous = self.take_slot(key)?;
         self.unindex(key, &previous);
         self.unschedule_removal(&previous);
         self.unschedule_deadline(&previous);
         Some(previous)
     }
 
+    /// [`Self::take_entry`] by a lookup pair.
+    pub(super) fn take_entry_parts(&mut self, key: &super::Parts) -> Option<Box<Entry>> {
+        let stored = self
+            .records
+            .get_key_value(key)
+            .map(|(stored, _)| stored.clone())?;
+        self.take_entry(&stored)
+    }
+
     fn insert(&mut self, key: Key, entry: Box<Entry>) {
         self.index(&key, &entry);
         self.schedule_removal(&key, &entry);
         self.schedule_deadline(&key, &entry);
-        self.records.insert(key, entry);
+        if terminal(entry.record.state()) {
+            self.cold.demote.push(key.clone());
+        }
+        self.records.insert(key, super::cold::Slot::Hot(entry));
     }
 }

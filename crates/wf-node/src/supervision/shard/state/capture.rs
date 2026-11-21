@@ -3,6 +3,7 @@
 use wf_application::commands::flow::history;
 
 use super::super::image::{self, Restored};
+use super::cold::{Slot, Stub};
 use super::events::History;
 use super::{Entry, Key, ShardState, flow_key};
 
@@ -13,7 +14,10 @@ impl ShardState {
         let mut entries: Vec<(&Key, &Entry)> = self
             .records
             .iter()
-            .map(|(key, entry)| (key, &**entry))
+            .filter_map(|(key, slot)| match slot {
+                Slot::Hot(entry) => Some((key, &**entry)),
+                Slot::Warm(..) | Slot::Cold(_) => None,
+            })
             .collect();
         entries.sort_unstable_by_key(|(_, entry)| entry.sequence);
         let mut out = Vec::new();
@@ -58,7 +62,45 @@ impl ShardState {
         image::encode_policies(&mut out, &policies)?;
         let records: Vec<(u8, &[u8], &[u8])> = self.governance_records().collect();
         image::encode_governance(&mut out, records.into_iter())?;
+        let mut stubs: Vec<(&Key, &Stub)> = self
+            .records
+            .iter()
+            .filter_map(|(key, slot)| match slot {
+                Slot::Warm(_, stub) | Slot::Cold(stub) => Some((key, stub)),
+                Slot::Hot(_) => None,
+            })
+            .collect();
+        stubs.sort_unstable_by_key(|(_, stub)| stub.sequence);
+        let stubs: Vec<image::StubEntry<'_>> = stubs
+            .into_iter()
+            .map(|(key, stub)| {
+                (
+                    (&key.0, key.1.as_slice()),
+                    stub.location,
+                    (&*stub.flow_type, &*stub.state),
+                    (stub.updated_at, stub.priority, stub.removal),
+                    (u64::from(stub.history), u64::from(stub.values)),
+                )
+            })
+            .collect();
+        image::encode_stubs(&mut out, &stubs)?;
         Some(out)
+    }
+
+    /// Restores a finished Flow on disk from a snapshot image (ADR-016).
+    pub(crate) fn restore_stub(&mut self, image: image::StubImage) {
+        let key = flow_key(image.partition, image.id);
+        let sequence = self.sequence();
+        self.catalog_insert_at(&key, (&image.flow_type, &image.state, image.updated_at));
+        self.expiries.insert((image.removal, sequence), key.clone());
+        self.cold_store().hold(image.location.file, 1);
+        let stub = self.stub(
+            image.location,
+            (&image.flow_type, &image.state),
+            (image.updated_at, sequence, image.priority, image.removal),
+            (image.history, image.values),
+        );
+        self.records.insert(key, Slot::Cold(stub));
     }
 
     /// Stores a record from a snapshot image, indexed like any other.

@@ -65833,3 +65833,45 @@ to 7.2 ms CPU per 1k Flows (was 7.4 to 7.5), RSS 469 to 485 MB (was 556 to
 suites pass.
 `state::key` (new, same review) holds `Key`, `Parts`, `flow_key` and the
 `Map` alias, keeping `state.rs` under the 400-line limit.
+
+### ADR016-A Finished Flows on disk
+
+New artifacts (solo design review): ADR-016; `wf_storage::cold`
+(`ColdStore`, `ColdWriter`, `Location`, `ColdError`; child `queue` with
+`ColdQueue`, `ColdBatch` and the `wf-cold` writer thread, listed as a
+thread owner and a durable-sync module); in `wf-node`
+`supervision::shard::state::cold` (`Slot`, `Stub`, `Seen`, `Cold`; child
+`settle` with `Ack`), `composition::cold` (`shards`, `tidy`),
+`image::StubImage`, `image::StubEntry`, `image::encode_stubs`,
+`NodeError::Cold`, `ShardState::{hot, hot_kv, seen, seen_kv, warm,
+take_slot, remove_cold, cool, settle_cold, restore_stub, cold_files}`,
+`catalog_insert_at`/`catalog_remove_at`. Shard images carry a stub
+section (snapshot version 12).
+
+Decisions: a Flow that finishes is encoded at the end of its round and
+handed to one cold writer thread, which writes every queued image, syncs
+each file once and answers; the Flow becomes a stub only once its image is
+durable and unchanged, so no shard thread waits on a file and every stub a
+snapshot holds names durable bytes. Commands load a cold Flow for their
+round (`warm`) and an unchanged one returns to its stub without a write;
+scans read without keeping (`seen`). Indexes stay as they were (they are
+computed from fields the stub keeps). Files are per removal hour and are
+deleted once sealed and unnamed; after replay the node waits for replay's
+images, then removes files no stub names. Schedules stay in memory. A
+first version wrote cold files on the shard threads, which then spent
+about half their time blocked in `write` (5-s profile, 16 shards): 10%
+less throughput; the writer thread replaced it.
+
+Evidence: 4 new tests (`cold::`) for reads after a snapshot and a restart
+with another shard count, a crash before a snapshot, a rewind back from
+disk and retention; making cold reads return nothing fails two of them.
+The 129 earlier node tests pass with finished Flows on disk, as do the
+storage tests (4 new in `cold_files`). Measured idle after 1.6M Flows (4
+SDK clients, `mem.sh`): physical footprint 1.45 GB (was 2.1 GB, -31%), RSS
+1.9 GB (was 3.5 GB), 822 MB of cold files. Three alternating 400k runs
+against 4091647: 8.8 to 9.0 ms CPU per 1k Flows (was 7.2 to 7.4, +22%:
+encoding each finished Flow and writing it), 277k to 287k Flows/s (was
+292k to 302k). The tests were written after the code, so no TDD is
+claimed. Open: the CPU cost (history is decoded and encoded again for
+each image), and memory per finished Flow (about 900 bytes left, against
+an estimated 330 for stub, key, catalog and removal entries).

@@ -104,6 +104,12 @@ pub(crate) fn load(
                 .ok_or(NodeError::SnapshotImage)?;
             state.restore(restored);
         }
+        for stub in decoded.stubs {
+            let state = shard_index(&stub.partition, shards)
+                .and_then(|index| states.get_mut(index))
+                .ok_or(NodeError::SnapshotImage)?;
+            state.restore_stub(stub);
+        }
     }
     Ok(Cut::new(id, base, count))
 }

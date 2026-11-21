@@ -89,7 +89,7 @@ impl ShardState {
     /// the Flow's after-image.
     pub(super) fn stamp_credit(&mut self, key: &Key, credit: Credit) -> bool {
         let defaults = self.defaults();
-        let Some(entry) = self.records.get(key) else {
+        let Some(entry) = self.hot(key) else {
             return false;
         };
         let mut meta = entry.meta.as_deref().cloned().unwrap_or(defaults);

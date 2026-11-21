@@ -5,9 +5,9 @@ worker_port_module = "client"
 worker_wire_modules = ["client::http", "client::tcp"]
 # ADR-010: runtime effect owners. Test sources and tooling packages are exempt.
 filesystem_packages = ["wf-storage"]
-durable_sync_modules = ["wf-storage::log::store", "wf-storage::log::group", "wf-storage::state::redb::store", "wf-storage::state::redb::snapshot::stage", "wf-storage::snapshot::files"]
+durable_sync_modules = ["wf-storage::cold", "wf-storage::log::store", "wf-storage::log::group", "wf-storage::state::redb::store", "wf-storage::state::redb::snapshot::stage", "wf-storage::snapshot::files"]
 # ADR-011: the group log writer thread.
-thread_owner_modules = ["wf-storage::log::group::writer", "wf-node::supervision"]
+thread_owner_modules = ["wf-storage::log::group::writer", "wf-storage::cold::queue", "wf-node::supervision"]
 
 [packages.wf-types]
 kind = "runtime"
@@ -47,7 +47,7 @@ external_normal = [
 kind = "runtime"
 normal = ["wf-types", "wf-domain", "wf-ports"]
 dev = ["wf-test-support"]
-modules = { log = true, state = true, transaction = true, snapshot = true, blob = true }
+modules = { log = true, state = true, transaction = true, snapshot = true, blob = true, cold = true }
 external_normal = [
   # ADR-015: group log block checksums.
   { name = "crc32fast", version = "=1.5.5", features = ["std"], default_features = false },

@@ -39,7 +39,15 @@ fn place(entry: &Entry) -> (&[u8], &[u8], u64) {
 
 impl ShardState {
     pub(super) fn catalog_insert(&mut self, key: &Key, entry: &Entry) {
-        let (flow_type, state, updated) = place(entry);
+        self.catalog_insert_at(key, place(entry));
+    }
+
+    /// Adds the member `key` placed by type, state and update time.
+    pub(super) fn catalog_insert_at(
+        &mut self,
+        key: &Key,
+        (flow_type, state, updated): (&[u8], &[u8], u64),
+    ) {
         // The usual case finds every level present, so nothing is copied
         // but the member.
         if let Some(members) = self
@@ -62,7 +70,15 @@ impl ShardState {
     }
 
     pub(super) fn catalog_remove(&mut self, key: &Key, entry: &Entry) {
-        let (flow_type, state, updated) = place(entry);
+        self.catalog_remove_at(key, place(entry));
+    }
+
+    /// Removes the member `key` placed by type, state and update time.
+    pub(super) fn catalog_remove_at(
+        &mut self,
+        key: &Key,
+        (flow_type, state, updated): (&[u8], &[u8], u64),
+    ) {
         let Some(states) = self.catalog.get_mut(flow_type) else {
             return;
         };
@@ -132,14 +148,15 @@ impl ShardState {
 
     /// Counts each Flow of one partition's members.
     fn visit(&self, counter: &mut Counter<'_>, (state, members): (&[u8], &Members), now: u64) {
-        let entries = members.iter().filter_map(|(_, key)| self.records.get(key));
+        // Finished Flows on disk are read, not kept (ADR-016).
+        let entries = members.iter().filter_map(|(_, key)| self.seen(key));
         for entry in entries {
             let meta = entry.meta.as_deref();
             counter.add(&Seen {
                 state,
                 leased: entry.record.lease().is_some(),
                 expired: self
-                    .removal_slot(entry)
+                    .removal_slot(&entry)
                     .is_some_and(|(until, _)| until <= now),
                 attributes: meta.map_or(&NO_ATTRIBUTES, |meta| &meta.attributes),
                 indexed: meta.map_or(&[], |meta| meta.indexed_attributes.as_slice()),
@@ -155,8 +172,7 @@ impl ShardState {
         let leased = members
             .iter()
             .filter(|(_, key)| {
-                self.records
-                    .get(key)
+                self.hot(key)
                     .is_some_and(|entry| entry.record.lease().is_some())
             })
             .count();
