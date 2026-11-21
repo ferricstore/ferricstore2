@@ -67,6 +67,8 @@ external_normal = [
   # ADR-018: consensus for replicated groups (the released 0.10 line).
   { name = "openraft", version = "=0.10.1", features = ["tokio-rt"], default_features = false },
   { name = "sha2", version = "=0.11.0", features = [], default_features = false },
+  # ADR-018: Raft traffic between members.
+  { name = "tokio", version = "=1.54.1", features = ["io-util", "net", "rt-multi-thread", "sync", "time"], default_features = false },
 ]
 external_dev = [
   { name = "futures-util", version = "=0.3.34", features = [], default_features = false },

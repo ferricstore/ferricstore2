@@ -8,6 +8,7 @@
 mod cluster;
 mod machine;
 mod network;
+mod peer;
 mod suite;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
@@ -17,5 +18,6 @@ fn runtime() -> TestResult<tokio::runtime::Runtime> {
     Ok(tokio::runtime::Builder::new_multi_thread()
         .worker_threads(4)
         .enable_time()
+        .enable_io()
         .build()?)
 }

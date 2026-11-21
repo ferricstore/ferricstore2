@@ -66192,3 +66192,26 @@ leader's loss, 20 more commit under a new leader, the old leader restarts on
 its log and catches up to all 40; three seeded runs with 10% message loss,
 cut links and member restarts apply every acknowledged write exactly once
 at its acknowledged index on every member (5 repeated runs green, 11-15 s).
+
+### ADR-018 phase 2a: Raft traffic between members
+
+New artifacts (solo design review): `wf_consensus::group::wire` (private:
+`Request`, `Response` and their codecs) and `group::peer` (`serve`,
+`Peers`, `Link`); policy: `wf-consensus` may use Tokio (net, io-util,
+time) for this traffic, separate from client listeners (ADR-001).
+
+Decisions: `OpenRaft` gives each replication stream and each vote its own
+network client and calls it one request at a time, so a link keeps one
+connection with plain request and response frames (`u32` length, body) and
+reconnects after any failure; a member serves each connection's requests in
+order. The hand-written codec sends append entries (vote, previous and
+committed ids, entries with the storage codec's payload), votes and
+pre-votes, and their answers; conflict hints, which are optional, are not
+sent. Snapshots are refused until phase 3 (the node purges no log before
+then).
+
+Evidence: wire round-trip unit tests (every request and response kind,
+blank, proposal and membership entries) pass; three members over loopback
+TCP elect, replicate 30 writes, lose their leader and commit 10 more under
+the new one, identical on both survivors (1.9 s; the whole `wf-consensus`
+suite green three times in a row).
