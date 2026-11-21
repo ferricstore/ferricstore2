@@ -3,6 +3,7 @@ name = "wf-test-support"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
 publish.workspace = true
 repository.workspace = true
 description = "M0-only isolated resources, explicit clocks and acknowledged fault barriers"

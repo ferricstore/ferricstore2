@@ -25,4 +25,8 @@ Read [the handoff and next steps](docs/CONTINUE.md) to continue implementation f
 
 M0 infrastructure, partial M1 domain implementation and scoped M2 persistence, with reviewed architecture and transport contracts. The development guide records executable checks, source-size limits and remaining gaps. Further runtime library choices remain evaluation candidates; component tests and reference registration do not establish complete workflow parity, milestone completion, performance or production readiness.
 
-Source checkout: ferricstore/ferricstore at `66586c596e271408d9184af32eb31cd7218c126e`, plus explicitly identified working-tree observations. Local original Elixir checkouts are preserved. New repository is private pending an explicit publication decision.
+Source checkout: ferricstore/ferricstore at `66586c596e271408d9184af32eb31cd7218c126e`, plus explicitly identified working-tree observations. Local original Elixir checkouts are preserved.
+
+## License
+
+Apache License 2.0; see [LICENSE](LICENSE).
