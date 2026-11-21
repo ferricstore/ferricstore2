@@ -66329,3 +66329,21 @@ another member is down; that member returns under the snapshotting leader
 then leads with both batches; the snapshotting member restarts from its
 snapshot and log, takes a third batch and leads with all three. Passes
 three times in a row (7 s); with the shard install made a no-op it fails.
+
+### ADR-018: replication cost, first measurement (21 Nov)
+
+The SDK queue benchmark (`examples/dbos_style_benchmark.py`, 16 shards)
+against a three-member group on one M4 Max, through its leader, and
+against a single node on the same machine:
+
+- One client (client-bound, ~86-90% client CPU): 87.5k Flows/s single
+  node, 80.8k through the group (p50 queue latency 315 and 263 ms).
+- Four concurrent clients, 400k Flows: 251k Flows/s single node, 126k
+  through the group. CPU for the 400k Flows: single node 3.7 s (9.3 ms per
+  1k); group leader 5.9 s (14.8 ms per 1k, +60%), followers 4.0 s and 1.2 s
+  (one may still have been catching up). All three members shared the one
+  machine, so the followers' replay competed with the leader.
+
+Next for this cost: fewer copies of a round's bytes on the replication
+path (proposal, entry log, per-follower encoding), no Tokio task per round
+in the proposer, and measuring with members on separate machines.
