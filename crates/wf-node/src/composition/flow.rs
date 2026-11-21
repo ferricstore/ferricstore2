@@ -40,7 +40,7 @@ impl FlowService for QueueNode {
             FlowCommand::PolicyGet(get) => return policy::get(router, get, reply),
             FlowCommand::RetentionCleanup(request) => return cleanup::run(router, &request, reply),
             FlowCommand::Info(read) => return info::read(router, *read, reply),
-            FlowCommand::Governance(command) if command.listed().is_some() => {
+            FlowCommand::Governance(command) if !command.listed().is_empty() => {
                 return governance::list(router, *command, reply);
             }
             FlowCommand::Governance(mut command) => {

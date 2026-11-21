@@ -28,6 +28,7 @@ mod flow_fifo;
 mod flow_info;
 mod flow_limit;
 mod flow_mutate;
+mod flow_overview;
 mod flow_payload;
 mod flow_policy;
 mod flow_query;

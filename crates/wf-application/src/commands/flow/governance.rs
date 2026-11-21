@@ -15,6 +15,7 @@ pub mod approval;
 pub mod budget;
 pub mod circuit;
 pub mod limit;
+pub mod overview;
 #[cfg(test)]
 mod tests;
 
@@ -94,6 +95,8 @@ pub enum Command {
     Limit(limit::Command),
     /// `FLOW.LIMIT.LIST`.
     LimitList(limit::List),
+    /// `FLOW.GOVERNANCE.OVERVIEW`.
+    Overview(Box<overview::Overview>),
 }
 
 impl Command {
@@ -105,7 +108,10 @@ impl Command {
             Self::Circuit(command) => Some((Kind::Circuit, command.scope())),
             Self::Budget(command) => Some((Kind::Budget, command.scope())),
             Self::Limit(command) => Some((Kind::Limit, &command.scope)),
-            Self::ApprovalList(_) | Self::BudgetList(_) | Self::LimitList(_) => None,
+            Self::ApprovalList(_)
+            | Self::BudgetList(_)
+            | Self::LimitList(_)
+            | Self::Overview(_) => None,
         }
     }
 
@@ -116,9 +122,10 @@ impl Command {
             Self::Circuit(command) => command.decide(stored, wall),
             Self::Budget(command) => command.decide(stored, wall),
             Self::Limit(command) => command.decide(stored, wall),
-            Self::ApprovalList(_) | Self::BudgetList(_) | Self::LimitList(_) => {
-                (Err(FlowError::Unavailable), None)
-            }
+            Self::ApprovalList(_)
+            | Self::BudgetList(_)
+            | Self::LimitList(_)
+            | Self::Overview(_) => (Err(FlowError::Unavailable), None),
         }
     }
 
@@ -134,25 +141,34 @@ impl Command {
         }
     }
 
-    /// The kind a listing reads.
+    /// The kinds a listing reads; none for a single-record command.
     #[must_use]
-    pub const fn listed(&self) -> Option<Kind> {
+    pub const fn listed(&self) -> &'static [Kind] {
         match self {
-            Self::ApprovalList(_) => Some(Kind::Approval),
-            Self::BudgetList(_) => Some(Kind::Budget),
-            Self::LimitList(_) => Some(Kind::Limit),
-            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) | Self::Limit(_) => None,
+            Self::ApprovalList(_) => &[Kind::Approval],
+            Self::BudgetList(_) => &[Kind::Budget],
+            Self::LimitList(_) => &[Kind::Limit],
+            Self::Overview(_) => &[Kind::Approval, Kind::Budget, Kind::Limit, Kind::Circuit],
+            Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) | Self::Limit(_) => &[],
         }
     }
 
-    /// One shard's part of a listing: the matching records' replies, with
-    /// the keys the join orders them by.
+    /// One shard's part of a listing from its records of the listed kinds:
+    /// the matching records' replies, with the keys the join orders them
+    /// by.
     #[must_use]
-    pub fn select<'a>(&self, records: impl Iterator<Item = &'a [u8]>, wall: u64) -> Listed {
+    pub fn select(&self, records: &[(Kind, &[u8])], wall: u64) -> Listed {
+        let pick = |kind: Kind| {
+            records
+                .iter()
+                .filter(move |(held, _)| *held == kind)
+                .map(|(_, value)| *value)
+        };
         match self {
-            Self::ApprovalList(list) => list.select(records),
-            Self::BudgetList(list) => list.select(records),
-            Self::LimitList(list) => list.select(records, wall),
+            Self::ApprovalList(list) => list.select(pick(Kind::Approval)),
+            Self::BudgetList(list) => list.select(pick(Kind::Budget)),
+            Self::LimitList(list) => list.select(pick(Kind::Limit), wall),
+            Self::Overview(overview) => overview.select(records, wall),
             Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) | Self::Limit(_) => Vec::new(),
         }
     }
@@ -164,6 +180,7 @@ impl Command {
             Self::ApprovalList(list) => list.join(parts),
             Self::BudgetList(list) => list.join(parts),
             Self::LimitList(list) => list.join(parts),
+            Self::Overview(overview) => overview.join(&parts),
             Self::Approval(_) | Self::Circuit(_) | Self::Budget(_) | Self::Limit(_) => Term::Nil,
         }
     }
@@ -180,6 +197,7 @@ pub fn is_governance(name: &str) -> bool {
     ]
     .iter()
     .any(|prefix| name.starts_with(prefix))
+        || name == "FLOW.GOVERNANCE.OVERVIEW"
 }
 
 /// Reads command `name` with options `args`.
@@ -195,6 +213,9 @@ pub fn parse(name: &str, args: &Term) -> Result<Command, FlowError> {
         "FLOW.BUDGET.LIST" => budget::parse_list(args).map(Command::BudgetList),
         name if name.starts_with("FLOW.BUDGET.") => budget::parse(name, args).map(Command::Budget),
         "FLOW.LIMIT.LIST" => limit::parse_list(args).map(Command::LimitList),
+        "FLOW.GOVERNANCE.OVERVIEW" => {
+            overview::parse(args).map(|overview| Command::Overview(Box::new(overview)))
+        }
         name if name.starts_with("FLOW.LIMIT.") => limit::parse(name, args).map(Command::Limit),
         _ => approval::parse(name, args).map(Command::Approval),
     }

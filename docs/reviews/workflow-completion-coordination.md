@@ -65588,3 +65588,27 @@ configuration conflict or the spend availability check each makes one
 fail. All 93 node tests, the TCP adapter and application tests pass; the
 SDK suite passes 40 of 60. Clippy, the ratchet, lint tests, docs,
 architecture and cargo-deny pass.
+
+### ADR014-GOVERNANCE5 FLOW.GOVERNANCE.OVERVIEW
+
+New artifacts (solo design review): `governance::overview` (`Overview`,
+`CircuitList`, `parse`), `governance::Command::Overview`; listings now
+declare the kinds they read (`listed() -> &[Kind]`) and select from the
+shard's records of those kinds; opcode 0x0254. No new dependency.
+
+Decisions: one fan-out for the four listings, keyed by kind so the join
+splits them; parse each listing from the options it knows so their
+refusals keep Elixir's order.
+
+Evidence: the Elixir overview scenario (partition and scope filters,
+pending status, flow filter, limit, six argument errors) matches the node
+apart from the unknown-option wording; this capture needed the Elixir
+reference restarted with its disk panic ratio raised (the host disk passed
+95% and Elixir began refusing writes). Ported: the overview summarizing
+records with counts, and partition scope filters across all four kinds;
+added cross-shard ordering of circuits and budgets. The tests were
+written after the code, so this step does not claim TDD; breaking the
+circuit order, the pending count or the listed kinds each makes one fail.
+All 95 node tests, the TCP adapter and application tests pass; the SDK
+suite passes 41 of 60, its native workflow test included. Clippy, the
+ratchet, lint tests, docs, architecture and cargo-deny pass.

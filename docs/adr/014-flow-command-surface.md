@@ -499,3 +499,16 @@ Each step is one commit with its tests.
   60, its native test now failing on the overview. The running-Flow limit
   that claims spend from (state governance `limits.running`) is the next
   part.
+- Step 15e: `FLOW.GOVERNANCE.OVERVIEW` (0x0254), as
+  `Governance.Admin.overview/2`: the approval, budget, limit and circuit
+  listings under the same options (each reads the options it knows and
+  refuses its own invalid ones, approvals first), joined from every
+  shard's records in one pass, with counts of approvals, pending
+  approvals, budgets, limits, circuits, open and half-open circuits.
+  Circuits are listed open first, then half-open, then closed, each by
+  scope; Elixir's wire layer has no circuit status filter, so neither
+  does this node. The scenario matches Elixir apart from the
+  unknown-option wording. The SDK suite passes 41 of 60: its native
+  workflow test (schedules, effects and every governance command) passes;
+  the rest are key-value commands, `CREATE_MANY`'s `idempotent` option, a
+  LangChain flow test and a topology check.
