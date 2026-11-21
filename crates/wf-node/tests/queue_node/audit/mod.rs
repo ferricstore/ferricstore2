@@ -16,6 +16,7 @@ mod create_many;
 mod named_values;
 mod signal;
 mod value_payload;
+mod value_refs;
 mod value_retention;
 
 /// A reply from the node: the Elixir-shaped term or the refusal.

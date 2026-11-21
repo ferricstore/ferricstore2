@@ -43,7 +43,9 @@ Gaps found so far:
   version, so a rewind or history could not bring it back.
 - G7 (closed by ADR-016 phase C): `FLOW.HISTORY` ignored `values: true`.
 - G8 (closed): retention cleanup reported `more?` until an extra empty pass.
-- G9: `value_refs` (attach an existing value by reference) is not read.
+- G9 (closed): `value_refs` (attach an existing value by reference) was
+  not read. Reads resolve attached references on the Flow's own shard;
+  claim records do not resolve them yet.
 
 ## `flow_write_contract_test.exs`
 
@@ -699,7 +701,7 @@ Gaps found so far:
 | 324 | retention cleanup removes overridden named value versions from history | fixed (G6, ADR-016 phase C) |
 | 386 | transition_many stores named value blobs for every transitioned flow | ported |
 | 438 | rewind restores named value refs from the target history snapshot | fixed (G6, ADR-016 phase C) |
-| 486 | create_many and spawn_children support per-item named values | gap G2, G9 |
+| 486 | create_many and spawn_children support per-item named values | fixed (G2, G9) |
 
 ## `flow/pipeline_history_read_test.exs`
 

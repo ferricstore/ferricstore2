@@ -51,7 +51,7 @@ impl ShardState {
                 let now = create.now_ms.unwrap_or(now);
                 self.create_flow(now, *create, partition)
             }
-            FlowCommand::Get(get) => (Ok(self.get_flow(&get, partition)), None),
+            FlowCommand::Get(get) => (Ok(self.get_flow(now, &get, partition)), None),
             FlowCommand::History(query) => (Ok(self.history_term(&query, partition)), None),
             FlowCommand::Mutate(mutation) => self.mutate(now, &mutation, partition),
             FlowCommand::ValuePut(put) => self.value_put(now, &put, partition),
@@ -127,12 +127,15 @@ impl ShardState {
         )
     }
 
-    fn get_flow(&self, get: &GetFlow, partition: Partition) -> Term {
+    fn get_flow(&mut self, now: u64, get: &GetFlow, partition: Partition) -> Term {
         let key = (partition, get.id.clone());
         let defaults = self.defaults();
-        self.hot_kv(&key).map_or(Term::Nil, |(key, entry)| {
-            Self::view(key, entry, &defaults).term(&get.include)
-        })
+        let Some((stored, entry)) = self.hot_kv(&key) else {
+            return Term::Nil;
+        };
+        let term = Self::view(stored, entry, &defaults).term(&get.include);
+        let attached = super::value::requested_refs(entry, &get.include.values);
+        self.with_attached(term, now, attached)
     }
 
     /// Logs the stored Flow under `key` as its after-image.
@@ -275,6 +278,10 @@ impl ShardState {
             state_meta,
             values,
             ..defaults
+        })
+        .map(|mut meta| {
+            super::value::attach(&mut meta, &create.value_refs);
+            meta
         })
     }
 

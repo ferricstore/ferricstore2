@@ -23,6 +23,7 @@ const COMMON: &[&str] = &[
     "attributes_delete",
     "state_meta",
     "values",
+    "value_refs",
     "drop_values",
     "override_values",
     // Elixir accepts a governed claim's options here; the Flow's credit is
@@ -133,6 +134,8 @@ pub struct Mutation {
     pub state_meta: BTreeMap<String, Term>,
     /// Named values to write.
     pub values: BTreeMap<Vec<u8>, Vec<u8>>,
+    /// References attached by name (audit gap G9).
+    pub value_refs: BTreeMap<Vec<u8>, Vec<u8>>,
     /// Named values to drop.
     pub drop_values: Vec<Vec<u8>>,
     /// Named values whose different bytes may replace the stored ones.
@@ -325,6 +328,7 @@ pub fn parse(name: &str, args: &Term) -> Result<Mutation, FlowError> {
         attributes_delete: deletes(&opts)?,
         state_meta: meta::state_meta_update(opts.get("state_meta"))?,
         values: values(&opts)?,
+        value_refs: super::create::value_refs(&opts)?,
         drop_values: names(&opts, "drop_values")?,
         override_values: names(&opts, "override_values")?,
         change,

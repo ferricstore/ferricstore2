@@ -31,6 +31,8 @@ pub struct Signal {
     pub run_at_ms: Option<u64>,
     /// Named values to write.
     pub values: BTreeMap<Vec<u8>, Vec<u8>>,
+    /// References attached by name (audit gap G9).
+    pub value_refs: BTreeMap<Vec<u8>, Vec<u8>>,
     /// Named values to drop.
     pub drop_values: Vec<Vec<u8>>,
     /// Named values whose bytes may change.
@@ -65,6 +67,11 @@ impl Signal {
         part(b"|");
         for name in self.drop_values.iter().chain(&self.override_values) {
             part(name);
+        }
+        part(b"|");
+        for (name, reference) in &self.value_refs {
+            part(name);
+            part(reference);
         }
         hasher.finalize().to_vec()
     }
@@ -104,6 +111,7 @@ pub fn parse(args: &Term) -> Result<Signal, FlowError> {
             "now_ms",
             "run_at_ms",
             "values",
+            "value_refs",
             "drop_values",
             "override_values",
         ],
@@ -139,6 +147,7 @@ pub fn parse(args: &Term) -> Result<Signal, FlowError> {
         now_ms: opts.non_neg_integer("now_ms")?,
         run_at_ms: opts.non_neg_integer("run_at_ms")?,
         values: values(&opts)?,
+        value_refs: super::create::value_refs(&opts)?,
         drop_values: opts.binary_list("drop_values")?,
         override_values: opts.binary_list("override_values")?,
     })

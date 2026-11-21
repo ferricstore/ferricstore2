@@ -511,3 +511,77 @@ fn retention_cleanup_removes_overridden_named_value_versions_from_history() -> T
     );
     Ok(())
 }
+
+#[test]
+fn create_many_and_spawn_children_support_per_item_named_values() -> TestResult {
+    let node = node("audit-named-many")?;
+    let partition = "tenant-named-many";
+    create(&node, "parent", "named-parent", &with(partition, &[]))?;
+    ok(
+        &node,
+        "FLOW.CREATE_MANY",
+        &with(
+            partition,
+            &[
+                (
+                    "items",
+                    Term::List(vec![map(&[
+                        ("id", text("created")),
+                        ("values", map(&[("order", text("order-created"))])),
+                        ("value_refs", map(&[("external", text("external-ref"))])),
+                    ])]),
+                ),
+                ("type", text("named-many-created")),
+                ("run_at_ms", int(1_000)),
+                ("now_ms", int(1_000)),
+            ],
+        ),
+    )?;
+    let created = get(
+        &node,
+        "created",
+        &with(partition, &[("values", texts(&["order"]))]),
+    )?;
+    assert_eq!(
+        field(&created, "values"),
+        map(&[("order", text("order-created"))])
+    );
+    assert_eq!(value_ref(&created, "external"), text("external-ref"));
+    let parent = claim_one(&node, "named-parent", Some(partition))?;
+    let mut spawn = with(
+        partition,
+        &[
+            ("id", text("parent")),
+            (
+                "children",
+                Term::List(vec![map(&[
+                    ("id", text("child")),
+                    ("type", text("named-child")),
+                    ("values", map(&[("order", text("order-child"))])),
+                    (
+                        "value_refs",
+                        map(&[("external", text("external-child-ref"))]),
+                    ),
+                ])]),
+            ),
+            ("group_id", text("named-group")),
+            ("wait_state", text("waiting")),
+            ("success", text("completed")),
+            ("failure", text("failed")),
+            ("now_ms", int(1_100)),
+        ],
+    );
+    spawn.extend(lease(&parent));
+    ok(&node, "FLOW.SPAWN_CHILDREN", &spawn)?;
+    let child = get(
+        &node,
+        "child",
+        &with(partition, &[("values", texts(&["order"]))]),
+    )?;
+    assert_eq!(
+        field(&child, "values"),
+        map(&[("order", text("order-child"))])
+    );
+    assert_eq!(value_ref(&child, "external"), text("external-child-ref"));
+    Ok(())
+}

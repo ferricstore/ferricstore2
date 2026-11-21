@@ -151,6 +151,8 @@ fn event_values(
         return Err(not_found());
     };
     refs.iter()
+        // Attached references come back through `event_refs` (G9).
+        .filter(|(_, entry)| !matches!(entry.get(b"version"), Some(Term::Nil) | None))
         .map(|(name, entry)| {
             let version = match entry.get(b"version") {
                 Some(Term::Int(version)) => u64::try_from(*version).ok(),
@@ -174,6 +176,21 @@ fn event_values(
                     .ok_or_else(not_found),
                 (_, None) => Err(not_found()),
             }
+        })
+        .collect()
+}
+
+/// The references an event shows attached (audit gap G9): its value refs
+/// without a version.
+fn event_refs(event: &HistoryEvent) -> BTreeMap<Vec<u8>, Vec<u8>> {
+    let Some(Term::Map(refs)) = event.extras[0].as_deref().and_then(json::decode) else {
+        return BTreeMap::new();
+    };
+    refs.into_iter()
+        .filter(|(_, entry)| matches!(entry.get(b"version"), Some(Term::Nil) | None))
+        .filter_map(|(name, entry)| match entry.get(b"ref") {
+            Some(Term::Bin(reference)) => Some((name, reference.clone())),
+            _ => None,
         })
         .collect()
 }
@@ -252,6 +269,7 @@ impl ShardState {
             .ok_or(ServiceError::Unavailable)?;
         let (payload, result, error) = restore_all(&mut meta, record, &target, request, next)?;
         meta.values = named_values(&target, &mut meta)?;
+        meta.value_refs = event_refs(&target);
         (meta.attributes, meta.state_meta) = fields(&target)?;
         meta.rewound_to = Some(request.to_event.clone());
         let fence = Fence::new(record.fence().get().saturating_add(1));

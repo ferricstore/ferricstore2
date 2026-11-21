@@ -29,6 +29,7 @@ const ALLOWED: &[&str] = &[
     "attributes",
     "state_meta",
     "values",
+    "value_refs",
 ];
 
 const MAX_TYPE_BYTES: usize = 128;
@@ -91,6 +92,8 @@ pub struct CreateFlow {
     pub state_meta: BTreeMap<String, Term>,
     /// Named values, by name.
     pub values: BTreeMap<Vec<u8>, Vec<u8>>,
+    /// References attached by name (audit gap G9).
+    pub value_refs: BTreeMap<Vec<u8>, Vec<u8>>,
 }
 
 fn too_long(key: &str, max: usize) -> FlowError {
@@ -241,6 +244,34 @@ pub fn values(opts: &Opts<'_>) -> Result<BTreeMap<Vec<u8>, Vec<u8>>, FlowError> 
     }
 }
 
+/// The `value_refs` option: names to references this Flow attaches but
+/// does not own (audit gap G9).
+///
+/// # Errors
+/// A name that is empty, or a reference that is not a non-empty binary up
+/// to 256 bytes.
+pub fn value_refs(opts: &Opts<'_>) -> Result<BTreeMap<Vec<u8>, Vec<u8>>, FlowError> {
+    match opts.get("value_refs") {
+        None | Some(Term::Nil) => Ok(BTreeMap::new()),
+        Some(Term::Map(entries)) => entries
+            .iter()
+            .map(|(name, reference)| match reference {
+                Term::Bin(bytes)
+                    if !name.is_empty() && !bytes.is_empty() && bytes.len() <= MAX_REF_BYTES =>
+                {
+                    Ok((name.clone(), bytes.clone()))
+                }
+                _ => Err(FlowError::rejected(
+                    "ERR flow value_refs must map names to references".to_owned(),
+                )),
+            })
+            .collect(),
+        Some(_) => Err(FlowError::rejected(
+            "ERR flow value_refs must be a map".to_owned(),
+        )),
+    }
+}
+
 /// The partition key option: a non-empty binary up to 256 bytes.
 ///
 /// # Errors
@@ -340,5 +371,6 @@ pub fn parse(args: &Term) -> Result<CreateFlow, FlowError> {
         attributes,
         state_meta,
         values: values(&opts)?,
+        value_refs: value_refs(&opts)?,
     })
 }

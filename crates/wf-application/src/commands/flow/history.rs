@@ -89,7 +89,7 @@ const EXTRAS: [&str; 6] = [
 
 /// The JSON extras of a Flow's fields, as Elixir adds them to each event.
 fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>; 7] {
-    let value_refs = (!meta.values.is_empty()).then(|| {
+    let value_refs = (!meta.values.is_empty() || !meta.value_refs.is_empty()).then(|| {
         let refs = meta
             .values
             .iter()
@@ -104,6 +104,11 @@ fn extras(meta: &FlowMeta, partition: &Partition, id: &[u8]) -> [Option<Vec<u8>>
                 ]);
                 (name.clone(), entry)
             })
+            .chain(
+                meta.value_refs
+                    .iter()
+                    .map(|(name, reference)| (name.clone(), super::record::attached(reference))),
+            )
             .collect();
         json::encode(&Term::Map(refs))
     });

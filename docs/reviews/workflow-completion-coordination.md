@@ -65972,3 +65972,29 @@ the first that has work due, or none. The ported "retention cleanup
 returns an exact continuation without a final empty pass" failed before
 (`more?` true after the last Flow) and passes. Its first refusal is checked
 as a refusal; Elixir's wording differs.
+
+### G9 Attached value references
+
+New artifacts (solo design review): `FlowMeta::value_refs`,
+`create::value_refs` (and the `value_refs` option of create, mutations and
+signals, also in the signal digest), `record::attached`, the node's
+`value::{attach, requested_refs}` and `ShardState::with_attached`,
+`rewind::event_refs`; `record::view` (the `View` rendering moved out of
+`record.rs` to keep it under the line limit). Snapshot version 14.
+
+Decisions, from the 21 Nov probe of Elixir: an attached reference shows in
+`value_refs` without digest or version and in history the same way; a read
+with `values` resolves it when it names a value this shard holds (a shared
+value in the Flow's partition), and leaves it out otherwise; attaching a
+name replaces the Flow's own value of that name, which stays readable by
+version, and writing an own value replaces an attached reference; dropping
+a name drops either; a rewind restores the event's references. Claim
+records do not resolve attached references yet.
+
+Evidence: the ported "create_many and spawn_children support per-item
+named values" passes (it failed on G2 and G9), and a new test covers the
+listing, the read, the replacement and the rewind. All 50 audit tests and
+all suites pass. No ported test is left waiting outside the repository.
+`state::value::attached` (new, same review) holds `requested_refs`,
+`attach` and `with_attached`, keeping `value.rs` under the line limit; the
+attached-reference test lives in `audit::value_refs`.

@@ -156,6 +156,7 @@ fn updated_meta(
     )?;
     super::value::write_values(&mut next, &mutation.values, &mutation.override_values)?;
     super::value::drop_values(&mut next, &mutation.drop_values);
+    super::value::attach(&mut next, &mutation.value_refs);
     let (payload, result, error, ttl) = match &mutation.change {
         Change::Transition { payload, .. } | Change::StepContinue { payload, .. } => {
             (payload.is_some(), false, false, None)

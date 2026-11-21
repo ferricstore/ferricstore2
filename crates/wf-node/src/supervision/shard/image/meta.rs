@@ -105,6 +105,12 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
         None => None,
     };
     optional_bin(out, governance.as_deref())?;
+    // Attached references (audit gap G9): name and reference each.
+    out.extend_from_slice(&u32::try_from(meta.value_refs.len()).ok()?.to_be_bytes());
+    for (name, reference) in &meta.value_refs {
+        bin(out, name)?;
+        bin(out, reference)?;
+    }
     // Kept value versions (ADR-016 phase C): kind, name, version, term
     // flag and bytes each.
     out.extend_from_slice(&u32::try_from(meta.retained.len()).ok()?.to_be_bytes());
@@ -208,6 +214,15 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
             .optional_bin()?
             .map(|bytes| Governance::decode(&bytes).map(Box::new).ok_or(Malformed))
             .transpose()?,
+        value_refs: {
+            let count = u32::from_be_bytes(reader.array()?);
+            let mut refs = BTreeMap::new();
+            for _ in 0..count {
+                let name = reader.bin()?.to_vec();
+                refs.insert(name, reader.bin()?.to_vec());
+            }
+            refs
+        },
         retained: decode_retained(reader)?,
     })
 }

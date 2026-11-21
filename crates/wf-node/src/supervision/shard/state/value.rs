@@ -18,8 +18,10 @@ use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_types::version::TimestampMillis;
 
+mod attached;
 mod versions;
 
+pub(super) use attached::{attach, requested_refs};
 pub(super) use versions::with_values;
 
 use super::super::command::Logged;
@@ -79,17 +81,19 @@ fn conflict(name: &[u8]) -> ServiceError {
     ))
 }
 
-/// Writes named values into `meta` with Elixir's rules; `version` of a new
-/// or replaced value is its previous version plus one.
-/// Drops named values, keeping their last versions readable.
+/// Drops named values and attached references, keeping the values' last
+/// versions readable.
 pub(super) fn drop_values(meta: &mut FlowMeta, names: &[Vec<u8>]) {
     for name in names {
+        meta.value_refs.remove(name);
         if let Some(value) = meta.values.remove(name) {
             meta.retain((RETAINED_NAMED, name, value.version), &value.bytes);
         }
     }
 }
 
+/// Writes named values into `meta` with Elixir's rules; `version` of a new
+/// or replaced value is its previous version plus one.
 pub(super) fn write_values<'a>(
     meta: &mut FlowMeta,
     values: impl IntoIterator<Item = (&'a Vec<u8>, &'a Vec<u8>)>,
@@ -106,6 +110,8 @@ pub(super) fn write_values<'a>(
             }
             None => {}
         }
+        // An own value replaces an attached reference of the name (G9).
+        meta.value_refs.remove(name);
         // Above every version the name has had, so a reference never
         // names two values.
         let version = meta.newest_named_version(name).saturating_add(1);
