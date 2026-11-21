@@ -119,6 +119,14 @@ impl ShardState {
                 ));
             }
         }
+        let priority = entry.priority;
+        let record = signaled(&entry.record, signal, now).ok_or(ServiceError::Unavailable)?;
+        // A move into a FIFO state needs a named partition, checked before
+        // any value is written. A passive signal enters no lane, so it is
+        // not checked (Elixir also refuses one on a claimed FIFO Flow).
+        if signal.transition_to.is_some() {
+            self.fifo_entry(&record, priority, Some(signal.partition_key.is_some()))?;
+        }
         write_values(&mut meta, &signal.values, &signal.override_values)?;
         for name in &signal.drop_values {
             meta.values.remove(name);
@@ -126,8 +134,6 @@ impl ShardState {
         if let Some(key) = &signal.idempotency_key {
             meta.signal_keys.insert(key.clone(), digest);
         }
-        let priority = entry.priority;
-        let record = signaled(&entry.record, signal, now).ok_or(ServiceError::Unavailable)?;
         let mut event = HistoryEvent::of(&record, priority, &meta, &key.0);
         event.kind = HistoryKind::Signaled;
         event.extras[3] = Some(signal.signal.clone());

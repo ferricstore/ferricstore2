@@ -15,6 +15,7 @@ use wf_application::commands::queue::{
 };
 use wf_node::composition::{QueueNode, QueueNodeConfig};
 
+mod audit;
 mod blocking;
 mod crash;
 mod flow_approval;

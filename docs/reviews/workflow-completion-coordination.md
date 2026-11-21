@@ -65698,3 +65698,35 @@ Timing (release, this machine): 886 ns per reservation before (digest
 without base64), 18 ns after, 2 µs once per policy set. All 101 node
 tests, the TCP adapter and application tests pass; clippy, the ratchet,
 lint tests, docs, architecture and cargo-deny pass.
+
+### AUDIT-1 Steps 1-10 against Elixir's tests: signals, named values, value payloads
+
+New artifacts (solo design review): `crates/wf-node/tests/queue_node/audit/`
+(`mod.rs` shared helpers, `signal.rs`, `named_values.rs`,
+`value_payload.rs`) and `docs/reviews/workflow-flow-test-audit.md`, the map
+of the 669 Elixir business tests for steps 1 to 10 and their status. No
+production artifact.
+
+Direction (user, 21 Nov): keep Elixir's features, not its quirks or
+wording; a behaviour that looks unintended is recorded, not copied.
+
+Finding and fix: a signal that moves an auto-partitioned Flow into a FIFO
+state was accepted; Elixir refuses it (FIFO lanes are per named partition).
+`signal_rejects_entry_into_a_fifo_state_without_an_explicit_partition`
+failed first ("expected a refusal, got OK"), then passed once
+`ShardState::try_signal` checks FIFO entry for a move, before any value is
+written. Elixir also refuses a passive signal on a claimed Flow whose run
+state is a FIFO state (probe `scenario_signal_fifo.py` against 6a5f2bc34);
+a passive signal enters no lane, so the node accepts it
+(`a_passive_signal_on_a_claimed_fifo_flow_keeps_its_lease`).
+
+Evidence: 27 audit tests pass (11 of 12 signal tests plus the passive
+case, 9 of 12 named-value tests, 6 of 17 value-payload tests; two
+value-payload tests are Elixir internals and one is covered by an earlier
+test). The 14 that fail wait outside the repository for gaps G2 to G9 in the
+audit map: batch create, batch item fields and list order, structured
+values beyond create, old value versions, history values, the cleanup
+continuation and `value_refs`. Except for the FIFO fix the ported tests
+were written against existing code, so no TDD is claimed for them. All node,
+TCP adapter, application, storage and domain tests pass; clippy, the
+ratchet, docs, architecture and cargo-deny pass.
