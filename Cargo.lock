@@ -133,6 +133,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "crc32fast"
+version = "1.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b929dd2a135771f40afabd1073f85eed59c800b7c61901e5c254270497dad64"
+dependencies = [
+ "cfg-if",
+]
+
+[[package]]
 name = "crypto-common"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1017,6 +1026,7 @@ dependencies = [
 name = "wf-storage"
 version = "0.1.0"
 dependencies = [
+ "crc32fast",
  "redb",
  "sha2",
  "wf-domain",

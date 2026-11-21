@@ -38,6 +38,16 @@ Flows/s and RSS after the run.
    allowed licences. Against 83cb0b4: 8.3 to 8.6 ms (was 8.9 to 9.3), RSS
    750 to 778 MB (was 770 to 806).
 
+3. **CRC32 group log blocks, encoded in one copy** (block format 2:
+   24-byte header with the CRC32 of the header fields and payload, from
+   `crc32fast` 1.5.5, MIT or Apache-2.0, hardware-accelerated). Version 1
+   sealed each block with SHA-256 and copied records twice; the checksum
+   only has to catch torn and damaged writes. A header of another version
+   is refused at open (this writer's torn tail always carries its own
+   version), so an old log is never cut to nothing; logs of format 1 must
+   be discarded (benchmark data only). Against def0fc1: 8.1 to 8.3 ms (was
+   8.4 to 8.8), RSS 743 to 759 MB (was 779 to 821).
+
 ## Consequences
 
 The binary links mimalloc's C code, built by `cc`; cargo-deny passes.

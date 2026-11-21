@@ -45,6 +45,8 @@ sha2 = { version = "=0.11.0", default-features = false }
 # ADR-014 step 13: cron schedules resolve wall-clock times in IANA zones from
 # the system zoneinfo, as Elixir does with its bundled database.
 jiff = { version = "=0.2.28", default-features = false, features = ["std", "tz-system", "tzdb-zoneinfo"] }
+# ADR-015: group log block checksums (SHA-256 was 2% of busy CPU).
+crc32fast = { version = "=1.5.5", default-features = false, features = ["std"] }
 # ADR-015: the shard's hash maps (randomly seeded; SipHash was 7% of busy
 # CPU in the 21 Nov profile).
 foldhash = { version = "=0.2.0", default-features = false, features = ["std"] }

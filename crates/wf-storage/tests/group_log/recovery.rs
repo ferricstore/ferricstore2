@@ -163,3 +163,36 @@ fn a_missing_middle_segment_is_refused() -> TestResult {
     std::fs::remove_dir_all(directory)?;
     Ok(())
 }
+
+/// A whole block in another format version is not a torn write (a torn
+/// write is a prefix of this writer's own block), so the log is refused
+/// instead of being cut back to nothing (ADR-015).
+#[test]
+fn a_block_of_another_format_version_is_refused_not_cut() -> TestResult {
+    let directory = directory("version")?;
+    let path = directory.join("log");
+    write_blocks(&path, 1, 2)?;
+    let file = segment(&path, 0)?;
+    let full = length(&file)?;
+    let mut bytes = std::fs::read(&file)?;
+    // Byte 4 of the header is the format version; this writer's is not 1,
+    // which is the version before checksums moved to CRC32.
+    let Some(version) = bytes.get_mut(4) else {
+        return Err("no header".into());
+    };
+    *version = 1;
+    std::fs::write(&file, &bytes)?;
+    let error = GroupLog::open(&path, GroupLogLimits::default())
+        .err()
+        .ok_or("a log of another format version opened")?;
+    assert_eq!(
+        error,
+        GroupLogError::Corrupt {
+            segment: 0,
+            offset: 0
+        }
+    );
+    assert_eq!(length(&file)?, full, "the log must not be truncated");
+    std::fs::remove_dir_all(directory)?;
+    Ok(())
+}

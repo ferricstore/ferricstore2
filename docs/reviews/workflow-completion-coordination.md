@@ -65757,3 +65757,20 @@ against 83cb0b4: 8.3 to 8.6 ms CPU per 1k Flows (was 8.9 to 9.3), RSS 750
 to 778 MB (was 770 to 806). Maps stay randomly seeded per instance, so
 chosen ids cannot be aimed at one bucket. Behaviour is unchanged; all
 suites and checks pass.
+
+### ADR015-CRC CRC32 group log blocks in one copy
+
+New artifacts (solo design review): group log block format 2 in
+`wf_storage::log::group::block` (24-byte header, CRC32 of fields and
+payload, records copied once into the output; `Parsed` for scan results);
+the reviewed external dependency `crc32fast` 1.5.5 (`std`) for
+`wf-storage`.
+
+Evidence: `a_block_of_another_format_version_is_refused_not_cut` was
+written first and failed (a patched log opened), then passed: a header of
+another version is refused at open instead of being cut as a torn tail,
+which before this change would have dropped a whole older log.
+`a_failed_segment_creation_fences_size_and_explicit_rotation` now sets a
+60-byte segment limit, since its two one-record blocks shrank under the
+old 100. Three alternating runs against def0fc1: 8.1 to 8.3 ms CPU per 1k
+Flows (was 8.4 to 8.8). All 24 group log tests and all suites pass.

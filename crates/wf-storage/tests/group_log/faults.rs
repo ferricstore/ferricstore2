@@ -175,8 +175,9 @@ fn a_failed_segment_creation_fences_size_and_explicit_rotation() -> TestResult {
     let directory = directory("create")?;
     let path = directory.join("log");
     let faults = Arc::new(Faults::default());
+    // Smaller than two one-record blocks, so the second append rotates.
     let limits = GroupLogLimits {
-        max_segment_bytes: 100,
+        max_segment_bytes: 60,
         ..GroupLogLimits::default()
     };
     // The first create makes segment 0; the second is the first rotation.

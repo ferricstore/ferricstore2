@@ -47,6 +47,8 @@ normal = ["wf-types", "wf-domain", "wf-ports"]
 dev = ["wf-test-support"]
 modules = { log = true, state = true, transaction = true, snapshot = true, blob = true }
 external_normal = [
+  # ADR-015: group log block checksums.
+  { name = "crc32fast", version = "=1.5.5", features = ["std"], default_features = false },
   { name = "redb", version = "=4.4.0", features = ["std"], default_features = false, source = "git+https://github.com/cberner/redb?rev=7061f7e60d4573311c0636e161d417b93e9fd2b1" },
   { name = "sha2", version = "=0.11.0", features = [], default_features = false },
 ]
