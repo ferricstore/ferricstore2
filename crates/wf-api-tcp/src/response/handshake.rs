@@ -61,7 +61,7 @@ pub struct Handshake<'a> {
     pub selected: &'a [&'a str],
 }
 
-fn text(value: &str) -> Value {
+pub(super) fn text(value: &str) -> Value {
     Value::Bin(value.as_bytes().to_vec())
 }
 
@@ -69,7 +69,7 @@ fn texts(values: &[&str]) -> Value {
     Value::Arr(values.iter().map(|value| text(value)).collect())
 }
 
-fn map(entries: Vec<(&str, Value)>) -> Value {
+pub(super) fn map(entries: Vec<(&str, Value)>) -> Value {
     Value::Map(
         entries
             .into_iter()
@@ -78,7 +78,7 @@ fn map(entries: Vec<(&str, Value)>) -> Value {
     )
 }
 
-fn int(value: u64) -> Value {
+pub(super) fn int(value: u64) -> Value {
     i64::try_from(value).map_or(Value::Unsigned(value), Value::Int)
 }
 

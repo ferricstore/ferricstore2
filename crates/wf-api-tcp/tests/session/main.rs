@@ -25,6 +25,7 @@ mod flow;
 mod handshake;
 mod options;
 mod queue;
+mod topology;
 mod typed;
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;

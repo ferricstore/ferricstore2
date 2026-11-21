@@ -66103,3 +66103,22 @@ and pass, including after a restart with another shard count. Parity rig
 `scenario_close.py` (wait any; cancel parent) is byte-identical to the
 Elixir reference on 6400 for records and histories (request hash and
 retention time dropped).
+
+### SHARDS (0x0007)
+
+New artifacts (solo design review): `response::topology` (`Topology`,
+`shards`) and `Opcode::Shards`.
+
+The Python SDK's topology-aware client (`FlowClient.from_urls`) refreshes
+its slot table with `SHARDS` and routes each key by slot; the node refused
+the opcode, so that client could not connect ("no FerricStore topology
+endpoint reachable"). The reply is Elixir's single-node shape, read from the
+reference on 6400: one range per shard of contiguous slots, lane
+`shard + 1`, hint `leader`, the node's endpoint, `route_epoch` as in the
+handshake, `shard_count` and `slots`. First step of the cluster work (step 5):
+with replica sets the ranges will name each range's leader.
+
+Evidence: `session::topology` failed before (opcode refused) and passes.
+Against a release build the SDK's topology client refreshed the table,
+routed a key to lane 3 and created, read and claimed a Flow through it;
+`get` leaves the payload out as Elixir's does.

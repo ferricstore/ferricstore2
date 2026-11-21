@@ -3,6 +3,7 @@
 //! the Elixir server for the replies captured in this crate's fixtures.
 
 mod handshake;
+mod topology;
 
 use std::fmt;
 
@@ -13,6 +14,7 @@ use crate::codec::{TooLong, Value, put_bin, put_len};
 use crate::request::ClaimShape;
 
 pub use handshake::{COMPACT_CODECS, Handshake, handshake};
+pub use topology::{Topology, shards};
 
 /// Success status.
 pub const STATUS_OK: u16 = 0;

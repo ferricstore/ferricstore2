@@ -35,6 +35,8 @@ pub enum Opcode {
     Quit,
     /// Capability query.
     Options,
+    /// The slot table.
+    Shards,
     /// Connection start.
     Startup,
     /// `FLOW.CLAIM_DUE` with a compact or typed-map body.
@@ -119,8 +121,9 @@ const FLOW_COMMANDS: [(&str, u16); 62] = [
     ("FLOW.QUERY", 0x0231),
 ];
 
-const OPCODES: [(Opcode, u16); 11] = [
+const OPCODES: [(Opcode, u16); 12] = [
     (Opcode::Hello, 0x0001),
+    (Opcode::Shards, 0x0007),
     (Opcode::Ping, 0x0003),
     (Opcode::Quit, 0x0009),
     (Opcode::Options, 0x000B),

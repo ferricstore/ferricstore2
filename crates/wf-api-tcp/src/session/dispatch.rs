@@ -122,6 +122,18 @@ pub(super) fn handle(
             }
             Err(error) => refuse(reply, error.message()),
         },
+        Some(Opcode::Shards) => {
+            let topology = response::Topology {
+                node: &context.info.node,
+                host: &context.info.host,
+                port: context.info.port,
+                shard_count: context.info.shard_count,
+            };
+            match response::shards(&topology) {
+                Ok(body) => reply.send(0, &body),
+                Err(_) => refuse(reply, "ERR SHARDS reply exceeds the frame limit"),
+            }
+        }
         Some(Opcode::Ping) => reply.send(0, &response::ok_text(b"PONG").unwrap_or_default()),
         Some(Opcode::Quit) => {
             reply.send(0, &response::ok_text(b"OK").unwrap_or_default());
