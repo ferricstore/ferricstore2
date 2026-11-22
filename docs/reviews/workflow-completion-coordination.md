@@ -66837,3 +66837,21 @@ binds as nil, so the binder's key checks (missing, unexpected) still come
 first, as Elixir's. Dropping integer decoding, the missing names, the
 64-pair bound or the uniqueness check each fail a test. Recorded
 decision: the node's cursors carry no nonce.
+
+### Flow test audit: query engine semantics; G40 (22 Nov)
+
+`flow/query/engine_test.exs` and `flow/query/executor_test.exs`: their
+query semantics ported through FLOW.QUERY as the SDK builders write it
+(`audit::query_semantics`: terminal reads with shared update times,
+metadata searches with no invented state filter, stuck reads by lease
+deadline, a missing run's empty history); engine installation,
+capability manifests and index execution are Elixir's.
+
+G40 closed, found by the terminal-read port: the three Flows created in
+terminal states were missing from the query, from GET and from INFO.
+RED: a Flow created `completed` with `now_ms: 5000` read nil after a
+second. Its removal time was its record time plus retention, decades in
+the past, so the retention sweep removed it at once; G13 had fixed this
+only for mutations. `create_flow` now takes the shard's clock and stamps
+a terminal create's `terminal_until` from max(command time, clock), as
+`mutate::meta` does. Removing the stamp fails three tests.

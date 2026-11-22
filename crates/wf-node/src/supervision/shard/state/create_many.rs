@@ -80,8 +80,7 @@ impl ShardState {
         if let Err(error) = self.warm(&key) {
             return (Err(error), None);
         }
-        let now = create.now_ms.unwrap_or(wall);
-        let (outcome, change) = self.create_flow(now, create, partition);
+        let (outcome, change) = self.create_flow(wall, create, partition);
         (outcome, change.map(|change| (key, change)))
     }
 }

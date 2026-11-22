@@ -99,3 +99,34 @@ fn a_missing_parameter_is_named_in_the_context() -> Result<(), String> {
     );
     Ok(())
 }
+
+#[test]
+fn index_ids_are_checked_before_their_lookup() {
+    // Elixir's `commands_test.exs`: "returns actionable usage and
+    // availability errors" (audit gap G41; its registry-unavailable case
+    // has no counterpart: the node's catalog is always there).
+    let lookup = |id: &str| {
+        super::indexes::reply(
+            &super::indexes::Indexes {
+                id: Some(id.as_bytes().to_vec()),
+            },
+            4,
+            0,
+        )
+        .err()
+        .map(|error| error.to_string())
+    };
+    let invalid = Some("ERR invalid query index id; use FLOW.QUERY.INDEXES [index-id]".to_owned());
+    assert_eq!(lookup("invalid/index"), invalid);
+    assert_eq!(lookup(""), invalid);
+    assert_eq!(lookup(&"x".repeat(65)), invalid);
+    assert_eq!(
+        lookup("unknown.index-1"),
+        Some("ERR query index not found; use FLOW.QUERY.INDEXES to list valid indexes".to_owned())
+    );
+    let usage = match parse(b"FLOW.QUERY.INDEXES", &words(&["one", "two"])) {
+        Err(error) => error.to_string(),
+        Ok(_) => String::new(),
+    };
+    assert_eq!(usage, "ERR syntax error; use FLOW.QUERY.INDEXES [index-id]");
+}

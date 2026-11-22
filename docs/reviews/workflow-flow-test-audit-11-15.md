@@ -15,6 +15,16 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
   Elixir's texts), decodes each value by its field's declared type (an
   integer from its digits, all else as text, as `Binder.bind_text`), and
   names missing parameters in the failure's detail, hint and context.
+- G40 (closed): a Flow created in a terminal state took its retention
+  from its record time, so with a client clock in the past
+  (`now_ms: 5000`) its removal time was decades ago and the retention
+  sweep removed it at once: reads, queries and counts never saw it. Its
+  retention now starts at the command's time, never before the shard's
+  clock, as G13 made it for Flows that finish later.
+- G41 (closed): `FLOW.QUERY.INDEXES` looked an id up without checking
+  it, so a malformed one answered "not found"; it is checked first (1 to
+  64 bytes of letters, digits, `_-:.`), with Elixir's "invalid query
+  index id" text.
 
 ## `flow/governance_argument_errors_test.exs`
 
@@ -102,27 +112,27 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | any strings are literal predicates while atom any explicitly omits optional predicates | open |
-| 35 | builds every retired record-read shape as a bound FQL request | open |
-| 61 | uses parameters for values and validates dynamic metadata fields | open |
-| 103 | builds null predicates without inventing a scalar parameter | open |
-| 126 | binds lifecycle state and workflow step as independent predicates | open |
-| 142 | builds bounded return projections with safely quoted dynamic fields | open |
-| 158 | rejects invalid, duplicate, and oversized return projections | open |
-| 176 | preserves the list default state without widening the index scan | open |
-| 184 | applies stuck time filters to the expired lease deadline window | open |
-| 205 | defaults and validates the stuck lease deadline window | open |
-| 225 | preserves typed metadata values as bound parameters | open |
-| 240 | rejects unscoped, unbounded, and incomplete collection requests | open |
+| 7 | any strings are literal predicates while atom any explicitly omits optional predicates | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 35 | builds every retired record-read shape as a bound FQL request | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 61 | uses parameters for values and validates dynamic metadata fields | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 103 | builds null predicates without inventing a scalar parameter | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 126 | binds lifecycle state and workflow step as independent predicates | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 142 | builds bounded return projections with safely quoted dynamic fields | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 158 | rejects invalid, duplicate, and oversized return projections | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 176 | preserves the list default state without widening the index scan | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 184 | applies stuck time filters to the expired lease deadline window | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 205 | defaults and validates the stuck lease deadline window | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 225 | preserves typed metadata values as bound parameters | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
+| 240 | rejects unscoped, unbounded, and incomplete collection requests | internal: a client-side FQL builder; the SDKs carry their own, whose text the ports use |
 
 ## `flow/query/commands_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | declares one administrative, read-only, keyless management command | open |
-| 21 | returns actionable usage and availability errors | open |
-| 38 | the default OSS command prepares as an extension instead of a static native AST | open |
-| 58 | does not claim unrelated extension commands | open |
+| 7 | declares one administrative, read-only, keyless management command | internal: Elixir's command table entry |
+| 21 | returns actionable usage and availability errors | fixed (`query::text_tests::index_ids_are_checked_before_their_lookup`; G41; its registry-unavailable case has no counterpart) |
+| 38 | the default OSS command prepares as an extension instead of a static native AST | internal: Elixir's command extension dispatch |
+| 58 | does not claim unrelated extension commands | internal: as line 38 |
 
 ## `flow/query/composite_backfill_test.exs`
 
@@ -294,52 +304,52 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 246 | the embedded API exposes the canonical Flow query entry point | open |
-| 251 | the direct exact-path engine rejects an unsupported physical path | open |
-| 264 | direct exact-path EXPLAIN binds canonical result projections | open |
-| 296 | default query execution uses the bounded state/type index for collection reads | open |
-| 336 | bare state/time pages return public metadata from query rows without payload hydration | open |
-| 431 | default query execution preserves bounded metadata and terminal reads | open |
-| 505 | terminal query returns every state when records share an update timestamp | open |
-| 540 | default metadata queries do not invent a queued-state filter | open |
-| 645 | default query execution preserves bounded lineage and inflight reads | open |
-| 743 | default stuck queries honor descending lease-deadline order before limiting | open |
-| 802 | stuck queries enforce both lease-deadline bounds without widening the index read | open |
-| 850 | malformed canonical envelopes never reach an installed query engine | open |
-| 873 | EXPLAIN rejects an unsupported canonical request version | open |
-| 884 | the engine rejects oversized bound point values before storage | open |
-| 904 | canonical validation rejects oversized values before any installed engine | open |
-| 926 | dispatches a validated canonical request through the installed query engine | open |
-| 943 | an instance freezes its query engine when it is built | open |
-| 969 | explicit per-instance query engines are isolated from application configuration | open |
-| 993 | an instance freezes and exposes its validated query capability manifest | open |
-| 1009 | cached capability manifests cannot bypass request-contract validation | open |
-| 1019 | index status capability and response contract are advertised coherently | open |
-| 1033 | default capabilities advertise the complete cost-aware planner surface | open |
-| 1049 | default capabilities expose the shared bounded response contract | open |
-| 1059 | every default EXPLAIN path matches the advertised OSS contract | open |
-| 1112 | capability support predicates fail closed for malformed provider values | open |
-| 1117 | default capabilities advertise every bounded lineage shape | open |
-| 1130 | instance construction rejects an invalid query engine | open |
-| 1143 | instance construction rejects an invalid query capability manifest | open |
-| 1156 | instance construction rejects capabilities the canonical parser cannot produce | open |
-| 1169 | capability negotiation rejects a surface without a complete request/result pair | open |
-| 1175 | capability negotiation rejects a request contract the parser cannot produce | open |
-| 1181 | keeps scope failures structured, permissioned, and value-free | open |
-| 1188 | query engine failures are fail-closed and never escape the boundary | open |
-| 1213 | query engine preserves canonical structured diagnostics | open |
-| 1246 | point-read storage outages remain structured and safe to retry | open |
-| 1276 | run-id-only point reads retain the direct auto-partition lookup | open |
-| 1301 | event queries retain the direct ordered history path | open |
-| 1326 | history continuation performs bounded exclusive seeks without duplicates | open |
-| 1385 | missing runs return a complete empty history page contract | open |
-| 1416 | history pages fail their raw scan budget without mutating expired LMDB rows | open |
-| 1480 | history pages fail closed when an indexed event payload is missing | open |
-| 1524 | history pages validate a dangling lookahead before issuing a cursor | open |
-| 1568 | parent lineage continuation performs bounded exclusive tuple seeks | open |
-| 1647 | root lineage pages include the authoritative root record within their hard bound | open |
-| 1723 | point reads fail closed when the physical record violates the bound predicates | open |
-| 1768 | point reads classify corrupt encoded records as storage inconsistency | open |
+| 246 | the embedded API exposes the canonical Flow query entry point | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 251 | the direct exact-path engine rejects an unsupported physical path | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 264 | direct exact-path EXPLAIN binds canonical result projections | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 296 | default query execution uses the bounded state/type index for collection reads | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 336 | bare state/time pages return public metadata from query rows without payload hydration | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 431 | default query execution preserves bounded metadata and terminal reads | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 505 | terminal query returns every state when records share an update timestamp | fixed (`audit::query_semantics::a_terminal_read_keeps_every_state_sharing_an_update_time`; G40: Flows created finished were removed at once) |
+| 540 | default metadata queries do not invent a queued-state filter | fixed (`audit::query_semantics::a_metadata_search_adds_no_state_filter`; G40) |
+| 645 | default query execution preserves bounded lineage and inflight reads | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 743 | default stuck queries honor descending lease-deadline order before limiting | ported (`audit::query_semantics::stuck_reads_order_by_lease_deadline_and_keep_both_bounds`) |
+| 802 | stuck queries enforce both lease-deadline bounds without widening the index read | ported (same test) |
+| 850 | malformed canonical envelopes never reach an installed query engine | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 873 | EXPLAIN rejects an unsupported canonical request version | covered: `flow_query::query_failures_carry_codes_and_indexes_describe_the_catalog` (an unsupported version) |
+| 884 | the engine rejects oversized bound point values before storage | covered: `query::reference_bind_tests::bound_ids_stop_at_the_storage_key_bounds` |
+| 904 | canonical validation rejects oversized values before any installed engine | covered: as line 884 |
+| 926 | dispatches a validated canonical request through the installed query engine | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 943 | an instance freezes its query engine when it is built | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 969 | explicit per-instance query engines are isolated from application configuration | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 993 | an instance freezes and exposes its validated query capability manifest | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1009 | cached capability manifests cannot bypass request-contract validation | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1019 | index status capability and response contract are advertised coherently | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1033 | default capabilities advertise the complete cost-aware planner surface | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1049 | default capabilities expose the shared bounded response contract | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1059 | every default EXPLAIN path matches the advertised OSS contract | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1112 | capability support predicates fail closed for malformed provider values | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1117 | default capabilities advertise every bounded lineage shape | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1130 | instance construction rejects an invalid query engine | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1143 | instance construction rejects an invalid query capability manifest | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1156 | instance construction rejects capabilities the canonical parser cannot produce | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1169 | capability negotiation rejects a surface without a complete request/result pair | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1175 | capability negotiation rejects a request contract the parser cannot produce | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1181 | keeps scope failures structured, permissioned, and value-free | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1188 | query engine failures are fail-closed and never escape the boundary | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1213 | query engine preserves canonical structured diagnostics | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1246 | point-read storage outages remain structured and safe to retry | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1276 | run-id-only point reads retain the direct auto-partition lookup | covered: `flow_query::queries_read_the_catalog_now_and_after_a_restart` (point reads in an auto bucket) |
+| 1301 | event queries retain the direct ordered history path | covered: same node test (event history) |
+| 1326 | history continuation performs bounded exclusive seeks without duplicates | covered: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row` (a page resumes after its last row; Elixir's index seeks are its own) |
+| 1385 | missing runs return a complete empty history page contract | ported (`audit::query_semantics::a_missing_run_has_an_empty_history_page`) |
+| 1416 | history pages fail their raw scan budget without mutating expired LMDB rows | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1480 | history pages fail closed when an indexed event payload is missing | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1524 | history pages validate a dangling lookahead before issuing a cursor | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1568 | parent lineage continuation performs bounded exclusive tuple seeks | covered: as line 1326 |
+| 1647 | root lineage pages include the authoritative root record within their hard bound | covered: `audit::lineage::lineage_queries_take_windows_states_order_and_counts` (a root query includes the root) |
+| 1723 | point reads fail closed when the physical record violates the bound predicates | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1768 | point reads classify corrupt encoded records as storage inconsistency | internal: Elixir's query engine installation, capability manifests, physical paths and storage reads; the node evaluates FLOW.QUERY in memory from its shard catalogs |
 
 ## `flow/query/error_test.exs`
 
@@ -369,119 +379,119 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 78 | executes a selective range and evaluates only residual predicates | open |
-| 108 | projects selected fields only after authoritative filtering and ordering | open |
-| 141 | evaluates sparse projections and residual predicates from query rows without log hydration | open |
-| 200 | returns the complete bare run allowlist from query rows without log hydration | open |
-| 257 | prepares the physical state-key prefix once for a query-row page | open |
-| 287 | prepares and applies a selective decoder for non-fused query rows | open |
-| 325 | uses exact dynamic fields for residual checks and response projection | open |
-| 390 | processes a fused composite and QueryRow page without legacy reads | open |
-| 438 | falls back to bounded two-stage reads when the first fused QueryRow exceeds its budget | open |
-| 475 | uses the bounded legacy path when worst-case fused page memory cannot be reserved | open |
-| 524 | rejects forged fused QueryRow byte accounting before decoding | open |
-| 556 | rejects malformed prefetched QueryRow bytes without a legacy retry | open |
-| 586 | rejects a query-row plan with a non-durable locator before log IO | open |
-| 613 | a custom authoritative reader remains an explicit query-row fallback | open |
-| 635 | serves a covered sparse projection without primary-record hydration | open |
-| 662 | serves covered dynamic attributes and state metadata without hydration | open |
-| 728 | rejects a covering index row that omits its required projection | open |
-| 749 | evaluates covered residual predicates without metadata or WAL hydration | open |
-| 776 | counts covering rows without primary-record hydration | open |
-| 794 | rejects a covering row whose payload does not match its index identity | open |
-| 815 | shared execution hydrates only the sealed physical scope and evaluates logical records | open |
-| 846 | shared execution validates and serves a scope-bound covering row | open |
-| 881 | shared execution serves a scope-bound query row without log hydration | open |
-| 946 | rejects a self-consistent plan outside the independently bound scope before storage | open |
-| 968 | stops an order-preserving range after one lookahead result | open |
-| 992 | bounds a covered native-order storage page to the result lookahead | open |
-| 1023 | continues bounded native reads after an expired projection is skipped | open |
-| 1069 | paginates an order-preserving range with an opaque bounded seek cursor | open |
-| 1120 | rejects replaying a cursor with different bound predicate values | open |
-| 1147 | rejects an authenticated oversized native storage cursor before storage | open |
-| 1189 | uses bounded top-K for an explicit non-native numeric order | open |
-| 1219 | bounded top-K does not project candidates that cannot enter the retained heap | open |
-| 1249 | does not revalidate the sealed index definition per hydrated row | open |
-| 1282 | paginates bounded top-K order without duplicates | open |
-| 1298 | paginates a multi-range union in global order after deduplication | open |
-| 1322 | deduplicates a multi-value IN union before hydration | open |
-| 1366 | counts every exact match across bounded pages without retaining result rows | open |
-| 1403 | fully covered counts do not materialize public record maps | open |
-| 1424 | prepared record matching does not reconstruct logical scope per covered count row | open |
-| 1445 | contradictory exact predicates execute as an empty bounded count | open |
-| 1478 | count unions deduplicate multivalue index entries before hydration | open |
-| 1510 | single-range counts do not retain an unnecessary global ID set | open |
-| 1538 | single-range counts reject a duplicate current-version key not owned by the hydrated row | open |
-| 1560 | count budget exhaustion fails instead of returning a partial scalar | open |
-| 1578 | reads covered count prefixes without index scans or row hydration | open |
-| 1603 | falls back to a bounded scan when a covered count can include expired rows | open |
-| 1648 | counts live expiring rows from query metadata during counter fallback | open |
-| 1683 | sums disjoint scalar counter ranges and rejects overflow or prefix mismatch | open |
-| 1730 | returns no partial result when an index-entry budget is exhausted | open |
-| 1749 | rejects a cross-tenant state key before any record read | open |
-| 1776 | rejects underreported range bytes before any record read | open |
-| 1811 | rejects an entry whose decoded binaries exceed its claimed storage bytes | open |
-| 1834 | rejects a malformed final page entry before reading its cursor field | open |
-| 1866 | rejects an oversized projected identity before hashing or hydration | open |
-| 1891 | rejects an out-of-domain projected version before hydration | open |
-| 1914 | rejects an out-of-domain projected expiry before hydration | open |
-| 1937 | rejects an oversized composite storage key before hydration | open |
-| 1972 | detects a projection change between range and row reads | open |
-| 1990 | does not hide a live row behind a stale projected expiry | open |
-| 2009 | serves a live expiring covering row without authoritative hydration | open |
-| 2034 | skips an expired covering row without authoritative hydration | open |
-| 2058 | skips a missing row only when its projected entry is expired | open |
-| 2076 | does not hide a malformed hydrated value behind an expired projected entry | open |
-| 2091 | checks the wall deadline between bounded pages | open |
-| 2115 | checks the wall deadline after a query-row read before validating its rows | open |
-| 2148 | samples the wall deadline during a large covering page | open |
-| 2182 | bounds authoritative reads by the remaining query deadline | open |
-| 2206 | does not start authoritative IO after the query deadline | open |
-| 2234 | reports a deadline that expires during final response assembly | open |
-| 2267 | defers exact response-size enforcement to the response boundary | open |
-| 2314 | accounts for the range page while hydrated rows are live | open |
-| 2334 | rejects a decoded covering page that exceeds the executor memory budget | open |
-| 2358 | rejects decoded record heap that only fits under external-term accounting | open |
-| 2388 | splits an over-budget hydration batch before materializing its records | open |
-| 2419 | resumes a bounded hydration prefix without rereading returned state keys | open |
-| 2465 | rejects a plan whose defensive rechecks do not exactly match the request | open |
-| 2487 | rejects incompatible plan versions and request fingerprints before storage | open |
-| 2510 | rejects a forged index definition and matching forged range before storage | open |
-| 2536 | rejects an empty plan for a non-empty request | open |
-| 2552 | rejects malformed composite range fields before storage | open |
-| 2569 | rejects a tenant-contained range widened beyond the request constraints | open |
-| 2589 | rejects removed plan order states before storage | open |
-| 2610 | rejects an unbounded hydration callback before storage | open |
-| 2631 | generated planned executions agree with the independent reference evaluator | open |
-| 2683 | reads real composite entries from LMDB and authoritative Flow rows from WARaft | open |
-| 2761 | serves real covering composite entries from LMDB without primary rows | open |
+| 78 | executes a selective range and evaluates only residual predicates | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 108 | projects selected fields only after authoritative filtering and ordering | covered: `query::tests::projects_selected_fields_after_filtering_ordering_and_limiting` |
+| 141 | evaluates sparse projections and residual predicates from query rows without log hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 200 | returns the complete bare run allowlist from query rows without log hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 257 | prepares the physical state-key prefix once for a query-row page | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 287 | prepares and applies a selective decoder for non-fused query rows | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 325 | uses exact dynamic fields for residual checks and response projection | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 390 | processes a fused composite and QueryRow page without legacy reads | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 438 | falls back to bounded two-stage reads when the first fused QueryRow exceeds its budget | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 475 | uses the bounded legacy path when worst-case fused page memory cannot be reserved | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 524 | rejects forged fused QueryRow byte accounting before decoding | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 556 | rejects malformed prefetched QueryRow bytes without a legacy retry | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 586 | rejects a query-row plan with a non-durable locator before log IO | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 613 | a custom authoritative reader remains an explicit query-row fallback | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 635 | serves a covered sparse projection without primary-record hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 662 | serves covered dynamic attributes and state metadata without hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 728 | rejects a covering index row that omits its required projection | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 749 | evaluates covered residual predicates without metadata or WAL hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 776 | counts covering rows without primary-record hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 794 | rejects a covering row whose payload does not match its index identity | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 815 | shared execution hydrates only the sealed physical scope and evaluates logical records | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 846 | shared execution validates and serves a scope-bound covering row | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 881 | shared execution serves a scope-bound query row without log hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 946 | rejects a self-consistent plan outside the independently bound scope before storage | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 968 | stops an order-preserving range after one lookahead result | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 992 | bounds a covered native-order storage page to the result lookahead | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1023 | continues bounded native reads after an expired projection is skipped | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1069 | paginates an order-preserving range with an opaque bounded seek cursor | covered: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row` |
+| 1120 | rejects replaying a cursor with different bound predicate values | covered: same test (another query's cursor is refused) |
+| 1147 | rejects an authenticated oversized native storage cursor before storage | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1189 | uses bounded top-K for an explicit non-native numeric order | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1219 | bounded top-K does not project candidates that cannot enter the retained heap | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1249 | does not revalidate the sealed index definition per hydrated row | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1282 | paginates bounded top-K order without duplicates | covered: as line 1069 |
+| 1298 | paginates a multi-range union in global order after deduplication | covered: as line 1069 |
+| 1322 | deduplicates a multi-value IN union before hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1366 | counts every exact match across bounded pages without retaining result rows | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1403 | fully covered counts do not materialize public record maps | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1424 | prepared record matching does not reconstruct logical scope per covered count row | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1445 | contradictory exact predicates execute as an empty bounded count | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1478 | count unions deduplicate multivalue index entries before hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1510 | single-range counts do not retain an unnecessary global ID set | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1538 | single-range counts reject a duplicate current-version key not owned by the hydrated row | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1560 | count budget exhaustion fails instead of returning a partial scalar | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1578 | reads covered count prefixes without index scans or row hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1603 | falls back to a bounded scan when a covered count can include expired rows | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1648 | counts live expiring rows from query metadata during counter fallback | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1683 | sums disjoint scalar counter ranges and rejects overflow or prefix mismatch | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1730 | returns no partial result when an index-entry budget is exhausted | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1749 | rejects a cross-tenant state key before any record read | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1776 | rejects underreported range bytes before any record read | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1811 | rejects an entry whose decoded binaries exceed its claimed storage bytes | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1834 | rejects a malformed final page entry before reading its cursor field | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1866 | rejects an oversized projected identity before hashing or hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1891 | rejects an out-of-domain projected version before hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1914 | rejects an out-of-domain projected expiry before hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1937 | rejects an oversized composite storage key before hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1972 | detects a projection change between range and row reads | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 1990 | does not hide a live row behind a stale projected expiry | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2009 | serves a live expiring covering row without authoritative hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2034 | skips an expired covering row without authoritative hydration | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2058 | skips a missing row only when its projected entry is expired | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2076 | does not hide a malformed hydrated value behind an expired projected entry | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2091 | checks the wall deadline between bounded pages | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2115 | checks the wall deadline after a query-row read before validating its rows | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2148 | samples the wall deadline during a large covering page | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2182 | bounds authoritative reads by the remaining query deadline | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2206 | does not start authoritative IO after the query deadline | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2234 | reports a deadline that expires during final response assembly | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2267 | defers exact response-size enforcement to the response boundary | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2314 | accounts for the range page while hydrated rows are live | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2334 | rejects a decoded covering page that exceeds the executor memory budget | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2358 | rejects decoded record heap that only fits under external-term accounting | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2388 | splits an over-budget hydration batch before materializing its records | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2419 | resumes a bounded hydration prefix without rereading returned state keys | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2465 | rejects a plan whose defensive rechecks do not exactly match the request | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2487 | rejects incompatible plan versions and request fingerprints before storage | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2510 | rejects a forged index definition and matching forged range before storage | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2536 | rejects an empty plan for a non-empty request | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2552 | rejects malformed composite range fields before storage | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2569 | rejects a tenant-contained range widened beyond the request constraints | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2589 | rejects removed plan order states before storage | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2610 | rejects an unbounded hydration callback before storage | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2631 | generated planned executions agree with the independent reference evaluator | internal: Elixir's agreement check between its planned executor and its reference evaluator |
+| 2683 | reads real composite entries from LMDB and authoritative Flow rows from WARaft | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
+| 2761 | serves real covering composite entries from LMDB without primary rows | internal: Elixir's index execution (query rows, covering indexes, fused pages, top-K, counters, budgets, deadlines, plan validation); the node evaluates FLOW.QUERY in memory from its shard catalogs |
 
 ## `flow/query/explain_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | renders deterministic, value-redacted plan evidence | open |
-| 86 | reports compact metadata-row projection without log hydration | open |
-| 106 | reports when a sparse projection is eligible for covering execution | open |
-| 139 | lists alternatives deterministically without physical bounds | open |
-| 190 | renders a stable rejected plan with a bounded reason | open |
-| 227 | renders scalar count semantics without row pagination | open |
-| 243 | describes authoritative history pagination without projection semantics | open |
-| 268 | describes authoritative lineage reads without projection semantics | open |
-| 297 | turns budget plan rejection into bounded remediation instead of crashing | open |
-| 327 | keeps the maximum registry alternative set inside the response budget | open |
-| 355 | adds validated actual counters without changing logical plan evidence | open |
-| 402 | distinguishes expected pressure from the hard execution ceiling | open |
+| 7 | renders deterministic, value-redacted plan evidence | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 86 | reports compact metadata-row projection without log hydration | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 106 | reports when a sparse projection is eligible for covering execution | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 139 | lists alternatives deterministically without physical bounds | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 190 | renders a stable rejected plan with a bounded reason | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 227 | renders scalar count semantics without row pagination | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 243 | describes authoritative history pagination without projection semantics | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 268 | describes authoritative lineage reads without projection semantics | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 297 | turns budget plan rejection into bounded remediation instead of crashing | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 327 | keeps the maximum registry alternative set inside the response budget | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 355 | adds validated actual counters without changing logical plan evidence | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
+| 402 | distinguishes expected pressure from the hard execution ceiling | internal: Elixir's EXPLAIN plan evidence for its indexes; the node's EXPLAIN describes its in-memory evaluation |
 
 ## `flow/query/field_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | normalizes built-in and bounded metadata field names without creating atoms | open |
-| 28 | round-trips metadata names that require bracket quoting | open |
-| 46 | rejects ambiguous, reserved, or oversized metadata paths | open |
-| 58 | distinguishes explicit null from a missing record field | open |
-| 74 | reads string-keyed decoded records without atomizing keys | open |
+| 6 | normalizes built-in and bounded metadata field names without creating atoms | internal: Elixir's field name normalization without atoms |
+| 28 | round-trips metadata names that require bracket quoting | covered: `query::fql::reference_tests::accepts_every_shape_the_reference_parser_accepts` (bracket-quoted names) |
+| 46 | rejects ambiguous, reserved, or oversized metadata paths | covered: `query::fql::reference_tests::refuses_what_the_reference_parser_refuses` (reserved names) |
+| 58 | distinguishes explicit null from a missing record field | covered: `query::tests::null_and_missing_stay_distinct` |
+| 74 | reads string-keyed decoded records without atomizing keys | internal: Elixir's string-keyed record decoding |
 
 ## `flow/query/fixed_index_executor_test.exs`
 
@@ -500,14 +510,14 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 20 | issues an authenticated cursor and resumes from its exclusive event boundary | open |
-| 101 | projects history fields after validating the full page and continuation | open |
-| 134 | bare history returns do not reserve a duplicate output page | open |
-| 169 | rejects history pages containing fields outside the public result allowlist | open |
-| 197 | rejects forged page accounting and malformed cursor continuations | open |
-| 242 | rejects a page whose decoded-record peak exceeds the executor budget | open |
-| 268 | rejects resumed pages that do not advance past the authenticated event boundary | open |
-| 312 | accepts pages of one millisecond in version order | open |
+| 20 | issues an authenticated cursor and resumes from its exclusive event boundary | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 101 | projects history fields after validating the full page and continuation | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 134 | bare history returns do not reserve a duplicate output page | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 169 | rejects history pages containing fields outside the public result allowlist | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 197 | rejects forged page accounting and malformed cursor continuations | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 242 | rejects a page whose decoded-record peak exceeds the executor budget | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 268 | rejects resumed pages that do not advance past the authenticated event boundary | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 312 | accepts pages of one millisecond in version order | covered: `audit::history_requests::event_ids_within_a_millisecond_compare_by_version_number` |
 
 ## `flow/query/index_catalog_test.exs`
 
@@ -705,41 +715,41 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | derives point-value limits from the generated storage key | open |
-| 23 | publishes the bounded query contract from one module | open |
+| 7 | derives point-value limits from the generated storage key | covered: `query::reference_bind_tests::bound_ids_stop_at_the_storage_key_bounds` |
+| 23 | publishes the bounded query contract from one module | internal: Elixir's limits module |
 
 ## `flow/query/lineage_executor_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 19 | issues an authenticated tuple cursor and resumes from its exclusive boundary | open |
-| 107 | projects lineage output after validating identity and order fields | open |
-| 141 | bare lineage returns do not reserve a duplicate output page | open |
-| 177 | rejects lineage pages containing fields outside the public result allowlist | open |
-| 208 | rejects forged page accounting and malformed continuation tuples | open |
-| 253 | rejects a page whose decoded-record peak exceeds the executor budget | open |
-| 279 | rejects resumed pages that do not advance past the authenticated lineage boundary | open |
+| 19 | issues an authenticated tuple cursor and resumes from its exclusive boundary | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 107 | projects lineage output after validating identity and order fields | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 141 | bare lineage returns do not reserve a duplicate output page | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 177 | rejects lineage pages containing fields outside the public result allowlist | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 208 | rejects forged page accounting and malformed continuation tuples | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 253 | rejects a page whose decoded-record peak exceeds the executor budget | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 279 | rejects resumed pages that do not advance past the authenticated lineage boundary | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
 
 ## `flow/query/lineage_read_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 9 | correlation pages seek backward by the exact update tuple | open |
-| 69 | expired cold rows consume the scan window without query-side deletion | open |
-| 125 | dangling lineage index references fail closed | open |
-| 162 | a dangling lookahead cannot produce a false has-more cursor | open |
-| 208 | lineage boundaries reject timestamps outside the exact ordered-index domain | open |
-| 226 | an existing root with an inexact ordering timestamp fails closed | open |
+| 9 | correlation pages seek backward by the exact update tuple | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 69 | expired cold rows consume the scan window without query-side deletion | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 125 | dangling lineage index references fail closed | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 162 | a dangling lookahead cannot produce a false has-more cursor | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 208 | lineage boundaries reject timestamps outside the exact ordered-index domain | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
+| 226 | an existing root with an inexact ordering timestamp fails closed | internal: Elixir's index paging executors (a page resuming after its last row: `query::tests::a_cursor_resumes_its_own_query_after_the_last_row`) |
 
 ## `flow/query/mandatory_scope_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 44 | dedicated scope adds no storage bytes | open |
-| 64 | shared scope is hidden, canonical, and tenant-partitions physical storage | open |
-| 141 | missing shared authority fails closed | open |
-| 148 | forged scope values fail closed | open |
-| 164 | a structurally valid scope is rejected under a different frozen schema | open |
+| 44 | dedicated scope adds no storage bytes | internal: Elixir's embedding storage scope (metadata extension) |
+| 64 | shared scope is hidden, canonical, and tenant-partitions physical storage | internal: Elixir's embedding storage scope (metadata extension) |
+| 141 | missing shared authority fails closed | internal: Elixir's embedding storage scope (metadata extension) |
+| 148 | forged scope values fail closed | internal: Elixir's embedding storage scope (metadata extension) |
+| 164 | a structurally valid scope is rejected under a different frozen schema | internal: Elixir's embedding storage scope (metadata extension) |
 
 ## `flow/query/memory_budget_test.exs`
 
@@ -1013,21 +1023,21 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | uses the same opaque tie breaker as composite entry keys | open |
-| 41 | explicit run-id ordering remains lexical and precedes the opaque final tie breaker | open |
-| 51 | fails closed for an unsupported multi-valued order field | open |
-| 58 | fails closed before encoding an oversized lexical order component | open |
-| 65 | checks bounded key lists in native order without changing tie semantics | open |
+| 7 | uses the same opaque tie breaker as composite entry keys | internal: Elixir's composite-key ordering and tie breaker |
+| 41 | explicit run-id ordering remains lexical and precedes the opaque final tie breaker | internal: Elixir's composite-key ordering and tie breaker |
+| 51 | fails closed for an unsupported multi-valued order field | internal: Elixir's composite-key ordering and tie breaker |
+| 58 | fails closed before encoding an oversized lexical order component | internal: Elixir's composite-key ordering and tie breaker |
+| 65 | checks bounded key lists in native order without changing tie semantics | internal: Elixir's composite-key ordering and tie breaker |
 
 ## `flow/query/record_projection_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | projects structural and bounded user metadata fields | open |
-| 59 | preserves misses and storage errors | open |
-| 64 | projects only requested run fields while preserving nested metadata shape | open |
-| 90 | projects complete run metadata maps when explicitly requested | open |
-| 110 | projects bounded history fields without flattening the response contract | open |
+| 6 | projects structural and bounded user metadata fields | covered: `query::tests::projects_selected_fields_after_filtering_ordering_and_limiting` and the reference projections |
+| 59 | preserves misses and storage errors | internal: Elixir's storage-error markers |
+| 64 | projects only requested run fields while preserving nested metadata shape | covered: `query::tests::projects_selected_fields_after_filtering_ordering_and_limiting` and the reference projections |
+| 90 | projects complete run metadata maps when explicitly requested | covered: `query::tests::projects_selected_fields_after_filtering_ordering_and_limiting` and the reference projections |
+| 110 | projects bounded history fields without flattening the response contract | covered: `query::tests::projects_selected_fields_after_filtering_ordering_and_limiting` and the reference projections |
 
 ## `flow/query/reference_evaluator_test.exs`
 
@@ -1113,51 +1123,51 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | builds one versioned page contract and accounts its complete encoded size | open |
-| 30 | builds record responses directly from covering index rows | open |
-| 47 | response byte accounting is stable after writing any signed response size | open |
-| 65 | rejects the full response instead of returning a partial page | open |
-| 73 | enforces the response budget against the native wire representation | open |
-| 88 | settles a negotiated compact response against its exact representation | open |
-| 141 | rejects inconsistent pagination and usage metadata | open |
-| 152 | rejects pagination metadata above the public cursor limit | open |
-| 159 | rejects malformed outgoing pagination cursors | open |
-| 166 | rejects unsupported quality values in every dimension | open |
-| 175 | fails closed for usage counters outside the native signed integer contract | open |
-| 186 | encodes nested unsigned 64-bit record values | open |
-| 194 | fails closed instead of raising for a nested integer above unsigned 64-bit | open |
-| 201 | builds a non-paginated scalar count without inventing row hydration | open |
-| 222 | settles a compact scalar count with the compact codec size | open |
+| 7 | builds one versioned page contract and accounts its complete encoded size | internal: Elixir's response page contract and budgets |
+| 30 | builds record responses directly from covering index rows | internal: Elixir's response page contract and budgets |
+| 47 | response byte accounting is stable after writing any signed response size | internal: Elixir's response page contract and budgets |
+| 65 | rejects the full response instead of returning a partial page | internal: Elixir's response page contract and budgets |
+| 73 | enforces the response budget against the native wire representation | internal: Elixir's response page contract and budgets |
+| 88 | settles a negotiated compact response against its exact representation | internal: Elixir's response page contract and budgets |
+| 141 | rejects inconsistent pagination and usage metadata | internal: Elixir's response page contract and budgets |
+| 152 | rejects pagination metadata above the public cursor limit | internal: Elixir's response page contract and budgets |
+| 159 | rejects malformed outgoing pagination cursors | internal: Elixir's response page contract and budgets |
+| 166 | rejects unsupported quality values in every dimension | internal: Elixir's response page contract and budgets |
+| 175 | fails closed for usage counters outside the native signed integer contract | internal: Elixir's response page contract and budgets |
+| 186 | encodes nested unsigned 64-bit record values | internal: Elixir's response page contract and budgets |
+| 194 | fails closed instead of raising for a nested integer above unsigned 64-bit | internal: Elixir's response page contract and budgets |
+| 201 | builds a non-paginated scalar count without inventing row hydration | covered: `flow_query::queries_read_the_catalog_now_and_after_a_restart` (a scalar count answers no page) |
+| 222 | settles a compact scalar count with the compact codec size | internal: Elixir's response page contract and budgets |
 
 ## `flow/query/result_codec_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 11 | the frozen wire schema covers the complete public result contract | open |
-| 18 | encodes the shared cross-SDK golden corpus byte for byte | open |
-| 65 | encodes a record page with one fixed schema and exact response bytes | open |
-| 130 | encodes scalar counts without a record or page envelope | open |
-| 150 | measures the exact compact payload without changing response usage | open |
-| 178 | encodes and measures a validated response in one pass | open |
-| 197 | encodes history records and preserves present nil separately from missing fields | open |
-| 218 | encodes sparse projected rows without placeholders for omitted fields | open |
-| 243 | explicit projection materially reduces encoded result work for metadata-heavy rows | open |
-| 271 | encodes every currently emitted quality combination | open |
-| 296 | keeps every public run field at its frozen bitmap position | open |
-| 319 | accepts string-keyed native response maps without changing their wire schema | open |
-| 333 | falls back for unknown contracts, fields, quality values, and unencodable values | open |
-| 355 | fails closed outside the public count, cursor, row, and usage bounds | open |
-| 376 | fails closed for structurally inconsistent usage | open |
-| 400 | keeps representative record pages materially smaller than typed maps | open |
+| 11 | the frozen wire schema covers the complete public result contract | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 18 | encodes the shared cross-SDK golden corpus byte for byte | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 65 | encodes a record page with one fixed schema and exact response bytes | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 130 | encodes scalar counts without a record or page envelope | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 150 | measures the exact compact payload without changing response usage | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 178 | encodes and measures a validated response in one pass | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 197 | encodes history records and preserves present nil separately from missing fields | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 218 | encodes sparse projected rows without placeholders for omitted fields | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 243 | explicit projection materially reduces encoded result work for metadata-heavy rows | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 271 | encodes every currently emitted quality combination | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 296 | keeps every public run field at its frozen bitmap position | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 319 | accepts string-keyed native response maps without changing their wire schema | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 333 | falls back for unknown contracts, fields, quality values, and unencodable values | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 355 | fails closed outside the public count, cursor, row, and usage bounds | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 376 | fails closed for structurally inconsistent usage | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
+| 400 | keeps representative record pages materially smaller than typed maps | internal: Elixir's negotiated compact result codec; the node answers the typed result map, which the SDKs read |
 
 ## `flow/query/shape_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | classifies point and history requests with their execution descriptors | open |
-| 34 | classifies generic, count, lineage, and fixed-index collection shapes | open |
-| 96 | the default OSS engine owns every parser-supported execution shape | open |
-| 108 | rejects ranges that cannot be represented exactly by fixed score indexes | open |
+| 6 | classifies point and history requests with their execution descriptors | internal: Elixir's execution shape classification |
+| 34 | classifies generic, count, lineage, and fixed-index collection shapes | internal: Elixir's execution shape classification |
+| 96 | the default OSS engine owns every parser-supported execution shape | internal: Elixir's execution shape classification |
+| 108 | rejects ranges that cannot be represented exactly by fixed score indexes | internal: Elixir's execution shape classification |
 
 ## `flow/query/source_catalog_test.exs`
 

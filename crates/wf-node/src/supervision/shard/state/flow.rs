@@ -47,10 +47,7 @@ impl ShardState {
             return (Err(error), None);
         }
         match command {
-            FlowCommand::Create(create) => {
-                let now = create.now_ms.unwrap_or(now);
-                self.create_flow(now, *create, partition)
-            }
+            FlowCommand::Create(create) => self.create_flow(now, *create, partition),
             FlowCommand::Get(get) => (Ok(self.get_flow(now, &get, partition)), None),
             FlowCommand::History(query) => (Ok(self.history_term(&query, partition)), None),
             FlowCommand::Mutate(mutation) => self.mutate(now, &mutation, partition),
@@ -184,25 +181,35 @@ impl ShardState {
         })
     }
 
+    /// Creates a Flow at its command time (the client's `now_ms`, else
+    /// `wall`, the shard's clock).
     pub(super) fn create_flow(
         &mut self,
-        now: u64,
+        wall: u64,
         create: CreateFlow,
         partition: Partition,
     ) -> Executed {
+        let now = create.now_ms.unwrap_or(wall);
         let key = flow_key(partition, create.id.clone());
         if let Some(existing) = self.hot(&key) {
             return (self.duplicate(&key, existing, &create), None);
         }
         let explicit = Some(create.partition_key.is_some());
         let entry = (create.flow_type.as_slice(), create.state.as_slice());
-        let meta = match self
+        let mut meta = match self
             .fifo_guard(entry, false, create.priority, explicit)
             .and_then(|()| self.new_meta(&create))
         {
             Ok(meta) => meta,
             Err(error) => return (Err(error), None),
         };
+        // A Flow created finished keeps its retention from the command's
+        // time, never before the shard's clock, as one that finishes later
+        // does (audit gaps G13, G40).
+        if super::children::terminal(&create.state) {
+            let start = now.max(wall);
+            meta.terminal_until = Some(start.saturating_add(meta.retention_ttl_ms));
+        }
         let command = CommittedCommand {
             id: match RecordId::new(create.id.clone()) {
                 Ok(id) => id,

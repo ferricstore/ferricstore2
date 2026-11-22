@@ -54,6 +54,15 @@ pub fn parse(args: &[Term]) -> Result<Indexes, FlowError> {
     }
 }
 
+/// Elixir's index id: 1 to 64 bytes of letters, digits, `_`, `-`, `:` and
+/// `.`.
+fn valid_id(id: &[u8]) -> bool {
+    (1..=64).contains(&id.len())
+        && id
+            .iter()
+            .all(|byte| byte.is_ascii_alphanumeric() || b"_-:.".contains(byte))
+}
+
 fn texts(items: &[&str]) -> Term {
     Term::List(items.iter().map(|item| Term::text(item)).collect())
 }
@@ -171,6 +180,14 @@ fn catalog(shards: u64, now_ms: u64) -> Term {
 /// # Errors
 /// Elixir's text for an index id this node does not have.
 pub fn reply(request: &Indexes, shards: usize, now_ms: u64) -> Result<Term, FlowError> {
+    // An id is checked before its lookup, as Elixir's
+    // `IndexDefinition.valid_id?` does (audit gap G41).
+    if request.id.as_ref().is_some_and(|id| !valid_id(id)) {
+        return Err(FlowError::rejected(format!(
+            "ERR invalid query index id; use {}",
+            USAGE.trim_start_matches("ERR syntax error; use ")
+        )));
+    }
     if request
         .id
         .as_ref()

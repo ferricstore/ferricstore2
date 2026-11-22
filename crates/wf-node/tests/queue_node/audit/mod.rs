@@ -44,6 +44,7 @@ mod policy_commands;
 mod policy_lifecycle;
 mod priority_retries;
 mod priority_shards;
+mod query_semantics;
 mod read_api;
 mod reclaim_batches;
 mod records_and_claims;
