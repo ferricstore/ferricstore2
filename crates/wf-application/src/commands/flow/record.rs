@@ -75,7 +75,8 @@ pub struct FlowMeta {
     /// The attribute names its type's policy indexed when the Flow was last
     /// written: the attributes broad reads see (ADR-014 step 11).
     pub indexed_attributes: Vec<String>,
-    /// The state metadata key its type's policy indexed then.
+    /// Kept in the stored format only: reads take the key from the type's
+    /// current policy (audit gap G31), and writes no longer stamp it.
     pub indexed_state_meta: Option<String>,
     /// Effects and governance ledger (ADR-014 step 14).
     pub governance: Option<Box<super::effect::Governance>>,

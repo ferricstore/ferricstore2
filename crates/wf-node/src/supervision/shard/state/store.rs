@@ -59,9 +59,11 @@ impl ShardState {
         self.write(key, flow, previous, events);
     }
 
-    /// A live whole-Flow write records the attribute names and state
-    /// metadata key its type's policy indexes now, as Elixir refreshes them
-    /// on each write (ADR-014 step 11); replay keeps the logged ones.
+    /// A live whole-Flow write records the attribute names its type's
+    /// policy indexes now, as Elixir refreshes them on each write (ADR-014
+    /// step 11; a policy change is future-only for them, as in Elixir);
+    /// replay keeps the logged ones. The state metadata key is read from
+    /// the policy instead (audit gap G31).
     /// Reducer writes (`store`) keep the names the Flow had, since their
     /// replay could not see the policy of the moment.
     fn stamped(
@@ -75,7 +77,6 @@ impl ShardState {
             meta.indexed_attributes = policy
                 .and_then(|policy| policy.indexed_attributes.clone())
                 .unwrap_or_default();
-            meta.indexed_state_meta = policy.and_then(|policy| policy.indexed_state_meta.clone());
         }
         (record, priority, meta)
     }

@@ -77,12 +77,17 @@ impl ShardState {
         }
     }
 
-    fn view<'a>(key: &'a Key, entry: &'a Entry, defaults: &'a FlowMeta) -> View<'a> {
+    /// The reply view of a Flow; its indexed state metadata key is its
+    /// type's policy's now (audit gap G31).
+    fn view<'a>(&'a self, key: &'a Key, entry: &'a Entry, defaults: &'a FlowMeta) -> View<'a> {
         View {
             record: &entry.record,
             partition: &key.0,
             priority: entry.priority,
             meta: entry.meta.as_deref().unwrap_or(defaults),
+            indexed_state_meta: self
+                .policy(entry.record.workflow_type())
+                .and_then(|installed| installed.policy.indexed_state_meta.as_deref()),
         }
     }
 
@@ -99,7 +104,7 @@ impl ShardState {
         let defaults = self.defaults();
         // A query row may name a finished Flow on disk (ADR-016).
         let (key, entry) = self.seen_kv(key)?;
-        Some(Self::view(key, &entry, &defaults).term(include))
+        Some(self.view(key, &entry, &defaults).term(include))
     }
 
     /// `FLOW.HISTORY`: the selected events, or none for a missing Flow.
@@ -133,7 +138,7 @@ impl ShardState {
         let Some((stored, entry)) = self.hot_kv(&key) else {
             return Term::Nil;
         };
-        let term = Self::view(stored, entry, &defaults).term(&get.include);
+        let term = self.view(stored, entry, &defaults).term(&get.include);
         let attached = super::value::requested_refs(entry, &get.include.values);
         let term = self.with_attached(term, now, attached);
         self.with_payload_ref(term, now, &key, &get.include)

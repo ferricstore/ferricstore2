@@ -66633,3 +66633,25 @@ Mutation checks (three runs each): no mixed check, no top counts, no
 ready-first round, a top count capped at one, and the lowest priority
 taken as the top each fail a test (the last after the order of the reply
 was asserted; sorted ids hid it).
+
+The SDK queue benchmark (400k Flows, 4 clients, 3 alternating runs)
+compared 17ed491 (G25) with 8e36f81 (G26-G30): 270-287k against 270-278k
+Flows/s and 8.3-8.7 against 8.4-8.6 ms CPU per 1k Flows, within noise.
+
+### Flow test audit: state metadata (22 Nov)
+
+`flow_state_meta_test.exs` ported (`audit::state_meta`): per-state
+metadata across states and a restart, separator-bearing names, searches
+as the SDK's `FLOW.QUERY` text (before and after the index policy, in
+terminal states, gone after retention), bounds and nulls. G31 closed.
+RED: after `indexed_state_meta` moved from `version` to `owner`, the
+existing Flow still answered `version`. The record view now takes the key
+from the type's current policy, and writes stop stamping it (the field
+stays in the stored format, unread). I first did the same for indexed
+attribute names and stats across states (RED there too: a count of 0),
+then found Elixir's "indexed attribute policy changes are future-only for
+broad indexes", which the node's `flow_info` test already ports; that
+part was reverted, so attribute names stay as written. Reading the stored
+key instead of the policy's fails the test. Its LMDB rows, migration
+worker, value discovery API and out-of-range integers (the protocol's are
+64-bit) are Elixir's.

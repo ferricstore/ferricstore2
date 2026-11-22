@@ -143,6 +143,12 @@ Gaps found so far:
   each round goes to the shards at the highest, for that many. Otherwise
   the first round goes to shards with ready Flows (ready work before
   expired leases), as G25 did.
+- G31 (closed): a record's `indexed_state_meta` was stamped when the
+  Flow was written and never changed, so after a policy changed or
+  removed the key existing Flows reported the old one; Elixir's migration
+  moves them. GET reads the key from the type's current policy (searches
+  never depended on it). Attribute names stay as written: Elixir makes
+  attribute index changes future-only.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -719,19 +725,19 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 36 | state_meta stores durable per-state metadata and survives later states | open |
-| 88 | claim preserves separator-bearing type and state index components | open |
-| 119 | state_meta version is queryable only when policy indexes that metadata key | open |
-| 180 | state metadata value discovery returns bounded typed counts from its index | open |
-| 210 | indexed state_meta policy backfills existing flow records | open |
-| 273 | changing or removing indexed state_meta policy deletes stale LMDB query rows | open |
-| 315 | indexed state_meta can query terminal state metadata | open |
-| 362 | retention cleanup deletes indexed state_meta query rows from LMDB | open |
-| 438 | state_meta and indexed_state_meta stay bounded | open |
-| 455 | rejects a state_meta merge that would overflow an existing state entry | open |
-| 495 | explicit null state_meta values survive the durable codec | open |
-| 512 | rejects state_meta numbers that cannot be represented by query and native codecs | open |
-| 547 | state_meta update rejects growth beyond the entry cap atomically | open |
+| 36 | state_meta stores durable per-state metadata and survives later states | ported (`audit::state_meta::state_metadata_is_kept_per_state_across_states_and_restarts`; its codec round trip as a restart) |
+| 88 | claim preserves separator-bearing type and state index components | ported (`audit::state_meta::a_claim_keeps_type_and_state_names_holding_separators`) |
+| 119 | state_meta version is queryable only when policy indexes that metadata key | ported (`audit::state_meta::searches_find_state_metadata_before_and_after_the_index_policy`) |
+| 180 | state metadata value discovery returns bounded typed counts from its index | internal: Elixir's `ReadAPI.state_meta_values` has no command, and the SDK has none |
+| 210 | indexed state_meta policy backfills existing flow records | ported (same search test; its LMDB rows are Elixir's) |
+| 273 | changing or removing indexed state_meta policy deletes stale LMDB query rows | fixed (`audit::state_meta::the_indexed_key_follows_the_policy`; G31; its LMDB rows as the record's key and searches) |
+| 315 | indexed state_meta can query terminal state metadata | ported (same search test) |
+| 362 | retention cleanup deletes indexed state_meta query rows from LMDB | ported (`audit::state_meta::retention_cleanup_removes_a_finished_flow_from_searches`; its LMDB rows as searches) |
+| 438 | state_meta and indexed_state_meta stay bounded | ported (`audit::state_meta::state_metadata_and_its_index_stay_bounded`) |
+| 455 | rejects a state_meta merge that would overflow an existing state entry | ported (same test) |
+| 495 | explicit null state_meta values survive the durable codec | ported (`audit::state_meta::null_values_and_64_bit_bounds_are_kept`) |
+| 512 | rejects state_meta numbers that cannot be represented by query and native codecs | ported (same test: the bounds are kept; out-of-range integers cannot be sent, as the protocol's integers are 64-bit) |
+| 547 | state_meta update rejects growth beyond the entry cap atomically | ported (`audit::state_meta::state_metadata_and_its_index_stay_bounded`) |
 
 ## `flow/read_api_test.exs`
 

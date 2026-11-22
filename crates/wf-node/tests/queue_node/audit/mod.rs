@@ -38,6 +38,7 @@ mod reclaim_batches;
 mod records_and_claims;
 mod shared_values;
 mod signal;
+mod state_meta;
 mod steps_contract;
 mod terminal_batches;
 mod transition_guards;

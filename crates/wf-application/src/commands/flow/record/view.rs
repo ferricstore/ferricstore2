@@ -21,6 +21,10 @@ pub struct View<'a> {
     pub priority: u8,
     /// Extra fields.
     pub meta: &'a FlowMeta,
+    /// The state metadata key its type's policy indexes now: existing
+    /// Flows follow a policy change, as Elixir's migration moves them
+    /// (audit gap G31).
+    pub indexed_state_meta: Option<&'a str>,
 }
 
 /// Elixir's `ValueHydration.apply_value_result`: the value and its size, or
@@ -260,7 +264,7 @@ impl View<'_> {
             let names = meta.indexed_attributes.iter().map(|name| Term::text(name));
             entries.push(("indexed_attributes", Term::List(names.collect())));
         }
-        if let Some(key) = &meta.indexed_state_meta {
+        if let Some(key) = self.indexed_state_meta {
             entries.push(("indexed_state_meta", Term::text(key)));
         }
         match meta.max_active_ms {
