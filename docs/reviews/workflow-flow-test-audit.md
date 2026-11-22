@@ -157,6 +157,10 @@ Gaps found so far:
 - G33 (closed): a child group's id, wait state and exhaust states were not
   bounded: a 129-byte group id or a 65-byte state was accepted. They take
   128 and 64 bytes, with Elixir's texts.
+- G34 (closed): a claim's states and partitions were not bounded (65
+  states were taken), and a lease deadline past the exact integer ceiling
+  had its own text. A claim's states times partitions stay within 64, as
+  Elixir bounds every claim, and the deadline refusal uses Elixir's text.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -852,15 +856,15 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | wait_keys supports explicit state | open |
-| 12 | wait_keys rejects a state filter whose expanded footprint is unbounded | open |
-| 19 | wait_keys rejects a partition filter whose expanded footprint is unbounded | open |
-| 26 | wait_keys bounds the combined state and partition footprint | open |
-| 42 | wait_keys accounts for encoded type and state bytes before generating internal keys | open |
-| 50 | return_records supports compact jobs | open |
-| 61 | claim_due rejects inexact lease timestamps before routing | open |
-| 93 | claim_due rejects block timeouts larger than the VM timer limit before routing | open |
-| 101 | claim_due rejects payload hydration above the configured ceiling before routing | open |
+| 7 | wait_keys supports explicit state | internal: Elixir's claim waiter keys |
+| 12 | wait_keys rejects a state filter whose expanded footprint is unbounded | fixed (`audit::claim_api::a_claims_states_times_partitions_stay_within_64`; G34) |
+| 19 | wait_keys rejects a partition filter whose expanded footprint is unbounded | fixed (same test; G34) |
+| 26 | wait_keys bounds the combined state and partition footprint | fixed (same test; G34) |
+| 42 | wait_keys accounts for encoded type and state bytes before generating internal keys | internal: Elixir's key-size check on generated waiter keys |
+| 50 | return_records supports compact jobs | ported (`audit::claim_api::a_compact_claim_answers_id_partition_lease_and_fence`) |
+| 61 | claim_due rejects inexact lease timestamps before routing | fixed (`audit::claim_api::claim_times_and_sizes_stay_within_their_ceilings`; G34: the deadline text) |
+| 93 | claim_due rejects block timeouts larger than the VM timer limit before routing | ported (same test) |
+| 101 | claim_due rejects payload hydration above the configured ceiling before routing | ported (same test) |
 
 ## `flow/mutation_attrs_test.exs`
 

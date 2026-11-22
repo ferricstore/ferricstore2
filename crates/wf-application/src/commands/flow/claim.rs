@@ -16,6 +16,8 @@ mod filters;
 use filters::states;
 pub(super) use filters::values;
 
+/// Most states times partitions one claim names.
+const MAX_FOOTPRINT: usize = 64;
 const ALLOWED: &[&str] = &[
     "type",
     "state",
@@ -173,6 +175,17 @@ fn include(opts: &Opts<'_>, records: bool) -> Result<Option<Include>, FlowError>
     }))
 }
 
+/// Elixir's claim filter footprint (audit gap G34): the states named times
+/// the partitions named stay within 64, each counting at least one.
+fn footprint(states: usize, partitions: usize) -> Result<(), FlowError> {
+    if states.max(1) > MAX_FOOTPRINT.checked_div(partitions.max(1)).unwrap_or(0) {
+        return Err(FlowError::rejected(format!(
+            "ERR flow claim filter footprint exceeds maximum {MAX_FOOTPRINT}"
+        )));
+    }
+    Ok(())
+}
+
 /// Reads `FLOW.CLAIM_DUE` or `FLOW.RECLAIM`.
 ///
 /// # Errors
@@ -221,7 +234,7 @@ pub fn parse(name: &str, args: &Term) -> Result<ParsedClaim, FlowError> {
     {
         return Err(FlowError::flow(
             "lease_ms",
-            "deadline exceeds the exact integer limit",
+            &format!("deadline exceeds maximum {}", super::MAX_EXACT),
         ));
     }
     let shape = shape(opts.get("return"))?;
@@ -246,6 +259,7 @@ pub fn parse(name: &str, args: &Term) -> Result<ParsedClaim, FlowError> {
         value => value,
     };
     let (partitions, any_partition) = partitions(&opts)?;
+    footprint(states.len(), partitions.as_ref().map_or(0, Vec::len))?;
     let request = ClaimFlows {
         flow_type,
         states,

@@ -66682,3 +66682,16 @@ states, lineage at 256 or unbounded) fails a test; the failure state's
 first survived until the test gave it its own case. Its Flows stored
 before the limits came through Elixir's uncapped internal create, which
 the node has no form of.
+
+### Flow test audit: pipeline reads, FIFO lanes, claim API (22 Nov)
+
+`flow/pipeline_history_read_test.exs` and `flow/fifo_lane_test.exs` are
+Elixir's modules (pipelined history callbacks, lane member codecs, native
+lane indexes); the lane behaviour they serve is in the node's `flow_fifo`
+tests. `flow/claim_due_api_test.exs` ported (`audit::claim_api`). G34
+closed. RED: a claim naming 65 states answered `[]`, and a lease deadline
+past 2^53-1 answered "exceeds the exact integer limit" where Elixir says
+"exceeds maximum 9007199254740991". `claim::footprint` refuses a claim
+whose states times partitions pass 64 (each counting at least one), as
+Elixir's `ClaimFilter` does for every claim; dropping the check, refusing
+at 64 or ignoring the partitions each fail the test.

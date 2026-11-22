@@ -19,6 +19,7 @@ mod batch_moves;
 mod batches;
 mod children_joins;
 mod children_rules;
+mod claim_api;
 mod claim_reads;
 mod create_many;
 mod history_filters;
